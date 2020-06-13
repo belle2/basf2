@@ -85,7 +85,7 @@ def draw_bklmhists(file_chain):
     Draw the BKLMHit2d-related distributions.
     """
 
-    contact = 'Giacomo De Pietro (giacomo.depietro@roma3.infn.it)'
+    contact = 'Martina Laurenza (martina.laurenza@roma3.infn.it)'
 
     # Shifter plots
 
@@ -102,7 +102,8 @@ def draw_bklmhists(file_chain):
     section = TH1F('Forward', 'Section for BKLMHit2ds', 2, -0.5, 1.5)
     file_chain.Draw('BKLMHit2ds.getSection()>>Forward', '')
     section.GetXaxis().SetTitle('0=backward  1=forward')
-    section.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if a muon hit is in backward (0) or forward (1) BKLM'))
+    section.GetListOfFunctions().Add(TNamed('Description',
+                                            'Flag indicating if a muon hit is in backward (0) or forward (1) BKLM'))
     section.GetListOfFunctions().Add(TNamed('Check', 'Somewhat more hits in the backward'))
     section.GetListOfFunctions().Add(TNamed('Contact', contact))
     section.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
@@ -112,8 +113,8 @@ def draw_bklmhists(file_chain):
     isOnTrack = TH1F('IsOnTrack', 'IsOnTrack for BKLMHit2ds', 2, -0.5, 1.5)
     file_chain.Draw('BKLMHit2ds.isOnTrack()>>IsOnTrack', '')
     isOnTrack.GetXaxis().SetTitle('0=not associated with Track  1=associated with Track')
-    isOnTrack.GetListOfFunctions().Add(TNamed('Description', 'Flag indicating if a muon hit
-                                              is associated with a CDC Track by Muid'))
+    isOnTrack.GetListOfFunctions().Add(TNamed('Description',
+                                              'Flag indicating if a muon hit is associated with a CDC Track by Muid'))
     isOnTrack.GetListOfFunctions().Add(TNamed('Check', 'Mostly associated'))
     isOnTrack.GetListOfFunctions().Add(TNamed('Contact', contact))
     isOnTrack.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
@@ -163,6 +164,16 @@ def draw_bklmhists(file_chain):
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
+    h2dtresRPC = ROOT.TH1F('muon.h2dtresRPC', 'BKLM muon 2d hits time resolution in RPC', 100, -10, 10)
+    file_chain.Draw('BKLMHit2ds.getTime()-KLMDigits.getMCTime()>>muon_h2dtresRPC',
+                    'KLMDigits.getSubdetector()==1 && BKLMHit2ds.inRPC()==1')
+    h2dtresRPC.SetXTitle('ns')
+    h2dtresRPC.GetListOfFunctions().Add(TNamed('Description', 'Time resolution'))
+    h2dtresRPC.GetListOfFunctions().Add(TNamed('Check', 'No Bias.'))
+    h2dtresRPC.GetListOfFunctions().Add(TNamed('Contact', contact))
+    h2dtresRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
+    h2dtresRPC.Write()
+
     timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 100, -2.0, 2.0)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeRPC', 'BKLMHit2ds.inRPC()==1')
     timeRPC.GetXaxis().SetTitle('t (ns)')
@@ -171,6 +182,16 @@ def draw_bklmhists(file_chain):
     timeRPC.GetListOfFunctions().Add(TNamed('Contact', contact))
     timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeRPC.Write()
+
+    h2dtresSci = ROOT.TH1F('muon.h2dtresSci', 'BKLM muon 2d hits time resolution in Scintillator', 100, -10, 10)
+    file_chain.Draw('BKLMHit2ds.getTime()-KLMDigits.getMCTime()>>muon_h2dtresSci',
+                    'KLMDigits.getSubdetector()==1 && BKLMHit2ds.inRPC()==0')
+    h2dtresSci.SetXTitle('ns')
+    h2dtresSci.GetListOfFunctions().Add(TNamed('Description', 'Time resolution'))
+    h2dtresSci.GetListOfFunctions().Add(TNamed('Check', 'No Bias.'))
+    h2dtresSci.GetListOfFunctions().Add(TNamed('Contact', contact))
+    h2dtresSci.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
+    h2dtresSci.Write()
 
     timeSci = TH1F('TimeSci', 'Hit time for BKLMHit2ds in scintillators', 100, -5.0, 15.0)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeSci', 'BKLMHit2ds.inRPC()==0')
@@ -201,36 +222,6 @@ def draw_bklmhists(file_chain):
     edep.GetListOfFunctions().Add(TNamed('Contact', contact))
     edep.GetListOfFunctions().Add(TNamed('MetaOptions', 'expert,pvalue-warn=1.00,pvalue-error=0.01'))
     edep.Write()
-
-    xy = TH2F('xy', 'y vs x for BKLMHit2ds', 140, -350.0, 350.0, 140, -350.0, 350.0)
-    file_chain.Draw('BKLMHit2ds.getGlobalPosition().Y():BKLMHit2ds.getGlobalPosition().X()>>xy', '')
-    xy.GetXaxis().SetTitle('x (cm)')
-    xy.GetYaxis().SetTitle('y (cm)')
-    xy.GetListOfFunctions().Add(TNamed('Description', 'Position projected into transverse plane of muon hit'))
-    xy.GetListOfFunctions().Add(TNamed('Check', 'Octagonal pattern with layers'))
-    xy.GetListOfFunctions().Add(TNamed('Contact', contact))
-    xy.GetListOfFunctions().Add(TNamed('MetaOptions', 'box, expert'))
-    xy.Write()
-
-    xz = TH2F('xz', 'x vs z for BKLMHit2ds', 140, -300.0, 400.0, 140, -350.0, 350.0)
-    file_chain.Draw('BKLMHit2ds.getGlobalPosition().X():BKLMHit2ds.getGlobalPosition().Z()>>xz', '')
-    xz.GetXaxis().SetTitle('z (cm)')
-    xz.GetYaxis().SetTitle('x (cm)')
-    xz.GetListOfFunctions().Add(TNamed('Description', 'Position projected into x-z plane of muon hit'))
-    xz.GetListOfFunctions().Add(TNamed('Check', ' '))
-    xz.GetListOfFunctions().Add(TNamed('Contact', contact))
-    xz.GetListOfFunctions().Add(TNamed('MetaOptions', 'box, expert'))
-    xz.Write()
-
-    yz = TH2F('yz', 'y vs z for BKLMHit2ds', 140, -300.0, 400.0, 140, -350.0, 350.0)
-    file_chain.Draw('BKLMHit2ds.getGlobalPosition().Y():BKLMHit2ds.getGlobalPosition().Z()>>yz', '')
-    yz.GetXaxis().SetTitle('z (cm)')
-    yz.GetYaxis().SetTitle('y (cm)')
-    yz.GetListOfFunctions().Add(TNamed('Description', 'Position projected into y-z plane of muon hit'))
-    yz.GetListOfFunctions().Add(TNamed('Check', ' '))
-    yz.GetListOfFunctions().Add(TNamed('Contact', contact))
-    yz.GetListOfFunctions().Add(TNamed('MetaOptions', 'box, expert'))
-    yz.Write()
 
 
 # Entry point of this script: call the main() function

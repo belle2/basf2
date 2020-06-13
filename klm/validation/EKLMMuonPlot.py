@@ -4,7 +4,7 @@
 """
 <header>
     <input>EKLMMuonOutput.root</input>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Martina Laurenza (martina.laurenza@roma3.infn.it)</contact>
     <description>Creation of EKLM muon validation plots.</description>
 </header>
 """

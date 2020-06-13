@@ -71,7 +71,7 @@ rec.add_reconstruction(path=main_path)
 
 main_path.add_module('RootOutput',
                      outputFileName=output_filename,
-                     branchNames=['MCParticles', 'ExtHits', 'Muids', 'KLMDigits', 'BKLMHit2ds', 'EKLMHit2ds'])
+                     branchNames=['MCParticles', 'KLMMuidLikelihoods', 'KLMDigits', 'BKLMHit2ds', 'EKLMHit2ds'])
 
 b2.process(main_path)
 print(b2.statistics)

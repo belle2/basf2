@@ -233,7 +233,7 @@ namespace {
     if (!MCMatching::isFSP(absPDG)) {
       if (property & Particle::PropertyFlags::c_IsIgnoreIntermediate)
         return true;
-    } else if (absPDG == 22) { // gamma
+    } else if (absPDG == Const::photon.getPDGCode()) { // gamma
       if (mcDaug->hasStatus(MCParticle::c_IsFSRPhoton) or mcDaug->hasStatus(MCParticle::c_IsPHOTOSPhoton)) {
         if (property & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons)
           return true;
@@ -244,7 +244,7 @@ namespace {
     } else if (absPDG == 12 or absPDG == 14 or absPDG == 16) { // neutrino
       if (property & Particle::PropertyFlags::c_IsIgnoreNeutrino)
         return true;
-    } else { // otherwise, massing FSP
+    } else { // otherwise, massive FSP
       if (property & Particle::PropertyFlags::c_IsIgnoreMassive)
         return true;
     }
@@ -564,7 +564,7 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
 
     if (!isFSP(generatedPDG)) {
       flags |= c_MissingResonance;
-    } else if (generatedPDG == 22) { //missing photon
+    } else if (generatedPDG == Const::photon.getPDGCode()) { //missing photon
       if (AnalysisConfiguration::instance()->useLegacyMCMatching()) {
         if (flags & (c_MissFSR | c_MissGamma)) {
           // if flags already have c_MissFSR or c_MissGamm, do nothing.

@@ -11,17 +11,8 @@
 #ifndef CDCDEDXSCANMODULE_H
 #define CDCDEDXSCANMODULE_H
 
-#include <reconstruction/dataobjects/DedxConstants.h>
-
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
-
-#include <string>
-#include <vector>
-#include <TFile.h>
-#include <TTree.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 

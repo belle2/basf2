@@ -18,12 +18,8 @@
 #include <reconstruction/modules/KlId/KLMExpert/KlId.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
-#include <TTree.h>
 #include <TFile.h>
-#include <TH1F.h>
 #include <TGraph.h>
-#include <TString.h>
-#include <TCut.h>
 #include <cstring>
 
 using namespace Belle2;

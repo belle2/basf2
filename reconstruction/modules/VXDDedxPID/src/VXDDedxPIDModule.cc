@@ -12,22 +12,17 @@
 #include <reconstruction/modules/VXDDedxPID/HelixHelper.h>
 
 #include <framework/gearbox/Const.h>
-#include <framework/utilities/FileSystem.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <genfit/MaterialEffects.h>
 
-#include <TFile.h>
 #include <TH2F.h>
-#include <TMath.h>
 
 #include <memory>
 #include <cassert>
 #include <cmath>
 #include <algorithm>
-#include <utility>
 
 using namespace Belle2;
 using namespace Dedx;

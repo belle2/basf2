@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
 #include <TFile.h>

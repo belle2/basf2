@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 
 #include <TObject.h>
-#include <map>
 
 namespace Belle2 {
 

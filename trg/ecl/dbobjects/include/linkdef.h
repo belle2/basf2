@@ -9,6 +9,6 @@
 #pragma link C++ class Belle2::TRGECLTMMPara+;
 #pragma link C++ class Belle2::TRGECLETMPara+;
 #pragma link C++ class Belle2::TRGECLBadRun+;
-#pragma link C++ class Belle2::TrgEclDatabaseImporter+;
+#pragma link C++ class Belle2::TrgEclDatabaseImporter-;
 
 #endif

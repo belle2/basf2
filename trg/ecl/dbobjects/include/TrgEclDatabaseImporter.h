@@ -63,8 +63,6 @@ namespace Belle2 {
     int endExp;
     //! End Run Number
     int endRun;
-    //! Class Def
-    ClassDef(TrgEclDatabaseImporter, 1);
   };
 } // End namespace Belle2
 #endif

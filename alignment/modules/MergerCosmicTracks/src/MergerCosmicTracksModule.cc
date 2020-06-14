@@ -30,7 +30,7 @@ MergerCosmicTracksModule::MergerCosmicTracksModule() : Module()
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName,
            "StoreArray containing the RecoTracks to read from and delete afterwards.",
            m_param_recoTracksStoreArrayName);
-  addParam("m_MergedRecoTracksStoreArrayName", m_param_mergedRecoTracksStoreArrayName,
+  addParam("mergedRecoTracksStoreArrayName", m_param_mergedRecoTracksStoreArrayName,
            "StoreArray to where to copy the merged RecoTrack.",
            m_param_mergedRecoTracksStoreArrayName);
   addParam("usingMagneticField", m_usingMagneticField,

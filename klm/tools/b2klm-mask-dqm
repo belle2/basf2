@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''Script used to mask channels in KLM DQM plots.'''
+'''Tool used to mask the (very) hot channels in KLM DQM reference plots.'''
 
 __author__ = 'Giacomo De Pietro'
 __copyright__ = '2020 - Belle II Collaboration'
@@ -35,17 +35,11 @@ def arg_parser():
                         type=str,
                         help='output file name',
                         metavar='OUTPUT_FILE')
-    parser.add_argument('--prepend_gt',
-                        default='',
+    parser.add_argument('--globaltags',
+                        required=True,
                         type=str,
-                        nargs='*',
-                        help='Global Tags to be prepended to "online"',
-                        metavar='GT')
-    parser.add_argument('--append_gt',
-                        default='',
-                        type=str,
-                        nargs='*',
-                        help='Global Tags to be appended to "online"',
+                        nargs='+',
+                        help='Global Tags to be used',
                         metavar='GT')
     return parser
 
@@ -61,8 +55,10 @@ if __name__ == "__main__":
     run_number = args.run
     input_file = args.input
     output_file = args.output
+    globaltags = args.globaltags
 
     # Check that input and output file names are correct
+    print()
     if not os.path.exists(input_file):
         basf2.B2FATAL('The input file does not exist.')
     if not output_file.endswith('.root'):
@@ -74,13 +70,7 @@ if __name__ == "__main__":
     os.system(command)
 
     # Set the Global Tags
-    basf2.conditions.override_globaltags(['online'])
-    if not (args.prepend_gt == ''):
-        for gt in reversed(args.prepend_gt):
-            basf2.conditions.prepend_globaltag(gt)
-    if not (args.append_gt == ''):
-        for gt in args.append_gt:
-            basf2.conditions.append_globaltag(gt)
+    basf2.conditions.override_globaltags(globaltags)
 
     # Set the logging options, including a temporary log file
     log_file = 'log.tmp'
@@ -110,7 +100,7 @@ if __name__ == "__main__":
     basf2.process(path=main)
 
     #####################################################
-    # Part 2: mask the channels with b2klm-executeMasking
+    # Part 2: mask the channels with b2klm-execute-masking
 
     print()
 
@@ -123,16 +113,14 @@ if __name__ == "__main__":
             debug, marker, channel, *garbage = line.split()
             channel_list.append(channel)
     file.close()
+    os.remove(log_file)
 
     # Finally, launch the command to mask the channels
     if not channel_list:
         basf2.B2INFO('There are no channels to mask, nothing to do.')
     else:
-        command = f'b2klm-executeMasking {output_file}'
+        command = f'b2klm-execute-masking {output_file}'
         for channel in channel_list:
             command += f' {channel}'
         basf2.B2INFO(f'The following command will be executed: {command}')
         os.system(command)
-        basf2.B2INFO(f'Masking complete: the reference file {output_file} is now ready.')
-
-    os.remove(log_file)

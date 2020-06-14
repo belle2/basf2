@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''Script used to generate KLM DQM reference plots and mask the (very) hot channels if necessary.'''
+'''Tool used to generate the KLM DQM reference plots and to mask the (very) hot channels if necessary.'''
 
 __author__ = 'Giacomo De Pietro'
 __copyright__ = '2020 - Belle II Collaboration'
@@ -9,9 +9,7 @@ __copyright__ = '2020 - Belle II Collaboration'
 
 import basf2
 import argparse
-import multiprocessing
 import os
-import sys
 import ROOT
 
 
@@ -58,9 +56,10 @@ def arg_parser():
 
 def check_file_content(file_name, input_branches):
 
+    #####################################################
     # Check if the file contains the given branches.
 
-    basf2.B2INFO('Checking the input file...')
+    basf2.B2INFO(f'Checking the input file {file_name} ...')
     file = ROOT.TFile.Open(file_name, 'READ')
     if file.IsZombie():
         basf2.B2FATAL('Cannot open the input file.')
@@ -71,73 +70,10 @@ def check_file_content(file_name, input_branches):
     return set(input_branches) <= set(file_branches)
 
 
-def apply_masking(exp_number, run_number, globaltags, output_file):
+if __name__ == "__main__":
 
     #####################################################
     # Part 0: setup
-
-    # Set the Global Tags
-    basf2.conditions.override_globaltags(globaltags)
-
-    # Set the logging options, including a temporary log file
-    log_file = 'log.tmp'
-    basf2.logging.log_level = basf2.LogLevel.INFO
-    basf2.logging.add_file(log_file)
-
-    #####################################################
-    # Part 1: run the KLM analysis module
-
-    # Create path
-    main = basf2.Path()
-
-    basf2.B2INFO(f'Exp {exp_number} Run {run_number}')
-
-    # Input
-    main.add_module('DQMHistAnalysisInputRootFile',
-                    Experiment=exp_number,
-                    RunNr=run_number,
-                    InputRootFile='KLMDQM.root',
-                    SelectFolders=['KLM'])
-
-    # Analysis module
-    analysis = basf2.register_module('DQMHistAnalysisKLM')
-    analysis.logging.log_level = basf2.LogLevel.DEBUG
-    analysis.logging.debug_level = 20
-    main.add_module(analysis)
-
-    # Process events
-    basf2.process(path=main)
-
-    #####################################################
-    # Part 2: mask the channels with b2klm-execute-masking
-
-    print()
-
-    # Open the log file to record the channels to be masked
-    line_marker = 'KLM@MaskMe'
-    channel_list = []
-    file = open(log_file)
-    for line in file:
-        if line_marker in line:
-            debug, marker, channel, *garbage = line.split()
-            channel_list.append(channel)
-    file.close()
-
-    # Finally, launch the command to mask the channels
-    if not channel_list:
-        basf2.B2INFO('There are no channels to mask, nothing to do.')
-    else:
-        command = f'b2klm-execute-masking {output_file}'
-        for channel in channel_list:
-            command += f' {channel}'
-        basf2.B2INFO(f'The following command will be executed: {command}')
-        os.system(command)
-        basf2.B2INFO(f'Masking complete: the reference file {output_file} is now ready.')
-
-    os.remove(log_file)
-
-
-if __name__ == "__main__":
 
     # Argument parsing
     args = arg_parser().parse_args()
@@ -188,9 +124,11 @@ if __name__ == "__main__":
     # Store the full list of GTs, it's needed for the masking step
     globaltags = basf2.conditions.globaltags
     if file_globaltags != '':
-        additional_globaltags = [tag.strip() for tag in file_globaltags.split(',')]
+        additional_globaltags = [globaltag.strip() for globaltag in file_globaltags.split(',')]
         globaltags = list(set(globaltags) | set(additional_globaltags))
-    print(globaltags)
+
+    #####################################################
+    # Part 1: run the KLM reconstruction and the DQM module
 
     # Set the global log level
     basf2.set_log_level(basf2.LogLevel.INFO)
@@ -237,11 +175,19 @@ if __name__ == "__main__":
     # Print the statistics
     print(basf2.statistics)
 
+    #####################################################
+    # Part 2: run the masking of (very) hot channels if required
+
     # Apply masking of hot channels
     if not disable_masking:
-        masking = multiprocessing.Process(target=apply_masking,
-                                          args=(exp_number, run_number, globaltags, output_dqm_file,))
-        masking.start()
-        masking.join()
-        if masking.exitcode != 0:
-            sys.exit(masking.exitcode)
+        globaltags_string = ''
+        for globaltag in globaltags:
+            globaltags_string += f'{globaltag} '
+        command = 'b2klm-mask-dqm '
+        command += f'--exp {exp_number} '
+        command += f'--run {run_number} '
+        command += '--input KLMDQM.root '
+        command += f'--output {output_dqm_file} '
+        command += f'--globaltags {globaltags_string} '
+        basf2.B2INFO(f'The following command will be executed: {command}')
+        os.system(command)

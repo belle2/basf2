@@ -116,5 +116,6 @@ int main(int argc, char* argv[])
   inputFile->Write("", TObject::kOverwrite);
   inputFile->Close();
   delete inputFile;
+  B2INFO("Masking complete: the reference file " << inputFileName << " is now ready.");
   return 0;
 }

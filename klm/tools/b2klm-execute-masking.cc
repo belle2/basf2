@@ -24,12 +24,26 @@
 
 /* C++ headers. */
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
 using namespace Belle2;
 
 int main(int argc, char* argv[])
 {
+  /* Print the usage message if --help or -h are used. */
+  if (argc == 1 or std::string(argv[1]) == "--help" or std::string(argv[1]) == "-h") {
+    std::cout << "Usage: " << argv[0] << " [INPUT_FILE] [CHANNEL1] [CHANNEL2] ... [CHANNELN]\n\n"
+              "   This tool masks the given channels of the KLM DQM reference plots stored\n"
+              "   in the given input file.\n\n"
+              "   The plots on which this tool acts are:\n"
+              "     KLM/masked_channels;\n"
+              "     KLM/strip_hits_subdetector_<X>_section_<Y>_sector_<W>_<Z>.\n\n"
+              "   This tool is not intended to be run standalone, since it is executed\n"
+              "   by 'b2klm-mask-dqm', which automatically detects the channels to be masked.\n";
+    return 0;
+  }
+  /* Print error messages when needed. */
   int nChannels = argc - 2;
   if (nChannels == 0) {
     B2ERROR("There are no channels to mask!");
@@ -49,6 +63,7 @@ int main(int argc, char* argv[])
     B2ERROR("The input file is not working!");
     return 0;
   }
+  /* Now we can safely execute the masking. */
   inputFile->cd();
   const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
   const KLMChannelArrayIndex* channelArrayIndex = &(KLMChannelArrayIndex::Instance());

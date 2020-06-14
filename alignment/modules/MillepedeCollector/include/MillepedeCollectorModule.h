@@ -12,9 +12,15 @@
 #define MILLEPEDECOLLECTORMODULE_H
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/geometry/B2Vector3.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <genfit/GblTrajectory.h>
@@ -176,6 +182,51 @@ namespace Belle2 {
 
     /** Map of list_name -> (mass, width) for custom mass and width setting */
     std::map<std::string,  std::tuple<double, double>> m_customMassConfig;
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
+
+    /** Event T0. */
+    StoreObjPtr<EventT0> m_EventT0;
+
+    /** CDC hits. */
+    StoreArray<RecoHitInformation::UsedCDCHit> m_CDCHits;
+
+    /** PXD hits. */
+    StoreArray<RecoHitInformation::UsedPXDHit> m_PXDHits;
+
+    /** SVD hits. */
+    StoreArray<RecoHitInformation::UsedSVDHit> m_SVDHits;
+
+    /** BKLM hits. */
+    StoreArray<RecoHitInformation::UsedBKLMHit> m_BKLMHits;
+
+    /** EKLM hits. */
+    StoreArray<RecoHitInformation::UsedEKLMHit> m_EKLMHits;
+
+    /** Tracks. */
+    StoreArray<RecoTrack>* m_RecoTracks = nullptr;
+
+    /** Particle lists. */
+    StoreObjPtr<ParticleList>* m_ParticleLists = nullptr;
+
+    /** Vertex lists. */
+    StoreObjPtr<ParticleList>* m_VertexLists = nullptr;
+
+    /** Primary vertex lists. */
+    StoreObjPtr<ParticleList>* m_PrimaryVertexLists = nullptr;
+
+    /** Two-body decay lists. */
+    StoreObjPtr<ParticleList>* m_TwoBodyDecayLists = nullptr;
+
+    /** Primary-vertex two-body decay lists. */
+    StoreObjPtr<ParticleList>* m_PrimaryTwoBodyDecayLists = nullptr;
+
+    /** Beam two-body decay lists. */
+    StoreObjPtr<ParticleList>* m_PrimaryMassTwoBodyDecayLists = nullptr;
+
+    /** Beam primary-vertex two-body decay lists. */
+    StoreObjPtr<ParticleList>* m_PrimaryMassVertexTwoBodyDecayLists = nullptr;
 
     /** Current vector of GBL data from trajectory to be stored in a tree */
     std::vector<gbl::GblData> m_currentGblData{};

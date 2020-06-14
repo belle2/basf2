@@ -14,6 +14,9 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TH1F.h>
 #include <TH2F.h>
@@ -221,7 +224,7 @@ namespace Belle2 {
     /** Number of full tracks with VXD+CDC */
     TH1F* m_TracksVXDCDC = nullptr;
     /** Number of all finding tracks */
-    TH1F* m_Tracks = nullptr;
+    TH1F* m_TracksHistogram = nullptr;
 
     /** helix parameters and their corellations: */
 
@@ -272,6 +275,13 @@ namespace Belle2 {
 
     /// StoreArray name where the merged RecoTracks are written.
     std::string m_param_RecoTracksStoreArrayName = "";
+
+    /** Tracks. */
+    StoreArray<RecoTrack> m_RecoTracks;
+
+    /** Tracks. */
+    StoreArray<Track> m_Tracks;
+
   };  //end class declaration
 
 }  // end namespace Belle2

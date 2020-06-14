@@ -12,12 +12,9 @@
 
 #include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/geometry/B2Vector3.h>
-#include <mdst/dataobjects/Track.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <svd/geometry/SensorInfo.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <vxd/geometry/GeoTools.h>
 
@@ -72,11 +69,8 @@ AlignDQMModule::~AlignDQMModule()
 
 void AlignDQMModule::initialize()
 {
-  StoreArray<RecoTrack> recoTracks(m_param_RecoTracksStoreArrayName);
-  recoTracks.isOptional();
-
-  StoreArray<Track> tracks(m_param_TracksStoreArrayName);
-  tracks.isOptional();
+  m_RecoTracks.isOptional(m_param_RecoTracksStoreArrayName);
+  m_Tracks.isOptional(m_param_TracksStoreArrayName);
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -512,7 +506,7 @@ void AlignDQMModule::defineHisto()
   m_TracksVXD = NULL;
   m_TracksCDC = NULL;
   m_TracksVXDCDC = NULL;
-  m_Tracks = NULL;
+  m_TracksHistogram = NULL;
 
   int iHitsInPXD = 10;
   int iHitsInSVD = 20;
@@ -587,9 +581,9 @@ void AlignDQMModule::defineHisto()
   m_TracksVXDCDC->GetYaxis()->SetTitle("counts");
   name = str(format("Alig_NoOfTracks"));
   title = str(format("No Of All Tracks Per Event"));
-  m_Tracks = new TH1F(name.c_str(), title.c_str(), iTracks, 0, iTracks);
-  m_Tracks->GetXaxis()->SetTitle("# tracks");
-  m_Tracks->GetYaxis()->SetTitle("counts");
+  m_TracksHistogram = new TH1F(name.c_str(), title.c_str(), iTracks, 0, iTracks);
+  m_TracksHistogram->GetXaxis()->SetTitle("# tracks");
+  m_TracksHistogram->GetYaxis()->SetTitle("counts");
 
   DirAlignSensResids->cd();
   for (int i = 0; i < nVXDSensors; i++) {
@@ -1048,7 +1042,7 @@ void AlignDQMModule::beginRun()
   if (m_TracksVXD != NULL) m_TracksVXD->Reset();
   if (m_TracksCDC != NULL) m_TracksCDC->Reset();
   if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Reset();
-  if (m_Tracks != NULL) m_Tracks->Reset();
+  if (m_TracksHistogram != NULL) m_TracksHistogram->Reset();
 }
 
 
@@ -1061,9 +1055,11 @@ void AlignDQMModule::event()
     int iTrackVXD = 0;
     int iTrackCDC = 0;
     int iTrackVXDCDC = 0;
-    StoreArray<Track> tracks(m_param_TracksStoreArrayName);
-    if (!tracks || !tracks.getEntries()) return;
-    for (const Track& track : tracks) {  // over tracks
+    if (!m_Tracks.isValid())
+      return;
+    if (m_Tracks.getEntries() == 0)
+      return;
+    for (const Track& track : m_Tracks) {  // over tracks
       RelationVector<RecoTrack> theRC = track.getRelationsTo<RecoTrack>(m_param_RecoTracksStoreArrayName);
       if (!theRC.size()) continue;
       RelationVector<PXDCluster> pxdClustersTrack = DataStore::getRelationsWithObj<PXDCluster>(theRC[0]);
@@ -1350,7 +1346,7 @@ void AlignDQMModule::event()
     if (m_TracksVXD != NULL) m_TracksVXD->Fill(iTrackVXD);
     if (m_TracksCDC != NULL) m_TracksCDC->Fill(iTrackCDC);
     if (m_TracksVXDCDC != NULL) m_TracksVXDCDC->Fill(iTrackVXDCDC);
-    if (m_Tracks != NULL) m_Tracks->Fill(iTrack);
+    if (m_TracksHistogram != NULL) m_TracksHistogram->Fill(iTrack);
 
   } catch (...) {
     B2DEBUG(70, "Some problem in Alignment DQM module!");

@@ -5,6 +5,9 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Gian Luca Pinna Angioni                                  *
  *                                                                        *
+ * Database object containing the nominal RF value and                    *
+ * the prescales to derive the clock frequecies of the sub-detectors.     *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/dbobjects/HardwareClockSettings.h>

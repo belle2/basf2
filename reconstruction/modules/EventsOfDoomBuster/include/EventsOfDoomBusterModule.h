@@ -14,9 +14,13 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <reconstruction/dbobjects/EventsOfDoomParameters.h>
 
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+
+#include <cstdint>
 
 namespace Belle2 {
   /**
@@ -33,8 +37,11 @@ namespace Belle2 {
     /// Default Destructor.
     virtual ~EventsOfDoomBusterModule() final;
 
-    /// Module initializer
+    /// Module initializer.
     void initialize() final;
+
+    /// Called when entering a new run.
+    void beginRun() final;
 
     /**
      * Flag each event.
@@ -48,18 +55,24 @@ namespace Belle2 {
      * The max number of CDC hits for an event to be kept for reconstruction.
      * By default, no events are skipped based upon this requirement.
      */
-    unsigned int m_nCDCHitsMax = 1e9;
+    uint32_t m_nCDCHitsMax = 1e9;
     /**
      * The max number of SVD shaper digits for an event to be kept for reconstruction.
      * By default, no events are skipped based upon this requirement.
      */
-    unsigned int m_nSVDShaperDigitsMax = 1e9;
+    uint32_t m_nSVDShaperDigitsMax = 1e9;
 
     /// Event Meta Data Store ObjPtr
     StoreObjPtr<EventMetaData> m_eventInfo;
+
     /// CDCHits StoreArray
     StoreArray<CDCHit> m_cdcHits;
+
     /// SVDShaperDigits StoreArray
     StoreArray<SVDShaperDigit> m_svdShaperDigits;
+
+    /// EventsOfDoomParameters Database OjbPtr
+    DBObjPtr<EventsOfDoomParameters> m_eventsOfDoomParameters;
+
   };
 } // Belle2 namespace

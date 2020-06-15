@@ -10,6 +10,8 @@
 #define CPRERRORMESSAGE_H
 
 // Includes
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <daq/slc/readout/RunInfoBuffer.h>
 

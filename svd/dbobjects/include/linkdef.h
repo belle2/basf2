@@ -8,7 +8,6 @@
 
 #pragma link C++ class Belle2::SVDCoolingPipesPar+;
 #pragma link C++ class Belle2::SVDEndringsPar+;
-#pragma link C++ class Belle2::SVDEndringsLayerPar+; // implicit
 
 #pragma link C++ class Belle2::SVDSupportRibsPar+;
 #pragma link C++ class Belle2::SVDSupportBoxPar+; // implicit

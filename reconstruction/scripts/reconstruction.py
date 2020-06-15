@@ -801,17 +801,5 @@ def prepare_cdst_analysis(path, components=None):
     # check, this one may not be needed...
     path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
-    # from here on mostly a replica of add_posttracking_reconstruction without dE/dx, prunetracks and eventT0 modules
-    add_ext_module(path, components)
-    add_top_modules(path, components)
-    add_arich_modules(path, components)
-    add_ecl_finalizer_module(path, components)
-    add_ecl_mc_matcher_module(path, components)
-    add_klm_modules(path, components)
-    add_klm_mc_matcher_module(path, components)
-    add_muid_module(path, components=components)
-    add_ecl_track_cluster_modules(path, components)
-    add_ecl_cluster_properties_modules(path, components)
-    add_ecl_chargedpid_module(path, components)
-    add_pid_module(path, components)
-    add_ecl_track_brem_finder(path, components)
+    # add the posttracking modules needed for cdst analysis
+    add_posttracking_reconstruction(path, components=components, for_cdst_analysis=True)

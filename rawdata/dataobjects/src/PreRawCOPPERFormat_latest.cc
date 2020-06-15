@@ -176,7 +176,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
 
-  char err_buf[500];
+  char err_buf[1000];
   int err_flag = 0;
   //
   // check Magic words
@@ -333,7 +333,7 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
   unsigned int temp_ctime_trgtype_footer = 0, temp_eve_footer = 0;
   unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
-  char err_buf[500];
+  char err_buf[1000];
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));

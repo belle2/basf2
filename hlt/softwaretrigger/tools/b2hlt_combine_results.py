@@ -92,8 +92,8 @@ if __name__ == "__main__":
                 # use prescale of first file
                 sum_out.at[PRESCALE_ROW, col] = prescales[0, i]
             else:
-                b2.B2WARNING("{}: Different prescale values found for this trigger line! " +
-                             "Final prescale value is set to NaN.".format(col))
+                b2.B2WARNING("{}: Different prescale values found for this trigger line! ".format(col) +
+                             "Final prescale value is set to NaN.")
                 sum_out.at[PRESCALE_ROW, col] = np.nan
             i += 1
 

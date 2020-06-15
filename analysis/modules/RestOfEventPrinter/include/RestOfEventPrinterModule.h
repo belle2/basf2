@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Matic Lubej                                              *
+ * Contributors: Matic Lubej, Sviat Bilokin                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -42,7 +42,6 @@ namespace Belle2 {
   private:
 
     std::vector<std::string> m_maskNames; /**< List of all mask names for which the info will be printed */
-    std::string m_whichMask; /**< Print Track mask (track), ECLCluster mask (cluster), or (both)? */
     bool m_fullPrint; /**< True: Print whole masks content. */
 
     /**

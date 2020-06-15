@@ -489,28 +489,43 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
   return maskNames;
 }
 
-void RestOfEvent::print() const
+void RestOfEvent::print(std::string maskName, bool unpackComposite) const
 {
-  B2INFO(" - Particles[" << m_particleIndices.size() << "] : ");
-  printIndices(m_particleIndices);
-  for (auto mask : m_masks) {
-    mask.print();
+  unsigned int nCharged = getChargedParticles(maskName, 0, unpackComposite).size();
+  unsigned int nPhotons = getPhotons(maskName, unpackComposite).size();
+  unsigned int nNeutralHadrons = getHadrons(maskName, unpackComposite).size();
+  std::string tab = " - ";
+  if (maskName != "") {
+    tab = " - - ";
+  } else {
+    if (m_isNested) {
+      B2INFO(tab << "Is Nested ROE");
+    }
+    if (m_isFromMC) {
+      B2INFO(tab << "Is build from genPartices");
+    }
   }
-  if (m_isNested) {
-    B2INFO("This ROE is nested.");
-  }
+  B2INFO(tab << "No. of Charged particles in ROE: " << nCharged);
+  B2INFO(tab << "No. of Photons           in ROE: " << nPhotons);
+  B2INFO(tab << "No. of Neutral hadrons   in ROE: " << nNeutralHadrons);
+  printIndices(maskName, unpackComposite, tab);
 }
 
-void RestOfEvent::printIndices(const std::set<int>& indices) const
+void RestOfEvent::printIndices(std::string maskName, bool unpackComposite, std::string tab) const
 {
-  if (indices.empty())
+  auto particles = getParticles(maskName, unpackComposite);
+  if (particles.size() == 0) {
+    B2INFO(tab << "No indices to print");
     return;
-
-  std::string printout =  "     -> ";
-  for (const int index : indices) {
-    printout += std::to_string(index) +  ", ";
   }
-  B2INFO(printout);
+  std::string printoutIndex =  tab + "|";
+  std::string printoutPDG =  tab + "|";
+  for (const auto particle : particles) {
+    printoutIndex += std::to_string(particle->getArrayIndex()) +  " |  ";
+    printoutPDG   += std::to_string(particle->getPDGCode()) +  " | ";
+  }
+  B2INFO(printoutPDG);
+  B2INFO(printoutIndex);
 }
 
 Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode, bool isSelfConjugated)

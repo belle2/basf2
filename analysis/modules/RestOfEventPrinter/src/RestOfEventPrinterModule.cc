@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Matic Lubej                                              *
+ * Contributors: Matic Lubej, Sviat Bilokin                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -48,7 +48,6 @@ namespace Belle2 {
     std::vector<std::string> emptyVector;
 
     addParam("maskNames", m_maskNames, "List of all mask names for which the info will be printed.", emptyVector);
-    addParam("whichMask", m_whichMask, "Print Track mask (track), ECLCluster mask (cluster), or (both)?", std::string("both"));
     addParam("fullPrint", m_fullPrint, "True: Print whole masks content.", false);
   }
 
@@ -68,9 +67,6 @@ namespace Belle2 {
       const Particle* part = roe->getRelated<Particle>();
       const MCParticle* mcpart = part->getRelated<MCParticle>();
 
-      unsigned int nAllTracks = roe->getNTracks();
-      unsigned int nAllECLClusters = roe->getNECLClusters();
-      unsigned int nAllKLMClusters = roe->getNKLMClusters();
       int relatedPDG = part->getPDGCode();
       int relatedMCPDG;
       if (mcpart)
@@ -81,20 +77,13 @@ namespace Belle2 {
       // Start printing
       B2INFO(" - " << "ROE related to particle with PDG: " << relatedPDG);
       B2INFO(" - " << "ROE related to MC particle with PDG: " << relatedMCPDG);
-      B2INFO(" - " << "No. of Tracks in ROE: " << nAllTracks);
-      B2INFO(" - " << "No. of ECLClusters in ROE: " << nAllECLClusters);
-      B2INFO(" - " << "No. of KLMClusters in ROE: " << nAllKLMClusters);
+
+      roe->print("");
 
       for (const auto& maskName : m_maskNames) {
-        unsigned int nTracks = roe->getNTracks(maskName);
-        unsigned int nECLClusters = roe->getNECLClusters(maskName);
-
-
         B2INFO(" - " << "Info for ROEMask with name: \'" << maskName << "\'");
+        roe->print(maskName);
 
-        B2INFO("    o) " << "No. of Tracks which pass the mask: " << nTracks);
-
-        B2INFO("    o) " << "No. of ECLClusters which pass the mask: " << nECLClusters);
         if (m_fullPrint) {
           printMaskParticles(roe->getParticles(maskName));
         }

@@ -380,7 +380,7 @@ namespace Belle2 {
     /**
      * Prints the contents of a RestOfEvent object to screen
      */
-    void print() const;
+    void print(std::string maskName = "", bool unpackComposite = true) const;
 
   private:
 
@@ -403,7 +403,7 @@ namespace Belle2 {
     /**
      * Prints indices in the given set in a single line
      */
-    void printIndices(const std::set<int>& indices) const;
+    void printIndices(std::string maskName = "", bool unpackComposite = true, std::string tab = " - ") const;
     ClassDef(RestOfEvent, 5) /**< class definition */
 
   };

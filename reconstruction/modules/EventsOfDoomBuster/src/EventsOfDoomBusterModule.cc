@@ -1,14 +1,17 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marco Milesi
+ * Contributors: Marco Milesi, Giacomo De Pietro                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
+/* Own header. */
 #include <reconstruction/modules/EventsOfDoomBuster/EventsOfDoomBusterModule.h>
 
+/* Belle 2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

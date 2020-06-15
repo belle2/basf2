@@ -1,25 +1,27 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marco Milesi
+ * Contributors: Marco Milesi, Giacomo De Pietro                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
-#include <framework/core/Module.h>
-
-#include <framework/dataobjects/EventMetaData.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
+/* Reconstruction headers. */
 #include <reconstruction/dbobjects/EventsOfDoomParameters.h>
 
+/* Belle 2 headers. */
+#include <cdc/dataobjects/CDCHit.h>
+#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 
+/* C++ headers. */
 #include <cstdint>
 
 namespace Belle2 {

@@ -30,6 +30,8 @@ namespace Belle2 {
      */
     EventsOfDoomParameters()
     {
+      m_nCDCHitsMax = 0;
+      m_nSVDShaperDigitsMax = 0;
     }
 
     /**

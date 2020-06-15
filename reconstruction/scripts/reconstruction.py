@@ -531,17 +531,17 @@ def add_top_modules(path, components=None, cosmics=False):
 
 def add_cluster_expert_modules(path, components=None):
     """
-    Add the cluster expert modules to the path.
+    Add the KLMExpert and ClusterMatcher modules to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    # klong id and cluster matcher, whcih also builds "cluster"
+    # KLMExpert (needed for KlId) ClusterMatcher (needed for Cluster)
     if components is None or ('KLM' in components and 'ECL' in components):
-        KLMClassifier = register_module('KLMExpert')
-        path.add_module(KLMClassifier)
-        ClusterMatch = register_module('ClusterMatcher')
-        path.add_module(ClusterMatch)
+        klm_expert = register_module('KLMExpert')
+        path.add_module(klm_expert)
+        cluster_matcher = register_module('ClusterMatcher')
+        path.add_module(cluster_matcher)
 
 
 def add_pid_module(path, components=None):

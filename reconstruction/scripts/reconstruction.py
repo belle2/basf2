@@ -275,7 +275,7 @@ def add_pretracking_reconstruction(path, components=None):
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                                    add_muid_hits=False, cosmics=False, for_cdst_analsys=False):
+                                    add_muid_hits=False, cosmics=False, for_cdst_analysis=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.

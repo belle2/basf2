@@ -354,7 +354,7 @@ namespace Belle2 {
   }
 
 
-  /*
+  /**
    * Get vector which is opposite to vIn in CMS ref frame
    * Be aware that input vIn and output are in the Lab frame
    */

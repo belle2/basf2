@@ -298,10 +298,10 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     /* Then, color the canvas with red if there is a dead module
      * and write an error message. */
     if (m_DeadBarrelModules.size() == 0) {
-      canvas->SetFillColor(kWhite);
+      canvas->Pad()->SetFillColor(kWhite);
       canvas->Update();
     } else {
-      canvas->SetFillColor(kRed);
+      canvas->Pad()->SetFillColor(kRed);
       for (uint16_t module : m_DeadBarrelModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
           module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
@@ -336,10 +336,10 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     /* Then, color the canvas with red if there is a dead module
      * and write an error message. */
     if (m_DeadEndcapModules.size() == 0) {
-      canvas->SetFillColor(kWhite);
+      canvas->Pad()->SetFillColor(kWhite);
       canvas->Update();
     } else {
-      canvas->SetFillColor(kRed);
+      canvas->Pad()->SetFillColor(kRed);
       for (uint16_t module : m_DeadEndcapModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
           module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
@@ -405,7 +405,7 @@ void DQMHistAnalysisKLMModule::event()
     }
   }
   fillMaskedChannelsHistogram("masked_channels");
-  latex.SetTextColor(kWhite);
+  latex.SetTextColor(kBlue);
   processPlaneHistogram("plane_bklm_phi", latex);
   processPlaneHistogram("plane_bklm_z", latex);
   processPlaneHistogram("plane_eklm", latex);

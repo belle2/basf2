@@ -17,7 +17,7 @@ namespace Belle2 {
 
   /**
    * Database object containing the nominal RF value and the prescales to derive
-   * the clock frequecies of the sub-detectors.
+   * the clock frequencies of the sub-detectors.
    */
   class HardwareClockSettings : public TObject {
 

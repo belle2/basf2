@@ -6,7 +6,7 @@
  * Contributors: Gian Luca Pinna Angioni                                  *
  *                                                                        *
  * Database object containing the nominal RF value and                    *
- * the prescales to derive the clock frequecies of the sub-detectors.     *
+ * the prescales to derive the clock frequencies of the sub-detectors.     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

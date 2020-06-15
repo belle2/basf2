@@ -33,6 +33,7 @@ namespace Belle2 {
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
     DistanceCalculatorModule();
+
     /** Destructor */
     virtual ~DistanceCalculatorModule();
 
@@ -44,9 +45,13 @@ namespace Belle2 {
 
   private:
 
+    /** returns the distance between tracks or vertex objects (depending on the m_mode) */
     void getDistance(const Particle* p1, const Particle* p2);
+    /** returns the error on the distance between tracks or vertex objects (depending on the m_mode) */
     void getDistanceErrors(const Particle* p1, const Particle* p2);
+    /** returns the distance between the btube and the object (depending on m_mode) */
     void getBtubeDistance(const Particle* p, const Btube* t);
+    /** returns the error on the distance between the btube and the object (depending on m_mode) */
     void getBtubeDistanceErrors(const Particle* p, const Btube* t);
 
     std::string m_listName; /**< name of particle list */

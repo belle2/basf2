@@ -14,6 +14,7 @@
 
 #include <sys/time.h>
 #include <unistd.h>
+#include <errno.h>
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/rawdata/CprErrorMessage.h>
 #include <daq/rawdata/modules/DAQConsts.h>

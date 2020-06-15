@@ -5,6 +5,7 @@ PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
 
 from argparse import ArgumentParser
+import basf2 as b2
 import os
 import uproot
 import root_pandas
@@ -55,7 +56,6 @@ if __name__ == "__main__":
 
     # loop over SWTRs
     sum_out = pd.DataFrame()
-    total_events = []  # number of total events in each data frame
     prescales = []  # prescale values of the trigger lines in each data frame
     for fi in args.input:
 
@@ -69,29 +69,36 @@ if __name__ == "__main__":
             sum_out = swtr
         else:
             sum_out = sum_out.add(swtr)
-        total_events.append(swtr['total_events'][0])
         prescales.append(get_prescales(swtr))
 
-    # the prescale values were also added up, to get the correct prescale values back,
-    # calculate the average prescale of the sum for each trigger line
-    prescales = np.array(prescales)
-    total_events = np.array(total_events)
-    overall_total_events = np.sum(total_events)
+    prescales = np.array(prescales)  # we want the prescales as numpy array for slicing
     i = 0  # index the trigger lines
+
+    # the prescale values were also added up, to get the correct prescale values back,
+    # we take the first prescale value of each trigger line
+    # if the prescale value of a trigger line is changing in the files set the prescale value
+    # to nan for this trigger line and give a warning
 
     for col in sum_out.columns:
         # loop over all trigger lines
         if col.find('software_trigger_cut_') >= 0 and sum_out[col][PRESCALE_ROW] > 0:
-            average_prescale = 0
-            for j, prescale in enumerate(prescales[:, i]):
-                # loop over the values of each data frame and calculate an average
-                # prescale value regarding the number of total events in the data frame
-                average_prescale += total_events[j]/overall_total_events*prescale
-            average_prescale = np.round(average_prescale, 3)
-            # overwrite the wrong added up prescale value with the calculated average value
-            sum_out.at[PRESCALE_ROW, col] = average_prescale
+            prescale_changed = False
+            for j in range(prescales[:, i].size - 1):
+                # check if prescales are changing in one of the files
+                if not prescales[j, i] == prescales[j+1, i]:
+                    prescale_changed = True
+                    break
+            if not prescale_changed:
+                # use prescale of first file
+                sum_out.at[PRESCALE_ROW, col] = prescales[0, i]
+            else:
+                b2.B2WARNING("{}: Different prescale values found for this trigger line! " +
+                             "Final prescale value is set to NaN.".format(col))
+                sum_out.at[PRESCALE_ROW, col] = np.nan
             i += 1
 
     root_pandas.to_root(sum_out, key='software_trigger_results', path=args.output)
-    # uproot.newtree doesn't work in the current externals version but when it does this can be root free
+    # TODO: uproot.newtree works with the current externals version so this can be root free
+    # BUT, unfortunately we are not sure how to write the pandas data frame to a root tree
+
     print("Created file %s" % args.output)

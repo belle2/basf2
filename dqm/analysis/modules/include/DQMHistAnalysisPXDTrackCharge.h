@@ -17,6 +17,7 @@
 #include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
+#include <array>
 #include <TF1.h>
 #include "TF1Convolution.h"
 #include <TCanvas.h>
@@ -83,6 +84,8 @@ namespace Belle2 {
     TCanvas* m_cCharge = nullptr;
     //! Final Canvases for Fit and Ref
     std::map<VxdID, TCanvas*> m_cChargeMod {};
+    //! Final Canvases for Fit and Ref per ASIC
+    std::map<VxdID, std::array<std::array<TCanvas*, 4>, 6>> m_cChargeModASIC {};
     //! Histogram for TrackedClusters
     TH1F* m_hTrackedClusters = nullptr;
     //! Final Canvas for TrackedClusters

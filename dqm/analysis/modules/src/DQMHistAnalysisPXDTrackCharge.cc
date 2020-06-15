@@ -74,6 +74,13 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
     std::string name = "PXD_Track_Cluster_Charge_" + (std::string)aVxdID;
     std::replace(name.begin(), name.end(), '.', '_');
     m_cChargeMod[aVxdID] = new TCanvas((m_histogramDirectoryName + "/c_Fit_" + name).data());
+    if (aVxdID == VxdID("1.5.1")) {
+      for (int s = 0; s < 6; s++) {
+        for (int d = 0; d < 4; d++) {
+          m_cChargeModASIC[aVxdID][s][d] = new TCanvas((m_histogramDirectoryName + "/c_Fit_" + name + Form("_s%d_d%d", s + 1, d + 1)).data());
+        }
+      }
+    }
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -300,6 +307,27 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       if (hh1->GetEntries() >= 1000) enough = true;
     }
   }
+
+  // now loop per module over asics pairs (1.5.1)
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+//     TCanvas* canvas = m_cChargeMod[m_PXDModules[i]];
+    if (canvas == nullptr) continue;
+
+    canvas->cd();
+    canvas->Clear();
+
+    for (int s = 1; s <= 6; s++) {
+      for (int d = 1; d <= 4; d++) {
+        std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i] + "_s%d_d%d";
+        std::replace(name.begin(), name.end(), '.', '_');
+
+        TH1* hh1 = findHist(m_histogramDirectoryName, name);
+        if (hh1) {
+        }
+      }
+    }
+  }
+
   m_cCharge->cd();
   m_cCharge->Clear();
   m_gCharge->SetMinimum(0);

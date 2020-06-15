@@ -75,10 +75,12 @@ namespace Belle2 {
     TEfficiency* m_hEffAll = nullptr;
     //! Final Canvas
     TCanvas* m_cEffAll = nullptr;
-    //! Efficiency, last state
-    TEfficiency* m_hEffAllLast;
+    //! TH1, last state, total
+    TH1* m_hEffAllLastTotal = nullptr;
+    //! TH1, last state, passed
+    TH1* m_hEffAllLastPassed = nullptr;
     //! Efficiency, last state, updated
-    TEfficiency* m_hEffAllUpdate;
+    TEfficiency* m_hEffAllUpdate = nullptr;
 
 
     /** TLine object for warning limit */

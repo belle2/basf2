@@ -109,11 +109,12 @@ void DQMHistAnalysisPXDEffModule::initialize()
                               m_PXDModules.size(), 0, m_PXDModules.size());
   m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Up-to-date Efficiency of each module;PXD Module;",
                                     m_PXDModules.size(), 0, m_PXDModules.size());
-  m_hEffAllLast = new TEfficiency("HitEffAlllast", "Latst update Efficiency of each module;PXD Module;",
-                                  m_PXDModules.size(), 0, m_PXDModules.size());
+
+  m_hEffAllLastTotal = m_hEffAll->GetCopyTotalHisto();
+  m_hEffAllLastPassed = m_hEffAll->GetCopyPassedHisto();
+
   m_hEffAll->SetConfidenceLevel(m_confidence);
   m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
-  m_hEffAllLast->SetConfidenceLevel(m_confidence);
 
 //   m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
   m_hEffAll->Paint("AP");
@@ -156,12 +157,10 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: beginRun called.");
 
-// if(m_hEffAll->GetTotalHistogram()) m_hEffAll->GetTotalHistogram()->Reset();
-// if(m_hEffAllUpdate->GetTotalHistogram()) m_hEffAllUpdate->GetTotalHistogram()->Reset();
-// if(m_hEffAllLast->GetTotalHistogram()) m_hEffAllLast->GetTotalHistogram()->Reset();
-// if(m_hEffAll->GetPassedHistogram()) m_hEffAll->GetPassedHistogram()->Reset();
-// if(m_hEffAllUpdate->GetPassedHistogram()) m_hEffAllUpdate->GetPassedHistogram()->Reset();
-// if(m_hEffAllLast->GetPassedHistogram()) m_hEffAllLast->GetPassedHistogram()->Reset();
+  // no way to reset TEfficiency
+  // Thus histo will contain old content until first update
+  m_hEffAllLastTotal->Reset();
+  m_hEffAllLastPassed->Reset();
   m_cEffAll->Clear();
 
   for (auto single_cmap : m_cEffModules) {
@@ -252,11 +251,11 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
 
-      if (m_hEffAllLast->GetTotalHistogram()->GetBinContent(j) + m_minEntries < nhit) {
-        m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLast->GetTotalHistogram()->GetBinContent(j));
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLast->GetPassedHistogram()->GetBinContent(j));
-        m_hEffAllLast->SetTotalEvents(j, nhit);
-        m_hEffAllLast->SetPassedEvents(j, nmatch);
+      if (m_hEffAllLastTotal->GetBinContent(j) + m_minEntries < nhit) {
+        m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
+        m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
+        m_hEffAllLastTotal->SetBinContent(j, nhit);
+        m_hEffAllLastPassed->SetBinContent(j, nmatch);
       }
 
       if (j == 6) continue; // wrkaround for 1.3.2 module
@@ -340,7 +339,6 @@ void DQMHistAnalysisPXDEffModule::event()
   {
     auto gru = m_hEffAllUpdate->GetPaintedGraph();
     if (gru) {
-      double scale_min = 1.0;
       for (int i = 0; i < gr->GetN(); i++) {
         gru->SetPointEXhigh(i, 0.);
         gru->SetPointEXlow(i, 0.);

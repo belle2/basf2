@@ -275,7 +275,7 @@ def add_pretracking_reconstruction(path, components=None):
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                                    add_muid_hits=False, cosmics=False):
+                                    add_muid_hits=False, cosmics=False, for_cdst_analsys=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -286,17 +286,26 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
-    :param cosmics: if True, steer TOP for cosmic reconstruction
+    :param cosmics: if True, steer TOP for cosmic reconstruction.
+    :param for_cdst_analysis: if True, dEdx, EventT0 and PruneTracks modules are not added to the path.
+    This is only needed by prepare_cdst_analysis().
     """
 
-    add_dedx_modules(path, components)
+    # Not add dEdx modules in prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        add_dedx_modules(path, components)
+
     add_ext_module(path, components)
+
     add_top_modules(path, components, cosmics=cosmics)
+
     add_arich_modules(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_PID')
 
-    path.add_module("EventT0Combiner")
+    # Not add EventT0Combiner module in prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        path.add_module("EventT0Combiner")
 
     add_ecl_finalizer_module(path, components)
 
@@ -307,9 +316,13 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     add_klm_mc_matcher_module(path, components)
 
     add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
+
     add_ecl_track_cluster_modules(path, components)
+
     add_ecl_cluster_properties_modules(path, components)
+
     add_ecl_chargedpid_module(path, components)
+
     add_pid_module(path, components)
 
     if addClusterExpertModules:
@@ -319,8 +332,10 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     add_ecl_track_brem_finder(path, components)
 
     # Prune tracks as soon as the post-tracking steps are complete
-    if pruneTracks:
-        add_prune_tracks(path, components)
+    # Not add prune tracks modules in prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        if pruneTracks:
+            add_prune_tracks(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 

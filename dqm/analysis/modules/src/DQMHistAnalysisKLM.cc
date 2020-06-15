@@ -186,6 +186,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
                                                       channelNumber);
       if (ite == m_MaskedChannels.end())
         m_NewMaskedChannels.push_back(channelNumber);
+      B2DEBUG(20, "KLM@MaskMe " << channelNumber);
     } else if ((nHits > average * m_ThresholdForHot) && (nHits > m_MinHitsForFlagging)) {
       channelStatus = "Hot";
     }

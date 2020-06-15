@@ -44,6 +44,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
+  addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -106,7 +107,13 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Up-to-date Efficiency of each module;PXD Module;",
+                                    m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hEffAllLast = new TEfficiency("HitEffAlllast", "Latst update Efficiency of each module;PXD Module;",
+                                  m_PXDModules.size(), 0, m_PXDModules.size());
   m_hEffAll->SetConfidenceLevel(m_confidence);
+  m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
+  m_hEffAllLast->SetConfidenceLevel(m_confidence);
 
 //   m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
   m_hEffAll->Paint("AP");
@@ -149,6 +156,12 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: beginRun called.");
 
+// if(m_hEffAll->GetTotalHistogram()) m_hEffAll->GetTotalHistogram()->Reset();
+// if(m_hEffAllUpdate->GetTotalHistogram()) m_hEffAllUpdate->GetTotalHistogram()->Reset();
+// if(m_hEffAllLast->GetTotalHistogram()) m_hEffAllLast->GetTotalHistogram()->Reset();
+// if(m_hEffAll->GetPassedHistogram()) m_hEffAll->GetPassedHistogram()->Reset();
+// if(m_hEffAllUpdate->GetPassedHistogram()) m_hEffAllUpdate->GetPassedHistogram()->Reset();
+// if(m_hEffAllLast->GetPassedHistogram()) m_hEffAllLast->GetPassedHistogram()->Reset();
   m_cEffAll->Clear();
 
   for (auto single_cmap : m_cEffModules) {
@@ -223,7 +236,7 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hEffAll->SetTotalEvents(j, 0);
       m_hEffAll->SetPassedEvents(j, 0);
     } else {
-      double nmatch = mapMatches[aModule]->Integral();
+      double nmatch = mapMatches[aModule]->Integral(); // GetEntries()?
       double nhit = mapHits[aModule]->Integral();
       if (nmatch > 10 && nhit > 10) { // could be zero, too
         imatch += nmatch;
@@ -239,6 +252,13 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
 
+      if (m_hEffAllLast->GetTotalHistogram()->GetBinContent(j) + m_minEntries < nhit) {
+        m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLast->GetTotalHistogram()->GetBinContent(j));
+        m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLast->GetPassedHistogram()->GetBinContent(j));
+        m_hEffAllLast->SetTotalEvents(j, nhit);
+        m_hEffAllLast->SetPassedEvents(j, nmatch);
+      }
+
       if (j == 6) continue; // wrkaround for 1.3.2 module
 
       // get the errors and check for limits for each bin seperately ...
@@ -253,6 +273,8 @@ void DQMHistAnalysisPXDEffModule::event()
 
   m_cEffAll->cd();
   m_hEffAll->Paint("AP");
+  m_hEffAllUpdate->Draw("same,AP");
+
 
   auto gr = m_hEffAll->GetPaintedGraph();
   if (gr) {
@@ -313,6 +335,21 @@ void DQMHistAnalysisPXDEffModule::event()
     }
     m_line_warn->Draw();
     m_line_error->Draw();
+  }
+
+  {
+    auto gru = m_hEffAllUpdate->GetPaintedGraph();
+    if (gru) {
+      double scale_min = 1.0;
+      for (int i = 0; i < gr->GetN(); i++) {
+        gru->SetPointEXhigh(i, 0.);
+        gru->SetPointEXlow(i, 0.);
+        // this has to be done first, as it will recalc Min/Max and destroy axis
+        Double_t x, y;
+        gru->GetPoint(i, x, y);
+        gru->SetPoint(i, x + 0.2, y); // shift a bit
+      }
+    }
   }
 
   m_cEffAll->Modified();

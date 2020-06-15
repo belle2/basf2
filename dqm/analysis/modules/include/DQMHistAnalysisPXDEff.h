@@ -60,6 +60,8 @@ namespace Belle2 {
     double m_warnlevel;
     //! error level for alarm
     double m_errorlevel;
+    /** Update entry intervall */
+    int m_minEntries = 1000;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -73,6 +75,11 @@ namespace Belle2 {
     TEfficiency* m_hEffAll = nullptr;
     //! Final Canvas
     TCanvas* m_cEffAll = nullptr;
+    //! Efficiency, last state
+    TEfficiency* m_hEffAllLast;
+    //! Efficiency, last state, updated
+    TEfficiency* m_hEffAllUpdate;
+
 
     /** TLine object for warning limit */
     TLine* m_line_warn{};

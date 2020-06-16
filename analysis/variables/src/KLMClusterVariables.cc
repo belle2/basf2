@@ -286,6 +286,7 @@ Returns the timing informationf of the associated KLMCluster.
 .. warning::
 Currently the KLM has no time calibration. This leads to a huge discrepancy for the klmClusterTiming variable if one compares collisions and simulated data. Moreover, the distribution of the variable on collisions data has a very complicated structure, due to the different timing shifts of different KLM components.
 It is recommended to not use it in any case until the KLM is calibrated, even for simulated data.
+
 )DOC");
   REGISTER_VARIABLE("klmClusterPositionX", klmClusterPositionX, R"DOC(
 Returns the :math:`x` position of the associated KLMCluster.
@@ -306,6 +307,7 @@ Returns the energy of the associated KLMCluster.
 .. warning::
 klmClusterEnergy is an approximation of the energy: it uses :b2:var:`klmClusterMomentum` as momentum and the hypothesis that the cluster was originated by a :math:`K_{L}^0`.
 It should be used with caution, and may not be physically meaningful.
+
 )DOC");
   REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
 Returns the magnitude magnitude of the associated KLMCluster. 
@@ -313,6 +315,7 @@ Returns the magnitude magnitude of the associated KLMCluster.
 .. warning::
 klmClusterMomentum is an approximation of the momentum, it is proportional to :b2:var:`klmClusterLayers`.
 It should be used with caution, and may not be physically meaningful.
+
 )DOC");
   REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM,
                     "Returns 1 if the associated KLMCluster is in barrel KLM.");

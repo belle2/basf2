@@ -2881,7 +2881,7 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     to the slow pion direction. The charge of the given pion list has to be consistent
     with the D* charge
 
-    @param decayString Decay string, must be of form `D* -> pi`
+    @param decayString Decay string, must be of form ``D* -> pi``
     @param slowPionCut Cut applied to the input pion list to identify slow pions
     @param DstarCut Cut applied to the output D* list
     @param path the module is added to this path

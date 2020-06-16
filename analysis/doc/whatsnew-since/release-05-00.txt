@@ -16,8 +16,8 @@ Variables
    region with another cluster. A cut string can be provided to ignore cluster that do not satisfy the specified criteria.
  * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
  * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
+ * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
 
- * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable  
 Modules
 +++++++
 

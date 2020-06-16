@@ -592,9 +592,19 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     :param add_hits_to_reco_track: Add the found KLM hits also to the RecoTrack. Make sure to refit the track afterwards.
     :param components: The components to use or None to use all standard components.
     """
+    # Muid is needed for muonID computation and ECLCluster-Track matching.
     if components is None or ('CDC' in components and 'ECL' in components and 'KLM' in components):
         muid = register_module('Muid', addHitsToRecoTrack=add_hits_to_reco_track)
         path.add_module(muid)
+    if components is not None and 'CDC' in components:
+        if ('ECL' not in components and 'KLM' in components):
+            B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
+                      'for correct muonID computation, will not be added to your reconstruction path. '
+                      'Make sure that this is fine for your purposes, otherwise please include also ECL.')
+        if ('ECL' in components and 'KLM' not in components):
+            B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
+                      'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
+                      ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
 
 
 def add_ecl_modules(path, components=None):

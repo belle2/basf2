@@ -489,13 +489,15 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
   return maskNames;
 }
 
-void RestOfEvent::print(std::string maskName, bool unpackComposite) const
+void RestOfEvent::print(const std::string& maskName, bool unpackComposite) const
 {
-  unsigned int nCharged = getChargedParticles(maskName, 0, unpackComposite).size();
-  unsigned int nPhotons = getPhotons(maskName, unpackComposite).size();
-  unsigned int nNeutralHadrons = getHadrons(maskName, unpackComposite).size();
   std::string tab = " - ";
   if (maskName != "") {
+    // Disable possible B2FATAL in printing method, might be useful for tests
+    if (!hasMask(maskName)) {
+      B2WARNING("No mask with the name '" << maskName << "' exists in this ROE! Nothing else to print");
+      return;
+    }
     tab = " - - ";
   } else {
     if (m_isNested) {
@@ -505,13 +507,16 @@ void RestOfEvent::print(std::string maskName, bool unpackComposite) const
       B2INFO(tab << "Is build from genPartices");
     }
   }
+  unsigned int nCharged = getChargedParticles(maskName, 0, unpackComposite).size();
+  unsigned int nPhotons = getPhotons(maskName, unpackComposite).size();
+  unsigned int nNeutralHadrons = getHadrons(maskName, unpackComposite).size();
   B2INFO(tab << "No. of Charged particles in ROE: " << nCharged);
   B2INFO(tab << "No. of Photons           in ROE: " << nPhotons);
   B2INFO(tab << "No. of Neutral hadrons   in ROE: " << nNeutralHadrons);
   printIndices(maskName, unpackComposite, tab);
 }
 
-void RestOfEvent::printIndices(std::string maskName, bool unpackComposite, std::string tab) const
+void RestOfEvent::printIndices(const std::string& maskName, bool unpackComposite, const std::string& tab) const
 {
   auto particles = getParticles(maskName, unpackComposite);
   if (particles.size() == 0) {

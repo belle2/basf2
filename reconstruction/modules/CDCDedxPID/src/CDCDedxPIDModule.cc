@@ -376,9 +376,9 @@ void CDCDedxPIDModule::event()
       double topHeight = outer - wirePosF.Perp();
       double bottomHeight = wirePosF.Perp() - inner;
       double cellHeight = topHeight + bottomHeight;
-      double topHalfWidth = PI * outer / nWires;
-      double bottomHalfWidth = PI * inner / nWires;
-      double cellHalfWidth = PI * wirePosF.Perp() / nWires;
+      double topHalfWidth = M_PI * outer / nWires;
+      double bottomHalfWidth = M_PI * inner / nWires;
+      double cellHalfWidth = M_PI * wirePosF.Perp() / nWires;
 
       // first construct the boundary lines, then create the cell
       const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);

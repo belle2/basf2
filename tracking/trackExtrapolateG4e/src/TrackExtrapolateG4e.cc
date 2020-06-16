@@ -164,22 +164,26 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 
   // Set up the EXT-specific geometry (might have already been done by MUID)
   if (m_TargetExt == nullptr) {
-    if (!m_COILGeometryPar.isValid()) {
+    if (!m_COILGeometryPar.isValid())
       B2FATAL("Coil geometry data are not available.");
-    } else {
-      double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
-      double rMinCoil = m_COILGeometryPar->getCryoRmin();
-      double halfLength = m_COILGeometryPar->getCryoLength();
-      m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
-      G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-    }
+    double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+    double rMinCoil = m_COILGeometryPar->getCryoRmin();
+    double halfLength = m_COILGeometryPar->getCryoLength();
+    m_COILGeometryPar.addCallback([this, &offsetZ, &rMinCoil, &halfLength]() {
+      offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+      rMinCoil = m_COILGeometryPar->getCryoRmin();
+      halfLength = m_COILGeometryPar->getCryoLength();
+    });
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
+    G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
   }
-  if (!m_BeamPipeGeo.isValid()) {
+  if (!m_BeamPipeGeo.isValid())
     B2FATAL("Beam pipe geometry data are not available.");
-  } else {
-    double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
-    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
-  }
+  double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
+  m_BeamPipeGeo.addCallback([this, &beampipeRadius]() {
+    beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm;
+  });
+  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 }
 
 // Initialize for MUID
@@ -241,22 +245,26 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
 
   // Set up the EXT-specific geometry (might have already been done by EXT)
   if (m_TargetExt == nullptr) {
-    if (!m_COILGeometryPar.isValid()) {
+    if (!m_COILGeometryPar.isValid())
       B2FATAL("Coil geometry data are not available.");
-    } else {
-      double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
-      double rMinCoil = m_COILGeometryPar->getCryoRmin();
-      double halfLength = m_COILGeometryPar->getCryoLength();
-      m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
-      G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-    }
+    double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+    double rMinCoil = m_COILGeometryPar->getCryoRmin();
+    double halfLength = m_COILGeometryPar->getCryoLength();
+    m_COILGeometryPar.addCallback([this, &offsetZ, &rMinCoil, &halfLength]() {
+      offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+      rMinCoil = m_COILGeometryPar->getCryoRmin();
+      halfLength = m_COILGeometryPar->getCryoLength();
+    });
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
+    G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
   }
-  if (!m_BeamPipeGeo.isValid()) {
+  if (!m_BeamPipeGeo.isValid())
     B2FATAL("Beam pipe geometry data are not available.");
-  } else {
-    double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
-    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
-  }
+  double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
+  m_BeamPipeGeo.addCallback([this, &beampipeRadius]() {
+    beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm;
+  });
+  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 
   // Set up the MUID-specific geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();

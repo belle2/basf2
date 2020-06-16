@@ -278,43 +278,49 @@ namespace Belle2 {
 
     VARIABLE_GROUP("KLM Cluster and KlongID");
 
-    REGISTER_VARIABLE("klmClusterKlId", klmClusterKlId, "Returns the KlId associated to the KLMCluster.");
+    REGISTER_VARIABLE("klmClusterKlId", klmClusterKlId, "Returns the KlId classifier output associated to the KLMCluster.");
     REGISTER_VARIABLE("klmClusterBelleTrackFlag", klmClusterBelleTrackFlag, "Returns the Belle-style Track flag.");
     REGISTER_VARIABLE("klmClusterBelleECLFlag", klmClusterBelleECLFlag, "Returns the Belle-style ECL flag.");
-    REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, "Returns KLMCluster's timing info.");
-    REGISTER_VARIABLE("klmClusterPositionX", klmClusterPositionX, "Returns KLMCluster's x position.");
-    REGISTER_VARIABLE("klmClusterPositionY", klmClusterPositionY, "Returns KLMCluster's y position.");
-    REGISTER_VARIABLE("klmClusterPositionZ", klmClusterPositionZ, "Returns KLMCluster's z position.");
+    REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, R"DOC(
+Returns the timing informationf of the associated KLMCluster.
+
+.. warning::
+Currently the KLM has no time calibration. This leads to a huge discrepancy for the klmClusterTiming variable if one compares collisions and simulated data. Moreover, the distribution of the variable on collisions data has a very complicated structure, due to the different timing shifts of different KLM components.
+It is recommended to not use it in any case until the KLM is calibrated, even for simulated data.
+)DOC");
+    REGISTER_VARIABLE("klmClusterPositionX", klmClusterPositionX, "Returns the :math:`x` position of the associated KLMCluster.");
+    REGISTER_VARIABLE("klmClusterPositionY", klmClusterPositionY, "Returns the :math:`y` position of the associated KLM\Cluster.");
+    REGISTER_VARIABLE("klmClusterPositionZ", klmClusterPositionZ, "Returns the :math:`z` position of the associated KLM\Cluster.");
     REGISTER_VARIABLE("klmClusterInnermostLayer", klmClusterInnermostLayer,
-                      "Returns KLM cluster's number of the innermost layer with hits.");
-    REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers, "Returns KLM cluster's number of layers with hits.");
+                      "Returns the number of the innermost KLM layer with a 2-dimensional hit of the associated KLMCluster.");
+    REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers, "Returns the number of KLM layers with 2-dimensional hits of the associated KLMCluster.");
     REGISTER_VARIABLE("klmClusterEnergy", klmClusterEnergy, R"DOC(
-Returns the energy of the KLMCluster. 
+Returns the energy of the associated KLMCluster. 
 
 .. warning::
     klmClusterEnergy is an approximation of the energy: it uses :b2:var:`klmClusterMomentum` as momentum and the hypothesis that the cluster was originated by a :math:`K_{L}^0`.
     It should be used with caution, and may not be physically meaningful.
 )DOC");
     REGISTER_VARIABLE("klmClusterMomentum", klmClusterMomentum, R"DOC(
-Returns the magnitude of the KLMCluster momentum. 
+Returns the magnitude magnitude of the associated KLMCluster. 
 
 .. warning::
     klmClusterMomentum is an approximation of the momentum, it is proportional to :b2:var:`klmClusterLayers`.
     It should be used with caution, and may not be physically meaningful.
 )DOC");
-    REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM, "Returns 1 if the associated KLMCluster is in BKLM.");
-    REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM, "Returns 1 if the associated KLMCluster is in EKLM.");
-    REGISTER_VARIABLE("klmClusterIsForwardEKLM", klmClusterIsForwardEKLM, "Returns 1 if the associated KLMCluster is in forward EKLM.");
+    REGISTER_VARIABLE("klmClusterIsBKLM", klmClusterIsBKLM, "Returns 1 if the associated KLMCluster is in barrel KLM.");
+    REGISTER_VARIABLE("klmClusterIsEKLM", klmClusterIsEKLM, "Returns 1 if the associated KLMCluster is in endcap KLM.");
+    REGISTER_VARIABLE("klmClusterIsForwardEKLM", klmClusterIsForwardEKLM, "Returns 1 if the associated KLMCluster is in forward endcap KLM.");
     REGISTER_VARIABLE("klmClusterIsBackwardEKLM", klmClusterIsBackwardEKLM,
-                      "Returns 1 if the associated KLMCluster is in backward EKLM.");
-    REGISTER_VARIABLE("klmClusterTheta", klmClusterTheta, "Returns KLMCluster's theta.");
-    REGISTER_VARIABLE("klmClusterPhi", klmClusterPhi, "Returns KLMCluster's phi.");
+                      "Returns 1 if the associated KLMCluster is in backward endcap KLM.");
+    REGISTER_VARIABLE("klmClusterTheta", klmClusterTheta, "Returns the polar (:math:`\theta`) angle of the associated KLMCluster.");
+    REGISTER_VARIABLE("klmClusterPhi", klmClusterPhi, "Returns the azimuthal (:math:`\phi`) angle of the associated KLMCluster.");
     REGISTER_VARIABLE("maximumKLMAngleCMS", maximumKLMAngleCMS ,
-                      "Returns the maximum angle in the CMS between the Particle and all KLM clusters in the event.");
+                      "Returns the maximum angle in the CMS frame between the Particle and all KLMClusters in the event.");
     REGISTER_VARIABLE("nKLMClusterTrackMatches", nKLMClusterTrackMatches,
-                      "Returns the number of Tracks matched to the KLMCluster associated to this Particle (>0 for K_L0 and matched Tracks, NaN for not-matched Tracks).");
+                      "Returns the number of Tracks matched to the KLMCluster associated to this Particle. This variable can return a number greater than 0 for :math:`K_{L}^0` or :math:`n` candidates originating from KLMClusters and returns NaN for Particles with no KLMClusters associated.");
     REGISTER_VARIABLE("nMatchedKLMClusters", nMatchedKLMClusters,
-                      "Returns the number of KLMClusters matched to the Track associated to this Particle. It can return only 0, 1 or NaN (it returns NaN for K_L0 candidates with no Tracks associated).");
+                      "Returns the number of KLMClusters matched to the Track associated to this Particle. This variable can return only 0 or 1 and return NaN for :math:`K_{L}^0` or :math:`n` candidates originating from KLMClusters with no Tracks associated.");
     REGISTER_VARIABLE("klmClusterTrackDistance", klmClusterTrackDistance,
                       "Returns the distance between the Track and the KLMCluster associated to this Particle. This variable returns NaN if there is no Track-to-KLMCluster relationship.");
 

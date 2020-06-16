@@ -24,6 +24,7 @@
 #include <TLine.h>
 #include <TGraphErrors.h>
 #include <TFile.h>
+#include <TH2.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
@@ -90,6 +91,10 @@ namespace Belle2 {
     TH1F* m_hTrackedClusters = nullptr;
     //! Final Canvas for TrackedClusters
     TCanvas* m_cTrackedClusters = nullptr;
+    //! Final Canvas Fit and Ref per ASIC
+    std::map<VxdID, TH2F*> m_hChargeModASIC2d {};
+    //! Final Canvas Fit and Ref per ASIC
+    std::map<VxdID, TCanvas*> m_cChargeModASIC2d {};
 
     /** TLine object for upper limit of track cluster charge */
     TLine* m_line_up{};

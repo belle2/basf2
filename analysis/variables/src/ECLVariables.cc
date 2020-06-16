@@ -16,14 +16,16 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 
+
 //analysis
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 #include <analysis/dataobjects/ECLTRGInformation.h>
 #include <analysis/dataobjects/ECLTriggerCell.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <analysis/ClusterUtility/ClusterUtils.h>
+#include <analysis/VariableManager/Utility.h>
 
 //MDST
 #include <mdst/dataobjects/ECLCluster.h>
@@ -1101,6 +1103,100 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr photonHasOverlap(const std::vector<std::string>& arguments)
+    {
+      std::string cutString = "";
+      if (arguments.size() > 0) {
+        cutString = arguments[0];
+      }
+      std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+
+      std::string photonlistname = "gamma:all";
+      if (arguments.size() > 1) {
+        photonlistname = arguments[1];
+      }
+
+      std::string tracklistname = "e-:all";
+      if (arguments.size() > 2) {
+        tracklistname = arguments[2];
+      }
+
+      auto func = [cut, photonlistname, tracklistname](const Particle * particle) -> double {
+
+        if (particle->getPDGCode() != Const::photon.getPDGCode())
+        {
+          B2WARNING("The variable photonHasOverlap is supposed to be calculated for photons. Returning NaN.");
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+
+        StoreObjPtr<ParticleList> photonlist(photonlistname);
+        if (!(photonlist.isValid()))
+        {
+          B2WARNING("The provided particle list " << photonlistname << " does not exist."
+          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        if (photonlist->getPDGCode() != Const::photon.getPDGCode())
+        {
+          B2WARNING("The list " << photonlistname << " does not contain photons."
+          " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+
+        StoreObjPtr<ParticleList> tracklist(tracklistname);
+        if (!(tracklist.isValid()))
+        {
+          B2WARNING("The provided particle list " << tracklistname << " does not exist."
+          " Therefore, the variable photonHasOverlap can not be calculated. Returning NaN.");
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+        if (!Const::chargedStableSet.contains(Const::ParticleType(abs(tracklist->getPDGCode()))))
+        {
+          B2WARNING("The list " << tracklistname << " does not contain charged final state particles."
+          " Therefore, the variable photonHasOverlap can not be calculated reliably. Returning NaN.");
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+
+        double connectedRegionID = eclClusterConnectedRegionID(particle);
+        unsigned mdstArrayIndex = particle->getMdstArrayIndex();
+
+        for (unsigned int i = 0; i < photonlist->getListSize(); i++)
+        {
+          const Particle* part = photonlist->getParticle(i);
+
+          // skip the particle itself
+          if (part->getMdstArrayIndex() == mdstArrayIndex) {
+            continue;
+          }
+
+          // skip photons that do not fulfill the provided criteria
+          if (!cut->check(part)) {
+            continue;
+          }
+
+          if (connectedRegionID == eclClusterConnectedRegionID(part)) {
+            return 1;
+          }
+        }
+
+        for (unsigned int i = 0; i < tracklist->getListSize(); i++)
+        {
+          const Particle* part = tracklist->getParticle(i);
+
+          // skip tracks that do not fulfill the provided criteria
+          if (!cut->check(part)) {
+            continue;
+          }
+
+          if (connectedRegionID == eclClusterConnectedRegionID(part)) {
+            return 1;
+          }
+        }
+
+        return 0;
+      };
+      return func;
+    }
 
     VARIABLE_GROUP("ECL Cluster related");
     REGISTER_VARIABLE("clusterEoP", eclClusterEoP, R"DOC(
@@ -1578,6 +1674,16 @@ cluster-matched tracks using the cluster 4-momenta.
 Used for ECL-based dark sector physics and debugging track-cluster matching.
 )DOC");
 
+    REGISTER_VARIABLE("photonHasOverlap(cutString, photonlistname, tracklistname)", photonHasOverlap, R"DOC(
+      Returns true if the connected ECL region of the particle's cluster is shared by another particle's cluster.
+      Neutral and charged cluster are considered.
+      A cut string can be provided to ignore cluster that do not satisfy the given criteria.
+      By default, the ParticleList ``gamma:all`` is used for the check of neutral ECL cluster,
+      and the ParticleList ``e-:all`` for the check of charged ECL cluster.
+      However, one can customize the name of the ParticleLists via additional arguments.
+      If no argument or only a cut string is provided and ``gamma:all`` or ``e-:all`` does not exist
+      or if the variable is requested for a particle that is not a photon, NaN is returned.
+      )DOC");
 
     // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
     VARIABLE_GROUP("ECL calibration");

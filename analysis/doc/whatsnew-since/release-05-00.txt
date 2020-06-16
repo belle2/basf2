@@ -12,10 +12,12 @@ Variables
 
  * Variables :b2:var:`recQ2Bh`, :b2:var:`recMissM2`, :b2:var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``,
    and :b2:var:`recQ2Bh` is now using a `diamond frame method <https://www.osti.gov/biblio/1442697>`_
+ * Added the new variable :b2:var:`photonHasOverlap`, which determines whether a particle's cluster is sharing its connected
+   region with another cluster. A cut string can be provided to ignore cluster that do not satisfy the specified criteria.
  * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
  * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
+ * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
 
- * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable  
 Modules
 +++++++
 

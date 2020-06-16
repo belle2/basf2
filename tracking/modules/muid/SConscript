@@ -1,14 +1,11 @@
 Import('env')
 
-env['LIBS'] = [
-    'CLHEP',
-    '$ROOT_LIBS',
-    '$GEANT4_LIBS',
-    'analysis_dataobjects',
-    'tracking_dataobjects',
-    'analysis',
-    'tracking',
-    'framework'
-    ]
+env['LIBS'] = ['tracking_trackExtrapolateG4e',
+               'framework',
+               'simulation',
+               'CLHEP',
+               '$GEANT4_LIBS',
+               '$ROOT_LIBS'
+              ]
 
 Return('env')

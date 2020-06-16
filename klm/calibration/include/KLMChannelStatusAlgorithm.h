@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2019  Belle II Collaboration                              *
+ * Copyright(C) 2020  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Kirill Chilikin                                          *
@@ -22,19 +22,174 @@ namespace Belle2 {
   /**
    * KLM channel status calibration algorithm.
    */
-  class KLMChannelStatusCalibrationAlgorithm : public CalibrationAlgorithm {
+  class KLMChannelStatusAlgorithm : public CalibrationAlgorithm {
 
   public:
 
     /**
+     * Calibration results.
+     */
+    class Results {
+
+      friend class KLMChannelStatusAlgorithm;
+
+    public:
+
+      /**
+       * Constructor.
+       */
+      Results();
+
+      /**
+       * Copy constructor.
+       */
+      Results(const Results& results);
+
+      /**
+       * Destructor.
+       */
+      ~Results();
+
+      /**
+       * Get channel status (last calibration).
+       */
+      KLMChannelStatus& getChannelStatus() const
+      {
+        return *m_ChannelStatus;
+      }
+
+      /**
+       * Get module status (last calibration).
+       */
+      KLMChannelStatus& getModuleStatus() const
+      {
+        return *m_ModuleStatus;
+      }
+
+      /**
+       * Get channel hit map.
+       */
+      const KLMChannelMapValue<unsigned int>& getHitMapChannel() const
+      {
+        return m_HitMapChannel;
+      }
+
+      /**
+       * Get module hit map.
+       */
+      const KLMChannelMapValue<unsigned int>& getHitMapModule() const
+      {
+        return m_HitMapModule;
+      }
+
+      /**
+       * Get sector hit map.
+       */
+      const KLMChannelMapValue<unsigned int>& getHitMapSector() const
+      {
+        return m_HitMapSector;
+      }
+
+      /**
+       * Get module hit map (no hot channels).
+       */
+      const KLMChannelMapValue<unsigned int>& getHitMapModuleNoHot() const
+      {
+        return m_HitMapModuleNoHot;
+      }
+
+      /**
+       * Get sector hit map (no hot channels).
+       */
+      const KLMChannelMapValue<unsigned int>& getHitMapSectorNoHot() const
+      {
+        return m_HitMapSectorNoHot;
+      }
+
+      /**
+       * Get module active-channel map.
+       */
+      const KLMChannelMapValue<unsigned int>& getModuleActiveChannelMap() const
+      {
+        return m_ModuleActiveChannelMap;
+      }
+
+      /**
+       * Get total hit number.
+       */
+      unsigned int getTotalHitNumber() const
+      {
+        return m_TotalHitNumber;
+      }
+
+      /**
+       * Get number of hits in EKLM.
+       */
+      unsigned int getHitNumberEKLM() const
+      {
+        return m_HitNumberEKLM;
+      }
+
+      /**
+       * Get number of hits in BKLM.
+       */
+      unsigned int getHitNumberBKLM() const
+      {
+        return m_HitNumberBKLM;
+      }
+
+    private:
+
+      /** Module status. */
+      KLMChannelStatus* m_ModuleStatus = nullptr;
+
+      /** Channel status. */
+      KLMChannelStatus* m_ChannelStatus = nullptr;
+
+      /** Channel hit map. */
+      KLMChannelMapValue<unsigned int> m_HitMapChannel;
+
+      /** Module hit map. */
+      KLMChannelMapValue<unsigned int> m_HitMapModule;
+
+      /** Sector hit map. */
+      KLMChannelMapValue<unsigned int> m_HitMapSector;
+
+      /** Module hit map (no hit channels). */
+      KLMChannelMapValue<unsigned int> m_HitMapModuleNoHot;
+
+      /** Sector hit map (no hot channels). */
+      KLMChannelMapValue<unsigned int> m_HitMapSectorNoHot;
+
+      /** Module active-channel map (number of active channels in module). */
+      KLMChannelMapValue<unsigned int> m_ModuleActiveChannelMap;
+
+      /** Total hit number. */
+      unsigned int m_TotalHitNumber = 0;
+
+      /** Number of hits in BKLM. */
+      unsigned int m_HitNumberBKLM = 0;
+
+      /** Number of hits in EKLM. */
+      unsigned int m_HitNumberEKLM = 0;
+
+      /** Number of hits in BKLM (no hot channels). */
+      unsigned int m_HitNumberBKLMNoHot = 0;
+
+      /** Number of hits in EKLM (no hot channels). */
+      unsigned int m_HitNumberEKLMNoHot = 0;
+
+    };
+
+    /**
      * Constructor.
      */
-    KLMChannelStatusCalibrationAlgorithm();
+    KLMChannelStatusAlgorithm();
 
     /**
      * Destructor.
      */
-    ~KLMChannelStatusCalibrationAlgorithm();
+    ~KLMChannelStatusAlgorithm();
 
     /**
      * Calibration.
@@ -110,92 +265,13 @@ namespace Belle2 {
       m_MinimalAverageHitNumber = minimalAverageHitNumber;
     }
 
-    /**
-     * Get module status (last calibration).
-     */
-    KLMChannelStatus& getModuleStatus() const
-    {
-      return *m_ModuleStatus;
-    }
 
     /**
-     * Get channel status (last calibration).
+     * Get results.
      */
-    KLMChannelStatus& getChannelStatus() const
+    const Results* getResults() const
     {
-      return *m_ChannelStatus;
-    }
-
-    /**
-     * Get channel hit map.
-     */
-    const KLMChannelMapValue<unsigned int>& getHitMapChannel() const
-    {
-      return m_HitMapChannel;
-    }
-
-    /**
-     * Get module hit map.
-     */
-    const KLMChannelMapValue<unsigned int>& getHitMapModule() const
-    {
-      return m_HitMapModule;
-    }
-
-    /**
-     * Get sector hit map.
-     */
-    const KLMChannelMapValue<unsigned int>& getHitMapSector() const
-    {
-      return m_HitMapSector;
-    }
-
-    /**
-     * Get module hit map (no hot channels).
-     */
-    const KLMChannelMapValue<unsigned int>& getHitMapModuleNoHot() const
-    {
-      return m_HitMapModuleNoHot;
-    }
-
-    /**
-     * Get sector hit map (no hot channels).
-     */
-    const KLMChannelMapValue<unsigned int>& getHitMapSectorNoHot() const
-    {
-      return m_HitMapSectorNoHot;
-    }
-
-    /**
-     * Get module active-channel map.
-     */
-    const KLMChannelMapValue<unsigned int>& getModuleActiveChannelMap() const
-    {
-      return m_ModuleActiveChannelMap;
-    }
-
-    /**
-     * Get total hit number.
-     */
-    unsigned int getTotalHitNumber() const
-    {
-      return m_TotalHitNumber;
-    }
-
-    /**
-     * Get number of hits in EKLM.
-     */
-    unsigned int getHitNumberEKLM() const
-    {
-      return m_HitNumberEKLM;
-    }
-
-    /**
-     * Get number of hits in BKLM.
-     */
-    unsigned int getHitNumberBKLM() const
-    {
-      return m_HitNumberBKLM;
+      return &m_Results;
     }
 
   protected:
@@ -266,44 +342,8 @@ namespace Belle2 {
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;
 
-    /** Module status. */
-    KLMChannelStatus* m_ModuleStatus = nullptr;
-
-    /** Channel status. */
-    KLMChannelStatus* m_ChannelStatus = nullptr;
-
-    /** Channel hit map. */
-    KLMChannelMapValue<unsigned int> m_HitMapChannel;
-
-    /** Module hit map. */
-    KLMChannelMapValue<unsigned int> m_HitMapModule;
-
-    /** Sector hit map. */
-    KLMChannelMapValue<unsigned int> m_HitMapSector;
-
-    /** Module hit map (no hit channels). */
-    KLMChannelMapValue<unsigned int> m_HitMapModuleNoHot;
-
-    /** Sector hit map (no hot channels). */
-    KLMChannelMapValue<unsigned int> m_HitMapSectorNoHot;
-
-    /** Module active-channel map (number of active channels in module). */
-    KLMChannelMapValue<unsigned int> m_ModuleActiveChannelMap;
-
-    /** Total hit number. */
-    unsigned int m_TotalHitNumber = 0;
-
-    /** Number of hits in BKLM. */
-    unsigned int m_HitNumberBKLM = 0;
-
-    /** Number of hits in EKLM. */
-    unsigned int m_HitNumberEKLM = 0;
-
-    /** Number of hits in BKLM (no hot channels). */
-    unsigned int m_HitNumberBKLMNoHot = 0;
-
-    /** Number of hits in EKLM (no hot channels). */
-    unsigned int m_HitNumberEKLMNoHot = 0;
+    /** Calibration results. */
+    Results m_Results;
 
   };
 

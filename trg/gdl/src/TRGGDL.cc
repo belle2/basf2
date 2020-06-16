@@ -21,12 +21,9 @@
 #include "trg/trg/Time.h"
 #include "trg/trg/State.h"
 #include "trg/trg/Signal.h"
-#include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/gdl/TRGGDL.h"
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
@@ -34,7 +31,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <TH2I.h>
 #include <TH1I.h>
 
 #define N_TIMING_REGISTERS 4
@@ -156,13 +152,13 @@ namespace Belle2 {
   {
     if (_debugLevel > 19) {
       for (int i = 0; i < m_InputBitsDB->getninbit(); i++) {
-        B2INFO("TRGGDL::initialize, inputBits: " << i << ", " << m_InputBitsDB->getinbitname(i));
+        B2DEBUG(20, "TRGGDL::initialize, inputBits: " << i << ", " << m_InputBitsDB->getinbitname(i));
       }
       for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
-        B2INFO("TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
+        B2DEBUG(20, "TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
       }
       for (int i = 0; i < db_algs->getnalgs(); i++) {
-        B2INFO("TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
+        B2DEBUG(20, "TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
       }
     }
     //if it is firmware simulation, do the cofigurnation
@@ -235,7 +231,7 @@ namespace Belle2 {
   void
   TRGGDL::fastSimulation(void)
   {
-    B2INFO("TRGGDL::fastSimulation starts.");
+    B2DEBUG(20, "TRGGDL::fastSimulation starts.");
     TRGDebug::enterStage("TRGGDL fastSim");
 
     if (TRGDebug::level())
@@ -322,7 +318,7 @@ namespace Belle2 {
   void
   TRGGDL::dataSimulation(void)
   {
-//  B2INFO("TRGGDL::dataSimulation starts.");
+//  B2DEBUG(20,"TRGGDL::dataSimulation starts.");
     StoreObjPtr<EventMetaData> bevt;
     /*
     unsigned _exp = bevt->getExperiment();

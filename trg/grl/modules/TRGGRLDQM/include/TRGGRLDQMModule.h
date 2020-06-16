@@ -11,13 +11,7 @@
 #ifndef TRCGRLDQMMODULE_h
 #define TRCGRLDQMMODULE_h
 
-#include "trg/grl/dataobjects/TRGGRLUnpackerStore.h"
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <stdlib.h>
-#include <iostream>
-#include <string>
 
 #include <TH1I.h>
 #include <TH1F.h>

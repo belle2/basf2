@@ -15,7 +15,6 @@
 #define TRGCDCTrack_FLAG_
 
 #include "trg/cdc/TrackBase.h"
-#include "trg/cdc/WireHit.h"
 #include "trg/cdc/Helix.h"
 
 #ifdef TRGCDC_SHORT_NAMES

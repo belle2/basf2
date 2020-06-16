@@ -16,12 +16,9 @@
 
 #include <string>
 #include "framework/core/Module.h"
-#include <framework/datastore/StoreObjPtr.h>
-#include "trg/grl/TRGGRL.h"
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
-//#include "trg/cdc/dataobjects/CDCTriggerTrack.h"
 
 namespace Belle2 {
 

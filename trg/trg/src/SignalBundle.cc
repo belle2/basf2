@@ -14,12 +14,10 @@
 #define TRG_SHORT_NAMES
 
 #include <string>
-#include <cstring>
 #include <algorithm>
 #include <limits>
 #include <iostream>
 #include <fstream>
-#include "trg/trg/Constants.h"
 #include "trg/trg/Utilities.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Clock.h"

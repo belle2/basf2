@@ -10,7 +10,6 @@
 
 #include <framework/database/DBImportObjPtr.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
-#include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <iostream>
 #include <fstream>
 

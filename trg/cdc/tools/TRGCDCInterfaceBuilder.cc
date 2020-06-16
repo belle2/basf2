@@ -14,16 +14,13 @@
 #define TRG_SHORT_NAMES
 
 #include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <string.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include "trg/trg/Utilities.h"
-#include "trg/cdc/FrontEnd.h"
 
 using namespace std;
 using namespace Belle2;

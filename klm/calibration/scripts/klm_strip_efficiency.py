@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""Implements some extra utilities for doing KLM calibration with the CAF."""
+"""Custom calibration strategy for KLM strip efficiency."""
 
 import collections
 import os
@@ -14,125 +14,107 @@ from caf.utils import split_runs_by_exp
 from caf.strategies import AlgorithmStrategy
 from caf.state_machines import AlgorithmMachine
 from ROOT.Belle2 import KLMStripEfficiencyAlgorithm
-
-
-def calibration_result_string(result):
-    if (result == 0):
-        res = 'successful'
-    elif (result == 1):
-        res = 'iteration is necessary'
-    elif (result == 2):
-        res = 'not enough data'
-    elif (result == 3):
-        res = 'failure'
-    elif (result == 4):
-        res = 'undefined'
-    return res
+from klm_strategies_common import get_lowest_exprun, get_highest_exprun, \
+                                  calibration_result_string
 
 
 class KLMStripEfficiency(AlgorithmStrategy):
-    """Custom strategy for executing the KLM strip efficiency. Requires complex run merging rules.
+    """
+    Custom strategy for executing the KLM strip efficiency. Requires complex
+    run merging rules.
 
-    This uses a `caf.state_machines.AlgorithmMachine` to actually execute the various steps rather than operating on
-    a CalibrationAlgorithm C++ class directly."""
+    This uses a `caf.state_machines.AlgorithmMachine` to actually execute
+    the various steps rather than operating on a CalibrationAlgorithm
+    C++ class directly.
+    """
 
-    #: The params that you could set on the Algorithm object which this Strategy would use.
+    #: The parameters of Algorithm object which this Strategy would use.
     #: Just here for documentation reasons.
-    usable_params = {"iov_coverage": IoV}
+    usable_params = {'iov_coverage': IoV}
 
     def __init__(self, algorithm):
         """
         """
         super().__init__(algorithm)
-        #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
-        #: It gets setup properly in :py:func:`run`
+        #: :py:class:`caf.state_machines.AlgorithmMachine` used to help
+        #: set up and execute CalibrationAlgorithm. It gets set up properly
+        #: in :py:func:`run`.
         self.machine = AlgorithmMachine(self.algorithm)
         #: Flag for the first execution of this AlgorithmStrategy
         self.first_execution = True
 
     def run(self, iov, iteration, queue):
         """
-        Runs the algorithm machine over the collected data and fills the results.
+        Runs the algorithm machine over the collected data and
+        fills the results.
         """
         if not self.is_valid():
-            raise StrategyError("This AlgorithmStrategy was not set up correctly!")
-        #: The multiprocessing queue we use to pass back results one at a time
+            raise StrategyError('The strategy KLMStripEfficiency was not '
+                                'set up correctly.')
+        #: The multiprocessing queue used to pass back results one at a time.
         self.queue = queue
 
-        basf2.B2INFO(f"Setting up {self.__class__.__name__} strategy for {self.algorithm.name}")
-        # Now add all the necessary parameters for a strategy to run
+        basf2.B2INFO(f'Setting up {self.__class__.__name__} strategy '
+                     f'for {self.algorithm.name}')
+        # Add all the necessary parameters for a strategy to run.
         machine_params = {}
-        machine_params["database_chain"] = self.database_chain
-        machine_params["dependent_databases"] = self.dependent_databases
-        machine_params["output_dir"] = self.output_dir
-        machine_params["output_database_dir"] = self.output_database_dir
-        machine_params["input_files"] = self.input_files
-        machine_params["ignored_runs"] = self.ignored_runs
+        machine_params['database_chain'] = self.database_chain
+        machine_params['dependent_databases'] = self.dependent_databases
+        machine_params['output_dir'] = self.output_dir
+        machine_params['output_database_dir'] = self.output_database_dir
+        machine_params['input_files'] = self.input_files
+        machine_params['ignored_runs'] = self.ignored_runs
         self.machine.setup_from_dict(machine_params)
-        # Start moving through machine states
-        basf2.B2INFO(f"Starting AlgorithmMachine of {self.algorithm.name}")
+        # Start moving through machine states.
+        basf2.B2INFO(f'Starting AlgorithmMachine of {self.algorithm.name}')
         self.algorithm.algorithm.setCalibrationStage(
             KLMStripEfficiencyAlgorithm.c_EfficiencyMeasurement)
-        # This sets up the logging and database chain, plus it assigns all input files from collector jobs.
-        # Note that we simply assign all input files, and use the execute(runs) to define which data to use.
+        # This sets up the logging and database chain and assigns all
+        # input files from collector jobs.
         self.machine.setup_algorithm(iteration=iteration)
-        # After this point, the logging is in the stdout of the algorithm
-        basf2.B2INFO(f"Beginning execution of {self.algorithm.name} using strategy {self.__class__.__name__}")
+        # After this point, the logging is in the stdout of the algorithm.
+        basf2.B2INFO(f'Beginning execution of {self.algorithm.name} using '
+                     f'strategy {self.__class__.__name__}')
 
-        all_runs_collected = set(runs_from_vector(self.algorithm.algorithm.getRunListFromAllData()))
-        # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
+        # Select of runs for calibration.
+        runs = self.algorithm.algorithm.getRunListFromAllData()
+        all_runs_collected = set(runs_from_vector(runs))
+        # Select runs overlapping with the calibration IOV if it is specified.
         if iov:
             runs_to_execute = runs_overlapping_iov(iov, all_runs_collected)
         else:
             runs_to_execute = all_runs_collected
-
-        # Remove the ignored runs from our run list to execute
+        # Remove the ignored runs.
         if self.ignored_runs:
-            basf2.B2INFO(f"Removing the ignored_runs from the runs to execute for {self.algorithm.name}")
+            basf2.B2INFO(f'Removing the ignored_runs from the runs '
+                         f'to execute for {self.algorithm.name}')
             runs_to_execute.difference_update(set(self.ignored_runs))
-        # Sets aren't ordered so lets go back to lists and sort
-        runs_to_execute = sorted(runs_to_execute)
 
+        # Creation of sorted run list split by experiment.
+        runs_to_execute = sorted(runs_to_execute)
         runs_to_execute = split_runs_by_exp(runs_to_execute)
 
+        # Get IOV coverage,
         iov_coverage = None
-        if "iov_coverage" in self.algorithm.params:
-            iov_coverage = self.algorithm.params["iov_coverage"]
+        if 'iov_coverage' in self.algorithm.params:
+            iov_coverage = self.algorithm.params['iov_coverage']
 
+        # Iterate over experiment run lists.
         number_of_experiments = len(runs_to_execute)
-        # Iterate over experiment run lists
         for i_exp, run_list in enumerate(runs_to_execute, start=1):
-            # If 'iov_coverage' was set in the algorithm.params and it is larger (at both ends) than the
-            # input data runs IoV, then we also have to set the first payload IoV to encompass the missing beginning
-            # of the iov_coverage, and the last payload IoV must cover up to the end of iov_coverage.
-            # This is only true for the lowest and highest experiments in our input data.
-            if iov_coverage and i_exp == 1:
-                lowest_exprun = ExpRun(iov_coverage.exp_low, iov_coverage.run_low)
-            else:
-                lowest_exprun = run_list[0]
-                if (i_exp > 1):
-                    lowest_exprun.run = 0
-
-            if iov_coverage and i_exp == number_of_experiments:
-                highest_exprun = ExpRun(iov_coverage.exp_high, iov_coverage.run_high)
-            else:
-                highest_exprun = run_list[-1]
-                if (i_exp < number_of_experiments):
-                    highest_exprun.run = -1
-
+            lowest_exprun = get_lowest_exprun(number_of_experiments, i_exp,
+                                              run_list, iov_coverage)
+            highest_exprun = get_highest_exprun(number_of_experiments, i_exp,
+                                                run_list, iov_coverage)
             self.process_experiment(run_list[0].exp, run_list, iteration,
                                     lowest_exprun, highest_exprun)
 
-        # Whenever you have a final result that can't be changed e.g. a success you committed, or a failure you can't
-        # force past or merge runs to avoid. You should send that result out.
+        # Send final state and result to CAF.
         self.send_result(self.machine.result)
-
-        # Check the result and commit
-        if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
-            # Tell the controlling process that we are done and whether the overall algorithm process managed to succeed
+        if (self.machine.result.result == AlgResult.ok.value) or \
+           (self.machine.result.result == AlgResult.iterate.value):
             self.send_final_state(self.COMPLETED)
         else:
-            # Tell the controlling process that we are done and whether the overall algorithm process managed to succeed
             self.send_final_state(self.FAILED)
 
     def execute_over_run_list(self, run_list, iteration, forced_calibration,
@@ -359,10 +341,10 @@ class KLMStripEfficiency(AlgorithmStrategy):
                     run_data[i][3] = KLMStripEfficiencyAlgorithm.Results(
                         self.machine.algorithm.algorithm.getResults())
                     result_str = calibration_result_string(run_data[i][1])
+                    basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
                     if (run_data[i][1] != 0):
                         basf2.B2FATAL('Forced calibration of run %d failed.' %
                                       (run_data[i][0]))
-                    basf2.B2INFO('Run %d: %s.' % (run_data[i][0], result_str))
                 if (run_for_merging >= 0):
                     merge_runs(run_data, i, run_for_merging, True)
             else:
@@ -488,7 +470,7 @@ class KLMStripEfficiency(AlgorithmStrategy):
             # The last run will be overwritten when writing the result.
             run_data[i][5].front().iov = \
                 Belle2.IntervalOfValidity(experiment, first_run, experiment, -1)
-            # If the calibration result is different, write the previous run.
+            # Write the previous run.
             if (i > 0):
                 iov = run_data[previous_run][5].front().iov
                 if (previous_run == 0):

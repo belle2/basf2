@@ -18,9 +18,7 @@
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>
 #include <framework/dataobjects/BinnedEventT0.h>
 #include <trg/ecl/TrgEclMapping.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
-#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/logging/Logger.h>
@@ -29,10 +27,8 @@
 
 #include <TLorentzVector.h>
 #include <TMath.h>
-#include <TRandom3.h>
 
 #include <iostream>
-#include <bitset>
 #include <fstream>
 
 

@@ -63,7 +63,7 @@ namespace Belle2 {
           }
 
           for (int iL = 0 ; iL < f_nLayer ; ++iL) {
-            if (0 <= iL && iL <= 7) ///// SL0
+            if (iL <= 7) ///// SL0
               layerHitRate[iL] /= (numEvents * timeWindowForSmallCell * 1e-6);
             else
               layerHitRate[iL] /= (numEvents * timeWindowForNormalCell * 1e-6);

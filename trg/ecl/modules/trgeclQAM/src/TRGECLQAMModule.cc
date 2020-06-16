@@ -24,29 +24,18 @@
 //framework headers
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
 //trg package headers
 
 #include <trg/ecl/modules/trgeclQAM/TRGECLQAMModule.h>
-#include <framework/database/IntervalOfValidity.h>
 
 #include <string.h>
-#include <stdlib.h>
-#include <iostream>
 #include <fstream>
 #include <TFile.h>
 #include <TString.h>
 
-#include <TCanvas.h>
-#include <TPDF.h>
-#include <TAttMarker.h>
-#include <TAttLine.h>
-#include <TNamed.h>
 #include <TAxis.h>
-#include <TPaveText.h>
-
+#include <TTree.h>
 
 #include <RooRealVar.h>
 #include <RooDataHist.h>

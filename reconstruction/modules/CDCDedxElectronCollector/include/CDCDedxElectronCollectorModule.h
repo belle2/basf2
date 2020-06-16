@@ -17,8 +17,6 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/ECLCluster.h>
-
 
 #include <vector>
 

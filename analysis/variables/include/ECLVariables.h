@@ -125,6 +125,16 @@ namespace Belle2 {
     double eclClusterCellId(const Particle* particle);
 
     /**
+     * return the thetaID [0,68] of the crystal with highest energy
+     */
+    double eclClusterThetaId(const Particle* particle);
+
+    /**
+     * return the phiID [0,143] of the crystal with highest energy
+     */
+    double eclClusterPhiId(const Particle* particle);
+
+    /**
      * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
      */
     double eclClusterE1E9(const Particle* particle);

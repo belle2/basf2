@@ -16,8 +16,6 @@
 #include <top/dataobjects/TOPDigit.h>
 
 class TH1F;
-class TF1;
-class TTree;
 
 namespace Belle2 {
   /**

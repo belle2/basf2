@@ -9,7 +9,6 @@
 
 #include <trg/cdc/modules/houghtracking/CDCTrigger2DFinderModule.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>

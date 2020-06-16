@@ -1,13 +1,10 @@
 #ifndef TRCCDCT2DDQMMODULE_h
 #define TRCCDCT2DDQMMODULE_h
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/HistoModule.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <stdlib.h>
-#include <iostream>
 #include <string>
 
 #include <TH1I.h>

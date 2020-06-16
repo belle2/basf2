@@ -45,7 +45,7 @@ namespace Belle2 {
 
     He3tubeCreator::He3tubeCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     He3tubeCreator::~He3tubeCreator()
@@ -55,6 +55,9 @@ namespace Belle2 {
 
     void He3tubeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       G4String symbol;
       G4double a, z, n;
       G4double abundance, density;

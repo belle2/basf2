@@ -62,6 +62,7 @@ def pre_collector():
         if moda.name() == 'SVDCoGTimeEstimator':
             moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("CalibrationWithEventT0", False)
         if moda.name() == 'SVDSimpleClusterizer':
             moda.param("Clusters", 'SVDClustersFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')

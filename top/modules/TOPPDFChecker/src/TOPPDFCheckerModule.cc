@@ -16,9 +16,7 @@
 #include <top/reconstruction/TOPconfigure.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // DataStore classes
 #include <mdst/dataobjects/Track.h>

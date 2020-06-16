@@ -12,7 +12,6 @@
 #define TOPMCTRACKMAKERMODULE_H
 
 #include <framework/core/Module.h>
-#include <string>
 
 namespace Belle2 {
 

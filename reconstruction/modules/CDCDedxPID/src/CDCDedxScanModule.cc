@@ -11,42 +11,20 @@
 #include <reconstruction/modules/CDCDedxPID/CDCDedxScanModule.h>
 #include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 
-#include <framework/gearbox/Const.h>
-#include <framework/utilities/FileSystem.h>
-
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 
-#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <vxd/geometry/GeoCache.h>
-#include <geometry/GeometryManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 
-#include <genfit/TrackCand.h>
-#include <genfit/Track.h>
-#include <genfit/AbsTrackRep.h>
-#include <genfit/Exception.h>
-#include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/StateOnPlane.h>
-
-#include <TGeoManager.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
-#include <cassert>
 #include <cmath>
-#include <algorithm>
-#include <utility>
 #include <stdlib.h>
 #include <time.h>
-
-#include "TMath.h"
-#include "TFile.h"
-#include "TH2F.h"
 
 using namespace Belle2;
 using namespace CDC;

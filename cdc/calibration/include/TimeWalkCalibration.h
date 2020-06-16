@@ -103,7 +103,6 @@ namespace Belle2 {
       unsigned short m_twParamMode_new = 1;          /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */
       unsigned short m_nTwParams_new = 2;            /**< No. of tw parameters. for new database*/
       unsigned short m_nTwParams_old;                /**< No. of tw parameters. in old database */
-      ClassDef(TimeWalkCalibration, 0);              /**< Time-walk calibration algorithm */
     };
   }//namespace CDC
 } // namespace Belle2

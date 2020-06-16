@@ -14,8 +14,6 @@
 #ifndef TRGCDCWireHitMC_FLAG_
 #define TRGCDCWireHitMC_FLAG_
 
-#include <string>
-
 #include "CLHEP/Geometry/Point3D.h"
 #include "CLHEP/Geometry/Vector3D.h"
 

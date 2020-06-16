@@ -254,6 +254,10 @@ namespace Belle2 {
     //  or 'isBoundaryRequired'.
     virtual void boundaryFindingTearDown() {};
 
+    // When using the boundaries functionality from isBoundaryRequired, this is used to store the boundaries. It is cleared when
+    // calling findPayloadBoundaries, before boundaryFindingSetup is called.
+    std::vector<Calibration::ExpRun> m_boundaries;
+
     // Helpers ---------------- Data retrieval -------
 
     /// Get the list of runs for which calibration is called

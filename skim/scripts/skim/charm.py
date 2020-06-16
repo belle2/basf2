@@ -13,7 +13,6 @@ from functools import lru_cache
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from validation_tools.metadata import create_validation_histograms
 from variables import variables as vm
 import vertex
 
@@ -206,8 +205,8 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 class XToDp_DpToKsHp(BaseSkim):
     """
     **Decay Modes**:
-    * :math:`D^+ \\to K_{S} \\pi^+`
-    * :math:`D^+ \\to K_{S} K^+`
+    * :math:`D^+_{(S)} \\to K_{S} \\pi^+`
+    * :math:`D^+_{(S)} \\to K_{S} K^+`
 
     **Additional Cuts**:
 
@@ -231,25 +230,16 @@ class XToDp_DpToKsHp(BaseSkim):
         },
     }
 
-    # Cached static method, so that its contents are only executed once for a single path
-    @staticmethod
-    @lru_cache()
-    def fillCharmSkimKs(path):
-        ma.fillParticleList('K_S0:V0_charmskim -> pi+ pi-', '0.3 < M < 0.7', True, path=path)
-        ma.reconstructDecay('K_S0:RD_charmskim -> pi+:all pi-:all', '0.3 < M < 0.7', 1, True, path=path)
-        ma.copyLists('K_S0:charmskim', ['K_S0:V0_charmskim', 'K_S0:RD_charmskim'], path=path)
-
     def build_lists(self, path):
         mySel = "abs(d0) < 1 and abs(z0) < 3"
         mySel += " and 0.296706 < theta < 2.61799"
         ma.fillParticleList("pi+:kshp", mySel, path=path)
         ma.fillParticleList("K+:kshp", mySel, path=path)
+        ma.cutAndCopyList('K_S0:kshp', 'K_S0:merged', 'formula(flightDistance/flightDistanceErr) > 2', path=path)
 
-        self.fillCharmSkimKs(path)
-
-        Dpcuts = "1.72 < M < 1.98 and useCMSFrame(p)>2"
-        Dp_Channels = ["K_S0:merged pi+:kshp",
-                       "K_S0:merged K+:kshp",
+        Dpcuts = "1.72 < M < 2.2 and useCMSFrame(p)>2"
+        Dp_Channels = ["K_S0:kshp pi+:kshp",
+                       "K_S0:kshp K+:kshp",
                        ]
 
         DpList = []
@@ -302,6 +292,10 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
         self.SkimLists = DstList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.reconstructDecay('D0:HpJm0_test -> pi+:loose K-:loose', '1.80 < M < 1.93 and useCMSFrame(p)>2.2', path=path)
         ma.reconstructDecay('D*+:HpJm0_test -> D0:HpJm0_test pi+:all', '0 < Q < 0.018', path=path)
 
@@ -481,7 +475,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdPi": ["loose"],
+            "stdPi": ["all"],
         },
         "stdPi0s": {
             "loadStdSkimPi0": [],
@@ -492,8 +486,12 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     }
 
     def build_lists(self, path):
+        mySel = "abs(d0) < 1 and abs(z0) < 3"
+        mySel += " and 0.296706 < theta < 2.61799"
+        ma.fillParticleList("pi+:ksomega", mySel, path=path)
+
         ma.cutAndCopyList("pi0:mypi0", "pi0:skim", "0.11 < M < 0.15 and p > 0.25 ", path=path)
-        ma.reconstructDecay("omega:3pi -> pi+:loose pi-:loose pi0:mypi0", "", path=path)
+        ma.reconstructDecay("omega:3pi -> pi+:ksomega pi-:ksomega pi0:mypi0", "", path=path)
 
         charmcuts = "1.7 < M < 2 and useCMSFrame(p)>2.4"
         ma.reconstructDecay("D0:KsOmega -> K_S0:merged omega:3pi", charmcuts, path=path)
@@ -533,6 +531,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     RequiredStandardLists = {
         "stdCharged": {
             "stdK": ["loose"],
+            "stdPi": ["loose"],
         },
         "stdPhotons": {
             "loadStdSkimPhoton": [],

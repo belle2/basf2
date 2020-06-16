@@ -14,7 +14,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
-#include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>

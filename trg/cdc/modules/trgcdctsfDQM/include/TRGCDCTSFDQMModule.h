@@ -2,13 +2,10 @@
 #define TRCCDCTSFDQMMODULE_h
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/TRGCDCTSFUnpackerStore.h>
-#include <trg/cdc/modules/trgcdctsfUnpacker/trgcdctsfUnpackerModule.h>
-#include <stdlib.h>
-#include <iostream>
 #include <string>
 
-#include <TH2I.h>
 #include <TH1I.h>
 
 namespace Belle2 {

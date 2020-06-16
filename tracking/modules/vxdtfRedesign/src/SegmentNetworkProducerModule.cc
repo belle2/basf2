@@ -392,7 +392,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           }
           if (nAdded > m_PARAMmaxTrackNodeAddedConnections) {
             B2WARNING("Number of added TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeAddedConnections
-                      << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+                      << "! Processing of the event will be aborted. The number of connections was = " << nAdded);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);

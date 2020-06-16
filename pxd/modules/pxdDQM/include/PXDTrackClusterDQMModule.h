@@ -20,6 +20,7 @@
 #include <TH1F.h>
 
 #include <map>
+#include <array>
 
 namespace Belle2 {
 
@@ -43,6 +44,7 @@ namespace Belle2 {
 
     std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
     bool m_moreHistos; /**< Fill aditional histograms */
+    bool m_ASICHistos; /**< Fill aditional histograms per ASCI region */
 
     /// the geometry
     VXD::GeoCache& m_vxdGeometry;
@@ -59,6 +61,8 @@ namespace Belle2 {
     std::map <VxdID, TH1F*> m_trackClusterCharge{};
     /** Cluster Charge for PXD clusters, uncorrected */
     std::map <VxdID, TH1F*> m_trackClusterChargeUC{};
+    /** Cluster Charge for ASIC combinations for PXD clusters */
+    std::map <VxdID, std::array<std::array<TH1F*, 4>, 6>> m_trackASICClusterCharge{};
 
     /** Number of Tracked Clusters per module */
     TH1F* m_trackedClusters{};

@@ -10,6 +10,9 @@
 
 #include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
 #include <framework/logging/Logger.h>
+
+#include <TRandom.h>
+
 #include <iostream>
 
 using namespace std;

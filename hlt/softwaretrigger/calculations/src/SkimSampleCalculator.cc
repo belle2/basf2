@@ -20,12 +20,15 @@
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <numeric>
+#include <TDatabasePDG.h>
+#include <analysis/variables/BelleVariables.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
-  m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau")
+  m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
+  m_KsParticles("K_S0:merged")
 {
 
 }
@@ -36,6 +39,8 @@ void SkimSampleCalculator::requireStoreArrays()
   m_gammaParticles.isRequired();
   m_pionHadParticles.isRequired();
   m_pionTauParticles.isRequired();
+  m_KsParticles.isOptional();
+
 };
 
 void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
@@ -221,6 +226,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // maxAngleTTLE
   double maxAngleTTLE = -10.;
+  int nJpsi = 0;
+  double Jpsi = 0.;
+  const double jPsiMasswindow = 0.11;
   if (m_pionParticles->getListSize() >= 2) {
     for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
       Particle* par1 = m_pionParticles->getParticle(i);
@@ -228,6 +236,11 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         Particle* par2 = m_pionParticles->getParticle(j);
         TLorentzVector V4p1 = par1->get4Vector();
         TLorentzVector V4p2 = par2->get4Vector();
+        TLorentzVector V4pSum = V4p1 + V4p2;
+        const auto chSum = par1->getCharge() + par2->getCharge();
+        const double mSum = V4pSum.M();
+        const double JpsidM = mSum - TDatabasePDG::Instance()->GetParticle(443)->Mass();
+        if (abs(JpsidM) < jPsiMasswindow && chSum == 0)  nJpsi++;
         const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
         const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
         const double temp = V3p1.Angle(V3p2);
@@ -236,10 +249,12 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     }
   }
 
+  if (nJpsi != 0) Jpsi = 1;
+
   calculationResult["maxAngleTTLE"] = maxAngleTTLE;
+  calculationResult["Jpsi"] = Jpsi;
 
   //maxAngleGGLE
-
   double maxAngleGGLE = -10.;
   if (m_gammaParticles->getListSize() >= 2) {
     for (unsigned int i = 0; i < m_gammaParticles->getListSize() - 1; i++) {
@@ -584,4 +599,21 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   calculationResult["HadronB"] = hadronb;
   calculationResult["HadronB1"] = hadronb1;
   calculationResult["HadronB2"] = hadronb2;
+
+  // nKshort
+  int nKshort = 0;
+  double Kshort = 0.;
+
+  if (m_KsParticles.isValid()) {
+    for (unsigned int i = 0; i < m_KsParticles->getListSize(); i++) {
+      const Particle* mergeKsCand = m_KsParticles->getParticle(i);
+      const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
+      const double KsCandMass = mergeKsCand->getMass();
+      if (KsCandMass > 0.468 && KsCandMass < 0.528 && isKsCandGood == 1.) nKshort++;
+    }
+  }
+
+  if (nKshort != 0) Kshort = 1;
+
+  calculationResult["Kshort"] = Kshort;
 }

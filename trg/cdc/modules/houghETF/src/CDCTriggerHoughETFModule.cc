@@ -9,7 +9,6 @@
 
 #include <trg/cdc/modules/houghETF/CDCTriggerHoughETFModule.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -19,7 +18,6 @@
 #include <iterator>
 
 #include <root/TMatrix.h>
-#include <numeric>
 
 /* defines */
 #define CDC_SUPER_LAYERS 9

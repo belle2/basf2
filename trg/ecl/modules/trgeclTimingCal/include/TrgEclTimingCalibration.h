@@ -8,10 +8,7 @@
 
 #include "TMatrixD.h"
 #include "TVectorD.h"
-#include "TDecompLU.h"
 #include "TVector3.h"
-#include "TFile.h"
-#include "TTree.h"
 
 #include <framework/core/Module.h>
 #include <trg/ecl/TrgEclMapping.h>

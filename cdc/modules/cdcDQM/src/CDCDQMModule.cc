@@ -21,6 +21,7 @@
 
 #include <TF1.h>
 #include <TVector3.h>
+#include <TDirectory.h>
 
 #include <fstream>
 #include <math.h>
@@ -51,10 +52,9 @@ namespace Belle2 {
   {
 
     TDirectory* oldDir = gDirectory;
-    TDirectory* dirCDCDQM = oldDir->mkdir("CDC");
 
-    dirCDCDQM->cd();
-
+    oldDir->mkdir("CDC");
+    oldDir->cd("CDC");
     m_hNEvents = new TH1F("hNEvents", "hNEvents", 10, 0, 10);
     m_hNEvents->GetXaxis()->SetBinLabel(1, "number of events");
     m_hOcc = new TH1F("hOcc", "hOccupancy", 150, 0, 1.5);

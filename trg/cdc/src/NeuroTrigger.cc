@@ -6,7 +6,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <string>

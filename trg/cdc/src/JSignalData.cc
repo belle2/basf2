@@ -18,11 +18,9 @@
 #ifndef __EXTERNAL__
 #include "trg/cdc/JSignalData.h"
 #include "trg/cdc/JSignal.h"
-#include "trg/cdc/FpgaUtility.h"
 #else
 #include "JSignal.h"
 #include "JSignalData.h"
-#include "FpgaUtility.h"
 #endif
 #include <iostream>
 #include <fstream>

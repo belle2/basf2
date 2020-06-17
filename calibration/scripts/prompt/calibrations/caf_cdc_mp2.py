@@ -19,6 +19,23 @@ import basf2
 from random import choice, seed
 
 
+def fix_tw_param():
+    from ROOT import Belle2
+    result = []
+    bad_boards = [0, 35, 37, 77, 97, 115, 133, 193, 204, 218, 247]
+    for ib in range(300):
+        if ib in bad_boards:
+            label = Belle2.GlobalLabel()
+            label.construct(Belle2.CDCTimeWalks.getGlobalUniqueID(), ib, 0)
+            result.append(label.label())
+            label.construct(Belle2.CDCTimeWalks.getGlobalUniqueID(), ib, 1)
+            result.append(label.label())
+#        else:
+#            label.construct(Belle2.CDCTimeWalks.getGlobalUniqueID(), ib, 1)
+#            result.append(label.label())
+    return result
+
+
 def select_files(all_input_files, min_events, max_processed_events_per_file):
     basf2.B2INFO("Attempting to choose a good subset of files")
     # Let's iterate, taking a sample of files from the total (no repeats or replacement) until we get enough events
@@ -73,9 +90,9 @@ def get_calibrations(input_data, **kwargs):
     max_files_per_run = 10
     min_events_per_file = 1000
 
-    max_events_per_calibration = 100000  # 100k events for each skim
+    max_events_per_calibration = 50000  # 100k events for each skim
     max_events_per_calibration_for_xt_sr = 2000000  # 2 M events for each skim
-    max_events_per_file = 3000
+    max_events_per_file = 1000
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
@@ -95,16 +112,18 @@ def get_calibrations(input_data, **kwargs):
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
     import millepede_calibration as mp2
     cal = mp2.create(
-        name='tz0',
-        dbobjects=['CDCTimeZeros'],
+        name='tztw0',
+        dbobjects=['CDCTimeZeros', 'CDCTimeWalks'],
         collections=[
             mp2.make_collection('hlt_mumu', pre_collector(), tracks=['RecoTracks']),
             mp2.make_collection('hlt_hadron', pre_collector(), tracks=['RecoTracks'])],
         files=dict(hlt_mumu=chosen_files_mumu, hlt_hadron=chosen_files_hadron),
         tags=None,
         timedep=[],
-        constraints=[alignment.constraints.CDCTimeZerosConstraint()],
-        fixed=[],
+        constraints=[alignment.constraints.CDCTimeZerosConstraint(basf2.find_file(
+            'calibration/scripts/prompt/calibrations/cdc-T0-constraints.txt'))],
+        fixed=fix_tw_param(),
+        #        fixed=[],
         commands=['method inversion 1 0.1',
                   'threads 25 1',
                   'chiscut 30. 6.',
@@ -157,6 +176,7 @@ def pre_collector(max_events=None):
 
     from reconstruction import add_reconstruction
     add_reconstruction(reco_path,
+                       components=['PXD', 'SVD', 'CDC', 'ECL'],
                        add_trigger_calculation=False,
                        trackFitHypotheses=[211, 13],
                        pruneTracks=False)

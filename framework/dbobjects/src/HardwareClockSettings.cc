@@ -17,7 +17,7 @@ using namespace Belle2;
 
 HardwareClockSettings::HardwareClockSettings() {}
 
-Float_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::string label) const
+Double_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::string label) const
 {
   bool isDetectorInPrescaleMap = kTRUE;
 
@@ -36,13 +36,13 @@ Float_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, std
 }
 
 
-Float_t  HardwareClockSettings::getGlobalClockFrequency() const
+Double_t  HardwareClockSettings::getGlobalClockFrequency() const
 {
   return  m_acceleratorRF / 4.;
 }
 
 
-Float_t  HardwareClockSettings::getAcceleratorRF() const
+Double_t  HardwareClockSettings::getAcceleratorRF() const
 {
   return  m_acceleratorRF;
 }
@@ -69,7 +69,7 @@ void HardwareClockSettings::setClockFrequency(const Const::EDetector detector, s
   m_clocksMap[detector][label] = frequency;
 }
 
-void HardwareClockSettings::setAcceleratorRF(Float_t acceleratorRF)
+void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
 {
   m_acceleratorRF = acceleratorRF;
 }

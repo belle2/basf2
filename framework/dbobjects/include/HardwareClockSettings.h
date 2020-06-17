@@ -37,15 +37,15 @@ namespace Belle2 {
      * @param detector The ID of the detector.
      * @param label The label for the clock.
      */
-    Float_t getClockFrequency(Const::EDetector detector, std::string label) const;
+    Double_t getClockFrequency(Const::EDetector detector, std::string label) const;
     /**
      * Get the global clock frequency.
      */
-    Float_t getGlobalClockFrequency() const;
+    Double_t getGlobalClockFrequency() const;
     /**
      * Get the accelerator RF value.
      */
-    Float_t getAcceleratorRF() const;
+    Double_t getAcceleratorRF() const;
     /**
      * Set the prescale value used to derive a detector clock from the global clock frequency.
      * @param detector The ID of the detector.
@@ -64,7 +64,7 @@ namespace Belle2 {
      * Set the accelerator RF value.
      * @param acceleratorRF Accelerator RF value.
      */
-    void    setAcceleratorRF(Float_t acceleratorRF);
+    void    setAcceleratorRF(Double_t acceleratorRF);
 
 
 
@@ -79,7 +79,7 @@ namespace Belle2 {
      */
     std::map<Const::EDetector, std::map<std::string, float>> m_clocksMap;
 
-    Float_t m_acceleratorRF = 0; /** [MHz] */
+    Double_t m_acceleratorRF = 0; /** [MHz] */
 
     ClassDef(HardwareClockSettings, 1)
   };

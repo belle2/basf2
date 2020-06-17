@@ -13,6 +13,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/database/DBArray.h>
@@ -274,6 +276,17 @@ namespace Belle2 {
        * Raw CDC array.
        */
       StoreArray<RawCDC>  m_rawCDCs;
+
+      /**
+       * CDC raw hits.
+       */
+      StoreArray<CDCRawHit> m_CDCRawHits;
+
+      /**
+       * CDC hits.
+       */
+      StoreArray<CDCHit> m_CDCHits;
+
     };//end class declaration
 
 

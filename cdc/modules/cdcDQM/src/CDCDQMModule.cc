@@ -13,9 +13,6 @@
 
 // CDC
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-
 // Dataobject classes
 #include <framework/database/DBObjPtr.h>
 
@@ -69,9 +66,6 @@ namespace Belle2 {
   void CDCDQMModule::initialize()
   {
     REG_HISTOGRAM
-    StoreArray<CDCHit> m_cdcHits;
-    StoreArray<CDCRawHit> m_cdcRawHits;
-    StoreObjPtr<TRGSummary> m_trgSummary;
     m_cdcHits.isOptional();
     m_cdcRawHits.isOptional();
     m_trgSummary.isOptional();
@@ -90,9 +84,6 @@ namespace Belle2 {
 
   void CDCDQMModule::event()
   {
-    StoreArray<CDCHit> m_cdcHits;
-    StoreArray<CDCRawHit> m_cdcRawHits;
-    StoreObjPtr<TRGSummary> m_trgSummary;
     const int nWires = 14336;
     setReturnValue(1);
     if (!m_trgSummary.isValid() || (m_trgSummary->getTimType() == Belle2::TRGSummary::TTYP_RAND)) {

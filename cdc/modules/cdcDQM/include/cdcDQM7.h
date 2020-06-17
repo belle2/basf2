@@ -6,6 +6,9 @@
 #ifndef CDCDQM7MODULE_H
 #define CDCDQM7MODULE_H
 
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCRawHit.h>
+
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -46,6 +49,13 @@ namespace Belle2 {
     void defineHisto() override;
 
   private:
+
+    //! CDC raw hits.
+    StoreArray<CDCRawHit> m_CDCRawHits;
+
+    //! CDC hits.
+    StoreArray<CDCHit> m_CDCHits;
+
     TH1D* h_nhits_L[56] = {nullptr}; /**<histogram hit in each layer*/
 
     TH1D* h_tdc_sL[9] = {nullptr};/**<tdc each super layer*/

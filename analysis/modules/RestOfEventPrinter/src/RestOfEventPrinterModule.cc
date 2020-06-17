@@ -48,7 +48,8 @@ namespace Belle2 {
     std::vector<std::string> emptyVector;
 
     addParam("maskNames", m_maskNames, "List of all mask names for which the info will be printed.", emptyVector);
-    addParam("fullPrint", m_fullPrint, "True: Print whole masks content.", false);
+    addParam("fullPrint", m_fullPrint, "If true, print whole masks content.", false);
+    addParam("unpackComposites", m_unpackComposites, "If true, replace composites by their daughters", true);
   }
 
   void RestOfEventPrinterModule::initialize()
@@ -78,11 +79,11 @@ namespace Belle2 {
       B2INFO(" - " << "ROE related to particle with PDG: " << relatedPDG);
       B2INFO(" - " << "ROE related to MC particle with PDG: " << relatedMCPDG);
 
-      roe->print("");
+      roe->print("", m_unpackComposites);
 
       for (const auto& maskName : m_maskNames) {
         B2INFO(" - " << "Info for ROEMask with name: \'" << maskName << "\'");
-        roe->print(maskName);
+        roe->print(maskName, m_unpackComposites);
 
         if (m_fullPrint) {
           printMaskParticles(roe->getParticles(maskName));

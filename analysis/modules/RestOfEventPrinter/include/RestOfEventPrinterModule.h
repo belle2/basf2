@@ -43,7 +43,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_maskNames; /**< List of all mask names for which the info will be printed */
     bool m_fullPrint; /**< True: Print whole masks content. */
-
+    bool m_unpackComposites; /**< True: Replace composite particles or V0 by their daughters, default is true */
     /**
      * Prints out values of the specific ROE  mask
      */

@@ -19,9 +19,9 @@ HardwareClockSettings::HardwareClockSettings() {}
 
 Double_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::string label) const
 {
-  bool isDetectorInPrescaleMap = kTRUE;
+  bool isDetectorInPrescaleMap = true;
 
-  if (m_prescaleMap.find(detector) == m_prescaleMap.end()) isDetectorInPrescaleMap = kFALSE;
+  if (m_prescaleMap.find(detector) == m_prescaleMap.end()) isDetectorInPrescaleMap = false;
   else if (m_prescaleMap.at(detector).find(label) != m_prescaleMap.at(detector).end())
     return  m_acceleratorRF / 4. / m_prescaleMap.at(detector).at(label);
 

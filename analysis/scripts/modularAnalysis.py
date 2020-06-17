@@ -1607,7 +1607,7 @@ def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
 
 def signalSideParticleFilter(particleList, selection, roe_path, deadEndPath):
     """
-    Checks if the current kROE object in the for_each roe path (argument roe_path) is related
+    Checks if the current ROE object in the for_each roe path (argument roe_path) is related
     to the particle from the input ParticleList. Additional selection criteria can be applied.
     If ROE is not related to any of the Particles from ParticleList or the Particle doesn't
     meet the selection criteria the execution of deadEndPath is started. This path, as the name

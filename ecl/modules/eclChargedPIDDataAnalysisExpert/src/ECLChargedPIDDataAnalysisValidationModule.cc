@@ -132,9 +132,7 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       m_pids_glob[chargedIdx][chargedStable.getIndex()] = std::numeric_limits<float>::quiet_NaN();
     }
 
-    StoreArray<MCParticle> particles;
-
-    for (const auto& particle : particles) {
+    for (const auto& particle : m_MCParticles) {
 
       if (!particle.hasStatus(MCParticle::c_PrimaryParticle)) continue; // Only check primaries.
       if (particle.hasStatus(MCParticle::c_Initial)) continue; // Ignore initial particles.

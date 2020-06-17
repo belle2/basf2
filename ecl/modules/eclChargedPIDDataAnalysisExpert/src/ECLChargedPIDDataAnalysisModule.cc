@@ -12,9 +12,6 @@
 
 #include <iostream>
 #include <ecl/modules/eclChargedPIDDataAnalysisExpert/ECLChargedPIDDataAnalysisModule.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -277,14 +274,13 @@ void ECLChargedPIDDataAnalysisModule::event()
 
   n2_eclEoP->clear();
 
-  StoreObjPtr<EventMetaData> eventmetadata;
-  if (eventmetadata) {
-    n1_iExperiment = eventmetadata->getExperiment();
-    n1_iRun = eventmetadata->getRun();
-    n1_iEvent = eventmetadata->getEvent();
-    n2_iExperiment = eventmetadata->getExperiment();
-    n2_iRun = eventmetadata->getRun();
-    n2_iEvent = eventmetadata->getEvent();
+  if (m_EventMetaData) {
+    n1_iExperiment = m_EventMetaData->getExperiment();
+    n1_iRun = m_EventMetaData->getRun();
+    n1_iEvent = m_EventMetaData->getEvent();
+    n2_iExperiment = m_EventMetaData->getExperiment();
+    n2_iRun = m_EventMetaData->getRun();
+    n2_iEvent = m_EventMetaData->getEvent();
   } else {
     n1_iExperiment = -1;
     n1_iRun = -1;
@@ -295,9 +291,7 @@ void ECLChargedPIDDataAnalysisModule::event()
   }
 
   // get the matched MC particle
-  StoreArray<MCParticle> m_mcpart;
-
-  for (const MCParticle& imcpart : m_mcpart) {
+  for (const MCParticle& imcpart : m_mcParticles) {
     if (!imcpart.hasStatus(MCParticle::c_PrimaryParticle)) continue; // only check primaries
     if (imcpart.hasStatus(MCParticle::c_Initial)) continue; // ignore initial particles
     if (imcpart.hasStatus(MCParticle::c_IsVirtual)) continue; // ignore virtual particles

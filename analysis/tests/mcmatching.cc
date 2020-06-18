@@ -669,7 +669,12 @@ namespace {
       Decay d(521, {211, Decay(421, {321, -211, Decay(111, {22, 22})}), 22});
       d.finalize();
       d.reconstruct({521, {211, {421, {321, -211, {111, {{22}, {22, {}, Decay::c_RelateWith, d.getMCParticle(211)}}}}}}});
-      //result: pi0 gets MC match 521. Gets misID & c_AddedWrongParticle because of 'wrong' photon, plus c_MissMassiveParticle since the B's daughters are missing, plus c_MissGamma because one photon was not reconstructed, plus c_MissingResonance because non-FSPs were missed (MC matched particle (521) has lots of daughters)
+      //result: pi0 gets MC match 521.
+      //Gets misID & c_AddedWrongParticle because of 'wrong' photon,
+      //plus c_MissMassiveParticle since the B's daughters are missing,
+      //plus c_MissGamma because one photon was not reconstructed,
+      //plus c_MissingResonance because non-FSPs were missed (MC matched particle (521) has lots of daughters)
+
       Particle* pi0 = d.getParticle(111);
       Decay* pi0decay = d.getDecay(111);
       ASSERT_TRUE(MCMatching::setMCTruth(pi0)) << pi0decay->getString();
@@ -1316,6 +1321,61 @@ namespace {
       EXPECT_EQ(Variable::isSignal(Y4S), 1.0) << d.getString();
 
     }
+
+    {
+      /** B0 -> [D- -> pi- pi+ pi- pi0] pi+ [rho0 -> pi+ pi-] */
+      Decay d(511, {{ -411, { -211, 211, -211, {111, {22, 22}}}}, 211, {113, {211, -211}}});
+
+      /** Reconstructed as B0 -> [D- -> pi- pi0] pi+ */
+      d.reconstruct({511, {{ -411, { -211, 0, 0, {111, {22, 22}}}}, 211, {0, {0, 0}}}});
+
+      Particle* B = d.m_particle;
+      Particle* D = d.m_particle->getDaughters()[0];
+
+      // don't set any properties
+
+      // D missed pi+ pi- -> c_MissMassiveParticle
+      ASSERT_TRUE(MCMatching::setMCTruth(D)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissMassiveParticle,
+                MCMatching::getMCErrors(D)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(D), 0.0) << d.getString();
+
+      // B missed [rho0 -> pi+ pi-] and D's daughters -> c_MissMassiveParticle and c_MissingResonance
+      ASSERT_TRUE(MCMatching::setMCTruth(B)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissingResonance | MCMatching::c_MissMassiveParticle,
+                MCMatching::getMCErrors(B)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(B), 0.0) << d.getString();
+    }
+    {
+      /** B0 -> [D- -> pi- pi+ pi- pi0] pi+ [rho0 -> pi+ pi-] */
+      Decay d(511, {{ -411, { -211, 211, -211, {111, {22, 22}}}}, 211, {113, {211, -211}}});
+
+      /** Reconstructed as B0 -> [D- -> pi- pi0] pi+ */
+      d.reconstruct({511, {{ -411, { -211, 0, 0, {111, {22, 22}}}}, 211, {0, {0, 0}}}});
+
+      Particle* B = d.m_particle;
+      Particle* D = d.m_particle->getDaughters()[0];
+
+      int isIgnoreMissing = Particle::PropertyFlags::c_IsIgnoreIntermediate |
+                            Particle::PropertyFlags::c_IsIgnoreMassive;
+      // set missing particle properties on B1
+      B->setProperty(isIgnoreMissing);
+
+      // D missed pi+ pi- -> c_MissMassiveParticle
+      ASSERT_TRUE(MCMatching::setMCTruth(D)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissMassiveParticle,
+                MCMatching::getMCErrors(D)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(D), 0.0) << d.getString();
+
+      // B missed [rho0 -> pi+ pi-] and D's daughters.
+      // B should accept missing [rho0 -> pi+ pi-]. But the D's daughters are supposed to still fire the missing massive flag.
+      // -> c_MissMassiveParticle
+      ASSERT_TRUE(MCMatching::setMCTruth(B)) << d.getString();
+      EXPECT_EQ(MCMatching::c_MissMassiveParticle,
+                MCMatching::getMCErrors(B)) << d.getString();
+      EXPECT_EQ(Variable::isSignal(B), 0.0) << d.getString();
+    }
+
   }
 
 

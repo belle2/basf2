@@ -272,7 +272,7 @@ void DQMHistAnalysisPXDEffModule::event()
 
   m_cEffAll->cd();
   m_hEffAll->Paint("AP");
-  m_hEffAllUpdate->Draw("same,AP");
+  m_hEffAllUpdate->Paint("same,AP");
 
 
   auto gr = m_hEffAll->GetPaintedGraph();
@@ -320,6 +320,7 @@ void DQMHistAnalysisPXDEffModule::event()
     m_cEffAll->Clear();
     gr->Draw("AP");
     if (gr2) gr2->Draw("same,AP");
+    else B2ERROR("EffUpd missing");
     m_cEffAll->cd(0);
 
     auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");

@@ -104,6 +104,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
+  m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
 
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
@@ -272,11 +273,9 @@ void DQMHistAnalysisPXDEffModule::event()
 
   m_cEffAll->cd();
   m_hEffAll->Paint("AP");
-  m_hEffAllUpdate->Paint("same,AP");
 
 
   auto gr = m_hEffAll->GetPaintedGraph();
-  auto gr2 = m_hEffAllUpdate->GetPaintedGraph();
   if (gr) {
     double scale_min = 1.0;
     for (int i = 0; i < gr->GetN(); i++) {
@@ -311,17 +310,10 @@ void DQMHistAnalysisPXDEffModule::event()
     gr->SetLineColor(4);
     gr->SetLineWidth(2);
     gr->SetMarkerStyle(8);
-    if (gr2) {
-      gr2->SetLineColor(kOrange);
-      gr2->SetLineWidth(2);
-      gr2->SetMarkerStyle(33);
-    }
 
     m_cEffAll->Clear();
-    gr->Draw("AP");
-    if (gr2) gr2->Draw("same,AP");
-    else B2ERROR("EffUpd missing");
     m_cEffAll->cd(0);
+    gr->Draw("AP");
 
     auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");
     tt->SetTextAngle(90);// Rotated
@@ -344,7 +336,12 @@ void DQMHistAnalysisPXDEffModule::event()
     m_line_error->Draw();
   }
 
+  m_cEffAll->Modified();
+  m_cEffAll->Update();
+
   {
+    m_cEffAllUpdate->cd();
+    m_hEffAllUpdate->Paint("AP");
     auto gru = m_hEffAllUpdate->GetPaintedGraph();
     if (gru) {
       for (int i = 0; i < gr->GetN(); i++) {
@@ -355,11 +352,14 @@ void DQMHistAnalysisPXDEffModule::event()
         gru->GetPoint(i, x, y);
         gru->SetPoint(i, x + 0.2, y); // shift a bit
       }
+      gru->SetLineColor(kOrange);
+      gru->SetLineWidth(2);
+      gru->SetMarkerStyle(33);
     }
+    m_cEffAllUpdate->Modified();
+    m_cEffAllUpdate->Update();
   }
 
-  m_cEffAll->Modified();
-  m_cEffAll->Update();
 
   double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
   m_monObj->setVariable("efficiency", var_efficiency);

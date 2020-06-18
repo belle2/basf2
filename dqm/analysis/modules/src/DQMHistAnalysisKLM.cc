@@ -369,6 +369,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 
 void DQMHistAnalysisKLMModule::event()
 {
+  /* Make sure that the vectors are cleared at each DQM refresh. */
+  m_DeadBarrelModules.clear();
+  m_DeadEndcapModules.clear();
+  m_MaskedChannels.clear();
   std::string str, histogramName, canvasName;
   TLatex latex;
   latex.SetTextColor(kRed);

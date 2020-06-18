@@ -127,10 +127,7 @@ namespace Belle2 {
     /** Vector of dead endcap modules. */
     std::vector<uint16_t> m_DeadEndcapModules;
 
-    /** Vector of new channels to be masked. */
-    std::vector<uint16_t> m_NewMaskedChannels;
-
-    /** Vector of channels already masked. */
+    /** Vector of masked channels. */
     std::vector<uint16_t> m_MaskedChannels;
 
     /** KLM channel array index. */

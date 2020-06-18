@@ -74,7 +74,6 @@ void DQMHistAnalysisKLMModule::beginRun()
     B2FATAL("No KLM electronics map.");
   m_DeadBarrelModules.clear();
   m_DeadEndcapModules.clear();
-  m_NewMaskedChannels.clear();
   m_MaskedChannels.clear();
 }
 
@@ -97,6 +96,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   std::string str;
   canvas->Clear();
   canvas->cd();
+  histogram->SetStats(false);
   histogram->Draw();
   average = 0;
   n = histogram->GetXaxis()->GetNbins();
@@ -185,7 +185,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
                                                       m_MaskedChannels.end(),
                                                       channelNumber);
       if (ite == m_MaskedChannels.end())
-        m_NewMaskedChannels.push_back(channelNumber);
+        m_MaskedChannels.push_back(channelNumber);
       B2DEBUG(20, "KLM@MaskMe " << channelNumber);
     } else if ((nHits > average * m_ThresholdForHot) && (nHits > m_MinHitsForFlagging)) {
       channelStatus = "Hot";
@@ -228,12 +228,13 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
     B2ERROR("KLM DQM histogram canvas KLM/c_" << histName << " is not found.");
     return;
   }
+  histogram->Clear();
   canvas->Clear();
   canvas->cd();
-  if (m_NewMaskedChannels.size() > 0) {
+  if (m_MaskedChannels.size() > 0) {
     int channelSubdetector, channelSection, channelSector;
     int layer, plane, strip;
-    for (uint16_t channel : m_NewMaskedChannels) {
+    for (uint16_t channel : m_MaskedChannels) {
       m_ElementNumbers->channelNumberToElementNumbers(
         channel, &channelSubdetector, &channelSection, &channelSector,
         &layer, &plane, &strip);
@@ -244,10 +245,8 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
         sectorNumber = m_ElementNumbers->sectorNumberEKLM(channelSection, channelSector);
       uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sectorNumber);
       histogram->Fill(sectorIndex);
-      m_MaskedChannels.push_back(channel);
     }
   }
-  m_NewMaskedChannels.clear();
   histogram->SetStats(false);
   histogram->Draw();
   canvas->Modified();
@@ -370,6 +369,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 
 void DQMHistAnalysisKLMModule::event()
 {
+  /* Make sure that the vectors are cleared at each DQM refresh. */
+  m_DeadBarrelModules.clear();
+  m_DeadEndcapModules.clear();
+  m_MaskedChannels.clear();
   std::string str, histogramName, canvasName;
   TLatex latex;
   latex.SetTextColor(kRed);

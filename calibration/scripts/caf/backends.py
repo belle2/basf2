@@ -4,6 +4,7 @@
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import conditions as b2conditions
 import os
+import re
 from abc import ABC, abstractmethod
 import pickle
 import configparser
@@ -674,6 +675,14 @@ class Batch(Backend):
         raise NotImplementedError(("Need to implement a _add_batch_directives(self, job, file) "
                                    "method in {} backend.".format(self.__class__.__name__)))
 
+    def _make_submit_file(self, job, submit_file_name):
+        """
+        Useful for the HTCondor backend where a submit is needed instead of batch
+        directives pasted directly into the submission script. It should be overwritten
+        if needed.
+        """
+        pass
+
     @classmethod
     @abstractmethod
     def _submit_to_batch(cls, cmd):
@@ -743,6 +752,10 @@ class Batch(Backend):
                             shutil.copy(file_path, job.working_dir)
 
                 self._dump_input_data(job)
+
+                # Make submission file if needed
+                self._make_submit_file(job, os.path.join(job.working_dir, self.submit_script).replace('.sh', '.sub'))
+
                 with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                     self._add_batch_directives(job, batch_file)
                     self._add_setup(job, batch_file)
@@ -768,6 +781,10 @@ class Batch(Backend):
                         shutil.copy(file_path, job.working_dir)
 
             self._dump_input_data(job)
+
+            # Make submission file if needed
+            self._make_submit_file(job, os.path.join(job.working_dir, self.submit_script).replace('.sh', '.sub'))
+
             with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                 self._add_batch_directives(job, batch_file)
                 self._add_setup(job, batch_file)
@@ -1040,6 +1057,123 @@ class LSF(Batch):
             job_id = job_id.replace(wrap, "")
         B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
         job.result = cls.LSFResult(job, job_id)
+
+
+class HTCondor(Batch):
+    """
+    Backend for submitting calibration processes to a HTCondor batch system
+    """
+    submission_cmds = ["condor_submit"]
+
+    def _make_submit_file(self, job, submit_file_name):
+        """
+        Fill HTCondor submission file
+        """
+        # Find all files in the working directory to copy on the worker node
+
+        files_to_transfer = [str(os.path.join(job.working_dir, i)) for i in os.listdir(job.working_dir)]
+
+        with open(submit_file_name, 'w') as submit_file:
+            print(f'executable = {submit_file_name.replace(".sub", ".sh")}', file=submit_file)
+            print(f'log = {os.path.join(job.output_dir, "htcondor.log")}', file=submit_file)
+            print(f'output = {os.path.join(job.output_dir, "stdout")}', file=submit_file)
+            print(f'error = {os.path.join(job.output_dir, "stderr")}', file=submit_file)
+            print(f'transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
+            print('universe = vanilla', file=submit_file)
+            print('getenv = true', file=submit_file)
+            print('requirements = (OpSysAndVer == "SL6" || OpSysAndVer == "CentOS7")', file=submit_file)
+            print('should_transfer_files = Yes', file=submit_file)
+            print('when_to_transfer_output = ON_EXIT', file=submit_file)
+            print('queue', file=submit_file)
+
+    def _add_batch_directives(self, job, batch_file):
+        """
+        For HTCondor leave empty as the directives are already included in the submit file
+        add instead basf2 setup directives
+        """
+        print("#!/bin/bash", file=batch_file)
+        if not job.setup_cmds:
+            job.add_basf2_setup()
+
+    @classmethod
+    def _create_cmd(cls, script_path):
+        """
+        """
+        submission_cmd = cls.submission_cmds[:]
+        submission_cmd.append(script_path.replace('.sh', '.sub'))
+        return submission_cmd
+
+    @classmethod
+    def _submit_to_batch(cls, cmd):
+        """
+        Do the actual batch submission command and collect the output to find out the job id for later monitoring.
+        """
+        os.chmod(cmd[-1].replace('.sub', '.sh'), 0o755)
+        job_dir = os.path.dirname(cmd[-1])
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
+        return int(re.findall('submitted to cluster ([0-9]+).\n', sub_out)[0])
+
+    class HTCondorResult(Result):
+        """
+        Simple class to help monitor status of jobs submitted by HTCondor Backend.
+
+        You pass in a `Job` object and job id from a condor_submit command.
+        When you call the `ready` method it runs condor_q and, if needed, condor_history to see whether or not the job has finished.
+        """
+
+        #: HTCondor statuses mapped to Job statuses
+        backend_code_to_status = {'0': "submitted",
+                                  '1': "submitted",
+                                  '2': "running",
+                                  '3': "failed",
+                                  '4': "completed",
+                                  '5': "submitted",
+                                  '6': "failed"
+                                  }
+
+        def __init__(self, job, job_id):
+            """
+            Pass in the job object and the job id to allow the result to do monitoring and perform
+            post processing of the job.
+            """
+            super().__init__(job)
+            #: job id given by HTCondor
+            self.job_id = job_id
+
+        def update_status(self):
+            """
+            Update the job's status by calling condor_h and, if needed, condor_history.
+            """
+            B2DEBUG(29, "Calling {}.result.update_status()".format(self.job.name))
+            backend_status = subprocess.check_output(
+                ["condor_q", str(self.job_id), '-af', 'JobStatus'], stderr=subprocess.STDOUT, universal_newlines=True).strip()
+            # if job is held (backend_status = 5) then report why then kill the job
+            if backend_status == '5':
+                hold_reason = subprocess.check_output(["condor_q", str(self.job_id), '-af',
+                                                       'HoldReason'], stderr=subprocess.STDOUT, universal_newlines=True)
+                B2WARNING(f'Job {self.job.name} on hold because of {hold_reason}. Killing it')
+                subprocess.check_output(["condor_rm", str(self.job_id)], stderr=subprocess.STDOUT, universal_newlines=True)
+            # If no backend status is returned then the job already left the queue
+            # check in the history to see if it suceeded or failed
+            if backend_status == '':
+                backend_status = subprocess.check_output(["condor_history", str(
+                    self.job_id), '-af', 'JobStatus'], stderr=subprocess.STDOUT, universal_newlines=True).strip()
+            if backend_status == '':
+                # This should not happen so, for paranoia, mark the job as failed
+                backend_status = '6'
+            try:
+                new_job_status = self.backend_code_to_status[backend_status]
+            except KeyError as err:
+                raise BackendError("Unidentified backend status found for Job({}): {}".format(self.job, backend_status))
+            if new_job_status != self.job.status:
+                self.job.status = new_job_status
+
+    @classmethod
+    def _create_job_result(cls, job, job_id):
+        """
+        """
+        B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
+        job.result = cls.HTCondorResult(job, job_id)
 
 
 class DIRAC(Backend):

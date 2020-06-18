@@ -25,14 +25,12 @@ def fix_tw_param():
     bad_boards = [0, 35, 37, 77, 97, 115, 133, 193, 204, 218, 247]
     for ib in range(300):
         if ib in bad_boards:
-            label = Belle2.GlobalLabel()
-            label.construct(Belle2.CDCTimeWalks.getGlobalUniqueID(), ib, 0)
-            result.append(label.label())
-            label.construct(Belle2.CDCTimeWalks.getGlobalUniqueID(), ib, 1)
-            result.append(label.label())
-#        else:
-#            label.construct(Belle2.CDCTimeWalks.getGlobalUniqueID(), ib, 1)
-#            result.append(label.label())
+            label0 = Belle2.GlobalLabel()
+            label0.construct(Belle2.CDCTimeWalks.getGlobalUniqueID(), ib, 0)
+            result.append(label0.label())
+            label1 = Belle2.GlobalLabel()
+            label1.construct(Belle2.CDCTimeWalks.getGlobalUniqueID(), ib, 1)
+            result.append(label1.label())
     return result
 
 
@@ -92,7 +90,8 @@ def get_calibrations(input_data, **kwargs):
 
     max_events_per_calibration = 50000  # 100k events for each skim
     max_events_per_calibration_for_xt_sr = 2000000  # 2 M events for each skim
-    max_events_per_file = 1000
+    max_events_per_file = 2000
+    max_events_per_file_had = 1000
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
@@ -101,7 +100,7 @@ def get_calibrations(input_data, **kwargs):
 
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
-    chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file)
+    chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file_had)
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
     # Get the overall IoV we want to cover, including the end values
@@ -133,8 +132,10 @@ def get_calibrations(input_data, **kwargs):
         init_event=(0, output_iov.run_low, output_iov.exp_low),
         min_entries=10000)
 
-    basf2.set_module_parameters(cal.collections['hlt_mumu'].pre_collector_path, 'RootInput', entrySequences=[f'0:{3000}'])
-    basf2.set_module_parameters(cal.collections['hlt_hadron'].pre_collector_path, 'RootInput', entrySequences=[f'0:{3000}'])
+    basf2.set_module_parameters(cal.collections['hlt_mumu'].pre_collector_path,
+                                'RootInput', entrySequences=[f'0:{max_events_per_file}'])
+    basf2.set_module_parameters(cal.collections['hlt_hadron'].pre_collector_path,
+                                'RootInput', entrySequences=[f'0:{max_events_per_file_had}'])
     cal.max_iterations = 3
     # Force the output payload IoV to be correct.
     # It may be different if you are using another strategy like SequentialRunByRun

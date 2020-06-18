@@ -60,16 +60,16 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     const std::vector<float> param  = tws->getTimeWalkParams(board);
     globals.add(
       GlobalLabel::construct<CDCTimeWalks>(board, 0),
-      exp(-param[1]* m_adcCount) * double(int(m_leftRight))
+      -driftVelocity * exp(-param[1]* m_adcCount) * double(int(m_leftRight))
     );
     globals.add(
       GlobalLabel::construct<CDCTimeWalks>(board, 1),
-      -m_adcCount * param[0]*exp(-param[1]* m_adcCount) * double(int(m_leftRight))
+      driftVelocity * m_adcCount * param[0]*exp(-param[1]* m_adcCount) * double(int(m_leftRight))
     );
   }
 
   // X-t relations calibration
-  if (driftTime > 20 && driftTime < 500 && fabs(driftVelocity) < 1.0e-2) {
+  /*  if (driftTime > 20 && driftTime < 500 && fabs(driftVelocity) < 1.0e-2) {
     // TODO: ugly to need to ask XTRelations for something here...
     // Can't I get this CDCGeometryPar or sth. like this?
     DBObjPtr<CDCXtRelations> xts;
@@ -105,7 +105,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
 
       );
     }
-  }
+    }*/
 
 
   // CDC Alignment ---------------------------------------------------

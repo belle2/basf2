@@ -228,7 +228,6 @@ void SVDPerformanceTTreeModule::event()
           const double res_U_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
           const TVector3 svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
           const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
-
           const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
           double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
           double svdZ_1 = svdGlobal_1(2);
@@ -238,7 +237,6 @@ void SVDPerformanceTTreeModule::event()
           m_svdClTime = svd_1->getClsTime();
           m_svdClSNR = svd_1->getSNR();
           m_svdClCharge = svd_1->getCharge();
-          m_svdClPos = svd_1->getPosition();
           m_svdClPosErr = svd_1->getPositionSigma();
           if (isMC && trueHit_1.size() > 0)
             m_svdTruePos = trueHit_1[0]->getU();
@@ -255,6 +253,7 @@ void SVDPerformanceTTreeModule::event()
           m_svdTrkPrimeOS = svd_predIntersect_1[2];
           m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
           m_svdTrkPosUnbiased = svd_predIntersect_unbiased[3];
+          m_svdClPos = m_svdRes / 1e4 + m_svdTrkPosUnbiased;
           m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[3][3]);
           m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
           m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[1];
@@ -283,7 +282,9 @@ void SVDPerformanceTTreeModule::event()
             for (unsigned int d = 0; d < m_svdSize; d++) {
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
-              m_svdStripPosition.push_back(svdSensor_1.getUCellPosition(theRecoDigits[d]->getCellID()));
+              double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits[d]->getCellID());
+              //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
+              m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
 
           m_t_U->Fill();
@@ -301,7 +302,6 @@ void SVDPerformanceTTreeModule::event()
           m_svdClTime = svd_1->getClsTime();
           m_svdClSNR = svd_1->getSNR();
           m_svdClCharge = svd_1->getCharge();
-          m_svdClPos = svd_1->getPosition();
           m_svdClPosErr = svd_1->getPositionSigma();
           if (isMC && trueHit_1.size() > 0)
             m_svdTruePos = trueHit_1[0]->getV();
@@ -318,6 +318,7 @@ void SVDPerformanceTTreeModule::event()
           m_svdTrkPrimeOS = svd_predIntersect_1[1];
           m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
           m_svdTrkPosUnbiased = svd_predIntersect_unbiased[4];
+          m_svdClPos = m_svdRes / 1e4 + m_svdTrkPosUnbiased;
           m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[4][4]);
           m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
           m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[2];
@@ -347,7 +348,9 @@ void SVDPerformanceTTreeModule::event()
             for (unsigned int d = 0; d < m_svdSize; d++) {
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
-              m_svdStripPosition.push_back(svdSensor_1.getVCellPosition(theRecoDigits[d]->getCellID()));
+              double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits[d]->getCellID());
+              //Aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
+              m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
 
           m_t_V->Fill();

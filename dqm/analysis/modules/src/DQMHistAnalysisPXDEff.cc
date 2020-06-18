@@ -276,6 +276,7 @@ void DQMHistAnalysisPXDEffModule::event()
 
 
   auto gr = m_hEffAll->GetPaintedGraph();
+  auto gr2 = m_hEffAllUpdate->GetPaintedGraph();
   if (gr) {
     double scale_min = 1.0;
     for (int i = 0; i < gr->GetN(); i++) {
@@ -310,9 +311,15 @@ void DQMHistAnalysisPXDEffModule::event()
     gr->SetLineColor(4);
     gr->SetLineWidth(2);
     gr->SetMarkerStyle(8);
+    if (gr2) {
+      gr2->SetLineColor(kOrange);
+      gr2->SetLineWidth(2);
+      gr2->SetMarkerStyle(33);
+    }
 
     m_cEffAll->Clear();
     gr->Draw("AP");
+    if (gr2) gr2->Draw("same,AP");
     m_cEffAll->cd(0);
 
     auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");

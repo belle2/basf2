@@ -252,85 +252,40 @@ namespace {
     return false;
   }
 
-  /** Recursively gather all matched MCParticles in daughters of p (taking special care of decay-in-flight things). */
-  /** If a daughter has e_extraInfoMCErrors already and missing particles are accepted,
-      accepted mc-daughters of the daughter are also stored. */
-  void appendDaughtersOfMatched(const Particle* p, unordered_set<const MCParticle*>& mcMatchedParticles)
+  /** Recursively gather all daughters which are accepted to be missed. */
+  void appendAcceptedMissingDaughters(const Particle* p, unordered_set<const MCParticle*>& acceptedParticles)
   {
-    for (unsigned i = 0; i < p->getNDaughters(); ++i) {
-      const Particle* daug = p->getDaughter(i);
+    const MCParticle* mcParticle = p->getRelatedTo<MCParticle>();
+    if (mcParticle) {
+      vector<const MCParticle*> genDaughters;
+      appendParticles(mcParticle, genDaughters);
 
-      //add matched MCParticle for 'daug'
-      const MCParticle* mcParticle = daug->getRelatedTo<MCParticle>();
-      if (mcParticle)
-        mcMatchedParticles.insert(mcParticle);
-
-      if (daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
-        // if property is not ordinary nor isUnspecified, it has missing particles flags
-        if (daug->getProperty() != Particle::PropertyFlags::c_Ordinary and
-            daug->getProperty() != Particle::PropertyFlags::c_IsUnspecified) {
-
-          // all generator level daughters will be stored in this vector
-          vector<const MCParticle*> genDaughters;
-
-          // primary daughters
-          const vector<MCParticle*>& daughters = mcParticle->getDaughters();
-          for (auto mcDaug : daughters) {
-            genDaughters.push_back(mcDaug);
-            appendParticles(mcDaug, genDaughters);
-          }
-
-          for (auto mcDaug : genDaughters) {
-            if (isDaughterAccepted(mcDaug, daug))
-              mcMatchedParticles.insert(mcDaug);
-          }
-
-        }
-      }
-
-      if (daug->getNDaughters() != 0) {
-        // if daug has daughters, call appendDaughtersOfMatched recursively.
-        appendDaughtersOfMatched(daug, mcMatchedParticles);
-        continue;
-      }
-
-      if (daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
-        if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
-          //now daug does not have any daughters.
-          //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
-          //so we'll also add all mother MCParticles until the first primary mother
-          mcParticle = mcParticle->getMother();
-          while (mcParticle) {
-            mcMatchedParticles.insert(mcParticle);
-            if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
-              break;
-
-            mcParticle = mcParticle->getMother();
-          }
-        }
+      for (auto mcDaug : genDaughters) {
+        if (isDaughterAccepted(mcDaug, p))
+          acceptedParticles.insert(mcDaug);
+        else
+          acceptedParticles.erase(mcDaug);
       }
     }
+
+    for (unsigned i = 0; i < p->getNDaughters(); ++i) {
+      const Particle* daug = p->getDaughter(i);
+      appendAcceptedMissingDaughters(daug, acceptedParticles);
+    }
+
   }
 
 
 }
 
-int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle, const bool honorProperty)
+int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle)
 {
   if (particle->hasExtraInfo(c_extraInfoMCErrors)) {
-    if (honorProperty) {
-      return (int(particle->getExtraInfo(c_extraInfoMCErrors)) & ~(getFlagsIgnoredByProperty(particle)));
-    } else {
-      return particle->getExtraInfo(c_extraInfoMCErrors);
-    }
+    return particle->getExtraInfo(c_extraInfoMCErrors);
   } else {
     if (!mcParticle)
       mcParticle = particle->getRelatedTo<MCParticle>();
-    if (honorProperty) {
-      return (int(setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle)) & ~(getFlagsIgnoredByProperty(particle)));
-    } else {
-      return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
-    }
+    return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
   }
 }
 
@@ -545,11 +500,16 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
 {
   int flags = 0;
 
-  unordered_set<const MCParticle*> mcMatchedParticles;
-  // Missing particles which are accepted by the property are also stored.
-  appendDaughtersOfMatched(particle, mcMatchedParticles);
   vector<const MCParticle*> genParts;
   appendParticles(mcParticle, genParts);
+
+  unordered_set<const MCParticle*> mcMatchedParticles;
+  appendParticles(particle, mcMatchedParticles);
+  unordered_set<const MCParticle*> acceptedParticles;
+  appendAcceptedMissingDaughters(particle, acceptedParticles);
+  for (auto part : acceptedParticles) {
+    mcMatchedParticles.insert(part);
+  }
 
 
   for (const MCParticle* genPart : genParts) {
@@ -626,17 +586,6 @@ int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
 {
   int flags = 0;
 
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons) {
-    flags |= (MCMatching::c_MissFSR);
-    flags |= (MCMatching::c_MissPHOTOS);
-  }
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreMassive) {
-    flags |= (MCMatching::c_MissMassiveParticle);
-    flags |= (MCMatching::c_MissKlong);
-  }
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
-  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreGamma) flags |= (MCMatching::c_MissGamma);
   if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
 
   return flags;

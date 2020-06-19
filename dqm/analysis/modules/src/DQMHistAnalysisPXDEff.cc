@@ -356,6 +356,9 @@ void DQMHistAnalysisPXDEffModule::event()
       gru->SetLineWidth(2);
       gru->SetMarkerStyle(33);
     }
+    m_cEffAllUpdate->Clear();
+    m_cEffAllUpdate->cd(0);
+    m_hEffAllUpdate->Draw("AP");
     m_cEffAllUpdate->Modified();
     m_cEffAllUpdate->Update();
   }

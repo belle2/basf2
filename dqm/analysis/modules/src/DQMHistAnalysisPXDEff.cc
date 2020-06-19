@@ -251,7 +251,7 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
 
-      if (m_hEffAllLastTotal->GetBinContent(j) + m_minEntries < nhit) {
+      if (m_hEffAllLastTotal->GetBinContent(j) < m_minEntries || m_hEffAllLastTotal->GetBinContent(j) + m_minEntries < nhit) {
         m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
         m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
         m_hEffAllLastTotal->SetBinContent(j, nhit);

@@ -16,6 +16,7 @@
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include "Math/ChebyshevPol.h"
 
 using namespace std;
 using namespace Belle2;
@@ -36,8 +37,8 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   const unsigned short layer = getWireID().getICLayer();
 
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  const double alpha = cdcgeo.getAlpha(wirePositon, mom);
-  const double theta = cdcgeo.getTheta(mom);
+  double alpha = cdcgeo.getAlpha(wirePositon, mom);
+  double theta = cdcgeo.getTheta(mom);
   const TVectorD& stateOnPlane = sop->getState();
   const double driftLengthEstimate = std::abs(stateOnPlane(3));
   const double driftTime = cdcgeo.getDriftTime(driftLengthEstimate, layer, LR, alpha, theta);
@@ -45,7 +46,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
 
   // CDC Calibration -------------------------------------------------
 
-  // T0 calibration (per wire) TODO check sign!!!
+  // Time zero calibration (per wire)
   if (driftTime > 20 && driftTime < 200 && fabs(driftVelocity) < 1.0e-2) {
     globals.add(
       GlobalLabel::construct<CDCTimeZeros>(getWireID(), 0),
@@ -53,7 +54,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     );
   }
 
-  // Time-walk calibration (per board) TODO checksign!!!
+  // Time walk calibration (per board)
   if (driftTime > 20 && driftTime < 200 && fabs(driftVelocity) < 1.0e-2 && m_adcCount < 400 && m_adcCount > 2) {
     DBObjPtr<CDCTimeWalks> tws;
     unsigned short board = CDCGeometryPar::Instance().getBoardID(getWireID());
@@ -68,44 +69,53 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     );
   }
 
-  // X-t relations calibration
-  /*  if (driftTime > 20 && driftTime < 500 && fabs(driftVelocity) < 1.0e-2) {
+  // Space time relations calibration
+  if (driftTime > 20 && driftTime < 500 && fabs(driftVelocity) < 1.0e-2) {
     // TODO: ugly to need to ask XTRelations for something here...
     // Can't I get this CDCGeometryPar or sth. like this?
+
+    theta = cdcgeo.getOutgoingTheta(alpha, theta);
+    alpha = cdcgeo.getOutgoingAlpha(alpha);
     DBObjPtr<CDCXtRelations> xts;
     auto xtid = xts->getXtID(getWireID().getICLayer(), LR, (float)alpha, (float)theta);
-    auto boundary = xts->getXtParams(xtid).at(6);
+    const auto& par = xts->getXtParams(xtid);
+    auto boundary = par.at(6);
     if (driftTime < boundary) {
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 0),
-        1. * double(int(m_leftRight))
-
+        ROOT::Math::Chebyshev5(driftTime, 1, par[1], par[2], par[3], par[4], par[5]) * double(int(m_leftRight))
       );
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 1),
-        driftTime * double(int(m_leftRight))
-
+        ROOT::Math::Chebyshev5(driftTime, par[0], 1, par[2], par[3], par[4], par[5]) * double(int(m_leftRight))
       );
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 2),
-        (2. * driftTime * driftTime - 1.) * double(int(m_leftRight))
-
+        ROOT::Math::Chebyshev5(driftTime, par[0], par[1], 1, par[3], par[4], par[5]) * double(int(m_leftRight))
       );
-      // TODO: params 3, 4, 5
-
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 3),
+        ROOT::Math::Chebyshev5(driftTime, par[0], par[1], par[2], 1, par[4], par[5]) * double(int(m_leftRight))
+      );
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 4),
+        ROOT::Math::Chebyshev5(driftTime, par[0], par[1], par[2], par[3], 1, par[5]) * double(int(m_leftRight))
+      );
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 5),
+        ROOT::Math::Chebyshev5(driftTime, par[0], par[1], par[2], par[3], par[4], 1) * double(int(m_leftRight))
+      );
     } else {
+      globals.add(
+        GlobalLabel::construct<CDCXtRelations>(xtid, 6),
+        -par[7] * double(int(m_leftRight))
+      );
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 7),
         (driftTime - boundary) * double(int(m_leftRight))
-
-      );
-      globals.add(
-        GlobalLabel::construct<CDCXtRelations>(xtid, 8),
-        1. * double(int(m_leftRight))
-
       );
     }
-    }*/
+  }
 
 
   // CDC Alignment ---------------------------------------------------

@@ -88,8 +88,8 @@ def get_calibrations(input_data, **kwargs):
     max_files_per_run = 10
     min_events_per_file = 1000
 
-    max_events_per_calibration = 50000  # 100k events for each skim
-    max_events_per_calibration_for_xt_sr = 2000000  # 2 M events for each skim
+    max_events_per_calibration = 50000
+    max_events_per_calibration_for_xt_sr = 2000000
     max_events_per_file = 2000
     max_events_per_file_had = 1000
 
@@ -110,8 +110,9 @@ def get_calibrations(input_data, **kwargs):
     # The actuall IoV we want for any prompt request is open-ended
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
     import millepede_calibration as mp2
-    cal = mp2.create(
-        name='tztw0',
+    # Calibrate time zero and time walk simultaneously.
+    cal1 = mp2.create(
+        name='tzw0',
         dbobjects=['CDCTimeZeros', 'CDCTimeWalks'],
         collections=[
             mp2.make_collection('hlt_mumu', pre_collector(), tracks=['RecoTracks']),
@@ -120,9 +121,8 @@ def get_calibrations(input_data, **kwargs):
         tags=None,
         timedep=[],
         constraints=[alignment.constraints.CDCTimeZerosConstraint(basf2.find_file(
-            'calibration/scripts/prompt/calibrations/cdc-T0-constraints.txt'))],
+                    'calibration/scripts/prompt/calibrations/cdc-T0-constraints.txt'))],
         fixed=fix_tw_param(),
-        #        fixed=[],
         commands=['method inversion 1 0.1',
                   'threads 25 1',
                   'chiscut 30. 6.',
@@ -132,16 +132,46 @@ def get_calibrations(input_data, **kwargs):
         init_event=(0, output_iov.run_low, output_iov.exp_low),
         min_entries=10000)
 
-    basf2.set_module_parameters(cal.collections['hlt_mumu'].pre_collector_path,
+    basf2.set_module_parameters(cal1.collections['hlt_mumu'].pre_collector_path,
                                 'RootInput', entrySequences=[f'0:{max_events_per_file}'])
-    basf2.set_module_parameters(cal.collections['hlt_hadron'].pre_collector_path,
+    basf2.set_module_parameters(cal1.collections['hlt_hadron'].pre_collector_path,
                                 'RootInput', entrySequences=[f'0:{max_events_per_file_had}'])
-    cal.max_iterations = 3
+    cal1.max_iterations = 5
+
+    # Calibration of XT is separated from tz/tw. in future, it will be simultaniously calibrated...
+    cal2 = mp2.create(
+        name='xt0',
+        dbobjects=['CDCXtRelations'],
+        collections=[
+            mp2.make_collection('hlt_mumu', pre_collector(), tracks=['RecoTracks']),
+            mp2.make_collection('hlt_hadron', pre_collector(), tracks=['RecoTracks'])],
+        files=dict(hlt_mumu=chosen_files_mumu, hlt_hadron=chosen_files_hadron),
+        tags=None,
+        timedep=[],
+        constraints=[],
+        fixed=[],
+        commands=['method inversion 1 0.1',
+                  'threads 25 1',
+                  'chiscut 30. 6.',
+                  'entries 100',
+                  'scaleerrors 1. 1.'],
+        params=dict(minPValue=0., externalIterations=0),
+        init_event=(0, output_iov.run_low, output_iov.exp_low),
+        min_entries=10000)
+
+    basf2.set_module_parameters(cal2.collections['hlt_mumu'].pre_collector_path,
+                                'RootInput', entrySequences=[f'0:{max_events_per_file}'])
+    basf2.set_module_parameters(cal2.collections['hlt_hadron'].pre_collector_path,
+                                'RootInput', entrySequences=[f'0:{max_events_per_file_had}'])
+    cal2.max_iterations = 2
     # Force the output payload IoV to be correct.
     # It may be different if you are using another strategy like SequentialRunByRun
-    for algorithm in cal.algorithms:
+    for algorithm in cal1.algorithms:
         algorithm.params = {"apply_iov": output_iov}
-    return [cal]
+    for algorithm in cal2.algorithms:
+        algorithm.params = {"apply_iov": output_iov}
+
+    return [cal1, cal2]
 
 
 #################################################

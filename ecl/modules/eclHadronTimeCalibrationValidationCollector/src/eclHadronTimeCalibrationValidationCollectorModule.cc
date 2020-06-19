@@ -137,25 +137,25 @@ void eclHadronTimeCalibrationValidationCollectorModule::prepare()
   auto cutflow = new TH1F("cutflow", " ;Cut label number ;Number of events passing cut", 10, 0, 10) ;
   registerObject<TH1F>("cutflow", cutflow) ;
 
-  auto clusterTime = new TH1F("clusterTime", ";Photon ECL cluster time (ns); number of ECL clusters", nbins, min_t, max_t) ;
+  auto clusterTime = new TH1F("clusterTime", ";Photon ECL cluster time [ns]; number of photon ECL clusters", nbins, min_t, max_t) ;
   registerObject<TH1F>("clusterTime", clusterTime) ;
 
   auto clusterTime_cid = new TH2F("clusterTime_cid",
-                                  ";cell ID ;Photon ECL cluster time (ns)", 8736, 0, 8736, nbins, min_t, max_t) ;
+                                  ";cell ID ;Photon ECL cluster time [ns]", 8736, 0, 8736, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTime_cid", clusterTime_cid) ;
 
   auto clusterTime_run = new TH2F("clusterTime_run",
-                                  ";Run number ;Photon ECL cluster time (ns)", 7000, 0, 7000, nbins, min_t, max_t) ;
+                                  ";Run number ;Photon ECL cluster time [ns]", 7000, 0, 7000, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTime_run", clusterTime_run) ;
 
 
   auto clusterTimeClusterE = new TH2F("clusterTimeClusterE",
-                                      ";Photon cluster energy [GeV];Cluster time [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
+                                      ";Photon cluster energy [GeV];Photon cluster time [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTimeClusterE", clusterTimeClusterE) ;
 
 
   auto dt99_clusterE = new TH2F("dt99_clusterE",
-                                ";Photon cluster energy [GeV];dt99 [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
+                                ";Photon cluster energy [GeV];dt99 [ns]", 100, 0, 10.0, nbins, 0, max_t) ;
   registerObject<TH2F>("dt99_clusterE", dt99_clusterE) ;
 
 

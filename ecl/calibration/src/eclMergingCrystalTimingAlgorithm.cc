@@ -355,6 +355,17 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
   // Go back to original TDirectory
   executeDir->cd();
 
+
+  /* Re-save the new bhabha calibrations to a payload.  The bhabha calibrations have NOT
+     been changed; however, the best way of controling which payloads get get uploaded to
+     the GT as part of the prommp calibrations is to save a second copy in this calibration
+     directory since we don't want to save all the payloads from the previous directory.
+     See the "<calibration>.save_payloads = <True/False>" code in the airflow steering file.*/
+  ECLCrystalCalib* bhabhaCalibCopy = new ECLCrystalCalib();
+  bhabhaCalibCopy->setCalibVector(bhabhaCalib, bhabhaCalibUnc);
+  saveCalibration(bhabhaCalibCopy, "ECLCrystalTimeOffsetBhabha");
+
+  // Save the new merged calibrations to a payload
   ECLCrystalCalib* newCrystalTimes = new ECLCrystalCalib();
   newCrystalTimes->setCalibVector(newCalib, newCalibUnc);
   saveCalibration(newCrystalTimes, m_payloadName);

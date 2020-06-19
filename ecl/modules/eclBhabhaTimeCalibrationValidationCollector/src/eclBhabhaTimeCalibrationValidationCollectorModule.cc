@@ -169,11 +169,11 @@ void eclBhabhaTimeCalibrationValidationCollectorModule::prepare()
 
 
   auto clusterTimeClusterE = new TH2F("clusterTimeClusterE",
-                                      ";Electron cluster energy [GeV];Cluster time [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
+                                      ";Electron cluster energy [GeV];Electron cluster time [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
   registerObject<TH2F>("clusterTimeClusterE", clusterTimeClusterE) ;
 
   auto dt99_clusterE = new TH2F("dt99_clusterE",
-                                ";Electron cluster energy [GeV];dt99 [ns]", 100, 0, 10.0, nbins, min_t, max_t) ;
+                                ";Electron cluster energy [GeV];dt99 [ns]", 100, 0, 10.0, nbins, 0, max_t) ;
   registerObject<TH2F>("dt99_clusterE", dt99_clusterE) ;
 
 

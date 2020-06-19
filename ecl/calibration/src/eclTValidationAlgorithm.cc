@@ -443,9 +443,9 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
 
   auto clusterTimePeak_ClusterEnergy_varBin = new TH1F("clusterTimePeak_ClusterEnergy_varBin",
-                                                       ";Photon cluster energy [GeV];Cluster time fit position [ns]", E_binEdges.size() - 1, &(E_binEdges[0]));
+                                                       ";ECL cluster energy [GeV];Cluster time fit position [ns]", E_binEdges.size() - 1, &(E_binEdges[0]));
   auto clusterTimePeakWidth_ClusterEnergy_varBin = new TH1F("clusterTimePeakWidth_ClusterEnergy_varBin",
-                                                            ";Photon cluster energy [GeV];Cluster time fit width [ns]", E_binEdges.size() - 1, &(E_binEdges[0]));
+                                                            ";ECL cluster energy [GeV];Cluster time fit width [ns]", E_binEdges.size() - 1, &(E_binEdges[0]));
 
   int Ebin_counter = 1 ;
 

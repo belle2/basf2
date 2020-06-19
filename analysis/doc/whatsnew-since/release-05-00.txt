@@ -25,3 +25,5 @@ Modules
    :ref:`DecayString` of the form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
  * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
    beamspot is added.
+ * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
+   reduce the number of candidates in the input particle list to one candidate per event based on a random value.

@@ -185,7 +185,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   double tcrate_min_cut = -150; //-20 ;
   double tcrate_max_cut = 150; //10 ;
   double tcrate_unc_min_cut = 0.0001 ;
-  double tcrate_unc_max_cut = 3 ;
+  double tcrate_unc_max_cut = 0.4 ;
 
   vector< vector<double> > allCrates_crate_times ;
   vector< vector<double> > allCrates_run_nums ;
@@ -362,7 +362,7 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     B2INFO("Mean crys+crate times for all runs used as offset (crate " << iCrate + 1 << ") = " << mean_time);
 
     for (long unsigned int jRun = 0; jRun < allCrates_crate_times[iCrate].size(); jRun++) {
-      allCrates_crystalCrate_times[iCrate][jRun] += -mean_time + timeShiftForPlotStyle[iCrate - 1] ;
+      allCrates_crystalCrate_times[iCrate][jRun] += -mean_time + timeShiftForPlotStyle[iCrate] ;
       if (jRun < 4 || iCrate == 1 || iCrate == 40 || iCrate == 51) {
         B2INFO("allCrates_crystalCrate_times(crate " << iCrate + 1 << ", run counter " << jRun + 1 << ") = " <<
                allCrates_crystalCrate_times[iCrate][jRun]);

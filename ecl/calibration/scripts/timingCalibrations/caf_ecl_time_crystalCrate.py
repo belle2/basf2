@@ -178,6 +178,7 @@ def get_calibrations(input_data, **kwargs):
     cal_crates_1 = Calibration("ECLcrateTimeCalibration_physics_1")
     cal_crates_1.add_collection(name="bhabha", collection=eclTCol)
     cal_crates_1.algorithms = [eclTAlgCrates]
+    cal_crates_1.save_payloads = False
 
     # Here we set the AlgorithmStrategy for our algorithm
     from caf.strategies import SimpleRunByRun
@@ -199,6 +200,14 @@ def get_calibrations(input_data, **kwargs):
     cal_crystals_1 = Calibration("ECLcrystalTimeCalibration_physics_1")
     cal_crystals_1.add_collection(name="bhabha", collection=eclTCol)
     cal_crystals_1.algorithms = [eclTAlgCrystals]
+
+    # Two payloads are created here:
+    #    * ECLCrystalTimeOffset
+    #    * ECLCrystalTimeOffsetBhabha
+    # We technically want to save ECLCrystalTimeOffsetBhabha to the GT but because we don't want
+    # ECLCrystalTimeOffset we save neither here and get the merging algorithm to save a copy
+    # of ECLCrystalTimeOffsetBhabha later.
+    cal_crystals_1.save_payloads = False
 
     # Here we set the AlgorithmStrategy for our algorithm
     from caf.strategies import SingleIOV
@@ -289,6 +298,7 @@ def get_calibrations(input_data, **kwargs):
     valid_cal_bhabha = Calibration("ECLcrystalTimeCalValidation_bhabhaPhysics")
     valid_cal_bhabha.add_collection(name="bhabha", collection=eclValTCol)
     valid_cal_bhabha.algorithms = [eclValTAlgBhabha]
+    valid_cal_bhabha.save_payloads = False
 
     # Here we set the AlgorithmStrategy for our algorithm
     from caf.strategies import SingleIOV
@@ -342,6 +352,7 @@ def get_calibrations(input_data, **kwargs):
     valid_cal_hadron = Calibration("ECLcrystalTimeCalValidation_hadronPhysics")
     valid_cal_hadron.add_collection(name="hadron", collection=eclValTCol)
     valid_cal_hadron.algorithms = [eclValTAlgHadronic]
+    valid_cal_hadron.save_payloads = False
 
     # Here we set the AlgorithmStrategy for our algorithm
     from caf.strategies import SingleIOV
@@ -368,6 +379,7 @@ def get_calibrations(input_data, **kwargs):
 
     cal_ecl_timeShifts = Calibration(name="ecl_t_shifts", collector="DummyCollector",
                                      algorithms=[tShifts_alg], input_files=input_files_first_last)
+    cal_ecl_timeShifts.save_payloads = False
 
     #######################################################################
     #######################################################################

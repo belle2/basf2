@@ -16,7 +16,6 @@
 
 #include "trg/trg/Board.h"
 #include "trg/trg/SignalVector.h"
-#include "trg/trg/SignalBundle.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCETFinder TRGCDCEventTimeFinder
@@ -25,9 +24,6 @@
 
 namespace Belle2 {
 
-  class TRGCDC;
-  class TRGCDCSegment;
-  class TRGCDCSegmentHit;
   class TRGCDCTrackSegmentFinder;
 
   /// A class of TRGCDC Event Time Finder

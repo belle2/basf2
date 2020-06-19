@@ -47,7 +47,7 @@ namespace Belle2 {
 
     Ph1sustrCreator::Ph1sustrCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     Ph1sustrCreator::~Ph1sustrCreator()
@@ -57,6 +57,9 @@ namespace Belle2 {
 
     void Ph1sustrCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       //lets get the stepsize parameter with a default value of 5 µm
       //double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 

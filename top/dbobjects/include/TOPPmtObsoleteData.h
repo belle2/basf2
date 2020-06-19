@@ -39,7 +39,7 @@ namespace Belle2 {
      * @param serialNumber serial number
      * @param type PMT type
      * @param cathode phote-cathode type
-     * @param HV obsolete high voltage in V
+     * @param obsHV obsolete high voltage in V
      * @param darkCurrent dark current in Hz
      * @param qe380 quantum efficiency at 380 nm
      */

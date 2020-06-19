@@ -218,7 +218,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentTriple>& segmentTriplePat
 
     const CDCSegmentTriple* secondSegmentTriple = *itSegmentTriple++;
     B2ASSERT("Two segement triples do not overlap in their axial segments",
-             firstSegmentTriple->getEndSegment() == secondSegmentTriple->getStartSegment());
+             *firstSegmentTriple->getEndSegment() == *secondSegmentTriple->getStartSegment());
 
     perpSOffset = appendReconstructedAverage(firstSegmentTriple->getEndSegment(),
                                              firstSegmentTriple->getTrajectory3D(),
@@ -281,7 +281,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
     const CDCSegmentPair* secondSegmentPair = *itSegmentPair++;
 
     B2ASSERT("Two segement pairs do not overlap in their segments",
-             firstSegmentPair->getToSegment() == secondSegmentPair->getFromSegment());
+             *firstSegmentPair->getToSegment() == *secondSegmentPair->getFromSegment());
 
     perpSOffset = appendReconstructedAverage(firstSegmentPair->getToSegment(),
                                              firstSegmentPair->getTrajectory3D(),

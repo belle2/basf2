@@ -16,7 +16,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 using namespace std;
 
@@ -33,6 +32,31 @@ namespace Belle2 {
       , m_cutAdjacent(cutAdjacent)
       , m_cutCluster(cutCluster)
       , m_timeAlgorithm(timeAlgorithm)
+      , m_storeShaperDigitsName("SVDShaperDigits")
+      , m_storeRecoDigitsName("SVDRecoDigits")
+      , m_charge(0)
+      , m_chargeError(0)
+      , m_seedCharge(0)
+      , m_6SampleTime(0)
+      , m_6SampleTimeError(0)
+      , m_position(0)
+      , m_positionError(0)
+      , m_SNR(0)
+      , m_seedSNR(0)
+      , m_seedIndex(-1)
+      , m_strips(4) {m_strips.clear();};
+
+    SimpleClusterCandidate::SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent,
+                                                   double cutCluster, int timeAlgorithm, std::string storeShaperDigitsName, std::string storeRecoDigitsName)
+      : m_vxdID(vxdID)
+      , m_isUside(isUside)
+      , m_sizeHeadTail(sizeHeadTail)
+      , m_cutSeed(cutSeed)
+      , m_cutAdjacent(cutAdjacent)
+      , m_cutCluster(cutCluster)
+      , m_timeAlgorithm(timeAlgorithm)
+      , m_storeShaperDigitsName(storeShaperDigitsName)
+      , m_storeRecoDigitsName(storeRecoDigitsName)
       , m_charge(0)
       , m_chargeError(0)
       , m_seedCharge(0)
@@ -295,9 +319,10 @@ namespace Belle2 {
       Belle2::SVDShaperDigit::APVFloatSamples returnSamples = {0, 0, 0, 0, 0, 0};
       //FIXME: the name of the StoreArray of RecoDigits and ShaperDigits
       // must be taken from the SimpleClusterizer.
-      const StoreArray<SVDRecoDigit> m_storeRecoDigits("SVDRecoDigits");
+      const StoreArray<SVDRecoDigit> m_storeRecoDigits(m_storeRecoDigitsName.c_str());
       for (auto istrip : m_strips) {
-        const SVDShaperDigit* shaperdigit = m_storeRecoDigits[istrip.recoDigitIndex]->getRelatedTo<SVDShaperDigit>("SVDShaperDigits");
+        const SVDShaperDigit* shaperdigit = m_storeRecoDigits[istrip.recoDigitIndex]->getRelatedTo<SVDShaperDigit>
+                                            (m_storeShaperDigitsName.c_str());
         if (!shaperdigit) B2ERROR("No shaperdigit for strip!?");
         Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();
         for (int iSample = 0; iSample < static_cast<int>(APVsamples.size()); ++iSample)

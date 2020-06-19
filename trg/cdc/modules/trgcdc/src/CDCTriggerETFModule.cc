@@ -1,7 +1,5 @@
 #include "trg/cdc/modules/trgcdc/CDCTriggerETFModule.h"
 
-#include <cdc/geometry/CDCGeometryPar.h>
-
 #include <TH1.h>
 
 using namespace std;

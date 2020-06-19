@@ -14,15 +14,12 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
+
+#include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
+#define CRC16POLYREV 0x8005   // CRC-16 polynomial, normal representation 
 
 #include <arpa/inet.h>
-#include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
-#include <boost/cstdint.hpp>  // for boost::uint16_t
-#define CRC16POLYREV 0x8005   // CRC-16 polynomial, normal representation 
 
 #include <sstream>
 #include <iomanip>

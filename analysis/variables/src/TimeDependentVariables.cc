@@ -27,11 +27,11 @@
 // framework aux
 #include <framework/gearbox/Const.h>
 
-#include <TLorentzVector.h>
 #include <TMatrixD.h>
+#include <TVectorD.h>
 #include <TVector3.h>
 
-#include <iostream>
+//#include <iostream>
 #include <cmath>
 
 using namespace std;
@@ -40,9 +40,8 @@ namespace Belle2 {
   namespace Variable {
 
     // from RotationTools.h
-    using RotationTools::rotateTensor;
-    using RotationTools::rotateTensorInv;
     using RotationTools::getUnitOrthogonal;
+    using RotationTools::toVec;
 
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     static const TVector3 vecNaN(realNaN, realNaN, realNaN);
@@ -189,10 +188,18 @@ namespace Belle2 {
 
     double particleDeltaTBelle(const Particle* particle)
     {
-      PCmsLabTransform T;
-      double boost = T.getBoostVector().Mag();
-      return particleDeltaZ(particle) / boost / Const::speedOfLight * 1e3;
+      double beta = PCmsLabTransform().getBoostVector().Mag();
+      double bg = beta / sqrt(1 - beta * beta);
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+      return particleDeltaZ(particle) / bg / c;
     }
+    double particleMCDeltaTau(const Particle* particle)
+    {
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
+      return vert->getMCDeltaTau();
+    }
+
     double particleMCDeltaT(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
@@ -200,14 +207,7 @@ namespace Belle2 {
       return vert->getMCDeltaT();
     }
 
-    double particleMCDeltaTapprox(const Particle* particle)
-    {
-      auto* vert = particle->getRelatedTo<TagVertex>();
-      if (!vert) return realNaN;
-      return vert->getMCDeltaTapprox();
-    }
-
-    double particleMCDeltaL(const Particle* particle)
+    double particleMCDeltaBoost(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
@@ -215,7 +215,7 @@ namespace Belle2 {
       double beta = PCmsLabTransform().getBoostVector().Mag();
       double bg = beta / sqrt(1 - beta * beta);
       double c = Const::speedOfLight / 1000.; // cm ps-1
-      return vert->getMCDeltaTapprox() * bg * c;
+      return vert->getMCDeltaT() * bg * c;
     }
 
 
@@ -231,7 +231,7 @@ namespace Belle2 {
       auto* vert = particle->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
 
-      double zVariance = particle->getVertexErrorMatrix()(2, 2);
+      double zVariance     = particle->getVertexErrorMatrix()(2, 2);
       double TagVZVariance = vert->getTagVertexErrMatrix()(2, 2);
       double result = sqrt(zVariance + TagVZVariance);
       if (!std::isfinite(result)) return realNaN;
@@ -305,24 +305,18 @@ namespace Belle2 {
 
     double vertexErrBoostDirection(const Particle* part)
     {
-      TVector3 boost = PCmsLabTransform().getBoostVector();
-
-      TMatrixD RR = (TMatrixD)part->getVertexErrorMatrix();
-      TMatrixD RotErr = rotateTensor(boost, RR);
-      return sqrt(RotErr(2, 2));
+      TVectorD bDir = toVec(PCmsLabTransform().getBoostVector().Unit());
+      // sqrt(bDir^T * Mat * bDir)
+      return sqrt(part->getVertexErrorMatrix().Similarity(bDir));
     }
 
 
     double vertexErrOrthBoostDirection(const Particle* part)
     {
-      TVector3 boost = PCmsLabTransform().getBoostVector();
-      TVector3 orthBoostDir = getUnitOrthogonal(boost);
-
-      TMatrixD RR = (TMatrixD)part->getVertexErrorMatrix();
-      TMatrixD RotErr = rotateTensor(orthBoostDir, RR);
-      return sqrt(RotErr(2, 2));
+      TVectorD oDir = toVec(getUnitOrthogonal(PCmsLabTransform().getBoostVector()));
+      // sqrt(oDir^T * Mat * oDir)
+      return sqrt(part->getVertexErrorMatrix().Similarity(oDir));
     }
-
 
 
 
@@ -384,91 +378,89 @@ namespace Belle2 {
 
     double tagTrackMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double result(realNaN);
-      if (trackIndex.size() != 1) return result;
-      unsigned int trackIndexInt(trackIndex.at(0));
-
       auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
 
-      if (vert)
-        result = (vert->getVtxFitTrackP(trackIndexInt)).Mag();
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
-      return result;
+      return vert->getVtxFitTrackP(trackIndexInt).Mag();
     }
 
     double tagTrackMomentumX(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
+
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       return vert->getVtxFitTrackPComponent(trackIndexInt, 0);
     }
 
     double tagTrackMomentumY(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
+
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       return vert->getVtxFitTrackPComponent(trackIndexInt, 1);
     }
 
     double tagTrackMomentumZ(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
+
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       return vert->getVtxFitTrackPComponent(trackIndexInt, 2);
     }
 
     double tagTrackZ0(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
+
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       return vert->getVtxFitTrackZ0(trackIndexInt);
     }
 
     double tagTrackD0(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
+
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       return vert->getVtxFitTrackD0(trackIndexInt);
     }
 
     double tagTrackRaveWeight(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
+
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       return vert->getRaveWeight(trackIndexInt);
     }
 
     double tagTrackDistanceToConstraint(const Particle* part, const std::vector<double>& trackIndex)
     {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
+
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      auto* vert = part->getRelatedTo<TagVertex>();
-      if (!vert) return realNaN;
       if (vert->getConstraintType() == "noConstraint") return realNaN;
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
       if (!tagParticle) return realNaN;
@@ -476,39 +468,35 @@ namespace Belle2 {
       return DistanceTools::trackToVtxDist(tagParticle->getTrackFitResult()->getPosition(),
                                            tagParticle->getMomentum(),
                                            vert->getConstraintCenter());
-
     }
 
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
     {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
+
       if (trackIndex.size() != 1) return realNaN;
       unsigned trackIndexInt = trackIndex.at(0);
 
-      auto* vert = part->getRelatedTo<TagVertex>();
-
-      if (!vert) return realNaN;
       if (vert->getConstraintType() == "noConstraint") return realNaN;
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
       if (!tagParticle) return realNaN;
 
       //recover the covariance matrix associated to the position of the tag track
-
-      TMatrixDSym trackPosCovMat(tagParticle->getVertexErrorMatrix());
+      TMatrixDSym trackPosCovMat = tagParticle->getVertexErrorMatrix();
 
       return DistanceTools::trackToVtxDistErr(tagParticle->getTrackFitResult()->getPosition(),
                                               tagParticle->getMomentum(),
                                               vert->getConstraintCenter(),
                                               trackPosCovMat,
                                               vert->getConstraintCov());
-
-
     }
 
     double tagTrackDistanceToConstraintSignificance(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double val(tagTrackDistanceToConstraint(part, trackIndex));
+      double val = tagTrackDistanceToConstraint(part, trackIndex);
       if (isinf(val) || isnan(val)) return realNaN;
-      double err(tagTrackDistanceToConstraintErr(part, trackIndex));
+      double err = tagTrackDistanceToConstraintErr(part, trackIndex);
       if (isinf(err) || isnan(err)) return realNaN;
 
       return val / err;
@@ -545,9 +533,9 @@ namespace Belle2 {
 
     double tagVDistanceToConstraintSignificance(const Particle* part)
     {
-      double val(tagVDistanceToConstraint(part));
+      double val = tagVDistanceToConstraint(part);
       if (isinf(val) || isnan(val)) return realNaN;
-      double err(tagVDistanceToConstraintErr(part));
+      double err = tagVDistanceToConstraintErr(part);
       if (isinf(err) || isnan(err)) return realNaN;
 
       return val / err;
@@ -555,13 +543,13 @@ namespace Belle2 {
 
     double tagTrackDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
 
-      const Particle* particle(vert->getVtxFitParticle(trackIndexInt));
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
+
+      const Particle* particle = vert->getVtxFitParticle(trackIndexInt);
       if (!particle) return realNaN;
 
       return DistanceTools::trackToVtxDist(particle->getTrackFitResult()->getPosition(),
@@ -571,18 +559,17 @@ namespace Belle2 {
 
     double tagTrackDistanceToTagVErr(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
+
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       const Particle* tagParticle(vert->getVtxFitParticle(trackIndexInt));
       if (!tagParticle) return realNaN;
 
       //recover the covariance matrix associated to the position of the tag track
-
-      TMatrixDSym trackPosCovMat(tagParticle->getVertexErrorMatrix());
+      TMatrixDSym trackPosCovMat = tagParticle->getVertexErrorMatrix();
 
       //To compute the uncertainty, the tag vtx uncertainty is NOT taken into account
       //The error computed is then the one in the chi2.
@@ -600,9 +587,9 @@ namespace Belle2 {
 
     double tagTrackDistanceToTagVSignificance(const Particle* part, const std::vector<double>& trackIndex)
     {
-      double val(tagTrackDistanceToTagV(part, trackIndex));
+      double val = tagTrackDistanceToTagV(part, trackIndex);
       if (isinf(val) || isnan(val)) return realNaN;
-      double err(tagTrackDistanceToTagVErr(part, trackIndex));
+      double err = tagTrackDistanceToTagVErr(part, trackIndex);
       if (isinf(err) || isnan(err)) return realNaN;
 
       return val / err;
@@ -610,17 +597,16 @@ namespace Belle2 {
 
     double tagTrackTrueDistanceToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return realNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return realNaN;
+
+      if (trackIndex.size() != 1) return realNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return realNaN;
 
-      TVector3 mcTagV(vert->getMCTagVertex());
-      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return realNaN;
+      TVector3 mcTagV = vert->getMCTagVertex();
       if (mcTagV(0)  == realNaN)                                        return realNaN;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return realNaN;
 
@@ -631,18 +617,16 @@ namespace Belle2 {
 
     TVector3 tagTrackTrueVecToTagV(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return vecNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
+
+      if (trackIndex.size() != 1) return vecNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return vecNaN;
 
-      TVector3 mcTagV(vert->getMCTagVertex());
-
-      if (mcTagV(0)  == -111 && mcTagV(1) == -111 && mcTagV(2) == -111) return vecNaN;
+      TVector3 mcTagV = vert->getMCTagVertex();
       if (mcTagV(0)  == realNaN)                                        return vecNaN;
       if (mcTagV(0)  == 0 && mcTagV(1) == 0 && mcTagV(2) == 0)          return vecNaN;
 
@@ -671,11 +655,12 @@ namespace Belle2 {
 
     TVector3 tagTrackTrueMomentum(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return vecNaN;
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
 
-      unsigned int trackIndexInt = trackIndex.at(0);
+      if (trackIndex.size() != 1) return vecNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
+
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return vecNaN;
 
@@ -702,11 +687,11 @@ namespace Belle2 {
 
     TVector3 tagTrackTrueOrigin(const Particle* part, const std::vector<double>& trackIndex)
     {
-      if (trackIndex.size() != 1) return vecNaN;
-      unsigned trackIndexInt = trackIndex.at(0);
-
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return vecNaN;
+
+      if (trackIndex.size() != 1) return vecNaN;
+      unsigned trackIndexInt = trackIndex.at(0);
 
       const MCParticle* mcParticle(vert->getVtxFitMCParticle(trackIndexInt));
       if (!mcParticle) return vecNaN;
@@ -758,290 +743,150 @@ namespace Belle2 {
     TagTrFPtr getTagTrackFunctionFromName(string const& name)
     {
       if (name == "TagTrackMomentum") return tagTrackMomentum;
-      if (name == "TagTrackMomentumX") return tagTrackMomentumX;
-      if (name == "TagTrackMomentumY") return tagTrackMomentumY;
-      if (name == "TagTrackMomentumZ") return tagTrackMomentumZ;
-      if (name == "TagTrackZ0") return tagTrackZ0;
-      if (name == "TagTrackD0") return tagTrackD0;
-      if (name == "TagTrackRaveWeight") return tagTrackRaveWeight;
-      if (name == "TagTrackDistanceToConstraint") return tagTrackDistanceToConstraint;
-      if (name == "TagTrackDistanceToConstraintErr") return tagTrackDistanceToConstraintErr;
-      if (name == "TagTrackDistanceToConstraintSignificance") return tagTrackDistanceToConstraintSignificance;
-      if (name == "TagTrackDistanceToTagV") return tagTrackDistanceToTagV;
-      if (name == "TagTrackDistanceToTagVErr") return tagTrackDistanceToTagVErr;
-      if (name == "TagTrackDistanceToTagVSignificance") return tagTrackDistanceToTagVSignificance;
-      if (name == "TagTrackTrueDistanceToTagV") return tagTrackTrueDistanceToTagV;
-      if (name == "TagTrackTrueVecToTagVX") return tagTrackTrueVecToTagVX;
-      if (name == "TagTrackTrueVecToTagVY") return tagTrackTrueVecToTagVY;
-      if (name == "TagTrackTrueVecToTagVZ") return tagTrackTrueVecToTagVZ;
-      if (name == "TagTrackTrueMomentumX") return tagTrackTrueMomentumX;
-      if (name == "TagTrackTrueMomentumY") return tagTrackTrueMomentumY;
-      if (name == "TagTrackTrueMomentumZ") return tagTrackTrueMomentumZ;
-      if (name == "TagTrackTrueOriginX") return tagTrackTrueOriginX;
-      if (name == "TagTrackTrueOriginY") return tagTrackTrueOriginY;
-      if (name == "TagTrackTrueOriginZ") return tagTrackTrueOriginZ;
+      else if (name == "TagTrackMomentumX") return tagTrackMomentumX;
+      else if (name == "TagTrackMomentumY") return tagTrackMomentumY;
+      else if (name == "TagTrackMomentumZ") return tagTrackMomentumZ;
+      else if (name == "TagTrackZ0") return tagTrackZ0;
+      else if (name == "TagTrackD0") return tagTrackD0;
+      else if (name == "TagTrackRaveWeight") return tagTrackRaveWeight;
+      else if (name == "TagTrackDistanceToConstraint") return tagTrackDistanceToConstraint;
+      else if (name == "TagTrackDistanceToConstraintErr") return tagTrackDistanceToConstraintErr;
+      else if (name == "TagTrackDistanceToConstraintSignificance") return tagTrackDistanceToConstraintSignificance;
+      else if (name == "TagTrackDistanceToTagV") return tagTrackDistanceToTagV;
+      else if (name == "TagTrackDistanceToTagVErr") return tagTrackDistanceToTagVErr;
+      else if (name == "TagTrackDistanceToTagVSignificance") return tagTrackDistanceToTagVSignificance;
+      else if (name == "TagTrackTrueDistanceToTagV") return tagTrackTrueDistanceToTagV;
+      else if (name == "TagTrackTrueVecToTagVX") return tagTrackTrueVecToTagVX;
+      else if (name == "TagTrackTrueVecToTagVY") return tagTrackTrueVecToTagVY;
+      else if (name == "TagTrackTrueVecToTagVZ") return tagTrackTrueVecToTagVZ;
+      else if (name == "TagTrackTrueMomentumX") return tagTrackTrueMomentumX;
+      else if (name == "TagTrackTrueMomentumY") return tagTrackTrueMomentumY;
+      else if (name == "TagTrackTrueMomentumZ") return tagTrackTrueMomentumZ;
+      else if (name == "TagTrackTrueOriginX") return tagTrackTrueOriginX;
+      else if (name == "TagTrackTrueOriginY") return tagTrackTrueOriginY;
+      else if (name == "TagTrackTrueOriginZ") return tagTrackTrueOriginZ;
 
       B2ERROR("From TimeDependentVariables: Trying to access unknown tagTrack function");
-      return NULL;
+      return nullptr;
+    }
+
+
+    double cumulate(const Particle* part,  const std::vector<std::string>& variable, double start,
+                    std::function<double(double, double, double)> fun)
+    {
+      TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return realNaN;
+      int nTracks = vert->getNFitTracks();
+
+      //calculate cumulative quantity
+      double acum = start;
+      for (int i = 0; i < nTracks; ++i) {
+        vector<double> indx(1, i);
+        double w = tagTrackRaveWeight(part, indx);
+        double f = (*fptr)(part, indx);
+        if (w > 0) {
+          acum = fun(acum, f, w);
+        }
+      }
+      return acum;
     }
 
     Manager::FunctionPtr tagTrackAverage(const std::vector<std::string>& variable)
     {
-      if (variable.size() == 1) {
-        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
-        auto func = [fptr](const Particle * part) -> double {
-          //recover number of tracks
-
-          auto* vert = part->getRelatedTo<TagVertex>();
-          if (!vert)
-            return realNaN;
-          int nTracks(vert->getNFitTracks());
-
-          //compute the average over tag tracks
-
-          double sum(0.);
-          int tot(0);
-
-          for (int i(0); i < nTracks; ++i)
-          {
-            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
-              sum += (*fptr)(part, vector<double>(1, 1.*i));
-              ++tot;
-            }
-          }
-
-          if (tot > 0)
-            return sum / (1.*tot);
-
-          return realNaN;
-        };
-
-        return func;
+      if (variable.size() != 1) {
+        B2FATAL("Wrong number of arguments for meta function tagTrackAverage");
+        return nullptr;
       }
 
-      B2FATAL("Wrong number of arguments for meta function tagTrackAverage");
-      return NULL;
+      return [variable](const Particle * part) {
+        double sum = cumulate(part, variable, 0, [](double s, double f, double) {return s + f;});
+        double tot = cumulate(part, variable, 0, [](double s, double  , double) {return s + 1;});
+        return (tot > 0) ? sum / tot : realNaN;
+      };
     }
 
     Manager::FunctionPtr tagTrackAverageSquares(const std::vector<std::string>& variable)
     {
-      if (variable.size() == 1) {
-        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
-        auto func = [fptr](const Particle * part) -> double {
-          //recover number of tracks
-
-          auto* vert = part->getRelatedTo<TagVertex>();
-          if (!vert)
-            return realNaN;
-          int nTracks(vert->getNFitTracks());
-
-          //compute the average over tag tracks
-
-          double sum(0.);
-          int tot(0);
-
-          for (int i(0); i < nTracks; ++i)
-          {
-            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
-              double term((*fptr)(part, vector<double>(1, 1.*i)));
-              sum += term * term;
-              ++tot;
-            }
-          }
-
-          if (tot > 0)
-            return sum / (1.*tot);
-
-          return realNaN;
-        };
-
-        return func;
+      if (variable.size() != 1) {
+        B2FATAL("Wrong number of arguments for meta function tagTrackAverageSquares");
+        return nullptr;
       }
 
-      B2FATAL("Wrong number of arguments for meta function tagTrackAverageSquares");
-      return NULL;
+      return [variable](const Particle * part) {
+        double sum = cumulate(part, variable, 0, [](double s, double f, double) {return s + f * f;});
+        double tot = cumulate(part, variable, 0, [](double s, double  , double) {return s + 1;});
+        return (tot > 0) ? sum / tot : realNaN;
+      };
     }
+
 
     Manager::FunctionPtr tagTrackMax(const std::vector<std::string>& variable)
     {
-      if (variable.size() == 1) {
-        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
-        auto func = [fptr](const Particle * part) -> double {
-          //recover number of tracks
-
-          auto* vert = part->getRelatedTo<TagVertex>();
-          if (!vert)
-            return realNaN;
-
-          int nTracks(vert->getNFitTracks());
-
-          //compute the average over tag tracks
-
-          double max(-DBL_MAX);
-
-          for (int i(0); i < nTracks; ++i)
-          {
-            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
-              double val((*fptr)(part, vector<double>(1, 1.*i)));
-              if (val > max) max = val;
-            }
-          }
-
-          if (max > -DBL_MAX)
-            return max;
-
-          return realNaN;
-        };
-
-        return func;
+      if (variable.size() != 1) {
+        B2FATAL("Wrong number of arguments for meta function tagTrackMax");
+        return nullptr;
       }
 
-      B2FATAL("Wrong number of arguments for meta function tagTrackMax");
-      return NULL;
+      return [variable](const Particle * part) {
+        double Max = cumulate(part, variable, -DBL_MAX, [](double s, double f, double) {return std::max(s, f);});
+        return (Max != -DBL_MAX) ? Max : realNaN;
+      };
     }
 
     Manager::FunctionPtr tagTrackMin(const std::vector<std::string>& variable)
     {
-      if (variable.size() == 1) {
-        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
-        auto func = [fptr](const Particle * part) -> double {
-          //recover number of tracks
-
-          auto* vert = part->getRelatedTo<TagVertex>();
-          if (!vert)
-            return realNaN;
-
-          int nTracks(vert->getNFitTracks());
-
-          //compute the minimum value over tag tracks
-
-          double min(DBL_MAX);
-
-          for (int i(0); i < nTracks; ++i)
-          {
-            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
-              double val((*fptr)(part, vector<double>(1, 1.*i)));
-              if (val < min) min = val;
-            }
-          }
-
-          if (min < DBL_MAX)
-            return min;
-
-          return realNaN;
-        };
-
-        return func;
+      if (variable.size() != 1) {
+        B2FATAL("Wrong number of arguments for meta function tagTrackMin");
+        return nullptr;
       }
 
-      B2FATAL("Wrong number of arguments for meta function tagTrackMin");
-      return NULL;
+      return [variable](const Particle * part) {
+        double Min = cumulate(part, variable, +DBL_MAX, [](double s, double f, double) {return std::min(s, f);});
+        return (Min != DBL_MAX) ? Min : realNaN;
+      };
     }
-
 
     Manager::FunctionPtr tagTrackWeightedAverage(const std::vector<std::string>& variable)
     {
-      if (variable.size() == 1) {
-        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
-        auto func = [fptr](const Particle * part) -> double {
-          //recover number of tracks
-
-          auto* vert = part->getRelatedTo<TagVertex>();
-          if (!vert)
-            return realNaN;
-
-          int nTracks(vert->getNFitTracks());
-
-          //compute the average over tag tracks
-
-          double sum(0.);
-          double sumW(0.);
-
-          for (int i(0); i < nTracks; ++i)
-          {
-            double w(tagTrackRaveWeight(part, vector<double>(1, 1.*i)));
-            sum += w * (*fptr)(part, vector<double>(1, 1.*i));
-            sumW += w;
-          }
-
-          return sum / sumW;
-        };
-
-        return func;
+      if (variable.size() != 1) {
+        B2FATAL("Wrong number of arguments for meta function tagTrackWeightedAverage");
+        return nullptr;
       }
 
-      B2FATAL("Wrong number of arguments for meta function tagTrackWeightedAverage");
-      return NULL;
+      return [variable](const Particle * part) {
+        double num = cumulate(part, variable, 0, [](double s, double f, double w) {return s + w * f;});
+        double den = cumulate(part, variable, 0, [](double s, double  , double w) {return s + w;});
+        return (den > 0) ? num / den : realNaN;
+      };
     }
 
     Manager::FunctionPtr tagTrackWeightedAverageSquares(const std::vector<std::string>& variable)
     {
-      if (variable.size() == 1) {
-        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
-        auto func = [fptr](const Particle * part) -> double {
-          //recover number of tracks
-
-          auto* vert = part->getRelatedTo<TagVertex>();
-          if (!vert)
-            return realNaN;
-
-          int nTracks(vert->getNFitTracks());
-
-          //compute the average over tag tracks
-
-          double sum(0.);
-          double sumW(0.);
-
-          for (int i(0); i < nTracks; ++i)
-          {
-            double w(tagTrackRaveWeight(part, vector<double>(1, 1.*i)));
-            double term((*fptr)(part, vector<double>(1, 1.*i)));
-            sum += w * term * term;
-            sumW += w;
-          }
-
-          return sum / sumW;
-        };
-
-        return func;
+      if (variable.size() != 1) {
+        B2FATAL("Wrong number of arguments for meta function tagTrackWeightedAverageSquares");
+        return nullptr;
       }
 
-      B2FATAL("Wrong number of arguments for meta function tagTrackWeightedAverageSquares");
-      return NULL;
+      return [variable](const Particle * part) -> double {
+        double num = cumulate(part, variable, 0, [](double s, double f, double w) {return s + w * f * f;});
+        double den = cumulate(part, variable, 0, [](double s, double  , double w) {return s + w;});
+        return (den > 0) ? num / den : realNaN;
+      };
     }
 
     Manager::FunctionPtr tagTrackSum(const std::vector<std::string>& variable)
     {
-      if (variable.size() == 1) {
-        TagTrFPtr fptr(getTagTrackFunctionFromName(variable.at(0)));
-        auto func = [fptr](const Particle * part) -> double {
-          //recover number of tracks
-
-          auto* vert = part->getRelatedTo<TagVertex>();
-          if (!vert)
-            return std::numeric_limits<double>::quiet_NaN();
-          int nTracks(vert->getNFitTracks());
-
-          //compute the sum over tag tracks
-
-          double sum(0.);
-
-          for (int i(0); i < nTracks; ++i)
-          {
-            if (tagTrackRaveWeight(part, vector<double>(1, 1.*i)) > 0) {
-              sum += (*fptr)(part, vector<double>(1, 1.*i));
-            }
-          }
-
-          return sum;
-        };
-
-        return func;
+      if (variable.size() != 1) {
+        B2FATAL("Wrong number of arguments for meta function tagTrackSum");
+        return nullptr;
       }
 
-      B2FATAL("Wrong number of arguments for meta function tagTrackSum");
-      return NULL;
+      return [variable](const Particle * part) {
+        return cumulate(part, variable, 0, [](double s, double f, double) {return s + f;});
+      };
     }
+
 
     //**********************************
     //VARIABLE REGISTRATION
@@ -1074,11 +919,11 @@ namespace Belle2 {
                       R"DOC(:math:`\Delta t` residual in ps, to be used for resolution function studies)DOC");
     REGISTER_VARIABLE("DeltaTBelle", particleDeltaTBelle,
                       R"DOC([Legacy] :math:`\Delta t` in ps, as it was used in Belle)DOC");
-    REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
+    REGISTER_VARIABLE("mcDeltaTau", particleMCDeltaTau,
                       R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
-    REGISTER_VARIABLE("mcDeltaTapprox", particleMCDeltaTapprox,
+    REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
                       R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps)DOC");
-    REGISTER_VARIABLE("mcDeltaL", particleMCDeltaL,
+    REGISTER_VARIABLE("mcDeltaBoost", particleMCDeltaBoost,
                       R"DOC(True difference of decay vertex boost-direction components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
 :math:`\Delta l = l(B_{rec}) - l(B_{tag})`)DOC");
     REGISTER_VARIABLE("DeltaZ", particleDeltaZ,
@@ -1106,9 +951,9 @@ namespace Belle2 {
                       "Returns the TagV component in the boost direction");
     REGISTER_VARIABLE("TagVOBoost", tagVOrthogonalBoostDirection,
                       "Returns the TagV component in the direction orthogonal to the boost");
-    REGISTER_VARIABLE("TagVmcLBoost", tagVTruthBoostDirection,
+    REGISTER_VARIABLE("mcTagVLBoost", tagVTruthBoostDirection,
                       "Returns the MC TagV component in the boost direction");
-    REGISTER_VARIABLE("TagVmcOBoost", tagVTruthOrthogonalBoostDirection,
+    REGISTER_VARIABLE("mcTagVOBoost", tagVTruthOrthogonalBoostDirection,
                       "Returns the MC TagV component in the direction orthogonal to the boost");
     REGISTER_VARIABLE("TagVLBoostErr", tagVErrBoostDirection,
                       "Returns the error of TagV in the boost direction");

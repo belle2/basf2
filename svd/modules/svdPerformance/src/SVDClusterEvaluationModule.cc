@@ -1,11 +1,5 @@
 #include <svd/modules/svdPerformance/SVDClusterEvaluationModule.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <TF1.h>
-#include <TMath.h>
-#include <TCanvas.h>
-#include <TGraphErrors.h>
-#include <TGraph.h>
-#include <TLegend.h>
 
 using namespace std;
 using namespace Belle2;

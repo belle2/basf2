@@ -17,7 +17,6 @@ import basf2 as b2
 import fei
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header, _sphinxify_decay
-from validation_tools.metadata import create_validation_histograms
 from variables import variables as vm
 
 
@@ -326,6 +325,10 @@ class feiHadronicB0(BaseFEISkim):
         self.SkimLists = ["B0:generic"]
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         vm.addAlias("d0_massDiff", "daughter(0,massDifference(0))")
         vm.addAlias("d0_M", "daughter(0,M)")
         vm.addAlias("nDaug", "countDaughters(1>0)")  # Dummy cut so all daughters are selected.
@@ -408,6 +411,10 @@ class feiHadronicBplus(BaseFEISkim):
         self.SkimLists = ["B+:generic"]
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         vm.addAlias("d0_massDiff", "daughter(0,massDifference(0))")
         vm.addAlias("d0_M", "daughter(0,M)")
         vm.addAlias("nDaug", "countDaughters(1>0)")  # Dummy cut so all daughters are selected.
@@ -493,6 +500,10 @@ class feiSLB0(BaseFEISkim):
         self.SkimLists = ["B0:semileptonic"]
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         vm.addAlias("d0_massDiff", "daughter(0,massDifference(0))")
         vm.addAlias("d0_M", "daughter(0,M)")
         vm.addAlias("nDaug", "countDaughters(1>0)")  # Dummy cut so all daughters are selected.
@@ -576,6 +587,10 @@ class feiSLBplus(BaseFEISkim):
         self.SkimLists = ["B+:semileptonic"]
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         vm.addAlias("d0_massDiff", "daughter(0,massDifference(0))")
         vm.addAlias("d0_M", "daughter(0,M)")
         vm.addAlias("nDaug", "countDaughters(1>0)")  # Dummy cut so all daughters are selected.

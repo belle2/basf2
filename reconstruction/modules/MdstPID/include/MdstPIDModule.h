@@ -23,17 +23,7 @@
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-#include <string>
-
 namespace Belle2 {
-
-  class PIDLikelihood;
-  class TOPLikelihood;
-  class ARICHLikelihood;
-  class CDCDedxLikelihood;
-  class VXDDedxLikelihood;
-  class ECLPidLikelihood;
-  class KLMMuidLikelihood;
 
   /**
    * a module to fill PIDLikelihoods

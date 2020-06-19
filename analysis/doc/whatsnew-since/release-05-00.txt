@@ -4,5 +4,24 @@ Changes in the analysis package since release-05-00
 Variables
 +++++++++
 
- * Variables :b2:var:`recQ2Bh`, :b2:var:`recMissM2`, :b2:var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``, 
+ * Variables :b2:var:`SoftwareTriggerResult`, :b2:var:`SoftwareTriggerResultNonPrescaled` and :b2:var:`SoftwareTriggerPrescaling` now silently return NAN if the trigger is not found.
+
+   .. warning:: this no longer dumps all possible trigger names instead please see ``b2hlt_triggers`` for a list of all possible names.
+
+   .. seealso:: ``b2hlt_triggers print --database online --format list``
+
+ * Variables :b2:var:`recQ2Bh`, :b2:var:`recMissM2`, :b2:var:`recQ2BhSimple` have been moved to a new variable group ``Specific kinematic variables``,
    and :b2:var:`recQ2Bh` is now using a `diamond frame method <https://www.osti.gov/biblio/1442697>`_
+ * Added the new variable :b2:var:`photonHasOverlap`, which determines whether a particle's cluster is sharing its connected
+   region with another cluster. A cut string can be provided to ignore cluster that do not satisfy the specified criteria.
+ * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
+ * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
+ * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
+
+Modules
++++++++
+
+ * The :b2:mod:`InclusiveDstarReconstruction` creates antiparticle lists correctly now. The module's input changed to a
+   :ref:`DecayString` of the form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
+ * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
+   beamspot is added.

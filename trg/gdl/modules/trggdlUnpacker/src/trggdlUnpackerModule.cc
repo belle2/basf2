@@ -13,6 +13,8 @@
 
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
+#include <iostream>
+
 using namespace std;
 using namespace Belle2;
 using namespace GDL;
@@ -35,7 +37,7 @@ TRGGDLUnpackerModule::TRGGDLUnpackerModule()
            "Print trigger readout board included in the data.",
            false);
   addParam("print_dbmap", m_print_dbmap, "Print Database Bit Map", false);
-  B2INFO("trggdlunpacker: Constructor done.");
+  B2DEBUG(20, "trggdlunpacker: Constructor done.");
 }
 
 void TRGGDLUnpackerModule::initialize()

@@ -1,5 +1,4 @@
 #include<svd/dbobjects/SVDCoGCalibrationFunction.h>
-#include<framework/logging/Logger.h>
 
 using namespace Belle2;
 

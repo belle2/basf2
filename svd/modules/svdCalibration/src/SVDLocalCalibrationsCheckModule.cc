@@ -11,13 +11,11 @@
 #include <svd/modules/svdCalibration/SVDLocalCalibrationsCheckModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
-#include <TStyle.h>
+#include <TCanvas.h>
 #include <TLine.h>
 #include <TPaveText.h>
+#include <TStyle.h>
 #include <TText.h>
 
 using namespace Belle2;

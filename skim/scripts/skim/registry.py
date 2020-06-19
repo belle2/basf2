@@ -100,6 +100,8 @@ RegisteredSkims = [
     ("18520400", "dark", "LFVZpVisible"),
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
+    ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
+    ("18520500", "lowMulti", "LowMassTwoTrack"),
 
     # --- WG9: Charmless B decays ---
     ("19130100", "btocharmless", "CharmlessHad2Body"),

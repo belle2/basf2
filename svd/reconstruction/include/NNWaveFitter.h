@@ -20,7 +20,6 @@
 #include <functional>
 #include <svd/reconstruction/NNWaveFitTool.h>
 #include <svd/simulation/SVDSimulationTools.h>
-#include <framework/gearbox/Unit.h>
 #include <Eigen/Dense>
 
 namespace Belle2 {

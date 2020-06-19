@@ -12,19 +12,13 @@
 
 
 #include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
 
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
 
-#include <svd/dataobjects/SVDHistograms.h>
-
 #include <string>
-#include <TList.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranch.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 namespace Belle2 {
   /**

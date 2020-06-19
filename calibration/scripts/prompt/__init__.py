@@ -1,3 +1,4 @@
+import basf2
 from collections import namedtuple
 import json
 
@@ -6,7 +7,7 @@ prompt_script_dir = "calibration/scripts/prompt/calibrations"
 
 
 class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username", "description",
-                                                        "input_data_formats", "input_data_names", "depends_on"])):
+                                                        "input_data_formats", "input_data_names", "depends_on", "expert_config"])):
     """
     Simple class to hold and display required information for a prompt calibration script (process).
 
@@ -31,13 +32,21 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
             want to depend on. This will allow the external automatic system to understand the overall ordering of
             scripts to run. If you encounter an import error when trying to run your prompt calibration script, it is
             likely that you have introduced a circular dependency.
+
+        expert_config (dict): Default expert configuration for this calibration script. This is an optional dictionary
+            (which must be JSON compliant) of configuration options for your get_calibrations(...) function.
+            This is supposed to be used as a catch-all place to send in options for your calibration setup. For example,
+            you may want to have an optional list of IoV boundaries so that your prompt script knows that it should split the
+            input data between different IoV ranges. Or you might want to send if options like the maximum events per
+            input file to process. The value in your settings object will be the *default*, but you can override the value via
+            the caf_config.json sent into ``b2caf-prompt-run``.
     """
 
     #: Allowed data file formats. You should use these values for ``CalibrationSettings.input_data_formats``.
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
     def __new__(cls, name, expert_username, description,
-                input_data_formats=None, input_data_names=None, depends_on=None):
+                input_data_formats=None, input_data_names=None, depends_on=None, expert_config=None):
         """
         The special method to create the tuple instance. Returning the instance
         calls the __init__ method
@@ -53,14 +62,29 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
             raise ValueError("You must specify at least one input data name")
         input_data_names = frozenset(input_data_names)
 
+        if expert_config:
+            # Check that it's a dictionary and not some other valid JSON object
+            if not isinstance(expert_config, dict):
+                raise TypeError("expert_config must be a dictionary")
+            # Check if it is JSONable since people might put objects in there by mistake
+            try:
+                json.dumps(expert_config)
+            except TypeError as e:
+                basf2.B2ERROR("expert_config could not be serialised to JSON. "
+                              "Most likely you used a non-supported type e.g. datetime.")
+                raise e
+        else:
+            expert_config = {}
+
         if depends_on:
             for calibration_settings in depends_on:
                 if not isinstance(calibration_settings, cls):
-                    raise ValueError("A list of {str(cls)} object is required when setting the 'depends_on' keyword.")
+                    raise TypeError("A list of {str(cls)} object is required when setting the 'depends_on' keyword.")
         else:
             depends_on = []
 
-        return super().__new__(cls, name, expert_username, description, input_data_formats, input_data_names, depends_on)
+        return super().__new__(cls, name, expert_username, description,
+                               input_data_formats, input_data_names, depends_on, expert_config)
 
     def json_dumps(self):
         """
@@ -73,7 +97,8 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
                            "input_data_formats": list(self.input_data_formats),
                            "input_data_names": list(self.input_data_names),
                            "depends_on": list(depends_on_names),
-                           "description": self.description
+                           "description": self.description,
+                           "expert_config": self.expert_config
                            })
 
     def __str__(self):
@@ -83,5 +108,6 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         output_str += f"  input_data_formats={list(self.input_data_formats)}\n"
         output_str += f"  input_data_names={list(self.input_data_names)}\n"
         output_str += f"  depends_on={list(depends_on_names)}\n"
-        output_str += f"  description='{self.description}'"
+        output_str += f"  description='{self.description}'\n"
+        output_str += f"  expert_config={self.expert_config}"
         return output_str

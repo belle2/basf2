@@ -40,17 +40,17 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   auto timeCal = new Belle2::SVDCoGCalibrationFunction();
   auto payload = new Belle2::SVDCoGTimeCalibrations::t_payload(*timeCal, m_id);
 
-  TF1* pol1 = new TF1("pol1", "[0] + [1]*x", -10, 80);
+  std::unique_ptr<TF1> pol1(new TF1("pol1", "[0] + [1]*x", -10, 80));
   pol1->SetParameters(-40, 0.9);
-  TF1* pol3 = new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -10, 80);
+  std::unique_ptr<TF1> pol3(new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -10, 80));
   pol3->SetParLimits(0, -200, 0);
   pol3->SetParLimits(1, 0, 10);
   pol3->SetParLimits(2, -1, 0);
   pol3->SetParLimits(3, 0, 1);
-  TF1* pol5 = new TF1("pol5", "[0] + [1]*x + [2]*x*x + [3]*x*x*x + [4]*x*x*x*x + [5]*x*x*x*x*x", -100, 100);
+  std::unique_ptr<TF1> pol5(new TF1("pol5", "[0] + [1]*x + [2]*x*x + [3]*x*x*x + [4]*x*x*x*x + [5]*x*x*x*x*x", -100, 100));
   pol5->SetParameters(-50, 1.5, 0.01, 0.0001, 0.00001, 0.000001);
 
-  TFile* f = new TFile("algorithm_6SampleCoG_output.root", "RECREATE");
+  std::unique_ptr<TFile> f(new TFile("algorithm_6SampleCoG_output.root", "RECREATE"));
 
   for (int layer = 0; layer < 4; layer++) {
     int layer_num = layer + 3;
@@ -115,7 +115,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
   f->Close();
   saveCalibration(payload, "SVDCoGTimeCalibrations");
 
-  delete f;
+  //delete f;
 
   // probably not needed - would trigger re-doing the collection
   // if ( ... too large corrections ... ) return c_Iterate;

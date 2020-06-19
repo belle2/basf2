@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorPlane.h>

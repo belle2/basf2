@@ -3,12 +3,12 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luigi Corona                                             *
+ * Contributors: Luigi Corona, Giulia Casarosa                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <svd/modules/svdSimulation/SVD3SamplesEmulator.h>
+#include <svd/modules/svdSimulation/SVD3SamplesEmulatorModule.h>
 
 using namespace Belle2;
 
@@ -29,15 +29,15 @@ SVD3SamplesEmulatorModule::SVD3SamplesEmulatorModule() : Module()
 
   // Parameter definitions
   addParam("SVDShaperDigits", m_shaperDigitInputName, "StoreArray with the input shaperdigits", std::string("SVDShaperDigits"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "input SVDEventInfo name", std::string(""));
   addParam("StartingSample", m_startingSample, "Starting sample of the three samples (between 0 and 3, the default is 0)", int(0));
-  addParam("outputArrayName", m_outputArrayName, "StoreArray with the output shaperdigits with 3 samples",
+  addParam("outputSVDShaperDigits", m_outputArrayName, "StoreArray with the output shaperdigits with 3 samples",
            std::string("SVDShaperDigit3Samples"));
-  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", std::string(""));
+  addParam("outputSVDEventInfo", m_svdEventInfoOutName, "output SVDEventInfo name", std::string("SVDEventInfo3Samples"));
 }
 
 SVD3SamplesEmulatorModule::~SVD3SamplesEmulatorModule()
 {
-  B2DEBUG(20, "Destructor");
 }
 
 
@@ -50,12 +50,13 @@ void SVD3SamplesEmulatorModule::initialize()
 
   B2DEBUG(10, "SVDShaperDigits: " << m_shaperDigitInputName);
   B2DEBUG(10, "StartingSample: " << m_startingSample);
-  B2DEBUG(10, "outputArrayName: " <<  m_outputArrayName);
+  B2DEBUG(10, "outputSVDShaperDigits: " <<  m_outputArrayName);
+  B2DEBUG(10, "outputSVDEventInfo: " <<  m_svdEventInfoOutName);
 
   B2INFO("The starting sample from which start to select the three samples:  " << m_startingSample);
   B2INFO("The three samples selected are: " << m_startingSample << " " << m_startingSample + 1 << " " << m_startingSample + 2);
 
-  m_ShaperDigit.isRequired();
+  m_ShaperDigit.isRequired(m_shaperDigitInputName);
   StoreArray<SVDShaperDigit> ShaperDigit3Samples(m_outputArrayName);
   ShaperDigit3Samples.registerInDataStore();
 
@@ -63,7 +64,7 @@ void SVD3SamplesEmulatorModule::initialize()
   m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
 
   //Register the new EventInfo with ModeByte for 3 samples in the data store
-  m_storeSVDEvtInfo3samples.registerInDataStore("SVDEventInfo3samples", DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeSVDEvtInfo3samples.registerInDataStore(m_svdEventInfoOutName, DataStore::c_ErrorIfAlreadyRegistered);
 }
 
 
@@ -87,7 +88,7 @@ void SVD3SamplesEmulatorModule::event()
 
   m_storeSVDEvtInfo3samples.create();
   m_storeSVDEvtInfo3samples->setTriggerType(m_storeSVDEvtInfo->getTriggerType());
-  modeByte.setDAQMode(1);
+  modeByte.setDAQMode(int(1));
   m_storeSVDEvtInfo3samples->setModeByte(modeByte);
 
 
@@ -109,15 +110,6 @@ void SVD3SamplesEmulatorModule::event()
     threeSamples[5] = 0.;
 
     ShaperDigit3Samples.appendNew(sensorID, side, cellID, threeSamples, fadcT, modeByte);
-    // SVDShaperDigit* shaperThree = ShaperDigit3Samples.appendNew(sensorID, side, cellID, threeSamples, fadcT, modeByte);
-    // SVDModeByte threeModeByte = shaperThree->getModeByte();
-    // int daq = threeModeByte.getDAQMode();
-    //
-    // SVDModeByte modeByteAfterSettingNew = shaper.getModeByte();
-    // int DAQModeAfterSettingNew = modeByteAfterSettingNew.getDAQMode();
-    // B2INFO("ModeByte: " << modeByteAfterSettingNew);
-    // B2INFO("DAQMode After Setting New One: " << DAQModeAfterSettingNew);
-    // B2INFO("DAQMode Of the new ShaperDigit: " << daq);
 
   }
 }

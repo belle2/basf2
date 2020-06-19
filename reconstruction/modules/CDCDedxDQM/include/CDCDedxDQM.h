@@ -15,17 +15,11 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/DBObjPtr.h>
 
 #include "TH1D.h"
 #include "TH2D.h"
-#include "TString.h"
-#include "TDirectory.h"
-using std::vector;
-using std::string;
 
 
 namespace Belle2 {

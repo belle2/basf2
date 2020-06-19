@@ -115,12 +115,17 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_line_low->SetLineWidth(3);
   m_line_low->SetLineStyle(7);
 
-  m_fLandau = new TF1("f_Landau", "landau(0)", m_rangeLow, m_rangeHigh);
-  m_fLandau->SetParameter(0, 1000);
-  m_fLandau->SetParameter(1, 50);
-  m_fLandau->SetParameter(2, 10);
-  m_fLandau->SetNpx(100);
-  m_fLandau->SetNumberFitPoints(100);
+  m_fConv = new TF1Convolution("landau", "gaus", m_rangeLow, m_rangeHigh);
+  m_fConv->SetRange(m_rangeLow, m_rangeHigh);
+  m_fFit = new TF1("fitfunc", *m_fConv, m_rangeLow, m_rangeHigh, m_fConv->GetNpar());
+  m_fFit->SetRange(m_rangeLow, m_rangeHigh);
+
+  m_fFit->SetParameter(0, 1000);
+  m_fFit->SetParLimits(0, 10, 1e7);
+  m_fConv->SetNofPointsFFT(1000);
+  m_fFit->SetNpx(100);
+  m_fFit->SetNumberFitPoints(100);
+  m_fFit->SetParNames("N", "MPV", "width", "mean", "sigma");
 
   m_fMean = new TF1("f_Mean", "pol0", 0, m_PXDModules.size());
   m_fMean->SetParameter(0, 50);
@@ -220,24 +225,28 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     TH1* hh1 = findHist(m_histogramDirectoryName, name);
     if (hh1) {
 
-      /// FIXME Replace by a nice fit
-      m_fLandau->SetParameter(0, 1000);
-      m_fLandau->SetParameter(1, 50);
-      m_fLandau->SetParLimits(1, 10, 80);
-      m_fLandau->SetParameter(2, 10);
-      m_fLandau->SetParLimits(2, 1, 50);
-
       if (hh1->GetEntries() > 100) {
+        m_fFit->SetParameter(0, 1000);
+        m_fFit->SetParLimits(0, 10, 1e9);
+        m_fFit->SetParameter(1, 50);
+        m_fFit->SetParLimits(1, 10, 80);
+        m_fFit->SetParameter(2, 10);
+        m_fFit->SetParLimits(2, 1, 100);
+        m_fFit->FixParameter(3, 0);
+        m_fFit->SetParameter(4, 10);
+        m_fFit->SetParLimits(4, 1, 50);
+
         for (int f = 0; f < 5; f++) {
-          hh1->Fit(m_fLandau, "R");
-          m_fLandau->SetRange(m_fLandau->GetParameter(1) - m_peakBefore, m_fLandau->GetParameter(1) + m_peakAfter);
+          hh1->Fit(m_fFit, "R");
+          m_fFit->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
+          m_fConv->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
         }
 
         int p = m_gCharge->GetN();
-        m_gCharge->SetPoint(p, i + 0.49, m_fLandau->GetParameter(1));
-        m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
-        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fLandau->GetParameter(1),
-                              m_fLandau->GetParError(1));
+        m_gCharge->SetPoint(p, i + 0.49, m_fFit->GetParameter(1));
+        m_gCharge->SetPointError(p, 0.1, m_fFit->GetParError(1)); // error in x is useless
+        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fFit->GetParameter(1),
+                              m_fFit->GetParError(1));
       }
 
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);

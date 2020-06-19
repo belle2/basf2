@@ -10,19 +10,28 @@
 
 // Own include
 #include <top/modules/TOPBackground/TOPBackgroundModule.h>
+
+#include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPSimHit.h>
 #include <top/geometry/TOPGeometryPar.h>
 
-#include <time.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <simulation/dataobjects/BeamBackHit.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+
+#include <TCanvas.h>
+#include <TLegend.h>
+#include <TLine.h>
+#include <TPad.h>
+#include <TROOT.h>
+#include <TStyle.h>
 
 #include <geometry/Materials.h>
 #include <G4Material.hh>
@@ -205,7 +214,7 @@ namespace Belle2 {
       module_occupancy->SetPoint(count_occ, PMTID , barID);
       count_occ++;
 
-      if (simHit) genergy->Fill(simHit->getEnergy());
+      genergy->Fill(simHit->getEnergy());
 
       const MCParticle* particle = DataStore::getRelated<MCParticle>(simHit);
 

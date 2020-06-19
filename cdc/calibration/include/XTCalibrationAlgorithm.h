@@ -107,6 +107,9 @@ namespace Belle2 {
 
       /// Check the convergence of XT fit.
       EResult checkConvergence();
+
+      /// Check if there are any wrong xt functions.
+      void sanitaryCheck();
     private:
       double m_minNdf = 5;    /**< minimum ndf required */
       double m_minPval = 0.;  /**< minimum pvalue required */

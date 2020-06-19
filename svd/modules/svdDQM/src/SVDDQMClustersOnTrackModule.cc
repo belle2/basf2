@@ -16,14 +16,12 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
 
 #include <boost/format.hpp>

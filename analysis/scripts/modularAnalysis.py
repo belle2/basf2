@@ -1353,6 +1353,27 @@ def rankByLowest(particleList,
     path.add_module(bcs)
 
 
+def applyRandomCandidateSelection(particleList, path=None):
+    """
+    If there are multiple candidates in the provided particleList, all but one of them are removed randomly.
+    This is done on a event-by-event basis.
+
+    @param particleList     ParticleList for which the random candidate selection should be applied
+    @param path             module is added to this path
+    """
+
+    rcs = register_module('BestCandidateSelection')
+    rcs.set_name('RandomCandidateSelection_' + particleList)
+    rcs.param('particleList', particleList)
+    rcs.param('variable', 'random')
+    rcs.param('selectLowest', False)
+    rcs.param('allowMultiRank', False)
+    rcs.param('numBest', 1)
+    rcs.param('cut', '')
+    rcs.param('outputVariable', '')
+    path.add_module(rcs)
+
+
 def printDataStore(eventNumber=-1, path=None):
     """
     Prints the contents of DataStore in the first event (or a specific event number or all events).

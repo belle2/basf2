@@ -104,34 +104,48 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
-  m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
-
   m_hEffAll = new TEfficiency("HitEffAll", "Integrated Efficiency of each module;PXD Module;",
                               m_PXDModules.size(), 0, m_PXDModules.size());
-  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Up-to-date Efficiency of each module;PXD Module;",
-                                    m_PXDModules.size(), 0, m_PXDModules.size());
-
+  m_hEffAll->SetConfidenceLevel(m_confidence);
+  m_hEffAll->Paint("AP");
   m_hEffAllLastTotal = m_hEffAll->GetCopyTotalHisto();
   m_hEffAllLastPassed = m_hEffAll->GetCopyPassedHisto();
 
-  m_hEffAll->SetConfidenceLevel(m_confidence);
-  m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
+  {
+    auto gr = m_hEffAll->GetPaintedGraph();
 
-//   m_hEffAll->GetYaxis()->SetRangeUser(0, 1.05);
-  m_hEffAll->Paint("AP");
-
-  auto gr = m_hEffAll->GetPaintedGraph();
-
-  if (gr) {
-    auto ax = gr->GetXaxis();
-    if (ax) {
-      ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
-      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-        TString ModuleName = (std::string)m_PXDModules[i];
-        ax->SetBinLabel(i + 1, ModuleName);
+    if (gr) {
+      auto ax = gr->GetXaxis();
+      if (ax) {
+        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+          TString ModuleName = (std::string)m_PXDModules[i];
+          ax->SetBinLabel(i + 1, ModuleName);
+        }
       }
     }
   }
+
+  m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
+  m_hEffAllUpdate = new TEfficiency("HitEffAllUpdate", "Up-to-date Efficiency of each module;PXD Module;",
+                                    m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
+
+  {
+    auto gr = m_hEffAllUpdate->GetPaintedGraph();
+
+    if (gr) {
+      auto ax = gr->GetXaxis();
+      if (ax) {
+        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+          TString ModuleName = (std::string)m_PXDModules[i];
+          ax->SetBinLabel(i + 1, ModuleName);
+        }
+      }
+    }
+  }
+
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_line_warn = new TLine(0, m_warnlevel, m_PXDModules.size(), m_warnlevel);
   m_line_error = new TLine(0, m_errorlevel, m_PXDModules.size(), m_errorlevel);
@@ -161,7 +175,8 @@ void DQMHistAnalysisPXDEffModule::beginRun()
   // Thus histo will contain old content until first update
   m_hEffAllLastTotal->Reset();
   m_hEffAllLastPassed->Reset();
-  m_cEffAll->Clear();
+  // m_cEffAll->Clear();
+  // m_cEffAllUpdate->Clear();
 
   for (auto single_cmap : m_cEffModules) {
     if (single_cmap.second) single_cmap.second->Clear();
@@ -251,7 +266,13 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
 
-      if (m_hEffAllLastTotal->GetBinContent(j) < m_minEntries || m_hEffAllLastTotal->GetBinContent(j) + m_minEntries < nhit) {
+      if (m_hEffAllLastTotal->GetBinContent(j) < m_minEntries) {
+        // update the first entries directly (short runs)
+        m_hEffAllUpdate->SetTotalEvents(j, nhit);
+        m_hEffAllUpdate->SetPassedEvents(j, nmatch);
+        m_hEffAllLastTotal->SetBinContent(j, nhit);
+        m_hEffAllLastPassed->SetBinContent(j, nmatch);
+      } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
         m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
         m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
         m_hEffAllLastTotal->SetBinContent(j, nhit);

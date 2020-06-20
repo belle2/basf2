@@ -17,15 +17,23 @@ input = register_module('DQMHistAnalysisInputRootFile')
 input.param('SelectFolders', ['TOP'])  # leave blank to include all folders
 # use full histogram names, leave blank to include all histograms
 input.param('SelectHistograms', ['TOP/recoTime', 'TOP/recoPull', 'TOP/good_hits_xy_*'])
-input.param('InputRootFile', "dqm_e0003r003772.root")
+input.param('FileList', ["root_file1.root", "root_file2.root"])
+input.param('RunList', [3000, 3001])
+input.param('EventsList', [10, 5])
+input.param('Experiment', 12)
+input.param('EventInterval', 10)
 main.add_module(input)
 
 top = register_module('DQMHistAnalysisTOP')
 main.add_module(top)
 
-output = register_module('DQMHistAnalysisOutputFile')
-output.param('SaveHistos', False)  # don't save histograms
-output.param('SaveCanvases', True)  # save canvases
+# output = register_module('DQMHistAnalysisOutputFile')
+# output.param('SaveHistos', False)  # don't save histograms
+# output.param('SaveCanvases', True)  # save canvases
+# main.add_module(output)
+
+output = register_module('DQMHistAnalysisOutputRelayMsg')
+output.param("Port", 9192)
 main.add_module(output)
 
 # Process all events

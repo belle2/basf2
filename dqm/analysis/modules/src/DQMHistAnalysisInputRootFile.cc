@@ -31,13 +31,13 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("InputRootFile", m_input_name, "Name of the input root file", std::string("input_histo.root"));
+  addParam("FileList", m_file_list, "List of input files" , std::vector<std::string> {"input_histo.root"});
   addParam("SelectFolders", m_folders, "List of folders for which to process, empty for all", std::vector<std::string>());
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
            std::vector<std::string>());
   addParam("Experiment", m_expno, "Experiment Nr" , 7u);
-  addParam("RunNr", m_runno, "Run Nr" , 1u);
-  addParam("TotalEvents", m_total_events, "Number of Events" , 1u);
+  addParam("RunList", m_run_list, "Run Number List" , std::vector<unsigned int> {1u});
+  addParam("EventsList", m_events_list, "Number of events for each run" , std::vector<unsigned int> {10u});
   addParam("EventInterval", m_interval, "Time between events (seconds)" , 20u);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
@@ -45,7 +45,13 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
 void DQMHistAnalysisInputRootFileModule::initialize()
 {
   if (m_file != nullptr) delete m_file;
-  m_file = new TFile(m_input_name.c_str());
+  if (m_file_list.size() == 0) B2ERROR("File list is empty.");
+  if (m_run_list.size() == 0) B2ERROR("Run list is empty.");
+  if (m_events_list.size() == 0) B2ERROR("Events list is empty.");
+  if (m_run_list.size() != m_events_list.size()) B2ERROR("Run list does not have the same size as events list.");
+  if (m_run_list.size() != m_file_list.size()) B2ERROR("Run list does not have the same size as file list.");
+  m_run_idx = 0;
+  m_file = new TFile(m_file_list[m_run_idx].c_str());
   m_eventMetaDataPtr.registerInDataStore();
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");
 }
@@ -76,7 +82,7 @@ bool DQMHistAnalysisInputRootFileModule::hname_pattern_match(std::string pattern
 
 void DQMHistAnalysisInputRootFileModule::beginRun()
 {
-  B2INFO("DQMHistAnalysisInputRootFile: beginRun called.");
+  B2INFO("DQMHistAnalysisInputRootFile: beginRun called. Run: " << m_run_list[m_run_idx]);
 }
 
 void DQMHistAnalysisInputRootFileModule::event()
@@ -84,10 +90,19 @@ void DQMHistAnalysisInputRootFileModule::event()
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
   sleep(m_interval);
 
-  if (m_count >= m_total_events) {
-    m_eventMetaDataPtr.create();
-    m_eventMetaDataPtr->setEndOfData();
-    return;
+  if (m_count >= m_events_list[m_run_idx]) {
+    m_run_idx++;
+    if (m_run_idx == m_run_list.size()) {
+      m_eventMetaDataPtr.create();
+      m_eventMetaDataPtr->setEndOfData();
+      return;
+    }
+    m_count = 0;
+    if (m_file != nullptr) {
+      m_file->Close();
+      delete m_file;
+    }
+    m_file = new TFile(m_file_list[m_run_idx].c_str());
   }
 
   std::vector<TH1*> hs;
@@ -125,7 +140,7 @@ void DQMHistAnalysisInputRootFileModule::event()
       TH1* h = (TH1*)dkey->ReadObj();
       if (h->InheritsFrom("TH2")) h->SetOption("col");
       else h->SetOption("hist");
-      Double_t scale = (m_count + 1.0) / m_total_events;
+      Double_t scale = (m_count + 1.0) / m_events_list[m_run_idx];
       h->Scale(scale);
       std::string hname = h->GetName();
 
@@ -173,7 +188,7 @@ void DQMHistAnalysisInputRootFileModule::event()
       TH1* h;
       if (cl->InheritsFrom("TH1")) { h = (TH1*)keyh->ReadObj(); hs.push_back(h); }
       else continue;
-      Double_t scale = (m_count + 1.0) / m_total_events;
+      Double_t scale = (m_count + 1.0) / m_events_list[m_run_idx];
       h->Scale(scale);
       std::string name = h->GetName();
       name.replace(name.find("/"), 1, "/c_");
@@ -202,9 +217,10 @@ void DQMHistAnalysisInputRootFileModule::event()
   m_eventMetaDataPtr.create();
 
   m_eventMetaDataPtr->setExperiment(m_expno);
-  m_eventMetaDataPtr->setRun(m_runno);
+  m_eventMetaDataPtr->setRun(m_run_list[m_run_idx]);
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(ts * 1e9);
+  B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
 
 }
 

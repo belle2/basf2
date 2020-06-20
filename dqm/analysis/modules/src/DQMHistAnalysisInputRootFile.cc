@@ -37,6 +37,8 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
            std::vector<std::string>());
   addParam("Experiment", m_expno, "Experiment Nr" , 7u);
   addParam("RunNr", m_runno, "Run Nr" , 1u);
+  addParam("TotalEvents", m_total_events, "Number of Events" , 1u);
+  addParam("EventInterval", m_interval, "Time between events (seconds)" , 20u);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
@@ -79,7 +81,10 @@ void DQMHistAnalysisInputRootFileModule::beginRun()
 
 void DQMHistAnalysisInputRootFileModule::event()
 {
-  if (m_count >= 1) {
+  B2INFO("DQMHistAnalysisInputRootFile: event called.");
+  sleep(m_interval);
+
+  if (m_count >= m_total_events) {
     m_eventMetaDataPtr.create();
     m_eventMetaDataPtr->setEndOfData();
     return;
@@ -120,6 +125,8 @@ void DQMHistAnalysisInputRootFileModule::event()
       TH1* h = (TH1*)dkey->ReadObj();
       if (h->InheritsFrom("TH2")) h->SetOption("col");
       else h->SetOption("hist");
+      Double_t scale = (m_count + 1.0) / m_total_events;
+      h->Scale(scale);
       std::string hname = h->GetName();
 
       bool hpass = false;
@@ -166,6 +173,8 @@ void DQMHistAnalysisInputRootFileModule::event()
       TH1* h;
       if (cl->InheritsFrom("TH1")) { h = (TH1*)keyh->ReadObj(); hs.push_back(h); }
       else continue;
+      Double_t scale = (m_count + 1.0) / m_total_events;
+      h->Scale(scale);
       std::string name = h->GetName();
       name.replace(name.find("/"), 1, "/c_");
       if (m_cs.find(name) == m_cs.end()) {

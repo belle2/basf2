@@ -97,6 +97,12 @@ namespace Belle2 {
 
     /** Evt number. */
     unsigned int m_count = 0;
+
+    /** Total number of events. */
+    unsigned int m_total_events = 0;
+
+    /** Time between two events in second. */
+    unsigned int m_interval = 0;
   };
 } // end namespace Belle2
 

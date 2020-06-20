@@ -89,18 +89,20 @@ def get_calibrations(input_data, **kwargs):
     min_events_per_file = 1000
 
     max_events_per_calibration = 50000
-    max_events_per_calibration_for_xt_sr = 2000000
+    max_events_per_calibration_xt = 1000000
     max_events_per_file = 2000
     max_events_per_file_had = 1000
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
     chosen_files_mumu = select_files(input_files_mumu[:], max_events_per_calibration, max_events_per_file)
+    chosen_files_mumu_xt = select_files(input_files_mumu[:], max_events_per_calibration_xt, max_events_per_file)
     basf2.B2INFO(f"Total number of hlt_mumu files actually used as input = {len(input_files_mumu)}")
 
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
     chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file_had)
+    chosen_files_hadron_xt = select_files(input_files_hadron[:], max_events_per_calibration_xt, max_events_per_file_had)
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
 
     # Get the overall IoV we want to cover, including the end values
@@ -145,7 +147,7 @@ def get_calibrations(input_data, **kwargs):
         collections=[
             mp2.make_collection('hlt_mumu', pre_collector(), tracks=['RecoTracks']),
             mp2.make_collection('hlt_hadron', pre_collector(), tracks=['RecoTracks'])],
-        files=dict(hlt_mumu=chosen_files_mumu, hlt_hadron=chosen_files_hadron),
+        files=dict(hlt_mumu=chosen_files_mumu_xt, hlt_hadron=chosen_files_hadron_xt),
         tags=None,
         timedep=[],
         constraints=[],

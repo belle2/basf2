@@ -21,27 +21,14 @@
 #include <trg/grl/dataobjects/TRGGRLShortTrack.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 //framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <framework/core/ModuleParamList.h>
 
-
-//utilities
-#include <framework/utilities/FileSystem.h>
-
-#include <boost/foreach.hpp>
-#include <fstream>
 #include <stdlib.h>
-#include <iostream>
 
 
 using namespace Belle2;

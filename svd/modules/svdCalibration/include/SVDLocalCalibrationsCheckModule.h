@@ -24,7 +24,6 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TList.h>
-#include <TCanvas.h>
 #include <TLegend.h>
 
 namespace Belle2 {

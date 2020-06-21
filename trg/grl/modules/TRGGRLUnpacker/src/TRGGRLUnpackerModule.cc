@@ -12,7 +12,6 @@
 //---------------------------------------------------------------
 
 #include <trg/grl/modules/TRGGRLUnpacker/TRGGRLUnpackerModule.h>
-#include <bitset>
 
 using namespace std;
 using namespace Belle2;

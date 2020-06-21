@@ -11,9 +11,7 @@
 // $Log$
 // 2017-02-21 : version 1.0
 //---------------------------------------------------------------
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEclFAMFit.h"
@@ -25,7 +23,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <math.h>
-#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;

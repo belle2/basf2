@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""A simple example calibration that takes one input data list from raw data and performs
-a single calibration."""
+"""KLM alignment."""
 
 import collections
 

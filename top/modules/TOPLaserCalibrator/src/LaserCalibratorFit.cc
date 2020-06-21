@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <iostream>
 #include <top/modules/TOPLaserCalibrator/LaserCalibratorFit.h>
 
 #include <framework/logging/Logger.h>

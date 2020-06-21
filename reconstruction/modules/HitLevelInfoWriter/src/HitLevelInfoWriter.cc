@@ -10,6 +10,10 @@
 
 #include <reconstruction/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
 
+#include <reconstruction/dataobjects/DedxConstants.h>
+
+#include <mdst/dataobjects/PIDLikelihood.h>
+
 using namespace Belle2;
 using namespace Dedx;
 

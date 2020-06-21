@@ -11,11 +11,8 @@
 // $Log$
 // 2017-02-16 : v01
 //---------------------------------------------------------------
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-
-#include <framework/logging/Logger.h>
 
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -27,7 +24,6 @@
 #include "trg//ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLWaveform.h" // by shebalin 
 
-#include <stdlib.h>
 #include <iostream>
 #include <math.h>
 #include <TRandom.h>

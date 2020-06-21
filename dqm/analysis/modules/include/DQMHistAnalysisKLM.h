@@ -94,7 +94,7 @@ namespace Belle2 {
      * Process histogram containing the number of hits in plane.
      * @param[in] histName  Histogram name.
      */
-    void processPlaneHistogram(const std::string& histName);
+    void processPlaneHistogram(const std::string& histName, TLatex& latex);
 
     /**
      * Fill histogram containing masked channels per sector.
@@ -121,10 +121,13 @@ namespace Belle2 {
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 
-    /** Vector of new channels to be masked. */
-    std::vector<uint16_t> m_NewMaskedChannels;
+    /** Vector of dead barrel modules. */
+    std::vector<uint16_t> m_DeadBarrelModules;
 
-    /** Vector of channels already masked. */
+    /** Vector of dead endcap modules. */
+    std::vector<uint16_t> m_DeadEndcapModules;
+
+    /** Vector of masked channels. */
     std::vector<uint16_t> m_MaskedChannels;
 
     /** KLM channel array index. */

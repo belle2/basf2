@@ -13,8 +13,6 @@
 #include <TFile.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <string>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 

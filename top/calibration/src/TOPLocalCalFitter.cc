@@ -15,14 +15,12 @@
 #include "TFile.h"
 #include "TMath.h"
 #include "TF1.h"
-#include "TMinuit.h"
 #include "TROOT.h"
 #include "TTree.h"
 #include "math.h"
 #include <limits>
 #include <framework/logging/Logger.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
-
 
 
 //using namespace std;

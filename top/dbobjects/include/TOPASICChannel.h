@@ -14,7 +14,6 @@
 #include <top/dbobjects/TOPASICPedestals.h>
 #include <top/dbobjects/TOPASICGains.h>
 #include <vector>
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

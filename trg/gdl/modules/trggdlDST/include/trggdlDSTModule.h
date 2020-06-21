@@ -5,12 +5,9 @@
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/TRGSummary.h>
 #include <trg/gdl/dataobjects/TRGGDLDST.h>
 #include <framework/database/DBObjPtr.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-#include <stdlib.h>
-#include <iostream>
 
 namespace Belle2 {
 

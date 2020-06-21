@@ -12,10 +12,8 @@
 #define COMBINEDPIDPERFORMANCEMODULE_H_
 
 #include <framework/core/Module.h>
-#include <TTree.h>
 #include <TFile.h>
 #include <TList.h>
-#include <TH1F.h>
 #include <TEfficiency.h>
 #include <TH3F.h>
 
@@ -25,20 +23,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// forward declarations
-class TTree;
-class TFile;
 
 namespace Belle2 {
-  class MCParticle;
-  class Track;
-  class TrackFitResult;
-  class PIDLikelihood;
-
-  template< class T >
-  class StoreArray;
 
   /** This module takes the MCParticles, the Tracks, and the PIDLikelihoods as input and
    *  produces a root file containing various histograms showing the PID performance

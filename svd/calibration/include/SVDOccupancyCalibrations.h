@@ -15,12 +15,8 @@
 #include <svd/dbobjects/SVDCalibrationsBase.h>
 #include <svd/dbobjects/SVDCalibrationsVector.h>
 #include <framework/database/DBObjPtr.h>
-#include <svd/calibration/SVDPulseShapeCalibrations.h>
 
 #include <string>
-
-//#include <framework/logging/Logger.h>
-
 
 namespace Belle2 {
 

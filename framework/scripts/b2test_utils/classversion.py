@@ -39,7 +39,7 @@ def check_base_classes(tclass):
     """Recursively check all base classes of a TClass to make sure all are well defined"""
     bases = tclass.GetListOfBases()
     if not bases:
-        raise ClassVersionError("class is incomplete")
+        raise ClassVersionError("Cannot get list of base classes.")
     for base in bases:
         baseclass = base.GetClassPointer()
         if not baseclass:

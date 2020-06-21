@@ -11,12 +11,10 @@
 #include <reconstruction/calibration/CDCDedxRunGainAlgorithm.h>
 
 #include <TF1.h>
-#include <TH1D.h>
 #include <TCanvas.h>
 #include <TLine.h>
-#include <TPaveText.h>
-#include<iostream>
-#include<fstream>
+#include <iostream>
+#include <fstream>
 
 using namespace Belle2;
 
@@ -84,12 +82,11 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
 
   //Fit absolute run
   status = "";
-  double RunGainAbs = 1.0, RunGainAbsErr = 0.0;
   FitGaussianWRange(hDedxAbs, status);
   if (status != "FitOK") RunGainAbs = 1.0;
   else {
     RunGainAbs = hDedxAbs->GetFunction("gaus")->GetParameter(1);
-    RunGainAbsErr = hDedxAbs->GetFunction("gaus")->GetParError(1);
+    Double_t RunGainAbsErr = hDedxAbs->GetFunction("gaus")->GetParError(1);
     hDedxAbs->SetTitle(Form("dE/dx abs, Run %d, Fit %s, Fit-mean %0.03f#pm%0.03f", expRun.second, status.Data(), RunGainAbs,
                             RunGainAbsErr));
   }

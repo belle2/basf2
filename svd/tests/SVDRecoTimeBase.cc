@@ -13,7 +13,6 @@
 #include <svd/dataobjects/SVDRecoTimeBase.h>
 #include <vector>
 #include <string>
-#include <cmath>
 #include <gtest/gtest.h>
 
 namespace Belle2 {

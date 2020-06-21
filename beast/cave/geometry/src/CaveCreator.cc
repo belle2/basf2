@@ -40,7 +40,7 @@ namespace Belle2 {
 
     CaveCreator::CaveCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     CaveCreator::~CaveCreator()
@@ -50,6 +50,9 @@ namespace Belle2 {
 
     void CaveCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       G4double density;
       G4double A;
       G4int Z;

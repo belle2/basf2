@@ -12,7 +12,6 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
-#include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/gearbox/Const.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 

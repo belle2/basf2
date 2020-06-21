@@ -9,7 +9,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <klm/modules/KLMChannelStatusCalibration/KLMChannelStatusCalibrationCollectorModule.h>
+#include <klm/modules/KLMChannelStatusCollector/KLMChannelStatusCollectorModule.h>
 
 /* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
@@ -22,9 +22,9 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMChannelStatusCalibrationCollector)
+REG_MODULE(KLMChannelStatusCollector)
 
-KLMChannelStatusCalibrationCollectorModule::KLMChannelStatusCalibrationCollectorModule() :
+KLMChannelStatusCollectorModule::KLMChannelStatusCollectorModule() :
   CalibrationCollectorModule(),
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
   m_ChannelArrayIndex(&(KLMChannelArrayIndex::Instance())),
@@ -34,11 +34,11 @@ KLMChannelStatusCalibrationCollectorModule::KLMChannelStatusCalibrationCollector
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-KLMChannelStatusCalibrationCollectorModule::~KLMChannelStatusCalibrationCollectorModule()
+KLMChannelStatusCollectorModule::~KLMChannelStatusCollectorModule()
 {
 }
 
-void KLMChannelStatusCalibrationCollectorModule::prepare()
+void KLMChannelStatusCollectorModule::prepare()
 {
   m_KLMDigits.isRequired();
   m_HitMap.registerInDataStore();
@@ -48,7 +48,7 @@ void KLMChannelStatusCalibrationCollectorModule::prepare()
   registerObject<TTree>("calibration_data", calibrationData);
 }
 
-void KLMChannelStatusCalibrationCollectorModule::collect()
+void KLMChannelStatusCollectorModule::collect()
 {
   for (KLMDigit& digit : m_KLMDigits) {
     uint16_t channel =
@@ -59,7 +59,7 @@ void KLMChannelStatusCalibrationCollectorModule::collect()
   }
 }
 
-void KLMChannelStatusCalibrationCollectorModule::closeRun()
+void KLMChannelStatusCollectorModule::closeRun()
 {
   uint16_t channel;
   unsigned int hits;
@@ -76,7 +76,7 @@ void KLMChannelStatusCalibrationCollectorModule::closeRun()
   m_HitMap->setDataAllChannels(0);
 }
 
-void KLMChannelStatusCalibrationCollectorModule::collectFromDQM(
+void KLMChannelStatusCollectorModule::collectFromDQM(
   const char* dqmFile)
 {
   std::string histogramName;

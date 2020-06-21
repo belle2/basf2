@@ -9,17 +9,11 @@
  **************************************************************************/
 
 #include <analysis/modules/DistanceCalculator/DistanceCalculatorModule.h>
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Btube.h>
+#include <framework/datastore/StoreObjPtr.h>
 
-#include <TMath.h>
-#include <TVectorF.h>
-#include <TMatrixFSym.h>
+#include <Eigen/Dense>
 #include <iostream>
-
-#include <Eigen/Core>
-#include <Eigen/Geometry>
 
 using namespace std;
 using namespace Belle2;
@@ -35,7 +29,8 @@ REG_MODULE(DistanceCalculator)
 //                 Implementation
 //-----------------------------------------------------------------
 
-DistanceCalculatorModule::DistanceCalculatorModule() : Module()
+DistanceCalculatorModule::DistanceCalculatorModule() : Module(),
+  m_distanceCovMatrix(0)
 {
   // Set module properties
   setDescription("Calculates distance between two vertices, distance of closest approach between a vertex and a track, distance of closest approach between two tracks, distance of closest approach between a vertex/track and Btube");
@@ -52,6 +47,8 @@ DistanceCalculatorModule::DistanceCalculatorModule() : Module()
            "vertexbtube: calculates the distance of closest approach between a vertex and a Btube,\n"
            "trackbtube: calculates the distance of closest approach between a track and a Btube",
            std::string("vertextrack"));
+
+  m_distance = Eigen::Matrix<double, Eigen::Dynamic, 1>::Zero(3);
 }
 
 DistanceCalculatorModule::~DistanceCalculatorModule()
@@ -112,7 +109,7 @@ Eigen::Vector3d getDocaTracks(const Particle* p1, const Particle* p2)
   Eigen::Vector3d v2(p2->getPx(), p2->getPy(), p2->getPz());
   Eigen::Vector3d n = v1.cross(v2); //The doca vector must be orthogonal to both lines.
   if (n.norm() < eps) {
-    //if tracks are parallel then the distance is independant of the point on the line
+    //if tracks are parallel then the distance is independent of the point on the line
     //and we can use the old way to calculate the DOCA
     return getDocaTrackVertex(p1, p2);
   }
@@ -136,10 +133,10 @@ TMatrixFSym getDocaTracksError(const Particle* p1, const Particle* p2)
   Eigen::Vector3d n_dir = n.normalized();
   //d_j = n_dir_j * n_dir_k r_k
   //Jij = del_i d_j = n_dir_i * n_dir_j
-  //Since the vector of closest approch is a linear function of r, it's
+  //Since the vector of closest approach is a linear function of r, it's
   //propagation of errors is exact
   TMatrixFSym Jacobian(3);
-  //Fill the jacobian matrix accodring to the equation:
+  //Fill the jacobian matrix according to the equation:
   // J_ij = n(i)n(j)
   for (int i = 0; i < 3; i++)
     for (int j = 0; j < 3; j++)
@@ -154,41 +151,42 @@ Eigen::Vector3d getDistanceVertices(const Particle* p1, const Particle* p2)
   Eigen::Vector3d r = p2v - p1v;
   return r;
 }
+
 TMatrixFSym getDistanceVerticesErrors(const Particle* p1, const Particle* p2)
 {
   TMatrixFSym err_r = p1->getVertexErrorMatrix() + p2->getVertexErrorMatrix();
   return err_r;
 }
 
-Eigen::Vector3d getDistance(const Particle* p1, const Particle* p2, const std::string& mode)
+void DistanceCalculatorModule::getDistance(const Particle* p1, const Particle* p2)
 {
-  if (mode == "2tracks") {
-    return getDocaTracks(p1, p2);
+  if (m_mode == "2tracks") {
+    m_distance = getDocaTracks(p1, p2);
   }
-  if (mode == "2vertices") {
-    return getDistanceVertices(p1, p2);
+  if (m_mode == "2vertices") {
+    m_distance = getDistanceVertices(p1, p2);
   }
-  if (mode == "vertextrack") {
-    return getDocaTrackVertex(p2, p1);
+  if (m_mode == "vertextrack") {
+    m_distance = getDocaTrackVertex(p2, p1);
   }
-  if (mode == "trackvertex") {
-    return getDocaTrackVertex(p1, p2);
+  if (m_mode == "trackvertex") {
+    m_distance = getDocaTrackVertex(p1, p2);
   }
 }
-TMatrixFSym getDistanceErrors(const Particle* p1, const Particle* p2, const std::string& mode)
-{
-  if (mode == "2tracks") {
-    return getDocaTracksError(p1, p2);
-  }
-  if (mode == "2vertices") {
-    return getDistanceVerticesErrors(p1, p2);
-  }
 
-  if (mode == "vertextrack") {
-    return getDocaTrackVertexError(p2, p1);
+void DistanceCalculatorModule::getDistanceErrors(const Particle* p1, const Particle* p2)
+{
+  if (m_mode == "2tracks") {
+    m_distanceCovMatrix = getDocaTracksError(p1, p2);
   }
-  if (mode == "trackvertex") {
-    return getDocaTrackVertexError(p1, p2);
+  if (m_mode == "2vertices") {
+    m_distanceCovMatrix = getDistanceVerticesErrors(p1, p2);
+  }
+  if (m_mode == "vertextrack") {
+    m_distanceCovMatrix = getDocaTrackVertexError(p2, p1);
+  }
+  if (m_mode == "trackvertex") {
+    m_distanceCovMatrix = getDocaTrackVertexError(p1, p2);
   }
 }
 
@@ -223,7 +221,7 @@ Eigen::Vector3d getDocaBtubeTrack(const Particle* pTrack, const Btube* tube)
   Eigen::Vector3d v2 = tube->getTubeDirection();
   Eigen::Vector3d n = v1.cross(v2); //The doca vector must be orthogonal to both lines.
   if (n.norm() < eps) {
-    //if tracks are parallel then the distance is independant of the point on the line
+    //if tracks are parallel then the distance is independent of the point on the line
     //and we can use the old way to calculate the DOCA
     return getDocaBtubeVertex(pTrack, tube);
   }
@@ -250,22 +248,24 @@ TMatrixFSym getDocaBtubeTrackError(const Particle* pTrack, const Btube* tube)
       Jacobian(i, j) = n_dir(i) * n_dir(j);
   return err_r.Similarity(Jacobian);
 }
-Eigen::Vector3d getBtubeDistance(const Particle* p, const Btube* t, const std::string& mode)
+
+void DistanceCalculatorModule::getBtubeDistance(const Particle* p, const Btube* t)
 {
-  if (mode == "vertexbtube") {
-    return getDocaBtubeVertex(p, t);
+  if (m_mode == "vertexbtube") {
+    m_distance = getDocaBtubeVertex(p, t);
   }
-  if (mode == "trackbtube") {
-    return getDocaBtubeTrack(p, t);
+  if (m_mode == "trackbtube") {
+    m_distance = getDocaBtubeTrack(p, t);
   }
 }
-TMatrixFSym getBtubeDistanceErrors(const Particle* p, const Btube* t, const std::string& mode)
+
+void DistanceCalculatorModule::getBtubeDistanceErrors(const Particle* p, const Btube* t)
 {
-  if (mode == "vertexbtube") {
-    return getDocaBtubeVertexError(p, t);
+  if (m_mode == "vertexbtube") {
+    m_distanceCovMatrix = getDocaBtubeVertexError(p, t);
   }
-  if (mode == "trackbtube") {
-    return getDocaBtubeTrackError(p, t);
+  if (m_mode == "trackbtube") {
+    m_distanceCovMatrix = getDocaBtubeTrackError(p, t);
   }
 }
 
@@ -276,8 +276,6 @@ void DistanceCalculatorModule::event()
   for (unsigned int i = 0; i < n; i++) {
     Particle* particle = plist->getParticle(i);
     std::vector<const Particle*> selectedParticles = m_decayDescriptor.getSelectionParticles(particle);
-    Eigen::Vector3d Distance;
-    TMatrixFSym DistanceCovMatrix(3);
     if ((m_mode == "vertexbtube") || (m_mode == "trackbtube")) {
       if (selectedParticles.size() == 1) {
         const Btube* t = particle->getRelatedTo<Btube>();
@@ -285,45 +283,45 @@ void DistanceCalculatorModule::event()
           B2FATAL("No associated Btube found");
         }
         const Particle* p0 = selectedParticles[0];
-        Distance = getBtubeDistance(p0, t, m_mode);
-        DistanceCovMatrix = getBtubeDistanceErrors(particle, t, m_mode);
+        getBtubeDistance(p0, t);
+        getBtubeDistanceErrors(particle, t);
       }
     } else {
       if (selectedParticles.size() == 2) {
         const Particle* p1 = selectedParticles[0];
         const Particle* p2 = selectedParticles[1];
-        Distance = getDistance(p1, p2, m_mode);
-        DistanceCovMatrix = getDistanceErrors(p1, p2, m_mode);
+        getDistance(p1, p2);
+        getDistanceErrors(p1, p2);
       }
     }
     Eigen::Matrix3d DistanceCovMatrix_eigen;
     DistanceCovMatrix_eigen.resize(3, 3);
     for (int row = 0; row < 3; row++) {
       for (int column = 0; column < 3; column++) {
-        DistanceCovMatrix_eigen(row, column) = DistanceCovMatrix[row][column]; //converting from TMatrixFSym to Eigen
+        DistanceCovMatrix_eigen(row, column) = m_distanceCovMatrix[row][column]; //converting from TMatrixFSym to Eigen
       }
     }
-    float DistanceMag = Distance.norm();
+    float DistanceMag = m_distance.norm();
     double dist_err = 0;
     if (DistanceMag != 0) {
-      Eigen::Vector3d dist_dir = Distance.normalized();
-      dist_err = TMath::Sqrt(((dist_dir.transpose()) * (DistanceCovMatrix_eigen * dist_dir)).norm());
+      Eigen::Vector3d dist_dir = m_distance.normalized();
+      dist_err = sqrt(((dist_dir.transpose()) * (DistanceCovMatrix_eigen * dist_dir)).norm());
     }
     particle->writeExtraInfo("CalculatedDistance", DistanceMag);
     particle->writeExtraInfo("CalculatedDistanceError", dist_err);
     //The Distance vector always points from the "vertex" to the "track/btube", if a single vertex is involved. In case of two vertices, it points from the "first" vertex to the "second" vertex. For two tracks or one track and btube, the direction is along "first track x second track" or "track x btube"
-    particle->writeExtraInfo("CalculatedDistanceVector_X", Distance(0));
-    particle->writeExtraInfo("CalculatedDistanceVector_Y", Distance(1));
-    particle->writeExtraInfo("CalculatedDistanceVector_Z", Distance(2));
+    particle->writeExtraInfo("CalculatedDistanceVector_X", m_distance(0));
+    particle->writeExtraInfo("CalculatedDistanceVector_Y", m_distance(1));
+    particle->writeExtraInfo("CalculatedDistanceVector_Z", m_distance(2));
     //Save the Covariance Matrix
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixXX", DistanceCovMatrix[0][0]);
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixXY", DistanceCovMatrix[0][1]);
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixXZ", DistanceCovMatrix[0][2]);
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixYX", DistanceCovMatrix[1][0]);
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixYY", DistanceCovMatrix[1][1]);
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixYZ", DistanceCovMatrix[1][2]);
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixZX", DistanceCovMatrix[2][0]);
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixZY", DistanceCovMatrix[2][1]);
-    particle->writeExtraInfo("CalculatedDistanceCovMatrixZZ", DistanceCovMatrix[2][2]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixXX", m_distanceCovMatrix[0][0]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixXY", m_distanceCovMatrix[0][1]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixXZ", m_distanceCovMatrix[0][2]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixYX", m_distanceCovMatrix[1][0]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixYY", m_distanceCovMatrix[1][1]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixYZ", m_distanceCovMatrix[1][2]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixZX", m_distanceCovMatrix[2][0]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixZY", m_distanceCovMatrix[2][1]);
+    particle->writeExtraInfo("CalculatedDistanceCovMatrixZZ", m_distanceCovMatrix[2][2]);
   }
 }

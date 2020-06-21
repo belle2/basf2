@@ -11,8 +11,6 @@
 #include <svd/modules/svdReconstruction/SVDMissingAPVsClusterCreatorModule.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
 #include <vxd/geometry/GeoCache.h>

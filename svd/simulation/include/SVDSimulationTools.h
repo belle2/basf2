@@ -15,7 +15,6 @@
 #include <cmath>
 #include <array>
 #include <algorithm>
-#include <numeric>
 #include <functional>
 #include <sstream>
 #include <framework/gearbox/Unit.h>

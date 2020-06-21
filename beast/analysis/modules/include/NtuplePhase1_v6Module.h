@@ -278,10 +278,10 @@ namespace Belle2 {
     Double_t m_input_PIN_width; /**< PIN width */
     std::vector<Double_t> m_input_HE3_EfCor; /**< HE3 inefficiency correction */
 
-    TF1* fctRate_HB;  /** fct HB */
-    TF1* fctRate_HC;  /** fct HC */
-    TF1* fctRate_LB;  /** fct LB */
-    TF1* fctRate_LC;  /** fct LC */
+    TF1* fctRate_HB = nullptr;  /** fct HB */
+    TF1* fctRate_HC = nullptr;  /** fct HC */
+    TF1* fctRate_LB = nullptr;  /** fct LB */
+    TF1* fctRate_LC = nullptr;  /** fct LC */
 
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
     TTree* m_treeTruth = 0;   /**< Truth tree pointer */

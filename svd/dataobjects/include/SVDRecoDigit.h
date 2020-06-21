@@ -21,8 +21,6 @@
 #include <string>
 #include <algorithm>
 #include <numeric>
-#include <functional>
-#include <limits>
 
 namespace Belle2 {
 

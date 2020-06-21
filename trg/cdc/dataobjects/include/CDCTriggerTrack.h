@@ -3,9 +3,7 @@
 
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
-#include <framework/gearbox/Const.h>
 #include <TVector3.h>
-#include <cmath>
 
 namespace Belle2 {
 

@@ -18,9 +18,6 @@
 #include <mdst/dataobjects/TRGSummary.h>
 
 #include "TH1F.h"
-#include "TDirectory.h"
-using std::vector;
-using std::string;
 
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDCluster.h>

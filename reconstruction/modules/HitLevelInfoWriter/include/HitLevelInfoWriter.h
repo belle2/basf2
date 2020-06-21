@@ -10,21 +10,17 @@
 
 #pragma once
 
-#include <reconstruction/dataobjects/DedxConstants.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <genfit/Track.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 #include <framework/core/Module.h>
 
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
@@ -37,7 +33,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <string>
 #include <vector>
 
 #include <TFile.h>

@@ -15,11 +15,6 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <string>
 #include <regex>
-#include <TH1F.h>
-#include <TH1D.h>
-#include <TH2F.h>
-#include <TH2D.h>
-#include <TProfile.h>
 
 namespace Belle2 {
 

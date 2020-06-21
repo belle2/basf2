@@ -15,7 +15,6 @@
 
 #include <TObject.h>
 #include <vector>
-#include <bitset>
 
 namespace Belle2 {
 

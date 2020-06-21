@@ -10,7 +10,6 @@
 
 #include <simulation/physicslist/Belle2PhysicsList.h>
 #include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
 #include "G4RegionStore.hh"
 #include "G4ProductionCuts.hh"
 
@@ -18,7 +17,6 @@
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
 #include "G4OpticalPhysics.hh"
-#include "G4EmParameters.hh"
 #include "G4DecayPhysics.hh"
 #include <simulation/physicslist/Geant4ePhysics.h>
 
@@ -246,7 +244,7 @@ void Belle2PhysicsList::setRegionCuts(const std::string& name, const std::vector
   auto* regionCuts = new G4ProductionCuts;
   regionCuts->SetProductionCut(cutValue * cm);
   bool foundOne{false};
-  for (const auto regionName : regions) {
+  for (const auto& regionName : regions) {
     auto* region = theRegionStore->GetRegion(regionName, false);
     if (!region) {
       B2WARNING("Cannot find Geant4 region for sub detector. Probably detector not present?"

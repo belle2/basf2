@@ -83,27 +83,27 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
     if (driftTime < boundary) {
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 0),
-        ROOT::Math::Chebyshev5(driftTime, 1, par[1], par[2], par[3], par[4], par[5]) * double(int(m_leftRight))
+        ROOT::Math::Chebyshev5(driftTime, 1, 0, 0, 0, 0, 0) * double(int(m_leftRight))
       );
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 1),
-        ROOT::Math::Chebyshev5(driftTime, par[0], 1, par[2], par[3], par[4], par[5]) * double(int(m_leftRight))
+        ROOT::Math::Chebyshev5(driftTime, 0, 1, 0, 0, 0, 0) * double(int(m_leftRight))
       );
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 2),
-        ROOT::Math::Chebyshev5(driftTime, par[0], par[1], 1, par[3], par[4], par[5]) * double(int(m_leftRight))
+        ROOT::Math::Chebyshev5(driftTime, 0, 0, 1, 0, 0, 0) * double(int(m_leftRight))
       );
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 3),
-        ROOT::Math::Chebyshev5(driftTime, par[0], par[1], par[2], 1, par[4], par[5]) * double(int(m_leftRight))
+        ROOT::Math::Chebyshev5(driftTime, 0, 0, 0, 1, 0, 0) * double(int(m_leftRight))
       );
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 4),
-        ROOT::Math::Chebyshev5(driftTime, par[0], par[1], par[2], par[3], 1, par[5]) * double(int(m_leftRight))
+        ROOT::Math::Chebyshev5(driftTime, 0, 0, 0, 0, 1, 0) * double(int(m_leftRight))
       );
       globals.add(
         GlobalLabel::construct<CDCXtRelations>(xtid, 5),
-        ROOT::Math::Chebyshev5(driftTime, par[0], par[1], par[2], par[3], par[4], 1) * double(int(m_leftRight))
+        ROOT::Math::Chebyshev5(driftTime, 0, 0, 0, 0, 0, 1) * double(int(m_leftRight))
       );
     } else {
       globals.add(

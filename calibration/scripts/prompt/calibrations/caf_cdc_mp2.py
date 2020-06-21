@@ -122,8 +122,7 @@ def get_calibrations(input_data, **kwargs):
         files=dict(hlt_mumu=chosen_files_mumu, hlt_hadron=chosen_files_hadron),
         tags=None,
         timedep=[],
-        constraints=[alignment.constraints.CDCTimeZerosConstraint(basf2.find_file(
-                    'calibration/scripts/prompt/calibrations/cdc-T0-constraints.txt'))],
+        constraints=[],
         fixed=fix_tw_param(),
         commands=['method inversion 1 0.1',
                   'threads 25 1',
@@ -138,6 +137,7 @@ def get_calibrations(input_data, **kwargs):
     basf2.set_module_parameters(cal1.collections['hlt_hadron'].pre_collector_path,
                                 'RootInput', entrySequences=[f'0:{max_events_per_file_had}'])
     cal1.max_iterations = 5
+    cal1.pre_algorithms = alignment.constraints.CDCTimeZerosConstraint(basf2.find_file('cdc/data/cdc-T0-constraints.txt'))
 
     # Calibration of XT is separated from tz/tw. in future, it will be simultaniously calibrated...
     cal2 = mp2.create(
@@ -151,7 +151,7 @@ def get_calibrations(input_data, **kwargs):
         timedep=[],
         constraints=[],
         fixed=[],
-        commands=['method inversion 1 0.1',
+        commands=['method sparseMINRES-QLP 3 0.01',
                   'threads 25 1',
                   'chiscut 30. 6.',
                   'entries 100',

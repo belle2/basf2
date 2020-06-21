@@ -6,7 +6,7 @@ import vertex as vtx
 
 from collections import namedtuple
 
-MillepedeCollection = namedtuple('MillepedeCollection', ['name', 'files', 'path', 'argk'])
+MillepedeCollection = namedtuple('MillepedeCollection', ['name', 'files', 'path', 'params'])
 
 
 def make_collection(name, files=None, path=None, **argk):
@@ -27,7 +27,7 @@ def make_collection(name, files=None, path=None, **argk):
 
     Returns
     -------
-    namedtuple('MillepedeCollection', ['name', 'files', 'path', 'argk'])
+    namedtuple('MillepedeCollection', ['name', 'files', 'path', 'params'])
 
     """
     if files is None:
@@ -35,7 +35,7 @@ def make_collection(name, files=None, path=None, **argk):
     if path is None:
         path = basf2.Path()
 
-    return MillepedeCollection(name=name, path=path, files=files, argk=argk)
+    return MillepedeCollection(name=name, path=path, files=files, params=argk)
 
 
 def physicsTracks(name="physicsTracks", files=None, add_unpackers=True, klm=False, prescale=1.):

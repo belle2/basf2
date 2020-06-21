@@ -403,7 +403,7 @@ def create(name,
         colname = col.name
         colfiles = col.files
         path = col.path
-        args = col.argk
+        args = col.params
 
         filelist = colfiles
         if colname in files:

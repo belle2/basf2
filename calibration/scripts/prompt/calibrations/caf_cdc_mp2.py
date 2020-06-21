@@ -117,8 +117,8 @@ def get_calibrations(input_data, **kwargs):
         name='tzw0',
         dbobjects=['CDCTimeZeros', 'CDCTimeWalks'],
         collections=[
-            mp2.make_collection('hlt_mumu', pre_collector(), tracks=['RecoTracks']),
-            mp2.make_collection('hlt_hadron', pre_collector(), tracks=['RecoTracks'])],
+            mp2.make_collection('hlt_mumu', path=pre_collector(), tracks=['RecoTracks']),
+            mp2.make_collection('hlt_hadron', path=pre_collector(), tracks=['RecoTracks'])],
         files=dict(hlt_mumu=chosen_files_mumu, hlt_hadron=chosen_files_hadron),
         tags=None,
         timedep=[],
@@ -131,7 +131,6 @@ def get_calibrations(input_data, **kwargs):
                   'entries 100',
                   'scaleerrors 1. 1.'],
         params=dict(minPValue=0., externalIterations=0),
-        init_event=(0, output_iov.run_low, output_iov.exp_low),
         min_entries=10000)
 
     basf2.set_module_parameters(cal1.collections['hlt_mumu'].pre_collector_path,
@@ -145,8 +144,8 @@ def get_calibrations(input_data, **kwargs):
         name='xt0',
         dbobjects=['CDCXtRelations'],
         collections=[
-            mp2.make_collection('hlt_mumu', pre_collector(), tracks=['RecoTracks']),
-            mp2.make_collection('hlt_hadron', pre_collector(), tracks=['RecoTracks'])],
+            mp2.make_collection('hlt_mumu', path=pre_collector(), tracks=['RecoTracks']),
+            mp2.make_collection('hlt_hadron', path=pre_collector(), tracks=['RecoTracks'])],
         files=dict(hlt_mumu=chosen_files_mumu_xt, hlt_hadron=chosen_files_hadron_xt),
         tags=None,
         timedep=[],
@@ -158,7 +157,6 @@ def get_calibrations(input_data, **kwargs):
                   'entries 100',
                   'scaleerrors 1. 1.'],
         params=dict(minPValue=0., externalIterations=0),
-        init_event=(0, output_iov.run_low, output_iov.exp_low),
         min_entries=10000)
 
     basf2.set_module_parameters(cal2.collections['hlt_mumu'].pre_collector_path,

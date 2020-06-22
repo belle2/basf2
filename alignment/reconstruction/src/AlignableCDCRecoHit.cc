@@ -107,11 +107,11 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
       );
     } else {
       globals.add(
-        GlobalLabel::construct<CDCXtRelations>(xtid, 6),
-        -par[7] * double(int(m_leftRight))
+        GlobalLabel::construct<CDCXtRelations>(xtid, 7),
+        double(int(m_leftRight))
       );
       globals.add(
-        GlobalLabel::construct<CDCXtRelations>(xtid, 7),
+        GlobalLabel::construct<CDCXtRelations>(xtid, 8),
         (driftTime - boundary) * double(int(m_leftRight))
       );
     }

@@ -362,17 +362,17 @@ void DQMHistAnalysisPXDEffModule::event()
   {
     m_cEffAllUpdate->cd();
     m_hEffAllUpdate->Paint("AP");
-    auto gru = m_hEffAllUpdate->GetPaintedGraph();
+    auto gr = m_hEffAllUpdate->GetPaintedGraph();
     double scale_min = 1.0;
-    if (gru) {
-      for (int i = 0; i < gru->GetN(); i++) {
-        gru->SetPointEXhigh(i, 0.);
-        gru->SetPointEXlow(i, 0.);
+    if (gr) {
+      for (int i = 0; i < gr->GetN(); i++) {
+        gr->SetPointEXhigh(i, 0.);
+        gr->SetPointEXlow(i, 0.);
         // this has to be done first, as it will recalc Min/Max and destroy axis
         Double_t x, y;
-        gru->GetPoint(i, x, y);
-        gru->SetPoint(i, x, y); // shift a bit if in same plot
-        auto val = y - gru->GetErrorYlow(i); // Error is relative to value
+        gr->GetPoint(i, x, y);
+        gr->SetPoint(i, x, y); // shift a bit if in same plot
+        auto val = y - gr->GetErrorYlow(i); // Error is relative to value
         if (i != 5) { // exclude 1.3.2
           /// check for val > 0.0) { would exclude all zero efficient modules!!!
           if (scale_min > val) scale_min = val;
@@ -380,11 +380,11 @@ void DQMHistAnalysisPXDEffModule::event()
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
-      gru->SetMinimum(0);
-      gru->SetMaximum(m_PXDModules.size());
-      auto ay = gru->GetYaxis();
+      gr->SetMinimum(0);
+      gr->SetMaximum(m_PXDModules.size());
+      auto ay = gr->GetYaxis();
       if (ay) ay->SetRangeUser(scale_min, 1.0);
-      auto ax = gru->GetXaxis();
+      auto ax = gr->GetXaxis();
       if (ax) {
         ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -392,9 +392,9 @@ void DQMHistAnalysisPXDEffModule::event()
           ax->SetBinLabel(i + 1, ModuleName);
         }
       }
-      gru->SetLineColor(kOrange);
-      gru->SetLineWidth(2);
-      gru->SetMarkerStyle(33);
+      gr->SetLineColor(kOrange);
+      gr->SetLineWidth(2);
+      gr->SetMarkerStyle(33);
     } else scale_min = 0.0;
     m_cEffAllUpdate->Clear();
     m_cEffAllUpdate->cd(0);

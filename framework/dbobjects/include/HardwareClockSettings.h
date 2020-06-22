@@ -65,7 +65,19 @@ namespace Belle2 {
      * @param acceleratorRF Accelerator RF value.
      */
     void    setAcceleratorRF(Double_t acceleratorRF);
-
+    /**
+    * Check if the prescale of a clock is available.
+    * @param detector The ID of the detector.
+    * @param label The label for the clock.
+    */
+    bool isPrescaleAvailable(Const::EDetector detector, std::string label) const;
+    /**
+    * Check if the frequency of a detector clock is available.
+    * The check is performed for both the clocks derived from the globalclock and the clocks not derived from it.
+    * @param detector The ID of the detector.
+    * @param label The label for the clock.
+    */
+    bool isFrequencyAvailable(Const::EDetector detector, std::string label) const;
 
 
   private:

@@ -17,6 +17,23 @@ using namespace Belle2;
 
 HardwareClockSettings::HardwareClockSettings() {}
 
+
+bool HardwareClockSettings::isPrescaleAvailable(Const::EDetector detector, std::string label) const
+{
+  if ((m_prescaleMap.find(detector) == m_prescaleMap.end())
+      || (m_prescaleMap.at(detector).find(label) == m_prescaleMap.at(detector).end())) return false;
+  else return true;
+}
+
+bool HardwareClockSettings::isFrequencyAvailable(Const::EDetector detector, std::string label) const
+{
+  if (((m_prescaleMap.find(detector) == m_prescaleMap.end()) ||
+       (m_prescaleMap.at(detector).find(label) == m_prescaleMap.at(detector).end()))
+      & ((m_clocksMap.find(detector) == m_clocksMap.end()) ||
+         (m_clocksMap.at(detector).find(label) == m_clocksMap.at(detector).end()))) return false;
+  else return true;
+}
+
 Double_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, std::string label) const
 {
   bool isDetectorInPrescaleMap = true;
@@ -73,3 +90,4 @@ void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
 {
   m_acceleratorRF = acceleratorRF;
 }
+

@@ -43,6 +43,15 @@ namespace {
     EXPECT_EQ(testClock.getClockFrequency(Const::EDetector::ECL, "dummy"), dummyFrequency);
     EXPECT_EQ(testClock.getClockFrequency(Const::EDetector::ARICH, "dummy"), dummyFrequency);
 
+    EXPECT_EQ(testClock.isPrescaleAvailable(Const::EDetector::TOP, "sampling"), true);
+    EXPECT_EQ(testClock.isPrescaleAvailable(Const::EDetector::TOP, "wrongname"), false);
+    EXPECT_EQ(testClock.isPrescaleAvailable(Const::EDetector::SVD, "wrongname"), false);
+
+    EXPECT_EQ(testClock.isFrequencyAvailable(Const::EDetector::TOP, "sampling"), true);
+    EXPECT_EQ(testClock.isFrequencyAvailable(Const::EDetector::ECL, "dummy"), true);
+    EXPECT_EQ(testClock.isFrequencyAvailable(Const::EDetector::ARICH, "wrongname"), false);
+    EXPECT_EQ(testClock.isFrequencyAvailable(Const::EDetector::SVD, "wrongname"), false);
+
 
     //Try to get prescale from detector not present in the prescale map
     EXPECT_B2ERROR(testClock.getClockPrescale(Const::EDetector::SVD, "sampling"));

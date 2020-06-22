@@ -111,8 +111,8 @@ namespace Belle2 {
             int endExp = endEvent.getExperiment();
             //int endRun = endEvent.getRun();
             int endRun = std::max(0, endEvent.getRun() - 1);
-            // The last run will be the same as this run
-            if (endEvent.getRun() == run && endExp == exp) {
+            // Last IoV open:
+            if (iCol == std::get<EventHeader>(timeTable).size() - 1) {
               endRun = -1;
               endExp = -1;
             }

@@ -26,11 +26,11 @@ from ROOT import TFile, TChain, TH1F, TH2F, TNamed, gStyle, PyConfig
 PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 import sys
-from optparse import OptionParser
+import argparse
 
 # contact person information
 # is added to the plot descriptions
-CONTACT_PERSON = {'Name': 'Martin Laurenza',
+CONTACT_PERSON = {'Name': 'Martina Laurenza',
                   'Email': 'martina.laurenza@roma3.infn.it'}
 
 
@@ -38,35 +38,36 @@ def main():
     """
     Create validation plots for BKLM.
     """
-
     print('Creating the BKLM validation plots...')
 
-    option_parser = OptionParser()
-    option_parser.add_option('-i', '--input-file', dest='input_file',
-                             default='../muon-KLMValidation.root',
-                             help='Root file with Ext/Muid/BKLM/EKLM validation data.'
-                             )
-    option_parser.add_option('-o', '--output-file', dest='output_file',
-                             default='BKLMMuon.root',
-                             help='Root file with BKLM validation histograms.')
-    (options, args) = option_parser.parse_args()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-i', '--input-file', dest='input_file',
+                        default='../muon-KLMValidation.root',
+                        help='Root file with Ext/Muid/BKLM/EKLM validation data.'
+                        )
+    parser.add_argument('-o', '--output-file', dest='output_file',
+                        default='BKLMMuon.root',
+                        help='Root file with BKLM validation histograms.')
+
+    args = parser.parse_args()
 
     # load chain of input files
     file_chain = TChain('tree')
-    file_chain.Add(options.input_file)
+    file_chain.Add(args.input_file)
 
     number_entries = 0
     try:
         number_entries = file_chain.GetEntries()
     except AttributeError:
-        print('Could not load input file(s) %s.' % options.input_file)
+        print('Could not load input file(s) %s.' % args.input_file)
 
     if number_entries == 0:
-        print('Data tree is empty or does not exist in file(s) %s. Exit.' % options.input_file)
+        print('Data tree is empty or does not exist in file(s) %s. Exit.' % args.input_file)
         sys.exit(0)
 
     # open the output root file
-    output_root_file = TFile(options.output_file, 'recreate')
+    output_root_file = TFile(args.output_file, 'recreate')
 
     # create and draw histograms
     gStyle.SetOptStat(0)
@@ -164,15 +165,14 @@ def draw_bklmhists(file_chain):
     zstrip.SetMinimum(0.0)
     zstrip.Write()
 
-    h2dtresRPC = ROOT.TH1F('muon.h2dtresRPC', 'BKLM muon 2d hits time resolution in RPC', 100, -10, 10)
-    file_chain.Draw('BKLMHit2ds.getTime()-KLMDigits.getMCTime()>>muon_h2dtresRPC',
+    RPC_bklmdigits_tres = ROOT.TH1F('RPC_bklmdigits_tres', 'KLM Digits time resolution in RPC', 250, -25, 25)
+    file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>RPC_bklmdigits_tres',
                     'KLMDigits.getSubdetector()==1 && BKLMHit2ds.inRPC()==1')
-    h2dtresRPC.SetXTitle('ns')
-    h2dtresRPC.GetListOfFunctions().Add(TNamed('Description', 'Time resolution'))
-    h2dtresRPC.GetListOfFunctions().Add(TNamed('Check', 'No Bias.'))
-    h2dtresRPC.GetListOfFunctions().Add(TNamed('Contact', contact))
-    h2dtresRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
-    h2dtresRPC.Write()
+    RPC_bklmdigits_tres.SetXTitle('ns')
+    RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in RPC'))
+    RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))
+    RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
+    RPC_bklmdigits_tres.Write()
 
     timeRPC = TH1F('TimeRPC', 'Hit time for BKLMHit2ds in RPCs', 100, -2.0, 2.0)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeRPC', 'BKLMHit2ds.inRPC()==1')
@@ -183,15 +183,14 @@ def draw_bklmhists(file_chain):
     timeRPC.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=1.00,pvalue-error=0.01'))
     timeRPC.Write()
 
-    h2dtresSci = ROOT.TH1F('muon.h2dtresSci', 'BKLM muon 2d hits time resolution in Scintillator', 100, -10, 10)
-    file_chain.Draw('BKLMHit2ds.getTime()-KLMDigits.getMCTime()>>muon_h2dtresSci',
+    Sci_bklmdigits_tres = ROOT.TH1F('Sci_bklmdigits_tres', 'KLM Digits time resolution in Scintillators', 250, -25, 25)
+    file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>Sci_bklmdigits_tres',
                     'KLMDigits.getSubdetector()==1 && BKLMHit2ds.inRPC()==0')
-    h2dtresSci.SetXTitle('ns')
-    h2dtresSci.GetListOfFunctions().Add(TNamed('Description', 'Time resolution'))
-    h2dtresSci.GetListOfFunctions().Add(TNamed('Check', 'No Bias.'))
-    h2dtresSci.GetListOfFunctions().Add(TNamed('Contact', contact))
-    h2dtresSci.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
-    h2dtresSci.Write()
+    Sci_bklmdigits_tres.SetXTitle('ns')
+    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in Scintillators'))
+    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))
+    Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('MetaOptions', 'shifter,pvalue-warn=0.50,pvalue-error=0.10'))
+    Sci_bklmdigits_tres.Write()
 
     timeSci = TH1F('TimeSci', 'Hit time for BKLMHit2ds in scintillators', 100, -5.0, 15.0)
     file_chain.Draw('BKLMHit2ds.getTime()>>TimeSci', 'BKLMHit2ds.inRPC()==0')
@@ -204,7 +203,7 @@ def draw_bklmhists(file_chain):
     timeSci.Write()
 
     nPE = TH1F('nGenPE', 'Generated PE in BKLM', 50, 0.0, 100)
-    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1')
+    file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE', 'KLMDigits.getSubdetector()==1 && KLMDigits.m_Layer < 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
     nPE.GetListOfFunctions().Add(TNamed('Check', ''))

@@ -12,6 +12,7 @@
  **************************************************************************/
 #include <framework/dbobjects/HardwareClockSettings.h>
 #include <framework/logging/Logger.h>
+#include <iostream>
 
 using namespace Belle2;
 
@@ -91,3 +92,23 @@ void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
   m_acceleratorRF = acceleratorRF;
 }
 
+void HardwareClockSettings::print()
+{
+  std::cout << std::endl;
+  std::cout << "Clock prescales:" << std::endl;
+  std::cout << "===================================" << std::endl;
+
+  for (const auto& det : m_prescaleMap) {
+    std::cout << det.first << std::endl;
+    for (const auto& clock : det.second)  std::cout << " " << clock.first << " " << clock.second << std::endl;
+  }
+  std::cout << "===================================" << std::endl;
+
+  std::cout << "Clock frequencies:" << std::endl;
+  std::cout << "===================================" << std::endl;
+  for (const auto& det : m_clocksMap) {
+    std::cout << det.first << std::endl;
+    for (const auto& clock : det.second)  std::cout << " " << clock.first << " " << clock.second << std::endl;
+  }
+  std::cout << "===================================" << std::endl;
+}

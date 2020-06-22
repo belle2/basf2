@@ -78,7 +78,12 @@ namespace Belle2 {
     * @param label The label for the clock.
     */
     bool isFrequencyAvailable(Const::EDetector detector, std::string label) const;
-
+    /**
+    * Get the channel map from the database and
+    * print it. fixme
+    * Print the content of the two datamember containing the prescale and the clocks
+    */
+    void print();
 
   private:
     /**

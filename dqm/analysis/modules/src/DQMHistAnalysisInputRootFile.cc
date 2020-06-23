@@ -32,7 +32,6 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
 {
   //Parameter definition
   addParam("FileList", m_file_list, "List of input files" , std::vector<std::string> {"input_histo.root"});
-  addParam("SelectFolders", m_folders, "List of folders for which to process, empty for all", std::vector<std::string>());
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",
            std::vector<std::string>());
   addParam("Experiment", m_expno, "Experiment Nr" , 7u);
@@ -117,19 +116,6 @@ void DQMHistAnalysisInputRootFileModule::event()
     TDirectory* d = (TDirectory*)key->ReadObj();
     std::string dirname = d->GetName();
 
-    bool pass = false;
-    if (m_folders.size() == 0) {
-      pass = true;
-    } else {
-      for (auto& wanted_folder : m_folders) {
-        if (wanted_folder == dirname) {
-          pass = true;
-          break;
-        }
-      }
-    }
-    if (!pass) continue;
-
     d->cd();
     TIter nextd(d->GetListOfKeys());
 
@@ -186,8 +172,23 @@ void DQMHistAnalysisInputRootFileModule::event()
     while ((keyh = (TKey*)nexth())) {
       TClass* cl = gROOT->GetClass(keyh->GetClassName());
       TH1* h;
-      if (cl->InheritsFrom("TH1")) { h = (TH1*)keyh->ReadObj(); hs.push_back(h); }
-      else continue;
+      if (!cl->InheritsFrom("TH1")) continue;
+      h = (TH1*)keyh->ReadObj();
+
+      bool hpass = false;
+      if (m_histograms.size() == 0) {
+        hpass = true;
+      } else {
+        for (auto& hpattern : m_histograms) {
+          if (hname_pattern_match(hpattern, h->GetName())) {
+            hpass = true;
+            break;
+          }
+        }
+      }
+      if (!hpass) continue;
+
+      hs.push_back(h);
       Double_t scale = (m_count + 1.0) / m_events_list[m_run_idx];
       h->Scale(scale);
       std::string name = h->GetName();

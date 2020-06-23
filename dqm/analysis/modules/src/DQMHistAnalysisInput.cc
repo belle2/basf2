@@ -3,9 +3,7 @@
 // Description :
 //
 // Author : Tomoyuki Konno, Tokyo Metropolitan Univerisity
-//          Boqun Wang, MPI for Physics
 // Date : 25 - Dec - 2015
-//        22 - Mar - 2020
 //-
 
 

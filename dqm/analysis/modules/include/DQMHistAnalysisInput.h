@@ -50,7 +50,9 @@ namespace Belle2 {
     std::string m_mempath;
     /** The name of the memory file (HLT or ExpressReco). */
     std::string m_memname;
+    /** The shmid for the shared memory. */
     int m_shm_id;
+    /** The semid for the shared memory. */
     int m_sem_id;
     /** The size of the shared memory. */
     int m_memsize;
@@ -60,9 +62,11 @@ namespace Belle2 {
     bool m_autocanvas;
     /** Whether to remove empty histograms. */
     bool m_remove_empty;
+    /** Whether to enable the run info to be displayed. */
     bool m_enable_run_info;
     /** The list of folders for which automatically generate canvases. */
     std::vector<std::string> m_acfolders;
+    /** The list of folders which are excluded from automatically generate canvases. */
     std::vector<std::string> m_exclfolders;
     /** The canvas hold the basic DQM info. */
     TCanvas* m_c_info = nullptr;

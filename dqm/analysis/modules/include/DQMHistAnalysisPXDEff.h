@@ -81,6 +81,8 @@ namespace Belle2 {
     TH1* m_hEffAllLastPassed = nullptr;
     //! Efficiency, last state, updated
     TEfficiency* m_hEffAllUpdate = nullptr;
+    //! Final Canvas for Update
+    TCanvas* m_cEffAllUpdate = nullptr;
 
 
     /** TLine object for warning limit */

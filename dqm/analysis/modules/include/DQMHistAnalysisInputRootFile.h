@@ -103,6 +103,9 @@ namespace Belle2 {
 
     /** Index in the list of runs, events and files */
     unsigned int m_run_idx = 0;
+
+    /** Test mode for null histograms */
+    bool m_null_histo_mode = false;
   };
 } // end namespace Belle2
 

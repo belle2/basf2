@@ -21,6 +21,7 @@ input.param('RunList', [3000, 3001])
 input.param('EventsList', [10, 5])
 input.param('Experiment', 12)
 input.param('EventInterval', 10)
+input.param('NullHistogramMode', False)  # Set to True to use the null histogram test mode, in which no histogram will be loaded
 main.add_module(input)
 
 top = register_module('DQMHistAnalysisTOP')

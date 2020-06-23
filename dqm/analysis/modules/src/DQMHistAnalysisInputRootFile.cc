@@ -38,6 +38,7 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("RunList", m_run_list, "Run Number List" , std::vector<unsigned int> {1u});
   addParam("EventsList", m_events_list, "Number of events for each run" , std::vector<unsigned int> {10u});
   addParam("EventInterval", m_interval, "Time between events (seconds)" , 20u);
+  addParam("NullHistogramMode", m_null_histo_mode, "Test mode for null histograms" , false);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
@@ -89,7 +90,7 @@ void DQMHistAnalysisInputRootFileModule::event()
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
   sleep(m_interval);
 
-  if (m_count >= m_events_list[m_run_idx]) {
+  if (m_count > m_events_list[m_run_idx]) {
     m_run_idx++;
     if (m_run_idx == m_run_list.size()) {
       m_eventMetaDataPtr.create();
@@ -102,6 +103,17 @@ void DQMHistAnalysisInputRootFileModule::event()
       delete m_file;
     }
     m_file = new TFile(m_file_list[m_run_idx].c_str());
+  }
+
+  if (m_null_histo_mode) {
+    m_eventMetaDataPtr.create();
+    m_eventMetaDataPtr->setExperiment(m_expno);
+    m_eventMetaDataPtr->setRun(m_run_list[m_run_idx]);
+    m_eventMetaDataPtr->setEvent(m_count);
+    m_eventMetaDataPtr->setTime(0);
+    B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
+    m_count++;
+    return;
   }
 
   std::vector<TH1*> hs;
@@ -126,7 +138,7 @@ void DQMHistAnalysisInputRootFileModule::event()
       TH1* h = (TH1*)dkey->ReadObj();
       if (h->InheritsFrom("TH2")) h->SetOption("col");
       else h->SetOption("hist");
-      Double_t scale = (m_count + 1.0) / m_events_list[m_run_idx];
+      Double_t scale = 1.0 * m_count / m_events_list[m_run_idx];
       h->Scale(scale);
       std::string hname = h->GetName();
 
@@ -189,7 +201,7 @@ void DQMHistAnalysisInputRootFileModule::event()
       if (!hpass) continue;
 
       hs.push_back(h);
-      Double_t scale = (m_count + 1.0) / m_events_list[m_run_idx];
+      Double_t scale = 1.0 * m_count / m_events_list[m_run_idx];
       h->Scale(scale);
       std::string name = h->GetName();
       name.replace(name.find("/"), 1, "/c_");
@@ -214,7 +226,6 @@ void DQMHistAnalysisInputRootFileModule::event()
     addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }
-  m_count++;
   m_eventMetaDataPtr.create();
 
   m_eventMetaDataPtr->setExperiment(m_expno);
@@ -223,6 +234,7 @@ void DQMHistAnalysisInputRootFileModule::event()
   m_eventMetaDataPtr->setTime(ts * 1e9);
   B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
 
+  m_count++;
 }
 
 void DQMHistAnalysisInputRootFileModule::endRun()

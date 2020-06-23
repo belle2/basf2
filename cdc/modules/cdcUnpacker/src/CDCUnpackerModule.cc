@@ -82,7 +82,7 @@ void CDCUnpackerModule::initialize()
   m_rawCDCs.isRequired(m_rawCDCName);
   m_CDCRawHitWaveForms.registerInDataStore(m_cdcRawHitWaveFormName);
   m_CDCRawHits.registerInDataStore(m_cdcRawHitName);
-  m_CDCHits.registerInDataStore(m_cdcRawHitName);
+  m_CDCHits.registerInDataStore(m_cdcHitName);
 
   // Relation.
   m_CDCHits.registerRelationTo(m_CDCRawHitWaveForms);

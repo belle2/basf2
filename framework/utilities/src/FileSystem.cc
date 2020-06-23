@@ -24,6 +24,7 @@
 #include <fcntl.h>
 
 #include <TMD5.h>
+#include <zlib.h>
 
 using namespace std;
 using namespace Belle2;
@@ -75,6 +76,32 @@ std::string FileSystem::calculateMD5(const std::string& filename)
   fs::path fullPath = fs::absolute(filename);
   std::unique_ptr<TMD5> md5(TMD5::FileChecksum(fullPath.c_str()));
   return md5->AsString();
+}
+
+std::string FileSystem::calculateAdler32(const std::string& filename)
+{
+  string chksum;
+  if (not isFile(filename)) return "";
+  fs::path fullPath = fs::absolute(filename);
+  FILE* fp = fopen(fullPath.c_str(), "rb");
+  if (fp) {
+    uLong i, sum = adler32(0, 0, 0);
+    char hexdigest[9];
+    Bytef* buf = (Bytef*) malloc(1024 * 1024 * sizeof(Bytef));
+    if (!buf) return "";
+    while ((i = fread((void*) buf, 1, sizeof(buf), fp)) > 0) {
+      sum = adler32(sum, buf, i);
+    }
+    fclose(fp);
+    free(buf);
+    // Adler32 checksums hex digests ARE zero padded although
+    // HLT legacy presentation may differ.
+    sprintf(hexdigest, "%08lx", sum);
+    chksum = hexdigest;
+  } else {
+    chksum = "";
+  }
+  return chksum;
 }
 
 std::string FileSystem::findFile(const string& path, const std::vector<std::string>& dirs, bool silent)

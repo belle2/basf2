@@ -69,8 +69,11 @@ namespace Belle2 {
     /** Check if filename points to an existing directory */
     static bool isDir(const std::string& filename);
 
-    /** calculate the MD5 checksum of a given file */
+    /** Calculate the MD5 checksum of a given file */
     static std::string calculateMD5(const std::string& filename);
+
+    /** Calculate the Adler-32 checksum of a given file */
+    static std::string calculateAdler32(const std::string& filename);
 
     /**
      * Load a shared library.

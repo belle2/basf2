@@ -44,34 +44,31 @@ Double_t  HardwareClockSettings::getClockFrequency(Const::EDetector detector, st
     return  m_acceleratorRF / 4. / m_prescaleMap.at(detector).at(label);
 
   if (m_clocksMap.find(detector) == m_clocksMap.end()) {
-    if (!isDetectorInPrescaleMap) B2ERROR("No clocks available for the given detector");
-    else  B2ERROR("Clock named " << label << " not available");
+    if (!isDetectorInPrescaleMap) B2ERROR("No clocks available for " << Const::parseDetectors(detector));
+    else  B2ERROR("Clock named " << label << " not available for " << Const::parseDetectors(detector));
   } else if (m_clocksMap.at(detector).find(label) != m_clocksMap.at(detector).end())
     return  m_clocksMap.at(detector).at(label);
-  else B2ERROR("Clock named " << label << " not available");
+  else B2ERROR("Clock named " << label << " not available for " << Const::parseDetectors(detector));
 
   return std::numeric_limits<float>::quiet_NaN();
 }
-
 
 Double_t  HardwareClockSettings::getGlobalClockFrequency() const
 {
   return  m_acceleratorRF / 4.;
 }
 
-
 Double_t  HardwareClockSettings::getAcceleratorRF() const
 {
   return  m_acceleratorRF;
 }
 
-
 Int_t HardwareClockSettings::getClockPrescale(Const::EDetector detector, std::string label) const
 {
-  if (m_prescaleMap.find(detector) == m_prescaleMap.end()) B2ERROR("No clocks available for the given detector");
+  if (m_prescaleMap.find(detector) == m_prescaleMap.end()) B2ERROR("No clocks available for " << Const::parseDetectors(detector));
   else if (m_prescaleMap.at(detector).find(label) != m_prescaleMap.at(detector).end())
     return m_prescaleMap.at(detector).at(label);
-  else B2ERROR("Clock named " << label << " not available");
+  else B2ERROR("Clock named " << label << " not available for " << Const::parseDetectors(detector));
 
   return std::numeric_limits<Int_t>::quiet_NaN();
 }
@@ -92,14 +89,14 @@ void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
   m_acceleratorRF = acceleratorRF;
 }
 
-void HardwareClockSettings::print()
+void HardwareClockSettings::print() const
 {
   std::cout << std::endl;
   std::cout << "Clock prescales:" << std::endl;
   std::cout << "===================================" << std::endl;
 
   for (const auto& det : m_prescaleMap) {
-    std::cout << det.first << std::endl;
+    std::cout << Const::parseDetectors(det.first) << ":" << std::endl;
     for (const auto& clock : det.second)  std::cout << " " << clock.first << " " << clock.second << std::endl;
   }
   std::cout << "===================================" << std::endl;
@@ -107,7 +104,7 @@ void HardwareClockSettings::print()
   std::cout << "Clock frequencies:" << std::endl;
   std::cout << "===================================" << std::endl;
   for (const auto& det : m_clocksMap) {
-    std::cout << det.first << std::endl;
+    std::cout << Const::parseDetectors(det.first) << ":" << std::endl;
     for (const auto& clock : det.second)  std::cout << " " << clock.first << " " << clock.second << std::endl;
   }
   std::cout << "===================================" << std::endl;

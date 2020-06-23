@@ -266,13 +266,14 @@ void DQMHistAnalysisPXDEffModule::event()
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
 
-      if (m_hEffAllLastTotal->GetBinContent(j) < m_minEntries) {
+      if (nhit < m_minEntries) {
         // update the first entries directly (short runs)
         m_hEffAllUpdate->SetTotalEvents(j, nhit);
         m_hEffAllUpdate->SetPassedEvents(j, nmatch);
         m_hEffAllLastTotal->SetBinContent(j, nhit);
         m_hEffAllLastPassed->SetBinContent(j, nmatch);
       } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
+        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
         m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
         m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
         m_hEffAllLastTotal->SetBinContent(j, nhit);
@@ -398,7 +399,7 @@ void DQMHistAnalysisPXDEffModule::event()
     } else scale_min = 0.0;
     m_cEffAllUpdate->Clear();
     m_cEffAllUpdate->cd(0);
-    m_hEffAllUpdate->Draw("AP");
+    gr->Draw("AP");
     auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is broken, please ignore");
     tt->SetTextAngle(90);// Rotated
     tt->SetTextAlign(12);// Centered

@@ -5,9 +5,6 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Gian Luca Pinna Angioni                                  *
  *                                                                        *
- * Database object containing the nominal RF value and                    *
- * the prescales to derive the clock frequencies of the sub-detectors.    *
- *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/dbobjects/HardwareClockSettings.h>
@@ -91,15 +88,11 @@ void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
 
 void HardwareClockSettings::print() const
 {
-  std::cout << std::endl;
-  std::cout << "Clock prescales:" << std::endl;
-  std::cout << "===================================" << std::endl;
-
+  B2INFO("Clock prescales:");
   for (const auto& det : m_prescaleMap) {
-    std::cout << Const::parseDetectors(det.first) << ":" << std::endl;
-    for (const auto& clock : det.second)  std::cout << " " << clock.first << " " << clock.second << std::endl;
+    LogVar("detector", Const::parseDetectors(det.first));
+    for (const auto& clock : det.second) LogVar("clock", clock.first);
   }
-  std::cout << "===================================" << std::endl;
 
   std::cout << "Clock frequencies:" << std::endl;
   std::cout << "===================================" << std::endl;

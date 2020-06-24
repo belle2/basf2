@@ -1063,6 +1063,7 @@ class HTCondor(Batch):
     """
     Backend for submitting calibration processes to a HTCondor batch system
     """
+    default_config_section = "HTCondor"
     submission_cmds = ["condor_submit"]
 
     def _make_submit_file(self, job, submit_file_name):
@@ -1073,15 +1074,20 @@ class HTCondor(Batch):
 
         files_to_transfer = [str(os.path.join(job.working_dir, i)) for i in os.listdir(job.working_dir)]
 
+        if 'universe' not in job.backend_args:
+            job.backend_args['universe'] = self.config[self.default_config_section]['universe']
+        if 'requirements' not in job.backend_args:
+            job.backend_args['requirements'] = self.config[self.default_config_section]['requirements']
+
         with open(submit_file_name, 'w') as submit_file:
             print(f'executable = {submit_file_name.replace(".sub", ".sh")}', file=submit_file)
             print(f'log = {os.path.join(job.output_dir, "htcondor.log")}', file=submit_file)
             print(f'output = {os.path.join(job.output_dir, "stdout")}', file=submit_file)
             print(f'error = {os.path.join(job.output_dir, "stderr")}', file=submit_file)
             print(f'transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
-            print('universe = vanilla', file=submit_file)
+            print(f'universe = {job.backend_args["universe"]}', file=submit_file)
+            print(f'requirements = {job.backend_args["requirements"]}', file=submit_file)
             print('getenv = true', file=submit_file)
-            print('requirements = (OpSysAndVer == "SL6" || OpSysAndVer == "CentOS7")', file=submit_file)
             print('should_transfer_files = Yes', file=submit_file)
             print('when_to_transfer_output = ON_EXIT', file=submit_file)
             print('queue', file=submit_file)

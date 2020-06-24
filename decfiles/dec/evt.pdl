@@ -177,6 +177,14 @@ add  p Particle  anti-Xss                      -30363  1.8000000e+00            
 * Light unflavored mesons
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
+* Mass range calculation:
+* if (Gamma > 150e-3) DeltaM = min(ceiling(Gamma * 3 / 100e-3) * 100e-3, 1000e-3)
+* elseif (Gamma > 100e-3) DeltaM = ceiling(Gamma * 4 / 100e-3) * 100e-3
+* elseif (Gamma > 50e-3) DeltaM = ceiling(Gamma * 4 / 50e-3) * 50e-3
+* elseif (Gamma > 10e-3) DeltaM = ceiling(Gamma * 5 / 20e-3) * 20e-3
+* elseif (Gamma > 1e-3) DeltaM = ceiling(Gamma * 6 / 5e-3) * 5e-3
+* elseif DeltaM = ceiling(Gamma * 6 / 1e-3) * 1e-3
+*---------------------------------------------------------------------------------------------------------------------------------------
 * pi
 add  p Particle  pi+                              211   139.57039e-3              0              0     3     0  7.8044971e+03        211
 add  p Particle  pi-                             -211   139.57039e-3              0              0    -3     0  7.8044971e+03       -211
@@ -184,50 +192,50 @@ add  p Particle  pi0                              111    134.9768e-3  7.7254924e
 * eta
 add  p Particle  eta                              221     547.862e-3        1.31e-6              0     0     0              0        221
 * f_0(500). PDG reports possible ranges for the mass and width, their central values are chosen here.
-add  p Particle  sigma_0                      9000221         475e-3         550e-3         478e-3     0     0              0          0
+add  p Particle  sigma_0                      9000221         475e-3         550e-3        1000e-3     0     0              0          0
 * rho(770)
-add  p Particle  rho+                             213      775.11e-3       149.1e-3         480e-3     3     2              0        213
-add  p Particle  rho-                            -213      775.11e-3       149.1e-3         480e-3    -3     2              0       -213
-add  p Particle  rho0                             113      775.26e-3       147.8e-3         480e-3     0     2              0        113
+add  p Particle  rho+                             213      775.11e-3       149.1e-3         600e-3     3     2              0        213
+add  p Particle  rho-                            -213      775.11e-3       149.1e-3         600e-3    -3     2              0       -213
+add  p Particle  rho0                             113      775.26e-3       147.8e-3         600e-3     0     2              0        113
 * omega(782)
-add  p Particle  omega                            223      782.65e-3        8.49e-3  1.8000000e-01     0     2              0        223
+add  p Particle  omega                            223      782.65e-3        8.49e-3          55e-3     0     2              0        223
 * eta'(958)
-add  p Particle  eta'                             331      957.78e-3       0.188e-3  2.0000000e-03     0     0              0        331
+add  p Particle  eta'                             331      957.78e-3       0.188e-3           2e-3     0     0              0        331
 * f_0(980). The width is given by PDG as "10 to 100 MeV". It is set to 70 MeV here, as in the original EvtGen evt.pdl.
-add  p Particle  f_0                          9010221         990e-3          70e-3  5.0000000e-03     0     0              0      10221
+add  p Particle  f_0                          9010221         990e-3          70e-3         300e-3     0     0              0      10221
 * a_0(980). The width is given by PDG as "50 to 100 MeV".
-add  p Particle  a_0+                         9000211         980e-3          75e-3  5.0000000e-02     3     0              0      10211
-add  p Particle  a_0-                        -9000211         980e-3          75e-3  5.0000000e-02    -3     0              0     -10211
-add  p Particle  a_00                         9000111         980e-3          75e-3  5.0000000e-02     0     0              0      10111
+add  p Particle  a_0+                         9000211         980e-3          75e-3         300e-3     3     0              0      10211
+add  p Particle  a_0-                        -9000211         980e-3          75e-3         300e-3    -3     0              0     -10211
+add  p Particle  a_00                         9000111         980e-3          75e-3         300e-3     0     0              0      10111
 * phi(1020)
-add  p Particle  phi                              333    1019.461e-3       4.249e-3  3.2000000e-02     0     2              0        333
+add  p Particle  phi                              333    1019.461e-3       4.249e-3          30e-3     0     2              0        333
 * h_1(1170)
-add  p Particle  h_1                            10223        1166e-3         375e-3  2.0000000e-01     0     2              0      10223
+add  p Particle  h_1                            10223        1166e-3         375e-3        1000e-3     0     2              0      10223
 * b_1(1235)
-add  p Particle  b_1+                           10213      1229.5e-3         142e-3  2.5000000e-01     3     2              0      10213
-add  p Particle  b_1-                          -10213      1229.5e-3         142e-3  2.5000000e-01    -3     2              0     -10213
-add  p Particle  b_10                           10113      1229.5e-3         142e-3  2.5000000e-01     0     2              0      10113
+add  p Particle  b_1+                           10213      1229.5e-3         142e-3         600e-3     3     2              0      10213
+add  p Particle  b_1-                          -10213      1229.5e-3         142e-3         600e-3    -3     2              0     -10213
+add  p Particle  b_10                           10113      1229.5e-3         142e-3         600e-3     0     2              0      10113
 * a_1(1260). The width is given by PDG as "250 to 600 MeV".
-add  p Particle  a_1+                           20213        1230e-3         425e-3  6.0000000e-01     3     2              0      20213
-add  p Particle  a_1-                          -20213        1230e-3         425e-3  6.0000000e-01    -3     2              0     -20213
-add  p Particle  a_10                           20113        1230e-3         425e-3  6.0000000e-01     0     2              0      20113
+add  p Particle  a_1+                           20213        1230e-3         425e-3        1000e-3     3     2              0      20213
+add  p Particle  a_1-                          -20213        1230e-3         425e-3        1000e-3    -3     2              0     -20213
+add  p Particle  a_10                           20113        1230e-3         425e-3        1000e-3     0     2              0      20113
 * f_2(1270)
-add  p Particle  f_2                              225      1275.5e-3       186.7e-3  2.7000000e-01     0     4              0        225
+add  p Particle  f_2                              225      1275.5e-3       186.7e-3         600e-3     0     4              0        225
 * f_1(1285)
-add  p Particle  f_1                            20223      1281.9e-3        22.7e-3  5.0000000e-02     0     2              0      20223
+add  p Particle  f_1                            20223      1281.9e-3        22.7e-3         120e-3     0     2              0      20223
 * eta(1295)
-add  p Particle  eta(2S)                       100221        1294e-3          55e-3  2.0000000e-01     0     0              0          0
+add  p Particle  eta(2S)                       100221        1294e-3          55e-3         250e-3     0     0              0          0
 * pi(1300). The width is given by PDG as "200 to 600 MeV".
-add  p Particle  pi(2S)+                       100211        1300e-3         400e-3  5.0000000e-01     3     0              0          0
-add  p Particle  pi(2S)-                      -100211        1300e-3         400e-3  5.0000000e-01    -3     0              0          0
-add  p Particle  pi(2S)0                       100111        1300e-3         400e-3  5.0000000e-01     0     0              0          0
+add  p Particle  pi(2S)+                       100211        1300e-3         400e-3        1000e-3     3     0              0          0
+add  p Particle  pi(2S)-                      -100211        1300e-3         400e-3        1000e-3    -3     0              0          0
+add  p Particle  pi(2S)0                       100111        1300e-3         400e-3        1000e-3     0     0              0          0
 * a_2(1320). The mass and width values in PDG are mode-dependent, the average width is not available.
 * The values from the 3 pi mode (the most precise one) are used here.
-add  p Particle  a_2+                             215      1318.6e-3         105e-3  5.0000000e-01     3     4              0        215
-add  p Particle  a_2-                            -215      1318.6e-3         105e-3  5.0000000e-01    -3     4              0       -215
-add  p Particle  a_20                             115      1318.6e-3         105e-3  5.0000000e-01     0     4              0        115
+add  p Particle  a_2+                             215      1318.6e-3         105e-3         500e-3     3     4              0        215
+add  p Particle  a_2-                            -215      1318.6e-3         105e-3         500e-3    -3     4              0       -215
+add  p Particle  a_20                             115      1318.6e-3         105e-3         500e-3     0     4              0        115
 * f_0(1370). The mass and width are given by PDG as "1200 to 1500 MeV" and "200 to 500 MeV", respectively.
-add  p Particle  f'_0                           30221        1350e-3         350e-3  3.5000000e-01     0     0              0      10331
+add  p Particle  f'_0                           30221        1350e-3         350e-3        1000e-3     0     0              0      10331
 * pi_1(1400)
 add  p Particle  pi(1)(1400)+                 9000213        1354e-3         330e-3        1000e-3     3     2              0          0
 add  p Particle  pi(1)(1400)-                -9000213        1354e-3         330e-3        1000e-3    -3     2              0          0
@@ -235,25 +243,25 @@ add  p Particle  pi(1)(1400)0                 9000113        1354e-3         330
 * eta(1405)
 add  p Particle  eta(1405)                    9020221      1408.8e-3        50.1e-3         250e-3     0     0              0          0
 * h_1(1415)
-add  p Particle  h'_1                           10333        1414e-3          90e-3  3.0000000e-01     0     2              0      10333
+add  p Particle  h'_1                           10333        1414e-3          90e-3         400e-3     0     2              0      10333
 * f_1(1420)
-add  p Particle  f'_1                           20333      1426.3e-3        54.5e-3  1.0000000e-01     0     2              0      20333
+add  p Particle  f'_1                           20333      1426.3e-3        54.5e-3         250e-3     0     2              0      20333
 * omega(1420). PDG reports possible ranges for the mass and width, their central values are chosen here.
-add  p Particle  omega(2S)                     100223        1410e-3         290e-3  4.0000000e-01     0     2              0          0
+add  p Particle  omega(2S)                     100223        1410e-3         290e-3         900e-3     0     2              0          0
 * a_0(1450)
 add  p Particle  a(0)(1450)+                    10211        1474e-3         265e-3         800e-3     3     0              0          0
 add  p Particle  a(0)(1450)-                   -10211        1474e-3         265e-3         800e-3    -3     0              0          0
 add  p Particle  a(0)(1450)0                    10111        1474e-3         265e-3         800e-3     0     0              0          0
 * rho(1450)
-add  p Particle  rho(2S)+                      100213        1465e-3         400e-3  5.0000000e-01     3     2              0          0
-add  p Particle  rho(2S)-                     -100213        1465e-3         400e-3  5.0000000e-01    -3     2              0          0
-add  p Particle  rho(2S)0                      100113        1465e-3         400e-3  5.0000000e-01     0     2              0          0
+add  p Particle  rho(2S)+                      100213        1465e-3         400e-3        1000e-3     3     2              0          0
+add  p Particle  rho(2S)-                     -100213        1465e-3         400e-3        1000e-3    -3     2              0          0
+add  p Particle  rho(2S)0                      100113        1465e-3         400e-3        1000e-3     0     2              0          0
 * eta(1475)
 add  p Particle  eta(1475)                     100331        1475e-3          90e-3         400e-3     0     0              0          0
 * f_0(1500)
-add  p Particle  f_0(1500)                    9030221        1506e-3         112e-3  3.0000000e-01     0     0              0          0
+add  p Particle  f_0(1500)                    9030221        1506e-3         112e-3         500e-3     0     0              0          0
 * f'_2(1525)
-add  p Particle  f'_2                             335      1517.4e-3          86e-3  2.0000000e-01     0     4              0        335
+add  p Particle  f'_2                             335      1517.4e-3          86e-3         350e-3     0     4              0        335
 * pi_1(1600)
 add  p Particle  pi(1)(1600)+                 9010213        1660e-3         257e-3         800e-3     3     2              0          0
 add  p Particle  pi(1)(1600)-                -9010213        1660e-3         257e-3         800e-3    -3     2              0          0
@@ -271,13 +279,13 @@ add  p Particle  pi(2)(1670)0                   10115      1670.6e-3         258
 * phi(1680)
 add  p Particle  phi(1680)                     100333        1680e-3         150e-3         600e-3     0     2              0          0
 * rho_3(1690). The width is mode-dependent, "2 pi, 2 K and K K pi" width is used.
-add  p Particle  rho(3)(1690)+                    217      1688.8e-3         161e-3         600e-3     3     6              0          0
-add  p Particle  rho(3)(1690)-                   -217      1688.8e-3         161e-3         600e-3    -3     6              0          0
-add  p Particle  rho(3)(1690)0                    117      1688.8e-3         161e-3         600e-3     0     6              0          0
+add  p Particle  rho(3)(1690)+                    217      1688.8e-3         161e-3         500e-3     3     6              0          0
+add  p Particle  rho(3)(1690)-                   -217      1688.8e-3         161e-3         500e-3    -3     6              0          0
+add  p Particle  rho(3)(1690)0                    117      1688.8e-3         161e-3         500e-3     0     6              0          0
 * rho(1700)
-add  p Particle  rho(3S)+                       30213        1720e-3         250e-3  5.0000000e-01     3     2              0          0
-add  p Particle  rho(3S)-                      -30213        1720e-3         250e-3  5.0000000e-01    -3     2              0          0
-add  p Particle  rho(3S)0                       30113        1720e-3         250e-3  5.0000000e-01     0     2              0          0
+add  p Particle  rho(3S)+                       30213        1720e-3         250e-3         800e-3     3     2              0          0
+add  p Particle  rho(3S)-                      -30213        1720e-3         250e-3         800e-3    -3     2              0          0
+add  p Particle  rho(3S)0                       30113        1720e-3         250e-3         800e-3     0     2              0          0
 * f_0(1710)
 add  p Particle  f(0)(1710)                     10331        1704e-3         123e-3         500e-3     0     0              0          0
 * pi(1800)
@@ -285,7 +293,7 @@ add  p Particle  pi(1800)+                    9010211        1810e-3         215
 add  p Particle  pi(1800)-                   -9010211        1810e-3         215e-3         700e-3    -3     0              0          0
 add  p Particle  pi(1800)0                    9010111        1810e-3         215e-3         700e-3     0     0              0          0
 * phi_3(1850)
-add  p Particle  phi(3)(1850)                     337        1854e-3          87e-3         400e-3     0     6              0          0
+add  p Particle  phi(3)(1850)                     337        1854e-3          87e-3         350e-3     0     6              0          0
 * f_2(1950)
 add  p Particle  f(2)(1950)                   9050225        1936e-3         464e-3        1000e-3     0     4              0          0
 * a_4(1970) (was a_4(2040))

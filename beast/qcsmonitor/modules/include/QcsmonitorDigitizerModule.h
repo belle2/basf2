@@ -73,7 +73,7 @@ namespace Belle2 {
 
 
     private:
-      StoreArray<QcsmonitorHit> m_qcsmonitorHit; /** Array for QcsmonitorHit */
+      StoreArray<QcsmonitorHit> m_qcsmonitorHit; /**< Array for QcsmonitorHit */
 
       /** reads data from QCSMONITOR.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

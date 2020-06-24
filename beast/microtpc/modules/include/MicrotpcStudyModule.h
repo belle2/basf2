@@ -100,7 +100,7 @@ namespace Belle2 {
       TH1F* h_tpc_rate[20];
       /** Neutron kin energy dis */
       TH2F* h_mctpc_kinetic[20];
-      /* Neutron kin energy dis */
+      /** Neutron kin energy dis */
       TH2F* h_mctpc_kinetic_zoom[20];
       /** theta v phi dis */
       TH2F* h_mctpc_tvp[20];

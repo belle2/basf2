@@ -75,7 +75,7 @@ namespace Belle2 {
 
     private:
 
-      StoreArray<ClawHit> m_clawHit; /** array for ClawHit */
+      StoreArray<ClawHit> m_clawHit; /**< array for ClawHit */
 
       /** reads data from CLAW.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

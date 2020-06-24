@@ -68,7 +68,7 @@ namespace Belle2 {
 
 
     private:
-      StoreArray<CsiHit_v2> m_csiHit_v2; /** array for CsiHit_v2 */
+      StoreArray<CsiHit_v2> m_csiHit_v2; /**< array for CsiHit_v2 */
 
       /** reads data from CSI.xml: threshold in MeV, range in MeV, and resolution in % */
       virtual void getXMLData();

@@ -73,7 +73,7 @@ namespace Belle2 {
 
     private:
 
-      StoreArray<MicrotpcHit> m_microtpcHit; /** Array for MicrotpcHit */
+      StoreArray<MicrotpcHit> m_microtpcHit; /**< Array for MicrotpcHit */
 
       /** reads data from MICROTPC.xml: tube location, drift data filename, sigma of impulse response function */
       void getXMLData();

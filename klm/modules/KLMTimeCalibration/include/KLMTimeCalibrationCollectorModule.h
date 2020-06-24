@@ -17,6 +17,7 @@
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 
 /* Belle 2 headers */
 #include <calibration/CalibrationCollectorModule.h>
@@ -63,7 +64,7 @@ namespace Belle2 {
     void collectScintEnd(RelationVector<EKLMHit2d>);
 
     /** Match KLM hit and extHit */
-    std::pair<ExtHit*, ExtHit*> matchExt(uint16_t channelID);
+    std::pair<ExtHit*, ExtHit*> matchExt(uint16_t channelID, std::vector<ExtHit*>);
 
     /** Save position difference betwen matched kLMHit and ExtHit. */
     void storeDistDiff(TVector3 pDiff);
@@ -77,8 +78,11 @@ namespace Belle2 {
     /** Input partilce list name */
     std::string m_inputListName;
 
-    /** map for handle the extHit, key is the channel id. */
-    std::multimap<int, ExtHit*> m_mapExtHits;
+    /** vector for handle the extHit in BKLM range. */
+    std::vector<ExtHit*> m_vExtHitsB;
+
+    /** vector for handle the extHit in EKLM range. */
+    std::vector<ExtHit*> m_vExtHitsE;
 
     /** Global tracks */
     StoreArray<Track> m_tracks;
@@ -100,6 +104,12 @@ namespace Belle2 {
 
     /** KLM element numbers pointer */
     const KLMElementNumbers* m_elementNum;
+
+    /** EKLM element numbers. */
+    const EKLMElementNumbers* m_eklmElementNumbers;
+
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_channelStatus;
 
     /**
      * Monitor histograms

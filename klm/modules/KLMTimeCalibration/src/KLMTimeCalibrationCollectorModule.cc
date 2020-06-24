@@ -79,17 +79,17 @@ void KLMTimeCalibrationCollectorModule::prepare()
   setDescription("Preparation for BKLM TimeCalibration Collector Module.");
 
   /* Initialize geometry. */
-  B2INFO("prepare :: Initialize geometry..");
+  //B2INFO("prepare :: Initialize geometry..");
   m_geoParB = bklm::GeometryPar::instance();
   m_geoParE = &(EKLM::GeometryData::Instance());
   m_TransformData = new EKLM::TransformData(true, EKLM::TransformData::c_None);
 
   /* Require input dataobjects. */
-  B2INFO("prepare :: Require input dataobjects..");
+  //B2INFO("prepare :: Require input dataobjects..");
   if (m_useEvtT0) m_eventT0.isRequired("EventT0");
   m_tracks.isRequired();
 
-  B2INFO("prepare :: Initialize outTree..");
+  //B2INFO("prepare :: Initialize outTree..");
   m_outTree = new TTree("time_calibration_data", "");
   m_outTree->Branch("t0",        &m_ev.t0,        "t0/D");
   m_outTree->Branch("flyTime",   &m_ev.flyTime,   "flyTime/D");
@@ -173,13 +173,13 @@ void KLMTimeCalibrationCollectorModule::collect()
     return;
   }  // track existence
 
-  B2INFO("debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
+  B2DEBUG(30, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
 
   getObjectPtr<TH1D>("m_HevtT0_1")->Fill(m_ev.t0);
   getObjectPtr<TH1I>("m_HnTrack")->Fill(n_track);
 
   /* Here begins the ext track sequence */
-  B2INFO("Collect :: Track loop begins.");
+  B2DEBUG(20, "Collect :: Track loop begins.");
 
   /* Main loop */
   for (unsigned iT = 0; iT < n_track; ++iT) {
@@ -195,60 +195,76 @@ void KLMTimeCalibrationCollectorModule::collect()
     getObjectPtr<TH1I>("m_HnBHit2d")->Fill(int(bklmHit2ds.size()));
     getObjectPtr<TH1I>("m_HnEHit2d")->Fill(int(eklmHit2ds.size()));
 
-    B2INFO("Track" << LogVar("exthits", extHits.size())
-           << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
+    B2DEBUG(30, "Track" << LogVar("exthits", extHits.size())
+            << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
     if (eklmHit2ds.size() < 2 && bklmHit2ds.size() < 2) continue;
-    if (extHits.size() < 2) continue;
 
     // Loop for extroplate hits
-    m_mapExtHits.clear();
-    B2INFO("Collect :: extHits loop begins.");
+    m_vExtHitsB.clear();
+    m_vExtHitsE.clear();
+    B2DEBUG(20, "Collect :: extHits loop begins.");
     for (unsigned iE = 0; iE < extHits.size(); ++iE) {
       ExtHit* extHit = extHits[iE];
+      if (extHit->getStatus() == EXT_ENTER) continue;
       // Select extHits in the KLM range
       bool bklmCover = (extHit->getDetectorID() == Const::EDetector::BKLM);
       bool eklmCover = (extHit->getDetectorID() == Const::EDetector::EKLM);
       if (!bklmCover && !eklmCover) continue;
 
       int copyId = extHit->getCopyID();
-      int tSub, tFor, tSec, tLay, tPla, tStr;
+      int tFor, tSec, tLay, tPla, tStr;
+      int tSub = -1;
 
-      B2INFO("Collect :: Assign elementNum based on copyId for extHits.");
+      if (eklmCover) {
+        tSub = KLMElementNumbers::c_EKLM;
+        EKLMElementNumbers::Instance().stripNumberToElementNumbers(copyId, &tFor, &tLay, &tSec, &tPla, &tStr);
+      }
+      if (bklmCover) {
+        tSub = KLMElementNumbers::c_BKLM;
+        BKLMElementNumbers::channelNumberToElementNumbers(copyId, &tFor, &tSec, &tLay, &tPla, &tStr);
+      }
+      if (tSub < 0) continue;
+      B2DEBUG(30, "Collect :: Assign elementNum based on copyId for extHits." << LogVar("Sub from elementNumber",
+              tSub) << LogVar("bklmCover",
+                              bklmCover) << LogVar("eklmCover", eklmCover));
 
-      //m_elementNum->moduleNumberToElementNumbers(copyId, &tSub, &tFor, &tSec, &tLay);
-      m_elementNum->channelNumberToElementNumbers(copyId, &tSub, &tFor, &tSec, &tLay, &tPla, &tStr);
-      B2INFO("Collect :: Assign elementNum based on copyId for extHits." << LogVar("Sub from elementNumber", tSub) << LogVar("bklmCover",
-             bklmCover) << LogVar("eklmCover", eklmCover));
+      int tChannel = m_elementNum->channelNumber(tSub, tFor, tSec, tLay, tPla, tStr);
+      if (m_channelStatus->getChannelStatus(tChannel) != KLMChannelStatus::c_Normal) continue;
 
       bool crossed = false; // should be only once ?
       KLMMuidLikelihood* muidLikelihood = track->getRelatedTo<KLMMuidLikelihood>();
-      if (tSub == KLMElementNumbers::c_BKLM && bklmCover) {
-        B2INFO("Collect :: muidLikelihood isExtrapolatedBarrelLayerCrossed for BKLM" << LogVar("Layer", tLay));
+      if (bklmCover) {
         crossed = muidLikelihood->isExtrapolatedBarrelLayerCrossed(tLay - 1);
+        if (crossed) {
+          m_vExtHitsB.push_back(extHit);
+        }
       }
-      if (tSub == KLMElementNumbers::c_EKLM && eklmCover) {
-        B2INFO("Collect :: muidLikelihood isExtrapolatedBarrelLayerCrossed for EKLM" << LogVar("Layer", tLay));
+      if (eklmCover) {
         crossed = muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay - 1);
+        if (crossed) {
+          m_vExtHitsE.push_back(extHit);
+        }
       }
-      B2INFO("Collect :: muidLikelihood isExtrapolatedBarrelLayerCrossed" << LogVar("crossed", crossed));
-      if (crossed)
-        m_mapExtHits.insert(std::pair<int, ExtHit*>(copyId, extHit));
     }
 
-    B2INFO("In KLM coverage: " << LogVar("exthits", m_mapExtHits.size())
-           << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("EKLMHit2d", eklmHit2ds.size()));
-    if (m_mapExtHits.size() < 2) continue;
-    B2INFO("Collect :: Map of extHits creation done.");
+    B2DEBUG(30, "In BKLM coverage: " << LogVar("exthits in BKLM", m_vExtHitsB.size())
+            << LogVar("BKLMHit2d", bklmHit2ds.size()) << LogVar("exthits in EKLM", m_vExtHitsE.size()) << LogVar("EKLMHit2d",
+                eklmHit2ds.size()));
+    B2DEBUG(20, "Collect :: Map of extHits creation done.");
 
-    collectRPC(bklmHit2ds);
-    collectScint(bklmHit2ds);
-    collectScintEnd(eklmHit2ds);
+    if (m_vExtHitsB.size() > 0) {
+      collectRPC(bklmHit2ds);
+      collectScint(bklmHit2ds);
+    }
+    if (m_vExtHitsE.size() > 0) {
+      collectScintEnd(eklmHit2ds);
+    }
   }
 }
 
 void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d> hit2ds)
 {
-  setDescription("Time Calibration Collector. Collect Function for EKLM parts of Collector Module Begins.");
+  setDescription("KLM time calibration collector. Used for collecting avaiable hits in EKLM range.");
 
   const HepGeom::Transform3D* tr;
   HepGeom::Point3D<double> hitGlobal_extHit, hitLocal_extHit;
@@ -269,8 +285,9 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
       unsigned int localID = digitHit->getUniqueChannelID();
       m_ev.channelId = m_elementNum->channelNumberEKLM(localID);
       m_ev.inRPC = 0;
+      if (m_channelStatus->getChannelStatus(m_ev.channelId) != KLMChannelStatus::c_Normal) continue;
 
-      std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(m_ev.channelId);
+      std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(m_ev.channelId, m_vExtHitsE);
       ExtHit* entryHit = pair_extHits.first;
       ExtHit* exitHit = pair_extHits.second;
       if (entryHit == nullptr || exitHit == nullptr) continue;
@@ -303,6 +320,7 @@ void KLMTimeCalibrationCollectorModule::collectScintEnd(RelationVector<EKLMHit2d
 
 void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> bklmHit2ds)
 {
+  setDescription("KLM time calibration collector. Used for collecting avaiable hits in BKLM_SCINT range.");
   double stripWidtm_HZ, stripWidtm_HPhi;
   for (unsigned iH2 = 0; iH2 < bklmHit2ds.size(); ++iH2) {
     BKLMHit2d* hit2d = bklmHit2ds[iH2];
@@ -329,7 +347,9 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
         uint16_t channelId_digit = m_elementNum->channelNumberBKLM(
                                      digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
                                      digitHit->isPhiReadout(), digitHit->getStrip());
-        std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(channelId_digit);
+        if (m_channelStatus->getChannelStatus(channelId_digit) != KLMChannelStatus::c_Normal) continue;
+
+        std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(channelId_digit, m_vExtHitsB);
         ExtHit* entryHit = pair_extHits.first;
         ExtHit* exitHit = pair_extHits.second;
         if (entryHit == nullptr || exitHit == nullptr) continue;
@@ -339,7 +359,7 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
 
         TVector3 positionGlobal_extHit = 0.5 * (entryHit->getPosition() + exitHit->getPosition());
         TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-        B2DEBUG(29, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+        B2DEBUG(39, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
 
         storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
@@ -368,7 +388,8 @@ void KLMTimeCalibrationCollectorModule::collectScint(RelationVector<BKLMHit2d> b
 
 void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bklmHit2ds)
 {
-  //int iSub, iFor, iSec, iLay, iPla, iStr;
+  setDescription("KLM time calibration collector. Used for collecting avaiable hits in BKLM_RPC range.");
+
   for (unsigned iH2 = 0; iH2 < bklmHit2ds.size(); ++iH2) {
     B2DEBUG(20, "BKLMHit2d related Track loop begins");
 
@@ -395,15 +416,9 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bkl
         uint16_t channelId_digit = m_elementNum->channelNumberBKLM(
                                      digitHit->getSection(), digitHit->getSector(), digitHit->getLayer(),
                                      digitHit->isPhiReadout(), digitHit->getStrip());
+        if (m_channelStatus->getChannelStatus(channelId_digit) != KLMChannelStatus::c_Normal) continue;
 
-        /*
-        B2DEBUG(20, "BKLM element numbers check. RPC Part.\n" <<
-                "ExtHit Forward :: Digit Forward   " << iFor   << "  " << digitHit->getSection()   << std::endl <<
-                "ExtHit Sector  :: Digit Sector    " << iSec   << "  " << digitHit->getSector()    << std::endl <<
-                "ExtHit Layer   :: Digit Layer     " << iLay   << "  " << digitHit->getLayer());
-        */
-
-        std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(channelId_digit);
+        std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(channelId_digit, m_vExtHitsB);
         ExtHit* entryHit = pair_extHits.first;
         ExtHit* exitHit = pair_extHits.second;
         if (entryHit == nullptr || exitHit == nullptr) continue;
@@ -411,7 +426,7 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bkl
         m_ev.flyTime = 0.5 * (entryHit->getTOF() + exitHit->getTOF());
         TVector3 positionGlobal_extHit = 0.5 * (entryHit->getPosition() + exitHit->getPosition());
         TVector3 positionGlobal_diff = positionGlobal_extHit - positionGlobal_hit2d;
-        B2DEBUG(29, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
+        B2DEBUG(39, LogVar("Distance between digit and hit2d", positionGlobal_diff.Mag()));
 
         storeDistDiff(positionGlobal_diff);
         const CLHEP::Hep3Vector positionLocal_extHit = corMod->globalToLocal(CLHEP::Hep3Vector(
@@ -438,24 +453,34 @@ void KLMTimeCalibrationCollectorModule::collectRPC(RelationVector<BKLMHit2d> bkl
   }
 }
 
-std::pair<ExtHit*, ExtHit*> KLMTimeCalibrationCollectorModule::matchExt(uint16_t kID)
+std::pair<ExtHit*, ExtHit*> KLMTimeCalibrationCollectorModule::matchExt(uint16_t kID, std::vector<ExtHit*> v_ExtHits)
 {
   setDescription("KLM time calibration collector. Used for KLM hit and ExtHit matching.");
 
   int iSub, iFor, iSec, iLay, iPla, iStr;
   int iSubK, iForK, iSecK, iLayK, iPlaK, iStrK;
-
+  iSub = -1;
   m_elementNum->channelNumberToElementNumbers(kID, &iSubK, &iForK, &iSecK, &iLayK, &iPlaK, &iStrK);
 
-  std::multimap<int, ExtHit*>::iterator it;
+  std::vector<ExtHit*>::iterator it;
   ExtHit* extHit = nullptr;
   ExtHit* entryHit = nullptr;
   ExtHit* exitHit = nullptr;
 
-  for (it = m_mapExtHits.begin(); it != m_mapExtHits.end(); ++it) {
-    extHit = it->second;
+  for (it = v_ExtHits.begin(); it != v_ExtHits.end(); ++it) {
+    extHit = *it;
     int copyid = extHit->getCopyID();
-    m_elementNum->channelNumberToElementNumbers(copyid, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
+    bool bklmCover = (extHit->getDetectorID() == Const::EDetector::BKLM);
+    bool eklmCover = (extHit->getDetectorID() == Const::EDetector::EKLM);
+
+    if (eklmCover) {
+      iSub = KLMElementNumbers::c_EKLM;
+      EKLMElementNumbers::Instance().stripNumberToElementNumbers(copyid, &iFor, &iLay, &iSec, &iPla, &iStr);
+    }
+    if (bklmCover) {
+      iSub = KLMElementNumbers::c_BKLM;
+      BKLMElementNumbers::channelNumberToElementNumbers(copyid, &iFor, &iSec, &iLay, &iPla, &iStr);
+    }
 
     if (iSub != iSubK) continue;
     if (iFor != iForK) continue;
@@ -467,7 +492,8 @@ std::pair<ExtHit*, ExtHit*> KLMTimeCalibrationCollectorModule::matchExt(uint16_t
     }
 
     switch (extHit->getStatus()) {
-      case EXT_ENTER:
+      //case EXT_ENTER:
+      case !EXT_EXIT:
         if (entryHit == nullptr) {
           entryHit = extHit;
         } else if (extHit->getTOF() < entryHit->getTOF()) {

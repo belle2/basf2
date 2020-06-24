@@ -29,7 +29,7 @@ CHANGES since release-01-02-11:
 - SoftwareTriggerResult:
   * non-prescaled results added
 - Particle masses:
-  * The particle masses have been updated to PDG 2019. As a result, the
+  * The particle masses have been updated to PDG 2020. As a result, the
     energies corresponding to the measured momenta became slightly different.
 """
 

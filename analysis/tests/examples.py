@@ -7,7 +7,7 @@ import subprocess
 import unittest
 import glob
 from basf2 import find_file
-from b2test_utils import clean_working_directory
+from b2test_utils import clean_working_directory, skip_test_if_light
 
 
 class ExamplesTest(unittest.TestCase):
@@ -42,6 +42,8 @@ class ExamplesTest(unittest.TestCase):
         """
         Test supported calibration examples.
         """
+        skip_test_if_light(self)  # calibration dataobjects not supported in light releases
+
         # list of the broken examples (to be removed when they are individually fixed)
         broken_cal_egs = ['B2CAL901-cDSTECLTRG.py'  # BII-4276
                           ]
@@ -75,10 +77,19 @@ class ExamplesTest(unittest.TestCase):
 
         self._test_examples_dir('analysis/examples/mva/', broken_mva_egs)
 
+    def test_reconstruction_examples(self):
+        """
+        Test supported reconstruction examples.
+        """
+
+        self._test_examples_dir('analysis/examples/reconstruction/')
+
     def test_simulation_examples(self):
         """
         Test supported simulation examples.
         """
+        skip_test_if_light(self)  # simulation doesn't work in light releaes
+
         # list of the broken examples (to be removed when they are individually fixed)
         broken_sim_egs = ['B2A104-SimulateAndReconstruct-withBeamBkg.py'
                           ]
@@ -89,12 +100,8 @@ class ExamplesTest(unittest.TestCase):
         """
         Test supported tagging examples.
         """
-        # list of the broken examples (to be removed when they are individually fixed)
-        broken_tag_egs = ['BtagBsigReconstruction.py',  # BII-4281
-                          'KlongDecayReconstructionExample.py'  # BII-4281
-                          ]
 
-        self._test_examples_dir('analysis/examples/tagging/', broken_tag_egs)
+        self._test_examples_dir('analysis/examples/tagging/')
 
     def test_variablemanager_examples(self):
         """
@@ -102,6 +109,13 @@ class ExamplesTest(unittest.TestCase):
         """
 
         self._test_examples_dir('analysis/examples/VariableManager/')
+
+    def test_postmdstidentification_examples(self):
+        """
+        Test supported PostMdstIdentification examples.
+        """
+
+        self._test_examples_dir('analysis/examples/PostMdstIdentification/')
 
 
 if __name__ == '__main__':

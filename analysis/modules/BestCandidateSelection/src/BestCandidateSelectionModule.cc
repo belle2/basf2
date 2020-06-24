@@ -31,7 +31,12 @@ BestCandidateSelectionModule::BestCandidateSelectionModule():
 {
   //the "undefined order" bit is not strictly true in the current implementation, but details (with anti-particle lists) are tricky
   setDescription(R"DOC(Sort particles by the value of a given ``variable``
-in the input list and optionally remove particles after the nth position
+in the input list and optionally remove particles after the nth position.
+
+Per default particles are sorted in descending order but it can be switched to
+an ascending order by setting ``selectLowest=True``. The convenience functions
+`modularAnalysis.rankByHighest` and `modularAnalysis.rankByLowest` set this
+parameter automatically based on their names.
 
 Particles will receive an extra-info field containing their rank as an integer
 starting at 1 (best). The name of this extra-info field defaults to
@@ -39,7 +44,7 @@ starting at 1 (best). The name of this extra-info field defaults to
 parameter.
 
 The ranking also takes antiparticles into account, so there will only be one
-B+- candidate with ``rank=1``.  The remaining list is sorted from best to worst
+B+- candidate with ``rank=1``. The remaining list is sorted from best to worst
 candidate (each charge, e.g. B+/B-, separately). The sorting is guaranteed
 to be stable between particle and anti particle list: particles with the same
 value for ``variable`` will keep their relative order. That is, a particle "A"

@@ -145,6 +145,9 @@ namespace Belle2 {
 
         std::vector<int> idSeq;
         fillUniqueIdentifier(particle, idSeq);
+        // the unique identifier sequence is sorted so that different orders of
+        // daughter particles are registered as duplicates
+        sort(idSeq.begin(), idSeq.end());
         m_particlesInTheList.push_back(idSeq);
       }
     }
@@ -187,6 +190,10 @@ namespace Belle2 {
 
       std::vector<int> idSeq;
       fillUniqueIdentifier(part, idSeq);
+      // before checking whether the sequence is already present it is sorted so
+      // that a different order of daughter particles is registered as a
+      // duplicated candidate
+      sort(idSeq.begin(), idSeq.end());
       bool uniqueSeq = isUnique(idSeq);
 
       if (uniqueSeq) {

@@ -126,7 +126,7 @@ namespace Belle2 {
     int numberOfCandidates = 0;
     while (m_generator->loadNext()) {
 
-      Particle&& particle = m_generator->getCurrentParticle();
+      Particle particle = m_generator->getCurrentParticle();
 
       TLorentzVector missDaughters;
       Particle* kparticle = nullptr;
@@ -224,7 +224,7 @@ namespace Belle2 {
         break;
       }
 
-      koutputList->addParticle(kparticle->getArrayIndex(), kparticle->getPDGCode(), kparticle->getFlavorType());
+      koutputList->addParticle(kparticle);
       kparticle->addExtraInfo("permID", idx);
 
     } //while

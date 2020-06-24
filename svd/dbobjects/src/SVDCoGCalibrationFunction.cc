@@ -1,10 +1,10 @@
 #include<svd/dbobjects/SVDCoGCalibrationFunction.h>
-#include<framework/logging/Logger.h>
 
 using namespace Belle2;
 
-std::vector <SVDCoGCalibrationFunction::cogFunction>
-SVDCoGCalibrationFunction::m_implementations;
+std::vector <SVDCoGCalibrationFunction::cogFunction> SVDCoGCalibrationFunction::m_implementations;
+
+std::vector <SVDCoGCalibrationFunction::cogFunctionErr> SVDCoGCalibrationFunction::m_implementationsErr;
 
 SVDCoGCalibrationFunction::SVDCoGCalibrationFunction(const SVDCoGCalibrationFunction& a): TObject(a)
 {

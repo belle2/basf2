@@ -10,16 +10,11 @@
 #define TXMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
 #include <daq/dataflow/EvtSocket.h>
 
-#include <boost/shared_ptr.hpp>
 #include <string>
-#include <vector>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/pcore/DataStoreStreamer.h>
-
 
 namespace Belle2 {
 

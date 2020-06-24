@@ -71,7 +71,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
                      target='qrCombined', overwrite=False,
                      transform_to_probability=False, signal_fraction=-1.0, classifier_args=None,
                      train_valid_fraction=.92, mva_steering_file='analysis/scripts/dft/tensorflow_dnn_interface.py',
-                     additional_roe_filter=None,
+                     maskName='',
                      path=None):
     """
     Interfacing for the DeepFlavorTagger. This function can be used for training (``teacher``), preparation of
@@ -107,7 +107,7 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
      tensorboard_dir: addition directory for logging the training process
     :param train_valid_fraction: float, train-valid fraction (.92). If transform to probability is
      enabled, train valid fraction will be splitted to a test set (.5)
-    :param additional_roe_filter: string, additional cut string applied for the particle lists in the RoE
+    :param maskName: get ROE particles from a specified ROE mask
     :param path: basf2 path obj
     :return: None
     """
@@ -155,12 +155,8 @@ def DeepFlavorTagger(particle_lists, mode='expert', working_dir='', uniqueIdenti
 
     dft_particle_lists = ['pi+:pos_charged', 'pi+:neg_charged']
 
-    pos_cut = 'charge > 0 and isInRestOfEvent == 1 and p < infinity'
-    neg_cut = 'charge < 0 and isInRestOfEvent == 1 and p < infinity'
-
-    if additional_roe_filter:
-        pos_cut = pos_cut + ' and ' + additional_roe_filter
-        neg_cut = neg_cut + ' and ' + additional_roe_filter
+    pos_cut = 'charge > 0 and isInRestOfEvent == 1 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
+    neg_cut = 'charge < 0 and isInRestOfEvent == 1 and passesROEMask(' + maskName + ') > 0.5 and p < infinity'
 
     ma.cutAndCopyList(dft_particle_lists[0], roe_particle_list, pos_cut, writeOut=True, path=roe_path)
     ma.cutAndCopyList(dft_particle_lists[1], roe_particle_list, neg_cut, writeOut=True, path=roe_path)

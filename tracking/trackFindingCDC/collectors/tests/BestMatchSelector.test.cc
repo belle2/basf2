@@ -21,7 +21,7 @@ namespace {
   /// Test for the BestMatchSelector
   TEST(TrackFindingCDCTest, best_match_selector)
   {
-    BestMatchSelector<int, double> selector;
+    BestMatchSelector<int, double, WeightedRelation> selector;
 
     int a = 1, b = 2;
     double c = 3, d = 4, e = 5;

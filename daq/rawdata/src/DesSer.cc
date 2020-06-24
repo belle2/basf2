@@ -7,7 +7,14 @@
 //-
 #include <daq/rawdata/DesSer.h>
 
+#include <netdb.h>
+#include <netinet/tcp.h>
+
+#include <sys/mman.h>
+#include <sys/socket.h>
 #include <sys/uio.h>
+
+#include <csignal>
 
 //#define DEBUG
 using namespace std;

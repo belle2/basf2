@@ -12,6 +12,11 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-05
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-05-00.txt
+
 Changes since release-04
 ========================
 
@@ -20,9 +25,18 @@ Changes since release-04
 
 .. .. rubric:: Some important feature
 
+.. rubric:: Neutral hadrons from ECLClusters get momentum from the cluster energy
+
+Since ``release-04`` it has been possible to load ECLClusters under the neutral hadron hypothesis.
+Previously we assumed a mass when calculating the particle momentum, however this leads to problems when, for example, a :math:`K_L^0` deposits less than its mass energy in the ECL. This happens about 50% of the time.
+
+The momentum of neutral hadrons from the ECL is now set to the :b2:var:`clusterE`.
+
 
 .. Detailed changes for the analysis package first, that's
    what user will want to see
+
+.. include:: analysis/doc/whatsnew-since/release-04-01.txt
 
 .. include:: analysis/doc/whatsnew-since/release-04-00.txt
 
@@ -30,6 +44,14 @@ Changes since release-04
    move it directly in here
 
 .. include:: framework/doc/whatsnew-since/release-04-00.txt
+
+.. Changes for decfiles package
+
+.. include:: decfiles/doc/whatsnew-since/release-04-02.txt
+
+.. Changes for b2bii here.
+
+.. include:: b2bii/doc/whatsnew-since/release-04-01.txt
 
 Changes since release-03
 ========================
@@ -95,7 +117,7 @@ If you have a physics analysis sensitive to this change: please discuss with the
 .. note::
         As a consequence of this, there is now a **difference** between the variables
         ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) compared to ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` );
-        and similarly for variables ( :b2:var:`mcDX`, :b2:var:`mcDY`, :b2:var:`mcDZ` )  compared to ( :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ` ).
+        and similarly for variables ( :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ` )  compared to ( :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY` and :b2:var:`mcDecayVertexFromIPZ` ).
 
 .. rubric:: Redesign of the Conditions Database Interface
 
@@ -134,11 +156,11 @@ The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not ma
 Its use in analysis is therefore deprecated.
 We do not expect to *remove* it, but *do not recommend* its use for any real physics analyses other than benchmarking or legacy studies.
 
-Instead we recommend you use either KFitter (`vertex.KFit`) for fast/simple fits, or TreeFitter (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
+Instead we recommend you use either KFit (`vertex.kFit`) for fast/simple fits, or TreeFit (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
 Please check the :ref:`TreeFitter` pages for details about the constraints available.
 If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
 
-.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFitter.
+.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFit.
 
 
 .. rubric:: Tidy up and rename of Helicity variables.

@@ -10,6 +10,10 @@
 
 #include <reconstruction/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
 
+#include <reconstruction/dataobjects/DedxConstants.h>
+
+#include <mdst/dataobjects/PIDLikelihood.h>
+
 using namespace Belle2;
 using namespace Dedx;
 
@@ -297,6 +301,10 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
       h_enta[ihit] = dedxTrack->getEnta(ihit);
       h_entaRS[ihit] = dedxTrack->getEntaRS(ihit);
       h_driftT[ihit] = dedxTrack->getDriftT(ihit);
+      h_WeightPionHypo[ihit] = dedxTrack->getWeightPionHypo(ihit);
+      h_WeightKaonHypo[ihit] = dedxTrack->getWeightKaonHypo(ihit);
+      h_WeightProtonHypo[ihit] = dedxTrack->getWeightProtonHypo(ihit);
+      h_foundByTrackFinder[ihit] = dedxTrack->getFoundByTrackFinder(ihit);
 
       // Get the calibration constants
       h_wireGain[ihit] = m_DBWireGains->getWireGain(h_wire[ihit]);
@@ -334,6 +342,10 @@ HitLevelInfoWriterModule::clearEntries()
       h_wireGain[ihit] = 0;
       h_twodCor[ihit] = 0;
       h_onedCor[ihit] = 0;
+      h_WeightPionHypo[ihit] = 0;
+      h_WeightKaonHypo[ihit] = 0;
+      h_WeightProtonHypo[ihit] = 0;
+      h_foundByTrackFinder[ihit] = 0;
     }
   }
 }
@@ -421,6 +433,10 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
     m_tree[i]->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
     m_tree[i]->Branch("hTwodcor", h_twodCor, "hTwodcor[hNHits]/D");
     m_tree[i]->Branch("hOnedcor", h_onedCor, "hOnedcor[hNHits]/D");
-  }
+    m_tree[i]->Branch("hWeightPionHypo", h_WeightPionHypo, "hWeightPionHypo[hNHits]/D");
+    m_tree[i]->Branch("hWeightKaonHypo", h_WeightKaonHypo, "hWeightKaonHypo[hNHits]/D");
+    m_tree[i]->Branch("hWeightProtonHypo", h_WeightProtonHypo, "hWeightProtonHypo[hNHits]/D");
+    m_tree[i]->Branch("hFoundByTrackFinder", h_foundByTrackFinder, "hFoundByTrackFinder[hNHits]/I");
 
+  }
 }

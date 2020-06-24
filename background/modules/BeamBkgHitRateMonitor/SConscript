@@ -7,9 +7,9 @@ env['LIBS'] = ['framework', 'rawdata_dataobjects', 'mdst_dataobjects',
                'top_dataobjects', 'top', 
                'arich_dataobjects', 'arich',
                'ecl_dataobjects', 'ecl', 'ecl_dbobjects', 'calibration', 'Geom',
-               'klm_bklm_dataobjects',
-               'klm_eklm_dataobjects', 'klm_eklm_dbobjects',
                'klm_dataobjects', 'klm_dbobjects',
+	       'hlt',
+	       'tracking_trackFindingCDC',
                '$ROOT_LIBS']
 
 Return('env')

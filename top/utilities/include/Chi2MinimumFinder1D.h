@@ -13,7 +13,6 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <framework/logging/Logger.h>
 #include <TH1F.h>
 #include <TH1D.h>
 

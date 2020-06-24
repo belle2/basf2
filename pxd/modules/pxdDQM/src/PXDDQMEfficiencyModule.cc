@@ -229,67 +229,6 @@ void PXDDQMEfficiencyModule::event()
   }
 }
 
-
-
-TVector3 PXDDQMEfficiencyModule::getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood,
-                                                  double& du, double& dv)
-{
-  //will be set true if the intersect was found
-  isgood = false;
-
-  TVector3 intersec(99999999, 9999999, 0); //point outside the sensor
-
-  genfit::MeasuredStateOnPlane gfTrackState = aTrack.getMeasuredStateOnPlaneFromFirstHit();
-
-  //adopted (aka stolen) from tracking/modules/pxdClusterRescue/PXDClusterRescueROIModule
-  try {
-    // get sensor plane
-    TVector3 zeroVec(0, 0, 0);
-    TVector3 uVec(1, 0, 0);
-    TVector3 vVec(0, 1, 0);
-
-    genfit::DetPlane* sensorPlane = new genfit::DetPlane();
-    sensorPlane->setO(pxdSensorInfo.pointToGlobal(zeroVec, m_useAlignment));
-    sensorPlane->setUV(pxdSensorInfo.vectorToGlobal(uVec, m_useAlignment), pxdSensorInfo.vectorToGlobal(vVec, m_useAlignment));
-
-    //boost pointer (will be deleted automatically ?!?!?)
-    genfit::SharedPlanePtr sensorPlaneSptr(sensorPlane);
-
-    // do extrapolation
-    gfTrackState.extrapolateToPlane(sensorPlaneSptr);
-  } catch (genfit::Exception& gfException) {
-    B2WARNING("Fitting failed: " << gfException.getExcString());
-    isgood = false;
-    return intersec;
-  } catch (...) {
-    B2WARNING("Fitting failed: for some reason");
-    isgood = false;
-    return intersec;
-  }
-
-  //local position
-  intersec = pxdSensorInfo.pointToLocal(gfTrackState.getPos(), m_useAlignment);
-
-  //try to get the momentum
-  B2DEBUG(1, "Fitted momentum on the plane p = " << gfTrackState.getMom().Mag());
-
-  // no tolerance currently! Maybe one should be added!
-  double tolerance = 0.0;
-  bool inside = pxdSensorInfo.inside(intersec.X(), intersec.Y(), tolerance, tolerance);
-
-  // get intersection point in local coordinates with covariance matrix
-  TMatrixDSym covMatrix = gfTrackState.getCov(); // 5D with elements q/p,u',v',u,v in plane system
-
-  // get ROI by covariance matrix and local intersection point
-  du = std::sqrt(covMatrix(3, 3));
-  dv = std::sqrt(covMatrix(4, 4));
-
-  if (inside) isgood = true;
-
-  return intersec;
-}
-
-
 void PXDDQMEfficiencyModule::defineHisto()
 {
   // Create a separate histogram directory and cd into it.

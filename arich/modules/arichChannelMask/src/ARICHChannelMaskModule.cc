@@ -10,7 +10,7 @@
 
 #include <arich/modules/arichChannelMask/ARICHChannelMaskModule.h>
 
-#include <TH1F.h>
+#include <TH2F.h>
 
 
 using namespace Belle2;
@@ -34,18 +34,23 @@ ARICHChannelMaskModule::ARICHChannelMaskModule() : CalibrationCollectorModule()
 void ARICHChannelMaskModule::prepare()
 {
 
-  auto hist = new TH1F("ch_occupancy", "HAPD channel occupancy", 420 * 144 + 1, -0.5, 420 * 144 + 0.5);
-  registerObject<TH1F>("ch_occupancy", hist);
+  auto hist = new TH2F("ch_occupancy", "HAPD channel occupancy in bits", 420 * 144 + 1, -0.5, 420 * 144 + 0.5, 4, -0.5, 3.5);
+  registerObject<TH2F>("ch_occupancy", hist);
   m_ARICHDigits.isRequired();
 }
 
 
 void ARICHChannelMaskModule::collect()
 {
-  auto hist = getObjectPtr<TH1F>("ch_occupancy");
-  hist->Fill(420 * 144); // evnt count
+  auto hist = getObjectPtr<TH2F>("ch_occupancy");
+  hist->Fill(420 * 144, 0); // evnt count
+
   for (const auto& digit : m_ARICHDigits) {
-    hist->Fill((digit.getModuleID() - 1) * 144 + digit.getChannelID());
+    uint8_t bits = digit.getBitmap();
+    for (int i = 0; i < 4; i++) {
+      if ((bits & (1 << i)) && !(bits & ~(1 << i))) {
+        hist->Fill((digit.getModuleID() - 1) * 144 + digit.getChannelID(), i);
+      }
+    }
   }
 }
-

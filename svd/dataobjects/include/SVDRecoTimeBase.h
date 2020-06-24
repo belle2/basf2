@@ -19,8 +19,6 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
-#include <numeric>
-#include <functional>
 
 namespace Belle2 {
 

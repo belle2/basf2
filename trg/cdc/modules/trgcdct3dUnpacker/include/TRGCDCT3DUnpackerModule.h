@@ -14,18 +14,13 @@
 #ifndef TRGCDCT3DUNPACKER_H
 #define TRGCDCT3DUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
-#include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
 #include "trg/cdc/dataobjects/TRGCDCT3DUnpackerStore.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -3517,19 +3512,19 @@ namespace Belle2 {
       virtual ~TRGCDCT3DUnpackerModule();
 
       /** Initilizes TRGCDCT3DUnpackerUnpackerModule.*/
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** Called event by event.*/
-      virtual void event();
+      virtual void event() override;
 
       /** Called when processing ended.*/
-      virtual void terminate();
+      virtual void terminate() override;
 
       /** Called when new run started.*/
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /** Called when run ended*/
-      virtual void endRun();
+      virtual void endRun() override;
 
       /** returns version of TRGCDCT3DUnpackerModule.*/
       std::string version() const;

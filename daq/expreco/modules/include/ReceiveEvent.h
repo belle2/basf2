@@ -10,16 +10,11 @@
 #define RECEIVE_EVENT_MODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
 #include <daq/dataflow/EvtSocket.h>
 
-#include <boost/shared_ptr.hpp>
 #include <string>
-#include <vector>
 
 #include <framework/pcore/DataStoreStreamer.h>
-
-#include <TSystem.h>
 
 namespace Belle2 {
 

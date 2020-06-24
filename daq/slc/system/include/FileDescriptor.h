@@ -1,8 +1,6 @@
 #ifndef _Belle2_FileDescriptor_hh
 #define _Belle2_FileDescriptor_hh
 
-#include "daq/slc/base/IOException.h"
-
 namespace Belle2 {
 
   class FileDescriptor {

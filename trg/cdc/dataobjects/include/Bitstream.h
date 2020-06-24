@@ -1,6 +1,5 @@
 #pragma once
 #include <TObject.h>
-#include <bitset>
 
 #define MERGER_WIDTH 256
 #define NUM_MERGER 146
@@ -12,12 +11,12 @@
 #define NUM_TSF 5
 #define T2D_TO_3D_WIDTH 747
 #define NN_IN_WIDTH 982
+#define NN_WIDTH 2048
 #define NN_OUT_WIDTH 570
+//#define NN_OUT_WIDTH 709
 
 
 namespace Belle2 {
-
-  class CDCTriggerUnpackerModule;
 
   /**
    * Class to hold one clock cycle of raw bit content
@@ -70,7 +69,7 @@ namespace Belle2 {
     SignalBus m_signal;
 
     //! Needed to make the ROOT object storable
-    ClassDef(Bitstream, 3);
+    ClassDef(Bitstream, 4);
   };
 
 }

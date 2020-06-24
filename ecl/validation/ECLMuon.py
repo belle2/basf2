@@ -29,10 +29,6 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
 main.add_module(eventinfosetter)
 
-# random number for generation
-# import random
-# intseed = random.randint(1, 10000000)
-
 # Fixed random seed
 set_random_seed(123456)
 
@@ -61,6 +57,7 @@ if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 else:
     print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
+B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
 
 add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
@@ -69,7 +66,6 @@ add_reconstruction(main)
 ecldataanalysis = register_module('ECLDataAnalysis')
 ecldataanalysis.param('rootFileName', '../ECLMuonOutput.root')
 ecldataanalysis.param('doTracking', 1)
-ecldataanalysis.param('doSimulation', 0)
 main.add_module(ecldataanalysis)
 
 process(main)

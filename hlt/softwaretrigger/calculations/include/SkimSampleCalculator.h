@@ -39,6 +39,12 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> m_pionParticles;
       /// Internal storage of the ECL clusters as particles.
       StoreObjPtr<ParticleList> m_gammaParticles;
+      /// Internal storage of the tracks as particles (definition for hadronb).
+      StoreObjPtr<ParticleList> m_pionHadParticles;
+      /// Internal storage of the tracks as particles (definition for tau skims).
+      StoreObjPtr<ParticleList> m_pionTauParticles;
+      /// Internal storage of the K_S0's.
+      StoreObjPtr<ParticleList> m_KsParticles;
     };
   }
 }

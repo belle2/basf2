@@ -30,6 +30,8 @@ Untested method EventLevelTrackingInfo::setNCDCHitsNotAssigned
 Untested method EventLevelTrackingInfo::setNCDCHitsNotAssignedPostCleaning
 Untested method EventLevelTrackingInfo::setNCDCSegments
 Untested method EventLevelTrackingInfo::setNVXDClustersInLayer
+Untested method EventLevelTrackingInfo::setPXDCKFAbortionFlag
+Untested method EventLevelTrackingInfo::setSVDCKFAbortionFlag
 Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
@@ -3550,6 +3552,8 @@ EventLevelTrackingInfo:
   hasCDCLayer(53): False
   hasCDCLayer(54): False
   hasCDCLayer(55): False
+  hasPXDCKFAbortionFlag(): False
+  hasSVDCKFAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
@@ -15100,6 +15104,8 @@ EventLevelTrackingInfo:
   hasCDCLayer(53): False
   hasCDCLayer(54): False
   hasCDCLayer(55): False
+  hasPXDCKFAbortionFlag(): False
+  hasSVDCKFAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:
@@ -21836,6 +21842,8 @@ EventLevelTrackingInfo:
   hasCDCLayer(53): False
   hasCDCLayer(54): False
   hasCDCLayer(55): False
+  hasPXDCKFAbortionFlag(): False
+  hasSVDCKFAbortionFlag(): False
   hasUnspecifiedTrackFindingFailure(): False
   hasVXDTF2AbortionFlag(): False
 PIDLikelihood#0:

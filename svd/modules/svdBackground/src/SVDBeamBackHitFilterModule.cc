@@ -10,11 +10,9 @@
 
 #include <svd/modules/svdBackground/SVDBeamBackHitFilterModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
+#include <simulation/dataobjects/BeamBackHit.h>
 
-#include <functional>
+#include <framework/datastore/StoreArray.h>
 
 using namespace std;
 using namespace Belle2;

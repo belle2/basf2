@@ -24,17 +24,13 @@ std::string CDCTrackingEventLevelMdstInfoFillerFindlet::getDescription()
 void CDCTrackingEventLevelMdstInfoFillerFindlet::initialize()
 {
   Super::initialize();
-  m_eventLevelTrackingInfo.registerInDataStore();
+  m_eventLevelTrackingInfo.isRequired();
 }
 
 // Actual work
 void CDCTrackingEventLevelMdstInfoFillerFindlet::apply(const std::vector<CDCWireHit>& inputWireHits,
                                                        const std::vector<CDCSegment2D>& inputWireHitSegments)
 {
-  if (!m_eventLevelTrackingInfo.isValid()) {
-    m_eventLevelTrackingInfo.create();
-  }
-
   int nhitTotal = inputWireHits.size(); //total number of hits
   int nTaken = 0;  // bg+assigned to tracks
   int nBg   = 0;  //

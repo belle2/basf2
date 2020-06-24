@@ -9,44 +9,20 @@
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 
-#include <stdlib.h>
 #include <string>
-#include <vector>
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
 
 #include <daq/dataflow/EvtSocket.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-
 #include <daq/rawdata/CprErrorMessage.h>
-#include <daq/rawdata/modules/DAQConsts.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
 #include <rawdata/dataobjects/RawHeader_latest.h>
-//#include <rawdata/dataobjects/RawCOPPER.h>
-
-
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-
-#include <sys/uio.h>
 
 #include <sys/mman.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 
 namespace Belle2 {
 

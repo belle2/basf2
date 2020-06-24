@@ -13,10 +13,8 @@
 
 #define TRGGRL_SHORT_NAMES
 
-#include <stdlib.h>
 #include <iostream>
 
-#include "trg/trg/Debug.h"
 #include "trg/grl/modules/trggrl/TRGGRLModule.h"
 #include <framework/logging/Logger.h>
 

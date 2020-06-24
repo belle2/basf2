@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
-# run 'pydoc3 vertex' for general documentation of vertexxing stuff
+# run 'pydoc3 vertex' for general documentation of vertexing stuff
 #
 # It is recommended to use the TreeFitter for everything as it is the fastest tool
 #
 # If you want to fit precise vertices with nTracks>2 attached and you are
-# interested in the vertex postion, TagV COULD BE the better tool as it
+# interested in the vertex position, TagV COULD BE the better tool as it
 # reweights the tracks. However, you have to check yourself.
 #
 # This tutorial demonstrates how to perform a fit with
@@ -29,8 +28,6 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variables.collections as vc
-import variables.utils as vu
 import vertex as vx
 from stdPi0s import stdPi0s
 
@@ -45,34 +42,33 @@ ma.inputMdst(environmentType='default',
 
 # use standard final state particle lists
 #
-# creates "pi0:looseFit" ParticleList
-# https://confluence.desy.de/display/BI/Physics+StandardParticles
-stdPi0s(listtype='looseFit', path=my_path)
+# creates "pi0:eff40_Jan2020Fit" ParticleList
+# see Standard Particles section at https://software.belle2.org/
+stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-ma.reconstructDecay(decayString='D0:pi0pi0 -> pi0:looseFit pi0:looseFit',
+ma.reconstructDecay(decayString='D0:pi0pi0 -> pi0:eff40_Jan2020Fit pi0:eff40_Jan2020Fit',
                     cut='1.7 < M < 2.0',
                     path=my_path)
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:looseFit',
+ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:eff40_Jan2020Fit',
                     cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
                     path=my_path)
 
+# perform MC matching (MC truth association)
+ma.matchMCTruth(list_name='B0:all', path=my_path)
+
 vx.treeFit(list_name='B0:all',
-           conf_level=-1,  # keep all cadidates, 0:keep only fit survivors, optimise this cut for your need
+           conf_level=0,  # 0:keep only fit survivors, -1: keep all candidates; optimise this cut for your need
            ipConstraint=True,
            # pins the B0 PRODUCTION vertex to the IP (increases SIG and BKG rejection) use for better vertex resolution
-           updateAllDaughters=True,  # update momenta off ALL particles
+           updateAllDaughters=True,  # update momenta of ALL particles
            massConstraint=['pi0'],  # mass constrain ALL pi0
            path=my_path)
-
-# perform MC matching (MC truth association)
-ma.matchMCTruth(list_name='B0:all',
-                path=my_path)
 
 # whatever you are interested in
 #

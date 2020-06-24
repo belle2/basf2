@@ -4,6 +4,7 @@
 import basf2
 from simulation import add_simulation
 from pxd import add_pxd_reconstruction
+from svd import add_svd_reconstruction
 import os
 import glob
 import sys
@@ -44,10 +45,14 @@ add_simulation(main, bkgfiles=bg, bkgOverlay=True)
 main.add_module("ARICHFillHits")
 main.add_module('TOPChannelMasker')
 add_pxd_reconstruction(main)
+add_svd_reconstruction(main)
+main.add_module('SVDZeroSuppressionEmulator', SNthreshold=5, ShaperDigitsIN='SVDShaperDigitsZS5')
 
 # Bkg rate monitor: output to flat ntuple
 # - all trigger types must be selected since no TRGSummary is given by the simulation
-main.add_module('BeamBkgHitRateMonitor', trgTypes=[],
+main.add_module('BeamBkgHitRateMonitor',
+                trgTypes=[],
+                svdShaperDigitsName='SVDShaperDigitsZS5',
                 outputFileName='beamBkgHitRates_MC.root')
 
 # Show progress of processing

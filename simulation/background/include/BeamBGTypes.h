@@ -51,6 +51,8 @@ namespace Belle2 {
         m_tags["BHWideLargeAngle"] = BackgroundMetaData::bg_BHWideLargeAngle;
         m_tags["InjectionLER"] = BackgroundMetaData::bg_InjectionLER;
         m_tags["InjectionHER"] = BackgroundMetaData::bg_InjectionHER;
+        m_tags["Brems_LER"] = BackgroundMetaData::bg_Brems_LER;
+        m_tags["Brems_HER"] = BackgroundMetaData::bg_Brems_HER;
         m_tags["other"] = BackgroundMetaData::bg_other;
       }
 

@@ -8,7 +8,7 @@ import validation
 import validationpath
 import validationserver
 
-from validationtestutil import check_excecute, check_path_exists
+from validationtestutil import check_execute, check_path_exists
 
 
 def main():
@@ -79,7 +79,7 @@ def main():
         # recreate
         # switch to this folder
         os.chdir(str(tmpdir))
-        check_excecute("create_validation_plots.py")
+        check_execute("create_validation_plots.py")
         check_path_exists(path_to_check)
 
 

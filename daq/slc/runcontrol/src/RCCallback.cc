@@ -1,7 +1,12 @@
 #include "daq/slc/runcontrol/RCCallback.h"
 
+#include <daq/slc/database/DBHandlerException.h>
 #include <daq/slc/database/DBInterface.h>
 #include <daq/slc/database/DBObjectLoader.h>
+
+#include <daq/slc/runcontrol/RCCommand.h>
+#include <daq/slc/runcontrol/RCHandlerException.h>
+#include <daq/slc/runcontrol/RCHandlerFatalException.h>
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/TCPSocket.h>
@@ -12,7 +17,6 @@
 
 #include <sstream>
 
-#include <cstring>
 #include <cstdlib>
 
 double tabort = 0;

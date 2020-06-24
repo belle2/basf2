@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>SLUntagged.dst.root</output>
+  <output>../SLUntagged.dst.root</output>
   <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """

@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <rawdata/dataobjects/RawTRG.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/Unpacker.h>
@@ -21,18 +22,15 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
 #include <trg/cdc/dbobjects/CDCTrigger2DConfig.h>
+#include <trg/cdc/dataobjects/CDCTriggerMLP.h>
+#include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 
 #include <array>
 #include <bitset>
 #include <vector>
 #include <string>
-#include <iostream>
 #include <iomanip>
-#include <utility>
-#include <typeinfo>
 
 namespace Belle2 {
 
@@ -235,14 +233,19 @@ namespace Belle2 {
     CDCTriggerUnpackerModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Delete dynamically allocated variables */
-    virtual void terminate();
+    virtual void terminate() override;
+
+    /** begin Run */
+    virtual void beginRun();
 
     /** convert raw data (in B2L buffer to bitstream) */
-    virtual void event();
+    virtual void event() override;
 
+    /** small function to rescale the NN output from -1, 1 to output scale */
+    std::vector<float> unscaleNNOutput(std::vector<float> input) const;
     /** data width of a single merger unit */
     /** number of merger unit in each super layers */
     static constexpr std::array<int, 9> nMergers = {10, 10, 12, 14, 16, 18, 20, 22, 24};
@@ -288,11 +291,9 @@ namespace Belle2 {
     /** additional information of the 2D finder track */
     StoreArray<CDCTriggerFinderClone> m_2DFinderClones;
 
-    /** bitstream of Neuro input (combination of stereo TS and single 2D track) */
-    StoreArray<CDCTriggerUnpacker::NNInputBitStream> m_bitsToNN;
 
-    /** bitstream of Neuro output (including intermediate results) */
-    StoreArray<CDCTriggerUnpacker::NNOutputBitStream> m_bitsFromNN;
+    /** bitstream of Neuro input and output (including intermediate results) */
+    StoreArray<CDCTriggerUnpacker::NNBitStream> m_bitsNN;
 
     /** decoded Neuro tracks */
     StoreArray<CDCTriggerTrack> m_NeuroTracks;
@@ -305,6 +306,9 @@ namespace Belle2 {
 
     /** decoded track segment hits from the neural network input */
     StoreArray<CDCTriggerSegmentHit> m_NNInputTSHits;
+
+    /** all decoded stereo track segment hits from the neural network input */
+    StoreArray<CDCTriggerSegmentHit> m_NNInputTSHitsAll;
 
     /** debug level specified in the steering file */
     int m_debugLevel = 0;
@@ -329,12 +333,28 @@ namespace Belle2 {
     /** NN cnttrg */
     int m_NeuroCnttrg = 0;
 
+    /** exp number */
+    unsigned m_exp = 0;
+    /** run number */
+    unsigned m_run = 0;
+
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;
 
     //condition database for number of TS in 2D
     DBObjPtr<CDCTrigger2DConfig> m_dbn2DTS;
+    /** current neurotrigger config from database; used for unscaling network target */
+    DBObjPtr<CDCTriggerNeuroConfig> m_cdctriggerneuroconfig;
+    /** output scale for the neural network output */
+    std::vector<float> m_NNOutputScale;
+    /** fake object to assign the user set scaling values to */
+    CDCTriggerMLP m_mlp_scale;
+    /** bool value for wether to use the conditions database */
+    bool m_useDB;
+    /** bool value wether to simulate 13 bit drift time by using 2dcc */
+    bool m_sim13dt;
   };
+
 
 }
 

@@ -12,7 +12,6 @@
 #define VXD_SENSORINFO_H
 
 #include <vxd/dataobjects/VxdID.h>
-#include <cmath>
 #include <float.h>
 
 #include <TGeoMatrix.h>
@@ -308,7 +307,7 @@ namespace Belle2 {
       }
 
       /** Fill parameters of planar deformation to vector */
-      void setSurfaceParameters(std::vector<double> planarParameters)
+      void setSurfaceParameters(const std::vector<double>& planarParameters)
       {
         m_surfaceDeformationParameters = planarParameters;
       }

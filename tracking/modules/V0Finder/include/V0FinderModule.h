@@ -72,10 +72,10 @@ namespace Belle2 {
       @param v0Hypothesis: the hypothesis for the V0 (Lambda, or Kshort, for all others nothing happens)
     */
     bool preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
-    // buffer some variables to speed up time
-    double m_mKshortMin2; ///< pre-calculated mininum Kshort mass squared
-    double m_mKshortMax2; ///< pre-calculated maximum Kshort mass squared
-    double m_mLambdaMin2; ///< pre-calculated mininum Lambda mass squared
-    double m_mLambdaMax2; ///< pre-calculated maximum Lambda mass squared
+    // buffer some variables to speed up time, actual values will be calculated at initialization
+    double m_mKshortMin2 = 0; ///< pre-calculated mininum Kshort mass squared
+    double m_mKshortMax2 = 0; ///< pre-calculated maximum Kshort mass squared
+    double m_mLambdaMin2 = 0; ///< pre-calculated mininum Lambda mass squared
+    double m_mLambdaMax2 = 0; ///< pre-calculated maximum Lambda mass squared
   };
 }

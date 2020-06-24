@@ -478,7 +478,7 @@ void SpaceResolutionCalibration::readSigma()
 void SpaceResolutionCalibration::readSigmaFromText()
 {
   ifstream ifs;
-  std::string fileName1 = "/cdc/data/" + m_sigmafile;
+  std::string fileName1 = "/data/cdc" + m_sigmafile;
   std::string fileName = FileSystem::findFile(fileName1);
   if (fileName == "") {
     fileName = FileSystem::findFile(m_sigmafile);

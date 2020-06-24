@@ -41,37 +41,69 @@ namespace Belle2 {
                double extTime, double hitTime, double chiSq);
 
     //! Destructor
-    virtual ~KLMMuidHit() {}
+    virtual ~KLMMuidHit()
+    {
+    }
 
     //! @return PDG particleID hypothesis used in this extrapolation
-    int getPdgCode() const { return m_PdgCode; }
+    int getPdgCode() const
+    {
+      return m_PdgCode;
+    }
 
     //! @return global-coordinate position of the extrapolated point (cm)
-    TVector3 getExtPosition() const { return m_ExtPosition; }
+    TVector3 getExtPosition() const
+    {
+      return m_ExtPosition;
+    }
 
     //! @return global-coordinate position of the matching KLM hit (cm)
-    TVector3 getHitPosition() const { return m_HitPosition; }
+    TVector3 getHitPosition() const
+    {
+      return m_HitPosition;
+    }
 
     //! @return time since start of event of the extrapolated point (ns)
-    double getExtTime() const { return m_ExtTime; }
+    double getExtTime() const
+    {
+      return m_ExtTime;
+    }
 
     //! @return time of the matching KLM hit (ns)
-    double getHitTime() const { return m_HitTime; }
+    double getHitTime() const
+    {
+      return m_HitTime;
+    }
 
     //! @return flag to indicate if hit is in barrel (true) or endcap (false)
-    bool inBarrel() const { return m_InBarrel; }
+    bool inBarrel() const
+    {
+      return m_InBarrel;
+    }
 
     //! @return flag to indicate if hit is in forward (true) or backward (false) half
-    bool isForward() const { return m_IsForward; }
+    bool isForward() const
+    {
+      return m_IsForward;
+    }
 
     //! @return sector number (1..8 for barrel, 1..4 for endcap)
-    int getSector() const { return m_Sector; }
+    int getSector() const
+    {
+      return m_Sector;
+    }
 
     //! @return layer number (1..15 for barrel, 1..14 for endcap)
-    int getLayer() const { return m_Layer; }
+    int getLayer() const
+    {
+      return m_Layer;
+    }
 
     //! @return chi-squared contribution of this hit for extrapolation point and KLM hit
-    double getChiSquared() const { return m_ChiSquared; }
+    double getChiSquared() const
+    {
+      return m_ChiSquared;
+    }
 
   private:
 

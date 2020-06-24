@@ -3,42 +3,40 @@ run in default settings
 [WARNING] warning  { module: FatalError package: steering }
 [ERROR] error  { module: FatalError package: steering }
 [FATAL] fatal error  { module: FatalError package: steering }
-[INFO] ================================================================================
-[INFO] Error summary: 1 errors and 1 warnings occurred.
-[WARNING] warning  { module: FatalError }
-[ERROR] error  { module: FatalError }
+[INFO] ===Error Summary================================================================
 [FATAL] fatal error  { module: FatalError }
+[ERROR] error  { module: FatalError }
+[WARNING] warning  { module: FatalError }
 [INFO] ================================================================================
-
+[ERROR] in total, 1 errors occurred during processing
+[WARNING] in total, 1 warnings occurred during processing
 run with no warnings
 [ERROR] error  { module: FatalError package: steering }
 [FATAL] fatal error  { module: FatalError package: steering }
-[INFO] ================================================================================
-[INFO] Error summary: 1 errors and 0 warnings occurred.
-[ERROR] error  { module: FatalError }
+[INFO] ===Error Summary================================================================
 [FATAL] fatal error  { module: FatalError }
+[ERROR] error  { module: FatalError }
 [INFO] ================================================================================
-
+[ERROR] in total, 1 errors occurred during processing
 run with no framework warnings
 [WARNING] warning  { module: FatalError package: steering }
 [ERROR] error  { module: FatalError package: steering }
 [FATAL] fatal error  { module: FatalError package: steering }
-[INFO] ================================================================================
-[INFO] Error summary: 1 errors and 1 warnings occurred.
-[WARNING] warning  { module: FatalError }
-[ERROR] error  { module: FatalError }
+[INFO] ===Error Summary================================================================
 [FATAL] fatal error  { module: FatalError }
+[ERROR] error  { module: FatalError }
+[WARNING] warning  { module: FatalError }
 [INFO] ================================================================================
-
+[ERROR] in total, 1 errors occurred during processing
+[WARNING] in total, 1 warnings occurred during processing
 run with no module warnings
 [ERROR] error  { module: FatalError package: steering }
 [FATAL] fatal error  { module: FatalError package: steering }
-[INFO] ================================================================================
-[INFO] Error summary: 1 errors and 0 warnings occurred.
-[ERROR] error  { module: FatalError }
+[INFO] ===Error Summary================================================================
 [FATAL] fatal error  { module: FatalError }
+[ERROR] error  { module: FatalError }
 [INFO] ================================================================================
-
+[ERROR] in total, 1 errors occurred during processing
 run without summary
 [WARNING] warning  { module: FatalError package: steering }
 [ERROR] error  { module: FatalError package: steering }

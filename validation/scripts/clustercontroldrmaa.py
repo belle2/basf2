@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
+# std
 import sys
 
+# ours
 from clustercontrolbase import ClusterBase
+from validationscript import Script
 
 
 class Cluster(ClusterBase):
@@ -78,7 +80,7 @@ class Cluster(ClusterBase):
         super().__init__()
 
     # noinspection PyMethodMayBeStatic
-    def adjust_path(self, path):
+    def adjust_path(self, path: str):
         """!
         This method can be used if path names are different on submission
         and execution hosts.
@@ -97,7 +99,7 @@ class Cluster(ClusterBase):
 
         return True
 
-    def execute(self, job, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options='', dry=False, tag='current'):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
@@ -142,38 +144,40 @@ class Cluster(ClusterBase):
                 self.logger.debug(
                     f"Script {job.name} started with job id {jobid}"
                 )
-                job.cluster_drmaa_jobid = jobid
+                job.job_id = jobid
 
             session.deleteJobTemplate(jt)
         return
 
-    def is_job_finished(self, job):
+    def is_job_finished(self, job: Script):
         """!
         Checks whether the '.done'-file has been created for a job. If so, it
         returns True, else it returns False.
         Also deletes the .done-File once it has returned True.
 
         @param job: The job of which we want to know if it finished
-        @return: True if the job has finished, otherwise False
+        @return: (True if the job has finished, exit code). If we can't find the
+            exit code in the '.done'-file, the returncode will be -666.
+            If the job is not finished, the exit code is returned as 0.
         """
 
         # import here first so the whole module can also be imported on python
         # installations which have no drmaa at all
         import drmaa
 
-        if not hasattr(job, 'cluster_drmaa_jobid'):
+        if job.job_id is None:
             print("Job has not been started with cluster drmaaa because "
-                  "cluster_drmaa_jobid is missing")
+                  "job id is missing")
             sys.exit(0)
 
         with drmaa.Session() as session:
 
             # some batch server will forget completed jobs right away
             try:
-                status = session.jobStatus(job.cluster_drmaa_jobid)
+                status = session.jobStatus(job.job_id)
             except drmaa.errors.InvalidJobException:
                 print("Job info for jobid {} cannot be retrieved, assuming "
-                      "job has terminated".format(job.cluster_drmaa_jobid))
+                      "job has terminated".format(job.job_id))
 
                 (donefile_exists, donefile_returncode) = \
                     self.checkDoneFile(job)

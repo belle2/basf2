@@ -11,15 +11,12 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
-#include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <string>
 
-#include <TFile.h>
 #include <TH2.h>
 
 namespace Belle2 {
@@ -70,7 +67,7 @@ namespace Belle2 {
     int m_maxClusterSize = 5; /**<max numnber of strips the PDF are separated into*/
     bool m_useLegacyNaming = true; /**<use legacy pdf naming*/
 
-    std::string m_outputFileName = "";
+    std::string m_outputFileName = "";/**<output file name*/
 
     std::string m_nameOfInstance =
       ""; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */

@@ -8,6 +8,13 @@
 //-
 
 #include "daq/rfarm/manager/RFEventProcessor.h"
+
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <cstring>
 #include <iostream>
 
 #define RFOTSOUT stdout

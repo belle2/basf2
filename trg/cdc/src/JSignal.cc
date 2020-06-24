@@ -936,6 +936,7 @@ namespace Belle2 {
       for (unsigned iCase = 0; iCase < data.size(); iCase++) {
         for (unsigned iAssignment = 0; iAssignment < data[iCase].second.size(); iAssignment++) {
           TRGCDCJSignal& lhs = *(data[iCase].second[iAssignment].first);
+          /* cppcheck-suppress variableScope */
           TRGCDCJSignal& rhs = data[iCase].second[iAssignment].second;
           if (lhs.m_commonData == 0) lhs.m_commonData = rhs.m_commonData;
         }

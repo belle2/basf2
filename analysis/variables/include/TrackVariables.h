@@ -55,6 +55,11 @@ namespace Belle2 {
     double trackFirstPXDLayer(const Particle* part);
 
     /**
+     * returns the first activated CDC layer associated to the track
+     */
+    double trackFirstCDCLayer(const Particle* part);
+
+    /**
      * returns the last CDC layer associated to the track
      */
     double trackLastCDCLayer(const Particle* part);
@@ -199,6 +204,8 @@ namespace Belle2 {
     /** mc-meas/err_meas for the respective helix parameter for the given particle */
     double getHelixTanLambdaPull(const Particle* part);
 
+    /** helper function to get track fit result from particle */
+    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle);
   }
 } // Belle2 namespace
 

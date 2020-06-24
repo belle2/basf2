@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -54,7 +53,7 @@ ma.reconstructDecay(decayString='B0 -> rho0 gamma:tight',
                     cut='5.2 < Mbc < 5.29 and abs(deltaE) < 2.0',
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B0', path=my_path)
 
 # Select variables that we want to store to ntuple

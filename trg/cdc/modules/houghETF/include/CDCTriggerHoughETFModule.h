@@ -173,8 +173,8 @@ namespace Belle2 {
                     std::vector<unsigned>& unselected);
 
     float calcEventTiming();
-    float medianMean(std::vector<int> v, int order);
     int median(std::vector<int> v);
+    int medianInTimeWindow(std::vector<int> v);
 
 
   protected:
@@ -189,16 +189,19 @@ namespace Belle2 {
     StoreArray<CDCTriggerSegmentHit> m_hits;
     /** list of fastest timing of TS associated with Track */
     std::vector<std::vector<CDCTriggerSegmentHit*>> associatedTSHitsList;
+    /** Switch to use priority timing instead of fastest timing */
+    bool m_usePriorityTiming;
     /** Switch method to determine the event timing */
     unsigned m_t0CalcMethod;
-    /** number of hits to average around median
-     *  (effective when t0CalcMEthod == 0) */
-    unsigned m_nHitsAverage;
     /** arrival order of fastest timing used as t0
-     *  (effective when t0CalcMEthod == 1) */
+     *  (effective when t0CalcMEthod == 0) */
     unsigned m_arrivalOrder;
-    /** Switch to use priority timing instead of fastest timing (FOR DEBUG) */
-    unsigned m_usePriorityTiming;
+    /** Start time of time window relative to median. (in ns)
+     *  (effective when t0CalcMEthod == 2) */
+    short m_timeWindowStart;
+    /** End time of time window relative to median. (in ns)
+     *  (effective when t0CalcMEthod == 2) */
+    short m_timeWindowEnd;
 
 
     /** Name of the StoreArray containing the input track segment hits. */

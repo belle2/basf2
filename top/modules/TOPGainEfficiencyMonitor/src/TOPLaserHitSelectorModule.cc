@@ -12,28 +12,17 @@
 #include <top/modules/TOPGainEfficiencyMonitor/TOPLaserHitSelectorModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 // Hit classes
-#include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPRawDigit.h>
-
-#include <top/geometry/TOPGeometryPar.h>
 
 // standard libraries
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-#include <set>
 #include <map>
-
-// ROOT
-#include <TMath.h>
-#include <TF1.h>
 
 using namespace std;
 

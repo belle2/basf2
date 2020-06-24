@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -14,8 +13,8 @@
 # The recommended way to do this is to use the standard
 # lists provided in the script: analysis/scripts/stdV0s.py:
 #
-#    stdKshorts(prioritiseV0, path)
-#    stdLambdas(prioritiseV0, path)
+#    stdKshorts(prioritiseV0, fitter, path)
+#    stdLambdas(prioritiseV0, fitter, path)
 #
 # Contributors: B. Scavino (August 2018)
 #               I. Komarov (September 2018)
@@ -63,9 +62,9 @@ pi0_vars = vc.kinematics + \
 
 v0_vars = vc.kinematics + \
     vc.inv_mass + \
-    vc.vertex +\
+    vc.vertex + \
     vc.mc_truth + \
-    ['chiProb'] +\
+    ['chiProb'] + \
     vu.create_daughter_aliases(pi0_vars, 0) +\
     vu.create_daughter_aliases(pi0_vars, 1)
 

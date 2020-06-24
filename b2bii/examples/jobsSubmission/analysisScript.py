@@ -66,7 +66,7 @@ else:
                            skimType, dataType, belleLevel)
 
 mypath = create_path()
-b2biiConversion.convertBelleMdstToBelleIIMdst(url, applyHadronBJSkim=True, path=mypath)
+b2biiConversion.convertBelleMdstToBelleIIMdst(url, applySkim=True, path=mypath)
 loadGearbox(mypath)
 
 

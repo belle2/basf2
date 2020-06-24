@@ -14,7 +14,6 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dbobjects/SVDCalibrationsBase.h>
 #include <svd/dbobjects/SVDCalibrationsVector.h>
-#include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDStripCalAmp.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>

@@ -1,13 +1,10 @@
 #ifndef TRCCDCT2DDQMMODULE_h
 #define TRCCDCT2DDQMMODULE_h
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/HistoModule.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
-#include <stdlib.h>
-#include <iostream>
 #include <string>
 
 #include <TH1I.h>
@@ -26,17 +23,17 @@ namespace Belle2 {
 
   public:
     //! initialize
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Event
-    virtual void event();
+    virtual void event() override;
     //! End Run
-    virtual void endRun();
+    virtual void endRun() override;
     //! terminate
-    virtual void terminate() {}
+    virtual void terminate() override {}
     //! Define Histogram
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   protected:
     //! TSF hit distribution as a function of tsfid

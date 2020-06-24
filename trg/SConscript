@@ -8,8 +8,9 @@ env['LIBS'] = ['framework',
 	       'trg_ecl_dataobjects',
 	       'trg_grl_dataobjects',
 	       'mdst_dataobjects',
-         'trg_trg',
-         'trg_cdc']
+	       'mdst_dbobjects',
+	       'trg_trg',
+	       'trg_cdc']
 #env.Append(CPPDEFINES = {'TRG_DEBUG':None})
 #env.Append(CPPDEFINES = {'TRG_DISPLAY':None})
 #env.ParseConfig('pkg-config --cflags --libs gtkmm-2.4')

@@ -65,9 +65,9 @@ variables = [
     'x_uncertainty',
     'y_uncertainty',
     'z_uncertainty',
-    'mcX',
-    'mcY',
-    'mcZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
 ]
 
 path.add_module('VariablesToNtuple',

@@ -39,17 +39,22 @@ namespace Belle2 {
     ClusterUtils();
 
     /**
-     * Returns four momentum vector
-     * @return const four momentum vector
+     * Returns cluster four momentum vector
+     * @return const cluster four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, double mass = 0.);
+    const TLorentzVector GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo,
-                                                 double mass = 0.);
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+
+    /**
+     * Returns four momentum vector
+     * @return const four momentum vector
+     */
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)

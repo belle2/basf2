@@ -1,6 +1,6 @@
 //+
 // File : DQMHistAnalysisIP.cc
-// Description : Median for IP position with delta histogramming
+// Description : Mean for IP position with delta histogramming
 //
 // Author : Bjoern Spruck, Mainz Univerisity
 // Date : 2019
@@ -31,6 +31,8 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   //Parameter definition
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
   B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
 }
 
@@ -38,7 +40,9 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
 DQMHistAnalysisIPModule::~DQMHistAnalysisIPModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -48,8 +52,7 @@ void DQMHistAnalysisIPModule::initialize()
 
   TString a;
   a = m_histoname;
-  a.ReplaceAll("/", "_");
-  m_c1 = new TCanvas("c_" + a);
+  m_c1 = new TCanvas(a + "_fit");
 
   m_line = new TLine(0, 10, 0, 0);
   m_line->SetVertical(true);
@@ -58,15 +61,17 @@ void DQMHistAnalysisIPModule::initialize()
 
   // need the function to get parameter names
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  std::string aa;
-  aa = m_pvPrefix + "Median";
-  SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-  aa = m_pvPrefix + "RMS";
-  SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-  // Read LO and HI limits from EPICS, seems this needs additional channels?
-  // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    std::string aa;
+    aa = m_pvPrefix + "Mean";
+    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
+    aa = m_pvPrefix + "RMS";
+    SEVCHK(ca_create_channel(aa.c_str(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+    // Read LO and HI limits from EPICS, seems this needs additional channels?
+    // SEVCHK(ca_get(DBR_DOUBLE,mychid[i],(void*)&data),"ca_get failure"); // data is only valid after ca_pend_io!!
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -120,6 +125,8 @@ void DQMHistAnalysisIPModule::beginRun()
   } else {
     B2DEBUG(20, "Histo " << m_histoname << " not found");
   }
+
+  if (m_h_last) m_h_last->Reset();
 }
 
 void DQMHistAnalysisIPModule::event()
@@ -164,19 +171,25 @@ void DQMHistAnalysisIPModule::event()
   if (hh1 != NULL) {
 
     if (!m_h_last) {
+      B2DEBUG(20, "Initial Clone");
+      gROOT->cd();
       m_h_last = (TH1*)hh1->Clone();
+      m_h_last->SetName(TString(hh1->GetName()) + "_last");
       m_h_last->Reset();
     }
 
     double last = m_h_last->GetEntries();
     double current = hh1->GetEntries();
-
-    if (current - last >= m_min_entries) {
+    B2DEBUG(20, "Entries: " << last << "," << current);
+    if (current - last >= m_minEntries) {
+      B2DEBUG(20, "Update Delta & Fit");
+      gROOT->cd();
       TH1* delta = (TH1*)hh1->Clone();
       delta->Add(m_h_last, -1.);
 
+      m_c1->Clear();
       m_c1->cd();// necessary!
-      delta->Draw("h");
+      delta->Draw("hist");
       m_h_last->Reset();
       m_h_last->Add(hh1);
 
@@ -184,9 +197,11 @@ void DQMHistAnalysisIPModule::event()
       double w = delta->GetRMS();// must be double bc of EPICS below
       double y1 = delta->GetMaximum();
       double y2 = delta->GetMinimum();
+      B2DEBUG(20, "Fit " << x << "," << w << "," << y1 << "," << y2);
       m_line->SetY1(y1 + (y1 - y2) * 0.05);
       m_line->SetX1(x);
       m_line->SetX2(x);
+      delta->GetXaxis()->SetRangeUser(x - 3 * w, x + 3 * w);
       if (!flag) {
         // dont add another line...
         m_line->Draw();
@@ -194,9 +209,12 @@ void DQMHistAnalysisIPModule::event()
       m_c1->Modified();
       m_c1->Update();
 #ifdef _BELLE2_EPICS
-      if (mychid[0]) SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&x), "ca_set failure");
-      if (mychid[1]) SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&w), "ca_set failure");
-      SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+      if (m_useEpics) {
+        B2INFO("Update EPICS");
+        if (mychid[0]) SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&x), "ca_set failure");
+        if (mychid[1]) SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&w), "ca_set failure");
+        SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+      }
 #endif
     }
   } else {
@@ -208,11 +226,13 @@ void DQMHistAnalysisIPModule::event()
 void DQMHistAnalysisIPModule::terminate()
 {
 #ifdef _BELLE2_EPICS
-  if (m_parameters > 0) {
-    for (auto i = 0; i < m_parameters; i++) {
-      if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+  if (m_useEpics) {
+    if (m_parameters > 0) {
+      for (auto i = 0; i < m_parameters; i++) {
+        if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
+      }
+      SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
     }
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
   B2DEBUG(20, "DQMHistAnalysisIP: terminate called");

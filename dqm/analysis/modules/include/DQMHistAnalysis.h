@@ -9,7 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-
+#include <dqm/dataobjects/MonitoringObject.h>
 #include <TH1.h>
 
 #include <string>
@@ -60,6 +60,12 @@ namespace Belle2 {
      * The type of list of histograms.
      */
     typedef std::map<std::string, TH1*> HistList;
+    /**
+     * The type of list of MonitoringObjects.
+     */
+    typedef std::map<std::string, MonitoringObject*> MonObjList;
+
+
 
   private:
     /**
@@ -82,6 +88,11 @@ namespace Belle2 {
      * The list of histograms.
      */
     static HistList g_hist;
+    /**
+     * The list of MonitoringObjects.
+     */
+    static MonObjList g_monObj;
+
 
   public:
     /**
@@ -89,6 +100,12 @@ namespace Belle2 {
      * @return The list of the histograms.
      */
     static const HistList& getHistList();
+    /**
+     * Get the list of MonitoringObjects.
+     * @return The list of the MonitoringObjects.
+     */
+    static const MonObjList& getMonObjList();
+
     /**
      * Find histogram.
      * @param histname The name of the histogram.
@@ -111,11 +128,18 @@ namespace Belle2 {
      */
     static TH1* findHist(const TDirectory* histdir, const TString& histname);
     /**
+     * Find MonitoringObject.
+     * @param objName The name of the MonitoringObject.
+     * @return The found MonitoringObject, or nullptr if not found.
+     */
+    static MonitoringObject* findMonitoringObject(const std::string& objName);
+    /**
      * Set the integer value of the parameter.
      * @param parname The name of the parameter.
      * @param vint The value to be set.
      */
     static void setIntValue(const std::string& parname, int vint);
+
     /**
      * Set the float value of the parameter.
      * @param parname The name of the parameter.
@@ -138,6 +162,13 @@ namespace Belle2 {
      */
     static void addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
+
+    /**
+     * Get MonitoringObject with given name (new object is created if non-existing)
+     * @param histname name of MonitoringObject to get
+     */
+    static MonitoringObject* getMonitoringObject(const std::string& histname);
+
     /**
      * Clear and reset the list of histograms.
      */

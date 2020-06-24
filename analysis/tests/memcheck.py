@@ -4,6 +4,9 @@
 """This script is used in the nightly build to check for memory issues with valgrind.
 It is run as a test to make sure the memcheck does not fail because of issues in the script."""
 
+from b2test_utils import skip_test_if_light
+skip_test_if_light()  # light builds don't contain simulation, reconstruction etc; skip before trying to import
+
 from basf2 import set_random_seed, set_log_level, LogLevel, create_path, Module, find_file, process, statistics
 from simulation import add_simulation
 from L1trigger import add_tsim
@@ -54,9 +57,8 @@ main.add_module('EvtGenInput', userDECFile=find_file('decfiles/dec/1111440100.de
 
 # detector simulation
 bg = None
-# temporarily disable background overlay until new background files are produced
-# if 'BELLE2_BACKGROUND_DIR' in os.environ:
-#    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+if 'BELLE2_BACKGROUND_DIR' in os.environ:
+    bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
 add_simulation(main, bkgfiles=bg)
 
 # trigger simulation
@@ -109,7 +111,7 @@ TagV('B0:jpsiks', 'breco', path=main)
 # select variables that we want to store to ntuple
 fs_vars = ['kaonID', 'muonID', 'dr', 'dz', 'pValue', 'isSignal', 'mcErrors', 'genMotherID']
 b_vars = ['nTracks', 'Mbc', 'deltaE', 'p', 'E', 'useCMSFrame(p)', 'useCMSFrame(E)',
-          'isSignal', 'mcErrors', 'nROE_KLMClusters', 'qrOutput(FBDT)', 'TagVLBoost', 'TagVz', 'TagVzErr', 'MCDeltaT'] + \
+          'isSignal', 'mcErrors', 'nROE_KLMClusters', 'qrOutput(FBDT)', 'TagVLBoost', 'TagVz', 'TagVzErr', 'mcDeltaT'] + \
     ['daughter(0,daughter(0,%s))' % var for var in fs_vars]
 
 # save variables to ntuple

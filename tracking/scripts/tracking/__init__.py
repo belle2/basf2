@@ -10,7 +10,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                                add_mva_quality_indicator=False):
+                                add_cdcTrack_QI=False, add_vxdTrack_QI=False, add_recoTrack_QI=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -33,17 +33,31 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
-    :param add_mva_quality_indicator: If true, add the MVA track quality estimation
-        to the path that sets the quality indicator property of the found tracks.
-        Requires ``fit_tracks`` to be also true for the final quality estimation step to work.
+    :param add_cdcTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found CDC standalone tracks
+    :param add_vxdTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found VXDTF2 tracks
+        (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+        -> setting this option to 'True' will have some influence on the final track collection)
+    :param add_recoTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of all found reco tracks
+        (Both other QIs needed as input.)
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
         return
 
-    if add_mva_quality_indicator and not fit_tracks:
-        B2ERROR("MVA track qualiy indicator requires `fit_tracks` to be enabled. Turning it off.")
-        add_mva_quality_indicator = False
+    if (add_cdcTrack_QI or add_vxdTrack_QI or add_recoTrack_QI) and not fit_tracks:
+        B2ERROR("MVA track qualiy indicator requires `fit_tracks` to be enabled. Turning all off.")
+        add_cdcTrack_QI = False
+        add_vxdTrack_QI = False
+        add_recoTrack_QI = False
+
+    if add_recoTrack_QI and (not add_cdcTrack_QI or not add_vxdTrack_QI):
+        B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
+        add_cdcTrack_QI = False
+        add_vxdTrack_QI = False
+        add_recoTrack_QI = False
 
     if not skipGeometryAdding:
         add_geometry_modules(path, components=components)
@@ -65,7 +79,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                           use_second_cdc_hits=use_second_cdc_hits,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
                           use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
-                          add_subtrack_mva_quality_indicators=add_mva_quality_indicator)
+                          add_cdcTrack_QI=add_cdcTrack_QI, add_vxdTrack_QI=add_vxdTrack_QI)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -78,7 +92,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_track_fit_and_track_creator(path, components=components, pruneTracks=pruneTracks,
                                         trackFitHypotheses=trackFitHypotheses,
                                         reco_tracks=reco_tracks,
-                                        add_mva_quality_indicator=add_mva_quality_indicator)
+                                        add_mva_quality_indicator=add_recoTrack_QI)
 
     if prune_temporary_tracks or pruneTracks:
         path.add_module("PruneRecoHits")
@@ -172,7 +186,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       prune_temporary_tracks=True, use_second_cdc_hits=False,
                       use_mc_truth=False, svd_ckf_mode="VXDTF2_after", add_both_directions=True,
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                      add_subtrack_mva_quality_indicators=False):
+                      add_cdcTrack_QI=False, add_vxdTrack_QI=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -187,11 +201,12 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         If true, prune them.
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
-    :param add_subtrack_mva_quality_indicators: If true, add intermediate
-        subtrack MVA quality indicators to the temporary reco tracks from CDC
-        and SVD standalone tracking. Does not add the final MVA quality
-        indicator to the produced ``reco_tracks`` store array, as it requires
-        the output of the track fit.
+    :param add_cdcTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found CDC standalone tracks
+    :param add_vxdTrack_QI: If true, add the MVA track quality estimation
+        to the path that sets the quality indicator property of the found VXDTF2 tracks
+        (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+        -> setting this option to 'True' will have some influence on the final track collection)
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
@@ -203,6 +218,10 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     if use_ecl_to_cdc_ckf and not is_ecl_used(components):
         B2ERROR("ECL CKF cannot be used without ECL. Turning it off.")
         use_ecl_to_cdc_ckf = False
+
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     # output tracks
     cdc_reco_tracks = "CDCRecoTracks"
@@ -230,7 +249,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 
     if is_cdc_used(components):
         add_cdc_track_finding(path, use_second_hits=use_second_cdc_hits, output_reco_tracks=cdc_reco_tracks,
-                              add_mva_quality_indicator=add_subtrack_mva_quality_indicators)
+                              add_mva_quality_indicator=add_cdcTrack_QI)
         temporary_reco_track_list.append(cdc_reco_tracks)
         latest_reco_tracks = cdc_reco_tracks
 
@@ -240,7 +259,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                               temporary_reco_tracks=svd_reco_tracks,
                               svd_ckf_mode=svd_ckf_mode, add_both_directions=add_both_directions,
                               use_svd_to_cdc_ckf=use_svd_to_cdc_ckf, prune_temporary_tracks=prune_temporary_tracks,
-                              add_mva_quality_indicator=add_subtrack_mva_quality_indicators)
+                              add_mva_quality_indicator=add_vxdTrack_QI)
         temporary_reco_track_list.append(svd_reco_tracks)
         temporary_reco_track_list.append(svd_cdc_reco_tracks)
         latest_reco_tracks = svd_cdc_reco_tracks
@@ -275,6 +294,10 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
 def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_taking_period='early_phase3',
                          merge_tracks=True, use_second_cdc_hits=False):
     import cdc.cr as cosmics_setup
+
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     if data_taking_period not in ["phase2", "early_phase3", "phase3"]:
         cosmics_setup.set_cdc_cr_parameters(data_taking_period)
@@ -314,9 +337,9 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
             latest_reco_tracks = svd_cdc_reco_tracks
 
         if is_pxd_used(components):
-            add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                  output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                  filter_cut=0.01)
+            add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                                     output_reco_tracks=full_reco_tracks, add_both_directions=True,
+                                     filter_cut=0.01)
 
         if merge_tracks:
             # merge the tracks together
@@ -363,7 +386,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
         path.add_module(material_effects)
 
     # SET StoreArray names
-
     svd_reco_tracks = "__ROIsvdRecoTracks"
 
     # SVD ONLY TRACK FINDING
@@ -371,8 +393,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
                                  svd_clusters=svd_cluster)
 
     # TRACK FITTING
-
-    # track fitting
     dafRecoFitter = register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
@@ -405,6 +425,10 @@ def add_vxd_standalone_cosmics_finder(
     :param max_rejected_sps: Maximal number of retries to refit a track after the worst spacepoint was removed;
                              defaults to 5;
     """
+
+    # register EventTrackingInfo
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
 
     sp_creator_pxd = register_module('PXDSpacePointCreator')
     sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)

@@ -269,46 +269,46 @@ class BackgroundTagColorMap(CDCHitColorMap):
     """
 
     #: access the SimHitBase enum of background tags
-    SimHitBase = Belle2.SimHitBase
+    BackgroundMetaData = Belle2.BackgroundMetaData
 
     #: dictionary of (tag, label) pairs
     bkgname_by_bkgtag = {
-        SimHitBase.bg_none: 'bg_none',
-        SimHitBase.bg_Coulomb_LER: 'bg_Coulomb_LER',
-        SimHitBase.bg_Coulomb_HER: 'bg_Coulomb_HER',
-        SimHitBase.bg_RBB_LER: 'bg_RBB_LER',
-        SimHitBase.bg_RBB_HER: 'bg_RBB_HER',
-        SimHitBase.bg_Touschek_LER: 'bg_Touschek_LER',
-        SimHitBase.bg_Touschek_HER: 'bg_Touschek_HER',
-        SimHitBase.bg_twoPhoton: 'bg_twoPhoton',
-        SimHitBase.bg_RBB_gamma: 'bg_RBB_gamma',
-        SimHitBase.bg_RBB_LER_far: 'bg_RBB_LER_far',
-        SimHitBase.bg_RBB_HER_far: 'bg_RBB_HER_far',
-        SimHitBase.bg_Touschek_LER_far: 'bg_Touschek_LER_far',
-        SimHitBase.bg_Touschek_HER_far: 'bg_Touschek_HER_far',
-        SimHitBase.bg_SynchRad_LER: 'bg_SynchRad_LER',
-        SimHitBase.bg_SynchRad_HER: 'bg_SynchRad_HER',
-        SimHitBase.bg_other: 'bg_other',
+        BackgroundMetaData.bg_none: 'bg_none',
+        BackgroundMetaData.bg_Coulomb_LER: 'bg_Coulomb_LER',
+        BackgroundMetaData.bg_Coulomb_HER: 'bg_Coulomb_HER',
+        BackgroundMetaData.bg_RBB_LER: 'bg_RBB_LER',
+        BackgroundMetaData.bg_RBB_HER: 'bg_RBB_HER',
+        BackgroundMetaData.bg_Touschek_LER: 'bg_Touschek_LER',
+        BackgroundMetaData.bg_Touschek_HER: 'bg_Touschek_HER',
+        BackgroundMetaData.bg_twoPhoton: 'bg_twoPhoton',
+        BackgroundMetaData.bg_RBB_gamma: 'bg_RBB_gamma',
+        BackgroundMetaData.bg_RBB_LER_far: 'bg_RBB_LER_far',
+        BackgroundMetaData.bg_RBB_HER_far: 'bg_RBB_HER_far',
+        BackgroundMetaData.bg_Touschek_LER_far: 'bg_Touschek_LER_far',
+        BackgroundMetaData.bg_Touschek_HER_far: 'bg_Touschek_HER_far',
+        BackgroundMetaData.bg_SynchRad_LER: 'bg_SynchRad_LER',
+        BackgroundMetaData.bg_SynchRad_HER: 'bg_SynchRad_HER',
+        BackgroundMetaData.bg_other: 'bg_other',
     }
 
     #: dictionary of (tag, color) pairs
     color_by_bkgtag = {
-        SimHitBase.bg_none: 'orange',
-        SimHitBase.bg_Coulomb_LER: 'red',
-        SimHitBase.bg_Coulomb_HER: 'darkred',
-        SimHitBase.bg_RBB_LER: 'blue',
-        SimHitBase.bg_RBB_HER: 'darkblue',
-        SimHitBase.bg_Touschek_LER: 'green',
-        SimHitBase.bg_Touschek_HER: 'darkgreen',
-        SimHitBase.bg_twoPhoton: 'violet',
-        SimHitBase.bg_RBB_gamma: 'skyblue',
-        SimHitBase.bg_RBB_LER_far: 'turquoise',
-        SimHitBase.bg_RBB_HER_far: 'darkturquoise',
-        SimHitBase.bg_Touschek_LER_far: 'olivergreen',
-        SimHitBase.bg_Touschek_HER_far: 'darkolivegreen',
-        SimHitBase.bg_SynchRad_LER: 'goldenrod',
-        SimHitBase.bg_SynchRad_HER: 'darkgoldenrod',
-        SimHitBase.bg_other: 'orange',
+        BackgroundMetaData.bg_none: 'orange',
+        BackgroundMetaData.bg_Coulomb_LER: 'red',
+        BackgroundMetaData.bg_Coulomb_HER: 'darkred',
+        BackgroundMetaData.bg_RBB_LER: 'blue',
+        BackgroundMetaData.bg_RBB_HER: 'darkblue',
+        BackgroundMetaData.bg_Touschek_LER: 'green',
+        BackgroundMetaData.bg_Touschek_HER: 'darkgreen',
+        BackgroundMetaData.bg_twoPhoton: 'violet',
+        BackgroundMetaData.bg_RBB_gamma: 'skyblue',
+        BackgroundMetaData.bg_RBB_LER_far: 'turquoise',
+        BackgroundMetaData.bg_RBB_HER_far: 'darkturquoise',
+        BackgroundMetaData.bg_Touschek_LER_far: 'olivergreen',
+        BackgroundMetaData.bg_Touschek_HER_far: 'darkolivegreen',
+        BackgroundMetaData.bg_SynchRad_LER: 'goldenrod',
+        BackgroundMetaData.bg_SynchRad_HER: 'darkgoldenrod',
+        BackgroundMetaData.bg_other: 'orange',
     }
 
     def __call__(self, iCDCHit, cdcHit):

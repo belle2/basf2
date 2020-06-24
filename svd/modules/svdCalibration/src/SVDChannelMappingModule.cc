@@ -11,6 +11,8 @@
 #include <svd/modules/svdCalibration/SVDChannelMappingModule.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <TH2F.h>
+
 using namespace std;
 using namespace Belle2;
 

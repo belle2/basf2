@@ -12,16 +12,16 @@
 
 #include "vxd/modules/vxdDQM/VXDDQMExpressRecoModule.h"
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <svd/geometry/SensorInfo.h>
 
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
+#include <pxd/geometry/SensorInfo.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>

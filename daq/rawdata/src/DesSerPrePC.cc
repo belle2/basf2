@@ -9,6 +9,12 @@
 #include <rawdata/dataobjects/RawFTSWFormat_latest.h>
 #include <rawdata/dataobjects/RawTLUFormat.h>
 
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <netinet/tcp.h>
+
+#include <sys/socket.h>
+
 //#define NO_DATA_CHECK
 //#define DUMHSLB
 

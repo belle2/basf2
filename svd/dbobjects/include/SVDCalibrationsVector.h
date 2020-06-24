@@ -16,6 +16,7 @@
 
 namespace Belle2 {
 
+  /** template class for vector (one per strip) calibrations */
   template <class T >
   class SVDCalibrationsVector {
 

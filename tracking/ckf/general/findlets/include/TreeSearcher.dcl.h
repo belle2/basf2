@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <tracking/trackFindingCDC/ca/CellularAutomaton.h>
@@ -33,10 +33,11 @@ namespace Belle2 {
    */
   template <class AState, class AStateRejecter, class AResult>
   class TreeSearcher : public
-    TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelation<AState>, AResult> {
+    TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelationPointerComparison<AState>, AResult> {
   private:
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelation<AState>, AResult>;
+    using Super =
+      TrackFindingCDC::Findlet<const AState, AState, const TrackFindingCDC::WeightedRelationPointerComparison<AState>, AResult>;
 
   public:
     /// Construct this findlet and add the subfindlet as listener
@@ -53,13 +54,13 @@ namespace Belle2 {
      */
     void apply(const std::vector<AState>& seededStates,
                std::vector<AState>& hitStates,
-               const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
+               const std::vector<TrackFindingCDC::WeightedRelationPointerComparison<AState>>& relations,
                std::vector<AResult>& results) final;
 
   private:
     /// Implementation of the traverseTree function
     void traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>& path,
-                      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
+                      const std::vector<TrackFindingCDC::WeightedRelationPointerComparison<AState>>& relations,
                       std::vector<AResult>& results);
 
   private:
@@ -67,7 +68,7 @@ namespace Belle2 {
     AStateRejecter m_stateRejecter;
 
     /// Findlet for adding a recursion cell state to the states
-    TrackFindingCDC::CellularAutomaton<AState> m_automaton;
+    TrackFindingCDC::CellularAutomaton<AState, TrackFindingCDC::WeightedRelationPointerComparison> m_automaton;
 
     /// Parameter: Make it possible to have all subresults in the end results vector.
     bool m_param_endEarly = true;

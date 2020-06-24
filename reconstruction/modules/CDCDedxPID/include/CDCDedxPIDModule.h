@@ -10,9 +10,6 @@
 
 #pragma once
 
-#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
@@ -22,11 +19,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
@@ -39,17 +34,10 @@
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
-#include <string>
 #include <vector>
-#include <map>
-#include <TVector3.h>
 
-class TH2F;
 
 namespace Belle2 {
-  class PXDCluster;
-  class SVDCluster;
-  class CDCDedxTrack;
 
   /** Extract CDC dE/dx information from fitted tracks.
    *
@@ -140,6 +128,12 @@ namespace Belle2 {
     void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
                       double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit) const;
 
+
+    /** Non linearity correction for HS correction (at higher ionisation)
+     *
+     * @param ADC is the real ADC
+     **/
+    Int_t NonLinearityADCMap(const int& ADC);
     /** for all particles, save log-likelihood values into 'logl'.
      *
      * @param logl  array of log-likelihood to be modified

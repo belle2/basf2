@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LHEINPUTMODULE_H
-#define LHEINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -21,9 +20,9 @@
 
 namespace Belle2 {
 
-  /** The LHEInput module.
-   * Loads events from a LHE file and stores the content
-   * into the MCParticle class.
+  /**
+   * The LHEInput module.
+   * Loads events from a LHE file and stores the content into the MCParticle class.
    */
   class LHEInputModule : public Module {
 
@@ -46,12 +45,12 @@ namespace Belle2 {
 
   protected:
 
-    std::vector <std::string>  m_inputFileNames; /**< The list of filenames of input LHEfile. */
+    std::vector<std::string>  m_inputFileNames; /**< The list of filenames of input LHEfile. */
     std::string m_inputFileName;     /**< The Name of the current input LHE file. */
     uint m_iFile;                    /**< Index of the current LHE input file. */
     int m_skipEventNumber;           /**< The number of events which should be skipped at the start of reading. */
-    int m_nInitial;                  /**< The number of particles in each event that should be made initial */
-    int m_nVirtual;                  /**< The number of particles in each event that should be made virtual */
+    int m_nInitial;              /**< The number of particles in each event that should be flagges with c_Initial */
+    int m_nVirtual;              /**< The number of particles in each event that should be flagged with c_IsVirtual */
     LHEReader m_lhe;                 /**< An instance of the LHE reader. */
     MCParticleGraph mpg;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
@@ -71,6 +70,4 @@ namespace Belle2 {
 
   };
 
-} // end namespace Belle2
-
-#endif // HEPEVTINPUTMODULE_H
+}

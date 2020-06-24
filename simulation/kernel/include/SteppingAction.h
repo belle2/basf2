@@ -14,6 +14,8 @@
 #include <globals.hh>
 #include <G4UserSteppingAction.hh>
 
+#include <vector>
+
 namespace Belle2 {
 
   namespace Simulation {
@@ -44,6 +46,12 @@ namespace Belle2 {
       /** Sets the trajectory option to enable storing of the simulated particle trajectories */
       void setStoreTrajectories(bool store) { m_storeTrajectories = store; }
 
+      /** Sets the radii of absorbers for killing tracks across them.
+       * This set is used in the PXD only simulation for PXD gain calibration.
+       * @param vec The c++ vector with the radii of absorbers in cm
+       */
+      void setAbsorbersR(const std::vector<float>& vec) { m_absorbers = vec; };
+
       /** The method will be called at each step during simulation.
        * @param step The pointer of current step.
        */
@@ -55,6 +63,8 @@ namespace Belle2 {
       int m_maxNumberSteps; /**< The maximum number of steps before the track transportation is stopped and the track is killed. */
       /** if true, check if the track has attached trajectory info and append step information if necessary */
       bool m_storeTrajectories = false;
+      std::vector<float> m_absorbers; /**< The absorbers defined at given radii where tracks across them will be destroyed. */
+
 
     };
 

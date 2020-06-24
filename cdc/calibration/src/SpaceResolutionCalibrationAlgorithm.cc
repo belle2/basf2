@@ -74,17 +74,17 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
 
   auto tree = getObjectPtr<TTree>("tree");
 
-  int lay;
-  float w;
-  float x_u;
-  float x_b;
-  float x_mea;
-  float Pval;
-  float alpha;
-  float theta;
-  float ndf;
-  float absRes_u;
-  float absRes_b;
+  UChar_t lay;
+  Float_t w;
+  Float_t x_u;
+  Float_t x_b;
+  Float_t x_mea;
+  Float_t Pval;
+  Float_t alpha;
+  Float_t theta;
+  Float_t ndf;
+  Float_t absRes_u;
+  Float_t absRes_b;
   tree->SetBranchAddress("lay", &lay);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
@@ -104,11 +104,11 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
   }
 
 
-  const int nEntries = tree->GetEntries();
+  const Long64_t nEntries = tree->GetEntries();
   B2INFO("Number of entries: " << nEntries);
   int ith = -99;
   int ial = -99;
-  for (int i = 0; i < nEntries; ++i) {
+  for (Long64_t i = 0; i < nEntries; ++i) {
     tree->GetEntry(i);
     if (std::fabs(x_b) < 0.02 || std::fabs(x_u) < 0.02) continue;
     if (Pval < m_minPval || ndf < m_minNdf) continue;
@@ -137,8 +137,9 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
     absRes_u = fabs(x_mea) - fabs(x_u);
     absRes_b = fabs(x_mea) - fabs(x_b);
 
-    m_hUnbiased[lay][ilr][ial][ith]->Fill(fabs(x_u), absRes_u, w);
-    m_hBiased[lay][ilr][ial][ith]->Fill(fabs(x_b), absRes_b, w);
+    int ilay = static_cast<int>(lay);
+    m_hUnbiased[ilay][ilr][ial][ith]->Fill(fabs(x_u), absRes_u, w);
+    m_hBiased[ilay][ilr][ial][ith]->Fill(fabs(x_b), absRes_b, w);
   }
 
 

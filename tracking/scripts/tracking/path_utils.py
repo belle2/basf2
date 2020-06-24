@@ -1,7 +1,7 @@
 from pybasf2 import B2WARNING
 
 from basf2 import register_module, create_path
-from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf
+from ckf.path_functions import add_pxd_ckf, add_ckf_based_merger, add_svd_ckf, add_cosmics_svd_ckf, add_cosmics_pxd_ckf
 from pxd import add_pxd_reconstruction
 from svd import add_svd_reconstruction
 from tracking.adjustments import adjust_module
@@ -265,6 +265,30 @@ def add_pxd_track_finding(path, components, input_reco_tracks, output_reco_track
                     VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)
 
 
+def add_pxd_cr_track_finding(path, components, input_reco_tracks, output_reco_tracks, use_mc_truth=False,
+                             add_both_directions=False, temporary_reco_tracks="PXDRecoTracks", **kwargs):
+    """Add the pxd track finding to the path"""
+    if not is_pxd_used(components):
+        return
+
+    if use_mc_truth:
+        # MC CKF needs MC matching information
+        path.add_module("MCRecoTracksMatcher", UsePXDHits=False,
+                        UseSVDHits=is_svd_used(components), UseCDCHits=is_cdc_used(components),
+                        mcRecoTracksStoreArrayName="MCRecoTracks",
+                        prRecoTracksStoreArrayName=input_reco_tracks)
+
+    add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks=input_reco_tracks, pxd_reco_tracks=temporary_reco_tracks,
+                        direction="backward", use_mc_truth=use_mc_truth, **kwargs)
+
+    if add_both_directions:
+        add_cosmics_pxd_ckf(path, svd_cdc_reco_tracks=input_reco_tracks, pxd_reco_tracks=temporary_reco_tracks,
+                            direction="forward", use_mc_truth=use_mc_truth, **kwargs)
+
+    path.add_module("RelatedTracksCombiner", CDCRecoTracksStoreArrayName=input_reco_tracks,
+                    VXDRecoTracksStoreArrayName=temporary_reco_tracks, recoTracksStoreArrayName=output_reco_tracks)
+
+
 def add_svd_track_finding(
         path,
         components,
@@ -306,6 +330,8 @@ def add_svd_track_finding(
     :param prune_temporary_tracks: Delete all hits expect the first and last from intermediate track objects.
     :param add_mva_quality_indicator: Add the VVXDQualityEstimatorMVA module to set the quality indicator
            property for tracks from VXDTF2 standalone tracking
+           (ATTENTION: Standard triplet QI of VXDTF2 is replaced in this case
+           -> setting this option to 'True' will have some influence on the final track collection)
     """
 
     if not is_svd_used(components):
@@ -439,6 +465,10 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     :param reattach_hits: if true, use the ReattachCDCWireHitsToRecoTracks module at the end of the CDC track finding
                           to readd hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
     """
+    # add EventLevelTrackinginfo for logging errors
+    if 'RegisterEventLevelTrackingInfo' not in path:
+        path.add_module('RegisterEventLevelTrackingInfo')
+
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
     path.add_module("TFCDC_WireHitPreparer",
                     wirePosition="aligned",
@@ -505,6 +535,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
+            filterParameters={"cut": 0.0},
+            deleteTracks=False,
+            resetTakenFlag=False
         )
 
     # Export CDCTracks to RecoTracks representation
@@ -779,6 +812,16 @@ def add_vxd_track_finding_vxdtf2(
     # Preparation
     #################
 
+    # setup the event level tracking info to log errors and stuff
+    nameTrackingInfoModule = "RegisterEventLevelTrackingInfo" + suffix
+    nameEventTrackingInfo = "EventLevelTrackingInfo" + suffix
+    if nameTrackingInfoModule not in path:
+        # Use modified name of module and created StoreObj as module might be added twice (PXDDataReduction)
+        registerEventlevelTrackingInfo = register_module('RegisterEventLevelTrackingInfo')
+        registerEventlevelTrackingInfo.set_name(nameTrackingInfoModule)
+        registerEventlevelTrackingInfo.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
+        path.add_module(registerEventlevelTrackingInfo)
+
     nameSPs = 'SpacePoints' + suffix
 
     pxdSPCreatorName = 'PXDSpacePointCreator' + suffix
@@ -809,10 +852,12 @@ def add_vxd_track_finding_vxdtf2(
         spacePointArrayNames += ["PXD" + nameSPs]
 
     nameSegNet = 'SegmentNetwork' + suffix
+
     segNetProducer = register_module('SegmentNetworkProducer')
     segNetProducer.param('NetworkOutputName', nameSegNet)
     segNetProducer.param('SpacePointsArrayNames', spacePointArrayNames)
     segNetProducer.param('sectorMapName', custom_setup_name or setup_name)
+    segNetProducer.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
     path.add_module(segNetProducer)
 
     #################
@@ -830,6 +875,7 @@ def add_vxd_track_finding_vxdtf2(
     trackFinder.param('setFamilies', useTwoStepSelection)
     trackFinder.param('selectBestPerFamily', useTwoStepSelection)
     trackFinder.param('xBestPerFamily', 30)
+    trackFinder.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
     path.add_module(trackFinder)
 
     if useTwoStepSelection:

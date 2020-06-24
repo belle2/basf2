@@ -30,7 +30,7 @@ b2.print_params(beamparameters)
 
 # specify number of events to be generated
 eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10000])
+eventinfosetter.param('evtNumList', [5000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 BottomoniumGammaUpsilonskimpath.add_module(eventinfosetter)

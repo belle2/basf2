@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>feiHadronicB0.dst.root</output>
+  <output>../feiHadronicB0.dst.root</output>
   <contact>philip.grace@adelaide.edu.au</contact>
 </header>
 """

@@ -13,33 +13,13 @@ __author__ = "N. Rout"
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdK, stdPi
-import skimExpertFunctions as expert
-
+from skim.btocharm import BtoDh_hh
 
 path = b2.Path()
 
-skimCode = expert.encodeSkimName('BtoDh_hh')
-
 fileList = ['../BtoDh_hh.dst.root']
-
 ma.inputMdstList('default', fileList, path=path)
 
-# Load particle lists
-stdPi('all', path=path)
-stdK('all', path=path)
-
-
-# Hh skim
-from skim.btocharm import loadD0bar, BsigToDhTohhList
-loadD0bar(path=path)
-BtoDhList = BsigToDhTohhList(path=path)
-expert.skimOutputUdst(skimCode, BtoDhList, path=path)
-ma.summaryOfLists(BtoDhList, path=path)
-
-# Suppress noisy modules, and then process
-expert.setSkimLogging(path)
+skim = BtoDh_hh()
+skim(path)
 b2.process(path)
-
-# print out the summary
-print(b2.statistics)

@@ -13,30 +13,13 @@ __author__ = "P. Grace"
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdE, stdMu, stdPi
-import skimExpertFunctions as expert
+from skim.semileptonic import PRsemileptonicUntagged
 
-
-PRSLpath = b2.Path()
+path = b2.Path()
 
 fileList = ['../PRsemileptonicUntagged.dst.root']
+ma.inputMdstList('default', fileList, path=path)
 
-ma.inputMdstList('default', fileList, path=PRSLpath)
-
-# Load particle lists
-stdPi('all', path=PRSLpath)
-stdE('all', path=PRSLpath)
-stdMu('all', path=PRSLpath)
-
-# PR Skim
-from skim.semileptonic import PRList
-PRList = PRList(path=PRSLpath)
-expert.skimOutputUdst('../PRsemileptonicUntagged', PRList, path=PRSLpath)
-
-ma.summaryOfLists(PRList, path=PRSLpath)
-
-
-expert.setSkimLogging(path=PRSLpath)
-b2.process(path=PRSLpath)
-# print out the summary
-print(b2.statistics)
+skim = PRsemileptonicUntagged(OutputFileName='../PRsemileptonicUntagged.udst.root')
+skim(path)
+b2.process(path)

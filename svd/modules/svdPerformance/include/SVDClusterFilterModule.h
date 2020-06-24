@@ -60,10 +60,10 @@ namespace Belle2 {
     float m_minClSNR; /**< minimum cluster SNR */
 
     std::set<VxdID> m_outVxdID; /**<set  containing the VxdID of the DUT sensors */
-    void create_outVxdID_set(); /**creates the set containing the VxdID of the DUT sensors */
+    void create_outVxdID_set(); /**<creates the set containing the VxdID of the DUT sensors */
 
-    SelectSubset<SVDCluster> m_selectedClusters; /** all clusters NOT on the layer with m_layerNum */
-    SelectSubset<SVDCluster> m_notSelectedClusters; /** all clusters on the layer with m_layerNum */
+    SelectSubset<SVDCluster> m_selectedClusters; /**< all clusters NOT on the layer with m_layerNum */
+    SelectSubset<SVDCluster> m_notSelectedClusters; /**< all clusters on the layer with m_layerNum */
   };
 }
 

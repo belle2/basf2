@@ -44,36 +44,63 @@ using namespace Belle2::Simulation;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-EnergyLossForExtrapolator::EnergyLossForExtrapolator(void)
-  : m_UserMaxEnergyTransfer(DBL_MAX), m_Initialised(false)
+EnergyLossForExtrapolator::EnergyLossForExtrapolator(void) :
+  m_Particle(nullptr),
+  m_Electron(nullptr),
+  m_Positron(nullptr),
+  m_MuonPlus(nullptr),
+  m_MuonMinus(nullptr),
+  m_PionPlus(nullptr),
+  m_PionMinus(nullptr),
+  m_KaonPlus(nullptr),
+  m_KaonMinus(nullptr),
+  m_Proton(nullptr),
+  m_AntiProton(nullptr),
+  m_Deuteron(nullptr),
+  m_AntiDeuteron(nullptr),
+  m_ProductionCuts(nullptr),
+  m_DedxElectron(nullptr),
+  m_DedxPositron(nullptr),
+  m_DedxMuon(nullptr),
+  m_DedxPion(nullptr),
+  m_DedxKaon(nullptr),
+  m_DedxProton(nullptr),
+  m_DedxDeuteron(nullptr),
+  m_RangeElectron(nullptr),
+  m_RangePositron(nullptr),
+  m_RangeMuon(nullptr),
+  m_RangePion(nullptr),
+  m_RangeKaon(nullptr),
+  m_RangeProton(nullptr),
+  m_RangeDeuteron(nullptr),
+  m_InvRangeElectron(nullptr),
+  m_InvRangePositron(nullptr),
+  m_InvRangeMuon(nullptr),
+  m_InvRangePion(nullptr),
+  m_InvRangeKaon(nullptr),
+  m_InvRangeProton(nullptr),
+  m_InvRangeDeuteron(nullptr),
+  m_MscatElectron(nullptr),
+  m_Material(nullptr),
+  m_MaterialIndex(0),
+  m_ElectronDensity(0),
+  m_RadLength(0),
+  m_Mass(0),
+  m_ChargeSq(0),
+  m_KineticEnergy(0),
+  m_Gamma(1.0),
+  m_BetaGammaSq(0),
+  m_BetaSq(0),
+  m_Tmax(0),
+  m_LinLossLimit(0.01),
+  m_UserTmin(1.*CLHEP::MeV),
+  m_UserTmax(10.*CLHEP::TeV),
+  m_UserMaxEnergyTransfer(DBL_MAX),
+  m_Nbins(70),
+  m_NMaterials(0),
+  m_Initialised(false)
 {
-  m_Particle = 0;
-  m_Material = 0;
-
-  m_LinLossLimit = 0.01;
-  m_UserTmin = 1.*CLHEP::MeV;
-  m_UserTmax = 10.*CLHEP::TeV;
-  m_Nbins = 70;
-
-  m_NMaterials = m_MaterialIndex = 0;
-  m_ProductionCuts = 0;
-
-  m_Mass = m_ChargeSq = m_ElectronDensity = m_RadLength = m_BetaGammaSq = m_BetaSq = m_KineticEnergy = m_Tmax = 0;
-  m_Gamma = 1.0;
-
-  m_Electron = m_Positron = m_MuonPlus = m_MuonMinus =
-                                           m_PionPlus = m_PionMinus = m_KaonPlus = m_KaonMinus =
-                                                          m_Proton = m_AntiProton = m_Deuteron = m_AntiDeuteron = 0;
-  m_DedxElectron = m_RangeElectron = m_InvRangeElectron = m_MscatElectron = 0;
-  m_DedxPositron = m_RangePositron = m_InvRangePositron = 0;
-  m_DedxMuon = m_RangeMuon = m_InvRangeMuon = 0;
-  m_DedxPion = m_RangePion = m_InvRangePion = 0;
-  m_DedxKaon = m_RangeKaon = m_InvRangeKaon = 0;
-  m_DedxProton = m_RangeProton = m_InvRangeProton = 0;
-  m_DedxDeuteron = m_RangeDeuteron = m_InvRangeDeuteron = 0;
-
   Initialisation();
-
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -281,7 +308,7 @@ void EnergyLossForExtrapolator::Initialisation()
   m_InvRangeDeuteron = PrepareTable();
   m_MscatElectron    = PrepareTable();
 
-  G4LossTableBuilder builder;
+  G4LossTableBuilder& builder = *(G4LossTableManager::Instance()->GetTableBuilder());
 
   B2DEBUG(10, "EnergyLossForExtrapolator Builds electron tables");
   ComputeElectronDEDX(m_Electron, m_DedxElectron);

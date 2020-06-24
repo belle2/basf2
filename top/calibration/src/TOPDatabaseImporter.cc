@@ -12,23 +12,14 @@
 #include <top/calibration/TOPDatabaseImporter.h>
 #include <top/geometry/TOPGeometryPar.h>
 
-// framework - core
-#include <framework/core/RandomGenerator.h> // gRandom
-
 // framework - Database
-#include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 
-// framework - xml
-#include <framework/gearbox/GearDir.h>
-
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // DB objects
@@ -45,6 +36,7 @@
 #include <top/dbobjects/TOPCalIntegratedCharge.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
 #include <top/dbobjects/TOPCalAsicShift.h>
+#include <top/dbobjects/TOPCalTimeWalk.h>
 
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
@@ -1444,6 +1436,35 @@ namespace Belle2 {
              << pmtQECorrected.getEntries() << " PMT's.");
 
   }
+
+
+  void TOPDatabaseImporter::importTimeWalk(PyObject* list, double a, double b,
+                                           int firstExp, int firstRun,
+                                           int lastExp, int lastRun)
+  {
+
+    std::vector<double> params;
+    if (PyList_Check(list)) {
+      for (Py_ssize_t i = 0; i < PyList_Size(list); i++) {
+        PyObject* value = PyList_GetItem(list, i);
+        params.push_back(PyFloat_AsDouble(value));
+        B2INFO(i << " " << params.back());
+      }
+    } else {
+      B2ERROR("Input Python object is not a list");
+      return;
+    }
+
+    DBImportObjPtr<TOPCalTimeWalk> timeWalk;
+    timeWalk.construct();
+    timeWalk->set(params, a, b);
+
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    timeWalk.import(iov);
+
+    B2RESULT("Time-walk constants imported");
+  }
+
 
 
 //---- for testing only -- will be removed --------------------------------

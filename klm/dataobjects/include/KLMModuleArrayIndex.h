@@ -13,9 +13,6 @@
 /* KLM headers. */
 #include <klm/dataobjects/KLMElementArrayIndex.h>
 
-/* C++ headers. */
-#include <map>
-
 namespace Belle2 {
 
   /**

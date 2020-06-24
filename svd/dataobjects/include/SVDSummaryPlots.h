@@ -18,6 +18,7 @@
 
 namespace Belle2 {
 
+  /** class to summarize SVD quantities per sensor and side*/
   class SVDSummaryPlots: public TObject {
 
   public:

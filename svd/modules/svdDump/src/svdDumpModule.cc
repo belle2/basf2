@@ -9,9 +9,6 @@
 
 #include <svd/modules/svdDump/svdDumpModule.h>
 
-//#include <rawdata/dataobjects/RawFTSW.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

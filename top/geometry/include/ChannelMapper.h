@@ -12,7 +12,6 @@
 
 #include <top/dbobjects/TOPChannelMap.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/IntervalOfValidity.h>
 
@@ -161,6 +160,13 @@ namespace Belle2 {
        * @return pixel ID (or c_invalidPixelID for invalid channel number)
        */
       int getPixelID(unsigned channel) const;
+
+      /**
+       * Returns PMT ID (1-based)
+       * @param pixel pixelID (1-based)
+       * @return PMT ID (or 0 for invalid pixel)
+       */
+      int getPmtID(int pixel) const;
 
       /**
        * Print mappings to terminal screen

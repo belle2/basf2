@@ -24,17 +24,13 @@
 #include <top/dataobjects/TOPBarHit.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// ROOT
-#include <TVector3.h>
+#include <cmath>
 
 using namespace std;
 
@@ -107,6 +103,8 @@ namespace Belle2 {
     // output
     m_pdfCollection.registerInDataStore();
     m_tracks.registerRelationTo(m_pdfCollection);
+    m_associatedPDFs.registerInDataStore();
+    m_digits.registerRelationTo(m_associatedPDFs);
 
     // check for module debug level
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
@@ -153,9 +151,10 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     // create reconstruction object
-    TOPreco reco(m_masses.size(), m_masses.data(), m_minBkgPerBar, m_scaleN0);
-    reco.setHypID(m_pdgCodes.size(), m_pdgCodes.data());
+    TOPreco reco(m_masses.size(), m_masses.data(), m_pdgCodes.data(),
+                 m_minBkgPerBar, m_scaleN0);
     reco.setPDFoption(m_PDFOption);
+    reco.setStoreOption(TOPreco::c_Full);
 
     // set time limit for photons lower than that given by TDC range (optional)
     if (m_maxTime > m_minTime) {
@@ -187,9 +186,12 @@ namespace Belle2 {
       for (unsigned i = 0; i < m_pdgCodes.size(); i++) {
         double mass = m_masses[i];
         int iPDGCode = m_pdgCodes[i];
-        reco.setMass(mass);
+        reco.setMass(mass, iPDGCode);
         reco.reconstruct(trk); // will run reconstruction only for this mass hypothesis
         if (reco.getFlag() != 1) break; // track is not in the acceptance of TOP
+
+        // associate PDF peaks with photons using S-plot technique
+        associatePDFPeaks(reco, trk.getModuleID(), iPDGCode);
 
         // collection of gaussian_t's for each pixel
         TOPPDFCollection::modulePDF_t channelPDFCollection;
@@ -214,6 +216,60 @@ namespace Belle2 {
     } // end loop over tracks
     ++m_iEvent;
   }
+
+
+  void TOPPDFDebuggerModule::associatePDFPeaks(const TOPreco& reco, int moduleID, int pdg)
+  {
+
+    for (const auto& digit : m_digits) {
+      if (digit.getModuleID() != moduleID) continue;
+      if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+
+      auto* associatedPDF = m_associatedPDFs.appendNew(pdg);
+      digit.addRelationTo(associatedPDF);
+
+      int pixelID = digit.getPixelID();
+      associatedPDF->setBackgroundWeight(reco.getBkgLevel(pixelID));
+
+      const auto& tts = TOPGeometryPar::Instance()->getTTS(moduleID, digit.getPMTNumber());
+      float time = digit.getTime();
+      float timeErr = digit.getTimeError();
+      for (int k = 0; k < reco.getNumofPDFPeaks(pixelID); k++) {
+        TOPAssociatedPDF::PDFPeak peak;
+        reco.getPDFPeak(pixelID, k, peak.position, peak.width, peak.numPhotons);
+        float wt = 0;
+        for (const auto& gaus : tts.getTTS()) {
+          float sig2 = peak.width * peak.width + gaus.sigma * gaus.sigma + timeErr * timeErr;
+          float x = pow(time - peak.position - gaus.position, 2) / sig2;
+          if (x > 20) continue;
+          wt += peak.numPhotons * gaus.fraction / sqrt(2 * M_PI * sig2) * exp(-x / 2);
+        }
+        if (wt > 0) {
+          peak.fic = reco.getPDFPeakFic(pixelID, k);
+          peak.e = reco.getPDFPeakE(pixelID, k);
+          peak.sige = reco.getPDFPeakSigE(pixelID, k);
+          peak.nx = reco.getPDFPeakNx(pixelID, k);
+          peak.ny = reco.getPDFPeakNy(pixelID, k);
+          peak.nxm = reco.getPDFPeakNxm(pixelID, k);
+          peak.nym = reco.getPDFPeakNym(pixelID, k);
+          peak.nxe = reco.getPDFPeakNxe(pixelID, k);
+          peak.nye = reco.getPDFPeakNye(pixelID, k);
+          peak.xd = reco.getPDFPeakXD(pixelID, k);
+          peak.yd = reco.getPDFPeakYD(pixelID, k);
+          peak.type = reco.getPDFPeakType(pixelID, k);
+          peak.kxe = reco.getPDFPeakKxe(pixelID, k);
+          peak.kye = reco.getPDFPeakKye(pixelID, k);
+          peak.kze = reco.getPDFPeakKze(pixelID, k);
+          peak.kxd = reco.getPDFPeakKxd(pixelID, k);
+          peak.kyd = reco.getPDFPeakKyd(pixelID, k);
+          peak.kzd = reco.getPDFPeakKzd(pixelID, k);
+          associatedPDF->appendPeak(peak, wt);
+        }
+      }
+    }
+
+  }
+
 
   void TOPPDFDebuggerModule::endRun()
   {

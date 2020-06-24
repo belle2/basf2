@@ -16,19 +16,20 @@
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
-#include <framework/core/RandomNumbers.h>
 #include <framework/gearbox/Unit.h>
 
 /* ROOT headers. */
 #include <TFile.h>
+#include <TRandom.h>
 #include <TTree.h>
 
 using namespace Belle2;
 
-KLMDisplacementGenerator::KLMDisplacementGenerator()
+KLMDisplacementGenerator::KLMDisplacementGenerator() :
+  m_GeoDat(&(EKLM::GeometryData::Instance())),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
 {
-  m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
 }
 
 KLMDisplacementGenerator::~KLMDisplacementGenerator()
@@ -48,8 +49,8 @@ void KLMDisplacementGenerator::fillZeroDisplacements(
         alignment->setModuleAlignment(module, &alignmentData);
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
-            segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
-                                              iSegment);
+            segment = m_eklmElementNumbers->segmentNumber(
+                        iSection, iLayer, iSector, iPlane, iSegment);
             segmentAlignment->setSegmentAlignment(segment, &alignmentData);
           }
         }
@@ -113,11 +114,11 @@ void KLMDisplacementGenerator::generateRandomDisplacement(
             for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
               for (iSegment = 1; iSegment <= m_GeoDat->getNSegments();
                    iSegment++) {
-                segment = m_GeoDat->segmentNumber(1, 1, 1, iPlane, iSegment);
+                segment = m_eklmElementNumbers->segmentNumber(1, 1, 1, iPlane, iSegment);
                 alignmentData = const_cast<KLMAlignmentData*>(
                                   segmentAlignment->getSegmentAlignment(segment));
-                segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
-                                                  iPlane, iSegment);
+                segment = m_eklmElementNumbers->segmentNumber(
+                            iSection, iLayer, iSector, iPlane, iSegment);
                 segmentAlignment->setSegmentAlignment(segment, alignmentData);
               }
             }
@@ -161,8 +162,8 @@ module:
               } while (!alignmentChecker.checkSegmentAlignment(
                          iSection, iLayer, iSector, iPlane, iSegment,
                          &moduleAlignmentData, &segmentAlignmentData, false));
-              segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
-                                                iPlane, iSegment);
+              segment = m_eklmElementNumbers->segmentNumber(
+                          iSection, iLayer, iSector, iPlane, iSegment);
               segmentAlignment->setSegmentAlignment(
                 segment, &segmentAlignmentData);
             }
@@ -230,8 +231,8 @@ void KLMDisplacementGenerator::readDisplacementFromROOTFile(
   n = tEKLMSegment->GetEntries();
   for (i = 0; i < n; i++) {
     tEKLMSegment->GetEntry(i);
-    segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
-                                      iSegment);
+    segment = m_eklmElementNumbers->segmentNumber(
+                iSection, iLayer, iSector, iPlane, iSegment);
     alignmentData = const_cast<KLMAlignmentData*>(
                       segmentAlignment->getSegmentAlignment(segment));
     switch (param) {
@@ -334,8 +335,8 @@ void KLMDisplacementGenerator::studySegmentAlignmentLimits(TFile* f)
           for (iLayer = 1; iLayer <= m_GeoDat->getNDetectorLayers(iSection);
                iLayer++) {
             for (iSector = 1; iSector <= m_GeoDat->getNSectors(); iSector++) {
-              segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector,
-                                                jPlane, jSegment);
+              segment = m_eklmElementNumbers->segmentNumber(
+                          iSection, iLayer, iSector, jPlane, jSegment);
               segmentAlignment.setSegmentAlignment(
                 segment, &alignmentDataRandom);
             }
@@ -407,8 +408,8 @@ void KLMDisplacementGenerator::saveDisplacement(
         tEKLMModule->Fill();
         for (iPlane = 1; iPlane <= m_GeoDat->getNPlanes(); iPlane++) {
           for (iSegment = 1; iSegment <= m_GeoDat->getNSegments(); iSegment++) {
-            segment = m_GeoDat->segmentNumber(iSection, iLayer, iSector, iPlane,
-                                              iSegment);
+            segment = m_eklmElementNumbers->segmentNumber(
+                        iSection, iLayer, iSector, iPlane, iSegment);
             alignmentData = const_cast<KLMAlignmentData*>(
                               segmentAlignment->getSegmentAlignment(segment));
             param = 2;

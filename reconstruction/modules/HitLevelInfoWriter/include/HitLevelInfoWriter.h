@@ -10,21 +10,17 @@
 
 #pragma once
 
-#include <reconstruction/dataobjects/DedxConstants.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <genfit/Track.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 #include <framework/core/Module.h>
 
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
@@ -37,7 +33,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 
-#include <string>
 #include <vector>
 
 #include <TFile.h>
@@ -177,6 +172,11 @@ namespace Belle2 {
     double h_wireGain[kMaxHits] = {}; /**< calibration hit gain */
     double h_twodCor[kMaxHits] = {};  /**< calibration 2D correction */
     double h_onedCor[kMaxHits] = {};  /**< calibration 1D cleanup correction */
+    double h_WeightPionHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
+    double h_WeightKaonHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
+    double h_WeightProtonHypo[kMaxHits] = {}; /**< weight for pion hypothesis from KalmanFitterInfo*/
+
+    int h_foundByTrackFinder[kMaxHits] = {}; /**< the 'found by track finder' flag for the given hit */
 
     // parameters: calibration constants
     DBObjPtr<CDCDedxScaleFactor> m_DBScaleFactor; /**< Scale factor to make electrons ~1 */

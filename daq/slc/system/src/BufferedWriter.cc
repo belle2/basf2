@@ -1,5 +1,7 @@
 #include "daq/slc/system/BufferedWriter.h"
 
+#include <daq/slc/base/IOException.h>
+
 #include <cstring>
 
 using namespace Belle2;

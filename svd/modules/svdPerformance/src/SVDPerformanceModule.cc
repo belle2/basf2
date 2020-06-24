@@ -1,16 +1,10 @@
 #include <svd/modules/svdPerformance/SVDPerformanceModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <geometry/GeometryManager.h>
-//#include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
-#include <list>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
 
 #include <boost/foreach.hpp>
 
@@ -939,116 +933,5 @@ TH2F*  SVDPerformanceModule::createHistogram2D(const char* name, const char* tit
 
   return h;
 }
-
-
-TH1F*  SVDPerformanceModule::createHistogramsRatio(const char* name, const char* title,
-                                                   TH1* hNum, TH1* hDen, bool isEffPlot,
-                                                   int axisRef)
-{
-
-  TH1F* h1den =  dynamic_cast<TH1F*>(hDen);
-  TH1F* h1num =  dynamic_cast<TH1F*>(hNum);
-  TH2F* h2den =  dynamic_cast<TH2F*>(hDen);
-  TH2F* h2num =  dynamic_cast<TH2F*>(hNum);
-  TH3F* h3den =  dynamic_cast<TH3F*>(hDen);
-  TH3F* h3num =  dynamic_cast<TH3F*>(hNum);
-
-  TH1* hden = 0;
-  TH1* hnum = 0;
-
-  if (h1den) {
-    hden = new TH1F(*h1den);
-    hnum = new TH1F(*h1num);
-  }
-  if (h2den) {
-    hden = new TH2F(*h2den);
-    hnum = new TH2F(*h2num);
-  }
-  if (h3den) {
-    hden = new TH3F(*h3den);
-    hnum = new TH3F(*h3num);
-  }
-
-  TAxis* the_axis;
-  TAxis* the_other1;
-  TAxis* the_other2;
-
-  if (axisRef == 0) {
-    the_axis = hden->GetXaxis();
-    the_other1 = hden->GetYaxis();
-    the_other2 = hden->GetZaxis();
-  } else if (axisRef == 1) {
-    the_axis = hden->GetYaxis();
-    the_other1 = hden->GetXaxis();
-    the_other2 = hden->GetZaxis();
-  } else if (axisRef == 2) {
-    the_axis = hden->GetZaxis();
-    the_other1 = hden->GetXaxis();
-    the_other2 = hden->GetYaxis();
-  } else
-    return NULL;
-
-
-  TH1F* h;
-  if (the_axis->GetXbins()->GetSize())
-    h = new TH1F(name, title, the_axis->GetNbins(), (the_axis->GetXbins())->GetArray());
-  else
-    h = new TH1F(name, title, the_axis->GetNbins(), the_axis->GetXmin(), the_axis->GetXmax());
-  h->GetXaxis()->SetTitle(the_axis->GetTitle());
-
-  h->GetYaxis()->SetRangeUser(0.00001, 1);
-
-  double num = 0;
-  double den = 0;
-  Int_t bin = 0;
-  Int_t nBins = 0;
-
-
-  for (int the_bin = 1; the_bin < the_axis->GetNbins() + 1; the_bin++) {
-
-    num = 0;
-    den = 0 ;
-
-    for (int other1_bin = 1; other1_bin < the_other1->GetNbins() + 1; other1_bin++)
-      for (int other2_bin = 1; other2_bin < the_other2->GetNbins() + 1; other2_bin++) {
-
-        if (axisRef == 0) bin = hden->GetBin(the_bin, other1_bin, other2_bin);
-        else if (axisRef == 1) bin = hden->GetBin(other1_bin, the_bin, other2_bin);
-        else if (axisRef == 2) bin = hden->GetBin(other1_bin, other2_bin, the_bin);
-
-        if (hden->IsBinUnderflow(bin))
-          B2INFO("  bin = " << bin << "(" << the_bin << "," << other1_bin << "," << other2_bin << "), UNDERFLOW");
-        if (hden->IsBinOverflow(bin))
-          B2INFO("  bin = " << bin << "(" << the_bin << "," << other1_bin << "," << other2_bin << "), OVERFLOW");
-
-        num += hnum->GetBinContent(bin);
-        den += hden->GetBinContent(bin);
-
-        nBins++;
-
-      }
-
-    double eff = 0;
-    double err = 0;
-
-    if (den > 0) {
-      eff = (double)num / den;
-      err = sqrt(eff * (1 - eff)) / sqrt(den);
-    }
-
-    if (isEffPlot) {
-      h->SetBinContent(the_bin, eff);
-      h->SetBinError(the_bin, err);
-    } else {
-      h->SetBinContent(the_bin, 1 - eff);
-      h->SetBinError(the_bin, err);
-    }
-
-  }
-
-  return h;
-
-}
-
 
 

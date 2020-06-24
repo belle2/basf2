@@ -162,7 +162,6 @@ namespace Belle2 {
         return xmax;
       }
 
-      ClassDef(SpaceResolutionCalibration, 0); /**< Class for calibraion CDC space resolution */
     };
   }
 }

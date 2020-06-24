@@ -17,7 +17,6 @@
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
 // FRAMEWORK
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>

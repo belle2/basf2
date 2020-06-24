@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/logging/Logger.h>
@@ -438,6 +437,7 @@ void TSF::simulateMerger(unsigned iClock)
       case Priority::first: {
         // update priority time
         unsigned priTS = iCell % nSegmentsInMerger;
+        /* cppcheck-suppress variableScope */
         timeVec& priorityTime = (get<MergerOut::priorityTime>(mergerData))[priTS];
         // when there is not already a (first priority) hit
         if (notHit(MergerOut::priorityTime, priTS, registeredCell)) {
@@ -482,7 +482,7 @@ void TSF::simulateMerger(unsigned iClock)
       pack<MergerOut::fastestTime, timeWidth> (input, nCellsInLayer, output);
       pack<MergerOut::secondPriorityHit, 1> (input, nCellsInLayer, output);
       pack<MergerOut::edgeTime, timeWidth> (input, nEdges, output);
-
+      /* cppcheck-suppress variableScope */
       auto& outputAcrossClocks = dataAcrossClocks[2 * iAx][iMerger];
       if (get<MergerOut::hitmap>(output)[0].any()) {
         string priTime, fasTime, edgTime;

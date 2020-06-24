@@ -11,9 +11,6 @@
 
 #include <string>
 
-#include "TH1.h"
-#include "TMemFile.h"
-
 #include <daq/dataflow/EvtSocket.h>
 #include <daq/dqm/DqmMemFile.h>
 

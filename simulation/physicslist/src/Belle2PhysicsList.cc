@@ -10,7 +10,6 @@
 
 #include <simulation/physicslist/Belle2PhysicsList.h>
 #include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
 #include "G4RegionStore.hh"
 #include "G4ProductionCuts.hh"
 
@@ -18,7 +17,6 @@
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
 #include "G4OpticalPhysics.hh"
-#include "G4EmParameters.hh"
 #include "G4DecayPhysics.hh"
 #include <simulation/physicslist/Geant4ePhysics.h>
 
@@ -40,6 +38,10 @@
 #include "G4IonConstructor.hh"
 #include "G4ShortLivedConstructor.hh"
 
+// Long lived
+#include "simulation/longlivedneutral/G4LongLivedNeutralPhysics.h"
+#include <framework/logging/Logger.h>
+
 #define g4ePDGcode 0
 
 using namespace Belle2;
@@ -49,12 +51,15 @@ using namespace Simulation;
 Belle2PhysicsList::Belle2PhysicsList(const G4String& physicsListName)
   : G4VModularPhysicsList(), m_globalCutValue(0.07)
 {
-  G4cout << " Using " << physicsListName << " physics list " << G4endl;
+  B2INFO("Using " << physicsListName << " physics list");
 
   m_pxdCutValue = m_globalCutValue;
   m_svdCutValue = m_globalCutValue;
   m_cdcCutValue = m_globalCutValue;
   m_arichtopCutValue = m_globalCutValue;
+  m_eclCutValue = m_globalCutValue;
+  m_klmCutValue = m_globalCutValue;
+
   // Decay
   RegisterPhysics(new G4DecayPhysics());
 
@@ -228,60 +233,48 @@ void Belle2PhysicsList::ConstructG4eParticles()
   }
 }
 
+void Belle2PhysicsList::setRegionCuts(const std::string& name, const std::vector<std::string>& regions, double cutValue)
+{
+  G4RegionStore* theRegionStore = G4RegionStore::GetInstance();
+  if (cutValue == 0) {
+    cutValue = m_globalCutValue;
+  } else {
+    B2INFO("Set production cut for detector region" << LogVar("detector", name) << LogVar("production_cut", cutValue));
+  }
+  auto* regionCuts = new G4ProductionCuts;
+  regionCuts->SetProductionCut(cutValue * cm);
+  bool foundOne{false};
+  for (const auto& regionName : regions) {
+    auto* region = theRegionStore->GetRegion(regionName, false);
+    if (!region) {
+      B2WARNING("Cannot find Geant4 region for sub detector. Probably detector not present?"
+                << LogVar("detector", name) << LogVar("region", regionName));
+      continue;
+    }
+    region->SetProductionCuts(regionCuts);
+    foundOne = true;
+  }
+  if (!foundOne) delete regionCuts;
+}
+
 
 void Belle2PhysicsList::SetCuts()
 {
   // Belle2 assumes input units are cm
-  G4cout << " Global cut set to " << m_globalCutValue << G4endl;
+  B2INFO("Setting global Geant4 production cut" << LogVar("cutValue", m_globalCutValue));
+
   SetCutValue(m_globalCutValue * cm, "proton");
   SetCutValue(m_globalCutValue * cm, "e-");
   SetCutValue(m_globalCutValue * cm, "e+");
   SetCutValue(m_globalCutValue * cm, "gamma");
 
-  G4RegionStore* theRegionStore = G4RegionStore::GetInstance();
-  G4ProductionCuts* regionCuts = 0;
-
-  // VXD region cut
-  if (m_pxdCutValue == 0.0) m_pxdCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_pxdCutValue * cm);
-  G4cout << " PXD cut set to " << m_pxdCutValue << G4endl;
-  theRegionStore->GetRegion("PXDEnvelope")->SetProductionCuts(regionCuts);
-
-  // SVD region cut
-  if (m_svdCutValue == 0.0) m_svdCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_svdCutValue * cm);
-  G4cout << " SVD cut set to " << m_svdCutValue << G4endl;
-  theRegionStore->GetRegion("SVDEnvelope")->SetProductionCuts(regionCuts);
-
-  // CDC region cut
-  if (m_cdcCutValue == 0.0) m_cdcCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_cdcCutValue * cm);
-  G4cout << " CDC cut set to " << m_cdcCutValue << G4endl;
-  theRegionStore->GetRegion("CDCEnvelope")->SetProductionCuts(regionCuts);
-
-  // ARICH region cut
-  if (m_arichtopCutValue == 0.0) m_arichtopCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
-  theRegionStore->GetRegion("ARICHEnvelope")->SetProductionCuts(regionCuts);
-
-  // TOP module region cuts
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_arichtopCutValue * cm);
-  G4cout << " ARICH and TOP modules cuts set to " << m_arichtopCutValue << G4endl;
-  theRegionStore->GetRegion("TOPEnvelope")->SetProductionCuts(regionCuts);
-
-  // ECL region cut
-  if (m_eclCutValue == 0.0) m_eclCutValue = m_globalCutValue;
-  regionCuts = new G4ProductionCuts;
-  regionCuts->SetProductionCut(m_eclCutValue * cm);
-  G4cout << " ECL cut set to " << m_eclCutValue << G4endl;
-  theRegionStore->GetRegion("ECLForwardEnvelope")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("ECLBarrelSector")->SetProductionCuts(regionCuts);
-  theRegionStore->GetRegion("ECLBackwardEnvelope")->SetProductionCuts(regionCuts);
+  setRegionCuts("PXD", {"PXDEnvelope"}, m_pxdCutValue);
+  setRegionCuts("SVD", {"SVDEnvelope"}, m_svdCutValue);
+  setRegionCuts("CDC", {"CDCEnvelope"}, m_cdcCutValue);
+  setRegionCuts("ARICH", {"ARICHEnvelope"}, m_arichtopCutValue);
+  setRegionCuts("TOP", {"TOPEnvelope"}, m_arichtopCutValue);
+  setRegionCuts("ECL", {"ECLForwardEnvelope", "ECLBarrelSector", "ECLBackwardEnvelope"}, m_eclCutValue);
+  setRegionCuts("KLM", {"BKLMEnvelope", "EKLMEnvelope"}, m_klmCutValue);
 }
 
 
@@ -327,6 +320,12 @@ void Belle2PhysicsList::SetECLProductionCutValue(G4double value)
 }
 
 
+void Belle2PhysicsList::SetKLMProductionCutValue(G4double value)
+{
+  m_klmCutValue = value;
+}
+
+
 void Belle2PhysicsList::UseStandardEMPhysics(G4bool yesno)
 {
   if (yesno) {
@@ -348,4 +347,9 @@ void Belle2PhysicsList::UseHighPrecisionNeutrons(G4bool yesno)
   if (yesno) G4cout << " High precision neutron option not yet ready " << G4endl;
 }
 
-
+void Belle2PhysicsList::UseLongLivedNeutralParticles()
+{
+  G4LongLivedNeutralPhysics* pLongLivedNeutral = new G4LongLivedNeutralPhysics();
+  RegisterPhysics(pLongLivedNeutral);
+  pLongLivedNeutral->ConstructParticle();
+}

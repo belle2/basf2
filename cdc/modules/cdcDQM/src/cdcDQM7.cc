@@ -7,16 +7,12 @@
 
 #include "cdc/modules/cdcDQM/cdcDQM7.h"
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/core/HistoModule.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRawHit.h>
 
 #include <TDirectory.h>
 
@@ -176,7 +172,8 @@ void cdcDQM7Module::initialize()
   REG_HISTOGRAM   // required to register histograms to HistoManager
   // register dataobjects
   m_rawFTSW.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
-
+  m_CDCRawHits.isRequired();
+  m_CDCHits.isRequired();
 }
 
 void cdcDQM7Module::beginRun()
@@ -207,9 +204,7 @@ void cdcDQM7Module::beginRun()
 
 void cdcDQM7Module::event()
 {
-
-  StoreArray<CDCHit> cdcHits;
-  int nent = cdcHits.getEntries();
+  int nent = m_CDCHits.getEntries();
   int ftdc = 0;
 
   // occ total
@@ -223,7 +218,7 @@ void cdcDQM7Module::event()
   int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
   for (int i = 0; i < nent; i++) {
-    CDCHit* cdchit = static_cast<CDCHit*>(cdcHits[i]);
+    CDCHit* cdchit = static_cast<CDCHit*>(m_CDCHits[i]);
 
     int sL = cdchit->getISuperLayer();
     int iL = cdchit->getILayer();
@@ -306,12 +301,11 @@ void cdcDQM7Module::event()
 
 
   //
-  StoreArray<CDCRawHit> cdcRawHits;
-  int r_nent = cdcRawHits.getEntries();
+  int r_nent = m_CDCRawHits.getEntries();
 
   // new
   for (int j = 0; j < r_nent; j++) {
-    CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(cdcRawHits[j]);
+    CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(m_CDCRawHits[j]);
 
     int brd = cdcrawhit->getBoardId();
     int v_adc = cdcrawhit->getFADC();

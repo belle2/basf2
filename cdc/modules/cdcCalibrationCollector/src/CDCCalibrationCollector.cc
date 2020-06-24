@@ -10,16 +10,9 @@
 
 #include "cdc/modules/cdcCalibrationCollector/CDCCalibrationCollector.h"
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <genfit/TrackPoint.h>
@@ -65,15 +58,13 @@ CDCCalibrationCollectorModule::~CDCCalibrationCollectorModule()
 
 void CDCCalibrationCollectorModule::prepare()
 {
-  StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
-  StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  StoreWrappedObjPtr<std::vector<CDCTrack>> cdcTracks(m_cdcTrackVectorName);
-  RelationArray relRecoTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  m_Tracks.isRequired(m_trackArrayName);
+  m_RecoTracks.isRequired(m_recoTrackArrayName);
+  m_TrackFitResults.isRequired(m_trackFitResultArrayName);
+  m_CDCHits.isRequired(m_cdcHitArrayName);
+  m_CDCTracks.isRequired(m_cdcTrackVectorName);
+  RelationArray relRecoTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
   //Store names to speed up creation later
-  m_recoTrackArrayName = recoTracks.getName();
-  m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
   if (!m_effStudy) { // by default collects calibration data
@@ -130,12 +121,7 @@ void CDCCalibrationCollectorModule::prepare()
 
 void CDCCalibrationCollectorModule::collect()
 {
-  const StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  const StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  const StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  const StoreWrappedObjPtr<std::vector<CDCTrack>> cdcTracks(m_cdcTrackVectorName);
-  const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
-  const RelationArray relTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  const RelationArray relTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
 
   /* CDCHit distribution */
   //  make evt t0 incase we dont use evt t0
@@ -155,7 +141,7 @@ void CDCCalibrationCollectorModule::collect()
   // Used in wire efficiency building
   std::vector<unsigned short> wiresInCDCTrack;
 
-  for (CDCTrack& cdcTrack : *cdcTracks) {
+  for (CDCTrack& cdcTrack : *m_CDCTracks) {
     for (CDCRecoHit3D& cdcHit : cdcTrack) {
       unsigned short eWireID = cdcHit.getWire().getEWire();
       wiresInCDCTrack.push_back(eWireID);
@@ -163,12 +149,12 @@ void CDCCalibrationCollectorModule::collect()
   }
   // WireID collection finished
 
-  const int nTr = recoTracks.getEntries();
+  const int nTr = m_RecoTracks.getEntries();
 
   // Skip events which have number of charged tracks <= 1.
   int nCTracks  = 0;
   for (int i = 0; i < nTr; ++i) {
-    RecoTrack* track = recoTracks[i];
+    RecoTrack* track = m_RecoTracks[i];
     if (track->getDirtyFlag()) continue;
     if (!track->getTrackFitStatus()->isFitted()) continue;
     const genfit::FitStatus* fs = track->getTrackFitStatus();
@@ -194,13 +180,13 @@ void CDCCalibrationCollectorModule::collect()
   }
 
 
-  const int nHits = cdcHits.getEntries();
+  const int nHits = m_CDCHits.getEntries();
   const int nWires = 14336;
   float oc = static_cast<float>(nHits) / static_cast<float>(nWires);
   getObjectPtr<TH1F>("hOccupancy")->Fill(oc);
 
   for (int i = 0; i < nTr; ++i) {
-    RecoTrack* track = recoTracks[i];
+    RecoTrack* track = m_RecoTracks[i];
     if (track->getDirtyFlag()) continue;
     const genfit::FitStatus* fs = track->getTrackFitStatus();
     if (!fs || !fs->isFitted()) continue;

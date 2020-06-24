@@ -19,16 +19,16 @@ HardwareClockSettings::HardwareClockSettings() {}
 bool HardwareClockSettings::isPrescaleAvailable(Const::EDetector detector, std::string label) const
 {
   if ((m_prescaleMap.find(detector) == m_prescaleMap.end())
-      || (m_prescaleMap.at(detector).find(label) == m_prescaleMap.at(detector).end())) return false;
+      or (m_prescaleMap.at(detector).find(label) == m_prescaleMap.at(detector).end())) return false;
   else return true;
 }
 
 bool HardwareClockSettings::isFrequencyAvailable(Const::EDetector detector, std::string label) const
 {
-  if (((m_prescaleMap.find(detector) == m_prescaleMap.end()) ||
+  if (((m_prescaleMap.find(detector) == m_prescaleMap.end()) or
        (m_prescaleMap.at(detector).find(label) == m_prescaleMap.at(detector).end()))
-      & ((m_clocksMap.find(detector) == m_clocksMap.end()) ||
-         (m_clocksMap.at(detector).find(label) == m_clocksMap.at(detector).end()))) return false;
+      and ((m_clocksMap.find(detector) == m_clocksMap.end()) or
+           (m_clocksMap.at(detector).find(label) == m_clocksMap.at(detector).end()))) return false;
   else return true;
 }
 
@@ -88,11 +88,15 @@ void HardwareClockSettings::setAcceleratorRF(Double_t acceleratorRF)
 
 void HardwareClockSettings::print() const
 {
-  B2INFO("Clock prescales:");
+  std::cout << std::endl;
+  std::cout << "Clock prescales:" << std::endl;
+  std::cout << "===================================" << std::endl;
+
   for (const auto& det : m_prescaleMap) {
-    LogVar("detector", Const::parseDetectors(det.first));
-    for (const auto& clock : det.second) LogVar("clock", clock.first);
+    std::cout << Const::parseDetectors(det.first) << ":" << std::endl;
+    for (const auto& clock : det.second)  std::cout << " " << clock.first << " " << clock.second << std::endl;
   }
+  std::cout << "===================================" << std::endl;
 
   std::cout << "Clock frequencies:" << std::endl;
   std::cout << "===================================" << std::endl;

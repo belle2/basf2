@@ -34,6 +34,7 @@ class toCDCCKF(TrackingValidationRun):
     @staticmethod
     def finder_module(path):
         """Add the ToCDCCKF module and related modules to the basf2 path"""
+
         path.add_module('SetupGenfitExtrapolation',
                         energyLossBrems=False, noiseBrems=False)
 

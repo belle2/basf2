@@ -13365,80 +13365,8 @@ With the Standalone script, the important analysis tools and scripts are loaded,
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>[INFO] Steering file: /home/belle2/hmwakel/skimming/development/skim/standalone/ALP3Gamma_Skim_Standalone.py
-[INFO] Adding new particle &#39;beam&#39; (pdg=55, mass=999 GeV, width=999 GeV, charge=0, spin=0)
-[INFO] Adding new particle &#39;ALP&#39; (pdg=9000006, mass=999 GeV, width=999 GeV, charge=0, spin=0)
-ALP:0 -&gt; gamma:cdcAndMinimumEnergy  gamma:cdcAndMinimumEnergy
-beam:0 -&gt; gamma:minimumEnergy ALP:0
-[INFO] Starting event processing, random seed is set to &#39;763911589baeee9c6729d9d9cac86af14e3b954d391fc619f0b010ca40de3ab4&#39;
-[INFO] Added file /ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007392/s00/e1003/4S/r00000/mixed/mdst/sub00/mdst_000141_prod00007392_task10020000141.root
-[INFO] ParticleLoader&#39;s Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:cdcAndMinimumEnergy (gamma:cdcAndMinimumEnergy)
-[INFO]    -&gt; MDST source: ECLClusters
-[INFO]    -&gt; With cuts  : E &gt;= 0.1 and theta &gt;= 0.297 and theta &lt;= 2.618
-[INFO] ParticleLoader&#39;s Summary of Actions:
-[INFO]  o) creating (anti-)ParticleList with name: gamma:minimumEnergy (gamma:minimumEnergy)
-[INFO]    -&gt; MDST source: ECLClusters
-[INFO]    -&gt; With cuts  : E &gt;= 0.1
-[INFO] Number of ParticleLists studied 1 
-<span class="ansi-yellow-fg">[WARNING] The branch ECLClustersToTracksNamedBremsstrahlung given in branchNames does not exist.  { module: RootOutput }
-</span>[INFO] Number of ParticleLists studied 1 
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltags (highest priority first) are release-03-01-00_rev3, Legacy_IP_Information
-[INFO] ParticleStats Summary: 
-
-[INFO] =======================================================================
-			|Retention|	    0| Unique 
-        beam:0( 0)	|	0.0000	1.0000	0.0000
-
-[INFO] 
-======================================================================
- Average Candidate Multiplicity (ACM) and ACM for Passed Events (ACMPE) 
-			| All Particles 		| Particles     		| AntiParticles 		
-			| ACM		| ACMPE		| ACM		| ACMPE		| ACM		| ACMPE 
-        beam:0( 0)	|	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan	  0.0000	    -nan
-
-[INFO] 
-=======================================================
-Total Retention: 0.0000
-Total Number of Particles created in the DataStore: 16752102
-=======================================================
-
-[INFO] RemoveParticlesNotInLists: removed 0 Particles (-nan % of total amount).
-[INFO] SkimFilter Summary: 
-
-[INFO] 
-=======================================================
-Total Retention: 0.0000
-
-=======================================================
-
-
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
-<span class="ansi-yellow-fg">[WARNING] The branch ECLClustersToTracksNamedBremsstrahlung given in branchNames does not exist.
-</span>[INFO] ================================================================================
-
-==========================================================================================================================================
-Name                                                                           |      Calls | Memory(MB) |    Time(s) |     Time(ms)/Call
-==========================================================================================================================================
-RootInput                                                                      |     200001 |         76 |      61.12 |    0.31 +-   2.45
-ProgressBar                                                                    |     200000 |          2 |       2.28 |    0.01 +-   0.01
-ParticleLoader_gamma:cdcAndMinimumEnergy                                       |     200000 |        -12 |      35.58 |    0.18 +-   5.08
-ParticleCombiner_ALP:0 -&gt; gamma:cdcAndMinimumEnergy  gamma:cdcAndMinimumEnergy |     200000 |         -2 |      19.08 |    0.10 +-   0.06
-ParticleLoader_gamma:minimumEnergy                                             |     200000 |        -11 |      25.60 |    0.13 +-   0.04
-ParticleCombiner_beam:0 -&gt; gamma:minimumEnergy ALP:0                           |     200000 |        -36 |      82.50 |    0.41 +-   0.48
-SkimFilter_18020300                                                            |     200000 |         -1 |       2.30 |    0.01 +-   0.00
-SwitchDataStore (&#39;&#39; -&gt; &#39;skim_18020300&#39;)                                        |          0 |          0 |       0.00 |    0.00 +-   0.00
-RemoveParticlesNotInLists                                                      |          0 |          0 |       0.00 |    0.00 +-   0.00
-RootOutput                                                                     |          0 |          0 |       0.00 |    0.00 +-   0.00
-SwitchDataStore (&#39;&#39; &lt;- &#39;skim_18020300&#39;)                                        |          0 |          0 |       0.00 |    0.00 +-   0.00
-ParticleStats                                                                  |     200000 |         -2 |       2.36 |    0.01 +-   0.00
-==========================================================================================================================================
-Total                                                                          |     200001 |          3 |     270.64 |    1.35 +-   5.69
-==========================================================================================================================================
-
-</pre>
+<span class="ansi-default-inverse-fg ansi-red-bg">[FATAL] The given filename and/or path is not valid: /home/belle2/hmwakel/skimming/development/skim/standalone/ALP3Gamma_Skim_Standalone.py  { function: void {anonymous}::executePythonFile(const string&amp;) }
+</span></pre>
 </div>
 </div>
 
@@ -13464,7 +13392,7 @@ Total                                                                          |
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Your skim script will have output a <code>.root</code> file. You now want to analyse this to ensure your skim will qualify for the skim package.</p>
+<p>Your skim script will have output a <code>.root</code> file. You now want to analyse the printed output to ensure your skim will qualify for the skim package.</p>
 <p>Important factors to look for:</p>
 <ul>
 <li><strong>Retention Rate</strong>: fraction of events that survive the skim. Retention rate is required to be around 10% for a skim to qualify.</li>
@@ -13501,7 +13429,7 @@ Total                                                                          |
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now you can work on improving the retention rate. Take a look at changing PID requirements, mass cuts, deltaE cuts.</p>
+<p>Now you can work on improving the retention rate. Take a look at PID requirements, mass cuts, deltaE cuts and see if there are some generic cuts that would improve the retention rate without cutting out physics for those that would use your skim.</p>
 
 </div>
 </div>
@@ -13509,18 +13437,15 @@ Total                                                                          |
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Exercise-C:-Run-on-different-generic-backgrounds-">Exercise C: Run on different generic backgrounds <a name="ExC" /><a class="anchor-link" href="#Exercise-C:-Run-on-different-generic-backgrounds-">&#182;</a></h3>
+<h3 id="Exercise-C:-Test-your-skim-on-generic-MC-and-data-">Exercise C: Test your skim on generic MC and data <a name="ExC" /><a class="anchor-link" href="#Exercise-C:-Test-your-skim-on-generic-MC-and-data-">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Now, test your skim on a small subset of generic backgrounds on a recent MC (perhaps $~1\,\mbox{fb}^{-1}$).</p>
-<p>Within the skim directory there will be an input file directory under <code>tools/samples</code>. Use these as the input files to your skim script.</p>
-<p>Create a new directory called <code>outputFiles</code>.
-Within <code>tools/</code> and edit <code>runSkims.py</code> to run over your skin.</p>
-<p>Once your skim has run on the different types of background, you can determine the statistics with respect to your skim. Run the script: <code>printSkimStats.py</code>.</p>
+<p>Now, test your skim on a small subset of generic backgrounds on a recent MC running <code>b2skim-stats-submit -s your_skim_name</code> <em>within</em> the skim directory. This command runs over 10,000 events for each of the generic MC and certain data collections.</p>
+<p>Once your skim has finished running on the different types of MC and data (you can check to see whether your jobs have finished runnning on kekcc through <code>bjobs</code>), you can determine the skim statistics by running <code>b2skim-stats-print -s your_skim_name</code> and can even add the <code>-C</code> option to print out to a Confluence friendly table.</p>
 
 </div>
 </div>
@@ -13528,7 +13453,7 @@ Within <code>tools/</code> and edit <code>runSkims.py</code> to run over your sk
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Each skim has been tested on various background types and the statistics are available at the Skimming Homepage.</p>
+<p>Each approved and used skim has to be tested on the various background types, validated with data and the statistics should be made available via the Skimming Homepage.</p>
 
 </div>
 </div>
@@ -13543,8 +13468,8 @@ Within <code>tools/</code> and edit <code>runSkims.py</code> to run over your sk
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>It is important to check that your skim is actually working. Go to <code>validation/</code> and look at the structure within.</p>
-<p>3 scripts are required in the validation directory:</p>
+<p>It is important to check our skims for each build of the software. Go to <code>validation/</code> and look at the structure within. There is an automatic nightly build validation that must be set up for each skim.</p>
+<p>3 scripts are required per skim in the validation directory:</p>
 <ul>
 <li><p><code>test0_myScript.py</code> ==&gt; this is used to generate a SIGNAL mode that will have a high survival rate in the skim to be tested.</p>
 </li>
@@ -13555,6 +13480,14 @@ Within <code>tools/</code> and edit <code>runSkims.py</code> to run over your sk
 </ul>
 <p>Use the current scripts as examples to write your own.</p>
 <p>Once this skim is accepted into the skim package, the output <code>.root</code> file produced using <code>test2_myScript.py</code> should also be pushed to the validation directory as a reference file.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That's it! Thank you for your interest and involvement in developing skims. If you have any feedback or questions about the skimming tutorial, please contact <a href="hannah.wakeling@mail.mcgill.ca">hannah.wakeling@mail.mcgill.ca</a>.</p>
 
 </div>
 </div>

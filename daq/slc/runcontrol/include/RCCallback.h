@@ -3,17 +3,9 @@
 #define _Belle2_RCCallback_hh
 
 #include "daq/slc/runcontrol/RCState.h"
-#include "daq/slc/runcontrol/RCCommand.h"
 #include "daq/slc/runcontrol/RCConfig.h"
-#include "daq/slc/runcontrol/RCHandlerException.h"
-#include "daq/slc/runcontrol/RCHandlerFatalException.h"
 
 #include <daq/slc/nsm/NSMCallback.h>
-#include <daq/slc/nsm/NSMData.h>
-
-#include <daq/slc/system/Mutex.h>
-#include <daq/slc/system/Cond.h>
-#include <daq/slc/system/PThread.h>
 
 namespace Belle2 {
 

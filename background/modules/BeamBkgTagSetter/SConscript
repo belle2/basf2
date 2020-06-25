@@ -1,14 +1,13 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'background_dataobjects',
+env['LIBS'] = ['framework', 
 	       'pxd_dataobjects',
 	       'svd_dataobjects',
 	       'cdc_dataobjects',
 	       'top_dataobjects',
 	       'arich_dataobjects',
 	       'ecl_dataobjects',
-	       'klm_bklm_dataobjects',
-	       'klm_eklm_dataobjects',
+	       'klm_dataobjects',
        	       'beast_beamabort_dataobjects',
 	       'beast_claws_dataobjects',
 	       'beast_claw_dataobjects',	

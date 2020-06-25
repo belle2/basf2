@@ -1,98 +1,78 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-#############################################################
+############################################################################
 #
-# This is a script that generates double generic BBbar
-# events and performs a charmonium skim.
-# Surviving events proceed to simulation and reconstruction.
-# We then reconstruct B -> J/psi KL events and recalculate the
-# KL momentum according to reconstructed direction using
+# This is a script that shows how to reconstruct B -> J/psi KL events and
+# recalculate the KL momentum according to the reconstructed direction using
 # kinematical constraints.
 #
 # Contributors: B. Oberhof, benjamin.oberhof@lnf.infn.it
 #
-#############################################################
+############################################################################
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import *
-from stdKlongs import *
-from ROOT import Belle2
-from vertex import vertexRave
-from vertex import TagV
-from reconstruction import add_mdst_output
-from glob import glob
 import basf2
+import modularAnalysis as ma
+from stdCharged import stdMu
+from stdKlongs import stdKlongs
+import variables.collections as vc
+import variables.utils as vu
+from variables import variables
+from vertex import TagV
 
-# Set parameters
-inputName = "/ghi/fs01/belle2/bdata/MC/signal/B2JpsiKL/JPsiKL.root"
-outputName = "reconstruct_jpsi_kl_example.root"
 
-inputMdstList('default', inputName)
+main = basf2.create_path()
+
+ma.inputMdstList('default', [basf2.find_file('B02JpsiKL_Jpsi2mumu.root', 'examples', False)], path=main)
 
 # Show progress of processing
-progress = register_module('ProgressBar')
-analysis_main.add_module(progress)
+main.add_module('ProgressBar')
 
-stdLooseMu()
-stdKlongs()
+stdMu('loose', path=main)
+stdKlongs('allklm', path=main)
 
-reconstructDecay(
-    'J/psi:mumu -> mu-:loose mu+:loose',
-    ' 3.08 < M < 3.12  and useCMSFrame(p) > 1.45 and useCMSFrame(p) < 1.95',
-    1,
-    True)
-matchMCTruth('J/psi:mumu')
+ma.reconstructDecay('J/psi:mumu -> mu-:loose mu+:loose', cut='3.08 < M < 3.12  and 1.45 < useCMSFrame(p) < 1.95', path=main)
 
-pcalc = register_module('KlongMomentumCalculatorExpert')
-pcalc.set_name('KlongMomentumCalculatorExpert_' + 'B0:1 -> J/psi:mumu K_L0:veryLoose')
-pcalc.param('decayString', 'B0:1 -> J/psi:mumu K_L0:veryLoose')
+pcalc = basf2.register_module('KlongMomentumCalculatorExpert')
+pcalc.set_name('KlongMomentumCalculatorExpert_' + 'B0 -> J/psi:mumu K_L0:allklm')
+pcalc.param('decayString', 'B0 -> J/psi:mumu K_L0:allklm')
 pcalc.param('cut', '')
 pcalc.param('decayMode', 0)
-pcalc.param('writeOut', 1)
+pcalc.param('writeOut', False)
 pcalc.param('recoList', "_reco")
-analysis_main.add_module(pcalc)
+main.add_module(pcalc)
 
-rmake = register_module('KlongDecayReconstructorExpert')
-rmake.set_name('KlongDecayReconstructorExpert_' + 'B0:1 -> J/psi:mumu K_L0:veryLoose')
-rmake.param('decayString', 'B0:1 -> J/psi:mumu K_L0:veryLoose')
-rmake.param('cut', 'M>0')
+rmake = basf2.register_module('KlongDecayReconstructorExpert')
+rmake.set_name('KlongDecayReconstructorExpert_' + 'B0 -> J/psi:mumu K_L0:allklm')
+rmake.param('decayString', 'B0 -> J/psi:mumu K_L0:allklm')
+rmake.param('cut', 'M > 0')
 rmake.param('decayMode', 0)
-rmake.param('writeOut', 1)
+rmake.param('writeOut', False)
 rmake.param('recoList', "_reco")
-analysis_main.add_module(rmake)
+main.add_module(rmake)
 
-buildRestOfEvent('B0:1')
-matchMCTruth('B0:1')
+ma.buildRestOfEvent('B0', path=main)
+ma.matchMCTruth('B0', path=main)
 
-TagV('B0:1', 'breco', 0.0001, 'standard_PXD')
+TagV('B0', constraintType='tube', confidenceLevel=0.0001, path=main)
 
-toolsDST1 = ['EventMetaData', '^B0:1']
-toolsDST1 += ['RecoStats', '^B0:1 -> J/psi:mumu K_L0:veryLoose_reco']
-toolsDST1 += ['InvMass', '^B0:1 -> ^J/psi:mumu ^K_L0:veryLoose_reco']
-toolsDST1 += ['DeltaEMbc', '^B0:1']
-toolsDST1 += ['Kinematics', '^B0:1 -> ^J/psi:mumu ^K_L0:veryLoose_reco']
-toolsDST1 += ['MCKinematics', '^B0:1 -> ^J/psi:mumu ^K_L0:veryLoose_reco']
-toolsDST1 += ['CMSKinematics', '^B0:1 -> ^J/psi:mumu ^K_L0:veryLoose_reco']
-toolsDST1 += ['MCTruth', '^B0:1 -> ^J/psi:mumu ^K_L0:veryLoose_reco']
-toolsDST1 += ['DeltaT', '^B0:1']
-toolsDST1 += ['MCDeltaT', '^B0:1']
-toolsDST1 += ['PDGCode', '^B0:1']
-toolsDST1 += ['Vertex', '^B0:1 -> ^J/psi:mumu ^K_L0:veryLoose_reco']
-toolsDST1 += ['MCVertex', '^B0:1 -> ^J/psi:mumu ^K_L0:veryLoose_reco']
-toolsDST1 += ['TagVertex', '^B0:1']
-toolsDST1 += ['MCTagVertex', '^B0:1']
-toolsDST1 += ['CustomFloats[isSignal:isExtendedSignal]', '^B0:1 -> ^J/psi:mumu ^K_L0:veryLoose_reco']
-toolsDST1 += ['CustomFloats[extraInfo(decayModeID)]', '^B0:1']
+commonVariables = vc.inv_mass + vc.mc_truth
+commonVariables += vc.kinematics + vc.mc_kinematics
+commonVariables += vc.vertex + vc.mc_vertex
 
-ntupleFile(outputName)
-ntupleTree('B1tree', 'B0:1', toolsDST1)
+variableList = [var for var in commonVariables]
+variableList += vc.deltae_mbc + vc.tag_vertex + vc.mc_tag_vertex + vc.reco_stats
+variableList += vu.create_aliases(commonVariables, 'daughter(0, {variable})', 'Jpsi')
+variableList += vu.create_aliases(commonVariables, 'daughter(1, {variable})', 'KL0')
+variableList += vu.create_aliases(vc.kinematics, 'useCMSFrame({variable})', 'CMS')
+variableList += vu.create_aliases(vc.kinematics, 'daughter(0, useCMSFrame({variable}))', 'Jpsi_CMS')
+variableList += vu.create_aliases(vc.kinematics, 'daughter(1, useCMSFrame({variable}))', 'KL0_CMS')
+variables.addAlias('dmID', 'extraInfo(decayModeID)')
+variableList += ['dmID']
 
-set_log_level(LogLevel.ERROR)
+ma.variablesToNtuple('B0', variables=variableList, filename="Reconstruct_jpsi_kl_example.root", treename='tree', path=main)
 
-# Process all modules added to the analysis_main path
-process(analysis_main)
+# Process all modules added to the main path
+basf2.process(main)
 
 # Print out the summary
-print(statistics)
+print(basf2.statistics)

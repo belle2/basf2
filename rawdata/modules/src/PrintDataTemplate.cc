@@ -100,6 +100,9 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   int n = i;
   rawftsw.GetTTTimeVal(n , &tv);
 
+  timeval tv_pc;
+  rawftsw.GetPCTimeVal(n , &tv_pc);
+
   printf("HdrNwords %d nodeID %.8x runsub %.8x run %.4x sub %.4x exp %.4x eve %.8x trl %.8x\n",
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
@@ -111,13 +114,15 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
          rawftsw.GetMagicTrailer(n)
         );
 
-  printf("ctimetrg %.8x utime %.8x ctime %.8x trg %d sec %.8x usec %.8x\n",
+  printf("ctimetrg %.8x utime %.8x ctime %.8x trg %d TTD(sec %.8x usec %.8x) PC(sec %.8x usec %.8x)\n",
          rawftsw.GetTTCtimeTRGType(n),
          rawftsw.GetTTUtime(n),
          rawftsw.GetTTCtime(n),
          rawftsw.GetTRGType(n),
-         (int)(tv.tv_sec),
-         (int)(tv.tv_usec));
+         (unsigned int)(tv.tv_sec),
+         (unsigned int)(tv.tv_usec),
+         (unsigned int)(tv_pc.tv_sec),
+         (unsigned int)(tv_pc.tv_usec));
   //  rawftsw.Get15bitTLUTag(n) );
 
   //

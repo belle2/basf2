@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cstdarg>
 #include <cstdio>
-#include <cstring>
 #include <unistd.h>
 
 using namespace Belle2;

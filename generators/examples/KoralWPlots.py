@@ -78,11 +78,6 @@ main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
 # Register the BHWideInput module
 koralw = basf2.register_module('KoralWInput')
 
-# Set the mode for the boost of the generated particles 0 = no boost 1 = BELLE
-
-# Set a random seed for the event generation
-koralw.param('RandomSeed', 2710)
-
 # Set the logging level for the KoralW module to INFO in order to see the total
 # cross section
 koralw.set_log_level(basf2.LogLevel.INFO)

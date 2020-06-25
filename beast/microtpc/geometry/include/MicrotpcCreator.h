@@ -24,8 +24,20 @@ namespace Belle2 {
     /** The creator for the MICROTPC geometry. */
     class MicrotpcCreator : public geometry::CreatorBase {
     public:
+      /**
+       * Constructor
+       */
       MicrotpcCreator();
+      /**
+       * Destructor
+       */
       virtual ~MicrotpcCreator();
+      /**
+       * Creation of the detector geometry from Gearbox (XML).
+       * @param[in] content   XML data directory.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
+       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
       /**  SensitiveDetector micro-tpc */

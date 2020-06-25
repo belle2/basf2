@@ -53,9 +53,9 @@ from ROOT import Belle2
 
 # Import basf2
 import basf2
+from basf2 import B2INFO, B2WARNING
 import pybasf2
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
 
 import basf2_mva
 
@@ -117,7 +117,7 @@ class TrainingDataInformation(object):
         pdgs = set([abs(pdg.from_name(particle.name)) for particle in self.particles])
 
         path = basf2.create_path()
-        module = register_module('VariablesToHistogram')
+        module = basf2.register_module('VariablesToHistogram')
         module.set_name("VariablesToHistogram_MCCount")
         module.param('variables', [(f'NumberOfMCParticlesInEvent({pdg})', 100, -0.5, 99.5) for pdg in pdgs])
         module.param('fileName', self.filename)
@@ -177,26 +177,26 @@ class FSPLoader(object):
         path = basf2.create_path()
 
         if self.config.b2bii:
-            fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                               ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
+            ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
+                                  ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
                                           ('Lambda0:V0', 'Lambda0:mdst'),
                                           ('pi0:FSP', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
-                copyParticles(outputList, inputList, writeOut=True, path=path)
+                ma.copyParticles(outputList, inputList, writeOut=True, path=path)
         else:
-            fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                               ('mu+:FSP', ''), ('gamma:FSP', ''),
-                               ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
-            fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
-            fillParticleList('Lambda0:V0 -> p+ pi-', '', writeOut=True, path=path)
-            fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
+            ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
+                                  ('mu+:FSP', ''), ('gamma:FSP', ''),
+                                  ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
+            ma.fillParticleList('K_S0:V0 -> pi+ pi-', '', writeOut=True, path=path)
+            ma.fillParticleList('Lambda0:V0 -> p+ pi-', '', writeOut=True, path=path)
+            ma.fillConvertedPhotonsList('gamma:V0 -> e+ e-', '', writeOut=True, path=path)
 
         if self.config.monitor:
             names = ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'K_S0', 'p+', 'K_L0', 'Lambda0', 'pi0']
             filename = 'Monitor_FSPLoader.root'
             pdgs = set([abs(pdg.from_name(name)) for name in names])
             variables = [(f'NumberOfMCParticlesInEvent({pdg})', 100, -0.5, 99.5) for pdg in pdgs]
-            variablesToHistogram('', variables=variables, filename=filename, path=path)
+            ma.variablesToHistogram('', variables=variables, filename=filename, path=path)
         return path
 
 
@@ -258,12 +258,12 @@ class TrainingData(object):
                     hist_variables_2d = [(x, channel.mvaConfig.target)
                                          for x in channel.mvaConfig.variables + spectators if x is not channel.mvaConfig.target]
                     hist_filename = f'Monitor_TrainingData_{channel.label}.root'
-                    variablesToHistogram(channel.name,
-                                         variables=config.variables2binnings(hist_variables),
-                                         variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                         filename=config.removeJPsiSlash(hist_filename), path=path)
+                    ma.variablesToHistogram(channel.name,
+                                            variables=config.variables2binnings(hist_variables),
+                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                                            filename=config.removeJPsiSlash(hist_filename), path=path)
 
-                teacher = register_module('VariablesToNtuple')
+                teacher = basf2.register_module('VariablesToNtuple')
                 teacher.set_name('VariablesToNtuple_' + channel.name)
                 teacher.param('fileName', filename)
                 teacher.param('treeName', 'variables')
@@ -307,36 +307,36 @@ class PreReconstruction(object):
             for channel in particle.channels:
 
                 if len(channel.daughters) == 1:
-                    cutAndCopyList(channel.name, channel.daughters[0], channel.preCutConfig.userCut, writeOut=True, path=path)
-                    variablesToExtraInfo(channel.name, {f'constant({channel.decayModeID})': 'decayModeID'}, path=path)
+                    ma.cutAndCopyList(channel.name, channel.daughters[0], channel.preCutConfig.userCut, writeOut=True, path=path)
+                    ma.variablesToExtraInfo(channel.name, {f'constant({channel.decayModeID})': 'decayModeID'}, path=path)
                 else:
-                    reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
-                                     writeOut=True, path=path)
+                    ma.reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
+                                        writeOut=True, path=path)
                 if self.config.monitor:
-                    matchMCTruth(channel.name, path=path)
+                    ma.matchMCTruth(channel.name, path=path)
                     bc_variable = channel.preCutConfig.bestCandidateVariable
                     hist_variables = [bc_variable, 'mcErrors', 'mcParticleStatus', channel.mvaConfig.target]
                     hist_variables_2d = [(bc_variable, channel.mvaConfig.target),
                                          (bc_variable, 'mcErrors'),
                                          (bc_variable, 'mcParticleStatus')]
                     filename = f'Monitor_PreReconstruction_BeforeRanking_{channel.label}.root'
-                    variablesToHistogram(channel.name,
-                                         variables=config.variables2binnings(hist_variables),
-                                         variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                         filename=filename, path=path)
+                    ma.variablesToHistogram(channel.name,
+                                            variables=config.variables2binnings(hist_variables),
+                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                                            filename=filename, path=path)
 
                 if channel.preCutConfig.bestCandidateMode == 'lowest':
-                    rankByLowest(channel.name,
-                                 channel.preCutConfig.bestCandidateVariable,
-                                 channel.preCutConfig.bestCandidateCut,
-                                 'preCut_rank',
-                                 path=path)
+                    ma.rankByLowest(channel.name,
+                                    channel.preCutConfig.bestCandidateVariable,
+                                    channel.preCutConfig.bestCandidateCut,
+                                    'preCut_rank',
+                                    path=path)
                 elif channel.preCutConfig.bestCandidateMode == 'highest':
-                    rankByHighest(channel.name,
-                                  channel.preCutConfig.bestCandidateVariable,
-                                  channel.preCutConfig.bestCandidateCut,
-                                  'preCut_rank',
-                                  path=path)
+                    ma.rankByHighest(channel.name,
+                                     channel.preCutConfig.bestCandidateVariable,
+                                     channel.preCutConfig.bestCandidateCut,
+                                     'preCut_rank',
+                                     path=path)
                 else:
                     raise RuntimeError("Unknown bestCandidateMode " + repr(channel.preCutConfig.bestCandidateMode))
 
@@ -346,25 +346,25 @@ class PreReconstruction(object):
                     hist_variables_2d += [('extraInfo(preCut_rank)', channel.mvaConfig.target),
                                           ('extraInfo(preCut_rank)', 'mcErrors'),
                                           ('extraInfo(preCut_rank)', 'mcParticleStatus')]
-                    variablesToHistogram(channel.name,
-                                         variables=config.variables2binnings(hist_variables),
-                                         variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                         filename=filename, path=path)
+                    ma.variablesToHistogram(channel.name,
+                                            variables=config.variables2binnings(hist_variables),
+                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                                            filename=filename, path=path)
                 # If we are not in monitor mode we do the mc matching now,
                 # otherwise we did it above already!
                 elif self.config.training:
-                    matchMCTruth(channel.name, path=path)
+                    ma.matchMCTruth(channel.name, path=path)
 
                 if re.findall(r"[\w']+", channel.decayString).count('pi0') > 1:
-                    B2INFO(f"Ignoring vertex fit because multiple pi0 are not supported yet {channel.name}.")
+                    basf2.B2INFO(f"Ignoring vertex fit because multiple pi0 are not supported yet {channel.name}.")
                 elif len(channel.daughters) > 1:
-                    pvfit = register_module('ParticleVertexFitter')
+                    pvfit = basf2.register_module('ParticleVertexFitter')
                     pvfit.set_name('ParticleVertexFitter_' + channel.name)
                     pvfit.param('listName', channel.name)
                     pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
-                    pvfit.param('vertexFitter', 'kfitter')
+                    pvfit.param('vertexFitter', 'KFit')
                     pvfit.param('fitType', 'vertex')
-                    pvfit.set_log_level(logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
+                    pvfit.set_log_level(basf2.logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
                     path.add_module(pvfit)
 
                 if self.config.monitor:
@@ -373,10 +373,10 @@ class PreReconstruction(object):
                                          ('chiProb', 'mcErrors'),
                                          ('chiProb', 'mcParticleStatus')]
                     filename = f'Monitor_PreReconstruction_AfterVertex_{channel.label}.root'
-                    variablesToHistogram(channel.name,
-                                         variables=config.variables2binnings(hist_variables),
-                                         variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                         filename=filename, path=path)
+                    ma.variablesToHistogram(channel.name,
+                                            variables=config.variables2binnings(hist_variables),
+                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                                            filename=filename, path=path)
 
         return path
 
@@ -428,7 +428,7 @@ class PostReconstruction(object):
 
         for particle in self.particles:
             for channel in particle.channels:
-                expert = register_module('MVAExpert')
+                expert = basf2.register_module('MVAExpert')
                 expert.set_name('MVAExpert_' + channel.name)
                 if self.config.training:
                     expert.param('identifier', channel.label + '.xml')
@@ -438,7 +438,7 @@ class PostReconstruction(object):
                 expert.param('listNames', [channel.name])
                 path.add_module(expert)
 
-                uniqueSignal = register_module('TagUniqueSignal')
+                uniqueSignal = basf2.register_module('TagUniqueSignal')
                 uniqueSignal.param('particleList', channel.name)
                 uniqueSignal.param('target', channel.mvaConfig.target)
                 uniqueSignal.param('extraInfoName', 'uniqueSignal')
@@ -456,16 +456,16 @@ class PostReconstruction(object):
                                          ('extraInfo(decayModeID)', 'extraInfo(uniqueSignal)'),
                                          ('extraInfo(decayModeID)', 'mcParticleStatus')]
                     filename = f'Monitor_PostReconstruction_AfterMVA_{channel.label}.root'
-                    variablesToHistogram(channel.name,
-                                         variables=config.variables2binnings(hist_variables),
-                                         variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                         filename=filename, path=path)
+                    ma.variablesToHistogram(channel.name,
+                                            variables=config.variables2binnings(hist_variables),
+                                            variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                                            filename=filename, path=path)
 
             cutstring = ''
             if particle.postCutConfig.value > 0.0:
                 cutstring = str(particle.postCutConfig.value) + ' < extraInfo(SignalProbability)'
 
-            copyLists(particle.identifier, [c.name for c in particle.channels], writeOut=True, path=path)
+            ma.copyLists(particle.identifier, [c.name for c in particle.channels], writeOut=True, path=path)
 
             if self.config.monitor:
                 hist_variables = ['mcErrors', 'mcParticleStatus', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)',
@@ -474,22 +474,22 @@ class PostReconstruction(object):
                                      ('extraInfo(decayModeID)', 'mcErrors'),
                                      ('extraInfo(decayModeID)', 'mcParticleStatus')]
                 filename = f'Monitor_PostReconstruction_BeforePostCut_{particle.identifier}.root'
-                variablesToHistogram(particle.identifier,
-                                     variables=config.variables2binnings(hist_variables),
-                                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                     filename=config.removeJPsiSlash(filename), path=path)
+                ma.variablesToHistogram(particle.identifier,
+                                        variables=config.variables2binnings(hist_variables),
+                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                                        filename=config.removeJPsiSlash(filename), path=path)
 
-            applyCuts(particle.identifier, cutstring, path=path)
+            ma.applyCuts(particle.identifier, cutstring, path=path)
 
             if self.config.monitor:
                 filename = f'Monitor_PostReconstruction_BeforeRanking_{particle.identifier}.root'
-                variablesToHistogram(particle.identifier,
-                                     variables=config.variables2binnings(hist_variables),
-                                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                     filename=config.removeJPsiSlash(filename), path=path)
+                ma.variablesToHistogram(particle.identifier,
+                                        variables=config.variables2binnings(hist_variables),
+                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                                        filename=config.removeJPsiSlash(filename), path=path)
 
-            rankByHighest(particle.identifier, 'extraInfo(SignalProbability)',
-                          particle.postCutConfig.bestCandidateCut, 'postCut_rank', path=path)
+            ma.rankByHighest(particle.identifier, 'extraInfo(SignalProbability)',
+                             particle.postCutConfig.bestCandidateCut, 'postCut_rank', path=path)
 
             if self.config.monitor:
                 hist_variables += ['extraInfo(postCut_rank)']
@@ -498,10 +498,10 @@ class PostReconstruction(object):
                                       ('mcErrors', 'extraInfo(postCut_rank)'),
                                       ('mcParticleStatus', 'extraInfo(postCut_rank)')]
                 filename = f'Monitor_PostReconstruction_AfterRanking_{particle.identifier}.root'
-                variablesToHistogram(particle.identifier,
-                                     variables=config.variables2binnings(hist_variables),
-                                     variables_2d=config.variables2binnings_2d(hist_variables_2d),
-                                     filename=config.removeJPsiSlash(filename), path=path)
+                ma.variablesToHistogram(particle.identifier,
+                                        variables=config.variables2binnings(hist_variables),
+                                        variables_2d=config.variables2binnings_2d(hist_variables_2d),
+                                        filename=config.removeJPsiSlash(filename), path=path)
 
                 if 'B' in particle.identifier:
                     variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
@@ -511,8 +511,8 @@ class PostReconstruction(object):
                                  'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
 
                 filename = f'Monitor_Final_{particle.identifier}.root'
-                variablesToNtuple(particle.identifier, variables, treename='variables',
-                                  filename=config.removeJPsiSlash(filename), path=path)
+                ma.variablesToNtuple(particle.identifier, variables, treename='variables',
+                                     filename=config.removeJPsiSlash(filename), path=path)
 
         return path
 
@@ -883,7 +883,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     # If we run in monitor mode we are interested in the ModuleStatistics,
     # these statistics contain the runtime for each module which was run.
     if configuration.monitor:
-        output = register_module('RootOutput')
+        output = basf2.register_module('RootOutput')
         output.param('outputFileName', 'Monitor_ModuleStatistics.root')
         output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
         output.param('branchNamesPersistent', ['ProcessStatistics'])

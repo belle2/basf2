@@ -23,15 +23,15 @@ from top_calibration import module_alignment
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
-globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
+globalTags = ['Reco_master_patch', 'data_reprocessing_proc10']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
-data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
+data_dir = '/group/belle2/dataprod/Data/OfficialReco/proc10/'
 dimuon_skim_dir = 'offskim/offskim_mumutop/cdst/sub00'
 bhabha_skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 main_output_dir = 'top_calibration'
 default_sample = 'dimuon'
 fixedParameters = ['dn/n']  # to list all names: basf2 -m TOPAlignmentCollector
-recalibrate = False  # if input data already well calibrated, otherwise switch to True
+new_cdst_format = False  # set to True for input in new cdst format
 #
 # ---------------------------------------------------------------------------------------
 
@@ -76,8 +76,8 @@ run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/alignment-{sample}-{expNo}-{run_range}"
 
 # Define calibration
-cal = module_alignment(inputFiles, sample, fixedParameters, recalibrate,
-                       globalTags, localDBs)
+cal = module_alignment(inputFiles, sample, fixedParameters,
+                       globalTags, localDBs, new_cdst_format)
 cal.backend_args = {"queue": "l"}
 
 # Add calibrations to CAF

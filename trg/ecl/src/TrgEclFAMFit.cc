@@ -11,9 +11,7 @@
 // $Log$
 // 2017-02-21 : version 1.0
 //---------------------------------------------------------------
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEclFAMFit.h"
@@ -25,7 +23,6 @@
 #include <stdlib.h>
 #include <iostream>
 #include <math.h>
-#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;
@@ -119,8 +116,10 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
   //  double EThreshold = _Threshold; //[MeV]
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 2;   // # of clk to suspend fit
-  double FitE = 0;
-  double FitT = 0;
+  /* cppcheck-suppress variableScope */
+  double FitE;
+  /* cppcheck-suppress variableScope */
+  double FitT;
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
 

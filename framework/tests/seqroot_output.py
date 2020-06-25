@@ -6,7 +6,9 @@
 from basf2 import create_path, process, set_random_seed, statistics, LogLevel, conditions
 import os
 import multiprocessing
+from b2test_utils import skip_test_if_light
 
+skip_test_if_light()  # light builds don't contain particle gun
 set_random_seed(42)
 
 # create a path

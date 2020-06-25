@@ -23,7 +23,7 @@ namespace Belle2 {
   public:
 
     /// Constructor
-    TRGGRLMATCH(): m_deltar(-999.), m_deltaz(-999.) {}
+    TRGGRLMATCH(): m_deltar(-999.), m_deltaz(-999.), m_e(-99.) {}
     /// Destructor
     ~TRGGRLMATCH() {}
 
@@ -37,6 +37,9 @@ namespace Belle2 {
     /**Get dphi_d*/
     double get_dphi_d() const {return m_dphi_d;}
 
+    /**Get cluster energy*/
+    double get_e() const {return m_e;}
+
     /** set the Delta R*/
     void setDeltaR(double deltar) { m_deltar = deltar; }
 
@@ -45,6 +48,9 @@ namespace Belle2 {
 
     /** set the dphi_d*/
     void set_dphi_d(double dphi_d) { m_dphi_d = dphi_d; }
+
+    /** set the cluster energy*/
+    void set_e(double e) { m_e = e; }
 
   private:
 
@@ -60,6 +66,9 @@ namespace Belle2 {
     /**Phi angle difference between the ECL cluster and the expected position
     which is calculated from CDC*/
     double m_dphi_d = -999.;
+
+    /**Cluster energy*/
+    double m_e = -99.;
 
     /**! The Class title*/
     ClassDef(TRGGRLMATCH, 2); /*< the class title */

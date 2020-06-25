@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Jo-Frederik Krohn, Francesco Tenchini                     *
+ * Contributor: Wouter Hulsbergen, Jo-Frederik Krohn, Francesco Tenchini  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -50,15 +50,15 @@ namespace TreeFitter {
                                                     );
 
     /** get helix and jacobian from a vertex */
-    static void getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+    static void getHelixAndJacobianFromVertexNumerical(const Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                        int charge, double Bz,
                                                        Belle2::Helix& helix,
                                                        Eigen::Matrix<double, 5, 6>& jacobian);
 
     /** get jacobian from a vertex */
-    static void getJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+    static void getJacobianFromVertexNumerical(const Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                int charge, double Bz,
-                                               Belle2::Helix& helix,
+                                               const Belle2::Helix& helix,
                                                Eigen::Matrix<double, 5, 6>& jacobian,
                                                double delta = 1e-5
                                               );

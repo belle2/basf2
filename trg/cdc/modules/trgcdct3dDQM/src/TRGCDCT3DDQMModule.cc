@@ -14,19 +14,11 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-//#include <framework/dbobjects/RunInfo.h>
-#include <framework/datastore/DataStore.h>
 
 #include <TDirectory.h>
-#include <TRandom3.h>
 #include <TPostScript.h>
 #include <TCanvas.h>
-#include <TStyle.h>
-#include <unistd.h>
 #include <iostream>
-#include <fstream>
-#include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -160,8 +152,9 @@ void TRGCDCT3DDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
-  defineHisto();
 
   char c_name_3D[100];
   sprintf(c_name_3D, "FirmTRGCDC3DFitterTracks%d", m_T3DMOD);

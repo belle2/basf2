@@ -145,17 +145,25 @@ void RecoTrackUtil::fill(const ARLHitHolderRange& rlWireHitHolders, RecoTrack& r
     ERightLeft rlInfo = rlWireHit.getRLInfo();
     using RightLeftInformation = RecoHitInformation::RightLeftInformation;
     if (rlInfo == ERightLeft::c_Left) {
-      recoTrack.addCDCHit(cdcHit, sortingParameter, RightLeftInformation::c_left);
+      recoTrack.addCDCHit(cdcHit,
+                          sortingParameter,
+                          RightLeftInformation::c_left,
+                          RecoHitInformation::c_CDCTrackFinder);
     } else if (rlInfo == ERightLeft::c_Right) {
-      recoTrack.addCDCHit(cdcHit, sortingParameter, RightLeftInformation::c_right);
+      recoTrack.addCDCHit(cdcHit,
+                          sortingParameter,
+                          RightLeftInformation::c_right,
+                          RecoHitInformation::c_CDCTrackFinder);
     } else if (rlInfo == ERightLeft::c_Invalid) {
       recoTrack.addCDCHit(cdcHit,
                           sortingParameter,
-                          RightLeftInformation::c_invalidRightLeftInformation);
+                          RightLeftInformation::c_invalidRightLeftInformation,
+                          RecoHitInformation::c_CDCTrackFinder);
     } else {
       recoTrack.addCDCHit(cdcHit,
                           sortingParameter,
-                          RightLeftInformation::c_undefinedRightLeftInformation);
+                          RightLeftInformation::c_undefinedRightLeftInformation,
+                          RecoHitInformation::c_CDCTrackFinder);
     }
   }
 }

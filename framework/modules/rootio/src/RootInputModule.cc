@@ -84,6 +84,9 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            false);
   addParam("cacheSize", m_cacheSize,
            "file cache size in Mbytes. If negative, use root default", 0);
+
+  addParam("discardErrorEvents", m_discardErrorEvents,
+           "Discard events with an error flag != 0", true);
 }
 
 RootInputModule::~RootInputModule() = default;
@@ -331,27 +334,41 @@ void RootInputModule::event()
   if (!m_tree)
     return;
 
-  const long nextEntry = InputController::getNextEntry();
-  if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
-    B2INFO("RootInput: will read entry " << nextEntry << " next.");
-    m_nextEntry = nextEntry;
-  } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0
-             && InputController::getNextEvent() >= 0) {
-    const long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(m_tree->GetTree(), InputController::getNextEvent(),
-                       InputController::getNextRun(), InputController::getNextExperiment());
-    if (entry >= 0) {
-      const long chainentry = m_tree->GetChainEntryNumber(entry);
-      B2INFO("RootInput: will read entry " << chainentry << " (entry " << entry << " in current file) next.");
-      m_nextEntry = chainentry;
-    } else {
-      B2ERROR("Couldn't find entry (" << InputController::getNextEvent() << ", " << InputController::getNextRun() << ", " <<
-              InputController::getNextExperiment() << ") in file! Loading entry " << m_nextEntry << " instead.");
+  while (true) {
+    const long nextEntry = InputController::getNextEntry();
+    if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
+      B2INFO("RootInput: will read entry " << nextEntry << " next.");
+      m_nextEntry = nextEntry;
+    } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0
+               && InputController::getNextEvent() >= 0) {
+      const long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(m_tree->GetTree(), InputController::getNextEvent(),
+                         InputController::getNextRun(), InputController::getNextExperiment());
+      if (entry >= 0) {
+        const long chainentry = m_tree->GetChainEntryNumber(entry);
+        B2INFO("RootInput: will read entry " << chainentry << " (entry " << entry << " in current file) next.");
+        m_nextEntry = chainentry;
+      } else {
+        B2ERROR("Couldn't find entry (" << InputController::getNextEvent() << ", " << InputController::getNextRun() << ", " <<
+                InputController::getNextExperiment() << ") in file! Loading entry " << m_nextEntry << " instead.");
+      }
     }
-  }
-  InputController::eventLoaded(m_nextEntry);
+    InputController::eventLoaded(m_nextEntry);
 
-  readTree();
-  m_nextEntry++;
+    readTree();
+    m_nextEntry++;
+
+    // check for events with errors
+    unsigned int errorFlag = 0;
+    if (m_discardErrorEvents && (m_nextEntry >= 0)) {
+      const StoreObjPtr<EventMetaData> eventMetaData;
+      errorFlag = eventMetaData->getErrorFlag();
+      if (errorFlag != 0) {
+        B2WARNING("Discarding corrupted event" << LogVar("errorFlag", errorFlag) << LogVar("experiment", eventMetaData->getExperiment())
+                  << LogVar("run", eventMetaData->getRun()) << LogVar("event", eventMetaData->getEvent()));
+      }
+    }
+    if (errorFlag == 0) break;
+  }
 }
 
 
@@ -407,6 +424,7 @@ void RootInputModule::readTree()
   localEntryNumber = m_tree->LoadTree(localEntryNumber);
 
   if (localEntryNumber == -2) {
+    m_nextEntry = -2;
     return; //end of file
   } else if (localEntryNumber < 0) {
     B2FATAL("Failed to load tree, corrupt file? Check standard error for additional messages. (TChain::LoadTree() returned error " <<

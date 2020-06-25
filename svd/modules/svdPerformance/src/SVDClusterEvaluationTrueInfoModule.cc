@@ -10,23 +10,18 @@
 
 #include <svd/modules/svdPerformance/SVDClusterEvaluationTrueInfoModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDSimHit.h>
+
+#include <TCanvas.h>
 #include <TFile.h>
+#include <TGraphErrors.h>
 #include <TText.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 #include <string>
-#include "TMath.h"
-#include <algorithm>
-#include <functional>
 
 
 using namespace Belle2;
@@ -798,8 +793,6 @@ void SVDClusterEvaluationTrueInfoModule::createArbitraryGraphError_Red(const cha
 bool SVDClusterEvaluationTrueInfoModule::goodTrueHit(const SVDTrueHit* thino)
 {
 
-  float charge = 0;
-  bool primary = false;
 
   bool isGood = false;
 
@@ -809,8 +802,8 @@ bool SVDClusterEvaluationTrueInfoModule::goodTrueHit(const SVDTrueHit* thino)
 
     m_histoControl_THToMCsize->Fill(relatVectorTHToMC.size());
 
-    charge = relatVectorTHToMC[0]->getCharge();
-    primary = relatVectorTHToMC[0]->isPrimaryParticle();
+    float charge = relatVectorTHToMC[0]->getCharge();
+    bool primary = relatVectorTHToMC[0]->isPrimaryParticle();
 
     m_histoControl_MCcharge->Fill(charge);
     m_histoControl_MCisPrimary->Fill(primary);

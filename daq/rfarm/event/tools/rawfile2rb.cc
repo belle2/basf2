@@ -6,14 +6,10 @@
 // Date : 25 - Sep - 2013
 //-
 
-#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <string.h>
-#include <errno.h>
-#include <netinet/in.h>
 
 #include "framework/pcore/RingBuffer.h"
 

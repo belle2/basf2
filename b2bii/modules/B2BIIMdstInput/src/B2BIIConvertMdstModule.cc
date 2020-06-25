@@ -64,6 +64,7 @@
 #include "belle_legacy/benergy/BeamEnergy.h"
 #include "belle_legacy/ip/IpProfile.h"
 #include "belle_legacy/tables/evtcls.h"
+#include "belle_legacy/tables/trg.h"
 
 
 #include <cmath>
@@ -167,14 +168,13 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("mcMatchingMode", m_mcMatchingModeString,
            "MC matching mode: 'Direct', or 'GeneratorLevel'",
            std::string("Direct"));
-  addParam("convertECLCrystalEnergies", m_convertECLCrystalEnergies, "Flag to switch on conversion of Datecl_mc_ehits into ECLHits",
-           false);
-  addParam("convertExtHits", m_convertExtHits, "Flag to switch on conversion of Mdst_ecl_trk into ExtHits", false);
   addParam("matchType2E9oE25Threshold", m_matchType2E9oE25Threshold,
            "clusters with a E9/E25 value above this threshold are classified as neutral even if tracks are matched to their connected region (matchType == 2)",
            -1.1);
 
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
+  addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
+  addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
 
   m_realData = false;
 
@@ -197,6 +197,8 @@ void B2BIIConvertMdstModule::initialize()
   else
     B2FATAL("Unknown MC matching mode: " << m_mcMatchingModeString);
   B2INFO("B2BIIConvertMdst: initialized.");
+  if (!m_nisEnable)
+    B2WARNING("nisKsFinder output has been disabled. ksnbVLike, ksnbNoLam, ksnbStandard will not be converted.");
 }
 
 void B2BIIConvertMdstModule::initializeDataStore()
@@ -210,13 +212,11 @@ void B2BIIConvertMdstModule::initializeDataStore()
   m_trackFitResults.registerInDataStore();
   m_v0s.registerInDataStore();
   m_particles.registerInDataStore();
-  if (m_convertECLCrystalEnergies) m_eclHits.registerInDataStore();
-  if (m_convertExtHits) m_extHits.registerInDataStore();
 
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
 
-  if (m_convertEvtcls) m_evtCls.registerInDataStore();
+  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
@@ -241,7 +241,6 @@ void B2BIIConvertMdstModule::initializeDataStore()
   //list here all Relations between Belle2 objects
   m_tracks.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_pidLikelihoods);
-  if (m_convertExtHits) m_tracks.registerRelationTo(m_extHits);
   m_eclClusters.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_eclClusters);
   m_klmClusters.registerRelationTo(m_tracks);
@@ -349,14 +348,11 @@ void B2BIIConvertMdstModule::event()
   // 10. Convert KLong information
   convertMdstKLongTable();
 
-  // 11. Convert ECL crystal energy
-  if (m_convertECLCrystalEnergies) convertECLHitTable();
-
-  // 12. Convert ExtHit information and set Track -> ExtHit relations
-  if (m_convertExtHits) convertExtHitTable();
-
-  // 13. Convert Evtcls panther table information
+  // 11. Convert Evtcls panther table information
   if (m_convertEvtcls) convertEvtclsTable();
+
+  // 12. Convert trigger information from rectrg_summary3
+  if (m_convertRecTrg) convertRecTrgTable();
 
 }
 
@@ -600,7 +596,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixP(i, j) = error7x7P[i][j];
 
-        daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP, pTypeP);
+        daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP);
         daughterP.updateMomentum(TLorentzVector(momentumP.px(), momentumP.py(), momentumP.pz(), momentumP.e()),
                                  TVector3(positionP.x(), positionP.y(), positionP.z()),
                                  errMatrixP, 0.5);
@@ -623,7 +619,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         trackFitPIndex = trackFitP->getArrayIndex();
 
-        daughterP = Particle(trackID[0] - 1, trackFitP, pTypeP, pTypeP);
+        daughterP = Particle(trackID[0] - 1, trackFitP, pTypeP);
         // set momentum/positions at pivot = V0 decay vertex
         getHelixParameters(trk_fit, pTypeP.getMass(), dauPivot,
                            helixParam,  error5x5,
@@ -655,7 +651,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixM(i, j) = error7x7M[i][j];
 
-        daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM, pTypeM);
+        daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM);
         daughterM.updateMomentum(TLorentzVector(momentumM.px(), momentumM.py(), momentumM.pz(), momentumM.e()),
                                  TVector3(positionM.x(), positionM.y(), positionM.z()),
                                  errMatrixM, 0.5);
@@ -678,7 +674,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         trackFitMIndex = trackFitM->getArrayIndex();
 
-        daughterM = Particle(trackID[1] - 1, trackFitM, pTypeM, pTypeM);
+        daughterM = Particle(trackID[1] - 1, trackFitM, pTypeM);
         // set momentum/positions at pivot = V0 decay vertex
         getHelixParameters(trk_fit, pTypeM.getMass(), dauPivot,
                            helixParam,  error5x5,
@@ -803,17 +799,19 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       convGammaPList->addParticle(newV0);
     }
     // append extra info: nisKsFinder quality indicators
-    if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
-      Belle::nisKsFinder ksnb;
-      double protIDP = atcPID(pidP, 2, 4);
-      double protIDM = atcPID(pidM, 2, 4);
-      ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
-      // K_S0 and Lambda (inverse cut on ksnbNoLam for Lambda selection).
-      newV0->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
-      newV0->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
-      // K_S0 only
-      if (belleV0.kind() == 1)
-        newV0->addExtraInfo("ksnbStandard", ksnb.standard());
+    if (m_nisEnable) {
+      if (belleV0.kind() <= 3) { // K_S0, Lambda, anti-Lambda
+        Belle::nisKsFinder ksnb;
+        double protIDP = atcPID(pidP, 2, 4);
+        double protIDM = atcPID(pidM, 2, 4);
+        ksnb.candidates(belleV0, Belle::IpProfile::position(1), momentumP, protIDP, protIDM);
+        // K_S0 and Lambda (inverse cut on ksnbNoLam for Lambda selection).
+        newV0->addExtraInfo("ksnbVLike", ksnb.nb_vlike());
+        newV0->addExtraInfo("ksnbNoLam", ksnb.nb_nolam());
+        // K_S0 only
+        if (belleV0.kind() == 1)
+          newV0->addExtraInfo("ksnbStandard", ksnb.standard());
+      }
     }
   }
 }
@@ -1089,6 +1087,16 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
     B2Pi0->appendDaughter(B2Gamma1);
     B2Pi0->appendDaughter(B2Gamma2);
 
+    // Add chisq of mass-constrained Kfit
+    B2Pi0->addExtraInfo("chiSquared", mdstPi0.chisq());
+
+    // Ndf of a pi0 mass-constrained kinematic fit is 1
+    B2Pi0->addExtraInfo("ndf", 1);
+
+    // Add p-value to extra Info
+    double prob = TMath::Prob(mdstPi0.chisq(), 1);
+    B2Pi0->setPValue(prob);
+
     // Add particle to particle list
     plist->addParticle(B2Pi0);
   }
@@ -1179,81 +1187,11 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
   }
 }
 
-void B2BIIConvertMdstModule::convertECLHitTable()
-{
-  if (m_realData)
-    return;
-
-  // check if the Datecl_mc_hits table has any entries
-  Belle::Datecl_mc_ehits_Manager& ehitsMgr = Belle::Datecl_mc_ehits_Manager::get_manager();
-  if (ehitsMgr.count() == 0) {
-    return;
-  }
-
-  // Loop over all Belle Datecl_mc_ehits
-  for (Belle::Datecl_mc_ehits_Manager::iterator ehitIterator = ehitsMgr.begin(); ehitIterator != ehitsMgr.end(); ++ehitIterator) {
-
-    // Pull Datecl_mc_ehits from manager
-    Belle::Datecl_mc_ehits datECLMCEHit = *ehitIterator;
-
-    // Create Belle II ECLHit
-    auto B2EclHit = m_eclHits.appendNew();
-
-    // Convert Datecl_mc_ehit -> ECLHit
-    convertECLHitObject(datECLMCEHit, B2EclHit);
-  }
-}
-
-void B2BIIConvertMdstModule::convertExtHitTable()
-{
-  Belle::Mdst_ecl_trk_Manager& eclTrkMgr = Belle::Mdst_ecl_trk_Manager::get_manager();
-  // check if the Mdst_ecl_trk table has any entries
-  if (eclTrkMgr.count() == 0) {
-    return;
-  }
-
-  Belle::Mdst_charged_Manager& chgMg = Belle::Mdst_charged_Manager::get_manager();
-
-  // Relations
-  RelationArray tracksToExtHits(m_tracks, m_extHits);
-
-  // Loop over all Belle Mdst_ecl_trk
-  for (Belle::Mdst_ecl_trk_Manager::iterator ecltrkIterator = eclTrkMgr.begin(); ecltrkIterator != eclTrkMgr.end();
-       ++ecltrkIterator) {
-
-    // Pull Mdst_ecl_trk from manager
-    Belle::Mdst_ecl_trk mdstECLTrk = *ecltrkIterator;
-
-    // Create Belle II ExtHit
-    auto B2ExtHit = m_extHits.appendNew();
-
-    // Convert Mdst_ecl_trk -> ExtHit
-    convertExtHitObject(mdstECLTrk, B2ExtHit);
-
-    // Set relation between track and ExtHit
-    Belle::Mdst_trk mTRK = mdstECLTrk.trk();
-
-    // the numbering in mdst_charged is
-    // not necessarily the same as in mdst_trk
-    // therefore we have to find the corresponding mdst_charged
-    for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); ++chgIterator) {
-      Belle::Mdst_charged mChar = *chgIterator;
-      Belle::Mdst_trk mTRK_in_charged = mChar.trk();
-
-      if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
-        // found the correct  mdst_charged
-        tracksToExtHits.add(mChar.get_ID() - 1, m_extHits.getEntries() - 1, 1.0);
-        break;
-      }
-    }
-  }
-}
-
 void B2BIIConvertMdstModule::convertEvtclsTable()
 {
   // Create StoreObj if it is not valid
-  if (not m_evtCls.isValid()) {
-    m_evtCls.create();
+  if (not m_evtInfo.isValid()) {
+    m_evtInfo.create();
   }
   // Pull Evtcls_flag(2) from manager
   Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
@@ -1277,22 +1215,47 @@ void B2BIIConvertMdstModule::convertEvtclsTable()
     std::string iVar = name + std::to_string(index);
     // 0-9 corresponding to evtcls_flag.flag(0-9)
     if (index < 10) {
-      m_evtCls->addExtraInfo(iVar, (*eflagIterator).flag(index));
+      m_evtInfo->addExtraInfo(iVar, (*eflagIterator).flag(index));
     } else {
       // 10-19 corresponding to evtcls_flag2.flag(0-9)
-      m_evtCls->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
+      m_evtInfo->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
     }
-    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
   }
 
   // Converting evtcls_hadronic_flag
   for (int index = 0; index < 6; ++index) {
     std::string iVar = name_had + std::to_string(index);
-    m_evtCls->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
-    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+    m_evtInfo->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
+    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
   }
 
 }
+
+void B2BIIConvertMdstModule::convertRecTrgTable()
+{
+
+  // Create StoreObj if it is not valid
+  if (not m_evtInfo.isValid()) {
+    m_evtInfo.create();
+  }
+
+  // Pull rectrg_summary3 from manager
+  Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
+
+  std::string name = "rectrg_summary3_m_final";
+  // Only one entry in each event
+  std::vector<Belle::Rectrg_summary3>::iterator eflagIterator = RecTrgSummary3Mgr.begin();
+
+  // Converting m_final(3)
+  for (int index = 0; index < 3; ++index) {
+    std::string iVar = name + std::to_string(index);
+    m_evtInfo->addExtraInfo(iVar, (*eflagIterator).final(index));
+    B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+  }
+
+}
+
 
 //-----------------------------------------------------------------------------
 // CONVERT OBJECTS
@@ -1842,28 +1805,6 @@ void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster&
   // note: Belle quality flag is not saved (no free int variable in Belle2 KLMCluster)
   klmCluster->setLayers(klm_cluster.layers());
   klmCluster->setInnermostLayer(klm_cluster.first_layer());
-}
-
-void B2BIIConvertMdstModule::convertECLHitObject(const Belle::Datecl_mc_ehits& ecl_mc_ehit, ECLHit* eclHit)
-{
-  // note: average time was not available in Belle
-  eclHit->setCellId(ecl_mc_ehit.cId());
-  eclHit->setEnergyDep(ecl_mc_ehit.energy());
-}
-
-void B2BIIConvertMdstModule::convertExtHitObject(const Belle::Mdst_ecl_trk& ecl_trk_hit, ExtHit* extHit)
-{
-  extHit->setPDGCode(Const::pion.getPDGCode()); // always set Pion
-  extHit->setDetectorID(Const::EDetector::ECL);
-  extHit->setCopyID(ecl_trk_hit.cId());
-  extHit->setStatus(EXT_ENTER);
-  extHit->setPosition(TVector3(ecl_trk_hit.x(0), ecl_trk_hit.x(1), ecl_trk_hit.x(2)));
-  extHit->setMomentum(TVector3(ecl_trk_hit.p(0), ecl_trk_hit.p(1), ecl_trk_hit.p(2)));
-  double covarianceMatrix[21];
-  for (int i = 0; i < 21; ++i) {
-    covarianceMatrix[i] = ecl_trk_hit.error(i);
-  }
-  extHit->setCovariance(covarianceMatrix);
 }
 
 

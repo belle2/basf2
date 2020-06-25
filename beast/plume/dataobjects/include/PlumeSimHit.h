@@ -100,6 +100,7 @@ namespace Belle2 {
     float getglobalTime()       const { return m_globalTime; }
     /** event number */
     int geteventnumber() const {return m_evtNum;}
+    /** set an event number */
     void seteventnumber(const int evtn) {m_evtNum = (unsigned)evtn;}
 
 
@@ -152,7 +153,7 @@ namespace Belle2 {
     /** global time */
     float m_globalTime;
     /** event number */
-    unsigned m_evtNum;
+    unsigned m_evtNum = 0;
 
     ClassDef(PlumeSimHit, 2)
   };

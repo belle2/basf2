@@ -16,8 +16,6 @@ import generators as ge
 import simulation as si
 import reconstruction as re
 import modularAnalysis as ma
-from ROOT import Belle2
-import glob
 
 
 # Defining custom path

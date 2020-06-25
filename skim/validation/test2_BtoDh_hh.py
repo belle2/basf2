@@ -9,25 +9,24 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
-from stdCharged import stdPi, stdK
+import basf2 as b2
+import modularAnalysis as ma
+from stdCharged import stdK, stdPi
 
-hhpath = Path()
+hhpath = b2.Path()
 
-inputMdst('default', '14140100.udst.root', path=hhpath)
+ma.inputMdst('default', '14140100.udst.root', path=hhpath)
 
 stdPi('all', path=hhpath)
 stdK('all', path=hhpath)
 
 
-reconstructDecay('D0 -> K-:all pi+:all', '1.84 < M < 1.89', path=hhpath)
-reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=hhpath)
+ma.reconstructDecay('D0 -> K-:all pi+:all', '1.84 < M < 1.89', path=hhpath)
+ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=hhpath)
 
 # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
 
-from variables import variables
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='BtoDh_hh_Validation.root',
     decayString='B-:ch3',
     variables=[
@@ -37,5 +36,5 @@ variablesToHistogram(
     variables_2d=[
         ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=hhpath)
 
-process(hhpath)
-print(statistics)
+b2.process(hhpath)
+print(b2.statistics)

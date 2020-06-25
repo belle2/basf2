@@ -31,9 +31,9 @@
 #include <top/dbobjects/TOPCalChannelThreshold.h>
 #include <top/dbobjects/TOPCalChannelNoise.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
+#include <top/dbobjects/TOPCalTimeWalk.h>
 
 #include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
-#include <string>
 
 
 namespace Belle2 {
@@ -121,6 +121,7 @@ namespace Belle2 {
     bool m_useSampleTimeCalibration;   /**< if true, use time base calibration */
     bool m_simulateTTS; /**< if true, add TTS to simulated hits */
     bool m_allChannels; /**< if true, always make waveforms for all channels */
+    double m_minWidthXheight;  /**< minimal width * height [ns * ADC counts] */
 
     // datastore objects
     StoreArray<TOPSimHit> m_simHits;        /**< collection of simuated hits */
@@ -139,6 +140,7 @@ namespace Belle2 {
     DBObjPtr<TOPCalChannelPulseHeight> m_pulseHeights; /**< pulse height param. */
     DBObjPtr<TOPCalChannelThreshold> m_thresholds; /**< channel thresholds */
     DBObjPtr<TOPCalChannelNoise> m_noises; /**< channel noise levels (r.m.s) */
+    OptionalDBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
     DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
 
     // default for no DB or calibration not available

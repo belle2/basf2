@@ -50,19 +50,24 @@ else:  # Use ParticleGun to generate 4GeV mu+ and mu-
                     thetaParams=[37, 130])
 
 # Add simulation
+main.add_module('Gearbox')
+main.add_module('Geometry',
+                components=['KLM'],
+                useDB=False)
 sim.add_simulation(path=main,
                    components=['KLM'])
 
 # Pack and unpack data
-main.add_module('BKLMRawPacker')
-main.add_module('KLMUnpacker')
+main.add_module('KLMPacker')
+main.add_module('KLMUnpacker',
+                WriteDigitRaws=True)
 
 # Add the digit analyzer module (optional)
 main.add_module('BKLMDigitAnalyzer',
                 outputRootName='bklmHitmap')
 
 # Add the reconstruction
-main.add_module('BKLMReconstructor')
+main.add_module('KLMReconstructor')
 
 # Add the self-tracking
 main.add_module('BKLMTracking',

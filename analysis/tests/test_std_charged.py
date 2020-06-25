@@ -107,6 +107,17 @@ class TestStdCharged(unittest.TestCase):
                 "Function: \"%s\" has no valid list based on efficiency percentile."
                 % (function.__name__))
 
+    def test_mostLikely_lists(self):
+        """check that the builder functions work with the mostLikely lists"""
+        nLists = 5  # Number of ParticleLoader's expected
+        testpath = create_path()
+        stdCharged.stdMostLikely(path=testpath)
+        self.assertEqual(
+            len(testpath.modules()), nLists,
+            "There should be %i fillParticleList calls" % nLists)
+        self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
+        for module in testpath.modules():
+            self._check_list_name('mostlikely', 'stdMostLikely', module)
 
 if __name__ == '__main__':
     unittest.main()

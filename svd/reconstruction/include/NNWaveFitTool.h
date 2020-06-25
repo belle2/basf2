@@ -12,16 +12,12 @@
 #ifndef _SVD_RECONSTRUCTION_NNWAVEFITTOOL_H
 #define _SVD_RECONSTRUCTION_NNWAVEFITTOOL_H
 
-#include <cmath>
 #include <vector>
-#include <map>
 #include <memory>
 #include <tuple>
 #include <algorithm>
 #include <numeric>
 #include <functional>
-#include <sstream>
-#include <framework/logging/Logger.h>
 #include <svd/simulation/SVDSimulationTools.h>
 
 namespace Belle2 {

@@ -20,7 +20,7 @@ from top_calibration import pulseHeight_calibration_rawdata
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
+globalTags = ['Reco_master_patch', 'data_reprocessing_proc10']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/group/belle2/dataprod/Data/Raw'
 main_output_dir = 'top_calibration'

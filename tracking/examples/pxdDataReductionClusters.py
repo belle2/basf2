@@ -5,6 +5,9 @@ import os
 from basf2 import *
 from tracking import *
 from simulation import add_simulation
+from simulation import add_roiFinder
+from svd import add_svd_reconstruction
+from tracking import add_tracking_for_PXDDataReduction_simulation
 from ROOT import Belle2
 
 numEvents = 100
@@ -55,7 +58,7 @@ PXDDIGI = register_module('PXDDigitizer')
 PXDCLUST = register_module('PXDClusterizer')
 
 pxdClusterFilter = register_module('PXDclusterFilter')
-pxdClusterFilter.param({'ROIidsName': 'ROIs', 'CreateOutside': True})
+pxdClusterFilter.param({'ROIidsName': 'ROIs', 'CreateOutside': True, 'overrideDB': True, 'enableFiltering': True})
 
 # Create paths
 main = create_path()
@@ -64,7 +67,7 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
-add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC'], usePXDDataReduction=False)
+add_simulation(main, components=['PXD', 'SVD', 'CDC'], forceSetPXDDataReduction=True, usePXDDataReduction=False)
 add_tracking_reconstruction(main, ['SVD', 'CDC'])
 main.add_module(pxdROIFinder)
 main.add_module(PXDDIGI)

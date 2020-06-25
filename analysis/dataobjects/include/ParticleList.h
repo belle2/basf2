@@ -26,7 +26,7 @@ namespace Belle2 {
    * o) flavor specific particles (particles that have an anti-particle, e.g. pi-, K-, D+, D0)
    * o) self-conjugated particles (particles that do not have an anti-particle, e.g. pi0, phi, or particles
    *    that have an anti-particle but are reconstructed in self-conjugated decay mode, e.g. K*0 -> K0s pi0, or D0 -> K- K+, ...)
-   * ParticleList can store only particles with same PDG code (whcih however can be reconstructed in different decay modes).
+   * ParticleList can store only particles with same PDG code (which however can be reconstructed in different decay modes).
    *
    * Each ParticleList can and should be bound with its anti-ParticleList at the time of creation of the lists.
    * This bond for example enables automatic reconstruction of charged conjugated decays in ParticleCombiner module for example.
@@ -172,6 +172,7 @@ namespace Belle2 {
      *
      * @param pdg PDG code of particles to be hold in this list
      * @param name of the particle list
+     * @param particleStoreName name of the Particle StoreArray
      */
     void initialize(int pdg, const std::string& name, const std::string& particleStoreName = "Particles");
 
@@ -209,6 +210,7 @@ namespace Belle2 {
      * @param iparticle index of the particle in the StoreArray<Particle>
      * @param pdg particle PDG code
      * @param flavorType particle flavor type
+     * @param includingAntiList include anti-particle list?
      */
     void addParticle(unsigned iparticle, int pdg, Particle::EFlavorType flavorType, bool includingAntiList = true);
 
@@ -280,8 +282,9 @@ namespace Belle2 {
     unsigned getListSize(bool includingAntiList = true) const;
 
     /**
-     * Returns i-th particle from the this list and anti list if requested
+     * Returns i-th particle from the list and anti list if requested
      * @param i list index (i < getListSize())
+     * @param includingAntiList consider anti-particle list as well?
      * @return pointer to Particle or NULL
      */
     Particle* getParticle(unsigned i, bool includingAntiList = true) const;

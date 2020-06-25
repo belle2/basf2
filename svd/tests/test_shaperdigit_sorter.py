@@ -14,17 +14,24 @@ class CreateDigits(basf2.Module):
         """digits is a list of (sensor, side, strip) for which to generate a digit"""
         super().__init__()
         self.svddigits = Belle2.PyStoreArray("SVDShaperDigits")
+        '''shaper digits'''
         self.digits = digits
+        '''test digits'''
         self.samples = ROOT.array('unsigned char', 6)()
+        '''six samples'''
         for i, sample in zip(range(6), [0, 0, 12, 18, 12, 8]):
             self.samples[i] = sample
         self.mode = Belle2.SVDModeByte(144)
+        '''svd mode byte'''
         self.fadc_time = 0
+        '''FADC time'''
 
     def initialize(self):
+        '''initialize'''
         self.svddigits.registerInDataStore()
 
     def event(self):
+        '''event'''
         for sensor, side, strip in self.digits:
             d = self.svddigits.appendNew()
             d.__assign__(Belle2.SVDShaperDigit(Belle2.VxdID(3, 1, sensor), side, strip, self.samples, self.fadc_time, self.mode))
@@ -38,6 +45,7 @@ class CheckOrderingOfDigits(basf2.Module):
     """Check ordering of SVD digits"""
 
     def event(self):
+        '''event'''
         digits = Belle2.PyStoreArray("SVDShaperDigits")
         current_ID = 0
         for d in digits:

@@ -24,12 +24,10 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDEventInfo.h>
-#include <boost/tuple/tuple.hpp>
 #include <fstream>
 #include <sstream>
 #include <regex>
 #include <algorithm>
-#include <numeric>
 #include <deque>
 #include <cmath>
 #include <root/TMath.h>
@@ -70,42 +68,42 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
 
   // 1. Collections
   addParam("MCParticles", m_storeMCParticlesName,
-           "MCParticle collection name", string(""));
+           "MCParticle collection name", m_storeMCParticlesName);
   addParam("SimHits", m_storeSimHitsName, "SimHit collection name",
-           string(""));
+           m_storeSimHitsName);
   addParam("TrueHits", m_storeTrueHitsName, "TrueHit collection name",
-           string(""));
-  addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", string(""));
-  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", string("SVDEventInfoSim"));
+           m_storeTrueHitsName);
+  addParam("ShaperDigits", m_storeShaperDigitsName, "ShaperDigits collection name", m_storeShaperDigitsName);
+  addParam("SVDEventInfo", m_svdEventInfoName, "SVDEventInfo name", m_svdEventInfoName);
 
   // 2. Physics
   addParam("SegmentLength", m_segmentLength,
-           "Maximum segment length (in millimeters)", 0.020);
+           "Maximum segment length (in millimeters)", m_segmentLength);
   addParam("WidthOfDiffusCloud", m_widthOfDiffusCloud,
-           "Integration range of charge cloud in sigmas", double(3.0));
+           "Integration range of charge cloud in sigmas", m_widthOfDiffusCloud);
 
   // 3. Noise
   addParam("PoissonSmearing", m_applyPoisson,
-           "Apply Poisson smearing on chargelets", bool(true));
+           "Apply Poisson smearing on chargelets", m_applyPoisson);
   addParam("ElectronicEffects", m_applyNoise, "Generate noise digits",
-           bool(false));
+           m_applyNoise);
   addParam("ZeroSuppressionCut", m_SNAdjacent,
-           "Zero suppression cut in sigmas of strip noise", double(3.0));
+           "Zero suppression cut in sigmas of strip noise", m_SNAdjacent);
   addParam("FADCmode", m_roundZS,
-           "FADC mode: if true, ZS cut is rounded to nearest ADU ", bool(true));
+           "FADC mode: if true, ZS cut is rounded to nearest ADU ", m_roundZS);
   addParam("numberOfSamples", m_nSamplesOverZS,
            "Keep digit if numberOfSamples or more samples are over ZS threshold",
-           decltype(m_nSamplesOverZS)(1));
+           m_nSamplesOverZS);
 
   // 4. Timing
   addParam("APVShapingTime", m_shapingTime, "APV25 shpaing time in ns",
-           double(250.0));
+           m_shapingTime);
   addParam("ADCSamplingTime", m_samplingTime,
-           "Interval between ADC samples in ns", double(31.44));
+           "Interval between ADC samples in ns", m_samplingTime);
   addParam("StartSampling", m_startSampling,
-           "Start of the sampling window, in ns", double(47.16));
+           "Start of the sampling window, in ns", m_startSampling);
   addParam("RandomizeEventTimes", m_randomizeEventTimes,
-           "Randomize event times over a frame interval", bool(false));
+           "Randomize event times over a frame interval", m_randomizeEventTimes);
   addParam("TimeFrameLow", m_minTimeFrame,
            "Left edge of event time randomization window, ns", m_minTimeFrame);
   addParam("TimeFrameHigh", m_maxTimeFrame,
@@ -114,9 +112,9 @@ SVDDigitizerModule::SVDDigitizerModule() : Module(),
   // 5. Reporting
   addParam("statisticsFilename", m_rootFilename,
            "ROOT Filename for statistics generation. If filename is empty, no statistics will be produced",
-           string(""));
+           m_rootFilename);
   addParam("storeWaveforms", m_storeWaveforms,
-           "Store waveforms in a TTree in the statistics file.", bool(false));
+           "Store waveforms in a TTree in the statistics file.", m_storeWaveforms);
   addParam("signalsList", m_signalsList,
            "Store signals (time/charge/tau) in a tab-delimited file",
            m_signalsList);
@@ -300,8 +298,8 @@ void SVDDigitizerModule::event()
     sensor.second.first.clear();  // u strips
     sensor.second.second.clear(); // v strips
   }
-  m_currentSensor = 0;
-  m_currentSensorInfo = 0;
+  //  m_currentSensor = 0;
+  //m_currentSensorInfo = 0;
 
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
@@ -332,7 +330,7 @@ void SVDDigitizerModule::event()
       }
     } else {
       // Don't bother with warnings for background SimHits
-      if (m_currentHit->getBackgroundTag() == SimHitBase::bg_none)
+      if (m_currentHit->getBackgroundTag() == BackgroundMetaData::bg_none)
         B2WARNING(
           "Could not find MCParticle which produced SVDSimhit " << i);
       m_currentParticle = -1;
@@ -729,6 +727,8 @@ void SVDDigitizerModule::saveDigits()
           samples.push_back(addNoise(s(t), elNoiseU));
           t += m_samplingTime;
         }
+        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+          samples.push_back(0);
       }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
@@ -808,6 +808,8 @@ void SVDDigitizerModule::saveDigits()
           samples.push_back(addNoise(s(t), elNoiseV));
           t += m_samplingTime;
         }
+        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+          samples.push_back(0);
       }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();

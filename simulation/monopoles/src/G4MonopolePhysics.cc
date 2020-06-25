@@ -12,20 +12,14 @@
 
 #include <simulation/monopoles/G4MonopolePhysics.h>
 #include <simulation/monopoles/G4mplIonisation.h>
-#include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 #include <simulation/monopoles/G4Monopole.h>
 #include <simulation/monopoles/G4MonopoleTransportation.h>
 #include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
 
-#include <G4ParticleDefinition.hh>
 #include <G4ProcessManager.hh>
-#include <G4ProcessVector.hh>
 #include <G4StepLimiter.hh>
-#include <G4Transportation.hh>
-#include <G4hMultipleScattering.hh>
-#include <G4hhIonisation.hh>
 #include <G4hIonisation.hh>
 #include <G4PhysicsListHelper.hh>
 #include <G4BuilderType.hh>
@@ -92,9 +86,12 @@ void G4MonopolePhysics::ConstructProcess()
     pmanager[0]->AddProcess(new G4MonopoleTransportation(fMpl), -1, 0, 0);
     pmanager[1]->RemoveProcess(0);
     pmanager[1]->AddProcess(new G4MonopoleTransportation(fApl), -1, 0, 0);
-  }
-
-  if (magn != 0.0) {
+//
+//  commented out the following 3 lines,
+//  to supress a cppcheck [duplicateCondition] warning for the if condition
+//  }
+//
+//  if (magn != 0.0) {
     G4double chg = sqrt(magn * magn + elec * elec);//TODO properly combine electric and magnetic ionisation
     G4mplIonisation* mplioni = new G4mplIonisation(chg);
     mplioni->SetDEDXBinning(nbin);

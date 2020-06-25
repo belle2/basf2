@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/bklm/modules/bklmTracking/BKLMTrackFitter.h>
 
 /* C++ headers. */
@@ -37,12 +37,15 @@ namespace Belle2 {
     void registerFitter(BKLMTrackFitter* fitter);
 
     //! find associated hits and do fit.
-    bool filter(std::list<BKLMHit2d* >& seed,
+    bool filter(const std::list<BKLMHit2d* >& seed,
                 std::list<BKLMHit2d* >& hits,
                 std::list<BKLMHit2d* >& track);
 
     //!  set the fitting mode, local system or global system
-    void  setGlobalFit(bool localOrGlobal) { m_globalFit = localOrGlobal; }
+    void  setGlobalFit(bool localOrGlobal)
+    {
+      m_globalFit = localOrGlobal;
+    }
 
   protected:
 

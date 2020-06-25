@@ -12,10 +12,10 @@
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <klm/bklm/dataobjects/BKLMSimHit.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMSimHit.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
@@ -205,7 +205,7 @@ namespace Belle2 {
     void addCDCHit(const CDCHit* hit, bool showTriggerHits = false);
 
     /** show outline of track segments. */
-    void addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit);
+    void addCDCTriggerSegmentHit(const std::string& collectionName, const CDCTriggerSegmentHit* hit);
 
     /** Add TOPDigits (shown aggregated per module). */
     void addTOPDigits(const StoreArray<TOPDigit>& digits);

@@ -1,10 +1,9 @@
 #include "daq/slc/system/Inotify.h"
 
+#include <daq/slc/base/IOException.h>
+
 #include <sys/inotify.h>
 #include <unistd.h>
-#include <fcntl.h>
-
-#include <iostream>
 
 using namespace Belle2;
 

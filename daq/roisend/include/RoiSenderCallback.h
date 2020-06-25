@@ -15,13 +15,15 @@ namespace Belle2 {
   public:
     RoiSenderCallback();
 
-  public:
-    void load(const DBObject&, const std::string&);
-    void start();
-    void stop();
-    void recover(const DBObject&, const std::string&);
-    void abort();
+  private:
+    /** overloaded functions from base class */
+    void load(const DBObject&, const std::string&) override;
+    void start(int /*expno*/, int /*runno*/) override;
+    void stop(void) override;
+    void recover(const DBObject&, const std::string&) override;
+    void abort(void) override;
 
+  public:
     void server();
 
   private:

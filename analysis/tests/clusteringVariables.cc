@@ -14,6 +14,8 @@
 #include <gtest/gtest.h>
 #include <TRandom3.h>
 
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
+
 // VariableManager and particle(list)
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
@@ -93,6 +95,9 @@ namespace {
       e1->setEnergy(0.3);
       e1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e1->setClusterId(1);
+      e1->setTime(1);
+      e1->setDeltaTime99(0.1);
+      e1->setConnectedRegionId(1);
       // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
       e2->setEnergy(0.6);
@@ -101,17 +106,23 @@ namespace {
       e2->setR(148.5);
       e2->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e2->setClusterId(2);
+      e2->setTime(2);
+      e2->setDeltaTime99(0.2);
+      e2->setConnectedRegionId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
-      e3->setTheta(0.2); // somewhere in the fwd encap
+      e3->setTheta(0.2); // somewhere in the fwd endcap
       e3->setPhi(1.5);
       e3->setR(200.0);
       e3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
       e3->addHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
-      // lets suppose this cluster could also be due to a neutral hadron. In
-      // this case, the c_neuralHadron hypothesis bit would hopefully also have
-      // been set by the reconstruction... arbirarily choose cluster 3
+      // let's suppose this cluster could also be due to a neutral hadron. In
+      // this case, the c_neutralHadron hypothesis bit would hopefully also have
+      // been set by the reconstruction... arbitrarily choose cluster 3
       e3->setClusterId(3);
+      e3->setTime(3);
+      e3->setDeltaTime99(0.3);
+      e3->setConnectedRegionId(1); // shares the connected region with cluster 1
 
       // aaand add clusters related to the tracks
       ECLCluster* e4 = eclclusters.appendNew(ECLCluster());
@@ -282,18 +293,14 @@ namespace {
     // grab variables for testing
     const Manager::Var* vHasNPhotons = Manager::Instance().getVariable("clusterHasNPhotons");
     const Manager::Var* vHasNeutHadr = Manager::Instance().getVariable("clusterHasNeutralHadron");
-    const Manager::Var* vHypothsisID = Manager::Instance().getVariable("clusterHypothesis");
-    // TODO: remove hypothesis id after release-04 (should be gone by -05)
 
-    // check that the hypotheses are correcltly propagated to the VM.
+    // check that the hypotheses are correctly propagated to the VM.
     for (size_t i = 0; i < gammalist->getListSize(); ++i) {
       EXPECT_FLOAT_EQ(vHasNPhotons->function(gammalist->getParticle(i)), 1.0);
       if (i == 2) { // third cluster arbitrarily chosen to test the behaviour of dual hypothesis clusters
         EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 1.0);
-        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 56.0);
       } else {
         EXPECT_FLOAT_EQ(vHasNeutHadr->function(gammalist->getParticle(i)), 0.0);
-        EXPECT_FLOAT_EQ(vHypothsisID->function(gammalist->getParticle(i)), 5.0);
       }
     } // end loop over test list
   }
@@ -306,6 +313,7 @@ namespace {
     const Manager::Var* vIsFromECL = Manager::Instance().getVariable("isFromECL");
     const Manager::Var* vIsFromKLM = Manager::Instance().getVariable("isFromKLM");
     const Manager::Var* vIsFromTrack = Manager::Instance().getVariable("isFromTrack");
+    const Manager::Var* vIsFromV0 = Manager::Instance().getVariable("isFromV0");
 
     for (int i = 0; i < eclclusters.getEntries(); ++i)
       if (!eclclusters[i]->isTrack()) {
@@ -313,8 +321,39 @@ namespace {
         EXPECT_TRUE(vIsFromECL->function(p));
         EXPECT_FALSE(vIsFromKLM->function(p));
         EXPECT_FALSE(vIsFromTrack->function(p));
+        EXPECT_FALSE(vIsFromV0->function(p));
       }
   }
+
+  TEST_F(ECLVariableTest, ECLThetaAndPhiId)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> clusters;
+    StoreArray<ECLCluster> eclclusters;
+    // make a particle from cluster #1
+    const Particle* p = particles.appendNew(Particle(eclclusters[0]));
+
+    // get the variables to test
+    const Manager::Var* clusterThetaID = Manager::Instance().getVariable("clusterThetaID");
+    const Manager::Var* clusterPhiID = Manager::Instance().getVariable("clusterPhiID");
+
+    {
+      clusters[0]->setMaxECellId(1);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 0);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 0);
+    }
+    {
+      clusters[0]->setMaxECellId(6903);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 52);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 134);
+    }
+    {
+      clusters[0]->setMaxECellId(8457);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 65);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 8);
+    }
+  }
+
 
   TEST_F(ECLVariableTest, WholeEventClosure)
   {
@@ -452,6 +491,124 @@ namespace {
 
     //now we expect non-nan results
     EXPECT_FLOAT_EQ(var->function(par), 0.73190731);
+  }
+
+  TEST_F(ECLVariableTest, averageECLTimeQuantities)
+  {
+    // we need the particles, and ECLClusters StoreArrays
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+
+    // create a photon (clusters) and a pi0 list
+    StoreObjPtr<ParticleList> gammalist("gamma:testGammaAllList");
+    StoreObjPtr<ParticleList> pionslist("pi0:testPizAllList");
+
+    // register the lists in the datastore
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    pionslist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the lists
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+    pionslist.create();
+    pionslist->initialize(111, pionslist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // make the pi0s as combinations of photons
+    ParticleGenerator combiner_pi0("pi0:testPizAllList -> gamma:testGammaAllList gamma:testGammaAllList");
+    combiner_pi0.init();
+    while (combiner_pi0.loadNext()) {
+      const Particle& particle = combiner_pi0.getCurrentParticle();
+
+      particles.appendNew(particle);
+      int iparticle = particles.getEntries() - 1;
+
+      pionslist->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+    }
+
+    // grab variables
+    const Manager::Var* weightedAverageECLTime = Manager::Instance().getVariable("weightedAverageECLTime");
+    const Manager::Var* maxDist = Manager::Instance().getVariable("maxWeightedDistanceFromAverageECLTime");
+
+    // particles without daughters should have NaN as weighted average
+    EXPECT_TRUE(std::isnan(weightedAverageECLTime->function(gammalist->getParticle(0))));
+
+    // check that weighted average of first pi0 is correct
+    EXPECT_FLOAT_EQ(weightedAverageECLTime->function(pionslist->getParticle(0)), 1.2);
+
+    // check that maximal difference to weighted average in units of uncertainty is calculated correctly
+    EXPECT_FLOAT_EQ(maxDist->function(pionslist->getParticle(0)), 4.0);
+  }
+
+  TEST_F(ECLVariableTest, photonHasOverlap)
+  {
+    // declare StoreArrays of Particles and ECLClusters
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+
+    // create a photon and the pion lists
+    StoreObjPtr<ParticleList> gammalist("gamma:all");
+    StoreObjPtr<ParticleList> pionlist("pi+:all");
+    StoreObjPtr<ParticleList> piminuslist("pi-:all");
+
+    // register the particle lists in the datastore
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    pionlist.registerInDataStore(DataStore::c_DontWriteOut);
+    piminuslist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the photon list
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // initialize the pion lists
+    pionlist.create();
+    pionlist->initialize(211, pionlist.getName());
+    piminuslist.create();
+    piminuslist->initialize(-211, piminuslist.getName());
+    piminuslist->bindAntiParticleList(*(pionlist));
+
+    // fill the pion list with the tracks
+    for (int i = 0; i < tracks.getEntries(); ++i) {
+      const Particle* p = particles.appendNew(Particle(tracks[i], Const::pion));
+      pionlist->addParticle(p);
+    }
+
+    // check overlap without any arguments
+    const Manager::Var* photonHasOverlapNoArgs = Manager::Instance().getVariable("photonHasOverlap()");
+    // the track list e-:all is missing so NaN is returned
+    EXPECT_TRUE(std::isnan(photonHasOverlapNoArgs->function(particles[0])));
+
+    // check overlap without any requirement on other photons
+    const Manager::Var* photonHasOverlapAll = Manager::Instance().getVariable("photonHasOverlap(, gamma:all, pi+:all)");
+    // cluster 3 and cluster 1 share the connected region
+    EXPECT_TRUE(photonHasOverlapAll->function(particles[0]));
+    // photonHasOverlap is designed for photons, so calling it for a pion returns NaN
+    EXPECT_TRUE(std::isnan(photonHasOverlapAll->function(particles[3])));
+
+    // check overlap with photons in barrel
+    const Manager::Var* photonHasOverlapBarrel = Manager::Instance().getVariable("photonHasOverlap(clusterReg==2, gamma:all, pi+:all)");
+    // cluster 3 is in the forward end cap so it doesn't matter that it has the same connected region like cluster 1
+    EXPECT_FALSE(photonHasOverlapBarrel->function(particles[0]));
   }
 
   class KLMVariableTest : public ::testing::Test {

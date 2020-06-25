@@ -12,7 +12,6 @@
 //---------------------------------------------------------------
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/gdl/dataobjects/TRGGDLDST.h>
@@ -20,7 +19,6 @@
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
 #include <string.h>
-#include <unistd.h>
 
 
 using namespace Belle2;

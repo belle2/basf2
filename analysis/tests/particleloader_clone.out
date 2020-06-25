@@ -2,7 +2,6 @@
 [INFO] The random number seed is set to "1337"
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
-[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -33,8 +32,7 @@
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
@@ -42,8 +40,7 @@
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: n0 (anti-n0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:frommc (e-:frommc)
@@ -102,7 +99,7 @@
 [INFO] Number of ParticleLists studied 1 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [WARNING] Number of excluded particles do not coincide with the number of target FSP daughters! Provided lists must be incomplete
  ... message repeated 19 times
 [INFO] ParticleStats Summary: 
@@ -212,7 +209,6 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO] Starting event processing, random seed is set to '1337'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst12.root
-[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+ (e-)
 [INFO]    -> MDST source: Tracks
@@ -243,8 +239,7 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
@@ -252,8 +247,7 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: n0 (anti-n0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:frommc (e-:frommc)
@@ -312,7 +306,7 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO] Number of ParticleLists studied 1 
 [INFO] Conditions Database: found working server
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [INFO] [ParticlePrinterModule] START ------------------------------
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles
@@ -1285,7 +1279,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=12 arrayIndex=50 identifier=1001 daughterIndices:  (none)
  mass=0.4976
- momentum=(nan, nan, nan) p=nan
+ momentum=(-0.01, -0.02, 0.09) p=0.09314
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1304,7 +1298,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=17 arrayIndex=51 identifier=6001 daughterIndices:  (none)
  mass=0.4976
- momentum=(nan, nan, nan) p=nan
+ momentum=(-0.00, -0.02, 0.02) p=0.02535
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1323,7 +1317,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=19 arrayIndex=52 identifier=8001 daughterIndices:  (none)
  mass=0.4976
- momentum=(nan, nan, nan) p=nan
+ momentum=(0.04, 0.09, 0.07) p=0.1225
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1342,7 +1336,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=23 arrayIndex=53 identifier=13001 daughterIndices:  (none)
  mass=0.4976
- momentum=(nan, nan, nan) p=nan
+ momentum=(0.06, -0.12, -0.15) p=0.1977
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1519,7 +1513,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=1 particleType=2 particleTypeUsedForFit=0
  mdstIndex=12 arrayIndex=62 identifier=1001 daughterIndices:  (none)
  mass=0.9396
- momentum=(nan, nan, nan) p=nan
+ momentum=(-0.01, -0.02, 0.09) p=0.09314
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1538,7 +1532,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=1 particleType=2 particleTypeUsedForFit=0
  mdstIndex=17 arrayIndex=63 identifier=6001 daughterIndices:  (none)
  mass=0.9396
- momentum=(nan, nan, nan) p=nan
+ momentum=(-0.00, -0.02, 0.02) p=0.02535
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1557,7 +1551,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=1 particleType=2 particleTypeUsedForFit=0
  mdstIndex=19 arrayIndex=64 identifier=8001 daughterIndices:  (none)
  mass=0.9396
- momentum=(nan, nan, nan) p=nan
+ momentum=(0.04, 0.09, 0.07) p=0.1225
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1576,7 +1570,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=1 particleType=2 particleTypeUsedForFit=0
  mdstIndex=23 arrayIndex=65 identifier=13001 daughterIndices:  (none)
  mass=0.9396
- momentum=(nan, nan, nan) p=nan
+ momentum=(0.06, -0.12, -0.15) p=0.1977
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):

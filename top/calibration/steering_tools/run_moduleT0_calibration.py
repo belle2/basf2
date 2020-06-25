@@ -21,13 +21,14 @@ from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
-globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
+globalTags = ['Reco_master_patch', 'data_reprocessing_proc10']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
-data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
+data_dir = '/group/belle2/dataprod/Data/OfficialReco/proc10/'
 bhabha_skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 dimuon_skim_dir = 'offskim/offskim_mumutop/cdst/sub00'
 main_output_dir = 'top_calibration'
 default_sample = 'bhabha'
+new_cdst_format = False  # set to True for input in new cdst format
 #
 # ---------------------------------------------------------------------------------------
 
@@ -72,8 +73,8 @@ run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/moduleT0-{sample}-{expNo}-{run_range}"
 
 # Define calibrations
-cal1 = moduleT0_calibration_DeltaT(inputFiles, globalTags, localDBs)
-cal2 = moduleT0_calibration_LL(inputFiles, sample, globalTags, localDBs)
+cal1 = moduleT0_calibration_DeltaT(inputFiles, globalTags, localDBs, new_cdst_format)
+cal2 = moduleT0_calibration_LL(inputFiles, sample, globalTags, localDBs, new_cdst_format)
 cal1.backend_args = {"queue": "s"}
 cal2.backend_args = {"queue": "s"}
 cal2.depends_on(cal1)

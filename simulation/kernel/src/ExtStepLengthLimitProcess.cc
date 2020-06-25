@@ -12,16 +12,14 @@
 #include <simulation/kernel/ExtStepLengthLimitProcess.h>
 #include <G4Track.hh>
 
-#include <framework/logging/Logger.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;
 
 ExtStepLengthLimitProcess::ExtStepLengthLimitProcess(const G4String& processName) :
-  G4VDiscreteProcess(processName)
+  G4VDiscreteProcess(processName),
+  m_stepLimit(kInfinity)  // user may change this with a geant4 UI command
 {
-  m_stepLimit = kInfinity; // user may change this with a geant4 UI command
 }
 
 ExtStepLengthLimitProcess::~ExtStepLengthLimitProcess()

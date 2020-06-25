@@ -46,6 +46,23 @@ namespace Belle2 {
       virtual std::vector<float> apply(Dataset& test_data) const = 0;
 
       /**
+       * Apply this expert onto a dataset.
+       * Multi-class mode signature.
+       * Not pure virtual, since not all derived classes need to re-implement this.
+       * @param test_data dataset
+       * @param classID class identifier.
+       */
+      virtual std::vector<float> apply(Dataset& test_data, const unsigned int classID) const
+      {
+
+        (void) test_data;
+        (void) classID;
+
+        return std::vector<float>();
+      };
+
+
+      /**
        * Virtual destructor
        */
       virtual ~Expert() = default;

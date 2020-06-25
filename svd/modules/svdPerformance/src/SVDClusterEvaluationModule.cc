@@ -1,11 +1,5 @@
 #include <svd/modules/svdPerformance/SVDClusterEvaluationModule.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <TF1.h>
-#include <TMath.h>
-#include <TCanvas.h>
-#include <TGraphErrors.h>
-#include <TGraph.h>
-#include <TLegend.h>
 
 using namespace std;
 using namespace Belle2;
@@ -633,46 +627,6 @@ bool SVDClusterEvaluationModule::isRelatedToTrack(SVDIntercept* inter)
 
 }
 
-bool SVDClusterEvaluationModule::fitResiduals(TH1F* res)
-{
-
-  float range = 0.4;
-
-  B2DEBUG(10, "fitting N1G1+N2G2 " << res->GetName());
-  TF1* function = new TF1("function", "gaus(0)+gaus(3)", -range, range);
-  function->SetParNames("N1", "mean1", "sigma1", "N2", "mean2", "sigma2");
-  function->SetParameter(0, 10);
-  function->SetParLimits(0, 0, 1000000);
-  function->SetParameter(1, 0);
-  function->SetParLimits(1, -0.02, 0.02);
-  function->SetParameter(2, 0.01);
-  function->SetParLimits(2, 0, 0.1);
-  function->SetParameter(3, 1);
-  function->SetParLimits(3, 0, 1000000);
-  function->SetParameter(4, 0);
-  function->SetParameter(5, 1);
-  function->SetParLimits(5, 0, 10);
-
-  int fitStatus =  res->Fit(function, "R");
-
-  if (fitStatus != 0) {
-    B2DEBUG(10, "previous fit failed, now trying with N1G1 " << res->GetName());
-    TF1* function1 = new TF1("functionG1", "gaus(0)", -range, range);
-    function1->SetParNames("N1", "mean1", "sigma1");
-    function1->SetParameter(0, 10);
-    function1->SetParLimits(0, 0, 1000000);
-    function1->SetParameter(1, 0);
-    function1->SetParameter(2, 0.01);
-    function1->SetParLimits(2, 0, 0.1);
-
-    fitStatus =  res->Fit(function1, "R");
-  }
-  if (fitStatus == 0)
-    return true;
-  else
-    return false;
-
-}
 
 void SVDClusterEvaluationModule::create_SVDHistograms_interCoor()
 {

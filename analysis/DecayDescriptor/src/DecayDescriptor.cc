@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald, Yo Sato                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayStringDecay.h>
@@ -15,7 +25,6 @@
 
 #include <boost/variant/get.hpp>
 #include <boost/spirit/include/qi.hpp>
-#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <set>
 #include <utility>
@@ -29,12 +38,9 @@ DecayDescriptor::DecayDescriptor() :
   m_mother(),
   m_iDaughter_p(-1),
   m_daughters(),
-  m_isIgnoreRadiatedPhotons(false),
-  m_isIgnoreIntermediate(false),
-  m_isIgnoreMassive(false),
-  m_isIgnoreNeutrino(false),
-  m_isIgnoreGamma(false),
-  m_isNULL(false)
+  m_properties(0),
+  m_isNULL(false),
+  m_isInitOK(false)
 {
 }
 
@@ -57,48 +63,46 @@ bool DecayDescriptor::init(const DecayString& s)
   // b) DecayStringDecay
 
   if (const DecayStringParticle* p = boost::get< DecayStringParticle >(&s)) {
-    bool isInitOK = m_mother.init(*p);
-    if (!isInitOK) {
+    m_isInitOK = m_mother.init(*p);
+    if (!m_isInitOK) {
       B2WARNING("Could not initialise mother particle " << p->m_strName);
       return false;
     }
     return true;
   } else if (const DecayStringDecay* d = boost::get< DecayStringDecay > (&s)) {
     // Initialise list of mother particles
-    bool isInitOK = m_mother.init(d->m_mother);
-    if (!isInitOK) {
+    m_isInitOK = m_mother.init(d->m_mother);
+    if (!m_isInitOK) {
       B2WARNING("Could not initialise mother particle " << d->m_mother.m_strName);
       return false;
     }
 
     // Identify arrow type
-    if (d->m_strArrow == "->" or d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
-      m_isIgnoreRadiatedPhotons = true;
-      m_isIgnoreIntermediate = true;
-      if (d->m_strArrow == "-->"  or d->m_strArrow == "=>"  or d->m_strArrow == "==>") {
-        B2WARNING("Use of " << d->m_strArrow << " will be deprecated in release-05, please consider to use ->.");
-      }
+    if (d->m_strArrow == "->") {
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons ;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreIntermediate;
     } else if (d->m_strArrow == "=norad=>") {
-      m_isIgnoreRadiatedPhotons = false;
-      m_isIgnoreIntermediate = true;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreIntermediate;
     } else if (d->m_strArrow == "=direct=>") {
-      m_isIgnoreRadiatedPhotons = true;
-      m_isIgnoreIntermediate = false;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons;
     } else if (d->m_strArrow == "=exact=>") {
-      m_isIgnoreRadiatedPhotons = false;
-      m_isIgnoreIntermediate = false;
+      // do nothing
     } else {
       B2WARNING("Unknown arrow: " << d->m_strArrow);
+      m_isInitOK = false;
       return false;
     }
 
     // Initialise list of daughters
-    if (d->m_daughters.empty()) return false;
+    if (d->m_daughters.empty()) {
+      m_isInitOK = false;
+      return false;
+    }
     int nDaughters = d->m_daughters.size();
     for (int iDaughter = 0; iDaughter < nDaughters; iDaughter++) {
       DecayDescriptor daughter;
-      isInitOK = daughter.init(d->m_daughters[iDaughter]);
-      if (!isInitOK) {
+      m_isInitOK = daughter.init(d->m_daughters[iDaughter]);
+      if (!m_isInitOK) {
         B2WARNING("Could not initialise daughter!");
         return false;
       }
@@ -108,19 +112,24 @@ bool DecayDescriptor::init(const DecayString& s)
     // Initialise list of keywords
     // For neutrino
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?nu")) !=  d->m_keywords.end()) {
-      m_isIgnoreNeutrino = true;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreNeutrino;
     }
     // For gamma
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?gamma")) != d->m_keywords.end()) {
-      m_isIgnoreGamma = true;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreGamma;
     }
     // For massive FSP
     if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "...")) != d->m_keywords.end()) {
-      m_isIgnoreMassive = true;
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreMassive;
+    }
+    // For brems photons
+    if ((std::find(d->m_keywords.begin(), d->m_keywords.end(), "?addbrems")) != d->m_keywords.end()) {
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreBrems;
     }
 
     return true;
   }
+  m_isInitOK = false;
   return false;
 }
 
@@ -137,8 +146,10 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   int iPDGCode_p = 0;
-  if (const auto* part_test = dynamic_cast<const Particle*>(p)) iPDGCode_p = part_test->getPDGCode();
-  else if (const auto* mc_test = dynamic_cast<const MCParticle*>(p)) iPDGCode_p = mc_test->getPDG();
+  if (const auto* part_test = dynamic_cast<const Particle*>(p))
+    iPDGCode_p = part_test->getPDGCode();
+  else if (const auto* mc_test = dynamic_cast<const MCParticle*>(p))
+    iPDGCode_p = mc_test->getPDG();
   else {
     B2WARNING("Template type not supported!");
     return 0;
@@ -187,10 +198,15 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
     for (int jDaughter_p = 0; jDaughter_p < nDaughters_p; jDaughter_p++) {
       const T* daughter = daughterList[jDaughter_p];
       int iPDGCode_daughter_p = 0;
-      if (const auto* part_test = dynamic_cast<const Particle*>(daughter)) iPDGCode_daughter_p = part_test->getPDGCode();
-      else if (const auto* mc_test = dynamic_cast<const MCParticle*>(daughter)) iPDGCode_daughter_p = mc_test->getPDG();
-      if (iDaughter_d == 0 && (m_isIgnoreRadiatedPhotons or m_isIgnoreGamma)
-          && iPDGCode_daughter_p == 22) matches_global.insert(jDaughter_p);
+      if (const auto* part_test = dynamic_cast<const Particle*>(daughter))
+        iPDGCode_daughter_p = part_test->getPDGCode();
+      else if (const auto* mc_test = dynamic_cast<const MCParticle*>(daughter))
+        iPDGCode_daughter_p = mc_test->getPDG();
+
+      if (iDaughter_d == 0 && (this->isIgnoreRadiatedPhotons() or this->isIgnoreGamma() or this->isIgnoreBrems())
+          && iPDGCode_daughter_p == 22)
+        matches_global.insert(jDaughter_p);
+
       int iMatchResult = m_daughters[iDaughter_d].match(daughter, jDaughter_p);
       if (iMatchResult < 0) isAmbiguities = true;
       if (abs(iMatchResult) == 2 && iCC == 1) continue;
@@ -207,7 +223,8 @@ int DecayDescriptor::match(const T* p, int iDaughter_p)
   }
 
   // Now, all daughters of the particles should be matched to at least one DecayDescriptor daughter
-  if (!(m_isIgnoreIntermediate or m_isIgnoreMassive or m_isIgnoreNeutrino) && int(matches_global.size()) != nDaughters_p) return 0;
+  if (!(this->isIgnoreIntermediate() or this->isIgnoreMassive() or this->isIgnoreNeutrino())
+      && int(matches_global.size()) != nDaughters_p) return 0;
 
   // In case that there are DecayDescriptor daughters with multiple matches, try to solve the problem
   // by removing the daughter candidates which are already used in other unambigous relations.
@@ -358,7 +375,7 @@ vector<string> DecayDescriptor::getSelectionNames()
       // stop, if nothing found
       if (itOccurrence == strNames.end()) break;
       // create new particle name by attaching a number
-      string strNameNew = strNameOld + boost::lexical_cast<string>(iOccurrence);
+      string strNameNew = strNameOld + std::to_string(iOccurrence);
       // ceck if the new particle name exists already, if not, then it is OK to use it
       if (count(strNames.begin(), strNames.end(), strNameNew) == 0) {
         *itOccurrence = strNameNew;

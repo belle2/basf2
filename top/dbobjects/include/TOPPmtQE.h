@@ -36,7 +36,7 @@ namespace Belle2 {
      * @param serialNumber serial number
      * @param lambdaFirst wavelenght of the first data point [nm]
      * @param lambdaStep wavelength step [nm]
-     * @param CE collection efficiency at B = 0T
+     * @param CE0 collection efficiency at B = 0T
      * @param CE collection efficiency at B = 1.5T
      */
     TOPPmtQE(const std::string& serialNumber,

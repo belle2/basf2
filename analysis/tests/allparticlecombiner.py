@@ -6,7 +6,7 @@ import basf2
 import b2test_utils
 import modularAnalysis as ma
 from variables import variables
-from vertex import vertexKFit
+from vertex import kFit
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple
@@ -22,7 +22,6 @@ class TestAllParticleCombiner(unittest.TestCase):
         # make logging more reproducible by replacing some strings.
         # Also make sure the testfile name is replaced if necessary
         b2test_utils.configure_logging_for_tests({testFile.name: "${testfile}"})
-        basf2.conditions.disable_globaltag_replay()
 
         basf2.set_random_seed("1234")
         main = basf2.create_path()
@@ -42,7 +41,7 @@ class TestAllParticleCombiner(unittest.TestCase):
 
         ma.combineAllParticles(['pi+:fromPV'], 'vpho:PVFit', path=main)
 
-        vertexKFit('vpho:PVFit', conf_level=-1, constraint='iptube', path=main)
+        kFit('vpho:PVFit', conf_level=-1, fit_type='vertex', constraint='iptube', path=main)
 
         variables.addAlias('PVX', 'x')
         variables.addAlias('PVY', 'y')

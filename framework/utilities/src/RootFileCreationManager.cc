@@ -40,7 +40,7 @@ namespace Belle2 {
       // Create shared ptr for the file which will correctly close it when the last user disconnects.
       ptr = std::shared_ptr<TFile>(TFile::Open(fileName.c_str(), "RECREATE"), TFile_Deleter);
       // Check if the file is actually open ... otherwise no use in returning it
-      if (!ptr->IsOpen()) {
+      if (!ptr || !ptr->IsOpen()) {
         if (!ignoreErrors) B2ERROR("Could not create file " << std::quoted(fileName));
         return nullptr;
       }

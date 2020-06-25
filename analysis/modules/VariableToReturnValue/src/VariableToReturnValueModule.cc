@@ -10,7 +10,8 @@
 
 #include <analysis/modules/VariableToReturnValue/VariableToReturnValueModule.h>
 
-#include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>

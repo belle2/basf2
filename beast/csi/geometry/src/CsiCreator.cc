@@ -53,7 +53,7 @@ namespace Belle2 {
 
     CsiCreator::CsiCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     CsiCreator::~CsiCreator()
@@ -63,6 +63,8 @@ namespace Belle2 {
 
     void CsiCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
+
+      m_sensitive = new SensitiveDetector();
 
       //Print the type (not used for now)
       B2DEBUG(200, "CsI Geometry Type: " << type);
@@ -208,7 +210,7 @@ namespace Belle2 {
 
     }
 
-    void CsiCreator::BuildEnclosure(const GearDir& content, G4AssemblyVolume* assembly, string side, int iEnclosure)
+    void CsiCreator::BuildEnclosure(const GearDir& content, G4AssemblyVolume* assembly, const string side, int iEnclosure)
     {
 
       string gearPath = "Enclosures/Enclosure";
@@ -275,7 +277,7 @@ namespace Belle2 {
       double AdjZ = enclosureContent.getLength("ShiftZ") * CLHEP::cm;
 
       G4Transform3D zsh = G4Translate3D(0, 0, zshift);
-      G4Transform3D invzsh = G4Translate3D(0, 0, -zshift);
+      //G4Transform3D invzsh = G4Translate3D(0, 0, -zshift);
       G4Transform3D m1 = G4RotateZ3D(Phi1);
       G4Transform3D m2 = G4RotateY3D(Theta);
       G4Transform3D m3 = G4RotateZ3D(Phi2);

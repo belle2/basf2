@@ -3,9 +3,10 @@
 
 import os
 import tempfile
-from basf2 import *
+import basf2
 import b2test_utils
-from modularAnalysis import *
+import modularAnalysis as ma
+from vertex import kFit
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple
@@ -30,28 +31,26 @@ def check(filename):
 
 testFile = tempfile.NamedTemporaryFile()
 
-conditions.disable_globaltag_replay()
+main = basf2.create_path()
 
-main = create_path()
+ma.inputMdst('default', b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
 
-inputMdst('default', b2test_utils.require_file('analysis/tests/mdst.root'), path=main)
+ma.fillParticleList('K-', '', path=main)
+ma.fillParticleList('pi+', '', path=main)
 
-fillParticleList('K-', '', path=main)
-fillParticleList('pi+', '', path=main)
-
-fillParticleList('gamma', '', path=main)
-reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
-matchMCTruth('pi0', path=main)
+ma.fillParticleList('gamma', '', path=main)
+ma.reconstructDecay('pi0 -> gamma gamma', '0.11 < M < 0.15', 0, path=main)
+ma.matchMCTruth('pi0', path=main)
 
 # KFit
-vertexKFit('pi0', 0.0, path=main)
+kFit('pi0', 0.0, path=main)
 
-reconstructDecay('D0 -> K- pi+ pi0', '', 0, path=main)
-matchMCTruth('D0', path=main)
+ma.reconstructDecay('D0 -> K- pi+ pi0', '', 0, path=main)
+ma.matchMCTruth('D0', path=main)
 
-vertexKFit('D0', 0.0, 'D0 -> ^K- ^pi+ pi0', path=main)
+kFit('D0', 0.0, decay_string='D0 -> ^K- ^pi+ pi0', path=main)
 
-ntupler = register_module('VariablesToNtuple')
+ntupler = basf2.register_module('VariablesToNtuple')
 ntupler.param('fileName', testFile.name)
 ntupler.param('variables', ['M', 'isSignal', 'distance', 'dr', 'dz', 'significanceOfDistance', 'pValue'])
 ntupler.param('particleList', 'D0')

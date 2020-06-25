@@ -27,9 +27,7 @@ namespace Belle2 {
 
   /**
    *
-   * This module evaluates the response of an MVA trained for charged particle identification between two hypotheses, S and B.
-   *
-   * Currently, it uses only ECL-based inputs.
+   * This module evaluates the response of an MVA trained for binary charged particle identification between two hypotheses, S and B.
    *
    * For a given input set of (S,B) mass hypotheses, it takes the Particle objects in the appropriate charged stable particle's ParticleLists,
    * calculates the MVA score using the appropriate xml weight file,
@@ -98,9 +96,19 @@ namespace Belle2 {
     int m_bkg_pdg;
 
     /**
-     * The input list of ParticleList names.
+     * The input list of names of ParticleList objects to which MVA weights will be applied.
      */
     std::vector<std::string> m_particle_lists;
+
+    /**
+     * The name of the database payload object with the MVA weights.
+     */
+    std::string m_payload_name;
+
+    /**
+     * Flag to specify if we use an ECL-only based training.
+     */
+    bool m_ecl_only;
 
     /**
      * The lookup name of the MVA score variable, given the input S, B mass hypotheses for the algorithm.
@@ -113,11 +121,11 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_event_metadata;
 
     /**
-     * Interface to get the database payload w/ the MVA weight files etc.
+     * Interface to get the database payload with the MVA weight files.
      * The payload class has a method to retrieve the correct weightfile representation
-     * given a particle (pdgId, clusterTheta, p).
+     * given a reconstructed particle's (clusterTheta, p).
      */
-    DBObjPtr<ChargedPidMVAWeights> m_weightfiles_representation;
+    std::unique_ptr<DBObjPtr<ChargedPidMVAWeights>> m_weightfiles_representation;
 
     /**
      * List of MVA::Expert objects.

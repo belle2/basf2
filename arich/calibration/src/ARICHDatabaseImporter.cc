@@ -43,6 +43,8 @@
 #include <arich/dbobjects/ARICHGlobalAlignment.h>
 #include <arich/dbobjects/ARICHMirrorAlignment.h>
 #include <arich/dbobjects/ARICHPositionElement.h>
+#include <arich/dbobjects/ARICHAeroTilesAlignment.h>
+#include <arich/dbobjects/ARICHGeoMergerCooling.h>
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
@@ -142,12 +144,12 @@ void ARICHDatabaseImporter::importModulesInfo()
   }
 
   // get list of installed modules from xml
-  content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  GearDir installedModules  = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
   B2INFO("Installed modules\n");
 
   std::vector<std::string> installed;
 
-  for (const GearDir& module : content.getNodes("Module")) {
+  for (const GearDir& module : installedModules.getNodes("Module")) {
     std::string hapdID = module.getString("@hapdID");
 
     unsigned sector = module.getInt("Sector");
@@ -243,6 +245,34 @@ void ARICHDatabaseImporter::importMirrorAlignment()
 
 }
 
+void ARICHDatabaseImporter::importAeroTilesAlignment()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir alignPars(content, "AeroTilesAlignment");
+
+  ARICHAeroTilesAlignment tileAlign;
+
+  for (auto tile : alignPars.getNodes("Slot")) {
+    int id = tile.getInt("@id");
+    double r = tile.getLength("r");
+    double phi = tile.getAngle("phi");
+    double z = tile.getLength("z");
+    double alpha = tile.getLength("alpha");
+    double beta = tile.getLength("beta");
+    double gamma = tile.getLength("gamma");
+    ARICHPositionElement alignEl(r * cos(phi), r * sin(phi), z, alpha, beta, gamma);
+    tileAlign.setAlignmentElement(id, alignEl);
+    alignEl.print();
+  }
+
+  DBImportObjPtr<ARICHAeroTilesAlignment> importObj;
+  importObj.construct(tileAlign);
+  importObj.import(m_iov);
+
+}
+
+
 void ARICHDatabaseImporter::importChannelMask()
 {
 
@@ -294,6 +324,101 @@ void ARICHDatabaseImporter::importChannelMask()
 
 }
 
+void ARICHDatabaseImporter::importMergerCoolingGeo()
+{
+
+  ARICHGeoMergerCooling cooling;
+  GearDir mergerCoolingParams = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/mergerCoolingBodiesv2");
+
+  cooling.setMergerCoolingBodiesMaterialName(mergerCoolingParams.getString("material"));
+  //std::cout<<"Merger cooling material -> "<<mergerCoolingParams.getString("material")<<std::endl;
+  for (auto mergerCoolingNode : mergerCoolingParams.getNodes("BodiesDatFileName/Body")) {
+    //std::cout<<"@positionID = "<<mergerCoolingNode.getInt("@positionID")<<std::endl;
+    tessellatedSolidStr mergerTessellation = readTessellatedSolidVerticesFromDATfile(mergerCoolingNode.getString());
+    cooling.addMergerCoolingBodiesInfo(mergerTessellation);
+  }
+  cooling.setMergerCoolingPositionID(mergerCoolingParams.getArray("mergerCoolingPositionID"));
+  cooling.checkMergerCoolingSystemDataConsistency();
+
+  DBImportObjPtr<ARICHGeoMergerCooling> importObj;
+  importObj.construct(cooling);
+  importObj.import(m_iov);
+  B2INFO("--> Mergers cooling bodies geometry imported.");
+
+}
+
+
+tessellatedSolidStr ARICHDatabaseImporter::readTessellatedSolidVerticesFromDATfile(const std::string& inDATfile)
+{
+
+  tessellatedSolidStr solidStr;
+  std::string mot;
+  std::ifstream infile(inDATfile.c_str(), std::ifstream::in);
+
+  if (infile.is_open()) {
+    double val = 0.0;
+    while (infile >> mot) {
+      if (mot == "BodyPositionID")
+        infile >> solidStr.tessellatedSolidID;
+      else
+        assert(0);
+      infile >> mot;
+      if (mot == "nCells")
+        infile >> solidStr.nCells;
+      else
+        assert(0);
+      infile >> mot;
+      if (mot == "nApexPerCell")
+        infile >> solidStr.nApexPerCell;
+      else
+        assert(0);
+
+      TString apexNamesStr[3][3] = { { "Apex_1_x", "Apex_1_y", "Apex_1_z" },
+        { "Apex_2_x", "Apex_2_y", "Apex_2_z" },
+        { "Apex_3_x", "Apex_3_y", "Apex_3_z" }
+      };
+      for (unsigned int i = 0; i < 3; i++) {
+        infile >> mot;
+        if (mot != apexNamesStr[0][i])
+          assert(0);
+        std::vector<double> valv;
+        for (unsigned int j = 0; j < solidStr.nCells; j++) {
+          infile >> val;
+          valv.push_back(val);
+        }
+        solidStr.posV1.push_back(valv);
+      }
+      //Apex_2_x, Apex_2_y, Apex_2_z
+      for (unsigned int i = 0; i < 3; i++) {
+        infile >> mot;
+        if (mot != apexNamesStr[1][i])
+          assert(0);
+        std::vector<double> valv;
+        for (unsigned int j = 0; j < solidStr.nCells; j++) {
+          infile >> val;
+          valv.push_back(val);
+        }
+        solidStr.posV2.push_back(valv);
+      }
+      //Apex_3_x, Apex_3_y, Apex_3_z
+      for (unsigned int i = 0; i < 3; i++) {
+        infile >> mot;
+        if (mot != apexNamesStr[2][i])
+          assert(0);
+        std::vector<double> valv;
+        for (unsigned int j = 0; j < solidStr.nCells; j++) {
+          infile >> val;
+          valv.push_back(val);
+        }
+        solidStr.posV3.push_back(valv);
+      }
+    }
+    infile.close();
+  } else {
+    B2WARNING("Unable to open file : " << inDATfile << " with cooling bodies geometry.");
+  }
+  return solidStr;
+}
 
 void ARICHDatabaseImporter::importChannelMask(TH1* h)
 {
@@ -600,6 +725,12 @@ void ARICHDatabaseImporter::printGlobalAlignment()
 void ARICHDatabaseImporter::printMirrorAlignment()
 {
   DBObjPtr<ARICHMirrorAlignment> align;
+  align->print();
+}
+
+void ARICHDatabaseImporter::printAeroTilesAlignment()
+{
+  DBObjPtr<ARICHAeroTilesAlignment> align;
   align->print();
 }
 
@@ -1579,8 +1710,6 @@ void ARICHDatabaseImporter::importAsicInfoRoot()
   tree->Branch("offsetF", "TH3F", &offsetF);
   tree->Branch("offsetR", "TH3F", &offsetR);
 
-  GearDir content = GearDir("/ArichData/AllData/asicList");
-
   // loop over root files
   for (const string& inputFile : m_inputFilesAsicRoot) {
 
@@ -1701,7 +1830,6 @@ void ARICHDatabaseImporter::importFebTest()
   GearDir content = GearDir("/ArichData/AllData/arich");
   GearDir content1 = GearDir("/ArichData/AllData/dnamap");
   GearDir content2 = GearDir("/ArichData/AllData/FEBData/Content");
-  GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
 
   for (const auto& runserial : content.getNodes("run")) {
     int serial = runserial.getInt("sn");
@@ -1850,7 +1978,6 @@ void ARICHDatabaseImporter::importFebTestRoot()
   GearDir content = GearDir("/ArichData/AllData/arich");
   GearDir content1 = GearDir("/ArichData/AllData/dnamap");
   GearDir content2 = GearDir("/ArichData/AllData/FEBData/Content");
-  GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
 
   for (const auto& runserial : content.getNodes("run")) {
     serial = runserial.getInt("sn");
@@ -2723,10 +2850,13 @@ void ARICHDatabaseImporter::exportFEBoardInfo()
 void ARICHDatabaseImporter::importModuleTest(const std::string& mypath, const std::string& HVtest)
 {
 
-  GearDir content;
-  if (HVtest == "no")  content = GearDir("/ArichData/AllData/moduletest");
-  else if (HVtest == "yes")  content = GearDir("/ArichData/AllData/moduletestHV");
+
+  std::string path;
+  if (HVtest == "no")  path = "/ArichData/AllData/moduletest";
+  else if (HVtest == "yes")  path = "/ArichData/AllData/moduletestHV";
   else B2INFO("Check HVB test parameter!");
+
+  GearDir content = GearDir(path);
 
   // define data array
   TClonesArray moduleConstants("Belle2::ARICHModuleTest");
@@ -3099,7 +3229,7 @@ void ARICHDatabaseImporter::importMagnetTest()
   // define data array
   TClonesArray magnetConstants("Belle2::ARICHMagnetTest");
   int num = 0;
-  string sn = "";
+  string sn;
 
   // loop over xml files and extract the data
   for (const auto& module : content.getNodes("module")) {

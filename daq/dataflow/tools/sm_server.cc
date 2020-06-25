@@ -5,6 +5,10 @@
 #include <daq/dataflow/SocketLib.h>
 #include <daq/dataflow/SocketManager.h>
 
+#include <cstdio>
+#include <cstdlib>
+#include <unistd.h>
+
 using namespace std;
 using namespace Belle2;
 

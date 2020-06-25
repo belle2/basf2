@@ -87,7 +87,7 @@ main.add_module(arichHits)
 
 if int(options.tracking):
     cdcunpacker = register_module('CDCUnpacker')
-    cdcunpacker.param('xmlMapFileName', "cdc/data/ch_map.dat")
+    cdcunpacker.param('xmlMapFileName', "data/cdc/ch_map.dat")
     cdcunpacker.param('enablePrintOut', False)
     main.add_module(cdcunpacker)
     add_cosmics_reconstruction(main, 'CDC', False)

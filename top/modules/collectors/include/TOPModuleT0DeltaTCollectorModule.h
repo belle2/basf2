@@ -13,7 +13,6 @@
 #include <calibration/CalibrationCollectorModule.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <top/dataobjects/TOPTimeZero.h>
 
 #include <framework/database/DBObjPtr.h>

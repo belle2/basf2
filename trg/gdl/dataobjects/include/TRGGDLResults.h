@@ -12,7 +12,7 @@
 //-----------------------------------------------------------
 #pragma once
 #include <TObject.h>
-#include <TVector3.h>
+
 namespace Belle2 {
 
   class TRGGDLResults : public TObject {

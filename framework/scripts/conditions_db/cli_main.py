@@ -32,6 +32,7 @@ import difflib
 from urllib.parse import urljoin
 import shutil
 import pprint
+import requests
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging, \
     LogPythonInterface
 from basf2.utils import pretty_print_table
@@ -54,6 +55,8 @@ def escape_ctrl_chars(name):
 
     # escape the control characters by putting theim in as \xFF
     def escape(match):
+        if match.group(0).isspace():
+            return match.group(0)
         return "\\x{:02x}".format(ord(match.group(0)))
 
     return escape_ctrl_chars._regex.sub(escape, name)
@@ -282,9 +285,12 @@ def command_tag_modify(args, db=None):
     # now we update the tag information
     info = req.json()
     old_name = info["name"]
+    changed = False
     for key in ["name", "description"]:
-        if getattr(args, key) is not None:
-            info[key] = getattr(args, key)
+        value = getattr(args, key)
+        if value is not None and value != info[key]:
+            info[key] = value
+            changed = True
 
     info["modifiedBy"] = os.environ.get("BELLE2_USER", os.getlogin()) if args.user is None else args.user
 
@@ -294,12 +300,15 @@ def command_tag_modify(args, db=None):
         if typeinfo is None:
             return 1
         # seems so, ok modify the tag info
-        info["globalTagType"] = typeinfo
+        if info['gloalTagType'] != typeinfo:
+            info["globalTagType"] = typeinfo
+            changed = True
 
     # and push the changed info to the server
-    db.request("PUT", "/globalTag",
-               "Modifying globaltag {} (id={globalTagId})".format(old_name, **info),
-               json=info)
+    if changed:
+        db.request("PUT", "/globalTag",
+                   "Modifying globaltag {} (id={globalTagId})".format(old_name, **info),
+                   json=info)
 
     if args.state is not None:
         name = args.name if args.name is not None else old_name
@@ -540,8 +549,8 @@ def command_diff(args, db):
         if ntags != 2:
             return 1
         print()
-        listA = db.get_all_iovs(args.tagA, message=str(iovfilter))
-        listB = db.get_all_iovs(args.tagB, message=str(iovfilter))
+        listA = [e for e in db.get_all_iovs(args.tagA, message=str(iovfilter)) if iovfilter.check(e.name)]
+        listB = [e for e in db.get_all_iovs(args.tagB, message=str(iovfilter)) if iovfilter.check(e.name)]
 
         B2INFO("Comparing contents ...")
         diff = difflib.SequenceMatcher(a=listA, b=listB)
@@ -552,7 +561,7 @@ def command_diff(args, db):
             table[0] += ["Iov"]
             columns += [-36]
         else:
-            table[0] = ["First Exp", "First Run", "Final Exp", "Final Run"]
+            table[0] += ["First Exp", "First Run", "Final Exp", "Final Run"]
             columns += [6, 6, 6, 6]
 
         if args.show_ids:
@@ -790,7 +799,10 @@ def command_dump(args, db):
 
         match = re.match(r"^dbstore_(.*)_rev_(.*).root$", os.path.basename(filename))
         if not match:
-            B2ERROR("Filename doesn't follow database convention. Should be dbstore_${payloadname}_rev_${revision}.root")
+            match = re.match(r"^(.*)_r(.*).root$", os.path.basename(filename))
+        if not match:
+            B2ERROR("Filename doesn't follow database convention.\n"
+                    "Should be 'dbstore_${payloadname}_rev_${revision}.root' or '${payloadname}_r${revision.root}'")
             return 1
         name = match.group(1)
         revision = match.group(2)
@@ -800,11 +812,12 @@ def command_dump(args, db):
         # the name,revision
         if args.id:
             req = db.request("GET", f"/payload/{args.id}", "Getting payload info")
-            payload = PayloadInformation.from_json(req.json(), {"payloadIov"})
+            payload = PayloadInformation.from_json(req.json())
+            name = payload.name
         elif args.revision:
             name, rev = args.revision
             rev = int(rev)
-            req = db.request("GET", f"/module/{name}/payloads", "Getting payload info")
+            req = db.request("GET", f"/module/{encode_name(name)}/payloads", "Getting payload info")
             for p in req.json():
                 if p["revision"] == rev:
                     payload = PayloadInformation.from_json(p)
@@ -833,16 +846,19 @@ def command_dump(args, db):
 
     # remote http opening or local file
     tfile = TFile.Open(filename)
-    if not tfile.IsOpen():
-        B2ERROR(f"Could not open payload file {filename}")
-        return 1
-
-    obj = tfile.Get(name)
-    if not obj:
-        B2ERROR(f"Could not find payload object in payload {filename}")
-        return 1
-
-    json_str = TBufferJSON.ConvertToJSON(obj)
+    json_str = None
+    raw_contents = None
+    if not tfile or not tfile.IsOpen():
+        # could be a non-root payload file
+        contents = db._session.get(filename, stream=True)
+        if contents.status_code != requests.codes.ok:
+            B2ERROR(f"Could not open payload file {filename}")
+            return 1
+        raw_contents = contents.raw.read().decode()
+    else:
+        obj = tfile.Get(name)
+        if obj:
+            json_str = TBufferJSON.ConvertToJSON(obj)
 
     def drop_fbits(obj):
         """
@@ -859,7 +875,7 @@ def command_dump(args, db):
         return obj
 
     with Pager(f"Contents of Payload {name}, revision {revision} (id {payloadId})", True):
-        if args.show_streamerinfo:
+        if args.show_streamerinfo and tfile:
             B2INFO("StreamerInfo of Payload {name}, revision {revision} (id {payloadId})")
             tfile.ShowStreamerInfo()
             # sadly this prints to std::cout or even stdout but doesn't flush ... so we have
@@ -868,14 +884,21 @@ def command_dump(args, db):
             # and add a newline
             print()
 
-        B2INFO(f"Contents of Payload {name}, revision {revision} (id {payloadId})")
-        # load the json as python object dropping some things we don't want to
-        # print
-        obj = json.loads(json_str.Data(), object_hook=drop_fbits)
-        # print the object content using pretty print with a certain width
-        pprint.pprint(obj, compact=True, width=shutil.get_terminal_size((80, 20))[0])
-
-    tfile.Close()
+        if json_str is not None:
+            B2INFO(f"Contents of Payload {name}, revision {revision} (id {payloadId})")
+            # load the json as python object dropping some things we don't want to
+            # print
+            obj = json.loads(json_str.Data(), object_hook=drop_fbits)
+            # print the object content using pretty print with a certain width
+            pprint.pprint(obj, compact=True, width=shutil.get_terminal_size((80, 20))[0])
+        elif raw_contents:
+            B2INFO(f"Raw contents of Payload {name}, revision {revision} (id {payloadId})")
+            print(escape_ctrl_chars(raw_contents))
+        elif tfile:
+            B2INFO(f"ROOT contents of Payload {name}, revision {revision} (id {payloadId})")
+            B2WARNING("The payload is a valid ROOT file but doesn't contain a payload object with the expected name. "
+                      " Automated display of file contents are not possible, showing just entries in the ROOT file.")
+            tfile.ls()
 
 
 class FullHelpAction(argparse._HelpAction):

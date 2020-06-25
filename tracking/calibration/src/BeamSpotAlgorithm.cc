@@ -83,6 +83,9 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   vertexSize[1][1] = hVertexY->GetRMS() * hVertexY->GetRMS() - hVarY->GetMean();
   vertexSize[2][2] = hVertexZ->GetRMS() * hVertexZ->GetRMS() - hVarZ->GetMean();
 
+  // if size y NAN, set it to expected size for beta_star_y = 1 mm:
+  if (vertexSize[1][1] < 0) vertexSize[1][1] = 0.3 * 1e-4 * 0.3 * 1e-4;
+
   auto payload = new BeamSpot();
 
   payload->setIP(vertexPos, vertexCov);

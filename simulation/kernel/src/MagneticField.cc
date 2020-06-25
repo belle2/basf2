@@ -13,7 +13,6 @@
 
 #include <framework/gearbox/Unit.h>
 
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <globals.hh>

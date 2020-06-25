@@ -16,8 +16,7 @@
 #include <background/modules/BeamBkgHitRateMonitor/TOPHitRateCounter.h>
 #include <background/modules/BeamBkgHitRateMonitor/ARICHHitRateCounter.h>
 #include <background/modules/BeamBkgHitRateMonitor/ECLHitRateCounter.h>
-#include <background/modules/BeamBkgHitRateMonitor/BKLMHitRateCounter.h>
-#include <background/modules/BeamBkgHitRateMonitor/EKLMHitRateCounter.h>
+#include <background/modules/BeamBkgHitRateMonitor/KLMHitRateCounter.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
@@ -78,10 +77,30 @@ namespace Belle2 {
              "TOP: time window in which to count hits [ns]", 100.0);
     addParam("svdShaperDigitsName", m_svdShaperDigitsName,
              "SVDShaperDigits collection name", string(""));
+    addParam("svdThrCharge", m_svdThrCharge,
+             "Energy cur on SVD Cluster charge in electrons", 15000.);
     addParam("additionalDataDescription", m_additionalDataDescription,
              "Additional dictionary of "
              "name->value pairs to be added to the file metadata to describe the data",
              m_additionalDataDescription);
+    addParam("cdcTimeWindowLowerEdgeSmallCell",  m_cdcTimeWindowLowerEdgeSmallCell,
+             "CDC: lower edge of the time window for small cells [tdc count = ns]",
+             4550);
+    addParam("cdcTimeWindowUpperEdgeSmallCell",  m_cdcTimeWindowUpperEdgeSmallCell,
+             "CDC: upper edge of the time window for small cells [tdc count = ns]",
+             5050);
+    addParam("cdcTimeWindowLowerEdgeNormalCell", m_cdcTimeWindowLowerEdgeNormalCell,
+             "CDC: lower edge of the time window for normal cells [tdc count = ns]",
+             4200);
+    addParam("cdcTimeWindowUpperEdgeNormalCell", m_cdcTimeWindowUpperEdgeNormalCell,
+             "CDC: upper edge of the time window for normal cells [tdc count = ns]",
+             5050);
+    addParam("cdcEnableBadWireTreatment", m_cdcEnableBadWireTreatment,
+             "CDC: flag to enable the bad wire treatment", true);
+    addParam("cdcEnableBackgroundHitFilter", m_cdcEnableBackgroundHitFilter,
+             "CDC: flag to enable the CDC background hit (crosstakl, noise) filter", true);
+    addParam("cdcEnableMarkBackgroundHit", m_cdcEnableMarkBackgroundHit,
+             "CDC: flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status).", false);
 
   }
 
@@ -106,9 +125,12 @@ namespace Belle2 {
     // create, set and append hit rate monitoring classes
     auto* pxd = new Background::PXDHitRateCounter();
     m_monitors.push_back(pxd);
-    auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName);
+    auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge);
     m_monitors.push_back(svd);
-    auto* cdc = new Background::CDCHitRateCounter();
+    auto* cdc = new Background::CDCHitRateCounter(m_cdcTimeWindowLowerEdgeSmallCell,  m_cdcTimeWindowUpperEdgeSmallCell,
+                                                  m_cdcTimeWindowLowerEdgeNormalCell, m_cdcTimeWindowUpperEdgeNormalCell,
+                                                  m_cdcEnableBadWireTreatment, m_cdcEnableBackgroundHitFilter,
+                                                  m_cdcEnableMarkBackgroundHit);
     m_monitors.push_back(cdc);
     auto* top = new Background::TOPHitRateCounter(m_topTimeOffset, m_topTimeWindow);
     m_monitors.push_back(top);
@@ -116,10 +138,8 @@ namespace Belle2 {
     m_monitors.push_back(arich);
     auto* ecl = new Background::ECLHitRateCounter();
     m_monitors.push_back(ecl);
-    auto* bklm = new Background::BKLMHitRateCounter();
-    m_monitors.push_back(bklm);
-    auto* eklm = new Background::EKLMHitRateCounter();
-    m_monitors.push_back(eklm);
+    auto* klm = new Background::KLMHitRateCounter();
+    m_monitors.push_back(klm);
 
     // open output root file
     m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE");

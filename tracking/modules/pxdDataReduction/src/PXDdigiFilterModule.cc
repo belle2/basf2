@@ -39,6 +39,8 @@ PXDdigiFilterModule::PXDdigiFilterModule() : Module()
   addParam("ROIidsName", m_ROIidsName, "The name of the StoreArray of ROIs", std::string(""));
   addParam("CreateOutside", m_CreateOutside, "Create the StoreArray of PXD pixel outside the ROIs", false);
 
+  addParam("overrideDB", m_overrideDB, "If set, ROI-filtering settings in DB are overwritten", false);
+  addParam("usePXDDataReduction", m_usePXDDataReduction, "enables/disables ROI-filtering if overrideDB=True", false);
 }
 
 void PXDdigiFilterModule::initialize()
@@ -66,7 +68,55 @@ void PXDdigiFilterModule::initialize()
   }
 }
 
+void PXDdigiFilterModule::beginRun()
+{
+  // reset variables used to enable/disable ROI-filtering
+  m_skipEveryNth = -1;
+  if (m_roiParameters) {
+    m_skipEveryNth = m_roiParameters->getDisableROIforEveryNth();
+  } else {
+    B2ERROR("No configuration for the current run found");
+  }
+  m_countNthEvent = 0;
+}
+
 void PXDdigiFilterModule::event()
+{
+  // parameters might also change on a per-event basis
+  if (m_roiParameters.hasChanged()) {
+    if (m_roiParameters) {
+      m_skipEveryNth = m_roiParameters->getDisableROIforEveryNth();
+    } else {
+      B2ERROR("No configuration for the current run found");
+    }
+    // and reset counter
+    m_countNthEvent = 0;
+  }
+
+  if (m_overrideDB) {
+    if (m_usePXDDataReduction) {
+      filterDigits();
+    } else {
+      copyDigits();
+    }
+    return;
+  }
+
+  m_countNthEvent++;
+
+  // Data reduction disabled -> simply copy everything
+  if (m_skipEveryNth > 0 and m_countNthEvent % m_skipEveryNth == 0) {
+    copyDigits();
+    m_countNthEvent = 0;
+
+    return;
+  }
+
+  // Perform data reduction
+  filterDigits();
+}
+
+void PXDdigiFilterModule::filterDigits()
 {
   StoreArray<PXDDigit> PXDDigits(m_PXDDigitsName);   /**< The PXDDigits to be filtered */
   StoreArray<ROIid> ROIids_store_array(m_ROIidsName); /**< The ROIs */
@@ -95,5 +145,12 @@ void PXDdigiFilterModule::event()
       return true;
     });
   }
-
 }
+
+void PXDdigiFilterModule::copyDigits()
+{
+  // omitting the variable name; otherwise a warning is produced (un-used variable)
+  m_selectorIN.select([](const PXDDigit* /* thePxdDigit */) {return true;});
+}
+
+

@@ -18,7 +18,6 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
-#include <functional>
 #include <limits>
 
 namespace Belle2 {

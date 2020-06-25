@@ -13,7 +13,7 @@
 #pragma once
 #include <mdst/dataobjects/TRGSummary.h>
 #include <TObject.h>
-#include <TVector3.h>
+
 namespace Belle2 {
 
   class TRGGDLDST : public TObject {

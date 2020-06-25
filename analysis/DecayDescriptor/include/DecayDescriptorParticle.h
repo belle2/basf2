@@ -1,14 +1,16 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald, Yo Sato                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #pragma once
+
+#include <analysis/dataobjects/Particle.h>
 
 #include <string>
 
@@ -26,8 +28,8 @@ namespace Belle2 {
     std::string m_strName;
     /** Is particle selected? */
     bool m_isSelected;
-    /** Is particle unspecified by marking @ ? */
-    bool m_isUnspecified;
+    /** Particle property. Flags are defined in Particle::PropertyFlags */
+    int m_properties;
     /** Label of this particle to distinguish e.g. different decay channels or selection criteria. */
     std::string m_strLabel;
     /** PDG code of the decaying particle. */
@@ -76,10 +78,25 @@ namespace Belle2 {
     {
       return m_iPDGCode;
     }
-    /** Is the particle unspecified? */
-    int isUnspecified() const
+    /** return property of the particle. */
+    int getProperty() const
     {
-      return m_isUnspecified;
+      return m_properties;
+    }
+    /** Is the particle unspecified? */
+    bool isUnspecified() const
+    {
+      return (m_properties & Particle::PropertyFlags::c_IsUnspecified);
+    }
+    /** Check if misID shall be ignored. */
+    bool isIgnoreMisID() const
+    {
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreMisID);
+    }
+    /** Check if decayInFlight shall be ignored. */
+    bool isIgnoreDecayInFlight() const
+    {
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreDecayInFlight);
     }
   };
 }

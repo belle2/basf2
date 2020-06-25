@@ -9,6 +9,9 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 CHANGES since release-02-01-00:
 - EventMetaData:
   + isEndOfRun
+- EventLevelTrackingInfo:
+  + hasSVDCKFAbortionFlag/setSVDCKFAbortionFlag
+  + hasPXDCKFAbortionFlag/setPXDCKFAbortionFlag
 - ECLCluster:
   + getPulseShapeDiscriminationMVA added
   + hasFailedFitTime

@@ -98,7 +98,8 @@ CDCTriggerTSFModule::initialize()
   int is = -1;
   int ias = -1;
   int iss = -1;
-  unsigned axialStereoLayerId = 0;
+  /* cppcheck-suppress variableScope */
+  unsigned axialStereoLayerId;
   unsigned axialStereoSuperLayerId = 0;
   unsigned nWires = 0;
   for (unsigned i = 0; i < nLayers; i++) {

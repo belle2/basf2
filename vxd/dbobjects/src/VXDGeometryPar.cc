@@ -10,7 +10,6 @@
 
 #include <vxd/dbobjects/VXDGeometryPar.h>
 #include <framework/logging/Logger.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <boost/format.hpp>
 
 using namespace Belle2;

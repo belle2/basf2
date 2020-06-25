@@ -117,6 +117,50 @@ namespace Belle2 {
 
 
     /**
+     * Options for the TMVA Multiclass MVA method
+     */
+    class TMVAOptionsMulticlass : public TMVAOptions {
+
+    public:
+      /**
+       * Constructor
+       * Adds Multiclass as AnalysisType to the factoryOptions
+       */
+      TMVAOptionsMulticlass()
+      {
+        m_factoryOption += ":AnalysisType=Multiclass";
+      }
+
+      /**
+       * Load mechanism to load Options from a xml tree
+       * @param pt xml tree
+       */
+      virtual void load(const boost::property_tree::ptree& pt) override;
+
+      /**
+       * Save mechanism to store Options in a xml tree
+       * @param pt xml tree
+       */
+      virtual void save(boost::property_tree::ptree& pt) const override;
+
+      /**
+       * Returns a program options description for all available options
+       */
+      virtual po::options_description getDescription() override;
+
+      /**
+       * Return method name
+       */
+      virtual std::string getMethod() const override { return "TMVAMulticlass"; }
+
+    public:
+
+      std::vector<std::string> m_classes; /**< Class name identifiers. */
+
+    };
+
+
+    /**
      * Options for the TMVA Regression MVA method
      */
     class TMVAOptionsRegression : public TMVAOptions {
@@ -197,6 +241,29 @@ namespace Belle2 {
     };
 
     /**
+     * Teacher for the TMVA Multiclass MVA method
+     */
+    class TMVATeacherMulticlass : public TMVATeacher {
+
+    public:
+      /**
+       * Constructs a new teacher using the GeneralOptions and specific options of this training
+       * @param general_options defining all shared options
+       * @param specific_options defining all method specific options
+       */
+      TMVATeacherMulticlass(const GeneralOptions& general_options, const TMVAOptionsMulticlass& _specific_options);
+
+      /**
+       * Train a mva method using the given dataset returning a Weightfile
+       * @param training_data used to train the method
+       */
+      virtual Weightfile train(Dataset& training_data) const override;
+
+    protected:
+      TMVAOptionsMulticlass specific_options; /**< Method specific options */
+    };
+
+    /**
      * Teacher for the TMVA Regression MVA method
      */
     class TMVATeacherRegression : public TMVATeacher {
@@ -218,6 +285,7 @@ namespace Belle2 {
     protected:
       TMVAOptionsRegression specific_options; /**< Method specific options */
     };
+
 
     /**
      * Expert for the TMVA MVA method
@@ -260,6 +328,41 @@ namespace Belle2 {
     protected:
       TMVAOptionsClassification specific_options; /**< Method specific options */
       float expert_signalFraction; /**< Signal fraction used to calculate the probability */
+
+    };
+
+    /**
+     * Expert for the TMVA Multiclass MVA method
+     */
+    class TMVAExpertMulticlass : public TMVAExpert {
+
+    public:
+      /**
+       * Load the expert from a Weightfile
+       * @param weightfile containing all information necessary to build the m_expert
+       */
+      virtual void load(Weightfile& weightfile) override;
+
+      /**
+       * Apply this m_expert onto a dataset
+       * @param test_data dataset
+       */
+      virtual std::vector<float> apply(Dataset& test_data) const override
+      {
+        (void) test_data;
+        return std::vector<float>();
+      };
+
+      /**
+       * Apply this expert onto a dataset.
+       * Multi-class mode signature.
+       * @param test_data dataset
+       * @param classID class identifier.
+       */
+      virtual std::vector<float> apply(Dataset& test_data, const unsigned int classID) const override;
+
+    protected:
+      TMVAOptionsMulticlass specific_options; /**< Method specific options */
 
     };
 

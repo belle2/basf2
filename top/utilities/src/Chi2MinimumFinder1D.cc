@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <top/utilities/Chi2MinimumFinder1D.h>
+
+#include <framework/logging/Logger.h>
+
 #include <math.h>
 
 namespace Belle2 {

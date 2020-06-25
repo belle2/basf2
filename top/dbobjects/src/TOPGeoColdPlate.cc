@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPGeoColdPlate.h>
-#include <framework/gearbox/Unit.h>
-#include <math.h>
 #include <iostream>
 
 using namespace std;

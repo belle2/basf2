@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ############################################################
 #
@@ -19,10 +18,8 @@ from modularAnalysis import inputMdst
 from modularAnalysis import fillParticleList
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from modularAnalysis import UnmeasuredfitKinematic1C
+from kinfit import UnmeasuredfitKinematic1C
 from modularAnalysis import variablesToNtuple
-import sys
-from beamparameters import add_beamparameters
 import variables.collections as vc
 import variables.utils as vu
 
@@ -30,10 +27,6 @@ import variables.utils as vu
 mypath = b2.create_path()
 
 b2.set_log_level(b2.LogLevel.WARNING)
-
-# not necessary, but set it explicitly
-beamparameters = add_beamparameters(mypath, "Y4S")
-b2.print_params(beamparameters)
 
 # Input file(s).
 inputMdst(environmentType='default',

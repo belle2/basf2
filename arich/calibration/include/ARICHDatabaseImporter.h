@@ -22,6 +22,7 @@
 #include <iostream>
 #include <string>
 #include <framework/database/IntervalOfValidity.h>
+#include <arich/dbobjects/tessellatedSolidStr.h>
 
 namespace Belle2 {
 
@@ -103,6 +104,21 @@ namespace Belle2 {
      * Import mirror alignment parameters from ARICH-MirrorAlignment.xml
      */
     void importMirrorAlignment();
+
+    /**
+     * Import aerogel tiles alignment parameters from ARICH-AeroTilesAlignment.xml
+     */
+    void importAeroTilesAlignment();
+
+    /**
+     * Import Merger cooling bodies geometry
+     */
+    void importMergerCoolingGeo();
+
+    /**
+     * reads merger cooling bodies geometry from dat files
+     */
+    tessellatedSolidStr readTessellatedSolidVerticesFromDATfile(const std::string& inDATfile);
 
     /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
@@ -240,6 +256,11 @@ namespace Belle2 {
      * Prints mirror alignment constants
      */
     void printMirrorAlignment();
+
+    /**
+     * Prints aerogel tiles alignment constants
+     */
+    void printAeroTilesAlignment();
 
     // DAQ classes
 
@@ -586,8 +607,6 @@ namespace Belle2 {
         rStream << " - " << rContainer[i];
       rStream << '\n';
     }
-
-    ClassDef(ARICHDatabaseImporter, 4);                 /**< ClassDef */
 
   };
 

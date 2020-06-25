@@ -55,6 +55,7 @@ namespace Belle2 {
      *
      * @param volume The physical volume to be checked.
      * @param path The path name identifying the mother volume.
+     * @param depth The current depth in this tree as this function is recursive
      * @return True if the volume or one of its daughters is overlapping
      */
     bool checkVolume(G4VPhysicalVolume* volume, const std::string& path, int depth = 0);

@@ -14,15 +14,12 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
+
+#include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
+#define CRC16POLYREV 0x8005   // CRC-16 polynomial, normal representation 
 
 #include <arpa/inet.h>
-#include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
-#include <boost/cstdint.hpp>  // for boost::uint16_t
-#define CRC16POLYREV 0x8005   // CRC-16 polynomial, normal representation 
 
 #include <sstream>
 #include <iomanip>
@@ -49,19 +46,16 @@ REG_MODULE(SVDUnpacker)
 std::string Belle2::SVD::SVDUnpackerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 
 SVDUnpackerModule::SVDUnpackerModule() : Module(),
-  m_generateOldDigits(false),
   m_mapping(m_xmlFileName),
   m_shutUpFTBError(0),
   m_FADCTriggerNumberOffset(0)
 {
   //Set module properties
-  setDescription("Produce SVDDigits from RawSVD. NOTE: only zero-suppressed mode is currently supported!");
+  setDescription("Produce SVDShaperDigits from RawSVD. NOTE: only zero-suppressed mode is currently supported!");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("SVDEventInfo", m_svdEventInfoName, "Name of the SVDEventInfo object", string(""));
   addParam("rawSVDListName", m_rawSVDListName, "Name of the raw SVD List", string(""));
-  addParam("svdDigitListName", m_svdDigitListName, "Name of the SVD Digits List", string(""));
-  addParam("GenerateOldDigits", m_generateOldDigits, "Generate SVDDigits", bool(false));
   addParam("svdShaperDigitListName", m_svdShaperDigitListName, "Name of the SVDShaperDigits list", string(""));
   addParam("shutUpFTBError", m_shutUpFTBError,
            "if >0 is the number of reported FTB header ERRORs before quiet operations. If <0 full log produced.", -1);
@@ -93,10 +87,6 @@ void SVDUnpackerModule::initialize()
   storeDAQDiagnostics.registerInDataStore();
   m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
 
-  if (m_generateOldDigits) {
-    m_svdDigit.registerInDataStore(m_svdDigitListName);
-  }
-
   StoreArray<SVDShaperDigit> storeShaperDigits(m_svdShaperDigitListName);
   storeShaperDigits.registerInDataStore();
   storeShaperDigits.registerRelationTo(storeDAQDiagnostics);
@@ -111,7 +101,7 @@ void SVDUnpackerModule::beginRun()
 
   if (! m_map) { //give up
     B2ERROR("SVD xml map not loaded." << std::endl <<
-            "No SVDDigit will be produced for this run!");
+            "No SVDShaperDigit will be produced for this run!");
     return;
   }
 
@@ -146,15 +136,9 @@ void SVDUnpackerModule::event()
   StoreArray<RawSVD> rawSVDList(m_rawSVDListName);
   if (!rawSVDList || !rawSVDList.getEntries())
     return;
-  StoreArray<SVDDigit> svdDigits(m_svdDigitListName);
+
   StoreArray<SVDShaperDigit> shaperDigits(m_svdShaperDigitListName);
   StoreArray<SVDDAQDiagnostic> DAQDiagnostics(m_svdDAQDiagnosticsListName);
-
-  if (!m_silentAppend && m_generateOldDigits && svdDigits && svdDigits.getEntries())
-    B2WARNING("Unpacking SVDDigits to a non-empty pre-existing StoreArray.\n"
-              << "This can lead to undesired behaviour. At least remember to\""
-              << "use SVDDigitSorter in your path and set the \n"
-              << "silentlyAppend parameter of SVDUnpacker to true.");
 
   if (!m_silentAppend && shaperDigits && shaperDigits.getEntries())
     B2WARNING("Unpacking SVDShaperDigits to a non-empty pre-existing \n"
@@ -396,17 +380,6 @@ void SVDUnpackerModule::event()
               sample[3] = m_data_B.sample4;
               sample[4] = m_data_B.sample5;
               sample[5] = m_data_B.sample6;
-            }
-
-            if (m_generateOldDigits) {
-              for (unsigned int idat = 0; idat < 6; idat++) {
-                // m_cellPosition member of the SVDDigit object is set to zero by NewDigit function
-                SVDDigit* newDigit = m_map->NewDigit(fadc, apv, strip, sample[idat], idat);
-                if (newDigit) {
-                  svdDigits.appendNew(*newDigit);
-                  delete newDigit;
-                }
-              }
             }
 
             // Generating SVDShaperDigit object

@@ -37,9 +37,9 @@ VXDQualityEstimatorMVAModule::VXDQualityEstimatorMVAModule() : Module()
 
 
   addParam("WeightFileIdentifier",
-           m_WeightFileIdentifier,
+           m_weightFileIdentifier,
            "Identifier of weightfile in Database or local root/xml file.",
-           m_WeightFileIdentifier);
+           m_weightFileIdentifier);
 
   addParam("UseTimingInfo",
            m_UseTimingInfo,
@@ -64,7 +64,7 @@ void VXDQualityEstimatorMVAModule::initialize()
     m_clusterInfoExtractor = std::make_unique<ClusterInfoExtractor>(m_variableSet, m_UseTimingInfo);
   }
 
-  m_mvaExpert = std::make_unique<MVAExpert>(m_WeightFileIdentifier, m_variableSet);
+  m_mvaExpert = std::make_unique<MVAExpert>(m_weightFileIdentifier, m_variableSet);
   m_mvaExpert->initialize();
 
   // create pointer to chosen estimator

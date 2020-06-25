@@ -9,6 +9,10 @@
 #include "daq/dqm/DqmMemFile.h"
 #include <framework/pcore/MsgHandler.h>
 
+#include <TH1.h>
+#include <TKey.h>
+#include <TText.h>
+
 using namespace Belle2;
 using namespace std;
 

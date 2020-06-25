@@ -1,0 +1,38 @@
+# EventType: 1210030003
+# Descriptor: [B+ -> pi+ pi- pi+]
+# NickName: Bu_PipPimPip
+# Documentation: BtoCharmless Phase 3 data validation studies.
+# Tested:Yes
+# PhysicsWG: BtoCharmless
+# Responsible: Riccardo Manfredi
+# Email: riccardo.manfredi@ts.infn.it
+# Cuts: None
+# Date: 20200522
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+0.0000053    pi+   pi-   pi+    PHSP;
+0.0000083    rho0  pi+           SVS;
+0.000001344  f_2   pi+          PHSP;
+0.0000014    rho(2S)0    pi+     SVS;
+Enddecay
+CDecay B-sig
+
+Decay f_2
+1.0   pi+   pi-                  TSS;
+Enddecay
+
+Decay rho0
+1.0 pi+      pi-                 VSS;
+Enddecay
+
+Decay rho(2S)0
+1.0 pi+      pi-                 VSS;
+Enddecay
+
+End 
+

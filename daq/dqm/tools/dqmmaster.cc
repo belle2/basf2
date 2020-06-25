@@ -1,10 +1,9 @@
 #include <daq/dqm/DqmMasterCallback.h>
 
-#include <daq/slc/psql/PostgreSQLInterface.h>
-
-#include <daq/slc/runcontrol/RCNodeDaemon.h>
-
 #include <daq/slc/base/ConfigFile.h>
+#include <daq/slc/psql/PostgreSQLInterface.h>
+#include <daq/slc/runcontrol/RCNodeDaemon.h>
+#include <daq/slc/system/Daemon.h>
 
 using namespace Belle2;
 

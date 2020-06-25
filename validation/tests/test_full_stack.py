@@ -13,7 +13,7 @@ import traceback
 # ours
 import validationserver
 import validationpath
-from validationtestutil import check_excecute
+from validationtestutil import check_execute
 
 # url of the local validation webserver
 validation_url = "http://localhost:8000/"
@@ -196,7 +196,7 @@ def main():
         os.chdir(str(tmpdir))
 
         for r in revs_to_gen:
-            check_excecute("validate_basf2 --test --tag {}".format(r))
+            check_execute("validate_basf2 --test --tag {}".format(r))
 
         # make sure the webserver process is terminated in any case
         try:

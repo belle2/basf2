@@ -3,7 +3,7 @@
  * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Markus Prim                                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -90,6 +90,6 @@ namespace Belle2 {
     /// The used raw connection
     ZMQRawOutput m_dataOutput;
     /// The used ROI connection
-    ZMQROIOutput m_roiOutput;
+    ZMQRawOutput m_roiOutput;
   };
 }

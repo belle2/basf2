@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVD_OCCUPANCY_H_
-#define SVD_OCCUPANCY_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -17,6 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDHistograms.h>
+#include <svd/dataobjects/SVDSummaryPlots.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
@@ -25,18 +25,9 @@
 
 
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
-#include <TCollection.h>
-#include <TList.h>
-#include <TH3F.h>
-
-// forward declarations
-class TTree;
-class TFile;
 
 namespace Belle2 {
 
@@ -74,6 +65,7 @@ namespace Belle2 {
 
     /// Store Object for reading the trigger decision.
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+    bool m_skipRejectedEvents = false; /**< if true skip events rejected by HLT*/
 
     int m_nEvents = 0; /**< number of events*/
     StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigit StoreArray*/
@@ -82,7 +74,26 @@ namespace Belle2 {
     SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
 
 
+    //! IDs of all SVD Modules to iterate over
+    std::vector<VxdID> m_SVDModules;
+
+    //layer summary
+    float m_distr_Nbins = 10000; /**< number of bins of occupancy distributions*/
+    float m_distr_min = 0; /**< min of occupancy distributions*/
+    float m_distr_max = 100; /**< max of occupancy distributions*/
+
+    TH1F* m_occ_L3U = nullptr; /**< occupancy distribution for L3 U-side sensors*/
+    TH1F* m_occ_L3V = nullptr; /**< occupancy distribution for L3 V-side sensors*/
+    TH1F* m_occ_L4U = nullptr; /**< occupancy distribution for L4 U-side sensors*/
+    TH1F* m_occ_L4V = nullptr; /**< occupancy distribution for L4 V-side sensors*/
+    TH1F* m_occ_L5U = nullptr; /**< occupancy distribution for L5 U-side sensors*/
+    TH1F* m_occ_L5V = nullptr; /**< occupancy distribution for L5 V-side sensors*/
+    TH1F* m_occ_L6U = nullptr; /**< occupancy distribution for L6 U-side sensors*/
+    TH1F* m_occ_L6V = nullptr; /**< occupancy distribution for L6 V-side sensors*/
+
     //SHAPER
+    SVDSummaryPlots* m_hit = nullptr; /**<hit number summary histogram*/
+    SVDHistograms<TH1F>* m_histo_dist = nullptr; /**<occupancy distribution histograms*/
     SVDHistograms<TH1F>* m_histo_occ = nullptr; /**<occupancy histograms*/
     SVDHistograms<TH1F>* m_histo_zsOcc = nullptr; /**<occupancy VS ZScut histograms*/
     SVDHistograms<TH1F>* m_histo_zsOccSQ = nullptr; /**< occupancy VS ZS cut swuared histograms*/
@@ -91,5 +102,4 @@ namespace Belle2 {
   };
 }
 
-#endif /* SVDOccupancyAnalysisModule_H_ */
 

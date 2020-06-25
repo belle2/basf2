@@ -4,17 +4,13 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <simulation/background/BkgNeutronWeight.h>
-
-#include <framework/core/InputController.h>
 
 #include <framework/dataobjects/FileMetaData.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDDigit.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDEnergyDepositionEvent.h>
 #include <svd/dataobjects/SVDNeutronFluxEvent.h>
@@ -23,13 +19,9 @@
 #include <fstream>
 #include <set>
 #include <algorithm>
-#include <numeric>
 #include <boost/format.hpp>
 
-#include "TH1F.h"
-#include "TH2F.h"
 #include "TVector3.h"
-#include "TDirectory.h"
 
 using namespace std;
 using boost::format;
@@ -116,7 +108,7 @@ void SVDBackgroundModule::initialize()
   StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
   StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
+  StoreArray<SVDShaperDigit> storeDigits(m_storeDigitsName);
   StoreArray<SVDCluster> storeClusters(m_storeClustersName);
 
   RelationArray relDigitsMCParticles(storeDigits, storeMCParticles);
@@ -163,7 +155,7 @@ void SVDBackgroundModule::event()
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   const StoreArray<SVDSimHit> storeSimHits(m_storeSimHitsName);
   const StoreArray<SVDTrueHit> storeTrueHits(m_storeTrueHitsName);
-  const StoreArray<SVDDigit> storeDigits(m_storeDigitsName);
+  const StoreArray<SVDShaperDigit> storeDigits(m_storeDigitsName);
   const StoreArray<SVDCluster> storeClsuters(m_storeClustersName);
 
   // Add two new StoreArrays
@@ -326,7 +318,7 @@ void SVDBackgroundModule::event()
     double currentSensorVCut = 0;
     // Store fired strips: count number of digits over threshold
     std::map<VxdID, std::multiset<unsigned short> > firedStrips;
-    for (const SVDDigit& digit : storeDigits) {
+    for (const SVDShaperDigit& digit : storeDigits) {
       // Filter out digits with signals below zero-suppression threshold
       // ARE THRE SUCH DIGITS?
       VxdID sensorID = digit.getSensorID();
@@ -336,8 +328,9 @@ void SVDBackgroundModule::event()
         currentSensorUCut = eToADU(3.0 * info.getElectronicNoiseU());
         currentSensorVCut = eToADU(3.0 * info.getElectronicNoiseV());
       }
-      B2DEBUG(30, "Digit charge: " << digit.getCharge() << " threshold: " << (digit.isUStrip() ? currentSensorUCut : currentSensorVCut));
-      if (digit.getCharge() < (digit.isUStrip() ? currentSensorUCut : currentSensorVCut)) continue;
+      B2DEBUG(30, "MaxCharge: " << digit.getMaxADCCounts() << " threshold: " << (digit.isUStrip() ? currentSensorUCut :
+              currentSensorVCut));
+      if (digit.getMaxADCCounts() < (digit.isUStrip() ? currentSensorUCut : currentSensorVCut)) continue;
       B2DEBUG(30, "Passed.");
       // Economize writing u- and v- strips by re-using the Segment field of VxdID
       VxdID writeID(sensorID);

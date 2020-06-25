@@ -48,7 +48,7 @@ namespace Belle2 {
        * @param mpl Reference to the monopole definition in GEANT4
        * @param verb Verbosity level, if GEANT4 was set to be verbose
        */
-      G4MonopoleTransportation(const G4Monopole* mpl, G4int verb = 1);
+      explicit G4MonopoleTransportation(const G4Monopole* mpl, G4int verb = 1);
       /**
        * Destructor.
        */

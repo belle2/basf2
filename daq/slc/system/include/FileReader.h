@@ -1,8 +1,6 @@
 #ifndef _Belle2_FileReader_hh
 #define _Belle2_FileReader_hh
 
-#include "daq/slc/system/FileDescriptor.h"
-
 #include "daq/slc/base/Reader.h"
 
 namespace Belle2 {

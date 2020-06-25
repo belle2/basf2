@@ -20,6 +20,8 @@
 #include <framework/logging/Logger.h>
 #include <TDecompChol.h>
 
+#include <numeric>
+
 using namespace Belle2;
 
 

@@ -16,7 +16,7 @@ from basf2 import create_path, process, statistics, set_random_seed
 
 from modularAnalysis import inputMdst, reconstructDecay, fillParticleList, matchMCTruth
 import os
-from vertex import vertexTree
+from vertex import treeFit
 
 from variables import variables
 import sys
@@ -39,7 +39,7 @@ reconstructDecay('B0:jpsiks -> J/psi:mumu K_S0:pipi', 'Mbc > 5.27 and abs(deltaE
 
 matchMCTruth('B0:jpsiks', path=path)
 
-vertexTree(
+treeFit(
     list_name='B0:jpsiks',
     conf_level=-1,
     updateAllDaughters=True,
@@ -65,9 +65,9 @@ variables = [
     'x_uncertainty',
     'y_uncertainty',
     'z_uncertainty',
-    'mcX',
-    'mcY',
-    'mcZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
 ]
 
 path.add_module('VariablesToNtuple',

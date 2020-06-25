@@ -33,10 +33,10 @@ void RelationApplier::initialize()
   m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
 }
 
-void RelationApplier::apply(const std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>&
+void RelationApplier::apply(const std::vector<TrackFindingCDC::WeightedRelationPointerComparison<const RecoTrack, const RecoTrack>>&
                             relationsCDCToSVD)
 {
-  for (const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>& relation : relationsCDCToSVD) {
+  for (const TrackFindingCDC::WeightedRelationPointerComparison<const RecoTrack, const RecoTrack>& relation : relationsCDCToSVD) {
     const RecoTrack* cdcTrack = relation.getFrom();
     const RecoTrack* svdTrack = relation.getTo();
     cdcTrack->addRelationTo(svdTrack, m_param_writeOutDirection);

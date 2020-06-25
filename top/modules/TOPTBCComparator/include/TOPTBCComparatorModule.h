@@ -12,16 +12,9 @@
 
 #include <framework/core/HistoModule.h>
 #include "TH1F.h"
-#include "TTree.h"
 #include "TH2F.h"
-#include "TCanvas.h"
-#include "TMultiGraph.h"
 #include <string>
-#include <set>
-#include <map>
 #include <vector>
-#include <deque>
-#include <utility>
 
 namespace Belle2 {
   /**

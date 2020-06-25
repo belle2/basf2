@@ -170,6 +170,9 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   TVector3 vertex = parent.getVertex();
   m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
   m_logCapture.start();
+  // we want to decay the particle so the decay time in the tree needs to be lower
+  // than whatever the daughters will get
+  parent.setDecayTime(-std::numeric_limits<float>::infinity());
   pdg = parent.getPDG();
   id = EvtPDL::evtIdFromStdHep(pdg);
   m_parent = EvtParticleFactory::particleFactory(id, m_pinit);
@@ -179,13 +182,13 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
     m_parent->setDiagonalSpinDensity();
   m_Generator->generateDecay(m_parent);
   m_logCapture.finish();
-  int iPart = addParticles2Graph(m_parent, graph, vertex, &parent);
+  int iPart = addParticles2Graph(m_parent, graph, vertex, &parent, parent.getProductionTime());
   m_parent->deleteTree();
   return iPart;
 }
 
 int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex,
-                                        MCParticleGraph::GraphParticle* parent)
+                                        MCParticleGraph::GraphParticle* parent, double timeOffset)
 {
   //Fill top particle in the tree & starting the queue:
   const int existingParticles = graph.size();
@@ -216,7 +219,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 
     //putting the daughter in the graph:
     MCParticleGraph::GraphParticle* graphDaughter = &graph.addParticle();
-    updateGraphParticle(currDaughter, graphDaughter, pPrimaryVertex);
+    updateGraphParticle(currDaughter, graphDaughter, pPrimaryVertex, timeOffset);
 
     //add relation between mother and daughter to graph:
     currMother->decaysInto((*graphDaughter));
@@ -239,7 +242,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 
 
 void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
-                                          TVector3 pPrimaryVertex)
+                                          TVector3 pPrimaryVertex, double timeOffset)
 {
   //updating the GraphParticle information from the EvtParticle information
 
@@ -257,7 +260,7 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   pVertex = pVertex + pPrimaryVertex;
 
   gParticle->setProductionVertex(pVertex(0), pVertex(1), pVertex(2));
-  gParticle->setProductionTime(Evtpos.get(0)*Unit::mm / Const::speedOfLight);
+  gParticle->setProductionTime((Evtpos.get(0)*Unit::mm / Const::speedOfLight) + timeOffset);
   gParticle->setValidVertex(true);
 
   //add PHOTOS flag

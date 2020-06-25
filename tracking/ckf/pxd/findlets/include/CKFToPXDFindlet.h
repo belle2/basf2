@@ -25,7 +25,7 @@
 #include <tracking/ckf/pxd/filters/relations/ChooseablePXDRelationFilter.h>
 #include <tracking/ckf/pxd/filters/results/ChooseablePXDResultFilter.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
 
 #include <string>
 #include <vector>
@@ -78,6 +78,8 @@ namespace Belle2 {
     unsigned int m_param_minimalHitRequirement = 1;
     /// Cut away tracks without SVD hits or not
     bool m_param_onlyUseTracksWithSVD = true;
+    /// Reverse the seed
+    bool m_param_reverseSeed = false;
 
     // Findlets
     /// Findlet for retrieving the cdc tracks and writing the result out
@@ -109,7 +111,7 @@ namespace Belle2 {
     /// States for the hits
     std::vector<CKFToPXDState> m_states;
     /// Relations between states
-    std::vector<TrackFindingCDC::WeightedRelation<CKFToPXDState>> m_relations;
+    std::vector<TrackFindingCDC::WeightedRelationPointerComparison<CKFToPXDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToPXDResult> m_results;
     /// Vector for storing the filtered results

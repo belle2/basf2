@@ -1,15 +1,7 @@
 #include <svd/modules/svdPerformance/SVDB4CommissioningPlotsModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <geometry/GeometryManager.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
-#include <list>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <boost/foreach.hpp>
@@ -320,15 +312,16 @@ void SVDB4CommissioningPlotsModule::endRun()
             dir_clusterAssigned_layer->cd();
             (h_clusterTrkCharge->getHistogram(sensor, view))->Write();
             (h_clusterTrkSNR->getHistogram(sensor, view))->Write();
+            (h_clusterTrkSize->getHistogram(sensor, view))->Write();
             (h_clusterTrkEnergy->getHistogram(sensor, view))->Write();
             (h_clusterTrkTime->getHistogram(sensor, view))->Write();
             (h_clusterTrkInterstripPos->getHistogram(sensor, view))->Write();
             dir_clusterNotAssigned_layer->cd();
             (h_clusterCharge->getHistogram(sensor, view))->Write();
             (h_clusterSNR->getHistogram(sensor, view))->Write();
+            (h_clusterSize->getHistogram(sensor, view))->Write();
             (h_clusterEnergy->getHistogram(sensor, view))->Write();
             (h_clusterTime->getHistogram(sensor, view))->Write();
-
           }
     }
 

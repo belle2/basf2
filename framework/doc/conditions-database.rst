@@ -48,10 +48,12 @@ further to ensure reproducibility of analyses: different processing iterations
 will use different globaltags. The only exceptions are the globaltag used online
 during data taking and for prompt processing of data directly after data taking:
 These two globaltags are flagged as running and information for new runs is
-constantly added to them as more data becomes available. 
+constantly added to them as more data becomes available.
 
 All globaltags to be used in analysis need to be fixed. Globaltags which are
-not fixed, i.e. "OPEN", cannot be used for data processing. Otherwise it is not possible to know exactly which conditions were used. If a globaltag in the processing chain is in "OPEN" state processing will not be possible.
+not fixed, i.e. "OPEN", cannot be used for data processing. Otherwise it is not
+possible to know exactly which conditions were used. If a globaltag in the
+processing chain is in "OPEN" state processing will not be possible.
 
 .. versionchanged:: release-04-00-00
    Prior to release-04-00-00 no check was performed on the state of globaltags
@@ -128,7 +130,8 @@ These settings can be modified by setting environment variables
 .. envvar:: BELLE2_CONDB_GLOBALTAG
 
    if set this overrides the default global tag returned by
-   `conditions.default_globaltags`. This can be a list of tags separated by white
+   `conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`.
+   This can be a list of tags separated by white
    space in which case all global tags are searched.
 
    ::
@@ -156,7 +159,7 @@ These settings can be modified by setting environment variables
 
    a whitespace separated list of urls and sqlite files to look for payload
    information. Will be used to populate
-   `conditions.metadata_providers <ConditionsConfiguration.metadata_providers`
+   `conditions.metadata_providers <ConditionsConfiguration.metadata_providers>`
 
    .. versionadded:: release-04-00-00
 
@@ -164,7 +167,7 @@ These settings can be modified by setting environment variables
 
    a whitespace separated list of directories or urls to look for payload files.
    Will be used to populate
-   `conditions.payload_locations <ConditionsConfiguration.payload_locations`
+   `conditions.payload_locations <ConditionsConfiguration.payload_locations>`
 
    .. versionadded:: release-04-00-00
 
@@ -252,26 +255,26 @@ The configuration interface changed for release-04 and the old configuration
 functions now create warnings but should still work in most cases. Only expert
 settings like custom log levels and database parameters are no longer supported.
 
-* `reset_database()`: Not really needed anymore as the default settings will be
+* `basf2.reset_database()`: Not really needed anymore as the default settings will be
   more suitable for everyone. Still works but behaves slightly different as it
   will reset to default settings instead of completely empty settings
 
-* `use_database_chain()` is no longer needed and can be removed. We now always have a list of globaltags.
+* `basf2.use_database_chain()` is no longer needed and can be removed. We now always have a list of globaltags.
 
-* `use_central_database()` should be replaced with `conditions.prepend_globaltag() <ConditionsConfiguration.prepend_globaltag>`
+* `basf2.use_central_database()` should be replaced with `conditions.prepend_globaltag() <ConditionsConfiguration.prepend_globaltag>`
 
-* `use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
+* `basf2.use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
 
-* the payloads in `localdb/database.txt` are no longer used by default, you
-  have to explicitly enable that using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.preprend_testing_payloads>`
+* the payloads in `localdb/database.txt` are no longer used by default, you have to explicitly enable that
+  using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.preprend_testing_payloads>`
 
 * you can now inspect what are the settings (``print(conditions.globaltags)``)
   and also edit that list (``conditions.globaltags += ["some", "other", "tags"]``).
   Lists are highest priority first
 
 * globaltag replay is new, see above for details about this. To disable this
-  feature you can call `conditions.disable_globaltag_replay() <ConditionsConfiguration.disable_globaltag_replay>` to revert to the
-  behavior in previous releases.
+  feature you can call `conditions.disable_globaltag_replay() <ConditionsConfiguration.disable_globaltag_replay>`
+  to revert to the behavior in previous releases.
 
 
 .. autofunction:: basf2.get_default_global_tags

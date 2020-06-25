@@ -554,7 +554,7 @@ namespace Belle2 {
     }
 
     /** Return an already created track representation of the given reco track for the PDG. You
-     * are nowt allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
+     * are not allowed to modify this TrackRep! Will return nulltpr if a trackRep is not available
      * for the given pdgCode.
      *
      * @param pdgCode PDG code of the track representations, only positive PDG numbers are allowed
@@ -729,7 +729,7 @@ namespace Belle2 {
     }
 
     /// Set the quality index attached to this RecoTrack. 0 means likely fake.
-    void setQualityIndicator(float qualityIndicator)
+    void setQualityIndicator(const float qualityIndicator)
     {
       m_qualityIndicator = qualityIndicator;
     }

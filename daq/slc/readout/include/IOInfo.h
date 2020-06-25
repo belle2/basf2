@@ -1,7 +1,6 @@
 #ifndef _Belle2_IOInfo_h
 #define _Belle2_IOInfo_h
 
-#include <string>
 #include <vector>
 
 namespace Belle2 {

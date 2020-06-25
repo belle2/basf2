@@ -164,22 +164,22 @@
 //   o   (ditto for m_TrackClusterAngle, m_TrackClusterInitialSeparationAngle,
 //        m_TrackClusterSeparationAngle, m_TrackRotationAngle)
 #pragma read \
-  sourceClass="Belle2::TrackClusterSeparation" source="double Distance" version="[-2]" \
-  targetClass="Belle2::TrackClusterSeparation" target="Distance" \
-  code = "{ Distance = onfile.Distance; }"
+  sourceClass="Belle2::TrackClusterSeparation" source="double m_Distance" version="[-2]" \
+  targetClass="Belle2::TrackClusterSeparation" target="m_Distance" \
+  code = "{ m_Distance = onfile.m_Distance; }"
 #pragma read \
-  sourceClass="Belle2::TrackClusterSeparation" source="double TrackClusterAngle" version="[-2]" \
-  targetClass="Belle2::TrackClusterSeparation" target="TrackClusterAngle" \
-  code = "{ TrackClusterAngle = onfile.TrackClusterAngle; }"
+  sourceClass="Belle2::TrackClusterSeparation" source="double m_TrackClusterAngle" version="[-2]" \
+  targetClass="Belle2::TrackClusterSeparation" target="m_TrackClusterAngle" \
+  code = "{ m_TrackClusterAngle = onfile.m_TrackClusterAngle; }"
 #pragma read \
-  sourceClass="Belle2::TrackClusterSeparation" source="double TrackClusterInitialSeparationAngle" version="[-2]" \
-  targetClass="Belle2::TrackClusterSeparation" target="TrackClusterInitialSeparationAngle" \
-  code = "{ TrackClusterInitialSeparationAngle = onfile.TrackClusterInitialSeparationAngle; }"
+  sourceClass="Belle2::TrackClusterSeparation" source="double m_TrackClusterInitialSeparationAngle" version="[-2]" \
+  targetClass="Belle2::TrackClusterSeparation" target="m_TrackClusterInitialSeparationAngle" \
+  code = "{ m_TrackClusterInitialSeparationAngle = onfile.m_TrackClusterInitialSeparationAngle; }"
 #pragma read \
-  sourceClass="Belle2::TrackClusterSeparation" source="double TrackClusterSeparationAngle" version="[-2]" \
-  targetClass="Belle2::TrackClusterSeparation" target="TrackClusterSeparationAngle" \
-  code = "{ TrackClusterSeparationAngle = onfile.TrackClusterSeparationAngle; }"
+  sourceClass="Belle2::TrackClusterSeparation" source="double m_TrackClusterSeparationAngle" version="[-2]" \
+  targetClass="Belle2::TrackClusterSeparation" target="m_TrackClusterSeparationAngle" \
+  code = "{ m_TrackClusterSeparationAngle = onfile.m_TrackClusterSeparationAngle; }"
 #pragma read \
-  sourceClass="Belle2::TrackClusterSeparation" source="double TrackRotationAngle" version="[-2]" \
-  targetClass="Belle2::TrackClusterSeparation" target="TrackRotationAngle" \
-  code = "{ TrackRotationAngle = onfile.TrackRotationAngle; }"
+  sourceClass="Belle2::TrackClusterSeparation" source="double m_TrackRotationAngle" version="[-2]" \
+  targetClass="Belle2::TrackClusterSeparation" target="m_TrackRotationAngle" \
+  code = "{ m_TrackRotationAngle = onfile.m_TrackRotationAngle; }"

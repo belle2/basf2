@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDCluster.h>
 #include <TH1.h>
 #include <string>
 #include <map>
@@ -37,16 +38,22 @@ namespace Belle2 {
 
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
-      std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits to be generated */
+      std::string m_PXDRawHitsName;  /**< The name of the StoreArray of PXDRawHits */
+      std::string m_PXDClustersName;  /**< The name of the StoreArray of PXDClusters */
 
       bool m_eachModule{false}; ///< create a histo per module
       bool m_offlineStudy{false}; ///< create histos with much finer binning and larger range
+      bool m_useClusters{false}; ///< use PXDClusters instead of Raw Hits
+      bool m_createMaxHist{false};///< create max hits histogram, not multi processing save!!
 
       /** Input array for DAQ Status. */
       StoreArray<RawFTSW> m_rawTTD;
 
       /** Input array for PXD Raw Hits. */
       StoreArray<PXDRawHit> m_storeRawHits;
+
+      /** Input array for PXD Clusters. */
+      StoreArray<PXDCluster> m_storeClusters;
 
       /** the VXD geometry */
       VXD::GeoCache& m_vxdGeometry;
@@ -59,9 +66,6 @@ namespace Belle2 {
 
       TH1F* hEOccAfterInjLER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
       TH1F* hEOccAfterInjHER{};          /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
-
-      std::map<VxdID, TH1F*> hEOccModAfterInjLER; /**<  Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
-      std::map<VxdID, TH1F*> hEOccModAfterInjHER; /**<  Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
       TH1F* hMaxOccAfterInjLER{};          /**< Histogram Max Occupancy after LER injection */
       TH1F* hMaxOccAfterInjHER{};          /**< Histogram Max Occupancy after HER injection */

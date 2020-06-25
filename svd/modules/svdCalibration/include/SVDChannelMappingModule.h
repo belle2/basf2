@@ -12,10 +12,8 @@
 #define svdchannelmappingModule_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <tracking/dataobjects/SVDIntercept.h>
@@ -23,15 +21,10 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <unordered_map>
-#include <map>
-#include <vector>
 #include <utility>
 #include <functional>
 #include <TH1.h>
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TFile.h>
-#include <iostream>
 
 namespace Belle2 {
 
@@ -58,9 +51,9 @@ namespace Belle2 {
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
-    TList* m_histoList_digits; /**< list of histograms for the strips*/
-    TList* m_histoList_clusters; /**< list of histograms for the clusters*/
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
+    TList* m_histoList_digits = nullptr; /**< list of histograms for the strips*/
+    TList* m_histoList_clusters = nullptr; /**< list of histograms for the clusters*/
 
   private:
 

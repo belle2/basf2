@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<AeroTilesAlignment>
+  <Slot id="1">
+    <r desc="alignment in r" unit="mm">0.0</r>
+    <phi desc="alignment in phi" unit="deg">0.0</phi>
+    <z desc="alignment in z" unit="mm">0.0</z>
+    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+    <beta desc="y angle alignment" unit="deg">0.0</beta>
+    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+  </Slot>
+ <Slot id="2">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="3">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="4">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="5">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="6">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="7">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="8">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="9">
+    <r desc="alignment in r" unit="mm">0.0</r>
+    <phi desc="alignment in phi" unit="deg">0.0</phi>
+    <z desc="alignment in z" unit="mm">0.0</z>
+    <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+    <beta desc="y angle alignment" unit="deg">0.0</beta>
+    <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="10">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="11">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="12">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="13">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="14">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="15">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="16">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="17">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+ <Slot id="18">
+   <r desc="alignment in r" unit="mm">0.0</r>
+   <phi desc="alignment in phi" unit="deg">0.0</phi>
+   <z desc="alignment in z" unit="mm">0.0</z>
+   <alpha desc="x angle alignment" unit="deg">0.0</alpha>
+   <beta desc="y angle alignment" unit="deg">0.0</beta>
+   <gamma desc="z angle alignment" unit="deg">0.0</gamma>
+ </Slot>
+</AeroTilesAlignment>

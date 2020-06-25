@@ -109,6 +109,21 @@ running check_22_real_mc: Check that merging fails if real and MC data are mixed
 [ERROR] Type (real/MC) for "test2.root" differs from previous files.
 [WARNING] File "test2.root" is empty.
 check_22_real_mc passed
+running check_23_legacy_ip: Check that we can merge if the Legacy_IP_Information is inconsistent
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_23_legacy_ip passed
+running check_24_legacy_ip_middle: Check that we can merge if the Legacy_IP_Information is inconsistent
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_24_legacy_ip_middle passed
+running check_25_legacy_ip_only: Check that we can merge if the Legacy_IP_Information is inconsistent
+[WARNING] File "test1.root" is empty.
+[WARNING] File "test2.root" is empty.
+[WARNING] All Files were empty
+check_25_legacy_ip_only passed
 running check_XX_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
     affect merge_basf2_files and adapt the correct version number here.

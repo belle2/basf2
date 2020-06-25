@@ -17,32 +17,36 @@ using namespace Belle2;
 ClusterUtils::ClusterUtils() = default;
 
 // -----------------------------------------------------------------------------
-const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo, double mass)
+const TLorentzVector ClusterUtils::GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
+{
+  // Use the geometry origin (0,0,0) and *not* the IP position
+  return Get4MomentumFromCluster(cluster, TVector3(0.0, 0.0, 0.0), hypo);
+}
+
+const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
 
   // Use the default vertex from the beam parameters if none is given.
-  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo, mass);
+  return Get4MomentumFromCluster(cluster, GetIPPosition(), hypo);
 }
 
 const TLorentzVector ClusterUtils::Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                           ECLCluster::EHypothesisBit hypo, double mass)
+                                                           ECLCluster::EHypothesisBit hypo)
 {
 
   // Get particle direction from vertex and reconstructed cluster position.
   TVector3 direction = cluster->getClusterPosition() - vertex;
 
-  const double E  = cluster->getEnergy(hypo);
-  double p = sqrt(E * E - mass * mass);
-  if (std::isnan(p)) // then the cluster was less energetic than the mass provided
-    p = std::numeric_limits<double>::quiet_NaN();
-  const double px = p * sin(direction.Theta()) * cos(direction.Phi());
-  const double py = p * sin(direction.Theta()) * sin(direction.Phi());
-  const double pz = p * cos(direction.Theta());
+  // Always ignore mass here (even for neutral hadrons) therefore the magnitude
+  // of the momentum is equal to the cluster energy under this hypo.
+  const double E  = cluster->getEnergy(hypo); //must not be changed or clusterE getters will be wrong
+  const double px = E * sin(direction.Theta()) * cos(direction.Phi());
+  const double py = E * sin(direction.Theta()) * sin(direction.Phi());
+  const double pz = E * cos(direction.Theta());
 
   const TLorentzVector l(px, py, pz, E);
   return l;
 }
-
 
 // -----------------------------------------------------------------------------
 
@@ -77,8 +81,6 @@ const TMatrixDSym ClusterUtils::GetCovarianceMatrix4x4FromCluster(const ECLClust
   const double energy = cluster->getEnergy(hypo);
   const double theta  = cluster->getTheta();
   const double phi    = cluster->getPhi();
-  // FIXME propagate possibly massive particles through the Jacobian
-  //const double p      = sqrt(energy * energy - mass * mass); // momentum
 
   const double st  = sin(theta);
   const double ct  = cos(theta);

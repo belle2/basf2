@@ -19,11 +19,10 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
+[INFO] ===Error Summary================================================================
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
-
+[WARNING] in total, 1 warnings occurred during processing
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
@@ -43,11 +42,10 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
+[INFO] ===Error Summary================================================================
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
-
+[WARNING] in total, 1 warnings occurred during processing
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
@@ -64,11 +62,10 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
+[INFO] ===Error Summary================================================================
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
-
+[WARNING] in total, 1 warnings occurred during processing
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
@@ -84,11 +81,10 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
+[INFO] ===Error Summary================================================================
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
-
+[WARNING] in total, 1 warnings occurred during processing
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
@@ -101,11 +97,10 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
+[INFO] ===Error Summary================================================================
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
-
+[WARNING] in total, 1 warnings occurred during processing
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
@@ -117,11 +112,10 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
+[INFO] ===Error Summary================================================================
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
-
+[WARNING] in total, 1 warnings occurred during processing
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
@@ -132,11 +126,10 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
+[INFO] ===Error Summary================================================================
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
-
+[WARNING] in total, 1 warnings occurred during processing
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems
@@ -146,11 +139,10 @@
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] EvtMetaDataTest::endRun()
 [INFO] EvtMetaDataTest::terminate()
-[INFO] ================================================================================
-[INFO] Error summary: 0 errors and 1 warnings occurred.
+[INFO] ===Error Summary================================================================
 [WARNING] Event processing stopped by module 'EvtMetaDataTest', which is not in control of event processing (does not provide EventMetaData)
 [INFO] ================================================================================
-
+[WARNING] in total, 1 warnings occurred during processing
 [INFO] event	run	exp
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems

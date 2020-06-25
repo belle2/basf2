@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -37,12 +36,8 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-import variables.collections as vc
-import variables.utils as vu
 import stdCharged as stdc
 from stdPi0s import stdPi0s
-
-b2.conditions.disable_globaltag_replay()
 
 # create path
 my_path = b2.create_path()
@@ -60,14 +55,14 @@ stdc.stdPi(listtype='loose', path=my_path)
 stdc.stdK(listtype='loose', path=my_path)
 
 
-stdPi0s(listtype='looseFit', path=my_path)
+stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
 
 # 1. reconstruct D0 in multiple decay modes
 ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
                     cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
                     dmID=1,
                     path=my_path)
-ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:looseFit',
+ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:eff40_Jan2020Fit',
                     cut='1.8 < M < 1.9 and 2.5 < useCMSFrame(p) < 5.5',
                     dmID=2,
                     path=my_path)
@@ -91,7 +86,7 @@ ma.reconstructDecay(decayString='D_s+:kkpi -> K-:loose K+:loose pi+:loose',
                     dmID=1,
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='D0:all', path=my_path)
 ma.matchMCTruth(list_name='D+:kpipi', path=my_path)
 ma.matchMCTruth(list_name='D_s+:kkpi', path=my_path)

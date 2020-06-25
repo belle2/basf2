@@ -102,6 +102,7 @@ void ProcessStatisticsPython::clear()
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
 //used to make python aware of default arguments
+// cppcheck-suppress unknownMacro
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getStatistics_overloads, getStatisticsString, 0, 1)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getModuleStatistics_overloads, getModuleStatistics, 1, 2)
 #if !defined(__GNUG__) || defined(__ICC)

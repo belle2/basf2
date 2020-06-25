@@ -74,7 +74,7 @@ namespace Belle2 {
 
     private:
 
-      StoreArray<BeamabortHit> m_beamabortHit; /** Array for BemaabortHit */
+      StoreArray<BeamabortHit> m_beamabortHit; /**< Array for BemaabortHit */
 
       /** Work function */
       double m_WorkFunction;

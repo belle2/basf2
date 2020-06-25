@@ -69,7 +69,7 @@ namespace Belle2 {
 
     private:
 
-      StoreArray<BgoHit> m_bgoHit; /** Array for Bgo Hits */
+      StoreArray<BgoHit> m_bgoHit; /**< Array for Bgo Hits */
 
 
       /** reads data from BGO.xml: threshold in MeV, range in MeV, and resolution in % */

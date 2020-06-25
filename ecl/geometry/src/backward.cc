@@ -6,6 +6,7 @@
 #include <G4VisAttributes.hh>
 #include <G4Box.hh>
 #include <G4AssemblyVolume.hh>
+#include <G4Region.hh>
 #include <G4TwoVector.hh>
 #include <G4PVReplica.hh>
 #include "G4UserLimits.hh"
@@ -81,9 +82,15 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
   G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, Materials::get("G4_AIR"),
                                                              "innervolume_logical", 0, 0, 0);
   innervolume_logical->SetVisAttributes(att("air"));
-  auto gpvbp = new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), innervolume_logical, "ECLBackwardPhysical", top, false,
-                                 0,
-                                 0);
+
+  // Set up region for production cuts
+  G4Region* aRegion = new G4Region("ECLBackwardEnvelope");
+  innervolume_logical->SetRegion(aRegion);
+  aRegion->AddRootLogicalVolume(innervolume_logical);
+
+  auto gpvbp = new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI),
+                                 innervolume_logical, "ECLBackwardPhysical",
+                                 top, false, 0, 0);
   if (overlap) gpvbp->CheckOverlaps(npoints);
 
   G4VSolid* innervolumesector_solid = new BelleLathe("innervolumesector_solid", -M_PI / 8, M_PI / 4, contour_in);

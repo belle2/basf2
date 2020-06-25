@@ -9,15 +9,11 @@
 //-
 
 #include <string>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
 
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFSharedMem.h"
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFLogManager.h"
-#include "daq/rfarm/manager/RFNSM.h"
 #include "daq/rfarm/manager/RFFlowStat.h"
 
 #include "framework/pcore/RingBuffer.h"

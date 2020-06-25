@@ -117,7 +117,7 @@ namespace Belle2 {
       // d2pdE2, d2ptsE2;
 
       /// Adjust E, theta and phi such that E>=m, 0<=theta<=pi, -pi <= phi < pi; returns true if anything was changed
-      static bool adjustEThetaPhi(double& m, double& E, double& theta, double& phi);
+      static bool adjustEThetaPhi(const double& m, double& E, double& theta, double& phi);
 
       /// Calculate chi2
       //    double calcChi2 () const;

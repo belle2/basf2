@@ -14,22 +14,13 @@
 
 
 #include <framework/core/Module.h>
-#include <TTree.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationIndex.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <TList.h>
-#include <svd/geometry/SensorInfo.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TGraphErrors.h>
-#include <TCanvas.h>
-#include <TLegend.h>
 
 
 namespace Belle2 {

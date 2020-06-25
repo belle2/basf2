@@ -7,21 +7,10 @@
 //        26 - Apr - 2012, for Belle II RFARM
 //-
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <signal.h>
-#include <sys/time.h>
-
-#include <vector>
 #include <string>
 
 #include "framework/pcore/RingBuffer.h"
-#include "daq/dataflow/REvtSocket.h"
+#include "daq/dataflow/RSocketLib.h"
 #include "daq/rfarm/manager/RFFlowStat.h"
 
 #define MAXBUFSIZE 20000000
@@ -40,9 +29,9 @@ public:
   int Reconnect(int ntry);
 
 private:
-  RingBuffer* m_rbuf;
-  RSocketRecv* m_sock;
-  RFFlowStat* m_flow;
+  Belle2::RingBuffer* m_rbuf;
+  Belle2::RSocketRecv* m_sock;
+  Belle2::RFFlowStat* m_flow;
   char* m_evtbuf;
   int* m_buf;
 

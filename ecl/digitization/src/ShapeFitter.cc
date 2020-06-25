@@ -182,17 +182,12 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
         B2 = B1 >> (k_b - 11);
         B5 = B1 >> (k_b - 9);
 
-
-        //B1 = B2 >> 13; //Variable 'B1' is reassigned a value before the old one has been used. (TF)
         B2 += (A1 << 11);
         B3 = (B2 / A1);
-
 
         T = ((it) << 3) + ((it) << 2) + ((B3 + 1) >> 1) + B3 - 3072;
 
         T = ((215 - *ttrig2) << 3) - 4 - T;
-
-
 
         B1 = B5 >> 9;
         B5 += (A1 << 9);
@@ -200,7 +195,6 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
         it += ((B3 + 1) >> 1) - 256;
         it = it > it_h ? it_h : it;
         it = it < it_l ? it_l : it;
-
 
         T = T > 2046 ?  2047 : T;
 
@@ -234,9 +228,8 @@ lam:
     C1 += (1 << (k_c - 1));
     C1 >>= k_c;
   }
-  ch2 = (A1** (f + it * 16) + B1** (f1 + it * 16)) >> k1_chi;
-  ch2 += C1;
-  //  ch2 = z0 - *n16 * ch2;
+
+
   ch2 = z00 - *n16 * C1;
   ch1 = ((ch2) * (ch2));
   ch1 = ch1 * k_np[*n16 - 1];

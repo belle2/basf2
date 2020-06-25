@@ -23,7 +23,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(const string& mcCollectionName,
 {
   m_mcParticleGenerator = new MCParticleGenerator(mcCollectionName, mcParticleGraph);
   if (false) {
-    G4Event* event;
+    G4Event* event = nullptr;
     GeneratePrimaries(event);
   }
 }

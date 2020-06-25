@@ -7,7 +7,7 @@ Tree Fitter
 
 The TreeFitter is a global fitting tool to simultaneously fit an entire decay chain. It tries to find the best decay vertex positions and momenta for the given decay hypothesis. Final state particles will be constrained to their masses, meaning no energy is extracted from the fit but pdg-mass and momentum measurement are used to determine it (same as track fitting procedure). The fit extracts the 4-momenta (->including energy) and decay vertex positions of intermediate particles. If an intermediate particle has a flight length less than :math:`1~\mu m` - for example a strongly decaying hadronic resonance - its decay and production vertex will be merged. The production vertex is the decay vertex of the mother particle. Note that the other fitters do not do this.
 
-The fit tries to find the solutions to a system of equations or at least the solution closest to the measurement given the measurement uncertainty and noise. The distance between (linearised) hypothesis and measurement is calculated using :math:`\chi^2 = \sum \frac{h-m}{\sigma}` the final goodness of the fit then can be evaluated using the p-value defined as the incomplete (lower = 1 - upper) gamma function of the :math:`\chi^2` and degrees of freedom :math:`r` devided by two: 
+The fit tries to find the solutions to a system of equations or at least the solution closest to the measurement given the measurement uncertainty and noise. The distance between (linearised) hypothesis and measurement is calculated using :math:`\chi^2 = \sum \frac{h-m}{\sigma}` the final goodness of the fit then can be evaluated using the p-value defined as the incomplete (lower = 1 - upper) gamma function of the :math:`\chi^2` and degrees of freedom :math:`r` divided by two:
 :math:`1 -\int^{ \frac{\chi^2}{2} }_{0} t^{r/2-1} e^{-t} dt~/~\Gamma(\frac{r}{2}).` 
 
 This quantity denotes the probability the observed :math:`\chi^2` exceeds the expectations for a correct model by chance (see ROOT documentation ``TMath::Prob(Double_t chi2,Int_t ndf)``).
@@ -38,14 +38,20 @@ Usage:
 ######
 
 The user reconstructs the desired decay chain and then passes the head of the tree to the vertex fitter. So when you are reconstructing :math:`B->D(K \pi)\pi` the list name of the B-meson has to be passed and the fit fits everything down the stream. 
-The vertex fitter has a convenience function: `vertex.vertexTree`.
+The vertex fitter has a convenience function: `vertex.treeFit`.
 
+
+.. hint:: The TreeFit will most likely change the kinematic properties of the decay head (mother) and,
+          if the option ``updateAllDaughters`` is turned on, also of the daughter particles.
+          To store the quantities prior to the TreeFit and be able to write them out to a ntuple for further analysis
+          it is recommended to run `variablesToExtraInfo` before the TreeFit.
 
 Parameters of the convenience function
 ######################################
+
 Import and use the convenience function:
 
-.. autofunction:: vertex.vertexTree
+.. autofunction:: vertex.treeFit
    :noindex:
 
 All other parameters are the same as for the module, see below.
@@ -71,7 +77,7 @@ To use the module add it to the path::
    :modules: TreeFitter
    :noindex:
 
-There are more parameters which are based on optimisations we made. I strongly recommend to not touch them.
+There are more parameters which are based on optimisations we made. It is strongly recommended to not touch them.
 
 FAQ:
 ####

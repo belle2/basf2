@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/gearbox/GearDir.h>
 #include <TObject.h>
 #include <string>
 #include <vector>

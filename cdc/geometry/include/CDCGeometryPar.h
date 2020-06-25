@@ -214,12 +214,12 @@ namespace Belle2 {
        */
       void calcMeanT0();
 
-      /**
-       * Read bad-wires (from a file).
-       * @param GearDir Gear Dir.
-       * @param mode 0: read simulation file, 1: read reconstruction file.
-       */
-      void readBadWire(const GearDir, int mode = 0);
+      //      /**
+      //       * Read bad-wires (from a file).
+      //       * @param GearDir Gear Dir.
+      //       * @param mode 0: read simulation file, 1: read reconstruction file.
+      //       */
+      //      void readBadWire(const GearDir, int mode = 0);
 
       /**
        * Set bad-wires (from DB)
@@ -576,6 +576,29 @@ namespace Belle2 {
         return iret;
       }
 
+      //! Returns frontend channel id. corresponding to the wire id.
+      /*!
+      \param wireID   wire  id.
+      \return         channel id. (0-47)
+      */
+      unsigned short getChannelID(const WireID& wID) const
+      {
+        std::map<WireID, unsigned short>::const_iterator it = m_wireToChannel.find(wID);
+        unsigned short iret = (it != m_wireToChannel.end()) ? it->second : -999;
+        return iret;
+      }
+
+      //! Returns wire id. corresponding to the board-and-cannel ids.
+      /*!
+      \param bd board   id. (1-300)
+      \param ch channel id. (0-47)
+      \return   wire    id.
+      */
+      const WireID getWireID(unsigned short bd, unsigned short ch) const
+      {
+        return WireID(m_boardAndChannelToWire[bd][ch]);
+      }
+
       //! Returns time-walk
       /*!
       \param wireID   wire id
@@ -808,12 +831,33 @@ namespace Belle2 {
       }
 
       /**
-       * Inquire if the wire is bad
+       * Inquire if the wire is totally-dead
        */
       inline bool isBadWire(const WireID& wid)
       {
-        std::vector<unsigned short>::iterator it = std::find(m_badWire.begin(), m_badWire.end(), wid.getEWire());
-        bool torf = (it != m_badWire.end()) ? true : false;
+        //        std::map<unsigned short, float>::iterator it = m_badWire.find(wid.getEWire());
+        //        bool torf = (it != m_badWire.end()) ? true : false;
+        //        return torf;
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isBadWire(wid) : false;
+        return torf;
+
+      }
+
+      /**
+       * Inquire if the wire is dead
+       */
+      inline bool isDeadWire(const WireID& wid, double& eff)
+      {
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isDeadWire(wid, eff) : false;
+        return torf;
+      }
+
+      /**
+       * Inquire if the wire is hot
+       */
+      inline bool isHotWire(const WireID& wid)
+      {
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isHotWire(wid) : false;
         return torf;
       }
 
@@ -1100,8 +1144,10 @@ namespace Belle2 {
       double m_meanT0;  /*!< mean t0 over all wires; should be double. */
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
+      std::map<WireID, unsigned short> m_wireToChannel; /*!< map relating wire-id and channel-id. */
+      unsigned short m_boardAndChannelToWire[nBoards][48]; /*!< array relating board-channel-id and wire-id. */
 
-      std::vector<unsigned short> m_badWire;  /*!< list of bad-wires. */
+      //      std::map<unsigned short, float> m_badWire;  /*!< list of bad-wires. */
 
       unsigned short m_tdcOffset;  /*!< Not used; to be removed later. */
       double m_clockFreq4TDC;      /*!< Clock frequency used for TDC (GHz). */

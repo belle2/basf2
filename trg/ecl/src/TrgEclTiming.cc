@@ -15,8 +15,6 @@
 #define TRGECLCLUSTER_SHORT_NAMES
 #include <framework/gearbox/Unit.h>
 
-
-#include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEclTiming.h"
 
 using namespace std;

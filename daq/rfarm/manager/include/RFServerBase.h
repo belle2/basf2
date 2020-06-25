@@ -10,6 +10,7 @@
 //-
 
 #include "daq/rfarm/manager/RfNodeInfo.h"
+#include <nsm2/nsm2.h>
 
 namespace Belle2 {
   class RFServerBase {

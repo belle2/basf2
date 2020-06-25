@@ -8,13 +8,9 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
 #include <TFileMerger.h>
-#include <TFile.h>
-#include <Riostream.h>
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 #include <daq/rfarm/event/hltsocket/HLTFile.h>
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

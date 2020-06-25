@@ -89,7 +89,11 @@ run = int(run)
 
 
 class configImporterToDBModule(Module):
+    '''detector configuration importer'''
+
     def beginRun(self):
+        '''begin run'''
+
         # call the importer class
         configImporterToDB = SVDDetectorConfigurationImporter(experiment, run, experiment, -1)
         if args.calib is not None:

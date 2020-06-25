@@ -13,8 +13,6 @@
 
 #include <framework/core/Module.h>
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -29,14 +27,6 @@
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
-#include <TCollection.h>
-#include <TList.h>
-#include <TH3F.h>
-
-// forward declarations
-class TTree;
-class TFile;
 
 namespace Belle2 {
 
@@ -212,7 +202,6 @@ namespace Belle2 {
 
     bool isRelatedToTrack(SVDIntercept* inter); /**< is the intercept related to a track */
 
-    bool fitResiduals(TH1F* res); /**< is the fit to residuals good? */
   };
 }
 

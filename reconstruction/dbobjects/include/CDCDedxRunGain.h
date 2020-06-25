@@ -43,7 +43,7 @@ namespace Belle2 {
     {
       m_gain *= rhs.getRunGain();
       return *this;
-    }
+    };
 
     /** Return run gain
      * @return run gain
@@ -51,7 +51,7 @@ namespace Belle2 {
     double getRunGain() const {return m_gain; };
 
     /** Set run gain
-     * @param run gain
+     * @param gain
      */
     void setRunGain(double gain) {m_gain = gain; };
 

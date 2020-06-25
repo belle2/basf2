@@ -14,7 +14,7 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>
 

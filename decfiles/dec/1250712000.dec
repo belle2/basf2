@@ -1,0 +1,27 @@
+# EventType: 1250712000
+# Descriptor: [B+ -> pi0 l nu ]cc
+# NickName: Bu_pi0lnu
+# Documentation: B+ -> pi0 l nu process
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Svenja Granderath, Mario Merola
+# Email: granderath@physik.uni-bonn.de, mario.merola@na.infn.it
+# Cuts: None
+# Date: 20191208
+#
+#
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+
+Decay B+sig
+0.000078   pi0     e+      nu_e             BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
+0.000078   pi0     mu+     nu_mu            BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
+Enddecay
+CDecay B-sig
+
+#
+End

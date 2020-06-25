@@ -33,9 +33,9 @@ namespace Belle2 {
       PXDRawHitMaskingModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the filtering */
-      virtual void event();
+      virtual void event() override;
 
     private:
       StoreArray<PXDRawHit> m_pxdRawHit; /**< Required input for  PXDRawHit */

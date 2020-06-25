@@ -72,14 +72,17 @@ namespace Belle2 {
       /**
        * Check whether polygon has an intersection with a polygon
        * or one of the polygons is fully inside another polygon.
-       * @param[in] lineSegment Line segment.
+       * @param[in] polygon Polygon.
        */
       bool hasIntersection(const Polygon2D& polygon) const;
 
       /**
        * Get line segments.
        */
-      LineSegment2D** getLineSegments() const;
+      LineSegment2D** getLineSegments() const
+      {
+        return m_LineSegments;
+      }
 
     private:
 

@@ -8,11 +8,10 @@ larger file) that is present on the buildbot server but not bamboo
 """
 
 import b2test_utils
-from basf2 import set_random_seed, create_path, process, conditions
+from basf2 import set_random_seed, create_path, process
 
 # make logging more reproducible by replacing some strings
 b2test_utils.configure_logging_for_tests()
-conditions.disable_globaltag_replay()
 set_random_seed("1337")
 testinput = [b2test_utils.require_file('analysis/tests/mdst.root')]
 fsps = ['K-', 'pi-', 'gamma', 'K_L0']
@@ -36,13 +35,42 @@ roe_path = create_path()
 v0list = 'K_S0 -> pi+ pi-'
 roe_path.add_module('ParticleLoader', decayStringsWithCuts=[(v0list, '')])
 
+roe_path.add_module('ParticleLoader', decayStringsWithCuts=[('mu+:roe',
+                                                             'isInRestOfEvent == 1 and isSignal == 1')])
+
 roe_path.add_module('RestOfEventUpdater',
                     particleList=v0list.split(' ->', 1)[0],
                     updateMasks=[mask[0]])
 roe_path.add_module('RestOfEventPrinter',
                     maskNames=[mask[0]],
                     fullPrint=False)
+
+jpsi_roe_list = 'J/psi:roe'
+roe_path.add_module('ParticleCombiner',
+                    decayString=jpsi_roe_list+' -> mu+:roe mu-:roe',
+                    cut='')
+
+roe_path.add_module('RestOfEventBuilder', particleList=jpsi_roe_list,
+                    createNestedROE=True, nestedROEMask=mask[0])
+
+# --------------------------------------------------------------------------- #
+nested_roe_path = create_path()
+
+nested_roe_path.add_module('RestOfEventPrinter',
+                           fullPrint=False)
+
+roe_path.for_each('RestOfEvent', 'NestedRestOfEvents', path=nested_roe_path)
+# --------------------------------------------------------------------------- #
+
+nested_list = 'B+:other'
+roe_path.add_module('ParticleLoader',
+                    decayStringsWithCuts=[(nested_list+' -> '+jpsi_roe_list, '')],
+                    useROEs=True)
+
+roe_path.add_module('ParticleStats', particleLists=[nested_list])
+roe_path.add_module('ParticlePrinter', listName=nested_list, fullPrint=True)
+
 testpath.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
 ###############################################################################
 
-process(testpath, 1)
+process(testpath, 5)

@@ -6,7 +6,7 @@
 #include <framework/datastore/RelationArray.h>
 
 #include <framework/dataobjects/FileMetaData.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <pxd/dataobjects/PXDTrueHit.h>

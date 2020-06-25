@@ -61,6 +61,9 @@ namespace Belle2 {
        */
       Weight operator()(const Object& object) final;
 
+      /// Const version of operator
+      Weight operator()(const Object& object) const;
+
     public:
       /// Return name of the selected filter
       std::string getFilterName() const

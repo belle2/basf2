@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Chunhua Li, Thomas Hauth, Nils Braun                     *
+ * Contributors: Chunhua Li, Thomas Hauth, Nils Braun, Markus Prim        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -50,8 +50,14 @@ namespace Belle2 {
       // Parameters
       /// Which cuts should be reported? Please remember to include the total_result also, if wanted.
       std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiers;
+      /// Which cuts should be ignored? This can be used to clear trigger lines from e.g. bhabha contamination.
+      std::map<std::string, std::vector<std::string>> m_param_cutResultIdentifiersIgnored;
       /// Which L1 cuts should be reported?
       std::vector<std::string> m_param_l1Identifiers;
+      /// Create total result histogram?
+      bool m_param_create_total_result_histograms;
+      /// Create exp/run/event number histograms?
+      bool m_param_create_exp_run_event_histograms;
 
       /// Which variables should be reported?
       std::vector<std::string> m_param_variableIdentifiers;

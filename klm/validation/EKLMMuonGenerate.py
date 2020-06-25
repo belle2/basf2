@@ -42,7 +42,7 @@ g4sim = register_module('FullSim')
 
 # EKLM Modules
 klmDigitizer = register_module('KLMDigitizer')
-eklmReconstructor = register_module('EKLMReconstructor')
+klmReconstructor = register_module('KLMReconstructor')
 
 # Output
 output = register_module('RootOutput')
@@ -59,7 +59,7 @@ main.add_module(geometry)
 main.add_module(g4sim)
 
 main.add_module(klmDigitizer)
-main.add_module(eklmReconstructor)
+main.add_module(klmReconstructor)
 
 main.add_module(output)
 

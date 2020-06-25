@@ -47,5 +47,10 @@ namespace Belle2 {
      */
     std::string particleListName(int pdgCode, const std::string& label);
 
+    /**
+     * Returns electric charge of a particle with given pdg code.
+     */
+    double charge(int pdgCode);
+
   }  // namespace EvtPDLUtil
 }  // namespace Belle2

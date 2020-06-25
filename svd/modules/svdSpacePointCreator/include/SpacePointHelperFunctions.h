@@ -12,17 +12,14 @@
 
 #include <vector>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/dataobjects/SVDCluster.h>
+
+#include <framework/datastore/StoreArray.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
-
 #include <unordered_map>
-
-#include <type_traits>
 
 #include <TH2.h>
 #include <math.h>
@@ -104,6 +101,14 @@ namespace Belle2 {
           B2DEBUG(1, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
           continue;
         }
+
+        if (! clusterCal.areClusterTimesCompatible(vCluster->getSensorID(), uCluster->getClsTime(), vCluster->getClsTime())) {
+          B2DEBUG(1, "Cluster combination rejected due to timing cut. Cluster time U (" << uCluster->getClsTime() <<
+                  ") is incompatible with Cluster time V (" << vCluster->getClsTime() << ")");
+          continue;
+        }
+
+
         foundCombinations.push_back({uCluster, vCluster});
 
 

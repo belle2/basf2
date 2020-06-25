@@ -21,7 +21,9 @@ if [ -f "file.list" ]; then
 fi
 
 i=0
-for folder in /group/belle2/dataprod/Data/release-04-00-02/DB00000748/proc10/e0008/4S/r*;
+#for folder in /group/belle2/dataprod/Data/release-04-00-02/DB00000748/proc10/e0008/4S/r*;
+for folder in /group/belle2/dataprod/dp_managers/ddossett/airflow/output_data/43/hlt_hadron/e10/r*;
+#/group/belle2/dataprod/dp_managers/ddossett/airflow/output_data/43/hlt_hadron/e10/r3605/sub00
 do
   IFS='/' read -r -a array <<< "${folder}"
   run="${array[@]: -1:1}"
@@ -30,17 +32,23 @@ do
   if [ -f "eachrun_${run_number}.txt" ]; then
     rm -rf eachrun_${run_number}.txt
   fi
-  if [ -d "${folder}/skim/hlt_hadron/cdst/sub00/" ]; then
+  #if [ -d "${folder}/skim/hlt_hadron/cdst/sub00/" ]; then
+  if [ -d "${folder}/sub00/" ]; then
     j=0
-    for f in ${folder}/skim/hlt_hadron/cdst/sub00/*.root;
+    #for f in ${folder}/skim/hlt_hadron/cdst/sub00/*.root;
+    for f in ${folder}/sub00/*.root;
     do
       ls ${f} >> ${OUTPUTLIST}/eachrun_${run_number}.txt
       (( j += 1 ))
     done
   fi
-  file="${folder}/skim/hlt_hadron/cdst/sub00/cdst.physics.0008.${run_number}.HLT*"
+  #cdst.physics.0010.03605.HLT0.hlt_hadron.f00000.root
+  #file="${folder}/skim/hlt_hadron/cdst/sub00/cdst.physics.0008.${run_number}.HLT*"
+  #file="${folder}/sub00/cdst.physics.0008.${run_number}.HLT*"
+  file="${folder}/sub00/cdst.physics.0010.${run_number}.HLT*"
   echo "FILE: ${file}"
-  if [ -d "${folder}/skim/hlt_hadron/cdst/sub00/" ]; then
+  #if [ -d "${folder}/skim/hlt_hadron/cdst/sub00/" ]; then
+  if [ -d "${folder}/sub00/" ]; then
     echo "${file}" >> ${OUTPUTLIST}/file.list  
   fi
   (( i += 1))

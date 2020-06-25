@@ -70,7 +70,7 @@ class DigitsTest(Module):
             assert abs(digit.getTimeError() - digitUnpacked.getTimeError()) < precision
             assert digit.getPulseHeight() == digitUnpacked.getPulseHeight()
             assert abs(digit.getPulseWidth() - digitUnpacked.getPulseWidth()) < precision
-            assert digit.getIntegral() == digitUnpacked.getIntegral()
+            # assert digit.getIntegral() == digitUnpacked.getIntegral()
             assert digit.getFirstWindow() == digitUnpacked.getFirstWindow()
             assert digit.getHitQuality() == digitUnpacked.getHitQuality()
             assert digit.getStatus() == digitUnpacked.getStatus()
@@ -144,7 +144,7 @@ class RawDigitsTest(Module):
             assert digit.getValuePeak() == digitUnpacked.getValuePeak()
             assert digit.getValueFall0() == digitUnpacked.getValueFall0()
             assert digit.getValueFall1() == digitUnpacked.getValueFall1()
-            assert digit.getIntegral() == digitUnpacked.getIntegral()
+            # assert digit.getIntegral() == digitUnpacked.getIntegral()
             assert digit.getRevo9Counter() == digitUnpacked.getRevo9Counter()
             assert digit.getPhase() == digitUnpacked.getPhase()
             assert digit.getErrorFlags() == digitUnpacked.getErrorFlags()

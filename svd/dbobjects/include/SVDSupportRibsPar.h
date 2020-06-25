@@ -44,10 +44,10 @@ namespace Belle2 {
     double getLength() const { return m_length; }
 
   private:
-    double m_theta;
-    double m_zpos;
-    double m_rpos;
-    double m_length;
+    double m_theta; /**< theta angle*/
+    double m_zpos; /**< position in z*/
+    double m_rpos; /**< position in r*/
+    double m_length; /**< length*/
 
     ClassDef(SVDSupportBoxPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

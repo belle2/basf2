@@ -3,7 +3,8 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Lu Cao                                                   *
+ * Contributors: Lu Cao and Chaoyi Lyu                                    *
+ *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

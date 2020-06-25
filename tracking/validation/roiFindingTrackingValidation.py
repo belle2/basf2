@@ -219,7 +219,7 @@ path = basf2.create_path()
 
 path.add_module('EventInfoSetter', evtNumList=N_EVENTS)
 path.add_module('EvtGenInput')
-add_simulation(path, usePXDDataReduction=False)
+add_simulation(path, forceSetPXDDataReduction=True, usePXDDataReduction=False)
 add_svd_reconstruction(path, isROIsimulation=True)
 
 #    path.add_module('RootInput', inputFileName=INPUT_FILE, entrySequences=["0:{}".format(N_EVENTS-1)])

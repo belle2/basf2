@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Sergei Gribanov, Mikhail Remnev                          *
@@ -10,7 +10,6 @@
 
 // ECL
 #include <ecl/utility/ECLDspUtilities.h>
-#include <ecl/utility/ECLDspEmulator.h>
 #include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/dbobjects/ECLDspData.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
@@ -245,7 +244,7 @@ short int* vectorsplit(std::vector<short int>& vectorFrom, int channel)
   return (vectorFrom.data() + (size / 16) * (channel - 1));
 }
 
-ECLDigit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttrig)
+ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttrig)
 {
   ECLChannelMapper mapper;
   mapper.initFromDB();
@@ -297,30 +296,18 @@ ECLDigit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttrig)
   //== Get thresholds
   DBObjPtr<ECLCrystalCalib> thr_LowAmp("ECL_FPGA_LowAmp");
   DBObjPtr<ECLCrystalCalib> thr_HitThresh("ECL_FPGA_HitThresh");
+  DBObjPtr<ECLCrystalCalib> thr_StoreDigit("ECL_FPGA_StoreDigit");
 
   int A0 = thr_LowAmp->getCalibVector()[cid - 1];
   int Ahard = thr_HitThresh->getCalibVector()[cid - 1];
+  int Askip = thr_StoreDigit->getCalibVector()[cid - 1];
 
   //== Perform fit
-  int ampFit, timeFit, qualityFit;
+  auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
+                       Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2,
+                       chi_thres);
 
-  lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0, Ahard, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres,
-         ampFit, timeFit, qualityFit);
-
-  //== Return fit results
-  ECLDigit ret;
-  ret.setCellId(cid);
-  ret.setAmp(ampFit);
-  ret.setQuality(qualityFit);
-  if (qualityFit != 2) {
-    ret.setTimeFit(timeFit);
-    ret.setChi(0);
-  } else {
-    ret.setTimeFit(0);
-    ret.setChi(timeFit);
-  }
-
-  return ret;
+  return result;
 }
 
 

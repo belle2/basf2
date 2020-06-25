@@ -10,13 +10,13 @@
 
 #include <simulation/kernel/StackingAction.h>
 #include <simulation/kernel/UserInfo.h>
-#include <framework/logging/Logger.h>
 
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTypes.hh>
 #include <G4Track.hh>
-#include <G4RunManager.hh>
+#include <G4VProcess.hh>
 
+#include <TRandom.h>
 
 using namespace std;
 using namespace Belle2;

@@ -14,9 +14,6 @@
 /* KLM headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 
-/* Belle 2 headers. */
-#include <framework/logging/Logger.h>
-
 using namespace Belle2;
 
 KLMChannelArrayIndex::KLMChannelArrayIndex() :

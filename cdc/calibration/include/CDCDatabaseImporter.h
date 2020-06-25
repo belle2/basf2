@@ -205,6 +205,15 @@ namespace Belle2 {
      */
     void printCDCWireHitRequirements() const;
 
+    /// Import crosstalk library prepared in rootFileName
+    void importCDCCrossTalkLibrary(const std::string& rootFileName) const;
+
+    /// Print the content of the crosstalk library
+    void printCDCCrossTalkLibrary() const;
+
+    /// Do some basic testing of the CDCCrossTalkLibrary
+    void testCDCCrossTalkLibrary(bool spotChecks = false) const;
+
   private:
 
     /**
@@ -214,7 +223,7 @@ namespace Belle2 {
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
-    ClassDef(CDCDatabaseImporter, 1);  /**< ClassDef */
+
   };
 
 } // Belle2 namespace

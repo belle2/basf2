@@ -431,7 +431,7 @@ void XTCalibration::readXT()
 
 void XTCalibration::readXTFromText()
 {
-  std::string fileName1 = "/cdc/data/" + m_xtfile;
+  std::string fileName1 = "/data/cdc" + m_xtfile;
   std::string fileName = FileSystem::findFile(fileName1);
   boost::iostreams::filtering_istream ifs;
   if (fileName == "") {

@@ -274,6 +274,6 @@ namespace Belle2 {
     template <class TrueHit>
     void getValuesForRoot(const SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables);
 
-    void writeToRoot(RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
+    void writeToRoot(const RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
   };
 }

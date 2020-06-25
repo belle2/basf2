@@ -323,7 +323,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_trkclusmatch->SetOption("HIST");
 
   // MetaOptions string.
-  std::string metaopts("pvalue-warn=0.25,pvalue-error=0.01");
+  std::string metaopts("pvalue-warn=0.1,pvalue-error=0.01");
   // Electron plots should be visible to the shifter by default.
   if (sigHypo == Const::electron) {
     metaopts = "shifter," + metaopts;
@@ -399,8 +399,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
 
   TString h_phi_N_name = TString::Format("h_phi_N_%i", sigHypoPdgId);
   TString h_phi_D_name = TString::Format("h_phi_D_%i", sigHypoPdgId);
-  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 10, -3.14159, 3.14159);
-  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 10, -3.14159, 3.14159);
+  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 5, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 5, -3.14159, 3.14159);
 
   // Fill the histograms from the sample's TTree.
 
@@ -422,7 +422,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
   TString pid_glob_ratio_phi_name = TString::Format("pid_glob_%i_%s__VS_phi", sigHypoPdgId, ratioType.c_str());
 
   // MetaOptions string.
-  std::string metaopts("pvalue-warn=0.1,pvalue-error=0.01,nostats");
+  std::string metaopts("pvalue-warn=0.01,pvalue-error=0.001,nostats");
   // Electron plots should be visible to the shifter by default.
   if (sampleHypo == Const::electron || sigHypo == Const::electron) {
     metaopts = "shifter," + metaopts;
@@ -539,8 +539,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
 
   TString h_phi_N_name = TString::Format("h_phi_N_%i", sampleHypoPdgId);
   TString h_phi_D_name = TString::Format("h_phi_D_%i", sampleHypoPdgId);
-  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 10, -3.14159, 3.14159);
-  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 10, -3.14159, 3.14159);
+  TH1F* h_phi_N = new TH1F(h_phi_N_name.Data(), "h_phi_N", 5, -3.14159, 3.14159);
+  TH1F* h_phi_D = new TH1F(h_phi_D_name.Data(), "h_phi_D", 5, -3.14159, 3.14159);
 
   TString match_cut_N("trackClusterMatch == 1");
   TString match_cut_D("trackClusterMatch >= 0");
@@ -563,7 +563,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
   TString match_eff_phi_name = TString::Format("trkclusmatch_%i_Efficiency__VS_phi", sampleHypoPdgId);
 
   // MetaOptions string.
-  std::string metaopts("pvalue-warn=0.1,pvalue-error=0.01,nostats");
+  std::string metaopts("pvalue-warn=0.01,pvalue-error=0.001,nostats");
   // Electron plots should be visible to the shifter by default.
   if (sampleHypo == Const::electron) {
     metaopts = "shifter," + metaopts;

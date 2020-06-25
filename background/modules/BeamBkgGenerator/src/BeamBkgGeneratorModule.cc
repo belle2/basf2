@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric , Andrii Natochii                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -29,6 +29,10 @@
 // random generator
 #include <TRandom.h>
 
+// coordinates translation
+#include <iostream>
+#include <TGeoMatrix.h>
+#include <generators/SAD/ReaderSAD.h>
 
 using namespace std;
 
@@ -45,7 +49,6 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   BeamBkgGeneratorModule::BeamBkgGeneratorModule() : Module()
-
   {
     // set module description
     setDescription("Beam background generator based on SAD files. "
@@ -60,7 +63,6 @@ namespace Belle2 {
     addParam("ringName", m_ringName, "name of the superKEKB ring (LER or HER)");
     addParam("realTime", m_realTime,
              "equivalent superKEKB running time to generate sample [ns].");
-
   }
 
   BeamBkgGeneratorModule::~BeamBkgGeneratorModule()
@@ -111,6 +113,7 @@ namespace Belle2 {
     // for SADMetaHit
     m_tree->SetBranchAddress("ss", &m_sad.ss);
     m_tree->SetBranchAddress("sraw", &m_sad.sraw);
+    m_tree->SetBranchAddress("ssraw", &m_sad.ssraw);
     m_tree->SetBranchAddress("nturn", &m_sad.nturn);
     m_tree->SetBranchAddress("xraw", &m_sad.xraw);
     m_tree->SetBranchAddress("yraw", &m_sad.yraw);
@@ -185,7 +188,7 @@ namespace Belle2 {
     if ((unsigned)section < m_sectionOrdering.size()) ring_section = m_sectionOrdering[section];
 
     StoreArray<SADMetaHit> SADMetaHits;
-    SADMetaHits.appendNew(SADMetaHit(m_sad.ss, m_sad.sraw, m_sad.ss, m_sad.s,
+    SADMetaHits.appendNew(SADMetaHit(m_sad.ssraw, m_sad.sraw, m_sad.ss, m_sad.s,
                                      0., m_sad.nturn,
                                      m_sad.x, m_sad.y, m_sad.px, m_sad.py, m_sad.xraw, m_sad.yraw,
                                      m_sad.r, m_sad.rr, m_sad.dp_over_p0, m_sad.E, m_sad.rate,
@@ -222,8 +225,31 @@ namespace Belle2 {
     part->setStatus(MCParticle::c_PrimaryParticle);
     part->addStatus(MCParticle::c_StableInGenerator);
 
-  }
+    // FarBeamLine region transformation
+    if (abs(m_sad.s * Unit::m) > 4.0 * Unit::m) {
+      // initial coordinates in SAD space
+      double particlePosSADfar[] = {m_sad.x* Unit::m, -m_sad.y* Unit::m, 0.0 * Unit::m};
+      double particleMomSADfar[] = {m_sad.px* Unit::GeV, -m_sad.py* Unit::GeV, pz* Unit::GeV};
+      // final coordinates in Geant4 space
+      double particlePosGeant4[] = {0.0, 0.0, 0.0};
+      double particleMomGeant4[] = {0.0, 0.0, 0.0};
 
+      // create a transformation matrix for a given ring
+      TGeoHMatrix transMatrix; /**< Transformation matrix from SAD space into geant4 space. */
+      if (m_ringName == "LER") {
+        transMatrix = m_readerSAD.SADtoGeant(ReaderSAD::c_LER, m_sad.s * Unit::m);
+      } else {
+        transMatrix = m_readerSAD.SADtoGeant(ReaderSAD::c_HER, m_sad.s * Unit::m);
+      }
+
+      // calculate a new set of coordinates in Geant4 space
+      transMatrix.LocalToMaster(particlePosSADfar, particlePosGeant4); // position
+      transMatrix.LocalToMasterVect(particleMomSADfar, particleMomGeant4); // momentum
+      // apply a new set of coordinates
+      part->setMomentum(TVector3(particleMomGeant4));
+      part->setProductionVertex(TVector3(particlePosGeant4));
+    }
+  }
 
   void BeamBkgGeneratorModule::endRun()
   {
@@ -270,7 +296,6 @@ namespace Belle2 {
     }
     return i1;
   }
-
 
 } // end Belle2 namespace
 

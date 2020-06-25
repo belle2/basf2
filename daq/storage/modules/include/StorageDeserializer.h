@@ -17,12 +17,7 @@
 #include <daq/slc/readout/RunInfoBuffer.h>
 
 #include <daq/storage/SharedEventBuffer.h>
-#include <daq/storage/BinData.h>
 #include "daq/storage/modules/DataStorePackage.h"
-
-#include <daq/slc/system/PThread.h>
-#include <daq/slc/system/Mutex.h>
-#include <daq/slc/system/Cond.h>
 
 #include <string>
 #include <vector>

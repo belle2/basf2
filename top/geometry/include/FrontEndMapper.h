@@ -12,8 +12,6 @@
 
 #include <top/dbobjects/TOPFrontEndMap.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/IntervalOfValidity.h>
 

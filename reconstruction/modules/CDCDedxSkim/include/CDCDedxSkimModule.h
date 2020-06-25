@@ -17,11 +17,7 @@
 
 #include <mdst/dataobjects/Track.h>
 
-#include <map>
-#include <string>
 #include <vector>
-#include <utility>
-#include <TVector3.h>
 
 namespace Belle2 {
 

@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Mikhail Remnev                                           *
@@ -22,6 +22,7 @@ namespace Belle2 {
       return val;
     }
 
+
     namespace ShapeFitter {
       bool amplitudeOverflow(long long amp)
       {
@@ -33,9 +34,13 @@ namespace Belle2 {
 
 namespace Belle2 {
   namespace ECL {
-    void lftda_(short int* f, short int* f1, short int* fg41, short int* fg43, short int* fg31, short int* fg32, short int* fg33,
-                int* y, int& ttrig2, int& A0, int& Ahard, int& k_a, int& k_b, int& k_c, int& k_16, int& k1_chi, int& k2_chi, int& chi_thres,
-                int& m_AmpFit, int& m_TimeFit, int& m_QualityFit)
+    template <typename INT>
+    ECLShapeFit lftda_(INT* f, INT* f1, INT* fg41,
+                       INT* fg43, INT* fg31, INT* fg32,
+                       INT* fg33, int* y, int& ttrig2, int& la_thr,
+                       int& hit_thr, int& skip_thr, int& k_a, int& k_b,
+                       int& k_c, int& k_16, int& k1_chi, int& k2_chi,
+                       int& chi_thres, bool adjusted_timing)
     {
       //                Typical plot of y_i (i=0..31)
       // +-------------------------------------------------------+
@@ -108,7 +113,12 @@ namespace Belle2 {
       }
 
       // Initial time index
-      int it0 = 48 + ((23 - ttrig) << 2);
+      int it0;
+      if (!adjusted_timing) {
+        it0 = 48 + ((23 - ttrig) << 2);
+      } else {
+        it0 = 48 + ((143 - ttrig2) << 2) / 6;
+      }
       // Min time index, max time index
       int it_l = 0, it_h = 191;
       // Time index, must be within [it_l, it_h]
@@ -126,6 +136,8 @@ namespace Belle2 {
       // Quality flag (https://confluence.desy.de/display/BI/ECL+Quality+flag)
       int validity_code = c_GoodQuality;
       bool skip_fit = false;
+      // Set to true if amplitude is less than SKIP_THR
+      bool skip_thr_flag = false;
 
       //== Calculate sum of first 16 points in the waveform.
       //   This sum is used for pedestal estimation.
@@ -136,6 +148,18 @@ namespace Belle2 {
 
       const int kz_s = 0;
       const long long z0 = z00 >> kz_s;
+
+      // Struct with fit results
+      ECLShapeFit result;
+      result.fit.resize(31);
+
+      //== Check for pedestal amplitude overflow
+
+      if (z00 > 0x3FFFF) {
+        skip_fit = true;
+        validity_code = c_InternalError;
+        A1 = -128;
+      }
 
       /***   FIRST APPROXIMATION   ***/
 
@@ -166,7 +190,7 @@ namespace Belle2 {
       //   (https://confluence.desy.de/display/BI/Electronics+Thresholds)
 
       bool low_ampl = false;
-      if (A2 < A0) low_ampl = true;
+      if (A2 < la_thr) low_ampl = true;
 
       /***   MAIN PART   ***/
 
@@ -223,10 +247,17 @@ namespace Belle2 {
           //== Check if amplitude is less than LA_THR
           //   (https://confluence.desy.de/display/BI/Electronics+Thresholds)
 
-          if (A1 < A0) {
+          if (A1 < la_thr) {
             it = it0;
             low_ampl = true;
             break;
+          }
+
+          //== Check if amplitude is less than SKIP_THR
+          //   (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+
+          if (A1 < skip_thr) {
+            skip_thr_flag = true;
           }
 
           // Internal variables for fit algo
@@ -234,7 +265,11 @@ namespace Belle2 {
 
           //== Estimate t_new as t_0 - B/A
 
-          B2 = B1 >> (k_b - 13);
+          if (k_b >= 13) {
+            B2 = B1 >> (k_b - 13);
+          } else {
+            B2 = B1 << (13 - k_b);
+          }
           B2 += (A1 << 13);
           B3 = (B2 / A1);
 
@@ -252,7 +287,7 @@ namespace Belle2 {
 
             if (B3 >= 0x37FE)
               delta_T = 2047;
-            else if (B3 <= 0x800)
+            else if ((B3 >> 1) <= 0x400)
               delta_T = -2047;
             else
               delta_T = ((B3 * 3 + 4) >> 3) - 3072;
@@ -261,7 +296,12 @@ namespace Belle2 {
             t_uncut = setInRange(t_uncut, -4096, 4095);
 
             T = -t_uncut;
-            T += ((210 - ttrig2) << 3);
+            if (!adjusted_timing) {
+              T += ((210 - ttrig2) << 3);
+            } else {
+              T += ((215 - ttrig2) << 3) - 4;
+            }
+
             T = setInRange(T, -2048, 2047);
 
             //== Estimate pedestal
@@ -301,32 +341,42 @@ namespace Belle2 {
       long long chi_sq = 0;
 
       if (!skip_fit) {
+        //== Get fit function values in 31 points
+
+        int B1_chi = B1 >> k_b;
+
+        // Points 0-15 contain identical pedestal value
+        result.fit[0] = A1 * f[it * 16] + B1_chi * f1[it * 16];
+        result.fit[0] >>= k1_chi;
+        result.fit[0] += C1;
+        for (int i = 1; i <= 15; i++) {
+          result.fit[i] = result.fit[0];
+        }
+        // Points 16-30 contain the signal
+        for (int i = 1; i < 16; i++) {
+          result.fit[i + 15] = A1 * f[it * 16 + i] + B1_chi * f1[it * 16 + i];
+          result.fit[i + 15] >>= k1_chi;
+          result.fit[i + 15] += C1;
+        }
+
         //== Get actual threshold for chi^2, based on amplitude fit.
-        //
+
         long long chi_thr;
         chi_thr = (A1 >> 1) * (A1 >> 1);
         chi_thr >>= (k2_chi - 2); // a1n
         chi_thr += chi_thres; // ch2_int
 
         //== Get chi^2
-        //
+
         long long chi;
 
-        int B1_chi = B1 >> k_b;
-
-        chi = A1 * f[it * 16] + B1_chi * f1[it * 16];
-        chi >>= k1_chi;
-        chi += C1;
-        chi = n_16 * chi - z00;
+        chi = n_16 * result.fit[0] - z00;
 
         chi_sq = chi * chi;
         chi_sq *= k_np[n_16 - 1];
         chi_sq >>= 16;
         for (int i = 1; i < 16; i++) {
-          chi = A1 * f[it * 16 + i] + B1_chi * f1[it * 16 + i];
-          chi >>= k1_chi;
-          chi += C1 - y[i + 15];
-
+          chi = result.fit[i + 15] - y[i + 15];
           chi_sq += chi * chi;
         }
 
@@ -336,28 +386,48 @@ namespace Belle2 {
 
       /***      ***/
 
-      //== Compare signal peak to HIT_THR (aka Ahard)
+      //== Compare signal peak to HIT_THR
       //   (See https://confluence.desy.de/display/BI/Electronics+Thresholds)
 
       int hit_val = y[20] + y[21] - (y[12] + y[13] + y[14] + y[15]) / 2;
-      if (hit_val < Ahard) {
+      if (hit_val <= hit_thr) {
         validity_code += 4;
       }
 
-      //==
+      //== Compare amplitude to SKIP_THR
+      //   (See https://confluence.desy.de/display/BI/Electronics+Thresholds)
 
-      m_AmpFit = A1;
-      if (validity_code != c_LowAmp) {
-        m_TimeFit = T;
-      } else {
-        // Quality flag is 2, sending chi^2 instead of time
-        m_TimeFit = chi_sq;
+      if (A1 < skip_thr && validity_code != c_InternalError) {
+        skip_thr_flag = true;
       }
-      m_QualityFit = validity_code;
 
-      return ;
+      //== Set output values
+
+      result.amp = A1;
+      result.time = T;
+      result.quality = validity_code % 4;
+      result.hit_thr = validity_code / 4;
+      result.skip_thr = skip_thr_flag;
+      result.low_amp = low_ampl;
+      result.pedestal = result.fit[0];
+
+      result.chi2 = chi_sq;
+
+      return result;
     }
 
+    template ECLShapeFit lftda_<short>(short* f, short* f1, short* fg41,
+                                       short* fg43, short* fg31, short* fg32,
+                                       short* fg33, int* y, int& ttrig2, int& la_thr,
+                                       int& hit_thr, int& skip_thr, int& k_a, int& k_b,
+                                       int& k_c, int& k_16, int& k1_chi, int& k2_chi,
+                                       int& chi_thres, bool adjusted_timing);
+    template ECLShapeFit lftda_<int>(int* f, int* f1, int* fg41,
+                                     int* fg43, int* fg31, int* fg32,
+                                     int* fg33, int* y, int& ttrig2, int& la_thr,
+                                     int& hit_thr, int& skip_thr, int& k_a, int& k_b,
+                                     int& k_c, int& k_16, int& k1_chi, int& k2_chi,
+                                     int& chi_thres, bool adjusted_timing);
   }
 }
 

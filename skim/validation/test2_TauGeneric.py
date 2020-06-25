@@ -1,11 +1,12 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
-from basf2 import *
-from modularAnalysis import *
-from variables import variables
-from stdCharged import *
-from stdPhotons import *
+import basf2 as b2
+import modularAnalysis as ma
+from variables import variables as vm
+from stdCharged import stdPi
+from stdPhotons import stdPhotons
+from skim.taupair import TauGeneric
 
 """
 <header>
@@ -15,35 +16,34 @@ from stdPhotons import *
 </header>
 """
 
-taugenericskim = Path()
+taugenericskim = b2.Path()
 
-inputMdst('default', '../TauGeneric.udst.root', path=taugenericskim)
+ma.inputMdst('default', '../TauGeneric.udst.root', path=taugenericskim)
 
 stdPi('all', path=taugenericskim)
 stdPhotons('all', path=taugenericskim)
 
 # set variables
-from skim.taupair import *
-SetTauGenericSkimVariables(path=taugenericskim)
+TauGeneric().additional_setup(path=taugenericskim)
 
-variables.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
+vm.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
 
 # the variables that are printed out are:
-variablesToHistogram(
+ma.variablesToHistogram(
     filename='TauGeneric_Validation.root',
     decayString='',
     variables=[('nGoodTracks', 7, 1, 8),
-               ('visibleEnergyOfEventCMS', 60, 0, 12),
+               ('visibleEnergyOfEventCMS', 40, 0, 12),
                ('E_ECLtrk', 70, 0, 7),
-               ('maxPt', 60, 0, 6),
+               ('maxPt', 30, 0, 6),
                ('invMS1', 60, 0, 3),
                ('invMS2', 60, 0, 3),
-               ('Theta_miss', 60, 0, 180)],
+               ('Theta_miss', 30, 0, 180)],
     variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3)],
     path=taugenericskim
 )
-process(taugenericskim)
-print(statistics)
+b2.process(taugenericskim)
+print(b2.statistics)
 
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"

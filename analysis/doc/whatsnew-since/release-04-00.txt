@@ -1,82 +1,55 @@
-Changes in the analysis package
--------------------------------
+Changes in the analysis package since release-04-00
+---------------------------------------------------
 
 Variables
 +++++++++
-
- * Renamed some `RestOfEvent` variables for consistency across the `VariableManager`.
-   Variables starting ``WE_XXX``, ``ROE_XXX``, and ``Rec_XXX`` are now ``weXXX``, ``roeXXX``, and ``recXXX``.
-   For example ``ROE_deltae`` is now :b2:var:`roeDeltae`.
-
- * Fixed bug and renamed ``mcFlavorOfOtherB0`` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B candidates.
-
+ * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` take into account the nontrivial
+   transformation of track parameters relative to IP when used for tracks.
+   `dr` did not center at zero before and now it does.
+ * Added :b2:var:`isDescendantOfList` and :b2:var:`isMCDescendantOfList` meta variables that allow to check whether the
+   particle is the descendant of the list (or if it is matched to the descendant of the list) at any generation.
+   The variables have recursive search inside, they extend :b2:var:`isDaughterOfList` and :b2:var:`isGrandDaughterOfList`.
+ * Added :b2:var:`mcParticleIsInMCList` which checks the underlying MC particles (either matched or generator level).
+ * Fixed bug and renamed ``mcFlavorOfOtherB0`` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B
+   candidates.
  * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
  * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
- * Fixed calculation of :b2:var:`cosHelicityAngleMomentum` for decays with bremscorrected electrons
- * Fixed :b2:var:`clusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
-
-  .. note:: All variables will return a quietNaN instead of -999 or other out-of-the-sky numbers in case of errors
-
- * Added :b2:var:`isSignalAcceptBremsPhotons` to ignore any reconstructed brems photons.
-
-  .. note:: This is not the generator-level match (see :issue:`BII-5741`) but simply ignores photons added by the :b2:mod:`BremsFinder`.
-
  * Allow use of meta variables in creation of aliases by replacing non
    alphanumeric characters with underscores in the alias name
-
- * Modified :b2:var:`daughterAngleInBetween` to accept generalized variable indeces instead of simple indeces. A 
-   generalized index is a column-separated string of daughter indexes belonging to different generations, 
+ * Modified :b2:var:`daughterAngle` to accept generalized variable indeces instead of simple indeces. A
+   generalized index is a column-separated string of daughter indexes belonging to different generations,
    starting from the root particle. For example, ``0:2:1`` indicates the second daughter (0) of the third daughter
    (2) of the first daughter (0) of the particle. Of course, conventional indexes are still working as expected:
    ``1`` still indicates the second daughter of the particle.
-
  * Added :b2:var:`daughterCombination`, that returns a variable calculated on the sum
-   of an arbitrary number of daughters. Generalized indeces are supported. This variable is mostly intended
+   of an arbitrary number of daughters. Generalized indexes are supported. This variable is mostly intended
    to calculate the invariant mass or the recoil mass of any set of particles belonging to a decay tree.
-
- * Added :b2:var:`useTagSideRecoilRestFrame`, which allows variables to be calculated in the rest frame
-   recoiling against the tag side B meson. This variable is intended to be used on Upsilon(4S) particle lists
-   only. The variable gives access to the signal B rest frame in semi-leptonic decays, where the four momentum
-   of the signal B can not be entirely reconstructed due to the presence of neutrinos in the decay.
-
- * Added new variables for fully-inclusive analysis: :b2:var:`nDaughterPhotons`, :b2:var:`nDaughterCharged` etc., which allow to count 
-   specific daughters easily, and :b2:var:`daughterAverageOf`, which is similar to the :b2:var:`daughterSumOf`, but outputs the mean value of a variable.
-
- * Fixed :b2:var:`goodBelleKshort`, now it returns ``extraInfo(goodKs)`` if the variable exists.
- * Fixed :b2:var:`isSignal`, which always accepted ``c_MissingResonance`` and ``c_MissFSR``/``c_MissPHOTOS`` even one used ``=direct=>``, ``=norad=>``, or ``=exact=>``.
-   Now it correctly respects the decay string grammar. The other isSignal* variables, such as :b2:var:`isSignalAcceptMissing`, are also fixed.
- * Added :b2:var:`useAlternativeDaughterHypothesis`, that returns a variable re-calculated using alternative mass assumptions for the particle's daughters.
-
+ * Fixed :b2:var:`isSignal`, which always accepted ``c_MissingResonance`` and ``c_MissFSR``/``c_MissPHOTOS`` even if one used
+   ``=direct=>``, ``=norad=>``, or ``=exact=>``.
+   Now it correctly respects the decay string grammar. The other isSignal* variables, such as :b2:var:`isSignalAcceptMissing`, are
+   also fixed.
+ * Added :b2:var:`useAlternativeDaughterHypothesis`, that returns a variable re-calculated using alternative mass assumptions for
+   the particle's daughters.
+ * Restructured the ``mc_flight_info`` collection by removing the non-sense
+   error variables and replacing ``mc_flightTime`` and ``mc_flightDistance``,
+   which were aliases created using `matchedMC`, with the dedicated variables
+   `mcFlightTime` and `mcFlightDistance`, respectively.
+ * Removed ``output_variable`` option in the :ref:`DeepFlavorTagger` and introduced a standard variable ``DNN_qrCombined`` for the
+   output.
+   The new variable returns the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables
+   ``FBDT_qrCombined`` and ``FANN_qrCombined`` do.
+   Now we can evaluate the output of both taggers in the same way.
+ * Bug fix to guard against range exceptions in :b2:var:`KSFWVariables` (see :issue:`BII-6138`).
 
 Modules
 +++++++
 
- * When merging ParticleLists using the :b2:mod:`ParticleListManipulator`
-   (`modularAnalysis.copyLists`) duplicates (not multiple candidates) are removed
-   on a first-come, first-served basis, i.e. the order of the input particles
-   matters. Now, the new parameter ``variable`` can be provided to determine
-   which duplicate should be preferred. The logic is the same as for the
-   :b2:mod:`BestCandidateSelection` module.
- * The :b2:mod:`ParticleLoader` can create neutron particle lists now. ECL
-   cluster with the hadron hypothesis as well as KLM cluster are used as source.
- * In :b2:mod:`TreeFitter` bugfix in mass constraint: chi2 correctly calculated now.
- * In :b2:mod:`TreeFitter` change of initialisation values increases performance in all fits with tracks.
- * In :b2:mod:`TreeFitter` max iterations set to 100, increases efficiency slightly in many cases.
- * In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result propagated error was slightly overestimated.
+ * In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result the
+   propagated error was slightly overestimated.
  * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
- * Removed module ``CreateBsigFromFullRecoBtag``
- * In BtubeCreator module, functionality to associate Btube to user's chosen B is added.
- * Deprecated module `FSRCorrection` in favour of `BremsFinder` and `BelleBremRecovery`.
- * In `ChargedPidMVA` module, remove handling of particle list modified by the deprecated `FSRCorrection` module.
- * In `ChargedPidMVA` module, apply MVA category cuts retrieved from the DB payload.
- * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`. One can find and create a ``ParticleList`` for all ``MCParticle`` decays matching a given :ref:`DecayString`.
+ * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`.
    Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
-
- * Added a :b2:mod:`BremsFinder` to unpack the bremsstrahlung relations provided by tracking.
-
-  .. hint:: This tool is the recommended way to correct for bremsstrahlung photons in Belle II analyses.
-
- * Enabled to select daughters which will be used to perform fitting with KFitter. One can use the selector `^` to select daughters.
+   But still the module has some bugs if one uses K_S0.
 
 Conditions DB
 +++++++++++++
@@ -86,4 +59,6 @@ Conditions DB
 Full Event Interpretation
 +++++++++++++++++++++++++
 
- * Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p, Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic = True) using a flag (baryonic = True).
+ * Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p,
+   Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic =
+   True) using a flag (baryonic = True).

@@ -163,8 +163,8 @@ main.add_module(eventinfosetter)
 main.add_module(particlegun)
 # add simulation for pxd only
 # turn off the cleanup as the storearrays are needed
-simulation.add_simulation(main, components=['PXD', 'SVD'], usePXDDataReduction=True,
-                          cleanupPXDDataReduction=False)
+simulation.add_simulation(main, components=['PXD', 'SVD'], forceSetPXDDataReduction=True,
+                          usePXDDataReduction=True, cleanupPXDDataReduction=False)
 set_module_parameters(main, type="Geometry", useDB=False, components=['PXD', 'SVD', 'MagneticFieldConstant4LimitedRSVD'])
 
 roiPayloadAssembler = register_module('ROIPayloadAssembler')

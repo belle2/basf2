@@ -9,27 +9,27 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
-from variables import variables
+import basf2 as b2
+import modularAnalysis as ma
+from variables import variables as vm
 from validation_tools.metadata import create_validation_histograms
 
-path = Path()
+path = b2.Path()
 
-inputMdst('default', '../PRsemileptonicUntagged.udst.root', path=path)
+ma.inputMdst('default', '../PRsemileptonicUntagged.udst.root', path=path)
 
-cutAndCopyLists('B0:all', ['B0:L1', 'B0:L2'], '', path=path)
+ma.cutAndCopyLists('B0:all', ['B0:PRSemileptonic_1', 'B0:PRSemileptonic_2'], '', path=path)
 
-buildRestOfEvent('B0:all', path=path)
-appendROEMask('B0:all', 'basic',
-              'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
-              'E>0.05',
-              path=path)
-buildContinuumSuppression('B0:all', 'basic', path=path)
+ma.buildRestOfEvent('B0:all', path=path)
+ma.appendROEMask('B0:all', 'basic',
+                 'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
+                 'E>0.05',
+                 path=path)
+ma.buildContinuumSuppression('B0:all', 'basic', path=path)
 
-variables.addAlias('d0_p', 'daughter(0, p)')
-variables.addAlias('d1_p', 'daughter(1, p)')
-variables.addAlias('MissM2', 'weMissM2(basic,0)')
+vm.addAlias('d0_p', 'daughter(0, p)')
+vm.addAlias('d1_p', 'daughter(1, p)')
+vm.addAlias('MissM2', 'weMissM2(basic,0)')
 
 histogramFilename = 'PRsemileptonicUntagged_Validation.root'
 myEmail = 'Phil Grace <philip.grace@adelaide.edu.au>'
@@ -46,5 +46,5 @@ create_validation_histograms(
     variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', myEmail, '', '')],
     path=path)
 
-process(path)
-print(statistics)
+b2.process(path)
+print(b2.statistics)

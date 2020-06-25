@@ -8,23 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <generators/modules/koralwinput/KoralWInputModule.h>
 
-#include <framework/utilities/FileSystem.h>
-#include <framework/logging/Logger.h>
+/* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
 
 using namespace std;
 using namespace Belle2;
 
-//-----------------------------------------------------------------
-//                 Register the Module
-//-----------------------------------------------------------------
+
 REG_MODULE(KoralWInput)
 
-//-----------------------------------------------------------------
-//                 Implementation
-//-----------------------------------------------------------------
 
 KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
 {
@@ -35,16 +32,12 @@ KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_s
   addParam("DataPath",  m_dataPath, "The path to the KoralW input data files.",
            FileSystem::findFile("/data/generators/koralw"));
   addParam("UserDataFile",  m_userDataFile, "The filename of the user KoralW input data file.",
-           FileSystem::findFile("/data/generators/koralw/KoralW_ee.data"));
-  addParam("RandomSeed", m_seed, "The random seed of the generator.", 1227);
+           FileSystem::findFile("/data/generators/koralw/KoralW_eeee.data"));
 }
-
 
 KoralWInputModule::~KoralWInputModule()
 {
-
 }
-
 
 void KoralWInputModule::initialize()
 {
@@ -53,9 +46,7 @@ void KoralWInputModule::initialize()
 
   //Beam Parameters, initial particle - KORALW cannot handle beam energy spread
   m_initial.initialize();
-
 }
-
 
 void KoralWInputModule::event()
 {
@@ -82,23 +73,20 @@ void KoralWInputModule::event()
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
 }
 
-
 void KoralWInputModule::terminate()
 {
   m_generator.term();
 
-  B2INFO(">>> Total cross section: " << m_generator.getCrossSection() << " pb +- " << m_generator.getCrossSectionError() << " pb");
+  B2RESULT("Total cross section: " << m_generator.getCrossSection() << " pb +- " << m_generator.getCrossSectionError() << " pb");
 }
 
 void KoralWInputModule::initializeGenerator()
 {
-
   const BeamParameters& nominal = m_initial.getBeamParameters();
   double ecm = nominal.getMass();
   m_generator.setCMSEnergy(ecm);
 
-  m_generator.init(m_dataPath, m_userDataFile, m_seed);
+  m_generator.init(m_dataPath, m_userDataFile);
 
   m_initialized = true;
-
 }

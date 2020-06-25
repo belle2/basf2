@@ -12,12 +12,7 @@
 #include <string>
 #include <vector>
 #include <stdlib.h>
-#include <sys/time.h>
 
-#include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <daq/rawdata/modules/DeSerializer.h>
@@ -26,18 +21,7 @@
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 
-
 #include <rawdata/dataobjects/RawFTSW.h>
-#include <rawdata/dataobjects/RawTLU.h>
-//#include <rawdata/RawROPC.h>
-#include <framework/dataobjects/EventMetaData.h>
-
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-
 
 namespace Belle2 {
 

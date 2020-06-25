@@ -26,6 +26,7 @@ SVDOccupancyAnalysisModule::SVDOccupancyAnalysisModule() : Module()
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDOccupancyAnalysis_output.root"));
 
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(false));
   addParam("groupNevents", m_group, "Number of events to group", float(10000));
   addParam("FADCmode", m_FADCmode,
            "FADC mode: if true the approximation to integer is done", bool(false));
@@ -57,6 +58,44 @@ void SVDOccupancyAnalysisModule::initialize()
 
 void SVDOccupancyAnalysisModule::beginRun()
 {
+
+
+  m_occ_L3U = new TH1F("occL3U", "Occupancy Distribution for L3 U side", m_distr_Nbins, m_distr_min, m_distr_max);
+  m_occ_L3U->GetXaxis()->SetTitle("occupancy(%)");
+  m_occ_L3V = new TH1F("occL3V", "Occupancy Distribution for L3 V side", m_distr_Nbins, m_distr_min, m_distr_max);
+  m_occ_L3V->GetXaxis()->SetTitle("occupancy(%)");
+  m_occ_L4U = new TH1F("occL4U", "Occupancy Distribution for L4 U side", m_distr_Nbins, m_distr_min, m_distr_max);
+  m_occ_L4U->GetXaxis()->SetTitle("occupancy(%)");
+  m_occ_L4V = new TH1F("occL4V", "Occupancy Distribution for L4 V side", m_distr_Nbins, m_distr_min, m_distr_max);
+  m_occ_L4V->GetXaxis()->SetTitle("occupancy(%)");
+  m_occ_L5U = new TH1F("occL5U", "Occupancy Distribution for L5 U side", m_distr_Nbins, m_distr_min, m_distr_max);
+  m_occ_L5U->GetXaxis()->SetTitle("occupancy(%)");
+  m_occ_L5V = new TH1F("occL5V", "Occupancy Distribution for L5 V side", m_distr_Nbins, m_distr_min, m_distr_max);
+  m_occ_L5V->GetXaxis()->SetTitle("occupancy(%)");
+  m_occ_L6U = new TH1F("occL6U", "Occupancy Distribution for L6 U side", m_distr_Nbins, m_distr_min, m_distr_max);
+  m_occ_L6U->GetXaxis()->SetTitle("occupancy(%)");
+  m_occ_L6V = new TH1F("occL6V", "Occupancy Distribution for L6 V side", m_distr_Nbins, m_distr_min, m_distr_max);
+  m_occ_L6V->GetXaxis()->SetTitle("occupancy(%)");
+
+
+  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+  //collect the list of all SVD Modules in the geometry here
+  std::vector<VxdID> sensors = geo.getListOfSensors();
+  for (VxdID& aVxdID : sensors) {
+    VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
+    if (info.getType() != VXD::SensorInfoBase::SVD) continue;
+    m_SVDModules.push_back(aVxdID); // reorder, sort would be better
+  }
+  std::sort(m_SVDModules.begin(), m_SVDModules.end());  // back to natural order
+
+  m_hit = new SVDSummaryPlots("hits@view", "Number of hits on @view/@side Side");
+
+  TH1F h_dist("dist_L@layerL@ladderS@sensor@view",
+              "Occupancy Distribution (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
+              m_distr_Nbins, m_distr_min, m_distr_max);
+  h_dist.GetXaxis()->SetTitle("occupancy (%)");
+  m_histo_dist = new SVDHistograms<TH1F>(h_dist);
 
   TH1F h_occ_768("occ768_L@layerL@ladderS@sensor@view", "Occupancy (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)",
                  768, 0, 768);
@@ -100,7 +139,7 @@ void SVDOccupancyAnalysisModule::beginRun()
 void SVDOccupancyAnalysisModule::event()
 {
 
-  if (m_resultStoreObjectPointer.isValid()) {
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
     const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
     if (!eventAccepted) return;
   }
@@ -117,6 +156,8 @@ void SVDOccupancyAnalysisModule::event()
 
     //fill standard occupancy plot, for default zero suppression
     m_histo_occtdep->fill(theVxdID, side, nEvent / m_group, m_svdShapers[digi]->getCellID());
+
+    m_hit->fill(theVxdID, side, 1);
 
     m_histo_occ->fill(theVxdID, side, m_svdShapers[digi]->getCellID());
 
@@ -147,6 +188,41 @@ void SVDOccupancyAnalysisModule::event()
 
   }
 
+  //loop on sensors, fill and clear
+  for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
+    B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
+    float nStripsV = 512;
+    if (m_SVDModules[i].getLayerNumber() == 3)
+      nStripsV = 768;
+
+    double occU = 100. * m_hit->getValue(m_SVDModules[i], 1) / 768;
+    double occV = 100. * m_hit->getValue(m_SVDModules[i], 0) / nStripsV;
+
+    m_histo_dist->fill(m_SVDModules[i], 1, occU);
+    m_histo_dist->fill(m_SVDModules[i], 0, occV);
+
+    if (m_SVDModules[i].getLayerNumber() == 3) {
+      m_occ_L3U->Fill(occU);
+      m_occ_L3V->Fill(occV);
+    }
+    if (m_SVDModules[i].getLayerNumber() == 4) {
+      m_occ_L4U->Fill(occU);
+      m_occ_L4V->Fill(occV);
+    }
+    if (m_SVDModules[i].getLayerNumber() == 5) {
+      m_occ_L5U->Fill(occU);
+      m_occ_L5V->Fill(occV);
+    }
+    if (m_SVDModules[i].getLayerNumber() == 6) {
+      m_occ_L6U->Fill(occU);
+      m_occ_L6V->Fill(occV);
+    }
+
+  }
+
+  (m_hit->getHistogram(0))->Reset();
+  (m_hit->getHistogram(1))->Reset();
+
 }
 
 
@@ -164,6 +240,14 @@ void SVDOccupancyAnalysisModule::endRun()
 
     TDirectory* oldDir = gDirectory;
 
+    m_occ_L3U->Write();
+    m_occ_L3V->Write();
+    m_occ_L4U->Write();
+    m_occ_L4V->Write();
+    m_occ_L5U->Write();
+    m_occ_L5V->Write();
+    m_occ_L6U->Write();
+    m_occ_L6V->Write();
 
     VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
 
@@ -174,6 +258,7 @@ void SVDOccupancyAnalysisModule::endRun()
       for (auto ladder : geoCache.getLadders(layer))
         for (Belle2::VxdID sensor :  geoCache.getSensors(ladder))
           for (int view = SVDHistograms<TH1F>::VIndex ; view < SVDHistograms<TH1F>::UIndex + 1; view++) {
+            (m_histo_dist->getHistogram(sensor, view))->Write();
 
             (m_histo_occ->getHistogram(sensor, view))->Scale(1. / m_nEvents);
             (m_histo_occ->getHistogram(sensor, view))->Write();

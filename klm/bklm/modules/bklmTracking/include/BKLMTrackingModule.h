@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/bklm/dataobjects/BKLMTrack.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMTrack.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 
 /* Belle 2 headers. */
@@ -81,7 +81,7 @@ namespace Belle2 {
   private:
 
     //! bklm GeometryPar
-    bklm::GeometryPar*   m_GeoPar = NULL;
+    bklm::GeometryPar* m_GeoPar = nullptr;
 
     //! TFile that store efficieny plots
     TFile* m_file = nullptr;

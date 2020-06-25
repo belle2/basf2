@@ -24,6 +24,7 @@
 
 //ECL
 #include <ecl/digitization/EclConfiguration.h>
+#include <ecl/utility/ECLChannelMapper.h>
 
 namespace Belle2 {
 
@@ -34,6 +35,7 @@ namespace Belle2 {
   class ECLSimHit;
   class ECLDigit;
   class ECLDsp;
+  class ECLDspWithExtraMCInfo;
   class ECLTrig;
   class ECLWaveforms;
 
@@ -46,6 +48,7 @@ namespace Belle2 {
    * of amplitude, time and quality.
    * The initial parameters of fit and algorithm are same as hardware.
    * This module outputs two array which are ECLDsp and ECLDigit.
+   * An additional array with more MC information for ECLDsp studies is created upon user request.
 
      \correlationdiagram
      ECLHit = graph.data('ECLHit')
@@ -56,6 +59,7 @@ namespace Belle2 {
      graph.relation(ECLDigitizer, ECLHit)
      graph.relation(ECLDigitizer, ECLDigit)
      graph.relation(ECLDigitizer, ECLDsp)
+     graph.relation(ECLDigitizer, ECLDspWithExtraMCInfo)
      \endcorrelationdiagram
 
    */
@@ -131,6 +135,12 @@ namespace Belle2 {
     /** Storage for waveform saving thresholds*/
     std::vector<double> m_Awave;
 
+    /** storage for trigger time in each ECL. The crate trigger time
+     *  is an even number from 0 to 142, so here it is stored as
+     *  numbers from 0 to 71 inclusive.
+     */
+    unsigned char m_ttime[ECL::ECL_CRATES];
+
     /** function wrapper for waveform fit */
     void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
                             int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
@@ -144,7 +154,7 @@ namespace Belle2 {
     /** read Shaper-DSP data from root file */
     void readDSPDB();
     /** Emulate response of energy deposition in a crystal and attached photodiode and make waveforms*/
-    int shapeSignals();
+    void shapeSignals();
     /** Produce and compress waveforms for beam background overlay */
     void makeWaveforms();
     /** repack waveform fit parameters from ROOT format to plain array of unsigned short for the shapeFitter function */
@@ -164,16 +174,23 @@ namespace Belle2 {
     /** Output Arrays */
     StoreArray<ECLDigit>  m_eclDigits;/**<  waveform fit result */
     StoreArray<ECLDsp>    m_eclDsps;/**<  generated waveforms */
+    StoreArray<ECLDspWithExtraMCInfo>    m_eclDspsWithExtraMCInfo;/**<  generated waveforms with extra MC information*/
     StoreArray<ECLTrig>   m_eclTrigs;/**< trigger information */
+
+    /** Channel Mapper */
+    ECL::ECLChannelMapper m_eclMapper; /**< channel mapper to utilize trigger information */
 
     /** Module parameters */
     bool m_background;  /**< background flag */
     bool m_calibration;  /**< calibration flag */
     bool m_inter; /**< internuclear counter effect */
     bool m_waveformMaker; /**< produce only waveform digits */
+    bool m_storeDspWithExtraMCInfo;  /**< DSP with extra info flag */
     unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
     int m_ADCThreshold; /**< ADC threshold for wavefom fits*/
     double m_WaveformThresholdOverride; /**< If gt 0, value will override ECL_FPGA_StoreWaveform and apply value (in GeV) as threshold for all crystals for waveform saving*/
+    double m_DspWithExtraMCInfoThreshold;  /**< Energy threshold above which to store DSPs with extra information */
+    bool m_trigTime; /**< Use trigger time from beam background overlay */
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
   };
 }//Belle2

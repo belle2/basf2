@@ -306,7 +306,7 @@ namespace Belle2 {
     * if value < 0, the track candidate is invalid and one should not use it anymore.
     * 0.5 is the standard value if not been set otherwise
     * */
-    void setQualityIndicator(double newIndicator) { m_qualityIndicator = newIndicator; }
+    void setQualityIndicator(const double newIndicator) { m_qualityIndicator = newIndicator; }
 
     /**
      * add a new SpacePoint and its according sorting parameter to the track candidate

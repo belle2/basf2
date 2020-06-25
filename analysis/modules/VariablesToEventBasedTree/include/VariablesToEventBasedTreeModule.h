@@ -61,7 +61,7 @@ namespace Belle2 {
     std::string m_treeName;
 
     /** ROOT file for output. */
-    TFile* m_file{nullptr};
+    std::shared_ptr<TFile> m_file{nullptr};
     /** The ROOT TNtuple for output. */
     StoreObjPtr<RootMergeable<TTree>> m_tree;
     /** List of function pointers corresponding to given variables. */

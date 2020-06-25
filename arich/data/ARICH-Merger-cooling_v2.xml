@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mergerCoolingBodiesv2 desc="Parameters of merger cooling bodies installed after Belle2 phase 2">
+  <material desc="Material of merger cooling bodies">ARICH_merger_Cooling_Bodies_Al</material>
+
+  <!-- Merger cooling body shape id (positionID) for each merger PCB -->
+
+  <mergerCoolingPositionID>
+     1       2       3       4       5       6       7       8       9      10      11      12
+     1       2       3       4       5       6       7       8       9      10      11      12
+     1       2       3       4       5       6       7       8       9      10      11      12
+     1       2       3       4       5       6       7       8       9      10      11      12
+     1       2       3       4       5       6       7       8       9      10      11      12
+     1       2       3       4       5       6       7       8       9      10      11      12
+  </mergerCoolingPositionID>
+
+  <BodiesDatFileName>
+
+    <Body positionID="1">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_01.stl.dat
+    </Body>
+    <Body positionID="2">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_02.stl.dat
+    </Body>
+    <Body positionID="3">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_03.stl.dat
+    </Body>
+    <Body positionID="4">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_04.stl.dat
+    </Body>
+    <Body positionID="5">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_05.stl.dat
+    </Body>
+    <Body positionID="6">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_06.stl.dat
+    </Body>
+    <Body positionID="7">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_07.stl.dat
+    </Body>
+    <Body positionID="8">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_08.stl.dat
+    </Body>
+    <Body positionID="9">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_09.stl.dat
+    </Body>
+    <Body positionID="10">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_10.stl.dat
+    </Body>
+    <Body positionID="11">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_11.stl.dat
+    </Body>
+    <Body positionID="12">
+      arich/data/2018-08-24_ARICH_merger_cooling_body_12.stl.dat
+    </Body>
+    
+  </BodiesDatFileName>
+
+</mergerCoolingBodiesv2>

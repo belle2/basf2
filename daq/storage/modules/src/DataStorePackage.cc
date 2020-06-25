@@ -2,17 +2,9 @@
 #include "daq/storage/ONSENBinData.h"
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-#include "framework/dataobjects/EventMetaData.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawPXD.h>
-
-#include <daq/slc/base/StringUtil.h>
-
-#include <TClonesArray.h>
-#include <TClass.h>
 
 #include <cstring>
 

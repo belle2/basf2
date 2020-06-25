@@ -4,7 +4,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen,  Francesco Tenchini, Jo-Frederik Krohn *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -61,7 +61,7 @@ namespace TreeFitter {
     return ErrCode(ErrCode::Status::success);
   }
 
-  bool RecoPhoton::useEnergy(Belle2::Particle& particle)
+  bool RecoPhoton::useEnergy(const Belle2::Particle& particle)
   {
     bool rc = true ;
     const int pdg = particle.getPDGCode();

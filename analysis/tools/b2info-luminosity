@@ -199,6 +199,7 @@ class Luminosity:
 
         # lumi in /fb
         df['lumi'] *= 1E-6
+
         # cumulative integrated luminosity
         df['intLumi'] = df['lumi'].cumsum()
 
@@ -236,16 +237,26 @@ class Luminosity:
         :param period: 1 for day, 2 for week (start on monday)
         """
 
+        # protection for strange entry in the database
+        df=self.df.copy()
+        #drop runs with no date
+
+        df["TMP"] = df.date.values                 # date is a DateTimeIndex
+        df = df[df.TMP.notnull()]                  # remove all NaT values
+        df.drop(["TMP"], axis=1, inplace=True)     # delete TMP again
+        #drop runs with start date before actual start  of BelleII
+        df=df[~(df['date']<'2018-01-01')]
+
         # Group runs by date, and store the int lumi per date as the max cumulative lumi.
         # This returns a pandas.Series object.
         srs_lumi_date = []
         if period==1: # daily
-            srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('d'))["lumi"].sum()
+            srs_lumi_date = df.groupby(df["date"].dt.floor('d'))["lumi"].sum()
             label="Daily"
             freq='D'
             width=1.0
         if period==2: # weekly
-            srs_lumi_date = self.df.groupby(self.df["date"].dt.floor('7d'))["lumi"].sum()
+            srs_lumi_date = df.groupby(df["date"].dt.floor('7d'))["lumi"].sum()
             label="Weekly"
             freq='7d'
             width=3.5
@@ -255,10 +266,11 @@ class Luminosity:
         x = srs_lumi_date.index.values
         y = srs_lumi_date.values
 
+        # integrated luminosity
+        yInt = np.cumsum(srs_lumi_date.values)
+
         figure, ax1 = plt.subplots()
 
-        # there must be a cleaner way to do this
-        yInt = np.append(np.array([0]), np.cumsum(srs_lumi_date.values)[:-1])
         
         ax1.bar(x, y, label=f"{label}", color="blue", width=width)
 
@@ -266,12 +278,8 @@ class Luminosity:
         ax1.set_ylabel(rf"Total integrated {label} luminosity [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.tick_params(axis='y', labelcolor="blue")
 
-        if period==1:
-            ax1.xaxis.set_major_locator(ticker.AutoLocator())
-            ax1.xaxis.set_minor_locator(ticker.MultipleLocator(1))
-        if period==2:
-            ax1.xaxis.set_major_locator(ticker.AutoLocator())
-            ax1.xaxis.set_minor_locator(ticker.AutoLocator())
+        ax1.xaxis.set_minor_locator(ticker.AutoLocator())
+        ax1.xaxis.set_major_locator(ticker.AutoLocator())
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
 
         # plot integrate lumi
@@ -279,19 +287,12 @@ class Luminosity:
         ax2.set_ylabel(r"Total integrated luminosity [$\mathrm{fb}^{-1}$]", color="red")
         ax2.tick_params(axis='y', labelcolor="red")
         ax2.plot(x, yInt, color="red", label="Total",lw=3)
-        if period==1:
-            ax2.xaxis.set_major_locator(ticker.AutoLocator())
-            ax2.xaxis.set_minor_locator(ticker.MultipleLocator(1))
-        if period==2:
-            ax2.xaxis.set_major_locator(ticker.AutoLocator())
-            ax2.xaxis.set_minor_locator(ticker.MultipleLocator(7))
+        ax2.xaxis.set_major_locator(ticker.AutoLocator())
+        ax2.xaxis.set_minor_locator(ticker.AutoLocator())
         ax2.set_ylim(bottom=0)
 
         h1, l1 = ax1.get_legend_handles_labels()
         h2, l2 = ax2.get_legend_handles_labels()
-
-        # addtext=rf"Total $\int\mathcal{{L}}dt = {self.df['intLumi'].max():.2f}\ [\mathrm{{fb}}^{{-1}}]$"
-        # h1.append(mpatches.Patch(color='none', label=addtext))
 
         ax2.legend(h1+h2, l1+l2, loc="upper left",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
 

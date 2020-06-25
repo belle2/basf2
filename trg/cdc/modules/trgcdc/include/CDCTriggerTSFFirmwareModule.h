@@ -6,9 +6,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/Cosim.h>
 
-#include <memory>
 #include <string>
-#include <cstring>
 #include <vector>
 #include <bitset>
 #include <array>
@@ -16,7 +14,6 @@
 #include <unordered_map>
 
 #include <unistd.h>
-#include <cstdlib>
 #include <cstdio>
 
 namespace Belle2 {
@@ -51,12 +48,12 @@ namespace Belle2 {
     /**
      * spawn child process for workers, open pipes to pass data
      */
-    void initialize();
+    void initialize() override;
 
     /**
      * close the pipes and wait for children to die.
      */
-    void terminate();
+    void terminate() override;
 
     /**
      * Things to do for each event.
@@ -64,7 +61,7 @@ namespace Belle2 {
      * It gets the CDCHits from DataStore, simulate the Merger output, pass them
      * to the firmware simulation process, and collect TSF firmware response.
      */
-    void event();
+    void event() override;
 
     /** number of TSF to simulate */
     static constexpr int m_nSubModules = 5;

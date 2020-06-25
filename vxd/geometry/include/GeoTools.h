@@ -12,10 +12,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vector>
-#include <set>
-#include <memory>
 #include <algorithm>
-#include <numeric>
 
 namespace Belle2 {
   namespace VXD {
@@ -397,6 +394,7 @@ namespace Belle2 {
        */
       bool isSVDSideU(VxdID chipID) const
       {
+        /* cppcheck-suppress duplicateExpressionTernary */
         return (chipID.getLayerNumber() == 3 ? chipID.getSegmentNumber() < c_nSVDChipsL3 : chipID.getSegmentNumber() < c_nSVDChipsLu);
       }
 

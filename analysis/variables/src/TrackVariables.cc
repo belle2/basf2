@@ -34,23 +34,22 @@
 
 using namespace std;
 
-namespace {
-
-  Belle2::TrackFitResult const* getTrackFitResultFromParticle(Belle2::Particle const* particle)
-  {
-    const Belle2::Track* track = particle->getTrack();
-    if (!track) {
-      return nullptr;
-    }
-
-    const Belle2::TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(abs(
-                                               particle->getPDGCode())));
-    return trackFit;
-  }
-}
-
 namespace Belle2 {
   namespace Variable {
+
+    // An helper function to get track fit results
+    // Not registered in variable mananger
+    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track) {
+        return nullptr;
+      }
+
+      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
+                                         particle->getPDGCode())));
+      return trackFit;
+    }
 
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
@@ -106,6 +105,15 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
       }
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
+    }
+
+    double trackFirstCDCLayer(const Particle* part)
+    {
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getHitPatternCDC().getFirstLayer();
     }
 
     double trackLastCDCLayer(const Particle* part)
@@ -236,7 +244,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return -1;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
       return trackFit->getPValue();
@@ -497,6 +505,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
     REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
+    REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,     "First activated CDC layer associated to the track");
     REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer, "Last CDC layer associated to the track");
     REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");

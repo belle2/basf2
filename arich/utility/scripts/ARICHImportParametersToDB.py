@@ -100,6 +100,11 @@ if argc == 5:
 
 # dbImporter.importGeometryConfig()
 
+# Import merger cooling bodies geometry
+# from arich/data/ARICH-Merger-cooling_v2.xml
+
+# dbImporter.importMergerCoolingGeo()
+
 # Import simple cosmic test geometry (i.e. one aerogel tile + scintilators).
 # Parameters are read from arich/data/ARICH-CosmicTest.xml
 
@@ -114,3 +119,8 @@ if argc == 5:
 # Parameters are read from arich/data/ARICH-MirrorAlignment.xml
 
 # dbImporter.importMirrorAlignment()
+
+# Import aerogel tile alignment parameters
+# Parameters are read from arich/data/ARICH-AeroTilesAlignment.xml
+
+# dbImporter.importAeroTilesAlignment()

@@ -38,7 +38,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
 
   for (int i = 0; i < 768; i++) { vecHS[i] = 0; stripOccAfterAbsCut[i] = 0;}
 
-  float occCal = 1.;
+  //  float occCal = 1.;
   float occThr = 0.2; //first absolute cut for strips with occupancy >20%
 
   //  auto HSBitmap = new Belle2::SVDCalibrationsBitmap();
@@ -72,15 +72,17 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     if (!side && layer != 3) nstrips = 512;
 
     for (int iterStrip = 0; iterStrip < nstrips; iterStrip++) {
-      occCal = hocc->GetBinContent(iterStrip + 1);
+      float occCal = hocc->GetBinContent(iterStrip + 1);
+      //      B2INFO("Occupancy for" << layer << "." << ladder << "." << sensor << "." << side << ", strip:" << iterStrip << ": " << occCal);
+
       if (occCal > occThr) {
-        vecHS[i] = 1;
-        stripOccAfterAbsCut[i] = 0;
-      } else stripOccAfterAbsCut[i] = occCal;
+        vecHS[iterStrip] = 1;
+        stripOccAfterAbsCut[iterStrip] = 0;
+      } else stripOccAfterAbsCut[iterStrip] = occCal;
     }
 
     //iterative procedure
-
+    //    B2INFO("Starting iterative procedure for hot strips finding");
     bool moreHS = true;
 
     while (moreHS && theHSFinder(stripOccAfterAbsCut, vecHS, nstrips)) {
@@ -89,6 +91,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
 
     for (int l = 0; l < nstrips; l++) {
       isHotStrip = (int) vecHS[l];
+
       payload->set(layer, ladder, sensor, bool(side), l, isHotStrip);
     }
   }

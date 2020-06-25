@@ -13,26 +13,21 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <svd/dataobjects/SVDCluster.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/SensorInfoBase.h>
 
 #include <string>
-#include <TH2.h>
 #include <TFile.h>
 
 namespace Belle2 {
 
 
-  /* Calculates the probability of a cluster originating from signal hit */
-
+  /** Calculates the probability of a cluster originating from signal hit */
   class SVDClusterQualityEstimatorModule : public Module {
 
   public:
 
-    /* Constructor */
+    /** Constructor */
     SVDClusterQualityEstimatorModule();
 
     /** Init the module.*/

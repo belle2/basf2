@@ -13,6 +13,7 @@
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
+#include <TH1D.h>
 
 namespace Belle2 {
   /**
@@ -50,6 +51,11 @@ namespace Belle2 {
     /** * function to make flag active for plotting */
     void setMonitoringPlots(bool value = false) {isMakePlots = value;}
 
+    /** * set sigma to restrict fir range around mean */
+    void setFitWidth(double value = 2.5) {fSigLim = value;}
+
+    /** * function to fit histogram in each cosine bin */
+    void FitGaussianWRange(TH1D*& temphist, TString& status);
 
   protected:
 
@@ -63,7 +69,7 @@ namespace Belle2 {
     bool isMethodSep; /**< if e+e- need to be consider sep */
     bool isMakePlots; /**< produce plots for status */
     bool isMergePayload; /**< merge payload at the of calibration */
-
+    double fSigLim = 2.5; /**< gaussian fit sigma limit */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
 
   };

@@ -5,9 +5,6 @@
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/Date.h>
 
-#include <ostream>
-#include <stdexcept>
-
 namespace Belle2 {
 
   class DBObject : public AbstractDBObject {

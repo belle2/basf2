@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <simulation/dataobjects/SimHitBase.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <string>
 #include <map>
 
@@ -30,30 +30,30 @@ namespace Belle2 {
        */
       BeamBGTypes()
       {
-        m_tags["Coulomb_LER"] = SimHitBase::bg_Coulomb_LER;
-        m_tags["Coulomb_HER"] = SimHitBase::bg_Coulomb_HER;
-        m_tags["RBB_LER"] = SimHitBase::bg_RBB_LER;
-        m_tags["RBB_HER"] = SimHitBase::bg_RBB_HER;
-        m_tags["Touschek_LER"] = SimHitBase::bg_Touschek_LER;
-        m_tags["Touschek_HER"] = SimHitBase::bg_Touschek_HER;
-        m_tags["twoPhoton"] = SimHitBase::bg_twoPhoton;
-        m_tags["RBB_gamma"] = SimHitBase::bg_RBB_gamma;
-        m_tags["RBB_LER_far"] = SimHitBase::bg_RBB_LER_far;
-        m_tags["RBB_HER_far"] = SimHitBase::bg_RBB_HER_far;
-        m_tags["Touschek_LER_far"] = SimHitBase::bg_Touschek_LER_far;
-        m_tags["Touschek_HER_far"] = SimHitBase::bg_Touschek_HER_far;
-        m_tags["SynchRad_LER"] = SimHitBase::bg_SynchRad_LER;
-        m_tags["SynchRad_HER"] = SimHitBase::bg_SynchRad_HER;
-        m_tags["BHWide_LER"] = SimHitBase::bg_BHWide_LER;
-        m_tags["BHWide_HER"] = SimHitBase::bg_BHWide_HER;
-        m_tags["RBB"] = SimHitBase::bg_RBB;
-        m_tags["BHWide"] = SimHitBase::bg_BHWide;
-        m_tags["BHWideLargeAngle"] = SimHitBase::bg_BHWideLargeAngle;
-        m_tags["InjectionLER"] = SimHitBase::bg_InjectionLER;
-        m_tags["InjectionHER"] = SimHitBase::bg_InjectionHER;
-        m_tags["Brems_LER"] = SimHitBase::bg_Brems_LER;
-        m_tags["Brems_HER"] = SimHitBase::bg_Brems_HER;
-        m_tags["other"] = SimHitBase::bg_other;
+        m_tags["Coulomb_LER"] = BackgroundMetaData::bg_Coulomb_LER;
+        m_tags["Coulomb_HER"] = BackgroundMetaData::bg_Coulomb_HER;
+        m_tags["RBB_LER"] = BackgroundMetaData::bg_RBB_LER;
+        m_tags["RBB_HER"] = BackgroundMetaData::bg_RBB_HER;
+        m_tags["Touschek_LER"] = BackgroundMetaData::bg_Touschek_LER;
+        m_tags["Touschek_HER"] = BackgroundMetaData::bg_Touschek_HER;
+        m_tags["twoPhoton"] = BackgroundMetaData::bg_twoPhoton;
+        m_tags["RBB_gamma"] = BackgroundMetaData::bg_RBB_gamma;
+        m_tags["RBB_LER_far"] = BackgroundMetaData::bg_RBB_LER_far;
+        m_tags["RBB_HER_far"] = BackgroundMetaData::bg_RBB_HER_far;
+        m_tags["Touschek_LER_far"] = BackgroundMetaData::bg_Touschek_LER_far;
+        m_tags["Touschek_HER_far"] = BackgroundMetaData::bg_Touschek_HER_far;
+        m_tags["SynchRad_LER"] = BackgroundMetaData::bg_SynchRad_LER;
+        m_tags["SynchRad_HER"] = BackgroundMetaData::bg_SynchRad_HER;
+        m_tags["BHWide_LER"] = BackgroundMetaData::bg_BHWide_LER;
+        m_tags["BHWide_HER"] = BackgroundMetaData::bg_BHWide_HER;
+        m_tags["RBB"] = BackgroundMetaData::bg_RBB;
+        m_tags["BHWide"] = BackgroundMetaData::bg_BHWide;
+        m_tags["BHWideLargeAngle"] = BackgroundMetaData::bg_BHWideLargeAngle;
+        m_tags["InjectionLER"] = BackgroundMetaData::bg_InjectionLER;
+        m_tags["InjectionHER"] = BackgroundMetaData::bg_InjectionHER;
+        m_tags["Brems_LER"] = BackgroundMetaData::bg_Brems_LER;
+        m_tags["Brems_HER"] = BackgroundMetaData::bg_Brems_HER;
+        m_tags["other"] = BackgroundMetaData::bg_other;
       }
 
       /**
@@ -61,7 +61,7 @@ namespace Belle2 {
        * @param bgType BG type name
        * @return BG tag value
        */
-      SimHitBase::BG_TAG getTag(const std::string& bgType)
+      BackgroundMetaData::BG_TAG getTag(const std::string& bgType)
       {
         return m_tags[bgType];
       }
@@ -71,7 +71,7 @@ namespace Belle2 {
        * @param bgTag BG tag value
        * @return BG type name or empty string
        */
-      std::string getType(SimHitBase::BG_TAG bgTag) const
+      std::string getType(BackgroundMetaData::BG_TAG bgTag) const
       {
         if (bgTag == 0) return "";
         for (auto tag : m_tags) {
@@ -110,7 +110,7 @@ namespace Belle2 {
 
     private:
 
-      std::map<std::string, SimHitBase::BG_TAG> m_tags; /**< a map of BG tags */
+      std::map<std::string, BackgroundMetaData::BG_TAG> m_tags; /**< a map of BG tags */
 
     };
 

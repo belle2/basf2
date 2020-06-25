@@ -2,288 +2,924 @@
 # -*- coding: utf-8 -*-
 
 """
-Skim list building functions for :math:`B\\to X_c + h` analyses
+List of functions to skim events containing :math:`B\\to X_c + h` decays,
+where :math:`X_c` stays for :math:`D^0`, :math:`D^{\\pm}`, :math:`D^{*0}` and :math:`D^{*\\pm}`,
+and :math:`h` stays for :math:`\\pi^{\\pm}`, :math:`K^{\\pm}`, :math:`\\rho^{\\pm}` and :math:`a_1^{\\pm}`.
 """
 
 __authors__ = [
-    "Minakshi Nayak",
+    "Fernando Abudinen",
     "Hulya Atmacan",
+    "Chiara La Licata",
+    "Minakshi Nayak",
     "Niharika Rout"
 ]
 
-from basf2 import *
-from modularAnalysis import *
-import sys
-import glob
-import os.path
-import basf2
+import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
 
 
-def BsigToDhTohhList(path):
+__liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
+
+
+@fancy_skim_header
+class BtoD0h_Kspi0(BaseSkim):
     """
-    Skim list definitions for all charged  B to charm 2 body decays.
+    Reconstructed decay modes:
 
-    **Skim Author**: H. Atmacan
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^0) K^+`,
 
-    **Skim Name**: BtoDh_hh
+    Cuts applied:
 
-    **Skim Category**: physics, hadronic B to charm
-
-    **Skim Code**: 14140100
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-    1. B- -> D0 (K- pi+) pi-
-    2. B- -> D0 (K+ pi-) pi-
-    3. B- -> D0 (pi- pi+) pi-
-    4. B- -> D0 (K- K+) pi-
-    5. B- -> D0 (K- pi+) K-
-    6. B- -> D0 (K+ pi-) K-
-    7. B- -> D0 (pi- pi+) K-
-    8. B- -> D0 (K- K+) K-
-
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.5 < M_D0 < 2.2
-    2. 5.2 < Mbc
-    3. abs(deltaE) < 0.3
+    * ``1.5 < M_D0 < 2.2``
+    * ``5.2 < Mbc``
+    * ``abs(deltaE) < 0.3``
 
     Note:
-    This skim uses loadD0bar() where D0 channels are defined.
-
-
+        This skim uses `skim.standardlists.charm.loadD0_Kspi0_loose`, where :math:`D^0`
+        channels are defined.
     """
+    __authors__ = ["Minakshi Nayak"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
 
-    __author__ = "H. Atmacan"
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadD0_Kspi0_loose": [],
+        },
+    }
 
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
-    BsigChannels = ['anti-D0:hh pi+:all',
-                    'anti-D0:hh K+:all'
-                    ]
-    BsigList = []
-    for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B+:BtoDh' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B+:BtoDh' + str(chID))
+        BsigChannels = ["anti-D0:Kspi0 pi+:all",
+                        "anti-D0:Kspi0 K+:all"]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Kspi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Kspi0" + str(chID))
 
-    Lists = BsigList
-    return Lists
+        self.SkimLists = BsigList
 
+    def validation_histograms(self, path):
+        ma.reconstructDecay('D0 -> K_S0:merged pi0:veryLooseFit', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
-def loadD0bar(path):
-
-    Dcuts = '1.5 < M < 2.2'
-    D0barChannels = [
-        'K+:all pi-:all',
-        'K-:all pi+:all',
-        'pi+:all pi-:all',
-        'K+:all K-:all'
-    ]
-    D0barList = []
-    for chID, channel in enumerate(D0barChannels):
-        reconstructDecay('anti-D0:D0Bar' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
-        D0barList.append('anti-D0:D0Bar' + str(chID))
-        copyLists('anti-D0:hh', D0barList, path=path)
-    return D0barList
+        # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
+        ma.variablesToHistogram(
+            filename='BtoDh_Kspi0_Validation.root',
+            decayString='B-:ch3',
+            variables=[
+                ('Mbc', 100, 5.2, 5.3),
+                ('deltaE', 100, -1, 1),
+                ('daughter(0, InvM)', 100, 1.8, 1.9)],  # D0 invariant mass
+            variables_2d=[
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=path)
 
 
-def BsigToDhToKshhList(path):
+@fancy_skim_header
+class BtoD0h_Kspipipi0(BaseSkim):
     """
-    **Skim Author**: M. Nayak
+    Reconstructed decay modes:
 
-    **Skim Name**: BtoDh_Kshh
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) K^+`,
 
-    **Skim Category**: physics, hadronic B to charm
+    Cuts applied:
 
-    **Skim Code**: 14140200
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-    1. B- -> D0 (Ks K- pi+) pi-
-    2. B- -> D0 (Ks K+ pi-) pi-
-    3. B- -> D0 (Ks pi- pi+) pi-
-    4. B- -> D0 (Ks K- K+) pi-
-    5. B- -> D0 (Ks K- pi+) K-
-    6. B- -> D0 (Ks K+ pi-) K-
-    7. B- -> D0 (Ks pi- pi+) K-
-    8. B- -> D0 (Ks K- K+) K-
-
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.5 < M_D0 < 2.2
-    2. 5.2 < Mbc
-    3. abs(deltaE) < 0.3
+    * ``1.8 < M_D0 < 1.9``
+    * ``5.25 < Mbc``
+    * ``abs(deltaE) < 0.2``
 
     Note:
-    This skim uses loadDkshh() where D0 channels are defined.
-
+        This skim uses `skim.standardlists.charm.loadD0_Kspipipi0`, where :math:`D^0`
+        channels are defined.
     """
-    __author__ = "M. Nayak"
 
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+    __authors__ = ["Niharika Rout"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
 
-    BsigChannels = ['D0:Kshh pi-:all',
-                    'D0:Kshh K-:all'
-                    ]
-    BsigList = []
-    for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkshh' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B-:BtoDhkshh' + str(chID))
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdK": ["all"],
+            "stdPi": ["all"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["eff40_Jan2020Fit"]
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadD0_Kspipipi0": [],
+        },
+    }
 
-    Lists = BsigList
-    return Lists
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.2"
+
+        BsigChannels = ["anti-D0:Kspipipi0 pi+:all",
+                        "anti-D0:Kspipipi0 K+:all"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Kspipipi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Kspipipi0" + str(chID))
+
+        self.SkimLists = BsigList
+
+    def validation_histograms(self, path):
+        ma.reconstructDecay('D0 -> K_S0:merged pi-:all pi+:all pi0:eff40_Jan2020Fit', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+
+        # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
+        ma.variablesToHistogram(
+            filename='BtoDh_Kspipipi0_Validation.root',
+            decayString='B-:ch3',
+            variables=[
+                ('Mbc', 100, 5.2, 5.3),
+                ('deltaE', 100, -1, 1),
+                ('daughter(0, InvM)', 100, 1.8, 1.9)],  # D0 invariant mass
+            variables_2d=[
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=path)
 
 
-def loadDkshh(path):
-    Dcuts = '1.5 < M < 2.2'
-
-    D0_Channels = [
-        'K_S0:merged pi+:all pi-:all',
-        'K_S0:merged K+:all K-:all'
-    ]
-    D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kshh' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
-        D0List.append('D0:Kshh' + str(chID))
-        copyLists('D0:Kshh', D0List, path=path)
-    return D0List
-
-
-def BsigToDhToKspi0List(path):
+@fancy_skim_header
+class B0toDpi_Kpipi(BaseSkim):
     """
-    **Skim Author**: M. Nayak
+    Reconstructed decay modes:
 
-    **Skim Name**: BtoDh_Kspi0
+    * :math:`B^{0}\\to D^{-} (D^{0} \\to K^+ \\pi^- \\pi^-) \\pi^+`
 
-    **Skim Category**: physics, hadronic B to charm
+    Cuts applied:
 
-    **Skim Code**: 14140300
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-    1. B- -> D0 (Ks pi0) pi-
-    2. B- -> D0 (Ks pi0) K-
-
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.5 < M_D0 < 2.2
-    2. 5.2 < Mbc
-    3. abs(deltaE) < 0.3
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
 
     Note:
-    This skim uses loadDkspi0() where D0 channels are defined.
-
+        This skim uses `skim.standardlists.charm.loadStdDplus_Kpipi`, where :math:`D^-`
+        channel is defined.
     """
-    __author__ = "M. Nayak"
 
-    Bcuts = 'Mbc > 5.2 and abs(deltaE) < 0.3'
+    __authors__ = ["Chiara La Licata"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
 
-    BsigChannels = ['D0:Kspi0 pi-:all',
-                    'D0:Kspi0 K-:all'
-                    ]
-    BsigList = []
-    for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkspi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B-:BtoDhkspi0' + str(chID))
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdDplus_Kpipi": [],
+        },
+    }
 
-    Lists = BsigList
-    return Lists
+    def build_lists(self, path):
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+        ma.reconstructDecay("B0:Dpi_Kpipi -> D-:Kpipi pi+:GoodTrack", Bcuts, 0, path=path)
 
-
-def loadDkspi0(path):
-    Dcuts = '1.5 < M < 2.2'
-
-    D0_Channels = [
-        'K_S0:merged pi0:skim'
-    ]
-
-    D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kspi0' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
-        D0List.append('D0:Kspi0' + str(chID))
-        copyLists('D0:Kspi0', D0List, path=path)
-    return D0List
+        self.SkimLists = ["B0:Dpi_Kpipi"]
 
 
-def BsigToDhToKspipipi0List(path):
+@fancy_skim_header
+class B0toDpi_Kspi(BaseSkim):
     """
-    **Skim Author**: N. Rout
+    Reconstructed decay modes:
 
-    **Skim Name**: BtoDh_Kspipipi0
+    * :math:`B^{0}\\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\pi^+`,
 
-    **Skim Category**: physics, hadronic B to charm
+    Cuts applied:
 
-    **Skim Code**: 14140400
-
-    **Working Group**: BtoCharm (WG4)
-
-    **Decay Modes**:
-    1. B- -> D0 (Ks pi+ pi- pi0) pi-
-    2. B- -> D0 (Ks pi+ pi- pi0) K-
-
-
-    **Particle Lists**: Standard lists for all particles.
-
-    **Additional Cuts**:
-    1. 1.8 < M_D0 < 1.9
-    2. 5.25 < Mbc
-    3. abs(deltaE) < 0.2
+    * ``1.8 < M_D < 1.9``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
 
     Note:
-    This skim uses loadDkspipipi0() where D0 channels are defined.
-
+        This skim uses `stdV0s.stdKshorts` and
+        `skim.standardlists.charm.loadStdDplus_Kpipi`, where :math:`D^0` channels are defined.
     """
-    __author__ = "N. Rout"
 
-    Bcuts = 'Mbc > 5.25 and abs(deltaE) < 0.2'
+    __authors__ = ["Fernando Abudinen", "Chiara La Licata"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
 
-    BsigChannels = ['D0:Kspipipi0 pi-:all',
-                    'D0:Kspipipi0 K-:all'
-                    ]
-    BsigList = []
-    for chID, channel in enumerate(BsigChannels):
-        reconstructDecay('B-:BtoDhkspipipi0' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        BsigList.append('B-:BtoDhkspipipi0' + str(chID))
+    RequiredStandardLists = {
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadStdDplus_Kspi": [],
+        },
+    }
 
-    Lists = BsigList
-    return Lists
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+        ma.reconstructDecay("B0:B0toDpi_Kspi -> D-:Kspi pi+:GoodTrack", Bcuts, 1, path=path)
 
-
-def loadDkspipipi0(path):
-    Dcuts = '1.8 < M < 1.9'
-
-    D0_Channels = [
-        'K_S0:merged pi+:all pi-:all pi0:skim'
-    ]
-    D0List = []
-    for chID, channel in enumerate(D0_Channels):
-        reconstructDecay('D0:Kspipipi0' + str(chID) + ' -> ' + channel, Dcuts, chID, path=path)
-        D0List.append('D0:Kspipipi0' + str(chID))
-        copyLists('D0:Kspipipi0', D0List, path=path)
-    return D0List
+        self.SkimLists = ["B0:B0toDpi_Kspi"]
 
 
-def DoubleCharmList(path):
-    Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
+@fancy_skim_header
+class B0toDstarPi_D0pi_Kpi(BaseSkim):
+    """
+    Reconstructed decay modes:
 
-    B0_Channels = ['D0:all D0:all',
-                   'D0:all D*0:all',
-                   'D*0:all D0:all',
-                   'D*0:all D*0:all']
+    * :math:`B^{0}\\to D^{*-} (D^{0} \\to K^+ \\pi^-) \\pi^+`
 
-    B0List = []
-    for chID, channel in enumerate(B0_Channels):
-        reconstructDecay('B0:DC' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        B0List.append('B0:DC' + str(chID))
+    Cuts applied:
 
-    Lists = B0List
-    return Lists
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpi`, where the
+        :math:`D^{*-}` channel is defined.
+    """
+
+    __authors__ = ["Chiara La Licata"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpi": [],
+            "loadStdDstarPlus_D0pi_Kpi": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+        ma.reconstructDecay("B0:Dstarpi_Kpi -> D*-:D0_Kpi pi+:GoodTrack", Bcuts, 0, path=path)
+
+        self.SkimLists = ["B0:Dstarpi_Kpi"]
+
+
+@fancy_skim_header
+class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\overline{D}^{0}
+      (\\to K^+ \\pi^- \\pi^- \\pi^+, K^+\\pi^-\\pi^0) \\pi^-) \\pi^+`
+
+    Cuts applied:
+
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+    """
+
+    __authors__ = ["Chiara La Licata"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpipi0": [],
+            "loadStdD0_Kpipipi": [],
+            "loadStdDstarPlus_D0pi_Kpipi0": [],
+            "loadStdDstarPlus_D0pi_Kpipipi": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+        BsigChannels = [
+            "D*-:D0_Kpipipi pi+:GoodTrack",
+            "D*-:D0_Kpipi0 pi+:GoodTrack"
+        ]
+
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B0:Dstarpi_Kpipipi_Kpipi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B0:Dstarpi_Kpipipi_Kpipi0" + str(chID))
+
+        self.SkimLists = BsigList
+
+
+@fancy_skim_header
+class B0toDrho_Kpipi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D^{-} (\\to K^+ \\pi^- \\pi^-) \\rho^+`,
+
+    Cuts applied:
+
+    * ``1.8 < M_D < 1.9``
+    * ``0.47 < M_rho < 1.07``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdDplus_Kpipi`, where :math:`D^0` channels
+        are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdDplus_Kpipi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+        ma.reconstructDecay("B0:B0toDrho_Kpipi -> D-:Kpipi rho+:all", Bcuts, 1, path=path)
+
+        self.SkimLists = ["B0:B0toDrho_Kpipi"]
+
+
+@fancy_skim_header
+class B0toDrho_Kspi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\rho^+`,
+
+    Cuts applied:
+
+    * ``1.8 < M_D < 1.9``
+    * ``0.47 < M_rho < 1.07``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `stdV0s.stdKshorts` and
+        `skim.standardlists.charm.loadStdDplus_Kspi`, where :math:`D^0` channels are defined, and
+        `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "stdV0s": {
+            "stdKshorts": []
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadStdDplus_Kspi": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        ma.reconstructDecay("B0:B0toDrho_Kspi -> D-:Kspi rho+:all", Bcuts, 1, path=path)
+
+        self.SkimLists = ["B0:B0toDrho_Kspi"]
+
+
+@fancy_skim_header
+class B0toDstarRho_D0pi_Kpi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\rho^+`,
+
+    Cuts applied:
+
+    * ``1.7 < M_D < 2.0``
+    * ``0.47 < M_rho < 1.07``
+    * ``DM_Dstar_D < 0.16``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpi` and
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpi` where :math:`D^0` channels are
+        defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpi": [],
+            "loadStdDstarPlus_D0pi_Kpi": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+        ma.reconstructDecay("B0:BtoDstarRho_D0pi_Kpi -> D*-:D0_Kpi rho+:all", Bcuts, 1, path=path)
+
+        self.SkimLists = ["B0:BtoDstarRho_D0pi_Kpi"]
+
+
+@fancy_skim_header
+class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0}
+      (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)\\pi^-) \\rho^+`,
+
+    Cuts applied:
+
+    * ``1.7 < M_D < 2.0``
+    * ``0.47 < M_rho < 1.07``
+    * ``DM_Dstar_D < 0.16``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`,
+        `skim.standardlists.charm.loadStdD0_Kpipipi`,
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpipi0` and
+        `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpipipi` where :math:`D^0`
+        channels are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpipi0": [],
+            "loadStdD0_Kpipipi": [],
+            "loadStdDstarPlus_D0pi_Kpipi0": [],
+            "loadStdDstarPlus_D0pi_Kpipipi": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = [
+            "D*-:D0_Kpipipi rho+:all",
+            "D*-:D0_Kpipi0 rho+:all",
+        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:B0toDstarRho" + str(chID) + " -> " + channel, Bcuts, chID, path=path, allowChargeViolation=True)
+            BsigList.append("B+:B0toDstarRho" + str(chID))
+
+        self.SkimLists = BsigList
+
+
+@fancy_skim_header
+class BtoD0h_hh(BaseSkim):
+    """
+    Skim list definitions for all charged B to charm 2 body decays.
+
+    Reconstructed decay modes:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) K^+`,
+
+    Cuts applied:
+
+    * ``1.5 < M_D0 < 2.2``
+    * ``5.2 < Mbc``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadD0_hh_loose`, where :math:`D^0`
+        channels are defined.
+    """
+
+    __authors__ = ["Hulya Atmacan"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadD0_hh_loose": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = [
+            "anti-D0:hh pi+:GoodTrack",
+            "anti-D0:hh K+:GoodTrack"
+        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_hh" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_hh" + str(chID))
+
+        self.SkimLists = BsigList
+
+    def validation_histograms(self, path):
+        ma.reconstructDecay('D0 -> K-:GoodTrack pi+:GoodTrack', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('B-:ch3 ->D0 K-:GoodTrack', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+
+        # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
+
+        ma.variablesToHistogram(
+            filename='BtoDh_hh_Validation.root',
+            decayString='B-:ch3',
+            variables=[
+                ('Mbc', 100, 5.2, 5.3),
+                ('deltaE', 100, -1, 1),
+                ('daughter(0, InvM)', 100, 1.8, 1.9)],  # D0 invariant mass
+            variables_2d=[
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=path)
+
+
+@fancy_skim_header
+class BtoD0h_Kpi(BaseSkim):
+    """
+    Skim list definitions for all charged B to charm 3 body decays.
+
+    Reconstructed decay modes:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
+
+    Cuts applied:
+
+    * ``1.7 < M_D0 < 2.0``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.5``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpi`, where :math:`D^0`
+        channels are defined.
+    """
+
+    __authors__ = ["Niharika Rout"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpi": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.5"
+
+        BsigChannels = ["anti-D0:Kpi pi+:GoodTrack",
+                        "anti-D0:Kpi K+:GoodTrack"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Kpi" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Kpi" + str(chID))
+
+        self.SkimLists = BsigList
+
+
+@fancy_skim_header
+class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+      \\pi^0) \\pi^+`
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+      \\pi^0) \\K^+`
+
+    Cuts applied:
+
+    * ``1.7 < M_D0 < 2.0``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipipi` and
+        `skim.standardlists.charm.loadStdD0_Kpipi0`, where :math:`D^0` channels are
+        defined.
+    """
+
+    __authors__ = ["Chiara La Licata"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpipi0": [],
+            "loadStdD0_Kpipipi": [],
+            "loadStdDstar0_D0pi0_Kpipipi": [],
+            "loadStdDstar0_D0pi0_Kpipi0": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = ["anti-D0:Kpipipi pi+:GoodTrack",
+                        "anti-D0:Kpipipi K+:GoodTrack",
+                        "anti-D0:Kpipi0 pi+:GoodTrack",
+                        "anti-D0:Kpipi0 K+:GoodTrack",
+                        "anti-D*0:D0_Kpipipi pi+:GoodTrack",
+                        "anti-D*0:D0_Kpipipi K+:GoodTrack",
+                        "anti-D*0:D0_Kpipi0 pi+:GoodTrack",
+                        "anti-D*0:D0_Kpipi0 K+:GoodTrack"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Khh_Khpi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Khh_Khpi0" + str(chID))
+
+        ma.copyLists(outputListName="B+:BtoD0h_merged", inputListNames=BsigList, path=path)
+
+        # Select only three random candidates
+        ma.rankByHighest(particleList="B+:BtoD0h_merged", variable="cos(mdstIndex)", numBest=3,
+                         outputVariable="cosMdstIndex_rank", path=path)
+
+        self.SkimLists = ["B+:BtoD0h_merged"]
+
+
+@fancy_skim_header
+class BtoD0h_Kshh(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ K^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ K^-) K^+`,
+
+    Cuts applied:
+
+    * ``1.5 < M_D0 < 2.2``
+    * ``5.2 < Mbc``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadD0_Kshh_loose`, where :math:`D^0`
+        channels are defined.
+    """
+
+    __authors__ = ["Minakshi Nayak"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "stdV0s": {
+            "stdKshorts": []
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadD0_Kshh_loose": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = ["anti-D0:Kshh pi+:GoodTrack",
+                        "anti-D0:Kshh K+:GoodTrack"
+                        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0h_Kshh" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0h_Kshh" + str(chID))
+
+        self.SkimLists = BsigList
+
+    def validation_histograms(self, path):
+        ma.reconstructDecay('D0 -> K_S0:merged pi+:GoodTrack pi-:GoodTrack', '1.84 < M < 1.89', path=path)
+        ma.reconstructDecay('B-:ch3 ->D0 K-:GoodTrack', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+
+        # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
+        ma.variablesToHistogram(
+            filename='BtoDh_Kshh_Validation.root',
+            decayString='B-:ch3',
+            variables=[
+                ('Mbc', 100, 5.2, 5.3),
+                ('deltaE', 100, -1, 1),
+                ('daughter(0, InvM)', 100, 1.8, 1.9)],  # D0 invariant mass
+            variables_2d=[
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=path)
+
+
+@fancy_skim_header
+class BtoD0rho_Kpi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\rho^+`,
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^0) \\rho^+`,
+
+    Cuts applied:
+
+    * ``1.7 < M_D0 < 2.0``
+    * ``0.47 < M_rho < 1.07``
+    * ``DM_Dstar_D < 0.16``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpi` and
+        `skim.standardlists.charm.loadStdDstar0_D0pi0_Kpi`, where :math:`D^0` channels
+        are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+    """
+
+    __authors__ = ["Fernando Abudinen"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpi": [],
+            "loadStdDstar0_D0pi0_Kpi": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+
+        BsigChannels = ["anti-D0:Kpi rho+:all",
+                        "anti-D*0:D0_Kpi rho+:all"]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0rho_Kpi" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0rho_Kpi" + str(chID))
+
+        self.SkimLists = BsigList
+
+
+@fancy_skim_header
+class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`
+    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2 \\pi^-
+      \\pi^+, K^+\\pi^-\\pi^0) \\pi^0) \\rho^+`
+
+    Cuts applied:
+
+    * ``1.7 < M_D0 < 2.0``
+    * ``DM_Dstar_D < 0.16``
+    * ``0.6 < M_rho < 0.9``
+    * ``cosHel_rho < 0.90``
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.3``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`,
+        `skim.standardlists.charm.loadStdD0_Kpipipi`,
+        `skim.standardlists.charm.loadStdDstar0_D0pi0_Kpipi0`, and
+        `skim.standardlists.charm.loadStdDstar0_D0pi0_Kpipipi`, where :math:`D^0`
+        channels are defined, and `skim.standardlists.lightmesons.loadStdAllRhoPlus`.
+
+    Warning:
+       This skim saves only three randomly-chosen :math:`B^{+}` candidates in a
+       ``B+:BtoD0rho_merged`` list, since the candidate multiplicity of this skim is
+       very high.
+    """
+    __authors__ = ["Fernando Abudinen"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+            "loadStdAllRhoPlus": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0_Kpipi0": [],
+            "loadStdD0_Kpipipi": [],
+            "loadStdDstar0_D0pi0_Kpipi0": [],
+            "loadStdDstar0_D0pi0_Kpipipi": [],
+        },
+    }
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9 and 0.6 <= daughter(1,M) <= 0.9"
+
+        BsigChannels = [
+            "anti-D0:Kpipipi rho+:all",
+            "anti-D0:Kpipi0 rho+:all",
+            "anti-D*0:D0_Kpipipi rho+:all",
+            "anti-D*0:D0_Kpipi0 rho+:all"
+        ]
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("B+:BtoD0rho_merged" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("B+:BtoD0rho_merged" + str(chID))
+
+        ma.copyLists(outputListName="B+:BtoD0rho_merged", inputListNames=BsigList, path=path)
+
+        # Select only three random candidates to save them as these channels have high multiplicity.
+        ma.rankByHighest(particleList="B+:BtoD0rho_merged", variable="cos(mdstIndex)", numBest=3,
+                         outputVariable="cosMdstIndex_rank", path=path)
+
+        self.SkimLists = ["B+:BtoD0rho_merged"]

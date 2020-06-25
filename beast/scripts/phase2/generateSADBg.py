@@ -130,7 +130,7 @@ if sampleType == 'study':
         ("/DetectorComponent[@name='TOP']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ARICH']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
-        ("/DetectorComponent[@name='BKLM']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='KLM']//BeamBackgroundStudy", '1', ''),
     ])
 main.add_module(gearbox)
 
@@ -144,6 +144,8 @@ main.add_module(generator)
 # Geant geometry
 geometry = register_module('Geometry')
 geometry.param('useDB', False)
+if phase == 31:
+    geometry.param('additionalComponents', ['BEAMABORT', 'MICROTPC', 'CLAWS', 'HE3TUBE'])
 main.add_module(geometry)
 
 # Geant simulation
@@ -165,10 +167,7 @@ if phase == 31:
 
 # to not store MCParticles use this, if you want MCParticles comment these two lines and uncomment the line after
 excludeBranch = ['MCParticles']
-main.add_module('RootOutput', outputFileName=outputFile, excludeBranchNames=excludeBranch,
-                buildIndex=False, autoFlushSize=-500000)
-
-# add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile)
+add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile, excludeBranches=excludeBranch)
 
 
 # Process events

@@ -7,9 +7,11 @@
 //-
 
 #include <daq/rfarm/event/modules/Raw2DsModule.h>
+#include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
+
 #include <TSystem.h>
 #include <stdlib.h>
-#include <time.h>
 #include <signal.h>
 
 #include "framework/datastore/StoreObjPtr.h"

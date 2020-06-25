@@ -20,13 +20,14 @@ from top_calibration import BS13d_calibration_cdst
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
-globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
+globalTags = ['Reco_master_patch', 'data_reprocessing_proc10']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
-data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
+data_dir = '/group/belle2/dataprod/Data/OfficialReco/proc10/'
 skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 main_output_dir = 'top_calibration'
 maxFiles = 10  # maximum number of input files per run (0 or negative means all)
-time_offset = -66.8  # must be set to 0 for release-4 processed data or newer
+time_offset = 0  # [ns], set to -66.8 for proc9 or older (processed w/ release-3)
+new_cdst_format = False  # set to True for input in new cdst format
 #
 # ---------------------------------------------------------------------------------------
 
@@ -63,7 +64,7 @@ run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
 output_dir = f"{main_output_dir}/BS13d-bhabha-{expNo}-{run_range}"
 
 # Define calibration
-cal = BS13d_calibration_cdst(inputFiles, time_offset, globalTags, localDBs)
+cal = BS13d_calibration_cdst(inputFiles, time_offset, globalTags, localDBs, new_cdst_format)
 cal.backend_args = {"queue": "s"}
 
 # Add calibration to CAF

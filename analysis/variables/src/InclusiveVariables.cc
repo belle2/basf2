@@ -16,7 +16,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 
-#include <boost/lexical_cast.hpp>
 using namespace std;
 
 namespace Belle2 {
@@ -54,8 +53,8 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         try {
           pdgCode = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The meta variable nDaughterCharged accepts zero or one arguments!");
+        } catch (std::invalid_argument&) {
+          B2ERROR("If an argument is provided to the meta variable nDaughterCharged it has to be an integer!");
           return nullptr;
         }
       }
@@ -68,7 +67,7 @@ namespace Belle2 {
             if (abs(daughter->getPDGCode()) == pdgCode) {
               result++;
             }
-          } else if (daughter->getParticleType() == Particle::EParticleType::c_Track) {
+          } else if (abs(daughter->getCharge()) > 0) {
             result++;
           }
         }
@@ -82,7 +81,8 @@ namespace Belle2 {
       int result = 0;
       auto fspDaughters = particle->getDaughters();
       for (auto* daughter : fspDaughters) {
-        if (daughter->getParticleType() == Particle::EParticleType::c_Composite) {
+        if (daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+            daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
           result++;
         }
       }

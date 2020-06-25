@@ -16,8 +16,6 @@
 #include <sys/stat.h>
 #include "nsm2/belle2nsm.h"
 
-#include <string>
-
 extern "C" {
 #ifdef USE_READLINE
 #include <readline/readline.h>

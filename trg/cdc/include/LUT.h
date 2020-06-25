@@ -24,9 +24,6 @@
 
 namespace Belle2 {
 
-  class TRGCDC;
-  class TRGCDCTrack;
-
 /// A class to use LUTs for TRGCDC
   class TRGCDCLUT {
 

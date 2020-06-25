@@ -8,16 +8,17 @@
 
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFNSM.h"
-//#include "daq/slc/nsm/NSMCommunicator.h"
-#include <time.h>
+
+#include <fcntl.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <cstring>
 
 extern "C" {
 #include <nsm2/nsmlib2.h>
-#include <nsm2/belle2nsm.h>
 }
 
 using namespace std;

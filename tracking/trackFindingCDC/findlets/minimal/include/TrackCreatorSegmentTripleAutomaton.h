@@ -49,7 +49,7 @@ namespace Belle2 {
 
     private: // cellular automaton
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<const CDCSegmentTriple> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCSegmentTriple, WeightedRelation> m_cellularPathFinder;
 
     private: // object pools
       /// Memory for the segment triple paths generated from the graph.

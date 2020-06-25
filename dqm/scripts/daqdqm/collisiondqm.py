@@ -23,15 +23,21 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
                      For dqm_mode == "dont_care" all the DQM modules should be added.
                      For dqm_mode == "all_events" only the DQM modules which should run on all events
                             (filtered and dismissed) should be added
-                     For dqm_mode == "before_reco" only thw DQM modules which should run before
-                            all reconstruction
+                     For dqm_mode == "before_filter" only the DQM modules which should run before
+                            the hlt filter
                      For dqm_mode == "filtered"  only the DQM modules which should run on filtered
                             events should be added
     """
 
-    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_reco"]
+    assert dqm_mode in ["dont_care", "all_events", "filtered", "before_filter"]
 
     add_common_dqm(path, components=components, dqm_environment=dqm_environment, dqm_mode=dqm_mode)
+
+    if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
+        # PXD (not useful on HLT)
+        if components is None or 'PXD' in components:
+            # need to be behind add_common_dqm as intercepts are calculated there
+            path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
 
     # the following makes only sense in collisions
     if dqm_environment == "expressreco":

@@ -21,6 +21,7 @@ from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 
 from rawdata import add_unpackers
 
+
 # Now we define a list of all the unpacker output we want to print out and all
 # the members we want to check
 unpacked_dataobjects = [
@@ -31,8 +32,11 @@ unpacked_dataobjects = [
     DataStorePrinter("TOPDigit", ["getModuleID", "getPixelID", "getPixelRow", "getPixelCol", "getRawTime",
                                   "getPulseHeight", "getPulseWidth"]),
     DataStorePrinter("ARICHDigit", ["getModuleID", "getChannelID", "getBitmap"]),
-    DataStorePrinter("BKLMDigit", ["getUniqueChannelID", "getTime", "getEDep", "getCharge", "getTime"]),
+    DataStorePrinter("BKLMDigit", ["getUniqueChannelID", "getTime", "getEnergyDeposit", "getCharge", "getTime"]),
     DataStorePrinter("EKLMDigit", ["getUniqueChannelID", "getCTime", "getCharge", "getPlane", "getStrip"]),
+    DataStorePrinter("CDCTriggerSegmentHit", ["getID"]),
+    DataStorePrinter("CDCTrigger2DFinderTrack", ["getTime", "getPt"]),
+    DataStorePrinter("CDCTriggerNeuroTrack", ["getTime", "getPt"]),
 ]
 
 

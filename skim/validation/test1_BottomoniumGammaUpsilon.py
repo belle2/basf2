@@ -12,36 +12,15 @@
 
 __author__ = "S. Spataro && S. Jia"
 
-from basf2 import *
-from modularAnalysis import *
-from stdPi0s import *
-from stdPhotons import *
-from stdCharged import *
-from skimExpertFunctions import encodeSkimName, setSkimLogging
+import basf2 as b2
+import modularAnalysis as ma
+from skim.quarkonium import BottomoniumUpsilon
 
-# create a new path
-BottomoniumGammaUpsilonskimpath = Path()
+path = b2.Path()
 
 fileList = ['../BottomoniumGammaUpsilon.dst.root']
+ma.inputMdstList('default', fileList, path=path)
 
-inputMdstList('default', fileList, path=BottomoniumGammaUpsilonskimpath)
-
-# use standard final state particle lists
-stdPi('loose', path=BottomoniumGammaUpsilonskimpath)
-stdE('loose', path=BottomoniumGammaUpsilonskimpath)
-stdMu('loose', path=BottomoniumGammaUpsilonskimpath)
-
-stdPhotons('loose', path=BottomoniumGammaUpsilonskimpath)
-
-# Bottomonium Skim
-from skim.quarkonium import *
-YList = UpsilonList(path=BottomoniumGammaUpsilonskimpath)
-skimOutputUdst('../BottomoniumGammaUpsilon.udst.root', YList, path=BottomoniumGammaUpsilonskimpath)
-summaryOfLists(YList, path=BottomoniumGammaUpsilonskimpath)
-
-
-setSkimLogging(path=BottomoniumGammaUpsilonskimpath)
-process(BottomoniumGammaUpsilonskimpath)
-
-# print out the summary
-print(statistics)
+skim = BottomoniumUpsilon(OutputFileName='../BottomoniumGammaUpsilon.udst.root')
+skim(path)
+b2.process(path)

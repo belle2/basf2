@@ -262,7 +262,7 @@ MayBePtr<const CDCHit> CDCMCMap::getHit(const CDCSimHit* simHit) const
 
 bool CDCMCMap::isBackground(const CDCSimHit* simHit) const
 {
-  return simHit ? simHit->getBackgroundTag() != CDCSimHit::bg_none : false;
+  return simHit ? simHit->getBackgroundTag() != BackgroundMetaData::bg_none : false;
 }
 
 bool CDCMCMap::isBackground(const CDCHit* hit) const

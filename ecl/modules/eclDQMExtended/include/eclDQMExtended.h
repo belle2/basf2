@@ -87,6 +87,8 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_calibrationThrA0;
     /** Hit threshold. */
     DBObjPtr<ECLCrystalCalib> m_calibrationThrAhard;
+    /** Skip amplitude threshold. */
+    DBObjPtr<ECLCrystalCalib> m_calibrationThrAskip;
 
     /** ECL channel mapper. */
     ECL::ECLChannelMapper mapper;
@@ -104,6 +106,8 @@ namespace Belle2 {
     std::vector<short int>  v_totalthrA0 = {};
     /** Vector to store hit thresholds. */
     std::vector<short int>  v_totalthrAhard = {};
+    /** Vector to store skip amplitude threshold. */
+    std::vector<short int>  v_totalthrAskip = {};
 
     /** Signal amplitude obtaining from DSP emulator. */
     int m_AmpFit{0};
@@ -154,6 +158,8 @@ namespace Belle2 {
     TH1F* h_amptimefail_shaperid{nullptr};
     /** Histogram: ShaperIDs w/ failed qualities. */
     TH1F* h_qualityfail_shaperid{nullptr};
+    /** Histogram: ShaperIDs w/ failed logic. */
+    TH1F* h_fail_shaperid{nullptr};
     /** Histogram: CrateIDs w/ failed amplitudes. */
     TH1F* h_ampfail_crateid{nullptr};
     /** Histogram: CrateIDs w/ failed times. */
@@ -162,6 +168,8 @@ namespace Belle2 {
     TH1F* h_amptimefail_crateid{nullptr};
     /** Histogram: CrateIDs w/ failed qualities. */
     TH1F* h_qualityfail_crateid{nullptr};
+    /** Histogram: CrateIDs w/ failed logic. */
+    TH1F* h_fail_crateid{nullptr};
 
     /** Histogram: Amplitude diff. (Emulator - Data) for amp. fails. */
     TH2F* h_ampdiff_cellid{nullptr};

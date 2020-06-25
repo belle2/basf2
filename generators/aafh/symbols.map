@@ -1,0 +1,10 @@
+# Tell the linker that only the C++ interface symbols should be public, all the
+# rest we want to be private to not interfere with anything else (aka Pythia)
+{
+global:
+    extern "C++" {
+        *Belle2::AAFHInterface*;
+    };
+local:
+    *;
+};

@@ -35,7 +35,8 @@
 #include "G4AntiNuclElastic.hh"
 #include "G4HadronicAbsorptionFritiof.hh"
 
-#include "G4ChipsHyperonInelasticXS.hh"
+#include "G4ChipsAntiBaryonElasticXS.hh"
+#include "G4ChipsAntiBaryonInelasticXS.hh"
 #include "G4ComponentAntiNuclNuclearXS.hh"
 #include "G4CrossSectionInelastic.hh"
 #include "G4CrossSectionElastic.hh"
@@ -104,7 +105,8 @@ void AntiBaryonPhysics::ConstructProcess()
   G4VCrossSectionDataSet* antiNucleonData =
     new G4CrossSectionInelastic(m_theAntiNucleonXS);
 
-  G4ChipsHyperonInelasticXS* hchipsInelastic = new G4ChipsHyperonInelasticXS;
+  G4ChipsAntiBaryonElasticXS* hchipsElastic = new G4ChipsAntiBaryonElasticXS;
+  G4ChipsAntiBaryonInelasticXS* hchipsInelastic = new G4ChipsAntiBaryonInelasticXS;
 
   //////////////////////////////////////////////////////////////////////////////
   //   Anti-proton                                                            //
@@ -138,6 +140,7 @@ void AntiBaryonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* anProcEl = new G4HadronElasticProcess;
   anProcEl->RegisterMe(elModel);
+  anProcEl->AddDataSet(hchipsElastic);
   procMan->AddDiscreteProcess(anProcEl);
 
   // inelastic
@@ -247,6 +250,7 @@ void AntiBaryonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* alamProcEl = new G4HadronElasticProcess;
   alamProcEl->RegisterMe(elModel);
+  alamProcEl->AddDataSet(hchipsElastic);
   procMan->AddDiscreteProcess(alamProcEl);
 
   // inelastic
@@ -264,6 +268,7 @@ void AntiBaryonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* aspProcEl = new G4HadronElasticProcess;
   aspProcEl->RegisterMe(elModel);
+  aspProcEl->AddDataSet(hchipsElastic);
   procMan->AddDiscreteProcess(aspProcEl);
 
   // inelastic
@@ -285,6 +290,7 @@ void AntiBaryonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* asmProcEl = new G4HadronElasticProcess;
   asmProcEl->RegisterMe(elModel);
+  asmProcEl->AddDataSet(hchipsElastic);
   procMan->AddDiscreteProcess(asmProcEl);
 
   // inelastic
@@ -302,6 +308,7 @@ void AntiBaryonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* axzProcEl = new G4HadronElasticProcess;
   axzProcEl->RegisterMe(elModel);
+  axzProcEl->AddDataSet(hchipsElastic);
   procMan->AddDiscreteProcess(axzProcEl);
 
   // inelastic
@@ -319,6 +326,7 @@ void AntiBaryonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* axmProcEl = new G4HadronElasticProcess;
   axmProcEl->RegisterMe(elModel);
+  axmProcEl->AddDataSet(hchipsElastic);
   procMan->AddDiscreteProcess(axmProcEl);
 
   // inelastic
@@ -336,6 +344,7 @@ void AntiBaryonPhysics::ConstructProcess()
   // elastic
   G4HadronElasticProcess* aomProcEl = new G4HadronElasticProcess;
   aomProcEl->RegisterMe(elModel);
+  aomProcEl->AddDataSet(hchipsElastic);
   procMan->AddDiscreteProcess(aomProcEl);
 
   // inelastic

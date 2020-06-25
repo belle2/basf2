@@ -239,7 +239,7 @@ namespace Belle2 {
      * Set vector of numbers of aerogel slots in individual ring
      * @param nAeroSlotsIndividualRing vector of numbers of aerogel slots in individual ring
      */
-    void setNAeroSlotsIndividualRing(std::vector<int>& nAeroSlotsIndividualRing) { m_nAeroSlotsIndividualRing = nAeroSlotsIndividualRing; }
+    void setNAeroSlotsIndividualRing(const std::vector<int>& nAeroSlotsIndividualRing) { m_nAeroSlotsIndividualRing = nAeroSlotsIndividualRing; }
 
     /**
      * Get number of aerogel layers

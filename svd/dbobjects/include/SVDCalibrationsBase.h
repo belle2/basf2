@@ -18,6 +18,7 @@
 
 namespace Belle2 {
 
+  /** base class for calibrations classes*/
   template < class T  >
   class SVDCalibrationsBase: public TObject {
 

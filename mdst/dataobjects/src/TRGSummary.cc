@@ -112,11 +112,11 @@ std::string TRGSummary::getInfoHTML() const
     const auto currentBitInWord = currentBit % c_trgWordSize;
 
     const auto ftdlBit =
-      (getFtdlBits(currentWord) & (1 << currentBitInWord)) > 0;
+      (getFtdlBits(currentWord) & ((unsigned int)1 << currentBitInWord)) > 0;
     const auto psnmBit =
-      (getPsnmBits(currentWord) & (1 << currentBitInWord)) > 0;
+      (getPsnmBits(currentWord) & ((unsigned int)1 << currentBitInWord)) > 0;
     const auto inputBit = (getInputBits(currentWord)
-                           & (1 << currentBitInWord)) > 0;
+                           & ((unsigned int)1 << currentBitInWord)) > 0;
 
     htmlOutput << "<td>" << currentBit << "(word " << currentWord << " bit "
                << currentBitInWord << ")</td>";

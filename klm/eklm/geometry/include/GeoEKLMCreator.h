@@ -527,7 +527,7 @@ namespace Belle2 {
        * Create sector support structure (main part without corners).
        * @param[in] sector Sector logical volume.
        */
-      void createSectorSupport(G4LogicalVolume* mlv) const;
+      void createSectorSupport(G4LogicalVolume* sector) const;
 
       /**
        * Create sector support corner 1.
@@ -654,6 +654,9 @@ namespace Belle2 {
 
       /** Current volumes. */
       struct VolumeNumbers m_CurVol;
+
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
 
       /** Transformation data. */
       TransformData* m_TransformData;

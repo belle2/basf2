@@ -1,10 +1,14 @@
 # EventType: 2610050101
-# Descriptor: [ccbar Dstarm2D0Pim D0bar2KS0PipPim]
-# NickName: 
+# Descriptor: [ccbar Dstarm2D0barPim D0bar2KS0PipPim]
+# NickName: DstmToD0barPim_D0barToKsPipPim
 # Cuts: None
-# Documentation: 
+# Documentation: MC13a signal request, decay used for
+#                tracking efficiency study
 # PhysicsWG: Charm
-# Test: Yes
+# Tested: Yes
+# Responsible: Emma Oxford
+# Email: emma.oxford@desy.de
+# Date: 20200210 (YYYYMMDD)
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
@@ -53,7 +57,7 @@ Decay D*-
 Enddecay
 
 Decay anti-D0sig
-1.0000     KS0sig   pi+   pi-       PHOTOS    PHSP;
+1.0000     KS0sig   pi+   pi-       PHOTOS    D_DALITZ;
 Enddecay
 
 Decay KS0sig

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ######################################################
 #
@@ -38,7 +37,7 @@ my_path = b2.create_path()
 ma.setupEventInfo(100, path=my_path)
 ge.add_inclusive_continuum_generator(finalstate="ccbar",
                                      particles=["D*+"],
-                                     userdecfile='B2A102-ccbarEventGeneration.dec',
+                                     userdecfile=b2.find_file('analysis/examples/simulations/B2A102-ccbarEventGeneration.dec'),
                                      path=my_path)
 
 re.add_mdst_output(mc=True, filename='B2A102-ccbarEventGeneration-kkmc.root', path=my_path)

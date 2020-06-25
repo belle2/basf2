@@ -9,16 +9,15 @@
 </header>
 """
 
-from basf2 import *
-from modularAnalysis import *
-from variables import variables
+import basf2 as b2
+import modularAnalysis as ma
 from validation_tools.metadata import create_validation_histograms
 
-charmless2chargedpath = Path()
+charmless2chargedpath = b2.Path()
 myEmail = 'khsmith@student.unimelb.edu.au'
 
 # the variables that are printed out are: Mbc, deltaE and Mbc vs deltaE
-inputMdst('default', '../CharmlessHad2BodyCharged.udst.root', path=charmless2chargedpath)
+ma.inputMdst('default', '../CharmlessHad2BodyCharged.udst.root', path=charmless2chargedpath)
 
 create_validation_histograms(
     rootfile='CharmlessHad2BodyCharged_Validation.root',
@@ -53,5 +52,5 @@ create_validation_histograms(
     path=charmless2chargedpath
 )
 
-process(charmless2chargedpath)
-print(statistics)
+b2.process(charmless2chargedpath)
+print(b2.statistics)

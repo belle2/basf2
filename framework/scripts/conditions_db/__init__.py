@@ -174,7 +174,14 @@ class ConditionsDB:
             B2INFO("Getting Conditions Database servers from Environment:")
             for i, url in enumerate(base_url_list, 1):
                 B2INFO(f"  {i}. {url}")
-        return base_url_list
+        # try to escalate to https for all given urls
+        full_list = []
+        for url in base_url_list:
+            if url.startswith("http://"):
+                full_list.append("https" + url[4:])
+            # but keep the http in case of connection problems
+            full_list.append(url)
+        return full_list
 
     def __init__(self, base_url=None, max_connections=10, retries=3):
         """
@@ -827,6 +834,8 @@ class ConditionsDB:
                                          json={'fields': issue})
             else:
                 fields = {'issue': json.dumps(issue)}
+                if 'user' in data.keys():
+                    fields['user'] = data['user']
                 if password:
                     fields['token'] = password[0]
                     fields['secret'] = password[1]

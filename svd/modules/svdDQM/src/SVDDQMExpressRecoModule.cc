@@ -5,18 +5,14 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Peter Kodys, Giulia Casarosa, Giuliana Rizzo             *
  *                                                                        *
- * Prepared for Belle II geometry                                         *
- *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include "svd/modules/svdDQM/SVDDQMExpressRecoModule.h"
 
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -57,12 +53,16 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   addParam("offlineZSShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name", std::string("SVDShaperDigitsZS5"));
   addParam("ShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name",
            std::string("SVDShaperDigits"));
-
-  addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", m_ShowAllHistos);
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
+  addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", int(0));
+  addParam("desynchronizeSVDTime", m_desynchSVDTime,
+           "if TRUE (as default): svdTime back in SVD time reference", bool(true));
+  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
+           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
   addParam("CutSVDCharge", m_CutSVDCharge,
-           "cut for accepting to hitmap histogram, using strips only", m_CutSVDCharge);
+           "cut for accepting to hitmap histogram, using strips only", float(0));
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
-           "cut for accepting clusters to hitmap histogram", m_CutSVDClusterCharge);
+           "cut for accepting clusters to hitmap histogram", float(0));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDExpReco"));
 
@@ -176,12 +176,22 @@ void SVDDQMExpressRecoModule::defineHisto()
   float ChargeMax = 80;
   int SNRBins = 50;
   float SNRMax = 100;
-  int TimeBins = 50;
-  float TimeMin = -100;
-  float TimeMax = 100;
+  int TimeBins = 200;
+  float TimeMin = -60;
+  float TimeMax = 140;
+  if (m_isSVDTimeCalibrated) {
+    TimeMin = -100 ;
+    TimeMax =  100 ;
+  }
 
   int MaxBinBins = 6;
   int MaxBinMax = 6;
+
+  TString refFrame = "in FTSW reference";
+  if (m_desynchSVDTime)
+    refFrame = "in SVD reference";
+
+
   //----------------------------------------------------------------
   // Charge of clusters for all sensors
   //----------------------------------------------------------------
@@ -273,44 +283,44 @@ void SVDDQMExpressRecoModule::defineHisto()
   //----------------------------------------------------------------
   // Cluster time distribution for all sensors
   //----------------------------------------------------------------
-  name = str(format("SVDDQM_ClusterTimeUAll"));
-  title = str(format("SVD U-Cluster Time for all sensors"));
-  m_clusterTimeUAll = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeUAll->GetXaxis()->SetTitle("cluster time [ns]");
+  TString Name = "SVDDQM_ClusterTimeUAll";
+  TString Title = Form("SVD U-Cluster Time %s for all sensors", refFrame.Data());
+  m_clusterTimeUAll = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeUAll->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeUAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeUAll);
-  name = str(format("SVDDQM_ClusterTimeVAll"));
-  title = str(format("SVD V-Cluster Time for all sensors"));
-  m_clusterTimeVAll = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeVAll->GetXaxis()->SetTitle("cluster time [ns]");
+  Name = "SVDDQM_ClusterTimeVAll";
+  Title = Form("SVD V-Cluster Time %s for all sensors", refFrame.Data());
+  m_clusterTimeVAll = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeVAll->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeVAll->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeVAll);
   //----------------------------------------------------------------
   // Time of clusters for L3/L456 sensors
   //----------------------------------------------------------------
-  name = str(format("SVDDQM_ClusterTimeU3"));
-  title = str(format("SVD U-Cluster Time for layer 3 sensors"));
-  m_clusterTimeU3 = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeU3->GetXaxis()->SetTitle("clusters time [ns]");
+  Name = "SVDDQM_ClusterTimeU3";
+  Title = Form("SVD U-Cluster Time %s for layer 3 sensors", refFrame.Data());
+  m_clusterTimeU3 = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeU3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeU3);
   name = str(format("SVDDQM_ClusterTimeV3"));
-  title = str(format("SVD V-Cluster Time for layer 3 sensors"));
-  m_clusterTimeV3 = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeV3->GetXaxis()->SetTitle("cluster time [ns]");
+  Title = Form("SVD V-Cluster Time %s for layer 3 sensors", refFrame.Data());
+  m_clusterTimeV3 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeV3->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeV3);
 
   name = str(format("SVDDQM_ClusterTimeU456"));
-  title = str(format("SVD U-Cluster Time for layers 4,5,6 sensors"));
-  m_clusterTimeU456 = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeU456->GetXaxis()->SetTitle("cluster time [ns]");
+  Title = Form("SVD U-Cluster Time %s for layers 4,5,6 sensors", refFrame.Data());
+  m_clusterTimeU456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeU456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeU456);
   name = str(format("SVDDQM_ClusterTimeV456"));
-  title = str(format("SVD V-Cluster Time for layers 4,5,6 sensors"));
-  m_clusterTimeV456 = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeV456->GetXaxis()->SetTitle("cluster time [ns]");
+  Title = Form("SVD V-Cluster Time %s for layers 4,5,6 sensors", refFrame.Data());
+  m_clusterTimeV456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeV456->GetYaxis()->SetTitle("count");
   m_histoList->Add(m_clusterTimeV456);
 
@@ -488,15 +498,15 @@ void SVDDQMExpressRecoModule::defineHisto()
     // Cluster time distribution
     //----------------------------------------------------------------
     name = str(format("SVDDQM_%1%_ClusterTimeU") % sensorDescr);
-    title = str(format("SVD Sensor %1% U-Cluster Time") % sensorDescr);
-    m_clusterTimeU[i] = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-    m_clusterTimeU[i]->GetXaxis()->SetTitle("time [ns]");
+    Title = Form("SVD Sensor %s U-Cluster Time %s", sensorDescr.c_str(), refFrame.Data());
+    m_clusterTimeU[i] = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+    m_clusterTimeU[i]->GetXaxis()->SetTitle("cluster time (ns)");
     m_clusterTimeU[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterTimeU[i]);
     name = str(format("SVDDQM_%1%_ClusterTimeV") % sensorDescr);
-    title = str(format("SVD Sensor %1% V-Cluster Time") % sensorDescr);
-    m_clusterTimeV[i] = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-    m_clusterTimeV[i]->GetXaxis()->SetTitle("time [ns]");
+    Title = Form("SVD Sensor %s V-Cluster Time %s", sensorDescr.c_str(), refFrame.Data());
+    m_clusterTimeV[i] = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+    m_clusterTimeV[i]->GetXaxis()->SetTitle("cluster time (ns)");
     m_clusterTimeV[i]->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_clusterTimeV[i]);
   }
@@ -591,12 +601,15 @@ void SVDDQMExpressRecoModule::initialize()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
     //Register collections
+    StoreArray<SVDShaperDigit> storeNoZSSVDShaperDigits(m_storeNoZSSVDShaperDigitsName);
     StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
     StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
     m_storeSVDClustersName = storeSVDClusters.getName();
 
     storeSVDClusters.isOptional();
     storeSVDShaperDigits.isOptional();
+    m_svdEventInfo.isOptional();
+    storeNoZSSVDShaperDigits.isOptional();
 
     //Store names to speed up creation later
     m_storeSVDShaperDigitsName = storeSVDShaperDigits.getName();
@@ -629,7 +642,7 @@ void SVDDQMExpressRecoModule::event()
 
   //check HLT decision and increase number of events only if the event has been accepted
 
-  if (m_resultStoreObjectPointer.isValid()) {
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
     const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
     if (!eventAccepted) return;
   }
@@ -643,7 +656,7 @@ void SVDDQMExpressRecoModule::event()
   const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
 
-  if (!storeSVDShaperDigits || !storeSVDShaperDigits.getEntries()) {
+  if (!storeSVDShaperDigits.isValid() || !storeSVDShaperDigits.getEntries()) {
     return;
   }
 
@@ -736,20 +749,21 @@ void SVDDQMExpressRecoModule::event()
   }
 
   // Fired strips ONLINE ZS
-  for (const SVDShaperDigit& digitIn : storeNoZSSVDShaperDigits) {
-    int iLayer = digitIn.getSensorID().getLayerNumber();
-    if ((iLayer < firstSVDLayer) || (iLayer > lastSVDLayer)) continue;
-    int iLadder = digitIn.getSensorID().getLadderNumber();
-    int iSensor = digitIn.getSensorID().getSensorNumber();
-    VxdID sensorID(iLayer, iLadder, iSensor);
-    int index = gTools->getSVDSensorIndex(sensorID);
-    SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
-    if (digitIn.isUStrip()) {
-      if (m_onlineZSstripCountU[index] != NULL) m_onlineZSstripCountU[index]->Fill(digitIn.getCellID());
-    } else {
-      if (m_onlineZSstripCountV[index] != NULL) m_onlineZSstripCountV[index]->Fill(digitIn.getCellID());
+  if (storeNoZSSVDShaperDigits.isValid())
+    for (const SVDShaperDigit& digitIn : storeNoZSSVDShaperDigits) {
+      int iLayer = digitIn.getSensorID().getLayerNumber();
+      if ((iLayer < firstSVDLayer) || (iLayer > lastSVDLayer)) continue;
+      int iLadder = digitIn.getSensorID().getLadderNumber();
+      int iSensor = digitIn.getSensorID().getSensorNumber();
+      VxdID sensorID(iLayer, iLadder, iSensor);
+      int index = gTools->getSVDSensorIndex(sensorID);
+      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      if (digitIn.isUStrip()) {
+        if (m_onlineZSstripCountU[index] != NULL) m_onlineZSstripCountU[index]->Fill(digitIn.getCellID());
+      } else {
+        if (m_onlineZSstripCountV[index] != NULL) m_onlineZSstripCountV[index]->Fill(digitIn.getCellID());
+      }
     }
-  }
 
   vector< set<int> > countsU(nSVDSensors); // sets to eliminate multiple samples per strip
   vector< set<int> > countsV(nSVDSensors);
@@ -763,6 +777,11 @@ void SVDDQMExpressRecoModule::event()
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getSVDSensorIndex(sensorID);
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+
+    float time = cluster.getClsTime();
+    if (m_desynchSVDTime && m_svdEventInfo.isValid())
+      time = time - m_svdEventInfo->getSVD2FTSWTimeShift(cluster.getFirstFrame());
+
     if (cluster.isUCluster()) {
       countsU.at(index).insert(SensorInfo.getUCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kTRUE,
@@ -774,21 +793,20 @@ void SVDDQMExpressRecoModule::event()
       if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterSNRUAll != NULL) m_clusterSNRUAll->Fill(cluster.getSNR());
       if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
-      if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
-      if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Fill(cluster.getClsTime());
+      if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(time);
+      if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Fill(time);
       if (iLayer == 3) {
         if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
         if (m_clusterSNRU3 != NULL) m_clusterSNRU3->Fill(cluster.getSNR());
-        if (m_clusterTimeU3 != NULL) m_clusterTimeU3->Fill(cluster.getClsTime());
+        if (m_clusterTimeU3 != NULL) m_clusterTimeU3->Fill(time);
       } else {
         if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
         if (m_clusterSNRU456 != NULL) m_clusterSNRU456->Fill(cluster.getSNR());
-        if (m_clusterTimeU456 != NULL) m_clusterTimeU456->Fill(cluster.getClsTime());
+        if (m_clusterTimeU456 != NULL) m_clusterTimeU456->Fill(time);
       }
 
       if (m_ShowAllHistos == 1)
         if (m_hitMapUCl[index] != NULL) m_hitMapUCl[index]->Fill(SensorInfo.getUCellID(cluster.getPosition()));
-
     } else {
       countsV.at(index).insert(SensorInfo.getVCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE,
@@ -800,18 +818,17 @@ void SVDDQMExpressRecoModule::event()
       if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
       if (m_clusterSNRVAll != NULL) m_clusterSNRVAll->Fill(cluster.getSNR());
       if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
-      if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(cluster.getClsTime());
-      if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Fill(cluster.getClsTime());
+      if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(time);
+      if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Fill(time);
       if (iLayer == 3) {
         if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
         if (m_clusterSNRV3 != NULL) m_clusterSNRV3->Fill(cluster.getSNR());
-        if (m_clusterTimeV3 != NULL) m_clusterTimeV3->Fill(cluster.getClsTime());
+        if (m_clusterTimeV3 != NULL) m_clusterTimeV3->Fill(time);
       } else {
         if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
         if (m_clusterSNRV456 != NULL) m_clusterSNRV456->Fill(cluster.getSNR());
-        if (m_clusterTimeV456 != NULL) m_clusterTimeV456->Fill(cluster.getClsTime());
+        if (m_clusterTimeV456 != NULL) m_clusterTimeV456->Fill(time);
       }
-
       if (m_ShowAllHistos == 1)
         if (m_hitMapVCl[index] != NULL) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));
 

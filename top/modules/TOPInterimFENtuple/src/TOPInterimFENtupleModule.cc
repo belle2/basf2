@@ -10,7 +10,6 @@
 
 #include <top/modules/TOPInterimFENtuple/TOPInterimFENtupleModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -22,8 +21,6 @@
 #include <top/dataobjects/TOPProductionEventDebug.h>
 #include <rawdata/dataobjects/RawTOP.h>
 
-#include <top/geometry/TOPGeometryPar.h>
-
 #include <iostream>
 #include <sstream>
 
@@ -34,8 +31,6 @@
 using namespace std;
 
 namespace Belle2 {
-
-  using namespace TOP;
 
   REG_MODULE(TOPInterimFENtuple)
 
@@ -230,7 +225,7 @@ namespace Belle2 {
       short globalChannelId = m_pixelId[m_nHit] - 1 + (m_slotNum[m_nHit] - 1) * c_NPixelPerModule;
       if (nHitOfflineFEMap.count(globalChannelId) == 0) nHitOfflineFEMap[globalChannelId] = 0;
       else if (nHitOfflineFEMap[globalChannelId] > c_NMaxHitPerChannel) {
-        if (noisyChannelBlackListSet.count(globalChannelId) == 0) {
+        if (noisyChannelBlackListSet.count(globalChannelId) == 0) { // cppcheck-suppress stlFindInsert
           noisyChannelBlackListSet.insert(globalChannelId);
           B2WARNING("TOPInterimFENtuple : noisy channel with too many hits (slotNum="
                     << (globalChannelId / c_NPixelPerModule + 1) << ", pixelId = "

@@ -23,6 +23,7 @@ def get_calibrations(input_data, **kwargs):
     from ROOT import Belle2
     from caf.utils import IoV
     from caf.framework import Calibration
+    from reconstruction import prepare_cdst_analysis
 
     # --------------------------------------------------------------
     # ..Bhabha
@@ -54,6 +55,11 @@ def get_calibrations(input_data, **kwargs):
                                 algorithms=[algo_ee5x5],
                                 input_files=input_files_bhabha
                                 )
+
+    # ..Add prepare_cdst_analysis to pre_collector_path
+    ee5x5_pre_path = basf2.create_path()
+    prepare_cdst_analysis(ee5x5_pre_path, components=['ECL'])
+    cal_ecl_ee5x5.pre_collector_path = ee5x5_pre_path
 
     # --------------------------------------------------------------
     # ..gamma gamma
@@ -92,6 +98,11 @@ def get_calibrations(input_data, **kwargs):
                                       input_files=input_files_gamma_gamma
                                       )
 
+    # ..Add prepare_cdst_analysis to pre_collector_path
+    gamma_gamma_pre_path = basf2.create_path()
+    prepare_cdst_analysis(gamma_gamma_pre_path, components=['ECL'])
+    cal_ecl_gamma_gamma.pre_collector_path = gamma_gamma_pre_path
+
     # --------------------------------------------------------------
     # ..muon pair
 
@@ -125,12 +136,11 @@ def get_calibrations(input_data, **kwargs):
 
     # ..Need to include track extrapolation in the path before collector
     ext_path = basf2.create_path()
-    ext_path.add_module("Gearbox")
-    ext_path.add_module("Geometry")
-    ext_path.add_module("SetupGenfitExtrapolation")
+    prepare_cdst_analysis(ext_path, components=['ECL'])
     ext_path.add_module("Ext", pdgCodes=[13])
     cal_ecl_mu_mu.pre_collector_path = ext_path
 
+    # --------------------------------------------------------------
     # Include a merging Calibration that doesn't require input data but instead creates the final
     # payload from the previous calibration payloads.
 
@@ -146,6 +156,11 @@ def get_calibrations(input_data, **kwargs):
     cal_ecl_merge.depends_on(cal_ecl_ee5x5)
     cal_ecl_merge.depends_on(cal_ecl_gamma_gamma)
     cal_ecl_merge.depends_on(cal_ecl_mu_mu)
+
+    # ..Uses cdst data so it requires prepare_cdst_analysis
+    ecl_merge_pre_path = basf2.create_path()
+    prepare_cdst_analysis(ecl_merge_pre_path, components=['ECL'])
+    ecl_merge_pre_path.pre_collector_path = ecl_merge_pre_path
 
     # --------------------------------------------------------------
     # ..Force the output iovs to be open

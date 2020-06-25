@@ -8,9 +8,7 @@
 // Date : 19 - Feb - 2013
 //-
 
-#include <string>
 #include <vector>
-#include <algorithm>
 
 #include <daq/dataflow/EvtSocket.h>
 

@@ -17,18 +17,12 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VxdID.h>
-
 #include <rawdata/dataobjects/RawSVD.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
-#include <svd/online/SVDStripNoiseMap.h>
 
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
-//
 
 
 namespace Belle2 {
@@ -77,19 +71,19 @@ namespace Belle2 {
       int n_basf2evt; /**<event number*/
       int m_nodeid; /**< Node ID*/
 
-      static std::string m_xmlFileName /**< channel mapping xml filename*/;
-      DBObjPtr<PayloadFile> m_mapping; /**<channel mapping payload*/
+      static std::string m_xmlFileName /**< xml filename*/;
+      DBObjPtr<PayloadFile> m_mapping; /**< channel map payload*/
 
-      std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**<map*/
+      std::unique_ptr<SVDOnlineToOfflineMap> m_map; /**< Pointer to online-to-offline map */
 
       /**maps containing assignment (0,1,2,3,4,..,nFADCboards-1) <-> FADC numbers  */
       FADCmap FADCnumberMap;
       /**maps containing assignment (0,1,2,3,4,..,nFADCboards-1) <-> FADC numbers  */
       FADCmap FADCnumberMapRev;
 
-      std::vector<uint32_t> data_words; /**<data words*/
+      std::vector<uint32_t> data_words; /**<vector of raw data words*/
 
-      //adds data32 to data vector and to crc16Input for further crc16 calculation
+      /** adds packed 32-bit data word to the raw data vector */
       void inline addData32(uint32_t adata32)
       {
         data_words.push_back(adata32);
@@ -99,74 +93,78 @@ namespace Belle2 {
 
       /** 6 samples and APV  channel struct*/
       struct DataInfo {
-        short data[6]; /**6 samples*/
-        unsigned short channel; /**APV channel number*/
+        short data[6]; /**< 6 samples*/
+        unsigned short channel; /**< APV channel number*/
       } dataInfo;
 
+      // The following assumes i386 byte order: MSB comes last!
 
-      // bit structures
+      /** implementation of FTB Header */
       struct FTBHeader {
-        unsigned int errorsField : 8;//LSB
-        unsigned int eventNumber : 24; //MSB
+        unsigned int errorsField : 8; /**< FTB error fields */
+        unsigned int eventNumber : 24; /**< FTB event number */
       };
 
+      /** implementation of FADC Header */
       struct MainHeader {
-        unsigned int trgNumber : 8; //LSB
-        unsigned int trgType : 4;
-        unsigned int trgTiming : 2;
-        unsigned int xTalk : 2;
-        unsigned int FADCnum : 8;
-        unsigned int evtType : 1; // Event type(0): 0…TTD event, 1…standalone event
-        unsigned int DAQMode : 2; // Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample
-        unsigned int runType : 2;
-        unsigned int check : 3; //MSB
+        unsigned int trgNumber : 8; /**< Trigger Number */
+        unsigned int trgType : 4;   /**< Trigger Type */
+        unsigned int trgTiming : 2; /**< Trigger Timing */
+        unsigned int xTalk : 2;     /**< cross talk tag */
+        unsigned int FADCnum : 8;   /**< FADC number */
+        unsigned int evtType : 1; /**< Event type(0): 0…TTD event, 1…standalone event */
+        unsigned int DAQMode : 2; /**< Event type(2:1): "00"…1-sample, "01"…3-sample, "10"…6-sample */
+        unsigned int runType : 2; /**< Run Type */
+        unsigned int check : 3; /**< MSB "110" - for FADC Header identification */
       };
 
-
+      /** implementation of APV Header */
       struct APVHeader {
-        unsigned int CMC1 : 8; //LSB
-        unsigned int CMC2 : 4;
-        unsigned int fifoErr: 1;
-        unsigned int frameErr: 1;
-        unsigned int detectErr: 1;
-        unsigned int apvErr : 1;
-        unsigned int pipelineAddr : 8;
-        unsigned int APVnum : 6;
-        unsigned int check : 2; //MSB
+        unsigned int CMC1 : 8; /**< Common Mode Noise w/o masking out particle signals */
+        unsigned int CMC2 : 4; /**< Common Mode Noise after masking out particle signals */
+        unsigned int fifoErr: 1; /**< FIFO full Error */
+        unsigned int frameErr: 1; /**< Frame Error */
+        unsigned int detectErr: 1; /**< Detection Error */
+        unsigned int apvErr : 1; /**< APV Error */
+        unsigned int pipelineAddr : 8; /**< Pipeline Address */
+        unsigned int APVnum : 6; /**< APV chip number */
+        unsigned int check : 2; /**< MSB "10" - for APV Header identification */
       };
 
+      /** implementation of the first data word */
       struct data_A {
-        unsigned int sample1 : 8; //LSB
-        unsigned int sample2 : 8;
-        unsigned int sample3 : 8;
-        unsigned int stripNum : 7;
-        unsigned int check : 1; //MSB
+        unsigned int sample1 : 8; /**< 1st data sample */
+        unsigned int sample2 : 8; /**< 2nd data sample */
+        unsigned int sample3 : 8; /**< 3rd data sample */
+        unsigned int stripNum : 7; /**< Strip number */
+        unsigned int check : 1; /**< MSB "1" - for Data word identification */
       };
 
+      /** implementation of the second data word */
       struct data_B {
-        unsigned int sample4 : 8; //LSB
-        unsigned int sample5 : 8;
-        unsigned int sample6 : 8;
-        unsigned int stripNum : 7;
-        unsigned int check : 1; //MSB
+        unsigned int sample4 : 8; /**< 4th data sample */
+        unsigned int sample5 : 8; /**< 5th data sample */
+        unsigned int sample6 : 8; /**< 6th data sample */
+        unsigned int stripNum : 7; /**< Strip number */
+        unsigned int check : 1; /**< MSB "1" - for Data word identification */
       };
 
-
+      /** implementation of FADC Trailer */
       struct FADCTrailer {
-        unsigned int FTBFlags: 16; //LSB
-        unsigned int dataSizeCut: 1;
-        unsigned int nullDigits: 7;
-        unsigned int fifoErrOR: 1;
-        unsigned int frameErrOR: 1;
-        unsigned int detectErrOR: 1;
-        unsigned int apvErrOR: 1;
-        unsigned int check : 4; //MSB
+        unsigned int FTBFlags: 16;  /**< FTB Flags Field */
+        unsigned int dataSizeCut: 1; /**< APV data-size cut flag  */
+        unsigned int nullDigits: 7; /**< "0000000" */
+        unsigned int fifoErrOR: 1;  /**< FIFO full Error OR */
+        unsigned int frameErrOR: 1; /**< Frame Error OR */
+        unsigned int detectErrOR: 1;/**< Detection Error OR */
+        unsigned int apvErrOR: 1;  /**< APV chip number OR */
+        unsigned int check : 4; /**<  MSB "1110" - for FADC Trailer identification */
       };
 
-
+      /** implementation of FTB Trailer */
       struct FTBTrailer {
-        unsigned int crc16 : 16; //LSB
-        unsigned int controlWord : 16; //MSB
+        unsigned int crc16 : 16; /**< FTB CRC16 Checksum  */
+        unsigned int controlWord : 16; /**< MSB "ff55" - FADC Trailer ID */
       };
 
 

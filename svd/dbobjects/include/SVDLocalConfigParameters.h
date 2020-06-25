@@ -12,7 +12,9 @@
  **************************************************************************/
 
 #pragma once
-#include "TObject.h"
+
+#include <TObject.h>
+#include <TString.h>
 
 namespace Belle2 {
   /**

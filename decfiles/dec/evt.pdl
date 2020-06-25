@@ -376,7 +376,7 @@ add  p Particle  K_4*0                            319        2048e-3         199
 add  p Particle  anti-K_4*0                      -319        2048e-3         198e-3         600e-3     0     8              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Charmed mesons
-* Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
+* Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
 * D
 add  p Particle  D+                               411     1869.65e-3              0              0     3     0  3.1178416e-01        411
@@ -420,26 +420,26 @@ add  p Particle  D*(2S)0                       100423        2623e-3         139
 add  p Particle  anti-D*(2S)0                 -100423        2623e-3         139e-3         500e-3     0     2              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Charmed strange mesons
-* Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
+* Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
 * D_s
-add  p Particle  D_s+                             431  1.9683400e+00              0              0     3     0  1.5109540e-01        431
-add  p Particle  D_s-                            -431  1.9683400e+00              0              0    -3     0  1.5109540e-01       -431
+add  p Particle  D_s+                             431     1968.34e-3              0              0     3     0  1.5109540e-01        431
+add  p Particle  D_s-                            -431     1968.34e-3              0              0    -3     0  1.5109540e-01       -431
 * D_s*. The D_s* width upper limit is Gamma < 1.9 MeV (90% C. L.).
-add  p Particle  D_s*+                            433      2112.2e-3  6.5821023e-06  1.0000000e-04     3     2              0        433
-add  p Particle  D_s*-                           -433      2112.2e-3  6.5821023e-06  1.0000000e-04    -3     2              0       -433
+add  p Particle  D_s*+                            433      2112.2e-3  6.5821023e-06          35e-6     3     2              0        433
+add  p Particle  D_s*-                           -433      2112.2e-3  6.5821023e-06          35e-6    -3     2              0       -433
 * D_s0*(2317). The D_s0*(2317) width upper limit is Gamma < 3.8 MeV (95% C. L.).
-add  p Particle  D_s0*+                         10431      2317.8e-3  1.0000033e-03          10e-3     3     0              0      10431
-add  p Particle  D_s0*-                        -10431      2317.8e-3  1.0000033e-03          10e-3    -3     0              0     -10431
+add  p Particle  D_s0*+                         10431      2317.8e-3  1.0000033e-03           6e-3     3     0              0      10431
+add  p Particle  D_s0*-                        -10431      2317.8e-3  1.0000033e-03           6e-3    -3     0              0     -10431
 * D_s1(2460). The D_s1(2460) width upper limit is Gamma < 3.5 MeV (95% C. L.).
-add  p Particle  D_s1+                          20433      2459.5e-3  1.0000033e-03          10e-3     3     2              0      20433
-add  p Particle  D_s1-                         -20433      2459.5e-3  1.0000033e-03          10e-3    -3     2              0     -20433
+add  p Particle  D_s1+                          20433      2459.5e-3  1.0000033e-03           6e-3     3     2              0      20433
+add  p Particle  D_s1-                         -20433      2459.5e-3  1.0000033e-03           6e-3    -3     2              0     -20433
 * D_s1(2536)
-add  p Particle  D'_s1+                         10433  2.5351100e+00  9.2000000e-04          10e-3     3     2              0      10433
-add  p Particle  D'_s1-                        -10433  2.5351100e+00  9.2000000e-04          10e-3    -3     2              0     -10433
+add  p Particle  D'_s1+                         10433     2535.11e-3        0.92e-3           6e-3     3     2              0      10433
+add  p Particle  D'_s1-                        -10433     2535.11e-3        0.92e-3           6e-3    -3     2              0     -10433
 * D_s2*(2573)
-add  p Particle  D_s2*+                           435      2569.1e-3        16.9e-3          60e-3     3     4              0        435
-add  p Particle  D_s2*-                          -435      2569.1e-3        16.9e-3          60e-3    -3     4              0       -435
+add  p Particle  D_s2*+                           435      2569.1e-3        16.9e-3          80e-3     3     4              0        435
+add  p Particle  D_s2*-                          -435      2569.1e-3        16.9e-3          80e-3    -3     4              0       -435
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Bottom mesons.
 * Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.

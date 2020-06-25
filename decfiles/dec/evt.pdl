@@ -379,35 +379,35 @@ add  p Particle  anti-K_4*0                      -319        2048e-3         198
 * Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
 *---------------------------------------------------------------------------------------------------------------------------------------
 * D
-add  p Particle  D+                               411  1.8696500e+00              0              0     3     0  3.1178416e-01        411
-add  p Particle  D-                              -411  1.8696500e+00              0              0    -3     0  3.1178416e-01       -411
-add  p Particle  D0                               421  1.8648300e+00              0              0     0     0  1.2294489e-01        421
-add  p Particle  anti-D0                         -421  1.8648300e+00              0              0     0     0  1.2294489e-01       -421
-* D*. The D*0 width upper limit is Gamma < 2.1 MeV (90% C. L.).
-add  p Particle  D*+                              413  2.0102600e+00  8.3400000e-05  4.0000000e-04     3     2              0        413
-add  p Particle  D*-                             -413  2.0102600e+00  8.3400000e-05  4.0000000e-04    -3     2              0       -413
-add  p Particle  D*0                              423  2.0068500e+00  6.5821023e-06  3.0000000e-04     0     2              0        423
-add  p Particle  anti-D*0                        -423  2.0068500e+00  6.5821023e-06  3.0000000e-04     0     2              0       -423
+add  p Particle  D+                               411     1869.65e-3              0              0     3     0  3.1178416e-01        411
+add  p Particle  D-                              -411     1869.65e-3              0              0    -3     0  3.1178416e-01       -411
+add  p Particle  D0                               421     1864.83e-3              0              0     0     0  1.2294489e-01        421
+add  p Particle  anti-D0                         -421     1864.83e-3              0              0     0     0  1.2294489e-01       -421
+* D*. The D*0 width upper limit is Gamma < 2.1 MeV (90% C. L.). The value from original EvtGen devt.pdl is used.
+add  p Particle  D*+                              413     2010.26e-3        83.4e-6         450e-3     3     2              0        413
+add  p Particle  D*-                             -413     2010.26e-3        83.4e-6         450e-3    -3     2              0       -413
+add  p Particle  D*0                              423     2006.85e-3  6.5821023e-06          35e-6     0     2              0        423
+add  p Particle  anti-D*0                        -423     2006.85e-3  6.5821023e-06          35e-6     0     2              0       -423
 * D_0*(2300)
-add  p Particle  D_0*+                          10411        2349e-3         221e-3         303e-3     3     0              0      10411
-add  p Particle  D_0*-                         -10411        2349e-3         221e-3         303e-3    -3     0              0     -10411
-add  p Particle  D_0*0                          10421        2300e-3         274e-3         299e-3     0     0              0      10421
-add  p Particle  anti-D_0*0                    -10421        2300e-3         274e-3         299e-3     0     0              0     -10421
+add  p Particle  D_0*+                          10411        2349e-3         221e-3         700e-3     3     0              0      10411
+add  p Particle  D_0*-                         -10411        2349e-3         221e-3         700e-3    -3     0              0     -10411
+add  p Particle  D_0*0                          10421        2300e-3         274e-3         800e-3     0     0              0      10421
+add  p Particle  anti-D_0*0                    -10421        2300e-3         274e-3         800e-3     0     0              0     -10421
 * D_1(2420)
-add  p Particle  D_1+                           10413      2423.2e-3          25e-3         270e-3     3     2              0      10413
-add  p Particle  D_1-                          -10413      2423.2e-3          25e-3         270e-3    -3     2              0     -10413
-add  p Particle  D_10                           10423      2420.8e-3        31.7e-3         272e-3     0     2              0      10423
-add  p Particle  anti-D_10                     -10423      2420.8e-3        31.7e-3         272e-3     0     2              0     -10423
+add  p Particle  D_1+                           10413      2423.2e-3          25e-3         140e-3     3     2              0      10413
+add  p Particle  D_1-                          -10413      2423.2e-3          25e-3         140e-3    -3     2              0     -10413
+add  p Particle  D_10                           10423      2420.8e-3        31.7e-3         160e-3     0     2              0      10423
+add  p Particle  anti-D_10                     -10423      2420.8e-3        31.7e-3         160e-3     0     2              0     -10423
 * D_1(2430). The D_1(2430)+ has not been observed.
-add  p Particle  D'_1+                          20413        2427e-3         384e-3         300e-3     3     2              0      20413
-add  p Particle  D'_1-                         -20413        2427e-3         384e-3         300e-3    -3     2              0     -20413
-add  p Particle  D'_10                          20423        2427e-3         384e-3         300e-3     0     2              0      20423
-add  p Particle  anti-D'_10                    -20423        2427e-3         384e-3         300e-3     0     2              0     -20423
+add  p Particle  D'_1+                          20413        2427e-3         384e-3        1000e-3     3     2              0      20413
+add  p Particle  D'_1-                         -20413        2427e-3         384e-3        1000e-3    -3     2              0     -20413
+add  p Particle  D'_10                          20423        2427e-3         384e-3        1000e-3     0     2              0      20423
+add  p Particle  anti-D'_10                    -20423        2427e-3         384e-3        1000e-3     0     2              0     -20423
 * D_2*(2460)
-add  p Particle  D_2*+                            415      2465.4e-3        46.7e-3         312e-3     3     4              0        415
-add  p Particle  D_2*-                           -415      2465.4e-3        46.7e-3         312e-3    -3     4              0       -415
-add  p Particle  D_2*0                            425      2460.7e-3        47.5e-3         309e-3     0     4              0        425
-add  p Particle  anti-D_2*0                      -425      2460.7e-3        47.5e-3         309e-3     0     4              0       -425
+add  p Particle  D_2*+                            415      2465.4e-3        46.7e-3         240e-3     3     4              0        415
+add  p Particle  D_2*-                           -415      2465.4e-3        46.7e-3         240e-3    -3     4              0       -415
+add  p Particle  D_2*0                            425      2460.7e-3        47.5e-3         240e-3     0     4              0        425
+add  p Particle  anti-D_2*0                      -425      2460.7e-3        47.5e-3         240e-3     0     4              0       -425
 * D(2550). The D(2550)+ has not neen observed.
 add  p Particle  D(2S)+                        100411        2564e-3         135e-3         500e-3     3     0              0          0
 add  p Particle  D(2S)-                       -100411        2564e-3         135e-3         500e-3    -3     0              0          0

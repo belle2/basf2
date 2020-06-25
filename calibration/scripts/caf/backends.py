@@ -1078,6 +1078,8 @@ class HTCondor(Batch):
             job.backend_args['universe'] = self.config[self.default_config_section]['universe']
         if 'requirements' not in job.backend_args:
             job.backend_args['requirements'] = self.config[self.default_config_section]['requirements']
+        if 'getenv' not in job.backend_args:
+            job.backend_args['getenv'] = self.config[self.default_config_section]['getenv']
 
         with open(submit_file_name, 'w') as submit_file:
             print(f'executable = {submit_file_name.replace(".sub", ".sh")}', file=submit_file)
@@ -1087,7 +1089,7 @@ class HTCondor(Batch):
             print(f'transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
             print(f'universe = {job.backend_args["universe"]}', file=submit_file)
             print(f'requirements = {job.backend_args["requirements"]}', file=submit_file)
-            print('getenv = true', file=submit_file)
+            print(f'getenv = {job.backend_args["getenv"]}', file=submit_file)
             print('should_transfer_files = Yes', file=submit_file)
             print('when_to_transfer_output = ON_EXIT', file=submit_file)
             print('queue', file=submit_file)
@@ -1097,9 +1099,18 @@ class HTCondor(Batch):
         For HTCondor leave empty as the directives are already included in the submit file
         add instead basf2 setup directives
         """
-        print("#!/bin/bash", file=batch_file)
-        if not job.setup_cmds:
-            job.add_basf2_setup()
+        print('#!/bin/bash', file=batch_file)
+        if 'BELLE2_TOOLS' not in os.environ:
+            raise BackendError('No BELLE2_TOOLS found in environment')
+        if 'BELLE2_RELEASE' in os.environ:
+            print(f'source {os.environ["BELLE2_TOOLS"]}/b2setup {os.environ["BELLE2_RELEASE"]}', file=batch_file)
+        elif 'BELLE2_LOCAL_DIR' in os.environ:
+            print('cwd=$(pwd)', file=batch_file)
+            print(f'cd {os.environ["BELLE2_LOCAL_DIR"]}', file=batch_file)
+            print(f'source {os.environ["BELLE2_TOOLS"]}/b2setup', file=batch_file)
+            print('cd $cwd', file=batch_file)
+        else:
+            raise BackendError('No BELLE2_RELEASE nor BELLE2_LOCAL_DIR found in environment')
 
     @classmethod
     def _create_cmd(cls, script_path):

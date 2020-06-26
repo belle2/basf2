@@ -165,7 +165,7 @@ def main():
                     "inputReleaseNumber": release,
                     "prodNumber": prodNumber,
                     "inputDBGlobalTag": DBGT,
-                    "campaign": campaign,
+                    "procNumber": campaign,
                     "experimentNumber": expNumber,
                     "beamEnergy": beamEnergy,
                     "inputDataLevel": "mdst",

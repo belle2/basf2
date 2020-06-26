@@ -163,7 +163,8 @@ namespace Belle2 {
 
 std::string Const::parseDetectors(EDetector det)
 {
-  if (det == Const::SVD)        return "SVD";
+  if (det == Const::PXD)   return "PXD";
+  else if (det == Const::SVD)   return "SVD";
   else if (det == Const::CDC)   return "CDC";
   else if (det == Const::TOP)   return "TOP";
   else if (det == Const::ARICH) return "ARICH";
@@ -176,7 +177,8 @@ std::string Const::parseDetectors(EDetector det)
   else if (det == Const::DAQ)   return "DAQ";
   else if (det == Const::BEAST) return "BEAST";
   else if (det == Const::TEST)  return "TEST";
-  else B2ERROR("Unknown detector component: " << det);
+  else B2FATAL("Unknown detector component: " << det);
+  return "INVALID";
 }
 
 Const::DetectorSet operator + (const Const::DetectorSet& firstSet, const Const::DetectorSet& secondSet)
@@ -210,6 +212,7 @@ unsigned short Const::DetectorSet::getBit(Const::EDetector det)
   if (det > TEST) {
     B2ERROR("Const::DetectorSet::getBit(): Invalid detector ID");
   }
+  // cppcheck-suppress shiftTooManyBits
   return (1 << (det - 1));
 }
 

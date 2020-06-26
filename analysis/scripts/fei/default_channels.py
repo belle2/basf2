@@ -906,7 +906,8 @@ def get_default_channels(
     if B_extra_cut is not None:
         hadronic_bs_user_cut += ' and [' + B_extra_cut + ']'
 
-    tight_precut = PreCutConfiguration(userCut=hadronic_bs_user_cut + 'and abs(formula(deltaE+Mbc-5.3669)) < 0.1',
+    # Override precut for some channels as this provides better performance
+    tight_precut = PreCutConfiguration(userCut=hadronic_bs_user_cut + ' and abs(formula(deltaE+Mbc-5.3669)) < 0.1',
                                        bestCandidateMode='highest',
                                        bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                        bestCandidateCut=20)

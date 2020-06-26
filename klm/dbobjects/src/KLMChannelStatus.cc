@@ -64,8 +64,8 @@ int KLMChannelStatus::getActiveStripsInModule(uint16_t module) const
   const KLMElementNumbers* elementNumbers =
     &(KLMElementNumbers::Instance());
   elementNumbers->moduleNumberToElementNumbers(
-    module, &subdetector, &section, &layer, &sector);
-  KLMChannelIndex klmModule(subdetector, section, layer, sector, 1, 1);
+    module, &subdetector, &section, &sector, &layer);
+  KLMChannelIndex klmModule(subdetector, section, sector, layer, 1, 1);
   klmModule.setIndexLevel(KLMChannelIndex::c_IndexLevelLayer);
   KLMChannelIndex klmNextModule(klmModule);
   ++klmNextModule;

@@ -90,9 +90,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
 {
   TH1* Triggers = nullptr;
   TString locationHits = "";
-  TString locationTriggers = "";
-
-  locationTriggers = "PXDEOccInjLER";
+  TString locationTriggers = "PXDEOccInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }

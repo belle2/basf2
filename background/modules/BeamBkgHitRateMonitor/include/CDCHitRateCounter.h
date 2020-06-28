@@ -26,8 +26,9 @@ namespace Belle2 {
     class CDCHitRateCounter: public HitRateBase {
 
     private:
-      static const int f_nLayer = 56; /**< the number of layers*/
       static const int f_nSuperLayer = 9; /**< the number of super layers*/
+      static const int f_nLayer = 56; /**< the number of layers*/
+      static const int f_nPhiDivision = 8; /**< the number of division in phi*/
 
     public:
 
@@ -35,17 +36,33 @@ namespace Belle2 {
        * tree structure
        */
       struct TreeStruct {
-        float layerHitRate[f_nLayer] = {0}; /**< Layer average hit rate in kHz*/
-        float superLayerHitRate[f_nSuperLayer] = {0}; /**< SuperLayer average hit rate in kHz */
         float averageRate = 0; /**< total detector average hit rate in KHz */
+        float superLayerHitRate[f_nSuperLayer] = {0}; /**< SuperLayer average hit rate in kHz */
+        float layerHitRate[f_nLayer] = {0}; /**< Layer average hit rate in kHz*/
+        float layerPhiHitRate[f_nLayer][f_nPhiDivision] = {0}; /**< Layer (in the phi bin) average hit rate in kHz*/
         int   timeWindowForSmallCell  = -1;/**< time window for the small cells in ns */
         int   timeWindowForNormalCell = -1;/**< time window for the normal cells in ns */
 
-        int   nActiveWireInLayer[f_nLayer] = {0}; /**<  number of wires used in this analysis in each layer */
-        int   nActiveWireInSuperLayer[f_nSuperLayer] = {0}; /**<  number of wires used in this analysis in each super layer*/
         int   nActiveWireInTotal = 0; /**<  number of wires used in this analysis in the whole CDC*/
+        int   nActiveWireInSuperLayer[f_nSuperLayer] = {0}; /**<  number of wires used in this analysis in each super layer*/
+        int   nActiveWireInLayer[f_nLayer] = {0}; /**<  number of wires used in this analysis in each layer */
+        int   nActiveWireInLayerPhi[f_nLayer][f_nPhiDivision] = {0}; /**<  number of wires used in this analysis in each phi bin in each layer */
+
         int   numEvents = 0; /**< number of events accumulated */
         bool  valid = false;  /**< status: true = rates valid */
+
+        /**
+         * constructor
+         */
+        TreeStruct()
+        {
+          for (int i = 0 ; i < f_nLayer ; ++i) {
+            for (int j = 0 ; j < f_nPhiDivision ; ++j) {
+              layerPhiHitRate[i][j] = 0;
+              nActiveWireInLayerPhi[i][j] = 0;
+            }
+          }
+        }
 
         /**
          * normalize accumulated hits to hit rate in kHz
@@ -63,10 +80,15 @@ namespace Belle2 {
           }
 
           for (int iL = 0 ; iL < f_nLayer ; ++iL) {
-            if (iL <= 7) ///// SL0
+            if (iL <= 7) { ///// SL0
               layerHitRate[iL] /= (numEvents * timeWindowForSmallCell * 1e-6);
-            else
+              for (int iPhi = 0 ; iPhi < f_nPhiDivision ; ++iPhi)
+                layerPhiHitRate[iL][iPhi] /= (numEvents * timeWindowForSmallCell * 1e-6);
+            } else {
               layerHitRate[iL] /= (numEvents * timeWindowForNormalCell * 1e-6);
+              for (int iPhi = 0 ; iPhi < f_nPhiDivision ; ++iPhi)
+                layerPhiHitRate[iL][iPhi] /= (numEvents * timeWindowForNormalCell * 1e-6);
+            }
           }
         }
       };
@@ -165,9 +187,11 @@ namespace Belle2 {
       const bool
       m_enableMarkBackgroundHit;   /**< flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status). default: false */
 
-      int m_nActiveWireInTotal = 0;                       /**< the number of wires used in this hit-rate calculation in the whole CDC */
-      int m_nActiveWireInSuperLayer[f_nSuperLayer] = {0}; /**< the number of wires used in this hit-rate calculation in each suler layer */
-      int m_nActiveWireInLayer[f_nLayer] = {0};           /**< the number of wires used in this hit-rate calculation in each layer */
+      int m_nActiveWireInTotal =
+        0;                             /**< the number of wires used in this hit-rate calculation in the whole CDC */
+      int m_nActiveWireInSuperLayer[f_nSuperLayer] = {0};       /**< the number of wires used in this hit-rate calculation in each suler layer */
+      int m_nActiveWireInLayer[f_nLayer] = {0};                 /**< the number of wires used in this hit-rate calculation in each layer */
+      int m_nActiveWireInLayerPhi[f_nLayer][f_nPhiDivision] = {0}; /**< the number of wires used in this hit-rate calculation in each phi bin in each layer */
 
       /**
        * set m_nActiveWireInTotal, m_nActiveWireInLayer[] and m_nActiveWireInSuperLayer[].
@@ -183,6 +207,11 @@ namespace Belle2 {
        */
       void countActiveWires();
 
+
+      /**
+       * get the bin ID of the division.
+       */
+      unsigned short getIPhiBin(unsigned short iSL, unsigned short iWireInLayer);
 
     };
 

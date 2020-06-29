@@ -90,7 +90,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   int i, n;
   std::map<uint16_t, double> moduleHitMap;
   std::map<uint16_t, double>::iterator it;
-  double nHits, nHitsPerModule, average;
+  double average = 0;
   int channelSubdetector, channelSection, channelSector;
   int layer, plane, strip;
   std::string str;
@@ -98,12 +98,11 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   canvas->cd();
   histogram->SetStats(false);
   histogram->Draw();
-  average = 0;
   n = histogram->GetXaxis()->GetNbins();
   for (i = 1; i <= n; i++) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
-    nHitsPerModule = histogram->GetBinContent(i);
+    double nHitsPerModule = histogram->GetBinContent(i);
     average = average + nHitsPerModule;
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
@@ -174,7 +173,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   for (i = 1; i <= n; ++i) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
-    nHits = histogram->GetBinContent(i);
+    double nHits = histogram->GetBinContent(i);
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
       &layer, &plane, &strip);
@@ -358,9 +357,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 {
   TIter nextkey(gROOT->GetListOfCanvases());
   TObject* obj = nullptr;
-  while ((obj = (TObject*)nextkey())) {
+  while ((obj = static_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvasName) return (TCanvas*)obj;
+      if (obj->GetName() == canvasName)
+        return static_cast<TCanvas*>(obj);
     }
   }
   return nullptr;

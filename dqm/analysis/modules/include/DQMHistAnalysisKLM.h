@@ -78,6 +78,11 @@ namespace Belle2 {
   protected:
 
     /**
+     * Get number of processed events.
+     */
+    double getProcessedEvents();
+
+    /**
      * Analyse channel hit histogram.
      * @param[in]  subdetector  Subdetector.
      * @param[in]  section      Section.
@@ -110,6 +115,9 @@ namespace Belle2 {
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
+    /** Number of processed events. */
+    double m_ProcessedEvents;
+
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
@@ -121,6 +129,12 @@ namespace Belle2 {
 
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
+
+    /** Input parameter for minimal number of processed events for error messages. */
+    double m_MinProcessedEventsForMessagesInput;
+
+    /** Minimal number of processed events for error messages. */
+    double m_MinProcessedEventsForMessages;
 
     /** Vector of dead barrel modules. */
     std::vector<uint16_t> m_DeadBarrelModules;

@@ -29,7 +29,7 @@ class SinglePhotonDark(BaseSkim):
     Skim list contains single photon candidates for the dark photon to invisible final
     state analysis.
     """
-    __authors__ = ["Sam Cunliffe"]
+    __authors__ = ["Sam Cunliffe", "Chris Hearty"]
     __contact__ = __liaison__
     __description__ = "Single photon skim list for the dark photon analysis."
     __category__ = "physics, dark sector"
@@ -46,11 +46,11 @@ class SinglePhotonDark(BaseSkim):
 
         # no other photon above 100 MeV
         angle = "0.296706 < theta < 2.61799"  # rad, (17 -- 150 deg)
-        minimum = "E > 0.1"  # GeV
-        ma.cutAndCopyList("gamma:100", "gamma:all", minimum + " and " + angle, path=path)
+        minimum = "E > 0.3"  # GeV
+        ma.cutAndCopyList("gamma:300", "gamma:all", minimum + " and " + angle, path=path)
 
         path = self.skim_event_cuts(
-            f"0 < nParticlesInList(gamma:100) <  2 and nCleanedTracks({cleaned}) < 1",
+            f"0 < nParticlesInList(gamma:300) <  2 and nCleanedTracks({cleaned}) < 1",
             path=path
         )
 
@@ -60,8 +60,10 @@ class SinglePhotonDark(BaseSkim):
         region_dependent += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
         region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
         region_dependent += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
-        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0] "     # between bwd and barrel
-        ma.cutAndCopyList("gamma:singlePhoton", "gamma:100", region_dependent, path=path)
+        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0] or "  # between bwd and barrel
+        # inner region of the barrel we have an 0.5 GeV trigger so allow for those
+        region_dependent += "[clusterTheta < 1.65457213 and clusterTheta > 0.77143553 and useCMSFrame(E) > 0.5]"
+        ma.cutAndCopyList("gamma:singlePhoton", "gamma:300", region_dependent, path=path)
         self.SkimLists = ["gamma:singlePhoton"]
 
 

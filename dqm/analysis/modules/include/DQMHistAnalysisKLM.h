@@ -92,7 +92,8 @@ namespace Belle2 {
 
     /**
      * Process histogram containing the number of hits in plane.
-     * @param[in] histName  Histogram name.
+     * @param[in]  histName  Histogram name.
+     * @param[out] latex     TLatex to draw messages.
      */
     void processPlaneHistogram(const std::string& histName, TLatex& latex);
 

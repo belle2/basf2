@@ -86,9 +86,11 @@ if __name__ == "__main__":
     # Input
     main.add_module('DQMHistAnalysisInputRootFile',
                     Experiment=exp_number,
-                    RunNr=run_number,
-                    InputRootFile=output_file,
-                    SelectFolders=['KLM'])
+                    RunList=[run_number],
+                    EventsList=[1],
+                    FileList=[output_file],
+                    SelectHistograms=['KLM/*'],
+                    EventInterval=1)
 
     # Analysis module
     analysis = basf2.register_module('DQMHistAnalysisKLM')

@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
   if (argc == 1 or std::string(argv[1]) == "--help" or std::string(argv[1]) == "-h") {
     std::cout << "Usage: " << argv[0] << " [INPUT_FILE] [CHANNEL1] [CHANNEL2] ... [CHANNELN]\n\n"
               "   This tool masks the given channels of the KLM DQM reference plots stored\n"
-              "   in the given input file.\n\n"
+              "   in the given input file (here 'channel' means 'channel number').\n\n"
               "   The plots on which this tool acts are:\n"
               "     KLM/masked_channels;\n"
               "     KLM/strip_hits_subdetector_<X>_section_<Y>_sector_<W>_<Z>.\n\n"

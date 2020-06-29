@@ -286,7 +286,7 @@ class EGammaControlDark(BaseSkim):
 
     __authors__ = ["Sam Cunliffe", "Torben Ferber"]
     __description__ = (
-        "Electron-gamma skim list for study of the ee backgrounds at low dark "
+        "Electron-gamma skim list for study of the ee backgrounds at high dark "
         "photon mass, as part of the dark photon analysis"
     )
     __contact__ = __liaison__

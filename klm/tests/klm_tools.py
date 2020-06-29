@@ -7,7 +7,7 @@ Test the klm tools.
 
 import os
 import glob
-from b2test_utils import skip_test, clean_working_directory
+import b2test_utils as b2u
 
 if __name__ == "__main__":
 
@@ -16,7 +16,7 @@ if __name__ == "__main__":
         B2INFO('Skipping the b2klm-create-dqm test.')
     else:
         for input_file in glob.glob(os.environ['BELLE2_VALIDATION_DATA_DIR'] + '/rawdata/*HLT?.*.root'):
-            with clean_working_directory() as test_klm_tools:
+            with b2u.clean_working_directory() as test_klm_tools:
                 command = f'b2klm-create-dqm -i {input_file} -n 100 --prepend_gt validation_2020-05-02 online_proc11'
                 assert(0 == os.system(command))
 

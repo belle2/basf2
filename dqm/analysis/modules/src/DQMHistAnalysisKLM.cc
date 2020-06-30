@@ -39,7 +39,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MinHitsForFlagging", m_MinHitsForFlagging, "Minimal number of hits in a channel required to flag it as 'Masked' or 'Hot'",
            50);
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
-           "Minimal number of processed events required to print error messages", 50000.);
+           "Minimal number of processed events required to print error messages", 10000.);
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_ProcessedEvents = 0.;
@@ -91,7 +91,7 @@ double DQMHistAnalysisKLMModule::getProcessedEvents()
 {
   TH1* histogram = findHist("DAQ/Nevent");
   if (histogram == nullptr) {
-    B2ERROR("DAQ DQM histogram DAQ/Nevent is not found.");
+    B2WARNING("DAQ DQM histogram DAQ/Nevent is not found.");
     /* Set the minimal number of processed events to 0 if we can't determine the processed events. */
     m_MinProcessedEventsForMessages = 0.;
     return 0.;

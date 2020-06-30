@@ -262,7 +262,7 @@ namespace {
 
     var = Manager::Instance().getVariable("useCMSFrame(roeP())");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), roe4VecCMS.Vect().Mag());
+    EXPECT_FLOAT_EQ(var->function(part), roe4VecCMS.P());
 
     var = Manager::Instance().getVariable("roePTheta()");
     ASSERT_NE(var, nullptr);
@@ -306,7 +306,7 @@ namespace {
 
     var = Manager::Instance().getVariable("weMissP(my_mask,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), miss4VecCMS.Vect().Mag());
+    EXPECT_FLOAT_EQ(var->function(part), miss4VecCMS.P());
 
     var = Manager::Instance().getVariable("weMissE(my_mask,0)");
     ASSERT_NE(var, nullptr);

@@ -62,7 +62,7 @@ def collect(calibration, collection, input_files, output_file='CollectorOutput.r
     main = tmp
     main.add_module(calibration.collections[collection].collector)
 
-    path_file_name = calibration.name + '.' + collection + '.path'
+    path_file_name = calibration.name + '.' + collection + '.' + output_file + '.path'
     with open(path_file_name, 'bw') as serialized_path_file:
         pickle.dump(basf2.pickle_path.serialize_path(main), serialized_path_file)
 

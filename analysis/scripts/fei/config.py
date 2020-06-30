@@ -56,13 +56,15 @@ MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."
 MVAConfiguration.sPlotVariable.__doc__ = "Discriminating variable used by sPlot to do data-driven training."
 
 
-PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, bestCandidateVariable,'
-                                             'bestCandidateCut, bestCandidateMode')
-PreCutConfiguration.__new__.__defaults__ = ('', -2, None, 0, 'lowest')
+PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, noBackgroundSampling,'
+                                             'bestCandidateVariable, bestCandidateCut, bestCandidateMode')
+PreCutConfiguration.__new__.__defaults__ = ('', -2, False, None, 0, 'lowest')
 PreCutConfiguration.__doc__ = "PreCut configuration class. These cuts is employed before training the mva classifier."
 PreCutConfiguration.userCut.__doc__ = "The user cut is passed directly to the ParticleCombiner."\
                                       "Particles which do not pass this cut are immediately discarded."
 PreCutConfiguration.vertexCut.__doc__ = "The vertex cut is passed as confidence level to the VertexFitter."
+PreCutConfiguration.noBackgroundSampling.__doc__ = "For very pure channels, the background sampling factor is too high" \
+                                                   " and the MVA can't be trained. This disables background sampling."
 PreCutConfiguration.bestCandidateVariable.__doc__ = "Variable from the VariableManager which is used to rank all candidates."
 PreCutConfiguration.bestCandidateMode.__doc__ = "Either lowest or highest."
 PreCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep after the best-candidate ranking."

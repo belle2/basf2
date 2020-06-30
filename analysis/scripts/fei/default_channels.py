@@ -628,7 +628,7 @@ def get_default_channels(
     BP.addChannel(['anti-D0', 'K+'])
     BP.addChannel(['D-', 'pi+', 'pi+'])
     BP.addChannel(['D-', 'pi+', 'pi+', 'pi0'])
-    BP.addChannel(['J/psi', 'K+'])
+    BP.addChannel(['J/psi', 'K+'], preCutConfig=BP.preCutConfig._replace(noBackgroundSampling=True))
     BP.addChannel(['J/psi', 'K+', 'pi+', 'pi-'])
     BP.addChannel(['J/psi', 'K+', 'pi0'])
     BP.addChannel(['J/psi', 'K_S0', 'pi+'])
@@ -781,7 +781,7 @@ def get_default_channels(
     B0.addChannel(['D_s*+', 'D-'])
     B0.addChannel(['D_s+', 'D*-'])
     B0.addChannel(['D_s*+', 'D*-'])
-    B0.addChannel(['J/psi', 'K_S0'])
+    B0.addChannel(['J/psi', 'K_S0'], preCutConfig=B0.preCutConfig._replace(noBackgroundSampling=True))
     B0.addChannel(['J/psi', 'K+', 'pi-'])
     B0.addChannel(['J/psi', 'K_S0', 'pi+', 'pi-'])
     if baryonic:

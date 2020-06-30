@@ -322,9 +322,9 @@ namespace {
     auto part = myParticles[2];  // B0
     StoreArray<RestOfEvent> myROEs;
 
-    StoreObjPtr<RestOfEvent> roeobjptr;
-    roeobjptr.assign(myROEs[0]); // This is here to use the relations
-    B2INFO("Ptr: " << roeobjptr << " valid: " << roeobjptr.isValid());
+    DataStore::StoreEntry& roeobjptr = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at("RestOfEvent");
+    roeobjptr.object = myROEs[0];
+    roeobjptr.ptr = myROEs[0];
 
     auto partROE1 = myParticles[3];  // gamma from ROE
     auto partROE2 = myParticles[5];  // pi from ROE
@@ -375,6 +375,7 @@ namespace {
     EXPECT_FLOAT_EQ(var->function(partROE1), 0.0);
 
     // Clear ptr at the end
-    roeobjptr.clear();
+    roeobjptr.object = nullptr;
+    roeobjptr.ptr = nullptr;
   }
 }

@@ -38,7 +38,11 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            10);
   addParam("MinHitsForFlagging", m_MinHitsForFlagging, "Minimal number of hits in a channel required to flag it as 'Masked' or 'Hot'",
            50);
+  addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
+           "Minimal number of processed events required to print error messages", 10000.);
 
+  m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
+  m_ProcessedEvents = 0.;
   m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
@@ -72,6 +76,8 @@ void DQMHistAnalysisKLMModule::beginRun()
 {
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No KLM electronics map.");
+  m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
+  m_ProcessedEvents = 0.;
   m_DeadBarrelModules.clear();
   m_DeadEndcapModules.clear();
   m_MaskedChannels.clear();
@@ -79,6 +85,18 @@ void DQMHistAnalysisKLMModule::beginRun()
 
 void DQMHistAnalysisKLMModule::endRun()
 {
+}
+
+double DQMHistAnalysisKLMModule::getProcessedEvents()
+{
+  TH1* histogram = findHist("DAQ/Nevent");
+  if (histogram == nullptr) {
+    B2WARNING("DAQ DQM histogram DAQ/Nevent is not found.");
+    /* Set the minimal number of processed events to 0 if we can't determine the processed events. */
+    m_MinProcessedEventsForMessages = 0.;
+    return 0.;
+  }
+  return histogram->GetEntries();
 }
 
 void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
@@ -298,7 +316,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     if (m_DeadBarrelModules.size() == 0) {
       canvas->Pad()->SetFillColor(kWhite);
       canvas->Update();
-    } else {
+    } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
       canvas->Pad()->SetFillColor(kRed);
       for (uint16_t module : m_DeadBarrelModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
@@ -336,7 +354,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     if (m_DeadEndcapModules.size() == 0) {
       canvas->Pad()->SetFillColor(kWhite);
       canvas->Update();
-    } else {
+    } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
       canvas->Pad()->SetFillColor(kRed);
       for (uint16_t module : m_DeadEndcapModules) {
         m_ElementNumbers->moduleNumberToElementNumbers(
@@ -373,6 +391,7 @@ void DQMHistAnalysisKLMModule::event()
   m_DeadBarrelModules.clear();
   m_DeadEndcapModules.clear();
   m_MaskedChannels.clear();
+  m_ProcessedEvents = getProcessedEvents();
   std::string str, histogramName, canvasName;
   TLatex latex;
   latex.SetTextColor(kRed);

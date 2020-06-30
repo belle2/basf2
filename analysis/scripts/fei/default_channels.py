@@ -923,14 +923,16 @@ def get_default_channels(
     # D_s & D*
     BS.addChannel(['D_s-', 'D_s+'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*+', 'D_s-'], preCutConfig=tight_precut)
-    BS.addChannel(['D_s*-', 'D_s*+'], preCutConfig=tight_precut)
-    BS.addChannel(['D_s+', 'D-'], preCutConfig=tight_precut)
-    BS.addChannel(['D*-', 'D_s+'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s*-', 'D_s+'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s*+', 'D_s*-'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s-', 'D+'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s+', 'D*-'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*+', 'D-'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*+', 'D*-'])
 
     # D_s
     BS.addChannel(['D_s-', 'K+'])
+    BS.addChannel(['D_s+', 'K-'])
     BS.addChannel(['D_s-', 'pi+'])
     BS.addChannel(['D_s-', 'pi+', 'pi+', 'pi-'], preCutConfig=tight_precut)
     BS.addChannel(['D_s-', 'D0', 'K+'], preCutConfig=tight_precut)
@@ -977,6 +979,7 @@ def get_default_channels(
     # Other
     BS.addChannel(['anti-D*0', 'K_S0'])
     BS.addChannel(['anti-D0', 'K_S0'])
+    BS.addChannel(['anti-D0', 'K-', 'pi+'])
 
     particles = []
     particles.append(pion)

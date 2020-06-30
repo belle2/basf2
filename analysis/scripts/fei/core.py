@@ -503,20 +503,17 @@ class PostReconstruction(object):
                                         variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                         filename=config.removeJPsiSlash(filename), path=path)
 
-                if 'B0' == particle.name or 'B+' == particle.name:
-                    variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                                 'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
-                elif 'B_s0' == particle.name:
-                    variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
-                else:
-                    variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                             'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+
+                if 'B_s0' == particle.name:
+                    variables += ['Mbc']
+                elif 'B' in particle.name:
+                    variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
 
                 filename = f'Monitor_Final_{particle.identifier}.root'
                 ma.variablesToNtuple(particle.identifier, variables, treename='variables',
                                      filename=config.removeJPsiSlash(filename), path=path)
-
         return path
 
 

@@ -906,12 +906,6 @@ def get_default_channels(
     if B_extra_cut is not None:
         hadronic_bs_user_cut += ' and [' + B_extra_cut + ']'
 
-    # Override precut for some channels as this provides better performance
-    tight_precut = PreCutConfiguration(userCut=hadronic_bs_user_cut + ' and abs(formula(deltaE+Mbc-5.3669)) < 0.1',
-                                       bestCandidateMode='highest',
-                                       bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
-                                       bestCandidateCut=20)
-
     BS = Particle('B_s0',
                   MVAConfiguration(variables=Bs_vars,
                                    target='isSignal'),
@@ -920,6 +914,9 @@ def get_default_channels(
                                       bestCandidateVariable='daughterProductOf(extraInfo(SignalProbability))',
                                       bestCandidateCut=20),
                   PostCutConfiguration(bestCandidateCut=20))
+
+    # Override precut for some channels as this provides better performance
+    tight_precut = BS.preCutConfig._replace(userCut=hadronic_bs_user_cut + ' and abs(formula(deltaE+Mbc-5.3669)) < 0.1')
 
     # D_s & D*
     BS.addChannel(['D_s-', 'D_s+'], preCutConfig=tight_precut)

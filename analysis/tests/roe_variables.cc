@@ -203,8 +203,40 @@ namespace {
     var = Manager::Instance().getVariable("nROE_NeutralECLClusters(my_mask)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
-  }
 
+    var = Manager::Instance().getVariable("nROE_KLMClusters");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 1.0);
+  }
+  /*
+   * Test ROE recoil frame variable
+   */
+  TEST_F(ROEVariablesTest, ROERecoilFrameVariable)
+  {
+    StoreArray<RestOfEvent> myROEs;
+    StoreArray<Particle> myParticles;
+    auto part = myParticles[2];  // B0
+    auto partNotROE = myParticles[0];  // electron has no ROE
+
+    // Signal side 4 vector
+    TLorentzVector  sig4Vec = part->get4Vector();
+
+    auto* var = Manager::Instance().getVariable("useROERecoilFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 5.2959199);
+
+    DataStore::StoreEntry& roeobjptr = DataStore::Instance().getStoreEntryMap(DataStore::c_Event).at("RestOfEvent");
+    roeobjptr.object = myROEs[0];
+    roeobjptr.ptr = myROEs[0];
+
+    var = Manager::Instance().getVariable("useROERecoilFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(partNotROE), 2.8002837);
+
+    // Clear ptr at the end
+    roeobjptr.object = nullptr;
+    roeobjptr.ptr = nullptr;
+  }
   /*
    * Test ROE kinematics variables
    */
@@ -314,6 +346,38 @@ namespace {
 
   }
   /*
+   * Test specific kinematic variables
+   */
+  TEST_F(ROEVariablesTest, ROESpecificKinematicVariables)
+  {
+    StoreArray<Particle> myParticles;
+    auto part = myParticles[2];  // B0
+    // Signal side 4 vector
+    TLorentzVector  sig4Vec = part->get4Vector();
+
+    auto* var = Manager::Instance().getVariable("bssMassDifference()");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), sig4Vec.M());
+
+    var = Manager::Instance().getVariable("weCosThetaEll()");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), -0.99858648);
+
+    var = Manager::Instance().getVariable("weXiZ()");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 0.27249247);
+
+    var = Manager::Instance().getVariable("weQ2lnuSimple(my_mask,0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), -2.1852231e-06);
+
+    // FIXME: This value is the same as for weQ2lnuSimple
+    // More complicated test setup is required to pass abs(cos_angle_nu) < 1
+    var = Manager::Instance().getVariable("weQ2lnu(my_mask,0)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), -2.1852231e-06);
+  }
+  /*
    * Test isInROE variables
    */
   TEST_F(ROEVariablesTest, IsInROEVariables)
@@ -373,6 +437,10 @@ namespace {
     var = Manager::Instance().getVariable("currentROEIsInList(pi0:vartest)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(partROE1), 0.0);
+
+    var = Manager::Instance().getVariable("particleRelatedToCurrentROE(PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(partROE1), 511.0);
 
     // Clear ptr at the end
     roeobjptr.object = nullptr;

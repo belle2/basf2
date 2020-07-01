@@ -11,7 +11,7 @@
 
 
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
-#include <iostream>
+
 namespace TreeFitter {
 
   Projection::Projection(int dimP, int dimC) :

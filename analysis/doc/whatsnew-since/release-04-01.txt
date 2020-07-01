@@ -117,10 +117,8 @@ Variables
    :b2:var:`TagTrackDistanceToConstraintErr`, :b2:var:`TagTrackDistanceToTagV`, :b2:var:`TagTrackDistanceToTagVErr`,
    :b2:var:`TagTrackTrueDistanceToTagV`. Meta-variables can be used to compute the average, weighted average, min or max
    of these variables, e.g. by doing ``TagTrackAverage(TagTrackTrueDistanceToTagV)`` 
- * Added ``mcDeltaL`` describing the true distance between Sig and Tag
+ * Added ``mcDeltaBoost`` describing the true distance between Sig and Tag
    vertices in the Y(4S) boost direction
- * Added ``mcDeltaTapprox`` to get :b2:var:`mcDeltaT` in the kinematic
-   approximation, i.e. based on ``mcDeltaL`` variable
  * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle
    identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
  * Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
@@ -150,6 +148,8 @@ Variables
  * Added a variable for TDCPV resolution study :b2:var:`DeltaTRes` and legacy Belle :b2:var:`DeltaTBelle`.
  * Added :b2:var:`genIPX`, :b2:var:`genIPY`, and :b2:var:`genIPZ`; the generator-level IP.
  * Clarified the documentation of the **measured** interaction point variables (:b2:var:`IPX` ff).
+ * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable :b2:var:`TagVmcOBoost` renamed to :b2:var:`mcTagVOBoost`
+
 
 Modules
 +++++++

@@ -218,9 +218,6 @@ namespace {
     auto part = myParticles[2];  // B0
     auto partNotROE = myParticles[0];  // electron has no ROE
 
-    // Signal side 4 vector
-    TLorentzVector  sig4Vec = part->get4Vector();
-
     auto* var = Manager::Instance().getVariable("useROERecoilFrame(E)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 5.2959199);

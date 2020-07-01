@@ -55,19 +55,19 @@ namespace Belle2 {
 
   private:
     /** Collect hits information for RPC of BKLM */
-    void collectRPC(RelationVector<BKLMHit2d>);
+    void collectRPC(RelationVector<BKLMHit2d>&);
 
     /** Collect hits information for scintillator of BKLM */
-    void collectScint(RelationVector<BKLMHit2d>);
+    void collectScint(RelationVector<BKLMHit2d>&);
 
     /** Collect hits information for scintillator of EKLM */
-    void collectScintEnd(RelationVector<EKLMHit2d>);
+    void collectScintEnd(RelationVector<EKLMHit2d>&);
 
     /** Match KLM hit and extHit */
-    std::pair<ExtHit*, ExtHit*> matchExt(uint16_t channelID, std::vector<ExtHit*>);
+    std::pair<ExtHit*, ExtHit*> matchExt(uint16_t channelID, std::multimap<unsigned int, ExtHit>&);
 
     /** Save position difference betwen matched kLMHit and ExtHit. */
-    void storeDistDiff(TVector3 pDiff);
+    void storeDistDiff(TVector3&);
 
     /** debug flag */
     bool m_Debug;
@@ -78,11 +78,11 @@ namespace Belle2 {
     /** Input partilce list name */
     std::string m_inputListName;
 
-    /** vector for handle the extHit in BKLM range. */
-    std::vector<ExtHit*> m_vExtHitsB;
+    /** map for handle the extHit related to RPC. */
+    std::multimap<unsigned int, ExtHit> m_vExtHits_RPC;
 
-    /** vector for handle the extHit in EKLM range. */
-    std::vector<ExtHit*> m_vExtHitsE;
+    /** map for handle the extHit related to scint. */
+    std::multimap<unsigned int, ExtHit> m_vExtHits;
 
     /** Global tracks */
     StoreArray<Track> m_tracks;

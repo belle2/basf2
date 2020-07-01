@@ -25,8 +25,10 @@
 #include <TString.h>
 #include <TTree.h>
 #include <TVector3.h>
+#include <Math/MinimizerOptions.h>
 
 using namespace Belle2;
+using namespace ROOT::Math;
 
 KLMTimeCalibrationAlgorithm::KLMTimeCalibrationAlgorithm() :
   CalibrationAlgorithm("KLMTimeCalibrationCollector")
@@ -37,6 +39,7 @@ KLMTimeCalibrationAlgorithm::KLMTimeCalibrationAlgorithm() :
 
   m_mc = Environment::Instance().isMC();
   m_elementNum = &(KLMElementNumbers::Instance());
+  m_minimizerOptions = ROOT::Math::MinimizerOptions();
 
   m_time_channelAvg_rpc = 0.0;
   m_etime_channelAvg_rpc = 0.0;
@@ -141,9 +144,9 @@ KLMTimeCalibrationAlgorithm::~KLMTimeCalibrationAlgorithm()
 CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 {
   int channelId;
-  double effSpeed, effSpeed_RPC;
-
-  m_timeCableDelay = new Belle2::KLMTimeCableDelay();
+  double effSpeed_end, effSpeed, effSpeed_RPC;
+  m_timeCableDelay = new KLMTimeCableDelay();
+  m_timeConstants = new KLMTimeConstants();
 
   fcn_gaus = new TF1("fcn_gaus", "gaus");
   fcn_land = new TF1("fcn_land", "landau");
@@ -179,21 +182,27 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   h_diff = new TH1D("h_diff", "Position difference between bklmHit2d and extHit;position difference", 100, 0, 10);
   h_calibrated = new TH1I("h_calibrated_summary", "h_calibrated_summary;calibrated or not", 3, 0, 3);
 
-  double lowEdge_scint = 0.0;
   double lowEdge_rpc = 0.0;
-  double upEdge_scint = 10.0;
   double upEdge_rpc = 10.0;
-  if (m_mc) {
-    lowEdge_scint = -20.0;
-    lowEdge_rpc = -20.0;
-    upEdge_scint = 30.0;
-    upEdge_rpc = 30.0;
-  } else {
-    lowEdge_scint = -4800.0;
-    lowEdge_rpc = -800.0;
-    upEdge_scint = -4408.0;
-    upEdge_rpc = -604.0;
-  }
+  double lowEdge_scint = 0.0;
+  double upEdge_scint = 10.0;
+  double lowEdge_scint_end = 0.0;
+  double upEdge_scint_end = 10.0;
+
+  B2INFO("Sample Type" << LogVar("data or mc", m_mc));
+  //if (m_mc) {
+  //lowEdge_scint = -20.0;
+  //lowEdge_rpc = -20.0;
+  //upEdge_scint = 30.0;
+  //upEdge_rpc = 30.0;
+  //} else {
+  lowEdge_rpc = -800.0;
+  upEdge_rpc = -600.0;
+  lowEdge_scint = -4800.0;
+  upEdge_scint = -4400.0;
+  lowEdge_scint_end = -4950.0;
+  upEdge_scint_end = -4650.0;
+  //}
   int nBin = 200;
   int nBin_scint = 400;
 
@@ -203,6 +212,11 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   gre_time_channel_scint = new TGraphErrors();
   gre_time_channel_rpc = new TGraphErrors();
+  gre_time_channel_scint_end = new TGraphErrors();
+
+  gr_timeShift_channel_scint = new TGraph();
+  gr_timeShift_channel_rpc = new TGraph();
+  gr_timeShift_channel_scint_end = new TGraph();
 
   hprf_rpc_phi_effC = new TProfile("hprf_rpc_phi_effC",
                                    "Time over propagation length for RPCs (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 400, 0.0,
@@ -214,26 +228,26 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
                                      "Time over propagation length for scintillators (Phi_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]", 350,
                                      0.0, 350.0);
   hprf_scint_z_effC = new TProfile("hprf_scint_z_effC",
-                                   "Time over propagation length for scintillators (Z_Readout); propagation distance[cm]; propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                   "Time over propagation length for scintillators (Z_Readout); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
                                    350, 0.0, 350.0);
   hprf_scint_plane1_effC_end = new TProfile("hprf_scint_plane1_effC_end",
                                             "Time over propagation length for scintillators (plane1, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
                                             350, 0.0, 350.0);
   hprf_scint_plane2_effC_end = new TProfile("hprf_scint_plane2_effC_end",
-                                            "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
+                                            "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
                                             350, 0.0, 350.0);
 
   h_time_rpc_tc = new TH1D("h_time_rpc_tc", "time distribtution for RPC", nBin, lowEdge_rpc, upEdge_rpc);
   h_time_scint_tc = new TH1D("h_time_scint_tc", "time distribtution for Scintillator", nBin_scint, lowEdge_scint, upEdge_scint);
-  h_time_scint_tc_end = new TH1D("h_time_scint_tc_end", "time distribtution for Scintillator (Endcap)", nBin_scint, lowEdge_scint,
-                                 upEdge_scint);
+  h_time_scint_tc_end = new TH1D("h_time_scint_tc_end", "time distribtution for Scintillator (Endcap)", nBin_scint, lowEdge_scint_end,
+                                 upEdge_scint_end);
 
   /** Hist declaration Global time distribution **/
   h_time_rpc = new TH1D("h_time_rpc", "time distribtution for RPC; T_rec-T_0-T_fly-T_propagation[ns]", nBin, lowEdge_rpc, upEdge_rpc);
   h_time_scint = new TH1D("h_time_scint", "time distribtution for Scintillator; T_rec-T_0-T_fly-T_propagation[ns]", nBin_scint,
                           lowEdge_scint, upEdge_scint);
   h_time_scint_end = new TH1D("h_time_scint_end", "time distribtution for Scintillator (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
-                              nBin_scint, lowEdge_scint, upEdge_scint);
+                              nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
   hc_time_rpc = new TH1D("hc_time_rpc", "Calibrated time distribtution for RPC; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                          nBin, lowEdge_rpc, upEdge_rpc);
@@ -242,7 +256,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
                            upEdge_scint);
   hc_time_scint_end = new TH1D("hc_time_scint_end",
                                "Calibrated time distribtution for Scintillator (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", nBin_scint,
-                               lowEdge_scint, upEdge_scint);
+                               lowEdge_scint_end, upEdge_scint_end);
 
   for (int iF = 0; iF < 2; ++iF) {
     hn = Form("h_timeF%d_rpc", iF);
@@ -253,7 +267,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     h_timeF_scint[iF] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
     hn = Form("h_timeF%d_scint_end", iF);
     ht = Form("Time distribtution for Scintillator of %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
-    h_timeF_scint_end[iF] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+    h_timeF_scint_end[iF] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
     hn = Form("h2_timeF%d_rpc", iF);
     ht = Form("Time distribtution for RPC of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
@@ -264,7 +278,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     hn = Form("h2_timeF%d_scint_end", iF);
     ht = Form("Time distribtution for Scintillator of %s (Endcap); Sector Index; T_rec-T_0-T_fly-T_propagation[ns]",
               iFstring[iF].Data());
-    h2_timeF_scint_end[iF] = new TH2D(hn.Data(), ht.Data(), 4, 0, 4, nBin_scint, lowEdge_scint, upEdge_scint);
+    h2_timeF_scint_end[iF] = new TH2D(hn.Data(), ht.Data(), 4, 0, 4, nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
     hn = Form("hc_timeF%d_rpc", iF);
     ht = Form("Calibrated time distribtution for RPC of %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iFstring[iF].Data());
@@ -276,7 +290,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     hn = Form("hc_timeF%d_scint_end", iF);
     ht = Form("Calibrated time distribtution for Scintillator of %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
               iFstring[iF].Data());
-    hc_timeF_scint_end[iF] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+    hc_timeF_scint_end[iF] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
     hn = Form("h2c_timeF%d_rpc", iF);
     ht = Form("Calibrated time distribtution for RPC of %s; Sector Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
@@ -289,7 +303,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     hn = Form("h2c_timeF%d_scint_end", iF);
     ht = Form("Calibrated time distribtution for Scintillator of %s (Endcap) ; Sector Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
               iFstring[iF].Data());
-    h2c_timeF_scint_end[iF] = new TH2D(hn.Data(), ht.Data(), 4, 0, 4, nBin_scint, lowEdge_scint, upEdge_scint);
+    h2c_timeF_scint_end[iF] = new TH2D(hn.Data(), ht.Data(), 4, 0, 4, nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
     for (int iS = 0; iS < 8; ++iS) {
       // Barrel parts
@@ -423,65 +437,65 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
       hn = Form("h_timeF%d_S%d_scint_end", iF, iS);
       ht = Form("Time distribtution for Scintillator of Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iS,
                 iFstring[iF].Data());
-      h_timeFS_scint_end[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+      h_timeFS_scint_end[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
       hn = Form("h2_timeF%d_S%d_end", iF, iS);
       ht = Form("Time distribtution of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
-      h2_timeFS_end[iF][iS] = new TH2D(hn.Data(), ht.Data(), maxLay, 0, maxLay, nBin_scint, lowEdge_rpc, upEdge_scint);
+      h2_timeFS_end[iF][iS] = new TH2D(hn.Data(), ht.Data(), maxLay, 0, maxLay, nBin_scint, lowEdge_scint_end, upEdge_scint_end);
       hn = Form("hc_timeF%d_S%d_scint_end", iF, iS);
       ht = Form("Calibrated time distribtution for Scintillator of Sector%d (Endcap), %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                 iS, iFstring[iF].Data());
-      hc_timeFS_scint_end[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+      hc_timeFS_scint_end[iF][iS] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
       hn = Form("h2c_timeF%d_S%d_end", iF, iS);
       ht = Form("Calibrated time distribtution of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                 iS, iFstring[iF].Data());
-      h2c_timeFS_end[iF][iS] = new TH2D(hn.Data(), ht.Data(), maxLay, 0, maxLay, nBin_scint, lowEdge_rpc, upEdge_scint);
+      h2c_timeFS_end[iF][iS] = new TH2D(hn.Data(), ht.Data(), maxLay, 0, maxLay, nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
       for (int iL = 0; iL < maxLay; ++iL) {
         hn = Form("h_timeF%d_S%d_L%d_end", iF, iS, iL);
         ht = Form("Time distribtution for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
                   iFstring[iF].Data());
-        h_timeFSL_end[iF][iS][iL] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+        h_timeFSL_end[iF][iS][iL] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
         hn = Form("hc_timeF%d_S%d_L%d_end", iF, iS, iL);
         ht = Form("Calibrated time distribtution for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                   iL, iS, iFstring[iF].Data());
-        hc_timeFSL_end[iF][iS][iL] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+        hc_timeFSL_end[iF][iS][iL] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
         for (int iP = 0; iP < 2; ++iP) {
           hn = Form("h_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
           ht = Form("Time distribtution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-          h_timeFSLP_end[iF][iS][iL][iP] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+          h_timeFSLP_end[iF][iS][iL][iP] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
           hn = Form("h2_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
           ht = Form("Time distribtution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-          h2_timeFSLP_end[iF][iS][iL][iP] = new TH2D(hn.Data(), ht.Data(), 75, 0, 75, nBin_scint, lowEdge_scint, upEdge_scint);
+          h2_timeFSLP_end[iF][iS][iL][iP] = new TH2D(hn.Data(), ht.Data(), 75, 0, 75, nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
           hn = Form("hc_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
           ht = Form("Calibrated time distribtution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-          hc_timeFSLP_end[iF][iS][iL][iP] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+          hc_timeFSLP_end[iF][iS][iL][iP] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
           hn = Form("h2c_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
           ht = Form("Calibrated time distribtution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); Channel Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-          h2c_timeFSLP_end[iF][iS][iL][iP] = new TH2D(hn.Data(), ht.Data(), 75, 0, 75, nBin_scint, lowEdge_scint, upEdge_scint);
+          h2c_timeFSLP_end[iF][iS][iL][iP] = new TH2D(hn.Data(), ht.Data(), 75, 0, 75, nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
           for (int iC = 0; iC < 75; ++iC) {
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc_end", iF, iS, iL, iP, iC);
             ht = Form("Time distribtution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            h_timeFSLPC_tc_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+            h_timeFSLPC_tc_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_end", iF, iS, iL, iP, iC);
             ht = Form("Time distribtution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            h_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+            h_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
 
             hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d_end", iF, iS, iL, iP, iC);
             ht = Form("Calibrated time distribtution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
-            hc_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint, upEdge_scint);
+            hc_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1D(hn.Data(), ht.Data(), nBin_scint, lowEdge_scint_end, upEdge_scint_end);
           }
         }
       }
@@ -494,6 +508,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   m_evtsChannel.clear();
   m_cFlag.clear();
+  m_minimizerOptions.SetDefaultStrategy(2);
 
   m_time_channelAvg_scint = 0.0;
   m_time_channelAvg_rpc = 0.0;
@@ -503,10 +518,13 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
    * Estimation of effected light speed for Scintillators and RPCs, separately.
    **********************************/
   B2INFO("Effected Light Speed Estimation.");
-  for (it_m = m_evts.begin(); it_m != m_evts.end(); ++it_m) {
-    channelId = it_m->first;
-    m_evtsChannel = it_m->second;
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
+    int iSub = klmChannel.getSubdetector();
+
     m_cFlag[channelId] = 0;
+    if (m_evts.find(channelId) == m_evts.end()) continue;
+    m_evtsChannel = m_evts[channelId];
 
     int n = m_evtsChannel.size();
     if (n < m_lower_limit_counts) {
@@ -515,27 +533,31 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     }
 
     m_cFlag[channelId] = 1;
-    int iSub, iFor, iSec, iLay, iPla, iStr;
-    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
-      bool inRPC = it_v->inRPC;
-
       TVector3 diffD = TVector3(it_v->diffDistX, it_v->diffDistY, it_v->diffDistZ);
       h_diff->Fill(diffD.Mag());
-
       double timeHit = it_v->time();
       if (m_useEventT0) timeHit = timeHit - it_v->t0;
-
-      h_timeFSLPC_tc[iFor][iSec - 1][iLay - 1][iPla][iStr - 1]->Fill(timeHit);
-      h_timeFSLPC_tc_end[iFor][iSec - 1][iLay - 1][iPla][iStr - 1]->Fill(timeHit);
-      if (m_elementNum->isBKLMChannel(channelId)) {
-        if (inRPC) {
+      if (iSub == KLMElementNumbers::c_BKLM) {
+        int iF = klmChannel.getSection();
+        int iS = klmChannel.getSector() - 1;
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane();
+        int iC = klmChannel.getStrip() - 1;
+        h_timeFSLPC_tc[iF][iS][iL][iP][iC]->Fill(timeHit);
+        if (iL > 1) {
           h_time_rpc_tc->Fill(timeHit);
         } else {
           h_time_scint_tc->Fill(timeHit);
         }
       } else {
+        int iF = klmChannel.getSection() - 1;
+        int iS = klmChannel.getSector() - 1;
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane() - 1;
+        int iC = klmChannel.getStrip() - 1;
+        h_timeFSLPC_tc_end[iF][iS][iL][iP][iC]->Fill(timeHit);
         h_time_scint_tc_end->Fill(timeHit);
       }
     }
@@ -548,76 +570,75 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   double tmpMean_scint_global = h_time_scint_tc->GetMean();
   double tmpMean_scint_global_end = h_time_scint_tc_end->GetMean();
 
-  for (KLMChannelIndex bklmChannel = m_klmChannels.beginBKLM(); bklmChannel != m_klmChannels.endBKLM(); ++bklmChannel) {
-    int iF = bklmChannel.getSection();
-    int iS = bklmChannel.getSector() - 1;
-    int iL = bklmChannel.getLayer() - 1;
-    int iP = bklmChannel.getPlane();
-    int iC = bklmChannel.getStrip() - 1;
+  B2INFO("Global Mean for Raw." << LogVar("RPC", tmpMean_rpc_global) << LogVar("Scint BKLM",
+         tmpMean_scint_global) << LogVar("Scint EKLM", tmpMean_scint_global_end));
 
-    channelId = m_elementNum->channelNumberBKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-    if (m_cFlag.find(channelId) == m_cFlag.end()) continue;
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
     if (!m_cFlag[channelId]) continue;
-    if (h_timeFSLPC_tc[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
-    h_timeFSLPC_tc[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
-    double tmpMean_channel = fcn_gaus->GetParameter(1);
-    if (iL < 2) {
-      m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global;
+
+    int iSub = klmChannel.getSubdetector();
+    if (iSub == KLMElementNumbers::c_BKLM) {
+      int iF = klmChannel.getSection();
+      int iS = klmChannel.getSector() - 1;
+      int iL = klmChannel.getLayer() - 1;
+      int iP = klmChannel.getPlane();
+      int iC = klmChannel.getStrip() - 1;
+      h_timeFSLPC_tc[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LESQ");
+      double tmpMean_channel = fcn_gaus->GetParameter(1);
+      if (iL > 1) {
+        m_timeShift[channelId] = tmpMean_channel - tmpMean_rpc_global;
+      } else {
+        m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global;
+      }
     } else {
-      m_timeShift[channelId] = tmpMean_channel - tmpMean_rpc_global;
+      int iF = klmChannel.getSection() - 1;
+      int iS = klmChannel.getSector() - 1;
+      int iL = klmChannel.getLayer() - 1;
+      int iP = klmChannel.getPlane() - 1;
+      int iC = klmChannel.getStrip() - 1;
+      h_timeFSLPC_tc_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LESQ");
+      double tmpMean_channel = fcn_gaus->GetParameter(1);
+      m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global_end;
     }
-  }
-  for (KLMChannelIndex eklmChannel = m_klmChannels.beginEKLM(); eklmChannel != m_klmChannels.endEKLM(); ++eklmChannel) {
-    int iF = eklmChannel.getSection();
-    int iS = eklmChannel.getSector() - 1;
-    int iL = eklmChannel.getLayer() - 1;
-    int iP = eklmChannel.getPlane();
-    int iC = eklmChannel.getStrip() - 1;
-
-    channelId = m_elementNum->channelNumberEKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-    if (m_cFlag.find(channelId) == m_cFlag.end()) continue;
-    if (!m_cFlag[channelId]) continue;
-
-    if (h_timeFSLPC_tc_end[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
-    h_timeFSLPC_tc_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
-    double tmpMean_channel = fcn_gaus->GetParameter(1);
-    m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global_end;
   }
 
   delete h_time_scint_tc;
   delete h_time_scint_tc_end;
   delete h_time_rpc_tc;
-  B2INFO("Effected Light round m_timeShift obtained. done.");
+  B2INFO("Effected Light m_timeShift obtained. done.");
 
-  for (it_m = m_evts.begin(); it_m != m_evts.end(); ++it_m) {
-    channelId = it_m->first;
-    if (m_cFlag.find(channelId) == m_cFlag.end()) continue;
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
     if (!m_cFlag[channelId]) continue;
-    if (m_timeShift.find(channelId) == m_timeShift.end()) continue;
-    m_evtsChannel = it_m->second;
-    int iSub, iFor, iSec, iLay, iPla, iStr;
-    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iFor, &iSec, &iLay, &iPla, &iStr);
+
+    m_evtsChannel = m_evts[channelId];
+    int iSub = klmChannel.getSubdetector();
 
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
       double timeHit = it_v->time() - m_timeShift[channelId];
       if (m_useEventT0) timeHit = timeHit - it_v->t0;
       double distHit = it_v->dist;
-      if (m_elementNum->isBKLMChannel(channelId)) {
-        if (it_v->inRPC) {
-          if (iPla) {
+
+      if (iSub == KLMElementNumbers::c_BKLM) {
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane();
+        if (iL > 1) {
+          if (iP) {
             hprf_rpc_phi_effC->Fill(distHit, timeHit);
           } else {
             hprf_rpc_z_effC->Fill(distHit, timeHit);
           }
         } else {
-          if (iPla) {
+          if (iP) {
             hprf_scint_phi_effC->Fill(distHit, timeHit);
           } else {
             hprf_scint_z_effC->Fill(distHit, timeHit);
           }
         }
       } else {
-        if (iPla) {
+        int iP = klmChannel.getPlane() - 1;
+        if (iP) {
           hprf_scint_plane1_effC_end->Fill(distHit, timeHit);
         } else {
           hprf_scint_plane2_effC_end->Fill(distHit, timeHit);
@@ -626,37 +647,38 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     }
   }
 
-  hprf_rpc_phi_effC->Fit("fcn_pol1");
+  B2INFO("Effective Ligit Spead Fitting.");
+  hprf_rpc_phi_effC->Fit("fcn_pol1", "EMQ");
   double slope_rpc_phi = fcn_pol1->GetParameter(1);
   double e_slope_rpc_phi = fcn_pol1->GetParError(1);
   double effC_rpc_phi = 1.0 / slope_rpc_phi;
   double e_effC_rpc_phi = e_slope_rpc_phi / (slope_rpc_phi * slope_rpc_phi);
 
-  hprf_rpc_z_effC->Fit("fcn_pol1");
+  hprf_rpc_z_effC->Fit("fcn_pol1", "EMQ");
   double slope_rpc_z = fcn_pol1->GetParameter(1);
   double e_slope_rpc_z = fcn_pol1->GetParError(1);
   double effC_rpc_z = 1.0 / slope_rpc_z;
   double e_effC_rpc_z = e_slope_rpc_z / (slope_rpc_z * slope_rpc_z);
 
-  hprf_scint_phi_effC->Fit("fcn_pol1");
+  hprf_scint_phi_effC->Fit("fcn_pol1", "EMQ");
   double slope_scint_phi = fcn_pol1->GetParameter(1);
   double e_slope_scint_phi = fcn_pol1->GetParError(1);
   double effC_scint_phi = 1.0 / slope_scint_phi;
   double e_effC_scint_phi = e_slope_scint_phi / (slope_scint_phi * slope_scint_phi);
 
-  hprf_scint_z_effC->Fit("fcn_pol1");
+  hprf_scint_z_effC->Fit("fcn_pol1", "EMQ");
   double slope_scint_z = fcn_pol1->GetParameter(1);
   double e_slope_scint_z = fcn_pol1->GetParError(1);
   double effC_scint_z = 1.0 / slope_scint_z;
   double e_effC_scint_z = e_slope_scint_z / (slope_scint_z * slope_scint_z);
 
-  hprf_scint_plane1_effC_end->Fit("fcn_pol1");
+  hprf_scint_plane1_effC_end->Fit("fcn_pol1", "EMQ");
   double slope_scint_plane1_end = fcn_pol1->GetParameter(1);
   double e_slope_scint_plane1_end = fcn_pol1->GetParError(1);
   double effC_scint_plane1_end = 1.0 / slope_scint_plane1_end;
   double e_effC_scint_plane1_end = e_slope_scint_plane1_end / (slope_scint_plane1_end * slope_scint_plane1_end);
 
-  hprf_scint_plane2_effC_end->Fit("fcn_pol1");
+  hprf_scint_plane2_effC_end->Fit("fcn_pol1", "EMQ");
   double slope_scint_plane2_end = fcn_pol1->GetParameter(1);
   double e_slope_scint_plane2_end = fcn_pol1->GetParError(1);
   double effC_scint_plane2_end = 1.0 / slope_scint_plane2_end;
@@ -680,36 +702,41 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
          << LogVar("Fitted Value (plane2 readout) ", logStr_z.Data()));
 
   // Default Effected Light Speed in current Database
-  effSpeed = 0.5671 * Const::speedOfLight;
+  effSpeed_end = 0.5 * (fabs(effC_scint_plane1_end) + fabs(effC_scint_plane2_end));
+  effSpeed = 0.5 * (fabs(effC_scint_phi) + fabs(effC_scint_z));
+  effSpeed_RPC = 0.5 * (fabs(effC_rpc_phi) + fabs(effC_rpc_z));
 
-  effSpeed = (fabs(effC_scint_phi) + fabs(effC_scint_z) + fabs(effC_scint_plane1_end) + fabs(effC_scint_plane2_end)) / 4.0;
-
-  effSpeed_RPC = (fabs(effC_rpc_phi) + fabs(effC_rpc_z)) / 2.0;
   effSpeed_RPC = 0.50 * Const::speedOfLight;
 
-  m_timeConstants->setEffLightSpeed(effSpeed, false);
-  m_timeConstants->setAmpTimeConstant(0, false);
-  m_timeConstants->setEffLightSpeed(effSpeed_RPC, true);
-  m_timeConstants->setAmpTimeConstant(0, true);
+  m_timeConstants->setEffLightSpeed(effSpeed_end, KLMTimeConstants::c_EKLM);
+  m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_EKLM);
+  m_timeConstants->setEffLightSpeed(effSpeed, KLMTimeConstants::c_BKLM);
+  m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_BKLM);
+  m_timeConstants->setEffLightSpeed(effSpeed_RPC, KLMTimeConstants::c_RPC);
+  m_timeConstants->setAmpTimeConstant(0, KLMTimeConstants::c_RPC);
+
+  effSpeed_end = 0.5671 * Const::speedOfLight;
+  effSpeed = 0.5671 * Const::speedOfLight;
 
   /** ======================================================================================= **/
   B2INFO("Time distribution filling begins.");
-  for (it_m = m_evts.begin(); it_m != m_evts.end(); ++it_m) {
-    channelId = it_m->first;
-    if (!m_cFlag[channelId]) continue;
-    int iF, iS, iL, iP, iC, iSub;
-    m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iF, &iS, &iL, &iP, &iC);
-    iS = iS - 1;
-    iL = iL - 1;
-    iC = iC - 1;
-    m_evtsChannel = it_m->second;
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
+    int iSub = klmChannel.getSubdetector();
 
-    if (m_elementNum->isBKLMChannel(channelId)) {
-      for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
-        bool inRPC = it_v->inRPC;
-        double timeHit = it_v->time();
-        if (m_useEventT0) timeHit = timeHit - it_v->t0;
-        if (inRPC) {
+    if (!m_cFlag[channelId]) continue;
+    m_evtsChannel = m_evts[channelId];
+
+    for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
+      double timeHit = it_v->time();
+      if (m_useEventT0) timeHit = timeHit - it_v->t0;
+      if (iSub == KLMElementNumbers::c_BKLM) {
+        int iF = klmChannel.getSection();
+        int iS = klmChannel.getSector() - 1;
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane();
+        int iC = klmChannel.getStrip() - 1;
+        if (iL > 1) {
           double propgationT = it_v->dist / effSpeed_RPC;
           h_time_rpc->Fill(timeHit - propgationT);
           h_timeF_rpc[iF]->Fill(timeHit - propgationT);
@@ -732,12 +759,12 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
           h2_timeFS[iF][iS]->Fill(iL, timeHit - propgationT);
           h2_timeFSLP[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT);
         }
-      }
-    }
-    if (m_elementNum->isEKLMChannel(channelId)) {
-      for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
-        double timeHit = it_v->time();
-        if (m_useEventT0) timeHit = timeHit - it_v->t0;
+      } else {
+        int iF = klmChannel.getSection() - 1;
+        int iS = klmChannel.getSector() - 1;
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane() - 1;
+        int iC = klmChannel.getStrip() - 1;
         double propgationT = it_v->dist / effSpeed;
         h_time_scint_end->Fill(timeHit - propgationT);
         h_timeF_scint_end[iF]->Fill(timeHit - propgationT);
@@ -756,104 +783,136 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
 
   int iChannel_rpc = 0;
   int iChannel = 0;
-  for (KLMChannelIndex bklmChannel = m_klmChannels.beginBKLM(); bklmChannel != m_klmChannels.endBKLM(); ++bklmChannel) {
-    int iF = bklmChannel.getSection();
-    int iS = bklmChannel.getSector() - 1;
-    int iL = bklmChannel.getLayer() - 1;
-    int iP = bklmChannel.getPlane();
-    int iC = bklmChannel.getStrip() - 1;
+  int iChannel_end = 0;
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
+    if (!m_cFlag[channelId]) continue;
+    int iSub = klmChannel.getSubdetector();
 
-    channelId = m_elementNum->channelNumberBKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-    if (m_evts.find(channelId) == m_evts.end()) continue;
-    if (h_timeFSLPC[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
+    if (iSub == KLMElementNumbers::c_BKLM) {
+      int iF = klmChannel.getSection();
+      int iS = klmChannel.getSector() - 1;
+      int iL = klmChannel.getLayer() - 1;
+      int iP = klmChannel.getPlane();
+      int iC = klmChannel.getStrip() - 1;
 
-    TFitResultPtr r = h_timeFSLPC[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
-    TFitResult& ftr = *r;
-    if (ftr.IsValid()) m_cFlag[channelId] = 2;
-    m_time_channel[channelId] = fcn_gaus->GetParameter(1);
-    m_etime_channel[channelId] = fcn_gaus->GetParError(1);
-
-    if (iL > 1) {
-      gre_time_channel_scint->SetPoint(iChannel, channelId, m_time_channel[channelId]);
-      gre_time_channel_scint->SetPointError(iChannel, 0., m_etime_channel[channelId]);
-      iChannel++;
+      TFitResultPtr r = h_timeFSLPC[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LESQ");
+      if (int(r) != 0) continue;
+      if (int(r) == 0) m_cFlag[channelId] = 2;
+      m_time_channel[channelId] = fcn_gaus->GetParameter(1);
+      m_etime_channel[channelId] = fcn_gaus->GetParError(1);
+      if (iL > 1) {
+        gre_time_channel_rpc->SetPoint(iChannel, channelId, m_time_channel[channelId]);
+        gre_time_channel_rpc->SetPointError(iChannel, 0., m_etime_channel[channelId]);
+        iChannel++;
+      } else {
+        gre_time_channel_scint->SetPoint(iChannel_rpc, channelId, m_time_channel[channelId]);
+        gre_time_channel_scint->SetPointError(iChannel_rpc, 0., m_etime_channel[channelId]);
+        iChannel_rpc++;
+      }
     } else {
-      gre_time_channel_rpc->SetPoint(iChannel_rpc, channelId, m_time_channel[channelId]);
-      gre_time_channel_rpc->SetPointError(iChannel_rpc, 0., m_etime_channel[channelId]);
-      iChannel_rpc++;
+      int iF = klmChannel.getSection() - 1;
+      int iS = klmChannel.getSector() - 1;
+      int iL = klmChannel.getLayer() - 1;
+      int iP = klmChannel.getPlane() - 1;
+      int iC = klmChannel.getStrip() - 1;
+
+      TFitResultPtr r = h_timeFSLPC_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LESQ");
+      if (int(r) != 0) continue;
+      if (int(r) == 0) m_cFlag[channelId] = 2;
+      m_time_channel[channelId] = fcn_gaus->GetParameter(1);
+      m_etime_channel[channelId] = fcn_gaus->GetParError(1);
+      gre_time_channel_scint_end->SetPoint(iChannel_end, channelId, m_time_channel[channelId]);
+      gre_time_channel_scint_end->SetPointError(iChannel_end, 0., m_etime_channel[channelId]);
+      iChannel_end++;
     }
   }
-  int iChannel_end = 0;
-  for (KLMChannelIndex eklmChannel = m_klmChannels.beginEKLM(); eklmChannel != m_klmChannels.endEKLM(); ++eklmChannel) {
-    int iF = eklmChannel.getSection();
-    int iS = eklmChannel.getSector() - 1;
-    int iL = eklmChannel.getLayer() - 1;
-    int iP = eklmChannel.getPlane();
-    int iC = eklmChannel.getStrip() - 1;
 
-    channelId = m_elementNum->channelNumberEKLM(iF, iS + 1, iL + 1, iP, iC + 1);
-    if (m_evts.find(channelId) == m_evts.end()) continue;
-    if (h_timeFSLPC_end[iF][iS][iL][iP][iC]->GetEntries() < m_lower_limit_counts) continue;
-
-    TFitResultPtr r = h_timeFSLPC_end[iF][iS][iL][iP][iC]->Fit(fcn_gaus, "LSM");
-    TFitResult& ftr = *r;
-    if (ftr.IsValid()) m_cFlag[channelId] = 2;
-    m_time_channel[channelId] = fcn_gaus->GetParameter(1);
-    m_etime_channel[channelId] = fcn_gaus->GetParError(1);
-
-    gre_time_channel_scint_end->SetPoint(iChannel_end, channelId, m_time_channel[channelId]);
-    gre_time_channel_scint_end->SetPointError(iChannel_end, 0., m_etime_channel[channelId]);
-    iChannel_end++;
-  }
-
-  gre_time_channel_scint->Fit("fcn_const");
+  gre_time_channel_scint->Fit("fcn_const", "EMQ");
   m_time_channelAvg_scint = fcn_const->GetParameter(0);
   m_etime_channelAvg_scint = fcn_const->GetParError(0);
 
-  gre_time_channel_scint_end->Fit("fcn_const");
+  gre_time_channel_scint_end->Fit("fcn_const", "EMQ");
   m_time_channelAvg_scint_end = fcn_const->GetParameter(0);
   m_etime_channelAvg_scint_end = fcn_const->GetParError(0);
 
-  gre_time_channel_rpc->Fit("fcn_const");
+  gre_time_channel_rpc->Fit("fcn_const", "EMQ");
   m_time_channelAvg_rpc = fcn_const->GetParameter(0);
   m_etime_channelAvg_rpc = fcn_const->GetParError(0);
 
   B2INFO("Channel's time distribution Fitting Done.");
+  B2DEBUG(29, LogVar("Average Time (RPC)", m_time_channelAvg_rpc) << LogVar("Average Time (Scint BKLM)",
+          m_time_channelAvg_scint) << LogVar("Average Time (Scint EKLM)", m_time_channelAvg_scint_end));
+
   B2INFO("Calibrated channel's time distribution Filling. Begins.");
 
   m_timeShift.clear();
-  for (it_m = m_evts.begin(); it_m != m_evts.end(); ++it_m) {
-    channelId = it_m->first;
-    m_evtsChannel = it_m->second;
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
     h_calibrated->Fill(int(m_cFlag[channelId]));
-    if (!m_cFlag[channelId] || (m_time_channel.find(channelId) == m_time_channel.end())) {
-      m_timeCableDelay->setTimeShift(channelId, 0.00);
-      continue;
-    }
-    bool inRPC = m_evtsChannel.at(0).inRPC;
-    if (m_elementNum->isBKLMChannel(channelId)) {
-      if (inRPC) {
+    if (m_time_channel.find(channelId) == m_time_channel.end()) continue;
+
+    int iSub = klmChannel.getSubdetector();
+    if (iSub == KLMElementNumbers::c_BKLM) {
+      int iL = klmChannel.getLayer() - 1;
+      if (iL > 1) {
         m_timeShift[channelId] = m_time_channel[channelId] - m_time_channelAvg_rpc;
       } else {
         m_timeShift[channelId] = m_time_channel[channelId] - m_time_channelAvg_scint;
       }
-    }
-    if (m_elementNum->isEKLMChannel(channelId)) {
+    } else {
       m_timeShift[channelId] = m_time_channel[channelId] - m_time_channelAvg_scint_end;
     }
     m_timeCableDelay->setTimeShift(channelId, m_timeShift[channelId]);
+  }
 
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
+    if (m_timeShift.find(channelId) != m_timeShift.end()) continue;
+    m_timeShift[channelId] = esti_timeShift(klmChannel);
+    m_timeCableDelay->setTimeShift(channelId, m_timeShift[channelId]);
+    B2DEBUG(29, "Uncalibrated Estimation " << LogVar("Channel", channelId) << LogVar("Estimated value", m_timeShift[channelId]));
+  }
+
+  iChannel_rpc = 0;
+  iChannel = 0;
+  iChannel_end = 0;
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
+    if (m_timeShift.find(channelId) == m_timeShift.end()) {
+      B2ERROR("!!! Not All Channels Calibration Constant Set. Error Happended on " << LogVar("Channel", channelId));
+      continue;
+    }
+    int iSub = klmChannel.getSubdetector();
+    if (iSub == KLMElementNumbers::c_BKLM) {
+      int iL = klmChannel.getLayer();
+      if (iL > 2) {
+        gr_timeShift_channel_rpc->SetPoint(iChannel, channelId, m_timeShift[channelId]);
+        iChannel_rpc++;
+      } else {
+        gr_timeShift_channel_scint->SetPoint(iChannel, channelId, m_timeShift[channelId]);
+        iChannel++;
+      }
+    } else {
+      gr_timeShift_channel_scint_end->SetPoint(iChannel_end, channelId, m_timeShift[channelId]);
+      iChannel_end++;
+    }
+  }
+
+  for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
+    channelId = klmChannel.getKLMChannelNumber();
+    int iSub = klmChannel.getSubdetector();
+    m_evtsChannel = m_evts[channelId];
     for (it_v = m_evtsChannel.begin(); it_v != m_evtsChannel.end(); ++it_v) {
-      int iF, iS, iL, iP, iC, iSub;
-      m_elementNum->channelNumberToElementNumbers(channelId, &iSub, &iF, &iS, &iL, &iP, &iC);
-      iS = iS - 1;
-      iL = iL - 1;
-      iC = iC - 1;
       double timeHit = it_v->time();
       if (m_useEventT0) timeHit = timeHit - it_v->t0;
-
-      if (m_elementNum->isBKLMChannel(channelId)) {
-        if (inRPC) {
+      if (iSub == KLMElementNumbers::c_BKLM) {
+        int iF = klmChannel.getSection();
+        int iS = klmChannel.getSector() - 1;
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane();
+        int iC = klmChannel.getStrip() - 1;
+        if (iL > 1) {
           double propgationT = it_v->dist / effSpeed_RPC;
           hc_time_rpc->Fill(timeHit - propgationT - m_timeShift[channelId]);
           hc_timeF_rpc[iF]->Fill(timeHit - propgationT - m_timeShift[channelId]);
@@ -876,8 +935,12 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
           h2c_timeFS[iF][iS]->Fill(iL, timeHit - propgationT - m_timeShift[channelId]);
           h2c_timeFSLP[iF][iS][iL][iP]->Fill(iC, timeHit - propgationT - m_timeShift[channelId]);
         }
-      }
-      if (m_elementNum->isEKLMChannel(channelId)) {
+      } else {
+        int iF = klmChannel.getSection() - 1;
+        int iS = klmChannel.getSector() - 1;
+        int iL = klmChannel.getLayer() - 1;
+        int iP = klmChannel.getPlane() - 1;
+        int iC = klmChannel.getStrip() - 1;
         double propgationT = it_v->dist / effSpeed;
         hc_time_scint_end->Fill(timeHit - propgationT - m_timeShift[channelId]);
         hc_timeF_scint_end[iF]->Fill(timeHit - propgationT - m_timeShift[channelId]);
@@ -899,7 +962,8 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
   m_timeShift.clear();
   m_cFlag.clear();
 
-  saveCalibration(m_timeCableDelay, "KLMTimeCalibration");
+  saveCalibration(m_timeCableDelay, "KLMTime_cableDelay");
+  saveCalibration(m_timeConstants, "KLMTime_basicConstant");
   return CalibrationAlgorithm::c_OK;
 }
 
@@ -939,6 +1003,9 @@ void KLMTimeCalibrationAlgorithm::saveHist()
   gre_time_channel_rpc->Write("gre_time_channel_rpc");
   gre_time_channel_scint->Write("gre_time_channel_scint");
   gre_time_channel_scint_end->Write("gre_time_channel_scint_end");
+  gr_timeShift_channel_rpc->Write("gr_timeShift_channel_rpc");
+  gr_timeShift_channel_scint->Write("gr_timeShift_channel_scint");
+  gr_timeShift_channel_scint_end->Write("gr_timeShift_channel_scint_end");
 
   B2INFO("Top file setup Done.");
 
@@ -1027,7 +1094,7 @@ void KLMTimeCalibrationAlgorithm::saveHist()
       h2_timeFS_end[iF][iS]->SetDirectory(dir_time_F_end[iF]);
       h2c_timeFS_end[iF][iS]->SetDirectory(dir_time_F_end[iF]);
 
-      sprintf(dirname, "Sector_%d_end", iF + 1);
+      sprintf(dirname, "Sector_%d_end", iS + 1);
       dir_time_FS_end[iF][iS] = dir_time_F_end[iF]->mkdir(dirname);
       dir_time_FS_end[iF][iS]->cd();
       for (int iL = 0; iL < maxLayer; ++iL) {
@@ -1060,4 +1127,82 @@ void KLMTimeCalibrationAlgorithm::saveHist()
   m_outFile->Write();
   m_outFile->Close();
   B2INFO("File Write and Close. Done.");
+}
+
+double KLMTimeCalibrationAlgorithm::esti_timeShift(KLMChannelIndex& klmChannel)
+{
+  double tS = 0.0;
+  int iSub = klmChannel.getSubdetector();
+  int iF = klmChannel.getSection();
+  int iS = klmChannel.getSector();
+  int iL = klmChannel.getLayer();
+  int iP = klmChannel.getPlane();
+  int iC = klmChannel.getStrip();
+  int totNStrips = EKLMElementNumbers::getMaximalStripNumber();
+  if (iSub == KLMElementNumbers::c_BKLM) totNStrips = BKLMElementNumbers::getNStrips(iF, iS, iL, iP);
+  if (iC == 1) {
+    KLMChannelIndex kCIndex_upper(iSub, iF, iS, iL, iP, iC + 1);
+    tS = tS_upperStrip(kCIndex_upper).second;
+  } else if (iC == totNStrips) {
+    KLMChannelIndex kCIndex_lower(iSub, iF, iS, iL, iP, iC - 1);
+    tS = tS_lowerStrip(kCIndex_lower).second;
+  } else {
+    KLMChannelIndex kCIndex_upper(iSub, iF, iS, iL, iP, iC + 1);
+    KLMChannelIndex kCIndex_lower(iSub, iF, iS, iL, iP, iC - 1);
+    std::pair<int, double> tS_upper = tS_upperStrip(kCIndex_upper);
+    std::pair<int, double> tS_lower = tS_lowerStrip(kCIndex_lower);
+    unsigned int td_upper = tS_upper.first - iC;
+    unsigned int td_lower = iC - tS_lower.first;
+    unsigned int td = tS_upper.first - tS_lower.first;
+    tS = (double(td_upper) * tS_lower.second + double(td_lower) * tS_upper.second) / double(td);
+  }
+  return tS;
+}
+
+std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_upperStrip(KLMChannelIndex& klmChannel)
+{
+  std::pair<int, double> tS;
+  int cId = klmChannel.getKLMChannelNumber();
+  int iSub = klmChannel.getSubdetector();
+  int iF = klmChannel.getSection();
+  int iS = klmChannel.getSector();
+  int iL = klmChannel.getLayer();
+  int iP = klmChannel.getPlane();
+  int iC = klmChannel.getStrip();
+  int totNStrips = EKLMElementNumbers::getMaximalStripNumber();
+  if (iSub == KLMElementNumbers::c_BKLM) totNStrips = BKLMElementNumbers::getNStrips(iF, iS, iL, iP);
+  if (m_timeShift.find(cId) != m_timeShift.end()) {
+    tS.first = iC;
+    tS.second = m_timeShift[cId];
+  } else if (iC == totNStrips) {
+    tS.first = iC;
+    tS.second = 0.0;
+  } else {
+    KLMChannelIndex kCIndex(iSub, iF, iS, iL, iP, iC + 1);
+    tS = tS_upperStrip(kCIndex);
+  }
+  return tS;
+}
+
+std::pair<int, double> KLMTimeCalibrationAlgorithm::tS_lowerStrip(KLMChannelIndex& klmChannel)
+{
+  std::pair<int, double> tS;
+  int cId = klmChannel.getKLMChannelNumber();
+  int iSub = klmChannel.getSubdetector();
+  int iF = klmChannel.getSection();
+  int iS = klmChannel.getSector();
+  int iL = klmChannel.getLayer();
+  int iP = klmChannel.getPlane();
+  int iC = klmChannel.getStrip();
+  if (m_timeShift.find(cId) != m_timeShift.end()) {
+    tS.first = iC;
+    tS.second = m_timeShift[cId];
+  } else if (iC == 1) {
+    tS.first = iC;
+    tS.second = 0.0;
+  } else {
+    KLMChannelIndex kCIndex(iSub, iF, iS, iL, iP, iC - 1);
+    tS = tS_lowerStrip(kCIndex);
+  }
+  return tS;
 }

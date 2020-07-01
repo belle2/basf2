@@ -21,6 +21,21 @@ namespace Belle2 {
   class KLMTimeConstants : public TObject {
 
   public:
+    /**
+     * Channel type.
+     */
+    enum ChannelType {
+
+      /** EKLM Scintillator. */
+      c_EKLM = 1,
+
+      /** BKLM Scintillator. */
+      c_BKLM = 2,
+
+      /** RPC. */
+      c_RPC = 3,
+
+    };
 
     /**
      * Constructor.
@@ -34,41 +49,47 @@ namespace Belle2 {
 
     /**
      * Get effective light speed of scintillators.
-     * @param[in] isRPC get value for RPC(true) or Scintillator(false).
+     * @param[in] cType Flag of channel type.
      */
-    double getEffLightSpeed(bool isRPC) const;
+    double getEffLightSpeed(int cType) const;
 
     /**
      * Set effective light speed of scintillators.
      * @param[in] lightSpeed Effective light speed.
-     * @param[in] isRPC set value for RPC(true) or Scintillator(false).
+     * @param[in] cType Flag of channel type.
      */
-    void setEffLightSpeed(double lightSpeed, bool isRPC);
+    void setEffLightSpeed(double lightSpeed, int cType);
 
     /**
      * Get amplitude dependence time constant.
      * This item is not supported by the firmwire so far.
-     * @param[in] isRPC get value for RPC(true) or Scintillator(false).
+     * @param[in] cType Flag of channel type.
      */
-    double getAmpTimeConstant(bool isRPC) const;
+    double getAmpTimeConstant(int cType) const;
 
     /**
      * Set amplitude dependence time constant.
      * This item is not supported by the firmwire so far.
      * @param[in] amplitudeTimeConstant Amplitude dependence time constant.
-     * @param[in] isRPC set value for RPC(true) or Scintillator(false).
+     * @param[in] cType Flag of channel type.
      */
-    void setAmpTimeConstant(double amplitudeTimeConstant, bool isRPC);
+    void setAmpTimeConstant(double amplitudeTimeConstant, int cType);
 
 
   private:
-    /** Effective light speed of scintillators. */
+    /** Effective light speed of scintillators for EKLM. */
+    double m_effLightSpeed_end;
+
+    /** Effective light speed of scintillators for BKLM. */
     double m_effLightSpeed;
 
     /** Effective light speed of RPCs. */
     double m_effLightSpeedRPC;
 
-    /** Amplitude dependence time constant of scintillators. */
+    /** Amplitude dependence time constant of scintillators for EKLM. */
+    double m_ampTimeConstant_end;
+
+    /** Amplitude dependence time constant of scintillators for BKLM. */
     double m_ampTimeConstant;
 
     /** Amplitude dependence time constant of RPCs. */

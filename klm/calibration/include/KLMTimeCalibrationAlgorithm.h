@@ -26,6 +26,7 @@
 #include <TH1I.h>
 #include <TH2D.h>
 #include <TProfile.h>
+#include <Math/MinimizerOptions.h>
 
 namespace Belle2 {
   /**
@@ -102,6 +103,21 @@ namespace Belle2 {
      */
     void saveHist();
 
+    /**
+     * Estimate value of calibration constant for uncalibrated channels.
+     */
+    double esti_timeShift(KLMChannelIndex&);
+
+    /**
+     * Tracing avaiable channels with increasing strip number.
+     */
+    std::pair<int, double> tS_upperStrip(KLMChannelIndex&);
+
+    /**
+     * Tracing avaiable channels with decreasing strip number.
+     */
+    std::pair<int, double> tS_lowerStrip(KLMChannelIndex&);
+
 
   protected:
     // Run algo on data
@@ -161,6 +177,7 @@ namespace Belle2 {
     /** KLM ChannelIndex object. */
     KLMChannelIndex m_klmChannels;
 
+    ROOT::Math::MinimizerOptions m_minimizerOptions;
     /**
      * DBObject of time cost on some parts of
      * the detector.
@@ -188,13 +205,21 @@ namespace Belle2 {
     /** distance between global and local position **/
     TH1D* h_diff;
 
-    /** Monitor Graphe of calibration constant value of each channel **/
+    /** Monitor Graphe of peak value of time distribution for each channel **/
     /** BKLM RPC */
     TGraphErrors* gre_time_channel_rpc;
     /** BKLM Scintillator */
     TGraphErrors* gre_time_channel_scint;
     /** EKLM */
     TGraphErrors* gre_time_channel_scint_end;
+
+    /** Monitor Graphe of calibration constant value of each channel **/
+    /** BKLM RPC */
+    TGraph* gr_timeShift_channel_rpc;
+    /** BKLM Scintillator */
+    TGraph* gr_timeShift_channel_scint;
+    /** EKLM */
+    TGraph* gr_timeShift_channel_scint_end;
 
     /** Profiles used for effected light speed estimation **/
     /** For BKLM RPC phi plane */

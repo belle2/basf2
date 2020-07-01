@@ -11,11 +11,16 @@
 /* Own header. */
 #include <klm/dbobjects/KLMTimeConstants.h>
 
+/* Belle 2 headers. */
+#include <framework/logging/Logger.h>
+
 using namespace Belle2;
 
 KLMTimeConstants::KLMTimeConstants() :
+  m_effLightSpeed_end(0.0),
   m_effLightSpeed(0.0),
   m_effLightSpeedRPC(0.0),
+  m_ampTimeConstant_end(0.0),
   m_ampTimeConstant(0.0),
   m_ampTimeConstantRPC(0.0)
 {
@@ -25,39 +30,61 @@ KLMTimeConstants::~KLMTimeConstants()
 {
 }
 
-double KLMTimeConstants::getEffLightSpeed(bool isRPC) const
+double KLMTimeConstants::getEffLightSpeed(int cType) const
 {
-  if (isRPC) {
-    return m_effLightSpeedRPC;
-  } else {
-    return m_effLightSpeed;
+  switch (cType) {
+    case c_EKLM:
+      return m_effLightSpeed_end;
+    case c_BKLM:
+      return m_effLightSpeed;
+    case c_RPC:
+      return m_effLightSpeedRPC;
   }
+  B2FATAL("Incorrect channel type: " << cType);
 }
 
-void KLMTimeConstants::setEffLightSpeed(double lightSpeed, bool isRPC)
+void KLMTimeConstants::setEffLightSpeed(double lightSpeed, int cType)
 {
-  if (isRPC) {
-    m_effLightSpeedRPC = lightSpeed;
-  } else {
-    m_effLightSpeed = lightSpeed;
+  switch (cType) {
+    case c_EKLM:
+      m_effLightSpeed_end = lightSpeed;
+      return;
+    case c_BKLM:
+      m_effLightSpeed = lightSpeed;
+      return;
+    case c_RPC:
+      m_effLightSpeedRPC = lightSpeed;
+      return;
   }
+  B2FATAL("Incorrect channel type: " << cType);
 }
 
-double KLMTimeConstants::getAmpTimeConstant(bool isRPC) const
+double KLMTimeConstants::getAmpTimeConstant(int cType) const
 {
-  if (isRPC) {
-    return m_ampTimeConstantRPC;
-  } else {
-    return m_ampTimeConstant;
+  switch (cType) {
+    case c_EKLM:
+      return m_ampTimeConstant_end;
+    case c_BKLM:
+      return m_ampTimeConstant;
+    case c_RPC:
+      return m_ampTimeConstantRPC;
   }
+  B2FATAL("Incorrect channel type: " << cType);
 }
 
-void KLMTimeConstants::setAmpTimeConstant(double amplitudeTimeConstant, bool isRPC)
+void KLMTimeConstants::setAmpTimeConstant(double amplitudeTimeConstant, int cType)
 {
-  if (isRPC) {
-    m_ampTimeConstantRPC = amplitudeTimeConstant;
-  } else {
-    m_ampTimeConstant = amplitudeTimeConstant;
+  switch (cType) {
+    case c_EKLM:
+      m_ampTimeConstant_end = amplitudeTimeConstant;
+      return;
+    case c_BKLM:
+      m_ampTimeConstant = amplitudeTimeConstant;
+      return;
+    case c_RPC:
+      m_ampTimeConstantRPC = amplitudeTimeConstant;
+      return;
   }
+  B2FATAL("Incorrect channel type: " << cType);
 }
 

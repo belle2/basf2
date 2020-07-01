@@ -160,11 +160,14 @@ namespace TreeFitter {
                                   forceFitAll); //FIXME obsolete not touching it now god knows where this might be needed
 
       }
+    } else if (mother->type() == kRecoComposite) {
+      rc = new FeedthroughParticle(particle, mother, config, forceFitAll);
     } else if (particle->hasExtraInfo("bremsCorrected")) { // Has Bremsstrahlungs-recovery
       if (particle->getExtraInfo("bremsCorrected") == 0.) { // No gammas assigned -> feedthrough
         rc = new FeedthroughParticle(particle, mother, config, forceFitAll);
       } else { // Got gammas -> Internal track
-        rc = new InternalTrack(particle, mother, config, forceFitAll, true, true); // Always mass-constrain brems tracks
+//        rc = new InternalTrack(particle, mother, config, forceFitAll, true, true); // Always mass-constrain brems tracks
+        rc = new RecoComposite(particle, mother, config, forceFitAll, true);
       }
     } else if (particle->getMdstArrayIndex() ||
                particle->getTrack() ||

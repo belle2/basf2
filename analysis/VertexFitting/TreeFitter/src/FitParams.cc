@@ -12,6 +12,8 @@
 #include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
 #include <string>
 
+#include <iostream>
+
 namespace TreeFitter {
 
 

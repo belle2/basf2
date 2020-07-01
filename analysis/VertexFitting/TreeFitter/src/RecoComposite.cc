@@ -13,12 +13,23 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 #include <TMatrixFSym.h>
+#include <iostream>
 
 namespace TreeFitter {
 
   RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother)
     : ParticleBase(particle, mother), m_params(), m_hasEnergy(true)
   {
+    updateParams();
+  }
+
+  RecoComposite::RecoComposite(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config,
+                               bool forceFitAll, bool massConstraint)
+    : ParticleBase(particle, mother, &config), m_params(), m_hasEnergy(true), m_massconstraint(massConstraint)
+  {
+    for (auto daughter : particle->getDaughters()) {
+      addDaughter(daughter, config, forceFitAll);
+    }
     updateParams();
   }
 
@@ -38,7 +49,6 @@ namespace TreeFitter {
 
     return ErrCode(ErrCode::Status::success) ;
   }
-
   void RecoComposite::updateParams()
   {
     const TVector3 pos = particle()->getVertex();
@@ -89,7 +99,6 @@ namespace TreeFitter {
     }
 
     p.getV().triangularView<Eigen::Lower>() = m_covariance.triangularView<Eigen::Lower>();
-
     return ErrCode(ErrCode::Status::success) ;
   }
 
@@ -97,6 +106,9 @@ namespace TreeFitter {
   {
     ErrCode status;
     switch (type) {
+      case Constraint::mass:
+        status |= projectMassConstraint(fitparams, p);
+        break;
       case Constraint::composite:
         status |= projectRecoComposite(fitparams, p);
         break ;

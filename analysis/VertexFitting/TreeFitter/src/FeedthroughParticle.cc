@@ -25,10 +25,12 @@ namespace TreeFitter {
     ParticleBase(particle, mother, &config)
   {
     if (particle) {
-      if (particle->getNDaughters() != 1) {
-        B2ERROR("FeedthroughParticles can only be initialized with a single daughter.");
+      if (particle->getNDaughters() > 1) {
+        B2ERROR("FeedthroughParticles can only be initialized with zero or one daughters.");
       }
-      addDaughter(particle->getDaughters()[0], config, forceFitAll);
+      if (particle->getNDaughters() == 1) {
+        addDaughter(particle->getDaughters()[0], config, forceFitAll);
+      }
     } else {
       B2ERROR("Trying to create a FeedthroughParticle from NULL. This should never happen.");
     }
@@ -50,7 +52,9 @@ namespace TreeFitter {
   ErrCode FeedthroughParticle::initCovariance(FitParams& fitparams) const
   {
     ErrCode status;
-    status |= m_daughters[0]->initCovariance(fitparams);
+    for (ParticleBase* daughter : m_daughters) {
+      status |= daughter->initCovariance(fitparams);
+    }
     return status;
   }
 

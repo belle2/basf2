@@ -91,6 +91,9 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
   addParam("inflationFactorCovZ", m_inflationFactorCovZ,
            "Inflate the covariance of the beamspot by this number so that the 3d beam constraint becomes weaker in Z.And: thisnumber->infinity : dim(beamspot constr) 3d->2d.",
            1);
+  addParam("momentumScalingFactor", m_momentumScalingFactor,
+           "Scale the momenta of tracks by this factor",
+           1.f);
 }
 
 void TreeFitterModule::initialize()
@@ -174,7 +177,8 @@ bool TreeFitterModule::fitTree(Belle2::Particle* head)
     m_customOriginVertex,
     m_customOriginCovariance,
     m_originDimension,
-    m_inflationFactorCovZ
+    m_inflationFactorCovZ,
+    m_momentumScalingFactor
   );
 
   std::unique_ptr<TreeFitter::FitManager> TreeFitter(

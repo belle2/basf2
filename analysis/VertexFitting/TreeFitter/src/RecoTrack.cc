@@ -21,14 +21,15 @@ namespace TreeFitter {
   constexpr double pi = TMath::Pi();
   constexpr double twoPi = TMath::TwoPi();
 
-  RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
+  RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config) :
     RecoParticle(particle, mother),
     m_bfield(0),
     m_trackfit(particle->getTrackFitResult()),
     m_cached(false),
     m_flt(0),
     m_params(5),
-    m_covariance(5, 5)
+    m_covariance(5, 5),
+    m_momentumScalingFactor(config.m_momentumScalingFactor)
   {
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
@@ -40,7 +41,7 @@ namespace TreeFitter {
     if (m_flt == 0) {
       const_cast<RecoTrack*>(this)->updFltToMother(fitparams);
     }
-    TVector3 recoP = m_trackfit->getHelix().getMomentumAtArcLength2D(m_flt, m_bfield);
+    TVector3 recoP = m_momentumScalingFactor * m_trackfit->getHelix().getMomentumAtArcLength2D(m_flt, m_bfield);
     const int momindex = momIndex();
     fitparams.getStateVector()(momindex) = recoP.X();
     fitparams.getStateVector()(momindex + 1) = recoP.Y();

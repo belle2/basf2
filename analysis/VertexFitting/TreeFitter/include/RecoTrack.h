@@ -20,7 +20,7 @@ namespace TreeFitter {
 
   public:
     /** constructor */
-    RecoTrack(Belle2::Particle* bc, const ParticleBase* mother) ;
+    RecoTrack(Belle2::Particle* bc, const ParticleBase* mother, const ConstraintConfiguration& config) ;
 
     /** destructor */
     virtual ~RecoTrack() {};
@@ -83,5 +83,8 @@ namespace TreeFitter {
 
     /** only lower triangle filled! */
     Eigen::Matrix<double, 5, 5>m_covariance;
+
+    /** scale the momenta by this correction factor */
+    const float m_momentumScalingFactor;
   };
 }

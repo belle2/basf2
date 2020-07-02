@@ -346,8 +346,8 @@ namespace {
     EXPECT_TRUE(T1Pion->isCopyOf(T1Kaon,          true));
     EXPECT_FALSE(T2Gamma->isCopyOf(T1Gamma,       true));
     EXPECT_TRUE(T3Gamma->isCopyOf(T4KL,           true));
-    EXPECT_B2FATAL(T1PionFromMC->isCopyOf(T1Pion, true));
-    EXPECT_B2FATAL(T1Pion->isCopyOf(T1PionFromMC, true));
+    EXPECT_FALSE(T1PionFromMC->isCopyOf(T1Pion, true));
+    EXPECT_FALSE(T1Pion->isCopyOf(T1PionFromMC, true));
     // Construct composite particles
     Particle* D0Pi1Pi2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
     D0Pi1Pi2->appendDaughter(T1Pion);

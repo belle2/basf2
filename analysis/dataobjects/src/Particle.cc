@@ -720,7 +720,10 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
        and oParticle->getParticleSource() != EParticleSourceObject::c_MCParticle)
       or (this->getParticleSource() != EParticleSourceObject::c_MCParticle
           and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle)) {
-    B2FATAL("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!");
+    B2ERROR("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!\n"
+            "                              If the MCParticle <-> Particle collision happens in the RestOfEventBuilder,\n"
+            "                              the ROE will consume the entire event.");
+    return false;
   }
   if (this->getParticleSource() == EParticleSourceObject::c_MCParticle
       and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle) {

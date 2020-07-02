@@ -326,12 +326,13 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
                 sys.exit(1)
         except KeyError:
             B2ERROR(
-                f"One or more of the blocks in {args.sampleRegistryYaml} has "
-                f"'sampleLabel': {sampleLabel}, but this does not correspond to any of "
-                f"the sample labels in {args.SkimStatsJson}\n\n"
+                f"One or more of the blocks in {args.sampleRegistryYaml} has a "
+                f"'sampleLabel' of '{sampleLabel}', but this does not correspond to any"
+                " of the sample labels in {args.SkimStatsJson}\n\n"
                 "To solve this, either:\n"
-                f" - produce stats for the sample {sampleLabel}, or"
-                f" - change the sampleLabel values in {args.sampleRegistryYaml} to one "
+                f" * produce stats for the sample '{sampleLabel}' and use the resulting"
+                "stats JSON file, or\n"
+                f" * change the sampleLabel values in {args.sampleRegistryYaml} to one "
                 f"out of {', '.join(sampleLabels)}"
             )
             sys.exit(1)

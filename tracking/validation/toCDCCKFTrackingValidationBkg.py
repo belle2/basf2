@@ -3,10 +3,10 @@
 
 """
 <header>
-  <contact>glazov@mail.desy.de</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>EvtGenSim.root</input>
   <output>toCDCCKFTrackingValidationBkg.root</output>
-  <description>This module validates ToCDCCKF module using Y(4S) runs.</description>
+  <description>This module validates ToCDCCKF module using Y(4S) runs with background.</description>
 </header>
 """
 

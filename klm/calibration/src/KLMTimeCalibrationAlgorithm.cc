@@ -887,7 +887,7 @@ CalibrationAlgorithm::EResult KLMTimeCalibrationAlgorithm::calibrate()
     if (iSub == KLMElementNumbers::c_BKLM) {
       int iL = klmChannel.getLayer();
       if (iL > 2) {
-        gr_timeShift_channel_rpc->SetPoint(iChannel, channelId, m_timeShift[channelId]);
+        gr_timeShift_channel_rpc->SetPoint(iChannel_rpc, channelId, m_timeShift[channelId]);
         iChannel_rpc++;
       } else {
         gr_timeShift_channel_scint->SetPoint(iChannel, channelId, m_timeShift[channelId]);

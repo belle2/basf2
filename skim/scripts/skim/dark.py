@@ -41,29 +41,46 @@ class SinglePhotonDark(BaseSkim):
     }
 
     def build_lists(self, path):
+
         # no good tracks in the event
         cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
 
-        # no other photon above 100 MeV
+        # only one photon above 300 MeV
+        # (there may be another photon lower energy -- veto these later)
         angle = "0.296706 < theta < 2.61799"  # rad, (17 -- 150 deg)
-        minimum = "E > 0.3"  # GeV
-        ma.cutAndCopyList("gamma:300", "gamma:all", minimum + " and " + angle, path=path)
+        ma.cutAndCopyList("gamma:300", "gamma:all", "E > 0.3 and " + angle, path=path)
 
         path = self.skim_event_cuts(
-            f"0 < nParticlesInList(gamma:300) <  2 and nCleanedTracks({cleaned}) < 1",
+            f"0 < nParticlesInList(gamma:300) < 2 and nCleanedTracks({cleaned}) < 1",
             path=path
         )
 
-        # all remaining single photon events (== candidates) with region
-        # dependent minimum energy in GeV
+        # check the second-most-energetic photon above 100 MeV and veto if it's
+        # in time with our signal candidate -- do this after the event cuts
+        # since it uses the ParticleCombiner and should not be done for all
+        # events (it also makes the logic cleaner and more readable)
+        intime = "maxWeightedDistanceFromAverageECLTime < 1"
+        ma.cutAndCopyList("gamma:100_to_300", "gamma:all",
+                          "E > 0.1 and E < 0.3 and " + angle, path=path)
+        ma.rankByHighest("gamma:100_to_300", "E", numBest=1, path=path)
+        ma.reconstructDecay(
+            "vpho:intime -> gamma:300 gamma:100_to_300", intime, path=path)
+        veto_additional_in_time_cluster = 'nParticlesInList(vpho:intime) < 1'
+        # FIXME: perhaps we can remove the angle requirement on the second cluster
+
+        # require a region-dependent minimum energy of the candidate
         region_dependent = " [clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
         region_dependent += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
         region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
         region_dependent += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
         region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0] or "  # between bwd and barrel
-        # inner region of the barrel we have an 0.5 GeV trigger so allow for those
+        # we have a new 0.5 GeV trigger in the inner barrel: [44.2, 94.8] degrees @ L1
         region_dependent += "[clusterTheta < 1.65457213 and clusterTheta > 0.77143553 and useCMSFrame(E) > 0.5]"
-        ma.cutAndCopyList("gamma:singlePhoton", "gamma:300", region_dependent, path=path)
+
+        # final signal selection is the region-dependent part and passing the
+        # 'in-time' veto on the second-most-energetic cluster
+        signal_selection = f"[{region_dependent}] and [{veto_additional_in_time_cluster}]"
+        ma.cutAndCopyList("gamma:singlePhoton", "gamma:300", signal_selection, path=path)
         self.SkimLists = ["gamma:singlePhoton"]
 
 

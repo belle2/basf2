@@ -99,7 +99,7 @@ void SVDMissingAPVsClusterCreatorModule::event()
 
     float position = isU ? info.getUCellPosition(floatingStrip) : info.getVCellPosition(floatingStrip);
     const int Nstrips = 128; //mnumber of strips in each APV
-    float positionError = Nstrips * pitch / sqrt(12);
+    float positionError = Nstrips * pitch;
 
     //time
     float time = m_time;
@@ -112,6 +112,11 @@ void SVDMissingAPVsClusterCreatorModule::event()
     float SNR = m_SNR;
 
     //  Store Cluster into Datastore
+    m_storeClusters.appendNew(SVDCluster(
+                                sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1
+                              ));
+
+    //append a second cluster in case we have two tracks crossing the same dead area
     m_storeClusters.appendNew(SVDCluster(
                                 sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1
                               ));

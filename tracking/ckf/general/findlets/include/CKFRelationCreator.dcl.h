@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>
@@ -20,11 +20,10 @@ namespace Belle2 {
 
   /// Findlet for applying filters for creating hit-hit and hit-seed relations
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter = ASeedRelationFilter>
-  class CKFRelationCreator : public
-    TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelationPointerComparison<AState>> {
+  class CKFRelationCreator : public TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>> {
   public:
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelationPointerComparison<AState>>;
+    using Super = TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>>;
 
     /// Construct this findlet and add the subfindlet as listener
     CKFRelationCreator();
@@ -37,7 +36,7 @@ namespace Belle2 {
 
     /// Apply both filters for creating state-hit and hit-hit relations
     void apply(std::vector<AState>& seedStates, std::vector<AState>& states,
-               std::vector<TrackFindingCDC::WeightedRelationPointerComparison<AState>>& relations) override;
+               std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations) override;
 
   private:
     /// Subfindlet for the relation checking between seed and hits

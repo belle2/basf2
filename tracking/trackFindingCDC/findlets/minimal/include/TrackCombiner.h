@@ -51,7 +51,7 @@ namespace Belle2 {
 
     private:
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<const CDCSegment3D, WeightedRelation> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCSegment3D> m_cellularPathFinder;
     };
   }
 }

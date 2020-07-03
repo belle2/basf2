@@ -56,7 +56,7 @@ namespace Belle2 {
       SegmentPairCreator m_segmentPairCreator;
 
       /// Findlet responsible for the creation of segment pairs relations of the CA.
-      WeightedRelationCreator<const CDCSegmentPair, ChooseableSegmentPairRelationFilter, WeightedRelation> m_segmentPairRelationCreator;
+      WeightedRelationCreator<const CDCSegmentPair, ChooseableSegmentPairRelationFilter> m_segmentPairRelationCreator;
 
       /// Reference to the relation filter to be used to construct the segment pair network.
       TrackCreatorSegmentPairAutomaton m_trackCreatorSegmentPairAutomaton;

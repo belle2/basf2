@@ -501,10 +501,10 @@ void RestOfEvent::print(const std::string& maskName, bool unpackComposite) const
     tab = " - - ";
   } else {
     if (m_isNested) {
-      B2INFO(tab << "Is Nested ROE");
+      B2INFO(tab << "ROE is nested");
     }
     if (m_isFromMC) {
-      B2INFO(tab << "Is build from generated partices");
+      B2INFO(tab << "ROE is build from generated particles");
     }
   }
   if (!m_isFromMC) {

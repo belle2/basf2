@@ -14,7 +14,10 @@
 #define DWLNEW DWLNEW_BBB
 #define TAURDF TAURDF_BBB
 #define TAUBRA TAUBRA_BBB
-#define TAUDCD TAUDCD_BBB  
+#define TAUDCD TAUDCD_BBB
+#define TAUBMC TAUBMC_BBB
+#define DADMEL DADMEL_BBB
+#define DADMMU DADMMU_BBB      
       SUBROUTINE JAKER(JAK)
 C     *********************
 C
@@ -42,11 +45,9 @@ C
 C     called by : DEXAY
 C ----------------------------------------------------------------------
       include 'TAUDCD_BBB_size.inc'
+      REAL*8            GAMPRT,SUM,CUMUL(NBMC)
       COMMON / TAUBRA / GAMPRT(NBMC),JLIST(NBMC),NCHAN
-
-C      REAL   CUMUL(20)
-
-      REAL   CUMUL(NBMC),RRR(1)
+      REAL              RRR(1)
 C
       IF(NCHAN.LE.0.OR.NCHAN.GT.NBMC) GOTO 902
       CALL KKMC_RANMAR(RRR,1)
@@ -62,6 +63,24 @@ C
  902  PRINT 9020
  9020 FORMAT(' ----- JAKER: WRONG NCHAN')
       STOP
+      END
+      SUBROUTINE JAKEREQ(ISKIP,JAK)
+      include 'TAUDCD_BBB_size.inc'
+      INTEGER ISKIP,JAK
+      INTEGER KSUM,ACTIVE
+      COMMON /KSUM/ KSUM,ACTIVE(NBMC)
+      INTEGER ICOUNT,ANSWER
+      DATA ICOUNT/0/
+      SAVE ICOUNT,ANSWER
+      IF (ISKIP.EQ.0) THEN
+         JAK=ANSWER
+      ELSE
+         ICOUNT=ICOUNT+1
+         JAK=ACTIVE(MOD(ICOUNT-1,KSUM)+1)
+C        PRINT *, 'ICOUNT, JAK, KSUM = ',ICOUNT, JAK, KSUM
+         ANSWER=JAK
+      ENDIF
+      RETURN
       END
       SUBROUTINE DEKAY(KTO,HX)
 C     ***********************
@@ -229,14 +248,16 @@ C     =====
       STOP
       END
       SUBROUTINE DEKAY1(IMOD,HH,ISGN)
-C     *******************************
+C     ******************************
 C THIS ROUTINE  SIMULATES TAU+  DECAY
       include 'TAUDCD_BBB_size.inc'
       COMMON / DECP4 / PP1(4),PP2(4),KF1,KF2
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
       COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
-      
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
+     &                ,NAMES
+      CHARACTER NAMES(NMODE)*31      
       REAL  HH(4)
       REAL  HV(4),PNU(4),PPI(4)
       REAL  PWB(4),PMU(4),PNM(4)
@@ -246,7 +267,9 @@ C THIS ROUTINE  SIMULATES TAU+  DECAY
       REAL  PNPI(4,9)
       REAL  PHOT(4)
       REAL  PDUM(4)
-      DATA NEV,NPRIN/0,10/
+      INTEGER IFEQUALBR
+      COMMON /IFEQUALBR/ IFEQUALBR
+      DATA NEV,NPRIN/0,0/
       KTO=1
       IF(JAK1.EQ.-1) RETURN
       IMD=IMOD
@@ -254,12 +277,21 @@ C THIS ROUTINE  SIMULATES TAU+  DECAY
 C     =================
       JAK=JAK1
       IF(JAK1.EQ.0) CALL JAKER(JAK)
+      IF (IFEQUALBR.GT.0) CALL JAKEREQ(1,JAK)
       IF(JAK.EQ.1) THEN
-        CALL DADMEL(0, ISGN,HV,PNU,PWB,PMU,PNM,PHOT)
+         IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1)
+     C   PRINT *, 'DEKAY1(0): tau- JAK = ', JAK,
+     C            'TAU-  -->   E- ANTI-NU_E NU_TAU'
+         CALL DADMEL(0, ISGN,HV,PNU,PWB,PMU,PNM,PHOT)
       ELSEIF(JAK.EQ.2) THEN
-        CALL DADMMU(0, ISGN,HV,PNU,PWB,PMU,PNM,PHOT)
+         IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1)
+     C   PRINT *, 'DEKAY1(0): tau- JAK = ', JAK,
+     C            'TAU-  -->   MU- ANTI-NU_MU NU_TAU'
+         CALL DADMMU(0, ISGN,HV,PNU,PWB,PMU,PNM,PHOT)
       ELSE
-        CALL DADNEW(0, ISGN,HV,PNU,PWB,PNPI,JAK-NLT)
+         IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1)
+     C   PRINT *, 'DEKAY1(0): tau- JAK = ', JAK,' ',NAMES(JAK-NLT),' '         
+         CALL DADNEW(0, ISGN,HV,PNU,PWB,PNPI,JAK-NLT)
       ENDIF
       DO 33 I=1,3
  33   HH(I)=HV(I)
@@ -287,7 +319,7 @@ C     =====================
  
       ELSE
 CAM     MULTIPION DECAY
-        CALL DWLNEW(1,ISGN,PNU,PWB,PNPI,JAK)
+        CALL DWLNEW(1,ISGN,PNU,PWB,PNPI,JAK,NEV)
         DO 80 I=1,4
  80     PP1(I)=PWB(I)
       ENDIF
@@ -303,7 +335,9 @@ C THIS ROUTINE  SIMULATES TAU-  DECAY
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
       COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
-
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
+     &                ,NAMES
+      CHARACTER NAMES(NMODE)*31
       REAL  HH(4)
       REAL  HV(4),PNU(4),PPI(4)
       REAL  PWB(4),PMU(4),PNM(4)
@@ -313,7 +347,9 @@ C THIS ROUTINE  SIMULATES TAU-  DECAY
       REAL  PNPI(4,9)
       REAL  PHOT(4)
       REAL  PDUM(4)
-      DATA NEV,NPRIN/0,10/
+      INTEGER IFEQUALBR
+      COMMON /IFEQUALBR/ IFEQUALBR
+      DATA NEV,NPRIN/0,0/
       KTO=2
       IF(JAK2.EQ.-1) RETURN
       IMD=IMOD
@@ -321,12 +357,21 @@ C THIS ROUTINE  SIMULATES TAU-  DECAY
 C     =================
       JAK=JAK2
       IF(JAK2.EQ.0) CALL JAKER(JAK)
+      IF (IFEQUALBR.GT.0) CALL JAKEREQ(0,JAK)
       IF(JAK.EQ.1) THEN
-        CALL DADMEL(0, ISGN,HV,PNU,PWB,PMU,PNM,PHOT)
+         IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1)
+     C   PRINT *, 'DEKAY2(0): tau+ JAK = ', JAK,
+     C            'TAU+  -->   E+ NU_E ANTI-NU_TAU'
+         CALL DADMEL(0, ISGN,HV,PNU,PWB,PMU,PNM,PHOT)
       ELSEIF(JAK.EQ.2) THEN
-        CALL DADMMU(0, ISGN,HV,PNU,PWB,PMU,PNM,PHOT)
+         IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1)
+     C   PRINT *, 'DEKAY2(0): tau+ JAK = ', JAK,
+     C            'TAU+  -->   MU+ NU_MU ANTI-NU_TAU'
+         CALL DADMMU(0, ISGN,HV,PNU,PWB,PMU,PNM,PHOT)
       ELSE
-        CALL DADNEW(0, ISGN,HV,PNU,PWB,PNPI,JAK-NLT)
+         IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1)
+     C   PRINT *, 'DEKAY2(0): tau+ JAK = ',JAK,'~',NAMES(JAK-NLT),'~'
+         CALL DADNEW(0, ISGN,HV,PNU,PWB,PNPI,JAK-NLT)
       ENDIF
       DO 33 I=1,3
  33   HH(I)=HV(I)
@@ -353,7 +398,7 @@ C     =====================
  
       ELSE
 CAM     MULTIPION DECAY
-        CALL DWLNEW(2,ISGN,PNU,PWB,PNPI,JAK)
+        CALL DWLNEW(2,ISGN,PNU,PWB,PNPI,JAK,NEV)
         DO 80 I=1,4
  80     PP1(I)=PWB(I)
       ENDIF
@@ -518,7 +563,9 @@ C ---------------------------------------------------------------------
       REAL  PNPI(4,9)
       REAL PHOT(4)
       REAL PDUM(4)
+      INTEGER NEV
 C
+      NEV=NEV+1
       IF(JAKIN.EQ.-1) RETURN
       DO 33 I=1,3
  33   POLAR(I)=POL(I)
@@ -539,7 +586,7 @@ CAM
       ELSE
         JNPI=JAK-NLT
         CALL DEXNEW(0, ISGN,POLAR,PNU,PWB,PNPI,JNPI)
-        CALL DWLNEW(KTO,ISGN,PNU,PWB,PNPI,JAK)
+        CALL DWLNEW(KTO,ISGN,PNU,PWB,PNPI,JAK,NEV)
       ENDIF
       NEVDEC(JAK)=NEVDEC(JAK)+1
       END
@@ -639,14 +686,14 @@ C
       IF (IME.EQ.2) THEN
        IF     (MNUM.EQ.1) THEN
         CALL CURR_PIPI0(PIM1,PIM2,HADCUR)
-       ELSEIF (MNUM.EQ.2) THEN
+       ELSEIF (MNUM.EQ.2.OR.MNUM.EQ.64.OR.MNUM.EQ.65) THEN 
          CALL CURR_PIK0(PIM1,PIM2,HADCUR)
        ELSEIF (MNUM.EQ.3) THEN
          CALL CURR_KPI0(PIM1,PIM2,HADCUR)
-       ELSEIF (MNUM.EQ.4) THEN
+       ELSEIF (MNUM.EQ.4.OR.MNUM.EQ.66.OR.MNUM.EQ.67) THEN 
          CALL CURR_KK0(PIM1,PIM2,HADCUR)
-       ELSE
-         write(*,*) 'DAM2PI: wrong MNUM= ',MNUM
+      ELSE
+         write(*,*) 'DAM2PI: IME = ', IME, ' wrong MNUM= ',MNUM
          STOP
        ENDIF
       ELSEIF (IME.EQ.4) THEN
@@ -731,49 +778,43 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER        IFBABAR
       INTEGER FF2PIRHO
        
       REAL PKSD,QQPKS
       INTEGER IK,K
-        DO IK=1,4
-         PKS(IK)=PC(IK)+ PN(IK)
-          QQ(IK)=PC(IK)- PN(IK)
-        ENDDO
+      DO IK=1,4
+       PKS(IK)=PC(IK)+ PN(IK)
+        QQ(IK)=PC(IK)- PN(IK)
+      ENDDO
 C QQ transverse to PKS
-        PKSD =PKS(4)*PKS(4)-PKS(3)*PKS(3)-PKS(2)*PKS(2)-PKS(1)*PKS(1)
-        QQPKS=PKS(4)* QQ(4)-PKS(3)* QQ(3)-PKS(2)* QQ(2)-PKS(1)* QQ(1)
-        DO 31 IK=1,4
+      PKSD =PKS(4)*PKS(4)-PKS(3)*PKS(3)-PKS(2)*PKS(2)-PKS(1)*PKS(1)
+      QQPKS=PKS(4)* QQ(4)-PKS(3)* QQ(3)-PKS(2)* QQ(2)-PKS(1)* QQ(1)
+      DO 31 IK=1,4
  31      QQ(IK)=QQ(IK)-PKS(IK)*QQPKS/PKSD
 
-      IF (IFBABAR.EQ.2) THEN 
-       CALL GETFF2PIRHO(FF2PIRHO)
+      if(sqrt(pksd).le.2*ampi) pksd=4*ampi**2 ! phase space edge protection
 
-       IF (FF2PIRHO.EQ.2) THEN ! Belle, 
+      CALL GETFF2PIRHO(FF2PIRHO)
+      IF (FF2PIRHO.EQ.0.OR.FF2PIRHO.EQ.1) THEN
+C Historically supposed to use RChL package or not, but now RChL has been integrated  
+         DO K=1,4 
+          HADCUR(K)=QQ(k)* sqrt(FPIRHO(sqrt(pksd)))
+         ENDDO
+          
+      ELSEIF (FF2PIRHO.EQ.2) THEN ! Belle, 
 C                                  ! all fit parameters, par(1...11), are free
-        if(sqrt(pksd).le.2*ampi) pksd=4*ampi**2 ! phase space edge protection
         DO K=1,4
          HADCUR(K)=QQ(k)* fpibel(sqrt(pksd),0)
         ENDDO
-       ELSEIF (FF2PIRHO.EQ.3) THEN ! Belle
+      ELSEIF (FF2PIRHO.EQ.3) THEN ! Belle
 c                             ! all fit parameter free except for 
 c                             !  par(1)=F_pi(0)=1-fixed
 
         DO K=1,4
          HADCUR(K)=QQ(k)* fpibel(sqrt(pksd),1)
         ENDDO
-       ELSE
-        write(*,*) 'problem in 2-scalars current FF2PIRHO=',FF2PIRHO
-        stop
-       ENDIF
-      ELSEIF (IFBABAR.eq.1.or.IFBABAR.eq.0) THEN ! BaBar/cleo
-        DO K=1,4 
-         HADCUR(K)=QQ(k)* sqrt(FPIRHO(sqrt(pksd)))
-        ENDDO
-
       ELSE
-        write(*,*) 'subroutine CURR_PIPI0: problem in 2-scalars current IFBABAR=',IFBABAR
+        write(*,*) 'problem in 2-scalars current FF2PIRHO=',FF2PIRHO
         stop
       ENDIF
       END
@@ -902,10 +943,12 @@ C          24.03.2014 OSh: clebsh/normalization vs. PI-PI0
       FUNCTION COEF(I,J)
 C clebsh gordan (or so ...)  coefs for 3 scalar final states
       implicit none
-C IFBABAR=0  TAUOLA cleo COEF(I,J) =  COEFc(I,J)
-C IIBABAR=2  TAUOLA RChL COEF(I,J) =  COEFr(I,J)
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
+C IRCHL3PI=0  TAUOLA cleo COEF(I,J) =  COEFc(I,J)
+C IRCHL3PI=1  TAUOLA RChL COEF(I,J) =  COEFr(I,J)
+      INTEGER IRCHL3PI
+      COMMON /SETRCHL/ IRCHL3PI
+      INTEGER IFKPIPI
+      COMMON /IFKPIPI/ IFKPIPI
       REAL COEFc(1:5,0:7)
       REAL COEFr(1:5,0:7)
       REAL COEF,COEFrr
@@ -931,67 +974,59 @@ C COEFc is to be used with cleo initialization
        ICONT=1
 C
 C*****COEFc(I,J)
-
+C TAU-  -->  PI- PI- PI+
        COEFc(1,0)= 2.0*SQRT(2.)/3.0
        COEFc(2,0)=-2.0*SQRT(2.)/3.0
 C AJW 2/98: Add in the D-wave and I=0 3pi substructure:
        COEFc(3,0)= 2.0*SQRT(2.)/3.0
        COEFc(4,0)= FPIc
        COEFc(5,0)= 0.0
-C
+C      TAU-  -->  K-  PI- K+
        COEFc(1,1)=-SQRT(2.)/3.0
        COEFc(2,1)= SQRT(2.)/3.0
        COEFc(3,1)= 0.0
        COEFc(4,1)= FPIc
        COEFc(5,1)= SQRT(2.)
 
-C
+C      TAU-  -->  K0  PI- K0B
        COEFc(1,2)=-SQRT(2.)/3.0
        COEFc(2,2)= SQRT(2.)/3.0
        COEFc(3,2)= 0.0
        COEFc(4,2)= 0.0
        COEFc(5,2)=-SQRT(2.)
 
-
+C      TAU-  -->  K-  PI0 K0
 C AJW 11/97: Add in the K*-prim-s, ala Finkemeier&Mirkes
-      IF (IFBABAR.eq.1) then ! BaBar
-       COEFc(1,3)= 0.0
-       COEFc(2,3)= -1.0
-       COEFc(3,3)= 0.0
-      ELSE  ! CLEO
        COEFc(1,3)= 1./3.
        COEFc(2,3)= -2./3.
        COEFc(3,3)= 2./3.
-      endif
        COEFc(4,3)= 0.0
        COEFc(5,3)= 0.0
-C
+C      TAU-  -->  PI0 PI0 K-
        COEFc(1,4)= 1.0/SQRT(2.)/3.0
        COEFc(2,4)=-1.0/SQRT(2.)/3.0
        COEFc(3,4)= 0.0
        COEFc(4,4)= 0.0
        COEFc(5,4)= 0.0
-C
+C      TAU-  -->  K-  PI- PI+
        COEFc(1,5)=-SQRT(2.)/3.0
        COEFc(2,5)= SQRT(2.)/3.0
        COEFc(3,5)= 0.0
        COEFc(4,5)= 0.0
        COEFc(5,5)=-SQRT(2.)
-C
+C      TAU-  -->  PI- K0B PI0
 C AJW 11/97: Add in the K*-prim-s, ala Finkemeier&Mirkes
-      IF (IFBABAR.eq.1) then ! BaBar
        COEFc(1,6)= 0.0
        COEFc(2,6)= -1.0
        COEFc(3,6)= 0.0
-      ELSE  ! CLEO
-       COEFc(1,6)= 1./3.
-       COEFc(2,6)= -2./3.
-       COEFc(3,6)= 2./3.
-      endif
-
+       IF (IFKPIPI.EQ.1) THEN! AJW 11/97: Add in the K*-prim-s, ala Finkemeier&Mirkes 
+         COEFc(1,6)= 1./3.
+         COEFc(2,6)=-2./3.
+         COEFc(3,6)= 2./3.
+       ENDIF
        COEFc(4,6)= 0.0
        COEFc(5,6)=-2.0
-C
+C      TAU-  --> ETA  PI-  PI0
        COEFc(1,7)= 0.0
        COEFc(2,7)= 0.0
        COEFc(3,7)= 0.0
@@ -1000,17 +1035,15 @@ C
 
       ENDIF
          
-      IF (J.GE.11) THEN 
-       COEF=COEFc(I,0)   ! these modes are not initialized
-      ELSEIF (IFBABAR.EQ.1.or.IFBABAR.eq.0.OR.(.not.(J.EQ.9.OR.J.EQ.0.OR.J.EQ.10))) THEN   ! so far rchl only for 3pi modes
+      IF (J.GE.11.AND.J.NE.13.AND.J.NE.14) THEN 
+         COEF=COEFc(I,0)        ! these modes are not initialized
+      ELSEIF ((J.EQ.9.OR.J.EQ.0.OR.J.EQ.10).AND.(IRCHL3PI.EQ.1)) THEN ! so far rchl only for 3pi modes
+       COEF=COEFrr(I,J)
+      ELSE 
        JJ=J
+       IF(J.EQ.13.OR.J.EQ.14) JJ=7
        IF(J.GE.9) JJ=0
        COEF=COEFc(I,JJ)
-      ELSEIF (IFBABAR.EQ.2) THEN
-       COEF=COEFrr(I,J)
-      ELSE
-       write(*,*) 'function COEF: wrong IFBABAR=',IFBABAR
-       stop
       ENDIF
       END
 
@@ -1095,7 +1128,7 @@ C
      $  SQRT(MAX(0.D0,(A**2-(B+C)**2)*(A**2-(B-C)**2)))/(2.D0*A)
 
 C
-      AMPIK(I,J)=DCDMAS(IDFFIN(I,J))
+      AMPIK(I,J)=DCDMAS(IDFFIN(I,J),0)
 C
 C
       jn=JNPI-nm4-nm5+3  ! for Q^2 spectrum we use sigee from ancient times. First 3 options of sigee are skipped.
@@ -1317,9 +1350,9 @@ C ----------------------------------------------------------------------
 
       REAL  HV(4),PN(4),PAA(4),PIM1(4),PIM2(4),PIPL(4),PNPI(4,9)
 C --- MASSES OF THE DECAY PRODUCTS
-       AMP1=DCDMAS(IDFFIN(1,JNPI))
-       AMP2=DCDMAS(IDFFIN(2,JNPI))
-       AMP3=DCDMAS(IDFFIN(3,JNPI))
+       AMP1=DCDMAS(IDFFIN(1,JNPI),0)
+       AMP2=DCDMAS(IDFFIN(2,JNPI),0)
+       AMP3=DCDMAS(IDFFIN(3,JNPI),0)
 
 C MATRIX ELEMENT NUMBER:
       MNUM=JNPI-NM4-NM5-NM6
@@ -1633,13 +1666,13 @@ C calculation of sign for CLAXI: version of C++
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
 
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
-
+      INTEGER IRCHL3PI
+      COMMON /SETRCHL/ IRCHL3PI
+      
       REAL  PIM1(4),PIM2(4),PIM3(4)
       REAL  PAA(4),VEC1(4),VEC2(4),VEC3(4),VEC4(4),VEC5(4)
 
-      REAL FNORM(0:19)
+      REAL FNORM(0:18)
       DOUBLE PRECISION GETFPIRPT
 
       COMPLEX HADCUR(4),FORM1,FORM2,FORM3,FORM4,FORM5,UROJ
@@ -1661,15 +1694,18 @@ C
       IF(MNUM.eq.10) MNUM=0  ! we shift position 10 to 0 (temporarily) 
                              ! to have the flexibility for FORM1, ... 
                              ! of the past
- 
-       IF (IFBABAR.EQ.1.or.IFBABAR.eq.0.OR.(.not.(MNUM.EQ.9.OR.MNUM.EQ.0))) THEN ! so far rchl only for 3pi modes
-         FPI=FPIc
-        ELSEIF (IFBABAR.EQ.2) THEN
+      IF (MNUM.GE.19.AND.MNUM.LE.21) MNUM=2 
+      IF (MNUM.GE.22.AND.MNUM.LE.23) MNUM=3
+      IF (MNUM.GE.24.AND.MNUM.LE.25) MNUM=6
+      IF (MNUM.GE.26.AND.MNUM.LE.27) MNUM=14
+      IF (MNUM.GE.31.AND.MNUM.LE.34) MNUM=7 
+      IF (MNUM.GE.35.AND.MNUM.LE.38) MNUM=13 
+      IF (MNUM.GE.39.AND.MNUM.LE.46) MNUM=14 
+      IF ((MNUM.EQ.9.OR.MNUM.EQ.0).AND.IRCHL3PI.EQ.1) THEN ! so far rchl only for 3pi modes
          FPI=GETFPIRPT(1) ! GET  defined in in ffwid3pi.f  of RChL-currents
-        ELSE
-         write(*,*) 'subroutine CURR3PI: wrong IFBABAR=',IFBABAR
-         stop
-       ENDIF 
+       ELSE
+         FPI=FPIc
+       ENDIF       
        FNORM(0)=CCABIB/FPI
        FNORM(1)=CCABIB/FPI
        FNORM(2)=CCABIB/FPI
@@ -1680,11 +1716,12 @@ C
        FNORM(7)=CCABIB/FPI
        FNORM(8)=0.0  ! this chanel is dead
        FNORM(9)=CCABIB/FPI
-       DO K=10,19
-         FNORM(K)=FNORM(9) ! these chanells are not initialized
+       DO K=10,18
+         FNORM(K)=FNORM(9) ! these chanells are not initialized (except 13,14)
        ENDDO
-
-C
+       FNORM(13)=SCABIB/FPI
+       FNORM(14)=SCABIB/FPI
+C     
       DO 10 I=1,4
    10 PAA(I)=PIM1(I)+PIM2(I)+PIM3(I)
       XMAA   =SQRT(ABS(PAA(4)**2-PAA(3)**2-PAA(2)**2-PAA(1)**2))
@@ -1702,6 +1739,7 @@ C
       PROD3  =PAA(4)*(PIM1(4)-PIM2(4))-PAA(1)*(PIM1(1)-PIM2(1))
      $       -PAA(2)*(PIM1(2)-PIM2(2))-PAA(3)*(PIM1(3)-PIM2(3))
       DO 40 I=1,4
+         
       VEC1(I)= PIM2(I)-PIM3(I) -PAA(I)*PROD1/XMAA**2
       VEC2(I)= PIM3(I)-PIM1(I) -PAA(I)*PROD2/XMAA**2
       VEC3(I)= PIM1(I)-PIM2(I) -PAA(I)*PROD3/XMAA**2
@@ -1786,7 +1824,7 @@ C
        BRAK= (GV**2+GA**2)*PT(4)*PIVEC(4) +2.*GV*GA*PT(4)*PIAKS(4)
      &      +2.*(GV**2-GA**2)*AMNUTA*AMTAU*BRAKM
        AMPLIT=(GFERMI)**2*BRAK/2.
-       IF (MNUM.GE.20) THEN   ! dead code under this if
+       IF (MNUM.GE.47) THEN   ! dead code under this if ! 20->31->47 (May 2020)
          PRINT *, 'MNUM=',MNUM
          ZNAK=-1.0
          XM1=0.0
@@ -2017,10 +2055,10 @@ C
       DATA PI /3.141592653589793238462643/
       INUM=JNPI-NM4-NM5-NM6-NM3-NM2
 
-      AMF1= DCDMAS(IDFFIN(1,JNPI))
+      AMF1= DCDMAS(IDFFIN(1,JNPI),4)
       AMF0=AMNUTA
-      IF(INUM.GE.3.AND.IDFFIN(3,JNPI).NE.0) AMF0= DCDMAS(IDFFIN(3,JNPI))
-      IF(INUM.GE.3.AND.IDFFIN(4,JNPI).NE.0) AMF0= DCDMAS(IDFFIN(4,JNPI))
+      IF(INUM.GE.3.AND.IDFFIN(3,JNPI).NE.0) AMF0= DCDMAS(IDFFIN(3,JNPI),4)
+      IF(INUM.GE.3.AND.IDFFIN(4,JNPI).NE.0) AMF0= DCDMAS(IDFFIN(4,JNPI),4)
         EKK= (AMTAU**2+AMF1**2-AMF0**2)/(2*AMTAU)
         ENU= (AMTAU**2-AMF1**2+AMF0**2)/(2*AMTAU)
         XKK= SQRT(EKK**2-AMF1**2)
@@ -2170,10 +2208,10 @@ C THREE BODY PHASE SPACE NORMALISED AS IN BJORKEN-DRELL
 C D**3 P /2E/(2PI)**3 (2PI)**4 DELTA4(SUM P)
       PHSPAC=1./2**23/PI**11
       PHSP=1./2**5/PI**2
-      AMP1=DCDMAS(IDFFIN(1,JNPI))    ! mass for  PIM2
-      AMP2=DCDMAS(IDFFIN(2,JNPI))    ! mass for  PIM1
-      AMP3=DCDMAS(IDFFIN(3,JNPI))    ! mass for  PIPL
-      AMP4=DCDMAS(IDFFIN(4,JNPI))    ! mass for  PIZ
+      AMP1=DCDMAS(IDFFIN(1,JNPI),0)    ! mass for  PIM2
+      AMP2=DCDMAS(IDFFIN(2,JNPI),0)    ! mass for  PIM1
+      AMP3=DCDMAS(IDFFIN(3,JNPI),0)    ! mass for  PIPL
+      AMP4=DCDMAS(IDFFIN(4,JNPI),0)    ! mass for  PIZ
 
  
       CALL CHOICE4(JNPI,PROB1,PROB2,AMROP,GAMROP,AMRX,GAMRX)
@@ -2482,44 +2520,38 @@ C
       EXTERNAL FORM1,FORM2,FORM3,FORM4,FORM5
       DATA PI /3.141592653589793238462643/
       DATA ICONT /0/
-
-      COMMON /SETINI/ IFBABAR
-      INTEGER        IFBABAR
-      INTEGER        IFKARL
+      INTEGER IFCURR4PI
+      COMMON /IFCURR4PI/ IFCURR4PI
       IME=IMEGET(4,MNUM)   ! type of matrix element to be used
-
 C
-!      write(*,*) 'falanti',mnum
+!     write(*,*) 'falanti',mnum
       IF (IME.EQ.2) THEN
-       IF     (MNUM.EQ.1.OR.MNUM.EQ.2) THEN ! MNUM
-        if (IFBABAR.eq.1) then
-         CALL CURR(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
-        else if (IFBABAR.eq.2) then
-          IFKARL=0 ! current choice between Karlsruhe (1), Novosibirsk(0)
-          if(IFKARL.eq.1) then 
-           CALL CURR_KARLS(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
-          else
-             if (MNUM.EQ.1) then
-              CALL CURR_BINP(MNUM,1,PIM1,PIM4,PIM2,PIM3,HADCUR)
-              CALL CURR_BINP(MNUM,7,PIM1,PIM4,PIM2,PIM3,HADCUR1)
-              do I=1,4
-              HADCUR(I) = HADCUR(I) + HADCUR1(I)
-              enddo
-             elseif (MNUM.EQ.2) then
-              CALL CURR_BINP(MNUM,-1,PIM4,PIM3,PIM1,PIM2,HADCUR)
-             endif
-          endif
-        else  ! IFBABAR
-         CALL CURR_CLEO(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
-        endif ! IFBABAR
-       ELSE   ! MNUM
-        CALL CURR(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
-       ENDIF  ! MNUM
+         IF     (MNUM.EQ.1.OR.MNUM.EQ.2) THEN ! MNUM
+            IF(IFCURR4PI.EQ.0) THEN ! current choice between Karlsruhe (1), Novosibirsk(0)[default]
+               IF (MNUM.EQ.1) THEN    !  2PI-,  PI+,  PI0 
+                  CALL CURR_BINP(MNUM,1,PIM1,PIM4,PIM2,PIM3,HADCUR)
+                  CALL CURR_BINP(MNUM,7,PIM1,PIM4,PIM2,PIM3,HADCUR1)
+                  DO I=1,4
+                     HADCUR(I) = HADCUR(I) + HADCUR1(I)
+                  ENDDO
+               ELSEIF (MNUM.EQ.2) THEN ! 3PI0,        PI-   
+                  CALL CURR_BINP(MNUM,-1,PIM4,PIM3,PIM1,PIM2,HADCUR)
+               ENDIF
+            ELSE IF (IFCURR4PI.eq.1) THEN
+               CALL CURR_KARLS(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
+            ELSE IF (IFCURR4PI.eq.2) THEN
+               CALL CURR(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
+            ELSE IF (IFCURR4PI.EQ.3) THEN
+               CALL CURR_CLEO(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
+            ENDIF
+         ELSE                   ! MNUM
+            CALL CURR(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
+         ENDIF                  ! MNUM
       ELSEIF (IME.EQ.4) THEN
-        CALL CURR4_wrap(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
+         CALL CURR4_wrap(MNUM,PIM1,PIM2,PIM3,PIM4,HADCUR)
       ELSEIF (IME.EQ.5) THEN
-        CALL DAM4PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT,HV)
-        RETURN
+         CALL DAM4PI_wrap(MNUM,PT,PN,PIM1,PIM2,PIM3,PIM4,AMPLIT,HV)
+         RETURN
       ELSE
 !       do nothing
       ENDIF  ! IME
@@ -2718,11 +2750,11 @@ C D**3 P /2E/(2PI)**3 (2PI)**4 DELTA4(SUM P)
       PHSPAC=1./2**29/PI**14                                            
 c     PHSPAC=1./2**5/PI**2                                              
 C init 5pi decay mode (JNPI)    
-      AMP1=DCDMAS(IDFFIN(1,JNPI))
-      AMP2=DCDMAS(IDFFIN(2,JNPI))
-      AMP3=DCDMAS(IDFFIN(3,JNPI))
-      AMP4=DCDMAS(IDFFIN(4,JNPI))
-      AMP5=DCDMAS(IDFFIN(5,JNPI))
+      AMP1=DCDMAS(IDFFIN(1,JNPI),0)
+      AMP2=DCDMAS(IDFFIN(2,JNPI),0)
+      AMP3=DCDMAS(IDFFIN(3,JNPI),0)
+      AMP4=DCDMAS(IDFFIN(4,JNPI),0)
+      AMP5=DCDMAS(IDFFIN(5,JNPI),0)
 c                                                                       
 C TAU MOMENTUM                                                          
       PT(1)=0.                                                          
@@ -3030,14 +3062,13 @@ C
       DATA ICONT /0/                                                    
 C       
       INUM=JNPI-NM3-NM4- NM5- NM6
-
-      AMF1= DCDMAS(IDFFIN(1,JNPI))
-      AMF2  = DCDMAS(IDFFIN(2,JNPI))  
+      AMF1=DCDMAS(IDFFIN(1,JNPI),0)
+      AMF2=DCDMAS(IDFFIN(2,JNPI),4)  
       AMF0=AMNUTA
 !      IF(INUM.GT.4) THEN
 !       write(*,*) inum,':',IDFFIN(1,IADDR),IDFFIN(2,IADDR),IDFFIN(3,IADDR),DCDMAS(IDFFIN(3,IADDR))
 !      ENDIF
-      IF(INUM.GT.3.AND.IDFFIN(3,JNPI).NE.0) AMF0= DCDMAS(IDFFIN(3,JNPI))
+      IF(INUM.GT.3.AND.IDFFIN(3,JNPI).NE.0) AMF0= DCDMAS(IDFFIN(3,JNPI),4)
 
 !      write(*,*) 'pajacna', INUM,  IDFFIN(1,IADDR),  IDFFIN(2,IADDR),  IDFFIN(3,IADDR)   
 !      write(*,*) 'pajacna', INUM,  DCDMAS(IDFFIN(1,IADDR)),  DCDMAS(IDFFIN(2,IADDR)),  IDFFIN(3,IADDR)
@@ -3142,7 +3173,7 @@ C PIONS BOOSTED FROM RHO REST FRAME TO TAU REST FRAME
  77   continue           
       RETURN             
       END                
-      SUBROUTINE DWLNEW(KTO,ISGN,PNU,PWB,PNPI,MODE)
+      SUBROUTINE DWLNEW(KTO,ISGN,PNU,PWB,PNPI,MODE,NEV)
 C ----------------------------------------------------------------------
 C Lorentz transformation to CMsystem and
 C Updating of HEPEVT record
@@ -3160,7 +3191,10 @@ C
       CHARACTER NAMES(NMODE)*31
       REAL  PNU(4),PWB(4),PNPI(4,9)
       REAL  PPI(4)
-C
+      INTEGER IS, NDAU, IDECAY
+      INTEGER NEV, NPRIN
+      DATA NPRIN/0/
+C     
       JNPI=MODE-NLT
 C position of decaying particle
       IF(KTO.EQ. 1) THEN
@@ -3175,22 +3209,23 @@ C tau neutrino (nu_tau is 16)
       ND=MULPIK(JNPI)
       IF(ND.EQ.2.AND.IDFFIN(3,JNPI).NE.0) THEN
         IS=1
-        CALL FILHEP(0,1,-IDFFIN(3,JNPI)*ISGN,-IS,-IS,0,0,PNU,AM,.TRUE.)
+        CALL FILHEP(0,1,-IDFFIN(3,JNPI)*ISGN,NPS,NPS,0,0,PNU,AM,.TRUE.)
       ELSEIF(ND.EQ.2.AND.IDFFIN(4,JNPI).NE.0) THEN
         IS=1
-        CALL FILHEP(0,1, IDFFIN(4,JNPI)     ,-IS,-IS,0,0,PNU,AM,.TRUE.)
+        CALL FILHEP(0,1, IDFFIN(4,JNPI)     ,NPS,NPS,0,0,PNU,AM,.TRUE.)
       ELSEIF(ND.EQ.1.AND.IDFFIN(3,JNPI).NE.0) THEN
         IS=1
-        CALL FILHEP(0,1,-IDFFIN(3,JNPI)*ISGN,-IS,-IS,0,0,PNU,AM,.TRUE.)
+        CALL FILHEP(0,1,-IDFFIN(3,JNPI)*ISGN,NPS,NPS,0,0,PNU,AM,.TRUE.)
       ELSEIF(ND.EQ.1.AND.IDFFIN(4,JNPI).NE.0) THEN
         IS=1
-        CALL FILHEP(0,1, IDFFIN(4,JNPI)     ,-IS,-IS,0,0,PNU,AM,.TRUE.)
+        CALL FILHEP(0,1, IDFFIN(4,JNPI)     ,NPS,NPS,0,0,PNU,AM,.TRUE.)
 c sigle scalar has no W
       ELSEIF(ND.EQ.1) THEN
         IS=1
-        CALL FILHEP(0,1,16*ISGN,-IS,-IS,0,0,PNU,AM,.TRUE.)
+        CALL FILHEP(0,1,16*ISGN,NPS,NPS,0,0,PNU,AM,.TRUE.)
 
       ELSE
+       ! IS=0
         CALL FILHEP(0,1,16*ISGN,NPS,NPS,0,0,PNU,AM,.TRUE.)
 C
 C W boson (W+ is 24)
@@ -3202,21 +3237,572 @@ C multi pi mode JNPI
 C 
 C get multiplicity of mode JNPI
       ND=MULPIK(JNPI)
-
+      NDAU=0
       DO I=1,ND
-
         KFPI=LUNPIK(IDFFIN(I,JNPI),-ISGN)
-
+C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
+        IDECAY=0
+        IF ((KFPI.EQ.221).AND.  !eta
+     c       (MODE.EQ.37.OR.MODE.EQ.38.OR.MODE.EQ.39.OR.MODE.EQ.40.OR.
+     c        MODE.EQ.41.OR.MODE.EQ.42.OR.MODE.EQ.43.OR.MODE.EQ.44.OR.
+     c        MODE.EQ.133.OR.MODE.EQ.134.OR.MODE.EQ.135.OR.MODE.EQ.136.OR.
+     c        MODE.EQ.137.OR.MODE.EQ.138.OR.MODE.EQ.139.OR.MODE.EQ.140.OR.
+     c        MODE.EQ.141.OR.MODE.EQ.142.OR.MODE.EQ.143.OR.MODE.EQ.144.OR.
+     c        MODE.EQ.145.OR.MODE.EQ.146.OR.MODE.EQ.147.OR.MODE.EQ.148.OR.
+     c        MODE.EQ.242.OR.MODE.EQ.243.OR.MODE.EQ.244.OR.MODE.EQ.245.OR.
+     c        MODE.EQ.246.OR.MODE.EQ.247.OR.MODE.EQ.248.OR.MODE.EQ.249.OR.
+     c        MODE.EQ.350.OR.MODE.EQ.351.OR.MODE.EQ.352.OR.MODE.EQ.353.OR.
+     c        MODE.EQ.354.OR.MODE.EQ.355.OR.MODE.EQ.356.OR.MODE.EQ.357))
+     c        IDECAY=1    
+        IF ((KFPI.EQ.223).AND. ! omega
+     c       (MODE.EQ.45.OR.MODE.EQ.46.OR.MODE.EQ.47.OR.
+     c        MODE.EQ.48.OR.MODE.EQ.49.OR.MODE.EQ.50.OR.
+     c        MODE.EQ.130.OR.MODE.EQ.131.OR.MODE.EQ.132.OR.
+     c        MODE.EQ.236.OR.MODE.EQ.237.OR.MODE.EQ.238.OR.
+     c        MODE.EQ.239.OR.MODE.EQ.240.OR.MODE.EQ.241.OR.
+     c        MODE.EQ.250.OR.MODE.EQ.251.OR.MODE.EQ.252.OR.
+     c        MODE.EQ.358.OR.MODE.EQ.359.OR.MODE.EQ.360.OR.
+     c        MODE.EQ.361.OR.MODE.EQ.362.OR.MODE.EQ.363))
+     c        IDECAY=1
+        IF ((KFPI.EQ.333).AND. ! phi
+     c       (MODE.EQ.230.OR.MODE.EQ.231.OR.MODE.EQ.232)) IDECAY=1
+        IF ((KFPI.EQ.20223).AND. ! f1
+     c       (MODE.EQ.233.OR.MODE.EQ.234.OR.MODE.EQ.235.OR.
+     c        MODE.EQ.253.OR.MODE.EQ.254.OR.MODE.EQ.255.OR.MODE.EQ.256.OR.
+     c        MODE.EQ.257.OR.MODE.EQ.258.OR.MODE.EQ.259.OR.MODE.EQ.260))
+     c       IDECAY=1
+        IF ((ABS(KFPI).EQ.20213).AND.(MODE.EQ.341)) IDECAY=1 ! a1+
+        IF ((ABS(KFPI).EQ.213).AND.(MODE.EQ.342)) IDECAY=1 ! rho+
+        IF ((ABS(KFPI).EQ.9000211).AND.(MODE.GE.343.AND.MODE.LE.346)) IDECAY=1 !a0+
+        IF ((ABS(KFPI).EQ.10213).AND.(MODE.GE.347.AND.MODE.LE.349)) IDECAY=1 !b1+
+C       IF ((ABS(KFPI).EQ.3122).AND.(MODE.GE.329.AND.MODE.LE.332)) IDECAY=1 ! Lambda(bar)
+        IF ((ABS(KFPI).EQ.9010221).AND.(MODE.GE.339.AND.MODE.LE.340)) IDECAY=1 ! f0
+        IF ((ABS(KFPI).EQ.9000111).AND.(MODE.GE.364.AND.MODE.LE.371)) IDECAY=1 ! a0
+C     
 C for charged conjugate case, change charged pions only
 C        IF(KFPI.NE.111)KFPI=KFPI*ISGN
         DO J=1,4
           PPI(J)=PNPI(J,I)
         END DO
         CALL TRALO4(KTO,PPI,PPI,AM)
-        CALL FILHEP(0,1,KFPI,-I-IS,-I-IS,0,0,PPI,AM,.TRUE.)
+        IF(IS.EQ.0) NPS = -I
+        IF (IDECAY.EQ.1) THEN
+           CALL FILHEP(0,2,KFPI,NPS,NPS,0,0,PPI,AM,.TRUE.)
+           CALL TDECAY(KFPI,MODE,PPI,NDAU)
+        ELSE
+           CALL FILHEP(0,1,KFPI,NPS-NDAU,NPS-NDAU,0,0,PPI,AM,.TRUE.)
+        ENDIF
       END DO
-C
+      IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1) THEN
+C        PRINT *, 'DWLNEW: DUMP '
+         CALL KKDUMPHEP(NEV,0,0)
+      ENDIF
       RETURN
+      END
+      SUBROUTINE TDECAY(KFPI,MODE,PINPUT,NDAU)
+      IMPLICIT NONE
+      INTEGER KFPI,MODE,NDAU,ISIGN,ID1,ID2,ID3
+      REAL PINPUT(4),XM1,XM2,XM3,PDAU1(4),PDAU2(4),PDAU3(4)
+      INTEGER IDECAY2,ID2_1,ID2_2,ID2_3
+      REAL XM2_1,XM2_2,XM2_3,PDAU2_1(4),PDAU2_2(4),PDAU2_3(4)
+      INTEGER IDECAY22,ID22_1,ID22_2,ID22_3
+      REAL XM22_1,XM22_2,XM22_3,PDAU22_1(4),PDAU22_2(4),PDAU22_3(4)
+      INTEGER IDECAY3,ID3_1,ID3_2
+      REAL XM3_1,XM3_2,PDAU3_1(4),PDAU3_2(4)
+      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+      REAL     DCDMAS
+      EXTERNAL DCDMAS
+C
+      ISIGN = KFPI/ABS(KFPI)
+      IF (MODE.EQ.37.OR.
+     c     MODE.EQ.41.OR.
+     c     MODE.EQ.133.OR.
+     c     MODE.EQ.137.OR.
+     c     MODE.EQ.141.OR.
+     c     MODE.EQ.145.OR.
+     c     MODE.EQ.242.OR.
+     c     MODE.EQ.246.OR.
+     c     MODE.EQ.350.OR.
+     c     MODE.EQ.354) THEN                    ! eta->gammagamma
+         ID1=22
+         ID2=22
+         ID3=0
+      ELSE IF (MODE.EQ.38.OR.
+     c        MODE.EQ.42.OR.
+     c        MODE.EQ.134.OR.
+     c        MODE.EQ.138.OR.
+     c        MODE.EQ.142.OR.
+     c        MODE.EQ.146.OR.
+     c        MODE.EQ.243.OR.
+     c        MODE.EQ.247.OR.
+     c        MODE.EQ.351.OR.
+     c        MODE.EQ.355) THEN                 ! eta->pi0pi0pi0
+         ID1= 111
+         ID2= 111
+         ID3= 111
+      ELSE IF (MODE.EQ.39.OR.
+     c        MODE.EQ.43.OR.
+     c        MODE.EQ.135.OR.
+     c        MODE.EQ.139.OR.
+     c        MODE.EQ.143.OR.
+     c        MODE.EQ.147.OR.
+     c        MODE.EQ.244.OR.
+     c        MODE.EQ.248.OR.
+     c        MODE.EQ.352.OR.
+     c        MODE.EQ.356) THEN                 ! eta->pi+pi-pi0
+         ID1= 211
+         ID2=-211
+         ID3= 111
+      ELSE IF (MODE.EQ.40.OR.
+     c        MODE.EQ.44.OR.
+     c        MODE.EQ.136.OR.
+     c        MODE.EQ.140.OR.
+     c        MODE.EQ.144.OR.
+     c        MODE.EQ.148.OR.
+     c        MODE.EQ.245.OR.
+     c        MODE.EQ.249.OR.
+     c        MODE.EQ.353.OR.
+     c        MODE.EQ.357) THEN                 ! eta->pi+pi-gamma
+         ID1= 211
+         ID2=-211
+         ID3= 22
+      ELSE IF (MODE.EQ.45.OR.
+     c        MODE.EQ.48.OR.
+     c        MODE.EQ.130.OR.
+     c        MODE.EQ.236.OR.
+     c        MODE.EQ.239.OR.
+     c        MODE.EQ.250.OR.
+     c        MODE.EQ.358.OR.
+     c        MODE.EQ.361) THEN                 ! omega->pi+pi-pi0
+         ID1= 211
+         ID2=-211
+         ID3= 111
+      ELSE IF (MODE.EQ.46.OR.
+     c         MODE.EQ.49.OR.
+     c         MODE.EQ.131.OR.
+     c         MODE.EQ.237.OR.
+     c         MODE.EQ.240.OR.
+     c         MODE.EQ.251.OR.
+     c         MODE.EQ.359.OR.
+     c         MODE.EQ.362) THEN                 ! omega->pi+pi-
+         ID1= 211
+         ID2=-211
+         ID3=0
+      ELSE IF (MODE.EQ.47.OR.
+     c         MODE.EQ.50.OR.
+     c         MODE.EQ.132.OR.
+     c         MODE.EQ.238.OR.
+     c         MODE.EQ.241.OR.
+     c         MODE.EQ.252.OR.
+     c         MODE.EQ.360.OR.
+     c         MODE.EQ.363) THEN                 ! omega->pi0gamma
+         ID1=111
+         ID2=22
+         ID3=0
+      ELSE IF (MODE.EQ.230) THEN     ! phi->K+K-
+         ID1= 321
+         ID2=-321
+         ID3=0
+      ELSE IF (MODE.EQ.231) THEN     ! phi->K0SK0L
+         ID1= 310
+         ID2= 130
+         ID3=0
+      ELSE IF (MODE.EQ.232) THEN     ! phi->pi+pi-pi0
+         ID1= 211
+         ID2=-211
+         ID3= 111
+      ELSE IF (MODE.EQ.233) THEN     ! f1->pi+pi-rho0(->pi+pi-)
+         ID1= 211
+         ID2=-211
+         ID3= 113
+      ELSE IF (MODE.EQ.234.OR.(MODE.GE.253.AND.MODE.LE.256)) THEN ! f1->pi+a0-(->pi-eta)
+         ID1= 211
+         ID2=-9000211
+         ID3=0
+      ELSE IF (MODE.EQ.235.OR.(MODE.EQ.257.AND.MODE.LE.260)) THEN ! f1->pi0a00(->pi0eta)
+         ID1= 111
+         ID2= 9000111
+         ID3=0
+      ELSE IF (MODE.EQ.341) THEN !   a1- -> pi-gamma
+         ID1=211*ISIGN
+         ID2=22
+         ID3=0
+      ELSE IF (MODE.EQ.342) THEN ! rho- -> pi-gamma
+         ID1=211*ISIGN
+         ID2=22
+         ID3=0
+      ELSE IF (MODE.GE.343.AND.MODE.LE.346) THEN ! a0- -> pi-eta
+         ID1=211*ISIGN
+         ID2=221
+         ID3=0
+      ELSE IF (MODE.GE.347.AND.MODE.LE.349) THEN ! b1- -> pi-omega
+         ID1=211*ISIGN
+         ID2=223
+         ID3=0
+      ELSE IF (MODE.GE.329.AND.MODE.LE.332) THEN ! Lambda -> p pi- OR Lambdabar -> pbar pi+
+         ID1=2212*ISIGN
+         ID2=-211*ISIGN
+         ID3=0
+      ELSE IF (MODE.GE.339.AND.MODE.LE.340) THEN ! f0(980)->pi+pi-
+         ID1= 211
+         ID2=-211
+         ID3=0
+      ELSE IF (MODE.GE.364.AND.MODE.LE.371) THEN ! a00(->pi0eta)
+         ID1=111
+         ID2=221
+         ID3=0
+      ENDIF
+C
+      XM1=DCDMAS(ID1,4)         ! masses
+      XM2=DCDMAS(ID2,4)
+      XM3=DCDMAS(ID3,4)
+C
+      IF (ID3.EQ.0) THEN ! 2 body channels
+         CALL TWODECAY(PINPUT,XM1,XM2,PDAU1,PDAU2)
+C     to hepevt
+         IDECAY2=0
+         IF ((ID2.EQ.-9000211).OR. ! a0- -> pi-eta
+     $       (ID2.EQ.9000111)) THEN ! a00 -> pi0eta
+            IDECAY2=1
+         ENDIF
+         IF (ID2.EQ.221) IDECAY2=1 ! eta decays
+         IF (ID2.EQ.223) IDECAY2=1 ! omega decays
+         IF (IDECAY2.EQ.0) THEN
+            NDAU=NDAU+2
+            CALL FILHEP(0,1,ID1,-1,-1,0,0,PDAU1,XM1,.TRUE.)
+            CALL FILHEP(0,1,ID2,-2,-2,0,0,PDAU2,XM2,.TRUE.)
+         ELSE
+            NDAU=NDAU+1
+            CALL FILHEP(0,1,ID1,-1,-1,0,0,PDAU1,XM1,.TRUE.)
+            CALL FILHEP(0,2,ID2,-2,-2,0,0,PDAU2,XM2,.TRUE.)
+C           CALL TDECAY(ID2,-MODE,PDAU2,NDAU) ! Alas: Fortran 77 does not have recursive function
+            IF (ID2.EQ.-9000211) THEN ! a0- -> pi-eta
+               ID2_1=-211
+               ID2_2= 221
+               ID2_3= 0
+            ELSE IF (ID2.EQ.9000111) THEN ! a00 -> pi0eta
+               ID2_1= 111
+               ID2_2= 221
+               ID2_3= 0
+            ELSE IF (ID2.EQ.221.AND.(MODE.EQ.343.OR.MODE.EQ.364.OR.MODE.EQ.368)) THEN ! eta -> gamma gamma
+               ID2_1=22
+               ID2_2=22
+               ID2_3=0
+            ELSE IF (ID2.EQ.221.AND.(MODE.EQ.344.OR.MODE.EQ.365.OR.MODE.EQ.369)) THEN ! eta -> pi0 pi0 pi0
+               ID2_1=111
+               ID2_2=111
+               ID2_3=111
+            ELSE IF (ID2.EQ.221.AND.(MODE.EQ.345.OR.MODE.EQ.366.OR.MODE.EQ.370)) THEN ! eta -> pi+ pi- pi0
+               ID2_1= 211
+               ID2_2=-211
+               ID2_3= 111
+            ELSE IF (ID2.EQ.221.AND.(MODE.EQ.346.OR.MODE.EQ.367.OR.MODE.EQ.371)) THEN ! eta -> pi+ pi- gammma
+               ID2_1= 211
+               ID2_2=-211
+               ID2_3= 22
+            ELSE IF (ID2.EQ.223.AND.MODE.EQ.347) THEN ! omega -> pi+ pi- pi0
+               ID2_1= 211
+               ID2_2=-211
+               ID2_3= 111
+            ELSE IF (ID2.EQ.223.AND.MODE.EQ.348) THEN ! omega -> pi+ pi-
+               ID2_1= 211
+               ID2_2=-211
+               ID2_3= 0
+            ELSE IF (ID2.EQ.223.AND.MODE.EQ.349) THEN ! omega -> pi0 gamma
+               ID2_1=111
+               ID2_2=22
+               ID2_3= 0
+            ENDIF
+            XM2_1=DCDMAS(ID2_1,4)
+            XM2_2=DCDMAS(ID2_2,4)
+            XM2_3=DCDMAS(ID2_3,4)
+            IF (ID2_3.EQ.0) THEN
+               CALL TWODECAY(PDAU2,XM2_1,XM2_2,PDAU2_1,PDAU2_2)
+               IDECAY22=0
+               IF (ID2_2.EQ.221.AND.
+     $              ((MODE.GE.253.AND.MODE.LE.256).OR.
+     $               (MODE.GE.257.AND.MODE.LE.260))) IDECAY22=1 ! decay eta
+               IF (IDECAY22.EQ.0) THEN
+                  NDAU=NDAU+2
+                  CALL FILHEP(0,1,ID2_1,-1,-1,0,0,PDAU2_1,XM2_1,.TRUE.)
+                  CALL FILHEP(0,1,ID2_2,-2,-2,0,0,PDAU2_2,XM2_2,.TRUE.)
+               ELSE
+                  NDAU=NDAU+1
+                  CALL FILHEP(0,1,ID2_1,-1,-1,0,0,PDAU2_1,XM2_1,.TRUE.)
+                  CALL FILHEP(0,2,ID2_2,-2,-2,0,0,PDAU2_2,XM2_2,.TRUE.)
+C                 CALL TDECAY(ID2_2,-MODE,PDAU2_2,NDAU) ! Alas: Fortran 77 does not have recursive function
+                  IF (MODE.EQ.253.OR.MODE.EQ.257) THEN !eta->gamma gamma
+                     ID22_1=22
+                     ID22_2=22
+                     ID22_3=0
+                     XM22_1=DCDMAS(ID22_1,4) ! masses
+                     XM22_2=DCDMAS(ID22_2,4)
+                     XM22_3=DCDMAS(ID22_3,4)
+                  ELSE IF (MODE.EQ.254.OR.MODE.EQ.258) THEN ! eta->pi0 pi0 pi0
+                     ID22_1=111
+                     ID22_2=111
+                     ID22_3=111
+                     XM22_1=DCDMAS(ID22_1,4) ! masses
+                     XM22_2=DCDMAS(ID22_2,4)
+                     XM22_3=DCDMAS(ID22_3,4)
+                  ELSE IF (MODE.EQ.255.OR.MODE.EQ.259) THEN ! eta->pi+pi-pi0
+                     ID22_1= 211
+                     ID22_2=-211
+                     ID22_3= 111
+                     XM22_1=DCDMAS(ID22_1,4) ! masses
+                     XM22_2=DCDMAS(ID22_2,4)
+                     XM22_3=DCDMAS(ID22_3,4)
+                  ELSE IF (MODE.EQ.256.OR.MODE.EQ.260) THEN ! eta->pi+pi-gamma
+                     ID22_1= 211
+                     ID22_2=-211
+                     ID22_3= 22
+                     XM22_1=DCDMAS(ID22_1,4) ! masses
+                     XM22_2=DCDMAS(ID22_2,4)
+                     XM22_3=DCDMAS(ID22_3,4)
+                  ENDIF
+                  IF (ID22_3.EQ.0) THEN ! 2 body channels of eta
+                     CALL TWODECAY(PDAU2_2,XM22_1,XM22_2,PDAU22_1,PDAU22_2)
+                     NDAU=NDAU+2
+                     CALL FILHEP(0,1,ID22_1,-1,-1,0,0,PDAU22_1,XM22_1,.TRUE.)
+                     CALL FILHEP(0,1,ID22_2,-2,-2,0,0,PDAU22_2,XM22_2,.TRUE.)
+                  ELSE          ! 3 body channels of eta
+                     CALL THRDECAY(PDAU2_2,XM22_1,XM22_2,XM22_3,PDAU22_1,PDAU22_2,PDAU22_3)
+                     NDAU=NDAU+3
+                     CALL FILHEP(0,1,ID22_1,-1,-1,0,0,PDAU22_1,XM22_1,.TRUE.)
+                     CALL FILHEP(0,1,ID22_2,-2,-2,0,0,PDAU22_2,XM22_2,.TRUE.)
+                     CALL FILHEP(0,1,ID22_3,-3,-3,0,0,PDAU22_3,XM22_3,.TRUE.)
+                  ENDIF
+               ENDIF
+            ELSE           ! body channels of eta and omega
+               CALL THRDECAY(PDAU2,XM2_1,XM2_2,XM2_3,PDAU2_1,PDAU2_2,PDAU2_3)
+               NDAU=NDAU+3
+               CALL FILHEP(0,1,ID2_1,-1,-1,0,0,PDAU2_1,XM2_1,.TRUE.)
+               CALL FILHEP(0,1,ID2_2,-2,-2,0,0,PDAU2_2,XM2_2,.TRUE.)
+               CALL FILHEP(0,1,ID2_3,-3,-3,0,0,PDAU2_3,XM2_3,.TRUE.)
+            ENDIF
+         ENDIF
+      ELSE                 ! 3 body channels    
+         CALL THRDECAY(PINPUT,XM1,XM2,XM3,PDAU1,PDAU2,PDAU3)
+C     to hepevt
+         IDECAY3=0
+         IF (ID3.EQ.113) IDECAY3=1 ! rho0->pi+pi-
+         IF (IDECAY3.EQ.0) THEN
+            NDAU=NDAU+3
+            CALL FILHEP(0,1,ID1,-1,-1,0,0,PDAU1,XM1,.TRUE.)
+            CALL FILHEP(0,1,ID2,-2,-2,0,0,PDAU2,XM2,.TRUE.)
+            CALL FILHEP(0,1,ID3,-3,-3,0,0,PDAU3,XM3,.TRUE.)
+         ELSE
+            NDAU=NDAU+2
+            CALL FILHEP(0,1,ID1,-1,-1,0,0,PDAU1,XM1,.TRUE.)
+            CALL FILHEP(0,1,ID2,-2,-2,0,0,PDAU2,XM2,.TRUE.)
+            CALL FILHEP(0,2,ID3,-3,-3,0,0,PDAU3,XM3,.TRUE.)
+C           CALL TDECAY(ID3,-MODE,PDAU3,NDAU) ! Alas: Fortran 77 does not have recursive function
+            ID3_1= 211
+            ID3_2=-211
+            XM3_1=DCDMAS(ID3_1,4)
+            XM3_2=DCDMAS(ID3_2,4)
+            CALL TWODECAY(PDAU3,XM3_1,XM3_2,PDAU3_1,PDAU3_2)
+            NDAU=NDAU+2
+            CALL FILHEP(0,1,ID3_1,-1,-1,0,0,PDAU3_1,XM3_1,.TRUE.)
+            CALL FILHEP(0,1,ID3_2,-2,-2,0,0,PDAU3_2,XM3_2,.TRUE.)
+         ENDIF
+      ENDIF
+C
+      END
+      SUBROUTINE TWODECAY(PINPUT,XM1,XM2,PDAU1,PDAU2)
+      INTEGER I
+      REAL PINPUT(4),XM1,XM2,PDAU1(4),PDAU2(4)
+      DOUBLE PRECISION PIN(4),X(4),Y(4),YM1,YM2,R,RU
+      DOUBLE PRECISION XLAM,a,b,c
+      XLAM(a,b,c)=SQRT(ABS((a-b-c)**2-4.0*b*c))
+      DO I=1,4
+         PIN(I)= PINPUT(I)     ! mother 4 momentum
+      ENDDO
+      YM1=XM1
+      YM2=XM2
+      R=SQRT(PIN(4)**2-PIN(3)**2-PIN(2)**2-PIN(1)**2)
+      RU=XLAM(R**2,YM1**2,YM2**2)/R/2 ! momenta of the two products
+      CALL SPHERD(RU,X)         !     random 3 vector on the sphere   
+      X(4)=SQRT(RU**2+YM1**2)
+      Y(4)=SQRT(RU**2+YM2**2)
+C      
+      Y(1)=-X(1)
+      Y(2)=-X(2)
+      Y(3)=-X(3)
+!     boost to lab and to real*4
+      CALL bostdq(-1,PIN,X,X)  
+      CALL bostdq(-1,PIN,Y,Y)
+      DO I=1,4
+         PDAU1(I)=X(I)
+         PDAU2(I)=Y(I)
+      ENDDO
+      END
+      SUBROUTINE THRDECAY(PINPUT,XM1,XM2,XM3,PDAU1,PDAU2,PDAU3)
+      INTEGER I
+      REAL PINPUT(4),XM1,XM2,XM3,PDAU1(4),PDAU2(4),PDAU3(4),RR(2)
+      DOUBLE PRECISION AMIN,AMAX,AM2,WT
+      DOUBLE PRECISION PIN(4),X(4),Y(4),Z(4),YM1,YM2,YM3,R,RU
+      DOUBLE PRECISION XLAM,a,b,c
+      XLAM(a,b,c)=SQRT(ABS((a-b-c)**2-4.0*b*c))
+      DO I=1,4
+         PIN(I)= PINPUT(I)     ! mother 4 momentum
+      ENDDO
+      YM1=XM1
+      YM2=XM2
+      YM3=XM3
+ 7    CONTINUE                  ! we generate mass of the first pair:
+      CALL KKMC_RANMAR(RR,2)
+      R=SQRT(PIN(4)**2-PIN(3)**2-PIN(2)**2-PIN(1)**2)
+      AMIN=YM1+YM2
+      AMAX=R-YM3
+      AM2=SQRT(AMIN**2+RR(1)*(AMAX**2-AMIN**2))
+C     weight for flat phase space
+      WT=XLAM(R**2,AM2**2,YM3**2)*XLAM(AM2**2,YM1**2,YM2**2)
+     &        /R**2                   /AM2**2
+      IF (RR(2).GT.WT) GOTO 7
+C
+      RU=XLAM(AM2**2,YM1**2,YM2**2)/AM2/2 ! momenta of the first two products in the rest frame of that pair
+      CALL SPHERD(RU,X)
+      X(4)=SQRT(RU**2+YM1**2)
+      Y(4)=SQRT(RU**2+YM2**2)
+C         
+      Y(1)=-X(1)
+      Y(2)=-X(2)
+      Y(3)=-X(3)
+C     generate momentum of that pair in rest frame of mother:
+      RU=XLAM(R**2,AM2**2,YM3**2)/R/2
+      CALL SPHERD(RU,Z)
+      Z(4)=SQRT(RU**2+AM2**2)
+C     and boost first two decay products to rest frame of other.
+      CALL bostdq(-1,Z,X,X)
+      CALL bostdq(-1,Z,Y,Y)
+C     redefine Z(4) to 4-momentum of the last decay product: 
+      Z(1)=-Z(1)
+      Z(2)=-Z(2)
+      Z(3)=-Z(3)
+      Z(4)=SQRT(RU**2+YM3**2)
+C     boost all to lab and move to real*4; also masses
+      CALL bostdq(-1,PIN,X,X)
+      CALL bostdq(-1,PIN,Y,Y)
+      CALL bostdq(-1,PIN,Z,Z)
+      DO I=1,4
+         PDAU1(I)=X(I)
+         PDAU2(I)=Y(I)
+         PDAU3(I)=Z(I)
+      ENDDO
+      END
+      subroutine bostdq(idir,vv,pp,q)
+*     *******************************
+c Boost along arbitrary vector v (see eg. J.D. Jacson, Classical 
+c Electrodynamics).
+c Four-vector pp is boosted from an actual frame to the rest frame 
+c of the four-vector v (for idir=1) or back (for idir=-1). 
+c q is a resulting four-vector.
+c Note: v must be time-like, pp may be arbitrary.
+c
+c Written by: Wieslaw Placzek            date: 22.07.1994
+c Last update: 3/29/95                     by: M.S.
+c 
+      implicit DOUBLE PRECISION (a-h,o-z)
+      parameter (nout=6)
+      DOUBLE PRECISION v(4),p(4),q(4),pp(4),vv(4)  
+      save
+!
+      do 1 i=1,4
+      v(i)=vv(i)
+ 1    p(i)=pp(i)
+      amv=(v(4)**2-v(1)**2-v(2)**2-v(3)**2)
+      if (amv.le.0d0) then
+        write(6,*) 'bosstv: warning amv**2=',amv
+      endif
+      amv=sqrt(abs(amv))
+      if (idir.eq.-1) then
+        q(4)=( p(1)*v(1)+p(2)*v(2)+p(3)*v(3)+p(4)*v(4))/amv
+        wsp =(q(4)+p(4))/(v(4)+amv)
+      elseif (idir.eq.1) then
+        q(4)=(-p(1)*v(1)-p(2)*v(2)-p(3)*v(3)+p(4)*v(4))/amv
+        wsp =-(q(4)+p(4))/(v(4)+amv)
+      else
+        write(nout,*)' >>> boostv: wrong value of idir = ',idir
+      endif
+      q(1)=p(1)+wsp*v(1)
+      q(2)=p(2)+wsp*v(2)
+      q(3)=p(3)+wsp*v(3)
+      end
+      SUBROUTINE KKDumpHEP (IEV, IFL,PRNTNU)
+*
+************************************************************************
+*
+*        SUBR. KKDumpHEP (IEV, IFL)
+*
+*   Dumps HEPEVT of event (CM frame) IEV depending on flag
+*    IFL = 0 (all particles)
+*    IFL > 0 (particles with ISTHEP = IFL)
+*
+*   Called by User
+*
+*   Version 1, 4/25/2002 Swagato Banerjee
+*   Version 2, 5/26/2005 Swagato Banerjee (CALL PYNAME)
+*
+************************************************************************
+**
+      Implicit none
+*..Include:
+*#include "stdhep/stdhep.inc"
+      INCLUDE '../KK2f/HepEvt.fi'
+*
+      INTEGER          IEV, IFL, I, J, NP,PRNTNU
+      REAL*8              PX,PY,PZ,EN, MS
+      CHARACTER CHAP*16
+*    -------------------------------------------------------------------
+      WRITE(6,'(''KKDumpHEP>CM> Event, NHEP : '',2I6)') IEV, NHEP
+      WRITE(6,
+     +  '(''     I   ISTHEP   ID                 M1 M2 D1 D2 PHEP(J),'',
+     +    ''J=1,5 m(PHEP(1-4))'')')
+      NP = 0
+      PX = 0.
+      PY = 0.
+      PZ = 0.
+      EN = 0.
+      MS = 0.
+      DO I= 1,NHEP
+        MS = PHEP(4,I)**2 - PHEP(3,I)**2 - PHEP(2,I)**2 - PHEP(1,I)**2
+        IF(MS.NE.0.0) MS=MS/SQRT(ABS(MS))
+        IF (PRNTNU.EQ.1.AND.ABS(IDHEP(I)).eq.16)
+     +   WRITE (6,'(''Mass(P4(nutau)) = '',F14.7,'' MeV'')') MS*1000.0
+        CALL PYNAME(IDHEP(I),CHAP)
+        IF (IFL.EQ.0) THEN
+          WRITE (6,'(2I6,I8,1X,A10,1X,4I6,6(1X,F10.5))')
+     +      I, ISTHEP(I), IDHEP(I), CHAP(1:10),
+     +      JMOHEP(1,I),JMOHEP(2,I),
+     +      JDAHEP(1,I),JDAHEP(2,I),
+     +      (PHEP(J,I),J=1,5),MS
+        ELSEIF (IFL.Eq.ISTHEP(I)) THEN
+          WRITE (6,'(2I6,I8,1X,A10,1X,4I6,6(1X,F10.5))')
+     +      I, ISTHEP(I), IDHEP(I), CHAP(1:10),
+     +      JMOHEP(1,I),JMOHEP(2,I),
+     +      JDAHEP(1,I),JDAHEP(2,I),
+     +     (PHEP(J,I),J=1,5),MS
+        ENDIF
+        IF (ISTHEP(I).EQ.1) THEN
+          NP=NP+1
+          PX=PX+PHEP(1,I)
+          PY=PY+PHEP(2,I)
+          PZ=PZ+PHEP(3,I)
+          EN=EN+PHEP(4,I)
+        ENDIF
+      ENDDO
+      WRITE(6,
+     +'(''KKDumpHEP>CM>Final State::NP,PX,PY,PZ,EN = '',I6,4(1X,F10.5))')
+     +                          NP,PX,PY,PZ,EN
+      RETURN
+*                                                            END KKDumpHEP
       END
       FUNCTION IMEGET(IMULT,MNUM)
       IMPLICIT NONE  
@@ -3355,4 +3941,217 @@ C            4- default ME wrapped curr., 5- wrapped ME
       IMPLICIT REAL*8 (A-H,O-Z)
       REAL*8  HV(4),QP(4),XN(4),XA(4),XK(4)
       RETURN
+      END
+      SUBROUTINE DADMEL(MODE,ISGN,HHV,PNU,PWB,Q1,Q2,PHX)
+C ----------------------------------------------------------------------
+C
+C     called by : DEXEL,(DEKAY,DEKAY1)
+C ----------------------------------------------------------------------
+      include 'TAUDCD_BBB_size.inc'
+      COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
+      REAL*4            GAMPMC    ,GAMPER
+
+      REAL*4         PHX(4)
+
+      COMMON / INOUT / INUT,IOUT
+
+
+      REAL  HHV(4),HV(4),PWB(4),PNU(4),Q1(4),Q2(4)
+      REAL  PDUM1(4),PDUM2(4),PDUM3(4),PDUM4(4),PDUM5(4)
+      REAL*4 RRR(3)
+      REAL*8 SWT, SSWT
+      DATA PI /3.141592653589793238462643/
+      DATA IWARM/0/
+C
+C     PRINT *, 'DADMEL: NBMC = ', NBMC
+      IF(MODE.EQ.-1) THEN
+C     ===================
+        IWARM=1
+        NEVRAW=0
+        NEVACC=0
+        NEVOVR=0
+        SWT=0
+        SSWT=0
+        WTMAX=1E-20
+        DO 15 I=1,500
+        CALL DPHSEL(WT,HV,PDUM1,PDUM2,PDUM3,PDUM4,PDUM5)
+        IF(WT.GT.WTMAX/1.2) WTMAX=WT*1.2
+15      CONTINUE
+CC      CALL HBOOK1(803,'WEIGHT DISTRIBUTION  DADMEL    $',100,0,2)
+C
+      ELSEIF(MODE.EQ. 0) THEN
+C     =======================
+300     CONTINUE
+        IF(IWARM.EQ.0) GOTO 902
+        NEVRAW=NEVRAW+1
+        CALL DPHSEL(WT,HV,PNU,PWB,Q1,Q2,PHX)
+CC      CALL HFILL(803,WT/WTMAX)
+        SWT=SWT+WT
+        SSWT=SSWT+WT**2
+        CALL KKMC_RANMAR(RRR,3)
+        RN=RRR(1)
+        IF(WT.GT.WTMAX) NEVOVR=NEVOVR+1
+        IF(RN*WTMAX.GT.WT) GOTO 300
+C ROTATIONS TO BASIC TAU REST FRAME
+        RR2=RRR(2)
+        COSTHE=-1.+2.*RR2
+        THET=ACOS(COSTHE)
+        RR3=RRR(3)
+        PHI =2*PI*RR3
+        CALL ROTOR2(THET,PNU,PNU)
+        CALL ROTOR3( PHI,PNU,PNU)
+        CALL ROTOR2(THET,PWB,PWB)
+        CALL ROTOR3( PHI,PWB,PWB)
+        CALL ROTOR2(THET,Q1,Q1)
+        CALL ROTOR3( PHI,Q1,Q1)
+        CALL ROTOR2(THET,Q2,Q2)
+        CALL ROTOR3( PHI,Q2,Q2)
+        CALL ROTOR2(THET,HV,HV)
+        CALL ROTOR3( PHI,HV,HV)
+        CALL ROTOR2(THET,PHX,PHX)
+        CALL ROTOR3( PHI,PHX,PHX)
+        DO 44,I=1,3
+ 44     HHV(I)=-ISGN*HV(I)
+        NEVACC=NEVACC+1
+C
+      ELSEIF(MODE.EQ. 1) THEN
+C     =======================
+        IF(NEVRAW.EQ.0) RETURN
+        PARGAM=SWT/FLOAT(NEVRAW+1)
+        ERROR=0
+        IF(NEVRAW.NE.0) ERROR=SQRT(SSWT/SWT**2-1./FLOAT(NEVRAW))
+        RAT=PARGAM/GAMEL
+        WRITE(IOUT, 7010) NEVRAW,NEVACC,NEVOVR,PARGAM,RAT,ERROR
+CC      CALL HPRINT(803)
+        GAMPMC(1)=RAT
+        GAMPER(1)=ERROR
+CAM     NEVDEC(1)=NEVACC
+      ENDIF
+C     =====
+      RETURN
+ 7010 FORMAT(///1X,15(5H*****)
+     $ /,' *',     25X,'******** DADMEL FINAL REPORT  ******** ',9X,1H*
+     $ /,' *',I20  ,5X,'NEVRAW = NO. OF EL  DECAYS TOTAL       ',9X,1H*
+     $ /,' *',I20  ,5X,'NEVACC = NO. OF EL   DECS. ACCEPTED    ',9X,1H*
+     $ /,' *',I20  ,5X,'NEVOVR = NO. OF OVERWEIGHTED EVENTS    ',9X,1H*
+     $ /,' *',E20.5,5X,'PARTIAL WTDTH ( ELECTRON) IN GEV UNITS ',9X,1H*
+     $ /,' *',F20.9,5X,'IN UNITS GFERMI**2*MASS**5/192/PI**3   ',9X,1H*
+     $ /,' *',F20.9,5X,'RELATIVE ERROR OF PARTIAL WIDTH        ',9X,1H*
+     $ /,' *',25X,     'COMPLETE QED CORRECTIONS INCLUDED      ',9X,1H*
+     $ /,' *',25X,     'BUT ONLY V-A CUPLINGS                  ',9X,1H*
+     $  /,1X,15(5H*****)/)
+ 902  WRITE(IOUT, 9020)
+ 9020 FORMAT(' ----- DADMEL: LACK OF INITIALISATION')
+      STOP
+      END
+      SUBROUTINE DADMMU(MODE,ISGN,HHV,PNU,PWB,Q1,Q2,PHX)
+C ----------------------------------------------------------------------
+      include 'TAUDCD_BBB_size.inc'
+      COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+C
+      REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
+     *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
+     *                 ,AMK,AMKZ,AMKST,GAMKST
+      COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
+      REAL*4            GAMPMC    ,GAMPER
+      COMMON / INOUT / INUT,IOUT
+      REAL*4         PHX(4)
+      REAL  HHV(4),HV(4),PNU(4),PWB(4),Q1(4),Q2(4)
+      REAL  PDUM1(4),PDUM2(4),PDUM3(4),PDUM4(4),PDUM5(4)
+      REAL*4 RRR(3)
+      REAL*8 SWT, SSWT
+      DATA PI /3.141592653589793238462643/
+      DATA IWARM /0/
+C
+C     PRINT *, 'DADMMU: NBMC = ', NBMC
+      IF(MODE.EQ.-1) THEN
+C     ===================
+        IWARM=1
+        NEVRAW=0
+        NEVACC=0
+        NEVOVR=0
+        SWT=0
+        SSWT=0
+        WTMAX=1E-20
+        DO 15 I=1,500
+        CALL DPHSMU(WT,HV,PDUM1,PDUM2,PDUM3,PDUM4,PDUM5)
+        IF(WT.GT.WTMAX/1.2) WTMAX=WT*1.2
+15      CONTINUE
+CC      CALL HBOOK1(802,'WEIGHT DISTRIBUTION  DADMMU    $',100,0,2)
+C
+      ELSEIF(MODE.EQ. 0) THEN
+C     =======================
+300     CONTINUE
+        IF(IWARM.EQ.0) GOTO 902
+        NEVRAW=NEVRAW+1
+        CALL DPHSMU(WT,HV,PNU,PWB,Q1,Q2,PHX)
+CC      CALL HFILL(802,WT/WTMAX)
+        SWT=SWT+WT
+        SSWT=SSWT+WT**2
+        CALL KKMC_RANMAR(RRR,3)
+        RN=RRR(1)
+        IF(WT.GT.WTMAX) NEVOVR=NEVOVR+1
+        IF(RN*WTMAX.GT.WT) GOTO 300
+C ROTATIONS TO BASIC TAU REST FRAME
+        COSTHE=-1.+2.*RRR(2)
+        THET=ACOS(COSTHE)
+        PHI =2*PI*RRR(3)
+        CALL ROTOR2(THET,PNU,PNU)
+        CALL ROTOR3( PHI,PNU,PNU)
+        CALL ROTOR2(THET,PWB,PWB)
+        CALL ROTOR3( PHI,PWB,PWB)
+        CALL ROTOR2(THET,Q1,Q1)
+        CALL ROTOR3( PHI,Q1,Q1)
+        CALL ROTOR2(THET,Q2,Q2)
+        CALL ROTOR3( PHI,Q2,Q2)
+        CALL ROTOR2(THET,HV,HV)
+        CALL ROTOR3( PHI,HV,HV)
+        CALL ROTOR2(THET,PHX,PHX)
+        CALL ROTOR3( PHI,PHX,PHX)
+        DO 44,I=1,3
+ 44     HHV(I)=-ISGN*HV(I)
+        NEVACC=NEVACC+1
+C
+      ELSEIF(MODE.EQ. 1) THEN
+C     =======================
+        IF(NEVRAW.EQ.0) RETURN
+        PARGAM=SWT/FLOAT(NEVRAW+1)
+        ERROR=0
+        IF(NEVRAW.NE.0) ERROR=SQRT(SSWT/SWT**2-1./FLOAT(NEVRAW))
+        RAT=PARGAM/GAMEL
+        WRITE(IOUT, 7010) NEVRAW,NEVACC,NEVOVR,PARGAM,RAT,ERROR
+CC      CALL HPRINT(802)
+        GAMPMC(2)=RAT
+        GAMPER(2)=ERROR
+CAM     NEVDEC(2)=NEVACC
+      ENDIF
+C     =====
+      RETURN
+ 7010 FORMAT(///1X,15(5H*****)
+     $ /,' *',     25X,'******** DADMMU FINAL REPORT  ******** ',9X,1H*
+     $ /,' *',I20  ,5X,'NEVRAW = NO. OF MU  DECAYS TOTAL       ',9X,1H*
+     $ /,' *',I20  ,5X,'NEVACC = NO. OF MU   DECS. ACCEPTED    ',9X,1H*
+     $ /,' *',I20  ,5X,'NEVOVR = NO. OF OVERWEIGHTED EVENTS    ',9X,1H*
+     $ /,' *',E20.5,5X,'PARTIAL WTDTH (MU  DECAY) IN GEV UNITS ',9X,1H*
+     $ /,' *',F20.9,5X,'IN UNITS GFERMI**2*MASS**5/192/PI**3   ',9X,1H*
+     $ /,' *',F20.9,5X,'RELATIVE ERROR OF PARTIAL WIDTH        ',9X,1H*
+     $ /,' *',25X,     'COMPLETE QED CORRECTIONS INCLUDED      ',9X,1H*
+     $ /,' *',25X,     'BUT ONLY V-A CUPLINGS                  ',9X,1H*
+     $  /,1X,15(5H*****)/)
+ 902  WRITE(IOUT, 9020)
+ 9020 FORMAT(' ----- DADMMU: LACK OF INITIALISATION')
+      STOP
       END

@@ -37,7 +37,7 @@ kkgeninput.param('kkmcoutputfilename', 'kkmc_tautau.txt')
 # run
 main.add_module("Progress")
 main.add_module(kkgeninput)
-# main.add_module("RootOutput", outputFileName="kkmc_tautau.root")
+main.add_module("RootOutput", outputFileName="kkmc_tautau.root")
 main.add_module("HepMCOutput", OutputFilename='kkmc_tautau.hepmc', StoreVirtualParticles=True)
 # main.add_module("PrintTauTauMCParticles", logLevel=LogLevel.INFO, onlyPrimaries=False)
 # main.add_module("PrintMCParticles", logLevel=LogLevel.INFO, onlyPrimaries=False)

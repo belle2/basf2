@@ -52,8 +52,8 @@ C switches of tau+ tau- decay modes !!
       Jak1            = xpar(ITAUXPAR+1)   ! Decay Mask for first tau
       Jak2            = xpar(ITAUXPAR+2)   ! Decay Mask for second tau
       IF( (Jak1.EQ.-1) .AND. (Jak2.EQ.-1) ) m_IsInitialized = 0
-      TAUOLA_BBB = xpar(ITAUXPAR+500)
-      PRINT*, 'Taupair_Initialize: Jak1, Jak2, IsInitialized, BBB = ', !SwB
+      TAUOLA_BBB = xpar(ITAUXPAR+900)
+      PRINT*, 'Taupair_Initialize: Jak1, Jak2, IsInitialized, BBB = ', 
      c                             Jak1, Jak2, m_IsInitialized, TAUOLA_BBB
         m_KeyClone      = 1       ! dip-switch for cloning procedure, =1,2
         m_KeyClone      = 2       ! dip-switch for cloning procedure, =1,2

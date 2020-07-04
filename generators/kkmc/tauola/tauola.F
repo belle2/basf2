@@ -39,11 +39,9 @@ C
 C     called by : DEXAY
 C ----------------------------------------------------------------------
       include 'TAUDCD_size.inc'
+      REAL*8            GAMPRT,SUM,CUMUL(NBMC)
       COMMON / TAUBRA / GAMPRT(NBMC),JLIST(NBMC),NCHAN
-
-C      REAL   CUMUL(20)
-
-      REAL   CUMUL(NBMC),RRR(1)
+      REAL     RRR(1)
 C
       IF(NCHAN.LE.0.OR.NCHAN.GT.NBMC) GOTO 902
       CALL KKMC_RANMAR(RRR,1)
@@ -2431,7 +2429,7 @@ C
      $  SQRT(MAX(0.D0,(A**2-(B+C)**2)*(A**2-(B-C)**2)))/(2.D0*A)
 
 C
-      AMPIK(I,J)=DCDMAS(IDFFIN(I,J))
+      AMPIK(I,J)=DCDMAS(IDFFIN(I,J),0)
 C
 C
 
@@ -2819,9 +2817,9 @@ C TYPE OF THE GENERATION:
       KEYT=4
       IF(JAA.EQ.7) KEYT=3
 C --- MASSES OF THE DECAY PRODUCTS
-      AMP1=DCDMAS(IDFFIN(1,JAA+NM4+NM5+NM6))
-      AMP2=DCDMAS(IDFFIN(2,JAA+NM4+NM5+NM6))
-      AMP3=DCDMAS(IDFFIN(3,JAA+NM4+NM5+NM6))
+      AMP1=DCDMAS(IDFFIN(1,JAA+NM4+NM5+NM6),0)
+      AMP2=DCDMAS(IDFFIN(2,JAA+NM4+NM5+NM6),0)
+      AMP3=DCDMAS(IDFFIN(3,JAA+NM4+NM5+NM6),0)
       CALL DPHTRE(DGAMT,HV,PN,PAA,PIM1,AMP1,PIM2,AMP2,PIPL,AMP3,KEYT,MNUM)
       DO I=1,4
          PNPI(I,1)=PIM1(I)
@@ -4275,7 +4273,7 @@ C
 	 	HADCUR(I) = HADCUR(I) + HADCUR1(I)
 	    ENDDO	
          ELSEIF(MNUM.EQ.2) THEN
-
+            IMOD = -1
             CALL CURR_BINP(MNUM,IMOD,PIM4,PIM3,PIM1,PIM2,HADCUR)
 
          ENDIF
@@ -4351,11 +4349,11 @@ C D**3 P /2E/(2PI)**3 (2PI)**4 DELTA4(SUM P)
       PHSPAC=1./2**29/PI**14                                            
 c     PHSPAC=1./2**5/PI**2                                              
 C init 5pi decay mode (JNPI)                                            
-      AMP1=DCDMAS(IDFFIN(1,JNPI))
-      AMP2=DCDMAS(IDFFIN(2,JNPI))
-      AMP3=DCDMAS(IDFFIN(3,JNPI))
-      AMP4=DCDMAS(IDFFIN(4,JNPI))
-      AMP5=DCDMAS(IDFFIN(5,JNPI))
+      AMP1=DCDMAS(IDFFIN(1,JNPI),0)
+      AMP2=DCDMAS(IDFFIN(2,JNPI),0)
+      AMP3=DCDMAS(IDFFIN(3,JNPI),0)
+      AMP4=DCDMAS(IDFFIN(4,JNPI),0)
+      AMP5=DCDMAS(IDFFIN(5,JNPI),0)
 c                                                                       
 C TAU MOMENTUM                                                          
       PT(1)=0.                                                          

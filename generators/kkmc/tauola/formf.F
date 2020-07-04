@@ -100,8 +100,12 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
+
+      INTEGER IRCHL3PI
+      COMMON /SETRCHL/ IRCHL3PI
+
+      INTEGER IFKPIPI
+      COMMON /IFKPIPI/ IFKPIPI
 
       COMPLEX FORMA1,FORMK1,FORMRO,FORMKS
       COMPLEX FA1A1P,FK1AB,F3PI,F3PI_RCHT
@@ -113,10 +117,7 @@ C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(1,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM1 = FORMA1*FORMRO
-      if (IFBABAR.eq.1)then
-           GAMAX=GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-           FORM1=AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else if (IFBABAR.EQ.2) THEN
+      IF (IRCHL3PI.EQ.1) THEN
         FORM1 = F3PI_RCHT(1,QQ,S1,SDWA)
       ELSE
         FORM1 = F3PI(1,QQ,S1,SDWA)
@@ -124,58 +125,35 @@ C       FORM1 = FORMA1*FORMRO
 
       ELSEIF (MNUM.EQ.1) THEN
 C ------------ K- pi- K+ (K*0 K-)
-      if (IFBABAR.eq.1)then
-      FORM1 = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM1 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FORM1
-      else ! CLEO
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM1 = FORMA1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.2) THEN
 C ------------ K0 pi- K0B (K*- K0)
-      if (IFBABAR.eq.1)then
-      FORM1 = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM1 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FORM1
-      else ! CLEO
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM1 = FORMA1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.3) THEN
 C ------------ K- pi0 K0 (K*0 K-)
-      if (IFBABAR.eq.1)then
-      FORM1 = 0.0
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM1 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FORM1
-      else ! CLEO
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM1 = FORMA1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.4) THEN
 C ------------ pi0 pi0 K-  (K*-pi0)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM1 = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
-      FORM1 = WIGFOR(QQ,XM2,GAM2)*FORM1
-      else ! CLEO
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMK1 = FK1AB(QQ,3)
        FORM1 = FORMK1*FORMKS
-      endif
+
       ELSEIF (MNUM.EQ.5) THEN
 C ------------ K- pi- pi+ (rho0 K-)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM1 = WIGFOR(QQ,XM2,GAM2)*FPIKM(SQRT(S1),AMPI,AMPI)
+      IF (IFKPIPI.eq.1) THEN  
+C     ala Finkemeier&Mirkes [SwB, Feb06] : F1 = BW[K1(1270)] X BW[rho]
+       XM2=1.254             !
+       GAM2=0.260            !
+       FORM1=WIGFOR(QQ,XM2,GAM2)*FPIKM(SQRT(S1),AMPI,AMPI)
       else ! CLEO
        FORMK1 = FK1AB(QQ,4)
        FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
@@ -184,16 +162,26 @@ C ------------ K- pi- pi+ (rho0 K-)
 
       ELSEIF (MNUM.EQ.6) THEN
 C ------------ pi- K0B pi0 (pi- K*0B)
-      if (IFBABAR.eq.1)then
-      FORM1=0.0
+      if (IFKPIPI.eq.1)then
+C     ala Finkemeier&Mirkes [SwB, Apr09]
+C     QQ : (pi k0B pi0), S1 : (k0B pi0)
+       XM1=1.403           !
+       GAM1=0.174          !
+       FK1=WIGFOR(QQ,XM1,GAM1)
+       XM2=1.254           !
+       GAM2=0.115          !
+       FK2=WIGFOR(QQ,XM2,GAM2)
+       AMIX=0.33           !
+       FORM1=(FK1+AMIX*FK2)/(1+AMIX)
+       FORM1=FORM1*BWIGM(S1,AMKST,GAMKST,AMKZ,AMPIZ)
       else ! CLEO
        FORMK1 = FK1AB(QQ,1)
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
        FORM1 = FORMK1*FORMKS
       endif
 
-      ELSEIF (MNUM.EQ.7) THEN
-C -------------- eta pi- pi0 final state
+      ELSEIF (MNUM.EQ.7.OR.MNUM.EQ.13.OR.MNUM.EQ.14) THEN
+C -------------- eta pi- pi0, eta K- pi0, eta pi- K0  final states
        FORM1=0.0
       ELSEIF     (MNUM.EQ.9) THEN
 C ------------  3 pi hadronic state (a1) 2 neutral pions
@@ -201,10 +189,7 @@ C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(1,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM1 = FORMA1*FORMRO
-      if (IFBABAR.eq.1)then
-           GAMAX=GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-           FORM1=AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else if (IFBABAR.EQ.2) THEN
+      IF (IRCHL3PI.EQ.1) THEN
         FORM1 = F3PI_RCHT(1,QQ,S1,SDWA)
       ELSE
         FORM1 = F3PI(1,QQ,S1,SDWA)
@@ -241,9 +226,11 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
+      INTEGER IRCHL3PI
+      COMMON /SETRCHL/ IRCHL3PI
 
+      INTEGER IFKPIPI
+      COMMON /IFKPIPI/ IFKPIPI
       COMPLEX FORMA1,FORMK1,FORMRO,FORMKS
       COMPLEX FA1A1P,FK1AB,F3PI,F3PI_RCHT
       wigner(a,b,c)=cmplx(1.0,0.0)/cmplx(a-b**2,b*c)
@@ -255,10 +242,7 @@ C       FORMRO = F3PI(2,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM2 = FORMA1*FORMRO
 C       FORM2 = F3PI(2,QQ,S1,SDWA)
-      if (IFBABAR.eq.1)then
-           GAMAX=GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-           FORM2=AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else if (IFBABAR.EQ.2) THEN
+      IF (IRCHL3PI.EQ.1) THEN
         FORM2 = F3PI_RCHT(2,QQ,S1,SDWA)
       ELSE
         FORM2 = F3PI(2,QQ,S1,SDWA)
@@ -266,57 +250,41 @@ C       FORM2 = F3PI(2,QQ,S1,SDWA)
 
       ELSEIF (MNUM.EQ.1) THEN
 C ------------ K- pi- K+ (rho0 pi-)
-      if (IFBABAR.eq.1)then
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM2 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else ! cleo
        FORMRO = FPIKM(SQRT(S1),AMK,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM2 = FORMA1*FORMRO
-      endif
 
       ELSEIF (MNUM.EQ.2) THEN
 C ------------ K0 pi- K0B (rho0 pi-)
-      if (IFBABAR.eq.1)then
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM2 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else ! cleo
        FORMRO = FPIKM(SQRT(S1),AMK,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM2 = FORMA1*FORMRO
-      endif
 
       ELSEIF (MNUM.EQ.3) THEN
 C ------------ K- pi0 K0 (rho- pi0)
-      if (IFBABAR.eq.1)then
-      GAMAX = GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-      FORM2 = AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else ! cleo
        FORMRO = FPIKM(SQRT(S1),AMK,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM2 = FORMA1*FORMRO
-      endif
 
       ELSEIF (MNUM.EQ.4) THEN
 C ------------ pi0 pi0 K-  (K*-pi0)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM2 = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
-      FORM2 = WIGFOR(QQ,XM2,GAM2)*FORM2
-      else ! cleo
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMK1 = FK1AB(QQ,3)
        FORM2 = FORMK1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.5) THEN
 C ------------ K- pi- pi+  (K*0B pi-)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM2 = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
-      FORM2 = WIGFOR(QQ,XM2,GAM2)*FORM2
+      IF (IFKPIPI.eq.1) THEN
+C     ala Finkemeier&Mirkes [SwB, Feb06] : F2 = (eta BW[K1(1270)]+BW[K1(1400)]) X BW[K*]
+       XM1=1.463            !
+       GAM1=0.300           !
+       FK1=WIGFOR(QQ,XM1,GAM1)
+       XM2=1.254            !
+       GAM2=0.260           !
+       FK2=WIGFOR(QQ,XM2,GAM2)
+       AMIX=0.33            ! (M. Finkemeier, E. Mirkes, ZPC69, 243 (1996))
+       FORM2=(FK1+AMIX*FK2)/(1+AMIX)
+       FORM2=FORM2*BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
       else ! cleo
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPI,AMK)
        FORMK1 = FK1AB(QQ,1)
@@ -324,19 +292,22 @@ C ------------ K- pi- pi+  (K*0B pi-)
       endif
 C
       ELSEIF (MNUM.EQ.6) THEN
-C ------------ pi- K0B pi0 (rho- K0B)
-      if (IFBABAR.eq.1)then
-      XM2   = 1.402
-      GAM2  = 0.174
-      FORM2 = WIGFOR(QQ,XM2,GAM2)*FPIKM(SQRT(S1),AMPI,AMPI)
+      if (IFKPIPI.eq.1)then
+C     ------------ pi- K0B pi0 (rho- K0B)
+C     ala Finkemeier&Mirkes [SwB, Apr09]
+C     QQ : (pi k0B pi0), S1 : (pi pi0)
+       XM2=1.254
+       GAM2=0.115
+       FORM2=WIGFOR(QQ,XM2,GAM2)*FPIKM(SQRT(S1),AMPIZ,AMPI)
       else ! cleo
+C     ------------ pi- K0B pi0 (rho- K0B)
        FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
        FORMK1 = FK1AB(QQ,2)
        FORM2 = FORMK1*FORMRO
       endif
 C
-      ELSEIF (MNUM.EQ.7) THEN
-C -------------- eta pi- pi0 final state
+      ELSEIF (MNUM.EQ.7.OR.MNUM.EQ.13.OR.MNUM.EQ.14) THEN
+C -------------- eta pi- pi0, eta K- pi0, eta pi- K0 final states
        FORM2=0.0
       ELSEIF     (MNUM.EQ.9) THEN
 C ------------  3 pi hadronic state (a1) 2 neutral
@@ -344,10 +315,7 @@ C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(2,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM2 = FORMA1*FORMRO
-      if (IFBABAR.eq.1)then
-           GAMAX=GAMA1*GFUN(QQ)/GFUN(AMA1**2)
-           FORM2=AMA1**2*WIGNER(QQ,AMA1,GAMAX)*FPIKM(SQRT(S1),AMPI,AMPI)
-      else if (IFBABAR.EQ.2) THEN
+      IF (IRCHL3PI.EQ.1) THEN
         FORM2 = F3PI_RCHT(2,QQ,S1,SDWA)
       ELSE
         FORM2 = F3PI(2,QQ,S1,SDWA)
@@ -464,8 +432,13 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
+
+      INTEGER IRCHL3PI
+      COMMON /SETRCHL/ IRCHL3PI
+
+      INTEGER IFKPIPI
+      COMMON /IFKPIPI/ IFKPIPI
+
       COMPLEX FORM3,BWIGM
       COMPLEX FORMA1,FORMK1,FORMRO,FORMKS
       COMPLEX FA1A1P,FK1AB,F3PI,F3PI_RCHT
@@ -476,31 +449,26 @@ C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(3,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM3 = FORMA1*FORMRO
-      if (IFBABAR.EQ.1) THEN
-        FORM3 = (0.,0.)
+      if (IRCHL3PI.EQ.1) THEN
+        FORM3 = (0.,0.) ! Calculation, for  IFORM = 3 is not needed
       else
         FORM3 = F3PI(3,QQ,S1,SDWA)
       endif
 
       ELSEIF (MNUM.EQ.3) THEN
-C ------------ K- pi0 K0  (K*- K0)
-      if (IFBABAR.EQ.1) THEN
-        FORM3 = (0.,0.)
-      else
+C  ------------ K- pi0 K0  (K*- K0)
+C      AJW 11/97: Add in the K*-prim-s, ala Finkemeier&Mirkes 
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMPIZ,AMK)
        FORMA1 = FA1A1P(QQ)
        FORM3 = FORMA1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.6) THEN
 C ------------ pi- K0B pi0 (K*- pi0)
-      if (IFBABAR.EQ.1) THEN
-        FORM3 = (0.,0.)
-      else
+C      AJW 11/97: Add in the K*-prim-s, ala Finkemeier&Mirkes
+C      QQ : (pi- k0B pi0), S1 : (pi- K0B)
        FORMKS = BWIGM(S1,AMKST,GAMKST,AMK,AMPI)
        FORMK1 = FK1AB(QQ,3)
        FORM3 = FORMK1*FORMKS
-      endif
 
       ELSEIF (MNUM.EQ.9) THEN
 C ------------  3 pi hadronic state (a1) 2 neutral
@@ -508,13 +476,13 @@ C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(3,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM3 = FORMA1*FORMRO
-      if (IFBABAR.EQ.1) THEN
-        FORM3 = (0.,0.)
+      if (IRCHL3PI.EQ.1) THEN
+        FORM3 = (0.,0.) ! Calculation, for  IFORM = 3 is not needed
       else
         FORM3 = F3PI(3,QQ,S1,SDWA)
       endif
 
-      ELSEIF     (MNUM.gt.9.and.MNUM.lt.20 ) THEN
+      ELSEIF     (MNUM.gt.9.and.MNUM.lt.20.and.MNUM.NE.13.and.MNUM.NE.14 ) THEN
 C ------------  3 pi hadronic state (a1) basically dummy
 C       FORMRO = FPIKM(SQRT(S1),AMPI,AMPI)
 C       FORMRO = F3PI(3,QQ,S1,SDWA)
@@ -543,8 +511,8 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON /SETINI/ IFBABAR
-      INTEGER         IFBABAR
+      INTEGER IRCHL3PI
+      COMMON /SETRCHL/ IRCHL3PI
 
       COMPLEX FORM4,WIGNER,FPIKM,F3PI_RCHT
       REAL*4 M
@@ -557,9 +525,9 @@ C       FORMRO = F3PI(3,QQ,S1,SDWA)
 C       FORMA1 = FA1A1P(QQ)
 C       FORM3 = FORMA1*FORMRO
 C        FORM4 = CMPLX(-1., 0.) 
-       IF (IFBABAR.EQ.2) FORM4 = F3PI_RCHT(4,QQ,S1,S2)* CMPLX(0., 1.)
+       IF (IRCHL3PI.EQ.1) FORM4 = F3PI_RCHT(4,QQ,S1,S2)* CMPLX(0., 1.)
       ELSEIF (MNUM.EQ.9) THEN
-       IF (IFBABAR.EQ.2) FORM4 = F3PI_RCHT(4,QQ,S1,S2)* CMPLX(0., 1.)
+       IF (IRCHL3PI.EQ.1) FORM4 = F3PI_RCHT(4,QQ,S1,S2)* CMPLX(0., 1.)
       ENDIF
 
       END
@@ -583,8 +551,8 @@ C
 
       IF     (MNUM.EQ.0) THEN
 C ------------  3 pi hadronic state (a1)
-        FORM5=0.0
-       ELSEIF (MNUM.EQ.1) THEN
+        FORM5=CMPLX(0.0,0.0)
+      ELSEIF (MNUM.EQ.1) THEN
 C ------------ K- pi- K+
          ELPHA=-0.2
          FORM5=FPIKMD(SQRT(QQ),AMPI,AMPI)/(1+ELPHA)
@@ -598,10 +566,10 @@ C ------------ K0 pi- K0B
      $          +ELPHA*BWIGM(S1,AMKST,GAMKST,AMPI,AMK))
       ELSEIF (MNUM.EQ.3) THEN
 C ------------ K- K0 pi0
-        FORM5=0.0
+        FORM5=CMPLX(0.0,0.0)
       ELSEIF (MNUM.EQ.4) THEN
 C ------------ pi0 pi0 K-
-        FORM5=0.0
+        FORM5=CMPLX(0.0,0.0)
       ELSEIF (MNUM.EQ.5) THEN
 C ------------ K- pi- pi+
         ELPHA=-0.2
@@ -619,10 +587,13 @@ C -------------- eta pi- pi0 final state
        FORM5=FPIKMD(SQRT(QQ),AMPI,AMPI)*FPIKM(SQRT(S1),AMPI,AMPI)
       ELSEIF (MNUM.EQ.9) THEN
 C ------------  3 pi hadronic state (a1)
-        FORM5=0.0
+        FORM5=CMPLX(0.0,0.0)
+      ELSEIF (MNUM.EQ.13.OR.MNUM.EQ.14) THEN
+C -------------- eta K- pi0, eta pi- K0 final states
+       FORM5=FPIK(SQRT(S2),AMPI,AMK)*FPIKM(SQRT(S1),1.43,0.9)
       ELSEIF     (MNUM.gt.9.and.MNUM.lt.20 ) THEN
 C ------------  3 pi hadronic state (a1) basically dummy
-        FORM5=0.0
+        FORM5=CMPLX(0.0,0.0)
       ENDIF
 C
       END

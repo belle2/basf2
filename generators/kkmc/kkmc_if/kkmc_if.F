@@ -83,7 +83,7 @@ c     input particle data file for pythia
       m_Read_PythiaFile=1
       goto 100
  101  Print *,'KK  No input for Pythia'
-      m_Read_PythiaFile=0 !SwB
+      m_Read_PythiaFile=0 
  100  continue
 
 C   TAUOLA fifo initialize
@@ -196,7 +196,7 @@ C   TAUOLA fifo clear
       call TAUFIF(0)
 
 C   Select decay channel
-      IF (m_Read_PythiaFile.EQ.1) THEN ! SwB
+      IF (m_Read_PythiaFile.EQ.1) THEN 
          call KK_select_decay_channel(-15) !tau+
          call KK_select_decay_channel(15) !tau-
       ENDIF

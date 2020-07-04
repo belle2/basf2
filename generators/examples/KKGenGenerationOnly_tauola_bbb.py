@@ -32,12 +32,12 @@ kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kk
 # kkgeninput.param('taudecaytableFile', Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat'))
 # above line makes decay table to be read by Pythia; uncomment next line to make tau decay table to be read by Tauola
 kkgeninput.param('taudecaytableFile', ' ')
-kkgeninput.param('kkmcoutputfilename', 'kkmc_tautau.txt')
+kkgeninput.param('kkmcoutputfilename', 'kkmc_tautau_bbb.txt')
 
 # run
 main.add_module("Progress")
 main.add_module(kkgeninput)
-# main.add_module("RootOutput", outputFileName="kkmc_tautau_bbb.root")
+main.add_module("RootOutput", outputFileName="kkmc_tautau_bbb.root")
 main.add_module("HepMCOutput", OutputFilename='kkmc_tautau_bbb.hepmc', StoreVirtualParticles=True)
 # main.add_module("PrintTauTauMCParticles", logLevel=LogLevel.INFO, onlyPrimaries=False)
 # main.add_module("PrintMCParticles", logLevel=LogLevel.INFO, onlyPrimaries=False)

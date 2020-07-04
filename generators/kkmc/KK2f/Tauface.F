@@ -19,6 +19,7 @@
 
 
       SUBROUTINE INIETC(ITAUXPAR,xpar)
+      include '../tauola/RChL-currents/parameter.inc'
       INCLUDE "BXformat.fi"
       REAL*8 xpar(*)
       INTEGER   INUT,IOUT
@@ -40,8 +41,60 @@
 *         hard coded both in Monte Carlo and in testing distribution.
 * KeyA1=3 function g(Q**2) hardcoded in the Monte Carlo
 *         (it is timy to calculate!), but appropriately adjusted in testing distribution.
+C SWITCHES FOR OPTIONS IN INITIALIZATION:
+C     =======================================================================
+C switch to initialize that all modes are represented equally.
+      INTEGER IFEQUALBR
+      DATA    IFEQUALBR /0/ 
+      COMMON /IFEQUALBR/ IFEQUALBR
+      
+C     FF2PIRHO ! switch for the two pion form factor
+C     = 0 CLEO parametrization
+C     = 1 RChL parametrization
+C      = 2, 3 Belle parametrization
+C     pi- pi0 -> Two options of Belle parametrization (PRD 78, 2008, 072006)
+C FF2PIRHO = 2  Belle parametrization (suggested default = 2)
+C               all parameters par (1...11) of fit are free
+C FF2PIRHO = 3  Belle parametrization,
+C               parameters of fit are free
+C     except for fixed par(1)=F_pi(0)=1
+      DATA   FF2PIRHO /0/
+      
+C     pi- pi- pi+, pi- pi0 pi0 -> Resonance Chiral Lagrangian initialization (PRD 88, 2013, 093012)
+C IRCHL3PI=0  TAUOLA CLEO COEF(I,J) =  COEFc(I,J)
+C IRCLH3PI=1  TAUOLA RChL COEF(I,J) =  COEFr(I,J) [suggested default]
+      INTEGER IRCHL3PI
+      DATA    IRCHL3PI /0/
+      COMMON /SETRCHL/ IRCHL3PI
+
+      
+! switch on initialization of FF mixing in tau- -> K-  PI- PI+ nu, PI- K0B PI0 nu 
+C IFKPIPI = 0 CLEO initialization (suggested default)
+C IFKPIPI = 1 BaBar initialization 
+C-- Improve Form Factors for tau->K-pi-pi+nu 
+C   New modelling using parameters from CLEO, PRD62, 072006 (2000):
+C   M(1270) = 1.254 GeV, M(1400) = 1.463 GeV
+C   G(1270) = 0.26 GeV,  G(1400) = 0.30 GeV
+C   F1 = BW[K1(1270)] X BW[rho], 
+C   F2 = (eta BW[K1(1270)]+BW[K1(1400)]) X BW[K*], 
+C   eta=0.33 (M. Finkemeier, E. Mirkes, ZPC69, 243 (1996))
+C Similar tuning also applied to tau- -> PI- K0B PI0 nu 
+      INTEGER IFKPIPI
+      DATA    IFKPIPI /0/
+      COMMON /IFKPIPI/ IFKPIPI
+
+C     pi- pi0 pi0 pi0, pi- pi- pi+ pi0:
+C     IFCURR4PI = 0  CPC 146 2002, hep=ph/0201149 [Novosibirsk] [suggested default]
+C     IFCURR4PI = 1  hep-ph/9410260 (probably) [Karlsruhe]
+C     IFCURR4PI = 2  R. Decker, M. Finkemeier, P. Heiliger, H.H.Jonsson, TTP94-13
+C     IFCURR4PI = 3  CLEO initialization
+      INTEGER IFCURR4PI
+      DATA    IFCURR4PI /0/
+      COMMON /IFCURR4PI/ IFCURR4PI
+C
       SAVE
-       idff    = xpar(ITAUXPAR+3)        ! Lund identifier for first tau (15 for  tau-)
+C-------------------------------------------------------------------------------
+      idff    = xpar(ITAUXPAR+3) ! Lund identifier for first tau (15 for  tau-)
 C XK0 for tau decays.
        xk0dec  = xpar(ITAUXPAR+5)        ! IR-cut for QED rad. in leptonic decays
 C radiative correction switch in tau --> e (mu) decays !
@@ -52,7 +105,7 @@ C switches of tau+ tau- decay modes !!
 C output file number for TAUOLA
        IOUT    = xpar(4)
 C  KeyA1 is used for formfactors actually not in use
-      KeyA1   = xpar(ITAUXPAR+6)        ! Type of a1 current
+       KeyA1   = xpar(ITAUXPAR+6)        ! Type of a1 current
 
         WRITE(iout,bxope)
         WRITE(iout,bxtxt) ' Parameters passed from KK  to Tauola:   '
@@ -64,6 +117,18 @@ C  KeyA1 is used for formfactors actually not in use
         WRITE(iout,bxl1g) xk0dec,    'IR-cut for lept r.c.','xk0dec','t06'
         WRITE(iout,bxclo)
 
+        IFEQUALBR = XPAR(ITAUXPAR+901)
+        FF2PIRHO  = XPAR(ITAUXPAR+902)
+        IRCHL3PI  = XPAR(ITAUXPAR+903)
+        IFKPIPI   = XPAR(ITAUXPAR+904)
+        IFCURR4PI = XPAR(ITAUXPAR+905)
+
+        PRINT *, 'IFEQUALBR, FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI = ',
+     C            IFEQUALBR, FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI
+
+        if(IRCHL3PI.eq.1) then
+           CALL INIRChL(1)      ! (IRCHL)
+        endif
       end
 
       SUBROUTINE INITDK(ITAUXPAR,xpar)
@@ -89,6 +154,7 @@ C  KeyA1 is used for formfactors actually not in use
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
+      REAL*8            GAMPRT,SUM
       COMMON / TAUBRA / GAMPRT(NBMC),JLIST(NBMC),NCHAN
       COMMON / TAUKLE / BRA1,BRK0,BRK0B,BRKS
       REAL*4            BRA1,BRK0,BRK0B,BRKS
@@ -202,7 +268,7 @@ C AJWMOD fix sign bug, 2/22/99
         IF(I.EQ.22) NAMES(I-7)='  TAU-  -->  K-  K0            '
       ELSE
         JLIST(I) = 0
-        GAMPRT(I) = 0.
+        GAMPRT(I) = 0.D0
       ENDIF
    1  CONTINUE
       DO I=1,NMODE
@@ -258,7 +324,7 @@ C initialization form KK
 *
 * PRINTOUTS FOR KK version
 
-      SUM=0
+      SUM=0.0D0
       DO K=1,NCHAN
        SUM=SUM+GAMPRT(K)
       ENDDO
@@ -318,10 +384,20 @@ C initialization form KK
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-*
+*     
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
+*
+      COMMON / PARMASD / AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD
+*
+      REAL*8            AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD
+
+
       CHARACTER*80 bxINIT
       PARAMETER (
      $  bxINIT ='(1x,1h*,g17.8,            16x, a31,a4,a4, 1x,1h*)'
@@ -341,16 +417,15 @@ C initialize rchl_parameters first
 
       AMPIZ  = 0.134964
       AMPI   = 0.139568
-      AMRO   = 0.773
-      GAMRO  = 0.145
+      AMRO   = 0.77526
+      GAMRO  = 0.1491
 *C    GAMRO  = 0.666
       AMA1   = 1.251
       GAMA1  = 0.599
       AMK    = 0.493667
-      AMKZ   = 0.49772
-      AMKST  = 0.8921
-      GAMKST = 0.0513
-C
+      AMKZ   = 0.497611 
+      AMKST  = 0.89555
+      GAMKST = 0.0473
 C
 C IN-COMING / OUT-GOING  FERMION MASSES
 !!      AMNUTA = PKORB(1,2)
@@ -370,13 +445,32 @@ C MASSES USED IN TAU DECAYS  Cleo settings
 !!      GAMKST = PKORB(2,13)
 C
 
+c --- REPEAT INITIALIZATION FOR DOUBLE PRECISION COMMON BLOCK
+      AMTAUD  = AMTAU
+      AMNUTAD = AMNUTA
+      AMELD   = AMEL
+      AMNUED  = AMNUE
+      AMMUD   = AMMU
+      AMNUMUD = AMNUMU
+*
+* MASSES USED IN TAU DECAYS
+      AMPIZD  = AMPIZ
+      AMPID   = AMPI
+      AMROD   = AMRO
+      GAMROD  = GAMRO
+      AMA1D   = AMA1
+      GAMA1D  = GAMA1
+      AMKD    = AMK
+      AMKZD   = AMKZ
+      AMKSTD  = AMKST
+      GAMKSTD = GAMKST
 
-      WRITE(iout,bxope)
+            WRITE(iout,bxope)
       WRITE(iout,bxtxt) ' TAUOLA Initialization SUBROUTINE INIMAS:    '
       WRITE(iout,bxtxt) ' Adopted to read from KK                     '
-      WRITE(iout,bxINIT) amtau, 'AMTAU tau-mass             ','****','***'
-      WRITE(iout,bxINIT) amel , 'AMEL  electron-mass        ','****','***'
-      WRITE(iout,bxINIT) ammu , 'AMMU  muon-mass            ','****','***'
+      WRITE(iout,bxINIT)amtau,'AMTAU tau-mass             ','****','***'
+      WRITE(iout,bxINIT)amel ,'AMEL  electron-mass        ','****','***'
+      WRITE(iout,bxINIT)ammu ,'AMMU  muon-mass            ','****','***'
       WRITE(iout,bxclo)
       END
       SUBROUTINE CHOICE(MNUM,RR,ICHAN,PROB1,PROB2,PROB3,
@@ -405,7 +499,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
        GAMRA=GAMRO
        AMRB =AMRO
        GAMRB=GAMRO
-      ELSEIF(MNUM.EQ.1) THEN
+      ELSEIF(MNUM.EQ.1) THEN ! TAU-  -->  K-, PI-,  K+
        PROB1=0.5
        PROB2=0.5
        AMRX =1.57
@@ -414,7 +508,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
        GAMRB=GAMKST
        AMRA =AMRO
        GAMRA=GAMRO
-      ELSEIF(MNUM.EQ.2) THEN
+      ELSEIF(MNUM.EQ.2) THEN ! TAU-  -->  K0, PI-, K0B
        PROB1=0.5
        PROB2=0.5
        AMRX =1.57
@@ -423,7 +517,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
        GAMRB=GAMKST
        AMRA =AMRO
        GAMRA=GAMRO
-      ELSEIF(MNUM.EQ.3) THEN
+      ELSEIF(MNUM.EQ.3) THEN ! TAU-  -->  K-,  PI0, K0
        PROB1=0.5
        PROB2=0.5
        AMRX =1.27
@@ -432,7 +526,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
        GAMRA=GAMKST
        AMRB =AMKST
        GAMRB=GAMKST
-      ELSEIF(MNUM.EQ.4) THEN
+      ELSEIF(MNUM.EQ.4) THEN ! TAU-  --> PI0  PI0   K-
        PROB1=0.5
        PROB2=0.5
        AMRX =1.27
@@ -441,7 +535,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
        GAMRA=GAMKST
        AMRB =AMKST
        GAMRB=GAMKST
-      ELSEIF(MNUM.EQ.5) THEN
+      ELSEIF(MNUM.EQ.5) THEN !  TAU-  -->  K-  PI-  PI+
        PROB1=0.5
        PROB2=0.5
        AMRX =1.27
@@ -450,7 +544,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
        GAMRA=GAMKST
        AMRB =AMRO
        GAMRB=GAMRO
-      ELSEIF(MNUM.EQ.6) THEN
+      ELSEIF(MNUM.EQ.6) THEN ! TAU-  --> PI-  K0B  PI0
        PROB1=0.4
        PROB2=0.4
        AMRX =1.27
@@ -459,7 +553,7 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
        GAMRA=GAMRO
        AMRB =AMKST
        GAMRB=GAMKST
-      ELSEIF(MNUM.EQ.7) THEN
+      ELSEIF(MNUM.EQ.7) THEN !  TAU-  --> ETA  PI-  PI0
        PROB1=0.0
        PROB2=1.0
        AMRX =1.27
@@ -525,7 +619,7 @@ C
 C
       PROB3=1.0-PROB1-PROB2
       END
-      FUNCTION DCDMAS(IDENT)
+      FUNCTION DCDMAS(IDENT,IRANGE)
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -533,6 +627,22 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
+      INTEGER           IRANGE
+      REAL              XRANGE,XRANGE1,XRANGE15,XRANGE2,XRANGE25,XRANGE3
+      REAL              QQBRWG
+      EXTERNAL          QQBRWG
+      XRANGE=IRANGE
+      XRANGE1=XRANGE
+      IF (XRANGE1.GT.1.0)  XRANGE1=1.0
+      XRANGE15=XRANGE
+      IF (XRANGE15.GT.1.5) XRANGE15=1.5
+      XRANGE2=XRANGE
+      IF (XRANGE2.GT.2.0)  XRANGE2=2.0
+      XRANGE25=XRANGE
+      IF (XRANGE25.GT.2.5) XRANGE25=2.5
+      XRANGE3=XRANGE
+      IF (XRANGE3.GT.3.0)  XRANGE3=3.0
+C
       IF      (IDENT.EQ. 1) THEN
         APKMAS=AMPI
       ELSEIF  (IDENT.EQ.-1) THEN
@@ -554,9 +664,9 @@ C
       ELSEIF  (IDENT.EQ.-8) THEN
         APKMAS=0.0001
       ELSEIF  (IDENT.EQ. 9) THEN
-        APKMAS=0.5488
+        APKMAS=0.5479
       ELSEIF  (IDENT.EQ.-9) THEN
-        APKMAS=0.5488
+        APKMAS=0.5479
       ELSEIF  (ABS(IDENT).EQ.13) THEN
         APKMAS=AMMU
       ELSEIF  (ABS(IDENT).EQ.11) THEN
@@ -565,38 +675,56 @@ C
         APKMAS=0.0
       ELSEIF  (ABS(IDENT).EQ.14) THEN
         APKMAS=0.0
-      ELSEIF  (ABS(IDENT).EQ.22) THEN
-        APKMAS=0.0
       ELSEIF  (ABS(IDENT).EQ.223) THEN
-        APKMAS=0.7826
+        APKMAS=QQBRWG(0.78265,0.00849,XRANGE)  ! omega(782)
       ELSEIF  (ABS(IDENT).EQ.333) THEN
-        APKMAS=1.019
+        APKMAS=QQBRWG(1.019461,0.004249,XRANGE)!  phi(1020)
       ELSEIF  (ABS(IDENT).EQ.113) THEN
-        APKMAS=0.7755
+        APKMAS=QQBRWG(AMRO,GAMRO,XRANGE1)       ! rho0(770)
+      ELSEIF  (ABS(IDENT).EQ.213) THEN
+        APKMAS=QQBRWG(AMRO,GAMRO,XRANGE3)       ! rho+(770)
       ELSEIF  (ABS(IDENT).EQ.331) THEN
-        APKMAS=0.958
+        APKMAS=QQBRWG(0.95778,0.000188,XRANGE) ! eta(prime)
+      ELSEIF  (ABS(IDENT).EQ.22) THEN
+        APKMAS=0.000                      ! gamma
       ELSEIF  (ABS(IDENT).EQ.2212) THEN
-         APKMAS=0.938272046
-      ELSEIF  (ABS(IDENT).EQ.10211) THEN
-         APKMAS=1.45
-      ELSEIF  (ABS(IDENT).EQ.10213) THEN
-         APKMAS=1.235
+         APKMAS=0.9382720813              ! proton
       ELSEIF  (ABS(IDENT).EQ.311) THEN
-         APKMAS=AMPIZ
+         APKMAS=AMKZ                      ! K0
       ELSEIF  (ABS(IDENT).EQ.111) THEN
-         APKMAS=AMPIZ
+         APKMAS=AMPIZ                     ! pi0
+      ELSEIF  (ABS(IDENT).EQ.211) THEN
+         APKMAS=AMPI                      ! pi+-
       ELSEIF  (ABS(IDENT).EQ. 221) THEN
-         APKMAS=0.5488
+         APKMAS=0.5488                    ! eta
+      ELSEIF  (ABS(IDENT).EQ. 321) THEN
+         APKMAS=AMK                       ! K+-
       ELSEIF  (ABS(IDENT).EQ. 310) THEN
-         APKMAS=0.497614
+         APKMAS=AMKZ                      ! K0S
+      ELSEIF  (ABS(IDENT).EQ. 130) THEN
+         APKMAS=AMKZ                      ! K0L
       ELSEIF  (ABS(IDENT).EQ. 313) THEN
-         APKMAS=0.89166
+         APKMAS=QQBRWG(AMKST,GAMKST,XRANGE)! K*0(892)
       ELSEIF  (ABS(IDENT).EQ. 3122) THEN
-         APKMAS=1.15683
+         APKMAS=1.115683                   ! Lambda
+      ELSEIF  (ABS(IDENT).EQ.10211) THEN
+         APKMAS=QQBRWG(1.474,0.265,XRANGE1)     ! a0+(1450)
       ELSEIF  (ABS(IDENT).EQ. 10111) THEN
-         APKMAS=0.98  
-      ELSEIF  (ABS(IDENT).EQ. 10221) THEN
-         APKMAS=0.98
+         APKMAS=QQBRWG(1.474,0.265,XRANGE1)     ! a00(1450) 
+      ELSEIF  (ABS(IDENT).EQ.10213) THEN
+         APKMAS=QQBRWG(1.2295,0.142,XRANGE2)    ! b1+(1235)
+      ELSEIF  (ABS(IDENT).EQ. 20223) THEN
+         APKMAS=QQBRWG(1.2819,0.0227,XRANGE1)   ! f1(1285)
+      ELSEIF  (ABS(IDENT).EQ. 20213) THEN
+         APKMAS=QQBRWG(1.230,0.250,XRANGE2)     ! a1+(1260)
+      ELSEIF  (ABS(IDENT).EQ.9000211) THEN
+         APKMAS=QQBRWG(0.980,0.045,XRANGE25)    ! a0+(980)
+      ELSEIF  (ABS(IDENT).EQ.9000111) THEN
+         APKMAS=QQBRWG(0.980,0.045,XRANGE25)    ! a00(980)
+      ELSEIF  (ABS(IDENT).EQ.9010221) THEN
+         APKMAS=QQBRWG(0.9856,0.0342,XRANGE)    ! f00(980)
+      ELSEIF  (ABS(IDENT).EQ.0) THEN 
+         APKMAS=0
       ELSE
         PRINT *, 'STOP IN APKMAS, WRONG IDENT=',IDENT
         STOP
@@ -611,87 +739,100 @@ C
       IDENT=ID*ISGN
 
       IF      (IDENT.EQ. 1) THEN
-        IPKDEF=-211
+        IPKDEF=-211       ! pi-
       ELSEIF  (IDENT.EQ.-1) THEN
-        IPKDEF= 211
+        IPKDEF= 211       ! pi+
       ELSEIF  (IDENT.EQ. 2) THEN
-        IPKDEF=111
+        IPKDEF=111        ! pi0
       ELSEIF  (IDENT.EQ.-2) THEN
-        IPKDEF=111
+        IPKDEF=111        ! pi0
       ELSEIF  (IDENT.EQ. 3) THEN
-        IPKDEF=-321
+        IPKDEF=-321       ! K-
       ELSEIF  (IDENT.EQ.-3) THEN
-        IPKDEF= 321
+        IPKDEF= 321       ! K+
         
       ELSEIF  (IDENT.EQ. 4) THEN
 *
 * K0 --> K0_LONG (IS 130) / K0_SHORT (IS 310) = 1/1
         CALL KKMC_RANMAR(XIO,1)
         IF (XIO(1).GT.BRK0) THEN
-          IPKDEF= 130
+          IPKDEF= 130     ! K0L
         ELSE
-          IPKDEF= 310
+          IPKDEF= 310     ! K0S
         ENDIF
       ELSEIF  (IDENT.EQ.-4) THEN
 *
 * K0B--> K0_LONG (IS 130) / K0_SHORT (IS 310) = 1/1
         CALL KKMC_RANMAR(XIO,1)
         IF (XIO(1).GT.BRK0B) THEN
-          IPKDEF= 130
+          IPKDEF= 130     ! K0L
         ELSE
-          IPKDEF= 310
+          IPKDEF= 310     ! K0S
         ENDIF
       ELSEIF  (IDENT.EQ. 8) THEN
-        IPKDEF= 22
+        IPKDEF= 22        ! gamma
       ELSEIF  (IDENT.EQ.-8) THEN
-        IPKDEF= 22
+        IPKDEF= 22        ! gamma
       ELSEIF  (IDENT.EQ. 9) THEN
-        IPKDEF= 221
+        IPKDEF= 221       ! eta
       ELSEIF  (IDENT.EQ.-9) THEN
-        IPKDEF= 221
+        IPKDEF= 221       ! eta
       ELSEIF  (ABS(IDENT).EQ.13) THEN
-        IPKDEF=IDENT
+        IPKDEF=IDENT      ! 13:mu-, -13:mu+
       ELSEIF  (ABS(IDENT).EQ.11) THEN
-        IPKDEF=IDENT 
+        IPKDEF=IDENT      ! 11:e-,  -11:e+
       ELSEIF  (ABS(IDENT).EQ.12) THEN
-        IPKDEF=IDENT
+        IPKDEF=IDENT      ! 12:nu_e -12:anti-nu_e
       ELSEIF  (ABS(IDENT).EQ.14) THEN
-        IPKDEF=IDENT 
+        IPKDEF=IDENT      ! 14:nu_mu -14:anti-nu_mu
       ELSEIF  (ABS(IDENT).EQ.223) THEN
-        IPKDEF=ABS(IDENT)
+        IPKDEF=ABS(IDENT) ! omega
       ELSEIF  (ABS(IDENT).EQ.333) THEN
-        IPKDEF=ABS(IDENT)
+        IPKDEF=ABS(IDENT) !phi
       ELSEIF  (ABS(IDENT).EQ.113) THEN
-        IPKDEF=ABS(IDENT)
+        IPKDEF=ABS(IDENT) ! rho0
+      ELSEIF  (ABS(IDENT).EQ.213) THEN
+        IPKDEF=IDENT      ! 213:rho+ -213:rho-
        ELSEIF  (ABS(IDENT).EQ.331) THEN
-        IPKDEF=ABS(IDENT)
+        IPKDEF=ABS(IDENT) ! eta(prime)
       ELSEIF  ((IDENT).EQ.22) THEN
-        IPKDEF=IDENT
+        IPKDEF=IDENT      ! gamma
       ELSEIF  (ABS(IDENT).EQ.2212) THEN
-        IPKDEF=IDENT
-      ELSEIF  (ABS(IDENT).EQ.10211) THEN
-        IPKDEF=IDENT
-      ELSEIF  (ABS(IDENT).EQ.10213) THEN
-        IPKDEF=IDENT
+        IPKDEF=IDENT      ! 2212:proton -2212:anti-proton
       ELSEIF  (ABS(IDENT).EQ.311) THEN
-         IPKDEF=IDENT
-      ELSEIF  (ABS(IDENT).EQ.311) THEN
-         IPKDEF=IDENT
+         IPKDEF=ABS(IDENT)! K0
+      ELSEIF  (ABS(IDENT).EQ.111) THEN
+         IPKDEF=ABS(IDENT)! pi0
+      ELSEIF  (ABS(IDENT).EQ.211) THEN
+         IPKDEF=IDENT     ! 211:pi+ -211:pi-
       ELSEIF  (ABS(IDENT).EQ.221) THEN
-         IPKDEF=IDENT
+         IPKDEF=ABS(IDENT)! eta
+      ELSEIF  (ABS(IDENT).EQ.321) THEN
+         IPKDEF=IDENT     ! 321:K+ -321:K-
       ELSEIF  (ABS(IDENT).EQ.310) THEN
-         IPKDEF=ABS(IDENT)
+         IPKDEF=ABS(IDENT)!K0S
+      ELSEIF  (ABS(IDENT).EQ.130) THEN
+         IPKDEF=ABS(IDENT)! K0L
       ELSEIF  (ABS(IDENT).EQ.313) THEN
-         IPKDEF=IDENT   
+         IPKDEF=IDENT     ! K*0(892)
       ELSEIF  (ABS(IDENT).EQ.3122) THEN
-         IPKDEF=IDENT   
+         IPKDEF=IDENT     ! Lambda
+      ELSEIF  (ABS(IDENT).EQ.10211) THEN
+        IPKDEF=IDENT      ! 10211:a0+(1450) -10211:a0-(1450)
       ELSEIF  (ABS(IDENT).EQ.10111 ) THEN
-         IPKDEF=ABS(IDENT)   
-      ELSEIF  (ABS(IDENT).EQ.10221 ) THEN
-         IPKDEF=ABS(IDENT)
-
-
-         
+         IPKDEF=ABS(IDENT)! a00(1450) 
+      ELSEIF  (ABS(IDENT).EQ.10213) THEN
+        IPKDEF=IDENT      ! 10213:b1+(1235) -10213:b1-(1235)
+      ELSEIF  (ABS(IDENT).EQ.20223 ) THEN
+         IPKDEF=ABS(IDENT)! f1(1285)
+      ELSEIF  (ABS(IDENT).EQ.20213 ) THEN
+         IPKDEF=IDENT     ! 20213:a1+(1260) -20213:a1-(1260)
+      ELSEIF  (ABS(IDENT).EQ.9000211) THEN
+         IPKDEF=IDENT     ! 9000211:a0+(980) -9000211:a0-(980)
+      ELSEIF  (ABS(IDENT).EQ.9000111) THEN
+         IPKDEF=ABS(IDENT)! a00(980)
+      ELSEIF  (ABS(IDENT).EQ.9010221) THEN
+         IPKDEF=ABS(IDENT)! f00(980)
       ELSE
         PRINT *, 'STOP IN IPKDEF, WRONG IDENT=',IDENT
         STOP
@@ -706,6 +847,7 @@ C CONTENTS
       include '../tauola/TAUDCD_size.inc'
       COMMON / TAUKLE / BRA1,BRK0,BRK0B,BRKS
       REAL*4            BRA1,BRK0,BRK0B,BRKS
+      REAL*8            GAMPRT
       COMMON / TAUBRA / GAMPRT(NBMC),JLIST(NBMC),NCHAN
       IF (KTO.EQ.1) THEN
 C     ==================
@@ -724,4 +866,29 @@ C AJWMOD: Set the BRs for (A1+ -> rho+ pi0) and (K*+ -> K0 pi+)
       ENDIF
 C     =====
       END
-
+      FUNCTION QQBRWG(CEN, FWID, XRANGE)
+C  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+C   Generate exact Breit Wigner distribution with Mean=CEN, FWHM=FWID
+C   between the limits XMIN, XMAX.
+C 
+C Adapted from /afs/cern.ch/lhcb/generator/QQ/qqlhcb/qqlib/qqbrwg.F (SwB Feb 2006)
+C  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      IMPLICIT NONE
+      REAL QQBRWG, CEN, FWID, XRANGE
+      REAL XMIN, XMAX, RRR(1)
+      REAL YMIN, YMAX
+C  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+      XMIN=CEN-XRANGE*FWID
+      XMAX=CEN+XRANGE*FWID
+      IF(FWID .EQ. 0.OR.XRANGE.EQ.0) THEN
+        QQBRWG = CEN
+      ELSE
+        YMIN = ATAN(2.*(XMIN-CEN)/FWID)
+        YMAX = ATAN(2.*(XMAX-CEN)/FWID)
+        CALL KKMC_RANMAR(RRR,1)
+        QQBRWG = CEN + FWID/2. * TAN(RRR(1)*(YMAX-YMIN)+YMIN)
+        IF (QQBRWG.GT.XMAX) QQBRWG=XMAX
+        IF (QQBRWG.LT.XMIN) QQBRWG=XMIN
+      ENDIF
+      RETURN
+      END

@@ -436,8 +436,7 @@ namespace Belle2 {
      */
     void resetConstraintCov();
 
-    ClassDef(TagVertex, 5) /**<
-           5. Renamed variables related to DeltaZ and DeltaT
+    ClassDef(TagVertex, 4) /**<
            4. Add info related to fit tracks, rave weights
            3. Add NDF, Chi2, Chi2IP
            2. Name to contain "Tag"

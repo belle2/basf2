@@ -920,9 +920,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("DeltaTBelle", particleDeltaTBelle,
                       R"DOC([Legacy] :math:`\Delta t` in ps, as it was used in Belle)DOC");
     REGISTER_VARIABLE("mcDeltaTau", particleMCDeltaTau,
-                      R"DOC(Generated proper decay time difference :math:`\Delta t` in ps: :math:`\tau(B_{\rm rec})-\tau(B_{\rm tag})`)DOC");
+                      R"DOC(Generated proper decay time difference :math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("mcDeltaT", particleMCDeltaT,
-                      R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps: :math:`(l(B_{\rm rec}) - l(B_{\rm tag}))/\beta_{\Upsilon(4S)}\gamma_{\Upsilon(4S)}`)DOC");
+                      R"DOC(Generated proper decay time difference (in z-difference approximation) :math:`\Delta t` in ps)DOC");
     REGISTER_VARIABLE("mcDeltaBoost", particleMCDeltaBoost,
                       R"DOC(True difference of decay vertex boost-direction components between signal B-meson :math:`(B_{rec})` and tag B-meson :math:`(B_{tag})`:
 :math:`\Delta l = l(B_{rec}) - l(B_{tag})`)DOC");

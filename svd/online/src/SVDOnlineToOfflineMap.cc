@@ -12,7 +12,6 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-#include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;

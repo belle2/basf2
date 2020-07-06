@@ -16,7 +16,6 @@ namespace Belle2 {
   typedef HepGeom::Point3D<double> Point3D;
 
   class TRGCDCLayer;
-  class TRGCDCSegment;
 
   /** Module for the Track Segment Finder of the CDC trigger.
    *  The CDC wires are organized in track segments with fixed shape.

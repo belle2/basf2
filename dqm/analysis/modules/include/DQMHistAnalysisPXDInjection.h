@@ -48,14 +48,23 @@ namespace Belle2 {
     //! Final Canvas
     TCanvas* m_cInjectionHERPXD = nullptr;
 
+    //! List of PXD sensors
     std::vector<VxdID> m_sensors;
+    //! Canvases per sensor for LER
     std::map <VxdID, TCanvas*>    m_cInjectionLERPXDMod;
+    //! Canvases per sensor for HER
     std::map <VxdID, TCanvas*> m_cInjectionHERPXDMod;
+    //! Histogram per sensor for LER
     std::map <VxdID, TH1F*> m_hInjectionLERPXDMod;
+    //! Histogram per sensor for HER
     std::map <VxdID, TH1F*> m_hInjectionHERPXDMod;
+    //! Canvases per sensor for LER normalized
     std::map <VxdID, TCanvas*> m_cInjectionLERPXDModNorm;
+    //! Canvases per sensor for HER normalized
     std::map <VxdID, TCanvas*> m_cInjectionHERPXDModNorm;
+    //! Histogram per sensor for LER normalized
     std::map <VxdID, TH1F*> m_hInjectionLERPXDModNorm;
+    //! Histogram per sensor for HER normalized
     std::map <VxdID, TH1F*>     m_hInjectionHERPXDModNorm;
 
   };

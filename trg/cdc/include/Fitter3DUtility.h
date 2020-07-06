@@ -7,8 +7,7 @@
 #include <TVector2.h>
 #include <map>
 #include <string>
-#include <functional>
-#include <tuple>
+
 namespace Belle2 {
   class TRGCDCJSignal;
   class TRGCDCJSignalData;

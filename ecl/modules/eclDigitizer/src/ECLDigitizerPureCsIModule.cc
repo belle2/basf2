@@ -28,7 +28,7 @@
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
 
 using namespace std;
 using namespace Belle2;

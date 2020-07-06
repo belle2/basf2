@@ -11,7 +11,6 @@
 
 // from basf2
 #include <framework/core/HistoModule.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 
@@ -19,7 +18,6 @@
 #include <string>
 #include <set>
 #include <map>
-#include <utility>
 
 // ROOT
 #include "TH1F.h"

@@ -15,7 +15,6 @@
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 
-#include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
@@ -49,6 +48,9 @@ SVDSimpleClusterizerModule::SVDSimpleClusterizerModule() : Module(),
            "TrueHit collection name", string(""));
   addParam("MCParticles", m_storeMCParticlesName,
            "MCParticles collection name", string(""));
+  addParam("ShaperDigits", m_storeShaperDigitsName,
+           "SVDShaperDigits collection name",
+           string(""));//NOTE: This collection is not directly accessed in this module, but indirectly accessed through SimpleClusterCandidate to get clustered samples.
 
   // 2. Clustering
   addParam("AdjacentSN", m_cutAdjacent,
@@ -150,7 +152,7 @@ void SVDSimpleClusterizerModule::event()
   }
   //create a dummy cluster just to start
   SimpleClusterCandidate clusterCandidate(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip(),
-                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster, m_timeAlgorithm);
+                                          m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster, m_timeAlgorithm, m_storeShaperDigitsName, m_storeRecoDigitsName);
 
   //loop over the SVDRecoDigits
   int i = 0;
@@ -200,7 +202,8 @@ void SVDSimpleClusterizerModule::event()
 
       //prepare for the next cluster:
       clusterCandidate = SimpleClusterCandidate(thisSensorID, thisSide, m_sizeHeadTail, m_cutSeed, m_cutAdjacent, m_cutCluster,
-                                                m_timeAlgorithm);
+                                                m_timeAlgorithm,
+                                                m_storeShaperDigitsName, m_storeRecoDigitsName);
 
       //start another cluster:
       if (! clusterCandidate.add(thisSensorID, thisSide, aStrip))

@@ -244,7 +244,9 @@ class TrainingData(object):
 
                 nBackground = self.mc_counts[0]['sum'] * channel.preCutConfig.bestCandidateCut
                 inverseSamplingRates = {}
-                if nBackground > Teacher.MaximumNumberOfMVASamples:
+                # For some very pure channels (Jpsi), this sampling can be too aggressive and training fails.
+                # It can therefore be disabled in the preCutConfig.
+                if nBackground > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noBackgroundSampling:
                     inverseSamplingRates[0] = int(nBackground / Teacher.MaximumNumberOfMVASamples) + 1
                 if nSignal > Teacher.MaximumNumberOfMVASamples:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1

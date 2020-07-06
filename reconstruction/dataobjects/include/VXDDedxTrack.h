@@ -16,8 +16,6 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
 
-#include <TVector3.h>
-
 #include <vector>
 
 namespace Belle2 {

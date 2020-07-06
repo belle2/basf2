@@ -11,7 +11,6 @@
 #ifndef FADC_APV_MAPPER_H_
 #define FADC_APV_MAPPER_H_
 
-#include <iostream>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDShaperDigit.h>

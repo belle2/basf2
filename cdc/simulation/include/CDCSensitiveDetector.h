@@ -13,7 +13,12 @@
 #define CDCSensitiveDetector_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+
+#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/WireID.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <vector>
 #include <map>
@@ -237,6 +242,12 @@ namespace Belle2 {
       unsigned short areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire,
                                   const WireID& otherWireId) const;
 
+
+      /** MC particles. */
+      StoreArray<MCParticle> m_MCParticles;
+
+      /** CDC simulation hits. */
+      StoreArray<CDCSimHit> m_CDCSimHits;
 
       /**
        * Magnetic field is on or off.

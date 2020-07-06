@@ -80,6 +80,16 @@ namespace Belle2 {
 
 
   protected:
+
+    /** CDC hits. */
+    StoreArray<CDCHit> m_cdcHits;
+
+    /** CDC raw hits. */
+    StoreArray<CDCRawHit> m_cdcRawHits;
+
+    /** Trigger summary. */
+    StoreObjPtr<TRGSummary> m_trgSummary;
+
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
     TH2F* m_hADC  = nullptr;              /**< Histogram of ADC for all boards (0-299) */

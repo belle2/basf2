@@ -24,12 +24,10 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDEventInfo.h>
-#include <boost/tuple/tuple.hpp>
 #include <fstream>
 #include <sstream>
 #include <regex>
 #include <algorithm>
-#include <numeric>
 #include <deque>
 #include <cmath>
 #include <root/TMath.h>

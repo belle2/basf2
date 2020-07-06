@@ -2,8 +2,6 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <framework/gearbox/Const.h>
-
 #include <Eigen/Dense>
 
 namespace {

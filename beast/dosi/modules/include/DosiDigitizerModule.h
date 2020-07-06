@@ -68,7 +68,7 @@ namespace Belle2 {
 
 
     private:
-      StoreArray<DosiHit> m_dosiHit; /** array for DosiHit */
+      StoreArray<DosiHit> m_dosiHit; /**< array for DosiHit */
 
       /** reads data from DOSI.xml: threshold in MeV, range in MeV, and resolution in % */
       virtual void getXMLData();

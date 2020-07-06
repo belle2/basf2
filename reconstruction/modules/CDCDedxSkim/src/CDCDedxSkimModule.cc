@@ -13,7 +13,6 @@
 #include "framework/datastore/StoreArray.h"
 
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 

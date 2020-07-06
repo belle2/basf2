@@ -11,9 +11,7 @@
 #include <top/dbobjects/TOPNominalTDC.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <math.h>
 #include <iostream>
-#include <TRandom.h>
 
 using namespace std;
 

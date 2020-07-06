@@ -6,9 +6,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/Cosim.h>
 
-#include <memory>
 #include <string>
-#include <cstring>
 #include <vector>
 #include <bitset>
 #include <array>
@@ -16,7 +14,6 @@
 #include <unordered_map>
 
 #include <unistd.h>
-#include <cstdlib>
 #include <cstdio>
 
 namespace Belle2 {

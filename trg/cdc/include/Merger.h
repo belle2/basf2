@@ -14,7 +14,6 @@
 #ifndef TRGCDCMerger_FLAG_
 #define TRGCDCMerger_FLAG_
 
-#include <float.h>
 #include <string>
 #include "trg/trg/Board.h"
 #include "trg/trg/SignalVector.h"

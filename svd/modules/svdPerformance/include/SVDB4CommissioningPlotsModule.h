@@ -12,12 +12,10 @@
 #define SVD_B4COMMISSIONINGPLOTS_H_
 
 #include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
 
 #include <framework/datastore/StoreArray.h>
 
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Track.h>
@@ -28,14 +26,8 @@
 #include <svd/dataobjects/SVDHistograms.h>
 
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
-#include <TH2F.h>
-#include <TDirectory.h>
-#include <TCollection.h>
-#include <TList.h>
-#include <TH3F.h>
 
 // forward declarations
 class TTree;

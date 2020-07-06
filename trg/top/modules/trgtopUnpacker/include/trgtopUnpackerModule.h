@@ -11,19 +11,13 @@
 #ifndef TRGTOPUNPACKER_H
 #define TRGTOPUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
-#include <vector>
 
-#include <framework/core/Module.h>
 #include "rawdata/dataobjects/RawTRG.h"
 #include "trg/top/dataobjects/TRGTOPUnpackerStore.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #define NUMBER_OF_SLOTS 16
 

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <framework/logging/Logger.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
 
 using namespace std;
 void Belle2::ECLWaveformData::print() const

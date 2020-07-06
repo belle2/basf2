@@ -17,6 +17,7 @@ RegisteredSkims = [
     ("10600600", "systematics", "SystematicsEELL"),
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
+    ("11640100", "systematics", "SystematicsPhiGamma"),
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),

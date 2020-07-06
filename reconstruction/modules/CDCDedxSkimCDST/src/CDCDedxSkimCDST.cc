@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxSkimCDST/CDCDedxSkimCDST.h>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+
 #include <framework/datastore/SelectSubset.h>
 
 #include <unordered_set>

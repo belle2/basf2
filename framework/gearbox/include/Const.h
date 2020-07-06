@@ -56,6 +56,13 @@ namespace Belle2 {
     };
 
     /**
+    * Converts Const::EDetector object to string.
+    * @param det Const::EDetector object to be converted to string
+    * @return converted string
+    */
+    static std::string parseDetectors(EDetector det);
+
+    /**
      * The DetectorSet class for sets of detector IDs in the form of EDetector
      * values. Only detectors may be included, not subdetectors.
      */

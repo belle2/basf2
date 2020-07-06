@@ -11,9 +11,6 @@
 #pragma once
 
 
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <mdst/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -26,7 +23,6 @@
 #include <genfit/Exception.h>
 #include <utility>
 #include <math.h>
-#include <TLorentzVector.h>
 
 /** Helper functions for all klid modules to improve readability of the code */
 namespace KlId {

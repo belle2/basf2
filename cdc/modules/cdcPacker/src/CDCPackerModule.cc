@@ -11,8 +11,6 @@
 
 #include <cdc/modules/cdcPacker/CDCPackerModule.h>
 #include <cdc/modules/cdcPacker/CDCChannelData.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/logging/Logger.h>
@@ -66,13 +64,8 @@ void CDCPackerModule::initialize()
   B2INFO("CDCPacker: initialize() Called.");
 
   m_rawCDCs.registerInDataStore(m_rawCDCName);
-  StoreArray<CDCRawHit> storeCDCRawHits(m_cdcRawHitName);
-
-  storeCDCRawHits.registerInDataStore();
-
-  StoreArray<CDCHit> storeDigit(m_cdcHitName);
-
-  storeDigit.registerInDataStore();
+  m_CDCRawHits.registerInDataStore(m_cdcRawHitName);
+  m_CDCHits.registerInDataStore(m_cdcHitName);
 
   loadMap();
 
@@ -113,10 +106,6 @@ int CDCPackerModule::getFEEID(int copper_id, int slot_id)
 
 void CDCPackerModule::event()
 {
-
-  // Create Data objects.
-  StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
-  StoreArray<CDCHit> cdcHits(m_cdcHitName);
   //  std::vector<int> eWire_nhit(36882, 0);
 
   int tot_chdata_bytes[302];
@@ -127,7 +116,7 @@ void CDCPackerModule::event()
   std::vector<CDCChannelData> chData;
   chData.clear();
 
-  for (const auto& hit : cdcHits) {
+  for (const auto& hit : m_CDCHits) {
     int eWire = (int)(hit.getID());
     int sly = eWire / 4096;
     int ily = (eWire % 4096) / 512;

@@ -11,10 +11,8 @@
 #include "svd/modules/svdDQM/SVDDQMExpressRecoModule.h"
 
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>

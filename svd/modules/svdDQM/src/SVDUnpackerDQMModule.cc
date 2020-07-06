@@ -11,23 +11,17 @@
 #include "svd/modules/svdDQM/SVDUnpackerDQMModule.h"
 #include <svd/online/SVDOnlineToOfflineMap.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
-#include <vxd/geometry/GeoTools.h>
+#include <TDirectory.h>
+#include <TLine.h>
+#include <TStyle.h>
 
 #include <algorithm>
 #include <string>
-#include "TDirectory.h"
-
-#include <TROOT.h>
-#include <TStyle.h>
-#include <TLine.h>
 
 
 using namespace std;

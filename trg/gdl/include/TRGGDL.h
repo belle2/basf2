@@ -17,34 +17,23 @@
 #define TRGGDL_UNDEFINED 999999
 
 #include <fstream>
-#include <iostream>
 #include <vector>
 #include "trg/trg/Clock.h"
 #include "trg/trg/SignalVector.h"
 #include "trg/trg/SignalBundle.h"
 
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <trg/grl/dataobjects/TRGGRLInfo.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
 #include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
-#include <mdst/dataobjects/TRGSummary.h>
 
 #include <TH1I.h>
 
-namespace HepGeom {
-  template <class T> class Point3D;
-}
-
 namespace Belle2 {
 
-  class TRGTime;
   class TRGClock;
   class TRGLink;
-  class TRGGDL;
 
 ///  The instance of TRGGDL is a singleton. 'TRGGDL::getTRGGDL()'
 ///  gives you a pointer to access the TRGGDL. Geometrical information

@@ -7,17 +7,23 @@ Test the klm tools.
 
 import os
 import glob
+
+import basf2 as b2
 import b2test_utils as b2u
+import validation_gt as vgt
 
 if __name__ == "__main__":
 
     # Test b2klm-create-dqm (it also tests b2klm-mask-dqm and b2klm-execute-masking)
     if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
-        B2INFO('Skipping the b2klm-create-dqm test.')
+        b2.B2INFO('Skipping the b2klm-create-dqm test.')
     else:
+        globaltags = ''
+        for globaltag in vgt.get_validation_globaltags():
+            globaltags += f'{globaltag} '
         for input_file in glob.glob(os.environ['BELLE2_VALIDATION_DATA_DIR'] + '/rawdata/*HLT?.*.root'):
             with b2u.clean_working_directory() as test_klm_tools:
-                command = f'b2klm-create-dqm -i {input_file} -n 100 --prepend_gt validation_2020-05-02 online_proc11'
+                command = f'b2klm-create-dqm -i {input_file} -n 100 --prepend_gt {globaltags}'
                 assert(0 == os.system(command))
 
     # Test b2klm-numberToIndex

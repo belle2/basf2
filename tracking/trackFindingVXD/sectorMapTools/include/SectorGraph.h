@@ -14,6 +14,8 @@
 #include <tracking/trackFindingVXD/sectorMapTools/SubGraphID.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SubGraph.h>
 
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -154,6 +156,48 @@ namespace Belle2 {
               ") and nFound (before/after/killed " << nFoundB4 << "/" << nFoundTotal() << "/" << nKilled);
 
       return nKilled;
+    }
+
+    /** returns removed occurances. */
+    unsigned pruneGraphAfterTraining(int secChainLength)
+    {
+      std::ofstream out;
+      unsigned cut = 0;
+
+      //TODO : Remove hardcoded threshold
+      //       don't use output txt file
+      if (secChainLength == 2) {
+        out.open("output2.txt");
+        cut = 2094;
+      } else if (secChainLength == 3) {
+        out.open("output3.txt");
+        cut = 146;
+      }
+      std::cout << "with cut at " << cut << std::endl;
+
+      int killed = 0;
+      std::vector<SubGraph<FilterType>*> deadBranches;
+
+      for (auto& subGraphEntry : m_subgraphs) {
+        SubGraph<FilterType>& graph = subGraphEntry.second;
+        if (graph.getFound() <= cut) {
+          deadBranches.push_back(&graph);
+        }
+      }
+
+      for (auto& graph : deadBranches) {
+        m_subgraphs.erase(graph->getID());
+        killed += 1;
+      }
+
+      for (auto& subGraphEntry : m_subgraphs) {
+        SubGraph<FilterType>& graph = subGraphEntry.second;
+        out << graph.output() << std::endl;
+      }
+
+      out.close();
+      return killed;
+
     }
 
 

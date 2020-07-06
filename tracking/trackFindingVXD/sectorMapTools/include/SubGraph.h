@@ -87,6 +87,12 @@ namespace Belle2 {
       return out;
     }
 
+    std::string output() const
+    {
+      std::string out = m_id.print() + " " + std::to_string(m_found);
+      return out;
+    }
+
     /** returns iD of this graph*/
     const SubGraphID& getID() const { return m_id; }
 

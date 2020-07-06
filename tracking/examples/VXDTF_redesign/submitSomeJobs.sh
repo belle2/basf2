@@ -15,7 +15,7 @@ outdir=./datadir/
 # number of events generated per random seed (at around 6000 events the cpu limit is reached for the s queue)
 nevt=4000
 # the name of the queue at KEK
-queue=s
+queue=l
 
 # loop over all random seeds
 for seed in ${rndseeds[@]} 

@@ -3,6 +3,7 @@
 * Copyright(C) YEAR Belle II Collaboration                        *
 *                                                                 *
 * Test module to get CDC geometry parameters into a .root files   *
+* To run this module use script: cdc/examples/runScanGeo.py       *
 *******************************************************************/
 #include <cdc/modules/cdcGeoScan/ScanCDCGeoModule.h>
 #include <geometry/GeometryManager.h>
@@ -20,8 +21,7 @@ REG_MODULE(ScanCDCGeo);
 
 ScanCDCGeoModule::ScanCDCGeoModule()
 {
-  setDescription("Setup geometry description");
-
+  setDescription("This module fills CDC geometry information in histo/tree format to a root file");
 }
 
 void ScanCDCGeoModule::initialize()

@@ -924,8 +924,8 @@ def get_default_channels(
     BS.addChannel(['D_s*-', 'D_s+'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*+', 'D_s*-'], preCutConfig=tight_precut)
     BS.addChannel(['D_s-', 'D+'], preCutConfig=tight_precut)
-    BS.addChannel(['D_s+', 'D*-'], preCutConfig=tight_precut)
-    BS.addChannel(['D_s*+', 'D-'], preCutConfig=tight_precut)
+    BS.addChannel(['D_s+', 'D*-'])
+    BS.addChannel(['D_s*+', 'D-'])
     BS.addChannel(['D_s*+', 'D*-'])
 
     # D_s
@@ -956,7 +956,7 @@ def get_default_channels(
     BS.addChannel(['D_s*-', 'D*+', 'K_S0'])
     BS.addChannel(['D_s*-', 'pi+', 'pi+', 'pi-'], preCutConfig=tight_precut)
     BS.addChannel(['D_s*-', 'pi+', 'pi0'], preCutConfig=tight_precut)          # rho+
-    BS.addChannel(['D_s*-', 'D0', 'K+', 'pi0'], preCutConfig=tight_precut)     # K*+
+    BS.addChannel(['D_s*-', 'D0', 'K+', 'pi0'])     # K*+
     BS.addChannel(['D_s*-', 'D0', 'K_S0', 'pi+'])   # K*+
     BS.addChannel(['D_s*-', 'D+', 'K+', 'pi-'])     # K*0
     BS.addChannel(['D_s*-', 'D+', 'K_S0', 'pi0'])   # K*0

@@ -43,10 +43,14 @@ namespace Belle2 {
     /**
      * Constructor for BKLM RPC simulation.
      * @param[in] simHit BKLM simulation hit.
-     * @param[in] strips  Strip.
+     * @param[in] strip  Strip.
      */
     KLMDigit(const BKLMSimHit* simHit, int strip);
 
+    /**
+     * Constructor for BKLM RPC simulation.
+     * @param[in] simHit BKLM simulation hit.
+     */
     explicit KLMDigit(const BKLMSimHit* simHit);
 
     /**

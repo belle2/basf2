@@ -30,8 +30,6 @@
 #include <utility> // std::pair
 #include <memory> // std::unique_ptr
 
-#include <iostream>
-
 #include <TChain.h>
 
 namespace Belle2 {
@@ -53,6 +51,9 @@ namespace Belle2 {
 
     /** If true, the full trained graphs will be printed to screen. WARNING: produces a lot of output for full detector-cases! */
     bool m_PARAMprintFullGraphs;
+
+    /** Relative threshold for puning the sector maps (in %). */
+    int m_RelThreshold;
     // ///////////////////////////////////////////////////////////////////////////////// member variables END:
   public:
 
@@ -212,7 +213,11 @@ namespace Belle2 {
        * 125k value-sets max.
        * */
 
-      nKilled += mainGraph.pruneGraphAfterTraining(secChainLength);
+      // Get the absolute threshold (nfound) from the relative threshold
+      int absThreshold = mainGraph.getAbsThreshold(m_RelThreshold);
+
+      // Prune the sector map
+      nKilled += mainGraph.pruneGraphAfterTraining(absThreshold);
 
       B2INFO("processSectorCombinations: nKilled after the training: " << nKilled);
 

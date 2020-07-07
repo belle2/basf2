@@ -87,6 +87,7 @@ namespace Belle2 {
       return out;
     }
 
+    /* Output id & nfound of the graphs */
     std::string output() const
     {
       std::string out = m_id.print() + " " + std::to_string(m_found);

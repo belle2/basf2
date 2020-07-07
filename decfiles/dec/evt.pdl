@@ -670,7 +670,7 @@ add  p Particle  Sigma(1775)0                    3216        1775e-3         120
 add  p Particle  anti-Sigma(1775)0              -3216        1775e-3         120e-3         500e-3     0     5              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Xi baryons
-* Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
+* Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
 add  p Particle  Xi0                             3322     1314.86e-3              0              0     0     1  8.6939813e+01       3322
 add  p Particle  anti-Xi0                       -3322     1314.86e-3              0              0     0     1  8.6939813e+01      -3322
@@ -682,13 +682,13 @@ add  p Particle  Xi*-                            3314        1535e-3         9.9
 add  p Particle  anti-Xi*+                      -3314        1535e-3         9.9e-3          50e-3     3     3              0      -3314
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Omega baryons
-* Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
+* Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
 add  p Particle  Omega-                          3334     1672.45e-3              0              0    -3     3  2.4612961e+01       3334
 add  p Particle  anti-Omega+                    -3334     1672.45e-3              0              0     3     3  2.4612961e+01      -3334
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Charmed baryons
-* Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
+* Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
 add  p Particle  Lambda_c+                       4122     2286.46e-3              0              0     3     1  6.0677993e-02       4122
 add  p Particle  anti-Lambda_c-                 -4122     2286.46e-3              0              0    -3     1  6.0677993e-02      -4122
@@ -732,7 +732,7 @@ add  p Particle  Omega_c*0                       4334      2765.9e-3            
 add  p Particle  anti-Omega_c*0                 -4334      2765.9e-3              0              0     0     3              0      -4334
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Doubly-charmed baryons
-* Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
+* Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Only the Xi_cc++ has been observed. Parameters of other states are the same as in the original EvtGen evt.pdl file.
 add  p Particle  Xi_cc++                         4422      3621.2e-3              0              0     6     1  7.6746869e-02       4422

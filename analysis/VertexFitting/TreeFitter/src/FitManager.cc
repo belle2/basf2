@@ -255,6 +255,14 @@ namespace TreeFitter {
           setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
           setExtraInfo(&cand, "ndf", m_ndf);
         }
+        if (pb.mother()) {
+          int motherPosIndex = pb.mother()->posIndex();
+          if (motherPosIndex >= 0) {
+            setExtraInfo(&cand, "prodVertexX", m_fitparams->getStateVector()(motherPosIndex));
+            setExtraInfo(&cand, "prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
+            setExtraInfo(&cand, "prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+          }
+        }
       }
 
       const int momindex = pb.momIndex();

@@ -11,45 +11,11 @@ def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True
     if(useNN and useCoG):
         print("WARNING! you can't select both NN and CoG for SVD reconstruction. Using the default algorithm (TB-equivalent)")
         add_svd_reconstruction_tb(path, isROIsimulation)
-
-    elif(not useNN and not useCoG):
-        add_svd_reconstruction_tb(path, isROIsimulation)
-
     elif(useNN):
         add_svd_reconstruction_nn(path, isROIsimulation)
 
     elif(useCoG):
         add_svd_reconstruction_CoG(path, isROIsimulation, applyMasking)
-
-
-def add_svd_reconstruction_tb(path, isROIsimulation=False):
-
-    if(isROIsimulation):
-        splitterName = '__ROISVDDigitSplitter'
-        sorterName = '__ROISVDDigitSorter'
-        clusterizerName = '__ROISVDClusterizer'
-        clusterName = '__ROIsvdClusters'
-    else:
-        splitterName = 'SVDDigitSplitter'
-        sorterName = 'SVDDigitSorter'
-        clusterizerName = 'SVDClusterizer'
-        clusterName = ""
-
-    if splitterName not in [e.name() for e in path.modules()]:
-        splitter = register_module('SVDDigitSplitter')
-        splitter.set_name(splitterName)
-        path.add_module(splitter)
-
-    if sorterName not in [e.name() for e in path.modules()]:
-        sorter = register_module('SVDDigitSorter')
-        sorter.set_name(sorterName)
-        path.add_module(sorter)
-
-    if clusterizerName not in [e.name() for e in path.modules()]:
-        clusterizer = register_module('SVDClusterizer')
-        clusterizer.set_name(clusterizerName)
-        clusterizer.param('Clusters', clusterName)
-        path.add_module(clusterizer)
 
 
 def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
@@ -187,11 +153,16 @@ def add_svd_reconstruction_nn(path, isROIsimulation=False, direct=False):
             path.add_module(clusterizer)
 
 
-def add_svd_simulation(path):
+def add_svd_simulation(path, daqMode=2):
 
     svdevtinfoset = register_module("SVDEventInfoSetter")
+    svdevtinfoset.param("daqMode", daqMode)
     path.add_module(svdevtinfoset)
+
     digitizer = register_module('SVDDigitizer')
+    if daqMode == 1:
+        digitizer.param("StartSampling", 58)
+
     path.add_module(digitizer)
 
 
@@ -199,6 +170,29 @@ def add_svd_unpacker(path):
 
     unpacker = register_module('SVDUnpacker')
     path.add_module(unpacker)
+
+
+def add_svd_unpacker_simulate3sampleAcquisitionMode(path, latencyShift=2):
+
+    unpacker = register_module('SVDUnpacker')
+    unpacker.param("SVDEventInfo", "SVDEventInfoOriginal")
+    unpacker.param("svdShaperDigitListName", "SVDShaperDigitsOriginal")
+    path.add_module(unpacker)
+
+    # emulate the 3-sample acquisition
+    emulator = register_module("SVD3SamplesEmulator")
+    emulator.param("SVDEventInfo", "SVDEventInfoOriginal")
+    emulator.param("SVDShaperDigits", "SVDShaperDigitsOriginal")
+    emulator.param("StartingSample", latencyShift)
+    emulator.param("outputSVDEventInfo", "SVDEventInfo")
+    emulator.param("outputSVDShaperDigits", "SVDShaperDigits3SampleAll")
+    path.add_module(emulator)
+
+    # emulate online zero-suppression
+    zsonline = register_module("SVDZeroSuppressionEmulator")
+    zsonline.param("ShaperDigits", "SVDShaperDigits3SampleAll")
+    zsonline.param("ShaperDigitsIN", "SVDShaperDigits")
+    path.add_module(zsonline)
 
 
 def add_svd_packer(path):

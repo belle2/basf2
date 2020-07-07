@@ -50,13 +50,12 @@ namespace Belle2 {
   private:
 
     // Input, output.
-    TFile* m_outputRootFile; /**< root ouput file pointer. */
+    TFile* m_outputRootFile = NULL; /**< root ouput file pointer. */
     std::string m_outputDirName; /**< output directory. */
     std::string m_outputRootFileName; /**< root output file name. */
 
     // Module parameters.
     bool m_useTrackInfo = true; /**< True if using clusters related to tracks. */
-    bool m_is2017TBanalysis = false; /**< True if analyzing 2017 testbeam data. */
 
     // Store arrays.
     StoreArray<SVDCluster> m_svdClusters; /**< SVD clusters store array. */
@@ -80,45 +79,45 @@ namespace Belle2 {
     const Double_t m_maxCharge = m_nBins * m_ADUEquivalent; /**< 1ADU bin width. */
 
     // tracks.
-    TH1F* h_nTracks; /**< Number of tracks. */
-    TH1F* h_TracksPvalue; /**< Tracks P value. */
-    TH1F* h_TracksMomentum; /**< Tracks momentum. */
-    TH1F* h_TracksnSVDhits; /**< Number of SVDhits for a track. */
+    TH1F* h_nTracks = NULL; /**< Number of tracks. */
+    TH1F* h_TracksPvalue = NULL; /**< Tracks P value. */
+    TH1F* h_TracksMomentum = NULL; /**< Tracks momentum. */
+    TH1F* h_TracksnSVDhits = NULL; /**< Number of SVDhits for a track. */
 
     // Cluster charge.
-    TH1F* h_clCharge[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge. */
-    TH2F* h_clChargeVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. track momentum. */
-    TH2F* h_clChargeVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. incident angle. */
-    TH2F* h_clChargeVsSNR[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster charge vs. SVDCluster SNR. */
+    TH1F* h_clCharge[m_nSensorTypes][m_nSides][m_nClSizes] = {NULL}; /**< SVDCluster charge. */
+    TH2F* h_clChargeVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes] = {NULL}; /**< SVDCluster charge vs. track momentum. */
+    TH2F* h_clChargeVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes] = {NULL}; /**< SVDCluster charge vs. incident angle. */
+    TH2F* h_clChargeVsSNR[m_nSensorTypes][m_nSides][m_nClSizes] = {NULL}; /**< SVDCluster charge vs. SVDCluster SNR. */
 
     // Cluster size.
-    TH1F* h_clSize[m_nSensorTypes][m_nSides]; /**< SVDCluster size */
-    TH2F* h_clSizeVsMomentum[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. track momentum. */
-    TH2F* h_clSizeVsIncidentAngle[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. incident angle. */
-    TH2F* h_clSizeVsSNR[m_nSensorTypes][m_nSides]; /**< SVDCluster size vs. SVDCluster SNR. */
+    TH1F* h_clSize[m_nSensorTypes][m_nSides] = {NULL}; /**< SVDCluster size */
+    TH2F* h_clSizeVsMomentum[m_nSensorTypes][m_nSides] = {NULL}; /**< SVDCluster size vs. track momentum. */
+    TH2F* h_clSizeVsIncidentAngle[m_nSensorTypes][m_nSides] = {NULL}; /**< SVDCluster size vs. incident angle. */
+    TH2F* h_clSizeVsSNR[m_nSensorTypes][m_nSides] = {NULL}; /**< SVDCluster size vs. SVDCluster SNR. */
 
     // cluster SNR.
-    TH1F* h_clSNR[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR. */
-    TH2F* h_clSNRVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR vs. track momentum. */
-    TH2F* h_clSNRVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes]; /**< SVDCluster SNR vs. incident angle. */
+    TH1F* h_clSNR[m_nSensorTypes][m_nSides][m_nClSizes] = {NULL}; /**< SVDCluster SNR. */
+    TH2F* h_clSNRVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes] = {NULL}; /**< SVDCluster SNR vs. track momentum. */
+    TH2F* h_clSNRVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes] = {NULL}; /**< SVDCluster SNR vs. incident angle. */
 
     // histogram lists.
     /** List of all histograms concerning track information: nTracks, Track P Value, momentum and SVD hits */
-    TList* m_histoList_Tracks;
+    TList* m_histoList_Tracks = NULL;
 
-    TList* m_histoList_clCharge[m_nSensorTypes]; /**< SVDCluster charge histogram list. */
-    TList* m_histoList_clChargeVsMomentum[m_nSensorTypes]; /**< SVDCluster charge vs. momentum histogram list. */
-    TList* m_histoList_clChargeVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster charge vs. incident angle hist list. */
-    TList* m_histoList_clChargeVsSNR[m_nSensorTypes]; /**< SVDCluster charge vs. SVDCluster SNR histogram list. */
+    TList* m_histoList_clCharge[m_nSensorTypes] = {NULL}; /**< SVDCluster charge histogram list. */
+    TList* m_histoList_clChargeVsMomentum[m_nSensorTypes] = {NULL}; /**< SVDCluster charge vs. momentum histogram list. */
+    TList* m_histoList_clChargeVsIncidentAngle[m_nSensorTypes] = {NULL}; /**< SVDCluster charge vs. incident angle hist list. */
+    TList* m_histoList_clChargeVsSNR[m_nSensorTypes] = {NULL}; /**< SVDCluster charge vs. SVDCluster SNR histogram list. */
 
-    TList* m_histoList_clSize[m_nSensorTypes]; /**< SVDCluster size histogram list. */
-    TList* m_histoList_clSizeVsMomentum[m_nSensorTypes]; /**< SVDCluster size vs. track momentum histogram list. */
-    TList* m_histoList_clSizeVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster size vs. incident angle histogram list. */
-    TList* m_histoList_clSizeVsSNR[m_nSensorTypes]; /**< SVDCluster size vs. SVDCluster SNR histogram list. */
+    TList* m_histoList_clSize[m_nSensorTypes] = {NULL}; /**< SVDCluster size histogram list. */
+    TList* m_histoList_clSizeVsMomentum[m_nSensorTypes] = {NULL}; /**< SVDCluster size vs. track momentum histogram list. */
+    TList* m_histoList_clSizeVsIncidentAngle[m_nSensorTypes] = {NULL}; /**< SVDCluster size vs. incident angle histogram list. */
+    TList* m_histoList_clSizeVsSNR[m_nSensorTypes] = {NULL}; /**< SVDCluster size vs. SVDCluster SNR histogram list. */
 
-    TList* m_histoList_clSNR[m_nSensorTypes]; /**< SVDCluster SNR histogram list. */
-    TList* m_histoList_clSNRVsMomentum[m_nSensorTypes]; /**< SVDCluster SNR vs. track momentum histogram list. */
-    TList* m_histoList_clSNRVsIncidentAngle[m_nSensorTypes]; /**< SVDCluster SNR vs. incident angle histogram list. */
+    TList* m_histoList_clSNR[m_nSensorTypes] = {NULL}; /**< SVDCluster SNR histogram list. */
+    TList* m_histoList_clSNRVsMomentum[m_nSensorTypes] = {NULL}; /**< SVDCluster SNR vs. track momentum histogram list. */
+    TList* m_histoList_clSNRVsIncidentAngle[m_nSensorTypes] = {NULL}; /**< SVDCluster SNR vs. incident angle histogram list. */
 
     // utility methods
     /** 1D histogram creator. */

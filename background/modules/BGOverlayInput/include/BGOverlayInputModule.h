@@ -79,6 +79,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_inputFileNames; /**< list of file names */
     std::string m_extensionName; /**< name added to default branch names */
+    std::string m_BackgroundInfoInstanceName = ""; /**< name BackgroundInfo name */
 
     TChain* m_tree = 0;            /**< tree pointer */
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */

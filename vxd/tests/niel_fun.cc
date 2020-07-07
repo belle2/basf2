@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
-#include <math.h>
 
 using namespace std;
 

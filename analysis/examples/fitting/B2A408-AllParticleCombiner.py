@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #############################################################################
 #
@@ -36,7 +35,7 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import signalSideParticleFilter
 from modularAnalysis import variablesToNtuple
 from modularAnalysis import variableToSignalSideExtraInfo
-from vertex import vertexRave
+from vertex import raveFit
 from vertex import treeFit
 from stdCharged import stdPi, stdK
 from variables import variables
@@ -135,7 +134,7 @@ applyCuts('pi+:fromPV', PVParticlesCuts, path=roe_path)
 
 # combine all particles in the rest of the event and fit them to a common vertex
 combineAllParticles(['pi+:fromPV'], 'vpho:PV', path=roe_path)
-vertexRave('vpho:PV', conf_level=0, constraint='iptube', path=roe_path)
+raveFit('vpho:PV', conf_level=0, constraint='iptube', path=roe_path)
 
 # save information about the calculated PV position
 PVVtxDictionary = {'x': 'PVx',

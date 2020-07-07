@@ -16,17 +16,8 @@
 
 #define TRGGRL_UNDEFINED 999999
 
-#include <fstream>
-#include <iostream>
 #include <vector>
 #include "trg/trg/Clock.h"
-#include "trg/trg/SignalVector.h"
-#include "trg/trg/SignalBundle.h"
-#include "trg/cdc/TRGCDC.h"
-#include "trg/cdc/Track.h"
-#include "trg/cdc/Helix.h"
-#include "trg/ecl/dataobjects/TRGECLCluster.h"
-#include "trg/ecl/TrgEclCluster.h"
 #include "trg/grl/TRGGRLMatch.h"
 #include <TFile.h>
 #include <TTree.h>

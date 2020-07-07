@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG
+from basf2 import B2ERROR, B2FATAL, B2INFO, B2DEBUG, B2WARNING
 from .utils import AlgResult
 from .utils import B2INFO_MULTILINE
 from .utils import runs_overlapping_iov, runs_from_vector
@@ -715,6 +715,8 @@ class SequentialBoundaries(AlgorithmStrategy):
         # Iterate over experiment run lists
         for i_exp, run_list in enumerate(runs_to_execute, start=1):
             B2DEBUG(26, f"Run List for this experiment={run_list}")
+            current_experiment = run_list[0].exp
+            B2INFO(f"Executing over data from experiment {current_experiment}")
             # If 'iov_coverage' was set in the algorithm.params and it is larger (at both ends) than the
             # input data runs IoV, then we also have to set the first payload IoV to encompass the missing beginning
             # of the iov_coverage, and the last payload IoV must cover up to the end of iov_coverage.
@@ -726,7 +728,7 @@ class SequentialBoundaries(AlgorithmStrategy):
                     lowest_exprun = run_list[0]
             # We are calibrating across multiple experiments so we shouldn't start from the middle but from the 0th run
             else:
-                lowest_exprun = ExpRun(run_list[0].exp, 0)
+                lowest_exprun = ExpRun(current_experiment, 0)
 
             # Override the normal value for the highest ExpRun (from data) if iov_coverage was set
             if iov_coverage and i_exp == number_of_experiments:
@@ -734,7 +736,7 @@ class SequentialBoundaries(AlgorithmStrategy):
             # If we have more experiments to execute then we wil be setting the final payload IoV in this experiment
             # to be unbounded
             elif i_exp < number_of_experiments:
-                highest_exprun = ExpRun(run_list[0].exp, -1)
+                highest_exprun = ExpRun(current_experiment, -1)
             # Otherwise just get the values from data
             else:
                 highest_exprun = run_list[-1]
@@ -750,11 +752,42 @@ class SequentialBoundaries(AlgorithmStrategy):
                 # Tell the Runner that we have failed
                 self.send_final_state(self.FAILED)
                 break
-            else:
-                B2INFO(f"Found {len(vec_boundaries)} boundaries.")
+            # Remove any boundaries not from the current experiment (only likely if they were set manually)
+            # We sort just to make everything easier later and just in case something mad happened.
+            run_boundaries = sorted([er for er in runs_from_vector(vec_boundaries) if er.exp == current_experiment])
+            B2INFO((f"Found {len(run_boundaries)} boundaries for this experiment. "
+                    "Checking if we have some data for all boundary IoVs..."))
             # First figure out the run lists to use for each execution (potentially different from the applied IoVs)
             # We use the boundaries and the run_list
-            boundary_iovs_to_run_lists = find_run_lists_from_boundaries(runs_from_vector(vec_boundaries), run_list)
+            boundary_iovs_to_run_lists = find_run_lists_from_boundaries(run_boundaries, run_list)
+            B2DEBUG(26, f"Boundary IoVs before checking data = {boundary_iovs_to_run_lists}")
+            # If there were any boundary IoVs with no run data, just remove them. Otherwise they will execute over all data.
+            boundary_iovs_to_run_lists = {key: value for key, value in boundary_iovs_to_run_lists.items() if value}
+            B2DEBUG(26, f"Boundary IoVs after checking data = {boundary_iovs_to_run_lists}")
+            # If any were removed then we might have gaps between the boundary IoVs. Fix those now by merging IoVs.
+            new_boundary_iovs_to_run_lists = {}
+            previous_boundary_iov = None
+            previous_boundary_run_list = None
+            for boundary_iov, run_list in boundary_iovs_to_run_lists.items():
+                if not previous_boundary_iov:
+                    previous_boundary_iov = boundary_iov
+                    previous_boundary_run_list = run_list
+                    continue
+                # We are definitely dealiing with IoVs from one experiment so we can make assumptions here
+                if previous_boundary_iov.run_high != (boundary_iov.run_low-1):
+                    B2WARNING(("Gap in boundary IoVs found before execution! "
+                               "Will correct it by extending the previous boundary up to the next one."))
+                    B2INFO(f"Original boundary IoV={previous_boundary_iov}")
+                    previous_boundary_iov = IoV(previous_boundary_iov.exp_low, previous_boundary_iov.run_low,
+                                                previous_boundary_iov.exp_high, boundary_iov.run_low-1)
+                    B2INFO(f"New boundary IoV={previous_boundary_iov}")
+                new_boundary_iovs_to_run_lists[previous_boundary_iov] = previous_boundary_run_list
+                previous_boundary_iov = boundary_iov
+                previous_boundary_run_list = run_list
+            else:
+                new_boundary_iovs_to_run_lists[previous_boundary_iov] = previous_boundary_run_list
+            boundary_iovs_to_run_lists = new_boundary_iovs_to_run_lists
+            B2DEBUG(26, f"Boundary IoVs after fixing gaps = {boundary_iovs_to_run_lists}")
             # Actually execute now that we have an IoV list to apply
             success = self.execute_over_boundaries(boundary_iovs_to_run_lists, lowest_exprun, highest_exprun, iteration)
             if not success:
@@ -763,8 +796,10 @@ class SequentialBoundaries(AlgorithmStrategy):
                 break
         # Only executes if we didn't fail any experiment execution
         else:
-            # Print any knowable gaps between result IoVs, if any are foun there is a problem.
+            # Print any knowable gaps between result IoVs, if any are found there is a problem, but not necessarily too bad.
             gaps = self.find_iov_gaps()
+            if gaps:
+                B2WARNING("There were gaps between the output IoV payloads! See the JSON file in the algorithm output directory.")
             # Dump them to a file for logging
             with open(f"{self.algorithm.name}_iov_gaps.json", "w") as f:
                 json.dump(gaps, f)

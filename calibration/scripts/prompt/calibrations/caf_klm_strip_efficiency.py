@@ -107,11 +107,11 @@ def get_calibrations(input_data, **kwargs):
     ########
     # Collect on multiple input data types for one calibration
 
-    from klm_calibration_utils import get_cdst_pre_collector_path
+    from klm_calibration_utils import get_strip_efficiency_pre_collector_path
 
     if input_files_cdst:
         coll_cdst = get_collector('hlt_mumu')
-        rec_path_cdst = get_cdst_pre_collector_path()
+        rec_path_cdst = get_strip_efficiency_pre_collector_path()
 
         collection_cdst = Collection(collector=coll_cdst,
                                      input_files=input_files_cdst,
@@ -124,11 +124,11 @@ def get_calibrations(input_data, **kwargs):
 
     cal_klm.algorithms = [alg]
 
-    from klm_calibration_utils import KLMStripEfficiency
+    from klm_strip_efficiency import KLMStripEfficiency
 
     for algorithm in cal_klm.algorithms:
         algorithm.strategy = KLMStripEfficiency
-        algorithm.params = {'apply_iov': output_iov}
+        algorithm.params = {'iov_coverage': output_iov}
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal_klm]
@@ -144,7 +144,7 @@ def get_collector(input_data_name):
 
     if input_data_name == 'hlt_mumu':
         return basf2.register_module('KLMStripEfficiencyCollector',
-                                     MuonListName='mu+:all',
+                                     MuonListName='mu+:klmStripEfficiency',
                                      MinimalMatchingDigits=14,
                                      MinimalMatchingDigitsOuterLayers=4,
                                      MinimalMomentumNoOuterLayers=4.0)

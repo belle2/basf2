@@ -11,9 +11,10 @@
 #pragma once
 
 #include <TObject.h>
-#include <functional>
+
+#include <cmath>
 #include <vector>
-#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
   /** class to contain the CoG Time calibrations*/
@@ -49,6 +50,7 @@ namespace Belle2 {
         m_implementations.push_back(&SVDCoGCalibrationFunction::pol1TBdep);
         m_implementations.push_back(&SVDCoGCalibrationFunction::pol3TBindep);
         m_implementations.push_back(&SVDCoGCalibrationFunction::pol5TBindep);
+        m_implementations.push_back(&SVDCoGCalibrationFunction::elsTBindep);
         //m_implementations.push_back(
         //  &SVDCoGCalibrationFunction::betterVersion);
       }
@@ -59,6 +61,7 @@ namespace Belle2 {
         m_implementationsErr.push_back(&SVDCoGCalibrationFunction::pol1TBdepErr);
         m_implementationsErr.push_back(&SVDCoGCalibrationFunction::pol3TBindepErr);
         m_implementationsErr.push_back(&SVDCoGCalibrationFunction::pol5TBindepErr);
+        m_implementationsErr.push_back(&SVDCoGCalibrationFunction::elsTBindepErr);
         //m_implementationsErr.push_back(
         //  &SVDCoGCalibrationFunction::betterVersion);
       }
@@ -93,7 +96,7 @@ namespace Belle2 {
 
 
     //SETTERS FOR function ID = 1 (pol3TBindep)
-    /** set the */
+    /** set the pol3 TB independent parameters*/
     void set_pol3parameters(double a, double b, double c, double d)
     {
       m_par[ 0 ] = a;
@@ -103,7 +106,7 @@ namespace Belle2 {
     }
 
     //SETTERS FOR function ID = 2 (pol5TBindep)
-    /** set the */
+    /** set the pol5 TB independent parameters*/
     void set_pol5parameters(double a, double b, double c, double d, double e, double f)
     {
       m_par[ 0 ] = a;
@@ -112,6 +115,16 @@ namespace Belle2 {
       m_par[ 3 ] = d;
       m_par[ 4 ] = e;
       m_par[ 5 ] = f;
+    }
+
+    //SETTERS FOR function ID = 3 (elsTBindep)
+    /** set the parameters for the ELS TB independent function*/
+    void set_elsparameters(double a, double b, double c, double d)
+    {
+      m_par[ 0 ] = a;
+      m_par[ 1 ] = b;
+      m_par[ 2 ] = c;
+      m_par[ 3 ] = d;
     }
 
     /** copy constructor */
@@ -134,6 +147,7 @@ namespace Belle2 {
       return raw_time * m_scale[ tb % nTriggerBins] +
              m_bias[ tb % nTriggerBins ];
     };
+    /** implementation of pol1 TB dep error*/
     double pol1TBdepErr(double , double raw_timeErr, int tb) const
     {
       return raw_timeErr * m_scale[ tb % nTriggerBins];
@@ -149,6 +163,7 @@ namespace Belle2 {
     {
       return m_par[0] + m_par[1] * raw_time + m_par[2] * pow(raw_time, 2) + m_par[3] * pow(raw_time, 3);
     };
+    /** implementation of pol3 TB indep error*/
     double pol3TBindepErr(double raw_time, double raw_timeErr, int) const
     {
       return raw_timeErr * (m_par[1] +  2 * m_par[2] * raw_time + 3 * m_par[3] * pow(raw_time, 2));
@@ -162,10 +177,33 @@ namespace Belle2 {
       return m_par[0] + m_par[1] * raw_time + m_par[2] * pow(raw_time, 2) + m_par[3] * pow(raw_time, 3) + m_par[4] * pow(raw_time,
              4) + m_par[5] * pow(raw_time, 5);
     };
+    /** implementation of pol5 TB indep error*/
     double pol5TBindepErr(double raw_time, double raw_timeErr, int) const
     {
       return raw_timeErr * (m_par[1] +  2 * m_par[2] * raw_time + 3 * m_par[3] * pow(raw_time, 2) + 4 * m_par[4] * pow(raw_time,
                             3) + 5 * m_par[5] * pow(raw_time, 4));
+    };
+
+    /** ID = 3, elsTBindep VERSION: (TB independent)
+    correctedValue = par[0] + t * par[1] + par[2]/(t - par[3])  if t<=par[3]-sqrt(-par[2])/4
+    correctedValue = NaN otherwise
+    */
+    /** els TB indep version implementation*/
+    double elsTBindep(double raw_time, int) const
+    {
+      if (raw_time > m_par[3] - sqrt(-m_par[2]) / 4)
+        return  std::numeric_limits<float>::quiet_NaN();
+
+      return m_par[0] + m_par[1] * raw_time + m_par[2] / (raw_time - m_par[3]);
+    };
+
+    /** implementation of els TB indep error*/
+    double elsTBindepErr(double raw_time, double raw_timeErr, int) const
+    {
+      if (raw_time > m_par[3] - sqrt(-m_par[2]) / 4)
+        return  std::numeric_limits<float>::quiet_NaN();
+
+      return raw_timeErr * (m_par[1] - m_par[2] / pow(raw_time - m_par[3], 2));
     };
 
     /** current function ID */
@@ -178,7 +216,7 @@ namespace Belle2 {
     static std::vector < cogFunctionErr > m_implementationsErr; //! Do not stream this, please throw it in the WC
 
 
-    ClassDef(SVDCoGCalibrationFunction, 5)
+    ClassDef(SVDCoGCalibrationFunction, 6)
   };
 
 }

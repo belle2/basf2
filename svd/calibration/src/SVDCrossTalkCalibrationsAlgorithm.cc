@@ -10,12 +10,15 @@
 
 #include <svd/calibration/SVDCrossTalkCalibrationsAlgorithm.h>
 #include <svd/calibration/SVDCrossTalkStripsCalibrations.h>
+
+#include <TH1F.h>
+
 #include <iostream>
 
 using namespace std;
 using namespace Belle2;
 
-SVDCrossTalkCalibrationsAlgorithm::SVDCrossTalkCalibrationsAlgorithm(const std::string str) :
+SVDCrossTalkCalibrationsAlgorithm::SVDCrossTalkCalibrationsAlgorithm(const std::string& str) :
   CalibrationAlgorithm("SVDCrossTalkCalibrationsCollector")
 {
   setDescription("Calibration algorithm for SVDCrossTalkCalibrations payload");

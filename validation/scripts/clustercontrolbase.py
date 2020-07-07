@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
 import logging
 import os
 import stat
+from abc import abstractmethod
+
+# ours
+from validationscript import Script
 
 
 class ClusterBase:
@@ -57,13 +62,13 @@ class ClusterBase:
         #: The file object to which all cluster messages will be written
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
-    def createDoneFileName(self, job):
+    def createDoneFileName(self, job: Script) -> str:
         """!
         Generate the file name used for the done output
         """
         return f"{self.path}/script_{job.name}.done"
 
-    def prepareSubmission(self, job, options, tag):
+    def prepareSubmission(self, job: Script, options, tag):
         """!
         Setup output folders and create the wrapping shell script. Will return
         the full file name of the generated wrapper script.
@@ -151,8 +156,17 @@ class ClusterBase:
 
         return [donefile_exists, returncode]
 
-    def terminate(self):
-        """!
-        Terminate the jobs and loose all resources
+    def terminate(self, job: Script):
+        """! Terminate running job.
         """
-        self.clusterlog.close()
+        self.logger.error("Script termination not supported.")
+
+    @abstractmethod
+    def adjust_path(self, path):
+        """!
+        This method can be used if path names are different on submission
+        and execution hosts.
+        @param path: The past that needs to be adjusted
+        @return: The adjusted path
+        """
+        pass

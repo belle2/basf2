@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dbobjects/BKLMGeometryPar.h>
 #include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 
 /* Belle 2 headers. */
 #include <framework/database/DBImportObjPtr.h>

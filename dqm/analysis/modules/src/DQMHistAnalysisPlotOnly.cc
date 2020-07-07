@@ -119,12 +119,10 @@ void DQMHistAnalysisPlotOnlyModule::event()
 
 //    if (it.second) {
     it.second->cd();
-    if (hh1) {
-      if (hh1->GetDimension() == 1) {
-        hh1->Draw("hist");
-      } else if (hh1->GetDimension() == 2) {
-        hh1->Draw("colz");
-      }
+    if (hh1->GetDimension() == 1) {
+      hh1->Draw("hist");
+    } else if (hh1->GetDimension() == 2) {
+      hh1->Draw("colz");
     }
     it.second->Modified();
     it.second->Update();

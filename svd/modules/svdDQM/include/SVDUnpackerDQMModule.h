@@ -11,27 +11,18 @@
 #ifndef SVDUnpackerDQMModule_H
 #define SVDUnpackerDQMModule_H
 
-
-#include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 
-#include <svd/dataobjects/SVDHistograms.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
 #include <memory>
 
 #include <framework/core/HistoModule.h>
 #include <string>
 #include <TH2S.h>
-#include <TDirectory.h>
-#include <TCollection.h>
-#include <map>
 
 namespace Belle2 {
 
@@ -79,7 +70,6 @@ namespace Belle2 {
     static std::string m_xmlFileName; /**< xml filename*/
     DBObjPtr<PayloadFile> m_mapping; /**< channel map payload*/
 
-    StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigits Store Arrra*/
     StoreArray<SVDDAQDiagnostic> m_svdDAQDiagnostics; /**<SVDDAQDiagnostic StoreArray*/
     StoreObjPtr<EventMetaData> m_eventMetaData; /**<EvtMetaData StoreObjectPointer*/
 

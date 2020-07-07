@@ -223,7 +223,7 @@ namespace Belle2 {
     int m_firstRun; /**< First run. */
     int m_lastExperiment; /**< Last experiment */
     int m_lastRun; /**< Last run. */
-    ClassDef(CDCDatabaseImporter, 1);  /**< ClassDef */
+
   };
 
 } // Belle2 namespace

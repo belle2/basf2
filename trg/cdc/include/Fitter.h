@@ -19,7 +19,6 @@
 namespace Belle2 {
 
   class TRGCDCTrackBase;
-  class TRGCDCTrack;
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCFitter TRGCDCFitter

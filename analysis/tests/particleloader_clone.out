@@ -32,8 +32,7 @@
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
@@ -41,8 +40,7 @@
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: n0 (anti-n0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:frommc (e-:frommc)
@@ -241,8 +239,7 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: K_L0 (K_L0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: gamma (gamma)
@@ -250,8 +247,7 @@ Total Number of Particles created in the DataStore: 15077401
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: n0 (anti-n0)
-[INFO]    -> MDST source: KLMClusters
-[INFO]    -> MDST source: ECLClusters
+[INFO]    -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)
 [INFO]    -> With cuts  : 
 [INFO] ParticleLoader's Summary of Actions:
 [INFO]  o) creating (anti-)ParticleList with name: e+:frommc (e-:frommc)
@@ -1283,7 +1279,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=12 arrayIndex=50 identifier=1001 daughterIndices:  (none)
  mass=0.4976
- momentum=(nan, nan, nan) p=nan
+ momentum=(-0.01, -0.02, 0.09) p=0.09314
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1302,7 +1298,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=17 arrayIndex=51 identifier=6001 daughterIndices:  (none)
  mass=0.4976
- momentum=(nan, nan, nan) p=nan
+ momentum=(-0.00, -0.02, 0.02) p=0.02535
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1321,7 +1317,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=19 arrayIndex=52 identifier=8001 daughterIndices:  (none)
  mass=0.4976
- momentum=(nan, nan, nan) p=nan
+ momentum=(0.04, 0.09, 0.07) p=0.1225
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1340,7 +1336,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=0 particleType=2 particleTypeUsedForFit=0
  mdstIndex=23 arrayIndex=53 identifier=13001 daughterIndices:  (none)
  mass=0.4976
- momentum=(nan, nan, nan) p=nan
+ momentum=(0.06, -0.12, -0.15) p=0.1977
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1517,7 +1513,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=1 particleType=2 particleTypeUsedForFit=0
  mdstIndex=12 arrayIndex=62 identifier=1001 daughterIndices:  (none)
  mass=0.9396
- momentum=(nan, nan, nan) p=nan
+ momentum=(-0.01, -0.02, 0.09) p=0.09314
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1536,7 +1532,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=1 particleType=2 particleTypeUsedForFit=0
  mdstIndex=17 arrayIndex=63 identifier=6001 daughterIndices:  (none)
  mass=0.9396
- momentum=(nan, nan, nan) p=nan
+ momentum=(-0.00, -0.02, 0.02) p=0.02535
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1555,7 +1551,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=1 particleType=2 particleTypeUsedForFit=0
  mdstIndex=19 arrayIndex=64 identifier=8001 daughterIndices:  (none)
  mass=0.9396
- momentum=(nan, nan, nan) p=nan
+ momentum=(0.04, 0.09, 0.07) p=0.1225
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1574,7 +1570,7 @@ Total Number of Particles created in the DataStore: 15077401
  flavorType=1 particleType=2 particleTypeUsedForFit=0
  mdstIndex=23 arrayIndex=65 identifier=13001 daughterIndices:  (none)
  mass=0.9396
- momentum=(nan, nan, nan) p=nan
+ momentum=(0.06, -0.12, -0.15) p=0.1977
  position=(0.00, 0.00, -0.00)
  p-value of fit (if done): 1
  error matrix (px, py, pz, E, x, y ,z):

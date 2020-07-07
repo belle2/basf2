@@ -337,9 +337,9 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None, data_t
             latest_reco_tracks = svd_cdc_reco_tracks
 
         if is_pxd_used(components):
-            add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                  output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                  filter_cut=0.01)
+            add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
+                                     output_reco_tracks=full_reco_tracks, add_both_directions=True,
+                                     filter_cut=0.01)
 
         if merge_tracks:
             # merge the tracks together

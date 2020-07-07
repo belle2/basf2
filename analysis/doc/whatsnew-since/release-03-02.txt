@@ -121,7 +121,7 @@ Variables
                 variables.addAlias("nPhotonsCDC", "nParticlesInList(gamma:cdc)")
                 variables.addAlias("totalPhotonEECL", "totalEnergyOfParticlesInList(gamma:all)")
 
-* Deprecated :b2:var:`clusterHypothesis` following changes to the ECLCluster storage on mdst. 
+* Deprecated ``clusterHypothesis`` following changes to the ECLCluster storage on mdst. 
   Please use :b2:var:`clusterHasNPhotons` and :b2:var:`clusterHasNeutralHadron`.
 
 * Removed ``ClusterHadronIntensity`` and ``clusterUniqueID``.
@@ -196,7 +196,7 @@ Modules
   ParticleList of composite particles (and only this one) was always added to
   the ROE.
 
-* The module :b2:mod:`VertexFitUpdateDaughters` now always updates
+* The module ``VertexFitUpdateDaughters`` now always updates
   the daughters (as advertised).
 
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # William Sutcliffe 2019
 
@@ -12,8 +11,6 @@ import basf2 as b2
 import modularAnalysis as ma
 
 import b2biiConversion
-import ROOT
-from ROOT import Belle2
 
 
 # Add the necessary database if required by default B2BII should be set up

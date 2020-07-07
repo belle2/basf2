@@ -151,6 +151,13 @@ namespace Belle2 {
         int pdgCode  = mother->getPDGCode();
         string listName = mother->getFullName();
 
+        // special case. if the list is called "all" it may not have a
+        // corresponding cut string this can introduce very dangerous bugs
+        string listLabel = mother->getLabel();
+        if (listLabel == "all")
+          if (cutParameter != "")
+            B2FATAL("You have tried to create a list " << listName << " with cuts! This is *very* error prone, so it is now forbidden.");
+
         if (not isValidPDGCode(pdgCode) and (m_useMCParticles == false and m_useROEs == false))
           B2ERROR("Invalid particle type requested to be loaded. Set a valid decayString module parameter.");
 
@@ -236,9 +243,8 @@ namespace Belle2 {
           }
 
           if (abs(pdgCode) == abs(Const::Klong.getPDGCode()) || abs(pdgCode) == abs(Const::neutron.getPDGCode())) {
-            B2INFO("   -> MDST source: KLMClusters");
+            B2INFO("   -> MDST source: exclusively KLMClusters or exclusively ECLClusters (matching between those not used)");
             m_KLMClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
-            B2INFO("   -> MDST source: ECLClusters");
             m_ECLClusters2Plists.emplace_back(pdgCode, listName, antiListName, isSelfConjugatedParticle, cut);
           }
 
@@ -466,8 +472,8 @@ namespace Belle2 {
         const PIDLikelihood* pidP = (v0Tracks.first)->getRelated<PIDLikelihood>();
         const PIDLikelihood* pidM = (v0Tracks.second)->getRelated<PIDLikelihood>();
 
-        const MCParticle* mcParticleP = (v0Tracks.first)->getRelated<MCParticle>();
-        const MCParticle* mcParticleM = (v0Tracks.second)->getRelated<MCParticle>();
+        const auto& mcParticlePWithWeight = (v0Tracks.first)->getRelatedToWithWeight<MCParticle>();
+        const auto& mcParticleMWithWeight = (v0Tracks.second)->getRelatedToWithWeight<MCParticle>();
 
         // add V0 daughters to the Particle StoreArray
         Particle* newDaugP;
@@ -484,20 +490,20 @@ namespace Belle2 {
         // if there are PIDLikelihoods and MCParticles then also add relations to the particles
         if (pidP)
           newDaugP->addRelationTo(pidP);
-        if (mcParticleP)
-          newDaugP->addRelationTo(mcParticleP);
+        if (mcParticlePWithWeight.first)
+          newDaugP->addRelationTo(mcParticlePWithWeight.first, mcParticlePWithWeight.second);
         newDaugP->addRelationTo(v0TrackFitResults.first);
 
         if (pidM)
           newDaugM->addRelationTo(pidM);
-        if (mcParticleM)
-          newDaugM->addRelationTo(mcParticleM);
+        if (mcParticleMWithWeight.first)
+          newDaugM->addRelationTo(mcParticleMWithWeight.first, mcParticleMWithWeight.second);
         newDaugM->addRelationTo(v0TrackFitResults.second);
 
         // sum the 4-momenta of the daughters and construct a particle object
         TLorentzVector v0Momentum = newDaugP->get4Vector() + newDaugM->get4Vector();
         Particle v0P(v0Momentum, v0Type.getPDGCode(), v0FlavorType,
-                     Particle::EParticleType::c_V0, v0->getArrayIndex());
+                     Particle::EParticleSourceObject::c_V0, v0->getArrayIndex());
 
         // add the daughters of the V0 (in the correct order) and don't update
         // the type to c_Composite (i.e. maintain c_V0)
@@ -599,7 +605,7 @@ namespace Belle2 {
         // create particle and add it to the Particle list.
         Particle particle(track->getArrayIndex(), trackFit, type);
 
-        if (particle.getParticleType() == Particle::c_Track) { // should always hold but...
+        if (particle.getParticleSource() == Particle::c_Track) { // should always hold but...
 
           Particle* newPart = particles.appendNew(particle);
           if (pid)
@@ -701,13 +707,13 @@ namespace Belle2 {
 
         // don't fill a neutron list with clusters that don't have the neutral
         // hadron hypothesis set (ECL people call this N2)
-        if (listPdgCode == Const::neutron.getPDGCode()
+        if (abs(listPdgCode) == Const::neutron.getPDGCode()
             and not cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron))
           continue;
 
         // create particle and check it before adding to list
         Particle particle(cluster, thisType);
-        if (particle.getParticleType() != Particle::c_ECLCluster) {
+        if (particle.getParticleSource() != Particle::c_ECLCluster) {
           B2FATAL("Particle created from ECLCluster does not have ECLCluster type.");
           continue;
         }
@@ -722,7 +728,8 @@ namespace Belle2 {
           // set the relation only if the MCParticle(reconstructed Particle)'s
           // energy contribution to this cluster amounts to at least 30(20)%
           if (relMCParticle)
-            if (weight / newPart->getEnergy() > 0.20 &&  weight / relMCParticle->getEnergy() > 0.30)
+            if (weight / newPart->getECLClusterEnergy() > 0.20
+                && weight / relMCParticle->getEnergy() > 0.30)
               newPart->addRelationTo(relMCParticle, weight);
         }
 
@@ -730,7 +737,6 @@ namespace Belle2 {
         // add particle to list if it passes the selection criteria
         auto& cut = get<c_CutPointer>(eclCluster2Plist);
         StoreObjPtr<ParticleList> plist(listName);
-
         if (cut->check(newPart))
           plist->addParticle(newPart);
 
@@ -785,7 +791,7 @@ namespace Belle2 {
 
         // create particle and check its type before adding it to list
         Particle particle(cluster, pdgCode);
-        if (particle.getParticleType() != Particle::c_KLMCluster) {
+        if (particle.getParticleSource() != Particle::c_KLMCluster) {
           B2FATAL("Particle created from KLMCluster does not have KLMCluster type.");
         }
         Particle* newPart = particles.appendNew(particle);

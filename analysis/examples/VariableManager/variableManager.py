@@ -1,32 +1,30 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-# You can access the Variable Manager directly in Python
-# This is useful either in PythonModules,
-# or if you want to add Aliases for variables (so shorter names)
+# The variableManager provides helpful tools for managing your variables.
 #
-# Also it is important to know that the sometimes variables contain special characters like (,:
-# Therefore we have to escape the variable names before putting them into ROOT files, you can get
-# the branch-names outputted by modules like VariablesToHistogram, VariablesToNtuple and VariablesToTree
-# using the makeROOTCompatible function
-#
-# Thomas Keck
+# Contributors:
+#   Thomas Keck
+#   Kilian Lieret (2020)
 #
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 
+import ROOT
 import variables
 from variables import variables as vm  # shorthand name for the VariableManager instance
 
+# Get information about a variable:
 var = vm.getVariable('M')
 print("Name and Description of Variable M")
 print(var.name)
 print(var.description)
 
+# Also see variablesToExtraInfo.py
 vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
 var = vm.getVariable('sigProb')
 print("Real name of sigProb: ", var.name)
 
+# We can also define collections of variables. For more on this, see usingCollections.py
 vm.addCollection('Kinematics', variables.std_vector('px', 'py', 'pz'))
 var = vm.getCollection('Kinematics')
 print("Collection named Kinematics: ", list(var))
@@ -34,7 +32,10 @@ print("Collection named Kinematics: ", list(var))
 result = vm.evaluate('constant(123)', None)
 print("Result of evaluating the variable 'constant(123)' ", result)
 
-import ROOT
+# the variable names can contain special characters like (,:
+# Therefore we have to escape the variable names before putting them into ROOT files.
+# You can get the branch-names outputted by modules like VariablesToHistogram, VariablesToNtuple and
+# VariablesToTree using the makeROOTCompatible function
 var = "extraInfo(SignalProbability)"
 print("Root Compatible name of ", var, " is ", ROOT.Belle2.makeROOTCompatible(var))
 

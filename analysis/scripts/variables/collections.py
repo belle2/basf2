@@ -14,12 +14,10 @@ cluster = [
     'clusterHasPulseShapeDiscrimination',
     'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
-    'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
     'nECLClusterTrackMatches',
     'clusterZernikeMVA',
     'clusterReg',
-    'weightedAverageECLTime',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
@@ -55,6 +53,12 @@ cluster = [
     'nRejectedECLShowersBWDEndcap',
     'nRejectedECLShowersBarrel',
     'nRejectedECLShowersFWDEndcap',
+]
+
+#: Cluster averages
+cluster_average = [
+    'maxWeightedDistanceFromAverageECLTime',
+    'weightedAverageECLTime'
 ]
 
 #: KLM cluster information
@@ -213,9 +217,11 @@ tag_vertex = [
 
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
-    'MCDeltaT',
-    'TagVmcLBoost',
-    'TagVmcOBoost',
+    'mcDeltaTau',
+    'mcDeltaT',
+    'mcDeltaBoost',
+    'mcTagVLBoost',
+    'mcTagVOBoost',
     'mcLBoost',
     'mcOBoost',
     'mcTagVx',
@@ -282,6 +288,24 @@ event_shape = [
     "aplanarity",
     "thrust",
     "thrustAxisCosTheta",
+]
+
+#: Variables created by event kinematics module
+event_kinematics = [
+    "missingMomentumOfEvent",
+    "missingMomentumOfEvent_Px",
+    "missingMomentumOfEvent_Py",
+    "missingMomentumOfEvent_Pz",
+    "missingMomentumOfEvent_theta",
+    "missingMomentumOfEventCMS",
+    "missingMomentumOfEventCMS_Px",
+    "missingMomentumOfEventCMS_Py",
+    "missingMomentumOfEventCMS_Pz",
+    "missingMomentumOfEventCMS_theta",
+    "missingEnergyOfEventCMS",
+    "missingMass2OfEvent",
+    "visibleEnergyOfEventCMS",
+    "totalPhotonsEnergyOfEvent"
 ]
 
 # now register all the variables declared in this file as collections

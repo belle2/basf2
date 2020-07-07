@@ -8,9 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-
 #include <reconstruction/modules/CDCDedxValidation/CDCDedxValidation.h>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+
+#include <TH2D.h>
 
 using namespace Belle2;
 

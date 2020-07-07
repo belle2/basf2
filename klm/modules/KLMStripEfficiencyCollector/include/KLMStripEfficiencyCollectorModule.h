@@ -11,13 +11,12 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
 #include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
 
 /* Belle 2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
@@ -30,6 +29,7 @@
 
 /* ROOT headers. */
 #include <TFile.h>
+#include <TH1F.h>
 #include <TTree.h>
 
 /* C++ headers. */
@@ -77,11 +77,8 @@ namespace Belle2 {
       /** Extrapolation hit. */
       const ExtHit* hit;
 
-      /** EKLM digit. */
-      const EKLMDigit* eklmDigit;
-
-      /** BKLM digit. */
-      const BKLMDigit* bklmDigit;
+      /** Digit. */
+      const KLMDigit* digit;
 
     };
 
@@ -126,9 +123,9 @@ namespace Belle2 {
 
     /**
      * Add hit to map.
-     * @param[in] hitMap  Hit map.
-     * @param[in] plane   Plane number.
-     * @param[in] hitData Hit data.
+     * @param[in] hitMap      Hit map.
+     * @param[in] planeGlobal Plane global number.
+     * @param[in] hitData     Hit data.
      */
     void addHit(std::map<uint16_t, struct HitData>& hitMap,
                 uint16_t planeGlobal, struct HitData* hitData);
@@ -141,17 +138,20 @@ namespace Belle2 {
 
     /**
      * Collect the data for one muon.
-     * @param[in] muon Muon.
+     * @param[in] muon                 Muon.
+     * @param[in] matchedDigitsInPlane Matched digits.
+     * @param[in] allExtHitsInPlane    Number of ExtHits.
      * @return True if the muon satisfies the selection criteria.
      */
-    bool collectDataTrack(const Particle* muon);
+    bool collectDataTrack(const Particle* muon, TH1F* matchedDigitsInPlane,
+                          TH1F* allExtHitsInPlane);
 
     /** Muon list name. */
     std::string m_MuonListName;
 
     /**
      * Maximal distance in the units of strip number from ExtHit to
-     * matching (B|E)KLMDigit.
+     * matching KLMDigit.
      */
     double m_AllowedDistance1D;
 
@@ -170,11 +170,8 @@ namespace Belle2 {
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EklmDigits;
-
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_BklmDigits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
 
     /** Tracks. */
     StoreArray<Track> m_tracks;
@@ -189,7 +186,7 @@ namespace Belle2 {
     const KLMElementNumbers* m_ElementNumbers;
 
     /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbersEKLM;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
     /** BKLM geometry. */
     const bklm::GeometryPar* m_GeometryBKLM;

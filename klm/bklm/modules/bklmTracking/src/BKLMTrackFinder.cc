@@ -12,7 +12,7 @@
 #include <klm/bklm/modules/bklmTracking/BKLMTrackFinder.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 
 /* Belle 2 headers. */
 #include <framework/logging/Logger.h>
@@ -26,11 +26,10 @@ BKLMTrackFinder::BKLMTrackFinder()
 {
 }
 
-BKLMTrackFinder::BKLMTrackFinder(BKLMTrackFitter* fitter)
+BKLMTrackFinder::BKLMTrackFinder(BKLMTrackFitter* fitter) :
+  m_Fitter(fitter),
+  m_globalFit(false)
 {
-  m_Fitter = fitter;
-  m_globalFit = false;
-  //m_Fitter->setGlobalFit(m_globalFit);
 }
 
 //! Destructor
@@ -46,7 +45,7 @@ void BKLMTrackFinder::registerFitter(BKLMTrackFitter* fitter)
 }
 
 //! find associated hits and do fit
-bool BKLMTrackFinder::filter(std::list<BKLMHit2d*>& seed,
+bool BKLMTrackFinder::filter(const std::list<BKLMHit2d*>& seed,
                              std::list<BKLMHit2d*>& hits,
                              std::list<BKLMHit2d*>& track)
 {

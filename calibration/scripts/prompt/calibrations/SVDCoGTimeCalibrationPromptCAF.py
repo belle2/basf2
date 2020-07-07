@@ -18,18 +18,11 @@ from caf import backends
 from caf import strategies
 from caf.utils import ExpRun, IoV
 
-import reconstruction as reco
+import svd as svd
 import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 
-input_branches = [
-    'SVDShaperDigitsFromTracks',
-    'EventT0',
-    'SVDShaperDigits',
-]
-
 now = datetime.datetime.now()
-# uniqueID = "SVDCoGTimeCalibrations_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_lat=+47.16"
 
 settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
                                expert_username="gdujany",
@@ -61,13 +54,17 @@ def get_calibrations(input_data, **kwargs):
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=True)
 
+    # unpack raw svd data and produce: SVDEventInfo and SVDShaperDigits
+    svd.add_svd_unpacker(path)
+
     # run SVD reconstruction, changing names of StoreArray
-    reco.add_svd_reconstruction(path)
+    svd.add_svd_reconstruction(path)
 
     for moda in path.modules():
         if moda.name() == 'SVDCoGTimeEstimator':
             moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("CalibrationWithEventT0", False)
         if moda.name() == 'SVDSimpleClusterizer':
             moda.param("Clusters", 'SVDClustersFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
@@ -113,7 +110,8 @@ def get_calibrations(input_data, **kwargs):
     # collector setup
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
-    collector.param("SVDRecoDigitsFromTracksName", "SVDRecoDigitsFromTracks")
+    collector.param("SVDEventInfoName", "SVDEventInfo")
+    collector.param("EventT0Name", "EventT0")
     collector.param("granularity", "run")
 
     # algorithm setup
@@ -134,6 +132,6 @@ def get_calibrations(input_data, **kwargs):
     calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in calibration.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
+        algorithm.params = {"iov_coverage": output_iov}
 
     return [calibration]

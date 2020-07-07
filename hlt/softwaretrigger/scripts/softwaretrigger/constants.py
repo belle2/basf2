@@ -36,6 +36,9 @@ class DQMModes(Enum):
     #: If not in HLT, just all all DQM modules
     dont_care = "dont_care"
 
+#: Definition of an EventOfDoom
+DOOM_NCDCHITSMAX = 6000
+DOOM_NSVDSHAPERDIGITSMAX = 70000
 
 #: Always store those objects
 ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTriggerResult", "TRGSummary", "ROIpayload", "SoftwareTriggerVariables"]
@@ -64,4 +67,4 @@ DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "KLM", "TRG"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 #: Location of the database in the online system
-DEFAULT_DB_FILE_LOCATION = "/cvmfs/basf2.daqnet.kek.jp/database/database.txt"
+DEFAULT_DB_FILE_LOCATION = "/cvmfs/basf2.daqnet.kek.jp/conditions"

@@ -15,10 +15,7 @@
 #include <reconstruction/dataobjects/VXDDedxTrack.h>
 #include <vxd/geometry/GeoCache.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <tracking/dataobjects/SVDIntercept.h>
 
-#include <cmath>
 #include <boost/foreach.hpp>
 
 #include <TCanvas.h>
@@ -26,9 +23,6 @@
 #include <TLegend.h>
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TLatex.h>
-#include <TGaxis.h>
-#include <TPaveLabel.h>
 
 
 /* --------------- WARNING ---------------------------------------------- *
@@ -60,7 +54,6 @@ SVDChargeSharingAnalysisModule::SVDChargeSharingAnalysisModule()
   // Parameter definitions
   addParam("outputDirName", m_outputDirName, "Name of the output directory.");
   addParam("outputRootFileName", m_outputRootFileName, "Name of output rootfile.");
-  addParam("is2017TBanalysis", m_is2017TBanalysis, "True if analyzing 2017 TB data.");
   addParam("useTrackInfo", m_useTrackInfo, "True if using clusters related to tracks in the analysis", bool(true));
 }
 
@@ -191,20 +184,12 @@ void SVDChargeSharingAnalysisModule::event()
     h_nTracks->Fill(m_Tracks.getEntries());
     // Obtaining track momentum, P value & SVD hits, track hypothesis made for pions(or electrons in case of TB)
     const TrackFitResult* tfr = NULL;
-    if (m_is2017TBanalysis) {
-      tfr = track.getTrackFitResult(Const::electron);
-    } else {
-      tfr = track.getTrackFitResult(Const::pion);
-    }
+    tfr = track.getTrackFitResult(Const::pion);
+
     if (tfr) {
       h_TracksPvalue->Fill(tfr->getPValue());
       h_TracksMomentum->Fill(tfr->getMomentum().Mag());
       h_TracksnSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
-      if (m_is2017TBanalysis) {
-        if ((tfr->getPValue() < 0.001) || (tfr->getMomentum().Mag() < 1)) {
-          continue;
-        } // cuts on mom & P value for TB
-      } // TB analysis
     } // trf
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
@@ -297,7 +282,6 @@ void SVDChargeSharingAnalysisModule::terminate()
   if (m_outputRootFile != NULL) {
     m_outputRootFile->cd();
     TDirectory* oldDir = gDirectory;
-    TObject* obj;
 
     TDirectory* dir_clCharge = oldDir->mkdir("clCharge");
     TDirectory* dir_clChargeVsSNR = oldDir->mkdir("clChargeVsSNR");
@@ -310,6 +294,8 @@ void SVDChargeSharingAnalysisModule::terminate()
       TDirectory* dir_clChargeSt = dir_clCharge->mkdir(m_nameSensorTypes[i].c_str());
       dir_clChargeSt->cd();
       TIter nextH_clCharge(m_histoList_clCharge[i]);
+      TObject* obj;
+
       while ((obj = dynamic_cast<TH1F*>(nextH_clCharge()))) {
         obj->Write();
       }

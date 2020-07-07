@@ -89,6 +89,7 @@ namespace Belle2 {
     static int getMCErrors(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle = nullptr,
                            const bool honorProperty = true);
 
+
     /** Sets error flags in extra-info (also returns it).
      *
      * Users should use getMCErrors(), which only calculates this information when necessary.
@@ -149,6 +150,35 @@ namespace Belle2 {
      * @returns ORed combination of MCErrorFlags flags for missing particles.
      */
     static int getMissingParticleFlags(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
+
+    /**
+     * Returns flags of given Final State Particle.
+     *
+     * @param particle
+     * @param mcParticle
+     * @return flags of given particle
+     */
+    static int getFlagsOfFSP(const Particle* particle, const MCParticle* mcParticle);
+
+    /**
+     * Returns flags of daughters of given particle.
+     *
+     * @param daughter
+     * @param mcParticle
+     * @return flags of daughters of given particle
+     */
+    static int getFlagsOfDaughters(const Particle* daughter, const MCParticle* mcParticle);
+
+    /**
+     * Returns flags of given daughter which is a brems photon.
+     * Special treatment for brems is done.
+     * @param daughter
+     * @param mcParticle (this is MC mother of daughter)
+     * @param genParts vector of MC (n*grand-)daughters
+     * @return flags of given daughter
+     */
+    static int getFlagsOfBremsPhotonDaughter(const Particle* daughter, const MCParticle* mcParticle,
+                                             const std::vector<const MCParticle*>& genParts);
 
     /**
      * Determines the number of daughter particles which are not neutrinos.

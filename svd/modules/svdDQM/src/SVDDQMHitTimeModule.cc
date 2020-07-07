@@ -11,6 +11,8 @@
 #include <svd/modules/svdDQM/SVDDQMHitTimeModule.h>
 #include <framework/core/HistoModule.h>
 
+#include <TDirectory.h>
+
 using namespace Belle2;
 
 REG_MODULE(SVDDQMHitTime)
@@ -20,6 +22,11 @@ SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("Make data quality monitoring plots for SVD Hit Time for bhabha, mu mu, and hadron samples seeded by different trigger times.(ECL, CDC)");
+  addParam("desynchronizeSVDTime", m_desynchSVDTime,
+           "if TRUE (default): svdTime back in SVD time reference, and eventT0 in eventT0synch", bool(true));
+  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
+           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
+
 }
 
 //---------------------------------
@@ -31,56 +38,73 @@ void SVDDQMHitTimeModule::defineHisto()
 {
 
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("SVDDQMHitTime")->cd();
+  oldDir->mkdir("SVDHitTime")->cd();
 
-  int nBins = 400 ;
-  double minT0 = -80 ;
-  double maxT0 =  120 ;
+  int nBins = 200 ;
+  double minT0 = -60 ;
+  double maxT0 =  140 ;
+  if (m_isSVDTimeCalibrated) {
+    minT0 = -100 ;
+    maxT0 =  100 ;
+  }
+
+  TString refFrame = "in FTSW reference";
+  if (m_desynchSVDTime)
+    refFrame = "in SVD reference";
 
   m_l3v_bhabha_L1_ECLTRG = new TH1F("SVDTime_L3V_bhabha_ECLTRG",
-                                    "SVD L3 V-Side Cluster Time : bhabhas, ECLTRG time",
+                                    Form("SVD L3 V-Side Cluster Time %s: bhabhas, ECLTRG time", refFrame.Data()),
                                     nBins, minT0, maxT0);
+  m_l3v_bhabha_L1_ECLTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_bhabha_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_bhabha_ECLTRG",
                                          "SVD L3 V-Side Cluster Time - EventT0 : bhabhas, ECLTRG time",
                                          nBins, minT0, maxT0);
+  m_l3vEvtT0_bhabha_L1_ECLTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_hadron_L1_ECLTRG = new TH1F("SVDTime_L3V_hadron_ECLTRG",
-                                    "SVD L3 V-Side Cluster Time : hadrons, ECLTRG time",
+                                    Form("SVD L3 V-Side Cluster Time %s: hadrons, ECLTRG time", refFrame.Data()),
                                     nBins, minT0, maxT0);
+  m_l3v_hadron_L1_ECLTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_hadron_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_hadron_ECLTRG",
                                          "SVD L3 V-Side Cluster Time - EventT0 : hadrons, ECLTRG time",
                                          nBins, minT0, maxT0);
-
+  m_l3vEvtT0_hadron_L1_ECLTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_mumu_L1_ECLTRG = new TH1F("SVDTime_L3V_mumu_ECLTRG",
-                                  "SVD L3 V-Side Cluster Time : mumus, ECLTRG time",
+                                  Form("SVD L3 V-Side Cluster Time %s: mumus, ECLTRG time", refFrame.Data()),
                                   nBins, minT0, maxT0);
+  m_l3v_mumu_L1_ECLTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_mumu_L1_ECLTRG = new TH1F("SVDTimeEvtT0_L3V_mumu_ECLTRG",
                                        "SVD L3 V-Side Cluster Time - EventT0 : mumus, ECLTRG time",
                                        nBins, minT0, maxT0);
+  m_l3vEvtT0_mumu_L1_ECLTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_bhabha_L1_CDCTRG = new TH1F("SVDTime_L3V_bhabha_CDCTRG",
-                                    "SVD L3 V-Side Cluster Time : bhabhas, CDCTRG time",
+                                    Form("SVD L3 V-Side Cluster Time %s: bhabhas, CDCTRG time", refFrame.Data()),
                                     nBins, minT0, maxT0);
+  m_l3v_bhabha_L1_CDCTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_bhabha_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_bhabha_CDCTRG",
                                          "SVD L3 V-Side Cluster Time - EventT0 : bhabhas, CDCTRG time",
                                          nBins, minT0, maxT0);
+  m_l3vEvtT0_bhabha_L1_CDCTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_hadron_L1_CDCTRG = new TH1F("SVDTime_L3V_hadron_CDCTRG",
-                                    "SVD L3 V-Side Cluster Time : hadrons, CDCTRG time",
+                                    Form("SVD L3 V-Side Cluster Time %s: hadrons, CDCTRG time", refFrame.Data()),
                                     nBins, minT0, maxT0);
+  m_l3v_hadron_L1_CDCTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_hadron_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_hadron_CDCTRG",
                                          "SVD L3 V-Side Cluster Time - EventT0 : hadrons, CDCTRG time",
                                          nBins, minT0, maxT0);
-
+  m_l3vEvtT0_hadron_L1_CDCTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   m_l3v_mumu_L1_CDCTRG = new TH1F("SVDTime_L3V_mumu_CDCTRG",
-                                  "SVD L3 V-Side Cluster Time : mumus, CDCTRG time",
+                                  Form("SVD L3 V-Side Cluster Time %s: mumus, CDCTRG time", refFrame.Data()),
                                   nBins, minT0, maxT0);
+  m_l3v_mumu_L1_CDCTRG->GetXaxis()->SetTitle("cluster time (ns)");
   m_l3vEvtT0_mumu_L1_CDCTRG = new TH1F("SVDTimeEvtT0_L3V_mumu_CDCTRG",
                                        "SVD L3 V-Side Cluster Time - EventT0 : mumus, CDCTRG time",
                                        nBins, minT0, maxT0);
-
+  m_l3vEvtT0_mumu_L1_CDCTRG->GetXaxis()->SetTitle("cluster time - EventT0 (ns)");
 
   oldDir->cd();
 
@@ -91,19 +115,10 @@ void SVDDQMHitTimeModule::defineHisto()
 void SVDDQMHitTimeModule::initialize()
 {
 
-  if (!m_clusters.isOptional()) {
-    B2WARNING("Missing SVDClusters, SVDDQMHitTime is skipped.");
-    return;
-  }
-
-  if (!m_TrgResult.isOptional()) {
-    B2WARNING("Missing TRGSummary, SVDDQMHitTime is skipped.");
-    return;
-  }
-  m_TrgResult.isRequired();
+  m_TrgResult.isOptional();
   m_eventT0.isOptional();
   m_svdEventInfo.isOptional();
-  m_clusters.isRequired();
+  m_clusters.isOptional();
 
   REG_HISTOGRAM
 
@@ -114,10 +129,6 @@ void SVDDQMHitTimeModule::initialize()
 //---------------------------------
 void SVDDQMHitTimeModule::beginRun()
 {
-  if (!m_clusters.isOptional()) {
-    B2WARNING("Missing SVDClusters, SVDDQMHitTime is skipped.");
-    return;
-  }
 
   m_l3v_bhabha_L1_ECLTRG->Reset();
   m_l3vEvtT0_bhabha_L1_ECLTRG->Reset();
@@ -139,6 +150,22 @@ void SVDDQMHitTimeModule::beginRun()
 //---------------------------------
 void SVDDQMHitTimeModule::event()
 {
+
+  if (!m_TrgResult.isValid()) {
+    B2WARNING("Missing TRGSummary, SVDDQMHitTime is skipped.");
+    return;
+  }
+  if (!m_svdEventInfo.isValid()) {
+    B2WARNING("Missing SVDEventInfo, SVDDQMHitTime is skipped.");
+    return;
+  }
+
+  if (!m_clusters.isValid()) {
+    B2WARNING("Missing SVDClusters, SVDDQMHitTime is skipped.");
+    return;
+  }
+
+
   if (!m_objTrgSummary.isValid()) {
     B2WARNING("TRGSummary object not available but required to indicate which detector provided the L1 trigger time");
     return;
@@ -195,14 +222,13 @@ void SVDDQMHitTimeModule::event()
 
   // get EventT0 if present and valid
   double eventT0 = -1000;
-  if (m_eventT0.isOptional())
-    if (m_eventT0.isValid())
-      if (m_eventT0->hasEventT0())
-        eventT0 = m_eventT0->getEventT0();
+  if (m_eventT0.isValid())
+    if (m_eventT0->hasEventT0())
+      eventT0 = m_eventT0->getEventT0();
 
-
-  // eventT0 is synchronized with SVD reference frame
-  eventT0 = eventT0 - 7.8625 * (3 - m_svdEventInfo->getModeByte().getTriggerBin());
+  // if svd time in SVD time reference is shown, eventT0 is also synchronized with SVD reference frame, firstFrame = 0
+  if (m_desynchSVDTime && m_svdEventInfo.isValid())
+    eventT0 = eventT0 - m_svdEventInfo->getSVD2FTSWTimeShift(0);
 
   //loop on clusters
   for (const SVDCluster& cluster : m_clusters) {
@@ -213,6 +239,10 @@ void SVDDQMHitTimeModule::event()
     if (cluster.isUCluster()) continue;
 
     double time = cluster.getClsTime();
+
+    //if svd time is shown in SVD time reference we need to desynchronize (eventT0 is, instead, synchronized, see a few lines above
+    if (m_desynchSVDTime && m_svdEventInfo.isValid())
+      time = time - m_svdEventInfo->getSVD2FTSWTimeShift(cluster.getFirstFrame());
 
     // Fill the plots that used the ECL trigger as the L1 timing source
     if (Is_ECL_L1TriggerSource) {

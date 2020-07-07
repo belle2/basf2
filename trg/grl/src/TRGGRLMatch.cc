@@ -11,19 +11,10 @@
 // $Log$
 //-----------------------------------------------------------------------------
 
-#include <fstream>
-#include "framework/datastore/StoreArray.h"
-#include "trg/trg/Debug.h"
-#include "trg/trg/Time.h"
-#include "trg/trg/State.h"
 #include "trg/trg/Signal.h"
-#include "trg/trg/Channel.h"
-#include "trg/trg/Utilities.h"
-#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Helix.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
-#include "trg/ecl/TrgEclCluster.h"
 #include "trg/grl/TRGGRLMatch.h"
 #include <math.h>
 

@@ -48,7 +48,7 @@ def setup_basf2_and_db(zmq=False):
     parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count(),
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
-                        help="set path to the local database.txt to use for the ConditionDB",
+                        help="set path to the local payload locations to use for the ConditionDB",
                         default=constants.DEFAULT_DB_FILE_LOCATION)
     parser.add_argument('--central-db-tag', type=str, nargs="*",
                         help="Use the central db with a specific tag (can be applied multiple times, order is relevant)")
@@ -62,17 +62,18 @@ def setup_basf2_and_db(zmq=False):
         for central_tag in args.central_db_tag:
             basf2.conditions.prepend_globaltag(central_tag)
     else:
-        # On HLT, we are still using the legacy database settings (e.g. database.txt) instead of the
-        # sqlite database. So we need to prevent the framework to use the sqlite database
-        # This should be changed as quickly as possible
-        basf2.conditions.metadata_providers = []
-        basf2.conditions.prepend_testing_payloads(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
+        basf2.conditions.globaltags = ["online"]
+        basf2.conditions.metadata_providers = ["file://" + basf2.find_file(args.local_db_path + "/metadata.sqlite")]
+        basf2.conditions.payload_locations = [basf2.find_file(args.local_db_path)]
 
     # Number of processes
     basf2.set_nprocesses(args.number_processes)
 
     # Logging
     basf2.set_log_level(basf2.LogLevel.ERROR)
+    # And because reasons we want every log message to be only one line,
+    # otherwise the LogFilter in daq_slc throws away the other lines
+    basf2.logging.enable_escape_newlines = True
 
     return args
 
@@ -157,17 +158,25 @@ def add_hlt_processing(path,
     # Unpack the event content
     add_unpackers(path, components=unpacker_components)
 
-    # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
-
-    # Add the part of the dqm modules, which should run after every reconstruction
-    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
-
     # Build up two paths: one for all accepted events...
     accept_path = basf2.Path()
 
     # ... and one for all dismissed events
     discard_path = basf2.Path()
+
+    # Run EventsOfDoomBuster savely, i.e. do not discard the events, put sent the event into the metadata path.
+    # This way the EventsOfDoomBuster is run twice (second time in add_reconstruction) but it will not bust any
+    # events, as we filtered here already. Caveat: nCDCHitsMax and nSVDShaperDigitsMax have to be equal in both
+    # modules.
+    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=constants.DOOM_NCDCHITSMAX,
+                           nSVDShaperDigitsMax=constants.DOOM_NSVDSHAPERDIGITSMAX)
+    doom.if_true(discard_path, basf2.AfterConditionPath.CONTINUE)
+
+    # Do the reconstruction needed for the HLT decision
+    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+
+    # Add the part of the dqm modules, which should run after every reconstruction
+    path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
 
     # Only turn on the filtering (by branching the path) if filtering is turned on
     if softwaretrigger_mode == constants.SoftwareTriggerModes.filter:

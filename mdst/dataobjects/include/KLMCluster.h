@@ -193,7 +193,7 @@ namespace Belle2 {
 
     /**
      * Set error of momentum absolute value.
-     * @param[in] errorX Error of momentum absolute value.
+     * @param[in] errorP Error of momentum absolute value.
      */
     void setErrorP(float errorP)
     {m_errorP = errorP;}

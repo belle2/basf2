@@ -155,6 +155,8 @@ namespace Belle2 {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
+          if (not eventExtraInfo.isValid())
+            return std::numeric_limits<float>::quiet_NaN();
           if (eventExtraInfo->hasExtraInfo(extraInfoName))
           {
             return eventExtraInfo->getExtraInfo(extraInfoName);
@@ -447,9 +449,9 @@ namespace Belle2 {
 
         // this only makes sense for particles that are *not* composite and come
         // from some mdst object (tracks, clusters..)
-        Particle::EParticleType particletype = particle->getParticleType();
-        if (particletype == Particle::EParticleType::c_Composite
-        or particletype == Particle::EParticleType::c_Undefined)
+        Particle::EParticleSourceObject particlesource = particle->getParticleSource();
+        if (particlesource == Particle::EParticleSourceObject::c_Composite
+        or particlesource == Particle::EParticleSourceObject::c_Undefined)
           return -1.0;
 
         // it *is* possible to have a particle list from different sources (like
@@ -458,7 +460,7 @@ namespace Belle2 {
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           Particle* iparticle = list->getParticle(i);
-          if (particletype == iparticle->getParticleType())
+          if (particlesource == iparticle->getParticleSource())
             if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
               return 1.0;
         }
@@ -789,10 +791,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -859,10 +857,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 5) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -894,10 +888,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -985,10 +975,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 4) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -1030,10 +1016,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1074,10 +1056,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 4) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -1122,10 +1100,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1163,10 +1137,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1207,10 +1177,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1287,7 +1253,7 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 || arguments.size() == 3) {
 
@@ -1318,11 +1284,52 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function daughterAngleInBetween");
+        B2FATAL("Wrong number of arguments for meta function daughterAngle");
       }
     }
 
-    Manager::FunctionPtr mcDaughterAngleInBetween(const std::vector<std::string>& arguments)
+    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+          if (!particle)
+            return std::numeric_limits<double>::quiet_NaN();
+
+          unsigned daughterIndex, grandDaughterIndex;
+          try {
+            daughterIndex = Belle2::convertString<int>(arguments[0]);
+            grandDaughterIndex = Belle2::convertString<int>(arguments[1]);
+          } catch (std::invalid_argument&)
+          {
+            B2FATAL("The arguments of grandDaughterDecayAngle have to be integers!");
+          }
+
+          if (daughterIndex >= particle->getNDaughters())
+            return std::numeric_limits<float>::quiet_NaN();
+
+          const Particle* daughter = particle->getDaughter(daughterIndex);
+
+          if (grandDaughterIndex >= daughter->getNDaughters())
+            return std::numeric_limits<float>::quiet_NaN();
+
+          TVector3  boost = - (daughter->get4Vector().BoostVector());
+
+          TLorentzVector motherMomentum = - particle->get4Vector();
+          motherMomentum.Boost(boost);
+
+          TLorentzVector grandDaughterMomentum = daughter->getDaughter(grandDaughterIndex)->get4Vector();
+          grandDaughterMomentum.Boost(boost);
+
+          return motherMomentum.Angle(grandDaughterMomentum.Vect());
+        };
+        return func;
+      } else {
+        B2FATAL("The meta variable grandDaughterDecayAngle needs exactly two integers as arguments!");
+      }
+    }
+
+    Manager::FunctionPtr mcDaughterAngle(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2 || arguments.size() == 3) {
 
@@ -1353,7 +1360,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function mcDaughterAngleInBetween");
+        B2FATAL("Wrong number of arguments for meta function mcDaughterAngle");
       }
     }
 
@@ -1511,6 +1518,44 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr unmask(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() >= 2) {
+        // get the function pointer of variable to be unmasked
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        // get the final mask which summarize all the input masks
+        int finalMask = 0;
+        for (size_t i = 1; i < arguments.size(); ++i) {
+          try {
+            finalMask |= Belle2::convertString<int>(arguments[i]);
+          } catch (std::invalid_argument&) {
+            B2FATAL("The input flags to meta function unmask() should be integer!");
+            return nullptr;
+          }
+        }
+
+        // unmask the variable
+        auto func = [var, finalMask](const Particle * particle) -> double {
+          int value = int(var->function(particle));
+
+          // judge if the value is nan before unmasking
+          if (std::isnan(value))
+            return std::numeric_limits<double>::quiet_NaN();
+
+          // apply the final mask
+          value &= (~finalMask);
+
+          return value;
+        };
+        return func;
+
+      } else {
+        B2FATAL("Meta function unmask needs at least two arguments!");
+      }
+    }
+
+
     Manager::FunctionPtr conditionalVariableSelector(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
@@ -1518,7 +1563,6 @@ namespace Belle2 {
         std::string cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
-        // cppcheck-suppress unreadVariable ; cppcheck has problems with lambda capture
         const Variable::Manager::Var* variableIfTrue = Manager::Instance().getVariable(arguments[1]);
         const Variable::Manager::Var* variableIfFalse = Manager::Instance().getVariable(arguments[2]);
 
@@ -1641,7 +1685,7 @@ namespace Belle2 {
         auto func = [var](const Particle * particle) -> double { return std::cos(var->function(particle)); };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function sin");
+        B2FATAL("Wrong number of arguments for meta function cos");
       }
     }
 
@@ -1796,10 +1840,6 @@ namespace Belle2 {
         std::string rankedVariableName = arguments[1];
         std::string returnVariableName = arguments[2];
         std::string extraInfoName = rankedVariableName + "_rank";
-        // 'rank' is correctly scoped, but cppcheck support the lambda
-        // function syntax and throws a (wrong) variableScope error
-
-        // cppcheck-suppress variableScope
         int rank = 1;
         try {
           rank = Belle2::convertString<int>(arguments[3]);
@@ -1878,11 +1918,6 @@ namespace Belle2 {
         }
 
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
-        // cppcheck has problems understanding lambda function syntax and throws
-        // a warning here about cut being unread. but it is read in the if
-        // statements so suppress the false positive
-        //
-        // cppcheck-suppress unreadVariable
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
@@ -2455,6 +2490,36 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr maxOpeningAngleInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxOpeningAngleInList");
+          int nParticles = listOfParticles->getListSize();
+          // return NaN if number of particles is less than 2
+          if (nParticles < 2) return std::numeric_limits<double>::quiet_NaN();
+
+          const auto& frame = ReferenceFrame::GetCurrent();
+          double maxOpeningAngle = -1;
+          for (int i = 0; i < nParticles; i++)
+          {
+            TVector3 v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
+            for (int j = i + 1; j < nParticles; j++) {
+              TVector3 v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
+              const double angle = v1.Angle(v2);
+              if (angle > maxOpeningAngle) maxOpeningAngle = angle;
+            }
+          }
+          return maxOpeningAngle;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function maxOpeningAngleInList");
+      }
+    }
 
     Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments)
     {
@@ -2698,10 +2763,10 @@ arguments. Operator precedence is taken into account. For example ::
 )DOCSTRING");
     REGISTER_VARIABLE("useRestFrame(variable)", useRestFrame,
                       "Returns the value of the variable using the rest frame of the given particle as current reference frame.\n"
-                      "E.g. useRestFrame(daughter(0, p)) returns the total momentum of the first daughter in its mother's rest-frame");
+                      "E.g. ``useRestFrame(daughter(0, p))`` returns the total momentum of the first daughter in its mother's rest-frame");
     REGISTER_VARIABLE("useCMSFrame(variable)", useCMSFrame,
                       "Returns the value of the variable using the CMS frame as current reference frame.\n"
-                      "E.g. useCMSFrame(E) returns the energy of a particle in the CMS frame.");
+                      "E.g. ``useCMSFrame(E)`` returns the energy of a particle in the CMS frame.");
     REGISTER_VARIABLE("useLabFrame(variable)", useLabFrame, R"DOC(
 Returns the value of ``variable`` in the *lab* frame.
 
@@ -2729,15 +2794,15 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "Returns NaN if particle is a nullptr.");
     REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
                       "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
-                      "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
+                      "E.g. ``varFor(11, p)`` returns the momentum if the particle is an electron or a positron.");
     REGISTER_VARIABLE("varForMCGen(variable)", varForMCGen,
                       "Returns the value of the variable for the given particle if the MC particle related to it is primary, not virtual, and not initial.\n"
                       "If no MC particle is related to the given particle, or the MC particle is not primary, virtual, or initial, NaN will be returned.\n"
-                      "E.g. varForMCGen(PDG) returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
+                      "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.");
     REGISTER_VARIABLE("nParticlesInList(particleListName)", nParticlesInList,
-                      "Returns number of particles in the given particle List.");
+                      "[Eventbased] Returns number of particles in the given particle List.");
     REGISTER_VARIABLE("isInList(particleListName)", isInList,
-                      "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see isDaughterOfList().");
+                      "Returns 1.0 if the particle is in the list provided, 0.0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.");
     REGISTER_VARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList, R"DOC(
@@ -2781,23 +2846,23 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
                       "Returns value of variable for the i-th daughter. E.g.\n"
-                      "  - daughter(0, p) returns the total momentum of the first daughter.\n"
-                      "  - daughter(0, daughter(1, p) returns the total momentum of the second daughter of the first daughter.\n\n"
+                      "  - ``daughter(0, p)`` returns the total momentum of the first daughter.\n"
+                      "  - ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.\n\n"
                       "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
                       "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
                       "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the i-th MC daughter does not exist.\n"
-                      "E.g. mcDaughter(0, PDG) will return the PDG code of the first MC daughter of the matched MC"
+                      "E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC"
                       "particle of the reconstructed particle the function is applied to./n"
-                      "The meta variable can also be nested: mcDaughter(0, mcDaughter(1, PDG)).");
+                      "The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.");
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
                       "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
                       "or if the MC mother does not exist.\n"
-                      "E.g. mcMother(PDG) will return the PDG code of the MC mother of the matched MC"
+                      "E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC"
                       "particle of the reconstructed particle the function is applied to.\n"
-                      "The meta variable can also be nested: mcMother(mcMother(PDG)).");
+                      "The meta variable can also be nested: ``mcMother(mcMother(PDG))``.");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
@@ -2819,74 +2884,89 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
 )DOC");
     REGISTER_VARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
-                      "E.g. daughterProductOf(extraInfo(SignalProbability)) returns the product of the SignalProbabilitys of all daughters.");
+                      "E.g. ``daughterProductOf(extraInfo(SignalProbability))`` returns the product of the SignalProbabilitys of all daughters.");
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf,
                       "Returns sum of a variable over all daughters.\n"
-                      "E.g. daughterSumOf(nDaughters) returns the number of grand-daughters.");
+                      "E.g. ``daughterSumOf(nDaughters)`` returns the number of grand-daughters.");
     REGISTER_VARIABLE("daughterLowest(variable)", daughterLowest,
                       "Returns the lowest value of the given variable among all daughters.\n"
-                      "E.g. useCMSFrame(daughterLowest(p)) returns the lowest momentum in CMS frame.");
+                      "E.g. ``useCMSFrame(daughterLowest(p))`` returns the lowest momentum in CMS frame.");
     REGISTER_VARIABLE("daughterHighest(variable)", daughterHighest,
                       "Returns the highest value of the given variable among all daughters.\n"
-                      "E.g. useCMSFrame(daughterHighest(p)) returns the highest momentum in CMS frame.");
+                      "E.g. ``useCMSFrame(daughterHighest(p))`` returns the highest momentum in CMS frame.");
     REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
-                      "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
-                      "(That means that it returns p_j - p_i)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the 'daughterDiffOfPhi' function.");
+                      "E.g. ``useRestFrame(daughterDiffOf(0, 1, p))`` returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
+                      "(That means that it returns :math:`p_j - p_i`)\n"
+                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.");
     REGISTER_VARIABLE("mcDaughterDiffOf(i, j, variable)", mcDaughterDiffOf,
                       "MC matched version of the 'daughterDiffOf' function."); 
     REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
-                      "E.g. useRestFrame(grandDaughterDiffOf(0, 1, p)) returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
-                      "(That means that it returns p_j - p_i)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the 'grandDaughterDiffOfPhi' function.");
+                      "E.g. ``useRestFrame(grandDaughterDiffOf(0, 1, p))`` returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
+                      "(That means that it returns :math:`p_j - p_i`)\n"
+                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.");
     REGISTER_VARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
-                      "Returns the difference in phi between the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
-                      "For a generic variable difference, see daughterDiffOf.");
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
+                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
                       "MC matched version of the 'daughterDiffOfPhi' function."); 
     REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
-                      "Returns the difference in phi between the first daughters of the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n");
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n");
     REGISTER_VARIABLE("daughterDiffOfClusterPhi(i, j)", daughterDiffOfClusterPhi,
-                      "Returns the difference in phi between the ECLClusters of two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
-                      "For a generic variable difference, see daughterDiffOf.");
+                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("grandDaughterDiffOfClusterPhi(i, j)", grandDaughterDiffOfClusterPhi,
-                      "Returns the difference in phi between the ECLClusters of the daughters of the two given daughters.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of the daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n");
     REGISTER_VARIABLE("daughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
-                      "Returns the difference in phi between the two given daughters in the CMS frame.\n"
+                      "Returns the difference in :math:`\\phi` between the two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
-                      "For a generic variable difference, see daughterDiffOf.");
+                      "The function returns :math:`\\phi_j - \\phi_i`.\n"
+                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
-                      "Returns the difference in phi between the ECLClusters of two given daughters in the CMS frame.\n"
+                      "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
-                      "The function returns phi_j - phi_i.\n"
+                      "The function returns :math:`\\phi_j - \\phi_i``.\n"
                       "The function returns NaN if at least one of the daughters is not matched to or not based on an ECLCluster.\n"
-                      "For a generic variable difference, see daughterDiffOf.");
+                      "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
     REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
                       "Returns the normalized difference of a variable between the two given daughters.\n"
-                      "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
+                      "E.g. ``daughterNormDiffOf(0, 1, p)`` returns the normalized momentum difference between first and second daughter in the lab frame.");
     REGISTER_VARIABLE("daughterMotherDiffOf(i, variable)", daughterMotherDiffOf,
                       "Returns the difference of a variable between the given daughter and the mother particle itself.\n"
-                      "E.g. useRestFrame(daughterMotherDiffOf(0, p)) returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
+                      "E.g. ``useRestFrame(daughterMotherDiffOf(0, p))`` returns the momentum difference between the given particle and its first daughter in the rest frame of the mother.");
     REGISTER_VARIABLE("daughterMotherNormDiffOf(i, variable)", daughterMotherNormDiffOf,
                       "Returns the normalized difference of a variable between the given daughter and the mother particle itself.\n"
-                      "E.g. daughterMotherNormDiffOf(1, p) returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
-    REGISTER_VARIABLE("daughterAngleInBetween(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", daughterAngleInBetween, R"DOC(
-Returns the angle in between any pair of particles belonging to the same decay tree. 
-The particles are identified via generalized daughter indexes, which are simply colon-separated lists of daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply identifies the second daughter of the root particle. 
+                      "E.g. ``daughterMotherNormDiffOf(1, p)`` returns the normalized momentum difference between the given particle and its second daughter in the lab frame.");
+    REGISTER_VARIABLE("daughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", daughterAngle, R"DOC(
+                       Returns the angle in between any pair of particles belonging to the same decay tree.
 
+                       The particles are identified via generalized daughter indexes, which are simply colon-separated lists of
+                       daughter indexes, ordered starting from the root particle. For example, ``0:1:3``  identifies the fourth
+                       daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
+                       identifies the second daughter of the root particle.
+
+                       Both two and three generalized indexes can be given to ``daughterAngle``. If two indices are given, the
+                       variable returns the angle between the momenta of the two given particles. If three indices are given, the
+                       variable returns the angle between the momentum of the third particle and a vector which is the sum of the
+                       first two daughter momenta.
+
+                       .. tip::
+                           ``daughterAngle(0, 3)`` will return the angle between the first and fourth daughter.
+                           ``daughterAngle(0, 1, 3)`` will return the angle between the fourth daughter and the sum of the first and
+                           second daughter.
+                           ``daughterAngle(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and
+                           the first daughter of the fourth daughter.
 Both two and three generalized indexes can be given to ``daughterAngleInBetween``. If two indices are given, the variable returns the angle between the momenta of the two given particles. If three indices are given,  the variable returns the angle between the momentum of the third particle and a vector which is the sum of the first two daughter momenta.
 
 .. tip::
@@ -2895,8 +2975,11 @@ Both two and three generalized indexes can be given to ``daughterAngleInBetween`
     ``daughterAngleInBetween(0:0, 3:0)`` will return the angle between the first daughter of the first daughter, and the first daughter of the fourth daughter
 
 )DOC");
-    REGISTER_VARIABLE("mcDaughterAngleInBetween(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngleInBetween, R"DOC(
-mc matched version of the 'daughterAngleInBetwee' function. )DOC");     
+    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"mc matched version of the 'daughterAngle' function.");     
+    REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
+                      "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
+                      "It is calculated with respect to the reverted momentum vector of the particle.\n"
+                      "Two arguments representing the daughter and granddaughter indices have to be provided as arguments.");
     REGISTER_VARIABLE("daughterClusterAngleInBetween(i, j)", daughterClusterAngleInBetween,
                       "Returns function which returns the angle between clusters associated to the two daughters."
                       "If two indices given: returns the angle between the momenta of the clusters associated to the two given daughters."
@@ -2906,11 +2989,11 @@ mc matched version of the 'daughterAngleInBetwee' function. )DOC");
                       "The arguments in the argument vector must be integers corresponding to the ith and jth (and kth) daughters.");
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
                       "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
-                      "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");
+                      "E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \\sqrt{(p_0 + p_1 + p_2)^2}`` of first, second and third daughter.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set by a module first.\n"
-                      "E.g. ``extraInfo(SignalProbability)`` returns the SignalProbability calculated by the MVAExpert module.\n"
+                      "E.g. ``extraInfo(SignalProbability)`` returns the SignalProbability calculated by the ``MVAExpert`` module.\n"
                       "If nothing is set under the given name or if the particle is a nullptr, NaN is returned.\n"
                       "In the latter case please use `eventExtraInfo` if you want to access an EventExtraInfo variable.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
@@ -2937,7 +3020,7 @@ mc matched version of the 'daughterAngleInBetwee' function. )DOC");
                       "E.g. sin(?) returns the sine of the value of the variable.");
     REGISTER_VARIABLE("cos(variable)", cos,
                       "Returns cos value of the given variable.\n"
-                      "E.g. sin(?) returns the cosine of the value of the variable.");
+                      "E.g. cos(?) returns the cosine of the value of the variable.");
     REGISTER_VARIABLE("log10(variable)", log10,
                       "Returns log10 value of the given variable.\n"
                       "E.g. log10(?) returns the log10 of the value of the variable.");
@@ -2950,6 +3033,11 @@ mc matched version of the 'daughterAngleInBetwee' function. )DOC");
     REGISTER_VARIABLE("isInfinity(variable)", isInfinity,
                       "Returns true if variable value evaluates to infinity (determined via std::isinf(double)).\n"
                       "Useful for debugging.");
+    REGISTER_VARIABLE("unmask(variable, flag1, flag2, ...)", unmask,
+                      "unmask(variable, flag1, flag2, ...) or unmask(variable, mask) sets certain bits in the variable to zero.\n"
+                      "For example, if you want to set the second, fourth and fifth bits to zero, you could call \n"
+                      "``unmask(variable, 2, 8, 16)`` or ``unmask(variable, 26)``.\n"
+                      "");
     REGISTER_VARIABLE("conditionalVariableSelector(cut, variableIfTrue, variableIfFalse)", conditionalVariableSelector,
                       "Returns one of the two supplied variables, depending on whether the particle passes the supplied cut.\n"
                       "The first variable is returned if the particle passes the cut, and the second variable is returned otherwise.");
@@ -2959,17 +3047,17 @@ mc matched version of the 'daughterAngleInBetwee' function. )DOC");
     REGISTER_VARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
-                      "around the neutral Pion mass (e.g. 0.130 < M < 0.140). \n"
+                      "around the neutral Pion mass (e.g. ``0.130 < M < 0.140``). \n"
                       "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1");
     REGISTER_VARIABLE("matchedMC(variable)", matchedMC,
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
-                      "E.g. matchedMC(p) returns the total momentum of the related MCParticle.\n"
+                      "E.g. ``matchedMC(p)`` returns the total momentum of the related MCParticle.\n"
                       "Returns NaN if no matched MCParticle exists.");
     REGISTER_VARIABLE("countInList(particleList, cut='')", countInList,
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
-                      "E.g. countInList(e+, isSignal == 1) returns the number of correctly reconstructed electrons in the event.\n"
+                      "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"
                       "The variable is event-based and does not need a valid particle pointer as input.");
     REGISTER_VARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
                       Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
@@ -3021,6 +3109,8 @@ mc matched version of the 'daughterAngleInBetwee' function. )DOC");
                       "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
+    REGISTER_VARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
+                      "Returns maximum opening angle in the given particle List.");
     REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
 Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters. 
 

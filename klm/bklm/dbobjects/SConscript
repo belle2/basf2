@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['$ROOT_LIBS', 'framework', 'klm_dbobjects']
-env['SUBLIB'] = True
-
-Return('env')

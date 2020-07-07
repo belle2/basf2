@@ -89,7 +89,11 @@ run = int(run)
 
 
 class dbImporterModule(Module):
+    '''channel mapping importer module'''
+
     def beginRun(self):
+        '''begin run'''
+
         # call the importer class
         dbImporter = SVDLocalCalibrationsImporter(experiment, run, experiment, -1)
         if args.mapp is not None:

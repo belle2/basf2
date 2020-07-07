@@ -36,4 +36,4 @@
 #define TREEFITTER_RESTORE_WARNINGS
 #endif
 
-#define MAX_MATRIX_SIZE 100
+#define MAX_MATRIX_SIZE -1

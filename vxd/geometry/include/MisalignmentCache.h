@@ -47,7 +47,7 @@ namespace Belle2 {
        * to the list.
        * @param misalignment 3D transform to add to the list of sensor misalignments.
        */
-      void addMisalignment(Belle2::VxdID sensorID, TGeoHMatrix& misalignment)
+      void addMisalignment(Belle2::VxdID sensorID, const TGeoHMatrix& misalignment)
       {
         m_misalignments[sensorID] = misalignment;
         m_isAlive = true;

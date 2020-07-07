@@ -12,8 +12,6 @@
 //---------------------------------------------------------------
 
 #include <trg/cdc/modules/trgcdct3dUnpacker/TRGCDCT3DUnpackerModule.h>
-#include <bitset>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -37,7 +35,7 @@ TRGCDCT3DUnpackerModule::TRGCDCT3DUnpackerModule()
   addParam("T3DMOD", m_T3DMOD,
            "T3D module number",
            0);
-  B2INFO("TRGCDCT3DUnpacker: Constructor done.");
+  B2DEBUG(20, "TRGCDCT3DUnpacker: Constructor done.");
 }
 
 TRGCDCT3DUnpackerModule::~TRGCDCT3DUnpackerModule()

@@ -46,13 +46,13 @@ void StatisticsTimingHLTDQMModule::defineHisto()
     histDir->cd();
   }
 
-  m_meanTimeHistogram = new TH1F("meanTimeHistogram", "Mean Processing Time", m_param_overviewModuleList.size(), 0,
+  m_meanTimeHistogram = new TH1F("meanTimeHistogram", "Mean Processing Time;time/ms", m_param_overviewModuleList.size(), 0,
                                  m_param_overviewModuleList.size());
   m_meanTimeHistogram->SetStats(false);
   m_meanMemoryHistogram = new TH1F("meanMemoryHistogram", "Mean Memory", m_param_overviewModuleList.size(), 0,
                                    m_param_overviewModuleList.size());
   m_meanMemoryHistogram->SetStats(false);
-  m_fullTimeHistogram = new TH1F("fullTimeHistogram", "Full Processing Time", 100, 0, 4000);
+  m_fullTimeHistogram = new TH1F("fullTimeHistogram", "Full Processing Time;time/ms", 100, 0, 4000);
 
   for (unsigned int index = 0; index < m_param_overviewModuleList.size(); index++) {
     const std::string& moduleName = m_param_overviewModuleList[index];

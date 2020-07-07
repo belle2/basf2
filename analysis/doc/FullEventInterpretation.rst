@@ -397,7 +397,7 @@ Speeding up the FEI
 
 The FEI is optimized for maximum speed, but the default configuration is not suitable for all applications. This means, one can save a lot of computing time. Here is a short list of things you can do to speed up the application of the FEI.
 
-*     Use `Fast Fit <https://github.com/thomaskeck/FastFit>`_ instead of KFitter will gain a factor 2.
+*     Use `Fast Fit <https://github.com/thomaskeck/FastFit>`_ instead of KFit will gain a factor 2.
 *     Deactivate the reconstruction unused B lists (by default hadronic, semileptonic, charged and neutral are all created) (see analysis/script/fei/default_channels.py). The get_default_channels function has parameters for this.
 *    If you use the semileptonic tag but don't want to use semileptonic D decays, you can deactivate them. But you have to comment out the corresponding channels in the get_default_channels function, or create your own custom channel configuration.
 *    Add extra cuts before the combination of the B mesons, e.g. the cut on Mbc is by default for hadronic B mesons only >5.2. There is a parameter called B_extra_cut in the get_default_channels function.

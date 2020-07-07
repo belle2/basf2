@@ -51,8 +51,6 @@ void DQMHistAnalysisTrackingModule::beginRun()
 
 void DQMHistAnalysisTrackingModule::event()
 {
-  bool error_flag = false;
-  bool warn_flag = false;
   if (!m_cTrackingError) return;
 
   std::string name = "NumberTrackingErrorFlags";
@@ -64,6 +62,8 @@ void DQMHistAnalysisTrackingModule::event()
   if (hh1) {
     hh1->SetStats(true); // maybe we want the mean?
 
+    bool error_flag = false;
+    bool warn_flag = false;
     double nGood = hh1->GetBinContent(1);
     double nBad = hh1->GetBinContent(2);
     double ratio = (nGood > 1) ? (nBad / nGood) : 1;

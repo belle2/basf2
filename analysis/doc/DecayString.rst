@@ -131,7 +131,6 @@ Arrows
 In addition to the common arrow :code:`'->'`, one can use different types of arrows. If the following verbose arrow is used, :b2:var:`isSignal` will consider missing radiated photons and/or missing intermediate resonances. 
 
 * :code:`'->'` intermediate resonances and radiated photons are ignored
-* :code:`'-->'`, :code:`'=>'` and :code:`'==>'` work same as :code:`'->'`. These three will be deprecated in release-05, please consider to use :code:`'->'`.
 * :code:`'=direct=>'` intermediate resonances are considered but radiated photons are ignored
 * :code:`'=norad=>'` radiated photons are considered but intermediate resonances are ignored
 * :code:`'=exact=>'` exact match of the decay including intermediate resonances and radiated photons

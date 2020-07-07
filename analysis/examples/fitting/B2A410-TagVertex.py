@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -30,7 +29,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from vertex import vertexRave
+from vertex import raveFit
 from modularAnalysis import buildRestOfEvent
 from modularAnalysis import fillParticleList
 from vertex import TagV
@@ -74,7 +73,7 @@ matchMCTruth('B0:jpsiks', path=my_path)
 
 # perform B0 kinematic vertex fit using only the mu+ mu-
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('B0:jpsiks', 0.0, 'B0 -> [J/psi -> ^mu+ ^mu-] K_S0', path=my_path)
+raveFit('B0:jpsiks', 0.0, decay_string='B0 -> [J/psi -> ^mu+ ^mu-] K_S0', path=my_path)
 
 # build the rest of the event associated to the B0
 buildRestOfEvent('B0:jpsiks', path=my_path)

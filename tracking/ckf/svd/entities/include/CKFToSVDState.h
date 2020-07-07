@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Nils Braun                                              *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -47,6 +47,11 @@ namespace Belle2 {
 
     /// Set the related SVD track, if we go along one of them (or a nullptr)
     void setRelatedSVDTrack(const RecoTrack* relatedSVDTrack);
+
+    /// Get the cached data of this state
+    const struct stateCache& getStateCache() const {
+      return m_stateCache;
+    }
 
   private:
     /// Precache the PXDRecoHits for runtime performance reasons.

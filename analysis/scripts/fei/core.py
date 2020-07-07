@@ -244,7 +244,9 @@ class TrainingData(object):
 
                 nBackground = self.mc_counts[0]['sum'] * channel.preCutConfig.bestCandidateCut
                 inverseSamplingRates = {}
-                if nBackground > Teacher.MaximumNumberOfMVASamples:
+                # For some very pure channels (Jpsi), this sampling can be too aggressive and training fails.
+                # It can therefore be disabled in the preCutConfig.
+                if nBackground > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noBackgroundSampling:
                     inverseSamplingRates[0] = int(nBackground / Teacher.MaximumNumberOfMVASamples) + 1
                 if nSignal > Teacher.MaximumNumberOfMVASamples:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1
@@ -362,7 +364,7 @@ class PreReconstruction(object):
                     pvfit.set_name('ParticleVertexFitter_' + channel.name)
                     pvfit.param('listName', channel.name)
                     pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
-                    pvfit.param('vertexFitter', 'kfitter')
+                    pvfit.param('vertexFitter', 'KFit')
                     pvfit.param('fitType', 'vertex')
                     pvfit.set_log_level(basf2.logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
                     path.add_module(pvfit)

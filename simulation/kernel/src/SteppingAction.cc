@@ -52,6 +52,21 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     return;
   }
 
+  //------------------------------
+  // Check for absorbers
+  //------------------------------
+  for (auto& rAbsorber : m_absorbers) {
+    const G4ThreeVector stepPrePos = step->GetPreStepPoint()->GetPosition() / CLHEP::mm * Unit::mm;
+    const G4ThreeVector stepPostPos = step->GetPostStepPoint()->GetPosition() / CLHEP::mm * Unit::mm;
+    if (stepPrePos.perp() < (rAbsorber * Unit::cm) && stepPostPos.perp() > (rAbsorber * Unit::cm)) {
+      //B2WARNING("SteppingAction: Track across absorbers, terminating!\n"
+      //<< "step_no=" << track->GetCurrentStepNumber() << " type=" << track->GetDefinition()->GetParticleName()
+      //<< "\n position=" << G4BestUnit(track->GetPosition(), "Length") << " momentum=" << G4BestUnit(track->GetMomentum(), "Energy") << "\n  PrePos.perp=" << stepPrePos.perp() << ", PostPos.perp=" << stepPostPos.perp() << " cm" );
+      track->SetTrackStatus(fStopAndKill);
+      return;
+    }
+  }
+
   //---------------------------------------
   // Check for very high number of steps.
   //---------------------------------------

@@ -51,13 +51,6 @@ namespace Belle2 {
     /**
      * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
      * Misidentification of charged FSP is allowed.
-     * It will be deprecated in release-05, please consider to use isSignalAcceptWrongFSPs.
-     */
-    double isExtendedSignal(const Particle* part);
-
-    /**
-     * return 1 if Particle is almost correctly reconstructed (SIGNAL), 0 otherwise.
-     * Misidentification of charged FSP is allowed.
      */
     double isSignalAcceptWrongFSPs(const Particle* part);
 
@@ -296,7 +289,7 @@ namespace Belle2 {
     double getCrossingAngle(const Particle*);
 
     /**
-     * retruns the weight of the ECLCluster -> MCParticle relation for the
+     * returns the weight of the ECLCluster -> MCParticle relation for the
      * MCParticle related to the particle provided.
      */
     double particleClusterMatchWeight(const Particle* particle);
@@ -312,7 +305,7 @@ namespace Belle2 {
      * relation with the largest weight. For particles created from ECLClusters
      * (photons) this will be the same as the mcPDG, for electrons or other
      * track based particles, the best mc match for the ECLCluster but might not
-     * correspont to the track's mcmatch (== the particle)
+     * correspond to the track's mcmatch (== the particle)
      */
     double particleClusterBestMCPDGCode(const Particle*);
 

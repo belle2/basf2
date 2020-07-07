@@ -9,7 +9,10 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxElectronCollector/CDCDedxElectronCollectorModule.h>
+
 #include <framework/dataobjects/EventMetaData.h>
+#include <mdst/dataobjects/ECLCluster.h>
+
 #include <TTree.h>
 #include <TH1F.h>
 

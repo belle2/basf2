@@ -71,7 +71,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   path=None, entrySequences=None,
                                   matchType2E9oE25Threshold=-1.1,
                                   enableNisKsFinder=True,
-                                  HadronA=True, HadronB=True):
+                                  HadronA=True, HadronB=True,
+                                  enableRecTrg=False, enableEvtcls=True):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -90,6 +91,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         enableNisKsFinder (bool): Enables to convert nisKsFinder information.
         HadronA (bool): Enables to switch on HadronA skim in B2BIIFixMdst module.
         HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
+        enableRecTrg (bool): Enables to convert RecTrg_summary3 table.
+        enableEvtcls (bool): Enables to convert Evtcls and Evtcls_hadronic tables.
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -152,6 +155,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         convert.param('mcMatchingMode', 'GeneratorLevel')
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
     convert.param("nisKsInfo", enableNisKsFinder)
+    convert.param("RecTrg", enableRecTrg)
+    convert.param("convertEvtcls", enableEvtcls)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

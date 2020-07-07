@@ -11,17 +11,15 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dataobjects/BKLMDigitOutOfRange.h>
-#include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/bklm/BKLMADCThreshold.h>
+#include <klm/dbobjects/eklm/EKLMChannels.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 #include <klm/dbobjects/KLMTimeConversion.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMChannels.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -79,26 +77,34 @@ namespace Belle2 {
   private:
 
     /**
-     * Unpack one EKLM digit.
-     * @param[in] rawData           Data to be unpacked.
-     * @param[in] copper            Copper identifier.
-     * @param[in] hslb              HSLB number.
-     * @param[in] lane              Lane.
-     * @param[in] klmDigitEventInfo KLMDigitEventInfo.
+     * Create KLM digit.
+     * @param[in] raw               Raw data.
+     * @param[in] klmDigitRaw       Raw digit.
+     * @param[in] klmDigitEventInfo Event information.
+     * @param[in] subdetector       Subdetector.
+     * @param[in] section           Section.
+     * @param[in] sector            Sector.
+     * @param[in] layer             Layer.
+     * @param[in] plane             Plane.
+     * @param[in] strip             Strip.
+     * @param[in] lastStrip         Last strip (for multiple-strip hits).
      */
-    void unpackEKLMDigit(const int* rawData, int copper, int hslb,
-                         EKLMDataConcentratorLane* lane,
-                         KLMDigitEventInfo* klmDigitEventInfo);
+    void createDigit(
+      const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
+      KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
+      int sector, int layer, int plane, int strip, int lastStrip);
 
     /**
-     * Unpack one BKLM digit.
+     * Unpack KLM digit.
      * @param[in] rawData           Data to be unpacked.
      * @param[in] copper            Copper identifier.
      * @param[in] hslb              HSLB number.
+     * @param[in] daqSubdetector    Subdetector (as determined from DAQ data).
      * @param[in] klmDigitEventInfo KLMDigitEventInfo.
      */
-    void unpackBKLMDigit(const int* rawData, int copper, int hslb,
-                         KLMDigitEventInfo* klmDigitEventInfo);
+    void unpackKLMDigit(const int* rawData, int copper, int hslb,
+                        int daqSubdetector,
+                        KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
      * To be used to map electronics address to module id.
@@ -119,17 +125,23 @@ namespace Belle2 {
 
     /* Module parameters. */
 
-    /** Name of BKLMDigit store array. */
-    std::string m_outputBKLMDigitsName;
-
-    /** Name of EKLMDigit store array. */
-    std::string m_outputEKLMDigitsName;
+    /** Name of KLMDigit store array. */
+    std::string m_outputKLMDigitsName;
 
     /** Record raw data in dataobject format (for debugging). */
     bool m_WriteDigitRaws;
 
     /** Record wrong hits (for debugging). */
     bool m_WriteWrongHits;
+
+    /** Debug electronics map (record DAQ channel instead of strip). */
+    bool m_DebugElectronicsMap;
+
+    /** Record DAQ channel for BKLM scintillators. */
+    bool m_DAQChannelBKLMScintillators;
+
+    /** Record DAQ channel for specific module. */
+    int m_DAQChannelModule;
 
     /* EKLM parameters. */
 
@@ -147,19 +159,19 @@ namespace Belle2 {
 
     /* BKLM parameters. */
 
-    /** Debug BKLM scintillators. */
-    bool m_DebugBKLMScintillators;
-
     /** The flag to keep the even packages. */
     bool m_keepEvenPackages = false;
 
     /** Load threshold from DataBase (true) or not (false). */
     bool m_loadThresholdFromDB = true;
 
-    /** Threshold for the scintillator NPE .*/
+    /** Threshold for the scintillator NPhotoelectrons .*/
     double m_scintThreshold = 140;
 
     /* Common database objects. */
+
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
     /** Time conversion. */
     DBObjPtr<KLMTimeConversion> m_TimeConversion;
@@ -167,38 +179,32 @@ namespace Belle2 {
     /** Raw data. */
     StoreArray<RawKLM> m_RawKLMs;
 
+    /** Digits. */
+    StoreArray<KLMDigit> m_Digits;
+
     /** Event information. */
     StoreArray<KLMDigitEventInfo> m_DigitEventInfos;
 
-    /* EKLM database objects. */
-
-    /** Electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_eklmElectronicsMap;
-
-    /** Channels. */
-    DBObjPtr<EKLMChannels> m_eklmChannels;
-
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_eklmDigits;
-
-    /* BKLM database objects. */
-
-    /** Electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_bklmElectronicsMap;
-
-    /** ADC offset and threshold read from database. */
-    DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
-
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_bklmDigits;
+    /** Out-of-range digits. */
+    StoreArray<KLMDigit> m_klmDigitsOutOfRange;
 
     /** Raw digits. */
     StoreArray<KLMDigitRaw> m_klmDigitRaws;
 
-    /** Out-of-range digits. */
-    StoreArray<BKLMDigitOutOfRange> m_bklmDigitOutOfRanges;
+    /* EKLM database objects. */
+
+    /** Channels. */
+    DBObjPtr<EKLMChannels> m_eklmChannels;
+
+    /* BKLM database objects. */
+
+    /** ADC offset and threshold read from database. */
+    DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
 
     /* Other common variables. */
+
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** Trigger ctime of the previous event. */
     unsigned int m_triggerCTimeOfPreviousEvent;
@@ -206,21 +212,7 @@ namespace Belle2 {
     /* Other EKLM variables. */
 
     /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_ElementNumbers;
-
-    /* Other BKLM variables. */
-
-    /**
-     * Counter for channels that were rejected due to unreasonable
-     * channel number.
-     */
-    long m_rejectedCount = 0;
-
-    /**
-     * Warning message: number of channels rejected due to unreasonable
-     * channel number.
-     */
-    std::map<std::string, long> m_rejected;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
   };
 

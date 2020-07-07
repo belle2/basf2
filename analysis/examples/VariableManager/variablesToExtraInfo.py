@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToExtraInfo module saves variables at some stage in the
 # processing chain for recovery later. In this example it saves the invariant
@@ -12,10 +11,9 @@
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 
-import os
 import basf2
 import modularAnalysis as ma  # a shorthand for the analysis tools namespace
-from vertex import KFit
+from vertex import kFit
 
 mypath = basf2.Path()  # create a new path
 
@@ -32,7 +30,7 @@ mypath.add_module('VariablesToExtraInfo',
 
 # Now we do a vertex fit (this can change the mass).
 # All candidates are kept.
-KFit('D0', -1.0, path=mypath)
+kFit('D0', -1.0, path=mypath)
 
 # now save the pre- and post- fit mass using VariablesToNtuple
 mypath.add_module('VariablesToNtuple',

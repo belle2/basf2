@@ -243,7 +243,7 @@ These methods should be executed inside the ROE loop:
   # Reconstruct a K_S0 candidate using ROE pions:
   ma.reconstructDecay('K_S0:roe -> pi+:roe pi-:roe', '0.45 < M < 0.55', path = roe_path)
   # Perform vertex fitting:
-  vtx.KFit('K_S0:roe',0.001, path=roe_path)
+  vtx.kFit('K_S0:roe',0.001, path=roe_path)
   # Insert a K_S0 candidate into the ROE mask:
   ma.optimizeROEWithV0('K_S0:roe',['cleanMask'],'', path=roe_path)
   # Execute loop for each ROE:
@@ -342,10 +342,28 @@ useful in combination with the visible signal side, for example in semileptonic
 :math:`B`-meson decays, where tag side has been reconstructed using :doc:`FullEventInterpretation`.
 
 .. hint::
-  The decay vertex of the resulting particles can be fitted by `KFit`.
+  It is recommended to try to use ROE variables first, unless it is *absolutely* necessary to reconstruct ROE as a particle in your analysis.
+  The decay vertex of the resulting particles can be fitted by `kFit`.
   Also MC truth-matching works, but after removing all neutral hadrons matched to tracks. 
   More improvements will come soon.
 
+
+Create ROE using MCParticles
+----------------------------
+
+It is possible to create ROE using MCParticles:
+
+::
+
+  ma.fillParticleListFromMC("B0:gen", signal_selection, 
+        addDaughters=True, skipNonPrimaryDaughters=True, path=main_path)
+  ma.buildRestOfEventFromMC("B0:gen",path=main_path)
+
+It is important to add primary daughters to the signal side particle and not to forget to provide a selection cut. 
+
+.. note::
+  ROE masks and many of the ROE variables are working only with reconstructed particles.
+  As a workaround one can reconstruct ROE as a particle.
 
 MVA based cleaning
 ------------------

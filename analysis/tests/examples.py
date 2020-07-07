@@ -100,12 +100,8 @@ class ExamplesTest(unittest.TestCase):
         """
         Test supported tagging examples.
         """
-        # list of the broken examples (to be removed when they are individually fixed)
-        broken_tag_egs = ['BtagBsigReconstruction.py',  # BII-4281
-                          'KlongDecayReconstructionExample.py'  # BII-4281
-                          ]
 
-        self._test_examples_dir('analysis/examples/tagging/', broken_tag_egs)
+        self._test_examples_dir('analysis/examples/tagging/')
 
     def test_variablemanager_examples(self):
         """
@@ -113,6 +109,13 @@ class ExamplesTest(unittest.TestCase):
         """
 
         self._test_examples_dir('analysis/examples/VariableManager/')
+
+    def test_postmdstidentification_examples(self):
+        """
+        Test supported PostMdstIdentification examples.
+        """
+
+        self._test_examples_dir('analysis/examples/PostMdstIdentification/')
 
 
 if __name__ == '__main__':

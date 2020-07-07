@@ -66,7 +66,7 @@ namespace Belle2 {
        */
       enum KFitError::ECode       setKnownVertex(const bool flag = true);
       /** Tell the object to perform a fit with track correlations.
-       * @param flag true for with correlation, false for otherwise
+       * @param m true for with correlation, false for otherwise
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setCorrelationMode(const bool m);

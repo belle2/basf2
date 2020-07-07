@@ -44,7 +44,9 @@ void plotDQM(){
   hHitsMerger->Draw();
 
   TCanvas* c2 = new TCanvas("c2","c2",500,500);
+  c2->cd();
   chHits->Draw();
+  
   cc->cd(6);
   hHitsHAPDperEvent->Draw("colz");
 

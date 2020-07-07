@@ -181,7 +181,7 @@ main.add_module('ProgressBar')
 eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, verbosity,
                                 maxDisplays, minRPCHits, legacyTimes, singleEntry, view)
 rawdata.add_unpackers(main, components=['KLM'])
-main.add_module('BKLMReconstructor')
+main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
 process(main, max_event=maxCount)

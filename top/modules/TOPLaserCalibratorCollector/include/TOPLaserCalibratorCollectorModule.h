@@ -14,7 +14,6 @@
 #include <calibration/CalibrationCollectorModule.h>
 
 //ECL
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {

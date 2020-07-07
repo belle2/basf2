@@ -24,6 +24,7 @@ class dump_clusters(Module):
         super(dump_clusters, self).__init__()
         #: Input file object.
         self.file = open(filename, 'w')
+#: name of the StoreArraw SVDClusters
         self.collection = collection
         #: Factors for decoding VXDId's
         self.vxdid_factors = (8192, 256, 32)

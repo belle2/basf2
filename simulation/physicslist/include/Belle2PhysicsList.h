@@ -69,7 +69,16 @@ namespace Belle2 {
       /** Use high precision neutron models below 20 MeV */
       void UseHighPrecisionNeutrons(G4bool);
 
+      /** Simulate neutral long-lived particles with given pdg and mass value */
+      void UseLongLivedNeutralParticles();
+
     private:
+      /** Set the produciton cuts to the given value for a list of regions belonging to a sub detector
+       * @param name name of the sub detector to print in messages
+       * @param regions list of region names to set the cut value
+       * @param cutValue production cut in cm, if 0 the global cut value will be used
+       */
+      void setRegionCuts(const std::string& name, const std::vector<std::string>& regions, double cutValue);
 
       /** Construct parallel particle types needed for reco */
       void ConstructG4eParticles();

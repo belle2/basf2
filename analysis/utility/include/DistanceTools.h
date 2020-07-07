@@ -29,6 +29,11 @@ namespace Belle2 {
   namespace DistanceTools {
 
     /**
+     * Returns the Point Of Closest Approach of a track to a vertex
+     */
+    TVector3 poca(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos);
+
+    /**
      * Returns the 3D vector between a vertex and a track's point of closest approach to that vertex
      */
     TVector3 trackToVtxVec(TVector3 const& trackPos, TVector3 const& trackP, TVector3 const& vtxPos);

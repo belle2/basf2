@@ -14,7 +14,6 @@
 #ifndef TRGECL_FLAG_
 #define TRGECL_FLAG_
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include "trg/ecl/TrgEclCluster.h"
@@ -30,9 +29,6 @@
 //
 namespace Belle2 {
 //
-//
-  /** ETM class */
-  class TrgEclMaster;
 //
 //
 //
@@ -92,7 +88,7 @@ namespace Belle2 {
     /** make LowMultiTriggerBit **/
     void makeLowMultiTriggerBit(std::vector<int>, std::vector<double>);
     /** make Trigger bit except for Low Multiplicity related bit **/
-    void makeTriggerBit(int, int, int, int, int, int, int, std::vector<int>, int, int, int, int, int, int, int, int, int);
+    void makeTriggerBit(int, int, int, int, double, int, int, std::vector<int>, int, int, int, int, int, int, int, int, int);
     /** Set Total Energy*/
     double setTotalEnergy(std::vector<double>);
     //! Get ECL Trigger bit

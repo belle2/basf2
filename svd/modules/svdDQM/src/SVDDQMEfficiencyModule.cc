@@ -10,7 +10,7 @@
 
 #include <svd/modules/svdDQM/SVDDQMEfficiencyModule.h>
 #include "TDirectory.h"
-#include "TMatrixDSym.h"
+
 using namespace Belle2;
 
 //-----------------------------------------------------------------

@@ -11,8 +11,6 @@
 #pragma once
 
 #include <framework/dataobjects/DigitBase.h>
-#include <framework/logging/Logger.h>
-#include <iostream>
 
 namespace Belle2 {
 

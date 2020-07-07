@@ -17,22 +17,22 @@ namespace Belle2 {
 
     double particleIsFromECL(const Particle* part)
     {
-      return (part->getParticleType() == Particle::EParticleType::c_ECLCluster);
+      return (part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster);
     }
 
     double particleIsFromKLM(const Particle* part)
     {
-      return (part->getParticleType() == Particle::EParticleType::c_KLMCluster);
+      return (part->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster);
     }
 
     double particleIsFromTrack(const Particle* part)
     {
-      return (part->getParticleType() == Particle::EParticleType::c_Track);
+      return (part->getParticleSource() == Particle::EParticleSourceObject::c_Track);
     }
 
     double particleIsFromV0(const Particle* part)
     {
-      return (part->getParticleType() == Particle::EParticleType::c_V0);
+      return (part->getParticleSource() == Particle::EParticleSourceObject::c_V0);
     }
 
     double particleMdstArrayIndex(const Particle* part)

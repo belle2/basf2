@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <top/dataobjects/TOPRawWaveform.h>
-#include <framework/logging/Logger.h>
 
 using namespace std;
 

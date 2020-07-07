@@ -22,11 +22,8 @@
 
 #include <svd/reconstruction/NNWaveFitTool.h>
 
-#include <unordered_map>
 #include <algorithm>
-#include <numeric>
 #include <functional>
-#include <cassert>
 
 using namespace std;
 using namespace Belle2;

@@ -21,6 +21,7 @@
 #include <G4EmProcessSubType.hh>
 #include <G4DecayProcessType.hh>
 #include <G4Event.hh>
+#include <G4ParticleTable.hh>
 
 using namespace Belle2;
 using namespace Belle2::Simulation;
@@ -34,17 +35,10 @@ TrackingAction::TrackingAction(MCParticleGraph& mcParticleGraph):
   m_storeTrajectories(false), m_distanceTolerance(0),
   m_storeMCTrajectories(), m_relMCTrajectories(StoreArray<MCParticle>(), m_storeMCTrajectories)
 {
-  if (false) {
-    G4Track* aTrack = nullptr;
-    PreUserTrackingAction(aTrack);
-    PostUserTrackingAction(aTrack);
-  }
 }
-
 
 TrackingAction::~TrackingAction()
 {
-
 }
 
 void TrackingAction::setStoreTrajectories(int store, double distanceTolerance)
@@ -73,10 +67,15 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
   try {
     //Check if the dynamic particle has a primary particle attached.
     //If the answer is yes, the UserInfo of the primary particle is recycled as the UserInfo of the track.
+    bool neutral_llp = false;
     if (dynamicParticle->GetPrimaryParticle() != NULL) {
       const G4PrimaryParticle* primaryParticle = dynamicParticle->GetPrimaryParticle();
       if (primaryParticle->GetUserInformation() != NULL) {
         const_cast<G4Track*>(track)->SetUserInformation(new TrackInfo(ParticleInfo::getInfo(*primaryParticle)));
+        //check for neutral long-lived primary particle
+        if (primaryParticle->GetParticleDefinition() == G4ParticleTable::GetParticleTable()->FindParticle("LongLivedNeutralParticle")) {
+          neutral_llp = true;
+        }
       } else {
         B2WARNING(track->GetDefinition()->GetPDGEncoding() << " has no MCParticle user information !");
       }
@@ -84,16 +83,20 @@ void TrackingAction::PreUserTrackingAction(const G4Track* track)
 
     //Get particle of current track
     MCParticleGraph::GraphParticle& currParticle = TrackInfo::getInfo(*track);
-    //Set the Values of the particle which are already known
+
     G4ThreeVector dpMom  = dynamicParticle->GetMomentum() / CLHEP::MeV * Unit::MeV;
-    G4ThreeVector trVtxPos = track->GetVertexPosition() / CLHEP::mm * Unit::mm;
     currParticle.setTrackID(track->GetTrackID());
-    currParticle.setPDG(dynamicParticle->GetPDGcode());
-    currParticle.setMass(dynamicParticle->GetMass() / CLHEP::MeV * Unit::MeV);
-    currParticle.setEnergy(dynamicParticle->GetTotalEnergy() / CLHEP::MeV * Unit::MeV);
-    currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
+    G4ThreeVector trVtxPos = track->GetVertexPosition() / CLHEP::mm * Unit::mm;
     currParticle.setProductionTime(track->GetGlobalTime()); // Time does not need a conversion factor
     currParticle.setProductionVertex(trVtxPos.x(), trVtxPos.y(), trVtxPos.z());
+
+    //Set the Values of the particle which are already known
+    if (!neutral_llp) {
+      currParticle.setPDG(dynamicParticle->GetPDGcode());
+      currParticle.setMass(dynamicParticle->GetMass() / CLHEP::MeV * Unit::MeV);
+      currParticle.setEnergy(dynamicParticle->GetTotalEnergy() / CLHEP::MeV * Unit::MeV);
+      currParticle.setMomentum(dpMom.x(), dpMom.y(), dpMom.z());
+    }
 
     //Primary or secondary particle?
     if (dynamicParticle->GetPrimaryParticle() != NULL) {

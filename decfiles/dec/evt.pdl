@@ -690,42 +690,42 @@ add  p Particle  anti-Omega+                    -3334     1672.45e-3            
 * Charmed baryons
 * Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.
 *---------------------------------------------------------------------------------------------------------------------------------------
-add  p Particle  Lambda_c+                       4122     2286.46e-3              0              0     3     1  5.9958492e-02       4122
-add  p Particle  anti-Lambda_c-                 -4122     2286.46e-3              0              0    -3     1  5.9958492e-02      -4122
-add  p Particle  Lambda_c(2593)+                14122     2592.25e-3         2.6e-3          54e-3     3     1              0          0
-add  p Particle  anti-Lambda_c(2593)-          -14122     2592.25e-3         2.6e-3          54e-3    -3     1              0          0
+add  p Particle  Lambda_c+                       4122     2286.46e-3              0              0     3     1  6.0677993e-02       4122
+add  p Particle  anti-Lambda_c-                 -4122     2286.46e-3              0              0    -3     1  6.0677993e-02      -4122
+add  p Particle  Lambda_c(2593)+                14122     2592.25e-3         2.6e-3          14e-3     3     1              0          0
+add  p Particle  anti-Lambda_c(2593)-          -14122     2592.25e-3         2.6e-3          14e-3    -3     1              0          0
 * The Lambda_c(2625) width limit is Gamma < 0.97 MeV (90% C. L.). The width is set to 0.
-add  p Particle  Lambda_c(2625)+                 4124     2628.11e-3              0        28.5e-3     3     3              0          0
-add  p Particle  anti-Lambda_c(2625)-           -4124     2628.11e-3              0        28.5e-3    -3     3              0          0
-add  p Particle  Sigma_c++                       4222     2453.97e-3        1.89e-3          27e-3     6     1              0       4222
-add  p Particle  anti-Sigma_c--                 -4222     2453.97e-3        1.89e-3          27e-3    -6     1              0      -4222
+add  p Particle  Lambda_c(2625)+                 4124     2628.11e-3              0              0     3     3              0          0
+add  p Particle  anti-Lambda_c(2625)-           -4124     2628.11e-3              0              0    -3     3              0          0
+add  p Particle  Sigma_c++                       4222     2453.97e-3        1.89e-3          10e-3     6     1              0       4222
+add  p Particle  anti-Sigma_c--                 -4222     2453.97e-3        1.89e-3          10e-3    -6     1              0      -4222
 * The Sigma_c(2455)+ width limit is Gamma < 4.6 MeV (90% C. L.).
 * The width is set to the average of the Sigma_c(2455)++ and Sigma_c(2455)0 widths.
-add  p Particle  Sigma_c+                        4212      2452.9e-3        1.86e-3       24.68e-3     3     1              0       4212
-add  p Particle  anti-Sigma_c-                  -4212      2452.9e-3        1.86e-3       24.68e-3    -3     1              0      -4212
-add  p Particle  Sigma_c0                        4112     2453.75e-3        1.83e-3          24e-3     0     1              0       4112
-add  p Particle  anti-Sigma_c0                  -4112     2453.75e-3        1.83e-3          24e-3     0     1              0      -4112
-add  p Particle  Sigma_c*++                      4224     2518.41e-3       14.78e-3          92e-3     6     3              0       4224
-add  p Particle  anti-Sigma_c*--                -4224     2518.41e-3       14.78e-3          92e-3    -6     3              0      -4224
+add  p Particle  Sigma_c+                        4212      2452.9e-3        1.86e-3          10e-3     3     1              0       4212
+add  p Particle  anti-Sigma_c-                  -4212      2452.9e-3        1.86e-3          10e-3    -3     1              0      -4212
+add  p Particle  Sigma_c0                        4112     2453.75e-3        1.83e-3          10e-3     0     1              0       4112
+add  p Particle  anti-Sigma_c0                  -4112     2453.75e-3        1.83e-3          10e-3     0     1              0      -4112
+add  p Particle  Sigma_c*++                      4224     2518.41e-3       14.78e-3          80e-3     6     3              0       4224
+add  p Particle  anti-Sigma_c*--                -4224     2518.41e-3       14.78e-3          80e-3    -6     3              0      -4224
 * The Sigma_c(2455)+ width limit is Gamma < 17 MeV (90% C. L.).
 * The width is set to 15 MeV.
-add  p Particle  Sigma_c*+                       4214      2517.5e-3          15e-3          90e-3     3     3              0       4214
-add  p Particle  anti-Sigma_c*-                 -4214      2517.5e-3          15e-3          90e-3    -3     3              0      -4214
-add  p Particle  Sigma_c*0                       4114     2518.48e-3        15.3e-3        91.9e-3     0     3              0       4114
-add  p Particle  anti-Sigma_c*0                 -4114     2518.48e-3        15.3e-3        91.9e-3     0     3              0      -4114
-add  p Particle  Xi_c+                           4232     2467.93e-3              0              0     3     1  1.3250827e-01       4232
-add  p Particle  anti-Xi_c-                     -4232     2467.93e-3              0              0    -3     1  1.3250827e-01      -4232
-add  p Particle  Xi_c0                           4132     2470.91e-3              0              0     0     1  3.3576755e-02       4132
-add  p Particle  anti-Xi_c0                     -4132     2470.91e-3              0              0     0     1  3.3576755e-02      -4132
+add  p Particle  Sigma_c*+                       4214      2517.5e-3          15e-3          80e-3     3     3              0       4214
+add  p Particle  anti-Sigma_c*-                 -4214      2517.5e-3          15e-3          80e-3    -3     3              0      -4214
+add  p Particle  Sigma_c*0                       4114     2518.48e-3        15.3e-3          80e-3     0     3              0       4114
+add  p Particle  anti-Sigma_c*0                 -4114     2518.48e-3        15.3e-3          80e-3     0     3              0      -4114
+add  p Particle  Xi_c+                           4232     2467.94e-3              0              0     3     1  1.3670536e-01       4232
+add  p Particle  anti-Xi_c-                     -4232     2467.94e-3              0              0    -3     1  1.3670536e-01      -4232
+add  p Particle  Xi_c0                           4132     2470.90e-3              0              0     0     1  4.5868246e-02       4132
+add  p Particle  anti-Xi_c0                     -4132     2470.90e-3              0              0     0     1  4.5868246e-02      -4132
 * The narrow Xi'_c+ states decay electromagnetically to the ground states. Their width has not been measured; it is set to 0.
 add  p Particle  Xi'_c+                          4322      2578.4e-3              0              0     3     1              0       4322
 add  p Particle  anti-Xi'_c-                    -4322      2578.4e-3              0              0    -3     1              0      -4322
 add  p Particle  Xi'_c0                          4312      2579.2e-3              0              0     0     1              0       4312
 add  p Particle  anti-Xi'_c0                    -4312      2579.2e-3              0              0     0     1              0      -4312
-add  p Particle  Xi_c*+                          4324     2645.57e-3        2.14e-3           8e-3     3     3              0       4324
-add  p Particle  anti-Xi_c*-                    -4324     2645.57e-3        2.14e-3           8e-3    -3     3              0      -4324
-add  p Particle  Xi_c*0                          4314     2646.38e-3        2.35e-3           8e-3     0     3              0       4314
-add  p Particle  anti-Xi_c*0                    -4314     2646.38e-3        2.35e-3           8e-3     0     3              0      -4314
+add  p Particle  Xi_c*+                          4324     2645.56e-3        2.14e-3          12e-3     3     3              0       4324
+add  p Particle  anti-Xi_c*-                    -4324     2645.56e-3        2.14e-3          12e-3    -3     3              0      -4324
+add  p Particle  Xi_c*0                          4314     2646.38e-3        2.35e-3          12e-3     0     3              0       4314
+add  p Particle  anti-Xi_c*0                    -4314     2646.38e-3        2.35e-3          12e-3     0     3              0      -4314
 add  p Particle  Omega_c0                        4332      2695.2e-3              0              0     0     1  8.0344379e-02       4332
 add  p Particle  anti-Omega_c0                  -4332      2695.2e-3              0              0     0     1  8.0344379e-02      -4332
 add  p Particle  Omega_c*0                       4334      2765.9e-3              0              0     0     3              0       4334

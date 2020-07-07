@@ -753,6 +753,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_phys") {bit = ecl_phys;}
     else if (bitname == "ecl_oflo") {bit = ecl_oflo;}
     else if (bitname == "ecl_3dbha") {bit = ecl_3dbha;}
+    else if (bitname == "bha_veto") {bit = ecl_3dbha;}
     else if (bitname == "ecl_lml_0") {bit = ecl_lml_0;}
     else if (bitname == "ecl_lml_1") {bit = ecl_lml_1;}
     else if (bitname == "ecl_lml_2") {bit = ecl_lml_2;}

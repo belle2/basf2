@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Kindo Haruki, Luka Santelj                               *
+ * Contributors: Makoto Uchida                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -85,6 +85,14 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
 
   m_cMain = new TCanvas("main", "main", 1500, 1000);
   m_monObj->addCanvas(m_cMain);
+
+  m_cADC = new TCanvas("adc", "adc", 1500, 1000);
+  m_monObj->addCanvas(m_cADC);
+  m_cTDC = new TCanvas("tdc", "tdc", 1500, 1000);
+  m_monObj->addCanvas(m_cTDC);
+  m_cHit = new TCanvas("hit", "hit", 1500, 1000);
+  m_monObj->addCanvas(m_cHit);
+
   m_cBadWire = new TCanvas("badwire", "Bad wires", 1000, 1000);
   m_monObj->addCanvas(m_cBadWire);
   B2DEBUG(20, "DQMHistAnalysisCDCMonObj: initialized.");
@@ -126,18 +134,6 @@ void DQMHistAnalysisCDCMonObjModule::beginRun()
   m_fieldR[56] = geom.getOuterWall(0).getRmin();
   m_fieldR[0] = geom.getInnerWall(0).getRmax();
 
-  //    const double offset = m_offSet[L];
-  //...Offset modification to be aligned to axial at z=0...
-  //  const double phiSize = 2 * M_PI / double(m_nWires[L]);
-
-  //  const double phiF = phiSize * (double(C) + offset)
-  //                      + phiSize * 0.5 * double(m_nShifts[L]) + m_globalPhiRotation;
-
-
-  /*
-   * calculate cell geometry
-   */
-
 }
 
 void DQMHistAnalysisCDCMonObjModule::event()
@@ -176,9 +172,9 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
 {
   m_badChannels.clear();
   for (int il = 0; il < 56; ++il) {
-    const int nbins = m_hHit[il]->GetNbinsX();
-    for (int iw = 0; iw < nbins; ++iw) {
-      const int y = m_hHit[il]->GetBinContent(iw + 1);
+    // const int nbins = m_hHits[il]->GetNbinsX();
+    for (int iw = 0; iw < m_nSenseWires[il]; ++iw) {
+      const int y = m_hHits[il]->GetBinContent(iw + 1);
       if (y == 0) {
         //B2INFO("l " << layer << " w " << wire);
         m_badChannels.push_back(std::make_pair(il, iw));
@@ -188,9 +184,10 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
   B2INFO("num bad wires " << m_badChannels.size());
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1F* h)
+float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h)
 {
-  TH1F* hist = (TH1F*)h->Clone();
+  TH1D
+  * hist = (TH1D*)h->Clone();
   hist->SetBinContent(1, 0.0);
   float m = hist->GetMean();
   return m;
@@ -212,12 +209,14 @@ std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned sho
 
 void DQMHistAnalysisCDCMonObjModule::endRun()
 {
-
+  B2INFO("end run");
   m_hNEvent = (TH1F*)findHist("CDC/hNEvents");
+  m_hADC = (TH2F*)findHist("CDC/hADC");
+  m_hADCTOTCut = (TH2F*)findHist("CDC/hADCTOTCut");
+  m_hTDC = (TH2F*)findHist("CDC/hTDC");
+  m_hHit = (TH2F*)findHist("CDC/hHit");
   TF1* fitFunc[300] = {};
   for (int i = 0; i < 300; ++i) {
-    m_hADC[i] = (TH1F*)findHist(Form("CDC/hADC%d", i));
-    m_hTDC[i] = (TH1F*)findHist(Form("CDC/hTDC%d", i));
     fitFunc[i] = new TF1(Form("f%d", i), "[0]+[6]*x+[1]*(exp([2]*(x-[3]))/(1+exp(-([4]-x)/[5])))",
                          4921 - 100, 4921 + 100);
     fitFunc[i]->SetParLimits(0, 0, 100);
@@ -225,29 +224,29 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     fitFunc[i]->SetParLimits(4, 4850., 5000.0);
     fitFunc[i]->SetParLimits(5, 0, 50.0);
   }
-
-  for (int i = 0; i < 56; ++i) {
-    m_hHit[i]  = (TH1F*)findHist(Form("CDC/hHitL%d", i));
-  }
-
   const int neve = m_hNEvent->GetBinContent(1);
 
   // ADC related
+  B2INFO("adc related");
   int nDeadADC = -1; // bid 0 always empty
   int nBadADC = 0;
   TH1F* hADCMean = new TH1F("hADCMean", "ADC mean;board;adc mean", 300, 0, 300);
+
+
   std::vector<float> means = {};
   for (int i = 0; i < 300; ++i) {
-    if (m_hADC[i]->GetEntries() == 0) {
+
+    m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 2);
+    if (m_hADCs[i]->GetEntries() == 0) {
       nDeadADC += 1;
     } else {
-      float n = static_cast<float>(m_hADC[i]->GetEntries());
-      float n0 = static_cast<float>(m_hADC[i]->GetBinContent(1));
+      float n = static_cast<float>(m_hADCs[i]->GetEntries());
+      float n0 = static_cast<float>(m_hADCs[i]->GetBinContent(1));
       if (n0 / n > 0.9) {
         B2DEBUG(99, "bad adc bid " << i << " " << n0 << " " << n);
         nBadADC += 1;
       }
-      float m = getHistMean(m_hADC[i]);
+      float m = getHistMean(m_hADCs[i]);
       //B2INFO(i << " " << m );
       means.push_back(m);
       hADCMean->SetBinContent(i + 1, m);
@@ -256,13 +255,15 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
   // TDC related
+  B2INFO("tdc related");
   int nDeadTDC = 1; // bid 0 always empty
   TH1F* hTDCEdge = new TH1F("hTDCEdge", "TDC edge;board;tdc edge [nsec]", 300, 0, 300);
   TH1F* hTDCSlope = new TH1F("hTDCSlope", "TDC slope;board;tdc slope [nsec]", 300, 0, 300);
   std::vector<float> tdcEdges = {};
   std::vector<float> tdcSlopes = {};
   for (int i = 0; i < 300; ++i) {
-    if (m_hTDC[i]->GetEntries() == 0 || m_hTDC[i] == nullptr) {
+    m_hTDCs[i] = m_hTDC->ProjectionY(Form("hTDC%d", i), i + 1, i + 2);
+    if (m_hTDCs[i]->GetEntries() == 0 || m_hTDCs[i] == nullptr) {
       nDeadTDC += 1;
     } else {
       fitFunc[i]->SetParameters(0, 100, 0.01, 4700, 4900, 2, 0.01);
@@ -270,9 +271,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       fitFunc[i]->SetParameter(6, 0.02);
       int xxx = -1;
       if (i < 28) {
-        xxx = m_hTDC[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
+        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
       } else {
-        xxx = m_hTDC[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
+        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
       }
       float p4 = fitFunc[i]->GetParameter(4);
       float p5 = fitFunc[i]->GetParameter(5);
@@ -287,7 +288,29 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     }
   }
 
-  // Bad wires relasted
+
+  // Hit related
+  B2INFO("hit related");
+  TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
+  int nHits = 0;
+  for (int i = 0; i < 56; ++i) {
+    m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 2);
+    if (m_hHits[i]->GetEntries() > 0 && m_hHits[i] != nullptr) {
+      int nhitSumL = 0;
+      int nBins = m_nSenseWires[i];
+      B2INFO("layer " << i << " nbins " << nBins);
+      for (int j = 0; j < nBins; ++j) {
+        nhitSumL += m_hHits[i]->GetBinContent(j + 1);
+      }
+      B2INFO("bbb");
+      hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL / neve));
+      hHitPerLayer->SetBinError(i + 1, 0);
+      nHits += nhitSumL;
+    }
+  }
+
+  // Bad wires related
+  B2INFO("bad wire related");
   TH2F* hBadChannel = new TH2F("hbadch", "bad channel map;wire;layer", 400, 0, 400, 56, 0, 56);
   for (int i = 0; i < 400; ++i) {
     for (int j = 0; j < 56; ++j) {
@@ -324,23 +347,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
 
-  // Hit related
-  TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
-
-  int nHits = 0;
-  for (int i = 0; i < 56; ++i) {
-    int nhitSumL = 0;
-    const int nBins = m_hHit[i]->GetNbinsX();
-    for (int j = 0; j < nBins; ++j) {
-      nhitSumL += m_hHit[i]->GetBinContent(j + 1);
-    }
-    hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL / neve));
-    hHitPerLayer->SetBinError(i + 1, 0);
-    nHits += nhitSumL;
-  }
 
 
-
+  B2INFO("writing");
   m_cMain->Divide(3, 2);
 
   m_cMain->cd(1);
@@ -366,6 +375,16 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_cMain->cd(6);
   hHitPerLayer->Draw();
 
+  m_cADC->cd(1);
+  m_hADC->Draw("colz");
+
+  m_cTDC->cd(1);
+  m_hTDC->Draw("colz");
+
+  m_cHit->cd(1);
+  m_hHit->Draw("colz");
+
+  /*
   m_cBadWire->cd();
   h2p->Draw("col");
   float superLayerR[10] = {16.3, 24.3, 35.66, 46.63, 57.55, 68.47,
@@ -392,7 +411,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_monObj->setVariable("nHits", nHits / neve);
   m_monObj->setVariable("nADC(n_0/n_tot>0.9)", nBadADC);
   m_monObj->setVariable("nBadWires", m_badChannels.size());
-
+  */
   TString fname;
   if (m_filename.length()) fname = m_filename;
   else fname = "cdc_mon_output.root";

@@ -65,6 +65,61 @@ namespace Belle2 {
     double v0DaughterTrackLastCDCLayer(const Particle* part, const std::vector<double>& daughterID);
 
     /**
+     * returns the fit P-value of the track
+     */
+    double v0DaughterTrackPValue(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the D0 impact parameter of the V0 daughter track
+     */
+    double v0DaughterTrackD0(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the tranverse momentum angle of the V0 daughter track
+     */
+    double v0DaughterTrackPhi0(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the curvature of the V0 daughter track
+     */
+    double v0DaughterTrackOmega(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the Z0 impact parameter of the V0 daughter track
+     */
+    double v0DaughterTrackZ0(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the slope of the V0 daughter track
+     */
+    double v0DaughterTrackTanLambda(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the d0 error of the track
+     */
+    double v0DaughterTrackD0Error(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the phi0 error of the track
+     */
+    double v0DaughterTrackPhi0Error(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the omega error of the track
+     */
+    double v0DaughterTrackOmegaError(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the z0 error of the track
+     */
+    double v0DaughterTrackZ0Error(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the tan(lambda) error of the track
+     */
+    double v0DaughterTrackTanLambdaError(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
      * returns the track parameter Tau  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda
      */
     double v0DaughterTrackParam5AtIPPerigee(const Particle* part, const std::vector<double>& params);
@@ -74,11 +129,6 @@ namespace Belle2 {
      * (0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...
      */
     double v0DaughterTrackParamCov5x5AtIPPerigee(const Particle* part, const std::vector<double>& params);
-
-    /**
-     * returns the fit P-value of the track
-     */
-    double v0DaughterTrackPValue(const Particle* part, const std::vector<double>& daughterID);
 
 
     /** helper function to get track fit result from V0 object */

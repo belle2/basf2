@@ -135,6 +135,126 @@ namespace Belle2 {
       return trackFit->getHitPatternCDC().getLastLayer();
     }
 
+    double v0DaughterTrackPValue(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      return trackFit->getPValue();
+    }
+
+
+    double v0DaughterTrackD0(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getD0();
+    }
+
+    double v0DaughterTrackPhi0(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getPhi0();
+    }
+
+    double v0DaughterTrackOmega(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getOmega();
+    }
+
+    double v0DaughterTrackZ0(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getZ0();
+    }
+
+    double v0DaughterTrackTanLambda(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getTanLambda();
+    }
+
+    double v0DaughterTrackD0Error(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      double errorSquared = trackFit->getCovariance5()[0][0];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double v0DaughterTrackPhi0Error(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      double errorSquared = trackFit->getCovariance5()[1][1];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double v0DaughterTrackOmegaError(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      double errorSquared = trackFit->getCovariance5()[2][2];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double v0DaughterTrackZ0Error(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      double errorSquared = trackFit->getCovariance5()[3][3];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double v0DaughterTrackTanLambdaError(const Particle* part, const std::vector<double>& daughterID)
+    {
+      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      double errorSquared = trackFit->getCovariance5()[4][4];
+      if (errorSquared > 0.0)
+        return sqrt(errorSquared);
+      else
+        return std::numeric_limits<double>::quiet_NaN();
+    }
+
     double v0DaughterTrackParam5AtIPPerigee(const Particle* part, const std::vector<double>& params)
     {
       auto trackFit = getTrackFitResultFromV0DaughterParticle(part, params[0]);
@@ -166,19 +286,6 @@ namespace Belle2 {
     }
 
 
-    double v0DaughterTrackPValue(const Particle* part, const std::vector<double>& daughterID)
-    {
-      auto trackFit = getTrackFitResultFromV0DaughterParticle(part, daughterID[0]);
-      if (!trackFit) {
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-
-      return trackFit->getPValue();
-    }
-
-
-
-
     VARIABLE_GROUP("V0Daughter");
 
     REGISTER_VARIABLE("v0DaughterNCDCHits(i)", v0DaughterTrackNCDCHits,     "Number of CDC hits associated to the i-th daughter track");
@@ -196,7 +303,26 @@ namespace Belle2 {
                       "Last CDC layer associated to the i-th daughter track");
     REGISTER_VARIABLE("v0DaughterPValue(i)",        v0DaughterTrackPValue,
                       "chi2 probalility of the i-th daughter track fit");
-
+    REGISTER_VARIABLE("v0DaughterD0(i)",        v0DaughterTrackD0,
+                      "d0 of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterPhi0(i)",        v0DaughterTrackPhi0,
+                      "phi0 of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterOmega(i)",        v0DaughterTrackOmega,
+                      "omega of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterZ0(i)",        v0DaughterTrackZ0,
+                      "z0 of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterTanLambda(i)",        v0DaughterTrackTanLambda,
+                      "tan(lambda) of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterD0Error(i)",        v0DaughterTrackD0Error,
+                      "d0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterPhi0Error(i)",        v0DaughterTrackPhi0Error,
+                      "phi0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterOmegaError(i)",        v0DaughterTrackOmegaError,
+                      "omega error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterZ0Error(i)",        v0DaughterTrackZ0Error,
+                      "z0 error of the i-th daughter track fit");
+    REGISTER_VARIABLE("v0DaughterTanLambdaError(i)",        v0DaughterTrackTanLambdaError,
+                      "tan(lambda) error of the i-th daughter track fit");
     REGISTER_VARIABLE("v0DaughterTau(i,j)",        v0DaughterTrackParam5AtIPPerigee,
                       "j-th track parameter (at IP perigee) of the i-th daughter track. "
                       "j:  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda");

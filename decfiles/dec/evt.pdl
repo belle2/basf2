@@ -589,7 +589,7 @@ add  p Particle  Upsilon(6S)                  9010553  1.0992000e+01          24
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
 * m(p+) = 9.382720813(58)e-01, m(n0) = 9.395654133(58)e-01.
-* Specifyibg more digits breaks framework tests, and, taking the error into account, it is not necessary anyway.
+* Specifying more digits breaks framework tests, and, taking the error into account, it is not necessary anyway.
 add  p Particle  p+                              2212  9.3827208e-01              0              0     3     1              0       2212
 add  p Particle  anti-p-                        -2212  9.3827208e-01              0              0    -3     1              0      -2212
 add  p Particle  n0                              2112  9.3956541e-01              0              0     0     1  2.6363749e+14       2112
@@ -646,22 +646,26 @@ add  p Particle  anti-Lambda(1830)0            -13126        1825e-3          90
 *---------------------------------------------------------------------------------------------------------------------------------------
 add  p Particle  Sigma+                          3222     1189.37e-3              0              0     3     1  2.4037359e+01       3222
 add  p Particle  anti-Sigma-                    -3222     1189.37e-3              0              0    -3     1  2.4037359e+01      -3222
-add  p Particle  Sigma0                          3212    1192.642e-3  8.8947561e-06  1.3000000e-04     0     1              0       3212
-add  p Particle  anti-Sigma0                    -3212    1192.642e-3  8.8947561e-06  1.3000000e-04     0     1              0      -3212
+add  p Particle  Sigma0                          3212    1192.642e-3  8.8947562e-06          60e-6     0     1              0       3212
+add  p Particle  anti-Sigma0                    -3212    1192.642e-3  8.8947562e-06          60e-6     0     1              0      -3212
 add  p Particle  Sigma-                          3112    1197.449e-3              0              0    -3     1  4.4339305e+01       3112
 add  p Particle  anti-Sigma+                    -3112    1197.449e-3              0              0     3     1  4.4339305e+01      -3112
-add  p Particle  Sigma*+                         3224      1382.8e-3          36e-3          35e-3     3     3              0       3224
-add  p Particle  anti-Sigma*-                   -3224      1382.8e-3          36e-3          35e-3    -3     3              0      -3224
-add  p Particle  Sigma*0                         3214      1383.7e-3          36e-3          35e-3     0     3              0       3214
-add  p Particle  anti-Sigma*0                   -3214      1383.7e-3          36e-3          35e-3     0     3              0      -3214
-add  p Particle  Sigma*-                         3114      1387.2e-3        39.4e-3          40e-3    -3     3              0       3114
-add  p Particle  anti-Sigma*+                   -3114      1387.2e-3        39.4e-3          40e-3     3     3              0      -3114
-add  p Particle  Sigma(1660)0                   13212        1660e-3         100e-3         400e-3     0     1              0          0
-add  p Particle  anti-Sigma(1660)0             -13212        1660e-3         100e-3         400e-3     0     1              0          0
-add  p Particle  Sigma(1670)0                   13214        1670e-3          60e-3         300e-3     0     3              0          0
-add  p Particle  anti-Sigma(1670)0             -13214        1670e-3          60e-3         300e-3     0     3              0          0
-add  p Particle  Sigma(1750)0                   23212        1750e-3          90e-3         450e-3     0     1              0          0
-add  p Particle  anti-Sigma(1750)0             -23212        1750e-3          90e-3         450e-3     0     1              0          0
+add  p Particle  Sigma*+                         3224      1382.8e-3          36e-3         200e-3     3     3              0       3224
+add  p Particle  anti-Sigma*-                   -3224      1382.8e-3          36e-3         200e-3    -3     3              0      -3224
+add  p Particle  Sigma*0                         3214      1383.7e-3          36e-3         200e-3     0     3              0       3214
+add  p Particle  anti-Sigma*0                   -3214      1383.7e-3          36e-3         200e-3     0     3              0      -3214
+add  p Particle  Sigma*-                         3114      1387.2e-3        39.4e-3         200e-3    -3     3              0       3114
+add  p Particle  anti-Sigma*+                   -3114      1387.2e-3        39.4e-3         200e-3     3     3              0      -3114
+* Sigma(1660)0. Pole residues are used.
+add  p Particle  Sigma(1660)0                   13212        1660e-3         200e-3         600e-3     0     1              0          0
+add  p Particle  anti-Sigma(1660)0             -13212        1660e-3         200e-3         600e-3     0     1              0          0
+* Sigma(1670)0. Pole residues are used.
+add  p Particle  Sigma(1670)0                   13214        1675e-3          70e-3         300e-3     0     3              0          0
+add  p Particle  anti-Sigma(1670)0             -13214        1675e-3          70e-3         300e-3     0     3              0          0
+* Sigma(1750)0. Pole residues are used.
+add  p Particle  Sigma(1750)0                   23212        1750e-3         150e-3         500e-3     0     1              0          0
+add  p Particle  anti-Sigma(1750)0             -23212        1750e-3         150e-3         500e-3     0     1              0          0
+* Sigma(1775)0. Pole residues are used.
 add  p Particle  Sigma(1775)0                    3216        1775e-3         120e-3         500e-3     0     5              0          0
 add  p Particle  anti-Sigma(1775)0              -3216        1775e-3         120e-3         500e-3     0     5              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------

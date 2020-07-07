@@ -55,7 +55,7 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDClsTrk"));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
-           "if TRUE (default): svdTime back in SVD time reference, and eventT0 in eventT0synch", bool(true));
+           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
   addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
            "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
 

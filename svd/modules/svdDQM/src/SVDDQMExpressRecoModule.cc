@@ -56,7 +56,7 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
   addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
   addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", int(0));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
-           "if TRUE (as default): svdTime back in SVD time reference", bool(true));
+           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
   addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
            "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
   addParam("CutSVDCharge", m_CutSVDCharge,

@@ -49,11 +49,11 @@ namespace Belle2 {
       if (not(dID == 0 || dID == 1))
         return nullptr;
 
-      if (particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
-        StoreArray<V0> V0s;
+      const V0* v0 = particle->getV0();
+      if (v0) {
         const TrackFitResult* trackFit = (dID == 0) ?
-                                         V0s[ particle->getMdstArrayIndex() ]->getTrackFitResults().first :
-                                         V0s[ particle->getMdstArrayIndex() ]->getTrackFitResults().second;
+                                         v0->getTrackFitResults().first :
+                                         v0->getTrackFitResults().second;
         return trackFit;
       } else {
         const TrackFitResult* trackFit = getTrackFitResultFromParticle(particle->getDaughter(dID));

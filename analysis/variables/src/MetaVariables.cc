@@ -925,10 +925,6 @@ namespace Belle2 {
     Manager::FunctionPtr mcDaughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1131,6 +1127,51 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
+      }
+    }
+
+    Manager::FunctionPtr mcDaughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of mcDaughterDiffOfPhiCMS meta function must be integers!");
+          return nullptr;
+        }
+
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(phi)");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
+          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          else
+          {
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            Particle iTmpPart(iMcDaughter);
+            Particle jTmpPart(jMcDaughter);
+            double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughterDiffOfPhiCMS");
       }
     }
 
@@ -2933,6 +2974,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
+    REGISTER_VARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
+                      "MC matched version of the 'daughterDiffOfPhiCMS' function.");      
     REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"

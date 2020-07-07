@@ -538,52 +538,52 @@ add  p Particle  Z(4430)-                    -9042413        4478e-3         181
 * Bottomonium
 * Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
-add  p Particle  eta_b                            551  9.3987000e+00  1.0000000e-02  3.0000000e-02     0     0              0        551
-add  p Particle  Upsilon                          553  9.4603000e+00  5.4020000e-05  5.0000000e-04     0     2              0        553
+add  p Particle  eta_b                            551      9398.7e-3          10e-3          50e-3     0     0              0        551
+add  p Particle  Upsilon                          553      9460.3e-3       54.02e-6         300e-6     0     2              0        553
 * The chi_bJ, h_b, and Upsilon(1D) states are narrow, there are no width measurements for any of them. The widths are set to 0.
-add  p Particle  chi_b0                         10551  9.8594400e+00              0              0     0     0              0      10551
-add  p Particle  chi_b1                         20553  9.8927800e+00              0              0     0     2              0      20553
-add  p Particle  h_b                            10553  9.8993000e+00              0              0     0     2              0      10553
-add  p Particle  chi_b2                           555  9.9122100e+00              0              0     0     4              0        555
+add  p Particle  chi_b0                         10551     9859.44e-3              0              0     0     0              0      10551
+add  p Particle  chi_b1                         20553     9892.78e-3              0              0     0     2              0      20553
+add  p Particle  h_b                            10553      9899.3e-3              0              0     0     2              0      10553
+add  p Particle  chi_b2                           555     9912.21e-3              0              0     0     4              0        555
 * The eta_b(2S) width upper limit is Gamma < 24 MeV (90% C. L.).
-add  p Particle  eta_b(2S)                     100551  9.9990000e+00              0              0     0     0              0          0
-add  p Particle  Upsilon(2S)                   100553  1.0023260e+01  3.1980000e-05  4.0000000e-04     0     2              0     100553
+add  p Particle  eta_b(2S)                     100551        9999e-3              0              0     0     0              0          0
+add  p Particle  Upsilon(2S)                   100553    10023.26e-3       31.98e-6         160e-6     0     2              0     100553
 * The eta_b2(1D) has not been observed.
 add  p Particle  eta_b2(1D)                     10555  1.0157000e+01              0              0     0     4              0      10555
 * The Upsilon_1(1D) and Upsilon_3(1D) has not been observed (possible indications are seen in e.g. Phys. Rev. D82, 111102 (2010)).
 * The Upsilon_2(1D) mass is set to the observed one, and the mass differences from the original EvtGen evt.pdl are kept:
 * Upsilon_1(1D): 1.0156200e+01 - 1.0150100e+01 = 0.0061
 * Upsilon_3(1D): 1.0159900e+01 - 1.0156200e+01 = 0.0037
-add  p Particle  Upsilon_1(1D)                  30553  1.0157600e+01              0              0     0     2              0      30553
-add  p Particle  Upsilon_2(1D)                  20555  1.0163700e+01              0              0     0     4              0      20555
-add  p Particle  Upsilon_3(1D)                    557  1.0167400e+01              0              0     0     6              0        557
-add  p Particle  chi_b0(2P)                    110551  1.0232500e+01              0              0     0     0              0     110551
-add  p Particle  chi_b1(2P)                    120553  1.0255460e+01              0              0     0     2              0     120553
-add  p Particle  h_b(2P)                       110553  1.0259800e+01              0              0     0     2              0     110553
-add  p Particle  chi_b2(2P)                    100555  1.0268650e+01              0              0     0     4              0     100555
+add  p Particle  Upsilon_1(1D)                  30553     10157.6e-3              0              0     0     2              0      30553
+add  p Particle  Upsilon_2(1D)                  20555     10163.7e-3              0              0     0     4              0      20555
+add  p Particle  Upsilon_3(1D)                    557     10167.4e-3              0              0     0     6              0        557
+add  p Particle  chi_b0(2P)                    110551     10232.5e-3              0              0     0     0              0     110551
+add  p Particle  chi_b1(2P)                    120553    10255.46e-3              0              0     0     2              0     120553
+add  p Particle  h_b(2P)                       110553     10259.8e-3              0              0     0     2              0     110553
+add  p Particle  chi_b2(2P)                    100555    10268.65e-3              0              0     0     4              0     100555
 * The eta_b(3S) has not been observed.
-add  p Particle  eta_b(3S)                     200551  1.0335000e+01              0              0     0     0              0          0
-add  p Particle  Upsilon(3S)                   200553  1.0355200e+01  2.0320000e-05  2.6000000e-04     0     2              0     200553
+add  p Particle  eta_b(3S)                     200551       10335e-3              0              0     0     0              0          0
+add  p Particle  Upsilon(3S)                   200553     10355.2e-3       20.32e-6         120e-6     0     2              0     200553
 * The eta_b2(2D) and Upsilon_J(2D) have not been observed.
-add  p Particle  Upsilon_1(2D)                 130553  1.0434900e+01              0              0     0     2              0     130553
-add  p Particle  Upsilon_2(2D)                 120555  1.0440600e+01              0              0     0     4              0     120555
-add  p Particle  eta_b2(2D)                    110555  1.0441000e+01              0              0     0     4              0     110555
-add  p Particle  Upsilon_3(2D)                 100557  1.0444300e+01              0              0     0     6              0     100557
+add  p Particle  Upsilon_1(2D)                 130553     10434.9e-3              0              0     0     2              0     130553
+add  p Particle  Upsilon_2(2D)                 120555     10440.6e-3              0              0     0     4              0     120555
+add  p Particle  eta_b2(2D)                    110555     10441.0e-3              0              0     0     4              0     110555
+add  p Particle  Upsilon_3(2D)                 100557     10444.3e-3              0              0     0     6              0     100557
 * The chi_b0(3P) has not been observed.
-add  p Particle  chi_b0(3P)                    210551  1.0500700e+01              0              0     0     0              0     210551
-add  p Particle  chi_b1(3P)                    220553  1.0513400e+01              0              0     0     2              0     220553
+add  p Particle  chi_b0(3P)                    210551     10500.7e-3              0              0     0     0              0     210551
+add  p Particle  chi_b1(3P)                    220553     10513.4e-3              0              0     0     2              0     220553
 * The h_b(3P) has not been observed.
-add  p Particle  h_b(3P)                       210553  1.0516000e+01              0              0     0     2              0     210553
-add  p Particle  chi_b2(3P)                    200555  1.0524000e+01              0              0     0     4              0     200555
-add  p Particle  Upsilon(4S)                   300553  1.0579400e+01  2.0500000e-02  3.9000000e-02     0     2              0     300553
-add  p Particle  Upsilon(5S)                  9000553  1.0889000e+01  5.1000000e-02  1.6500000e+00     0     2              0          0
+add  p Particle  h_b(3P)                       210553     10516.0e-3              0              0     0     2              0     210553
+add  p Particle  chi_b2(3P)                    200555     10524.0e-3              0              0     0     4              0     200555
+add  p Particle  Upsilon(4S)                   300553     10579.4e-3        20.5e-3         120e-3     0     2              0     300553
+add  p Particle  Upsilon(5S)                  9000553     10885.2e-3          37e-3         200e-3     0     2              0          0
 * Zb: not in the original EvtGen evt.pdl; added for Belle II by B. Fulsom 01/10/2015.
-add  p Particle  Zb(10610)-                  -9052513  1.0607200e+01  1.8400000e-02              0    -3     2               0         0
-add  p Particle  Zb(10610)+                   9052513  1.0607200e+01  1.8400000e-02              0     3     2               0         0
-add  p Particle  Zb(10650)-                  -9152513  1.0652200e+01  1.1500000e-02              0    -3     2               0         0
-add  p Particle  Zb(10650)+                   9152513  1.0652200e+01  1.1500000e-02              0     3     2               0         0
+add  p Particle  Zb(10610)-                  -9052513     10607.2e-3        18.4e-3         100e-3    -3     2               0         0
+add  p Particle  Zb(10610)+                   9052513     10607.2e-3        18.4e-3         100e-3     3     2               0         0
+add  p Particle  Zb(10650)-                  -9152513     10652.2e-3        11.5e-3          60e-3    -3     2               0         0
+add  p Particle  Zb(10650)+                   9152513     10652.2e-3        11.5e-3          60e-3     3     2               0         0
 * Upsilon(6S): not in the original EvtGen evt.pdl; added for Belle II by B. Fulsom 01/10/2015.
-add  p Particle  Upsilon(6S)                  9010553  1.0992000e+01  4.9000000e-02              0     0     2              0          0
+add  p Particle  Upsilon(6S)                  9010553  1.0992000e+01          24e-3         120e-3     0     2              0          0
 *---------------------------------------------------------------------------------------------------------------------------------------
 * N baryons
 * Data from M. Tanabashi et al. (Particle Data Group), Phys. Rev. D 98, 030001 (2018) and 2019 update.

@@ -13,8 +13,6 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
-#include<iostream>
-
 namespace TreeFitter {
 
   bool Constraint::operator<(const Constraint& rhs) const

@@ -13,7 +13,6 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 
 #include <TMatrixFSym.h>
-#include <iostream>
 
 namespace TreeFitter {
 

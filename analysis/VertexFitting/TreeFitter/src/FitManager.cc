@@ -19,8 +19,6 @@
 #include <analysis/VertexFitting/TreeFitter/DecayChain.h>
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 
-#include<iostream>
-
 namespace TreeFitter {
 
   FitManager::FitManager(Belle2::Particle* particle,
@@ -244,10 +242,9 @@ namespace TreeFitter {
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
     }
-    if (pb.type() == 10) {
+    if (pb.type() == ParticleBase::kFeedthroughParticle) {
       return;
     }
-
 
     if (m_updateDaugthers || isTreeHead) {
       if (posindex >= 0) {

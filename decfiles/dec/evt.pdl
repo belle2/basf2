@@ -383,7 +383,7 @@ add  p Particle  D+                               411     1869.65e-3            
 add  p Particle  D-                              -411     1869.65e-3              0              0    -3     0  3.1178416e-01       -411
 add  p Particle  D0                               421     1864.83e-3              0              0     0     0  1.2294489e-01        421
 add  p Particle  anti-D0                         -421     1864.83e-3              0              0     0     0  1.2294489e-01       -421
-* D*. The D*0 width upper limit is Gamma < 2.1 MeV (90% C. L.). The value from original EvtGen devt.pdl is used.
+* D*. The D*0 width upper limit is Gamma < 2.1 MeV (90% C. L.). The value from original EvtGen evt.pdl is used.
 add  p Particle  D*+                              413     2010.26e-3        83.4e-6         450e-3     3     2              0        413
 add  p Particle  D*-                             -413     2010.26e-3        83.4e-6         450e-3    -3     2              0       -413
 add  p Particle  D*0                              423     2006.85e-3  6.5821023e-06          35e-6     0     2              0        423
@@ -478,19 +478,23 @@ add  p Particle  B_2*0                            515      5739.5e-3        24.2
 add  p Particle  anti-B_2*0                      -515      5739.5e-3        24.2e-3  2.0000000e-01     0     4              0       -515
 *---------------------------------------------------------------------------------------------------------------------------------------
 * Bottom strange mesons
+* Data from P.A. Zyla et al. (Particle Data Group), to be published in Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
 *---------------------------------------------------------------------------------------------------------------------------------------
-add  p Particle  B_s0                             531  5.3667700e+00              0              0     0     0  4.4129450e-01        531
-add  p Particle  anti-B_s0                       -531  5.3667700e+00              0              0     0     0  4.4129450e-01       -531
-add  p Particle  B_s0H                            530  5.3663000e+00              0              0     0     0  4.6074353e-01          0
-add  p Particle  B_s0L                            350  5.3663000e+00              0              0     0     0  4.2184546e-01          0
-add  p Particle  B_s*0                            533  5.4154000e+00  6.5821220e-06  1.0000000e-04     0     2              0        533
-add  p Particle  anti-B_s*0                      -533  5.4154000e+00  6.5821220e-06  1.0000000e-04     0     2              0       -533
+add  p Particle  B_s0                             531     5366.88e-3              0              0     0     0  4.5778308e-01        531
+add  p Particle  anti-B_s0                       -531     5366.88e-3              0              0     0     0  4.5778308e-01       -531
+add  p Particle  B_s0H                            530     5366.88e-3              0              0     0     0  4.8566378e-01          0
+add  p Particle  B_s0L                            350     5366.88e-3              0              0     0     0  4.2660467e-01          0
+* The B_s*0 width is not measured. The value from original EvtGen evt.pdl is used.
+add  p Particle  B_s*0                            533      5415.4e-3  6.5821220e-06  1.0000000e-04     0     2              0        533
+add  p Particle  anti-B_s*0                      -533      5415.4e-3  6.5821220e-06  1.0000000e-04     0     2              0       -533
+* The B_s0*0 is not observed. The values from original EvtGen evt.pdl are used.
 add  p Particle  B_s0*0                         10531  5.8410000e+00  1.4993444e-01  6.5000000e-02     0     0              0      10531
 add  p Particle  anti-B_s0*0                   -10531  5.8410000e+00  1.4993444e-01  6.5000000e-02     0     0              0     -10531
-add  p Particle  B_s10                          10533  5.8310000e+00  3.9891649e-02  1.0000000e-02     0     2              0      10533
-add  p Particle  anti-B_s10                    -10533  5.8310000e+00  3.9891649e-02  1.0000000e-02     0     2              0     -10533
-add  p Particle  B_s2*0                           535  5.8399600e+00  1.6000000e-03  2.9000000e-02     0     4              0        535
-add  p Particle  anti-B_s2*0                     -535  5.8399600e+00  1.6000000e-03  2.9000000e-02     0     4              0       -535
+add  p Particle  B_s10                          10533     5828.70e-3         0.5e-3           3e-3     0     2              0      10533
+add  p Particle  anti-B_s10                    -10533     5828.70e-3         0.5e-3           3e-3     0     2              0     -10533
+add  p Particle  B_s2*0                           535     5839.86e-3        1.49e-3           8e-3     0     4              0        535
+add  p Particle  anti-B_s2*0                     -535     5839.86e-3        1.49e-3           8e-3     0     4              0       -535
+* May be the B_sJ(5850). The values from original EvtGen evt.pdl are used.
 add  p Particle  B'_s10                         20533  5.8590000e+00  2.5027080e-01  2.0000000e-02     0     2              0      20533
 add  p Particle  anti-B'_s10                   -20533  5.8590000e+00  2.5027080e-01  2.0000000e-02     0     2              0     -20533
 *---------------------------------------------------------------------------------------------------------------------------------------

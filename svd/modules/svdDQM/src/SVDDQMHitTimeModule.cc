@@ -23,7 +23,7 @@ SVDDQMHitTimeModule::SVDDQMHitTimeModule(): HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("Make data quality monitoring plots for SVD Hit Time for bhabha, mu mu, and hadron samples seeded by different trigger times.(ECL, CDC)");
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
-           "if TRUE (default): svdTime back in SVD time reference, and eventT0 in eventT0synch", bool(true));
+           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
   addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
            "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
 

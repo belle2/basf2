@@ -795,6 +795,7 @@ C QQ transverse to PKS
       if(sqrt(pksd).le.2*ampi) pksd=4*ampi**2 ! phase space edge protection
 
       CALL GETFF2PIRHO(FF2PIRHO)
+C     PRINT *, 'FF2PIRHO = ', FF2PIRHO
       IF (FF2PIRHO.EQ.0.OR.FF2PIRHO.EQ.1) THEN
 C Historically supposed to use RChL package or not, but now RChL has been integrated  
          DO K=1,4 
@@ -1016,14 +1017,9 @@ C      TAU-  -->  K-  PI- PI+
        COEFc(5,5)=-SQRT(2.)
 C      TAU-  -->  PI- K0B PI0
 C AJW 11/97: Add in the K*-prim-s, ala Finkemeier&Mirkes
-       COEFc(1,6)= 0.0
-       COEFc(2,6)= -1.0
-       COEFc(3,6)= 0.0
-       IF (IFKPIPI.EQ.1) THEN! AJW 11/97: Add in the K*-prim-s, ala Finkemeier&Mirkes 
-         COEFc(1,6)= 1./3.
-         COEFc(2,6)=-2./3.
-         COEFc(3,6)= 2./3.
-       ENDIF
+       COEFc(1,6)= 1./3.
+       COEFc(2,6)=-2./3.
+       COEFc(3,6)= 2./3.
        COEFc(4,6)= 0.0
        COEFc(5,6)=-2.0
 C      TAU-  --> ETA  PI-  PI0
@@ -3194,6 +3190,8 @@ C
       INTEGER IS, NDAU, IDECAY
       INTEGER NEV, NPRIN
       DATA NPRIN/0/
+      INTEGER LAMDEC
+      COMMON /LAMDEC/ LAMDEC
 C     
       JNPI=MODE-NLT
 C position of decaying particle
@@ -3275,7 +3273,7 @@ C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
         IF ((ABS(KFPI).EQ.213).AND.(MODE.EQ.342)) IDECAY=1 ! rho+
         IF ((ABS(KFPI).EQ.9000211).AND.(MODE.GE.343.AND.MODE.LE.346)) IDECAY=1 !a0+
         IF ((ABS(KFPI).EQ.10213).AND.(MODE.GE.347.AND.MODE.LE.349)) IDECAY=1 !b1+
-C       IF ((ABS(KFPI).EQ.3122).AND.(MODE.GE.329.AND.MODE.LE.332)) IDECAY=1 ! Lambda(bar)
+        IF ((ABS(KFPI).EQ.3122).AND.(MODE.GE.329.AND.MODE.LE.332).AND.(LAMDEC.EQ.1)) IDECAY=1 ! Lambda(bar)
         IF ((ABS(KFPI).EQ.9010221).AND.(MODE.GE.339.AND.MODE.LE.340)) IDECAY=1 ! f0
         IF ((ABS(KFPI).EQ.9000111).AND.(MODE.GE.364.AND.MODE.LE.371)) IDECAY=1 ! a0
 C     

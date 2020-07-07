@@ -424,13 +424,13 @@ C     simplified  (FF3PIRHOPR =0)
 
 
 C FF2PIRHO: dipswitch for the two pion form factor (default FF2PIRHO = 1) 
-C FF2PIRHO =1   RChL parametrization 
+C FF2PIRHO = 1  RChL parametrization 
 C FF2PIRHO = 2  Belle parametrization, 
 C               all parameters par (1...11) of fit are free 
 C FF2PIRHO = 3  Belle parametrization, 
 C               parameters of fit are free 
 C               except for fixed par(1)=F_pi(0)=1
-      FF2PIRHO =2
+C      FF2PIRHO =2
 
 
 C FCOUL: dipswitch for the Coulomb interaction 

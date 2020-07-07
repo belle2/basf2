@@ -50,8 +50,8 @@ C switch to initialize that all modes are represented equally.
       
 C     FF2PIRHO ! switch for the two pion form factor
 C     = 0 CLEO parametrization
-C     = 1 RChL parametrization
-C      = 2, 3 Belle parametrization
+C     = 1 RChL parametrization (is same as = 0 in this implementation)
+C     = 2, 3 Belle parametrization
 C     pi- pi0 -> Two options of Belle parametrization (PRD 78, 2008, 072006)
 C FF2PIRHO = 2  Belle parametrization (suggested default = 2)
 C               all parameters par (1...11) of fit are free
@@ -84,13 +84,19 @@ C Similar tuning also applied to tau- -> PI- K0B PI0 nu
       COMMON /IFKPIPI/ IFKPIPI
 
 C     pi- pi0 pi0 pi0, pi- pi- pi+ pi0:
-C     IFCURR4PI = 0  CPC 146 2002, hep=ph/0201149 [Novosibirsk] [suggested default]
+C     IFCURR4PI = 0  CPC 146 2002, hep-ph/0201149 [Novosibirsk] [suggested default]
 C     IFCURR4PI = 1  hep-ph/9410260 (probably) [Karlsruhe]
 C     IFCURR4PI = 2  R. Decker, M. Finkemeier, P. Heiliger, H.H.Jonsson, TTP94-13
 C     IFCURR4PI = 3  CLEO initialization
       INTEGER IFCURR4PI
       DATA    IFCURR4PI /0/
       COMMON /IFCURR4PI/ IFCURR4PI
+C
+C     Optional test flag to decay Lambda or not inside TAUOLA
+C     [Note: LAMDEC=1 will reset its lifetime, so turn the flag should be turned off by default]   
+      INTEGER LAMDEC
+      DATA    LAMDEC /0/
+      COMMON /LAMDEC/ LAMDEC
 C
       SAVE
 C-------------------------------------------------------------------------------
@@ -122,9 +128,16 @@ C  KeyA1 is used for formfactors actually not in use
         IRCHL3PI  = XPAR(ITAUXPAR+903)
         IFKPIPI   = XPAR(ITAUXPAR+904)
         IFCURR4PI = XPAR(ITAUXPAR+905)
+        LAMDEC    = XPAR(ITAUXPAR+906)
 
-        PRINT *, 'IFEQUALBR, FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI = ',
-     C            IFEQUALBR, FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI
+C       Print functional flags
+        PRINT *, 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI = ',
+     $            FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI
+        
+C       Print optional flags 
+        PRINT *, 'IFEQUALBR, LAMDEC = ',
+     $            IFEQUALBR, LAMDEC
+
 
         if(IRCHL3PI.eq.1) then
            CALL INIRChL(1)      ! (IRCHL)

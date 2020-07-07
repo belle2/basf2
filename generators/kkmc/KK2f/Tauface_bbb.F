@@ -943,7 +943,7 @@ C=================================================
         IF(II.EQ.32) NAMES(I-NLT)='  TAU-  --> eta pi-            ' ! TauDecayModeBBB = 194 ! split into TauDecayModeBBB = 246-249
         IF(II.EQ.33) NAMES(I-NLT)='  TAU-  --> PI-  PHI           ' ! TauDecayModeBBB = 195 
         IF(II.EQ.34) NAMES(I-NLT)='  TAU-  -->  K-  PHI           ' ! TauDecayModeBBB = 196 ! included after being split into K+K-, K0SK0L (TauDecayModeBBB = 230, 231)
-        IF(II.EQ.35) NAMES(I-NLT)='  TAU-  -->  PI- OMEGA         ' ! TauDecayModeBBB = 197 ! in TauDecayModeBBB = 237 (om->pi+pi-) and 3 (om->pi+pi-pi0) and 120 (om->pi0gamma)
+        IF(II.EQ.35) NAMES(I-NLT)='  TAU-  -->  PI- OMEGA         ' ! TauDecayModeBBB = 197 ! in TauDecayModeBBB = 237 (om->pi+pi-) and 3 (om->pi+pi-pi0) and 110 (om->pi0gamma)
         IF(II.EQ.36) NAMES(I-NLT)='  TAU-  -->  K-  OMEGA         ' ! TauDecayModeBBB = 198 ! included after being split into TauDecayModeBBB = 250-252
         IF(II.EQ.37) NAMES(I-NLT)='  TAU-  -->  PI- ETAprm        ' ! TauDecayModeBBB = 199 
         IF(II.EQ.38) NAMES(I-NLT)='  TAU-  -->  K-  ETAprm        ' ! TauDecayModeBBB = 200 

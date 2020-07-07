@@ -43,7 +43,7 @@ RawSecMapMergerModule::RawSecMapMergerModule() : Module()
            bool(false));
 
   addParam("threshold", m_RelThreshold,
-           "Relative threshold (in %) used to prune the sector maps. Will remove X % of the sector maps.", {0});
+           "Relative threshold (in %) used to prune the sector maps. Will remove X % of the subgraphs.", {0});
 }
 
 

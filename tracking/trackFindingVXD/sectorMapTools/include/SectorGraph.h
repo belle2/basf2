@@ -179,6 +179,8 @@ namespace Belle2 {
       for (int nfound = 1; nfound < hc_nfound->GetNbinsX(); nfound++) {
         if (hc_nfound->GetBinContent(nfound) > relThreshold / 100.) {
           B2INFO("Absolute threshold : remove every graph with nfound < " << nfound);
+          delete h_nfound;
+          delete hc_nfound;
           return nfound;
         }
       }

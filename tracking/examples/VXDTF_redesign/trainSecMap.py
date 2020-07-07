@@ -38,8 +38,12 @@ arg_parser.add_argument('--train_sample', '-i', type=str, action='append',
                         help='List of prepared training data file names which will be used for the training of the SecMap')
 arg_parser.add_argument('--secmap', '-s', type=str,
                         help='Inclusion of the root file containing the trained SecMap for the application of the VXDTF2.')
-arg_parser.add_argument('--threshold', '-t', type=int, default=0,
-                        help='Relative threshold (in %) used to prune the sector maps.')
+arg_parser.add_argument(
+    '--threshold',
+    '-t',
+    type=int,
+    default=0,
+    help='Relative threshold (in %) used to prune the sector maps. Will remove X % of the least used subgraphs.')
 
 arguments = arg_parser.parse_args(sys.argv[1:])
 train_data = arguments.train_sample

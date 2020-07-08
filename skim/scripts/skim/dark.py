@@ -309,7 +309,7 @@ class EGammaControlDark(BaseSkim):
 
         # want exactly 1 good quality track in the event
         # (not one good electron, one good anything)
-        phys_perf_good_track = 'd0 < 1 and abs(z0) < 5'
+        phys_perf_good_track = 'abs(dr) < 1 and abs(dz) < 3 and pt > 0.15'  # cm, cm, GeV/c
         one_good_track = f'[nCleanedTracks({phys_perf_good_track}) == 1]'
 
         # exactly 1 good photon in the event

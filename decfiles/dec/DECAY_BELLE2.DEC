@@ -7754,6 +7754,7 @@ Enddecay
 CDecay anti-K*0
 
 # K*(892)+
+# PDG 2020 data.
 Decay K*+
 0.66600667  K0  pi+                        VSS;
 0.33300333  K+  pi0                        VSS;

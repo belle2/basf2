@@ -130,9 +130,40 @@ namespace Belle2 {
      */
     double v0DaughterTrackParamCov5x5AtIPPerigee(const Particle* part, const std::vector<double>& params);
 
+    /**
+     * returns the pull of the helix parameter d0 with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& params);
+
+    /**
+     * returns the pull of the helix parameter phi0 with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotPhi0Pull(const Particle* part, const std::vector<double>& params);
+
+    /**
+     * returns the pull of the helix parameter omega with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotOmegaPull(const Particle* part, const std::vector<double>& params);
+
+    /**
+     * returns the pull of the helix parameter z0 with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotZ0Pull(const Particle* part, const std::vector<double>& params);
+
+    /**
+     * returns the pull of the helix parameter tan(lambda) with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& params);
+
 
     /** helper function to get track fit result from V0 object */
     TrackFitResult const* getTrackFitResultFromV0DaughterParticle(Particle const* particle, const double daughterID);
+
+    /** helper function to get pull of the helix parameters of the V0 daughter tracks*/
+    double getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
+        const int tauIndex);
+
+
   }
 } // Belle2 namespace
 

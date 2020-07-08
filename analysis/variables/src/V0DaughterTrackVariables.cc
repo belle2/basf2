@@ -12,7 +12,8 @@
 #include <analysis/variables/V0DaughterTrackVariables.h>
 #include <analysis/VariableManager/Manager.h>
 
-#include <analysis/variables/TrackVariables.h>
+#include <analysis/variables/TrackVariables.h>// getTrackFitResultFromParticle
+#include <analysis/variables/MCTruthVariables.h>// isSignal 
 
 // framework - DataStore
 #include <framework/datastore/StoreObjPtr.h>
@@ -56,6 +57,8 @@ namespace Belle2 {
                                          v0->getTrackFitResults().second;
         return trackFit;
       } else {
+        if (!(particle->getDaughter(dID)))
+          return nullptr;
         const TrackFitResult* trackFit = getTrackFitResultFromParticle(particle->getDaughter(dID));
         return trackFit;
       }
@@ -285,6 +288,82 @@ namespace Belle2 {
       return cov[paramID];
     }
 
+    // helper function to get pull of the helix parameters of the V0 daughter tracks
+    // Not registered in variable mananger
+    double getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
+        const int tauIndex)
+    {
+      if (!particle) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      const int dID = int(std::lround(daughterID));
+      if (not(dID == 0 || dID == 1)) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      const MCParticle* mcparticle_v0 = particle->getRelatedTo<MCParticle>();
+      if (!mcparticle_v0) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      if (isSignal(particle) < 0.5) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      if (!(particle->getDaughter(dID))) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      const MCParticle* mcparticle = particle->getDaughter(dID)->getRelatedTo<MCParticle>();
+      if (!mcparticle) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      const TrackFitResult* trackFit = getTrackFitResultFromV0DaughterParticle(particle, daughterID);
+      if (!trackFit) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      // MC information
+      const TVector3 mcProdVertex   = mcparticle->getVertex();
+      const TVector3 mcMomentum     = mcparticle->getMomentum();
+      const double mcParticleCharge = mcparticle->getCharge();
+      const double BzAtProdVertex = BFieldManager::getField(TVector3(mcProdVertex.X(), mcProdVertex.Y(),
+                                                            mcProdVertex.Z())).Z() / Belle2::Unit::T;
+      Helix mcHelix = Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+      mcHelix.passiveMoveBy(mcProdVertex);
+      const std::vector<double> mcHelixPars = { mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(),
+                                                mcHelix.getZ0(), mcHelix.getTanLambda()
+                                              };
+
+      // measured information (from the rconstructed particle)
+      UncertainHelix measHelix = trackFit->getUncertainHelix();
+      measHelix.passiveMoveBy(particle->getVertex());
+      const TMatrixDSym measCovariance = measHelix.getCovariance();
+      const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(),
+                                                 measHelix.getZ0(), measHelix.getTanLambda()
+                                                };
+      const std::vector<double> measErrSquare = {measCovariance[0][0], measCovariance[1][1], measCovariance[2][2],
+                                                 measCovariance[3][3], measCovariance[4][4]
+                                                };
+
+      if (not(measErrSquare.at(tauIndex) > 0)) { return std::numeric_limits<double>::quiet_NaN(); }
+
+      return (mcHelixPars.at(tauIndex) - measHelixPars.at(tauIndex)) / std::sqrt(measErrSquare.at(tauIndex));
+    }
+
+    double v0DaughterHelixWithVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& params)
+    {
+      return getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(part, params[0], 0);
+    }
+
+    double v0DaughterHelixWithVertexAsPivotPhi0Pull(const Particle* part, const std::vector<double>& params)
+    {
+      return getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(part, params[0], 1);
+    }
+
+    double v0DaughterHelixWithVertexAsPivotOmegaPull(const Particle* part, const std::vector<double>& params)
+    {
+      return getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(part, params[0], 2);
+    }
+
+    double v0DaughterHelixWithVertexAsPivotZ0Pull(const Particle* part, const std::vector<double>& params)
+    {
+      return getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(part, params[0], 3);
+    }
+
+    double v0DaughterHelixWithVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& params)
+    {
+      return getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(part, params[0], 4);
+    }
+
 
     VARIABLE_GROUP("V0Daughter");
 
@@ -329,5 +408,15 @@ namespace Belle2 {
     REGISTER_VARIABLE("v0DaughterCov(i,j)",        v0DaughterTrackParamCov5x5AtIPPerigee,
                       "j-th element of the 15 covariance matrix elements (at IP perigee) of the i-th daughter track. "
                       "(0,0), (0,1) ... (1,1), (1,2) ... (2,2) ...");
+    REGISTER_VARIABLE("v0DaughterD0Pull(i)",       v0DaughterHelixWithVertexAsPivotD0Pull,
+                      "d0 pull of the i-th daughter track with the V0 vertex as the track pivot");
+    REGISTER_VARIABLE("v0DaughterPhi0Pull(i)",     v0DaughterHelixWithVertexAsPivotPhi0Pull,
+                      "phi0 pull of the i-th daughter track with the V0 vertex as the track pivot");
+    REGISTER_VARIABLE("v0DaughterOmegaPull(i)",    v0DaughterHelixWithVertexAsPivotOmegaPull,
+                      "omega pull of the i-th daughter track with the V0 vertex as the track pivot");
+    REGISTER_VARIABLE("v0DaughterZ0Pull(i)",       v0DaughterHelixWithVertexAsPivotZ0Pull,
+                      "z0 pull of the i-th daughter track with the V0 vertex as the track pivot");
+    REGISTER_VARIABLE("v0DaughterTanLambdaPull(i)", v0DaughterHelixWithVertexAsPivotTanLambdaPull,
+                      "tan(lambda) pull of the i-th daughter track with the V0 vertex as the track pivot");
   }
 }

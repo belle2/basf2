@@ -582,3 +582,54 @@ class SystematicsLambda(BaseSkim):
             LambdaList.append("Lambda0:syst" + str(chID))
 
         self.SkimLists = LambdaList
+
+
+@fancy_skim_header
+class SystematicsPhiGamma(BaseSkim):
+    """
+    Uses the ``gamma:loose`` list and a cut on the number of tracks.
+
+    Cuts applied:
+
+    * :math:`E_{\\gamma}> 3\\,\\text{GeV}` AND
+    * :math:`E_{\\gamma}< 8\\,\\text{GeV}`
+    * :math:`n_{\\text{tracks}} \\geq 2` AND :math:`n_{\\text{tracks}} \\leq 4`
+    * at least 1 candidate in the K_S0:merged or in the phi->K+:all K-:all lists
+    """
+    __authors__ = ["Giuseppe Finocchiaro", "Benjamin Oberhof"]
+    __description__ = (
+        "Skim for ISR - phi gamma analyses, "
+        ":math:`e^+ e^- \\to \\phi \\gamma ` and "
+        ":math:`\\phi` decays into two charged tracks "
+        "(:math: `K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)"
+    )
+    __contact__ = __liaison__
+    __category__ = "systematics"
+
+    RequiredStandardLists = {
+        "stdPhotons": {
+            "stdPhotons": ["loose"]
+        },
+        "stdCharged": {
+            "stdK": ["all"],
+        },
+        "stdV0s": {
+            "stdKshorts": ["merged"],
+        }
+    }
+
+    TestFiles = [get_test_file("phigamma_neutral")]
+
+    def build_lists(self, path):
+        EventCuts = [
+            "[nTracks>=2] and [nTracks<=4]",
+            "[nParticlesInList(gamma:PhiSystematics) > 0]",
+            "[[nParticlesInList(phi:charged) > 0] or [nParticlesInList(K_S0:PhiSystematics) > 0]]"
+        ]
+
+        ma.cutAndCopyList("gamma:PhiSystematics", "gamma:loose", "3 < E < 8", writeOut=True, path=path)
+        ma.reconstructDecay('phi:charged -> K+:all K-:all', '0.9 < M < 1.2', path=path)
+        ma.copyList('K_S0:PhiSystematics', 'K_S0:merged', writeOut=True, path=path)
+
+        path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
+        self.SkimLists = ["gamma:PhiSystematics"]

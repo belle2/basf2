@@ -17,6 +17,8 @@ env['LIBS'] = [
     'mva',
     'framework',
     'simulation',
+    'ir',
+    'structure', 'structure_dbobjects',
     'genfit2',
     'EG',
     'CLHEP',

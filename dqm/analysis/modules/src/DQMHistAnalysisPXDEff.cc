@@ -171,16 +171,24 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: beginRun called.");
 
-  // no way to reset TEfficiency
+  // no way to reset TEfficiency, do it bin by bin
+  // m_cEffAll->Clear();
+  // m_cEffAllUpdate->Clear();
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    int j = i + 1;
+    m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAll->SetTotalEvents(j, 0);
+    m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAllUpdate->SetTotalEvents(j, 0);
+  }
   // Thus histo will contain old content until first update
   m_hEffAllLastTotal->Reset();
   m_hEffAllLastPassed->Reset();
-  // m_cEffAll->Clear();
-  // m_cEffAllUpdate->Clear();
 
   for (auto single_cmap : m_cEffModules) {
     if (single_cmap.second) single_cmap.second->Clear();
   }
+
 }
 
 
@@ -247,8 +255,8 @@ void DQMHistAnalysisPXDEffModule::event()
     int j = i + 1;
 
     if (mapHits[aModule] == nullptr || mapMatches[aModule] == nullptr) {
+      m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, 0);
-      m_hEffAll->SetPassedEvents(j, 0);
     } else {
       double nmatch = mapMatches[aModule]->Integral(); // GetEntries()?
       double nhit = mapHits[aModule]->Integral();
@@ -263,11 +271,13 @@ void DQMHistAnalysisPXDEffModule::event()
       }
 
       all += ihit;
+      m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
 
       if (nhit < m_minEntries) {
         // update the first entries directly (short runs)
+        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
         m_hEffAllUpdate->SetTotalEvents(j, nhit);
         m_hEffAllUpdate->SetPassedEvents(j, nmatch);
         m_hEffAllLastTotal->SetBinContent(j, nhit);

@@ -48,10 +48,10 @@ namespace Belle2 {
 
     private:
       /// Creator of the track relations for linking
-      WeightedRelationCreator<const CDCTrack, ChooseableTrackRelationFilter, WeightedRelation> m_trackRelationCreator;
+      WeightedRelationCreator<const CDCTrack, ChooseableTrackRelationFilter> m_trackRelationCreator;
 
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<const CDCTrack, WeightedRelation> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCTrack> m_cellularPathFinder;
 
       /// Memory for the relations between tracks to be followed on linking
       std::vector<WeightedRelation<const CDCTrack> > m_trackRelations;

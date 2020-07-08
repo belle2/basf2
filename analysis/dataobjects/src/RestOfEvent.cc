@@ -501,18 +501,23 @@ void RestOfEvent::print(const std::string& maskName, bool unpackComposite) const
     tab = " - - ";
   } else {
     if (m_isNested) {
-      B2INFO(tab << "Is Nested ROE");
+      B2INFO(tab << "ROE is nested");
     }
     if (m_isFromMC) {
-      B2INFO(tab << "Is build from genPartices");
+      B2INFO(tab << "ROE is build from generated particles");
     }
   }
-  unsigned int nCharged = getChargedParticles(maskName, 0, unpackComposite).size();
-  unsigned int nPhotons = getPhotons(maskName, unpackComposite).size();
-  unsigned int nNeutralHadrons = getHadrons(maskName, unpackComposite).size();
-  B2INFO(tab << "No. of Charged particles in ROE: " << nCharged);
-  B2INFO(tab << "No. of Photons           in ROE: " << nPhotons);
-  B2INFO(tab << "No. of Neutral hadrons   in ROE: " << nNeutralHadrons);
+  if (!m_isFromMC) {
+    unsigned int nCharged = getChargedParticles(maskName, 0, unpackComposite).size();
+    unsigned int nPhotons = getPhotons(maskName, unpackComposite).size();
+    unsigned int nNeutralHadrons = getHadrons(maskName, unpackComposite).size();
+    B2INFO(tab << "No. of Charged particles in ROE: " << nCharged);
+    B2INFO(tab << "No. of Photons           in ROE: " << nPhotons);
+    B2INFO(tab << "No. of K_L0 and neutrons in ROE: " << nNeutralHadrons);
+  } else {
+    unsigned int nParticles = getParticles(maskName, unpackComposite).size();
+    B2INFO(tab << "No. of generated particles in ROE: " << nParticles);
+  }
   printIndices(maskName, unpackComposite, tab);
 }
 

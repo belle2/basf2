@@ -14,9 +14,7 @@
 #ifndef TRGECLDIGITIZER_H
 #define TRGECLDIGITIZER_H
 
-#include <iostream>
 #include <TObject.h>
-#include <TVector3.h>
 #include "trg/ecl/TrgEclMapping.h"
 #include "trg/ecl/TrgEclDataBase.h"
 

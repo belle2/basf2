@@ -41,12 +41,18 @@ namespace Belle2 {
     /**
      * Set time shift.
      */
-    void setTimeShift(float timeShift);
+    void setTimeShift(float timeShift)
+    {
+      m_TimeShift = timeShift;
+    }
 
     /**
      * Get time shift.
      */
-    float getTimeShift() const;
+    float getTimeShift() const
+    {
+      return m_TimeShift;
+    }
 
   private:
 

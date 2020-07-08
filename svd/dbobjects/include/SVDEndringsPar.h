@@ -11,7 +11,6 @@
 
 #include <TObject.h>
 #include <string>
-#include <map>
 
 
 namespace Belle2 {

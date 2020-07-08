@@ -18,12 +18,8 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <bitset>
-#include "trg/trg/Time.h"
 
 namespace Belle2 {
-
-  class TRGTime;
 
 /// A class to represent a state of multi bits
   class TRGState {

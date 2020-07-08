@@ -13,7 +13,6 @@
 #include <TObject.h>
 #include <vector>
 #include <top/dbobjects/TOPASICPedestals.h>
-#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 

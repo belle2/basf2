@@ -18,7 +18,7 @@ path = b2.Path()
 
 ma.inputMdst('default', '../PRsemileptonicUntagged.udst.root', path=path)
 
-ma.cutAndCopyLists('B0:all', ['B0:L1', 'B0:L2'], '', path=path)
+ma.cutAndCopyLists('B0:all', ['B0:PRSemileptonic_1', 'B0:PRSemileptonic_2'], '', path=path)
 
 ma.buildRestOfEvent('B0:all', path=path)
 ma.appendROEMask('B0:all', 'basic',

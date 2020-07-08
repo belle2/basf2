@@ -24,12 +24,10 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDEventInfo.h>
-#include <boost/tuple/tuple.hpp>
 #include <fstream>
 #include <sstream>
 #include <regex>
 #include <algorithm>
-#include <numeric>
 #include <deque>
 #include <cmath>
 #include <root/TMath.h>
@@ -729,6 +727,8 @@ void SVDDigitizerModule::saveDigits()
           samples.push_back(addNoise(s(t), elNoiseU));
           t += m_samplingTime;
         }
+        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+          samples.push_back(0);
       }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
@@ -808,6 +808,8 @@ void SVDDigitizerModule::saveDigits()
           samples.push_back(addNoise(s(t), elNoiseV));
           t += m_samplingTime;
         }
+        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+          samples.push_back(0);
       }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();

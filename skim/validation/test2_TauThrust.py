@@ -5,7 +5,7 @@ import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdPi
 from stdPhotons import stdPhotons
-from skim.taupair import SetTauThrustSkimVariables
+from skim.taupair import TauThrust
 
 """
 <header>
@@ -23,7 +23,7 @@ stdPi('all', path=tauthrustskim)
 stdPhotons('all', path=tauthrustskim)
 
 # set variables
-SetTauThrustSkimVariables(path=tauthrustskim)
+TauThrust().additional_setup(path=tauthrustskim)
 
 # the variables that are printed out are:
 ma.variablesToHistogram(

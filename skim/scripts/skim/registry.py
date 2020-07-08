@@ -17,6 +17,7 @@ RegisteredSkims = [
     ("10600600", "systematics", "SystematicsEELL"),
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
+    ("11640100", "systematics", "SystematicsPhiGamma"),
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
@@ -93,6 +94,7 @@ RegisteredSkims = [
     ("18020100", "dark", "SinglePhotonDark"),
     ("18020200", "dark", "GammaGammaControlKLMDark"),
     ("18020300", "dark", "ALP3Gamma"),
+    ("18020400", "dark", "EGammaControlDark"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
@@ -100,6 +102,8 @@ RegisteredSkims = [
     ("18520400", "dark", "LFVZpVisible"),
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
+    ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
+    ("18520500", "lowMulti", "LowMassTwoTrack"),
 
     # --- WG9: Charmless B decays ---
     ("19130100", "btocharmless", "CharmlessHad2Body"),

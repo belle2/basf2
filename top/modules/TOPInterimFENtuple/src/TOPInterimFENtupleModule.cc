@@ -10,7 +10,6 @@
 
 #include <top/modules/TOPInterimFENtuple/TOPInterimFENtupleModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
@@ -22,8 +21,6 @@
 #include <top/dataobjects/TOPProductionEventDebug.h>
 #include <rawdata/dataobjects/RawTOP.h>
 
-#include <top/geometry/TOPGeometryPar.h>
-
 #include <iostream>
 #include <sstream>
 
@@ -34,8 +31,6 @@
 using namespace std;
 
 namespace Belle2 {
-
-  using namespace TOP;
 
   REG_MODULE(TOPInterimFENtuple)
 

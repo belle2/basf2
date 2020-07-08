@@ -10,7 +10,6 @@
 
 #include <reconstruction/modules/EventT0Combiner/EventT0Combiner.h>
 
-#include <numeric>
 #include <cmath>
 
 using namespace Belle2;

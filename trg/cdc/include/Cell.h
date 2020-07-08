@@ -14,7 +14,6 @@
 #ifndef TRGCDCCell_FLAG_
 #define TRGCDCCell_FLAG_
 
-#include <vector>
 #include "CLHEP/Geometry/Vector3D.h"
 #include "CLHEP/Geometry/Point3D.h"
 #include "trg/trg/Signal.h"
@@ -33,7 +32,6 @@ namespace Belle2 {
 
   class TRGCDC;
   class TRGCDCCellHit;
-  class TRGCDCTrackSegment;
 
 /// A class to represent a wire in CDC.
   class TRGCDCCell {

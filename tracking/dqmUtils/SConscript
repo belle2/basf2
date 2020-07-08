@@ -1,0 +1,8 @@
+Import('env')
+
+# Mark this folder as a sub library
+env.Dictionary()['SUBLIB'] = True
+
+env['LIBS'] = ['vxd', 'vxd_dataobjects', 'rawdata_dataobjects', 'tracking_dataobjects']
+
+Return('env')

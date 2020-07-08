@@ -74,6 +74,16 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
     std::string name = "PXD_Track_Cluster_Charge_" + (std::string)aVxdID;
     std::replace(name.begin(), name.end(), '.', '_');
     m_cChargeMod[aVxdID] = new TCanvas((m_histogramDirectoryName + "/c_Fit_" + name).data());
+    if (aVxdID == VxdID("1.5.1")) {
+      for (int s = 0; s < 6; s++) {
+        for (int d = 0; d < 4; d++) {
+          m_cChargeModASIC[aVxdID][s][d] = new TCanvas((m_histogramDirectoryName + "/c_Fit_" + name + Form("_s%d_d%d", s + 1, d + 1)).data());
+        }
+      }
+      m_hChargeModASIC2d[aVxdID] = new TH2F(("PXD_TCChargeMPV_" + name).data(), ("PXD TCCharge MPV " + name + ";Switcher;DCD;MPV").data(),
+                                            6, 0.5, 6.5, 4, 0.5, 4.5);
+      m_cChargeModASIC2d[aVxdID] = new TCanvas((m_histogramDirectoryName + "/c_TCCharge_MPV_" + name).data());
+    }
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -115,12 +125,17 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_line_low->SetLineWidth(3);
   m_line_low->SetLineStyle(7);
 
-  m_fLandau = new TF1("f_Landau", "landau(0)", m_rangeLow, m_rangeHigh);
-  m_fLandau->SetParameter(0, 1000);
-  m_fLandau->SetParameter(1, 50);
-  m_fLandau->SetParameter(2, 10);
-  m_fLandau->SetNpx(100);
-  m_fLandau->SetNumberFitPoints(100);
+  m_fConv = new TF1Convolution("landau", "gaus", m_rangeLow, m_rangeHigh);
+  m_fConv->SetRange(m_rangeLow, m_rangeHigh);
+  m_fFit = new TF1("fitfunc", *m_fConv, m_rangeLow, m_rangeHigh, m_fConv->GetNpar());
+  m_fFit->SetRange(m_rangeLow, m_rangeHigh);
+
+  m_fFit->SetParameter(0, 1000);
+  m_fFit->SetParLimits(0, 10, 1e7);
+  m_fConv->SetNofPointsFFT(1000);
+  m_fFit->SetNpx(100);
+  m_fFit->SetNumberFitPoints(100);
+  m_fFit->SetParNames("N", "MPV", "width", "mean", "sigma");
 
   m_fMean = new TF1("f_Mean", "pol0", 0, m_PXDModules.size());
   m_fMean->SetParameter(0, 50);
@@ -220,24 +235,28 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     TH1* hh1 = findHist(m_histogramDirectoryName, name);
     if (hh1) {
 
-      /// FIXME Replace by a nice fit
-      m_fLandau->SetParameter(0, 1000);
-      m_fLandau->SetParameter(1, 50);
-      m_fLandau->SetParLimits(1, 10, 80);
-      m_fLandau->SetParameter(2, 10);
-      m_fLandau->SetParLimits(2, 1, 50);
-
       if (hh1->GetEntries() > 100) {
+        m_fFit->SetParameter(0, 1000);
+        m_fFit->SetParLimits(0, 10, 1e9);
+        m_fFit->SetParameter(1, 50);
+        m_fFit->SetParLimits(1, 10, 80);
+        m_fFit->SetParameter(2, 10);
+        m_fFit->SetParLimits(2, 1, 100);
+        m_fFit->FixParameter(3, 0);
+        m_fFit->SetParameter(4, 10);
+        m_fFit->SetParLimits(4, 1, 50);
+
         for (int f = 0; f < 5; f++) {
-          hh1->Fit(m_fLandau, "R");
-          m_fLandau->SetRange(m_fLandau->GetParameter(1) - m_peakBefore, m_fLandau->GetParameter(1) + m_peakAfter);
+          hh1->Fit(m_fFit, "R");
+          m_fFit->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
+          m_fConv->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
         }
 
         int p = m_gCharge->GetN();
-        m_gCharge->SetPoint(p, i + 0.49, m_fLandau->GetParameter(1));
-        m_gCharge->SetPointError(p, 0.1, m_fLandau->GetParError(1)); // error in x is useless
-        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fLandau->GetParameter(1),
-                              m_fLandau->GetParError(1));
+        m_gCharge->SetPoint(p, i + 0.49, m_fFit->GetParameter(1));
+        m_gCharge->SetPointError(p, 0.1, m_fFit->GetParError(1)); // error in x is useless
+        m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), m_fFit->GetParameter(1),
+                              m_fFit->GetParError(1));
       }
 
       TH1* hist2 = GetHisto("ref/" + m_histogramDirectoryName + "/" + name);
@@ -291,6 +310,62 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       if (hh1->GetEntries() >= 1000) enough = true;
     }
   }
+
+  // now loop per module over asics pairs (1.5.1)
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+//     TCanvas* canvas = m_cChargeMod[m_PXDModules[i]];
+    VxdID& aVxdID = m_PXDModules[i];
+
+    if (m_hChargeModASIC2d[aVxdID]) m_hChargeModASIC2d[aVxdID]->Reset();
+    if (m_cChargeModASIC2d[aVxdID]) m_cChargeModASIC2d[aVxdID]->Clear();
+
+    for (int s = 1; s <= 6; s++) {
+      for (int d = 1; d <= 4; d++) {
+        std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i] + Form("_sw%d_dcd%d", s, d);
+        std::replace(name.begin(), name.end(), '.', '_');
+
+        TH1* hh1 = findHist(m_histogramDirectoryName, name);
+        if (hh1) {
+          double mpv = 0.0;
+          if (hh1->GetEntries() > 100) {
+            m_fFit->SetParameter(0, 1000);
+            m_fFit->SetParLimits(0, 10, 1e9);
+            m_fFit->SetParameter(1, 50);
+            m_fFit->SetParLimits(1, 10, 80);
+            m_fFit->SetParameter(2, 10);
+            m_fFit->SetParLimits(2, 1, 100);
+            m_fFit->FixParameter(3, 0);
+            m_fFit->SetParameter(4, 10);
+            m_fFit->SetParLimits(4, 1, 50);
+
+            for (int f = 0; f < 5; f++) {
+              hh1->Fit(m_fFit, "R");
+              m_fFit->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
+              m_fConv->SetRange(m_fFit->GetParameter(1) - m_peakBefore - m_fFit->GetParameter(4) / 2 , m_fFit->GetParameter(1) + m_peakAfter);
+            }
+            mpv = m_fFit->GetParameter(1);
+          }
+
+          if (m_cChargeModASIC[aVxdID][s - 1][d - 1]) {
+            m_cChargeModASIC[aVxdID][s - 1][d - 1]->Clear();
+            m_cChargeModASIC[aVxdID][s - 1][d - 1]->cd();
+            hh1->Draw("hist");
+          }
+
+          if (m_hChargeModASIC2d[aVxdID]) {
+            if (mpv > 0.0) m_hChargeModASIC2d[aVxdID]->Fill(s, d, mpv); // TODO check what is s, d
+          }
+        }
+      }
+    }
+
+    // Overview map of ASCI combinations
+    if (m_hChargeModASIC2d[aVxdID] && m_cChargeModASIC2d[aVxdID]) {
+      m_cChargeModASIC2d[aVxdID]->cd();
+      m_hChargeModASIC2d[aVxdID]->Draw("colz");
+    }
+  }
+
   m_cCharge->cd();
   m_cCharge->Clear();
   m_gCharge->SetMinimum(0);

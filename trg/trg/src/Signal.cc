@@ -12,7 +12,6 @@
 //-----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <functional>
 #include <iostream>
 #include <cctype>
 #include "trg/trg/Clock.h"

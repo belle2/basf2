@@ -13,7 +13,6 @@
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <vector>
 #include <string>
-#include <limits>
 #include <cmath>
 #include <gtest/gtest.h>
 

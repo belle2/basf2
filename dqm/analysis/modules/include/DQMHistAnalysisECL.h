@@ -71,9 +71,9 @@ namespace Belle2 {
     /** TLine to show upper boundary for 'trigtag2_trigid' histogram. */
     TLine* m_upper_boundary_trigtag2 = nullptr;
 
-    //TLine to show lower boundary for 'crate_time_offsets' graph. */
+    /** TLine to show lower boundary for 'crate_time_offsets' graph. */
     TLine* m_lower_boundary_time_offsets = nullptr;
-    //TLine to show upper boundary for 'crate_time_offsets' graph. */
+    /** TLine to show upper boundary for 'crate_time_offsets' graph. */
     TLine* m_upper_boundary_time_offsets = nullptr;
 
     /** TCanvas for time offsets. */

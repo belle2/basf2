@@ -108,7 +108,7 @@ void ZMQClient::subscribe(EMessageTypes filter)
 void ZMQClient::send(zmq::message_t& message) const
 {
   B2ASSERT("Can only run this on started clients", m_socket);
-  m_socket->send(message);
+  m_socket->send(message, zmq::send_flags::none);
 }
 
 #if defined(__GNUC__) && !defined(__clang__)

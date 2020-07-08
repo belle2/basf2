@@ -8,12 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-#include "TStyle.h"
-
 #include <reconstruction/calibration/CDCDedx2DCellAlgorithm.h>
+
+#include <reconstruction/dbobjects/CDCDedx2DCell.h>
+
+#include <TBox.h>
+#include <TCanvas.h>
+#include <TH2F.h>
+#include <TLine.h>
+#include <TMath.h>
+#include <TStyle.h>
+
+#include <algorithm>
+#include <fstream>
 
 using namespace Belle2;
 

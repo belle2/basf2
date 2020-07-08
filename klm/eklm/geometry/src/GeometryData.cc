@@ -636,26 +636,6 @@ void EKLM::GeometryData::saveToDatabase(const IntervalOfValidity& iov) const
   Database::Instance().storeData("EKLMGeometry", m_Geometry, iov);
 }
 
-double EKLM::GeometryData::getStripLength(int strip) const
-{
-  return m_StripPosition[strip - 1].getLength();
-}
-
-int EKLM::GeometryData::getStripLengthIndex(int positionIndex) const
-{
-  return m_StripAllToLen[positionIndex];
-}
-
-int EKLM::GeometryData::getStripPositionIndex(int lengthIndex) const
-{
-  return m_StripLenToAll[lengthIndex];
-}
-
-int EKLM::GeometryData::getNStripsDifferentLength() const
-{
-  return m_nStripDifferent;
-}
-
 bool EKLM::GeometryData::hitInEKLM(double z) const
 {
   double zMm;

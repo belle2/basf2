@@ -12,17 +12,14 @@
 
 #include <vector>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/dataobjects/SVDCluster.h>
+
+#include <framework/datastore/StoreArray.h>
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <tracking/spacePointCreation/SpacePoint.h>
-
 #include <unordered_map>
-
-#include <type_traits>
 
 #include <TH2.h>
 #include <math.h>

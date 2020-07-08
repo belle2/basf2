@@ -100,7 +100,7 @@ namespace Belle2 {
     TFile* m_outputRootFile;
 
     //! Pointer to ROOT tree with extra info
-    TTree* m_extraInfo{nullptr};
+    TTree* m_extraInfo = nullptr;
 
     //! Pointer to ROOT list of histograms
     TList* m_histoList;

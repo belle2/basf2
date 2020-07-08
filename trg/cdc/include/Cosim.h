@@ -6,7 +6,6 @@
 #include <iostream>
 #include <iomanip>
 #include <bitset>
-#include <algorithm>
 
 #include <unistd.h>
 

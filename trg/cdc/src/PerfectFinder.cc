@@ -14,7 +14,6 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
 #include <map>
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "trg/trg/Debug.h"

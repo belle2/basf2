@@ -12,10 +12,6 @@
 #define TRGTIMING_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-
 
 namespace Belle2 {
 

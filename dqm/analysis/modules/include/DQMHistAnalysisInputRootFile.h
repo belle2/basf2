@@ -71,8 +71,8 @@ namespace Belle2 {
      */
     bool hname_pattern_match(std::string pattern, std::string text);
 
-    /** The name of the input root file. */
-    std::string m_input_name;
+    /** The list of names of the input root file. */
+    std::vector<std::string> m_file_list;
 
     /** The TFile object for the input file. */
     TFile* m_file = nullptr;
@@ -83,20 +83,29 @@ namespace Belle2 {
     /** The map between canvas name and canvas object. */
     std::map<std::string, TCanvas*> m_cs;
 
-    /** List of folders to process. */
-    std::vector<std::string> m_folders;
-
     /** List of histogram name patterns to process. */
     std::vector<std::string> m_histograms;
 
     /** Exp number. */
     unsigned int m_expno = 0;
 
-    /** Run number. */
-    unsigned int m_runno = 0;
-
     /** Evt number. */
     unsigned int m_count = 0;
+
+    /** List of total number of events for each run. */
+    std::vector<unsigned int> m_events_list;
+
+    /** List of runs. */
+    std::vector<unsigned int> m_run_list;
+
+    /** Time between two events in second. */
+    unsigned int m_interval = 0;
+
+    /** Index in the list of runs, events and files */
+    unsigned int m_run_idx = 0;
+
+    /** Test mode for null histograms */
+    bool m_null_histo_mode = false;
   };
 } // end namespace Belle2
 

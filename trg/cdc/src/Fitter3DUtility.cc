@@ -13,7 +13,6 @@
 #endif
 #include <utility>
 #include <iostream>
-#include <sstream>
 #include <fstream>
 #include "TLorentzVector.h"
 #include "TVector3.h"
@@ -27,7 +26,6 @@ using std::tuple;
 using std::vector;
 using std::map;
 using std::string;
-using std::stringstream;
 using std::to_string;
 using std::get;
 using std::function;

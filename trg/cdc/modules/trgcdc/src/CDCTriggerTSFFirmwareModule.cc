@@ -14,7 +14,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <trg/cdc/dataobjects/Bitstream.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/logging/Logger.h>

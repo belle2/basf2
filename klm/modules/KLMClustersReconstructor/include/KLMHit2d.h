@@ -43,17 +43,26 @@ namespace Belle2 {
     /**
      * Whether hit is in BKLM.
      */
-    bool inBKLM() const;
+    bool inBKLM() const
+    {
+      return m_bklmHit;
+    }
 
     /**
      * Get BKLM hit.
      */
-    BKLMHit2d* getBKLMHit2d() const;
+    BKLMHit2d* getBKLMHit2d() const
+    {
+      return m_bklmHit2d;
+    }
 
     /**
      * Get EKLM hit.
      */
-    EKLMHit2d* getEKLMHit2d() const;
+    EKLMHit2d* getEKLMHit2d() const
+    {
+      return m_eklmHit2d;
+    }
 
     /**
      * Get hit position.

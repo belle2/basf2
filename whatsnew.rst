@@ -12,6 +12,11 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-05
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-05-00.txt
+
 Changes since release-04
 ========================
 

@@ -10,9 +10,7 @@
 
 #include <vxd/geometry/GeoVXDRadiationSensors.h>
 #include <geometry/Materials.h>
-#include <iostream>
 
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 #include <G4Box.hh>
 #include <G4PVPlacement.hh>

@@ -17,7 +17,6 @@
 #include <string>
 #include <vector>
 #include <TMatrixDSym.h>
-#include <TProfile.h>
 #include <TH1F.h>
 #include <TH2F.h>
 
@@ -188,7 +187,7 @@ namespace Belle2 {
      * @param ntuple ntuple data
      * @param xxval TBC constants of 256 samples, and xxval[0]=0, xxval[256]=2*FTSW
      */
-    double Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval);
+    double Chisq(const std::vector<TwoTimes>& ntuple, const std::vector<double>& xxval);
 
     /**
      * Save vector to histogram and write it out

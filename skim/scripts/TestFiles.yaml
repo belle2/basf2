@@ -82,10 +82,21 @@ MC13_uubarBGx0:
 
 ## MC13 low multiplicity
 
-MC13_eeBGx1:
-  location:
-  total_input_files:
-  average_events_per_file:
+# MC13_eeBGx0:
+#   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeBGx0.root
+
+MC13_eeeeBGx0:
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeeeBGx0.root
+
+MC13_eemumuBGx0:
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_eemumuBGx0.root
+
+MC13_mumuBGx0:
+  location: /group/belle2/dataprod/MC/SkimTraining/MC13_mumuBGx0.root
+
+
+# MC13_eeBGx1:
+#   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeBGx1.root
 
 MC13_eeeeBGx1:
   location: /group/belle2/dataprod/MC/SkimTraining/MC13_eeeeBGx1.root
@@ -106,6 +117,19 @@ MC13_mumuBGx1:
   location: /group/belle2/dataprod/MC/SkimTraining/MC13_mumuBGx1.root
   total_input_files: 2297
   average_events_per_file: 10000
+
+
+## phi-gamma neutral and charged MC
+
+phigamma_neutral:
+  location: /group/belle2/users/fnc/MC/phi_gamma_neutral_prod/phi_gamma_neutral_prod_mdst_00001.root
+  total_input_files: 600
+  average_events_per_file: 1000
+
+phigamma_charged:
+  location: /group/belle2/users/fnc/MC/phi_gamma_charged_prod/phi_gamma_charged_prod_mdst_00001.root
+  total_input_files: 500
+  average_events_per_file: 1000
 
 
 ## MC12 generic
@@ -228,27 +252,27 @@ MC12_mumuBGx1:
 #  |____/ \__,_|\__\__,_| |___/\__,_|_| |_| |_| .__/|_|\___||___/
 #                                             |_|
 
+# NOTE: proc11 samples are hlt_hadron skims
+proc11_exp10:
+  location: /group/belle2/dataprod/MC/SkimTraining/proc11_exp10.mdst.root
+
+proc11_exp8:
+  location: /group/belle2/dataprod/MC/SkimTraining/proc11_exp8.mdst.root
+
+proc11_exp7:
+  location: /group/belle2/dataprod/MC/SkimTraining/proc11_exp7.mdst.root
+
 proc10_exp8:
   location: /group/belle2/dataprod/MC/SkimTraining/proc10_exp8.mdst.root
-  total_input_files:
-  average_events_per_file:
 
 proc10_exp7:
   location: /group/belle2/dataprod/MC/SkimTraining/proc10_exp7.mdst.root
-  total_input_files:
-  average_events_per_file:
 
 proc9_exp3:
   location: /group/belle2/dataprod/MC/SkimTraining/proc9_exp3.mdst.root
-  total_input_files:
-  average_events_per_file:
 
 proc9_exp7:
   location: /group/belle2/dataprod/MC/SkimTraining/proc9_exp7.mdst.root
-  total_input_files:
-  average_events_per_file:
 
 proc9_exp8:
   location: /group/belle2/dataprod/MC/SkimTraining/proc9_exp8.mdst.root
-  total_input_files:
-  average_events_per_file:

@@ -11,15 +11,12 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
-#include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <string>
 #include <map>
 
-#include <TFile.h>
 #include <TH2.h>
 
 namespace Belle2 {

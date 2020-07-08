@@ -11,6 +11,8 @@
 #include <reconstruction/modules/CDCDedxDQM/CDCDedxDQM.h>
 #include <framework/core/HistoModule.h>
 
+#include <TDirectory.h>
+
 using namespace Belle2;
 
 REG_MODULE(CDCDedxDQM)

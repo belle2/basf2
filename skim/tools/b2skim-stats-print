@@ -71,15 +71,15 @@ def required_length(*, min=None, max=None):
         def __call__(self, parser, args, values, option_string=None):
             if min is not None and max is None:
                 if len(values) < min:
-                    msg = "Argument '{self.dest}' requires at least {min} arguments."
+                    msg = f"Argument '{self.dest}' requires at least {min} arguments."
                     raise argparse.ArgumentTypeError(msg)
             elif min is None and max is not None:
                 if len(values) > max:
-                    msg = "Argument '{self.dest}' requires at most {max} arguments."
+                    msg = f"Argument '{self.dest}' requires at most {max} arguments."
                     raise argparse.ArgumentTypeError(msg)
             elif min is not None and max is not None:
                 if len(values) < min or len(values) > max:
-                    msg = "Argument '{self.dest}' requires between {min} and {max} arguments."
+                    msg = f"Argument '{self.dest}' requires between {min} and {max} arguments."
                     raise argparse.ArgumentTypeError(msg)
             setattr(args, self.dest, values)
 
@@ -621,10 +621,18 @@ def getAllSamples(mcCampaign):
                 f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
                 f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
                 f"{mcCampaign}_eemumuBGx1": f"{mcCampaign}: eemumu BGx1",
+
+                # f"{mcCampaign}_eeBGx0": f"{mcCampaign}: ee BGx0",
+                f"{mcCampaign}_mumuBGx0": f"{mcCampaign}: mumu BGx0",
+                f"{mcCampaign}_eeeeBGx0": f"{mcCampaign}: eeee BGx0",
+                f"{mcCampaign}_eemumuBGx0": f"{mcCampaign}: eemumu BGx0",
             }
         )
 
     dataSampleLabels = {
+        "proc11_exp10": "Data: proc11 exp. 10 (hlt_hadron)",
+        "proc11_exp8": "Data: proc11 exp. 8 (hlt_hadron)",
+        "proc11_exp7": "Data: proc11 exp. 7 (hlt_hadron)",
         "proc10_exp8": "Data: proc10 exp. 8",
         "proc10_exp7": "Data: proc10 exp. 7",
         "proc9_exp3": "Data: proc9 exp. 3",
@@ -1027,7 +1035,7 @@ def fillSkimStatsDict(
                         skim, sample, TestingCombined
                     )
 
-                except (TypeError, ZeroDivisionError):
+                except (TypeError, ZeroDivisionError, KeyError):
                     allSkimStats[skim][statName][sample] = None
                     if verbose:
                         B2WARNING(

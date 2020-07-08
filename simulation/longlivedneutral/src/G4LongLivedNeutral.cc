@@ -12,10 +12,7 @@
 
 #include <simulation/longlivedneutral/G4LongLivedNeutral.h>
 
-#include <G4ParticleTable.hh>
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

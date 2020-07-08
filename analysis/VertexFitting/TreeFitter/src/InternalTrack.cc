@@ -34,7 +34,6 @@ namespace TreeFitter {
     ParticleBase(particle, mother, &config), // config pointer here to allow final states not to have it
     m_massconstraint(false),
     m_noEnergySum(noEnergySum),
-    m_automatic_vertex_constraining(config.m_automatic_vertex_constraining),
     m_isconversion(false),
     m_bfield(0.)
   {

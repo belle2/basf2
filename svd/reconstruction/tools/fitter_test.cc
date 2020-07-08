@@ -1,14 +1,10 @@
-#include <cmath>
 #include <iostream>
 #include <iterator>
 #include <string>
-#include <array>
 #include <vector>
 #include <tuple>
 #include <algorithm>
 #include <random>
-#include <numeric>
-#include <functional>
 #include <chrono>
 
 #include <svd/reconstruction/NNWaveFitter.h>

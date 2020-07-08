@@ -16,9 +16,7 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/utilities/ClosestApproach.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <cdc/dataobjects/CDCSimHit.h>
 
 #include "G4Step.hh"
 #include "G4TransportationManager.hh"
@@ -53,16 +51,14 @@ namespace Belle2 {
     m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0)
   {
-    StoreArray<MCParticle> mcParticles;
-    StoreArray<CDCSimHit> cdcSimHits;
-    RelationArray cdcSimHitRel(mcParticles, cdcSimHits);
+    RelationArray cdcSimHitRel(m_MCParticles, m_CDCSimHits);
     registerMCParticleRelation(cdcSimHitRel);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_doNothing);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_negativeWeight);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_deleteElement);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_zeroWeight);
-    cdcSimHits.registerInDataStore();
-    mcParticles.registerRelationTo(cdcSimHits);
+    m_CDCSimHits.registerInDataStore();
+    m_MCParticles.registerRelationTo(m_CDCSimHits);
 
     CDCSimControlPar& cntlp = CDCSimControlPar::getInstance();
 
@@ -560,9 +556,9 @@ namespace Belle2 {
       //StoreArray<Relation> mcPartToSimHits(getRelationCollectionName());
       //StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
       //if (saveIndex < 0) {B2FATAL("SimHit wasn't saved despite charge != 0");}
-      //StoreArray<CDCSimHit> cdcArray(DEFAULT_CDCSIMHITS);
+      //StoreArray<CDCSimHit> m_CDCSimHits(DEFAULT_CDCSIMHITS);
 
-      //new(mcPartToSimHits->AddrAt(saveIndex)) Relation(mcPartArray, cdcArray, trackID, saveIndex);
+      //new(mcPartToSimHits->AddrAt(saveIndex)) Relation(mcPartArray, m_CDCSimHits, trackID, saveIndex);
 
     } //end of wire loop
 
@@ -623,15 +619,11 @@ namespace Belle2 {
     }
 #endif
 
-    StoreArray<MCParticle> mcParticles;
+    RelationArray cdcSimHitRel(m_MCParticles, m_CDCSimHits);
 
-    StoreArray<CDCSimHit> cdcArray;
+    m_hitNumber = m_CDCSimHits.getEntries();
 
-    RelationArray cdcSimHitRel(mcParticles, cdcArray);
-
-    m_hitNumber = cdcArray.getEntries();
-
-    CDCSimHit* simHit =  cdcArray.appendNew();
+    CDCSimHit* simHit =  m_CDCSimHits.appendNew();
 
     simHit->setWireID(layerId, wireId);
     simHit->setTrackId(trackID);
@@ -1449,15 +1441,13 @@ line100:
     // N.B. MCParticle is incomplete at this stage; the relation betw it and
     // simHit is Okay.
     // MCParticle will be completed after all sub-detectors' EndOfEvent calls.
-    StoreArray<CDCSimHit>  simHits;
-    StoreArray<MCParticle> mcParticles;
-    RelationArray mcPartToSimHits(mcParticles, simHits);
+    RelationArray mcPartToSimHits(m_MCParticles, m_CDCSimHits);
     int nRelationsMinusOne = mcPartToSimHits.getEntries() - 1;
 
     if (nRelationsMinusOne == -1) return;
 
-    //    std::cout <<"#simHits= " << simHits.getEntries() << std::endl;
-    //    std::cout <<"#mcParticles= " << mcParticles.getEntries() << std::endl;
+    //    std::cout <<"#simHits= " << m_CDCSimHits.getEntries() << std::endl;
+    //    std::cout <<"#MCParticles= " << m_MCParticles.getEntries() << std::endl;
     //    std::cout <<"#mcPartToSimHits= " << mcPartToSimHits.getEntries() << std::endl;
 
     //reset some of negative weights to positive; this is needed for the hits
@@ -1489,7 +1479,7 @@ line100:
         //  std::cout <<"trackId,,iSimHit,wgtafterreset= "<<  trackId <<" "<< iSimHit <<" "<< mcPartToSimHit.getWeight(iRelation) << std::endl;
       }
 
-      CDCSimHit* sHit = simHits[mcPartToSimHit.getToIndex(iRelation)];
+      CDCSimHit* sHit = m_CDCSimHits[mcPartToSimHit.getToIndex(iRelation)];
 
       if (weight > 0.) {
         m_hitWithPosWeight.insert(std::pair<unsigned short, CDCSimHit*>(sHit->getWireID().getISuperLayer(), sHit));

@@ -13,25 +13,12 @@
 
 using namespace Belle2;
 
-EKLM::Circle2D::Circle2D(double x, double y, double radius)
+EKLM::Circle2D::Circle2D(double x, double y, double radius) :
+  m_Center(x, y, 0),
+  m_Radius(radius)
 {
-  m_Center.setX(x);
-  m_Center.setY(y);
-  m_Center.setZ(0);
-  m_Radius = radius;
 }
 
 EKLM::Circle2D::~Circle2D()
 {
 }
-
-const HepGeom::Point3D<double>& EKLM::Circle2D::getCenter() const
-{
-  return m_Center;
-}
-
-double EKLM::Circle2D::getRadius() const
-{
-  return m_Radius;
-}
-

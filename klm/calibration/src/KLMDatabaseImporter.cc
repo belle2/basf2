@@ -25,11 +25,7 @@
 
 using namespace Belle2;
 
-KLMDatabaseImporter::KLMDatabaseImporter() :
-  m_ExperimentLow(0),
-  m_RunLow(0),
-  m_ExperimentHigh(-1),
-  m_RunHigh(-1)
+KLMDatabaseImporter::KLMDatabaseImporter()
 {
 }
 

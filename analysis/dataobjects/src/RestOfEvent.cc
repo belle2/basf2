@@ -71,7 +71,8 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
     }
   }
   for (const int index : source) {
-    if (allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_Composite && unpackComposite) {
+    if ((allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+         allParticles[index]->getParticleSource() == Particle::EParticleSourceObject::c_V0) && unpackComposite) {
       auto fsdaughters = allParticles[index]->getFinalStateDaughters();
       for (auto* daughter : fsdaughters) {
         result.push_back(daughter);
@@ -203,7 +204,8 @@ void RestOfEvent::updateMaskWithCuts(const std::string& maskName, const std::sha
       maskedParticles.push_back(particle);
     }
     // don't lose a possible V0 particle
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+        particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
       maskedParticles.push_back(particle);
     }
   }
@@ -217,7 +219,7 @@ void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* part
   if (!mask) {
     B2FATAL("ROE Mask does not exist!");
   }
-  std::vector<const Particle*> allROEParticles = getParticles(name);
+  std::vector<const Particle*> allROEParticles = getParticles(name, false);
   std::vector<int> indicesToErase;
   std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();
   for (auto* maskParticle : allROEParticles) {
@@ -253,7 +255,8 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const P
   if (!mask->isValid()) {
     return false; //We should have particles here!
   }
-  if (particleV0->getParticleSource() != Particle::EParticleSourceObject::c_Composite) {
+  if (particleV0->getParticleSource() != Particle::EParticleSourceObject::c_Composite and
+      particleV0->getParticleSource() != Particle::EParticleSourceObject::c_V0) {
     return false;
   }
   std::vector<const Particle*> daughtersV0 =  particleV0->getFinalStateDaughters();
@@ -486,28 +489,53 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
   return maskNames;
 }
 
-void RestOfEvent::print() const
+void RestOfEvent::print(const std::string& maskName, bool unpackComposite) const
 {
-  B2INFO(" - Particles[" << m_particleIndices.size() << "] : ");
-  printIndices(m_particleIndices);
-  for (auto mask : m_masks) {
-    mask.print();
+  std::string tab = " - ";
+  if (maskName != "") {
+    // Disable possible B2FATAL in printing method, might be useful for tests
+    if (!hasMask(maskName)) {
+      B2WARNING("No mask with the name '" << maskName << "' exists in this ROE! Nothing else to print");
+      return;
+    }
+    tab = " - - ";
+  } else {
+    if (m_isNested) {
+      B2INFO(tab << "ROE is nested");
+    }
+    if (m_isFromMC) {
+      B2INFO(tab << "ROE is build from generated particles");
+    }
   }
-  if (m_isNested) {
-    B2INFO("This ROE is nested.");
+  if (!m_isFromMC) {
+    unsigned int nCharged = getChargedParticles(maskName, 0, unpackComposite).size();
+    unsigned int nPhotons = getPhotons(maskName, unpackComposite).size();
+    unsigned int nNeutralHadrons = getHadrons(maskName, unpackComposite).size();
+    B2INFO(tab << "No. of Charged particles in ROE: " << nCharged);
+    B2INFO(tab << "No. of Photons           in ROE: " << nPhotons);
+    B2INFO(tab << "No. of K_L0 and neutrons in ROE: " << nNeutralHadrons);
+  } else {
+    unsigned int nParticles = getParticles(maskName, unpackComposite).size();
+    B2INFO(tab << "No. of generated particles in ROE: " << nParticles);
   }
+  printIndices(maskName, unpackComposite, tab);
 }
 
-void RestOfEvent::printIndices(const std::set<int>& indices) const
+void RestOfEvent::printIndices(const std::string& maskName, bool unpackComposite, const std::string& tab) const
 {
-  if (indices.empty())
+  auto particles = getParticles(maskName, unpackComposite);
+  if (particles.size() == 0) {
+    B2INFO(tab << "No indices to print");
     return;
-
-  std::string printout =  "     -> ";
-  for (const int index : indices) {
-    printout += std::to_string(index) +  ", ";
   }
-  B2INFO(printout);
+  std::string printoutIndex =  tab + "|";
+  std::string printoutPDG =  tab + "|";
+  for (const auto particle : particles) {
+    printoutIndex += std::to_string(particle->getArrayIndex()) +  " |  ";
+    printoutPDG   += std::to_string(particle->getPDGCode()) +  " | ";
+  }
+  B2INFO(printoutPDG);
+  B2INFO(printoutIndex);
 }
 
 Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode, bool isSelfConjugated)

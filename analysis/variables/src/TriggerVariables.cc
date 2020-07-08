@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2018-2020 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
@@ -28,11 +28,37 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 
+// boost
+#include <boost/algorithm/string.hpp>
+
 namespace Belle2 {
   namespace {
     /**
+     * There are two ways to write a trigger identifier, either:
+     *
+     *    "software_trigger_cut&base_identifier&cut_identifier"
+     *
+     * or the format provided by the CLI `hlt_triggers print --list` :
+     *
+     *    "base_identifier cut_identifier" // with a space
+     *
+     * In case the latter is provided by the user, then convert to the former.
+     * In case of the former, do nothing. Return the input (idempotent function).
+     *
+     * This function is hidden in a anonymous namespace -- only needed in this file.
+     */
+    std::string fullFormatIdentifier(const std::string& identifier)
+    {
+      std::string out = identifier;
+      boost::replace_all(out, " ", "&");
+      if (identifier.substr(0, 21) != "software_trigger_cut&")
+        out = "software_trigger_cut&" + out;
+      return out;
+    }
+
+    /**
      * This function is the basis for returning in the variables for software trigger result.
-     * It is hidden in a anonymous namespace.
+     * Also hidden in a anonymous namespace.
      */
     double extractSoftwareTriggerResultImplementation(bool nonPrescaled, const std::string& triggerIdentifier, const Particle*)
     {
@@ -44,18 +70,13 @@ namespace Belle2 {
       SoftwareTriggerCutResult swtcr;
       try {
         if (nonPrescaled) {
-          swtcr = swtr->getNonPrescaledResult(triggerIdentifier);
+          swtcr = swtr->getNonPrescaledResult(fullFormatIdentifier(triggerIdentifier));
         } else {
-          swtcr = swtr->getResult(triggerIdentifier);
+          swtcr = swtr->getResult(fullFormatIdentifier(triggerIdentifier));
         }
       } catch (const std::out_of_range&) {
-        // then the trigger identifier is wrong
-        std::string err = "The trigger identifier \"" + triggerIdentifier;
-        err += "\" was not found. Maybe you misspelled it?\n";
-        err += "Here are all possible trigger identifiers: \n";
-        auto res = swtr->getResults();
-        for (auto& re : res) err += re.first + "\n";
-        B2FATAL(err);
+        // then the trigger identifier is wrong -- silently return nan
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return double(swtcr); // see mdst/dataobjects/include/SoftwareTriggerResult.h
     };
@@ -293,20 +314,18 @@ namespace Belle2 {
        * (after having looked this up from the trigger db payload)
        *
        * This workflow will probably improve later: but for now parse the args
-       * to check we have one name, then check the name does not throw an
-       * exception when we ask for it from the SWTR (std::map)
+       * to check we have one name, then check the database object is valid.
+       * If not return NAN.
        */
       if (args.size() != 1)
         B2FATAL("Wrong number of arguments for the function softwareTriggerPrescaling");
       std::string triggerIdentifier = args[0];
 
       auto outputFunction = [triggerIdentifier](const Particle*) -> double {
-        DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(triggerIdentifier);
-        if (not downloadedCut)
-        {
-          B2FATAL("There is no trigger with the given name " << triggerIdentifier << "!");
-        }
 
+        DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(fullFormatIdentifier(triggerIdentifier));
+        if (not downloadedCut)
+          return std::numeric_limits<double>::quiet_NaN();
         return double(downloadedCut->getPreScaleFactor());
       };
 
@@ -337,24 +356,44 @@ namespace Belle2 {
                       "Returns ETimingType time type.");
     //-------------------------------------------------------------------------
     VARIABLE_GROUP("Software Trigger");
-    REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult,
-                      "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
-                      "defined as reject (-1), accept (1), or noResult (0). Note "
-                      "that the meanings of these change depending if using trigger "
-                      "or the skim stage, hence expert.");
+    REGISTER_VARIABLE("SoftwareTriggerResult(triggerIdentifier)", softwareTriggerResult, R"DOC(
+[Eventbased] [Expert] returns the SoftwareTriggerCutResult, defined as reject (-1), accept (1), or noResult (0). 
+If the trigger identifier is not found, returns NaN.
+
+For example:
+
+.. code-block:: 
+
+    SoftwareTriggerResult(filter 1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV)
+
+which is equivalent to
+
+.. code-block::
+
+    SoftwareTriggerResult(software_trigger_cut&filter&1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV)
+
+
+.. warning:: the meanings of these change depending if using trigger or the skim stage, hence expert.
+
+.. seealso:: ``b2hlt_triggers`` for possible triggerIdentifiers.
+
+        )DOC");
+
     REGISTER_VARIABLE("SoftwareTriggerResultNonPrescaled(triggerIdentifier)", softwareTriggerResultNonPrescaled,
                       "[Eventbased] [Expert] returns the SoftwareTriggerCutResult, "
                       "if this trigger would not be prescaled."
                       "Please note, this is not the final HLT decision! "
                       "It is defined as reject (-1), accept (1), or noResult (0). Note "
                       "that the meanings of these change depending if using trigger "
-                      "or the skim stage, hence expert.");
+                      "or the skim stage, hence expert."
+                      "If the trigger identifier is not found, returns NaN.");
     REGISTER_VARIABLE("HighLevelTrigger", passesAnyHighLevelTrigger,
                       "[Eventbased] 1.0 if event passes the HLT trigger, 0.0 if not");
     REGISTER_VARIABLE("SoftwareTriggerPrescaling(triggerIdentifier)", softwareTriggerPrescaling,
                       "[Eventbased] return the prescaling for the specific software trigger identifier. "
                       "Please note, this prescaling is taken from the currently setup database. It only corresponds "
-                      "to the correct HLT prescale if you are using the online database!");
+                      "to the correct HLT prescale if you are using the online database!"
+                      "If the trigger identifier is not found, returns NaN.");
     //-------------------------------------------------------------------------
   }
 }

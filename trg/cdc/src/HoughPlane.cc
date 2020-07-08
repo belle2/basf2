@@ -13,7 +13,6 @@
 
 #define TRGCDC_SHORT_NAMES
 
-#include <cstdlib>
 #include "trg/cdc/HoughPlane.h"
 
 namespace Belle2 {

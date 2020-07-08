@@ -51,19 +51,13 @@
 // $Log$
 // 2017-02-23 version 1.0
 // 2019-05-13 version 2.0 for Phase 3
+// 2020-05-13 version 2.1 for Bug fixing
 //---------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
 #define TRGECL_SHORT_NAMES
 
-//#include <cstdlib>
 #include "framework/datastore/StoreArray.h"
-//#include "trg/trg/Debug.h"
-//#include "trg/trg/Time.h"
-//#include "trg/trg/Signal.h"
-//#include "trg/trg/Link.h"
-//#include "trg/trg/Utilities.h"
-#include <framework/logging/Logger.h>
 #include "trg/ecl/TrgEclMaster.h"
 #include "trg/ecl/TrgEclCluster.h"
 
@@ -161,7 +155,7 @@ TrgEclMaster::name(void) const
 std::string
 TrgEclMaster::version(void) const
 {
-  return std::string("TrgEclMaster 1.00");
+  return std::string("TrgEclMaster 2.1");
 }
 //
 //
@@ -449,7 +443,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
       flagoverflow = 1;
     }
 
-    makeTriggerBit(hit, Timing, 0, timingsource, (int)E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
+    makeTriggerBit(hit, Timing, 0, timingsource, E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
                    bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale, E_burst);
 
 
@@ -820,7 +814,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     flagoverflow = 1;
   }
 
-  makeTriggerBit(hit, Timing, 0, timingsource, (int)E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
+  makeTriggerBit(hit, Timing, 0, timingsource, E_phys, bhabha2D, physics, bhabhabit, icn, beambkgtag, flagoverflow,
                  bhabha3D_veto, _Lowmultibit, bhabha3D_sel, mumu, bhabhaprescale, E_burst);
 
   //
@@ -1039,7 +1033,7 @@ TrgEclMaster::setRS(std::vector<int> TCId, std::vector<double> TCHit, std::vecto
 }
 
 
-void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource, int etot, int bhabha2D, int physics,
+void TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource, double etot, int bhabha2D, int physics,
                                   std::vector<int> bhabhatype, int ICN, int BGVeto, int ClusterOverflow, int bhabha3D, int lowmultibit, int bhabha3D_sel, int mumubit,
                                   int prescale, int burst)
 {

@@ -18,13 +18,6 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * returns number of hits associated to this track for given tracking detector
-     *
-     * If given particle is not created out of the Track, the return value is 0.
-     */
-    double v0DaughterTrackNHits(const Particle* part, const std::vector<double>& daughterID, const Const::EDetector& det);
-
-    /**
      * returns the number of CDC hits associated to this track
      */
     double v0DaughterTrackNCDCHits(const Particle* part, const std::vector<double>& daughterID);
@@ -120,6 +113,31 @@ namespace Belle2 {
     double v0DaughterTrackTanLambdaError(const Particle* part, const std::vector<double>& daughterID);
 
     /**
+     * returns the pull of the helix parameter d0 with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter phi0 with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotPhi0Pull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter omega with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotOmegaPull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter z0 with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotZ0Pull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter tan(lambda) with the V0 vertex as the track pivot.
+     */
+    double v0DaughterHelixWithVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
      * returns the track parameter Tau  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda
      */
     double v0DaughterTrackParam5AtIPPerigee(const Particle* part, const std::vector<double>& params);
@@ -130,40 +148,26 @@ namespace Belle2 {
      */
     double v0DaughterTrackParamCov5x5AtIPPerigee(const Particle* part, const std::vector<double>& params);
 
-    /**
-     * returns the pull of the helix parameter d0 with the V0 vertex as the track pivot.
-     */
-    double v0DaughterHelixWithVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& params);
 
     /**
-     * returns the pull of the helix parameter phi0 with the V0 vertex as the track pivot.
+     * helper function to get the number of hits associated to a track for given tracking detector
+     * If given particle is not created out of the Track, the return value is 0.
+     * Not registered in variable mananger
      */
-    double v0DaughterHelixWithVertexAsPivotPhi0Pull(const Particle* part, const std::vector<double>& params);
-
-    /**
-     * returns the pull of the helix parameter omega with the V0 vertex as the track pivot.
-     */
-    double v0DaughterHelixWithVertexAsPivotOmegaPull(const Particle* part, const std::vector<double>& params);
-
-    /**
-     * returns the pull of the helix parameter z0 with the V0 vertex as the track pivot.
-     */
-    double v0DaughterHelixWithVertexAsPivotZ0Pull(const Particle* part, const std::vector<double>& params);
-
-    /**
-     * returns the pull of the helix parameter tan(lambda) with the V0 vertex as the track pivot.
-     */
-    double v0DaughterHelixWithVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& params);
-
+    double getV0DaughterTrackDetNHits(const Particle* particle, const double daughterID, const Const::EDetector& det);
 
     /** helper function to get track fit result from V0 object */
-    TrackFitResult const* getTrackFitResultFromV0DaughterParticle(Particle const* particle, const double daughterID);
+    const TrackFitResult* getTrackFitResultFromV0DaughterParticle(const Particle* particle, const double daughterID);
+
+    /** helper function to get the helix parameters of the V0 daughter tracks*/
+    double getv0DaughterTrackParamAtIndex(const Particle* particle, const double daughterID, const int tauIndex);
+
+    /** helper function to get error of the helix parameters of the V0 daughter tracks*/
+    double getv0DaughterTrackParamErrorAtIndex(const Particle* particle, const double daughterID, const int tauIndex);
 
     /** helper function to get pull of the helix parameters of the V0 daughter tracks*/
     double getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
         const int tauIndex);
 
-
   }
 } // Belle2 namespace
-

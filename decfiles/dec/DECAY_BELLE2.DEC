@@ -403,6 +403,8 @@ Decay B0
 #                               variables mX, q2, and El (=> 512 weights total).
 #                               The list of weights is included as ModelAlias
 #                               once per B charge state.
+# March 1, 2018 A. Ermakov updated charmless semileptonic BFs to PDG 2017 values
+
 # NOTE: - The specified parameters for model VUBHYBRID are:
 #         mb, a, alpha_s, nbins_mX, nbins_q2, nbins_El,
 #         list of threshold values for mX, q2, El in ascending order.
@@ -10211,7 +10213,6 @@ Decay Xi_b-
   0.00018    D0         Lambda0   pi-                     PHSP;
   0.00020    Sigma_c0   K-                                PHSP;
   0.00020    Omega_c0   K-                                PHSP;
-#
 #  aaa 10/19/05 Do not if this is correct but filling out with inclusives
 0.38757         d       anti-u          d       cs_0    PYTHIA         13;
 0.16995         d       anti-u          d       cs_1    PYTHIA         13;
@@ -10289,6 +10290,7 @@ Decay Xi_b0
 Enddecay
 
 Decay anti-Xi_b0
+#                  SemiLeptonic Decays
   0.05460    anti-Xi_c-      e+    nu_e                   PHSP;
   0.05460    anti-Xi_c-      mu+   nu_mu                  PHSP;
   0.02000    anti-Xi_c-      tau+  nu_tau                 PHSP;
@@ -10424,7 +10426,6 @@ Decay B_c-
 0.000016   eta_c(2S)  tau-    anti-nu_tau               PHSP;
 0.00002    anti-D0    tau-    anti-nu_tau               PHSP;
 0.00008    anti-D*0   tau-    anti-nu_tau               PHSP;
-#
 #
 #                  Hadronic Decays
 0.00200    eta_c      pi-                   PHSP;

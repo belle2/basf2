@@ -227,3 +227,40 @@ class ISRpipicc(BaseSkim):
                 ("useCMSFrame(cosTheta)", 50, -1, 1),
                 ("m2Recoil", 50, -1, 1)
             ], path=path)
+
+
+@fancy_skim_header
+class CharmoniumPsi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * J/psi -> l^+ l^- (l = e or mu)
+    * psi(2S) -> l^+ l^- (l = e or mu)
+
+    Selection criteria:
+
+    * 2 tracks with electronID > 0.1 or muonID > 0.1 and 2.7 < M < 4.
+      Track-quality requirements are not applied.
+    """
+    __authors__ = ["Kirill Chilikin"]
+    __description__ = "Selection of J/psi and psi(2S) via leptonic decays."
+    __contact__ = __liaison__
+    __category__ = "physics, quarkonium"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["loosepid"],
+            "stdMu": ["loosepid"],
+        },
+    }
+
+    def build_lists(self, path):
+
+        # Reconstruct J/psi or psi(2S).
+        ma.reconstructDecay("J/psi:ee -> e+:loosepid e-:loosepid",
+                            "2.7 < M < 4", path=path)
+        ma.reconstructDecay("J/psi:mumu -> mu+:loosepid mu-:loosepid",
+                            "2.7 < M < 4", path=path)
+
+        # Return the lists.
+        self.SkimLists = ["J/psi:ee", "J/psi:mumu"]

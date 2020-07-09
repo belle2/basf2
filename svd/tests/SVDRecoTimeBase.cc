@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDRecoTimeBase.h>
 #include <vector>
 #include <string>
@@ -32,8 +31,6 @@ namespace Belle2 {
       EXPECT_EQ(0, timeBase.getNBins());
       for (auto  bin : bins)
         EXPECT_EQ(SVDRecoTimeBase::BinnedDataType(0.0), bin);
-      EXPECT_EQ(SVDModeByte::c_DefaultID, timeBase.getModeByte().getID());
-      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(timeBase.getModeByte()));
     }
 
     /**
@@ -43,9 +40,8 @@ namespace Belle2 {
     {
       // Create an arbitrary recotimeBase
       VxdID sensorID(3, 4, 1);
-      SVDModeByte timeBaseModeByte(151);
       std::vector<float> init_bins({ -5.0, -3.0, -1.0, 1.0, 3.0, 5.0});
-      SVDRecoTimeBase timeBase(sensorID, false, init_bins, timeBaseModeByte);
+      SVDRecoTimeBase timeBase(sensorID, false, init_bins);
       // Test getters
       EXPECT_EQ(sensorID, timeBase.getSensorID());
       EXPECT_FALSE(timeBase.isUStrip());
@@ -53,8 +49,6 @@ namespace Belle2 {
       const SVDRecoTimeBase::BinEdgesArray& bins = timeBase.getBins();
       for (size_t ib = 0; ib < bins.size(); ++ib)
         EXPECT_EQ(init_bins[ib], bins[ib]);
-      EXPECT_EQ(timeBaseModeByte, timeBase.getModeByte());
-      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(timeBase.getModeByte()));
     }
     /**
      * Check object printout
@@ -63,9 +57,8 @@ namespace Belle2 {
     {
       // Create an arbitrary recotimeBase
       VxdID sensorID(3, 4, 1);
-      SVDModeByte timeBaseModeByte(151);
       std::vector<float> init_bins({ -5.0, -3.0, -1.0, 1.0, 3.0, 5.0});
-      SVDRecoTimeBase timeBase(sensorID, false, init_bins, timeBaseModeByte);
+      SVDRecoTimeBase timeBase(sensorID, false, init_bins);
       // Test toString method
       EXPECT_EQ("VXDID : 25632 = 3.4.1 side: V bins: -5 -3 -1 1 3 5  mode: 0-suppr/global/6 samples/???\n", timeBase.toString());
     }

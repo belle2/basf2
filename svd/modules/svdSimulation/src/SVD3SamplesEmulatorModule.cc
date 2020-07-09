@@ -109,7 +109,7 @@ void SVD3SamplesEmulatorModule::event()
     threeSamples[4] = 0.;
     threeSamples[5] = 0.;
 
-    ShaperDigit3Samples.appendNew(sensorID, side, cellID, threeSamples, fadcT, modeByte);
+    ShaperDigit3Samples.appendNew(sensorID, side, cellID, threeSamples, fadcT);
 
   }
 }

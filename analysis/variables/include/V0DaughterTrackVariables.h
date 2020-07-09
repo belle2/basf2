@@ -3,7 +3,7 @@
  * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck, Torben Ferber    *
+ * Contributors: Kota Nakagiri, Yuma Uematsu                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

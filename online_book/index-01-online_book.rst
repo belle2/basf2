@@ -2,7 +2,10 @@
 Online textbook
 ===============
 
-This online textbook aims to help new Belle II members to get acquired with the anlaysis procedure. 
+This online textbook aims to help new Belle II members to get started with the software.
+
+.. include:: contribute.rst
+   :literal:
 
 .. toctree::
    :glob:

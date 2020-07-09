@@ -171,7 +171,7 @@ namespace TreeFitter {
                particle->getECLCluster() ||
                particle->getKLMCluster()) { // external particles and final states
       if (particle->getTrack()) {
-        rc = new RecoTrack(particle, mother, config);
+        rc = new RecoTrack(particle, mother);
       } else if (particle->getECLCluster()) {
         rc = new RecoPhoton(particle, mother);
 

@@ -123,8 +123,5 @@ namespace Belle2 {
 
     /** inflate beamspot covariance of z by this number */
     int m_inflationFactorCovZ;
-
-    /** scale the momenta of tracks by this correction factor */
-    float m_momentumScalingFactor;
   };
 }

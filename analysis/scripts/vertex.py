@@ -197,7 +197,6 @@ def treeFit(
     customOriginConstraint=False,
     customOriginVertex=[0.001, 0, 0.0116],
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
-    momentumScalingFactor=1.0,
     path=None,
 ):
     """
@@ -231,7 +230,6 @@ def treeFit(
             for momenta and vertex position. Otherwise only the momenta of the head of the tree will be updated,
             however for all daughters we also update the vertex position with the fit results as this would
             otherwise be set to {0, 0, 0} contact us if this causes any hardship/confusion.
-        momentumScalingFactor (float): track momentum scaling factor (default of 1.0 means no scaling)
         path (basf2.Path): modules are added to this path
     """
     treeFitter = register_module("TreeFitter")
@@ -248,7 +246,6 @@ def treeFit(
     treeFitter.param('customOriginConstraint', customOriginConstraint)
     treeFitter.param('customOriginVertex', customOriginVertex)
     treeFitter.param('customOriginCovariance', customOriginCovariance)
-    treeFitter.param('momentumScalingFactor', momentumScalingFactor)
     path.add_module(treeFitter)
 
 

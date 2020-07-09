@@ -21,7 +21,7 @@ namespace TreeFitter {
   constexpr double pi = TMath::Pi();
   constexpr double twoPi = TMath::TwoPi();
 
-  RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration& config) :
+  RecoTrack::RecoTrack(Belle2::Particle* particle, const ParticleBase* mother) :
     RecoParticle(particle, mother),
     m_bfield(0),
     m_trackfit(particle->getTrackFitResult()),
@@ -29,7 +29,7 @@ namespace TreeFitter {
     m_flt(0),
     m_params(5),
     m_covariance(5, 5),
-    m_momentumScalingFactor(config.m_momentumScalingFactor)
+    m_momentumScalingFactor(particle->getMomentumScalingFactor())
   {
     m_bfield = Belle2::BFieldManager::getField(TVector3(0, 0, 0)).Z() / Belle2::Unit::T; //Bz in Tesla
     m_covariance = Eigen::Matrix<double, 5, 5>::Zero(5, 5);
@@ -41,7 +41,7 @@ namespace TreeFitter {
     if (m_flt == 0) {
       const_cast<RecoTrack*>(this)->updFltToMother(fitparams);
     }
-    TVector3 recoP = m_momentumScalingFactor * m_trackfit->getHelix().getMomentumAtArcLength2D(m_flt, m_bfield);
+    TVector3 recoP = m_trackfit->getHelix(m_momentumScalingFactor).getMomentumAtArcLength2D(m_flt, m_bfield);
     const int momindex = momIndex();
     fitparams.getStateVector()(momindex) = recoP.X();
     fitparams.getStateVector()(momindex + 1) = recoP.Y();
@@ -71,7 +71,7 @@ namespace TreeFitter {
   ErrCode RecoTrack::updFltToMother(const FitParams& fitparams)
   {
     const int posindexmother = mother()->posIndex();
-    m_flt = m_trackfit->getHelix().getArcLength2DAtXY(
+    m_flt = m_trackfit->getHelix(m_momentumScalingFactor).getArcLength2DAtXY(
               fitparams.getStateVector()(posindexmother),
               fitparams.getStateVector()(posindexmother + 1));
     return ErrCode(ErrCode::Status::success);
@@ -83,6 +83,7 @@ namespace TreeFitter {
     std::vector<float> trackParameter = m_trackfit->getTau();
     for (unsigned int i = 0; i < trackParameter.size(); ++i) {
       m_params(i) = trackParameter[i];
+      if (i == 2) m_params(2) /= m_momentumScalingFactor; // index 2 is the curvature of the track
     }
     TMatrixDSym cov = m_trackfit->getCovariance5();
     for (int row = 0; row < 5; ++row) {

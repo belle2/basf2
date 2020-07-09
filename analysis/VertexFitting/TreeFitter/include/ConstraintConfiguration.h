@@ -31,8 +31,7 @@ namespace TreeFitter {
                              m_customOriginCovariance({}),
                              m_originDimension(3),
                              m_headOfTreePDG(0),
-                             m_inflationFactorCovZ(1),
-                             m_momentumScalingFactor(1.)
+                             m_inflationFactorCovZ(1)
     {};
 
     /** constructor */
@@ -47,8 +46,7 @@ namespace TreeFitter {
                             const std::vector<double>& customOriginVertex,
                             const std::vector<double>& customOriginCovariance,
                             const int& originDimension,
-                            const int& inflationFactorCovZ = 1,
-                            const float& momentumScalingFactor = 1.
+                            const int& inflationFactorCovZ = 1
                            ) :
       m_massConstraintType(massConstraintType),
       m_massConstraintListPDG(massConstraintListPDG),
@@ -62,8 +60,7 @@ namespace TreeFitter {
       m_customOriginCovariance(customOriginCovariance),
       m_originDimension(originDimension),
       m_headOfTreePDG(0),
-      m_inflationFactorCovZ(inflationFactorCovZ),
-      m_momentumScalingFactor(momentumScalingFactor)
+      m_inflationFactorCovZ(inflationFactorCovZ)
     {}
 
     /** const flag for the type of the mass constraint */
@@ -104,9 +101,6 @@ namespace TreeFitter {
 
     /** inflate covariance of z by this number -> iptube  */
     const int m_inflationFactorCovZ;
-
-    /** momentum scaling correction factor */
-    const float m_momentumScalingFactor;
   };
 }
 

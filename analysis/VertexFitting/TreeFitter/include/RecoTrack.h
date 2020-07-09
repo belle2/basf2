@@ -20,7 +20,7 @@ namespace TreeFitter {
 
   public:
     /** constructor */
-    RecoTrack(Belle2::Particle* bc, const ParticleBase* mother, const ConstraintConfiguration& config) ;
+    RecoTrack(Belle2::Particle* bc, const ParticleBase* mother) ;
 
     /** destructor */
     virtual ~RecoTrack() {};

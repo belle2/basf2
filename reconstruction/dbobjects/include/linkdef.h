@@ -12,6 +12,7 @@
 #pragma link C++ class Belle2::CDCDedxMomentumCor+;
 #pragma link C++ class Belle2::CDCDedx2DCell+;
 #pragma link C++ class Belle2::CDCDedx1DCell+;
+#pragma link C++ class Belle2::CDCDedxADCNonLinearity+;
 #pragma link C++ class Belle2::CDCDedxHadronCor+;
 #pragma link C++ class Belle2::CDCDedxMeanPars+;
 #pragma link C++ class Belle2::CDCDedxSigmaPars+;

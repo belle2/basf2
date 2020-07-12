@@ -60,9 +60,9 @@ namespace Belle2 {
     }
 
     /** Add a single hit to the object */
-    void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS, int adcCount, double dE,
-                double path, double dedx,
-                double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
+    void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS,
+                int adcCount, int adcbaseCount, double dE, double path, double dedx, double cellHeight, double cellHalfWidth,
+                int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
                 double onedcor, int foundByTrackFinder, double weightPionHypo, double weightKaonHypo, double weightProtHypo)
     {
 
@@ -72,6 +72,7 @@ namespace Belle2 {
       m_hPath.push_back(path);
       m_hDedx.push_back(dedx);
       m_hADCCount.push_back(adcCount);
+      m_hADCBaseCount.push_back(adcbaseCount);
       m_hDoca.push_back(doca);
       m_hDocaRS.push_back(docaRS);
       m_hEnta.push_back(enta);
@@ -197,6 +198,9 @@ namespace Belle2 {
     /** Return the adcCount for this hit */
     int getADCCount(int i) const { return m_hADCCount[i]; }
 
+    /** Return the base adcCount (no non-linearity) for this hit */
+    int getADCBaseCount(int i) const { return m_hADCBaseCount[i]; }
+
     /** Return the distance of closest approach to the sense wire for this hit */
     double getDoca(int i) const { return m_hDoca[i]; }
 
@@ -316,6 +320,7 @@ namespace Belle2 {
     std::vector<double> m_hPath;    /**< path length in the CDC cell */
     std::vector<double> m_hDedx;  /**< charge per path length (dE/dx) */
     std::vector<int> m_hADCCount; /**< adcCount per hit */
+    std::vector<int> m_hADCBaseCount; /**< adcCount base count (uncorrected) per hit */
     std::vector<double> m_hDoca;  /**< distance of closest approach to sense wire */
     std::vector<double> m_hEnta;  /**< entrance angle in CDC cell */
     std::vector<double> m_hDocaRS;/**< distance of closest approach to sense wire after rescalling cell L=W */

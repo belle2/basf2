@@ -440,7 +440,10 @@ void CDCDedxPIDModule::event()
         LinearGlobalADCCountTranslator translator;
         int adcbaseCount = cdcHit->getADCCount(); // pedestal subtracted?
         double nlFactor = 1.6;
-        int adcCount = nlFactor * NonLinearityADCMap(adcbaseCount / nlFactor);
+        // int adcCount = nlFactor * NonLinearityADCMap(adcbaseCount / nlFactor);
+        int adcCount = (m_DBNonLADCCell && m_usePrediction
+                        && numMCParticles == 0) ? nlFactor * m_DBNonLADCCell->getCorrectedADC(adcbaseCount / nlFactor, currentLayer) : adcbaseCount;
+
         double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
         int driftT = cdcHit->getTDCCount();
 
@@ -498,8 +501,8 @@ void CDCDedxPIDModule::event()
             else cellDedx *= std::sin(trackMom.Theta());
 
             if (m_enableDebugOutput)
-              dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
-                                cellHalfWidth, driftT,
+              dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
+                                adcCount, adcbaseCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
                                 driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
                                 foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
             nhitscombined++;
@@ -874,33 +877,4 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
     // fill the chi value for this particle type
     if (sigma != 0) chi[pdgIter.getIndex()] = ((dedx - mean) / (sigma));
   }
-}
-
-Int_t CDCDedxPIDModule::NonLinearityADCMap(const int& ADC)
-{
-
-  // added by Roy on 29.Apr.20
-  // piecewise linear map
-  // y values are the saturated ADC readout
-  // x are the corrected ADC values
-
-  const double x[11] = {
-    0.0, 200.0, 248.5, 344.0, 487.0, 642.5,
-    787.6, 932.6, 1171.0, 1471.5, 1906.7
-  };
-  const double y[11] = {
-    0.0, 200.0, 248.5, 344.0, 475.9, 572.4,
-    634.5, 682.8, 758.6, 827.6, 910.3
-  };
-
-  int ibin = 9;
-  for (int i = 0; i < 10; i++) {
-    if (ADC >= y[i] && ADC < y[i + 1]) {ibin = i;}
-  }
-
-  // Invert
-  Double_t slope = (y[ibin + 1] - y[ibin]) / (x[ibin + 1] - x[ibin]);
-  Int_t ADC_Modified =  Int_t(x[ibin] + (ADC - y[ibin]) / slope);
-
-  return ADC_Modified;
 }

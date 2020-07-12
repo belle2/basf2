@@ -56,7 +56,7 @@ class TestJob(TestCase):
         job_dict["input_files"] = []
         job_dict["setup_cmds"] = []
         job_dict["backend_args"] = {}
-        job_dict["subjobs"] = [{"input_files": [], "args": [str(i)]} for i in range(4)]
+        job_dict["subjobs"] = [{"id": i, "input_files": [], "args": [str(i)]} for i in range(4)]
         self.job2_dict = job_dict
         self.job2 = Job(name2, job_dict=job_dict)  # Set up this one from a dictionary
 
@@ -66,6 +66,9 @@ class TestJob(TestCase):
     def test_dict_setup(self):
         self.maxDiff = None  # If this test fails you will need to see the diff of a large dictionary
         self.assertEqual(len(self.job2.subjobs), 4)
+        self.assertEqual(self.job2_dict, self.job2.job_dict)
+        self.job2_dict["subjobs"].pop()
+        del self.job2.subjobs[3]
         self.assertEqual(self.job2_dict, self.job2.job_dict)
 
     def test_job_json_serialise(self):

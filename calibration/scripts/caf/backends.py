@@ -358,8 +358,8 @@ class Job:
             self.setup_cmds = job_dict["setup_cmds"]
             self.backend_args = job_dict["backend_args"]
             self.subjobs = {}
-            for subjob_i, subjob_dict in enumerate(job_dict["subjobs"]):
-                self.create_subjob(subjob_i, input_files=subjob_dict["input_files"], args=subjob_dict["args"])
+            for subjob_dict in job_dict["subjobs"]:
+                self.create_subjob(subjob_dict["id"], input_files=subjob_dict["input_files"], args=subjob_dict["args"])
 
         #: The result object of this Job. Only filled once the job is submitted to a backend since the backend creates a special
         #: result class depending on its type.
@@ -672,6 +672,7 @@ class SubJob(Job):
             we only output the input files and arguments that are specific to this subjob and no other details.
         """
         job_dict = {}
+        job_dict["id"] = self.id
         job_dict["input_files"] = [i.as_posix() for i in self.input_files]
         job_dict["args"] = self.args
         return job_dict
@@ -965,6 +966,7 @@ class Local(Backend):
                                                               script_path)
                                                              )
                                        )
+        job.status = "submitted"
         B2INFO(f"{job} submitted")
 
     @submit.register(Job)

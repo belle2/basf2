@@ -495,6 +495,12 @@ class CalibrationMachine(Machine):
         Dumps the `Job` object for the collections to JSON files so that it's configuration can be recovered
         later in case of failure.
         """
+        # Wait for jobs (+subjobs) to be submitted so that all information is filled. Since the parent CAF object asynchronously
+        # submits the jobs this might need to wait a while.
+        while any(map(lambda j: j.status == "init", self._collector_jobs.values())):
+            B2DEBUG(29, "Some Collector Jobs still in 'init' state. Waiting...")
+            time.sleep(5)
+
         for collection_name, job in self._collector_jobs.items():
             collector_job_output_file_name = self.calibration.collections[collection_name].job_config
             output_file = self.root_dir.joinpath(str(self.iteration), self.collector_input_dir,
@@ -624,20 +630,6 @@ class CalibrationMachine(Machine):
         self.calibration.jobs_to_submit.extend(list(self._collector_jobs.values()))
         self._collector_timing["start"] = time.time()
         self._collector_timing["last_update"] = time.time()
-        for job in self._collector_jobs.values():
-            if job.subjobs:
-                extra_indent = "  "
-                for subjob in job.subjobs.values():
-                    info_lines = [f"Collector {subjob} Details".format(subjob)]
-                    info_lines.append(f"ID number: {subjob.id}")
-                    try:
-                        job_id = subjob.result.job_id
-                        info_lines.append(f"Batch Job ID: {job_id}")
-                    except AttributeError:
-                        pass
-                    info_lines.append("Input Files:")
-                    info_lines.extend(extra_indent + str(file_path) for file_path in subjob.input_files)
-                    B2INFO_MULTILINE(info_lines)
 
     def _no_require_iteration(self):
         """

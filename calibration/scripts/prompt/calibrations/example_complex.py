@@ -51,8 +51,7 @@ settings = CalibrationSettings(name="Example Complex",
 # that have had their input files assigned and any configuration applied. The final output payload IoV(s)
 # should also be set correctly to be open-ended e.g. IoV(exp_low, run_low, -1, -1)
 #
-# The database_chain, backend_args, backend, max_files_per_collector_job, and heartbeat of these
-# calibrations will all be set/overwritten by the b2caf-prompt-run tool.
+# The database_chain of these calibrations will all be set/overwritten by the b2caf-prompt-run tool.
 
 
 def get_calibrations(input_data, **kwargs):

@@ -113,29 +113,54 @@ namespace Belle2 {
     double v0DaughterTrackTanLambdaError(const Particle* part, const std::vector<double>& daughterID);
 
     /**
-     * returns the pull of the helix parameter d0 with the V0 vertex as the track pivot.
+     * returns the pull of the helix parameter d0 with the true V0 vertex as the track pivot.
      */
-    double v0DaughterHelixWithVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID);
+    double v0DaughterHelixWithTrueVertexAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID);
 
     /**
-     * returns the pull of the helix parameter phi0 with the V0 vertex as the track pivot.
+     * returns the pull of the helix parameter phi0 with the true V0 vertex as the track pivot.
      */
-    double v0DaughterHelixWithVertexAsPivotPhi0Pull(const Particle* part, const std::vector<double>& daughterID);
+    double v0DaughterHelixWithTrueVertexAsPivotPhi0Pull(const Particle* part, const std::vector<double>& daughterID);
 
     /**
-     * returns the pull of the helix parameter omega with the V0 vertex as the track pivot.
+     * returns the pull of the helix parameter omega with the true V0 vertex as the track pivot.
      */
-    double v0DaughterHelixWithVertexAsPivotOmegaPull(const Particle* part, const std::vector<double>& daughterID);
+    double v0DaughterHelixWithTrueVertexAsPivotOmegaPull(const Particle* part, const std::vector<double>& daughterID);
 
     /**
-     * returns the pull of the helix parameter z0 with the V0 vertex as the track pivot.
+     * returns the pull of the helix parameter z0 with the true V0 vertex as the track pivot.
      */
-    double v0DaughterHelixWithVertexAsPivotZ0Pull(const Particle* part, const std::vector<double>& daughterID);
+    double v0DaughterHelixWithTrueVertexAsPivotZ0Pull(const Particle* part, const std::vector<double>& daughterID);
 
     /**
-     * returns the pull of the helix parameter tan(lambda) with the V0 vertex as the track pivot.
+     * returns the pull of the helix parameter tan(lambda) with the true V0 vertex as the track pivot.
      */
-    double v0DaughterHelixWithVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID);
+    double v0DaughterHelixWithTrueVertexAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter d0 with the origin as the track pivot.
+     */
+    double v0DaughterHelixWithOriginAsPivotD0Pull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter phi0 with the origin as the track pivot.
+     */
+    double v0DaughterHelixWithOriginAsPivotPhi0Pull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter omega with the origin as the track pivot.
+     */
+    double v0DaughterHelixWithOriginAsPivotOmegaPull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter z0 with the origin as the track pivot.
+     */
+    double v0DaughterHelixWithOriginAsPivotZ0Pull(const Particle* part, const std::vector<double>& daughterID);
+
+    /**
+     * returns the pull of the helix parameter tan(lambda) with the origin as the track pivot.
+     */
+    double v0DaughterHelixWithOriginAsPivotTanLambdaPull(const Particle* part, const std::vector<double>& daughterID);
 
     /**
      * returns the track parameter Tau  0:d0, 1:phi0, 2:omega, 3:z0, 4:tanLambda
@@ -165,8 +190,12 @@ namespace Belle2 {
     /** helper function to get error of the helix parameters of the V0 daughter tracks*/
     double getv0DaughterTrackParamErrorAtIndex(const Particle* particle, const double daughterID, const int tauIndex);
 
-    /** helper function to get pull of the helix parameters of the V0 daughter tracks*/
-    double getHelixParameterPullOfV0DaughterWithVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
+    /** helper function to get pull of the helix parameters of the V0 daughter tracks with the true V0 vertex as the pivot */
+    double getHelixParameterPullOfV0DaughterWithTrueVertexAsPivotAtIndex(const Particle* particle, const double daughterID,
+        const int tauIndex);
+
+    /** helper function to get pull of the helix parameters of the V0 daughter tracks with the origin as the pivot */
+    double getHelixParameterPullOfV0DaughterWithOriginAsPivotAtIndex(const Particle* particle, const double daughterID,
         const int tauIndex);
 
   }

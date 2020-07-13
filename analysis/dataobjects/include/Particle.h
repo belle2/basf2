@@ -914,7 +914,7 @@ namespace Belle2 {
     float m_px;     /**< momentum component x */
     float m_py;     /**< momentum component y */
     float m_pz;     /**< momentum component z */
-    float m_momentumScale; /**< momentum scaling factor */
+    float m_momentumScale = 1.0; /**< momentum scaling factor */
     float m_x;      /**< position component x */
     float m_y;      /**< position component y */
     float m_z;      /**< position component z */

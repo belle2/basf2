@@ -356,9 +356,9 @@ class GenerateSimTask(Basf2PathTask):
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(hashed=True)
+    queue = 'l'
 
     #: Name of the ROOT output file with generated and simulated events.
-
     def output_file_name(self, n_events=None, random_seed=None):
         if n_events is None:
             n_events = self.n_events
@@ -382,7 +382,7 @@ class GenerateSimTask(Basf2PathTask):
         if self.experiment_number in [1002, 1003]:
             runNo = 0
         elif self.experiment_number == 12:
-            runNo = 2300
+            runNo = 5736
         path.add_module(
             "EventInfoSetter", evtNumList=[self.n_events], runList=[runNo], expList=[self.experiment_number]
         )
@@ -391,6 +391,8 @@ class GenerateSimTask(Basf2PathTask):
         # beamparameters = bp.add_beamparameters(path, "Y4S")
         # beamparameters.param("covVertex", [(14.8e-4)**2, (1.5e-4)**2, (360e-4)**2])
         # ge.add_babayaganlo_generator(path=path, finalstate='ee', minenergy=0.15, minangle=10.0)
+        # path.add_module("ActivatePXDPixelMasker")
+        # path.add_module("ActivatePXDGainCalibrator")
         path.add_module("EvtGenInput")
         # if self.experiment_number == 8:
         bkg_files = self.bkgfiles_dir
@@ -401,7 +403,7 @@ class GenerateSimTask(Basf2PathTask):
             components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'TRG']
         else:
             components = None
-        simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, components=components)
+        simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, components=components)  # , usePXDDataReduction=False)
 
         path.add_module(
             "RootOutput",
@@ -527,6 +529,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
     experiment_number = b2luigi.IntParameter()
     #: Random basf2 seed used by the GenerateSimTask.
     random_seed = b2luigi.Parameter()
+    queue = 'l'
 
     #: Filename of the recorded/collected data for the final QE MVA training.
     def get_records_file_name(self,  n_events=None, random_seed=None):
@@ -551,16 +554,24 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             # return ['datafiles/generated_mc_N' + str(n_events) + random_seed[6:] + '.root']
             return ['datafiles/generated_mc_N' + str(n_events) + '_MC13b_GTs_r1060' + random_seed[6:] + '.root']
         elif "DATA__" in random_seed:
-            # ['/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT1.f00001.root',
-            # '/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT2.f00002.root',
-            # '/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT3.f00003.root',
-            # '/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT4.f00004.root',
-            # '/group/belle2/dataprod/Data/Raw/e0008_TOBEREMOVED/r01060/sub00/physics.0008.01060.HLT5.f00005.root', ]
-            return ['/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT1.f00001.root',
-                    '/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT2.f00002.root',
-                    '/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT3.f00003.root',
-                    '/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT4.f00004.root',
-                    '/group/belle2/dataprod/Data/Raw/e0012/r02300/sub00/physics.0012.02300.HLT5.f00005.root']
+            return ['/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT1.f00001.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT2.f00002.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT3.f00003.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT4.f00004.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT5.f00005.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT6.f00006.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT7.f00007.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT8.f00008.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT9.f00009.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT1.f00011.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT2.f00012.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT3.f00013.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT4.f00014.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT5.f00015.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT6.f00016.root',
+                    # '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT7.f00017.root',
+                    # '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT8.f00018.root',
+                    '/group/belle2/dataprod/Data/Raw/e0012/r05736/sub00/physics.0012.05736.HLT9.f00019.root']
         else:
             return self.get_input_file_names(GenerateSimTask.output_file_name(
                 GenerateSimTask, n_events=n_events, random_seed=random_seed[7:]))
@@ -2102,13 +2113,20 @@ class MasterTask(b2luigi.WrapperTask):
 if __name__ == "__main__":
     basf2.conditions.reset()
     # basf2.conditions.prepend_globaltag("release-04-00-03")
-    basf2.conditions.prepend_globaltag("online_proc10")
-    basf2.conditions.prepend_globaltag("data_reprocessing_proc10")
-    basf2.conditions.prepend_globaltag("mc_production_MC13b")
+    # basf2.conditions.prepend_globaltag("online_proc10")
+    # basf2.conditions.prepend_globaltag("data_reprocessing_proc10")
+    # basf2.conditions.prepend_globaltag("mc_production_MC13b")
+    # basf2.conditions.prepend_globaltag("klm_alignment_testing")
     # basf2.conditions.prepend_globaltag("online_proc11")
     # basf2.conditions.prepend_globaltag("data_reprocessing_proc11")
     # basf2.conditions.prepend_globaltag("mc_production_MC13b_proc11")
-    basf2.conditions.prepend_globaltag("klm_alignment_testing")
-    # basf2.conditions.prepend_globaltag("mc_production_MC13a_rev1")
+    basf2.conditions.prepend_globaltag("mc_production_MC13a_rev1")
+
+    # basf2.conditions.prepend_globaltag("online")
+    # basf2.conditions.prepend_globaltag("Reco_master_patch_rel5")
+    # basf2.conditions.prepend_globaltag("online")
+    # basf2.conditions.prepend_globaltag("data_reprocessing_prompt")
+    # basf2.conditions.prepend_globaltag("bgoverlay_production_rel5patch")
+    # basf2.conditions.prepend_globaltag("prerel5_rundep_mc_test")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MasterTask(), workers=workers)

@@ -30,10 +30,38 @@ namespace Belle2 {
     /// Names of the variables to be generated
     constexpr
     static char const* const basicTrackVarNames[] = {
-      "size",
       "pt",
+      "size",
+      "hits_per_layer",
       "n_tracks",
+
       "sz_slope",
+      "s_range",
+      "avg_hit_dist",
+      "has_matching_segment",
+
+      "cont_layer_mean",
+      "cont_layer_variance",
+      "cont_layer_max",
+      "cont_layer_min",
+      "cont_layer_first",
+      "cont_layer_last",
+      "cont_layer_max_vs_last",
+      "cont_layer_first_vs_min",
+      "cont_layer_count",
+      "cont_layer_occupancy",
+
+      "super_layer_mean",
+      "super_layer_variance",
+      "super_layer_max",
+      "super_layer_min",
+      "super_layer_first",
+      "super_layer_last",
+      "super_layer_max_vs_last",
+      "super_layer_first_vs_min",
+      "super_layer_count",
+      "super_layer_occupancy",
+
       "drift_length_mean",
       "drift_length_variance",
       "drift_length_max",
@@ -57,10 +85,6 @@ namespace Belle2 {
       "empty_s_max",
       "empty_s_min",
       "empty_s_sum",
-
-      "has_matching_segment",
-
-      "s_range",
     };
 
     /// Vehicle class to transport the variable names

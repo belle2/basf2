@@ -1,5 +1,6 @@
 # Hardcoded selected files and folders by Henrik Junkerkalefeld #
 # ############################################################# #
+tracking/scripts/tracking/train/old*
 tracking/scripts/tracking/train/logs/
 tracking/scripts/tracking/train/output/
 tracking/scripts/tracking/train/datafiles/

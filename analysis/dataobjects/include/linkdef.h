@@ -48,4 +48,10 @@
   target="m_particleSource"                     \
   code="{m_particleSource = m_particleType;}"   \
 
+#pragma read                                    \
+  version="[-12]"                               \
+  targetClass="Belle2::Particle"                \
+  target="m_momentumScale"                      \
+  code="{m_momentumScale = 1.0;}"               \
+
 #endif

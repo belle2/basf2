@@ -439,3 +439,13 @@ the remote machine:
 
 Now navigate to ``http://0.0.0.0:8XXX`` on your local machine to see the rendered
 web pages.
+
+Previewing documentation changes in a pull request
+--------------------------------------------------
+
+1. Open your PR
+2. Wait for it to build
+3. click on the build status and open the detailed build results
+4. open the "Artifacts" tab
+5. click "Sphinx Documentation"
+

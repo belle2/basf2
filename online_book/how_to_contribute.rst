@@ -8,6 +8,7 @@ How to contribute
 * Something is **wrong**/**misleading**: Fix it with a pull request or raise the issue by creating a JIRA ticket.
   If you are unsure about it, you can ask on `questions.belle2.org <https://questions.belle2.org>`_ before.
 * You notice that something is **missing**: 
+  
   * If you're not sure whether it belongs here, ask the librarians, e.g. by creating a JIRA ticket
     or per email. You can either assign the JIRA ticket to someone you like or submit a pull request for it yourself (preferred).
   * If it is already marked as a todo item, check if someone else is working on it (search on JIRA) and if not,
@@ -42,7 +43,7 @@ Submitting a PR
 You need to 
 
 1. Clone the software repository or create a development setup as explained in
-   :doc:`tools_doc/index-01-tools`
+   :doc:`/tools_doc/index-01-tools`
 2. Change to a new branch ``feature/...`` or ``bugfix/...``
 3. Make your changes
 4. Optionally: Preview them locally as described in :doc:`/framework/doc/atend-doctools`

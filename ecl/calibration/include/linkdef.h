@@ -11,5 +11,6 @@
 #pragma link C++ class Belle2::ECL::eclBhabhaTAlgorithm-;
 #pragma link C++ class Belle2::ECL::eclee5x5Algorithm-;
 #pragma link C++ class Belle2::ECL::eclMergingCrystalEAlgorithm-;
+#pragma link C++ class Belle2::ECL::eclEdgeAlgorithm-;
 
 #endif

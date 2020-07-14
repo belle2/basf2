@@ -2,7 +2,7 @@ We want YOU to contribute to this book!
 ---------------------------------------
 
 If you are an **expert** of some topics, *please share your knowledge*!
-This is not only an act of altrustism: Your contribution will
+This is not only an act of altruism: Your contribution will
 
 * save you from having to answer the same questions over and over again
 * bring your students up to speed fast, so they can work *for* you and not 

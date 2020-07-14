@@ -101,7 +101,7 @@ namespace Belle2 {
       }
 
       double slope = (tempY[ibin + 1] - tempY[ibin]) / (tempX[ibin + 1] - tempX[ibin]);
-      return  double(tempX[ibin] + (ADC - tempY[ibin]) / slope);
+      return  std::round(tempX[ibin] + (ADC - tempY[ibin]) / slope);
     }
 
     /** return specific hadron parameter

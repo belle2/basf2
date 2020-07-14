@@ -439,10 +439,8 @@ void CDCDedxPIDModule::event()
 
         LinearGlobalADCCountTranslator translator;
         int adcbaseCount = cdcHit->getADCCount(); // pedestal subtracted?
-        double nlFactor = 1.6;
-        // int adcCount = nlFactor * NonLinearityADCMap(adcbaseCount / nlFactor);
         int adcCount = (m_DBNonLADCCell && m_usePrediction
-                        && numMCParticles == 0) ? nlFactor * m_DBNonLADCCell->getCorrectedADC(adcbaseCount / nlFactor, currentLayer) : adcbaseCount;
+                        && numMCParticles == 0) ? m_DBNonLADCCell->getCorrectedADC(adcbaseCount, currentLayer) : adcbaseCount;
 
         double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
         int driftT = cdcHit->getTDCCount();

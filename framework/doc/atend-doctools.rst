@@ -416,7 +416,7 @@ How to test locally
 You can test locally your changes in the Sphinx documentation by compiling your
 code with the following command:
 
-::
+.. code:: bash
 
     scons --sphinx html
 
@@ -428,7 +428,7 @@ If you are working on a remote server with port `8XXXX`` forwarded to your local
 machine (as when running a Jupyter notebook), you can also start a tiny web server on
 the remote machine and access it from your local machine:
 
-::
+.. code:: bash
 
     # log in to remote with port forwarding
     # (8XXX is a unique number of your choice)

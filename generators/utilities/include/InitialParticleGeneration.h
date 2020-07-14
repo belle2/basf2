@@ -37,7 +37,26 @@ namespace Belle2 {
     explicit InitialParticleGeneration(int allowedFlags = 0): m_allowedFlags(allowedFlags | MCInitialParticles::c_generateCMS) {};
 
     /** Generate a new event */
-    MCInitialParticles& generate(bool forceGeneration = false);
+    MCInitialParticles& generate();
+
+    /** Update the vertex position:
+     *
+     * 1. If there is no initial particles object generate a new one with nominal values
+     *    without smearing
+     * 2. If the BeamParameters disallow smearing of the vertex it does nothing
+     * 3. If initial particles already exist check if the vertex smearing has already
+     *    been applied. If not, apply vertex smearing if allowed.
+     * 4. Return the **shift** in vertex to the previous value
+     *    (or the origin if there was no previous value).
+     *
+     * This function does not update the energies as this would possibly introduce
+     * inconsistency between values used by the generator and the values contained
+     * in the initial particles. But it is useful to smear the vertex after generation.
+     *
+     * @param force if true the vertex will be regenerated even if vertex smearing
+     *              was already applied.
+     */
+    TVector3 updateVertex(bool force = false);
 
     /** Return reference to nominal beam parameters */
     const BeamParameters& getBeamParameters() const { return *m_beamParams; }

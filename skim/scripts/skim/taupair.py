@@ -419,8 +419,6 @@ class TauThrust(BaseSkim):
         vm.addAlias('nTracksS2Thrust', 'nParticlesInList(pi+:thrustS2)')
 
     def build_lists(self, path):
-        path = self.skim_event_cuts("nGoodTracksThrust==2", path=path)
-
         ma.reconstructDecay("tau+:thrust -> pi+:thrustS1", "", path=path)
         eventParticle = ["tau+:thrust"]
 
@@ -438,7 +436,8 @@ class TauThrust(BaseSkim):
         ma.applyCuts("tau+:thrust", topologyCuts, path=path)  # cut3
         ma.applyCuts("tau+:thrust", "0.8 < thrust", path=path)  # cut4
         ma.applyCuts("tau+:thrust", "visibleEnergyOfEventCMS < 10.4", path=path)  # cut5
-        ma.applyCuts("tau+:thrust", "thrust < 0.99", path=path)  # cut6 thrust upper cut for 1x1
+        # cut6 thrust upper cut for 1x1 topology
+        ma.applyCuts("tau+:thrust", "thrust < 0.99 or nGoodTracksThrust!=2", path=path)
 
         self.SkimLists = eventParticle
 

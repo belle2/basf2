@@ -9,17 +9,7 @@
  **************************************************************************/
 
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/DBStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/LogSystem.h>
 #include <trg/cdc/dbobjects/CDCTrigger2DConfig.h>
-#include <iostream>
-#include <fstream>
-//#include <TFile.h>
-//#include <TH1F.h>
 
 using namespace Belle2;
 

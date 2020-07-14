@@ -13,14 +13,11 @@
 
 #define TRGGDL_SHORT_NAMES
 
-#include <stdlib.h>
 #include <iostream>
 
 #include "trg/trg/Debug.h"
 #include "trg/gdl/modules/trggdl/TRGGDLModule.h"
-//framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
+//framework
 #include <framework/logging/Logger.h>
 
 using namespace std;

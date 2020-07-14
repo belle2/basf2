@@ -6,14 +6,11 @@
  * Contributors: Jo-Frederik Krohn                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- * **************************************************************************/
+ **************************************************************************/
 
 #pragma once
 
 
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <mdst/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -26,7 +23,6 @@
 #include <genfit/Exception.h>
 #include <utility>
 #include <math.h>
-#include <TLorentzVector.h>
 
 /** Helper functions for all klid modules to improve readability of the code */
 namespace KlId {
@@ -41,7 +37,7 @@ namespace KlId {
       const TVector3& trackPos = track.getPosition();
 
       if (trackPos.Angle(pos) < angle) {
-        B2DEBUG(150, "BelleFlagTracklAngle::" << trackPos.Angle(pos));
+        B2DEBUG(20, "BelleFlagTracklAngle::" << trackPos.Angle(pos));
         return 1;
       }
     }
@@ -60,7 +56,7 @@ namespace KlId {
       const TVector3& clusterPos = eclcluster.getClusterPosition();
 
       if (clusterPos.Angle(pos) < angle) {
-        B2DEBUG(150, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
+        B2DEBUG(20, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
         return 1;
       }
     }
@@ -199,22 +195,21 @@ namespace KlId {
     return part ->getPDG();
   }
 
-
-
-
-
-  /** find closest ECL Cluster and its distance */
+  /**
+   * Find the closest ECLCluster with a neutral hadron hypothesis, and return it with its distance.
+   * If there are no suitabile ECLClusters, a nullptr is returned.
+   */
   std::pair<Belle2::ECLCluster*, double> findClosestECLCluster(const TVector3& klmClusterPosition,
       const Belle2::ECLCluster::EHypothesisBit eclhypothesis = Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)
   {
 
-    Belle2::ECLCluster* closestECL = nullptr ;
+    Belle2::ECLCluster* closestECL = nullptr;
     double closestECLAngleDist = 1e10;
     Belle2::StoreArray<Belle2::ECLCluster> eclClusters;
 
     if (eclClusters.getEntries() > 0) {
-      unsigned int index = 0;
-      unsigned int indexOfClosestCluster = 0;
+      int index = 0;
+      int indexOfClosestCluster = -1;
       for (Belle2::ECLCluster& eclcluster : eclClusters) {
 
         if (eclcluster.hasHypothesis(eclhypothesis)) {
@@ -223,15 +218,13 @@ namespace KlId {
           double angularDist = eclclusterPos.Angle(klmClusterPosition);
           if (angularDist < closestECLAngleDist) {
             closestECLAngleDist = angularDist;
-            // the problem here is one can not just use a refenrence to klmCluster because the next cluster will be written in the same address
-            // so that after the loop the reference would always point to the last cluster in the list...
-            // if you know a more elegant solution than using the index pls tell me (Jo)
             indexOfClosestCluster = index;
           }
         }
         ++index;
       }
-      closestECL = eclClusters[indexOfClosestCluster];
+      if (indexOfClosestCluster > -1)
+        closestECL = eclClusters[indexOfClosestCluster];
     }
     return std::make_pair(closestECL, closestECLAngleDist);
   }

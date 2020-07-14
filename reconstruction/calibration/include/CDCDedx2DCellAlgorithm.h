@@ -10,18 +10,11 @@
 
 #pragma once
 
-#include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <calibration/CalibrationAlgorithm.h>
-#include <framework/database/DBObjPtr.h>
-#include <TF1.h>
-#include <TLine.h>
-#include <TBox.h>
-#include <TMath.h>
-#include <TH1D.h>
-#include <TH2D.h>
-#include <TH2F.h>
-#include <TString.h>
-#include <TCanvas.h>
+
+#include <TH1F.h>
+
+#include <iostream>
 
 namespace Belle2 {
   /**

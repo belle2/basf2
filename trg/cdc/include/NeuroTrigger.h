@@ -4,17 +4,13 @@
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBImportObjPtr.h>
-#include <framework/database/DBStore.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
 #include <framework/dataobjects/BinnedEventT0.h>
 
 namespace Belle2 {
 
-  class CDCTriggerSegmentHit;
   class CDCTriggerTrack;
 
   /** Class to represent the CDC Neurotrigger.

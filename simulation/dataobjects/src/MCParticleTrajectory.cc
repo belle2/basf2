@@ -10,7 +10,6 @@
 
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <TVector3.h>
-#include <iostream>
 #include <stack>
 #include <tuple>
 

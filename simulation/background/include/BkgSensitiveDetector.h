@@ -12,8 +12,6 @@
 #define BACKSENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <simulation/dataobjects/BeamBackHit.h>
-#include <TString.h>
 
 namespace Belle2 {
 

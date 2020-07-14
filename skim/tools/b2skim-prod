@@ -8,14 +8,15 @@
 `production system <https://confluence.desy.de/display/BI/Production+Definition>`_, and
 also generating combined steering files.
 
-YAML files are used by this tool to define the LPNs of datasets. Below are examples of valid YAML
-entries for data and MC.
+YAML files are used by this tool to define the LPNs of datasets. Below are examples of
+valid YAML entries for data and MC. The tool ``skim/tools/lpn2yaml.py`` is provided to
+create these YAML files from a list of LPNs.
 
 .. code-block:: yaml
 
     ## Example of a YAML file for data:
     proc9_exp3r1:
-        sampleLabel: proc9_exp3
+        sampleLabel: proc9_exp3  # This label must match a skim sample in TestFiles.yaml
         LPNPrefix: /belle/Data
         inputReleaseNumber: release-03-02-02
         prodNumber: prod00008530
@@ -855,7 +856,10 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                 # need to add some more letters and numbers to keep our prod names and
                 # filenames unique.
                 if args.lpns_per_json:
-                    LPNBlockIdentifier = f"_b{LPNBlockNumber + 1}"
+                    LPNBlockIdentifier = f"_b{LPNBlockNumber + args.StartingBatchNumber}"
+                    outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
+                elif args.StartingBatchNumber > 1:
+                    LPNBlockIdentifier = f"_b{args.StartingBatchNumber}"
                     outputFileName = f"{args.campaign}_{skimName}_{sampleLabelForFilename}{LPNBlockIdentifier}.json"
                 else:
                     LPNBlockIdentifier = ""
@@ -941,6 +945,14 @@ def get_argument_parser():
         "--lpns-per-json",
         type=int,
         help="Restrict number of LPNs in each JSON file to given number.",
+    )
+    parser.add_argument(
+        "-b",
+        "--starting-batch-number",
+        default=1,
+        type=int,
+        dest="StartingBatchNumber",
+        help="Starting number to count from for batch label appended to prod names.",
     )
 
     mcDataGroup = parser.add_mutually_exclusive_group(required=True)

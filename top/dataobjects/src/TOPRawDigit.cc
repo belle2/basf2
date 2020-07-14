@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <top/dataobjects/TOPRawDigit.h>
+
+#include <framework/logging/Logger.h>
+
 #include <math.h>
 
 using namespace std;

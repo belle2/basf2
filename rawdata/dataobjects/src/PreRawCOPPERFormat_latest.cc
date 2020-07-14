@@ -532,6 +532,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
+
     ff55_lower_bits = m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF;
 
     if (ff55_higher_bits != 0xff550000) {
@@ -554,22 +555,44 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
         sprintf(err_buf, "[FATAL] B2link down on slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
                 m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s", err_buf); fflush(stdout);
+        PrintData(m_buffer, m_nwords);
+        fflush(stdout);
+        B2FATAL(err_buf);
       } else {
-        m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-        sprintf(err_buf, "[FATAL] B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
-                m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x1 << 28);
+          sprintf(err_buf,
+                  "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot A eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  m_node_id,
+                  cur_ftsw_eve32,
+                  m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          PrintData(m_buffer, m_nwords);
+          fflush(stdout);
+        } else {
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x1 << 28);
+          sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n",
+                  m_node_id,
+                  cur_ftsw_eve32,
+                  m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          PrintData(m_buffer, m_nwords);
+          fflush(stdout);
+          B2FATAL(err_buf);
+        }
       }
-      printf("%s", err_buf); fflush(stdout);
-      PrintData(m_buffer, m_nwords);
-      fflush(stdout);
-      B2FATAL(err_buf);
     }
   }
 
   if (copper_buf[ POS_CH_B_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
+
     ff55_lower_bits = (m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
 
     if (ff55_higher_bits != 0xff550000) {
@@ -589,24 +612,47 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       const int linkdown_bit = 15;
       //      const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
-        sprintf(err_buf, "[FATAL] B2link down on slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+        sprintf(err_buf, "[FATAL] B2link down on slot B eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
                 m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s", err_buf); fflush(stdout);
+        PrintData(m_buffer, m_nwords);
+        fflush(stdout);
+        B2FATAL(err_buf);
       } else {
-        m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-        sprintf(err_buf, "[FATAL] B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-                m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x2 << 28);
+          sprintf(err_buf,
+                  "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot B eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  m_node_id,
+                  cur_ftsw_eve32,
+                  m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          PrintData(m_buffer, m_nwords);
+          fflush(stdout);
+        } else {
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x2 << 28);
+          sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",
+                  m_node_id,
+                  cur_ftsw_eve32,
+                  m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          PrintData(m_buffer, m_nwords);
+          fflush(stdout);
+          B2FATAL(err_buf);
+        }
       }
-      printf("%s", err_buf); fflush(stdout);
-      PrintData(m_buffer, m_nwords);     fflush(stdout);
-      B2FATAL(err_buf);
     }
   }
 
   if (copper_buf[ POS_CH_C_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
+
     ff55_lower_bits = (m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
 
     if (ff55_higher_bits != 0xff550000) {
@@ -614,7 +660,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       sprintf(err_buf,
               "[FATAL] ERROR_EVENT : HSLB slotC's trailer magic word(0xff55) is invalid. :  : eve %8u run %d foooter %.8x : %s %s %d\n",
               cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
-              m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+              m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
       PrintData(m_buffer, m_nwords); fflush(stdout);
@@ -624,26 +670,50 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
     if (ff55_lower_bits != 0) {
       char err_buf[500];
       const int linkdown_bit = 15;
-      //      const int packet_crcerr_bit = 8;
+
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
-        sprintf(err_buf, "[FATAL] B2link down on slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+        sprintf(err_buf, "[FATAL] B2link down on slot C eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
                 m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s", err_buf); fflush(stdout);
+        PrintData(m_buffer, m_nwords);
+        fflush(stdout);
+        B2FATAL(err_buf);
       } else {
-        m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
-        sprintf(err_buf, "[FATAL] B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-                m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x4 << 28);
+          sprintf(err_buf,
+                  "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot C eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  m_node_id,
+                  cur_ftsw_eve32,
+                  m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          PrintData(m_buffer, m_nwords);
+          fflush(stdout);
+        } else {
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x4 << 28);
+          sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",
+                  m_node_id,
+                  cur_ftsw_eve32,
+                  m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          PrintData(m_buffer, m_nwords);
+          fflush(stdout);
+          B2FATAL(err_buf);
+        }
       }
-      printf("%s", err_buf); fflush(stdout);
-      PrintData(m_buffer, m_nwords);     fflush(stdout);
-      B2FATAL(err_buf);
+
     }
   }
 
   if (copper_buf[ POS_CH_D_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
                        0xFFFF0000;
+
     ff55_lower_bits = (m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
 
     if (ff55_higher_bits != 0xff550000) {
@@ -661,18 +731,42 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
     if (ff55_lower_bits != 0) {
       char err_buf[500];
       const int linkdown_bit = 15;
+
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
-        sprintf(err_buf, "[FATAL] B2link down on slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
+        sprintf(err_buf, "[FATAL] B2link down on slot D eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
                 m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        printf("%s", err_buf); fflush(stdout);
+        PrintData(m_buffer, m_nwords);
+        fflush(stdout);
+        B2FATAL(err_buf);
       } else {
-        sprintf(err_buf, "[FATAL] B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",  cur_ftsw_eve32,
-                m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        if (((unsigned int)m_node_id & DETECTOR_MASK) == ARICH_ID) {
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8 << 28);
+          sprintf(err_buf,
+                  "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot D eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  m_node_id,
+                  cur_ftsw_eve32,
+                  m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          PrintData(m_buffer, m_nwords);
+          fflush(stdout);
+        } else {
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
+          m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8 << 28);
+          sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",
+                  m_node_id,
+                  cur_ftsw_eve32,
+                  m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          PrintData(m_buffer, m_nwords);
+          fflush(stdout);
+          B2FATAL(err_buf);
+        }
       }
-      printf("%s", err_buf); fflush(stdout);
-      PrintData(m_buffer, m_nwords); fflush(stdout);
-      B2FATAL(err_buf);
     }
   }
 

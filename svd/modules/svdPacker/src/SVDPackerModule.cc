@@ -21,12 +21,11 @@
 #include <arpa/inet.h>
 #include <boost/crc.hpp>
 
-#include <sstream>
-#include <iomanip>
 #include <cstring>
-//
-#include<vector>
-
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 
 using namespace std;

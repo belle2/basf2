@@ -50,7 +50,7 @@ namespace Belle2 {
 
     protected:
       /** Step processing method
-       * @param step the G4Step with the current step information
+       * @param aStep the G4Step with the current step information
        * @return true if a Hit has been created, false if the hit was ignored
        */
       bool step(G4Step* aStep, G4TouchableHistory*) override;

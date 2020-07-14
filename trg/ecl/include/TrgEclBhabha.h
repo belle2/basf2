@@ -14,8 +14,6 @@
 #ifndef TRGECLBHABHA_FLAG_
 #define TRGECLBHABHA_FLAG_
 
-#include <iostream>
-#include <string>
 #include <vector>
 
 #include "trg/ecl/TrgEclMapping.h"

@@ -103,8 +103,8 @@ namespace Belle2 {
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
         int pdgCode = track.GetDefinition()->GetPDGEncoding();
 
-        const G4VPhysicalVolume& v = * track.GetVolume();
-        G4ThreeVector posCell = v.GetTranslation();
+        //const G4VPhysicalVolume& v = * track.GetVolume();
+        //G4ThreeVector posCell = v.GetTranslation();
         // Get layer ID
 
         //if (v.GetName().find("Crystal") != std::string::npos) {

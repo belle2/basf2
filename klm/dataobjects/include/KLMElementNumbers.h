@@ -14,6 +14,9 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
+/* C++ headers. */
+#include <string>
+
 namespace Belle2 {
 
   /**
@@ -244,6 +247,14 @@ namespace Belle2 {
      * @param[in] subdetector Subdetector.
      */
     int getMinimalPlaneNumber(int subdetector) const;
+
+    /**
+     * Get DAQ name for a given sector.
+     * @param[in] subdetector Subdetector.
+     * @param[in] section     Section.
+     * @param[in] sector      Sector.
+     */
+    std::string getSectorDAQName(int subdetector, int section, int sector) const;
 
   private:
 

@@ -13,9 +13,13 @@
 #include <framework/core/Module.h>
 #include <string>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
+#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include "TTree.h"
 #include "TFile.h"
 #include "TVector3.h"
@@ -68,7 +72,11 @@ namespace Belle2 {
       void terminate() override;
 
     private:
-      StoreObjPtr<EventT0> m_eventTimeStoreObject; /**<Event t0 */
+      StoreObjPtr<EventMetaData> m_EventMetaData;   /**< Event metadata. */
+      StoreObjPtr<EventT0> m_eventTimeStoreObject;  /**< Event t0 */
+      StoreArray<Track> m_Tracks;                   /**< Tracks. */
+      StoreArray<RecoTrack> m_RecoTracks;           /**< Tracks. */
+      StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_recoTrackArrayName ;       /**< Belle2::RecoTrack StoreArray nam.e */
       std::string m_trackFitResultArrayName;  /**< Belle2::TrackFitResult StoreArray name. */

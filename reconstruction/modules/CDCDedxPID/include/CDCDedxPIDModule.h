@@ -10,9 +10,6 @@
 
 #pragma once
 
-#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
@@ -22,11 +19,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
@@ -39,17 +34,10 @@
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
-#include <string>
 #include <vector>
-#include <map>
-#include <TVector3.h>
 
-class TH2F;
 
 namespace Belle2 {
-  class PXDCluster;
-  class SVDCluster;
-  class CDCDedxTrack;
 
   /** Extract CDC dE/dx information from fitted tracks.
    *

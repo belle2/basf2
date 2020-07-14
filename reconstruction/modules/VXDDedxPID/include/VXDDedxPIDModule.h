@@ -22,25 +22,16 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
-#include <string>
 #include <vector>
-#include <TVector3.h>
-#include <TH2F.h>
 
-class TH2F;
 
 namespace Belle2 {
-  class PXDCluster;
-  class SVDCluster;
-  class VXDDedxTrack;
   class HelixHelper;
 
   /** Extract dE/dx from fitted tracks.

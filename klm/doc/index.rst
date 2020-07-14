@@ -95,3 +95,14 @@ Section for our beautiful tools.
    :prog: b2klm-create-dqm
    :nodefault:
    :nogroupsections:
+
+
+``b2klm-mask-dqm``: Mask very hot channels in DQM reference plots
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: klm/tools/b2klm-mask-dqm
+   :func: arg_parser
+   :prog: b2klm-mask-dqm
+   :nodefault:
+   :nogroupsections:

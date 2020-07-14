@@ -1956,7 +1956,8 @@ namespace Belle2 {
 
     double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
     {
-      if (particle->getParticleSource() == Particle::c_Composite) {
+      if (particle->getParticleSource() == Particle::c_Composite or
+          particle->getParticleSource() == Particle::c_V0) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
         for (auto& i : fspDaug) {
           if (isInThisRestOfEvent(i, roe, maskName) == 0)

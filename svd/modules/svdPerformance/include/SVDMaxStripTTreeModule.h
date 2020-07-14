@@ -17,8 +17,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
-#include <TTree.h>
 #include <TFile.h>
+#include <TH1F.h>
+#include <TTree.h>
 
 namespace Belle2 {
 

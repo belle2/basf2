@@ -9,7 +9,16 @@
  **************************************************************************/
 
 #include <svd/modules/svdCrossTalkCalibrationsCollector/SVDCrossTalkCalibrationsCollectorModule.h>
+
+#include <svd/modules/svdCrossTalkFinder/SVDCrossTalkFinderHelperFunctions.h>
+
+#include <vxd/geometry/GeoCache.h>
+
+#include <TH1F.h>
+
 #include <iostream>
+
+
 using namespace std;
 using namespace Belle2;
 

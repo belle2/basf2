@@ -32,27 +32,44 @@ namespace Belle2 {
        */
       BgoDigitizerModule();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~BgoDigitizerModule();
 
-      /**  */
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
 
-      /**  */
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
 
-      /**  */
+      /**
+       * Event processor.
+       */
       virtual void event() override;
 
-      /**  */
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
-      /**  */
+
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
 
     private:
 
-      StoreArray<BgoHit> m_bgoHit; /** Array for Bgo Hits */
+      StoreArray<BgoHit> m_bgoHit; /**< Array for Bgo Hits */
 
 
       /** reads data from BGO.xml: threshold in MeV, range in MeV, and resolution in % */

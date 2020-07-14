@@ -23,6 +23,9 @@
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
 
+#include "trg/ecl/TrgEclDataBase.h"
+#include "trg/ecl/TrgEclMapping.h"
+
 using namespace std;
 using namespace Belle2;
 

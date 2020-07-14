@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <TF1.h>
+#include "TF1Convolution.h"
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TGraphErrors.h>
@@ -71,7 +72,9 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! only one fit function for all Landaus
-    TF1* m_fLandau = nullptr;
+    TF1Convolution* m_fConv = nullptr;
+    //! only one fit function for all Landaus
+    TF1* m_fFit = nullptr;
     //! Fit the Mean for all modules
     TF1* m_fMean = nullptr;
     //! Graph covering all modules

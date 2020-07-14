@@ -22,7 +22,6 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerFinderClone.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLPInput.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <trg/cdc/dbobjects/CDCTrigger2DConfig.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <trg/cdc/dbobjects/CDCTriggerNeuroConfig.h>
@@ -31,10 +30,7 @@
 #include <bitset>
 #include <vector>
 #include <string>
-#include <iostream>
 #include <iomanip>
-#include <utility>
-#include <typeinfo>
 
 namespace Belle2 {
 
@@ -242,6 +238,9 @@ namespace Belle2 {
     /** Delete dynamically allocated variables */
     virtual void terminate() override;
 
+    /** begin Run */
+    virtual void beginRun();
+
     /** convert raw data (in B2L buffer to bitstream) */
     virtual void event() override;
 
@@ -333,6 +332,11 @@ namespace Belle2 {
     int m_2DFinderCnttrg = 0;
     /** NN cnttrg */
     int m_NeuroCnttrg = 0;
+
+    /** exp number */
+    unsigned m_exp = 0;
+    /** run number */
+    unsigned m_run = 0;
 
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;

@@ -12,7 +12,6 @@
 //-----------------------------------------------------------------------------
 
 #include <algorithm>
-#include <functional>
 #include <iostream>
 #include <ctype.h>
 #include <cstring>

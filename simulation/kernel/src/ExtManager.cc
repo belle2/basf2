@@ -19,15 +19,12 @@
 #include <string>
 
 #include <G4UImanager.hh>
-#include <G4ErrorRunManagerHelper.hh>
 #include <G4RunManager.hh>
 #include <G4EventManager.hh>
 #include <G4RegionStore.hh>
 #include <G4ProductionCutsTable.hh>
 #include <G4ErrorPropagatorData.hh>
 #include <G4ErrorPropagator.hh>
-#include <G4ErrorTrajErr.hh>
-#include <G4ErrorFreeTrajState.hh>
 #include <G4StateManager.hh>
 #include <G4TransportationManager.hh>
 #include <G4FieldManager.hh>
@@ -40,7 +37,6 @@
 #include <G4HelixSimpleRunge.hh>
 #include <G4EquationOfMotion.hh>
 #include <G4ChordFinder.hh>
-#include <G4HadronicProcessStore.hh>
 #include <G4LossTableManager.hh>
 #include <G4VisExecutive.hh>
 #include <G4VExceptionHandler.hh>
@@ -65,6 +61,10 @@ public:
     // Is this an exception for low-momentum track that would over-curl in B field?
     if (strstr(description, "Error returned: 3") != nullptr) {
       B2DEBUG(1, "In " << origin << ", " << code << ": " << description);
+      //FIXME: Workaround for the unresolved navigation problem
+    } else if (strstr(code, "GeomNav0003") != NULL) {
+      B2DEBUG(100, "In " << origin << ", " << code << ": " << description);
+      // END FIXME
     } else {
       B2ERROR("In " << origin << ", " << code << ": " << description);
     }

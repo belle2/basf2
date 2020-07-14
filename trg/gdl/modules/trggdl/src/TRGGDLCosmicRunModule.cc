@@ -1,7 +1,5 @@
 #include "trg/gdl/modules/trggdl/TRGGDLCosmicRunModule.h"
 
-#include <framework/datastore/DataStore.h>
-
 using namespace std;
 using namespace Belle2;
 

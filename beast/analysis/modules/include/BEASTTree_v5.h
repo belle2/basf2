@@ -25,199 +25,199 @@ namespace Belle2 {
     struct BEASTTree_v5 {
 
       /**Beast PVs **/
-      UInt_t ts; /** */
-      UInt_t event; /** */
-      UInt_t run; /** */
-      UInt_t subrun; /** */
-      std::vector<double>*  SKB_HER_current;/** */
-      std::vector<double>*  SKB_LER_current;/** */
-      std::vector<double>*  SKB_HER_lifetime;/** */
-      std::vector<double>*  SKB_LER_lifetime;/** */
-      std::vector<float>* SKB_LER_Zeff_D02;/** */
-      std::vector<float>* SKB_LER_Zeff_D06;/** */
-      std::vector<double>  SKB_HER_RLR;/** */
-      std::vector<double>  SKB_LER_RLR;/** */
-      std::vector<double>*  SKB_HER_integratedCurrent;/** */
-      std::vector<double>*  SKB_LER_integratedCurrent;
-      std::vector<double>*  SKB_HER_injectionFlag;/** */
-      std::vector<double>*  SKB_LER_injectionFlag;/** */
-      std::vector<double>*  SKB_HER_injectionFlag_safe;/** */
-      std::vector<double>*  SKB_LER_injectionFlag_safe;/** */
-      std::vector<double>*  SKB_HER_abortFlag;/** */
-      std::vector<double>*  SKB_LER_abortFlag;/** */
-      std::vector<double>*  SKB_HER_abortFlag_safe;/** */
-      std::vector<double>*  SKB_LER_abortFlag_safe;/** */
-      std::vector<double>*  SKB_HER_injectionRate;/** */
-      std::vector<double>*  SKB_LER_injectionRate;/** */
-      std::vector<double>*  SKB_HER_injectionEfficiency;/** */
-      std::vector<double>*  SKB_LER_injectionEfficiency;/** */
-      std::vector<double>*  SKB_HER_injectionCharge;/** */
-      std::vector<double>*  SKB_LER_injectionCharge;/** */
-      std::vector<double>*  SKB_HER_injectionRepetitionRate;/** */
-      std::vector<double>*  SKB_LER_injectionRepetitionRate;/** */
-      std::vector<double>*  SKB_HER_injectionNumberOfBunches;/** */
-      std::vector<double>*  SKB_LER_injectionNumberOfBunches;/** */
-      std::vector<double>*  SKB_HER_beamSize_xray_X;/** */
-      std::vector<double>*  SKB_HER_beamSize_xray_Y;/** */
-      std::vector<double>*  SKB_HER_correctedBeamSize_xray_Y;/** */
-      std::vector<double>*  SKB_LER_beamSize_xray_X;/** */
-      std::vector<double>*  SKB_LER_beamSize_xray_Y;/** */
-      std::vector<double>*  SKB_LER_correctedBeamSize_xray_Y;/** */
-      std::vector<double>*  SKB_HER_beamSize_SR_Y;/** */
-      std::vector<double>*  SKB_LER_beamSize_SR_Y;/** */
-      std::vector<double>*  SKB_HER_beamSize_SR_X;/** */
-      std::vector<double>*  SKB_LER_beamSize_SR_X;/** */
-      std::vector<double>*  SKB_beamLoss_nearCollimators;/** */
-      std::vector<double>*  SKB_beamLoss_aroundMasks;/** */
-      std::vector<double>*  SKB_HER_pressure_average;/** */
-      std::vector<double>*  SKB_LER_pressure_average;/** */
-      std::vector<float>*   SKB_HER_pressures;/** */
-      std::vector<float>*   SKB_LER_pressures;/** */
-      std::vector<float>*   SKB_LER_pressures_local;/** */
-      std::vector<float>*   SKB_HER_pressures_local;/** */
-      std::vector<double>*  SKB_HER_pressure_average_corrected;/** */
-      std::vector<double>*  SKB_LER_pressure_average_corrected;/** */
-      std::vector<float>*   SKB_HER_pressures_corrected;/** */
-      std::vector<float>*   SKB_LER_pressures_corrected;/** */
-      std::vector<float>*   SKB_LER_pressures_local_corrected;/** */
-      std::vector<float>*   SKB_HER_pressures_local_corrected;/** */
-      std::vector<float>*   SKB_HER_collimatorPositions_inX;/** */
-      std::vector<float>*   SKB_HER_collimatorPositions_inY;/** */
-      std::vector<float>*   SKB_HER_collimatorPositions_mm;/** */
-      std::vector<float>*   SKB_LER_collimatorPositions_mm;/** */
-      std::vector<float>*   SKB_LER_partialPressures_D06;/** */
-      std::vector<float>*   SKB_LER_partialPressures_D02;/** */
-      std::vector<float>*   DIA_current;/** */
-      std::vector<float>*   CSI_temperature;/** */
-      std::vector<float>*   CSI_humidity;/** */
-      std::vector<float>*   TPC_gas_flow;/** */
-      std::vector<float>*   TPC_gas_pressure;/** */
-      std::vector<double>*  SKB_Status;/** */
-      std::vector<short>*   SKB_beamLoss_ionChambers_mean;/** */
-      std::vector<short>*   SKB_beamLoss_PINdiodes_mean;/** */
-      std::vector<float>*   SKB_HER_collimatorPositions_DMM;/** */
-      std::vector<float>*   SKB_HER_collimatorPositions_fromBeam;/** */
-      std::vector<float>*   SKB_LER_collimatorPositions_DMM;/** */
-      std::vector<float>*   SKB_LER_collimatorPositions_X;/** */
-      std::vector<float>*   SKB_LER_collimatorPositions_Y;/** */
-      std::vector<float>*   SKB_LER_collimatorPositions_fromBeam;/** */
-      std::vector<float>*   PIN_voltage;/** */
-      std::vector<float>*   PIN_temperature;/** */
-      std::vector<float> PIN_dose;/** */
-      std::vector<float> PIN_dose_av;/** */
-      std::vector<int>*     TPC3_idx;/** */
-      std::vector<int>*     TPC3_npoints;/** */
-      std::vector<int>*     TPC3_channel;/** */
-      std::vector<int>*     TPC3_sumTOT;/** */
-      std::vector<float>*   TPC3_sumE;/** */
-      std::vector<unsigned short>* TPC3_hitside;/** */
-      std::vector<double>*  TPC3_phi;/** */
-      std::vector<double>*  TPC3_theta;/** */
-      std::vector<float>*  TPC3_chi2;/** */
-      std::vector<double>*  TPC3_dEdx;/** */
-      std::vector<int>*     TPC3_PID_neutrons;/** */
-      std::vector<int>*     TPC3_PID_alphas_top;/** */
-      std::vector<int>*     TPC3_PID_alphas_bottom;/** */
-      std::vector<int>*     TPC3_PID_xrays;/** */
-      std::vector<int>*     TPC3_PID_protons;/** */
-      std::vector<int>*     TPC3_PID_others;/** */
-      std::vector<unsigned int>* TPC3_N_neutrons;/** */
-      std::vector<unsigned int>* TPC3_N_alphas_top;/** */
-      std::vector<unsigned int>* TPC3_N_alphas_bottom;/** */
-      std::vector<unsigned int>* TPC3_N_xrays;/** */
-      std::vector<unsigned int>* TPC3_N_protons;/** */
-      std::vector<unsigned int>* TPC3_N_others;/** */
-      std::vector<unsigned int>* TPC3_selectedTrackIdx;/** */
-      std::vector<int>*     TPC3_hits_col;/** */
-      std::vector<int>*     TPC3_hits_row;/** */
-      std::vector<int>*     TPC3_hits_bcid;/** */
-      std::vector<int>*     TPC3_hits_tot;/** */
-      std::vector<int>*     TPC4_idx;/** */
-      std::vector<int>*     TPC4_npoints;/** */
-      std::vector<int>*     TPC4_channel;/** */
-      std::vector<int>*     TPC4_sumTOT;/** */
-      std::vector<float>*   TPC4_sumE;/** */
-      std::vector<unsigned short>* TPC4_hitside;/** */
-      std::vector<double>* TPC4_phi;/** */
-      std::vector<double>* TPC4_theta;/** */
-      std::vector<float>* TPC4_chi2;/** */
-      std::vector<double>* TPC4_dEdx;/** */
-      std::vector<int>* TPC4_PID_neutrons;/** */
-      std::vector<int>* TPC4_PID_alphas_top;/** */
-      std::vector<int>* TPC4_PID_alphas_bottom;/** */
-      std::vector<int>* TPC4_PID_xrays;/** */
-      std::vector<int>* TPC4_PID_protons;/** */
-      std::vector<int>* TPC4_PID_others;/** */
-      std::vector<unsigned int>* TPC4_N_neutrons;/** */
-      std::vector<unsigned int>* TPC4_N_alphas_top;/** */
-      std::vector<unsigned int>* TPC4_N_alphas_bottom;/** */
-      std::vector<unsigned int>* TPC4_N_xrays;/** */
-      std::vector<unsigned int>* TPC4_N_protons;/** */
-      std::vector<unsigned int>* TPC4_N_others;/** */
-      std::vector<int>* TPC4_selectedTrackIdx;/** */
-      std::vector<int>* TPC4_hits_col;/** */
-      std::vector<int>* TPC4_hits_row;/** */
-      std::vector<int>* TPC4_hits_bcid;/** */
-      std::vector<int>* TPC4_hits_tot;/** */
-      std::vector<float> BGO_energy;/** */
-      std::vector<float> CSI_hitRate;/** */
-      std::vector<float> CSI_sumE;/** */
-      std::vector<float>* CSI_data_sumE;/** */
-      std::vector<float> CSI_Ebin;/** */
-      std::vector<float> HE3_rate;/** */
-      std::vector<float> CLAWS_rate;/** */
-      std::vector<float> QCSS_rate;/** */
-      std::vector<float> DIA_dose; /** */
-      std::vector<float>* DIA_data_dose; /** */
-      std::vector<float>* PIN_data_dose; /** */
-      std::vector<float>* BGO_data_dose; /** */
-      std::vector<float> BGO_energy_av;/** */
-      std::vector<float> CSI_hitRate_av;/** */
-      std::vector<float> CSI_sumE_av;/** */
-      std::vector<float> CSI_Ebin_av;/** */
-      std::vector<float> HE3_rate_av;/** */
-      std::vector<float> CLAWS_rate_av;/** */
-      std::vector<float> QCSS_rate_av;/** */
-      std::vector<float> DIA_dose_av; /** */
+      UInt_t ts; /** unix time [s] */
+      UInt_t event; /** eventID */
+      UInt_t run; /** runID */
+      UInt_t subrun; /** subrunID */
+      std::vector<double>*  SKB_HER_current;/** HER current [mA] */
+      std::vector<double>*  SKB_LER_current;/** LER current [mA] */
+      std::vector<double>*  SKB_HER_lifetime;/** HER beam lifetime [min] */
+      std::vector<double>*  SKB_LER_lifetime;/** HER beam lifetime [min] */
+      std::vector<float>* SKB_LER_Zeff_D02;/** LER Zeff at D02 section */
+      std::vector<float>* SKB_LER_Zeff_D06;/** LER Zeff at D06 section */
+      std::vector<double>  SKB_HER_RLR;/** HER Ring Loss Rate */
+      std::vector<double>  SKB_LER_RLR;/** LER Ring Loss Rate */
+      std::vector<double>*  SKB_HER_integratedCurrent;/** Beast PV */
+      std::vector<double>*  SKB_LER_integratedCurrent;/** Beast PV */
+      std::vector<double>*  SKB_HER_injectionFlag;/** Beast PV */
+      std::vector<double>*  SKB_LER_injectionFlag;/** Beast PV */
+      std::vector<double>*  SKB_HER_injectionFlag_safe;/** Beast PV */
+      std::vector<double>*  SKB_LER_injectionFlag_safe;/** Beast PV */
+      std::vector<double>*  SKB_HER_abortFlag;/** Beast PV */
+      std::vector<double>*  SKB_LER_abortFlag;/** Beast PV */
+      std::vector<double>*  SKB_HER_abortFlag_safe;/** Beast PV */
+      std::vector<double>*  SKB_LER_abortFlag_safe;/** Beast PV */
+      std::vector<double>*  SKB_HER_injectionRate;/** HER injection rate [mA/s] */
+      std::vector<double>*  SKB_LER_injectionRate;/** LER injection rate [mA/s] */
+      std::vector<double>*  SKB_HER_injectionEfficiency;/** HER injection efficiency [%] */
+      std::vector<double>*  SKB_LER_injectionEfficiency;/** LER injection efficiency [%] */
+      std::vector<double>*  SKB_HER_injectionCharge;/** HER injection charge */
+      std::vector<double>*  SKB_LER_injectionCharge;/** LER injection charge */
+      std::vector<double>*  SKB_HER_injectionRepetitionRate;/** HER injection repetition rate [Hz] */
+      std::vector<double>*  SKB_LER_injectionRepetitionRate;/** LER injection repetition rate [Hz] */
+      std::vector<double>*  SKB_HER_injectionNumberOfBunches;/** HER injection number of bunches */
+      std::vector<double>*  SKB_LER_injectionNumberOfBunches;/** LER injection number of bunches */
+      std::vector<double>*  SKB_HER_beamSize_xray_X;/** HER horizontal beam size by X-ray monitor [um] */
+      std::vector<double>*  SKB_HER_beamSize_xray_Y;/** HER vertical beam size by X-ray monitor [um] */
+      std::vector<double>*  SKB_HER_correctedBeamSize_xray_Y;/** HER corrected vertical beam size by X-ray monitor [um] */
+      std::vector<double>*  SKB_LER_beamSize_xray_X;/** LER horizontal beam size by X-ray monitor [um] */
+      std::vector<double>*  SKB_LER_beamSize_xray_Y;/** LER vertical beam size by X-ray monitor [um] */
+      std::vector<double>*  SKB_LER_correctedBeamSize_xray_Y;/** LER corrected vertical beam size by X-ray monitor [um] */
+      std::vector<double>*  SKB_HER_beamSize_SR_Y;/** HER vertical beam size by SR monitor [um] */
+      std::vector<double>*  SKB_LER_beamSize_SR_Y;/** LER vertical beam size by SR monitor [um] */
+      std::vector<double>*  SKB_HER_beamSize_SR_X;/** HER horizontal beam size by SR monitor [um] */
+      std::vector<double>*  SKB_LER_beamSize_SR_X;/** LER horizontal beam size by SR monitor [um] */
+      std::vector<double>*  SKB_beamLoss_nearCollimators;/** Collimator BLM */
+      std::vector<double>*  SKB_beamLoss_aroundMasks;/** Mask BLM */
+      std::vector<double>*  SKB_HER_pressure_average;/** HER ring average pressure [Pa] */
+      std::vector<double>*  SKB_LER_pressure_average;/** LER ring average pressure [Pa] */
+      std::vector<float>*   SKB_HER_pressures;/** Beast PV */
+      std::vector<float>*   SKB_LER_pressures;/** Beast PV */
+      std::vector<float>*   SKB_LER_pressures_local;/** Beast PV */
+      std::vector<float>*   SKB_HER_pressures_local;/** Beast PV */
+      std::vector<double>*  SKB_HER_pressure_average_corrected;/** HER corrected ring average pressure [Pa] */
+      std::vector<double>*  SKB_LER_pressure_average_corrected;/** LER corrected ring average pressure [Pa] */
+      std::vector<float>*   SKB_HER_pressures_corrected;/** Beast PV */
+      std::vector<float>*   SKB_LER_pressures_corrected;/** Beast PV */
+      std::vector<float>*   SKB_LER_pressures_local_corrected;/** Beast PV */
+      std::vector<float>*   SKB_HER_pressures_local_corrected;/** Beast PV */
+      std::vector<float>*   SKB_HER_collimatorPositions_inX;/** HER collimator head horizontal position [mm] */
+      std::vector<float>*   SKB_HER_collimatorPositions_inY;/** HER collimator head vertical position [mm] */
+      std::vector<float>*   SKB_HER_collimatorPositions_mm;/** HER collimator position [mm] */
+      std::vector<float>*   SKB_LER_collimatorPositions_mm;/** LER collimator position [mm] */
+      std::vector<float>*   SKB_LER_partialPressures_D06;/** LER partial RGA pressure at D06 section [Pa] */
+      std::vector<float>*   SKB_LER_partialPressures_D02;/** LER partial RGA pressure at D02 section [Pa] */
+      std::vector<float>*   DIA_current;/** Beast PV */
+      std::vector<float>*   CSI_temperature;/** Beast PV */
+      std::vector<float>*   CSI_humidity;/** Beast PV */
+      std::vector<float>*   TPC_gas_flow;/** TPC gas flow */
+      std::vector<float>*   TPC_gas_pressure;/** TPC gas pressure */
+      std::vector<double>*  SKB_Status;/** Beast PV */
+      std::vector<short>*   SKB_beamLoss_ionChambers_mean;/** BLM mean ion chamber*/
+      std::vector<short>*   SKB_beamLoss_PINdiodes_mean;/** BLM mean pin-diod */
+      std::vector<float>*   SKB_HER_collimatorPositions_DMM;/** Beast PV */
+      std::vector<float>*   SKB_HER_collimatorPositions_fromBeam;/** HER collimator head position w.r.t. beam [mm] */
+      std::vector<float>*   SKB_LER_collimatorPositions_DMM;/** Beast PV */
+      std::vector<float>*   SKB_LER_collimatorPositions_X;/** Beast PV */
+      std::vector<float>*   SKB_LER_collimatorPositions_Y;/** Beast PV */
+      std::vector<float>*   SKB_LER_collimatorPositions_fromBeam;/** LER collimator head position w.r.t. beam [mm] */
+      std::vector<float>*   PIN_voltage;/** Pin-diod voltage */
+      std::vector<float>*   PIN_temperature;/** Pin-diod temperature */
+      std::vector<float> PIN_dose;/** Pin-diod dose */
+      std::vector<float> PIN_dose_av;/** Pin-diod average dose */
+      std::vector<int>*     TPC3_idx;/** TPC id */
+      std::vector<int>*     TPC3_npoints;/** TPC number of points */
+      std::vector<int>*     TPC3_channel;/** TPC channel */
+      std::vector<int>*     TPC3_sumTOT;/** TPC Time-over-Threshold */
+      std::vector<float>*   TPC3_sumE;/** TPC energy deposition */
+      std::vector<unsigned short>* TPC3_hitside;/** TPC side of hits */
+      std::vector<double>*  TPC3_phi;/** TPC phi ange */
+      std::vector<double>*  TPC3_theta;/** TPC theta angle */
+      std::vector<float>*  TPC3_chi2;/** TPC chi2 */
+      std::vector<double>*  TPC3_dEdx;/** PC dE/dx */
+      std::vector<int>*     TPC3_PID_neutrons;/** Beast PV */
+      std::vector<int>*     TPC3_PID_alphas_top;/** Beast PV */
+      std::vector<int>*     TPC3_PID_alphas_bottom;/** Beast PV */
+      std::vector<int>*     TPC3_PID_xrays;/** Beast PV */
+      std::vector<int>*     TPC3_PID_protons;/** Beast PV */
+      std::vector<int>*     TPC3_PID_others;/** Beast PV */
+      std::vector<unsigned int>* TPC3_N_neutrons;/** Beast PV */
+      std::vector<unsigned int>* TPC3_N_alphas_top;/** Beast PV */
+      std::vector<unsigned int>* TPC3_N_alphas_bottom;/** Beast PV */
+      std::vector<unsigned int>* TPC3_N_xrays;/** Beast PV */
+      std::vector<unsigned int>* TPC3_N_protons;/** Beast PV */
+      std::vector<unsigned int>* TPC3_N_others;/** Beast PV */
+      std::vector<unsigned int>* TPC3_selectedTrackIdx;/** Beast PV */
+      std::vector<int>*     TPC3_hits_col;/** Beast PV */
+      std::vector<int>*     TPC3_hits_row;/** Beast PV */
+      std::vector<int>*     TPC3_hits_bcid;/** Beast PV */
+      std::vector<int>*     TPC3_hits_tot;/** Beast PV */
+      std::vector<int>*     TPC4_idx;/** Beast PV */
+      std::vector<int>*     TPC4_npoints;/** Beast PV */
+      std::vector<int>*     TPC4_channel;/** Beast PV */
+      std::vector<int>*     TPC4_sumTOT;/** Beast PV */
+      std::vector<float>*   TPC4_sumE;/** Beast PV */
+      std::vector<unsigned short>* TPC4_hitside;/** Beast PV */
+      std::vector<double>* TPC4_phi;/** Beast PV */
+      std::vector<double>* TPC4_theta;/** Beast PV */
+      std::vector<float>* TPC4_chi2;/** Beast PV */
+      std::vector<double>* TPC4_dEdx;/** Beast PV */
+      std::vector<int>* TPC4_PID_neutrons;/** Beast PV */
+      std::vector<int>* TPC4_PID_alphas_top;/** Beast PV */
+      std::vector<int>* TPC4_PID_alphas_bottom;/** Beast PV */
+      std::vector<int>* TPC4_PID_xrays;/** Beast PV */
+      std::vector<int>* TPC4_PID_protons;/** Beast PV */
+      std::vector<int>* TPC4_PID_others;/** Beast PV */
+      std::vector<unsigned int>* TPC4_N_neutrons;/** Beast PV */
+      std::vector<unsigned int>* TPC4_N_alphas_top;/** Beast PV */
+      std::vector<unsigned int>* TPC4_N_alphas_bottom;/** Beast PV */
+      std::vector<unsigned int>* TPC4_N_xrays;/** Beast PV */
+      std::vector<unsigned int>* TPC4_N_protons;/** Beast PV */
+      std::vector<unsigned int>* TPC4_N_others;/** Beast PV */
+      std::vector<int>* TPC4_selectedTrackIdx;/** Beast PV */
+      std::vector<int>* TPC4_hits_col;/** Beast PV */
+      std::vector<int>* TPC4_hits_row;/** Beast PV */
+      std::vector<int>* TPC4_hits_bcid;/** Beast PV */
+      std::vector<int>* TPC4_hits_tot;/** Beast PV */
+      std::vector<float> BGO_energy;/** Beast PV */
+      std::vector<float> CSI_hitRate;/** Beast PV */
+      std::vector<float> CSI_sumE;/** Beast PV */
+      std::vector<float>* CSI_data_sumE;/** Beast PV */
+      std::vector<float> CSI_Ebin;/** Beast PV */
+      std::vector<float> HE3_rate;/** Beast PV */
+      std::vector<float> CLAWS_rate;/** Beast PV */
+      std::vector<float> QCSS_rate;/** Beast PV */
+      std::vector<float> DIA_dose; /** Beast PV */
+      std::vector<float>* DIA_data_dose; /** Beast PV */
+      std::vector<float>* PIN_data_dose; /** Beast PV */
+      std::vector<float>* BGO_data_dose; /** Beast PV */
+      std::vector<float> BGO_energy_av;/** Beast PV */
+      std::vector<float> CSI_hitRate_av;/** Beast PV */
+      std::vector<float> CSI_sumE_av;/** Beast PV */
+      std::vector<float> CSI_Ebin_av;/** Beast PV */
+      std::vector<float> HE3_rate_av;/** Beast PV */
+      std::vector<float> CLAWS_rate_av;/** Beast PV */
+      std::vector<float> QCSS_rate_av;/** Beast PV */
+      std::vector<float> DIA_dose_av; /** Beast PV */
 
-      std::vector<float>* CSI_data_rate; /** */
-      std::vector<float>* HE3_data_rate; /** */
-      std::vector<float>* QCSS_data_rate; /** */
-      std::vector<float>* CLAWS_data_rate; /** */
-      std::vector<float>* CSI_data_Ebin; /** */
+      std::vector<float>* CSI_data_rate; /** Beast PV */
+      std::vector<float>* HE3_data_rate; /** Beast PV */
+      std::vector<float>* QCSS_data_rate; /** Beast PV */
+      std::vector<float>* CLAWS_data_rate; /** Beast PV */
+      std::vector<float>* CSI_data_Ebin; /** Beast PV */
 
-      std::vector<double> SAD_HER_lifetime;/** */
-      std::vector<double> SAD_LER_lifetime;/** */
-      std::vector<double> SAD_HER_lifetime_av;/** */
-      std::vector<double> SAD_LER_lifetime_av;/** */
-      std::vector<double> SAD_HER_RLR;/** */
-      std::vector<double> SAD_LER_RLR;/** */
-      std::vector<double> SAD_HER_RLR_av;/** */
-      std::vector<double> SAD_LER_RLR_av;/** */
+      std::vector<double> SAD_HER_lifetime;/** Beast PV */
+      std::vector<double> SAD_LER_lifetime;/** Beast PV */
+      std::vector<double> SAD_HER_lifetime_av;/** Beast PV */
+      std::vector<double> SAD_LER_lifetime_av;/** Beast PV */
+      std::vector<double> SAD_HER_RLR;/** SAD HER Ring Loss Rate */
+      std::vector<double> SAD_LER_RLR;/** SAD LER Ring Loss Rate */
+      std::vector<double> SAD_HER_RLR_av;/** SAD HER average Ring Loss Rate */
+      std::vector<double> SAD_LER_RLR_av;/** SAD LER average Ring Loss Rate */
 
-      std::vector<float> DOSI;/** */
-      std::vector<float> DOSI_av;/** */
+      std::vector<float> DOSI;/** Beast PV */
+      std::vector<float> DOSI_av;/** Beast PV */
 
-      std::vector<double> mc_reweight_LERB;/** */
-      std::vector<double> mc_reweight_LERC;/** */
-      std::vector<double> mc_reweight_LERT;/** */
-      std::vector<double> mc_reweight_HERB;/** */
-      std::vector<double> mc_reweight_HERC;/** */
-      std::vector<double> mc_reweight_HERT;/** */
+      std::vector<double> mc_reweight_LERB;/** LER Bremsstrahlung scale coef. */
+      std::vector<double> mc_reweight_LERC;/** LER Coulomb scale coef. */
+      std::vector<double> mc_reweight_LERT;/** LER Touschek scale coef. */
+      std::vector<double> mc_reweight_HERB;/** HER Bremsstrahlung scale coef. */
+      std::vector<double> mc_reweight_HERC;/** HER Coulomb scale coef. */
+      std::vector<double> mc_reweight_HERT;/** HER Touschek scale coef. */
 
       //std::vector<float> TPC_rate_av[2][5];/** */
       //std::vector<float> TPC_rate[2][5];/** */
-      float TPC_rate_av[2][5];/** */
-      float TPC_rate[2][5];/** */
+      float TPC_rate_av[2][5];/** TPC average rate */
+      float TPC_rate[2][5];/** TPC rate */
       //float TPC_dose_av[2][5];/** */
       //float TPC_dose[2][5];/** */
-      std::vector<float> TPC_dose;/** */
-      std::vector<float> TPC_dose_av;/** */
+      std::vector<float> TPC_dose;/** TPC dose */
+      std::vector<float> TPC_dose_av;/** TPC average dose */
 
-      float TPC_angular_rate_av[2][9][18];/** */
-      float TPC_angular_rate[2][9][18];/** */
-      float TPC_angular_dose_av[2][9][18];/** */
-      float TPC_angular_dose[2][9][18];/** */
+      float TPC_angular_rate_av[2][9][18];/** TPC angular average rate */
+      float TPC_angular_rate[2][9][18];/** TPC angular rate */
+      float TPC_angular_dose_av[2][9][18];/** TPC angular average dose */
+      float TPC_angular_dose[2][9][18];/** TPC angular dose */
 
       /**
        *.clear the structure: set elements to zero

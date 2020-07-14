@@ -14,12 +14,8 @@
 
 #include <array>
 #include <bitset>
-#include <queue>
 #include <string>
-#include <sstream>
-#include <utility>
 #include <numeric>
-#include <iomanip>
 #include <algorithm>
 
 using namespace Belle2;
@@ -533,6 +529,7 @@ CDCTriggerUnpackerModule::CDCTriggerUnpackerModule() : Module(), m_rawTriggers("
 void CDCTriggerUnpackerModule::initialize()
 {
   m_debugLevel = getLogConfig().getDebugLevel();
+
   //m_rawTriggers.isRequired();
   if (m_unpackMerger) {
     m_mergerBits.registerInDataStore("CDCTriggerMergerBits");
@@ -629,6 +626,16 @@ void CDCTriggerUnpackerModule::terminate()
   }
 }
 
+void CDCTriggerUnpackerModule::beginRun()
+{
+
+  StoreObjPtr<EventMetaData> bevt;
+  m_exp = bevt->getExperiment();
+  m_run = bevt->getRun();
+
+}
+
+
 void CDCTriggerUnpackerModule::event()
 {
 
@@ -641,6 +648,12 @@ void CDCTriggerUnpackerModule::event()
   B2DEBUG(10, padright(experimentstring, 100));
 
   setReturnValue(0);
+
+  if (m_exp < 7) {
+    B2DEBUG(20, "exp<7: skip cdctrg unpacker for DQM");
+    return;
+  }
+
   // Read RawTRG data block.
   B2DEBUG(99,  m_rawTriggers.getEntries() << " COPPERs in RawTRGs");
 

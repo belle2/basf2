@@ -182,7 +182,7 @@ namespace TreeFitter {
         rc = new RecoResonance(particle, mother);
 
       }  else {
-        rc = new RecoComposite(particle, mother);
+        rc = new InternalParticle(particle, mother, config, forceFitAll);
 
       }
 

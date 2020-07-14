@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <string>
-#include <vector>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

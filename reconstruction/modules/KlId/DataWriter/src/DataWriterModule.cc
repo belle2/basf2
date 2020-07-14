@@ -14,16 +14,13 @@
 #include <mdst/dataobjects/KlId.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <tracking/dataobjects/TrackClusterSeparation.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
 #include <TTree.h>
 #include <TFile.h>
-#include <cstring>
 #include <utility>
 
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"

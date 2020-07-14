@@ -15,7 +15,6 @@
 #include <top/reconstruction/TOPconfigure.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -163,7 +162,8 @@ namespace Belle2 {
 
     int Nhyp = 1;
     double mass = m_selector.getChargedStable().getMass();
-    TOPreco reco(Nhyp, &mass, m_minBkgPerBar, m_scaleN0);
+    int pdg = m_selector.getChargedStable().getPDGCode();
+    TOPreco reco(Nhyp, &mass, &pdg, m_minBkgPerBar, m_scaleN0);
     reco.setPDFoption(m_PDFOption);
     const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
     double timeMin = tdc.getTimeMin();

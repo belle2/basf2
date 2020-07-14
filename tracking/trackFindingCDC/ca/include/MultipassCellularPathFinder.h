@@ -30,7 +30,7 @@ namespace Belle2 {
      *  knots until there is no more path fullfilling the minimal length / energy requirement given
      *  as minStateToFollow to the constructor.
      */
-    template <class ACellHolder, template<class> class WeightedRelationClass>
+    template <class ACellHolder, template<class...> class WeightedRelationClass>
     class MultipassCellularPathFinder {
     public:
       /// Default constructor also checking the validity of the template arguments

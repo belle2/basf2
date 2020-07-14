@@ -14,7 +14,6 @@
 #define TRG_SHORT_NAMES
 
 #include <string>
-#include <vector>
 #include <iostream>
 #include "trg/trg/Signal.h"
 

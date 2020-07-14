@@ -1,7 +1,6 @@
 #pragma once
 
 #include <TObject.h>
-#include <unordered_map>
 #include <vector>
 
 namespace Belle2 {

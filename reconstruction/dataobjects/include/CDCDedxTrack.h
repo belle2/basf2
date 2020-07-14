@@ -11,12 +11,8 @@
 #ifndef CDCDEDXTRACK_H
 #define CDCDEDXTRACK_H
 
-#include <reconstruction/dataobjects/DedxConstants.h>
-
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
-
-#include <TVector3.h>
 
 #include <vector>
 
@@ -244,9 +240,13 @@ namespace Belle2 {
     /** Int value corresponds to values of enum Belle2::RecoHitInformation::OriginTrackFinder */
     int getFoundByTrackFinder(int i) const { return m_hFoundByTrackFinder[i]; }
 
-    /** Return the max weights from KalmanFitterInfo */
+    /** Return the max weights from KalmanFitterInfo using pion hypothesis */
     double getWeightPionHypo(int i) const { return m_hWeightPionHypo[i]; }
+
+    /** Return the max weights from KalmanFitterInfo using kaon hypothesis */
     double getWeightKaonHypo(int i) const { return m_hWeightKaonHypo[i]; }
+
+    /** Return the max weights from KalmanFitterInfo using proton hypothesis */
     double getWeightProtonHypo(int i) const { return m_hWeightProtHypo[i]; }
 
     /** Return the PID (chi) value */

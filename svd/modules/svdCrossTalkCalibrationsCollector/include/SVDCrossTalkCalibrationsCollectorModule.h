@@ -11,22 +11,16 @@
 #pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
-#include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/SensorInfoBase.h>
-#include <vxd/geometry/GeoCache.h>
 #include <svd/calibration/SVDOccupancyCalibrations.h>
-#include <svd/modules/svdCrossTalkFinder/SVDCrossTalkFinderHelperFunctions.h>
+
+#include <TH1F.h>
+#include <TTree.h>
 
 #include <string>
-#include <TH2.h>
-#include <TFile.h>
-#include <TTree.h>
 #include <map>
 
 

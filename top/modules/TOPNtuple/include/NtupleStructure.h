@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <TTree.h>
+#include <Rtypes.h>
 
 namespace Belle2 {
   namespace TOP {

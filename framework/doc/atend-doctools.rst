@@ -425,8 +425,8 @@ navigate it with your favorite browser to check if the output is what you
 expect.
 
 If you are working on a remote server with port `8XXXX`` forwarded to your local
-machine (as when running a Jupyter notebook), you can start a tiny web server on
-the remote machine:
+machine (as when running a Jupyter notebook), you can also start a tiny web server on
+the remote machine and access it from your local machine:
 
 ::
 

@@ -1,7 +1,7 @@
 .. _detector:
 
-Detecor and performance
-=======================
+Detector and performance
+========================
 
 This chapter contains key information about the subsystems of the detector.
 

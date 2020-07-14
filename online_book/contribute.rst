@@ -25,4 +25,4 @@ This is not only an act of altruism:
   to be a rite of passage.
 * You also get your questions answered and people will thank you for raising them!
 
-Learn more about this: :doc:`online_book/how_to_contribute`
+Learn more about this: :doc:`/online_book/how_to_contribute`.

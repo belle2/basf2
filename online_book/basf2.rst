@@ -16,4 +16,3 @@ This chapter contains materials devoted to work with Belle II Analysis Software 
    basf2/first_steering_file
    basf2/variables
    basf2/output
-   

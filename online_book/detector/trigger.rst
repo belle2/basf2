@@ -1,7 +1,7 @@
 .. _trigger:
 
 Trigger
--------
+=======
 
 .. include:: ../todo.rst
 

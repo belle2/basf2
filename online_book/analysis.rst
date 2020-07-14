@@ -14,5 +14,3 @@ This chapter describes how to do offline analysis. We introduce root-based and p
    analysis/pandas
    analysis/fitting
    analysis/reproducibility
-
-   

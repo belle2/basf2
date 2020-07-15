@@ -26,7 +26,7 @@ namespace Belle2 {
    * Super-layer information is generated on demand. The super-layer counting goes from 0 to 8.
    *
    * The numbering scheme just in this class is equivalent to the one defined in the note BELLE2-NOTE-TE-2015-022:
-   * https://docs.belle2.org/record/256/files/BELLE2-NOTE-TE-2015-022.pdf
+   * https://docs.belle2.org/record/256
    *
    * @sa HitPatternVXD
    */

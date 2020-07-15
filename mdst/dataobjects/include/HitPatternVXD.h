@@ -23,7 +23,7 @@ namespace Belle2 {
    *  - PXD: layers 1 and 2;
    *  - SVD: layers 3, 4, 5 and 6.
    * The numbering scheme in this class is equivalent to the one defined in the note BELLE2-NOTE-TE-2015-010:
-   * https://docs.belle2.org/record/243/files/Belle%20II%20note%200010.pdf?version=3
+   * https://docs.belle2.org/record/243
    *
    * @sa HitPatternCDC
    *

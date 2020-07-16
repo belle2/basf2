@@ -332,6 +332,7 @@ def fancy_skim_header(SkimClass):
         SkimClass.__doc__ = header
 
     # If documentation of template functions not redefined, make sure BaseSkim docstring is not repeated
+    SkimClass.load_standard_lists.__doc__ = SkimClass.load_standard_lists.__doc__ or ""
     SkimClass.build_lists.__doc__ = SkimClass.build_lists.__doc__ or ""
     SkimClass.validation_histograms.__doc__ = SkimClass.validation_histograms.__doc__ or ""
     SkimClass.additional_setup.__doc__ = SkimClass.additional_setup.__doc__ or ""

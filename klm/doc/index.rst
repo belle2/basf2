@@ -59,11 +59,9 @@ Likelihood extraction
 The likelihood of having the matched-hit range and transverse-scattering :math:`\chi^{2}` distribution is obtained from pre-calculated probability density functions (PDFs). 
 There are separate PDFs for each charged-particle hypothesis and charge and for each extrapolation outcome. 
 
-* The *longitudinal-profile* PDF value for extrapolation ending outcome and outermost layer and for particle hypotesis is samples according to the measurement
-vector :math:`\vec{c}` given by: (a) the pattern of of all KLM layers touched during the extrapolation and (b) the pattern of matched hits in the touched layers.
+* The *longitudinal-profile* PDF value for extrapolation ending outcome and outermost layer and for particle hypotesis is samples according to the measurement vector :math:`\vec{c}` given by: (a) the pattern of of all KLM layers touched during the extrapolation and (b) the pattern of matched hits in the touched layers.
 
-* The *transverse-scattering* probability density function for KLM region and particle hypotesis is sampled according to the measurement of :math:`\chi^{2}` 
-from the Kalman filter and the number of degrees of freedom, which is twice the number of matched hits.
+* The *transverse-scattering* probability density function for KLM region and particle hypotesis is sampled according to the measurement of :math:`\chi^{2}` from the Kalman filter and the number of degrees of freedom, which is twice the number of matched hits.
 
 For each track, the **likelihood** for a given particle hypothesis is the product of the corrisponding longitudinal-profile and transverse-scattering PDF values.
 The natural logarithm of this value is stored in the ``KLMMuidLikelihood``  data-object. Then, the six likelihood values are normalized by dividing by their sum 

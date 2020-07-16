@@ -15,8 +15,9 @@ __authors__ = [
 import basf2 as b2
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdMu, stdPi
+from stdPhotons import stdPhotons
 from variables import variables
-
 
 __liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
 
@@ -45,14 +46,10 @@ class BtoXgamma(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all", "loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X_{(s,d)}\\gamma` decays."""
@@ -123,16 +120,11 @@ class BtoXll(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-            "stdCharged": {
-                "stdE": ["all"],
-                "stdMu": ["all"],
-                "stdPi": ["all"],
-            },
-            "stdPhotons": {
-                "stdPhotons": ["all"],
-            },
-        }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
@@ -218,16 +210,11 @@ class BtoXll_LFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"],
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` LFV decays."""
@@ -304,8 +291,6 @@ class inclusiveBplusToKplusNuNu(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     NoisyModules = ["ParticleCombiner"]
-
-    RequiredStandardLists = None
 
     def build_lists(self, path):
 

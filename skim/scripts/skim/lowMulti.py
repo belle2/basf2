@@ -9,7 +9,7 @@ __authors__ = [
 
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, get_test_file, fancy_skim_header
+from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 
 
 @fancy_skim_header
@@ -22,7 +22,6 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 
-    RequiredStandardLists = None
     TestFiles = [get_test_file("MC13_mumuBGx1")]
 
     def __init__(self, prescale=1, **kwargs):
@@ -103,7 +102,6 @@ class LowMassTwoTrack(BaseSkim):
     __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
     __category__ = "physics, low multiplicity"
 
-    RequiredStandardLists = None
     TestFiles = [get_test_file("MC13_mumuBGx1")]
 
     def build_lists(self, path):

@@ -9,7 +9,7 @@ the classes to contain the class version and checksum from the compiled
 dictionary.
 
 For a more detailed explanation please look at the documentation for
-`b2code-classversion-check`. But basically this tool looks for linkdef.h files
+``b2code-classversion-check``. But basically this tool looks for linkdef.h files
 in the given search folders and will update the class version and class checksum
 comments to reflect the actual values reported by ROOT when loading the class.
 

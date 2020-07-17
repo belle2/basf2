@@ -264,6 +264,12 @@ void CDCDedxPIDModule::event()
     // get the cosine correction only for data!
     dedxTrack->m_cosCor = (m_DBCosineCor && m_usePrediction && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
 
+    // get the cosine edge correction only for data!
+    bool isEdge = false;
+    if ((abs(costh + 0.860) < 0.010) || abs(costh - 0.960) <= 0.010)isEdge = true;
+    dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && m_usePrediction && numMCParticles == 0
+                               && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
+
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
     double layerdx = 0.0; // total path length in current layer
@@ -439,8 +445,8 @@ void CDCDedxPIDModule::event()
 
         LinearGlobalADCCountTranslator translator;
         int adcbaseCount = cdcHit->getADCCount(); // pedestal subtracted?
-        int adcCount = (m_DBNonLADCCell && m_usePrediction
-                        && numMCParticles == 0) ? m_DBNonLADCCell->getCorrectedADC(adcbaseCount, currentLayer) : adcbaseCount;
+        int adcCount = (m_DBNonlADC && m_usePrediction
+                        && numMCParticles == 0) ? m_DBNonlADC->getCorrectedADC(adcbaseCount, currentLayer) : adcbaseCount;
 
         double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
         int driftT = cdcHit->getTDCCount();
@@ -474,7 +480,7 @@ void CDCDedxPIDModule::event()
           //       It is applied in two places below (hit level and layer level)
 
 
-          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
+          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * wiregain * twodcor * onedcor;
           if (correction != 0) {
             dadcCount = dadcCount / correction;
 

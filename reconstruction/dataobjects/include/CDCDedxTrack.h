@@ -33,7 +33,7 @@ namespace Belle2 {
       RelationsObject(),
       m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_pCDC(0),
       m_length(0.0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
-      m_scale(0), m_cosCor(0), m_runGain(0),
+      m_scale(0), m_cosCor(0), m_cosEdgeCor(0), m_runGain(0),
       m_lNHitsUsed(0)
     {
       m_simDedx = m_dedxAvg = m_dedxAvgTruncated = m_dedxAvgTruncatedNoSat = m_dedxAvgTruncatedErr = 0.0;
@@ -127,6 +127,9 @@ namespace Belle2 {
 
     /** Return the cosine correction for this track */
     double getCosineCorrection() const { return m_cosCor; }
+
+    /** Return the cosine correction for this track */
+    double getCosEdgeCorrection() const { return m_cosEdgeCor; }
 
     /** Return the run gain for this track */
     double getRunGain() const { return m_runGain; }
@@ -289,6 +292,7 @@ namespace Belle2 {
     // calibration constants
     double m_scale; /**< scale factor to make electrons ~1 */
     double m_cosCor;  /**< calibration cosine correction */
+    double m_cosEdgeCor;  /**< calibration cosine edge correction */
     double m_runGain; /**< calibration run gain */
     std::vector<double> m_hWireGain; /**< calibration hit gain (indexed on number of hits) */
     std::vector<double> m_hTwodCor;  /**< calibration 2-D correction (indexed on number of hits) */

@@ -30,6 +30,7 @@
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
 #include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h>
+#include <reconstruction/dbobjects/CDCDedxCosineEdge.h>
 #include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
@@ -168,7 +169,8 @@ namespace Belle2 {
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
-    DBObjPtr<CDCDedxADCNonLinearity> m_DBNonLADCCell; /**< non-lineary ACD correction DB object */
+    DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< non-lineary ACD correction DB object */
+    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-lineary ACD correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */

@@ -72,7 +72,7 @@ The requirement :math:`\Delta > \Delta_{min}` for a user-selected :math:`\Delta_
 
 Muid Likelihoods are constructed by ``MuidBuilder`` class.
 
-.. autoclass:: MuidBuilder  
+.. cpp:class:: MuidBuilder 
 
 .. seealso:: `"Track extrapolation and muon identification using GEANT4E in event reconstruction in the Belle II experiment" <https://docs.belle2.org/record/502/files/BELLE2-TALK-CONF-2017-026.pdf>`_
 

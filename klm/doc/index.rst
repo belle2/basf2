@@ -74,18 +74,16 @@ Muid Likelihoods are constructed by ``MuidBuilder`` class.
 
 .. cpp:class:: MuidBuilder 
 
-Build the Muid likelihoods starting from the hit pattern and the transverse scattering in KLM
+  Build the Muid likelihoods starting from the hit pattern and the transverse scattering in KLM.
+  
+  .. autofunction:: MuidBuilder.getPDF
 
-REGISTER_FUNCTION("fillPDFs(Hypotesys)", fillPDFs, R"DOC(
-Retrieve the PDFs from the database according to the given hypothesis.
-
-Parameters:
-   Hypothesis (int): hypothesis number.
+  
 
 .. see also:: `"MuidElementNumber Class" <https://b2-master.belle2.org/software/development/classBelle2_1_1MuidElementNumbers.html#abac5ea6b84578687bc483bb611738e35>`_
 
 
- )DOC")
+
 
 
 .. seealso:: `"Track extrapolation and muon identification using GEANT4E in event reconstruction in the Belle II experiment" <https://docs.belle2.org/record/502/files/BELLE2-TALK-CONF-2017-026.pdf>`_

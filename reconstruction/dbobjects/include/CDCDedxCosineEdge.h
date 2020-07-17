@@ -92,10 +92,10 @@ namespace Belle2 {
         coslow = -0.870; coshigh = -0.850; //this is hardcoded and fix
       } else if (costh > 0) {
         temp = m_largeCos[1];
-        coslow = 0.950; coshigh = 0.970; //this is hardcoded and fix
+        coslow = 0.950; coshigh = 0.960; //this is hardcoded and fix
       } else {
         B2ERROR("CDCDedxCosineEdge:choose > 0 for forward and <0 for backward side");
-        return 0;
+        return 1.0;
       }
 
       //don't do anything for other cosine range
@@ -132,7 +132,7 @@ namespace Belle2 {
         coslow = -0.870; coshigh = -0.850;
       } else if (side > 0) {
         temp = m_largeCos[1];
-        coslow = 0.950; coshigh = 0.970;
+        coslow = 0.950; coshigh = 0.960;
       } else {
         B2ERROR("CDCDedxCosineEdge:choose > 0 for forward and <0 for backward side");
         return  -99.0;
@@ -163,7 +163,7 @@ namespace Belle2 {
         coslow = -0.870; coshigh = -0.850;
       } else if (side > 0) {
         temp = m_largeCos[1];
-        coslow = 0.950; coshigh = 0.970;
+        coslow = 0.950; coshigh = 0.960;
       } else {
         B2ERROR("CDCDedxCosineEdge:choose > 0 for forward and <0 for backward side");
         return;

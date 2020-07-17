@@ -266,7 +266,7 @@ void CDCDedxPIDModule::event()
 
     // get the cosine edge correction only for data!
     bool isEdge = false;
-    if ((abs(costh + 0.860) < 0.010) || abs(costh - 0.960) <= 0.010)isEdge = true;
+    if ((abs(costh + 0.860) < 0.010) || abs(costh - 0.955) <= 0.005)isEdge = true;
     dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && m_usePrediction && numMCParticles == 0
                                && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
 

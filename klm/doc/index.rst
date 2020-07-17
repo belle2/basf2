@@ -73,6 +73,7 @@ The requirement :math:`\Delta > \Delta_{min}` for a user-selected :math:`\Delta_
 Muid Likelihoods are constructed by ``MuidBuilder`` class.
 
 .. cpp:class:: MuidBuilder 
+
 Build the Muid likelihoods starting from the hit pattern and the transverse scattering in KLM
 
 REGISTER_FUNCTION("fillPDFs(Hypotesys)", fillPDFs, R"DOC(

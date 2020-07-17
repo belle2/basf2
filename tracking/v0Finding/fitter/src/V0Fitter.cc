@@ -651,6 +651,7 @@ RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(const Track* origTrack, Reco
         recoHitInformations[nRemoveHits + 2]->getTrackingDetector() != RecoHitInformation::RecoHitDetector::c_SVD) { /// not SVD hit (CDC)
       recoHitInformations[nRemoveHits  ]->setUseInFit(false);
       recoHitInformations[nRemoveHits + 1]->setUseInFit(false);
+      nRemoveHits += 2;
     }
   }
 

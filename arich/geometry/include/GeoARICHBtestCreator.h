@@ -34,8 +34,14 @@ namespace Belle2 {
       /** Constructor of the GeoPXDCreator class. */
       GeoARICHBtestCreator();
 
+      /** Copy constructor (disabled). */
+      GeoARICHBtestCreator(const GeoARICHBtestCreator&) = delete;
+
       /** The destructor of the GeoPXDCreator class. */
       virtual ~GeoARICHBtestCreator();
+
+      /** Operator = (disabled). */
+      GeoARICHBtestCreator& operator=(const GeoARICHBtestCreator&) = delete;
 
       /**
        * Creates the ROOT Objects for the ARICH Beamtest 2011 geometry.

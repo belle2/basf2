@@ -27,7 +27,7 @@ class defaultPedestalImporter(basf2.Module):
         iov = Belle2.IntervalOfValidity.always()
 
         payload = Belle2.SVDPedestalCalibrations.t_payload(-1, "PedestalCalibrations_default_" +
-                                                           str(now.isoformat()) + "_INFO:_fakenullptrpedestals")
+                                                           str(now.isoformat()) + "_INFO:_fakeNULLpedestals")
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 

@@ -47,7 +47,7 @@ namespace Belle2 {
       , m_strips(4) {m_strips.clear();};
 
     SimpleClusterCandidate::SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent,
-                                                   double cutCluster, int timeAlgorithm, std::string storeShaperDigitsName, std::string storeRecoDigitsName)
+                                                   double cutCluster, int timeAlgorithm, const std::string& storeShaperDigitsName, const std::string& storeRecoDigitsName)
       : m_vxdID(vxdID)
       , m_isUside(isUside)
       , m_sizeHeadTail(sizeHeadTail)

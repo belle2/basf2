@@ -28,6 +28,7 @@ namespace Belle2 {
     /** returns whether the hit came on time or not */
     bool isInTime(double svdTime, double svdTimeError = 0, double t0 = 0 , double t0Error = 0)
     {
+      // cppcheck-suppress assignBoolToPointer
       selFunction f = m_implementations[m_current];
       return (this->*f)(svdTime, svdTimeError, t0, t0Error) ;
     }

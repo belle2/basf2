@@ -58,6 +58,7 @@ REG_MODULE(SVDDigitizer)
 
 std::string Belle2::SVD::SVDDigitizerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 SVDDigitizerModule::SVDDigitizerModule() : Module(),
+  m_currentSensor(nullptr),
   m_mapping(m_xmlFileName)
 {
   //Set module properties

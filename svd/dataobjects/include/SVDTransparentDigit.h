@@ -127,7 +127,8 @@ namespace Belle2 {
       } else {
         memset(m_fine_corrADC, 0, sizeof(m_fine_corrADC));
       }
-
+      memset(m_cmc, 0, sizeof(m_cmc));
+      memset(m_fine_cmc, 0, sizeof(m_fine_cmc));
     }
 
     /** Default constructor for the ROOT IO. */

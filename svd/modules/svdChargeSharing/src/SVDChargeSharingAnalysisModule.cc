@@ -63,6 +63,7 @@ SVDChargeSharingAnalysisModule::~SVDChargeSharingAnalysisModule()
 
 void SVDChargeSharingAnalysisModule::initialize()
 {
+  // cppcheck-suppress publicAllocationError
   m_outputRootFile = new TFile((m_outputDirName + "/" + m_outputRootFileName).c_str(), "RECREATE");
 
   //StoreArrays

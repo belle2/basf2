@@ -78,7 +78,7 @@ void SVDOccupancyAnalysisModule::beginRun()
   m_occ_L6V->GetXaxis()->SetTitle("occupancy(%)");
 
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all SVD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();

@@ -33,8 +33,12 @@ namespace Belle2 {
 
     /** Constructor */
     SVDDQMExpressRecoModule();
+    /** Copy constructor (disabled) */
+    SVDDQMExpressRecoModule(const SVDDQMExpressRecoModule&) = delete;
     /* Destructor */
     virtual ~SVDDQMExpressRecoModule();
+    /** Operator = (disabled) */
+    SVDDQMExpressRecoModule& operator=(const SVDDQMExpressRecoModule&) = delete;
 
     /** Module function initialize */
     void initialize() override final;

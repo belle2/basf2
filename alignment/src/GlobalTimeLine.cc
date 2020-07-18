@@ -112,7 +112,7 @@ namespace Belle2 {
             //int endRun = endEvent.getRun();
             int endRun = std::max(0, endEvent.getRun() - 1);
             // Last IoV open:
-            if (iCol == std::get<EventHeader>(timeTable).size() - 1) {
+            if (iCol == static_cast<int>(std::get<EventHeader>(timeTable).size()) - 1) {
               endRun = -1;
               endExp = -1;
             }

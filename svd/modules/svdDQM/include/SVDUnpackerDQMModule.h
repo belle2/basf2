@@ -104,8 +104,8 @@ namespace Belle2 {
     std::vector<unsigned short> vec_fadc; /**<vector of FADC boards*/
 
     //histogram
-    TH2S* DQMUnpackerHisto = NULL; /**< TH2S histogram with Unpacking errors*/
-    TH1S* DQMEventFractionHisto = NULL; /**< TH1S histogram showing the fraction of events affected by errors*/
+    TH2S* DQMUnpackerHisto = nullptr; /**< TH2S histogram with Unpacking errors*/
+    TH1S* DQMEventFractionHisto = nullptr; /**< TH1S histogram showing the fraction of events affected by errors*/
 
   };
 

@@ -235,7 +235,7 @@ void SVDOccupancyAnalysisModule::terminate()
 void SVDOccupancyAnalysisModule::endRun()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;

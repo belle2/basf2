@@ -277,7 +277,7 @@ void SVDB4CommissioningPlotsModule::endRun()
 {
   B2INFO("SVDB4CommissioningPlotsModule::endRun(), writing the histograms");
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;

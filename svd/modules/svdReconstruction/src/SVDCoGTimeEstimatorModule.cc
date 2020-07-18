@@ -268,7 +268,7 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaper
   } else {
     averagetime = -1;
     m_StopCreationReco = true;
-    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is NULL! Skipping this SVDShaperDigit!");
+    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
   }
 
   return averagetime;

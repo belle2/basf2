@@ -15,8 +15,6 @@
 #include <tracking/dqmUtils/DQMEventProcessorBase.h>
 #include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
 
-using namespace std;
-
 namespace Belle2 {
   /**
    * The purpose of this class is to process one event() in AlignDQMModule.
@@ -33,7 +31,7 @@ namespace Belle2 {
      * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
      * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
      * @param trackStoreArrayName - StoreArray name where the merged Tracks are written. */
-    AlignDQMEventProcessor(AlignDQMModule* histoModule, string tracksStoreArrayName, string recoTracksStoreArrayName) :
+    AlignDQMEventProcessor(AlignDQMModule* histoModule, std::string tracksStoreArrayName, std::string recoTracksStoreArrayName) :
       DQMEventProcessorBase(histoModule, recoTracksStoreArrayName, tracksStoreArrayName) { }
 
   protected:

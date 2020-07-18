@@ -15,8 +15,6 @@
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
-using namespace std;
-
 namespace Belle2 {
   /** DQM of Alignment for off line
     * residuals per sensor, layer,
@@ -44,10 +42,11 @@ namespace Belle2 {
     /** Function to create TH1F and add it to the vector of histograms (m_histograms).
      * All histograms in the module should be created via this function (or following Create- functions).
      * This function calls base function but wirh "Alig_" prefix to the name parameter */
-    virtual TH1F* Create(string name, string title, int nbinsx, double xlow, double xup, string xTitle, string yTitle) override;
+    virtual TH1F* Create(std::string name, std::string title, int nbinsx, double xlow, double xup, std::string xTitle,
+                         std::string yTitle) override;
     /** Same as above but for TH2F. */
-    virtual TH2F* Create(string name, string title, int nbinsx, double xlow, double xup,  int nbinsy, double ylow, double yup,
-                         string xTitle, string yTitle, string zTitle) override;
+    virtual TH2F* Create(std::string name, std::string title, int nbinsx, double xlow, double xup,  int nbinsy, double ylow, double yup,
+                         std::string xTitle, std::string yTitle, std::string zTitle) override;
 
     /** @name Fill- functions
      * All the following Fill- functions are used by DQMEventProcessorBase or derived classes to fill histograms.

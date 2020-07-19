@@ -12,8 +12,6 @@
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
-using namespace std;
-
 namespace Belle2::HistogramFactory {
   /**
    * This class represents a quantity which value can be set both permanently and temporarily.
@@ -123,7 +121,7 @@ namespace Belle2::HistogramFactory {
     * @param low - lower boundary of axis range
     * @param up - upper boundary of axis range
     * @param title - title of the axis */
-    Axis(int nbins, double low, double up, string title)
+    Axis(int nbins, double low, double up, std::string title)
     {
       m_nbins.Set(nbins);
       m_low.Set(low);
@@ -138,7 +136,7 @@ namespace Belle2::HistogramFactory {
     /** Set value of up */
     Axis& up(double up) { m_up.Set(up); return *this; }
     /** Set value of title */
-    Axis& title(string title) { m_title.Set(title); return *this; }
+    Axis& title(std::string title) { m_title.Set(title); return *this; }
 
   private:
     /** number of bins in the axis */
@@ -148,7 +146,7 @@ namespace Belle2::HistogramFactory {
     /** upper boundary of axis range */
     Parameter<double> m_up = Parameter(.0);
     /** title of axis */
-    Parameter<string> m_title = Parameter(string());
+    Parameter<std::string> m_title = Parameter(std::string());
 
     friend class Factory;
   };
@@ -215,9 +213,9 @@ namespace Belle2::HistogramFactory {
 
     /** Create TH1F with given name and title.
     * All temporarily set parameters needed to create the TH1F become invalidated. This is common for all following Create- functions. */
-    TH1F* CreateTH1F(string name, string title);
+    TH1F* CreateTH1F(std::string name, std::string title);
     /** Create TH2F with given name and title. */
-    TH2F* CreateTH2F(string name, string title);
+    TH2F* CreateTH2F(std::string name, std::string title);
 
     /** Create TH1F array for layers from given name template and title template. */
     TH1F** CreateLayersTH1F(boost::format nameTemplate, boost::format titleTemplate);
@@ -238,9 +236,9 @@ namespace Belle2::HistogramFactory {
     Factory& nbinsyDefault(int nbinsy) {    m_nbinsy.Set(nbinsy); return *this; } /**< Sets nbinsy permanently. */
     Factory& ylowDefault(double ylow) {     m_ylow.Set(ylow);     return *this; } /**< Sets ylow permanently. */
     Factory& yupDefault(double yup) {       m_yup.Set(yup);       return *this; } /**< Sets yup permanently. */
-    Factory& xTitleDefault(string xTitle) { m_xTitle.Set(xTitle); return *this; } /**< Sets xTitle permanently. */
-    Factory& yTitleDefault(string yTitle) { m_yTitle.Set(yTitle); return *this; } /**< Sets yTitle permanently. */
-    Factory& zTitleDefault(string zTitle) { m_zTitle.Set(zTitle); return *this; } /**< Sets zTitle permanently. */
+    Factory& xTitleDefault(std::string xTitle) { m_xTitle.Set(xTitle); return *this; } /**< Sets xTitle permanently. */
+    Factory& yTitleDefault(std::string yTitle) { m_yTitle.Set(yTitle); return *this; } /**< Sets yTitle permanently. */
+    Factory& zTitleDefault(std::string zTitle) { m_zTitle.Set(zTitle); return *this; } /**< Sets zTitle permanently. */
     /** @} */
 
     /** @name Named parameters
@@ -253,9 +251,9 @@ namespace Belle2::HistogramFactory {
     Factory& nbinsy(int nbinsy) {    m_nbinsy.SetTemporarily(nbinsy); return *this; } /**< Sets nbinsy temporarily */
     Factory& ylow(double ylow) {     m_ylow.SetTemporarily(ylow);     return *this; } /**< Sets ylow temporarily */
     Factory& yup(double yup) {       m_yup.SetTemporarily(yup);       return *this; } /**< Sets yup temporarily */
-    Factory& xTitle(string xTitle) { m_xTitle.SetTemporarily(xTitle); return *this; } /**< Sets xTitle temporarily */
-    Factory& yTitle(string yTitle) { m_yTitle.SetTemporarily(yTitle); return *this; } /**< Sets yTitle temporarily */
-    Factory& zTitle(string zTitle) { m_zTitle.SetTemporarily(zTitle); return *this; } /**< Sets zTitle temporarily */
+    Factory& xTitle(std::string xTitle) { m_xTitle.SetTemporarily(xTitle); return *this; } /**< Sets xTitle temporarily */
+    Factory& yTitle(std::string yTitle) { m_yTitle.SetTemporarily(yTitle); return *this; } /**< Sets yTitle temporarily */
+    Factory& zTitle(std::string zTitle) { m_zTitle.SetTemporarily(zTitle); return *this; } /**< Sets zTitle temporarily */
     /** @} */
 
   private:
@@ -265,11 +263,11 @@ namespace Belle2::HistogramFactory {
     Parameter<int> m_nbinsx = Parameter(0); /**< number of bins along the x axis */
     Parameter<double> m_xlow = Parameter(.0); /**< lower boundary of x axis range */
     Parameter<double> m_xup = Parameter(.0); /**< upper boundary of x axis range */
-    Parameter<string> m_xTitle = Parameter(string()); /**< title of the x axis */
-    Parameter<string> m_yTitle = Parameter(string()); /**< title of the y axis */
+    Parameter<std::string> m_xTitle = Parameter(std::string()); /**< title of the x axis */
+    Parameter<std::string> m_yTitle = Parameter(std::string()); /**< title of the y axis */
     Parameter<int> m_nbinsy = Parameter(0); /**< number of bins along the y axis */
     Parameter<double> m_ylow = Parameter(.0); /**< lower boundary of y axis range */
     Parameter<double> m_yup = Parameter(.0); /**< upper boundary of y axis range */
-    Parameter<string> m_zTitle = Parameter(string()); /**< title of the z axis */
+    Parameter<std::string> m_zTitle = Parameter(std::string()); /**< title of the z axis */
   };
 }

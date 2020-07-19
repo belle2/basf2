@@ -14,8 +14,6 @@
 
 #include <tracking/dataobjects/RecoHitInformation.h>
 
-using namespace std;
-
 namespace Belle2 {
   /**
    * The purpose of this class is to process one event() in DQMHistoModuleBase, which is a base for TrackDQMModule and AlignDQMModule.
@@ -33,9 +31,10 @@ namespace Belle2 {
      * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
      * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
      * @param trackStoreArrayName - StoreArray name where the merged Tracks are written. */
-    DQMEventProcessorBase(DQMHistoModuleBase* histoModule, const string& recoTracksStoreArrayName, const string& tracksStoreArrayName) :
-      m_recoTracksStoreArrayName(recoTracksStoreArrayName),
-      m_tracksStoreArrayName(tracksStoreArrayName)
+    DQMEventProcessorBase(DQMHistoModuleBase* histoModule, const std::string& recoTracksStoreArrayName,
+                          const std::string& tracksStoreArrayName) :
+      m_tracksStoreArrayName(tracksStoreArrayName),
+      m_recoTracksStoreArrayName(recoTracksStoreArrayName)
     {
       m_histoModule = histoModule;
     }
@@ -96,9 +95,9 @@ namespace Belle2 {
     /** DQM histogram module on which the Fill- functions are called to fill histograms. */
     DQMHistoModuleBase* m_histoModule = nullptr;
     /** StoreArray name where Tracks are written. */
-    string m_tracksStoreArrayName = "";
+    std::string m_tracksStoreArrayName = "";
     /** StoreArray name where RecoTracks are written. */
-    string m_recoTracksStoreArrayName = "";
+    std::string m_recoTracksStoreArrayName = "";
 
     /** index of track (with valid TrackFitResult and related RecoTrack) */
     int m_iTrack = 0;

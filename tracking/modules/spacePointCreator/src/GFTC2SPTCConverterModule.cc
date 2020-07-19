@@ -266,7 +266,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
   // create a vector of SpacePoint* and one with sorting Parameters to add to the SpacePointTrackCand
   std::vector<const SpacePoint*> spacePoints;
   std::vector<double> sortingParams;
-  for (const HitInfo<SpacePoint> aSP : tcSpacePoints) {
+  for (const HitInfo<SpacePoint>& aSP : tcSpacePoints) {
     spacePoints.push_back(aSP.second);
     sortingParams.push_back(aSP.first);
   }

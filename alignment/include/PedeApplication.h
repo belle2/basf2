@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PEDEAPPLICATION_H
-#define PEDEAPPLICATION_H
+#pragma once
 
 #include <alignment/dataobjects/PedeSteering.h>
 #include <alignment/PedeResult.h>
@@ -52,4 +51,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

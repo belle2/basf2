@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef UPDATEPARTICLETRACKCANDMODULE_H
-#define UPDATEPARTICLETRACKCANDMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -45,5 +44,3 @@ namespace Belle2 {
     bool m_removeBKLM; /**< Remove BKLM hits from TrackCand */
   };
 }
-
-#endif /* UPDATEPARTICLETRACKCANDMODULE_H */

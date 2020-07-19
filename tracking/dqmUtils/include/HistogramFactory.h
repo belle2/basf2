@@ -164,7 +164,7 @@ namespace Belle2::HistogramFactory {
   public:
     /** Constructor.
     * @param histoModule - pointer on histogram module is needed because this class actually doesn't create histograms by itself, but it calls functions on the module instead. */
-    Factory(DQMHistoModuleBase* histoModule)
+    explicit Factory(DQMHistoModuleBase* histoModule)
     {
       m_histoModule = histoModule;
     }

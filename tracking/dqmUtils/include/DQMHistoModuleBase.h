@@ -117,9 +117,9 @@ namespace Belle2 {
      * @param parameter - name of the parameter we want to change. Possible values are:
      * name, title, nbinsx, xlow, xup, xTitle, yTitle (for both TH1F and TH2F) and nbinsy, ylow, yup, zTitle (only for TH2F).
      * @param value - new value we wish the parameter of the histogram to have. Int and double values are parsed from string so they must be given correctly. */
-    void ProcessHistogramParameterChange(string name, string parameter, string value);
+    void ProcessHistogramParameterChange(const string& name, const string& parameter, const string& value);
     /** On given histogram sets given parameter to given value. Used in the function above. */
-    void EditHistogramParameter(TH1* histogram, string parameter, string value);
+    void EditHistogramParameter(TH1* histogram, const string& parameter, string value);
 
     /** All the following Define- functions should be used in the defineHisto() function to define histograms. The convention is that every Define- function is responsible for creating its
      * own TDirectory (if it's needed). In any case the function must then return to the original gDirectory.

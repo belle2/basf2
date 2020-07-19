@@ -297,7 +297,6 @@ bool StandardTrackingPerformanceModule::isSignalDecay(const MCParticle& mcPartic
   daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
 
   for (auto daughterMCParticle : daughterMcParticles) {
-    // cppcheck-suppress useStlAlgorithm
     daughterPDGs.push_back(daughterMCParticle->getPDG());
   }
 

@@ -132,6 +132,7 @@ SectorMapComparer::compareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
   bool isTriplet =  t_first->GetBranch("centerFullSecID") != nullptr;
 
   // some cross checks
+  // cppcheck-suppress knownConditionTrueFalse
   if (vals_t_second.size() != vals_t_first.size()) {
     B2WARNING("Number of filters stored in the two SectorMaps seem to differ! This is per se not dangerous, but some cuts may be compared to zero.");
   }

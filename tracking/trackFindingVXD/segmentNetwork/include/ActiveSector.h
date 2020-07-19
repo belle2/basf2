@@ -119,7 +119,7 @@ namespace Belle2 {
 
 
     /** adds new several new hits to vector of hits  */
-    inline void addHits(std::vector<HitType*>& newHits)
+    inline void addHits(const std::vector<HitType*>& newHits)
     {
       for (HitType* aHit : newHits) { addHit(aHit); }
     }

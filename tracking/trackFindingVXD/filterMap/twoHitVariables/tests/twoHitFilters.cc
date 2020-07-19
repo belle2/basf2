@@ -423,9 +423,6 @@ namespace VXDTFtwoHitFilterTest {
   /** shows how to use the filter Distance3DNormed in a simple case */
   TEST_F(TwoHitFilterTest, BasicFilterTestDistance3DNormed)
   {
-    // Very verbose declaration, the old normed distance 3D has only an upper cut, no lower one:
-    Filter< Distance3DNormed<SpacePoint>, UpperBoundedSet<double>, VoidObserver > filter(UpperBoundedSet<double>(1.));
-
     // prepare spacePoints for new stuff
     SpacePoint innerSP = provideSpacePointDummy(1 , 2, 3);
     SpacePoint outerSP1 = provideSpacePointDummy(2 , 3, 4);

@@ -380,7 +380,6 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
         // determine intersecting SpacePoints.
         for (const auto& spacePoint : relatedSpacePointsA) {
           for (const auto& spacePointCompare : relatedSpacePointsB) {
-            // cppcheck-suppress useStlAlgorithm
             if (spacePoint == spacePointCompare) {
               spacePointCandidates.push_back(&spacePoint);
               break;

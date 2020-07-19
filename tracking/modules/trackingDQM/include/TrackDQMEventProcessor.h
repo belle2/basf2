@@ -33,7 +33,7 @@ namespace Belle2 {
      * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
      * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
      * @param trackStoreArrayName - StoreArray name where the merged Tracks are written. */
-    TrackDQMEventProcessor(TrackDQMModule* histoModule, string recoTracksStoreArrayName, string tracksStoreArrayName) :
+    TrackDQMEventProcessor(TrackDQMModule* histoModule, const string& recoTracksStoreArrayName, const string& tracksStoreArrayName) :
       DQMEventProcessorBase(histoModule, recoTracksStoreArrayName, tracksStoreArrayName) { }
 
   protected:

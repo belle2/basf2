@@ -33,11 +33,11 @@ namespace Belle2 {
      * @param histoModule - DQMHistoModuleBase or derived module on which the Fill- functions are called.
      * @param recoTracksStoreArrayName - StoreArray name where the merged RecoTracks are written.
      * @param trackStoreArrayName - StoreArray name where the merged Tracks are written. */
-    DQMEventProcessorBase(DQMHistoModuleBase* histoModule, string recoTracksStoreArrayName, string tracksStoreArrayName)
+    DQMEventProcessorBase(DQMHistoModuleBase* histoModule, const string& recoTracksStoreArrayName, const string& tracksStoreArrayName) :
+      m_recoTracksStoreArrayName(recoTracksStoreArrayName),
+      m_tracksStoreArrayName(tracksStoreArrayName)
     {
       m_histoModule = histoModule;
-      m_recoTracksStoreArrayName = recoTracksStoreArrayName;
-      m_tracksStoreArrayName = tracksStoreArrayName;
     }
 
     /** Call this to start processing the event data and filling histograms.

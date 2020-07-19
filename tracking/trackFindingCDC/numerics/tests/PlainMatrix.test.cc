@@ -282,6 +282,9 @@ TEST(TrackFindingCDCTest, PlainMatrixEigenMap_mapToEigen)
   EXPECT_EQ(0, eigenMap(0, 0)) << "write back test " << 0 << ", " << 0;
   EXPECT_EQ(0, result(0, 0)) << "write back test " << 0 << ", " << 0;
 
+  // cppcheck-suppress unreadVariable
+  eigenMap = Eigen::Matrix<double, 5, 2>::Zero();
+
   for (int i = 0; i < result.rows(); ++i) {
     for (int j = 0; j < result.cols(); ++j) {
       EXPECT_EQ(0, result(i, j)) << "write back test " << i << ", " << j;

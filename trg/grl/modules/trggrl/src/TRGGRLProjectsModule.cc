@@ -819,6 +819,8 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "track") {bit = false;}
     else if (bitname == "trkfit") {bit = false;}
 
+    else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+
     trgInfo->setInputBits(i, bit);
   }
 

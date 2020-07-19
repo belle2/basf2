@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCTRACKCANDCLASSIFIER_H_
-#define MCTRACKCANDCLASSIFIER_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -252,5 +251,3 @@ namespace Belle2 {
     float compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit);
   };
 }
-
-#endif /* MCTrackCandClassifierModule_H_ */

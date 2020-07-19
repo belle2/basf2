@@ -49,18 +49,13 @@ namespace Belle2 {
       if (not(dID == 0 || dID == 1))
         return nullptr;
 
-      const V0* v0 = particle->getV0();
-      if (v0) {
-        const TrackFitResult* trackFit = (dID == 0) ?
-                                         v0->getTrackFitResults().first :
-                                         v0->getTrackFitResults().second;
-        return trackFit;
-      } else {
-        if (!(particle->getDaughter(dID)))
-          return nullptr;
-        const TrackFitResult* trackFit = getTrackFitResultFromParticle(particle->getDaughter(dID));
-        return trackFit;
-      }
+      const Particle* daughter = particle->getDaughter(dID);
+      if (!daughter)
+        return nullptr;
+
+      const TrackFitResult* trackFit = daughter->getRelated<TrackFitResult>();
+
+      return trackFit;
     }
 
     // helper function to get the helix parameters of the V0 daughter tracks

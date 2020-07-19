@@ -230,7 +230,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
       std::pair<SpacePoint*, conversionStatus> aSpacePoint = processTrackCandHit(aTCHit, pxdClusters, svdClusters, fHitIDs, iTCHit);
 
       // if there is more than one single Cluster SpacePoint related to a Cluster, add one
-      if (aSpacePoint.first != NULL && (aSpacePoint.second >= 0 || aSpacePoint.second == c_nonSingleSP)) {
+      if (aSpacePoint.first != nullptr && (aSpacePoint.second >= 0 || aSpacePoint.second == c_nonSingleSP)) {
         if (aSpacePoint.second == c_singleClusterSP) usedSingleCluster = true;
         tcSpacePoints.push_back({sortingParam, aSpacePoint.first});
         B2DEBUG(60, "Added SpacePoint " << aSpacePoint.first->getArrayIndex() << " from Array " << aSpacePoint.first->getArrayName() <<
@@ -295,7 +295,7 @@ GFTC2SPTCConverterModule::processTrackCandHit(genfit::TrackCandHit* hit, const S
   int planeID = hit->getPlaneId(); // not used at the moment (except for debug output)
   B2DEBUG(60, "Processing TrackCandHit " << iHit << " with detID: " << detID << ", hitID: " << hitID << ", planeID: " << planeID);
 
-  std::pair<SpacePoint*, conversionStatus> returnSP = { NULL, c_noFail }; // default return, optimistically assuming no fail
+  std::pair<SpacePoint*, conversionStatus> returnSP = { nullptr, c_noFail }; // default return, optimistically assuming no fail
 
   if (detID == Const::PXD) {
     const PXDCluster* aCluster = pxdClusters[hitID];
@@ -318,7 +318,7 @@ std::pair<Belle2::SpacePoint*, GFTC2SPTCConverterModule::conversionStatus>
 GFTC2SPTCConverterModule::getSpacePoint(const ClusterType* cluster, std::vector<flaggedPair<int> >& flaggedHitIDs, int iHit,
                                         bool singleCluster, std::string arrayName)
 {
-  std::pair<SpacePoint*, conversionStatus> spacePoint = {NULL, c_noFail}; // default return. be optimistic and assume that there are no problems!
+  std::pair<SpacePoint*, conversionStatus> spacePoint = {nullptr, c_noFail}; // default return. be optimistic and assume that there are no problems!
 
   B2DEBUG(70, "Trying to find a related SpacePoint in StoreArray " << arrayName << " for Cluster " << cluster->getArrayIndex() <<
           " from Array " << cluster->getArrayName());
@@ -344,7 +344,7 @@ GFTC2SPTCConverterModule::getSpacePoint(const ClusterType* cluster, std::vector<
   } else {
     // try to get the appropriate double Cluster SVD SpacePoint
     spacePoint = findAppropriateSpacePoint<ClusterType>(spacePoints, flaggedHitIDs);
-    if (spacePoint.first == NULL) {
+    if (spacePoint.first == nullptr) {
       B2DEBUG(80, "Did not find an appropriate double Cluster SpacePoint for Cluster " << cluster->getArrayIndex() << " from Array " <<
               cluster->getArrayName() << ". Reason for failure: " << spacePoint.second);
       m_noTwoClusterSPCtr++;
@@ -357,7 +357,7 @@ GFTC2SPTCConverterModule::getSpacePoint(const ClusterType* cluster, std::vector<
     }
   }
 
-  if (m_PARAMcheckTrueHits && spacePoint.first != NULL) { // only do the TrueHit check if there is actually something to check
+  if (m_PARAMcheckTrueHits && spacePoint.first != nullptr) { // only do the TrueHit check if there is actually something to check
     if (!foundRelatedTrueHit<TrueHitType>(spacePoint.first)) { spacePoint.second = c_foundNoTrueHit; }
   }
 
@@ -370,7 +370,7 @@ std::pair<Belle2::SpacePoint*, GFTC2SPTCConverterModule::conversionStatus>
 GFTC2SPTCConverterModule::findAppropriateSpacePoint(const Belle2::RelationVector<Belle2::SpacePoint>& spacePoints,
                                                     std::vector<flaggedPair<int> >& flaggedHitIDs)
 {
-  std::pair<SpacePoint*, conversionStatus> returnSP = { NULL, c_noFail }; // default return, be optimistc and assume that there are no problems
+  std::pair<SpacePoint*, conversionStatus> returnSP = { nullptr, c_noFail }; // default return, be optimistc and assume that there are no problems
   B2DEBUG(100, "Trying to find an appropriate SpacePoint from RelationVector with " << spacePoints.size() << " entries!");
   if (spacePoints.size() == 0) {
     B2DEBUG(80, "There are no spacePoints to choose of!");
@@ -481,8 +481,8 @@ std::pair<int, int> GFTC2SPTCConverterModule::checkExistAndValid(int clusterInd,
 // ============================================================================ GET NDF =============================================================================================
 int GFTC2SPTCConverterModule::getNDF(Belle2::SpacePoint* spacePoint)
 {
-  if (spacePoint == NULL) {
-    B2ERROR("Got NULL pointer to determine the NDF of!");
+  if (spacePoint == nullptr) {
+    B2ERROR("Got nullptr pointer to determine the NDF of!");
     return 0;
   }
   std::pair<bool, bool> assignedHits = spacePoint->getIfClustersAssigned();

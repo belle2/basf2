@@ -255,8 +255,8 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
       continue;
 
 
-    const VXDTrueHit* relatedTrueHit = NULL;
-    RelationsObject* cluster = NULL;
+    const VXDTrueHit* relatedTrueHit = nullptr;
+    RelationsObject* cluster = nullptr;
 
     // SVD case
     if (hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
@@ -342,7 +342,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
       // simple case PXD : there is a one to one relation between cluster and SpacePoint
       if (hitInfos[iHit]->getTrackingDetector() == RecoHitInformation::c_PXD) {
         PXDCluster* pxdCluster = hitInfos.at(iHit)->getRelated<PXDCluster>();
-        SpacePoint* relatedPXDSP = NULL;
+        SpacePoint* relatedPXDSP = nullptr;
         if (pxdCluster) relatedPXDSP = pxdCluster->getRelated<SpacePoint>(*m_pxdSpacePointsStoreArrayName);
         // if found a spacepoint one is already done!
         if (relatedPXDSP) {
@@ -367,7 +367,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
       RelationVector<SpacePoint> relatedSpacePointsA = clusterA->getRelationsFrom<SpacePoint>(
                                                          *m_svdSpacePointsStoreArrayName);
 
-      SVDCluster* clusterB = NULL;
+      SVDCluster* clusterB = nullptr;
       if (iHit + 1 < hitInfos.size()) clusterB = hitInfos.at(iHit + 1)->getRelated<SVDCluster>();
 
       B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClusters: Number of SpacePoints related to first cluster: " <<

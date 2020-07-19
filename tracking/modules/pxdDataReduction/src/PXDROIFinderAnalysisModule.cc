@@ -162,7 +162,7 @@ void PXDROIFinderAnalysisModule::initialize()
     m_rootFileName += ".root";
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
   } else
-    m_rootFilePtr = NULL;
+    m_rootFilePtr = nullptr;
 
 
   m_h1GlobalTime = new TH1F("hGlobalTime", "global time for PXDDigits contained in ROI", 100, 0, 1);
@@ -1027,7 +1027,7 @@ void PXDROIFinderAnalysisModule::terminate()
 
 
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
 
     TDirectory* oldDir = gDirectory;

@@ -254,7 +254,7 @@ namespace VXDTFtwoHitFilterTest {
                                         &CountingObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(),
                                        std::placeholders::_3);
 
-    char* realname(NULL);
+    char* realname(nullptr);
     int status(0);
     realname = abi::__cxa_demangle(typeid(storeFuncVariantB).name(), 0, 0, &status);
     std::string name(realname);

@@ -70,7 +70,7 @@ namespace Belle2 {
     {
       auto  result = m_allSetupsFilters.find(setupName);
       if (result == m_allSetupsFilters.end())
-        return NULL;
+        return nullptr;
       return result->second;
     }
 

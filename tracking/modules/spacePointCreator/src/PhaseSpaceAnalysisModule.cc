@@ -45,8 +45,8 @@ PhaseSpaceAnalysisModule::PhaseSpaceAnalysisModule() : Module()
   addParam("rootFileName", m_PARAMrootFileName, "Name of the output root file without '.root' file ending + write mode"\
            " ('UPDATE' or 'RECREATE')", defaultRootFName);
 
-  // initialize pointers to NULL (cppcheck)
-  m_rootFilePtr = NULL;
+  // initialize pointers to nullptr (cppcheck)
+  m_rootFilePtr = nullptr;
   initializeCounters(0);
 }
 
@@ -142,7 +142,7 @@ void PhaseSpaceAnalysisModule::event()
         continue;
       }
       MCParticle* mcParticle = mcParticles[id];
-      if (mcParticle == NULL) { // safety measure
+      if (mcParticle == nullptr) { // safety measure
         m_noMcPartCtr++;
         continue;
       }
@@ -159,7 +159,7 @@ void PhaseSpaceAnalysisModule::terminate()
   stringstream furtherInfo;
   if (m_skippedTCsCtr || m_noMcPartCtr) {
     furtherInfo << " There were " << m_skippedTCsCtr << " negative mcParticle IDs and " << m_noMcPartCtr <<
-                " NULL pointers to MCParticles";
+                " nullptr pointers to MCParticles";
   }
   unsigned int nMCParts = accumulate(m_mcPartCtr.begin(), m_mcPartCtr.end(), 0);
   B2INFO("PhaseSpaceAnalysis::terminate(): Collected mcParticle info in " << m_PARAMcontainerNames.size() << " containers."\
@@ -174,7 +174,7 @@ void PhaseSpaceAnalysisModule::terminate()
   }
 
   // do ROOT stuff
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O could mix with the root I/O of this module
     for (TTree* tree : m_treePtrs) { tree->Write(); }
     m_rootFilePtr->Close();

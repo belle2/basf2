@@ -36,7 +36,7 @@ namespace Belle2 {
     /** returns whether the uCluster time is compatible with the vClsuter time */
     bool areClustersInTime(double uTime, double vTime)
     {
-      if (abs(uTime - vTime) > m_maxUVTimeDifference)
+      if (std::abs(uTime - vTime) > m_maxUVTimeDifference)
         return false;
       return true;
     }

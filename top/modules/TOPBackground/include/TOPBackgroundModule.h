@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPBACKGROUND_H
-#define TOPBACKGROUND_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -140,5 +139,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif // TOPBACKGROUND_H

@@ -85,7 +85,7 @@ namespace Belle2 {
      * is not bent).
      */
     bool getFlyByDistanceVector(B2Vector3D& pointingVector, B2Vector3D& trackDir,
-                                const genfit::AbsTrackRep* rep = NULL,
+                                const genfit::AbsTrackRep* rep = nullptr,
                                 bool usePlaneFromFit = false);
 
     /**

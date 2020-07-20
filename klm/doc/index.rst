@@ -76,9 +76,9 @@ Muid Likelihoods are constructed by ``MuidBuilder`` class.
 
 Build the Muid likelihoods starting from the hit pattern and the transverse scattering in KLM.
 
-Parameters:
+.. cpp:Parameters:: pdg(int)
 
-pdg(int): PDG code of the particle hypothesis.
+ PDG code of the particle hypothesis.
 
 
 

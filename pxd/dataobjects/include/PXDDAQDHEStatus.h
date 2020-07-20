@@ -158,8 +158,12 @@ namespace Belle2 {
     PXDDAQDHPComMode& cm_back()  { return m_commode.back(); };
     /** Returns number of Common Mode blocks in this event */
     size_t cm_size() const { return m_commode.size(); };
-    /** Returns CM at position i */
-    int get_cm(int i) const { return std::get<2>(m_commode[i]); };
+    /** Returns CM DHP ID at position i */
+    int get_cm_dhp(int i) const { return std::get<0>(m_commode[i]); };
+    /** Returns CM row at position i */
+    int get_cm_row(int i) const { return std::get<1>(m_commode[i]); };
+    /** Returns CM value at position i */
+    int get_cm_value(int i) const { return std::get<2>(m_commode[i]); };
 
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this DHE/sensor */

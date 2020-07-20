@@ -66,16 +66,9 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-
-  std::vector<std::string> ms = {"1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2", "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
-                                 "2.4.1", "2.4.2", "2.5.1", "2.5.2"
-                                };
-  for (auto a :  ms)
-    sensors.push_back(VxdID(a));
-
   for (VxdID& aVxdID : sensors) {
-//     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-//     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
+    VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
+    if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
 
     std::string name = "PXD_Track_Cluster_Charge_" + (std::string)aVxdID;
@@ -362,8 +355,6 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
           if (m_hChargeModASIC2d[aVxdID]) {
             if (mpv > 0.0) m_hChargeModASIC2d[aVxdID]->Fill(s, d, mpv); // TODO check what is s, d
           }
-        } else {
-          B2ERROR(name << " not found");
         }
       }
     }
@@ -371,7 +362,6 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     // Overview map of ASCI combinations
     if (m_hChargeModASIC2d[aVxdID] && m_cChargeModASIC2d[aVxdID]) {
       m_cChargeModASIC2d[aVxdID]->cd();
-      gStyle->SetOptStat(0);
       m_hChargeModASIC2d[aVxdID]->Draw("colz");
     }
   }

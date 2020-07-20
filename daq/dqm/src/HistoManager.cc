@@ -142,9 +142,7 @@ bool HistoManager::merge()
         // Add histogram if exist
         else {
           TH1* merge_hist = mergelist[name];
-          TList list;
-          list.Add(hist);
-          merge_hist->Merge(&list);
+          merge_hist->Add(hist);
         }
       }
     }

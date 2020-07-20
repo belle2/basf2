@@ -57,9 +57,7 @@ void HistogramMapping::operator+=(const HistogramMapping& rhs)
       auto* copiedHistogram = dynamic_cast<TH1*>(histogram->Clone());
       m_histograms.insert({key, std::unique_ptr<TH1>(copiedHistogram)});
     } else {
-      TList list = new TList;
-      list.Add(histogram.get());
-      m_histograms[key]->Merge(&list);
+      m_histograms[key]->Add(histogram.get());
     }
   }
 }

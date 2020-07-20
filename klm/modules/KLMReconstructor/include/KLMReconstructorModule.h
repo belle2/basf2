@@ -19,7 +19,8 @@
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
-#include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
+#include <klm/dbobjects/KLMTimeCableDelay.h>
+#include <klm/dbobjects/KLMTimeConstants.h>
 #include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
@@ -76,6 +77,8 @@ namespace Belle2 {
 
   private:
 
+    /* Methods. */
+
     /**
      * Reconstruct BKLMHit1d and BKLMHit2d.
      */
@@ -86,14 +89,36 @@ namespace Belle2 {
      */
     void reconstructEKLMHits();
 
-    /* EKLM methods. */
+    /**
+     * Time correction by subtract cable delay.
+     * @param[in] td    Original time of the digit.
+     * @param[in] digit KLM Digit.
+     */
+    void correctCableDelay(double& td, const KLMDigit* digit);
+
+
+    /* Member variables. */
+
+    /* Parameters and switchs . */
+    /* switchs. */
+    /** Perform cable delay time correction (true) or not (false). */
+    bool m_timeCableDelayCorrection;
+
+    /** Perform alignment correction (true) or not (false). */
+    bool m_bklmIfAlign;
+
+    /** Ignore scintillators (to debug their electronics mapping). */
+    bool m_bklmIgnoreScintillators;
 
     /**
-     * Get 2d hit time corresponding to EKLM digit.
-     * @param[in] d    EKLM Digit.
-     * @param[in] dist Distance from 2d hit to SiPM.
+     * Check if segments intersect. Normally should be true, but it may be
+     * necessary to turn this check off for debugging.
      */
-    double getTime(KLMDigit* d, double dist);
+    bool m_eklmCheckSegmentIntersection;
+
+    /* parameters. */
+    /** KLM time window. */
+    DBObjPtr<KLMTimeWindow> m_TimeWindow;
 
     /** Half-width of the time coincidence window used to create a 2D hit from 1D digits/hits. */
     double m_CoincidenceWindow;
@@ -104,36 +129,14 @@ namespace Belle2 {
     /** Half-width of the time window relative to the prompt time for BKLMHit2ds. */
     double m_PromptWindow;
 
-    /** KLM time window. */
-    DBObjPtr<KLMTimeWindow> m_TimeWindow;
+    /** Constant used for time information correction. */
+    DBObjPtr<KLMTimeConstants> m_timeConstants;
 
-    /** KLM digits. */
-    StoreArray<KLMDigit> m_Digits;
-
-    /* BKLM parameters. */
+    /** Calibration constant of time delay from cable. */
+    DBObjPtr<KLMTimeCableDelay> m_timeCableDelay;
 
     /** BKLM GeometryPar singleton. */
     bklm::GeometryPar* m_bklmGeoPar;
-
-    /** Perform alignment correction (true) or not (false). */
-    bool m_bklmIfAlign;
-
-    /** Ignore scintillators (to debug their electronics mapping). */
-    bool m_bklmIgnoreScintillators;
-
-    /** BKLM 1d hits. */
-    StoreArray<BKLMHit1d> m_bklmHit1ds;
-
-    /** BKLM 2d hits. */
-    StoreArray<BKLMHit2d> m_bklmHit2ds;
-
-    /* EKLM parameters. */
-
-    /**
-     * Check if segments intersect. Normally should be true, but it may be
-     * necessary to turn this check off for debugging.
-     */
-    bool m_eklmCheckSegmentIntersection;
 
     /** Element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
@@ -141,29 +144,39 @@ namespace Belle2 {
     /** Geometry data. */
     const EKLM::GeometryData* m_eklmGeoDat;
 
-    /** Number of strips. */
-    int m_eklmNStrip;
-
     /** Transformation data. */
     EKLM::TransformData* m_eklmTransformData;
 
     /** Reconstruction parameters. */
     DBObjPtr<EKLMReconstructionParameters> m_eklmRecPar;
 
-    /** Time calibration data. */
-    DBObjPtr<EKLMTimeCalibration> m_eklmTimeCalibration;
+    /** Effective light speed in fiber for EKLM scintillators. */
+    double m_effC_eklm;
 
-    /** Time calibration data for individual strips. */
-    const EKLMTimeCalibrationData** m_eklmTimeCalibrationData;
+    /** Effective light speed in fiber for BKLM scintillators. */
+    double m_effC_bklm;
 
-    /** Default time calibration data. */
-    EKLMTimeCalibrationData m_eklmDefaultTimeCalibrationData;
+    /** Effective light speed in fiber for BKLM RPCs. */
+    double m_effC_RPC;
+
+    /** Number of strips of EKLM. */
+    int m_eklmNStrip;
+
+
+    /* Input and output storeArrays. */
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
+
+    /** BKLM 1d hits. */
+    StoreArray<BKLMHit1d> m_bklmHit1ds;
+
+    /** BKLM 2d hits. */
+    StoreArray<BKLMHit2d> m_bklmHit2ds;
 
     /** EKLM 2d hits. */
     StoreArray<EKLMHit2d> m_eklmHit2ds;
 
     /** Alignment Hits. */
     StoreArray<EKLMAlignmentHit> m_eklmAlignmentHits;
-
   };
 } // end namespace Belle2

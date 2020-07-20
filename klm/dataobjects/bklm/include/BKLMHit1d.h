@@ -132,6 +132,13 @@ namespace Belle2 {
       return m_EnergyDeposit;
     }
 
+    //! Set reconstructed hit time
+    //! @parameter t hit time (ns)
+    void setTime(double t)
+    {
+      m_Time = t;
+    }
+
   private:
 
     //! detector-module identifier

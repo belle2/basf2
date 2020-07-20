@@ -200,7 +200,7 @@ namespace Belle2 {
       //! Convert 2D strip position (0..nStrips along each axis) to local coordinates
       const CLHEP::Hep3Vector getLocalPosition(double phiStripAve, double zStripAve) const;
 
-      //! Convert local coordinates to signal-propagation distance (ns)
+      //! Convert local coordinates to signal-propagation distance (cm)
       const CLHEP::Hep3Vector getPropagationDistance(const CLHEP::Hep3Vector&) const;
 
       //! Convert local coordinates to signal-propagation time (ns)

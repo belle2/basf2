@@ -202,14 +202,14 @@ namespace Belle2 {
        * @param data_loader used to train the method
        * @param jobName name of the TMVA training
        */
-      Weightfile trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, std::string& jobName) const;
+      Weightfile trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, const std::string& jobName) const;
 #else
       /**
        * Train a mva method using the given factory returning a Weightfile
        * @param factory used to train the method
        * @param jobName name of the TMVA training
        */
-      Weightfile trainFactory(TMVA::Factory& factory, std::string& jobName) const;
+      Weightfile trainFactory(TMVA::Factory& factory, const std::string& jobName) const;
 #endif
 
     private:

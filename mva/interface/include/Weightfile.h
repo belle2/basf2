@@ -262,7 +262,7 @@ namespace Belle2 {
        * @param identifier in the database
        * @param iov interval of validity of this weightfile
        */
-      static void saveArrayToDatabase(std::vector<Weightfile>& weightfiles, const std::string& identifier,
+      static void saveArrayToDatabase(const std::vector<Weightfile>& weightfiles, const std::string& identifier,
                                       const Belle2::IntervalOfValidity& iov = Belle2::IntervalOfValidity(0, 0, -1, -1));
 
       /**

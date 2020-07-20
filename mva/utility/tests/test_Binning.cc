@@ -68,10 +68,12 @@ namespace {
 
     EXPECT_FLOAT_EQ(binning.m_signal_cdf[0], 1.0 / 6.0);
     EXPECT_FLOAT_EQ(binning.m_signal_cdf[1], 3.0 / 6.0);
+    // cppcheck-suppress duplicateExpression
     EXPECT_FLOAT_EQ(binning.m_signal_cdf[2], 6.0 / 6.0);
 
     EXPECT_FLOAT_EQ(binning.m_bckgrd_cdf[0], 3.0 / 6.0);
     EXPECT_FLOAT_EQ(binning.m_bckgrd_cdf[1], 5.0 / 6.0);
+    // cppcheck-suppress duplicateExpression
     EXPECT_FLOAT_EQ(binning.m_bckgrd_cdf[2], 6.0 / 6.0);
 
     binning.m_boundaries[0] = 1.0;

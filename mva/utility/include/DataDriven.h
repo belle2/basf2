@@ -205,14 +205,14 @@ namespace Belle2 {
      * @param dataset to calculate the weights for
      * @param binning used to retrieve the required pdf and cdf values
      */
-    std::vector<float> getSPlotWeights(Dataset& dataset, Binning& binning);
+    std::vector<float> getSPlotWeights(Dataset& dataset, const Binning& binning);
 
     /**
      * Returns Boost weights
      * @param dataset to calculate the weights for
      * @param binning used to retrieve the required pdf and cdf values
      */
-    std::vector<float> getBoostWeights(Dataset& dataset, Binning& binning);
+    std::vector<float> getBoostWeights(Dataset& dataset, const Binning& binning);
 
     /**
      * Returns advanced sPlot weights
@@ -220,7 +220,7 @@ namespace Belle2 {
      * @param binning used to retrieve the required pdf and cdf values
      * @param boost_prediction prediction of the expert for the dataset
      */
-    std::vector<float> getAPlotWeights(Dataset& dataset, Binning& binning, const std::vector<float>& boost_prediction);
+    std::vector<float> getAPlotWeights(Dataset& dataset, const Binning& binning, const std::vector<float>& boost_prediction);
 
   }
 }

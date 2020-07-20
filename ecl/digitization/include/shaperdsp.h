@@ -157,7 +157,7 @@ namespace Belle2 {
 
       ~ShaperDSP_t() {}
       /** initialization of the parameters response function */
-      void init(const std::vector<double>& s, double u = -1);
+      void init(const std::vector<double>& s, double u = 27.7221);
       /** wrapper of the function */
       double operator()(double) const;
       /** TF1 ROOT interface */

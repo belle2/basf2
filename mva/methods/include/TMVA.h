@@ -191,7 +191,7 @@ namespace Belle2 {
       /**
        * Constructs a new teacher using the GeneralOptions and specific options of this training
        * @param general_options defining all shared options
-       * @param specific_options defininf all method specific options
+       * @param _specific_options defining all method specific options
        */
       TMVATeacher(const GeneralOptions& general_options, const TMVAOptions& _specific_options);
 
@@ -226,7 +226,7 @@ namespace Belle2 {
       /**
        * Constructs a new teacher using the GeneralOptions and specific options of this training
        * @param general_options defining all shared options
-       * @param specific_options defining all method specific options
+       * @param _specific_options defining all method specific options
        */
       TMVATeacherClassification(const GeneralOptions& general_options, const TMVAOptionsClassification& _specific_options);
 
@@ -249,7 +249,7 @@ namespace Belle2 {
       /**
        * Constructs a new teacher using the GeneralOptions and specific options of this training
        * @param general_options defining all shared options
-       * @param specific_options defining all method specific options
+       * @param _specific_options defining all method specific options
        */
       TMVATeacherMulticlass(const GeneralOptions& general_options, const TMVAOptionsMulticlass& _specific_options);
 
@@ -272,7 +272,7 @@ namespace Belle2 {
       /**
        * Constructs a new teacher using the GeneralOptions and specific options of this training
        * @param general_options defining all shared options
-       * @param specific_options defining all method specific options
+       * @param _specific_options defining all method specific options
        */
       TMVATeacherRegression(const GeneralOptions& general_options, const TMVAOptionsRegression& _specific_options);
 

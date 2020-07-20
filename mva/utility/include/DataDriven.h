@@ -86,7 +86,7 @@ namespace Belle2 {
 
       /**
        * Load the event number iEvent
-       * @param iEvent event number to load
+       * @param event event number to load
        */
       virtual void loadEvent(unsigned int event) override;
 
@@ -140,7 +140,7 @@ namespace Belle2 {
 
       /**
        * Load the event number iEvent
-       * @param iEvent event number to load
+       * @param event event number to load
        */
       virtual void loadEvent(unsigned int event) override;
 
@@ -185,7 +185,7 @@ namespace Belle2 {
 
       /**
        * Load the event number iEvent
-       * @param iEvent event number to load
+       * @param event event number to load
        */
       virtual void loadEvent(unsigned int event) override;
 

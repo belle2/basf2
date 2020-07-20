@@ -35,7 +35,7 @@ namespace Belle2 {
        */
       virtual float getCharge(unsigned short adcCount = 0,
                               const WireID&  wireID = WireID(),
-                              bool ambiguityDiscrimiator = false,
+                              bool ambiguityDiscriminator = false,
                               float z = 0, float theta = static_cast<float>(TMath::Pi() / 2.)) = 0;
     };
   }

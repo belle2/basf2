@@ -164,7 +164,7 @@ namespace Belle2 {
 
       /**
        * Check if the hit wire is valid or not.
-       * @param WireID hit wire.
+       * @param wireId hit wire.
        */
       bool isValidBoardChannel(WireID wireId)
       {

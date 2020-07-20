@@ -48,7 +48,7 @@ namespace Belle2 {
       virtual double getDriftLength(unsigned short tdcCount     = 0,
                                     const WireID& wireID        = WireID(),
                                     double timeOfFlightEstimator = 0.,
-                                    bool ambiguityDiscrimiator  = false,
+                                    bool ambiguityDiscriminator  = false,
                                     double z = 0,
                                     double alpha = 0,
                                     double theta = static_cast<double>(TMath::Pi() / 2.),

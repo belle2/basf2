@@ -194,6 +194,7 @@ namespace Belle2 {
 
         G4Material* medWall = medAir;
         if (strstr((wallName).c_str(), "MiddleWall") != NULL) {
+          // cppcheck-suppress redundantInitialization
           medWall = medCFRP;
         } else {
           medWall = medAluminum;
@@ -220,6 +221,7 @@ namespace Belle2 {
 
         G4Material* medWall = medAir;
         if (strstr(wallName.c_str(), "MiddleWall") != NULL) {
+          // cppcheck-suppress redundantInitialization
           medWall = medCFRP;
         } else if (strstr(wallName.c_str(), "MiddleGlue") != NULL) { // Glue layer 0.005 mmt
           medWall = medGlue;

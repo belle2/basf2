@@ -147,7 +147,7 @@ namespace Belle2 {
       G4Material* cdcMedGas = cdcMed;
 
       CDCGeometryPar& cdcgp = CDCGeometryPar::Instance(&geo);
-      CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+      const CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
       //      std::cout << gcp.getMaterialDefinitionMode() << std::endl;
 
       //      if (cdcgp.getMaterialDefinitionMode() == 2) {

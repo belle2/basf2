@@ -108,6 +108,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreArray<Track> m_tracks;  /**< collection of tracks */
 
+    StoreArray<TOPPixelLikelihood> m_pixelData; /**< collection of per-pixel data */
   };
 
 } // Belle2 namespace

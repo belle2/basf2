@@ -105,6 +105,8 @@ namespace Belle2 {
     m_tracks.registerRelationTo(m_pdfCollection);
     m_associatedPDFs.registerInDataStore();
     m_digits.registerRelationTo(m_associatedPDFs);
+    m_pixelData.registerInDataStore();
+    m_tracks.registerRelationTo(m_pixelData);
 
     // check for module debug level
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
@@ -183,6 +185,10 @@ namespace Belle2 {
         module.momentumToLocal(trk.getMomentum()),
         trk.getModuleID()
       );
+
+      TOPPixelLikelihood* topPLkhs = m_pixelData.appendNew();
+      topPLkhs->setModuleID(trk.getModuleID());
+
       for (unsigned i = 0; i < m_pdgCodes.size(); i++) {
         double mass = m_masses[i];
         int iPDGCode = m_pdgCodes[i];
@@ -211,8 +217,33 @@ namespace Belle2 {
         } // end loop over pixels
 
         topPDFColl->addHypothesisPDF(channelPDFCollection, iPDGCode);
+
+        // Initialize logL and sfot std::arrays
+        TOPPixelLikelihood::pixelArray_t pixLogLs, pixSigPhots;
+        int arraySize = static_cast<int>(pixLogLs.size()); // 512
+
+        // Create zeroed out arrays for pixel data
+        float logls[arraySize], sfots[arraySize];
+        for (int ch = 0; ch < arraySize; ch++) {
+          logls[ch] = 0;
+          sfots[ch] = 0;
+        }
+
+        double timeShift = 0, timeMin = 0, timeMax = 0, sigma = 0; /**< getLogL arguments */
+        reco.getLogL(timeShift, timeMin, timeMax, sigma, &logls[0], &sfots[0]);
+
+        for (int ch = 0; ch < arraySize; ch++) {
+          pixLogLs[ch] = logls[ch];
+          pixSigPhots[ch] = sfots[ch];
+        }
+
+        topPLkhs->addHypothesisLikelihoods(pixLogLs, iPDGCode);
+        topPLkhs->addHypothesisSignalPhotons(pixSigPhots, iPDGCode);
       }
-      if (reco.getFlag() == 1) track.addRelationTo(topPDFColl);
+      if (reco.getFlag() == 1) {
+        track.addRelationTo(topPDFColl);
+        track.addRelationTo(topPLkhs);
+      }
     } // end loop over tracks
     ++m_iEvent;
   }

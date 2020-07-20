@@ -206,7 +206,7 @@ def main():
                     "mcType": MCEventType,
                     "mcBackground": args.bg,
                     "inputDataLevel": "mdst",
-                    "runNumbers": runNumber,
+                    "runNumber": runNumber,
                 }
 
     to_yaml(DataBlocks, args.output)

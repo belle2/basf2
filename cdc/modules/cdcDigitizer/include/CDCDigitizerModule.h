@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDIGITIZER_H
-#define CDCDIGITIZER_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -254,5 +253,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCDIGITIZER_H

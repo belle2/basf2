@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCPACKERMODULE_H
-#define CDCPACKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -292,6 +291,4 @@ namespace Belle2 {
 
   } //end CDC namespace;
 } // end namespace Belle2
-
-#endif // CDCPackerModule_H
 

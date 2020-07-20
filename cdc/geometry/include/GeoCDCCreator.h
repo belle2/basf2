@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOCDCCREATOR_H
-#define GEOCDCCREATOR_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 
@@ -193,5 +192,3 @@ namespace Belle2 {
 
   } // end of cdc namespace
 } // end of Belle2 namespace
-
-#endif /* GEOCDCBELLEII_H */

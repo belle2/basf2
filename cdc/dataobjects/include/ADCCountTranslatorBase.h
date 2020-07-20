@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ADCCOUNTTRANSLATORBASE_H
-#define ADCCOUNTTRANSLATORBASE_H
+#pragma once
 
 #include <cdc/dataobjects/WireID.h>
 
@@ -41,4 +40,3 @@ namespace Belle2 {
     };
   }
 }
-#endif /* ADCCOUNTTRANSLATORBASE_H */

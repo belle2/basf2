@@ -1,15 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2012 - Belle II Collaboration                             *
- *                                                                                             *
- * Author: The Belle II Collaboration                                          *
- * Contributors: CDC group                                                      *
- *                                                                                              *
- * This software is provided "as is" without any warranty.         *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: CDC group                                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCGEOCONTROLPAR_H
-#define CDCGEOCONTROLPAR_H
+#pragma once
 
 #include <string>
 
@@ -663,5 +662,3 @@ namespace Belle2 {
 
   } // end of namespace CDC
 } // end of namespace Belle2
-
-#endif

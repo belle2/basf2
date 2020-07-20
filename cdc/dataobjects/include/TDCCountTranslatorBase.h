@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DRIFTTIMETRANSLATORBASE_H
-#define DRIFTTIMETRANSLATORBASE_H
+#pragma once
 
 #include <cdc/dataobjects/WireID.h>
 
@@ -88,4 +87,3 @@ namespace Belle2 {
     };
   }
 }
-#endif /* DRIFTTIMETRANSLATORBASE_H_ */

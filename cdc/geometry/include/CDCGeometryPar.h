@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCGEOMETRYPAR_H
-#define CDCGEOMETRYPAR_H
+#pragma once
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBArray.h>
@@ -1331,5 +1330,3 @@ namespace Belle2 {
 
   } // end of namespace CDC
 } // end of namespace Belle2
-
-#endif

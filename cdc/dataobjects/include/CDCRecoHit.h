@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCRECOHIT_H
-#define CDCRECOHIT_H
+#pragma once
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
@@ -163,4 +162,3 @@ namespace Belle2 {
     //        derives from genfit::WireMeasurement.
   };
 }
-#endif

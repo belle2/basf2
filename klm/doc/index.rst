@@ -76,7 +76,7 @@ Muid Likelihoods are constructed by ``MuidBuilder`` class.
 
   Build the Muid likelihoods starting from the hit pattern and the transverse scattering in KLM.
   
-  .. autofunction:: getPDF
+  .. autofunction:: MuidBuilder.getPDF
 
   
 

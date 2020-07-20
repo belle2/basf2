@@ -134,14 +134,14 @@ namespace Belle2 {
        * @param[in] gbxParams Gear Dir.
        * @param[in] mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readXT(const GearDir gbxParams, int mode = 0);
+      void readXT(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Read XT-relation table in new format.
        * @param[in] gbxParams Gear Dir.
        * @param[in] mode 0: read simulation file, 1: read reconstruction file.
        */
-      void newReadXT(const GearDir gbxParams, int mode = 0);
+      void newReadXT(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set XT-relation table (from DB).
@@ -158,21 +158,21 @@ namespace Belle2 {
        * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readSigma(const GearDir gbxParams, int mode = 0);
+      void readSigma(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Read spatial resolution table in new format.
        * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void newReadSigma(const GearDir gbxParams, int mode = 0);
+      void newReadSigma(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Read fudge factors
        * @param gbxParams Gear Dir.
        * @param mode dummy now.
        */
-      void readFFactor(const GearDir gbxParams, int mode = 0);
+      void readFFactor(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set spatial resolution (from DB).
@@ -189,7 +189,7 @@ namespace Belle2 {
        * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readPropSpeed(const GearDir gbxParams, int mode = 0);
+      void readPropSpeed(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set prop.-speeds (from DB).
@@ -201,7 +201,7 @@ namespace Belle2 {
        * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readT0(const GearDir gbxParams, int mode = 0);
+      void readT0(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set t0 parameters (from DB)
@@ -241,14 +241,14 @@ namespace Belle2 {
        * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readTW(const GearDir gbxParams, int mode = 0);
+      void readTW(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Read spatial edep-to-adc conv. factors.
        * @param gbxParams Gear Dir.
        * @param mode dummy now..
        */
-      void readEDepToADC(const GearDir gbxParams, int mode = 0);
+      void readEDepToADC(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set time-walk parameters.

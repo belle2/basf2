@@ -8,8 +8,10 @@ from variables import variables as vm
 
 
 class TestVariableCollections(unittest.TestCase):
+    """Test case for the variables.collections """
 
     def test_collections(self):
+        """ Loads all variables from collections into variable manager """
         excluded = ['utils', 'name', 'value']
         for collection in dir(vc):
             if (collection.startswith('__') or collection in excluded):

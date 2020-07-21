@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GLOBALLABEL_H
-#define GLOBALLABEL_H
+#pragma once
 
 #include <map>
 #include <set>
@@ -310,5 +309,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

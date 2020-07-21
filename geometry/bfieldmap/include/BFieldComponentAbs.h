@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENTABS_H
-#define BFIELDCOMPONENTABS_H
+#pragma once
 
 #include <framework/geometry/B2Vector3.h>
 
@@ -72,5 +71,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENTABS_H */

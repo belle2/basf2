@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCPARTICLE_H
-#define MCPARTICLE_H
+#pragma once
 
 #include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
@@ -587,5 +586,3 @@ namespace Belle2 {
   }
 
 } // end namespace Belle2
-
-#endif

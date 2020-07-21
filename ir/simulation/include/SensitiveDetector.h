@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef IR_SENSITIVEDETECTOR_H_
-#define IR_SENSITIVEDETECTOR_H_
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
@@ -60,5 +59,3 @@ namespace Belle2 {
     }; // SensitiveDetector class
   } //end of namespace IR
 } // end of namespace Belle2
-
-#endif /* IR_SENSITIVEDETECTOR_H_ */

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDDEDXPIDMODULE_H
-#define VXDDEDXPIDMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -154,4 +153,3 @@ namespace Belle2 {
 
   };
 } // Belle2 namespace
-#endif

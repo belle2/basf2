@@ -1,22 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+genPixelLikelihoods.py
+Author: Connor Hainje
 
-from enum import Enum
-from argparse import ArgumentParser
+A sample script that demonstrates how to collect data using the TOPPixelLikelihood
+data object.
+
+Example usage:
+    basf2 genPixelLikelihoods.py -n100 -- --particle 321 --output kaon.awkd
+
+Note: data writing uses AwkwardArrays (tested with v0.12.6).
+"""
+
 from basf2 import *
 import ROOT
-from pandas import DataFrame
-import pandas as pd
 from ROOT import Belle2
 from tracking import add_tracking_reconstruction, add_cr_tracking_reconstruction
 from svd import add_svd_reconstruction, add_svd_simulation
 from pxd import add_pxd_reconstruction, add_pxd_simulation
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+
+from argparse import ArgumentParser
 import numpy as np
-import os
 import awkward as awk
-import h5py
 
 
 # command line options
@@ -35,26 +43,22 @@ ap.add_argument('--zVertex',        type=float, default=0.,   help='z-coordinate
 
 opts = ap.parse_args()
 
-# use a python3 enum for readable particle gun configuration setup
 
+class WriteData(Module):
+    """
+    Data collector module. Gathers TOP Cherenkov photon data for each event.
+    On terminate(), writes gathered data to given output file.
 
-class ParticleGunConfig(Enum):
-    FROMORIGIN = 0
-    FROMABOVE = 1
-    FROMSIDE = 2
+    Attributes:
+        data: A list containing AwkwardArrays with each event's data.
+    """
 
-
-class WritePDFs(Module):
     def initialize(self):
-        self.jobid = int(os.environ.get("SLURM_ARRAY_TASK_ID", "0"))
-        self.index = self.jobid * 100000
-        self.trainData = []
-        self.pixelData = []
-        self.xAxis = ROOT.TVector3(1, 0, 0)
-        self.yAxis = ROOT.TVector3(0, 1, 0)
-        self.zAxis = ROOT.TVector3(0, 0, 1)
+        """Inits WriteData object."""
+        self.data = []
 
     def event(self):
+        """Collects event data about TOP Cherenkov photons."""
         mcps = Belle2.PyStoreArray("MCParticles")
         mcp = sorted(mcps, key=lambda x: x.getEnergy(), reverse=True)[0]
         mcp_pdg = abs(mcp.getPDG())
@@ -76,7 +80,7 @@ class WritePDFs(Module):
             return
 
         moduleID = 0
-        photon_emissions = []
+        photon_detections = []
         for d in digits:
             if moduleID == 0:
                 moduleID = d.getModuleID()
@@ -91,12 +95,12 @@ class WritePDFs(Module):
             time = photon.getDetectionTime()
             point = photon.getEmissionPoint()
             emitTime = photon.getEmissionTime()
-            photon_emissions.append([
+            photon_detections.append([
                 chanID, time,
                 point.X(), point.Y(), point.Z(), emitTime
             ])
 
-        self.pixelData.append(
+        self.data.append(
             awk.fromiter([
                 np.array(pixlogl.getPixelLogL_e()),
                 np.array(pixlogl.getPixelLogL_mu()),
@@ -113,13 +117,14 @@ class WritePDFs(Module):
                 logl.getLogL_pi(),
                 logl.getLogL_K(),
                 logl.getLogL_p(),
-                photon_emissions,
+                photon_detections,
                 mcp_pdg
             ])
         )
 
     def terminate(self):
-        awk.save(opts.output, self.pixelData, mode="w")
+        """Writes data to given output file."""
+        awk.save(opts.output, self.data, mode="w")
 
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
@@ -129,8 +134,7 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-# Number of events reset to one in evtNumList: [1]
-eventinfosetter.param({'evtNumList': [10000], 'runList': [int(os.environ.get("LSB_JOBINDEX", "1"))]})
+eventinfosetter.param({'evtNumList': [10000]})
 main.add_module(eventinfosetter)
 
 # Gearbox: access to database (xml files)
@@ -140,14 +144,6 @@ main.add_module(gearbox)
 # Geometry
 geometry = register_module('Geometry')
 main.add_module(geometry)
-geometry.param('components', [
-        'MagneticField',
-        'BeamPipe',
-        'PXD',
-        'SVD',
-        'CDC',
-        'TOP',
-])
 
 # Particle gun: generate multiple tracks
 particlegun = register_module('ParticleGun')
@@ -157,7 +153,7 @@ particlegun.param('varyNTracks', False)
 particlegun.param('independentVertices', False)
 particlegun.param('momentumGeneration', 'uniform')
 particlegun.param('momentumParams', [opts.momentum_lower, opts.momentum_upper])
-particlegun.param('thetaGeneration', 'uniform')  # 'uniformCos'
+particlegun.param('thetaGeneration', 'uniform')
 particlegun.param('thetaParams', [opts.theta_lower, opts.theta_upper])
 particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [opts.phi_lower, opts.phi_upper])
@@ -165,9 +161,8 @@ particlegun.param('vertexGeneration', 'fixed')
 particlegun.param('xVertexParams', [opts.xVertex])
 particlegun.param('yVertexParams', [opts.yVertex])
 particlegun.param('zVertexParams', [opts.zVertex])
-
-
 main.add_module(particlegun)
+
 # Simulation
 simulation = register_module('FullSim')
 main.add_module(simulation)
@@ -198,18 +193,16 @@ main.add_module(ext)
 # TOP reconstruction
 top_cm = register_module('TOPChannelMasker')
 main.add_module(top_cm)
+
 topreco = register_module('TOPReconstructor')
-# topreco.logging.log_level = LogLevel.DEBUG  # remove or comment to suppress printout
-# topreco.logging.debug_level = 2  # or set level to 0 to suppress printout
 main.add_module(topreco)
 
 pdfdebug = register_module("TOPPDFDebugger")
 pdfdebug.pdfOption = 'fine'  # other options: 'optimal', 'rough'
 main.add_module(pdfdebug)
 
-fcp = WritePDFs()
-fcp.fname = opts.output
-main.add_module(fcp)
+data_getter = WriteData()
+main.add_module(data_getter)
 
 # Show progress of processing
 progress = register_module('Progress')
@@ -217,6 +210,3 @@ main.add_module(progress)
 
 # Process events
 process(main)
-
-# Print call statistics
-# print(statistics)

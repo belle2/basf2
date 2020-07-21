@@ -218,24 +218,13 @@ namespace Belle2 {
 
         topPDFColl->addHypothesisPDF(channelPDFCollection, iPDGCode);
 
-        // Initialize logL and sfot std::arrays
-        TOPPixelLikelihood::pixelArray_t pixLogLs, pixSigPhots;
-        int arraySize = static_cast<int>(pixLogLs.size()); // 512
-
-        // Create zeroed out arrays for pixel data
-        float logls[arraySize], sfots[arraySize];
-        for (int ch = 0; ch < arraySize; ch++) {
-          logls[ch] = 0;
-          sfots[ch] = 0;
-        }
+        // Initialize logL and sfot pixel arrays
+        TOPPixelLikelihood::PixelArray_t pixLogLs, pixSigPhots;
+        pixLogLs.fill(0);
+        pixSigPhots.fill(0);
 
         double timeShift = 0, timeMin = 0, timeMax = 0, sigma = 0; /**< getLogL arguments */
-        reco.getLogL(timeShift, timeMin, timeMax, sigma, &logls[0], &sfots[0]);
-
-        for (int ch = 0; ch < arraySize; ch++) {
-          pixLogLs[ch] = logls[ch];
-          pixSigPhots[ch] = sfots[ch];
-        }
+        reco.getLogL(timeShift, timeMin, timeMax, sigma, pixLogLs.data(), pixSigPhots.data());
 
         topPLkhs->addHypothesisLikelihoods(pixLogLs, iPDGCode);
         topPLkhs->addHypothesisSignalPhotons(pixSigPhots, iPDGCode);

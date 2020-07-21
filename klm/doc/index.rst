@@ -43,7 +43,7 @@ the log-likelihood differences may be used to selector reject the muon hypotesis
    :no-parameters:
    
 Track extrapolation
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 The **extrapolation** proceeds step by step through the detector geometry, starting at the outermost point of the reconstructed track's trajectory and with phase-space coordinates and covariance matrix.
 Upon crossing a KLM detector layer, the nearest two-dimensional hit -if any- in that layer is considered for association with the track. If the hit is within about :math:`3.5\sigma`
 (where :math:`\sigma` is the 2d hit uncertainty) in either of the two local-coordinates directions then it is declared a matching hit and the Kalman filter 
@@ -80,6 +80,7 @@ Build the Muid likelihoods starting from the hit pattern and the transverse scat
 
 * pdg (*int*): PDG code of the particle hypothesis.
 
+.. _MuonEff_picture:
 .. figure:: figures/Likelihood-muon-pion-eff-fake-momentum-styled-1.jpg
   :width: 40em
   :align: center

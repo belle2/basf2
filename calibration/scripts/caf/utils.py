@@ -658,9 +658,10 @@ def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None, 
         polling_time (int): Time between checking if our results are ready.
         pool: Optional Pool object used to multprocess the b2file-metadata-show subprocesses.
             We don't close or join the Pool as you might want to use it yourself, we just wait until the results are ready.
-        filterfalse (function): An optional function object that will be called on each absolute filepath found from your patterns.
-            If True is returned the file will have its metadata returned. If False it will be skipped.
-            The filter function should take the filepath string as its only argument.
+
+        filterfalse (`function`): An optional function object that will be called on each absolute filepath found from your
+            patterns. If True is returned the file will have its metadata returned. If False it will be skipped. The filter function
+            should take the filepath string as its only argument.
 
     Returns:
         dict: Mapping of matching input file paths (Key) to their IoV (Value)

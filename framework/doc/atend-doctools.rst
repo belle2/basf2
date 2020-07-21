@@ -296,7 +296,7 @@ Basf2 Module documentation can be added to sphinx automatically using
 
   .. rst:role:: modules
 
-    Explicitely choose the modules to document with a comma separated list of modules:
+    Explicitly choose the modules to document with a comma separated list of modules:
 
     .. code-block:: rst
 
@@ -368,7 +368,7 @@ We can also add documentation for basf2 variables with a very similar syntax to 
 
   .. rst:role:: regex-filter
 
-     Can be used to filter the selected variables by a pyton
+     Can be used to filter the selected variables by a python
      :py:mod:`regular expression <re>` For example to show all variables in
      the group "Kinematics" which begin with x
 

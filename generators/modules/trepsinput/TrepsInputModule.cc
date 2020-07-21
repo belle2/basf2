@@ -47,14 +47,14 @@ TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_sme
            "if true, use WListTable for discrete and sorted W. if false (default), use DifferentialCrossSection", false);
 
   addParam("MaximalQ2", m_maximalQ2,
-           "Maximal Q^2 = -q^2, where q is the difference between the initial "
+           "Maximal :math:`Q^2 = -q^2`, where q is the difference between the initial "
            "and final electron or positron momenta. Negative means no cut.",
            -1.0);
   addParam("MaximalAbsCosTheta", m_maximalAbsCosTheta,
-           "Maximal |cos(theta)|, where theta is the final-state particle "
+           "Maximal :math:`|\\cos(\\theta)|`, where :math:`\\theta` is the final-state particle "
            "polar angle.", 1.01);
   addParam("ApplyCosThetaCutCharged", m_applyCosThetaCutCharged,
-           "Whether to apply cut on |cos(theta)| for charged particles only.",
+           "Whether to apply cut on :math:`|cos(theta)|` for charged particles only.",
            true);
   addParam("MinimalTransverseMomentum", m_minimalTransverseMomentum,
            "Minimal transverse momentum of the final-state particles.", 0.0);

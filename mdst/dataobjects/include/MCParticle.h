@@ -580,7 +580,8 @@ namespace Belle2 {
 
   inline MCParticle* MCParticle::getMother() const
   {
-    if (m_mother == 0) return NULL;
+    if (m_mother == 0)
+      return nullptr;
     fixParticleList();
     return static_cast<MCParticle*>(m_plist->At(m_mother - 1));
   }

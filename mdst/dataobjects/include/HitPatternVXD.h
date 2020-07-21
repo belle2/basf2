@@ -22,6 +22,7 @@ namespace Belle2 {
    * Only hits from the outgoing arm are stored. For each layer there are two bits. The layer counting is:
    *  - PXD: layers 1 and 2;
    *  - SVD: layers 3, 4, 5 and 6.
+   *
    * The numbering scheme in this class is equivalent to the one defined in the note BELLE2-NOTE-TE-2015-010:
    * https://docs.belle2.org/record/243
    *

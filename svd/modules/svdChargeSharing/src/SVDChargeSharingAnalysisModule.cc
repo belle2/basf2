@@ -330,6 +330,9 @@ void SVDChargeSharingAnalysisModule::terminate()
     }
     m_outputRootFile->Close();
   }
+
+  delete m_outputRootFile;
+
 } //terminate
 
 TH1F* SVDChargeSharingAnalysisModule::createHistogram1D(const char* name, const char* title,

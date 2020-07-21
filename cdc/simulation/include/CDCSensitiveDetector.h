@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCSensitiveDetector_H
-#define CDCSensitiveDetector_H
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 
@@ -305,5 +304,3 @@ namespace Belle2 {
     };
   }
 } // end of namespace Belle2
-
-#endif

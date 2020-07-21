@@ -92,7 +92,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMStripEfficiencyCollectorModule();
+    ~KLMStripEfficiencyCollectorModule();
 
     /**
      * Initializer.

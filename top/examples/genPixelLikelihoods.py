@@ -55,6 +55,7 @@ class WriteData(Module):
 
     def initialize(self):
         """Inits WriteData object."""
+        # A list containing arrays with each event's data
         self.data = []
 
     def event(self):

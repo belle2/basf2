@@ -17,6 +17,8 @@ Variables
  * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
  * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
  * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
+ * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection, 
+   collections of ROE and recoil variables have been expanded
 
 Modules
 +++++++

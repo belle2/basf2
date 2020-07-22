@@ -601,7 +601,7 @@ class SystematicsPhiGamma(BaseSkim):
         "Skim for ISR - phi gamma analyses, "
         ":math:`e^+ e^- \\to \\phi \\gamma ` and "
         ":math:`\\phi` decays into two charged tracks "
-        "(:math: `K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)"
+        "(:math:`K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)"
     )
     __contact__ = __liaison__
     __category__ = "systematics"

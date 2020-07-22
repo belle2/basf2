@@ -29,8 +29,6 @@ if __name__ == "__main__":
     ignorechoosingarelease = 'Choosing a release'
     #: ignore warning about not finding Geometry module ?!
     ignoregeometry = 'b2:mod reference target not found: Geometry'
-    #: ignore skim registry warning (NEEDS TO BE FIXED!)
-    ignoreskimregistry = 'skim.registry.combined_skims'
     check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
                      re.findall(ignorehtmlstaticpath, x) or
@@ -42,6 +40,5 @@ if __name__ == "__main__":
                      re.findall(ignoreduplicatedescriptionofrole, x) or
                      re.findall(ignoreduplicatemvalabel, x) or
                      re.findall(ignorechoosingarelease, x) or
-                     re.findall(ignoregeometry, x) or
-                     re.findall(ignoreskimregistry, x)
+                     re.findall(ignoregeometry, x)
                      )

@@ -42,6 +42,8 @@ if __name__ == "__main__":
     ignoreaddreconstruction = 'add_reconstruction'
     #: ignore warning about not finding Geometry module ?!
     ignoregeometry = 'b2:mod reference target not found: Geometry'
+    #: ignore online_book
+    ignoreonlinebook = 'online_book'
     check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
                      re.findall(ignorehtmlstaticpath, x) or
@@ -56,6 +58,7 @@ if __name__ == "__main__":
                      re.findall(ignoreaddmdstoutput, x) or
                      re.findall(ignoreaddsimulation, x) or
                      re.findall(ignoreaddreconstruction, x) or
+                     re.findall(ignoreonlinebook, x) or
                      re.findall(ignoregeometry, x),
                      toolopts
                      )

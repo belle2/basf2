@@ -31,7 +31,7 @@ if __name__ == "__main__":
     ignoregeometry = 'b2:mod reference target not found: Geometry'
     #: ignore skim registry warning (NEEDS TO BE FIXED!)
     ignoreskimregistry = 'skim.registry.combined_skims'
-    check_error_free("b2code-sphinx-warnings", "sphinx", "",
+    check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
                      re.findall(ignorehtmlstaticpath, x) or
                      re.findall(ignoreunsupportedthemeoption, x) or

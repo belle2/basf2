@@ -17,6 +17,10 @@ Variables
  * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
  * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
  * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
+ * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them. A few
+   binary PID variables have been added to the PID variable collection.
+
+   .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
 
 Modules
 +++++++

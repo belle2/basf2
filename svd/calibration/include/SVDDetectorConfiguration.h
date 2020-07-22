@@ -64,6 +64,7 @@ namespace Belle2 {
      *
      * Output: float corresponding to the injected charge [e]
      */
+    // cppcheck-suppress unusedPrivateFunction
     float getInjectedCharged()
     {
       return m_svdLocalConfig_aDBObjPtr->getInjectedCharge();

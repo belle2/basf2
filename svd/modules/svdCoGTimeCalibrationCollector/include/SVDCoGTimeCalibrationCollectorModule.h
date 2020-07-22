@@ -74,13 +74,13 @@ namespace Belle2 {
     StoreObjPtr<EventT0> m_eventT0; /**< EventT0 store object pointer*/
 
     /**SVDHistograms */
-    SVDHistograms<TH2F>* m_hEventT0vsCoG = NULL; /**< Scatter plot t0 vs t_raw (CoG)*/
-    SVDHistograms<TH1F>* m_hEventT0 = NULL; /**< EventT0 synchronized distribution*/
-    SVDHistograms<TH1F>* m_hEventT0nosync = NULL; /**< EventT0 NOT synchroinized distribution*/
+    SVDHistograms<TH2F>* m_hEventT0vsCoG = nullptr; /**< Scatter plot t0 vs t_raw (CoG)*/
+    SVDHistograms<TH1F>* m_hEventT0 = nullptr; /**< EventT0 synchronized distribution*/
+    SVDHistograms<TH1F>* m_hEventT0nosync = nullptr; /**< EventT0 NOT synchroinized distribution*/
 
-    TH1F* m_hEventT0FromCDST = NULL; /**< EventT0 distribution read by the cDST*/
-    TH1F* m_hEventT0FromCDSTSync = NULL; /**< EventT0 distribution read by the cDST and then synchronized*/
-    TH1F* m_hRawCoGTimeL3V = NULL; /**< Raw_CoG distribution of layer3 V-side */
+    TH1F* m_hEventT0FromCDST = nullptr; /**< EventT0 distribution read by the cDST*/
+    TH1F* m_hEventT0FromCDSTSync = nullptr; /**< EventT0 distribution read by the cDST and then synchronized*/
+    TH1F* m_hRawCoGTimeL3V = nullptr; /**< Raw_CoG distribution of layer3 V-side */
 
     double m_rawCoGBinWidth = 2; /**< Raw_CoG Bin Width [ns] for 2D-histogram */
   };

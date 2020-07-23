@@ -808,14 +808,14 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "cdcklm_1") {bit = cdcklm_1;}
     else if (bitname == "cdcklm_2") {bit = cdcklm_2;}
     else if (bitname == "cdcklm_3") {bit = cdcklm_3;}
-    else if (bitname == "d_b2b3") {bit = cluster_b2b_1to3 > 0;}
-    else if (bitname == "d_b2b5") {bit = cluster_b2b_1to5 > 0;}
-    else if (bitname == "d_b2b7") {bit = cluster_b2b_1to7 > 0;}
-    else if (bitname == "d_b2b9") {bit = cluster_b2b_1to9 > 0;}
-    else if (bitname == "p_b2b3") {bit = Trkcluster_b2b_1to3 > 0;}
-    else if (bitname == "p_b2b5") {bit = Trkcluster_b2b_1to5 > 0;}
-    else if (bitname == "p_b2b7") {bit = Trkcluster_b2b_1to7 > 0;}
-    else if (bitname == "p_b2b9") {bit = Trkcluster_b2b_1to9 > 0;}
+    else if (bitname == "d3") {bit = cluster_b2b_1to3 > 0;}
+    else if (bitname == "d5") {bit = cluster_b2b_1to5 > 0;}
+    else if (bitname == "d7") {bit = cluster_b2b_1to7 > 0;}
+    else if (bitname == "d9") {bit = cluster_b2b_1to9 > 0;}
+    else if (bitname == "p3") {bit = Trkcluster_b2b_1to3 > 0;}
+    else if (bitname == "p5") {bit = Trkcluster_b2b_1to5 > 0;}
+    else if (bitname == "p7") {bit = Trkcluster_b2b_1to7 > 0;}
+    else if (bitname == "p9") {bit = Trkcluster_b2b_1to9 > 0;}
     else if (bitname == "track") {bit = false;}
     else if (bitname == "trkfit") {bit = false;}
 

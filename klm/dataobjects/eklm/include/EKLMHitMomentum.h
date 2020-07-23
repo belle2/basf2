@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EKLMHitMomentum();
+    virtual ~EKLMHitMomentum();
 
     /**
      * Set momentum.

@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EKLMHitCoord();
+    virtual ~EKLMHitCoord();
 
     /**
      * Set hit local position.

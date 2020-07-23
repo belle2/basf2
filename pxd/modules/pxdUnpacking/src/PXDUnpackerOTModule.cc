@@ -451,6 +451,8 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
   unsigned int dhp_reserved     = 0;
   unsigned int dhp_dhe_id       = 0;
   unsigned int dhp_dhp_id       = 0;
+  unsigned int wrap = 0; // workaround to recalc a relative frame number
+  int last_gate = -1; // workaround to recalc a relative frame number
 
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
 //   unsigned int dhp_offset = 0;
@@ -579,6 +581,12 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
         pixelflag = false;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
+        if (last_gate != -1 && (int)dhp_row / 4 < last_gate) {
+          // B2DEBUF(29,"Wrap " << LogVar("last", last_gate) << LogVar("curr", dhp_row / 4) << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
+          wrap++; // relies on the order of data before mapping and the fact that OT firmware delivers only one frame
+        }
+        last_gate = dhp_row / 4;
+
         if (dhp_cm == 63) { // fifo overflow
           B2WARNING("DHP data loss (CM=63) in " << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
           /// FIXME TODO set an error bit ... but define one first
@@ -646,8 +654,9 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
             B2DEBUG(29, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
           };*/
 
+          // in new firmware, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) would always been 0
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
+                                                        (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo + wrap) & 0x3F);
         }
       }
     }

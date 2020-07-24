@@ -1108,13 +1108,12 @@ namespace Belle2 {
         wei = pow(3.*zp * zp - 1., 2);
         weimax = 2.;
       }
-      /* cppcheck-suppress duplicateCondition */
-      if (TrepsB::pmodel == 307) {
+      if (TrepsB::pmodel == 308) {
         // 2- -> VP -> 3P
         wei = z * zp - 0.5 * u * up * cos(phip);
         weimax = 1.5;
       }
-      if (TrepsB::pmodel == 308) {
+      if (TrepsB::pmodel == 309) {
         // 2- -> TP -> 3P
         wei = pow(3.*zs * zs - 1., 2);
         weimax = 4.;

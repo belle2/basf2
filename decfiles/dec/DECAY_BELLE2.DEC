@@ -5117,7 +5117,7 @@ Decay B-
 
 #0.000550000 D0      K-      K0                              PHSP;  
 #0.000750000 D0      K-      K*0                             PHSP;  
-0.001500000 D*0     K-      anti-K*0                        PHSP;  
+0.001500000 D*0     K-      K*0                             PHSP;  
 0.018000000 D*0     pi+     pi-     pi-     pi0             PHSP;  
 0.005700000 D*0     pi-     pi-     pi-     pi+     pi+     PHSP;  
 0.002600000 D*+     pi-     pi-     pi-     pi+             PHSP;  

@@ -32,8 +32,12 @@ namespace Belle2 {
 
     /** Constructor */
     SVDDQMClustersOnTrackModule();
+    /** Copy constructor (disabled) */
+    SVDDQMClustersOnTrackModule(const SVDDQMClustersOnTrackModule&) = delete;
     /* Destructor */
     virtual ~SVDDQMClustersOnTrackModule();
+    /** Operator = (disabled) */
+    SVDDQMClustersOnTrackModule& operator=(const SVDDQMClustersOnTrackModule&) = delete;
 
     /** Module function initialize */
     void initialize() override final;

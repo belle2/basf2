@@ -10,7 +10,7 @@
 
 #include <svd/modules/svdDQM/SVDDQMHitTimeModule.h>
 #include <framework/core/HistoModule.h>
-
+#include <mdst/dataobjects/TRGSummary.h>
 #include <TDirectory.h>
 
 using namespace Belle2;
@@ -175,12 +175,12 @@ void SVDDQMHitTimeModule::event()
 
   bool Is_ECL_L1TriggerSource = false ;
   bool Is_CDC_L1TriggerSource = false ;
-  if (m_L1TimingSrc == 0) {            // for L1 timing source is "ecl trigger"
+  if (m_L1TimingSrc == TRGSummary::ETimingType::TTYP_ECL) {            // for L1 timing source is "ecl trigger"
     Is_ECL_L1TriggerSource = true ;
-  } else if (m_L1TimingSrc == 3) {     // for L1 timing source is "cdc trigger"
+  } else if (m_L1TimingSrc == TRGSummary::ETimingType::TTYP_CDC) {     // for L1 timing source is "cdc trigger"
     Is_CDC_L1TriggerSource = true ;
   }
-  // else if(m_L1TimingSrc==5){  // for L1 timing source is "delayed Bhabha" }
+  // else if(m_L1TimingSrc==ETimingType::TTYP_DPHY){  // for L1 timing source is "delayed Bhabha" }
   B2DEBUG(20, "Is_ECL_L1TriggerSource = " << Is_ECL_L1TriggerSource) ;
   B2DEBUG(20, "Is_CDC_L1TriggerSource= " << Is_CDC_L1TriggerSource) ;
 

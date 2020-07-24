@@ -55,7 +55,7 @@ class XToD0_D0ToHpJm(BaseSkim):
             path (basf2.Path): Skim path to be processed.
 
         Returns:
-            D0List (list(str)): List of particle list names.
+            List of D0 particle list names.
         """
         mySel = "abs(d0) < 1 and abs(z0) < 3"
         mySel += " and 0.296706 < theta < 2.61799"
@@ -122,7 +122,7 @@ class XToD0_D0ToNeutrals(BaseSkim):
             path (basf2.Path): Skim path to be processed.
 
         Returns:
-            D0List (list(str)): List of particle list names.
+            List of D0 particle list names.
         """
         charmcuts = "1.78 < M < 1.94 and useCMSFrame(p)>2.2"
         D0_Channels = ["pi0:skim pi0:skim",

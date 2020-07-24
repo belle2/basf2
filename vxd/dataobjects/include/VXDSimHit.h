@@ -113,7 +113,7 @@ namespace Belle2 {
      * least one entry with a fraction of one and the total number of deposited
      * electrons.
      *
-     * @param length target number of electrons per step
+     * @param electronsPerStep length target number of electrons per step
      * @return vector of (fraction, electron) pairs
      */
     std::vector<std::pair<float, float> > getElectronsConstantNumber(double electronsPerStep) const;

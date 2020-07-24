@@ -436,6 +436,111 @@
       END
 
 
+      SUBROUTINE GET_LOGL_CH_SFOT(T0,TMIN,TMAX,SIGT,PLKH,SFOT_CH)
+
+      IMPLICIT NONE
+      REAL T0                   ! time shift
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
+      REAL SIGT                 ! additional time smearing
+      REAL PLKH(0:*)            ! channel log likelihoods
+      REAL SFOT_CH(0:*)         ! channel exp. signal photons
+#include "TOP_DATA.fi"
+#include "TOP_RTRA.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PIK.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+      INTEGER I, ICH, M, NUMCH, NFOT, TYP
+      REAL T, TERR, F, SFOT, PS, PD, PB
+      REAL FUNC_PDF, POIS_LOG
+      REAL PS_CH(0:NUM_CHA-1)
+      INTEGER NFOT_CH(0:NUM_CHA-1)
+      
+      IF(N_RTRA.NE.1) RETURN
+      IF(RTRA_FLAG(1).NE.1) RETURN
+
+      IF(TMAX.LE.TMIN) THEN
+         TMAX=T_MAX
+         TMIN=T_MIN
+      ENDIF
+      
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      SFOT=STFS*PS+STFD*PD+STFB*PB
+      IF(SFOT.EQ.0) RETURN
+      
+      NFOT=0
+      NUMCH=NCH(0)+NCH(1)
+
+      DO ICH=0,NUMCH-1
+         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)+
+     &        STFB*PIK_BGR(ICH)*(TMAX-TMIN)
+         NFOT_CH(ICH)=0
+      ENDDO
+      
+      DO I=1,N_DATA
+         M=DATA_MOD(I)
+         IF(M.EQ.MODUL) THEN
+            ICH=DATA_ICH(I)
+            IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
+            T=DATA_TIME(I)
+            TERR=DATA_TERR(I)
+            IF(T.LT.TMIN.OR.T.GT.TMAX) CYCLE
+            NFOT=NFOT+1
+            NFOT_CH(ICH)=NFOT_CH(ICH)+1
+            TYP=PMT_TYPE(ICH,M)
+            F=FUNC_PDF(T-T0,TERR,ICH,TYP,SIGT)/SFOT
+            PLKH(ICH)=PLKH(ICH)+LOG(F)
+         ENDIF
+      ENDDO
+      DO ICH=0,NUMCH-1
+         PLKH(ICH)=PLKH(ICH)+POIS_LOG(SFOT_CH(ICH),FLOAT(NFOT_CH(ICH)))
+      ENDDO
+      
+      RTRA_NFOT(1)=NFOT
+      
+      END
+
+
+      SUBROUTINE GET_SFOT(T0,TMIN,TMAX,SFOT_CH)
+
+      IMPLICIT NONE
+      REAL T0                   ! time shift
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
+      REAL SFOT_CH(0:*)         ! channel exp. signal photons
+#include "TOP_DATA.fi"
+#include "TOP_RTRA.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PIK.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+      INTEGER ICH, NUMCH
+      REAL SFOT, PS, PD, PB
+      REAL PS_CH(0:NUM_CHA-1)
+      
+      IF(N_RTRA.NE.1) RETURN
+      IF(RTRA_FLAG(1).NE.1) RETURN
+
+      IF(TMAX.LE.TMIN) THEN
+         TMAX=T_MAX
+         TMIN=T_MIN
+      ENDIF
+      
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      SFOT=STFS*PS+STFD*PD+STFB*PB
+      IF(SFOT.EQ.0) RETURN
+      
+      NUMCH=NCH(0)+NCH(1)
+
+      DO ICH=0,NUMCH-1
+         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)+
+     &        STFB*PIK_BGR(ICH)*(TMAX-TMIN)
+      ENDDO
+      
+      END
+
+
       SUBROUTINE GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
       
       IMPLICIT NONE

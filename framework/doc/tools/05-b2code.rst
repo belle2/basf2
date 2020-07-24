@@ -57,6 +57,7 @@ To run on the full release directory run it without any arguments::
 
     b2code-doxygen-warnings
 
+
 ``b2code-classversion-check``: Perform sanity checks on ROOT class versions
 ---------------------------------------------------------------------------
 
@@ -67,8 +68,9 @@ To run on the full release directory run it without any arguments::
     :nodefault:
     :nogroupsections:
 
- ``b2code-classversion-update``: Update linkdef information for sanity checks
------------------------------------------------------------------------------
+
+``b2code-classversion-update``: Update linkdef information for sanity checks
+----------------------------------------------------------------------------
 
 .. argparse::
     :filename: framework/tools/b2code-classversion-update
@@ -110,3 +112,29 @@ However in this case a directory to check has to be provided
     :prog: b2code-parallel_processing-benchmark
     :nodefault:
     :nogroupsections:
+
+``b2code-sphinx-build``: Build the sphinx documentation
+-------------------------------------------------------
+
+This script will run sphinx with the appropriate arguments to build the user
+documentation and optionally only show the warnings.
+
+.. rubric:: Optional Arguments
+
+--light           Create documentation only for the light release, that is only
+                  for the packages included in a light release build.
+-t TARGET, --target TARGET
+                  Documentation format to generate. If not given the default
+                  will be "html". Available options are "html", "latex", "json"
+-h, --help        Show this help message
+-o, --output-dir  Where to put the documentation. If not given the default is
+                  the build directory in the software/release directory
+
+All other options will be forwarded to ``sphinx-build``
+
+
+``b2code-sphinx-warnings``: Show all the warnings when building the documentation
+---------------------------------------------------------------------------------
+
+This script will create the sphinx documentation and check whether there are any warnings.
+All extra arguments are forwarded to ``b2code-sphinx-build``.

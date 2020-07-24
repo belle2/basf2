@@ -535,7 +535,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
   //void SVDLocalCalibrationsMonitorModule::terminate()
   //{
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
 
     m_rootFilePtr->cd();
 

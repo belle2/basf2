@@ -21,7 +21,7 @@ public:
    * @param FileName String containing the table filename. */
   explicit TNiel(const std::string& FileName);
   /** Get NIEL factor for a given particle energy.
-   * @param particle kinetic energy in MeV.
+   * @param EMeV particle kinetic energy in MeV.
    * @return NIEL factor for a particle with a given energy.
    */
   double getNielFactor(double EMeV);

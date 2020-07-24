@@ -131,7 +131,7 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
 
   //auxilairy variables to store the XML file values
   // TODO: calInjectedCharge is not used! Check if it can be removed.
-  std::string calInjectedCharge = "";
+  std::string calInjectedCharge;
   std::string calibTimeUnits = "";
   std::string calibDate = "";
 

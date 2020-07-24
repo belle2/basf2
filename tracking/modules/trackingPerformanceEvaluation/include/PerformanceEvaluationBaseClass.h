@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef PERFORMANCEEVALUATIONBASECLASS_H_
-#define PERFORMANCEEVALUATIONBASECLASS_H_
+
+#pragma once
 
 #include <TFile.h>
 #include <TList.h>
@@ -139,6 +139,3 @@ namespace Belle2 {
 
   };
 } // end of namespace
-
-
-#endif /* PERFORMANCEEVALUATIONBASECLASS_H_ */

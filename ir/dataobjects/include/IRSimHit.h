@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef IRSIMHIT_H
-#define IRSIMHIT_H
+#pragma once
 
 #include <TVector3.h>
 #include <string>
@@ -87,5 +86,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

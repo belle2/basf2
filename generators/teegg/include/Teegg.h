@@ -29,7 +29,7 @@ namespace Belle2 {
      */
     Teegg();
 
-    /** Destrucotr. */
+    /** Destructor. */
     ~Teegg();
 
     /** Sets the default settings for the TEEGG Fortran generator. */
@@ -141,7 +141,7 @@ namespace Belle2 {
     void setMTRXGG(const std::string& mtrxgg = "NONE") {m_sMTRXGG = mtrxgg;}
 
     /** set logical variable. If true then generate unweighted events
-      * @param wghtmx logical variable. If true then generate unweighted events
+      * @param unwght logical variable. If true then generate unweighted events
       */
     void setUNWGHT(int unwght = 1) { m_UNWGHT = unwght; }
 

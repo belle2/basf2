@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
-#define EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
+#pragma once
 
 #include <cstddef>
 
@@ -153,4 +152,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif

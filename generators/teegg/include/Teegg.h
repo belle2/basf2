@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TEEGG_H
-#define TEEGG_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <TLorentzRotation.h>
@@ -243,4 +242,3 @@ namespace Belle2 {
 }
 
 
-#endif /* TEEG_H */

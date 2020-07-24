@@ -19,8 +19,7 @@
 // $Log$
 
 
-#ifndef PACKAGE_TREPS3B_H_INCLUDED
-#define PACKAGE_TREPS3B_H_INCLUDED
+#pragma once
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
@@ -251,4 +250,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif /* PACKAGE_TREPS3B_H_INCLUDED */

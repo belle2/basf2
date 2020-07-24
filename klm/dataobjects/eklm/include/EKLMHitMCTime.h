@@ -25,29 +25,39 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMHitMCTime();
+    EKLMHitMCTime()
+    {
+    }
 
     /**
      * Destructor.
      */
-    virtual ~EKLMHitMCTime();
+    virtual ~EKLMHitMCTime()
+    {
+    }
 
     /**
      * Set MC time.
      * @param[in] t TIme.
      */
-    void setMCTime(float t);
+    void setMCTime(float t)
+    {
+      m_MCTime = t;
+    }
 
     /**
      * Get MC time.
      * @return Time.
      */
-    float getMCTime() const;
+    float getMCTime() const
+    {
+      return m_MCTime;
+    }
 
   protected:
 
     /** Time. */
-    float m_MCTime;
+    float m_MCTime = -1;
 
   private:
 

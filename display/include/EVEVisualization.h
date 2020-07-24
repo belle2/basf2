@@ -1,5 +1,4 @@
-#ifndef EVEVISUALIZATION_H
-#define EVEVISUALIZATION_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -205,7 +204,7 @@ namespace Belle2 {
     void addCDCHit(const CDCHit* hit, bool showTriggerHits = false);
 
     /** show outline of track segments. */
-    void addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit);
+    void addCDCTriggerSegmentHit(const std::string& collectionName, const CDCTriggerSegmentHit* hit);
 
     /** Add TOPDigits (shown aggregated per module). */
     void addTOPDigits(const StoreArray<TOPDigit>& digits);
@@ -372,4 +371,3 @@ namespace Belle2 {
     bool m_drawBackward = false;
   };
 }
-#endif

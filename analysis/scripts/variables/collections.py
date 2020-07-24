@@ -14,12 +14,10 @@ cluster = [
     'clusterHasPulseShapeDiscrimination',
     'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
-    'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
     'nECLClusterTrackMatches',
     'clusterZernikeMVA',
     'clusterReg',
-    'weightedAverageECLTime',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
@@ -47,6 +45,10 @@ cluster = [
     'clusterTiming',
     'clusterTrackMatch',
     'goodBelleGamma',
+]
+
+#: Cluster-related event variables
+event_level_cluster = [
     'nECLOutOfTimeCrystals',
     'nECLOutOfTimeCrystalsBWDEndcap',
     'nECLOutOfTimeCrystalsBarrel',
@@ -55,6 +57,12 @@ cluster = [
     'nRejectedECLShowersBWDEndcap',
     'nRejectedECLShowersBarrel',
     'nRejectedECLShowersFWDEndcap',
+]
+
+#: Cluster averages
+cluster_average = [
+    'maxWeightedDistanceFromAverageECLTime',
+    'weightedAverageECLTime'
 ]
 
 #: KLM cluster information
@@ -127,11 +135,26 @@ mc_variables = [
 pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'deuteronID']
 
 #: Replacement for ROEMultiplicities tool
-roe_multiplicities = ['nROE_KLMClusters']
+roe_multiplicities = [
+    'nROE_Charged()',
+    'nROE_Photons()',
+    'nROE_NeutralHadrons()'
+]
 
-#: Recoil kinematics relaed variables
+#: Rest-Of-Event kinematics
+roe_kinematics = [
+    'roeE()',
+    'roeM()',
+    'roeP()',
+    'roeMbc()',
+    'roeDeltae()'
+]
+
+#: Recoil kinematics related variables
 recoil_kinematics = [
     'pRecoil',
+    'eRecoil',
+    'mRecoil',
     'pRecoilPhi',
     'pRecoilTheta',
     'pxRecoil',
@@ -213,11 +236,11 @@ tag_vertex = [
 
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
+    'mcDeltaTau',
     'mcDeltaT',
-    'mcDeltaTapprox',
-    'mcDeltaL',
-    'TagVmcLBoost',
-    'TagVmcOBoost',
+    'mcDeltaBoost',
+    'mcTagVLBoost',
+    'mcTagVOBoost',
     'mcLBoost',
     'mcOBoost',
     'mcTagVx',

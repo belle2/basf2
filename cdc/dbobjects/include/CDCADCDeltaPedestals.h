@@ -38,8 +38,9 @@ namespace Belle2 {
 
     /**
      * Set ADC pedestals in the list.
-     * @param board id
-     * @param pedestal
+     * @param board    Board id
+     * @param ch       Channel id
+     * @param pedestal Pedestal value
      */
     void setPedestal(int board, int ch, float pedestal)
     {
@@ -68,8 +69,8 @@ namespace Belle2 {
 
     /**
      * Get ADC pedestal for the specified board.
-     * @param  board id.
-     * @param  board channel.
+     * @param  board Board id.
+     * @param  ch Channel id.
      * @return pedestal for the board (and channel).
      */
     float getPedestal(const unsigned short& board, const unsigned short& ch) const

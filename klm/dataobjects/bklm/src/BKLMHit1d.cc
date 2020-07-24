@@ -34,11 +34,11 @@ BKLMHit1d::BKLMHit1d() :
 
 // Constructor with a cluster of contiguous parallel KLMDigits
 BKLMHit1d::BKLMHit1d(const std::vector<const KLMDigit*>& digits) :
-  RelationsObject()
+  RelationsObject(),
+  m_ModuleID(0),
+  m_Time(0.0),
+  m_EnergyDeposit(0.0)
 {
-  m_Time = 0.0;
-  m_EnergyDeposit = 0.0;
-  m_ModuleID = 0;
   if (digits.size() == 0) {
     B2WARNING("Attempt to create a BKLMHit1d with no KLMDigits");
     return;

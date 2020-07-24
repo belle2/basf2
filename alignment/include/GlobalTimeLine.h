@@ -67,7 +67,7 @@ namespace Belle2 {
       /// Convert the finalized TimeTable to PayloadsTable
       /// @param timeTable finalized TimeTable
       /// @param vector GlobalParamVector initialized with DB object for which payloads should be generated
-      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, GlobalParamVector& vector);
+      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, const GlobalParamVector& vector);
 
       /// Create the initial TimeTable fromm the mapping of timedep parameters
       /// in GlobalLabel
@@ -157,7 +157,7 @@ namespace Belle2 {
         /// @param vector the global vector initialized with DB objects for which payloads shoudl be generated
         /// WARNING: do not construct() or loadFromDB() the vector - use it "raw" - the internal object handlers
         /// are copied into the payloads table constructing the internal DB objects would result in copiyng them around, too
-        GlobalParamTimeLine(const std::vector<EventMetaData>& events, GlobalLabel& label, GlobalParamVector& vector);
+        GlobalParamTimeLine(const std::vector<EventMetaData>& events, GlobalLabel& label, const GlobalParamVector& vector);
 
         /// Load every single payload with the content in database at its corresponding
         /// event (when it should start to be valid)

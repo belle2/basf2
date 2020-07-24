@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef PXD_DATAOBJECTS_PXDENERGYDEPOSITIONEVENT_H
-#define PXD_DATAOBJECTS_PXDENERGYDEPOSITIONEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
 #include <algorithm>
@@ -73,5 +71,3 @@ namespace Belle2 {
     ClassDef(PXDEnergyDepositionEvent, 2)
   };
 } // end namespace Belle2
-
-#endif

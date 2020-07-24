@@ -15,7 +15,6 @@
 #include <globals.hh>
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;

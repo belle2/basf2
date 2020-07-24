@@ -133,7 +133,7 @@ namespace Belle2 {
 
       /** calculate  Sv123 function */
       double Sv123(const sv123shift_t&) const;
-      /** calculate derivetive of the Sv123 function */
+      /** calculate derivative of the Sv123 function */
       dd_t ddSv123(const sv123shift_t&) const;
 
       /**  Numerical calculation of the time convolution.  Integration  with histogram
@@ -157,6 +157,10 @@ namespace Belle2 {
 
       ~ShaperDSP_t() {}
       /** initialization of the parameters response function */
+      /** The variable double u = 27.7221 is the 'unitscale' of the waveform template*/
+      /** This sets the normalization for the template amplitude to be unity. */
+      /** If the waveform templates are modified this needs to be adjusted as well.*/
+      /** Dynamical calculation task is tracked in BII-7049 */
       void init(const std::vector<double>& s, double u = 27.7221);
       /** wrapper of the function */
       double operator()(double) const;

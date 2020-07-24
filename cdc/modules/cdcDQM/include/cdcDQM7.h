@@ -3,8 +3,10 @@
 /* Nanae Taniguchi 2019.02.17 */
 /* Junhao Yin 2019.11 */
 
-#ifndef CDCDQM7MODULE_H
-#define CDCDQM7MODULE_H
+#pragma once
+
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCRawHit.h>
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
@@ -33,15 +35,26 @@ namespace Belle2 {
 
     //! Module functions
     void initialize() override;
+    //! action at runbegin
     void beginRun() override;
+    //! action per each event
     void event() override;
+    //! action at run end
     void endRun() override;
+    //! termination action
     void terminate() override;
 
     //! function to define histograms
     void defineHisto() override;
 
   private:
+
+    //! CDC raw hits.
+    StoreArray<CDCRawHit> m_CDCRawHits;
+
+    //! CDC hits.
+    StoreArray<CDCHit> m_CDCHits;
+
     TH1D* h_nhits_L[56] = {nullptr}; /**<histogram hit in each layer*/
 
     TH1D* h_tdc_sL[9] = {nullptr};/**<tdc each super layer*/
@@ -66,4 +79,3 @@ namespace Belle2 {
 
   };
 }
-#endif

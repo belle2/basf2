@@ -9,7 +9,6 @@
  **************************************************************************/
 // Own include
 #include <top/modules/TOPDigitizer/TOPTriggerDigitizerModule.h>
-#include <top/geometry/TOPGeometryPar.h>
 
 // Hit classes
 #include <top/dataobjects/TOPRawWaveform.h>
@@ -17,12 +16,10 @@
 #include <top/dataobjects/TOPTriggerMCInfo.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // ROOT
@@ -32,8 +29,6 @@
 using namespace std;
 
 namespace Belle2 {
-
-  using namespace TOP;
 
   //-----------------------------------------------------------------
   //                 Register the Module

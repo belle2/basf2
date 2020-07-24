@@ -63,6 +63,9 @@ namespace Belle2 {
     /** Use enent T0 or not. */
     bool m_UseEventT0;
 
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
+
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;
 

@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/KLMDigitEventInfo.h>
 #include <klm/dataobjects/KLMDigitRaw.h>
@@ -47,54 +47,64 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMUnpackerModule();
+    ~KLMUnpackerModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 
     /**
-     * Unpack one EKLM digit.
-     * @param[in] rawData           Data to be unpacked.
-     * @param[in] copper            Copper identifier.
-     * @param[in] hslb              HSLB number.
-     * @param[in] klmDigitEventInfo KLMDigitEventInfo.
+     * Create KLM digit.
+     * @param[in] raw               Raw data.
+     * @param[in] klmDigitRaw       Raw digit.
+     * @param[in] klmDigitEventInfo Event information.
+     * @param[in] subdetector       Subdetector.
+     * @param[in] section           Section.
+     * @param[in] sector            Sector.
+     * @param[in] layer             Layer.
+     * @param[in] plane             Plane.
+     * @param[in] strip             Strip.
+     * @param[in] lastStrip         Last strip (for multiple-strip hits).
      */
-    void unpackEKLMDigit(const int* rawData, int copper, int hslb,
-                         KLMDigitEventInfo* klmDigitEventInfo);
+    void createDigit(
+      const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
+      KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
+      int sector, int layer, int plane, int strip, int lastStrip);
 
     /**
-     * Unpack one BKLM digit.
+     * Unpack KLM digit.
      * @param[in] rawData           Data to be unpacked.
      * @param[in] copper            Copper identifier.
      * @param[in] hslb              HSLB number.
+     * @param[in] daqSubdetector    Subdetector (as determined from DAQ data).
      * @param[in] klmDigitEventInfo KLMDigitEventInfo.
      */
-    void unpackBKLMDigit(const int* rawData, int copper, int hslb,
-                         KLMDigitEventInfo* klmDigitEventInfo);
+    void unpackKLMDigit(const int* rawData, int copper, int hslb,
+                        int daqSubdetector,
+                        KLMDigitEventInfo* klmDigitEventInfo);
 
     /**
      * To be used to map electronics address to module id.
@@ -175,6 +185,12 @@ namespace Belle2 {
     /** Event information. */
     StoreArray<KLMDigitEventInfo> m_DigitEventInfos;
 
+    /** Out-of-range digits. */
+    StoreArray<KLMDigit> m_klmDigitsOutOfRange;
+
+    /** Raw digits. */
+    StoreArray<KLMDigitRaw> m_klmDigitRaws;
+
     /* EKLM database objects. */
 
     /** Channels. */
@@ -184,12 +200,6 @@ namespace Belle2 {
 
     /** ADC offset and threshold read from database. */
     DBObjPtr<BKLMADCThreshold> m_bklmADCParams;
-
-    /** Out-of-range digits. */
-    StoreArray<KLMDigit> m_bklmDigitsOutOfRange;
-
-    /** Raw digits. */
-    StoreArray<KLMDigitRaw> m_klmDigitRaws;
 
     /* Other common variables. */
 
@@ -202,21 +212,7 @@ namespace Belle2 {
     /* Other EKLM variables. */
 
     /** Element numbers. */
-    const EKLM::ElementNumbersSingleton* m_eklmElementNumbers;
-
-    /* Other BKLM variables. */
-
-    /**
-     * Counter for channels that were rejected due to unreasonable
-     * channel number.
-     */
-    long m_rejectedCount = 0;
-
-    /**
-     * Warning message: number of channels rejected due to unreasonable
-     * channel number.
-     */
-    std::map<std::string, long> m_rejected;
+    const EKLMElementNumbers* m_eklmElementNumbers;
 
   };
 

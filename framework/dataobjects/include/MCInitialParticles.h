@@ -13,15 +13,17 @@
 #include <TLorentzVector.h>
 #include <TLorentzRotation.h>
 
-
 namespace Belle2 {
+
   /** This class contains the initial state for the given event.
    * This is not to be confused with the nominal beam parameters but is an event
    * dependent info which contains all implemented smearing effects. It is only
    * set in Montecarlo.
    */
   class MCInitialParticles: public TObject {
+
   public:
+
     /** Possible Flags for initial event generation */
     enum EGenerationFlags {
       /** generate initial event in CMS instead of lab */
@@ -40,17 +42,20 @@ namespace Belle2 {
 
     /** Default constructor */
     MCInitialParticles(): TObject() {}
+
     /** Copy constructor */
     MCInitialParticles(const MCInitialParticles& b): TObject(), m_her(b.m_her), m_ler(b.m_ler),
-      m_vertex(b.m_vertex), m_generationFlags(b.m_generationFlags) {}
+      m_vertex(b.m_vertex), m_validFlag(b.m_validFlag), m_generationFlags(b.m_generationFlags) {}
+
     /** Assignment operator */
     MCInitialParticles& operator=(const MCInitialParticles& b)
     {
       m_her = b.m_her; m_ler = b.m_ler; m_vertex = b.m_vertex;
-      m_generationFlags = b.m_generationFlags;
+      m_validFlag = b.m_validFlag; m_generationFlags = b.m_generationFlags;
       resetBoost();
       return *this;
     }
+
     /** Equality operator */
     bool operator==(const MCInitialParticles& b) const
     {
@@ -64,7 +69,8 @@ namespace Belle2 {
 #define MCP_DBL_CMP(a,b,x) ((a.x()==b.x())||(std::abs(a.x()-b.x())<1e-10))
 #define MCP_VEC3_CMP(a,b) (MCP_DBL_CMP(a,b,X) && MCP_DBL_CMP(a,b,Y) && MCP_DBL_CMP(a,b,Z))
 #define MCP_VEC4_CMP(a,b) (MCP_VEC3_CMP(a,b) && MCP_DBL_CMP(a,b,E))
-      return MCP_VEC4_CMP(m_her, b.m_her) && MCP_VEC4_CMP(m_ler, b.m_ler) && MCP_VEC3_CMP(m_vertex, b.m_vertex) &&
+      return MCP_VEC4_CMP(m_her, b.m_her) && MCP_VEC4_CMP(m_ler, b.m_ler) && MCP_VEC3_CMP(m_vertex, b.m_vertex)
+             && m_validFlag == b.m_validFlag &&
              m_generationFlags == b.m_generationFlags;
 #undef MCP_DBL_CMP
 #undef MCP_VEC3_CMP
@@ -82,61 +88,84 @@ namespace Belle2 {
      */
     void set(const TLorentzVector& her, const TLorentzVector& ler, const TVector3& vertex)
     {
-      m_her = her; m_ler = ler; m_vertex = vertex;
+      m_her = her;
+      m_ler = ler;
+      m_vertex = vertex;
+      m_validFlag = true;
       resetBoost();
     }
+
     /** Set the High Energy Beam 4-momentum */
     void setHER(const TLorentzVector& her)
     {
       m_her = her;
       resetBoost();
     }
+
     /** Set the Low Energy Beam 4-momentum */
     void setLER(const TLorentzVector& ler)
     {
       m_ler = ler;
       resetBoost();
     }
+
     /** Set the vertex position */
     void setVertex(const TVector3& vertex)
     {
       m_vertex = vertex;
     }
+
     /** Set collison time */
     void setTime(double time) {m_time = time;}
+
+    /** Set the generation flags to be used for event generation (ORed combination of EGenerationFlags) */
+    void setGenerationFlags(int flags) { m_generationFlags = flags; }
+
     /** Get 4vector of the high energy beam */
     const TLorentzVector& getHER() const { return m_her; }
+
     /** Get 4vector of the low energy beam */
     const TLorentzVector& getLER() const { return m_ler; }
+
     /** Get the position of the collision */
     const TVector3& getVertex() const { return m_vertex; }
-    /** get collison time */
+
+    /** Get collison time */
     double getTime() const {return m_time;}
+
     /** Get the the actual collision energy (in lab system)*/
     double getEnergy() const { return (m_her + m_ler).E(); }
+
     /** Get the invariant mass of the collision (= energy in CMS) */
     double getMass() const { calculateBoost(); return m_invariantMass; }
+
     /** Return the LorentzRotation to convert from lab to CMS frame */
     const TLorentzRotation& getLabToCMS() const
     {
       calculateBoost(); return *m_labToCMS;
     }
+
     /** Return the LorentzRotation to convert from CMS to lab frame */
     const TLorentzRotation& getCMSToLab() const
     {
       calculateBoost(); return *m_CMSToLab;
     }
 
-    /** Set the generation flags to be used for event generation (ORed combination of EGenerationFlags) */
-    void setGenerationFlags(int flags) { m_generationFlags = flags; }
+    /** Get the flag to check if a valid MCInitialParticles object was already generated and filled in an event. */
+    bool getValidFlag() const { return m_validFlag; }
+
     /** Get the generation flags to be used for event generation (ORed combination of EGenerationFlags) */
     int getGenerationFlags() const { return m_generationFlags; }
+
     /** Check if a certain set of EGenerationFlags is set */
     bool hasGenerationFlags(int flags) const { return (m_generationFlags & flags) == flags; }
+
     /** Return string representation of all active flags for printing
      * @param separator separation string to be put between flags */
     std::string getGenerationFlagString(const std::string& separator = " ") const;
+
   private:
+
     /** Calculate the boost if necessary */
     void calculateBoost() const;
     /** Reset cached transformations after changing parameters. */
@@ -155,10 +184,12 @@ namespace Belle2 {
     mutable TLorentzRotation* m_CMSToLab{nullptr}; //!transient
     /** invariant mass of HER+LER (calculated on first use, not saved to file) */
     mutable double m_invariantMass{0.0}; //!transient
+    /** Flag to check if a valid MCInitialParticles object was already generated and filled in an event. */
+    bool m_validFlag = false;
     /** Flags to be used when generating events */
     int m_generationFlags{0};
     /** ROOT Dictionary */
-    ClassDef(MCInitialParticles, 2);
+    ClassDef(MCInitialParticles, 3);
   };
 
   inline void MCInitialParticles::calculateBoost() const

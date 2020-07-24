@@ -48,32 +48,32 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~BKLMDigitAnalyzerModule() override;
+    ~BKLMDigitAnalyzerModule() override;
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
 
   private:
@@ -100,7 +100,7 @@ namespace Belle2 {
     TFile* m_outputRootFile;
 
     //! Pointer to ROOT tree with extra info
-    TTree* m_extraInfo{nullptr};
+    TTree* m_extraInfo = nullptr;
 
     //! Pointer to ROOT list of histograms
     TList* m_histoList;
@@ -137,11 +137,11 @@ namespace Belle2 {
 
     //! Create a ROOT 1D histogram
     TH1F* createTH1(const char* name, const char* title, Int_t nBinsX, Double_t minX, Double_t maxX, const char* titleX,
-                    const char* titleY, bool drawStat, TList* histoList = NULL);
+                    const char* titleY, bool drawStat, TList* histoList = nullptr);
 
     //! Create a ROOT 2D histogram
     TH2F* createTH2(const char* name, const char* title, Int_t nBinsX, Double_t minX, Double_t maxX, const char* titleX, Int_t nBinsY,
-                    Double_t minY, Double_t maxY, const char* titleY, bool drawStat, TList* histoList = NULL);
+                    Double_t minY, Double_t maxY, const char* titleY, bool drawStat, TList* histoList = nullptr);
   };
 
 }

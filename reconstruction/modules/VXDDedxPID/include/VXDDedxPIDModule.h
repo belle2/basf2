@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDDEDXPIDMODULE_H
-#define VXDDEDXPIDMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -22,25 +21,16 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
-#include <string>
 #include <vector>
-#include <TVector3.h>
-#include <TH2F.h>
 
-class TH2F;
 
 namespace Belle2 {
-  class PXDCluster;
-  class SVDCluster;
-  class VXDDedxTrack;
   class HelixHelper;
 
   /** Extract dE/dx from fitted tracks.
@@ -163,4 +153,3 @@ namespace Belle2 {
 
   };
 } // Belle2 namespace
-#endif

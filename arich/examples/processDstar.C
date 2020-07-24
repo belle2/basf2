@@ -81,7 +81,7 @@ void processDstar(){
   sigf->SetParameters(fitf->GetParameter(0),fitf->GetParameter(1),fitf->GetParameter(2),fitf->GetParameter(3),fitf->GetParameter(4));
   bkgf->SetParameter(0,fitf->GetParameter(5));
   
-  double sigmaPi = sigf->GetParameter(2);
+  //double sigmaPi = sigf->GetParameter(2);
   // total number of pions in arich and its error
   double ntotPi = sigf->Integral(1.81,1.9) *  scale; 
   double ntotPiErr = fitf->GetParError(0)/sigf->GetParameter(0) * ntotPi;
@@ -105,7 +105,7 @@ void processDstar(){
   sigf->SetParameters(fitf->GetParameter(0),fitf->GetParameter(1),fitf->GetParameter(2),fitf->GetParameter(3),fitf->GetParameter(4));
   bkgf->SetParameter(0,fitf->GetParameter(5));
   
-  double sigmaK = sigf->GetParameter(2);
+  //double sigmaK = sigf->GetParameter(2);
   // total number of kaons in arich and its error
   double ntotK = sigf->Integral(1.81,1.9) * scale;
   double ntotKErr = fitf->GetParError(0)/sigf->GetParameter(0)*ntotK;

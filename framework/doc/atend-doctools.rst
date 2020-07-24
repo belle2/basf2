@@ -296,7 +296,7 @@ Basf2 Module documentation can be added to sphinx automatically using
 
   .. rst:role:: modules
 
-    Explicitely choose the modules to document with a comma separated list of modules:
+    Explicitly choose the modules to document with a comma separated list of modules:
 
     .. code-block:: rst
 
@@ -368,7 +368,7 @@ We can also add documentation for basf2 variables with a very similar syntax to 
 
   .. rst:role:: regex-filter
 
-     Can be used to filter the selected variables by a pyton
+     Can be used to filter the selected variables by a python
      :py:mod:`regular expression <re>` For example to show all variables in
      the group "Kinematics" which begin with x
 
@@ -416,10 +416,36 @@ How to test locally
 You can test locally your changes in the Sphinx documentation by compiling your
 code with the following command:
 
-::
+.. code:: bash
 
     scons --sphinx html
 
 The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
 navigate it with your favorite browser to check if the output is what you
 expect.
+
+If you are working on a remote server with port `8XXXX`` forwarded to your local
+machine (as when running a Jupyter notebook), you can also start a tiny web server on
+the remote machine and access it from your local machine:
+
+.. code:: bash
+
+    # log in to remote with port forwarding
+    # (8XXX is a unique number of your choice)
+    ssh login.cc.kek.jp -L 8XXX:localhost:8XXX
+    # set up basf2
+    cd ${BELLE2_LOCAL_DIR}/build/html
+    python3 -m http.server 8XXX
+
+Now navigate to ``http://0.0.0.0:8XXX`` on your local machine to see the rendered
+web pages.
+
+Previewing documentation changes in a pull request
+--------------------------------------------------
+
+1. Open your PR
+2. Wait for it to build
+3. click on the build status and open the detailed build results
+4. open the "Artifacts" tab
+5. click "Sphinx Documentation"
+

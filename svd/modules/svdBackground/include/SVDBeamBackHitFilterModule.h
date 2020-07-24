@@ -12,7 +12,6 @@
 #define SVDBeamBackHitFilterModule_H
 
 #include <framework/core/Module.h>
-#include <simulation/dataobjects/BeamBackHit.h>
 
 namespace Belle2 {
   namespace SVD {

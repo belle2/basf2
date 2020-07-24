@@ -1,4 +1,4 @@
-/***************************************************************************
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  *************************************************************************/
-#ifndef DataWriterModule_H
-#define DataWriterModule_H
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -16,7 +16,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KlId.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -258,5 +257,3 @@ namespace Belle2 {
 
   }; // end class
 } // end namespace Belle2
-
-#endif

@@ -1,4 +1,4 @@
-#!/usr/bin/env/python3
+#!/usr/bin/env python3
 # -*-coding: utf-8-*-
 
 """
@@ -18,7 +18,7 @@ path = b2.Path()
 
 ma.inputMdst('default', '../SLUntagged.udst.root', path=path)
 
-ma.cutAndCopyLists('B+:all', ['B+:SL0', 'B+:SL1', 'B+:SL2', 'B+:SL3'], '', path=path)
+ma.cutAndCopyLists('B+:all', ['B+:SLUntagged_0', 'B+:SLUntagged_1', 'B+:SLUntagged_2', 'B+:SLUntagged_3'], '', path=path)
 
 ma.buildRestOfEvent('B+:all', path=path)
 ma.appendROEMask('B+:all', 'basic',

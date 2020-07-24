@@ -734,7 +734,7 @@ void CDCGeometryPar::setWirPosMisalignParams()
 
 
 // Read x-t params.
-void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
+void CDCGeometryPar::readXT(const GearDir& gbxParams, const int mode)
 {
   if (m_xtFileFormat == 0) {
     //    oldReadXT(gbxParams, mode);
@@ -745,7 +745,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
 
 
 // Read x-t params. (new)
-void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
+void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
 {
   m_linearInterpolationOfXT = true;  //must be true now
 
@@ -879,7 +879,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
 
 
 // Read space resol. params.
-void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
+void CDCGeometryPar::readSigma(const GearDir& gbxParams, const int mode)
 {
   if (m_sigmaFileFormat == 0) {
     //    oldReadSigma(gbxParams, mode);
@@ -888,7 +888,7 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
   }
 }
 
-void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
+void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
 {
   m_linearInterpolationOfSgm = true; //must be true now
 
@@ -995,7 +995,7 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
 
 
 // Read fudge factors
-void CDCGeometryPar::readFFactor(const GearDir gbxParams, const int mode)
+void CDCGeometryPar::readFFactor(const GearDir& gbxParams, const int mode)
 {
   std::string fileName0 = CDCGeoControlPar::getInstance().getFFactorFile();
   if (mode == 1) {
@@ -1007,7 +1007,7 @@ void CDCGeometryPar::readFFactor(const GearDir gbxParams, const int mode)
 
 
 // Read propagation speed param.
-void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
+void CDCGeometryPar::readPropSpeed(const GearDir& gbxParams, const int mode)
 {
   std::string fileName0 = CDCGeoControlPar::getInstance().getPropSpeedFile();
   if (mode == 1) {
@@ -1075,7 +1075,7 @@ void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
 
 
 // Read t0 params.
-void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
+void CDCGeometryPar::readT0(const GearDir& gbxParams, int mode)
 {
   std::string fileName0 = CDCGeoControlPar::getInstance().getT0File();
   if (mode == 1) {
@@ -1152,7 +1152,7 @@ void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
 
 
 // Read time-walk parameters
-void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
+void CDCGeometryPar::readTW(const GearDir& gbxParams, const int mode)
 {
   std::string fileName0 = CDCGeoControlPar::getInstance().getTwFile();
   if (mode == 1) {
@@ -1222,7 +1222,7 @@ void CDCGeometryPar::readChMap()
 
 
 // Read edep-to-adc
-void CDCGeometryPar::readEDepToADC(const GearDir gbxParams, const int mode)
+void CDCGeometryPar::readEDepToADC(const GearDir& gbxParams, const int mode)
 {
   //  B2WARNING("CDCGeometryPar: readEDepToADC is not ready!");
   std::string fileName0 = CDCGeoControlPar::getInstance().getEDepToADCFile();
@@ -2350,7 +2350,7 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
 
     //    double minTime0 = minTime;
     //higher-order corr. using Newton method; trial to minimize x^2
-    double  edm = 10.;   //(cm)
+    double  edm; //  = 10.;   //(cm)  (SG: fix to avoid cpp-check warning)
     //      const double epsi4t = 0.01; //(ns)
     //    const double epsi4x = 1.e-5; //(cm)
     const double epsi4x = 5.e-6; //(cm)

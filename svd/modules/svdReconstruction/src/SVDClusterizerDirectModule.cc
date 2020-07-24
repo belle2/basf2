@@ -10,7 +10,6 @@
 
 #include <svd/modules/svdReconstruction/SVDClusterizerDirectModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
@@ -278,6 +277,7 @@ void SVDClusterizerDirectModule::event()
 
       // If the strip is not masked away, save normalized samples (sample/stripNoise)
       apvSamples normedSamples;
+      // cppcheck-suppress knownConditionTrueFalse
       if (validDigit) {
         auto samples = digit.getSamples();
         transform(samples.begin(), samples.end(), normedSamples.begin(),

@@ -11,10 +11,8 @@
 #include <trg/klm/modules/klmtrigger/KLMTriggerModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // event data
 #include <framework/dataobjects/EventMetaData.h>
@@ -259,6 +257,7 @@ void KLMTriggerModule::calcChisq()
 
     // calculate chisq
     int denom = sumXX * nHits - sumX * sumX;
+    /* cppcheck-suppress variableScope */
     double denomInversed = 0.0;
     double slopeXY = 0.0;
     double interceptXY = 0.0;

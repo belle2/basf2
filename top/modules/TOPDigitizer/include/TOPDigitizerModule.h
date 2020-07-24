@@ -34,7 +34,6 @@
 #include <top/dbobjects/TOPCalTimeWalk.h>
 
 #include <top/modules/TOPDigitizer/PulseHeightGenerator.h>
-#include <string>
 
 
 namespace Belle2 {

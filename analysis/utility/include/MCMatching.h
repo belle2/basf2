@@ -163,7 +163,7 @@ namespace Belle2 {
     /**
      * Returns flags of daughters of given particle.
      *
-     * @param particle
+     * @param daughter
      * @param mcParticle
      * @return flags of daughters of given particle
      */
@@ -174,7 +174,7 @@ namespace Belle2 {
      * Special treatment for brems is done.
      * @param daughter
      * @param mcParticle (this is MC mother of daughter)
-     * @param vector of MC (n*grand-)daughters
+     * @param genParts vector of MC (n*grand-)daughters
      * @return flags of given daughter
      */
     static int getFlagsOfBremsPhotonDaughter(const Particle* daughter, const MCParticle* mcParticle,

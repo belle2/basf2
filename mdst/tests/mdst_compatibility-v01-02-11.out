@@ -822,7 +822,7 @@ TrackFitResult#4:
   getTransverseMomentum(): 0.238067
   getZ0(): 0.0341534
 TrackFitResult#5:
-  get4Momentum(): (0.66296,-0.0812781,0.0151493,0.682518)
+  get4Momentum(): (0.66296,-0.0812781,0.0151493,0.682519)
   getChargeSign(): -1
   getCotTheta(): 0.0226812
   getCov(): size(15)
@@ -855,7 +855,7 @@ TrackFitResult#5:
     -3.408523e-07 -2.847148e-06 -9.239512e-09  4.655149e-08  1.481085e-06  1.569881e-09 
     -1.770077e-10 -1.473407e-09 -3.107470e-06 -7.439113e-09  1.569881e-09  1.566125e-06 
   getD0(): 0.00368576
-  getEnergy(): 0.682518
+  getEnergy(): 0.682519
   getHitPatternCDC(): 0011110011111111111111111111111111101111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.66296,-0.0812781,0.0151493)
@@ -3207,7 +3207,7 @@ TrackFitResult#49:
   getTransverseMomentum(): 0.17529
   getZ0(): 1.73574
 TrackFitResult#50:
-  get4Momentum(): (0.10508,0.15984,0.30132,0.383228)
+  get4Momentum(): (0.10508,0.15984,0.30132,0.383229)
   getChargeSign(): -1
   getCotTheta(): 1.57522
   getCov(): size(15)
@@ -3240,7 +3240,7 @@ TrackFitResult#50:
      2.322356e-06 -1.017919e-07  6.111410e-06  6.942332e-08  6.049773e-07  2.869317e-07 
     -1.154895e-07  5.962607e-08 -2.800302e-06  1.923843e-07  2.869317e-07  9.297665e-07 
   getD0(): 0.830273
-  getEnergy(): 0.383228
+  getEnergy(): 0.383229
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.10508,0.15984,0.30132)
@@ -3419,7 +3419,7 @@ TrackFitResult#53:
   getTransverseMomentum(): 0.192549
   getZ0(): 1.73499
 TrackFitResult#54:
-  get4Momentum(): (0.10508,0.15984,0.30132,0.383228)
+  get4Momentum(): (0.10508,0.15984,0.30132,0.383229)
   getChargeSign(): -1
   getCotTheta(): 1.57522
   getCov(): size(15)
@@ -3452,7 +3452,7 @@ TrackFitResult#54:
      2.322356e-06 -1.017920e-07  6.111410e-06  6.942333e-08  6.049773e-07  2.869317e-07 
     -1.154895e-07  5.962607e-08 -2.800302e-06  1.923844e-07  2.869317e-07  9.297665e-07 
   getD0(): 0.830273
-  getEnergy(): 0.383228
+  getEnergy(): 0.383229
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.10508,0.15984,0.30132)
@@ -6444,7 +6444,7 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-204.037,-71.088,24.7)
-  getEnergy(): 0.814644
+  getEnergy(): 0.814642
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -6460,7 +6460,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 3
-  getMomentum(): (-0.605149,-0.210838,0.0732572,0.814644)
+  getMomentum(): (-0.605149,-0.210838,0.0732572,0.814642)
   getMomentumMag(): 0.645
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)
@@ -6472,7 +6472,7 @@ KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (212.836,56.2027,167.3)
-  getEnergy(): 0.814644
+  getEnergy(): 0.814642
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -6488,7 +6488,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 2
   getLayers(): 2
-  getMomentum(): (0.496506,0.13111,0.390279,0.814644)
+  getMomentum(): (0.496506,0.13111,0.390279,0.814642)
   getMomentumMag(): 0.645
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)
@@ -11657,7 +11657,7 @@ TrackFitResult#26:
   getTransverseMomentum(): 0.177326
   getZ0(): 31.5066
 TrackFitResult#27:
-  get4Momentum(): (-0.138763,-0.26251,0.050116,0.3319)
+  get4Momentum(): (-0.138763,-0.26251,0.050116,0.331901)
   getChargeSign(): -1
   getCotTheta(): 0.168781
   getCov(): size(15)
@@ -11690,7 +11690,7 @@ TrackFitResult#27:
      1.165808e-04  1.203938e-04 -5.070708e-05 -2.858429e-06  1.901150e-06  7.032026e-07 
      3.572025e-06  4.037607e-06 -1.911718e-04  2.459373e-07  7.032026e-07  4.929268e-06 
   getD0(): 13.9894
-  getEnergy(): 0.3319
+  getEnergy(): 0.331901
   getHitPatternCDC(): 0101111011111111111111111111111111111111111111011111111111111111
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.138763,-0.26251,0.050116)
@@ -12028,7 +12028,7 @@ TrackFitResult#33:
   getTransverseMomentum(): 0.159823
   getZ0(): 0.488098
 TrackFitResult#34:
-  get4Momentum(): (0.217932,0.0406896,-0.021139,0.262824)
+  get4Momentum(): (0.217932,0.0406896,-0.021139,0.262825)
   getChargeSign(): 1
   getCotTheta(): -0.0953506
   getCov(): size(15)
@@ -12061,7 +12061,7 @@ TrackFitResult#34:
      1.665567e-06 -4.487246e-06 -1.712044e-07  8.544887e-06  2.580231e-06 -8.255529e-07 
      3.340173e-07 -8.158824e-07 -6.216515e-06 -5.579378e-06 -8.255529e-07  1.870052e-06 
   getD0(): 0.18634
-  getEnergy(): 0.262824
+  getEnergy(): 0.262825
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000001010101010100010001
   getMomentum(): (0.217932,0.0406896,-0.021139)
@@ -12399,7 +12399,7 @@ TrackFitResult#40:
   getTransverseMomentum(): 1.03989
   getZ0(): 0.0190282
 TrackFitResult#41:
-  get4Momentum(): (0.0579933,0.0447517,0.0412849,0.162942)
+  get4Momentum(): (0.0579933,0.0447517,0.0412849,0.162943)
   getChargeSign(): -1
   getCotTheta(): 0.563597
   getCov(): size(15)
@@ -12432,7 +12432,7 @@ TrackFitResult#41:
      5.805114e-04 -2.886362e-03 -7.351892e-04  7.856905e-05  1.837868e-04  7.785171e-05 
      4.815570e-04 -1.396877e-03 -9.546341e-04  4.309062e-05  7.785171e-05  1.048235e-04 
   getD0(): -0.979502
-  getEnergy(): 0.162942
+  getEnergy(): 0.162943
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0579933,0.0447517,0.0412849)
@@ -20183,7 +20183,7 @@ TrackFitResult#10:
   getTransverseMomentum(): 0.216791
   getZ0(): 0.00585604
 TrackFitResult#11:
-  get4Momentum(): (0.554238,0.0530046,0.165179,0.597288)
+  get4Momentum(): (0.554238,0.0530046,0.165179,0.597289)
   getChargeSign(): 1
   getCotTheta(): 0.296676
   getCov(): size(15)
@@ -20216,7 +20216,7 @@ TrackFitResult#11:
      2.534248e-07 -2.571750e-06  1.280736e-07 -4.814651e-08  1.198409e-06 -1.108541e-08 
     -5.350353e-09  5.561606e-08 -2.517328e-06 -6.289584e-08 -1.108541e-08  1.149310e-06 
   getD0(): 0.00345961
-  getEnergy(): 0.597288
+  getEnergy(): 0.597289
   getHitPatternCDC(): 0011011011111111111111111111111111111111110111100111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.554238,0.0530046,0.165179)
@@ -21879,7 +21879,7 @@ TrackFitResult#42:
   getTransverseMomentum(): 0.0817248
   getZ0(): -1.92086
 TrackFitResult#43:
-  get4Momentum(): (0.159509,0.122028,-0.0685073,0.253982)
+  get4Momentum(): (0.159509,0.122028,-0.0685073,0.253983)
   getChargeSign(): -1
   getCotTheta(): -0.341115
   getCov(): size(15)
@@ -21912,7 +21912,7 @@ TrackFitResult#43:
      1.444427e-05 -1.111687e-05 -6.246107e-06 -1.930293e-06  3.261767e-06  8.411041e-07 
      8.403198e-08 -5.862783e-08 -2.161187e-05  1.058592e-06  8.411041e-07  4.199212e-06 
   getD0(): 0.251741
-  getEnergy(): 0.253982
+  getEnergy(): 0.253983
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.159509,0.122028,-0.0685073)
@@ -22091,7 +22091,7 @@ TrackFitResult#46:
   getTransverseMomentum(): 0.0817248
   getZ0(): -1.92086
 TrackFitResult#47:
-  get4Momentum(): (0.159509,0.122028,-0.0685073,0.253982)
+  get4Momentum(): (0.159509,0.122028,-0.0685073,0.253983)
   getChargeSign(): -1
   getCotTheta(): -0.341115
   getCov(): size(15)
@@ -22124,7 +22124,7 @@ TrackFitResult#47:
      1.444427e-05 -1.111687e-05 -6.246107e-06 -1.930293e-06  3.261767e-06  8.411041e-07 
      8.403198e-08 -5.862783e-08 -2.161187e-05  1.058592e-06  8.411041e-07  4.199212e-06 
   getD0(): 0.251741
-  getEnergy(): 0.253982
+  getEnergy(): 0.253983
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.159509,0.122028,-0.0685073)
@@ -24065,7 +24065,7 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (204.037,-23.088,200.3)
-  getEnergy(): 0.814644
+  getEnergy(): 0.814642
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -24081,7 +24081,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 2
-  getMomentum(): (0.458786,-0.0519143,0.450383,0.814644)
+  getMomentum(): (0.458786,-0.0519143,0.450383,0.814642)
   getMomentumMag(): 0.645
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)
@@ -24093,7 +24093,7 @@ KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-78.9,-163.5,283.9)
-  getEnergy(): 0.497614
+  getEnergy(): 0.497611
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -24109,7 +24109,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 1
-  getMomentum(): (-0,-0,0,0.497614)
+  getMomentum(): (-0,-0,0,0.497611)
   getMomentumMag(): 0
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DEDXCONSTANTS_H
-#define DEDXCONSTANTS_H
+#pragma once
 
 namespace Belle2 {
   namespace Dedx {
@@ -20,4 +19,3 @@ namespace Belle2 {
     enum Detector { c_PXD, c_SVD, c_CDC };
   }
 }
-#endif

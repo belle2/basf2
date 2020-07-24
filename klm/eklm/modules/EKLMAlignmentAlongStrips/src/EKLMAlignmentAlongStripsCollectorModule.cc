@@ -23,13 +23,15 @@ using namespace Belle2;
 REG_MODULE(EKLMAlignmentAlongStripsCollector)
 
 EKLMAlignmentAlongStripsCollectorModule::
-EKLMAlignmentAlongStripsCollectorModule() : CalibrationCollectorModule()
+EKLMAlignmentAlongStripsCollectorModule() :
+  CalibrationCollectorModule(),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_GeoDat(nullptr),
+  m_TransformData(nullptr),
+  m_Event(new EKLMAlignmentAlongStripsAlgorithm::Event)
 {
   setDescription("Module for EKLM alignment along strip (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_Event = new EKLMAlignmentAlongStripsAlgorithm::Event;
-  m_GeoDat = nullptr;
-  m_TransformData = nullptr;
 }
 
 EKLMAlignmentAlongStripsCollectorModule::
@@ -85,7 +87,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
   for (i = 0; i < n; i++) {
     if (m_KLMDigits[i]->getSubdetector() != KLMElementNumbers::c_EKLM)
       continue;
-    vol = m_GeoDat->stripNumber(
+    vol = m_ElementNumbers->stripNumber(
             m_KLMDigits[i]->getSection(), m_KLMDigits[i]->getLayer(),
             m_KLMDigits[i]->getSector(), m_KLMDigits[i]->getPlane(),
             m_KLMDigits[i]->getStrip());
@@ -111,7 +113,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
       hitGlobal.setY(hitPosition.Y() / Unit::mm * CLHEP::mm);
       hitGlobal.setZ(hitPosition.Z() / Unit::mm * CLHEP::mm);
       m_Event->stripGlobal = it2->first;
-      m_GeoDat->stripNumberToElementNumbers(
+      m_ElementNumbers->stripNumberToElementNumbers(
         m_Event->stripGlobal, &m_Event->section, &m_Event->layer,
         &m_Event->sector, &m_Event->plane, &m_Event->strip);
       tr = m_TransformData->getStripGlobalToLocal(
@@ -122,9 +124,9 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
       m_Event->distSiPM = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
       m_Event->distFarEnd = 0.5 * l + hitLocal.x() / CLHEP::mm * Unit::mm;
       m_Event->segmentGlobal =
-        m_GeoDat->segmentNumber(
+        m_ElementNumbers->segmentNumber(
           m_Event->section, m_Event->layer, m_Event->sector, m_Event->plane,
-          (m_Event->strip - 1) / m_GeoDat->getNStripsSegment() + 1);
+          (m_Event->strip - 1) / m_ElementNumbers->getNStripsSegment() + 1);
       calibrationData->Fill();
     }
   }

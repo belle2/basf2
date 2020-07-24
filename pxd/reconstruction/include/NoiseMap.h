@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_NOISEMAP_H
-#define PXD_NOISEMAP_H
+#pragma once
 
 #include <pxd/reconstruction/Pixel.h>
 
@@ -62,5 +61,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif //PXD_NOISEMAP_H

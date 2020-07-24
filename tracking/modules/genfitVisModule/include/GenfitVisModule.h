@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2013 - Belle II Collaboration                             *
@@ -9,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GenfitVisModule_H
-#define GenfitVisModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include "genfit/EventDisplay.h"
@@ -20,8 +18,6 @@ namespace Belle2 {
 
   /**
    * Visualize genfit::Tracks using the genfit::EventDisplay.
-   *
-   *    *
    */
   class GenfitVisModule : public Module {
 
@@ -54,5 +50,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* GenfitVisModule_H */

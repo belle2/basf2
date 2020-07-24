@@ -124,10 +124,10 @@ namespace Belle2 {
      *  Use this if you want to create relate objects in this array to objects in 'toArray'.
      *  Must be called in the initialization phase.
      *
-     * @param toArray    Array the relation should point to (from this PyStoreArray)
-     * @param durability Durability of the relation.
-     * @param storeFlags ORed combination of DataStore::EStoreFlags
-     * @param Additional name for the relation, or "" for the default naming
+     * @param toArray        Array the relation should point to (from this PyStoreArray)
+     * @param durability     Durability of the relation.
+     * @param storeFlags     ORed combination of DataStore::EStoreFlags
+     * @param namedRelation  Additional name for the relation, or "" for the default naming
      */
     bool registerRelationTo(const PyStoreArray& toArray,
                             DataStore::EDurability durability = DataStore::EDurability::c_Event,
@@ -140,6 +140,7 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this PyStoreArray)
      * @param durability Durability of the relation.
+     * @param namedRelation Name of the relation in case it's not the default name
      * @return           True if the relations exists.
      */
     bool requireRelationTo(const PyStoreArray& toArray,
@@ -153,6 +154,7 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this PyStoreArray)
      * @param durability Durability of the relation.
+     * @param namedRelation Name of the relation in case it's not the default name
      * @return           True if the relations exists.
      */
     bool optionalRelationTo(const PyStoreArray& toArray,

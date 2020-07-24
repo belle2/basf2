@@ -103,6 +103,9 @@ namespace Belle2 {
       /** Geometry data. */
       const GeometryData* m_GeoDat;
 
+      /** Element numbers. */
+      const EKLMElementNumbers* m_ElementNumbers;
+
       /** Sector support edge: corner 1 line. */
       LineSegment2D* m_LineCorner1;
 

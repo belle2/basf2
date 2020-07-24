@@ -11,6 +11,7 @@ namespace Belle2 {
   namespace Utils {
 
     /** Helper struct for the C++17 std::visit overload pattern to allow simple use of variants */
+    // cppcheck-suppress syntaxError ; apparently this confuses cppcheck
     template<class... Ts> struct VisitOverload : Ts... { using Ts::operator()...; };
     /** Function for the C++17 std::visit overload pattern to allow simple use of variants */
     template<class... Ts> VisitOverload(Ts...) -> VisitOverload<Ts...>;

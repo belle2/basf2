@@ -50,25 +50,37 @@ namespace Belle2 {
      * Get hit global position x coordinate.
      * @return Hit x coordinate.
      */
-    float getPositionX() const;
+    float getPositionX() const
+    {
+      return m_globalX;
+    }
 
     /**
      * Get hit global position y coordinate.
      * @return Hit y coordinate.
      */
-    float getPositionY() const;
+    float getPositionY() const
+    {
+      return m_globalY;
+    }
 
     /**
      * Get hit global position z coordinate.
      * @return Hit z coordinate.
      */
-    float getPositionZ() const;
+    float getPositionZ() const
+    {
+      return m_globalZ;
+    }
 
     /**
      * Get hit global position.
      * @return Hit coordinates.
      */
-    TVector3 getPosition() const;
+    TVector3 getPosition() const
+    {
+      return TVector3(m_globalX, m_globalY, m_globalZ);
+    }
 
   protected:
 

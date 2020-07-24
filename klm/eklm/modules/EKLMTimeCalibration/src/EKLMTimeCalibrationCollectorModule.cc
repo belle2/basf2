@@ -26,16 +26,17 @@ using namespace Belle2;
 REG_MODULE(EKLMTimeCalibrationCollector)
 
 EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
-  CalibrationCollectorModule()
+  CalibrationCollectorModule(),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_TransformData(nullptr),
+  m_GeoDat(nullptr),
+  m_ev( {0, 0, 0}),
+      m_Strip(0)
 {
   setDescription("Module for EKLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("UseEventT0", m_UseEventT0, "Calibrate relatively to event T0.",
            false);
-  m_ev = {0, 0, 0};
-  m_Strip = 0;
-  m_TransformData = nullptr;
-  m_GeoDat = nullptr;
 }
 
 EKLMTimeCalibrationCollectorModule::~EKLMTimeCalibrationCollectorModule()
@@ -110,9 +111,10 @@ void EKLMTimeCalibrationCollectorModule::collect()
     for (j = 0; j < 2; j++) {
       entryHit[j] = nullptr;
       exitHit[j] = nullptr;
-      vol = m_GeoDat->stripNumber(digits[j]->getSection(), digits[j]->getLayer(),
-                                  digits[j]->getSector(), digits[j]->getPlane(),
-                                  digits[j]->getStrip());
+      vol = m_ElementNumbers->stripNumber(
+              digits[j]->getSection(), digits[j]->getLayer(),
+              digits[j]->getSector(), digits[j]->getPlane(),
+              digits[j]->getStrip());
       itLower = mapExtHit.lower_bound(vol);
       itUpper = mapExtHit.upper_bound(vol);
       for (it = itLower; it != itUpper; ++it) {
@@ -158,10 +160,10 @@ void EKLMTimeCalibrationCollectorModule::collect()
       m_ev.time = digits[j]->getTime() - hitTime;
       m_ev.dist = 0.5 * l - hitLocal.x() / CLHEP::mm * Unit::mm;
       m_ev.npe = digits[j]->getNPhotoelectrons();
-      m_Strip =
-        m_GeoDat->stripNumber(digits[j]->getSection(), digits[j]->getLayer(),
-                              digits[j]->getSector(), digits[j]->getPlane(),
-                              digits[j]->getStrip());
+      m_Strip = m_ElementNumbers->stripNumber(
+                  digits[j]->getSection(), digits[j]->getLayer(),
+                  digits[j]->getSector(), digits[j]->getPlane(),
+                  digits[j]->getStrip());
       calibrationData->Fill();
     }
   }

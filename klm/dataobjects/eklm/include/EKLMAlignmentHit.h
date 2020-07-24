@@ -35,7 +35,7 @@ namespace Belle2 {
 
     /**
      * Constructor.
-     * @param[in] digitIdentifier Digit identifier.
+     * @param[in] plane Plane number.
      */
     explicit EKLMAlignmentHit(int plane);
 
@@ -47,7 +47,10 @@ namespace Belle2 {
     /**
      * Get digit identifier.
      */
-    int getDigitIdentifier() const;
+    int getDigitIdentifier() const
+    {
+      return m_DigitIdentifier;
+    }
 
   private:
 

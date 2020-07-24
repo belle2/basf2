@@ -113,7 +113,7 @@ int TauDecayMarkerModule::getNumDaughterOfTau(int s, int id, int sign)
   if (s > 0) tauid = idOfTauPlus;
   int ret = 0;
   StoreArray<MCParticle> MCParticles;
-  MCParticle& p = *MCParticles[tauid - 1];
+  const MCParticle& p = *MCParticles[tauid - 1];
 
   if (id == 0) {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
@@ -147,7 +147,7 @@ int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign
   if (s > 0) tauid = idOfTauPlus;
   int ret = 0;
   StoreArray<MCParticle> MCParticles;
-  MCParticle& p = *MCParticles[tauid - 1];
+  const MCParticle& p = *MCParticles[tauid - 1];
 
   if (id == 0) {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {

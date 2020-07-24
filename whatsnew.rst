@@ -12,19 +12,69 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-05
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-05-00.txt
+
 Changes since release-04
 ========================
 
 .. important changes should go here. Especially things that break backwards
       compatibility
 
-.. .. rubric:: Some important feature
+.. rubric:: Neutral hadrons from ECLClusters get momentum from the cluster energy
 
+Since ``release-04`` it has been possible to load ECLClusters under the neutral hadron hypothesis.
+Previously we assumed a mass when calculating the particle momentum, however this leads to problems when, for example, a :math:`K_L^0` deposits less than its mass energy in the ECL. This happens about 50% of the time.
+
+The momentum of neutral hadrons from the ECL is now set to the :b2:var:`clusterE`.
+
+.. rubric:: Bremsstrahlung correction
+
+The `BremsFinder` module has been developed to find relations between tracks
+and photons that are likely to have been emitted by these tracks via
+Bremsstrahlung. The matching quality figure of merit is based on the angular
+distance between the photon ECL cluster and the extrapolated hit position of
+the track at the ECL. The function `correctBrems` performs the actual
+correction. There is also a reimplementation of Belle's Bremsstrahlung
+correction approach of looking for photons in a cone around tracks
+(`correctBremsBelle`), which is recommended for ``b2bii`` analyses.
+
+.. warning:: While it is technically possible to perform a TreeFit after
+             applying Bremsstrahlung correction, the fit performance is unfortunately quite
+             bad. However, there is already an improvement in the pipeline that should fix
+             this issue. It will probably be available in one of the next light releases.
+
+.. rubric:: MC reconstruction and MC matching
+
+The :b2:mod:`ParticleCombinerFromMC` module and its corresponding wrapper
+function `reconstructMCDecay` should be used instead of `findMCDecay` to
+reconstruct decay modes based on MC information.
+
+The DecayStringGrammar has been extended with new exception markers for
+Bremsstrahlung, decay in flight, and misidentification.
+
+.. warning:: There are two known issues in the MC matching: Exceptions for the MC matching
+             of daughter particles are not propagated to the mother particle and some
+             photons produced by PHOTOS are misinterpreted as other radiated photons
+
+.. rubric:: Redefinition of angle variables
+
+The kinematic variables :b2:var:`decayAngle`, :b2:var:`daughterAngle` and
+:b2:var:`pointingAngle` now return the angle instead of its cosine.
+
+.. rubric:: Protection of ParticleLists and particle combinations
+
+It is no longer allowed to use the label ``"all"`` for a particle list if a
+cut is applied. Reconstructed decays need to preserve electric charge.
+However, this can be deactivated if you know what you are doing, e.g. in
+searches for New Physics.
 
 .. Detailed changes for the analysis package first, that's
    what user will want to see
 
-.. include:: analysis/doc/whatsnew-since/release-04-01.txt
+.. include:: analysis/doc/whatsnew-since/release-04-02.txt
 
 .. include:: analysis/doc/whatsnew-since/release-04-00.txt
 
@@ -32,6 +82,10 @@ Changes since release-04
    move it directly in here
 
 .. include:: framework/doc/whatsnew-since/release-04-00.txt
+
+.. Changes for decfiles package
+
+.. include:: decfiles/doc/whatsnew-since/release-04-02.txt
 
 .. Changes for b2bii here.
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALIGNMENT_MILLEPEDETREECONVERSIONALGORITHM_H
-#define ALIGNMENT_MILLEPEDETREECONVERSIONALGORITHM_H
+#pragma once
 
 #include <calibration/CalibrationAlgorithm.h>
 
@@ -52,6 +51,4 @@ namespace Belle2 {
   };
 
 }
-
-#endif
 

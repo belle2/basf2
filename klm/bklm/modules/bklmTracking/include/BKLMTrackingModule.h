@@ -37,22 +37,22 @@ namespace Belle2 {
     BKLMTrackingModule();
 
     //! Destructor
-    virtual ~BKLMTrackingModule();
+    ~BKLMTrackingModule();
 
     //! Initialize at start of job
-    virtual void initialize() override;
+    void initialize() override;
 
     //! begin run stuff
-    virtual void beginRun() override;
+    void beginRun() override;
 
     //! Unpack one event and create digits
-    virtual void event() override;
+    void event() override;
 
     //! end run stuff
-    virtual void endRun() override;
+    void endRun() override;
 
     //! Terminate at the end of job
-    virtual void terminate() override;
+    void terminate() override;
 
     //! Judge if two hits come from the same sector
     bool sameSector(BKLMHit2d* hit1, BKLMHit2d* hit2);
@@ -81,7 +81,7 @@ namespace Belle2 {
   private:
 
     //! bklm GeometryPar
-    bklm::GeometryPar*   m_GeoPar = NULL;
+    bklm::GeometryPar* m_GeoPar = nullptr;
 
     //! TFile that store efficieny plots
     TFile* m_file = nullptr;

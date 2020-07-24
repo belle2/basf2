@@ -1545,7 +1545,7 @@ void EVEVisualization::addEKLMHit2d(const EKLMHit2d* eklm2dhit)
 
 void EVEVisualization::addROI(const ROIid* roi)
 {
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   VxdID sensorID = roi->getSensorID();
   const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensorID);
@@ -1673,7 +1673,7 @@ void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
   }
 }
 
-void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
+void EVEVisualization::addCDCTriggerSegmentHit(const std::string& collectionName, const CDCTriggerSegmentHit* hit)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   TEveStraightLineSet* shape = new TEveStraightLineSet();
@@ -1760,7 +1760,7 @@ void EVEVisualization::addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit)
   shape->SetTitle(ObjectInfo::getTitle(hit) +
                   TString::Format("\nPriority: %d\nLeft/Right: %d",
                                   hit->getPriorityPosition(), hit->getLeftRight()));
-  addToGroup("CDCTriggerSegmentHits", shape);
+  addToGroup(collectionName, shape);
   addObject(hit, shape);
 }
 

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2015-2020 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric, Anze Zupanc, Thomas Keck                   *
+ * Contributors: Marko Staric, Anze Zupanc, Thomas Keck, Sam Cunliffe     *
  *       for the EventKinematics variables: Ami Rostomyan,                *
  *                                          Michel Villanueva             *
  *                                                                        *
@@ -197,6 +197,35 @@ namespace Belle2 {
     {
       PCmsLabTransform T;
       return (T.getBeamFourMomentum()).E();
+    }
+
+    double getGenIPX(const Particle*)
+    {
+      // generated IP corresponds to the generated vertex of the
+      // first not-initial and not-virtual MCParticle
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().X();
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double getGenIPY(const Particle*)
+    {
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().Y();
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    double getGenIPZ(const Particle*)
+    {
+      StoreArray<MCParticle> mcps;
+      for (const auto& mcp : mcps)
+        if (not mcp.isInitial() and not mcp.isVirtual() and mcp.isPrimaryParticle())
+          return mcp.getVertex().Z();
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     double getIPX(const Particle*)
@@ -500,11 +529,25 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
     REGISTER_VARIABLE("beamPy", getBeamPy, "[Eventbased] Beam momentum Py (lab)");
     REGISTER_VARIABLE("beamPz", getBeamPz, "[Eventbased] Beam momentum Pz (lab)");
 
-    REGISTER_VARIABLE("IPX", getIPX, "[Eventbased] x coordinate of the IP");
-    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the IP");
-    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the IP");
+    REGISTER_VARIABLE("IPX", getIPX, R"DOC(
+[Eventbased] x coordinate of the measured interaction point.
 
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the IP covariance matrix")
+.. note:: For old data and uncalibrated MC files this will return 0.0.
+
+.. note:: You might hear tracking and calibration people refer to this as the ``BeamSpot``.
+)DOC");
+    REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the measured interaction point");
+    REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the measured interaction point");
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point")
+
+    REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
+[Eventbased] x coordinate of the interaction point used for the underlying **MC generation**.
+Returns NAN for data.
+
+.. note:: This is normally smeared from 0.0
+)DOC");
+    REGISTER_VARIABLE("genIPY", getGenIPY, "[Eventbased] y coordinate of the interaction point used for the underlying **MC generation**.");
+    REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] z coordinate of the interaction point used for the underlying **MC generation**.");
 
     REGISTER_VARIABLE("date", eventYearMonthDay,
                       "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"

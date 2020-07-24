@@ -11,7 +11,6 @@
 #pragma once
 
 #include <calibration/CalibrationAlgorithm.h>
-#include <TH1.h>
 
 namespace Belle2 {
 
@@ -21,7 +20,7 @@ namespace Belle2 {
   public:
 
     /** Constructor  */
-    SVDCrossTalkCalibrationsAlgorithm(const std::string str);
+    explicit SVDCrossTalkCalibrationsAlgorithm(const std::string& str);
 
     /** Destructor */
     virtual ~SVDCrossTalkCalibrationsAlgorithm() {}

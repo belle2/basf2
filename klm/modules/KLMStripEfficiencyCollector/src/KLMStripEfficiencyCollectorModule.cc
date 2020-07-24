@@ -12,9 +12,6 @@
 #include <klm/modules/KLMStripEfficiencyCollector/KLMStripEfficiencyCollectorModule.h>
 #include <klm/dataobjects/KLMChannelIndex.h>
 
-/* ROOT headers. */
-#include <TH1F.h>
-
 /* CLHEP headers. */
 #include <CLHEP/Vector/ThreeVector.h>
 
@@ -24,10 +21,14 @@ REG_MODULE(KLMStripEfficiencyCollector)
 
 KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   CalibrationCollectorModule(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_GeometryBKLM(nullptr),
+  m_PlaneArrayIndex(&(KLMPlaneArrayIndex::Instance())),
   m_MatchingFile(nullptr),
   m_MatchingTree(nullptr),
-  m_MatchedStrip(0)
+  m_MatchingHitData( {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr}),
+                   m_MatchedStrip(0)
 {
   setDescription("Module for KLM strip efficiency data collection.");
   addParam("MuonListName", m_MuonListName, "Muon list name.",
@@ -47,10 +48,6 @@ KLMStripEfficiencyCollectorModule::KLMStripEfficiencyCollectorModule() :
   addParam("Debug", m_Debug, "Debug mode.", false);
   addParam("DebugFileName", m_MatchingFileName, "Debug file name.", std::string("matching.root"));
   setPropertyFlags(c_ParallelProcessingCertified);
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
-  m_PlaneArrayIndex = &(KLMPlaneArrayIndex::Instance());
-  m_MatchingHitData = {0, 0, 0, 0, 0, 0, 0., nullptr, nullptr};
 }
 
 KLMStripEfficiencyCollectorModule::~KLMStripEfficiencyCollectorModule()
@@ -157,9 +154,18 @@ void KLMStripEfficiencyCollectorModule::collect()
 {
   std::vector<unsigned int> toRemove;
   unsigned int nMuons = m_MuonList->getListSize();
+  /*
+   * The getter functions create the object for particular experiment and run.
+   * It is not guaranteed that collectDataTrack() is called if there are
+   * no tracks (e.g. for too short or bad runs). Thus, they are called here
+   * to guarantee the creation of histograms.
+   */
+  TH1F* matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
+  TH1F* allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
   for (unsigned int i = 0; i < nMuons; ++i) {
     const Particle* muon = m_MuonList->getParticle(i);
-    bool trackUsed = collectDataTrack(muon);
+    bool trackUsed = collectDataTrack(muon, matchedDigitsInPlane,
+                                      allExtHitsInPlane);
     if (m_RemoveUnusedMuons && !trackUsed)
       toRemove.push_back(muon->getArrayIndex());
   }
@@ -200,13 +206,12 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
   }
 }
 
-bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
+bool KLMStripEfficiencyCollectorModule::collectDataTrack(
+  const Particle* muon, TH1F* matchedDigitsInPlane, TH1F* allExtHitsInPlane)
 {
   const int nExtrapolationLayers =
     KLMElementNumbers::getMaximalExtrapolationLayer();
   const Track* track = muon->getTrack();
-  TH1F* matchedDigitsInPlane = getObjectPtr<TH1F>("matchedDigitsInPlane");
-  TH1F* allExtHitsInPlane = getObjectPtr<TH1F>("allExtHitsInPlane");
   RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
   std::map<uint16_t, struct HitData> selectedHits;
   std::map<uint16_t, struct HitData>::iterator it;
@@ -234,7 +239,7 @@ bool KLMStripEfficiencyCollectorModule::collectDataTrack(const Particle* muon)
     if (hit.getDetectorID() == Const::EDetector::EKLM) {
       int stripGlobal = hit.getCopyID();
       hitData.subdetector = KLMElementNumbers::c_EKLM;
-      m_ElementNumbersEKLM->stripNumberToElementNumbers(
+      m_eklmElementNumbers->stripNumberToElementNumbers(
         stripGlobal, &hitData.section, &hitData.layer, &hitData.sector,
         &hitData.plane, &hitData.strip);
       channel = m_ElementNumbers->channelNumberEKLM(

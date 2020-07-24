@@ -9,7 +9,16 @@
  **************************************************************************/
 
 #include <svd/modules/svdCrossTalkCalibrationsCollector/SVDCrossTalkCalibrationsCollectorModule.h>
+
+#include <svd/modules/svdCrossTalkFinder/SVDCrossTalkFinderHelperFunctions.h>
+
+#include <vxd/geometry/GeoCache.h>
+
+#include <TH1F.h>
+
 #include <iostream>
+
+
 using namespace std;
 using namespace Belle2;
 
@@ -93,7 +102,6 @@ void SVDCrossTalkCalibrationsCollectorModule::collect()
   vector<std::string> clusterStrips_uSide ;
   vector<std::string> clusterStrips_vSide ;
   vector<std::string> clusterChips_uSide ;
-  vector<std::string> clusterChips_vSide ;
   vector<int> strips_uSide;
   vector<int> strips_vSide;
 

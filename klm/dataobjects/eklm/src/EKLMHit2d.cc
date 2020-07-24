@@ -16,33 +16,22 @@
 
 using namespace Belle2;
 
-EKLMHit2d::EKLMHit2d()
+EKLMHit2d::EKLMHit2d() :
+  m_ChiSq(-1)
 {
-  m_ChiSq = -1;
 }
 
 
-EKLMHit2d::EKLMHit2d(KLMDigit* s1)
+EKLMHit2d::EKLMHit2d(KLMDigit* s1) :
+  m_ChiSq(-1)
 {
   if (s1->getSubdetector() != KLMElementNumbers::c_EKLM)
     B2FATAL("Trying to construct a EKLMHit2d using KLMDigits from BKLM.");
   setSection(s1->getSection());
   setLayer(s1->getLayer());
   setSector(s1->getSector());
-  m_ChiSq = -1;
 }
 
 EKLMHit2d::~EKLMHit2d()
 {
 }
-
-float EKLMHit2d::getChiSq() const
-{
-  return m_ChiSq;
-}
-
-void EKLMHit2d::setChiSq(float chisq)
-{
-  m_ChiSq = chisq;
-}
-

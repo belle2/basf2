@@ -61,7 +61,7 @@ void PhysicsObjectsDQMModule::initialize()
   REG_HISTOGRAM
 
   StoreObjPtr<SoftwareTriggerResult> result;
-  result.isRequired();
+  result.isOptional();
 }
 
 
@@ -87,13 +87,13 @@ void PhysicsObjectsDQMModule::event()
 {
   StoreObjPtr<SoftwareTriggerResult> result;
   if (!result.isValid()) {
-    B2ERROR("SoftwareTriggerResult object not available but needed to select events for the histograms.");
+    B2WARNING("SoftwareTriggerResult object not available but needed to select events for the histograms.");
     return;
   }
 
   const std::map<std::string, int>& results = result->getResults();
   if (results.find(m_triggerIdentifier) == results.end()) {
-    B2ERROR("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifier);
+    B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifier);
     return;
   }
 

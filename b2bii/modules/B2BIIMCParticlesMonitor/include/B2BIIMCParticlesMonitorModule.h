@@ -5,28 +5,33 @@
 // Contributors: Hulya Atmacan
 // Date : November 21, 2015
 //-
-#ifndef B2BIIMCPARTICLESMONITORMODULE_H
-#define B2BIIMCPARTICLESMONITORMODULE_H
+
+#pragma once
 
 #include <framework/core/HistoModule.h>        // <- Substitution of HistoModule.h
 #include "TH1F.h"
 
 namespace Belle2 {
 
+  /** Declaration of class B2BIIMCParticlesMonitor */
   class B2BIIMCParticlesMonitorModule : public HistoModule {  // <- derived from HistoModule class
 
   public:
 
-    /**    Constructor */
+    /** Constructor */
     B2BIIMCParticlesMonitorModule();
     /** Destructor */
     virtual ~B2BIIMCParticlesMonitorModule();
 
-    /** Module functions */
+    /** Initialize the module */
     virtual void initialize() override;
+    /** Called when a new run is started */
     virtual void beginRun() override;
+    /** Called for each event */
     virtual void event() override;
+    /** Called when the current run finished */
     virtual void endRun() override;
+    /** Terminates the module */
     virtual void terminate() override;
 
     /** function to define histograms */
@@ -49,4 +54,3 @@ namespace Belle2 {
 
   };
 }
-#endif

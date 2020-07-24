@@ -65,7 +65,7 @@ namespace Belle2 {
        * @param motherIndex mother index from MCParticle graph
        * @param useTime use MCParticle decay time (as given by the generator)
        */
-      void addParticle(MCParticle& mcParticle,
+      void addParticle(const MCParticle& mcParticle,
                        G4Event* event,
                        G4PrimaryParticle* lastG4Mother,
                        int motherIndex,

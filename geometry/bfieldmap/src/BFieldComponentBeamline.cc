@@ -27,23 +27,23 @@ namespace Belle2 {
   /** Triangle structure */
   struct triangle_t {
     /** 1st vertex index in a list of xy-points */
-    short int j0;
+    short int j0{0};
     /** 2nd vertex index in a list of xy-points */
-    short int j1;
+    short int j1{0};
     /** 3rd vertex index in a list of xy-points */
-    short int j2;
+    short int j2{0};
     /** 1st adjacent triangle in a list of triangles */
-    short int n0;
+    short int n0{0};
     /** 2nd adjacent triangle in a list of triangles */
-    short int n1;
+    short int n1{0};
     /** 3rd adjacent triangle in a list of triangles */
-    short int n2;
+    short int n2{0};
   };
 
   /** A simple 2d vector stucture */
   struct xy_t {
-    double x; /**< x component */
-    double y; /**< y component */
+    double x{0}; /**< x component */
+    double y{0}; /**< y component */
   };
 
   /**

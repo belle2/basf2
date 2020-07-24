@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_CLUSTERCANDIDATE_H
-#define PXD_CLUSTERCANDIDATE_H
+#pragma once
 
 #include <pxd/reconstruction/Pixel.h>
 #include <vector>
@@ -95,5 +94,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif //PXD_CLUSTERCANDIDATE_H

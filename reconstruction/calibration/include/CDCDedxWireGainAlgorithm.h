@@ -12,16 +12,9 @@
 
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <calibration/CalibrationAlgorithm.h>
-#include <cdc/dataobjects/WireID.h>
 #include <framework/database/DBObjPtr.h>
-#include <TH1D.h>
-#include <TLine.h>
-#include <TCanvas.h>
-#include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
-#include <TMath.h>
 
 namespace Belle2 {
   /**

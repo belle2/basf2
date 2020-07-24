@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <framework/logging/Logger.h>
 #include <vector>
 
 namespace Belle2 {
@@ -58,7 +57,7 @@ namespace Belle2 {
     /**
      * Useful constructor
      */
-    TOPAssociatedPDF(int PDG): m_PDG(PDG)
+    explicit TOPAssociatedPDF(int PDG): m_PDG(PDG)
     {}
 
     /**

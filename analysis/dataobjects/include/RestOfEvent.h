@@ -67,8 +67,8 @@ namespace Belle2 {
       /**
        * Default constructor.
        * All private members are set to 0 (all vectors are empty).
-       * @param name of mask
-       * @param origin of mask, for debug
+       * @param name name of mask
+       * @param origin origin of mask, for debug
        */
       Mask(const std::string& name = "", const std::string& origin = "unknown"): m_name(name),
         m_origin(origin)
@@ -93,7 +93,7 @@ namespace Belle2 {
       /**
        *  Add selected particles to the mask
        */
-      void addParticles(std::vector<const Particle*>& particles)
+      void addParticles(const std::vector<const Particle*>& particles)
       {
         if (isValid()) {
           B2INFO("Mask " + m_name + " originating from "  + m_origin + " is  valid, cannot write to it!");
@@ -179,7 +179,7 @@ namespace Belle2 {
     /**
      * Add StoreArray indices of given Particles to the list of unused particles in the event.
      *
-     * @param Reference to a vector of unused Particles
+     * @param particle Reference to a vector of unused Particles
      */
     void addParticles(const std::vector<const Particle*>& particle);
     /**
@@ -192,7 +192,9 @@ namespace Belle2 {
     /**
      * Converts ROE to Particle and adds it to StoreArray
      *
-     * @param Name of the ROE mask to use for 4-vector and daughters
+     * @param maskName Name of the ROE mask to use for 4-vector and daughters
+     * @param pdgCode PDG code
+     * @param isSelfConjugated is the particle self-conjugated
      */
     Particle* convertToParticle(const std::string& maskName = "", int pdgCode = 0, bool isSelfConjugated = true);
     /**
@@ -204,23 +206,23 @@ namespace Belle2 {
     }
     /**
      * Check if ROE has StoreArray index of given  to the list of unused tracks in the event.
-     * @param Pointer to the Particle
-     * @param Name of the mask to work with
+     * @param particle Pointer to the Particle
+     * @param maskName Name of the mask to work with
      */
     bool hasParticle(const Particle* particle, const std::string& maskName = "") const;
     /**
      * Initialize new mask
-     * @param Name of the mask to work with
-     * @param Name of the creator module
+     * @param name Name of the mask to work with
+     * @param origin origin of the creator module
      */
     void initializeMask(const std::string& name, const std::string& origin = "unknown");
     /**
      * Update mask with cuts
-     * @param Name of the mask to work with
-     * @param Cut on Track particles
-     * @param Cut on ECL particles
-     * @param Cut on KLM particles
-     * @param Update existing mask if true or not if false
+     * @param name Name of the mask to work with
+     * @param trackCut Cut on Track particles
+     * @param eclCut Cut on ECL particles
+     * @param klmCut Cut on KLM particles
+     * @param updateExisting Update existing mask if true or not if false
      */
     void updateMaskWithCuts(const std::string& name, const std::shared_ptr<Variable::Cut>& trackCut = nullptr,
                             const std::shared_ptr<Variable::Cut>& eclCut = nullptr, const std::shared_ptr<Variable::Cut>& klmCut = nullptr,
@@ -229,21 +231,21 @@ namespace Belle2 {
      * Update mask by keeping or excluding particles
      * @param Name of the mask to work with
      * @param Reference to particle collection
-     * @param ParticleType of the collection
+     * @param ParticleSourceObject of the collection
      * @param Update the ROE mask by passing or discarding particles in the provided particle list
      */
-    void excludeParticlesFromMask(const std::string& maskName, std::vector<const Particle*>& particles,
-                                  Particle::EParticleType listType,
+    void excludeParticlesFromMask(const std::string& maskName, const std::vector<const Particle*>& particles,
+                                  Particle::EParticleSourceObject listType,
                                   bool discard);
     /**
      * True if this ROE object has mask
-     * @param Name of the mask to work with
+     * @param name Name of the mask to work with
      */
     bool hasMask(const std::string& name) const;
     /**
      * Update mask with composite particle
-     * @param Name of the mask to work with
-     * @param Pointer to composite particle
+     * @param name Name of the mask to work with
+     * @param particleV0 Pointer to composite particle
      */
     void updateMaskWithV0(const std::string& name, const Particle* particleV0);
     /**
@@ -258,33 +260,33 @@ namespace Belle2 {
     /**
      * Get all Particles from ROE mask.
      *
-     * @param name of mask
-     * @param return daughters of composite particles
+     * @param maskName Name of mask
+     * @param unpackComposite return daughters of composite particles
      * @return vector of pointers to ROE Particles
      */
     std::vector<const Particle*> getParticles(const std::string& maskName = "", bool unpackComposite = true) const;
     /**
     * Get photons from ROE mask.
     *
-    * @param name of mask
-    * @param return daughters of composite particles
+    * @param maskName Name of mask
+    * @param unpackComposite return daughters of composite particles
     * @return vector of pointers to unused Particles
     */
     std::vector<const Particle*> getPhotons(const std::string& maskName = "", bool unpackComposite = true) const;
     /**
      * Get hadrons from ROE mask.
      *
-     * @param name of mask
-     * @param return daughters of composite particles
+     * @param maskName Name of mask
+     * @param unpackComposite return daughters of composite particles
      * @return vector of pointers to ROE Particles
      */
     std::vector<const Particle*> getHadrons(const std::string& maskName = "", bool unpackComposite = true) const;
     /**
     * Get charged particles from ROE mask.
     *
-    * @param name of mask
-    * @param absolute value of PDG code of charged particle
-    * @param return daughters of composite particles
+    * @param maskName Name of mask
+    * @param pdg absolute value of PDG code of charged particle
+    * @param unpackComposite return daughters of composite particles
     * @return vector of pointers to ROE Particles
     */
     std::vector<const Particle*> getChargedParticles(const std::string& maskName = "", unsigned int pdg = 0,
@@ -293,7 +295,7 @@ namespace Belle2 {
     /**
      * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return vector of pointers to unused Tracks
      */
     std::vector<const Track*> getTracks(const std::string& maskName = "") const;
@@ -301,7 +303,7 @@ namespace Belle2 {
     /**
      * Get vector of all (no mask) or a subset (use mask) of all ECLClusters in ROE.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return vector of pointers to unused ECLClusters
      */
     std::vector<const ECLCluster*> getECLClusters(const std::string& maskName = "") const;
@@ -309,7 +311,7 @@ namespace Belle2 {
     /**
      * Get vector of all unused KLMClusters.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return vector of pointers to unused KLMClusters
      */
     std::vector<const KLMCluster*> getKLMClusters(const std::string& maskName = "") const;
@@ -317,7 +319,7 @@ namespace Belle2 {
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks and ECLClusters in ROE.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
     TLorentzVector get4Vector(const std::string& maskName = "") const;
@@ -326,7 +328,7 @@ namespace Belle2 {
      * OBSOLETE:
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
     TLorentzVector get4VectorTracks(const std::string& maskName = "") const;
@@ -334,7 +336,7 @@ namespace Belle2 {
     /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all ECLClusters in ROE.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return 4-momentum of unused Tracks and ECLClusters in ROE
      */
     TLorentzVector get4VectorNeutralECLClusters(const std::string& maskName = "") const;
@@ -342,7 +344,7 @@ namespace Belle2 {
     /**
      * Get number of all (no mask) or a subset (use mask) of all Tracks in ROE.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return number of all remaining tracks
      */
     int getNTracks(const std::string& maskName = "") const;
@@ -350,7 +352,7 @@ namespace Belle2 {
     /**
      * Get number of all (no mask) or a subset (use mask) of all ECLclusters in ROE.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return number of all remaining ECL clusters
      */
     int getNECLClusters(const std::string& maskName = "") const;
@@ -358,7 +360,7 @@ namespace Belle2 {
     /**
      * Get number of all remaining KLM clusters.
      *
-     * @param name of mask
+     * @param maskName Name of mask
      * @return number of all remaining KLM clusters
      */
     int getNKLMClusters(const std::string& maskName = "") const;
@@ -378,12 +380,7 @@ namespace Belle2 {
     /**
      * Prints the contents of a RestOfEvent object to screen
      */
-    void print() const;
-
-    /**
-     * Compares particles. TODO: This doesn't belong here
-     */
-    static bool compareParticles(const Particle* roeParticle, const Particle* toAddParticle);
+    void print(const std::string& maskName = "", bool unpackComposite = true) const;
 
   private:
 
@@ -397,7 +394,7 @@ namespace Belle2 {
     /**
      *  Checks if a particle has its copy in the provided list
      */
-    bool isInParticleList(const Particle* roeParticle, std::vector<const Particle*>& particlesToUpdate) const;
+    bool isInParticleList(const Particle* roeParticle, const std::vector<const Particle*>& particlesToUpdate) const;
 
     /**
      *  Helper method to find ROE mask
@@ -406,7 +403,7 @@ namespace Belle2 {
     /**
      * Prints indices in the given set in a single line
      */
-    void printIndices(const std::set<int>& indices) const;
+    void printIndices(const std::string& maskName = "", bool unpackComposite = true, const std::string& tab = " - ") const;
     ClassDef(RestOfEvent, 5) /**< class definition */
 
   };

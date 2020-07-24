@@ -48,7 +48,7 @@ namespace Belle2 {
 
     Ph1bpipeCreator::Ph1bpipeCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     Ph1bpipeCreator::~Ph1bpipeCreator()
@@ -58,6 +58,9 @@ namespace Belle2 {
 
     void Ph1bpipeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       //Beam pipes 6 pillars
       double pillar_height = 61.9 * CLHEP::cm / 2.;
       double pillar_length = 3. * CLHEP::cm;
@@ -117,9 +120,9 @@ namespace Belle2 {
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 //    flag_limitStep = true for SynRad simulation
-      double stepMax = 50. *CLHEP::mm;
+      //double stepMax = 50. *CLHEP::mm;
       //cout << " stepMax = " << stepMax << endl;
-      bool flag_limitStep = false;
+      //bool flag_limitStep = false;
 //      bool flag_limitStep = true;
 
 ///      double stepSize = content.getLength("stepSize", 5*CLHEP::um);
@@ -203,7 +206,7 @@ namespace Belle2 {
                                                    pipe_hz);
       G4VSolid* s_PH1BPIPEVac = new G4IntersectionSolid("s_PH1BPIPEVac", s_PH1BPIPE, s_PH1BPIPEV);
       G4LogicalVolume* l_PH1BPIPEVac = new G4LogicalVolume(s_PH1BPIPEVac, geometry::Materials::get(vacPipe), "l_PH1BPIPEVac", 0, 0);
-      if (flag_limitStep) l_PH1BPIPEVac->SetUserLimits(new G4UserLimits(stepMax));
+      //if (flag_limitStep) l_PH1BPIPEVac->SetUserLimits(new G4UserLimits(stepMax));
       new G4PVPlacement(0, PH1BPIPEpos, l_PH1BPIPEVac, "p_PH1BPIPEVac", l_PH1BPIPETiN , false, 0);
 
       //create central endcaps
@@ -248,7 +251,7 @@ namespace Belle2 {
       G4VSolid* s_PH1BPIPEendcapVac = new G4IntersectionSolid("s_PH1BPIPEendcapVac", s_PH1BPIPEendcap , s_PH1BPIPEendcapV);
       G4LogicalVolume* l_PH1BPIPEendcapVac = new G4LogicalVolume(s_PH1BPIPEendcapVac, geometry::Materials::get(vacPipe),
                                                                  "l_PH1BPIPEendcapVac", 0, 0);
-      if (flag_limitStep) l_PH1BPIPEendcapVac->SetUserLimits(new G4UserLimits(stepMax));
+      //if (flag_limitStep) l_PH1BPIPEendcapVac->SetUserLimits(new G4UserLimits(stepMax));
       new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), l_PH1BPIPEendcapVac, "p_PH1BPIPEendcapVacTop", l_PH1BPIPEendcapTiNTop, false, 0);
       new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), l_PH1BPIPEendcapVac, "p_PH1BPIPEendcapVacBot", l_PH1BPIPEendcapTiNBot, false, 0);
 
@@ -345,7 +348,7 @@ namespace Belle2 {
       transform_XshapeForwx = transform_XshapeForwx * G4RotateY3D(-A2);
       G4IntersectionSolid* XshapeForw = new G4IntersectionSolid("XshapeForw", AluCont_f, XshapeForwx, transform_XshapeForwx);
       G4LogicalVolume* l_XshapeForw = new G4LogicalVolume(XshapeForw, geometry::Materials::get(vacPipe), "l_XshapeForw", 0 , 0);
-      if (flag_limitStep) l_XshapeForw ->SetUserLimits(new G4UserLimits(stepMax));
+      //if (flag_limitStep) l_XshapeForw ->SetUserLimits(new G4UserLimits(stepMax));
       new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), l_XshapeForw, "p_XshapeForw", l_XshapeTiNForw , false, 0);
 
       //create far forward parts
@@ -375,7 +378,7 @@ namespace Belle2 {
                                                                  transform_sXshapefPOS_12);
       //put HER vacuum part in AluCont_fp
       G4LogicalVolume* l_XshapefPOS1 = new G4LogicalVolume(XshapefPOS1, geometry::Materials::get(vacPipe), "l_XshapefPOS1", 0 , 0);
-      if (flag_limitStep) l_XshapefPOS1 ->SetUserLimits(new G4UserLimits(stepMax));
+      //if (flag_limitStep) l_XshapefPOS1 ->SetUserLimits(new G4UserLimits(stepMax));
       G4RotationMatrix* yRotP = new G4RotationMatrix;
       yRotP->rotateY(-A1);
       new G4PVPlacement(yRotP, G4ThreeVector(2 * endcap_hz * tan(A2) + xpipe_hz * sin(A2) + xpipePOS_hz / 2.*sin(A1), 0., 0.),
@@ -419,7 +422,7 @@ namespace Belle2 {
                                                                  transform_sXshapefPOS_32);
       //put HER vacuum part into l_XshapefPOS2
       G4LogicalVolume* l_XshapefPOS3 = new G4LogicalVolume(XshapefPOS3, geometry::Materials::get(vacPipe), "l_XshapefPOS3", 0 , 0);
-      if (flag_limitStep) l_XshapefPOS3 ->SetUserLimits(new G4UserLimits(stepMax));
+      //if (flag_limitStep) l_XshapefPOS3 ->SetUserLimits(new G4UserLimits(stepMax));
       new G4PVPlacement(0, G4ThreeVector(0. , 0., 0.), l_XshapefPOS3 , "p_XshapefPOS3", l_XshapefPOS2, false, 0);
 
       // create x-shape tubes backward
@@ -514,7 +517,7 @@ namespace Belle2 {
       transform_XshapeBackwx = transform_XshapeBackwx * G4RotateY3D(A2);
       G4IntersectionSolid* XshapeBackw = new G4IntersectionSolid("XshapeBackw", AluCont_b, XshapeBackwx, transform_XshapeBackwx);
       G4LogicalVolume* l_XshapeBackw = new G4LogicalVolume(XshapeBackw, geometry::Materials::get(vacPipe), "l_XshapeBackw", 0 , 0);
-      if (flag_limitStep) l_XshapeBackw->SetUserLimits(new G4UserLimits(stepMax));
+      //if (flag_limitStep) l_XshapeBackw->SetUserLimits(new G4UserLimits(stepMax));
       // Place XshapeBackw
       new G4PVPlacement(0, G4ThreeVector(0., 0., 0.), l_XshapeBackw, "p_XshapeBackw", l_XshapeTiNBackw , false, 0);
 
@@ -545,7 +548,7 @@ namespace Belle2 {
                                                                  transform_sXshapebMIN_12);
       //put HER vacuum part in AluCont_bp
       G4LogicalVolume* l_XshapebMIN1 = new G4LogicalVolume(XshapebMIN1, geometry::Materials::get(vacPipe), "l_XshapebMIN1", 0 , 0);
-      if (flag_limitStep) l_XshapebMIN1 ->SetUserLimits(new G4UserLimits(stepMax));
+      //if (flag_limitStep) l_XshapebMIN1 ->SetUserLimits(new G4UserLimits(stepMax));
       new G4PVPlacement(yRotP, G4ThreeVector(-(2 * endcap_hz * tan(A2) + xpipe_hz * sin(A2) + xpipeMIN_hz / 2.*sin(A1)), 0., 0.),
                         l_XshapebMIN1 , "p_XshapebMIN1", logi_AluCont_bp, false, 0);
       //LER far backward part
@@ -585,7 +588,7 @@ namespace Belle2 {
                                                                  transform_sXshapebMIN_32);
       //put HER vacuum part in AluCont_bp
       G4LogicalVolume* l_XshapebMIN3 = new G4LogicalVolume(XshapebMIN3, geometry::Materials::get(vacPipe), "l_XshapebMIN3", 0 , 0);
-      if (flag_limitStep) l_XshapebMIN3 ->SetUserLimits(new G4UserLimits(stepMax));
+      //if (flag_limitStep) l_XshapebMIN3 ->SetUserLimits(new G4UserLimits(stepMax));
       new G4PVPlacement(0, G4ThreeVector(0. , 0., 0.), l_XshapebMIN3 , "p_XshapebMIN3", l_XshapebMIN2, false, 0);
 
     }

@@ -13,7 +13,6 @@
 #define SVD_DATAOBJECTS_SVDOCCUPANCYEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <algorithm>
 
 namespace Belle2 {
   /** Class SVDOccupancyEvent:

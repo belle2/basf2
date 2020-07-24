@@ -56,7 +56,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMDigit()
+    ~KLMDigit()
     {
     }
 
@@ -404,9 +404,9 @@ namespace Belle2 {
      * Set SiPM MC time.
      * @param[in] time Time.
      */
-    void setSiPMMCTime(float t)
+    void setSiPMMCTime(float time)
     {
-      m_SiPMMCTime = t;
+      m_SiPMMCTime = time;
     }
 
   protected:

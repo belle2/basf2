@@ -19,14 +19,16 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
+#include <ir/dbobjects/BeamPipeGeo.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/dbobjects/MuidParameters.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+#include <structure/dbobjects/COILGeometryPar.h>
 
 /* Geant4 headers. */
 #include <G4ErrorTrajErr.hh>
@@ -354,6 +356,12 @@ namespace Belle2 {
     //! virtual "target" cylinder for MUID (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_TargetMuid;
 
+    //! Conditions-database object for COIL geometry
+    DBObjPtr<COILGeometryPar> m_COILGeometryPar;
+
+    //! Conditions-database object for beam pipe geometry
+    DBObjPtr<BeamPipeGeo> m_BeamPipeGeo;
+
     //! Minimum squared radius (cm) outside of which extrapolation will continue
     double m_MinRadiusSq;
 
@@ -436,8 +444,8 @@ namespace Belle2 {
     //! Conditions-database object for KLM strip efficiency
     DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
-    //! Conditions-database object for Muid parameters
-    DBObjPtr<MuidParameters> m_muidParameters;
+    //! Conditions-database object for KLM likelihood parameters
+    DBObjPtr<KLMLikelihoodParameters> m_klmLikelihoodParameters;
 
     //! ECL clusters
     StoreArray<ECLCluster> m_eclClusters;

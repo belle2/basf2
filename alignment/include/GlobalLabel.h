@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GLOBALLABEL_H
-#define GLOBALLABEL_H
+#pragma once
 
 #include <map>
 #include <set>
@@ -222,6 +221,7 @@ namespace Belle2 {
 
     //! Constructor for any detector
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)
+    //! @param paramId id of the parameter of the element
     void construct(gidTYPE elementId, gidTYPE paramId);
 
   public:
@@ -309,5 +309,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

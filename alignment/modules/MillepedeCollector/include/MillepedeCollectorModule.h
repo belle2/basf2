@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MILLEPEDECOLLECTORMODULE_H
-#define MILLEPEDECOLLECTORMODULE_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <calibration/CalibrationCollectorModule.h>
@@ -68,10 +67,14 @@ namespace Belle2 {
      */
     bool fitRecoTrack(RecoTrack& recoTrack, Particle* particle = nullptr);
 
-    /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex) */
+    /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex)
+     * @param msop MeasuredStateOnPlane - linearization point (track state @ plane) at which the transformation should be computed
+     */
     TMatrixD getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop);
 
-    /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex) */
+    /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex)
+     * @param msop MeasuredStateOnPlane - linearization point (track state @ plane) at which the transformation should be computed
+     */
     TMatrixD getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop);
 
     ///  Compute the transformation matrices d(q/p,u'v',u,v)/d(vx,vy,vz,px,py,pz,theta,phi,M) = dq/d(v,z) for
@@ -180,5 +183,3 @@ namespace Belle2 {
     void updateMassWidthIfSet(std::string listName, double& mass, double& width);
   };
 }
-
-#endif /* MILLEPEDECOLLECTORMODULE_H */

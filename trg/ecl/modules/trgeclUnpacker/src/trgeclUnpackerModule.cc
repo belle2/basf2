@@ -23,6 +23,9 @@
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
 
+#include "trg/ecl/TrgEclDataBase.h"
+#include "trg/ecl/TrgEclMapping.h"
+
 using namespace std;
 using namespace Belle2;
 
@@ -42,7 +45,7 @@ TRGECLUnpackerModule::TRGECLUnpackerModule()
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  B2INFO("trgeclunpacker: Constructor done.");
+  B2DEBUG(20, "trgeclunpacker: Constructor done.");
 }
 
 TRGECLUnpackerModule::~TRGECLUnpackerModule() {}
@@ -88,7 +91,7 @@ void TRGECLUnpackerModule::event()
 
 void TRGECLUnpackerModule::readCOPPEREvent(RawTRG* raw_copper, int i, int nnn)
 {
-
+  /* cppcheck-suppress variableScope */
   int* rdat;
   if (raw_copper->GetDetectorNwords(i, 0) > 0) {
     rdat = raw_copper->GetDetectorBuffer(i, 0);
@@ -135,14 +138,18 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int window_num  = 0;
 
   // Summary
+  /* cppcheck-suppress variableScope */
   int summary_data      = 0;
   int summary_recon     = 0;
+  /* cppcheck-suppress variableScope */
   int summary_revo      = 0;
+  /* cppcheck-suppress variableScope */
   bool summary_trg      = false;
-
+  /* cppcheck-suppress variableScope */
   int data_win          = 0;
 
   // TC
+  /* cppcheck-suppress variableScope */
   int ntc_win           =     0;
   bool tc_trg           = false;
   // TC info
@@ -264,8 +271,11 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   // <---- Unpacking
 
   // Summary
+  /* cppcheck-suppress variableScope */
   int sum_num_ord  = 0;
+  /* cppcheck-suppress variableScope */
   int sum_num      = 0;
+  /* cppcheck-suppress variableScope */
   int sum_revo     = 0;
   int cl_theta[6]  = {0};
   int cl_phi[6]    = {0};
@@ -509,17 +519,27 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int m_evtNum   = 0;
 
   int m_tcNum    = 0;
+  /* cppcheck-suppress variableScope */
   int m_tcid     = 0;
+  /* cppcheck-suppress variableScope */
   int m_time     = -9999;
+  /* cppcheck-suppress variableScope */
   int m_energy   = 0;
+  /* cppcheck-suppress variableScope */
   int m_win      = 0;
+  /* cppcheck-suppress variableScope */
   int m_revo     = 0;
+  /* cppcheck-suppress variableScope */
   int m_caltime  = -9999;
 
   int tot_ntc          = tc_info.size();
+  /* cppcheck-suppress variableScope */
   int evt_ntc          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_revo         = -9999;
+  /* cppcheck-suppress variableScope */
   int evt_win          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_timing       = -9999; // most energetic
   int evt_cl_theta[6]  = {0};
   int evt_cl_phi[6]    = {0};
@@ -528,31 +548,57 @@ void TRGECLUnpackerModule::checkBuffer(int* rdat, int nnn)
   int evt_cl_1gev[6]   = {0};
   int evt_cl_2gev[6]   = {0};
   int evt_cl_bha[6]    = {0};
+  /* cppcheck-suppress variableScope */
   int evt_ncl          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_low_multi    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b2bhabha_v   = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b2bhabha_s   = 0;
+  /* cppcheck-suppress variableScope */
   int evt_mumu         = 0;
+  /* cppcheck-suppress variableScope */
   int evt_prescale     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_icn          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_icn_over     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot_type    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot         = 0;
+  /* cppcheck-suppress variableScope */
   int evt_ecl_bst      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b1_type      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b1bhabha     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_physics      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_type    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot_all     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_min     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_max     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_win     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_i     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_c     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_f     = 0;
+  /* cppcheck-suppress variableScope */
   int cl_tcid = 0;
+  /* cppcheck-suppress variableScope */
   int cl_thetaid = 0;
+  /* cppcheck-suppress variableScope */
   int cl_phiid = 0;
+  /* cppcheck-suppress variableScope */
   int m_clNum    = 0;
 
 
@@ -834,13 +880,17 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   int window_num  = 0;
 
   // Summary
+  /* cppcheck-suppress variableScope */
   int summary_data      = 0;
+  /* cppcheck-suppress variableScope */
   int summary_revo      = 0;
+  /* cppcheck-suppress variableScope */
   bool summary_trg      = false;
-
+  /* cppcheck-suppress variableScope */
   int data_win          = 0;
 
   // TC
+  /* cppcheck-suppress variableScope */
   int ntc_win           =     0;
   bool tc_trg           = false;
   // TC info
@@ -957,7 +1007,9 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   // <---- Unpacking
 
   // Summary
+  /* cppcheck-suppress variableScope */
   int sum_num        = 0;
+  /* cppcheck-suppress variableScope */
   int sum_revo       = 0;
   int cl_theta[6]    = {0};
   int cl_phi[6]      = {0};
@@ -1233,47 +1285,83 @@ void TRGECLUnpackerModule::checkBuffer_v136(int* rdat, int nnn)
   int m_evtNum   = 0;
 
   int m_tcNum    = 0;
+  /* cppcheck-suppress variableScope */
   int m_tcid     = 0;
+  /* cppcheck-suppress variableScope */
   int m_time     = -9999;
+  /* cppcheck-suppress variableScope */
   int m_energy   = 0;
+  /* cppcheck-suppress variableScope */
   int m_win      = 0;
+  /* cppcheck-suppress variableScope */
   int m_revo     = 0;
+  /* cppcheck-suppress variableScope */
   int m_caltime  = -9999;
 
   int tot_ntc          = tc_info.size();
+  /* cppcheck-suppress variableScope */
   int evt_ntc          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_revo         = -9999;
+  /* cppcheck-suppress variableScope */
   int evt_win          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_timing       = -9999;
   int evt_cl_theta[6]  = {0};
   int evt_cl_phi[6]    = {0};
   int evt_cl_time[6]   = { -9999};
   int evt_cl_energy[6] = {0};
+  /* cppcheck-suppress variableScope */
   int evt_ncl          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_low_multi    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b2bhabha_v   = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b2bhabha_s   = 0;
+  /* cppcheck-suppress variableScope */
   int evt_mumu         = 0;
+  /* cppcheck-suppress variableScope */
   int evt_prescale     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_icn          = 0;
+  /* cppcheck-suppress variableScope */
   int evt_icn_over     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot_type    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot         = 0;
+  /* cppcheck-suppress variableScope */
   int evt_ecl_bst      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b1_type      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_b1bhabha     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_physics      = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_type    = 0;
+  /* cppcheck-suppress variableScope */
   int evt_etot_all     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_min     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_max     = 0;
+  /* cppcheck-suppress variableScope */
   int evt_time_win     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_i     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_c     = 0;
+  /* cppcheck-suppress variableScope */
   int etot_f     = 0;
+  /* cppcheck-suppress variableScope */
   int cl_tcid = 0;
+  /* cppcheck-suppress variableScope */
   int cl_thetaid = 0;
+  /* cppcheck-suppress variableScope */
   int cl_phiid = 0;
+  /* cppcheck-suppress variableScope */
   int m_clNum    = 0;
 
 

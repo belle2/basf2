@@ -12,7 +12,7 @@
 #include <klm/eklm/calibration/EKLMChannelDataImporter.h>
 
 /* KLM headers. */
-#include <klm/dataobjects/eklm/ElementNumbersSingleton.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/eklm/EKLMChannels.h>
 #include <klm/dbobjects/KLMElectronicsMap.h>
@@ -32,10 +32,6 @@ using namespace Belle2;
 
 EKLMChannelDataImporter::EKLMChannelDataImporter()
 {
-  m_ExperimentLow = 0;
-  m_RunLow = 0;
-  m_ExperimentHigh = -1;
-  m_RunHigh = -1;
 }
 
 EKLMChannelDataImporter::~EKLMChannelDataImporter()
@@ -55,6 +51,7 @@ void EKLMChannelDataImporter::loadChannelData(EKLMChannelData* channelData)
 {
   m_Channels.construct();
   const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
+  const EKLMElementNumbers* elementNumbers = &(EKLMElementNumbers::Instance());
   int iSection, iLayer, iSector, iPlane, iStrip, strip;
   for (iSection = 1; iSection <= geoDat->getNSections(); iSection++) {
     for (iLayer = 1; iLayer <= geoDat->getNDetectorLayers(iSection);
@@ -62,8 +59,8 @@ void EKLMChannelDataImporter::loadChannelData(EKLMChannelData* channelData)
       for (iSector = 1; iSector <= geoDat->getNSectors(); iSector++) {
         for (iPlane = 1; iPlane <= geoDat->getNPlanes(); iPlane++) {
           for (iStrip = 1; iStrip <= geoDat->getNStrips(); iStrip++) {
-            strip = geoDat->stripNumber(iSection, iLayer, iSector, iPlane,
-                                        iStrip);
+            strip = elementNumbers->stripNumber(
+                      iSection, iLayer, iSector, iPlane, iStrip);
             m_Channels->setChannelData(strip, channelData);
           }
         }
@@ -77,8 +74,7 @@ void EKLMChannelDataImporter::setChannelData(
   EKLMChannelData* channelData)
 {
   int stripGlobal;
-  const EKLM::ElementNumbersSingleton* elementNumbers =
-    &(EKLM::ElementNumbersSingleton::Instance());
+  const EKLMElementNumbers* elementNumbers = &(EKLMElementNumbers::Instance());
   stripGlobal = elementNumbers->stripNumber(section, layer, sector, plane,
                                             strip);
   m_Channels->setChannelData(stripGlobal, channelData);
@@ -92,10 +88,8 @@ void EKLMChannelDataImporter::loadActiveChannels(const char* activeChannelsData)
   int subdetector, section, layer, sector, plane, strip, stripGlobal;
   /* cppcheck-suppress variableScope */
   const uint16_t* detectorChannel;
-  const EKLM::ElementNumbersSingleton* elementNumbers =
-    &(EKLM::ElementNumbersSingleton::Instance());
-  const KLMElementNumbers* klmElementNumbers =
-    &(KLMElementNumbers::Instance());
+  const EKLMElementNumbers* elementNumbers = &(EKLMElementNumbers::Instance());
+  const KLMElementNumbers* klmElementNumbers = &(KLMElementNumbers::Instance());
   DBObjPtr<KLMElectronicsMap> electronicsMap;
   KLMElectronicsChannel electronicsChannel;
   TFile* file;
@@ -145,10 +139,8 @@ void EKLMChannelDataImporter::loadHighVoltage(const char* highVoltageData)
   int subdetector, section, layer, sector, plane, strip, stripGlobal;
   /* cppcheck-suppress variableScope */
   const uint16_t* detectorChannel;
-  const EKLM::ElementNumbersSingleton* elementNumbers =
-    &(EKLM::ElementNumbersSingleton::Instance());
-  const KLMElementNumbers* klmElementNumbers =
-    &(KLMElementNumbers::Instance());
+  const EKLMElementNumbers* elementNumbers = &(EKLMElementNumbers::Instance());
+  const KLMElementNumbers* klmElementNumbers = &(KLMElementNumbers::Instance());
   DBObjPtr<KLMElectronicsMap> electronicsMap;
   KLMElectronicsChannel electronicsChannel;
   TFile* file;
@@ -199,10 +191,8 @@ void EKLMChannelDataImporter::loadLookbackWindow(const char* lookbackWindowData)
   int subdetector, section, layer, sector, plane, strip, stripGlobal;
   /* cppcheck-suppress variableScope */
   const uint16_t* detectorChannel;
-  const EKLM::ElementNumbersSingleton* elementNumbers =
-    &(EKLM::ElementNumbersSingleton::Instance());
-  const KLMElementNumbers* klmElementNumbers =
-    &(KLMElementNumbers::Instance());
+  const EKLMElementNumbers* elementNumbers = &(EKLMElementNumbers::Instance());
+  const KLMElementNumbers* klmElementNumbers = &(KLMElementNumbers::Instance());
   DBObjPtr<KLMElectronicsMap> electronicsMap;
   KLMElectronicsChannel electronicsChannel;
   TFile* file;
@@ -255,10 +245,8 @@ void EKLMChannelDataImporter::loadThresholds(const char* thresholdsData)
   int subdetector, section, layer, sector, plane, strip, stripGlobal;
   /* cppcheck-suppress variableScope */
   const uint16_t* detectorChannel;
-  const EKLM::ElementNumbersSingleton* elementNumbers =
-    &(EKLM::ElementNumbersSingleton::Instance());
-  const KLMElementNumbers* klmElementNumbers =
-    &(KLMElementNumbers::Instance());
+  const EKLMElementNumbers* elementNumbers = &(EKLMElementNumbers::Instance());
+  const KLMElementNumbers* klmElementNumbers = &(KLMElementNumbers::Instance());
   DBObjPtr<KLMElectronicsMap> electronicsMap;
   KLMElectronicsChannel electronicsChannel;
   TFile* file;

@@ -21,33 +21,34 @@ from basf2 import *
 import svd.overlay_utils as svdou
 import simulation as simu
 import glob
+import basf2
 
 tag = "unused"
 if len(sys.argv) == 2:
     tag = sys.argv[1]
 
+'''
 # PREPARE YOUR INPUT FILES - ERROR printed at the end does not
 #                            affect output files
 # function provides output rootfile with SVDShaperDigits only
-'''
-main = create_path()
 
-# cosmics
-svdou.prepare_svd_overlay(main,\
- ["/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_120.root",\
-      "/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_101.root",
-"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_100.root",\
-"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_10.root",\
-"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_1.root",\
-"/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/cosmics/reco_firstCollisions_exp0010_run00311_2.root"
-])
+# random TRG
+# 1. link the input raw data in /gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG/
+# and select:
+# location="/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG/*.root"
+# and outputFileTag = ZS3
+# 2. then select:
+# location="/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/randomTRG/*_ZS3.root"
+# and outputFileTag = overlay
+# and outputFileTag = overlayZS with same location
 
-# xTalk
-svdou.prepare_svd_overlay(main,\
-                              ["/gpfs/fs02/belle2/group/detector/SVD/overlayFiles/xTalk/physics*f00001.root"]
-                          )
-
-process(main)
+filelist=glob.glob(location)
+# print(filelist)
+for inputfile in filelist:
+    main = create_path()
+#    svdou.prepare_svd_overlay(main, [inputfile],"ZS3")
+    svdou.prepare_svd_overlay(main, [inputfile],"overlay")
+#    svdou.prepare_svd_overlay(main, [inputfile],"overlayZS5")
 '''
 
 # EXAMPLE OF OVERLAY
@@ -76,7 +77,7 @@ if len(bg) == 0:
     sys.exit()
 simu.add_simulation(main, bkgfiles=bg, usePXDDataReduction=False, forceSetPXDDataReduction=True)
 
-if str(tag) == "xTalk" or str(tag) == "cosmics":
+if str(tag) == "xTalk" or str(tag) == "cosmics" or str(tag) == "randomTrigger" or str(tag) == "randomTriggerZS5":
     svdou.overlay_svd_data(main, str(tag))
 
 

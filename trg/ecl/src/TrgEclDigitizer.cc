@@ -11,11 +11,8 @@
 // $Log$
 // 2017-02-16 : v01
 //---------------------------------------------------------------
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
-
-#include <framework/logging/Logger.h>
 
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dataobjects/ECLSimHit.h>
@@ -27,7 +24,6 @@
 #include "trg//ecl/dataobjects/TRGECLDigi0.h"
 #include "trg/ecl/dataobjects/TRGECLWaveform.h" // by shebalin 
 
-#include <stdlib.h>
 #include <iostream>
 #include <math.h>
 #include <TRandom.h>
@@ -145,7 +141,9 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
         if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}// 0.01MeV cut
+        /* cppcheck-suppress variableScope */
         double maxbkgE = 0;
+        /* cppcheck-suppress variableScope */
         int maxbkgtag = 0;
         TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
         if (_BeambkgTag == 1) {
@@ -232,7 +230,9 @@ TrgEclDigitizer::getTCHit(int TableFlag)
     }
     for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
       for (int  iTime = 0; iTime < nBinTime; iTime++) {
+        /* cppcheck-suppress variableScope */
         double maxbkgE = 0;
+        /* cppcheck-suppress variableScope */
         int maxbkgtag = 0;
         if (TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
         TCTiming[iTCIdm][iTime] /= TCEnergy[iTCIdm][iTime];
@@ -352,7 +352,9 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE, std::
   double tgen = 10.3;   // orignal
   int bkg_level = 1030;
   double ttt0 = 0; // [us]
+  /* cppcheck-suppress variableScope */
   double ttt1 = 0; // [us]
+  /* cppcheck-suppress variableScope */
   double ttt2 = 0; // [us]
   //
   double frac_pileup   = 0.035; // pileup noise fraction?
@@ -618,8 +620,13 @@ TrgEclDigitizer::FADC(int flag_gen,
   //--------------------------------------
   double tsh, dd;
   static double tc, tc2, tsc, tris, b1, b2;
-  static double amp, td, t1, t2,  dft, as;
-
+  static double amp, dft, as;
+  /* cppcheck-suppress variableScope */
+  static double td;
+  /* cppcheck-suppress variableScope */
+  static double t1;
+  /* cppcheck-suppress variableScope */
+  static double t2;
 
   static int ifir = 0;
 

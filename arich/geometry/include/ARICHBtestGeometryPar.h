@@ -129,11 +129,11 @@ namespace Belle2 {
 
 
     //! Set the tracking shift
-    void setTrackingShift(TVector3&);
+    void setTrackingShift(const TVector3&);
     //! Get the tracking shift
     TVector3 getTrackingShift();
     //! Set the rotation center of the Aerogel RICH frame
-    void setRotationCenter(TVector3&);
+    void setRotationCenter(const TVector3&);
     //! Get the rotation center of the Aerogel RICH frame
     TVector3 getRotationCenter();
 
@@ -158,7 +158,7 @@ namespace Belle2 {
     //! Set the mapping of the electronic channel to the HAPD module nr and the channel number
     int AddHapdElectronicMapPair(int, int);
     //! Set of the setup global offset
-    void setOffset(TVector3&);
+    void setOffset(const TVector3&);
     //! Get the setup global offset
     TVector3 getOffset();
 

@@ -57,7 +57,7 @@ namespace TreeFitter {
     }
 
     /** has energy in fit params? */
-    static bool useEnergy(Belle2::Particle& cand) ;
+    static bool useEnergy(const Belle2::Particle& cand) ;
 
   private:
 

@@ -10,25 +10,16 @@
 
 #pragma once
 
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
-#include "TH1F.h"
-#include "TString.h"
-#include "TDirectory.h"
-using std::vector;
-using std::string;
-
 #include <framework/dataobjects/EventT0.h>
+
+#include <TH1F.h>
+#include <TDirectory.h>
 
 namespace Belle2 {
 
@@ -71,10 +62,12 @@ namespace Belle2 {
 
 
     StoreObjPtr<TRGSummary>    m_objTrgSummary;   /**< Trigger Summary data object */
-    // L1 timing source from getTimeType() in TRGSummary
-    // See ETimingTYpe in mdst/dataobjects/include/TRGSummary.h (but information is obsolete...)
-    // (2019/11/11) release-04-00-02, return values from getTimType() are
-    // 0=ecltrg, 3=cdctrg, 5=delayed Bhabha, 7=random trigger from gdl, (toptrg is undefined yet)
+    /**
+     * L1 timing source from getTimeType() in TRGSummary
+     * See ETimingTYpe in mdst/dataobjects/include/TRGSummary.h (but information is obsolete...)
+     * (2019/11/11) release-04-00-02, return values from getTimType() are
+     *  0=ecltrg, 3=cdctrg, 5=delayed Bhabha, 7=random trigger from gdl, (toptrg is undefined yet)
+     */
     int m_L1TimingSrc;
 
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */

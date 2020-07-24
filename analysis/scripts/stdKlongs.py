@@ -10,7 +10,7 @@
 #
 ########################################################
 
-from basf2 import B2FATAL
+from basf2 import B2FATAL, B2WARNING
 from modularAnalysis import fillParticleList, cutAndCopyList
 
 
@@ -30,13 +30,19 @@ def stdKlongs(listtype='allklm', path=None):
 
     # all KLM clusters
     if listtype == 'allklm':
+        B2WARNING('The Klong particles in the list "allklm" are exclusively built from KLMClusters!')
         fillParticleList('K_L0:allklm', '[isFromKLM > 0] and [klmClusterKlId >= 0] and [klmClusterKlId <= 1]', True, path)
+    elif listtype == 'allecl':
+        B2WARNING('The Klong particles in the list "allecl" are exclusively built from ECLClusters!')
+        fillParticleList('K_L0:allecl', 'isFromECL > 0', True, path)
     else:
         B2FATAL("""
-Only the 'allklm' list (all KLM clusters) is currently supported. Please use:
 
-stdKlongs('allklm', path=mypath)
-""")
+    Only the particle lists 'allklm' (Klongs built from KLM clusters) and 'allecl' (Klongs built from neutral ECLCluster) are
+    currently supported. Please use:
+
+    stdKlongs('allklm', path=mypath)
+            """)
 #    # loose KLs, removes buggy KLM clusters
 #    elif listtype == 'veryLoose':
 #        stdKlongs('all', path)

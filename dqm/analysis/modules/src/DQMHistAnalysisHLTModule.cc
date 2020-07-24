@@ -88,7 +88,7 @@ void DQMHistAnalysisHLTModule::initialize()
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
-    SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &m_epicschid), "ca_create_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
@@ -145,7 +145,6 @@ void DQMHistAnalysisHLTModule::event()
 
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     SEVCHK(ca_get(DBR_DOUBLE, m_epicschid, (void*)&instLuminosity), "ca_get failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   } else {
@@ -253,4 +252,14 @@ void DQMHistAnalysisHLTModule::event()
     canvas->Modified();
     canvas->Update();
   }
+}
+
+void DQMHistAnalysisHLTModule::terminate()
+{
+#ifdef _BELLE2_EPICS
+  if (not m_pvPrefix.empty()) {
+    SEVCHK(ca_clear_channel(m_epicschid), "ca_clear_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
+#endif
 }

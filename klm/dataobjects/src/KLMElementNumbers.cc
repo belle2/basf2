@@ -19,9 +19,9 @@
 
 using namespace Belle2;
 
-KLMElementNumbers::KLMElementNumbers()
+KLMElementNumbers::KLMElementNumbers() :
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
 {
-  m_ElementNumbersEKLM = &(EKLM::ElementNumbersSingleton::Instance());
 }
 
 KLMElementNumbers::~KLMElementNumbers()
@@ -69,7 +69,7 @@ uint16_t KLMElementNumbers::channelNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  channel = m_ElementNumbersEKLM->stripNumber(
+  channel = m_eklmElementNumbers->stripNumber(
               section, layer, sector, plane, strip);
   return channel;
 }
@@ -120,7 +120,7 @@ void KLMElementNumbers::channelNumberToElementNumbers(
      * Note that the default order of elements is different
      * for EKLM-specific code!
      */
-    m_ElementNumbersEKLM->stripNumberToElementNumbers(
+    m_eklmElementNumbers->stripNumberToElementNumbers(
       localChannel, section, layer, sector, plane, strip);
   }
 }
@@ -141,7 +141,7 @@ uint16_t KLMElementNumbers::planeNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  planeGlobal = m_ElementNumbersEKLM->planeNumber(
+  planeGlobal = m_eklmElementNumbers->planeNumber(
                   section, layer, sector, plane);
   return planeGlobal;
 }
@@ -171,7 +171,7 @@ uint16_t KLMElementNumbers::moduleNumberEKLM(
    * Note that the default order of elements is different
    * for EKLM-specific code!
    */
-  module = m_ElementNumbersEKLM->sectorNumber(section, layer, sector);
+  module = m_eklmElementNumbers->sectorNumber(section, layer, sector);
   return module;
 }
 
@@ -200,7 +200,7 @@ void KLMElementNumbers::moduleNumberToElementNumbers(
      * Note that the default order of elements is different
      * for EKLM-specific code!
      */
-    m_ElementNumbersEKLM->sectorNumberToElementNumbers(
+    m_eklmElementNumbers->sectorNumberToElementNumbers(
       localModule, section, layer, sector);
   }
 }
@@ -229,7 +229,7 @@ uint16_t KLMElementNumbers::sectorNumberBKLM(int section, int sector) const
 uint16_t KLMElementNumbers::sectorNumberEKLM(int section, int sector) const
 {
   uint16_t sect;
-  sect = m_ElementNumbersEKLM->sectorNumberKLMOrder(section, sector);
+  sect = m_eklmElementNumbers->sectorNumberKLMOrder(section, sector);
   return sect;
 }
 
@@ -247,4 +247,29 @@ int KLMElementNumbers::getMinimalPlaneNumber(int subdetector) const
     return 0;
   else
     return 1;
+}
+
+std::string KLMElementNumbers::getSectorDAQName(int subdetector, int section, int sector) const
+{
+  std::string name;
+  if (subdetector == c_BKLM) {
+    BKLMElementNumbers::checkSector(sector);
+    if (section == BKLMElementNumbers::c_BackwardSection)
+      name = "BB" + std::to_string(sector - 1);
+    if (section == BKLMElementNumbers::c_ForwardSection)
+      name = "BF" + std::to_string(sector - 1);
+  }
+  if (subdetector == c_EKLM) {
+    m_eklmElementNumbers->checkSector(sector);
+    if (section == EKLMElementNumbers::c_BackwardSection)
+      name = "EB" + std::to_string(sector - 1);
+    if (section == EKLMElementNumbers::c_ForwardSection)
+      name = "EF" + std::to_string(sector - 1);
+  }
+  if (name.empty())
+    B2FATAL("Invalid KLM sector."
+            << LogVar("Subdetector", subdetector)
+            << LogVar("Section", section)
+            << LogVar("Sector", sector));
+  return name;
 }

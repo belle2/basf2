@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef STANDARDTRACKINGPERFORMANCEMODULE_H_
-#define STANDARDTRACKINGPERFORMANCEMODULE_H_
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/modules/standardTrackingPerformance/ParticleProperties.h>
@@ -135,7 +135,3 @@ namespace Belle2 {
 
 
 } // end of namespace
-
-
-
-#endif /* STANDARDTRACKINGPERFORMANCEMODULE_H_ */

@@ -27,27 +27,28 @@ using namespace Belle2;
 
 REG_MODULE(KLMDigitizer)
 
-KLMDigitizerModule::KLMDigitizerModule() : Module(),
+KLMDigitizerModule::KLMDigitizerModule() :
+  Module(),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_ChannelSpecificSimulation(false),
-  m_EfficiencyMode(c_Plane)
+  m_EfficiencyMode(c_Plane),
+  m_Fitter(nullptr)
 {
-  setDescription("KLM digitization module");
+  setDescription("KLM digitization module: create KLMDigits from BKLMSimHits and EKLMSimHits.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("SimulationMode", m_SimulationMode,
-           "Simulation mode (\"Generic\" or \"ChannelSpecific\")",
+           "Simulation mode (\"Generic\" or \"ChannelSpecific\").",
            std::string("Generic"));
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
            "Initial digitization time (ns).", double(-40.));
-  addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data", false);
+  addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data and set a relation with KLMDigits.", false);
   addParam("Efficiency", m_Efficiency,
-           "Efficiency determination mode (\"Strip\" or \"Plane\")",
+           "Efficiency determination mode (\"Strip\" or \"Plane\").",
            std::string("Plane"));
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            false);
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLM::ElementNumbersSingleton::Instance());
-  m_Fitter = nullptr;
 }
 
 KLMDigitizerModule::~KLMDigitizerModule()
@@ -65,7 +66,6 @@ void KLMDigitizerModule::initialize()
     m_FPGAFits.registerInDataStore();
     m_Digits.registerRelationTo(m_FPGAFits);
   }
-  m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
   if (m_SimulationMode == "Generic") {
     /* Nothing to do. */
   } else if (m_SimulationMode == "ChannelSpecific") {
@@ -122,6 +122,7 @@ void KLMDigitizerModule::beginRun()
     B2FATAL("KLM strip efficiency data are not available.");
   if (m_ChannelSpecificSimulation)
     checkChannelParameters();
+  m_Fitter = new KLM::ScintillatorFirmware(m_DigPar->getNDigitizations());
 }
 
 /*
@@ -189,6 +190,12 @@ void KLMDigitizerModule::digitizeBKLM()
       bklmDigit->setFitStatus(simulator.getFitStatus());
       bklmDigit->setNPhotoelectrons(simulator.getNPhotoelectrons());
       bklmDigit->setEnergyDeposit(simulator.getEnergy());
+      if (simulator.getFitStatus() == KLM::c_ScintillatorFirmwareSuccessfulFit &&
+          m_SaveFPGAFit) {
+        KLMScintillatorFirmwareFitResult* fit =
+          m_FPGAFits.appendNew(*simulator.getFPGAFit());
+        bklmDigit->addRelationTo(fit);
+      }
     }
   }
 }
@@ -454,9 +461,9 @@ void KLMDigitizerModule::event()
 
 void KLMDigitizerModule::endRun()
 {
+  delete m_Fitter;
 }
 
 void KLMDigitizerModule::terminate()
 {
-  delete m_Fitter;
 }

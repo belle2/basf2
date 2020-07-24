@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCCROSSTALKADDER_H
-#define CDCCROSSTALKADDER_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -76,6 +75,7 @@ namespace Belle2 {
 
     /** Structure for saving the x-talk information. */
     struct XTalkInfo {
+      /** Constructor that initializes all members. */
       XTalkInfo(unsigned short tdc, unsigned short adc, unsigned short tot, unsigned short status) :
         m_tdc(tdc), m_adc(adc), m_tot(tot), m_status(status) {}
       unsigned short m_tdc; /**< TDC count */
@@ -86,5 +86,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCCROSSTALKADDER_H

@@ -46,14 +46,12 @@ BKLMTrackFitter::BKLMTrackFitter():
   m_Chi2(0.0),
   m_NumHit(0),
   m_globalFit(false),
+  m_SectorPar(4, 0),
+  m_SectorErr(4, 0),
+  m_GlobalPar(4, 0),
+  m_GlobalErr(4, 0),
   m_GeoPar(nullptr)
 {
-  HepVector     iniPar(4, 0);
-  HepSymMatrix  iniErr(4, 0);
-  m_GlobalPar = iniPar;
-  m_SectorPar = iniPar;
-  m_GlobalErr = iniErr;
-  m_SectorErr = iniErr;
 }
 
 //! Destructor

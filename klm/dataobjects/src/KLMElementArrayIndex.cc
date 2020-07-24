@@ -34,6 +34,9 @@ KLMElementArrayIndex::KLMElementArrayIndex(
       case KLMChannelIndex::c_IndexLevelLayer:
         number = klmElement.getKLMModuleNumber();
         break;
+      case KLMChannelIndex::c_IndexLevelSector:
+        number = klmElement.getKLMSectorNumber();
+        break;
       default:
         B2FATAL("Unsupported index level in KLMElementArrayIndex.");
     }

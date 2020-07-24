@@ -264,7 +264,7 @@ bool ECLTrackClusterMatchingPerformanceModule::isChargedStable(const MCParticle&
 
 void ECLTrackClusterMatchingPerformanceModule::setupTree()
 {
-  if (m_tracksTree == NULL || m_clusterTree == NULL) {
+  if (m_tracksTree == nullptr || m_clusterTree == nullptr) {
     B2FATAL("Data tree or event tree was not created.");
   }
   addVariableToTree("expNo", m_iExperiment, m_tracksTree);
@@ -362,7 +362,7 @@ void ECLTrackClusterMatchingPerformanceModule::setupTree()
 
 void ECLTrackClusterMatchingPerformanceModule::writeData()
 {
-  if (m_tracksTree != NULL && m_clusterTree != NULL) {
+  if (m_tracksTree != nullptr && m_clusterTree != nullptr) {
     TDirectory* oldDir = gDirectory;
     if (m_outputFile)
       m_outputFile->cd();
@@ -372,7 +372,7 @@ void ECLTrackClusterMatchingPerformanceModule::writeData()
     delete m_clusterTree;
     oldDir->cd();
   }
-  if (m_outputFile != NULL) {
+  if (m_outputFile != nullptr) {
     m_outputFile->Close();
     delete m_outputFile;
   }

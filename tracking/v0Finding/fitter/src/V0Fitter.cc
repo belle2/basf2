@@ -57,10 +57,10 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
   m_copiedRecoTracks.registerRelationTo(m_recoTracks);
 
 
-  B2ASSERT("Material effects not set up.  Please use SetupGenfitExtrapolationModule.",
-           genfit::MaterialEffects::getInstance()->isInitialized());
-  B2ASSERT("Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.",
-           genfit::FieldManager::getInstance()->isInitialized());
+  B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),
+           "Material effects not set up.  Please use SetupGenfitExtrapolationModule.");
+  B2ASSERT(genfit::FieldManager::getInstance()->isInitialized(),
+           "Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.");
 }
 
 void V0Fitter::setFitterMode(int fitterMode)

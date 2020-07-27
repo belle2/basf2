@@ -118,9 +118,9 @@ namespace Belle2 {
       specific_options(_specific_options) { }
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
-    Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, std::string& jobName) const
+    Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, TMVA::DataLoader& data_loader, const std::string& jobName) const
 #else
-    Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, std::string& jobName) const
+    Weightfile TMVATeacher::trainFactory(TMVA::Factory& factory, const std::string& jobName) const
 #endif
     {
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,8,0)
@@ -228,6 +228,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
+      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
@@ -349,6 +350,7 @@ namespace Belle2 {
         free(directory_template);
       }
 
+      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;

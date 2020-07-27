@@ -82,7 +82,7 @@ Build the Muid likelihoods starting from the hit pattern and the transverse scat
 
 
 .. figure:: Likelihood-muon-pion-eff-fake-momentum-styled-1.jpg
-   :width: 40
+   :width: 400
    :align: center
 
 

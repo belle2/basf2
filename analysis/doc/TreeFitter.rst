@@ -24,6 +24,8 @@ The constraints can be counted as following:
 +--------------+------------------------------+------------------------------------------+
 | Intermediate | px, py, pz, E, x, y, z, tau  | 4 (kinematic) + 3 (geometric) + 1 (mass) |
 +--------------+------------------------------+--------------+---------------------------+
+| Brems-corr.  | px, py, pz, x, y, z          | 7 (composite) + 1 (mass)
++--------------+------------------------------+--------------+---------------------------+
 
 :math:`\tau` is the decay length. For intermediates it depends, generally there are 4 equations from the kinematic constraint, if they have a flight length longer than :math:`1~\mu m` AND a well defined production vertex (a mother particle or an origin constraint) we extract the flight length and can use a geometric constraint, which the fit will automatically do unless configured otherwise. If the particle shares the decay vertex with the mother we will only extract this vertex parameters once in the fit. A mass constraint will only be used if the user configures the fit to do so.
 So for example for :math:`J/\psi \rightarrow l^+ l^-` the calculation is the following: 

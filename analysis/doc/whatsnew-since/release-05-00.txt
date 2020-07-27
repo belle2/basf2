@@ -27,3 +27,13 @@ Modules
    beamspot is added.
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
+
+Vertex Fitting
+++++++++++++++
+ 
+ * Changed the treatment of Bremsstrahlungs-corrected tracks in `vertex.treeFit`.
+   The previous implementation exhibited bad performance when a Bremsstrahlungs-photon
+   is applied. The new implementation fits the corrected Track as a single particle, 
+   analogous to, what KFit does.
+
+

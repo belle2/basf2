@@ -9,15 +9,11 @@
 // Date : 15 - May - 2014
 //-
 
-#include <svd/online/SVDOnlineToOfflineMap.h>
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawSVD.h>
 
 #include <string>
-#include <ctime>
-#include <vector>
 #include <fstream>
 
 namespace Belle2 {
@@ -39,15 +35,15 @@ namespace Belle2 {
   private:
     StoreArray<RawSVD> m_rawSVD; /**< Array for RawSVD */
 
-    unsigned long  m_event;
+    unsigned long  m_event; /**<event number*/
 
-    int m_nFtbHeader;
-    int m_nFtbTrailer;
+    int m_nFtbHeader; /**<FTB header*/
+    int m_nFtbTrailer; /**<FTB trailer*/
 
     std::string    m_outputFileName; /**< Name of output file. */
-    std::ofstream* m_outputFile;     /**< output file. */
+    std::ofstream* m_outputFile = nullptr;     /**< output file. */
 
-    std::string    m_svdRawName;
+    std::string    m_svdRawName; /**raw name*/
 
   };
 } // Namaspace Belle2

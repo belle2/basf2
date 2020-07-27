@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Digit Calibration.                                                     *
  *                                                                        *
@@ -12,6 +12,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
  *               Chris Hearty (hearty@physics.ubc.ca) (CH)                *
+ *               Ewan Hill (ehill@mail.ubc.ca)                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,6 +28,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <ecl/utility/ECLTimingUtilities.h>
+
 class TH1F;
 class TFile;
 
@@ -35,7 +38,6 @@ namespace Belle2 {
   class EventLevelClusteringInfo;
 
   class ECLCrystalCalib;
-  class ECLPureCsIInfo;
   class ECLDigit;
   class ECLDsp;
   class ECLCalDigit;
@@ -117,8 +119,8 @@ namespace Belle2 {
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalTimeOffset;  /**< single crystal time calibration offset*/
 
     std::vector < float > v_calibrationCrateTimeOffset;  /**< single crate time calibration offset as vector (per crystal) */
-    std::vector < float >
-    v_calibrationCrateTimeOffsetUnc;  /**< single crate time calibration offset as vector uncertainty (per crystal) */
+    std::vector < float > v_calibrationCrateTimeOffsetUnc;  /**< single crate time calibration offset as
+                                                                 vector uncertainty (per crystal) */
     DBObjPtr<ECLCrystalCalib> m_calibrationCrateTimeOffset;  /**< single crate time calibration offset (per crystal) */
 
     std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
@@ -156,12 +158,27 @@ namespace Belle2 {
     const double c_pol2Var1 = 1684.0; /**< 2-order fit for p1 Var1 + Var2*bg + Var3*bg^2. */
     const double c_pol2Var2 = 3080.0; /**< 2-order fit for p1. */
     const double c_pol2Var3 = -613.9; /**< 2-order fit for p1. */
-    double m_pol2Max; /** < Maximum of p1 2-order fit to limit values */
+    double m_pol2Max; /**< Maximum of p1 2-order fit to limit values */
     const int c_nominalBG = 183; /**< Number of out of time digits at BGx1.0. */
-    double m_averageBG; /** < Average dose per crystal calculated from m_th1dBackground */
-    const double c_minT99 = 3.5;
+    double m_averageBG; /**< Average dose per crystal calculated from m_th1dBackground */
+    const double c_minT99 = 3.5; /**< The minimum t99 */
 
-    bool m_simulatePure = 0; /** < Flag to set pure CsI simulation option */
+    bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
+
+
+    std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =
+      std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
+
+    // For the energy dependence correction to the time
+    // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
+    // Only change the time walk function paramters if they change away from the below dummy values
+    double m_energyDependenceTimeOffsetFitParam_p1 = -999;     /**< p1 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p2 = -999;     /**< p2 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p3 = -999;     /**< p3 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p4 = -999;     /**< p4 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p5 = -999;     /**< p5 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p6 = -999;     /**< p6 in "energy dependence equation" */
+
   };
 
   /** Class derived from ECLDigitCalibratorModule, only difference are the names */
@@ -182,7 +199,6 @@ namespace Belle2 {
     /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/
     virtual const char* eventLevelClusteringInfoName() const override
     { return "EventLevelClusteringInfoPureCsI" ; }
-
 
   };
 

@@ -70,6 +70,7 @@ namespace Belle2 {
    * which knows the truth information if two tracks belong together or not.
    */
   class SVDResultVarSet : public TrackFindingCDC::VarSet<SVDResultVarNames> {
+    /// Type of the base class
     using Super = TrackFindingCDC::VarSet<SVDResultVarNames>;
 
   public:

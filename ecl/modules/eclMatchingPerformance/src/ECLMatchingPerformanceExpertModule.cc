@@ -14,13 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
-
-#include <pxd/reconstruction/PXDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit.h>
-#include <svd/reconstruction/SVDRecoHit2D.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <root/TFile.h>
 #include <root/TTree.h>
@@ -113,10 +107,10 @@ void ECLMatchingPerformanceExpertModule::event()
       m_trackProperties.nCDChits = recoTrack->getNumberOfCDCHits();
 
       for (auto& eclCluster : track.getRelationsTo<ECLCluster>()) {
-        if (eclCluster.getHypothesisId() != 5) continue;
+        if (!eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
         if (!(eclCluster.isTrack())) continue;
         m_matchedToECLCluster = 1;
-        m_hypothesisOfMatchedECLCluster = eclCluster.getHypothesisId();
+        m_hypothesisOfMatchedECLCluster = eclCluster.getHypotheses();
         break;
       }
 
@@ -293,7 +287,7 @@ void ECLMatchingPerformanceExpertModule::setupTree()
   addVariableToTree("nCDChits", m_trackProperties.nCDChits);
 
   addVariableToTree("ECLMatch", m_matchedToECLCluster);
-  addVariableToTree("HypothesisID", m_hypothesisOfMatchedECLCluster);
+  addVariableToTree("Hypothesis", m_hypothesisOfMatchedECLCluster);
 
   addVariableToTree("MinDistance", m_distance);
 

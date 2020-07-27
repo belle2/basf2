@@ -26,15 +26,15 @@ namespace {
       m_weight = 1.0;
     }
 
-    virtual unsigned int getNumberOfFeatures() const override { return 1; }
-    virtual unsigned int getNumberOfSpectators() const override { return 0; }
-    virtual unsigned int getNumberOfEvents() const override { return m_data.size(); }
-    virtual void loadEvent(unsigned int iEvent) override
+    [[nodiscard]] unsigned int getNumberOfFeatures() const override { return 1; }
+    [[nodiscard]] unsigned int getNumberOfSpectators() const override { return 0; }
+    [[nodiscard]] unsigned int getNumberOfEvents() const override { return m_data.size(); }
+    void loadEvent(unsigned int iEvent) override
     {
       m_input[0] = m_data[iEvent]; m_target = 1.0 * iEvent / 10; m_isSignal = m_target == 1;
     };
-    virtual float getSignalFraction() override { return 0.1; };
-    virtual std::vector<float> getFeature(unsigned int) override { return m_data; }
+    float getSignalFraction() override { return 0.1; };
+    std::vector<float> getFeature(unsigned int) override { return m_data; }
 
     std::vector<float> m_data;
   };

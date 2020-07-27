@@ -1,5 +1,3 @@
-#ifndef COSMICRAYHLTDQMMODULE_H
-#define COSMICRAYHLTDQMMODULE_H
 //+
 // File : CosmicRayHLTDQMModule.h
 // Description : Module to monitor the reconstruction of cosmic ray on hlt
@@ -8,9 +6,9 @@
 // Date :  19 - May - 2017
 //-
 
+#pragma once
+
 #include <string>
-#include <vector>
-#include <map>
 
 #include <TH1F.h>
 
@@ -102,5 +100,3 @@ namespace Belle2 {
 
   } // end namespace SoftwareTrigger
 } // end namespace Belle2
-
-#endif // SOFTWARETRIGGERCOSMICRAYDQMMODULE_H

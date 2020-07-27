@@ -22,7 +22,7 @@
 namespace Belle2 {
   namespace MVA {
 
-    AbstractInterface::AbstractInterface(std::string name) : m_name(name)
+    AbstractInterface::AbstractInterface(const std::string& name) : m_name(name)
     {
       if (s_supported_interfaces.find(m_name) != s_supported_interfaces.end()) {
         B2WARNING("An interface with the name " << m_name << " already exists!");
@@ -48,6 +48,7 @@ namespace Belle2 {
       static Interface<TMVAOptionsClassification, TMVATeacherClassification, TMVAExpertClassification>
       interface_TMVAClassification;
       static Interface<TMVAOptionsRegression, TMVATeacherRegression, TMVAExpertRegression> interface_TMVARegression;
+      static Interface<TMVAOptionsMulticlass, TMVATeacherMulticlass, TMVAExpertMulticlass> interface_TMVAMulticlass;
       static Interface<PythonOptions, PythonTeacher, PythonExpert> interface_Python;
       static Interface<PDFOptions, PDFTeacher, PDFExpert> interface_PDF;
       static Interface<CombinationOptions, CombinationTeacher, CombinationExpert> interface_Combination;

@@ -11,7 +11,6 @@
 #ifndef ARICHDATABASEIMPORTER_H
 #define ARICHDATABASEIMPORTER_H
 
-#include <TObject.h>
 #include <TGraph.h>
 #include <TH1.h>
 #include <TH2F.h>
@@ -23,6 +22,7 @@
 #include <iostream>
 #include <string>
 #include <framework/database/IntervalOfValidity.h>
+#include <arich/dbobjects/tessellatedSolidStr.h>
 
 namespace Belle2 {
 
@@ -106,6 +106,21 @@ namespace Belle2 {
     void importMirrorAlignment();
 
     /**
+     * Import aerogel tiles alignment parameters from ARICH-AeroTilesAlignment.xml
+     */
+    void importAeroTilesAlignment();
+
+    /**
+     * Import Merger cooling bodies geometry
+     */
+    void importMergerCoolingGeo();
+
+    /**
+     * reads merger cooling bodies geometry from dat files
+     */
+    tessellatedSolidStr readTessellatedSolidVerticesFromDATfile(const std::string& inDATfile);
+
+    /**
      * Import channel mask for all HAPD modules from the database (list of dead channels)
      * Goes through the list of installed modules in ARICH-InstalledModules.xml,
      * finds corresponding lists of dead channels in the database and imports lightweight
@@ -143,9 +158,19 @@ namespace Belle2 {
     void importFEMappings();
 
     /**
-     * Prints mappings of FE electronics from the database
+     * Prints merger to FEB mappings from the database
      */
-    void printFEMappings();
+    void printMergerMapping();
+
+    /**
+     * Prints Copper to merger mappings from the database
+     */
+    void printCopperMapping();
+
+    /**
+     * Prints reconstruction parameters
+     */
+    void printReconstructionPar();
 
     /**
      * Prints geometry configuration parameters from the database
@@ -159,6 +184,21 @@ namespace Belle2 {
      * for simple option, draw TGraph2D with "pcolz" option and set view to "top"
      */
     void dumpQEMap(bool simple = false);
+
+    /**
+     * Dumps detector map of HAPD modules to HV cable channels
+     */
+    void dumpHvMappings();
+
+    /**
+     * Prints electronics mappings for all modules (merger ID + SN, merger port, copper, finnese)
+     */
+    void printFEMappings();
+
+    /**
+     * Dumps module - merger mapping into root file
+     */
+    void dumpMergerMapping(bool sn = true);
 
     /**
      * Dumps module numbering scheme into root file (module position on the detector plane -> module number)
@@ -216,6 +256,11 @@ namespace Belle2 {
      * Prints mirror alignment constants
      */
     void printMirrorAlignment();
+
+    /**
+     * Prints aerogel tiles alignment constants
+     */
+    void printAeroTilesAlignment();
 
     // DAQ classes
 
@@ -562,8 +607,6 @@ namespace Belle2 {
         rStream << " - " << rContainer[i];
       rStream << '\n';
     }
-
-    ClassDef(ARICHDatabaseImporter, 4);                 /**< ClassDef */
 
   };
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDBackgroundMODULE_H_
-#define PXDBackgroundMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Unit.h>
@@ -18,7 +17,6 @@
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <string>
-#include <vector>
 #include <memory>
 #include <map>
 #include <vxd/background/niel_fun.h>
@@ -184,16 +182,6 @@ namespace Belle2 {
         result += VXD::GeoCache::getInstance().getSensors(ladderID).size();
       return result;
     }
-
-    /** Get total number of sensors */
-    inline int PXDBackgroundModule::getTotalSensors()
-    {
-      int result = 0;
-      for (auto layerID : VXD::GeoCache::getInstance().getLayers(VXD::SensorInfoBase::PXD))
-        result += getNumSensors(layerID.getLayerNumber());
-      return result;
-    }
   } // namespace PXD
 } // namespace Belle2
-#endif
 

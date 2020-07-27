@@ -3,7 +3,8 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor:                                                           *
+ * Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -20,31 +21,27 @@
 namespace TreeFitter {
 
   DecayChain::DecayChain(Belle2::Particle* particle,
-                         bool forceFitAll,
-                         const bool ipConstraint,
-                         const bool customOrigin,
-                         const std::vector<double>& customOriginVertex,
-                         const std::vector<double>& customOriginCovariance
+                         const ConstraintConfiguration& config,
+                         bool forceFitAll
                         ) :
     m_dim(0),
-    m_headOfChain(0),
-    m_isOwner(true)
+    m_headOfChain(nullptr),
+    m_isOwner(true),
+    m_config(config)
   {
 
-    if (ipConstraint && customOrigin) {
+    if (config.m_ipConstraint && config.m_customOrigin) {
       B2FATAL("Setup error. Cant have both custom origin and ip constraint.");
     }
-
-    if (ipConstraint || customOrigin) {
+    config.m_headOfTreePDG = std::abs(particle->getPDGCode());
+    if (config.m_ipConstraint || config.m_customOrigin) {
       m_headOfChain = ParticleBase::createOrigin(particle,
-                                                 forceFitAll,
-                                                 customOriginVertex,
-                                                 customOriginCovariance,
-                                                 ipConstraint // is beamspot
+                                                 config,
+                                                 forceFitAll
                                                 );
-    } else if ((!customOrigin) && (!ipConstraint)) {
+    } else if ((!config.m_customOrigin) && (!config.m_ipConstraint)) {
 
-      m_headOfChain = ParticleBase::createParticle(particle, 0, forceFitAll);
+      m_headOfChain = ParticleBase::createParticle(particle, nullptr, config, forceFitAll);
     }
 
     m_headOfChain->updateIndex(m_dim);
@@ -69,9 +66,9 @@ namespace TreeFitter {
 
   void DecayChain::removeConstraintFromList()
   {
-    for (auto removeConstraint : removeConstraintList) {
+    for (auto removeConstraint : m_config.m_removeConstraintList) {
       m_constraintlist.erase(std::remove_if(m_constraintlist.begin(), m_constraintlist.end(),
-      [&](Constraint constraint) { return constraint.name() == removeConstraint ;}),
+      [&](const Constraint & constraint) { return constraint.name() == removeConstraint ;}),
       m_constraintlist.end());
     }
   }
@@ -119,7 +116,7 @@ namespace TreeFitter {
 
   const ParticleBase* DecayChain::locate(Belle2::Particle* particle) const
   {
-    const ParticleBase* rc(0);
+    const ParticleBase* rc(nullptr);
     const auto mapRow = m_particleMap.find(particle) ;
 
     if (mapRow == m_particleMap.end()) {

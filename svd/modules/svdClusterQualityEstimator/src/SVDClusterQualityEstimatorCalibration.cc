@@ -10,6 +10,8 @@
 #include <svd/modules/svdClusterQualityEstimator/ClusterQualityHelperFunctions.h>
 #include <svd/modules/svdClusterQualityEstimator/SVDClusterQualityEstimatorCalibrationModule.h>
 
+#include <TFile.h>
+
 #include <vector>
 #include <math.h>
 

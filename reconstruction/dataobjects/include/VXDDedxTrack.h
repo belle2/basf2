@@ -8,15 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDDEDXTRACK_H
-#define VXDDEDXTRACK_H
+#pragma once
 
 #include <reconstruction/dataobjects/DedxConstants.h>
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
-
-#include <TVector3.h>
 
 #include <vector>
 
@@ -102,6 +99,8 @@ namespace Belle2 {
 
     /** Return the momentum valid at the IP */
     double getMomentum() const { return m_p; }
+    /** Return the MC truemomentum valid at the IP */
+    double getTrueMomentum() const { return m_pTrue; }
     /** Return the number of hits for this track */
     double size() const { return m_nHits; }
     /** Return the number of hits used to determine the truncated mean */
@@ -160,4 +159,3 @@ namespace Belle2 {
     ClassDef(VXDDedxTrack, 2); /**< Debug output for VXDDedxPID module. */
   };
 }
-#endif

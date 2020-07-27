@@ -10,17 +10,13 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <TFile.h>
-#include <tracking/modules/trackingPerformanceEvaluation/HitXPModule.h>
 #include <tracking/modules/vxdtfRedesign/NoKickCutsEvalModule.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <svd/dataobjects/SVDTrueHit.h>
 
-#include <cstdio>
-#include <stdio.h>
 #include <stdlib.h>
-#include <TCanvas.h>
-#include <iostream>
 #include <fstream>
 #include <string>
 #include "TH1.h"
@@ -28,13 +24,8 @@
 #include "TF1.h"
 #include "TH2.h"
 #include "TF2.h"
-#include "TMath.h"
-#include "TFitResult.h"
 #include "TString.h"
-#include "TLatex.h"
 #include <algorithm>
-#include <functional>
-
 
 using namespace Belle2;
 

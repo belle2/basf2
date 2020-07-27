@@ -1,0 +1,16 @@
+<table>
+  <col width="45%">
+  <col width="55%">
+  <tr title="The time when we last restarted b2validation-server. Note that many elements are reloaded without restarting the server.">
+    <td>Last restart:</td>
+    <td id="system_last_restart">{{last_restart}}</td>
+  </tr>
+  <tr title="The software version when we last restarted b2validation-server. Note that many elements are reloaded without restarting the server.">
+    <td>Ver. (restart):</td>
+    <td id="system_version_restart"><a class="git" target="_blank" href="https://stash.desy.de/projects/B2/repos/software/commits/{{version}}">{{version_restart}}</a></td>
+  </tr>
+  <tr title="The software version in the working directory of the server. Note that many elements are reloaded without restarting the server.">
+    <td>Ver. (current):</td>
+    <td id="system_version_current"><a class="git" target="_blank" href="https://stash.desy.de/projects/B2/repos/software/commits/{{version}}">{{version_current}}</a></td>
+  </tr>
+</table>

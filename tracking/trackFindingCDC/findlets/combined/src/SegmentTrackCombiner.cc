@@ -17,6 +17,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::Chooseable<BaseSegmentTrackFilter>;
 template class TrackFindingCDC::ChooseableFilter<SegmentTrackFilterFactory>;
 
 SegmentTrackCombiner::SegmentTrackCombiner()

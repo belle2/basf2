@@ -3,7 +3,7 @@
 
 """
 <header>
-  <contact>tracking@belle2.kek.jp</contact>
+  <contact>software-tracking@belle2.org</contact>
   <input>VxdCdcValidationHarvested.root</input>
   <description>This module creates efficiency plots for the V0 validation.</description>
 </header>
@@ -15,16 +15,24 @@ import ROOT
 
 
 class VxdCdcMergerValidationPlots:
+    """Create efficiency plots for the V0 validation"""
 
     def __init__(self, input_file='../VxdCdcValidationHarvested.root', output_file='VxdCdcMergerValidation.root'):
+        """Constructor"""
+        #: cached name of the input file
         self.input_file = input_file
+        #: cached name of the output file
         self.output_file = output_file
 
+        #: 1D histogram of merged hits
         self.hist_merged_hits = ROOT.TH1F("merged_hits", "Merged Hits", 70, 0, 140)
+        #: Profile histogram of good merged hits by transverse momentum
         self.hist_good_over_pt = ROOT.TProfile("good_over_pt", "Good Merge over Pt", 50, 0, 4)
+        #: Profile histogram of good merged hits by polar angle
         self.hist_good_over_theta = ROOT.TProfile("good_over_theta", "Good Merge over Theta", 50, 0, 4)
 
     def collect_histograms(self):
+        """Fill the histograms in each event"""
         input_root_file = ROOT.TFile.Open(self.input_file, "READ")
 
         for event in input_root_file.VxdCdcMergerHarvester_tree:
@@ -37,6 +45,7 @@ class VxdCdcMergerValidationPlots:
 
     @staticmethod
     def histogram_plot(hist, title, x_variable, x_unit=None, description='', check='', contact='', meta_options=''):
+        """Label and annotate the histograms"""
         hist.SetName("".join(title.split()))
         xlabel = '{} / ({})'.format(x_variable, x_unit) if x_unit is not None else '{}'.format(x_variable)
         ylabel = 'Entries / ({} {})'.format((hist.GetXaxis().GetXmax() -
@@ -51,6 +60,7 @@ class VxdCdcMergerValidationPlots:
         return hist
 
     def plot(self):
+        """Draw all of the histograms to the output ROOT file"""
         output_root_file = ROOT.TFile.Open(self.output_file, "RECREATE")
 
         VxdCdcMergerValidationPlots.histogram_plot(self.hist_merged_hits, "Number of hits of merged tracks", "Number of Hits", None,

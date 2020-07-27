@@ -11,6 +11,7 @@ namespace Belle2 {
   namespace Utils {
 
     /** Helper struct for the C++17 std::visit overload pattern to allow simple use of variants */
+    // cppcheck-suppress syntaxError ; apparently this confuses cppcheck
     template<class... Ts> struct VisitOverload : Ts... { using Ts::operator()...; };
     /** Function for the C++17 std::visit overload pattern to allow simple use of variants */
     template<class... Ts> VisitOverload(Ts...) -> VisitOverload<Ts...>;
@@ -67,12 +68,17 @@ namespace Belle2 {
     class Timer {
     public:
       /** Constructor, with some identifying text */
-      explicit Timer(const std::string& text = "");
+      explicit Timer(std::string  text = "");
       ~Timer();
     private:
       double m_startTime; /**< time at start (in ns). */
       std::string m_text; /**< identifying text (printed at end). */
     };
+
+    /**
+     * Execute a shell command and return its output
+     */
+    std::string getCommandOutput(const std::string& command, const std::vector<std::string>& arguments = {}, bool searchPath = true);
   }
 
   /**

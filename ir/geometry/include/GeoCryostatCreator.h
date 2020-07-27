@@ -19,16 +19,10 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <ir/dbobjects/CryostatGeo.h>
 #include <string>
-#include <vector>
-#include <map>
-#include <sstream>
-
 
 #include <G4Transform3D.hh>
 #include <G4VSolid.hh>
 class G4LogicalVolume;
-class G4AssemblyVolume;
-class G4Polycone;
 
 namespace Belle2 {
   namespace ir {
@@ -67,6 +61,12 @@ namespace Belle2 {
 
       /** The destructor of the GeoCryostatCreator class. */
       virtual ~GeoCryostatCreator();
+
+      /** Do not want a copy constructor */
+      GeoCryostatCreator(const GeoCryostatCreator&) = delete;
+
+      /** Do not want an assignment operator */
+      GeoCryostatCreator& operator =(const GeoCryostatCreator&) = delete;
 
       /**
       * Creates the ROOT Objects for the Cryostat geometry.

@@ -14,7 +14,6 @@
 #ifndef TRGTime_FLAG_
 #define TRGTime_FLAG_
 
-#include <float.h>
 #include <string>
 
 namespace Belle2 {

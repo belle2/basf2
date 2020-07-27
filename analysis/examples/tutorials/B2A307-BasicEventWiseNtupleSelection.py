@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #########################################################
 #
@@ -29,6 +28,7 @@
 #               S. Spataro (October 2017)
 #               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
+#               I. Komarov (September 2019)
 #
 ################################################################################
 
@@ -44,13 +44,36 @@ my_path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdstList(environmentType='default',
-                 filelist=[b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False),
-                           b2.find_file('ccbar_background.root', 'examples', False)],
+                 filelist=[b2.find_file('B2pi0D_D2hh_D2hhh_B2munu.root', 'examples', False)],
                  path=my_path)
+
+# We want to apply cut on event shape. For this, we are creating events shape object
+# First, create a list of good tracks (using the pion mass hypothesis)
+# and good gammas with very minimal cuts
+ma.fillParticleList(decayString='pi+:goodtracks',
+                    cut='pt> 0.1',
+                    path=my_path)
+ma.fillParticleList(decayString='gamma:goodclusters',
+                    cut='E > 0.1',
+                    path=my_path)
+
+# Second, create event shape
+ma.buildEventShape(inputListNames=['pi+:goodtracks', 'gamma:goodclusters'],
+                   allMoments=True,
+                   foxWolfram=True,
+                   harmonicMoments=True,
+                   cleoCones=True,
+                   thrust=True,
+                   collisionAxis=True,
+                   jets=True,
+                   sphericity=True,
+                   checkForDuplicates=False,
+                   path=my_path)
 
 # Apply a selection at the event level, to avoid
 # processing useless events
-ma.applyEventCuts(cut='R2EventLevel < 0.3', path=my_path)
+ma.applyEventCuts(cut='foxWolframR2 < 0.3', path=my_path)
+
 
 # The following lines cut&pasted from A304
 
@@ -64,8 +87,9 @@ stdc.stdK(listtype='loose', path=my_path)
 stdc.stdMu(listtype='loose', path=my_path)
 
 
-# creates "pi0:looseFit" ParticleList
-stdPi0s(listtype='looseFit', path=my_path)
+# creates "pi0:eff40_Jan2020Fit" ParticleList
+stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
+
 
 # 1. reconstruct D0 in multiple decay modes
 ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
@@ -73,7 +97,7 @@ ma.reconstructDecay(decayString='D0:ch1 -> K-:loose pi+:loose',
                     dmID=1,
                     path=my_path)
 
-ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:looseFit',
+ma.reconstructDecay(decayString='D0:ch2 -> K-:loose pi+:loose pi0:eff40_Jan2020Fit',
                     cut='1.8 < M < 1.9',
                     dmID=2,
                     path=my_path)
@@ -105,7 +129,7 @@ ma.reconstructDecay(decayString='B+:tag -> anti-D0:all pi+:loose',
                     dmID=1,
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B+:tag',
                 path=my_path)
 
@@ -115,13 +139,13 @@ ma.reconstructDecay(decayString='Upsilon(4S) -> B-:tag mu+:loose',
                     cut="",
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='Upsilon(4S)', path=my_path)
 
 # 5. build rest of the event
 ma.buildRestOfEvent(target_list_name='Upsilon(4S)', path=my_path)
 
-d_vars = vc.mc_truth + vc.kinematics + vc.inv_mass + ['R2EventLevel']
+d_vars = vc.mc_truth + vc.kinematics + vc.inv_mass + ['foxWolframR2']
 mu_vars = vc.mc_truth
 
 b_vars = vc.mc_truth + \
@@ -129,9 +153,9 @@ b_vars = vc.mc_truth + \
     vu.create_aliases_for_selected(list_of_variables=d_vars,
                                    decay_string='B- -> ^D0 pi-') + \
     vu.create_aliases(list_of_variables=['decayModeID'],
-                      wrapper='daughter(0,extraInfo(variable))',
-                      prefix="D") + \
-    ['R2EventLevel']
+                      wrapper='daughter(0,extraInfo({variable}))',
+                      prefix="D0") + \
+    ['foxWolframR2']
 
 u4s_vars = vc.mc_truth + \
     vc.roe_multiplicities + \
@@ -140,8 +164,6 @@ u4s_vars = vc.mc_truth + \
     vc.kinematics + \
     vu.create_aliases_for_selected(list_of_variables=b_vars,
                                    decay_string='Upsilon(4S) -> ^B- mu+') + \
-    vu.create_aliases_for_selected(list_of_variables=d_vars,
-                                   decay_string='Upsilon(4S) -> [B- -> ^D0 pi-] mu+') + \
     vu.create_aliases_for_selected(list_of_variables=mu_vars,
                                    decay_string='Upsilon(4S) -> B- ^mu+')
 

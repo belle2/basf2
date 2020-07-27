@@ -9,13 +9,7 @@
 #ifndef SENDHEADER_H
 #define SENDHEADER_H
 
-#include <string.h>
-//#include <framework/datastore/DataStore.h>
-//#include <TObject.h>
-#include <daq/rawdata/modules/DAQConsts.h>
-
 #include "rawdata/dataobjects/RawHeader_latest.h"
-
 
 namespace Belle2 {
 

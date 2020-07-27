@@ -27,7 +27,6 @@
 #include <boost/iostreams/concepts.hpp>
 
 #include <TGeoManager.h>
-#include <TMath.h>
 
 using namespace Belle2;
 

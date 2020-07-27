@@ -11,17 +11,10 @@
 #ifndef KKGENINTERFACE_H
 #define KKGENINTERFACE_H
 
-#include <framework/core/FrameworkExceptions.h>
-#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-
 #include <string>
-#include <fstream>
-#include <string.h>
 #include <unordered_map>
-
-#include <TLorentzRotation.h>
 
 #define nmxhep 4000
 struct hepevt_type {

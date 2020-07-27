@@ -14,14 +14,10 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
-#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
-#include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
@@ -133,8 +129,6 @@ namespace DirectedNodeNetworkTests {
       vector<const SpacePoint*> sps4TC5 = { allSpacePoints.at(2), allSpacePoints.at(4)};
       SpacePointTrackCand* aSPTC5 = m_spacePointTrackCandData.appendNew((sps4TC5)); // shares a hit with tc2 and tc3
       aSPTC5->setQualityIndicator(0.65);
-      // false positive due to new with placement (cppcheck issue #7163)
-      // cppcheck-suppress memleak
     }
 
     /** TearDown environment - clear datastore */

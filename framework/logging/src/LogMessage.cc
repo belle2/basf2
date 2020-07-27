@@ -16,19 +16,19 @@
 
 #include <boost/property_tree/json_parser.hpp>
 #include <ostream>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
 
-
 LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message, const char* package,
-                       const std::string& function, const std::string& file, unsigned int line, int debugLevel) :
+                       std::string  function, std::string  file, unsigned int line, int debugLevel) :
   m_logLevel(logLevel),
   m_message(message),
   m_module(""),
   m_package(package ? package : ""),
-  m_function(function),
-  m_file(file),
+  m_function(std::move(function)),
+  m_file(std::move(file)),
   m_line(line),
   m_debugLevel(debugLevel),
   m_logInfo(0)
@@ -36,13 +36,13 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, const std::string& message
 }
 
 LogMessage::LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messageStream, const char* package,
-                       const std::string& function, const std::string& file, unsigned int line, int debugLevel) :
+                       std::string  function, std::string  file, unsigned int line, int debugLevel) :
   m_logLevel(logLevel),
   m_message(std::move(messageStream)),
   m_module(""),
   m_package(package ? package : ""),
-  m_function(function),
-  m_file(file),
+  m_function(std::move(function)),
+  m_file(std::move(file)),
   m_line(line),
   m_debugLevel(debugLevel),
   m_logInfo(0)
@@ -71,11 +71,11 @@ std::string LogMessage::toJSON(bool complete) const
                 (LogConfig::c_Timestamp | LogConfig::c_Level | LogConfig::c_Message | LogConfig::c_Module |
                  LogConfig::c_Package | LogConfig::c_Function | LogConfig::c_File | LogConfig::c_Line);
   // in JSON we always output level, independent of what the log info says, otherwise it is hard to parse
-  buffer << "{\"level\":\"" << LogConfig::logLevelToString(m_logLevel) << '"';
+  buffer << R"({"level":")" << LogConfig::logLevelToString(m_logLevel) << '"';
   if (logInfo & LogConfig::c_Message) {
-    buffer << ",\"message\":\"" << create_escapes(m_message.getMessage()) << '"';
+    buffer << R"(,"message":")" << create_escapes(m_message.getMessage()) << '"';
     const auto& vars = m_message.getVariables();
-    if (vars.size() > 0 or complete) {
+    if ((vars.size() > 0 or complete) and !(logInfo & LogConfig::c_NoVariables)) {
       buffer << ",\"variables\":{";
       bool first{true};
       for (const auto& v : vars) {
@@ -87,13 +87,13 @@ std::string LogMessage::toJSON(bool complete) const
     }
   }
   if (logInfo & LogConfig::c_Module)
-    buffer << ",\"module\":\"" << create_escapes(m_module) << '"';
+    buffer << R"(,"module":")" << create_escapes(m_module) << '"';
   if (logInfo & LogConfig::c_Package)
-    buffer << ",\"package\":\"" << create_escapes(m_package) << '"';
+    buffer << R"(,"package":")" << create_escapes(m_package) << '"';
   if (logInfo & LogConfig::c_Function)
-    buffer << ",\"function\":\"" << create_escapes(m_function) << '"';
+    buffer << R"(,"function":")" << create_escapes(m_function) << '"';
   if (logInfo & LogConfig::c_File)
-    buffer << ",\"file\":\"" << create_escapes(m_file) << '"';
+    buffer << R"(,"file":")" << create_escapes(m_file) << '"';
   if (logInfo & LogConfig::c_Line)
     buffer << ",\"line\":" << m_line;
   if (logInfo & LogConfig::c_Timestamp)
@@ -127,7 +127,7 @@ std::ostream& LogMessage::print(std::ostream& out) const
     out << "(" << ProcHandler::EvtProcID() << ") ";
   }
   if (logInfo & LogConfig::c_Message) {
-    out << m_message.str();
+    out << m_message.str(!(logInfo & LogConfig::c_NoVariables));
   }
   // if there is no module or package or similar there's no need to print them
   if (m_module.empty()) logInfo &= ~LogConfig::c_Module;
@@ -167,19 +167,4 @@ std::ostream& LogMessage::print(std::ostream& out) const
 ostream& operator<< (ostream& out, const LogMessage& logMessage)
 {
   return logMessage.print(out);
-}
-
-namespace Belle2 {
-  size_t hash(const LogMessage& msg)
-  {
-    return (
-             std::hash<std::string>()(msg.m_message.str())
-             ^ std::hash<std::string>()(msg.m_module)
-             ^ std::hash<std::string>()(msg.m_package)
-             ^ std::hash<std::string>()(msg.m_function)
-             ^ std::hash<std::string>()(msg.m_file)
-             ^ msg.m_line
-             ^ msg.m_logLevel
-           );
-  }
 }

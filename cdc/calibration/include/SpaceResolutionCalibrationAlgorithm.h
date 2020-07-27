@@ -13,14 +13,9 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TGraphErrors.h>
-#include <TProfile.h>
-#include <TF1.h>
-#include <TFile.h>
-#include <TChain.h>
-#include <TTree.h>
-#include <TSystem.h>
 #include <calibration/CalibrationAlgorithm.h>
-#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dbobjects/CDCGeometry.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   namespace CDC {
@@ -65,6 +60,8 @@ namespace Belle2 {
       /// Set name for histogram output
       void setHistFileName(const std::string& name) {m_histName = "histSigma_" + name + ".root";}
 
+      /// Set threshold for the fraction of fitted results.
+      void setThreshold(double th = 0.6) {m_threshold = th;}
 
     protected:
       /// Run algo on data
@@ -78,6 +75,32 @@ namespace Belle2 {
       /// Prepare the calibration of space resolution.
       void prepare();
 
+      /// search max point at boundary region
+      double getUpperBoundaryForFit(TGraphErrors* graph)
+      {
+        double ymax = 0;
+        double xmax = 0;
+        int imax = 0;
+        double x, y;
+        int unCount = floor(0.05 / m_binWidth);
+        int N = graph->GetN();
+        int Nstart = floor(0.5 * (N - unCount));
+        int Nend = N - unCount;
+        for (int i  = Nstart; i < Nend; ++i) {
+          graph->GetPoint(i, x, y);
+          if (graph->GetErrorY(i) > 0.06E-3) continue;
+          if (y > ymax) {
+            xmax = x; ymax = y;
+            imax = i;
+          }
+        }
+        if (imax <= Nstart) {
+          graph->GetPoint(Nend, x, y);
+          xmax = x;
+        }
+        return xmax;
+      }
+
     private:
       static const int Max_nalpha = 18; /**< Maximum alpha bin.*/
       static const int Max_ntheta = 7; /**< maximum theta bin  */
@@ -89,6 +112,7 @@ namespace Belle2 {
       bool m_debug = false;   /**< Debug or not */
       bool m_storeHisto = false; /**<  Store histogram or not*/
       bool m_bField = true;                   /**< Work with BField, fit range and initial parameters is different incase B and noB */
+      double m_threshold = 0.6 ; /**< minimal requirement for the fraction of fitted results */
       double m_sigma[56][2][18][7][8]; /**<new sigma prameters.*/
       TGraphErrors* m_gFit[56][2][18][7];  /**< sigma*sigma graph for fit*/
       TGraphErrors* m_graph[56][2][18][7];    /**< sigma graph.*/

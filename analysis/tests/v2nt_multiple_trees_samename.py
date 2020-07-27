@@ -4,9 +4,12 @@
 import ROOT
 import b2test_utils
 from basf2 import set_random_seed, create_path, process
+from b2test_utils import configure_logging_for_tests
 from modularAnalysis import variablesToNtuple
 
 set_random_seed("1337")
+# make logging a bit less verbose and more reproducible
+configure_logging_for_tests()
 
 ###############################################################################
 # add the same V2NT twice without specifying a different name

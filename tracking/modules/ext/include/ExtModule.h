@@ -8,12 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EXTMODULE_H
-#define EXTMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
+/* Belle 2 headers. */
 #include <framework/gearbox/Const.h>
+#include <framework/core/Module.h>
 
+/* C++ headers. */
 #include <string>
 #include <vector>
 
@@ -21,7 +22,8 @@ namespace Belle2 {
 
   class TrackExtrapolateG4e;
 
-  /** The geant4e-based track extrapolation module.
+  /**
+   * The geant4e-based track extrapolation module.
    *
    * This module extrapolates tracks outward from the outer perimeter of the CDC
    * using geant4e.
@@ -64,15 +66,6 @@ namespace Belle2 {
     //!  ChargedStable hypotheses
     std::vector<Const::ChargedStable> m_Hypotheses;
 
-    //! User-defined name of the Track collection of the reconstructed tracks to be extrapolated
-    std::string m_TracksColName;
-
-    //! Name of the RecoTrack collection of the reconstructed tracks to be extrapolated
-    std::string m_RecoTracksColName;
-
-    //! User-defined name of the extHit collection of the extrapolation hits
-    std::string m_ExtHitsColName;
-
     //! User-defined minimum transverse momentum in GeV/c for extrapolation to be started
     double m_MinPt;
 
@@ -81,9 +74,6 @@ namespace Belle2 {
 
     //! User-define maximum step size in cm (0 for no upper limit)
     double m_MaxStep;
-
-    //! User-defined flag for source (0 = beam, 1 = cosmic ray)
-    int    m_Cosmic;
 
     //! User-defined tracking verbosity:
     //! 0=Silent; 1=Min info per step; 2=sec particles; 3=pre/post step info; 4=like 3 but more info; 5=proposed step length info
@@ -112,5 +102,3 @@ namespace Belle2 {
   };
 
 } // end of namespace Belle2
-
-#endif // EXTMODULE_H

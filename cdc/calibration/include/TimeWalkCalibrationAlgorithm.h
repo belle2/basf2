@@ -10,7 +10,8 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-#include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dbobjects/CDCGeometry.h>
+#include <framework/database/DBObjPtr.h>
 #include <TH1D.h>
 #include <TH2D.h>
 #include "string"
@@ -98,7 +99,7 @@ namespace Belle2 {
       double m_minNdf = 20;                          /**< minimum number of degree of freedom required for track. */
       double m_minPval = 0.;                         /**< minimum number of Prob(chi2) of fitted track. */
       double m_constTerm[300] = {0.};                /**< const term in fitting, it will be added to T0 instead tw */
-      unsigned short m_flag[300];                    /**< flag for fit status */
+      unsigned short m_flag[300] = {0};                    /**< flag for fit status */
       std::vector<float> m_tw_old[300];              /**< tw list before calibration. */
       std::vector<float> m_tw_new[300];              /**< tw list after calibration. */
       bool m_storeHisto = true;                      /**< Store all Histogram or not*/

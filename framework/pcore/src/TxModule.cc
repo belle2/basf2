@@ -15,8 +15,6 @@
 #include <framework/core/RandomNumbers.h>
 #include <framework/core/Environment.h>
 
-#include <stdlib.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -37,7 +35,7 @@ TxModule::TxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_blocking
   }
 }
 
-TxModule::~TxModule() { }
+TxModule::~TxModule() = default;
 
 void TxModule::initialize()
 {
@@ -87,11 +85,11 @@ void TxModule::event()
 
   // Put the message in ring buffer
   for (;;) {
-    int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
+    int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize(), true);
     if (stat >= 0) break;
     if (!m_blockingInsert) {
       B2WARNING("Ring buffer seems full, removing some previous data.");
-      m_rbuf->remq(NULL);
+      m_rbuf->remq(nullptr);
     }
     //    usleep(200);
     usleep(20);

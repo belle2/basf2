@@ -13,16 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <beast/pindiode/dataobjects/PindiodeHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TF1.h>
-#include <TVector3.h>
-
 
 namespace Belle2 {
   namespace pindiode {
@@ -41,26 +32,43 @@ namespace Belle2 {
        */
       PinDigitizerModule();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~PinDigitizerModule();
 
-      /**  */
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
 
-      /**  */
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
 
-      /**  */
+      /**
+       * Event processor.
+       */
       virtual void event() override;
 
-      /**  */
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
-      /**  */
+
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
 
     private:
-      StoreArray<PindiodeHit> m_pindiodeHit; /** Array for PindiodeHit */
+      StoreArray<PindiodeHit> m_pindiodeHit; /**< Array for PindiodeHit */
 
       /** Cremat gain */
       double m_CrematGain;

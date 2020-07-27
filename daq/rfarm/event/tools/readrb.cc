@@ -6,7 +6,6 @@
 // Date : 28 - Apr - 2012
 //-
 #include <string>
-#include <vector>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,7 +47,7 @@ int main(int argc, char** argv)
       printf("EoF found. Exitting.....\n");
     }
     nevt++;
-    if (nevt % 1000 == 0) printf("readrb : event = %d\n", nevt);
+    if (nevt % 1000 == 0) printf("readrb : event = %d (size=%d)\n", nevt, *((int*)evbuf));
     usleep(sltime);
   }
 }

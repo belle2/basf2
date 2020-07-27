@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -19,13 +18,8 @@
 #include <beast/csi/dataobjects/CsiDigiHit.h>
 #include <beast/csi/modules/CsIStudyModule.h>
 
-
-
 // ROOT
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
-#include <TH2.h>
 #include <TFile.h>
 
 using namespace std;

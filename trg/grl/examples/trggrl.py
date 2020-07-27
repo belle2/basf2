@@ -100,7 +100,7 @@ pGun.param(param_pGun)
 
 mcparticleprinter.param('maxLevel', -1)
 # need to check
-# g4sim.param('UICommands',['/control/execute ' +
+# g4sim.param('UICommandsAtIdle',['/control/execute ' +
 #                           os.path.join(os.environ.get('BELLE2_LOCAL_DIR', None),"trg/cdc/examples/physics.mac")])
 
 # ...CDCDigitizer...

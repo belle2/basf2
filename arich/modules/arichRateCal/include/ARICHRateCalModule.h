@@ -12,10 +12,8 @@
 #define ARICHRATECALMODULE_H
 
 #include <framework/core/HistoModule.h>
-#include <arich/geometry/ARICHGeometryPar.h>
 #include <string>
 
-#include <TH1.h>
 #include <TH2.h>
 
 namespace Belle2 {
@@ -73,14 +71,17 @@ namespace Belle2 {
     unsigned int calword(const int* buf);
 
   protected:
-    TH2* h_rate2D[100];
+    TH2* h_rate2D[100] = {NULL};
     int m_nrun;
     int m_nevents;
     double m_dth;
     double m_th0;
     bool m_debugmode;
+    bool m_internalmode;
     std::string m_daqdb;
-    unsigned int m_ibyte;
+    unsigned int m_ibyte = 0;
+    int m_run_count = 0;
+    int m_evt_count = 0;
 
   };
 

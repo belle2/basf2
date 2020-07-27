@@ -17,25 +17,24 @@
 
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
-#include <geometry/utilities.h>
 
 #include <cmath>
 #include <boost/format.hpp>
 
 #include <G4Material.hh>
+#include <G4ProductionCuts.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Torus.hh>
 #include <G4Trd.hh>
 #include <G4SubtractionSolid.hh>
-#include <G4PVReplica.hh>
+#include <G4Region.hh>
 #include <G4VSolid.hh>
 
 #include <G4Polycone.hh>
 #include <G4Cons.hh>
 #include <G4Colour.hh>
 #include <G4LogicalVolume.hh>
-#include <G4VPhysicalVolume.hh>
 #include <G4PVPlacement.hh>
 #include <G4Transform3D.hh>
 #include <G4VisAttributes.hh>
@@ -148,7 +147,7 @@ namespace Belle2 {
       G4Material* cdcMedGas = cdcMed;
 
       CDCGeometryPar& cdcgp = CDCGeometryPar::Instance(&geo);
-      CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+      const CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
       //      std::cout << gcp.getMaterialDefinitionMode() << std::endl;
 
       //      if (cdcgp.getMaterialDefinitionMode() == 2) {
@@ -172,11 +171,15 @@ namespace Belle2 {
                        mother.getNNodes(), motherZ.data(),
                        motherRmin.data(), motherRmax.data());
       logical_cdc = new G4LogicalVolume(solid_cdc, medAir, "logicalCDC", 0, 0, 0);
-      physical_cdc = new G4PVPlacement(0, G4ThreeVector(geo.getGlobalOffsetX() * CLHEP::cm, geo.getGlobalOffsetY() * CLHEP::cm,
-                                                        geo.getGlobalOffsetZ() * CLHEP::cm), logical_cdc, "physicalCDC",
-                                       &topVolume, false,
-                                       0);
+      physical_cdc = new G4PVPlacement(0, G4ThreeVector(geo.getGlobalOffsetX() * CLHEP::cm,
+                                                        geo.getGlobalOffsetY() * CLHEP::cm,
+                                                        geo.getGlobalOffsetZ() * CLHEP::cm), logical_cdc,
+                                       "physicalCDC", &topVolume, false, 0);
 
+      // Set up region for production cuts
+      G4Region* aRegion = new G4Region("CDCEnvelope");
+      logical_cdc->SetRegion(aRegion);
+      aRegion->AddRootLogicalVolume(logical_cdc);
 
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(0., 1., 0.)));
       for (const auto& wall : geo.getOuterWalls()) {
@@ -190,7 +193,8 @@ namespace Belle2 {
 
 
         G4Material* medWall = medAir;
-        if (strstr((wallName).c_str(), "MiddleWall") != NULL) {
+        if (strstr((wallName).c_str(), "MiddleWall") != nullptr) {
+          // cppcheck-suppress redundantInitialization
           medWall = medCFRP;
         } else {
           medWall = medAluminum;
@@ -216,9 +220,10 @@ namespace Belle2 {
         const int iInnerWall = wall.getId();
 
         G4Material* medWall = medAir;
-        if (strstr(wallName.c_str(), "MiddleWall") != NULL) {
+        if (strstr(wallName.c_str(), "MiddleWall") != nullptr) {
+          // cppcheck-suppress redundantInitialization
           medWall = medCFRP;
-        } else if (strstr(wallName.c_str(), "MiddleGlue") != NULL) { // Glue layer 0.005 mmt
+        } else if (strstr(wallName.c_str(), "MiddleGlue") != nullptr) { // Glue layer 0.005 mmt
           medWall = medGlue;
         } else { // Al layer 0.1 mmt
           medWall = medAluminum;
@@ -343,7 +348,9 @@ namespace Belle2 {
           const auto& epLayerFwdIn = endplate.getEndPlateLayer(nEPLayer / 2);
           const auto& epLayerFwdOut = endplate.getEndPlateLayer(nEPLayer - 1);
           const auto& senseLayer = geo.getSenseLayer(iSLayer);
-          const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+          //    const auto& fieldLayerIn = geo.getFieldLayer(iSLayer - 1);
+          int iSLayerMinus1 = iSLayer - 1; //avoid cpp-check warning
+          const auto& fieldLayerIn = geo.getFieldLayer(iSLayerMinus1); //avoid cpp-check warning
           rmin_sensitive_left = epLayerBwdIn.getRmax();
           rmax_sensitive_left = epLayerBwdOut.getRmax();
           zback_sensitive_left = senseLayer.getZbwd();

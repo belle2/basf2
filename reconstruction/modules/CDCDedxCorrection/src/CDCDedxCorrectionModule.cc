@@ -10,19 +10,10 @@
 
 #include <reconstruction/modules/CDCDedxCorrection/CDCDedxCorrectionModule.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 
-#include <framework/gearbox/Const.h>
-#include <framework/utilities/FileSystem.h>
-
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
-
-#include <cassert>
 #include <cmath>
 #include <algorithm>
-#include <utility>
-#include <stdlib.h>
-#include <time.h>
 
 using namespace Belle2;
 using namespace Dedx;

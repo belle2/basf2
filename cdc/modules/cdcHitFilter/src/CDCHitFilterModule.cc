@@ -12,9 +12,6 @@
 #include <cdc/modules/cdcHitFilter/CDCHitFilterModule.h>
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-
 using namespace Belle2;
 using namespace CDC;
 

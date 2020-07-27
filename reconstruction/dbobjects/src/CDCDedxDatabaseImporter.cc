@@ -17,7 +17,6 @@
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
 // FRAMEWORK
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
@@ -33,7 +32,7 @@
 // NAMESPACES
 using namespace Belle2;
 
-CDCDedxDatabaseImporter::CDCDedxDatabaseImporter(std::string inputFileName, std::string name)
+CDCDedxDatabaseImporter::CDCDedxDatabaseImporter(std::string inputFileName, const std::string& name)
 {
   m_inputFileNames.push_back(inputFileName);
   m_name = name;

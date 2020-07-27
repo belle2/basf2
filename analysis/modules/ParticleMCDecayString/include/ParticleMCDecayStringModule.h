@@ -17,7 +17,6 @@
 #include <TTree.h>
 #include <TFile.h>
 
-#include <functional>
 #include <string>
 #include <unordered_set>
 #include <cstdint>

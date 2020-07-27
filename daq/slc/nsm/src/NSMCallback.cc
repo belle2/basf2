@@ -1,19 +1,14 @@
 #include "daq/slc/nsm/NSMCallback.h"
 
 #include "daq/slc/system/LogFile.h"
-#include "daq/slc/system/Time.h"
 
 #include "daq/slc/nsm/NSMCommunicator.h"
+#include "daq/slc/nsm/NSMHandlerException.h"
 
-#include <signal.h>
-#include <string.h>
 #include <cstdlib>
 #include <iostream>
 #include <sstream>
-#include <fstream>
-#include <unistd.h>
 #include <cstdarg>
-#include <cctype>
 
 using namespace Belle2;
 
@@ -28,6 +23,8 @@ NSMCallback::NSMCallback(const int timeout)
   reg(NSMCommand::VREPLY);
   reg(NSMCommand::VLISTGET);
   reg(NSMCommand::VLISTSET);
+
+  add(new NSMVHandlerText("rcstate", true, false, NSMState::ONLINE_S.getLabel()), false, true);
 }
 
 void NSMCallback::addNode(const NSMNode& node)
@@ -169,7 +166,7 @@ void NSMCallback::vget(const std::string& nodename, const std::string& vname)
       var.setNode(getNode().getName());
       var.setName(vname);
       //var.setId(i + 1);
-      var.setRevision(getRevision());
+      var.setDate(Date());
       NSMCommunicator::send(NSMMessage(node, var));
       if (m_node_v_m.find(vname) == m_node_v_m.end()) {
         m_node_v_m.insert(NSMNodeMapMap::value_type(vname, NSMNodeMap()));

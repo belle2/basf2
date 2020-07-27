@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2.core import basf2label, basf2copyright, get_default_global_tags, list_module_search_paths, \
-    LogPythonInterface
+from basf2.core import basf2label, basf2copyright, list_module_search_paths, LogPythonInterface
 from basf2.version import version, release
+from basf2 import conditions
 
 import os
 import sys
@@ -64,7 +64,7 @@ for var in ["RELEASE", "RELEASE_DIR", "LOCAL_DIR", "SUBDIR", "EXTERNALS_VERSION"
     name = "BELLE2_" + var
     print((name + ":").ljust(25), os.environ.get(name, ''))
 
-print('Default global tags:'.ljust(25), get_default_global_tags())
+print('Default global tags:'.ljust(25), conditions.default_globaltags)
 print('Kernel version:'.ljust(25), os.uname()[2])
 python_version = sys.version_info[:3]
 print('Python version:'.ljust(25), '.'.join(str(ver) for ver in python_version))

@@ -11,12 +11,12 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
+
+#include <TH1F.h>
+
 #include <string>
-//#include <map>
-#include <TH2.h>
 
 namespace Belle2 {
 
@@ -51,9 +51,9 @@ namespace Belle2 {
       StoreArray<PXDRawHit> m_storeRawHits;
 
       /** Histogram pixelcount/??? */
-      TH1F* hrawPxdHitsCount[eNumSensors][eNumSwitcher][eNumDCD];
+      TH1F* hrawPxdHitsCount[eNumSensors][eNumSwitcher][eNumDCD] = {};
       /** Histogram raw pixel charge */
-      TH1F* hrawPxdHitsCharge[eNumSensors][eNumSwitcher][eNumDCD];
+      TH1F* hrawPxdHitsCharge[eNumSensors][eNumSwitcher][eNumDCD] = {};
 
       virtual void defineHisto() override;
 

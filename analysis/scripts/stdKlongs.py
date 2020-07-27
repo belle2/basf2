@@ -10,67 +10,75 @@
 #
 ########################################################
 
-from basf2 import *
-from modularAnalysis import *
+from basf2 import B2FATAL, B2WARNING
+from modularAnalysis import fillParticleList, cutAndCopyList
 
 
-def stdKlongs(listtype='veryLoose', path=analysis_main):
+def stdKlongs(listtype='allklm', path=None):
     """
-    Function to prepare one of several standardized types of Klong lists:
+    Warning:
+        This function is a placeholder for Klong selections. Currently
+        everything but the 'allklm' list is disabled pending study.
 
-    - 'K_L0:all' with no cuts
-    - 'K_L0:veryLoose' (default) with some (very)loose quality selections
-    - 'K_L0:loose' with KlongID requirements
-    - 'K_L0:tight' like loose but with higher ID cut
+    Prepares the 'K_L0:allklm' list with no cuts (all KLM clusters are loaded).
 
-    @param listtype name of standard list
-    @param path     modules are added to this path
+    Parameters:
+        listtype (str): name of standard list options (currently only
+            'all' is supported/recommended)
+        path (basf2.Path): modules are added to this path
     """
 
     # all KLM clusters
-    if listtype == 'all':
-        fillParticleList('K_L0:all', '', True, path)
+    if listtype == 'allklm':
+        B2WARNING('The Klong particles in the list "allklm" are exclusively built from KLMClusters!')
+        fillParticleList('K_L0:allklm', '[isFromKLM > 0] and [klmClusterKlId >= 0] and [klmClusterKlId <= 1]', True, path)
+    elif listtype == 'allecl':
+        B2WARNING('The Klong particles in the list "allecl" are exclusively built from ECLClusters!')
+        fillParticleList('K_L0:allecl', 'isFromECL > 0', True, path)
+    else:
+        B2FATAL("""
 
-    # loose KLs, removes buggy KLM clusters
-    elif listtype == 'veryLoose':
-        stdKlongs('all', path)
-        cutAndCopyList(
-            'K_L0:veryLoose',
-            'K_L0:all',
-            'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100.',
-            True,
-            path)
+    Only the particle lists 'allklm' (Klongs built from KLM clusters) and 'allecl' (Klongs built from neutral ECLCluster) are
+    currently supported. Please use:
 
-    # additional cuts on KL_ID
-    elif listtype == 'loose':
-        stdKlongs('all', path)
-        cutAndCopyList(
-            'K_L0:loose',
-            'K_L0:all',
-            'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100. and klongID_KLM > 0.04',
-            True,
-            path)
-
-    # additional cuts on KL_ID
-    elif listtype == 'tight':
-        stdKlongs('loose', path)
-        cutAndCopyList(
-            'K_L0:tight',
-            'K_L0:loose',
-            'klongID_KLM > 0.2',
-            True,
-            path)
-
-
-# Used in skimming code
-def loadStdSkimKL0(path=analysis_main):
-    stdKlongs('loose', path)
-    cutAndCopyList(
-        'K_L0:skim',
-        'K_L0:loose',
-        '',
-        True,
-        path)
-
-# Only used for Belle via b2bii
-# ?
+    stdKlongs('allklm', path=mypath)
+            """)
+#    # loose KLs, removes buggy KLM clusters
+#    elif listtype == 'veryLoose':
+#        stdKlongs('all', path)
+#        selection = 'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100.'
+#        B2WARNING("The standard Klong lists are not studied or optimised yet. ")
+#        B2WARNING("Beware that anything more complex than the 'all' list may not work as desired (or at all).")
+#        B2WARNING("You will have the following cuts applied: %s" % selection)
+#        cutAndCopyList(
+#            'K_L0:veryLoose',
+#            'K_L0:all',
+#            selection,
+#            True,
+#            path)
+#
+#    # additional cuts on KL_ID
+#    elif listtype == 'loose':
+#        stdKlongs('all', path)
+#        selection = 'E > 0.5 and E < 10. and klmClusterTiming > -10 and klmClusterTiming < 100. and klmClusterKlId > 0.04'
+#        B2WARNING("The standard Klong lists are not studied or optimised yet. ")
+#        B2WARNING("Beware that anything more complex than the 'all' list may not work as desired (or at all).")
+#        B2WARNING("You will have the following cuts applied: %s" % selection)
+#        cutAndCopyList(
+#            'K_L0:loose',
+#            'K_L0:all',
+#            selection,
+#            True,
+#            path)
+#
+#    # additional cuts on KL_ID
+#    elif listtype == 'tight':
+#        stdKlongs('loose', path)
+#        tight_selection = 'klmClusterKlId > 0.2'
+#        B2WARNING("With the following additional tight selection: %s" % tight_selection)
+#        cutAndCopyList(
+#            'K_L0:tight',
+#            'K_L0:loose',
+#            tight_selection,
+#            True,
+#            path)

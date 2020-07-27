@@ -138,6 +138,9 @@ namespace Belle2 {
 //Original definition.
 //static double ecl_adhoc_corr( int Exp, int Run, double Energy, double)
 //Modified 20081222
+  /** The function giving correction factor.
+   *  Corresponding Data/MC so that energy in data should be divided by this.
+   */
   static double ecl_adhoc_corr(int Exp, int Run, int iflag05th,
                                double Energy, double)
   {
@@ -580,6 +583,7 @@ namespace Belle2 {
 //=================================================================
 // Fix up wrong calib. in Exp.45 by Isamu Nakamura, added 20060413.
 //=================================================================
+  /** The function giving correction factor in Exp.45. */
   static double ecl_adhoc_corr_45(int exp, int /*run*/, int cid)
   {
 
@@ -604,6 +608,7 @@ namespace Belle2 {
 //=====================
 // Correct energy scale (MC) to make pi0 peak nominal. 20080530
 //=====================
+  /** Correct energy scale (MC) to make pi0 peak nominal. */
   static double ecl_mcx3_corr(int /*exp*/, int /*run*/, double energy, double /*theta*/)
   {
     //KM std::cout<<"ecl_mcx3_corr called."<<std::endl;
@@ -622,6 +627,7 @@ namespace Belle2 {
 // Make MC mass peak to PDG's one.
 // Version0.1 2001/07/17 trial version.
 //===============================================
+  /** Make MC mass peak to PDG value. */
   static double mpi0pdg(double Energy) // Energy in GeV.
   {
     // return value.
@@ -775,8 +781,8 @@ namespace Belle2 {
 
 //
     double resol;
-    double para[4];
-    double error[4];
+    double para[4] = { };
+    double error[4] = { };
 
     double pbuf = p;
 //--
@@ -1320,12 +1326,13 @@ namespace Belle2 {
     // Correct energy and error matrix in Mdst_ecl.
     double factor;
     double factor13;
-    double shower_energy, shower_theta;
+
     for (std::vector<Belle::Mdst_ecl>::iterator itecl = eclmgr.begin();
          itecl != eclmgr.end(); ++itecl) {
       Belle::Mdst_ecl& shower = *itecl;
-      shower_energy = shower.energy();
-      shower_theta  = shower.theta();
+      // Shower energy and polar angle
+      double shower_energy = shower.energy();
+      double shower_theta  = shower.theta();
 
       // Fix wrong calib. for Exp. 45.
       //      if( Eno==45 )
@@ -1443,18 +1450,17 @@ namespace Belle2 {
       shower.error(3, shower.error(3) / factor); // Energy-theta.
 
       // Incriment Belle::Mdst_ecl_aux pointer.
-      itaux++;
+      ++itaux;
     }
 
     // Correct energy in Belle::Mdst_gamma.
-    double gamma_energy, gamma_cos;
     for (std::vector<Belle::Mdst_gamma>::iterator itgam = gammamgr.begin();
          itgam != gammamgr.end(); ++itgam) {
       Belle::Mdst_gamma& gamma = *itgam;
       // Create the gamma's 3vector
       CLHEP::Hep3Vector gamma_3v(gamma.px(), gamma.py(), gamma.pz());
-      gamma_energy = gamma_3v.mag();
-      gamma_cos    = gamma_3v.cosTheta();
+      double gamma_energy = gamma_3v.mag();
+      double gamma_cos    = gamma_3v.cosTheta();
 
       // control sequence by option and expmc.
       switch (option) {
@@ -1716,8 +1722,8 @@ namespace Belle2 {
           CLHEP::HepMatrix Dy(6, 1, 0);
 
           int iter = 0;
-          double Df, f_old = DBL_MAX;
-          double Dchi2, chi2_old = DBL_MAX;
+          double f_old = DBL_MAX;
+          double chi2_old = DBL_MAX;
           double /*mass_gg,*/ chi2 = DBL_MAX;
           bool exit_flag = false;
 
@@ -1766,9 +1772,9 @@ namespace Belle2 {
             y = y0 + Dy;
             int ierr;
             chi2 = (Dy.T() * V.inverse(ierr) * Dy)[0][0];
-            Dchi2 = fabs(chi2 - chi2_old);
+            double Dchi2 = fabs(chi2 - chi2_old);
             chi2_old = chi2;
-            Df = fabs(f[0][0] - f_old);
+            double Df = fabs(f[0][0] - f_old);
             f_old = f[0][0];
 
             // When chi-sq. change is small enough and mass is
@@ -2264,7 +2270,7 @@ namespace Belle2 {
     Belle::Mdst_gamma_Manager& Gamma  = Belle::Mdst_gamma_Manager::get_manager();
 
     for (std::vector<Belle::Mdst_gamma>::iterator
-         it = Gamma.begin(); it != Gamma.end(); it++) {
+         it = Gamma.begin(); it != Gamma.end(); ++it) {
       double r(it->ecl().r());
       double theta(it->ecl().theta());
       double phi(it->ecl().phi());

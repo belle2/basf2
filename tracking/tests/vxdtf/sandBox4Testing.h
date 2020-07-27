@@ -1,9 +1,6 @@
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <gtest/gtest.h>
 #include <vector>
-
-#include <math.h> // sqrt, atan, isinf, ...
 
 namespace Belle2 {
 

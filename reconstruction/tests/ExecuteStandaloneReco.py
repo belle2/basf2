@@ -24,4 +24,4 @@ with tempfile.TemporaryDirectory() as tempdir:
     # run reconstruction only
     assert(0 == os.system("basf2 " + reco_steering))
     # Check if there are 10 events in the file
-    assert(0 == os.system("check_basf2_file -n10 evtgen_bbar.root"))
+    assert(0 == os.system("b2file-check -n10 evtgen_bbar.root"))

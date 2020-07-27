@@ -27,16 +27,19 @@ namespace Belle2 {
    */
   class SVDCoGTimeCalibrations {
   public:
-    static std::string name;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar< SVDCoGCalibrationFunction > > t_payload;
+    static std::string name; /**< name of the SVDCoGCalibrationFunction payload */
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar< SVDCoGCalibrationFunction > >
+    t_payload; /**< typedef for the SVDCoGCalibrationFunction payload of all SVD sensors*/
 
     /** Constructor, no input argument is required */
-    SVDCoGTimeCalibrations()
-      : m_aDBObjPtr(name)
-    {}
+    SVDCoGTimeCalibrations() : m_aDBObjPtr(name)
+    {
+      m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDCoGTimeCalibrations: from now on we are using " <<
+        this->m_aDBObjPtr -> get_uniqueID()); });
+    }
 
-    /** Return the charge (number of electrons/holes) collected on a specific
-     * strip, given the number of ADC counts.
+    /** Return the strip time, given the raw strip time
      *
      * Input:
      * @param sensor ID: identity of the sensor for which the
@@ -63,6 +66,36 @@ namespace Belle2 {
 
     }
 
+    /** Return the strip time error, given the raw strip time,
+     * and tje raw time error
+     *
+     * Input:
+     * @param sensor ID: identity of the sensor for which the
+     * calibration is required
+     * @param isU: sensor side, true for p side, false for n side
+     * @param strip: strip number - NOT USED
+     * @param raw_time : raw CoG time in ns
+     * @param raw_timeErr : raw CoG time in ns
+     * @param bin : trigger bin (0,1,2,3)
+     *
+     * Output: double corresponding to the corrected time [ns]
+     */
+    inline double getCorrectedTimeError(
+      const Belle2::VxdID& sensorID,
+      const bool& isU, const unsigned short& strip,
+      const double& raw_time,
+      const double& raw_timeErr,
+      const int& bin
+    ) const
+    {
+      return m_aDBObjPtr->get(sensorID.getLayerNumber(),
+                              sensorID.getLadderNumber(),
+                              sensorID.getSensorNumber(),
+                              m_aDBObjPtr->sideIndex(isU),
+                              strip).calibratedValueError(raw_time, raw_timeErr, bin);
+
+    }
+
     /** returns the unique ID of the payload */
     TString getUniqueID() { return m_aDBObjPtr->get_uniqueID(); }
 
@@ -72,7 +105,7 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr< t_payload > m_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDCoGCalibrationFunction payload */
   };
 }
 

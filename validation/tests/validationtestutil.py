@@ -5,7 +5,7 @@ import os
 import sys
 
 
-def check_excecute(cmd, terminate_on_error=True):
+def check_execute(cmd, terminate_on_error=True):
     """
     Executes a shell commands and check for =! 0 return codes
     """
@@ -27,7 +27,8 @@ def check_path_exists(paths, terminate_on_error=True):
     Checks if a path exists.
 
     @param paths: list of file system path (directories or files)
-    @param terminate_on_error: if true, the execution is terminated if one part is not present
+    @param terminate_on_error: if true, the execution is terminated if one part
+        is not present
     @return: None
     """
 

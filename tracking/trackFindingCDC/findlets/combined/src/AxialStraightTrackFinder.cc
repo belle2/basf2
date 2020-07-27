@@ -9,13 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/AxialStraightTrackFinder.h>
 
-#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <mdst/dataobjects/ECLCluster.h>
-
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -52,7 +48,7 @@ void AxialStraightTrackFinder::apply(const std::vector<CDCWireHit>& wireHits,
   std::vector<const ECLCluster*> clusters;
   clusters.reserve(m_storeArrayClusters.getEntries());
   for (const ECLCluster& cluster : m_storeArrayClusters) {
-    if (cluster.getHypothesisId() == ECLCluster::c_neutralHadron) { //FIXME reasonable to pick other hypothesis?
+    if (cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) { //FIXME reasonable to pick other hypothesis?
       clusters.emplace_back(&cluster);
     }
   }

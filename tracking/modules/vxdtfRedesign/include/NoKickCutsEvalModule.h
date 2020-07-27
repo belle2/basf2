@@ -8,19 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef NOKICKCUTSEVAL_H
-#define NOKICKCUTSEVAL_H
+#pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <tracking/dataobjects/hitXP.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
 #include <TFile.h>
 #include <math.h>
-
 
 namespace Belle2 {
 
@@ -111,7 +106,7 @@ namespace Belle2 {
     bool c_fitMethod; /**< flag to activate the fit method to evaluate the cuts */
 
     NoKickRTSel m_trackSel; /**< auxiliary variable to use methods of NoKickRTSel */
-    TFile* m_outputFile; /**< output file of cuts */
+    TFile* m_outputFile = nullptr; /**< output file of cuts */
     std::vector<double> m_histoLim; /**< limits of DeltaX histograms */
     std::vector<std::vector<std::vector<std::vector<std::vector<TH1F*>>>>> m_histo; /**< DeltaX histograms */
 
@@ -134,4 +129,3 @@ namespace Belle2 {
     };
   };
 }
-#endif

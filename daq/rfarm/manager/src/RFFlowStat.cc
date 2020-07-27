@@ -11,7 +11,7 @@
 using namespace Belle2;
 using namespace std;
 
-RFFlowStat::RFFlowStat(char* shmname, int id, RingBuffer* rbuf)
+RFFlowStat::RFFlowStat(const char* shmname, int id, RingBuffer* rbuf)
 {
   m_rfshm = new RFSharedMem(shmname);
   m_cell = &(m_rfshm->GetCell(id));
@@ -22,7 +22,7 @@ RFFlowStat::RFFlowStat(char* shmname, int id, RingBuffer* rbuf)
   gettimeofday(&m_t0, 0);
 }
 
-RFFlowStat::RFFlowStat(char* shmname)
+RFFlowStat::RFFlowStat(const char* shmname)
 {
   m_rfshm = new RFSharedMem(shmname);
 }

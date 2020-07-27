@@ -17,7 +17,8 @@ using namespace Belle2;
 using namespace std;
 
 
-VXDGeoPlacementPar::VXDGeoPlacementPar(const std::string& name, double u, double v, std::string w, double woffset): m_name(name),
+VXDGeoPlacementPar::VXDGeoPlacementPar(const std::string& name, double u, double v, const std::string& w,
+                                       double woffset): m_name(name),
   m_u(u),
   m_v(v), m_w(w), m_woffset(woffset)
 { }

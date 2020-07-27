@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# @cond
+# @cond SUPPRESS_DOXYGEN
 
 # Thomas Keck 2016
 
@@ -22,14 +22,15 @@ import collections
 import copy
 import itertools
 import typing
+import basf2
 
 # Define classes at top level to make them pickable
-# Creates new classs via namedtuple, which are like a struct in C
+# Creates new class via namedtuple, which are like a struct in C
 
 FeiConfiguration = collections.namedtuple('FeiConfiguration', 'prefix, cache, b2bii, monitor, legacy, externTeacher, training')
 FeiConfiguration.__new__.__defaults__ = ('FEI_TEST', None, False, True, None, 'basf2_mva_teacher', False)
 FeiConfiguration.__doc__ = "Fei Global Configuration class"
-FeiConfiguration.prefix.__doc__ = "The database prefix used for all weightfiles"
+FeiConfiguration.prefix.__doc__ = "The database prefix used for all weight files"
 FeiConfiguration.cache.__doc__ = "The stage which is passed as input, it is assumed that all previous stages"\
                                  "do not have to be reconstructed again. Can be either a number or"\
                                  " a filename containing a pickled number or"\
@@ -38,8 +39,9 @@ FeiConfiguration.b2bii.__doc__ = "If true, it is assumed that we run on converte
 FeiConfiguration.monitor.__doc__ = "If true, monitor histograms are created"
 FeiConfiguration.legacy.__doc__ = "Pass the summary file of a legacy FEI training,"\
                                   "and the algorithm will be able to apply this training."
-FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, externClusterTeacher"
+FeiConfiguration.externTeacher.__doc__ = "Teacher command e.g. basf2_mva_teacher, b2mva-kekcc-cluster-teacher"
 FeiConfiguration.training.__doc__ = "If you train the FEI set this to True, otherwise to False"
+
 
 MVAConfiguration = collections.namedtuple('MVAConfiguration', 'method, config, variables, target, sPlotVariable')
 MVAConfiguration.__new__.__defaults__ = ('FastBDT',
@@ -54,13 +56,15 @@ MVAConfiguration.target.__doc__ = "Target variable from the VariableManager."
 MVAConfiguration.sPlotVariable.__doc__ = "Discriminating variable used by sPlot to do data-driven training."
 
 
-PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, bestCandidateVariable, '
-                                             'bestCandidateCut, bestCandidateMode')
-PreCutConfiguration.__new__.__defaults__ = ('', -2, None, 0, 'lowest')
+PreCutConfiguration = collections.namedtuple('PreCutConfiguration', 'userCut, vertexCut, noBackgroundSampling,'
+                                             'bestCandidateVariable, bestCandidateCut, bestCandidateMode')
+PreCutConfiguration.__new__.__defaults__ = ('', -2, False, None, 0, 'lowest')
 PreCutConfiguration.__doc__ = "PreCut configuration class. These cuts is employed before training the mva classifier."
 PreCutConfiguration.userCut.__doc__ = "The user cut is passed directly to the ParticleCombiner."\
-                                      "Particles which do not pass this cut are immediatly discarded."
+                                      "Particles which do not pass this cut are immediately discarded."
 PreCutConfiguration.vertexCut.__doc__ = "The vertex cut is passed as confidence level to the VertexFitter."
+PreCutConfiguration.noBackgroundSampling.__doc__ = "For very pure channels, the background sampling factor is too high" \
+                                                   " and the MVA can't be trained. This disables background sampling."
 PreCutConfiguration.bestCandidateVariable.__doc__ = "Variable from the VariableManager which is used to rank all candidates."
 PreCutConfiguration.bestCandidateMode.__doc__ = "Either lowest or highest."
 PreCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to keep after the best-candidate ranking."
@@ -74,9 +78,9 @@ PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to ke
 DecayChannel = collections.namedtuple('DecayChannel', 'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID')
 DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
-DecayChannel.name.__doc__ = "Name of the channel e.g. D0:generic_0"
-DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weightfiles independent of decayModeID"
-DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 ==> K+ pi-"
+DecayChannel.name.__doc__ = "str:Name of the channel e.g. :code:`D0:generic_0`"
+DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weight files independent of decayModeID"
+DecayChannel.decayString.__doc__ = "DecayDescriptor of the channel e.g. D0 -> K+ pi-"
 DecayChannel.daughters.__doc__ = "List of daughter particles of the decay channel e.g. [K+, pi-]"
 DecayChannel.mvaConfig.__doc__ = "MVAConfiguration object which is used for this channel."
 DecayChannel.preCutConfig.__doc__ = "PreCutConfiguration object which is used for this channel."
@@ -89,11 +93,11 @@ MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'dQ': ('dQ', 100, -1.0, 1.0),
                              'abs(dM)': ('abs(dM)', 100, 0.0, 1.0),
                              'abs(dQ)': ('abs(dQ)', 100, 0.0, 1.0),
-                             'piid': ('piid', 100, 0.0, 1.0),
-                             'Kid': ('Kid', 100, 0.0, 1.0),
-                             'prid': ('prid', 100, 0.0, 1.0),
-                             'eid': ('eid', 100, 0.0, 1.0),
-                             'muid': ('muid', 100, 0.0, 1.0),
+                             'pionID': ('pionID', 100, 0.0, 1.0),
+                             'kaonID': ('kaonID', 100, 0.0, 1.0),
+                             'protonID': ('protonID', 100, 0.0, 1.0),
+                             'electronID': ('electronID', 100, 0.0, 1.0),
+                             'muonID': ('muonID', 100, 0.0, 1.0),
                              'isSignal': ('isSignal', 2, -0.5, 1.5),
                              'isSignalAcceptMissingNeutrino': ('isSignalAcceptMissingNeutrino', 2, -0.5, 1.5),
                              'isPrimarySignal': ('isPrimarySignal', 2, -0.5, 1.5),
@@ -151,12 +155,12 @@ class Particle(object):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param identifier is the pdg name of the particle as a string
-                   with an optional additional user label seperated by ':'
+                   with an optional additional user label separated by ':'
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig intermediate pre cut configuration
             @param postCutConfig post cut configuration
         """
-        #: pdg name of the particle with an optional additional user label seperated by :
+        #: pdg name of the particle with an optional additional user label separated by :
         self.identifier = identifier + ':generic' if len(identifier.split(':')) < 2 else identifier
         v = self.identifier.split(':')
         #: The name of the particle as correct pdg name e.g. K+, pi-, D*0.
@@ -217,9 +221,9 @@ class Particle(object):
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
         # At the moment all channels must have the same target variable. Why?
         if mvaConfig is not None and mvaConfig.target != self.mvaConfig.target:
-            B2FATAL(
-                'Particle %s has common target %s, while channel %s has %s. Each particle must have exactly one target!' %
-                (particle.identifier, self.mvaConfig.target, ' '.join(daughters), mvaConfig.target))
+            basf2.B2FATAL(
+                f'Particle {self.identifier} has common target {self.mvaConfig.target}, while channel '
+                f'{" ".join(daughters)} has {mvaConfig.target}. Each particle must have exactly one target!')
         # Replace generic-variables with ordinary variables.
         # All instances of {} are replaced with all combinations of daughter indices
         mvaVars = []
@@ -231,9 +235,11 @@ class Particle(object):
         decayModeID = len(self.channels)
         self.channels.append(DecayChannel(name=self.identifier + '_' + str(decayModeID),
                                           label=removeJPsiSlash(self.identifier + ' ==> ' + ' '.join(daughters)),
-                                          decayString=self.identifier + '_' + str(decayModeID) + ' ==> ' + ' '.join(daughters),
+                                          decayString=self.identifier + '_' + str(decayModeID) + ' -> ' + ' '.join(daughters),
                                           daughters=daughters,
                                           mvaConfig=mvaConfig,
                                           preCutConfig=preCutConfig,
                                           decayModeID=decayModeID))
         return self
+
+# @endcond

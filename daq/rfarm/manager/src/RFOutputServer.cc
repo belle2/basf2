@@ -9,6 +9,15 @@
 
 #include "daq/rfarm/manager/RFOutputServer.h"
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#include <unistd.h>
+
+#include <csignal>
+#include <cstring>
+
 #define RFOTSOUT stdout
 
 using namespace std;
@@ -156,6 +165,9 @@ int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* nsmc)
       m_nnodes++;
     }
   }
+
+  m_rbufin->forceClear();
+  m_rbufout->forceClear();
   return 0;
 }
 
@@ -170,7 +182,7 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
   if (m_pid_sender != 0) {
     printf("killing sender %d\n", m_pid_sender);
     //    kill(m_pid_sender, SIGINT);
-    kill(m_pid_sender, SIGKILL);
+    kill(m_pid_sender, SIGINT);
     ws = waitpid(m_pid_sender, &status, 0);
     printf("wait return = %d, status = %d\n", ws, status);
   }
@@ -206,8 +218,8 @@ int RFOutputServer::UnConfigure(NSMmsg*, NSMcontext*)
 int RFOutputServer::Start(NSMmsg*, NSMcontext*)
 {
   // Clear RingBuffer
+  m_rbufout->forceClear();
   //  m_rbufin->forceClear();
-  //  m_rbufout->forceClear();
   return 0;
 }
 
@@ -276,6 +288,13 @@ void RFOutputServer::server()
     m_flow->fillProcessStatus(GetNodeInfo(), m_pid_receiver[recv_id], m_pid_sender,
                               m_pid_basf2);
   }
+}
+void RFOutputServer::cleanup()
+{
+  printf("RFOutputServer : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  printf("RFOutputServer: Done. Exitting\n");
+  exit(-1);
 }
 
 

@@ -23,18 +23,8 @@
 #include "trg/ecl/dataobjects/TRGECLDigi0MC.h"
 #include "trg/ecl/dataobjects/TRGECLHitMC.h"
 
-//#include <ecl/geometry/ECLGeometryPar.h>
-//#include <ecl/dataobjects/ECLSimHit.h>
-
 //C++/C standard lib elements.
-#include <string>
-#include <vector>
-#include <queue>
 #include <map>
-
-//ROOT
-#include <TRandom3.h>
-
 
 namespace Belle2 {
   //namespace ECL {
@@ -80,11 +70,11 @@ namespace Belle2 {
 
 
     /** CPU time     */
-    double m_timeCPU;
+    double m_timeCPU = 0.;
     /** Run number   */
-    int    m_nRun;
+    int    m_nRun = 0;
     /** Event number */
-    int    m_nEvent;
+    int    m_nEvent = 0;
     /** object of TC Mapping*/
     TrgEclMapping* _TCMap;
     /** TCId  */

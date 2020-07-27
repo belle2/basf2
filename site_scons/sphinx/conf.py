@@ -19,6 +19,7 @@ import re
 import glob
 import shutil
 import subprocess
+import jupytext
 
 sys.path.insert(0, os.path.abspath("extensions"))
 
@@ -45,7 +46,17 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinxarg.ext',
     'basf2ext',
+    'nbsphinx',
 ]
+
+nbsphinx_allow_errors = True
+# Anything that ends with .jupy.py will be understood as a jupyter
+# notebook converted to a plain python file with jupytext. During the sphinx
+# build, jupytext will converted it back to a .ipynb file and nbsphinx will
+# build the HTML
+nbsphinx_custom_formats = {
+    '.doc.jupy.py': lambda s: jupytext.reads(s, '.py'),
+}
 
 # autosummary_generate = True
 
@@ -69,7 +80,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'basf2'
-copyright = '2010-2017, Belle II Collaboration'
+copyright = '2010-2019, Belle II Collaboration'
 author = 'Belle2 Software Group'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -108,7 +119,22 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_sphinxbuild', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['.*', '_sphinxbuild', 'Thumbs.db', 'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
+# If we want to create the light release documentation then we need t exclude anything not in the light release.
+if tags.has('light'):
+    light_packages = set([entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')])
+    for entry in os.listdir("../../"):
+        if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_patterns or entry in light_packages:
+            continue
+        exclude_patterns.append(entry)
+    del light_packages
+
+# now we need to exclude everything in the build dir except for the tools_doc
+# sub dir but there's no negative exclusion pattern so do it manually
+exclude_patterns.remove("build")
+exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*']
+# Ignore jupyter notebooks by default, we only want the ones meant for documentation
+exclude_patterns += ['**/*.ipynb', '*.ipynb']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents. :any: allows easy linking to functions/classes/modules
@@ -146,7 +172,7 @@ numfig = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'classic'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -154,7 +180,7 @@ html_theme = 'classic'
 html_theme_options = {'stickysidebar': True}
 
 # Add any paths that contain custom themes here, relative to this directory.
-# html_theme_path = []
+html_theme_path = ["_themes", ]
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
@@ -165,7 +191,7 @@ html_theme_options = {'stickysidebar': True}
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-# html_logo = None
+html_logo = "b2logo.svg"
 
 # The name of an image file (relative to this directory) to use as a favicon of
 # the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

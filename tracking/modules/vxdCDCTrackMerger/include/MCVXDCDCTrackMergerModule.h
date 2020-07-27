@@ -17,10 +17,8 @@
 #include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>
 
 #include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParam.h>
 
 namespace Belle2 {
-  class ModuleParamList;
   class RecoTrack;
 
   /// Findlet for merging VXD and CDC tracks with MC information.

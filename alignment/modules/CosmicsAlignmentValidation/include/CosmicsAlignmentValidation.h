@@ -1,14 +1,12 @@
-#ifndef COSMICS_VAL_H
-#define COSMICS_VAL_H
+#pragma once
 
 #include <framework/core/Module.h>
-class TH1;
-class TH2;
-class TNtuple;
+#include <mdst/dataobjects/TrackFitResult.h>
+
+#include <genfit/Track.h>
+
 class TTree;
 class TFile;
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <genfit/Track.h>
 
 #include <string>
 
@@ -103,4 +101,3 @@ namespace Belle2 {
 
   };
 }
-#endif

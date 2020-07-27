@@ -220,9 +220,9 @@ void ECLEventT0Module::event()
       if (itlocal[imin] > 0 && itlocal[imin] < nhypo) {
         float chiTarget = chiVsT0[itlocal[imin]] + 4.;
         int ih = itlocal[imin];
-        while (chiVsT0[ih] < chiTarget && ih < nhypo - 1) {ih++;};
+        while (ih < nhypo - 1 and chiVsT0[ih] < chiTarget) {ih++;}
         int il = itlocal[imin];
-        while (chiVsT0[il] < chiTarget && il > 0) {il--;};
+        while (il > 0 and chiVsT0[il] < chiTarget) {il--;};
         localUnc = (t0hypo[ih] - t0hypo[il]) / 4.;
       }
       localT0Unc.push_back(localUnc);
@@ -242,7 +242,7 @@ void ECLEventT0Module::event()
       if (itsel > 0 && itsel < nhypo) {
         float chiTarget = chiVsT0[itsel] + 4.;
         int ih = itsel;
-        do {ih++;} while (chiVsT0[ih] < chiTarget && ih < nhypo - 1);
+        while (ih < nhypo - 1 and chiVsT0[ih] < chiTarget) {ih++;}
         float ta = t0hypo[ih - 1];
         float tb = t0hypo[ih];
         float ca = chiVsT0[ih - 1];
@@ -250,7 +250,7 @@ void ECLEventT0Module::event()
         float th = tb;
         if (cb != ca) {th = ta + (tb - ta) * (chiTarget - ca) / (cb - ca);}
         int il = itsel;
-        do {il--;} while (chiVsT0[il] < chiTarget && il > 0);
+        while (il > 0 and chiVsT0[il] < chiTarget) {il--;}
         ta = t0hypo[il];
         tb = t0hypo[il + 1];
         ca = chiVsT0[il];

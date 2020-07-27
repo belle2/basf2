@@ -15,7 +15,6 @@
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
-
 // ROOT includes
 #include <TMatrixD.h>
 
@@ -64,7 +63,7 @@ namespace Belle2 {
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
-    PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1, float sigmaV = -1);
+    explicit PXDRecoHit(const PXDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1, float sigmaV = -1);
 
     /** Construct PXDRecoHit from a PXD cluster.
      * For users that want to supply their own errors on construction
@@ -74,7 +73,7 @@ namespace Belle2 {
      * @param sigmaV Error of the Hit along v
      * @param covUV  Covariance between u and v
      */
-    PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float covUV);
+    explicit PXDRecoHit(const PXDCluster* hit, float sigmaU, float sigmaV, float covUV);
 
     /** Construct PXDRecoHit from a PXD cluster
      * This constructor is intended as a temporary solution for people who want
@@ -86,7 +85,7 @@ namespace Belle2 {
      *
      * @param hit    PXDCluster to use as base
      */
-    PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
+    explicit PXDRecoHit(const PXDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
 
     /** Creating a deep copy of this hit. */
     genfit::AbsMeasurement* clone() const override;
@@ -140,6 +139,9 @@ namespace Belle2 {
 
     /** Set up Detector plane information */
     void setDetectorPlane();
+
+    /** Apply planar deformation of sensors*/
+    TVectorD applyPlanarDeformation(TVectorD hitCoords, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
 
     ClassDefOverride(PXDRecoHit, 8)
   };

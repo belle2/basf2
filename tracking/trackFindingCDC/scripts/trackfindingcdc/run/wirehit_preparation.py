@@ -13,6 +13,8 @@ class WireHitPreparerRunMixin(RunMixin):
     n_loops = float("nan")
 
     def create_argument_parser(self, **kwds):
+        """Configure the basf2 job script using the translated command-line arguments"""
+
         argument_parser = super().create_argument_parser(**kwds)
 
         argument_parser.add_argument(
@@ -38,8 +40,10 @@ class WireHitPreparerRunMixin(RunMixin):
         return argument_parser
 
     def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
+        """
+        Sets up a path that plays back pregenerated events or generates events
+        based on the properties in the base class.
+        """
         path = super().create_path()
 
         wire_hit_preparer = path.add_module("TFCDC_WireHitPreparer",

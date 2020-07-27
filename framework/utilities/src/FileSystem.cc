@@ -61,7 +61,7 @@ bool FileSystem::loadLibrary(std::string library, bool fullname)
   B2DEBUG(100, "Loading shared library " << library);
   void* libPointer = dlopen(library.c_str() , RTLD_LAZY | RTLD_GLOBAL);
 
-  if (libPointer == NULL) {
+  if (libPointer == nullptr) {
     B2ERROR("Could not open shared library file (error in dlopen) : " << dlerror());
     return false;
   }
@@ -101,10 +101,10 @@ std::string FileSystem::findFile(const string& path, bool silent)
 {
   std::vector<std::string> dirs;
   if (getenv("BELLE2_LOCAL_DIR")) {
-    dirs.push_back(getenv("BELLE2_LOCAL_DIR"));
+    dirs.emplace_back(getenv("BELLE2_LOCAL_DIR"));
   }
   if (getenv("BELLE2_RELEASE_DIR")) {
-    dirs.push_back(getenv("BELLE2_RELEASE_DIR"));
+    dirs.emplace_back(getenv("BELLE2_RELEASE_DIR"));
   }
   return findFile(path, dirs, silent);
 }
@@ -114,7 +114,7 @@ std::string FileSystem::findFile(const string& path, const std::string& dataType
   std::vector<std::string> dirs;
   std::string envVar = "BELLE2_" + boost::to_upper_copy(dataType) + "_DATA_DIR";
   if (getenv(envVar.c_str())) {
-    dirs.push_back(getenv(envVar.c_str()));
+    dirs.emplace_back(getenv(envVar.c_str()));
   }
   std::string dirName = boost::to_lower_copy(dataType) + "-data";
   if (getenv("VO_BELL2_SW_DIR")) {
@@ -128,7 +128,7 @@ std::string FileSystem::findFile(const string& path, const std::string& dataType
   return result;
 }
 
-FileSystem::Lock::Lock(std::string fileName, bool readonly) :
+FileSystem::Lock::Lock(const std::string& fileName, bool readonly) :
   m_readOnly(readonly)
 {
   const int mode = readonly ? O_RDONLY : O_RDWR;

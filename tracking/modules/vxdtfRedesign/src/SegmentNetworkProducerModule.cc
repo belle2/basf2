@@ -11,11 +11,9 @@
 #include <tracking/modules/vxdtfRedesign/SegmentNetworkProducerModule.h>
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
+#include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/VoidObserver.h>
-#include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
-#include <tracking/trackFindingVXD/filterTools/ObserverCheckFilters.h>
-
 
 using namespace std;
 using namespace Belle2;
@@ -40,6 +38,11 @@ SegmentNetworkProducerModule::SegmentNetworkProducerModule() : Module()
            m_PARAMNetworkOutputName,
            "Unique name for the DirectedNodeNetworkContainer Store Object Pointer created and filled by this module.",
            string(""));
+
+  addParam("EventLevelTrackingInfoName",
+           m_PARAMEventLevelTrackingInfoName,
+           "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
+           string("EventLevelTrackingInfo"));
 
   addParam("addVirtualIP",
            m_PARAMAddVirtualIP,
@@ -134,7 +137,7 @@ void SegmentNetworkProducerModule::initialize()
 
   m_network.registerInDataStore(m_PARAMNetworkOutputName, DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered);
 
-  m_eventLevelTrackingInfo.registerInDataStore();
+  m_eventLevelTrackingInfo.isRequired(m_PARAMEventLevelTrackingInfoName);
 }
 
 
@@ -144,11 +147,6 @@ void SegmentNetworkProducerModule::event()
 
   if (m_vxdtfFilters == nullptr) {
     B2FATAL("Requested secMapName '" << m_PARAMsecMapName << "' does not exist! Can not continue...");
-  }
-
-  // Make sure the EventLevelTrackingInfo object is available and created, in case we have to flag an aborted event.
-  if (!m_eventLevelTrackingInfo.isValid()) {
-    m_eventLevelTrackingInfo.create();
   }
 
   // make sure that network exists:
@@ -181,7 +179,7 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
 {
   std::vector<RawSectorData> collectedData; // contains the raw sectors to be activated
   std::deque<TrackNode>& trackNodes = m_network->accessTrackNodes(); // collects trackNodes
-  int nSPsFound = 0, nSPsLost = 0, nCollected = 0;
+  int nCollected = 0;
 
   for (StoreArray<SpacePoint>& storeArray : m_spacePoints) {
     // match all SpacePoints with the sectors:
@@ -194,10 +192,8 @@ std::vector<SegmentNetworkProducerModule::RawSectorData> SegmentNetworkProducerM
 
       if (sectorFound == nullptr) {
         B2WARNING("SpacePoint in sensor " << aSP.getVxdID() << " no sector found, SpacePoint discarded!");
-        nSPsLost++;
         continue;
       }
-      nSPsFound++;
 
       trackNodes.emplace_back(&aSP);
 
@@ -320,7 +316,7 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
     m_network->accessActiveSectorNetwork();
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
 
-  unsigned int nAccepted = 0, nRejected = 0, nLinked = 0, nAdded = 0;
+  unsigned int nLinked = 0, nAdded = 0;
 
   // loop over outer sectors to get their hits(->outerHits) and inner sectors
   for (auto* outerSector : activeSectorNetwork.getNodes()) {
@@ -368,10 +364,8 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
           if (!accepted) {
-            nRejected++;
             continue;
           }
-          nAccepted++;
 
           std::int32_t innerNodeID = innerHit->getID();
           hitNetwork.addNode(innerNodeID, *innerHit);
@@ -389,16 +383,16 @@ bool SegmentNetworkProducerModule::buildTrackNodeNetwork()
           }
 
           if (nLinked > m_PARAMmaxTrackNodeConnections) {
-            B2ERROR("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
-                    << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+            B2WARNING("Number of TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeConnections
+                      << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);
             return false;
           }
           if (nAdded > m_PARAMmaxTrackNodeAddedConnections) {
-            B2ERROR("Number of added TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeAddedConnections
-                    << "! Processing of the event will be aborted. The number of connections was = " << nLinked);
+            B2WARNING("Number of added TrackNodeConnections has exceeded maximal size limit of " << m_PARAMmaxTrackNodeAddedConnections
+                      << "! Processing of the event will be aborted. The number of connections was = " << nAdded);
             m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
             m_network->set_trackNodeConnections(nLinked);
             m_network->set_trackNodeAddedConnections(nAdded);
@@ -426,7 +420,7 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
   DirectedNodeNetwork<Belle2::TrackNode, VoidMetaInfo>& hitNetwork = m_network->accessHitNetwork();
   DirectedNodeNetwork<Segment<Belle2::TrackNode>, CACell>& segmentNetwork = m_network->accessSegmentNetwork();
   std::deque<Belle2::Segment<Belle2::TrackNode>>& segments = m_network->accessSegments();
-  unsigned int nAccepted = 0, nRejected = 0, nLinked = 0, nAdded = 0;
+  unsigned int nLinked = 0, nAdded = 0;
 
   for (DirectedNode<TrackNode, VoidMetaInfo>* outerHit : hitNetwork.getNodes()) {
     const vector<DirectedNode<TrackNode, VoidMetaInfo>*>& centerHits = outerHit->getInnerNodes();
@@ -475,10 +469,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         if (m_PARAMallFiltersOff) accepted = true; // bypass all filters
 
         if (!accepted) {
-          nRejected++;
           continue;
         }
-        nAccepted++;
 
         std::int64_t innerSegmentID = static_cast<std::int64_t>(centerHit->getEntry().getID()) << 32 | static_cast<std::int64_t>
                                       (innerHit->getEntry().getID());
@@ -516,8 +508,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
         }
 
         if (nLinked > m_PARAMmaxSegmentConnections) {
-          B2ERROR("Number of SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentConnections
-                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          B2WARNING("Number of SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentConnections
+                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);
@@ -525,8 +517,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           return;
         }
         if (nAdded > m_PARAMmaxSegmentAddedConnections) {
-          B2ERROR("Number of added SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentAddedConnections
-                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          B2WARNING("Number of added SegmentConnections exceeds the limit of " << m_PARAMmaxSegmentAddedConnections
+                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);
@@ -534,9 +526,9 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           return;
         }
         if (segments.size() > m_PARAMmaxNetworkSize) {
-          B2ERROR("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
-                  << ". Network size is " << segmentNetwork.size()
-                  << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
+          B2WARNING("SegmentNetwork size exceeds the limit of " << m_PARAMmaxNetworkSize
+                    << ". Network size is " << segmentNetwork.size()
+                    << ". VXDTF2 will abort the processing ot the event and the SegmentNetwork is cleared.");
           m_eventLevelTrackingInfo->setVXDTF2AbortionFlag();
           m_network->set_segmentConnections(nLinked);
           m_network->set_segmentAddedConnections(nAdded);

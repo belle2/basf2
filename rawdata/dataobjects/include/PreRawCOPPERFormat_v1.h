@@ -46,19 +46,19 @@ namespace Belle2 {
 
 
     //! get Detector buffer length
-    int GetDetectorNwords(int n, int finesse_num) override;
+    int GetDetectorNwords(int n, int finesse_num) OVERRIDE_CPP17;
 
     //! get Detector buffer of slot A
-    int* Get1stDetectorBuffer(int n) override;
+    int* Get1stDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot B
-    int* Get2ndDetectorBuffer(int n) override;
+    int* Get2ndDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot C
-    int* Get3rdDetectorBuffer(int n) override;
+    int* Get3rdDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot D
-    int* Get4thDetectorBuffer(int n) override;
+    int* Get4thDetectorBuffer(int n) OVERRIDE_CPP17;
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
@@ -68,13 +68,13 @@ namespace Belle2 {
     // Get information from 13words "COPPER header" attached by COPPER board
     //
     //! get COPPER counter(not event number)
-    unsigned int GetCOPPERCounter(int n) override;
+    unsigned int GetCOPPERCounter(int n) OVERRIDE_CPP17;
 
     //! get # of offset words for FINESSE slot A buffer position
-    int GetOffset1stFINESSE(int n) override;
+    int GetOffset1stFINESSE(int n) OVERRIDE_CPP17;
 
     //! get data size of  FINESSE buffer
-    int GetFINESSENwords(int n, int finesse) override;
+    int GetFINESSENwords(int n, int finesse) OVERRIDE_CPP17;
 
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
@@ -83,50 +83,50 @@ namespace Belle2 {
     //    virtual int* GetFTSW2Words(int n);
 
     //! get b2l block from "FEE b2link header"
-    virtual int* GetExpRunSubrunBuf(int n) override;
+    virtual int* GetExpRunSubrunBuf(int n) OVERRIDE_CPP17;
 
     //! get b2l block from "FEE b2link header"
-    virtual unsigned int GetB2LFEE32bitEventNumber(int n) override;
+    virtual unsigned int GetB2LFEE32bitEventNumber(int n) OVERRIDE_CPP17;
 
     //
     // read magic word to check data
     //
     //! get magic word of  COPPER driver header
-    unsigned int GetMagicDriverHeader(int n) override;
+    unsigned int GetMagicDriverHeader(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER FPGA header
-    unsigned int GetMagicFPGAHeader(int n) override;
+    unsigned int GetMagicFPGAHeader(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER FPGA trailer
-    unsigned int GetMagicFPGATrailer(int n) override;
+    unsigned int GetMagicFPGATrailer(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER driver trailer
-    unsigned int GetMagicDriverTrailer(int n) override;
+    unsigned int GetMagicDriverTrailer(int n) OVERRIDE_CPP17;
 
     //! get a checksum on trailer
-    unsigned int GetTrailerChksum(int  n) override;
+    unsigned int GetTrailerChksum(int  n) OVERRIDE_CPP17;
 
     //! Check if COPPER Magic words are correct
-    bool CheckCOPPERMagic(int n) override;
+    bool CheckCOPPERMagic(int n) OVERRIDE_CPP17;
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
     unsigned int FillTopBlockRawHeader(unsigned int m_node_id,
-                                       unsigned int prev_eve32, unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) override;
+                                       unsigned int prev_eve32, unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) OVERRIDE_CPP17;
 
     //! read COPPER driver's checksum value
-    unsigned int GetDriverChkSum(int n) override;
+    unsigned int GetDriverChkSum(int n) OVERRIDE_CPP17;
 
     //! calc COPPER driver's checksum value
-    unsigned int CalcDriverChkSum(int n) override;
+    unsigned int CalcDriverChkSum(int n) OVERRIDE_CPP17;
 
     //! check data contents
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
                    unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) override;
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) OVERRIDE_CPP17;
 
     //! check data contents
-    void CheckUtimeCtimeTRGType(int n) override;
+    void CheckUtimeCtimeTRGType(int n) OVERRIDE_CPP17;
 
     //! check magic words of B2link HSLB header/trailer
     int CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords);
@@ -154,7 +154,7 @@ namespace Belle2 {
                          int* detector_buf_2nd, int nwords_2nd,
                          int* detector_buf_3rd, int nwords_3rd,
                          int* detector_buf_4th, int nwords_4th,
-                         RawCOPPERPackerInfo rawcprpacker_info) override;
+                         RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
 
     //
     // size of "COPPER front header" and "COPPER trailer"

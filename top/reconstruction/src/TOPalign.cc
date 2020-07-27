@@ -23,6 +23,7 @@ extern "C" {
                  int*, int*, int*, int*);
   void set_pdf_opt_(int*, int*, int*);
   void top_alignment_(int*, float*, float*, double*, float*, float*, int*);
+  int rtra_get_nfot_(int*);
 }
 
 using namespace std;
@@ -83,13 +84,15 @@ namespace Belle2 {
           B2WARNING("addData: no space available in /TOP_DATA/");
           return status;
         case -1:
-          B2ERROR("addData: invalid module ID " << moduleID + 1);
+          B2ERROR("addData: invalid module ID."
+                  << LogVar("moduleID", moduleID + 1));
           return status;
         case -2:
-          B2ERROR("addData: invalid pixel ID " << pixelID + 1);
+          B2ERROR("addData: invalid pixel ID."
+                  << LogVar("pixelID", pixelID + 1));
           return status;
         case -3:
-          B2ERROR("addData: digit should already be masked-out (different masks used?)");
+          B2DEBUG(100, "addData: digit should already be masked-out (different masks used?)");
           return status;
         default:
           return status;
@@ -106,6 +109,7 @@ namespace Belle2 {
 
     int TOPalign::iterate(const TOPtrack& track, const Const::ChargedStable& hypothesis)
     {
+      m_numPhotons = -1;
       if (track.getModuleID() != m_moduleID) return -3;
 
       // pass track parameters to fortran code
@@ -126,8 +130,9 @@ namespace Belle2 {
       // set single mass hypothesis
       int Num = 1;
       float mass = hypothesis.getMass();
+      int pdg = hypothesis.getPDGCode();
       rtra_set_hypo_(&Num, &mass);
-      rtra_set_hypid_(&Num, &HYP);
+      rtra_set_hypid_(&Num, &pdg);
 
       // set PDF option
       set_pdf_opt_(&m_opt, &m_NP, &m_NC);
@@ -145,6 +150,8 @@ namespace Belle2 {
       if (ier < 0) return ier;
 
       m_numTracks++;
+      int K = 1;
+      m_numPhotons = rtra_get_nfot_(&K);
       if (ier != 0) return ier;
 
       for (size_t i = 0; i < dpar.size(); i++) {

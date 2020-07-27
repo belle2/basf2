@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOPXDCREATOR_H
-#define GEOPXDCREATOR_H
+#pragma once
 
 #include <vector>
 #include <vxd/geometry/GeoVXDCreator.h>
@@ -113,7 +112,7 @@ namespace Belle2 {
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
        */
-      void readHalfShellSupport(GearDir support, PXDGeometryPar& pxdGeometryPar);
+      void readHalfShellSupport(const GearDir& support, PXDGeometryPar& pxdGeometryPar);
 
     private:
 
@@ -123,5 +122,3 @@ namespace Belle2 {
     }; // class GeoPXDCreator
   } // namespace PXD
 } //namespace Belle2
-
-#endif /* GEOPXDCREATOR_H */

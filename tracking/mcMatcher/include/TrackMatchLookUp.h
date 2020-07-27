@@ -11,7 +11,6 @@
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -51,8 +50,8 @@ namespace Belle2 {
      * The name of the StoreArray of the pattern recognition tracks to defaults to the standard
      * name.
      */
-    TrackMatchLookUp(const std::string& mcRecoTrackStoreArrayName,
-                     const std::string& prRecoTrackStoreArrayName = "");
+    explicit TrackMatchLookUp(const std::string& mcRecoTrackStoreArrayName,
+                              const std::string& prRecoTrackStoreArrayName = "");
 
   private:
     /*!

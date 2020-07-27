@@ -12,7 +12,6 @@
 //---------------------------------------------------------------
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/gdl/dataobjects/TRGGDLDST.h>
@@ -20,11 +19,7 @@
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
 #include <string.h>
-#include <unistd.h>
 
-#ifndef __clang__
-#pragma GCC diagnostic ignored "-Wstack-usage="
-#endif
 
 using namespace Belle2;
 using namespace GDL;
@@ -81,7 +76,7 @@ void TRGGDLDSTModule::event()
   int n_leafsExtra = 0;
   n_leafsExtra = m_unpacker->getnLeafsExtra();
   int n_clocks = m_unpacker->getnClks();
-  int nconf = m_unpacker->getconf();
+  //int nconf = m_unpacker->getconf(); // unused
 
 
   StoreArray<TRGGDLUnpackerStore> entAry;
@@ -101,7 +96,7 @@ void TRGGDLDSTModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    int* Bits[n_leafs + n_leafsExtra];
+    std::vector<int*> Bits(n_leafs + n_leafsExtra);
     //set pointer
     for (int i = 0; i < 320; i++) {
       if (LeafBitMap[i] != -1) {

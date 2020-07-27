@@ -55,14 +55,15 @@ namespace Belle2 {
 
       /**
        * Read the sensor definitions from the database
-       * @param sensors Reference to the database containing the parameters
+       * @param sensor Reference to the database containing the parameters
        */
       virtual SensorInfoBase* createSensorInfo(const VXDGeoSensorPar& sensor) = 0;
 
       /**
        * Return a SensitiveDetector implementation for a given sensor
-       * @param sensorID SensorID for the sensor
-       * @param sensor   Information about the sensor to create the Sensitive Detector for
+       * @param sensorID  SensorID for the sensor
+       * @param sensor    Information about the sensor to create the Sensitive Detector for
+       * @param placement Placement of the sensor
        */
       virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
                                                              const VXDGeoSensorPlacement& placement) = 0;
@@ -93,7 +94,7 @@ namespace Belle2 {
        * @param  params Payload object
        * @return Transformation matrix for component
        */
-      G4Transform3D getAlignment(VXDAlignmentPar params);
+      G4Transform3D getAlignment(const VXDAlignmentPar& params);
 
       /**
        * Place a list of subcomponents into an component.
@@ -119,6 +120,7 @@ namespace Belle2 {
                                          bool originCenter = true, bool allowOutside = false);
 
       /** Create a trapezoidal solid.
+       * @param name name of the Geant4 solid
        * @param width full forward width of the shape in mm
        * @param width2 full backward width of the shape in mm
        * @param length length of the shape in mm
@@ -140,7 +142,7 @@ namespace Belle2 {
       /**
        * Return vector of VXDGeoPlacements with all the components defined inside a given path
        */
-      std::vector<VXDGeoPlacementPar> getSubComponents(GearDir path);
+      std::vector<VXDGeoPlacementPar> getSubComponents(const GearDir& path);
 
       /**
        * Read parameters for a ladder in layer with given ID from gearbox and layer
@@ -159,6 +161,7 @@ namespace Belle2 {
        * The name is assumed to be unique and Volumes are cached.
        * @param name Name of the component
        * @param components Path to components
+       * @param vxdGeometryPar VXD geometry parameters
        */
       void readComponent(const std::string& name, GearDir components, VXDGeometryPar& vxdGeometryPar);
 
@@ -168,7 +171,8 @@ namespace Belle2 {
        * @param placements container holding names of all components to be cached
        * @param componentDir Path to Gearbox where parameters are to be found
        */
-      void readSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir, VXDGeometryPar& vxdGeometryPar);
+      void readSubComponents(const std::vector<VXDGeoPlacementPar>& placements, const GearDir& componentsDir,
+                             VXDGeometryPar& vxdGeometryPar);
 
     protected:
       /** Prefix to prepend to all volume names */

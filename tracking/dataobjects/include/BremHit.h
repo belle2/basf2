@@ -16,6 +16,7 @@
 
 namespace Belle2 {
 
+  /** A bremsstrahlung hit that correlates an ECLCluster with a RecoTrack */
   class BremHit : public RelationsObject {
   public:
     /**
@@ -46,13 +47,13 @@ namespace Belle2 {
     }
 
     /** Set the radiation position. */
-    void setPosition(TVector3& position) {m_position = position;}
+    void setPosition(const TVector3& position) {m_position = position;}
 
     /** Set the radiated energy. */
-    void setBremEnergy(double bremEnergy) {m_bremEnergy = bremEnergy;}
+    void setBremEnergy(const double bremEnergy) {m_bremEnergy = bremEnergy;}
 
     /** Set the distance between the extrapolation and the bremCluster position. */
-    void setClusterDistance(double distance) {m_clusterDistance = distance;}
+    void setClusterDistance(const double distance) {m_clusterDistance = distance;}
 
     /** Return the radiation position. */
     TVector3 getPosition() const
@@ -71,6 +72,7 @@ namespace Belle2 {
       return m_clusterDistance;
     }
 
+    /** Return the effective acceptance factor to find the BremHit. */
     double getEffAcceptanceFactor() const
     {
       return m_acceptanceFactor;
@@ -92,6 +94,7 @@ namespace Belle2 {
     /** The acceptance factor which is needed to find the BremHit. */
     double m_acceptanceFactor;
 
+    /** Making this class a ROOT class.*/
     ClassDef(BremHit, 1);
   };
 }

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Nils Braun                                              *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,6 +24,10 @@ CKFToSVDState::CKFToSVDState(const RecoTrack* seed, bool reversed) : CKFState(se
   } else {
     setMeasuredStateOnPlane(seed->getMeasuredStateOnPlaneFromFirstHit());
   }
+  m_stateCache.isHitState = false;
+  m_stateCache.phi = this->getMeasuredStateOnPlane().getPos().Phi();
+  m_stateCache.theta = this->getMeasuredStateOnPlane().getPos().Theta();
+  m_stateCache.geoLayer = this->getGeometricalLayer();
 }
 
 unsigned int CKFToSVDState::getGeometricalLayer() const
@@ -59,8 +63,19 @@ CKFToSVDState::CKFToSVDState(const SpacePoint* hit) : CKFState<RecoTrack, SpaceP
 {
   m_recoHits.reserve(2);
   for (const SVDCluster& svdCluster : hit->getRelationsTo<SVDCluster>()) {
+    // cppcheck-suppress useStlAlgorithm
     m_recoHits.emplace_back(&svdCluster);
   }
+  m_stateCache.isHitState = true;
+  m_stateCache.sensorID = hit->getVxdID();
+  m_stateCache.geoLayer = this->getGeometricalLayer();
+  m_stateCache.ladder = m_stateCache.sensorID.getLadderNumber();
+  const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(hit->getVxdID());
+  m_stateCache.sensorCenterPhi = sensorInfo.pointToGlobal(TVector3(0., 0., 0.), true).Phi();
+  m_stateCache.phi = hit->getPosition().Phi();
+  m_stateCache.theta = hit->getPosition().Theta();
+  m_stateCache.localNormalizedu = hit->getNormalizedLocalU();
+  m_stateCache.localNormalizedv = hit->getNormalizedLocalV();
 }
 
 const RecoTrack* CKFToSVDState::getRelatedSVDTrack() const

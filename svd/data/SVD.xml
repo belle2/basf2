@@ -55,10 +55,10 @@
 		<HalfShell name="Pat">
 			<shellAngle unit="deg">0</shellAngle>
 			<Layer id="3">
-				<Ladder id="7">  <phi unit="deg"> 33.624</phi></Ladder>
-				<Ladder id="1">  <phi unit="deg"> 85.053</phi></Ladder>
-				<Ladder id="2">  <phi unit="deg">290.767</phi></Ladder>
-				<Ladder id="3">  <phi unit="deg">342.195</phi></Ladder>
+				<Ladder id="2">  <phi unit="deg"> 33.624</phi></Ladder>
+				<Ladder id="3">  <phi unit="deg"> 85.053</phi></Ladder>
+				<Ladder id="7">  <phi unit="deg">290.767</phi></Ladder>
+				<Ladder id="1">  <phi unit="deg">342.195</phi></Ladder>
 			</Layer>
 			<Layer id="4">
 				<Ladder id="1">  <phi unit="deg">  8.000</phi></Ladder>

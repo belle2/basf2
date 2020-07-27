@@ -39,11 +39,11 @@ namespace Belle2 {
       // Single number
       if (interval_marker_position == std::string::npos) {
         int64_t number = std::stol(token);
-        intervals.push_back(std::make_pair(number, number));
+        intervals.emplace_back(number, number);
       } else {
         int64_t interval_begin = std::stol(token.substr(0, interval_marker_position));
         int64_t interval_end = std::stol(token.substr(interval_marker_position + 1));
-        intervals.push_back(std::make_pair(interval_begin, interval_end));
+        intervals.emplace_back(interval_begin, interval_end);
       }
     }
 

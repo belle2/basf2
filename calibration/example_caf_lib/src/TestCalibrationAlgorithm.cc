@@ -4,14 +4,16 @@
 
 #include <TTree.h>
 #include <TH1F.h>
-#include <TRandom.h>
 #include <TClonesArray.h>
+#include <TRandom.h>
+
 
 #include <alignment/dataobjects/MilleData.h>
 #include <calibration/dbobjects/TestCalibObject.h>
 #include <calibration/dbobjects/TestCalibMean.h>
 
 using namespace Belle2;
+using namespace Calibration;
 
 TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTest")
 {
@@ -25,8 +27,47 @@ TestCalibrationAlgorithm::TestCalibrationAlgorithm(): CalibrationAlgorithm("CaTe
   );
 }
 
+void TestCalibrationAlgorithm::createDebugHistogram()
+{
+  std::string debugFileName = (this->getPrefix()) + "debug.root";
+  B2INFO("Storing histograms in " << debugFileName);
+
+  // Save the current directory to change back later
+  TDirectory* currentDir = gDirectory;
+  TFile* debugFile = new TFile(debugFileName.c_str(), "RECREATE");
+  debugFile->cd();
+  TH1F* debugHisto = new TH1F("h1", "h1", 30, -3., 3.);
+  for (int i = 0; i < 1000; ++i) {
+    debugHisto->Fill(gRandom->Gaus());
+  }
+
+  debugHisto->Write();
+  debugFile->Close();
+  currentDir->cd();
+}
+
 CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 {
+  // Some calibrations may want to pass information from one execution to the next.
+  // We do this via a json object that is created like a std::map (or Python dictionary).
+  // You will have set this json object up manually by calling loadInputJson(string),
+  // or the Python CAF may do this for you.
+  //
+  // USING THIS FEATURE IS OPTIONAL!!!
+  //
+  // It is only for cases where you really need to pass a message from one execution of the algorithm
+  // to the next. It is not supposed to be for all of your config variables. Use member variables for
+  // configuring your algorithm!
+
+  // You can pull in from the Input JSON like so
+  // First you must know the string used to label the value, in this case we save the previous calculated mean
+  const std::string previousMeanKey = "previous_mean";
+  // Test if the key exists in our inputJson object (was it set?)
+  if (inputJsonKeyExists(previousMeanKey)) {
+    const float prevMean = getOutputJsonValue<float>(previousMeanKey);
+    B2INFO("An input JSON object was set with the previous calculated mean = " << prevMean);
+  }
+
   // Pulling in data from collector output. It now returns shared_ptr<T> so the underlying pointer
   // will delete itself automatically at the end of this scope unless you do something
   auto ttree = getObjectPtr<TTree>("MyTree");
@@ -43,6 +84,9 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
 
   B2INFO("Mean of MyHisto was " << mean);
   B2INFO("Mean Error of MyHisto was " << meanError);
+
+  // Create debugging histo if we asked for it
+  if (m_debugHisto) createDebugHistogram();
 
   // Fail if we we're asked to. Useful for testing
   if (getForceFail()) {
@@ -72,9 +116,38 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   // Iterate until we find answer to the most fundamental question...
   B2INFO("mean: " << mean);
   B2INFO("meanError: " << meanError);
+
+  // Remember how we optionally had an input JSON object? Well this is how you can pass out JSON information
+  // to the Python CAF. You need to set the information into the object
+  setOutputJsonValue<float>(previousMeanKey, mean);
+
+  // Decide if we need to iterate or if this value was fine
   if (mean - 42. >= 1.) {
     return c_Iterate;
   } else {
     return c_OK;
+  }
+}
+
+bool TestCalibrationAlgorithm::isBoundaryRequired(const ExpRun& currentRun)
+{
+  auto hist = getObjectPtr<TH1F>("MyHisto");
+  float mean = hist->GetMean();
+  // First run?
+  if (!m_previousMean) {
+    B2INFO("This is the first run encountered, let's say it is a boundary.");
+    B2INFO("Initial mean was " << mean);
+    m_previousMean.emplace(mean);
+    return true;
+  }
+  // Shifted since last time?
+  else if ((mean - m_previousMean.value()) > m_allowedMeanShift) {
+    B2INFO("Histogram mean has shifted from " << m_previousMean.value()
+           << " to " << mean << ". We are requesting a new payload boundary for ("
+           << currentRun.first << "," << currentRun.second << ")");
+    m_previousMean.emplace(mean);
+    return true;
+  } else {
+    return false;
   }
 }

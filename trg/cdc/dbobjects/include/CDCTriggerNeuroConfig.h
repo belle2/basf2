@@ -13,8 +13,6 @@
 #include <TFile.h>
 #include <trg/cdc/dataobjects/CDCTriggerMLP.h>
 #include <string>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 
@@ -22,22 +20,28 @@ namespace Belle2 {
    *
    */
 
+  /** struct to hold a line of information of b2link format */
   class CDCTriggerNeuroConfig: public TObject {
   public:
-    /** struct to hold a line of information of b2link format */
-    struct B2FormatLine {
-      int start;
-      int end;
-      int offset;
-      std::string name;
-      std::string description;
-    };
     /** constructor */
     CDCTriggerNeuroConfig() {}
 
     /** destructor */
     virtual ~CDCTriggerNeuroConfig() {};
 
+    struct B2FormatLine {
+      B2FormatLine() : start(0), end(0), offset(0), name("None") {}
+      /** start bit number in B2Link */
+      int start;
+      /** end bit number in B2Link */
+      int end;
+      /** offset of information in B2Link */
+      int offset;
+      /** name of information in B2link */
+      std::string name;
+      /** description of information in B2link */
+      std::string description;
+    };
     /** function to directly set b2link format */
     void setB2Format(const std::vector<B2FormatLine>& format)
     {
@@ -45,13 +49,26 @@ namespace Belle2 {
         addB2FormatLine(line);
       }
     }
+    /** function to return right line of b2link format */
+    B2FormatLine getB2FormatLine(const std::string& name) const
+    {
+      B2FormatLine ret;
+      for (auto line : m_B2Format) {
+        if (name == line.name) {
+          ret = line;
+          continue;
+        }
+      }
+      return ret;
+    }
+
     /** function to add line to b2link format, overloaded  */
     void addB2FormatLine(const B2FormatLine& line)
     {
       m_B2Format.push_back(line);
     }
     /** function to add line to b2link format, overloaded  */
-    void addB2FormatLine(int start, int end, int offset, std::string name, std::string description)
+    void addB2FormatLine(int start, int end, int offset, const std::string& name, const std::string& description)
     {
       B2FormatLine b;
       b.start = start;
@@ -136,23 +153,23 @@ namespace Belle2 {
     std::string getNNTFirmwareComment()      const  {return m_NNTFirmwareComment;}
 
   private:
-    // B2Format
+    /** B2Format */
     std::vector<B2FormatLine> m_B2Format = {};
 
-    // Used neurotrigger filename
+    /** Used neurotrigger filename */
     std::string m_NNName;
 
-    // weights of expert networks
+    /** weights of expert networks */
     std::vector<CDCTriggerMLP> m_MLPs;
 
-    // short field for notes
+    /** short field for notes */
     std::string m_NNNotes;
 
     /** switch wether the ETF is used or the first priority time of the
      * TSF is  used during preprocessing**/
-    bool m_useETF = true;
+    bool m_useETF = false;
 
-    // short field for notes
+    /** short field for notes */
     std::string m_PPNotes;
 
     /** Firmware Version ID **/
@@ -161,7 +178,7 @@ namespace Belle2 {
     /** Short comment on Firmware **/
     std::string m_NNTFirmwareComment;
 
-    ClassDef(CDCTriggerNeuroConfig, 1); /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCTriggerNeuroConfig, 3); /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2
 

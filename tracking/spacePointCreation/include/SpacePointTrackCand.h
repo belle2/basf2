@@ -12,7 +12,6 @@
 
 // framework
 #include <framework/datastore/RelationsObject.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/core/FrameworkExceptions.h>
 
 // SpacePoint
@@ -103,8 +102,8 @@ namespace Belle2 {
      *  sortingParameters are generated from the order of the SpacePoints!
      *  Each SPTC is created in c_isActive-state and has to be deactivated manually, if need be.
      */
-    SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
-                        int mcTrackID = -1);
+    explicit SpacePointTrackCand(const std::vector<const Belle2::SpacePoint*>& spacePoints, int pdgCode = 0, double charge = 0,
+                                 int mcTrackID = -1);
 
 
     /**
@@ -307,7 +306,7 @@ namespace Belle2 {
     * if value < 0, the track candidate is invalid and one should not use it anymore.
     * 0.5 is the standard value if not been set otherwise
     * */
-    void setQualityIndicator(double newIndicator) { m_qualityIndicator = newIndicator; }
+    void setQualityIndicator(const double newIndicator) { m_qualityIndicator = newIndicator; }
 
     /**
      * add a new SpacePoint and its according sorting parameter to the track candidate

@@ -42,9 +42,9 @@ namespace Belle2 {
     public:
 
       /// Constructor
-      SoftGaussMassConstraint(double sigma_,     ///< The sigma value
-                              double mass_ = 0.   ///< The mass difference between object sets 1 and 2
-                             );
+      explicit SoftGaussMassConstraint(double sigma_,     ///< The sigma value
+                                       double mass_ = 0.   ///< The mass difference between object sets 1 and 2
+                                      );
       /// Virtual destructor
       virtual ~SoftGaussMassConstraint();
 

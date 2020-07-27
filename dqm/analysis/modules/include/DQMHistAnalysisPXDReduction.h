@@ -13,11 +13,9 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
-#include <TF1.h>
 #include <TH2F.h>
 #include <TCanvas.h>
 
@@ -31,6 +29,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDReductionModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDReductionModule();
   private:
 
     //! Module functions to be called from main process
@@ -54,6 +54,10 @@ namespace Belle2 {
     TH1F* m_hReduction = nullptr;
     //! Final Canvas
     TCanvas* m_cReduction = nullptr;
+
+
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/ClusterCache.h>
 #include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>

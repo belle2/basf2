@@ -21,13 +21,14 @@ Belle 2 Software or for additional information, please
 .. toctree::
    :glob:
    :maxdepth: 2
-   :numbered:
+   :numbered: 3
 
+   whatsnew
    build/tools_doc/index*
    framework/doc/index*
    */doc/index*
-   */sphinx_*
    framework/doc/atend*
+   online_book/index*
 
 .. only:: format_html
 

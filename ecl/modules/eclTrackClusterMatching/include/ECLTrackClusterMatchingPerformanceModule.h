@@ -9,15 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <ecl/dataobjects/ECLShower.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/modules/standardTrackingPerformance/ParticleProperties.h>
 
 // forward declarations
@@ -25,16 +22,6 @@ class TTree;
 class TFile;
 
 namespace Belle2 {
-  class MCParticle;
-  class Track;
-  class TrackFitResult;
-  class RecoTrack;
-  class ECLCluster;
-  class ECLShower;
-
-  template< class T >
-  class StoreArray;
-
 
   /** This module takes the MCParticle collection as input and checks if the
    * related reconstructed track is matched to an ECLCluster. This information
@@ -62,9 +49,7 @@ namespace Belle2 {
 
     // Required input
     StoreArray<ECLCluster> m_eclClusters; /**< Required input array of ECLClusters */
-    StoreArray<ECLShower> m_eclShowers; /**< Required input array of ECLShowers */
     StoreArray<MCParticle> m_mcParticles; /**< Required input array of MCParticles */
-    StoreArray<RecoTrack> m_recoTracks; /**< Required input array of RecoTracks */
     StoreArray<Track> m_tracks; /**< Required input array of Tracks */
     StoreArray<TrackFitResult> m_trackFitResults; /**< Required input array of TrackFitResults */
 

@@ -15,9 +15,6 @@
 
 #include <string>
 
-#include <Geant4/G4Transform3D.hh>
-#include <root/TGeoMatrix.h>
-
 namespace Belle2 {
   /** Setup material handling and magnetic fields for use by genfit's extrapolation code
    *  (RKTrackRep).  This should be one of the first modules on any path working with tracks.

@@ -6,6 +6,7 @@
 #include <display/EveGeometry.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <simulation/dataobjects/MCParticleTrajectory.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -196,7 +197,11 @@ void DisplayModule::event()
     for (std::string colName : recoTrackArrays) {
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
-        m_visualizer->addTrackCandidate(colName, recoTrack);
+        if (colName != "RecoTracksMpl") {
+          m_visualizer->addTrackCandidate(colName, recoTrack);
+        } else {
+          m_visualizer->addTrackCandidateImproved(colName, recoTrack);
+        }
       }
     }
 
@@ -225,9 +230,12 @@ void DisplayModule::event()
   }
 
   if (m_showTriggerObjects) {
-    StoreArray<CDCTriggerSegmentHit> tshits;
-    for (auto& hit : tshits)
-      m_visualizer->addCDCTriggerSegmentHit(&hit);
+    const auto arrayList = StoreArray<CDCTriggerSegmentHit>::getArrayList();
+    for (const auto& i : arrayList) {
+      StoreArray<CDCTriggerSegmentHit> tshits(i);
+      for (auto& hit : tshits)
+        m_visualizer->addCDCTriggerSegmentHit(i, &hit);
+    }
 
     //add all possible track candidate arrays
     const auto trgTrackArrays = StoreArray<CDCTriggerTrack>::getArrayList();
@@ -271,14 +279,16 @@ void DisplayModule::event()
 
     StoreArray<ECLCluster> clusters;
     for (const ECLCluster& cluster : clusters) {
-      if (m_showMCInfo) {
-        //make sure we add particles producing these
-        const MCParticle* mcpart = cluster.getRelated<MCParticle>();
-        if (mcpart)
-          m_visualizer->addMCParticle(mcpart);
-      }
+      if (cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        if (m_showMCInfo) {
+          //make sure we add particles producing these
+          const MCParticle* mcpart = cluster.getRelated<MCParticle>();
+          if (mcpart)
+            m_visualizer->addMCParticle(mcpart);
+        }
 
-      m_visualizer->addECLCluster(&cluster);
+        m_visualizer->addECLCluster(&cluster);
+      }
     }
 
     StoreArray<KLMCluster> klmclusters;

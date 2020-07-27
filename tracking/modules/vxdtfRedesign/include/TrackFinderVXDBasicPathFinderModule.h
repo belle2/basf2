@@ -16,8 +16,6 @@
 
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
-
 #include <tracking/trackFindingVXD/algorithms/CellularAutomaton.h>
 #include <tracking/trackFindingVXD/algorithms/PathCollectorRecursive.h>
 #include <tracking/trackFindingVXD/algorithms/NodeFamilyDefiner.h>
@@ -28,7 +26,6 @@
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/trackFindingVXD/algorithms/CAValidator.h>
 #include <tracking/trackFindingVXD/algorithms/NodeCompatibilityCheckerBase.h>
@@ -71,6 +68,9 @@ namespace Belle2 {
 
     /** name for StoreObjPtr<DirectedNodeNetwork> which contains the networks needed */
     std::string m_PARAMNetworkName;
+
+    /// Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding)
+    std::string m_PARAMEventLevelTrackingInfoName;
 
     /** the name of the SectorMap used for this instance. */
     std::string m_PARAMsecMapName;

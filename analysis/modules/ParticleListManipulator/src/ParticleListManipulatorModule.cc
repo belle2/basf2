@@ -26,6 +26,7 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/ValueIndexPairSorting.h>
 
 using namespace std;
 
@@ -41,7 +42,8 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  ParticleListManipulatorModule::ParticleListManipulatorModule() : Module()
+  ParticleListManipulatorModule::ParticleListManipulatorModule():
+    m_variable(nullptr)
 
   {
     setDescription("Manipulates ParticleLists: copies/merges/performs particle selection");
@@ -56,12 +58,17 @@ namespace Belle2 {
 
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
 
+    addParam("variable", m_variableName, "Variable which defines the best duplicate (see ``selectLowest`` for ordering)",
+             std::string("mdstIndex"));
+    addParam("preferLowest", m_preferLowest,
+             "If true, duplicate with lowest value of ``variable`` is accepted, otherwise higher one.", true);
+
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
-    // initializing the rest of private memebers
+    // initializing the rest of private members
     m_pdgCode   = 0;
-    m_isSelfConjugatedParticle = 0;
+    m_isSelfConjugatedParticle = false;
   }
 
   void ParticleListManipulatorModule::initialize()
@@ -101,6 +108,10 @@ namespace Belle2 {
       antiParticleList.registerInDataStore(flags);
     }
 
+    m_variable = Variable::Manager::Instance().getVariable(m_variableName);
+    if (!m_variable) {
+      B2ERROR("Variable '" << m_variableName << "' is not available in Variable::Manager!");
+    }
     m_cut = Variable::Cut::compile(m_cutParameter);
   }
 
@@ -134,33 +145,60 @@ namespace Belle2 {
 
         std::vector<int> idSeq;
         fillUniqueIdentifier(particle, idSeq);
+        // the unique identifier sequence is sorted so that different orders of
+        // daughter particles are registered as duplicates
+        sort(idSeq.begin(), idSeq.end());
         m_particlesInTheList.push_back(idSeq);
       }
     }
 
-    // copy all particles from input lists that pass selection criteria into plist
-    for (unsigned i = 0; i < m_inputListNames.size(); i++) {
-      const StoreObjPtr<ParticleList> inPList(m_inputListNames[i]);
+    // create list of candidate indices and corresponding sorting values
+    typedef std::pair<double, unsigned int> ValueIndexPair;
+    std::vector<ValueIndexPair> valueToIndex;
 
-      std::vector<int> fsParticles     = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,               false);
+    // fill all particles from input lists that pass selection criteria into comparison list
+    for (const auto& inputListName : m_inputListNames) {
+      const StoreObjPtr<ParticleList> inPList(inputListName);
+
+      std::vector<int> fsParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle, false);
       const std::vector<int>& scParticles     = inPList->getList(ParticleList::EParticleType::c_SelfConjugatedParticle, false);
-      const std::vector<int>& fsAntiParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle,
-                                                                 true);
+      const std::vector<int>& fsAntiParticles = inPList->getList(ParticleList::EParticleType::c_FlavorSpecificParticle, true);
 
       fsParticles.insert(fsParticles.end(), scParticles.begin(), scParticles.end());
       fsParticles.insert(fsParticles.end(), fsAntiParticles.begin(), fsAntiParticles.end());
 
-      for (unsigned j = 0; j < fsParticles.size(); j++) {
-        const Particle* part = particles[fsParticles[j]];
+      for (int fsParticle : fsParticles) {
+        const Particle* part = particles[fsParticle];
 
-        std::vector<int> idSeq;
-        fillUniqueIdentifier(part, idSeq);
-        bool uniqueSeq = isUnique(idSeq);
-
-        if (uniqueSeq && m_cut->check(part)) {
-          plist->addParticle(part);
-          m_particlesInTheList.push_back(idSeq);
+        if (m_cut->check(part)) {
+          valueToIndex.emplace_back(m_variable->function(part), part->getArrayIndex());
         }
+      }
+    }
+
+    // use stable sort to make sure we keep the relative order of elements with
+    // same value as it was before
+    if (m_preferLowest) {
+      std::stable_sort(valueToIndex.begin(), valueToIndex.end(), ValueIndexPairSorting::lowerPair<ValueIndexPair>);
+    } else {
+      std::stable_sort(valueToIndex.begin(), valueToIndex.end(), ValueIndexPairSorting::higherPair<ValueIndexPair>);
+    }
+
+    // starting from the best candidate add all particles to output list that are not already in it
+    for (const auto& candidate : valueToIndex) {
+      const Particle* part = particles[candidate.second];
+
+      std::vector<int> idSeq;
+      fillUniqueIdentifier(part, idSeq);
+      // before checking whether the sequence is already present it is sorted so
+      // that a different order of daughter particles is registered as a
+      // duplicated candidate
+      sort(idSeq.begin(), idSeq.end());
+      bool uniqueSeq = isUnique(idSeq);
+
+      if (uniqueSeq) {
+        plist->addParticle(part);
+        m_particlesInTheList.push_back(idSeq);
       }
     }
   }
@@ -181,9 +219,7 @@ namespace Belle2 {
 
   bool ParticleListManipulatorModule::isUnique(const std::vector<int>& idSeqOUT)
   {
-    for (unsigned i = 0; i < m_particlesInTheList.size(); i++) {
-      std::vector<int> idSeqIN = m_particlesInTheList[i];
-
+    for (const auto& idSeqIN : m_particlesInTheList) {
       bool sameSeq = (idSeqIN == idSeqOUT);
       if (sameSeq)
         return false;
@@ -192,4 +228,3 @@ namespace Belle2 {
     return true;
   }
 } // end Belle2 namespace
-

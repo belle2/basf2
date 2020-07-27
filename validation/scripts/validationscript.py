@@ -3,10 +3,11 @@
 
 import re
 import os
+from typing import Optional, Dict, Any, List
+import logging
 
 # A pretty printer. Prints prettier lists, dicts, etc. :)
 import pprint
-pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 # Import XML Parser. Use C-Version, if available
 try:
@@ -14,8 +15,10 @@ try:
 except ImportError:
     import xml.etree.ElementTree as XMLTree
 
-from validationfunctions import find_creator
 import json_objects
+
+
+pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
 class ScriptStatus:
@@ -66,7 +69,7 @@ class Script:
     @var _object: Pointer to the object itself. Is this even necessary?
     """
 
-    def __init__(self, path, package, log):
+    def __init__(self, path: str, package: str, log: Optional[logging.Logger]):
         """!
         The default constructor.
         """
@@ -75,15 +78,16 @@ class Script:
         # Is this necessary?
         self._object = self
 
-        # stores the reference to the logging object used in this validation run
+        # stores the reference to the logging object used in this validation
+        # run
         self.log = log
 
         # The (absolute) path of the steering file
         self.path = path
 
         # The runtime of the script
-        self.runtime = None
-        self.start_time = None
+        self.runtime = None  # type: Optional[int]
+        self.start_time = None  # type: Optional[int]
 
         # The name of the steering file. Basically the file name of the
         # steering file, but everything that is not a letter is replaced
@@ -96,7 +100,7 @@ class Script:
         self.package = package
 
         # The information from the file header
-        self.header = None
+        self.header = None  # type: Optional[Dict, Any]
 
         # A list of script objects, on which this script depends
         self.dependencies = []
@@ -112,7 +116,12 @@ class Script:
         self.control = None
 
         # The returncode of the script. Should be 0 if all went well.
-        self.returncode = None
+        self.returncode = None  # type: Optional[int]
+
+        #: Id of job for job submission. This is set by some of the
+        #: cluster controls in order to terminate the job if it exceeds the
+        #: runtime.
+        self.job_id = None  # type: Optional[str]
 
     @staticmethod
     def sanitize_file_name(file_name):
@@ -146,20 +155,27 @@ class Script:
         elif self.status == ScriptStatus.cached:
             string_status = "cached"
 
-        return json_objects.Script(self.name_not_sanitized, self.path, string_status,
-                                   log_url=os.path.join(self.package, self.name_not_sanitized) + ".log",
-                                   return_code=self.returncode)
+        return json_objects.Script(
+            self.name_not_sanitized,
+            self.path,
+            string_status,
+            log_url=os.path.join(self.package, self.name_not_sanitized) +
+            ".log",
+            return_code=self.returncode
+        )
 
-    def get_recursive_dependencies(self, list_of_scripts, level=0):
+    def get_recursive_dependencies(self, scripts, level=0):
         """!
         Loops over all dependencies of this script and recursively retrieves
         their sub-dependencies
         """
 
         if level > 50:
-            self.log.error('Recurisve dependency lookup reached level {0} and will quit now.'
-                           'Possibly circular dependcencies in the validation scripts ?'
-                           .format(level))
+            self.log.error(
+                f'Recurisve dependency lookup reached level {level} and will '
+                f'quit now. Possibly circular dependcencies in the validation '
+                f'scripts ? '
+            )
 
         all_deps = set()
         for dep in self.dependencies:
@@ -169,14 +185,16 @@ class Script:
             next_level = level + 1
 
             # find script object
-            dep_script = [x for x in list_of_scripts if x.name == dep.name]
+            dep_script = [x for x in scripts if x.name == dep.name]
             rec_deps = []
             if len(dep_script) == 1:
-                rec_deps = dep_script[0].get_recursive_dependencies(list_of_scripts, next_level)
+                rec_deps = dep_script[0].get_recursive_dependencies(
+                    scripts, next_level)
             else:
-                self.log.error('Depending script with the name {0} could not be found in the list of '
-                               'registered scripts.'
-                               .format(dep.name))
+                self.log.error(
+                    f'Depending script with the name {dep.name} could not be '
+                    f'found in the list of registered scripts. '
+                )
 
             # only add, if not already in the dependencies list
             for rc in rec_deps:
@@ -191,7 +209,7 @@ class Script:
         """
         return "script_unique_name_{}_{}".format(self.package, self.name)
 
-    def compute_dependencies(self, list_of_scripts):
+    def compute_dependencies(self, scripts):
         """!
         Loops over the input files given in the header and tries to find the
         corresponding Script objects, which will then be stored in the
@@ -206,13 +224,18 @@ class Script:
 
                 # Find the script which is responsible for the creation of
                 # the input file (in the same package or in validation folder)
-                creator = find_creator(root_file, self.package, list_of_scripts, self.log)
+                creator = find_creator(
+                    root_file,
+                    self.package,
+                    scripts,
+                    self.log
+                )
 
                 # If no creator could be found, raise an error!
                 if creator is None:
-                    self.log.error('Unmatched dependency for {0}:'
-                                   '{1} has no creator!'
-                                   .format(self.path, root_file))
+                    self.log.error(
+                        f'Unmatched dependency for {self.path}:{root_file} '
+                        f'has no creator!')
                     self.status = ScriptStatus.skipped
 
                 # If creator(s) could be found, add those scripts to the
@@ -229,7 +252,7 @@ class Script:
             # is presumed as a dependency
 
             # Get a list of all the script in the same directory
-            in_same_pkg = [script for script in list_of_scripts
+            in_same_pkg = [script for script in scripts
                            if script.package == self.package]
 
             # Divide that list into .py and .c files, because .py files are
@@ -289,7 +312,9 @@ class Script:
         """
 
         # Read the file as a whole
-        with open(self.path, "r") as data:
+        # We specify encoding and errors here to avoid exceptions for people
+        # with strange preferred encoding settings in their OS
+        with open(self.path, "r", encoding="utf-8", errors="replace") as data:
             steering_file_content = data.read()
 
         # Define the regex to extract everything between the <header>-tags
@@ -340,3 +365,43 @@ class Script:
                 self.header[branch.tag.strip()] += branch_value
             else:
                 self.header[branch.tag.strip()] = branch_value
+
+
+def find_creator(
+        outputfile: str,
+        package: str,
+        scripts: List[Script],
+        log: logging.Logger
+) -> Optional[List[Script]]:
+    """!
+    This function receives the name of a file and tries to find the file
+    in the given package which produces this file, i.e. find the file in
+    whose header 'outputfile' is listed under <output></output>.
+    It then returns a list of all Scripts who claim to be creating 'outputfile'
+
+    @param outputfile: The file of which we want to know by which script is
+        created
+    @param package: The package in which we want to search for the creator
+    """
+
+    # Get a list of all Script objects for scripts in the given package as well
+    # as from the validation-folder
+    candidates = [script for script in scripts
+                  if script.package in [package, 'validation']]
+
+    # Reserve some space for the results we will return
+    results = []
+
+    # Loop over all candidates and check if they have 'outputfile' listed
+    # under their outputs
+    for candidate in candidates:
+        if candidate.header and \
+           outputfile in candidate.header.get('output', []):
+            results.append(candidate)
+
+    # Return our results and warn if there is more than one creator
+    if len(results) == 0:
+        return None
+    if len(results) > 1:
+        log.warning('Found multiple creators for' + outputfile)
+    return results

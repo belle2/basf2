@@ -12,17 +12,9 @@
 #define BEAMABORTSTUDYMODULE_H
 
 #include <framework/core/HistoModule.h>
-#include <string>
-#include <vector>
 
-
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 namespace Belle2 {
   namespace beamabort {
@@ -41,25 +33,43 @@ namespace Belle2 {
        */
       BeamabortStudyModule();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~BeamabortStudyModule();
 
-      /**  */
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
 
-      /**  */
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
 
-      /**  */
+      /**
+       * Event processor.
+       */
       virtual void event() override;
 
-      /**  */
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
 
-      /**  */
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
-      /** Defines the histograms*/
+      /**
+       * Defines the histograms
+       */
       virtual void defineHisto() override;
 
 

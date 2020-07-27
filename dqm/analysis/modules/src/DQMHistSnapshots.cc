@@ -11,14 +11,9 @@
 #include <dqm/analysis/modules/DQMHistSnapshots.h>
 #include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
-#include <TSystem.h>
-#include <TStyle.h>
 #include <TClass.h>
-#include <TDirectory.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TKey.h>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -35,7 +30,7 @@ REG_MODULE(DQMHistSnapshots)
 DQMHistSnapshotsModule::DQMHistSnapshotsModule()
   : DQMHistAnalysisModule()
 {
-  addParam("CheckInterval", m_check_interval, "Interval of two checks", 180);
+  addParam("CheckInterval", m_check_interval, "Interval between two checks [s]", 180);
   B2DEBUG(1, "DQMHistSnapshots: Constructor done.");
 }
 
@@ -82,8 +77,11 @@ void DQMHistSnapshotsModule::event()
 {
 
   time_t cur_time = time(NULL);
-  if (cur_time - m_last_check < m_check_interval) return;
-  m_last_check = cur_time;
+  int check = 0;
+  if ((m_last_check == 0) || (cur_time - m_last_check > m_check_interval)) {
+    check = 1;
+    m_last_check = cur_time;
+  }
 
   const HistList& hlist = getHistList();
 
@@ -100,17 +98,22 @@ void DQMHistSnapshotsModule::event()
       std::string hname = s[1];
       std::string canvas_name = dirname + "/c_" + hname;
       n->canvas = find_canvas(canvas_name);
+      n->stale = 0;
 
       m_ssnode.push_back(n);
-    } else { // compare with existing snapshot
+    } else {
       TH1* h = it->second;
-      if (h->GetEntries() > n->histo->GetEntries()) { // need better way to determine whether the histo is updated
-        delete n->histo;
-        n->histo = (TH1*)h->Clone();
-      } else { // notify that the histogram is stale
-        if (n->canvas != NULL) {
-          h->SetTitle((h->GetTitle() + string(" NOT UPDATED")).c_str());
+      if (check == 1) {
+        if (h->GetEntries() > n->histo->GetEntries()) { // histogram has been updated
+          delete n->histo;
+          n->histo = (TH1*)h->Clone();
+          n->stale = 0;
+        } else { // notify that the histogram is stale
+          n->stale = 1;
         }
+      }
+      if (n->stale == 1 && n->canvas != NULL) {
+        h->SetTitle((h->GetTitle() + string(" [STALLED]")).c_str());
       }
     }
 

@@ -3,6 +3,7 @@
 
 import os
 import sys
+import multiprocessing
 
 from basf2 import *
 
@@ -61,5 +62,5 @@ elapsed.param('EventInterval', 10000)
 main.add_module(elapsed)
 
 # Process events
-set_nprocesses(int(argvs[4]))
+set_nprocesses(multiprocessing.cpu_count())
 process(main)

@@ -25,9 +25,8 @@ namespace {
 
     Eigen::Matrix<double, 3, 6> G;
 
-    G << 1, 0, 0, 1, 0, 0,
-    0, 1, 0, 0, 1, 0,
-    0, 0, 1, 0, 0, 1;
+    // cppcheck-suppress constStatement
+    G << 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1;
 
     const  Eigen::Matrix<double, 3, 6>& c_G = G;
 
@@ -40,6 +39,7 @@ namespace {
     //  0   0    0.5
     //
     Eigen::Matrix<double, 3, 1> residuals;
+    // cppcheck-suppress constStatement
     residuals << .1, .2, .3;
     const Eigen::Matrix<double, 3, 1>& c_r = residuals;
 
@@ -48,12 +48,15 @@ namespace {
     kalman.updateState(fitParDim6);
 
     Eigen::Matrix<double, 6, 1> expectedUpdatedFitpars;
+    // cppcheck-suppress constStatement
     expectedUpdatedFitpars << -0.05, -0.1, -0.15, -0.05, -0.1, -0.15;
 
     EXPECT_TRUE(expectedUpdatedFitpars.isApprox(fitParDim6.getStateVector().segment(0, 6))) << "fitpar update failed.";
 
     Eigen::Matrix<double, 6, 6> expectedUpdatedCov = Eigen::Matrix<double, 6, 6>::Identity(6, 6);
+    // cppcheck-suppress constStatement
     expectedUpdatedCov.diagonal < -3 > () << -1, -1, -1;
+    // cppcheck-suppress constStatement
     expectedUpdatedCov.diagonal<3>() << -1, -1, -1;
 
     kalman.updateCovariance(fitParDim6);

@@ -191,7 +191,7 @@ main.add_module(sadinput)
 
 fullsim = register_module('FullSim')
 fullsim.param('PhysicsList', 'FTFP_BERT_HP')
-fullsim.param('UICommands', ['/process/inactivate nKiller'])
+fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
 fullsim.param('StoreAllSecondaries', True)
 fullsim.param('SecondariesEnergyCut', 0.0)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)

@@ -16,7 +16,6 @@ namespace genfit {
 }
 
 namespace Belle2 {
-  class SpacePoint;
   class CKFToSVDState;
 
   /// Kalman stepper implementation for the SVD CKF

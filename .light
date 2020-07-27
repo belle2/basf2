@@ -1,6 +1,7 @@
 /.light
 /.externals
 /index.rst
+/whatsnew.rst
 /site_scons/
 /framework/
 /mdst/
@@ -8,3 +9,4 @@
 /analysis/
 /skim/
 /geometry/
+/b2bii/

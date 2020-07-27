@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCGEOMETRYPAR_H
-#define CDCGEOMETRYPAR_H
+#pragma once
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
@@ -133,17 +131,17 @@ namespace Belle2 {
 
       /**
        * Read XT-relation table.
-       * @param[in] GearDir Gear Dir.
+       * @param[in] gbxParams Gear Dir.
        * @param[in] mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readXT(const GearDir, int mode = 0);
+      void readXT(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Read XT-relation table in new format.
-       * @param[in] GearDir Gear Dir.
+       * @param[in] gbxParams Gear Dir.
        * @param[in] mode 0: read simulation file, 1: read reconstruction file.
        */
-      void newReadXT(const GearDir, int mode = 0);
+      void newReadXT(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set XT-relation table (from DB).
@@ -157,24 +155,24 @@ namespace Belle2 {
 
       /**
        * Read spatial resolution table.
-       * @param GearDir Gear Dir.
+       * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readSigma(const GearDir, int mode = 0);
+      void readSigma(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Read spatial resolution table in new format.
-       * @param GearDir Gear Dir.
+       * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void newReadSigma(const GearDir, int mode = 0);
+      void newReadSigma(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Read fudge factors
-       * @param GearDir Gear Dir.
+       * @param gbxParams Gear Dir.
        * @param mode dummy now.
        */
-      void readFFactor(const GearDir, int mode = 0);
+      void readFFactor(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set spatial resolution (from DB).
@@ -188,10 +186,10 @@ namespace Belle2 {
 
       /**
        * Read the propagation speed along the sense wire.
-       * @param GearDir Gear Dir.
+       * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readPropSpeed(const GearDir, int mode = 0);
+      void readPropSpeed(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set prop.-speeds (from DB).
@@ -200,10 +198,10 @@ namespace Belle2 {
 
       /**
        * Read t0 parameters (from a file).
-       * @param GearDir Gear Dir.
+       * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readT0(const GearDir, int mode = 0);
+      void readT0(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set t0 parameters (from DB)
@@ -215,12 +213,12 @@ namespace Belle2 {
        */
       void calcMeanT0();
 
-      /**
-       * Read bad-wires (from a file).
-       * @param GearDir Gear Dir.
-       * @param mode 0: read simulation file, 1: read reconstruction file.
-       */
-      void readBadWire(const GearDir, int mode = 0);
+      //      /**
+      //       * Read bad-wires (from a file).
+      //       * @param GearDir Gear Dir.
+      //       * @param mode 0: read simulation file, 1: read reconstruction file.
+      //       */
+      //      void readBadWire(const GearDir, int mode = 0);
 
       /**
        * Set bad-wires (from DB)
@@ -240,17 +238,17 @@ namespace Belle2 {
 
       /**
        * Read time-walk parameter.
-       * @param GearDir Gear Dir.
+       * @param gbxParams Gear Dir.
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
-      void readTW(const GearDir, int mode = 0);
+      void readTW(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Read spatial edep-to-adc conv. factors.
-       * @param GearDir Gear Dir.
+       * @param gbxParams Gear Dir.
        * @param mode dummy now..
        */
-      void readEDepToADC(const GearDir, int mode = 0);
+      void readEDepToADC(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set time-walk parameters.
@@ -555,9 +553,8 @@ namespace Belle2 {
 
       //! Returns t0 parameter of the specified sense wire
       /*!
-      \param layerId The layer id. of the wire
-      \param cellId  The wire id. of the wire
-      \return t0.
+      \param wireID Wire id.
+      \return       t0.
       */
       float getT0(const WireID& wireID) const
       {
@@ -567,8 +564,8 @@ namespace Belle2 {
 
       //! Returns frontend board id. corresponding to the wire id.
       /*!
-      \param wireID   wire  id.
-      \return         board id.
+      \param wID   wire  id.
+      \return      board id.
       */
       unsigned short getBoardID(const WireID& wID) const
       {
@@ -577,9 +574,32 @@ namespace Belle2 {
         return iret;
       }
 
+      //! Returns frontend channel id. corresponding to the wire id.
+      /*!
+      \param wID   wire  id.
+      \return      channel id. (0-47)
+      */
+      unsigned short getChannelID(const WireID& wID) const
+      {
+        std::map<WireID, unsigned short>::const_iterator it = m_wireToChannel.find(wID);
+        unsigned short iret = (it != m_wireToChannel.end()) ? it->second : -999;
+        return iret;
+      }
+
+      //! Returns wire id. corresponding to the board-and-cannel ids.
+      /*!
+      \param bd board   id. (1-300)
+      \param ch channel id. (0-47)
+      \return   wire    id.
+      */
+      const WireID getWireID(unsigned short bd, unsigned short ch) const
+      {
+        return WireID(m_boardAndChannelToWire[bd][ch]);
+      }
+
       //! Returns time-walk
       /*!
-      \param wireID   wire id
+      \param wID      wire id
       \param adcCount ADC count
       \return         time-walk (in ns)
       */
@@ -809,12 +829,33 @@ namespace Belle2 {
       }
 
       /**
-       * Inquire if the wire is bad
+       * Inquire if the wire is totally-dead
        */
       inline bool isBadWire(const WireID& wid)
       {
-        std::vector<unsigned short>::iterator it = std::find(m_badWire.begin(), m_badWire.end(), wid.getEWire());
-        bool torf = (it != m_badWire.end()) ? true : false;
+        //        std::map<unsigned short, float>::iterator it = m_badWire.find(wid.getEWire());
+        //        bool torf = (it != m_badWire.end()) ? true : false;
+        //        return torf;
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isBadWire(wid) : false;
+        return torf;
+
+      }
+
+      /**
+       * Inquire if the wire is dead
+       */
+      inline bool isDeadWire(const WireID& wid, double& eff)
+      {
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isDeadWire(wid, eff) : false;
+        return torf;
+      }
+
+      /**
+       * Inquire if the wire is hot
+       */
+      inline bool isHotWire(const WireID& wid)
+      {
+        bool torf = *m_badWireFromDB ? (*m_badWireFromDB)->isHotWire(wid) : false;
         return torf;
       }
 
@@ -957,6 +998,7 @@ namespace Belle2 {
 
       /**
        * Converts incoming-  to outgoing-theta.
+       * @param alpha in rad.
        * @param theta in rad.
        */
       double getOutgoingTheta(const double alpha, const double theta) const;
@@ -1084,7 +1126,7 @@ namespace Belle2 {
       float m_FWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
       float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
-      float m_eDepToADCParams[MAX_N_SLAYERS][MAX_N_SCELLS][4] = {0}; /*!< edep-to-ADC conv. params. */
+      float m_eDepToADCParams[MAX_N_SLAYERS][MAX_N_SCELLS][6] = {0}; /*!< edep-to-ADC conv. params. */
 
       float m_alphaPoints[maxNAlphaPoints]; /*!< alpha sampling points for xt (rad) */
       float m_thetaPoints[maxNThetaPoints]; /*!< theta sampling points for xt (rad) */
@@ -1101,8 +1143,10 @@ namespace Belle2 {
       double m_meanT0;  /*!< mean t0 over all wires; should be double. */
 
       std::map<WireID, unsigned short> m_wireToBoard;  /*!< map relating wire-id and board-id. */
+      std::map<WireID, unsigned short> m_wireToChannel; /*!< map relating wire-id and channel-id. */
+      unsigned short m_boardAndChannelToWire[nBoards][48]; /*!< array relating board-channel-id and wire-id. */
 
-      std::vector<unsigned short> m_badWire;  /*!< list of bad-wires. */
+      //      std::map<unsigned short, float> m_badWire;  /*!< list of bad-wires. */
 
       unsigned short m_tdcOffset;  /*!< Not used; to be removed later. */
       double m_clockFreq4TDC;      /*!< Clock frequency used for TDC (GHz). */
@@ -1126,6 +1170,7 @@ namespace Belle2 {
       DBObjPtr<CDCAlignment>* m_alignmentFromDB; /*!< alignment params. retrieved from DB. */
       DBObjPtr<CDCMisalignment>* m_misalignmentFromDB; /*!< misalignment params. retrieved from DB. */
       DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB; /*!< Pointer to edep-to-ADC conv. params. from DB. */
+
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
     };
@@ -1285,5 +1330,3 @@ namespace Belle2 {
 
   } // end of namespace CDC
 } // end of namespace Belle2
-
-#endif

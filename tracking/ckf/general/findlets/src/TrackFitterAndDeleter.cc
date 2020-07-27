@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/ckf/general/findlets/TrackFitterAndDeleter.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;

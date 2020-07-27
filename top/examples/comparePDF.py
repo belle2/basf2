@@ -7,6 +7,7 @@
 # -------------------------------------------------------------------------
 
 from basf2 import *
+import os
 
 # particle parameters (emitted from IP) - change as you like
 p = 3       # GeV/c
@@ -23,7 +24,7 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param('evtNumList', [1000])
 main.add_module(eventinfosetter)
 
 # Histogram manager immediately after master module

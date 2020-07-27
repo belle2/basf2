@@ -17,8 +17,6 @@
 
 
 #include <trg/ecl/TrgEclBeamBKG.h>
-#include <framework/logging/Logger.h>
-#include "trg/ecl/TrgEclBeamBKG.h"
 
 using namespace std;
 using namespace Belle2;

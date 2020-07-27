@@ -15,8 +15,7 @@
  **************************************************************************/
 
 #include <framework/database/DBImportObjPtr.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/DatabaseChain.h>
+#include <framework/database/Configuration.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
 // ecl
@@ -44,8 +43,8 @@ int main(int argc, char** argv)
 
   //------------------------------------------------------------------------
   //..Specify database
-  DatabaseChain::createInstance();
-  LocalDatabase::createInstance("localdb/database.txt", "", LogConfig::c_Debug);
+  auto& conf = Conditions::Configuration::getInstance();
+  conf.prependTestingPayloadLocation("localdb/database.txt");
 
   //..set debug level
   LogConfig* logging = LogSystem::Instance().getLogConfig();

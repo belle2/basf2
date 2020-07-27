@@ -20,7 +20,6 @@
 #include <generators/utilities/InitialParticleGeneration.h>
 
 #include <string>
-#include <TLorentzRotation.h>
 
 namespace Belle2 {
   /**

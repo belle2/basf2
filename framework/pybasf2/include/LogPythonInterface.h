@@ -82,6 +82,13 @@ namespace Belle2 {
     void setPackageLogConfig(const std::string& package, const LogConfig& config);
 
     /**
+     * Set maximum number of repetitions before silencing "identical" log messages
+     *
+     * Identity only checks for log level and message content (excluding variables)
+     */
+    void setMaxMessageRepetitions(unsigned repetitions);
+
+    /**
      * Get the log level
      *
      * @return The log level
@@ -118,6 +125,12 @@ namespace Belle2 {
      */
     LogConfig& getPackageLogConfig(const std::string& package);
 
+    /**
+     * Get maximum number of repetitions before silencing "identical" log messages
+     *
+     * Identity only checks for log level and message content (excluding variables)
+     */
+    unsigned getMaxMessageRepetitions() const;
 
     /**
      * Add a file as output connection
@@ -139,6 +152,14 @@ namespace Belle2 {
      *                 parts of the log message.
      */
     void addLogJSON(bool complete);
+
+
+    /**
+     * Add a UDP server as an output connection
+     * @param hostname the hostname of the UDP server. Will throw an exception if it can not be resolved.
+     * @param port the port to connect to
+     */
+    void addLogUDP(const std::string& hostname, unsigned short port);
 
     /**
      * Add the console as output connection
@@ -171,19 +192,29 @@ namespace Belle2 {
     bool getPythonLoggingEnabled() const;
 
     /**
+    * Set flag if newlines in log messages to console should be replaced by '\n'
+    */
+    void setEscapeNewlinesEnabled(bool enabled) const;
+
+    /**
+     * Get flag if newlines in log messages to console should be replaced by '\n'`
+     */
+    bool getEscapeNewlinesEnabled() const;
+
+    /**
      * Produce debug message
      *
      * @param args positional arguments, concatenated to form message
      * @param kwargs keyword arguments to be converted to log variables
      */
-    static boost::python::object logDebug(boost::python::tuple args, boost::python::dict kwargs);
+    static boost::python::object logDebug(boost::python::tuple args, const boost::python::dict& kwargs);
     /**
      * Produce info message
      *
      * @param args positional arguments, concatenated to form message
      * @param kwargs keyword arguments to be converted to log variables
      */
-    static boost::python::object logInfo(boost::python::tuple args, boost::python::dict kwargs);
+    static boost::python::object logInfo(boost::python::tuple args, const boost::python::dict& kwargs);
 
     /**
      * Produce result message
@@ -191,21 +222,21 @@ namespace Belle2 {
      * @param args positional arguments, concatenated to form message
      * @param kwargs keyword arguments to be converted to log variables
      */
-    static boost::python::object logResult(boost::python::tuple args, boost::python::dict kwargs);
+    static boost::python::object logResult(boost::python::tuple args, const boost::python::dict& kwargs);
     /**
      * Produce warning message
      *
      * @param args positional arguments, concatenated to form message
      * @param kwargs keyword arguments to be converted to log variables
      */
-    static boost::python::object logWarning(boost::python::tuple args, boost::python::dict kwargs);
+    static boost::python::object logWarning(boost::python::tuple args, const boost::python::dict& kwargs);
     /**
      * Produce error message
      *
      * @param args positional arguments, concatenated to form message
      * @param kwargs keyword arguments to be converted to log variables
      */
-    static boost::python::object logError(boost::python::tuple args, boost::python::dict kwargs);
+    static boost::python::object logError(boost::python::tuple args, const boost::python::dict& kwargs);
 
     /**
      * Produce fatal message
@@ -213,7 +244,7 @@ namespace Belle2 {
      * @param args positional arguments, concatenated to form message
      * @param kwargs keyword arguments to be converted to log variables
      */
-    static boost::python::object logFatal(boost::python::tuple args, boost::python::dict kwargs);
+    static boost::python::object logFatal(boost::python::tuple args, const boost::python::dict& kwargs);
 
     /** return dict with log statistics */
     boost::python::dict getLogStatistics();

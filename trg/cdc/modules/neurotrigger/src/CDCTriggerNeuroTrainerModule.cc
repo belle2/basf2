@@ -15,7 +15,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 
 #include <fstream>
@@ -135,10 +134,15 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
            "1 value or same as SLpattern.", m_parameters.SLpatternMask);
   addParam("tMax", m_parameters.tMax,
            "Maximal drift time (for scaling, unit: trigger timing bins).", m_parameters.tMax);
+  addParam("et_option", m_parameters.et_option,
+           "option on how to obtain the event time. Possibilities are: "
+           "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', 'etf_or_zero', 'etf_or_fastest2d', 'fastest2d'.",
+           m_parameters.et_option);
   addParam("T0fromHits", m_parameters.T0fromHits,
-           "If true, the event time is determined from all relevant hits "
-           "in a sector, if there is no valid event time from the event time finder. "
-           "If false, no drift times are used if there is no valid event time.",
+           "Deprecated, kept for backward compatibility. If true, the event time is "
+           "determined from all relevant hits in a sector, if there is no valid event "
+           "time from the event time finder. If false, no drift times are used if "
+           "there is no valid event time.",
            m_parameters.T0fromHits);
   addParam("selectSectorByMC", m_selectSectorByMC,
            "If true, track parameters for sector selection are taken "
@@ -195,6 +199,9 @@ CDCTriggerNeuroTrainerModule::CDCTriggerNeuroTrainerModule() : Module()
   addParam("repeatTrain", m_repeatTrain,
            "If >1, training is repeated several times with different start weights. "
            "The weights which give the best resolution on the test samples are kept.", 1);
+  addParam("NeuroTrackInputMode", m_neuroTrackInputMode,
+           "When using real tracks, use neurotracks instead of 2dtracks as input to the neurotrigger",
+           false);
 }
 
 
@@ -226,7 +233,7 @@ CDCTriggerNeuroTrainerModule::initialize()
       }
     }
   }
-  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName);
+  m_NeuroTrigger.initializeCollections(m_hitCollectionName, m_EventTimeName, m_parameters.et_option);
   // consistency check of training parameters
   if (m_NeuroTrigger.nSectors() != m_trainSets.size())
     B2ERROR("Number of training sets (" << m_trainSets.size() << ") should match " <<
@@ -419,9 +426,9 @@ CDCTriggerNeuroTrainerModule::event()
           continue;
         }
         // read out or determine event time
-        m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack]);
+        m_NeuroTrigger.getEventTime(isector, *m_tracks[itrack], m_parameters.et_option, m_neuroTrackInputMode);
         // check hit pattern
-        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack]);
+        unsigned long hitPattern = m_NeuroTrigger.getInputPattern(isector, *m_tracks[itrack], m_neuroTrackInputMode);
         unsigned long sectorPattern = m_NeuroTrigger[isector].getSLpattern();
         B2DEBUG(250, "hitPattern " << hitPattern << " sectorPattern " << sectorPattern);
         if (sectorPattern > 0 && (sectorPattern & hitPattern) != sectorPattern) {
@@ -429,7 +436,12 @@ CDCTriggerNeuroTrainerModule::event()
           continue;
         }
         // get training data
-        vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
+        vector<unsigned> hitIds;
+        if (m_neuroTrackInputMode) {
+          hitIds = m_NeuroTrigger.selectHitsHWSim(isector, *m_tracks[itrack]);
+        } else {
+          hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks[itrack]);
+        }
         m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector, hitIds), target);
         if (m_saveDebug) {
           phiHistsMC[isector]->Fill(phi0Target);

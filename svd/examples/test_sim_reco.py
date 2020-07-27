@@ -8,9 +8,7 @@ from simulation import add_simulation
 from reconstruction import add_reconstruction
 from ROOT import Belle2
 
-numEvents = 2000
-
-# first register the modules
+numEvents = 10000
 
 set_random_seed(1)
 
@@ -31,13 +29,22 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
-add_simulation(main, components=['MagneticField', 'SVD'], usePXDDataReduction=False)
-add_reconstruction(main, components=['MagneticField', 'SVD'])
+add_simulation(main)
+add_reconstruction(main)
 
-# display = register_module("Display")
-# main.add_module(display)
+fil = register_module('SVDShaperDigitsFromTracks')
+fil.param('outputINArrayName', 'SVDShaperDigitsFromTracks')
+main.add_module(fil)
 
-main.add_module('RootOutput')
+input_branches = [
+    'SVDShaperDigitsFromTracks',
+    'EventT0',
+    'SVDShaperDigits'
+]
+
+main.add_module("RootOutput", branchNames=input_branches, outputFileName="RootOutput_CoGCalibration_10k.root")
+
+print_path(main)
 
 # Process events
 process(main)

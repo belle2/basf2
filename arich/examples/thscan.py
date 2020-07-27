@@ -9,24 +9,40 @@
 ######################################################
 
 from basf2 import *
+import os
+from optparse import OptionParser
 
 # Set the log level to show only error and fatal messages
 set_log_level(LogLevel.INFO)
 
-input = register_module('RootInput')
-input.param('inputFileName', '/gpfs/fs02/belle2/users/tkonno/led/arich.0002.02836.HLT5.f00000.root')
+from basf2 import conditions
+conditions.override_globaltags()
+conditions.append_globaltag('online')
+conditions.append_globaltag('ARICH_phase3_test')
+
+
+# parameters
+parser = OptionParser()
+parser.add_option('-i', '--inputpath', dest='path', default='')
+(options, args) = parser.parse_args()
+
+input = register_module('SeqRootInput')
+file_list = [options.path + f for f in os.listdir(options.path) if f.endswith('.sroot')]
+
+input.param('inputFileNames', file_list)
 
 histo = register_module('HistoManager')
 
 cal = register_module('ARICHRateCal')
 cal.param("nrun", 100)
 cal.param("nevents", 1000)
-cal.param("dth", 0.01)
-cal.param("th0", -0.5)
+cal.param("dth", 0.0096)  # can be ignored when internal = True
+cal.param("th0", -0.48)  # can be ignored when internal = True
+cal.param("internal", True)
 
 unpack = register_module('ARICHUnpacker')
-unpack.param('RawUnpackerMode', 1)
-unpack.param('DisableUnpacker', 1)
+# unpack.param('RawUnpackerMode', 1)
+# unpack.param('DisableUnpackerMode', 1)
 
 convert = register_module('Convert2RawDet')
 output = register_module('RootOutput')

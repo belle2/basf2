@@ -143,7 +143,6 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
       double alpha = recoPos2D.angleWith(flightDirection);
 
       const CDCWire& wire = recoHit3D.getWire();
-      const CDCHit* hit = recoHit3D.getWireHit().getHit();
       const bool rl = recoHit3D.getRLInfo() == ERightLeft::c_Right;
 
       double driftLength = std::fabs(recoHit3D.getSignedRecoDriftLength());
@@ -151,9 +150,12 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
         // Setup the drift length such that only information
         // that would be present in two dimensional reconstruction is used
         const double beta = 1;
-        double flightTimeEstimate = 0;
         flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
 
+        //TODO: for now this seems to be unused, (see following comment)
+        /*
+        double flightTimeEstimate = 0;
+        const CDCHit* hit = recoHit3D.getWireHit().getHit();
         driftLength =
           tdcCountTranslator.getDriftLength(hit->getTDCCount(),
                                             wire.getWireID(),
@@ -161,6 +163,7 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
                                             rl,
                                             wire.getRefZ(),
                                             alpha);
+        */
 
         // As the legendre finder does not reestimate the drift length
         // We simply set it to the reference drift length for now.

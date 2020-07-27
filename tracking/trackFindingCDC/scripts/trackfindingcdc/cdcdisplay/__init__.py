@@ -397,8 +397,10 @@ class CDCSVGDisplayModule(basf2.Module):
                 plotter.draw(theCDCWireTopology)
 
         if self.use_cpp:
+            #: prefilled default is to use the C++ plotter
             self.prefilled_cppplotter = cppplotter
         if self.use_python:
+            #: prefilled default is to use the python plotter
             self.prefilled_plotter = plotter
 
         segment_relation_filter = Belle2.TrackFindingCDC.MVAFeasibleSegmentRelationFilter()

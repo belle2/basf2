@@ -10,15 +10,12 @@
 #define RBUF2RBUFMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/RingBuffer.h>
 
-#include <boost/shared_ptr.hpp>
 #include <string>
-#include <vector>
 
-#include <framework/pcore/DataStoreStreamer.h>
-//#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #define RBUFSIZE 100000000
 #define MAXEVTSIZE  400000000
@@ -60,6 +57,7 @@ namespace Belle2 {
     //! No. of sent events
     int m_nrecv;
 
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< EventMetaData. */
   };
 
 } // end namespace Belle2

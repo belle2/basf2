@@ -4,7 +4,7 @@
 #####################################################################
 # VXDTF2 Example Scripts - Collect Data for use with VXDQE_teacher
 #
-# Uses QETrainingDataCollector module to collect data to be able to
+# Uses VXDQETrainingDataCollector module to collect data to be able to
 # train a FastBDT weightfile
 #
 # Contributors: Jonas Wagner, Sebastian Racs
@@ -44,7 +44,7 @@ add_vxd_track_finding_vxdtf2(path, reco_tracks="RecoTracks", components=['SVD'],
 
 add_mc_matcher(path, components=['SVD'])
 
-data = register_module('QETrainingDataCollector')
+data = register_module('VXDQETrainingDataCollector')
 data.param('EstimationMethod', estimationMethod)
 data.param('ClusterInformation', clusterInfo)
 data.param('TrainingDataOutputName', name + '.root')

@@ -12,17 +12,17 @@
     <Radius unit="mm">6500.15</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_1</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">87.81</value>
-          <value energy="2.0">87.81</value>
-          <value energy="3.0">87.81</value>
-          <value energy="4.0">87.81</value>
-          <value energy="5.0">87.81</value>
+          <value energy="1.0">0.8781</value>
+          <value energy="2.0">0.8781</value>
+          <value energy="3.0">0.8781</value>
+          <value energy="4.0">0.8781</value>
+          <value energy="5.0">0.8781</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -41,17 +41,17 @@
     <Radius unit="mm">6503.11</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_3</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">88.43</value>
-          <value energy="2.0">88.43</value>
-          <value energy="3.0">88.43</value>
-          <value energy="4.0">88.43</value>
-          <value energy="5.0">88.43</value>
+          <value energy="1.0">0.8843</value>
+          <value energy="2.0">0.8843</value>
+          <value energy="3.0">0.8843</value>
+          <value energy="4.0">0.8843</value>
+          <value energy="5.0">0.8843</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -70,17 +70,17 @@
     <Radius unit="mm">6499.54</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_2</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">87.76</value>
-          <value energy="2.0">87.76</value>
-          <value energy="3.0">87.76</value>
-          <value energy="4.0">87.76</value>
-          <value energy="5.0">87.76</value>
+          <value energy="1.0">0.8776</value>
+          <value energy="2.0">0.8776</value>
+          <value energy="3.0">0.8776</value>
+          <value energy="4.0">0.8776</value>
+          <value energy="5.0">0.8776</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -99,17 +99,17 @@
     <Radius unit="mm">6504.60</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_4</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.85</value>
-          <value energy="2.0">85.85</value>
-          <value energy="3.0">85.85</value>
-          <value energy="4.0">85.85</value>
-          <value energy="5.0">85.85</value>
+          <value energy="1.0">0.8585</value>
+          <value energy="2.0">0.8585</value>
+          <value energy="3.0">0.8585</value>
+          <value energy="4.0">0.8585</value>
+          <value energy="5.0">0.8585</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -128,17 +128,17 @@
     <Radius unit="mm">6503.16</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_5</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">81.94</value>
-          <value energy="2.0">81.94</value>
-          <value energy="3.0">81.94</value>
-          <value energy="4.0">81.94</value>
-          <value energy="5.0">81.94</value>
+          <value energy="1.0">0.8194</value>
+          <value energy="2.0">0.8194</value>
+          <value energy="3.0">0.8194</value>
+          <value energy="4.0">0.8194</value>
+          <value energy="5.0">0.8194</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -157,17 +157,17 @@
     <Radius unit="mm">6505.25</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_6</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">82.33</value>
-          <value energy="2.0">82.33</value>
-          <value energy="3.0">82.33</value>
-          <value energy="4.0">82.33</value>
-          <value energy="5.0">82.33</value>
+          <value energy="1.0">0.8233</value>
+          <value energy="2.0">0.8233</value>
+          <value energy="3.0">0.8233</value>
+          <value energy="4.0">0.8233</value>
+          <value energy="5.0">0.8233</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -186,17 +186,17 @@
     <Radius unit="mm">6507.20</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_7</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.13</value>
-          <value energy="2.0">85.13</value>
-          <value energy="3.0">85.13</value>
-          <value energy="4.0">85.13</value>
-          <value energy="5.0">85.13</value>
+          <value energy="1.0">0.8513</value>
+          <value energy="2.0">0.8513</value>
+          <value energy="3.0">0.8513</value>
+          <value energy="4.0">0.8513</value>
+          <value energy="5.0">0.8513</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -215,17 +215,17 @@
     <Radius unit="mm">6505.43</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_8</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.13</value>
-          <value energy="2.0">85.13</value>
-          <value energy="3.0">85.13</value>
-          <value energy="4.0">85.13</value>
-          <value energy="5.0">85.13</value>
+          <value energy="1.0">0.8513</value>
+          <value energy="2.0">0.8513</value>
+          <value energy="3.0">0.8513</value>
+          <value energy="4.0">0.8513</value>
+          <value energy="5.0">0.8513</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -244,17 +244,17 @@
     <Radius unit="mm">6502.32</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_10</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.21</value>
-          <value energy="2.0">85.21</value>
-          <value energy="3.0">85.21</value>
-          <value energy="4.0">85.21</value>
-          <value energy="5.0">85.21</value>
+          <value energy="1.0">0.8521</value>
+          <value energy="2.0">0.8521</value>
+          <value energy="3.0">0.8521</value>
+          <value energy="4.0">0.8521</value>
+          <value energy="5.0">0.8521</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -273,17 +273,17 @@
     <Radius unit="mm">6507.46</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_11</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.87</value>
-          <value energy="2.0">85.87</value>
-          <value energy="3.0">85.87</value>
-          <value energy="4.0">85.87</value>
-          <value energy="5.0">85.87</value>
+          <value energy="1.0">0.8587</value>
+          <value energy="2.0">0.8587</value>
+          <value energy="3.0">0.8587</value>
+          <value energy="4.0">0.8587</value>
+          <value energy="5.0">0.8587</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -302,17 +302,17 @@
     <Radius unit="mm">6513.36</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_12</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.07</value>
-          <value energy="2.0">85.07</value>
-          <value energy="3.0">85.07</value>
-          <value energy="4.0">85.07</value>
-          <value energy="5.0">85.07</value>
+          <value energy="1.0">0.8507</value>
+          <value energy="2.0">0.8507</value>
+          <value energy="3.0">0.8507</value>
+          <value energy="4.0">0.8507</value>
+          <value energy="5.0">0.8507</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -331,17 +331,17 @@
     <Radius unit="mm">6508.32</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_13</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">84.86</value>
-          <value energy="2.0">84.86</value>
-          <value energy="3.0">84.86</value>
-          <value energy="4.0">84.86</value>
-          <value energy="5.0">84.86</value>
+          <value energy="1.0">0.8486</value>
+          <value energy="2.0">0.8486</value>
+          <value energy="3.0">0.8486</value>
+          <value energy="4.0">0.8486</value>
+          <value energy="5.0">0.8486</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -360,17 +360,17 @@
     <Radius unit="mm">6502.49</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_14</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.04</value>
-          <value energy="2.0">85.04</value>
-          <value energy="3.0">85.04</value>
-          <value energy="4.0">85.04</value>
-          <value energy="5.0">85.04</value>
+          <value energy="1.0">0.8504</value>
+          <value energy="2.0">0.8504</value>
+          <value energy="3.0">0.8504</value>
+          <value energy="4.0">0.8504</value>
+          <value energy="5.0">0.8504</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -389,17 +389,17 @@
     <Radius unit="mm">6506.98</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_9</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.53</value>
-          <value energy="2.0">85.53</value>
-          <value energy="3.0">85.53</value>
-          <value energy="4.0">85.53</value>
-          <value energy="5.0">85.53</value>
+          <value energy="1.0">0.8553</value>
+          <value energy="2.0">0.8553</value>
+          <value energy="3.0">0.8553</value>
+          <value energy="4.0">0.8553</value>
+          <value energy="5.0">0.8553</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -418,17 +418,17 @@
     <Radius unit="mm">6514.26</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_15</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">85.59</value>
-          <value energy="2.0">85.59</value>
-          <value energy="3.0">85.59</value>
-          <value energy="4.0">85.59</value>
-          <value energy="5.0">85.59</value>
+          <value energy="1.0">0.8559</value>
+          <value energy="2.0">0.8559</value>
+          <value energy="3.0">0.8559</value>
+          <value energy="4.0">0.8559</value>
+          <value energy="5.0">0.8559</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -447,17 +447,17 @@
     <Radius unit="mm">6507.82</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_16</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">86.40</value>
-          <value energy="2.0">86.40</value>
-          <value energy="3.0">86.40</value>
-          <value energy="4.0">86.40</value>
-          <value energy="5.0">86.40</value>
+          <value energy="1.0">0.8640</value>
+          <value energy="2.0">0.8640</value>
+          <value energy="3.0">0.8640</value>
+          <value energy="4.0">0.8640</value>
+          <value energy="5.0">0.8640</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>
@@ -476,17 +476,17 @@
     <Radius unit="mm">6521.72</Radius>
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
-    <OpticalSurface>QuartzSurface</OpticalSurface>
+    <OpticalSurface>QuartzSurface_17</OpticalSurface>
     <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
         <Property name="REFLECTIVITY" unit="eV">
-          <value energy="1.0">87.15</value>
-          <value energy="2.0">87.15</value>
-          <value energy="3.0">87.15</value>
-          <value energy="4.0">87.15</value>
-          <value energy="5.0">87.15</value>
+          <value energy="1.0">0.8715</value>
+          <value energy="2.0">0.8715</value>
+          <value energy="3.0">0.8715</value>
+          <value energy="4.0">0.8715</value>
+          <value energy="5.0">0.8715</value>
         </Property>
       </Properties>
       <Type>dielectric_metal</Type>

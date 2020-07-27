@@ -21,7 +21,6 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <tuple>
 
 namespace Belle2 {
 
@@ -53,34 +52,26 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> m_inputList; /**< ParticleList which contains information that will be used for updating */
 
     std::vector<std::string> m_maskNamesForUpdating; /**< Container for all mask names which will be updated */
-
     std::string m_selection; /**< Cut string which will be used for updating masks */
     std::shared_ptr<Variable::Cut> m_cut; /**< Cut object which performs the cuts */
     bool m_discard; /**< Update the ROE mask by passing or discarding particles in the provided particle list. Default is to pass. */
 
-    std::vector<double>
-    m_fractions; /**< A priori fractions used for newly added masks. Fractions of existing masks will not be changed (default: pion always) */
 
     // Methods:
-    /**
-     * Get the ParticleType of the input particle list
-     * @returns ParticleType, which is used in RestOfEvent methods
-     */
-    Particle::EParticleType getListType();
     /**
      * Update ROE masks by excluding or keeping particles
      * @param Pointer to RestOfEvent object for update
      * @param Reference to particle collection
      * @param ParticleType of the collection
      */
-    void updateMasksWithParticles(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate,
-                                  Particle::EParticleType listType);
+    void updateMasksWithParticles(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate,
+                                  Particle::EParticleSourceObject listType);
     /**
      * Update ROE masks with provided composite particle collection
      * @param Pointer to RestOfEvent object for update
      * @param Reference to composite particle collection
      */
-    void updateMasksWithV0(StoreObjPtr<RestOfEvent> roe, std::vector<const Particle*>& particlesToUpdate);
+    void updateMasksWithV0(const StoreObjPtr<RestOfEvent>& roe, std::vector<const Particle*>& particlesToUpdate);
   };
 }
 

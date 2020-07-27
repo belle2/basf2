@@ -37,12 +37,20 @@
 #pragma link C++ class Belle2::CDCADCDeltaPedestals+;
 #pragma link C++ class Belle2::CDCFEElectronics+;
 #pragma link C++ class Belle2::CDCEDepToADCConversions+;
+#pragma link C++ class Belle2::CDCWireHitRequirements+;
+#pragma link C++ class Belle2::CDCCrossTalkLibrary+;
 #pragma link C++ class Belle2::CDCFudgeFactorsForSigma+;
+
+#pragma link C++ class Belle2::asicChannel+;  // implicit
+#pragma link C++ class Belle2::adcAsicTuple+; // implicit
+
 
 #pragma link C++ class std::map <unsigned short, float>+;
 #pragma link C++ class std::vector<float>+;
 #pragma link C++ class std::map <unsigned short, std::vector<float>>+;
 #pragma link C++ class std::pair<unsigned short, std::vector<float>>+;
+
+#pragma link C++ class std::vector<Belle2::adcAsicTuple>+;
 
 #pragma read sourceClass="Belle2::CDCTimeWalks" version="[-1]" \
   source="std::map<unsigned short, float> m_tws" \
@@ -54,6 +62,17 @@
     for (it = onfile.m_tws.begin(); it != onfile.m_tws.end(); ++it) { \
       buf[0] = it->second; \
       m_tws.insert(std::pair<unsigned short, std::vector<float>>(it->first, buf)); \
+    }\
+  }"
+
+#pragma read sourceClass="Belle2::CDCBadWires" version="[-1]" \
+  source="std::vector<unsigned short> m_wires" \
+  targetClass="Belle2::CDCBadWires" \
+  target="m_wires" \
+  code="{ \
+    float effi = 0.; \
+    for (int i=0; i < onfile.m_wires.size(); ++i) { \
+      m_wires.insert(std::pair<unsigned short,float>(onfile.m_wires[i], effi)); \
     }\
   }"
 #endif

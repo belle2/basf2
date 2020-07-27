@@ -15,8 +15,6 @@
 
 #include <string>
 #include <vector>
-#include <utility> // std::pair, std::move
-
 
 namespace Belle2 {
 
@@ -39,10 +37,10 @@ namespace Belle2 {
     /** overloaded '=='-operator */
     bool operator==(const SubGraphID& b) const
     {
-      unsigned size = m_idChain.size();
-      if (b.size() != size) { return false; }
+      unsigned chainsize = m_idChain.size();
+      if (b.size() != chainsize) { return false; }
 
-      for (unsigned i = 0; i < size; i++) {
+      for (unsigned i = 0; i < chainsize; i++) {
         if (b.m_idChain[i] != m_idChain[i]) { return false; }
       }
 
@@ -54,8 +52,8 @@ namespace Belle2 {
     bool operator<(const SubGraphID& b)  const
     {
       // sorting: if outermost (== first) sector > of b.outermost this > b. If outermost == b.outermost, step is repeated until end of chain length is reached. last straw: longer chain is bigger.
-      unsigned size = m_idChain.size() < b.size() ? m_idChain.size() : b.size();
-      for (unsigned i = 0 ; i < size; i++) {
+      unsigned chainsize = m_idChain.size() < b.size() ? m_idChain.size() : b.size();
+      for (unsigned i = 0 ; i < chainsize; i++) {
         if (m_idChain[i] < b.m_idChain[i]) return true;
         if (m_idChain[i] == b.m_idChain[i]) continue;
         return false;
@@ -65,7 +63,7 @@ namespace Belle2 {
 
 
     /** constructor, mandatory iDChain musst at least contain one iD. Sectors should be sorted from outer to inner sectors, please take care of that yourself since this is not checked internally. */
-    SubGraphID(const std::vector<unsigned>& idChain) : m_idChain(idChain)
+    explicit SubGraphID(const std::vector<unsigned>& idChain) : m_idChain(idChain)
     {
       if (m_idChain.empty()) { B2FATAL("SubGraphID-Constructor, given idChain is empty - illegal usage!"); }
     }
@@ -86,10 +84,10 @@ namespace Belle2 {
     /** if both graphs have got the same IDs except the last one, they share a trunk. */
     bool checkSharesTrunk(const SubGraphID& b) const
     {
-      unsigned size = m_idChain.size();
-      if (b.size() != size) { return false; }
+      unsigned chainsize = m_idChain.size();
+      if (b.size() != chainsize) { return false; }
 
-      for (unsigned i = 0; i < size - 1; i++) {
+      for (unsigned i = 0; i < chainsize - 1; i++) {
         if (b.m_idChain[i] != m_idChain[i]) { return false; }
       }
 

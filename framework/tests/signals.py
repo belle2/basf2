@@ -96,7 +96,7 @@ def run_test(init_signal, event_signal, abort, test_in_process):
         fileExists = os.path.isfile(testFile.name)
         if fileExists and (not abort or event_signal == signal.SIGINT):
             # is ROOT file ok?
-            file_ok_ret = os.system('showmetadata ' + testFile.name)
+            file_ok_ret = os.system('b2file-metadata-show ' + testFile.name)
             basf2.B2WARNING("file_ok_ret: " + str(file_ok_ret))
             if file_ok_ret != 0:
                 raise RuntimeError("Root file not properly closed!")

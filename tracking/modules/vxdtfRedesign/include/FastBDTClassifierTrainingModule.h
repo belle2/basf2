@@ -19,9 +19,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
-#include <array>
 #include <vector>
-#include <iostream>
 
 namespace Belle2 {
 

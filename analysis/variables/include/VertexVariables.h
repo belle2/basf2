@@ -24,37 +24,93 @@ namespace Belle2 {
     /**
      * return x decay vertex coordinate of matched generated particle
      */
-    double particleMCX(const Particle* part);
+    double mcDecayVertexX(const Particle* part);
+
     /**
      * return y decay vertex coordinate of matched generated particle
      */
-    double particleMCY(const Particle* part);
+    double mcDecayVertexY(const Particle* part);
+
     /**
      * return z decay vertex coordinate of matched generated particle
      */
-    double particleMCZ(const Particle* part);
+    double mcDecayVertexZ(const Particle* part);
+
     /**
-     * return distance to interaction point of matched generated particle decay vertex
+     * return transverse position of matched generated particle decay vertex
      */
-    double particleMCDistance(const Particle* part);
+    double mcDecayVertexRho(const Particle* part);
+
+    /**
+     * return x decay vertex coordinate of matched generated particle with respect to the IP
+     */
+    double mcDecayVertexFromIPX(const Particle* part);
+
+    /**
+     * return y decay vertex coordinate of matched generated particle with respect to the IP
+     */
+    double mcDecayVertexFromIPY(const Particle* part);
+
+    /**
+     * return z decay vertex coordinate of matched generated particle with respect to the IP
+     */
+    double mcDecayVertexFromIPZ(const Particle* part);
 
     /**
      * return transverse distance to interaction point of matched generated particle decay vertex
      */
-    double particleMCRho(const Particle* part);
+    double mcDecayVertexFromIPRho(const Particle* part);
+
+    /**
+     * return distance to interaction point of matched generated particle decay vertex
+     */
+    double mcDecayVertexFromIPDistance(const Particle* part);
 
     /**
      * return x production vertex coordinate of matched generated particle
      */
-    double particleMCProductionX(const Particle* part);
+    double mcProductionVertexX(const Particle* part);
+
     /**
      * return y production vertex coordinate of matched generated particle
      */
-    double particleMCProductionY(const Particle* part);
+    double mcProductionVertexY(const Particle* part);
+
     /**
      * return z production vertex coordinate of matched generated particle
      */
-    double particleMCProductionZ(const Particle* part);
+    double mcProductionVertexZ(const Particle* part);
+
+    /**
+     * return x production vertex coordinate of matched generated particle with respect to the IP
+     */
+    double mcProductionVertexFromIPX(const Particle* part);
+
+    /**
+     * return y production vertex coordinate of matched generated particle with respect to the IP
+     */
+    double mcProductionVertexFromIPY(const Particle* part);
+
+    /**
+     * return z production vertex coordinate of matched generated particle with respect to the IP
+     */
+    double mcProductionVertexFromIPZ(const Particle* part);
+
+    /**
+     * return position in x relative to origin
+     */
+    double particleX(const Particle* part);
+
+    /**
+     * return position in y relative to origin
+     */
+    double particleY(const Particle* part);
+
+    /**
+     * return position in z relative to origin
+     */
+    double particleZ(const Particle* part);
+
     /**
      * return position in x relative to interaction point
      */

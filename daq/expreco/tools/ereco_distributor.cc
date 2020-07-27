@@ -9,6 +9,10 @@
 #include "daq/expreco/ERecoDistributor.h"
 #include "daq/rfarm/manager/RFNSM.h"
 
+#include <unistd.h>
+
+#include <cstring>
+
 using namespace std;
 using namespace Belle2;
 

@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/segmentTriple/BaseSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/SegmentTripleFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
@@ -16,6 +17,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
+    extern template class Chooseable<BaseSegmentTripleFilter>;
     extern template class ChooseableFilter<SegmentTripleFilterFactory>;
     using ChooseableSegmentTripleFilter = ChooseableFilter<SegmentTripleFilterFactory>;
   }

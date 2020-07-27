@@ -46,11 +46,11 @@ namespace Belle2 {
     public:
 
       /// Constructor
-      SoftBWMassConstraint(double gamma_,      ///< The Gamma value
-                           double mass_ = 0.,  ///< The mass difference between object sets 1 and 2
-                           double massmin_ = -std::numeric_limits<double>::infinity(),   ///< lower mass bound
-                           double massmax_ =  std::numeric_limits<double>::infinity()    ///< upper mass bound
-                          );
+      explicit SoftBWMassConstraint(double gamma_,      ///< The Gamma value
+                                    double mass_ = 0.,  ///< The mass difference between object sets 1 and 2
+                                    double massmin_ = -std::numeric_limits<double>::infinity(),   ///< lower mass bound
+                                    double massmax_ =  std::numeric_limits<double>::infinity()    ///< upper mass bound
+                                   );
       /// Virtual destructor
       virtual ~SoftBWMassConstraint();
 

@@ -1,154 +1,29 @@
 #include <gtest/gtest.h>
+#include "utilities/TestParticleFactory.h"
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/ReferenceFrame.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
-#include <framework/utilities/TestHelpers.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
-#include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/Const.h>
-#include <TMatrixFSym.h>
-#include <TRandom3.h>
 #include <TLorentzVector.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Variable;
-
-
-namespace {
-  class TestParticleFactory {
-  public:
-    TestParticleFactory(): m_photonIndex(0) {};
-    ~TestParticleFactory() {};
-
-    const Particle* produceParticle(const string& decayString, const TLorentzVector& momentum, const TVector3& vertex)
-    {
-      StoreArray<Particle> myParticles;
-      DecayDescriptor* decaydescriptor = new DecayDescriptor();
-      bool isString = decaydescriptor->init(decayString);
-      if (!isString) {
-        B2INFO("Decay string is not defined: " << decayString);
-        return nullptr;
-      }
-      vector<string> strNames = decaydescriptor->getSelectionNames();
-      for (auto& name : strNames) {
-        B2INFO("Creation of particle: " << name);
-      }
-      // Recursive function
-      auto* result = createParticle(decaydescriptor, momentum, vertex);
-      delete decaydescriptor;
-      return result;
-    };
-
-    Particle::EParticleType getType(const DecayDescriptorParticle* particleDescription)
-    {
-      int pdg = abs(particleDescription->getPDGCode());
-      // Emmm, I still do not know how to make it in an elegant way
-      if (pdg == 211 || pdg == 11 || pdg == 321) {
-        return Particle::EParticleType::c_Track;
-      }
-      if (pdg == 22) {
-        return Particle::EParticleType::c_ECLCluster;
-      }
-      return Particle::EParticleType::c_Composite;
-    }
-
-    const Particle* createParticle(const DecayDescriptor* particleDescriptor, const TLorentzVector& momentum, const TVector3& vertex)
-    {
-      Particle::EParticleType type = getType(particleDescriptor->getMother());
-      if (type == Particle::EParticleType::c_Track) {
-        return createCharged(particleDescriptor, momentum, vertex);
-      }
-      if (type == Particle::EParticleType::c_ECLCluster) {
-        return createPhoton(momentum);
-      }
-      StoreArray<Particle> myParticles;
-      //Create composite particle:
-      auto* motherDescriptor = particleDescriptor->getMother();
-      B2INFO("Mother PDG: " << motherDescriptor->getPDGCode() << " selected: " << motherDescriptor->isSelected() << " name: " <<
-             motherDescriptor->getNameSimple());
-      unsigned int nDaughters = particleDescriptor->getNDaughters();
-      Particle mother(momentum, motherDescriptor->getPDGCode());
-      for (unsigned int i = 0; i < nDaughters; i++) {
-        auto* daughter = particleDescriptor->getDaughter(i)->getMother();
-        B2INFO("\tDaughter PDG: " << daughter->getPDGCode() << " selected: " << daughter->isSelected() << " name: " <<
-               daughter->getNameSimple());
-        auto* daughterParticle = createParticle(particleDescriptor->getDaughter(i), momentum, vertex);
-        mother.appendDaughter(daughterParticle);
-      }
-      auto* result = myParticles.appendNew(mother);
-      return result;
-    };
-
-    const Particle* createPhoton(const TLorentzVector& momentum)
-    {
-      StoreArray<ECLCluster> myECLClusters;
-      StoreArray<Particle> myParticles;
-      ECLCluster myECL;
-      myECL.setIsTrack(false);
-      TRandom3 generator;
-      float eclREC = momentum[3];
-      myECL.setConnectedRegionId(m_photonIndex++);
-      myECL.setEnergy(eclREC);
-      myECL.setHypothesisId(5);
-      //This is necessary to avoid isCopyOf == true for ECLClusters:
-      myECL.setClusterId(m_photonIndex++);
-      ECLCluster* savedECL = myECLClusters.appendNew(myECL);
-
-      Particle p(savedECL);
-      Particle* part = myParticles.appendNew(p);
-      B2INFO("\tParticle PDG: " << part->getPDGCode() << " charge: " << part->getCharge()  << " momentum: " <<
-             part->getMomentumMagnitude() << " index: " << part->getArrayIndex() << " eclindex: " << part->getECLCluster()->getArrayIndex()
-             << " theta: " << part->getECLCluster()->getTheta());
-      return part;
-    }
-
-    const Particle* createCharged(const DecayDescriptor* particleDescriptor,  const TLorentzVector& momentum, const TVector3& vertex)
-    {
-      auto* particleDescription = particleDescriptor->getMother();
-      TVector3 tmomentum(momentum[0], momentum[1], momentum[2]);
-      const float pValue = 0.5;
-      const float bField = 1.5;
-      TMatrixDSym cov6(6);
-      const int charge = (particleDescription->getPDGCode()) / abs(particleDescription->getPDGCode());
-      unsigned long long int CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-      StoreArray<TrackFitResult> myTrackFits;
-      StoreArray<Track> myTracks;
-      myTrackFits.appendNew(vertex, tmomentum, cov6, charge, Const::ChargedStable(abs(particleDescription->getPDGCode())), pValue, bField,
-                            CDCValue, 16777215);
-      Track mytrack;
-      StoreArray<Particle> myParticles;
-      mytrack.setTrackFitResultIndex(Const::ChargedStable(abs(particleDescription->getPDGCode())), myTrackFits.getEntries() - 1);
-      Track* savedTrack = myTracks.appendNew(mytrack);
-      Particle* part = myParticles.appendNew(savedTrack, Const::ChargedStable(abs(particleDescription->getPDGCode())));
-      B2INFO("\tParticle PDG: " << part->getPDGCode() << " charge: " << part->getCharge()  << " charge: " << charge << " momentum: " <<
-             part->getMomentumMagnitude() << " index: " << part->getArrayIndex());
-      return part;
-    }
-  private:
-    int m_photonIndex;
-  };
-};
 namespace {
   class ROETest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
 
       DataStore::Instance().setInitializeActive(true);
@@ -170,7 +45,7 @@ namespace {
       myTracks.registerRelationTo(myPIDLikelihoods);
       DataStore::Instance().setInitializeActive(false);
 
-      TestParticleFactory factory;
+      TestUtilities::TestParticleFactory factory;
       TVector3 ipposition(0, 0, 0);
       TLorentzVector ksmomentum(1, 0, 0, 3);
       TVector3 ksposition(1.0, 0, 0);
@@ -202,9 +77,9 @@ namespace {
       roe.updateMaskWithCuts("cutMask", trackSelection, eclSelection);
       roe.initializeMask("excludeMask", "TestModule");
       vector<const Particle*> excludeParticles = {ksParticle->getDaughter(1), d0Particle->getDaughter(0)};
-      roe.excludeParticlesFromMask("excludeMask", excludeParticles, Particle::EParticleType::c_Track, true);
+      roe.excludeParticlesFromMask("excludeMask", excludeParticles, Particle::EParticleSourceObject::c_Track, true);
       roe.initializeMask("keepMask", "TestModule");
-      roe.excludeParticlesFromMask("keepMask", excludeParticles, Particle::EParticleType::c_Track, false);
+      roe.excludeParticlesFromMask("keepMask", excludeParticles, Particle::EParticleSourceObject::c_Track, false);
       roe.initializeMask("V0Mask", "TestModule");
       roe.updateMaskWithCuts("V0Mask"); // No selection
       //Add V0 to ROE mask:
@@ -214,7 +89,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -242,6 +117,44 @@ namespace {
     EXPECT_FALSE(roe->hasParticle(myParticles[10])); // B0_K_S0_pi1
     EXPECT_FALSE(roe->hasParticle(myParticles[11])); // B0_pi0_gamma0
   }
+
+  TEST_F(ROETest, useROERecoilFrame)
+  {
+    Gearbox& gearbox = Gearbox::getInstance();
+    gearbox.setBackends({std::string("file:")});
+    gearbox.close();
+    gearbox.open("geometry/Belle2.xml", false);
+
+    StoreArray<Particle> myParticles;
+    StoreArray<RestOfEvent> myROEs;
+    StoreObjPtr<RestOfEvent> myROEObject;
+    DataStore::Instance().setInitializeActive(true);
+    myROEObject.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+    myParticles[14]->addRelationTo(myROEs[0]);                 // Add relation to B0
+    myROEObject.assign(myROEs[0]);
+
+    PCmsLabTransform T;
+    // Recoil vector against all ROE particles
+    TLorentzVector pRecoil = T.getBeamFourMomentum() - myROEs[0]->get4Vector();
+    Particle tmp(pRecoil, 0);
+    RestFrame frame(&tmp);
+    //std::cout << "HER: " << T.getBeamParams().getHER()[0] << " LER: " << T.getBeamParams().getLER()[0] << std::endl;
+
+    const Manager::Var* var = Manager::Instance().getVariable("useROERecoilFrame(p)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(myParticles[5]), frame.getMomentum(myParticles[5]->get4Vector()).P()); // test on D0 in ROE
+    EXPECT_FLOAT_EQ(var->function(myParticles[14]), frame.getMomentum(myParticles[14]->get4Vector()).P()); // test on B0 on signal side
+    var = Manager::Instance().getVariable("useROERecoilFrame(E)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(myParticles[5]), frame.getMomentum(myParticles[5]->get4Vector()).E()); // test on D0 in ROE
+    EXPECT_FLOAT_EQ(var->function(myParticles[14]), frame.getMomentum(myParticles[14]->get4Vector()).E()); // test on B0 on signal side
+
+    DataStore::Instance().setInitializeActive(true);
+    DataStore::Instance().getEntry(myROEObject)->object = nullptr;
+    DataStore::Instance().setInitializeActive(false);
+  }
+
   TEST_F(ROETest, getParticles)
   {
     StoreArray<Particle> myParticles;

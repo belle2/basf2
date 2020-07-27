@@ -2,17 +2,15 @@
 #define TRCCDCTSFDQMMODULE_h
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/TRGCDCTSFUnpackerStore.h>
-#include <trg/cdc/modules/trgcdctsfUnpacker/trgcdctsfUnpackerModule.h>
-#include <stdlib.h>
-#include <iostream>
 #include <string>
 
-#include <TH2I.h>
 #include <TH1I.h>
 
 namespace Belle2 {
 
+  //! DQM module of TRGCDCTSF
   class TRGCDCTSFDQMModule : public HistoModule {
 
   public:
@@ -23,43 +21,53 @@ namespace Belle2 {
 
   public:
     //! initialize
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Event
-    virtual void event();
+    virtual void event() override;
     //! End Run
-    virtual void endRun();
+    virtual void endRun() override;
     //! terminate
-    virtual void terminate() {}
+    virtual void terminate() override {}
     //! Define Histogram
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   protected:
-    //Total number of TSF hits per event in each superlayer
-    TH1I* h_nhit;
+    //! Total number of TSF hits per event in each superlayer
+    TH1I* h_nhit = nullptr;
 
-    //Total number of hits in each TSF
-    TH1I* h_nhit_tsf;
+    //! Total number of hits in each TSF
+    TH1I* h_nhit_tsf = nullptr;
 
-    //TDirectories
-    TDirectory* oldDir;
-    TDirectory* dirDQM;
+    //! Valid type of TSF hits in each superlayer
+    TH1I* h_valid = nullptr;
 
-    //flag to save ps file
+    //! Timing of TSF hits in each superlayer
+    TH1I* h_timing = nullptr;
+
+    //! TDirectories
+    TDirectory* oldDir = nullptr;
+    //! TDirectories
+    TDirectory* dirDQM = nullptr;
+
+    //! flag to save ps file
     bool m_generatePostscript;
 
-    //name of ps file
+    //! name of ps file
     std::string m_postScriptName;
 
-    //experiment number
-    unsigned _exp;
+    //! experiment number
+    unsigned _exp = 0;
 
-    //run number
-    unsigned _run;
+    //! run number
+    unsigned _run = 0;
 
-    //TSF module number
-    int m_TSFMOD;
+    //! TSF module number
+    int m_TSFMOD = 0;
+
+    //! TSF data store
+    StoreArray<TRGCDCTSFUnpackerStore> entAry;
 
   };
 

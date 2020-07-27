@@ -12,8 +12,12 @@ import shutil
 import time
 import pathlib
 
-from basf2 import *
+import basf2
+from basf2 import create_path
+from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
+from basf2 import conditions as b2conditions
 from basf2.pickle_path import serialize_path
+
 import os
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
@@ -35,6 +39,7 @@ from .backends import Job
 from .backends import LSF
 from .backends import PBS
 from .backends import Local
+from .runners import AlgorithmsRunner
 
 
 class State():
@@ -424,6 +429,8 @@ class CalibrationMachine(Machine):
         self.collector_backend = None
         #: Results of each iteration for all algorithms of this calibration
         self._algorithm_results = {}
+        #: Final state of the algorithm runner for the current iteration
+        self._runner_final_state = None
         #: IoV to be executed, currently will loop over all runs in IoV
         self.iov_to_calibrate = iov_to_calibrate
         #: root directory for this Calibration
@@ -456,9 +463,9 @@ class CalibrationMachine(Machine):
                                    self.automatic_transition])
         self.add_transition("complete", "running_algorithms", "algorithms_completed",
                             after=self.automatic_transition,
-                            conditions=self._no_failed_iov)
+                            conditions=self._runner_not_failed)
         self.add_transition("fail", "running_algorithms", "algorithms_failed",
-                            conditions=self._any_failed_iov)
+                            conditions=self._runner_failed)
         self.add_transition("iterate", "algorithms_completed", "init",
                             conditions=[self._require_iteration,
                                         self._below_max_iterations],
@@ -577,35 +584,19 @@ class CalibrationMachine(Machine):
         if self._collector_jobs_ready():
             return any([job.status == "failed" for job in self._collector_jobs.values()])
 
-    def _no_failed_iov(self):
+    def _runner_not_failed(self):
         """
         Returns:
-            bool: If no result in the current iteration results list has a failed algorithm code we return True.
+            bool: If AlgorithmsRunner succeeded return True.
         """
-        return not self._any_failed_iov(log_failures=False)
+        return not self._runner_failed()
 
-    def _any_failed_iov(self, **kwargs):
+    def _runner_failed(self):
         """
         Returns:
-            bool: If any result in the current iteration results list has a failed algorithm code we return True.
+            bool: If AlgorithmsRunner failed return True.
         """
-        log_failures = kwargs["log_failures"]
-
-        failed_results = defaultdict(list)
-        iteration_results = self._algorithm_results[self.iteration]
-        for algorithm_name, results in iteration_results.items():
-            for result in results:
-                if result.result == AlgResult.failure.value or result.result == AlgResult.not_enough_data.value:
-                    failed_results[algorithm_name].append(result)
-        if failed_results:
-            if log_failures:
-                for algorithm_name, results in failed_results.items():
-                    B2WARNING("Failed results found in {} - {}".format(self.calibration.name, algorithm_name))
-                    for result in results:
-                        if result.result == AlgResult.failure.value:
-                            B2ERROR("c_Failure returned for {}".format(result.iov))
-                        elif result.result == AlgResult.not_enough_data.value:
-                            B2WARNING("c_NotEnoughData returned for {}".format(result.iov))
+        if self._runner_final_state == AlgorithmsRunner.FAILED:
             return True
         else:
             return False
@@ -722,7 +713,7 @@ class CalibrationMachine(Machine):
                 continue
         else:
             if "fail" in possible_transitions:
-                getattr(self, "fail")(log_failures=True)
+                getattr(self, "fail")()
             else:
                 raise MachineError(("Failed to automatically transition out of {0} state.".format(self.state)))
 
@@ -971,6 +962,7 @@ class CalibrationMachine(Machine):
             # results. But here we had an actual exception so we just force into failure instead.
             self._state = State("algorithms_failed")
         self._algorithm_results[self.iteration] = algs_runner.results
+        self._runner_final_state = algs_runner.final_state
 
     def _prepare_final_db(self):
         """
@@ -994,9 +986,8 @@ class AlgorithmMachine(Machine):
     #: Required attributes that must exist before the machine can run properly.
     #: Some are allowed be values that return False whe tested e.g. "" or []
     required_attrs = ["algorithm",
-                      "global_tag",
-                      "local_database_chain",
                       "dependent_databases",
+                      "database_chain",
                       "output_dir",
                       "output_database_dir",
                       "input_files"
@@ -1024,14 +1015,13 @@ class AlgorithmMachine(Machine):
 
         #: Algorithm() object whose state we are modelling
         self.algorithm = algorithm
-        #: Global tag for this calibration
-        self.global_tag = ""
         #: Collector output files, will contain all files retured by the output patterns
         self.input_files = []
-        #: User defined local database chain i.e. if you have localdb's for custom alignment etc
-        self.local_database_chain = []
         #: CAF created local databases from previous calibrations that this calibration/algorithm depends on
         self.dependent_databases = []
+        #: Assigned database chain to the overall Calibration object, or to the 'default' Collection.
+        #: Database chains for manually created Collections have no effect here.
+        self.database_chain = []
         #: The algorithm output directory which is mostly used to store the stdout file
         self.output_dir = ""
         #: The output database directory for the localdb that the algorithm will commit to
@@ -1041,6 +1031,7 @@ class AlgorithmMachine(Machine):
 
         self.add_transition("setup_algorithm", "init", "ready",
                             before=[self._setup_logging,
+                                    self._change_working_dir,
                                     self._setup_database_chain,
                                     self._set_input_data,
                                     self._pre_algorithm])
@@ -1048,6 +1039,7 @@ class AlgorithmMachine(Machine):
                             after=self._execute_over_iov)
         self.add_transition("complete", "running_algorithm", "completed")
         self.add_transition("fail", "running_algorithm", "failed")
+        self.add_transition("fail", "ready", "failed")
         self.add_transition("setup_algorithm", "completed", "ready")
         self.add_transition("setup_algorithm", "failed", "ready")
 
@@ -1087,26 +1079,33 @@ class AlgorithmMachine(Machine):
         """
         Apply all databases in the correct order
         """
-        # Clean everything out just in case
-        reset_database()
-        use_database_chain()
+        # We deliberately override the normal database ordering because we don't want input files GTs to affect
+        # the processing. Only explicit GTs and intermediate local DBs made by the CAF should be added here.
+        b2conditions.reset()
+        b2conditions.override_globaltags()
+
         # Apply all the databases in order, starting with the user-set chain for this Calibration
         for database in self.database_chain:
             if database.db_type == 'local':
-                B2INFO("Using local database {} for {}".format((database.filepath.as_posix(), database.payload_dir.as_posix()),
-                                                               self.algorithm.name))
-                use_local_database(database.filepath.as_posix(), database.payload_dir.as_posix())
+                B2INFO("Adding Local Database {} to head of chain of local databases, for {}.".format(
+                       database.filepath.as_posix(),
+                       self.algorithm.name))
+
+                b2conditions.prepend_testing_payloads(database.filepath.as_posix())
             elif database.db_type == 'central':
-                B2INFO("Using Central database tag {} for {}".format(database.global_tag, self.algorithm.name))
-                use_central_database(database.global_tag)
+                B2INFO("Adding Central database tag {} to head of GT chain, for {}".format(
+                       database.global_tag,
+                       self.algorithm.name))
+                b2conditions.prepend_globaltag(database.global_tag)
             else:
                 raise ValueError("Unknown database type {}".format(database.db_type))
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
         for filename, directory in self.dependent_databases:
-            B2INFO("Using local database {} created by a dependent calibration for {}".format(directory, self.algorithm.name))
-            use_local_database(filename, directory)
+            B2INFO(("Adding Local Database {} to head of chain of local databases created by"
+                    " a dependent calibration, for {}").format(filename, self.algorithm.name))
+            b2conditions.prepend_testing_payloads(filename)
 
         # Create a directory to store the payloads of this algorithm
         create_directories(pathlib.Path(self.output_database_dir), overwrite=False)
@@ -1115,10 +1114,9 @@ class AlgorithmMachine(Machine):
         B2INFO("Output local database for {} stored at {}".format(
                self.algorithm.name,
                self.output_database_dir))
-        use_local_database(str(self.output_database_dir.joinpath("database.txt")),
-                           str(self.output_database_dir),
-                           False,
-                           LogLevel.INFO)
+        # Things have changed. We now need to do the expert settings to create a database directly.
+        # LocalDB is readonly without this but we don't need 'use_local_database' during writing.
+        b2conditions.expert_settings(save_payloads=str(self.output_database_dir.joinpath("database.txt")))
 
     def _setup_logging(self, **kwargs):
         """
@@ -1126,11 +1124,17 @@ class AlgorithmMachine(Machine):
         # add logfile for output
         log_file = os.path.join(self.output_dir, self.algorithm.name + '_stdout')
         B2INFO('Output log file at {}'.format(log_file))
-        reset_log()
-        set_log_level(LogLevel.INFO)
-#        set_log_level(LogLevel.DEBUG)
-#        set_debug_level(100)
-        log_to_file(log_file)
+        basf2.reset_log()
+        basf2.set_log_level(basf2.LogLevel.INFO)
+#        basf2.set_log_level(basf2.LogLevel.DEBUG)
+#        basf2.set_debug_level(100)
+        basf2.log_to_file(log_file)
+
+    def _change_working_dir(self, **kwargs):
+        """
+        """
+        B2INFO("Changing current working directory to {}".format(self.output_dir))
+        os.chdir(self.output_dir)
 
     def _pre_algorithm(self, **kwargs):
         """

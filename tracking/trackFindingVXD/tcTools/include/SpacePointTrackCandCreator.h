@@ -12,10 +12,6 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
-#include <TVector3.h>
-#include <TVectorD.h>
-#include <TMatrixDSym.h>
-
 namespace Belle2 {
 
   /** small class to take simple vectors of SpacePoints and convert them to real SpacePointTrackCands */

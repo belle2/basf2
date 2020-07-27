@@ -70,6 +70,7 @@ namespace Belle2 {
    * which knows the truth information if two tracks belong together or not.
    */
   class PXDResultVarSet : public TrackFindingCDC::VarSet<PXDResultVarNames> {
+    /// Type of the base class
     using Super = TrackFindingCDC::VarSet<PXDResultVarNames>;
 
   public:

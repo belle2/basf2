@@ -47,10 +47,10 @@ main.add_module('EventInfoSetter')
 # WARNING: ECL cannot be displayed (will crash due to unsupported volumes)
 if phase2:
     main.add_module('Gearbox', fileName='/geometry/Beast2_phase2.xml')
-    main.add_module('Geometry', components=['FANGS', 'CLAWS', 'PLUME', 'PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+    main.add_module('Geometry', components=['FANGS', 'CLAWS', 'PLUME', 'PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'KLM'])
 else:
     main.add_module('Gearbox')
-    main.add_module('Geometry', components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'BKLM', 'EKLM'])
+    main.add_module('Geometry', components=['PXD', 'SVD', 'CDC', 'TOP', 'ARICH', 'KLM'])
 
 display = register_module('Display')
 

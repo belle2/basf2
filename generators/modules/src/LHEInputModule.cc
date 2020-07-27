@@ -14,10 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
 
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
+#include <TF1.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,7 +29,11 @@ REG_MODULE(LHEInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
+LHEInputModule::LHEInputModule() : Module(),
+  m_evtNum(-1),
+  m_initial(0),
+  m_nInitial(0),
+  m_nVirtual(0)
 {
   //Set module properties
   setDescription("LHE file input. This module loads an event record from LHE format and store the content into the MCParticle collection. LHE format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
@@ -44,8 +46,10 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
   addParam("expNum", m_expNum, "ExpNum (should be set if makeMaster=true)", 0);
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated (not implemented yet).", false);
-  addParam("nInitialParticles", m_nInitial, "Number of particles at the beginning of the events that should be made initial.", 0);
-  addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
+  addParam("nInitialParticles", m_nInitial, "Number of MCParticles at the beginning of the events that should be flagged c_Initial.",
+           0);
+  addParam("nVirtualParticles", m_nVirtual,
+           "Number of MCParticles at the beginning of the events that should be flagged c_IsVirtual.", 0);
   addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", true);
   addParam("meanDecayLength", m_meanDecayLength,
@@ -76,8 +80,8 @@ void LHEInputModule::initialize()
   } catch (runtime_error& e) {
     B2FATAL(e.what());
   }
-  m_lhe.m_nVirtual    = m_nVirtual;
-  m_lhe.m_nInitial    = m_nInitial;
+  m_lhe.setInitialIndex(m_nInitial);
+  m_lhe.setVirtualIndex(m_nInitial + m_nVirtual);
   m_lhe.m_wrongSignPz = m_wrongSignPz;
 
   //boost

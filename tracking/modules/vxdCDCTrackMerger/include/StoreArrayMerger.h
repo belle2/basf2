@@ -41,7 +41,9 @@ namespace Belle2 {
     /// Helper function to remove all tracks, which have a related CDC track from the vector.
     void removeVXDRecoTracksWithPartner(std::vector<RecoTrack*>& tracks);
 
+    /// Get the name of the VXD StoreArray<RecoTrack>
     const std::string& getVXDStoreArrayName() { return m_param_vxdRecoTrackStoreArrayName; }
+    /// Get the name of the CDC StoreArray<RecoTrack>
     const std::string& getCDCStoreArrayName() { return m_param_cdcRecoTrackStoreArrayName; }
 
   private:

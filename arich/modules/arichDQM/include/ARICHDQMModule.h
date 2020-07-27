@@ -13,23 +13,9 @@
 
 #include <framework/core/HistoModule.h>
 
-//ARICH dataobjects
-#include <arich/dataobjects/ARICHHit.h>
-#include <arich/dataobjects/ARICHTrack.h>
-#include <arich/dataobjects/ARICHPhoton.h>
-#include <arich/dataobjects/ARICHLikelihood.h>
-
-#include <TCanvas.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TH3F.h>
-#include <TVector2.h>
-#include <TText.h>
-#include <TFile.h>
-
-#include <vector>
-#include <string>
-#include <map>
 
 namespace Belle2 {
 
@@ -88,7 +74,6 @@ namespace Belle2 {
     bool m_arichEvents; /**< process only events that have extrapolated hit in arich */
     int m_maxHits; /**< exclude events with very large number of hits in arich */
     int m_minHits; /**< exclude events with number of hits lower than this */
-    int m_hotThr; /**< Threshold scale of hits/channel to dicide hot channels */
 
     //Histograms to show status by 1/0
     TH1* h_chStat = NULL;/**<Status of each channels*/
@@ -102,10 +87,14 @@ namespace Belle2 {
     TH1* h_chipHit = NULL;/**<The number of hits in each ASIC chip*/
     TH1* h_hapdHit = NULL;/**<The number of hits in each HAPD*/
     TH1* h_mergerHit = NULL;/**<The number of hits in each Merger Boards*/
+    TH2* h_bitsPerMergerNorm =
+      NULL;/*<The number of hits in each bit in each Merger Board normalised to number of HAPDs and sum(bit1, bit2)>*/
+    TH2* h_bitsPerHapdMerger = NULL;/*<The number of hits in each bit in each HAPD sorted by Merger Board>*/
     TH1* h_secHapdHit[6] = {};/**<The number of hits in each HAPDs of each sector*/
     TH2* h_hapdHitPerEvent = NULL; /**< number of hits in each HAPD per event */
     TH1* h_aerogelHit = NULL;/**<The number of reconstructed photons in each aerogel tiles*/
     TH1* h_bits = NULL;/**<Timing bits*/
+    TH2* h_bitsPerChannel = NULL;/**/
     TH2* h_hitsPerTrack2D = NULL;/**<Sum of 2D hit/track map on each position of track*/
     TH2* h_tracks2D = NULL;/**<2D track distribution of whole ARICH*/
     TH3* h_aerogelHits3D = NULL; /**< 3D histogram of */
@@ -114,6 +103,8 @@ namespace Belle2 {
     TH1* h_hitsPerEvent = NULL;/**<Ihe number of all hits in each event*/
     TH1* h_theta = NULL;/**<Reconstructed Cherenkov angles*/
     TH1* h_hitsPerTrack = NULL;/**<Average hits/track calculated from h_hits2D and h_track2D*/
+    TH1* h_trackPerEvent = NULL;/**<Number of tracks in ARICH per event (with p>0.5 GeV)*/
+    TH1* h_flashPerAPD = NULL;/**<Number of flashes in each APD */
 
     TH1* h_secTheta[6] = {};/**<Detailed view of Cherenkov angle for each sector*/
     TH1* h_secHitsPerTrack[6] = {};/**<Detailed average hits/track for each sector*/

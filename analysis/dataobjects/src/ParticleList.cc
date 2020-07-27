@@ -11,7 +11,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -40,7 +39,7 @@ void ParticleList::initialize(int pdg, const std::string& name, const std::strin
   m_antiListName.clear();
 }
 
-void ParticleList::setParticleCollectionName(std::string name, bool forAntiParticle)
+void ParticleList::setParticleCollectionName(const std::string& name, bool forAntiParticle)
 {
   m_particleStore = name;
 
@@ -90,9 +89,6 @@ void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorTyp
     // add it to the self-conjugated list of this (and anti-particle list if exists)
 
     // check if the particle is already in this list
-    // TODO: this check can be removed in future, since all
-    // modules that append particles to lists performe such
-    // tests by themselves
     if (std::find(m_scList.begin(), m_scList.end(), iparticle) == m_scList.end()) {
       m_scList.push_back(iparticle);
     } else {
@@ -110,9 +106,6 @@ void ParticleList::addParticle(unsigned iparticle, int pdg, Particle::EFlavorTyp
     if (antiParticle)
       getAntiParticleList().addParticle(iparticle, pdg, type, false);
     else {
-      // TODO: this check can be removed in future, since all
-      // modules that append particles to lists performe such
-      // tests by themselves
       if (std::find(m_fsList.begin(), m_fsList.end(), iparticle) == m_fsList.end()) {
         m_fsList.push_back(iparticle);
       } else {
@@ -129,17 +122,17 @@ void ParticleList::removeParticles(const std::vector<unsigned int>& toRemove, bo
 {
   std::vector<int> newList;
   // remove Particles from flavor-specific list of this Particle List
-  for (unsigned i = 0; i < m_fsList.size(); ++i) {
-    if (std::find(toRemove.begin(), toRemove.end(), m_fsList[i]) == toRemove.end())
-      newList.push_back(m_fsList[i]);
+  for (int i : m_fsList) {
+    if (std::find(toRemove.begin(), toRemove.end(), i) == toRemove.end())
+      newList.push_back(i);
   }
   m_fsList = newList;
 
   // remove Particles from self-conjugated list of this Particle List
   newList.clear();
-  for (unsigned i = 0; i < m_scList.size(); ++i) {
-    if (std::find(toRemove.begin(), toRemove.end(), m_scList[i]) == toRemove.end())
-      newList.push_back(m_scList[i]);
+  for (int i : m_scList) {
+    if (std::find(toRemove.begin(), toRemove.end(), i) == toRemove.end())
+      newList.push_back(i);
   }
   m_scList = newList;
 

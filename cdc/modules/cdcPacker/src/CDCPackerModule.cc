@@ -11,24 +11,14 @@
 
 #include <cdc/modules/cdcPacker/CDCPackerModule.h>
 #include <cdc/modules/cdcPacker/CDCChannelData.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportArray.h>
 
-#include <sstream>
 #include <iostream>
-#include <fstream>
-#include <iomanip>
 #include <cstring>
 
 using namespace std;
@@ -74,13 +64,8 @@ void CDCPackerModule::initialize()
   B2INFO("CDCPacker: initialize() Called.");
 
   m_rawCDCs.registerInDataStore(m_rawCDCName);
-  StoreArray<CDCRawHit> storeCDCRawHits(m_cdcRawHitName);
-
-  storeCDCRawHits.registerInDataStore();
-
-  StoreArray<CDCHit> storeDigit(m_cdcHitName);
-
-  storeDigit.registerInDataStore();
+  m_CDCRawHits.registerInDataStore(m_cdcRawHitName);
+  m_CDCHits.registerInDataStore(m_cdcHitName);
 
   loadMap();
 
@@ -121,10 +106,6 @@ int CDCPackerModule::getFEEID(int copper_id, int slot_id)
 
 void CDCPackerModule::event()
 {
-
-  // Create Data objects.
-  StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
-  StoreArray<CDCHit> cdcHits(m_cdcHitName);
   //  std::vector<int> eWire_nhit(36882, 0);
 
   int tot_chdata_bytes[302];
@@ -135,14 +116,14 @@ void CDCPackerModule::event()
   std::vector<CDCChannelData> chData;
   chData.clear();
 
-  for (const auto& hit : cdcHits) {
+  for (const auto& hit : m_CDCHits) {
     int eWire = (int)(hit.getID());
     int sly = eWire / 4096;
     int ily = (eWire % 4096) / 512;
     int iwire = (eWire % 512);
     short tdc = hit.getTDCCount();
     short adc = hit.getADCCount();
-
+    unsigned short tot = hit.getTOT();
     //
     // If not prepared the map element for this cell, exit.
     //
@@ -156,7 +137,7 @@ void CDCPackerModule::event()
     if (hit.is2ndHit() == false) { // first hit timing for one cell.
       // increase 8 bytes (4 bhytes).
       tot_chdata_bytes[ m_fee_board[ sly ][ ily ][ iwire] ] += ch_data_bytes;
-      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, 0xbbaa, adc, tdc);
+      CDCChannelData chd(m_fee_board[sly][ily][iwire], m_fee_ch[sly][ily][iwire], 8, tot, adc, tdc);
       chData.push_back(chd);
     } else { // second hit timing
       // Search ChData object for this cell.
@@ -268,7 +249,7 @@ void CDCPackerModule::event()
                              rawcprpacker_info);
 
     for (int j = 0; j < 4; j++) {
-      if (buf[j] != NULL) delete [] buf[j];
+      if (buf[j] != nullptr) delete [] buf[j];
     }
   }
   m_event++;

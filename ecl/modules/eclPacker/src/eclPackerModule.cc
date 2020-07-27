@@ -6,7 +6,6 @@
 #include <iomanip>
 
 //Framework
-#include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
 //ECL

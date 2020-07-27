@@ -14,7 +14,7 @@
 #include <tracking/trackFindingVXD/filterMap/threeHitVariables/CircleCenterXY.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/CosDirectionXY.h>
 #include <framework/geometry/B2Vector3.h>
-#include <math.h>
+#include <cmath>
 
 #define HELIXPARAMETERFIT_NAME HelixParameterFit
 

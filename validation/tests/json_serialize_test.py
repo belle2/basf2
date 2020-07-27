@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Test serialization of JSON objects.
+"""
+
 import unittest
-from ipython_tools import handler
-import basf2
 import json
-import datetime
 import json_objects
 
 
@@ -13,6 +14,16 @@ import json_objects
 
 
 class TestJsonSerialize(unittest.TestCase):
+    """
+    Test serialization of JSON objects.
+
+    This is usually done as follows:
+
+    1. Create JSON class
+    2. Serialize
+    3. Deserialize
+    4. Check that extracted information is correct
+    """
 
     def test_serialize_comparison(self):
 
@@ -22,15 +33,17 @@ class TestJsonSerialize(unittest.TestCase):
 
         cplot = json_objects.ComparisonPlot("plot_one")
 
-        cfile1 = json_objects.ComparisonPlotFile(compared_revisions=revs,
-                                                 plots=[cplot],
-                                                 title="",
-                                                 rootfile="",
-                                                 package="")
+        cfile = json_objects.ComparisonPlotFile(
+            compared_revisions=revs,
+            plots=[cplot],
+            title="",
+            rootfile="",
+            package=""
+        )
 
-        cp1 = json_objects.ComparisonPackage("pack1", [cfile1])
+        cp = json_objects.ComparisonPackage("pack1", [cfile])
 
-        comp = json_objects.Comparison(revs, [cp1])
+        comp = json_objects.Comparison(revs, [cp])
 
         js = json_objects.dumps(comp)
         js_decode = json.loads(js)
@@ -52,7 +65,11 @@ class TestJsonSerialize(unittest.TestCase):
         self.assertEqual("label2", js_decode["revisions"][1]["label"])
 
     def test_comparison_plot_file(self):
-        ccp1 = json_objects.ComparisonPlotFile(title="title", package="package", rootfile="rootfile")
+        ccp1 = json_objects.ComparisonPlotFile(
+            title="title",
+            package="package",
+            rootfile="rootfile"
+        )
         ccp2 = json_objects.ComparisonPlotFile("package", "title", "rootfile")
 
         self.assertEqual(ccp1.title, "title")
@@ -61,25 +78,6 @@ class TestJsonSerialize(unittest.TestCase):
         self.assertEqual(ccp2.title, "title")
         self.assertEqual(ccp2.package, "package")
 
-
-#     def test_serialize_packages_nested(self):
-#
-#         plot1 = json_objects.PlotFile("package", "filename", "rootfile", "shortname")
-#         plot2 = json_objects.PlotFile("package", "filename", "rootfile", "shortname")
-#         plot3 = json_objects.PlotFile("package", "filename", "rootfile", "shortname")
-#         plot4 = json_objects.PlotFile("package", "filename", "rootfile", "shortname")
-#
-#         rr1 = json_objects.Package("package1", [plot1, plot2])
-#         rr2 = json_objects.Package("package2", [plot3, plot4])
-#         rlist = {"packages": [rr1, rr2]}
-#
-#         js = json_objects.dumps(rlist)
-#         js_decode = json.loads(js)
-#
-#         self.assertEqual(2, len(js_decode))
-#         self.assertEqual("package1", js_decode["packages"][0]["name"])
-#         self.assertEqual(2, len(js_decode["packages"][1]["plotfiles"]))
-#         self.assertEqual("filename", js_decode["packages"][1]["plotfiles"][0]["filename"])
 
 if __name__ == "__main__":
     unittest.main()

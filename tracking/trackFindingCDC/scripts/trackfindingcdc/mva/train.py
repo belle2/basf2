@@ -42,14 +42,23 @@ class ClassificationOverview:
                  groupbys=[],
                  auxiliaries=[],
                  filters=[]):
+        """Constructor"""
+        #: cached output filename
         self.output_file_name = output_file_name
+        #: cached truth name
         self.truth_name = truth_name
+        #: cached selection-specifier array
         self.select = select
+        #: cached exclusion-specifier array
         self.exclude = exclude
+        #: cached groupby-specifier array
         self.groupbys = groupbys
+        #: cached auxiliary-specifier array
         self.auxiliaries = auxiliaries
+        #: cached filter-specifier array
         self.filters = filters
 
+        #: array of classification analyses
         self.classification_analyses = []
 
     def train(self, input_tree):

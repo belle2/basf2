@@ -59,7 +59,7 @@ namespace Belle2 {
         m_spectators[i] = pt.get<std::string>(std::string("spectator") + std::to_string(i));
       }
 
-      unsigned int numberOfFeatures = pt.get<unsigned int>("number_feature_variables");
+      auto numberOfFeatures = pt.get<unsigned int>("number_feature_variables");
       m_variables.resize(numberOfFeatures);
       for (unsigned int i = 0; i < numberOfFeatures; ++i) {
         m_variables[i] = pt.get<std::string>(std::string("variable") + std::to_string(i));

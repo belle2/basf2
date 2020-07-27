@@ -37,6 +37,7 @@ namespace Belle2 {
         }
       }
 
+      /** return the decay time*/
       double getTau() const { return m_tau; }
 
     private:
@@ -180,6 +181,7 @@ namespace Belle2 {
 
     private:
 
+      /**minimizer precision*/
       static int s_minimizer_precision;
 
       /** Perform fit on the data */
@@ -193,6 +195,7 @@ namespace Belle2 {
       /** Calculate fitted data. */
       void calculateFittedData();
       /** High-order Gauss-Legendre quadrature for likelihood integrals */
+      // cppcheck-suppress unusedPrivateFunction
       double integral12(double lower, double upper, std::function<double(double)> f);
       /** High-order Gauss-Legendre quadrature for likelihood integrals */
       double integral20(double lower, double upper, std::function<double(double)> f);

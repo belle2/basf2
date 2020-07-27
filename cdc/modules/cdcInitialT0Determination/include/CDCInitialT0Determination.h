@@ -8,16 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <framework/core/Module.h>
 
-#include <cdc/dataobjects/WireID.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
+
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <string>
-#include <vector>
 #include "TH1.h"
-#include "TFile.h"
+
 namespace Belle2 {
 
   /**
@@ -53,6 +52,8 @@ namespace Belle2 {
     void terminate() override;
 
   private:
+
+    StoreArray<CDCHit> m_CDCHits; /**< CDC hits. */
     TH1D* m_hTDC[56][400] = {{nullptr}}; /**< TDC distribution histo. */
     TH1D* m_hTDCBoard[300] = {nullptr}; /**< T0 distribution of each board. */
     TH1D* m_hT0All = nullptr;   /**< T0 distribution of all channel. */

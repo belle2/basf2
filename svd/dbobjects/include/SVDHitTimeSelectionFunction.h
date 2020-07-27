@@ -11,25 +11,36 @@
 #pragma once
 
 #include <TObject.h>
-#include <functional>
+
+#include <cmath>
 #include <vector>
-#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
+  /** class to contain the cut on svd hit time at SP creation step*/
   class SVDHitTimeSelectionFunction : public TObject {
 
   public:
 
-
+    /** typedef of the output calibration function*/
     typedef bool (SVDHitTimeSelectionFunction::*selFunction)(double, double, double, double) const;
 
     /** returns whether the hit came on time or not */
     bool isInTime(double svdTime, double svdTimeError = 0, double t0 = 0 , double t0Error = 0)
     {
+      // cppcheck-suppress assignBoolToPointer
       selFunction f = m_implementations[m_current];
       return (this->*f)(svdTime, svdTimeError, t0, t0Error) ;
     }
 
+    /** returns whether the uCluster time is compatible with the vClsuter time */
+    bool areClustersInTime(double uTime, double vTime)
+    {
+      if (std::abs(uTime - vTime) > m_maxUVTimeDifference)
+        return false;
+      return true;
+    }
+    float m_maxUVTimeDifference = 100; /**< max time difference of U and V clusters*/
 
     /** constructor */
     SVDHitTimeSelectionFunction()
@@ -43,6 +54,9 @@ namespace Belle2 {
       }
 
       m_current = 0; //firstVersion is the default //m_implementations.size() - 1;
+      m_deltaT = 100; //ns
+      m_nSigma = 100;
+      m_tMin = -999; //ns
     };
 
     /** copy constructor */
@@ -61,9 +75,9 @@ namespace Belle2 {
     float getMinTime() { return m_tMin; };
 
     //implementation secondVersion, setters and getters
-    /** set the minimum deltaT */
+    /** set the minimum time distance wrt t0 */
     void setDeltaTime(double deltaT) { m_deltaT = deltaT; }
-    /** returns the  minimum cluster time */
+    /** returns the minimum time distnace wrt t0 */
     float getDeltaTime() { return m_deltaT; };
 
     //implementation thirdVersion, setters and getters
@@ -72,34 +86,38 @@ namespace Belle2 {
     /** returns the  minimum cluster time */
     float getNsigma() { return m_nSigma; };
 
-
-
+    //max U-V time difference
+    /** set m_maxUVTimeDifference */
+    void setMaxUVTimeDifference(double timeDiff) { m_maxUVTimeDifference = timeDiff; }
+    /** get m_maxUVTimeDifference */
+    float getMaxUVTimeDifference() { return m_maxUVTimeDifference; }
   private:
 
     /** function parameters & implementations*/
 
     /** FIRST VERSION, ID = 0: isOnTime if t > m_tMin */
-    double m_tMin; /**< minimum cluster time*/
     bool firstVersion(double svdTime, double /* svdTimeError */, double /* t0 */, double /* t0Error */) const
     {
       return svdTime > m_tMin;
     };
+    double m_tMin; /**< minimum cluster time*/
 
     /** SECOND VERSION, ID = 1: isOnTime if |t - t0|< deltaT */
-    double m_deltaT; /**< minimum time distance wrt t0 */
     bool secondVersion(double svdTime, double /* svdTimeError */, double t0, double /* t0Error */) const
     {
       return fabs(svdTime - t0) < m_deltaT;
     };
+    double m_deltaT; /**< minimum time distance wrt t0 */
 
 
     /** THIRD VERSION, ID = 2: isOnTime if |t - t0|< nSigma*sigma */
-    double m_nSigma; /**< number of Sigma */
     bool thirdVersion(double svdTime, double svdTimeError, double t0, double t0Error) const
     {
       float err2 = svdTimeError * svdTimeError + t0Error * t0Error;
       return (svdTime - t0) * (svdTime - t0) < m_nSigma * m_nSigma * err2;
     };
+    double m_nSigma; /**< number of Sigma */
+
 
     /** current function ID */
     int m_current;
@@ -107,7 +125,7 @@ namespace Belle2 {
     static std::vector < selFunction > m_implementations; //! Do not stream this, please throw it in the WC
 
 
-    ClassDef(SVDHitTimeSelectionFunction, 2)
+    ClassDef(SVDHitTimeSelectionFunction, 3) /**< needed by root*/
   };
 
 }

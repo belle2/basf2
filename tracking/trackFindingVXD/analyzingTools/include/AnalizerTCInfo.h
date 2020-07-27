@@ -14,18 +14,12 @@
 #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 #include <tracking/trackFindingVXD/analyzingTools/TCType.h>
 
-// fw:
-#include <framework/logging/Logger.h>
-
 // root:
 #include <TVector3.h>
 
 // stl:
 #include <vector>
 #include <utility> // std::pair
-
-
-
 
 namespace Belle2 {
   /** simple class storing infos relevant for a TC for analizing it. */
@@ -57,7 +51,7 @@ namespace Belle2 {
 
 
     /** static function for correctly creating TrackCandidates */
-    static AnalizerTCInfo createTC(bool isReference, MCVXDPurityInfo& iD, SpacePointTrackCand& aTC)
+    static AnalizerTCInfo createTC(bool isReference, const MCVXDPurityInfo& iD, SpacePointTrackCand& aTC)
     {
       AnalizerTCInfo newTC;
 

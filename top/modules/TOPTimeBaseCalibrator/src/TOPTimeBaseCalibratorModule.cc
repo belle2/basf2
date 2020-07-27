@@ -13,17 +13,12 @@
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // DataStore classes
-#include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawDigit.h>
 #include <top/dbobjects/TOPSampleTimes.h>
@@ -31,13 +26,10 @@
 // Root
 #include "TFile.h"
 #include "TProfile.h"
-#include "TH1F.h"
-#include "TH2F.h"
 #include <TSystem.h>
 #include <TMatrixDSym.h>
 
 #include <iostream>
-#include <sstream>
 
 using namespace std;
 
@@ -667,7 +659,7 @@ namespace Belle2 {
     if (fabs(m_dchi2dxv) < m_change_xstep) m_xstep = m_new_xstep;
   }
 
-  double TOPTimeBaseCalibratorModule::Chisq(const std::vector<TwoTimes>& ntuple, std::vector<double>& xxval)
+  double TOPTimeBaseCalibratorModule::Chisq(const std::vector<TwoTimes>& ntuple, const std::vector<double>& xxval)
   {
     double sum1 = 0.0;
     double sum2 = 0.0; //sum od dt and dt**2

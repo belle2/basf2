@@ -19,22 +19,15 @@
 #define TRGECLFAM_SHORT_NAMES
 
 //framework headers
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-
 #include <framework/logging/Logger.h>
 
-#include <G4RunManager.hh>
-
 //trg package headers
-#include "trg/trg/Debug.h"
 #include "trg/ecl/modules/trgecl/TRGECLFAMModule.h"
 #include "trg/ecl/TrgEclDigitizer.h"
 #include "trg/ecl/TrgEclFAMFit.h"
 
 #include "trg/ecl/dbobjects/TRGECLFAMPara.h"
 
-#include <stdlib.h>
 #include <iostream>
 
 using namespace std;
@@ -93,7 +86,6 @@ namespace Belle2 {
     }
     B2DEBUG(100, "TRGECLFAMModule ... created");
     Threshold.clear();
-    Threshold.resize(576, 0);
   }
 //
 //

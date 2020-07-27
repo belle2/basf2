@@ -9,7 +9,6 @@ from modularAnalysis import *
 
 
 if __name__ == "__main__":
-
     variables = ['p', 'pt', 'pz', 'phi',
                  'chiProb', 'dr', 'dz', 'dphi',
                  'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, dz)', 'daughter(1, dz)',

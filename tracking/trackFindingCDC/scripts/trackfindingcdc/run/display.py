@@ -8,6 +8,7 @@ import trackfindingcdc.cdcdisplay as cdcdisplay
 
 
 class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
+    """Prepare and execute a basf2 job to read generated events or generate new events then display the CDC tracks"""
 
     #: Destination folder for displays
     output_folder = '/tmp'
@@ -22,15 +23,19 @@ class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
     filename_prefix = ""
 
     def __init__(self):
+        """Constructor"""
         super().__init__()
+        #: Use the CDCSVGDisplay module to draw the CDC and tracks/hits
         self._cdc_display_module = cdcdisplay.CDCSVGDisplayModule(self.output_folder)
 
     @property
     def cdc_display_module(self):
+        """Get the display module"""
         cdc_display_module = self._cdc_display_module
         return cdc_display_module
 
     def create_argument_parser(self, **kwds):
+        """Translate the command-lne arguments to basf2-job parameter"""
         argument_parser = super().create_argument_parser(**kwds)
 
         argument_parser.add_argument(
@@ -108,6 +113,7 @@ Note that some options are only relevant, if the cellular automaton finder in th
         return argument_parser
 
     def configure(self, arguments):
+        """Configure the basf2 job script using the translated command-line arguments"""
         super().configure(arguments)
 
         cdc_display_module = self.cdc_display_module
@@ -135,6 +141,7 @@ Note that some options are only relevant, if the cellular automaton finder in th
                 setattr(cdc_display_module, option, is_active_option)
 
     def create_path(self):
+        """Create the basf2 path"""
         main_path = super().create_path()
         main_path.add_module(self.cdc_display_module)
         return main_path

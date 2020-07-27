@@ -40,12 +40,17 @@ namespace Belle2 {
      * Returns the name of the anti-particle ParticleList for particles with given pdg code and with given label.
      * If the anti-particle does not exist the particle's name is returned instead
      */
-    std::string antiParticleListName(int pdgCode, std::string label);
+    std::string antiParticleListName(int pdgCode, const std::string& label);
 
     /**
      * Returns the name of the particle ParticleList for particles with given pdg code and with given label.
      */
-    std::string particleListName(int pdgCode, std::string label);
+    std::string particleListName(int pdgCode, const std::string& label);
+
+    /**
+     * Returns electric charge of a particle with given pdg code.
+     */
+    double charge(int pdgCode);
 
   }  // namespace EvtPDLUtil
 }  // namespace Belle2

@@ -10,28 +10,30 @@
 #pragma once
 
 #include <framework/pcore/zmq/messages/ZMQModuleMessage.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/zmq/messages/ZMQDefinitions.h>
 
 #include <zmq.hpp>
-#include <memory>
 
 namespace Belle2 {
   /// A message with the socket ID. Needed in input<->worker communication.
-  class ZMQIdMessage : public ZMQModuleMessage<3> {
+  class ZMQIdMessage : public ZMQModuleMessage<4> {
+    friend class ZMQMessageFactory;
+
   public:
+    /// Where the identity is stored
+    static constexpr const unsigned int c_identity = 0;
+    /// Where the type of the message is stored
+    static constexpr const unsigned int c_type = 1;
+    /// Where the data is stored
+    static constexpr const unsigned int c_data = 2;
+    /// Where the additional data is stored
+    static constexpr const unsigned int c_additionalData = 3;
+
     /// The if the message is of a given type
-    bool isMessage(const c_MessageTypes isType) const
+    bool isMessage(const EMessageTypes isType) const
     {
       const auto& type = getMessagePartAsString<c_type>();
       return type.size() == 1 and type[0] == static_cast<char>(isType);
-    }
-
-    /// Is the data part empty?
-    bool isEmpty() const
-    {
-      return getMessagePart<c_data>().size() == 0;
     }
 
     /// Get the identity part
@@ -40,14 +42,19 @@ namespace Belle2 {
       return getMessagePartAsString<c_identity>();
     }
 
-  private:
-    /// Where the identity is stored
-    static const unsigned int c_identity = 0;
-    /// Where the type of the message is stored
-    static const unsigned int c_type = 1;
-    /// Where the data is stored
-    static const unsigned int c_data = 2;
+    /// Get the data part
+    zmq::message_t& getDataMessage()
+    {
+      return getMessagePart<c_data>();
+    }
 
+    /// Get the additional data part
+    zmq::message_t& getAdditionalDataMessage()
+    {
+      return getMessagePart<c_additionalData>();
+    }
+
+  private:
     /// Copy the constructor from the base class
     using ZMQModuleMessage::ZMQModuleMessage;
   };

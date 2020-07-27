@@ -15,7 +15,6 @@
 #define TRGCDCTrack_FLAG_
 
 #include "trg/cdc/TrackBase.h"
-#include "trg/cdc/WireHit.h"
 #include "trg/cdc/Helix.h"
 
 #ifdef TRGCDC_SHORT_NAMES
@@ -51,7 +50,7 @@ namespace Belle2 {
     TRGCDCTrack();
 
     /// Constructor from a Circle.
-    TRGCDCTrack(const TRGCDCCircle&);
+    explicit TRGCDCTrack(const TRGCDCCircle&);
 
     /// Destructor
     virtual ~TRGCDCTrack();

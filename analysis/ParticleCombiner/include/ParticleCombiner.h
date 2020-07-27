@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck, Anze Zupanc                                 *
+ *               Sam Cunliffe, Torben Ferber                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,6 +14,7 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -53,7 +55,7 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce combinations with the given sizes of each particle list
-     * @param sizes the sizes of the particle lists to combine
+     * @param _sizes the sizes of the particle lists to combine
      */
     void init(const std::vector<unsigned int>& _sizes);
 
@@ -94,7 +96,7 @@ namespace Belle2 {
 
     /**
      * Initialises the generator to produce the given type of sublist
-     * @param numberOfLists Number of Particle Lists which shall be combined
+     * @param _numberOfLists Number of Particle Lists which shall be combined
      */
     void init(unsigned int _numberOfLists);
 
@@ -129,7 +131,14 @@ namespace Belle2 {
      * @param decayString
      * @param cutParameter
      */
-    explicit ParticleGenerator(std::string decayString, std::string cutParameter = "");
+    explicit ParticleGenerator(const std::string& decayString, const std::string& cutParameter = "");
+
+    /**
+     * Initialises the generator to produce the given type of sublist
+     * @param decaydescriptor
+     * @param cutParameter
+     */
+    explicit ParticleGenerator(const DecayDescriptor& decaydescriptor, const std::string& cutParameter = "");
 
     /**
      * Initialises the generator to produce the given type of sublist
@@ -139,7 +148,7 @@ namespace Belle2 {
     /**
      * Loads the next combination. Returns false if there is no next combination
      */
-    bool loadNext();
+    bool loadNext(bool loadAntiParticle = true);
 
     /**
      * Returns the particle
@@ -213,6 +222,15 @@ namespace Belle2 {
     bool currentCombinationIsUnique();
 
     /**
+     * Check that: if the current combination has at least two particles from an ECL source,
+     * then they are from different connected regions or from the same connected region but have
+     * the same hypothesis.
+     *
+     * @return true if indices not found in the stack; if true indices pushed to stack
+     */
+    bool currentCombinationIsECLCRUnique();
+
+    /**
      * In the case input daughter particle lists collide (two or more lists contain copies of Particles)
      * the Particle's Store Array index can not be longer used as its unique identifier, which is needed
      * to check for uniqueness of accpeted combinations. Instead unique identifier is created for all particles
@@ -237,6 +255,8 @@ namespace Belle2 {
     int m_pdgCode; /**< PDG Code of the particle which is combined */
     bool m_isSelfConjugated; /**< True if the combined particle is self-conjugated */
     unsigned int m_iParticleType; /**< The type of particle which is currently generated */
+    int m_properties; /**< Particle property. Flags are defined in Particle::PropertyFlags */
+    std::vector<int> m_daughterProperties; /**< Daughter's particle properties. */
 
     unsigned int m_numberOfLists; /**< Number of lists which are combined */
     std::vector<StoreObjPtr<ParticleList>> m_plists; /**< particle lists */

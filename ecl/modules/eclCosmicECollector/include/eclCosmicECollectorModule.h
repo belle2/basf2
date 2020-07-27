@@ -81,17 +81,5 @@ namespace Belle2 {
     /** Existing single crystal calibration from DB; will be updated by CAF */
     DBObjPtr<ECLCrystalCalib> m_CosmicECalib; /**< database object */
     std::vector<float> CosmicECalib; /**< vector obtained from DB object */
-
-    //** Time offset from electronics calibration from database */
-    DBObjPtr<ECLCrystalCalib> m_ElectronicsTime; /**< database object */
-    std::vector<float> ElectronicsTime; /**< vector obtained from DB object */
-
-    //** Time offset calibration from database for crystals */
-    DBObjPtr<ECLCrystalCalib> m_TimeOffsetCrystal; /**< database object */
-    std::vector<float> TimeOffsetCrystal; /**< vector obtained from DB object */
-
-    //** Time offset calibration from database for crates per crystal */
-    DBObjPtr<ECLCrystalCalib> m_TimeOffsetCrate; /**< database object */
-    std::vector<float> TimeOffsetCrate; /**< vector obtained from DB object */
   };
 }

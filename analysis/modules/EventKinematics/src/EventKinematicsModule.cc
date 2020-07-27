@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
 
 #include <analysis/modules/EventKinematics/EventKinematicsModule.h>
 
@@ -17,10 +16,10 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/EventKinematics.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <iostream>
 
@@ -46,9 +45,7 @@ EventKinematicsModule::EventKinematicsModule() : Module()
 
 }
 
-EventKinematicsModule::~EventKinematicsModule()
-{
-}
+EventKinematicsModule::~EventKinematicsModule() = default;
 
 void EventKinematicsModule::initialize()
 {
@@ -116,7 +113,8 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
       TLorentzVector p_lab = part->get4Vector();
       m_particleMomentumList.push_back(p_lab);
 
-      if (part->getParticleType() == Particle::EParticleType::c_ECLCluster)
+      if ((part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster)
+          and (part->getPDGCode() == Const::photon.getPDGCode()))
         m_photonsMomentumList.push_back(p_lab);
 
       TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
@@ -130,7 +128,7 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
 TVector3 EventKinematicsModule::getMissingMomentum()
 {
   PCmsLabTransform T;
-  TLorentzVector beam = T.getBeamParams().getHER() + T.getBeamParams().getLER();
+  TLorentzVector beam = T.getBeamFourMomentum();
   TVector3 p = beam.Vect();
   int nParticles = m_particleMomentumList.size();
   for (int i = 0; i < nParticles; ++i) {
@@ -179,5 +177,3 @@ float EventKinematicsModule::getTotalPhotonsEnergy()
   }
   return photonsEnergy;
 }
-
-

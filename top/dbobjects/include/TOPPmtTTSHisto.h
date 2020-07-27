@@ -12,7 +12,6 @@
 
 #include <TObject.h>
 #include <framework/logging/Logger.h>
-#include <vector>
 #include <TH1F.h>
 
 namespace Belle2 {
@@ -68,7 +67,8 @@ namespace Belle2 {
       }
       pmtPixel--;
       if (pmtPixel >= c_NumPmtPixels) {
-        B2ERROR("TOPPmtTTSHisto::setHistogram: invalid PMT pixel " << pmtPixel + 1);
+        B2ERROR("TOPPmtTTSHisto::setHistogram: invalid PMT pixel "
+                << LogVar("PMT pixel", pmtPixel + 1));
         return;
       }
       m_histo[pmtPixel] = *histo;

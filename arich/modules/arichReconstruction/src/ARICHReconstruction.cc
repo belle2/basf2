@@ -11,25 +11,20 @@
 #include "arich/modules/arichReconstruction/ARICHReconstruction.h"
 #include "arich/dbobjects/ARICHGeometryConfig.h"
 #include "arich/modules/arichReconstruction/Utility.h"
-#include "arich/geometry/ARICHBtestGeometryPar.h"
 #include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
 #include "arich/dataobjects/ARICHPhoton.h"
 
 // DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
 #include <vector>
 #include <TRotation.h>
 #include <TRandom3.h>
-#include <TFile.h>
-#include <TGraph2D.h>
 
 using namespace std;
 using namespace boost;
@@ -89,11 +84,22 @@ namespace Belle2 {
     m_zaero[m_nAerogelLayers  ] = m_arichgp->getDetectorZPosition();
     m_zaero[m_nAerogelLayers + 1] = m_zaero[m_nAerogelLayers] + m_arichgp->getHAPDGeometry().getWinThickness();
 
-    m_mirrorNorms.clear();
-    m_mirrorPoints.clear();
-    for (unsigned i = 1; i < m_arichgp->getMirrors().getNMirrors() + 1; i++) {
-      m_mirrorNorms.push_back(getMirrorNorm(i));
-      m_mirrorPoints.push_back(getMirrorPoint(i));
+    if (m_mirrAlign.hasChanged()) {
+      m_mirrorNorms.clear();
+      m_mirrorPoints.clear();
+      for (unsigned i = 1; i < m_arichgp->getMirrors().getNMirrors() + 1; i++) {
+        m_mirrorNorms.push_back(getMirrorNorm(i));
+        m_mirrorPoints.push_back(getMirrorPoint(i));
+      }
+    }
+
+    if (m_tileAlign) {
+      if (m_tileAlign.hasChanged()) {
+        for (int iTile = 1; iTile < 125; iTile++) {
+          m_tilePars[iTile - 1][0] = m_tileAlign->getAlignmentElement(iTile).getAlpha();
+          m_tilePars[iTile - 1][1] = m_tileAlign->getAlignmentElement(iTile).getBeta();
+        }
+      }
     }
   }
 
@@ -290,8 +296,6 @@ namespace Belle2 {
     rf0[0] = r;
     rf0[1] = rf;
 
-    double rind = 0;
-
     for (int iter = 0; iter < niter; iter++) {
 
       // direction in the space between aerogels and detector
@@ -302,7 +306,7 @@ namespace Belle2 {
       // *************************************
       // n-layers of aerogel // refractiveInd relative refractive index
       for (int a = n - 1; a >= 0 ; a--) {
-        rind = refractiveInd[a] / refractiveInd[a + 1];
+        double rind = refractiveInd[a] / refractiveInd[a + 1];
         dirf0[a] = Refraction(dirf0[a + 1], rind);
       }
 
@@ -338,7 +342,8 @@ namespace Belle2 {
     return -1;
   }
 
-  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood)
+  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrack, const StoreArray<ARICHHit>& arichHits,
+                                       ARICHLikelihood& arichLikelihood)
   {
 
     const unsigned int nPhotonHits = arichHits.getEntries(); // number of detected photons
@@ -374,6 +379,10 @@ namespace Belle2 {
 
     double wideGaussFract = (m_recPars->getParameters())[0];
     double wideGaussSigma = (m_recPars->getParameters())[1];
+
+    unsigned tileID = m_arichgp->getAerogelPlane().getAerogelTileID(arichTrack.getPosition().X(), arichTrack.getPosition().Y());
+    double r = arichTrack.getPosition().XYvector().Mod();
+    if (tileID > 0) correctEmissionPoint(tileID, r);
 
     //------------------------------------------------------
     // Calculate number of expected detected photons (emmited x geometrical acceptance).
@@ -486,21 +495,28 @@ namespace Belle2 {
       int nfoo = nDetPhotons;
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) { esigi[iHyp] = 0; ebgri[iHyp] = 0;}
 
+      bool reflOK = true; // remove window photons from reflected hypothesis
+
       // loop over possible mirror reflections
       for (int mirr = 0; mirr < refl; mirr++) {
+
+        if (!reflOK) break; // photon from window so break
+
         // calculate fi_ch for a given track refl
         TVector3 virthitpos =  HitVirtualPosition(hitpos, mirrors[mirr]);
 
-        // if hit is more than 15cm from the track position on the detector plane, skip it.
+        // if hit is more than 25cm from the track position on the detector plane, skip it.
         // (not reconstructing hits with irrelevantly large Cherenkov angle)
-        if ((track_at_detector - virthitpos).Mag() > 15.0) continue;
+        if ((track_at_detector - virthitpos).Mag() > 25.0) continue;
 
         double sigExpArr[c_noOfHypotheses] = {0.0}; // esigi for given mirror hypothesis only
         double th_cer_all[c_noOfAerogels] = {0.0};
         double fi_cer_all[c_noOfAerogels] = {0.0};
+
         double weight[c_noOfHypotheses][c_noOfAerogels] = { {0.0} };
         double weight_sum[c_noOfHypotheses] = {0.0};
         int proc = 0;
+        double fi_cer_trk = 0.;
 
         // loop over all aerogel layers
         for (unsigned int iAerogel = 0; iAerogel < m_nAerogelLayers; iAerogel++) {
@@ -520,9 +536,11 @@ namespace Belle2 {
 
           th_cer_all[iAerogel] = th_cer;
           fi_cer_all[iAerogel] = fi_cer;
+          fi_cer_trk = dirch.XYvector().DeltaPhi(edirr.XYvector());
 
+          if (mirr == 0 && th_cer < 0.1) reflOK = false;
           // skip photons with irrelevantly large/small Cherenkov angle
-          if ((th_cer > 0.5 || th_cer < 0.1) && iAerogel == 0) break;
+          if (th_cer > 0.5 || th_cer < 0.1) continue;
 
           // count photons with 0.1<thc<0.5
           if (nfoo == nDetPhotons) nDetPhotons++;
@@ -584,13 +602,13 @@ namespace Belle2 {
           if (!bkgAdded) {
             for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
               std::vector<double> pars = {momentum / sqrt(p_mass[iHyp]*p_mass[iHyp] + momentum * momentum), double(arichTrack.hitsWindow())};
-              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_all[0], pars);
+              ebgri[iHyp] += m_recPars->getBackgroundPerPad(th_cer_all[1], pars);
             }
             bkgAdded = true;
           }
         }
         // create ARICHPhoton if desired
-        if (m_storePhot && th_cer_all[0] > 0 && th_cer_all[0] < 0.6) {
+        if (m_storePhot && th_cer_all[1] > 0 && th_cer_all[1] < 0.6) {
           double n_cos_theta_ch[c_noOfHypotheses] = {0.0};
           double phi_ch[c_noOfHypotheses] = {0.0};
           for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
@@ -606,9 +624,10 @@ namespace Belle2 {
               phi_ch[iHyp] = -99999.;
             }
           }
-          ARICHPhoton phot(iPhoton, th_cer_all[0], fi_cer_all[0], mirrors[mirr]); // th_cer of the first aerogel layer assumption is stored
+          ARICHPhoton phot(iPhoton, th_cer_all[1], fi_cer_all[1], mirrors[mirr]); // th_cer of the first aerogel layer assumption is stored
           phot.setBkgExp(ebgri); // store expected number of background hits
           phot.setSigExp(sigExpArr); // store expected number of signal hits
+          phot.setPhiCerTrk(fi_cer_trk); // store phi angle in track coordinates
           phot.setNCosThetaCh(n_cos_theta_ch); // store n cos(theta_th) for all particle hypotheses
           phot.setPhiCh(phi_ch); // store phi_ch for all particle hypotheses
           phot.setXY(hitpos.X(), hitpos.Y()); // store x-y hit position
@@ -722,14 +741,23 @@ namespace Belle2 {
   TVector3 ARICHReconstruction::getMirrorNorm(int mirrorID)
   {
     if (m_alignMirrors && m_mirrAlign.isValid()) {
-      TVector3 mirnorm(1, 0, 0);
-      mirnorm.RotateX(m_mirrAlign->getAlignmentElement(mirrorID).getAlpha());
-      mirnorm.RotateY(m_mirrAlign->getAlignmentElement(mirrorID).getBeta());
-      mirnorm.RotateZ(m_arichgp->getMirrors().getNormVector(mirrorID).Phi() + m_mirrAlign->getAlignmentElement(mirrorID).getGamma());
+
+      TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(mirrorID);
+      mirnorm.SetTheta(mirnorm.Theta() + m_mirrAlign->getAlignmentElement(mirrorID).getAlpha());
+      mirnorm.SetPhi(mirnorm.Phi() + m_mirrAlign->getAlignmentElement(mirrorID).getBeta());
       return mirnorm;
+
     }
     return m_arichgp->getMirrors().getNormVector(mirrorID);
   }
 
+  void ARICHReconstruction::correctEmissionPoint(int tileID, double r)
+  {
+
+    double ang = m_tilePars[tileID - 1][0] + m_tilePars[tileID - 1][1] * r;
+    m_zaero[0] = m_arichgp->getAerogelPlane().getAerogelZPosition() + m_thickness[0] - ang * 50.;
+    m_zaero[1] = m_zaero[0] +  m_thickness[1];
+
+  }
 
 }

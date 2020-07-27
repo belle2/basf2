@@ -11,12 +11,11 @@
 # This software is provided "as is" without any warranty.
 # -----------------------------------------------------------
 
-# Usage: basf2 run_collector.py inputFile.sroot outputFile.root
-# Or: basf2 run_eclCosmicE_collector.py inputFile.root outputFile.root
+# Usage: basf2 -i inputFile.root run_eclCosmicE_collector.py [outputFile.root globaltag]
 
 # Run just the collector part of the eclCosmicE calibration, which calibrates the single crystal
 # energy response using cosmic rays.
-# Input file should be cosmic data in root or sroot format, including ecl digits
+# Input file should be cosmic data in root format, including ecl digits
 
 # Output histograms are written to specified output file.
 # run_eclCosmicE_algorithm.py is then used to perform calibration using these histograms, or to simply copy
@@ -25,26 +24,21 @@
 import os
 import sys
 import glob
-from basf2 import *
+import basf2 as b2
 from ROOT import Belle2
 from rawdata import add_unpackers
 
-main = create_path()
 
-# input file, sequential root
-narg = len(sys.argv)
-inputfile = "/hsm/belle2/bdata/users/kuzmin/05399/cosmic.0001.05399.HLT1.f00000.sroot"  # Larger file for cosmic run (slower)
-# inputfile = "/hsm/belle2/bdata/users/kuzmin/11362/cosmic.0001.11362.HLT4.f00000.sroot"  # Smaller file for cosmic run (faster)
-if(narg >= 2):
-    inputfiles = glob.glob(sys.argv[1])
-    main.add_module('SeqRootInput', inputFileNames=inputfiles)
-else:
-    main.add_module('SeqRootInput', inputFileName=inputfile)
+# input file
+main = b2.create_path()
+inputfile = '/ghi/fs01/belle2/bdata/Data/Raw/e0007/r01112/sub00/*.root'
+main.add_module('RootInput', inputFileNames=[inputfile])
 
 # output file
 outputName = "eclCosmicECollectorOutput.root"
-if(narg >= 3):
-    outputName = sys.argv[2]
+narg = len(sys.argv)
+if(narg >= 2):
+    outputName = sys.argv[1]
 main.add_module("HistoManager", histoFileName=outputName)
 
 main.add_module('Progress')
@@ -52,22 +46,25 @@ main.add_module('Progress')
 # ECL unpackers
 add_unpackers(main, components='ECL')
 
-set_log_level(LogLevel.INFO)
+b2.set_log_level(b2.LogLevel.INFO)
 
 # CAF collector code
-eclCosmicE = register_module('eclCosmicECollector', logLevel=LogLevel.DEBUG, debugLevel=9)
+eclCosmicE = b2.register_module('eclCosmicECollector', logLevel=b2.LogLevel.DEBUG, debugLevel=9)
 eclCosmicE.param('minCrysE', 0.01)
 eclCosmicE.param('mockupL1', False)
 eclCosmicE.param('trigThreshold', 0.1)
 main.add_module(eclCosmicE)
 
 # It is possible to force the job to use the specified global tag.
-# Default localdb is the subdirectory of current working directory, but can be overwritten
-reset_database()
-use_database_chain()
-use_central_database("development")
-use_local_database("localdb/database.txt")
+# Default localdb is the subdirectory of current working directory
+centralGT = "data_reprocessing_prompt_bucket3b"
+if(narg >= 3):
+    centralGT = sys.argv[2]
+b2.reset_database()
+b2.use_database_chain()
+b2.use_central_database(centralGT)
+b2.use_local_database("localdb/database.txt")
 
-process(main)
+b2.process(main)
 
-print(statistics)
+print(b2.statistics)

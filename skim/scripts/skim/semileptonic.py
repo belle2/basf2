@@ -6,124 +6,266 @@
 
 __authors__ = [
     "Racha Cheaib",
-    "Hannah Wakeling"
+    "Hannah Wakeling",
+    "Phil Grace"
 ]
 
-from basf2 import *
-from modularAnalysis import *
+import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
+from variables import variables as vm
 
 
-def SemileptonicList(path):
+__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
+
+
+@fancy_skim_header
+class PRsemileptonicUntagged(BaseSkim):
     """
-    Note:
-        * (Semi-)Leptonic Working Group skim for semi-leptonic analysis.
-        * To be used initially for for B semileptonic decays (B to D l v) (l= electron, muon)
-        * Skim code: 11160200
-        * Uses D:all lists
+    Reconstructed decay modes:
 
-    **Decay Modes**:
+    * :math:`B^0 \\to \\pi^- e^+`
+    * :math:`B^0 \\to \\pi^- \\mu^+`
 
-        * B+ -> D0 e+
-        * B+ -> D0 mu+
-        * B+ -> D*0 e+
-        * B+ -> D*0 mu+
-        * B0 ->  D+ e-
-        * B0 ->  D+ mu-
-        * B0 ->  D*+ e-
-        * B0 ->  D*+ mu-
+    Event-level cuts:
 
-    **Cuts applied**:
+    * :math:`\\text{foxWolframR2} > 0.5` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} > 4`
 
-        * lepton momentum > 0.35 GeV
-        * 5.24 < B_Mbc < 5.29
-        * | deltaE | < 0.5
-        * nTracks > 4
-    """
+    Cuts on electrons:
 
-    __authors__ = [
-        "Phillip Urquijo",
-        "Racha Cheaib"
-    ]
+    * :math:`\\text{electronID} > 0.5`
+    * :math:`p > 1.5\\,\\text{GeV}` in CMS frame
 
-    cutAndCopyList('e-:SLB', 'e-:all', 'p>0.35', True, path=path)
-    cutAndCopyList('mu-:SLB', 'mu-:all', 'p>0.35', True, path=path)
-    Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
+    Cuts on muons:
 
-    BplusChannels = ['D0:all e+:SLB',
-                     'D0:all mu+:SLB',
-                     'D*0:all e+:SLB',
-                     'D*0:all mu+:SLB'
-                     ]
+    * :math:`\\text{muonID} > 0.5`
+    * :math:`p > 1.5\\,\\text{GeV}` in CMS frame
 
-    B0Channels = ['D+:all e-:SLB',
-                  'D+:all mu-:SLB',
-                  'D*+:all e-:SLB',
-                  'D*+:all mu-:SLB'
-                  ]
+    Cuts on pions:
 
-    bplusList = []
-    for chID, channel in enumerate(BplusChannels):
-        reconstructDecay('B+:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
-        bplusList.append('B+:SL' + str(chID))
+    * :math:`\\text{pionID}>0.5`
+    * :math:`\\text{muonID}<0.2`
+    * :math:`0.060\\,\\text{GeV}<p<0.220\\,\\text{GeV}` in CMS frame
 
-    b0List = []
-    for chID, channel in enumerate(B0Channels):
-        reconstructDecay('B0:SL' + str(chID) + ' -> ' + channel, Bcuts, chID, path=path)
-        applyCuts('B+:SL' + str(chID), 'nTracks>4', path=path)
-        b0List.append('B0:SL' + str(chID))
+    Cuts on partially reconstructed :math:`B` mesons:
 
-    allLists = b0List + bplusList
-    return allLists
-
-
-def PRList(path):
-    """
-    Note:
-        * (Semi-)Leptonic Working Group skim for partial reconstruction analysis.
-        * To be used initially for measuring B to D* l v using partial reconstruction.
-        * Skim code: 11110100
-
-    **Decay Modes**:
-
-    * B0:L1 ->  pi-:PR1 e+:PR1
-    * B0:L2 ->  pi-:PR1 mu+:PR1
-
-    **Cuts applied**:
-
-    * electronID>0.5
-    * muonID>0.5
-    * lepton Momentum>1.5
-    * R2EventLevel<0.5
-    * nTracks>4
+    * :math:`\\cos\\theta_{\\ell,\\,\\pi}<0` in CMS frame.
     """
 
-    __authors__ = [
-        "Lucien Cremaldi",
-        "Racha Cheaib",
-        "Romulus Godang"
-    ]
+    __authors__ = ["Lucien Cremaldi", "Racha Cheaib", "Romulus Godang"]
+    __description__ = "Skim for partial reconstruction analysis in leptonic group."
+    __contact__ = __liaison__
+    __category__ = "physics, semileptonic"
 
-    cutAndCopyList('e+:PR1', 'e+:all', 'useCMSFrame(p) > 1.50 and electronID > 0.5', path=path)
-    cutAndCopyList('mu+:PR1', 'mu+:all', 'useCMSFrame(p) > 1.50 and muonID > 0.5', path=path)
-    cutAndCopyList('pi-:PR1', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220', path=path)
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdMu": ["all"],
+            "stdPi": ["all"],
+        },
+    }
 
-    cutAndCopyList('e+:PR2', 'e+:all', '0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5', path=path)
-    cutAndCopyList('mu+:PR2', 'mu+:all', '0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5', path=path)
-    cutAndCopyList('pi-:PR2', 'pi-:all', 'pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160', path=path)
+    def build_lists(self, path):
+        ma.fillParticleList(decayString="pi+:PRSL_eventshape",
+                            cut="pt> 0.1", path=path)
+        ma.fillParticleList(decayString="gamma:PRSL_eventshape",
+                            cut="E > 0.1", path=path)
 
-    reconstructDecay('B0:L1 ->  pi-:PR1 e+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 1, path=path)
-    applyCuts('B0:L1', 'R2EventLevel<0.5 and nTracks>4', path=path)
+        ma.buildEventShape(inputListNames=["pi+:PRSL_eventshape", "gamma:PRSL_eventshape"],
+                           allMoments=False,
+                           foxWolfram=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
+                           checkForDuplicates=False,
+                           path=path)
 
-    reconstructDecay('B0:L2 ->  pi-:PR1 mu+:PR1', 'useCMSFrame(daughterAngle(0,1))<0.00', 2, path=path)
-    applyCuts('B0:L2', 'R2EventLevel<0.5 and nTracks>4', path=path)
+        path = self.skim_event_cuts("foxWolframR2<0.5 and nTracks>4", path=path)
 
-    reconstructDecay('B0:L3 ->  pi-:PR2 e+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 3, path=path)
-    applyCuts('B0:L3', 'R2EventLevel<0.5 and nTracks>4', path=path)
+        ma.cutAndCopyList("e+:PRSemileptonic_1", "e+:all",
+                          "useCMSFrame(p) > 1.50 and electronID > 0.5", path=path)
+        ma.cutAndCopyList("mu+:PRSemileptonic_1", "mu+:all",
+                          "useCMSFrame(p) > 1.50 and muonID > 0.5", path=path)
+        ma.cutAndCopyList("pi-:PRSemileptonic_1", "pi-:all",
+                          "pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220", path=path)
 
-    reconstructDecay('B0:L4 ->  pi-:PR2 mu+:PR2', 'useCMSFrame(daughterAngle(0,1))<1.00', 4, path=path)
-    applyCuts('B0:L4', 'R2EventLevel<0.5 and nTracks>4', path=path)
+        ma.cutAndCopyList("e+:PRSemileptonic_2", "e+:all",
+                          "0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5", path=path)
+        ma.cutAndCopyList("mu+:PRSemileptonic_2", "mu+:all",
+                          "0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5", path=path)
+        ma.cutAndCopyList("pi-:PRSemileptonic_2", "pi-:all",
+                          "pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.160", path=path)
 
-    PRList = ['B0:L1', 'B0:L2']
+        ma.reconstructDecay("B0:PRSemileptonic_1 ->  pi-:PRSemileptonic_1 e+:PRSemileptonic_1",
+                            "useCMSFrame(cos(daughterAngle(0,1)))<0.00", 1, path=path)
+        ma.reconstructDecay("B0:PRSemileptonic_2 ->  pi-:PRSemileptonic_1 mu+:PRSemileptonic_1",
+                            "useCMSFrame(cos(daughterAngle(0,1)))<0.00", 2, path=path)
+        ma.reconstructDecay("B0:PRSemileptonic_3 ->  pi-:PRSemileptonic_2 e+:PRSemileptonic_2",
+                            "useCMSFrame(cos(daughterAngle(0,1)))<1.00", 3, path=path)
+        ma.reconstructDecay("B0:PRSemileptonic_4 ->  pi-:PRSemileptonic_2 mu+:PRSemileptonic_2",
+                            "useCMSFrame(cos(daughterAngle(0,1)))<1.00", 4, path=path)
 
-    return PRList
+        self.SkimLists = ["B0:PRSemileptonic_1", "B0:PRSemileptonic_2"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        ma.cutAndCopyLists("B0:PRSemileptonic_semileptonic",
+                           ["B0:PRSemileptonic_1", "B0:PRSemileptonic_2"], "", path=path)
+
+        ma.buildRestOfEvent("B0:PRSemileptonic_semileptonic", path=path)
+        ma.appendROEMask("B0:PRSemileptonic_semileptonic", "basic",
+                         "pt>0.05 and -2<dr<2 and -4.0<dz<4.0",
+                         "E>0.05",
+                         path=path)
+        ma.buildContinuumSuppression("B0:PRSemileptonic_semileptonic", "basic", path=path)
+
+        vm.addAlias("d0_p", "daughter(0, p)")
+        vm.addAlias("d1_p", "daughter(1, p)")
+        vm.addAlias("MissM2", "weMissM2(basic,0)")
+
+        histogramFilename = f"{self}_Validation.root"
+        email = "Phil Grace <philip.grace@adelaide.edu.au>"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B0:PRSemileptonic",
+            variables_1d=[
+                ("Mbc", 100, 4.0, 5.3, "Mbc", email, "", ""),
+                ("d0_p", 100, 0, 5.2, "Signal-side pion momentum", email, "", ""),
+                ("d1_p", 100, 0, 5.2, "Signal-side lepton momentum", email, "", ""),
+                ("MissM2", 100, -5, 5, "Missing mass squared", email, "", "")
+            ],
+            variables_2d=[("deltaE", 100, -5, 5, "Mbc", 100, 4.0, 5.3, "Mbc vs deltaE", email, "", "")],
+            path=path)
+
+
+@fancy_skim_header
+class SLUntagged(BaseSkim):
+    """
+    Cuts applied:
+
+    * :math:`p_{\\ell} > 0.35\\,\\text{GeV}`
+    * :math:`5.24 < M_{\\text{bc}} < 5.29`
+    * :math:`|\\Delta E | < 0.5`
+    * :math:`n_{\\text{tracks}} > 4`
+
+    Reconstructed decays:
+
+    * :math:`B^+ \\to \\overline{D}^{0} e^+`
+    * :math:`B^+ \\to \\overline{D}^{0} \\mu^+`
+    * :math:`B^+ \\to \\overline{D}^{*0} e^+`
+    * :math:`B^+ \\to \\overline{D}^{*0} \\mu^+`
+    * :math:`B^0 \\to  D^{-} e^+`
+    * :math:`B^0 \\to  D^{-} \\mu^+`
+    * :math:`B^0 \\to  D^{*-} e^+`
+    * :math:`B^0 \\to  D^{*-} \\mu^+`
+    """
+
+    __authors__ = ["Phillip Urquijo", "Racha Cheaib"]
+    __description__ = (
+        "Skim for semileptonic decays, :math:`B: decays "
+        "(:math:`B \\to D \\ell\\nu,` where :math:`\\ell=e,\\mu`)"
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, semileptonic"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdK": ["all"],
+            "stdMu": ["all"],
+            "stdPi": ["all", "loose"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["loose"],
+        },
+        "stdPi0s": {
+            "stdPi0s": ["eff40_Jan2020"],
+        },
+        "stdV0s": {
+            "stdKshorts": [],
+        },
+        "skim.standardlists.lightmesons": {
+            "loadStdPi0ForBToHadrons": [],
+        },
+        "skim.standardlists.charm": {
+            "loadPiForBtoHadrons": [],
+            "loadKForBtoHadrons": [],
+            "loadStdD0": [],
+            "loadStdDstar0": [],
+            "loadStdDplus": [],
+            "loadStdDstarPlus": [],
+        },
+    }
+
+    def build_lists(self, path):
+        ma.cutAndCopyList("e+:SLUntagged", "e+:all", "p>0.35", True, path=path)
+        ma.cutAndCopyList("mu+:SLUntagged", "mu+:all", "p>0.35", True, path=path)
+        Bcuts = "5.24 < Mbc < 5.29 and abs(deltaE) < 0.5"
+
+        BplusChannels = ["anti-D0:all e+:SLUntagged",
+                         "anti-D0:all mu+:SLUntagged",
+                         "anti-D*0:all e+:SLUntagged",
+                         "anti-D*0:all mu+:SLUntagged"
+                         ]
+
+        B0Channels = ["D-:all e+:SLUntagged",
+                      "D-:all mu+:SLUntagged",
+                      "D*-:all e+:SLUntagged",
+                      "D*-:all mu+:SLUntagged"
+                      ]
+
+        bplusList = []
+        for chID, channel in enumerate(BplusChannels):
+            ma.reconstructDecay(f"B+:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
+            ma.applyCuts(f"B+:SLUntagged_{chID}", "nTracks>4", path=path)
+            bplusList.append(f"B+:SLUntagged_{chID}")
+
+        b0List = []
+        for chID, channel in enumerate(B0Channels):
+            ma.reconstructDecay(f"B0:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
+            ma.applyCuts(f"B0:SLUntagged_{chID}", "nTracks>4", path=path)
+            b0List.append(f"B0:SLUntagged_{chID}")
+
+        self.SkimLists = b0List + bplusList
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        ma.cutAndCopyLists("B+:SLUntagged",
+                           ["B+:SLUntagged_0", "B+:SLUntagged_1", "B+:SLUntagged_2", "B+:SLUntagged_3"],
+                           "", path=path)
+
+        ma.buildRestOfEvent("B+:SLUntagged", path=path)
+        ma.appendROEMask("B+:SLUntagged", "basic",
+                         "pt>0.05 and -2<dr<2 and -4.0<dz<4.0",
+                         "E>0.05",
+                         path=path)
+        ma.buildContinuumSuppression("B+:SLUntagged", "basic", path=path)
+
+        vm.addAlias("d1_p", "daughter(1,p)")
+        vm.addAlias("MissM2", "weMissM2(basic,0)")
+
+        histogramFilename = f"{self}_Validation.root"
+        myEmail = "Phil Grace <philip.grace@adelaide.edu.au>"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B+:SLUntagged",
+            variables_1d=[
+                ("cosThetaBetweenParticleAndNominalB", 100, -6.0, 4.0, "cosThetaBY", myEmail, "", ""),
+                ("Mbc", 100, 4.0, 5.3, "Mbc", myEmail, "", ""),
+                ("d1_p", 100, 0, 5.2, "Signal-side lepton momentum", myEmail, "", ""),
+                ("MissM2", 100, -5, 5, "Missing mass squared", myEmail, "", "")
+            ],
+            variables_2d=[("deltaE", 100, -5, 5, "Mbc", 100, 4.0, 5.3, "Mbc vs deltaE", myEmail, "", "")],
+            path=path)

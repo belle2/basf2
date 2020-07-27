@@ -15,9 +15,9 @@
 #include <framework/logging/Logger.h>
 #include <framework/io/RootIOUtilities.h>
 
-#include <boost/filesystem/operations.hpp>
+#include <TLeaf.h>
 
-#include <iostream>
+#include <boost/filesystem/operations.hpp>
 
 namespace Belle2 {
   namespace MVA {
@@ -46,7 +46,7 @@ namespace Belle2 {
 
     }
 
-    unsigned int Dataset::getFeatureIndex(std::string feature)
+    unsigned int Dataset::getFeatureIndex(const std::string& feature)
     {
 
       auto it = std::find(m_general_options.m_variables.begin(), m_general_options.m_variables.end(), feature);
@@ -58,7 +58,7 @@ namespace Belle2 {
 
     }
 
-    unsigned int Dataset::getSpectatorIndex(std::string spectator)
+    unsigned int Dataset::getSpectatorIndex(const std::string& spectator)
     {
 
       auto it = std::find(m_general_options.m_spectators.begin(), m_general_options.m_spectators.end(), spectator);
@@ -319,8 +319,8 @@ namespace Belle2 {
       m_target_double = 0.0;
       m_weight_double = 1.0;
 
-      for (auto variable : general_options.m_variables)
-        for (auto spectator : general_options.m_spectators)
+      for (const auto& variable : general_options.m_variables)
+        for (const auto& spectator : general_options.m_spectators)
           if (variable == spectator or variable == general_options.m_target_variable or spectator == general_options.m_target_variable) {
             B2ERROR("Interface doesn't support variable more then one time in either spectators, variables or target variable");
             throw std::runtime_error("Interface doesn't support variable more then one time in either spectators, variables or target variable");
@@ -499,11 +499,11 @@ namespace Belle2 {
     {
       if (not variableName.empty()) {
         if (checkForBranch(m_tree, variableName)) {
-          m_tree->SetBranchStatus(variableName.c_str(), 1);
+          m_tree->SetBranchStatus(variableName.c_str(), true);
           m_tree->SetBranchAddress(variableName.c_str(), &variableTarget);
         } else {
           if (checkForBranch(m_tree, Belle2::makeROOTCompatible(variableName))) {
-            m_tree->SetBranchStatus(Belle2::makeROOTCompatible(variableName).c_str(), 1);
+            m_tree->SetBranchStatus(Belle2::makeROOTCompatible(variableName).c_str(), true);
             m_tree->SetBranchAddress(Belle2::makeROOTCompatible(variableName).c_str(), &variableTarget);
           } else {
             B2ERROR("Couldn't find given " << variableType << " variable named " << variableName <<
@@ -526,7 +526,7 @@ namespace Belle2 {
     void ROOTDataset::setBranchAddresses()
     {
       // Deactivate all branches by default
-      m_tree->SetBranchStatus("*", 0);
+      m_tree->SetBranchStatus("*", false);
       std::string typeName;
 
       if (m_general_options.m_weight_variable.empty()) {
@@ -537,7 +537,7 @@ namespace Belle2 {
 
       if (m_general_options.m_weight_variable == "__weight__") {
         if (checkForBranch(m_tree, "__weight__")) {
-          m_tree->SetBranchStatus("__weight__", 1);
+          m_tree->SetBranchStatus("__weight__", true);
           if (m_isDoubleInputType)
             m_tree->SetBranchAddress("__weight__", &m_weight_double);
           else

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <string>
 #include <boost/format.hpp>
 
 namespace Belle2 {

@@ -25,11 +25,9 @@
 #include <cmath>
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
-    BaseHardConstraint::~BaseHardConstraint()
-    {}
+    BaseHardConstraint::~BaseHardConstraint() = default;
 
 
     void BaseHardConstraint::add1stDerivativesToMatrix(double* M, int idim) const
@@ -88,7 +86,7 @@ namespace Belle2 {
       // dPidAk[KMAX*4*i + 4*k + ii] is $\frac {\partial P_{i,ii}}{\partial a_k}$,
       // with ii=0, 1, 2, 3 for E, px, py, pz
       const int n = fitobjects.size();
-      double* dPidAk = new double[n * BaseDefs::MAXPAR * BaseDefs::MAXINTERVARS];
+      auto* dPidAk = new double[n * BaseDefs::MAXPAR * BaseDefs::MAXINTERVARS];
       bool* dPidAkval = new bool[n];
 
       for (int i = 0; i < n; ++i) dPidAkval[i] = false;
@@ -245,7 +243,7 @@ namespace Belle2 {
     {
       B2INFO("BaseConstraint::test1stDerivatives for " << getName());
       double y[100];
-      for (int i = 0; i < 100; ++i) y[i] = 0;
+      for (double& i : y) i = 0;
       addToGlobalChi2DerVector(y, 100, 1);
       double eps = 0.00001;
       for (unsigned int ifo = 0; ifo < fitobjects.size(); ++ifo) {
@@ -266,7 +264,7 @@ namespace Belle2 {
     {
       B2INFO("BaseConstraint::test2ndDerivatives for " << getName());
       const int idim = 100;
-      double* M = new double[idim * idim];
+      auto* M = new double[idim * idim];
       for (int i = 0; i < idim * idim; ++i) M[i] = 0;
       add2ndDerivativesToMatrix(M, idim, 1);
       double eps = 0.0001;
@@ -361,8 +359,8 @@ namespace Belle2 {
         assert(foi);
         if (firstDerivatives(i, dgdpi)) {
           B2INFO("first derivs for obj " << i << " : ");
-          for (int j = 0; j < BaseDefs::MAXINTERVARS; j++)
-            B2INFO(dgdpi[j] << " ");
+          for (double j : dgdpi)
+            B2INFO(j << " ");
         }
       }
 

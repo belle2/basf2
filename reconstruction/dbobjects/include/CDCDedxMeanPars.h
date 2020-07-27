@@ -12,7 +12,6 @@
 
 #include <TObject.h>
 #include <vector>
-#include <cmath>
 
 namespace Belle2 {
 
@@ -31,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxMeanPars(short version, std::vector<double>& meanpars): m_version(version), m_meanpars(meanpars) {};
+    CDCDedxMeanPars(short version, const std::vector<double>& meanpars): m_version(version), m_meanpars(meanpars) {};
 
     /**
      * Destructor
@@ -68,9 +67,9 @@ namespace Belle2 {
     void setMeanPar(int par, double value) {m_meanpars[par] = value; };
 
   private:
-    short m_version; /**< version number for mean parameterization */
+    short m_version{ -1}; /**< version number for mean parameterization */
     std::vector<double> m_meanpars; /**< dE/dx mean parameters */
 
-    ClassDef(CDCDedxMeanPars, 1); /**< ClassDef */
+    ClassDef(CDCDedxMeanPars, 2); /**< ClassDef */
   };
 } // end namespace Belle2

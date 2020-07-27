@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2014-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck                   *
+ * Contributors: Anze Zupanc, Sam Cunliffe, Martin Heck, Torben Ferber    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -53,6 +53,11 @@ namespace Belle2 {
      * returns the first activated PXD layer associated to the track
      */
     double trackFirstPXDLayer(const Particle* part);
+
+    /**
+     * returns the first activated CDC layer associated to the track
+     */
+    double trackFirstCDCLayer(const Particle* part);
 
     /**
      * returns the last CDC layer associated to the track
@@ -167,6 +172,40 @@ namespace Belle2 {
      */
     double trackFindingFailureFlag(const Particle*);
 
+    /**
+    * returns extrapolated theta position based on helix parameters
+    * parameters are the radius and z values to stop extrapolation
+    */
+    double trackHelixExtTheta(const Particle* part, const std::vector<double>& pars);
+
+    /**
+    * returns extrapolated phi position based on helix parameters
+    * parameters are the radius and z values to stop extrapolation
+    */
+    double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars);
+
+    /**
+     * returns the PDG code of the track fit hypothesis actually used for the particle
+     */
+    double trackFitHypothesisPDG(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixD0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixPhi0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixOmegaPull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixZ0Pull(const Particle* part);
+
+    /** mc-meas/err_meas for the respective helix parameter for the given particle */
+    double getHelixTanLambdaPull(const Particle* part);
+
+    /** helper function to get track fit result from particle */
+    TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle);
   }
 } // Belle2 namespace
 

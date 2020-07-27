@@ -7,6 +7,8 @@
 //-
 #include <daq/dqm/HistoServer.h>
 
+#include <framework/pcore/MsgHandler.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -52,8 +54,6 @@ int HistoServer::server()
   while (m_force_exit == 0) {
     int exam_stat = m_man->examine();
     if (exam_stat == 0) {
-      printf("Initial connection request detected!\n");
-      //      int fd = recvsock[;
     } else if (exam_stat == 1) { //
       // printf ( "Histo data ready on socket\n" );
       vector<int>& recvsock = m_man->connected_socket_list();

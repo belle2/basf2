@@ -20,20 +20,13 @@
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
-#include <cstdlib>
 #include <cmath>
-#include <bitset>
-#include <iomanip>
 
 #include <framework/dataobjects/EventMetaData.h>
-#include "framework/datastore/StoreArray.h"
-#include "framework/datastore/RelationArray.h"
-#include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
-#include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
@@ -47,7 +40,6 @@
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 #include "trg/cdc/LUT.h"
-#include "trg/cdc/SegmentHit.h"
 #include "trg/trg/Constants.h"
 #include "trg/cdc/Helix.h"
 #include "trg/cdc/Fitter3DUtility.h"
@@ -58,8 +50,6 @@
 #include "trg/cdc/FpgaUtility.h"
 #include "trg/cdc/HandleRoot.h"
 
-#include <TRandom3.h>
-
 using namespace std;
 namespace Belle2 {
 
@@ -68,7 +58,8 @@ namespace Belle2 {
                                  const TRGCDC& TRGCDC,
                                  const std::map<std::string, bool>& flags)
     : m_name(name), m_cdc(TRGCDC),
-      m_mBool(flags), m_rootFitter3DFileName(rootFitter3DFile)
+      m_mBool(flags), m_rootFitter3DFileName(rootFitter3DFile),
+      m_treeTrackFitter3D(), m_treeConstantsFitter3D() // 2019/07/31 by ytlai
   {
     m_fileFitter3D = 0;
     m_commonData = 0;
@@ -613,6 +604,7 @@ namespace Belle2 {
       int phiBitSize = 13;
       // pt = 0.3*1.5*rho*0.01;
       //double rhoMin = 48;
+      /* cppcheck-suppress variableScope */
       double rhoMin = 20;
       double rhoMax = 2500;
       //double rhoMax = 1600;

@@ -15,10 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;

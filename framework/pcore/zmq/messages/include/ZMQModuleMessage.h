@@ -10,7 +10,6 @@
 #pragma once
 
 #include <framework/pcore/zmq/messages/ZMQMessageHelper.h>
-#include <framework/logging/LogMethod.h>
 
 #include <zmq.hpp>
 #include <memory>
@@ -34,23 +33,15 @@ namespace Belle2 {
     static void toSocket(std::unique_ptr<ZMQModuleMessage> message, const std::unique_ptr<zmq::socket_t>& socket)
     {
       for (unsigned int i = 0; i < c_messageParts - 1; i++) {
-        socket->send(message->m_messageParts[i], ZMQ_SNDMORE);
+        socket->send(message->m_messageParts[i], zmq::send_flags::sndmore);
       }
-      socket->send(message->m_messageParts[c_messageParts - 1]);
+      socket->send(message->m_messageParts[c_messageParts - 1], zmq::send_flags::none);
     }
 
     /// Do not allow to copy a message
     ZMQModuleMessage(const ZMQModuleMessage&) = delete;
     /// Do not allow to copy a message
     void operator=(const ZMQModuleMessage&) = delete;
-
-  protected:
-    /// Constructor out of different parts
-    template <class ...T>
-    explicit ZMQModuleMessage(const T& ... arguments) :
-      m_messageParts( {ZMQMessageHelper::createZMQMessage(arguments)...})
-    {
-    }
 
     /// Get a reference to the message parts
     MessageParts& getMessageParts()
@@ -105,6 +96,13 @@ namespace Belle2 {
   protected:
     /// Do not allow to create a new message from scratch publicly
     ZMQModuleMessage() = default;
+
+    /// Constructor out of different parts
+    template <class ...T>
+    explicit ZMQModuleMessage(T&& ... arguments) :
+      m_messageParts( {ZMQMessageHelper::createZMQMessage(std::forward<T>(arguments)) ... })
+    {
+    }
 
   private:
     /// The content of this message as an array of zmq messages. Will be set during constructor or when coming from a socket.

@@ -15,6 +15,9 @@
 
 namespace Belle2 {
 
+  /**
+   * The module to plot a list of histograms into canvases.
+   */
   class DQMHistAnalysisPlotOnlyModule : public DQMHistAnalysisModule {
 
     // Public functions
@@ -39,7 +42,11 @@ namespace Belle2 {
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;
 
-    //TH1* findHistLocal(TString a);
+    /**
+     * Get histogram by its name.
+     * @param a The name of the histogram.
+     * @return The found histogram, nullptr if not found.
+     */
     TH1* GetHisto(TString a);
 
     /** Parameter list for histograms */

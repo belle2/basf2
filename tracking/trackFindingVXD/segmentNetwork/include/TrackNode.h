@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
 
@@ -26,7 +25,7 @@ namespace Belle2 {
     TrackNode() : m_sector(nullptr), m_spacePoint(nullptr), m_identifier(-1) {}
 
     /** Constructor with information from SpacePoint */
-    TrackNode(SpacePoint* spacePoint) :
+    explicit TrackNode(SpacePoint* spacePoint) :
       m_sector(nullptr), m_spacePoint(spacePoint), m_identifier(spacePoint->getArrayIndex())
     {}
 

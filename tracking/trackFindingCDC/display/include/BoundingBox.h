@@ -9,10 +9,8 @@
  **************************************************************************/
 #pragma once
 
-
 #include <algorithm>
 #include <cmath>
-#include <utility>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

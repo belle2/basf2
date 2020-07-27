@@ -94,7 +94,7 @@ namespace Belle2 {
     std::vector<std::vector<double> > m_stXts;
 
     /** Datastore for firmware simulation **/
-    Belle2::TRGCDCJSignalData* m_commonData;
+    Belle2::TRGCDCJSignalData* m_commonData = nullptr;
     /** Signalstore for firmware simulation **/
     std::map<std::string, Belle2::TRGCDCJSignal> m_mSignalStorage;
     /** Lutstore for firmware simulation **/

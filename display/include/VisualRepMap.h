@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2014 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher                                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <vector>
@@ -64,9 +74,13 @@ namespace Belle2 {
     /** Selection inside TEveCalo* is complicated, use this to keep track of ECL clusters. */
     void addCluster(const TObject* dataStoreObject, TEveCaloData* caloData, int towerID);
   private:
+    /** default constructor */
     VisualRepMap();
     /** no copy ctor */
     VisualRepMap(const VisualRepMap&) = delete;
+    /** no assignment */
+    VisualRepMap& operator=(const VisualRepMap&) = delete;
+    /** destructor */
     ~VisualRepMap();
 
     class DataStoreEveElementMap;

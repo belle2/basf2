@@ -9,15 +9,11 @@
  **************************************************************************/
 
 #include <framework/utilities/ScopeGuard.h>
+#include <framework/utilities/Utils.h>
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 
 namespace {
-  /** Helper struct for the C++17 overload pattern */
-  template<class... Ts> struct overloads : Ts... { using Ts::operator()...; };
-  /** Deduction guide for the C++17 overload pattern */
-  template<class... Ts> overloads(Ts...) -> overloads<Ts...>;
-
   /** Simple functor to set and get the values of an integer */
   struct IntSetterGetterFunctor {
     /** Constructor */
@@ -101,7 +97,7 @@ namespace {
     }
     ASSERT_EQ(old, 17);
     {
-      auto guard = Belle2::ScopeGuard::guardFunctor(overloads{
+      auto guard = Belle2::ScopeGuard::guardFunctor(Belle2::Utils::VisitOverload{
         [&old](int v) { old = v; },
         [&old]() { return old; }
       }, 21);
@@ -122,7 +118,7 @@ namespace {
     }
     ASSERT_EQ(value, "before");
     {
-      auto guard = Belle2::ScopeGuard::guardFunctor(overloads{
+      auto guard = Belle2::ScopeGuard::guardFunctor(Belle2::Utils::VisitOverload{
         [&value](const std::string & v) { value = v; },
         [&value]() { return value; }
       }, "after");
@@ -140,6 +136,7 @@ namespace {
       auto guard1 = Belle2::ScopeGuard::guardStreamState(buf);
       buf << ":b:" << std::fixed << std::setprecision(4) << 2.3;
       {
+
         auto guard3 = Belle2::ScopeGuard::guardStreamState(buf);
         buf << ":c:" << std::setprecision(5) << std::setw(10) << std::setfill('-') << 3.4;
       }
@@ -167,5 +164,22 @@ namespace {
       ASSERT_EQ(root, boost::filesystem::current_path().c_str());
     }
     ASSERT_EQ(start, boost::filesystem::current_path().c_str());
+  }
+
+
+  /** Test guarding the ROOT batch state */
+  TEST(ScopeGuards, Batch)
+  {
+    const bool start = gROOT->IsBatch();
+    {
+      auto guard1 = Belle2::ScopeGuard::guardBatchMode();
+      ASSERT_EQ(true, gROOT->IsBatch());
+      {
+        auto guard2 = Belle2::ScopeGuard::guardBatchMode(false);
+        ASSERT_EQ(false, gROOT->IsBatch());
+      }
+      ASSERT_EQ(true, gROOT->IsBatch());
+    }
+    ASSERT_EQ(start, gROOT->IsBatch());
   }
 }

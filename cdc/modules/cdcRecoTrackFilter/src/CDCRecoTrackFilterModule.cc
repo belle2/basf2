@@ -9,11 +9,8 @@
  **************************************************************************/
 
 #include "cdc/modules/cdcRecoTrackFilter/CDCRecoTrackFilterModule.h"
-#include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <boost/foreach.hpp>
-#include "TMath.h"
-#include "iostream"
 
 using namespace std;
 using namespace Belle2;
@@ -36,9 +33,7 @@ CDCRecoTrackFilterModule::~CDCRecoTrackFilterModule()
 
 void CDCRecoTrackFilterModule::initialize()
 {
-  StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
-  m_recoTrackArrayName = recoTracks.getName();
-
+  m_RecoTracks.isRequired(m_recoTrackArrayName);
 }
 
 void CDCRecoTrackFilterModule::beginRun()
@@ -47,12 +42,10 @@ void CDCRecoTrackFilterModule::beginRun()
 
 void CDCRecoTrackFilterModule::event()
 {
-  const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
-
   // Loop over Recotracks
-  int nTr = recoTracks.getEntries();
+  int nTr = m_RecoTracks.getEntries();
   for (int i = 0; i < nTr; ++i) {
-    const RecoTrack* track = recoTracks[i];
+    const RecoTrack* track = m_RecoTracks[i];
     BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
       WireID wireid(cdchit->getID());
       unsigned short slay = wireid.getISuperLayer();

@@ -41,6 +41,10 @@ namespace Belle2 {
       /// Getter for the singletone instance
       static const CDCSimHitLookUp& getInstance();
 
+      /// Singleton: Delete copy constructor and assignment operator
+      CDCSimHitLookUp(CDCSimHitLookUp&) = delete;
+      CDCSimHitLookUp& operator=(const CDCSimHitLookUp&) = delete;
+
       /// Default constructor - for cppcheck
       CDCSimHitLookUp() = default;
 

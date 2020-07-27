@@ -13,7 +13,6 @@
 
 #include <list>
 #include <vector>
-#include <memory>
 
 class EvtDecayBase;
 

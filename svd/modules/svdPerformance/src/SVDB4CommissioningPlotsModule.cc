@@ -1,15 +1,7 @@
 #include <svd/modules/svdPerformance/SVDB4CommissioningPlotsModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <geometry/GeometryManager.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
-#include <list>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <boost/foreach.hpp>
@@ -27,10 +19,10 @@ SVDB4CommissioningPlotsModule::SVDB4CommissioningPlotsModule() : Module()
 
   addParam("outputFileName", m_rootFileName, "Name of output root file.", std::string("SVDB4CommissioningPlots_output.root"));
 
-  addParam("RecoDigitsName", m_RecoDigitName, "Name of RecoDigit Store Array.", std::string(""));
-  addParam("ClustersName", m_ClusterName, "Name of Cluster Store Array.", std::string(""));
-  addParam("TrackListName", m_TrackName, "Name of Track Store Array.", std::string(""));
-  addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string(""));
+  addParam("RecoDigitsName", m_RecoDigitName, "Name of RecoDigit Store Array.", std::string("SVDRecoDigits"));
+  addParam("ClustersName", m_ClusterName, "Name of Cluster Store Array.", std::string("SVDClusters"));
+  addParam("TrackListName", m_TrackName, "Name of Track Store Array.", std::string("Tracks"));
+  addParam("TrackFitResultListName", m_TrackFitResultName, "Name of TracksFitResult Store Array.", std::string("TrackFitResults"));
 }
 
 SVDB4CommissioningPlotsModule::~SVDB4CommissioningPlotsModule()
@@ -151,6 +143,11 @@ void SVDB4CommissioningPlotsModule::beginRun()
   hClusterTrkTime.GetXaxis()->SetTitle("time (ns)");
   h_clusterTrkTime = new SVDHistograms<TH1F>(hClusterTrkTime);
 
+  TH1F hClusterTrkInterstripPos("clusterTrk_interstripPos_L@layerL@ladderS@sensor@view",
+                                "Interstrip Position of Clusters Related to Tracks in @layer.@ladder.@sensor @view/@side side",
+                                400, 0 , 1);
+  hClusterTrkInterstripPos.GetXaxis()->SetTitle("interstrip position");
+  h_clusterTrkInterstripPos = new SVDHistograms<TH1F>(hClusterTrkInterstripPos);
 
   //tracks
   m_nTracks = new TH1F("h1nTracks", "number of Tracks per event", 50, 0, 50);
@@ -180,8 +177,7 @@ void SVDB4CommissioningPlotsModule::event()
   }
   BOOST_FOREACH(Track & track, m_Tracks) {
 
-    const TrackFitResult* tfr = NULL;
-    tfr = track.getTrackFitResult(Const::pion);
+    const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
     if (tfr) {
       m_Pvalue->Fill(tfr->getPValue());
       m_mom->Fill(tfr->getMomentum().Mag());
@@ -198,14 +194,22 @@ void SVDB4CommissioningPlotsModule::event()
       int clSize = svdClustersTrack[cl]->getSize();
       float clSN = svdClustersTrack[cl]->getSNR();
       float clTime = svdClustersTrack[cl]->getClsTime();
+      float clPosition = svdClustersTrack[cl]->getPosition();
       VxdID::baseType theVxdID = (VxdID::baseType)svdClustersTrack[cl]->getSensorID();
       int side = svdClustersTrack[cl]->isUCluster();
+
+      const VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(theVxdID);
+      float pitch = aSensorInfo->getVPitch();
+      if (side == 1)
+        pitch = aSensorInfo->getUPitch();
+      float clInterstripPos = fmod(clPosition, pitch) / pitch;
 
       h_clusterTrkCharge->fill(theVxdID, side, clCharge / 1000.);
       h_clusterTrkSize->fill(theVxdID, side, clSize);
       h_clusterTrkSNR->fill(theVxdID, side, clSN);
       h_clusterTrkEnergy->fill(theVxdID, side, clEnergy);
       h_clusterTrkTime->fill(theVxdID, side, clTime);
+      h_clusterTrkInterstripPos->fill(theVxdID, side, clInterstripPos);
 
       //      if(svdClustersTrack.size()%2 != 0)
       //  B2INFO(" Event Number = "<<eventMD->getEvent()<<"  "<<theVxdID<<"."<<side<<" position = "<<svdClustersTrack[cl]->getPosition()<<" charge = "<<svdClustersTrack[cl]->getCharge());
@@ -273,7 +277,7 @@ void SVDB4CommissioningPlotsModule::endRun()
 {
   B2INFO("SVDB4CommissioningPlotsModule::endRun(), writing the histograms");
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;
@@ -308,14 +312,16 @@ void SVDB4CommissioningPlotsModule::endRun()
             dir_clusterAssigned_layer->cd();
             (h_clusterTrkCharge->getHistogram(sensor, view))->Write();
             (h_clusterTrkSNR->getHistogram(sensor, view))->Write();
+            (h_clusterTrkSize->getHistogram(sensor, view))->Write();
             (h_clusterTrkEnergy->getHistogram(sensor, view))->Write();
             (h_clusterTrkTime->getHistogram(sensor, view))->Write();
+            (h_clusterTrkInterstripPos->getHistogram(sensor, view))->Write();
             dir_clusterNotAssigned_layer->cd();
             (h_clusterCharge->getHistogram(sensor, view))->Write();
             (h_clusterSNR->getHistogram(sensor, view))->Write();
+            (h_clusterSize->getHistogram(sensor, view))->Write();
             (h_clusterEnergy->getHistogram(sensor, view))->Write();
             (h_clusterTime->getHistogram(sensor, view))->Write();
-
           }
     }
 

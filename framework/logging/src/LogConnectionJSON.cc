@@ -11,9 +11,6 @@
 #include <framework/logging/LogConnectionJSON.h>
 #include <framework/logging/LogMessage.h>
 #include <boost/property_tree/json_parser.hpp>
-#include <fstream>
-#include <iostream>
-#include <cstdio>
 
 namespace Belle2 {
 

@@ -14,7 +14,6 @@
 #include <TObject.h>
 #include <TH1S.h>
 #include <TH2F.h>
-#include <framework/logging/Logger.h>
 #include <TTimeStamp.h>
 #include <TGraph.h>
 

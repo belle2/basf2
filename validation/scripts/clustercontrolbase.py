@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# std
 import logging
 import os
-import subprocess
 import stat
-import shutil
-import sys
+from abc import abstractmethod
+
+# ours
+from validationscript import Script
 
 
 class ClusterBase:
     """
-    Base class which provides basic functionality to wrap basf2 into a shell script setting up the
-    environment and checking for completion of script
+    Base class which provides basic functionality to wrap basf2 into a shell
+    script setting up the environment and checking for completion of script
     """
 
     def __init__(self):
@@ -49,8 +51,7 @@ class ClusterBase:
             self.b2setup += '; b2code-option ' + os.environ.get('BELLE2_OPTION')
 
         # Write to log which revision we are using
-        self.logger.debug('Setting up the following release: {0}'
-                          .format(self.b2setup))
+        self.logger.debug(f'Setting up the following release: {self.b2setup}')
 
         # Define the folder in which the log of the cluster messages will be
         # stored (same folder like the log for validate_basf2.py)
@@ -61,13 +62,13 @@ class ClusterBase:
         #: The file object to which all cluster messages will be written
         self.clusterlog = open(clusterlog_dir + 'clusterlog.log', 'w+')
 
-    def createDoneFileName(self, job):
+    def createDoneFileName(self, job: Script) -> str:
         """!
         Generate the file name used for the done output
         """
-        return "{0}/script_{1}.done".format(self.path, job.name)
+        return f"{self.path}/script_{job.name}.done"
 
-    def prepareSubmission(self, job, options, tag):
+    def prepareSubmission(self, job: Script, options, tag):
         """!
         Setup output folders and create the wrapping shell script. Will return
         the full file name of the generated wrapper script.
@@ -78,8 +79,7 @@ class ClusterBase:
         # convention, data files will be stored in the parent dir.
         # Then make sure the folder exists (create if it does not exist) and
         # change to cwd to this folder.
-        output_dir = os.path.abspath('./results/{0}/{1}'.
-                                     format(tag, job.package))
+        output_dir = os.path.abspath(f'./results/{tag}/{job.package}')
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -99,7 +99,7 @@ class ClusterBase:
         else:
             # .py files are executed with basf2
             # 'options' contains an option-string for basf2, e.g. '-n 100'
-            command = 'basf2 {0} {1}'.format(job.path, options)
+            command = f'basf2 {job.path} {options}'
 
         # Create a helpfile-shellscript, which contains all the commands that
         # need to be executed by the cluster.
@@ -147,7 +147,7 @@ class ClusterBase:
                 except ValueError:
                     returncode = -666
 
-            print("donefile found with return code {}".format(returncode))
+            print(f"donefile found with return code {returncode}")
             donefile_exists = True
             os.remove(donefile_path)
         else:
@@ -156,8 +156,17 @@ class ClusterBase:
 
         return [donefile_exists, returncode]
 
-    def terminate(self):
-        """!
-        Terminate the jobs and loose all resources
+    def terminate(self, job: Script):
+        """! Terminate running job.
         """
-        self.clusterlog.close()
+        self.logger.error("Script termination not supported.")
+
+    @abstractmethod
+    def adjust_path(self, path):
+        """!
+        This method can be used if path names are different on submission
+        and execution hosts.
+        @param path: The past that needs to be adjusted
+        @return: The adjusted path
+        """
+        pass

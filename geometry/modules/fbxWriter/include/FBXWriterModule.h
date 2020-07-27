@@ -8,20 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FBXWRITERMODULE_H
-#define FBXWRITERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
 #include <string>
 #include <fstream>
 
-#include "G4Transform3D.hh"  // Using 'class G4Transform3D' conflicts with typedef here
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4VSolid;
-class G4AffineTransform;
 class G4Polyhedron;
+class G4String;
 class HepPolyhedron;
 
 namespace Belle2 {
@@ -158,4 +156,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif

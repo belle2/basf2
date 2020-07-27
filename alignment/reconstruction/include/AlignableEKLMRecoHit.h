@@ -8,26 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALIGNABLEEKLMRECOHIT_H
-#define ALIGNABLEEKLMRECOHIT_H
+#pragma once
 
-/* External headers. */
-#include <TMatrixD.h>
+#include <framework/geometry/B2Vector3.h>
+#include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
 
-/* Genfit headers. */
 #include <genfit/ICalibrationParametersDerivatives.h>
-#include <genfit/HMatrixUV.h>
 #include <genfit/PlanarMeasurement.h>
 #include <genfit/TrackCandHit.h>
 
-/* Belle2 headers. */
-#include <eklm/dataobjects/EKLMAlignmentHit.h>
-#include <eklm/dataobjects/EKLMElementID.h>
+#include <TMatrixD.h>
 
 namespace Belle2 {
 
   /**
-   * Alignable EKLMHit2d.
+   * Alignable EKLM hit.
    */
   class AlignableEKLMRecoHit: public genfit::PlanarMeasurement,
     public genfit::ICalibrationParametersDerivatives {
@@ -89,14 +84,23 @@ namespace Belle2 {
 
   private:
 
-    /** Sector identifier. */
-    EKLMElementID m_Sector;
+    /** Section number. */
+    int m_Section;
 
-    /** Segment identifier. */
-    EKLMElementID m_Segment;
+    /** Sector number. */
+    int m_Sector;
+
+    /** Layer number. */
+    int m_Layer;
+
+    /** KLM module number. */
+    uint16_t m_KLMModule;
+
+    /** Segment number. */
+    uint16_t m_Segment;
 
     /** V direction. */
-    TVector3 m_StripV;
+    B2Vector3D m_StripV;
 
     /** Needed to make objects storable. */
     ClassDefOverride(AlignableEKLMRecoHit, 2);
@@ -104,6 +108,4 @@ namespace Belle2 {
   };
 
 }
-
-#endif
 

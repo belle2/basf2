@@ -1,18 +1,9 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TGraphErrors.h>
-#include <TProfile.h>
 #include <TF1.h>
-#include <TFile.h>
-#include <TChain.h>
-#include <TTree.h>
-#include <TSystem.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
-#include <framework/database/IntervalOfValidity.h>
 
 namespace Belle2 {
   namespace CDC {
@@ -92,7 +83,7 @@ namespace Belle2 {
       double m_Pvalmin = 0.; /**<  Minimum Prob(chi2) of track*/
       double m_binWidth = 0.05; /**<width of each bin, unit cm*/
       bool m_debug = false;   /**< Debug or not */
-      bool m_draw = false;    /**< print out histogram in pdf file or not*/
+      //bool m_draw = false;    /**< print out histogram in pdf file or not*/
       bool m_storeHisto = false; /**<  Store histogram or not*/
       bool m_useDB = false;     /**<  use db or text mode*/
       bool m_useProfileFromInputSigma = true; /**<  Use binning from old sigma or new one form input*/
@@ -100,7 +91,7 @@ namespace Belle2 {
       //      bool m_LRseparate = true;
       double sigma_old[56][2][18][7][8]; /**<old sigma prameters.*/
       double sigma_new[56][2][18][7][8]; /**<new sigma prameters.*/
-      TF1* ffit[56][2][18][7];           /**< fitting function*/
+      //TF1* ffit[56][2][18][7];           /**< fitting function*/
       TGraphErrors* gfit[56][2][18][7];  /**< sigma*sigma graph for fit*/
       TGraphErrors* gr[56][2][18][7];    /**< sigma graph.*/
       TH2F* hist_b[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of biased residual */
@@ -116,10 +107,10 @@ namespace Belle2 {
       std::string m_ProfileFileName = "sigma_profile"; /**<  Profile file name*/
       DBObjPtr<CDCSpaceResols>* m_sResolFromDB ;         /**<  Database for sigma*/
       std::string m_sigmafile = "cdc/data/sigma.dat";    /**<  Sigma file name, for text mode*/
-      int m_firstExperiment; /**< First experiment. */
-      int m_firstRun; /**< First run. */
-      int m_lastExperiment; /**< Last experiment */
-      int m_lastRun; /**< Last run. */
+      //int m_firstExperiment; /**< First experiment. */
+      //int m_firstRun; /**< First run. */
+      //int m_lastExperiment; /**< Last experiment */
+      //int m_lastRun; /**< Last run. */
 
       int m_nalpha; /**<number of alpha bins*/
       int m_ntheta;/**<number of  theta bins*/
@@ -141,9 +132,36 @@ namespace Belle2 {
       double itheta_old[7]; /**< represented alphas of theta bins from input. */
 
       unsigned short m_sigmaParamMode_old; /**< sigma mode from input. */
-      unsigned short m_sigmaParamMode = 1; /**< sigma mode for this calibration.*/
+      //unsigned short m_sigmaParamMode = 1; /**< sigma mode for this calibration.*/
 
-      ClassDef(SpaceResolutionCalibration, 0); /**< Class for calibraion CDC space resolution */
+      /**
+       * search max point at boundary region
+       */
+      double getUpperBoundaryForFit(TGraphErrors* graph)
+      {
+        double ymax = 0;
+        double xmax = 0;
+        int imax = 0;
+        double x, y;
+        int unCount = floor(0.05 / m_binWidth);
+        int N = graph->GetN();
+        int Nstart = floor(0.5 * (N - unCount));
+        int Nend = N - unCount;
+        for (int i  = Nstart; i < Nend; ++i) {
+          graph->GetPoint(i, x, y);
+          if (graph->GetErrorY(i) > 0.06E-3) continue;
+          if (y > ymax) {
+            xmax = x; ymax = y;
+            imax = i;
+          }
+        }
+        if (imax <= Nstart) {
+          graph->GetPoint(Nend, x, y);
+          xmax = x;
+        }
+        return xmax;
+      }
+
     };
   }
 }

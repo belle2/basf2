@@ -60,8 +60,10 @@ namespace Belle2 {
     virtual bool extract(const BaseSVDStateFilter::Object* result) override;
 
   private:
+    /// Pointer to the object containing event number etc
     StoreObjPtr<EventMetaData> m_eventMetaData;
 
+    /// MC information used in the SVD CKF
     MCUtil m_mcUtil;
   };
 }

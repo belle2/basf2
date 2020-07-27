@@ -13,8 +13,6 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <iostream>
-
 namespace Belle2 {
   /* This namespace provides basic parameters in SVD setup.
    */

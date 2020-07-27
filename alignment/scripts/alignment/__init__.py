@@ -47,7 +47,7 @@ class MillepedeCalibration():
                  primary_vertices=None,
                  path=None):
         """
-        components are the names of DB objects to calibrate (BeamParameters etc.)
+        components are the names of DB objects to calibrate (BeamSpot etc.)
         tracks are collections of RecoTracks of fitted charged tracks (usually cosmic rays, no associated particle)
         particles are names of ParticleLists with single charged particles
         vertices are names ParticleLists with at least two body decays fitted with vertex constraint
@@ -108,7 +108,7 @@ class MillepedeCalibration():
         """ Select db objects for calibration from list of their names """
         #: db objects for calibration
         self.components = components
-        calibrate_vertex = ((components == []) or ('BeamParameters' in components))
+        calibrate_vertex = ((components == []) or ('BeamSpot' in components))
 
         std_components = ROOT.vector('string')()
         for component in components:

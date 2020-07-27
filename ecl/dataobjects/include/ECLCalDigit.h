@@ -30,6 +30,7 @@ namespace Belle2 {
       c_IsTimeCalibrated = 1 << 1,
       c_IsTimeResolutionCalibrated = 1 << 2,
       c_IsFailedFit = 1 << 3,
+      c_IsFailedTimeResolution = 1 << 4,
       c_IsCalibrated = c_IsEnergyCalibrated | c_IsTimeCalibrated | c_IsTimeResolutionCalibrated,
     };
 
@@ -193,6 +194,11 @@ namespace Belle2 {
      */
     bool isFailedFit() const;
 
+    /*! Get Boolean time resolution failed status
+     * @return time resolution failed
+     */
+    bool isTimeResolutionFailed() const;
+
   private:
 
     int m_CellId;   /**< Cell ID */
@@ -246,6 +252,13 @@ namespace Belle2 {
   {
     return hasStatus(c_IsFailedFit);
   }
+
+  // inline isTimeResolutionFailed
+  inline bool ECLCalDigit::isTimeResolutionFailed() const
+  {
+    return hasStatus(c_IsFailedTimeResolution);
+  }
+
 
 } // end namespace Belle2
 

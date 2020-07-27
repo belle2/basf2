@@ -27,6 +27,7 @@ import original_basf2
 
 class BASF2StateRecorder(object):
     """ Drop-in replacement of the basf2 module, which keeps track of all functions calls """
+
     def __getattr__(self, name):
         """ Return attribute with the given name in the basf2 namespace """
         return getattr(original_basf2, name)

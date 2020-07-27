@@ -24,7 +24,7 @@ namespace Belle2 {
         throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
       }
 
-      unsigned int numberOfWeightfiles = pt.get<unsigned int>("Combination_number_of_weightfiles");
+      auto numberOfWeightfiles = pt.get<unsigned int>("Combination_number_of_weightfiles");
       m_weightfiles.resize(numberOfWeightfiles);
       for (unsigned int i = 0; i < numberOfWeightfiles; ++i) {
         m_weightfiles[i] = pt.get<std::string>(std::string("Combination_weightfile") + std::to_string(i));

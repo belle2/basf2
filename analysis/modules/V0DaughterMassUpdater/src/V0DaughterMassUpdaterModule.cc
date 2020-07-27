@@ -10,6 +10,9 @@
 
 #include <analysis/modules/V0DaughterMassUpdater/V0DaughterMassUpdaterModule.h>
 #include <analysis/dataobjects/ParticleList.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -43,7 +46,7 @@ void V0DaughterMassUpdaterModule::event()
       if (particlelist->getListSize() == 0) continue;
       for (unsigned int i = 0; i < particlelist->getListSize(); ++i) {
         Particle* iParticle = particlelist->getParticle(i);
-        if (iParticle->getParticleType() != Particle::EParticleType::c_Composite)
+        if (iParticle->getParticleSource() != Particle::EParticleSourceObject::c_Composite)
           B2FATAL("This V0 particle is not a composite particle!");
         else {
           std::vector<Belle2::Particle*> dau = iParticle -> getDaughters();

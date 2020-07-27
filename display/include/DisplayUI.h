@@ -1,13 +1,20 @@
-#ifndef DISPLAYUI_H
-#define DISPLAYUI_H
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2012 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher                                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
 
 #include <TQObject.h>
 
 #include <string>
-#include <utility>
 #include <vector>
 
-class TEveBox;
 class TEveElement;
 class TEveElementList;
 class TGButton;
@@ -16,7 +23,6 @@ class TGPictureButton;
 class TGLabel;
 class TGNumberEntry;
 class TGTextEntry;
-class TTimer;
 struct Event_t;
 
 namespace Belle2 {
@@ -36,7 +42,7 @@ namespace Belle2 {
      *
      * @param automatic if true, hide window and save events using automaticEvent()
      */
-    DisplayUI(bool automatic = false);
+    explicit DisplayUI(bool automatic = false);
 
     /** Destructor. */
     ~DisplayUI();
@@ -225,4 +231,3 @@ namespace Belle2 {
     ClassDef(DisplayUI, 0)
   };
 }
-#endif

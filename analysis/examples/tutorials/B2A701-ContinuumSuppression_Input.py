@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -20,7 +19,6 @@
 import basf2 as b2
 import modularAnalysis as ma
 import sys
-import glob
 import os
 
 
@@ -39,36 +37,40 @@ import os
 
 
 input_file_list = []
-# Plesae pick meaningful output name when run on grid
+
+# Please pick a meaningful output name when running on the grid
 outfile = "B2A702_output.root"
+
+step = 'train'
 
 magnetic_field = 'default'
 
-if len(sys.argv) == 2:
+if len(sys.argv) >= 2:
     if sys.argv[1] not in ['train', 'test', 'apply_signal', 'apply_qqbar']:
         sys.exit("usage:\n\tbasf2 B2A701-ContinuumSuppression_Input.py <train,test,apply_signal,apply_qqbar>")
     else:
         step = str(sys.argv[1])
-        if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
-            b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
-        path = os.getenv('BELLE2_EXAMPLES_DATA_DIR') + '/'
+if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
+    b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
-        # MC11 is not ready yet, so we have to manually put MC10 as a magnetic field config.
-        magnetic_field = 'MC10'
-        if step == 'train':
-            input_file_list = [path + 'ccbar_sample_to_train.root',
-                               path + 'Bd2K0spi0_to_train.root']
-        elif step == 'test':
-            input_file_list = [path + 'ccbar_sample_to_test.root',
-                               path + 'Bd2K0spi0_to_test.root']
-        elif step == 'apply_signal':
-            input_file_list = [path + 'Bd2K0spi0_to_test.root']
-        elif step == 'apply_qqbar':
-            input_file_list = [path + 'ccbar_sample_to_test.root', ]
-        else:
-            sys.exit('Step does not match any of the available samples: `train`, `test`, `apply_signal`or `apply_qqbar`')
-        outfile = step + '.root'
+path = os.getenv('BELLE2_EXAMPLES_DATA_DIR') + '/'
+
+# MC11 is not ready yet, so we have to manually put MC10 as a magnetic field config.
+magnetic_field = 'MC10'
+if step == 'train':
+    input_file_list = [path + 'ccbar_sample_to_train.root',
+                       path + 'Bd2K0spi0_to_train.root']
+elif step == 'test':
+    input_file_list = [path + 'ccbar_sample_to_test.root',
+                       path + 'Bd2K0spi0_to_test.root']
+elif step == 'apply_signal':
+    input_file_list = [path + 'Bd2K0spi0_to_test.root']
+elif step == 'apply_qqbar':
+    input_file_list = [path + 'ccbar_sample_to_test.root', ]
+else:
+    sys.exit('Step does not match any of the available samples: `train`, `test`, `apply_signal`or `apply_qqbar`')
+outfile = step + '.root'
 
 # ---------------------------------------------------------------------------------------------
 
@@ -116,7 +118,7 @@ ma.buildContinuumSuppression(list_name='B0',
                              path=my_path)
 
 # Define the variables for training.
-#  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+#  For details, please see the Continuum suppression section at https://software.belle2.org
 #  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
 #  signal-B final state particles.
 trainVars = [
@@ -141,15 +143,15 @@ trainVars = [
     'KSFWVariables(hoo2)',
     'KSFWVariables(hoo3)',
     'KSFWVariables(hoo4)',
-    'cleoConeThrust0',
-    'cleoConeThrust1',
-    'cleoConeThrust2',
-    'cleoConeThrust3',
-    'cleoConeThrust4',
-    'cleoConeThrust5',
-    'cleoConeThrust6',
-    'cleoConeThrust7',
-    'cleoConeThrust8',
+    'CleoConeCS(1)',
+    'CleoConeCS(2)',
+    'CleoConeCS(3)',
+    'CleoConeCS(4)',
+    'CleoConeCS(5)',
+    'CleoConeCS(6)',
+    'CleoConeCS(7)',
+    'CleoConeCS(8)',
+    'CleoConeCS(9)'
 ]
 
 # Save target variable necessary for training.

@@ -17,11 +17,8 @@
 
 #include <framework/geometry/B2Vector3.h> // gradually moving to B2Vector3 instead of TVector3
 
-#include <TVector3.h>
 #include <TFile.h>
 #include <TTree.h>
-
-#include <array>
 
 namespace Belle2 {
   /**
@@ -192,7 +189,7 @@ namespace Belle2 {
 
     /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
     bool getDirectionOfFlight(std::pair<const B2Vector3<double>, const B2Vector3<double> > const& hitPosAndMom,
-                              const B2Vector3<double> origin);
+                              const B2Vector3<double>& origin);
 
     /**
      * Exception for case when no TrueHit can be found for a Cluster
@@ -277,6 +274,6 @@ namespace Belle2 {
     template <class TrueHit>
     void getValuesForRoot(const SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables);
 
-    void writeToRoot(RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
+    void writeToRoot(const RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
   };
 }

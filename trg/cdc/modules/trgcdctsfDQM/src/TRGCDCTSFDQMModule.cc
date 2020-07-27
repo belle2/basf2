@@ -11,23 +11,16 @@
 // 1.00 : 2017/05/08 : First version
 //---------------------------------------------------------------
 #include <trg/cdc/modules/trgcdctsfDQM/TRGCDCTSFDQMModule.h>
-#include <trg/cdc/modules/trgcdctsfUnpacker/trgcdctsfUnpackerModule.h>
 
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dbobjects/RunInfo.h>
-#include <framework/datastore/DataStore.h>
 
 #include <TDirectory.h>
-#include <TRandom3.h>
 #include <TPostScript.h>
 #include <TCanvas.h>
 #include <TStyle.h>
-#include <unistd.h>
 #include <iostream>
-#include <fstream>
-#include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -58,17 +51,29 @@ void TRGCDCTSFDQMModule::defineHisto()
 {
   oldDir = gDirectory;
   dirDQM = NULL;
-  dirDQM = oldDir->mkdir("TRGCDCTSF");
+  //dirDQM = oldDir->mkdir("TRGCDCTSF");
+  if (!oldDir->Get("TRGCDCTSF"))dirDQM = oldDir->mkdir("TRGCDCTSF");
+  else dirDQM = (TDirectory*)oldDir->Get("TRGCDCTSF");
   dirDQM->cd();
   //Total number of TSF hits per event in each superlayer
-  h_nhit = new TH1I("hCDCTSF_nhit", "nhit", 10, 0, 10);
+  h_nhit = new TH1I(Form("hCDCTSF_nhit_mod%d", m_TSFMOD), Form("nhit_mod%d", m_TSFMOD), 16, 0, 16);
   h_nhit->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
   h_nhit->GetXaxis()->SetTitle("Total number of TSF hits/event");
   //Total number of hits in each TSF
-  h_nhit_tsf = new TH1I("hCDCTSF_nhit_tsf", "nhit_tsf", 200, 0, 200);
+  h_nhit_tsf = new TH1I(Form("hCDCTSF_nhit_tsf_mod%d", m_TSFMOD), Form("nhit_tsf_mod%d", m_TSFMOD), 200, 0, 200);
   h_nhit_tsf->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
   h_nhit_tsf->GetXaxis()->SetTitle("TSF ID");
   h_nhit_tsf->GetYaxis()->SetTitle("Total number of hits");
+  //Validity of hits in each super layer
+  h_valid = new TH1I(Form("hCDCTSF_valid_mod%d", m_TSFMOD), Form("valid__mod%d", m_TSFMOD), 10, 0, 10);
+  h_valid->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
+  h_valid->GetXaxis()->SetTitle("Validity");
+  h_valid->GetYaxis()->SetTitle("#of tsf hits");
+  //Timing of hits in each super layer
+  h_timing = new TH1I(Form("hCDCTSF_timing_mod%d", m_TSFMOD), Form("timing__mod%d", m_TSFMOD), 520, -5, 515);
+  h_timing->SetTitle(Form("Exp%d Run%d SuperLayer%d", _exp, _run, m_TSFMOD));
+  h_timing->GetXaxis()->SetTitle("Timing");
+  h_timing->GetYaxis()->SetTitle("#of tsf hits");
   oldDir->cd();
 }
 
@@ -89,8 +94,14 @@ void TRGCDCTSFDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
-  defineHisto();
+
+  char c_name[100];
+  sprintf(c_name, "TRGCDCTSFUnpackerStore%d", m_TSFMOD);
+  entAry.isRequired(c_name);
+  if (!entAry || !entAry.getEntries()) return;
 
 }
 
@@ -125,8 +136,6 @@ void TRGCDCTSFDQMModule::event()
 
   dirDQM->cd();
 
-  StoreArray<TRGCDCTSFUnpackerStore> entAry;
-  if (!entAry || !entAry.getEntries()) return;
 
   //Fill
   int nhit = 0;
@@ -135,28 +144,139 @@ void TRGCDCTSFDQMModule::event()
   }
   h_nhit->Fill(nhit);
 
-  int id = 0;
+  /* cppcheck-suppress variableScope */
+  int id;
+  /* cppcheck-suppress variableScope */
+  int v ;
+  /* cppcheck-suppress variableScope */
+  int rt;
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
     id = entAry[ii]->m_trackerhit0id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit0v;
+    rt = entAry[ii]->m_trackerhit0rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit1id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit1v;
+    rt = entAry[ii]->m_trackerhit1rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit2id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit2v;
+    rt = entAry[ii]->m_trackerhit2rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit3id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit3v;
+    rt = entAry[ii]->m_trackerhit3rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit4id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit4v;
+    rt = entAry[ii]->m_trackerhit4rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit5id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit5v;
+    rt = entAry[ii]->m_trackerhit5rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit6id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit6v;
+    rt = entAry[ii]->m_trackerhit6rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit7id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit7v;
+    rt = entAry[ii]->m_trackerhit7rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit8id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit8v;
+    rt = entAry[ii]->m_trackerhit8rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
     id = entAry[ii]->m_trackerhit9id;
-    if (id != 0)h_nhit_tsf->Fill(id);
+    v  = entAry[ii]->m_trackerhit9v;
+    rt = entAry[ii]->m_trackerhit9rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+
+    // to fill 5 more TS for 15 TS version, only for TSF 1,3,5
+    if (entAry[ii]->m_N2DTS == 10) continue;
+
+    id = entAry[ii]->m_trackerhit10id;
+    v  = entAry[ii]->m_trackerhit10v;
+    rt = entAry[ii]->m_trackerhit10rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+    id = entAry[ii]->m_trackerhit11id;
+    v  = entAry[ii]->m_trackerhit11v;
+    rt = entAry[ii]->m_trackerhit11rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+    id = entAry[ii]->m_trackerhit12id;
+    v  = entAry[ii]->m_trackerhit12v;
+    rt = entAry[ii]->m_trackerhit12rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+    id = entAry[ii]->m_trackerhit13id;
+    v  = entAry[ii]->m_trackerhit13v;
+    rt = entAry[ii]->m_trackerhit13rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+    id = entAry[ii]->m_trackerhit14id;
+    v  = entAry[ii]->m_trackerhit14v;
+    rt = entAry[ii]->m_trackerhit14rt;
+    if (v != 0) {
+      h_nhit_tsf->Fill(id);
+      h_valid->Fill(v);
+      h_timing->Fill(rt);
+    }
+
+
   }
 
   oldDir->cd();

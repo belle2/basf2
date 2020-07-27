@@ -18,8 +18,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // Dataobject classes
@@ -128,6 +126,8 @@ namespace Belle2 {
         int bufferSize = raw.GetDetectorNwords(0, finesse);
         if (bufferSize < 1) continue;
 
+        int err = 0;
+
         int dataFormat = m_dataFormat;
         if (dataFormat == 0) { // auto detect data format
           DataArray array(buffer, bufferSize, m_swapBytes);
@@ -151,13 +151,13 @@ namespace Belle2 {
                 dataFormat = 0x0301; //assume it's interim format
                 m_swapBytes = true;
               } else {
-                B2ERROR("TOPUnpacker: Could not establish data format.");
+                B2WARNING("TOPUnpacker: Could not establish data format.");
+                err = bufferSize;
               }
             }
           }
         }
 
-        int err = 0;
         switch (dataFormat) {
           case static_cast<int>(TOP::RawDataType::c_Type0Ver16):
             unpackType0Ver16(buffer, bufferSize);
@@ -171,19 +171,29 @@ namespace Belle2 {
           case static_cast<int>(TOP::RawDataType::c_Draft):
             unpackProductionDraft(buffer, bufferSize);
             break;
-          case static_cast<int>(TOP::RawDataType::c_ProductionDebug):
-            err = unpackProdDebug(buffer, bufferSize, true);
+          case static_cast<int>(TOP::RawDataType::c_ProductionDebug01):
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug01, true);
+            break;
+          case static_cast<int>(TOP::RawDataType::c_ProductionDebug02):
+            err = unpackProdDebug(buffer, bufferSize, TOP::RawDataType::c_ProductionDebug02, true);
             break;
 
           default:
             B2ERROR("TOPUnpacker: unknown data format."
                     << LogVar("Type", (dataFormat >> 8))
                     << LogVar("Version", (dataFormat & 0xFF)));
+            err = bufferSize;
+
         }
 
-        if (err != 0)
-          B2ERROR("TOPUnpacker: extra or missing words in data buffer."
-                  << LogVar("Difference", err));
+        if (err != 0) {
+          stringstream copperName;
+          //nodeid format is described on page7 of: https://confluence.desy.de/display/BI/DAQ+WebHome?preview=%2F34029242%2F37487394%2FSetupPocketDAQ_4p1_RawCOPPERDataFormat.pdf
+          copperName << "cpr" << ((raw.GetNodeID(0) >> 24) * 1000 + (raw.GetNodeID(0) & 0x3FF)) << char('a' + finesse);
+          B2ERROR("TOPUnpacker: error in unpacking data from frontend " << copperName.str()
+                  << LogVar("words unused", err)
+                  << LogVar("copper", copperName.str()));
+        }
 
       } // finesse loop
     } // m_rawData loop
@@ -769,7 +779,7 @@ namespace Belle2 {
   }
 
 
-  int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize,
+  int TOPUnpackerModule::unpackProdDebug(const int* buffer, int bufferSize, TOP::RawDataType dataFormat,
                                          bool pedestalSubtracted)
   {
 
@@ -785,6 +795,19 @@ namespace Belle2 {
     unsigned int evtMagicHeader = (word >> 12) & 0xF;
     unsigned int evtScrodID = word & 0xFFF;
 
+    // determine slot number (moduleID) and boardstack
+    int moduleID = 0;
+    int boardstack = 0;
+    const auto* feemap = m_topgp->getFrontEndMapper().getMap(evtScrodID);
+    if (feemap) {
+      moduleID = feemap->getModuleID();
+      boardstack = feemap->getBoardstackNumber();
+    } else {
+      B2WARNING("TOPUnpacker: no front-end map available."
+                << LogVar("SCROD ID", evtScrodID));
+    }
+
+
     B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
             (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
             << "\tevtType = " << evtType
@@ -793,8 +816,8 @@ namespace Belle2 {
             << ", evtScrodID = " << evtScrodID);
 
     if (evtMagicHeader != 0xA) {
-      B2ERROR("TOPUnpacker: event header magic word mismatch. should be 0xA."
-              << LogVar("Magic word", evtMagicHeader));
+      B2WARNING("TOPUnpacker: event header magic word mismatch. should be 0xA."
+                << LogVar("Magic word", evtMagicHeader));
       return array.getRemainingWords();
     }
 
@@ -833,7 +856,9 @@ namespace Belle2 {
             << ", evtEventQueueDepth = " << evtEventQueueDepth
             << ", evtEventNumberByte = " << evtEventNumberByte);
 
-    m_productionEventDebugs.appendNew(evtScrodID,
+    m_productionEventDebugs.appendNew(evtType,
+                                      evtVersion,
+                                      evtScrodID,
                                       evtSkipHit,
                                       evtCtime,
                                       evtPhase,
@@ -853,51 +878,117 @@ namespace Belle2 {
            && array.getIndex() < evtNumWordsCore - 2) {  // -1 for 0-based counting, -1 for hit footer word
       array.resetChecksum();
 
-      word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(4)/hasWaveform(1)/isOnHeap(1)/heapWindow(6)
-      unsigned int hitCarrier = word >> 30;
-      unsigned int hitAsic = (word >> 28) & 0x3;
-      unsigned int hitChannel = (word >> 25) & 0x7;
-      unsigned int hitWindow = (word >> 16) & 0x1FF;
-      unsigned int hitMagicHeader = (word >> 12) & 0xF;
-      unsigned int hitTFine = (word >> 8) & 0xF;
-      bool         hitHasWaveform = (word >> 7) & 0x1;
-      bool         hitIsOnHeap = (word >> 6) & 0x1;
-      unsigned int hitHeapWindow = word  & 0x3F;
+
+      //need to predefine some variables here as we need to branch out between two data format versions for the next two words
+      unsigned int hitCarrier = 0;
+      unsigned int hitAsic = 0;
+      unsigned int hitChannel = 0;
+      unsigned int hitWindow = 0;
+      unsigned int hitMagicHeader = 0;
+      unsigned int hitTFine = 0;
+      bool         hitHasWaveform = false;
+      bool         hitIsOnHeap = false;
+      unsigned int hitHeapWindow = 0;
+      bool         hitIsOnHeapStraddle = false;
+      unsigned int hitHeapWindowStraddle = 0;
+      bool         hitIsWindowStraddle = false;
+      short        hitIntegral = 0;
+      short        hitVPeak = 0;
+
+      if (dataFormat == TOP::RawDataType::c_ProductionDebug01) {    //dataformat 0x0401
+        word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(4)/hasWaveform(1)/isOnHeap(1)/heapWindow(6)
+        hitCarrier = word >> 30;
+        hitAsic = (word >> 28) & 0x3;
+        hitChannel = (word >> 25) & 0x7;
+        hitWindow = (word >> 16) & 0x1FF;
+        hitMagicHeader = (word >> 12) & 0xF;
+        hitTFine = (word >> 8) & 0xF;
+        hitHasWaveform = (word >> 7) & 0x1;
+        hitIsOnHeap = (word >> 6) & 0x1;
+        hitHeapWindow = word  & 0x3F;
 
 
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
-              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
-              << "\thitCarrier = " << hitCarrier
-              << ", hitAsic = " << hitAsic
-              << ", hitChannel = " << hitChannel
-              << ", hitWindow = " << hitWindow
-//      << ", hitMagicHeader = " << hitMagicHeader
-//      << ", hitTFine = " << hitTFine
-              << ", hitHasWaveform = " << hitHasWaveform
-//      << ", hitIsOnHeap = " << hitIsOnHeap
-//      << ", hitHeapWindow = " << hitHeapWindow
-             );
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thitCarrier = " << hitCarrier
+                << ", hitAsic = " << hitAsic
+                << ", hitChannel = " << hitChannel
+                << ", hitWindow = " << hitWindow
+                //      << ", hitMagicHeader = " << hitMagicHeader
+                //      << ", hitTFine = " << hitTFine
+                << ", hitHasWaveform = " << hitHasWaveform
+                //      << ", hitIsOnHeap = " << hitIsOnHeap
+                //      << ", hitHeapWindow = " << hitHeapWindow
+               );
+
+
+        word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/integral(16)
+        hitVPeak = expand13to16bits(word >> 16);
+        hitIntegral = word & 0xFFFF;
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thitVPeak = " << hitVPeak
+                << ", hitIntegral = " << hitIntegral);
+
+      } else if (dataFormat == TOP::RawDataType::c_ProductionDebug02) { //dataformat 0x0402
+        word = array.getWord(); // hit word 0, carrier(2)/asic(2)/channel(3)/window(9)/0xB(4)/tFine(4)/hasWaveform(1)/isWindowStraddle(1)/integral(6)
+        hitCarrier = word >> 30;
+        hitAsic = (word >> 28) & 0x3;
+        hitChannel = (word >> 25) & 0x7;
+        hitWindow = (word >> 16) & 0x1FF;
+        hitMagicHeader = (word >> 12) & 0xF;
+        hitTFine = (word >> 8) & 0xF;
+        hitHasWaveform = (word >> 7) & 0x1;
+        hitIsWindowStraddle = (word >> 6) & 0x1;
+        hitIntegral = word & 0x3F;
+
+
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thitCarrier = " << hitCarrier
+                << ", hitAsic = " << hitAsic
+                << ", hitChannel = " << hitChannel
+                << ", hitWindow = " << hitWindow
+                //      << ", hitMagicHeader = " << hitMagicHeader
+                //      << ", hitTFine = " << hitTFine
+                << ", hitHasWaveform = " << hitHasWaveform
+                << ", hitIsWindowStraddle = " << hitHasWaveform
+                << ", hitIntegral = " << hitIntegral
+                //      << ", hitHeapWindow = " << hitHeapWindow
+               );
+
+        word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/isOnHeap1(1)/heapWindow1(7)/isOnHeap0(1)/heapWindow0(7)
+        hitVPeak = expand13to16bits(word >> 16);
+        hitIsOnHeapStraddle = (word >> 15) & 0x1;
+        hitHeapWindowStraddle = (word >> 8) & 0x7F;
+        hitIsOnHeap = (word >> 7) & 0x1;
+        hitHeapWindow = word & 0x1;
+
+        B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
+                (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
+                << "\thitVPeak = " << hitVPeak
+                << ", hitIsOnHeapStraddle = " << hitIsOnHeapStraddle
+                << ", hitHeapWindowStraddle = " << hitHeapWindowStraddle
+                << ", hitIsOnHeap = " << hitIsOnHeap
+                << ", hitHeapWindow = " << hitHeapWindow);
+      } else { //could not match the data format
+        B2WARNING("TOPUnpacker: could not match data type inside unpackProdDebug()"
+                  << LogVar("evtType", evtType) << LogVar("evtVersion", evtVersion));
+        return array.getRemainingWords();
+      }
+
 
       if (hitHasWaveform) {
         numExpectedWaveforms += 1;
       }
 
       if (hitMagicHeader != 0xB) {
-        B2ERROR("TOPUnpacker: hit header magic word mismatch. should be 0xB."
-                << LogVar("Magic word", hitMagicHeader));
+        B2WARNING("TOPUnpacker: hit header magic word mismatch. should be 0xB."
+                  << LogVar("Magic word", hitMagicHeader));
         return array.getRemainingWords();
       }
 
-
-      word = array.getWord(); // hit word 1, reserved(3)/vPeak(13)/integral(16)
-      short hitVPeak = expand13to16bits(word >> 16);
-      short hitIntegral = word & 0xFFFF;
-      B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
-              (word >> 16) << " " << setfill('0') << setw(4) << (word & 0xFFFF) << std::dec
-              << "\thitVPeak = " << hitVPeak
-              << ", hitIntegral = " << hitIntegral);
-
-      word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
+      word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/vRise1(13)
       short hitVRise0 = expand13to16bits(word >> 16);
       short hitVRise1 = expand13to16bits(word);
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
@@ -905,7 +996,7 @@ namespace Belle2 {
               << "\thitVRise0 = " << hitVRise0
               << ", hitVRise1 = " << hitVRise1);
 
-      word = array.getWord(); // hit word 2, reserved(3)/vRise0(13)/reserved(3)/Vrise1(13)
+      word = array.getWord(); // hit word 3, reserved(3)/vFall0(13)/reserved(3)/vFall1(13)
       short hitVFall0 = expand13to16bits(word >> 16);
       short hitVFall1 = expand13to16bits(word);
       B2DEBUG(200, std::dec << array.getIndex() << ":\t" << setfill('0') << setw(4) << std::hex <<
@@ -927,7 +1018,7 @@ namespace Belle2 {
               << ", checksum " << (array.validateChecksum() ? "OK" : "NOT OK"));
 
       if (!array.validateChecksum()) {
-        B2ERROR("TOPUnpacker: hit checksum invalid.");
+        B2WARNING("TOPUnpacker: hit checksum invalid.");
         return array.getRemainingWords();
       }
 
@@ -956,10 +1047,23 @@ namespace Belle2 {
         digitsWithWaveform.push_back(digit);
       }
 
-      auto* hitDebug = m_productionHitDebugs.appendNew(hitHasWaveform,
-                                                       hitIsOnHeap,
-                                                       hitWindow,
-                                                       hitIsOnHeap ? hitHeapWindow : hitWindow);
+      TOPProductionHitDebug* hitDebug = 0;
+      if (dataFormat == TOP::RawDataType::c_ProductionDebug01) { // dataformat 0x0401
+        hitDebug = m_productionHitDebugs.appendNew(hitHasWaveform,
+                                                   hitIsOnHeap,
+                                                   hitWindow,
+                                                   hitIsOnHeap ? 428 + hitHeapWindow : hitWindow, //hitHeapWindow is counted from the start of the heap
+                                                   hitIsWindowStraddle);
+      } else if (dataFormat == TOP::RawDataType::c_ProductionDebug02) { // dataformat 0x0402
+        hitDebug = m_productionHitDebugs.appendNew(hitHasWaveform,
+                                                   hitIsOnHeap,
+                                                   hitWindow,
+                                                   hitIsOnHeap ? 428 + hitHeapWindow : hitWindow, //hitHeapWindow is counted from the start of the heap
+                                                   hitIsWindowStraddle,
+                                                   hitWindow + 1, //logical address of straddle window is always +1
+                                                   hitIsOnHeapStraddle ? 428 + hitHeapWindowStraddle : hitWindow +
+                                                   1); //physical address might be entirely different if straddled window is on heap
+      }
 
       //parse extra words if exist:
       for (unsigned int i = 0; i < evtExtra; ++i) {
@@ -970,7 +1074,9 @@ namespace Belle2 {
         hitDebug->appendExtraWord(word);
       }
 
-      digit->addRelationTo(hitDebug);
+      if (hitDebug) {
+        digit->addRelationTo(hitDebug);
+      }
 
       numHitsFound += 1;
     } // end of hits loop
@@ -992,24 +1098,12 @@ namespace Belle2 {
     }
 
     if (evtMagicFooter != 0x5) {
-      B2ERROR("TOPUnpacker: event footer magic word mismatch. should be 0x5."
-              << LogVar("Magic word", evtMagicFooter));
+      B2WARNING("TOPUnpacker: event footer magic word mismatch. should be 0x5."
+                << LogVar("Magic word", evtMagicFooter));
       return array.getRemainingWords();
     }
 
     B2DEBUG(200, "the rest:");
-
-    // determine slot number (moduleID) and boardstack
-    int moduleID = 0;
-    int boardstack = 0;
-    const auto* feemap = m_topgp->getFrontEndMapper().getMap(evtScrodID);
-    if (feemap) {
-      moduleID = feemap->getModuleID();
-      boardstack = feemap->getBoardstackNumber();
-    } else {
-      B2ERROR("TOPUnpacker: no front-end map available."
-              << LogVar("SCROD ID", evtScrodID));
-    }
 
     unsigned int numParsedWaveforms = 0;
     while (array.peekWord() != 0x6c617374 //next word is not wf footer word
@@ -1036,9 +1130,9 @@ namespace Belle2 {
               << ", wfChannel " << wfChannel);
 
       if (wfNSamples != 32 && wfNSamples != 16) {
-        B2ERROR("TOPUnpacker: suspicious value for wfNSamples."
-                << LogVar("Value", wfNSamples));
-        //return array.getRemainingWords();
+        B2WARNING("TOPUnpacker: suspicious value for wfNSamples."
+                  << LogVar("wfNSamples", wfNSamples));
+        return array.getRemainingWords();
       }
 
       word = array.getWord(); // waveform word 1, 0x0(1)/startSamp(6)/logAddress(9)/carrierEventNumber(7)/readAddr(9)
@@ -1090,9 +1184,9 @@ namespace Belle2 {
         if (digit->getScrodChannel() == channel % 128) {
           digit->addRelationTo(waveform);
         } else {
-          B2ERROR("TOPUnpacker: hit and its waveform have different channel number."
-                  << LogVar("channel (hit)", digit->getScrodChannel())
-                  << LogVar("channel (waveform)", channel % 128));
+          B2WARNING("TOPUnpacker: hit and its waveform have different channel number."
+                    << LogVar("channel (hit)", digit->getScrodChannel())
+                    << LogVar("channel (waveform)", channel % 128));
         }
       }
       numParsedWaveforms += 1;
@@ -1100,9 +1194,9 @@ namespace Belle2 {
     } // end of waveform segments loop
 
     if (numExpectedWaveforms != numParsedWaveforms) {
-      B2ERROR("TOPUnpacker: number of expected and parsed waveforms does not match."
-              << LogVar("expected", numExpectedWaveforms)
-              << LogVar("parsed", numParsedWaveforms));
+      B2WARNING("TOPUnpacker: number of expected and parsed waveforms does not match."
+                << LogVar("expected", numExpectedWaveforms)
+                << LogVar("parsed", numParsedWaveforms));
     }
 
     return array.getRemainingWords();

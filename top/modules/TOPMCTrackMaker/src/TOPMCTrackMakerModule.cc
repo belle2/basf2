@@ -11,21 +11,17 @@
 // Own include
 #include <top/modules/TOPMCTrackMaker/TOPMCTrackMakerModule.h>
 
-
-
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <framework/geometry/BFieldManager.h>
 
 // dataobjects
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/ExtHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
@@ -115,7 +111,7 @@ namespace Belle2 {
                            Const::pion,
                            1.0,            // pValue
                            BFieldManager::getField(0, 0, 0).Z() / Unit::T,
-                           0,
+                           0x38FFFFFFFFFFFFFF, // 56 hits, in all CDC layers
                            0);
       auto* track = tracks.appendNew();
       track->setTrackFitResultIndex(Const::pion, fitResults.getEntries() - 1);
@@ -130,6 +126,7 @@ namespace Belle2 {
                                        Const::TOP,
                                        barHit->getModuleID(),
                                        EXT_ENTER,
+                                       false,
                                        tof,
                                        barHit->getPosition(),
                                        barHit->getMomentum(),

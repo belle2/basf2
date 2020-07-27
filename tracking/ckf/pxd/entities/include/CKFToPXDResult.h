@@ -21,7 +21,7 @@ namespace Belle2 {
     using Super = CKFResult<RecoTrack, SpacePoint>;
   public:
     /// Constructor using a path.
-    CKFToPXDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& path);
+    explicit CKFToPXDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& path);
 
     /// Called in the exporter findlet for adding this to a already created reco track.
     void addToRecoTrack(RecoTrack& recoTrack) const;

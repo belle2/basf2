@@ -8,13 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "EvtGenBase/EvtPatches.hh"
 #include <stdlib.h>
-#include <assert.h>
 #include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
 #include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
 
 #include <string>
 
@@ -28,6 +24,7 @@
 
 namespace Belle2 {
 
+  /** register the model in EvtGen */
   B2_EVTGEN_REGISTER_MODEL(EvtBSemiTauonic2HDMType2);
 
   EvtBSemiTauonic2HDMType2::EvtBSemiTauonic2HDMType2(): m_CalcHelAmp(0), m_CalcAmp(0) {}

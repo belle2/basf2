@@ -10,13 +10,11 @@
 
 #include <tracking/modules/pxdDataReduction/ROIPayloadAssemblerModule.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <stdlib.h>
 #include <set>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-// #include <tracking/dataobjects/ROIrawID.h>
 
 using namespace std;
 using namespace Belle2;
@@ -69,7 +67,7 @@ void ROIPayloadAssemblerModule::initialize()
 
 void ROIPayloadAssemblerModule::event()
 {
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
   unsigned int evtNr = m_eventMetaData->getEvent();
   unsigned int countROIs = 0;
   bool accepted = true;
@@ -77,9 +75,12 @@ void ROIPayloadAssemblerModule::event()
   if (!mAcceptAll) {
     StoreObjPtr<SoftwareTriggerResult> result;
     if (!result.isValid()) {
-      B2FATAL("SoftwareTriggerResult object not available but needed to generate the ROI payload.");
+      /// Events rejected by the EventOfDoomBuster will NOT contain SoftwareTriggerResult
+      B2INFO("SoftwareTriggerResult object not available but needed to generate the ROI payload.");
+      accepted = false;
+    } else {
+      accepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*result);
     }
-    accepted = SoftwareTrigger::FinalTriggerDecisionCalculator::getFinalTriggerDecision(*result);
   }
 
   map<VxdID, set<ROIrawID, ROIrawID>> mapOrderedROIraw;

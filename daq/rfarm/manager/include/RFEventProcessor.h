@@ -9,14 +9,11 @@
 //-
 
 #include <string>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 #include "daq/rfarm/manager/RFConf.h"
 #include "daq/rfarm/manager/RFSharedMem.h"
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFLogManager.h"
-#include "daq/rfarm/manager/RFNSM.h"
 #include "daq/rfarm/manager/RFFlowStat.h"
 
 #include "framework/pcore/RingBuffer.h"
@@ -42,6 +39,9 @@ namespace Belle2 {
     // Server function
     void server();
 
+    // Cleanup
+    void cleanup();
+
   private:
     RFConf*            m_conf;
     RFSharedMem*       m_shm;
@@ -58,6 +58,9 @@ namespace Belle2 {
     int m_pid_hrelay;
     int m_nnodes;
     char m_nodename[256];
+
+    int m_expno;
+    int m_runno;
 
   };
 

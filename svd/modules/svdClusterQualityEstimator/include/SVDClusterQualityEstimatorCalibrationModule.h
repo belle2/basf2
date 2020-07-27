@@ -11,15 +11,12 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
-#include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <string>
 #include <map>
 
-#include <TFile.h>
 #include <TH2.h>
 
 namespace Belle2 {
@@ -53,18 +50,16 @@ namespace Belle2 {
 
   protected:
 
-    void calculateProb(TH2F* signal, TH2F* background, TH2F* probability);
-    void calculateError(TH2F* signal, TH2F* background, TH2F* error);
+    void calculateProb(TH2F* signal, TH2F* background, TH2F* probability); /**< compute probvability*/
+    void calculateError(TH2F* signal, TH2F* background, TH2F* error); /**<compute error*/
 
     // Data members
     std::string m_svdClustersName; /**< SVDCluster collection name */
     std::string m_recoTracksName; /**< RecoTrack collection name */
 
-    StoreArray<SVDCluster>
-    m_svdClusters; /**< the storeArray for svdClusters  */
+    StoreArray<SVDCluster> m_svdClusters; /**< the storeArray for svdClusters  */
 
-    StoreArray<RecoTrack>
-    m_recoTracks; /**< StoreArray for recoTracks */
+    StoreArray<RecoTrack> m_recoTracks; /**< StoreArray for recoTracks */
 
     int m_binSizeCharge; /**< Number of bins in charge dimension */
 
@@ -74,7 +69,7 @@ namespace Belle2 {
 
     bool m_useLegacyNaming; /**< Choice between PDF naming conventions */
 
-    std::string m_outputFileName;
+    std::string m_outputFileName; /**< output filename*/
 
     std::string
     m_nameOfInstance; /**< allows the user to set an identifier for this module. Usefull if one wants to use several instances of that module */

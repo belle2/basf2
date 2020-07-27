@@ -28,7 +28,6 @@ using std::sin;
 using std::cos;
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
 // constructor
@@ -51,7 +50,7 @@ namespace Belle2 {
     }
 
 // destructor
-    NeutrinoFitObject::~NeutrinoFitObject() {}
+    NeutrinoFitObject::~NeutrinoFitObject() = default;
 
     NeutrinoFitObject::NeutrinoFitObject(const NeutrinoFitObject& rhs)
       : ParticleFitObject(rhs), ctheta(0), stheta(0), cphi(0), sphi(0), pt(0), px(0), py(0), pz(0), dptdE(0),
@@ -75,7 +74,7 @@ namespace Belle2 {
 
     NeutrinoFitObject& NeutrinoFitObject::assign(const BaseFitObject& source)
     {
-      if (const NeutrinoFitObject* psource = dynamic_cast<const NeutrinoFitObject*>(&source)) {
+      if (const auto* psource = dynamic_cast<const NeutrinoFitObject*>(&source)) {
         if (psource != this) {
           ParticleFitObject::assign(source);
           // only mutable data members, need not to be copied, if cache is invalid
@@ -285,6 +284,5 @@ namespace Belle2 {
     }
 
   }// end OrcaKinFit namespace
-
 } // end Belle2 namespace
 

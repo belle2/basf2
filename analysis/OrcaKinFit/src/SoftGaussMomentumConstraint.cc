@@ -23,7 +23,6 @@
 #include<cassert>
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
 // constructor
@@ -38,8 +37,7 @@ namespace Belle2 {
     {}
 
 // destructor
-    SoftGaussMomentumConstraint::~SoftGaussMomentumConstraint()
-    {}
+    SoftGaussMomentumConstraint::~SoftGaussMomentumConstraint() = default;
 
 // calulate current value of constraint function
     double SoftGaussMomentumConstraint::getValue() const
@@ -48,11 +46,11 @@ namespace Belle2 {
       double totpy = 0;
       double totpz = 0;
       double totE = 0;
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        if (pxfact != 0) totpx += fitobjects[i]->getPx();
-        if (pyfact != 0) totpy += fitobjects[i]->getPy();
-        if (pzfact != 0) totpz += fitobjects[i]->getPz();
-        if (efact  != 0) totE  += fitobjects[i]->getE();
+      for (auto fitobject : fitobjects) {
+        if (pxfact != 0) totpx += fitobject->getPx();
+        if (pyfact != 0) totpy += fitobject->getPy();
+        if (pzfact != 0) totpz += fitobject->getPz();
+        if (efact  != 0) totE  += fitobject->getE();
       }
       return pxfact * totpx + pyfact * totpy + pzfact * totpz + efact * totE - value;
     }
@@ -64,16 +62,16 @@ namespace Belle2 {
 //          =  +-1/M * p(i) * d p(i) /d par(j)
     void SoftGaussMomentumConstraint::getDerivatives(int idim, double der[]) const
     {
-      for (unsigned int i = 0; i < fitobjects.size(); i++) {
-        for (int ilocal = 0; ilocal < fitobjects[i]->getNPar(); ilocal++) {
-          if (!fitobjects[i]->isParamFixed(ilocal)) {
-            int iglobal = fitobjects[i]->getGlobalParNum(ilocal);
+      for (auto fitobject : fitobjects) {
+        for (int ilocal = 0; ilocal < fitobject->getNPar(); ilocal++) {
+          if (!fitobject->isParamFixed(ilocal)) {
+            int iglobal = fitobject->getGlobalParNum(ilocal);
             assert(iglobal >= 0 && iglobal < idim);
             double d = 0;
-            if (pxfact != 0) d += pxfact * fitobjects[i]->getDPx(ilocal);
-            if (pyfact != 0) d += pyfact * fitobjects[i]->getDPy(ilocal);
-            if (pzfact != 0) d += pzfact * fitobjects[i]->getDPz(ilocal);
-            if (efact  != 0) d +=  efact * fitobjects[i]->getDE(ilocal);
+            if (pxfact != 0) d += pxfact * fitobject->getDPx(ilocal);
+            if (pyfact != 0) d += pyfact * fitobject->getDPy(ilocal);
+            if (pzfact != 0) d += pzfact * fitobject->getDPz(ilocal);
+            if (efact  != 0) d +=  efact * fitobject->getDE(ilocal);
             der[iglobal] = d;
           }
         }
@@ -101,5 +99,3 @@ namespace Belle2 {
 
   }// end OrcaKinFit namespace
 } // end Belle2 namespace
-
-

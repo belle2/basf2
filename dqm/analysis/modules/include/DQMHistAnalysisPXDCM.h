@@ -13,11 +13,10 @@
 #include "cadef.h"
 #endif
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <vxd/geometry/SensorInfoBase.h>
+#include <vxd/dataobjects/VxdID.h>
 
-#include <TF1.h>
+#include <vector>
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TLine.h>
@@ -32,6 +31,8 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisPXDCMModule();
+    //! Destructor
+    ~DQMHistAnalysisPXDCMModule();
   private:
 
     //! Module functions to be called from main process
@@ -55,12 +56,19 @@ namespace Belle2 {
     TH2F* m_hCommonMode = nullptr;
     //! Final Canvas
     TCanvas* m_cCommonMode = nullptr;
-    //! Lines in the Canvas to guide the eye
-    TLine* m_line1 = nullptr, *m_line2 = nullptr, *m_line3 = nullptr;
+    //! Line in the Canvas to guide the eye
+    TLine* m_line1 = nullptr;
+    //! Line in the Canvas to guide the eye
+    TLine* m_line2 = nullptr;
+    //! Line in the Canvas to guide the eye
+//     TLine* m_line3 = nullptr;
+
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
 
 #ifdef _BELLE2_EPICS
-    //! one epics PV
-    chid  mychid;
+    //! epics PVs
+    std::vector <chid> mychid;
 #endif
   };
 } // end namespace Belle2

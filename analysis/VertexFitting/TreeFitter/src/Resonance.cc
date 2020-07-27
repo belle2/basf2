@@ -4,7 +4,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,8 +15,9 @@ namespace TreeFitter {
 
   Resonance::Resonance(Belle2::Particle* particle,
                        const ParticleBase* mother,
+                       const ConstraintConfiguration& config,
                        bool forceFitAll) :
-    InternalParticle(particle, mother, forceFitAll) {}
+    InternalParticle(particle, mother, config, forceFitAll) {}
 
   ErrCode Resonance::initMotherlessParticle(FitParams& fitparams)
   {
@@ -37,7 +38,7 @@ namespace TreeFitter {
     return status;
   }
 
-  Resonance::~Resonance() {};
+  Resonance::~Resonance() = default;
 
   std::string Resonance::parname(int index) const
   {

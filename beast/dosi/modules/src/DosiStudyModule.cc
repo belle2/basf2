@@ -13,36 +13,19 @@
 #include <beast/dosi/dataobjects/DosiHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 
 //c++
 #include <cmath>
-#include <boost/foreach.hpp>
 #include <string>
-#include <iostream>
 #include <fstream>
-#include <vector>
-#include <stdlib.h>
 
 // ROOT
-#include <TVector3.h>
-#include <TFile.h>
-#include <TTree.h>
 #include <TString.h>
-#include <TSystem.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-#include <TMath.h>
 
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 
@@ -170,7 +153,8 @@ void DosiStudyModule::event()
     double sad_ssraw = MetaHit.getssraw();
     double ssraw = 0;
     if (sad_ssraw >= 0) ssraw = sad_ssraw / 100.;
-    else if (sad_ssraw < 0) ssraw = 3000. + sad_ssraw / 100.;
+    else ssraw = 3000. + sad_ssraw / 100.;
+    //else if (sad_ssraw < 0) ssraw = 3000. + sad_ssraw / 100.;
     ring_section = section_ordering[(int)((ssraw) / 250.)] - 1;
     //ring_section = MetaHit.getring_section() - 1;
   }

@@ -25,8 +25,6 @@
 #include <limits>
 #include <list>
 
-using namespace std;
-
 namespace Belle2 {
   namespace geometry {
     /** Parse a color string of the form #rgb, #rrggbb, #rgba, #rrggbbaa or
@@ -38,14 +36,14 @@ namespace Belle2 {
      *
      * rgb(r, g, b) expects the fraction of red, green and blue as float between 0 and 1.
      */
-    G4Colour parseColor(string colorString)
+    G4Colour parseColor(std::string colorString)
     {
       boost::to_lower(colorString);
       double red(0), green(0), blue(0), alpha(0);
       if (colorString[0] == '#') {
         size_t size = colorString.size();
         unsigned int colorValue;
-        stringstream in(colorString);
+        std::stringstream in(colorString);
         in.get();
         in >> std::hex >> colorValue;
         if (in.fail()) size = 0;
@@ -71,47 +69,48 @@ namespace Belle2 {
             alpha = ((colorValue & 0x000000ff) >>  0) / 255.;
             break;
           default:
-            B2WARNING("Could not parse color string '" + colorString + "'" << endl);
+            B2WARNING("Could not parse color string '" + colorString + "'");
         }
       } else if (colorString.substr(0, 3) == "rgb") {
         //Parse value of the type rgb(1.0,1.0,1.0)
-        size_t startPos = colorString.find("(");
-        size_t stopPos = colorString.find(")");
-        string ws(" \t\r\n,");
-        stringstream in(colorString.substr(startPos + 1, stopPos - startPos - 1));
+        size_t startPos = colorString.find('(');
+        size_t stopPos = colorString.find(')');
+        std::string ws(" \t\r\n,");
+        std::stringstream in(colorString.substr(startPos + 1, stopPos - startPos - 1));
         in >> red;
-        while (ws.find(in.peek()) != string::npos) in.get();
+        while (ws.find(in.peek()) != std::string::npos) in.get();
         in >> green;
-        while (ws.find(in.peek()) != string::npos) in.get();
+        while (ws.find(in.peek()) != std::string::npos) in.get();
         in >> blue;
-        while (ws.find(in.peek()) != string::npos) in.get();
+        while (ws.find(in.peek()) != std::string::npos) in.get();
         in >> alpha;
-        red   = min(1.0, max(0.0, red));
-        green = min(1.0, max(0.0, green));
-        blue  = min(1.0, max(0.0, blue));
-        alpha = min(1.0, max(0.0, alpha));
+        red   = std::min(1.0, std::max(0.0, red));
+        green = std::min(1.0, std::max(0.0, green));
+        blue  = std::min(1.0, std::max(0.0, blue));
+        alpha = std::min(1.0, std::max(0.0, alpha));
       }
       return G4Colour(red, green, blue, alpha);
     }
 
-    void setColor(G4LogicalVolume& volume, const string& color)
+    void setColor(G4LogicalVolume& volume, const std::string& color)
     {
-      G4VisAttributes* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
+      auto* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
       if (!attr) attr = GeometryManager::getInstance().newVisAttributes();
       attr->SetColor(parseColor(color));
       volume.SetVisAttributes(attr);
     }
+
     void setVisibility(G4LogicalVolume& volume, bool visible)
     {
-      G4VisAttributes* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
+      auto* attr = const_cast<G4VisAttributes*>(volume.GetVisAttributes());
       if (!attr) attr = GeometryManager::getInstance().newVisAttributes();
       attr->SetVisibility(visible);
       volume.SetVisAttributes(attr);
     }
 
-    G4Polycone* createPolyCone(const string& name, const GearDir& params, double& minZ, double& maxZ)
+    G4Polycone* createPolyCone(const std::string& name, const GearDir& params, double& minZ, double& maxZ)
     {
-      if (!params) return 0;
+      if (!params) return nullptr;
 
       double minPhi = params.getAngle("minPhi", 0);
       double dPhi   = params.getAngle("maxPhi", 2 * M_PI) - minPhi;
@@ -119,18 +118,18 @@ namespace Belle2 {
       int nPlanes = planes.size();
       if (nPlanes < 2) {
         B2ERROR("Polycone needs at least two planes");
-        return 0;
+        return nullptr;
       }
       std::vector<double> z(nPlanes, 0);
       std::vector<double> rMin(nPlanes, 0);
       std::vector<double> rMax(nPlanes, 0);
       int index(0);
-      minZ = numeric_limits<double>::infinity();
-      maxZ = -numeric_limits<double>::infinity();
+      minZ = std::numeric_limits<double>::infinity();
+      maxZ = -std::numeric_limits<double>::infinity();
       for (const GearDir& plane : planes) {
         z[index]    = plane.getLength("posZ") / Unit::mm;
-        minZ = min(minZ, z[index]);
-        maxZ = max(maxZ, z[index]);
+        minZ = std::min(minZ, z[index]);
+        maxZ = std::max(maxZ, z[index]);
         rMin[index] = plane.getLength("innerRadius") / Unit::mm;
         rMax[index] = plane.getLength("outerRadius") / Unit::mm;
         ++index;
@@ -142,9 +141,9 @@ namespace Belle2 {
     //Use unnamed namespace to hide helper functions/definitions from outside
     namespace {
       /** Struct representing the Z and X coordinate of a point */
-      typedef pair<double, double> ZXPoint;
+      using ZXPoint = std::pair<double, double>;
       /** List of points in the ZX plane */
-      typedef list<ZXPoint> PointList;
+      using PointList = std::list<ZXPoint>;
       /** Helper function for createRotationSolid.
        * This function subdivides the polyline given by segments to contain a
        * point at every z position in points.  Furthermore, the polyline will
@@ -160,8 +159,8 @@ namespace Belle2 {
        */
       void subdivideSegments(const PointList& points, PointList& segments)
       {
-        double lastZ = -numeric_limits<double>::infinity();
-        for (const ZXPoint p : points) {
+        double lastZ = -std::numeric_limits<double>::infinity();
+        for (const ZXPoint& p : points) {
           if (p.first < lastZ) {
             B2FATAL("createRotationSolid: Points have to be given with ascending z positions");
           }
@@ -170,8 +169,8 @@ namespace Belle2 {
           //coordinate we know that we need a new segment. We calculate the x
           //position of the segment and insert a new point at that position in
           //the list of points
-          PointList::iterator segStart = segments.begin();
-          PointList::iterator segEnd = segStart;
+          auto segStart = segments.begin();
+          auto segEnd = segStart;
           ++segEnd;
           for (; segEnd != segments.end(); ++segEnd) {
             if ((p.first > segStart->first && p.first < segEnd->first) ||
@@ -202,10 +201,10 @@ namespace Belle2 {
       //Make a list of all the points (ZX coordinates)
       PointList innerPoints;
       PointList outerPoints;
-      for (const GearDir point : params.getNodes("InnerPoints/point")) {
+      for (const GearDir& point : params.getNodes("InnerPoints/point")) {
         innerPoints.push_back(ZXPoint(point.getLength("z") / Unit::mm, point.getLength("x") / Unit::mm));
       }
-      for (const GearDir point : params.getNodes("OuterPoints/point")) {
+      for (const GearDir& point : params.getNodes("OuterPoints/point")) {
         outerPoints.push_back(ZXPoint(point.getLength("z") / Unit::mm, point.getLength("x") / Unit::mm));
       }
       //Subdivide the segments to have an x position for each z specified for
@@ -216,9 +215,9 @@ namespace Belle2 {
       maxZ = outerPoints.front().first;
 
       //Now we create the array of planes needed for the polycone
-      vector<double> z;
-      vector<double> rMin;
-      vector<double> rMax;
+      std::vector<double> z;
+      std::vector<double> rMin;
+      std::vector<double> rMax;
 
       double innerZ{0};
       double innerX{0};
@@ -242,7 +241,7 @@ namespace Belle2 {
         if (popInner) innerPoints.pop_front();
         if (innerZ != outerZ) {
           B2ERROR("createRotationSolid: Something is wrong, z values should be identical");
-          return 0;
+          return nullptr;
         }
         z.push_back(innerZ);
         rMin.push_back(innerX);
@@ -269,9 +268,9 @@ namespace Belle2 {
       maxZ = outerPoints.front().first;
 
       //Now we create the array of planes needed for the polycone
-      vector<double> z;
-      vector<double> rMin;
-      vector<double> rMax;
+      std::vector<double> z;
+      std::vector<double> rMin;
+      std::vector<double> rMax;
 
       double innerZ{0};
       double innerX{0};
@@ -295,7 +294,7 @@ namespace Belle2 {
         if (popInner) innerPoints.pop_front();
         if (innerZ != outerZ) {
           B2ERROR("createRotationSolid: Something is wrong, z values should be identical");
-          return 0;
+          return nullptr;
         }
         z.push_back(innerZ / Unit::mm);
         rMin.push_back(innerX / Unit::mm);

@@ -92,8 +92,17 @@ namespace Belle2 {
      */
     void setEndOfData();
 
+    /** Marks the end of the current run. Is only used and understood in special HLT processing.
+     *
+     * Can only be used by the first ZMQ input module.
+     */
+    void setEndOfRun(unsigned int experimentNumber, unsigned int runNumber);
+
     /** is end-of-data set? (see setEndOfData()). */
     bool isEndOfData() const;
+
+    /** is end-of-run set? (see setEndOfRun()). */
+    bool isEndOfRun() const;
 
     /** Parent LFN Setter.
      *

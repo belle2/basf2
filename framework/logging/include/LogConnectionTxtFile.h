@@ -33,7 +33,7 @@ namespace Belle2 {
      * @param append If this value is set to true, an existing file will not be overridden,
      *               but instead the log messages will be added to the end of the file.
      */
-    LogConnectionTxtFile(const std::string& filename, bool append = false);
+    explicit LogConnectionTxtFile(const std::string& filename, bool append = false);
 
     /** The LogConnectionTxtFile destructor. */
     virtual ~LogConnectionTxtFile();

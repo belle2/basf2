@@ -311,6 +311,11 @@ void FitADC(Int_t iLayer, Int_t kDraw)
     printf("ADC histogram was filled\n");
   }
 
+  if(hADCfit[iLayer]->GetEntries() ==0){
+    printf("No entries for Layer %d\n", iLayer);
+    return 0;
+  }
+
   Char_t cOP[10]="0";
   TCanvas *cvfit;
 

@@ -1,42 +1,32 @@
-#ifndef EVEVISUALIZATION_H
-#define EVEVISUALIZATION_H
+#pragma once
 
-#include <display/ObjectInfo.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <simulation/dataobjects/MCParticleTrajectory.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/dataobjects/ROIid.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/GFRaveVertex.h>
 
 #include <TEveStraightLineSet.h>
 #include <TVector3.h>
-#include <TString.h>
 #include <TEveTrack.h>
 
 #include <string>
@@ -52,7 +42,6 @@ class TEveTrackPropagator;
 
 namespace Belle2 {
   class DisplayData;
-  class VisualRepMap;
   class EveVisBField;
 
   /** Produces visualisation for MCParticles, simhits, genfit::Tracks, geometry and other things.
@@ -107,6 +96,8 @@ namespace Belle2 {
 
     /** disabled. */
     EVEVisualization(const EVEVisualization&) = delete;
+    /** disabled assignment */
+    EVEVisualization& operator=(const EVEVisualization&) = delete;
     /** Destructor. */
     ~EVEVisualization();
 
@@ -120,6 +111,12 @@ namespace Belle2 {
     /** Add a RecoTrack, to evaluate track finding. */
     void addTrackCandidate(const std::string& collectionName,
                            const RecoTrack& recoTrack);
+
+    /** Add a RecoTrack, but use stored genfit track representation
+     * to make visualisation objects.
+     * FIXME this is mostly just a workaround for monopoles.*/
+    void addTrackCandidateImproved(const std::string& collectionName,
+                                   const RecoTrack& recoTrack);
 
     /** Add a CDCTriggerTrack. */
     void addCDCTriggerTrack(const std::string& collectionName,
@@ -207,7 +204,7 @@ namespace Belle2 {
     void addCDCHit(const CDCHit* hit, bool showTriggerHits = false);
 
     /** show outline of track segments. */
-    void addCDCTriggerSegmentHit(const CDCTriggerSegmentHit* hit);
+    void addCDCTriggerSegmentHit(const std::string& collectionName, const CDCTriggerSegmentHit* hit);
 
     /** Add TOPDigits (shown aggregated per module). */
     void addTOPDigits(const StoreArray<TOPDigit>& digits);
@@ -321,7 +318,7 @@ namespace Belle2 {
     bool m_assignToPrimaries;
 
     /** If true, secondary MCParticles (and hits created by them) will not be shown. */
-    bool m_hideSecondaries;
+    bool m_hideSecondaries{false};
 
     /** map MCParticles to MCTrack (so hits can be added to the correct track). */
     std::map<const MCParticle*, MCTrack> m_mcparticleTracks;
@@ -374,4 +371,3 @@ namespace Belle2 {
     bool m_drawBackward = false;
   };
 }
-#endif

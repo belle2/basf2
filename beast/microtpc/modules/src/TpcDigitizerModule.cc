@@ -12,25 +12,14 @@
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/core/RandomNumbers.h>
 
 //c++
 #include <cmath>
 #include <boost/foreach.hpp>
 #include <vector>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 using namespace Belle2;
 using namespace microtpc;
@@ -136,7 +125,7 @@ void TpcDigitizerModule::event()
 
     const int PDGid = microtpcSimHit.gettkPDG();
     if (m_LookAtRec == 1) {
-      if (PDGid != 1000020040 || PDGid != 1000060120 || PDGid != 1000080160 || PDGid != 2212) {
+      if (PDGid != 1000020040 && PDGid != 1000060120 && PDGid != 1000080160 && PDGid != 2212) {
         continue;
       }
     }

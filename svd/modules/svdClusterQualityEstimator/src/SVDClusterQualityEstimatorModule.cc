@@ -10,6 +10,9 @@
 
 #include <svd/modules/svdClusterQualityEstimator/SVDClusterQualityEstimatorModule.h>
 #include <svd/modules/svdClusterQualityEstimator/ClusterQualityHelperFunctions.h>
+#include <framework/utilities/FileSystem.h>
+
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;

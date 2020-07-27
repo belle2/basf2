@@ -8,18 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <cstdio>
-
-#include "EvtGenBase/EvtPatches.hh"
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtTensor4C.hh"
-#include "EvtGenBase/EvtVector4C.hh"
-#include "EvtGenBase/EvtScalarParticle.hh"
-#include "EvtGenBase/EvtDiracSpinor.hh"
 #include "EvtGenBase/EvtId.hh"
 #include "EvtGenBase/EvtAmp.hh"
-#include "EvtGenBase/EvtReport.hh"
 
 #include "framework/logging/Logger.h"
 #include "generators/evtgen/models/EvtBSemiTauonicScalarMesonAmplitude.h"

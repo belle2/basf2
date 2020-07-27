@@ -203,6 +203,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC, 
 {
   m_NDF = 0; // reset for every trackCand
   std::vector<HitInfo<SpacePoint> > tcSpacePoints;
+  // cppcheck-suppress unreadVariable
   conversionStatus convStatus = c_noFail; // part of return
 
   int nHits = genfitTC->getNHits();
@@ -337,6 +338,7 @@ GFTC2SPTCConverterModule::getSpacePoint(const ClusterType* cluster, std::vector<
       m_nonSingleSPCtr++;
     }
     spacePoint.first = spacePoints[0];
+    // cppcheck-suppress redundantAssignment
     spacePoint.second = c_singleClusterSP;
     markHitAsUsed(flaggedHitIDs, iHit); // mark hit as used
   } else {

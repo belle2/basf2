@@ -22,19 +22,20 @@ namespace Belle2 {
     class HitReclaimer : public Findlet<const CDCWireHit> {
 
     private:
+      /// Type of the base class
       using Super = Findlet<const CDCWireHit>;
 
     public:
-      // Constructor
+      /// Constructor
       HitReclaimer();
 
-      // Initialisation before the event processing starts
+      /// Initialisation before the event processing starts
       void initialize() final;
 
-      // Short description of the findlet
+      /// Short description of the findlet
       std::string getDescription() final;
 
-      // Execute over wireHits
+      /// Execute over wireHits
       void apply(const std::vector<CDCWireHit>& wireHits);
     };
   }

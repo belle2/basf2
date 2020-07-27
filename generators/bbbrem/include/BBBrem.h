@@ -11,12 +11,9 @@
 #ifndef BBBREM_H
 #define BBBREM_H
 
-#include <framework/gearbox/Unit.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <TLorentzRotation.h>
-
-#include <string>
 
 namespace Belle2 {
 

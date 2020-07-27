@@ -13,11 +13,6 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vector>
 #include "TH1F.h"
 #include "TH2F.h"
 
@@ -33,9 +28,11 @@ namespace Belle2 {
     /* Destructor */
     virtual ~VXDDQMExpressRecoModule();
 
-    /** Module functions */
+    /** Initialize */
     void initialize() override final;
+    /** Begin run */
     void beginRun() override final;
+    /** Event */
     void event() override final;
 
     /**
@@ -78,11 +75,11 @@ namespace Belle2 {
     float m_CutCorrelationTimeSVD = 70;
 
     /** Correlations and hit maps from space points */
-    TH2F** m_correlationsSP;
+    TH2F** m_correlationsSP{nullptr};
     /** Correlations and hit maps from space points - differencies in Phi*/
-    TH1F** m_correlationsSP1DPhi;
+    TH1F** m_correlationsSP1DPhi{nullptr};
     /** Correlations and hit maps from space points - differencies in Theta*/
-    TH1F** m_correlationsSP1DTheta;
+    TH1F** m_correlationsSP1DTheta{nullptr};
 
   };
 

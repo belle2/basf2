@@ -15,7 +15,6 @@
 #define TRGECLFAMPARA_H
 
 #include <TObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -48,7 +47,7 @@ namespace Belle2 {
       int FAMId,
       int ChannelId,
       int TEreconstruct,
-      int ConversionFactor,
+      double ConversionFactor,
       int Toffset,
       int Threshold,
       int Wavemean,
@@ -88,7 +87,7 @@ namespace Belle2 {
     void setTEreconstruct(int TEreconstruct) { m_TEreconstruct = TEreconstruct; }
 
     //! Set ConversionFactor CC
-    void setConversionFactor(int ConversionFactor) { m_ConversionFactor = ConversionFactor; }
+    void setConversionFactor(double ConversionFactor) { m_ConversionFactor = ConversionFactor; }
 
     //! Set T offset
     void setToffset(int Toffset) { m_Toffset = Toffset; }
@@ -167,8 +166,8 @@ namespace Belle2 {
     //! T&E reconstruction method
     int m_TEreconstruct;
 
-    /* //! ConversionFactor CC */
-    int m_ConversionFactor;
+    //! ConversionFactor CC
+    double m_ConversionFactor;
 
     //! T offset
     int m_Toffset;
@@ -188,7 +187,7 @@ namespace Belle2 {
 
 
     //! the class title
-    ClassDef(TRGECLFAMPara, 1); /*< the class title */
+    ClassDef(TRGECLFAMPara, 2); /*< the class title */
   };
 } //! end namespace Belle2
 

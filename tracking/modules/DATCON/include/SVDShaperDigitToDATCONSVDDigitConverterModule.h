@@ -11,18 +11,12 @@
 #pragma once
 
 #include <framework/core/Module.h>
-// #include <framework/datastore/DataStore.h>
-// #include <framework/datastore/RelationArray.h>
-// #include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/geometry/SensorInfo.h>
-
-#include <vxd/dataobjects/VxdID.h>
 
 #include <tracking/dataobjects/DATCONSVDDigit.h>
 

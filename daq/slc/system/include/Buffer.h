@@ -1,7 +1,7 @@
 #ifndef _Belle2_Buffer_hh
 #define _Belle2_Buffer_hh
 
-#include <string>
+#include <cstddef>
 
 namespace Belle2 {
 

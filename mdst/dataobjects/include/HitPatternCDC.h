@@ -9,7 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <Rtypes.h>
+#include <RtypesCore.h>
 
 #include <bitset>
 #include <map>
@@ -25,8 +25,8 @@ namespace Belle2 {
    * For each layer there is one bit. The layer counting is from 0 to 55.
    * Super-layer information is generated on demand. The super-layer counting goes from 0 to 8.
    *
-   * The numbering scheme just in this class is equivalent to the one defined in [BELLE2-NOTE-TE-2015-022].
-   * --> https://d2comp.kek.jp/record/256/files/BELLE2-NOTE-TE-2015-022.pdf
+   * The numbering scheme just in this class is equivalent to the one defined in the note BELLE2-NOTE-TE-2015-022:
+   * https://docs.belle2.org/record/256
    *
    * @sa HitPatternVXD
    */

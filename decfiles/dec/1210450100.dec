@@ -1,0 +1,37 @@
+# EventType: 1210450100
+# Descriptor: [B+ -> (K*+ -> (Ks -> pi+ pi-)pi+) mu+ mu- ]cc
+# NickName: Bu_Kstmu+mu-_Ks0pi_pi+pi-
+# Documentation: Rare b -> s ll decay, 5 body channel, non-resonant in mu+mu-
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Borys Knysh
+# Email: borys.knysh@gmail.com
+# Cuts: None
+# Date: 20190909
+#
+#
+Alias      K_S0sig  K_S0
+Alias K*+sig K*+
+Alias K*-sig K*-
+ChargeConj K*+sig K*-sig
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+Decay B+sig
+1.0  K*+sig     mu+      mu-                              PHOTOS BTOSLLBALL;
+Enddecay
+CDecay B-sig
+#
+Decay K*+sig
+1.0      K_S0sig  pi+                PHOTOS        VSS;
+Enddecay
+CDecay K*-sig
+#
+Decay K_S0sig
+1.0 pi+     pi-              PHOTOS      PHSP;
+Enddecay
+#
+End

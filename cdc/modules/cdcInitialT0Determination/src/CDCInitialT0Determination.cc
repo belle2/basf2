@@ -1,8 +1,6 @@
 #include "cdc/modules/cdcInitialT0Determination/CDCInitialT0Determination.h"
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreArray.h>
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
-#include "iostream"
 #include "TF1.h"
 #include "TDirectory.h"
 #include "TFile.h"
@@ -48,13 +46,12 @@ void CDCInitialT0DeterminationModule::initialize()
     m_hTDCBoard[ib] = new TH1D(Form("hTDCBoard%d", ib), "",  m_tdcMax - m_tdcMin, m_tdcMin, m_tdcMax);
   }
   m_hT0All = new TH1D("hT0All", "", 8500, 0, 8500);
-
+  m_CDCHits.isRequired();
 }
 void CDCInitialT0DeterminationModule::event()
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  StoreArray<CDCHit> cdcHits;
-  for (const auto& hit : cdcHits) {
+  for (const auto& hit : m_CDCHits) {
     WireID wireid(hit.getID());
     unsigned short lay = wireid.getICLayer();
     unsigned short w = wireid.getIWire();

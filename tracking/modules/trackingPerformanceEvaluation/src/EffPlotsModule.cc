@@ -9,34 +9,20 @@
  **************************************************************************/
 
 #include <tracking/modules/trackingPerformanceEvaluation/EffPlotsModule.h>
-#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
-#include <framework/datastore/RelationsObject.h>
 
 #include <framework/geometry/BFieldManager.h>
 
-#include <vxd/geometry/GeoCache.h>
-
-#include <genfit/Track.h>
-#include <genfit/TrackCand.h>
-
+#include <tracking/dataobjects/MCParticleInfo.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/V0ValidationVertex.h>
 
-#include <root/TTree.h>
-#include <root/TAxis.h>
 #include <root/TObject.h>
 
 #include <boost/foreach.hpp>
 #include <vector>
-#include <utility>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 
@@ -1276,38 +1262,6 @@ void EffPlotsModule::terminate()
 
     m_rootFilePtr->Close();
   }
-}
-
-bool EffPlotsModule::isV0(const MCParticle& the_mcParticle)
-{
-
-  bool isGamma = false;
-  if (abs(the_mcParticle.getPDG()) == 22)
-    isGamma = true;
-
-  bool isK_S0 = false;
-  if (abs(the_mcParticle.getPDG()) == 310)
-    isK_S0 = true;
-
-  bool isK_0 = false;
-  if (abs(the_mcParticle.getPDG()) == 311)
-    isK_0 = true;
-
-  bool isLambda = false;
-  if (abs(the_mcParticle.getPDG()) == 3122)
-    isLambda = true;
-
-  bool twoChargedProngs = false;
-
-  if (the_mcParticle.getDaughters().size() == 2)
-    twoChargedProngs = true;
-
-  if (twoChargedProngs)
-    if (the_mcParticle.getDaughters()[0]->getCharge() == 0)
-      twoChargedProngs = false;
-
-  return ((isGamma || isK_S0 || isK_0 || isLambda) && twoChargedProngs);
-
 }
 
 bool EffPlotsModule::isK_Short(const MCParticle& the_mcParticle)

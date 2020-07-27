@@ -13,16 +13,16 @@
 #include <simulation/monopoles/G4MonopoleEquation.h>
 
 #include <globals.hh>
-#include <G4PhysicalConstants.hh>
-#include <G4SystemOfUnits.hh>
-#include <iomanip>
+#include <CLHEP/Units/PhysicalConstants.h>
+#include <CLHEP/Units/SystemOfUnits.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
-G4MonopoleEquation::G4MonopoleEquation(G4ElectroMagneticField* emField)
-  : G4EquationOfMotion(emField)
+G4MonopoleEquation::G4MonopoleEquation(G4MagneticField* mField)
+  : G4EquationOfMotion(mField)
 {}
 
 G4MonopoleEquation::~G4MonopoleEquation()
@@ -40,10 +40,6 @@ G4MonopoleEquation::SetChargeMomentumMass(G4ChargeState particleChargeState,
   fElCharge = eplus * particleElectricCharge * c_light;
 
   fMagCharge =  eplus * particleMagneticCharge * c_light ;
-
-  // G4cout << " G4MonopoleEquation: ElectricCharge=" << particleElectricCharge
-  //           << "; MagneticCharge=" << particleMagneticCharge
-  //           << G4endl;//TODO print with B2DEBUG or remove altogether
 
   fMassCof = particleMass * particleMass ;
 }

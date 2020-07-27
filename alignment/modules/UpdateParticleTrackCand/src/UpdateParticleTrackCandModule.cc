@@ -12,10 +12,10 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
+#include <framework/geometry/B2Vector3.h>
 #include <mdst/dataobjects/Track.h>
+
 #include <genfit/TrackCand.h>
-#include <TVectorD.h>
 
 using namespace Belle2;
 
@@ -80,8 +80,8 @@ void UpdateParticleTrackCandModule::event()
           }
         }
 
-        TVector3 vertexPos = particle->getVertex();
-        TVector3 vertexMom = particle->getMomentum();
+        B2Vector3D vertexPos = particle->getVertex();
+        B2Vector3D vertexMom = particle->getMomentum();
         trackCand->setPosMomSeed(vertexPos, vertexMom, particle->getCharge());
         trackCand->setPdgCode(particle->getPDGCode());
       }

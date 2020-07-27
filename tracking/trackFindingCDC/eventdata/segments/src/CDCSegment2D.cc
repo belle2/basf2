@@ -224,6 +224,7 @@ CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCTangent* >& tange
   std::vector<std::reference_wrapper<const CDCTangent> > tangents;
   tangents.reserve(tangentPath.size());
   for (const CDCTangent* tangent : tangentPath) {
+    // cppcheck-suppress useStlAlgorithm
     tangents.push_back(std::ref(*tangent));
   }
 
@@ -245,6 +246,7 @@ CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCFacet* >& facetPa
   std::vector<std::reference_wrapper<const CDCFacet> > facets;
   facets.reserve(facetPath.size());
   for (const CDCFacet* facet : facetPath) {
+    // cppcheck-suppress useStlAlgorithm
     facets.push_back(std::ref(*facet));
   }
 
@@ -262,6 +264,7 @@ CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCSegment2D*>& segm
       result = segment2D;
     } else {
       for (const CDCRecoHit2D& recoHit2D : segment2D) {
+        // cppcheck-suppress useStlAlgorithm
         result.push_back(recoHit2D);
       }
     }
@@ -322,6 +325,7 @@ std::vector<const CDCWire*> CDCSegment2D::getWireSegment() const
 {
   std::vector<const CDCWire*> wireSegment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
+    // cppcheck-suppress useStlAlgorithm
     wireSegment.push_back(&(recoHit2D.getWire()));
   }
   return wireSegment;
@@ -331,6 +335,7 @@ CDCWireHitSegment CDCSegment2D::getWireHitSegment() const
 {
   CDCWireHitSegment wireHitSegment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
+    // cppcheck-suppress useStlAlgorithm
     wireHitSegment.push_back(&(recoHit2D.getWireHit()));
   }
   wireHitSegment.setTrajectory2D(getTrajectory2D());
@@ -342,6 +347,7 @@ CDCSegment2D CDCSegment2D::getAlias() const
 {
   CDCSegment2D segment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
+    // cppcheck-suppress useStlAlgorithm
     segment.push_back(recoHit2D.getAlias());
   }
   segment.setISuperCluster(getISuperCluster());
@@ -377,6 +383,7 @@ CDCRLWireHitSegment CDCSegment2D::getRLWireHitSegment() const
 {
   CDCRLWireHitSegment rlWireHitSegment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
+    // cppcheck-suppress useStlAlgorithm
     rlWireHitSegment.push_back(recoHit2D.getRLWireHit());
   }
   rlWireHitSegment.setTrajectory2D(getTrajectory2D());
@@ -389,6 +396,7 @@ CDCSegment2D CDCSegment2D::reversed() const
   CDCSegment2D reverseSegment;
   reverseSegment.reserve(size());
   for (const CDCRecoHit2D& recohit : reversedRange(*this)) {
+    // cppcheck-suppress useStlAlgorithm
     reverseSegment.push_back(recohit.reversed());
   }
 

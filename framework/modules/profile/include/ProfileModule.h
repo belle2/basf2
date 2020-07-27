@@ -124,8 +124,8 @@ namespace Belle2 {
      * @param lmdMemoryExtract Lambda expression to extrat the plotted memory quantity from the MemTime
      *                         data structure. Use either m_extractVirtualMem or m_extractRssMem here
      */
-    void storeMemoryGraph(std::string name, std::string title, std::string xAxisName, std::string imgOutput,
-                          MemoryExtractLambda lmdMemoryExtract);
+    void storeMemoryGraph(const std::string& name, const std::string& title, const std::string& xAxisName, const std::string& imgOutput,
+                          const MemoryExtractLambda& lmdMemoryExtract);
 
     double m_timeOffset;      /**< time at module creation */
     MemTime m_initializeInfo; /**< memory usage and time at initialization */

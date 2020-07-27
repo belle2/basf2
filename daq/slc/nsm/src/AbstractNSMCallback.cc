@@ -1,19 +1,13 @@
 #include "daq/slc/nsm/AbstractNSMCallback.h"
-#include "daq/slc/nsm/NSMCallback.h"
 
-#include "daq/slc/system/LogFile.h"
 #include "daq/slc/system/Time.h"
 
+#include "daq/slc/base/TimeoutException.h"
 #include "daq/slc/database/DBObject.h"
 
 #include "daq/slc/nsm/NSMCommunicator.h"
 
-#include <signal.h>
-#include <string.h>
 #include <cstdlib>
-#include <iostream>
-#include <sstream>
-#include <unistd.h>
 
 using namespace Belle2;
 
@@ -133,8 +127,8 @@ void AbstractNSMCallback::readVar(const NSMMessage& msg, NSMVar& var)
   const char* value = (msg.getData() + pars[2] + 1 + pars[3] + 1);
   var = NSMVar(name, (NSMVar::Type)pars[0], pars[1], value);
   var.setNode(node);
-  var.setId(pars[3]);
-  var.setRevision(pars[4]);
+  var.setId(pars[4]);
+  var.setDate(pars[5]);
 }
 
 bool AbstractNSMCallback::get(const NSMNode& node, NSMVHandler* handler,

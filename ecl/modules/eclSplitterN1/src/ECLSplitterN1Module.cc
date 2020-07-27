@@ -31,7 +31,6 @@
 #include "TH1F.h"
 
 // FRAMEWORK
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <framework/geometry/B2Vector3.h>
@@ -46,7 +45,6 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 
 // MDST
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // NAMESPACES
@@ -327,12 +325,33 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
       // Get the optimal number of neighbours as function of raw energy and background level
       const unsigned int nOptimal = getOptimalNumberOfDigits(highestEnergyID, energyEstimation, backgroundLevel);
+      aECLShower->setNominalNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
+
+      // Get the list of crystals used for the energy calculation
+      std::vector< std::pair<unsigned int, double>> listCrystalPairs; // cell id and weighted reconstructed energy
+      listCrystalPairs.resize(digits.size()); //resize to number of all crystals in cluster
 
       std::vector < std::pair<double, double> > weighteddigits;
       weighteddigits.resize(digits.size());
       for (unsigned int i = 0; i < digits.size(); ++i) {
         weighteddigits.at(i) = std::make_pair((digits.at(i)).getEnergy(), weights.at(i));
+        listCrystalPairs.at(i) = std::make_pair((digits.at(i)).getCellId(), weights.at(i) * (digits.at(i)).getEnergy());
       }
+
+      // sort the listCrystals and keep the n highest in descending order
+      std::sort(listCrystalPairs.begin(), listCrystalPairs.end(), [](auto & left, auto & right) {
+        return left.second < right.second;
+      });
+      std::vector< unsigned int> listCrystals; //cell id
+
+      for (unsigned int i = 0; i < digits.size(); ++i) {
+        if (i < nOptimal) {
+          listCrystals.push_back(listCrystalPairs[i].first);
+        }
+      }
+
+      aECLShower->setNumberOfCrystalsForEnergy(static_cast<double>(listCrystals.size()));
+      aECLShower->setListOfCrystalsForEnergy(listCrystals);
 
       showerEnergy = getEnergySum(weighteddigits, nOptimal);
       B2DEBUG(150, "Shower Energy (1): " << showerEnergy);
@@ -360,7 +379,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
     // Fill shower Ids
     aECLShower->setShowerId(1); // always one (only this single shower in the CR)
-    aECLShower->setHypothesisId(Belle2::ECLCluster::c_nPhotons);
+    aECLShower->setHypothesisId(Belle2::ECLShower::c_nPhotons);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
     // Add relations of all CalDigits of the CR to the local maximum (here: all weights = 1).
@@ -718,12 +737,34 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
         // Get the optimal number of neighbours as function of raw energy and background level
         const unsigned int nOptimal = getOptimalNumberOfDigits(locmaxcellid, energyEstimation, backgroundLevel);
+        aECLShower->setNominalNumberOfCrystalsForEnergy(static_cast<double>(nOptimal));
+
+        // Get the list of crystals used for the energy calculation
+        std::vector< std::pair<unsigned int, double>> listCrystalPairs; // cell id and weighted reconstructed energy
+        listCrystalPairs.resize(newdigits.size()); //resize to number of all crystals in cluster
 
         std::vector < std::pair<double, double> > weighteddigits;
         weighteddigits.resize(newdigits.size());
         for (unsigned int i = 0; i < newdigits.size(); ++i) {
           weighteddigits.at(i) = std::make_pair((newdigits.at(i)).getEnergy(), newweights.at(i));
+          listCrystalPairs.at(i) = std::make_pair((newdigits.at(i)).getCellId(), newweights.at(i) * (newdigits.at(i)).getEnergy());
         }
+
+        // sort the listCrystals and keep the n highest in descending order
+        std::sort(listCrystalPairs.begin(), listCrystalPairs.end(), [](auto & left, auto & right) {
+          return left.second < right.second;
+        });
+
+        std::vector< unsigned int> listCrystals; //cell id
+
+        for (unsigned int i = 0; i < newdigits.size(); ++i) {
+          if (i < nOptimal) {
+            listCrystals.push_back(listCrystalPairs[i].first);
+          }
+        }
+
+        aECLShower->setNumberOfCrystalsForEnergy(static_cast<double>(listCrystals.size()));
+        aECLShower->setListOfCrystalsForEnergy(listCrystals);
 
         showerEnergy = getEnergySum(weighteddigits, nOptimal);
         B2DEBUG(150, "Shower Energy (2): " << showerEnergy);
@@ -745,7 +786,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // Get unique ID
       aECLShower->setShowerId(iShower);
       ++iShower;
-      aECLShower->setHypothesisId(ECLCluster::c_nPhotons);
+      aECLShower->setHypothesisId(Belle2::ECLShower::c_nPhotons);
       aECLShower->setConnectedRegionId(aCR.getCRId());
 
       // Add relation to the CR.

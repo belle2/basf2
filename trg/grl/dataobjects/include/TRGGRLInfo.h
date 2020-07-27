@@ -13,12 +13,14 @@
 //-----------------------------------------------------------
 #pragma once
 #include <TObject.h>
-#include <TVector3.h>
+
 namespace Belle2 {
 
+  /// a class to store TRGGRL TSIM info
   class TRGGRLInfo : public TObject {
   public:
 
+    /// Constructor
     TRGGRLInfo():
       m_n_2dfinder_track(-1),
       m_n_2dfitter_track(-1),
@@ -39,6 +41,7 @@ namespace Belle2 {
       m_n_high_2000_cluster414(-1),
       m_n_high_2000_cluster231516(-1),
       m_n_high_2000_cluster117(-1),
+      m_n_high_2000_endcap_cluster(-1),
       m_nbbc(-1),
       m_nbbtc(-1),
       m_n_klm_track(-1),
@@ -54,6 +57,7 @@ namespace Belle2 {
       m_Trk_b2b_1to5(-1),
       m_Trk_b2b_1to7(-1),
       m_Trk_b2b_1to9(-1),
+      m_Trk_open90(-1),
       m_cluster_b2b_1to3(-1),
       m_cluster_b2b_1to5(-1),
       m_cluster_b2b_1to7(-1),
@@ -66,12 +70,25 @@ namespace Belle2 {
       m_fed(-1),
       m_fp(-1),
       m_eeb(-1),
-      m_fep(-1)
+      m_fep(-1),
+      m_n_st(-1),
+      m_s2s3(-1),
+      m_s2s5(-1),
+      m_s2so(-1),
+      m_s2f3(-1),
+      m_s2f5(-1),
+      m_s2fo(-1),
+      m_bwdsb(-1),
+      m_bwdnb(-1),
+      m_fwdsb(-1),
+      m_fwdnb(-1),
+      m_brlfb(-1),
+      m_brlnb(-1)
     {}
     ~TRGGRLInfo() {}
 
 
-    /**set the number of 2D tracks*/
+    /**get the number of 2D tracks*/
     int getN2Dfindertrk() const  {return m_n_2dfinder_track;}
     /**get the number of 2D fitter tracks*/
     int getN2Dfittertrk() const  {return m_n_2dfitter_track;}
@@ -119,15 +136,15 @@ namespace Belle2 {
     int getBhabhaVeto() const {return m_bhabhaveto;}
     /**get eclbhabha*/
     int geteclBhabhaVeto() const {return m_eclbhabhaveto;}
-    /***/
+    /**get PhiPairHigh*/
     int getPhiPairHigh() const {return m_n_PhiPairHigh;}
-    /***/
+    /**get PhiPairLow*/
     int getPhiPairLow() const {return m_n_PhiPairLow;}
-    /***/
+    /**3D pair*/
     int get3DPair() const {return m_n_3DPair;}
-    /***/
+    /**NSameHem1Trk*/
     int getNSameHem1Trk() const {return m_n_SameHem1Trk;}
-    /***/
+    /**NOppHem1Trk*/
     int getNOppHem1Trk() const {return m_n_OppHem1Trk;}
     /**get Trk_b2b_1to3*/
     int getTrk_b2b_1to3() const {return m_Trk_b2b_1to3;}
@@ -137,6 +154,8 @@ namespace Belle2 {
     int getTrk_b2b_1to7() const {return m_Trk_b2b_1to7;}
     /**get Trk_b2b_1to9*/
     int getTrk_b2b_1to9() const {return m_Trk_b2b_1to9;}
+    /**get Trk_open90*/
+    int getTrk_open90() const {return m_Trk_open90;}
     /**get cluster_b2b_1to3*/
     int getcluster_b2b_1to3() const {return m_cluster_b2b_1to3;}
     /**get cluster_b2b_1to5*/
@@ -163,7 +182,34 @@ namespace Belle2 {
     int geteeb() const {return m_eeb;}
     /**get fep: one track & one matched & track-cluster b2b */
     int getfep() const {return m_fep;}
-
+    /**get the number of short tracks*/
+    int getNshorttrk() const  {return m_n_st;}
+    /**get s2s3: short-to-short b2b, 10 to 30 degress*/
+    int gets2s3() const  {return m_s2s3;}
+    /**get s2s5: short-to-short b2b, 10 to 50 degress*/
+    int gets2s5() const  {return m_s2s5;}
+    /**get s2so: short-to-short opening angle > 90 degrees*/
+    int gets2so() const  {return m_s2so;}
+    /**get s2f3: short-to-full b2b, 10 to 30 degress*/
+    int gets2f3() const  {return m_s2f3;}
+    /**get s2f5: short-to-full b2b, 10 to 50 degress*/
+    int gets2f5() const  {return m_s2f5;}
+    /**get s2fo: short-to-full opening angle > 90 degrees*/
+    int gets2fo() const  {return m_s2fo;}
+    /**get bwdsb: short track matched to bhabha cluster in bwd endcap*/
+    int getbwdsb() const  {return m_bwdsb;}
+    /**get bwdnb: neutral bhabha cluster in bwd endcap*/
+    int getbwdnb() const  {return m_bwdnb;}
+    /**get fwdsb: short track matched to bhabha cluster in fwd endcap*/
+    int getfwdsb() const  {return m_bwdsb;}
+    /**get fwdnb: neutral bhabha cluster in fwd endcap*/
+    int getfwdnb() const  {return m_bwdnb;}
+    /**get brlfb: full track matched to bhabha cluster in barrel*/
+    int getbrlfb() const  {return m_brlfb;}
+    /**get brlnb: neutral bhabha cluster in barrel*/
+    int getbrlnb() const  {return m_brlnb;}
+    /**get GDL input bit */
+    bool getInputBits(int i) const {return m_InputBits[i];}
 
     /**set the number of 2D tracks*/
     void setN2Dfindertrk(int N2Dfindertrk)  {m_n_2dfinder_track = N2Dfindertrk;}
@@ -211,15 +257,15 @@ namespace Belle2 {
     void setBhabhaVeto(int bha)  {m_bhabhaveto = bha;}
     /**set the value of sbhabha*/
     void seteclBhabhaVeto(int eclbha)  {m_eclbhabhaveto = eclbha;}
-    /***/
+    /**set PairHigh*/
     void setPairHigh(int PhiPairHigh) {m_n_PhiPairHigh = PhiPairHigh;}
-    /***/
+    /**set PairLow*/
     void setPairLow(int PhiPairLow) {m_n_PhiPairLow = PhiPairLow;}
-    /***/
+    /**set 3DPair*/
     void set3DPair(int n3DPair) {m_n_3DPair = n3DPair;}
-    /***/
+    /**set NSameHem1Trk*/
     void setNSameHem1Trk(int SameHem1Trk) {m_n_SameHem1Trk = SameHem1Trk;}
-    /***/
+    /**set NOppHem1Trk*/
     void setNOppHem1Trk(int OppHem1Trk) {m_n_OppHem1Trk = OppHem1Trk;}
     /**set the value of Trk_b2b_1to3*/
     void setTrk_b2b_1to3(int Trk_b2b_1to3) {m_Trk_b2b_1to3 = Trk_b2b_1to3;}
@@ -229,6 +275,8 @@ namespace Belle2 {
     void setTrk_b2b_1to7(int Trk_b2b_1to7) {m_Trk_b2b_1to7 = Trk_b2b_1to7;}
     /**set the value of Trk_b2b_1to9*/
     void setTrk_b2b_1to9(int Trk_b2b_1to9) {m_Trk_b2b_1to9 = Trk_b2b_1to9;}
+    /**set the value of Trk_open90*/
+    void setTrk_open90(int Trk_open90) {m_Trk_open90 = Trk_open90;}
     /**set the value of cluster_b2b_1to3*/
     void setcluster_b2b_1to3(int cluster_b2b_1to3) {m_cluster_b2b_1to3 = cluster_b2b_1to3;}
     /**set the value of cluster_b2b_1to5*/
@@ -255,6 +303,34 @@ namespace Belle2 {
     void seteeb(int eeb) {m_eeb = eeb;}
     /**set fep: one track & one matched & track-cluster b2b*/
     void setfep(int fep) {m_fep = fep;}
+    /**set the number of short tracks*/
+    void setNshorttrk(int Nshorttrk)  {m_n_st = Nshorttrk;}
+    /**set s2s3: short-to-short b2b, 10 to 30 degress*/
+    void sets2s3(int s2s3) {m_s2s3 = s2s3;}
+    /**set s2s5: short-to-short b2b, 10 to 50 degress*/
+    void sets2s5(int s2s5) {m_s2s5 = s2s5;}
+    /**set s2so: short-to-short opening angle > 90 degrees*/
+    void sets2so(int s2so) {m_s2so = s2so;}
+    /**set s2f3: short-to-full b2b, 10 to 30 degress*/
+    void sets2f3(int s2f3) {m_s2f3 = s2f3;}
+    /**set s2f5: short-to-full b2b, 10 to 50 degress*/
+    void sets2f5(int s2f5) {m_s2f5 = s2f5;}
+    /**set s2fo: short-to-full opening angle > 90 degrees*/
+    void sets2fo(int s2fo) {m_s2fo = s2fo;}
+    /**set bwdsb: short track matched to bhabha cluster in bwd endcap*/
+    void setbwdsb(int bwdsb) {m_bwdsb = bwdsb;}
+    /**set bwdnb: neutral bhabha cluster in bwd endcap*/
+    void setbwdnb(int bwdnb) {m_bwdnb = bwdnb;}
+    /**set fwdsb: short track matched to bhabha cluster in fwd endcap*/
+    void setfwdsb(int fwdsb) {m_fwdsb = fwdsb;}
+    /**set fwdnb: neutral bhabha cluster in fwd endcap*/
+    void setfwdnb(int fwdnb) {m_fwdnb = fwdnb;}
+    /**set brlfb: full track matched to bhabha cluster in barrel*/
+    void setbrlfb(int brlfb) {m_brlfb = brlfb;}
+    /**set brlnb: neutral bhabha cluster in barrel*/
+    void setbrlnb(int brlnb) {m_brlnb = brlnb;}
+    /**set GDL input bit*/
+    void setInputBits(int i, bool bit) {m_InputBits[i] = bit;}
 
 
   private:
@@ -312,15 +388,15 @@ namespace Belle2 {
     int m_bhabhaveto;
     /**ecl Bhabha veto (only ecl information is used), eclbahbah:1, non-eclbhabha:0*/
     int m_eclbhabhaveto;
-    /***/
+    /**number of PhiPairHigh*/
     int m_n_PhiPairHigh;
-    /***/
+    /**number of PhiPairLow*/
     int m_n_PhiPairLow;
-    /***/
+    /**number of 3DPair*/
     int m_n_3DPair;
-    /***/
+    /**number of SameHem+1Trk*/
     int m_n_SameHem1Trk;
-    /***/
+    /**number of OppHem+1Trk*/
     int m_n_OppHem1Trk;
     /**Trk_b2b_1to3*/
     int m_Trk_b2b_1to3;
@@ -330,6 +406,8 @@ namespace Belle2 {
     int m_Trk_b2b_1to7;
     /**Trk_b2b_1to9*/
     int m_Trk_b2b_1to9;
+    /**Trk_open90*/
+    int m_Trk_open90;
     /**cluster_b2b_1to3*/
     int m_cluster_b2b_1to3;
     /**cluster_b2b_1to5*/
@@ -356,9 +434,37 @@ namespace Belle2 {
     int m_eeb;
     /**fep: one track & one matched & track-cluster b2b*/
     int m_fep;
+    /**the number of short tracks*/
+    int m_n_st;
+    /**s2s3: short-to-short b2b, 10 to 30 degress*/
+    int m_s2s3;
+    /**s2s5: short-to-short b2b, 10 to 50 degress*/
+    int m_s2s5;
+    /**s2so: short-to-short opening angle > 90 degrees*/
+    int m_s2so;
+    /**s2f3: short-to-full b2b, 10 to 30 degress*/
+    int m_s2f3;
+    /**s2f5: short-to-full b2b, 10 to 50 degress*/
+    int m_s2f5;
+    /**s2fo: short-to-full opening angle > 90 degrees*/
+    int m_s2fo;
+    /**bwdsb: short track matched to bhabha cluster in bwd endcap*/
+    int m_bwdsb;
+    /**bwdnb: neutral bhabha cluster in bwd endcap*/
+    int m_bwdnb;
+    /**fwdsb: short track matched to bhabha cluster in fwd endcap*/
+    int m_fwdsb;
+    /**fwdnb: neutral bhabha cluster in fwd endcap*/
+    int m_fwdnb;
+    /**brlfb: full track matched to bhabha cluster in barrel*/
+    int m_brlfb;
+    /**brlnb: neutral bhabha cluster in barrel*/
+    int m_brlnb;
+    /**GDL input bits**/
+    std::vector<bool> m_InputBits = std::vector<bool>(320, false);
 
     /**! The Class title*/
-    ClassDef(TRGGRLInfo, 2); /*< the class title */
+    ClassDef(TRGGRLInfo, 3); /*< the class title */
   };
 } // end namespace Belle2
 

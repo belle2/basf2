@@ -15,12 +15,12 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <string>
-#include <stdexcept>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 
+#include <TF1.h>
 #include <TLorentzVector.h>
 
 using namespace std;
@@ -114,13 +114,13 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
     // initial 2 (e+/e-), virtual 3 (Z/gamma*)
     // check if particle should be made virtual according to steering options:
-    if (i < m_nVirtual && i >= m_nInitial)
+    if (i < m_indexVirtual && i >= m_indexInitial)
       p.addStatus(MCParticle::c_IsVirtual);
 
-    if (i < m_nInitial)
+    if (i < m_indexInitial)
       p.addStatus(MCParticle::c_Initial);
 
-    if (m_nVirtual < m_nInitial) B2WARNING("IsVirtual particle requested but is overwritten by Initial");
+    if (m_indexVirtual < m_indexInitial) B2WARNING("IsVirtual particle requested but is overwritten by Initial");
 
   }
 //   return eventID;

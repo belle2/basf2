@@ -17,14 +17,9 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-#include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDCluster.h>
 
-#include <tracking/dataobjects/DATCONSVDDigit.h>
-
 #include <vxd/dataobjects/VxdID.h>
-
-#include <genfit/PlanarMeasurement.h>
 
 #include <vector>
 #include <string>
@@ -50,8 +45,8 @@ namespace Belle2 {
     *  @param clusters            container carrying pointers to DATCONSVDCluster (1 or 2 (u+v), must not be nullptr).
     *  @param aSensorInfo         SensorInfoBase for testing purposes, usually derived from first cluster.
     */
-    DATCONSVDSpacePoint(std::vector<SVDCluster const*>& clusters,
-                        VXD::SensorInfoBase const* aSensorInfo = nullptr);
+    explicit DATCONSVDSpacePoint(std::vector<SVDCluster const*>& clusters,
+                                 VXD::SensorInfoBase const* aSensorInfo = nullptr);
 
     /** Default constructor for the ROOT IO. */
     DATCONSVDSpacePoint() :
@@ -66,7 +61,7 @@ namespace Belle2 {
     *  @param sensorID           VxdID of sensor the DATCONSVDSpacePoint shall be on.
     *  @param detID              SensorType detector-type (PXD, SVD, ...) to be used.
     */
-    DATCONSVDSpacePoint(B2Vector3<double> pos, std::pair<double, double> normalizedLocal,
+    DATCONSVDSpacePoint(B2Vector3<double>& pos, const std::pair<double, double>& normalizedLocal,
                         std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID) :
       m_position(pos),
       m_normalizedLocal(normalizedLocal),
@@ -74,8 +69,6 @@ namespace Belle2 {
       m_vxdID(sensorID), m_sensorType(detID)
     {}
 
-    /** Default Destructor. */
-    virtual ~DATCONSVDSpacePoint() {}
     //-----------------------------------------------------------------------------------------------------------------
 
     /** overloaded '<<' stream operator. Print secID to stream by converting it to string */

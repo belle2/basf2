@@ -1,5 +1,6 @@
 import basf2
 from basf2 import _constwrapper
+from b2test_utils import configure_logging_for_tests
 import ROOT
 from ROOT import Belle2
 import multiprocessing
@@ -18,11 +19,7 @@ class DBInterface(unittest.TestCase):
         self.assertNotEqual(p.exitcode, 0)
 
     def setUp(self):
-        # disable error summary
-        basf2.logging.enable_summary(False)
-        # modify logging to remove the useless module: lines
-        for level in basf2.LogLevel.values.values():
-            basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
+        configure_logging_for_tests()
 
     def tearDown(self):
         Belle2.DBStore.Instance().reset()

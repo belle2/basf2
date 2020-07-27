@@ -287,7 +287,7 @@ const boost::array<FilterID::filterTypes, FilterID::numFilters> FilterID::enumVe
 
 
 
-FilterID::filterTypes FilterID::getFilterType(std::string filterString)
+FilterID::filterTypes FilterID::getFilterType(const std::string& filterString)
 {
   // WARNING TODO FIXME: improve that function (by the way, it is not sorted like the entries from above)
   if (filterString == nameAngles3D)

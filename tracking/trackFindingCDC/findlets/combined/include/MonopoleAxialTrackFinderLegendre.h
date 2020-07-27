@@ -58,9 +58,10 @@ namespace Belle2 {
       void apply(const std::vector<CDCWireHit>& wireHits, std::vector<CDCTrack>& tracks);
 
     private: // findlets
+      /// Class of Pass keys
       using EPass = AxialTrackCreatorHitLegendre::EPass;
 
-      // Findlet for straight legendre pass
+      /// Findlet for straight legendre pass
       AxialTrackCreatorHitLegendre m_straightMonopoleAxialTrackCreatorHitLegendre{EPass::Straight};
 
       // Other findlets, like HitMigrator and Merger are not yet used because of limiting thresholds

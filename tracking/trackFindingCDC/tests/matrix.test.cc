@@ -12,15 +12,10 @@
 This file contains some basic investigation on numerically matrix algorithms.
 */
 
-#include <cmath>
 #include <gtest/gtest.h>
-#include <functional>
 
-#include <map>
 #include <vector>
 #include <Eigen/Dense>
-#include <TMatrixDSym.h>
-#include <Math/SMatrix.h>
 
 
 // 1. Study of matrix inversions

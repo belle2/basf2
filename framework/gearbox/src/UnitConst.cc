@@ -131,7 +131,7 @@ namespace Belle2 {
 
   double Unit::convertValue(double value, const std::string& unitString)
   {
-    map<string, double>::const_iterator it = s_conversionFactors.find(unitString);
+    auto it = s_conversionFactors.find(unitString);
     if (it == s_conversionFactors.end()) {
       B2ERROR("Could not find conversion factor for unit " << unitString << ", assuming 1.0");
       return value;
@@ -141,7 +141,7 @@ namespace Belle2 {
 
   double Unit::convertValueToUnit(double value, const std::string& unitString)
   {
-    map<string, double>::const_iterator it = s_conversionFactors.find(unitString);
+    auto it = s_conversionFactors.find(unitString);
     if (it == s_conversionFactors.end()) {
       B2ERROR("Could not find conversion factor for unit " << unitString << ", assuming 1.0");
       return value;
@@ -160,6 +160,26 @@ namespace Belle2 {
 }
 
 /*** The implementation of the Const class defined in Const.h starts here ***/
+
+std::string Const::parseDetectors(EDetector det)
+{
+  if (det == Const::PXD)   return "PXD";
+  else if (det == Const::SVD)   return "SVD";
+  else if (det == Const::CDC)   return "CDC";
+  else if (det == Const::TOP)   return "TOP";
+  else if (det == Const::ARICH) return "ARICH";
+  else if (det == Const::ECL)   return "ECL";
+  else if (det == Const::KLM)   return "KLM";
+  else if (det == Const::BKLM)  return "BKLM";
+  else if (det == Const::EKLM)  return "EKLM";
+  else if (det == Const::IR)    return "IR";
+  else if (det == Const::TRG)   return "TRG";
+  else if (det == Const::DAQ)   return "DAQ";
+  else if (det == Const::BEAST) return "BEAST";
+  else if (det == Const::TEST)  return "TEST";
+  else B2FATAL("Unknown detector component: " << det);
+  return "INVALID";
+}
 
 Const::DetectorSet operator + (const Const::DetectorSet& firstSet, const Const::DetectorSet& secondSet)
 {
@@ -189,7 +209,10 @@ unsigned short Const::DetectorSet::getBit(Const::EDetector det)
             "identifier (possibly a subdetector):" << det);
     return 0;
   }
-
+  if (det > TEST) {
+    B2ERROR("Const::DetectorSet::getBit(): Invalid detector ID");
+  }
+  // cppcheck-suppress shiftTooManyBits
   return (1 << (det - 1));
 }
 
@@ -359,7 +382,7 @@ void Const::ParticleSet::add(const Const::ParticleType& p)
 {
   if (contains(p))
     return;
-  m_particles.push_back(Const::ParticleType(p.getPDGCode(), this, m_particles.size()));
+  m_particles.emplace_back(p.getPDGCode(), this, m_particles.size());
 }
 
 bool Const::ParticleSet::contains(const Const::ParticleType& p) const

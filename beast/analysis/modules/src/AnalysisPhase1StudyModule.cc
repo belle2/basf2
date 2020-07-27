@@ -11,29 +11,17 @@
 #include <beast/analysis/modules/AnalysisPhase1StudyModule.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
-#include <boost/foreach.hpp>
 
-
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
 #include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
 
 using namespace std;
 
@@ -135,7 +123,7 @@ void AnalysisPhase1StudyModule::event()
   double s = 0;
   //double xraw = 0;
   //double yraw = 0;
-  double sraw = 0;
+  //double sraw = 0;
   double E = 0;
   double rate = 0;
   StoreArray<SADMetaHit> sadMetaHits;
@@ -147,7 +135,7 @@ void AnalysisPhase1StudyModule::event()
     s = sadMetaHit.gets();
     //xraw = sadMetaHit.getxraw();
     //yraw = sadMetaHit.getyraw();
-    sraw = sadMetaHit.getsraw();
+    double sraw = sadMetaHit.getsraw();
     E = sadMetaHit.getE();
     rate = sadMetaHit.getrate();
     h_sad_sir[0]->Fill(s / 100., rate);

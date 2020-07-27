@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/filters/segment/BaseSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/segment/SegmentFilterFactory.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
@@ -23,6 +24,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
 
+    // Guard to prevent repeated instantiations
+    extern template class TrackFindingCDC::Chooseable<BaseSegmentFilter>;
+    extern template class TrackFindingCDC::ChooseableFilter<SegmentFilterFactory>;
+
     /// Deletes fake segments that have been rejected by a filter
     class SegmentRejecter : public Findlet<CDCSegment2D&> {
 
@@ -32,7 +37,7 @@ namespace Belle2 {
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      SegmentRejecter(const std::string& defaultFilterName = "all");
+      explicit SegmentRejecter(const std::string& defaultFilterName = "all");
 
       /// Short description of the findlet
       std::string getDescription() final;

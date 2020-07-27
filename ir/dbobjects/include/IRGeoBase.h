@@ -10,11 +10,9 @@
 
 #pragma once
 
-#include <framework/gearbox/Unit.h>
 #include <map>
 #include <string>
 #include <TObject.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
@@ -71,6 +69,7 @@ namespace Belle2 {
     /**
      * Get string parameter with giving default value in case of non-existence
      * @param name parameter name
+     * @param def default parameter value
      */
     const std::string& getParameterStr(const std::string& name, const std::string& def) const
     {

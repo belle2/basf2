@@ -22,6 +22,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <top/dataobjects/TOPRecBunch.h>
 #include <mdst/dataobjects/Track.h>
 
@@ -89,6 +90,8 @@ namespace Belle2 {
     int m_cutNphot;   /**< Number of photon cut */
 
     // histograms
+    TH1F* m_BoolEvtMonitor = 0;           /**< Event desynchronization monitoring */
+
     TH1F* m_recoTime = 0;           /**< time distribution */
     TH1F* m_recoTimeBg = 0;         /**< time distribution background */
     TH1F* m_recoTimeMinT0 = 0;      /**< time distribution in respect to the first peak */
@@ -96,13 +99,22 @@ namespace Belle2 {
     TH1F* m_recoPull = 0;           /**< pull distribution */
     TH2F* m_recoTimeDiff_Phic = 0;  /**< residuals vs phiCer */
     TProfile* m_recoPull_Phic = 0;  /**< pulls vs phiCer */
+    TH1F* m_goodHitsPerEventAll = 0; /**< Histograms for good hits per event (all slots)*/
+    TH1F* m_badHitsPerEventAll = 0; /**< Histograms for bad hits per event (all slots)*/
+    TH1F* m_goodTDCAll = 0; /**< Histograms for TDC distribution of good hits (all slots)*/
+    TH1F* m_badTDCAll = 0; /**< Histograms for TDC distribution of bad hits (all slots)*/
 
     TH1F* m_goodHits = nullptr; /**< Histogram for number of accumulated good hits */
     TH1F* m_badHits = nullptr; /**< Histogram for number of accumulated bad hits */
     TH2F* m_window_vs_slot = 0; /**< Histogram window w.r.t reference vs. slot number */
     TH1F* m_bunchOffset = 0; /**< reconstructed bunch: current offset */
     TH1F* m_time = 0; /**< time distribution of good hits */
-    TProfile* m_hitsPerEvent = 0; /**< a profile histogram of good hits per event */
+    TProfile* m_goodHitsPerEventProf = 0; /**< a profile histogram of good hits per event */
+    TProfile* m_badHitsPerEventProf = 0; /**< a profile histogram of bad hits per event */
+    TH1F* m_TOPOccAfterInjLER = 0; /**< Histogram Ndigits after LER injection */
+    TH1F* m_TOPOccAfterInjHER = 0; /**< Histogram Ndigits after HER injection */
+    TH1F* m_TOPEOccAfterInjLER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+    TH1F* m_TOPEOccAfterInjHER = 0; /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
     std::vector<TH2F*> m_window_vs_asic; /**< Histograms window w.r.t reference vs. ASIC */
     std::vector<TH2F*> m_goodHitsXY; /**< Histograms (2D) for good hits in x-y*/
@@ -123,6 +135,7 @@ namespace Belle2 {
     int m_numModules = 0; /**< number of TOP modules */
 
     // dataobjects
+    StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
     StoreArray<Track> m_tracks;    /**< collection of tracks */

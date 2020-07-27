@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
-// #include <tracking/trackFindingCDC/findlets/minimal/TrackSZFitter.h>
 
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
@@ -23,7 +22,7 @@
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 #include <tracking/trackFindingCDC/utilities/HitComperator.h>
 
-#include <tracking/trackFindingCDC/hough/quadratic/HitQuadraticLegendre.h>
+#include <tracking/trackFindingCDC/hough/hyperbolic/HitHyperHough.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackInspector.h>
 
 #include <vector>
@@ -66,14 +65,14 @@ namespace Belle2 {
       /// Create RL wire hits out of the wire hits
       RLTaggedWireHitCreator m_rlWireHitCreator;
       /// Find matching hits to a track
-      StereoHitTrackQuadTreeMatcher<HitQuadraticLegendre> m_matcher;
+      StereoHitTrackQuadTreeMatcher<HitHyperHough> m_matcher;
       /// Filter for the Stereo Hits added to the track
       FilterSelector<CDCTrack, CDCRLWireHit, ChooseableFilter<StereoHitFilterFactory>> m_filterSelector;
       /// Select only those where the relation is unique (or the best one in those groups)
       SingleMatchSelector<CDCTrack, CDCRLWireHit, HitComperator> m_singleMatchSelector;
       /// Add the hits to the tracks
       StereoHitTrackAdder m_adder;
-      // Print found tracks
+      /// Print found tracks
       TrackInspector m_inspector;
       /// Fit the tracks after creation TODO the fitter obviously should be different
 //       TrackSZFitter m_szFitter;

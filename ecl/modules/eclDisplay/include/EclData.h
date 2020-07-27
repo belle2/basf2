@@ -18,9 +18,6 @@
 #include <TTree.h>
 #include <TH1F.h>
 
-class TTree;
-
-
 namespace Belle2 {
 
   class ECLCalDigit;

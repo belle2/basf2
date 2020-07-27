@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCHIT_H
-#define CDCHIT_H
+#pragma once
 
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/WireID.h>
 #include <framework/dataobjects/DigitBase.h>
@@ -41,9 +39,9 @@ namespace Belle2 {
   public:
     /** Empty constructor for ROOT IO. */
     CDCHit() :
-      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_status(0), m_otherHitIndex(-1), m_adcCountAtLeadingEdge(0)
+      m_eWire(65535), m_tdcCount(0), m_adcCount(0), m_status(0), m_tot(0), m_otherHitIndex(-1), m_adcCountAtLeadingEdge(0)
     {
-      B2DEBUG(250, "Empty CDCHit Constructor called.");
+      B2DEBUG(29, "Empty CDCHit Constructor called.");
     }
 
     /** Constructor to set all internal variables.
@@ -57,21 +55,23 @@ namespace Belle2 {
      *  @param iLayer      Layer number inside the Super Layer.
      *  @param iWire       Wire number in the Layer.
      *  @param status         Status of the hit.
+     *  @param tot            Time over threshold.
      *  @param otherHitIndex  Index to the other hit.
-     *  @param leadingEdgeADC ADCcount for a narrow gate at the leading edge.
+     *  @param leadingEdgeADC FADCcount at a sampling point near the leading edge.
      */
     CDCHit(unsigned short tdcCount, unsigned short adcCount,
-           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status = 0, signed short otherHitIndex = -1,
-           unsigned short leadingEdgeADC = 0);
+           unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire, unsigned short status = 0, unsigned short tot = 0,
+           signed short otherHitIndex = -1, unsigned short leadingEdgeADC = 0);
 
     /** Constructor using the WireID object. */
-    CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID, unsigned short status = 0,
+    CDCHit(unsigned short tdcCount, unsigned short adcCount, const WireID& wireID, unsigned short status = 0, unsigned short tot = 0,
            signed short otherHitIndex = -1, unsigned short leadingEdgeADC = 0)
     {
       setTDCCount(tdcCount);
       setADCCount(adcCount);
       setWireID(wireID);
       setStatus(status);
+      setTOT(tot);
       setOtherHitIndex(otherHitIndex);
       setADCCountAtLeadingEdge(leadingEdgeADC);
     }
@@ -87,7 +87,7 @@ namespace Belle2 {
      */
     void setWireID(unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire)
     {
-      B2DEBUG(250, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
+      B2DEBUG(29, "setWireId called with" << iSuperLayer << ", " << iLayer << ", " << iWire);
       m_eWire = WireID(iSuperLayer, iLayer, iWire).getEWire();
     }
 
@@ -97,14 +97,13 @@ namespace Belle2 {
       m_eWire = wireID.getEWire();
     }
 
-
     /** Setter for CDCHit status.
      *
      *  @param status  indicates the CDCHit object status.
      */
     void setStatus(unsigned short status)
     {
-      B2DEBUG(250, "setStatus called with " << status);
+      B2DEBUG(29, "setStatus called with " << status);
       m_status = status;
     }
 
@@ -126,7 +125,7 @@ namespace Belle2 {
      */
     void setTDCCount(short tdcCount)
     {
-      B2DEBUG(250, "setTDCCount called with " << tdcCount);
+      B2DEBUG(29, "setTDCCount called with " << tdcCount);
       m_tdcCount = tdcCount;
     }
 
@@ -153,6 +152,12 @@ namespace Belle2 {
     void setADCCountAtLeadingEdge(unsigned short adcCount)
     {
       m_adcCountAtLeadingEdge = adcCount;
+    }
+
+    /** Setter for TOT. */
+    void setTOT(unsigned short tot)
+    {
+      m_tot = tot;
     }
 
     /** Getter for iWire. */
@@ -237,6 +242,12 @@ namespace Belle2 {
       return m_adcCountAtLeadingEdge;
     }
 
+    /** Getter for TOT. */
+    unsigned short getTOT() const
+    {
+      return m_tot;
+    }
+
     /**
      * Implementation of the base class function.
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
@@ -246,7 +257,7 @@ namespace Belle2 {
 
     /**
      * Implementation of the base class function.
-     * Pile-up method.
+     * Overlay method.
      * @param bg BG digit
      * @return append status
      */
@@ -271,17 +282,17 @@ namespace Belle2 {
     /** Status of CDCHit. */
     unsigned short  m_status;
 
+    /** Time over threshod. */
+    unsigned short  m_tot;
+
     /** Index to the other hit. */
     signed short  m_otherHitIndex;
 
     /** ADC count at leading edge. */
     unsigned short  m_adcCountAtLeadingEdge;
 
-
   private:
     /** ROOT Macro.*/
-    ClassDefOverride(CDCHit, 7);
+    ClassDefOverride(CDCHit, 8);
   };
 } // end namespace Belle2
-
-#endif

@@ -15,28 +15,22 @@
 #define TRGCDC_SHORT_NAMES
 
 #include "trg/trg/Debug.h"
+#include "trg/cdc/Segment.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/EventTime.h"
-#include <cstdlib>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <bitset>
-#include <sstream>
 #include <vector>
 
-#include "cdc/dataobjects/CDCHit.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/trg/Utilities.h"
-#include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
-#include "framework/datastore/StoreArray.h"
-#include "framework/datastore/RelationArray.h"
 
-#include "TH1.h"
 #include "TH1D.h"
 
 using namespace std;
@@ -45,7 +39,15 @@ namespace Belle2 {
 
   TRGCDCEventTime::TRGCDCEventTime(const TRGCDC& TRGCDC, bool makeRootFile)
     : _cdc(TRGCDC),
-      m_makeRootFile(makeRootFile)
+      cnt{{0}},
+  ft{{{0}}},
+  m_foundT0(0), // 2019/07/31 by ytlai
+  m_minusET(0),
+  m_noET(0),
+  threshold(0),
+  m_eventN(0),
+  m_makeRootFile(makeRootFile),
+  m_ver(0)
   {
 
     if (m_makeRootFile) m_fileEvtTime = new TFile("ETF.root", "RECREATE");
@@ -63,11 +65,13 @@ namespace Belle2 {
 
     memset(cnt, 0, sizeof cnt);
     memset(ft, 0, sizeof ft);
-    m_minusET = 0;
-    m_noET = 0;
-    m_eventN = 0;
-    m_ver = 0;
-    m_foundT0 = 0;
+
+    // move to constructor
+    //m_minusET = 0;
+    //m_noET = 0;
+    //m_eventN = 0;
+    //m_ver = 0;
+    //m_foundT0 = 0;
   }
   TRGCDCEventTime::~TRGCDCEventTime()
   {

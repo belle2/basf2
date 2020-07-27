@@ -10,12 +10,10 @@
 
 #pragma once
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <string>
 #include <TVector3.h>
-#include <TVector2.h>
 #include <TRotation.h>
 
 namespace Belle2 {
@@ -241,7 +239,7 @@ namespace Belle2 {
      * Set vector of numbers of aerogel slots in individual ring
      * @param nAeroSlotsIndividualRing vector of numbers of aerogel slots in individual ring
      */
-    void setNAeroSlotsIndividualRing(std::vector<int>& nAeroSlotsIndividualRing) { m_nAeroSlotsIndividualRing = nAeroSlotsIndividualRing; }
+    void setNAeroSlotsIndividualRing(const std::vector<int>& nAeroSlotsIndividualRing) { m_nAeroSlotsIndividualRing = nAeroSlotsIndividualRing; }
 
     /**
      * Get number of aerogel layers
@@ -519,7 +517,7 @@ namespace Belle2 {
     double m_imgTubeThickness =
       0.0; /**< imaginary tube thikness just after aerogel layers used as volume to which tracks are extrapolated */
 
-    double m_compensationARICHairVolumeThick_min; /**< Minimum thickness of the compensation volume with ARICH air */
+    double m_compensationARICHairVolumeThick_min = 0; /**< Minimum thickness of the compensation volume with ARICH air */
 
     ClassDefOverride(ARICHGeoAerogelPlane, 3); /**< ClassDef */
 

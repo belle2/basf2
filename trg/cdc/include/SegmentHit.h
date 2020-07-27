@@ -30,7 +30,7 @@ namespace Belle2 {
   public:
 
     /// Constructor.
-    TRGCDCSegmentHit(const TRGCDCSegment&);
+    explicit TRGCDCSegmentHit(const TRGCDCSegment&);
 
     /// Destructor
     virtual ~TRGCDCSegmentHit();

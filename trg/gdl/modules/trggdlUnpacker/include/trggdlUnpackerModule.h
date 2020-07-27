@@ -14,9 +14,7 @@
 #ifndef TRGGDLUNPACKER_H
 #define TRGGDLUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
 #include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
@@ -24,11 +22,9 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBBadrun.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-#include <trg/gdl/dbobjects/TRGGDLDBBadrun.h>
 
 namespace Belle2 {
 
@@ -80,18 +76,35 @@ namespace Belle2 {
 
     private:
 
+      /** flag to dump data base map **/
+      bool m_print_dbmap;
+
       /** flag to select board search mode **/
       bool m_trgReadoutBoardSearch;
 
       StoreArray<TRGGDLUnpackerStore> store;
 
       //condition database for unpacer
-      DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
+      DBObjPtr<TRGGDLDBUnpacker> m_dbunpacker;
+      //condition database for badrun
+      DBObjPtr<TRGGDLDBBadrun> m_dbbadrun;
+
+      //variables to store database
       int LeafBitMap[320];
       char LeafNames[320][100];
-      //condition database for badrun
-      DBObjPtr<TRGGDLDBBadrun> m_badrun;
-
+      int nword_header;
+      int n_clocks;
+      int nBits;
+      int n_leafs;
+      int n_leafsExtra;
+      int conf;
+      int bad_flag;
+      int unpack_flag;
+      std::vector<std::vector<int>> BitMap;
+      std::vector<std::vector<int>> BitMap_extra;
+      int conf_map;
+      int evt_map;
+      int clk_map;
     };
   }
 } // end namespace Belle2

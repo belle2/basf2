@@ -21,19 +21,10 @@ class G4MagneticField;
 class G4Mag_UsualEqRhs;
 class G4MagIntegratorStepper;
 class G4ChordFinder;
-class G4VUserPrimaryGeneratorAction;
 class G4VisManager;
 class G4StepLimiter;
 
 namespace Belle2 {
-
-  namespace Simulation {
-    class PhysicsList;
-    class EventAction;
-    class TrackingAction;
-    class SteppingAction;
-    class StackingAction;
-  }
 
   /** The full Geant4 simulation module.
    *
@@ -101,14 +92,25 @@ namespace Belle2 {
     int m_hadronProcessVerbosity;          /**< Hadron Process verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
     int m_emProcessVerbosity;              /**< Loss Table verbosity: 0=Silent; 1=info level; 2=debug level, default=0 */
     std::string m_physicsList;             /**< The name of the physics list which is used for the simulation. */
+    bool m_standardEM;                     /*!< If set to true, replaces fast EM physics with standard EM physics. */
     bool m_optics;                         /*!< If set to true, registers the optical physics list. */
+    bool m_HPneutrons;                     /*!< If true, high precision neutron models used below 20 MeV. */
     bool m_monopoles;                      /*!< If set to true, G4MonopolePhysics is registered in Geant4 PhysicsList.*/
     double m_monopoleMagneticCharge;       /*!< The value of monopole magnetic charge in units of e+.*/
     double m_productionCut;                /*!< Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance. */
+    double m_pxdProductionCut;             /*!< Secondary production threshold in PXD envelope. */
+    double m_svdProductionCut;             /*!< Secondary production threshold in SVD envelope. */
+    double m_cdcProductionCut;             /*!< Secondary production threshold in CDC envelope. */
+    double m_arichtopProductionCut;        /*!< Secondary production threshold in ARICH and TOP envelopes. */
+    double m_eclProductionCut;             /*!< Secondary production threshold in ECL envelopes. */
+    double m_klmProductionCut;             /*!< Secondary production threshold in BKLM and EKLM envelopes. */
     int m_maxNumberSteps;                  /*!< The maximum number of steps before the track transportation is stopped and the track is killed. */
     double m_photonFraction;               /**< The fraction of Cerenkov photons which will be kept and propagated. */
     bool m_useNativeGeant4;                /**< If set to true, uses the Geant4 navigator and native detector construction class. */
-    std::vector<std::string> m_uiCommands; /**< A list of Geant4 UI commands that should be applied before the simulation starts. */
+    std::vector<std::string> m_uiCommandsAtPreInit; /**< A list of Geant4 UI commands that should be applied at PreInit state,
+                                                         before the Geant4 initialization and before the simulation starts. */
+    std::vector<std::string> m_uiCommandsAtIdle;    /**< A list of Geant4 UI commands that should be applied at Idle state,
+                                                         after the Geant4 initialization and before the simulation starts. */
     bool m_EnableVisualization;            /**< If set to true the Geant4 visualization support is enabled. */
 
     bool m_storeOpticalPhotons;            /**< controls storing of optical photons in MCParticles */
@@ -125,6 +127,9 @@ namespace Belle2 {
 
     int m_trajectoryStore;                 /**< If true, store the trajectories of all primary particles */
     double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
+    std::vector<float> m_absorbers;        /**< The absorbers defined at given radii where tracks across them will be destroyed.
+                                                This set is used in the PXD only simulation for PXD gain calibration.*/
+
 
 
   private:

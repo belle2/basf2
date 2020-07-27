@@ -12,29 +12,17 @@
 #include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorHit.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <cmath>
-#include <boost/foreach.hpp>
 
-
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 
 // ROOT
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
 
 int eventNum = 0;
 
@@ -103,19 +91,19 @@ void QcsmonitorStudyModule::defineHisto()
   h_qcss_rs_hitrate2W->Sumw2();
 
   for (int i = 0; i < 40; i++) {
-    h_qcss_rate1[i] = new TH1F(TString::Format("qcss_rate1_%d", i), "PE distributions", 500, 0., 5000.);
-    h_qcss_rate2[i] = new TH1F(TString::Format("qcss_rate2_%d", i), "PE distributions", 500, 0., 5000.);
-    h_qcss_rate1W[i] = new TH1F(TString::Format("qcss_rate1W_%d", i), "PE distributions", 500, 0., 5000.);
-    h_qcss_rate2W[i] = new TH1F(TString::Format("qcss_rate2W_%d", i), "PE distributions", 500, 0., 5000.);
-    h_qcss_pe1[i] = new TH2F(TString::Format("qcss_pe1_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_qcss_pe2[i] = new TH2F(TString::Format("qcss_pe2_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_qcss_pe1W[i] = new TH2F(TString::Format("qcss_pe1W_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
-    h_qcss_pe2W[i] = new TH2F(TString::Format("qcss_pe2W_%d", i), "PE distributions", 500, 0., 5000., 100, 0., 1000.);
+    h_qcss_rate1[i] = new TH1F(TString::Format("qcss_rate1_%d", i), "PE distributions", 500, 0., 500.);
+    h_qcss_rate2[i] = new TH1F(TString::Format("qcss_rate2_%d", i), "PE distributions", 500, 0., 500.);
+    h_qcss_rate1W[i] = new TH1F(TString::Format("qcss_rate1W_%d", i), "PE distributions", 500, 0., 500.);
+    h_qcss_rate2W[i] = new TH1F(TString::Format("qcss_rate2W_%d", i), "PE distributions", 500, 0., 500.);
+    h_qcss_pe1[i] = new TH2F(TString::Format("qcss_pe1_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_qcss_pe2[i] = new TH2F(TString::Format("qcss_pe2_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_qcss_pe1W[i] = new TH2F(TString::Format("qcss_pe1W_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
+    h_qcss_pe2W[i] = new TH2F(TString::Format("qcss_pe2W_%d", i), "PE distributions", 500, 0., 500., 100, 0., 1000.);
 
-    h_qcss_rs_rate1[i] = new TH2F(TString::Format("qcss_rs_rate1_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_qcss_rs_rate2[i] = new TH2F(TString::Format("qcss_rs_rate2_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_qcss_rs_rate1W[i] = new TH2F(TString::Format("qcss_rs_rate1W_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
-    h_qcss_rs_rate2W[i] = new TH2F(TString::Format("qcss_rs_rate2W_%d", i), "PE distributions", 500, 0., 5000., 12, 0., 12.);
+    h_qcss_rs_rate1[i] = new TH2F(TString::Format("qcss_rs_rate1_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_qcss_rs_rate2[i] = new TH2F(TString::Format("qcss_rs_rate2_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_qcss_rs_rate1W[i] = new TH2F(TString::Format("qcss_rs_rate1W_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
+    h_qcss_rs_rate2W[i] = new TH2F(TString::Format("qcss_rs_rate2W_%d", i), "PE distributions", 500, 0., 500., 12, 0., 12.);
 
     h_qcss_rate1[i]->Sumw2();
     h_qcss_rate2[i]->Sumw2();

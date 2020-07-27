@@ -17,6 +17,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::Chooseable<BaseStereoHitFilter>;
 template class TrackFindingCDC::ChooseableFilter<StereoHitFilterFactory>;
 
 StereoHitFinder::StereoHitFinder() : Super()

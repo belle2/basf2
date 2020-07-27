@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <generators/modules/pairgen/PairGenModule.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
 #include <TMath.h>

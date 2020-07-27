@@ -14,8 +14,6 @@
 #include <TObject.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <framework/logging/Logger.h>
-
 namespace Belle2 {
 
   /** This class defines the dbobject and the method to access the information
@@ -48,7 +46,7 @@ namespace Belle2 {
     }
   private:
 
-    ClassDef(SVDLocalRunBadStrips, 1);
+    ClassDef(SVDLocalRunBadStrips, 1); /**< needed by root*/
   };
 }
 

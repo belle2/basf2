@@ -10,8 +10,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <string>
-
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 

@@ -9,7 +9,6 @@
  **************************************************************************/
 // Own include
 #include <top/modules/TOPDigitizer/TOPTriggerDigitizerModule.h>
-#include <top/geometry/TOPGeometryPar.h>
 
 // Hit classes
 #include <top/dataobjects/TOPRawWaveform.h>
@@ -17,12 +16,10 @@
 #include <top/dataobjects/TOPTriggerMCInfo.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // ROOT
@@ -32,8 +29,6 @@
 using namespace std;
 
 namespace Belle2 {
-
-  using namespace TOP;
 
   //-----------------------------------------------------------------
   //                 Register the Module
@@ -61,9 +56,6 @@ namespace Belle2 {
              "width of discriminator gate [samples]", 8);
     addParam("samplingPhase", m_samplingPhase,
              "sampling phase [samples]", 7);
-    addParam("bunchTimeStamp", m_bunchTimeStamp,
-             "time stamp of interaction: if negative generate it randomly, "
-             "otherwise use this value", -1);
   }
 
   TOPTriggerDigitizerModule::~TOPTriggerDigitizerModule()
@@ -85,8 +77,6 @@ namespace Belle2 {
 
     if (m_samplingPhase < 0 or m_samplingPhase >= c_SamplingCycle)
       B2ERROR("samplingPhase must be positive and less than " << c_SamplingCycle);
-    if (m_bunchTimeStamp >= c_Frame9Period)
-      B2ERROR("bunchTimeStamp must be less than " << c_Frame9Period);
 
   }
 
@@ -105,14 +95,18 @@ namespace Belle2 {
     StoreObjPtr<TOPTriggerMCInfo> mcInfo;
     mcInfo.create();
 
-    int bunchTimeStamp = m_bunchTimeStamp;
-    if (bunchTimeStamp < 0) {
-      bunchTimeStamp = gRandom->Integer(c_Frame9Period);
+    if (waveforms.getEntries() == 0) {
+      B2ERROR("No waveforms available for digitization");
+      return;
     }
+    unsigned revo9count = waveforms[0]->getRevo9Counter();
+    int offsetSamples = waveforms[0]->getOffsetWindows() * TOPRawWaveform::c_WindowSize +
+                        (revo9count % 6) * TOPRawWaveform::c_WindowSize / 3;
+
+    int bunchTimeStamp = int((revo9count + gRandom->Rndm()) * c_SamplingCycle / 3.0);
     mcInfo->setBunchTimeStamp(bunchTimeStamp);
 
-    const auto& tdc = TOPGeometryPar::Instance()->getGeometry()->getNominalTDC();
-    int offset = bunchTimeStamp - tdc.getSample(0) / c_SamplingCycle;
+    int offset = bunchTimeStamp - offsetSamples / c_SamplingCycle;
 
     for (const auto& waveform : waveforms) {
       const auto& data = waveform.getWaveform();

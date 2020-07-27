@@ -26,7 +26,7 @@ std::vector<std::string> PyStoreArray::list(DataStore::EDurability durability)
 
 void PyStoreArray::printList(DataStore::EDurability durability)
 {
-  for (auto n : list(durability))
+  for (const auto& n : list(durability))
     B2INFO(n);
 }
 
@@ -59,7 +59,7 @@ bool PyStoreArray::registerInDataStore(DataStore::EStoreFlags storeFlags)
   return registerInDataStore(m_storeAccessor.getName(), storeFlags);
 }
 
-bool PyStoreArray::registerInDataStore(std::string name,
+bool PyStoreArray::registerInDataStore(const std::string& name,
                                        DataStore::EStoreFlags storeFlags)
 {
   if (not hasValidClass()) {
@@ -112,6 +112,26 @@ bool PyStoreArray::optionalRelationTo(const PyStoreArray& toArray,
                                                toArray.m_storeAccessor,
                                                durability,
                                                namedRelation);
+}
+
+bool PyStoreArray::hasRelationTo(const PyStoreArray& toArray,
+                                 DataStore::EDurability durability,
+                                 const std::string& namedRelation) const
+{
+  return DataStore::Instance().hasRelation(this->m_storeAccessor,
+                                           toArray.m_storeAccessor,
+                                           durability,
+                                           namedRelation);
+}
+
+bool PyStoreArray::hasRelationFrom(const PyStoreArray& fromArray,
+                                   DataStore::EDurability durability,
+                                   const std::string& namedRelation) const
+{
+  return DataStore::Instance().hasRelation(fromArray.m_storeAccessor,
+                                           this->m_storeAccessor,
+                                           durability,
+                                           namedRelation);
 }
 
 bool PyStoreArray::hasValidClass() const

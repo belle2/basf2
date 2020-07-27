@@ -4,11 +4,8 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/utilities/FileSystem.h>
 //
-#include <iostream>
 #include <fstream>
 #include <string>
-#include <cstdio>
-#include <cstdlib>
 
 using namespace Belle2;
 using namespace std;
@@ -16,7 +13,7 @@ using namespace ECL;
 
 ECLChannelMapper::ECLChannelMapper()
 {
-  int i = 0, j = 0;
+  int i;
   for (i = 0; i < ECL_BARREL_CRATES * ECL_BARREL_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
     convertArrayBarrel[i] = 0;
   for (i = 0; i < ECL_FWD_CRATES * ECL_FWD_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
@@ -24,15 +21,23 @@ ECLChannelMapper::ECLChannelMapper()
   for (i = 0; i < ECL_BKW_CRATES * ECL_BKW_SHAPERS_IN_CRATE * ECL_CHANNELS_IN_SHAPER; i++)
     convertArrayBKW[i] = 0;
   for (i = 0; i < ECL_TOTAL_CHANNELS; i++)
-    for (j = 0; j < 3; j++)
+    for (int j = 0; j < 3; j++)
       convertArrayInv[i][j] = 0;
 
   isInitialized = false;
 
 }
 
+bool ECLChannelMapper::initFromFile()
+{
+  std::string filePath = FileSystem::findFile("ecl/data/ecl_channels_map.txt");
+  return initFromFile(filePath.c_str());
+}
+
 bool ECLChannelMapper::initFromFile(const char* eclMapFileName)
 {
+  B2WARNING("Reading possibly outdated ECLChannelMap from " << eclMapFileName);
+
   ifstream mapFile(eclMapFileName);
   if (mapFile.is_open()) {
 
@@ -106,10 +111,11 @@ bool ECLChannelMapper::initFromDB()
   }
 
   if (!channelMap.isValid()) {
-    B2WARNING("ECLChannelMapper:: Could not get ECLChannelMap from the database. Trying to initialize from text file");
-    std::string filePath = FileSystem::findFile("ecl/data/ecl_channels_map.txt");
-    return initFromFile(filePath.c_str());
+    B2FATAL("ECLChannelMapper:: Could not get ECLChannelMap from the database.");
   }
+
+  B2INFO("ECLChannelMapper:: loaded ECLChannelMap from the database"
+         << LogVar("IoV", channelMap.getIoV()));
 
   const auto& mappingBAR = channelMap->getMappingBAR();
   const auto& mappingFWD = channelMap->getMappingFWD();
@@ -241,7 +247,7 @@ int ECLChannelMapper::getCellId(int iCrate, int iShaper, int iChannel)
   //          37 - 44  -- Forward
   //          45 - 52  -- Backward
   int cellID = 0;
-  int arrayIndex = 0;
+  int arrayIndex;
 
   if (iCrate   < 1 || iCrate   > 52) return -1;
   if (iShaper  < 1 || iShaper  > 12) return -1;

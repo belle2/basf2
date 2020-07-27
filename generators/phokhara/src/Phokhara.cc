@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <generators/phokhara/Phokhara.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>

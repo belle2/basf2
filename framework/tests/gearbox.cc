@@ -1,8 +1,5 @@
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/utilities/FileSystem.h>
 
 #include <gtest/gtest.h>
 #include <string>
@@ -18,7 +15,7 @@ namespace {
   {
     Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;
-    backends.push_back("file:");
+    backends.emplace_back("file:");
     gb.setBackends(backends);
     gb.open("geometry/SuperKEKB.xml");
     queue<GearDir> nodes;

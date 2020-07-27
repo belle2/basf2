@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -108,9 +107,12 @@ namespace Belle2 {
       std::string m_storeClustersName; /**< PXDClusters StoreArray name */
       std::string m_storeDigitsName; /**< PXDDigits StoreArray name */
       double m_integrationTime; /**< Integration time of PXD. */
+      double m_timePeriod; /**< Period for background time series. */
       bool m_maskDeadPixels; /**< Correct bg rates by taking into account masked pixels */
       int m_nBinsU; /**< Number of regions per sensor along u side */
       int m_nBinsV; /**< Number of regions per sensor along v side */
+
+      int m_nPXDSensors; /**< Total number of PXD sensors */
 
       std::map<VxdID, SensorData> m_sensorData; /**< Struct to hold sensor-wise background data. */
       std::map<unsigned long long int,  std::map<VxdID, SensorData> > m_buffer; /**< Struct to hold sensor-wise background data. */

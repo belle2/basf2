@@ -6,10 +6,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/HTML.h>
 #include <framework/utilities/ColorPalette.h>
 
 #include <utility>
@@ -59,6 +57,7 @@ void InfoWidget::update()
   //check if the object given by lastURI exists in the new event, too.
   //array pages are ok, too
   if (lastURI != "") {
+    // cppcheck-suppress unreadVariable
     URI parsedURI(lastURI);
     if (!parsedURI.object and !lastURI.EndsWith("/")) {
       //doesn't exist, go to main page

@@ -13,9 +13,6 @@
 //Framework
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationsObject.h>
 
 //ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
@@ -145,7 +142,7 @@ void ECLTRGInformationModule::event()
   for (const auto& cluster : m_eclClusters) {
 
     // only photon clusters
-    if (cluster.getHypothesisId() != ECLCluster::c_nPhotons) continue;
+    if (!cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
     // map TCId, energy
     tcmap TCMap;
@@ -230,10 +227,10 @@ void ECLTRGInformationModule::event()
 
             const auto cluster = rel.object(irel);
 
-            if (cluster->getHypothesisId() != ECLCluster::c_nPhotons) continue;
+            if (!cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
 
             const auto weight = rel.weight(irel);
-            float clusterenergy = cluster->getEnergy();
+            float clusterenergy = cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
             B2DEBUG(28, irel << " " << clusterenergy << " " << m_clusterEnergyThreshold);
 

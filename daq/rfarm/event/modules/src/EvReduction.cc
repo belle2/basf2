@@ -8,10 +8,9 @@
 
 #include <daq/rfarm/event/modules/EvReduction.h>
 #include <TSystem.h>
-#include <stdlib.h>
 
-#include "framework/datastore/StoreObjPtr.h"
-
+#include <rawdata/dataobjects/RawTLU.h>
+#include <rawdata/dataobjects/RawTRG.h>
 
 // #define DESY
 
@@ -54,18 +53,18 @@ void EvReductionModule::initialize()
   // Initialize EvtMetaData
 
   // Initialize Array of RawCOPPER
-  StoreArray<RawDataBlock>::registerPersistent();
-  StoreArray<RawCOPPER>::registerPersistent();
-  StoreArray<RawSVD>::registerPersistent();
-  StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawTOP>::registerPersistent();
-  StoreArray<RawARICH>::registerPersistent();
-  StoreArray<RawECL>::registerPersistent();
-  StoreArray<RawKLM>::registerPersistent();
-  StoreArray<RawFTSW>::registerPersistent();
+  m_rawDataBlock.registerInDataStore();
+  m_rawCOPPER.registerInDataStore();
+  m_rawSVD.registerInDataStore();
+  m_rawCDC.registerInDataStore();
+  m_rawTOP.registerInDataStore();
+  m_rawARICH.registerInDataStore();
+  m_rawECL.registerInDataStore();
+  m_rawKLM.registerInDataStore();
+  m_rawFTSW.registerInDataStore();
 
 #ifdef DESY
-  StoreArray<RawTLU>::registerPersistent();
+  m_rawTLU.registerInDataStore();
 #endif
   B2INFO("Rx initialized.");
 }

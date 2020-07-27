@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/pybasf2/PyDBArray.h>
-#include <framework/database/DBStore.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TClonesArray.h>

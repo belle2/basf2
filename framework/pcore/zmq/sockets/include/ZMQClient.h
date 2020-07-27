@@ -33,7 +33,7 @@ namespace Belle2 {
     void reset();
 
     /// Subscribe to the given multicast message type.
-    void subscribe(c_MessageTypes messageType);
+    void subscribe(EMessageTypes messageType);
 
     /// Send a message over the data socket.
     template <class AZMQMessage>

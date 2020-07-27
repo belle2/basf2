@@ -74,7 +74,7 @@ main.add_module(particlegun)
 # Geant simulation
 fullsim = register_module('FullSim')
 fullsim.param('PhysicsList', 'FTFP_BERT_HP')
-fullsim.param('UICommands', ['/process/inactivate nKiller'])
+fullsim.param('UICommandsAtIdle', ['/process/inactivate nKiller'])
 fullsim.param('StoreAllSecondaries', True)
 fullsim.param('SecondariesEnergyCut', 0.000001)  # [MeV] need for CDC EB neutron flux
 main.add_module(fullsim)

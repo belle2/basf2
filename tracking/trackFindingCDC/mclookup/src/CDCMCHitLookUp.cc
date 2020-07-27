@@ -115,7 +115,7 @@ ERightLeft CDCMCHitLookUp::getRLInfo(const CDCHit* ptrHit) const
 bool CDCMCHitLookUp::isBackground(const CDCHit* ptrHit) const
 {
   const CDCSimHit* ptrSimHit = getSimHit(ptrHit);
-  return ptrSimHit ? ptrSimHit->getBackgroundTag() != CDCSimHit::bg_none : false;
+  return ptrSimHit ? ptrSimHit->getBackgroundTag() != BackgroundMetaData::bg_none : false;
 }
 
 

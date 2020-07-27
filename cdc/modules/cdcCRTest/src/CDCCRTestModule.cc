@@ -12,31 +12,22 @@
 #include <TTree.h>
 #include <framework/gearbox/Const.h>
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/StateOnPlane.h>
-#include <set>
-#include <boost/format.hpp>
 #include <boost/foreach.hpp>
 
 #include <cdc/translators/RealisticCDCGeometryTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include "TDirectory.h"
-#include "TMath.h"
 #include <Math/ProbFuncMathCore.h>
-#include "iostream"
 
 using namespace std;
 using namespace Belle2;
@@ -58,11 +49,11 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Track fit results histograms will be put into this directory", std::string("trackfit"));
   addParam("NameOfTree", m_treeName, "name of tree in output file", string("tree"));
-  addParam("fillExpertHistograms", m_fillExpertHistos, "Fill additional histograms", false);
-  addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
+  addParam("fillExpertHistograms", m_fillExpertHistos, "Fill additional histograms", true);
+  addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", false);
   addParam("plotResidual", m_plotResidual, "plot biased residual, normalized res and xtplot for all layer", false);
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
-           false);
+           true);
   addParam("hitEfficiency", m_hitEfficiency, "calculate hit efficiency(Not work now) true:yes false:No", false);
   addParam("TriggerPos", m_TriggerPos, "Trigger position use for cut and reconstruct Trigger image", std::vector<double> { -0.6, -13.25, 17.3});
   addParam("NormTriggerPlaneDirection", m_TriggerPlaneDirection, "Normal trigger plane direction and reconstruct Trigger image",
@@ -74,10 +65,10 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
            false);
   addParam("EstimateResultForUnFittedLayer", m_EstimateResultForUnFittedLayer,
            "Calculate residual for Layer that is set unUseInFit", true);
-  addParam("SmallerOutput", m_SmallerOutput, "If true, trigghit position, residual cov,absRes, will not be stored", true);
+  addParam("SmallerOutput", m_SmallerOutput, "If true, trigghit position, residual cov,absRes, will not be stored", false);
   addParam("StoreTrackParams", m_StoreTrackParams, "Store Track Parameter or not, it will be multicount for each hit", true);
-  addParam("StoreHitDistribution", m_MakeHitDist, "Make hit distribution or not", false);
-  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", false);
+  addParam("StoreHitDistribution", m_MakeHitDist, "Make hit distribution or not", true);
+  addParam("EventT0Extraction", m_EventT0Extraction, "use event t0 extract t0 or not", true);
   addParam("MinimumPt", m_MinimumPt, "Tracks with tranverse momentum small than this will not recored", 0.);
 }
 
@@ -223,14 +214,12 @@ void CDCCRTestModule::defineHisto()
 void CDCCRTestModule::initialize()
 {
   REG_HISTOGRAM
-  StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
-  StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  RelationArray relRecoTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  m_Tracks.isRequired(m_trackArrayName);
+  m_RecoTracks.isRequired(m_recoTrackArrayName);
+  m_TrackFitResults.isRequired(m_trackFitResultArrayName);
+  m_CDCHits.isRequired(m_cdcHitArrayName);
+  RelationArray relRecoTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
   //Store names to speed up creation later
-  m_recoTrackArrayName = recoTracks.getName();
-  m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
   for (size_t i = 0; i < m_allHistos.size(); ++i) {
@@ -251,28 +240,24 @@ void CDCCRTestModule::beginRun()
 void CDCCRTestModule::event()
 {
   evtT0 = 0.;
-  const StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  const StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  const StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
-  const RelationArray relTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  const RelationArray relTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
 
   /* CDCHit distribution */
   if (m_MakeHitDist) {
-    for (int i = 0; i < cdcHits.getEntries(); ++i) {
-      Belle2::CDCHit* hit = cdcHits[i];
+    for (int i = 0; i < m_CDCHits.getEntries(); ++i) {
+      Belle2::CDCHit* hit = m_CDCHits[i];
       m_hHitDistInCDCHit[getICLayer(hit->getISuperLayer(), hit->getILayer())]->Fill(hit->getIWire());
       m_h2DHitDistInCDCHit->Fill(hit->getIWire(), getICLayer(hit->getISuperLayer(), hit->getILayer()));
     }
   }
   // Loop over Recotracks
-  int nTr = recoTracks.getEntries();
+  int nTr = m_RecoTracks.getEntries();
   m_hNTracksPerEvent->Fill(nTr);
 
   int nfitted = 0;
 
   for (int i = 0; i < nTr; ++i) {
-    RecoTrack* track = recoTracks[i];
+    RecoTrack* track = m_RecoTracks[i];
     if (track->getDirtyFlag()) {B2INFO("Dirty flag was set for track: " << track->getPositionSeed().Y()); continue;}
     m_hNHits_trackcand->Fill(track->getNumberOfCDCHits());
     if (m_MakeHitDist) {
@@ -576,7 +561,7 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
 
     SortingRecoHitPair frontSideHit = std::make_pair(0, nullptr);;
     SortingRecoHitPair backsideSideHit = std::make_pair(0, nullptr);;
-    SortingRecoHitPair hit4extraction = std::make_pair(0, nullptr);
+    SortingRecoHitPair hit4extraction; // = std::make_pair(0, nullptr); avoid cppcheck warning.
 
     //find closest hit to hit which do not fit
     //    if (hitID < track->getNumberOfCDCHits() / 2) { //case for first part of track, searching forward, stop at first choice

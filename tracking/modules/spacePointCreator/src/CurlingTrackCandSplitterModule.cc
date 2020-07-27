@@ -157,6 +157,7 @@ void CurlingTrackCandSplitterModule::initialize()
     // check if there are two entries and if the second value is either UPDATE or RECREATE
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       string output;
+      // cppcheck-suppress useStlAlgorithm
       for (string entry : m_PARAMrootFileName) { output += "'" + entry + "' "; }
       B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
     }
@@ -527,6 +528,8 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 }
 
 // ======================================= GET GLOBAL POSITION AND MOMENTUM ============================================================
+
+/// Helper class to retrieve the global position and momentum of a TrueHit
 template<class TrueHit>
 std::pair<const Belle2::B2Vector3<double>, const Belle2::B2Vector3<double> >
 CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
@@ -557,13 +560,11 @@ CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
 // ======================================= GET DIRECTION OF FLIGHT ======================================================================
 bool CurlingTrackCandSplitterModule::getDirectionOfFlight(const
                                                           std::pair<const B2Vector3<double>, const B2Vector3<double>>& hitPosAndMom,
-                                                          const B2Vector3<double> origin)
+                                                          const B2Vector3<double>& origin)
 {
   B2Vector3<double> originToHit = hitPosAndMom.first - origin;
   B2Vector3<double> momentumAtHit = hitPosAndMom.second + originToHit;
 
-  // additional debug output from developement to find a possible B2Vector3 bug
-//   B2DEBUG(250, "hitPosMom.first (" << hitPosAndMom.first.X() << "," << hitPosAndMom.first.Y() << "," << hitPosAndMom.first.Z() << "). hitPosAndMom.second: (" << hitPosAndMom.second.X() << "," << hitPosAndMom.second.Y() << "," << hitPosAndMom.second.Z() << "). origin: (" << origin.X() << "," << origin.Y() << "," << origin.Z() << ")");
 
   B2DEBUG(100, "Position of hit relative to origin is (" << originToHit.X() << "," << originToHit.Y() << "," << originToHit.Z() <<
           "). Momentum relative to hit (relative to origin) (" << momentumAtHit.X() << "," << momentumAtHit.Y() << "," << momentumAtHit.Z() <<
@@ -733,7 +734,7 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
 }
 
 // =================================== WRITE TO ROOT ===============================================================================
-void CurlingTrackCandSplitterModule::writeToRoot(RootVariables& rootVariables)
+void CurlingTrackCandSplitterModule::writeToRoot(const RootVariables& rootVariables)
 {
   m_rootGlobalPosResiduals = rootVariables.PosResiduesGlobal;
   m_rootLocalPosResiduals = rootVariables.PosResiduesLocal;

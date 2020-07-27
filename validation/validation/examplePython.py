@@ -8,7 +8,6 @@ This file contains example for generating validation plots using python
 import basf2
 import array
 import numpy as np
-from datetime import datetime
 from ROOT import TFile, TNtuple, TH1F, TF1, TH2F, TF2, TRandom3, gRandom, TNamed, TEfficiency, TGraphErrors
 
 basf2.set_random_seed(1337)
@@ -56,7 +55,9 @@ gausH.FillRandom("exp_fn", 5000)
 gausH.GetListOfFunctions().Add(TNamed('Description', "Expert Validation Plot"))
 gausH.GetListOfFunctions().Add(TNamed('Check', "Exp Histogram Check"))
 gausH.GetListOfFunctions().Add(TNamed('Contact', "Exp Histogram Contact"))
-gausH.GetListOfFunctions().Add(TNamed('MetaOptions', "logy, nostats, C, expert"))
+gausH.GetListOfFunctions().Add(TNamed(
+    'MetaOptions', "logy, nostats, C"
+))
 
 gausH.Write()
 
@@ -87,6 +88,7 @@ for i in range(5000):
     passed = gRandom.Uniform(ratio * 0.45, 1.0)
     pos = gRandom.Uniform(ratio * 30.0, 49.5)
     gaus_total.Fill(pos)
+# fixme
 if passed > 0.5:
     gaus_passed.Fill(pos)
 
@@ -95,6 +97,7 @@ teff.SetName("TEfficiency")
 teff.GetListOfFunctions().Add(TNamed('Description', "Efficiency plot of something"))
 teff.GetListOfFunctions().Add(TNamed('Check', "Check For Something"))
 teff.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
+teff.GetListOfFunctions().Add(TNamed('MetaOptions', ""))
 
 teff.Write()
 
@@ -107,12 +110,14 @@ for i in range(50):
     ratio = float(i) / 50.0
     passed = gRandom.Uniform(ratio * 0.45, 1.0)
 
+# fixme
 graph_err.SetPoint(i, i + 1.0, passed)
 
 graph_err.SetName("TGraphErrors")
 graph_err.GetListOfFunctions().Add(TNamed('Description', "TGraphErrors plot of something"))
 graph_err.GetListOfFunctions().Add(TNamed('Check', "Check For Something"))
 graph_err.GetListOfFunctions().Add(TNamed('Contact', "Contact Someone"))
+graph_err.GetListOfFunctions().Add(TNamed('MetaOptions', ""))
 
 graph_err.Write()
 

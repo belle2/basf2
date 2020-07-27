@@ -16,7 +16,6 @@
 #include <mdst/dataobjects/Track.h>
 
 #include <TFile.h>
-#include <TDirectory.h>
 #include <TNtuple.h>
 
 
@@ -56,7 +55,7 @@ namespace Belle2 {
 
     static bool m_saveControlNtuples; /**< if true produces a rootfile with control ntupled*/
     std::string m_rootFileName;   /**< root file name */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing ntuples */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing ntuples */
 
   private:
 
@@ -72,8 +71,8 @@ namespace Belle2 {
     static void fillControlNtuples(const Track* track,
                                    bool isSelected); /**< determine if the track does not satisfies the selection criteria */
 
-    static TNtuple* m_selectedNtpl;
-    static TNtuple* m_rejectedNtpl;
+    static TNtuple* m_selectedNtpl; /**< tuple of selected tracks */
+    static TNtuple* m_rejectedNtpl; /**< tuple of rejected tracks */
   };
 }
 

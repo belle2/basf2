@@ -111,12 +111,8 @@ print("# of lookback windows : " + str(lookbackWindows))
 print()
 print("start process...")
 
-
-# data base
-reset_database()
-# path_to_db = "/group/belle2/group/detector/TOP/calibration/combined/Combined_TBCrun417x_LocaT0run4855_AfterRelease01/localDB"
-# use_local_database(path_to_db + '/localDB.txt', path_to_db)
-use_central_database('332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000')
+# Define a global tag (note: the one given bellow will become out-dated!)
+use_central_database('data_reprocessing_proc8')
 
 # Create path
 main = create_path()
@@ -135,15 +131,8 @@ if not isGlobalDAQ:
     converter = register_module('Convert2RawDet')
     main.add_module(converter)
 
-# geometry parameters
-gearbox = register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry (only TOP needed)
-geometry = register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # Unpacking (format auto detection works now)
 unpack = register_module('TOPUnpacker')

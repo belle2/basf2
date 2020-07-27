@@ -51,7 +51,7 @@ namespace Belle2 {
      * @param description The optional description of the parameter.
      * @param force If true the parameter has to be set by the user in the steering file.
      */
-    ModuleParam(T& paramVariable, const std::string& description = "", bool force = false);
+    explicit ModuleParam(T& paramVariable, const std::string& description = "", bool force = false);
 
     /**
      * Destructor.
@@ -63,14 +63,14 @@ namespace Belle2 {
      *
      * @param value The parameter value which should be assigned to the parameter.
      */
-    void setValue(T value);
+    void setValue(const T& value);
 
     /**
      * Sets the default value of a parameter.
      *
      * @param defaultValue The parameter default value of the parameter.
      */
-    void setDefaultValue(T defaultValue);
+    void setDefaultValue(const T& defaultValue);
 
     /**
      * Returns the value of the parameter.
@@ -116,7 +116,7 @@ namespace Belle2 {
 
   private:
     /// The default value of the parameter.
-    T m_defaultValue;
+    T m_defaultValue{};
 
     /// Reference to the member variable in the module which stores the parameter value.
     T& m_paramVariable;

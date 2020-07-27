@@ -12,10 +12,19 @@ argvs = sys.argv
 argc = len(argvs)
 
 if argc<=1:
-    print "Usage : start_hlt unit_name"
+    print "Usage : stop_hlt_globalif unit_name configname"
     sys.exit()
 
-configname = "PHASE2"
+#configname = "PHASE2"
+
+unitname = argvs[1]
+configname = argvs[2]
+
+# detector hlt?
+if unitname.find ('_') != 0:
+    detector = unitname[unitname.find('_')+1:]
+else:
+    detector = unitname
 
 # Open PID file
 path = os.environ["HOME"]+"/pid." + argvs[1]
@@ -43,16 +52,18 @@ except:
 
 # Stop nsmbridged
 mypid = int(pidfile.readline())
-try :
-    os.kill ( mypid, signal.SIGINT )
-#    os.waitpid(mypid, 0 )
-    print "nsmbridged killed."
-except : 
-    print "nsmbridged : no such process"
-    pass
+if mypid > 0 :
+    try :
+        os.kill ( mypid, signal.SIGINT )
+    #    os.waitpid(mypid, 0 )
+        print "nsmbridged killed."
+    except : 
+        print "nsmbridged : no such process"
+        pass
 
 # Stop event builder
-cmd = "rcrequest -c eb1_" + argvs[1] + " eb1_" + argvs[1] + " abort"
+#cmd = "rcrequest -c eb1_" + argvs[1] + " eb1_" + argvs[1] + " abort"
+cmd = "rcrequest -c eb1_" + detector + " eb1_" + detector + " abort"
 try :
     print "Sending ABORT to EB1RX. May take some time if not LOADed."
     p = subprocess.Popen(cmd, shell=True)

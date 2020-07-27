@@ -37,10 +37,10 @@ namespace Belle2 {
 
 
   protected:
-    CollectorTFInfo m_collector = CollectorTFInfo();
+    CollectorTFInfo m_collector = CollectorTFInfo(); /**< cached ref to CollectorTFInfo() */
     // Pass Ids
-    std::vector<int> pass_sector_ids = {0, 1, 2};
-    int pass_sector_id_single = 0;
+    std::vector<int> pass_sector_ids = {0, 1, 2}; /**< fixed vector of pass indices (values are never used) */
+    int pass_sector_id_single = 0; /**< fixed index for beginning pass */
 
 
   };

@@ -12,7 +12,6 @@
 #define ARICHSENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <arich/dataobjects/ARICHSimHit.h>
 #include <framework/database/DBObjPtr.h>
 #include <arich/dbobjects/ARICHSimulationPar.h>
 

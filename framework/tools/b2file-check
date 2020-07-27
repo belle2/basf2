@@ -27,6 +27,8 @@ import os
 import argparse
 import json
 from contextlib import redirect_stdout
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
 import ROOT
 
 

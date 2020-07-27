@@ -34,6 +34,7 @@
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 
 using namespace std;
 using namespace boost;
@@ -290,10 +291,8 @@ namespace Belle2 {
       return pxdGeometryPar;
     }
 
-    void GeoPXDCreator::readHalfShellSupport(GearDir support, PXDGeometryPar& pxdGeometryPar)
+    void GeoPXDCreator::readHalfShellSupport(const GearDir& support, PXDGeometryPar& pxdGeometryPar)
     {
-      if (!support) return;
-
       for (const GearDir& endflange : support.getNodes("Endflange")) {
         VXDPolyConePar endflangePar(
           endflange.getString("@name"),
@@ -376,6 +375,11 @@ namespace Belle2 {
         setVisibility(*envelope, false);
         physEnvelope = new G4PVPlacement(getAlignment(parameters.getAlignment(m_prefix)), envelope, m_prefix + ".Envelope",
                                          &topVolume, false, 1);
+
+        // Set up region for production cuts
+        G4Region* aRegion = new G4Region("PXDEnvelope");
+        envelope->SetRegion(aRegion);
+        aRegion->AddRootLogicalVolume(envelope);
       }
 
       //Read the definition of all sensor types
@@ -408,15 +412,17 @@ namespace Belle2 {
         sensor.setSensorInfo(createSensorInfo(paramsSensor));
 
         vector<VXDGeoPlacement> subcomponents;
-        for (const VXDGeoPlacementPar& component : paramsSensor.getComponents()) {
-          subcomponents.push_back(VXDGeoPlacement(
-                                    component.getName(),
-                                    component.getU() / Unit::mm,
-                                    component.getV() / Unit::mm,
-                                    component.getW(),
-                                    component.getWOffset() / Unit::mm
-                                  ));
-        }
+        const auto& components = paramsSensor.getComponents();
+        subcomponents.reserve(components.size());
+        std::transform(components.begin(), components.end(), std::back_inserter(subcomponents),
+        [](auto const & component) {
+          return VXDGeoPlacement(component.getName(),
+                                 component.getU() / Unit::mm,
+                                 component.getV() / Unit::mm,
+                                 component.getW(),
+                                 component.getWOffset() / Unit::mm
+                                );
+        });
         sensor.setComponents(subcomponents);
         m_sensorMap[sensorTypeID] = sensor;
       }
@@ -451,17 +457,17 @@ namespace Belle2 {
         }
 
         vector<VXDGeoPlacement> subComponents;
-        for (const VXDGeoPlacementPar& paramsSubComponent : paramsComponent.getSubComponents()) {
-          subComponents.push_back(VXDGeoPlacement(
-                                    paramsSubComponent.getName(),
-                                    paramsSubComponent.getU()  / Unit::mm,
-                                    paramsSubComponent.getV()  / Unit::mm,
-                                    paramsSubComponent.getW(),
-                                    paramsSubComponent.getWOffset()  / Unit::mm
-                                  ));
-
-        }
-
+        const auto& paramsSubComponents = paramsComponent.getSubComponents();
+        subComponents.reserve(paramsSubComponents.size());
+        std::transform(paramsSubComponents.begin(), paramsSubComponents.end(), std::back_inserter(subComponents),
+        [](auto const & paramsSubComponent) {
+          return VXDGeoPlacement(paramsSubComponent.getName(),
+                                 paramsSubComponent.getU() / Unit::mm,
+                                 paramsSubComponent.getV() / Unit::mm,
+                                 paramsSubComponent.getW(),
+                                 paramsSubComponent.getWOffset() / Unit::mm
+                                );
+        });
         createSubComponents(m_prefix + "." + name, c, subComponents);
         if (m_activeChips &&  parameters.getSensitiveChipID(name) >= 0) {
           int chipID = parameters.getSensitiveChipID(name);

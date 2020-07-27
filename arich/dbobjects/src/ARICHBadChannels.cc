@@ -10,6 +10,8 @@
 
 #include <arich/dbobjects/ARICHBadChannels.h>
 
+#include <algorithm>
+
 using namespace Belle2;
 using namespace std;
 

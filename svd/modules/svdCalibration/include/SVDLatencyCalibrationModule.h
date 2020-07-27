@@ -18,15 +18,8 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
-#include <TList.h>
-
-// forward declarations
-class TTree;
-class TFile;
-
 
 namespace Belle2 {
   /**
@@ -42,27 +35,29 @@ namespace Belle2 {
      */
     SVDLatencyCalibrationModule();
 
-    /**  */
+    /**  initialize */
     virtual void initialize() override;
 
-    /**  */
+    /**  begin run*/
     virtual void beginRun() override;
 
-    /**  */
+    /**  event*/
     virtual void event() override;
 
-    /**  */
+    /**  end run */
     virtual void endRun() override;
+
+
+  private:
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
 
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-  private:
 
-    SVDHistograms<TH1F>* m_histo_maxAmplitude;
+    SVDHistograms<TH1F>* m_histo_maxAmplitude = nullptr; /**<vector of histograms containing the max bin distribution*/
 
     std::string m_shapersListName; /**< shapers list name */
     StoreArray<SVDShaperDigit> m_digits; /**< SVD digits*/

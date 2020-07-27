@@ -13,15 +13,8 @@
 
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 
-#include <svd/calibration/SVDNoiseCalibrations.h>
-#include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
-#include <svd/dbobjects/SVDLocalRunBadStrips.h>
-
-#include <vxd/dataobjects/VxdID.h>
-
 
 namespace Belle2 {
 
@@ -50,7 +43,7 @@ namespace Belle2 {
     private:
       //      SVDNoiseCalibrations m_obj_noise;
       //      SVDPulseShapeCalibrations m_obj_pulseShape;
-      SVDCoGTimeCalibrations m_obj_cog;
+      SVDCoGTimeCalibrations m_obj_cog; /**< CoG calibrations payload*/
       //      DBObjPtr<SVDLocalRunBadStrips> m_obj_badStrip;
 
 

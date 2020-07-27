@@ -13,8 +13,6 @@
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/SeqFile.h>
 
-#include <string>
-
 namespace Belle2 {
 
   /*! A class definition of an input module for Sequential ROOT I/O */

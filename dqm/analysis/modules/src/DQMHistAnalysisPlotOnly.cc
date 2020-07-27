@@ -8,11 +8,8 @@
 
 
 #include <dqm/analysis/modules/DQMHistAnalysisPlotOnly.h>
-#include <TSystem.h>
 #include <TDirectory.h>
 #include <TROOT.h>
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TClass.h>
 
 using namespace std;
@@ -122,12 +119,10 @@ void DQMHistAnalysisPlotOnlyModule::event()
 
 //    if (it.second) {
     it.second->cd();
-    if (hh1) {
-      if (hh1->GetDimension() == 1) {
-        hh1->Draw("hist");
-      } else if (hh1->GetDimension() == 2) {
-        hh1->Draw("colz");
-      }
+    if (hh1->GetDimension() == 1) {
+      hh1->Draw("hist");
+    } else if (hh1->GetDimension() == 2) {
+      hh1->Draw("colz");
     }
     it.second->Modified();
     it.second->Update();

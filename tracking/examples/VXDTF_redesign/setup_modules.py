@@ -425,7 +425,7 @@ def setup_sim(path=0, useEDeposit=True, useMultipleScattering=True, allowDecay=T
         uiCommandList.append('/particle/process/dump')
         uiCommandList.append('/particle/select kaon-')
         uiCommandList.append('/particle/process/dump')
-    g4sim.param('UICommands', uiCommandList)
+    g4sim.param('UICommandsAtIdle', uiCommandList)
 
     # print(uiCommandList)
     if (path is 0):

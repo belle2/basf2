@@ -19,7 +19,6 @@
 #include <boost/python/extract.hpp>
 #include "Python.h"
 #include <vector>
-#include <cmath>
 #include <cstdio>
 
 namespace {

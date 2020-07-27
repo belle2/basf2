@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LHEREADER_H
-#define LHEREADER_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -18,8 +17,6 @@
 #include <string>
 #include <fstream>
 
-#include <TF1.h>
-#include <TRandom.h>
 #include <TLorentzRotation.h>
 
 namespace Belle2 {
@@ -52,7 +49,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    LHEReader(): m_nVirtual(0), m_nInitial(0), m_wrongSignPz(false), m_lineNr(0) {}
+    LHEReader():
+      m_wrongSignPz(false),
+      m_lineNr(0),
+      m_indexInitial(0),
+      m_indexVirtual(0)
+    {}
 
     /**
      * Destructor.
@@ -84,8 +86,18 @@ namespace Belle2 {
      */
     bool skipEvents(int n);
 
-    int m_nVirtual;        /**< The number of particles in each event with a set Virtual flag. */
-    int m_nInitial;        /**< The number of particles in each event with a set Initial flag. */
+    /**
+     * Set the maximum index of particles in each event that must be set as c_Initial (1-based).
+     * @param[in] index Maximum index for c_Initial.
+     */
+    void setInitialIndex(int index) { m_indexInitial = index; }
+
+    /**
+     * Set the maximum index of particles in each event that must be set as c_IsVirtual (1-based).
+     * @param[in] index Maximum index for c_IsVirtual.
+     */
+    void setVirtualIndex(int index) { m_indexVirtual = index; }
+
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
     TLorentzRotation m_labboost;     /**< Boost&rotation vector for boost from CM to LAB. */
     double m_meanDecayLength = 0.;        /**< Mean lifetime*c of displaced particle. */
@@ -126,8 +138,10 @@ namespace Belle2 {
      */
     int readParticle(MCParticleGraph::GraphParticle& particle);
 
+    int m_indexInitial;  /**< Maximum index of particles in each event that must be set as c_Initial (1-based). */
+
+    int m_indexVirtual;  /**< Maximum index of particles in each event that must be set as c_IsVirtual (1-based). */
+
   };
 
 }
-
-#endif //LHEREADER_H

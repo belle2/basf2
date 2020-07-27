@@ -45,7 +45,7 @@ def get_basf2_repo(non_dirty_check=False):
     return repo
 
 
-def checkout_git_revision(revision, use_stash=False, repo=None):
+def checkout_git_revision(revision, repo=None, use_stash=False):
     """
     Checkout the given revision in the basf2 repository.
     ATTENTION: this does not check for dirty files etc.
@@ -94,6 +94,10 @@ def fix_root_command_line():
 
 
 def get_git_hashes_between(git_end_hash, git_start_hash):
+    """
+    Return list of git hashes between `git_end_hash` and `git_start_hash`
+    (but not including them).
+    """
     try:
         git_hashs = check_output(["git", "log", str(git_start_hash + ".." + git_end_hash),
                                   "--pretty=format:%H"]).decode("utf-8").split("\n")

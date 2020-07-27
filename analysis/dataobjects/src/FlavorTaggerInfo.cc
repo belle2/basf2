@@ -15,7 +15,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/logging/Logger.h>
-#include <iostream>
 
 using namespace Belle2;
 
@@ -29,7 +28,7 @@ void FlavorTaggerInfo::setUseModeFlavorTagger(const std::string& mode)
   m_useModeFlavorTagger = mode;
 }
 
-void FlavorTaggerInfo::addMethodMap(std::string method)
+void FlavorTaggerInfo::addMethodMap(const std::string& method)
 {
   StoreArray<FlavorTaggerInfoMap> flavTagInfoMap;
   if (m_methodMap.find(method) == m_methodMap.end()) {
@@ -68,8 +67,8 @@ void FlavorTaggerInfo::setP(float momentum)
 
 void FlavorTaggerInfo::setParticle(Particle* particle)
 {
-  if (particle == NULL) {
-    Particle* particle_empty = new Particle();
+  if (particle == nullptr) {
+    auto* particle_empty = new Particle();
     m_particle.push_back(particle_empty);
   } else {
     m_particle.push_back(particle);
@@ -78,8 +77,8 @@ void FlavorTaggerInfo::setParticle(Particle* particle)
 
 void FlavorTaggerInfo::setMCParticle(MCParticle* particle)
 {
-  if (particle == NULL) {
-    MCParticle* particle_empty = new MCParticle();
+  if (particle == nullptr) {
+    auto* particle_empty = new MCParticle();
     m_MCparticle.push_back(particle_empty);
   } else {
     m_MCparticle.push_back(particle);
@@ -88,8 +87,8 @@ void FlavorTaggerInfo::setMCParticle(MCParticle* particle)
 
 void FlavorTaggerInfo::setMCParticleMother(MCParticle* particle)
 {
-  if (particle == NULL) {
-    MCParticle* particle_empty = new MCParticle();
+  if (particle == nullptr) {
+    auto* particle_empty = new MCParticle();
     m_MCparticle_mother.push_back(particle_empty);
   } else {
     m_MCparticle_mother.push_back(particle);
@@ -147,7 +146,7 @@ void FlavorTaggerInfo::setZ0(double Z0)
   m_Z0.push_back(float(Z0));
 }
 
-void FlavorTaggerInfo::setCategories(std::string category)
+void FlavorTaggerInfo::setCategories(const std::string& category)
 {
   m_categories.push_back(category);
 }
@@ -161,7 +160,7 @@ std::string FlavorTaggerInfo::getUseModeFlavorTagger()
   return m_useModeFlavorTagger;
 }
 
-FlavorTaggerInfoMap* FlavorTaggerInfo::getMethodMap(std::string method)
+FlavorTaggerInfoMap* FlavorTaggerInfo::getMethodMap(const std::string& method)
 {
   auto it = m_methodMap.find(method);
   if (it == m_methodMap.end()) {
@@ -171,7 +170,7 @@ FlavorTaggerInfoMap* FlavorTaggerInfo::getMethodMap(std::string method)
   }
 }
 
-bool FlavorTaggerInfo::isMethodInMap(std::string method)
+bool FlavorTaggerInfo::isMethodInMap(const std::string& method)
 {
   auto it = m_methodMap.find(method);
   if (it == m_methodMap.end()) {
@@ -213,8 +212,8 @@ std::vector<MCParticle*> FlavorTaggerInfo::getMCParticleMother()
 
 std::vector<Track*> FlavorTaggerInfo::getTracks()
 {
-  for (unsigned i = 0; i < m_tracks.size(); i++) {
-    if (m_tracks[i]) {
+  for (auto& track : m_tracks) {
+    if (track) {
     }
   }
   return m_tracks;
@@ -284,5 +283,3 @@ std::vector<std::string> FlavorTaggerInfo::getCategories()
 {
   return m_categories;
 }
-
-

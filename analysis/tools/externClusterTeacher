@@ -1,25 +1,14 @@
 #!/bin/bash
-# Runs the externTeacher tool as a job on the cluster
+OLD=externClusterTeacher
+NEW=analysis-mva-kekcc-cluster-teacher
+echo -e "\033[0;31mAttention:\033[0m ${OLD} has been renamed to ${NEW}.
 
-rf=`mktemp -u`
-f=$(basename $rf)
-echo "Use $f as temporary file"
-printf " %q" basf2_mva_teacher "$@" > "$f" 
-#echo "externTeacher $*" > "$f"
-cat "$f"
-chmod +x ./"$f"
+Some time ago the software group has decided that we should enforce a more
+systematic naming convention for command line tools. The old names have been
+kept for compatibility but will now be removed. The tool you tried to call is
+one of those which has been renamed.
 
-#wait 1-20s to not run into issues with the batch system (low system limits)
-sleep `echo $RANDOM | sed -e 's/\(.\)\(.*\)/\1.\2/g'`
-sleep `echo $RANDOM | sed -e 's/\(.\)\(.*\)/\1.\2/g'`
-echo ""
-echo bsub -K -q sx -e "$f".elog -o "$f".log "$f"
-bsub -K -q sx -e "$f".elog -o "$f".log ./"$f"
-# Print log files, so FEI finds MVA ranking
-# It is possible that we have to wait for the log file,
-# because it may take some time to move the log file from the cluster to disk
-while [ ! -f "$f".log ]; do sleep 1; done
-cat "$f".log
-while [ ! -f "$f".elog ]; do sleep 1; done
-cat "$f".elog
-#rm $f
+From now on please use \033[0;32m${NEW}\033[0m
+
+\033[0;31mAttention:\033[0m ${OLD} has been renamed to ${NEW}."
+$NEW "$@"

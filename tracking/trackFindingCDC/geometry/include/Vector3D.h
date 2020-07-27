@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
+#include <framework/geometry/B2Vector3.h>
+
 #include <string>
 #include <iosfwd>
 #include <cmath>
@@ -38,6 +40,9 @@ namespace Belle2 {
       /// Constructor translating from a TVector3 instance
       explicit Vector3D(const TVector3& tVector3);
 
+      /// Constructor translating from a B2Vector3 instance
+      explicit Vector3D(const B2Vector3D& b2Vector3);
+
       /// Constructor from three coordinates
       Vector3D(double x, double y, double z)
         : m_xy(x, y)
@@ -61,6 +66,9 @@ namespace Belle2 {
 
       /// Assignment translating from a TVector3 instance
       Vector3D& operator=(const TVector3& tVector3);
+
+      /// Assignment translating from a B2Vector3 instance
+      Vector3D& operator=(const B2Vector3D& b2Vector3);
 
       /// Constructs the average of two vectors
       /** Computes the average of two vectors.
@@ -104,6 +112,9 @@ namespace Belle2 {
 
       /// Casting the back to TVector3 seamlessly
       operator const TVector3() const;
+
+      /// Casting the back to B2Vector3 seamlessly
+      operator const B2Vector3D() const;
 
       /// Equality comparison with all three coordinates
       bool operator==(const Vector3D& rhs) const

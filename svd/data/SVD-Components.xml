@@ -52,13 +52,13 @@
 		<length unit="mm">125.580</length>
 		<height unit="um">300</height>
 		<Active>
-			<u unit="mm"> 1.520</u>
-			<v unit="mm"> 1.390</v>
+			<u unit="mm"> 1.515</u>
+			<v unit="mm"> 1.350</v>
 			<stripsU>768</stripsU>
 			<stripsV>512</stripsV>
-			<width  unit="mm">57.590</width>
-			<width2 unit="mm">38.420</width2>
-			<length unit="mm">122.760</length>
+			<width  unit="mm">57.600</width>
+			<width2 unit="mm">38.400</width2>
+			<length unit="mm">122.880</length>
 			<height unit="um"> 300</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
@@ -75,8 +75,8 @@
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <ADUEquivalentU unit="e">270</ADUEquivalentU>
                         <ADUEquivalentV unit="e">259</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">820</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">716</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">540</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">467</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -87,12 +87,12 @@
 		<length unit="mm">124.880</length>
 		<height unit="um">320</height>
 		<Active>
-			<u unit="mm"> 0.940</u>
-			<v unit="mm"> 0.990</v>
+			<u unit="mm"> 1.000</u>
+			<v unit="mm"> 1.000</v>
 			<stripsU>768</stripsU>
 			<stripsV>512</stripsV>
-			<width  unit="mm">57.720</width>
-			<length unit="mm">122.900</length>
+			<width  unit="mm">57.600</width>
+			<length unit="mm">122.880</length>
 			<height unit="um"> 320</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
@@ -110,12 +110,12 @@
                         <!-- All except backward sensors are on Origami -->
                         <ADUEquivalentU unit="e">297</ADUEquivalentU>
                         <ADUEquivalentV unit="e">231</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">984</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">527</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">708</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">306</ElectronicNoiseV>
                         <ADUEquivalentSbwU unit="e">274</ADUEquivalentSbwU>
                         <ADUEquivalentSbwV unit="e">260</ADUEquivalentSbwV>
-                        <ElectronicNoiseSbwU unit="e">853</ElectronicNoiseSbwU>
-                        <ElectronicNoiseSbwV unit="e">716</ElectronicNoiseSbwV>
+                        <ElectronicNoiseSbwU unit="e">567</ElectronicNoiseSbwU>
+                        <ElectronicNoiseSbwV unit="e">471</ElectronicNoiseSbwV>
 		</Active>
 	</SensorBase>
 
@@ -126,12 +126,12 @@
 		<length unit="mm">124.880</length>
 		<height unit="um">320.000</height>
 		<Active>
-			<u unit="mm"> 0.940</u>
-			<v unit="mm"> 0.990</v>
+			<u unit="mm"> 1.015</u>
+			<v unit="mm"> 1.000</v>
 			<stripsU>768</stripsU>
 			<stripsV>768</stripsV>
-			<width  unit="mm">38.520</width>
-			<length unit="mm">122.900</length>
+			<width  unit="mm">38.400</width>
+			<length unit="mm">122.880</length>
 			<height unit="um">320.000</height>
                         <stripEdgeU unit="um">100</stripEdgeU>
                         <stripEdgeV unit="um">100</stripEdgeV>
@@ -148,8 +148,8 @@
                         <CouplingCapacitanceV unit="pF/cm">30</CouplingCapacitanceV>
                         <ADUEquivalentU unit="e">320</ADUEquivalentU>
                         <ADUEquivalentV unit="e">323</ADUEquivalentV>
-                        <ElectronicNoiseU unit="e">1054</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">798</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">793</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">585</ElectronicNoiseV>
 		</Active>
 		<!-- For now, layer 3 only has a flex on top -->
 		<Component name="KaptonLayer3">

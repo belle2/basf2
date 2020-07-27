@@ -9,15 +9,10 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDReduction.h>
 #include <TROOT.h>
-#include <TStyle.h>
-#include <TClass.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
 using namespace Belle2;
-
-
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -34,16 +29,25 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
-  addParam("HistoDir", m_histogramDirectoryName, "Name of Histogram dir", std::string("pxd"));
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:ReductionFlag"));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
+}
+
+DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
+{
+#ifdef _BELLE2_EPICS
+  if (ca_current_context()) ca_context_destroy();
+#endif
 }
 
 void DQMHistAnalysisPXDReductionModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");
 
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+  m_monObj = getMonitoringObject("pxd");
+
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -58,7 +62,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
   gROOT->cd(); // this seems to be important, or strange things happen
 
-  m_cReduction = new TCanvas("c_Reduction");
+  m_cReduction = new TCanvas((m_histogramDirectoryName + "/c_Reduction").data());
   m_hReduction = new TH1F("Reduction", "Reduction; Module; Reduction", m_PXDModules.size(), 0, m_PXDModules.size());
   m_hReduction->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hReduction->SetStats(false);
@@ -85,8 +89,8 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
 
 #ifdef _BELLE2_EPICS
-  SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
 #endif
 }
@@ -106,6 +110,9 @@ void DQMHistAnalysisPXDReductionModule::event()
   m_hReduction->Reset(); // dont sum up!!!
 
   bool enough = false;
+  double ireduction = 0.0;
+  int ireductioncnt = 0;
+//   int ccnt = 1;
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
@@ -116,25 +123,33 @@ void DQMHistAnalysisPXDReductionModule::event()
       hh1 = findHist(m_histogramDirectoryName, name);
     }
     if (hh1) {
-      B2INFO("Histo " << name << " found in mem");
-      m_hReduction->Fill(i, hh1->GetMean());
+//       B2INFO("Histo " << name << " found in mem");
+      auto mean = hh1->GetMean();
+      m_hReduction->Fill(i, mean);
       if (hh1->GetEntries() > 100) enough = true;
+      if (mean > 0) {
+        ireduction += mean; // well fit would be better
+        ireductioncnt++;
+      }
     }
+//     ccnt++;
   }
   m_cReduction->cd();
 
   // not enough Entries
   if (!enough) {
-    m_cReduction->Pad()->SetFillColor(6);// Magenta
+    m_cReduction->Pad()->SetFillColor(kGray);// Magenta or Gray
   } else {
 //   B2INFO("data "<<data);
-    /// FIXME: absolute numbers or relative numbers and what is the laccpetable limit?
+    /// FIXME: absolute numbers or relative numbers and what is the accpetable limit?
 //   if (data > 100.) {
-//     m_cReduction->Pad()->SetFillColor(2);// Red
+//     m_cReduction->Pad()->SetFillColor(kRed);// Red
 //   } else if (data > 50.) {
-//     m_cReduction->Pad()->SetFillColor(5);// Yellow
+//     m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
 //   } else {
-    m_cReduction->Pad()->SetFillColor(0);// White
+//     m_cReduction->Pad()->SetFillColor(kGreen);// Green
+//   } else {
+    m_cReduction->Pad()->SetFillColor(kWhite);// White
   }
 
   if (m_hReduction) {
@@ -144,10 +159,13 @@ void DQMHistAnalysisPXDReductionModule::event()
 //     m_line3->Draw();
   }
 
+  double data = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
+
+  m_monObj->setVariable("reduction", data);
+
   m_cReduction->Modified();
   m_cReduction->Update();
 #ifdef _BELLE2_EPICS
-  double data = 0; // what do we want to return?
 
   SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");

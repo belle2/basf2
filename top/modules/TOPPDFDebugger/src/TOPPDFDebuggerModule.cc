@@ -19,25 +19,18 @@
 #include <top/reconstruction/TOPconfigure.h>
 
 // Hit classes
-#include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
-#include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPPDFCollection.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPBarHit.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-//##include <framework/gearbox/Unit.h>
-//##include <framework/gearbox/Const.h>
-//##include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
 
-// ROOT
-#include <TVector3.h>
+#include <cmath>
 
 using namespace std;
 
@@ -57,9 +50,8 @@ namespace Belle2 {
   TOPPDFDebuggerModule::TOPPDFDebuggerModule() : Module()
   {
     // Set description
-    setDescription("Reconstruction for TOP counter. Uses reconstructed tracks "
-                   "extrapolated to TOP and TOPDigits to calculate log likelihoods "
-                   "for charged stable particles");
+    setDescription("This module makes an analytic PDF available in "
+                   "a store array TOPPDFCollections, related from Tracks");
 
     // Set property flags
     setPropertyFlags(c_ParallelProcessingCertified);
@@ -72,15 +64,19 @@ namespace Belle2 {
     addParam("minTime", m_minTime,
              "lower limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
     addParam("maxTime", m_maxTime,
-             "time limit for photons [ns] (0 = use full TDC range)", 0.0);
+             "upper limit for photon time [ns] (default if minTime >= maxTime)", 0.0);
+    /* not implemented
     addParam("writeNPdfs", m_writeNPdfs,
-             "Write out the PDF for the first N events. -1 is for all.", 0);
+       "Write out the PDF for the first N events. -1 is for all.", 0);
     addParam("writeNPulls", m_writeNPulls,
-             "Write out pulls for the first N events. -1 is for all.", 0);
-
-    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_masses[i] = 0;}
-    for (unsigned i = 0; i < Const::ChargedStable::c_SetSize; i++) {m_pdgCodes[i] = 0;}
-
+       "Write out pulls for the first N events. -1 is for all.", 0);
+    */
+    addParam("pdfOption", m_pdfOption,
+             "PDF option, one of 'rough', 'fine', 'optimal'", std::string("fine"));
+    addParam("pdgCodes", m_pdgCodes,
+             "PDG codes of charged stable particles for which to construct PDF. "
+             "Empty list means all charged stable particles.",
+             m_pdgCodes);
   }
 
 
@@ -92,11 +88,8 @@ namespace Belle2 {
   void TOPPDFDebuggerModule::initialize()
   {
     // input
-    StoreArray<TOPDigit> digits;
-    digits.isRequired();
-
-    StoreArray<Track> tracks;
-    tracks.isRequired();
+    m_digits.isRequired();
+    m_tracks.isRequired();
 
     StoreArray<ExtHit> extHits;
     extHits.isRequired();
@@ -108,24 +101,47 @@ namespace Belle2 {
     barHits.isOptional();
 
     // output
-    StoreArray<TOPPDFCollection> pdfCollection;
-    pdfCollection.registerInDataStore();
-    tracks.registerRelationTo(pdfCollection);
+    m_pdfCollection.registerInDataStore();
+    m_tracks.registerRelationTo(m_pdfCollection);
+    m_associatedPDFs.registerInDataStore();
+    m_digits.registerRelationTo(m_associatedPDFs);
+    m_pixelData.registerInDataStore();
+    m_tracks.registerRelationTo(m_pixelData);
 
     // check for module debug level
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
       m_debugLevel = getLogConfig().getDebugLevel();
     }
 
-    // Initialize masses
-    for (const auto& part : Const::chargedStableSet) {
-      m_masses[part.getIndex()] = part.getMass();
-      m_pdgCodes[part.getIndex()] = abs(part.getPDGCode());
+    // particle hypotheses
+    if (m_pdgCodes.empty()) {
+      for (const auto& part : Const::chargedStableSet) {
+        m_pdgCodes.push_back(abs(part.getPDGCode()));
+        m_masses.push_back(part.getMass());
+      }
+    } else {
+      for (auto& pdg : m_pdgCodes) pdg = abs(pdg);
+      for (auto pdg : m_pdgCodes) {
+        auto part = Const::ChargedStable(pdg); //throws runtime error for invalid pdg
+        m_masses.push_back(part.getMass());
+      }
     }
 
     // Configure TOP detector
     TOPconfigure config;
     if (m_debugLevel > 0) config.print();
+
+    // Parse PDF option
+    if (m_pdfOption == "rough") {
+      m_PDFOption = TOPreco::c_Rough;
+    } else if (m_pdfOption == "fine") {
+      m_PDFOption = TOPreco::c_Fine;
+    } else if (m_pdfOption == "optimal") {
+      m_PDFOption = TOPreco::c_Optimal;
+    } else {
+      B2ERROR("TOPPDFDebuggerModule: unknown PDF option '" << m_pdfOption << "'");
+    }
+
   }
 
   void TOPPDFDebuggerModule::beginRun()
@@ -134,14 +150,13 @@ namespace Belle2 {
 
   void TOPPDFDebuggerModule::event()
   {
-    // output: pdfs
-    StoreArray<TOPPDFCollection> pdfCollection;
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     // create reconstruction object
-    TOPreco reco(Const::ChargedStable::c_SetSize, m_masses, m_minBkgPerBar, m_scaleN0);
-    reco.setHypID(Const::ChargedStable::c_SetSize, m_pdgCodes);
-    reco.setPDFoption(TOPreco::c_Fine);
+    TOPreco reco(m_masses.size(), m_masses.data(), m_pdgCodes.data(),
+                 m_minBkgPerBar, m_scaleN0);
+    reco.setPDFoption(m_PDFOption);
+    reco.setStoreOption(TOPreco::c_Full);
 
     // set time limit for photons lower than that given by TDC range (optional)
     if (m_maxTime > m_minTime) {
@@ -149,8 +164,7 @@ namespace Belle2 {
     }
 
     // add photons
-    StoreArray<TOPDigit> digits;
-    for (const auto& digit : digits) {
+    for (const auto& digit : m_digits) {
       if (digit.getHitQuality() == TOPDigit::EHitQuality::c_Good) {
         reco.addData(digit.getModuleID(), digit.getPixelID(),
                      digit.getTime(), digit.getTimeError());
@@ -158,25 +172,32 @@ namespace Belle2 {
     }
 
     // reconstruct track-by-track and store the results
-    StoreArray<Track> tracks;
-    for (const auto& track : tracks) {
+    for (const auto& track : m_tracks) {
       // construct TOPtrack from mdst track
       TOPtrack trk(&track);
       if (!trk.isValid()) continue;
 
       // add this vector of vector of triplets to the TOPPDFCollection
-      TOPPDFCollection* topPDFColl = pdfCollection.appendNew();
+      TOPPDFCollection* topPDFColl = m_pdfCollection.appendNew();
       const auto& module = geo->getModule(trk.getModuleID());
       topPDFColl->setLocalPositionMomentum(
         module.pointToLocal(trk.getPosition()),
-        module.momentumToLocal(trk.getMomentum())
+        module.momentumToLocal(trk.getMomentum()),
+        trk.getModuleID()
       );
-      for (size_t ihypothesis = 0; ihypothesis < Const::ChargedStable::c_SetSize; ++ihypothesis) {
-        double iMass = m_masses[ihypothesis];
-        int iPDGCode = m_pdgCodes[ihypothesis];
-        reco.setMass(iMass);
+
+      TOPPixelLikelihood* topPLkhs = m_pixelData.appendNew();
+      topPLkhs->setModuleID(trk.getModuleID());
+
+      for (unsigned i = 0; i < m_pdgCodes.size(); i++) {
+        double mass = m_masses[i];
+        int iPDGCode = m_pdgCodes[i];
+        reco.setMass(mass, iPDGCode);
         reco.reconstruct(trk); // will run reconstruction only for this mass hypothesis
         if (reco.getFlag() != 1) break; // track is not in the acceptance of TOP
+
+        // associate PDF peaks with photons using S-plot technique
+        associatePDFPeaks(reco, trk.getModuleID(), iPDGCode);
 
         // collection of gaussian_t's for each pixel
         TOPPDFCollection::modulePDF_t channelPDFCollection;
@@ -189,18 +210,86 @@ namespace Belle2 {
             // get this peak
             reco.getPDFPeak(pixelID, k, position, width, numPhotons);
 
-            auto tp = make_tuple(position, width, numPhotons);
+            auto tp = TOPPDFCollection::Gaussian(position, width, numPhotons);
             channelPDFCollection.at(pixelID - 1).push_back(tp);
 
           } // end loop over peaks in the pdf for this pixel
         } // end loop over pixels
 
         topPDFColl->addHypothesisPDF(channelPDFCollection, iPDGCode);
+
+        // Initialize logL and sfot pixel arrays
+        TOPPixelLikelihood::PixelArray_t pixLogLs, pixSigPhots;
+        pixLogLs.fill(0);
+        pixSigPhots.fill(0);
+
+        double timeShift = 0, timeMin = 0, timeMax = 0, sigma = 0; /**< getLogL arguments */
+        reco.getLogL(timeShift, timeMin, timeMax, sigma, pixLogLs.data(), pixSigPhots.data());
+
+        topPLkhs->addHypothesisLikelihoods(pixLogLs, iPDGCode);
+        topPLkhs->addHypothesisSignalPhotons(pixSigPhots, iPDGCode);
       }
-      track.addRelationTo(topPDFColl);
+      if (reco.getFlag() == 1) {
+        track.addRelationTo(topPDFColl);
+        track.addRelationTo(topPLkhs);
+      }
     } // end loop over tracks
     ++m_iEvent;
   }
+
+
+  void TOPPDFDebuggerModule::associatePDFPeaks(const TOPreco& reco, int moduleID, int pdg)
+  {
+
+    for (const auto& digit : m_digits) {
+      if (digit.getModuleID() != moduleID) continue;
+      if (digit.getHitQuality() != TOPDigit::c_Good) continue;
+
+      auto* associatedPDF = m_associatedPDFs.appendNew(pdg);
+      digit.addRelationTo(associatedPDF);
+
+      int pixelID = digit.getPixelID();
+      associatedPDF->setBackgroundWeight(reco.getBkgLevel(pixelID));
+
+      const auto& tts = TOPGeometryPar::Instance()->getTTS(moduleID, digit.getPMTNumber());
+      float time = digit.getTime();
+      float timeErr = digit.getTimeError();
+      for (int k = 0; k < reco.getNumofPDFPeaks(pixelID); k++) {
+        TOPAssociatedPDF::PDFPeak peak;
+        reco.getPDFPeak(pixelID, k, peak.position, peak.width, peak.numPhotons);
+        float wt = 0;
+        for (const auto& gaus : tts.getTTS()) {
+          float sig2 = peak.width * peak.width + gaus.sigma * gaus.sigma + timeErr * timeErr;
+          float x = pow(time - peak.position - gaus.position, 2) / sig2;
+          if (x > 20) continue;
+          wt += peak.numPhotons * gaus.fraction / sqrt(2 * M_PI * sig2) * exp(-x / 2);
+        }
+        if (wt > 0) {
+          peak.fic = reco.getPDFPeakFic(pixelID, k);
+          peak.e = reco.getPDFPeakE(pixelID, k);
+          peak.sige = reco.getPDFPeakSigE(pixelID, k);
+          peak.nx = reco.getPDFPeakNx(pixelID, k);
+          peak.ny = reco.getPDFPeakNy(pixelID, k);
+          peak.nxm = reco.getPDFPeakNxm(pixelID, k);
+          peak.nym = reco.getPDFPeakNym(pixelID, k);
+          peak.nxe = reco.getPDFPeakNxe(pixelID, k);
+          peak.nye = reco.getPDFPeakNye(pixelID, k);
+          peak.xd = reco.getPDFPeakXD(pixelID, k);
+          peak.yd = reco.getPDFPeakYD(pixelID, k);
+          peak.type = reco.getPDFPeakType(pixelID, k);
+          peak.kxe = reco.getPDFPeakKxe(pixelID, k);
+          peak.kye = reco.getPDFPeakKye(pixelID, k);
+          peak.kze = reco.getPDFPeakKze(pixelID, k);
+          peak.kxd = reco.getPDFPeakKxd(pixelID, k);
+          peak.kyd = reco.getPDFPeakKyd(pixelID, k);
+          peak.kzd = reco.getPDFPeakKzd(pixelID, k);
+          associatedPDF->appendPeak(peak, wt);
+        }
+      }
+    }
+
+  }
+
 
   void TOPPDFDebuggerModule::endRun()
   {

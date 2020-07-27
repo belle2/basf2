@@ -112,36 +112,57 @@ namespace Belle2 {
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
       // No total results should not change anything.
-      result.addResult(SoftwareTriggerDBHandler::makeFullCutName("fast_reco", "some_cut"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeFullCutName("filter", "some_cut"), SoftwareTriggerCutResult::c_reject);
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
-      // fast reco has accepted -> accept
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_accept);
+      // Revision 2
+      // filter has rejected -> reject
+      result.clear();
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("filter"), SoftwareTriggerCutResult::c_reject);
+      EXPECT_EQ(false, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
+
+      // filter has accepted and skim also -> accept
+      result.clear();
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("filter"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("skim"), SoftwareTriggerCutResult::c_accept);
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
+      // filter has rejected and skim should not change anything -> reject
+      result.clear();
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("filter"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("skim"), SoftwareTriggerCutResult::c_accept);
+      EXPECT_EQ(false, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
+
+      // filter has accepted, skim does not matter -> accept
+      result.clear();
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("filter"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("skim"), SoftwareTriggerCutResult::c_reject);
+      EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
+
+      // Revision 1
       // fast reco has rejected -> reject
       result.clear();
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("fast_reco"), SoftwareTriggerCutResult::c_reject);
       EXPECT_EQ(false, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
       // fast reco has accepted and hlt also -> accept
       result.clear();
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_accept);
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("hlt"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("fast_reco"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("hlt"), SoftwareTriggerCutResult::c_accept);
       EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
       // fast reco has rejected and hlt should not change anything -> reject
       result.clear();
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_reject);
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("hlt"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("fast_reco"), SoftwareTriggerCutResult::c_reject);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("hlt"), SoftwareTriggerCutResult::c_accept);
       EXPECT_EQ(false, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
 
       // fast reco and hlt have accepted, calib does not matter -> accept
       result.clear();
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("fast_reco"), SoftwareTriggerCutResult::c_accept);
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("hlt"), SoftwareTriggerCutResult::c_accept);
-      result.addResult(SoftwareTriggerDBHandler::makeTotalCutName("calib"), SoftwareTriggerCutResult::c_reject);
-      EXPECT_EQ(true, FinalTriggerDecisionCalculator::getFinalTriggerDecision(result));
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("fast_reco"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("hlt"), SoftwareTriggerCutResult::c_accept);
+      result.addResult(SoftwareTriggerDBHandler::makeTotalResultName("calib"), SoftwareTriggerCutResult::c_reject);
+
     }
   }
 }

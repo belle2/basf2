@@ -67,7 +67,7 @@ class PackerUnpackerTest(Module):
 main = create_path()
 
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 particlegun = register_module('ParticleGun')
@@ -79,6 +79,7 @@ particlegun.param('thetaParams', [20.0, 25.0])
 main.add_module(particlegun)
 
 add_simulation(main, components=['ARICH'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["ARICH"])
 
 Packer = register_module('ARICHPacker')
 main.add_module(Packer)

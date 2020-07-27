@@ -6,6 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::ECL::ECLChannelMapper;
-
+#pragma link C++ class Belle2::ECL::ECLDspUtilities;
 
 #endif

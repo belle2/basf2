@@ -1,3 +1,14 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Guglielmo De Nardo                                       *
+ *                Alon Hershenhorn                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef ECLSampleShaper
 #define ECLSampleShaper
 
@@ -5,11 +16,16 @@
 
 namespace Belle2 {
   namespace ECL {
+
+    /** digitisation shaper */
     class ECLSampledShaper {
     public:
+      /** constructor */
       ECLSampledShaper(const TH1F* s, double ts = 1)
         : m_sampledShape(s), m_timeScale(ts) {}
+      /** destructor */
       ~ECLSampledShaper() { delete m_sampledShape;}
+      /** fill the sampled shape array */
       void fillarray(int N, double* a)
       {
         if (m_timeScale == 1)
@@ -24,8 +40,8 @@ namespace Belle2 {
         }
       }
     private:
-      const TH1F* m_sampledShape;
-      const int m_timeScale;
+      const TH1F* m_sampledShape; /**< the sampled shape */
+      const int m_timeScale; /**< the time scale */
     };
 
   }

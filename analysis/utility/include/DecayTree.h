@@ -13,11 +13,7 @@
 #include <analysis/utility/DecayNode.h>
 
 #include <vector>
-#include <list>
 #include <string>
-#include <algorithm>
-#include <memory>
-
 
 namespace Belle2 {
 
@@ -31,7 +27,7 @@ namespace Belle2 {
     /**
      * Create a new Decay tree from a decaystring
      */
-    DecayTree(const std::string& decaystring, bool removeRadiativeGammaFlag = false);
+    explicit DecayTree(const std::string& decaystring, bool removeRadiativeGammaFlag = false);
 
     /**
      * Copy constructor

@@ -1,5 +1,4 @@
 #include <TRandom.h>
-#include <vector>
 //index prescalefactor cut
 //0 1 n_2d_finder>=3
 //1 1 n_2d_finder==2&&BhabhaVeto==0
@@ -32,8 +31,9 @@ namespace Belle2 {
 
   /**set the total number of trigger lines and prescalefactor*/
   const int ntrgline = 18;
-  /**prescale factor*/
+  /**prescale factor for phase2*/
   double scalef_phase2[ntrgline] = {1, 1, 20, 1, 1, 1, 1, 1, 1, 1, 1, 10, 10, 1, 1, 1, 1, 1};
+  /**prescale factor for phase3*/
   double scalef_phase3[ntrgline] = {1, 1, 20, 2, 1, 1, 1, 1, 2, 1, 1, 20, 20, 1, 5, 1, 3, 5};
 
   /**select one event in number of prescale factor events*/

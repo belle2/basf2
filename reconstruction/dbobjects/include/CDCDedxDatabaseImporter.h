@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <TFile.h>
 #include <TObject.h>
 
 namespace Belle2 {
@@ -26,7 +25,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxDatabaseImporter(std::string inputFileName, std::string m_name);
+    CDCDedxDatabaseImporter(std::string inputFileName, const std::string& m_name);
 
     /**
      * Destructor
@@ -63,7 +62,6 @@ namespace Belle2 {
     std::vector<std::string> m_inputFileNames; /**< Name of input ROOT files */
     std::string m_name; /**< Name of database ROOT file */
 
-    ClassDef(CDCDedxDatabaseImporter, 2); /**< ClassDef */
   };
 
 } // Belle2 namespace

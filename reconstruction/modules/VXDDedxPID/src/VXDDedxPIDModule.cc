@@ -12,22 +12,17 @@
 #include <reconstruction/modules/VXDDedxPID/HelixHelper.h>
 
 #include <framework/gearbox/Const.h>
-#include <framework/utilities/FileSystem.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <genfit/MaterialEffects.h>
 
-#include <TFile.h>
 #include <TH2F.h>
-#include <TMath.h>
 
 #include <memory>
 #include <cassert>
 #include <cmath>
 #include <algorithm>
-#include <utility>
 
 using namespace Belle2;
 using namespace Dedx;
@@ -43,9 +38,8 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module()
 
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits,
-           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", true);
-  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
-  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
+           "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", false);
+  // no need to define highest and lowest truncated value as we always remove higest two dE/dx value from the 8 dE/dx value
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
@@ -272,10 +266,9 @@ void VXDDedxPIDModule::event()
       // add a few last things to the VXDDedxTrack
       const int numDedx = dedxTrack->dedx.size();
       dedxTrack->m_nHits = numDedx;
-      // add a factor of 0.5 here to make sure we are rounding appropriately...
-      const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
-      const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
-      dedxTrack->m_nHitsUsed = highEdgeTrunc - lowEdgeTrunc;
+      // no need to define lowedgetruncated and highedgetruncated as we always remove the highest 2 dE/dx values from 8 dE/dx value
+
+      dedxTrack->m_nHitsUsed = numDedx - 2;
 
       // now book the information for this track
       VXDDedxTrack* newVXDDedxTrack = m_dedxTracks.appendNew(*dedxTrack);
@@ -295,53 +288,45 @@ void VXDDedxPIDModule::terminate()
   B2DEBUG(50, "VXDDedxPIDModule exiting after processing " << m_trackID <<
           " tracks in " << m_eventID + 1 << " events.");
 }
-
+// calculateMeans need some change as we always remove highest 2 dE/dx values
 void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr,
                                       const std::vector<double>& dedx) const
 {
-  // Calculate the truncated average by skipping the lowest & highest
-  // events in the array of dE/dx values
+  // Calculate the truncated average by skipping only highest two value
   std::vector<double> sortedDedx = dedx;
   std::sort(sortedDedx.begin(), sortedDedx.end());
 
   double truncatedMeanTmp = 0.0;
   double meanTmp = 0.0;
   double sumOfSquares = 0.0;
-  int numValuesTrunc = 0;
   const int numDedx = sortedDedx.size();
 
-  // add a factor of 0.5 here to make sure we are rounding appropriately...
-  const int lowEdgeTrunc = int(numDedx * m_removeLowest + 0.5);
-  const int highEdgeTrunc = int(numDedx * (1 - m_removeHighest) + 0.5);
+
   for (int i = 0; i < numDedx; i++) {
     meanTmp += sortedDedx[i];
-    if (i >= lowEdgeTrunc and i < highEdgeTrunc) {
-      truncatedMeanTmp += sortedDedx[i];
-      sumOfSquares += sortedDedx[i] * sortedDedx[i];
-      numValuesTrunc++;
-    }
   }
-
   if (numDedx != 0) {
     meanTmp /= numDedx;
   }
-  if (numValuesTrunc != 0) {
-    truncatedMeanTmp /= numValuesTrunc;
-  } else {
-    truncatedMeanTmp = meanTmp;
+
+  for (int i = 0; i < numDedx - 2; i++) {
+    truncatedMeanTmp += sortedDedx[i];
+    sumOfSquares += sortedDedx[i] * sortedDedx[i];
+  }
+  if (numDedx - 2 != 0) {
+    truncatedMeanTmp /= numDedx - 2;
   }
 
   *mean = meanTmp;
   *truncatedMean = truncatedMeanTmp;
 
-  if (numValuesTrunc > 1) {
-    *truncatedMeanErr = sqrt(sumOfSquares / double(numValuesTrunc) - truncatedMeanTmp * truncatedMeanTmp) / double(
-                          numValuesTrunc - 1);
+  if (numDedx - 2 > 1) {
+    *truncatedMeanErr = sqrt(sumOfSquares / double(numDedx - 2) - truncatedMeanTmp * truncatedMeanTmp) / double(
+                          (numDedx - 2) - 1);
   } else {
     *truncatedMeanErr = 0;
   }
 }
-
 
 double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHelper* helix)
 {

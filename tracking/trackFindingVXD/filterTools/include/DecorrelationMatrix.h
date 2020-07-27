@@ -40,7 +40,10 @@ namespace Belle2 {
     explicit DecorrelationMatrix(const MatrixT& matrix = MatrixT::Identity()) : m_matrix(matrix) { }
 
     /** copy constructor */
-    DecorrelationMatrix(const DecorrelationMatrix& matrix) : m_matrix(matrix.getMatrix()) { }
+    DecorrelationMatrix(const DecorrelationMatrix& matrix) = default;
+
+    /** assignment operator */
+    DecorrelationMatrix& operator=(const DecorrelationMatrix& rhs) = default;
 
     const MatrixT& getMatrix() const { return m_matrix; } /**< get the currently stored matrix */
 

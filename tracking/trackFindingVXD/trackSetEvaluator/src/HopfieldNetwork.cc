@@ -9,7 +9,12 @@
  **************************************************************************/
 
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
+
+#include <framework/logging/Logger.h>
+
 #include <Eigen/Dense>
+
+#include <numeric>
 
 using namespace Belle2;
 

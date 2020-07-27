@@ -9,15 +9,13 @@
  **************************************************************************/
 
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
-#include <framework/gearbox/Unit.h>
 #include <math.h>
 #include <iostream>
-#include <TVector2.h>
 
 using namespace std;
 using namespace Belle2;
 
-void ARICHGeoDetectorPlane::setRingPar(std::vector<std::pair<double, double>>& ringPar)
+void ARICHGeoDetectorPlane::setRingPar(const std::vector<std::pair<double, double>>& ringPar)
 {
   m_ringPar = ringPar;
 

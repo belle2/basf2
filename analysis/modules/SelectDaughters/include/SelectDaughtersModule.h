@@ -14,17 +14,6 @@
 #include <string>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
-
-// DataStore
-#include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// DataObjects
-#include <framework/dbobjects/BeamParameters.h>
-#include <analysis/dataobjects/ParticleList.h>
-
-
 namespace Belle2 {
   /**
    * Redefine (select) the daughters of a particle

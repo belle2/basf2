@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPGeometry.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <math.h>
 #include <iostream>
@@ -21,8 +20,8 @@ namespace Belle2 {
   void TOPGeometry::appendModule(const TOPGeoModule& module)
   {
     if (isModuleIDValid(module.getModuleID())) {
-      B2ERROR("TOPGeometry::appendModule: a module with ID = " << module.getModuleID()
-              << "already appended");
+      B2ERROR("TOPGeometry::appendModule: module already appended."
+              << LogVar("ID", module.getModuleID()));
       return;
     }
     m_modules.push_back(module);
@@ -43,13 +42,20 @@ namespace Belle2 {
     for (const auto& module : m_modules) {
       if (module.getModuleID() == moduleID) return module;
     }
-    B2FATAL("TOPGeometry::getModule: invalid module ID " << moduleID);
+    B2FATAL("TOPGeometry::getModule: invalid module, ID = " << moduleID);
   }
 
   const TOPNominalTTS& TOPGeometry::getTTS(unsigned type) const
   {
     std::map<unsigned, TOPNominalTTS>::const_iterator it = m_tts.find(type);
     if (it == m_tts.end()) return m_nominalTTS;
+    return it->second;
+  }
+
+  double TOPGeometry::getPDETuningFactor(unsigned type) const
+  {
+    std::map<unsigned, float>::const_iterator it = m_tuneFactorsPDE.find(type);
+    if (it == m_tuneFactorsPDE.end()) return 1.0;
     return it->second;
   }
 
@@ -149,6 +155,16 @@ namespace Belle2 {
     m_QBB.print();
     cout << endl;
     m_nominalQE.print();
+    cout << endl;
+    cout << "Photo-detection efficiency tuning factors" << endl;
+    cout << "-----------------------------------------" << endl;
+    if (m_tuneFactorsPDE.empty()) {
+      cout << " Not available" << endl;
+    } else {
+      for (const auto& x : m_tuneFactorsPDE) {
+        cout << " PMT type: " << x.first << "  factor = " << x.second << endl;
+      }
+    }
     cout << endl;
     m_nominalTTS.print();
     cout << endl;

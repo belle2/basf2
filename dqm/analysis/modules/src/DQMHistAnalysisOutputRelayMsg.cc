@@ -10,13 +10,11 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutputRelayMsg.h>
 #include <TROOT.h>
-#include <TSystem.h>
 #include <TClass.h>
 #include <TObject.h>
 #include <TCanvas.h>
 #include <TMessage.h>
-#include "TKey.h"
-#include "TIterator.h"
+#include <ctime>
 
 using namespace std;
 using namespace Belle2;
@@ -61,9 +59,15 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
   B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: event called.");
   TMessage mess(kMESS_OBJECT);
 
-  TIter nextkey(gROOT->GetListOfCanvases());
+  TSeqCollection* seq = gROOT->GetListOfCanvases();
+  TIter nextkey(seq);
   TObject* obj = 0;
 
+  time_t now = time(0);
+  char mbstr[100];
+  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+
+  B2INFO("[" << mbstr << "] sending " << seq->GetEntries() << " objects.");
   bool first_try = true;
   while ((obj = (TObject*)nextkey())) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {

@@ -1,7 +1,14 @@
-// ******************************************************************
-// MC Matching
-// authors: A. Zupanc (anze.zupanc@ijs.si), C. Pulvermacher (christian.pulvermacher@kit.edu)
-// ******************************************************************
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ *                                                                        *
+ * Copyright(C) 2013-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Anze Zupanc, Christian Pulvermacher, Yo Sato,            *
+ *               Alejandro Mora                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <analysis/utility/MCMatching.h>
 #include <analysis/utility/AnalysisConfiguration.h>
@@ -29,17 +36,18 @@ std::string MCMatching::explainFlags(unsigned int flags)
   while (flags != 0) {
     if (flags & f) {
       switch (f) {
-        case c_MissFSR             : s += "c_MissFSR"; break;
-        case c_MissingResonance    : s += "c_MissingResonance"; break;
-        case c_DecayInFlight       : s += "c_DecayInFlight"; break;
-        case c_MissNeutrino        : s += "c_MissNeutrino"; break;
-        case c_MissGamma           : s += "c_MissGamma"; break;
-        case c_MissMassiveParticle : s += "c_MissMassiveParticle"; break;
-        case c_MissKlong           : s += "c_MissKlong"; break;
-        case c_MisID               : s += "c_MisID"; break;
-        case c_AddedWrongParticle  : s += "c_AddedWrongParticle"; break;
-        case c_InternalError       : s += "c_InternalError"; break;
-        case c_MissPHOTOS          : s += "c_MissPHOTOS"; break;
+        case c_MissFSR               : s += "c_MissFSR"; break;
+        case c_MissingResonance      : s += "c_MissingResonance"; break;
+        case c_DecayInFlight         : s += "c_DecayInFlight"; break;
+        case c_MissNeutrino          : s += "c_MissNeutrino"; break;
+        case c_MissGamma             : s += "c_MissGamma"; break;
+        case c_MissMassiveParticle   : s += "c_MissMassiveParticle"; break;
+        case c_MissKlong             : s += "c_MissKlong"; break;
+        case c_MisID                 : s += "c_MisID"; break;
+        case c_AddedWrongParticle    : s += "c_AddedWrongParticle"; break;
+        case c_InternalError         : s += "c_InternalError"; break;
+        case c_MissPHOTOS            : s += "c_MissPHOTOS"; break;
+        case c_AddedRecoBremsPhoton  : s += "c_AddedRecoBremsPhoton"; break;
         default:
           s += to_string(f);
           B2ERROR("MCMatching::explainFlags() doesn't know about flag " << f << ", please update it.");
@@ -85,8 +93,8 @@ bool MCMatching::setMCTruth(const Particle* particle)
   if (particle->hasExtraInfo(c_extraInfoMCErrors))
     return true;
 
-  const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
-  if (mcParticle) { //nothing to do
+  if (particle->getRelatedTo<MCParticle>()) {
+    //nothing to do
     return true;
   }
 
@@ -97,13 +105,14 @@ bool MCMatching::setMCTruth(const Particle* particle)
   }
 
   // check, if for all daughter particles Particle -> MCParticle relation exists
+  bool daugMCTruth = true;
   for (int i = 0; i < nChildren; ++i) {
     const Particle* daugP = particle->getDaughter(i);
-    //returns quickly when not found
-    bool daugMCTruth = setMCTruth(daugP);
-    if (!daugMCTruth)
-      return false;
+    // call setMCTruth for all daughters
+    daugMCTruth &= setMCTruth(daugP);
   }
+  if (!daugMCTruth)
+    return false;
 
   int motherIndex = 0;
   if (nChildren == 1) {
@@ -161,6 +170,76 @@ bool MCMatching::setMCTruth(const Particle* particle)
   return true;
 }
 
+
+//utility functions used by setMCErrorsExtraInfo() getMissingParticleFlags()
+namespace {
+  /** Recursively gather all matched MCParticles in daughters of p (taking special care of decay-in-flight things). */
+  void appendParticles(const Particle* p, unordered_set<const MCParticle*>& mcMatchedParticles)
+  {
+    for (unsigned i = 0; i < p->getNDaughters(); ++i) {
+      const Particle* daug = p->getDaughter(i);
+
+      //add matched MCParticle for 'daug'
+      const MCParticle* mcParticle = daug->getRelatedTo<MCParticle>();
+      if (mcParticle)
+        mcMatchedParticles.insert(mcParticle);
+
+      if (daug->getNDaughters() != 0) {
+        // if daug has daughters, call appendParticles recursively.
+        appendParticles(daug, mcMatchedParticles);
+        continue;
+      }
+
+      if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
+        //now daug does not have any daughters.
+        //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
+        //so we'll also add all mother MCParticles until the first primary mother
+        mcParticle = mcParticle->getMother();
+        while (mcParticle) {
+          mcMatchedParticles.insert(mcParticle);
+          if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
+            break;
+
+          mcParticle = mcParticle->getMother();
+        }
+      }
+
+    }
+  }
+
+  /** Recursively gather all daughters of 'gen' we want to reconstruct. */
+  void appendParticles(const MCParticle* gen, vector<const MCParticle*>& children)
+  {
+    if (MCMatching::isFSP(gen->getPDG()))
+      return; //stop at the bottom of the MC decay tree (ignore secondaries)
+
+    const vector<MCParticle*>& genDaughters = gen->getDaughters();
+    for (auto daug : genDaughters) {
+      children.push_back(daug);
+      appendParticles(daug, children);
+    }
+  }
+}
+
+int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle, const bool honorProperty)
+{
+  if (particle->hasExtraInfo(c_extraInfoMCErrors)) {
+    if (honorProperty) {
+      return (int(particle->getExtraInfo(c_extraInfoMCErrors)) & ~(getFlagsIgnoredByProperty(particle)));
+    } else {
+      return particle->getExtraInfo(c_extraInfoMCErrors);
+    }
+  } else {
+    if (!mcParticle)
+      mcParticle = particle->getRelatedTo<MCParticle>();
+    if (honorProperty) {
+      return (int(setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle)) & ~(getFlagsIgnoredByProperty(particle)));
+    } else {
+      return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
+    }
+  }
+}
+
 int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcParticle)
 {
   auto setStatus = [](Particle * part, int s) -> int {
@@ -168,65 +247,137 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
     return s;
   };
 
+  if (!mcParticle)
+    return setStatus(particle, MCErrorFlags::c_InternalError);
+
+  if (particle->getNDaughters() == 0) { //FSP
+    //other checks concern daughters of particle, so we're done here
+    return setStatus(particle, getFlagsOfFSP(particle, mcParticle));;
+  }
+
   int status = 0;
 
-  if (!mcParticle)
-    return setStatus(particle, status | MCErrorFlags::c_InternalError);
-
-  unsigned nChildren = particle->getNDaughters();
-  if (nChildren == 0) { //FSP-like
-    if (particle->getPDGCode() != mcParticle->getPDG()) {
-      if (!mcParticle->hasStatus(MCParticle::c_PrimaryParticle)) {
-        //secondary particle, so the original particle probably decayed
-        status |= MCErrorFlags::c_DecayInFlight;
-        //find first primary mother
-        const MCParticle* primary = mcParticle->getMother();
-        while (primary and !primary->hasStatus(MCParticle::c_PrimaryParticle))
-          primary = primary->getMother();
-
-        if (!primary) {
-          status |= MCErrorFlags::c_InternalError;
-        } else if (particle->getPDGCode() != primary->getPDG()) {
-          //if primary particle also has wrong PDG code, we're actually MisIDed
-          status |= MCErrorFlags::c_MisID;
-        }
-      } else {
-        status |= MCErrorFlags::c_MisID;
-      }
-    }
-
-    //other checks concern daughters of particle, so we're done here
-    return setStatus(particle, status);
-  }
+  // Check if particle (non FSP) has different PDG code than mcParticle
   const Particle::EFlavorType flavorType = particle->getFlavorType();
   if ((flavorType == Particle::c_Flavored and particle->getPDGCode() != mcParticle->getPDG())
       or (flavorType == Particle::c_Unflavored and abs(particle->getPDGCode()) != abs(mcParticle->getPDG()))) {
+    auto mother = mcParticle->getMother();
+
     // Check if mother particle has the correct pdg code, if so we have to take care of the special case
     // tau -> rho nu, where a the matched mother is  the rho, but we have only a missing resonance and not added a wrong particle.
-    auto mother = mcParticle->getMother();
-    if (mother and particle->getPDGCode() == mother->getPDG() and getNumberOfDaughtersWithoutNeutrinos(mother) == 1) {
+    if (mother and particle->getPDGCode() == mother->getPDG() and getNumberOfDaughtersWithoutNeutrinos(mother) == 1
+        and !particle->hasExtraInfo("bremsCorrected")) {
       if (abs(mother->getPDG()) != 15 and abs(mcParticle->getPDG()) != 15) {
         B2WARNING("Special treatment in MCMatching for tau is called for a non-tau particle. Check if you discovered another special case here, or if we have a bug! "
                   << mother->getPDG() << " " << particle->getPDGCode() << " " << mcParticle->getPDG());
       }
       status |= MCErrorFlags::c_MissingResonance;
-    } else {
+    } else if (!(particle->getProperty() & Particle::PropertyFlags::c_IsUnspecified)) {
+      // Check if the particle is unspecified. If so the flag of c_AddedWrongParticle will be ignored.
       status |= MCErrorFlags::c_AddedWrongParticle;
     }
   }
 
-  //add up all (accepted) status flags we collected for our daughters
-  const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError;
-  int daughterStatus = 0;
-  for (unsigned i = 0; i < nChildren; ++i) {
-    const Particle* daughter = particle->getDaughter(i);
-    daughterStatus |= getMCErrors(daughter);
-  }
-  status |= (daughterStatus & daughterStatusAcceptMask);
+  status |= getFlagsOfDaughters(particle, mcParticle);
 
   status |= getMissingParticleFlags(particle, mcParticle);
 
+  // Mask the flags ignored by PropertyFlags of the particle
+  status &= ~(getFlagsIgnoredByProperty(particle));
+
   return setStatus(particle, status);
+}
+
+int MCMatching::getFlagsOfFSP(const Particle* particle, const MCParticle* mcParticle)
+{
+  if (particle->getPDGCode() == mcParticle->getPDG())
+    return MCErrorFlags::c_Correct;
+
+  // if PDG of particle is different from that of mcParticle
+  if (mcParticle->hasStatus(MCParticle::c_PrimaryParticle)) {
+    // if particle is primary, add the c_MisID flag.
+    return MCErrorFlags::c_MisID;
+  } else {
+    // secondary particle, so the original particle probably decayed
+    int status = MCErrorFlags::c_DecayInFlight;
+
+    //find first primary mother
+    const MCParticle* primary = mcParticle->getMother();
+    while (primary and !primary->hasStatus(MCParticle::c_PrimaryParticle))
+      primary = primary->getMother();
+
+    if (!primary) {
+      status |= MCErrorFlags::c_InternalError;
+    } else if (particle->getPDGCode() != primary->getPDG()) {
+      //if primary particle also has wrong PDG code, we're actually MisIDed
+      status |= MCErrorFlags::c_MisID;
+    }
+    return status;
+  }
+}
+
+int MCMatching::getFlagsOfDaughters(const Particle* particle, const MCParticle* mcParticle)
+{
+  unsigned nChildren = particle->getNDaughters();
+
+  //Vector to store all the MC (n*grand-)daughters of the mother of the bremsstrahlung corrected particle
+  vector<const MCParticle*> genParts;
+  //Fill it only in the case we have a particle that has been brems corrected
+  if (particle->hasExtraInfo("bremsCorrected") && nChildren > 1) {
+    if (mcParticle && mcParticle->getMother())
+      appendParticles(mcParticle->getMother(), genParts);
+  }
+
+  int daughterStatuses = 0;
+  vector<int> daughterProperties = particle->getDaughterProperties();
+  for (unsigned i = 0; i < nChildren; ++i) {
+    const Particle* daughter = particle->getDaughter(i);
+    int daughterStatus = 0;
+    if (particle->hasExtraInfo("bremsCorrected") && daughter->getPDGCode() == Const::photon.getPDGCode()) {
+      // if the daughter is a brems photon, start the special treatment
+      daughterStatus |= getFlagsOfBremsPhotonDaughter(daughter, mcParticle, genParts);
+    } else {
+      daughterStatus |= getMCErrors(daughter);
+    }
+
+    int daughterStatusAcceptMask = (~c_Correct);
+    if (i < daughterProperties.size()) // sanity check. daughterProperties should be larger than i.
+      daughterStatusAcceptMask = makeDaughterAcceptMask(daughterProperties[i]);
+
+    daughterStatuses |= (daughterStatus & daughterStatusAcceptMask);
+  }
+
+  //add up all (accepted) status flags we collected for our daughters
+  const int daughterStatusesAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError | c_AddedRecoBremsPhoton;
+  return (daughterStatuses & daughterStatusesAcceptMask);
+
+}
+
+
+int MCMatching::getFlagsOfBremsPhotonDaughter(const Particle* daughter, const MCParticle* mcParticle,
+                                              const vector<const MCParticle*>& genParts)
+{
+  //At first, call getMCErrors as usual
+  int daughterStatus = getMCErrors(daughter);
+
+  //Check if the daugther has an MC particle related
+  const MCParticle* mcDaughter = daughter->getRelatedTo<MCParticle>();
+  //If it hasn't, add the c_BremsPhotonAdded flag to the mother and stop the propagation of c_InternalError
+  if (!mcDaughter) {
+    daughterStatus &= (~c_InternalError);
+    daughterStatus |= c_AddedRecoBremsPhoton;
+  }
+  //If it has, check if MCParticle of the daughter is same as the mother. If so, we'll stop the propagation of c_MisID
+  else if (mcDaughter == mcParticle) {
+    daughterStatus &= (~c_MisID);
+  }
+  //If it has, check if the MC particle is (n*grand)-daughter of the particle mother. If it isn't, we'll add the error flag
+  else if (std::find(genParts.begin(), genParts.end(), mcDaughter) == genParts.end()) {
+    daughterStatus |= c_AddedRecoBremsPhoton;
+  }
+  //else nothing to do
+
+  return daughterStatus;
 }
 
 int MCMatching::getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle)
@@ -240,17 +391,6 @@ int MCMatching::getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticl
     }
   }
   return daughters.size() - number_of_neutrinos;
-}
-
-int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle)
-{
-  if (particle->hasExtraInfo(c_extraInfoMCErrors)) {
-    return particle->getExtraInfo(c_extraInfoMCErrors);
-  } else {
-    if (!mcParticle)
-      mcParticle = particle->getRelatedTo<MCParticle>();
-    return setMCErrorsExtraInfo(const_cast<Particle*>(particle), mcParticle);
-  }
 }
 
 bool MCMatching::isFSP(int pdg)
@@ -307,50 +447,6 @@ bool MCMatching::isRadiativePhoton(const MCParticle* p)
 }
 
 
-//utility functions used by getMissingParticleFlags()
-namespace {
-  /** Recursively gather all matched MCParticles in daughters of p (taking special care of decay-in-flight things). */
-  void appendParticles(const Particle* p, unordered_set<const MCParticle*>& mcMatchedParticles)
-  {
-    for (unsigned i = 0; i < p->getNDaughters(); ++i) {
-      const Particle* daug = p->getDaughter(i);
-
-      //add matched MCParticle for 'daug'
-      const MCParticle* mcParticle = daug->getRelatedTo<MCParticle>();
-      if (mcParticle) {
-        mcMatchedParticles.insert(mcParticle);
-        if (daug->getNDaughters() == 0 and
-            static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) &
-            MCMatching::c_DecayInFlight) {
-          //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
-          //so we'll also add all mother MCParticles until the first primary mother
-          do {
-            mcParticle = mcParticle->getMother();
-            if (mcParticle)
-              mcMatchedParticles.insert(mcParticle);
-          } while (mcParticle and !mcParticle->hasStatus(MCParticle::c_PrimaryParticle));
-        }
-      }
-      appendParticles(daug, mcMatchedParticles);
-    }
-  }
-
-  /** Recursively gather all daughters of 'gen' we want to reconstruct. */
-  void appendParticles(const MCParticle* gen, vector<const MCParticle*>& children)
-  {
-    if (MCMatching::isFSP(gen->getPDG()))
-      return; //stop at the bottom of the MC decay tree (ignore secondaries)
-
-    const vector<MCParticle*>& genDaughters = gen->getDaughters();
-    for (unsigned i = 0; i < genDaughters.size(); ++i) {
-      const MCParticle* daug = genDaughters[i];
-      children.push_back(daug);
-      appendParticles(daug, children);
-    }
-  }
-}
-
-
 int MCMatching::getMissingParticleFlags(const Particle* particle, const MCParticle* mcParticle)
 {
   int flags = 0;
@@ -361,43 +457,100 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
   appendParticles(mcParticle, genParts);
 
   for (const MCParticle* genPart : genParts) {
-    const bool missing = (mcMatchedParticles.find(genPart) == mcMatchedParticles.end());
-    if (missing) {
 
-      //we want to set a flag, so what kind of particle is genPart?
-      const int generatedPDG = genPart->getPDG();
-      const int absGeneratedPDG = abs(generatedPDG);
+    // if genPart exists in mcMatchedParticles, continue
+    if (mcMatchedParticles.find(genPart) != mcMatchedParticles.end())
+      continue;
 
-      if (!isFSP(generatedPDG)) {
-        flags |= c_MissingResonance;
-      } else if (generatedPDG == 22) { //missing photon
-        if (AnalysisConfiguration::instance()->useLegacyMCMatching()) {
-          if (!(flags & c_MissFSR) or !(flags & c_MissGamma)) {
-            if (isFSRLegacy(genPart)) {
-              flags |= c_MissFSR;
-              flags |= c_MissPHOTOS;
-            } else {
-              flags |= c_MissGamma;
-            }
-          }
+    //we want to set a flag, so what kind of particle is genPart?
+    const int generatedPDG = genPart->getPDG();
+    const int absGeneratedPDG = abs(generatedPDG);
+
+    if (!isFSP(generatedPDG)) {
+      flags |= c_MissingResonance;
+    } else if (generatedPDG == 22) { //missing photon
+      if (AnalysisConfiguration::instance()->useLegacyMCMatching()) {
+        if (flags & (c_MissFSR | c_MissGamma)) {
+          // if flags already have c_MissFSR or c_MissGamm, do nothing.
         } else {
-          if (isFSR(genPart))
+          if (isFSRLegacy(genPart)) {
             flags |= c_MissFSR;
-          else if (genPart->hasStatus(MCParticle::c_IsPHOTOSPhoton))
             flags |= c_MissPHOTOS;
-          else
+          } else {
             flags |= c_MissGamma;
+          }
         }
-      } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
-        flags |= c_MissNeutrino;
-
-      } else { //neither photon nor neutrino -> massive
-        flags |= c_MissMassiveParticle;
-        if (absGeneratedPDG == 130) {
-          flags |= c_MissKlong;
-        }
+      } else {
+        if (isFSR(genPart))
+          flags |= c_MissFSR;
+        else if (genPart->hasStatus(MCParticle::c_IsPHOTOSPhoton))
+          flags |= c_MissPHOTOS;
+        else
+          flags |= c_MissGamma;
       }
+    } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
+      flags |= c_MissNeutrino;
+    } else { //neither photon nor neutrino -> massive
+      flags |= c_MissMassiveParticle;
+      if (absGeneratedPDG == 130)
+        flags |= c_MissKlong;
     }
   }
   return flags;
+}
+
+int MCMatching::countMissingParticle(const Particle* particle, const MCParticle* mcParticle, const vector<int>& daughterPDG)
+{
+  unordered_set<const MCParticle*> mcMatchedParticles;
+  appendParticles(particle, mcMatchedParticles);
+  vector<const MCParticle*> genParts;
+  appendParticles(mcParticle, genParts);
+
+  int nMissingDaughter = 0;
+
+  for (const MCParticle* genPart : genParts) {
+    const bool missing = (mcMatchedParticles.find(genPart) == mcMatchedParticles.end());
+    if (missing) {
+
+      const int generatedPDG = genPart->getPDG();
+      const int absGeneratedPDG = abs(generatedPDG);
+
+      auto result = find(daughterPDG.begin(), daughterPDG.end(), absGeneratedPDG);
+      if (result != daughterPDG.end())
+        nMissingDaughter++;
+    }
+  }
+
+  return nMissingDaughter;
+}
+
+int MCMatching::getFlagsIgnoredByProperty(const Particle* part)
+{
+  int flags = 0;
+
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons) {
+    flags |= (MCMatching::c_MissFSR);
+    flags |= (MCMatching::c_MissPHOTOS);
+  }
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreIntermediate) flags |= (MCMatching::c_MissingResonance);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreMassive) {
+    flags |= (MCMatching::c_MissMassiveParticle);
+    flags |= (MCMatching::c_MissKlong);
+  }
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreNeutrino) flags |= (MCMatching::c_MissNeutrino);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreGamma) flags |= (MCMatching::c_MissGamma);
+  if (part->getProperty() & Particle::PropertyFlags::c_IsIgnoreBrems) flags |= (MCMatching::c_AddedRecoBremsPhoton);
+
+  return flags;
+}
+
+int MCMatching::makeDaughterAcceptMask(int daughterProperty)
+{
+  int flags = 0;
+
+  if (daughterProperty & Particle::PropertyFlags::c_IsIgnoreMisID) flags |= (MCMatching::c_MisID);
+  if (daughterProperty & Particle::PropertyFlags::c_IsIgnoreDecayInFlight) flags |= (MCMatching::c_DecayInFlight);
+
+  return (~flags);
+
 }

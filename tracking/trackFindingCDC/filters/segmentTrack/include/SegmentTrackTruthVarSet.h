@@ -14,13 +14,10 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <utility>
 #include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCSegment2D;
-    class CDCTrack;
 
     /// Names of the variables to be generated
     constexpr

@@ -30,7 +30,6 @@ namespace Belle2 {
 
   class MultilineWidget;
   class ECLChannelMapper;
-  class ECLPainter;
 
   /**
    * Root TGMainFrame that contains multiple widgets that display the

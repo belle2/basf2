@@ -5,28 +5,26 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::PXDSimHit+;
-#pragma link C++ class Belle2::PXDDigit+;
-#pragma link C++ class Belle2::PXDTrueHit+;
-#pragma link C++ class Belle2::PXDCluster+;
-#pragma link C++ class Belle2::PXDRawHit+;
-#pragma link C++ class Belle2::PXDRawROIs+;
-#pragma link C++ class Belle2::PXDRawAdc+;
-#pragma link C++ class Belle2::PXDRawCluster+;
-#pragma link C++ class Belle2::PXDHardwareCluster+;
-#pragma link C++ class Belle2::PXDInjectionBGTiming+;
+#pragma link C++ class Belle2::PXDSimHit+; // checksum=0x1a29d35c, version=3
+#pragma link C++ class Belle2::PXDDigit+; // checksum=0x2ea122d3, version=5
+#pragma link C++ class Belle2::PXDTrueHit+; // checksum=0xa2812fe1, version=6
+#pragma link C++ class Belle2::PXDCluster+; // checksum=0xbc8fec5d, version=5
+#pragma link C++ class Belle2::PXDRawHit+; // checksum=0xf3f25bd, version=6
+#pragma link C++ class Belle2::PXDRawROIs+; // checksum=0x769611e7, version=3
+#pragma link C++ class Belle2::PXDRawAdc+; // checksum=0x5127f0f4, version=3
+#pragma link C++ class Belle2::PXDInjectionBGTiming+; // checksum=0x3a01879a, version=1
 
-#pragma link C++ class Belle2::PXDDAQDHPStatus;
-#pragma link C++ class Belle2::PXDDAQDHEStatus;
-#pragma link C++ class Belle2::PXDDAQDHCStatus;
-#pragma link C++ class Belle2::PXDDAQPacketStatus;
-#pragma link C++ class Belle2::PXDDAQStatus+;
+#pragma link C++ class Belle2::PXDDAQDHPStatus+; // checksum=0xb381bf7a, version=1
+#pragma link C++ class Belle2::PXDDAQDHEStatus+; // checksum=0x1c75a52e, version=6
+#pragma link C++ class Belle2::PXDDAQDHCStatus+; // checksum=0x24e6063e, version=4
+#pragma link C++ class Belle2::PXDDAQPacketStatus+; // checksum=0x946311e, version=2
+#pragma link C++ class Belle2::PXDDAQStatus+; // checksum=0xb3f1e87c, version=2
 
-#pragma link C++ class Belle2::PXDGatedModeInfo+;
+#pragma link C++ class Belle2::PXDGatedModeInfo+; // checksum=0x8846af1d, version=1
 
-#pragma link C++ class Belle2::PXDEnergyDepositionEvent+;
-#pragma link C++ class Belle2::PXDNeutronFluxEvent+;
-#pragma link C++ class Belle2::PXDOccupancyEvent+;
+#pragma link C++ class Belle2::PXDEnergyDepositionEvent+; // checksum=0xb98aafb8, version=2
+#pragma link C++ class Belle2::PXDNeutronFluxEvent+; // checksum=0x28070b7b, version=1
+#pragma link C++ class Belle2::PXDOccupancyEvent+; // checksum=0x6d2b3a39, version=2
 
 
 #endif

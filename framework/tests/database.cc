@@ -1,8 +1,6 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/ConditionsDatabase.h>
-#include <framework/database/DatabaseChain.h>
+#include <framework/database/Configuration.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/EventDependency.h>
@@ -42,7 +40,7 @@ namespace {
     TestHelpers::TempDirCreator m_tempDir; /**< ensure all tests are run inside a temporary directory. */
 
     /** Create a database with a TNamed object and an array of TObjects for experiment 1 to 5 each. */
-    virtual void SetUp()
+    void SetUp() override
     {
       StoreObjPtr<EventMetaData> evtPtr;
       DataStore::Instance().setInitializeActive(true);
@@ -50,17 +48,25 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
       evtPtr.construct(0, 0, 1);
 
+      auto& c = Conditions::Configuration::getInstance();
       switch (m_dbType) {
         case c_local:
-          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+          c.setGlobalTags({});
+          c.overrideGlobalTags();
+          c.setMetadataProviders({});
+          c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
+          c.appendTestingPayloadLocation("testPayloads/TestDatabase.txt");
           break;
         case c_central:
-          ConditionsDatabase::createDefaultInstance("default");
+          c.setGlobalTags({"default"});
+          c.overrideGlobalTags();
           break;
         case c_chain:
-          DatabaseChain::createInstance();
-          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
-          ConditionsDatabase::createDefaultInstance("default");
+          c.setGlobalTags({"default"});
+          c.overrideGlobalTags();
+          c.setMetadataProviders({});
+          c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
+          c.appendTestingPayloadLocation("testPayloads/TestDatabase.txt");
           break;
         case c_default:
           break;
@@ -100,7 +106,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
       Database::reset();
@@ -193,6 +199,14 @@ namespace {
     EXPECT_TRUE(iov1.trimOverlap(iov2, false));
     EXPECT_TRUE(iov1 == IntervalOfValidity(1, 1, 3, 10));
     EXPECT_TRUE(iov2 == IntervalOfValidity(3, 11, 4, -1));
+
+    // Validity is larger than we want on the lower edge
+    iov1 = IntervalOfValidity(11, 0, 12, 86);
+    // Want to trim off everything below exp=12
+    iov2 = IntervalOfValidity(0, 0, 11, -1);
+    EXPECT_TRUE(iov1.trimOverlap(iov2, false));
+    EXPECT_EQ(iov1, IntervalOfValidity(12, 0, 12, 86));
+    EXPECT_EQ(iov2, IntervalOfValidity(0, 0, 11, -1));
   }
 
   /** Test database access via DBObjPtr */
@@ -203,7 +217,7 @@ namespace {
 
     evtPtr->setExperiment(1);
     DBStore::Instance().update();
-    EXPECT_TRUE(named);
+    ASSERT_TRUE(named);
     EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
     evtPtr->setExperiment(4);
     EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
@@ -223,7 +237,7 @@ namespace {
     // check iteration on fresh object
     {
       int i = 0;
-      for (auto o : missing) {
+      for (const auto& o : missing) {
         (void)o;
         ++i;
       }
@@ -244,9 +258,8 @@ namespace {
     // check iteration on existing
     {
       int i = 0;
-      for (auto o : objects) {
-        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
-        ++i;
+      for (const auto& o : objects) {
+        EXPECT_EQ(o.GetUniqueID(), ++i);
       }
       EXPECT_EQ(i, 4);
     }
@@ -254,7 +267,7 @@ namespace {
     // check iteration on missing object
     {
       int i = 0;
-      for (auto o : missing) {
+      for (const auto& o : missing) {
         (void)o;
         ++i;
       }
@@ -266,9 +279,8 @@ namespace {
     // check iteration over missing but previously existing
     {
       int i = 0;
-      for (auto o : objects) {
-        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
-        ++i;
+      for (const auto& o : objects) {
+        EXPECT_EQ(o.GetUniqueID(), ++i);
       }
       EXPECT_EQ(i, 0);
     }
@@ -535,7 +547,7 @@ namespace {
     //found in the database during testing, just a override.
     EXPECT_B2FATAL(BFieldManager::getFieldInTesla({0, 0, 0}));
     //Unless we add a new one
-    Belle2::MagneticField* field = new Belle2::MagneticField();
+    auto* field = new Belle2::MagneticField();
     field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
     Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
     //So now it should work again
@@ -561,19 +573,27 @@ namespace {
     DataBaseNoDataStoreTest() : m_event(0, 0, 1) {};
 
     /** Create a database with a TNamed object and an array of TObjects for experiment 1 to 5 each. */
-    virtual void SetUp()
+    void SetUp() override
     {
+      auto& c = Conditions::Configuration::getInstance();
       switch (m_dbType) {
         case c_local:
-          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+          c.setGlobalTags({});
+          c.overrideGlobalTags();
+          c.setMetadataProviders({});
+          c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
+          c.appendTestingPayloadLocation("testPayloads/TestDatabase.txt");
           break;
         case c_central:
-          ConditionsDatabase::createDefaultInstance("default");
+          c.setGlobalTags({"default"});
+          c.overrideGlobalTags();
           break;
         case c_chain:
-          DatabaseChain::createInstance();
-          LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
-          ConditionsDatabase::createDefaultInstance("default");
+          c.setGlobalTags({"default"});
+          c.overrideGlobalTags();
+          c.setMetadataProviders({});
+          c.setNewPayloadLocation("testPayloads/TestDatabase.txt");
+          c.appendTestingPayloadLocation("testPayloads/TestDatabase.txt");
           break;
         case c_default:
           break;
@@ -613,7 +633,7 @@ namespace {
     }
 
     /** Just reset the Database, hopefully no DataStore needs resetting */
-    virtual void TearDown()
+    void TearDown() override
     {
       if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
       Database::reset();
@@ -628,7 +648,7 @@ namespace {
     DBObjPtr<TNamed> named;
     m_event.setExperiment(1);
     DBStore::Instance().update(m_event); // The DBStore takes a reference to an EventMetaData object
-    EXPECT_TRUE(named);
+    ASSERT_TRUE(named);
     EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
     m_event.setExperiment(4);
     EXPECT_TRUE(strcmp(named->GetName(), "Experiment 1") == 0);
@@ -648,7 +668,7 @@ namespace {
     // check iteration on fresh object
     {
       int i = 0;
-      for (auto o : missing) {
+      for (const auto& o : missing) {
         (void)o;
         ++i;
       }
@@ -669,9 +689,8 @@ namespace {
     // check iteration on existing
     {
       int i = 0;
-      for (auto o : objects) {
-        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
-        ++i;
+      for (const auto& o : objects) {
+        EXPECT_EQ(o.GetUniqueID(), ++i);
       }
       EXPECT_EQ(i, 4);
     }
@@ -679,7 +698,7 @@ namespace {
     // check iteration on missing object
     {
       int i = 0;
-      for (auto o : missing) {
+      for (const auto& o : missing) {
         (void)o;
         ++i;
       }
@@ -691,9 +710,8 @@ namespace {
     // check iteration over missing but previously existing
     {
       int i = 0;
-      for (auto o : objects) {
-        EXPECT_EQ(objects[i]->GetUniqueID(), i + 1);
-        ++i;
+      for (const auto& o : objects) {
+        EXPECT_EQ(o.GetUniqueID(), ++i);
       }
       EXPECT_EQ(i, 0);
     }

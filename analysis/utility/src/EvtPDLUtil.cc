@@ -29,17 +29,21 @@ std::string Belle2::EvtPDLUtil::antiParticleName(int pdgCode)
   return TDatabasePDG::Instance()->GetParticle(pdgCode)->AntiParticle()->GetName();
 }
 
-std::string Belle2::EvtPDLUtil::antiParticleListName(int pdgCode, std::string label)
+std::string Belle2::EvtPDLUtil::antiParticleListName(int pdgCode, const std::string& label)
 {
   if (label.empty())
     return antiParticleName(pdgCode);
   return antiParticleName(pdgCode) + ":" + label;
 }
 
-std::string Belle2::EvtPDLUtil::particleListName(int pdgCode, std::string label)
+std::string Belle2::EvtPDLUtil::particleListName(int pdgCode, const std::string& label)
 {
   if (label.empty())
     return particleName(pdgCode);
   return particleName(pdgCode) + ":" + label;
 }
 
+double Belle2::EvtPDLUtil::charge(int pdgCode)
+{
+  return TDatabasePDG::Instance()->GetParticle(pdgCode)->Charge() / 3.0;
+}

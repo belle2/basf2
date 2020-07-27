@@ -9,16 +9,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_IGNORED_PIXELS_MAP_H_
-#define PXD_IGNORED_PIXELS_MAP_H_
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <boost/property_tree/ptree.hpp>
+
+#include <functional>
 #include <map>
 #include <unordered_map>
 #include <set>
 #include <unordered_set>
-
 
 namespace Belle2 {
   /** This class provides a check for ignored (=cold, hot or otherwise deffective)
@@ -89,5 +88,4 @@ namespace Belle2 {
   };
 
 } // namespace Belle2
-#endif
 

@@ -28,7 +28,6 @@
 #include <framework/utilities/RootFileCreationManager.h>
 
 #include <cmath>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -81,7 +80,7 @@ void VariablesToNtupleModule::initialize()
     return;
   }
 
-  m_file->cd();
+  TDirectory::TContext directoryGuard(m_file.get());
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
@@ -112,9 +111,9 @@ void VariablesToNtupleModule::initialize()
     m_tree->get().Branch("__candidate__", &m_candidate, "__candidate__/I");
     m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   }
-  for (unsigned iVar = 0; iVar < m_variables.size(); ++iVar)
-    if (Variable::isCounterVariable(m_variables[iVar])) {
-      B2WARNING("The counter '" << m_variables[iVar]
+  for (const auto& variable : m_variables)
+    if (Variable::isCounterVariable(variable)) {
+      B2WARNING("The counter '" << variable
                 << "' is handled automatically by VariablesToNtuple, you don't need to add it.");
     }
 
@@ -132,6 +131,11 @@ void VariablesToNtupleModule::initialize()
     if (!var) {
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
+      if (m_particleList.empty() && var->description.find("[Eventbased]") == string::npos) {
+        B2ERROR("Variable '" << varStr << "' is not an event-based variable, "
+                "but you are using VariablesToNtuple without a decay string, i.e. in the event-wise mode.");
+        continue;
+      }
       m_functions.push_back(var->function);
     }
     enumerate++;
@@ -208,14 +212,13 @@ void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing NTuple " << m_treeName);
-    m_file->cd();
+    TDirectory::TContext directoryGuard(m_file.get());
     m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
+    m_file.reset();
     if (writeError) {
-      m_file.reset();
       B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
-    m_file.reset();
   }
 }

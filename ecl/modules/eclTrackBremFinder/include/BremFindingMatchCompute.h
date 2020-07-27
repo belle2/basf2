@@ -16,7 +16,6 @@ namespace genfit {
 namespace Belle2 {
 
   class ECLCluster;
-  class MeasuredStateOnPlane;
 
   /**
    * Module to compute if an extrapolation to the ECL matches the position of an secondary ECLCLuster

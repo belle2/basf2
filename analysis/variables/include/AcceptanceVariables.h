@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
@@ -50,7 +49,8 @@ namespace Belle2 {
 
     /**
      * particle falls within KLM angular acceptance
-     * 1: Forward; 2: Barrel; 3: Backwards.
+     * 1: Forward endcap; 2: Forward overlap; 3: Barrel;
+     * 4: Backward overlap; 5: Backward endcap.
      */
     double thetaInKLMAcceptance(const Particle* particle);
 
@@ -63,6 +63,11 @@ namespace Belle2 {
      * particle falls within EKLM angular acceptance
      */
     double thetaInEKLMAcceptance(const Particle* particle);
+
+    /**
+     * particle falls within the angular region where KLM barrel and endcaps overlap
+     */
+    double thetaInKLMOverlapAcceptance(const Particle* particle);
 
     /**
      * particle falls within TOP transverse momentum acceptance

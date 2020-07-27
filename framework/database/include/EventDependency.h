@@ -12,8 +12,6 @@
 #include <framework/database/IntraRunDependency.h>
 #include <vector>
 
-class TClass;
-
 namespace Belle2 {
 
   /**

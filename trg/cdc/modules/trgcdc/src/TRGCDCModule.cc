@@ -13,7 +13,6 @@
 
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
 #include <iostream>
 #include "G4RunManager.hh"
 
@@ -33,6 +32,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /// register the basf2 module TRGCDC
   REG_MODULE(TRGCDC);
 
   string

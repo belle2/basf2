@@ -9,12 +9,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCHITFILTERMODULE_H
-#define CDCHITFILTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <cdc/dataobjects/CDCHit.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -77,6 +75,4 @@ namespace Belle2 {
 
   } //end CDC namespace;
 } // end namespace Belle2
-
-#endif // CDCHitFilter_H
 

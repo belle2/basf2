@@ -72,7 +72,6 @@ namespace Belle2 {
     int m_hysteresis; /**< pulse height threshold hysteresis [ADC counts] */
     int m_gateWidth;  /**< width of discriminator gate [samples] */
     int m_samplingPhase;  /**< sampling phase [samples] */
-    int m_bunchTimeStamp; /**< time stamp of the interaction (see addParam for more) */
   };
 
 } // Belle2 namespace

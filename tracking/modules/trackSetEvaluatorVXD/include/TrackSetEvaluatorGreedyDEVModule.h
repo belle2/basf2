@@ -14,8 +14,6 @@
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapNetwork.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <vector>
-
 
 namespace Belle2 {
 

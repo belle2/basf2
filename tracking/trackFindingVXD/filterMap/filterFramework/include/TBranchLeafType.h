@@ -9,7 +9,8 @@
  **************************************************************************/
 
 #pragma once
-#include <Rtypes.h>
+
+#include <RtypesCore.h>
 
 namespace Belle2 {
   /// Overloading TBranchLeafType to be able to get identifier 'C' for type char*

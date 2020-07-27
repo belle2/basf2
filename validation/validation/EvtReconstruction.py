@@ -6,12 +6,16 @@
   <input>EvtGenSim.root</input>
   <output>EvtRec.root,EvtRec_mdst.root</output>
   <cacheable/>
-  <contact>tkuhr</contact>
-  <description>This steering file runs the standard reconstruction on an input file with generic BBbar events.</description>
+  <contact>Software team b2soft@mail.desy.de</contact>
+  <description>
+    This steering file runs the standard reconstruction on an input file with
+    generic BBbar events.
+  </description>
 </header>
 """
 
-from basf2 import *
+from basf2 import set_random_seed, create_path, process, statistics, \
+    register_module
 from reconstruction import add_reconstruction, add_mdst_output
 from validation import statistics_plots, event_timing_plot
 
@@ -43,9 +47,16 @@ process(main)
 # Print call statistics
 print(statistics)
 
-statistics_plots('EvtRec_statistics.root', contact='tkuhr',
-                 jobDesc='a standard reconstruction job with generic EvtGen events',
-                 prefix='EvtRec')
-event_timing_plot('../EvtRec.root', 'EvtRec_statistics.root', contact='tkuhr',
-                  jobDesc='a standard reconstruction job with generic EvtGen events',
-                  prefix='EvtRec')
+statistics_plots(
+    'EvtRec_statistics.root',
+    contact='Software team b2soft@mail.desy.de',
+    job_desc='a standard reconstruction job with generic EvtGen events',
+    prefix='EvtRec'
+)
+event_timing_plot(
+    '../EvtRec.root',
+    'EvtRec_statistics.root',
+    contact='Software team b2soft@mail.desy.de',
+    job_desc='a standard reconstruction job with generic EvtGen events',
+    prefix='EvtRec'
+)

@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kodys                                              *
+ * Contributors: Peter Kodys, Jachym Bartik                               *
  *                                                                        *
  * Prepared for track quality check                                       *
  * Prepared for Phase 2 and Belle II geometry                             *
@@ -13,130 +13,47 @@
 
 #pragma once
 
-#include <framework/core/HistoModule.h>
+#include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
-#include <framework/core/Module.h>
-#include <framework/core/HistoModule.h>
-#include <TH1F.h>
-#include <TH2F.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
+
+using namespace std;
 
 namespace Belle2 {
 
   /** DQM of tracks
-    * their momentum,
-    * Number of hits in tracks,
-    * Number of tracks.
-    *
-    */
-  class TrackDQMModule : public HistoModule {  // <- derived from HistoModule class
+   * their momentum,
+   * Number of hits in tracks,
+   * Number of tracks. */
+  class TrackDQMModule : public DQMHistoModuleBase {
 
   public:
-
     /** Constructor */
     TrackDQMModule();
     /* Destructor */
-    ~TrackDQMModule();
+    ~TrackDQMModule() { }
 
     /** Module functions */
-    void initialize() override final;
-    void beginRun() override final;
-    void event() override final;
+    virtual void initialize() override;
+    virtual void event() override;
 
-    /**
-    * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
-    * to be placed in this function.
-    */
-    void defineHisto() override final;
+    /** Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed to be placed in this function.
+     * Also at the end function all m_histogramParameterChanges should be processed via the ProcessHistogramParameterChange function. */
+    virtual void defineHisto() override;
 
-  private:
+  protected:
+    /** All the following Define- functions should be used in the defineHisto() function to define histograms. The convention is that every Define- function is responsible for creating its
+     * own TDirectory (if it's needed). In any case the function must then return to the original gDirectory.
+     * For the creation of histograms the THFFactory or the Create- functions should be used. */
+    virtual void DefineFlags();
 
-    /** StoreArray name where Tracks are written. */
-    std::string m_TracksStoreArrayName;
-    /** StoreArray name where RecoTracks are written. */
-    std::string m_RecoTracksStoreArrayName;
+    /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+    StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
-    /** p Value */
-    TH1F* m_PValue;
-    /** Chi2 */
-    TH1F* m_Chi2;
-    /** NDF */
-    TH1F* m_NDF;
-    /** Chi2 / NDF */
-    TH1F* m_Chi2NDF;
-    /** Unbiased residuals for PXD u vs v */
-    TH2F* m_UBResidualsPXD;
-    /** Unbiased residuals for SVD u vs v */
-    TH2F* m_UBResidualsSVD;
-    /** Unbiased residuals for PXD and SVD u vs v per sensor*/
-    TH2F** m_UBResidualsSensor;
-    /** Unbiased residuals for PXD u */
-    TH1F* m_UBResidualsPXDU;
-    /** Unbiased residuals for SVD u */
-    TH1F* m_UBResidualsSVDU;
-    /** Unbiased residuals for PXD and SVD u per sensor*/
-    TH1F** m_UBResidualsSensorU;
-    /** Unbiased residuals for PXD v */
-    TH1F* m_UBResidualsPXDV;
-    /** Unbiased residuals for SVD v */
-    TH1F* m_UBResidualsSVDV;
-    /** Unbiased residuals for PXD and SVD v per sensor*/
-    TH1F** m_UBResidualsSensorV;
-    /** Track related clusters - hitmap in IP angle range */
-    TH2F** m_TRClusterHitmap;
-    /** Track related clusters - neighbor corelations in Phi */
-    TH2F** m_TRClusterCorrelationsPhi;
-    /** Track related clusters - neighbor corelations in Theta */
-    TH2F** m_TRClusterCorrelationsTheta;
-
-
-    /** Track momentum Pt.Phi */
-    TH1F* m_MomPhi;
-    /** Track momentum Pt.CosTheta */
-    TH1F* m_MomCosTheta;
-    /** Track momentum Pt.X */
-    TH1F* m_MomX;
-    /** Track momentum Pt.Y */
-    TH1F* m_MomY;
-    /** Track momentum Pt.Z */
-    TH1F* m_MomZ;
-    /** Track momentum Pt */
-    TH1F* m_MomPt;
-    /** Track momentum Magnitude */
-    TH1F* m_Mom;
-    /** d0 - the signed distance to the IP in the r-phi plane */
-    TH1F* m_D0;
-    /** d0 vs Phi - the signed distance to the IP in the r-phi plane */
-    TH2F* m_D0Phi;
-    /** z0 - the z0 coordinate of the perigee (beam spot position) */
-    TH1F* m_Z0;
-    /** z0 vs d0 - signed distance to the IP in r-phi vs. z0 of the perigee (to see primary vertex shifts along R or z) */
-    TH2F* m_D0Z0;
-    /** Phi - the angle of the transverse momentum in the r-phi plane, with CDF naming convention */
-    TH1F* m_Phi;
-    /** TanLambda - the slope of the track in the r-z plane */
-    TH1F* m_TanLambda;
-    /** Omega - the curvature of the track. It's sign is defined by the charge of the particle */
-    TH1F* m_Omega;
-
-
-    /** Number of hits on PXD */
-    TH1F* m_HitsPXD;
-    /** Number of hits on SVD */
-    TH1F* m_HitsSVD;
-    /** Number of hits on CDC */
-    TH1F* m_HitsCDC;
-    /** Number of all hits in tracks */
-    TH1F* m_Hits;
-    /** Number of tracks only with VXD */
-    TH1F* m_TracksVXD;
-    /** Number of tracks only with CDC */
-    TH1F* m_TracksCDC;
-    /** Number of full tracks with VXD+CDC */
-    TH1F* m_TracksVXDCDC;
-    /** Number of all finding tracks */
-    TH1F* m_Tracks;
-
-  };  //end class declaration
-
-}  // end namespace Belle2
-
+    /** Monitors the Error flags set by the tracking code. As of the time of implementation there only were two flags:
+     * VXDTF2AbortionFlag, i.e. how often the VXDTF2 did abort the event and did not produce tracks,
+     * and UnspecifiedTrackFindingFailure.
+     * The histogram records if any flag was set. */
+    TH1F* m_trackingErrorFlags = nullptr;
+  };
+}

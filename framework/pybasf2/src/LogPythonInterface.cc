@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2018 Belle II Collaboration                          *
+ * Copyright(C) 2010-2020 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Martin Ritter, Thomas Kuhr                               *
@@ -12,18 +12,20 @@
 
 #include <framework/pybasf2/LogPythonInterface.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/logging/LogConnectionFilter.h>
 #include <framework/logging/LogConnectionTxtFile.h>
 #include <framework/logging/LogConnectionJSON.h>
+#include <framework/logging/LogConnectionUDP.h>
 #include <framework/logging/LogConnectionConsole.h>
 #include <framework/logging/LogVariableStream.h>
+#include <framework/logging/LogSystem.h>
 
 #include <framework/core/Environment.h>
 
 #include <iostream>
 #include <string>
 #include <map>
+#include <utility>
 
 using namespace std;
 using namespace Belle2;
@@ -31,7 +33,7 @@ using namespace boost::python;
 
 void LogPythonInterface::setLogLevel(LogConfig::ELogLevel level)
 {
-  LogConfig::ELogLevel overrideLevel = (LogConfig::ELogLevel)Environment::Instance().getLogLevelOverride();
+  auto overrideLevel = (LogConfig::ELogLevel)Environment::Instance().getLogLevelOverride();
   if (overrideLevel != LogConfig::c_Default)
     level = overrideLevel;
 
@@ -56,6 +58,11 @@ void LogPythonInterface::setLogInfo(LogConfig::ELogLevel level, int info)
 void LogPythonInterface::setPackageLogConfig(const std::string& package, const LogConfig& config)
 {
   LogSystem::Instance().addPackageLogConfig(package, config);
+}
+
+void LogPythonInterface::setMaxMessageRepetitions(unsigned repetitions)
+{
+  LogSystem::Instance().setMaxMessageRepetitions(repetitions);
 }
 
 LogConfig::ELogLevel LogPythonInterface::getLogLevel()
@@ -83,9 +90,19 @@ LogConfig& LogPythonInterface::getPackageLogConfig(const std::string& package)
   return LogSystem::Instance().getPackageLogConfig(package);
 }
 
+unsigned LogPythonInterface::getMaxMessageRepetitions() const
+{
+  return LogSystem::Instance().getMaxMessageRepetitions();
+}
+
 void LogPythonInterface::addLogJSON(bool complete)
 {
   LogSystem::Instance().addLogConnection(new LogConnectionJSON(complete));
+}
+
+void LogPythonInterface::addLogUDP(const std::string& hostname, unsigned short port)
+{
+  LogSystem::Instance().addLogConnection(new LogConnectionUDP(hostname, port));
 }
 
 void LogPythonInterface::addLogFile(const std::string& filename, bool append)
@@ -128,13 +145,23 @@ bool LogPythonInterface::getPythonLoggingEnabled() const
   return LogConnectionConsole::getPythonLoggingEnabled();
 }
 
+void LogPythonInterface::setEscapeNewlinesEnabled(bool enabled) const
+{
+  LogConnectionConsole::setEscapeNewlinesEnabled(enabled);
+}
+
+bool LogPythonInterface::getEscapeNewlinesEnabled() const
+{
+  return LogConnectionConsole::getEscapeNewlinesEnabled();
+}
+
 /** Return dict containing message counters */
 dict LogPythonInterface::getLogStatistics()
 {
   dict returnDict;
-  LogSystem& logSys = LogSystem::Instance();
+  const LogSystem& logSys = LogSystem::Instance();
   for (int iLevel = 0; iLevel < LogConfig::c_Default; ++iLevel) {
-    LogConfig::ELogLevel logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
+    auto logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
     returnDict[logLevel] = logSys.getMessageCounter(logLevel);
   }
   return returnDict;
@@ -176,6 +203,20 @@ void LogPythonInterface::exposePythonAPI()
   by default. In contrast to all other log levels DEBUG messages have an
   additional numeric indication of their priority called the ``debug_level`` to
   allow for different levels of verbosity.
+
+  The agreed values for ``debug_level`` are
+
+  * **0-9** for user code. These numbers are reserved for user analysis code and
+    may not be used by any part of basf2.
+  * **10-19** for analysis package code. The use case is that a user wants to debug
+    problems in analysis jobs with the help of experts.
+
+  * **20-29** for simulation/reconstruction code.
+  * **30-39** for core framework code.
+
+  .. note:: The default maximum debug level which will be shown when
+            running ``basf2 --debug`` without any argument for ``--debug`` is **10**
+
 
 .. attribute:: INFO
 
@@ -277,9 +318,23 @@ These fields can be used as a bitmask to configure the appearance of log message
   .add_property("debug_level", &LogConfig::getDebugLevel, &LogConfig::setDebugLevel, "set or get the current debug level")
   .add_property("abort_level", &LogConfig::getAbortLevel, &LogConfig::setAbortLevel,
                 "set or get the severity which causes program abort")
-  .def("set_log_level", &LogConfig::setLogLevel, args("log_level"), "set the log level")
-  .def("set_debug_level", &LogConfig::setDebugLevel, args("debug_level"), "set the debug level")
-  .def("set_abort_level", &LogConfig::setAbortLevel, args("abort_level"), "set the severity which causes program abort")
+  .def("set_log_level", &LogConfig::setLogLevel, args("log_level"), R"DOC(
+Set the minimum log level to be shown. Messages with a log level below this value will not be shown at all.
+
+.. warning: Message with a level of `ERROR <LogLevel.ERROR>` or higher will always be shown and cannot be silenced.
+)DOC")
+  .def("set_debug_level", &LogConfig::setDebugLevel, args("debug_level"), R"DOC(
+Set the maximum debug level to be shown. Any messages with log level `DEBUG <LogLevel.DEBUG>` and a larger debug level will not be shown.
+
+.. seealso: the documentation of `DEBUG <LogLevel.DEBUG>` for suitable values
+)DOC")
+  .def("set_abort_level", &LogConfig::setAbortLevel, args("abort_level"), R"DOC(
+Set the severity which causes program abort.
+
+This can be set to a `LogLevel` which will cause the processing to be aborted if
+a message with the given level or higher is encountered. The default is
+`FATAL <LogLevel.FATAL>`. It cannot be set any higher but can be lowered.
+)DOC")
   .def("set_info", &LogConfig::setLogInfo, args("log_level", "log_info"),
        "set the bitmask of LogInfo members to show when printing messages for a given log level")
   .def("get_info", &LogConfig::getLogInfo, args("log_level"),
@@ -312,12 +367,28 @@ consistent error reporting throughout the framework
 .. seealso::
 
    For all features, see :download:`b2logging.py </framework/examples/b2logging.py>`)")
-  .add_property("log_level",  &LogPythonInterface::getLogLevel,  &LogPythonInterface::setLogLevel,
-                "Attribute for setting/getting the current `log level <basf2.LogLevel>`. Messages with a lower level are ignored.")
+  .add_property("log_level",  &LogPythonInterface::getLogLevel,  &LogPythonInterface::setLogLevel, R"DOC(
+Attribute for setting/getting the current `log level <basf2.LogLevel>`.
+Messages with a lower level are ignored.
+
+.. warning: Message with a level of `ERROR <LogLevel.ERROR>` or higher will always be shown and cannot be silenced.
+)DOC")
   .add_property("debug_level", &LogPythonInterface::getDebugLevel, &LogPythonInterface::setDebugLevel,
                 "Attribute for getting/setting the debug level. If debug messages are enabled, their level needs to be at least this high to be printed. Defaults to 100.")
   .add_property("abort_level", &LogPythonInterface::getAbortLevel, &LogPythonInterface::setAbortLevel,
                 "Attribute for setting/getting the `log level <basf2.LogLevel>` at which to abort processing. Defaults to `FATAL <LogLevel.FATAL>` but can be set to a lower level in rare cases.")
+  .add_property("max_repetitions", &LogPythonInterface::getMaxMessageRepetitions, &LogPythonInterface::setMaxMessageRepetitions, R"DOC(
+Set the maximum amount of times log messages with the same level and message text
+(excluding variables) will be repeated before it is suppressed. Suppressed messages
+will still be counted but not shown for the remainder of the processing.
+
+This affects messages with the same text but different ref:`logging_logvariables`.
+If the same log message is repeated frequently with different variables all of
+these will be suppressed after the given amount of repetitions.
+
+.. versionadded:: release-05-00-00
+)DOC")
+
   .def("set_package", &LogPythonInterface::setPackageLogConfig, args("package", "config"),
        "Set `basf2.LogConfig` for given package, see also `package() <basf2.LogPythonInterface.package>`.")
   .def("package", &LogPythonInterface::getPackageLogConfig, return_value_policy<reference_existing_object>(), args("package"),
@@ -351,11 +422,25 @@ Write log output to console, but format log messages as json objects for
 simplified parsing by other tools.  Each log message will be printed as a one
 line JSON object.
 
+.. versionadded:: release-03-00-00
+
 Parameters:
    complete_info (bool): If this is set to True the complete log information is printed regardless of the `LogInfo` setting.
 
 See Also:
    `add_console()`, `set_info()`
+)DOCSTRING")
+  .def("add_udp", &LogPythonInterface::addLogUDP, (bp::arg("hostname"), bp::arg("port")), R"DOCSTRING(
+    Send the log output as a JSON object to the given hostname and port via UDP.
+
+.. versionadded:: release-04-00-00
+
+Parameters:
+   hostname (str): The hostname to send the message to. If it can not be resolved, an exception will be thrown.
+   port (int): The port on the host to send the message via UDP.
+
+See Also:
+   `add_json()`
 )DOCSTRING")
   .def("terminal_supports_colors", &terminalSupportsColors, "Returns true if the terminal supports colored output")
   .staticmethod("terminal_supports_colors")
@@ -373,7 +458,16 @@ Enable or disable logging via python. If this is set to true than log messages
 will be sent via `sys.stdout`. This is probably slightly slower but is useful
 when running in jupyter notebooks or when trying to redirect stdout in python
 to a buffer. This setting affects all log connections to the
-console.)DOCSTRING")
+console.
+
+.. versionadded:: release-03-00-00)DOCSTRING")
+  .add_property("enable_escape_newlines", &LogPythonInterface::getEscapeNewlinesEnabled,
+                &LogPythonInterface::setEscapeNewlinesEnabled, R"DOCSTRING(
+Enable or disable escaping of newlines in log messages to the console. If this
+is set to true than any newline character in log messages printed to the console
+will be replaced by a "\n" to ensure that every log messages fits exactly on one line.
+
+.. versionadded:: release-04-02-00)DOCSTRING")
   ;
 
   //Expose Logging object
@@ -386,14 +480,16 @@ console.)DOCSTRING")
   //set docstring ...
 
   const std::string common_doc = R"DOCSTRING(
-All additional positional arguments are concatenated to the message and all
-keyword arguments are added to the function as log variables.)DOCSTRING";
+All additional positional arguments are converted to strings and concatenated
+to the log message. All keyword arguments are added to the function as
+:ref:`logging_logvariables`.)DOCSTRING";
 
   auto logDebug = raw_function(&LogPythonInterface::logDebug);
   def("B2DEBUG", logDebug);
   setattr(logDebug, "__doc__", "B2DEBUG(debugLevel, message, *args, **kwargs)\n\n"
           "Print a `DEBUG <basf2.LogLevel.DEBUG>` message. "
-          "The first argument is the debug Level. " + common_doc);
+          "The first argument is the `debug_level <basf2.LogLevel.DEBUG>`. " +
+          common_doc);
 
   auto logInfo = raw_function(&LogPythonInterface::logInfo);
   def("B2INFO", logInfo);
@@ -403,7 +499,8 @@ keyword arguments are added to the function as log variables.)DOCSTRING";
   auto logResult = raw_function(&LogPythonInterface::logResult);
   def("B2RESULT", logResult);
   setattr(logResult, "__doc__", "B2RESULT(message, *args, **kwargs)\n\n"
-          "Print a `RESULT <basf2.LogLevel.RESULT>` message. " + common_doc);
+          "Print a `RESULT <basf2.LogLevel.RESULT>` message. " + common_doc
+          + "\n\n.. deprecated:: release-01-00-00\n    use `B2INFO()` instead");
 
   auto logWarning = raw_function(&LogPythonInterface::logWarning);
   def("B2WARNING", logWarning);
@@ -418,8 +515,9 @@ keyword arguments are added to the function as log variables.)DOCSTRING";
   auto logFatal = raw_function(&LogPythonInterface::logFatal);
   def("B2FATAL", logFatal);
   setattr(logFatal, "__doc__", "B2FATAL(message, *args, **kwargs)\n\n"
-          "Print a `FATAL <basf2.LogLevel.FATAL>` message. "
-          "This also exits the programm with an error. " + common_doc);
+          "Print a `FATAL <basf2.LogLevel.FATAL>` message. " + common_doc +
+          "\n\n.. note:: This also exits the programm with an error and is "
+          "guaranteed to not return.");
 }
 
 namespace {
@@ -433,7 +531,7 @@ namespace {
    * objects to a std::map<string,string> by using the `str()` operator in
    * python.
    */
-  auto pythonDictToMap(dict d)
+  auto pythonDictToMap(const dict& d)
   {
     std::map<std::string, std::string> result;
     if (d.is_none()) return result;
@@ -452,7 +550,7 @@ namespace {
    * log stream variables. In case of debug messages the first argument is
    * treated as the debug level.
    */
-  void dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, boost::python::dict kwargs)
+  void dispatchMessage(LogConfig::ELogLevel logLevel, boost::python::tuple args, const boost::python::dict& kwargs)
   {
     int debugLevel = 0;
     const int firstArg = logLevel == LogConfig::c_Debug ? 1 : 0;
@@ -495,47 +593,47 @@ namespace {
   }
 }
 
-boost::python::object LogPythonInterface::logDebug(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logDebug(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2DEBUG
-  dispatchMessage(LogConfig::c_Debug, args, kwargs);
+  dispatchMessage(LogConfig::c_Debug, std::move(args), kwargs);
 #endif
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logInfo(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logInfo(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2INFO
-  dispatchMessage(LogConfig::c_Info, args, kwargs);
+  dispatchMessage(LogConfig::c_Info, std::move(args), kwargs);
 #endif
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logResult(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logResult(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2RESULT
-  dispatchMessage(LogConfig::c_Result, args, kwargs);
+  dispatchMessage(LogConfig::c_Result, std::move(args), kwargs);
 #endif
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logWarning(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logWarning(boost::python::tuple args, const boost::python::dict& kwargs)
 {
 #ifndef LOG_NO_B2WARNING
-  dispatchMessage(LogConfig::c_Warning, args, kwargs);
+  dispatchMessage(LogConfig::c_Warning, std::move(args), kwargs);
 #endif
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logError(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logError(boost::python::tuple args, const boost::python::dict& kwargs)
 {
-  dispatchMessage(LogConfig::c_Error, args, kwargs);
+  dispatchMessage(LogConfig::c_Error, std::move(args), kwargs);
   return boost::python::object();
 }
 
-boost::python::object LogPythonInterface::logFatal(boost::python::tuple args, boost::python::dict kwargs)
+boost::python::object LogPythonInterface::logFatal(boost::python::tuple args, const boost::python::dict& kwargs)
 {
-  dispatchMessage(LogConfig::c_Fatal, args, kwargs);
+  dispatchMessage(LogConfig::c_Fatal, std::move(args), kwargs);
   std::exit(1);
   return boost::python::object();
 }

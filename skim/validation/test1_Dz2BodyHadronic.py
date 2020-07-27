@@ -9,44 +9,15 @@
 </header>
 """
 
-from ROOT import Belle2
-from basf2 import *
-from modularAnalysis import *
-from beamparameters import add_beamparameters
-from skimExpertFunctions import *
+import basf2 as b2
+import modularAnalysis as ma
+from skim.charm import DstToD0Pi_D0ToHpJm
 
-from stdCharged import *
-from stdPi0s import *
+path = b2.Path()
 
-set_log_level(LogLevel.INFO)
-import sys
-import os
-import glob
+fileList = ["../WG6_DstToD0pi_D0ToKpi.dst.root"]
+ma.inputMdstList('default', fileList, path=path)
 
-fileList = [
-    './WG6_DstToD0pi_D0ToKpi.dst.root'
-]
-
-# create path
-myAna_Main = create_path()
-
-inputMdstList('MC9', fileList, path=myAna_Main)
-
-stdPi('loose', path=myAna_Main)
-stdK('loose', path=myAna_Main)
-stdPi('all', path=myAna_Main)
-stdK('all', path=myAna_Main)
-stdE('all', path=myAna_Main)
-
-
-m skim.charm import DstToD0PiD0ToHpJm
-DstToD0PiD0ToHpJmList = DstToD0PiD0ToHpJm(myAna_Main)
-
-skimOutputUdst('WG6_DstToD0ToKpi', DstToD0PiD0ToHpJmList, path=myAna_Main)
-summaryOfLists(DstList, path=myAna_Main)
-
-
-setSkimLogging()
-process(myAna_Main)
-
-print(statistics)
+skim = DstToD0Pi_D0ToHpJm(OutputFileName='../WG6_DstToD0ToKpi.udst.root')
+skim(path)
+b2.process(path)

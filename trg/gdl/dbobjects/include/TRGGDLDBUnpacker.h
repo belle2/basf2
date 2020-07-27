@@ -10,8 +10,6 @@
 #pragma once
 
 #include <TObject.h>
-#include <unordered_map>
-#include <vector>
 
 namespace Belle2 {
 
@@ -29,11 +27,11 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    TRGGDLDBUnpacker(): m_nLeafs(0), m_nLeafsExtra(0), m_nClks(0), m_nBits(0), m_conf(0), m_LeafMap{0}, m_LeafNames{0}, m_BitMap{0},
+    TRGGDLDBUnpacker(): m_nLeafs(0), m_nLeafsExtra(0), m_nClks(0), m_nBits(0), m_conf(0), m_LeafNames{0}, m_LeafMap{0}, m_BitMap{0},
       m_nword_header(0), m_nword_input(0), m_nword_output(0), m_BitMap_extra{0} {}
 
     /** copy constructor */
-    TRGGDLDBUnpacker(const TRGGDLDBUnpacker& b)
+    TRGGDLDBUnpacker(const TRGGDLDBUnpacker& b): TObject(b)
     {
       m_nLeafs = b.m_nLeafs;
       m_nLeafsExtra = b.m_nLeafsExtra;
@@ -196,10 +194,10 @@ namespace Belle2 {
     int m_nClks;
 
     /** num of Bit **/
-    int m_nBits;
+    int m_nBits = 0;
 
     /** conf **/
-    int m_conf;
+    int m_conf = 0;
 
     /** leaf names **/
     char m_LeafNames[320][100];

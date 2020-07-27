@@ -2,7 +2,7 @@
 <header>
   <input>TOPNtuple.root</input>
   <output>kaonID.root, numberOfPhotons.root, trackResolutions.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Makes validation histograms</description>
 </header>
 */
@@ -83,6 +83,7 @@ void kaonID(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
       "Most of the entries should be distributed at negative values."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   h->Write();
 
   h = new TH1F("h102", "log likelihood difference for kaons (p < 2 GeV/c)", 
@@ -95,6 +96,7 @@ void kaonID(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
       "Most of the entries should be distributed at positive values."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   h->Write();
 
   h = new TH1F("h103", "log likelihood difference for pions (p > 2 GeV/c)", 
@@ -107,6 +109,7 @@ void kaonID(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
       "Most of the entries should be distributed at negative values."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   h->Write();
 
   h = new TH1F("h104", "log likelihood difference for kaons (p > 2 GeV/c)", 
@@ -119,6 +122,7 @@ void kaonID(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
       "Most of the entries should be distributed at positive values."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   h->Write();
 
   h = new TH2F("h105", "log likelihood difference vs. momentum for pions", 
@@ -131,7 +135,6 @@ void kaonID(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Most of the entries should be distributed below zero."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
-  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
   h->Write();
 
   h = new TH2F("h106", "log likelihood difference vs. momentum for kaons", 
@@ -144,7 +147,6 @@ void kaonID(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     "Most of the entries should be distributed above zero."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
-  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
   h->Write();
 
   output->Close();
@@ -170,6 +172,7 @@ void numberOfPhotons(TTree* top)
     "Distribution should peak at around 20 photons; bin at zero must be fairly small; "
     "long tail is normal."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   h->Write();
 
   h = new TH2F("h202", "number of detected photons per track vs polar angle", 
@@ -182,7 +185,6 @@ void numberOfPhotons(TTree* top)
   h->GetListOfFunctions()->Add(new TNamed("Check", 
     ""));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
-  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "expert"));
   h->Write();
 
   output->Close();

@@ -1,8 +1,5 @@
-#include <sys/stat.h>
 #include <cstdio>
-#include <iostream>
 #include <trg/gdl/TrgBit.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 using namespace Belle2;

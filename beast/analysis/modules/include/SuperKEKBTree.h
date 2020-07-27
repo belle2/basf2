@@ -11,8 +11,6 @@
 #ifndef SUPERKEKBTREE_H
 #define SUPERKEKBTREE_H
 
-#include <TTree.h>
-
 namespace Belle2 {
   namespace SuperKEKB {
 

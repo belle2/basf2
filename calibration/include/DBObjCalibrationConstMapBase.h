@@ -10,18 +10,10 @@
 
 #pragma once
 
-#include <iostream>
-#include <fstream>
 #include <utility>
 #include <map>
 #include <TObject.h>
-#include <TClonesArray.h>
 #include <TClass.h>
-
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-
-
 
 namespace Belle2 {
 

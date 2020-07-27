@@ -7,5 +7,6 @@
 
 #pragma link C++ namespace Belle2::ParticleListName-;
 #pragma link C++ class Belle2::DecayDescriptor-;
+#pragma link C++ class Belle2::ParticleListHelper-;
 
 #endif

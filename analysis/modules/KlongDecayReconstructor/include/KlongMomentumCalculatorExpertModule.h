@@ -13,13 +13,9 @@
 #include <framework/core/Module.h>
 
 #include <analysis/VariableManager/Utility.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 

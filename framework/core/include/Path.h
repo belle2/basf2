@@ -57,7 +57,7 @@ namespace Belle2 {
      *
      * @param module Module that should be added to the path.
      */
-    void addModule(std::shared_ptr<Module> module);
+    void addModule(const std::shared_ptr<Module>& module);
 
     /** Returns true if this Path doesn't contain any elements. */
     bool isEmpty() const;
@@ -104,16 +104,16 @@ namespace Belle2 {
     //--------------------------------------------------
 
     /** See 'pydoc3 basf2.Path' */
-    void addPath(PathPtr path);
+    void addPath(const PathPtr& path);
 
     /** See 'pydoc3 basf2.Path' */
-    void forEach(std::string loopObjectName, std::string arrayName, PathPtr path);
+    void forEach(const std::string& loopObjectName, const std::string& arrayName, PathPtr path);
 
     /** See 'pydoc3 basf2.Path' */
     void doWhile(PathPtr path, const std::string& condition, unsigned int maxIterations);
 
     /** See 'pydoc3 basf2.Path' */
-    void addIndependentPath(PathPtr independent_path, std::string ds_ID, boost::python::list merge_back);
+    void addIndependentPath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back);
 
     /** return a string of the form [module a -> module b -> [another path]]
      *

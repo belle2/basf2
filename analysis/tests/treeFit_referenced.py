@@ -3,9 +3,9 @@
 import unittest
 import os
 import tempfile
-from basf2 import *
-from modularAnalysis import *
-from vertex import vertexTree
+import basf2
+import b2test_utils
+import modularAnalysis as ma
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple
@@ -19,34 +19,40 @@ class TestTreeFits(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
-        main = create_path()
+        # we want to use the latest grated globaltag, not the old one from the
+        # file
+        basf2.conditions.disable_globaltag_replay()
 
-        inputMdst('default', Belle2.FileSystem.findFile('analysis/tests/100_noBKG_B0ToPiPiPi0.root'), path=main)
+        main = basf2.create_path()
 
-        fillParticleList('pi+:a', 'pionID > 0.5', path=main)
+        inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
+        ma.inputMdst('default', inputfile, path=main)
 
-        fillParticleList('gamma:a', '', path=main)
-        reconstructDecay('pi0:a -> gamma:a gamma:a', '0.125 < InvM < 0.145', 0, path=main)
+        ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
 
-        reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
-        matchMCTruth('B0:rec', path=main)
+        ma.fillParticleList('gamma:a', '', path=main)
+        ma.reconstructDecay('pi0:a -> gamma:a gamma:a', '0.125 < InvM < 0.145', 0, path=main)
 
+        ma.reconstructDecay('B0:rec -> pi-:a pi+:a pi0:a', '', 0, path=main)
+        ma.matchMCTruth('B0:rec', path=main)
+
+        conf = 0
         main.add_module('TreeFitter',
                         particleList='B0:rec',
-                        confidenceLevel=-1,
+                        confidenceLevel=conf,
                         massConstraintList=[],
                         massConstraintListParticlename=[],
                         expertUseReferencing=True,
                         ipConstraint=True,
                         updateAllDaughters=True)
 
-        ntupler = register_module('VariablesToNtuple')
+        ntupler = basf2.register_module('VariablesToNtuple')
         ntupler.param('fileName', testFile.name)
         ntupler.param('variables', ['chiProb', 'M', 'isSignal'])
         ntupler.param('particleList', 'B0:rec')
         main.add_module(ntupler)
 
-        process(main)
+        basf2.process(main)
 
         ntuplefile = TFile(testFile.name)
         ntuple = ntuplefile.Get('ntuple')
@@ -59,16 +65,17 @@ class TestTreeFits(unittest.TestCase):
         truePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal > 0)")
         falsePositives = ntuple.GetEntries("(chiProb > 0) && (isSignal == 0)")
 
+        mustBeZero = ntuple.GetEntries("(chiProb < {})".format(conf))
+
         print("True fit survivors: {0} out of {1} true candidates".format(truePositives, allSig))
         print("False fit survivors: {0} out of {1} false candidates".format(falsePositives, allBkg))
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertFalse(falsePositives == 0, "No background survived the fit. This is weird.")
+        self.assertTrue(falsePositives < 2107, "Background rejection too small.")
 
-        self.assertTrue(truePositives > (allSig / 2.), "More than 50% of signal did not survived the fit.")
-
-        self.assertFalse(allBkg == falsePositives, "All background candidates survived the fit.")
+        self.assertTrue(truePositives > 32, "Signal rejection too high")
+        self.assertFalse(mustBeZero, "We should have dropped all candidates with confidence level less than {}.".format(conf))
 
         print("Test passed, cleaning up.")
 

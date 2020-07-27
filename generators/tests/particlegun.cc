@@ -1,6 +1,5 @@
 #include <generators/particlegun/ParticleGun.h>
 #include <gtest/gtest.h>
-#include <boost/foreach.hpp>
 #include <iostream>
 using namespace std;
 

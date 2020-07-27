@@ -12,7 +12,6 @@
 
 #include <arich/dbobjects/ARICHBiasVoltages.h>
 #include <iostream>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;

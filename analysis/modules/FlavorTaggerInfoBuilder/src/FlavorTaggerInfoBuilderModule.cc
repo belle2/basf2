@@ -10,19 +10,12 @@
 
 #include <analysis/modules/FlavorTaggerInfoBuilder/FlavorTaggerInfoBuilderModule.h>
 
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
-
-#include <framework/logging/Logger.h>
-
-#include <iostream>
 
 using namespace Belle2;
 

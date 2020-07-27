@@ -10,10 +10,8 @@
 #pragma once
 
 #include <tracking/dataobjects/FullSecID.h>
-#include <framework/logging/Logger.h>
 
 // C++-std:
-#include <vector>
 #include <string>
 
 namespace Belle2 {

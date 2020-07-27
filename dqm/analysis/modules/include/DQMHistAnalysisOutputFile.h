@@ -36,10 +36,10 @@ namespace Belle2 {
     // Data members
   private:
 
-    std::string m_filename;//! file name of root file
-    std::string m_histogramDirectoryName;//! Directory name within root file where to place things
-    bool m_saveHistos;//! Write all Histos to file
-    bool m_saveCanvases;//! Write all Canvases to file
+    std::string m_filename;/**< file name of root file */
+    std::string m_histogramDirectoryName;/**< Directory name within root file where to place things */
+    bool m_saveHistos;/**< Write all Histos to file */
+    bool m_saveCanvases;/**< Write all Canvases to file */
   };
 } // end namespace Belle2
 

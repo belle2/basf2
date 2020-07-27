@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Pulvermacher                                   *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <TString.h>
@@ -16,7 +26,9 @@ namespace Belle2 {
     void Inspect(TClass* cl, const char* pname, const char* mname, const void* add) override;
 
   private:
+    /** Constructor */
     HtmlClassInspector() { }
+
     /** Return finished table. */
     TString getTable() const;
 

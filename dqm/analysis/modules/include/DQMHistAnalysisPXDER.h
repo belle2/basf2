@@ -13,17 +13,13 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
-#include <TROOT.h>
-#include <vector>
+#include "TFile.h"
 #include "TH1I.h"
 #include "TH1F.h"
-#include "TH2F.h"
+
+#include <vector>
 
 namespace Belle2 {
   /*! PXD DQM AnalysisModule */
@@ -35,7 +31,7 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisPXDERModule();
     /* Destructor */
-    ~DQMHistAnalysisPXDERModule() override final;
+    ~DQMHistAnalysisPXDERModule();
 
   private:
 
@@ -149,13 +145,6 @@ namespace Belle2 {
     int c_nPXDSensors = 0;
 
     /** Function return index of sensor in plots.
-       * @param Layer Layer position of sensor
-       * @param Ladder Ladder position of sensor
-       * @param Sensor Sensor position of sensor
-       * @return Index of sensor in plots.
-       */
-    int getSensorIndex(const int Layer, const int Ladder, const int Sensor) const;
-    /** Function return index of sensor in plots.
        * @param Index Index of sensor in plots.
        * @param Layer return Layer position of sensor
        * @param Ladder return Ladder position of sensor
@@ -220,6 +209,12 @@ namespace Belle2 {
     std::string m_refFileName;
     /** The pointer to the reference file */
     TFile* m_refFile = nullptr;
+
+    /**
+     * Get a histogram by name (DEPRECATED), better use function from base class!
+     * @param histoname The name of the histogram.
+     * @return The pointer to the histogram, or nullptr if not found.
+     */
     TH1* GetHisto(TString histoname);
 
   };

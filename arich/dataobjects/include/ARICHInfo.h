@@ -12,7 +12,6 @@
 #define ARICHINFO_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -24,7 +23,9 @@ namespace Belle2 {
     //! Empty constructor
     /*! Recommended for ROOT IO */
     ARICHInfo():
-      m_trgtype(0)
+      m_trgtype(0),
+      m_thscan_mode(0),
+      m_vth_thscan(0.0)
     {
       /*! does nothing */
     }
@@ -33,13 +34,19 @@ namespace Belle2 {
     /*!
       \param trgtype obtained from B2L data
     */
-    ARICHInfo(int trgtype)
+    explicit ARICHInfo(int trgtype)
     {
       m_trgtype = trgtype;
     }
 
     //! Set the trigger type
-    void settrgtype(double trgtype) { m_trgtype = trgtype; }
+    void settrgtype(int trgtype) { m_trgtype = trgtype; }
+
+    //! Set the threshold scan mode flag
+    void setthscan_mode(bool mode) { m_thscan_mode = mode; }
+
+    //! Set vth for thscan mode
+    void setvth_thscan(double vth_thscan) { m_vth_thscan = vth_thscan; }
 
     //! Set number of tracks of this event
     void setntrack(double n_track) { m_n_track = n_track; }
@@ -53,6 +60,12 @@ namespace Belle2 {
     //! Get the trigger type
     int gettrgtype() const { return m_trgtype; }
 
+    //! Get the threshold scan mode flag
+    bool getthscan_mode() const { return m_thscan_mode; }
+
+    //! Get vth for thscan
+    double getvth_thscan() const { return m_vth_thscan; }
+
     //! Get number of tracks of this event
     int getntrack() const { return m_n_track; }
 
@@ -65,12 +78,15 @@ namespace Belle2 {
   private:
 
     int m_trgtype = 0;            /**< trigger type */
+    bool m_thscan_mode = false;  /**< Flag of threshold scan run  */
+    double m_vth_thscan = 0;            /**< vth value for thscan mode */
     int m_n_track = 0;            /**< number of tracks of this event */
     int m_n_exthit = 0;            /**< number of eligible ExtHits of this event */
     int m_n_hit = 0;            /**< number of ARICHHits of this event */
 
 
-    ClassDef(ARICHInfo, 1); /**< the class title */
+
+    ClassDef(ARICHInfo, 3); /**< the class title */
 
   };
 

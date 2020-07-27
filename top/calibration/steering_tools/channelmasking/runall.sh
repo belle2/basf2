@@ -1,0 +1,3 @@
+basf2 channelMasking_hltdqm.py
+basf2 importChannelMask.py
+b2conditionsdb upload staging_top_calibrations localDB/localDB.txt

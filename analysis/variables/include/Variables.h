@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <analysis/VariableManager/Manager.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <vector>
 
@@ -127,41 +126,16 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 
     /**
-     * cosine of the angle in CMS between momentum the reconstructed particle and a nominal B particle. It is somewhere between -1 and 1
-     * if only a single massless particle like a neutrino is missing in the reconstruction.
+     * cosine of the angle in CMS between momentum the reconstructed particle and a nominal B particle.
+     * It is somewhere between -1 and 1 if only a single massless particle like a neutrino is missing in the reconstruction.
      */
     double cosThetaBetweenParticleAndNominalB(const Particle* part);
-
-    /**
-     * Cosine of the helicity angle of the i-th (where 'i' is the parameter passed to the function) daughter of the particle provided"
-     * assuming that the mother of the provided particle correspond to the Centre of Mass System, whose parameters are
-     * automatically loaded by the function, given the accelerators conditions.
-     */
-    Manager::FunctionPtr cosHelicityAngleIfCMSIsTheMother(const std::vector<std::string>& arguments);
 
     /**
      * Returns the cosine of the angle between the particle and the thrust axis
      * of the event, as calculate by the EventShapeCalculator module.
      */
     double cosToThrustOfEvent(const Particle* part);
-
-    /**
-     * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
-     * of the two daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
-     * If the given particle has three daughters: cosine of the angle between the normal vector of the plane
-     * defined by the momenta of the three daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
-     * Else: 0.
-     */
-    double cosHelicityAngle(const Particle* part);
-
-    /**
-     * To be used for the decay pi0 -> e+ e- gamma: cosine of the angle between the momentum of the gamma in the frame
-     * of the given particle (mother) and the momentum of the given particle in the lab frame.
-     * Else: 0.
-     */
-    double cosHelicityAnglePi0Dalitz(const Particle* part);
-
-
 
     /**
      * return the (i,j)-th element of the MomentumVertex covariance matrix
@@ -189,7 +163,7 @@ namespace Belle2 {
     /**
      * return mass (determined from particle's daughter 4-momentum vectors)
      */
-    double particleInvariantMass(const Particle* part);
+    double particleInvariantMassFromDaughters(const Particle* part);
 
     /**
      * return mass (determined from particle's daughter 4-momentum vectors under proton mass assumption)
@@ -197,20 +171,19 @@ namespace Belle2 {
     double particleInvariantMassLambda(const Particle* part);
 
     /**
-     * return uncertainty of the invariant mass (determined from particle's daughter 4-momentum vectors)
+     * return uncertainty of the invariant mass
      */
     double particleInvariantMassError(const Particle* part);
 
     /**
-     * return signed deviation of particle's invariant mass from its nominal mass
+     * return signed deviation of particle's invariant mass from its nominal mass in units of uncertainty on the invariant mass
      */
     double particleInvariantMassSignificance(const Particle* part);
 
     /**
-     * return signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass
+     * return mass squared (determined from particle's 4-momentum vector)
      */
-    double particleInvariantMassBeforeFitSignificance(const Particle* part);
-
+    double particleMassSquared(const Particle* part);
 
     /**
      * return released energy in decay
@@ -231,36 +204,6 @@ namespace Belle2 {
      * return energy difference in CMS
      */
     double particleDeltaE(const Particle* part);
-
-    /**
-     * return StoreArray index (0-based) of the MDST object from which the Particle was created
-     */
-    double particleMdstArrayIndex(const Particle* part);
-
-    /**
-     * return unique identifier for identification of Particles that are constructed from the same object in the detector (Track, energy deposit, ...)
-     */
-    double particleMdstSource(const Particle* part);
-
-    /**
-     * return prob(chi^2,ndf) of fit
-     */
-    double particlePvalue(const Particle* part);
-
-    /**
-     * return number of daughter particles
-     */
-    double particleNDaughters(const Particle* part);
-
-    /**
-     * return flavor type
-     */
-    double particleFlavorType(const Particle* part);
-
-    /**
-     * return charge
-     */
-    double particleCharge(const Particle* part);
 
     /**
      * return component x of 3-momentum recoiling against given Particle
@@ -316,7 +259,7 @@ namespace Belle2 {
 
     /**
      *
-     * return invarian mass squared of the system recoiling against given Particle
+     * return invariant mass squared of the system recoiling against given Particle
      */
     double recoilMassSquared(const Particle* particle);
 
@@ -380,10 +323,26 @@ namespace Belle2 {
     double b2bClusterPhi(const Particle* particle);
 
     /**
-     * return Kshort using Belle goodKS algorithm
+     * returns the longitudinal momentum asymmetry
+     * alpha = (p_{L}^{+} - p_{L}^{-}) / (p_{L}^{+} - p_{L}^{-})
+     * for the Armenteros plot.
+     * The particle (mother) is required to have exactly two daughters.
+     * In case the two daughters have same charge it will return
+     * alpha = (p_{L}^{d1} - p_{L}^{d2}) / (p_{L}^{d1} - p_{L}^{d2})
+     * where d1 is the first daughter, d2 the second daughter.
      */
-    double goodBelleKshort(const Particle* KS);
+    double ArmenterosLongitudinalMomentumAsymmetry(const Particle* part);
 
+    /**
+     * returns the transverse momentum of the first daughter with
+     * respect to the V0 mother
+     */
+    double ArmenterosDaughter1Qt(const Particle* part);
 
+    /**
+     * returns the transverse momentum of the second daughter with
+     * respect to the V0 mother
+     */
+    double ArmenterosDaughter2Qt(const Particle* part);
   }
 } // Belle2 namespace

@@ -13,12 +13,8 @@
 
 #include <framework/core/Module.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/cosmics/SGCosmic.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -38,24 +37,24 @@ ma.inputMdst(environmentType='default',
 
 # use standard final state particle lists
 #
-# creates "pi0:looseFit" ParticleList
-# https://confluence.desy.de/display/BI/Physics+StandardParticles
-stdPi0s(listtype='looseFit', path=my_path)
+# creates "pi0:eff40_Jan2020Fit" ParticleList
+# see Standard Particles section at https://software.belle2.org/
+stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
 
 # reconstruct D0 -> pi0 pi0 decay
 # keep only candidates with 1.7 < M(pi0pi0) < 2.0 GeV
-ma.reconstructDecay(decayString='D0:pi0pi0 -> pi0:looseFit pi0:looseFit',
+ma.reconstructDecay(decayString='D0:pi0pi0 -> pi0:eff40_Jan2020Fit pi0:eff40_Jan2020Fit',
                     cut='1.7 < M < 2.0',
                     path=my_path)
 
 # reconstruct B0 -> D0 pi0 decay
 # keep only candidates with Mbc > 5.24 GeV
 # and -1 < Delta E < 1 GeV
-ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:looseFit',
+ma.reconstructDecay(decayString='B0:all -> D0:pi0pi0 pi0:eff40_Jan2020Fit',
                     cut='5.24 < Mbc < 5.29 and abs(deltaE) < 1.0',
                     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='B0:all',
                 path=my_path)
 
@@ -72,12 +71,10 @@ B0_vars = vc.inv_mass + \
 
 pi0_vars = vc.mc_truth + \
     vc.kinematics + \
-    vc.mass_before_fit + \
-    ['extraInfo(BDT)', 'decayAngle(0)'] + \
+    ['extraInfo(BDT)', 'decayAngle(0)', 'weightedAverageECLTime'] + \
     vu.create_aliases_for_selected(
         list_of_variables=vc.cluster + vc.kinematics,
         decay_string='pi0 -> ^gamma ^gamma')
-
 
 # Saving variables to ntuple
 output_file = 'B2A302-B02D0Pi0-D02Pi0Pi0-Reconstruction.root'
@@ -85,7 +82,7 @@ ma.variablesToNtuple('B0:all', B0_vars,
                      filename=output_file,
                      treename='b0',
                      path=my_path)
-ma.variablesToNtuple('pi0:looseFit', pi0_vars,
+ma.variablesToNtuple('pi0:eff40_Jan2020Fit', pi0_vars,
                      filename=output_file,
                      treename='pi0',
                      path=my_path)

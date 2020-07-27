@@ -42,6 +42,9 @@ namespace Belle2 {
     /// Fit V0 with given hypothesis and store if fit was successful.
     bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
 
+    /// Get track hypotheses for a given v0 hypothesis.
+    std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis);
+
   private:
 
     /** Starting point: point closest to axis where either track is defined
@@ -66,7 +69,7 @@ namespace Belle2 {
      * @param vertex Result of the fit is returned via reference.
      * @return
      */
-    bool fitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
+    bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
 
     /// Extrapolate the fit results to the perigee to the vertex.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
@@ -79,8 +82,6 @@ namespace Belle2 {
     TrackFitResult* buildTrackFitResult(const genfit::Track& track, const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                         const Const::ParticleType& trackHypothesis);
 
-    /// Get track hypotheses for a given v0 hypothesis.
-    std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis);
 
   private:
     bool m_validation;  ///< Validation flag.

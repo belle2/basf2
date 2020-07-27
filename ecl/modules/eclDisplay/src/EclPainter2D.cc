@@ -58,6 +58,15 @@ EclPainter2D::~EclPainter2D()
     delete hgrid;
 }
 
+void EclPainter2D::cloneFrom(const EclPainter2D& other)
+{
+  m_type = other.m_type;
+  m_hist = new TH2F(*other.m_hist);
+  hgrid = 0;
+  grid = 0;
+  initGrid();
+}
+
 void EclPainter2D::setTitles()
 {
   const char* name[3][3] = {

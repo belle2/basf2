@@ -11,9 +11,7 @@
 #ifndef EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
 #define EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
 
-
-#include <complex>
-#include <iostream>
+#include <cstddef>
 
 namespace Belle2 {
 

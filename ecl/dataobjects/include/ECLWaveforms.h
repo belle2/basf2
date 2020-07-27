@@ -12,7 +12,6 @@
 #define ECLWAVEFORMS_H
 
 #include <TObject.h>
-#include <algorithm>
 
 namespace Belle2 {
   /*!
@@ -27,8 +26,8 @@ namespace Belle2 {
     std::vector<unsigned int>& getStore() { return m_store;}
 
   private:
-    std::vector<unsigned int> m_store;
-    ClassDef(ECLWaveforms, 1);/**< ClassDef */
+    std::vector<unsigned int> m_store; /**< the data */
+    ClassDef(ECLWaveforms, 1); /**< ClassDef */
   };
 }
 #endif

@@ -20,7 +20,7 @@ namespace Belle2 {
 
   /**
    * Class to hold the information for the ECL shower energy corrections
-   * Corrections produced by Claudia Cecchi (claudia.cecchi@pg.infn.itElisa) Manoni (elisa.manoni@pg.infn.it)
+   * Corrections produced by Claudia Cecchi (claudia.cecchi@pg.infn.it) Elisa Manoni (elisa.manoni@pg.infn.it)
    * This is a temperary class as there is no information about phi dependence.
    * An improved version will be implemented at a later time.
    *
@@ -38,16 +38,16 @@ namespace Belle2 {
 
     /**
      * Constructor
-     * Theta angles are in degrees!!
+     * Angles are in degrees!!
      */
     ECLShowerEnergyCorrectionTemporary(const TGraph2D& graph,
-                                       const float thetaMin,
-                                       const float thetaMax,
+                                       const float angleMin,
+                                       const float angleMax,
                                        const float energyMin,
                                        const float energyMax) :
       m_graph(graph),
-      m_thetaMin(thetaMin),
-      m_thetaMax(thetaMax),
+      m_angleMin(angleMin),
+      m_angleMax(angleMax),
       m_energyMin(energyMin),
       m_energyMax(energyMax)
     {
@@ -60,25 +60,25 @@ namespace Belle2 {
     ~ECLShowerEnergyCorrectionTemporary() {};
 
     /*! Get the TGraph2D graph
-     * x - theta (degrees)
+     * x - angle (degrees)
      * y - energy
      * z - correction factor
-     * Theta angles are in degrees!!
+     * Angles are in degrees!!
      * @return graph holding correction information
      */
     TGraph2D getGraph2D() const {return m_graph;}
 
-    /*! Get Minimum value of theta which the corrections are valid for.
+    /*! Get Minimum value of angle which the corrections are valid for.
      * Angles are in degrees!!
-     * @return Minimum theta
+     * @return Minimum angle
      */
-    float getThetaMin() const {return m_thetaMin;}
+    float getAngleMin() const {return m_angleMin;}
 
-    /*! Get Maximum value of theta which the corrections are valid for.
+    /*! Get Maximum value of angle which the corrections are valid for.
      * Angles are in degrees!!
-     * @return Maximum theta
+     * @return Maximum angle
      */
-    float getThetaMax() const {return m_thetaMax;}
+    float getAngleMax() const {return m_angleMax;}
 
     /*! Get Minimum value of energy which the corrections are valid for.
      * @return Minimum energy
@@ -92,8 +92,8 @@ namespace Belle2 {
 
   private:
     TGraph2D m_graph; /**< graph holding the shower energy corrections. */
-    float m_thetaMin; /**< Minimum value of theta which the corrections are valid for (in degrees). */
-    float m_thetaMax; /**< Maximum value of theta which the corrections are valid for (in degrees). */
+    float m_angleMin; /**< Minimum value of angle which the corrections are valid for (in degrees). */
+    float m_angleMax; /**< Maximum value of angle which the corrections are valid for (in degrees). */
     float m_energyMin; /**< Minimum value of energy which the corrections are valid for. */
     float m_energyMax; /**< Maximum value of energy which the corrections are valid for. */
 

@@ -18,9 +18,6 @@
 #include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
 #include <tracking/pxdDataReductionClasses/ROIPixelTranslator.h>
 #include <string>
-#include <TTree.h>
-#include <TFile.h>
-#include <time.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
 namespace Belle2 {
@@ -53,14 +50,14 @@ namespace Belle2 {
 
     void endRun() override;
 
-    ROIPixelTranslator* m_thePixelTranslator; /**< the pixel translator object*/
-    PXDInterceptor* m_thePXDInterceptor; /**< the pxd interceptor object*/
+    ROIPixelTranslator* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
+    PXDInterceptor* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
     std::string m_PXDInterceptListName; /**< intercept list name*/
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
 
-    double m_toleranceZ;
-    double m_tolerancePhi;
+    double m_toleranceZ; /**< tolerance for finding sensor in Z coordinate (cm) */
+    double m_tolerancePhi; /**< tolerance for finding sensor in phi coordinate (radians) */
 
     double m_sigmaSystU; /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI U width */
     double m_sigmaSystV;  /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI V width */

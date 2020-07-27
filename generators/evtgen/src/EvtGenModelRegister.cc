@@ -10,6 +10,8 @@
 
 #include <generators/evtgen/EvtGenModelRegister.h>
 
+#include <memory>
+
 using namespace std;
 
 namespace Belle2 {

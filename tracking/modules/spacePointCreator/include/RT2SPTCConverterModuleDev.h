@@ -10,15 +10,9 @@
 # pragma once
 
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <tracking/spacePointCreation/SpacePointTrackCand.h>
-
-#include <tracking/dataobjects/RecoTrack.h>
-
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickRTSel.h>
-#include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
 #include <boost/optional.hpp>
 #include <bitset>

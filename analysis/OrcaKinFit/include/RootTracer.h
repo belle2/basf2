@@ -51,6 +51,11 @@ namespace Belle2 {
       RootTracer(const char* filename = "trace.root", const char* option = "RECREATE");
       virtual ~RootTracer();
 
+      /// We do not want to copy construct
+      RootTracer(const RootTracer&) = delete;
+      RootTracer& operator=(const RootTracer&) = delete;
+
+
       /// Called at the start of a new fit (during initialization)
       virtual void initialize(BaseFitter& fitter) override;
       /// Called at the end of each step

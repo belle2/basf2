@@ -46,7 +46,7 @@ namespace Belle2 {
 
 
     /** get a copy of a storearray */
-    static bool initialize(StoreArray<ObserverInfo> aStoreArray)
+    static bool initialize(const StoreArray<ObserverInfo>& aStoreArray)
     {
       ObserverCheckFilters::s_storeArray = aStoreArray;
       return true;
@@ -61,7 +61,7 @@ namespace Belle2 {
 
 
     /** convert a SpacePiont into a version that can be stored in the datastore */
-    static SpacePointInfo convertSpacePoint(SpacePoint aSpacePoint)
+    static SpacePointInfo convertSpacePoint(const SpacePoint& aSpacePoint)
     {
       SpacePointInfo spInfo;
       spInfo.setPosition(aSpacePoint.getPosition());

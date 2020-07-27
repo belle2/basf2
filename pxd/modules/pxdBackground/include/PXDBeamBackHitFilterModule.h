@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDBeamBackHitFilterModule_H
-#define PXDBeamBackHitFilterModule_H
+#pragma once
 
 #include <framework/core/Module.h>
-#include <simulation/dataobjects/BeamBackHit.h>
 
 namespace Belle2 {
   namespace PXD {
@@ -39,5 +37,3 @@ namespace Belle2 {
 
   } //end PXD namespace;
 } // end namespace Belle2
-
-#endif // PXDBeamBackHitFilterModule_H

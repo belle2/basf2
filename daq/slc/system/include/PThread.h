@@ -6,8 +6,6 @@
 #include <pthread.h>
 #include <signal.h>
 #include <cstdio>
-#include <exception>
-#include <iostream>
 
 namespace Belle2 {
 
@@ -55,7 +53,6 @@ namespace Belle2 {
 
   public:
     PThread() : m_th(0) {}
-
     template<class WORKER>
     PThread(WORKER* worker, bool destroyed = true, bool detached = true)
     {
@@ -71,7 +68,10 @@ namespace Belle2 {
           m_th = 0;
         }
       }
-      if (detached) detach();
+      if (detached) {
+        detach();
+        m_th = 0;
+      }
     }
     ~PThread() {}
 

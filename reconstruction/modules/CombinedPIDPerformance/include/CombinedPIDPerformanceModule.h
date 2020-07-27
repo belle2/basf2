@@ -8,14 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef COMBINEDPIDPERFORMANCEMODULE_H_
-#define COMBINEDPIDPERFORMANCEMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
-#include <TTree.h>
 #include <TFile.h>
 #include <TList.h>
-#include <TH1F.h>
 #include <TEfficiency.h>
 #include <TH3F.h>
 
@@ -25,20 +22,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// forward declarations
-class TTree;
-class TFile;
 
 namespace Belle2 {
-  class MCParticle;
-  class Track;
-  class TrackFitResult;
-  class PIDLikelihood;
-
-  template< class T >
-  class StoreArray;
 
   /** This module takes the MCParticles, the Tracks, and the PIDLikelihoods as input and
    *  produces a root file containing various histograms showing the PID performance
@@ -71,7 +56,7 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcParticles; /**< Required array of input MCParticles */
 
     /** list to store TObjects */
-    TList* m_histoList;
+    TList* m_histoList{nullptr};
 
     /** method to create TEfficiencies */
     TEfficiency* createEfficiency(const char* name, const char* title,
@@ -109,7 +94,7 @@ namespace Belle2 {
     std::vector< TEfficiency* > m_epi_FakeRates;    /**< electron fake rates */
     std::vector< TEfficiency* > m_mpi_FakeRates;    /**< muon fake rates */
 
-    TH3F* h_ROC[5][10]; /**< ROC histograms */
+    TH3F* h_ROC[5][10] = {}; /**< ROC histograms */
 
     /** returns the likelihood ratio for given log likelihoods */
     double pidvalue(float pida, float pidb);
@@ -129,5 +114,3 @@ namespace Belle2 {
 
   };
 } // end of namespace
-
-#endif

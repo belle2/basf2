@@ -16,8 +16,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCTrack;
-    class CDCRLWireHit;
 
     /// Names of the variables to be generated
     constexpr

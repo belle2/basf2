@@ -8,14 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Own header. */
 #include <reconstruction/modules/MdstPID/MdstPIDModule.h>
 
-// framework aux
-#include <framework/logging/Logger.h>
+/* Belle2 headers. */
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+#include <klm/muid/MuidElementNumbers.h>
 
+/* C++ headers. */
 #include <string>
-
 
 using namespace std;
 
@@ -24,7 +26,7 @@ namespace Belle2 {
   REG_MODULE(MdstPID)
 
   MdstPIDModule::MdstPIDModule() : Module(),
-    m_pid(NULL)
+    m_pid(nullptr)
   {
     setDescription("Create MDST PID format (PIDLikelihood objects) from subdetector PID info.");
     setPropertyFlags(c_ParallelProcessingCertified);
@@ -98,7 +100,7 @@ namespace Belle2 {
       if (ecl) setLikelihoods(ecl);
 
       // set klm likelihoods
-      const Muid* muid = track->getRelatedTo<Muid>();
+      const KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
       if (muid) setLikelihoods(muid);
 
     }
@@ -158,25 +160,22 @@ namespace Belle2 {
   }
 
 
-  void MdstPIDModule::setLikelihoods(const Muid* muid)
+  void MdstPIDModule::setLikelihoods(const KLMMuidLikelihood* muid)
   {
-
     if (abs(muid->getPDGCode()) != abs(Const::muon.getPDGCode())) {
-      B2WARNING("MdstPID, Muid: extrapolation with other than muon hypothesis ignored");
+      B2WARNING("MdstPID, KLMMuidLikelihood: extrapolation with other than muon hypothesis ignored");
       return;
     }
 
-    if (muid->getOutcome() == 0) return; // muon can't reach KLM
+    if (muid->getOutcome() == MuidElementNumbers::c_NotReached)
+      return; // track extrapolation didn't reach KLM
 
-    if (muid->getJunkPDFValue() != 0) return; // unclassifiable track (all likelihoods were zero)
+    if (muid->getJunkPDFValue())
+      return; // unclassifiable track (all likelihoods were zero), extremely rare
 
-    m_pid->setLogLikelihood(Const::KLM, Const::electron, muid->getLogL_e());
-    m_pid->setLogLikelihood(Const::KLM, Const::muon, muid->getLogL_mu());
-    m_pid->setLogLikelihood(Const::KLM, Const::pion, muid->getLogL_pi());
-    m_pid->setLogLikelihood(Const::KLM, Const::kaon, muid->getLogL_K());
-    m_pid->setLogLikelihood(Const::KLM, Const::proton, muid->getLogL_p());
-    m_pid->setLogLikelihood(Const::KLM, Const::deuteron, muid->getLogL_d());
-
+    for (const auto& chargedStable : Const::chargedStableSet) {
+      m_pid->setLogLikelihood(Const::KLM, chargedStable, muid->getLogL(chargedStable.getPDGCode()));
+    }
   }
 
 

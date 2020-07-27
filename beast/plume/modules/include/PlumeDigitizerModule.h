@@ -17,9 +17,6 @@
 #include <beast/plume/dataobjects/PlumeSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <string>
-
-
 namespace Belle2 {
   namespace plume {
     /**
@@ -37,22 +34,38 @@ namespace Belle2 {
        */
       PlumeDigitizerModule();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~PlumeDigitizerModule();
 
-      /**  */
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
 
-      /**  */
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
 
-      /**  */
+      /**
+       * Event processor.
+       */
       virtual void event() override;
 
-      /**  */
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
 
-      /**  */
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
       /** set the parameters of the response model */
@@ -78,9 +91,9 @@ namespace Belle2 {
       float m_posmm_z;
 
       /** collection of PlumeHit saved in the datastore by the module*/
-      StoreArray<PlumeHit> m_plumeHits;
-      StoreArray<MCParticle> m_particles;
-      StoreArray<PlumeSimHit> m_plumeSimHits;
+      StoreArray<PlumeHit> m_plumeHits; /**< PLUME hits */
+      StoreArray<MCParticle> m_particles; /**< PLUME particles */
+      StoreArray<PlumeSimHit> m_plumeSimHits; /**< PLUME SimHits */
     };
 
   }

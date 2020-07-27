@@ -13,12 +13,10 @@
 
 #include <trg/cdc/modules/trgcdct3dConverter/TRGCDCT3DConverterModule.h>
 #include <bitset>
-#include <iomanip>
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/JSignal.h"
 #include "trg/cdc/JSignalData.h"
-#include "trg/cdc/JLUT.h"
 
 using namespace std;
 using namespace Belle2;
@@ -35,30 +33,30 @@ string TRGCDCT3DConverterModule::version() const
 TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
   : Module::Module()
 {
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   string desc = "TRGCDCT3DConverterModule(" + version() + ")";
   setDescription(desc);
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
-           string("CDCTriggerSegmentHits"));
+           string("CDCTriggerSegmentHits0"));
   addParam("addTSToDatastore", m_addTSToDatastore,
            "If true, adds TS to datastore",
            true);
   addParam("EventTimeName", m_EventTimeName,
            "Name of the event time object.",
-           string("BinnedEventT0"));
+           string("BinnedEventT00"));
   addParam("addEventTimeToDatastore", m_addEventTimeToDatastore,
            "If true, adds event time to datastore",
            true);
   addParam("inputCollectionName", m_inputCollectionName,
            "Name of the StoreArray holding the input tracks from the 2D finder.",
-           string("TRGCDC2DFinderTracks"));
+           string("TRGCDC2DFinderTracks0"));
   addParam("add2DFinderToDatastore", m_add2DFinderToDatastore,
            "If true, adds 2D Finder results to datastore",
            true);
   addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the 3D output tracks.",
-           string("TRGCDC3DFitterTracks"));
+           string("TRGCDC3DFitterTracks0"));
   addParam("add3DToDatastore", m_add3DToDatastore,
            "If true, adds 3D results to datastore",
            true);
@@ -67,7 +65,7 @@ TRGCDCT3DConverterModule::TRGCDCT3DConverterModule()
            unsigned(0));
   addParam("firmwareResultCollectionName", m_firmwareResultCollectionName,
            "Name of the StoreArray holding the firmware results.",
-           string("TRGCDCT3DUnpackerStores"));
+           string("TRGCDCT3DUnpackerStores0"));
   addParam("isVerbose", m_isVerbose,
            "If not zero, prints detail information.",
            unsigned(0));
@@ -458,7 +456,7 @@ void TRGCDCT3DConverterModule::addTSDatastore(vector<vector<vector<double> > >& 
 
 void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<double> > > >& tsfInfo)
 {
-  tsfInfo.resize(4, vector<vector<vector<double> > > (10, vector<vector<double> > (48, vector<double> (4))));
+  tsfInfo.resize(4, vector<vector<vector<double> > > (15, vector<vector<double> > (48, vector<double> (4))));
   for (int iClk = 0; iClk < m_firmwareResults.getEntries(); iClk++) {
     TRGCDCT3DUnpackerStore* result = m_firmwareResults[iClk];
     //cout<<"iClk:"<<iClk<<" tsf1_cc:"<<result->m_tsf1_cc<<" tsf1ts0_id:"<<result->m_tsf1ts0_id<<" tsf1ts0_rt:"<<result->m_tsf1ts0_rt<<" tsf1ts0_lr:"<<result->m_tsf1ts0_lr<<" tsf1ts0_pr:"<<result->m_tsf1ts0_pr<<endl;
@@ -512,6 +510,31 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
     tsfInfo[0][9][iClk][2] = result->m_tsf1ts9_lr;
     tsfInfo[0][9][iClk][3] = result->m_tsf1ts9_pr;
     tsfInfo[0][9][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][10][iClk][0] = result->m_tsf1ts10_id;
+    tsfInfo[0][10][iClk][1] = result->m_tsf1ts10_rt;
+    tsfInfo[0][10][iClk][2] = result->m_tsf1ts10_lr;
+    tsfInfo[0][10][iClk][3] = result->m_tsf1ts10_pr;
+    tsfInfo[0][10][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][11][iClk][0] = result->m_tsf1ts11_id;
+    tsfInfo[0][11][iClk][1] = result->m_tsf1ts11_rt;
+    tsfInfo[0][11][iClk][2] = result->m_tsf1ts11_lr;
+    tsfInfo[0][11][iClk][3] = result->m_tsf1ts11_pr;
+    tsfInfo[0][11][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][12][iClk][0] = result->m_tsf1ts12_id;
+    tsfInfo[0][12][iClk][1] = result->m_tsf1ts12_rt;
+    tsfInfo[0][12][iClk][2] = result->m_tsf1ts12_lr;
+    tsfInfo[0][12][iClk][3] = result->m_tsf1ts12_pr;
+    tsfInfo[0][12][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][13][iClk][0] = result->m_tsf1ts13_id;
+    tsfInfo[0][13][iClk][1] = result->m_tsf1ts13_rt;
+    tsfInfo[0][13][iClk][2] = result->m_tsf1ts13_lr;
+    tsfInfo[0][13][iClk][3] = result->m_tsf1ts13_pr;
+    tsfInfo[0][13][iClk][4] = result->m_tsf1_cc;
+    tsfInfo[0][14][iClk][0] = result->m_tsf1ts14_id;
+    tsfInfo[0][14][iClk][1] = result->m_tsf1ts14_rt;
+    tsfInfo[0][14][iClk][2] = result->m_tsf1ts14_lr;
+    tsfInfo[0][14][iClk][3] = result->m_tsf1ts14_pr;
+    tsfInfo[0][14][iClk][4] = result->m_tsf1_cc;
 
     tsfInfo[1][0][iClk][0] = result->m_tsf3ts0_id;
     tsfInfo[1][0][iClk][1] = result->m_tsf3ts0_rt;
@@ -563,6 +586,31 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
     tsfInfo[1][9][iClk][2] = result->m_tsf3ts9_lr;
     tsfInfo[1][9][iClk][3] = result->m_tsf3ts9_pr;
     tsfInfo[1][9][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][10][iClk][0] = result->m_tsf3ts10_id;
+    tsfInfo[1][10][iClk][1] = result->m_tsf3ts10_rt;
+    tsfInfo[1][10][iClk][2] = result->m_tsf3ts10_lr;
+    tsfInfo[1][10][iClk][3] = result->m_tsf3ts10_pr;
+    tsfInfo[1][10][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][11][iClk][0] = result->m_tsf3ts11_id;
+    tsfInfo[1][11][iClk][1] = result->m_tsf3ts11_rt;
+    tsfInfo[1][11][iClk][2] = result->m_tsf3ts11_lr;
+    tsfInfo[1][11][iClk][3] = result->m_tsf3ts11_pr;
+    tsfInfo[1][11][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][12][iClk][0] = result->m_tsf3ts12_id;
+    tsfInfo[1][12][iClk][1] = result->m_tsf3ts12_rt;
+    tsfInfo[1][12][iClk][2] = result->m_tsf3ts12_lr;
+    tsfInfo[1][12][iClk][3] = result->m_tsf3ts12_pr;
+    tsfInfo[1][12][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][13][iClk][0] = result->m_tsf3ts13_id;
+    tsfInfo[1][13][iClk][1] = result->m_tsf3ts13_rt;
+    tsfInfo[1][13][iClk][2] = result->m_tsf3ts13_lr;
+    tsfInfo[1][13][iClk][3] = result->m_tsf3ts13_pr;
+    tsfInfo[1][13][iClk][4] = result->m_tsf3_cc;
+    tsfInfo[1][14][iClk][0] = result->m_tsf3ts14_id;
+    tsfInfo[1][14][iClk][1] = result->m_tsf3ts14_rt;
+    tsfInfo[1][14][iClk][2] = result->m_tsf3ts14_lr;
+    tsfInfo[1][14][iClk][3] = result->m_tsf3ts14_pr;
+    tsfInfo[1][14][iClk][4] = result->m_tsf3_cc;
 
     tsfInfo[2][0][iClk][0] = result->m_tsf5ts0_id;
     tsfInfo[2][0][iClk][1] = result->m_tsf5ts0_rt;
@@ -614,6 +662,31 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
     tsfInfo[2][9][iClk][2] = result->m_tsf5ts9_lr;
     tsfInfo[2][9][iClk][3] = result->m_tsf5ts9_pr;
     tsfInfo[2][9][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][10][iClk][0] = result->m_tsf5ts10_id;
+    tsfInfo[2][10][iClk][1] = result->m_tsf5ts10_rt;
+    tsfInfo[2][10][iClk][2] = result->m_tsf5ts10_lr;
+    tsfInfo[2][10][iClk][3] = result->m_tsf5ts10_pr;
+    tsfInfo[2][10][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][11][iClk][0] = result->m_tsf5ts11_id;
+    tsfInfo[2][11][iClk][1] = result->m_tsf5ts11_rt;
+    tsfInfo[2][11][iClk][2] = result->m_tsf5ts11_lr;
+    tsfInfo[2][11][iClk][3] = result->m_tsf5ts11_pr;
+    tsfInfo[2][11][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][12][iClk][0] = result->m_tsf5ts12_id;
+    tsfInfo[2][12][iClk][1] = result->m_tsf5ts12_rt;
+    tsfInfo[2][12][iClk][2] = result->m_tsf5ts12_lr;
+    tsfInfo[2][12][iClk][3] = result->m_tsf5ts12_pr;
+    tsfInfo[2][12][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][13][iClk][0] = result->m_tsf5ts13_id;
+    tsfInfo[2][13][iClk][1] = result->m_tsf5ts13_rt;
+    tsfInfo[2][13][iClk][2] = result->m_tsf5ts13_lr;
+    tsfInfo[2][13][iClk][3] = result->m_tsf5ts13_pr;
+    tsfInfo[2][13][iClk][4] = result->m_tsf5_cc;
+    tsfInfo[2][14][iClk][0] = result->m_tsf5ts14_id;
+    tsfInfo[2][14][iClk][1] = result->m_tsf5ts14_rt;
+    tsfInfo[2][14][iClk][2] = result->m_tsf5ts14_lr;
+    tsfInfo[2][14][iClk][3] = result->m_tsf5ts14_pr;
+    tsfInfo[2][14][iClk][4] = result->m_tsf5_cc;
 
     tsfInfo[3][0][iClk][0] = result->m_tsf7ts0_id;
     tsfInfo[3][0][iClk][1] = result->m_tsf7ts0_rt;
@@ -665,6 +738,31 @@ void TRGCDCT3DConverterModule::storeTSFirmwareData(vector<vector<vector<vector<d
     tsfInfo[3][9][iClk][2] = result->m_tsf7ts9_lr;
     tsfInfo[3][9][iClk][3] = result->m_tsf7ts9_pr;
     tsfInfo[3][9][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][10][iClk][0] = result->m_tsf7ts10_id;
+    tsfInfo[3][10][iClk][1] = result->m_tsf7ts10_rt;
+    tsfInfo[3][10][iClk][2] = result->m_tsf7ts10_lr;
+    tsfInfo[3][10][iClk][3] = result->m_tsf7ts10_pr;
+    tsfInfo[3][10][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][11][iClk][0] = result->m_tsf7ts11_id;
+    tsfInfo[3][11][iClk][1] = result->m_tsf7ts11_rt;
+    tsfInfo[3][11][iClk][2] = result->m_tsf7ts11_lr;
+    tsfInfo[3][11][iClk][3] = result->m_tsf7ts11_pr;
+    tsfInfo[3][11][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][12][iClk][0] = result->m_tsf7ts12_id;
+    tsfInfo[3][12][iClk][1] = result->m_tsf7ts12_rt;
+    tsfInfo[3][12][iClk][2] = result->m_tsf7ts12_lr;
+    tsfInfo[3][12][iClk][3] = result->m_tsf7ts12_pr;
+    tsfInfo[3][12][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][13][iClk][0] = result->m_tsf7ts13_id;
+    tsfInfo[3][13][iClk][1] = result->m_tsf7ts13_rt;
+    tsfInfo[3][13][iClk][2] = result->m_tsf7ts13_lr;
+    tsfInfo[3][13][iClk][3] = result->m_tsf7ts13_pr;
+    tsfInfo[3][13][iClk][4] = result->m_tsf7_cc;
+    tsfInfo[3][14][iClk][0] = result->m_tsf7ts14_id;
+    tsfInfo[3][14][iClk][1] = result->m_tsf7ts14_rt;
+    tsfInfo[3][14][iClk][2] = result->m_tsf7ts14_lr;
+    tsfInfo[3][14][iClk][3] = result->m_tsf7ts14_pr;
+    tsfInfo[3][14][iClk][4] = result->m_tsf7_cc;
 
   }
 }

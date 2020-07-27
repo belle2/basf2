@@ -14,9 +14,6 @@
 
 /* Belle 2 headers. */
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/utilities/FileSystem.h>
 #include <generators/modules/evtgendecay/EvtGenDecayModule.h>
 
@@ -32,7 +29,7 @@ EvtGenDecayModule::EvtGenDecayModule() : Module()
                  "the module 'EvtGenInput'.");
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)",
            FileSystem::findFile(
-             "generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true));
+             "decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file",
            std::string(""));
   addParam("MCParticleColName", m_MCParticleColName,
@@ -49,7 +46,7 @@ void EvtGenDecayModule::initialize()
   StoreArray<MCParticle> mcParticles(m_MCParticleColName);
   mcParticles.isRequired();
   const std::string defaultDecFile =
-    FileSystem::findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC", true);
+    FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
   if (m_DecFile.empty()) {
     B2ERROR("No global decay file defined, please make sure "
             "the parameter 'DecFile' is set correctly.");

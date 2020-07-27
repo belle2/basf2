@@ -10,7 +10,6 @@
 #include <framework/pcore/EvtMessage.h>
 
 #include <new>
-#include <cstdlib>
 #include <cstring>
 
 #include <sys/time.h>
@@ -183,7 +182,7 @@ void EvtMessage::setMsg(char const* msgin, int size, ERecordType type)
   //initialize message header properly
   new(m_data) EvtHeader(size + sizeof(EvtHeader), type);
   struct timeval tv;
-  gettimeofday(&tv, NULL);
+  gettimeofday(&tv, nullptr);
   this->setTime(tv);
   if (size > 0)
     memcpy(m_data + sizeof(EvtHeader), msgin, size);

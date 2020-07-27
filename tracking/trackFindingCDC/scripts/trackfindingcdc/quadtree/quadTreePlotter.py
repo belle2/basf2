@@ -19,21 +19,31 @@ from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 
 
 class QuadTreePlotter(basf2.Module):
-    #: This Module is able to draw the content coming from a QuadTreeImplementation with debugOutput = True.
+    """
+    This Module is able to draw the content coming from a QuadTreeImplementation with debugOutput = True.
+    """
 
     def __init__(self, queue):
         """
         Do not forget to set the ranges! Otherwise you will end up with an empty plot..
         """
         basf2.Module.__init__(self)
+        #: cached output filename
         self.file_name_of_quad_tree_content = "output.root"
+        #: cached flag to draw QuadTree
         self.draw_quad_tree_content = True
+        #: cached minimum x value
         self.range_x_min = 0
+        #: cached maximum x value
         self.range_x_max = 0
+        #: cached minimum y value
         self.range_y_min = 0
+        #: cached maximum y value
         self.range_y_max = 0
 
+        #: cached value of the queue input parameter
         self.queue = queue
+        #: cached array of output filenames (one file per image)
         self.file_names = []
 
     def plot_quad_tree_content(self):
@@ -105,6 +115,7 @@ class QuadTreePlotter(basf2.Module):
         self.save_and_show_file()
 
     def terminate(self):
+        """Termination signal at the end of the event processing"""
         self.queue.put("quadTree", self.file_names)
 
 
@@ -114,14 +125,22 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
     Implementation of a quad tree plotter for SegmentQuadTrees
     """
 
+    #: by default, do not draw a segment intersection
     draw_segment_intersection = True and False
+    #: by default, do not draw a segment
     draw_segment = True and False
+    #: by default, do not draw an averaged segment
     draw_segment_averaged = True and False
+    #: by default, do not draw a fitted segment
     draw_segment_fitted = True and False
+    #: by default, do not draw the MC information
     draw_mc_information = True and False
+    #: by default, do not draw the MC hits
     draw_mc_hits = True and False
 
+    #: by default, polar angles and cuts are in the range (0,pi) rather than (-pi/2,+pi/2)
     theta_shifted = False
+    #: an alias for the maximum value of the polar angle
     maximum_theta = np.pi
 
     def calculateIntersectionInQuadTreePicture(self, first, second):
@@ -218,13 +237,17 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
         draw_mc_hits
         """
         if self.theta_shifted:
+            #: lower x bound for polar angle
             self.range_x_min = -self.maximum_theta / 2
+            #: upper x bound for polar angle
             self.range_x_max = self.maximum_theta / 2
         else:
             self.range_x_min = 0
             self.range_x_max = self.maximum_theta
 
+        #: lower y bound
         self.range_y_min = -0.08
+        #: upper y bound
         self.range_y_max = 0.08
 
         self.init_plotting()
@@ -331,10 +354,15 @@ class StereoQuadTreePlotter(QuadTreePlotter):
     Implementation of a quad tree plotter for StereoHitAssignment
     """
 
+    #: by default, do not draw the MC hits
     draw_mc_hits = False
+    #: by default, do not draw the MC tracks
     draw_mc_tracks = False
+    #: by default, do not draw the track hits
     draw_track_hits = False
+    #: by default, draw the last track
     draw_last_track = True
+    #: by default, do not delete the bad track hits
     delete_bad_hits = False
 
     def create_trajectory_from_track(self, track):
@@ -386,6 +414,9 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         return l, z0
 
     def plot_hit_line(self, recoHit3D, color):
+        """
+        Draw one recoHit3D
+        """
         if recoHit3D:
             if recoHit3D.getStereoType() == 0:
                 return
@@ -405,12 +436,17 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         draw_last_track
         delete_bad_hits
         """
+        #: by default, draw the QuadTree
         self.draw_quad_tree_content = True
 
+        #: default lower x bound
         self.range_x_min = -2 - np.sqrt(3)
+        #: default upper x bound
         self.range_x_max = 2 + np.sqrt(3)
 
+        #: default lower y bound
         self.range_y_min = -100
+        #: default upper y bound
         self.range_y_max = -self.range_y_min
 
         self.init_plotting()

@@ -1,13 +1,10 @@
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 
 #include <TMatrixD.h>
 #include <TMatrixDSym.h>
 #include <TVector3.h>
 #include <TRandom3.h>
-#include <TMath.h>
 
 #include <vector>
 

@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <analysis/VariableManager/Manager.h>
@@ -32,15 +31,11 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /** constructor */
     SignalSideVariablesToExtraInfoModule();
-
     /** Register input and output data */
     virtual void initialize() override;
-
-    /**  */
+    /** process event */
     virtual void event() override;
 
 

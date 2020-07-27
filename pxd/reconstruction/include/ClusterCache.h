@@ -8,12 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_CLUSTERCACHE_H
-#define PXD_CLUSTERCACHE_H
+#pragma once
 
-#include <cstring>
 #include <deque>
-#include <pxd/reconstruction/Pixel.h>
 #include <pxd/reconstruction/ClusterCandidate.h>
 
 namespace Belle2 {
@@ -92,6 +89,9 @@ namespace Belle2 {
       /** No copy construction. */
       ClusterCache(const ClusterCache&) = delete;
 
+      /** No operator= **/
+      ClusterCache& operator=(const ClusterCache&) = delete;
+
       /** Delete the cache and free the memory */
       ~ClusterCache();
       /** Clear the cache structure */
@@ -158,5 +158,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif //PXD_CLUSTERCACHE_H

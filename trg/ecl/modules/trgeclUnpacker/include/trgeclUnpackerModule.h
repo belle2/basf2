@@ -17,20 +17,16 @@
 #ifndef TRGECLUNPACKER_H
 #define TRGECLUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
-#include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -69,27 +65,32 @@ namespace Belle2 {
     /** Unpacker main function.*/
     virtual void checkBuffer(int*, int);
 
-    /** Unpacker main function. ETM verion 114 */
-    virtual void checkBuffer_114(int*, int);
-
-    /** Unpacker main function. ETM verion 115 */
-    virtual void checkBuffer_115(int*, int);
+    /** Unpacker main function for upto version 136.*/
+    virtual void checkBuffer_v136(int*, int);
 
   protected :
     /** Event number */
     int n_basf2evt;
-    int etm_version;
-
-    unsigned int nodeid;
-    int nwords;
-    int iFiness;
+    //! ETM Version
+    int etm_version = 0;
+    //! Node Id
+    unsigned int nodeid = 0;
+    //! N Word
+    int nwords = 0;
+    //! Finess
+    int iFiness = 0;
+    //! Trigger Type
+    int trgtype = 0;
 
   private :
-
+    //! ECL Trigger Unpacker TC output
     StoreArray<TRGECLUnpackerStore>     m_TRGECLTCArray;
+    //! ECL Trigger Unpacker Summary output
     StoreArray<TRGECLUnpackerSumStore>  m_TRGECLSumArray;
+    //! ECL Trigger Unpacker Event output
     StoreArray<TRGECLUnpackerEvtStore>  m_TRGECLEvtArray;
-
+    //! ECL Trigger Cluster output
+    StoreArray<TRGECLCluster>  m_TRGECLClusterArray;
   };
 
 } // end namespace Belle2

@@ -27,7 +27,7 @@
       <sec name="L13" unit="cm">0.65</sec>
       <sec name="L14" unit="cm">0.25</sec>
       <sec name="L15" unit="cm">0.9</sec>
-      <sec name="L16" unit="cm">0.9</sec>
+      <sec name="L16" unit="cm">1.0</sec>
       <sec name="R1" unit="cm">1.16</sec>
       <sec name="R2" unit="cm">2.5</sec>
       <sec name="R3" unit="cm">2.25</sec>

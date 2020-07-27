@@ -1,44 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import variables.utils as ut
-
-#: Placehoder for FT variables collection
-#: BII-3853
-flavor_tagging = [
-    "qrOutput(FBDT)"]
-
+from variables import utils
 
 #: Replacement for DeltaEMbc
-deltae_mbc = [
-    "Mbc",
-    "deltaE"]
+deltae_mbc = ["Mbc", "deltaE"]
 
 #: Replacement to Kinematics tool
-kinematics = ['px',
-              'py',
-              'pz',
-              'pt',
-              'p',
-              'E']
-
+kinematics = ['px', 'py', 'pz', 'pt', 'p', 'E']
 
 #: Cluster-related variables
 cluster = [
-    'PulseShapeDiscriminationMVA',
-    'ClusterHasPulseShapeDiscrimination',
-    'ClusterNumberOfHadronDigits',
+    'clusterPulseShapeDiscriminationMVA',
+    'clusterHasPulseShapeDiscrimination',
+    'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
-    'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
     'nECLClusterTrackMatches',
     'clusterZernikeMVA',
     'clusterReg',
-    'clusterTrigger',
-    'weightedAverageECLTime',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
-    'clusterCRID',
     'clusterClusterID',
     'clusterConnectedRegionID',
     'clusterE1E9',
@@ -50,7 +32,10 @@ cluster = [
     'clusterErrorTheta',
     'clusterErrorTiming',
     'clusterHighestE',
-    'clusterHypothesis',
+    'clusterHasFailedErrorTiming',
+    'clusterHasFailedTiming',
+    'clusterHasNPhotons',
+    'clusterHasNeutralHadron',
     'clusterLAT',
     'clusterNHits',
     'clusterPhi',
@@ -59,11 +44,11 @@ cluster = [
     'clusterTheta',
     'clusterTiming',
     'clusterTrackMatch',
-    'clusterUniqueID',
-    'eclExtPhi',
-    'eclExtPhiId',
-    'eclExtTheta',
     'goodBelleGamma',
+]
+
+#: Cluster-related event variables
+event_level_cluster = [
     'nECLOutOfTimeCrystals',
     'nECLOutOfTimeCrystalsBWDEndcap',
     'nECLOutOfTimeCrystalsBarrel',
@@ -71,53 +56,55 @@ cluster = [
     'nRejectedECLShowers',
     'nRejectedECLShowersBWDEndcap',
     'nRejectedECLShowersBarrel',
-    'nRejectedECLShowersFWDEndcap']
+    'nRejectedECLShowersFWDEndcap',
+]
+
+#: Cluster averages
+cluster_average = [
+    'maxWeightedDistanceFromAverageECLTime',
+    'weightedAverageECLTime'
+]
+
+#: KLM cluster information
+klm_cluster = [
+    'klmClusterKlId',
+    'klmClusterTiming',
+    'klmClusterPositionX',
+    'klmClusterPositionY',
+    'klmClusterPositionZ',
+    'klmClusterInnermostLayer',
+    'klmClusterLayers',
+    'klmClusterEnergy',
+    'klmClusterMomentum',
+    'klmClusterIsBKLM',
+    'klmClusterIsEKLM',
+    'klmClusterIsForwardEKLM',
+    'klmClusterIsBackwardEKLM',
+    'klmClusterTheta',
+    'klmClusterPhi',
+    'nKLMClusterTrackMatches',
+    'nMatchedKLMClusters',
+]
 
 #: Dalitz masses for three body decays
 dalitz_3body = [
     'daughterInvM(0, 1)',  # invariant mass of daughters 1 and 2
     'daughterInvM(0, 2)',  # invariant mass of daughters 1 and 3
-    'daughterInvM(1, 2)'  # invariant mass of daughters 2 and 3
+    'daughterInvM(1, 2)',  # invariant mass of daughters 2 and 3
 ]
-# Hint: you can set aliases for convenient names as follows:
-# from variables import variables as vm
-# vm.addAlias("msq12", "formula(daughterInvM(0, 1) **2))
 
-#: Tracking variables
-#: Replacement for Track tool
-track = [
-    'dr',
-    'dx',
-    'dy',
-    'dz',
-    'd0',
-    'z0',
-    'pValue']
+#: Tracking variables, replacement for Track tool
+track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue']
 
 #: Replacement for TrackHits tool
-track_hits = [
-    'nCDCHits',
-    'nPXDHits',
-    'nSVDHits',
-    'nVXDHits']
+track_hits = ['nCDCHits', 'nPXDHits', 'nSVDHits', 'nVXDHits']
 
 #: Replacement for MCTruth tool
-mc_truth = [
-    'isSignal',
-    'mcErrors',
-    'mcPDG']
+mc_truth = ['isSignal', 'mcErrors', 'mcPDG']
 
 
 #: Replacement for MCKinematics tool
-mc_kinematics = [
-    'mcE',
-    'mcP',
-    'mcPT',
-    'mcPX',
-    'mcPY',
-    'mcPZ',
-    'mcPhi'
-]
+mc_kinematics = ['mcE', 'mcP', 'mcPT', 'mcPX', 'mcPY', 'mcPZ', 'mcPhi']
 
 #: Truth-matching related variables
 mc_variables = [
@@ -126,9 +113,9 @@ mc_variables = [
     'genMotherPDG',
     'genParticleID',
     'isCloneTrack',
-    'mcDX',
-    'mcDY',
-    'mcDZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
     'mcDecayTime',
     'mcE',
     'mcErrors',
@@ -141,41 +128,50 @@ mc_variables = [
     'mcPZ',
     'mcPhi',
     'mcVirtual',
-    'nMCMatches'
+    'nMCMatches',
 ]
 
 #: PID variables
-pid = [
-    'kaonID',
-    'pionID',
-    'protonID',
-    'muonID',
-    'electronID',
-    'deuteronID']
+pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'deuteronID']
 
 #: Replacement for ROEMultiplicities tool
 roe_multiplicities = [
-    'nROE_KLMClusters',
+    'nROE_Charged()',
+    'nROE_Photons()',
+    'nROE_NeutralHadrons()'
 ]
 
-#: Recoil kinematics relaed variables
+#: Rest-Of-Event kinematics
+roe_kinematics = [
+    'roeE()',
+    'roeM()',
+    'roeP()',
+    'roeMbc()',
+    'roeDeltae()'
+]
+
+#: Recoil kinematics related variables
 recoil_kinematics = [
     'pRecoil',
+    'eRecoil',
+    'mRecoil',
     'pRecoilPhi',
     'pRecoilTheta',
     'pxRecoil',
     'pyRecoil',
-    'pzRecoil'
+    'pzRecoil',
 ]
 
 #: Flight info variables
-flight_info = ['flightTime',
-               'flightDistance',
-               'flightTimeErr',
-               'flightDistanceErr']
+flight_info = [
+    'flightTime',
+    'flightDistance',
+    'flightTimeErr',
+    'flightDistanceErr',
+]
 
 #: MC true flight info variables
-mc_flight_info = ut.make_mc(flight_info)
+mc_flight_info = ['mcFlightTime', 'mcFlightDistance']
 
 #: Replacement for Vertex tuple tool
 vertex = [
@@ -199,26 +195,37 @@ vertex = [
     'prodVertexXErr',
     'prodVertexYErr',
     'prodVertexZErr',
-    'pValue']
+    'chiProb',
+]
 
 #: Replacement for MCVertex tuple tool
 mc_vertex = [
-    'mcX',
-    'mcY',
-    'mcZ',
-    'mcDistance',
-    'mcRho',
-    'mcProdVertexX',
-    'mcProdVertexY',
-    'mcProdVertexZ']
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
+    'mcDecayVertexFromIPDistance',
+    'mcDecayVertexRho',
+    'mcProductionVertexX',
+    'mcProductionVertexY',
+    'mcProductionVertexZ'
+]
 
-#: Tag-side related variables
+#: CPV and Tag-side related variables
 tag_vertex = [
+    'DeltaT',
+    'DeltaTErr',
+    'DeltaZ',
+    'DeltaZErr',
+    'DeltaBoost',
+    'DeltaBoostErr',
     'TagVLBoost',
     'TagVLBoostErr',
     'TagVOBoost',
     'TagVOBoostErr',
     'TagVpVal',
+    'TagVNDF',
+    'TagVChi2',
+    'TagVChi2IP',
     'TagVx',
     'TagVxErr',
     'TagVy',
@@ -229,10 +236,11 @@ tag_vertex = [
 
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
-    'MCDeltaT',
-    'MCTagBFlavor',
-    'TagVmcLBoost',
-    'TagVmcOBoost',
+    'mcDeltaTau',
+    'mcDeltaT',
+    'mcDeltaBoost',
+    'mcTagVLBoost',
+    'mcTagVOBoost',
     'mcLBoost',
     'mcOBoost',
     'mcTagVx',
@@ -245,73 +253,83 @@ momentum_uncertainty = [
     'E_uncertainty',
     'pxErr',
     'pyErr',
-    'pzErr'
+    'pzErr',
 ]
 
 #: Replacement for RecoStats tool
 reco_stats = [
-    'nECLClusters',
     'nTracks',
 ]
 
 #: Replacement for InvMass tool
-inv_mass = [
-    'M',
-    'ErrM',
-    'SigM',
-    'InvM'
-]
-
-#: Replacement for MassBeforeFit tool
-mass_before_fit = [
-    'ErrM',
-    'InvM'
-]
+inv_mass = ['M', 'ErrM', 'SigM', 'InvM']
 
 #: Extra energy variables
-extra_energy = ["ROE_eextra()"]
+extra_energy = ["roeEextra()"]
 
 #: Event level tracking variables
-event_level_tracking = ["nExtraCDCHits",
-                        "nExtraCDCHitsPostCleaning",
-                        "hasExtraCDCHitsInLayer(0)",
-                        "hasExtraCDCHitsInLayer(1)",
-                        "hasExtraCDCHitsInLayer(2)",
-                        "hasExtraCDCHitsInLayer(3)",
-                        "hasExtraCDCHitsInLayer(4)",
-                        "hasExtraCDCHitsInLayer(5)",
-                        "hasExtraCDCHitsInLayer(6)",
-                        "hasExtraCDCHitsInLayer(7)",
-                        "nExtraCDCSegments",
-                        "trackFindingFailureFlag"]
+event_level_tracking = [
+    "nExtraCDCHits",
+    "nExtraCDCHitsPostCleaning",
+    "hasExtraCDCHitsInLayer(0)",
+    "hasExtraCDCHitsInLayer(1)",
+    "hasExtraCDCHitsInLayer(2)",
+    "hasExtraCDCHitsInLayer(3)",
+    "hasExtraCDCHitsInLayer(4)",
+    "hasExtraCDCHitsInLayer(5)",
+    "hasExtraCDCHitsInLayer(6)",
+    "hasExtraCDCHitsInLayer(7)",
+    "nExtraCDCSegments",
+    "trackFindingFailureFlag",
+]
 
+#: Event shape variables
+event_shape = [
+    "foxWolframR1",
+    "foxWolframR2",
+    "foxWolframR3",
+    "foxWolframR4",
+    "harmonicMomentThrust0",
+    "harmonicMomentThrust1",
+    "harmonicMomentThrust2",
+    "harmonicMomentThrust3",
+    "harmonicMomentThrust4",
+    "cleoConeThrust0",
+    "cleoConeThrust1",
+    "cleoConeThrust2",
+    "cleoConeThrust3",
+    "cleoConeThrust4",
+    "cleoConeThrust5",
+    "cleoConeThrust6",
+    "cleoConeThrust7",
+    "cleoConeThrust8",
+    "sphericity",
+    "aplanarity",
+    "thrust",
+    "thrustAxisCosTheta",
+]
 
-# Event shape variables
-event_shape = ["foxWolframR1",
-               "foxWolframR2",
-               "foxWolframR3",
-               "foxWolframR4",
-               "harmonicMomentThrust0",
-               "harmonicMomentThrust1",
-               "harmonicMomentThrust2",
-               "harmonicMomentThrust3",
-               "harmonicMomentThrust4",
-               "cleoConeThrust0",
-               "cleoConeThrust1",
-               "cleoConeThrust2",
-               "cleoConeThrust3",
-               "cleoConeThrust4",
-               "cleoConeThrust5",
-               "cleoConeThrust6",
-               "cleoConeThrust7",
-               "cleoConeThrust8",
-               "sphericity",
-               "aplanarity",
-               "thrust",
-               "thrustAxisCosTheta"]
+#: Variables created by event kinematics module
+event_kinematics = [
+    "missingMomentumOfEvent",
+    "missingMomentumOfEvent_Px",
+    "missingMomentumOfEvent_Py",
+    "missingMomentumOfEvent_Pz",
+    "missingMomentumOfEvent_theta",
+    "missingMomentumOfEventCMS",
+    "missingMomentumOfEventCMS_Px",
+    "missingMomentumOfEventCMS_Py",
+    "missingMomentumOfEventCMS_Pz",
+    "missingMomentumOfEventCMS_theta",
+    "missingEnergyOfEventCMS",
+    "missingMass2OfEvent",
+    "visibleEnergyOfEventCMS",
+    "totalPhotonsEnergyOfEvent"
+]
 
-# List of the variable lists declared in this file.
-# 'A bit' ugly but works.
-list_of_the_lists = list(set(dir()) - set(dir(ut) + ['ut']))
-for l in list_of_the_lists:
-    exec("ut.add_collection(" + l + ",\"" + l + "\")")
+# now register all the variables declared in this file as collections
+# TODO: this is still not optimal but better than before. Should we not just
+# get rid of the collections in the manager?
+for name, value in list(globals().items()):
+    if isinstance(value, list):
+        utils.add_collection(value, name)

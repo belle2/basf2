@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <cassert>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

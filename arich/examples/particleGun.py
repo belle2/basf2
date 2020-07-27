@@ -9,7 +9,7 @@ from svd import add_svd_reconstruction
 from svd import add_svd_reconstruction_CoG
 from pxd import add_pxd_reconstruction
 from simulation import add_simulation
-
+import os
 # --------------------------------------------------------------------
 # Example of using ARICH reconstruction
 # needs reconstructed tracks (Tracks), extrapolated to ARICH (ExtHits)
@@ -65,7 +65,7 @@ particlegun.param('independentVertices', False)
 main.add_module(particlegun)
 
 # Simulation & Digitizer of inner detectors
-add_simulation(main, components=['MagneticField', 'PXD', 'SVD', 'CDC', 'ARICH'], usePXDDataReduction=False)
+add_simulation(main, usePXDDataReduction=False)
 # tracking
 add_tracking_reconstruction(main)
 

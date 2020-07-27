@@ -17,7 +17,6 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
@@ -46,10 +45,19 @@ namespace Belle2 {
      */
     void initialize() override;
 
+    /**
+     *Initializations at the begin of the run.
+     */
     void beginRun() override;
 
+    /**
+     *Event loop.
+     */
     void event() override;
 
+    /**
+     *Executed at the end of the run.
+     */
     void endRun() override;
 
     /**

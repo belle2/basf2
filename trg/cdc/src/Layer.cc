@@ -15,7 +15,6 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <iostream>
-#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Cell.h"
 #include "trg/cdc/Layer.h"
 
@@ -23,6 +22,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /// TRGCDCUndefinedLayer declaration
   const TRGCDCLayer* TRGCDCUndefinedLayer = new TRGCDCLayer(9999,
                                                             9999,
                                                             9999,
@@ -71,7 +71,9 @@ namespace Belle2 {
        _offset(w.layer().offset()),
        _nShifts(w.layer().nShifts()),
        _cellSize(w.cellSize()),
-       _nCells(w.layer().nCells())
+       _nCells(w.layer().nCells()),
+       _innerRadius(), // 2019/07/31 by ytlai
+       _outerRadius()
   {
   }
 

@@ -5,7 +5,6 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Luka Santelj                                             *
  *                                                                        *
- *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -19,15 +18,9 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <ir/dbobjects/FarBeamLineGeo.h>
 #include <string>
-#include <vector>
-#include <map>
-#include <sstream>
 
 #include <G4Transform3D.hh>
 #include <G4VSolid.hh>
-//class G4LogicalVolume;
-//class G4AssemblyVolume;
-//class G4Polycone;
 
 namespace Belle2 {
   namespace ir {
@@ -65,6 +58,12 @@ namespace Belle2 {
 
       /** The destructor of the GeoFarBeamLineCreator class. */
       virtual ~GeoFarBeamLineCreator();
+
+      /** Do not want a copy constructor */
+      GeoFarBeamLineCreator(const GeoFarBeamLineCreator&) = delete;
+
+      /** Do not want an assignment operator */
+      GeoFarBeamLineCreator& operator =(const GeoFarBeamLineCreator&) = delete;
 
       /**
       * Creates the ROOT Objects for the FarBeamLine geometry.

@@ -2,217 +2,351 @@
 # -*- coding: utf-8 -*-
 
 """
-Skim list building functions for radiative and electroweak
-:math:`b\\to (s,\\,d)\\gamma`, and :math:`b\\to (s,\\,d)\\ell\\ell` analyses
+
+Skim list building functions for EWP inclusive skims:
+B->Xgamma, B->Xll, B->Xll (LFV modes)
+
 """
 
 __authors__ = [
-    ""
+    "Trevor Shillington"
 ]
 
-from basf2 import *
-from modularAnalysis import *
-
-# take the loose stdPhotons SPL and require a bit of energy for eta candidates
-
-
-def Xs0Modes():
-    list = [
-        # ordered as in BN1480
-        'K+:ewp pi-:ewp',  # 1
-        'K_S0:ewp pi0:ewpHigh',  # 4
-        'K_S0:ewp pi+:ewpHigh pi-:ewp2High',  # 6
-        'K+:ewp pi-:ewp pi0:ewpHigh',  # 7
-        'K+:ewp pi-:ewpHigh pi+:ewp2High pi-:ewp',  # 9
-        'K_S0:ewp pi+:ewpHigh pi-:ewp2High pi0:ewpHigh',  # 12
-        'K_S0:ewp pi+:ewpHigh pi-:ewp2High pi+:ewp pi-:ewp',  # 14
-        'K+:ewp pi+:ewpHigh pi-:ewp2High pi+:ewp pi0:ewpHigh',  # 15
-        'K_S0:ewp pi0:ewpHigh pi0:ewpHigh',  # 18
-        'K+:ewp pi-:ewp pi0:ewpHigh pi0:ewpHigh',  # 19
-        'K_S0:ewp pi+:ewpHigh pi-:ewp2High pi0:ewpHigh pi0:ewpHigh',  # 22
-        # 'K_S0:ewp eta:ewp',  # 24
-        # 'K+:ewp eta:ewp pi-:ewp',  # 25
-        # 'K_S0:ewp eta:ewp pi0:ewpHigh',  # 28
-        # 'K_S0:ewp eta:ewp pi+:ewp pi-:ewp',  # 30
-        # 'K+:ewp eta:ewp pi-:ewp pi0:ewpHigh',  # 31
-        'K+:ewp K-:ewp K_S0:ewp',  # 34
-        'K+:ewp K+:ewp K-:ewp pi-:ewp',  # 35
-        'K+:ewp K-:ewp K_S0:ewp pi0:ewpHigh',  # 38
-    ]
-    return list
+import basf2 as b2
+import modularAnalysis as ma
+from skimExpertFunctions import BaseSkim, fancy_skim_header
+from variables import variables
 
 
-def XsplusModes():
-    list = [
-        'K_S0:ewp pi+:ewp',  # 2
-        'K+:ewp pi0:ewpHigh',  # 3
-        'K+:ewp pi+:ewpHigh pi-:ewp2High',  # 5
-        'K_S0:ewp pi+:ewp pi0:ewpHigh',  # 8
-        'K_S0:ewp pi+:ewpHigh pi+:ewp2High pi-:ewp',  # 10
-        'K+:ewp pi+:ewpHigh pi-:ewp2High pi0:ewpHigh',  # 11
-        'K+:ewp pi+:ewpHigh pi-:ewp2High pi+:ewp pi-:ewp',  # 13
-        'K_S0:ewp pi+:ewpHigh pi+:ewp2High pi-:ewp pi0:ewpHigh',  # 16
-        'K+:ewp pi0:ewpHigh pi0:ewpHigh',  # 17
-        'K_S0:ewp pi+:ewp pi0:ewpHigh pi0:ewpHigh',  # 20
-        'K+:ewp pi+:ewpHigh pi-:ewp2High pi0:ewpHigh pi0:ewpHigh',  # 21
-        # 'K+:ewp eta:ewp',  # 23
-        # 'K_S0:ewp eta:ewp pi+:ewp',  # 26
-        # 'K+:ewp eta:ewp pi0:ewpHigh',  # 27
-        # 'K+:ewp eta:ewp pi+:ewp pi-:ewp',  # 29
-        # 'K_S0:ewp eta:ewp pi+:ewp pi0:ewp ',  # 32
-        'K+:ewp K+:ewp K-:ewp',  # 33
-        'K+:ewp K-:ewp K_S0:ewp pi+:ewp',  # 36
-        'K+:ewp K+:ewp K-:ewp pi0:ewpHigh',  # 37
-    ]
-    return list
+__liaison__ = "Trevor Shillington <trshillington@hep.physics.mcgill.ca>"
 
 
-def Xd0Modes():
-    list = [
-        'pi+:ewpHigh pi-:ewp2High',
-        'pi+:ewpHigh pi-:ewp2High pi0:ewpHigh',
-        'pi+:ewpHigh pi-:ewp2High pi0:ewpHigh pi0:ewpHigh',
-    ]
-    return list
+@fancy_skim_header
+class BtoXgamma(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^+ \\to X\\gamma` inclusive
+
+    Event-level cuts:
+
+    * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} >= 3`
+
+    Cuts on photons:
+
+    * :math:`\\text{clusterE9E21}>0.9`
+    * :math:`1.4\\,\\text{GeV}<\\text{E_{\\gamma}}<3.4\\,\\text{GeV}` in CMS frame
+    """
+
+    __authors__ = ["Trevor Shillington"]
+    __description__ = ":math:`B\\to X\\gamma` inclusive skim."
+    __contact__ = __liaison__
+    __category__ = "physics, electroweak penguins, radiative decays"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["all", "loose"],
+        },
+    }
+
+    def build_lists(self, path):
+        """Build the skim list for :math:`B \\to X_{(s,d)}\\gamma` decays."""
+        # event level cuts: R2 and require a minimum number of tracks + decent photons
+        ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
+        ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
+
+        ma.buildEventShape(inputListNames=['pi+:BtoXgamma_eventshape', 'gamma:BtoXgamma_eventshape'],
+                           allMoments=False,
+                           foxWolfram=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
+                           checkForDuplicates=False,
+                           path=path)
+
+        # Apply event cuts R2 < 0.5 and nTracks >= 3
+        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+
+        # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
+        ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
+
+        ma.reconstructDecay('B+:gamma -> gamma:ewp', '', path=path, allowChargeViolation=True)
+
+        self.SkimLists = ['B+:gamma']
 
 
-def XdplusModes():
-    list = [
-        'pi+:ewp pi0:ewpHigh',
-        'pi+:ewpHigh pi+:ewp2High pi-:ewp pi0:ewpHigh',
-        # 'pi+:ewp eta:ewp',
-        'pi+:ewpHigh pi+:ewp2High pi-:ewp',
-    ]
-    return list
+@fancy_skim_header
+class BtoXll(BaseSkim):
+    """
+        Reconstructed decay modes:
+
+      * :math:`B^+ \\to X e^+ e^-`
+      * :math:`B^+ \\to X e^+ e^+`
+      * :math:`B^+ \\to X \\mu^+ \\mu^-`
+      * :math:`B^+ \\to X \\mu^+ \\mu^+`
 
 
-def B2XgammaList(path):
-    """Build the skim list for B --> X(s,d) gamma decays"""
+      Event-level cuts:
 
-    # event level cuts: R2 and require a minimum number of tracks + decent photons
-    applyEventCuts(
-        'R2EventLevel < 0.7 and ' +
-        'formula(nTracks + nParticlesInList(gamma:loose) / 2) > 4', path=path)
-    #
-    # cuts in addition to the standard particle lists
-    # should be revised for each new SPL release
-    cutAndCopyList('K+:ewp', 'K+:95eff', 'abs(d0) < 1.0 and abs(z0) < 4.0', path=path)
-    cutAndCopyList('pi+:ewp', 'pi+:95eff', 'abs(d0) < 1.0 and abs(z0) < 4.0', path=path)
-    cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.25 and abs(d0) < 1.0 and abs(z0) < 4.0', path=path)
-    cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.10 and abs(d0) < 1.0 and abs(z0) < 4.0', path=path)
-    #
-    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.25 and 0.120 < M < 0.145', path=path)
-    cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.50 and 0.120 < M < 0.145', path=path)
-    cutAndCopyList('K_S0:ewp', 'K_S0:all', 'p > 0.50 and 0.4776 < M < 0.5176', path=path)  # 20 MeV width
-    #
-    #
-    # take the tight stdPhotons SPL (timing cuts dependent on regions) and add
-    # a minimum lab-frame energy requirement (1.5 GeV) and cluster shape e9oe21
-    cutAndCopyList('gamma:ewpE15', 'gamma:tight', 'clusterE9E21 > 0.9 and 1.5 < E < 100', path=path)
-    #
-    # invariant mass and dE windows for all modes
-    btoxgammacuts = '5.2 < Mbc < 5.29 and -0.5 < deltaE < 0.3'
+      * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+        :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+      * :math:`n_{\\text{tracks}} >= 3`
 
-    # B0 --> Xd0 gamma
-    B02dgammaList = []
-    for chID, channel in enumerate(Xd0Modes()):
-        reconstructDecay('B0:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True, path=path)
-        rankByLowest('B0:EWP_b2dgamma' + str(chID), 'abs(dM)', numBest=3, path=path)
-        B02dgammaList.append('B0:EWP_b2dgamma' + str(chID))
+      Cuts on electrons:
 
-    # B0 --> Xs0 gamma
-    B02sgammaList = []
-    for chID, channel in enumerate(Xs0Modes()):
-        reconstructDecay('B0:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True, path=path)
-        rankByLowest('B0:EWP_b2sgamma' + str(chID), 'abs(dM)', numBest=3, path=path)
-        B02sgammaList.append('B0:EWP_b2sgamma' + str(chID))
+      * :math:`\\text{electronID} > 0.1`
+      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+      * :math:'dr<0.5 and abs(dz)<2'
 
-    # B+ --> Xd+ gamma
-    Bplus2dgammaList = []
-    for chID, channel in enumerate(XdplusModes()):
-        reconstructDecay('B+:EWP_b2dgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True, path=path)
-        rankByLowest('B+:EWP_b2dgamma' + str(chID), 'abs(dM)', numBest=3, path=path)
-        Bplus2dgammaList.append('B+:EWP_b2dgamma' + str(chID))
+      Cuts on muons:
 
-    # B+ --> Xs+ gamma
-    Bplus2sgammaList = []
-    for chID, channel in enumerate(XsplusModes()):
-        reconstructDecay('B+:EWP_b2sgamma' + str(chID) + ' -> ' + channel + ' gamma:ewpE15', btoxgammacuts, chID, True, path=path)
-        rankByLowest('B+:EWP_b2sgamma' + str(chID), 'abs(dM)', numBest=3, path=path)
-        Bplus2sgammaList.append('B+:EWP_b2sgamma' + str(chID))
-
-    return B02dgammaList + B02sgammaList + Bplus2dgammaList + Bplus2sgammaList
+      * :math:`\\text{muonID} > 0.5`
+      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+      * :math:'dr<0.5 and abs(dz)<2'
 
 
-def B2XllList(path):
-    """Build the skim list for B --> X(s,d) l+ l- decays"""
+      Cut on dilepton energy:
 
-    # event level cuts: R2 and require a minimum number of tracks
-    applyEventCuts('R2EventLevel < 0.7 and nTracks > 4', path=path)
+      * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
+      """
 
-    # cuts in addition to the standard particle lists
-    # should be revised for each new SPL release
-    cutAndCopyList('mu+:ewpHigh', 'mu+:95eff', 'p > 0.70', path=path)
-    cutAndCopyList('e+:ewpHigh', 'e+:95eff', 'p > 0.40', path=path)
-    #
-    cutAndCopyList('K+:ewp', 'K+:95eff', 'abs(d0) < 0.2 and abs(z0) < 0.2', path=path)
-    cutAndCopyList('pi+:ewp', 'pi+:95eff', 'abs(d0) < 0.2 and abs(z0) < 0.2', path=path)
-    cutAndCopyList('pi+:ewpHigh', 'pi+:95eff', 'p > 0.40', path=path)
-    cutAndCopyList('pi+:ewp2High', 'pi+:95eff', 'p > 0.25', path=path)
-    #
-    cutAndCopyList('pi0:ewp', 'pi0:skim', 'p > 0.20 and 0.115 < M < 0.145', path=path)
-    cutAndCopyList('pi0:ewpHigh', 'pi0:skim', 'p > 0.40 and 0.115 < M < 0.145', path=path)
-    cutAndCopyList('K_S0:ewp', 'K_S0:all', '0.4776 < M < 0.5176', path=path)  # 20 MeV width
+    __authors__ = ["Trevor Shillington"]
+    __description__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
+    __contact__ = __liaison__
+    __category__ = "physics, electroweak penguins, radiative decays"
 
-    # invariant mass and dE windows for all modes
-    btoxlldilepton = 'formula(daughter(0, E)+daughter(1, E)) > 1.5'  # dilepton energy sum in a dirty way
-    btoxllcuts = '5.2 < Mbc < 5.29 and -0.5 < deltaE < 0.3 and ' + btoxlldilepton
+    RequiredStandardLists = {
+            "stdCharged": {
+                "stdE": ["all"],
+                "stdMu": ["all"],
+                "stdPi": ["all"],
+            },
+            "stdPhotons": {
+                "stdPhotons": ["all"],
+            },
+        }
 
-    # B0 --> Xd0 l+ l-
-    B02dllList = []
-    for chID, channel in enumerate(Xd0Modes() + [' pi0:ewp ', ' eta:ewp ']):
-        reconstructDecay('B0:EWP_b2dee' + str(chID) + ' ->  e-:ewpHigh  e+:ewpHigh  ' + channel, btoxllcuts, chID, True, path=path)
-        reconstructDecay(
-            'B0:EWP_b2dmumu' +
-            str(chID) +
-            ' ->  mu+:ewpHigh mu-:ewpHigh ' +
-            channel,
-            btoxllcuts,
-            chID,
-            True,
-            path=path)
-        rankByLowest('B0:EWP_b2dee' + str(chID), 'abs(dM)', numBest=3, path=path)
-        rankByLowest('B0:EWP_b2dmumu' + str(chID), 'abs(dM)', numBest=3, path=path)
-        B02dllList.append('B0:EWP_b2dee' + str(chID))
-        B02dllList.append('B0:EWP_b2dmumu' + str(chID))
+    def build_lists(self, path):
+        """Build the skim list for :math:`B \\to X\\ell\\ell` non-LFV decays."""
 
-    # B0 --> Xs0 l+ l-
-    B02sllList = []
-    for chID, channel in enumerate(Xs0Modes() + [' K_S0:ewp ']):
-        reconstructDecay('B0:EWP_b2see' + str(chID) + ' -> e-:ewpHigh  e+:ewpHigh  ' + channel, btoxllcuts, chID, True, path=path)
-        reconstructDecay('B0:EWP_b2smumu' + str(chID) + ' -> mu+:ewpHigh mu-:ewpHigh ' + channel, btoxllcuts, chID, True, path=path)
-        rankByLowest('B0:EWP_b2see' + str(chID), 'abs(dM)', numBest=3, path=path)
-        rankByLowest('B0:EWP_b2smumu' + str(chID), 'abs(dM)', numBest=3, path=path)
-        B02sllList.append('B0:EWP_b2see' + str(chID))
-        B02sllList.append('B0:EWP_b2smumu' + str(chID))
-    # B+ --> Xd+ l+ l-
-    Bplus2dllList = []
-    for chID, channel in enumerate(XdplusModes() + ['pi+:95eff ']):
-        reconstructDecay('B-:EWP_b2dee' + str(chID) + ' -> e-:ewpHigh e+:ewpHigh   ' + channel, btoxllcuts, chID, True, path=path)
-        reconstructDecay('B-:EWP_b2dmumu' + str(chID) + ' -> mu+:ewpHigh mu-:ewpHigh ' + channel, btoxllcuts, chID, True, path=path)
-        rankByLowest('B-:EWP_b2dee' + str(chID), 'abs(dM)', numBest=3, path=path)
-        rankByLowest('B-:EWP_b2dmumu' + str(chID), 'abs(dM)', numBest=3, path=path)
-        Bplus2dllList.append('B-:EWP_b2dee' + str(chID))
-        Bplus2dllList.append('B-:EWP_b2dmumu' + str(chID))
+        # event level cuts: R2 and require a minimum number of tracks
+        ma.fillParticleList(decayString='pi+:BtoXll_eventshape', cut='pt > 0.1', path=path)
+        ma.fillParticleList(decayString='gamma:BtoXll_eventshape', cut='E > 0.1', path=path)
 
-    # B+ --> Xs+ l+ l-
-    Bplus2sllList = []
-    for chID, channel in enumerate(XsplusModes() + [' K+:95eff ']):
-        reconstructDecay('B-:EWP_b2see' + str(chID) + ' -> e-:ewpHigh  e+:ewpHigh  ' + channel, btoxllcuts, chID, True, path=path)
-        reconstructDecay('B-:EWP_b2smumu' + str(chID) + ' -> mu+:ewpHigh mu-:ewpHigh ' + channel, btoxllcuts, chID, True, path=path)
-        rankByLowest('B-:EWP_b2see' + str(chID), 'abs(dM)', numBest=3, path=path)
-        rankByLowest('B-:EWP_b2smumu' + str(chID), 'abs(dM)', numBest=3, path=path)
-        Bplus2sllList.append('B-:EWP_b2see' + str(chID))
-        Bplus2sllList.append('B-:EWP_b2smumu' + str(chID))
+        ma.buildEventShape(inputListNames=['pi+:BtoXll_eventshape', 'gamma:BtoXll_eventshape'],
+                           allMoments=False,
+                           foxWolfram=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
+                           checkForDuplicates=False,
+                           path=path)
 
-    return B02dllList + B02sllList + Bplus2dllList + Bplus2sllList
+        # Apply event cuts R2 < 0.5 and nTracks >= 3
+        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+
+        # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
+        # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
+        fairTrack = 'dr < 0.5 and abs(dz) < 2'
+
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
+
+        # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
+        E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
+
+        # B+ reconstruction:
+        # oppositely charged leptons
+        ma.reconstructDecay('B+:ch1 -> e+:ewp e-:ewp', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch2 -> mu+:ewp mu-:ewp', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
+        # same charge leptons
+        ma.reconstructDecay('B+:ch3 -> e+:ewp e+:ewp', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch4 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=4, path=path, allowChargeViolation=True)
+
+        ma.copyLists('B+:xll', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
+
+        self.SkimLists = ['B+:xll']
+
+
+@fancy_skim_header
+class BtoXll_LFV(BaseSkim):
+    """
+      Reconstructed decay modes:
+
+    * :math:`B^+ \\to X e^+ \\mu^-`
+    * :math:`B^+ \\to X \\mu^+ e^-`
+    * :math:`B^+ \\to X e^+ \\mu^+`
+
+
+    Event-level cuts:
+
+    * :math:`\\text{foxWolframR2} < 0.5` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} >= 3`
+
+    Cuts on electrons:
+
+    * :math:`\\text{electronID} > 0.1`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:'dr<0.5 and abs(dz)<2'
+
+    Cuts on muons:
+
+    * :math:`\\text{muonID} > 0.5`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:'dr<0.5 and abs(dz)<2'
+
+
+    Cut on dilepton energy:
+
+    * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
+    """
+
+    __authors__ = ["Trevor Shillington"]
+    __description__ = ":math:`B\\to X\\ell\\ell` (LFV modes only) inclusive skim."
+    __contact__ = __liaison__
+    __category__ = "physics, electroweak penguins, radiative decays"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdE": ["all"],
+            "stdMu": ["all"],
+            "stdPi": ["all"],
+        },
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+    }
+
+    def build_lists(self, path):
+        """Build the skim list for :math:`B \\to X\\ell\\ell` LFV decays."""
+        # Create lists for buildEventShape (basically all tracks and clusters)
+        ma.cutAndCopyList('pi+:BtoXllLFV_eventshape', 'pi+:all', 'pt> 0.1', path=path)
+        ma.cutAndCopyList('gamma:BtoXllLFV_eventshape', 'gamma:all', 'E > 0.1', path=path)
+
+        # buildEventShape to access R2
+        ma.buildEventShape(inputListNames=['pi+:BtoXllLFV_eventshape', 'gamma:BtoXllLFV_eventshape'],
+                           allMoments=False,
+                           foxWolfram=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
+                           checkForDuplicates=False,
+                           path=path)
+
+        # Apply event cuts R2 < 0.5 and nTracks >= 3
+        path = self.skim_event_cuts('foxWolframR2 < 0.5 and nTracks >= 3', path=path)
+
+        # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
+        # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
+        fairTrack = 'dr < 0.5 and abs(dz) < 2'
+
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
+
+        # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
+        E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
+
+        # B+ reconstruction:
+        # oppositely charged leptons
+        ma.reconstructDecay('B+:lfvch1 -> e+:ewp mu-:ewp', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:lfvch2 -> mu+:ewp e-:ewp', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
+        # same charge leptons
+        ma.reconstructDecay('B+:lfvch3 -> e+:ewp mu+:ewp', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
+
+        ma.copyLists('B+:lfv', ['B+:lfvch1', 'B+:lfvch2', 'B+:lfvch3'], path=path)
+
+        self.SkimLists = ['B+:lfv']
+
+
+class inclusiveBplusToKplusNuNu(BaseSkim):
+    """
+      Reconstructed decay modes:
+
+    * :math:`B^+ \\to K\\nu\\nu` inclusive
+
+    Track cleanup:
+    * :math:'p_t>0.1'
+    * :math:'thetaInCDCAcceptance'
+    * :math:'dr<0.5 and abs(dz)<3.0'
+
+    Event cleanup:
+    * :math:`3 < nCleanedTracks < 11`
+
+    Kaon cuts:
+    * :math:'track cleanup + event cleanup + nPXDHits>0'
+    * :math:'p_t rank=1'
+    * :math:'kaonID>0.01'
+
+    MVA info and cuts:
+    * mva_identifier: MVAFastBDT_InclusiveBplusToKplusNuNu_Skim
+    * Global Tag: mva_inclusiveBplusToKplusNuNu
+    * :math:'mva\\_identifier>0.5'
+    """
+
+    __authors__ = ["Cyrille Praz"]
+    __description__ = "Inclusive skim for :math:`B\\to K\\nu\\nu` analysis"
+    __contact__ = __liaison__
+    __category__ = "physics, electroweak penguins, radiative decays"
+
+    NoisyModules = ["ParticleCombiner"]
+
+    RequiredStandardLists = None
+
+    def build_lists(self, path):
+
+        # Default cleanup also used in and ma.buildEventShape
+        track_cleanup = 'pt > 0.1'
+        track_cleanup += ' and thetaInCDCAcceptance'
+        track_cleanup += ' and abs(dz) < 3.0'
+        track_cleanup += ' and dr < 0.5'
+
+        # Min 4 tracks and Max 10 tracks per event.
+        event_cleanup = 'nCleanedTracks({}) > 3'.format(track_cleanup)
+        event_cleanup += ' and nCleanedTracks({}) < 11'.format(track_cleanup)
+
+        # Define the signal
+        total_cleanup = track_cleanup + ' and ' + event_cleanup + ' and ' + 'nPXDHits>0'
+        ma.fillParticleList('K+:inclusiveBplusToKplusNuNu', cut=total_cleanup, path=path)
+        ma.rankByHighest('K+:inclusiveBplusToKplusNuNu', 'pt', path=path)
+        ma.applyCuts('K+:inclusiveBplusToKplusNuNu', 'extraInfo(pt_rank)==1', path=path)
+        ma.applyCuts('K+:inclusiveBplusToKplusNuNu', 'kaonID>1e-2', path=path)
+        ma.reconstructDecay(decayString='B+:inclusiveBplusToKplusNuNu -> K+:inclusiveBplusToKplusNuNu', cut='', path=path)
+
+        # Build the event-based variables that we need
+        ma.buildEventShape(inputListNames=[],
+                           default_cleanup=True,
+                           allMoments=False,
+                           cleoCones=True,
+                           collisionAxis=False,
+                           foxWolfram=True,
+                           harmonicMoments=True,
+                           jets=False,
+                           sphericity=True,
+                           thrust=True,
+                           checkForDuplicates=False,
+                           path=path)
+
+        # Apply a MVA by reading from the DB
+        mva_identifier = 'MVAFastBDT_InclusiveBplusToKplusNuNu_Skim'
+        b2.conditions.append_globaltag('mva_inclusiveBplusToKplusNuNu')
+        path.add_module('MVAExpert', listNames=['B+:inclusiveBplusToKplusNuNu'],
+                        extraInfoName=mva_identifier, identifier=mva_identifier)
+        variables.addAlias(mva_identifier, 'extraInfo({})'.format(mva_identifier))
+        ma.applyCuts('B+:inclusiveBplusToKplusNuNu', mva_identifier+'>0.5', path=path)
+
+        self.SkimLists = ['B+:inclusiveBplusToKplusNuNu']

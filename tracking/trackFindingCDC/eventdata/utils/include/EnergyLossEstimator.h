@@ -14,6 +14,9 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     *  Helper struct to provide consistent energy loss estimation throughout the CDC track finding.
+     */
     class EnergyLossEstimator {
 
     public:

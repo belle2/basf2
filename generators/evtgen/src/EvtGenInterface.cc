@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Susanne Koblitz, Martin Ritter                           *
+ * Contributors: Susanne Koblitz, Martin Ritter, Umberto Tamponi          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,17 +17,20 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/evtgen/EvtGenModelRegister.h>
 
+#include <memory>
 #include <string>
 #include <queue>
 
 #include <EvtGenExternal/EvtExternalGenList.hh>
 #include <EvtGenBase/EvtAbsRadCorr.hh>
+#include <EvtGenBase/EvtCPUtil.hh>
 #include <EvtGenBase/EvtDecayTable.hh>
 #include <EvtGenBase/EvtDecayBase.hh>
+#include <EvtGenBase/EvtParticleFactory.hh>
 #include <EvtGenBase/EvtPDL.hh>
+#include <EvtGenBase/EvtRandom.hh>
 
 #include <TLorentzVector.h>
-#include <TMath.h>
 
 using namespace std;
 using namespace Belle2;
@@ -45,7 +48,7 @@ EvtGenInterface::~EvtGenInterface()
   if (m_Generator) delete m_Generator;
 }
 
-EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName)
+EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName, const bool coherentMixing)
 {
   IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
   initLogCapture.start();
@@ -62,14 +65,23 @@ EvtGen* EvtGenInterface::createEvtGen(const std::string& DECFileName)
 
   FileSystem::TemporaryFile tmp;
   EvtGenDatabasePDG::Instance()->WriteEvtGenTable(tmp);
+
+  auto mixingMode = EvtCPUtil::Incoherent;
+  if (coherentMixing)
+    mixingMode =  EvtCPUtil::Coherent;
+  else {
+    B2WARNING("Evtgen has been set to decay the B mesons incoherently. This is useful as a workaround only to generate Y(5S, 6S) -> BBar for QCD studies.");
+    B2WARNING("If you are generating Y(4S) events, you _really_ must use the coherent decay mode.");
+  }
+
   return new EvtGen(DECFileName.c_str(), tmp.getName().c_str(), &EvtGenInterface::m_eng,
-                    radCorrEngine, &extraModels, EvtCPUtil::Coherent);
+                    radCorrEngine, &extraModels,  mixingMode);
 
   initLogCapture.finish();
 }
 
 int EvtGenInterface::setup(const std::string& DECFileName, const std::string& parentParticle,
-                           const std::string& userFileName)
+                           const std::string& userFileName, const bool coherentMixing)
 {
   B2DEBUG(150, "Begin initialisation of EvtGen Interface.");
 
@@ -77,7 +89,7 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
   IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Debug, 100, 100);
   initLogCapture.start();
   if (!m_Generator) {
-    m_Generator = createEvtGen(DECFileName);
+    m_Generator = createEvtGen(DECFileName, coherentMixing);
   }
   if (!userFileName.empty()) {
     m_Generator->readUDecay(userFileName.c_str());
@@ -158,6 +170,9 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
   TVector3 vertex = parent.getVertex();
   m_pinit.set(momentum.E(), momentum.X(), momentum.Y(), momentum.Z());
   m_logCapture.start();
+  // we want to decay the particle so the decay time in the tree needs to be lower
+  // than whatever the daughters will get
+  parent.setDecayTime(-std::numeric_limits<float>::infinity());
   pdg = parent.getPDG();
   id = EvtPDL::evtIdFromStdHep(pdg);
   m_parent = EvtParticleFactory::particleFactory(id, m_pinit);
@@ -167,13 +182,13 @@ int EvtGenInterface::simulateDecay(MCParticleGraph& graph,
     m_parent->setDiagonalSpinDensity();
   m_Generator->generateDecay(m_parent);
   m_logCapture.finish();
-  int iPart = addParticles2Graph(m_parent, graph, vertex, &parent);
+  int iPart = addParticles2Graph(m_parent, graph, vertex, &parent, parent.getProductionTime());
   m_parent->deleteTree();
   return iPart;
 }
 
 int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph, TVector3 pPrimaryVertex,
-                                        MCParticleGraph::GraphParticle* parent)
+                                        MCParticleGraph::GraphParticle* parent, double timeOffset)
 {
   //Fill top particle in the tree & starting the queue:
   const int existingParticles = graph.size();
@@ -204,7 +219,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 
     //putting the daughter in the graph:
     MCParticleGraph::GraphParticle* graphDaughter = &graph.addParticle();
-    updateGraphParticle(currDaughter, graphDaughter, pPrimaryVertex);
+    updateGraphParticle(currDaughter, graphDaughter, pPrimaryVertex, timeOffset);
 
     //add relation between mother and daughter to graph:
     currMother->decaysInto((*graphDaughter));
@@ -227,7 +242,7 @@ int EvtGenInterface::addParticles2Graph(EvtParticle* top, MCParticleGraph& graph
 
 
 void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
-                                          TVector3 pPrimaryVertex)
+                                          TVector3 pPrimaryVertex, double timeOffset)
 {
   //updating the GraphParticle information from the EvtParticle information
 
@@ -245,7 +260,7 @@ void EvtGenInterface::updateGraphParticle(EvtParticle* eParticle, MCParticleGrap
   pVertex = pVertex + pPrimaryVertex;
 
   gParticle->setProductionVertex(pVertex(0), pVertex(1), pVertex(2));
-  gParticle->setProductionTime(Evtpos.get(0)*Unit::mm / Const::speedOfLight);
+  gParticle->setProductionTime((Evtpos.get(0)*Unit::mm / Const::speedOfLight) + timeOffset);
   gParticle->setValidVertex(true);
 
   //add PHOTOS flag

@@ -1,5 +1,4 @@
-#ifndef RFPROCESSMANAGER_H
-#define RFPROCESSMANAGER_H
+#pragma once
 //+
 // File : RFProcessManager.h
 // Description : Manages process forking for RFARM control clients
@@ -8,15 +7,8 @@
 // Date : 20 - June - 2013
 //-
 
-#include <unistd.h>
 #include <stdio.h>
-#include <string.h>
-#include <sys/time.h>
 #include <sys/types.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 #include <vector>
 
@@ -51,8 +43,6 @@ namespace Belle2 {
 
   };
 }
-#endif
-
 
 
 

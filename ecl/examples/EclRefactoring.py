@@ -1,65 +1,71 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-#
-# This steering file includes all modules of the
-# ECL code.
-#
-# Example steering file - 2016 Belle II Collaboration
-# Author(s): Torben Ferber (ferber@physics.ubc.ca)
-#
-########################################################
+"""This steering file includes all modules of the
+   ECL code.
 
-import os
-from basf2 import *
-from simulation import add_simulation
-from reconstruction import *
+Usage:
+    basf2 EclRefactoring.py [-- --bkgDirectory <path_to_files>]
+"""
 
-import sys
 import glob
+import argparse
+import basf2 as b2
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from reconstruction import add_mdst_output
 
-# user input
-withbg = 0  # add beam background yes/no
-bgfolder = ''  # folder that holds beam background
-seed = 10000  # seed for random numbers
-mdstfile = 'eclrefactoring.root'  # output file
+__author__ = ['Torben Ferber', 'Abtin Narimani Charan']
+__copyright__ = 'Copyright 2020 - Belle II Collaboration'
+__maintainer__ = 'Abtin Narimani Charan'
+__email__ = 'abtin.narimani.charan@desy.de'
 
-# set log level
-set_log_level(LogLevel.INFO)
 
-# fix random seed
-set_random_seed(seed)
+def argparser():
 
-# create main path
-main = create_path()
+    parser = argparse.ArgumentParser()
 
-# add event infosetter
-eventinfosetter = register_module('EventInfoSetter')
-main.add_module(eventinfosetter)
+    parser.add_argument('--bkgDirectory',
+                        help='Path to beam background directory'
+                        'If you want to add beam background, pass this option.')
+    return parser
 
-# add generator
-evtgeninput = register_module('EvtGenInput')
-main.add_module(evtgeninput)
+args = argparser().parse_args()
 
-# add default full simulation and digitization
-if (withbg == 1):
-    bg = glob.glob(bgfolder + '/*.root')
-    add_simulation(main, bkgfiles=bg)
+# Set log level
+b2.set_log_level(b2.LogLevel.INFO)
+
+# Fix random seed
+b2.set_random_seed(123456)
+
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
+
+# Register and add 'EventInfoSetter' module
+eventInfoSetter = b2.register_module('EventInfoSetter')
+mainPath.add_module(eventInfoSetter)
+
+# Register and add 'EvtGenInput' module
+evtGenInput = b2.register_module('EvtGenInput')
+mainPath.add_module(evtGenInput)
+
+# Add default full simulation and digitization
+if args.bkgDirectory:
+    # Add beam background
+    bgFiles = glob.glob(args.bkgDirectory + '/*.root')
+    # Add simulation
+    add_simulation(mainPath, bkgfiles=bgFiles)
 else:
-    add_simulation(main)
+    add_simulation(mainPath)
 
-# add reconstruction
-add_reconstruction(main)
+# Add reconstruction
+add_reconstruction(mainPath)
 
-# --------------------------------------------------
-# --------------------------------------------------
-
-# add output file with all of the available ECL information
+# Add output mdst file with all of the available ECL information
 add_mdst_output(
-    main,
+    mainPath,
     mc=True,
-    filename=mdstfile,
+    filename='ecl_refactoring.mdst.root',
     additionalBranches=[
         'ECLDigits',
         'ECLCalDigits',
@@ -68,8 +74,10 @@ add_mdst_output(
         'ECLLocalMaximums'])
 
 # Show progress of processing
-progress = register_module('ProgressBar')
-main.add_module(progress)
+progressBar = b2.register_module('ProgressBar')
+mainPath.add_module(progressBar)
 
-process(main)
-print(statistics)
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
+print(b2.statistics)

@@ -16,10 +16,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 
-#include <vxd/dataobjects/VxdID.h>
-
 #include <tracking/dataobjects/DATCONSVDSpacePoint.h>
-
 
 namespace Belle2 {
 

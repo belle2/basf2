@@ -12,39 +12,41 @@
 
 #include <simulation/monopoles/G4MonopolePhysics.h>
 #include <simulation/monopoles/G4mplIonisation.h>
-#include <simulation/monopoles/G4mplIonisationWithDeltaModel.h>
 #include <simulation/monopoles/G4Monopole.h>
 #include <simulation/monopoles/G4MonopoleTransportation.h>
+#include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
 
-#include <G4ParticleDefinition.hh>
 #include <G4ProcessManager.hh>
-#include <G4ProcessVector.hh>
 #include <G4StepLimiter.hh>
-#include <G4Transportation.hh>
-#include <G4hMultipleScattering.hh>
-#include <G4hhIonisation.hh>
 #include <G4hIonisation.hh>
 #include <G4PhysicsListHelper.hh>
 #include <G4BuilderType.hh>
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/SystemOfUnits.h>
 #include <cmath>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4MonopolePhysics::G4MonopolePhysics(double magneticCharge)
   : G4VPhysicsConstructor("Monopole physics"),
+    fMagCharge(magneticCharge), //in units of the positron charge
     fMpl(0), fApl(0)
 {
   //No way to store magnetic charge in TDatabasePDG,
-  //so part of the information (e, m, pdg, etc.) should be stored before generation
+  //so part of the information (e, m, code, etc.) should be stored before generation
   //and other part (g) passed to the simulation setup
-  fMagCharge = magneticCharge;//TODO check untis, should be handled as (e+)
-  fElCharge  = TDatabasePDG::Instance()->GetParticle(99666)->Charge() / 3.0;
-  fMonopoleMass = TDatabasePDG::Instance()->GetParticle(99666)->Mass() * GeV;
+  const auto monopoleInPDG = TDatabasePDG::Instance()->GetParticle(c_monopolePDGCode);
+  const auto antiMonopoleInPDG = TDatabasePDG::Instance()->GetParticle(-c_monopolePDGCode);
+  if (!monopoleInPDG || !antiMonopoleInPDG) {
+    B2FATAL("Monopole physics was requested, but the monopole parameters"
+            "were not registered in local PDG database under PID code " << c_monopolePDGCode);
+  }
+  fElCharge  = monopoleInPDG->Charge() / 3.0; //TParticlePDG returns in units of |e|/3
+  fMonopoleMass = antiMonopoleInPDG->Mass() * GeV;
   SetPhysicsType(bUnknown);
 }
 
@@ -54,9 +56,9 @@ G4MonopolePhysics::~G4MonopolePhysics()
 
 void G4MonopolePhysics::ConstructParticle()
 {
-  fMpl = new G4Monopole("monopole",      fMonopoleMass,  fMagCharge,  fElCharge,  99666);
+  fMpl = new G4Monopole("monopole",      fMonopoleMass,  fMagCharge,  fElCharge,  c_monopolePDGCode);
 //NOTE careful not to use same name or encoding, this will lead to G4exception
-  fApl = new G4Monopole("anti-monopole", fMonopoleMass, -fMagCharge, -fElCharge, -99666);
+  fApl = new G4Monopole("anti-monopole", fMonopoleMass, -fMagCharge, -fElCharge, -c_monopolePDGCode);
 }
 
 
@@ -84,9 +86,12 @@ void G4MonopolePhysics::ConstructProcess()
     pmanager[0]->AddProcess(new G4MonopoleTransportation(fMpl), -1, 0, 0);
     pmanager[1]->RemoveProcess(0);
     pmanager[1]->AddProcess(new G4MonopoleTransportation(fApl), -1, 0, 0);
-  }
-
-  if (magn != 0.0) {
+//
+//  commented out the following 3 lines,
+//  to supress a cppcheck [duplicateCondition] warning for the if condition
+//  }
+//
+//  if (magn != 0.0) {
     G4double chg = sqrt(magn * magn + elec * elec);//TODO properly combine electric and magnetic ionisation
     G4mplIonisation* mplioni = new G4mplIonisation(chg);
     mplioni->SetDEDXBinning(nbin);

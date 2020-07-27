@@ -12,7 +12,6 @@
 #define SVD_RECODIGIT_H
 
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDModeByte.h>
 #include <framework/datastore/RelationsObject.h>
 
 #include <vector>
@@ -21,8 +20,6 @@
 #include <string>
 #include <algorithm>
 #include <numeric>
-#include <functional>
-#include <limits>
 
 namespace Belle2 {
 
@@ -30,7 +27,7 @@ namespace Belle2 {
    * The SVD RecoDigit class.
    *
    * The SVDRecoDigit is a calibrated and time-fitted strip signal.
-   * It contains SVDModeByte and strip identification data, plus fit
+   * It contains strip identification data, plus fit
    * and fit quality information.
    * NB:
    * This class will be _bulky_ and is not intended for storage beyond the
@@ -48,14 +45,14 @@ namespace Belle2 {
     /** Types for internal storage of probability array.
      */
     typedef uint16_t StoredProbType;
-    typedef std::vector<StoredProbType> StoredProbArray;
-    static const uint16_t storedProbArrayNorm = UINT16_MAX;
+    typedef std::vector<StoredProbType> StoredProbArray; /**< vector of StoreProbType objects*/
+    static const uint16_t storedProbArrayNorm = UINT16_MAX; /**<some constant */
 
     /** Type for output probability array.
      * There is no link between this and what the fitter may produce.
      */
     typedef double OutputProbType;
-    typedef std::vector<OutputProbType> OutputProbArray;
+    typedef std::vector<OutputProbType> OutputProbArray; /**< vector of OutProbType objects*/
 
     /** Constructor using a stl container of time bin probabilities.
      * @param sensorID Sensor VXD ID.
@@ -67,17 +64,14 @@ namespace Belle2 {
      * @param fittedTimeEorror time error estimate.
      * @param probabilities pdf for time estimate.
      * @param chi2 Standardized chi2 for the fit.
-     * @param mode SVDModeByte structure, packed trigger time bin and DAQ
-     * mode.
      */
     template<typename T>
     SVDRecoDigit(VxdID sensorID, bool isU, short cellID, float fittedAmplitude,
                  float fittedAmplitudeError, float fittedTime, float fittedTimeError,
-                 const T& probabilities, float chi2, SVDModeByte mode = SVDModeByte()):
+                 const T& probabilities, float chi2):
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID),
       m_fittedAmplitude(fittedAmplitude), m_fittedAmplitudeError(fittedAmplitudeError),
-      m_fittedTime(fittedTime), m_fittedTimeError(fittedTimeError), m_fitChi2Ndf(chi2),
-      m_mode(mode.getID())
+      m_fittedTime(fittedTime), m_fittedTimeError(fittedTimeError), m_fitChi2Ndf(chi2)
     {
       // Expecting input array normalized to 1, but don't rely on it.
       double inputNorm = std::accumulate(probabilities.begin(), probabilities.end(), 0.0);
@@ -166,17 +160,10 @@ namespace Belle2 {
      */
     float getChi2Ndf() const { return m_fitChi2Ndf; }
 
-    /** Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.
-     * @return the SVDModeByte object of the digit
-     */
-    SVDModeByte getModeByte() const
-    { return m_mode; }
-
     /** Display main parameters in this object */
     std::string toString() const
     {
       VxdID thisSensorID(m_sensorID);
-      SVDModeByte thisMode(m_mode);
 
       std::ostringstream os;
       os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID) << " strip: "
@@ -186,7 +173,7 @@ namespace Belle2 {
          << " probabilities: ";
       std::copy(m_probabilities.begin(), m_probabilities.end(),
                 std::ostream_iterator<StoredProbType>(os, " "));
-      os << "Chi2/ndf: " << m_fitChi2Ndf << " " << thisMode << std::endl;
+      os << "Chi2/ndf: " << m_fitChi2Ndf << std::endl;
       return os.str();
     }
 
@@ -195,16 +182,15 @@ namespace Belle2 {
     VxdID::baseType m_sensorID; /**< Compressed sensor identifier.*/
     bool m_isU; /**< True if U, false if V. */
     short m_cellID; /**< Strip coordinate in pitch units. */
-    float m_stripNoise; /**< Noise of the strip, from calibration. */
+    //    float m_stripNoise; /**< Noise of the strip, from calibration. */
     float m_fittedAmplitude; /**< Fitted amplitude of the signal ("charge") */
-    float m_fittedAmplitudeError; /** Error estimate of amplitude fit. */
-    float m_fittedTime; /** Fitted arrival time of the signal. */
-    float m_fittedTimeError; /** Error estiamte of time fit. */
-    StoredProbArray m_probabilities; /** pdf of the time estimate. */
-    float m_fitChi2Ndf; /** Standardized chi2 of the fit. */
-    SVDModeByte::baseType m_mode; /**< Mode byte, trigger FADCTime + DAQ mode */
+    float m_fittedAmplitudeError; /**< Error estimate of amplitude fit. */
+    float m_fittedTime; /**< Fitted arrival time of the signal. */
+    float m_fittedTimeError; /**< Error estimate of time fit. */
+    StoredProbArray m_probabilities; /**< pdf of the time estimate. */
+    float m_fitChi2Ndf; /**< Standardized chi2 of the fit. */
 
-    ClassDef(SVDRecoDigit, 1)
+    ClassDef(SVDRecoDigit, 3)
 
   }; // class SVDRecoDigit
 

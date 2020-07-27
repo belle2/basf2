@@ -39,7 +39,7 @@ void CKFToSVDResult::addToRecoTrack(RecoTrack& recoTrack) const
   for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(getHits())) {
     RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>();
     for (const SVDCluster& cluster : relatedClusters) {
-      recoTrack.addSVDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_VXDTrackFinder);
+      recoTrack.addSVDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_CDCtoSVDCKF);
       sortingParameter++;
     }
   }

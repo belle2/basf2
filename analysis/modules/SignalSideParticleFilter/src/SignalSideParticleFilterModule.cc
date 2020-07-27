@@ -11,7 +11,10 @@
 #include <analysis/modules/SignalSideParticleFilter/SignalSideParticleFilterModule.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 
 using namespace Belle2;

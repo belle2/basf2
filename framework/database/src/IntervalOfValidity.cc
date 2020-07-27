@@ -81,8 +81,8 @@ void IntervalOfValidity::makeValid()
 
 bool IntervalOfValidity::contains(const EventMetaData& event) const
 {
-  int experiment = (int) event.getExperiment();
-  int run = (int) event.getRun();
+  auto experiment = (int) event.getExperiment();
+  auto run = (int) event.getRun();
 
   // check for empty interval
   if (empty()) return false;
@@ -135,7 +135,6 @@ bool IntervalOfValidity::trimOverlap(IntervalOfValidity& iov, bool trimOlder)
     younger.m_runLow = older.m_runHigh + 1;
     if (younger.m_runLow == 0) {
       younger.m_experimentLow++;
-      younger.m_runHigh = -1;
     }
     younger.makeValid();
   }

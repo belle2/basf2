@@ -27,10 +27,12 @@ namespace Belle2 {
    */
   class SVDClusterCalibrations {
   public:
-    static std::string name;
-    static std::string time_name;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDClusterCuts> > t_payload;
-    typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDHitTimeSelectionFunction> > t_time_payload;
+    static std::string name; /**< name of SVDClusterCuts  payload*/
+    static std::string time_name; /**< name of SVDHitTimeSelectionFunction payload */
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDClusterCuts> >
+    t_payload;  /**< typedef for the of SVDClusterCuts  payload of all SVD sensors*/
+    typedef SVDCalibrationsBase< SVDCalibrationsScalar<SVDHitTimeSelectionFunction> >
+    t_time_payload; /**< typedef for the of SVDHitTimeSelectionFunction  payload of all SVD sensors*/
 
     /** Constructor, no input argument is required */
     SVDClusterCalibrations()
@@ -38,8 +40,12 @@ namespace Belle2 {
       , m_time_aDBObjPtr(time_name)
     {
       m_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
-        B2INFO("SVDClusterCalibrations: from now one we are using " <<
+        B2INFO("SVDClusterCuts: from now on we are using " <<
         this->m_aDBObjPtr -> get_uniqueID()); });
+
+      m_time_aDBObjPtr.addCallback([ this ](const std::string&) -> void {
+        B2INFO("SVDHitTimeSelectionFunction: from now on we are using " <<
+        this->m_time_aDBObjPtr -> get_uniqueID()); });
     }
 
     /** Return the corrected cluster position error
@@ -110,7 +116,8 @@ namespace Belle2 {
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
                               m_aDBObjPtr->sideIndex(isU),
-                              0).minAdjSNR;
+                              0 //strip not relevant
+                             ).minAdjSNR;
 
     }
 
@@ -133,7 +140,8 @@ namespace Belle2 {
                               sensorID.getLadderNumber(),
                               sensorID.getSensorNumber(),
                               m_aDBObjPtr->sideIndex(isU),
-                              0).minClusterSNR;
+                              0 // strip not relevant
+                             ).minClusterSNR;
 
     }
 
@@ -163,9 +171,35 @@ namespace Belle2 {
                                    sensorID.getLadderNumber(),
                                    sensorID.getSensorNumber(),
                                    m_aDBObjPtr->sideIndex(isU),
-                                   0).isInTime(svdTime, svdTimeError, t0, t0Error);
+                                   0 //strip not relevant
+                                  ).isInTime(svdTime, svdTimeError, t0, t0Error);
 
     }
+
+    /** Return whether the cluster is estimated to be in time with the event or off-time
+     *
+     * Input:
+     * @param sensor ID: identity of the sensor for which the
+     * calibration is required
+     * @param uTime: U-Side cluster time
+     * @param vTime: V-Side cluster time
+     *
+     * Output: bool true if the U and V cluster times are compatible
+     */
+    inline bool areClusterTimesCompatible(
+      const Belle2::VxdID& sensorID,
+      const double& uTime, const double& vTime = 0
+    ) const
+    {
+      return m_time_aDBObjPtr->get(sensorID.getLayerNumber(),
+                                   sensorID.getLadderNumber(),
+                                   sensorID.getSensorNumber(),
+                                   m_aDBObjPtr->sideIndex(true), // side not relevant
+                                   0 // strip not relevant
+                                  ).areClustersInTime(uTime, vTime);
+
+    }
+
 
     /** Return the version of the function used to determine whether the
      * cluster time is acceptable at the SP creation
@@ -187,7 +221,8 @@ namespace Belle2 {
                                    sensorID.getLadderNumber(),
                                    sensorID.getSensorNumber(),
                                    m_aDBObjPtr->sideIndex(isU),
-                                   0).getFunctionID();
+                                   0 // strip not relevant
+                                  ).getFunctionID();
 
     }
 
@@ -211,7 +246,8 @@ namespace Belle2 {
                                    sensorID.getLadderNumber(),
                                    sensorID.getSensorNumber(),
                                    m_aDBObjPtr->sideIndex(isU),
-                                   0).getMinTime();
+                                   0 // strip not relevant
+                                  ).getMinTime();
 
     }
 
@@ -225,8 +261,8 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr< t_payload > m_aDBObjPtr;
-    DBObjPtr< t_time_payload > m_time_aDBObjPtr;
+    DBObjPtr< t_payload > m_aDBObjPtr; /**< SVDClusterCuts  payload */
+    DBObjPtr< t_time_payload > m_time_aDBObjPtr; /**< SVDHitTimeSelectionFunction paylaod */
   };
 }
 

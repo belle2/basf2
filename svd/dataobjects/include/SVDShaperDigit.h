@@ -12,13 +12,11 @@
 #define SVD_SHAPERDIGIT_H
 
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDModeByte.h>
 #include <framework/dataobjects/DigitBase.h>
 #include <cstdint>
 #include <sstream>
 #include <string>
 #include <algorithm>
-#include <functional>
 #include <limits>
 
 namespace Belle2 {
@@ -27,9 +25,7 @@ namespace Belle2 {
    * The SVD ShaperDigit class.
    *
    * The SVDShaperDigit holds a set of 6 raw APV25 signal samples,
-   * zero-padded in 3-sample mode) taken on a strip. It also holds
-   * DAQ mode (3 or 6 samples) and trigger time information in an
-   * SVDModeByte structure, and time fit from FADC (when available).
+   * zero-padded in 3-sample mode) taken on a strip.
    */
 
   class SVDShaperDigit : public DigitBase {
@@ -44,12 +40,12 @@ namespace Belle2 {
      * of doubles suitable for computing.
      */
     typedef uint8_t APVRawSampleType;
-    typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples;
+    typedef std::array<APVRawSampleType, c_nAPVSamples> APVRawSamples; /**<array of APVRawSamplesType objects */
 
     /** Types for array of samples for processing.
      */
     typedef float APVFloatSampleType;
-    typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples;
+    typedef std::array<APVFloatSampleType, c_nAPVSamples> APVFloatSamples; /**<array of APVFloatSampleType objects*/
 
     /** Constructor using c-array of samples.
      * @param sensorID Sensor VXD ID.
@@ -57,15 +53,13 @@ namespace Belle2 {
      * @param cellID Strip ID.
      * @param samples std::array of 6 APV raw samples.
      * @param FADCTime Time estimate from FADC
-     * @param mode SVDModeByte structure, packed trigger time bin and DAQ
      * mode.
      */
     template<typename T>
     SVDShaperDigit(VxdID sensorID, bool isU, short cellID,
-                   T samples[c_nAPVSamples], int8_t FADCTime = 0,
-                   SVDModeByte mode = SVDModeByte()):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_FADCTime(FADCTime),
-      m_mode(mode.getID())
+                   T samples[c_nAPVSamples], int8_t FADCTime = 0
+                  ):
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_FADCTime(FADCTime)
     {
       std::transform(samples, samples + c_nAPVSamples, m_samples.begin(),
                      [](T x)->APVRawSampleType { return trimToSampleRange(x); }
@@ -78,14 +72,12 @@ namespace Belle2 {
      * @param cellID Strip ID.
      * @param samples std::array of 6 APV raw samples.
      * @param FADCTime Time estimate from FADC
-     * @param mode SVDModeByte structure, packed trigger time bin and DAQ
      * mode.
      */
     template<typename T>
     SVDShaperDigit(VxdID sensorID, bool isU, short cellID, T samples,
-                   int8_t FADCTime = 0, SVDModeByte mode = SVDModeByte()):
-      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_FADCTime(FADCTime),
-      m_mode(mode.getID())
+                   int8_t FADCTime = 0):
+      m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_FADCTime(FADCTime)
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
                      [](typename T::value_type x)->APVRawSampleType
@@ -131,16 +123,47 @@ namespace Belle2 {
       return returnSamples;
     }
 
-    /** Get digit FADCTime estimate
+
+    /**
+     * Get the max bin.
+     * @return int time bin corresponding to the higher sample amplitude
+     */
+    int getMaxTimeBin() const
+    {
+      float amplitude = 0;
+      int maxbin = 0;
+      APVFloatSamples samples =  this->getSamples();
+      for (int k = 0; k < 6; k ++) {
+        if (samples[k] > amplitude) {
+          amplitude = samples[k];
+          maxbin = k;
+        }
+      }
+      return maxbin;
+    }
+
+    /**
+     * Get the ADC counts corresponding to the higher sample amplitude
+     * @return int of the ADC counts corresponding to the higher sample amplitude
+     */
+    int getMaxADCCounts() const
+    {
+      float amplitude = 0;
+      APVFloatSamples samples =  this->getSamples();
+      for (int k = 0; k < 6; k ++) {
+        if (samples[k] > amplitude)
+          amplitude = samples[k];
+      }
+      return amplitude;
+    }
+
+
+    /**
+     * Get digit FADCTime estimate
      * @return digit time estimate from FADC
      */
     float getFADCTime() const { return static_cast<float>(m_FADCTime); }
 
-    /** Get the SVDMOdeByte object containing information on trigger FADCTime and DAQ mode.
-     * @return the SVDModeByte object of the digit
-     */
-    SVDModeByte getModeByte() const
-    { return m_mode; }
 
     /**
      * Convert a value to sample range.
@@ -161,14 +184,13 @@ namespace Belle2 {
     std::string toString() const
     {
       VxdID thisSensorID(m_sensorID);
-      SVDModeByte thisMode(m_mode);
 
       std::ostringstream os;
       os << "VXDID : " << m_sensorID << " = " << std::string(thisSensorID) << " strip: "
          << ((m_isU) ? "U-" : "V-") << m_cellID << " samples: ";
       std::copy(m_samples.begin(), m_samples.end(),
                 std::ostream_iterator<unsigned int>(os, " "));
-      os << "FADC time: " << (unsigned int)m_FADCTime << " " << thisMode << std::endl;
+      os << "FADC time: " << (unsigned int)m_FADCTime << std::endl;
       return os.str();
     }
 
@@ -229,7 +251,7 @@ namespace Belle2 {
     {
       int nOKSamples = 0;
       Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
-      for (int k = 0; k < this->getNSamples(); k ++)
+      for (int k = 0; k < 6; k ++)
         if (samples_vec[k] >= cutMinSignal)
           nOKSamples++;
 
@@ -240,22 +262,6 @@ namespace Belle2 {
     }
 
 
-    /** returns the number of samples, 6, 3 or 1 */
-    int getNSamples() const
-    {
-
-      SVDModeByte thisMode(m_mode);
-      int modality = (int)thisMode.getDAQMode();
-
-      if (modality == 2)
-        return 6;
-      else if (modality == 1)
-        return 3;
-      else if (modality == 0)
-        return 1;
-
-      return -1;
-    }
 
   private:
 
@@ -264,11 +270,8 @@ namespace Belle2 {
     short m_cellID = 0; /**< Strip coordinate in pitch units. */
     APVRawSamples m_samples; /**< 6 APV signals from the strip. */
     int8_t m_FADCTime = 0; /**< digit time estimate from the FADC, in ns */
-    SVDModeByte::baseType m_mode = SVDModeByte::c_DefaultID;
-    /**< Mode byte, trigger FADCTime + DAQ mode */
 
-
-    ClassDefOverride(SVDShaperDigit, 3)
+    ClassDefOverride(SVDShaperDigit, 5)
 
   }; // class SVDShaperDigit
 

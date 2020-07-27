@@ -4,16 +4,13 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Jo-Frederik Krohn, Francesco Tenchini                     *
+ * Contributor: Wouter Hulsbergen, Jo-Frederik Krohn, Francesco Tenchini  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#include <iostream>
 #include <TMath.h>
 
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -134,9 +131,10 @@ namespace TreeFitter {
 
   }
 
-  void HelixUtils::getHelixAndJacobianFromVertexNumerical(Eigen::Matrix<double, 1, 6>& positionAndMom,
+  void HelixUtils::getHelixAndJacobianFromVertexNumerical(const Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                           int charge, double Bz,
                                                           Belle2::Helix& helix,
+                                                          // cppcheck-suppress constParameter ; jacobian is updated below
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
@@ -181,9 +179,10 @@ namespace TreeFitter {
   }
 
   void HelixUtils::getJacobianFromVertexNumerical(
-    Eigen::Matrix<double, 1, 6>& positionAndMom,
+    const Eigen::Matrix<double, 1, 6>& positionAndMom,
     int charge, double Bz,
-    Belle2::Helix& helix,
+    const Belle2::Helix& helix,
+    // cppcheck-suppress constParameter ; jacobian is assigned new matrix elements below
     Eigen::Matrix<double, 5, 6>& jacobian,
     double delta
   )
@@ -378,6 +377,7 @@ namespace TreeFitter {
     return sqrt(sqr(x - point.x()) + sqr(y - point.y()) + sqr(z - point.z())) ;
   }
 
+  // cppcheck-suppress constParameter ; jacobian is clearly updated in the function
   void HelixUtils::getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,
                                                         const double x,
                                                         const double y,
@@ -447,7 +447,7 @@ namespace TreeFitter {
     jacobian(3, 2) = 1;
     jacobian(3, 3) = (pz * (px2 * x - py * (aq * r + py * x) + 2 * px * py * y)) / (pt2 * pt02);
     jacobian(3, 4) = (pz * (px * (aq * r + 2 * py * x) - px2 * y + py2 * y)) / (pt2 * pt02);
-    jacobian(3, 5) = std::atan2(-(aq * (px * x + py * y)), px2 + py * py0 - aq * px * y) / aq;
+    jacobian(3, 5) = std::atan2(-(aq * (px * x + py * y)), (px2 + py * py0 - aq * px * y)) / aq; //pt on num. and denom cancels.
 
     // D tan lambda / Dx_i
     jacobian(4, 0) = 0;

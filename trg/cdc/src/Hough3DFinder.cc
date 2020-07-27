@@ -14,14 +14,12 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
 #include <map>
 #include "TFile.h"
 #include "TTree.h"
 #include <framework/dataobjects/EventMetaData.h>
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
-#include "mdst/dataobjects/MCParticle.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"
@@ -449,6 +447,7 @@ namespace Belle2 {
     if (m_mBool["debugEfficiency"]) {
       // Notify when efficiency is not 1.
       for (unsigned iTrack = 0; iTrack < trackList.size(); iTrack++) {
+        /* cppcheck-suppress variableScope */
         TCTrack& aTrack = * trackList[iTrack];
         // Find number of super layers that have priority layer hit.
         int nPriorityHitSL = 0;

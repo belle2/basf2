@@ -29,7 +29,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxScaleFactor(double scale): m_scale(scale) {};
+    explicit CDCDedxScaleFactor(double scale): m_scale(scale) {};
 
     /**
      * Destructor

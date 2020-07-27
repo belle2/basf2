@@ -3,13 +3,12 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: CDC group                                    *
+ * Contributors: CDC group                                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCJOBCNTLPARMODIFIER_H
-#define CDCJOBCNTLPARMODIFIER_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -43,7 +42,8 @@ namespace Belle2 {
     CDC::CDCGeoControlPar& m_gcp;  /*!< Reference to CDCGeo... */
 
     //For Simulation
-    bool m_wireSag;                               /*!< Switch for sense wire sag */
+    bool m_timeWalk;                        /*!< Switch for time walk in translator */
+    bool m_wireSag;                         /*!< Switch for sense wire sag */
     bool m_modLeftRightFlag;                /*!< Switch for modified left/right flag */
     bool m_debug4Sim;                          /*!< Switch for debug printing. */
     double m_thresholdEnergyDeposit;  /*!< Energy thresh. for G4 step (GeV) */
@@ -90,5 +90,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCJOBCNTLPARMODIFIER_H

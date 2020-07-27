@@ -21,6 +21,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+template class TrackFindingCDC::Chooseable<BaseTrackFilter>;
 template class TrackFindingCDC::ChooseableFilter<TrackFilterFactory>;
 
 TrackRejecter::TrackRejecter(const std::string& defaultFilterName)

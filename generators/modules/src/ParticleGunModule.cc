@@ -91,6 +91,7 @@ discretePt:
   m_parameters.xVertexParams  = {0.0, 10 * Unit::um};
   m_parameters.yVertexParams  = {0.0, 59 * Unit::nm};
   m_parameters.zVertexParams  = {0.0, 190 * Unit::um};
+  m_parameters.timeParams     = {0.0 * Unit::ns};
 
   //Parameter definition
   addParam("nTracks", m_parameters.nTracks,
@@ -112,6 +113,9 @@ discretePt:
   addParam("thetaGeneration", m_thetaDist,
            "Theta distribution: one of fixed, uniform, normal, normalCos, polyline, uniformCos, "
            "polylineCos or discrete", string("uniform"));
+  addParam("timeGeneration", m_timeDist,
+           "Time distribution: one of fixed, uniform, normal, normalCos, polyline, uniformCos, "
+           "polylineCos or discrete", string("fixed"));
   addParam("vertexGeneration", m_vertexDist,
            "Vertex (x,y,z) distribution: one of fixed, uniform, normal, polyline or "
            "discrete", string("fixed"));
@@ -149,8 +153,8 @@ discretePt:
   addParam("zVertexParams", m_parameters.zVertexParams,
            "Parameters for the z vertex generation. Meaning of the parameters "
            "depends on the chosen distribution", m_parameters.zVertexParams);
-  addParam("timeOffset", m_parameters.timeOffset,
-           "Time offset", 0.0);
+  addParam("timeParams", m_parameters.timeParams,
+           "Time offset", m_parameters.timeParams);
 }
 
 ParticleGun::EDistribution ParticleGunModule::convertDistribution(std::string name)
@@ -189,6 +193,7 @@ void ParticleGunModule::initialize()
   m_parameters.xVertexDist  = convertDistribution(m_vertexDist);
   m_parameters.yVertexDist  = convertDistribution(m_vertexDist);
   m_parameters.zVertexDist  = convertDistribution(m_vertexDist);
+  m_parameters.timeDist  = convertDistribution(m_timeDist);
   if (getParam<std::string>("xVertexGeneration").isSetInSteering()) {
     m_parameters.xVertexDist  = convertDistribution(m_xVertexDist);
   }

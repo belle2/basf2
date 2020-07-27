@@ -7,9 +7,11 @@
 //-
 
 #include <daq/rfarm/event/modules/Raw2DsModule.h>
+#include <daq/dataobjects/SendHeader.h>
+#include <daq/dataobjects/SendTrailer.h>
+
 #include <TSystem.h>
 #include <stdlib.h>
-#include <time.h>
 #include <signal.h>
 
 #include "framework/datastore/StoreObjPtr.h"
@@ -68,19 +70,19 @@ void Raw2DsModule::initialize()
   m_rbuf = new RingBuffer(m_rbufname.c_str());
 
   // Initialize EvtMetaData
-  StoreObjPtr<EventMetaData>::registerPersistent();
+  m_eventMetaData.registerInDataStore();
 
   // Initialize Array of RawCOPPER
-  StoreArray<RawDataBlock>::registerPersistent();
-  StoreArray<RawCOPPER>::registerPersistent();
-  StoreArray<RawSVD>::registerPersistent();
-  StoreArray<RawCDC>::registerPersistent();
-  StoreArray<RawTOP>::registerPersistent();
-  StoreArray<RawARICH>::registerPersistent();
-  StoreArray<RawECL>::registerPersistent();
-  StoreArray<RawKLM>::registerPersistent();
-  StoreArray<RawTRG>::registerPersistent();
-  StoreArray<RawFTSW>::registerPersistent();
+  m_rawDataBlock.registerInDataStore();
+  m_rawCOPPER.registerInDataStore();
+  m_rawSVD.registerInDataStore();
+  m_rawCDC.registerInDataStore();
+  m_rawTOP.registerInDataStore();
+  m_rawARICH.registerInDataStore();
+  m_rawECL.registerInDataStore();
+  m_rawKLM.registerInDataStore();
+  m_rawTRG.registerInDataStore();
+  m_rawFTSW.registerInDataStore();
 
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization
@@ -128,7 +130,7 @@ void Raw2DsModule::registerRawCOPPERs()
   while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
     //    usleep(100);
     //    usleep(20);
-    if (signalled != 0) break;
+    if (signalled != 0) return;
     usleep(5);
   }
   //  B2INFO("Raw2Ds: got an event from RingBuffer, size=" << size <<

@@ -14,7 +14,7 @@ namespace {
   class RelationsObjectTest : public ::testing::Test {
   protected:
     /** fill StoreArrays with entries from 0..9 */
-    virtual void SetUp()
+    void SetUp() override
     {
       evtData.registerInDataStore();
       profileData.registerInDataStore();
@@ -28,7 +28,7 @@ namespace {
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -85,20 +85,20 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     //not yet set
-    EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_FALSE((relObjData)[0]->getRelated<ProfileInfo>() != nullptr);
 
     (relObjData)[0]->addRelationTo((profileData)[0], -42.0);
 
     //now it should be found (index updated because RelationContainer was just created)
-    EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_TRUE((relObjData)[0]->getRelated<ProfileInfo>() != nullptr);
 
     //test again with different object
-    EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_FALSE((relObjData)[1]->getRelated<ProfileInfo>() != nullptr);
 
     (relObjData)[1]->addRelationTo((profileData)[0], -42.0);
 
     //now it should be found (index updated because addRelation marks RelationContainer as modified)
-    EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != NULL);
+    EXPECT_TRUE((relObjData)[1]->getRelated<ProfileInfo>() != nullptr);
   }
 
   /** Test getting array name/index from a RelationsObject. */
@@ -214,6 +214,13 @@ namespace {
     relObjData.registerRelationTo(profileData, DataStore::c_Event, DataStore::c_WriteOut, relationName);
     DataStore::Instance().setInitializeActive(false);
 
+    //check the hasRelation finder works with and without names
+    EXPECT_TRUE(relObjData.hasRelationTo(profileData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(profileData.hasRelationTo(relObjData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(profileData.hasRelationTo(evtData, DataStore::c_Event, relationName));
+    EXPECT_FALSE(relObjData.hasRelationTo(profileData));
+    EXPECT_FALSE(profileData.hasRelationTo(relObjData));
+
     (relObjData)[0]->addRelationTo((profileData)[0], -42.0, relationName);
 
     //getRelations
@@ -241,8 +248,8 @@ namespace {
     // Check if the "ALL" parameter also works
     StoreEntry* storeEntry = nullptr;
     int index = -1;
-    auto allRelations = DataStore::Instance().getRelationsWith(DataStore::c_FromSide, (relObjData)[0], storeEntry, index,
-                                                               TObject::Class(), "ALL", "");
+    DataStore::Instance().getRelationsWith(DataStore::c_FromSide, (relObjData)[0], storeEntry, index,
+                                           TObject::Class(), "ALL", "");
 
     //adding relations to NULL is safe and doesn't do anything
     (relObjData)[0]->addRelationTo(static_cast<TObject*>(nullptr), 1.0, relationName);

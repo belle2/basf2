@@ -17,6 +17,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <top/dbobjects/TOPSampleTimes.h>
 #include <top/dbobjects/TOPSignalShape.h>
+#include <top/dbobjects/TOPCalTimeWalk.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <map>
 #include <vector>
@@ -54,13 +56,49 @@ namespace Belle2 {
        * Constructor
        * @param moduleID TOP module ID
        * @param pixelID pixel ID
-       * @param window storage window number (first window of waveform)
-       * @param storageDepth analog storage depth
+       * @param timeOffset time offset [ns]
+       * @param calErrorsSq calibration uncertainies squared
+       * @param shift shift of waveform window due to asic mis-alignment [num of windows]
        * @param rmsNoise r.m.s of noise [ADC counts]
        * @param sampleTimes sample times
        */
-      TimeDigitizer(int moduleID, int pixelID, unsigned window, unsigned storageDepth,
-                    double rmsNoise, const TOPSampleTimes& sampleTimes);
+      TimeDigitizer(int moduleID, int pixelID, double timeOffset, double calErrorsSq,
+                    int shift, double rmsNoise, const TOPSampleTimes& sampleTimes);
+
+      /**
+       * Sets storage depth
+       * @param storageDepth analog storage depth
+       */
+      static void setStorageDepth(unsigned storageDepth) {s_storageDepth = storageDepth;}
+
+      /**
+       * Sets the number of readout windows
+       * @param numWin number of readout windows
+       */
+      static void setReadoutWindows(unsigned numWin) {s_readoutWindows = numWin;}
+
+      /**
+       * Sets the number of windows before the first ASIC window
+       * @param offsetWin number of offset windows
+       */
+      static void setOffsetWindows(int offsetWin) {s_offsetWindows = offsetWin;}
+
+      /**
+       * Sets first ASIC window
+       * @param window storage window number
+       */
+      static void setFirstWindow(unsigned window) {s_window = window;}
+
+      /**
+       * Mask samples at the end of a window to emulate phase-2 data
+       * @param maskThem mask (true) or not mask (false)
+      */
+      static void maskSamples(bool maskThem) {s_maskSamples = maskThem;}
+
+      /**
+       * Stores pointer to time walk DB object defined in TOPDigitizerModule
+       */
+      static void setTimeWalk(DBObjPtr<TOPCalTimeWalk>* timeWalk) {s_timeWalk = timeWalk;}
 
       /**
        * Sets sample times
@@ -113,7 +151,7 @@ namespace Belle2 {
        * Returns ASIC storage window number
        * @return window number
        */
-      unsigned getASICWindow() const {return m_window;}
+      unsigned getASICWindow() const {return s_window;}
 
       /**
        * Returns hardware channel number
@@ -208,24 +246,33 @@ namespace Belle2 {
        * Generate waveform.
        * The size (number of ASIC windows) is given by the size of first argument.
        * The size of second argument must be the same as the first one.
+       * @param startSample starting sample w.r.t first window number
        * @param baselines possible baseline shifts of ASIC windows
        * @param rmsNoises noise levels (r.m.s) per ASIC window
        * @param pedestals average pedestals per ASIC window
        * @param ADCRange ADC range (2^NumBits)
        * @return generated waveform
        */
-      std::vector<short> generateWaveform(const std::vector<double>& baselines,
+      std::vector<short> generateWaveform(int startSample,
+                                          const std::vector<double>& baselines,
                                           const std::vector<double>& rmsNoises,
                                           const std::vector<double>& pedestals,
                                           int ADCRange) const;
 
+      static unsigned s_storageDepth;  /**< ASIC analog storage depth */
+      static unsigned s_readoutWindows;   /**< number of readout windows */
+      static int s_offsetWindows;    /**< number of windows before first wf window */
+      static unsigned s_window;      /**< first window number */
+      static bool s_maskSamples;     /**< mask samples at window boundary (phase-2) */
+      static DBObjPtr<TOPCalTimeWalk>* s_timeWalk; /**< pointer to DB object */
 
       int m_moduleID = 0;     /**< module ID (1-based) */
       int m_pixelID = 0;      /**< pixel (e.g. software channel) ID (1-based) */
-      unsigned m_window = 0;  /**< storage window number */
-      unsigned m_storageDepth = 0;  /**< ASIC analog storage depth */
+      double m_timeOffset = 0; /**< time offset [ns] */
+      double m_calErrorsSq = 0; /**< calibration uncertainties squared */
       double m_rmsNoise = 0;  /**< r.m.s of noise [ADC counts] */
       const TOPSampleTimes* m_sampleTimes = 0; /**< sample times */
+      int m_windowShift = 0; /**< additional wf window shift due to asic mis-alignment */
 
       unsigned m_channel = 0; /**< hardware channel number (0-based) */
       unsigned m_scrodID = 0; /**< SCROD ID */

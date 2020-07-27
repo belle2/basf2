@@ -12,23 +12,14 @@
 #include <top/calibration/TOPDatabaseImporter.h>
 #include <top/geometry/TOPGeometryPar.h>
 
-// framework - core
-#include <framework/core/RandomGenerator.h> // gRandom
-
 // framework - Database
-#include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 
-// framework - xml
-#include <framework/gearbox/GearDir.h>
-
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // DB objects
@@ -44,7 +35,8 @@
 #include <top/dbobjects/TOPCalCommonT0.h>
 #include <top/dbobjects/TOPCalIntegratedCharge.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
-
+#include <top/dbobjects/TOPCalAsicShift.h>
+#include <top/dbobjects/TOPCalTimeWalk.h>
 
 #include <top/dbobjects/TOPPmtGainPar.h>
 #include <top/dbobjects/TOPPmtQE.h>
@@ -52,6 +44,8 @@
 #include <top/dbobjects/TOPPmtObsoleteData.h>
 #include <top/dbobjects/TOPPmtTTSPar.h>
 #include <top/dbobjects/TOPPmtTTSHisto.h>
+
+#include <top/dbobjects/TOPFrontEndSetting.h>
 
 #include <iostream>
 #include <fstream>
@@ -235,35 +229,46 @@ namespace Belle2 {
       }
 
       double t0Cal = 0.;
+      double t0CalErr = 0.;
       int channelID = 0; // 0-511
       int slotID = 0;    // 1-16
+      int fitStatus = 0; // fit status, 0 = OK
 
       treeCal->SetBranchAddress("channel", &channelID);
       treeCal->SetBranchAddress("slot", &slotID);
-      treeCal->SetBranchAddress("t0Const", &t0Cal);
+      treeCal->SetBranchAddress("channelT0", &t0Cal);
+      treeCal->SetBranchAddress("channelT0Err", &t0CalErr);
+      treeCal->SetBranchAddress("fitStatus", &fitStatus);
 
       B2INFO("--> importing constats");
 
       for (int iCal = 0; iCal < treeCal->GetEntries(); iCal++) {
         treeCal->GetEntry(iCal);
         if (!geo->isModuleIDValid(slotID)) {
-          B2ERROR("Slot ID is not valid (fileName = " << fileName << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
+          B2ERROR("Slot ID is not valid (fileName = " << fileName
+                  << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
                   "). Skipping the entry.");
           continue;
         }
-        if (channelID < 0 || channelID > 511) {
-          B2ERROR("Channel ID is not valid (fileName = " << fileName << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
+        if (channelID < 0 or channelID > 511) {
+          B2ERROR("Channel ID is not valid (fileName = " << fileName
+                  << ", SlotID = " << slotID << ", ChannelID = " << channelID <<
                   "). Skipping the entry.");
           continue;
         }
-        double err = 0.; // No error provided yet!!
-        channelT0->setT0(slotID, channelID, t0Cal, err);
-        nCal[slotID - 1]++;
+        channelT0->setT0(slotID, channelID, t0Cal, t0CalErr);
+        if (fitStatus == 0) {
+          nCal[slotID - 1]++;
+        } else {
+          channelT0->setUnusable(slotID, channelID);
+        }
       }
 
       file->Close();
       B2INFO("--> Input file closed");
     }
+    channelT0->suppressAverage();
+
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     channelT0.import(iov);
 
@@ -281,6 +286,87 @@ namespace Belle2 {
              << nCalTot << "/ 8192");
   }
 
+
+  void TOPDatabaseImporter::importChannelT0(std::string fileName,
+                                            int expNo, int firstRun, int lastRun)
+  {
+    // declare db object to be imported -- and construct it
+    DBImportObjPtr<TOPCalChannelT0> channelT0;
+    channelT0.construct();
+
+    // open the root file
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // loop over slots and set channel T0
+    int nModules = TOPGeometryPar::Instance()->getGeometry()->getNumModules();
+    int count = 0; // counter of calibrated constants
+    for (int moduleID = 1; moduleID <= nModules; moduleID++) {
+      std::string name = "channelT0_slot";
+      if (moduleID < 10) name += "0";
+      name += std::to_string(moduleID);
+      auto* h = (TH1F*) file->Get(name.c_str());
+      if (!h) {
+        B2ERROR("Histogram with name '" + name + "' not found");
+        continue;
+      }
+      for (int channel = 0; channel < h->GetNbinsX(); channel++) {
+        double value = h->GetBinContent(channel + 1);
+        double error = h->GetBinError(channel + 1);
+        channelT0->setT0(moduleID, channel, value, error);
+        if (error > 0) {
+          count++;
+        } else {
+          channelT0->setUnusable(moduleID, channel);
+        }
+      }
+    }
+    file->Close();
+
+    channelT0->suppressAverage();
+
+    // import to database
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    channelT0.import(iov);
+
+    B2INFO("Channel T0 for exp " << expNo << " run " << firstRun << " to " << lastRun
+           << " imported. Calibrated channels: " << count << "/" << nModules * 512);
+
+  }
+
+
+  void TOPDatabaseImporter::importAsicShifts_BS13d(double s0, double s1, double s2, double s3,
+                                                   int expNo, int firstRun, int lastRun)
+  {
+
+    std::vector<double> shifts;
+    shifts.push_back(s0);
+    shifts.push_back(s1);
+    shifts.push_back(s2);
+    shifts.push_back(s3);
+
+    DBImportObjPtr<TOPCalAsicShift> asicShift;
+    asicShift.construct();
+
+    int moduleID = 13;
+    unsigned bs = 3;
+    for (unsigned carrier = 0; carrier < 4; carrier++) {
+      for (unsigned a = 0; a < 4; a++) {
+        unsigned asic = a + carrier * 4 + bs * 16;
+        asicShift->setT0(moduleID, asic, shifts[carrier]);
+      }
+    }
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    asicShift.import(iov);
+
+    B2INFO("ASIC shifts of BS13d imported for exp " << expNo << " run " << firstRun <<
+           " to " << lastRun);
+  }
 
 
   void TOPDatabaseImporter::importOfflineCommonT0Calibration(string fileName,
@@ -310,6 +396,7 @@ namespace Belle2 {
     float integral = 0;
     float sigma = 0;
     int runNum = 0;
+    int fitStatus = 0;
 
     treeCal->SetBranchAddress("offset", &t0);
     treeCal->SetBranchAddress("runNum", &runNum);
@@ -317,44 +404,59 @@ namespace Belle2 {
     treeCal->SetBranchAddress("offsetErr", &t0Err);
     treeCal->SetBranchAddress("chi2", &chi2);
     treeCal->SetBranchAddress("integral", &integral);
+    treeCal->SetBranchAddress("fitStatus", &fitStatus);
 
     treeCal->GetEntry(0);
 
-    if (lastRun == -1 && firstRun == -1) {
+    if (lastRun == -1 and firstRun == -1) {
       lastRun = runNum;
       firstRun = runNum;
       B2INFO("Using the run number from the tree ");
-    } else
-      B2INFO("Using the run numbers passed to the importer");
-    B2INFO("IOV = (" << firstExp << ", "  << firstRun << ", " << lastExp << ", "  << lastRun << ")");
-    float cT0 = 0.5;
-    float cT0Err = 0;
-    if (integral > 10 &&  sigma > 0.05  && sigma < 0.33) {
-      B2INFO("Good calibration found ");
-      B2INFO("t0 =" << t0 << " pm "  << t0Err);
-      B2INFO("sigma =" << sigma);
-      B2INFO("chi2 =" << chi2);
-      cT0 = t0;
-      cT0Err = t0Err;
     } else {
-      B2INFO("BAD calibration found- Importing the default value (0.5) ");
-      B2INFO("t0 =" << t0 << " pm "  << t0Err);
-      B2INFO("sigma =" << sigma);
-      B2INFO("chi2 =" << chi2);
+      B2INFO("Using the run numbers passed to the importer");
     }
-
-    B2INFO("Importing " << cT0);
+    B2INFO("IOV = (" << firstExp << ", "  << firstRun << ", "
+           << lastExp << ", "  << lastRun << ")");
 
     DBImportObjPtr<TOPCalCommonT0> commonT0;
-    commonT0.construct(cT0, cT0Err);
+    commonT0.construct(t0, t0Err);
+
+    if (fitStatus == 0 and integral > 10 and sigma > 0.05 and sigma < 0.33) {
+      B2INFO("Good calibration found ");
+      B2INFO("t0 = " << t0 << " +- "  << t0Err);
+      B2INFO("sigma = " << sigma);
+      B2INFO("chi2 = " << chi2);
+    } else {
+      B2INFO("BAD calibration found - set calibration to 'unusable'");
+      B2INFO("t0 = " << t0 << " +- "  << t0Err);
+      B2INFO("sigma = " << sigma);
+      B2INFO("chi2 = " << chi2);
+      B2INFO("fit status = " << fitStatus);
+      commonT0->setUnusable();
+    }
+
     file->Close();
+
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     commonT0.import(iov);
     B2INFO("--> constants imported");
     B2INFO("   ");
   }
 
+  void TOPDatabaseImporter::importCommonT0(double value, double error,
+                                           int expNo, int firstRun, int lastRun,
+                                           bool roughlyCalibrated)
+  {
+    DBImportObjPtr<TOPCalCommonT0> commonT0;
+    commonT0.construct(value, error);
+    if (roughlyCalibrated) commonT0->setRoughlyCalibrated();
 
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    commonT0.import(iov);
+
+    B2INFO("--> constants for exp = " << expNo
+           << " run = " << firstRun << " to " << lastRun << " imported");
+  }
 
   void TOPDatabaseImporter::importModuleT0Calibration(string fileName,
                                                       int firstExp, int firstRun,
@@ -395,6 +497,8 @@ namespace Belle2 {
     inFile.close();
     B2INFO("--> Input file closed");
 
+    moduleT0->suppressAverage();
+
     IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
     moduleT0.import(iov);
 
@@ -403,6 +507,53 @@ namespace Belle2 {
       B2INFO("--> Time offset of Slot " << iSlot << " = " << moduleT0->getT0(iSlot));
     }
 
+
+  }
+
+
+  void TOPDatabaseImporter::importModuleT0(std::string fileName,
+                                           int expNo, int firstRun, int lastRun)
+  {
+
+    // construct DB import object
+    DBImportObjPtr<TOPCalModuleT0> moduleT0;
+    moduleT0.construct();
+
+    // open the root file
+    TFile* file = TFile::Open(fileName.c_str(), "r");
+    if (!file) {
+      B2ERROR("openFile: " << fileName << " *** failed to open");
+      return;
+    }
+    B2INFO(fileName << ": open for reading");
+
+    // get histogram and set the DB import object
+    auto* h = (TH1F*) file->Get("moduleT0");
+    if (not h) {
+      B2ERROR("no histogram 'moduleT0' found in the file, nothing imported");
+      return;
+    }
+    int count = 0; // counter of calibrated
+    for (int slot = 1; slot <= h->GetNbinsX(); slot++) {
+      double value = h->GetBinContent(slot);
+      double error = h->GetBinError(slot);
+      moduleT0->setT0(slot, value, error);
+      if (error > 0) {
+        count++;
+      } else {
+        moduleT0->setUnusable(slot);
+      }
+    }
+    file->Close();
+
+    moduleT0->suppressAverage();
+
+    // import the object
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    moduleT0.import(iov);
+
+    B2INFO("Module T0 for exp " << expNo << " run " << firstRun << " to " << lastRun
+           << " imported. Calibrated modules: " << count << "/" << 16);
 
   }
 
@@ -1087,6 +1238,37 @@ namespace Belle2 {
     return;
   }
 
+  void TOPDatabaseImporter::importFrontEndSettings(int lookback, int readoutWin,
+                                                   int extraWin, int offset,
+                                                   int expNo, int firstRun, int lastRun)
+  {
+    DBImportObjPtr<TOPFrontEndSetting> feSetting;
+    feSetting.construct();
+
+    // write-window depths (write-window is 128 samples)
+    std::vector<int> writeDepths;
+    for (int i = 0; i < 3; i++) {
+      writeDepths.push_back(214);
+      writeDepths.push_back(212);
+      writeDepths.push_back(214);
+    }
+    feSetting->setWriteDepths(writeDepths);
+    feSetting->setLookbackWindows(lookback);
+    feSetting->setReadoutWindows(readoutWin);
+    feSetting->setExtraWindows(extraWin);
+    feSetting->setOffset(offset);
+
+    // window shifts
+    std::vector<int> shifts = {0, 0, 1, 1, 1, 2};
+    feSetting->setWindowShifts(shifts);
+
+    IntervalOfValidity iov(expNo, firstRun, expNo, lastRun);
+    feSetting.import(iov);
+
+    B2INFO("Front-end settings imported for exp " << expNo << " run " << firstRun <<
+           " to " << lastRun);
+  }
+
 
   void TOPDatabaseImporter::importDummyCalModuleAlignment(int firstExp, int firstRun,
                                                           int lastExp, int lastRun)
@@ -1209,6 +1391,16 @@ namespace Belle2 {
     return;
   }
 
+  void TOPDatabaseImporter::importDummyCalAsicShift(int firstExp, int firstRun,
+                                                    int lastExp, int lastRun)
+  {
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    DBImportObjPtr<TOPCalAsicShift> asicShift;
+    asicShift.construct();
+    asicShift.import(iov);
+    B2INFO("Dummy TOPCalAsicShift imported");
+  }
+
   void TOPDatabaseImporter::correctTOPPmtQE()
   {
     B2ERROR("Function disabled since the corrected payload TOPPmtQEs already imported");
@@ -1244,6 +1436,35 @@ namespace Belle2 {
              << pmtQECorrected.getEntries() << " PMT's.");
 
   }
+
+
+  void TOPDatabaseImporter::importTimeWalk(PyObject* list, double a, double b,
+                                           int firstExp, int firstRun,
+                                           int lastExp, int lastRun)
+  {
+
+    std::vector<double> params;
+    if (PyList_Check(list)) {
+      for (Py_ssize_t i = 0; i < PyList_Size(list); i++) {
+        PyObject* value = PyList_GetItem(list, i);
+        params.push_back(PyFloat_AsDouble(value));
+        B2INFO(i << " " << params.back());
+      }
+    } else {
+      B2ERROR("Input Python object is not a list");
+      return;
+    }
+
+    DBImportObjPtr<TOPCalTimeWalk> timeWalk;
+    timeWalk.construct();
+    timeWalk->set(params, a, b);
+
+    IntervalOfValidity iov(firstExp, firstRun, lastExp, lastRun);
+    timeWalk.import(iov);
+
+    B2RESULT("Time-walk constants imported");
+  }
+
 
 
 //---- for testing only -- will be removed --------------------------------

@@ -8,8 +8,7 @@
 // Contirbutors: Anze Zupanc, Matic Lubej,
 //-
 
-#ifndef B2BII_CONVERT_MDST_H
-#define B2BII_CONVERT_MDST_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -33,7 +32,12 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <framework/dbobjects/BeamParameters.h>
+#include <analysis/dataobjects/EventExtraInfo.h>
+
+// Replace BeamParameters
+#include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dbobjects/CollisionBoostVector.h>
+#include <mdst/dbobjects/CollisionInvariantMass.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
@@ -60,6 +64,9 @@ typedef HepGeom::Point3D<double> HepPoint3D;
 
 // enable nisKsFinder (needs externals > v00-07-01)
 #define HAVE_NISKSFINDER
+
+// enable goodLambda (needs externals >= v01-08-00)
+#define HAVE_GOODLAMBDA
 
 namespace Belle2 {
 
@@ -96,18 +103,19 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /** Constructor */
     B2BIIConvertMdstModule();
+    /** Destructor */
     virtual ~B2BIIConvertMdstModule() override;
 
-    //! Module functions to be called from main process
+    /** Initialize the module */
     virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun() override;
-    virtual void event() override;
-    virtual void endRun() override;
-    virtual void terminate() override;
+    virtual void beginRun() override; /**< Called when the current run begins. */
+    virtual void event() override; /**< Called for each event */
+    virtual void endRun() override; /**<  Called when the current run is finished.*/
+    virtual void terminate() override; /**< Terminates the module.*/
 
     // Data members
   private:
@@ -124,7 +132,7 @@ namespace Belle2 {
 
     //! flag that tells which form of covariance matrix should be used in the conversion of charged tracks
     // true = use 6x6 (position, momentum) covariance matrix
-    // false = use 5x5 (helix parameters) covaraince matrix
+    // false = use 5x5 (helix parameters) covariance matrix
     bool m_use6x6CovarianceMatrix4Tracks;
 
     //! MC matching mode.
@@ -133,12 +141,35 @@ namespace Belle2 {
     //! C matching mode.
     MCMatchingMode m_mcMatchingMode;
 
+    bool m_convertEvtcls; /**< Flag to switch on conversion of Evtcls table */
+
+    bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */
+
+    bool m_convertRecTrg; /**< Flag to switch on conversion of rectrg_summary3 */
+
+    /**
+     * E9/E25 threshold value
+     * clusters with a value above this threshold are classified as neutral
+     * even if tracks are matched to their connected region (matchType == 2)
+     */
+    double m_matchType2E9oE25Threshold;
+
     //! variable to tell us which IPProfile bin was active last time we looked
     int m_lastIPProfileBin{ -1};
 
     //-----------------------------------------------------------------------------
     // CONVERT TABLES
     //-----------------------------------------------------------------------------
+
+    /**
+     * Reads and converts m_final from rectrg_summary3
+     */
+    void convertRecTrgTable();
+
+    /**
+     * Reads and converts all entries of evtcls Panther table
+     */
+    void convertEvtclsTable();
 
     /**
      * Reads and converts all entries of Gen_hepevt Panther table to MCParticle dataobjects and adds them to StoreArray<MCParticle>.
@@ -181,10 +212,10 @@ namespace Belle2 {
      */
     void convertMdstVee2Table();
 
-    /** Stores beam parameters (energy, angles) in BeamParameters (currently in the DataStore). */
+    /** Stores beam parameters (energy, angles) in CollisionInvariantMass and CollisionBoostVector (currently in the DataStore). */
     void convertBeamEnergy();
 
-    /** Stores the IPProfiles in BeamParameters (currently in DataStore) */
+    /** Stores the IPProfiles in BeamSpot (currently in DataStore) */
     void convertIPProfile(bool beginRun = false);
 
     //-----------------------------------------------------------------------------
@@ -282,7 +313,7 @@ namespace Belle2 {
     /** maps Belle hypotheses to Const::ChargedStable (from http://belle.kek.jp/secured/wiki/doku.php?id=software:atc_pid). */
     const static Const::ChargedStable c_belleHyp_to_chargedStable[c_nHyp];
 
-    /** Add given Belle likelihoods (not log-likelihoods, in Belle hypothethis order) for given detector to pid. */
+    /** Add given Belle likelihoods (not log-likelihoods, in Belle hypothesis order) for given detector to pid. */
     void setLikelihoods(PIDLikelihood* pid, Const::EDetector det, double likelihoods[c_nHyp], bool discard_allzero = false);
 
 #ifdef HAVE_KID_ACC
@@ -292,7 +323,7 @@ namespace Belle2 {
     double cdc_pid(const Belle::Mdst_charged& chg, int idp);
 #endif
 
-    /* calcualtes atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
+    /** calculates atc_pid(3,1,5,sigHyp,bkgHyp).prob() from converted PIDLikelihood */
     double atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp);
 
     //-----------------------------------------------------------------------------
@@ -300,10 +331,9 @@ namespace Belle2 {
     //-----------------------------------------------------------------------------
 
     /**
-     * Sets ECLCluster -> Track relations
+     * Sets Track -> ECLCluster relations
      */
-    void setECLClustersToTracksRelations();
-
+    void setTracksToECLClustersRelations();
 
     /**
      * Sets KLMCluster -> Track and ECLCluster relations
@@ -322,7 +352,7 @@ namespace Belle2 {
     /**
      * Checks if the reconstructed object (Track, ECLCluster, ...) was matched to the same MCParticle
      */
-    void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, std::string objectName);
+    void testMCRelation(const Belle::Gen_hepevt& belleMC, const MCParticle* mcP, const std::string& objectName);
 
     //! MCParticle Graph to build Belle2 MC Particles
     Belle2::MCParticleGraph m_particleGraph;
@@ -356,15 +386,26 @@ namespace Belle2 {
     /** V0-particles. */
     StoreArray<V0> m_v0s;
 
-    /** Partciles. */
+    /** Particles. */
     StoreArray<Particle> m_particles;
 
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
-    /** BeamParameters */
-    DBObjPtr<BeamParameters> m_beamParamsDB;
-    BeamParameters m_beamParams;
+    /** Event Extra Info*/
+    StoreObjPtr<EventExtraInfo> m_evtInfo;
+
+    /** BeamSpot for IP */
+    OptionalDBObjPtr<BeamSpot> m_beamSpotDB;
+    BeamSpot m_beamSpot; /**< Interaction Point of the beam */
+
+    /** CollisionBoostVector for boost vector*/
+    OptionalDBObjPtr<CollisionBoostVector> m_collisionBoostVectorDB;
+    CollisionBoostVector m_collisionBoostVector; /**< CollisionBoostVector for bosst vector of the beam */
+
+    /** CollisionInvariantMass for Invariant Mass of Beam*/
+    OptionalDBObjPtr<CollisionInvariantMass> m_collisionInvMDB;
+    CollisionInvariantMass m_collisionInvM; /**< CollisionInvariantMass for the invariant mass of the beam */
 
     /** CONVERSION OF TRACK ERROR MATRIX ELEMENTS */
     /** Belle error matrix elements are in the following order
@@ -386,5 +427,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

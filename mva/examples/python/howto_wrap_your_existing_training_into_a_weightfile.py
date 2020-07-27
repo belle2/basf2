@@ -80,6 +80,11 @@ if __name__ == "__main__":
     Other Python-based frameworks like sklearn, tensorflow, xgboost, ... have predefined hooks,
     but you can overwrite all of them.
     """
+    from basf2 import conditions
+    # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
+    conditions.testing_payloads = [
+        'localdb/database.txt'
+    ]
 
     # First I create an external sklearn weightfile
     from sklearn.ensemble import GradientBoostingClassifier

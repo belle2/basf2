@@ -104,10 +104,7 @@ namespace Belle2 {
 
     };
 
-    ParticleConstraint::ParticleConstraint()
-    {
-      invalidateCache();
-    }
+    ParticleConstraint::ParticleConstraint() { }
 
   }// end OrcaKinFit namespace
 } // end Belle2 namespace

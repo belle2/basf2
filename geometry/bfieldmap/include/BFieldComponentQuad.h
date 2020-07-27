@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENTQUAD_H
-#define BFIELDCOMPONENTQUAD_H
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
-#include <boost/array.hpp>
 #include <string>
 
 namespace Belle2 {
@@ -44,21 +42,21 @@ namespace Belle2 {
 
     /** Aperture data structure. */
     struct ApertPoint {
-      double s; /**< length along beamline in [cm] */
-      double r; /**< aperture in [cm] */
+      double s{0}; /**< length along beamline in [cm] */
+      double r{0}; /**< aperture in [cm] */
     };
 
     /** Quadrupole lense data structure. This is a flat structure so
     magnetic field has only X and Y components */
     struct ParamPoint3 {
-      double s;   /**< s in [cm] */
-      double L;   /**< element length in [cm] */
-      double mxx; /**< xx coefficents to calculate Bx */
-      double mxy; /**< xy coefficents to calculate Bx */
-      double mx0; /**< x0 coefficents to calculate Bx */
-      double myx; /**< yx coefficents to calculate By */
-      double myy; /**< yy coefficents to calculate By */
-      double my0; /**< y0 coefficents to calculate By */
+      double s{0};   /**< s in [cm] */
+      double L{0};   /**< element length in [cm] */
+      double mxx{0}; /**< xx coefficents to calculate Bx */
+      double mxy{0}; /**< xy coefficents to calculate Bx */
+      double mx0{0}; /**< x0 coefficents to calculate Bx */
+      double myx{0}; /**< yx coefficents to calculate By */
+      double myy{0}; /**< yy coefficents to calculate By */
+      double my0{0}; /**< y0 coefficents to calculate By */
       /**
        * Calculates the X component of the magnetic field vector at
        * the specified space point from a quadrupole lense.
@@ -98,8 +96,8 @@ namespace Belle2 {
 
     /** start and stop indicies to narrow search in array */
     struct irange_t {
-      short int i0; /**< start index */
-      short int i1; /**< stop index */
+      short int i0{0}; /**< start index */
+      short int i1{0}; /**< stop index */
     };
 
     /** The BFieldComponentQuad constructor. */
@@ -230,5 +228,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENTQUAD_H */

@@ -22,6 +22,7 @@
 
 import glob
 from basf2 import *
+import os
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 
@@ -73,7 +74,7 @@ add_reconstruction(path)
 
 output = register_module('RootOutput')
 output.param('outputFileName', output_filename)
-output.param('branchNames', ['MCParticles', 'ExtHits', 'Muids', 'BKLMHit2ds', 'EKLMHit2ds'])
+output.param('branchNames', ['MCParticles', 'ExtHits', 'KLMMuidLikelihoods', 'BKLMHit2ds', 'EKLMHit2ds'])
 path.add_module(output)
 
 process(path)

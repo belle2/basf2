@@ -13,7 +13,6 @@
 #include <framework/core/Module.h>
 
 #include <string>
-#include <memory>
 
 namespace Belle2 {
 

@@ -18,9 +18,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // hit types
-#include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
 
@@ -47,7 +45,7 @@ namespace {
   // with range based for
   template <class Iter>
   struct iter_pair_range : std::pair<Iter, Iter> {
-    iter_pair_range(std::pair<Iter, Iter> const& x)
+    explicit iter_pair_range(std::pair<Iter, Iter> const& x)
       : std::pair<Iter, Iter>(x)
     {
     }

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 #######################################################
 #
@@ -22,8 +21,6 @@ import modularAnalysis as ma
 import variables.collections as vc
 import variables.utils as vu
 import stdCharged as stdc
-from stdV0s import stdKshorts
-from stdPi0s import stdPi0s
 
 # create path
 my_path = b2.create_path()
@@ -49,15 +46,25 @@ ma.reconstructDecay(decayString='D0:kpi -> K-:loose pi+:loose', cut='1.8 < M < 1
 
 # reconstruct D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
-# and D* CMS momentum > 2.5 GeV
-ma.reconstructDecay(decayString='D*+ -> D0:kpi pi+:all', cut='0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=my_path)
+ma.reconstructDecay(decayString='D*+ -> D0:kpi pi+:all', cut='0.0 < Q < 0.2', path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 ma.matchMCTruth(list_name='D*+', path=my_path)
 
 # Select variables that we want to store to ntuple
 dstar_vars = vc.inv_mass + vc.mc_truth
 
+# We now want to select variables for all of the final state hadrons in the
+# decay products, that is, the K- and the two pi+.
+# You already know how to define these variables with the help of the
+# ``daughter`` metavariable: If we consider D^* -> D0 pi+, then we could access
+# information about the pion as daughter(1, variable).
+# Creating aliases for all of these variables would fill the next 100 lines
+# though, so we instead use the ``create_aliases_for_selected`` helper function:
+# We specify a list of variables and then a decay string, with particles
+# selected with a leading ``^``.
+# Again, for more information on how to create aliases, head over to
+# VariableManager/variableAliases.py.
 fs_hadron_vars = vu.create_aliases_for_selected(
     list_of_variables=vc.pid + vc.track + vc.mc_truth,
     decay_string='D*+ -> [D0 -> ^K- ^pi+] ^pi+')

@@ -15,7 +15,6 @@
 #include <geometry/CreatorFactory.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -34,9 +33,9 @@ namespace Belle2 {
 
     FANGSCreator::FANGSCreator(Simulation::SensitiveDetectorBase* sensitive): m_sensitive(sensitive)
     {
-      if (!m_sensitive) {
+      /*if (!m_sensitive) {
         m_sensitive = new SensitiveDetector();
-      }
+      }*/
     }
 
     FANGSCreator::~FANGSCreator()
@@ -48,6 +47,11 @@ namespace Belle2 {
     void FANGSCreator::createShape(const std::string& prefix, const GearDir& params, G4LogicalVolume* parent, double roffset,
                                    bool check)
     {
+
+      if (!m_sensitive) {
+        m_sensitive = new SensitiveDetector();
+      }
+
       std::string name = params.getString("@name");
       if (!prefix.empty()) {
         name = prefix + "." + name;

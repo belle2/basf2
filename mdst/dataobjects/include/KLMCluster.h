@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KLMCLUSTER_H
-#define KLMCLUSTER_H
+#pragma once
 
 /* External headers. */
 #include <TLorentzVector.h>
@@ -80,10 +79,10 @@ namespace Belle2 {
     {return TVector3(m_globalX, m_globalY, m_globalZ);}
 
     /**
-     * Get global position (TVector3 version) of the origin of K0L
-     * (always return (0,0,0) since we believe all K0Ls to originate at or
+     * Get global position (TVector3 version) of the origin of KLMCluster
+     * (always return (0,0,0) since we believe all KLMClusters to originate at or
      * near primary vertex).
-     * @return K0L origin coordinates.
+     * @return KLMCluster origin coordinates.
      */
     inline TVector3 getPosition() const
     {return TVector3(0, 0, 0);}
@@ -194,7 +193,7 @@ namespace Belle2 {
 
     /**
      * Set error of momentum absolute value.
-     * @param[in] errorX Error of momentum absolute value.
+     * @param[in] errorP Error of momentum absolute value.
      */
     void setErrorP(float errorP)
     {m_errorP = errorP;}
@@ -240,6 +239,4 @@ namespace Belle2 {
   };
 
 }
-
-#endif
 

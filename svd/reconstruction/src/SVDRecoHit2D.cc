@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorPlane.h>
@@ -59,7 +58,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, f
 }
 
 SVDRecoHit2D::SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(NULL), m_uCluster(0), m_vCluster(0),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(nullptr), m_uCluster(0), m_vCluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
@@ -81,13 +80,13 @@ SVDRecoHit2D::SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(NULL), m_uCluster(&uHit), m_vCluster(&vHit),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(nullptr), m_uCluster(&uHit), m_vCluster(&vHit),
   m_energyDep(0)
 {
   if ((uHit.getRawSensorID() != vHit.getRawSensorID()) || !uHit.isUCluster() || vHit.isUCluster())
     B2FATAL("Error in SVDRecoHit2D: Incorrect SVDCluster instances on input!");
 
-    m_sensorID = uHit.getRawSensorID();
+  m_sensorID = uHit.getRawSensorID();
 
   // Now that we have a v coordinate, we can rescale u.
   const SVD::SensorInfo& info =
@@ -118,14 +117,14 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHit):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(NULL), m_uCluster(0), m_vCluster(0), m_energyDep(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(nullptr), m_uCluster(0), m_vCluster(0), m_energyDep(0)
 {
   const SVDCluster& uHit = *(uRecoHit.getCluster());
   const SVDCluster& vHit = *(vRecoHit.getCluster());
   if ((uHit.getRawSensorID() != vHit.getRawSensorID()) || !uHit.isUCluster() || vHit.isUCluster())
     B2FATAL("Error in SVDRecoHit2D: Incorrect SVDCluster instances on input!");
 
-    m_sensorID = uHit.getRawSensorID();
+  m_sensorID = uHit.getRawSensorID();
   m_uCluster = &uHit;
   m_vCluster = &vHit;
 
@@ -157,8 +156,6 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHi
   setDetectorPlane();
 }
 
-
-
 void SVDRecoHit2D::setDetectorPlane()
 {
   // Construct a finite detector plane and set it.
@@ -174,9 +171,55 @@ void SVDRecoHit2D::setDetectorPlane()
   setPlane(detPlane, m_sensorID);
 }
 
+TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters,
+                                              const genfit::StateOnPlane& state) const
+{
+  // Legendre parametrization of deformation
+  auto L1 = [](double x) {return x;};
+  auto L2 = [](double x) {return (3 * x * x - 1) / 2;};
+  auto L3 = [](double x) {return (5 * x * x * x - 3 * x) / 2;};
+  auto L4 = [](double x) {return (35 * x * x * x * x - 30 * x * x + 3) / 8;};
+
+  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(m_sensorID));
+
+  double u = rawHit[0];                 // U coordinate of hit
+  double v = rawHit[1];                 // V coordinate of hit
+  double width = geometry.getWidth(v);  // Width of sensor (U side)
+  double length = geometry.getLength(); // Length of sensor (V side)
+  u = u * 2 / width;                    // Legendre parametrization required U in (-1, 1)
+  v = v * 2 / length;                   // Legendre parametrization required V in (-1, 1)
+
+  /* Planar deformation using Legendre parametrization
+     w(u, v) = L_{31} * L2(u) + L_{32} * L1(u) * L1(v) + L_{33} * L2(v) +
+               L_{41} * L3(u) + L_{42} * L2(u) * L1(v) + L_{43} * L1(u) * L2(v) + L_{44} * L3(v) +
+               L_{51} * L4(u) + L_{52} * L3(u) * L1(v) + L_{53} * L2(u) * L2(v) + L_{54} * L1(u) * L3(v) + L_{55} * L4(v); */
+  double dw =
+    planarParameters[0] * L2(u) + planarParameters[1] * L1(u) * L1(v) + planarParameters[2] * L2(v) +
+    planarParameters[3] * L3(u) + planarParameters[4] * L2(u) * L1(v) + planarParameters[5] * L1(u) * L2(v) + planarParameters[6] * L3(
+      v) +
+    planarParameters[7] * L4(u) + planarParameters[8] * L3(u) * L1(v) + planarParameters[9] * L2(u) * L2(v) + planarParameters[10] * L1(
+      u) * L3(v) + planarParameters[11] * L4(v);
+
+  double du_dw = state.getState()[1]; // slope in U direction
+  double dv_dw = state.getState()[2]; // slope in V direction
+
+  u = u * width / 2;  // from Legendre to Local parametrization
+  v = v * length / 2; // from Legendre to Local parametrization
+
+  TVectorD pos(2);
+
+  pos[0] = u + dw * du_dw;
+  pos[1] = v + dw * dv_dw;
+
+  return pos;
+}
+
 std::vector<genfit::MeasurementOnPlane*> SVDRecoHit2D::constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const
 {
-  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(rawHitCoords_, rawHitCov_, state.getPlane(),
+  // Apply planar deformation
+  TVectorD pos = applyPlanarDeformation(rawHitCoords_, VXD::GeoCache::get(m_sensorID).getSurfaceParameters(), state);
+
+  return std::vector<genfit::MeasurementOnPlane*>(1, new genfit::MeasurementOnPlane(pos, rawHitCov_, state.getPlane(),
                                                   state.getRep(), this->constructHMatrix(state.getRep())));
 }
 

@@ -56,6 +56,13 @@ namespace Belle2 {
     };
 
     /**
+    * Converts Const::EDetector object to string.
+    * @param det Const::EDetector object to be converted to string
+    * @return converted string
+    */
+    static std::string parseDetectors(EDetector det);
+
+    /**
      * The DetectorSet class for sets of detector IDs in the form of EDetector
      * values. Only detectors may be included, not subdetectors.
      */
@@ -286,7 +293,7 @@ namespace Belle2 {
        * @param set     Pointer to set this particle belongs to (or NULL if stand-alone).
        * @param index   Index of this particle in 'set'.
        */
-      explicit ParticleType(int pdgCode, const ParticleSet* set = NULL, int index = -1):
+      explicit ParticleType(int pdgCode, const ParticleSet* set = nullptr, int index = -1):
         m_pdgCode(pdgCode), m_set(set), m_index(index)  {}
 
       /** Copy constructor  */
@@ -533,7 +540,7 @@ namespace Belle2 {
     static const ChargedStable proton;    /**< proton particle */
     static const ChargedStable deuteron;  /**< deuteron particle */
 
-    static const Cluster clusterphoton;   /**< electron cluster */
+    static const Cluster clusterphoton;   /**< photon cluster */
     static const Cluster clusterKlong;    /**< K^0_L cluster */
     static const Cluster clusterelectron; /**< electron cluster  */
     static const Cluster clusterpion;     /**< charged hadron cluster */

@@ -9,7 +9,7 @@
     <TimeStep unit="ns">0.8</TimeStep> 
     <MinTime>0.0</MinTime>
     <MaxTime unit="ms">1.0</MaxTime>
-    <PEthres>8.0</PEthres>
+    <PEthres>1.0</PEthres>
     <Ethres>0.05</Ethres>
     <C_keV_to_MIP>805.5</C_keV_to_MIP>
     <C_MIP_to_PE>27</C_MIP_to_PE>

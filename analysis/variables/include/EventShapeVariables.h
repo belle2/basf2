@@ -157,9 +157,9 @@ namespace Belle2 {
     double thrustAxisY(const Particle* particle);
 
     /**
-     * Returns the Y component of the thrust axis
+     * Returns the Z component of the thrust axis
      */
-    double thrustAxisY(const Particle* particle);
+    double thrustAxisZ(const Particle* particle);
 
     /**
      * Returns cos(polar_angle) of the thrust axis

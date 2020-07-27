@@ -13,13 +13,10 @@
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 
@@ -52,12 +49,16 @@ namespace Belle2 {
     // Add parameters
     addParam("useSampleTimeCalibration", m_useSampleTimeCalibration,
              "if true, use sample time calibration", true);
+    addParam("useAsicShiftCalibration", m_useAsicShiftCalibration,
+             "if true, use ASIC shifts calibration", true);
     addParam("useChannelT0Calibration", m_useChannelT0Calibration,
              "if true, use channel T0 calibration", true);
     addParam("useModuleT0Calibration", m_useModuleT0Calibration,
              "if true, use module T0 calibration", true);
     addParam("useCommonT0Calibration", m_useCommonT0Calibration,
              "if true, use common T0 calibration", true);
+    addParam("useTimeWalkCalibration", m_useTimeWalkCalibration,
+             "if true, use time-walk calibration", true);
     addParam("subtractBunchTime", m_subtractBunchTime,
              "if true, subtract reconstructed bunch time", true);
 
@@ -84,32 +85,53 @@ namespace Belle2 {
     // check if calibrations are available when needed - if not, terminate
 
     if (m_useSampleTimeCalibration) {
-      if (!m_timebase.isValid()) {
+      if (not m_timebase.isValid()) {
         B2FATAL("Sample time calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
     if (m_useChannelT0Calibration) {
-      if (!m_channelT0.isValid()) {
+      if (not m_channelT0.isValid()) {
         B2FATAL("Channel T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
+    if (m_useAsicShiftCalibration) {
+      if (not m_asicShift.isValid()) {
+        B2FATAL("ASIC shifts calibration requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
+    }
     if (m_useModuleT0Calibration) {
-      if (!m_moduleT0.isValid()) {
+      if (not m_moduleT0.isValid()) {
         B2FATAL("Module T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
     if (m_useCommonT0Calibration) {
-      if (!m_commonT0.isValid()) {
+      if (not m_commonT0.isValid()) {
         B2FATAL("Common T0 calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
+    }
+    if (m_useTimeWalkCalibration) {
+      if (not m_timeWalk.isValid()) {
+        // B2FATAL("Time-walk calibration requested but not available for run "
+        B2WARNING("Time-walk calibration is not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment());
+      }
+    }
+
+    if (not m_feSetting.isValid()) {
+      B2FATAL("Front-end settings are not available for run "
+              << evtMetaData->getRun()
+              << " of experiment " << evtMetaData->getExperiment());
     }
 
   }
@@ -118,7 +140,8 @@ namespace Belle2 {
   {
     int revo9cnt = m_recBunch->getRevo9Counter();
     double SSTfrac = (revo9cnt % 6) / 6.0;
-    double timeOffset = SSTfrac * m_syncTimeBase;  // in [ns], to be subtracted
+    double offset = m_feSetting->getOffset() / 24.0;
+    double timeOffset = (SSTfrac + offset) * m_syncTimeBase;  // in [ns], to be subtracted
     const auto& feMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
@@ -142,7 +165,7 @@ namespace Belle2 {
       if (m_useSampleTimeCalibration) {
         auto bs = channel / 128;
         const auto* feemap = feMapper.getMap(moduleID, bs);
-        if (!feemap) {
+        if (not feemap) {
           B2ERROR("No front-end map available."
                   << LogVar("slot", moduleID)
                   << LogVar("boardstack", bs));
@@ -157,11 +180,22 @@ namespace Belle2 {
       double time = sampleTimes->getTime(window, rawTimeLeading) - timeOffset;
 
       // apply other calibrations
+      if (m_useTimeWalkCalibration and m_timeWalk.isValid()) {
+        if (m_timeWalk->isCalibrated()) {
+          time -= m_timeWalk->getTimeWalk(digit.getPulseHeight());
+        }
+      }
       if (m_useChannelT0Calibration) {
         const auto& cal = m_channelT0;
         if (cal->isCalibrated(moduleID, channel)) {
           time -= cal->getT0(moduleID, channel);
           statusBits |= TOPDigit::c_ChannelT0Calibrated;
+        }
+      }
+      if (m_useAsicShiftCalibration) {
+        auto asic = channel / 8;
+        if (m_asicShift->isCalibrated(moduleID, asic)) {
+          time -= m_asicShift->getT0(moduleID, asic);
         }
       }
       if (m_useModuleT0Calibration) {

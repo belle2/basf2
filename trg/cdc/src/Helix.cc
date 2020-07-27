@@ -13,7 +13,6 @@
 
 #include <math.h>
 #include <float.h>
-#include <exception>
 #include "trg/cdc/Helix.h"
 #include "CLHEP/Matrix/Matrix.h"
 
@@ -24,12 +23,15 @@ namespace Belle2 {
 //  const double
 //  TRGCDCHelix::m_ALPHA = 222.376063;       // = 10000. / 2.99792458 / BFIELD
 
+  /// 2*PI
   const double
   M_PI2 = 2. * M_PI;
 
+  /// 4*PI
   const double
   M_PI4 = 4. * M_PI;
 
+  /// 8*PI
   const double
   M_PI8 = 8. * M_PI;
 

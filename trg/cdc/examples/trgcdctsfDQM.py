@@ -20,7 +20,7 @@ set_log_level(LogLevel.DEBUG)
 
 main = create_path()
 
-if argc == 2 and argvs[1][-6:0] == ".sroot":
+if argc == 2 and argvs[1][-6:] == ".sroot":
     f_in_root = argvs[1]
     input = register_module('SeqRootInput')
     matchobj = re.search(r"([^\/]+)\.sroot", f_in_root)
@@ -43,21 +43,16 @@ main.add_module(input)
 histo = register_module('HistoManager')
 histo.param("histoFileName", "dqm.%s.root" % basename)
 
-# Unpacker
-trgcdctsfUnpacker = register_module("TRGCDCTSFUnpacker")
-trgcdctsfUnpacker.param('TSFMOD', 0)
-main.add_module(trgcdctsfUnpacker)
+
+nmod = [0, 1, 2, 3, 4, 5, 6]
+for mod in nmod:
+    # Unpacker
+    main.add_module('TRGCDCTSFUnpacker', TSFMOD=mod)
+
+    # DQM
+    main.add_module('TRGCDCTSFDQM', TSFMOD=mod)
+
 main.add_module(histo)
-
-# DQM
-trgcdctsfdqm = register_module('TRGCDCTSFDQM')
-trgcdctsfdqm.param('generatePostscript', True)
-trgcdctsfdqm.param('TSFMOD', 0)
-# postscript file name
-psname = "dqm.%s.ps" % basename
-trgcdctsfdqm.param('postScriptName', psname)
-
-main.add_module(trgcdctsfdqm)
 
 progress = register_module('Progress')
 main.add_module(progress)

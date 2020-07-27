@@ -10,7 +10,6 @@
 
 #pragma once
 #include <TObject.h>
-#include <TList.h>
 #include <string>
 #include <TTimeStamp.h>
 #include <arich/dbobjects/ARICHFEBoardInfo.h>

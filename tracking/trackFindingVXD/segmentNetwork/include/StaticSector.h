@@ -36,10 +36,14 @@ namespace Belle2 {
     /// CONSTRUCTORS
 
     /** standard constructor */
-    StaticSector() : m_secID(FullSecID()), m_compactSecIDsMap(nullptr) { }
+    StaticSector() :
+      m_secID(FullSecID()), m_compactSecIDsMap(nullptr)
+    {}
 
     /** constructor */
-    StaticSector(FullSecID secID) : m_secID(secID), m_compactSecIDsMap(nullptr) {}
+    explicit StaticSector(FullSecID secID) :
+      m_secID(secID), m_compactSecIDsMap(nullptr)
+    {}
 
 
     // ACCESSOR FUNCTIONS
@@ -242,9 +246,9 @@ namespace Belle2 {
         char typeID = accessor[index].first;
         void* valuePtr = accessor[index].second;
         if (typeID == TBranchLeafType(double())) x = *((double*)valuePtr);
-        else if (typeID == TBranchLeafType(int())) x = *((int*)valuePtr);
-        else if (typeID == TBranchLeafType(float())) x = *((float*)valuePtr);
-        else if (typeID == TBranchLeafType(bool())) x = *((bool*)valuePtr);
+        else if (typeID == TBranchLeafType(int())) x = (double)(*((int*)valuePtr));
+        else if (typeID == TBranchLeafType(float())) x = (double)(*((float*)valuePtr));
+        else if (typeID == TBranchLeafType(bool())) x = (double)(*((bool*)valuePtr));
         else {
           B2FATAL("Unrecognized type : " << typeID);
         } // end else if

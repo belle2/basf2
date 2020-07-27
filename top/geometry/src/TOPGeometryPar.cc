@@ -11,7 +11,6 @@
 
 #include <top/geometry/TOPGeometryPar.h>
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogSystem.h>
@@ -99,10 +98,13 @@ namespace Belle2 {
       }
       if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
         m_oldPayload = true;
-        B2WARNING("TOPGeometry: old payload found, pixel dependent PDE will not be used");
+        B2WARNING("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tag");
       }
       if ((*m_geoDB)->getTTSes().empty()) {
-        B2WARNING("TOPGeometry: old payload found, nominal TTS will be used");
+        B2WARNING("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tag");
+      }
+      if ((*m_geoDB)->arePDETuningFactorsEmpty()) {
+        B2WARNING("TOPGeometry: old payload revision (before bugfix and update of optical properties)");
       }
 
       // Make sure that we abort as soon as the geometry changes
@@ -208,8 +210,8 @@ namespace Belle2 {
       auto pixelID = pmtArray.getPixelID(pmtID, pmtPixel);
       auto channel = getChannelMapper().getChannel(pixelID);
 
-      double RQE = 1.0;
-      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+      double RQE = geo->getPDETuningFactor(getPMTType(moduleID, pmtID));
+      if (m_channelRQE.isValid()) RQE *= m_channelRQE->getRQE(moduleID, channel);
 
       return pmtQE->getEfficiency(pmtPixel, lambda, m_BfieldOn) * RQE;
 
@@ -220,9 +222,10 @@ namespace Belle2 {
     {
 
       auto channel = getChannelMapper().getChannel(pixelID);
+      auto pmtID = getChannelMapper().getPmtID(pixelID);
 
-      double RQE = 1.0;
-      if (m_channelRQE.isValid()) RQE = m_channelRQE->getRQE(moduleID, channel);
+      double RQE = getGeometry()->getPDETuningFactor(getPMTType(moduleID, pmtID));
+      if (m_channelRQE.isValid()) RQE *= m_channelRQE->getRQE(moduleID, channel);
 
       double thrEffi = 1.0;
       if (m_thresholdEff.isValid()) thrEffi = m_thresholdEff->getThrEff(moduleID, channel);
@@ -295,9 +298,17 @@ namespace Belle2 {
         }
       }
 
+      std::map<std::string, const TOPPmtInstallation*> map;
+      for (const auto& pmt : m_pmtInstalled) {
+        map[pmt.getSerialNumber()] = &pmt;
+      }
+      const auto* geo = getGeometry();
+
       std::vector<float> envelopeQE;
       for (const auto& pmt : m_pmtQEData) {
         float ce = pmt.getCE(m_BfieldOn);
+        auto pmtInstalled = map[pmt.getSerialNumber()];
+        if (pmtInstalled) ce *= geo->getPDETuningFactor(pmtInstalled->getType());
         if (pmt.getLambdaFirst() == lambdaFirst and pmt.getLambdaStep() == lambdaStep) {
           const auto& envelope = pmt.getEnvelopeQE();
           if (envelopeQE.size() < envelope.size()) {
@@ -520,8 +531,8 @@ namespace Belle2 {
           for (const GearDir& slot : displacedGeometry.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: DisplacedGeometry.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             TOPGeoModuleDisplacement moduleDispl(slot.getLength("x"),
@@ -545,8 +556,8 @@ namespace Belle2 {
           for (const GearDir& slot : displacedPMTArrays.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: DisplacedPMTArrays.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             TOPGeoPMTArrayDisplacement arrayDispl(slot.getLength("x"),
@@ -567,7 +578,8 @@ namespace Belle2 {
           for (const GearDir& slot : brokenGlues.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID " << moduleID);
+              B2WARNING("TOPGeometryPar: BrokenGlues.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
@@ -592,8 +604,8 @@ namespace Belle2 {
           for (const GearDir& slot : peelOff.getNodes("Slot")) {
             int moduleID = slot.getInt("@ID");
             if (!geo->isModuleIDValid(moduleID)) {
-              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID "
-                        << moduleID);
+              B2WARNING("TOPGeometryPar: PeelOffCookiess.xml: invalid moduleID."
+                        << LogVar("moduleID", moduleID));
               continue;
             }
             auto& module = const_cast<TOPGeoModule&>(geo->getModule(moduleID));
@@ -740,6 +752,7 @@ namespace Belle2 {
       GearDir pmtTTSParams(content, "TTSofPMTs");
       for (const GearDir& ttsPar : pmtTTSParams.getNodes("TTSpar")) {
         int type = ttsPar.getInt("type");
+        double tuneFactor = ttsPar.getDouble("PDEtuneFactor");
         TOPNominalTTS tts("TTS of " + ttsPar.getString("@name") + " PMT");
         tts.setPMTType(type);
         for (const GearDir& Gauss : ttsPar.getNodes("Gauss")) {
@@ -749,6 +762,7 @@ namespace Belle2 {
         }
         tts.normalize();
         geo->appendTTS(tts);
+        geo->appendPDETuningFactor(type, tuneFactor);
       }
 
       // nominal TDC
@@ -850,7 +864,7 @@ namespace Belle2 {
 
 
     TOPGeoBarSegment TOPGeometryPar::createBarSegment(const GearDir& content,
-                                                      const std::string SN)
+                                                      const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "QuartzBars/QuartzBar[@SerialNumber='" + SN + "']");
@@ -873,7 +887,7 @@ namespace Belle2 {
 
 
     TOPGeoMirrorSegment TOPGeometryPar::createMirrorSegment(const GearDir& content,
-                                                            const std::string SN)
+                                                            const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "Mirrors/Mirror[@SerialNumber='" + SN + "']");
@@ -903,7 +917,7 @@ namespace Belle2 {
 
 
     TOPGeoPrism TOPGeometryPar::createPrism(const GearDir& content,
-                                            const std::string SN)
+                                            const std::string& SN)
     {
       // dimensions and material
       GearDir params(content, "Prisms/Prism[@SerialNumber='" + SN + "']");

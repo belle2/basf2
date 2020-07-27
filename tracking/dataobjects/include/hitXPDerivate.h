@@ -9,22 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <svd/dataobjects/SVDDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
-#include <vxd/geometry/GeoCache.h>
-#include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorInfoBase.h>
-#include <TFile.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <tracking/dataobjects/MCParticleInfo.h>
 #include <tracking/dataobjects/hitXP.h>
-
-
 
 namespace Belle2 {
 
@@ -42,7 +32,7 @@ namespace Belle2 {
     /** constructor for SVD hit
     * with arguments:  hit, cluster, particle, sensor info)
     */
-    hitXPDerivate(const SVDTrueHit& hit, const SVDCluster cluster, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
+    hitXPDerivate(const SVDTrueHit& hit, const SVDCluster& cluster, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
 
     /** constructor for PXD hit
     * with arguments:  hit, particle, sensor info)

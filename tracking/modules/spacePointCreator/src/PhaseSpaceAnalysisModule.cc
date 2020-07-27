@@ -82,6 +82,7 @@ void PhaseSpaceAnalysisModule::initialize()
     }
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       string output;
+      // cppcheck-suppress useStlAlgorithm
       for (string id : m_PARAMrootFileName) { output += "'" + id + "' "; }
       B2FATAL("PhaseSpaceAnalysis::initialize() : rootFileName is set wrong: entries are: " << output);
     }
@@ -102,6 +103,7 @@ void PhaseSpaceAnalysisModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCounter = eventMetaDataPtr->getEvent();
   string arrayNames;
+  // cppcheck-suppress useStlAlgorithm
   for (string name : m_PARAMcontainerNames) { arrayNames += " " + name; }
   B2DEBUG(10, "PhaseSpaceAnalysis::event(). Processing event " << eventCounter << " for StoreArray names :" << arrayNames);
 

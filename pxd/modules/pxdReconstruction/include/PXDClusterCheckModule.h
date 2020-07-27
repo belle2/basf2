@@ -8,17 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDClusterCheckModule_H
-#define PXDClusterCheckModule_H
+#pragma once
 
 #include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/reconstruction/Pixel.h>
 #include <string>
 
 namespace Belle2 {
-  class RelationArray;
-  class RelationElement;
 
   namespace PXD {
 
@@ -48,5 +43,3 @@ namespace Belle2 {
 
   } //end PXD namespace;
 } // end namespace Belle2
-
-#endif // PXDClusterCheckModule_H

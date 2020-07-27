@@ -1,0 +1,74 @@
+Changes in the analysis package
+-------------------------------
+
+Variables
++++++++++
+
+There have been improvements and additions to the variables available in the variable manager.
+Some older, unhelpful, or deprecated variables have been removed, but this should be less than previous major releases.
+As usual, please ask at https://questions.belle2.org if anything is unclear or your favourite variable seems to have been removed.  There is likely a good reason.
+
+* Addition of `vertex information <vertex_information>`, `flight distance information <flight_information>`, and MC hierarchy information (:b2:var:`mcMother` and :b2:var:`mcDaughter` metavariables).
+
+* Some variables that check lists (:b2:var:`isInList` and :b2:var:`isDaughterOfList`).
+
+* Additions and fixes to the `RestOfEvent variables <restOfEventVariables>`.
+  Kinematics related to the `RestOfEvent` now obey the reference frame syntax (e.g. :b2:var:`useCMSFrame`).
+
+* Bug-fixes to L1 trigger information (prescales are now available in :b2:var:`L1PSNMBitPrescale`), and event level tracking information.
+
+* Special variables to return the :math:`\phi` angle difference between two daughters (:b2:var:`daughterDiffOfPhi` c.f. :b2:var:`daughterDiffOf`).
+
+* **Removal** of the PhysicsTriggerVariables (all of which were experimental and only intended for use in the study of triggers).
+
+  .. seealso::
+      Pull request `[PR#2581] <https://stash.desy.de/projects/B2/repos/software/pull-requests/2581>`_
+
+New Modular Analysis Tools
+++++++++++++++++++++++++++
+
+* Multiple particle lists may be written to the same file with `VariablesToNtuple <v2nt>`.
+
+* A new improved `RestOfEvent` which takes particle lists as input. The syntax is mostly backward-compatible, but please check the `updated documentation <RestOfEvent>` if your analysis relies on this functionality.
+  In addition some new features are added (such as nested `RestOfEvent`).
+
+* Separation of `EventShape <eventShapeVariables>` and `EventKinematics <eventKinematicsVariables>` and addition of many global event shape variables based on particle lists. 
+
+  .. seealso::
+ 	`This event shape / continuum suppression tutorial <https://confluence.desy.de/download/attachments/99515171/Continuum_suppression_lecture_V2.pdf>`_ (October 2018) for more details.
+
+Fitters
++++++++
+
+* Many improvements to **TreeFitter**, which is now the recommended vertex fitter almost all use cases, even for simple vertices with two tracks.
+  Please refer to the `TreeFitter documentation <treeFitter>` for full details.
+
+  .. seealso::
+ 	`This TreeFitter tutorial <https://confluence.desy.de/download/attachments/99515171/slides_oct_2018.pdf>`_ (October 2018).
+
+* Bug fixes to OrcaKinFit.
+
+* KFit is now accessible from other `basf2` modules.
+
+Loading V0 Particles
+++++++++++++++++++++
+
+* When loading V0 particles (i.e. :math:`K_S^0`, :math:`\Lambda^0`, or converted photons) using the ParticleLoader (`fillParticleList`) you must now specify the daughters in a decay string.
+  For example, to load :math:`\Lambda^0\to p^+\pi^-` decays from V0s:
+
+  .. code-block:: python
+
+	from modularAnalysis import fillParticleList
+        fillParticleList('Lambda0 -> p+ pi-', '0.9 < M < 1.3', path=mypath)
+
+Tutorials and Examples
+++++++++++++++++++++++
+
+* The style of many of the tutorial scripts have been updated to assist with and provide examples of these new changes.
+  See:
+
+  .. code-block:: text
+
+	$BELLE2_RELEASE_DIR/analysis/examples/tutorials
+
+

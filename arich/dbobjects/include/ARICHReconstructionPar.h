@@ -57,6 +57,15 @@ namespace Belle2 {
     }
 
     /**
+     * Set flat background per pad
+     * @param flatBkgPerPad value of flat background per pad
+     */
+    void setFlatBkgPerPad(const float flatBkgPerPad)
+    {
+      m_flatBkgPerPad = flatBkgPerPad;
+    }
+
+    /**
      * Set additional cherenkov angle PDF parameters
      * @param pars vector of parameters
      */
@@ -104,12 +113,21 @@ namespace Belle2 {
     }
 
     /**
+     * Get flat background per pad
+     * @return flat background per pad
+     */
+    float getFlatBkgPerPad() const
+    {
+      return m_flatBkgPerPad;
+    }
+
+    /**
     * Get expected number of background hits for pad at given theta
     * @param th_cer pad theta angle
     * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
     * @return expected number of backgrond hits on pad
     */
-    double getBackgroundPerPad(double th_cer, std::vector<double>& pars) const;
+    double getBackgroundPerPad(double th_cer, const std::vector<double>& pars) const;
 
     /**
      * Get number of expected background hits in ring (0.1<theta<0.5rad by default)

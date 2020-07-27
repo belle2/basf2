@@ -11,14 +11,11 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/processing/AxialTrackUtil.h>
-#include <tracking/trackFindingCDC/processing/LowHitsAxialTrackUtil.h>
 
 #include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class Vector2D;
 
     /**
      *  Base class that receives candidates found by quadtree.
@@ -27,7 +24,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      BaseCandidateReceiver(std::vector<const CDCWireHit*> allAxialWireHits);
+      explicit BaseCandidateReceiver(std::vector<const CDCWireHit*> allAxialWireHits);
       /// Destructor
       virtual ~BaseCandidateReceiver();
       /// Main entry point for the post processing call from the QuadTreeProcessor

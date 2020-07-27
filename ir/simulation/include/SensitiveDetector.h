@@ -9,11 +9,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef IR_SENSITIVEDETECTOR_H_
-#define IR_SENSITIVEDETECTOR_H_
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <ir/dataobjects/IRSimHit.h>
 
 namespace Belle2 {
   namespace ir {
@@ -51,7 +49,7 @@ namespace Belle2 {
 
       /**
        * Process each step and calculate variables defined in IRSimHit.
-       * @param step Current Geant4 step in the sensitive medium.
+       * @param aStep Current Geant4 step in the sensitive medium.
        * @result true if a hit was stored, o.w. false.
        */
       bool step(G4Step* aStep, G4TouchableHistory*) override;
@@ -61,5 +59,3 @@ namespace Belle2 {
     }; // SensitiveDetector class
   } //end of namespace IR
 } // end of namespace Belle2
-
-#endif /* IR_SENSITIVEDETECTOR_H_ */

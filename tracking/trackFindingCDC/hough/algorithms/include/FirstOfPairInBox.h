@@ -20,8 +20,9 @@ namespace Belle2 {
     template<class AHitInBoxAlgorithm>
     class FirstOfPairInBox {
     public:
-      /// The type of the underlaying HoughBox (copied from the underlaying hit algorithm)
+      /// The type of the underlying HoughBox (copied from the underlying hit algorithm)
       using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
+      /// The hit-finding algorithm
       using BoxAlgorithm = AHitInBoxAlgorithm;
 
       /// Redirect the first element of a pair to the next algorithm.

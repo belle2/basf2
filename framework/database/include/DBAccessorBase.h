@@ -131,6 +131,21 @@ namespace Belle2 {
       addCallback([ = ](const std::string&) {(*object.*callback)();});
     }
 
+    /** Return current revision of the object */
+    unsigned int getRevision() const { ensureAttached(); return m_entry->getRevision(); }
+
+    /** Return current IoV of the object */
+    IntervalOfValidity getIoV() const { ensureAttached(); return m_entry->getIoV(); }
+
+    /** Get current checksum */
+    const std::string& getChecksum() const { ensureAttached(); return m_entry->getChecksum(); }
+
+    /** Get the filename this object is loaded from */
+    const std::string& getFilename() const { ensureAttached(); return m_entry->getFilename(); }
+
+    /** Check whether this conditions object is required (at least one user declared it as required) */
+    bool isRequired() const { ensureAttached(); return m_entry->isRequired(); }
+
   protected:
     /** Return a pointer to the Object already cast to the correct type */
     template<class T = TObject> const T * getObject() const

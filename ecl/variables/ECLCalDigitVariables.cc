@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2018 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -14,17 +14,20 @@
 // framework
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 
 // dataobjects
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLCellIdMapping.h>
 #include <tracking/dataobjects/ExtHit.h>
+
+#include <ecl/dataobjects/ECLDsp.h>
 
 using namespace std;
 
@@ -40,11 +43,19 @@ namespace Belle2 {
       twoComponentChi2 = 10,
       twoComponentTotalEnergy = 11,
       twoComponentHadronEnergy = 12,
+      twoComponentDiodeEnergy = 13,
+      twoComponentSavedChi2_PhotonHadron = 14,
+      twoComponentSavedChi2_PileUpPhoton = 15,
+      twoComponentSavedChi2_PhotonDiode = 16,
+      twoComponentFitType = 17,
+      weight = 18,
       phi = 20,
       theta = 21,
       phiId = 22,
       thetaId = 23,
-      cellId = 24
+      cellId = 24,
+      mcenergy = 25,
+      usedforenergy = 26
     };
 
     // enum with available center types
@@ -104,6 +115,83 @@ namespace Belle2 {
       return -1;
     }
 
+    //! @returns variable requested (expert function, only called from this file)
+    double getCalDigitExpertByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (energy rank, variable id).");
+      }
+
+      if (int(std::lround(vars[0])) < 0)  B2FATAL("Index cannot be negative.");
+
+      const unsigned int indexIn = int(std::lround(vars[0]));
+
+      const int varid = int(std::lround(vars[1]));
+
+      //EnergyToSort vector is used for sorting digits by digit energy measured by FPGAs
+      std::vector<std::tuple<double, unsigned int>> energyToSort;
+
+      const ECLCluster* cluster = particle->getECLCluster();
+
+      if (cluster) {
+
+        auto relatedDigits = cluster->getRelationsTo<ECLCalDigit>();
+
+        if (indexIn < relatedDigits.size()) {
+
+          for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
+
+            const auto caldigit = relatedDigits.object(iRel);
+
+            energyToSort.emplace_back(caldigit->getEnergy(), iRel);
+
+          }
+
+        } else {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+
+        std::sort(energyToSort.begin(), energyToSort.end(), std::greater<>());
+
+        const auto [digitEnergy, caldigitIndex] = energyToSort[indexIn];
+
+        const auto caldigitSelected = relatedDigits.object(caldigitIndex);
+
+        if (varid == varType::energy) {
+          return caldigitSelected->getEnergy();
+        } else if (varid == varType::time) {
+          return caldigitSelected->getTime();
+        } else if (varid == varType::twoComponentChi2) {
+          return caldigitSelected->getTwoComponentChi2();
+        } else if (varid == varType::twoComponentTotalEnergy) {
+          return caldigitSelected->getTwoComponentTotalEnergy();
+        } else if (varid == varType::twoComponentHadronEnergy) {
+          return caldigitSelected->getTwoComponentHadronEnergy();
+        } else if (varid == varType::twoComponentSavedChi2_PhotonHadron) {
+          return caldigitSelected->getTwoComponentSavedChi2(ECLDsp::photonHadron);
+        } else if (varid == varType::twoComponentSavedChi2_PileUpPhoton) {
+          return caldigitSelected->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton);
+        } else if (varid == varType::twoComponentSavedChi2_PhotonDiode) {
+          return caldigitSelected->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing);
+        } else if (varid == varType::twoComponentDiodeEnergy) {
+          return caldigitSelected->getTwoComponentDiodeEnergy();
+        } else if (varid == varType::twoComponentFitType) {
+          return int(caldigitSelected->getTwoComponentFitType());
+        } else if (varid == varType::cellId) {
+          return caldigitSelected->getCellId();
+        } else if (varid == varType::weight) {
+          const auto weight = relatedDigits.weight(caldigitIndex);
+          return weight;
+        } else {
+          B2FATAL("variable id not found.");
+        }
+
+      }
+
+      return std::numeric_limits<double>::quiet_NaN();
+
+    }
 
     //! @returns variable requested (expert function, only called from this file)
     double getCalDigitExpert(const Particle* particle, const std::vector<double>& vars)
@@ -186,6 +274,44 @@ namespace Belle2 {
             return eclCalDigits[storearraypos]->getTwoComponentTotalEnergy();
           } else if (varid == varType::twoComponentHadronEnergy) {
             return eclCalDigits[storearraypos]->getTwoComponentHadronEnergy();
+          } else if (varid == varType::twoComponentSavedChi2_PhotonHadron) {
+            return eclCalDigits[storearraypos]->getTwoComponentSavedChi2(ECLDsp::photonHadron);
+          } else if (varid == varType::twoComponentSavedChi2_PileUpPhoton) {
+            return eclCalDigits[storearraypos]->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton);
+          } else if (varid == varType::twoComponentSavedChi2_PhotonDiode) {
+            return eclCalDigits[storearraypos]->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing);
+          } else if (varid == varType::twoComponentDiodeEnergy) {
+            return eclCalDigits[storearraypos]->getTwoComponentDiodeEnergy();
+          } else if (varid == varType::twoComponentFitType) {
+            return int(eclCalDigits[storearraypos]->getTwoComponentFitType());
+          } else if (varid == varType::mcenergy) {
+            // loop over all related MCParticles
+            auto digitMCRelations = eclCalDigits[storearraypos]->getRelationsTo<MCParticle>();
+            double edep = 0.0;
+            for (unsigned int i = 0; i < digitMCRelations.size(); ++i) {
+              edep += digitMCRelations.weight(i);
+            }
+            return edep;
+          } else if (varid == varType::usedforenergy) {
+            const ECLCluster* cluster = particle->getECLCluster();
+            if (cluster) {
+              unsigned int cellid = eclCalDigits[storearraypos]->getCellId();
+
+              std::vector<unsigned int> listCellIds;
+              auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>(); // should never happen to have more than one shower
+              for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
+                const auto shower = clusterShowerRelations.object(ir);
+                listCellIds = shower->getListOfCrystalsForEnergy();
+              }
+
+              if (std::find(listCellIds.begin(), listCellIds.end(), cellid) != listCellIds.end()) { //find is faster than count
+                return 1;
+              }
+
+              return 0;
+            }
+            return std::numeric_limits<double>::quiet_NaN();
+
           }
         } else {
           return std::numeric_limits<double>::quiet_NaN();
@@ -199,6 +325,126 @@ namespace Belle2 {
 
   namespace Variable {
 
+    //! @returns the eclcaldigit energy by digit energy rank
+    double getECLCalDigitEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::energy};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit Time by digit energy rank
+    double getECLCalDigitTimeByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::time};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit cell id by digit energy rank
+    double getCellIdByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::cellId};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit fit type by digit energy rank
+    double getTwoComponentFitTypeByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentFitType};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component chi2 by digit energy rank
+    double getTwoComponentChi2ByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentChi2};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component total energy by digit energy rank
+    double getTwoComponentTotalEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentTotalEnergy};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component hadron energy by digit energy rank
+    double getTwoComponentHadronEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentHadronEnergy};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component diode energy by digit energy rank
+    double getTwoComponentDiodeEnergyByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentDiodeEnergy};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component chi2 for photon+hadron fit type by digit energy rank
+    double getTwoComponentChi2SavedByEnergyRank_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonHadron};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component chi2 for photon+hadron + pile-up photon fit type by digit energy rank
+    double getTwoComponentChi2SavedByEnergyRank_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentSavedChi2_PileUpPhoton};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component chi2 for photon+diode fit type by digit energy rank
+    double getTwoComponentChi2SavedByEnergyRank_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonDiode};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit weight by digit energy rank
+    double getWeightByEnergyRank(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 1) {
+        B2FATAL("Need exactly one parameters (energy index).");
+      }
+      std::vector<double> parameters {vars[0], ECLCalDigitVariable::varType::weight};
+      return ECLCalDigitVariable::getCalDigitExpertByEnergyRank(particle, parameters);
+    }
+
     //! @returns the eclcaldigit energy
     double getECLCalDigitEnergy(const Particle* particle, const std::vector<double>& vars)
     {
@@ -209,6 +455,18 @@ namespace Belle2 {
       std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::energy, ECLCalDigitVariable::centerType::maxCell};
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
+
+    //! @returns the MC deposited energy
+    double getMCEnergy(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::mcenergy, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
 
     //! @returns the eclcaldigit energy from ext
     double getExtECLCalDigitEnergy(const Particle* particle, const std::vector<double>& vars)
@@ -321,6 +579,17 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
+    //! @returns the 1 if the eclcladigit was used in the energy calculation
+    double getUsedForClusterEnergy(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::usedforenergy, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
     //! @returns the eclcaldigit two component hadron energy from ext
     double getExtECLCalDigitTwoComponentHadronEnergy(const Particle* particle, const std::vector<double>& vars)
     {
@@ -329,6 +598,116 @@ namespace Belle2 {
       }
 
       std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentHadronEnergy, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component Diode energy
+    double getECLCalDigitTwoComponentDiodeEnergy(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentDiodeEnergy, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component Diode energy from ext
+    double getExtECLCalDigitTwoComponentDiodeEnergy(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentDiodeEnergy, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component Fit Type
+    double getECLCalDigitTwoComponentFitType(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentFitType, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component Fit Type from ext
+    double getExtECLCalDigitTwoComponentFitType(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentFitType, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PhotonHadron fit
+    double getECLCalDigitTwoComponentChi2Saved_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonHadron, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PhotonHadron fit from ext
+    double getExtECLCalDigitTwoComponentChi2Saved_PhotonHadron(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonHadron, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PileUpPhoton fit
+    double getECLCalDigitTwoComponentChi2Saved_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PileUpPhoton, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PileUpPhoton fit from ext
+    double getExtECLCalDigitTwoComponentChi2Saved_PileUpPhoton(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PileUpPhoton, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PhotonDiode fit
+    double getECLCalDigitTwoComponentChi2Saved_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonDiode, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit two component saved chi2 for PhotonDiode fit from ext
+    double getExtECLCalDigitTwoComponentChi2Saved_PhotonDiode(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::twoComponentSavedChi2_PhotonDiode, ECLCalDigitVariable::centerType::extCell};
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
@@ -343,6 +722,17 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
+    //! @returns the eclcaldigit phi from ext
+    double getExtPhi(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::phi, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
     //! @returns the eclcaldigit theta
     double getTheta(const Particle* particle, const std::vector<double>& vars)
     {
@@ -351,6 +741,17 @@ namespace Belle2 {
       }
 
       std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::theta, ECLCalDigitVariable::centerType::maxCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
+    //! @returns the eclcaldigit theta from ext
+    double getExtTheta(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::theta, ECLCalDigitVariable::centerType::extCell};
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
@@ -365,6 +766,17 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
+    //! @returns the eclcaldigit phi id from ext
+    double getExtPhiId(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::phiId, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
+
     //! @returns the eclcaldigit theta id
     double getThetaId(const Particle* particle, const std::vector<double>& vars)
     {
@@ -376,6 +788,16 @@ namespace Belle2 {
       return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
     }
 
+    //! @returns the eclcaldigit theta id from ext
+    double getExtThetaId(const Particle* particle, const std::vector<double>& vars)
+    {
+      if (vars.size() != 2) {
+        B2FATAL("Need exactly two parameters (cellid and neighbour area size).");
+      }
+
+      std::vector<double> parameters {vars[0], vars[1], ECLCalDigitVariable::varType::thetaId, ECLCalDigitVariable::centerType::extCell};
+      return ECLCalDigitVariable::getCalDigitExpert(particle, parameters);
+    }
 
     //! @returns the eclcaldigit cell id
     double getCellId(const Particle* particle, const std::vector<double>& vars)
@@ -451,6 +873,21 @@ namespace Belle2 {
       return mapping->getCellIdToThetaId(centercellid);
     }
 
+    //! @returns the eclcaldigit center cell phi id
+    double getCenterCellPhiId(const Particle* particle)
+    {
+      const int centercellid = ECLCalDigitVariable::getCenterCell(particle);
+      StoreObjPtr<ECLCellIdMapping> mapping;
+
+      if (!mapping) {
+        B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      if (centercellid < 0) return std::numeric_limits<double>::quiet_NaN();
+      return mapping->getCellIdToPhiId(centercellid);
+    }
+
     //! @returns the eclcaldigit ext cell theta id
     double getExtCellThetaId(const Particle* particle)
     {
@@ -464,6 +901,21 @@ namespace Belle2 {
 
       if (extcellid < 0) return std::numeric_limits<double>::quiet_NaN();
       return mapping->getCellIdToThetaId(extcellid);
+    }
+
+    //! @returns the eclcaldigit ext cell phi id
+    double getExtCellPhiId(const Particle* particle)
+    {
+      const int extcellid = ECLCalDigitVariable::getExtCell(particle);
+      StoreObjPtr<ECLCellIdMapping> mapping;
+
+      if (!mapping) {
+        B2ERROR("Mapping not found, did you forget to run the eclFillCellIdMapping module?");
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+
+      if (extcellid < 0) return std::numeric_limits<double>::quiet_NaN();
+      return mapping->getCellIdToPhiId(extcellid);
     }
 
     //! @returns the eclcaldigit ext cell crystal theta
@@ -571,6 +1023,58 @@ namespace Belle2 {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
+    double getTotalECLCalDigitMCEnergy(const Particle* particle)
+    {
+      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      double sum = 0.0;
+      auto mcDigitRelations = mcparticle->getRelationsWith<ECLCalDigit>();
+      for (unsigned int ir = 0; ir < mcDigitRelations.size(); ++ir) {
+        sum += mcDigitRelations.weight(ir);
+      }
+
+      return sum;
+
+    }
+
+    double getClusterECLCalDigitMCEnergy(const Particle* particle)
+    {
+      // get MCParticle (return if there is none)
+      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        std::vector<unsigned int> listCellIds;
+        auto clusterShowerRelations = cluster->getRelationsWith<ECLShower>(); // should never happen to have more than one shower
+        for (unsigned int ir = 0; ir < clusterShowerRelations.size(); ++ir) {
+          const auto shower = clusterShowerRelations.object(ir);
+          listCellIds = shower->getListOfCrystalsForEnergy();
+        }
+
+        double sum = 0.0;
+        auto clusterDigitRelations = mcparticle->getRelationsWith<ECLCalDigit>();
+        for (unsigned int ir = 0; ir < clusterDigitRelations.size(); ++ir) {
+
+          // check if this digit is in the current cluster
+          unsigned int cellid = clusterDigitRelations.object(ir)->getCellId();
+          if (std::find(listCellIds.begin(), listCellIds.end(), cellid) != listCellIds.end()) { //find is faster than count
+            sum += clusterDigitRelations.weight(ir);
+          }
+        }
+
+        return sum;
+      }
+
+      return std::numeric_limits<float>::quiet_NaN();
+
+    }
+
+
+
     double getClusterNHitsThreshold(const Particle* particle, const std::vector<double>& vars)
     {
       if (vars.size() != 1) {
@@ -622,14 +1126,20 @@ namespace Belle2 {
                       "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
     REGISTER_VARIABLE("eclcaldigitCellId(i, j)", getCellId,
                       "[calibration] Returns the cell id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+    REGISTER_VARIABLE("eclcaldigitUsedForClusterEnergy(i, j)", getUsedForClusterEnergy,
+                      " [calibration] Returns the 0 (not used) 1 (used) of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
+
     REGISTER_VARIABLE("eclcaldigitCenterCellId", getCenterCellId, "[calibration] Returns the center cell id");
     REGISTER_VARIABLE("eclcaldigitCenterCellThetaId", getCenterCellThetaId, "[calibration] Returns the center cell theta id");
+    REGISTER_VARIABLE("eclcaldigitCenterCellPhiId", getCenterCellPhiId, "[calibration] Returns the center cell phi id");
     REGISTER_VARIABLE("eclcaldigitCenterCellCrystalTheta", getCenterCellCrystalTheta,
                       "[calibration] Returns the center cell crystal theta");
     REGISTER_VARIABLE("eclcaldigitCenterCellCrystalPhi", getCenterCellCrystalPhi,
                       "[calibration] Returns the center cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitCenterCellIndex(i)", getCenterCellIndex,
-                      "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours)");
+                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours)");
+    REGISTER_VARIABLE("eclcaldigitMCEnergy(i, j)", getMCEnergy,
+                      "[calibration] Returns the true deposited energy of all particles of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours (1-based)");
     REGISTER_VARIABLE("clusterNHitsThreshold(i)", getClusterNHitsThreshold,
                       "[calibration] Returns sum of crystal weights sum(w_i) with w_i<=1  associated to this cluster above threshold (in GeV)");
 
@@ -646,16 +1156,90 @@ namespace Belle2 {
                       "[calibration] Returns the TwoComponentHadronEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
     REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2(i, j)", getExtECLCalDigitTwoComponentChi2,
                       "[calibration] Returns the TwoComponentchi2 of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtPhi(i, j)", getExtPhi,
+                      "[calibration] Returns phi of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+    REGISTER_VARIABLE("eclcaldigitExtTheta(i, j)", getExtTheta,
+                      "[calibration] Returns theta of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+    REGISTER_VARIABLE("eclcaldigitExtPhiId(i, j)", getExtPhiId,
+                      "[calibration] Returns the phi Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
+    REGISTER_VARIABLE("eclcaldigitExtThetaId(i, j)", getExtThetaId,
+                      "[calibration] Returns the theta Id of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an extrapolated track");
     REGISTER_VARIABLE("eclcaldigitExtCellId", getExtCellId, "[calibration] Returns the extrapolated cell id");
     REGISTER_VARIABLE("eclcaldigitExtCellThetaId", getExtCellThetaId, "[calibration] Returns the ext cell theta id");
+    REGISTER_VARIABLE("eclcaldigitExtCellPhiId", getExtCellPhiId, "[calibration] Returns the ext cell phi id");
     REGISTER_VARIABLE("eclcaldigitExtCellCrystalTheta", getExtCellCrystalTheta, "[calibration] Returns the ext cell crystal theta");
     REGISTER_VARIABLE("eclcaldigitExtCellCrystalPhi", getExtCellCrystalPhi, "[calibration] Returns the ext cell crystal phi");
     REGISTER_VARIABLE("eclcaldigitExtCenterCellIndex(i)", getExtCenterCellIndex,
-                      "[calibration] Returns the center cell index (within its 5x5 (j=5) or 7x7 (j=7) neighbours) for an ext track");
+                      "[calibration] Returns the center cell index (within its 5x5 (i=5) or 7x7 (i=7) neighbours) for an ext track");
+
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentFitType(i, j)", getExtECLCalDigitTwoComponentFitType,
+                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentDiodeEnergy(i, j)", getExtECLCalDigitTwoComponentDiodeEnergy,
+                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PhotonHadron(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PhotonHadron,
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PileUpPhoton(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PileUpPhoton,
+                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+    REGISTER_VARIABLE("eclcaldigitExtTwoComponentChi2Saved_PhotonDiode(i, j)", getExtECLCalDigitTwoComponentChi2Saved_PhotonDiode,
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours for an ext track");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentFitType(i, j)", getECLCalDigitTwoComponentFitType,
+                      "[calibration] Returns the TwoComponentFitType of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergy(i, j)", getECLCalDigitTwoComponentDiodeEnergy,
+                      "[calibration] Returns the TwoComponentDiodeEnergy of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PhotonHadron(i, j)", getECLCalDigitTwoComponentChi2Saved_PhotonHadron,
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonHadron of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PileUpPhoton(i, j)", getECLCalDigitTwoComponentChi2Saved_PileUpPhoton,
+                      "[calibration] Returns the TwoComponentChi2Saved_PileUpPhoton of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2Saved_PhotonDiode(i, j)", getECLCalDigitTwoComponentChi2Saved_PhotonDiode,
+                      "[calibration] Returns the TwoComponentChi2Saved_PhotonDiode of the i-th caldigit for 5x5 (j=5) or 7x7 (j=7) neighbours");
+
+    REGISTER_VARIABLE("eclcaldigitEnergyByEnergyRank(i)", getECLCalDigitEnergyByEnergyRank,
+                      "[calibration] Returns the caldigit energy of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTimeByEnergyRank(i)", getECLCalDigitTimeByEnergyRank,
+                      "[calibration] Returns the caldigit time of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentFitTypeByEnergyRank(i)", getTwoComponentFitTypeByEnergyRank,
+                      "[calibration] Returns the offline fit type of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2ByEnergyRank(i)", getTwoComponentChi2ByEnergyRank,
+                      "[calibration] Returns the two component chi2 of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentEnergyByEnergyRank(i)", getTwoComponentTotalEnergyByEnergyRank,
+                      "[calibration] Returns the two component total energy of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergyByEnergyRank(i)", getTwoComponentHadronEnergyByEnergyRank,
+                      "[calibration] Returns the two component fit Hadron Energy of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergyByEnergyRank(i)", getTwoComponentDiodeEnergyByEnergyRank,
+                      "[calibration] Returns the two component fit Diode Energy of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonHadron(i)", getTwoComponentChi2SavedByEnergyRank_PhotonHadron,
+                      "[calibration] Returns the chi2 for the photo+hadron fit type of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PileUpPhoton(i)", getTwoComponentChi2SavedByEnergyRank_PileUpPhoton,
+                      "[calibration] Returns the chi2 for the photo+hadron+pile-up photon fit type of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonDiode(i)", getTwoComponentChi2SavedByEnergyRank_PhotonDiode,
+                      "[calibration] Returns the chi2 for the photo+diode fit type of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitWeightByEnergyRank(i)", getWeightByEnergyRank,
+                      "[calibration] Returns the weight of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("eclcaldigitCellIdByEnergyRank(i)", getCellIdByEnergyRank,
+                      "[calibration] Returns the cell id of the i-th highest energy caldigit in the cluster (i>=0)");
+
+    REGISTER_VARIABLE("totalECLCalDigitMCEnergy", getTotalECLCalDigitMCEnergy,
+                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle");
+
+    REGISTER_VARIABLE("clusterECLCalDigitMCEnergy", getClusterECLCalDigitMCEnergy,
+                      "[calibration] Returns total deposited MC energy in all ECLCalDigits for the MC particle that are used to calculate the cluster energy");
+
 
   }
 
   // Create an empty module which allows basf2 to easily find the library and load it from the steering file
   class EnableECLCalDigitVariablesModule: public Module {}; // Register this module to create a .map lookup file.
-  REG_MODULE(EnableECLCalDigitVariables);
+  REG_MODULE(EnableECLCalDigitVariables); /**< register the empty module */
 }

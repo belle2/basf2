@@ -3,16 +3,16 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini                                        *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
-
 namespace TreeFitter {
   class FitParams;
+  class ConstraintConfiguration;
 
   /** class for resonances as internal particles */
   class Resonance : public InternalParticle {
@@ -20,6 +20,7 @@ namespace TreeFitter {
     /** constructor */
     Resonance(Belle2::Particle* particle,
               const ParticleBase* mother,
+              const ConstraintConfiguration& config,
               bool forceFitAll);
 
     /** destructor  */

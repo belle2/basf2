@@ -10,23 +10,18 @@
 
 #include <svd/modules/svdPerformance/SVDClusterEvaluationTrueInfoModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDSimHit.h>
+
+#include <TCanvas.h>
 #include <TFile.h>
+#include <TGraphErrors.h>
 #include <TText.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 #include <string>
-#include "TMath.h"
-#include <algorithm>
-#include <functional>
 
 
 using namespace Belle2;
@@ -40,6 +35,7 @@ SVDClusterEvaluationTrueInfoModule::SVDClusterEvaluationTrueInfoModule() : Modul
   setDescription("This modules generates performance plots on SVD clustering.");
 
   addParam("outputFileName", m_outputFileName, "output rootfile name", std::string("SVDClusterEvaluationTrueInfo.root"));
+  addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", std::string(""));
 }
 
 
@@ -61,6 +57,9 @@ void SVDClusterEvaluationTrueInfoModule::initialize()
   SVDRecoDigits.isRequired();
   SVDClusters.isRequired();
   SVDTrueHits.isRequired();
+  if (!m_storeSVDEvtInfo.isOptional(m_svdEventInfoName)) m_svdEventInfoName = "SVDEventInfoSim";
+  m_storeSVDEvtInfo.isRequired(m_svdEventInfoName);
+
 
   m_outputFile = new TFile(m_outputFileName.c_str(), "RECREATE");
 
@@ -213,6 +212,8 @@ void SVDClusterEvaluationTrueInfoModule::beginRun()
 void SVDClusterEvaluationTrueInfoModule::event()
 {
 
+  SVDModeByte modeByte = m_storeSVDEvtInfo->getModeByte();
+
   StoreArray<SVDShaperDigit> SVDShaperDigits;
   StoreArray<SVDRecoDigit> SVDRecoDigits;
   StoreArray<SVDCluster> SVDClusters;
@@ -307,8 +308,6 @@ void SVDClusterEvaluationTrueInfoModule::event()
 
       //get trigger bin
       int triggerBin = 0;
-      RelationVector<SVDRecoDigit> relatVectorClusToRD = DataStore::getRelationsWithObj<SVDRecoDigit>(&clus);
-      SVDModeByte modeByte = relatVectorClusToRD[0]->getModeByte();
       triggerBin = (int)modeByte.getTriggerBin();
 
       if (triggerBin == 0)
@@ -470,7 +469,7 @@ void SVDClusterEvaluationTrueInfoModule::endRun()
   //WRITE HISTOS AND GRAPHS//
   ///////////////////////////
 
-  if (m_outputFile != NULL) {
+  if (m_outputFile != nullptr) {
     m_outputFile->cd();
 
     TDirectory* oldDir = gDirectory;
@@ -794,8 +793,6 @@ void SVDClusterEvaluationTrueInfoModule::createArbitraryGraphError_Red(const cha
 bool SVDClusterEvaluationTrueInfoModule::goodTrueHit(const SVDTrueHit* thino)
 {
 
-  float charge = 0;
-  bool primary = false;
 
   bool isGood = false;
 
@@ -805,8 +802,8 @@ bool SVDClusterEvaluationTrueInfoModule::goodTrueHit(const SVDTrueHit* thino)
 
     m_histoControl_THToMCsize->Fill(relatVectorTHToMC.size());
 
-    charge = relatVectorTHToMC[0]->getCharge();
-    primary = relatVectorTHToMC[0]->isPrimaryParticle();
+    float charge = relatVectorTHToMC[0]->getCharge();
+    bool primary = relatVectorTHToMC[0]->isPrimaryParticle();
 
     m_histoControl_MCcharge->Fill(charge);
     m_histoControl_MCisPrimary->Fill(primary);

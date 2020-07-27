@@ -13,20 +13,17 @@
 #ifndef TRGECLDATABASE_H
 #define TRGECLDATABASE_H
 
-#include <iostream>
-#include <TObject.h>
-#include <TVector3.h>
-
+#include <vector>
 
 namespace Belle2 {
-  //  class TrgEclDataBase;
+  ///  class TrgEclDataBase;
   class TrgEclDataBase {
 
   public:
 
-    /** Constructor */
+    //! TrgEclDataBase Constructor
     TrgEclDataBase();
-    /** Destructor */
+    //! TrgEclDataBase Destructor
     virtual ~TrgEclDataBase() {}
 
   public:

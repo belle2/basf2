@@ -13,7 +13,6 @@
 
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 
@@ -28,6 +27,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /// register the basf2 TRGCDCTSStream module
   REG_MODULE(TRGCDCTSStream);
 
   string

@@ -9,7 +9,7 @@
  It will create a latex document containing a summary and plots
  and tries to compile this summary.tex into a PDF file summary.pdf
 
- You can improvide modify this script
+ You can improve / modify this script
  E.g. If you want to add new plots:
  Add your plot in the monitoring.py file
  Add your plot below using b2latex.Graphics
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     o = b2latex.LatexFile()
 
     o += b2latex.TitlePage(title='Full Event Interpretation Report',
-                           authors=['Thomas Keck', 'Christian Pulvermacher'],
+                           authors=['Thomas Keck', 'Christian Pulvermacher', 'William Sutcliffe'],
                            abstract=r"""
                            This report contains key performance indicators and control plots of the Full Event Interpretation.
                            The pre-, and post-cuts as well as trained multivariate selection methods are described.
@@ -154,7 +154,7 @@ if __name__ == '__main__':
         o += b2latex.Section(format.decayDescriptor(p.particle.identifier)).finish()
         string = b2latex.String(r"In the reconstruction of {name} {nChannels} out of {max_nChannels} possible channels were used. "
                                 r"The covered inclusive / exclusive branching fractions is {inc_br:.5f} / {exc_br:.5f}."
-                                r"The final unqiue efficiency and purity was {eff:.5f} / {pur:.5f}")
+                                r"The final unique efficiency and purity was {eff:.5f} / {pur:.5f}")
 
         o += string.finish(name=format.decayDescriptor(p.particle.identifier),
                            nChannels=p.reconstructed_number_of_channels,

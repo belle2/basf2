@@ -7,12 +7,10 @@
 
 #include "G4VPVParameterisation.hh"
 
-#include "Randomize.hh"
-
 #include "G4VGraphicsScene.hh"
 
-//#include "G4Trap.hh"
-#include <map>
+#include "CLHEP/Random/RandFlat.h"
+
 using namespace Belle2;
 using namespace std;
 using namespace ECL;
@@ -707,9 +705,9 @@ PolyhedronBelleCrystal::PolyhedronBelleCrystal(int n, const G4ThreeVector* pt)
 
   int count = 1;
   for (int j = 0; j < nsides; j++)
-    pF[count++] = G4Facet(1 + j, 0,  1 + j + nsides, 0, 1 + ((j + 1) % nsides) + nsides, 0, 1 + (j + 1) % nsides, 0);
-  for (int j = 0; j < nsides - 2; j++) pF[count++] = G4Facet(1, 0,  2 + j, 0, 3 + j, 0, 0, 0);
-  for (int j = 0; j < nsides - 2; j++) pF[count++] = G4Facet(1 + nsides, 0,  3 + j + nsides, 0, 2 + j + nsides, 0, 0, 0);
+    pF[count++] = G4Facet(1 + j, 0, 1 + (j + 1) % nsides, 0, 1 + ((j + 1) % nsides) + nsides, 0,  1 + j + nsides, 0);
+  for (int j = 0; j < nsides - 2; j++) pF[count++] = G4Facet(1 + nsides, 0,  2 + j + nsides, 0, 3 + j + nsides, 0, 0, 0);
+  for (int j = 0; j < nsides - 2; j++) pF[count++] = G4Facet(1, 0,  3 + j, 0, 2 + j, 0, 0, 0);
   SetReferences();
 }
 

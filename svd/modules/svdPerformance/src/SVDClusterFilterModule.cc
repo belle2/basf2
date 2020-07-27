@@ -99,7 +99,8 @@ void SVDClusterFilterModule::event()
       B2DEBUG(10, "below SNR (OUT):" << aCluster->getSNR());
 
     if (aboveSNR && inVxdID)
-      B2DEBUG(10, "keeping " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber());
+      B2DEBUG(10, "keeping " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber() << " SNR = "
+              << aCluster->getSNR());
 
     return (inVxdID && aboveSNR);
 
@@ -119,7 +120,8 @@ void SVDClusterFilterModule::event()
         B2DEBUG(10, "above SNR (IN):" << aCluster->getSNR());
 
       if (!(aboveSNR && inVxdID))
-        B2DEBUG(10, "rejecting " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber());
+        B2DEBUG(10, "rejecting " << aCluster->getSensorID().getLayerNumber() << "." << aCluster->getSensorID().getLadderNumber() <<
+                " SNR = " << aCluster->getSNR());
 
       return (!(inVxdID && aboveSNR));
 

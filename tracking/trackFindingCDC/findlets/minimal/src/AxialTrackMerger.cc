@@ -86,6 +86,7 @@ void AxialTrackMerger::doTracksMerging(std::vector<CDCTrack>& axialTracks,
   AxialTrackUtil::deleteShortTracks(axialTracks);
 }
 
+/// Determine the best track for merging with the candidate track
 template <class ACDCTracks>
 WithWeight<MayBePtr<CDCTrack> > AxialTrackMerger::calculateBestTrackToMerge(CDCTrack& track, ACDCTracks& tracks)
 {
@@ -137,10 +138,13 @@ double AxialTrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   // We use the wire hits here as we do not want them to bring
   // their "old" reconstructed position when fitting.
   std::vector<const CDCWireHit*> combinedWireHits;
+  combinedWireHits.reserve(track1.size() + track2.size());
   for (const CDCRecoHit3D& hit : track1) {
+    // cppcheck-suppress useStlAlgorithm
     combinedWireHits.push_back(&(hit.getWireHit()));
   }
   for (const CDCRecoHit3D& hit : track2) {
+    // cppcheck-suppress useStlAlgorithm
     combinedWireHits.push_back(&(hit.getWireHit()));
   }
 

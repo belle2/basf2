@@ -11,8 +11,6 @@
 #pragma once
 
 #include <framework/dataobjects/DigitBase.h>
-#include <framework/logging/Logger.h>
-#include <iostream>
 
 namespace Belle2 {
 
@@ -26,12 +24,17 @@ namespace Belle2 {
 
     /**
      * hit quality enumerators
+     *
+     * Note: the only allowed place for switching c_Good to c_Masked or c_Uncalibrated is
+     * TOPChannelMasker because this information must also be passed to reconstruction
      */
     enum EHitQuality {
-      c_Junk = 0,
-      c_Good = 1,
-      c_CrossTalk = 3,
-      c_CalPulse = 4
+      c_Junk = 0, // invalid feature extraction, pedestal jump, width too narrow/too wide
+      c_Good = 1, // good photon hit
+      c_CrossTalk = 3, // cross-talk
+      c_CalPulse = 4,  // calibration pulse
+      c_Uncalibrated = 5, // good photon hit, but no time-base or channel T0 calibration
+      c_Masked = 6 // good photon hit, but channel is masked as dead or hot
     };
 
     /**

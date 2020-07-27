@@ -9,11 +9,8 @@
  **************************************************************************/
 
 #include <generators/modules/CosmicsModule.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
 #include <boost/assign/std/vector.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;

@@ -13,12 +13,12 @@ void SelectSubsetBase::swapSetsAndDestroyOriginal()
   DataStore::Instance().replaceData(*subset, *set);
 
   //swap relations
-  for (std::string fromArray : m_inheritFromArrays) {
+  for (const std::string& fromArray : m_inheritFromArrays) {
     RelationArray setRel(DataStore::relationName(fromArray, set->getName()));
     RelationArray subsetRel(DataStore::relationName(fromArray, subset->getName()));
     DataStore::Instance().replaceData(subsetRel, setRel);
   }
-  for (std::string toArray : m_inheritToArrays) {
+  for (const std::string& toArray : m_inheritToArrays) {
     RelationArray setRel(DataStore::relationName(set->getName(), toArray));
     RelationArray subsetRel(DataStore::relationName(subset->getName(), toArray));
     DataStore::Instance().replaceData(subsetRel, setRel);

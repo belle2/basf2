@@ -13,27 +13,12 @@
 #include <reconstruction/dataobjects/DedxConstants.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <genfit/Track.h>
-
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/SelectSubset.h>
-
-#include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
-#include <reconstruction/dbobjects/CDCDedxWireGain.h>
-#include <reconstruction/dbobjects/CDCDedxRunGain.h>
-#include <reconstruction/dbobjects/CDCDedxCosineCor.h>
-#include <reconstruction/dbobjects/CDCDedx2DCell.h>
-#include <reconstruction/dbobjects/CDCDedx1DCell.h>
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
@@ -41,15 +26,7 @@
 #include <string>
 #include <vector>
 
-#include <TFile.h>
-#include <TTree.h>
-#include <TString.h>
-
-class TH2F;
-
 namespace Belle2 {
-
-  class CDCDedxTrack;
 
   /** Extracts dE/dx information for calibration testing. Writes a ROOT file.
    */
@@ -77,7 +54,7 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-
+    bool isRecList;/**< set particle list type FS or reco particle list */
     std::vector<std::string> m_strParticleList; /**< Vector of ParticleLists to write out */
     StoreArray<CDCDedxTrack> m_dedxTracks; /**< Intput array of CDCDedxTracks */
     SelectSubset<CDCDedxTrack> m_selector; /**< Used to get a subset of the input array */

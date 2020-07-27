@@ -14,8 +14,6 @@
 #ifndef TRGECLTCMAPPING_FLAG_
 #define TRGECLTCMAPPING_FLAG_
 
-#include <iostream>
-#include <string>
 #include <vector>
 #include "TVector3.h"
 //
@@ -23,9 +21,6 @@
 //
 namespace Belle2 {
 //
-//
-//
-  class TrgEclMapping;
 //
   /*! A class of TC Mapping.*/
 //
@@ -57,7 +52,8 @@ namespace Belle2 {
     int getTCIdFromFAMChannel(int , int);
     /** Get FAM # and Channel # from TC Id*/
     std::vector<int> getFAMChannelFromTCId(int);
-
+    //! get TCId from phi and theta position(LSB = 1.4)
+    int getTCIdFromPosition(int, int);
   private:
 
 

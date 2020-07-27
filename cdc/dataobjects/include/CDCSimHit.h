@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCSIMHIT_H
-#define CDCSIMHIT_H
+#pragma once
 
 #include <cdc/dataobjects/WireID.h>
 #include <simulation/dataobjects/SimHitBase.h>
-#include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
 
@@ -314,12 +312,11 @@ namespace Belle2 {
      */
     virtual void shiftInTime(float delta) override
     {
-      m_globalTime = m_flightTime + delta;
+      m_globalTime += delta;
     }
 
 
     /** ROOT Macro. */
-    ClassDef(CDCSimHit, 5);
+    ClassDefOverride(CDCSimHit, 6);
   };
 } // end namespace Belle2
-#endif

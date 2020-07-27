@@ -8,14 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEPROPERTIES_H_
-#define PARTICLEPROPERTIES_H_
+#pragma once
 
 namespace Belle2 {
   /** This struct is used by the StandardTrackingPerformanceModule to save information
    * of reconstructed tracks
    */
   struct ParticleProperties {
+
+    ParticleProperties() = default; /**< default constructor */
+
+    /** constructor which sets all members to the given value */
+    explicit ParticleProperties(double value)
+    {
+      setAllTo(value);
+    }
 
     static const int maxNweights = 160; /**< the maximum number of stored weights */
 
@@ -27,18 +34,18 @@ namespace Belle2 {
     double ptot; /**< measured total momentum */
     double cosTheta; /**< polar angle of measured momentum vector */
     double phi; /**< azimuthal angle of measured momentum vector */
-    double x; /** < measured x value of position */
-    double y; /** < measured y value of position */
-    double z; /** < measured z value of position */
+    double x; /**< measured x value of position */
+    double y; /**< measured y value of position */
+    double z; /**< measured z value of position */
 
-    int nPXDhits;  /** Number of PXD hits in reconstructed track  */
-    int nSVDhits;  /** Number of SVD hits in reconstructed track  */
-    int nCDChits;  /** Number of CDC hits in reconstructed track  */
+    int nPXDhits;  /**< Number of PXD hits in reconstructed track  */
+    int nSVDhits;  /**< Number of SVD hits in reconstructed track  */
+    int nCDChits;  /**< Number of CDC hits in reconstructed track  */
 
-    int nWeights;  /** Number of entries in weights array  */
-    float weights[maxNweights];  /** Weights of the hits in sequence  */
+    int nWeights;  /**< Number of entries in weights array  */
+    float weights[maxNweights];  /**< Weights of the hits in sequence  */
 
-    int pdg_gen; /** PDG code of generated particle */
+    int pdg_gen; /**< PDG code of generated particle */
     double mass_gen; /**< generated mass */
     double px_gen; /**< generated momentum in x direction */
     double py_gen; /**< generated momentum in y direction */
@@ -82,7 +89,6 @@ namespace Belle2 {
       px_gen = value;
       py_gen = value;
       pz_gen = value;
-      pt = value;
       pt_gen = value;
       ptot_gen = value;
       cosTheta_gen = value;
@@ -102,6 +108,3 @@ namespace Belle2 {
   };
 
 }
-
-
-#endif /* PARTICLEPROPERTIES_H_ */

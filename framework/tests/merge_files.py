@@ -6,11 +6,12 @@ import sys
 import re
 import subprocess
 import itertools
+from shutil import copyfile
 import ROOT
 from ROOT.Belle2 import FileMetaData, EventMetaData
 # we don't really need basf2 but it fixes the print buffering problem
 import basf2
-from b2test_utils import clean_working_directory
+from b2test_utils import clean_working_directory, skip_test_if_light
 
 
 def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[], **argk):
@@ -24,12 +25,11 @@ def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[]
         f.write(testfile_steering)
 
     subprocess.call(["basf2", "-o", name, "--experiment", str(exp), "--run", str(run),
-                    "-n", str(events), steering_file] + branchNames, env=env)
+                     "-n", str(events), steering_file] + branchNames, env=env)
 
 
 def create_testfile_direct(name, metadata=None, release="test_release", user="test_user", seed=None,
-                           site="test_site", global_tag="test_globaltag", steering="test_steering",
-                           is_mc=True):
+                           site="test_site", global_tag="test_globaltag", steering="test_steering"):
     """similar to create_testfile but does it manually without running basf2 for
     full control over the FileMetaData"""
     if metadata is None:
@@ -39,11 +39,10 @@ def create_testfile_direct(name, metadata=None, release="test_release", user="te
 
     if seed is not None:
         metadata.setRandomSeed(seed)
+    metadata.setLfn(name)
     metadata.setCreationData("the most auspicious of days for testing", site, user, release)
     metadata.setDatabaseGlobalTag(global_tag)
     metadata.setSteering(steering)
-    if (not is_mc):
-        metadata.declareRealData()
     f = ROOT.TFile(name, "RECREATE")
     t = ROOT.TTree("persistent", "persistent")
     t.Branch("FileMetaData", metadata)
@@ -73,7 +72,7 @@ def merge_files(*args, output="output.root", filter_modified=False):
       filter_modified: if True omit warnings that the release is modified and
           consistency cannot be checked
     """
-    process = subprocess.run(["merge_basf2_files", "-q", output] + list(args), stdout=subprocess.PIPE)
+    process = subprocess.run(["b2file-merge", "-q", output] + list(args), stdout=subprocess.PIPE)
     # do we want to filter the modified release warning?
     if filter_modified:
         # if so replace them using regular expression
@@ -326,11 +325,11 @@ def check_19_lowhigh():
 
 
 def check_20_test_file():
-    """Check that a merged file passes the check_basf2_file program"""
+    """Check that a merged file passes the b2file-check program"""
     create_testfile("test1.root", events=1111)
     create_testfile("test2.root", events=123)
     merge_files("test1.root", "test2.root", filter_modified=True)
-    return subprocess.call(["check_basf2_file", "-n", "1234", "--mcevents", "1234",
+    return subprocess.call(["b2file-check", "-n", "1234", "--mcevents", "1234",
                             "output.root", "EventMetaData", "MCParticles"]) == 0
 
 
@@ -357,9 +356,39 @@ def check_21_eventmetadata():
 
 def check_22_real_mc():
     """Check that merging fails if real and MC data are mixed"""
-    create_testfile_direct("test1.root", is_mc=True)
-    create_testfile_direct("test2.root", is_mc=False)
+    create_testfile_direct("test1.root")
+    copyfile(basf2.find_file("framework/tests/fake_real.root"), "test2.root")
     return merge_files("test1.root", "test2.root") != 0
+
+
+def check_23_legacy_ip():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="test_globaltag")
+    create_testfile_direct("test2.root", global_tag="test_globaltag,Legacy_IP_Information")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == "test_globaltag"
+
+
+def check_24_legacy_ip_middle():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="test_globaltag,other")
+    create_testfile_direct("test2.root", global_tag="test_globaltag,Legacy_IP_Information,other")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == "test_globaltag,other"
+
+
+def check_25_legacy_ip_only():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="")
+    create_testfile_direct("test2.root", global_tag="Legacy_IP_Information")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == ""
 
 
 def check_XX_filemetaversion():
@@ -370,6 +399,7 @@ def check_XX_filemetaversion():
 
 
 if __name__ == "__main__":
+    skip_test_if_light()  # light builds don't have particle gun
     failures = 0
     existing = [e for e in sorted(globals().items()) if e[0].startswith("check_")]
     for name, fcn in existing:

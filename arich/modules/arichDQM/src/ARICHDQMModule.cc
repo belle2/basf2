@@ -10,19 +10,14 @@
 
 // Own include
 #include <arich/modules/arichDQM/ARICHDQMModule.h>
-#include <arich/modules/arichDQM/hitMapMaker.h>
 
 // ARICH
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
 #include <arich/dbobjects/ARICHMergerMapping.h>
-#include <arich/dbobjects/ARICHCopperMapping.h>
 #include <arich/dbobjects/ARICHGeoDetectorPlane.h>
 #include <arich/dbobjects/ARICHGeoAerogelPlane.h>
-#include <framework/database/DBObjPtr.h>
-
 #include <arich/dataobjects/ARICHHit.h>
-#include <arich/dataobjects/ARICHSimHit.h>
 #include <arich/dataobjects/ARICHDigit.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHTrack.h>
@@ -33,33 +28,16 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // Dataobject classes
 #include <framework/database/DBObjPtr.h>
 
-// Raw data object class
-#include <rawdata/dataobjects/RawARICH.h>
-
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH3F.h>
 #include <TF1.h>
-#include <TCanvas.h>
-#include <TStyle.h>
-#include <TMath.h>
-#include <THStack.h>
 #include <TVector3.h>
-#include <TFile.h>
-#include <TImage.h>
-#include <TPad.h>
 
-#include <sstream>
 #include <fstream>
 #include <math.h>
-#include <algorithm>
 
 using namespace std;
 
@@ -92,8 +70,7 @@ namespace Belle2 {
   {
 
     TDirectory* oldDir = gDirectory;
-    TDirectory* dirARICHDQM = NULL;
-    dirARICHDQM = oldDir->mkdir("ARICH");
+    TDirectory* dirARICHDQM = oldDir->mkdir("ARICH");
     dirARICHDQM->cd();
 
     //Histograms for analysis and statistics
@@ -105,10 +82,22 @@ namespace Belle2 {
     h_hapdHit = new TH1D("hapdHit", "Number of hits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
     h_hapdHitPerEvent = new TH2D("hapdHitPerEvent", "Number of hits in each HAPD per Event;HAPD serial;Hits/event", 420, 0.5, 420 + 0.5,
                                  144, -0.5, 143.5);
-    h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB serial;Hits", 72, 0.5, 72 + 0.5);
+    h_trackPerEvent = new TH1D("trackPerEvent", "Number of tracks in ARICH per event; # of tracks;Events", 6, -0.5, 5.5);
+
+    h_mergerHit = new TH1D("mergerHit", "Number of hits in each merger board;MB ID;Hits", 72, 0.5, 72 + 0.5);
+    h_bitsPerMergerNorm = new TH2D("bitsPerMergerNorm", "Normalised number of hits in each bit in each Merger;Bit;MB ID;Hits", 5,
+                                   -1 - 0.5,
+                                   4 - 0.5, 72, 0.5, 72 + 0.5); // copy of h_bits, normalised to number of connected Hapds and to sum(bit1, bit2)
+    h_bitsPerHapdMerger = new TH2D("bitsPerHapdMerger",
+                                   "Number of hits in each bit in each Hapd sorted by mergers;Bit;HAPD unsorted;Hits", 5, -1 - 0.5,
+                                   4 - 0.5, 432, 1, 432);
+
     h_aerogelHit = new TH1D("aerogelHit", "Number track associated hits in each aerogel tile;Aerogel slot ID;Hits", 125, -0.5,
                             125 - 0.5);
-    h_bits = new TH1D("bits", "Number of hits in each bit;Bit;Hits", 4, -0.5, 4 - 0.5);
+    h_bits = new TH1D("bits", "Number of hits in each bit;Bit;Hits", 5, -1 - 0.5,
+                      4 - 0.5); //Bin at -1 is added to set minimum 0 without SetMinimum(0) due to bugs in jsroot on DQM server.
+    h_bitsPerChannel = new TH2D("bitsPerChannel", "Number of hits in each bit in each chanenel;Bit;channel #;Hits", 4, - 0.5,
+                                4 - 0.5, 420 * 144, -0.5, 420 * 144 - 0.5); // copy of h_bits
     h_hitsPerTrack2D = new TH2D("hitsPerTrack2D", "2D distribution of track associated hits;X[cm];Y[cm];Hits", 230, -115, 115, 230,
                                 -115, 115);
     h_tracks2D = new TH2D("tracks2D", "Distribution track positions;X[cm];Y[cm];Tracks", 230, -115, 115, 230, -115, 115);
@@ -126,10 +115,6 @@ namespace Belle2 {
                                  0.5, 71 - 0.5);
     }
 
-    TDirectory* dirAerogel = NULL;
-    dirAerogel =  dirARICHDQM->mkdir("expert");
-    dirAerogel->cd();
-
     h_chDigit = new TH1D("chDigit", "Number of raw digits in each channel;Channel serial;Hits", 420 * 144, -0.5, 420 * 144 - 0.5);
     h_chipDigit = new TH1D("chipDigit", "Number of raw digits in each chip;Chip serial;Hits", 420 * 4, -0.5, 420 * 4 - 0.5);
     h_hapdDigit = new TH1D("hapdDigit", "Number of raw digits in each HAPD;HAPD serial;Hits", 420, 0.5, 421 - 0.5);
@@ -141,7 +126,8 @@ namespace Belle2 {
                                 -M_PI, M_PI, 100, 0, 0.5);
     h_thetaPhi = new TH2D("thetaPhi", "Cherenkov theta vs phi;#phi [rad];#theta_{c} [rad]", 100, -M_PI, M_PI, 100, 0., 0.5);
 
-    dirARICHDQM->cd();
+    h_flashPerAPD = new TH1D("flashPerAPD", "Number of flashes per APD; APD serial; number of flash", 420 * 4, -0.5, 420 * 4 - 0.5);
+
 
     //Select "LIVE" monitoring histograms
     h_chStat->SetOption("LIVE");
@@ -155,6 +141,8 @@ namespace Belle2 {
     h_chipDigit->SetOption("LIVE");
     h_hapdDigit->SetOption("LIVE");
     h_mergerHit->SetOption("LIVE");
+    h_bitsPerMergerNorm->SetOption("LIVE");
+    h_bitsPerHapdMerger->SetOption("LIVE");
 
     h_aerogelHit->SetOption("LIVE");
     h_bits->SetOption("LIVE");
@@ -164,6 +152,8 @@ namespace Belle2 {
     h_hitsPerEvent->SetOption("LIVE");
     h_theta->SetOption("LIVE");
     h_hitsPerTrack->SetOption("LIVE");
+    h_trackPerEvent->SetOption("LIVE");
+    h_flashPerAPD->SetOption("LivE");
 
     for (int i = 0; i < 6; i++) {
       h_secTheta[i]->SetOption("LIVE");
@@ -178,11 +168,14 @@ namespace Belle2 {
     h_chipHit->SetMinimum(0);
     h_hapdHit->SetMinimum(0);
     h_mergerHit->SetMinimum(0);
+    h_bitsPerMergerNorm->SetMinimum(0);
+    h_bitsPerHapdMerger->SetMinimum(0);
     h_aerogelHit->SetMinimum(0);
     h_bits->SetMinimum(0);
+    h_bitsPerChannel->SetMinimum(0);
     h_hitsPerTrack2D->SetMinimum(0);
     h_tracks2D->SetMinimum(0);
-
+    h_flashPerAPD->SetMinimum(0);
     h_hitsPerEvent->SetMinimum(0);
     h_theta->SetMinimum(0);
     h_hitsPerTrack->SetMinimum(0);
@@ -220,7 +213,6 @@ namespace Belle2 {
 
     h_chStat->Reset();
     h_aeroStat->Reset();
-
     h_chDigit->Reset();
     h_chipDigit->Reset();
     h_hapdDigit->Reset();
@@ -229,9 +221,12 @@ namespace Belle2 {
     h_chipHit->Reset();
     h_hapdHit->Reset();
     h_mergerHit->Reset();
+    h_bitsPerMergerNorm->Reset();
+    h_bitsPerHapdMerger->Reset();
 
     h_aerogelHit->Reset();
     h_bits->Reset();
+    h_bitsPerChannel->Reset();
     h_hitsPerTrack2D->Reset();
     h_tracks2D->Reset();
     h_aerogelHits3D->Reset();
@@ -239,7 +234,8 @@ namespace Belle2 {
     h_hitsPerEvent->Reset();
     h_theta->Reset();
     h_hitsPerTrack->Reset();
-
+    h_trackPerEvent->Reset();
+    h_flashPerAPD->Reset();
     h_mirrorThetaPhi->Reset();
     h_thetaPhi->Reset();
 
@@ -271,19 +267,39 @@ namespace Belle2 {
 
     if (!arichLikelihoods.getEntries() && m_arichEvents) { setReturnValue(0); return;}
 
+    std::vector<int> apds(420 * 4, 0);
     for (const auto& digit : arichDigits) {
       uint8_t bits = digit.getBitmap();
-      for (int i = 0; i < 8; i++) {
-        if ((bits & (1 << i)) && !(bits & ~(1 << i))) h_bits->Fill(i);
-        else if (!bits) h_bits->Fill(8);
-      }
-      // fill occupancy histograms for raw data
       int moduleID  = digit.getModuleID();
       int channelID = digit.getChannelID();
+      int mergerID = arichMergerMap->getMergerID(moduleID);
+      int febSlot = arichMergerMap->getFEBSlot(moduleID);
+      unsigned binID = (mergerID - 1) * N_FEB2MERGER + (febSlot);
+
+      for (int i = 0; i < 8; i++) {
+        if ((bits & (1 << i)) && !(bits & ~(1 << i))) {
+          h_bits->Fill(i);
+          h_bitsPerChannel->Fill(i, (moduleID - 1) * 144 + channelID);
+          h_bitsPerMergerNorm->Fill(i, mergerID);
+          h_bitsPerHapdMerger->Fill(i, binID);
+        } else if (!bits) {
+          h_bits->Fill(8);
+          h_bitsPerChannel->Fill(8, (moduleID - 1) * 144 + channelID);
+          h_bitsPerMergerNorm->Fill(8, mergerID);
+          h_bitsPerHapdMerger->Fill(8, binID);
+        }
+      }
+
+      // fill occupancy histograms for raw data
       h_chDigit  ->Fill((moduleID - 1) * 144 + channelID);
-      h_chipDigit->Fill((moduleID - 1) * 4   + channelID / 36);
+      int chip = (moduleID - 1) * 4   + channelID / 36;
+      h_chipDigit->Fill(chip);
+      apds[chip] += 1;
       h_hapdDigit->Fill(moduleID);
     }
+
+    int iapd = 0;
+    for (auto apd : apds) { if (apd > 20) h_flashPerAPD->Fill(iapd); iapd++;}
 
     std::vector<int> hpd(420, 0);
     int nHit = 0;
@@ -315,15 +331,16 @@ namespace Belle2 {
     int mmid = 1;
     for (auto hh : hpd) { h_hapdHitPerEvent->Fill(mmid, hh); mmid++;}
 
-    for (const auto& arichLikelihood : arichLikelihoods) {
+    int ntrk = 0;
+    for (const auto& arichTrack : arichTracks) {
 
-      ARICHTrack* arichTrack = arichLikelihood.getRelated<ARICHTrack>();
 
       //Momentum limits are applied
-      if (arichTrack->getPhotons().size() == 0) continue;
-      if (arichTrack->getMomentum() < m_momDnLim || arichTrack->getMomentum() > m_momUpLim) continue;
+      //if (arichTrack.getPhotons().size() == 0) continue;
+      if (arichTrack.getMomentum() > 0.5) ntrk++; // count tracks with momentum larger than 0.5 GeV
+      if (arichTrack.getMomentum() < m_momDnLim || arichTrack.getMomentum() > m_momUpLim) continue;
 
-      TVector3 recPos = arichTrack->getPosition();
+      TVector3 recPos = arichTrack.getPosition();
       int trSector = 0;
       double dPhi = 0;
       if (recPos.Phi() >= 0) {
@@ -355,11 +372,10 @@ namespace Belle2 {
 
       h_tracks2D->Fill(recPos.X(), recPos.Y());
 
-      std::vector<ARICHPhoton> photons = arichTrack->getPhotons();
-      int nPhoton = 0;
+      std::vector<ARICHPhoton> photons = arichTrack.getPhotons();
       for (auto& photon : photons) {
         if (photon.getMirror() == 0) {
-          if (trR < 95.) {
+          if (trR < 93.) {
             h_thetaPhi->Fill(photon.getPhiCer(), photon.getThetaCer());
             h_theta->Fill(photon.getThetaCer());
           }
@@ -371,32 +387,75 @@ namespace Belle2 {
             hitSector++;
           }
           h_secTheta[hitSector]->Fill(photon.getThetaCer());
-          nPhoton++;
         } else {
-          if (trR > 85.) h_mirrorThetaPhi->Fill(photon.getMirror(), photon.getPhiCer(), photon.getThetaCer());
+          if (trR > 95.) h_mirrorThetaPhi->Fill(photon.getMirror(), photon.getPhiCer(), photon.getThetaCer());
         }
       }
 
-      h_hitsPerTrack->Fill(nPhoton);
-      h_secHitsPerTrack[trSector]->Fill(nPhoton);
-      h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nPhoton);
+      //Get ARICHLikelihood related to the ARICHTrack
+      const ExtHit* extHit = arichTrack.getRelated<ExtHit>();
+      const Track* mdstTrack = NULL;
+      if (extHit) mdstTrack = extHit->getRelated<Track>();
+      const ARICHLikelihood* lkh = NULL;
+      if (mdstTrack) lkh = mdstTrack->getRelated<ARICHLikelihood>();
+      else lkh = arichTrack.getRelated<ARICHLikelihood>();
 
-      int aeroID = arichGeoAero.getAerogelTileID(recPos.X(), recPos.Y());
-      h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
-                            (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20) ,
-                            nPhoton);
-      h_aerogelHit->Fill(aeroID, nPhoton);
+      if (lkh) {
+        if (!lkh->getFlag()) continue; //Fill only when the number of expected photons is more than 0.
+        double nphoton = lkh->getDetPhot();
+        h_hitsPerTrack->Fill(nphoton);
+        h_secHitsPerTrack[trSector]->Fill(nphoton);
+        h_hitsPerTrack2D->Fill(recPos.X(), recPos.Y(), nphoton);
+        int aeroID = arichGeoAero.getAerogelTileID(recPos.X(), recPos.Y());
+        h_aerogelHits3D->Fill(aeroID, (trPhi - arichGeoAero.getRingDPhi(iRing)*iAzimuth) / (arichGeoAero.getRingDPhi(iRing) / 20) ,
+                              (trR - arichGeoAero.getRingRadius(iRing)) / ((arichGeoAero.getRingRadius(iRing + 1) - arichGeoAero.getRingRadius(iRing)) / 20),
+                              nphoton);
+        h_aerogelHit->Fill(aeroID, nphoton);
+      }
     }
+
+    h_trackPerEvent->Fill(ntrk);
 
   }
 
   void ARICHDQMModule::endRun()
   {
+
+    DBObjPtr<ARICHMergerMapping> arichMergerMap;
+    if (h_theta->GetEntries() < 200) return;
+    TF1* f1 = new TF1("arichFitFunc", "gaus(0)+pol1(3)", 0.25, 0.4);
+    f1->SetParameters(0.8 * h_theta->GetMaximum(), 0.323, 0.016, 0, 0);
+    f1->SetParName(0, "C");
+    f1->SetParName(1, "mean");
+    f1->SetParName(2, "sigma");
+    f1->SetParName(3, "p0");
+    f1->SetParName(4, "p1");
+    h_theta->Fit(f1, "R");
+
+    //Normalise bins in histogram bitsPerMergerNorm
+    for (int mergerID = 1; mergerID < 73; ++mergerID) {
+      double NHapd = 0;
+      for (int febSlot = 1; febSlot < 7; ++febSlot) {
+        if (arichMergerMap->getModuleID(mergerID, febSlot) > 0) NHapd++;
+      }
+
+      double bin_value[5];
+      for (int i = 1; i <= 5; ++i) {
+        // loop over bits and save values
+        bin_value[i - 1] = h_bitsPerMergerNorm->GetBinContent(i, mergerID);
+      }
+
+      for (int i = 1; i <= 5; ++i) {
+        // loop over bits again and set bin content
+        h_bitsPerMergerNorm->SetBinContent(i, mergerID,
+                                           bin_value[i - 1] / (bin_value[3] + bin_value[2]) / NHapd); // normalise with sum of bit1 and bit2, and number of connected HAPDs
+      }
+    }
+
+
   }
 
   void ARICHDQMModule::terminate()
   {
   }
 }
-
-

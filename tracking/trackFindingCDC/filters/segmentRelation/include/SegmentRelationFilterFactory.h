@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      SegmentRelationFilterFactory(const std::string& defaultFilterName = "realistic");
+      explicit SegmentRelationFilterFactory(const std::string& defaultFilterName = "realistic");
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

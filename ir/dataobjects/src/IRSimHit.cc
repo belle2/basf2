@@ -42,7 +42,7 @@ void IRSimHit::setdepEnergy(float depEnergy)
 {
   m_depEnergy = depEnergy;
 }
-void IRSimHit::setVolname(std::string Volname)
+void IRSimHit::setVolname(const std::string& Volname)
 {
   m_Volname = Volname;
 }

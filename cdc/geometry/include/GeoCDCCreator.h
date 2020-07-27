@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOCDCCREATOR_H
-#define GEOCDCCREATOR_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 
@@ -19,16 +18,13 @@
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 
-
 #include <cdc/simulation/CDCSensitiveDetector.h>
 #include <cdc/dbobjects/CDCGeometry.h>
-#include <iostream>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class G4VisAttributes;
 class G4UserLimits;
-
 
 namespace Belle2 {
 
@@ -196,5 +192,3 @@ namespace Belle2 {
 
   } // end of cdc namespace
 } // end of Belle2 namespace
-
-#endif /* GEOCDCBELLEII_H */

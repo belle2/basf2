@@ -5,6 +5,8 @@
 ! mar-2017: change in some commons
 ! feb-2018: change in some commons
 ! oct-2018: change in some commons
+! feb-2020: change in some commons
+! may-2020: change in some commons
 !----------------------------------------------------------------------
 
       SUBROUTINE SET_CHANNEL_MASK(MDN, ICH, FLAG)
@@ -26,6 +28,23 @@
       IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) RETURN
       IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
       CH_MASK(ICH,MDN)=FLAG.NE.0
+      
+      END
+
+
+      SUBROUTINE SET_CHANNEL_OFF(MDN, ICH)
+
+      IMPLICIT NONE
+      INTEGER MDN               ! module ID
+      INTEGER ICH               ! channel (i.e. pixelID-1)
+
+#include "TOP_GEO.fi"
+#include "TOP_PIK.fi"
+#include "TOP_MASK.fi"
+      
+      IF(MDN.LT.0.OR.MDN.GE.NSIZ_MOD) RETURN
+      IF(ICH.LT.0.OR.ICH.GE.NUM_CHA) RETURN
+      CH_MASK(ICH,MDN)=.FALSE.
       
       END
 

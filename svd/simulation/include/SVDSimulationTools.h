@@ -15,7 +15,6 @@
 #include <cmath>
 #include <array>
 #include <algorithm>
-#include <numeric>
 #include <functional>
 #include <sstream>
 #include <framework/gearbox/Unit.h>
@@ -35,7 +34,7 @@ namespace Belle2 {
 
     /** Vector of input samples in float form */
     typedef double apvSampleBaseType;
-    typedef std::array<apvSampleBaseType, nAPVSamples> apvSamples;
+    typedef std::array<apvSampleBaseType, nAPVSamples> apvSamples; /**< vector od apvSample BaseType objects*/
 
     /** APV time base - times for the 6 signals */
     const apvSamples apvTimeBase =
@@ -120,10 +119,11 @@ namespace Belle2 {
     };
 
 
-// ==============================================================================
-// The 3-samples filter
-// ------------------------------------------------------------------------------
+    // ==============================================================================
+    // The 3-samples filter
+    // ------------------------------------------------------------------------------
 
+    /** pass zero suppression*/
     template<typename T>
     inline void zeroSuppress(T& a, double thr)
     {
@@ -134,6 +134,7 @@ namespace Belle2 {
 // The 3-samples filter
 // ------------------------------------------------------------------------------
 
+    /** pass 3-samples*/
     template<typename T>
     inline bool pass3Samples(const T& a, double thr)
     {
@@ -203,6 +204,7 @@ namespace Belle2 {
       double decodeTau(double scaledTau) const
       { return m_minTau + 1.0 / m_ATRatio * (scaledTau - m_minAmplitude); }
 
+      /**print tool*/
       void print(std::ostringstream& os) const
       {
         os << "TauEncoder object, "

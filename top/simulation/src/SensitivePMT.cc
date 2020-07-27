@@ -3,14 +3,12 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric, Marko Staric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <top/simulation/SensitivePMT.h>
-#include <top/dataobjects/TOPSimHit.h>
-#include <top/dataobjects/TOPSimPhoton.h>
 
 #include <simulation/kernel/UserInfo.h>
 #include <G4Step.hh>
@@ -19,10 +17,6 @@
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTypes.hh>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -38,19 +32,14 @@ namespace Belle2 {
       Simulation::SensitiveDetectorBase("TOP", Const::TOP)
     {
 
-      StoreArray<MCParticle> mcParticles;
+      m_simHits.registerInDataStore();
+      m_mcParticles.registerRelationTo(m_simHits);
 
-      StoreArray<TOPSimHit> simHits;
-      simHits.registerInDataStore();
-      mcParticles.registerRelationTo(simHits);
+      m_simPhotons.registerInDataStore(DataStore::c_DontWriteOut);
+      m_simHits.registerRelationTo(m_simPhotons, DataStore::c_Event,
+                                   DataStore::c_DontWriteOut);
 
-      StoreArray<TOPSimPhoton> simPhotons;
-      simPhotons.registerInDataStore(DataStore::c_DontWriteOut);
-      simHits.registerRelationTo(simPhotons, DataStore::c_Event,
-                                 DataStore::c_DontWriteOut);
-
-      RelationArray  relation(mcParticles, simHits);
-      registerMCParticleRelation(relation);
+      registerMCParticleRelation(m_relParticleHit);
 
     }
 
@@ -61,7 +50,7 @@ namespace Belle2 {
       G4Track& photon  = *aStep->GetTrack();
 
       // check if the track is an optical photon
-      if (photon.GetDefinition()->GetParticleName() != "opticalphoton") return false;
+      if (photon.GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()) return false;
 
       // photon energy in [eV]
       double energy = photon.GetKineticEnergy() * Unit::MeV / Unit::eV;
@@ -115,17 +104,13 @@ namespace Belle2 {
 
       // write to store arrays; add relations
 
-      StoreArray<TOPSimHit> simHits;
-      TOPSimHit* simHit = simHits.appendNew(moduleID, pmtID, xLocal, yLocal,
-                                            detTime, energy);
+      auto* simHit = m_simHits.appendNew(moduleID, pmtID, xLocal, yLocal,
+                                         detTime, energy);
 
-      StoreArray<MCParticle> particles;
-      RelationArray relParticleHit(particles, simHits);
       int parentID = photon.GetParentID();
       if (parentID == 0) parentID = photon.GetTrackID();
-      relParticleHit.add(parentID, simHit->getArrayIndex());
+      m_relParticleHit.add(parentID, simHit->getArrayIndex());
 
-      StoreArray<TOPSimPhoton> simPhotons;
       const auto* geo = m_topgp->getGeometry();
       if (geo->isModuleIDValid(moduleID)) {
         // transform to local frame
@@ -135,12 +120,13 @@ namespace Belle2 {
         emiMomDir = module.momentumToLocal(emiMomDir);
         detMomDir = module.momentumToLocal(detMomDir);
       } else {
-        B2ERROR("SensitivePMT: undefined module ID = " << moduleID);
+        B2ERROR("TOP::SensitivePMT: undefined module ID."
+                << LogVar("moduleID", moduleID));
       }
-      TOPSimPhoton* simPhoton = simPhotons.appendNew(moduleID,
-                                                     emiPoint, emiMomDir, emiTime,
-                                                     detPoint, detMomDir, detTime,
-                                                     length, energy);
+      auto* simPhoton = m_simPhotons.appendNew(moduleID,
+                                               emiPoint, emiMomDir, emiTime,
+                                               detPoint, detMomDir, detTime,
+                                               length, energy);
 
       simHit->addRelationTo(simPhoton);
 

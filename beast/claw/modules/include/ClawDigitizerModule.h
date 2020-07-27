@@ -12,16 +12,9 @@
 #define CLAWDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/claw/dataobjects/ClawHit.h>
-#include <string>
 #include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TF1.h>
-#include <TVector3.h>
 
 /** size of hit */
 const Int_t MAXSIZE         = 10000;
@@ -45,27 +38,44 @@ namespace Belle2 {
        */
       ClawDigitizerModule();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~ClawDigitizerModule();
 
-      /**  */
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
 
-      /**  */
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
 
-      /**  */
+      /**
+       * Event processor.
+       */
       virtual void event() override;
 
-      /**  */
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
-      /**  */
+
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
 
     private:
 
-      StoreArray<ClawHit> m_clawHit; /** array for ClawHit */
+      StoreArray<ClawHit> m_clawHit; /**< array for ClawHit */
 
       /** reads data from CLAW.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

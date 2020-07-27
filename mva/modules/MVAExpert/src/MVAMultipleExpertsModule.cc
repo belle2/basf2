@@ -19,6 +19,7 @@
 #include <mva/interface/Interface.h>
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <memory>
 
 #include <framework/logging/Logger.h>
 
@@ -70,8 +71,8 @@ namespace Belle2 {
 
     for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
       if (not(boost::ends_with(m_identifiers[i], ".root") or boost::ends_with(m_identifiers[i], ".xml"))) {
-        m_weightfile_representations[i] = (std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
-                                           DBObjPtr<DatabaseRepresentationOfWeightfile>(MVA::makeSaveForDatabase(m_identifiers[i]))));
+        m_weightfile_representations[i] = std::make_unique<DBObjPtr<DatabaseRepresentationOfWeightfile>>(
+                                            MVA::makeSaveForDatabase(m_identifiers[i]));
       }
     }
 
@@ -130,7 +131,7 @@ namespace Belle2 {
 
     std::vector<float> dummy;
     dummy.resize(m_individual_feature_variables[i].size(), 0);
-    m_datasets[i] = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
+    m_datasets[i] = std::make_unique<MVA::SingleDataset>(general_options, dummy, 0);
 
   }
 
@@ -189,4 +190,3 @@ namespace Belle2 {
   }
 
 } // Belle2 namespace
-

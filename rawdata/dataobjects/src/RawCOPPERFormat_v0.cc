@@ -76,10 +76,8 @@ int RawCOPPERFormat_v0::GetDetectorNwords(int n, int finesse_num)
   char err_buf[500];
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n", finesse_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
-  //   sleep(12345678);
-  //   exit(-1);
-  //   return 0;
+  printf("%s\n", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }
 
 
@@ -105,11 +103,8 @@ int RawCOPPERFormat_v0::GetFINESSENwords(int n, int finesse_num)
   char err_buf[500];
   sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
           finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
-  //   sleep(12345678);
-  //   exit(-1);
-  //   return 0;
-
+  printf("%s\n", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }
 
 
@@ -143,9 +138,8 @@ unsigned int RawCOPPERFormat_v0::GetB2LFEE32bitEventNumber(int n)
     char err_buf[500];
     sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
+    printf("%s\n", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
 
   if (err_flag == 1) {
@@ -156,10 +150,7 @@ unsigned int RawCOPPERFormat_v0::GetB2LFEE32bitEventNumber(int n)
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] [ERROR] %s\n", err_buf);
 #ifndef NO_DATA_CHECK
-    string err_str = err_buf; throw (err_str);
-    //     sleep(12345678);
-    //     exit(-1);
-
+    B2FATAL(err_buf);
 #endif //NO_DATA_CHECK
   }
   return eve_num;
@@ -169,11 +160,8 @@ unsigned int RawCOPPERFormat_v0::GetB2LFEE32bitEventNumber(int n)
   char err_buf[500];
   sprintf(err_buf, "You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n%s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf; throw (err_str);
-  //   sleep(12345678);
-  //   exit(1);
-  //   return 0;
-
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 #endif // READ_OLD_B2LFEE_FORMAT_FILE
 
 }
@@ -193,10 +181,8 @@ void RawCOPPERFormat_v0::CheckData(int n,
           n, prev_evenum, *cur_evenum_rawcprhdr, prev_copper_ctr, *cur_copper_ctr,
           prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
-  string err_str = err_buf;
-  throw (err_str);
-
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 
 //   char err_buf[500];
 //   int err_flag = 0;
@@ -400,9 +386,8 @@ void RawCOPPERFormat_v0::CheckUtimeCtimeTRGType(int n)
     char err_buf[500];
     sprintf(err_buf, "CORRUPTED DATA: mismatch over FINESSEs. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    string err_str = err_buf; throw (err_str);
-    //     sleep(1234567);
-    //     exit(1);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
   }
   return;
 }
@@ -417,10 +402,9 @@ unsigned int RawCOPPERFormat_v0::FillTopBlockRawHeader(unsigned int m_node_id, u
           "This function for format ver.0 is not supported. (node %.8x preveve %u prevrun %u currun %u ) Exiting...\n %s %s %d\n",
           m_node_id,  prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
   return 0;
-
 
 //   const int cpr_id = 0;
 //   //  m_temp_value = 12345678;
@@ -692,9 +676,8 @@ void RawCOPPERFormat_v0::CheckB2LFEEHeaderVersion(int n)
         char err_buf[500];
         sprintf(err_buf, "FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        string err_str = err_buf; throw (err_str);
-        //         sleep(12345678);
-        //         exit(-1);
+        printf("%s", err_buf); fflush(stdout);
+        B2FATAL(err_buf);
 #endif
       } else {
         // this word for 32bit unixtime
@@ -708,9 +691,8 @@ void RawCOPPERFormat_v0::CheckB2LFEEHeaderVersion(int n)
       char err_buf[500];
       sprintf(err_buf, "RawCOPPERFormat_v0 contains no FINESSE data. Exiting...\n %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      string err_str = err_buf; throw (err_str);
-      //       sleep(12345678);
-      //      exit(-1);
+      printf("%s", err_buf); fflush(stdout);
+      B2FATAL(err_buf);
 #endif
     }
   }
@@ -729,6 +711,6 @@ int* RawCOPPERFormat_v0::PackDetectorBuf(int* packed_buf_nwords,
   sprintf(err_buf, "This function is not supported (%p %p %d %p %d %p %d %p %d %p ) Exiting...\n%s %s %d\n"
           , packed_buf_nwords, detector_buf_1st, nwords_1st, detector_buf_2nd, nwords_2nd, detector_buf_3rd,
           nwords_3rd, detector_buf_4th, nwords_4th, &rawcprpacker_info, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  string err_str = err_buf;
-  throw (err_str);
+  printf("%s", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
 }

@@ -1,0 +1,28 @@
+# EventType: 1220008000
+# Descriptor: [B+ -> K*+ eta]
+# NickName: Bu_K*+eta
+# Documentation: Channel considered as background for B->K*gamma
+# Tested: Yes
+# Physics WG: EWP
+# Responsible: Borys Knysh
+# Email: borys.knysh@gmail.com
+# Cuts: None
+# Date: 20190701
+
+Alias myB+ B+
+Alias myB- B-
+ChargeConj myB+ myB-
+
+Decay Upsilon(4S)
+0.500 myB+  B-                          VSS;
+0.500 B+  myB-                          VSS;
+Enddecay
+
+Decay myB+
+1.000 K*+   eta				SVS;
+Enddecay
+CDecay myB-
+
+
+End
+

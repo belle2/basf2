@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/legendre/quadtree/BaseCandidateReceiver.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
 
@@ -26,7 +25,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      OffOriginExtension(std::vector<const CDCWireHit*> allAxialWireHits, double levelPrecision = 9);
+      explicit OffOriginExtension(std::vector<const CDCWireHit*> allAxialWireHits, double levelPrecision = 9);
 
       /// Main entry point for the post processing call from the QuadTreeProcessor
       void operator()(const std::vector<const CDCWireHit*>& inputWireHits, void* qt) final;

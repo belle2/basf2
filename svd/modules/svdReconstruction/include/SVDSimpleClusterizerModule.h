@@ -13,8 +13,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/SimpleClusterCandidate.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -25,6 +23,8 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
+#include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
+#include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
 
 namespace Belle2 {
 
@@ -60,6 +60,8 @@ namespace Belle2 {
       std::string m_storeTrueHitsName;
       /** Name of the collection to use for the MCParticles */
       std::string m_storeMCParticlesName;
+      /** Name of the collection to use for the SVDShaperDigits */
+      std::string m_storeShaperDigitsName;
       /** Name of the relation between SVDRecoDigits and MCParticles */
       std::string m_relRecoDigitMCParticleName;
       /** Name of the relation between SVDClusters and MCParticles */
@@ -83,23 +85,32 @@ namespace Belle2 {
 
 
       // 2. Clustering
-      /** Seed cut in units of noise. DEPRECATED */
-      double m_cutSeed;
-      /** Adjacent cut in units of noise. DEPRECATED */
-      double m_cutAdjacent;
+      /** Seed cut in units of noise. DEPRECATED - useDB */
+      double m_cutSeed = 5;
+      /** Adjacent cut in units of noise. DEPRECATED - useDB*/
+      double m_cutAdjacent = 3;
       /** Size of the cluster at which we switch from Center of Gravity to Analog Head Tail */
-      int m_sizeHeadTail;
-      // Cluster cut in units of m_elNoise, not included (yet?)
-      double m_cutCluster;
-      //use DB
-      bool m_useDB; //if false, use the module parameters
+      int m_sizeHeadTail = 3;
+      /** Cluster cut in units of m_elNoise, not included (yet?) */
+      double m_cutCluster = 0;
+      /** if true takes the clusterizer cuts from the DB object*/
+      bool m_useDB = true;
+      /** selects the algorithm to compute the cluster tim
+       *  0 = 6-sample CoG (default)
+       *  1 = 3-sample CoG (TO DO: default if 3-sample acquisition mode)
+       *  2 = 3-sample ELS
+       */
+      int m_timeAlgorithm = 0;
 
       //calibration objects
-      SVDPulseShapeCalibrations m_PulseShapeCal;
-      SVDNoiseCalibrations m_NoiseCal;
-      SVDClusterCalibrations m_ClusterCal;
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/
+      SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations db object*/
 
-      void writeClusters(SimpleClusterCandidate clusterCand);
+      SVD3SampleCoGTimeCalibrations m_3CoGTimeCal; /**< SVD 3-sample CoG Time calibrations db object*/
+      SVD3SampleELSTimeCalibrations m_3ELSTimeCal; /**< SVD 3-sample ELS Time calibrations db object*/
+
+      void writeClusters(SimpleClusterCandidate clusterCand); /**<write the cluster candidate to clusters*/
     };//end class declaration
 
 

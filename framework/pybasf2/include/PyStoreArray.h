@@ -97,7 +97,7 @@ namespace Belle2 {
      *  @param storeFlags  ORed combination of DataStore::EStoreFlags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(std::string name = "",
+    bool registerInDataStore(const std::string& name = "",
                              DataStore::EStoreFlags storeFlags = DataStore::EStoreFlags::c_WriteOut);
 
     /** Ensure this array has been registered previously.
@@ -124,10 +124,10 @@ namespace Belle2 {
      *  Use this if you want to create relate objects in this array to objects in 'toArray'.
      *  Must be called in the initialization phase.
      *
-     * @param toArray    Array the relation should point to (from this PyStoreArray)
-     * @param durability Durability of the relation.
-     * @param storeFlags ORed combination of DataStore::EStoreFlags
-     * @param Additional name for the relation, or "" for the default naming
+     * @param toArray        Array the relation should point to (from this PyStoreArray)
+     * @param durability     Durability of the relation.
+     * @param storeFlags     ORed combination of DataStore::EStoreFlags
+     * @param namedRelation  Additional name for the relation, or "" for the default naming
      */
     bool registerRelationTo(const PyStoreArray& toArray,
                             DataStore::EDurability durability = DataStore::EDurability::c_Event,
@@ -140,6 +140,7 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this PyStoreArray)
      * @param durability Durability of the relation.
+     * @param namedRelation Name of the relation in case it's not the default name
      * @return           True if the relations exists.
      */
     bool requireRelationTo(const PyStoreArray& toArray,
@@ -153,11 +154,32 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this PyStoreArray)
      * @param durability Durability of the relation.
+     * @param namedRelation Name of the relation in case it's not the default name
      * @return           True if the relations exists.
      */
     bool optionalRelationTo(const PyStoreArray& toArray,
                             DataStore::EDurability durability = DataStore::c_Event,
                             std::string const& namedRelation = "") const;
+
+    /** Check for the existence of a relation to the provided toArray (from this Pystorearray)
+     *
+     * @param toArray       Array the relation should point to (from this StoreArray)
+     * @param durability    Durability of the relation.
+     * @param namedRelation Additional name for the relation, or "" for the default naming
+     */
+    bool hasRelationTo(const PyStoreArray& toArray,
+                       DataStore::EDurability durability = DataStore::c_Event,
+                       const std::string& namedRelation = "") const;
+
+    /** Check for the existence of a relation from the provided toArray (to this Pystorearray)
+     *
+     * @param fromArray     Array the relation should point to (from this StoreArray)
+     * @param durability    Durability of the relation.
+     * @param namedRelation Additional name for the relation, or "" for the default naming
+     */
+    bool hasRelationFrom(const PyStoreArray& fromArray,
+                         DataStore::EDurability durability = DataStore::c_Event,
+                         const std::string& namedRelation = "") const;
 
     /** Return name under which the object is saved in the DataStore. */
     std::string getName() const { return m_storeAccessor.getName(); }

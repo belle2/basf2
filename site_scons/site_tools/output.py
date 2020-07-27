@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from root_dict import rootcint
-from reg_map import map_builder
 from SCons.Script import GetOption
 
 # compile: blue
@@ -73,7 +71,7 @@ def generate(env):
             INSTALLSTR=color_map['install'] + '*** ' + install_text + ' : ${TARGET}' + color_map['end'],
             COPYCOMSTR=color_map['copy'] + '*** copying    : ${TARGET}' + color_map['end'],
             MAPCOMSTR=color_map['map'] + '*** map        : ${TARGET}' + color_map['end'],
-            ROOTCINTCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}' + color_map['end'],
+            ROOTCLINGCOMSTR=color_map['dict'] + '*** dictionary : ${TARGET}' + color_map['end'],
             STRIPCOMSTR=color_map['strip'] + '*** stripping  : ${TARGET}' + color_map['end'],
         )
 

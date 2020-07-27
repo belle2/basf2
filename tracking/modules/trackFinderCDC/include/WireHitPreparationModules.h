@@ -12,8 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundDetector.h>
 #include <tracking/trackFindingCDC/findlets/minimal/HitReclaimer.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
@@ -37,7 +36,7 @@ namespace Belle2 {
       using Super = FindletModule<WireHitPreparer>;
 
     public:
-      // Constructor
+      /// Constructor
       TFCDC_WireHitPreparerModule();
     };
 
@@ -55,7 +54,9 @@ namespace Belle2 {
       TFCDC_WireHitCreatorModule();
     };
 
-
+    /**
+     * Module to reclaim CDC hits
+     */
     class TFCDC_HitReclaimerModule : public FindletModule<HitReclaimer> {
 
       /// Type of the base class
@@ -64,6 +65,22 @@ namespace Belle2 {
     public:
       /// Constructor
       TFCDC_HitReclaimerModule();
+    };
+
+
+    /**
+     * Module counterpart to the WireHitBackgroundDetector findlet,
+     * which marks CDCWireHits as background based on the result of a filter.
+     * FindletModule is used as an adaptor findlet->module.
+     */
+    class TFCDC_WireHitBackgroundDetectorModule : public FindletModule<WireHitBackgroundDetector> {
+
+      /// Type of the base class
+      using Super = FindletModule<WireHitBackgroundDetector>;
+
+    public:
+      /// Constructor
+      TFCDC_WireHitBackgroundDetectorModule();
     };
   }
 }

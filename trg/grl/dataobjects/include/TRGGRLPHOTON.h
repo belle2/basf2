@@ -18,10 +18,13 @@
 
 namespace Belle2 {
 
+  /// a class for neutral ECL cluster in TRGGRL
   class TRGGRLPHOTON : public RelationsObject {
   public:
 
+    /// Constructor
     TRGGRLPHOTON(): m_phi_d(-999.), m_e(-1.0) {}
+    /// Destructor
     ~TRGGRLPHOTON() {}
 
     /**Get phi_d*/

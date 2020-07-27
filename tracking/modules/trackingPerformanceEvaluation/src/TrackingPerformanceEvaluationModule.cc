@@ -9,12 +9,8 @@
  **************************************************************************/
 
 #include <tracking/modules/trackingPerformanceEvaluation/TrackingPerformanceEvaluationModule.h>
-#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
 
 #include <framework/geometry/BFieldManager.h>
@@ -40,14 +36,9 @@
 
 #include <genfit/KalmanFitterInfo.h>
 
-#include <root/TTree.h>
-#include <root/TAxis.h>
 #include <root/TObject.h>
 
 #include <boost/foreach.hpp>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 
@@ -557,12 +548,11 @@ void TrackingPerformanceEvaluationModule::event()
   StoreArray<SVDCluster> svdClusters;
   StoreArray<CDCHit> cdcHit;
 
-  bool hasRecoTrack = false;
 
   BOOST_FOREACH(RecoTrack & mcRecoTrack, mcRecoTracks) {
 
     int nRecoTrack = 0;
-    hasRecoTrack = false;
+    bool hasRecoTrack = false;
 
     //3.a retrieve the RecoTrack
     RelationVector<RecoTrack> RecoTracks_fromMCRecoTrack = DataStore::getRelationsWithObj<RecoTrack>(&mcRecoTrack);
@@ -581,46 +571,9 @@ void TrackingPerformanceEvaluationModule::event()
 
       B2DEBUG(99, "~~~~~ " << RecoTracks_fromMCParticle.size() << " RecoTracks related to this MCParticle");
       for (int tc = 0; tc < (int)RecoTracks_fromMCParticle.size(); tc++)
-
         if (!hasRecoTrack) {
-
           hasRecoTrack = true;
           nRecoTrack++;
-
-          /*
-                genfit::TrackCandHit* thehitMCRT = 0;
-                for (int hitMCRT = 0; hitMCRT < (int)mcTrackCand.getNHits(); hitMCRT++) {
-
-                  thehitMCRT = mcTrackCand.getHit(hitMCRT);
-                  if (!thehitMCRT)
-                    continue;
-
-                  int hitId = thehitMCRT->getHitId();
-                  int detId = thehitMCRT->getDetId();
-                  if (detId == 1)
-                    m_h1_HitsMCRecoTrack->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
-                  if (detId == 2)
-                    m_h1_HitsMCRecoTrack->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
-                  //      if(thehitMCRT->getDetId() == 3)
-                  //        m_h1_HitsMCRecoTrack->Fill( cdcHit[hitId]->getLayer() );
-
-                  genfit::TrackCandHit* thehitTC = 0;
-                  for (int hitTC = 0; hitTC < (int)TrackCands_fromMCParticle[tc]->getNHits(); hitTC++) {
-
-                    thehitTC = TrackCands_fromMCParticle[tc]->getHit(hitTC);
-                    if (!thehitTC)
-                      continue;
-
-                    if ((*thehitTC) == (*thehitMCRT)) {
-                      if (detId == Const::PXD)
-                        m_h1_HitsRecoTrackPerMCRecoTrack->Fill(pxdClusters[hitId]->getSensorID().getLayerNumber());
-                      if (detId == Const::SVD)
-                        m_h1_HitsRecoTrackPerMCRecoTrack->Fill(svdClusters[hitId]->getSensorID().getLayerNumber());
-                      continue;
-                    }
-                  }
-            }
-          */
         }
 
     }
@@ -882,7 +835,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
   const TrackFitResult* fitResult = theTrack.getTrackFitResult(Const::ChargedStable(m_ParticleHypothesis));
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   bool hasPXDhit = false;
   bool isTrueHit = false;
@@ -954,20 +907,21 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
           const PXDCluster* pxdcl = pxdHit->getCluster();
           RelationVector<PXDTrueHit> pxdth_fromcl = DataStore::getRelationsWithObj<PXDTrueHit>(pxdcl);
 
-          const PXDTrueHit* trueHit = pxdth_fromcl[0];
+          if ((int)pxdth_fromcl.size() != 0) {
+            const PXDTrueHit* trueHit = pxdth_fromcl[0];
 
-          if (trueHit) {
-            int trueHitIndex = trueHit->getArrayIndex();
-            RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&theTrack);
-            for (int mcp = 0; mcp < (int)MCParticles_fromTrack.size(); mcp++) {
-              RelationVector<PXDTrueHit> trueHit_fromMCParticles = DataStore::getRelationsWithObj<PXDTrueHit>(MCParticles_fromTrack[mcp]);
-              for (int th = 0; th < (int)trueHit_fromMCParticles.size(); th++) {
-                if (trueHit_fromMCParticles[th]->getArrayIndex() == trueHitIndex)
-                  isTrueHit = true;
+            if (trueHit) {
+              int trueHitIndex = trueHit->getArrayIndex();
+              RelationVector<MCParticle> MCParticles_fromTrack = DataStore::getRelationsWithObj<MCParticle>(&theTrack);
+              for (int mcp = 0; mcp < (int)MCParticles_fromTrack.size(); mcp++) {
+                RelationVector<PXDTrueHit> trueHit_fromMCParticles = DataStore::getRelationsWithObj<PXDTrueHit>(MCParticles_fromTrack[mcp]);
+                for (int th = 0; th < (int)trueHit_fromMCParticles.size(); th++) {
+                  if (trueHit_fromMCParticles[th]->getArrayIndex() == trueHitIndex)
+                    isTrueHit = true;
+                }
               }
             }
           }
-
 
         } else if (svdHit2D) {
 

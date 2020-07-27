@@ -6,13 +6,13 @@
 // Date : 16 - Feb - 2015
 //-
 
-#ifndef B2BIIMDST_INPUT_H
-#define B2BIIMDST_INPUT_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 #define BELLE_TARGET_H "belle-x86_64-unknown-linux-gnu-g++.h"
 #include "belle_legacy/panther/panther.h"
@@ -33,17 +33,21 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    /** Constructor */
     B2BIIMdstInputModule();
+    /** Destructor */
     virtual ~B2BIIMdstInputModule() override;
 
-    //! Module functions to be called from main process
+    /** Initialize the module */
     virtual void initialize() override;
 
-    //! Module functions to be called from event process
+    /** Called when a new run is started */
     virtual void beginRun() override;
+    /** Called for each event */
     virtual void event() override;
+    /** Called when the current run finished */
     virtual void endRun() override;
+    /** Terminates the module. */
     virtual void terminate() override;
 
     // Data members
@@ -93,8 +97,9 @@ namespace Belle2 {
 
     //! Entries numbers which are valid for the current file
     std::set<int64_t> m_valid_entries_in_current_file;
+
+    //! File metadata to declare if we process real data or simulated data
+    StoreObjPtr<FileMetaData> m_fileMetadata{"", DataStore::c_Persistent};
   };
 
 } // end namespace Belle2
-
-#endif

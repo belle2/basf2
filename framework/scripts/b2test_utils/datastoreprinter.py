@@ -86,24 +86,39 @@ class DataStorePrinter(object):
                     # and add (name,args,display,callback) tuple
                     self.object_members.append((member, args, None, None))
 
-        # sort them to have fixed order
-        self.object_members.sort(key=lambda x: repr(x))
+        # sort them by member name to have fixed order: python sort is
+        # guaranteed to be stable so different calls to the same member will
+        # remain in same relative order
+        self.object_members.sort(key=lambda x: x[0])
 
-    def add_member(self, name, arguments=[], callback=None, display=None):
+    def add_member(self, name, arguments=[], print_callback=None, display=None):
         """
         Add an additional member to be printed.
 
         Args:
             name (str): name of the member
-            arguments (list): arguments to pass to the member when calling it
-            callback (function or None): callback function to print the result
-                of the member call. The function will be called with the arguments
-                (name, arguments, result)
+            arguments (list or callable): arguments to pass to the member when calling it
+                If this is a callable object then the function is called with
+                the object as first argument and the member name to be tested as
+                second argument. The function is supposed to return the list of
+                arguments to pass to the member when calling. Possible return
+                valus for the callable are:
+
+                * a `list` of arguments to be passed to the member. An empty
+                  `list` means to call the member with no arguments.
+                * a `tuple` of `lists <list>` to call the member once for each
+                  list of arguments in the tuple
+                * `None` or an empty tuple to not call the member at all
+            print_callback (function or None): if not None a function to print
+                the result of the member call. The function will be called with
+                the arguments (name, arguments, result) and should print the
+                result on stdout without any additional information.
             display (str or None): display string to use when printing member call
-                info instead of function name and arguments
+                info instead of function name + arguments. If it is not given
+                the default output will be ``{membername}({arguments}):``
+                followed by the result.
         """
-        import bisect
-        bisect.insort(self.object_members, (name, arguments, callback, display))
+        self.object_members.append((name, arguments, print_callback, display))
         # return self for method chaining
         return self
 
@@ -143,22 +158,40 @@ class DataStorePrinter(object):
 
         # loop over all defined member/argument combinations
         # and print "member(arguments): result" for each
-        for name, args, callback, display in self.object_members:
-            result = getattr(obj, name)(*args)
-            # display can be used to override what is printed for the member. If
-            # so, use it here
-            if display is not None:
-                print("  " + display + ": ", end="")
+        for name, arguments, callback, display in self.object_members:
+            # if arguments is callable it means we need to call it to determine
+            # the arguments
+            if callable(arguments):
+                all_args = arguments(obj, name)
+                # None means we don't calle the member this time
+                if all_args is None:
+                    continue
+                # list is one set of arguments, tuple(list) is n set of
+                # arguments. So convert list into tuple of length 1 to call
+                # member once
+                if isinstance(all_args, list):
+                    all_args = (all_args,)
             else:
-                # otherwise just print name and arguments
-                print("  %s(%s): " % (name, ",".join(map(str, args))), end="")
-            # if a callback is set the callback is used to print the result
-            if callback is not None:
-                print("", end="", flush=True)
-                callback(name, args, result)
-            # otherwise use default function
-            else:
-                self._printResult(result)
+                # if arguments is not callable we asume it's one set of
+                # arguments
+                all_args = (arguments,)
+
+            for args in all_args:
+                result = getattr(obj, name)(*args)
+                # display can be used to override what is printed for the member. If
+                # so, use it here
+                if display is not None:
+                    print("  " + display + ": ", end="")
+                else:
+                    # otherwise just print name and arguments
+                    print("  %s(%s): " % (name, ",".join(map(str, args))), end="")
+                # if a callback is set the callback is used to print the result
+                if callback is not None:
+                    print("", end="", flush=True)
+                    callback(name, args, result)
+                # otherwise use default function
+                else:
+                    self._printResult(result)
 
     def _printResult(self, result, depth=0, weight=None):
         """ Print the result of calling a certain member.

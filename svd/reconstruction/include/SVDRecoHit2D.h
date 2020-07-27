@@ -58,7 +58,8 @@ namespace Belle2 {
      * @param sigmaU Error of the Hit along u
      * @param sigmaV Error of the Hit along v
      */
-    SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = NULL, float sigmaU = -1, float sigmaV = -1);
+    explicit SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit* trackCandHit = nullptr, float sigmaU = -1,
+                          float sigmaV = -1);
 
 
     /** Construct SVDRecoHit directly from vxdid and coordinates without using a hit object from the storearray
@@ -95,7 +96,7 @@ namespace Belle2 {
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
 
-    /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
+    /** Get pointer to the TrueHit used when creating this RecoHit, can be nullptr if created from something else */
     const SVDTrueHit* getTrueHit() const { return m_trueHit; }
     /** Get pointer to the u cluster used to create this RecoHit. */
     const SVDCluster* getUCluster() const {return m_uCluster; }
@@ -138,6 +139,9 @@ namespace Belle2 {
 
     /** Set up Detector plane information */
     void setDetectorPlane();
+
+    /** Apply planar deformation of sensors */
+    TVectorD applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
 
     ClassDefOverride(SVDRecoHit2D, 7)
   };

@@ -2,6 +2,7 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/ModuleParam.templateDetails.h> // needed for complicated parameter types 
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -51,6 +52,12 @@ V0FinderModule::V0FinderModule() : Module()
 
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
            "Maximum chi² for the vertex fit (NDF = 1)", 50.);
+
+
+  addParam("massRangeKshort", m_MassRangeKshort, "mass range in GeV for reconstructed Kshort used for pre-selection of candidates"
+           " (to be chosen loosely as used momenta ignore material effects)", m_MassRangeKshort);
+  addParam("massRangeLambda", m_MassRangeLambda, "mass range in GeV for reconstructed Lambda used for pre-selection of candidates"
+           " (to be chosen loosely as used momenta ignore material effects)", m_MassRangeLambda);
 }
 
 
@@ -62,6 +69,29 @@ void V0FinderModule::initialize()
   //All the other required StoreArrays are checked in the Construtor of the V0Fitter.
   m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
                                           m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack, m_validation);
+
+  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
+
+  // safeguard for users that try to break the code
+  if (std::get<0>(m_MassRangeKshort) > std::get<1>(m_MassRangeKshort)) {
+    B2FATAL("The minimum has to be smaller than the maximum of the Kshort mass range! min = " <<  std::get<0>
+            (m_MassRangeKshort) << " max = " << std::get<1>(m_MassRangeKshort));
+  }
+  if (std::get<0>(m_MassRangeLambda) > std::get<1>(m_MassRangeLambda)) {
+    B2FATAL("The minimum has to be smaller than the maximum of the Lambda mass range! min = " <<  std::get<0>
+            (m_MassRangeLambda) << " max = " << std::get<1>(m_MassRangeLambda));
+  }
+
+  // precalculate the mass range squared
+  m_mKshortMin2 = std::get<0>(m_MassRangeKshort) < 0 ? -std::get<0>(m_MassRangeKshort) * std::get<0>(m_MassRangeKshort) : std::get<0>
+                  (m_MassRangeKshort) * std::get<0>(m_MassRangeKshort);
+  m_mKshortMax2 = std::get<1>(m_MassRangeKshort) < 0 ? -std::get<1>(m_MassRangeKshort) * std::get<1>(m_MassRangeKshort) : std::get<1>
+                  (m_MassRangeKshort) * std::get<1>(m_MassRangeKshort);
+  m_mLambdaMin2 = std::get<0>(m_MassRangeLambda) < 0 ? -std::get<0>(m_MassRangeLambda) * std::get<0>(m_MassRangeLambda) : std::get<0>
+                  (m_MassRangeLambda) * std::get<0>(m_MassRangeLambda);
+  m_mLambdaMax2 = std::get<1>(m_MassRangeLambda) < 0 ? -std::get<1>(m_MassRangeLambda) * std::get<1>(m_MassRangeLambda) : std::get<1>
+                  (m_MassRangeLambda) * std::get<1>(m_MassRangeLambda);
+
 }
 
 
@@ -78,7 +108,7 @@ void V0FinderModule::event()
 
   for (const auto& track : m_tracks) {
     RecoTrack const* const  recoTrack = track.getRelated<RecoTrack>();
-    B2ASSERT(recoTrack, "No RecoTrack available for given Track.");
+    B2ASSERT("No RecoTrack available for given Track.", recoTrack);
 
     if (recoTrack->getChargeSeed() > 0) {
       tracksPlus.push_back(&track);
@@ -94,15 +124,82 @@ void V0FinderModule::event()
     return;
   }
 
-  m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
 
   // Pair up each positive track with each negative track.
   for (auto& trackPlus : tracksPlus) {
     for (auto& trackMinus : tracksMinus) {
-      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
-      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
-      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
-      m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+      try {
+        if (preFilterTracks(trackPlus, trackMinus, Const::Kshort)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Kshort);
+      } catch (const genfit::Exception& e) {
+        // genfit exception raised, skip this track pair for this hypothesis
+        B2WARNING("Genfit exception caught. Skipping this track pair for Kshort hypothesis. " << LogVar("Genfit exception:", e.what()));
+      }
+
+      try {
+        // the pre-filter is not able to reject photons, so no need to apply pre filter for photons
+        m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::photon);
+      } catch (const genfit::Exception& e) {
+        // genfit exception raised, skip this track pair for this hypothesis
+        B2WARNING("Genfit exception caught. Skipping this track pair for photon hypothesis. " << LogVar("Genfit exception:", e.what()));
+      }
+
+      try {
+        if (preFilterTracks(trackPlus, trackMinus, Const::Lambda))  m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::Lambda);
+      } catch (const genfit::Exception& e) {
+        // genfit exception raised, skip this track pair for this hypothesis
+        B2WARNING("Genfit exception caught. Skipping this track pair for Lambda hypothesis. " << LogVar("Genfit exception:", e.what()));
+      }
+
+      try {
+        if (preFilterTracks(trackPlus, trackMinus, Const::antiLambda)) m_v0Fitter->fitAndStore(trackPlus, trackMinus, Const::antiLambda);
+      } catch (const genfit::Exception& e) {
+        // genfit exception raised, skip this track pair for this hypothesis
+        B2WARNING("Genfit exception caught. Skipping this track pair for anti-Lambda hypothesis. " << LogVar("Genfit exception:",
+                  e.what()));
+      }
     }
   }
+
+}
+
+
+bool
+V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis)
+{
+  const double* range_m2_min = nullptr;
+  const double* range_m2_max = nullptr;
+  if (v0Hypothesis == Const::Kshort) {
+    range_m2_min = &m_mKshortMin2;
+    range_m2_max = &m_mKshortMax2;
+  } else if (v0Hypothesis == Const::Lambda or v0Hypothesis == Const::antiLambda) {
+    range_m2_min = &m_mLambdaMin2;
+    range_m2_max = &m_mLambdaMax2;
+  } else {
+    // this case is not covered so accept everything
+    return true;
+  }
+
+  const auto trackHypotheses = m_v0Fitter->getTrackHypotheses(v0Hypothesis);
+
+  // first track should always be the positve one
+  double m_plus = trackHypotheses.first.getMass();
+  double p_plus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getMomentum().Mag();
+  double E_plus = sqrt(m_plus * m_plus + p_plus * p_plus);
+
+  // second track is the negative
+  double m_minus = trackHypotheses.second.getMass();
+  double p_minus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getMomentum().Mag();
+  double E_minus = sqrt(m_minus * m_minus + p_minus * p_minus);
+
+  // now do the adding of the 4momenta
+  double sum_E2 = (E_minus + E_plus) * (E_minus + E_plus);
+
+  // the minimal/maximal allowed mass for these 4momenta is given if the 3momenta are aligned ( cos(angle)= +/- 1 )
+  double candmass_min2 = sum_E2 - (p_plus + p_minus) * (p_plus + p_minus);
+  double candmass_max2 = sum_E2 - (p_plus - p_minus) * (p_plus - p_minus);
+
+  // if true possible candiate mass overlaps with the user specified range
+  bool in_range = candmass_max2 > *range_m2_min and candmass_min2 < *range_m2_max;
+
+  return in_range;
 }

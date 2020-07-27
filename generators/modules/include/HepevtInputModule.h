@@ -15,7 +15,6 @@
 
 #include <string>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <generators/hepevt/HepevtReader.h>

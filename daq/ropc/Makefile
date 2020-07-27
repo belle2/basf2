@@ -11,7 +11,7 @@ DAQPATH=${TEMP_LOCAL_DIR}/daq/dataobjects/src:${TEMP_LOCAL_DIR}/daq/rawdata/src
 SLCPATH=${TEMP_LOCAL_DIR}/daq/slc/readout/src:${TEMP_LOCAL_DIR}/daq/slc/system/src:${TEMP_LOCAL_DIR}/daq/slc/base/src
 VPATH = ${RAWDATAPATH}:${DAQPATH}:${SLCPATH}
 
-RAWDATAOBJS = RawDataBlockFormat.o RawCOPPERFormat.o RawCOPPERFormat_latest.o PreRawCOPPERFormat_latest.o PostRawCOPPERFormat_latest.o RawHeader_latest.o RawTrailer_latest.o RawTLUFormat.o RawFTSWFormat.o CRCCalculator.o 
+RAWDATAOBJS = RawDataBlockFormat.o RawCOPPERFormat.o RawCOPPERFormat_latest.o PreRawCOPPERFormat_latest.o PostRawCOPPERFormat_latest.o RawHeader_latest.o RawTrailer_latest.o RawTLUFormat.o RawFTSWFormat.o RawFTSWFormat_latest.o CRCCalculator.o 
 DAQOBJS = DesSer.o DesSerPrePC.o DesSerCOPPER.o CprErrorMessage.o SendHeader.o SendTrailer.o
 SLCOBJS = RunInfoBuffer.o SharedMemory.o MMutex.o MCond.o LogFile.o Mutex.o Date.o ConfigFile.o StringUtil.o
 OBJS = ${RAWDATAOBJS} ${DAQOBJS} ${SLCOBJS}
@@ -27,6 +27,9 @@ all: clean link ${TARGET1} ${TARGET2} cleanobj
 ropc: clean_ropc link ${TARGET1} cleanobj
 
 copper: clean_copper link ${TARGET2} cleanobj
+	@ echo "!!!!!!! Martin added overrides to reduce cppcheck warnings (https://stash.desy.de/projects/B2/repos/software/pull-requests/2825/overview), which leads to failure of compiling on COPPER. To compile on a COPPER, please run the following commands to remove override in rawdata classes"
+	@ echo "!!!!!!! cd rawdata/dataobjects/include; sed -i -e 's/ override;/;/g' *.h"
+
 
 ${TARGET1}: ${TARGET1}.cc ${OBJS}
 	$(CXX) $(CFLAGS) ${LIBFLAG} -L./ $^ -o $@ 

@@ -8,17 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDMAP_H_
-#define BFIELDMAP_H_
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
 #include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
 
-#include <string>
 #include <list>
-
 
 namespace Belle2 {
   /**
@@ -121,5 +118,3 @@ namespace Belle2 {
 
 
 } //end of namespace Belle2
-
-#endif /* BFIELDMAP_H_ */

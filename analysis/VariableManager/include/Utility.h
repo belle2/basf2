@@ -13,7 +13,6 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <framework/utilities/GeneralCut.h>
-#include <string.h>
 
 namespace Belle2 {
 
@@ -46,6 +45,6 @@ namespace Belle2 {
      * A check if this variable string is a counter type variable to be handled
      * by the VariablesTo* output modules directly.
      */
-    bool isCounterVariable(std::string variableName);
+    bool isCounterVariable(const std::string& variableName);
   }
 }

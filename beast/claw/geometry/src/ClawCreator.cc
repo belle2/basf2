@@ -13,13 +13,9 @@
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-//#include <claw/simulation/SensitiveDetector.h>
 
-#include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -28,14 +24,9 @@
 #include <G4PVPlacement.hh>
 
 //Shapes
-#include <G4Trap.hh>
 #include <G4Box.hh>
-#include <G4Polycone.hh>
-#include "G4UnionSolid.hh"
 #include "G4SubtractionSolid.hh"
 #include <G4UserLimits.hh>
-#include <G4RegionStore.hh>
-#include "G4Tubs.hh"
 
 //Visualization Attributes
 #include <G4VisAttributes.hh>
@@ -54,7 +45,7 @@ namespace Belle2 {
 
     ClawCreator::ClawCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     ClawCreator::~ClawCreator()
@@ -64,6 +55,9 @@ namespace Belle2 {
 
     void ClawCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
 

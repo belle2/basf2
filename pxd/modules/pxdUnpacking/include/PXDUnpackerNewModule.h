@@ -117,77 +117,6 @@ namespace Belle2 {
       /** Output array for Raw Adcs. */
       StoreArray<PXDRawAdc> m_storeRawAdc;
 
-      /** Unpack one event (several frames) stored in RawPXD object
-       * @param px RawPXD data object
-       * @param inx Index of RawPXD packet
-       */
-      void unpack_rawpxd(RawPXD& px, int inx);
-
-      /** Unpack one frame (within an event).
-       * @param data pointer to frame
-       * @param len length of frame
-       * @param Frame_Number current frame number
-       * @param Frames_in_event number of frames in PxdRaw object (subevent)
-       * @param daqpktstat Daq Packet Status Object
-       * @param daqdhevect Daq DHE Status Object
-       */
-      void unpack_dhc_frame_v01(void* data, const int len, const int Frame_Number, const int Frames_in_event,
-                                PXDDAQPacketStatus& daqpktstat);
-
-      /** Unpack one frame (within an event).
-       * @param data pointer to frame
-       * @param len length of frame
-       * @param Frame_Number current frame number
-       * @param Frames_in_event number of frames in PxdRaw object (subevent)
-       * @param daqpktstat Daq Packet Status Object
-       * @param daqdhevect Daq DHE Status Object
-       */
-      void unpack_dhc_frame_v05(void* data, const int len, const int Frame_Number, const int Frames_in_event,
-                                PXDDAQPacketStatus& daqpktstat);
-
-      /** Unpack DHP data within one DHE frame
-       * @param data pointer to dhp data
-       * @param len length of dhp data
-       * @param dhe_first_readout_frame_lo 16 bit of the first readout frame from DHE Start
-       * @param dhe_ID raw DHE ID from DHC frame
-       * @param dhe_DHPport raw DHP port from DHC frame
-       * @param dhe_reformat flag if DHE did reformatting
-       * @param vxd_id vertex Detector ID
-       */
-      void unpack_dhp_v01(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID,
-                          unsigned dhe_DHPport,
-                          unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
-
-      /** Unpack DHP data within one DHE frame
-       * @param data pointer to dhp data
-       * @param len length of dhp data
-       * @param dhe_first_readout_frame_lo 16 bit of the first readout frame from DHE Start
-       * @param dhe_ID raw DHE ID from DHC frame
-       * @param dhe_DHPport raw DHP port from DHC frame
-       * @param dhe_reformat flag if DHE did reformatting
-       * @param vxd_id vertex Detector ID
-       */
-      void unpack_dhp_v05(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID,
-                          unsigned dhe_DHPport,
-                          unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
-
-      /** Unpack DHP RAW data within one DHE frame (pedestals, etc)
-       * @param data pointer to dhp data
-       * @param len length of dhp data
-       * @param dhe_ID raw DHE ID from DHC frame
-       * @param dhe_DHPport raw DHP port from DHC frame
-       * @param vxd_id vertex Detector ID
-       */
-      void unpack_dhp_raw(void* data, unsigned int len, unsigned int dhe_ID, unsigned dhe_DHPport, VxdID vxd_id);
-
-      /** Unpack DHP/FCE data within one DHE frame
-       * Not fully implemented as cluster format not 100% fixed
-       * @param data pointer to dhp data
-       * @param len length of dhp data
-       * @param vxd_id vertex Detector ID
-       */
-      void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
-
       /** Error Mask set per packet / frame*/
       PXDError::PXDErrorFlags m_errorMask{0};
       /** Error Mask set per packet / DHE */
@@ -210,6 +139,84 @@ namespace Belle2 {
 
       /** some workaround check for continouous frame ids */
       int m_last_dhp_readout_frame_lo[4] { -1}; // signed because -1 means undefined
+
+
+      /** Unpack one event (several frames) stored in RawPXD object
+       * @param px RawPXD data object
+       * @param inx Index of RawPXD packet
+       */
+      void unpack_rawpxd(RawPXD& px, int inx);
+
+      /// ==== the functions for the "old" firmware ====
+
+      /** Unpack one frame (within an event).
+       * @param data pointer to frame
+       * @param len length of frame
+       * @param Frame_Number current frame number
+       * @param Frames_in_event number of frames in PxdRaw object (subevent)
+       * @param daqpktstat Daq Packet Status Object
+       * @param daqdhevect Daq DHE Status Object
+       */
+      void unpack_dhc_frame_v01(void* data, const int len, const int Frame_Number, const int Frames_in_event,
+                                PXDDAQPacketStatus& daqpktstat);
+
+      /** Unpack DHP data within one DHE frame
+       * @param data pointer to dhp data
+       * @param len length of dhp data
+       * @param dhe_first_readout_frame_lo 16 bit of the first readout frame from DHE Start
+       * @param dhe_ID raw DHE ID from DHC frame
+       * @param dhe_DHPport raw DHP port from DHC frame
+       * @param dhe_reformat flag if DHE did reformatting
+       * @param vxd_id vertex Detector ID
+       */
+      void unpack_dhp_v01(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID,
+                          unsigned dhe_DHPport,
+                          unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
+
+      /// ==== the functions for the "new" firmware ====
+
+      /** Unpack one frame (within an event).
+       * @param data pointer to frame
+       * @param len length of frame
+       * @param Frame_Number current frame number
+       * @param Frames_in_event number of frames in PxdRaw object (subevent)
+       * @param daqpktstat Daq Packet Status Object
+       * @param daqdhevect Daq DHE Status Object
+       */
+      void unpack_dhc_frame_v05(void* data, const int len, const int Frame_Number, const int Frames_in_event,
+                                PXDDAQPacketStatus& daqpktstat);
+
+      /** Unpack DHP data within one DHE frame
+       * @param data pointer to dhp data
+       * @param len length of dhp data
+       * @param dhe_first_readout_frame_lo 16 bit of the first readout frame from DHE Start
+       * @param dhe_ID raw DHE ID from DHC frame
+       * @param dhe_DHPport raw DHP port from DHC frame
+       * @param dhe_reformat flag if DHE did reformatting
+       * @param vxd_id vertex Detector ID
+       */
+      void unpack_dhp_v05(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID,
+                          unsigned dhe_DHPport,
+                          unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
+
+      /// ==== more firmware version independent functions ====
+
+      /** Unpack DHP RAW data within one DHE frame (pedestals, etc)
+       * @param data pointer to dhp data
+       * @param len length of dhp data
+       * @param dhe_ID raw DHE ID from DHC frame
+       * @param dhe_DHPport raw DHP port from DHC frame
+       * @param vxd_id vertex Detector ID
+       */
+      void unpack_dhp_raw(void* data, unsigned int len, unsigned int dhe_ID, unsigned dhe_DHPport, VxdID vxd_id);
+
+      /** Unpack DHP/FCE data within one DHE frame
+       * Not fully implemented as cluster format not 100% fixed
+       * @param data pointer to dhp data
+       * @param len length of dhp data
+       * @param vxd_id vertex Detector ID
+       */
+      void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
 
     public:
       /** helper function to "count" nr of set bits within lower 5 bits.

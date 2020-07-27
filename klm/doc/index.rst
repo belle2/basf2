@@ -81,7 +81,7 @@ Build the Muid likelihoods starting from the hit pattern and the transverse scat
 * pdg (*int*): PDG code of the particle hypothesis.
 
 
-.. figure:: /home/belle2/martina/development/klm/doc/figures/Likelihood-muon-pion-eff-fake-momentum-styled-1.jpg
+.. figure:: Likelihood-muon-pion-eff-fake-momentum-styled-1.jpg
    :width: 40
    :align: center
 

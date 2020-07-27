@@ -172,7 +172,7 @@ void numberOfPhotons(TTree* top)
     "Distribution should peak at around 20 photons; bin at zero must be fairly small; "
     "long tail is normal."));
   h->GetListOfFunctions()->Add(new TNamed("Contact", "marko.staric@ijs.si"));
-  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+  h->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,kolmogorov"));
   h->Write();
 
   h = new TH2F("h202", "number of detected photons per track vs polar angle", 

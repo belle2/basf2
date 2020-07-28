@@ -55,11 +55,11 @@ namespace Belle2 {
     struct RelationFilterUtil {
       /* *@{*/
       /** Appends relations between elements in the given AItems using the ARelationFilter. */
-      template <class AObject, class ARelationFilter, template<class ...> class WeightedRelationClass>
+      template <class AObject, class ARelationFilter>
       static void appendUsing(ARelationFilter& relationFilter,
                               const std::vector<AObject*>& froms,
                               const std::vector<AObject*>& tos,
-                              std::vector<WeightedRelationClass<AObject>>& weightedRelations,
+                              std::vector<WeightedRelation<AObject>>& weightedRelations,
                               unsigned int maximumNumberOfRelations = std::numeric_limits<unsigned int>::max())
       {
         for (AObject* from : froms) {
@@ -97,10 +97,10 @@ namespace Belle2 {
       /* *@}*/
 
       /// Shortcut for applying appendUsing with froms=tos
-      template <class AObject, class ARelationFilter, template<class ...> class WeightedRelationClass>
+      template <class AObject, class ARelationFilter>
       static void appendUsing(ARelationFilter& relationFilter,
                               const std::vector<AObject*>& objects,
-                              std::vector<WeightedRelationClass<AObject>>& weightedRelations)
+                              std::vector<WeightedRelation<AObject>>& weightedRelations)
       {
         appendUsing(relationFilter, objects, objects, weightedRelations);
       };

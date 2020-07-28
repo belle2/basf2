@@ -17,7 +17,6 @@
 #include <string>
 #include <cstring>
 #include <algorithm>
-#include "trg/trg/Constants.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDCLUSTER_H
-#define PXDCLUSTER_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -253,4 +252,3 @@ namespace Belle2 {
 
 
 } //Belle2 namespace
-#endif

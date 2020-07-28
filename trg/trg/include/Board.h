@@ -20,7 +20,6 @@
 namespace Belle2 {
 
   class TRGClock;
-  class TRGSignalBundle;
   class TRGChannel;
 
 /// A class to represent a trigger board

@@ -23,7 +23,6 @@
 #include "G4HadronicInteractionRegistry.hh"
 #include "G4PreCompoundModel.hh"
 #include "G4BinaryLightIonReaction.hh"
-#include "G4HadronElastic.hh"
 #include "G4NuclNuclDiffuseElastic.hh"
 
 #include "G4CrossSectionElastic.hh"

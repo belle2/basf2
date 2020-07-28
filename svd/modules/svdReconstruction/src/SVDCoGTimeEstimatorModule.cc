@@ -199,7 +199,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //recording of the RecoDigit
     m_storeReco.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, modeByte));
+                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
     int recoDigitIndex = m_storeReco.getEntries() - 1;
@@ -268,7 +268,7 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaper
   } else {
     averagetime = -1;
     m_StopCreationReco = true;
-    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is NULL! Skipping this SVDShaperDigit!");
+    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
   }
 
   return averagetime;

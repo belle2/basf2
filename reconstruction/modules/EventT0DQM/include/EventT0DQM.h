@@ -10,25 +10,16 @@
 
 #pragma once
 
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
-#include "TH1F.h"
-#include "TString.h"
-#include "TDirectory.h"
-using std::vector;
-using std::string;
-
 #include <framework/dataobjects/EventT0.h>
+
+#include <TH1F.h>
+#include <TDirectory.h>
 
 namespace Belle2 {
 

@@ -354,8 +354,10 @@ namespace Belle2 {
   }
 
 
-  // get vector which is oposite to vIn in CMS ref frame
-  // Be aware that input vIn and output are in the Lab frame
+  /**
+   * Get vector which is opposite to vIn in CMS ref frame
+   * Be aware that input vIn and output are in the Lab frame
+   */
   static TLorentzVector flipVector(TLorentzVector vIn)
   {
     TLorentzVector vCMS = PCmsLabTransform::labToCms(vIn);
@@ -748,8 +750,11 @@ namespace Belle2 {
     }
 
     //perform fit
+
+    int isGoodFit(-1);
+
     try {
-      int isGoodFit = rFit.fit("avf");
+      isGoodFit = rFit.fit("avf");
       // if problems
       if (isGoodFit < 1) return false;
     } catch (const rave::CheckedFloatException&) {
@@ -758,7 +763,12 @@ namespace Belle2 {
     }
 
     //save the track info for later use
+
+    for (unsigned int i(0); i < particleAndWeights.size() && isGoodFit >= 1; ++i)
+      particleAndWeights.at(i).weight = rFit.getWeight(i);
+
     //Tracks are sorted from highest rave weight to lowest
+
     fillParticles(particleAndWeights);
 
     //if the fit is good, save the infos related to the vertex

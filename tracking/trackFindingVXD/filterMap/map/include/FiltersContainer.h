@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
 
-#ifndef FILTERSCONTAINER_HH
-#define FILTERSCONTAINER_HH
+#pragma once
 
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include <unordered_map>
@@ -96,4 +95,3 @@ namespace Belle2 {
 
   };
 }
-#endif

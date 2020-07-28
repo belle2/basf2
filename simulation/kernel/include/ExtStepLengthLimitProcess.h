@@ -15,7 +15,6 @@
 #include "G4VDiscreteProcess.hh"
 
 class G4Track;
-class G4Field;
 
 namespace Belle2 {
 

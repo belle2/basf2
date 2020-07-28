@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef OVERLAPCHECKERMODULE_H
-#define OVERLAPCHECKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -74,4 +73,3 @@ namespace Belle2 {
     StoreObjPtr<DisplayData> m_displayData; /**< Pointer to the DisplayData where we add the overlap points for rendering */
   };
 } //Belle2 namespace
-#endif

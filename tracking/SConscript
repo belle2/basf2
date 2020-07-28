@@ -16,14 +16,10 @@ env['LIBS'] = [
     'mva_dataobjects',
     'mva',
     'framework',
-    'simulation',
     'genfit2',
     'EG',
-    'CLHEP',
     '$ROOT_LIBS',
-    '$GEANT4_LIBS',
     'FastBDT_shared'
     ]
 
 Return('env')
-

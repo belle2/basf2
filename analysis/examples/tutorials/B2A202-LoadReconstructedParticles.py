@@ -68,7 +68,12 @@ ma.fillParticleList(decayString='p+:good', cut='protonID > 0.1', path=my_path)
 # (-> for more details about V0s have a look at B2A203-LoadV0s.py)
 # or for example stdPi0s() from stdPi0s.py:
 stdKshorts(prioritiseV0=True, path=my_path)
+stdPi0s(listtype='eff10_Jan2020Fit', path=my_path)
+stdPi0s(listtype='eff20_Jan2020Fit', path=my_path)
+stdPi0s(listtype='eff30_Jan2020Fit', path=my_path)
 stdPi0s(listtype='eff40_Jan2020Fit', path=my_path)
+stdPi0s(listtype='eff50_Jan2020Fit', path=my_path)
+stdPi0s(listtype='eff60_Jan2020Fit', path=my_path)
 stdKlongs(listtype='allklm', path=my_path)  # only 'allklm' is recommended at the moment
 
 # print contents of the DataStore after loading Particles

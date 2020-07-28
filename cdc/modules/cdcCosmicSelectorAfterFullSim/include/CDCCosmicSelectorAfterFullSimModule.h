@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCCOSMICSELECTORAFTERFULLSIM_H
-#define CDCCOSMICSELECTORAFTERFULLSIM_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -50,5 +49,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCCOSMICSELECTORAFTERFULLSIM_H

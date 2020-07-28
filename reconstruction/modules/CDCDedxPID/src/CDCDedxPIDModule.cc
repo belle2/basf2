@@ -10,8 +10,10 @@
 
 #include <reconstruction/modules/CDCDedxPID/CDCDedxPIDModule.h>
 
+#include <reconstruction/dataobjects/DedxConstants.h>
+#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
+
 #include <framework/gearbox/Const.h>
-#include <framework/utilities/FileSystem.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -20,25 +22,19 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <genfit/AbsTrackRep.h>
 #include <genfit/Exception.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/StateOnPlane.h>
 #include <genfit/KalmanFitterInfo.h>
 
-#include <TFile.h>
 #include <TH2F.h>
-#include <TMath.h>
 #include <TRandom.h>
 
 #include <memory>
-#include <cassert>
 #include <cmath>
 #include <algorithm>
-#include <utility>
 
 using namespace Belle2;
 using namespace CDC;
@@ -380,9 +376,9 @@ void CDCDedxPIDModule::event()
       double topHeight = outer - wirePosF.Perp();
       double bottomHeight = wirePosF.Perp() - inner;
       double cellHeight = topHeight + bottomHeight;
-      double topHalfWidth = PI * outer / nWires;
-      double bottomHalfWidth = PI * inner / nWires;
-      double cellHalfWidth = PI * wirePosF.Perp() / nWires;
+      double topHalfWidth = M_PI * outer / nWires;
+      double bottomHalfWidth = M_PI * inner / nWires;
+      double cellHalfWidth = M_PI * wirePosF.Perp() / nWires;
 
       // first construct the boundary lines, then create the cell
       const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);
@@ -596,11 +592,11 @@ void CDCDedxPIDModule::event()
     double pidvalues[Const::ChargedStable::c_SetSize];
     Const::ParticleSet set = Const::chargedStableSet;
     if (m_usePrediction) {
-      for (const Const::ChargedStable& pdgIter : set) {
+      for (const Const::ChargedStable pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = -0.5 * dedxTrack->m_cdcChi[pdgIter.getIndex()] * dedxTrack->m_cdcChi[pdgIter.getIndex()];
       }
     } else {
-      for (const Const::ChargedStable& pdgIter : set) {
+      for (const Const::ChargedStable pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = dedxTrack->m_cdcLogl[pdgIter.getIndex()];
       }
     }
@@ -865,7 +861,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
-  for (const Const::ChargedStable& pdgIter : set) {
+  for (const Const::ChargedStable pdgIter : set) {
     double bg = p / pdgIter.getMass();
 
     // determine the predicted mean and resolution

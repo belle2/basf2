@@ -14,10 +14,8 @@
 
 #include <G4VEnergyLossProcess.hh>
 #include <globals.hh>
-#include <G4VEmModel.hh>
 
 class G4Material;
-class G4VEmFluctuationModel;
 
 namespace Belle2 {
 

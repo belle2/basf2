@@ -27,7 +27,6 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/TrackPoint.h>
 #include <TVector3.h>
-#include <TDirectory.h>
 #include <math.h>
 #include <iostream>
 #include <mdst/dataobjects/Track.h>
@@ -71,6 +70,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_U->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_U->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
   m_t_U->Branch("svdStripTime", &m_svdStripTime);
+  m_t_U->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_U->Branch("svdRes", &m_svdRes, "svdRes/F");
   m_t_U->Branch("svdClIntStrPos", &m_svdClIntStrPos, "svdClIntStrPos/F");
   m_t_U->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
@@ -109,6 +109,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_V->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
   m_t_V->Branch("svdStripTime", &m_svdStripTime);
+  m_t_V->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_V->Branch("svdRes", &m_svdRes, "svdRes/F");
   m_t_V->Branch("svdClIntStrPos", &m_svdClIntStrPos, "svdClIntStrPos/F");
   m_t_V->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
@@ -236,7 +237,6 @@ void SVDPerformanceTTreeModule::event()
           m_svdClTime = svd_1->getClsTime();
           m_svdClSNR = svd_1->getSNR();
           m_svdClCharge = svd_1->getCharge();
-          m_svdClPos = svd_1->getPosition();
           m_svdClPosErr = svd_1->getPositionSigma();
           if (isMC && trueHit_1.size() > 0)
             m_svdTruePos = trueHit_1[0]->getU();
@@ -253,6 +253,7 @@ void SVDPerformanceTTreeModule::event()
           m_svdTrkPrimeOS = svd_predIntersect_1[2];
           m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
           m_svdTrkPosUnbiased = svd_predIntersect_unbiased[3];
+          m_svdClPos = m_svdRes / 1e4 + m_svdTrkPosUnbiased;
           m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[3][3]);
           m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
           m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[1];
@@ -271,15 +272,20 @@ void SVDPerformanceTTreeModule::event()
 
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
+          m_svdStripPosition.clear();
           //retrieve relations and set strip charges and times
           RelationVector<SVDRecoDigit> theRecoDigits = DataStore::getRelationsWithObj<SVDRecoDigit>(svd_1);
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          if (!(m_svdSize == 128 && theRecoDigits.size() == 0))
+          //skip clusters created beacuse of missing APV
+          if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+              double misalignedStripPos = svdSensor_1.getUCellPosition(theRecoDigits[d]->getCellID());
+              //aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
+              m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
 
           m_t_U->Fill();
@@ -297,7 +303,6 @@ void SVDPerformanceTTreeModule::event()
           m_svdClTime = svd_1->getClsTime();
           m_svdClSNR = svd_1->getSNR();
           m_svdClCharge = svd_1->getCharge();
-          m_svdClPos = svd_1->getPosition();
           m_svdClPosErr = svd_1->getPositionSigma();
           if (isMC && trueHit_1.size() > 0)
             m_svdTruePos = trueHit_1[0]->getV();
@@ -314,6 +319,7 @@ void SVDPerformanceTTreeModule::event()
           m_svdTrkPrimeOS = svd_predIntersect_1[1];
           m_svdTrkTraversedLength = svdSensor_1.getThickness() * sqrt(1 + m_svdTrkPrimeOS * m_svdTrkPrimeOS + m_svdTrkPrime * m_svdTrkPrime);
           m_svdTrkPosUnbiased = svd_predIntersect_unbiased[4];
+          m_svdClPos = m_svdRes / 1e4 + m_svdTrkPosUnbiased;
           m_svdTrkPosErrUnbiased = sqrt(covMatrix_unbiased[4][4]);
           m_svdTrkQoPUnbiased = svd_predIntersect_unbiased[0];
           m_svdTrkPrimeUnbiased = svd_predIntersect_unbiased[2];
@@ -331,6 +337,7 @@ void SVDPerformanceTTreeModule::event()
 
           m_svdStripCharge.clear();
           m_svdStripTime.clear();
+          m_svdStripPosition.clear();
 
 
           //retrieve relations and set strip charges and times
@@ -338,10 +345,14 @@ void SVDPerformanceTTreeModule::event()
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          if (!(m_svdSize == 128 && theRecoDigits.size() == 0))
+          //skip clusters created beacuse of missing APV
+          if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
+              double misalignedStripPos = svdSensor_1.getVCellPosition(theRecoDigits[d]->getCellID());
+              //Aligned strip pos = misaligned strip - ( misaligned cluster - aligned cluster)
+              m_svdStripPosition.push_back(misalignedStripPos - svd_1->getPosition() + m_svdClPos);
             }
 
           m_t_V->Fill();
@@ -359,7 +370,7 @@ void SVDPerformanceTTreeModule::event()
 void SVDPerformanceTTreeModule::terminate()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     m_t_U->Write();
     m_t_V->Write();

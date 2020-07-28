@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HITHIT_H
-#define HITHIT_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <TTree.h>
@@ -129,4 +128,3 @@ namespace Belle2 {
 
   };
 }
-#endif

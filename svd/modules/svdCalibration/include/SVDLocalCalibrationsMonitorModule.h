@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
 
 #include <svd/calibration/SVDFADCMaskedStrips.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>

@@ -12,7 +12,6 @@
 #define SVD_IGNORED_STRIPS_MAP_H_
 
 #include <vxd/dataobjects/VxdID.h>
-#include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
 #include <set>
 

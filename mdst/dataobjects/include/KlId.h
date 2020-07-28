@@ -8,15 +8,17 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef KlId_H
-#define KlId_H
+
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
-  /** KlId datastore object to store results from KlId calculations.
-   * Note that the klid id is stored as the weight between the cluster and this object */
+  /**
+   * Klong identifcation (KlId) datastore object to store results from KlId calculations.
+   * Note that the KlId is stored as the weight between the KLMCluster and this object.
+   */
   class KlId : public RelationsObject {
 
   public:
@@ -38,8 +40,7 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(KlId,
-             2); /**< K_L0 ID object. The actual ID is stored as the weight of a relation to this object. The klongID is a classfier ouput. This means it is a frequency relative to the Klong fraction of the sample the id is trained on and the performance of the classification. */
+    /** ClassDef. */
+    ClassDef(KlId, 2);
   };
 }
-#endif

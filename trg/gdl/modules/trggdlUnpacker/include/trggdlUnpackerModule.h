@@ -14,9 +14,7 @@
 #ifndef TRGGDLUNPACKER_H
 #define TRGGDLUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
 #include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
@@ -24,8 +22,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/TRGGDLDBBadrun.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>

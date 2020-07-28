@@ -12,7 +12,6 @@
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework aux
-#include <framework/logging/Logger.h>
 #include <TH1F.h>
 
 using namespace std;

@@ -29,7 +29,6 @@
 #include <svd/online/SVDStripNoiseMap.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <memory>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
 
 namespace Belle2 {

@@ -31,6 +31,7 @@ namespace Belle2 {
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
+     * @param detNb detector number
      */
     CaveSimHit(float energyDep, int detNb):
       m_energyDep(energyDep), m_detNb(detNb) {}

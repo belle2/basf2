@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPWavelengthFilter.h>
-#include <framework/gearbox/Unit.h>
-#include <math.h>
 #include <iostream>
 #include <iomanip>
 

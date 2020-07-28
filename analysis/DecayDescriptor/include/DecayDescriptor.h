@@ -133,7 +133,7 @@ namespace Belle2 {
     /** return i-th daughter (0 based index). */
     const DecayDescriptor* getDaughter(int i) const
     {
-      return (i < getNDaughters()) ? &(m_daughters[i]) : NULL;
+      return (i < getNDaughters()) ? &(m_daughters[i]) : nullptr;
     }
     /** return property of the particle. */
     int getProperty() const

@@ -5,8 +5,8 @@
 // Contributors: Hulya Atmacan
 // Date : November 21, 2015
 //-
-#ifndef B2BIIMCPARTICLESMONITORMODULE_H
-#define B2BIIMCPARTICLESMONITORMODULE_H
+
+#pragma once
 
 #include <framework/core/HistoModule.h>        // <- Substitution of HistoModule.h
 #include "TH1F.h"
@@ -54,4 +54,3 @@ namespace Belle2 {
 
   };
 }
-#endif

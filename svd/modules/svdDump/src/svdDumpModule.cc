@@ -9,9 +9,6 @@
 
 #include <svd/modules/svdDump/svdDumpModule.h>
 
-//#include <rawdata/dataobjects/RawFTSW.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -68,7 +65,7 @@ void svdDumpModule::terminate()
   B2INFO("svdDumpModule: terminate() is called.");
 
   m_outputFile->close();
-  delete m_outputFile; m_outputFile = NULL;
+  delete m_outputFile; m_outputFile = nullptr;
 
   return;
 }

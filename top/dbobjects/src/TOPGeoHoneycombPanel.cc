@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPGeoHoneycombPanel.h>
-#include <framework/gearbox/Unit.h>
 #include <math.h>
 #include <iostream>
 

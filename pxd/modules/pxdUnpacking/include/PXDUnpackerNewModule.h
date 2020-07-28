@@ -147,6 +147,8 @@ namespace Belle2 {
 
       /** firmware version from DB. */
       std::unique_ptr<DBObjPtr<PXDDHHFirmwareVersionPar>> m_firmwareFromDB;
+      /** override firmware version from DB. */
+      int m_overrideFirmwareVersion{0};
 
       /** Unpack one event (several frames) stored in RawPXD object
        * @param px RawPXD data object

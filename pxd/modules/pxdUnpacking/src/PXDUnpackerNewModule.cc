@@ -62,6 +62,7 @@ PXDUnpackerNewModule::PXDUnpackerNewModule() :
   addParam("FormatBonnDAQ", m_formatBonnDAQ, "ONSEN or BonnDAQ format", false);
   addParam("Verbose", m_verbose, "Turn on extra verbosity for log-level debug", false);
   addParam("ContinueOnError", m_continueOnError, "Continue package depacking on error (for debugging)", false);
+  addParam("overrideFirmwareVersion", m_overrideFirmwareVersion, "Overwrite Firmware Version from DB with this value", 0);
 //   (
 //              /*EPXDErrFlag::c_DHC_END | EPXDErrFlag::c_DHE_START | EPXDErrFlag::c_DATA_OUTSIDE |*/
 //              EPXDErrFlag::c_FIX_SIZE | EPXDErrFlag::c_DHE_CRC | EPXDErrFlag::c_DHC_UNKNOWN | /*EPXDErrFlag::c_MERGER_CRC |*/
@@ -98,13 +99,19 @@ void PXDUnpackerNewModule::initialize()
   m_unpackedEventsCount = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
 
-  m_firmwareFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDDHHFirmwareVersionPar>>(new
-                     Belle2::DBObjPtr<Belle2::PXDDHHFirmwareVersionPar>());
+  if (m_overrideFirmwareVersion == 0) {
+    m_firmwareFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDDHHFirmwareVersionPar>>(new
+                       Belle2::DBObjPtr<Belle2::PXDDHHFirmwareVersionPar>());
+  }
 }
 
 void PXDUnpackerNewModule::beginRun()
 {
-  if ((*m_firmwareFromDB).isValid()) m_firmware = (**m_firmwareFromDB).getDHHFirmwareVersion();
+  if (m_overrideFirmwareVersion == 0) {
+    if ((*m_firmwareFromDB).isValid()) m_firmware = (**m_firmwareFromDB).getDHHFirmwareVersion();
+  } else {
+    m_firmware = m_overrideFirmwareVersion;
+  }
 }
 
 void PXDUnpackerNewModule::terminate()

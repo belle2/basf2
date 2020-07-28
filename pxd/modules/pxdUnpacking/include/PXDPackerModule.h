@@ -43,6 +43,8 @@ namespace Belle2 {
     private:
       /** Initialize the module */
       void initialize() override final;
+      /** begin run */
+      void beginRun() override final;
       /** do the packing */
       void event() override final;
       /** Terminate the module */

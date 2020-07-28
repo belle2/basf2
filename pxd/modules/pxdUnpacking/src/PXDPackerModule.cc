@@ -551,7 +551,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
   } else {
     //B2DEBUG(20,"Found data for halfladder DHEID: " << dhe_id << " Chip: " << chip_id);
   }
-  * /
+
   add_frame_to_payload();
 
 }

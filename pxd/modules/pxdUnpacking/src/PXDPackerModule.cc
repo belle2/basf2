@@ -62,6 +62,7 @@ PXDPackerModule::PXDPackerModule() :
   addParam("dhe_to_dhc", m_dhe_to_dhc,  "DHE to DHC mapping (DHC_ID, DHE1, DHE2, ..., DHE5) ; -1 disable port");
   addParam("InvertMapping",  m_InvertMapping, "Use invers mapping to DHP row/col instead of \"remapped\" coordinates", false);
   addParam("Clusterize",  m_Clusterize, "Use clusterizer (FCE format)", false);
+  addParam("overrideFirmwareVersion", m_overrideFirmwareVersion, "Overwrite Firmware Version from DB with this value", 0);
 
 }
 
@@ -128,6 +129,14 @@ void PXDPackerModule::initialize()
 
 }
 
+void PXDPackerModule::beginRun()
+{
+  if (m_overrideFirmwareVersion == 0) {
+    if ((*m_firmwareFromDB).isValid()) m_firmware = (**m_firmwareFromDB).getDHHFirmwareVersion();
+  } else {
+    m_firmware = m_overrideFirmwareVersion;
+  }
+}
 void PXDPackerModule::terminate()
 {
 }
@@ -523,19 +532,26 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
     append_int16(last_rowstart);
   }
 
-
   if (empty) {
+
+    /// This behaviour has changed in the overlapping trigger firmware.
+    /// Ghost frames are ALWAYS an indication for a data flow/daq problem
+    /// we better make this switchable! databse parameter which is used by unpacker?
+    /// need to be consistent for simulation!
     B2DEBUG(27, "Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
-    // we DROP the frame, thus we have to correct DHE and DHC counters
-    dhc_byte_count -= 8; // fixed size of Header
-    dhe_byte_count -= 8; // fixed size of Header
-    start_frame();
-    /// Ghost Frame ... start frame overwrites frame info set above
-    append_int32((EDHCFrameHeaderDataType::c_GHOST << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
-                 (m_trigger_nr & 0xFFFF));
+    if (m_firmware < 10) {
+      // we DROP the frame, thus we have to correct DHE and DHC counters
+      dhc_byte_count -= 8; // fixed size of Header
+      dhe_byte_count -= 8; // fixed size of Header
+      start_frame();
+      /// Ghost Frame ... start frame overwrites frame info set above
+      append_int32((EDHCFrameHeaderDataType::c_GHOST << 27) | ((dhe_id & 0x3F) << 20) | ((chip_id & 0x03) << 16) |
+                   (m_trigger_nr & 0xFFFF));
+    }
   } else {
     //B2DEBUG(20,"Found data for halfladder DHEID: " << dhe_id << " Chip: " << chip_id);
   }
+  * /
   add_frame_to_payload();
 
 }

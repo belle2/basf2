@@ -512,6 +512,8 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
   if (c2 >= PACKER_NUM_COLS) c2 = PACKER_NUM_COLS;
   for (int rr = startrow; rr < startrow + PACKER_NUM_ROWS; rr++) {
     int row = (rr % PACKER_NUM_ROWS); // warp around
+    /// we do not create a second frame (thats what the old firmware would have been doing)
+    /// we do not support some "extra" readout gates before trigger and/or at teh end of the full frame
     bool rowstart = true;
     for (int col = c1; col < c2; col++) {
       if (halfladder_pixmap[row][col] != 0) {

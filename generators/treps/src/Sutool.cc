@@ -68,7 +68,7 @@ namespace Belle2 {
   }
 
   int Sutool::pdecy(double mpr, double* mse,
-                    TVector3& ppri, TLorentzVector* psec, int nums)
+                    const TVector3& ppri, TLorentzVector* psec, int nums)
   // multi-body decay by phase space
   // translated from EPOCS PDECY$
   // original EPOCS version gives a good approximation for nums = 3

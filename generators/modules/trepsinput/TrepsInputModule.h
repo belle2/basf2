@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <generators/treps/Treps3B.h>
+#include <generators/treps/UtrepsB.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -53,7 +54,7 @@ namespace Belle2 {
   private:
 
     /** Treps generator **/
-    TrepsB m_generator;
+    UtrepsB m_generator;
 
     /** Parameter file which configures the setting of beam, production particle etc. */
     std::string m_parameterFile;

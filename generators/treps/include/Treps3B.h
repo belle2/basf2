@@ -21,11 +21,11 @@
 
 #pragma once
 
-#include <TVector3.h>
-#include <TLorentzVector.h>
-#include <TH1F.h>
-#include <TTree.h>
-#include <TString.h>
+#include<TVector3.h>
+#include<TLorentzVector.h>
+#include<TH1F.h>
+#include<TTree.h>
+#include<TString.h>
 #include <generators/treps/Sutool.h>
 #include <generators/treps/Particle_array.h>
 
@@ -47,17 +47,16 @@ namespace Belle2 {
     TString filnam_hist; // filename for HBOOK histogram output
     int ntot, nsave ; // number of events generated and saved
 
+
     // member functions
     void setParameterFile(const std::string& file)
     {
       parameterFile = file;
     }
-
     void setWlistFile(const std::string& file)
     {
       wlistFile = file;
     }
-
     void setDiffcrosssectionFile(const std::string& file)
     {
       diffcrosssectionFile = file;
@@ -67,22 +66,18 @@ namespace Belle2 {
     {
       ebeam = energy;
     }
-
     void setElectronMomentum(TVector3 p)
     {
       pfeb = p;
     }
-
     void setPositronMomentum(TVector3 p)
     {
       pfpb = p;
     }
-
     TVector3 getElectronMomentum()
     {
       return pfeb;
     }
-
     TVector3 getPositronMomentum()
     {
       return pfpb;
@@ -92,12 +87,10 @@ namespace Belle2 {
     {
       q2max = q2;
     }
-
     void setMaximalAbsCosTheta(double cost)
     {
       cost_cut = cost;
     }
-
     void applyCosThetaCutCharged(bool apply)
     {
       if (apply) {
@@ -108,12 +101,10 @@ namespace Belle2 {
         qzmin = -0.1;
       }
     }
-
     void setMinimalTransverseMomentum(double pt)
     {
       pt_cut = pt;
     }
-
     void applyTransverseMomentumCutCharged(bool apply)
     {
       if (apply) {
@@ -125,9 +116,7 @@ namespace Belle2 {
       }
     }
 
-    /** initialization of parametrization of pi+pi- partial waves */
-    void initg() ;
-    Interps b00, b20, b22; // Parameter sets
+
 
     void initp(void); // initialize the generator. read parameterFile and load the parameters
     void wtable(); // read diffcrosssectionFile and load W-DifferentialCrossSection table.
@@ -150,26 +139,29 @@ namespace Belle2 {
                 double&, double&, double&, TVector3&,
                 TVector3&, TVector3&, double&) ;
 
-    // Returns 1: this will be overwritten in UtrepsB.h
-    int tpuser(Part_gen*, int);
+    // This will be overwritten in UtrepsB.h
+    virtual int tpuser(TLorentzVector, TLorentzVector,
+                       Part_gen*, int);
 
     // const member functions
     void terminate(void) const ;
     void print_event(void) const ; // print event information at B2DEBUG(10)
 
-    // Returns 1: this will be overwritten in UtrepsB.h
-    double tpform(double, double) const ;
-    // Returns 1: this will be overwritten in UtrepsB.h
-    double tpangd(double, double) ;
+    // returns form factor effect, actually always returns 1. This will be overwritten in UtrepsB.h
+    virtual double tpform(double, double) const ;
+    // always returns 1. This will be overwritten in UtrepsB.h
+    virtual double tpangd(double, double) ;
 
-    //void trkpsh(int, TLorentzVector, TLorentzVector, Part_gen*, int) const;
+    void trkpsh(int, TLorentzVector, TLorentzVector, Part_gen*, int) const;
+
+
 
   private:
 
     // private member functions
     double tpgetd(int, double, double, double,  double);
     double tpgetz(int);
-    double tpgetq(double, double);
+    double tpgetq(double, double, double);
     void tpgetm(Part_cont*, int);
 
     // private const member functions
@@ -183,8 +175,6 @@ namespace Belle2 {
     double simpsnz(double, double, double, int) const ;
     double tpdfy(double, double) const;
     double tpdfz(double, double) const;
-    double d2func(double) const;
-    double qfunc(double, double) const;
 
     // data members
     std::string parameterFile; // filename for parameter input

@@ -114,9 +114,9 @@ namespace Belle2 {
 
 
     /** get Mask for found DHPs with valid data */
-    unsigned short getDHPFoundMas(void) { return m_dhp_found_mask;};
+    unsigned short getDHPFoundMask(void) { return m_dhp_found_mask;};
     /** set Mask for found DHPs with valid data */
-    void setDHPFoundMas(unsigned short dhpmask) { m_dhp_found_mask = dhpmask;};
+    void setDHPFoundMask(unsigned short dhpmask) { m_dhp_found_mask = dhpmask;};
 
     /** set erroinfo from the DHE END **/
     void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};

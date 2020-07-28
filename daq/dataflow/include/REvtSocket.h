@@ -15,49 +15,52 @@
 
 #define MAXEVTSIZE 80000000
 
-typedef unsigned short u_short;
+namespace Belle2 {
 
-using namespace Belle2;
+  typedef unsigned short u_short;
 
-class REvtSocketRecv {
-public:
-  REvtSocketRecv(std::string hostname, int port);
-  ~REvtSocketRecv();
+  class REvtSocketRecv {
+  public:
+    REvtSocketRecv(std::string hostname, int port);
+    ~REvtSocketRecv();
 
-  int status();
+    int status();
 
-  int send(EvtMessage* msg);
-  EvtMessage* recv(void);
+    int send(EvtMessage* msg);
+    EvtMessage* recv(void);
 
-  int send_buffer(int size, char* buf);
-  int recv_buffer(char* buf);
+    int send_buffer(int size, char* buf);
+    int recv_buffer(char* buf);
 
-  RSocketRecv* sock(void);
+    RSocketRecv* sock(void);
 
-private:
-  RSocketRecv* m_sock;
-  char* m_recbuf;
-};
+  private:
+    RSocketRecv* m_sock;
+    char* m_recbuf;
+  };
 
-class REvtSocketSend {
-public:
-  REvtSocketSend(int port, bool accept_at_init = true);
-  ~REvtSocketSend();
+  class REvtSocketSend {
+  public:
+    REvtSocketSend(int port, bool accept_at_init = true);
+    ~REvtSocketSend();
 
-  int status();
+    int status();
 
-  int send(EvtMessage* msg);
-  EvtMessage* recv(void);
+    int send(EvtMessage* msg);
+    EvtMessage* recv(void);
 
-  int send_buffer(int size, char* buf);
-  int recv_buffer(char* buf);
+    int send_buffer(int size, char* buf);
+    int recv_buffer(char* buf);
 
-  RSocketSend* sock(void);
+    RSocketSend* sock(void);
 
-private:
-  RSocketSend* m_sock;
-  char* m_recbuf;
-};
+  private:
+    RSocketSend* m_sock;
+    char* m_recbuf;
+  };
+
+}
+
 #endif
 
 

@@ -136,6 +136,7 @@ void PXDDAQDQMModule::event()
     PXDErrorFlags mask = (1ull << i);
     if ((evt_emask & mask) == mask) hDAQErrorEvent->Fill(getPXDBitErrorName(i).c_str(), 1);
   }
+  hDAQDHPDataMissing->Fill(-1); // to normalize to the number of events
   B2DEBUG(20, "Iterate PXD Packets, Err " << evt_emask);
   for (auto& pkt : evt) {
     B2DEBUG(20, "Iterate PXD DHC in Pkt " << pkt.getPktIndex());

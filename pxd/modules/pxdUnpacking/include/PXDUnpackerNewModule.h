@@ -76,7 +76,7 @@ namespace Belle2 {
       unsigned int m_maxDHPFrameDiff{0};
 
       /** Firmware version, must be read from database on run change */
-      int m_firmware{5};
+      int m_firmware{0};
 
       /** Critical error mask which defines return value of task */
       uint64_t m_criticalErrorMask{0}; // TODO this should be type PXDErrorFlag .. but that does not work with addParam()

@@ -145,11 +145,13 @@ void PXDPackerModule::event()
 {
   StoreObjPtr<EventMetaData> evtPtr;
 
-//   B2ERROR("Test : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," << evtPtr->getExperiment() << "," << evtPtr->getTime() << " ==");
+  // B2DEBUG(27,"Test : " << evtPtr->getEvent() << ","  << evtPtr->getRun() << "," << evtPtr->getSubrun() << "," << evtPtr->getExperiment() << "," << evtPtr->getTime() << " ==");
 
   // First, throw the dices for a few event-wise properties
 
   m_trigger_dhp_framenr = gRandom->Integer(0x10000);
+  // we use the very same m_trigger_dhp_framenr in DHE and DHP header, no second DHP farem is generated anyway
+
   if (m_storeInjectionBGTiming.isValid()) {
     m_trigger_dhe_gate = m_storeInjectionBGTiming->getTriggerGate();
   } else {
@@ -321,7 +323,7 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
     dhe_active >>= 1;
   }
 
-  /// lets copy the HLT/ROI frame
+  /// lets copy the HLT/ROI frame TODO
 
   //  start_frame();
   //  append_int32((EDHCFrameHeaderDataType::c_ONSEN_ROI<<27) | (m_trigger_nr & 0xFFFF));
@@ -495,7 +497,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
 
   if (dhe_has_remapped == 0) {
     // problem, we do not have an exact definition of if this bit is set in the new firmware and under which circumstances
-    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up tabel etc!)
+    // and its not clear if we have to translate the coordinates back to "DHP" layout! (look up table etc!)
     assert(dhe_has_remapped == 0);
   }
 
@@ -535,12 +537,10 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
   }
 
   if (empty) {
-
+    B2DEBUG(27, "Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
     /// This behaviour has changed in the overlapping trigger firmware.
     /// Ghost frames are ALWAYS an indication for a data flow/daq problem
-    /// we better make this switchable! databse parameter which is used by unpacker?
     /// need to be consistent for simulation!
-    B2DEBUG(27, "Found no data for halfladder! DHEID: " << dhe_id << " Chip: " << chip_id);
     if (m_firmware < 10) {
       // we DROP the frame, thus we have to correct DHE and DHC counters
       dhc_byte_count -= 8; // fixed size of Header

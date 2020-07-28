@@ -15,7 +15,7 @@ def add_tsim(
     SimulationMode=1,
     shortTracks=False,
     OpenFilter=False,
-    Belle2Phase="Phase2",
+    Belle2Phase="Phase3",
     PrintResult=False,
     component=[
         "CDC",

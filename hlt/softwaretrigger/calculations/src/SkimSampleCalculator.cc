@@ -618,7 +618,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   calculationResult["Kshort"] = Kshort;
 
   // 4 leptons skim
-  int n4lep = 0;
+  int nFourLep = 0;
   double fourLep = 0.;
 
   double visibleEnergyCMS = visibleEnergyCMSnorm * BeamEnergyCMS() * 2.0;
@@ -641,12 +641,12 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         bool fourLepCand = chSum == 0 && (V4p1.P() > 0.4 && V4p2.P() > 0.4) && cos(opAng) > -0.997 && ptCMS < 0.15 && abs(pzCMS) < 2.5
                            && mSum < 6;
 
-        if (fourLepCand)  n4lep++;
+        if (fourLepCand)  nFourLep++;
       }
     }
   }
 
-  if (n4lep != 0 && visibleEnergyCMS < 6) fourLep = 1;
+  if (nFourLep != 0 && visibleEnergyCMS < 6) fourLep = 1;
 
   calculationResult["FourLep"] = fourLep;
 }

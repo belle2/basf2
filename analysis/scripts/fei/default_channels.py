@@ -968,9 +968,9 @@ def get_default_channels(
     # J/Psi
     BS.addChannel(['J/psi', 'K_S0'])
     BS.addChannel(['J/psi', 'pi+', 'pi-'])
-    BS.addChannel(['J/psi', 'K+', 'K-']),  # Phi
-    BS.addChannel(['J/psi', 'K_S0', 'K-', 'pi+']),
-    BS.addChannel(['J/psi', 'K-', 'K+', 'pi0']),
+    BS.addChannel(['J/psi', 'K+', 'K-'], preCutConfig=BS.preCutConfig._replace(noBackgroundSampling=True))  # Phi
+    BS.addChannel(['J/psi', 'K_S0', 'K-', 'pi+'])
+    BS.addChannel(['J/psi', 'K-', 'K+', 'pi0'])
     BS.addChannel(['J/psi', 'pi-', 'pi+', 'pi0'])  # Eta
     BS.addChannel(['J/psi', 'pi+', 'pi-', 'pi-', 'pi+', 'pi0'])  # Etaprime
 

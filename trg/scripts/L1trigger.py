@@ -17,7 +17,7 @@ def add_tsim(
     OpenFilter=False,
     Belle2Phase="Phase3",
     PrintResult=False,
-    component=[
+    components=[
         "CDC",
         "ECL",
         "KLM",

@@ -98,6 +98,13 @@ void PXDUnpackerNewModule::initialize()
   m_unpackedEventsCount = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
 
+  m_firmwareFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDDHHFirmwareVersionPar>>(new
+                     Belle2::DBObjPtr<Belle2::PXDDHHFirmwareVersionPar>());
+}
+
+void PXDUnpackerNewModule::beginRun()
+{
+  if ((*m_firmwareFromDB).isValid()) m_firmware = (**m_firmwareFromDB).getDHHFirmwareVersion();
 }
 
 void PXDUnpackerNewModule::terminate()
@@ -275,10 +282,13 @@ void PXDUnpackerNewModule::unpack_rawpxd(RawPXD& px, int inx)
       m_errorMask |= c_FRAME_SIZE;
     } else {
       B2DEBUG(29, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
-      if (m_firmware < 5) {
+      if (m_firmware < 10) {///
         unpack_dhc_frame_v01(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
+      } else if (m_firmware >= 10) {
+        //
+        unpack_dhc_frame_v10(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
       } else {
-        unpack_dhc_frame_v05(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
+        B2FATAL("Firmware Version not supported " << m_firmware);
       }
       ll += lo; /// no rounding needed
     }
@@ -672,7 +682,7 @@ void PXDUnpackerNewModule::unpack_dhp_v01(void* data, unsigned int frame_len, un
   }
 }
 
-void PXDUnpackerNewModule::unpack_dhp_v05(void* data, unsigned int frame_len, unsigned int dhe_first_readout_frame_id_lo,
+void PXDUnpackerNewModule::unpack_dhp_v10(void* data, unsigned int frame_len, unsigned int dhe_first_readout_frame_id_lo,
                                           unsigned int dhe_ID, unsigned dhe_DHPport, unsigned dhe_reformat, VxdID vxd_id,
                                           PXDDAQPacketStatus& daqpktstat)
 {
@@ -1684,7 +1694,7 @@ void PXDUnpackerNewModule::unpack_dhc_frame_v01(void* data, const int len, const
 }
 
 
-void PXDUnpackerNewModule::unpack_dhc_frame_v05(void* data, const int len, const int Frame_Number, const int Frames_in_event,
+void PXDUnpackerNewModule::unpack_dhc_frame_v10(void* data, const int len, const int Frame_Number, const int Frames_in_event,
                                                 PXDDAQPacketStatus& daqpktstat)
 {
   /// The following STATIC variables are used to save some state or count some things
@@ -1890,7 +1900,7 @@ void PXDUnpackerNewModule::unpack_dhc_frame_v05(void* data, const int len, const
       if (m_checkPaddingCRC) m_errorMask |= dhc.check_padding(); // isUnfiltered_event
 
 
-      unpack_dhp_v05(data, len - 4,
+      unpack_dhp_v10(data, len - 4,
                      dhe_first_readout_frame_id_lo,
                      dhc.data_direct_readout_frame->getDHEId(),
                      dhc.data_direct_readout_frame->getDHPPort(),

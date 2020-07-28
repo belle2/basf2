@@ -23,6 +23,9 @@
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 
+#include <pxd/dbobjects/PXDDHHFirmwareVersionPar.h>
+#include <framework/database/DBObjPtr.h>
+
 namespace Belle2 {
 
   namespace PXD {
@@ -48,6 +51,8 @@ namespace Belle2 {
 
       /** Initialize the module */
       void initialize() override final;
+      /** Begin Run */
+      void beginRun() override final;
       /** do the unpacking */
       void event() override final;
       /** Terminate the module */
@@ -140,6 +145,8 @@ namespace Belle2 {
       /** some workaround check for continouous frame ids */
       int m_last_dhp_readout_frame_lo[4] { -1}; // signed because -1 means undefined
 
+      /** firmware version from DB. */
+      std::unique_ptr<DBObjPtr<PXDDHHFirmwareVersionPar>> m_firmwareFromDB;
 
       /** Unpack one event (several frames) stored in RawPXD object
        * @param px RawPXD data object
@@ -183,7 +190,7 @@ namespace Belle2 {
        * @param daqpktstat Daq Packet Status Object
        * @param daqdhevect Daq DHE Status Object
        */
-      void unpack_dhc_frame_v05(void* data, const int len, const int Frame_Number, const int Frames_in_event,
+      void unpack_dhc_frame_v10(void* data, const int len, const int Frame_Number, const int Frames_in_event,
                                 PXDDAQPacketStatus& daqpktstat);
 
       /** Unpack DHP data within one DHE frame
@@ -195,7 +202,7 @@ namespace Belle2 {
        * @param dhe_reformat flag if DHE did reformatting
        * @param vxd_id vertex Detector ID
        */
-      void unpack_dhp_v05(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID,
+      void unpack_dhp_v10(void* data, unsigned int len, unsigned int dhe_first_readout_frame_lo, unsigned int dhe_ID,
                           unsigned dhe_DHPport,
                           unsigned dhe_reformat, VxdID vxd_id, PXDDAQPacketStatus& daqpktstat);
 

@@ -166,10 +166,8 @@ def add_hlt_processing(path,
 
     # Run EventsOfDoomBuster savely, i.e. do not discard the events, put sent the event into the metadata path.
     # This way the EventsOfDoomBuster is run twice (second time in add_reconstruction) but it will not bust any
-    # events, as we filtered here already. Caveat: nCDCHitsMax and nSVDShaperDigitsMax have to be equal in both
-    # modules.
-    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=constants.DOOM_NCDCHITSMAX,
-                           nSVDShaperDigitsMax=constants.DOOM_NSVDSHAPERDIGITSMAX)
+    # events, as we filtered here already.
+    doom = path.add_module("EventsOfDoomBuster")
     doom.if_true(discard_path, basf2.AfterConditionPath.CONTINUE)
 
     # Do the reconstruction needed for the HLT decision

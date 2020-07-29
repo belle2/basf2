@@ -48,4 +48,23 @@
   target="m_particleSource"                     \
   code="{m_particleSource = m_particleType;}"   \
 
+
+#pragma read                                    \
+  sourceClass="Belle2::TagVertex"               \
+  source="float m_MCdeltaT"                     \
+  version="[-3]"                                \
+  targetClass="Belle2::TagVertex"               \
+  target="m_mcDeltaT"                           \
+  code="{m_mcDeltaT = onfile.m_MCdeltaT;}"      \
+
+
+#pragma read                                    \
+  sourceClass="Belle2::TagVertex"               \
+  source="TVector3 m_MCtagV"                    \
+  version="[-3]"                                \
+  targetClass="Belle2::TagVertex"               \
+  target="m_MCtagV"                             \
+  code="{m_mcTagV = onfile.m_MCtagV;}"          \
+
+
 #endif

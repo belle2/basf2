@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from basf2 import *
 from cdctrigger import add_cdc_trigger
 from ecltrigger import add_ecl_trigger
 from klmtrigger import add_klm_trigger
@@ -15,10 +14,10 @@ def add_tsim(
         SimulationMode=1,
         shortTracks=False,
         OpenFilter=False,
-        Belle2Phase="Phase3",
+        Belle2Phase='Phase3',
         PrintResult=False,
-        components=["CDC", "ECL", "KLM", "GRL", "GDL"]):
-    """
+        components=['CDC', 'ECL', 'KLM', 'GRL', 'GDL']):
+    '''
     Add the L1 trigger simulation (TSIM) modules to path.
 
     @param path: Modules are added to this path.
@@ -31,7 +30,7 @@ def add_tsim(
     @param Belle2Phase: The trigger menu at the given Phase is applied. Available options: Phase2, Phase3.
     @param PrintResult: If true, print the summary statistics of the L1 trigger efficiency.
     @param components: List of sub-trigger components to be included in TSIM.
-    """
+    '''
 
     add_subdetector_tsim(
         path=path,
@@ -52,8 +51,8 @@ def add_subdetector_tsim(
         path,
         SimulationMode=1,
         shortTracks=False,
-        components=["CDC", "ECL", "KLM"]):
-    """
+        components=['CDC', 'ECL', 'KLM']):
+    '''
     Add subdetector modules to the TSIM with no GRL and no GDL.
     @param path: Modules are added to this path.
     @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
@@ -61,13 +60,13 @@ def add_subdetector_tsim(
     @param shortTracks: The standard CDC track finding requires hits in 4 axial super layers. With the shortTracks
         option, tracks with hits in the 3 innermost super layers are also found.
     @param components: List of subdetector components to be included in TSIM.
-    """
+    '''
 
-    if ("CDC" in components):
+    if ('CDC' in components):
         add_cdc_trigger(path=path, SimulationMode=SimulationMode, shortTracks=shortTracks, thetaDef='avg', zDef='min')
-    if ("ECL" in components):
+    if ('ECL' in components):
         add_ecl_trigger(path=path)
-    if ("KLM" in components):
+    if ('KLM' in components):
         add_klm_trigger(path=path)
 
 
@@ -75,10 +74,10 @@ def add_grl_gdl_tsim(
         path,
         SimulationMode=1,
         OpenFilter=False,
-        Belle2Phase="Phase3",
+        Belle2Phase='Phase3',
         PrintResult=False,
         components=['GRL', 'GDL']):
-    """
+    '''
     Add GRL and GDL modules to the TSIM with no subdetectors. The function have to applied based on the dataobjects
     produced by add_subdetector_tsim.
     @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
@@ -88,7 +87,7 @@ def add_grl_gdl_tsim(
     @param Belle2Phase: The trigger menu at the given Phase is applied. Available options: Phase2, Phase3.
     @param PrintResult: If true, print the summary statistics of the L1 trigger efficiency.
     @param components: List of logic components to be included in TSIM.
-    """
+    '''
 
     if ('GRL' in components):
         add_grl_trigger(path=path, SimulationMode=SimulationMode)

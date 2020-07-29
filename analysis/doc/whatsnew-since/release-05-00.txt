@@ -33,4 +33,4 @@ Modules
 Full Event Interpretation
 +++++++++++++++++++++++++
 
-* Added option to reconstruct strange B mesons (at Y(5S)) in 51 decaychannels. Can be switched on with the ``strangeB`` flag in `fei.get_default_channels()`.
+* Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in `fei.get_default_channels()`.

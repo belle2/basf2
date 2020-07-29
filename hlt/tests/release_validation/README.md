@@ -28,6 +28,9 @@ will just be executed and depend on a proper shebang and **need to be executable
 * scripts should indicate failure with a non-zero return code.
 * stdout and stderr of all scripts will automatically be saved to `OUTPUT_DIR`
 
+How to Run
+----------
+
 The validation can then be executed with `./run.sh` which takes two optional arguments
 
 * the stage, either "manual" or "automatic"
@@ -37,3 +40,9 @@ The validation can then be executed with `./run.sh` which takes two optional arg
 ```
 ./run.sh automatic automatic-validation-release-04-02-06
 ```
+
+When to Run
+-----------
+These tests are not intended to run on each individual PR to the main (master) branch, but only for release version which are intended to run on the HLT.
+This should prevent release tags which are not usable on the HLT system.
+

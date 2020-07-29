@@ -29,3 +29,8 @@ Modules
    beamspot is added.
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
+
+Full Event Interpretation
++++++++++++++++++++++++++
+
+* Added option to reconstruct strange B mesons (at Y(5S)) in 51 decaychannels. Can be switched on with the ``strangeB`` flag in `fei.get_default_channels()`.

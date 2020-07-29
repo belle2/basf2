@@ -11,18 +11,13 @@ from effCalculation import EffCalculation
 
 
 def add_tsim(
-    path,
-    SimulationMode=1,
-    shortTracks=False,
-    OpenFilter=False,
-    Belle2Phase="Phase3",
-    PrintResult=False,
-    components=[
-        "CDC",
-        "ECL",
-        "KLM",
-        "GRL",
-        "GDL"]):
+        path,
+        SimulationMode=1,
+        shortTracks=False,
+        OpenFilter=False,
+        Belle2Phase="Phase3",
+        PrintResult=False,
+        components=["CDC", "ECL", "KLM", "GRL", "GDL"]):
     """
     Add the L1 trigger simulation (TSIM) modules to path.
 
@@ -54,13 +49,10 @@ def add_tsim(
 
 
 def add_subdetector_tsim(
-    path,
-    SimulationMode=1,
-    shortTracks=False,
-    components=[
-        "CDC",
-        "ECL",
-        "KLM"]):
+        path,
+        SimulationMode=1,
+        shortTracks=False,
+        components=["CDC", "ECL", "KLM"]):
     """
     Add subdetector modules to the TSIM with no GRL and no GDL.
     @param path: Modules are added to this path.
@@ -85,7 +77,7 @@ def add_grl_gdl_tsim(
         OpenFilter=False,
         Belle2Phase="Phase3",
         PrintResult=False,
-        components=components):
+        components=['GRL', 'GDL']):
     """
     Add GRL and GDL modules to the TSIM with no subdetectors. The function have to applied based on the dataobjects
     produced by add_subdetector_tsim.

@@ -92,7 +92,7 @@ def add_grl_gdl_tsim(
     if ('GRL' in components):
         add_grl_trigger(path=path, SimulationMode=SimulationMode)
     if ('GDL' in components):
-        add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2phase)
+        add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
     if PrintResult:
         if ('GRL' in components or 'GDL' in components):
             EffCalculation(path=path, Belle2Phase=Belle2Phase)

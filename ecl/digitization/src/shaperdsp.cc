@@ -322,6 +322,20 @@ void ShaperDSP_t::init(const double* s, double unitscale)
   _w1   = 0.5 * s[9];
   _ccc  = s[5];
 
+  if (unitscale < 0) {
+    unitscale = 1.0
+                / (-.109  + .919    * t01 - .261 * t01 * t01)
+                / (-.109  + .919    * t02 - .261 * t02 * t02)
+                / (.262   + .174    * tb1 - .208 * tb1 * tb1)
+                / (.262   + .174    * tb2 - .208 * tb2 * tb2)
+                / (4.56   - 1.58    * td1)
+                / (1.391  - 0.434   * ts1)
+                / (1.06   - 0.578   * (t01 - tb1) * (t01 - tb1))
+                / (1.06   - 0.578   * (t02 - tb2) * (t02 - tb2))
+                / (1.2140 - 0.79645 * t01 + 0.63440 * t01 * t01)
+                / (1.2140 - 0.79645 * t02 + 0.63440 * t02 * t02);
+  }
+
   _cs0 *= unitscale;
   _cc0 *= unitscale;
   _cs1 *= unitscale;
@@ -335,7 +349,7 @@ void ShaperDSP_t::init(const double* s, double unitscale)
 
 void ShaperDSP_t::init(const double* s)
 {
-  init(s, 27.7221);
+  init(s, -1);
 }
 
 void ShaperDSP_t::init(const std::vector<double>& s, double unitscale)

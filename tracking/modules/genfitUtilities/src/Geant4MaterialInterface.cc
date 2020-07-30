@@ -370,7 +370,6 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
   // No boundary in sight?
   if (safety > fabs(sMax)) {
-    // cppcheck-suppress knownConditionTrueFalse
     if (debug)
       std::cout << "   next boundary is farther away than sMax \n";
     return stepSign * safety; // sMax
@@ -378,7 +377,6 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
   // Are we at the boundary?
   if (slDist < delta) {
-    // cppcheck-suppress knownConditionTrueFalse
     if (debug)
       std::cout << "   very close to the boundary -> return @ it " << it
                 << " stepSign*slDist = "

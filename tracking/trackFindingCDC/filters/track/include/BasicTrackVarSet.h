@@ -36,6 +36,7 @@ namespace Belle2 {
       "n_tracks",
 
       "sz_slope",
+      "z0",
       "s_range",
       "avg_hit_dist",
       "has_matching_segment",
@@ -67,6 +68,12 @@ namespace Belle2 {
       "drift_length_max",
       "drift_length_min",
       "drift_length_sum",
+
+      "norm_drift_length_mean",
+      "norm_drift_length_variance",
+      "norm_drift_length_max",
+      "norm_drift_length_min",
+      "norm_drift_length_sum",
 
       "adc_mean",
       "adc_variance",

@@ -41,6 +41,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   // use boost accumulators, which lazily provide different statistics (mean, variance, ...) for the
   // data that they accumulate (i.e. are "filled" with).
   statistics_accumulator drift_length_acc; /* correlated to actual distance from hit to wire*/
+  statistics_accumulator norm_drift_length_acc;
   statistics_accumulator adc_acc; /* integrated charge over the cell*/
   statistics_accumulator empty_s_acc; /* gap within the track?!*/
   statistics_accumulator tot_acc; /* time over threshold */
@@ -56,9 +57,12 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
 
   std::vector<unsigned int> cont_layer;
   std::vector<unsigned int> super_layer;
+  std::vector<double> wire_space{0.33, 0.349, 0.369, 0.389, 0.408, 0.428, 0.448, 0.467, 0.505, 0.54, 0.576, 0.612, 0.648, 0.683, 0.598, 0.627, 0.657, 0.686, 0.716, 0.746, 0.669, 0.694, 0.719, 0.745, 0.77, 0.795, 0.717, 0.739, 0.761, 0.783, 0.805, 0.827, 0.758, 0.778, 0.798, 0.817, 0.837, 0.857, 0.788, 0.806, 0.823, 0.841, 0.859, 0.876, 0.815, 0.832, 0.848, 0.864, 0.88, 0.896, 0.835, 0.85, 0.865, 0.88, 0.894, 0.909};
   // Fill accumulators with ADC and drift circle information
   for (const CDCRecoHit3D& recoHit : *track) {
     drift_length_acc(recoHit.getWireHit().getRefDriftLength());
+    norm_drift_length_acc(static_cast<double>(recoHit.getWireHit().getRefDriftLength()) / wire_space.at(static_cast<unsigned int>
+                          (recoHit.getWireHit().getHit()->getICLayer())));
     adc_acc(static_cast<unsigned int>(recoHit.getWireHit().getHit()->getADCCount()));
     tot_acc(static_cast<unsigned int>(recoHit.getWireHit().getHit()->getTOT()));
     cont_layer_acc(static_cast<unsigned int>(recoHit.getWireHit().getHit()->getICLayer()));
@@ -119,6 +123,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   // Overwrite boost-accumulator behavior for containers with 0 or 1 elements
   // Set variances containers with for 0/1 elements to -1 (boost default: nan/0 respectively)
   double drift_length_variance = -1;
+  double norm_drift_length_variance = -1;
   double adc_variance = -1;
   double tot_variance = -1;
   double cont_layer_variance = -1;
@@ -127,6 +132,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
     // for more than two elements, calculate variance with bessel correction
     double bessel_corr = (double)size / (size - 1.0);
     drift_length_variance = std::sqrt(bacc::variance(drift_length_acc) * bessel_corr);
+    norm_drift_length_variance = std::sqrt(bacc::variance(norm_drift_length_acc) * bessel_corr);
     adc_variance = std::sqrt(bacc::variance(adc_acc) * bessel_corr);
     tot_variance = std::sqrt(bacc::variance(tot_acc) * bessel_corr);
     cont_layer_variance = std::sqrt(bacc::variance(cont_layer_acc) * bessel_corr);
@@ -148,6 +154,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   var<named("n_tracks")>() = n_tracks;
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
+  var<named("z0")>() = toFinite(trajectorySZ.getZ0(), 0);
   var<named("s_range")>() = toFinite(s_range, 0);
   var<named("avg_hit_dist")>() = toFinite(avg_hit_dist, 0);
   var<named("has_matching_segment")>() = track->getHasMatchingSegment();
@@ -179,6 +186,12 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   var<named("drift_length_max")>() = toFinite(bacc::max(drift_length_acc), 0);
   var<named("drift_length_min")>() = toFinite(bacc::min(drift_length_acc), 0);
   var<named("drift_length_sum")>() = toFinite(bacc::sum(drift_length_acc), 0);
+
+  var<named("norm_drift_length_mean")>() = toFinite(bacc::mean(norm_drift_length_acc), 0);
+  var<named("norm_drift_length_variance")>() = toFinite(norm_drift_length_variance, 0);
+  var<named("norm_drift_length_max")>() = toFinite(bacc::max(norm_drift_length_acc), 0);
+  var<named("norm_drift_length_min")>() = toFinite(bacc::min(norm_drift_length_acc), 0);
+  var<named("norm_drift_length_sum")>() = toFinite(bacc::sum(norm_drift_length_acc), 0);
 
   var<named("adc_mean")>() = toFinite(bacc::mean(adc_acc), 0);
   var<named("adc_variance")>() = toFinite(adc_variance, 0);

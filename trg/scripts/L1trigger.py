@@ -15,7 +15,6 @@ def add_tsim(
         shortTracks=False,
         OpenFilter=False,
         Belle2Phase='Phase3',
-        PrintResult=False,
         components=['CDC', 'ECL', 'KLM', 'GRL', 'GDL']):
     '''
     Add the L1 trigger simulation (TSIM) modules to path.
@@ -28,7 +27,6 @@ def add_tsim(
     @param OpenFilter: If true, the events failed to pass L1 trigger will be discarded. Make sure you do need
         open filter before you set the value to True.
     @param Belle2Phase: The trigger menu at the given Phase is applied. Available options: Phase2, Phase3.
-    @param PrintResult: If true, print the summary statistics of the L1 trigger efficiency.
     @param components: List of sub-trigger components to be included in TSIM.
     '''
 
@@ -42,7 +40,6 @@ def add_tsim(
         SimulationMode=SimulationMode,
         OpenFilter=OpenFilter,
         Belle2Phase=Belle2Phase,
-        PrintResult=PrintResult,
         components=components)
     path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
 
@@ -54,6 +51,7 @@ def add_subdetector_tsim(
         components=['CDC', 'ECL', 'KLM']):
     '''
     Add subdetector modules to the TSIM with no GRL and no GDL.
+
     @param path: Modules are added to this path.
     @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
@@ -75,17 +73,16 @@ def add_grl_gdl_tsim(
         SimulationMode=1,
         OpenFilter=False,
         Belle2Phase='Phase3',
-        PrintResult=False,
         components=['GRL', 'GDL']):
     '''
     Add GRL and GDL modules to the TSIM with no subdetectors. The function have to applied based on the dataobjects
     produced by add_subdetector_tsim.
+
     @param SimulationMode: The simulation mode in TSIM: 1) fast simulation, trigger algoritm simulation only,
         no firmware simulation; 2) full simulation, both trigger algorithm and firmware are simulated.
     @param OpenFilter: If true, the events failed to pass L1 trigger will be discarded. Make sure you do need
         open filter before you set the value to True.
     @param Belle2Phase: The trigger menu at the given Phase is applied. Available options: Phase2, Phase3.
-    @param PrintResult: If true, print the summary statistics of the L1 trigger efficiency.
     @param components: List of logic components to be included in TSIM.
     '''
 
@@ -93,6 +90,3 @@ def add_grl_gdl_tsim(
         add_grl_trigger(path=path, SimulationMode=SimulationMode)
     if ('GDL' in components):
         add_gdl_trigger(path=path, SimulationMode=SimulationMode, OpenFilter=OpenFilter, Belle2Phase=Belle2Phase)
-    if PrintResult:
-        if ('GRL' in components or 'GDL' in components):
-            EffCalculation(path=path, Belle2Phase=Belle2Phase)

@@ -427,7 +427,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
       MCParticle* currentMother = aMcParticlePtr->getMother();
       int nFalsePdgCodes = 0;
       int nAncestor = 0;
-      while (currentMother not_eq NULL) {
+      while (currentMother not_eq nullptr) {
         int currentMotherPdgCode = currentMother->getPDG();
         for (int i = 0; i not_eq nFromPdgCodes; ++i) {
           if (m_fromPdgCodes[i] not_eq currentMotherPdgCode) {

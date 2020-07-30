@@ -66,5 +66,13 @@
   target="m_MCtagV"                             \
   code="{m_mcTagV = onfile.m_MCtagV;}"          \
 
+#pragma read                                                   \
+  sourceClass="Belle2::TagVertex"                              \
+  source="TMatrixFSym m_tagVertexErrMatrix"                    \
+  version="[-3]"                                               \
+  targetClass="Belle2::TagVertex"                              \
+  target="m_tagVertexErrMatrix"                                \
+  code="{m_tagVertexErrMatrix = onfile.m_tagVertexErrMatrix;}" \
+
 
 #endif

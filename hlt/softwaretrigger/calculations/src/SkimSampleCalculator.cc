@@ -536,8 +536,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
       double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
-      bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.4 && p1Eop < maxEoP && p1CDChits > 0
-                      && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC == 1;
+      const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.4 && p1Eop < maxEoP && p1CDChits > 0
+                            && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC == 1;
 
       //------------Second track variables----------------
       for (unsigned int l = k + 1; l < m_pionParticles->getListSize(); l++) {
@@ -580,8 +580,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
-        bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.4 && p2Eop < maxEoP && p2CDChits > 0
-                        && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC == 1;
+        const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.4 && p2Eop < maxEoP && p2CDChits > 0
+                              && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC == 1;
 
         double eTotMumuTracks = enECLTrack1 + enECLTrack2;
         double EMumutot = eTotMumuTracks + eMumuTotGammas;
@@ -607,8 +607,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const double recoilP = fr.getMomentum(pIN - V4p1 - V4p2).P();
 
-        bool radmumu_tag = nTracks < 4 && goodTrk1 == 1 && goodTrk2 == 1 && highestP > 1 && lowestP < 3 && (p1hasKLMid == 1
-                           || p2hasKLMid == 1) && abs(diffPhi) >= 0.5 * M_PI && recoilP > 0.1 && (enECLTrack1 <= 0.25 || enECLTrack2 <= 0.25);
+        const bool radmumu_tag = nTracks < 4 && goodTrk1 == 1 && goodTrk2 == 1 && highestP > 1 && lowestP < 3 && (p1hasKLMid == 1
+                                 || p2hasKLMid == 1) && abs(diffPhi) >= 0.5 * M_PI && recoilP > 0.1 && (enECLTrack1 <= 0.25 || enECLTrack2 <= 0.25);
 
         if (radmumu_tag) radmumu = 1;
 

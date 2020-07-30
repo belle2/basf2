@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from basf2 import B2INFO
 from cdctrigger import add_cdc_trigger
 from ecltrigger import add_ecl_trigger
 from klmtrigger import add_klm_trigger
@@ -15,7 +16,8 @@ def add_tsim(
         shortTracks=False,
         OpenFilter=False,
         Belle2Phase='Phase3',
-        components=['CDC', 'ECL', 'KLM', 'GRL', 'GDL']):
+        components=['CDC', 'ECL', 'KLM', 'GRL', 'GDL'],
+        PrintInfo=False):
     '''
     Add the L1 trigger simulation (TSIM) modules to path.
 
@@ -42,6 +44,13 @@ def add_tsim(
         Belle2Phase=Belle2Phase,
         components=components)
     path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
+    if PrintInfo:
+        B2INFO('The L1 trigger simulation (TSIM) is set up with the following configuration:',
+               SimulationMode=SimulationMode,
+               ShortTracks=shortTracks,
+               OpenFilter=OpenFilter,
+               Belle2Phase=Belle2Phase,
+               Components=', '.join(components))
 
 
 def add_subdetector_tsim(

@@ -81,7 +81,7 @@ namespace Belle2 {
      * (so it is calculated only once per candidate).
      *
      * @param particle pointer to the particle. setMCTruth() must have been called previously (usually via the MCMatching module)!
-     * @param mc pointer to the matched MCParticle. Can be specified to avoid repeated lookups.
+     * @param mcParticle pointer to the matched MCParticle. Can be specified to avoid repeated lookups.
      *
      * @return ORed combination of MCErrorFlags describing differences between reconstructed particle and MC truth.
      */

@@ -45,6 +45,10 @@ cluster = [
     'clusterTiming',
     'clusterTrackMatch',
     'goodBelleGamma',
+]
+
+#: Cluster-related event variables
+event_level_cluster = [
     'nECLOutOfTimeCrystals',
     'nECLOutOfTimeCrystalsBWDEndcap',
     'nECLOutOfTimeCrystalsBarrel',
@@ -131,11 +135,26 @@ mc_variables = [
 pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'deuteronID']
 
 #: Replacement for ROEMultiplicities tool
-roe_multiplicities = ['nROE_KLMClusters']
+roe_multiplicities = [
+    'nROE_Charged()',
+    'nROE_Photons()',
+    'nROE_NeutralHadrons()'
+]
 
-#: Recoil kinematics relaed variables
+#: Rest-Of-Event kinematics
+roe_kinematics = [
+    'roeE()',
+    'roeM()',
+    'roeP()',
+    'roeMbc()',
+    'roeDeltae()'
+]
+
+#: Recoil kinematics related variables
 recoil_kinematics = [
     'pRecoil',
+    'eRecoil',
+    'mRecoil',
     'pRecoilPhi',
     'pRecoilTheta',
     'pxRecoil',

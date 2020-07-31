@@ -22,8 +22,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <alignment/dbobjects/VXDAlignment.h>
 
-#include <TMath.h>
-
 class G4VPhysicalVolume;
 // forward declaring G4Transform3D is a pain
 namespace HepGeom { class Transform3D; }

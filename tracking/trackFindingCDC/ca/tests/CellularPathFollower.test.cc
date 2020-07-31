@@ -12,8 +12,6 @@
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
-
 #include <utility>
 
 using namespace Belle2;
@@ -28,7 +26,7 @@ TEST(TrackFindingCDCTest, CellularPathFollower_followSingle)
   Element secondElement(std::make_pair(1, 1));
   secondElement.getAutomatonCell().setCellWeight(1);
 
-  std::vector<WeightedRelationPointerComparison<Element>> relations;
+  std::vector<WeightedRelation<Element>> relations;
   relations.emplace_back(&startElement, 1, &secondElement);
 
   // Mimic execution of the cellular automaton
@@ -39,7 +37,7 @@ TEST(TrackFindingCDCTest, CellularPathFollower_followSingle)
   secondElement.getAutomatonCell().setCellState(1);
   secondElement.getAutomatonCell().setAssignedFlag();
 
-  CellularPathFollower<Element, WeightedRelationPointerComparison> cellularPathFollower;
+  CellularPathFollower<Element> cellularPathFollower;
   const std::vector<Element*> elementPath =
     cellularPathFollower.followSingle(&startElement, relations, -INFINITY);
   EXPECT_EQ(2, elementPath.size());

@@ -279,6 +279,62 @@ class LFVZpVisible(BaseSkim):
 
 
 @fancy_skim_header
+class EGammaControlDark(BaseSkim):
+    """
+    **Physics channel**: ee → eγ
+    """
+
+    __authors__ = ["Sam Cunliffe", "Torben Ferber"]
+    __description__ = (
+        "Electron-gamma skim list for study of the ee backgrounds at high dark "
+        "photon mass, as part of the dark photon analysis"
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector, control-channel"
+
+    RequiredStandardLists = {
+        "stdPhotons": {
+            "stdPhotons": ["all"],
+        },
+        "stdCharged": {
+            "stdE": ["all"],
+        },
+    }
+
+    def build_lists(self, path):
+
+        # long-winded names for the particle lists to avoid clash
+        internal_skim_label = "forEGammaSkim"
+        skim_output_label = "EGammaControl"
+
+        # want exactly 1 good quality track in the event
+        # (not one good electron, one good anything)
+        phys_perf_good_track = 'abs(dr) < 1 and abs(dz) < 3 and pt > 0.15'  # cm, cm, GeV/c
+        one_good_track = f'[nCleanedTracks({phys_perf_good_track}) == 1]'
+
+        # exactly 1 good photon in the event
+        photon_energy_cut = '0.45'
+        good_photon = 'theta > 0.296706 and theta < 2.61799' +\
+            f' and useCMSFrame(E) > {photon_energy_cut}'
+        ma.cutAndCopyList(f'gamma:{internal_skim_label}', 'gamma:all', good_photon, path=path)
+        one_good_photon = f'[eventCached(nParticlesInList(gamma:{internal_skim_label})) == 1]'
+
+        # apply the event-level cuts
+        event_cuts = f'{one_good_photon} and {one_good_track}'
+        path = self.skim_event_cuts(event_cuts, path=path)
+
+        # fill electron lists (tighter than previous selection)
+        good_track_w_hie_cluster_match = '%s and clusterE > 2.0' % phys_perf_good_track
+        ma.cutAndCopyList(f'e+:{internal_skim_label}', 'e+:all', good_track_w_hie_cluster_match, path=path)
+
+        # reconstruct decay
+        ma.reconstructDecay(
+            f'vpho:{skim_output_label} -> e+:{internal_skim_label} gamma:{internal_skim_label}',
+            '', 1, allowChargeViolation=True, path=path)
+        self.SkimLists = [f"vpho:{skim_output_label}"]
+
+
+@fancy_skim_header
 class GammaGammaControlKLMDark(BaseSkim):
     """
     **Physics channel**: ee → γγ

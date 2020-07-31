@@ -192,5 +192,6 @@ namespace Belle2 {
     double m_DspWithExtraMCInfoThreshold;  /**< Energy threshold above which to store DSPs with extra information */
     bool m_trigTime; /**< Use trigger time from beam background overlay */
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
+    bool m_dspDataTest; /**< DSP data usage flag */
   };
 }//Belle2

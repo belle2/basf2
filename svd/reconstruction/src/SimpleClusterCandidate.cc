@@ -32,8 +32,6 @@ namespace Belle2 {
       , m_cutAdjacent(cutAdjacent)
       , m_cutCluster(cutCluster)
       , m_timeAlgorithm(timeAlgorithm)
-      , m_storeShaperDigitsName("SVDShaperDigits")
-      , m_storeRecoDigitsName("SVDRecoDigits")
       , m_charge(0)
       , m_chargeError(0)
       , m_seedCharge(0)
@@ -44,10 +42,13 @@ namespace Belle2 {
       , m_SNR(0)
       , m_seedSNR(0)
       , m_seedIndex(-1)
-      , m_strips(4) {m_strips.clear();};
+      , m_strips(4)
+      , m_storeShaperDigitsName("SVDShaperDigits")
+      , m_storeRecoDigitsName("SVDRecoDigits")
+    {m_strips.clear();};
 
     SimpleClusterCandidate::SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent,
-                                                   double cutCluster, int timeAlgorithm, std::string storeShaperDigitsName, std::string storeRecoDigitsName)
+                                                   double cutCluster, int timeAlgorithm, const std::string& storeShaperDigitsName, const std::string& storeRecoDigitsName)
       : m_vxdID(vxdID)
       , m_isUside(isUside)
       , m_sizeHeadTail(sizeHeadTail)
@@ -55,8 +56,6 @@ namespace Belle2 {
       , m_cutAdjacent(cutAdjacent)
       , m_cutCluster(cutCluster)
       , m_timeAlgorithm(timeAlgorithm)
-      , m_storeShaperDigitsName(storeShaperDigitsName)
-      , m_storeRecoDigitsName(storeRecoDigitsName)
       , m_charge(0)
       , m_chargeError(0)
       , m_seedCharge(0)
@@ -67,7 +66,10 @@ namespace Belle2 {
       , m_SNR(0)
       , m_seedSNR(0)
       , m_seedIndex(-1)
-      , m_strips(4) {m_strips.clear();};
+      , m_strips(4)
+      , m_storeShaperDigitsName(storeShaperDigitsName)
+      , m_storeRecoDigitsName(storeRecoDigitsName)
+    {m_strips.clear();};
 
     bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip)
     {

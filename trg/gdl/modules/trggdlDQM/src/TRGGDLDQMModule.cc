@@ -1011,6 +1011,16 @@ TRGGDLDQMModule::fillOutputExtra(void)
     bool lml12_fired = isFired("LML12");
     bool lml13_fired = isFired("LML13");
     bool eclmumu_fired = isFired("ECLMUMU");
+    bool mu_b2b_fired = isFired("mu_b2b");
+    bool mu_eb2b_fired = isFired("mu_eb2b");
+    bool cdcklm1_fired = isFired("cdcklm1");
+    bool cdcklm2_fired = isFired("cdcklm2");
+    bool klm_hit_fired = isFired("klm_hit");
+    bool eklm_hit_fired = isFired("eklm_hit");
+    bool cdcecl1_fired = isFired("cdcecl1");
+    bool cdcecl2_fired = isFired("cdcecl2");
+    bool cdcecl3_fired = isFired("cdcecl3");
+    bool cdcecl4_fired = isFired("cdcecl4");
 
     if (1) {
       h_psn_extra[skim[ifill]]->Fill(0.5);
@@ -1138,6 +1148,66 @@ TRGGDLDQMModule::fillOutputExtra(void)
     if (eclmumu_fired && (fff_fired || ffo_fired || ffb_fired)) {
       h_psn_extra[skim[ifill]]->Fill(41.5);
     }
+    if (mu_b2b_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(42.5);
+    }
+    if (mu_eb2b_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(43.5);
+    }
+    if (cdcklm1_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(44.5);
+    }
+    if (cdcklm2_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(45.5);
+    }
+    if (klm_hit_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(46.5);
+    }
+    if (eklm_hit_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(47.5);
+    }
+    if (mu_b2b_fired  && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(48.5);
+    }
+    if (mu_eb2b_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(49.5);
+    }
+    if (cdcklm1_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(50.5);
+    }
+    if (cdcklm2_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(51.5);
+    }
+    if (klm_hit_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(52.5);
+    }
+    if (eklm_hit_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(53.5);
+    }
+    if (cdcecl1_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(54.5);
+    }
+    if (cdcecl2_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(55.5);
+    }
+    if (cdcecl3_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(56.5);
+    }
+    if (cdcecl4_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_extra[skim[ifill]]->Fill(57.5);
+    }
+    if (cdcecl1_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(58.5);
+    }
+    if (cdcecl2_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(59.5);
+    }
+    if (cdcecl3_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(60.5);
+    }
+    if (cdcecl4_fired && lml_fired) {
+      h_psn_extra[skim[ifill]]->Fill(61.5);
+    }
 
   }
 }
@@ -1147,6 +1217,8 @@ const char* TRGGDLDQMModule::output_extra[n_output_extra] = {
   "ff", "ff&(lml|eclmumu)", "f", "f&(lml|eclmumu)", "lml|eclmumu", "fff&(lml|eclmumu)", "ffo&(lml|eclmumu)", "ffb&(lml|eclmumu)", "ffy", "ffy&(c4|hie)",
   "fyo&(c4|hie)", "fyb&(c4|hie)", "(ffy|ffo|ffb)&(c4|hie)", "ffy&(lml|eclmumu)", "fyo&(lml|eclmumu)", "fyb&(lml|eclmumu)", "c4&(fff|ffo|ffb)", "hie&(fff|ffo|ffb)", "lml0&(fff|ffo|ffb)", "lml1&(fff|ffo|ffb)",
   "lml2&(fff|ffo|ffb)", "lml3&(fff|ffo|ffb)", "lml4&(fff|ffo|ffb)", "lml5&(fff|ffo|ffb)", "lml6&(fff|ffo|ffb)", "lml7&(fff|ffo|ffb)", "lml8&(fff|ffo|ffb)", "lml9&(fff|ffo|ffb)", "lml10&(fff|ffo|ffb)", "lml12&(fff|ffo|ffb)",
-  "lml13&(fff|ffo|ffb)", "eclmumu&(fff|ffo|ffb)"
+  "lml13&(fff|ffo|ffb)", "eclmumu&(fff|ffo|ffb)", "mu_b2b&(fff|ffo|ffb)", "mu_eb2b&(fff|ffo|ffb)", "cdcklm1&(fff|ffo|ffb)", "cdcklm2&(fff|ffo|ffb)", "klm_hit&(fff|ffo|ffb)", "eklm_hit&(fff|ffo|ffb)", "mu_b2b&(lml|eclmumu)", "mu_eb2b&(lml|eclmumu)",
+  "cdcklm1&(lml|eclmumu)", "cdcklm2&(lml|eclmumu)", "klm_hit&(lml|eclmumu)", "eklm_hit&(lml|eclmumu)", "cdcecl1&(fff|ffo|ffb)", "cdcecl2&(fff|ffo|ffb)", "cdcecl3&(fff|ffo|ffb)", "cdcecl4&(fff|ffo|ffb)", "cdcecl1&(lml|eclmumu)", "cdcecl2&(lml|eclmumu)",
+  "cdcecl3&(lml|eclmumu)", "cdcecl4&(lml|eclmumu)"
 };
 

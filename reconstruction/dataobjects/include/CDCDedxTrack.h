@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXTRACK_H
-#define CDCDEDXTRACK_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
@@ -335,4 +334,3 @@ namespace Belle2 {
     ClassDef(CDCDedxTrack, 14); /**< Debug output for CDCDedxPID module. */
   };
 }
-#endif

@@ -69,7 +69,7 @@ namespace Belle2 {
 
 
     private:
-      StoreArray<FANGSHit> m_fangsHit; /** array for FANGSHit */
+      StoreArray<FANGSHit> m_fangsHit; /**< array for FANGSHit */
 
       /** reads data from MICROFANGS.xml: tube location, drift data filename, sigma of impulse response function */
       void getXMLData();

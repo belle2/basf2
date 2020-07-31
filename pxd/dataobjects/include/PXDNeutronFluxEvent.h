@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef PXD_DATAOBJECTS_NEUTRONFLUXEVENT_H
-#define PXD_DATAOBJECTS_NEUTRONFLUXEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
 #include <algorithm>
@@ -84,5 +82,3 @@ namespace Belle2 {
     ClassDef(PXDNeutronFluxEvent, 1)
   };
 } // end namespace Belle2
-
-#endif

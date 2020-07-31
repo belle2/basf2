@@ -214,6 +214,17 @@ namespace Belle2 {
      * @return super layer pattern of hits in the current track
      */
     unsigned long getInputPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
+    /** Get complete hit pattern of neurotrack. This does the same as
+     * the getInputPattern function, but also shows the axial hit bits.
+     * This function was made for the simulation of the hardware debug
+     * information "TSVector".
+     */
+    unsigned long getCompleteHitPattern(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
+    /** Get the drift threshold bits, where the time of the TS was outside of the accepted time window and thus
+     * shifted to the allowed maximum within the borders. Note, that to get the same values as from the unpacker,
+     * this value has to be combined with the (complement of the) TSVector.
+     */
+    unsigned long getPureDriftThreshold(unsigned isector, const CDCTriggerTrack& track, const bool neurotrackinputmode);
 
     /** Select hits for each super layer from the ones related to input track
      * @param isector              index of the MLP that will use the input

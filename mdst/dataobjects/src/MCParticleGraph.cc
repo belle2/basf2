@@ -260,7 +260,7 @@ void MCParticleGraph::loadList(const string& name)
     newParticle = oldParticle;
     //If this particle has a mother we just add the decay to this mother
     const MCParticle* oldMother = oldParticle.getMother();
-    if (oldMother != NULL) {
+    if (oldMother != nullptr) {
       unsigned motherIndex  = oldMother->getArrayIndex() + particleOffset;
       if (motherIndex >= size())
         B2FATAL("MCParticle collection \"" << name << "\" not sorted correctly: mother index larger than daughter. Cannot load into Graph");

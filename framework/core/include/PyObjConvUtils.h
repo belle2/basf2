@@ -500,6 +500,7 @@ namespace Belle2 {
      * Reads a scalar type (int, double, string, bool) from a python object.
      *
      * @param pyObject Python object which stores the scalar type.
+     * @param Scalar A scalar.
      * @return Scalar type, which holds the value from the python object
      */
     template<typename Scalar>

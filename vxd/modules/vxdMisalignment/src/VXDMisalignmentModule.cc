@@ -10,8 +10,6 @@
 #include <vxd/modules/vxdMisalignment/VXDMisalignmentModule.h>
 #include <vxd/geometry/MisalignmentCache.h>
 
-#include <framework/logging/Logger.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::VXD;

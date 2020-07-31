@@ -32,8 +32,12 @@ namespace Belle2 {
 
     /** Constructor */
     SVDDQMClustersOnTrackModule();
+    /** Copy constructor (disabled) */
+    SVDDQMClustersOnTrackModule(const SVDDQMClustersOnTrackModule&) = delete;
     /* Destructor */
     virtual ~SVDDQMClustersOnTrackModule();
+    /** Operator = (disabled) */
+    SVDDQMClustersOnTrackModule& operator=(const SVDDQMClustersOnTrackModule&) = delete;
 
     /** Module function initialize */
     void initialize() override final;
@@ -50,7 +54,7 @@ namespace Belle2 {
   private:
 
     /** if TRUE: svdTime back in SVD time reference*/
-    bool m_desynchSVDTime = true;
+    bool m_desynchSVDTime = false;
 
     /** parameter to change the range of the time histograms*/
     bool m_isSVDTimeCalibrated = false;

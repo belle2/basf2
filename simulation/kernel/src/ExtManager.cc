@@ -61,6 +61,10 @@ public:
     // Is this an exception for low-momentum track that would over-curl in B field?
     if (strstr(description, "Error returned: 3") != nullptr) {
       B2DEBUG(1, "In " << origin << ", " << code << ": " << description);
+      //FIXME: This is an exception for Gean4 navigation error from the basf2 side, reported as BII-6782
+    } else if (strstr(code, "GeomNav0003") != nullptr) {
+      B2DEBUG(20, "In " << origin << ", " << code << ": " << description);
+      // END FIXME
     } else {
       B2ERROR("In " << origin << ", " << code << ": " << description);
     }

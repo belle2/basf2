@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef TRACKINGPERFORMANCEEVALUATIONMODULE_H_
-#define TRACKINGPERFORMANCEEVALUATIONMODULE_H_
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
@@ -176,6 +176,3 @@ namespace Belle2 {
 
   };
 } // end of namespace
-
-
-#endif /* TRACKINGPERFORMANCEEVALUATIONMODULE_H_ */

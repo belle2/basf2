@@ -20,6 +20,7 @@ For each class there are two values:
    given in the ``ClassDef`` macro. If the data layout of the class changes the
    version number needs to be increased so that ROOT can realize the class is
    different if for example reading an older version from a file.
+
 2. The class checksum, a short hexadecimal string representing a checksum over
    the class memory layout. It can be used to spot differences between different
    class versions: If the checksum changes the class version needs to be

@@ -10,8 +10,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITENERGYCONSTANTS_H
-#define ECLDIGITENERGYCONSTANTS_H
+#pragma once
 #include <TObject.h>
 
 namespace Belle2 {
@@ -77,4 +76,3 @@ namespace Belle2 {
     ClassDef(ECLDigitEnergyConstants, 2); /**< ClassDef */
   };
 } // end namespace Belle2
-#endif

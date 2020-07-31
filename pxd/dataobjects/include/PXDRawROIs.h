@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRAWROIS_H
-#define PXDRAWROIS_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -119,4 +118,3 @@ namespace Belle2 {
 
 
 } //Belle2 namespace
-#endif

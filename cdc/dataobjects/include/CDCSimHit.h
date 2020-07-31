@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCSIMHIT_H
-#define CDCSIMHIT_H
+#pragma once
 
 #include <cdc/dataobjects/WireID.h>
 #include <simulation/dataobjects/SimHitBase.h>
@@ -321,4 +320,3 @@ namespace Belle2 {
     ClassDefOverride(CDCSimHit, 6);
   };
 } // end namespace Belle2
-#endif

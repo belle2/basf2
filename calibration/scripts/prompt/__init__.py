@@ -28,7 +28,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
             prompt calibration process i.e. Use these in the ``get_calibrations`` function to access the correct input
             data files.
 
-        depends_on list(CalibrationSettings): The settings variables of the other prompt calibrations that you want
+        depends_on (list(CalibrationSettings)): The settings variables of the other prompt calibrations that you want
             want to depend on. This will allow the external automatic system to understand the overall ordering of
             scripts to run. If you encounter an import error when trying to run your prompt calibration script, it is
             likely that you have introduced a circular dependency.
@@ -42,7 +42,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
             the caf_config.json sent into ``b2caf-prompt-run``.
     """
 
-    #: Allowed data file formats. You should use these values for `CalibrationSettings.input_data_formats`.
+    #: Allowed data file formats. You should use these values for ``CalibrationSettings.input_data_formats``.
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
     def __new__(cls, name, expert_username, description,

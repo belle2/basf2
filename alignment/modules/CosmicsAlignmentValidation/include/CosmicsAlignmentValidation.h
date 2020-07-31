@@ -1,5 +1,4 @@
-#ifndef COSMICS_VAL_H
-#define COSMICS_VAL_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -102,4 +101,3 @@ namespace Belle2 {
 
   };
 }
-#endif

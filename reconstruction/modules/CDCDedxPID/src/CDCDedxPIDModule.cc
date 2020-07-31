@@ -592,11 +592,11 @@ void CDCDedxPIDModule::event()
     double pidvalues[Const::ChargedStable::c_SetSize];
     Const::ParticleSet set = Const::chargedStableSet;
     if (m_usePrediction) {
-      for (const Const::ChargedStable& pdgIter : set) {
+      for (const Const::ChargedStable pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = -0.5 * dedxTrack->m_cdcChi[pdgIter.getIndex()] * dedxTrack->m_cdcChi[pdgIter.getIndex()];
       }
     } else {
-      for (const Const::ChargedStable& pdgIter : set) {
+      for (const Const::ChargedStable pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = dedxTrack->m_cdcLogl[pdgIter.getIndex()];
       }
     }
@@ -861,7 +861,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
-  for (const Const::ChargedStable& pdgIter : set) {
+  for (const Const::ChargedStable pdgIter : set) {
     double bg = p / pdgIter.getMass();
 
     // determine the predicted mean and resolution

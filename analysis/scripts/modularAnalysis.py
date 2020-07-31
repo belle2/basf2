@@ -1823,8 +1823,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
     fillParticleList('pi+:roe_default', '', path=path)
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(chargedPIDPriors, path=path)
-        inputParticlelists = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
+        stdMostLikely(chargedPIDPriors, '_roe', path=path)
+        inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     if not belle_sources:
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
@@ -2534,14 +2534,14 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(chargedPIDPriors, path=path)
-        inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
+        stdMostLikely(chargedPIDPriors, '_evtkin', path=path)
+        inputListNames = ['%s:mostlikely_evtkin' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
         fillParticleList('gamma:evtkin', '', path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
             for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']:
-                applyCuts(f'{ptype}:mostlikely', trackCuts, path=path)
+                applyCuts(f'{ptype}:mostlikely_evtkin', trackCuts, path=path)
             applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
             B2INFO("No cleanup in EventKinematics module.")

@@ -155,10 +155,12 @@ def stdMu(listtype=_defaultlist, path=None):
     stdCharged('mu', listtype, path)
 
 
-def stdMostLikely(pidPriors=None, path=None):
+def stdMostLikely(pidPriors=None, suffix='', path=None):
     """
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
+    @param pidPriors    list of 5 float numbers used to reweight PID likelihoods
+    @param suffix       string added to the end of particle list names
     @param path         modules are added to this path
     """
     # Here we need basic track quality cuts to be applied,
@@ -169,5 +171,5 @@ def stdMostLikely(pidPriors=None, path=None):
         args = str(pidPriors)[1:-1]  # remove brackets
     trackQuality = 'thetaInCDCAcceptance and nCDCHits>20'
     for name in _chargednames:
-        fillParticleList('%s+:%s' % (name, _mostLikelyList),
+        fillParticleList('%s+:%s' % (name, _mostLikelyList+suffix),
                          'pidIsMostLikely(%s) > 0 and %s' % (args, trackQuality), True, path=path)

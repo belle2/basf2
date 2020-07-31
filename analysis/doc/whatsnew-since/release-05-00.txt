@@ -19,6 +19,10 @@ Variables
  * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
  * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection, 
    collections of ROE and recoil variables have been expanded
+ * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them. A few
+   binary PID variables have been added to the PID variable collection.
+
+   .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
 
 Modules
 +++++++

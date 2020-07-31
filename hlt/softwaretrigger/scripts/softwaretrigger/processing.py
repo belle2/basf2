@@ -48,7 +48,7 @@ def setup_basf2_and_db(zmq=False):
     parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count(),
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
-                        help="set path to the local database.txt to use for the ConditionDB",
+                        help="set path to the local payload locations to use for the ConditionDB",
                         default=constants.DEFAULT_DB_FILE_LOCATION)
     parser.add_argument('--central-db-tag', type=str, nargs="*",
                         help="Use the central db with a specific tag (can be applied multiple times, order is relevant)")
@@ -62,11 +62,9 @@ def setup_basf2_and_db(zmq=False):
         for central_tag in args.central_db_tag:
             basf2.conditions.prepend_globaltag(central_tag)
     else:
-        # On HLT, we are still using the legacy database settings (e.g. database.txt) instead of the
-        # sqlite database. So we need to prevent the framework to use the sqlite database
-        # This should be changed as quickly as possible
-        basf2.conditions.metadata_providers = []
-        basf2.conditions.prepend_testing_payloads(ROOT.Belle2.FileSystem.findFile(args.local_db_path))
+        basf2.conditions.globaltags = ["online"]
+        basf2.conditions.metadata_providers = ["file://" + basf2.find_file(args.local_db_path + "/metadata.sqlite")]
+        basf2.conditions.payload_locations = [basf2.find_file(args.local_db_path)]
 
     # Number of processes
     basf2.set_nprocesses(args.number_processes)

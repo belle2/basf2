@@ -98,7 +98,7 @@ namespace Belle2 {
       }
       if (includingVars) {
         B2INFO(" - " << particle->getArrayIndex() << " = " << particle->getPDGCode() << "[" << i << "]");
-        if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
+        if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
           std::string s;
           for (int idx : particle->getDaughterIndices())
             s += " " + std::to_string(idx);

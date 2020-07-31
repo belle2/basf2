@@ -24,6 +24,7 @@ namespace Belle2 {
   public:
     /**
      * Create a DecayForest from a full decaystring outputted by ParticleMCDecayString
+     * @param full_decaystring full decay string
      * @param save_memory by storing only the reconstructed and first valid original DecayTree
      * @param removeRadiativeGammaFlag remove radiative photons from decay string. Handle with care:
      * In the decay B+ --> e+ nu_e gamma, the gamma would be removed although this might be your signal.

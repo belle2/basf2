@@ -22,8 +22,10 @@ import sys
 
 
 class printSVDPitches(basf2.Module):
+    '''class to print SVD pitches'''
 
     def printPitch(self, layer, ladder, sensor):
+        '''print pitch function'''
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -41,6 +43,7 @@ class printSVDPitches(basf2.Module):
         print("V pitch = " + str(sensorInfo.getVPitch(-sensorInfo.getLength() / 2) * 10000) + ' mu')
 
     def beginRun(self):
+        '''begin run'''
 
         print('Layer 3')
         self.printPitch(3, 1, 2)
@@ -53,8 +56,10 @@ class printSVDPitches(basf2.Module):
 
 
 class printSVDSizes(basf2.Module):
+    ''' class to print SVD sizes'''
 
     def printSize(self, layer, ladder, sensor):
+        '''function to print the sizes'''
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -68,6 +73,7 @@ class printSVDSizes(basf2.Module):
         print("U size at V=+length/2 = " + str(sensorInfo.getUSize(sensorInfo.getLength() / 2) * 10) + ' mm')
 
     def beginRun(self):
+        '''begin run'''
 
         print('Layer 3')
         self.printSize(3, 1, 2)
@@ -80,8 +86,10 @@ class printSVDSizes(basf2.Module):
 
 
 class printSVDStripLengths(basf2.Module):
+    '''class to print strip length'''
 
     def printStripLength(self, layer, ladder, sensor):
+        '''function to print strip length'''
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -96,6 +104,7 @@ class printSVDStripLengths(basf2.Module):
         print(' U strips at vID=' + str(nVcells) + ' = ' + str(sensorInfo.getStripLengthU(nVcells) * 10) + ' mm')
 
     def beginRun(self):
+        '''begin run'''
 
         print('Layer 3')
         self.printStripLength(3, 1, 2)
@@ -108,8 +117,10 @@ class printSVDStripLengths(basf2.Module):
 
 
 class printSVDStripPositions(basf2.Module):
+    '''class to print strip positions'''
 
     def printStripPosition(self, layer, ladder, sensor):
+        '''function to print strip positions'''
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -134,6 +145,7 @@ class printSVDStripPositions(basf2.Module):
               str(sensorInfo.getUCellID(sensorInfo.getUCellPosition(0, 0), sensorInfo.getVCellPosition(0))))
 
     def beginRun(self):
+        '''begin run'''
 
         print('Layer 3')
         self.printStripPosition(3, 1, 2)
@@ -146,9 +158,10 @@ class printSVDStripPositions(basf2.Module):
 
 
 class printSVDSensors(basf2.Module):
+    '''class to print svd sensors'''
 
     def beginRun(self):
-
+        '''begin run'''
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
         print("printing all sensors of the SVD in the geometry:")
@@ -162,8 +175,10 @@ class printSVDSensors(basf2.Module):
 
 
 class printSVDLadders(basf2.Module):
+    '''class to print svd ladders'''
 
     def beginRun(self):
+        '''begin run'''
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -202,7 +217,7 @@ class printSVDLadders(basf2.Module):
                     print(sensorID + '     ' + xStr + '     ' + yStr + '     ' + radStr + '     ' + degStr)
 
 
-# add your database here
+# TO DO: update conditions functions:
 # reset_database()
 # use_database_chain()
 # use_central_database("release-02-00-00")

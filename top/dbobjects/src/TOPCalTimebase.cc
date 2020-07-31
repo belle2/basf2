@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPCalTimebase.h>
+
+#include <framework/logging/Logger.h>
+
 #include <iostream>
 
 using namespace std;

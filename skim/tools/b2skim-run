@@ -4,12 +4,30 @@
 """General steering file for running skims."""
 
 import argparse
-from importlib import import_module
+import sys
+from textwrap import indent
 
 import basf2 as b2
 import modularAnalysis as ma
-import skimExpertFunctions as expert
+from skimExpertFunctions import CombinedSkim
 from skim.registry import Registry
+
+
+class _HelpAction(argparse._HelpAction):
+    """Help action which prints the help strings of all subparsers."""
+    def __call__(self, parser, namespace, values, option_string=None):
+        parser.print_help()
+
+        subparsers_actions = [
+            action for action in parser._actions
+            if isinstance(action, argparse._SubParsersAction)]
+
+        for subparsers_action in subparsers_actions:
+            for choice, subparser in subparsers_action.choices.items():
+                print(f"\nhelp for subcommand '{choice}':")
+                print(indent(subparser.format_help(), " "*2))
+
+        parser.exit()
 
 
 class CustomHelpFormatter(argparse.HelpFormatter):
@@ -26,62 +44,81 @@ class CustomHelpFormatter(argparse.HelpFormatter):
             return action.help
 
 
+class CustomArgumentParser(argparse.ArgumentParser):
+    """Argument parser which propogates help formatter to all subparsers."""
+
+    def __init__(self, **kwargs):
+        kwargs["formatter_class"] = CustomHelpFormatter
+        super(CustomArgumentParser, self).__init__(**kwargs)
+
+    def error(self, message):
+        sys.stderr.write(f"Error: {message}\n")
+        self.print_help()
+        sys.exit(2)
+
+
 def get_argument_parser():
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=CustomHelpFormatter,
+    parser = CustomArgumentParser(description=__doc__, add_help=False)
+    parser.add_argument("-h", "--help", action=_HelpAction, help="Show a full help message.")
+    subparsers = parser.add_subparsers(
+        dest="action", help="Run just one skim, or multiple skims at once.",
+    )
+    subparsers.required = True
+
+    single = subparsers.add_parser("single", help="Run a single skim.")
+
+    single.add_argument(
+        "skim", choices=Registry.names, metavar="Skim", help="Skim to run.",
     )
 
-    parser.add_argument(
-        "skim", choices=Registry.names, metavar="Skim", help="Skim to be run"
-    )
-    parser.add_argument(
-        "-n",
-        "--max-input-events",
-        dest="MaxInputEvents",
-        metavar="MaxInputEvents",
-        type=int,
-        default=0,
-        help="Maximum number of input events to process.",
-    )
-    parser.add_argument(
-        "-i",
-        "--input-file-list",
-        dest="InputFileList",
-        metavar="InputFileList",
-        nargs="+",
-        default=[expert.get_test_file("MC12_mixedBGx1")],
-        help="Input file list",
-    )
-    parser.add_argument(
+    single.add_argument(
         "-o",
         "--output-udst-name",
-        dest="OutputFileName",
-        metavar="OutputFileName",
+        dest="OutputFilename",
+        metavar="Output uDST location",
         help="Location of output uDST file.",
     )
 
+    combined = subparsers.add_parser(
+        "combined", help="Run several skims as a combined steering file.",
+    )
+
+    combined.add_argument(
+        "skims",
+        nargs="+",
+        choices=Registry.names,
+        metavar="Skim",
+        help="List of skims to run as a combined skim.",
+    )
+
+    module = subparsers.add_parser("module", help="Run all skims in a module.")
+
+    module.add_argument(
+        "module",
+        choices=Registry.modules,
+        metavar="module",
+        help="Skim module to run all skims for as combined steering file.",
+    )
+
+    for subparser in [single, combined, module]:
+        subparser.add_argument(
+            "-n",
+            "--max-input-events",
+            dest="MaxInputEvents",
+            metavar="MaxInputEvents",
+            type=int,
+            help="Maximum number of input events to process.",
+        )
+        subparser.add_argument(
+            "-i",
+            "--input-file-list",
+            dest="InputFileList",
+            metavar="InputFileList",
+            nargs="+",
+            help="Input file list",
+        )
+
     return parser
-
-
-def get_skim_function(SkimName):
-    """Get the skim class constructor for the given skim.
-
-    This is achieved by importing the module listed alongside the skim name in the
-    `skim.registry.Registry`.
-
-    Parameters:
-        SkimName (str): Name of the skim to be found.
-
-    Returns:
-        SkimFunction: The class constructor for the given skim.
-    """
-    # TODO: Delete this `if` statement once everything is implemented
-    if SkimName not in ["LeptonicUntagged", "SinglePhotonDark"]:
-        raise NotImplementedError
-
-    ModuleName = Registry.get_skim_module(SkimName)
-    SkimModule = import_module(f"skim.{ModuleName}")
-    return getattr(SkimModule, SkimName)
 
 
 def main():
@@ -89,13 +126,30 @@ def main():
     args = parser.parse_args()
 
     path = b2.Path()
-    ma.inputMdstList("default", args.InputFileList, path=path)
 
-    SkimFunction = get_skim_function(args.skim)
-    Skim = SkimFunction(args.OutputFileName)
+    # Get the list of skims to run from the argument parsers
+    if args.action == "single":
+        SkimFunction = Registry.get_skim_function(args.skim)
+        Skim = SkimFunction(OutputFileName=args.OutputFilename)
+    elif args.action == "combined":
+        skims = list({*args.skims})
+        if sorted(skims) != sorted(args.skims):
+            b2.B2FATAL("Attempting to run a skim twice!")
+        SkimObjects = [Registry.get_skim_function(skim)() for skim in skims]
+        Skim = CombinedSkim(*SkimObjects)
+    elif args.action == "module":
+        SkimObjects = [
+            Registry.get_skim_function(skim)()
+            for skim in Registry.get_skims_in_module(args.module)
+        ]
+        Skim = CombinedSkim(*SkimObjects)
+
+    InputFileList = args.InputFileList or Skim.TestFiles
+    ma.inputMdstList("default", InputFileList, path=path)
     Skim(path)
 
-    b2.process(path, max_event=args.MaxInputEvents)
+    MaxInputEvents = args.MaxInputEvents or 0
+    b2.process(path, max_event=MaxInputEvents)
     print(b2.statistics())
 
 

@@ -96,7 +96,7 @@ namespace Belle2 {
 
     /**
      * Get element numbers by channel number.
-     * @param[in]  channel Channel.
+     * @param[in]  channel Channel number.
      * @param[out] section Section (0-based).
      * @param[out] sector  Sector (1-based).
      * @param[out] layer   Layer (1-based).
@@ -118,11 +118,11 @@ namespace Belle2 {
 
     /**
      * Get element numbers by plane number.
-     * @param[in]  channel Channel.
-     * @param[out] section Section (0-based).
-     * @param[out] sector  Sector (1-based).
-     * @param[out] layer   Layer (1-based).
-     * @param[out] plane   Plane (0-based).
+     * @param[in]  planeGlobal Plane number.
+     * @param[out] section     Section (0-based).
+     * @param[out] sector      Sector (1-based).
+     * @param[out] layer       Layer (1-based).
+     * @param[out] plane       Plane (0-based).
      */
     static void planeNumberToElementNumbers(
       uint16_t planeGlobal, int* section, int* sector, int* layer, int* plane);
@@ -132,6 +132,7 @@ namespace Belle2 {
      * @param[in] section Section (0-based).
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
+     * @param[in] fatalError Issue fatal error (default) or not.
      */
     static uint16_t moduleNumber(int section, int sector, int layer, bool fatalError = true);
 
@@ -199,11 +200,12 @@ namespace Belle2 {
 
     /**
      * Check channel number.
-     * @param[in] section Section (0-based).
-     * @param[in] sector  Sector (1-based).
-     * @param[in] layer   Layer (1-based).
-     * @param[in] plane   Plane (0-based).
-     * @param[in] strip   Strip (1-based).
+     * @param[in] section    Section (0-based).
+     * @param[in] sector     Sector (1-based).
+     * @param[in] layer      Layer (1-based).
+     * @param[in] plane      Plane (0-based).
+     * @param[in] strip      Strip (1-based).
+     * @param[in] fatalError Issue fatal error (default) or not.
      */
     static bool checkChannelNumber(
       int section, int sector, int layer, int plane, int strip, bool fatalError = true);

@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLTIMINGUTILITIES_H
-#define ECLTIMINGUTILITIES_H
+#pragma once
 
 namespace Belle2 {
   namespace ECL {
@@ -64,8 +63,3 @@ namespace Belle2 {
     }; // ECLTimingUtilities class
   } // namespace ECL
 } // namespace Belle2
-
-#endif
-
-
-

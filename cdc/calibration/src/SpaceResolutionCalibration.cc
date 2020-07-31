@@ -22,9 +22,8 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-SpaceResolutionCalibration::SpaceResolutionCalibration():
-  m_firstExperiment(0), m_firstRun(0),
-  m_lastExperiment(-1), m_lastRun(-1)
+SpaceResolutionCalibration::SpaceResolutionCalibration()
+// : m_firstExperiment(0), m_firstRun(0), m_lastExperiment(-1), m_lastRun(-1)
 {
   /*Space resolution calibration*/
 }

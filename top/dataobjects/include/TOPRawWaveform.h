@@ -12,7 +12,6 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <vector>
-#include <string>
 #include <algorithm>
 
 namespace Belle2 {
@@ -99,7 +98,7 @@ namespace Belle2 {
 
     /**
      * Sets number of global clock tics since last revo9 flag
-     * @param revo9counter
+     * @param revo9Counter counter state
      */
     void setRevo9Counter(unsigned short revo9Counter) {m_revo9Counter = revo9Counter;}
 

@@ -24,17 +24,12 @@
 #include <top/dataobjects/TOPBarHit.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-// ROOT
-#include <TVector3.h>
 #include <cmath>
 
 using namespace std;
@@ -110,6 +105,8 @@ namespace Belle2 {
     m_tracks.registerRelationTo(m_pdfCollection);
     m_associatedPDFs.registerInDataStore();
     m_digits.registerRelationTo(m_associatedPDFs);
+    m_pixelData.registerInDataStore();
+    m_tracks.registerRelationTo(m_pixelData);
 
     // check for module debug level
     if (getLogConfig().getLogLevel() == LogConfig::c_Debug) {
@@ -156,8 +153,8 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
 
     // create reconstruction object
-    TOPreco reco(m_masses.size(), m_masses.data(), m_minBkgPerBar, m_scaleN0);
-    reco.setHypID(m_pdgCodes.size(), m_pdgCodes.data());
+    TOPreco reco(m_masses.size(), m_masses.data(), m_pdgCodes.data(),
+                 m_minBkgPerBar, m_scaleN0);
     reco.setPDFoption(m_PDFOption);
     reco.setStoreOption(TOPreco::c_Full);
 
@@ -188,10 +185,14 @@ namespace Belle2 {
         module.momentumToLocal(trk.getMomentum()),
         trk.getModuleID()
       );
+
+      TOPPixelLikelihood* topPLkhs = m_pixelData.appendNew();
+      topPLkhs->setModuleID(trk.getModuleID());
+
       for (unsigned i = 0; i < m_pdgCodes.size(); i++) {
         double mass = m_masses[i];
         int iPDGCode = m_pdgCodes[i];
-        reco.setMass(mass);
+        reco.setMass(mass, iPDGCode);
         reco.reconstruct(trk); // will run reconstruction only for this mass hypothesis
         if (reco.getFlag() != 1) break; // track is not in the acceptance of TOP
 
@@ -216,8 +217,22 @@ namespace Belle2 {
         } // end loop over pixels
 
         topPDFColl->addHypothesisPDF(channelPDFCollection, iPDGCode);
+
+        // Initialize logL and sfot pixel arrays
+        TOPPixelLikelihood::PixelArray_t pixLogLs, pixSigPhots;
+        pixLogLs.fill(0);
+        pixSigPhots.fill(0);
+
+        double timeShift = 0, timeMin = 0, timeMax = 0, sigma = 0; /**< getLogL arguments */
+        reco.getLogL(timeShift, timeMin, timeMax, sigma, pixLogLs.data(), pixSigPhots.data());
+
+        topPLkhs->addHypothesisLikelihoods(pixLogLs, iPDGCode);
+        topPLkhs->addHypothesisSignalPhotons(pixSigPhots, iPDGCode);
       }
-      if (reco.getFlag() == 1) track.addRelationTo(topPDFColl);
+      if (reco.getFlag() == 1) {
+        track.addRelationTo(topPDFColl);
+        track.addRelationTo(topPLkhs);
+      }
     } // end loop over tracks
     ++m_iEvent;
   }

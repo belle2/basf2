@@ -81,7 +81,8 @@ namespace Belle2 {
       int result = 0;
       auto fspDaughters = particle->getDaughters();
       for (auto* daughter : fspDaughters) {
-        if (daughter->getParticleType() == Particle::EParticleType::c_Composite) {
+        if (daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
+            daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
           result++;
         }
       }

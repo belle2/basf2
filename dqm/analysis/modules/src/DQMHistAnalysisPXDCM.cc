@@ -44,7 +44,10 @@ DQMHistAnalysisPXDCMModule::~DQMHistAnalysisPXDCMModule()
 
 void DQMHistAnalysisPXDCMModule::initialize()
 {
-  VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+  m_monObj = getMonitoringObject("pxd");
+
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
@@ -130,6 +133,9 @@ void DQMHistAnalysisPXDCMModule::event()
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         current += v;
       }
+
+      m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), hh1->GetMean());
+
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
       outside += hh1->Integral(16, 63);

@@ -12,20 +12,18 @@
 #define SVDCrossTalkFinderModule_H
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/SensorInfoBase.h>
-#include <vxd/geometry/GeoCache.h>
 #include <svd/calibration/SVDOccupancyCalibrations.h>
 
-#include <string>
-#include <TH2.h>
 #include <TFile.h>
+#include <TH1F.h>
+
+#include <string>
 #include <map>
 
 namespace Belle2 {

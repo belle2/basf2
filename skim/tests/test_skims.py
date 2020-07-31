@@ -13,9 +13,6 @@ from skim.registry import Registry
 
 __authors__ = ["Phil Grace"]
 
-# TODO: Delete this line once everything is implemented
-Registry.names = ["LeptonicUntagged", "SinglePhotonDark"]
-
 # NOTE: Another way this test could have been written is to run the standalone steering
 # file for every skim:
 #

@@ -155,6 +155,8 @@ namespace Belle2 {
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName](const Particle*) -> double {
           StoreObjPtr<EventExtraInfo> eventExtraInfo;
+          if (not eventExtraInfo.isValid())
+            return std::numeric_limits<float>::quiet_NaN();
           if (eventExtraInfo->hasExtraInfo(extraInfoName))
           {
             return eventExtraInfo->getExtraInfo(extraInfoName);
@@ -447,9 +449,9 @@ namespace Belle2 {
 
         // this only makes sense for particles that are *not* composite and come
         // from some mdst object (tracks, clusters..)
-        Particle::EParticleType particletype = particle->getParticleType();
-        if (particletype == Particle::EParticleType::c_Composite
-        or particletype == Particle::EParticleType::c_Undefined)
+        Particle::EParticleSourceObject particlesource = particle->getParticleSource();
+        if (particlesource == Particle::EParticleSourceObject::c_Composite
+        or particlesource == Particle::EParticleSourceObject::c_Undefined)
           return -1.0;
 
         // it *is* possible to have a particle list from different sources (like
@@ -458,7 +460,7 @@ namespace Belle2 {
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
           Particle* iparticle = list->getParticle(i);
-          if (particletype == iparticle->getParticleType())
+          if (particlesource == iparticle->getParticleSource())
             if (particle->getMdstArrayIndex() == iparticle->getMdstArrayIndex())
               return 1.0;
         }
@@ -789,10 +791,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -820,10 +818,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 5) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -855,10 +849,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -896,10 +886,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 4) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -941,10 +927,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -985,10 +967,6 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOfClusterPhi(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 4) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
@@ -1033,10 +1011,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1074,10 +1048,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterDiffOfClusterPhiCMS(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1118,10 +1088,6 @@ namespace Belle2 {
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         int iDaughterNumber = 0;
         int jDaughterNumber = 0;
         try {
@@ -1473,7 +1439,6 @@ namespace Belle2 {
         std::string cutString = arguments[0];
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
-        // cppcheck-suppress unreadVariable ; cppcheck has problems with lambda capture
         const Variable::Manager::Var* variableIfTrue = Manager::Instance().getVariable(arguments[1]);
         const Variable::Manager::Var* variableIfFalse = Manager::Instance().getVariable(arguments[2]);
 
@@ -1751,10 +1716,6 @@ namespace Belle2 {
         std::string rankedVariableName = arguments[1];
         std::string returnVariableName = arguments[2];
         std::string extraInfoName = rankedVariableName + "_rank";
-        // 'rank' is correctly scoped, but cppcheck support the lambda
-        // function syntax and throws a (wrong) variableScope error
-
-        // cppcheck-suppress variableScope
         int rank = 1;
         try {
           rank = Belle2::convertString<int>(arguments[3]);
@@ -1833,11 +1794,6 @@ namespace Belle2 {
         }
 
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
-        // cppcheck has problems understanding lambda function syntax and throws
-        // a warning here about cut being unread. but it is read in the if
-        // statements so suppress the false positive
-        //
-        // cppcheck-suppress unreadVariable
         std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
@@ -2410,6 +2366,36 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr maxOpeningAngleInList(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        std::string listName = arguments[0];
+        auto func = [listName](const Particle*) -> double {
+          StoreObjPtr<ParticleList> listOfParticles(listName);
+
+          if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << listName << " given to maxOpeningAngleInList");
+          int nParticles = listOfParticles->getListSize();
+          // return NaN if number of particles is less than 2
+          if (nParticles < 2) return std::numeric_limits<double>::quiet_NaN();
+
+          const auto& frame = ReferenceFrame::GetCurrent();
+          double maxOpeningAngle = -1;
+          for (int i = 0; i < nParticles; i++)
+          {
+            TVector3 v1 = frame.getMomentum(listOfParticles->getParticle(i)).Vect();
+            for (int j = i + 1; j < nParticles; j++) {
+              TVector3 v2 = frame.getMomentum(listOfParticles->getParticle(j)).Vect();
+              const double angle = v1.Angle(v2);
+              if (angle > maxOpeningAngle) maxOpeningAngle = angle;
+            }
+          }
+          return maxOpeningAngle;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function maxOpeningAngleInList");
+      }
+    }
 
     Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments)
     {
@@ -2933,7 +2919,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. ``matchedMC(p)`` returns the total momentum of the related MCParticle.\n"
                       "Returns NaN if no matched MCParticle exists.");
-    REGISTER_VARIABLE("countInList(particleList, cut='')", countInList,
+    REGISTER_VARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"
@@ -2988,6 +2974,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided.");
     REGISTER_VARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.");
+    REGISTER_VARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,
+                      "Returns maximum opening angle in the given particle List.");
     REGISTER_VARIABLE("daughterCombination(variable, daughterIndex_1, daughterIndex_2 ... daughterIndex_n)", daughterCombination,R"DOC(
 Returns a ``variable`` function only of the 4-momentum calculated on an arbitrary set of (grand)daughters. 
 

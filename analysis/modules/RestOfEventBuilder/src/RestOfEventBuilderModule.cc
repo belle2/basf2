@@ -174,8 +174,8 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
       std::vector<const Particle*> storedParticleDaughters = storedParticle->getFinalStateDaughters();
       for (auto* storedParticleDaughter : storedParticleDaughters) {
         bool toAdd = true;
-        if ((m_fromMC and storedParticleDaughter->getParticleType() != Particle::EParticleType::c_MCParticle)
-            or (!m_fromMC and storedParticleDaughter->getParticleType() == Particle::EParticleType::c_MCParticle)) {
+        if ((m_fromMC and storedParticleDaughter->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle)
+            or (!m_fromMC and storedParticleDaughter->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle)) {
           B2FATAL("The value of fromMC parameter is not consisted with the type of provided particles, MC vs Reco");
         }
         // Remove non primary MCParticles
@@ -245,9 +245,9 @@ void RestOfEventBuilderModule::printEvent()
 
 void RestOfEventBuilderModule::printParticle(const Particle* particle)
 {
-  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_ECLCluster);
-  std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleType::c_KLMCluster);
-  std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleType::c_Track);
+  std::vector<int> eclFSPs   = particle->getMdstArrayIndices(Particle::EParticleSourceObject::c_ECLCluster);
+  std::vector<int> klmFSPs   = particle->getMdstArrayIndices(Particle::EParticleSourceObject::c_KLMCluster);
+  std::vector<int> trackFSPs = particle->getMdstArrayIndices(Particle::EParticleSourceObject::c_Track);
 
   B2INFO("[RestOfEventBuilderModule] tracks  : ");
 

@@ -44,37 +44,37 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~KLMDQMModule();
+    ~KLMDQMModule();
 
     /**
      * Definition of the histograms.
      */
-    virtual void defineHisto() override;
+    void defineHisto() override;
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 
@@ -136,6 +136,9 @@ namespace Belle2 {
 
     /** Number of channel hit histograms per sector for EKLM. */
     const int m_ChannelHitHistogramsEKLM = 3;
+
+    /** Masked channels per sector. */
+    TH1F* m_MaskedChannelsPerSector;
 
     /** Axial position of muon hit. */
     TH1F* m_bklmHit2dsZ;

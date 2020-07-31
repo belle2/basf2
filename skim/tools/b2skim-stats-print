@@ -28,6 +28,7 @@ __email__ = "philip.grace@adelaide.edu.au, rachac@mail.ubc.ca"
 
 import argparse
 from functools import lru_cache
+from itertools import product
 import json
 import pandas as pd
 from pathlib import Path
@@ -37,7 +38,7 @@ from textwrap import wrap
 
 from basf2 import B2WARNING, B2ERROR
 from basf2.utils import pretty_print_table
-from skim.registry import Registry, combined_skims
+from skim.registry import Registry
 from skimExpertFunctions import get_test_file, get_total_infiles, get_events_per_file
 
 
@@ -63,6 +64,28 @@ class CustomHelpFormatter(argparse.HelpFormatter):
             return action.help
 
 
+def required_length(*, min=None, max=None):
+    """Custom action for argparse to enforce a minimum number of arguments to an option."""
+
+    class RequiredLength(argparse.Action):
+        def __call__(self, parser, args, values, option_string=None):
+            if min is not None and max is None:
+                if len(values) < min:
+                    msg = f"Argument '{self.dest}' requires at least {min} arguments."
+                    raise argparse.ArgumentTypeError(msg)
+            elif min is None and max is not None:
+                if len(values) > max:
+                    msg = f"Argument '{self.dest}' requires at most {max} arguments."
+                    raise argparse.ArgumentTypeError(msg)
+            elif min is not None and max is not None:
+                if len(values) < min or len(values) > max:
+                    msg = f"Argument '{self.dest}' requires between {min} and {max} arguments."
+                    raise argparse.ArgumentTypeError(msg)
+            setattr(args, self.dest, values)
+
+    return RequiredLength
+
+
 def getArgumentParser():
     """Construct the argument parser.
 
@@ -70,74 +93,85 @@ def getArgumentParser():
         parser (argparse.ArgumentParser): An argument parser which obtains its
             list of valid skim names from `skim.registry`.
     """
-    allStandaloneSkims = Registry.names
-    allCombinedSkims = sorted(combined_skims.keys())
-
     parser = argparse.ArgumentParser(
-        description="Reads the output files of test skim jobs from "
-        "``b2skim-stats-submit`` and prints tables of performance statistics. "
-        "One or more standalone or combined skim names must be provided.",
+        description=(
+            "Reads the output files of test skim jobs from "
+            "``b2skim-stats-submit`` and prints tables of performance statistics. "
+            "One or more single or combined skim names must be provided."
+        ),
         formatter_class=CustomHelpFormatter,
     )
-    parser.add_argument(
+    SkimSelector = parser.add_mutually_exclusive_group(required=True)
+    SkimSelector.add_argument(
         "-s",
-        "--standalone",
+        "--single",
         nargs="+",
         default=[],
-        choices=["all"] + allStandaloneSkims,
-        metavar="SKIM",
-        help="List of standalone skims to run.",
+        choices=["all"] + Registry.names,
+        metavar="skim",
+        help="List of individual skims to run.",
     )
-    parser.add_argument(
+    SkimSelector.add_argument(
         "-c",
         "--combined",
         nargs="+",
         default=[],
-        choices=["all"] + allCombinedSkims,
-        metavar="SKIM",
+        metavar="CombinedSkim",
         help="List of combined skims to run.",
     )
-    parser.add_argument(
+
+    OutputGroup = parser.add_mutually_exclusive_group()
+    OutputGroup.add_argument(
         "-C",
         "--confluence",
-        action="store_true",
-        help="Print a wiki markup table to be copied to Confluence.",
+        nargs="?",
+        const="SkimStats.txt",
+        metavar="OutputFilename",
+        help="Save a wiki markup table to be copied to Confluence.",
     )
-    parser.add_argument(
+    OutputGroup.add_argument(
         "-M",
         "--markdown",
-        action="store_true",
+        nargs="?",
+        const="SkimStats.md",
+        metavar="OutputFilename",
         help=(
             "Save a markdown table in a format that can be copied into "
             "pull request comments."
         ),
     )
-    parser.add_argument(
+    OutputGroup.add_argument(
         "-J",
         "--json",
-        action="store_true",
+        nargs="?",
+        const="SkimStats.json",
+        metavar="OutputFilename",
         help="Save the tables of statistics to a JSON file.",
     )
+    OutputGroup.add_argument(
+        "--average-over",
+        nargs="+",
+        default=[],
+        choices=["skims", "samples"],
+        action=required_length(max=2),
+        help=(
+            "If this argument is given, this tool will produce stat averages over "
+            "all given skims or all given samples. These are printed in JSON format."
+        ),
+    )
+
     parser.add_argument(
         "--mccampaign",
         default="MC13",
         choices=["MC12", "MC13"],
         help="The MC campaign to test on.",
     )
-    parser.add_argument(
-        "--average-over",
-        nargs="+",
-        default=[],
-        choices=["skims", "samples"],
-        help="If this argument is given, this tool will produce stat averages over "
-        "all given skims or all given samples. These are printed in JSON format.",
-    )
 
-    sampleGroup = parser.add_mutually_exclusive_group()
-    sampleGroup.add_argument(
+    SampleGroup = parser.add_mutually_exclusive_group()
+    SampleGroup.add_argument(
         "--mconly", action="store_true", help="Test on only MC samples."
     )
-    sampleGroup.add_argument(
+    SampleGroup.add_argument(
         "--dataonly", action="store_true", help="Test on only data samples."
     )
 
@@ -146,20 +180,30 @@ def getArgumentParser():
         "--verbose",
         action="store_true",
         dest="VERBOSE",
-        help="Print out extra warning messages when the script cannot "
-        "calculate a value, but moves on anyway.",
+        help=(
+            "Print out extra warning messages when the script cannot "
+            "calculate a value, but moves on anyway."
+        ),
     )
 
     return parser
 
 
+def get_metadata(*, TestingCombined=False):
+    LogDirectory = Path("log") / ("combined" if TestingCombined else "single")
+    with open(LogDirectory / "metadata.json") as MetadataFile:
+        metadata = json.load(MetadataFile)
+    return metadata
+
+
 @lru_cache()
-def getLogFile(skim, sample):
+def getLogFile(skim, sample, TestingCombined):
     """Read in the log file of a test job as a string.
 
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         logFileContents (str): A string containing the contents of the log file
@@ -168,8 +212,10 @@ def getLogFile(skim, sample):
     Raises:
         SkimNotRunException: Raised if the log file cannot be opened.
     """
+    LogDirectory = Path("log") / ("combined" if TestingCombined else "single")
+
     try:
-        logFileName = Path("log", f"{skim}_{sample}.out")
+        logFileName = LogDirectory / f"{skim}_{sample}.out"
         with open(logFileName) as logFile:
             logFileContents = logFile.read()
     except FileNotFoundError:
@@ -188,12 +234,13 @@ def getLogFile(skim, sample):
 
 
 @lru_cache()
-def getJsonFile(skim, sample):
+def getJsonFile(skim, sample, TestingCombined):
     """Read in the JSON output from ``--job-information`` of a test job as a dict.
 
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         jsonFileContents (dict): A dict read from the ``--jobinformation`` JSON
@@ -203,8 +250,10 @@ def getJsonFile(skim, sample):
         SkimNotRunException: Raised if the JSON file cannot be opened,
             or the JSON file does not pass `testJsonFile`.
     """
+    LogDirectory = Path("log") / ("combined" if TestingCombined else "single")
+
     try:
-        jsonFileName = Path("log", f"JobInformation_{skim}_{sample}.json")
+        jsonFileName = LogDirectory / f"{skim}_{sample}.json"
         with open(jsonFileName) as jsonFile:
             jsonFileContents = json.load(jsonFile)
     except FileNotFoundError:
@@ -239,24 +288,25 @@ def getStatFromLog(statisticName, logFileContents):
     return float(statFromLog)
 
 
-def nInputEvents(skim, sample):
+def nInputEvents(skim, sample, TestingCombined):
     """Read the number of input MDST events from the JSON output file from
     ``--job-information``.
 
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         nInputEvents (int): Total number of events that the test skim job was
             run on.
     """
-    jsonFileContents = getJsonFile(skim, sample)
+    jsonFileContents = getJsonFile(skim, sample, TestingCombined)
 
     return jsonFileContents["basf2_status"]["total_events"]
 
 
-def nSkimmedEvents(skim, sample):
+def nSkimmedEvents(skim, sample, TestingCombined):
     """Read the number of output uDST events from the JSON output file from
     ``--job-information``. If more than one output file is present, take the
     maximum across output files.
@@ -264,11 +314,12 @@ def nSkimmedEvents(skim, sample):
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         nSkimmedEvents (int): The average number of events in the output uDST files.
     """
-    jsonFileContents = getJsonFile(skim, sample)
+    jsonFileContents = getJsonFile(skim, sample, TestingCombined)
 
     outputFileInfoList = jsonFileContents["output_files"]
     eventNumberList = [
@@ -278,7 +329,7 @@ def nSkimmedEvents(skim, sample):
     return max(eventNumberList)
 
 
-def udstSize(skim, sample):
+def udstSize(skim, sample, TestingCombined):
     """Read the size of the of output uDST file from the JSON output file from
     ``--job-information``. If more than one output file is present, take the
     maximum across output files.
@@ -286,11 +337,12 @@ def udstSize(skim, sample):
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         udstSize (float): The average file size of the output uDST files.
     """
-    jsonFileContents = getJsonFile(skim, sample)
+    jsonFileContents = getJsonFile(skim, sample, TestingCombined)
 
     outputFileInfoList = jsonFileContents["output_files"]
     udstSizeList = [
@@ -300,39 +352,41 @@ def udstSize(skim, sample):
     return max(udstSizeList)
 
 
-def logSize(skim, sample):
+def logSize(skim, sample, TestingCombined):
     """Calculate the size of the log file directly from the length of a string
     containing the log.
 
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         logSize (float): The size of the log file in kB.
     """
-    logFileContents = getLogFile(skim, sample)
+    logFileContents = getLogFile(skim, sample, TestingCombined)
 
     return len(logFileContents) / 1024
 
 
-def cpuTime(skim, sample):
+def cpuTime(skim, sample, TestingCombined):
     """Read the CPU time of the test from the "Resource usage summary" section
     of the log file.
 
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         cpuTime (float): The CPU time of the test job in seconds.
     """
-    logFileContents = getLogFile(skim, sample)
+    logFileContents = getLogFile(skim, sample, TestingCombined)
 
     return getStatFromLog("CPU time", logFileContents)
 
 
-def averageCandidateMultiplicity(skim, sample):
+def averageCandidateMultiplicity(skim, sample, TestingCombined):
     """Read the average multiplicity of passed events by parsing the "Average
     Candidate Multiplicity" blocks of the log file. If there is more than output
     one particle list, then the multiplicity is averaged over the particle
@@ -341,12 +395,13 @@ def averageCandidateMultiplicity(skim, sample):
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         averageCandidateMultiplicity (float): The candidate multiplicity of
             passed events, averaged over the particle lists.
     """
-    logFileContents = getLogFile(skim, sample)
+    logFileContents = getLogFile(skim, sample, TestingCombined)
 
     # Find all the blocks with the header "Average Candidate Multiplicity", and
     # join them into a single string.
@@ -370,34 +425,36 @@ def averageCandidateMultiplicity(skim, sample):
     return averageCandidateMultiplicity
 
 
-def memoryAverage(skim, sample):
+def memoryAverage(skim, sample, TestingCombined):
     """Read the average memory usage of the test from the "Resource usage
     summary" section of the log file.
 
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
        memoryAverage (float): Average memory usage of the test in MB.
     """
-    logFileContents = getLogFile(skim, sample)
+    logFileContents = getLogFile(skim, sample, TestingCombined)
 
     return getStatFromLog("Average Memory", logFileContents)
 
 
-def memoryMaximum(skim, sample):
+def memoryMaximum(skim, sample, TestingCombined):
     """Read the maximum memory usage of the test from the "Resource usage
     summary" section of the log file.
 
     Args:
         skim (str): The name of the skim being tested.
         sample (str): The label of the sample being tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
 
     Returns:
         memoryMaximum (float): Maximum memory usage of the test in MB.
     """
-    logFileContents = getLogFile(skim, sample)
+    logFileContents = getLogFile(skim, sample, TestingCombined)
 
     return getStatFromLog("Max Memory", logFileContents)
 
@@ -422,7 +479,7 @@ def testJsonFile(jsonFileContents):
     the files were written successfully.
 
     Args:
-        jsonFileContents (dict): A dict read from the JobInformation JSON output
+        jsonFileContents (dict): A dict read from the job information JSON output
             of a skim script.
 
     Raises:
@@ -472,46 +529,53 @@ def testLogFile(logFileContents):
         return False
 
 
-def getSkimsToPrint(parser, standaloneList, combinedList):
+def getSkimsToPrint(SingleSkims, CombinedSkims):
     """Get a list of of skims to print stats for, dependent on the skim names present in
-    ``standaloneSkimList`` and ``combinedSkimList``.
+    ``SingleSkims`` and ``CombinedSkims``.
 
-    If ``standaloneSkimList`` is a list of skim names, then those are included
-    in the list of skims to run. If ``standaloneSkimList`` is ``['all']``, then
-    all available standalone skims are run. ``combinedSkimList`` is handled
-    likewise.
+    If ``SingleSkims`` is a list of skim names, then those are included in the list of
+    skims to run. If ``SingleSkims`` is ``['all']``, then all available standalone skims
+    are run. ``CombinedSkims`` is handled likewise.
 
     Args:
-        parser (argparse.ArgumentParser): A parser with a help message to be
-            printed if no skim names are provided.
-        standaloneSkimList (list): A list of skim names, like that obtained from
-            the ``--standalone`` argument of the ``getArgumentParser`` argument
-            parser.
-        combinedSkimList (list): A list of skim names, like that obtained from
-            the ``--combined`` argument of the ``getArgumentParser`` argument
-            parser.
+        SingleSkims (list): A list individual skim names.
+        CombinedSkims (list): A list of combined skims names.
 
     Returns:
         skims (list): A list of skim names to be tested.
+        TestingCombined (bool): True if this tool is being run on combined skims.
+
+    Raises:
+        ValueError: Raised if a combined skim name is asked for that was not included in
+            the YAML file input to ``b2skim-stats-submit -c``. Also raised if "all" is
+            given as an argument to ``-s`` or ``-c`` along with a list of other skims.
     """
-    allStandaloneSkims = Registry.names
-    allCombinedSkims = list(combined_skims.keys())
+    if args.single:
+        TestingCombined = False
 
-    if not (standaloneList or combinedList):
-        parser.print_help()
-        sys.exit(0)
-
-    if standaloneList == ["all"]:
-        standaloneSkims = allStandaloneSkims
+        skims = args.single
+        if skims == ["all"]:
+            skims = Registry.names
+        elif "all" in skims:
+            raise ValueError("Cannot pass both 'all' and a list of skim names.")
     else:
-        standaloneSkims = standaloneList
+        TestingCombined = True
 
-    if combinedList == ["all"]:
-        combinedSkims = allCombinedSkims
-    else:
-        combinedSkims = combinedList
+        CombinedSkimDefinitions = get_metadata(TestingCombined=True)["CombinedSkims"]
 
-    return standaloneSkims + combinedSkims
+        skims = args.combined
+        if skims == ["all"]:
+            skims = CombinedSkimDefinitions.keys()
+        elif "all" in skims:
+            raise ValueError("Cannot pass both 'all' and a list of skim names.")
+
+        unrecognised = set(skims).difference(CombinedSkimDefinitions)
+        if unrecognised:
+            raise ValueError(
+                f"Unrecognised combined skim name{'s'*(len(unrecognised)>1)}: {', '.join(unrecognised)}."
+            )
+
+    return skims, TestingCombined
 
 
 def getAllSamples(mcCampaign):
@@ -545,26 +609,35 @@ def getAllSamples(mcCampaign):
         f"{mcCampaign}_taupairBGx0": f"{mcCampaign}: taupair BGx0",
     }
 
-    # For MC13 the low mult test samples exist (but they don't for MC12 
+    # For MC13 the low mult test samples exist (but they don't for MC12
     # and older) so here is a hack.
     # TODO: remove once when we regularly add the same low mult samples
-    mcCampaignNumber = int(re.search(r'\d+', mcCampaign).group())
+    mcCampaignNumber = int(re.search(r"\d+", mcCampaign).group())
     if mcCampaignNumber > 12:
-        mcSampleLabels.update({
-            f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
-            # f"{mcCampaign}_eeBGx1": f"{mcCampaign}: ee BGx1",
-            f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
-            f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
-            f"{mcCampaign}_eemumuBGx1": f"{mcCampaign}: eemumu BGx1",
-        })
+        mcSampleLabels.update(
+            {
+                f"{mcCampaign}_ggBGx1": f"{mcCampaign}: gg BGx1",
+                # f"{mcCampaign}_eeBGx1": f"{mcCampaign}: ee BGx1",
+                f"{mcCampaign}_mumuBGx1": f"{mcCampaign}: mumu BGx1",
+                f"{mcCampaign}_eeeeBGx1": f"{mcCampaign}: eeee BGx1",
+                f"{mcCampaign}_eemumuBGx1": f"{mcCampaign}: eemumu BGx1",
+
+                # f"{mcCampaign}_eeBGx0": f"{mcCampaign}: ee BGx0",
+                f"{mcCampaign}_mumuBGx0": f"{mcCampaign}: mumu BGx0",
+                f"{mcCampaign}_eeeeBGx0": f"{mcCampaign}: eeee BGx0",
+                f"{mcCampaign}_eemumuBGx0": f"{mcCampaign}: eemumu BGx0",
+            }
+        )
 
     dataSampleLabels = {
+        "proc11_exp10": "Data: proc11 exp. 10 (hlt_hadron)",
+        "proc11_exp8": "Data: proc11 exp. 8 (hlt_hadron)",
+        "proc11_exp7": "Data: proc11 exp. 7 (hlt_hadron)",
         "proc10_exp8": "Data: proc10 exp. 8",
         "proc10_exp7": "Data: proc10 exp. 7",
         "proc9_exp3": "Data: proc9 exp. 3",
         "proc9_exp7": "Data: proc9 exp. 7",
         "proc9_exp8": "Data: proc9 exp. 8",
-        "bucket7_exp8": "Data: bucket7 exp. 8",
     }
 
     return mcSampleLabels, dataSampleLabels
@@ -618,7 +691,8 @@ def getStatSpecifier():
 
     * ``'Calculate'`` (`function`): An anonymous function which calculates a
       statistic for one skim and one sample. The arguments of this function must
-      the names of the skim and sample being tested.
+      the names of the skim, sample being tested and a boolean which is True if
+      the tool is running on combined skims.
 
     * ``'CalculationDescription'`` (`str`): A sentence description of how the
       statistic is calculated.
@@ -644,9 +718,9 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": True,
-            "Calculate": lambda skim, sample: 100
-            * nSkimmedEvents(skim, sample)
-            / nInputEvents(skim, sample),
+            "Calculate": lambda skim, sample, combined: 100
+            * nSkimmedEvents(skim, sample, combined)
+            / nInputEvents(skim, sample, combined),
             "CalculationDescription": "Number of skimmed events divided by number of input events.",
             "CombineMC": lambda statDict, mcCampaign, beamBackground: (
                 mcWeightedAverage(statDict, mcCampaign, beamBackground)
@@ -658,7 +732,9 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: nInputEvents(skim, sample),
+            "Calculate": lambda skim, sample, combined: nInputEvents(
+                skim, sample, combined
+            ),
             "CalculationDescription": "Number of events in the input MDST file.",
             "CombineMC": None,
         },
@@ -668,7 +744,9 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: nSkimmedEvents(skim, sample),
+            "Calculate": lambda skim, sample, combined: nSkimmedEvents(
+                skim, sample, combined
+            ),
             "CalculationDescription": "Number of events in the output uDST file.",
             "CombineMC": None,
         },
@@ -678,7 +756,7 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: cpuTime(skim, sample),
+            "Calculate": lambda skim, sample, combined: cpuTime(skim, sample, combined),
             "CalculationDescription": (
                 "CPU time of test job as printed in the output logs."
             ),
@@ -690,8 +768,8 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": False,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: (
-                cpuTime(skim, sample) / nInputEvents(skim, sample)
+            "Calculate": lambda skim, sample, combined: (
+                cpuTime(skim, sample, combined) / nInputEvents(skim, sample, combined)
             ),
             "CalculationDescription": (
                 "CPU time of test job divided by number of input events."
@@ -706,8 +784,10 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": True,
-            "Calculate": lambda skim, sample: (
-                cpuTime(skim, sample) / nInputEvents(skim, sample) * HEPSpecPerCore
+            "Calculate": lambda skim, sample, combined: (
+                cpuTime(skim, sample, combined)
+                / nInputEvents(skim, sample, combined)
+                * HEPSpecPerCore
             ),
             "CalculationDescription": (
                 "CPU time of test job divided by number of input events."
@@ -722,9 +802,9 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: (
-                cpuTime(skim, sample)
-                / nInputEvents(skim, sample)
+            "Calculate": lambda skim, sample, combined: (
+                cpuTime(skim, sample, combined)
+                / nInputEvents(skim, sample, combined)
                 * get_events_per_file(sample)
                 * HEPSpecPerCore
             ),
@@ -742,7 +822,9 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: (udstSize(skim, sample) / 1024),
+            "Calculate": lambda skim, sample, combined: (
+                udstSize(skim, sample, combined) / 1024
+            ),
             "CalculationDescription": "File size of output uDST.",
             "CombineMC": None,
         },
@@ -752,8 +834,9 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": True,
-            "Calculate": lambda skim, sample: (
-                udstSize(skim, sample) / nSkimmedEvents(skim, sample)
+            "Calculate": lambda skim, sample, combined: (
+                udstSize(skim, sample, combined)
+                / nSkimmedEvents(skim, sample, combined)
             ),
             "CalculationDescription": (
                 "File size of output uDST divided by number of skimmed events."
@@ -768,8 +851,8 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": True,
-            "Calculate": lambda skim, sample: (
-                udstSize(skim, sample) / nInputEvents(skim, sample)
+            "Calculate": lambda skim, sample, combined: (
+                udstSize(skim, sample, combined) / nInputEvents(skim, sample, combined)
             ),
             "CalculationDescription": (
                 "File size of output uDST divided by number of input events."
@@ -784,9 +867,9 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: (
-                udstSize(skim, sample)
-                / nInputEvents(skim, sample)
+            "Calculate": lambda skim, sample, combined: (
+                udstSize(skim, sample, combined)
+                / nInputEvents(skim, sample, combined)
                 * get_events_per_file(sample)
                 / 1024
             ),
@@ -804,7 +887,7 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: logSize(skim, sample),
+            "Calculate": lambda skim, sample, combined: logSize(skim, sample, combined),
             "CalculationDescription": "File size of the output logs.",
             "CombineMC": None,
         },
@@ -814,8 +897,10 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: (
-                logSize(skim, sample) / nInputEvents(skim, sample) * 1024
+            "Calculate": lambda skim, sample, combined: (
+                logSize(skim, sample, combined)
+                / nInputEvents(skim, sample, combined)
+                * 1024
             ),
             "CalculationDescription": (
                 "File size of the output logs divided by the number of input events."
@@ -830,8 +915,8 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: (
-                averageCandidateMultiplicity(skim, sample)
+            "Calculate": lambda skim, sample, combined: (
+                averageCandidateMultiplicity(skim, sample, combined)
             ),
             "CalculationDescription": (
                 "Candidate multiplicity as listed in output logs, averaged over the "
@@ -847,7 +932,9 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: memoryAverage(skim, sample),
+            "Calculate": lambda skim, sample, combined: memoryAverage(
+                skim, sample, combined
+            ),
             "CalculationDescription": "Average memory usage, as listed in output logs.",
             "CombineMC": lambda statDict, mcCampaign, beamBackground: mcWeightedAverage(
                 statDict, mcCampaign, beamBackground
@@ -859,7 +946,9 @@ def getStatSpecifier():
             "PrintToScreen": True,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: memoryMaximum(skim, sample),
+            "Calculate": lambda skim, sample, combined: memoryMaximum(
+                skim, sample, combined
+            ),
             "CalculationDescription": "Maximum memory usage, as listed in output logs.",
             "CombineMC": lambda statDict, mcCampaign, beamBackground: (
                 mcMax(statDict, mcCampaign, beamBackground)
@@ -871,10 +960,10 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: (
-                udstSize(skim, sample)
+            "Calculate": lambda skim, sample, combined: (
+                udstSize(skim, sample, combined)
                 * nTotalEvents(sample)
-                / nInputEvents(skim, sample)
+                / nInputEvents(skim, sample, combined)
                 / 1024 ** 2
             ),
             "CalculationDescription": (
@@ -891,10 +980,10 @@ def getStatSpecifier():
             "PrintToScreen": False,
             "PrintToConfluence": True,
             "PrintAverages": False,
-            "Calculate": lambda skim, sample: (
-                logSize(skim, sample)
+            "Calculate": lambda skim, sample, combined: (
+                logSize(skim, sample, combined)
                 * nTotalEvents(sample)
-                / nInputEvents(skim, sample)
+                / nInputEvents(skim, sample, combined)
                 / 1024 ** 2
             ),
             "CalculationDescription": (
@@ -910,7 +999,9 @@ def getStatSpecifier():
     return statSpecifier
 
 
-def fillSkimStatsDict(skims, samples, statSpecifier, verbose=False):
+def fillSkimStatsDict(
+    skims, samples, statSpecifier, *, TestingCombined=False, verbose=False
+):
     """Fill a nested dict with skim performance statistics, using the skim and
     sample names provided. The dict ``statSpecifier`` determines how each
     statistic is to be calculated.
@@ -923,6 +1014,7 @@ def fillSkimStatsDict(skims, samples, statSpecifier, verbose=False):
         samples (list): List of sample labels to test on.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
+        TestingCombined (bool): True if this tool is being run on combined skims.
         verbose (bool): Print extra messages when a statistic can't be calculated, but
             the script moves on anyway.
 
@@ -939,9 +1031,11 @@ def fillSkimStatsDict(skims, samples, statSpecifier, verbose=False):
                 statFunction = statSpec["Calculate"]
 
                 try:
-                    allSkimStats[skim][statName][sample] = statFunction(skim, sample)
+                    allSkimStats[skim][statName][sample] = statFunction(
+                        skim, sample, TestingCombined
+                    )
 
-                except (TypeError, ZeroDivisionError):
+                except (TypeError, ZeroDivisionError, KeyError):
                     allSkimStats[skim][statName][sample] = None
                     if verbose:
                         B2WARNING(
@@ -1065,35 +1159,35 @@ def addWeightedMC(
             dict, with an extra entry for combined MC samples.
     """
 
-    for skim, skimStats in allSkimStats.items():
-        for stat, statSpec in statSpecifier.items():
-            for beamBackground in beamBackgrounds:
-                try:
-                    combiningFunction = statSpec["CombineMC"]
-                    if combiningFunction:
-                        skimStats[stat][
-                            f"Combined MC {beamBackground}"
-                        ] = combiningFunction(
-                            skimStats[stat], mcCampaign, beamBackground
-                        )
-                    elif verbose:
-                        skimStats[stat][f"Combined MC {beamBackground}"] = None
-                        B2WARNING(
-                            f"No method provided in `statsSpecifier` for combining MC "
-                            f"estimate of {stat}. This may be because there is no "
-                            "sensible way to combine this value."
-                        )
-                except TypeError:
-                    skimStats[stat][f"Combined MC {beamBackground}"] = None
-                    if verbose:
-                        B2WARNING(
-                            f"Could not calculate combined MC estimate for {stat} for {skim} skim."
-                        )
+    for (skim, skimStats), (stat, statSpec), beamBackground in product(
+        allSkimStats.items(), statSpecifier.items(), beamBackgrounds
+    ):
+        try:
+            combiningFunction = statSpec["CombineMC"]
+            if combiningFunction:
+                skimStats[stat][f"Combined MC {beamBackground}"] = combiningFunction(
+                    skimStats[stat], mcCampaign, beamBackground
+                )
+            elif verbose:
+                skimStats[stat][f"Combined MC {beamBackground}"] = None
+                B2WARNING(
+                    f"No method provided in `statsSpecifier` for combining MC "
+                    f"estimate of {stat}. This may be because there is no "
+                    "sensible way to combine this value."
+                )
+        except TypeError:
+            skimStats[stat][f"Combined MC {beamBackground}"] = None
+            if verbose:
+                B2WARNING(
+                    f"Could not calculate combined MC estimate for {stat} for {skim} skim."
+                )
 
     return allSkimStats
 
 
-def printToJson(allSkimStats, statSpecifier):
+def printToJson(
+    allSkimStats, statSpecifier, *, TestingCombined=False, OutputFilename=None
+):
     """Write the nested dict of skim performance statistics to a JSON file. Also
     prints a message after writing the file.
 
@@ -1102,11 +1196,22 @@ def printToJson(allSkimStats, statSpecifier):
             ``getSkimStatsDict``.
         statSpecifier (dict): A nested dict specifying how each statistic should
             be calculated and printed, as returned by ``getStatSpecifier``.
+        TestingCombined (bool): True if this tool is being run on combined skims.
+        OutputFilename (str): File location to write the formatted stats to.
     """
-    outputJsonName = "skimStats.json"
-    with open(outputJsonName, "w") as outputJson:
-        json.dump(allSkimStats, outputJson, indent=4)
-    print(f"\nWrote stats to JSON file {outputJsonName}")
+    metadata = get_metadata(TestingCombined=TestingCombined)
+    OutputDict = {
+        "TestType": (
+            "Testing combined skims" if TestingCombined else "Testing single skims"
+        ),
+        **metadata,
+        "stats": allSkimStats,
+    }
+
+    OutputFilename = Path(OutputFilename).with_suffix(".json")
+    with open(OutputFilename, "w") as outputJson:
+        json.dump(OutputDict, outputJson, indent=2)
+    print(f"Wrote stats to JSON file {OutputFilename}")
 
 
 def printToScreen(
@@ -1117,6 +1222,7 @@ def printToScreen(
     beamBackgrounds,
     mcOnly,
     dataOnly,
+    *,
     tabulateAvailable=True,
 ):
     """Format the skim performance statistics in an ASCII table, and print to
@@ -1212,6 +1318,8 @@ def printToConfluence(
     dataSampleLabels,
     samples,
     beamBackgrounds,
+    *,
+    OutputFilename=None,
 ):
     """Format the skim performance statistics in Confluence wiki markdown, and
     write to a file. The top of the output file includes an information on how
@@ -1231,8 +1339,8 @@ def printToConfluence(
             the values are more readable labels to be used in printed tables.
         samples (list): A list of samples to print statistics for.
         beamBackgrounds (list): A list of beam background labels, such as "BGx1".
+        OutputFilename (str): File location to write the formatted stats to.
     """
-    confluenceFileName = "confluenceTables.txt"
 
     selectedStats = [
         stat
@@ -1283,18 +1391,26 @@ def printToConfluence(
 
     confluenceString = "\n".join(confluenceStrings)
 
-    with open(confluenceFileName, "w") as confluenceFile:
+    OutputFilename = Path(OutputFilename).with_suffix(".txt")
+    with open(OutputFilename, "w") as confluenceFile:
         confluenceFile.write(confluenceString)
 
     print(
-        f"\nWrote tables to {confluenceFileName}. The contents of this file can "
+        f"Wrote tables to {OutputFilename}. The contents of this file can "
         "be copied directly to Confluence as Wiki markup in the markup editor "
         "(accessible via ctrl-shift-D or cmd-shift-D)."
     )
 
 
 def printToMarkdown(
-    allSkimStats, mcSampleLabels, dataSampleLabels, beamBackgrounds, mcOnly, dataOnly,
+    allSkimStats,
+    mcSampleLabels,
+    dataSampleLabels,
+    beamBackgrounds,
+    mcOnly,
+    dataOnly,
+    *,
+    OutputFilename=None,
 ):
     """Format the skim performance statistics as a markdown table, which will be
     formatted nicely if pasted into a pull request on BitBucket.
@@ -1311,6 +1427,7 @@ def printToMarkdown(
         beamBackgrounds (list): A list of beam background labels, such as "BGx1".
         mcOnly (bool): Print only MC samples statistics.
         dataOnly (bool): Print only data samples statistics.
+        OutputFilename (str): File location to write the formatted stats to.
     """
     statSpecifier = getStatSpecifier()
     selectedStats = [
@@ -1362,12 +1479,12 @@ def printToMarkdown(
         markdownTables.append(f"**Performance statistics for {skimName} skim:**")
         markdownTables.append(table)
 
-    markdownFileName = "skimStats.md"
-    with open(markdownFileName, "w") as markdownFile:
+    OutputFilename = Path(OutputFilename).with_suffix(".md")
+    with open(OutputFilename, "w") as markdownFile:
         markdownFile.write("\n\n".join(markdownTables))
 
     print(
-        f"\nWrote tables to {markdownFileName}. This format is suitable for including "
+        f"Wrote tables to {OutputFilename}. This format is suitable for including "
         "in pull request comments."
     )
 
@@ -1458,7 +1575,7 @@ if __name__ == "__main__":
     parser = getArgumentParser()
     args = parser.parse_args()
 
-    skims = getSkimsToPrint(parser, args.standalone, args.combined)
+    skims, TestingCombined = getSkimsToPrint(args.single, args.combined)
     mcSampleLabels, dataSampleLabels = getAllSamples(args.mccampaign)
     samples = getSamplesToPrint(
         list(mcSampleLabels.keys()),
@@ -1468,7 +1585,13 @@ if __name__ == "__main__":
     )
 
     statSpecifier = getStatSpecifier()
-    allSkimStats = fillSkimStatsDict(skims, samples, statSpecifier, args.VERBOSE)
+    allSkimStats = fillSkimStatsDict(
+        skims,
+        samples,
+        statSpecifier,
+        TestingCombined=TestingCombined,
+        verbose=args.VERBOSE,
+    )
 
     beamBackgrounds = ["BGx1", "BGx0"]
     if not args.dataonly:
@@ -1476,58 +1599,14 @@ if __name__ == "__main__":
             allSkimStats, statSpecifier, args.mccampaign, beamBackgrounds, args.VERBOSE
         )
 
-    try:
-        from tabulate import tabulate
+    # Test for the availability of tabulate
+    if args.confluence or args.markdown:
+        # Confluence and Markdown require tabulate
+        try:
+            from tabulate import tabulate
 
-        printToScreen(
-            allSkimStats,
-            statSpecifier,
-            mcSampleLabels,
-            dataSampleLabels,
-            beamBackgrounds,
-            args.mconly,
-            args.dataonly,
-            tabulateAvailable=True,
-        )
-
-        if args.confluence:
-            printToConfluence(
-                allSkimStats,
-                statSpecifier,
-                mcSampleLabels,
-                dataSampleLabels,
-                samples,
-                beamBackgrounds,
-            )
-
-        if args.markdown:
-            printToMarkdown(
-                allSkimStats,
-                mcSampleLabels,
-                dataSampleLabels,
-                beamBackgrounds,
-                args.mconly,
-                args.dataonly,
-            )
-
-    except ModuleNotFoundError:
-        printToScreen(
-            allSkimStats,
-            statSpecifier,
-            mcSampleLabels,
-            dataSampleLabels,
-            beamBackgrounds,
-            args.mconly,
-            args.dataonly,
-            tabulateAvailable=False,
-        )
-
-        B2WARNING(
-            "Please consider installing the third-party package `tabulate`:\n"
-            "    pip3 install tabulate --user"
-        )
-
-        if args.confluence or args.markdown:
+            tabulateAvailable = True
+        except ModuleNotFoundError:
             B2ERROR(
                 "This tool relies on the third-party package `tabulate` to "
                 "format wiki markdown. The package is not currently installed, "
@@ -1537,7 +1616,56 @@ if __name__ == "__main__":
             )
             sys.exit(1)
 
-    if args.json:
-        printToJson(allSkimStats, statSpecifier)
+    elif not any([args.confluence, args.markdown, args.json]):
+        # Printing to screen can still be done without tabulate
+        try:
+            from tabulate import tabulate
 
-    printAverages(allSkimStats, skims, samples, statSpecifier, args.average_over)
+            tabulateAvailable = True
+        except ModuleNotFoundError:
+            tabulateAvailable = False
+            B2WARNING(
+                "Please consider installing the third-party package `tabulate`:\n"
+                "    pip3 install tabulate --user"
+            )
+
+    if args.confluence:
+        printToConfluence(
+            allSkimStats,
+            statSpecifier,
+            mcSampleLabels,
+            dataSampleLabels,
+            samples,
+            beamBackgrounds,
+            OutputFilename=args.confluence,
+        )
+    elif args.json:
+        printToJson(
+            allSkimStats,
+            statSpecifier,
+            TestingCombined=TestingCombined,
+            OutputFilename=args.json,
+        )
+    elif args.markdown:
+        printToMarkdown(
+            allSkimStats,
+            mcSampleLabels,
+            dataSampleLabels,
+            beamBackgrounds,
+            args.mconly,
+            args.dataonly,
+            OutputFilename=args.markdown,
+        )
+    elif args.average_over:
+        printAverages(allSkimStats, skims, samples, statSpecifier, args.average_over)
+    else:
+        printToScreen(
+            allSkimStats,
+            statSpecifier,
+            mcSampleLabels,
+            dataSampleLabels,
+            beamBackgrounds,
+            args.mconly,
+            args.dataonly,
+            tabulateAvailable=tabulateAvailable,
+        )

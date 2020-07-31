@@ -39,18 +39,18 @@ from ROOT import EventDataRecoDigit
 
 
 class SVDValidationTTreeRecoDigit(Module):
+    '''class to create reco digitis ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeRecoDigit, self).__init__()
-        # Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeRecoDigit.root', 'recreate')
-        # TTrees for output data
+        '''Output ROOT file'''
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-
-        # Instance of the EventData class
+        '''TTrees for output data'''
         self.data = EventDataRecoDigit()
+        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataRecoDigit.__dict__:
@@ -59,9 +59,6 @@ class SVDValidationTTreeRecoDigit(Module):
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
-
-    def beginRun(self):
-        """ Does nothing """
 
     def event(self):
         """Take digits from SVDRecoDigits with a truehit and save needed information"""

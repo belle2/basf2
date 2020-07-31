@@ -101,7 +101,7 @@ namespace Belle2 {
       while (!qq.empty()) {
         auto d = qq.front(); // get daughter
         qq.pop();            // remove the daughter from the queue
-        if (isCloneTrack(d)) return 1.0;
+        if (isCloneTrack(d) == 1.0) return 1.0;
         size_t nDau = d->getNDaughters(); // number of daughters of daughters
         for (size_t iDau = 0; iDau < nDau; iDau++)
           qq.push(d->getDaughter(iDau));
@@ -185,7 +185,7 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (!mcparticle)
-        return -1.0;
+        return std::numeric_limits<float>::quiet_NaN();
 
       double m_ID = mcparticle->getArrayIndex();
       return m_ID;
@@ -578,8 +578,8 @@ namespace Belle2 {
 
     double isReconstructible(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -594,8 +594,8 @@ namespace Belle2 {
 
     double seenInPXD(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -604,8 +604,8 @@ namespace Belle2 {
 
     double seenInSVD(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -614,8 +614,8 @@ namespace Belle2 {
 
     double seenInCDC(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -624,8 +624,8 @@ namespace Belle2 {
 
     double seenInTOP(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -634,8 +634,8 @@ namespace Belle2 {
 
     double seenInECL(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -644,8 +644,8 @@ namespace Belle2 {
 
     double seenInARICH(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -654,8 +654,8 @@ namespace Belle2 {
 
     double seenInKLM(const Particle* p)
     {
-      if (p->getParticleType() == Particle::EParticleType::c_Composite)
-        return -1.0;
+      if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
+        return std::numeric_limits<float>::quiet_NaN();
       const MCParticle* mcp = p->getRelated<MCParticle>();
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -756,7 +756,7 @@ namespace Belle2 {
         if (mcps[i]->getArrayIndex() == matchedToIndex)
           return mcps.weight(i);
 
-      return -1.0;
+      return std::numeric_limits<float>::quiet_NaN();
     }
 
     double particleClusterBestMCMatchWeight(const Particle* particle)

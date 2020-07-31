@@ -8,11 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCPACKERMODULE_H
-#define CDCPACKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/database/DBArray.h>
@@ -93,7 +94,7 @@ namespace Belle2 {
       /**
        * Getter for Front End Electronics ID.
        * @param copper_id Copper ID.
-       * @param slod_id FINNES slot ID (0-3).
+       * @param slot_id FINNES slot ID (0-3).
        */
       int getFEEID(int copper_id, int slot_id);
 
@@ -274,11 +275,20 @@ namespace Belle2 {
        * Raw CDC array.
        */
       StoreArray<RawCDC>  m_rawCDCs;
+
+      /**
+       * CDC raw hits.
+       */
+      StoreArray<CDCRawHit> m_CDCRawHits;
+
+      /**
+       * CDC hits.
+       */
+      StoreArray<CDCHit> m_CDCHits;
+
     };//end class declaration
 
 
   } //end CDC namespace;
 } // end namespace Belle2
-
-#endif // CDCPackerModule_H
 

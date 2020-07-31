@@ -13,6 +13,7 @@
 /* External headers. */
 #include <TMatrixDSym.h>
 #include <TMatrixD.h>
+#include <TVectorD.h>
 #include <TRotation.h>
 
 namespace Belle2 {
@@ -63,6 +64,34 @@ namespace Belle2 {
     }
 
 
+
+    /**
+     * Rotate tensor orgMat, where the rotation is described by a transformation
+     * which transform vector (0,0,1) -> vTo
+     * @param[in] vTo  vector defining rotation
+     * @param[in] orgMat tensor before rotation
+     */
+    inline TMatrixD rotateTensor(const TVector3& vTo, const TMatrixD& orgMat)
+    {
+      TMatrixD r = getRotationMatrixYZ(vTo.Theta(), vTo.Phi());
+      TMatrixD rT = r; rT.T();
+      return r * orgMat * rT;
+    }
+
+    /**
+     * Rotate tensor orgMat, where the rotation is described by a transformation
+     * which transform vector vTo -> (0,0,1)
+     * @param[in] vTo  vector defining rotation
+     * @param[in] orgMat tensor before rotation
+     */
+    inline TMatrixD rotateTensorInv(const TVector3& vTo, const TMatrixD& orgMat)
+    {
+      TMatrixD r = getRotationMatrixYZ(vTo.Theta(), vTo.Phi());
+      TMatrixD rT = r; rT.T();
+      return rT * orgMat * r;
+    }
+
+
     /**
      * Convert squared matrix to symmetric matrix
      * as S = (A + At) / 2
@@ -77,6 +106,25 @@ namespace Belle2 {
           mS(i, j) = (m(i, j) + m(j, i)) / 2;
         }
       return mS;
+    }
+
+
+    /**
+     * Convert TVector3 to TVectorD
+     *
+     */
+    inline TVectorD toVec(TVector3 v)
+    {
+      return TVectorD(0, 2, v.X(), v.Y(), v.Z(), "END");
+    }
+
+    /**
+     * Get a vector orthogonal to v of the unit lenght
+     *
+     */
+    TVector3 getUnitOrthogonal(TVector3 v)
+    {
+      return TVector3(v.Z(), 0, -v.X()).Unit();
     }
 
   }

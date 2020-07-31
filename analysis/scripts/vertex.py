@@ -261,6 +261,7 @@ def TagV(
     maskName='',
     fitAlgorithm='Rave',
     useTruthInFit=False,
+    useRollBack=False,
     path=None,
 ):
     """
@@ -294,6 +295,9 @@ def TagV(
         useTruthInFit (bool): True when the tag vertex fit is performed with the true momentum and
             position of the tracks (default is false). The variable :b2:var:`TagVFitTruthStatus` is set to 1
             if the truth-matching succeeds and 2 otherwise.
+        useRollBack (bool): True when the tag vertex fit is performed with position of tracks rolled back to
+            position of the mother B (default is false). The variable :b2:var:`TagVRollBackStatus` is set to 1
+            if the truth-matching succeeds and 2 otherwise.
         path (basf2.Path): modules are added to this path
 
     Warning:
@@ -316,6 +320,7 @@ def TagV(
     tvfit.param('reqPXDHits', reqPXDHits)
     tvfit.param('fitAlgorithm', fitAlgorithm)
     tvfit.param('useTruthInFit', useTruthInFit)
+    tvfit.param('useRollBack', useRollBack)
     path.add_module(tvfit)
 
 
@@ -334,8 +339,8 @@ def fitPseudo(
 
         from modularAnalysis import fitPseudo
         from stdPi0s import stdPi0s
-        stdPi0s("loose", path=mypath)
-        fitPseudo("pi0:loose", path=mypath)
+        stdPi0s("eff40_Jan2020", path=mypath)
+        fitPseudo("pi0:eff40_Jan2020", path=mypath)
 
     Parameters:
         list_name (str): the name of the list to add the covariance matrix to

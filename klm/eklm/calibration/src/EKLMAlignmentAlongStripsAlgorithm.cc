@@ -21,7 +21,7 @@
 using namespace Belle2;
 
 static bool compareSegmentSignificance(
-  std::pair<int, double>& first, std::pair<int, double>& second)
+  const std::pair<int, double>& first, const std::pair<int, double>& second)
 {
   return first.second > second.second;
 }

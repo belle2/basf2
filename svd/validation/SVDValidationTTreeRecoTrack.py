@@ -38,18 +38,18 @@ from ROOT import EventDataRecoTrack
 
 
 class SVDValidationTTreeRecoTrack(Module):
+    '''class to create the reco track ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeRecoTrack, self).__init__()
-        # Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeRecoTrack.root', 'recreate')
-        # TTrees for output data
+        '''Output ROOT file'''
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-
-        # Instance of the EventData class
+        '''TTrees for output data'''
         self.data = EventDataRecoTrack()
+        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataRecoTrack.__dict__:
@@ -58,9 +58,6 @@ class SVDValidationTTreeRecoTrack(Module):
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
-
-    def beginRun(self):
-        """ Does nothing """
 
     def event(self):
         """Take clusters from SVDRecoTracks with a truehit and save needed information"""

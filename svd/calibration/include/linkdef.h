@@ -6,23 +6,31 @@
 #pragma link C++ nestedclasses;
 
 // The following two are needed for the python interface
-#pragma link C++ class Belle2::SVDDatabaseImporter+;
-#pragma link C++ class Belle2::SVDCoGTimeCalibrations+;
-#pragma link C++ class Belle2::SVDClusterCalibrations+;
-#pragma link C++ class Belle2::SVDNoiseCalibrations;
-#pragma link C++ class Belle2::SVDPulseShapeCalibrations;
-#pragma link C++ class Belle2::SVDPedestalCalibrations;
-#pragma link C++ class Belle2::SVDFADCMaskedStrips;
-#pragma link C++ class Belle2::SVDHotStripsCalibrations;
-#pragma link C++ class Belle2::SVDLocalCalibrationsImporter+;
-#pragma link C++ class Belle2::SVDDetectorConfiguration+;
-#pragma link C++ class Belle2::SVDDetectorConfigurationImporter+;
-#pragma link C++ class Belle2::SVDCoGTimeCalibrationAlgorithm+;
-#pragma link C++ class Belle2::SVDCrossTalkStripsCalibrations;
-#pragma link C++ class Belle2::SVDOccupancyCalibrations;
-#pragma link C++ class Belle2::SVDOccupancyCalibrationsAlgorithm;
-#pragma link C++ class Belle2::SVDHotStripsCalibrationsAlgorithm;
+//calibrations wrappers
+#pragma link C++ class Belle2::SVDCrossTalkStripsCalibrations-; // checksum=0x6bd85b66, version=-1
+#pragma link C++ class Belle2::SVDOccupancyCalibrations-; // checksum=0xf86a6c36, version=-1
+#pragma link C++ class Belle2::SVDCoGTimeCalibrations-; // checksum=0x3c67791c, version=-1
+#pragma link C++ class Belle2::SVD3SampleCoGTimeCalibrations-; // checksum=0x8950f4e1, version=-1
+#pragma link C++ class Belle2::SVD3SampleELSTimeCalibrations-; // checksum=0x371ee746, version=-1
+#pragma link C++ class Belle2::SVDClusterCalibrations-; // checksum=0x2908aba1, version=-1
+#pragma link C++ class Belle2::SVDNoiseCalibrations-; // checksum=0xe1bbb6f3, version=-1
+#pragma link C++ class Belle2::SVDPulseShapeCalibrations-; // checksum=0x6bdaa4b, version=-1
+#pragma link C++ class Belle2::SVDPedestalCalibrations-; // checksum=0xbb219a89, version=-1
+#pragma link C++ class Belle2::SVDFADCMaskedStrips-; // checksum=0x5c3369a8, version=-1
+#pragma link C++ class Belle2::SVDHotStripsCalibrations-; // checksum=0x94dfda0f, version=-1
+#pragma link C++ class Belle2::SVDDetectorConfiguration-; // checksum=0x8ad578cb, version=-1
 
+//calibration importers
+#pragma link C++ class Belle2::SVDDatabaseImporter-;
+#pragma link C++ class Belle2::SVDLocalCalibrationsImporter-;
+#pragma link C++ class Belle2::SVDDetectorConfigurationImporter-;
 
-#pragma link C++ class Belle2::SVDCrossTalkCalibrationsAlgorithm;
+//calibration algorithms
+#pragma link C++ class Belle2::SVDCoGTimeCalibrationAlgorithm-; // checksum=0x249f61df, version=-1
+#pragma link C++ class Belle2::SVD3SampleCoGTimeCalibrationAlgorithm-; // checksum=0x74ca57c3, version=-1
+#pragma link C++ class Belle2::SVD3SampleELSTimeCalibrationAlgorithm-; // checksum=0x60f7430, version=-1
+#pragma link C++ class Belle2::SVDOccupancyCalibrationsAlgorithm-; // checksum=0xd1c55b35, version=-1
+#pragma link C++ class Belle2::SVDHotStripsCalibrationsAlgorithm-; // checksum=0x3e0c24c4, version=-1
+#pragma link C++ class Belle2::SVDCrossTalkCalibrationsAlgorithm-; // checksum=0x71ffb51b, version=-1
+
 #endif

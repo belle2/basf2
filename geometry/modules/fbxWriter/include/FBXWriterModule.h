@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FBXWRITERMODULE_H
-#define FBXWRITERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -157,4 +156,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif

@@ -60,12 +60,17 @@ void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
 int KLMChannelStatus::getActiveStripsInModule(uint16_t module) const
 {
   int active;
-  int subdetector, section, layer, sector;
+  int subdetector, section, sector, layer;
   const KLMElementNumbers* elementNumbers =
     &(KLMElementNumbers::Instance());
   elementNumbers->moduleNumberToElementNumbers(
-    module, &subdetector, &section, &layer, &sector);
-  KLMChannelIndex klmModule(subdetector, section, layer, sector, 1, 1);
+    module, &subdetector, &section, &sector, &layer);
+  KLMChannelIndex klmModule(subdetector, section, sector, layer, 1, 1);
+  /* Plane number is 0-based for BKLM. */
+  if (subdetector == KLMElementNumbers::c_BKLM) {
+    KLMChannelIndex klmModuleTemp(subdetector, section, sector, layer, 0, 1);
+    klmModule = klmModuleTemp;
+  }
   klmModule.setIndexLevel(KLMChannelIndex::c_IndexLevelLayer);
   KLMChannelIndex klmNextModule(klmModule);
   ++klmNextModule;

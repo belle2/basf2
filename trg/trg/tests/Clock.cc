@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <cmath>
 
 #include <trg/trg/Clock.h>
 

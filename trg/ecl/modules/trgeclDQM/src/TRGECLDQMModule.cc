@@ -12,16 +12,11 @@
 #include <trg/ecl/modules/trgeclDQM/TRGECLDQMModule.h>
 #include <trg/ecl/TrgEclMapping.h>
 #include <trg/ecl/TrgEclCluster.h>
-#include <trg/ecl/TrgEclMaster.h>
 #include <trg/ecl/TrgEclDataBase.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-
 #include <TDirectory.h>
-#include <TRandom3.h>
-#include <unistd.h>
 
 using namespace Belle2;
 

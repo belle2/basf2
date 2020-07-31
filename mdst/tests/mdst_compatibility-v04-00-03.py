@@ -14,6 +14,9 @@ CHANGES since release-04-00-03:
 - Global tags:
   * The compatibility tag "Legacy_IP_Information" is no longer added for
     release 4 input files.
+- Particle masses:
+  * The particle masses have been updated to PDG 2020. As a result, the
+    energies corresponding to the measured momenta became slightly different.
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging

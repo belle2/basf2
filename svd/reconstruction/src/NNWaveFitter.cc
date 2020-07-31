@@ -15,7 +15,6 @@
 #include <algorithm>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-#include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;

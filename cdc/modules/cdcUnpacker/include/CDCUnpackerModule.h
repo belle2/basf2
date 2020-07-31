@@ -8,13 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCUnpackerModule_H
-#define CDCUnpackerModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCRawHit.h>
+#include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
@@ -162,7 +164,7 @@ namespace Belle2 {
 
       /**
        * Check if the hit wire is valid or not.
-       * @param WireID hit wire.
+       * @param wireId hit wire.
        */
       bool isValidBoardChannel(WireID wireId)
       {
@@ -320,16 +322,30 @@ namespace Belle2 {
        * Whether pedestal is subtracted (true) or not (false).
        */
       bool m_pedestalSubtraction = true;
+
       /**
        * Input array for CDC Raw.
        */
       StoreArray<RawCDC> m_rawCDCs;
+
+      /**
+       * Raw hit waveforms.
+       */
+      StoreArray<CDCRawHitWaveForm> m_CDCRawHitWaveForms;
+
+      /**
+       * Raw hits.
+       */
+      StoreArray<CDCRawHit> m_CDCRawHits;
+
+      /**
+       * CDC hits.
+       */
+      StoreArray<CDCHit> m_CDCHits;
 
     };//end class declaration
 
 
   } //end CDC namespace;
 } // end namespace Belle2
-
-#endif // CDCUnpackerModule_H
 

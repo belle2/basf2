@@ -15,8 +15,6 @@
 #include <vector>
 #include <vxd/dbobjects/VXDGeoPlacementPar.h>
 
-#include <algorithm>
-
 namespace Belle2 {
 
 

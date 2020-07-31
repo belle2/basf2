@@ -23,6 +23,9 @@
 
 #include <trg/ecl/modules/trgeclUnpacker/trgeclUnpackerModule.h>
 
+#include "trg/ecl/TrgEclDataBase.h"
+#include "trg/ecl/TrgEclMapping.h"
+
 using namespace std;
 using namespace Belle2;
 
@@ -42,7 +45,7 @@ TRGECLUnpackerModule::TRGECLUnpackerModule()
   setDescription(desc);
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  B2INFO("trgeclunpacker: Constructor done.");
+  B2DEBUG(20, "trgeclunpacker: Constructor done.");
 }
 
 TRGECLUnpackerModule::~TRGECLUnpackerModule() {}

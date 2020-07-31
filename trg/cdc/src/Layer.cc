@@ -15,7 +15,6 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <iostream>
-#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Cell.h"
 #include "trg/cdc/Layer.h"
 

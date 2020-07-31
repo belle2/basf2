@@ -159,7 +159,7 @@ bool LogPythonInterface::getEscapeNewlinesEnabled() const
 dict LogPythonInterface::getLogStatistics()
 {
   dict returnDict;
-  LogSystem& logSys = LogSystem::Instance();
+  const LogSystem& logSys = LogSystem::Instance();
   for (int iLevel = 0; iLevel < LogConfig::c_Default; ++iLevel) {
     auto logLevel = static_cast<LogConfig::ELogLevel>(iLevel);
     returnDict[logLevel] = logSys.getMessageCounter(logLevel);

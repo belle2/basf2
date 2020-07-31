@@ -144,12 +144,12 @@ void ARICHDatabaseImporter::importModulesInfo()
   }
 
   // get list of installed modules from xml
-  content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  GearDir installedModules  = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
   B2INFO("Installed modules\n");
 
   std::vector<std::string> installed;
 
-  for (const GearDir& module : content.getNodes("Module")) {
+  for (const GearDir& module : installedModules.getNodes("Module")) {
     std::string hapdID = module.getString("@hapdID");
 
     unsigned sector = module.getInt("Sector");
@@ -1710,8 +1710,6 @@ void ARICHDatabaseImporter::importAsicInfoRoot()
   tree->Branch("offsetF", "TH3F", &offsetF);
   tree->Branch("offsetR", "TH3F", &offsetR);
 
-  GearDir content = GearDir("/ArichData/AllData/asicList");
-
   // loop over root files
   for (const string& inputFile : m_inputFilesAsicRoot) {
 
@@ -1832,7 +1830,6 @@ void ARICHDatabaseImporter::importFebTest()
   GearDir content = GearDir("/ArichData/AllData/arich");
   GearDir content1 = GearDir("/ArichData/AllData/dnamap");
   GearDir content2 = GearDir("/ArichData/AllData/FEBData/Content");
-  GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
 
   for (const auto& runserial : content.getNodes("run")) {
     int serial = runserial.getInt("sn");
@@ -1981,7 +1978,6 @@ void ARICHDatabaseImporter::importFebTestRoot()
   GearDir content = GearDir("/ArichData/AllData/arich");
   GearDir content1 = GearDir("/ArichData/AllData/dnamap");
   GearDir content2 = GearDir("/ArichData/AllData/FEBData/Content");
-  GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
 
   for (const auto& runserial : content.getNodes("run")) {
     serial = runserial.getInt("sn");
@@ -2854,10 +2850,13 @@ void ARICHDatabaseImporter::exportFEBoardInfo()
 void ARICHDatabaseImporter::importModuleTest(const std::string& mypath, const std::string& HVtest)
 {
 
-  GearDir content;
-  if (HVtest == "no")  content = GearDir("/ArichData/AllData/moduletest");
-  else if (HVtest == "yes")  content = GearDir("/ArichData/AllData/moduletestHV");
+
+  std::string path;
+  if (HVtest == "no")  path = "/ArichData/AllData/moduletest";
+  else if (HVtest == "yes")  path = "/ArichData/AllData/moduletestHV";
   else B2INFO("Check HVB test parameter!");
+
+  GearDir content = GearDir(path);
 
   // define data array
   TClonesArray moduleConstants("Belle2::ARICHModuleTest");
@@ -3230,7 +3229,7 @@ void ARICHDatabaseImporter::importMagnetTest()
   // define data array
   TClonesArray magnetConstants("Belle2::ARICHMagnetTest");
   int num = 0;
-  string sn = "";
+  string sn;
 
   // loop over xml files and extract the data
   for (const auto& module : content.getNodes("module")) {

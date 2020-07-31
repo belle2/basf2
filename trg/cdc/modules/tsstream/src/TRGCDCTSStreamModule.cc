@@ -13,7 +13,6 @@
 
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 

@@ -220,12 +220,12 @@ namespace Belle2 {
     /**
      * Operator ==.
      */
-    bool operator==(KLMChannelIndex& index);
+    bool operator==(const KLMChannelIndex& index);
 
     /**
      * Operator !=.
      */
-    bool operator!=(KLMChannelIndex& index);
+    bool operator!=(const KLMChannelIndex& index);
 
     /**
      * Operator *.

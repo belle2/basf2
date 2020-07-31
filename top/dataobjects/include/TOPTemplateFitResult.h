@@ -26,65 +26,65 @@ namespace Belle2 {
 
     /**
      *Usefull contructor for data from Zynqs
-     *@param template fit rising edge, lower 8 bit are fraction
-     *@param background offset
-     *@param amplitude
-     *@param chi square
+     *@param risingEdge template fit rising edge, lower 8 bit are fraction
+     *@param backgroundOffset background offset
+     *@param amplitude amplitude
+     *@param chisquare chi square
      */
     explicit TOPTemplateFitResult(short risingEdge, short backgroundOffset,
                                   short amplitude, short chisquare);
 
     /**
      *Usefull contructor for software implementation of template fit in basf2
-     *@param template fit rising edge in samples
-     *@param template fit rising edge in ns
-     *@param background offset
-     *@param amplitude
-     *@param chi square
+     *@param risingEdge template fit rising edge in samples
+     *@param risingEdgeTime template fit rising edge in ns
+     *@param backgroundOffset background offset
+     *@param amplitude amplitude
+     *@param chisquare chi square
      */
     TOPTemplateFitResult(double risingEdge, double risingEdgeTime, double backgroundOffset,
                          double amplitude, double chisquare);
 
     /**
      * Sets background offset
-     * @param background offset
+     * @param backgroundOffset background offset
      */
     void setBackgroundOffset(double backgroundOffset) { m_backgroundOffset = backgroundOffset;}
 
     /**
      * Sets amplitude
-     * @param amplitude
+     * @param amplitude amplitude
      */
     void setAmplitude(double amplitude) {m_amplitude = amplitude;}
 
     /**
      * Sets chi square
-     * @param chi square
+     * @param chisquare chi square
      */
     void setChisquare(double chisquare) {m_chisquare = chisquare;}
 
     /**
      * Sets rising edge from Zynq and converts to double
      * This does not convert from sample to time space
-     * @param rising edge
+     * @param risingEdge rising edge
      */
     void setRisingEdgeAndConvert(unsigned short risingEdge);
 
     /**
      * Sets rising edge in samples
-     * @param rising edge in samples
+     * @param risingEdge rising edge in samples
      */
     void setRisingEdge(double risingEdge) {m_risingEdge = risingEdge;}
 
     /**
      * Sets rising edge in ns
-     * @param rising edge in ns
+     * @param risingEdge rising edge in ns
      */
     void setRisingEdgeTime(double risingEdge) {m_risingEdgeTime = risingEdge;}
 
     /**
-     *Get rising edge in samples
-     *@return rising edge in samples
+     * Get rising edge in samples
+     * @return rising edge in samples
      */
     double getRisingEdge() const {return m_risingEdge;}
 
@@ -122,7 +122,7 @@ namespace Belle2 {
 
     /**
      * Convert rising edge saved in short to double
-     * @param input short
+     * @param risingEdgeS input short
      * @return output double
      */
     double risingEdgeShortToRisingEdgeDouble(unsigned short risingEdgeS) const;

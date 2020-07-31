@@ -17,7 +17,7 @@
 #
 # IMPORTANT: default paths are for KEKCC only!!
 #
-# examples are in svd/examples/overlayUtils.py
+# examples are in svd/examples/runOverlay.py
 #
 ######
 

@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <reconstruction/modules/EventsOfDoomBuster/EventsOfDoomBusterModule.h>
 
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

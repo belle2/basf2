@@ -48,7 +48,7 @@ namespace Belle2 {
 
     PindiodeCreator::PindiodeCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     PindiodeCreator::~PindiodeCreator()
@@ -58,6 +58,9 @@ namespace Belle2 {
 
     void PindiodeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       //Visualization Attributes
       //G4VisAttributes *invis = new G4VisAttributes(G4Colour(1,1,1));
       //invis->SetColor(0,0,0,0);
@@ -119,7 +122,7 @@ namespace Belle2 {
         double ch_woAu[100];
         double phi[100];
         double r[100];
-        int dimr_pin = 0;
+        //int dimr_pin = 0;
         if (phase == 1) {
           int dimwAu = 0;
           for (int wAu : activeParams.getArray("Ch_wAu", {0})) {
@@ -144,7 +147,8 @@ namespace Belle2 {
             r[dimy] = sqrt(x_pos[dimy] * x_pos[dimy] + y_pos[dimy] * y_pos[dimy]);
             double Phi = 0;
             if (x_pos[dimy] >= 0) Phi = TMath::ASin(y_pos[dimy] / r[dimy]) * TMath::RadToDeg();
-            else if (x_pos[dimy] < 0) Phi = -TMath::ASin(y_pos[dimy] / r[dimy]) * TMath::RadToDeg() + 180.;
+            else Phi = -TMath::ASin(y_pos[dimy] / r[dimy]) * TMath::RadToDeg() + 180.;
+            //else if (x_pos[dimy] < 0) Phi = -TMath::ASin(y_pos[dimy] / r[dimy]) * TMath::RadToDeg() + 180.;
             phi[dimy] = Phi * CLHEP::deg  - 90. * CLHEP::deg;
             dimy++;
           }
@@ -170,6 +174,7 @@ namespace Belle2 {
             phi[dimPhi] = Phi  - 90. * CLHEP::deg;
             dimPhi++;
           }
+          int dimr_pin = 0;
           for (double r_pin : activeParams.getArray("r_pin", {0})) {
             r_pin *= CLHEP::cm;
             r[dimr_pin] = r_pin;
@@ -344,11 +349,15 @@ namespace Belle2 {
         for (int i = 0; i < dimz; i++) {
           int detID1 = 2 * i;
           int detID2 = 2 * i + 1;
-          if (phase == 1) {
+          /*if (phase == 1) {
             detID1 = ch_wAu[i];
             detID2 = ch_woAu[i];
-          }
+          }*/
           if (phase == 1) {
+
+            detID1 = ch_wAu[i];
+            detID2 = ch_woAu[i];
+
             transform = G4Translate3D(x_pos[i], y_pos[i],
                                       z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
                         G4Translate3D((0.5 - 0.392) * InchtoCm + dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
@@ -360,8 +369,7 @@ namespace Belle2 {
             */
             new G4PVPlacement(transform, l_pin, TString::Format("p_pin_1_%d", i).Data(), &topVolume, false, detID1);
             B2INFO("With Au PIN-" << detID1 << " placed at: " << transform.getTranslation() << " mm");
-          }
-          if (phase == 1) {
+
             transform = G4Translate3D(x_pos[i], y_pos[i],
                                       z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
                         G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
@@ -369,6 +377,14 @@ namespace Belle2 {
             new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID2);
             B2INFO("        PIN-" << detID2 << " placed at: " << transform.getTranslation() << " mm");
           }
+          /*if (phase == 1) {
+            transform = G4Translate3D(x_pos[i], y_pos[i],
+                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]) *
+                        G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+                                      (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin);
+            new G4PVPlacement(transform, l_pin, TString::Format("p_pin_2_%d", i).Data(), &topVolume, false, detID2);
+            B2INFO("        PIN-" << detID2 << " placed at: " << transform.getTranslation() << " mm");
+          }*/
           /*
             if (phase == 2) transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) *
             G4Translate3D(-(0.5 - 0.392) * InchtoCm - dx_shole, (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,

@@ -56,18 +56,18 @@ from ROOT import EventDataCluster
 
 
 class SVDValidationTTreeCluster(Module):
+    '''class to produce the ttree for cluster validation'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeCluster, self).__init__()
-        # Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeCluster.root', 'recreate')
-        # TTrees for output data
+        '''Output ROOT file'''
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-
-        # Instance of the EventData class
+        '''TTrees for output data'''
         self.data = EventDataCluster()
+        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventDataCluster.__dict__:
@@ -76,9 +76,6 @@ class SVDValidationTTreeCluster(Module):
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
-
-    def beginRun(self):
-        """ Does nothing """
 
     def event(self):
         """ Find clusters with a truehit and save needed information """

@@ -24,11 +24,11 @@ KLMChannelIndex::KLMChannelIndex(enum IndexLevel indexLevel) :
   m_Sector(1),
   m_Layer(1),
   m_Plane(0),
-  m_Strip(1)
+  m_Strip(1),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
 {
   setNStripsPlane();
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMChannelIndex::KLMChannelIndex(
@@ -40,11 +40,11 @@ KLMChannelIndex::KLMChannelIndex(
   m_Sector(sector),
   m_Layer(layer),
   m_Plane(plane),
-  m_Strip(strip)
+  m_Strip(strip),
+  m_ElementNumbers(&(KLMElementNumbers::Instance())),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance()))
 {
   setNStripsPlane();
-  m_ElementNumbers = &(KLMElementNumbers::Instance());
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMChannelIndex::~KLMChannelIndex()
@@ -319,7 +319,7 @@ KLMChannelIndex& KLMChannelIndex::increment()
   return *this;
 }
 
-bool KLMChannelIndex::operator==(KLMChannelIndex& index)
+bool KLMChannelIndex::operator==(const KLMChannelIndex& index)
 {
   switch (m_IndexLevel) {
     case c_IndexLevelStrip:
@@ -349,7 +349,7 @@ bool KLMChannelIndex::operator==(KLMChannelIndex& index)
   return true;
 }
 
-bool KLMChannelIndex::operator!=(KLMChannelIndex& index)
+bool KLMChannelIndex::operator!=(const KLMChannelIndex& index)
 {
   switch (m_IndexLevel) {
     case c_IndexLevelStrip:

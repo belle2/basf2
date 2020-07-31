@@ -15,7 +15,6 @@
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
 #include <genfit/Exception.h>
@@ -141,6 +140,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   m_ExtInitialized = true;
 
   // Define required objects, register the new ones and relations
+  m_recoTracks.isRequired();
   m_tracks.isRequired();
   m_extHits.registerInDataStore();
   m_tracks.registerRelationTo(m_extHits);
@@ -164,16 +164,26 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 
   // Set up the EXT-specific geometry (might have already been done by MUID)
   if (m_TargetExt == nullptr) {
-    GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
+    if (!m_COILGeometryPar.isValid())
+      B2FATAL("Coil geometry data are not available.");
+    double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+    double rMinCoil = m_COILGeometryPar->getCryoRmin();
+    double halfLength = m_COILGeometryPar->getCryoLength();
+    m_COILGeometryPar.addCallback([this, &offsetZ, &rMinCoil, &halfLength]() {
+      offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+      rMinCoil = m_COILGeometryPar->getCryoRmin();
+      halfLength = m_COILGeometryPar->getCryoLength();
+    });
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-    GearDir beampipeContent = GearDir("/Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
-    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
+  if (!m_BeamPipeGeo.isValid())
+    B2FATAL("Beam pipe geometry data are not available.");
+  double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
+  m_BeamPipeGeo.addCallback([this, &beampipeRadius]() {
+    beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm;
+  });
+  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 }
 
 // Initialize for MUID
@@ -235,15 +245,26 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
 
   // Set up the EXT-specific geometry (might have already been done by EXT)
   if (m_TargetExt == nullptr) {
-    GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-    GearDir beampipeContent = GearDir("/Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
-    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+    if (!m_COILGeometryPar.isValid())
+      B2FATAL("Coil geometry data are not available.");
+    double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+    double rMinCoil = m_COILGeometryPar->getCryoRmin();
+    double halfLength = m_COILGeometryPar->getCryoLength();
+    m_COILGeometryPar.addCallback([this, &offsetZ, &rMinCoil, &halfLength]() {
+      offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+      rMinCoil = m_COILGeometryPar->getCryoRmin();
+      halfLength = m_COILGeometryPar->getCryoLength();
+    });
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
+    G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
   }
+  if (!m_BeamPipeGeo.isValid())
+    B2FATAL("Beam pipe geometry data are not available.");
+  double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
+  m_BeamPipeGeo.addCallback([this, &beampipeRadius]() {
+    beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm;
+  });
+  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 
   // Set up the MUID-specific geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
@@ -321,11 +342,11 @@ void TrackExtrapolateG4e::beginRun(bool byMuid)
       B2FATAL("KLM channel status data are not available.");
     if (!m_klmStripEfficiency.isValid())
       B2FATAL("KLM strip efficiency data are not available.");
-    if (!m_muidParameters.isValid())
-      B2FATAL("Muid parameters are not available.");
+    if (!m_klmLikelihoodParameters.isValid())
+      B2FATAL("KLM likelihood parameters are not available.");
     std::vector<int> muidPdgCodes = MuidElementNumbers::getPDGVector();
     if (!m_MuidBuilderMap.empty()) {
-      if (m_muidParameters.hasChanged()) { /* Clear m_MuidBuilderMap if MuidParameters payload changed. */
+      if (m_klmLikelihoodParameters.hasChanged()) { /* Clear m_MuidBuilderMap if KLMLikelihoodParameters payload changed. */
         for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
           delete muidBuilder;
         m_MuidBuilderMap.clear();
@@ -960,6 +981,12 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     return extState;
   }
   const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
+  // check for a valid track fit
+  if (!recoTrack->wasFitSuccessful(trackRep)) {
+    B2WARNING("RecoTrack fit failed for cardinal representation: skipping extrapolation for this track.");
+    extState.pdgCode = 0; // prevent start of extrapolation in swim()
+    return extState;
+  }
   int charge = int(trackRep->getPDGCharge());
   if (charge != 0) {
     extState.pdgCode *= charge;

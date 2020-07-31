@@ -64,7 +64,11 @@ static bool sameSector(KLMDigit* d1, KLMDigit* d2)
 
 KLMReconstructorModule::KLMReconstructorModule() :
   Module(),
+  m_CoincidenceWindow(0),
+  m_PromptTime(0),
+  m_PromptWindow(0),
   m_bklmGeoPar(nullptr),
+  m_eklmElementNumbers(&(EKLMElementNumbers::Instance())),
   m_eklmGeoDat(nullptr),
   m_eklmNStrip(0),
   m_eklmTransformData(nullptr),
@@ -72,36 +76,14 @@ KLMReconstructorModule::KLMReconstructorModule() :
 {
   setDescription("Create BKLMHit1ds from KLMDigits and then create BKLMHit2ds from BKLMHit1ds; create EKLMHit2ds from KLMDigits.");
   setPropertyFlags(c_ParallelProcessingCertified);
-  // MC 1 GeV/c muons: 1-sigma width is 0.43 ns
-  addParam("CoincidenceWindow", m_CoincidenceWindow,
-           "Half-width of time coincidence window for KLMDigits used to create "
-           "EKLMHit2ds or BKLMHit1ds and BKLMHit1ds used to create "
-           "BKLMHit2ds (ns).",
-           double(50.0));
-  // MC 1 GeV/c muons: mean prompt time is 0.43 ns
-  addParam("PromptTime", m_bklmPromptTime,
-           "Nominal time of prompt BKLMHit2ds (ns).",
-           double(0.0));
-  // MC 1 GeV/c muons: 1-sigma width is 0.15 ns
-  // Raw KLM scintillator hit times are in the range from -5000 to -4000 ns
-  // approximately. The time window can be readjusted after completion of
-  // the implementation of KLM time calibration.
-  addParam("PromptWindow", m_bklmPromptWindow,
-           "Half-width time window of BKLMHit2ds relative to PrompTime (ns).",
-           //double(50.0));
-           double(10000.0));
   addParam("IfAlign", m_bklmIfAlign,
            "Perform alignment correction (true) or not (false).",
-           bool(true));
-  addParam("LoadTimingFromDB", m_bklmLoadTimingFromDB,
-           "Load timing window from database (true) or not (false).",
            bool(true));
   addParam("IgnoreScintillators", m_bklmIgnoreScintillators,
            "Ignore scintillators (to debug their electronics mapping).",
            false);
   addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
-  m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
 }
 
 KLMReconstructorModule::~KLMReconstructorModule()
@@ -133,16 +115,11 @@ void KLMReconstructorModule::initialize()
 
 void KLMReconstructorModule::beginRun()
 {
-  /* BKLM. */
-  if (m_bklmLoadTimingFromDB) {
-    if (!m_bklmTiming.isValid())
-      B2FATAL("BKLM time window data are not available.");
-    m_CoincidenceWindow = m_bklmTiming->getCoincidenceWindow();
-    m_bklmPromptTime = m_bklmTiming->getPromptTime();
-    /* Not use the promt window value from database
-     * until the time calibration is ready. */
-    // m_bklmPromptWindow = m_bklmTiming->getPromptWindow();
-  }
+  if (!m_TimeWindow.isValid())
+    B2FATAL("KLM time window data are not available.");
+  m_CoincidenceWindow = m_TimeWindow->getCoincidenceWindow();
+  m_PromptTime = m_TimeWindow->getPromptTime();
+  m_PromptWindow = m_TimeWindow->getPromptWindow();
   /* EKLM. */
   /* cppcheck-suppress variableScope */
   int i;
@@ -177,6 +154,8 @@ void KLMReconstructorModule::reconstructBKLMHits()
   for (int index = 0; index < m_Digits.getEntries(); ++index) {
     const KLMDigit* digit = m_Digits[index];
     if (digit->getSubdetector() != KLMElementNumbers::c_BKLM)
+      continue;
+    if (digit->isMultiStrip())
       continue;
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
@@ -233,7 +212,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
       double time = 0.5 * (phiTime + zTime) - global.mag() / Const::speedOfLight;
       BKLMHit2d* hit2d = m_bklmHit2ds.appendNew(phiHit, zHit, global, time); // Also sets relation BKLMHit2d -> BKLMHit1d
-      if (std::fabs(time - m_bklmPromptTime) > m_bklmPromptWindow)
+      if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);
     }
   }
@@ -264,6 +243,8 @@ void KLMReconstructorModule::reconstructEKLMHits()
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
     if (m_Digits[i]->getSubdetector() != KLMElementNumbers::c_EKLM)
+      continue;
+    if (m_Digits[i]->isMultiStrip())
       continue;
     if (m_Digits[i]->isGood())
       digitVector.push_back(m_Digits[i]);

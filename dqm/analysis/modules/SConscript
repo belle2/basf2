@@ -7,7 +7,8 @@ Import('env')
 env['LIBS'] = ['framework', 'daq', 'dqm', 'RooFit', 'RooFitCore', 'vxd',
                'boost_regex', 'arich',
                'klm_dataobjects', 'klm_dbobjects',
-               'klm_dataobjects', 'svd_dataobjects']
+               'dqm_dataobjects', 'svd_dataobjects',
+	       'cdc_dataobjects','cdc']
 
 option = os.environ['BELLE2_OPTION']
 # disable EPICS if clang compiled

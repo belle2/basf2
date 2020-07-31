@@ -25,7 +25,9 @@ namespace Belle2 {
   public:
 
     //! Default constructor
-    BKLMADCThreshold():  m_ADCOffset(0), m_threshold(0), m_MPPCGain(0) {};
+    BKLMADCThreshold():  m_ADCOffset(0), m_threshold(0), m_MPPCGain(0)
+    {
+    }
 
     //!Constructor
     BKLMADCThreshold(int ADCOffset, double threshold, double gain)
@@ -33,28 +35,48 @@ namespace Belle2 {
       m_ADCOffset = ADCOffset;
       m_threshold = threshold;
       m_MPPCGain = gain;
-    };
+    }
 
     //! Destructor
-    ~BKLMADCThreshold() {};
+    ~BKLMADCThreshold()
+    {
+    }
 
     //! Get the ADC offset
-    int getADCOffset() const {return m_ADCOffset;}
+    int getADCOffset() const
+    {
+      return m_ADCOffset;
+    }
 
     //! Get the ADC threshold
-    double getADCThreshold() const { return m_threshold; }
+    double getADCThreshold() const
+    {
+      return m_threshold;
+    }
 
     //! Get the MPPC gain
-    double getMPPCGain() const { return m_MPPCGain; }
+    double getMPPCGain() const
+    {
+      return m_MPPCGain;
+    }
 
     //! Set the ADC offset
-    void setADCOffset(int ADCOffset) { m_ADCOffset = ADCOffset;}
+    void setADCOffset(int ADCOffset)
+    {
+      m_ADCOffset = ADCOffset;
+    }
 
     //! Set the ADC threshold
-    void setADCThreshold(double threshold) { m_threshold = threshold; }
+    void setADCThreshold(double threshold)
+    {
+      m_threshold = threshold;
+    }
 
     //! Set the MPPC gain
-    void setMPPCGain(double gain) { m_MPPCGain = gain; }
+    void setMPPCGain(double gain)
+    {
+      m_MPPCGain = gain;
+    }
 
 
   private:
@@ -68,7 +90,7 @@ namespace Belle2 {
     //! MPPC gain
     double m_MPPCGain;
 
-    //! ClassDef, must be the last term before the closing {}
+    /** Class version. */
     ClassDef(BKLMADCThreshold, 1);
 
   };

@@ -92,7 +92,7 @@ void CDCCrossTalkAdderModule::event()
               xTalks[i].second.TOT);
       WireID widx = m_cdcgp->getWireID(board, xTalks[i].first);
       if (!m_cdcgp->isBadWire(widx)) { // for non-bad wire
-        if (m_includeEarlyXTalks || (!m_includeEarlyXTalks && xTalks[i].second.TDC <= tdcCount)) {
+        if (m_includeEarlyXTalks || (xTalks[i].second.TDC <= tdcCount)) {
           const double t0 = m_cdcgp->getT0(widx);
           const double ULOfTDC = (t0 - m_lowEdgeOfTimeWindow[board]) * m_invOfTDCBinWidth;
           const double LLOfTDC = (t0 - m_uprEdgeOfTimeWindow[board]) * m_invOfTDCBinWidth;

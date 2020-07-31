@@ -15,14 +15,12 @@
 #include "TFile.h"
 #include "TMath.h"
 #include "TF1.h"
-#include "TMinuit.h"
 #include "TROOT.h"
 #include "TTree.h"
 #include "math.h"
 #include <limits>
 #include <framework/logging/Logger.h>
 #include <top/dbobjects/TOPCalChannelT0.h>
-
 
 
 //using namespace std;
@@ -568,13 +566,11 @@ CalibrationAlgorithm::EResult TOPLocalCalFitter::calibrate()
     auto onepc = (unsigned int)(hitTree->GetEntries() / 100);
     if (i % onepc == 0)
       std::cout << "processing hit " << i << " of " << hitTree->GetEntries() << " (" << i / (onepc * 10) << " %)" << std::endl;
-    if (i < 0)
-      continue;
     hitTree->GetEntry(i);
     auto it = std::lower_bound(m_binEdges.cbegin(),  m_binEdges.cend(), amplitude);
     int iLowerEdge = std::distance(m_binEdges.cbegin(), it) - 1;
 
-    if (iLowerEdge >= 0 && iLowerEdge < m_binEdges.size() - 1 &&  refTimeValid)
+    if (iLowerEdge >= 0 && iLowerEdge < static_cast<int>(m_binEdges.size()) - 1 && refTimeValid)
       h_hitTimeLaserHistos[iLowerEdge]->Fill(channel + (slot - 1) * 512, hitTime);
     if (amplitude > 80. &&  refTimeValid)
       h_hitTime->Fill(channel + (slot - 1) * 512, hitTime);

@@ -13,12 +13,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasurementOnPlane.h>
@@ -218,14 +214,12 @@ void CDCCRTestModule::defineHisto()
 void CDCCRTestModule::initialize()
 {
   REG_HISTOGRAM
-  StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
-  StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  RelationArray relRecoTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  m_Tracks.isRequired(m_trackArrayName);
+  m_RecoTracks.isRequired(m_recoTrackArrayName);
+  m_TrackFitResults.isRequired(m_trackFitResultArrayName);
+  m_CDCHits.isRequired(m_cdcHitArrayName);
+  RelationArray relRecoTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
   //Store names to speed up creation later
-  m_recoTrackArrayName = recoTracks.getName();
-  m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
   for (size_t i = 0; i < m_allHistos.size(); ++i) {
@@ -246,28 +240,24 @@ void CDCCRTestModule::beginRun()
 void CDCCRTestModule::event()
 {
   evtT0 = 0.;
-  const StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  const StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  const StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
-  const RelationArray relTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  const RelationArray relTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
 
   /* CDCHit distribution */
   if (m_MakeHitDist) {
-    for (int i = 0; i < cdcHits.getEntries(); ++i) {
-      Belle2::CDCHit* hit = cdcHits[i];
+    for (int i = 0; i < m_CDCHits.getEntries(); ++i) {
+      Belle2::CDCHit* hit = m_CDCHits[i];
       m_hHitDistInCDCHit[getICLayer(hit->getISuperLayer(), hit->getILayer())]->Fill(hit->getIWire());
       m_h2DHitDistInCDCHit->Fill(hit->getIWire(), getICLayer(hit->getISuperLayer(), hit->getILayer()));
     }
   }
   // Loop over Recotracks
-  int nTr = recoTracks.getEntries();
+  int nTr = m_RecoTracks.getEntries();
   m_hNTracksPerEvent->Fill(nTr);
 
   int nfitted = 0;
 
   for (int i = 0; i < nTr; ++i) {
-    RecoTrack* track = recoTracks[i];
+    RecoTrack* track = m_RecoTracks[i];
     if (track->getDirtyFlag()) {B2INFO("Dirty flag was set for track: " << track->getPositionSeed().Y()); continue;}
     m_hNHits_trackcand->Fill(track->getNumberOfCDCHits());
     if (m_MakeHitDist) {
@@ -571,7 +561,7 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
 
     SortingRecoHitPair frontSideHit = std::make_pair(0, nullptr);;
     SortingRecoHitPair backsideSideHit = std::make_pair(0, nullptr);;
-    SortingRecoHitPair hit4extraction = std::make_pair(0, nullptr);
+    SortingRecoHitPair hit4extraction; // = std::make_pair(0, nullptr); avoid cppcheck warning.
 
     //find closest hit to hit which do not fit
     //    if (hitID < track->getNumberOfCDCHits() / 2) { //case for first part of track, searching forward, stop at first choice

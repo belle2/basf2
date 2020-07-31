@@ -467,13 +467,21 @@ def correctBremsBelle(outputListName,
 
 def copyLists(outputListName, inputListNames, writeOut=False, path=None):
     """
-    Copy all Particle indices from all input ParticleLists to the single output ParticleList.
+    Copy all Particle indices from all input ParticleLists to the
+    single output ParticleList.
     Note that the Particles themselves are not copied.
     The original and copied ParticleLists will point to the same Particles.
+
     Duplicates are removed based on the first-come, first-served principle.
     Therefore, the order of the input ParticleLists matters.
-    If you want to select the best duplicate based on another criterion, have
-    a look at the function `mergeListsWithBestDuplicate`.
+
+    .. seealso::
+        If you want to select the best duplicate based on another criterion, have
+        a look at the function `mergeListsWithBestDuplicate`.
+
+    .. note::
+        Two particles that differ only by the order of their daughters are
+        considered duplicates and one of them will be removed.
 
     @param ouputListName copied ParticleList
     @param inputListName vector of original ParticleLists to be copied
@@ -524,7 +532,7 @@ def cutAndCopyLists(outputListName, inputListNames, cut, writeOut=False, path=No
     ``outputListName`` if they pass ``cut`` (given selection criteria).
 
     Note:
-        Note the Particles themselves are not copied.
+        Note that the Particles themselves are not copied.
         The original and copied ParticleLists will point to the same Particles.
 
     Example:
@@ -576,6 +584,39 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
         path (basf2.Path): modules are added to this path
     """
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
+
+
+def trackingEfficiency(inputListNames, fraction, path=None):
+    """
+    Randomly remove tracks from the provided particle lists to estimate the tracking efficiency.
+    Takes care of the duplicates, if any.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        fraction (float): fraction of particles to be removed randomly
+        path (basf2.Path): module is added to this path
+    """
+
+    trackingefficiency = register_module('TrackingEfficiency')
+    trackingefficiency.param('particleLists', inputListNames)
+    trackingefficiency.param('frac', fraction)
+    path.add_module(trackingefficiency)
+
+
+def trackingMomentum(inputListNames, scale, path=None):
+    """
+    Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        scale (float): scaling factor (1.0 -- no scaling)
+        path (basf2.Path): module is added to this path
+    """
+
+    trackingmomentum = register_module('TrackingMomentum')
+    trackingmomentum.param('particleLists', inputListNames)
+    trackingmomentum.param('scale', scale)
+    path.add_module(trackingmomentum)
 
 
 def mergeListsWithBestDuplicate(outputListName,
@@ -1312,6 +1353,27 @@ def rankByLowest(particleList,
     path.add_module(bcs)
 
 
+def applyRandomCandidateSelection(particleList, path=None):
+    """
+    If there are multiple candidates in the provided particleList, all but one of them are removed randomly.
+    This is done on a event-by-event basis.
+
+    @param particleList     ParticleList for which the random candidate selection should be applied
+    @param path             module is added to this path
+    """
+
+    rcs = register_module('BestCandidateSelection')
+    rcs.set_name('RandomCandidateSelection_' + particleList)
+    rcs.param('particleList', particleList)
+    rcs.param('variable', 'random')
+    rcs.param('selectLowest', False)
+    rcs.param('allowMultiRank', False)
+    rcs.param('numBest', 1)
+    rcs.param('cut', '')
+    rcs.param('outputVariable', '')
+    path.add_module(rcs)
+
+
 def printDataStore(eventNumber=-1, path=None):
     """
     Prints the contents of DataStore in the first event (or a specific event number or all events).
@@ -2033,30 +2095,27 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
     path.add_module(updateMask)
 
 
-def printROEInfo(mask_names=[], which_mask='both', full_print=False, path=None):
+def printROEInfo(mask_names=[], full_print=False,
+                 unpackComposites=True, path=None):
     """
     This function prints out the information for the current ROE, so it should only be used in the for_each path.
     It prints out basic ROE object info.
 
-    If mask names are provided, specific information for those masks will be printed out. By default, basic
-    ECLCluster and Track mask info will be printed out, but it is possible to do this only for one, if needed.
+    If mask names are provided, specific information for those masks will be printed out.
 
-    It is also possible to print out the specific mask values for each Track and ECLCluster by setting the 'full_print'
-    option to True.
+    It is also possible to print out all particles in a given mask if the
+    'full_print' is set to True.
 
-    @param mask_names   array of ROEMask names for printing out info
-    @param which_mask   print out info for Tracks ('track'), ECLClusters ('cluster') or ('both')
-    @param full_print   print out mask values for each Track/ECLCLuster in mask
-    @param path         modules are added to this path
+    @param mask_names         array of ROEMask names for printing out info
+    @param unpackComposites   if true, replace composite particles by their daughters
+    @param full_print         print out particles in mask
+    @param path               modules are added to this path
     """
-    if not isinstance(path, Path):
-        B2FATAL("Error from printROEInfo, please add this to the for_each path")
-
     printMask = register_module('RestOfEventPrinter')
     printMask.set_name('RestOfEventPrinter')
     printMask.param('maskNames', mask_names)
-    printMask.param('whichMask', which_mask)
     printMask.param('fullPrint', full_print)
+    printMask.param('unpackComposites', unpackComposites)
     path.add_module(printMask)
 
 
@@ -2727,14 +2786,22 @@ def applyChargedPidMVA(particleLists, path, trainingMode, binaryHypoPDGCodes=(0,
 
     # Map the training mode enum value to the actual name of the payload in the GT.
     payloadNames = {
-        Belle2.ChargedPidMVAWeights.c_Classification: {"mode": "Classification", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.c_Multiclass: {"mode": "Multiclass", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.c_ECL_Classification: {"mode": "ECL_Classification", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.c_ECL_Multiclass: {"mode": "ECL_Multiclass", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.c_PSD_Classification: {"mode": "PSD_Classification", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.c_PSD_Multiclass: {"mode": "PSD_Multiclass", "detector": "ALL"},
-        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Classification: {"mode": "ECL_PSD_Classification", "detector": "ECL"},
-        Belle2.ChargedPidMVAWeights.c_ECL_PSD_Multiclass: {"mode": "ECL_PSD_Multiclass", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Classification:
+        {"mode": "Classification", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass:
+        {"mode": "Multiclass", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Classification:
+        {"mode": "ECL_Classification", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_Multiclass:
+        {"mode": "ECL_Multiclass", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_PSD_Classification:
+        {"mode": "PSD_Classification", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_PSD_Multiclass:
+        {"mode": "PSD_Multiclass", "detector": "ALL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_PSD_Classification:
+        {"mode": "ECL_PSD_Classification", "detector": "ECL"},
+        Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_ECL_PSD_Multiclass:
+        {"mode": "ECL_PSD_Multiclass", "detector": "ECL"},
     }
 
     if payloadNames.get(trainingMode) is None:
@@ -2822,7 +2889,7 @@ def calculateDistance(list_name, decay_string, mode='vertextrack', path=None):
     path.add_module(dist_mod)
 
 
-def addInclusiveDstarReconstruction(inputPionList, outputDstarList, slowPionCut, path):
+def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     """
     Adds the InclusiveDstarReconstruction module to the given path.
     This module creates a D* particle list by estimating the D* four momenta
@@ -2832,15 +2899,15 @@ def addInclusiveDstarReconstruction(inputPionList, outputDstarList, slowPionCut,
     to the slow pion direction. The charge of the given pion list has to be consistent
     with the D* charge
 
-    @param inputPionList Name of the input pion particle list
-    @param outputDstarList Name of the output D* particle list
-    @param slowPionCut Cut applied to the pion list to identify slow pions
+    @param decayString Decay string, must be of form ``D* -> pi``
+    @param slowPionCut Cut applied to the input pion list to identify slow pions
+    @param DstarCut Cut applied to the output D* list
     @param path the module is added to this path
     """
     incl_dstar = register_module("InclusiveDstarReconstruction")
-    incl_dstar.param("pionListName", inputPionList)
-    incl_dstar.param("DstarListName", outputDstarList)
+    incl_dstar.param("decayString", decayString)
     incl_dstar.param("slowPionCut", slowPionCut)
+    incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
 
 if __name__ == '__main__':

@@ -23,8 +23,8 @@ ma.inputMdstList('default', filelist, path=ISRskimpath)
 stdMu('95eff', path=ISRskimpath)
 stdPi('95eff', path=ISRskimpath)
 # [ee -> ISR pi+pi- [J/psi -> mu+mu-]] decay
-ma.reconstructDecay('J/psi:mumu -> mu+:95eff mu-:95eff', '2.9 < M < 3.3', path=ISRskimpath)
-ma.reconstructDecay('vpho:myCombinations -> J/psi:mumu pi+:95eff pi-:95eff', '', path=ISRskimpath)
+ma.reconstructDecay('J/psi:mumu_validation -> mu+:95eff mu-:95eff', '2.9 < M < 3.3', path=ISRskimpath)
+ma.reconstructDecay('vpho:myCombinations -> J/psi:mumu_validation pi+:95eff pi-:95eff', '', path=ISRskimpath)
 
 ma.variablesToHistogram(
     filename='ISRpipimumu_Validation.root',

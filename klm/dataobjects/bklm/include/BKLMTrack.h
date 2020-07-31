@@ -44,7 +44,9 @@ namespace Belle2 {
     BKLMTrack& operator=(const BKLMTrack&);
 
     //! Destructor
-    virtual ~BKLMTrack() {}
+    ~BKLMTrack()
+    {
+    }
 
     //! Get track parameters in the global system. y = p0 + p1 * x; z = p2 + p3 * x
     TVectorD  getTrackParam();
@@ -65,16 +67,28 @@ namespace Belle2 {
     TMatrixD getLocalInterceptVariance(double x);
 
     //! Get the fitted chi2 of the track
-    float getTrackChi2() { return m_Chi2; }
+    float getTrackChi2()
+    {
+      return m_Chi2;
+    }
 
     //! Get the number of 2d hits on the track
-    int getNumHitOnTrack() { return m_NumHit; }
+    int getNumHitOnTrack()
+    {
+      return m_NumHit;
+    }
 
     //! Is fit valid
-    bool isValid() { return m_Valid; }
+    bool isValid()
+    {
+      return m_Valid;
+    }
 
     //! Is fit good
-    bool  isGood()  { return m_Good; }
+    bool  isGood()
+    {
+      return m_Good;
+    }
 
     //! Set track parameters in the global system. y = p0 + p1 * x; z = p2 + p3 * x
     void setTrackParam(const CLHEP::HepVector& trkPar);
@@ -89,16 +103,28 @@ namespace Belle2 {
     void setLocalTrackParamErr(const CLHEP::HepSymMatrix& trkParErr);
 
     //! Set the fitted chi2 of the track
-    void setTrackChi2(const float chi2) {m_Chi2 = chi2; }
+    void setTrackChi2(const float chi2)
+    {
+      m_Chi2 = chi2;
+    }
 
     //! Set the number of 2d hits on the track
-    void setNumHitOnTrack(const int NumHit) { m_NumHit = NumHit; }
+    void setNumHitOnTrack(const int NumHit)
+    {
+      m_NumHit = NumHit;
+    }
 
     //! set the fit valid status
-    void setIsValid(const bool valid) {  m_Valid = valid; }
+    void setIsValid(const bool valid)
+    {
+      m_Valid = valid;
+    }
 
     //! set the fit good status
-    void setIsGood(const bool good) {  m_Good = good; }
+    void setIsGood(const bool good)
+    {
+      m_Good = good;
+    }
 
   private:
 

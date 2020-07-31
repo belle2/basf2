@@ -1,5 +1,0 @@
-Skim testing tools
-==================
-See [the Sphinx documentation](https://b2-master.belle2.org/software/development/sphinx/skim/doc/index-01-skim.html#testing-skim-performance) for an explanation on how to use `b2skim-stats-submit` and `b2skim-stats-print` to test your skim.
-
-For every new release you need to copy the statistics to the relevant section of the [skim performance and validation Confluenced page](https://confluence.desy.de/display/BI/Skim+Performance+and+Validation).

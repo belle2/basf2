@@ -46,7 +46,8 @@ using namespace Belle2;
 
 Particle::Particle() :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(nan("")), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0),
+  m_arrayPointer(nullptr)
 {
   resetErrorMatrix();
 }
@@ -54,7 +55,7 @@ Particle::Particle() :
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   setFlavorType();
   set4Vector(momentum);
@@ -65,10 +66,10 @@ Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
 Particle::Particle(const TLorentzVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
-                   const EParticleType type,
+                   const EParticleSourceObject source,
                    const unsigned mdstIndex) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(flavorType), m_particleType(type), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(flavorType), m_particleSource(source), m_properties(0), m_arrayPointer(nullptr)
 {
   if (flavorType == c_Unflavored and pdgCode < 0)
     m_pdgCode = -pdgCode;
@@ -87,7 +88,7 @@ Particle::Particle(const TLorentzVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
   m_properties(0), m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
@@ -98,7 +99,7 @@ Particle::Particle(const TLorentzVector& momentum,
   resetErrorMatrix();
 
   if (!daughterIndices.empty()) {
-    m_particleType    = c_Composite;
+    m_particleSource    = c_Composite;
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
     }
@@ -117,7 +118,7 @@ Particle::Particle(const TLorentzVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(arrayPointer)
 {
   m_pdgCode = pdgCode;
@@ -129,7 +130,7 @@ Particle::Particle(const TLorentzVector& momentum,
   m_properties = properties;
 
   if (!daughterIndices.empty()) {
-    m_particleType    = c_Composite;
+    m_particleSource    = c_Composite;
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
     }
@@ -150,7 +151,7 @@ Particle::Particle(const TLorentzVector& momentum,
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1),
   m_daughterIndices(daughterIndices),
-  m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0),
   m_daughterProperties(daughterProperties),
   m_arrayPointer(arrayPointer)
 {
@@ -163,7 +164,7 @@ Particle::Particle(const TLorentzVector& momentum,
   m_properties = properties;
 
   if (!daughterIndices.empty()) {
-    m_particleType    = c_Composite;
+    m_particleSource    = c_Composite;
     if (getArrayPointer() == nullptr) {
       B2FATAL("Composite Particle (with daughters) was constructed outside StoreArray without specifying daughter array!");
     }
@@ -182,12 +183,12 @@ Particle::Particle(const int trackArrayIndex,
                    const TrackFitResult* trackFit,
                    const Const::ChargedStable& chargedStable) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (!trackFit) return;
 
   m_flavorType = c_Flavored; //tracks are charged
-  m_particleType = c_Track;
+  m_particleSource = c_Track;
 
   setMdstArrayIndex(trackArrayIndex);
 
@@ -209,12 +210,12 @@ Particle::Particle(const int trackArrayIndex,
                    const Const::ChargedStable& chargedStable,
                    const Const::ChargedStable& chargedStableUsedForFit) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (!trackFit) return;
 
   m_flavorType = c_Flavored; //tracks are charged
-  m_particleType = c_Track;
+  m_particleSource = c_Track;
 
   setMdstArrayIndex(trackArrayIndex);
 
@@ -233,7 +234,7 @@ Particle::Particle(const int trackArrayIndex,
 
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (!eclCluster) return;
 
@@ -250,7 +251,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
   m_py = clustermom.Py();
   m_pz = clustermom.Pz();
 
-  m_particleType = c_ECLCluster;
+  m_particleSource = c_ECLCluster;
   setMdstArrayIndex(eclCluster->getArrayIndex());
 
   // set Chi^2 probability:
@@ -269,7 +270,7 @@ Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type
 
 Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (!klmCluster) return;
 
@@ -280,7 +281,7 @@ Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
   setVertex(klmCluster->getPosition());
   updateMass(m_pdgCode); // KLMCluster internally use Klong mass, overwrite here to allow neutrons
 
-  m_particleType = c_KLMCluster;
+  m_particleSource = c_KLMCluster;
   setMdstArrayIndex(klmCluster->getArrayIndex());
 
   // set Chi^2 probability:
@@ -295,12 +296,12 @@ Particle::Particle(const KLMCluster* klmCluster, const int pdgCode) :
 
 Particle::Particle(const MCParticle* mcParticle) :
   m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
+  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
   if (!mcParticle) return;
 
   m_pdgCode      = mcParticle->getPDG();
-  m_particleType = c_MCParticle; // TODO: what about daughters if not FS particle?
+  m_particleSource = c_MCParticle; // TODO: what about daughters if not FS particle?
 
   setMdstArrayIndex(mcParticle->getArrayIndex());
 
@@ -327,7 +328,7 @@ void Particle::setMdstArrayIndex(const int arrayIndex)
   m_mdstIndex = arrayIndex;
 
   // set the identifier
-  if (m_particleType == c_ECLCluster) {
+  if (m_particleSource == c_ECLCluster) {
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
@@ -347,11 +348,11 @@ int Particle::getMdstSource() const
 {
   // Is identifier already set
   if (m_identifier > -1)
-    return m_identifier + (m_particleType << 24);
+    return m_identifier + (m_particleSource << 24);
 
   // Identifier is not set.
   int identifier = 0;
-  if (m_particleType == c_ECLCluster) {
+  if (m_particleSource == c_ECLCluster) {
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
       const int crid     = cluster->getConnectedRegionId();
@@ -365,7 +366,7 @@ int Particle::getMdstSource() const
     identifier = m_mdstIndex;
   }
 
-  return identifier + (m_particleType << 24);
+  return identifier + (m_particleSource << 24);
 }
 
 
@@ -617,12 +618,12 @@ std::vector<const Belle2::Particle*> Particle::getFinalStateDaughters() const
   return fspDaughters;
 }
 
-std::vector<int> Particle::getMdstArrayIndices(EParticleType type) const
+std::vector<int> Particle::getMdstArrayIndices(EParticleSourceObject source) const
 {
   std::vector<int> mdstIndices;
   for (const Particle* fsp : getFinalStateDaughters()) {
-    // is this FSP daughter constructed from given MDST type
-    if (fsp->getParticleType() == type)
+    // is this FSP daughter constructed from given MDST source
+    if (fsp->getParticleSource() == source)
       mdstIndices.push_back(fsp->getMdstArrayIndex());
   }
   return mdstIndices;
@@ -633,7 +634,7 @@ void Particle::appendDaughter(const Particle* daughter, const bool updateType)
 {
   if (updateType) {
     // is it a composite particle or fsr corrected?
-    m_particleType = c_Composite;
+    m_particleSource = c_Composite;
   }
 
   // add daughter index
@@ -655,7 +656,7 @@ void Particle::removeDaughter(const Particle* daughter)
   }
 
   if (getNDaughters() == 0)
-    m_particleType = c_Undefined;
+    m_particleSource = c_Undefined;
 }
 
 bool Particle::overlapsWith(const Particle* oParticle) const
@@ -695,6 +696,13 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
       oParticle->getDaughter(i)->fillDecayChain(othrDecayChain);
     }
 
+    // Even if the daughters have been provided in a different order in the
+    // decay string the particles should be identified as copies / duplicates.
+    // Therefore, the decay chain vectors, which contain both the pdg codes and
+    // the mdst sources, are sorted here before comparing them.
+    sort(thisDecayChain.begin(), thisDecayChain.end());
+    sort(othrDecayChain.begin(), othrDecayChain.end());
+
     for (unsigned i = 0; i < thisDecayChain.size(); i++)
       if (thisDecayChain[i] != othrDecayChain[i])
         return false;
@@ -708,15 +716,20 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
     return true;
   //If we compare here a reconstructed Particle to a generated MCParticle
   //it means that something went horribly wrong and we must stop
-  if ((this->getParticleType() == EParticleType::c_MCParticle and oParticle->getParticleType() != EParticleType::c_MCParticle)
-      or (this->getParticleType() != EParticleType::c_MCParticle and oParticle->getParticleType() == EParticleType::c_MCParticle)) {
-    B2FATAL("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!");
+  if ((this->getParticleSource() == EParticleSourceObject::c_MCParticle
+       and oParticle->getParticleSource() != EParticleSourceObject::c_MCParticle)
+      or (this->getParticleSource() != EParticleSourceObject::c_MCParticle
+          and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle)) {
+    B2WARNING("Something went wrong: MCParticle is being compared to a non MC Particle. Please check your script!\n"
+              "                              If the MCParticle <-> Particle comparison happens in the RestOfEventBuilder,\n"
+              "                              the Rest Of Event may contain signal side particles.");
+    return false;
   }
-  if (this->getParticleType() == EParticleType::c_MCParticle
-      and oParticle->getParticleType() == EParticleType::c_MCParticle) {
+  if (this->getParticleSource() == EParticleSourceObject::c_MCParticle
+      and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle) {
     return this->getMCParticle() == oParticle->getMCParticle();
   }
-  if (this->getParticleType() != oParticle->getParticleType()) {
+  if (this->getParticleSource() != oParticle->getParticleSource()) {
     return false;
   }
   if (this->getMdstSource() == oParticle->getMdstSource()) {
@@ -756,7 +769,7 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
 
 const Track* Particle::getTrack() const
 {
-  if (m_particleType == c_Track) {
+  if (m_particleSource == c_Track) {
     StoreArray<Track> tracks;
     return tracks[m_mdstIndex];
   } else
@@ -782,7 +795,7 @@ const TrackFitResult* Particle::getTrackFitResult() const
 
 const PIDLikelihood* Particle::getPIDLikelihood() const
 {
-  if (m_particleType == c_Track) {
+  if (m_particleSource == c_Track) {
     StoreArray<Track> tracks;
     return tracks[m_mdstIndex]->getRelated<PIDLikelihood>();
   } else
@@ -791,7 +804,7 @@ const PIDLikelihood* Particle::getPIDLikelihood() const
 
 const V0* Particle::getV0() const
 {
-  if (m_particleType == c_V0) {
+  if (m_particleSource == c_V0) {
     StoreArray<V0> v0s;
     return v0s[m_mdstIndex];
   } else {
@@ -802,10 +815,10 @@ const V0* Particle::getV0() const
 
 const ECLCluster* Particle::getECLCluster() const
 {
-  if (m_particleType == c_ECLCluster) {
+  if (m_particleSource == c_ECLCluster) {
     StoreArray<ECLCluster> eclClusters;
     return eclClusters[m_mdstIndex];
-  } else if (m_particleType == c_Track) {
+  } else if (m_particleSource == c_Track) {
     // a track may be matched to several clusters under different hypotheses
     // take the most energetic of the c_nPhotons hypothesis as "the" cluster
     StoreArray<Track> tracks;
@@ -836,10 +849,10 @@ double Particle::getECLClusterEnergy() const
 
 const KLMCluster* Particle::getKLMCluster() const
 {
-  if (m_particleType == c_KLMCluster) {
+  if (m_particleSource == c_KLMCluster) {
     StoreArray<KLMCluster> klmClusters;
     return klmClusters[m_mdstIndex];
-  } else if (m_particleType == c_Track) {
+  } else if (m_particleSource == c_Track) {
     // If there is an associated KLMCluster, it's the closest one
     StoreArray<Track> tracks;
     const KLMCluster* klmCluster = tracks[m_mdstIndex]->getRelatedTo<KLMCluster>();
@@ -852,7 +865,7 @@ const KLMCluster* Particle::getKLMCluster() const
 
 const MCParticle* Particle::getMCParticle() const
 {
-  if (m_particleType == c_MCParticle) {
+  if (m_particleSource == c_MCParticle) {
     StoreArray<MCParticle> mcParticles;
     return mcParticles[m_mdstIndex];
   } else {
@@ -1035,6 +1048,7 @@ void Particle::setFlavorType()
   if (m_pdgCode == 22) {m_flavorType = c_Unflavored; return;} // gamma
   if (m_pdgCode == 310) {m_flavorType = c_Unflavored; return;} // K_s
   if (m_pdgCode == 130) {m_flavorType = c_Unflavored; return;} // K_L
+  if (m_pdgCode == 43) {m_flavorType = c_Unflavored; return;} // Xu0
   int nnn = m_pdgCode / 10;
   int q3 = nnn % 10; nnn /= 10;
   int q2 = nnn % 10; nnn /= 10;
@@ -1076,7 +1090,7 @@ std::string Particle::getInfoHTML() const
   stream << " <b>PDGMass</b>=" << getPDGMass();
   stream << "<br>";
   stream << " <b>flavorType</b>=" << m_flavorType;
-  stream << " <b>particleType</b>=" << m_particleType;
+  stream << " <b>particleType</b>=" << m_particleSource;
   stream << " <b>particleTypeUsedForFit</b>=" << m_pdgCodeUsedForFit;
   stream << "<br>";
 

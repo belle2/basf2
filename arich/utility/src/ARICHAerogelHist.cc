@@ -29,11 +29,8 @@
 using namespace std;
 using namespace Belle2;
 
-ARICHAerogelHist::ARICHAerogelHist(const char* name, const char* title) : TH2Poly()
+ARICHAerogelHist::ARICHAerogelHist(const char* name, const char* title) : TH2Poly(), m_histName(name), m_histTitle(title)
 {
-
-  m_histName = name;
-  m_histTitle = title;
   SetName(m_histName.Data());
   SetTitle(m_histTitle.Data());
   SetInitialParametersByDefault();
@@ -162,7 +159,7 @@ void ARICHAerogelHist::dumpVerticesMap()
 
 void ARICHAerogelHist::SetUpVerticesMap()
 {
-  double dPhi = -999.0;
+
   for (unsigned int i = 0; i < m_nTiles.size(); i++) {
     std::vector<TVector2> vecTvec;
     int nTiles = m_nTiles[i];
@@ -182,7 +179,7 @@ void ARICHAerogelHist::SetUpVerticesMap()
     vecTvec.push_back(v2);
     //Add circular points from outer radious (clockwise added)
     if (m_nCircularPoints > 0) {
-      dPhi = phimax / (m_nCircularPoints + 1);
+      double dPhi = phimax / (m_nCircularPoints + 1);
       for (int j = 0; j < m_nCircularPoints; j++) {
         TVector2 v;
         v.SetMagPhi(rmax, (phimax / 2.0 - dPhi * (j + 1)));
@@ -200,7 +197,7 @@ void ARICHAerogelHist::SetUpVerticesMap()
     vecTvec.push_back(v4);
     //Add circular points inner radious
     if (m_nCircularPoints > 0) {
-      dPhi = phimin / (m_nCircularPoints + 1);
+      double dPhi = phimin / (m_nCircularPoints + 1);
       for (int j = 0; j < m_nCircularPoints; j++) {
         TVector2 v;
         v.SetMagPhi(rmin, (-phimax / 2.0 + dPhi * (j + 1)));

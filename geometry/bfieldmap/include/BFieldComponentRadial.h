@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENTRADIAL_H
-#define BFIELDCOMPONENTRADIAL_H
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
@@ -106,7 +105,7 @@ namespace Belle2 {
      * @param srmin minimum radius for the gap in endyoke [cm].
      * @param zyoke minimum Z of endyoke [cm].
      * @param gaph height of the gap in endyoke [cm].
-     * param iront thickness of iron plate in endyoke [cm].
+     * @param iront thickness of iron plate in endyoke [cm].
      */
     void setKlmParameters(double srmin, double zyoke, double gaph, double iront)
     {
@@ -137,5 +136,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENTRADIAL_H */

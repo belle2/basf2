@@ -10,9 +10,6 @@
 
 #pragma once
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 #include <vxd/dataobjects/VxdID.h>
 
 namespace Belle2 {

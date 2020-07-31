@@ -26,17 +26,17 @@ using namespace Belle2;
 REG_MODULE(EKLMTimeCalibrationCollector)
 
 EKLMTimeCalibrationCollectorModule::EKLMTimeCalibrationCollectorModule() :
-  CalibrationCollectorModule()
+  CalibrationCollectorModule(),
+  m_ElementNumbers(&(EKLMElementNumbers::Instance())),
+  m_TransformData(nullptr),
+  m_GeoDat(nullptr),
+  m_ev( {0, 0, 0}),
+      m_Strip(0)
 {
   setDescription("Module for EKLM time calibration (data collection).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("UseEventT0", m_UseEventT0, "Calibrate relatively to event T0.",
            false);
-  m_ev = {0, 0, 0};
-  m_Strip = 0;
-  m_ElementNumbers = &(EKLMElementNumbers::Instance());
-  m_TransformData = nullptr;
-  m_GeoDat = nullptr;
 }
 
 EKLMTimeCalibrationCollectorModule::~EKLMTimeCalibrationCollectorModule()

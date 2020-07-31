@@ -40,12 +40,18 @@ namespace Belle2 {
       /**
        * Get center.
        */
-      const HepGeom::Point3D<double>& getCenter() const;
+      const HepGeom::Point3D<double>& getCenter() const
+      {
+        return m_Center;
+      }
 
       /**
        * Get radius.
        */
-      double getRadius() const;
+      double getRadius() const
+      {
+        return m_Radius;
+      }
 
     protected:
 

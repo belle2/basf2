@@ -68,7 +68,7 @@ void KLMClustersReconstructorModule::beginRun()
 {
 }
 
-static bool compareDistance(KLMHit2d& hit1, KLMHit2d& hit2)
+static bool compareDistance(const KLMHit2d& hit1, const KLMHit2d& hit2)
 {
   return hit1.getPosition().Mag() < hit2.getPosition().Mag();
 }

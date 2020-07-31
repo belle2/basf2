@@ -48,11 +48,10 @@ RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "Raw
 #: Objects which will be kept after the ExpressReconstruction, for example for the Event Display
 PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'SVDClusters', 'PXDClusters',
-                     'CDCHits', 'TOPDigits', 'ARICHHits',
-                     'ECLClusters',
+                     'CDCHits', 'TOPDigits',
+                     'ARICHHits', 'ECLClusters',
                      'BKLMHit1ds', 'BKLMHit2ds',
-                     'EKLMHit1ds', 'EKLMHit2ds',
-                     'SoftwareTriggerResult']
+                     'EKLMHit2ds', 'SoftwareTriggerResult']
 
 #: list of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]
@@ -67,4 +66,4 @@ DEFAULT_HLT_COMPONENTS = ["CDC", "SVD", "ECL", "TOP", "ARICH", "KLM", "TRG"]
 DEFAULT_EXPRESSRECO_COMPONENTS = DEFAULT_HLT_COMPONENTS + ["PXD"]
 
 #: Location of the database in the online system
-DEFAULT_DB_FILE_LOCATION = "/cvmfs/basf2.daqnet.kek.jp/database/database.txt"
+DEFAULT_DB_FILE_LOCATION = "/cvmfs/basf2.daqnet.kek.jp/conditions"

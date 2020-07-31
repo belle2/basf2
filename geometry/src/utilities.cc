@@ -160,7 +160,7 @@ namespace Belle2 {
       void subdivideSegments(const PointList& points, PointList& segments)
       {
         double lastZ = -std::numeric_limits<double>::infinity();
-        for (const ZXPoint p : points) {
+        for (const ZXPoint& p : points) {
           if (p.first < lastZ) {
             B2FATAL("createRotationSolid: Points have to be given with ascending z positions");
           }

@@ -274,7 +274,7 @@ namespace Belle2 {
 
     /**
      * Example of exporting TTS histograms
-     * @param outFilefileName : name of the root file where data will be saved
+     * @param outFileName name of the root file where data will be saved
      */
     void exportPmtTTSHisto(std::string outFileName = "RetrievedHistos.root");
 

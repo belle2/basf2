@@ -92,7 +92,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMStripEfficiencyCollectorModule();
+    ~KLMStripEfficiencyCollectorModule();
 
     /**
      * Initializer.
@@ -123,9 +123,9 @@ namespace Belle2 {
 
     /**
      * Add hit to map.
-     * @param[in] hitMap  Hit map.
-     * @param[in] plane   Plane number.
-     * @param[in] hitData Hit data.
+     * @param[in] hitMap      Hit map.
+     * @param[in] planeGlobal Plane global number.
+     * @param[in] hitData     Hit data.
      */
     void addHit(std::map<uint16_t, struct HitData>& hitMap,
                 uint16_t planeGlobal, struct HitData* hitData);

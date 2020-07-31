@@ -63,6 +63,8 @@ namespace Belle2 {
      *  @param pValue        p-value of the corresponding track fit.
      *  @param bField        Magnetic field to be used for the calculation of the curvature;
                              It is assumed, that the B-field is parallel to the z-Axis.
+     *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
+     *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
      */
     TrackFitResult(const TVector3& position, const TVector3& momentum,
                    const TMatrixDSym& covariance, const short int charge,
@@ -78,6 +80,8 @@ namespace Belle2 {
      *  @param cov5          Covariance matrix of the helix paramters of the track; @sa m_cov5
      *  @param particleType  Particle Type used for the mass hypothesis of the fit.
      *  @param pValue        p-value of the corresponding track fit.
+     *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
+     *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
      */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                    const Const::ParticleType& particleType, const float pValue,
@@ -134,7 +138,7 @@ namespace Belle2 {
 
     /** Return track charge (1 or -1).
      *
-     *  @TODO For very small values, we might be unsure and return zero.
+     *  @todo For very small values, we might be unsure and return zero.
      */
     short getChargeSign() const { return (getOmega() > 0) - (getOmega() < 0); }
 

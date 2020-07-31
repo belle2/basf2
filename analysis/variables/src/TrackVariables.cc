@@ -107,6 +107,15 @@ namespace Belle2 {
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
     }
 
+    double trackFirstCDCLayer(const Particle* part)
+    {
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getHitPatternCDC().getFirstLayer();
+    }
+
     double trackLastCDCLayer(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
@@ -235,7 +244,7 @@ namespace Belle2 {
     {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) {
-        return -1;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
       return trackFit->getPValue();
@@ -496,6 +505,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
     REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
+    REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,     "First activated CDC layer associated to the track");
     REGISTER_VARIABLE("lastCDCLayer", trackLastCDCLayer, "Last CDC layer associated to the track");
     REGISTER_VARIABLE("d0",        trackD0,        "Signed distance to the POCA in the r-phi plane");
     REGISTER_VARIABLE("phi0",      trackPhi0,      "Angle of the transverse momentum in the r-phi plane");

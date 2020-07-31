@@ -47,34 +47,52 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMUnpackerModule();
+    ~KLMUnpackerModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
+
+    /**
+     * Create KLM digit.
+     * @param[in] raw               Raw data.
+     * @param[in] klmDigitRaw       Raw digit.
+     * @param[in] klmDigitEventInfo Event information.
+     * @param[in] subdetector       Subdetector.
+     * @param[in] section           Section.
+     * @param[in] sector            Sector.
+     * @param[in] layer             Layer.
+     * @param[in] plane             Plane.
+     * @param[in] strip             Strip.
+     * @param[in] lastStrip         Last strip (for multiple-strip hits).
+     */
+    void createDigit(
+      const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
+      KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
+      int sector, int layer, int plane, int strip, int lastStrip);
 
     /**
      * Unpack KLM digit.

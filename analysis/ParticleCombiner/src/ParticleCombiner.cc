@@ -545,7 +545,7 @@ namespace Belle2 {
         //
         // auto cluster = p->getECLCluster();
         // if (cluster) { // then do stuff
-        if (p->getParticleType() == Particle::EParticleType::c_ECLCluster) {
+        if (p->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster) {
           nECLSource++;
           auto* cluster = p->getECLCluster();
           connectedregions.push_back(cluster->getConnectedRegionId());

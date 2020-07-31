@@ -22,36 +22,30 @@
 #include <simulation/kernel/StackingAction.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <simulation/monopoles/G4MonopolePhysics.h>
+#include <simulation/longlivedneutral/G4LongLivedNeutralPhysics.h>
 
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
-#include <G4VUserPhysicsList.hh>
 #include <G4PhysListFactory.hh>
 #include <G4ProcessVector.hh>
 #include <G4OpticalPhysics.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTable.hh>
-#include <G4DecayTable.hh>
 #include <G4EventManager.hh>
 #include <G4RunManager.hh>
 #include <G4UImanager.hh>
-#include <G4UIExecutive.hh>
 #include <G4VisExecutive.hh>
 #include <G4StepLimiter.hh>
 #include <G4EmParameters.hh>
 #include <G4HadronicProcessStore.hh>
-#include <G4CascadeChannelTables.hh>
-#include <G4CascadeChannel.hh>
 #include <G4InuclParticleNames.hh>
 
 #include <G4Mag_UsualEqRhs.hh>
@@ -94,7 +88,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            0);
   addParam("HadronProcessVerbosity", m_hadronProcessVerbosity, "Hadron Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
   addParam("EmProcessVerbosity", m_emProcessVerbosity, "Em Process verbosity: 0=Silent; 1=info level; 2=debug level", 0);
-  addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("FTFP_BERT"));
+  addParam("PhysicsList", m_physicsList, "The name of the physics list which is used for the simulation.", string("Belle2"));
   addParam("StandardEM", m_standardEM, "If true, replaces fast EM physics with standard EM physics.", false);
   addParam("RegisterOptics", m_optics, "If true, G4OpticalPhysics is registered in Geant4 PhysicsList.", true);
   addParam("UseHighPrecisionNeutrons", m_HPneutrons, "If true, high precision neutron models used below 20 MeV.", false);
@@ -137,7 +131,6 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            0.0);
   addParam("deltaChordInMagneticField", m_deltaChordInMagneticField,
            "[mm] The maximum miss-distance between the trajectory curve and its linear cord(s) approximation", 0.25);
-
   vector<string> defaultCommandsAtPreInit;
   addParam("UICommandsAtPreInit", m_uiCommandsAtPreInit,
            "A list of Geant4 UI commands that should be applied at PreInit state, before the simulation starts.",
@@ -146,13 +139,14 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
   addParam("UICommandsAtIdle", m_uiCommandsAtIdle,
            "A list of Geant4 UI commands that should be applied at Idle state, before the simulation starts.",
            defaultCommandsAtIdle);
-
-
   addParam("trajectoryStore", m_trajectoryStore,
            "If non-zero save the full trajectory of 1=primary, 2=non-optical or 3=all particles", 0);
   addParam("trajectoryDistanceTolerance", m_trajectoryDistanceTolerance,
            "Maximum deviation from the real trajectory points when merging "
            "segments (in cm)", 5e-4);
+  vector<float> defaultAbsorbers;
+  addParam("AbsorbersRadii", m_absorbers,
+           "Radii (in cm) of absorbers across which tracks will be destroyed.", defaultAbsorbers);
 
   //Make sure the instance of the run manager is created now to initialize some stuff we need for geometry
   RunManager::Instance();
@@ -218,6 +212,7 @@ void FullSimModule::initialize()
     physicsList->SetARICHTOPProductionCutValue(m_arichtopProductionCut);
     physicsList->SetECLProductionCutValue(m_eclProductionCut);
     physicsList->SetKLMProductionCutValue(m_klmProductionCut);
+    physicsList->UseLongLivedNeutralParticles();
 
     //Apply the Geant4 UI commands in PreInit State - before initialization
     if (m_uiCommandsAtPreInit.size() > 0) {
@@ -240,6 +235,9 @@ void FullSimModule::initialize()
     if (m_monopoles) {
       physicsList->RegisterPhysics(new G4MonopolePhysics(m_monopoleMagneticCharge));
     }
+
+    physicsList->RegisterPhysics(new G4LongLivedNeutralPhysics());
+
     physicsList->SetDefaultCutValue((m_productionCut / Unit::mm) * CLHEP::mm);  // default is 0.7 mm
 
     //Apply the Geant4 UI commands in PreInit State - before initialization
@@ -327,6 +325,10 @@ void FullSimModule::initialize()
   //Add the stepping action which provides additional security checks
   SteppingAction* steppingAction = new SteppingAction();
   steppingAction->setMaxNumberSteps(m_maxNumberSteps);
+  steppingAction->setAbsorbersR(m_absorbers);
+  for (auto& rAbsorber : m_absorbers) {
+    B2INFO("An absorber found at R = " << rAbsorber << " cm");
+  }
   runManager.SetUserAction(steppingAction);
 
   //Add the stacking action which provides performance speed ups for the handling of optical photons
@@ -347,7 +349,8 @@ void FullSimModule::initialize()
   while ((*partIter)()) {
     G4ParticleDefinition* currParticle = partIter->value();
     G4ProcessVector& currProcList = *currParticle->GetProcessManager()->GetProcessList();
-    for (int iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
+    assert(currProcList.size() < INT_MAX);
+    for (int iProcess = 0; iProcess < static_cast<int>(currProcList.size()); ++iProcess) {
       G4Transportation* transport = dynamic_cast<G4Transportation*>(currProcList[iProcess]);
       if (transport != nullptr) {
         //Geant4 energy unit is MeV
@@ -374,7 +377,8 @@ void FullSimModule::initialize()
       G4ProcessManager* processManager = currParticle->GetProcessManager();
       if (processManager) {
         G4ProcessVector* processList = processManager->GetProcessList();
-        for (int i = 0; i < processList->size(); ++i) {
+        assert(processList->size() < INT_MAX);
+        for (int i = 0; i < static_cast<int>(processList->size()); ++i) {
           if (((*processList)[i]->GetProcessName() == "Cerenkov") ||
               ((*processList)[i]->GetProcessName() == "Scintillation") ||
               ((*processList)[i]->GetProcessName() == "hFritiofCaptureAtRest")) {

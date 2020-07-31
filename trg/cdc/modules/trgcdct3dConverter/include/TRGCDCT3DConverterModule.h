@@ -14,16 +14,11 @@
 #ifndef TRGCDCT3DCONVERTER_H
 #define TRGCDCT3DCONVERTER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
 #include <vector>
-
-#include "rawdata/dataobjects/RawTRG.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include "trg/cdc/dataobjects/TRGCDCT3DUnpackerStore.h"
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>

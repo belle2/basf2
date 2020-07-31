@@ -14,14 +14,12 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
 #include <map>
 #include "TFile.h"
 #include "TTree.h"
 #include <framework/dataobjects/EventMetaData.h>
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
-#include "mdst/dataobjects/MCParticle.h"
 #include "cdc/dataobjects/CDCHit.h"
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "cdc/geometry/CDCGeometryPar.h"

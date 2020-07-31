@@ -37,7 +37,7 @@ namespace Belle2 {
 
       double V = fabs(x);
       double H = 0;
-      double Y = 0;
+      double Y;
 
       if (V < HF) {
         Y = V * V;

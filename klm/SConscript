@@ -6,7 +6,7 @@ env['LIBS'] = ['klm_dataobjects', 'klm_dbobjects',
                'framework',
                'geometry',
                'mdst_dataobjects',
-               'simulation',
+               'simulation', 'simulation_dataobjects',
                '$ROOT_LIBS']
 
 Return('env')

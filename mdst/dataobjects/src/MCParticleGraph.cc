@@ -32,8 +32,8 @@ struct cycle_detector : public dfs_visitor<> {
    * This method is invoked on back edges in the graph.
    * If a back edge is found, it means a cyclic reference was found and therefore
    * an exception of type MCParticleGraph::CyclicReferenceError() is thrown.
-   * @param Edge The edge of the graph.
-   * @param Graph Reference to the graph itself.
+   * @tparam Edge The edge of the graph.
+   * @tparam Graph Reference to the graph itself.
    */
   template <class Edge, class Graph> void back_edge(Edge, Graph&) { throw MCParticleGraph::CyclicReferenceError(); }
 };
@@ -179,7 +179,7 @@ public:
    * @param m Reference to the mother particle whose vertex and time information should be set.
    * @param d Reference to the daughter particle.
    */
-  void setVertexTime(MCParticleGraph::GraphParticle& m, MCParticleGraph::GraphParticle& d)
+  void setVertexTime(MCParticleGraph::GraphParticle& m, const MCParticleGraph::GraphParticle& d)
   {
     //Only set vertex information if both particles have a valid vertex set
     m.setValidVertex(m.hasValidVertex() &&  d.hasValidVertex());
@@ -260,7 +260,7 @@ void MCParticleGraph::loadList(const string& name)
     newParticle = oldParticle;
     //If this particle has a mother we just add the decay to this mother
     const MCParticle* oldMother = oldParticle.getMother();
-    if (oldMother != NULL) {
+    if (oldMother != nullptr) {
       unsigned motherIndex  = oldMother->getArrayIndex() + particleOffset;
       if (motherIndex >= size())
         B2FATAL("MCParticle collection \"" << name << "\" not sorted correctly: mother index larger than daughter. Cannot load into Graph");

@@ -29,8 +29,8 @@ double TrackFilterModule::m_min_Pval = 0;
 
 bool TrackFilterModule::m_saveControlNtuples = true;
 
-TNtuple* TrackFilterModule::m_selectedNtpl = NULL;
-TNtuple* TrackFilterModule::m_rejectedNtpl = NULL;
+TNtuple* TrackFilterModule::m_selectedNtpl = nullptr;
+TNtuple* TrackFilterModule::m_rejectedNtpl = nullptr;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -131,7 +131,7 @@ bool TrackFilterModule::isSelected(const Track* track)
   int pionCode = 211;
 
   const TrackFitResult*  tfr = track->getTrackFitResult(Const::ChargedStable(pionCode));
-  if (tfr == NULL)
+  if (tfr == nullptr)
     return false;
 
   if (tfr->getD0() < m_min_d0 || tfr->getD0() > m_max_d0)

@@ -3,8 +3,7 @@
 /* Nanae Taniguchi 2019.02.17 */
 /* Junhao Yin 2019.11 */
 
-#ifndef CDCDQM7MODULE_H
-#define CDCDQM7MODULE_H
+#pragma once
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRawHit.h>
@@ -80,4 +79,3 @@ namespace Belle2 {
 
   };
 }
-#endif

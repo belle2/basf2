@@ -48,11 +48,10 @@ RAWDATA_OBJECTS = ["RawCDCs", "RawSVDs", "RawPXDs", "RawTOPs", "RawARICHs", "Raw
 #: Objects which will be kept after the ExpressReconstruction, for example for the Event Display
 PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'SVDClusters', 'PXDClusters',
-                     'CDCHits', 'TOPDigits', 'ARICHHits',
-                     'ECLClusters',
+                     'CDCHits', 'TOPDigits',
+                     'ARICHHits', 'ECLClusters',
                      'BKLMHit1ds', 'BKLMHit2ds',
-                     'EKLMHit1ds', 'EKLMHit2ds',
-                     'SoftwareTriggerResult']
+                     'EKLMHit2ds', 'SoftwareTriggerResult']
 
 #: list of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData"]

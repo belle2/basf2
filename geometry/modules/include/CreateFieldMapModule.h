@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef GEOMETRY_MODULES_CREATEFIELDMAPMODULE_H
-#define GEOMETRY_MODULES_CREATEFIELDMAPMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -69,5 +67,3 @@ namespace Belle2 {
     bool m_createTree{false};
   };
 }
-
-#endif /* GEOMETRY_MODULES_CREATEFIELDMAPMODULE_H */

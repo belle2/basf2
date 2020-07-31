@@ -30,6 +30,9 @@ CHANGES since release-01-00-04:
   * getTimTypeBits is replaced by getTimType
 - SoftwareTriggerResult:
   * non-prescaled results added
+- Particle masses:
+  * The particle masses have been updated to PDG 2020. As a result, the
+    energies corresponding to the measured momenta became slightly different.
 """
 
 from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging

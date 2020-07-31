@@ -62,7 +62,7 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   m_vxdID = clusters[0]->getSensorID();
 
   //We need some handle to translate IDs to local and global coordinates.
-  if (aSensorInfo == NULL) {
+  if (aSensorInfo == nullptr) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_vxdID);
   }
 
@@ -74,7 +74,7 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   double uSigma = -1; // negative sigmas are not possible, setting to -1 for catching cases of missing Cluster
   double vSigma = -1; // negative sigmas are not possible, setting to -1 for catching cases of missing Cluster
 
-  const SVDCluster* vCluster(NULL), *uCluster(NULL);
+  const SVDCluster* vCluster(nullptr), *uCluster(nullptr);
   for (const SVDCluster* aCluster : clusters) {
     if (aCluster->isUCluster() == true) {
       m_clustersAssigned.first = true;
@@ -90,7 +90,7 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   }
 
   if (aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth() &&
-      vCluster != NULL && uCluster != NULL) // is a WedgeSensor and we do have a vCluster
+      vCluster != nullptr && uCluster != nullptr) // is a WedgeSensor and we do have a vCluster
     uCoord = uCluster->getPosition(vCoord);
 
   // the second parameter set to true results in alignment constants being applied
@@ -155,7 +155,7 @@ std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
-  if (aSensorInfo == NULL) {
+  if (aSensorInfo == nullptr) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 
@@ -184,7 +184,7 @@ std::pair<double, double> SpacePoint::convertNormalizedToLocalCoordinates(
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
-  if (aSensorInfo == NULL) {
+  if (aSensorInfo == nullptr) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 
@@ -208,7 +208,7 @@ B2Vector3<double> SpacePoint::getGlobalCoordinates(std::pair<double, double> con
                                                    VXD::SensorInfoBase const* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global coordinates.
-  if (aSensorInfo == NULL) {
+  if (aSensorInfo == nullptr) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 

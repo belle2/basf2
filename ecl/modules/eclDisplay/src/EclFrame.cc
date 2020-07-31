@@ -497,7 +497,7 @@ void EclFrame::updateInfo(int event, int px, int py, TObject*)
   if (event == 11) {
     EclPainter* new_painter = m_ecl_painter->handleClick(px, py);
 
-    if (new_painter != NULL) {
+    if (new_painter != nullptr) {
       delete m_ecl_painter;
       m_ecl_painter = new_painter;
       doDraw();

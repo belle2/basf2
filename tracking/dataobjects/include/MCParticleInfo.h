@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCPARTICLEINFO_H_
-#define MCPARTICLEINFO_H_
+#pragma once
 
 #include <TVector3.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -80,5 +79,3 @@ namespace Belle2 {
     double m_charge;
   };
 }
-
-#endif /* MCPARTICLEINFO_H_ */

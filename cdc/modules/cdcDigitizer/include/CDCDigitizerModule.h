@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDIGITIZER_H
-#define CDCDIGITIZER_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -73,12 +72,7 @@ namespace Belle2 {
     /** Method used to smear the drift length.
      *
      *  @param driftLength The value of drift length.
-     *  @param fraction Fraction of the first Gaussian used to smear drift length.
-     *  @param mean1 Mean value of the first Gassian used to smear drift length.
-     *  @param resolution1 Resolution of the first Gassian used to smear drift length.
-     *  @param mean2 Mean value of the second Gassian used to smear drift length.
-     *  @param resolution2 Resolution of the second Gassian used to smear drift length.
-     *
+     *  @param dDdt        dD/dt (drift velocity).
      *  @return Drift length after smearing.
      */
     double smearDriftLength(double driftLength, double dDdt);
@@ -254,5 +248,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCDIGITIZER_H

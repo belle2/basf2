@@ -249,7 +249,7 @@ void CDCPackerModule::event()
                              rawcprpacker_info);
 
     for (int j = 0; j < 4; j++) {
-      if (buf[j] != NULL) delete [] buf[j];
+      if (buf[j] != nullptr) delete [] buf[j];
     }
   }
   m_event++;

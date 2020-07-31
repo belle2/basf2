@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REALISTICCDCGEOMETRYTRANSLATOR_H_
-#define REALISTICCDCGEOMETRYTRANSLATOR_H_
+#pragma once
 
 #include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -65,4 +64,3 @@ namespace Belle2 {
     };
   }
 }
-#endif /* REALISTICCDCGEOMETRYTRANSLATOR_H */

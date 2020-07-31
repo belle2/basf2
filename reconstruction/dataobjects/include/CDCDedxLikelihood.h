@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXLIKELIHOOD_H
-#define CDCDEDXLIKELIHOOD_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
@@ -56,4 +55,3 @@ namespace Belle2 {
     ClassDef(CDCDedxLikelihood, 1); /**< Container for likelihoods obtained by the CDC dE/dx PID (CDCDedxPIDModule). */
   };
 }
-#endif

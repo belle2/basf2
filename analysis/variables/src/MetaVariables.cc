@@ -2919,7 +2919,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. ``matchedMC(p)`` returns the total momentum of the related MCParticle.\n"
                       "Returns NaN if no matched MCParticle exists.");
-    REGISTER_VARIABLE("countInList(particleList, cut='')", countInList,
+    REGISTER_VARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"

@@ -172,7 +172,6 @@ if __name__ == "__main__":
                 match = match and (d1.getCellID() == d2.getCellID())
                 for s1, s2 in zip(d1.getSamples(), d2.getSamples()):
                     match = match and (int(s1) == int(s2))
-                match = match and (d1.getModeByte() == d2.getModeByte())
                 if not match:
                     print(d1.toString())
                     print(d2.toString())

@@ -45,6 +45,7 @@ namespace Belle2 {
       /** Add a new entry to the list of sensor misalignments.
        * This method will manually add a new (VxdID, Transform3D) pair
        * to the list.
+       * @param sensorID Sensor identifier.
        * @param misalignment 3D transform to add to the list of sensor misalignments.
        */
       void addMisalignment(Belle2::VxdID sensorID, const TGeoHMatrix& misalignment)
@@ -64,7 +65,7 @@ namespace Belle2 {
 
       /** Return misalignment shift for a VXDTrueHit.
        * This is the principal misalignment method, used to misalign TrueHits or Clusters (via relation to their TrueHits.
-       * @param truehit pointer to the TrueHit to misalign
+       * @param hit pointer to the TrueHit to misalign
        * @return std::pair<double, double> of misalignment shifts
        **/
       MisalignmentShiftType getMisalignmentShift(const VXDTrueHit* hit);

@@ -469,7 +469,7 @@ void SVDClusterEvaluationTrueInfoModule::endRun()
   //WRITE HISTOS AND GRAPHS//
   ///////////////////////////
 
-  if (m_outputFile != NULL) {
+  if (m_outputFile != nullptr) {
     m_outputFile->cd();
 
     TDirectory* oldDir = gDirectory;

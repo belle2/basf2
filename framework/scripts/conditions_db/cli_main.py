@@ -829,7 +829,7 @@ def command_dump(args, db):
             name, globaltag, exp, run = args.valid
             payload = None
             for p in db.get_all_iovs(globaltag, exp, run, f", name={name}"):
-                if p.name == name and payload is None or p.revision > payload.revision:
+                if p.name == name and (payload is None or p.revision > payload.revision):
                     payload = p
 
             if payload is None:

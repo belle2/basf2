@@ -433,7 +433,7 @@ void TrackingPerformanceEvaluationModule::event()
 
       const TrackFitResult* fitResult = Tracks_fromMCParticle[trk]->getTrackFitResult(Const::ChargedStable(m_ParticleHypothesis));
 
-      if ((fitResult == NULL) || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis)))
+      if ((fitResult == nullptr) || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis)))
         B2WARNING(" the TrackFitResult is not found!");
 
       else { // valid TrackFitResult found
@@ -496,7 +496,7 @@ void TrackingPerformanceEvaluationModule::event()
     //check if the track has been fitted
     const TrackFitResult* fitResult = track.getTrackFitResult(Const::ChargedStable(m_ParticleHypothesis));
 
-    if ((fitResult == NULL) || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis)))
+    if ((fitResult == nullptr) || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis)))
       continue;
 
     m_h1_pValue->Fill(fitResult->getPValue());
@@ -682,7 +682,7 @@ void TrackingPerformanceEvaluationModule::terminate()
 
   addPurityPlots(m_histoList, m_h3_MCParticlesPerTrack, m_h3_Tracks);
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;
@@ -845,7 +845,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
   double pt = -999;
 
 
-  if ((fitResult != NULL)
+  if ((fitResult != nullptr)
       || (fitResult->getParticleType() != Const::ChargedStable(m_ParticleHypothesis))) { // valid TrackFitResult found
     d0_err = sqrt((fitResult->getCovariance5())[0][0]);
     z0_err = sqrt((fitResult->getCovariance5())[3][3]);
@@ -991,7 +991,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
     }
   }
 
-  if ((fitResult != NULL) && (fitResult->getParticleType() == Const::ChargedStable(m_ParticleHypothesis))) {
+  if ((fitResult != nullptr) && (fitResult->getParticleType() == Const::ChargedStable(m_ParticleHypothesis))) {
     if (hasPXDhit) {
       m_h2_d0errVSpt_wpxd->Fill(pt, d0_err);
       m_h2_z0errVSpt_wpxd->Fill(pt, z0_err);

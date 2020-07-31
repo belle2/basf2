@@ -10,7 +10,7 @@
  * out of time digits above a certain energy threshold.                   *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *               Chris Hearty (hearty@physics.ubc.ca) (CH)                *
  *               Ewan Hill (ehill@mail.ubc.ca)                            *
  *                                                                        *

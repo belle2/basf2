@@ -17,6 +17,12 @@ Variables
  * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
  * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
  * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
+ * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection, 
+   collections of ROE and recoil variables have been expanded
+ * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them. A few
+   binary PID variables have been added to the PID variable collection.
+
+   .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
 
 Modules
 +++++++
@@ -27,3 +33,8 @@ Modules
    beamspot is added.
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
+
+Full Event Interpretation
++++++++++++++++++++++++++
+
+* Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in `fei.get_default_channels()`.

@@ -92,7 +92,7 @@ namespace Belle2 {
 
     /**
      * Get t0 for the specified wire
-     * @param  wire id.
+     * @param  wid Wire id.
      * @return t0 for the wire
      */
     float getT0(const WireID& wid) const

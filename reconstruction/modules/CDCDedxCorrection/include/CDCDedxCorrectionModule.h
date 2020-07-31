@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXCORRECTIONMODULE_H
-#define CDCDEDXCORRECTIONMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -141,4 +140,3 @@ namespace Belle2 {
 
   };
 } // Belle2 namespace
-#endif

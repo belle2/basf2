@@ -103,7 +103,7 @@ namespace Belle2 {
 
   void ParticleWeightingLookUpCreatorModule::terminate()
   {
-    if (lims != NULL) {
+    if (lims != nullptr) {
       delete lims;
     }
   }

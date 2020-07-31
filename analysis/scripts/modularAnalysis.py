@@ -2503,7 +2503,7 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildEventKinematics(inputListNames=[], default_cleanup=True,
+def buildEventKinematics(inputListNames=[], default_cleanup=True, custom_cuts=None,
                          chargedPIDPriors=None, fillWithMostLikely=False, path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
@@ -2522,6 +2522,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
     @param default_cleanup    if True and either inputListNames empty or fillWithMostLikely True, default clean up cuts are applied
+    @param custom_cuts        tuple of selection cut strings of form (trackCuts, photonCuts), default is None,
+                              which would result in a standard predefined selection cuts
     @param path               modules are added to this path
     """
     trackCuts = 'pt > 0.1'
@@ -2531,6 +2533,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 
     gammaCuts = 'E > 0.05'
     gammaCuts += ' and thetaInCDCAcceptance'
+    if (custom_cuts is not None):
+        trackCuts, gammaCuts = custom_cuts
 
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
@@ -2567,6 +2571,7 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 
 def buildEventShape(inputListNames=[],
                     default_cleanup=True,
+                    custom_cuts=None,
                     allMoments=False,
                     cleoCones=True,
                     collisionAxis=True,
@@ -2608,6 +2613,8 @@ def buildEventShape(inputListNames=[],
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.
+    @param custom_cuts        tuple of selection cut strings of form (trackCuts, photonCuts), default is None,
+                              which would result in a standard predefined selection cuts
     @param path               Path to append the eventShape modules to.
     @param thrust             Enables the calculation of thrust-related quantities (CLEO
                               cones, Harmonic moments, jets).
@@ -2627,6 +2634,16 @@ def buildEventShape(inputListNames=[],
                               is quite time consuming, instead of using it consider sanitizing
                               the lists you are passing to the function.
     """
+    trackCuts = 'pt > 0.1'
+    trackCuts += ' and thetaInCDCAcceptance'
+    trackCuts += ' and abs(dz) < 3.0'
+    trackCuts += ' and dr < 0.5'
+
+    gammaCuts = 'E > 0.05'
+    gammaCuts += ' and thetaInCDCAcceptance'
+    if (custom_cuts is not None):
+        trackCuts, gammaCuts = custom_cuts
+
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)
@@ -2635,14 +2652,8 @@ def buildEventShape(inputListNames=[],
 
         if default_cleanup:
             B2INFO("Applying standard cuts")
-            trackCuts = 'pt > 0.1'
-            trackCuts += ' and thetaInCDCAcceptance'
-            trackCuts += ' and abs(dz) < 3.0'
-            trackCuts += ' and dr < 0.5'
             applyCuts('pi+:evtshape', trackCuts, path=path)
 
-            gammaCuts = 'E > 0.05'
-            gammaCuts += ' and thetaInCDCAcceptance'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
             B2WARNING("Creating the default lists with no cleanup.")

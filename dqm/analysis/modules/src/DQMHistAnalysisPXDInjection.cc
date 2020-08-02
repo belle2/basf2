@@ -89,6 +89,7 @@ void DQMHistAnalysisPXDInjectionModule::beginRun()
 void DQMHistAnalysisPXDInjectionModule::event()
 {
   TH1* Triggers = nullptr;
+  // cppcheck-suppress unreadVariable
   TString locationHits = "";
   TString locationTriggers = "PXDEOccInjLER";
   if (m_histogramDirectoryName != "") {

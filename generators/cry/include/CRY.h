@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CRY_H
-#define CRY_H
+#pragma once
 
 #include "cry/CRYGenerator.h"
 #include "cry/CRYSetup.h"
@@ -214,4 +213,3 @@ namespace Belle2 {
 
   };
 } // end namespace Belle2
-#endif /* CRY_H */

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <daq/hbasf2/apps/ZMQApp.h>
+#include <fstream>
 #include <nlohmann/json.hpp>
 
 namespace Belle2 {

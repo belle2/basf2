@@ -451,7 +451,7 @@ namespace {
     // unless any of the classes we store get modified or the ROOT version
     // changes in which case we have to check this again
 
-    TFile file("testPayloads/dbstore_EventDependency_rev_9e708d.root");
+    TFile file("testPayloads/dbstore_EventDependency_rev_cfd2d3.root");
     auto evdep = (EventDependency*) file.Get("EventDependency");
 
     auto beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
@@ -468,7 +468,7 @@ namespace {
 
     file.Close();
 
-    TFile file2("testPayloads/dbstore_BeamSpot_rev_40831a.root");
+    TFile file2("testPayloads/dbstore_BeamSpot_rev_a5e02d.root");
     auto beam2 = (BeamSpot*) file2.Get("BeamSpot");
     beam2->getIPPosition().Print();
     EXPECT_EQ(beam2->getIPPosition()[0], 3.);

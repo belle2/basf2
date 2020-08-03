@@ -24,9 +24,6 @@ for fsp in fsps:
     # updated respectively.
     testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')])
 
-# Particle to call variables on:
-signal_list = 'mu-'
-testpath.add_module('ParticleLoader', decayStringsWithCuts=[(signal_list, 'mdstIndex == 0')])
 # Variables created by event kinematics module
 event_kinematics = [
     "missingMomentumOfEvent",
@@ -47,6 +44,6 @@ event_kinematics = [
 
 testpath.add_module('EventKinematics', particleLists=fsps)
 # Print the variables to log
-testpath.add_module('ParticlePrinter', listName=signal_list, fullPrint=False,
+testpath.add_module('ParticlePrinter', listName='', fullPrint=False,
                     variables=event_kinematics)
 process(testpath, 1)

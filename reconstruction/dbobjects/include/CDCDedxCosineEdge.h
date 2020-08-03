@@ -143,7 +143,7 @@ namespace Belle2 {
         return -99.0;
       }
 
-      if (temp.size() <= 0)return -99.0;
+      if (temp.size() == 0)return -99.0;
       double bw = abs(coshigh - coslow) / temp.size();
       double bc = coslow  + (0.5 + ibin) * bw; //bin centre
       std::cout << "Par # " << ibin << ", costh bin centre = " << bc << ", const =" << temp[ibin] << std::endl;
@@ -169,7 +169,7 @@ namespace Belle2 {
         return;
       }
 
-      if (temp.size() <= 0)return;
+      if (temp.size() == 0)return;
       double bw = abs(coshigh - coslow) / temp.size();
       B2INFO("Printing parameters (0=backward and 1=forward): " << side << ", nPars = " << temp.size());
       for (unsigned int ibin = 0; ibin < temp.size(); ibin++) {

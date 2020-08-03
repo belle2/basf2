@@ -227,6 +227,7 @@ void DQMHistAnalysisIPModule::terminate()
 {
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
+    // cppcheck-suppress knownConditionTrueFalse
     if (m_parameters > 0) {
       for (auto i = 0; i < m_parameters; i++) {
         if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");

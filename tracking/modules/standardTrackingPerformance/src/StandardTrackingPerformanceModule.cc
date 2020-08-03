@@ -38,7 +38,7 @@ using namespace Belle2;
 REG_MODULE(StandardTrackingPerformance)
 
 StandardTrackingPerformanceModule::StandardTrackingPerformanceModule() :
-  Module(), m_outputFile(NULL), m_dataTree(NULL), m_trackProperties(-999),  m_pValue(-999),
+  Module(), m_outputFile(nullptr), m_dataTree(nullptr), m_trackProperties(-999),  m_pValue(-999),
   m_nGeneratedChargedStableMcParticles(-999), m_nReconstructedChargedStableTracks(-999),
   m_nFittedChargedStabletracks(-999)
 {
@@ -214,7 +214,7 @@ bool StandardTrackingPerformanceModule::isChargedStable(const MCParticle& mcPart
 
 void StandardTrackingPerformanceModule::setupTree()
 {
-  if (m_dataTree == NULL) {
+  if (m_dataTree == nullptr) {
     B2FATAL("Data tree was not created.");
   }
 
@@ -260,14 +260,14 @@ void StandardTrackingPerformanceModule::setupTree()
 
 void StandardTrackingPerformanceModule::writeData()
 {
-  if (m_dataTree != NULL) {
+  if (m_dataTree != nullptr) {
     TDirectory* oldDir = gDirectory;
     if (m_outputFile)
       m_outputFile->cd();
     m_dataTree->Write();
     oldDir->cd();
   }
-  if (m_outputFile != NULL) {
+  if (m_outputFile != nullptr) {
     m_outputFile->Close();
   }
 }
@@ -297,7 +297,6 @@ bool StandardTrackingPerformanceModule::isSignalDecay(const MCParticle& mcPartic
   daughterMcParticles = removeFinalStateRadiation(daughterMcParticles);
 
   for (auto daughterMCParticle : daughterMcParticles) {
-    // cppcheck-suppress useStlAlgorithm
     daughterPDGs.push_back(daughterMCParticle->getPDG());
   }
 

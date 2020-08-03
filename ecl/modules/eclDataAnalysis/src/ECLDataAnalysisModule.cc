@@ -483,7 +483,7 @@ void ECLDataAnalysisModule::initialize()
   if (m_writeToRoot == true) {
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
   } else
-    m_rootFilePtr = NULL;
+    m_rootFilePtr = nullptr;
 
   // initialize tree
   m_tree     = new TTree("m_tree", "ECL Analysis tree");
@@ -2157,10 +2157,10 @@ void ECLDataAnalysisModule::event()
       m_eclShowerToMC1->push_back(idx[0]);
       MCParticle* amcParticle = m_mcParticles[idx[0]];
       m_eclShowerToMC1PDG->push_back(amcParticle->getPDG());
-      if (amcParticle->getMother() != NULL) {
+      if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC1Moth->push_back(amcParticle->getMother()->getIndex());
         m_eclShowerToMC1MothPDG->push_back(amcParticle->getMother()->getPDG());
-        if (amcParticle->getMother()->getMother() != NULL) {
+        if (amcParticle->getMother()->getMother() != nullptr) {
           m_eclShowerToMC1GMoth->push_back(amcParticle->getMother()->getMother()->getIndex());
           m_eclShowerToMC1GMothPDG->push_back(amcParticle->getMother()->getMother()->getPDG());
         } else {
@@ -2187,10 +2187,10 @@ void ECLDataAnalysisModule::event()
       m_eclShowerToMC2->push_back(idx[1]);
       MCParticle* amcParticle = m_mcParticles[idx[1]];
       m_eclShowerToMC2PDG->push_back(amcParticle->getPDG());
-      if (amcParticle->getMother() != NULL) {
+      if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC2Moth->push_back(amcParticle->getMother()->getIndex());
         m_eclShowerToMC2MothPDG->push_back(amcParticle->getMother()->getPDG());
-        if (amcParticle->getMother()->getMother() != NULL) {
+        if (amcParticle->getMother()->getMother() != nullptr) {
           m_eclShowerToMC2GMoth->push_back(amcParticle->getMother()->getMother()->getIndex());
           m_eclShowerToMC2GMothPDG->push_back(amcParticle->getMother()->getMother()->getPDG());
         } else {
@@ -2217,10 +2217,10 @@ void ECLDataAnalysisModule::event()
       m_eclShowerToMC3->push_back(idx[2]);
       MCParticle* amcParticle = m_mcParticles[idx[2]];
       m_eclShowerToMC3PDG->push_back(amcParticle->getPDG());
-      if (amcParticle->getMother() != NULL) {
+      if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC3Moth->push_back(amcParticle->getMother()->getIndex());
         m_eclShowerToMC3MothPDG->push_back(amcParticle->getMother()->getPDG());
-        if (amcParticle->getMother()->getMother() != NULL) {
+        if (amcParticle->getMother()->getMother() != nullptr) {
           m_eclShowerToMC3GMoth->push_back(amcParticle->getMother()->getMother()->getIndex());
           m_eclShowerToMC3GMothPDG->push_back(amcParticle->getMother()->getMother()->getPDG());
         } else {
@@ -2247,10 +2247,10 @@ void ECLDataAnalysisModule::event()
       m_eclShowerToMC4->push_back(idx[3]);
       MCParticle* amcParticle = m_mcParticles[idx[3]];
       m_eclShowerToMC4PDG->push_back(amcParticle->getPDG());
-      if (amcParticle->getMother() != NULL) {
+      if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC4Moth->push_back(amcParticle->getMother()->getIndex());
         m_eclShowerToMC4MothPDG->push_back(amcParticle->getMother()->getPDG());
-        if (amcParticle->getMother()->getMother() != NULL) {
+        if (amcParticle->getMother()->getMother() != nullptr) {
           m_eclShowerToMC4GMoth->push_back(amcParticle->getMother()->getMother()->getIndex());
           m_eclShowerToMC4GMothPDG->push_back(amcParticle->getMother()->getMother()->getPDG());
         } else {
@@ -2277,10 +2277,10 @@ void ECLDataAnalysisModule::event()
       m_eclShowerToMC5->push_back(idx[4]);
       MCParticle* amcParticle = m_mcParticles[idx[4]];
       m_eclShowerToMC5PDG->push_back(amcParticle->getPDG());
-      if (amcParticle->getMother() != NULL) {
+      if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC5Moth->push_back(amcParticle->getMother()->getIndex());
         m_eclShowerToMC5MothPDG->push_back(amcParticle->getMother()->getPDG());
-        if (amcParticle->getMother()->getMother() != NULL) {
+        if (amcParticle->getMother()->getMother() != nullptr) {
           m_eclShowerToMC5GMoth->push_back(amcParticle->getMother()->getMother()->getIndex());
           m_eclShowerToMC5GMothPDG->push_back(amcParticle->getMother()->getMother()->getPDG());
         } else {
@@ -2310,13 +2310,13 @@ void ECLDataAnalysisModule::event()
     MCParticle* amcParticle = m_mcParticles[imcpart];
     m_mcIdx->push_back(amcParticle->getArrayIndex());
     m_mcPdg->push_back(amcParticle->getPDG());
-    if (amcParticle->getMother() != NULL) m_mcMothPdg->push_back(amcParticle->getMother()->getPDG());
+    if (amcParticle->getMother() != nullptr) m_mcMothPdg->push_back(amcParticle->getMother()->getPDG());
     else m_mcMothPdg->push_back(-999);
-    if (amcParticle->getMother() != NULL
-        && amcParticle->getMother()->getMother() != NULL) m_mcGMothPdg->push_back(amcParticle->getMother()->getMother()->getPDG());
+    if (amcParticle->getMother() != nullptr
+        && amcParticle->getMother()->getMother() != nullptr) m_mcGMothPdg->push_back(amcParticle->getMother()->getMother()->getPDG());
     else m_mcGMothPdg->push_back(-999);
-    if (amcParticle->getMother() != NULL && amcParticle->getMother()->getMother() != NULL
-        && amcParticle->getMother()->getMother()->getMother() != NULL)
+    if (amcParticle->getMother() != nullptr && amcParticle->getMother()->getMother() != nullptr
+        && amcParticle->getMother()->getMother()->getMother() != nullptr)
       m_mcGGMothPdg->push_back(amcParticle->getMother()->getMother()->getMother()->getPDG());
     else m_mcGGMothPdg->push_back(-999);
     m_mcEnergy->push_back(amcParticle->getEnergy());
@@ -2392,7 +2392,7 @@ void ECLDataAnalysisModule::endRun()
 void ECLDataAnalysisModule::terminate()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     m_tree->Write();
   }

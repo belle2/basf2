@@ -866,7 +866,7 @@ int SGCosmic::mkDz_pos_v2(const double dz, const float rndm)
 int SGCosmic::mkDz_neg_v2(const double dz, const float rndm)
 {
   const int nch = 100;
-  const int width = 100;
+  //const int width = 100;
   double dz_neg[nch] = { 0., 1.000000, 0., 0., 0.,
                          0., 0., 0., 0., 0.,
                          0., 0., 0., 0., 0.,
@@ -891,8 +891,8 @@ int SGCosmic::mkDz_neg_v2(const double dz, const float rndm)
   // normalize by peak value --> max = 1
   double max = findMax(dz_neg, nch);
   for (int i = 0; i < nch; i++) dz_neg[i] /= max;
-  int index = (int)((double)nch / (double)width * (dz + 50.));
-
+  // nch is equal to width here, not needed to compute the ratio
+  int index = (int)(dz + 50.);
   if (dz_neg[index] > rndm) return 1;
   return 0;
 }

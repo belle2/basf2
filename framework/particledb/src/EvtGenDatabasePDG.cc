@@ -90,7 +90,7 @@ EvtGenParticlePDG* EvtGenDatabasePDG::AddParticle(const char* name, const char* 
 void EvtGenDatabasePDG::ReadEvtGenTable(const char* filename)
 {
   //ok, now load the data
-  std::string defaultFilename = FileSystem::findFile("decfiles/dec/evt.pdl");
+  std::string defaultFilename = FileSystem::findFile("data/framework/particledb/evt.pdl");
   if (defaultFilename.empty())
     B2FATAL("Cannot find the default particle database file (evt.pdl).");
   if (!filename) {

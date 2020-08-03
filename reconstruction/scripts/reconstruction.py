@@ -31,8 +31,7 @@ import mdst
 
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
-                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       nCDCHitsMax=6000, nSVDShaperDigitsMax=70000):
+                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -55,8 +54,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param nCDCHitsMax: the max number of CDC hits for an event to be reconstructed.
-    :param nSVDShaperDigitsMax: the max number of SVD shaper digits for an event to be reconstructed.
     """
 
     # Check components.
@@ -64,7 +61,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
     empty_path = create_path()
-    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=nCDCHitsMax, nSVDShaperDigitsMax=nSVDShaperDigitsMax)
+    doom = path.add_module('EventsOfDoomBuster')
     doom.if_true(empty_path, AfterConditionPath.END)
 
     # Add modules that have to be run BEFORE track reconstruction

@@ -18,6 +18,8 @@
 #pragma link C++ class Belle2::CDCDedxMeanPars+;
 #pragma link C++ class Belle2::CDCDedxSigmaPars+;
 #pragma link C++ class Belle2::DedxPDFs;
+#pragma link C++ class Belle2::EventsOfDoomParameters+;
+
 #pragma link C++ class Belle2::CDCDedxDatabaseImporter-;
 
 #endif

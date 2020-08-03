@@ -2555,7 +2555,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, custom_cuts=No
         fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
-            B2INFO("Using default cleanup in EventKinematics module.")
+            if (custom_cuts is not None):
+                B2INFO("Using default cleanup in EventKinematics module.")
             applyCuts('pi+:evtkin', trackCuts, path=path)
             applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
@@ -2651,7 +2652,8 @@ def buildEventShape(inputListNames=[],
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
-            B2INFO("Applying standard cuts")
+            if (custom_cuts is not None):
+                B2INFO("Applying standard cuts")
             applyCuts('pi+:evtshape', trackCuts, path=path)
 
             applyCuts('gamma:evtshape', gammaCuts, path=path)

@@ -161,6 +161,7 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None):
 
     @param pidPriors    list of 6 float numbers used to reweight PID likelihoods
     @param suffix       string added to the end of particle list names
+    @param custom_cuts  custom selection cut string, if empty, standard track quality cuts will be applied
     @param path         modules are added to this path
     """
     # Here we need basic track quality cuts to be applied,

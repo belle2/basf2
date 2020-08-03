@@ -434,7 +434,7 @@ void ECLClusterFWD_1000MeV(TTree* cluster_treeFWD)
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hMultip->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
-  TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy in FWD endcap", 100, 0.7, 1.1);
+  TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy in FWD endcap", 40, 0.7, 1.1);
   cluster_treeFWD->Draw("eclClusterEnergy>>hEnergy","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Corrected deposited energy for 1000 MeV/c single photons in FWD endcap"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 1000 MeV and left-side tail.")); 
@@ -442,7 +442,7 @@ void ECLClusterFWD_1000MeV(TTree* cluster_treeFWD)
   hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
-  TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy in FWD endcap", 100, 0.7, 1.1);
+  TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy in FWD endcap", 40, 0.7, 1.1);
   cluster_treeFWD->Draw("eclClusterEnergyDepSum>>hEnDepSum","eclClusterTheta<31.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 1000 MeV/c single photons in FWD endcap"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 1000 MeV and left-side tail.")); 
@@ -904,7 +904,7 @@ void ECLClusterBarrel_1000MeV(TTree* cluster_treeBarrel)
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hMultip->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
-  TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy in Barrel", 100, 0.7, 1.1);
+  TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy in Barrel", 40, 0.7, 1.1);
   cluster_treeBarrel->Draw("eclClusterEnergy>>hEnergy","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Corrected deposited energy for 1000 MeV/c single photons in Barrel"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 1000 MeV and left-side tail.")); 
@@ -912,7 +912,7 @@ void ECLClusterBarrel_1000MeV(TTree* cluster_treeBarrel)
   hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
-  TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy in Barrel", 100, 0.7, 1.1);
+  TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy in Barrel", 40, 0.7, 1.1);
   cluster_treeBarrel->Draw("eclClusterEnergyDepSum>>hEnDepSum","eclClusterTheta>31.5*3.1415/180&&eclClusterTheta<131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 1000 MeV/c single photons in Barrel"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 1000 MeV and left-side tail.")); 
@@ -1371,7 +1371,7 @@ void ECLClusterBWD_1000MeV(TTree* cluster_treeBWD)
   hMultip->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it")); 
   hMultip->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
-  TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy in BWD endcap", 100, 0.7, 1.1);
+  TH1F* hEnergy = new TH1F("hEnergy","Corrected Cluster Energy in BWD endcap", 40, 0.7, 1.1);
   cluster_treeBWD->Draw("eclClusterEnergy>>hEnergy","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
   hEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Corrected deposited energy for 1000 MeV/c single photons in BWD endcap"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 1000 MeV and left-side tail.")); 
@@ -1379,7 +1379,7 @@ void ECLClusterBWD_1000MeV(TTree* cluster_treeBWD)
   hEnergy->GetListOfFunctions()->Add(new TNamed("Contact","elisa.manoni@pg.infn.it"));
   hEnergy->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
-  TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy in BWD endcap", 100, 0.7, 1.1);
+  TH1F* hEnDepSum = new TH1F("hEnDepSum","Reconstructed Cluster Energy in BWD endcap", 40, 0.7, 1.1);
   cluster_treeBWD->Draw("eclClusterEnergyDepSum>>hEnDepSum","eclClusterTheta>131.5*3.1415/180&&eclClusterToMC1==0&&eclClusterHasNPhotonHypothesis==1");
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Description", "Uncorrected deposited energy for 1000 MeV/c single photons in BWD endcap"));
   hEnDepSum->GetListOfFunctions()->Add(new TNamed("Check", "Consistent shape, peak around 1000 MeV and left-side tail.")); 

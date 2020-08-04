@@ -7,3 +7,10 @@ BASF2 is an abbreviation of the Belle II Analysis Software Framework. The collab
 
 .. _link: https://arxiv.org/abs/1809.04299
 
+.. container:: toggle
+
+    .. container:: header
+
+        **Show/hide**
+
+    Something something

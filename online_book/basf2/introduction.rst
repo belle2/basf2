@@ -14,18 +14,16 @@ BASF2 is an abbreviation of the Belle II Analysis Software Framework. The collab
 
     **Exercises**: 5 min
 
-    **Prerequisites**: 
+    **Prerequisites**: None
 
-    * None
+    Questions:
 
-    **Questions**:
+        * What is basf2?
+        * When to use basf2?
 
-    * What is basf2?
-    * When to use basf2?
+    Objectives:
 
-    **Objectives**:
-
-    * Install basf2
+        * Install basf2
 
 .. admonition:: Question
     :class: exercise

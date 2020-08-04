@@ -55,7 +55,7 @@ def command_tag_merge(args, db=None):
     present in earlier globaltags.
 
     The result is equivalent to having multiple globaltags setup in the conditions
-    access for basf2.
+    access for basf2 (highest goes first).
 
     Warning:
       This command requires all globaltags are overlap free.
@@ -179,10 +179,17 @@ def command_tag_merge(args, db=None):
 
         pretty_print_table(table, columns, transform=color_row)
 
-    # Ok, we're still alive, create all payloads
+    # Ok, we're still alive, create all payloads and print a message every 100 IoVs copied,
+    # since it can take a lot of time
     if not args.dry_run:
+        total_iovs = len(final) * len(payload.iov.iovs)
+        count = 0
+        B2INFO(f'Now copying {total_iovs} payloads into {args.output}.')
         for payload in final:
             for iov in payload.iov:
                 db.create_iov(output_id, payload.payload_id, *iov.tuple)
+                count += 1
+                if (count % 100 == 0):
+                    B2INFO(f'Copied {count}/{total_iovs} payloads.')
 
     return 0

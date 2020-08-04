@@ -8,6 +8,13 @@ However, a few warnings can not easily be omitted and are therefore accepted for
 import re
 from b2test_utils import check_error_free
 
+#: tool option
+toolopts = None
+try:
+    import generators
+except ModuleNotFoundError:
+    toolopts = ['--light']
+
 if __name__ == "__main__":
     #: ignore html_static_path
     ignorehtmlstaticpath = 'html_static_path'
@@ -27,11 +34,17 @@ if __name__ == "__main__":
     ignoreduplicatemvalabel = 'duplicate label mva'
     #: ignore warning from tools repository
     ignorechoosingarelease = 'Choosing a release'
+    #: ignore add_mdst_output of reconstruction package (not in light build)
+    ignoreaddmdstoutput = 'add_mdst_output'
+    #: ignore add_simulation of simulation package (not in light build)
+    ignoreaddsimulation = 'add_simulation'
+    #: ignore add_reconstruction of reconstruction package (not in light build)
+    ignoreaddreconstruction = 'add_reconstruction'
     #: ignore warning about not finding Geometry module ?!
     ignoregeometry = 'b2:mod reference target not found: Geometry'
-    #: ignore skim registry warning (NEEDS TO BE FIXED!)
-    ignoreskimregistry = 'skim.registry.combined_skims'
-    check_error_free("b2code-sphinx-warnings", "sphinx", "",
+    #: ignore online_book
+    ignoreonlinebook = 'online_book'
+    check_error_free("b2code-sphinx-warnings", "sphinx", None,
                      lambda x:
                      re.findall(ignorehtmlstaticpath, x) or
                      re.findall(ignoreunsupportedthemeoption, x) or
@@ -42,6 +55,10 @@ if __name__ == "__main__":
                      re.findall(ignoreduplicatedescriptionofrole, x) or
                      re.findall(ignoreduplicatemvalabel, x) or
                      re.findall(ignorechoosingarelease, x) or
-                     re.findall(ignoregeometry, x) or
-                     re.findall(ignoreskimregistry, x)
+                     re.findall(ignoreaddmdstoutput, x) or
+                     re.findall(ignoreaddsimulation, x) or
+                     re.findall(ignoreaddreconstruction, x) or
+                     re.findall(ignoreonlinebook, x) or
+                     re.findall(ignoregeometry, x),
+                     toolopts
                      )

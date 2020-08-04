@@ -22,9 +22,9 @@ Modules
    .. code-block:: python
 
         from modularAnalysis import reconstructDecay, matchMCTruth
-	reconstructDecay('B0:signal  -> mu+ mu- ... ?gamma', '', path=mypath)
-	reconstructDecay('B0:generic -> D*-:Dpi pi+:all', '', path=mypath)
-	reconstructDecay('Upsilon(4S):BB -> B0:generic B0:signal', '', path=mypath)
-	matchMCTruth('Upsilon(4S)', path=mypath)
+        reconstructDecay('B0:signal  -> mu+ mu- ... ?gamma', '', path=mypath)
+        reconstructDecay('B0:generic -> D*-:Dpi pi+:all', '', path=mypath)
+        reconstructDecay('Upsilon(4S):BB -> B0:generic B0:signal', '', path=mypath)
+        matchMCTruth('Upsilon(4S)', path=mypath)
 
-   In above case, missing massive FSP and gamma in ``B0:signal`` are accepted for not only ``B0:signal`` but also ``Upsilon(4S)``, so that `isSignal` can be 1.
+   In the above case, missing daughters (massive FSP and gamma) of ``B0:signal`` are accepted for not only ``B0:signal`` but also ``Upsilon(4S)``, so that `isSignal` can be 1.

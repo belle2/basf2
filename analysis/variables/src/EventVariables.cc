@@ -397,6 +397,17 @@ namespace Belle2 {
       return missing;
     }
 
+    double genMissingMass2OfEvent(const Particle*)
+    {
+      StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMass2();
+      return missing;
+    }
+
     double visibleEnergyOfEventCMS(const Particle*)
     {
       StoreObjPtr<EventKinematics> evtShape;
@@ -588,6 +599,8 @@ Returns NAN for data.
                       "[Eventbased] The missing energy in CMS obtained with EventKinematics module")
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent,
                       "[Eventbased] The missing mass squared obtained with EventKinematics module")
+    REGISTER_VARIABLE("genMissingMass2OfEvent", genMissingMass2OfEvent,
+                      "[Eventbased] The missing mass squared obtained with EventKinematics module from generator")
     REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS,
                       "[Eventbased] The visible energy in CMS obtained with EventKinematics module")
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,

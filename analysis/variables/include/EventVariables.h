@@ -219,6 +219,10 @@ namespace Belle2 {
     double missingEnergyOfEventCMS(const Particle*);
 
     /**
+    * return the generated missing mass squred
+    */
+    double genMissingMass2OfEvent(const Particle*);
+    /**
     * return the missing mass squred
     */
     double missingMass2OfEvent(const Particle*);

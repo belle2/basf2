@@ -18,7 +18,8 @@ Modules
  * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
    beamspot is added.
  * The MC matching with the :ref:`DecayString` properly works in hierarchical decay. For example, 
-.. code-block:: python
+
+   .. code-block:: python
 
         from modularAnalysis import reconstructDecay, matchMCTruth
 	reconstructDecay('B0:signal  -> mu+ mu- ... ?gamma', '', path=mypath)

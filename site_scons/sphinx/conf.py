@@ -463,4 +463,4 @@ def setup(app):
     app.connect('autodoc-process-signature', process_sig)
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-skip-member', skipmember)
-    app.add_css_file('custom.css')
+    app.add_css_file('css/custom.css')

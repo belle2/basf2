@@ -196,7 +196,7 @@ def check_linkdef(filename, message_style="belle2"):
                           "Please add + or - (for classes not to be written to file) after the classname.")
 
         # This class seems to be intended to be serialized so make sure we can
-        if version != 0:
+        if "version" in locals() and version != 0:
             try:
                 check_dictionary(classname)
             except ClassVersionError as e:

@@ -39,12 +39,20 @@
     background: #dbfaf4;
 }
 
-.rst-content .key-points .admonition-title{
+.rst-content .exercise .admonition-title{
     background: #F085B2; /*#1abc9c*/
 }
 
-.rst-content .key-points {
+.rst-content .exercise {
     background: #ffecf3; /*#dbfaf4;*/
+}
+
+.rst-content .key-points .admonition-title{
+    background: #9c9ff4; /*#888888;*/
+}
+
+.rst-content .key-points {
+    background: #f7f0ff; /*#F0F0F0;*/
 }
 
 .rst-content .overview .admonition-title{

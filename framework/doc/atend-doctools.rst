@@ -487,14 +487,14 @@ Additional boxes for the online lessons
         :class: key-points
 
         * basf2 is used to process "raw" data, reconstruct particles
-          and create `*.root` output files
+          and create ``*.root`` output files
           that you can then analyze with any tool of your liking (root, pandas, ...)
 
 .. admonition:: Key points
     :class: key-points
 
     * basf2 is used to process "raw" data, reconstruct particles
-      and create `*.root` output files
+      and create ``*.root`` output files
       that you can then analyze with any tool of your liking (root, pandas, ...)
 
 

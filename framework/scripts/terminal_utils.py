@@ -114,7 +114,7 @@ class Pager(object):
         # that they behave as expected, i.e. as if we would only have
         # redirected sys.stdout and sys.stderr ...
         sys.__stdout__ = io.TextIOWrapper(os.fdopen(self._original_stdout_fd, "wb"))
-        sys.__stderr__ = io.TextIOWrapper(os.fdopen(self._original_stdout_fd, "wb"))
+        sys.__stderr__ = io.TextIOWrapper(os.fdopen(self._original_stderr_fd, "wb"))
 
         # fine, everything is saved, start the pager
         pager_cmd = [self._pager]
@@ -136,10 +136,19 @@ class Pager(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """ exiting context """
-        sys.stdout.flush()
         # no pager, nothing to do
         if self._pager_process is None:
             return
+
+        # otherwise let's try to flush whatever is left
+        try:
+            sys.stdout.flush()
+        except BrokenPipeError:
+            # apparently pager died before we could flush ... so let's move the
+            # remaining output to /dev/null and flush whatever is left
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, sys.stdout.fileno())
+            sys.stdout.flush()
 
         # restore output
         os.dup2(self._original_stdout_fd, sys.stdout.fileno())
@@ -151,6 +160,9 @@ class Pager(object):
 
         # wait for pager
         self._pager_process.communicate()
+
+        # and if we exited due to broken pipe ... then ignore it
+        return exc_type == BrokenPipeError
 
 
 class InputEditor():

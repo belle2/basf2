@@ -17,3 +17,13 @@ Modules
    :ref:`DecayString` of the form ``D* -> pi`` and MC Matching is applicable (one can use :b2:var:`isSignal`).
  * In `BtubeCreator` module, functionality to apply a cut on the confidence level of the fit of fully reconstructed B to the
    beamspot is added.
+ * The MC matching with the :ref:`DecayString` properly works in hierarchical decay. For example, 
+.. code-block:: python
+
+        from modularAnalysis import reconstructDecay, matchMCTruth
+	reconstructDecay('B0:signal  -> mu+ mu- ... ?gamma', '', path=mypath)
+	reconstructDecay('B0:generic -> D*-:Dpi pi+:all', '', path=mypath)
+	reconstructDecay('Upsilon(4S):BB -> B0:generic B0:signal', '', path=mypath)
+	matchMCTruth('Upsilon(4S)', path=mypath)
+
+   In above case, missing massive FSP and gamma in ``B0:signal`` are accepted for not only ``B0:signal`` but also ``Upsilon(4S)``, so that `isSignal` can be 1.

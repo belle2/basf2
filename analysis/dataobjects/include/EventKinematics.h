@@ -31,8 +31,8 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0.
      */
-    EventKinematics() :  m_missingMomentum(0.0, 0.0, 0.0), m_missingMomentumCMS(0.0, 0.0, 0.0),
-      m_missingEnergyCMS(0.0), m_missingMass2(0.0), m_visibleEnergyCMS(0.0), m_photonsEnergy(0.0) {};
+    EventKinematics(bool isFromMC = false) :  m_missingMomentum(0.0, 0.0, 0.0), m_missingMomentumCMS(0.0, 0.0, 0.0),
+      m_missingEnergyCMS(0.0), m_missingMass2(0.0), m_visibleEnergyCMS(0.0), m_photonsEnergy(0.0), m_isFromMC(isFromMC) {};
 
     // setters
 
@@ -156,6 +156,7 @@ namespace Belle2 {
 
     float m_photonsEnergy; /**< Total energy of photons in lab */
 
+    bool m_isFromMC; /**< Is from MC switch */
     ClassDef(EventKinematics, 1) /**< class definition */
 
   };

@@ -48,6 +48,8 @@ namespace Belle2 {
 
   private:
 
+    bool m_fromMC;  /**< Is from MC */
+
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 
     /** A vector of the particles' 4-momenta in lab*/

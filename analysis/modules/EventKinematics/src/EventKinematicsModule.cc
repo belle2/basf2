@@ -42,6 +42,7 @@ EventKinematicsModule::EventKinematicsModule() : Module()
 
   // Parameter definitions
   addParam("particleLists", m_particleLists, "List of the ParticleLists", vector<string>());
+  addParam("fromMC", m_fromMC, "is from MC", false);
 
 }
 
@@ -49,7 +50,8 @@ EventKinematicsModule::~EventKinematicsModule() = default;
 
 void EventKinematicsModule::initialize()
 {
-  StoreObjPtr<EventKinematics> evtKinematics;
+  auto arrayName = (!m_fromMC) ? "EventKinematics" : "EventKinematicsFromMC";
+  StoreObjPtr<EventKinematics> evtKinematics(arrayName);
   evtKinematics.registerInDataStore();
 
 }
@@ -60,8 +62,7 @@ void EventKinematicsModule::beginRun()
 
 void EventKinematicsModule::event()
 {
-  StoreObjPtr<EventKinematics> eventKinematics;
-  if (!eventKinematics) eventKinematics.create();
+  auto* eventKinematics = new EventKinematics(m_fromMC);
   EventKinematicsModule::getParticleMomentumLists(m_particleLists);
 
   TVector3 missingMomentum = EventKinematicsModule::getMissingMomentum();
@@ -81,6 +82,13 @@ void EventKinematicsModule::event()
 
   float totalPhotonsEnergy = EventKinematicsModule::getTotalPhotonsEnergy();
   eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
+  if (m_fromMC) {
+    StoreObjPtr<EventKinematics> eventKinematicsPtr("EventKinematicsFromMC");
+    eventKinematicsPtr.assign(eventKinematics);
+  } else {
+    StoreObjPtr<EventKinematics> eventKinematicsPtr;
+    eventKinematicsPtr.assign(eventKinematics);
+  }
 }
 
 void EventKinematicsModule::endRun()
@@ -109,11 +117,15 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
       const Particle* part = plist->getParticle(i);
+      if (part->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle and !m_fromMC) {
+        B2FATAL("EventKinematics received MCParticles as an input, but fromMC flag is false");
+      }
 
       TLorentzVector p_lab = part->get4Vector();
       m_particleMomentumList.push_back(p_lab);
 
-      if ((part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster)
+      if ((part->getParticleSource() == Particle::EParticleSourceObject::c_ECLCluster or
+           part->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle)
           and (part->getPDGCode() == Const::photon.getPDGCode()))
         m_photonsMomentumList.push_back(p_lab);
 

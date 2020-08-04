@@ -410,6 +410,94 @@ Additional Features
   ``:issue:`BII-XXXX```, for example ``:issue:`BII-8``` (:issue:`BII-8`)
 
 
+Additional boxes for the online lessons
+---------------------------------------
+
+.. code:: rst
+
+    .. admonition:: Overview
+        :class: overview
+
+        **Teaching**: 10 min
+
+        **Exercises**: 5 min
+
+        **Prerequisites**: None
+
+        **Questions**:
+
+            * What is a particle list?
+            * What are final state particles?
+            * How can I specify decays?
+
+        **Objectives**:
+
+            * Reconstruct particles
+
+.. admonition:: Overview
+    :class: overview
+
+    **Teaching**: 10 min
+
+    **Exercises**: 5 min
+
+    **Prerequisites**: None
+
+    **Questions**:
+
+        * What is a particle list?
+        * What are final state particles?
+        * How can I specify decays?
+
+    **Objectives**:
+
+        * Reconstruct particles
+
+
+.. code:: rst
+
+    .. admonition:: Question
+        :class: exercise
+
+        Can you answer me this please?
+
+.. admonition:: Question
+    :class: exercise
+
+    Can you answer me this please?
+
+**Note**: You can also use ``.. admonition:: Exercise`` for an exercise rather than a question
+(generally the content after ``admonition::`` will be the title).
+
+.. code:: rst
+
+   .. admonition:: Solution
+      :class: toggle solution
+
+      Something something
+
+.. admonition:: Solution
+   :class: toggle solution
+
+   Something something
+
+.. code:: rst
+
+    .. admonition:: Key points
+        :class: key-points
+
+        * basf2 is used to process "raw" data, reconstruct particles
+          and create `*.root` output files
+          that you can then analyze with any tool of your liking (root, pandas, ...)
+
+.. admonition:: Key points
+    :class: key-points
+
+    * basf2 is used to process "raw" data, reconstruct particles
+      and create `*.root` output files
+      that you can then analyze with any tool of your liking (root, pandas, ...)
+
+
 How to test locally
 -------------------
 

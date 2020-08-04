@@ -802,9 +802,9 @@ Decay B0
 0.000001  K*- K+ pi0             PHSP;
 0.000001  K*0 anti-K0 pi0        PHSP;
 0.000001  K0 anti-K*0 pi0        PHSP;
-0.0000033  K+ anti-K*0 pi-       PHSP;
+0.0000022  K+ anti-K*0 pi-       PHSP; #[Reconstructed PDG2020]
 0.000001  K*+ anti-K0 pi-        PHSP;
-0.000003320 K- K*0 pi+           PHSP; #[Reconstructed PDG2011]
+0.0000045 K- K*0 pi+             PHSP; #[Reconstructed PDG2020]
 0.000001  K*- K0 pi+             PHSP;
 
 #--- 4-body phi-K*, phi-K-pi, K-K-K*, pi-K-K-K -----------------------
@@ -1460,10 +1460,10 @@ Decay B0
 0.007800000 D*-     D*+     K0              PHSP;
 
 # Internal W-emission amplitude (color suppressed modes)
-0.0005   D0  anti-D0  K0                    PHSP;
-0.0005   D*0  anti-D0  K0                   PHSP;
-0.0015   D0  anti-D*0  K0                   PHSP;
-0.0015   D*0  anti-D*0  K0                  PHSP;
+0.00027   D0  anti-D0  K0                    PHSP; #PDG2020
+0.00054   D*0  anti-D0  K0                   PHSP; #PDG2020
+0.00054   D0  anti-D*0  K0                   PHSP; #PDG2020
+0.00240   D*0  anti-D*0  K0                  PHSP; #PDG2020
 
 # K* modes
 0.0025   D-  D0  K*+                        PHSP;
@@ -1593,33 +1593,33 @@ Decay B0
 
 #  Lam_c X  / Sigma_c X      4.0 %
 #
-0.01034345    anti-cd_0 ud_0                                  PYTHIA 23;
-0.02068700    anti-cd_1 ud_1                                  PYTHIA 23;
+0.01034898    anti-cd_0 ud_0                                  PYTHIA 23;
+0.02069805    anti-cd_1 ud_1                                  PYTHIA 23;
 
 #  Xi_c X    2.5%
 #
-0.00282097    anti-cs_0 ud_0                                  PYTHIA 23;
-0.00564193    anti-cs_1 ud_1                                  PYTHIA 23;
+0.00282248    anti-cs_0 ud_0                                  PYTHIA 23;
+0.00564494    anti-cs_1 ud_1                                  PYTHIA 23;
 
-0.25374423    u       anti-d  anti-c  d                       PYTHIA 48;
-0.04325455    u       anti-d  anti-c  d                       PYTHIA 13;
-0.01974668    u       anti-s  anti-c  d                       PYTHIA 13;
-0.01692571    u       anti-c  anti-d  d                       PYTHIA 48;
-0.00084627    u       anti-c  anti-s  d                       PYTHIA 48;
+0.25387981    u       anti-d  anti-c  d                       PYTHIA 48;
+0.04327766    u       anti-d  anti-c  d                       PYTHIA 13;
+0.01975723    u       anti-s  anti-c  d                       PYTHIA 13;
+0.01693475    u       anti-c  anti-d  d                       PYTHIA 48;
+0.00084672    u       anti-c  anti-s  d                       PYTHIA 48;
 #lange - try to crank up the psi production....
-0.06958339    c       anti-s  anti-c  d                       PYTHIA 13;
-0.00564193    c       anti-d  anti-c  d                       PYTHIA 13;
-0.00282097    u       anti-d  anti-u  d                       PYTHIA 48;
-0.00376129    c       anti-s  anti-u  d                       PYTHIA 48;
+0.06962057    c       anti-s  anti-c  d                       PYTHIA 13;
+0.00564494    c       anti-d  anti-c  d                       PYTHIA 13;
+0.00282248    u       anti-d  anti-u  d                       PYTHIA 48;
+0.00376330    c       anti-s  anti-u  d                       PYTHIA 48;
 # JGS 11/5/02 This and similar a few lines above have been divided by two
 # to solve a double-counting problem for this channel
-0.00192762    u       anti-u  anti-d  d                       PYTHIA 48;
-0.00006584    d       anti-d  anti-d  d                       PYTHIA 48;
-0.00008462    s       anti-s  anti-d  d                       PYTHIA 48;
-0.00206865    u       anti-u  anti-s  d                       PYTHIA 48;
-0.00169254    d       anti-d  anti-s  d                       PYTHIA 48;
-0.00141048    s       anti-s  anti-s  d                       PYTHIA 48;
-0.00470161    anti-s  d                                       PYTHIA 32;
+0.00192865    u       anti-u  anti-d  d                       PYTHIA 48;
+0.00006588    d       anti-d  anti-d  d                       PYTHIA 48;
+0.00008467    s       anti-s  anti-d  d                       PYTHIA 48;
+0.00206976    u       anti-u  anti-s  d                       PYTHIA 48;
+0.00169344    d       anti-d  anti-s  d                       PYTHIA 48;
+0.00141123    s       anti-s  anti-s  d                       PYTHIA 48;
+0.00470412    anti-s  d                                       PYTHIA 32;
 0.000052000 anti-D0 K0                                      PHSP;
 0.000046000 anti-D0 K+      pi-                             PHSP;
 0.000006000 D0      K+      pi-                             PHSP;
@@ -2149,10 +2149,10 @@ Decay anti-B0
 0.000001  K*- K+ pi0             PHSP;
 0.000001  K*0 anti-K0 pi0        PHSP;
 0.000001  K0 anti-K*0 pi0        PHSP;
-0.000003320 K+ anti-K*0 pi-      PHSP;
-0.000001  K*+ anti-K0 pi-        PHSP;
-0.0000033  K- K*0 pi+            PHSP;
+0.0000022 K- K*0 pi+             PHSP; #[Reconstructed PDG2020]
 0.000001  K*- K0 pi+             PHSP;
+0.0000045  K+ anti-K*0 pi-       PHSP; #[Reconstructed PDG2020]
+0.000001  K*+ anti-K0 pi-        PHSP;
 
 #--- 4-body phi-K*, phi-K-pi, K-K-K*, pi-K-K-K -----------------------
 0.0000098 phi     anti-K*0       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
@@ -2804,13 +2804,13 @@ Decay anti-B0
 0.0015   D+  D-  anti-K0                         PHSP;
 0.0018   D*+ D-  anti-K0                         PHSP;
 0.0047   D+  D*-  anti-K0                        PHSP;
-0.007800000 D*+     D*-     anti-K0              PHSP;
+0.007800000 D*+     D*-     anti-K0              PHSP;s
 
 # Internal W-emission amplitude (color suppressed modes)
-0.0005   D0  anti-D0  anti-K0                    PHSP;
-0.0005   D*0  anti-D0 anti-K0                    PHSP;
-0.0015   D0  anti-D*0  anti-K0                   PHSP;
-0.0015   D*0  anti-D*0  anti-K0                  PHSP;
+0.00027   D0  anti-D0  anti-K0                    PHSP; #PDG 2020
+0.00054   D*0  anti-D0 anti-K0                    PHSP; #PDG 2020
+0.00054   D0  anti-D*0  anti-K0                   PHSP; #PDG 2020
+0.00240   D*0  anti-D*0  anti-K0                  PHSP; #PDG 2020
 
 # K* modes
 0.0025   D+  anti-D0  K*-                        PHSP;
@@ -2940,33 +2940,33 @@ Decay anti-B0
 
 #  Lam_c X  / Sigma_c X      6.0 %
 #
-0.01034345    cd_0    anti-ud_0                               PYTHIA 23;
-0.02068700    cd_1    anti-ud_1                               PYTHIA 23;
+0.01034898    cd_0    anti-ud_0                               PYTHIA 23;
+0.02069805    cd_1    anti-ud_1                               PYTHIA 23;
 
 #  Xi_c X     2.5%
 #
-0.00282097    cs_0    anti-ud_0                               PYTHIA 23;
-0.00564193    cs_1    anti-ud_1                               PYTHIA 23;
+0.00282248    cs_0    anti-ud_0                               PYTHIA 23;
+0.00564494    cs_1    anti-ud_1                               PYTHIA 23;
 
-0.25374423    anti-u  d       c       anti-d                  PYTHIA 48;
-0.04325455    anti-u  d       c       anti-d                  PYTHIA 25;
-0.01974668    anti-u  s       c       anti-d                  PYTHIA 23;
-0.01692571    anti-u  c       d       anti-d                  PYTHIA 48;
-0.00084627    anti-u  c       s       anti-d                  PYTHIA 48;
+0.25387981    anti-u  d       c       anti-d                  PYTHIA 48;
+0.04327766    anti-u  d       c       anti-d                  PYTHIA 25;
+0.01975723    anti-u  s       c       anti-d                  PYTHIA 23;
+0.01693475    anti-u  c       d       anti-d                  PYTHIA 48;
+0.00084672    anti-u  c       s       anti-d                  PYTHIA 48;
 #lange - try to crank up the psi production....
-0.06958339    anti-c  s       c       anti-d                  PYTHIA 13;
-0.00564193    anti-c  d       c       anti-d                  PYTHIA 13;
-0.00282097    anti-u  d       u       anti-d                  PYTHIA 48;
-0.00376129    anti-c  s       u       anti-d                  PYTHIA 48;
+0.06962057    anti-c  s       c       anti-d                  PYTHIA 13;
+0.00564494    anti-c  d       c       anti-d                  PYTHIA 13;
+0.00282248    anti-u  d       u       anti-d                  PYTHIA 48;
+0.00376330    anti-c  s       u       anti-d                  PYTHIA 48;
 # JGS 11/5/02 This and similar a few lines above have been divided by two
 # to solve a double-counting problem for this channel
-0.00192762    anti-u  u       d       anti-d                  PYTHIA 48;
-0.00006584    anti-d  d       d       anti-d                  PYTHIA 48;
-0.00008462    anti-s  s       d       anti-d                  PYTHIA 48;
-0.00206865    anti-u  u       s       anti-d                  PYTHIA 48;
-0.00169254    anti-d  d       s       anti-d                  PYTHIA 48;
-0.00141048    anti-s  s       s       anti-d                  PYTHIA 48;
-0.00470161    s       anti-d                                  PYTHIA 32;
+0.00192865    anti-u  u       d       anti-d                  PYTHIA 48;
+0.00006588    anti-d  d       d       anti-d                  PYTHIA 48;
+0.00008467    anti-s  s       d       anti-d                  PYTHIA 48;
+0.00206976    anti-u  u       s       anti-d                  PYTHIA 48;
+0.00169344    anti-d  d       s       anti-d                  PYTHIA 48;
+0.00141123    anti-s  s       s       anti-d                  PYTHIA 48;
+0.00470412    s       anti-d                                  PYTHIA 32;
 0.000052000 D0      anti-K0                                 PHSP;
 0.000046000 D0      K-      pi+                             PHSP;
 0.000006000 anti-D0 K-      pi+                             PHSP;
@@ -4029,7 +4029,7 @@ Decay B+
 #  Xi_c X     2.4%
 0.00850087    anti-cs_1 uu_1               PYTHIA 23;
 
-0.21277218    u       anti-d  anti-c  u                       PYTHIA         48;
+0.21277219    u       anti-d  anti-c  u                       PYTHIA         48;
 0.04061510    u       anti-d  anti-c  u                       PYTHIA         13;
 0.02125208    u       anti-s  anti-c  u                       PYTHIA         13;
 #lange - try to crank up the psi production....
@@ -4993,8 +4993,8 @@ Decay B-
 # External+internal W-emission amplitude
 0.002100000 D0      anti-D0 K-           PHSP; 
 0.0018   D*0  anti-D0  K-                PHSP;
-0.004700000 D0      anti-D*0 K-          PHSP; 
-0.005300000 D*0     anti-D*0 K-          PHSP; 
+0.004700000 D0      anti-D*0 K-          PHSP;
+0.005300000 D*0     anti-D*0 K-          PHSP;
 # Internal W-emission amplitude (color suppressed modes)
 0.0005    D-  D+  K-                     PHSP;
 0.0005    D*-  D+  K-                    PHSP;
@@ -5097,7 +5097,7 @@ Decay B-
 #  Xi_c X     2.5%
 0.00850087    cs_1    anti-uu_1           PYTHIA 23; 
 
-0.21277218    anti-u  d       c       anti-u                  PYTHIA         48; 
+0.21277219    anti-u  d       c       anti-u                  PYTHIA         48; 
 0.04061510    anti-u  d       c       anti-u                  PYTHIA         13; 
 0.02125208    anti-u  s       c       anti-u                  PYTHIA         13; 
 #lange - try to crank up the psi production....

@@ -42,7 +42,7 @@ if __name__ == "__main__":
         basf2.reset_database()
         if args.override:
             basf2.conditions.override_globaltags()
-        basf2.use_central_database("online")
+            basf2.use_central_database("online")
 
         path = basf2.Path()
 

@@ -418,6 +418,56 @@ namespace Belle2 {
       return (pInitial - pDaughters).M();
     }
 
+    TLorentzVector MCInvisibleP4(const MCParticle* mcparticle)
+    {
+      TLorentzVector ResultP4;
+      int pdg = abs(mcparticle->getPDG());
+      bool isNeutrino = (pdg == 12 or pdg == 14 or pdg == 16);
+
+      if (mcparticle->getNDaughters() > 0) {
+        const std::vector<MCParticle*> daughters = mcparticle->getDaughters();
+        for (auto daughter : daughters)
+          ResultP4 += MCInvisibleP4(daughter);
+      } else if (isNeutrino)
+        ResultP4 += mcparticle->get4Vector();
+
+      return ResultP4;
+    }
+
+    double particleMCCosThetaBetweenParticleAndNominalB(const Particle* part)
+    {
+      int particlePDG = abs(part->getPDGCode());
+      if (particlePDG != 511 and particlePDG != 521)
+        B2FATAL("The variable mcCosThetaBetweenParticleAndNominalB is only meant to be used on B mesons!");
+
+      PCmsLabTransform T;
+      double e_Beam = T.getCMSEnergy() / 2.0; // GeV
+      double m_B = part->getPDGMass();
+      // if this is a continuum run, use an approximate Y(4S) CMS energy
+      if (e_Beam * e_Beam - m_B * m_B < 0) {
+        e_Beam = 1.0579400E+1 / 2.0; // GeV
+      }
+      double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
+
+      // Calculate cosThetaBY with daughter neutrino momenta subtracted
+      const MCParticle* mcB = part->getRelatedTo<MCParticle>();
+      if (mcB == nullptr)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      int mcParticlePDG = abs(mcB->getPDG());
+      if (mcParticlePDG != 511 and mcParticlePDG != 521)
+        return std::numeric_limits<double>::quiet_NaN();
+
+      TLorentzVector p = T.rotateLabToCms() * (mcB->get4Vector() - MCInvisibleP4(mcB));
+      double e_d = p.E();
+      double m_d = p.M();
+      double p_d = p.Rho();
+
+      double theta_BY = (2 * e_Beam * e_d - m_B * m_B - m_d * m_d)
+                        / (2 * p_B * p_d);
+      return theta_BY;
+    }
+
     double mcParticleSecondaryPhysicsProcess(const Particle* p)
     {
       const MCParticle* mcp = p->getMCParticle();
@@ -903,6 +953,9 @@ namespace Belle2 {
                       "The theta of matched MCParticle, NaN if no match. Requires running matchMCTruth() on the reconstructed particles, or a particle list filled with generator particles (MCParticle objects).");
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
+    REGISTER_VARIABLE("mcCosThetaBetweenParticleAndNominalB",
+                      particleMCCosThetaBetweenParticleAndNominalB,
+                      "Cosine of the angle in CMS between momentum the particle and a nominal B particle. In this calculation, the momenta of all descendant neutrinos is subtracted from the B momentum.");
 
 
     REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,

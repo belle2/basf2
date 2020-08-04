@@ -112,7 +112,7 @@ def command_tag_merge(args, db=None):
         group = args.add_argument_group("required named arguments")
         group.add_argument("-o", "--output", required=True, help="Name of the output globaltag")
         args.add_argument("--dry-run", help="Don't do anything, just print a table with the results",
-                          action="store_true", default="False")
+                          action="store_true", default=False)
         args.add_argument("--run-range", nargs=4, default=None, type=int,
                           metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
                           help="Can be for numbers to limit the run range to put"
@@ -183,6 +183,6 @@ def command_tag_merge(args, db=None):
     if not args.dry_run:
         for payload in final:
             for iov in payload.iov:
-                db.create_iov(output_id, payload.payload_id, *iov.tuple())
+                db.create_iov(output_id, payload.payload_id, *iov.tuple)
 
     return 0

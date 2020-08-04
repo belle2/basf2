@@ -1,30 +1,63 @@
-.toggle {
-    background: none repeat scroll 0 0 #e7f2fa;
+.rst-content .toggle {
     padding: 12px;
     line-height: 24px;
     margin-bottom: 24px;
 }
 
-.toggle .admonition-title {
+.rst-content .toggle .admonition-title {
     display: block;
     clear: both;
     cursor: pointer;
 }
 
-
-.toggle p:last-child {
+.rst-content .toggle p:last-child {
     margin-bottom: 0;
 }
 
-.toggle .admonition-title {
+.rst-content .toggle .admonition-title {
     display: block;
     clear: both;
 }
 
-.toggle .admonition-title:after {
+.rst-content .toggle .admonition-title:after {
+    content: " ▼";
+}
+
+.rst-content .toggle .admonition-title.open:after {
     content: " ▶";
 }
 
-.toggle .admonition-title.open:after {
-    content: " ▼";
+.rst-content .solution .admonition-title:before {
+    content: "  ";
 }
+
+.rst-content .solution .admonition-title, .rst-content .key-points .admonition-title{
+    background: #1abc9c
+}
+
+.rst-content .solution, .rst-content .key-points {
+    background: #dbfaf4;
+}
+
+
+.rst-content .overview .admonition-title{
+    background: #888888;
+}
+
+.rst-content .overview {
+    background: #F0F0F0;
+}
+
+.rst-content .overview .admonition-title:before {
+    content: "  ";
+}
+
+
+.rst-content .exercise .admonition-title:before {
+    content: "  ";
+}
+
+.rst-content .key-points .admonition-title:before {
+    content: " ";
+}
+

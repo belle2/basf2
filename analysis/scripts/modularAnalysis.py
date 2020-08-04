@@ -2570,6 +2570,35 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, custom_cuts=No
     path.add_module(eventKinematicsModule)
 
 
+def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
+    """
+    Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
+    using generated particles. If no ParticleList is provided, default generated ParticleLists are used.
+
+    @param inputListNames     list of ParticleLists used to calculate the global event kinematics.
+                              If the list is empty, default ParticleLists are filled.
+    @param selectionCut       optional selection cuts
+    """
+    if (len(inputListNames) == 0):
+        # Type of particles to use for EventKinematics
+        # K_S0 and Lambda0 are added here because some of them have interacted
+        # with the detector material
+        types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
+                 'K_S0', 'Lambda0']
+        for t in types:
+            fillParticleListFromMC("%s:evtkin_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+                                   True, True, path=path)
+            if (selectionCut != '')
+            applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
+            inputListNames += ["%s:evtkin_default_gen" % t]
+
+    eventKinematicsModule = register_module('EventKinematics')
+    eventKinematicsModule.set_name('EventKinematics_')
+    eventKinematicsModule.param('particleLists', inputListNames)
+    eventKinematicsModule.param('fromMC', True)
+    path.add_module(eventKinematicsModule)
+
+
 def buildEventShape(inputListNames=[],
                     default_cleanup=True,
                     custom_cuts=None,

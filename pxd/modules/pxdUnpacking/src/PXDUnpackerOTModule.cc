@@ -37,9 +37,6 @@ REG_MODULE(PXDUnpackerOT)
 ///*********************** Main unpacker code ***********************
 ///******************************************************************
 
-// disable debug messages for performance reasons
-#define LOG_NO_B2DEBUG
-
 PXDUnpackerOTModule::PXDUnpackerOTModule() :
   Module(),
   m_storeRawHits(),

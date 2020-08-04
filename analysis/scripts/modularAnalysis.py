@@ -2588,8 +2588,8 @@ def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
         for t in types:
             fillParticleListFromMC("%s:evtkin_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
                                    True, True, path=path)
-            if (selectionCut != '')
-            applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
+            if (selectionCut != ''):
+                applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
             inputListNames += ["%s:evtkin_default_gen" % t]
 
     eventKinematicsModule = register_module('EventKinematics')

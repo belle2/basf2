@@ -1,3 +1,13 @@
+/* Style fixes */
+/* ----------- */
+
+/* Avoid having a too large admonition box, because the last child
+   adds bottom margin in addition to its mother */
+.rst-content .admonition *:last-child {
+    margin-bottom: 0 !important;
+}
+
+
 /* Getting things to toggle, e.g. for solution boxes */
 /* ------------------------------------------------- */
 
@@ -11,11 +21,6 @@
     display: block;
     clear: both;
     cursor: pointer;
-}
-
-/* todo: this doesn't cover the case where the last element is not a p */
-.rst-content .toggle p:last-child {
-    margin-bottom: 0;
 }
 
 .rst-content .toggle .admonition-title {

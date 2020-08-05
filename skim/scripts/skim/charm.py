@@ -776,7 +776,7 @@ class DstToD0Pi_D0ToHpHmKs(BaseSkim):
 @fancy_skim_header
 class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     """
-    Cut criteria are not finiloosey decided, and could be changed. Please check the
+    Cut criteria are not finally decided, and could be changed. Please check the
     code in the master branch to get up-to-date information.
     """
 
@@ -816,7 +816,7 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
 @fancy_skim_header
 class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     """
-    Cut criteria are not finiloosey decided, and could be changed. Please check the
+    Cut criteria are not finally decided, and could be changed. Please check the
     code in the master branch to get up-to-date information.
     """
 

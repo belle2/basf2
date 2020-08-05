@@ -1,3 +1,6 @@
+/* Getting things to toggle, e.g. for solution boxes */
+/* ------------------------------------------------- */
+
 .rst-content .toggle {
     padding: 12px;
     line-height: 24px;
@@ -18,10 +21,14 @@
 .rst-content .toggle .admonition-title {
     display: block;
     clear: both;
+    /* Avoid that there is a bit of the box that will be expanded 
+    later showing */
     margin-bottom: -12px;
 }
 
 .rst-content .toggle .admonition-title + * {
+	/* Since we set the admonition-title to have -12px margin, we need to 
+	balance this for its first sibling here. */
     margin-top: 24px;
 }
 
@@ -33,6 +40,9 @@
     content: " ▶";
 }
 
+/* Styling specific admonitions */
+/* ---------------------------- */
+
 .rst-content .hint .admonition-title, .rst-content .solution .admonition-title{
     background: #f9c9da;
     color: inherit;
@@ -42,10 +52,12 @@
 
 .rst-content .hint .admonition-title:before {
     content: "  ";
+    width: 15px;
 }
 
 .rst-content .solution .admonition-title:before {
     content: "  ";
+    width: 15px;
 }
 
 .rst-content .exercise, .rst-content .solution, .rst-content .hint{
@@ -82,16 +94,21 @@
 .rst-content .overview .admonition-title:before, .rst-content .overview .sidebar-title:before {
     content: "  ";
     font-family: FontAwesome;
+    width: 15px;
 }
-
 
 .rst-content .exercise .admonition-title:before {
     content: "  ";
+    width: 15px;
 }
 
 .rst-content .key-points .admonition-title:before {
     content: " ";
+    width: 15px;
 }
+
+/* Stacking boxes */
+/* -------------- */
 
 .stacked {
     margin-bottom: 0px;

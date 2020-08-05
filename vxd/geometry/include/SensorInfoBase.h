@@ -186,6 +186,7 @@ namespace Belle2 {
       /** Return the corresponding pixel/strip ID of a given u coordinate
        * @param u u coordinate of the pixel/strip
        * @param v v coordinate of the pixel/strip, ignored for rectangular sensors
+       * @param clamp flag for clamp
        * @return ID of the pixel/strip covering the given coordinate
        */
       int getUCellID(double u, double v = 0, bool clamp = false) const
@@ -196,6 +197,7 @@ namespace Belle2 {
 
       /** Return the corresponding pixel/strip ID of a given v coordinate
        * @param v v coordinate of the pixel/strip
+       * @param clamp flag for clamp
        * @return ID of the pixel/strip covering the given coordinate
        */
       int getVCellID(double v, bool clamp = false) const

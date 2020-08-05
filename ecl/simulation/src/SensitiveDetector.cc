@@ -170,7 +170,7 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 
   int hitNum = m_eclHits.getEntries();
   //  assert(hitNum == 0);
-  for (const pair<int, hit_t>&  t : a) {
+  for (pair<int, hit_t> t : a) {
     int key = t.first, cellId = key / 160;
     for (const thit_t& s : tr)
       if (s.hid == key) m_eclHitRel.add(s.tid, hitNum);

@@ -159,15 +159,11 @@ namespace Belle2 {
     /// Set global parameter
     void setGlobalParam(double value, unsigned short element, unsigned short i)
     {
-      // TODO: this does not allow updates
-      //setTimeWalkParam(element, value);
-      // directly access the map
-      //      m_tws[element] = value;
       std::map<unsigned short, std::vector<float>>::iterator it = m_tws.find(element);
       if (it != m_tws.end()) {
-        it->second[i] = value;
+        (it->second)[i] = static_cast<float>(value);
       } else {
-        B2FATAL("Specified tw params not found in setGlobalParam !");
+        m_tws.insert(std::pair<unsigned short, std::vector<float>>(element, {static_cast<float>(value), 0.}));
       }
     }
     /// list stored global parameters
@@ -176,6 +172,7 @@ namespace Belle2 {
       std::vector<std::pair<unsigned short, unsigned short>> result;
       for (auto id_timewalk : m_tws) {
         result.push_back({id_timewalk.first, 0});
+        result.push_back({id_timewalk.first, 1});
       }
       return result;
     }
@@ -183,9 +180,9 @@ namespace Belle2 {
 
   private:
     unsigned short m_twParamMode =
-      0; /*!< Mode for tw parameterization; the initial value should be the one for classdef=1; do not modify it. */
+      1; /*!< Mode for tw parameterization; the initial value should be the one for classdef=1; do not modify it. */
     unsigned short m_nTwParams =
-      1;   /*!< No. of tw parameters; the initial value should be the one for classdef=1; do not modify it. */
+      2;   /*!< No. of tw parameters; the initial value should be the one for classdef=1; do not modify it. */
     std::map<unsigned short, std::vector<float>> m_tws; /**< tw list */
 
     ClassDef(CDCTimeWalks, 2); /**< ClassDef */

@@ -579,24 +579,24 @@ namespace {
 
 
     // -
-    EXPECT_FLOAT_EQ(exp->function(NULL), 1337.);
-    EXPECT_FLOAT_EQ(run->function(NULL), 12345.);
-    EXPECT_FLOAT_EQ(evt->function(NULL), 54321.);
-    EXPECT_FLOAT_EQ(date->function(NULL), 20101101.);
-    EXPECT_FLOAT_EQ(year->function(NULL), 2010.);
-    EXPECT_FLOAT_EQ(time->function(NULL), 1288569600);
+    EXPECT_FLOAT_EQ(exp->function(nullptr), 1337.);
+    EXPECT_FLOAT_EQ(run->function(nullptr), 12345.);
+    EXPECT_FLOAT_EQ(evt->function(nullptr), 54321.);
+    EXPECT_FLOAT_EQ(date->function(nullptr), 20101101.);
+    EXPECT_FLOAT_EQ(year->function(nullptr), 2010.);
+    EXPECT_FLOAT_EQ(time->function(nullptr), 1288569600);
   }
 
   TEST_F(EventVariableTest, TestGlobalCounters)
   {
     StoreArray<MCParticle> mcParticles; // empty
     const Manager::Var* var = Manager::Instance().getVariable("nMCParticles");
-    EXPECT_FLOAT_EQ(var->function(NULL), 0.0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 0.0);
 
     for (unsigned i = 0; i < 10; ++i)
       mcParticles.appendNew();
 
-    EXPECT_FLOAT_EQ(var->function(NULL), 10.0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 10.0);
 
     // TODO: add other counters nTracks etc in here
   }

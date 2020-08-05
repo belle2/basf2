@@ -16,7 +16,7 @@
 
 using namespace Belle2;
 
-// NULL pointer
+// nullptr pointer
 StoreArray<ObserverInfo> ObserverCheckFilters::s_storeArray = StoreArray<ObserverInfo>();
 
 //initialize with an empty object

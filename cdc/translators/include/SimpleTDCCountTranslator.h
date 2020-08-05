@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIMPLETDCCOUNTTRANSLATOR_H
-#define SIMPLETDCCOUNTTRANSLATOR_H
+#pragma once
 
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
@@ -105,4 +104,3 @@ namespace Belle2 {
     };
   }
 }
-#endif /* SimpleTDCCountTranslator_H_ */

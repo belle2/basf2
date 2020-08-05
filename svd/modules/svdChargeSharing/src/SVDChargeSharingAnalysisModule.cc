@@ -63,6 +63,7 @@ SVDChargeSharingAnalysisModule::~SVDChargeSharingAnalysisModule()
 
 void SVDChargeSharingAnalysisModule::initialize()
 {
+  // cppcheck-suppress publicAllocationError
   m_outputRootFile = new TFile((m_outputDirName + "/" + m_outputRootFileName).c_str(), "RECREATE");
 
   //StoreArrays
@@ -183,7 +184,7 @@ void SVDChargeSharingAnalysisModule::event()
 
     h_nTracks->Fill(m_Tracks.getEntries());
     // Obtaining track momentum, P value & SVD hits, track hypothesis made for pions(or electrons in case of TB)
-    const TrackFitResult* tfr = NULL;
+    const TrackFitResult* tfr = nullptr;
     tfr = track.getTrackFitResult(Const::pion);
 
     if (tfr) {
@@ -279,7 +280,7 @@ void SVDChargeSharingAnalysisModule::terminate()
     }
   }
   // save to .root file
-  if (m_outputRootFile != NULL) {
+  if (m_outputRootFile != nullptr) {
     m_outputRootFile->cd();
     TDirectory* oldDir = gDirectory;
 
@@ -329,6 +330,9 @@ void SVDChargeSharingAnalysisModule::terminate()
     }
     m_outputRootFile->Close();
   }
+
+  delete m_outputRootFile;
+
 } //terminate
 
 TH1F* SVDChargeSharingAnalysisModule::createHistogram1D(const char* name, const char* title,

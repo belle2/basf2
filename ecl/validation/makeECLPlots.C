@@ -39,63 +39,63 @@ void makeECLPlots()
   
   TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
   gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
-  if (TFile::Open("../ECLBkgOutput.root") != NULL) {
+  if (TFile::Open("../ECLBkgOutput.root") != nullptr) {
     TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
     TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");
     ECL2D(bkg_tree);
     ECLBkg(bkg_tree);
   }
-  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputFWD.root") != nullptr) {
     TFile* cluster_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
     TTree* cluster_treeFWD = (TTree*) cluster_inputFWD->Get("m_tree");
     ECLClusterFWD(cluster_treeFWD);
   }
-  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputFWD.root") != nullptr) {
     TFile* clusterReso_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
     TTree* clusterReso_treeFWD = (TTree*) clusterReso_inputFWD->Get("m_tree");
     ECLClusterResoFWD(clusterReso_treeFWD);
   }
-  if (TFile::Open("../ECLClusterOutputFWD.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputFWD.root") != nullptr) {
     TFile* cd_inputFWD = TFile::Open("../ECLClusterOutputFWD.root");
     TTree* cd_treeFWD = (TTree*) cd_inputFWD->Get("m_tree");
     ECLCalDigitFWD(cd_treeFWD);
   } 
-  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != nullptr) {
     TFile* cluster_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
     TTree* cluster_treeBarrel = (TTree*) cluster_inputBarrel->Get("m_tree");
     ECLClusterBarrel(cluster_treeBarrel);
   } 
-  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != nullptr) {
     TFile* clusterReso_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
     TTree* clusterReso_treeBarrel = (TTree*) clusterReso_inputBarrel->Get("m_tree");
     ECLClusterResoBarrel(clusterReso_treeBarrel);
   }
-  if (TFile::Open("../ECLClusterOutputBarrel.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputBarrel.root") != nullptr) {
     TFile* cd_inputBarrel = TFile::Open("../ECLClusterOutputBarrel.root");
     TTree* cd_treeBarrel = (TTree*) cd_inputBarrel->Get("m_tree");
     ECLCalDigitBarrel(cd_treeBarrel);
   }
-  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputBWD.root") != nullptr) {
     TFile* cluster_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
     TTree* cluster_treeBWD = (TTree*) cluster_inputBWD->Get("m_tree");
     ECLClusterBWD(cluster_treeBWD);
   }
-  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputBWD.root") != nullptr) {
     TFile* clusterReso_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
     TTree* clusterReso_treeBWD = (TTree*) clusterReso_inputBWD->Get("m_tree");
     ECLClusterResoBWD(clusterReso_treeBWD);
   }
-  if (TFile::Open("../ECLClusterOutputBWD.root") != NULL) {
+  if (TFile::Open("../ECLClusterOutputBWD.root") != nullptr) {
     TFile* cd_inputBWD = TFile::Open("../ECLClusterOutputBWD.root");
     TTree* cd_treeBWD = (TTree*) cd_inputBWD->Get("m_tree");
     ECLCalDigitBWD(cd_treeBWD);
   }
-  if (TFile::Open("../ECLMuonOutput.root") != NULL) {
+  if (TFile::Open("../ECLMuonOutput.root") != nullptr) {
     TFile* muon_input = TFile::Open("../ECLMuonOutput.root");
     TTree* muon_tree = (TTree*) muon_input->Get("m_tree");
     ECLMuon(muon_tree);
   }
-  if (TFile::Open("../ECLEvtGenOutput.root") != NULL) {
+  if (TFile::Open("../ECLEvtGenOutput.root") != nullptr) {
     TFile* genericBB_input = TFile::Open("../ECLEvtGenOutput.root");
     TTree* genericBB_tree = (TTree*) genericBB_input->Get("m_tree");
     ECLEvtGen(genericBB_tree);

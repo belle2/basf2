@@ -31,7 +31,7 @@ def get_argument_parser():
 
     parser.add_argument(
         "-o",
-        "--output-udst-name",
+        "--output-script-name",
         dest="OutputFilename",
         metavar="OutputFilename",
         nargs="?",

@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <vector>
 #include <string>
@@ -38,8 +37,6 @@ namespace Belle2 {
       for (auto prob : pdf)
         EXPECT_EQ(SVDRecoDigit::OutputProbType(1.0), prob);
       EXPECT_EQ(100.0, digit.getChi2Ndf());
-      EXPECT_EQ(SVDModeByte::c_DefaultID, digit.getModeByte().getID());
-      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
     }
 
     /**
@@ -50,7 +47,6 @@ namespace Belle2 {
       // Create an arbitrary recodigit
       VxdID sensorID(3, 4, 1);
       short int cellID = 132;
-      SVDModeByte digitModeByte(151);
       float init_charge = 23456;
       float init_chargeErr = 1234;
       float init_time = -16;
@@ -59,7 +55,7 @@ namespace Belle2 {
 
       std::vector<float> init_probs({0.0, 0.01, 0.10, 0.79, 0.06, 0.04});
       SVDRecoDigit digit(sensorID, false, cellID, init_charge, init_chargeErr, init_time,
-                         init_timeErr, init_probs, init_chi2, digitModeByte);
+                         init_timeErr, init_probs, init_chi2);
       // Test getters
       EXPECT_EQ(sensorID, digit.getSensorID());
       EXPECT_FALSE(digit.isUStrip());
@@ -75,8 +71,7 @@ namespace Belle2 {
       float outputNorm = std::accumulate(pdf.begin(), pdf.end(), 0.0);
       EXPECT_LE(fabs(1.0 - outputNorm), 1.0e-6);
       EXPECT_EQ(init_chi2, digit.getChi2Ndf());
-      EXPECT_EQ(digitModeByte, digit.getModeByte());
-      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
+
     }
     /**
      * Check object creation and data getters using a stl container of probabilities.
@@ -86,7 +81,6 @@ namespace Belle2 {
       // Create an arbitrary recodigit
       VxdID sensorID(3, 4, 1);
       short int cellID = 132;
-      SVDModeByte digitModeByte(151);
       float init_charge = 23456;
       float init_chargeErr = 1234;
       float init_time = -16;
@@ -95,10 +89,10 @@ namespace Belle2 {
 
       std::vector<float> init_probs({0.0, 0.01, 0.10, 0.79, 0.06, 0.04});
       SVDRecoDigit digit(sensorID, false, cellID, init_charge, init_chargeErr, init_time,
-                         init_timeErr, init_probs, init_chi2, digitModeByte);
+                         init_timeErr, init_probs, init_chi2);
       // Test getters
       std::string
-      digitString("VXDID : 25632 = 3.4.1 strip: V-132 Amplitude: 23456 +/- 1234 Time: -16 +/- 3.21\n probabilities: 0 655 6553 51772 3932 2621 Chi2/ndf: 2.34 0-suppr/global/6 samples/???\n");
+      digitString("VXDID : 25632 = 3.4.1 strip: V-132 Amplitude: 23456 +/- 1234 Time: -16 +/- 3.21\n probabilities: 0 655 6553 51772 3932 2621 Chi2/ndf: 2.34\n");
       EXPECT_EQ(digitString, digit.toString());
     }
 

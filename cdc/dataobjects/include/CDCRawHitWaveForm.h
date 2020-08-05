@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCRAWHITWAVEFORM_H
-#define CDCRAWHITWAVEFORM_H
+#pragma once
 
 // Includes
 #include <framework/datastore/RelationsObject.h>
@@ -152,5 +151,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif // End of RAWCDCWAVEFORM_H

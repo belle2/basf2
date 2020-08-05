@@ -720,7 +720,10 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
        and oParticle->getParticleSource() != EParticleSourceObject::c_MCParticle)
       or (this->getParticleSource() != EParticleSourceObject::c_MCParticle
           and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle)) {
-    B2FATAL("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!");
+    B2WARNING("Something went wrong: MCParticle is being compared to a non MC Particle. Please check your script!\n"
+              "                              If the MCParticle <-> Particle comparison happens in the RestOfEventBuilder,\n"
+              "                              the Rest Of Event may contain signal side particles.");
+    return false;
   }
   if (this->getParticleSource() == EParticleSourceObject::c_MCParticle
       and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle) {

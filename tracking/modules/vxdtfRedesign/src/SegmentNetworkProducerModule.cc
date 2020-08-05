@@ -249,7 +249,7 @@ void SegmentNetworkProducerModule::buildActiveSectorNetwork(std::vector<SegmentN
     // find innerSectors of outerSector and add them to the network:
     const std::vector<FullSecID>& innerSecIDs = outerSector.getInner2spSecIDs();
 
-    for (const FullSecID innerSecID : innerSecIDs) {
+    for (const FullSecID& innerSecID : innerSecIDs) {
       std::int32_t innerEntryID = innerSecID;
       vector<RawSectorData>::iterator innerRawSecPos =
         std::find_if(collectedData.begin(), collectedData.end(),

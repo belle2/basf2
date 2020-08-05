@@ -48,6 +48,7 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
   } catch (...) {}
 
   file_json["checksums"]["md5"] = FileSystem::calculateMD5(fileName);
+  file_json["checksums"]["adler32"] = FileSystem::calculateAdler32(fileName);
   // no sha256 yet
 
   m_json["output_files"].push_back(file_json);
@@ -65,6 +66,7 @@ void MetadataService::addRootNtupleFile(const std::string& fileName)
   // no metadata and no check
 
   file_json["checksums"]["md5"] = FileSystem::calculateMD5(fileName);
+  file_json["checksums"]["adler32"] = FileSystem::calculateAdler32(fileName);
   // no sha256 yet
 
   m_json["output_files"].push_back(file_json);

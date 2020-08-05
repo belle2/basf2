@@ -349,7 +349,7 @@ void ECLWaveformFitModule::event()
     for (int j = 0; j < ec.m_nsmp; j++) fitA[j] = aECLDsp.getDspA()[j];
 
     //setting relation of eclDSP to aECLDigit
-    const ECLDigit* d = NULL;
+    const ECLDigit* d = nullptr;
     for (const auto& aECLDigit : m_eclDigits) {
       if (aECLDigit.getCellId() - 1 == id) {
         d = &aECLDigit;
@@ -357,7 +357,7 @@ void ECLWaveformFitModule::event()
         break;
       }
     }
-    if (d == NULL) continue;
+    if (d == nullptr) continue;
 
     //Skipping low amplitude waveforms
     if (d->getAmp() * m_ADCtoEnergy[id] < m_EnergyThreshold)  continue;

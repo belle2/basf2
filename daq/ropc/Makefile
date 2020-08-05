@@ -1,6 +1,6 @@
 CXX = g++
 INCDIR = ./include
-CFLAGS   = -g -O3 -Wall -fPIC -I ${INCDIR}
+CFLAGS   = -g -O3 -Wall -fPIC -I ${INCDIR} -DNOBASF2
 #LOCALLIB  = CPRROPCDAQ
 LIBFLAG = -lrt -lpthread#-l${LOCALLIB}
 

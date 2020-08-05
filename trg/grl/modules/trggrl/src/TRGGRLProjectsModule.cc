@@ -753,6 +753,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_phys") {bit = ecl_phys;}
     else if (bitname == "ecl_oflo") {bit = ecl_oflo;}
     else if (bitname == "ecl_3dbha") {bit = ecl_3dbha;}
+    else if (bitname == "bha_veto") {bit = ecl_3dbha;}
     else if (bitname == "ecl_lml_0") {bit = ecl_lml_0;}
     else if (bitname == "ecl_lml_1") {bit = ecl_lml_1;}
     else if (bitname == "ecl_lml_2") {bit = ecl_lml_2;}
@@ -807,16 +808,18 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "cdcklm_1") {bit = cdcklm_1;}
     else if (bitname == "cdcklm_2") {bit = cdcklm_2;}
     else if (bitname == "cdcklm_3") {bit = cdcklm_3;}
-    else if (bitname == "d_b2b3") {bit = cluster_b2b_1to3 > 0;}
-    else if (bitname == "d_b2b5") {bit = cluster_b2b_1to5 > 0;}
-    else if (bitname == "d_b2b7") {bit = cluster_b2b_1to7 > 0;}
-    else if (bitname == "d_b2b9") {bit = cluster_b2b_1to9 > 0;}
-    else if (bitname == "p_b2b3") {bit = Trkcluster_b2b_1to3 > 0;}
-    else if (bitname == "p_b2b5") {bit = Trkcluster_b2b_1to5 > 0;}
-    else if (bitname == "p_b2b7") {bit = Trkcluster_b2b_1to7 > 0;}
-    else if (bitname == "p_b2b9") {bit = Trkcluster_b2b_1to9 > 0;}
+    else if (bitname == "d3") {bit = cluster_b2b_1to3 > 0;}
+    else if (bitname == "d5") {bit = cluster_b2b_1to5 > 0;}
+    else if (bitname == "d7") {bit = cluster_b2b_1to7 > 0;}
+    else if (bitname == "d9") {bit = cluster_b2b_1to9 > 0;}
+    else if (bitname == "p3") {bit = Trkcluster_b2b_1to3 > 0;}
+    else if (bitname == "p5") {bit = Trkcluster_b2b_1to5 > 0;}
+    else if (bitname == "p7") {bit = Trkcluster_b2b_1to7 > 0;}
+    else if (bitname == "p9") {bit = Trkcluster_b2b_1to9 > 0;}
     else if (bitname == "track") {bit = false;}
     else if (bitname == "trkfit") {bit = false;}
+
+    else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
 
     trgInfo->setInputBits(i, bit);
   }

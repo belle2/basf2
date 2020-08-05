@@ -7,12 +7,12 @@ using namespace Belle2;
 REG_MODULE(SVDClusterEvaluation)
 
 SVDClusterEvaluationModule::SVDClusterEvaluationModule(): Module()
-  , m_interCoor(NULL)
-  , m_interSigma(NULL)
-  , m_clsCoor(NULL)
-  , m_clsResid(NULL)
-  , m_clsMinResid(NULL)
-  , m_clsResid2D(NULL)
+  , m_interCoor(nullptr)
+  , m_interSigma(nullptr)
+  , m_clsCoor(nullptr)
+  , m_clsResid(nullptr)
+  , m_clsMinResid(nullptr)
+  , m_clsResid2D(nullptr)
 {
 
   setDescription("This module check performances of SVD reconstruction of VXD TB data");
@@ -122,7 +122,7 @@ void SVDClusterEvaluationModule::initialize()
 void SVDClusterEvaluationModule::beginRun()
 {
 
-  if (m_interCoor == NULL) {
+  if (m_interCoor == nullptr) {
 
     //INTERCEPTS
     create_SVDHistograms_interCoor();
@@ -305,7 +305,7 @@ void SVDClusterEvaluationModule::endRun()
   ms_run = meta->getRun();
   ms_experiment = meta->getExperiment();
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     m_tree->Write();

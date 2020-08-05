@@ -63,7 +63,7 @@
   source="TVector3 m_MCtagV"                    \
   version="[-3]"                                \
   targetClass="Belle2::TagVertex"               \
-  target="m_MCtagV"                             \
+  target="m_mcTagV"                             \
   code="{m_mcTagV = onfile.m_MCtagV;}"          \
 
 #pragma read                                                   \

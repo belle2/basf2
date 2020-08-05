@@ -74,5 +74,14 @@
   target="m_tagVertexErrMatrix"                                \
   code="{m_tagVertexErrMatrix = onfile.m_tagVertexErrMatrix;}" \
 
+#pragma read                                   \
+  sourceClass="Belle2::EventKinematics"        \
+  source="bool m_builtFromMC"                  \
+  version="[-2]"                               \
+  targetClass="Belle2::EventKinematics"        \
+  target="m_builtFromMC"                       \
+  code="{m_builtFromMC = false;}"              \
+
+
 
 #endif

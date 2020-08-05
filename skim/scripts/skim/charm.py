@@ -245,9 +245,9 @@ class XToDp_DpToHpHmJp(BaseSkim):
     """
     **Decay Modes**:
 
-    * :math:`D^+_{(S)} \\to K^+ K^- \\pi^+`
-    * :math:`D^+_{(S)} \\to \\pi^+ \\pi^- \\K^+`
-    * For `D^+_{(S)} \\to K_{S} h^+`, which includes a K_{S} vertex, please check `XToDp_DpToKsHp`
+    * :math:`D^+_{(S)} \\to K^+ K^- \\pi^+`,
+    * :math:`D^+_{(S)} \\to \\pi^+ \\pi^- K^+`,
+    * For :math:`D^+_{(S)} \\to K_{S} h^+`, which includes a :math:`K_{S}` vertex, please check `XToDp_DpToKsHp`
 
     **Additional Cuts**:
 
@@ -591,7 +591,7 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
     **Decay Modes**:
 
     * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\pi^- \\pi^+`
-    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to pi^+ \\pi^- \\pi^- \\pi^+`
+    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^- \\pi^+`
 
 
     **Additional Cuts**:

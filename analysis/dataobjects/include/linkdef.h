@@ -77,7 +77,7 @@
 #pragma read                                   \
   sourceClass="Belle2::EventKinematics"        \
   source="bool m_builtFromMC"                  \
-  version="[-2]"                               \
+  version="[1]"                                \
   targetClass="Belle2::EventKinematics"        \
   target="m_builtFromMC"                       \
   code="{m_builtFromMC = false;}"              \

@@ -157,7 +157,7 @@ namespace Belle2 {
     float m_photonsEnergy; /**< Total energy of photons in lab */
 
     bool m_builtFromMC; /**< Is from MC switch */
-    ClassDef(EventKinematics, 3) /**< class definition */
+    ClassDef(EventKinematics, 2) /**< class definition */
 
   };
 

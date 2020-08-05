@@ -119,7 +119,10 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
     for (int i = 0; i < m_part; i++) {
       const Particle* part = plist->getParticle(i);
       if (part->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle and !m_usingMC) {
-        B2FATAL("EventKinematics received MCParticles as an input, but fromMC flag is false");
+        B2FATAL("EventKinematics received MCParticles as an input, but usingMC flag is false");
+      }
+      if (part->getParticleSource() != Particle::EParticleSourceObject::c_MCParticle and m_usingMC) {
+        B2FATAL("EventKinematics received reconstructed Particles as an input, but usingMC flag is true");
       }
 
       TLorentzVector p_lab = part->get4Vector();

@@ -75,6 +75,8 @@ RegisteredSkims = [
     ("17230200", "charm", "XToD0_D0ToNeutrals"),
     ("17230300", "charm", "DstToD0Pi_D0ToRare"),  # D0 -> g g/e e/mu mu
     ("17230400", "charm", "XToDp_DpToKsHp"),  # D+ -> Ks h+
+    ("17230500", "charm", "XToDp_DpToHpHmJp"),  # D+ -> h+ h- j+
+    ("17230600", "charm", "LambdacTopHpJm"),  # Lambda_c+ -> proton h- j+
     ("17240100", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
     # D* -> D0 -> K- pi+ pi0 (""+WS)
     ("17240200", "charm", "DstToD0Pi_D0ToHpJmPi0"),
@@ -89,6 +91,8 @@ RegisteredSkims = [
     # D* -> D0 -> K- pi+ pi0 (""+WS)
     ("17240800", "charm", "EarlyData_DstToD0Pi_D0ToHpJmPi0"),
     ("17240900", "charm", "EarlyData_DstToD0Pi_D0ToHpHmPi0"),  # D* -> D0 -> h h pi0
+    ("17241000", "charm", "DstToDpPi0_DpToHpPi0"),  # D*+ -> D+ pi0, D+ -> h+ pi0
+    ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18020100", "dark", "SinglePhotonDark"),

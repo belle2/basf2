@@ -6,7 +6,10 @@ Skim list building functions for charm analyses.
 
 .. Note::
     The Hp, Hm and Jm in the function name represent arbitrary charged particles with
-    positive or negative charge.
+    positive or negative charge. The Hp and Jm in `XToD0_D0ToHpJm`, mean a positive particle
+    and a negative particle that could be either conjugate or non-conjugate. The Hp and Hm
+    in `DstToD0Pi_D0ToHpHmPi0`, mean a positive particle and a negative particle that
+    must be conjugate.
 """
 
 from functools import lru_cache
@@ -205,25 +208,26 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 class XToDp_DpToKsHp(BaseSkim):
     """
     **Decay Modes**:
-    * :math:`D^+_{(S)} \\to K_{S} \\pi^+`
-    * :math:`D^+_{(S)} \\to K_{S} K^+`
+
+    * :math:`D^+_{(S)} \\to K_{S} \\pi^+`,
+    * :math:`D^+_{(S)} \\to K_{S} K^+`,
 
     **Additional Cuts**:
 
-    * ``Tracks: same as D0ToHpJm()``
+    * ``Tracks not from Ks: same as D0ToHpJm()``
     * ``Ks: directly taken from stdKshort()``
     * ``1.72 < M(D+) < 1.98, pcms(D+) > 2``
     """
 
     __authors__ = ["Guanda Gong"]
-    __description__ = "Skim list for D+ to Ks h+."
+    __description__ = "Skim list for D_(s)+ to Ks h+."
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
+            "stdK": ["loose"],
+            "stdPi": ["loose"],
         },
         "stdV0s": {
             "stdKshorts": [],
@@ -251,6 +255,135 @@ class XToDp_DpToKsHp(BaseSkim):
 
 
 @fancy_skim_header
+class XToDp_DpToHpHmJp(BaseSkim):
+    """
+    **Decay Modes**:
+
+    * :math:`D^+_{(S)} \\to K^{+} K^{-} \\pi^+`
+    * :math:`D^+_{(S)} \\to \\pi^{+} \\pi^{-} \\K^+`
+    * For `D^+_{(S)} \\to K_{S} h^+`, which includes a K_{S} vertex, please check `XToDp_DpToKsHp`
+
+    **Additional Cuts**:
+
+    * ``Tracks: same as D0ToHpJm()``
+    * ``1.7 < M(D+) < 2.2, pcms(D+) > 2``
+    """
+
+    __authors__ = ["Aman Sangal"]
+    __description__ = "Skim list for D_(s)+ to h+ h- j+."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdK": ["loose"],
+            "stdPi": ["loose"],
+        },
+
+    }
+
+    def build_lists(self, path):
+        Dpcuts = "1.7 < M < 2.2 and useCMSFrame(p)>2"
+
+        Dp_Channels = ["pi+:loose pi-:loose K+:loose",
+                       "K+:loose K-:loose pi+:loose",
+                       ]
+
+        DpList = []
+        for chID, channel in enumerate(Dp_Channels):
+            ma.reconstructDecay("D+:HpHmJp" + str(chID) + " -> " + channel, Dpcuts, chID, path=path)
+            DpList.append("D+:HpHmJp" + str(chID))
+
+        self.SkimLists = DpList
+
+
+@fancy_skim_header
+class LambdacTopHpJm(BaseSkim):
+    """
+    **Decay Modes**:
+
+    * :math:`\\Lambda_c^+ \\to p K^{-} \\pi^+`
+
+    **Additional Cuts**:
+
+    * ``Tracks: from the standard loose list``
+    * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.1``
+    """
+
+    __authors__ = ["Justin Guilliams"]
+    __description__ = "Skim list for Lambda_c^+ -> p K^- pi^+."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPr": ["loose"],
+            "stdK": ["loose"],
+            "stdPi": ["loose"],
+        },
+
+    }
+
+    def build_lists(self, path):
+
+        LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p)>2.1"
+        LambdacChannels = ["p+:loose K-:loose pi+:loose",
+                           ]
+
+        LambdacList = []
+        for chID, channel in enumerate(LambdacChannels):
+            ma.reconstructDecay("Lambda_c+:pHpJm" + str(chID) + " -> " + channel, LambdacCuts, chID, path=path)
+            LambdacList.append("Lambda_c+:pHpJm" + str(chID))
+
+        self.SkimLists = LambdacList
+
+
+@fancy_skim_header
+class DstToDpPi0_DpToHpPi0(BaseSkim):
+    """
+    **Decay Modes**:
+    * :math:`D^{*+}\\to \\pi^{0} D^{+}, D^+ \\to \\pi^+ \\pi^{0}`
+
+    **Additional Cuts**:
+
+    * ``Tracks: same as D0ToHpJm()``
+    * ``\\pi^{0}: directly taken from pi0:skim standard list``
+    * ``1.72 < M(D+) < 1.98, pcms(D+) > 2``
+    """
+
+    __authors__ = ["Johannes Brand"]
+    __description__ = "Skim list for D*+ to D+ pi0, D+ to h+ pi0."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+        },
+        "stdPi0s": {
+            "loadStdSkimPi0": [],
+        },
+    }
+
+    def build_lists(self, path):
+        mySel = "abs(d0) < 1 and abs(z0) < 3"
+        mySel += " and 0.296706 < theta < 2.61799"
+        ma.fillParticleList("pi+:kshp", mySel, path=path)
+        ma.cutAndCopyList("pi0:myskim", "pi0:skim", "", path=path)
+
+        Dpcuts = "1.72 < M < 1.98 and useCMSFrame(p)>2"
+        Dp_Channels = ["pi+:kshp pi0:myskim",
+                       ]
+
+        DpList = []
+        for chID, channel in enumerate(Dp_Channels):
+            ma.reconstructDecay("D+:HpPi0" + str(chID) + " -> " + channel, Dpcuts, chID, path=path)
+            DpList.append("D+:HpPi0" + str(chID))
+
+        self.SkimLists = DpList
+
+
+@fancy_skim_header
 class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     """
     **Decay Modes**:
@@ -259,7 +392,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
 
     **Additional Cuts**:
 
-    1. ``All Cuts in D0ToHpJm()``
+    1. ``loose Cuts in D0ToHpJm()``
 
     2. ``0 < Q < 0.018``
     """
@@ -274,8 +407,8 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
             "stdPhotons": ["loose"],
         },
         "stdCharged": {
-            "stdK": ["all", "loose"],
-            "stdPi": ["all", "loose"],
+            "stdK": ["loose", "loose"],
+            "stdPi": ["loose", "loose"],
         },
     }
 
@@ -297,7 +430,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
         from validation_tools.metadata import create_validation_histograms
 
         ma.reconstructDecay('D0:HpJm0_test -> pi+:loose K-:loose', '1.80 < M < 1.93 and useCMSFrame(p)>2.2', path=path)
-        ma.reconstructDecay('D*+:HpJm0_test -> D0:HpJm0_test pi+:all', '0 < Q < 0.018', path=path)
+        ma.reconstructDecay('D*+:HpJm0_test -> D0:HpJm0_test pi+:loose', '0 < Q < 0.018', path=path)
 
         vm.addAlias('M_D0', 'daughter(0,InvM)')
         vm.addAlias('Pcms_D0', 'daughter(0,useCMSFrame(p))')
@@ -374,8 +507,8 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdK": ["all", "loose"],
-            "stdPi": ["all", "loose"],
+            "stdK": ["loose", "loose"],
+            "stdPi": ["loose", "loose"],
         },
         "stdPi0s": {
             "loadStdSkimPi0": [],
@@ -390,8 +523,8 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         DstList = []
         # NOTE: renamed to avoid particle list name clashes
         ma.reconstructDecay("D0:HpJmPi0_withPID -> K-:loose pi+:loose pi0:myskim", charmcuts, path=path)
-        ma.reconstructDecay("D*+:HpJmPi0RS_withPID -> D0:HpJmPi0_withPID pi+:all", Dstcuts, path=path)
-        ma.reconstructDecay("D*-:HpJmPi0WS_withPID -> D0:HpJmPi0_withPID pi-:all", Dstcuts, path=path)
+        ma.reconstructDecay("D*+:HpJmPi0RS_withPID -> D0:HpJmPi0_withPID pi+:loose", Dstcuts, path=path)
+        ma.reconstructDecay("D*-:HpJmPi0WS_withPID -> D0:HpJmPi0_withPID pi-:loose", Dstcuts, path=path)
         ma.copyLists("D*+:HpJmPi0_withPID", ["D*+:HpJmPi0RS_withPID", "D*+:HpJmPi0WS_withPID"], path=path)
         DstList.append("D*+:HpJmPi0_withPID")
 
@@ -420,8 +553,8 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdK": ["all", "loose"],
-            "stdPi": ["all", "loose"],
+            "stdK": ["loose", "loose"],
+            "stdPi": ["loose", "loose"],
         },
         "stdPhotons": {
             "loadStdSkimPhoton": [],
@@ -446,7 +579,7 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
             # NOTE: renamed to avoid particle list name clashes
             ma.reconstructDecay("D0:HpHmPi0" + str(chID) + "_withPID" + " -> " + channel, charmcuts, chID, path=path)
             ma.reconstructDecay(
-                "D*+:HpHmPi0" + str(chID) + "_withPID" + " -> D0:HpHmPi0" + str(chID) + "_withPID" + " pi+:all",
+                "D*+:HpHmPi0" + str(chID) + "_withPID" + " -> D0:HpHmPi0" + str(chID) + "_withPID" + " pi+:loose",
                 Dstcuts, chID, path=path)
             DstList.append("D*+:HpHmPi0" + str(chID) + "_withPID")
 
@@ -475,7 +608,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdPi": ["all"],
+            "stdPi": ["loose"],
         },
         "stdPi0s": {
             "loadStdSkimPi0": [],
@@ -497,8 +630,51 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
         ma.reconstructDecay("D0:KsOmega -> K_S0:merged omega:3pi", charmcuts, path=path)
 
         DstList = []
-        ma.reconstructDecay("D*+:KsOmega -> D0:KsOmega pi+:all", "0 < Q < 0.018", path=path)
+        ma.reconstructDecay("D*+:KsOmega -> D0:KsOmega pi+:loose", "0 < Q < 0.018", path=path)
         DstList.append("D*+:KsOmega")
+
+        self.SkimLists = DstList
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
+    """
+    **Decay Modes**:
+
+    * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K_{-} \\pi^+ \\pi^- \\pi^{+}`
+
+
+    **Additional Cuts**:
+
+    * ``Tracks: same as D0ToHpJm()``
+    * ``1.7< M(D0) < 2.0, pcms(D0) > 2.4``
+    * ``Q < 0.018``
+    """
+
+    __authors__ = ["Kavita Lalwani, Chanchal Sharma"]
+    __description__ = "Skim list for D*+ to K- pi+ pi- pi+."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    RequiredStandardLists = {
+        "stdCharged": {
+            "stdPi": ["all"],
+            "stdK": ["all"],
+        },
+    }
+
+    def build_lists(self, path):
+        mySel = "abs(d0) < 1 and abs(z0) < 3"
+        mySel += " and 0.296706 < theta < 2.61799"
+        ma.fillParticleList("pi+:hphmhpjm", mySel, path=path)
+        ma.fillParticleList("K+:hphmhpjm", mySel, path=path)
+
+        charmcuts = "1.7 < M < 2.0 and useCMSFrame(p)>2.4"
+        ma.reconstructDecay("D0:HpHmHpJm -> K-:hphmhpjm pi+:hphmhpjm pi-:hphmhpjm pi+:hphmhpjm", charmcuts, path=path)
+
+        DstList = []
+        ma.reconstructDecay("D*+:HpHmHpJm -> D0:HpHmHpJm pi+:hphmhpjm", "0 < Q < 0.018", path=path)
+        DstList.append("D*+:HpHmHpJm")
 
         self.SkimLists = DstList
 
@@ -539,9 +715,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         "stdPi0s": {
             "loadStdSkimPi0": [],
         },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
+
     }
 
     def build_lists(self, path):
@@ -552,8 +726,8 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         DstList = []
         ma.reconstructDecay("D0:HpJmEta -> K-:loose pi+:loose eta:myskim", charmcuts, path=path)
         vertex.treeFit("D0:HpJmEta", 0.001, path=path)
-        ma.reconstructDecay("D*+:HpJmEtaRS_eta -> D0:HpJmEta pi+:all", Dstcuts, path=path)
-        ma.reconstructDecay("D*-:HpJmEtaWS_eta -> D0:HpJmEta pi-:all", Dstcuts, path=path)
+        ma.reconstructDecay("D*+:HpJmEtaRS_eta -> D0:HpJmEta pi+:loose", Dstcuts, path=path)
+        ma.reconstructDecay("D*-:HpJmEtaWS_eta -> D0:HpJmEta pi-:loose", Dstcuts, path=path)
         vertex.kFit("D*+:HpJmEtaRS_eta", conf_level=0.001, path=path)
         vertex.kFit("D*+:HpJmEtaWS_eta", conf_level=0.001, path=path)
         DstList.append("D*+:HpJmEtaRS_eta")
@@ -583,7 +757,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
 
     RequiredStandardLists = {
         "stdCharged": {
-            "stdPi": ["all"],
+            "stdPi": ["loose"],
         },
         "stdPi0s": {
             "loadStdSkimPi0": [],
@@ -600,7 +774,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
 
         DstList = []
         for chID, channel in enumerate(D0List):
-            ma.reconstructDecay("D*+:2Nbdy" + str(chID) + " -> pi+:all " + channel, Dstcuts, chID, path=path)
+            ma.reconstructDecay("D*+:2Nbdy" + str(chID) + " -> pi+:loose " + channel, Dstcuts, chID, path=path)
             DstList.append("D*+:2Nbdy" + str(chID))
 
         self.SkimLists = DstList
@@ -660,7 +834,7 @@ class DstToD0Pi_D0ToHpHmKs(BaseSkim):
 @fancy_skim_header
 class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     """
-    Cut criteria are not finially decided, and could be changed. Please check the
+    Cut criteria are not finiloosey decided, and could be changed. Please check the
     code in the master branch to get up-to-date information.
     """
 
@@ -705,7 +879,7 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
 @fancy_skim_header
 class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     """
-    Cut criteria are not finially decided, and could be changed. Please check the
+    Cut criteria are not finiloosey decided, and could be changed. Please check the
     code in the master branch to get up-to-date information.
     """
 

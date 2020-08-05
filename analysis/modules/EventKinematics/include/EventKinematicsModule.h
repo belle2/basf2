@@ -48,7 +48,7 @@ namespace Belle2 {
 
   private:
 
-    bool m_fromMC;  /**< Is from MC */
+    bool m_usingMC;  /**< Is from MC */
 
     std::vector<std::string> m_particleLists;  /**< Name of the ParticleList */
 

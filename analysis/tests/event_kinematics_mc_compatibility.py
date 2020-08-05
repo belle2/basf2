@@ -33,7 +33,7 @@ event_kinematics = [
     'genMissingMomentumOfEventCMS'
 ]
 
-testpath.add_module('EventKinematics', particleLists=fsps, fromMC=True)
+testpath.add_module('EventKinematics', particleLists=fsps, usingMC=True)
 # Print the variables to log
 testpath.add_module('ParticlePrinter', listName='', fullPrint=False,
                     variables=event_kinematics)

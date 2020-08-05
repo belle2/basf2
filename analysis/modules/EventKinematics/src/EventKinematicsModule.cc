@@ -42,7 +42,7 @@ EventKinematicsModule::EventKinematicsModule() : Module()
 
   // Parameter definitions
   addParam("particleLists", m_particleLists, "List of the ParticleLists", vector<string>());
-  addParam("fromMC", m_fromMC, "is from MC", false);
+  addParam("usingMC", m_usingMC, "is using generated particles", false);
 
 }
 
@@ -50,7 +50,7 @@ EventKinematicsModule::~EventKinematicsModule() = default;
 
 void EventKinematicsModule::initialize()
 {
-  auto arrayName = (!m_fromMC) ? "EventKinematics" : "EventKinematicsFromMC";
+  auto arrayName = (!m_usingMC) ? "EventKinematics" : "EventKinematicsFromMC";
   StoreObjPtr<EventKinematics> evtKinematics(arrayName);
   evtKinematics.registerInDataStore();
 
@@ -62,7 +62,7 @@ void EventKinematicsModule::beginRun()
 
 void EventKinematicsModule::event()
 {
-  auto* eventKinematics = new EventKinematics(m_fromMC);
+  auto* eventKinematics = new EventKinematics(m_usingMC);
   EventKinematicsModule::getParticleMomentumLists(m_particleLists);
 
   TVector3 missingMomentum = EventKinematicsModule::getMissingMomentum();
@@ -83,7 +83,7 @@ void EventKinematicsModule::event()
   float totalPhotonsEnergy = EventKinematicsModule::getTotalPhotonsEnergy();
   eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
   // Here the DataStore should take ownership of the eventKinematics pointer:
-  if (m_fromMC) {
+  if (m_usingMC) {
     StoreObjPtr<EventKinematics> eventKinematicsPtr("EventKinematicsFromMC");
     eventKinematicsPtr.assign(eventKinematics);
   } else {
@@ -118,7 +118,7 @@ void EventKinematicsModule::getParticleMomentumLists(vector<string> particleList
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
       const Particle* part = plist->getParticle(i);
-      if (part->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle and !m_fromMC) {
+      if (part->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle and !m_usingMC) {
         B2FATAL("EventKinematics received MCParticles as an input, but fromMC flag is false");
       }
 

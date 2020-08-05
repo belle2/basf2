@@ -2596,7 +2596,7 @@ def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
     eventKinematicsModule = register_module('EventKinematics')
     eventKinematicsModule.set_name('EventKinematics_')
     eventKinematicsModule.param('particleLists', inputListNames)
-    eventKinematicsModule.param('fromMC', True)
+    eventKinematicsModule.param('usingMC', True)
     path.add_module(eventKinematicsModule)
 
 

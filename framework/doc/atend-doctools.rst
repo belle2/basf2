@@ -529,9 +529,24 @@ The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
 navigate it with your favorite browser to check if the output is what you
 expect.
 
+Alternatively you can also build the sphinx documentation without building any
+code with
+
+.. code:: bash
+
+    b2code-sphinx-build
+
+which will be slightly faster. If you're only interested in sphinx warnings,
+use
+
+.. code:: bash
+
+    b2code-sphinx-warnings
+
 If you are working on a remote server with port ``8XXXX`` forwarded to your local
 machine (as when running a Jupyter notebook), you can also start a tiny web server on
-the remote machine and access it from your local machine:
+the remote machine and access it from your local machine to view the rendered
+documentation:
 
 .. code:: bash
 

@@ -623,7 +623,7 @@ Returns NAN for data.
     REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS,
                       "[Eventbased] The missing energy in CMS obtained with EventKinematics module")
     REGISTER_VARIABLE("genMissingEnergyOfEventCMS", genMissingEnergyOfEventCMS,
-                      "[Eventbased] The missing energy in CMS obtained with EventKinematics module")
+                      "[Eventbased] The missing energy in CMS obtained with EventKinematics module from generator")
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent,
                       "[Eventbased] The missing mass squared obtained with EventKinematics module")
     REGISTER_VARIABLE("genMissingMass2OfEvent", genMissingMass2OfEvent,

@@ -2578,6 +2578,7 @@ def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
     @param inputListNames     list of ParticleLists used to calculate the global event kinematics.
                               If the list is empty, default ParticleLists are filled.
     @param selectionCut       optional selection cuts
+    @param path               Path to append the eventKinematics module to.
     """
     if (len(inputListNames) == 0):
         # Type of particles to use for EventKinematics

@@ -82,6 +82,7 @@ void EventKinematicsModule::event()
 
   float totalPhotonsEnergy = EventKinematicsModule::getTotalPhotonsEnergy();
   eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
+  // Here the DataStore should take ownership of the eventKinematics pointer:
   if (m_fromMC) {
     StoreObjPtr<EventKinematics> eventKinematicsPtr("EventKinematicsFromMC");
     eventKinematicsPtr.assign(eventKinematics);

@@ -189,7 +189,7 @@ namespace Belle2 {
     double missingMomentumOfEvent_theta(const Particle*);
 
     /**
-    * return the magnitude of the missing momentum of the event in CMS
+    * return the generated magnitude of the missing momentum of the event in CMS
     */
     double genMissingMomentumOfEventCMS(const Particle*);
 
@@ -220,6 +220,7 @@ namespace Belle2 {
 
     /**
     * return difference between the total energy of tracks (pion mass hypothesis) and photons in CMS and the beam energy
+    * using generator information
     */
     double genMissingEnergyOfEventCMS(const Particle*);
 

@@ -23,7 +23,7 @@ for fsp in fsps:
     # There is an annoying warning in ParticleLoader about zero charged tracks
     # If it will be removed in the future releases, the test log should be
     # updated respectively.
-    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, '')],
+    testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, 'mcPrimary > 0 and nDaughters == 0')],
                         addDaughters=True, skipNonPrimaryDaughters=True, useMCParticles=True)
 
 # Variables created by event kinematics module

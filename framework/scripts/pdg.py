@@ -7,8 +7,9 @@ pdg - access particle definitions
 
 This module helps to access particle definitions. When the software is loaded a
 list of known particles is read from the EvtGen particle definition file
-:file:`decfiles/dec/evt.pdl`. This file contains all well-known standard-model
-particles and their properties: mass, width or lifetime, charge, spin.
+:file:`framework/particledb/data/evt.pdl`. This file contains all well-known
+standard-model particles and their properties: mass, width or lifetime, charge,
+spin.
 ...
 
 This module allows to easily access this information (see `get`) or if necessary

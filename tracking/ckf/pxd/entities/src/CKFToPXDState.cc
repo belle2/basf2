@@ -62,7 +62,6 @@ const std::vector<PXDRecoHit>& CKFToPXDState::getRecoHits() const
 CKFToPXDState::CKFToPXDState(const SpacePoint* hit) : CKFState<RecoTrack, SpacePoint>(hit)
 {
   for (const PXDCluster& pxdCluster : hit->getRelationsTo<PXDCluster>()) {
-    // cppcheck-suppress useStlAlgorithm
     m_recoHits.emplace_back(&pxdCluster);
   }
   m_stateCache.isHitState = true;

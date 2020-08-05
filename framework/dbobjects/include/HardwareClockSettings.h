@@ -101,14 +101,14 @@ namespace Belle2 {
 
     /**
      * Map of clocks not derived from the global clock.
-     * HardwareClockSettings are stored as frequency in MhZ.
+     * HardwareClockSettings are stored as frequency in MHz.
      */
     std::map<Const::EDetector, std::map<std::string, float>> m_clocksMap;
 
-    /*
-     * Accelrator radio frequecny value.
+    /**
+     * Accelerator radio frequency value in MHz
      */
-    Double_t m_acceleratorRF = 0; /** [MHz] */
+    Double_t m_acceleratorRF = 0;
 
     ClassDef(HardwareClockSettings, 1)
   };

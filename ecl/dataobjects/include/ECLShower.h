@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
  *               Alon Hershenhorn (hershen@phas.ubc.ca)                   *
  *               Poyuan Chen                                              *
@@ -11,8 +11,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSHOWER_H
-#define ECLSHOWER_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <TVector3.h>
@@ -577,4 +576,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

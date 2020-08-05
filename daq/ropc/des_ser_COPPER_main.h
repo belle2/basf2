@@ -41,9 +41,6 @@
 /* #include <sys/stat.h> */
 /* #include <fcntl.h> */
 
-/* using namespace std; */
-/* using namespace Belle2; */
-
 /* namespace Belle2 { */
 
 /*   /\*! A class definition of an input module for Sequential ROOT I/O *\/ */

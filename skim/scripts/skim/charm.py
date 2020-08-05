@@ -15,10 +15,13 @@ Skim list building functions for charm analyses.
 from functools import lru_cache
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header
-from variables import variables as vm
 import vertex
-
+from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import loadStdSkimPhoton, stdPhotons
+from stdPi0s import loadStdSkimPi0
+from stdV0s import stdKshorts
+from variables import variables as vm
 
 __liaison__ = "Guanda Gong <gonggd@mail.ustc.edu.cn>"
 
@@ -34,10 +37,9 @@ class XToD0_D0ToHpJm(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = None
-
     # Cached static method, so that its contents are only executed once for a single path.
     # Factored out into a separate function here, so it is available to other skims.
+
     @staticmethod
     @lru_cache()
     def D0ToHpJm(path):
@@ -96,17 +98,13 @@ class XToD0_D0ToNeutrals(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadStdSkimPi0(path=path)
+        stdKshorts(path=path)
 
     # Cached static method, so that its contents are only executed once for a single path
     # Factored out into a separate function here, so it is available to other skims.
+
     @staticmethod
     @lru_cache()
     def D0ToNeutrals(path):
@@ -169,19 +167,12 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["loose"],
-            "stdMu": ["loose"],
-            "stdPi": ["loose"],
-        },
-        "stdPhotons": {
-            "loadStdSkimPhoton": [],
-        },
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("loose", path=path)
+        stdMu("loose", path=path)
+        stdPi("loose", path=path)
+        loadStdSkimPhoton(path=path)
+        loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
         charmcuts = "1.78 < M < 1.94"
@@ -224,15 +215,10 @@ class XToDp_DpToKsHp(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["loose"],
-            "stdPi": ["loose"],
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdK("all", path=path)
+        stdPi("all", path=path)
+        stdKshorts(path=path)
 
     def build_lists(self, path):
         mySel = "abs(d0) < 1 and abs(z0) < 3"
@@ -402,15 +388,12 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["loose"],
-        },
-        "stdCharged": {
-            "stdK": ["loose", "loose"],
-            "stdPi": ["loose", "loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("loose", path=path)
+        stdK("all", path=path)
+        stdK("loose", path=path)
+        stdPi("all", path=path)
+        stdPi("loose", path=path)
 
     def build_lists(self, path):
         D0List = self.D0ToHpJm(path)
@@ -505,15 +488,12 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["loose", "loose"],
-            "stdPi": ["loose", "loose"],
-        },
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdK("all", path=path)
+        stdK("loose", path=path)
+        stdPi("all", path=path)
+        stdPi("loose", path=path)
+        loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
         Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
@@ -551,18 +531,13 @@ class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["loose", "loose"],
-            "stdPi": ["loose", "loose"],
-        },
-        "stdPhotons": {
-            "loadStdSkimPhoton": [],
-        },
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdK("all", path=path)
+        stdK("loose", path=path)
+        stdPi("all", path=path)
+        stdPi("loose", path=path)
+        loadStdSkimPhoton(path=path)
+        loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
         Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
@@ -606,17 +581,10 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["loose"],
-        },
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        loadStdSkimPi0(path=path)
+        stdKshorts(path=path)
 
     def build_lists(self, path):
         mySel = "abs(d0) < 1 and abs(z0) < 3"
@@ -704,19 +672,12 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["loose"],
-            "stdPi": ["loose"],
-        },
-        "stdPhotons": {
-            "loadStdSkimPhoton": [],
-        },
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-
-    }
+    def load_standard_lists(self, path):
+        stdK("loose", path=path)
+        stdPi("loose", path=path)
+        loadStdSkimPhoton(path=path)
+        loadStdSkimPi0(path=path)
+        stdKshorts(path=path)
 
     def build_lists(self, path):
         ma.reconstructDecay("eta:myskim -> gamma:loose gamma:loose", "0.49 < M < 0.55 and p > 0.28", path=path)
@@ -755,17 +716,10 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["loose"],
-        },
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        loadStdSkimPi0(path=path)
+        stdKshorts(path=path)
 
     def build_lists(self, path):
         D0List = self.D0ToNeutrals(path)
@@ -802,11 +756,8 @@ class DstToD0Pi_D0ToHpHmKs(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdV0s": {
-            "stdKshorts": []
-        },
-    }
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
 
     def build_lists(self, path):
         mySel = "abs(d0) < 1 and abs(z0) < 3"
@@ -843,14 +794,9 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "loadStdSkimPhoton": [],
-        },
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadStdSkimPhoton(path=path)
+        loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
         mySel = "abs(d0) < 0.5 and abs(z0) < 1.0"  # IP cut, tighter than previous skims
@@ -888,11 +834,8 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
-    RequiredStandardLists = {
-        "stdPi0s": {
-            "loadStdSkimPi0": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
         mySel = "abs(d0) < 0.5 and abs(z0) < 1.0"  # IP cut, tighter than previous skims

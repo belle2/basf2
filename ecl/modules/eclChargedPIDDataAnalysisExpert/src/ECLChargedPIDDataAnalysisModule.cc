@@ -133,7 +133,7 @@ void ECLChargedPIDDataAnalysisModule::initialize()
   if (m_writeToRoot) {
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
   } else {
-    m_rootFilePtr = NULL;
+    m_rootFilePtr = nullptr;
   }
   // initialize N1 tree
   n1_tree = new TTree("n1_tree", "ECL Charged PID tree: N1 Hypothesis");
@@ -307,7 +307,7 @@ void ECLChargedPIDDataAnalysisModule::event()
 
     // get mc particle kinematics
     n1_mcPdg->push_back(imcpart.getPDG());
-    if (imcpart.getMother() != NULL) n1_mcMothPdg->push_back(imcpart.getMother()->getPDG());
+    if (imcpart.getMother() != nullptr) n1_mcMothPdg->push_back(imcpart.getMother()->getPDG());
     else n1_mcMothPdg->push_back(-999);
     n1_mcEnergy->push_back(imcpart.getEnergy());
     n1_mcP->push_back(imcpart.getMomentum().Mag());
@@ -315,7 +315,7 @@ void ECLChargedPIDDataAnalysisModule::event()
     n1_mcPhi->push_back(imcpart.getMomentum().Phi());
 
     n2_mcPdg->push_back(imcpart.getPDG());
-    if (imcpart.getMother() != NULL) n2_mcMothPdg->push_back(imcpart.getMother()->getPDG());
+    if (imcpart.getMother() != nullptr) n2_mcMothPdg->push_back(imcpart.getMother()->getPDG());
     else n2_mcMothPdg->push_back(-999);
     n2_mcEnergy->push_back(imcpart.getEnergy());
     n2_mcP->push_back(imcpart.getMomentum().Mag());
@@ -433,7 +433,7 @@ void ECLChargedPIDDataAnalysisModule::endRun()
 
 void ECLChargedPIDDataAnalysisModule::terminate()
 {
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     n1_tree->Write();
     n2_tree->Write();

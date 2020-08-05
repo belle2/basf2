@@ -104,6 +104,11 @@ namespace Belle2 {
     double deuteronID(const Particle* part);
 
     /**
+     * return binary PID between two particle hypotheses
+     */
+    double binaryPID(const Particle* part, const std::vector<double>& arguments);
+
+    /**
      * @return the charged PID BDT score for a certain mass hypothesis with respect to all other charged stable particle hypotheses.
      *
      * The signal hypothesis pdgId and the detector(s) used for the BDT training are passed as a vector of strings of size = 2.

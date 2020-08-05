@@ -40,27 +40,28 @@
 }
 
 .rst-content .exercise .admonition-title{
-    background: #F085B2; /*#1abc9c*/
+    background: #F085B2;
 }
 
 .rst-content .exercise {
-    background: #ffecf3; /*#dbfaf4;*/
+    background: #ffecf3;
 }
 
 .rst-content .key-points .admonition-title{
-    background: #9c9ff4; /*#888888;*/
+    background: #9c9ff4;
 }
 
 .rst-content .key-points {
-    background: #f7f0ff; /*#F0F0F0;*/
+    background: #f7f0ff;
 }
 
-.rst-content .overview .admonition-title{
-    background: #9c9ff4; /*#888888;*/
+.rst-content .overview .admonition-title, .rst-content .overview .sidebar-title {
+    background: #9c9ff4;
+    color: white;
 }
 
 .rst-content .overview {
-    background: #f7f0ff; /*#F0F0F0;*/
+    background: #f7f0ff;
 }
 
 .rst-content .overview p, .rst-content .overview ul, .rst-content .overview blockquote {
@@ -68,8 +69,9 @@
 }
 
 
-.rst-content .overview .admonition-title:before {
+.rst-content .overview .admonition-title:before, .rst-content .overview .sidebar-title:before {
     content: "  ";
+    font-family: FontAwesome;
 }
 
 

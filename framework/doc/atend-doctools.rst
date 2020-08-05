@@ -413,28 +413,7 @@ Additional Features
 Additional boxes for the online lessons
 ---------------------------------------
 
-.. code:: rst
-
-    .. admonition:: Overview
-        :class: overview
-
-        **Teaching**: 10 min
-
-        **Exercises**: 5 min
-
-        **Prerequisites**: None
-
-        **Questions**:
-
-            * What is a particle list?
-            * What are final state particles?
-            * How can I specify decays?
-
-        **Objectives**:
-
-            * Reconstruct particles
-
-.. admonition:: Overview
+.. sidebar:: Overview
     :class: overview
 
     **Teaching**: 10 min
@@ -453,18 +432,38 @@ Additional boxes for the online lessons
 
         * Reconstruct particles
 
+.. code:: rst
+
+    .. sidebar:: Overview
+        :class: overview
+
+        **Teaching**: 10 min
+
+        **Exercises**: 5 min
+
+        **Prerequisites**: None
+
+        **Questions**:
+
+            * What is a particle list?
+            * What are final state particles?
+            * How can I specify decays?
+
+        **Objectives**:
+
+            * Reconstruct particles
 
 .. code:: rst
 
     .. admonition:: Question
         :class: exercise
 
-        Can you answer me this please?
+        What's the object-oriented way to get rich?
 
 .. admonition:: Question
     :class: exercise
 
-    Can you answer me this please?
+    What's the object-oriented way to get rich?
 
 **Note**: You can also use ``.. admonition:: Exercise`` for an exercise rather than a question
 (generally the content after ``admonition::`` will be the title).
@@ -474,28 +473,28 @@ Additional boxes for the online lessons
    .. admonition:: Solution
       :class: toggle solution
 
-      Something something
+      Inheritance.
 
 .. admonition:: Solution
    :class: toggle solution
 
-   Something something
+   Inheritance.
 
 .. code:: rst
 
     .. admonition:: Key points
         :class: key-points
 
-        * basf2 is used to process "raw" data, reconstruct particles
-          and create ``*.root`` output files
-          that you can then analyze with any tool of your liking (root, pandas, ...)
+        * There are 10 kinds of people in this world:
+          Those who understand binary, those who don't,
+          and those who weren't expecting a base 3 joke.
 
 .. admonition:: Key points
     :class: key-points
 
-    * basf2 is used to process "raw" data, reconstruct particles
-      and create ``*.root`` output files
-      that you can then analyze with any tool of your liking (root, pandas, ...)
+    * There are 10 kinds of people in this world:
+      Those who understand binary, those who don't,
+      and those who weren't expecting a base 3 joke.
 
 
 How to test locally

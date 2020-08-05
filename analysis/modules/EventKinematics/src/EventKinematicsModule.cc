@@ -42,7 +42,7 @@ EventKinematicsModule::EventKinematicsModule() : Module()
 
   // Parameter definitions
   addParam("particleLists", m_particleLists, "List of the ParticleLists", vector<string>());
-  addParam("usingMC", m_usingMC, "is using generated particles", false);
+  addParam("usingMC", m_usingMC, "is built using generated particles", false);
 
 }
 

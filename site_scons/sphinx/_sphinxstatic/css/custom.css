@@ -33,13 +33,12 @@
     content: " ▶";
 }
 
-.rst-content .hint .admonition-title{
-    background: #43d5b5;
+.rst-content .hint .admonition-title, .rst-content .solution .admonition-title{
+    background: #f9c9da;
+    color: inherit;
+    font-weight: inherit;
 }
 
-.rst-content .hint {
-    background: #dbfaf4;
-}
 
 .rst-content .hint .admonition-title:before {
     content: "  ";
@@ -49,21 +48,14 @@
     content: "  ";
 }
 
-.rst-content .solution .admonition-title{
-    background: #1abc9c
-}
-
-.rst-content .solution{
-    background: #dbfaf4;
+.rst-content .exercise, .rst-content .solution, .rst-content .hint{
+    background: #ffecf3;
 }
 
 .rst-content .exercise .admonition-title{
     background: #F085B2;
 }
 
-.rst-content .exercise {
-    background: #ffecf3;
-}
 
 .rst-content .key-points .admonition-title{
     background: #9c9ff4;

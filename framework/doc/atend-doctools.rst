@@ -459,9 +459,9 @@ No hands-on training without some nice exercises:
 .. code:: rst
 
     .. admonition:: Question
-        :class: exercise stacked
+       :class: exercise stacked
 
-        What's the object-oriented way to get rich?
+       What's the object-oriented way to get rich?
 
     .. admonition:: Hint
        :class: toggle hint stacked

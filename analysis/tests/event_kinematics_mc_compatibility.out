@@ -38,3 +38,5 @@
 	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 [INFO] Conditions data: configured globaltags (highest priority first) are master_2018-12-24, Legacy_IP_Information
 [INFO]      o) genMissingMass2OfEvent = 0.757609
+[INFO]      o) genMissingEnergyOfEventCMS = -1.18511
+[INFO]      o) genMissingMomentumOfEventCMS = 0.804289

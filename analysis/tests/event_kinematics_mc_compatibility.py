@@ -28,7 +28,9 @@ for fsp in fsps:
 
 # Variables created by event kinematics module
 event_kinematics = [
-    "genMissingMass2OfEvent",
+    'genMissingMass2OfEvent',
+    'genMissingEnergyOfEventCMS',
+    'genMissingMomentumOfEventCMS'
 ]
 
 testpath.add_module('EventKinematics', particleLists=fsps, fromMC=True)

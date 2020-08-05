@@ -3,6 +3,8 @@ from basf2 import B2INFO, B2ERROR, B2FATAL, LogPythonInterface
 from collections import defaultdict
 from basf2.utils import pretty_print_table
 from terminal_utils import Pager
+from concurrent.futures import ProcessPoolExecutor
+from itertools import repeat
 
 
 def get_all_iovsets(existing_payloads, run_range=None):
@@ -44,6 +46,14 @@ def get_all_iovsets(existing_payloads, run_range=None):
         result.append(info)
 
     return result
+
+
+def create_iov_wrapper(db, globaltag_id, payload):
+    """
+    Wrapper function for adding payloads into a given globaltag.
+    """
+    for iov in payload.iov:
+        db.create_iov(globaltag_id, payload.payload_id, *iov.tuple)
 
 
 def command_tag_merge(args, db=None):
@@ -118,6 +128,8 @@ def command_tag_merge(args, db=None):
                           help="Can be for numbers to limit the run range to put"
                           "in the output globaltag: All iovs will be limited to "
                           "be in this range.")
+        args.add_argument("-j", type=int, default=1, dest="nprocess",
+                          help="Number of concurrent processes to use for creating payloads into the output globaltag.")
         return
 
     # prepare some colors for easy distinction of source tag
@@ -179,17 +191,10 @@ def command_tag_merge(args, db=None):
 
         pretty_print_table(table, columns, transform=color_row)
 
-    # Ok, we're still alive, create all payloads and print a message every 100 IoVs copied,
-    # since it can take a lot of time
+    # Ok, we're still alive, create all the payloads using multiple processes.
     if not args.dry_run:
-        total_iovs = len(final) * len(payload.iov.iovs)
-        count = 0
-        B2INFO(f'Now copying {total_iovs} payloads into {args.output}.')
-        for payload in final:
-            for iov in payload.iov:
-                db.create_iov(output_id, payload.payload_id, *iov.tuple)
-                count += 1
-                if (count % 100 == 0):
-                    B2INFO(f'Copied {count}/{total_iovs} payloads.')
+        B2INFO(f'Now copying the payloads into {args.output}...')
+        with ProcessPoolExecutor(max_workers=args.nprocess) as pool:
+            pool.map(create_iov_wrapper, repeat(db, len(final)), repeat(output_id, len(final)), final)
 
     return 0

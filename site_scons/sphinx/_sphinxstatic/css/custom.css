@@ -10,6 +10,7 @@
     cursor: pointer;
 }
 
+/* todo: this doesn't cover the case where the last element is not a p */
 .rst-content .toggle p:last-child {
     margin-bottom: 0;
 }
@@ -17,6 +18,11 @@
 .rst-content .toggle .admonition-title {
     display: block;
     clear: both;
+    margin-bottom: -12px;
+}
+
+.rst-content .toggle .admonition-title + * {
+    margin-top: 24px;
 }
 
 .rst-content .toggle .admonition-title:after {
@@ -27,8 +33,20 @@
     content: " ▶";
 }
 
-.rst-content .solution .admonition-title:before {
+.rst-content .hint .admonition-title{
+    background: #43d5b5;
+}
+
+.rst-content .hint {
+    background: #dbfaf4;
+}
+
+.rst-content .hint .admonition-title:before {
     content: "  ";
+}
+
+.rst-content .solution .admonition-title:before {
+    content: "  ";
 }
 
 .rst-content .solution .admonition-title{
@@ -83,3 +101,14 @@
     content: " ";
 }
 
+.stacked {
+    margin-bottom: 0px;
+}
+
+.rst-content .stacked {
+    margin-bottom: 0px;
+}
+
+.rst-content .stacked .admonition {
+    margin-bottom: 0px;
+}

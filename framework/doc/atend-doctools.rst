@@ -453,32 +453,48 @@ Additional boxes for the online lessons
 
             * Reconstruct particles
 
+
+No hands-on training without some nice exercises:
+
 .. code:: rst
 
     .. admonition:: Question
-        :class: exercise
+        :class: exercise stacked
 
         What's the object-oriented way to get rich?
 
+    .. admonition:: Hint
+       :class: toggle hint stacked
+
+       Think about relationships between classes!
+
+    .. admonition:: Solution
+       :class: toggle solution
+
+       Inheritance.
+
 .. admonition:: Question
-    :class: exercise
+   :class: exercise stacked
 
-    What's the object-oriented way to get rich?
+   What's the object-oriented way to get rich?
 
-**Note**: You can also use ``.. admonition:: Exercise`` for an exercise rather than a question
-(generally the content after ``admonition::`` will be the title).
+.. admonition:: Hint
+   :class: toggle hint stacked
 
-.. code:: rst
-
-   .. admonition:: Solution
-      :class: toggle solution
-
-      Inheritance.
+   Think about relationships between classes!
 
 .. admonition:: Solution
    :class: toggle solution
 
    Inheritance.
+
+**Notes**:
+
+* You can also use ``.. admonition:: Exercise`` for an exercise rather than a question
+  (generally the content after ``admonition::`` will be the title).
+* The ``stacked`` class removes the space after the question block, so that the solution
+  block is directly joined. If you want to write some text after your question, simply
+  remove this class.
 
 .. code:: rst
 

@@ -30,7 +30,13 @@ AddOption('--create-json', dest="create_json", action="store_true", default=Fals
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
-    SetOption('num_jobs', multiprocessing.cpu_count())
+    num_jobs = multiprocessing.cpu_count()
+    if 'BELLE2_MAX_BUILDS' in os.environ:
+        if os.environ['BELLE2_MAX_BUILDS'] == 'LOAD':
+            num_jobs = max(int(num_jobs / (1. + os.getloadavg()[1])), 1)
+        else:
+            num_jobs = min(num_jobs, int(os.environ['BELLE2_MAX_BUILDS']))
+    SetOption('num_jobs', num_jobs)
 except:
     pass
 

@@ -65,7 +65,7 @@ def command_tag_merge(args, db=None):
     present in earlier globaltags.
 
     The result is equivalent to having multiple globaltags setup in the conditions
-    access for basf2 (highest goes first).
+    access for basf2 (highest priority goes first).
 
     Warning:
       This command requires all globaltags are overlap free.

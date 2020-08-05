@@ -175,6 +175,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
   addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
+  addParam("TrkExtra", m_convertTrkExtra, " Flag to switch on conversion of first_x,y,z and last_x,y,z from Mdst_trk_fit", true);
 
   m_realData = false;
 
@@ -218,6 +219,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
 
+  if (m_convertTrkExtra) m_belleTrkExtra.registerInDataStore();
+
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> pi0ParticleList("pi0:mdst");
@@ -241,6 +244,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   //list here all Relations between Belle2 objects
   m_tracks.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_pidLikelihoods);
+  if (m_convertTrkExtra) m_tracks.registerRelationTo(m_belleTrkExtra);
   m_eclClusters.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_eclClusters);
   m_klmClusters.registerRelationTo(m_tracks);
@@ -1644,6 +1648,11 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     HitPatternCDC patternCdc;
     patternCdc.setNHits(cdcNHits);
 
+    // conversion of track position in CDC layers
+    if (m_convertTrkExtra) {
+      auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_z(), trk_fit.first_z(),
+                                                    trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z());
+    }
     // conversion of the SVD hit pattern
     int svdHitPattern = trk_fit.hit_svd();
     // use hits from 3: SVD-rphi, 4: SVD-z

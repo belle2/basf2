@@ -176,12 +176,6 @@ def check_linkdef(filename, message_style="belle2"):
 
         line, column, classname, clingflags, options = content
 
-        # check if we can actually load the class
-        try:
-            version, checksum = get_class_version(classname)
-        except ClassVersionError as e:
-            print_message("error", e)
-
         # no need to check anything else if we don't have storage enabled
         if "nostreamer" in clingflags:
             if "evolution" in clingflags:
@@ -194,6 +188,12 @@ def check_linkdef(filename, message_style="belle2"):
         elif "evolution" not in clingflags:
             print_message("warning", "using old ROOT3 streamer format without evolution. "
                           "Please add + or - (for classes not to be written to file) after the classname.")
+
+        # check if we can actually load the class
+        try:
+            version, checksum = get_class_version(classname)
+        except ClassVersionError as e:
+            print_message("error", e)
 
         # This class seems to be intended to be serialized so make sure we can
         if "version" in locals() and version != 0:

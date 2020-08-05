@@ -48,14 +48,14 @@
 /* Styling specific admonitions */
 /* ---------------------------- */
 
-.rst-content .hint .admonition-title, .rst-content .solution .admonition-title{
+.rst-content .xhint .admonition-title, .rst-content .solution .admonition-title{
     background: #f9c9da;
     color: inherit;
     font-weight: inherit;
 }
 
 
-.rst-content .hint .admonition-title:before {
+.rst-content .xhint .admonition-title:before {
     content: "  ";
     width: 15px;
 }
@@ -65,7 +65,7 @@
     width: 15px;
 }
 
-.rst-content .exercise, .rst-content .solution, .rst-content .hint{
+.rst-content .exercise, .rst-content .solution, .rst-content .xhint{
     background: #ffecf3;
 }
 

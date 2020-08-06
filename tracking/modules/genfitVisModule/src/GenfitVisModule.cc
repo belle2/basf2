@@ -11,6 +11,7 @@
 #include "tracking/modules/genfitVisModule/GenfitVisModule.h"
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 #include <geometry/GeometryManager.h>
 #include <genfit/Track.h>
@@ -24,6 +25,8 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
+// cpp-check does not seem to resolve the includes properly and gives an error here
+// cppcheck-suppress unknownMacro
 REG_MODULE(GenfitVis)
 
 //-----------------------------------------------------------------

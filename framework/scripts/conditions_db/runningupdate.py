@@ -310,8 +310,7 @@ class RunningTagUpdater:
 
         Warning:
             This action cannot be undone, only call it after checking the
-            operations
-            returned by the calculation of the update
+            operations returned by the calculation of the update
         """
         if self._operations is None:
             raise RunningTagUpdaterError("Update needs to be calculated first")

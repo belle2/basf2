@@ -332,7 +332,9 @@ event_kinematics = [
 mc_event_kinematics = [
     'genMissingMass2OfEvent',
     'genMissingEnergyOfEventCMS',
-    'genMissingMomentumOfEventCMS'
+    'genMissingMomentumOfEventCMS',
+    'genTotalPhotonsEnergyOfEvent',
+    'genVisibleEnergyOfEventCMS'
 ]
 
 # now register all the variables declared in this file as collections

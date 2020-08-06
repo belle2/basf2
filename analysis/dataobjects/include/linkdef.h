@@ -9,13 +9,13 @@
 #pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 #pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xa87084c6, version=5
-#pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=4
+#pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=5
 #pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0xccdb3c88, version=1
 #pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0x2e59c562, version=3
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+; // checksum=0xcdef997a, version=3
 #pragma link C++ class Belle2::StringWrapper+; // checksum=0xf15ef1c4, version=1
 #pragma link C++ class Belle2::EventShapeContainer+; // checksum=0x57e119da, version=1
-#pragma link C++ class Belle2::EventKinematics+; // checksum=0x2ede9ce0, version=1
+#pragma link C++ class Belle2::EventKinematics+; // checksum=0x23d1bfc2, version=2
 #pragma link C++ class Belle2::TauPairDecay+; // checksum=0x15ea58a, version=1
 #pragma link C++ class Belle2::ECLEnergyCloseToTrack+; // checksum=0xeadb37d4, version=1
 #pragma link C++ class Belle2::ECLTRGInformation+; // checksum=0x744abff9, version=3
@@ -63,7 +63,7 @@
   source="TVector3 m_MCtagV"                    \
   version="[-3]"                                \
   targetClass="Belle2::TagVertex"               \
-  target="m_MCtagV"                             \
+  target="m_mcTagV"                             \
   code="{m_mcTagV = onfile.m_MCtagV;}"          \
 
 #pragma read                                                   \

@@ -2565,7 +2565,7 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, custom_cuts=No
         particleLists = inputListNames
 
     eventKinematicsModule = register_module('EventKinematics')
-    eventKinematicsModule.set_name('EventKinematics_')
+    eventKinematicsModule.set_name('EventKinematics_reco')
     eventKinematicsModule.param('particleLists', particleLists)
     path.add_module(eventKinematicsModule)
 
@@ -2594,7 +2594,7 @@ def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
             inputListNames += ["%s:evtkin_default_gen" % t]
 
     eventKinematicsModule = register_module('EventKinematics')
-    eventKinematicsModule.set_name('EventKinematics_')
+    eventKinematicsModule.set_name('EventKinematics_gen')
     eventKinematicsModule.param('particleLists', inputListNames)
     eventKinematicsModule.param('usingMC', True)
     path.add_module(eventKinematicsModule)

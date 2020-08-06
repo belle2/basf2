@@ -288,7 +288,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param cosmics: if True, steer TOP for cosmic reconstruction.
     :param for_cdst_analysis: if True, dEdx, EventT0 and PruneTracks modules are not added to the path.
-    This is only needed by prepare_cdst_analysis().
+           This is only needed by prepare_cdst_analysis().
     """
 
     # Not add dEdx modules in prepare_cdst_analysis()

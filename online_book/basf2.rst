@@ -1,4 +1,4 @@
-.. _basf2:
+.. _onlinebookbasf2:
 
 Work with basf2
 ===============

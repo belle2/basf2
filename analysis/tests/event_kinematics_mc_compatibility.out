@@ -40,3 +40,5 @@
 [INFO]      o) genMissingMass2OfEvent = 4.81344
 [INFO]      o) genMissingEnergyOfEventCMS = 2.28391
 [INFO]      o) genMissingMomentumOfEventCMS = 0.634668
+[INFO]      o) genTotalPhotonsEnergyOfEvent = 0
+[INFO]      o) genVisibleEnergyOfEventCMS = 8.29565

@@ -20,17 +20,16 @@ fsps = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
 testpath = create_path()
 testpath.add_module('RootInput', inputFileNames=testinput)
 for fsp in fsps:
-    # There is an annoying warning in ParticleLoader about zero charged tracks
-    # If it will be removed in the future releases, the test log should be
-    # updated respectively.
     testpath.add_module('ParticleLoader', decayStringsWithCuts=[(fsp, 'mcPrimary > 0 and nDaughters == 0')],
                         addDaughters=True, skipNonPrimaryDaughters=True, useMCParticles=True)
 
-# Variables created by event kinematics module
+# Variables filled by event kinematics module
 event_kinematics = [
     'genMissingMass2OfEvent',
     'genMissingEnergyOfEventCMS',
-    'genMissingMomentumOfEventCMS'
+    'genMissingMomentumOfEventCMS',
+    'genTotalPhotonsEnergyOfEvent',  # It is 0, because there is no primary photons in the event
+    'genVisibleEnergyOfEventCMS',
 ]
 
 testpath.add_module('EventKinematics', particleLists=fsps, usingMC=True)

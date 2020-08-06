@@ -442,6 +442,18 @@ namespace Belle2 {
       return visible;
     }
 
+    double genVisibleEnergyOfEventCMS(const Particle*)
+    {
+      StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double visible = evtShape->getVisibleEnergyCMS();
+      return visible;
+    }
+
+
     double totalPhotonsEnergyOfEvent(const Particle*)
     {
       StoreObjPtr<EventKinematics> evtShape;
@@ -452,6 +464,18 @@ namespace Belle2 {
       double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
       return energyOfPhotons;
     }
+
+    double genTotalPhotonsEnergyOfEvent(const Particle*)
+    {
+      StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
+      return energyOfPhotons;
+    }
+
 
     double eventYearMonthDay(const Particle*)
     {
@@ -630,8 +654,12 @@ Returns NAN for data.
                       "[Eventbased] The missing mass squared obtained with EventKinematics module from generator")
     REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS,
                       "[Eventbased] The visible energy in CMS obtained with EventKinematics module")
+    REGISTER_VARIABLE("genVisibleEnergyOfEventCMS", genVisibleEnergyOfEventCMS,
+                      "[Eventbased] The visible energy in CMS obtained with EventKinematics module from generator")
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,
                       "[Eventbased] The energy in lab of all the photons obtained with EventKinematics module");
+    REGISTER_VARIABLE("genTotalPhotonsEnergyOfEvent", genTotalPhotonsEnergyOfEvent,
+                      "[Eventbased] The energy in lab of all the photons obtained with EventKinematics module from generator");
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0,

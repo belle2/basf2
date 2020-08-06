@@ -5,11 +5,11 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::Particle+; // checksum=0xf385aee8, version=12
+#pragma link C++ class Belle2::Particle+; // checksum=0x5a78ef64, version=13
 #pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 #pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xa87084c6, version=5
-#pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=4
+#pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=5
 #pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0xccdb3c88, version=1
 #pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0x2e59c562, version=3
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+; // checksum=0xcdef997a, version=3
@@ -49,6 +49,8 @@
   code="{m_particleSource = m_particleType;}"   \
 
 #pragma read                                    \
+  sourceClass="Belle2::Particle"                \
+  source=""                                     \
   version="[-12]"                               \
   targetClass="Belle2::Particle"                \
   target="m_momentumScale"                      \

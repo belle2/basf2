@@ -48,11 +48,16 @@ namespace Belle2 {
         outErr = std::numeric_limits<float>::quiet_NaN();
         return std::numeric_limits<float>::quiet_NaN();
       }
+      // check if the particle source is a composite particle
       if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) ||
           !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite)) {
-        B2WARNING("Attempting to calculate flight " << mode << " for non composite particle");
-        outErr = std::numeric_limits<float>::quiet_NaN();
-        return std::numeric_limits<float>::quiet_NaN();
+        // check if the particle source is a V0
+        if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) ||
+            !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0)) {
+          B2WARNING("Attempting to calculate flight " << mode << " for neither composite particle nor V0");
+          outErr = std::numeric_limits<float>::quiet_NaN();
+          return std::numeric_limits<float>::quiet_NaN();
+        }
       }
       if (!(mode == "distance") && !(mode == "time")) {
         B2WARNING("FlightInfo helper function called with mode '" << mode

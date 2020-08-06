@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
         -o|--output-dir)
-        OUTPUT=$(realpath $2)
+        OUTPUT=$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$2")
         shift 2
         ;;
         -h|--help)

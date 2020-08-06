@@ -65,6 +65,8 @@ namespace Belle2 {
     /// The socket used for polling is just the stored socket.
     std::vector<zmq::socket_t*> getSockets() const final;
 
+    /// Return the connection string for this socket
+    std::string getEndPoint() const;
   protected:
     /// The shared ZMQParent instance
     std::shared_ptr<ZMQParent> m_parent;

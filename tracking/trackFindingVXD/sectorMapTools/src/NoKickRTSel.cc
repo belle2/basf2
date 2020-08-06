@@ -98,7 +98,7 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
 void NoKickRTSel::hit8TrackBuilder(const RecoTrack& track)
 {
   hitXPBuilder(track);
-  for (const hitXP XP : m_hitXP) {
+  for (const hitXP& XP : m_hitXP) {
     if (m_8hitTrack.size() < 1) {
       m_8hitTrack.push_back(XP);
     } else if (XP.m_sensorLayer != m_8hitTrack.back().m_sensorLayer ||

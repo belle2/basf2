@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef __h_shapes
-#define __h_shapes
+#pragma once
 #include <string>
 #include <vector>
 #include <G4VSolid.hh>
@@ -65,4 +64,3 @@ namespace Belle2 {
 
   }
 }
-#endif //__h_shapes

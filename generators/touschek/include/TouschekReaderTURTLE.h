@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOUSCHEKREADERTURTLE_H
-#define TOUSCHEKREADERTURTLE_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -80,4 +79,3 @@ namespace Belle2 {
 
 }
 
-#endif /* TOUSCHEKREADERTURTLE_H */

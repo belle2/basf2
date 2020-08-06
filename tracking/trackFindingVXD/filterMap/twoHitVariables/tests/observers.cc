@@ -769,7 +769,7 @@ namespace VXDTFObserversTest {
       RelationVector<PXDCluster> pxDClusters = aSP.getRelationsTo<PXDCluster>();
       for (PXDCluster& aCluster : pxDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
-        if (aParticle == NULL) { nullptrTrap = 1; }
+        if (aParticle == nullptr) { nullptrTrap = 1; }
         EXPECT_EQ(0, nullptrTrap);
 
         EXPECT_EQ(aSP.getArrayIndex(), aCluster.getArrayIndex());
@@ -784,7 +784,7 @@ namespace VXDTFObserversTest {
       RelationVector<SVDCluster> svDClusters = aSP.getRelationsTo<SVDCluster>();
       for (SVDCluster& aCluster : svDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
-        if (aParticle == NULL) { nullptrTrap = 2; }
+        if (aParticle == nullptr) { nullptrTrap = 2; }
         EXPECT_EQ(0, nullptrTrap);
 
         EXPECT_EQ(aSP.getArrayIndex(), 2 + aCluster.getArrayIndex() / 2);
@@ -913,7 +913,7 @@ namespace VXDTFObserversTest {
                                         &CountUsedObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(),
                                        std::placeholders::_3);
 
-    char* realname(NULL);
+    char* realname(nullptr);
     int status(0);
     realname = abi::__cxa_demangle(typeid(storeFuncVariantB).name(), 0, 0, &status);
     std::string name(realname);

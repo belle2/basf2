@@ -100,12 +100,12 @@ void ExtModule::initialize()
   // Const::chargedStableSet, i.e., electron, muon, pion, kaon, proton, deuteron)
   m_Hypotheses.clear();
   if (m_PDGCodes.empty()) {
-    for (const Const::ChargedStable& pdgIter : Const::chargedStableSet) {
+    for (const Const::ChargedStable pdgIter : Const::chargedStableSet) {
       m_Hypotheses.push_back(pdgIter);
     }
   } else { // user defined
     std::vector<Const::ChargedStable> stack;
-    for (const Const::ChargedStable& pdgIter : Const::chargedStableSet) {
+    for (const Const::ChargedStable pdgIter : Const::chargedStableSet) {
       stack.push_back(pdgIter);
     }
     for (unsigned int i = 0; i < m_PDGCodes.size(); ++i) {

@@ -33,7 +33,7 @@ pdg.add_particle("test2", 1, 5.28, 0.1, 0, 0.5)
 pdg.add_particle("foo\tbar", 10001, 0, 0, 0, 0)
 
 # default evt.pdl filename
-default_evtpdl = basf2.find_file(os.path.join("decfiles", "dec", "evt.pdl"))
+default_evtpdl = basf2.find_file(os.path.join("data", "framework", "particledb", "evt.pdl"))
 # create a temporary one and compare
 retcode = 0
 with NamedTemporaryFile() as tempfile:

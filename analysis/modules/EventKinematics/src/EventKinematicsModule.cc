@@ -62,7 +62,9 @@ void EventKinematicsModule::beginRun()
 
 void EventKinematicsModule::event()
 {
-  auto* eventKinematics = new EventKinematics(m_usingMC);
+  auto arrayName = (!m_usingMC) ? "EventKinematics" : "EventKinematicsFromMC";
+  StoreObjPtr<EventKinematics> eventKinematics(arrayName);
+  if (!eventKinematics) eventKinematics.construct(m_usingMC);
   EventKinematicsModule::getParticleMomentumLists(m_particleLists);
 
   TVector3 missingMomentum = EventKinematicsModule::getMissingMomentum();
@@ -82,14 +84,6 @@ void EventKinematicsModule::event()
 
   float totalPhotonsEnergy = EventKinematicsModule::getTotalPhotonsEnergy();
   eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
-  // Here the DataStore should take ownership of the eventKinematics pointer:
-  if (m_usingMC) {
-    StoreObjPtr<EventKinematics> eventKinematicsPtr("EventKinematicsFromMC");
-    eventKinematicsPtr.assign(eventKinematics);
-  } else {
-    StoreObjPtr<EventKinematics> eventKinematicsPtr;
-    eventKinematicsPtr.assign(eventKinematics);
-  }
 }
 
 void EventKinematicsModule::endRun()

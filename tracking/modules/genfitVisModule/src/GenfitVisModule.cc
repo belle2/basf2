@@ -11,7 +11,6 @@
 #include "tracking/modules/genfitVisModule/GenfitVisModule.h"
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
 
 #include <geometry/GeometryManager.h>
 #include <genfit/Track.h>

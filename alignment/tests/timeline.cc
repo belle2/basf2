@@ -452,7 +452,9 @@ namespace {
     // changes in which case we have to check this again
 
     TFile file("testPayloads/dbstore_EventDependency_rev_cfd2d3.root");
+    ASSERT_TRUE(file.IsOpen());
     auto evdep = (EventDependency*) file.Get("EventDependency");
+    ASSERT_TRUE(evdep);
 
     auto beam = dynamic_cast<BeamSpot*>(evdep->getObject(EventMetaData(530532, 2, 0)));
     EXPECT_EQ(beam->getIPPosition()[2], 42.);
@@ -469,14 +471,18 @@ namespace {
     file.Close();
 
     TFile file2("testPayloads/dbstore_BeamSpot_rev_a5e02d.root");
+    ASSERT_TRUE(file2.IsOpen());
     auto beam2 = (BeamSpot*) file2.Get("BeamSpot");
+    ASSERT_TRUE(beam2);
     beam2->getIPPosition().Print();
     EXPECT_EQ(beam2->getIPPosition()[0], 3.);
 
     file2.Close();
 
     TFile file3("testPayloads/dbstore_VXDAlignment_rev_e2d5fc.root");
+    ASSERT_TRUE(file3.IsOpen());
     auto vxd = (VXDAlignment*) file3.Get("VXDAlignment");
+    ASSERT_TRUE(vxd);
     EXPECT_EQ(vxd->getGlobalParam(VxdID(1, 0, 0, 1).getID(), 3), 44.);
 
     file3.Close();

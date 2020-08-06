@@ -95,7 +95,7 @@ class Pager(object):
             # and duplicate the current output file descriptors
             self._original_stdout_fd = os.dup(sys.stdout.fileno())
             self._original_stderr_fd = os.dup(sys.stderr.fileno())
-        except Exception:
+        except AttributeError:
             # jupyter notebook stdout/stderr objects don't have a fileno so
             # don't support paging
             return
@@ -222,9 +222,9 @@ class InputEditor():
                 input_string = tmpfile.read().strip()
             input_string = self._remove_comment_lines(input_string)
 
-        except (FileNotFoundError, subprocess.CalledProcessError) as e:
-                # If editor not found or other problem with subprocess call, fall back to terminal input
-            print("Could not open {}.".format(self.get_editor_command()))
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            # If editor not found or other problem with subprocess call, fall back to terminal input
+            print(f"Could not open {self.get_editor_command()}.")
             print("Try to set your $VISUAL or $EDITOR environment variables properly.\n")
             sys.exit(1)
 

@@ -1121,6 +1121,9 @@ std::string Particle::getInfoHTML() const
   stream << " <b>p</b>=" << getP();
   stream << "<br>";
 
+  stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
+  stream << "<br>";
+
   stream << " <b>position</b>=" << HTML::getString(getVertex());
   stream << "<br>";
 

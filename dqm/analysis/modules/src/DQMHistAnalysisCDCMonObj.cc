@@ -51,7 +51,7 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
   // set module description (e.g. insert text)
   setDescription("Modify and analyze the data quality histograms of CDCMonObj");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("Filename", m_filename, "Output root filename (if not set mon_e{exp}r{run}.root is used", std::string(""));
+  addParam("Filename", m_filename, "Output root filename (if not set monCDC_e{exp}r{run}.root is used", std::string(""));
 }
 
 DQMHistAnalysisCDCMonObjModule::~DQMHistAnalysisCDCMonObjModule()
@@ -92,16 +92,16 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   m_monObj->addCanvas(m_cTDC);
   m_cHit = new TCanvas("hit", "hit", 1500, 1000);
   m_monObj->addCanvas(m_cHit);
-  //m_cADCs[1] = new TCanvas("adc1", "adc1", 1500, 1000);
-  //m_monObj->addCanvas(m_cADCs[1]);
+  m_cADC1000 = new TCanvas("ADC1000", "ADC1000", 1500, 1000);
+  m_monObj->addCanvas(m_cADC1000);
   m_cHitL = new TCanvas("hitL", "hitL", 1500, 6000);
   m_monObj->addCanvas(m_cHitL);
   for (int i = 0; i < 300; i++) {
-    m_cADCs[i] = new TCanvas(Form("hADC%d", i), Form("hADC%d", i), 250, 120);
+    m_cADCs[i] = new TCanvas(Form("hADC%d", i), Form("hADC%d", i), 300, 150);
     m_monObj->addCanvas(m_cADCs[i]);
   }
   for (int i = 0; i < 300; i++) {
-    m_cTDCs[i] = new TCanvas(Form("hTDC%d", i), Form("hTDC%d", i), 250, 120);
+    m_cTDCs[i] = new TCanvas(Form("hTDC%d", i), Form("hTDC%d", i), 300, 150);
     m_monObj->addCanvas(m_cTDCs[i]);
   }
 
@@ -247,7 +247,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   int nDeadADC = -1; // bid 0 always empty
   int nBadADC = 0;
   TH1F* hADCMean = new TH1F("hADCMean", "ADC mean;board;adc mean", 300, 0, 300);
-
+  TH1F* hADC1000 = new TH1F("hADC1000", "hADC1000", 300, 0, 300);
 
   std::vector<float> means = {};
   for (int i = 0; i < 300; ++i) {
@@ -270,6 +270,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       means.push_back(m);
       hADCMean->SetBinContent(i + 1, m);
       hADCMean->SetBinError(i + 1, 0);
+      double overflow = m_hADCs[i]->GetBinContent(1001);
+      hADC1000->SetBinContent(i + 1, overflow / (overflow + n));
     }
   }
 
@@ -409,6 +411,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_cHit->cd();
   m_hHit->Draw("colz");
 
+  m_cADC1000->cd();
+  hADC1000->Draw();
+
   m_cHitL->Divide(4, 14);
   for (int i = 0; i < 56; i++) {
     m_cHitL->cd(i + 1);
@@ -488,7 +493,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     TH1* hexp = findHist("DQMInfo/expno");
     int run = hrun ? std::stoi(hrun->GetTitle()) : 0;
     int exp = hexp ? std::stoi(hexp->GetTitle()) : 0;
-    fname = TString::Format("mon_e%04dr%06d.root", exp, run);
+    fname = TString::Format("monCDC_e%04dr%06d.root", exp, run);
   }
 
   TFile f(fname, "NEW");

@@ -24,6 +24,9 @@ Variables
 
    .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
 
+ * Fixed the variable :b2:var:`isDescendantOfList`, which did not work if the ParticleLoader was used to fill a ParticleList with
+   descendants of an existing list or exclude them.
+
 Modules
 +++++++
 

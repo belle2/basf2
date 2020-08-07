@@ -112,6 +112,9 @@ namespace Belle2 {
     TCanvas* m_cADC = nullptr; /**< main panel */
     TCanvas* m_cTDC = nullptr; /**< bad wire panel */
     TCanvas* m_cHit = nullptr; /**< main panel */
+    TCanvas* m_cADCs[300] = {};
+    TCanvas* m_cTDCs[300] = {};
+    TCanvas* m_cHitL = nullptr;
 
     std::string m_filename; /**< output file name */
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */

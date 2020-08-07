@@ -92,6 +92,18 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   m_monObj->addCanvas(m_cTDC);
   m_cHit = new TCanvas("hit", "hit", 1500, 1000);
   m_monObj->addCanvas(m_cHit);
+  //m_cADCs[1] = new TCanvas("adc1", "adc1", 1500, 1000);
+  //m_monObj->addCanvas(m_cADCs[1]);
+  m_cHitL = new TCanvas("hitL", "hitL", 1500, 6000);
+  m_monObj->addCanvas(m_cHitL);
+  for (int i = 0; i < 300; i++) {
+    m_cADCs[i] = new TCanvas(Form("hADC%d", i), Form("hADC%d", i), 250, 120);
+    m_monObj->addCanvas(m_cADCs[i]);
+  }
+  for (int i = 0; i < 300; i++) {
+    m_cTDCs[i] = new TCanvas(Form("hTDC%d", i), Form("hTDC%d", i), 250, 120);
+    m_monObj->addCanvas(m_cTDCs[i]);
+  }
 
   m_cBadWire = new TCanvas("badwire", "Bad wires", 1000, 1000);
   m_monObj->addCanvas(m_cBadWire);
@@ -224,8 +236,12 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     fitFunc[i]->SetParLimits(4, 4850., 5000.0);
     fitFunc[i]->SetParLimits(5, 0, 50.0);
   }
-  const int neve = m_hNEvent->GetBinContent(1);
-
+  TH1F* hfastTDC = (TH1F*)findHist("CDC/fast_tdc");
+  int neve = hfastTDC->GetEntries();
+  //  const int neve = m_hNEvent->GetBinContent(1);
+  //  B2INFO("neve"<<m_hNEvent->GetBinContent(0));
+  //B2INFO("neve"<<m_hNEvent->GetBinContent(1));
+  //B2INFO("neve"<<m_hNEvent->GetBinContent(2));
   // ADC related
   B2INFO("adc related");
   int nDeadADC = -1; // bid 0 always empty
@@ -235,8 +251,10 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   std::vector<float> means = {};
   for (int i = 0; i < 300; ++i) {
-
-    m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 2);
+    m_hADCTOTCuts[i] = m_hADCTOTCut->ProjectionY(Form("hADCTOTCut%d", i), i + 1, i + 1, "");
+    m_hADCTOTCuts[i]->SetTitle(Form("hADCTOTCut%d", i));
+    m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 1, "");
+    m_hADCs[i]->SetTitle(Form("hADC%d", i));
     if (m_hADCs[i]->GetEntries() == 0) {
       nDeadADC += 1;
     } else {
@@ -244,6 +262,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       float n0 = static_cast<float>(m_hADCs[i]->GetBinContent(1));
       if (n0 / n > 0.9) {
         B2DEBUG(99, "bad adc bid " << i << " " << n0 << " " << n);
+        //B2INFO("bad adc bid " << i << " " << n0 << " " << n);
         nBadADC += 1;
       }
       float m = getHistMean(m_hADCs[i]);
@@ -262,7 +281,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   std::vector<float> tdcEdges = {};
   std::vector<float> tdcSlopes = {};
   for (int i = 0; i < 300; ++i) {
-    m_hTDCs[i] = m_hTDC->ProjectionY(Form("hTDC%d", i), i + 1, i + 2);
+    m_hTDCs[i] = m_hTDC->ProjectionY(Form("hTDC%d", i), i + 1, i + 1);
+    m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
     if (m_hTDCs[i]->GetEntries() == 0 || m_hTDCs[i] == nullptr) {
       nDeadTDC += 1;
     } else {
@@ -285,7 +305,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
         tdcEdges.push_back(p4);
         tdcSlopes.push_back(p5);
       }
+      //      cout<<i<<" "<<p4<<endl;
     }
+
   }
 
 
@@ -294,16 +316,19 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
   int nHits = 0;
   for (int i = 0; i < 56; ++i) {
-    m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 2);
+    m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 1);
+    m_hHits[i]->SetTitle(Form("hHit%d", i));
     if (m_hHits[i]->GetEntries() > 0 && m_hHits[i] != nullptr) {
       int nhitSumL = 0;
       int nBins = m_nSenseWires[i];
-      B2INFO("layer " << i << " nbins " << nBins);
+      // B2INFO("layer " << i << " nbins " << nBins);
       for (int j = 0; j < nBins; ++j) {
         nhitSumL += m_hHits[i]->GetBinContent(j + 1);
       }
-      B2INFO("bbb");
-      hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL / neve));
+      //B2INFO("bbb");
+      if (neve > 0) {
+        hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL / neve));
+      } else hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL));
       hHitPerLayer->SetBinError(i + 1, 0);
       nHits += nhitSumL;
     }
@@ -366,7 +391,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hTDCSlope->SetMinimum(0);
   hTDCSlope->SetMaximum(50);
   hTDCSlope->Draw();
-
+  //m_hADCs[2]->Draw();
   m_cMain->cd(4);
   hBadChannel->Draw("col");
 
@@ -375,15 +400,43 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_cMain->cd(6);
   hHitPerLayer->Draw();
 
-  m_cADC->cd(1);
+  m_cADC->cd();
   m_hADC->Draw("colz");
 
-  m_cTDC->cd(1);
+  m_cTDC->cd();
   m_hTDC->Draw("colz");
 
-  m_cHit->cd(1);
+  m_cHit->cd();
   m_hHit->Draw("colz");
 
+  m_cHitL->Divide(4, 14);
+  for (int i = 0; i < 56; i++) {
+    m_cHitL->cd(i + 1);
+    m_hHits[i]->GetXaxis()->SetRangeUser(0, m_nSenseWires[i]);
+    m_hHits[i]->Draw("hist");
+  }
+
+
+  for (int i = 0; i < 300; i++) {
+    m_cADCs[i]->cd();
+    m_hADCTOTCuts[i]->SetFillColor(42);
+    Double_t max = m_hADCTOTCuts[i]->GetMaximum();
+    m_hADCs[i]->GetYaxis()->SetRangeUser(0, 3 * max);
+    m_hADCs[i]->Draw("hist");
+    m_hADCTOTCuts[i]->Draw("hist same");
+
+    m_cTDCs[i]->cd();
+    m_hTDCs[i]->Draw("hist");
+    fitFunc[i]->SetLineColor(kRed);
+    fitFunc[i]->Draw("same");
+    max = m_hTDCs[i]->GetMaximum();
+    TLine* l1 = new TLine(tdcEdges[i], 0, tdcEdges[i], max * 1.05);
+    l1->SetLineColor(kRed);
+    l1->Draw();
+    TLine* l0 = new TLine(4900, 0, 4900, max * 1.05);
+    l0->Draw();
+    //cout<<i<<" "<<tdcEdges[i]<<endl;
+  }
   /*
   m_cBadWire->cd();
   h2p->Draw("col");
@@ -412,9 +465,31 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_monObj->setVariable("nADC(n_0/n_tot>0.9)", nBadADC);
   m_monObj->setVariable("nBadWires", m_badChannels.size());
   */
+  //  cout<<nBadADC<<endl;
+  // nBadADC=3.5;
+  //m_monObj->setVariable("nbadADC", nBadADC); //"nADC(n_0/n_tot>0.9)"
+
+  m_monObj->setVariable("nEvents", neve);
+  m_monObj->setVariable("nHits", nHits / neve);
+  m_monObj->setVariable("nBadWires", m_badChannels.size());
+  m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0.0) / means.size());
+  m_monObj->setVariable("nDeadADC", nDeadADC);
+  m_monObj->setVariable("nADC(n_0/n_tot>0.9)", nBadADC); //????
+  m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / tdcEdges.size());
+  m_monObj->setVariable("nDeadTDC", nDeadTDC);
+  m_monObj->setVariable("tdcSlope", std::accumulate(tdcSlopes.begin(), tdcSlopes.end(), 0.0) / tdcSlopes.size());
+
   TString fname;
+  //  if (m_filename.length()) fname = m_filename;
+  //else fname = "cdc_mon_output.root";
   if (m_filename.length()) fname = m_filename;
-  else fname = "cdc_mon_output.root";
+  else {
+    TH1* hrun = findHist("DQMInfo/runno");
+    TH1* hexp = findHist("DQMInfo/expno");
+    int run = hrun ? std::stoi(hrun->GetTitle()) : 0;
+    int exp = hexp ? std::stoi(hexp->GetTitle()) : 0;
+    fname = TString::Format("mon_e%04dr%06d.root", exp, run);
+  }
 
   TFile f(fname, "NEW");
 
@@ -426,6 +501,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   const MonObjList& objts =  getMonObjList();
   // write them to the output file
   for (const auto& obj : objts)(obj.second)->Write();
+  m_cMain->Write();
 
   f.Close();
 

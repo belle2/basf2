@@ -507,34 +507,6 @@ namespace Belle2 {
       std::vector<std::string> new_arguments = arguments;
       new_arguments.push_back(std::string("1"));
       return isDescendantOfList(new_arguments);
-//       if (arguments.size() > 0) {
-//         auto listNames = arguments;
-//         auto func = [listNames](const Particle * particle) -> double {
-//           double output = 0;
-
-//           for (auto& iListName : listNames)
-//           {
-
-//             StoreObjPtr<ParticleList> listOfParticles(iListName);
-
-//             if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isDaughterOfList");
-
-//             for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
-//               Particle* iParticle = listOfParticles->getParticle(i);
-//               for (unsigned j = 0; j < iParticle->getNDaughters(); ++j) {
-//                 if (particle == iParticle->getDaughter(j)) {
-//                   output = 1; goto endloop;
-//                 }
-//               }
-//             }
-//           }
-// endloop:
-//           return output;
-//         };
-//         return func;
-//       } else {
-//         B2FATAL("Wrong number of arguments for meta function isDaughterOfList");
-//       }
     }
 
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments)
@@ -543,39 +515,6 @@ namespace Belle2 {
       std::vector<std::string> new_arguments = arguments;
       new_arguments.push_back(std::string("2"));
       return isDescendantOfList(new_arguments);
-//       if (arguments.size() > 0) {
-//         auto listNames = arguments;
-//         auto func = [listNames](const Particle * particle) -> double {
-//           double output = 0;
-
-//           for (auto& iListName : listNames)
-//           {
-
-//             StoreObjPtr<ParticleList> listOfParticles(iListName);
-
-//             if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isGrandDaughterOfList");
-
-//             for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
-//               Particle* iParticle = listOfParticles->getParticle(i);
-//               for (unsigned j = 0; j < iParticle->getNDaughters(); ++j) {
-//                 const Particle* jDaughter = iParticle->getDaughter(j);
-//                 for (unsigned k = 0; k < jDaughter->getNDaughters(); ++k) {
-
-//                   if (particle == jDaughter->getDaughter(k)) {
-//                     output = 1; goto endloop;
-//                   }
-//                 }
-//               }
-//             }
-
-//           }
-// endloop:
-//           return output;
-//         };
-//         return func;
-//       } else {
-//         B2FATAL("Wrong number of arguments for meta function isGrandDaughterOfList");
-//       }
     }
 
     Manager::FunctionPtr isDescendantOfList(const std::vector<std::string>& arguments)
@@ -604,7 +543,7 @@ namespace Belle2 {
               {
                 const Particle* daughter = m->getDaughter(i);
                 if ((flag == 1.) or (flag < 0)) {
-                  if (p->getArrayIndex() == daughter->getArrayIndex()) {
+                  if (p->isCopyOf(daughter)) {
                     return 1;
                   }
                 }

@@ -457,6 +457,7 @@
  daughter PDGCodes: 211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.466
  momentum=(0.64, -0.02, 0.40) p=0.7521
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -477,6 +478,7 @@
  daughter PDGCodes: 211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=6.847
  momentum=(-0.50, 0.94, 1.82) p=2.112
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -525,6 +527,7 @@
  daughter PDGCodes: 211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.452
  momentum=(0.60, 0.66, 0.22) p=0.9219
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -573,6 +576,7 @@
  daughter PDGCodes: 211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.452
  momentum=(0.60, 0.66, 0.22) p=0.9219
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -631,6 +635,7 @@
  daughter PDGCodes: -211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.849
  momentum=(0.81, 0.62, 0.71) p=1.241
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -651,6 +656,7 @@
  daughter PDGCodes: -211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=7.143
  momentum=(-0.33, 1.58, 2.14) p=2.676
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -709,6 +715,7 @@
  daughter PDGCodes: 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=3.889
  momentum=(1.01, -0.76, 1.92) p=2.297
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -729,6 +736,7 @@
  daughter PDGCodes: 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.175
  momentum=(-0.13, 0.20, 3.34) p=3.349
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -802,6 +810,7 @@
  daughter PDGCodes: 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.89
  momentum=(0.92, 0.45, 0.70) p=1.243
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -822,6 +831,7 @@
  daughter PDGCodes: 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=7.228
  momentum=(-0.22, 1.41, 2.13) p=2.56
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1005,6 +1015,7 @@
  daughter PDGCodes: 211, -211, 211, 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.945
  momentum=(0.54, -0.66, 2.14) p=2.299
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1053,6 +1064,7 @@
  daughter PDGCodes: 211, 211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=7.907
  momentum=(0.49, 0.19, 0.76) p=0.9252
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1101,6 +1113,7 @@
  daughter PDGCodes: 211, -211, 211, 211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.863
  momentum=(0.46, -0.45, 2.19) p=2.281
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1164,6 +1177,7 @@
  daughter PDGCodes: 211, -211, 211, 211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=7.99
  momentum=(1.28, -0.43, 2.73) p=3.05
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1212,6 +1226,7 @@
  daughter PDGCodes: 211, -211, 211, 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=9.013
  momentum=(0.81, -0.55, 2.00) p=2.223
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1260,6 +1275,7 @@
  daughter PDGCodes: -211, 211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.86
  momentum=(0.49, -0.63, 2.22) p=2.359
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1308,6 +1324,7 @@
  daughter PDGCodes: -211, 211, -211, 211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=8.844
  momentum=(0.92, -0.75, 1.95) p=2.284
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1356,6 +1373,7 @@
  daughter PDGCodes: 211, -211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.273
  momentum=(-0.01, -0.58, 1.24) p=1.367
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1419,6 +1437,7 @@
  daughter PDGCodes: 211, -211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=7.924
  momentum=(0.15, -1.58, 1.91) p=2.482
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):
@@ -1467,6 +1486,7 @@
  daughter PDGCodes: 211, -211, 211, 211, -211, -211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.754
  momentum=(0.85, -0.18, 1.82) p=2.021
+ momentum scaling factor=1
  position=(0.00, 0.00, 0.00)
  p-value of fit (if done): -1
  error matrix (px, py, pz, E, x, y ,z):

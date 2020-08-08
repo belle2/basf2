@@ -24,6 +24,10 @@ Variables
 
    .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
 
+ * Added new generated event kinematics variables :b2:var:`genMissingMass2OfEvent`,  :b2:var:`genMissingEnergyOfEventCMS`, 
+   :b2:var:`genMissingMomentumOfEventCMS`, :b2:var:`genTotalPhotonsEnergyOfEvent`, :b2:var:`genVisibleEnergyOfEventCMS` 
+   and a corresponding collection ``mc_event_kinematics``.
+
 Modules
 +++++++
 
@@ -33,6 +37,7 @@ Modules
    beamspot is added.
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
+ * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

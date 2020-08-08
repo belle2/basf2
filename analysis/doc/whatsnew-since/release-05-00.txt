@@ -38,11 +38,6 @@ Modules
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
-
-Full Event Interpretation
-+++++++++++++++++++++++++
-
-* Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in `fei.get_default_channels()`.
  * The MC matching with the :ref:`DecayString` properly works in hierarchical decay. For example, 
 
    .. code-block:: python
@@ -65,3 +60,8 @@ Full Event Interpretation
    In this case, one wants to accept missing massive daughters in ``B0:Dpi`` decay but not in ``D-:pipi0`` decay.
    So, if the decay of ``D-:pipi0`` in the MC truth level is ``D- -> pi+ pi- pi- pi0``, `isSignal` of ``D-:pipi0`` and ``B0:Dpi`` will be 0, since there are missing daughters in ``D-:pipi0`` decay.
    If one wants to accept missing daughters in ``D-:pipi0``, please use the :ref:`DecayString` grammar in the reconstruction of ``D-:pipi0`` or use `isSignalAcceptMissing` variable instead of `isSignal`.
+
+Full Event Interpretation
++++++++++++++++++++++++++
+
+* Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in `fei.get_default_channels()`.

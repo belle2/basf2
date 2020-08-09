@@ -112,8 +112,10 @@ namespace Belle2 {
     TCanvas* m_cADC = nullptr; /**< main panel */
     TCanvas* m_cTDC = nullptr; /**< bad wire panel */
     TCanvas* m_cHit = nullptr; /**< main panel */
-    TCanvas* m_cADCs[300] = {};
-    TCanvas* m_cTDCs[300] = {};
+    // TCanvas* m_cADCs[300] = {};
+    // TCanvas* m_cTDCs[300] = {};
+    TCanvas* m_cADCs = nullptr;
+    TCanvas* m_cTDCs = nullptr;
     TCanvas* m_cHitL = nullptr;
     TCanvas* m_cADC1000 = nullptr;
 

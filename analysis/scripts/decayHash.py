@@ -130,7 +130,7 @@ def _pdg_to_name(x):
     pdg_string = str(pdg_code)
     try:
         pdg_string = pdg.to_name(pdg_code)
-    except Exception as e:
+    except BaseException:
         pass
 
     if selected:

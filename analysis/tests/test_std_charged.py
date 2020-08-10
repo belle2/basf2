@@ -119,5 +119,6 @@ class TestStdCharged(unittest.TestCase):
         for module in testpath.modules():
             self._check_list_name('mostlikely', 'stdMostLikely', module)
 
+
 if __name__ == '__main__':
     unittest.main()

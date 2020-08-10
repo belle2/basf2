@@ -156,16 +156,15 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   // Normalize the trajectory and hit contents of the tracks
   m_trackNormalizer.apply(tracks);
 
-  printf("Next Event:\n");
+  B2INFO("Next Event:");
   for (const CDCTrack& track : tracks) {
     for (const CDCRecoHit3D hit : track) {
-      printf("Hit: %d %d %f %f %f %f %d %d %d %d\n",
-             track.front().getWire().getEWire(),
-             hit.getWire().getWireID().getEWire(),
-             hit.getWireHit().getRefDriftLength(),
-             hit.getRecoPos3D().x(), hit.getRecoPos3D().y(),
-             hit.getRecoPos3D().z(), hit.getWire().getILayer(),
-             hit.getWire().getICLayer(), hit.getWire().getISuperLayer(),
+      B2INFO("Hit: " <<
+             track.front().getWire().getEWire() << "; " <<
+             hit.getWire().getWireID().getEWire() << "; " <<
+             hit.getWireHit().getRefDriftLength() << "; " <<
+             hit.getRecoPos3D().x() << ", " << hit.getRecoPos3D().y() << ", " << hit.getRecoPos3D().z() << "; " <<
+             hit.getWire().getILayer() << ", " << hit.getWire().getICLayer() << ", " << hit.getWire().getISuperLayer() << "; " <<
              hit.getRLInfo());
     }
   }

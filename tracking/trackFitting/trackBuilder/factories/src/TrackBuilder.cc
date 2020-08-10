@@ -118,10 +118,10 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
   if (tfr) {
     TVector3 pos = tfr->getPosition();
     TVector3 mom = tfr->getMomentum();
-    printf("Track: %d %d %d %f %f %f %f %f %f\n",
-           recoTrack.getNumberOfCDCHits(), recoTrack.getNumberOfSVDHits(), recoTrack.getNumberOfPXDHits(),
-           pos.X(), pos.Y(), pos.Z(),
-           mom.X(), mom.Y(), mom.Z()
+    B2INFO("Track: " <<
+           recoTrack.getNumberOfCDCHits() << ", " << recoTrack.getNumberOfSVDHits() << ", " << recoTrack.getNumberOfPXDHits() << "; " <<
+           pos.X() << ", " << pos.Y() << ", " << pos.Z() << "; " <<
+           mom.X() << ", " << mom.Y() << ", " << mom.Z()
           );
   }
 

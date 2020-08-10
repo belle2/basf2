@@ -114,6 +114,18 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     newTrack.setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
   }
 
+  const TrackFitResult* tfr = newTrack.getTrackFitResult(Const::muon);
+  if (tfr) {
+    TVector3 pos = tfr->getPosition();
+    TVector3 mom = tfr->getMomentum();
+    printf("Track: %d %d %d %f %f %f %f %f %f\n",
+           recoTrack.getNumberOfCDCHits(), recoTrack.getNumberOfSVDHits(), recoTrack.getNumberOfPXDHits(),
+           pos.X(), pos.Y(), pos.Z(),
+           mom.X(), mom.Y(), mom.Z()
+          );
+  }
+
+
   B2DEBUG(100, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
   if (newTrack.getNumberOfFittedHypotheses() > 0) {
     Track* addedTrack = tracks.appendNew(newTrack);

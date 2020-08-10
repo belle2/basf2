@@ -15,6 +15,16 @@
 #                                                                                    *
 # ************************************************************************************
 
+from matplotlib.colors import colorConverter
+from matplotlib.collections import PolyCollection
+from mpl_toolkits.mplot3d import Axes3D
+import IPython
+from ROOT import PyConfig
+import glob
+import sys
+import math
+from matplotlib.ticker import FormatStrFormatter
+import matplotlib.pyplot as plt
 import ROOT
 from ROOT import Belle2
 from basf2 import B2INFO
@@ -29,20 +39,9 @@ mpl.use('Agg')
 mpl.rcParams.update({'font.size': 22})
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
-import math
-import sys
-import glob
 
-from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True
 PyConfig.StartGuiThread = False
-from array import array
-import IPython
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.collections import PolyCollection
-from matplotlib.colors import colorConverter
 
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 

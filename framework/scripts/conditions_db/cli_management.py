@@ -1,10 +1,10 @@
+import functools
+from concurrent.futures import ProcessPoolExecutor
+from collections import defaultdict
 from conditions_db.iov import IoVSet, IntervalOfValidity
 from basf2 import B2INFO, B2ERROR, B2FATAL, LogPythonInterface
-from collections import defaultdict
 from basf2.utils import pretty_print_table
 from terminal_utils import Pager
-from concurrent.futures import ProcessPoolExecutor
-from itertools import repeat
 
 
 def get_all_iovsets(existing_payloads, run_range=None):
@@ -68,7 +68,11 @@ def command_tag_merge(args, db=None):
     access for basf2 (highest priority goes first).
 
     Warning:
-      This command requires all globaltags are overlap free.
+      The order of the globaltags is highest priority first, so payloads from
+      globaltags earlier on the command line will be taken with before globaltags
+      from later tags.
+
+      This command requires that all globaltags are overlap free.
 
     For each globaltag in the list we copy all payloads to the output globaltag
     if there is no payload of that name valid for the given interval of validity
@@ -98,7 +102,7 @@ def command_tag_merge(args, db=None):
         payload1, rev 1, valid from 1,11 to 1,19
         payload1, rev 3, valid from 1,20 to 1,22
         payload1, rev 1, valid from 1,23 to 1,30
-        payload2, rev 2, valid ftom 0,1 to 0,-1
+        payload2, rev 2, valid from 0,1 to 0,-1
         payload2, rev 1, valid from 1,0 to 1,-1
 
     When finished, this command will print a table of payloads and their
@@ -114,7 +118,7 @@ def command_tag_merge(args, db=None):
         payload1, rev 3, valid from 1,20 to 1,21
         payload2, rev 1, valid from 1,0 to 1,21
 
-    .. versionadded:: release-05-00-00
+    .. versionadded:: release-05-01-00
     """
 
     if db is None:
@@ -129,7 +133,8 @@ def command_tag_merge(args, db=None):
                           "in the output globaltag: All iovs will be limited to "
                           "be in this range.")
         args.add_argument("-j", type=int, default=1, dest="nprocess",
-                          help="Number of concurrent processes to use for creating payloads into the output globaltag.")
+                          help="Number of concurrent processes to use for "
+                          "creating payloads into the output globaltag.")
         return
 
     # prepare some colors for easy distinction of source tag
@@ -138,7 +143,7 @@ def command_tag_merge(args, db=None):
         colors = "\x1b[32m \x1b[34m \x1b[35m \x1b[31m".split()
         colors = {tag: color for tag, color in zip(args.globaltag, colors)}
 
-    def color_row(row, widths, line):
+    def color_row(row, _, line):
         """Color the lines depending on which globaltag the payload comes from"""
         if not support_color:
             return line
@@ -146,11 +151,13 @@ def command_tag_merge(args, db=None):
         end = '\x1b[0m'
         return begin + line + end
 
-    with Pager(f"Result of merging globaltags", True):
+    with Pager("Result of merging globaltags", True):
         # make sure output tag exists
         output_id = db.get_globalTagInfo(args.output)
         if output_id is None:
+            B2ERROR("Output globaltag doesn't exist. Please create it first with a proper description")
             return False
+
         output_id = output_id["globalTagId"]
 
         # check all globaltags exist
@@ -194,7 +201,8 @@ def command_tag_merge(args, db=None):
     # Ok, we're still alive, create all the payloads using multiple processes.
     if not args.dry_run:
         B2INFO(f'Now copying the payloads into {args.output}...')
+        create_iov = functools.partial(create_iov_wrapper, db, output_id)
         with ProcessPoolExecutor(max_workers=args.nprocess) as pool:
-            pool.map(create_iov_wrapper, repeat(db, len(final)), repeat(output_id, len(final)), final)
+            pool.map(create_iov, final)
 
     return 0

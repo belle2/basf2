@@ -13,6 +13,9 @@
 #include <vector>
 
 #include <sys/time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/rawdata/CprErrorMessage.h>

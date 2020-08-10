@@ -86,21 +86,21 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   m_cMain = new TCanvas("main", "main", 1500, 1000);
   m_monObj->addCanvas(m_cMain);
 
-  m_cADC = new TCanvas("adc", "adc", 1500, 1000);
+  m_cADC = new TCanvas("adc", "adc", 2000, 10000);
   m_monObj->addCanvas(m_cADC);
-  m_cTDC = new TCanvas("tdc", "tdc", 1500, 1000);
+  m_cTDC = new TCanvas("tdc", "tdc", 2000, 10000);
   m_monObj->addCanvas(m_cTDC);
-  m_cHit = new TCanvas("hit", "hit", 1500, 1000);
+  m_cHit = new TCanvas("hit", "hit", 1500, 6000);
   m_monObj->addCanvas(m_cHit);
   m_cADC1000 = new TCanvas("ADC1000", "ADC1000", 1500, 1000);
   m_monObj->addCanvas(m_cADC1000);
-  m_cHitL = new TCanvas("hitL", "hitL", 1500, 6000);
-  m_monObj->addCanvas(m_cHitL);
+  //  m_cHitL = new TCanvas("hitL", "hitL", 1500, 6000);
+  //m_monObj->addCanvas(m_cHitL);
   // m_cADCs=new TCanvas("hADCs","hADCs",2000,10000);
-  m_cADCs = new TCanvas("hADCs", "hADCs", 2000, 10000);
-  m_monObj->addCanvas(m_cADCs);
-  m_cTDCs = new TCanvas("hTDCs", "hTDCs", 2000, 10000);
-  m_monObj->addCanvas(m_cTDCs);
+  //m_cADCs = new TCanvas("hADCs", "hADCs", 2000, 10000);
+  //m_monObj->addCanvas(m_cADCs);
+  //m_cTDCs = new TCanvas("hTDCs", "hTDCs", 2000, 10000);
+  //m_monObj->addCanvas(m_cTDCs);
 
 
   m_cBadWire = new TCanvas("badwire", "Bad wires", 1000, 1000);
@@ -400,6 +400,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_cMain->cd(6);
   hHitPerLayer->Draw();
 
+  /*
   m_cADC->cd();
   m_hADC->Draw("colz");
 
@@ -408,29 +409,29 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   m_cHit->cd();
   m_hHit->Draw("colz");
-
+  */
   m_cADC1000->cd();
   hADC1000->Draw();
 
-  m_cHitL->Divide(4, 14);
+  m_cHit->Divide(4, 14);
   for (int i = 0; i < 56; i++) {
-    m_cHitL->cd(i + 1);
+    m_cHit->cd(i + 1);
     m_hHits[i]->GetXaxis()->SetRangeUser(0, m_nSenseWires[i]);
     m_hHits[i]->Draw("hist");
   }
 
-  m_cADCs->Divide(6, 50, 0, 0);
-  m_cTDCs->Divide(6, 50, 0, 0);
+  m_cADC->Divide(6, 50, 0.0002, 0.0002);
+  m_cTDC->Divide(6, 50, 0.0002, 0.0002);
 
   for (int i = 0; i < 300; i++) {
-    m_cADCs->cd(i + 1);
+    m_cADC->cd(i + 1);
     m_hADCTOTCuts[i]->SetFillColor(42);
     Double_t max = m_hADCTOTCuts[i]->GetMaximum();
     m_hADCs[i]->GetYaxis()->SetRangeUser(0, 3 * max);
     m_hADCs[i]->Draw("hist");
     m_hADCTOTCuts[i]->Draw("hist same");
 
-    m_cTDCs->cd(i + 1);
+    m_cTDC->cd(i + 1);
     m_hTDCs[i]->Draw("hist");
     fitFunc[i]->SetLineColor(kRed);
     fitFunc[i]->Draw("same");

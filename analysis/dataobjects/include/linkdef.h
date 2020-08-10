@@ -15,7 +15,7 @@
 #pragma link C++ class Belle2::FlavorTaggerInfoMap+; // checksum=0xcdef997a, version=3
 #pragma link C++ class Belle2::StringWrapper+; // checksum=0xf15ef1c4, version=1
 #pragma link C++ class Belle2::EventShapeContainer+; // checksum=0x57e119da, version=1
-#pragma link C++ class Belle2::EventKinematics+; // checksum=0x2ede9ce0, version=1
+#pragma link C++ class Belle2::EventKinematics+; // checksum=0x23d1bfc2, version=2
 #pragma link C++ class Belle2::TauPairDecay+; // checksum=0x15ea58a, version=1
 #pragma link C++ class Belle2::ECLEnergyCloseToTrack+; // checksum=0xeadb37d4, version=1
 #pragma link C++ class Belle2::ECLTRGInformation+; // checksum=0x744abff9, version=3
@@ -79,5 +79,13 @@
   targetClass="Belle2::TagVertex"                              \
   target="m_tagVertexErrMatrix"                                \
   code="{m_tagVertexErrMatrix = onfile.m_tagVertexErrMatrix;}" \
+
+#pragma read                                   \
+  sourceClass="Belle2::EventKinematics"        \
+  source="bool m_builtFromMC"                  \
+  version="[1]"                                \
+  targetClass="Belle2::EventKinematics"        \
+  target="m_builtFromMC"                       \
+  code="{m_builtFromMC = false;}"              \
 
 #endif

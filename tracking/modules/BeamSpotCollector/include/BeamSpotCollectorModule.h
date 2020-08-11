@@ -102,6 +102,13 @@ namespace Belle2 {
     /**store the y errors for the pull*/
     std::vector<float> m_err_y;
 
+    int m_evt, m_exp, m_run;
+    double m_time;
+    double m_mu0_d0, m_mu0_z0, m_mu0_phi0, m_mu0_tanlambda;
+    double m_mu1_d0, m_mu1_z0, m_mu1_phi0, m_mu1_tanlambda;
+
+
+
     Double_t m_median = 0; /**<The median of y coord*/
     Double_t m_quantile = 0.5;/**<The 0.5 quantile for the median*/
     Int_t m_r = 0; /**<Counter for sampling*/

@@ -95,6 +95,7 @@ unsigned int RawFTSWFormat_latest::GetMagicTrailer(int n)
 int RawFTSWFormat_latest::GetIsHER(int n)
 {
   int* buffer = GetBuffer(n);
+  /* cppcheck-suppress shiftTooManyBitsSigned */
   int ret = (buffer[ POS_INJECTION_INFO ] & INJ_HER_LER_MASK) >> INJ_HER_LER_SHIFT;
   return ret; // 1 -> HER, 0 -> LER
 }

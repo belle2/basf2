@@ -118,5 +118,6 @@ class TestStdHyperons(unittest.TestCase):
             self.assertTrue(self._check_list(create_list, expected_lists=['Omega-:std', f'Omega-:{omegatype}']))
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Omega:{omegatype}']))
 
+
 if __name__ == '__main__':
     unittest.main()

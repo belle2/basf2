@@ -11,21 +11,20 @@
 # This software is provided "as is" without any warranty.                #
 ##########################################################################
 
+import json
+import os
+import basf2_mva
+from basf2 import B2ERROR, B2FATAL
+import basf2
+from ROOT import Belle2
+import variables.utils as vu
+import modularAnalysis as ma
 from ROOT import gSystem
 gSystem.Load('libanalysis.so')
-import modularAnalysis as ma
-import variables.utils as vu
-from ROOT import Belle2
-import basf2
-from basf2 import B2ERROR, B2FATAL
-import basf2_mva
 
 # make ROOT compatible available
 Belle2.Variable.Manager
 Belle2.Variable.Manager.Instance()
-
-import os
-import json
 
 
 def get_variables(particle_list, ranked_variable, variables=None, particleNumber=1):

@@ -43,11 +43,11 @@
 # FEI defines own command line options, therefore we disable
 # the ROOT command line options, which otherwise interfere sometimes.
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
+PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 # FEI uses multi-threading for parallel execution of tasks therefore
 # the ROOT gui-thread is disabled, which otherwise interferes sometimes
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 import ROOT
 from ROOT import Belle2
 
@@ -614,14 +614,14 @@ class Teacher(object):
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
-                    l = [m for m in f.GetListOfKeys()]
-                    if not l:
+                    keys = [m for m in f.GetListOfKeys()]
+                    if not keys:
                         B2WARNING(f"Training of MVC failed. ROOT file does not contain a tree. "
                                   "Ignoring channel {channel.label}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
-                    tree = l[0].ReadObj()
+                    tree = keys[0].ReadObj()
                     nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
                     nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
                     if nSig < Teacher.MinimumNumberOfMVASamples:
@@ -776,7 +776,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     """
-    print("""
+    print(r"""
     ____ _  _ _    _       ____ _  _ ____ _  _ ___    _ _  _ ___ ____ ____ ___  ____ ____ ___ ____ ___ _ ____ _  _
     |___ |  | |    |       |___ |  | |___ |\ |  |     | |\ |  |  |___ |__/ |__] |__/ |___  |  |__|  |  | |  | |\ |
     |    |__| |___ |___    |___  \/  |___ | \|  |     | | \|  |  |___ |  \ |    |  \ |___  |  |  |  |  | |__| | \|

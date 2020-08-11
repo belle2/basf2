@@ -44,7 +44,7 @@ namespace Belle2 {
 
   protected:
     //number of skims
-    static const int nskim_gdldqm = 9;
+    static const int nskim_gdldqm = 11;
     int start_skim_gdldqm = 0;
     int end_skim_gdldqm = 0;
     int m_skim = -1;
@@ -183,8 +183,10 @@ namespace Belle2 {
       "software_trigger_cut&skim&accept_mumu_2trk",
       "software_trigger_cut&skim&accept_gamma_gamma",
       "software_trigger_cut&skim&accept_bhabha",
-      "software_trigger_cut&skim&accept_HadronB",
-      "software_trigger_cut&skim&accept_Dimuon"
+      "software_trigger_cut&skim&accept_hadronb",
+      "software_trigger_cut&skim&accept_hadronb1",
+      "software_trigger_cut&skim&accept_hadronb2",
+      "software_trigger_cut&skim&accept_mumutight"
     };
 
     //name of histgrams
@@ -196,8 +198,10 @@ namespace Belle2 {
       "mumu2trk",
       "gammagamma",
       "bhabha",
-      "HadronB",
-      "Dimuon"
+      "hadronb",
+      "hadronb1",
+      "hadronb2",
+      "mumutight"
     };
 
     //ecltrg<->ecl mappint

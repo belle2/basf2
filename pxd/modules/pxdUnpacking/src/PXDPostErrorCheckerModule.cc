@@ -196,10 +196,16 @@ void PXDPostErrorCheckerModule::event()
       }
     }
   }
+
+  /// the following does only work with the overlapping trigger firmware.
+  /// TODO make this check depending on firmware version database object (not yet existing)
   for (auto& a : found_dhe) {
-    if (a.second > 1) B2ERROR("More than one packet for same DHE ID " << a.first);
-//    if (!m_dhe_expected[a.first]) B2ERROR("This DHE ID was not expected " << a.first);
+    if (a.second > 1) B2WARNING("More than one packet for same DHE ID " << a.first);
   }
+  /// the following checks would require the (not yet existing) database object which marks the available modules
+//  for (auto& a : found_dhe) {
+//    if (!m_dhe_expected[a.first]) B2ERROR("This DHE ID was not expected " << a.first);
+//  }
 //  for (auto& a : m_dhe_expected) {
 //    if (a.second) {
 //      if (found_dhe[a.first] == 0) B2ERROR("DHE packet missing for DHE ID " << a.first);

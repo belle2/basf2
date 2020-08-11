@@ -20,5 +20,6 @@ class TestVariableCollections(unittest.TestCase):
                 variable = vm.getVariable(variable_name)
                 self.assertNotEqual(variable, None)
 
+
 if __name__ == '__main__':
     unittest.main()

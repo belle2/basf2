@@ -667,8 +667,8 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=None):
                         "_" + weightFiles + 'EventLevelKaonPionFBDT'
                     identifierEventLevelKaonPion = filesDirectory + '/' + methodPrefixEventLevelKaonPion + '_1.root'
                     if not os.path.isfile(identifierEventLevelKaonPion):
-                                # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
-                                # sampling. The others are not needed and skipped
+                        # Slow Pion and Kaon categories are used if Kaon-Pion is lacking for
+                        # sampling. The others are not needed and skipped
                         if category != "SlowPion" and category != "Kaon":
                             continue
 

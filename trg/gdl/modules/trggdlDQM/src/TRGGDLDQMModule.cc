@@ -32,7 +32,6 @@
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
-#include "trg/ecl/modules/rec_ecl/rec_ecl.h"
 
 using namespace std;
 using namespace Belle2;

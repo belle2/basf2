@@ -5,6 +5,7 @@
 The core module of the Belle II Analysis Software Framework.
 """
 
+import pybasf2
 import sys as _sys
 import signal as _signal
 
@@ -18,7 +19,6 @@ if _sys.version_info[0] < 3:
 from basf2 import _override_print  # noqa
 
 # import the C++ library with the exported functions
-import pybasf2
 # and also import all of them in current scope for ease of use
 from pybasf2 import *  # noqa
 

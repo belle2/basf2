@@ -27,6 +27,7 @@ namespace Belle2 {
       int cellID; /**<strip cellID*/
       int maxSample; /** ADC max of the acquired samples*/
       int noise; /** ADC noise */
+      Belle2::SVDShaperDigit::APVFloatSamples samples; /** ADC of the acquired samples*/
     };
 
     /**
@@ -35,6 +36,11 @@ namespace Belle2 {
     class RawCluster {
 
     public:
+
+      /**
+       * Default Constructor to create an empty RawCluster
+       */
+      RawCluster() {};
 
       /**
        * Constructor to create an empty RawCluster

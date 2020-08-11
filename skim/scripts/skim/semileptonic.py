@@ -11,9 +11,16 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
+                                      loadStdD0, loadStdDplus, loadStdDstar0,
+                                      loadStdDstarPlus)
+from skim.standardlists.lightmesons import loadStdPi0ForBToHadrons
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdK, stdMu, stdPi
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s
+from stdV0s import stdKshorts
 from variables import variables as vm
-
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 
@@ -58,13 +65,10 @@ class PRsemileptonicUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"],
-            "stdPi": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
 
     def build_lists(self, path):
         ma.fillParticleList(decayString="pi+:PRSL_eventshape",
@@ -176,34 +180,22 @@ class SLUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdK": ["all"],
-            "stdMu": ["all"],
-            "stdPi": ["all", "loose"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["loose"],
-        },
-        "stdPi0s": {
-            "stdPi0s": ["eff40_Jan2020"],
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0": [],
-            "loadStdDstar0": [],
-            "loadStdDplus": [],
-            "loadStdDstarPlus": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdK("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPi("loose", path=path)
+        stdPhotons("loose", path=path)
+        stdPi0s("eff40_Jan2020", path=path)
+        stdKshorts(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0(path=path)
+        loadStdDstar0(path=path)
+        loadStdDplus(path=path)
+        loadStdDstarPlus(path=path)
 
     def build_lists(self, path):
         ma.cutAndCopyList("e+:SLUntagged", "e+:all", "p>0.35", True, path=path)

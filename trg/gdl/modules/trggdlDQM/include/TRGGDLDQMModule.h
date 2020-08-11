@@ -13,6 +13,9 @@
 
 #include <TH2I.h>
 #include <TH1I.h>
+#include "trg/ecl/TrgEclMapping.h"
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 
 namespace Belle2 {
 
@@ -96,6 +99,7 @@ namespace Belle2 {
     TH1I* h_psn_extra[nskim_gdldqm] = {nullptr};
     TH1I* h_psn_pure_extra[nskim_gdldqm] = {nullptr};
     TH1D* h_eff[nskim_gdldqm] = {nullptr};
+    TH1D* h_pure_eff[nskim_gdldqm] = {nullptr};
     TH1D* h_eff_shifter = {nullptr};
     //! timtype
     TH1I* h_timtype[nskim_gdldqm] = {nullptr};
@@ -140,6 +144,8 @@ namespace Belle2 {
     static const char* c_eff[n_eff];
     static const int n_eff_shifter = 8;
     static const char* c_eff_shifter[n_eff_shifter];
+    static const int n_pure_eff = 10;
+    static const char* c_pure_eff[n_pure_eff];
 
     //condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
@@ -193,6 +199,11 @@ namespace Belle2 {
       "HadronB",
       "Dimuon"
     };
+
+    //ecltrg<->ecl mappint
+    TrgEclMapping* trgeclmap;
+    StoreArray<ECLCalDigit> m_ECLCalDigitData;
+    StoreArray<ECLDigit>    m_ECLDigitData;
 
   };
 

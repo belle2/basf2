@@ -29,7 +29,10 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
+#include "trg/ecl/modules/rec_ecl/rec_ecl.h"
 
 using namespace std;
 using namespace Belle2;
@@ -171,6 +174,12 @@ void TRGGDLDQMModule::defineHisto()
     for (int i = 0; i < n_eff; i++) {
       h_eff[iskim]->GetXaxis()->SetBinLabel(i + 1, c_eff[i]);
     }
+    h_pure_eff[iskim]  = new TH1D(Form("hGDL_pure_eff_%s", skim_smap[iskim].c_str()), "efficiency wrt. offline", n_pure_eff, 0,
+                                  n_pure_eff);
+    for (int i = 0; i < n_pure_eff; i++) {
+      h_pure_eff[iskim]->GetXaxis()->SetBinLabel(i + 1, c_pure_eff[i]);
+      h_pure_eff[iskim]->GetXaxis()->SetLabelSize(0.05);
+    }
     for (unsigned i = 0; i < n_inbit; i++) {
       if (m_bitNameOnBinLabel) {
         h_itd[iskim]->GetXaxis()->SetBinLabel(h_itd[iskim]->GetXaxis()->FindBin(i + 0.5), inbitname[i]);
@@ -247,6 +256,7 @@ void TRGGDLDQMModule::beginRun()
     h_psn_extra[iskim]->Reset();
     h_psn_pure_extra[iskim]->Reset();
     h_eff[iskim]->Reset();
+    h_pure_eff[iskim]->Reset();
     h_timtype[iskim]->Reset();
   }
   h_eff_shifter->Reset();
@@ -272,6 +282,10 @@ void TRGGDLDQMModule::initialize()
   StoreObjPtr<EventMetaData> bevt;
   _exp = bevt->getExperiment();
   _run = bevt->getRun();
+
+  m_ECLCalDigitData.registerInDataStore();
+  m_ECLDigitData.registerInDataStore();
+  trgeclmap = new TrgEclMapping();
 
   // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
@@ -1422,10 +1436,61 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
   }
 
   //get offline ECL cluster information
-  StoreArray<ECLCluster> ECLClusters;
+  //StoreArray<ECLCluster> ECLClusters;
+  //double total_energy = 0;
+  //for (int iclst = 0; iclst < ECLClusters.getEntries(); iclst++) {
+  //  total_energy += ECLClusters[iclst]->getEnergyRaw();
+  //}
+  //
+  //
+  int ecl_timing_threshold_low  = -200; // (ns)  xtal timing selection
+  int ecl_timing_threshold_high =  200; // (ns)  xtal timing selection
+  double ecl_xtcid_energy_sum[576] = {0};
   double total_energy = 0;
-  for (int iclst = 0; iclst < ECLClusters.getEntries(); iclst++) {
-    total_energy += ECLClusters[iclst]->getEnergyRaw();
+  int ncluster = 0;
+  for (const auto& eclcalhit : m_ECLCalDigitData) {
+
+    // (ecl) calibation status check and cut
+    if (!eclcalhit.isCalibrated()) {continue;}
+    if (eclcalhit.isFailedFit()) {continue;}
+    if (eclcalhit.isTimeResolutionFailed()) {continue;}
+
+    // (ecl) xtal-id
+    int ecl_cid   = (double) eclcalhit.getCellId();
+
+    // (ecl) fitter quality check and cut
+    int ecl_quality = -1;
+    for (const auto& eclhit : m_ECLDigitData) {
+      if (ecl_cid == eclhit.getCellId()) {
+        ecl_quality = (int) eclhit.getQuality();
+      }
+    }
+    if (ecl_quality != 0) {continue;}
+
+    // (ecl) xtal energy
+    double ecl_xtal_energy  = eclcalhit.getEnergy(); // ECLCalDigit
+
+
+    // (ecl) timing cut
+    int ecl_timing = eclcalhit.getTime();
+    if (ecl_timing < ecl_timing_threshold_low ||
+        ecl_timing > ecl_timing_threshold_high) {continue;}
+
+    // (ecl) tc-id for xtal-id
+    int ecl_tcid  = trgeclmap->getTCIdFromXtalId(ecl_cid);
+    int ecl_thetaid = trgeclmap->getTCThetaIdFromTCId(ecl_tcid);
+
+    if (ecl_tcid >= 0 && ecl_tcid < 576 && ecl_thetaid >= 2 && ecl_thetaid <= 15) { //pick up only 2=<thetaid=<15
+      ecl_xtcid_energy_sum[ecl_tcid] = ecl_xtcid_energy_sum[ecl_tcid] + ecl_xtal_energy;
+      //ecltimingsum[i] = ecl_timing;
+    }
+  }
+
+  for (int i = 0; i < 576; i++) {
+    if (ecl_xtcid_energy_sum[i] > 0.1) {
+      total_energy += ecl_xtcid_energy_sum[i];
+      ncluster += 1;
+    }
   }
 
   //get offline KLM cluster information
@@ -1435,7 +1500,7 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
   if (n_fulltrack > 2) {
     //std::cout << "fff" << std::endl;
     bool fff_fired = isFired("fff");
-    bool ffy_fired = isFired("fff");
+    bool ffy_fired = isFired("ffy");
     bool c4_fired  = isFired("C4");
     bool hie_fired = isFired("HIE");
     if (c4_fired || hie_fired) {
@@ -1497,8 +1562,59 @@ TRGGDLDQMModule::fillOutputPureExtra(void)
       h_psn_pure_extra[0]->Fill(10.5);
     }
   }
+
+  //c4: require the total number of cluster is more than 3
+  if (ncluster > 3) {
+    //std::cout << "hie" << std::endl;
+    bool fff_fired = isFired("FFF");
+    bool ffo_fired = isFired("FFO");
+    bool ffb_fired = isFired("FFB");
+    bool c4_fired = isFired("c4");
+    if (fff_fired || ffo_fired || ffb_fired) {
+      h_psn_pure_extra[0]->Fill(11.5);
+    }
+    if (c4_fired && (fff_fired || ffo_fired || ffb_fired)) {
+      h_psn_pure_extra[0]->Fill(12.5);
+    }
+  }
+
+  h_pure_eff[0]->SetBinContent(1,  h_psn_pure_extra[0]->GetBinContent(1 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 0 + 1)); //fff with c4|hie
+  h_pure_eff[0]->SetBinContent(2,  h_psn_pure_extra[0]->GetBinContent(4 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 3 + 1)); //ffo with c4|hie
+  h_pure_eff[0]->SetBinContent(3,  h_psn_pure_extra[0]->GetBinContent(7 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 6 + 1)); //ffb with c4|hie
+  h_pure_eff[0]->SetBinContent(4,  h_psn_pure_extra[0]->GetBinContent(2 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 0 + 1)); //ffy with c4|hie
+  h_pure_eff[0]->SetBinContent(5,  h_psn_pure_extra[0]->GetBinContent(5 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 3 + 1)); //fyo with c4|hie
+  h_pure_eff[0]->SetBinContent(6,  h_psn_pure_extra[0]->GetBinContent(8 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 6 + 1)); //fyb with c4|hie
+  h_pure_eff[0]->SetBinContent(7,  h_psn_pure_extra[0]->GetBinContent(10 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 9 + 1)); //hie with fff|ffo|ffb
+  h_pure_eff[0]->SetBinContent(8,  h_psn_pure_extra[0]->GetBinContent(12 + 1) / h_psn_pure_extra[0]->GetBinContent(
+                                 11 + 1)); //hie with fff|ffo|ffb
+
 }
 
 const char* TRGGDLDQMModule::output_pure_extra[n_output_pure_extra] = {
-  "c4|hie 3fulltrack skim", "fff&(c4|hie) 3fulltrack skim", "fff|ffo|ffb E>1GeV skim", "hie&(fff|ffo|ffb) E>1GeV skim"
+  "c4|hie offline_fff", "fff&(c4|hie) offline_fff", "ffy&(c4|hie) offline_fff",
+  "c4|hie offline_ffo", "ffo&(c4|hie) offline_ffo", "fyo&(c4|hie) offline_ffo",
+  "c4|hie offline_ffb", "ffb&(c4|hie) offline_ffb", "fyb&(c4|hie) offline_ffb",
+  "fff|ffb|ffo offline_hie", "hie&(fff|ffb|ffo) offline_hie",
+  "fff|ffb|ffo offline_c4", "c4&(fff|ffb|ffo) offline_c4"
 };
+
+
+const char* TRGGDLDQMModule::c_pure_eff[n_pure_eff] = {
+  "fff with c4|hie",
+  "ffo with c4|hie",
+  "ffb with c4|hie",
+  "ffy with c4|hie",
+  "fyo with c4|hie",
+  "fyb with c4|hie",
+  "hie with fff|ffo|ffb",
+  "c4 with fff|ffo|ffb"
+};
+
+

@@ -1560,7 +1560,7 @@
          <sec name="dy1" unit="cm">0.6</sec>
          <sec name="dy2" unit="cm">0.6</sec>
          <sec name="dz" unit="cm">2.0</sec>
-         <sec name="Z" unit="m">9.322</sec>
+         <sec name="Z" unit="m">5.719</sec>
          <MotherVolume>LHL2</MotherVolume>
          <Material>Cu</Material>
          <Desc>Horizontal collimator D01H5</Desc>
@@ -1574,7 +1574,7 @@
          <sec name="dy1" unit="cm">0.6</sec>
          <sec name="dy2" unit="cm">0.6</sec>
          <sec name="dz" unit="cm">2.0</sec>
-         <sec name="Z" unit="m">4.799</sec>
+         <sec name="Z" unit="m">5.381</sec>
          <MotherVolume>LLR4</MotherVolume>
          <Material>Cu</Material>
          <Desc>Horizontal collimator D02H4</Desc>

@@ -66,7 +66,7 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
 void V0Fitter::setFitterMode(int fitterMode)
 {
   if (not(0 <= fitterMode && fitterMode <= 3)) {
-    B2WARNING("invalid fitter mode! set as the default fitter");
+    B2WARNING("invalid fitter mode! set fitter mode as 0");
   } else {
     m_v0FitterMode = fitterMode;
     if (fitterMode == 3)

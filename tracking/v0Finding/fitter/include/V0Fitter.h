@@ -44,10 +44,10 @@ namespace Belle2 {
 
     /// set V0 fitter mode.
     /// switch the mode of fitAndStore function.
-    ///   0: original (default)
+    ///   0: original
     ///   1: original with vertexFitWithRecoTracks function
     ///   2: remove hits inside the V0 vertex position
-    ///   3: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair
+    ///   3: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair (default)
     void setFitterMode(int fitterMode);
 
     /// Fit V0 with given hypothesis and store if fit was successful.

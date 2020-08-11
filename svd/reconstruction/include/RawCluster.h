@@ -49,42 +49,42 @@ namespace Belle2 {
 
       /**
        * Add a Strip to the current cluster.
-       * Update the cluster seed seed.
+       * Update the cluster seed strip.
        * @param stripInCluster aStrip to add to the cluster
        * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
        */
       bool add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip);
 
       /**
-       * returns true if the raw cluster candidate can be promoted to raw cluster
+       * @return true if the raw cluster candidate can be promoted to raw cluster (seedMaxSample > 0 and seedSNR > cutSeed)
        */
       bool isGoodRawCluster();
 
       /**
-       * returns the VxdID of the cluster sensor
+       * @return the VxdID of the cluster sensor
        */
       VxdID getSensorID() {return m_vxdID;}
 
       /**
-       * returns true if the cluster is on the U/P side
+       * @return true if the cluster is on the U/P side
        */
       bool isUSide() {return m_isUside;}
 
       /**
-       * returns the APVFloatSamples obtained summing
+       * @return the APVFloatSamples obtained summing
        * sample-by-sample all the strips on the cluster
        */
       Belle2::SVDShaperDigit::APVFloatSamples getClsSamples() const;
 
       /**
-       * returns the float vector of clustered 3-samples
+       * @return the float vector of clustered 3-samples
        * selected by the MaxSum method
        * with First Frame of the selection
        */
       std::pair<int, std::vector<float>> getMaxSum3Samples() const;
 
       /**
-       * returns the first frame
+       * @return the first frame
        * applying the MaxSum algorithm
        */
       int getFirstFrame()
@@ -93,13 +93,13 @@ namespace Belle2 {
       }
 
       /**
-       * returns the cluster size (number of strips of the cluster)
+       * @return the cluster size (number of strips of the cluster)
        */
       int getSize() const { return m_strips.size(); }
 
       /**
-      returns the vector of the strips in the cluster
-      */
+       * @return the vector of the strips in the cluster
+       */
       const std::vector<stripInCluster> getStripsInCluster() const { return m_strips; };
 
     protected:
@@ -124,9 +124,6 @@ namespace Belle2 {
 
       /** SVDShaperDigit index of the seed strip of the cluster */
       int m_seedIndex;
-
-      /** first frame selected with the max-sum algorithm */
-      //      int m_firstFrame = 0;
 
       /** vector containing the strips in the cluster */
       std::vector<stripInCluster> m_strips;

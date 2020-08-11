@@ -185,8 +185,8 @@ void DQMHistAnalysisInputModule::event()
   } else {
     if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated "
                                                 + mmt.AsString()).c_str());
-    m_expno = atoi(expno.c_str());
-    m_runno = atoi(runno.c_str());
+    m_expno = std::stoi(expno);
+    m_runno = std::stoi(runno);
   }
   B2INFO("DQMHistAnalysisInput: " << m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
          mmt.AsString());

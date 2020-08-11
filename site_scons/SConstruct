@@ -30,7 +30,13 @@ AddOption('--create-json', dest="create_json", action="store_true", default=Fals
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
-    SetOption('num_jobs', multiprocessing.cpu_count())
+    num_jobs = multiprocessing.cpu_count()
+    if 'BELLE2_MAX_BUILDS' in os.environ:
+        if os.environ['BELLE2_MAX_BUILDS'] == 'LOAD':
+            num_jobs = max(int(num_jobs / (1. + os.getloadavg()[1])), 1)
+        else:
+            num_jobs = min(num_jobs, int(os.environ['BELLE2_MAX_BUILDS']))
+    SetOption('num_jobs', num_jobs)
 except:
     pass
 
@@ -54,7 +60,7 @@ extsubdir = os.environ.get('BELLE2_EXTERNALS_SUBDIR', subdir)
 
 # check for root
 if 'ROOTSYS' not in os.environ:
-    print('root is not set up.')
+    print('ROOT is not set up.')
     print(setup_message)
     Exit(1)
 
@@ -62,8 +68,7 @@ if GetOption("check_externals"):
     if "BELLE2_EXTERNALS_VERSION" in os.environ and os.path.exists(".externals"):
         ext_version = open(".externals").read().strip()
         if ext_version != os.environ["BELLE2_EXTERNALS_VERSION"]:
-            print("externals version (%s) differs from the one defined in .externals (%s)" \
-                % (os.environ["BELLE2_EXTERNALS_VERSION"], ext_version))
+            print(f"externals version ({os.environ['BELLE2_EXTERNALS_VERSION']}) differs from the one defined in .externals ({ext_version})")
             print("Please run b2setup again.")
             Exit(1)
 
@@ -202,7 +207,7 @@ elif option == 'clang':
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
-    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wshadow', '-Wno-unused-command-line-argument'],
+    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
     # system ones. First we disable the default c++ include path
@@ -234,7 +239,7 @@ if(not GetOption('no-debuginfo')):
 override_from_environment = ['CC', 'CXX', 'LD']
 for v in override_from_environment:
     if v in os.environ:
-        print("Note: Overriding variable %s ('%s') from environment ($%s='%s')." % (v, global_env[v], v, os.environ[v]))
+        print(f"Note: overriding variable {v} ('{global_env[v]}') from environment (${v}='{os.environ[v]}').")
         global_env[v] = os.environ[v]
 
 if os.environ.get("BELLE2_USE_CCACHE", "no").lower() in ["yes", "true", "on", "1"]:

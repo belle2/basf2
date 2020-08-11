@@ -110,6 +110,6 @@ namespace Belle2 {
      */
     Double_t m_acceleratorRF = 0;
 
-    ClassDef(HardwareClockSettings, 1)
+    ClassDef(HardwareClockSettings, 2)
   };
 }

@@ -16,13 +16,13 @@ del pickable_basf2.functionname
 """
 
 
-import original_basf2
 import sys
 import pickle
 import inspect
 import unittest.mock as mock
 import basf2
-sys.modules['original_basf2'] = sys.modules['basf2']
+sys.modules['original_basf2'] = sys.modules['basf2']  # noqa
+import original_basf2
 
 
 class BASF2StateRecorder(object):

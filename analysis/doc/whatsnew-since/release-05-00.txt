@@ -27,6 +27,8 @@ Variables
  * Added new generated event kinematics variables :b2:var:`genMissingMass2OfEvent`,  :b2:var:`genMissingEnergyOfEventCMS`, 
    :b2:var:`genMissingMomentumOfEventCMS`, :b2:var:`genTotalPhotonsEnergyOfEvent`, :b2:var:`genVisibleEnergyOfEventCMS` 
    and a corresponding collection ``mc_event_kinematics``.
+ * Fixed the variable :b2:var:`isDescendantOfList`, which did not work if the ParticleLoader was used to fill a ParticleList with
+   descendants of an existing list or exclude them.
 
 Modules
 +++++++

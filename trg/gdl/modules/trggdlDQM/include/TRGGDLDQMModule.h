@@ -94,6 +94,9 @@ namespace Belle2 {
     TH1I* h_psn_rise[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
     TH1I* h_psn_fall[N_BITS_RESERVED][nskim_gdldqm] = {nullptr};
     TH1I* h_psn_extra[nskim_gdldqm] = {nullptr};
+    TH1I* h_psn_pure_extra[nskim_gdldqm] = {nullptr};
+    TH1D* h_eff[nskim_gdldqm] = {nullptr};
+    TH1D* h_eff_shifter = {nullptr};
     //! timtype
     TH1I* h_timtype[nskim_gdldqm] = {nullptr};
     //! event by event psnm timing distribution
@@ -116,6 +119,7 @@ namespace Belle2 {
     std::string m_postScriptName;
     void fillRiseFallTimings(void);
     void fillOutputExtra(void);
+    void fillOutputPureExtra(void);
 
     void genVcd(void);
     bool anaBitCondition(void);
@@ -130,6 +134,12 @@ namespace Belle2 {
 
     static const int n_output_extra = 62;
     static const char* output_extra[n_output_extra];
+    static const int n_output_pure_extra = 20;
+    static const char* output_pure_extra[n_output_pure_extra];
+    static const int n_eff = 35;
+    static const char* c_eff[n_eff];
+    static const int n_eff_shifter = 8;
+    static const char* c_eff_shifter[n_eff_shifter];
 
     //condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;

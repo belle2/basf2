@@ -13,14 +13,12 @@
 #include <vector>
 
 #include <sys/time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
 
 #include <daq/slc/readout/RunInfoBuffer.h>
 #include <daq/rawdata/CprErrorMessage.h>
 #include <daq/rawdata/modules/DAQConsts.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
+#include <rawdata/switch_basf2_standalone.h>
 
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>

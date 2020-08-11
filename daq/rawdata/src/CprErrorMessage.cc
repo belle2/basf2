@@ -8,10 +8,9 @@
 //#include <framework/logging/Logger.h>
 #include <daq/rawdata/CprErrorMessage.h>
 // #include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <syslog.h>
 // #include <framework/core/Module.h>
+#include <rawdata/switch_basf2_standalone.h>
 
 using namespace std;
 using namespace Belle2;

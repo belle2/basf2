@@ -42,7 +42,7 @@
 
 .. _b2conditionsdb-request:
 
-``b2conditionsdb-request``: Request inclusion of payloads in offical global tag
+``b2conditionsdb-request``: Request inclusion of payloads in official global tag
 -------------------------------------------------------------------------------
 
 .. versionadded:: release-03-00-00

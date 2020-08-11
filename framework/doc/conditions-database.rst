@@ -11,7 +11,7 @@ payloads and iovs for a certain dataset is called a **globaltag** and is
 identified by a unique name.
 
 Payload
-    An atom of conditons data identified by name and revision number
+    An atom of conditions data identified by name and revision number
 
     * usually ROOT files containing custom objects
     * a payload cannot be modified after creation.
@@ -82,7 +82,7 @@ By default the software will look for conditions data in
 1. user globaltags: Look in all globaltags provided by the user by setting `conditions.globaltags <ConditionsConfiguration.globaltags>`
 2. globaltag replay: Look in different base globaltags depending on the use case:
 
-    - **Procesing existing files (i.e. mdst)**: the globaltags specified in the input file are used.
+    - **Processing existing files (i.e. mdst)**: the globaltags specified in the input file are used.
     - **Generating and events**: the default globaltags for the current software version (`conditions.default_globaltags <ConditionsConfiguration.default_globaltags>` are used.
 
 The globaltag replay can be disabled by calling `conditions.override_globaltags() <ConditionsConfiguration.override_globaltags>`

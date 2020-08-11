@@ -31,7 +31,7 @@ were generated using ``b2validation`` and generate comparison plots:
     :nogroupsections:
     :absolutecommand:
 
-``b2validation-server``: Run Webserver Displaying the Phyiscs Validation Results
+``b2validation-server``: Run Webserver Displaying the Physics Validation Results
 --------------------------------------------------------------------------------
 
 With ``b2validation-server`` you can run a local webserver to display the

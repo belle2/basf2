@@ -77,7 +77,7 @@ def merge_files(*args, output="output.root", filter_modified=False):
     if filter_modified:
         # if so replace them using regular expression
         process.stdout = re.sub(rb"^\[WARNING\] File \"(.*?)\" created with modified software ([a-zA-Z0-9\-+]*?): "
-                                rb"cannot verify that files are compatible\\n", b"", process.stdout, flags=re.MULTILINE)
+                                rb"cannot verify that files are compatible\n", b"", process.stdout, flags=re.MULTILINE)
 
     # in any case print output
     sys.stdout.buffer.write(process.stdout)

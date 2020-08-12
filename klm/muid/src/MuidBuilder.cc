@@ -110,12 +110,8 @@ void MuidBuilder::fillPDFs(MuidElementNumbers::Hypothesis hypothesis)
 void MuidBuilder::spline(int n, double dx, double Y[], double B[], double C[], double D[])
 {
   /* Restrictions: equal-size bins and more than 3 bins. */
-  int sizeY = sizeof(Y) / sizeof(double);
-  int sizeB = sizeof(B) / sizeof(double);
-  int sizeC = sizeof(C) / sizeof(double);
-  int sizeD = sizeof(D) / sizeof(double);
-  if ((n < 4) || (sizeY != n) || (sizeB != n) || (sizeC != n) || (sizeD != n))
-    B2FATAL("The spline interpolation can't be applied.");
+  if (n < 2)
+    B2FATAL("The spline interpolation can't be applied (histograms with less than 3 bins).");
   /* Generate the spline interpolation coefficients B, C, D to smooth out a binned histogram. */
   D[0] = dx;
   C[1] = (Y[1] - Y[0]) / dx;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Legacy_IP_Information for exp3 est
+# Legacy_IP_Information GT is for exp3 test file
 
 import os
 import sys

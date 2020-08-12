@@ -11,14 +11,12 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <vector>
-#include <deque>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -49,7 +47,7 @@ std::string SegmentTrackAdderWithNormalization::getDescription()
 void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCTrack, const CDCSegment2D>>& relations,
                                                std::vector<CDCTrack>& tracks, const std::vector<CDCSegment2D>& segments)
 {
-  // Storage space for the hits - deque for address persistence
+  // Storage space for the hits
   std::vector<CDCRecoHit3D> recoHits3D;
   recoHits3D.reserve(2500);
 
@@ -155,18 +153,4 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 
   // Normalize the trajectory and hit contents of the tracks
   m_trackNormalizer.apply(tracks);
-
-  B2INFO("Next Event:");
-  for (const CDCTrack& track : tracks) {
-    for (const CDCRecoHit3D hit : track) {
-      B2INFO("Hit: " <<
-             track.front().getWire().getEWire() << "; " <<
-             hit.getWire().getWireID().getEWire() << "; " <<
-             hit.getWireHit().getRefDriftLength() << "; " <<
-             hit.getRecoPos3D().x() << ", " << hit.getRecoPos3D().y() << ", " << hit.getRecoPos3D().z() << "; " <<
-             hit.getWire().getILayer() << ", " << hit.getWire().getICLayer() << ", " << hit.getWire().getISuperLayer() << "; " <<
-             hit.getRLInfo());
-    }
-  }
-
 }

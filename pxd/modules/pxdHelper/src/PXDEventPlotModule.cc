@@ -73,9 +73,9 @@ void PXDEventPlotModule::event()
   unsigned int evtNr = m_eventMetaData->getEvent();
   unsigned int evtRun = m_eventMetaData->getRun();
 
-  for (auto h : m_histos) {
-    if (h.second) h.second->Reset();
-  }
+  for (auto h : m_histos) if (h.second) h.second->Reset();
+  for (auto h : m_histos_gm) if (h.second) h.second->Reset();
+  for (auto h : m_histos_gm2) if (h.second) h.second->Reset();
 
   std::map <VxdID, bool> cm_map;
   bool cm_flag = false;

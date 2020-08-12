@@ -208,6 +208,8 @@ CDCTriggerNeuroModule::event()
                            tsvector,
                            m_tracks2D[itrack]->getTime(),
                            quadrant //quadrant simulated from phi
+                           - 1, //quadrant not known in simulation
+                           m_tracks2D[itrack]->getQualityVector()
                           );
     m_tracks2D[itrack]->addRelationTo(NNtrack);
     if (m_neuroTrackInputMode) {

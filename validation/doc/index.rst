@@ -7,15 +7,15 @@ changed and we want to make sure that they don't perform worse than before
 (e.g. lower reconstruction efficiencies or slower runtime) and that they work
 as intended.
 
-To that end, the e.g. software package has a ``validation`` subdirectory that
+To that end, the every software package has a ``validation`` subdirectory that
 contains a number of simple steering files. The ``validation`` package collects
-these and runs them. The resulting output ``*.root`` files can then be compared
-across versions to spot degradations and other problems.
+these steering files and runs them. The resulting output ``*.root`` files can then be compared
+across software versions ("revisions") to spot performance degradations and other problems.
 
-To aid this, the ``validation`` package contains a small webserver, that can also
-be run locally to show the comparison plots.
+To provide a simple user interface, the ``validation`` package contains a small webserver,
+that can also be run locally to show the comparison plots.
 
-The validation framework is also run centrally on a nightly basis. 
+The validation framework is also run centrally on a nightly basis.
 The results are shown at `https://validation.belle2.org/ <https://validation.belle2.org/>`_.
 
 Command line utilities

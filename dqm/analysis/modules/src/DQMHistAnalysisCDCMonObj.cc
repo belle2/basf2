@@ -92,8 +92,8 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   m_monObj->addCanvas(m_cTDC);
   m_cHit = new TCanvas("hit", "hit", 1500, 6000);
   m_monObj->addCanvas(m_cHit);
-  m_cADC1000 = new TCanvas("ADC1000", "ADC1000", 1500, 1000);
-  m_monObj->addCanvas(m_cADC1000);
+  //m_cADC1000 = new TCanvas("ADC1000", "ADC1000", 1500, 1000);
+  //m_monObj->addCanvas(m_cADC1000);
   //  m_cHitL = new TCanvas("hitL", "hitL", 1500, 6000);
   //m_monObj->addCanvas(m_cHitL);
   // m_cADCs=new TCanvas("hADCs","hADCs",2000,10000);
@@ -245,7 +245,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   int nDeadADC = -1; // bid 0 always empty
   int nBadADC = 0;
   TH1F* hADCMean = new TH1F("hADCMean", "ADC mean;board;adc mean", 300, 0, 300);
-  TH1F* hADC1000 = new TH1F("hADC1000", "hADC1000", 300, 0, 300);
+  TH1F* hADC1000 = new TH1F("ADC1000", "ADC1000", 300, 0, 300);
+  TH1F* hADC0 = new TH1F("ADC0", "ADC0", 300, 0, 300);
 
   std::vector<float> means = {};
   for (int i = 0; i < 300; ++i) {
@@ -253,16 +254,18 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     m_hADCTOTCuts[i]->SetTitle(Form("hADCTOTCut%d", i));
     m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 1, "");
     m_hADCs[i]->SetTitle(Form("hADC%d", i));
+    float n = static_cast<float>(m_hADCs[i]->GetEntries());
     if (m_hADCs[i]->GetEntries() == 0) {
       nDeadADC += 1;
+      hADC0->SetBinContent(i + 1, -0.1);
     } else {
-      float n = static_cast<float>(m_hADCs[i]->GetEntries());
       float n0 = static_cast<float>(m_hADCs[i]->GetBinContent(1));
       if (n0 / n > 0.9) {
         B2DEBUG(99, "bad adc bid " << i << " " << n0 << " " << n);
         //B2INFO("bad adc bid " << i << " " << n0 << " " << n);
         nBadADC += 1;
       }
+      float bin1 = m_hADCs[i]->GetBinContent(1);
       float m = getHistMean(m_hADCs[i]);
       //B2INFO(i << " " << m );
       means.push_back(m);
@@ -270,6 +273,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       hADCMean->SetBinError(i + 1, 0);
       double overflow = m_hADCs[i]->GetBinContent(1001);
       hADC1000->SetBinContent(i + 1, overflow / (overflow + n));
+      hADC0->SetBinContent(i + 1, bin1 / (overflow + n));
+      //cout<<n<<" "<<overflow+n<<" "<<bin1<<endl;
+      /// for some reason, GetEntries() does not include overflow???
     }
   }
 
@@ -375,7 +381,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
 
   B2INFO("writing");
-  m_cMain->Divide(3, 2);
+  m_cMain->Divide(3, 3);
 
   m_cMain->cd(1);
   hADCMean->SetMinimum(0);
@@ -399,6 +405,10 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hBadChannelBC->Draw("col");
   m_cMain->cd(6);
   hHitPerLayer->Draw();
+  m_cMain->cd(7);
+  hADC1000->Draw();
+  m_cMain->cd(8);
+  hADC0->Draw();
 
   /*
   m_cADC->cd();
@@ -410,8 +420,8 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_cHit->cd();
   m_hHit->Draw("colz");
   */
-  m_cADC1000->cd();
-  hADC1000->Draw();
+  //m_cADC1000->cd();
+  //hADC1000->Draw();
 
   m_cHit->Divide(4, 14);
   for (int i = 0; i < 56; i++) {

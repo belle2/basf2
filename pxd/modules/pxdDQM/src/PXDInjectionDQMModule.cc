@@ -38,7 +38,7 @@ PXDInjectionDQMModule::PXDInjectionDQMModule() : HistoModule() , m_vxdGeometry(V
   addParam("offlineStudy", m_offlineStudy, "use finest binning and larger range", false);
   addParam("useClusters", m_useClusters, "use cluster instead of raw hits", false);
   addParam("createMaxHist", m_createMaxHist, "create histo with max occupancy (not mp save!!!)", false);
-  addParam("createGateHist", m_createGateHist, "create 2d histo with gate against occupancy", true);
+  addParam("createGateHist", m_createGateHist, "create 2d histo with gate against occupancy", false);
 
 }
 
@@ -164,6 +164,8 @@ void PXDInjectionDQMModule::beginRun()
   for (auto& a : hOccModAfterInjHER) if (a.second) a.second->Reset();
   for (auto& a : hMaxOccModAfterInjLER) if (a.second) a.second->Reset();
   for (auto& a : hMaxOccModAfterInjHER) if (a.second) a.second->Reset();
+  for (auto& a : hOccModAfterInjLERGate) if (a.second) a.second->Reset();
+  for (auto& a : hOccModAfterInjHERGate) if (a.second) a.second->Reset();
 }
 
 void PXDInjectionDQMModule::event()

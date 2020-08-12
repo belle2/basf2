@@ -369,10 +369,14 @@ namespace Belle2 {
   void MuidProb::spline(int n, double dx, double Y[], double B[],
                         double C[], double D[])
   {
-
-    // Generate the spline interpolation coefficients B, C, D to smooth out a
-    // binned histogram. Restrictions:  equal-size bins. more than 3 bins.
-
+    // Restrictions: equal-size bins and more than 3 bins.
+    int sizeY = sizeof(Y) / sizeof(double);
+    int sizeB = sizeof(B) / sizeof(double);
+    int sizeC = sizeof(C) / sizeof(double);
+    int sizeD = sizeof(D) / sizeof(double);
+    if ((n < 4) || (sizeY != n) || (sizeB != n) || (sizeC != n) || (sizeD != n))
+      B2FATAL("The spline interpolation can't be applied.");
+    // Generate the spline interpolation coefficients B, C, D to smooth out a binned histogram.
     D[0] = dx;          // let's do it!
     C[1] = (Y[1] - Y[0]) / dx;
     for (int i = 1; i < n - 1; i++) {

@@ -114,7 +114,7 @@ void MuidBuilder::spline(int n, double dx, double Y[], double B[], double C[], d
   int sizeB = sizeof(B) / sizeof(double);
   int sizeC = sizeof(C) / sizeof(double);
   int sizeD = sizeof(D) / sizeof(double);
-  if ((n < 4) || (sizeY != n) || (sizeB != n) || (sizeC != n) !!(sizeD != n))
+  if ((n < 4) || (sizeY != n) || (sizeB != n) || (sizeC != n) || (sizeD != n))
     B2FATAL("The spline interpolation can't be applied.");
   /* Generate the spline interpolation coefficients B, C, D to smooth out a binned histogram. */
   D[0] = dx;

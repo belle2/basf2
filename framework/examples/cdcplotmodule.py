@@ -13,13 +13,8 @@ from ROOT import Belle2
 import matplotlib.cm as colormap
 from matplotlib.patches import Circle
 import matplotlib.pyplot as plt
-from basf2 import Module, Path, process, B2INFO
+from basf2 import Module, Path, process, B2INFO, B2WARNING
 from simulation import add_simulation
-
-import matplotlib
-# to avoid loading gtk backend in the following imports
-# (fails if no X11 display is available)
-matplotlib.use('agg')
 
 
 def plot(x, y, col, show=0):

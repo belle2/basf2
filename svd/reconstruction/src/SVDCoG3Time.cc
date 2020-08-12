@@ -59,7 +59,7 @@ namespace Belle2 {
 
       //compute average noise
       int aveNoise = 0;
-      for (auto s : m_rawCluster.getStripsInCluster())
+      for (auto s : m_rawCluster.getStripsInRawCluster())
         aveNoise += 1. / s.noise / s.noise;
 
       aveNoise = 1. / TMath::Sqrt(aveNoise);

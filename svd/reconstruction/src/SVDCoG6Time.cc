@@ -63,7 +63,7 @@ namespace Belle2 {
     double SVDCoG6Time::getClusterTime()
     {
 
-      std::vector<Belle2::SVD::stripInCluster> strips = m_rawCluster.getStripsInCluster();
+      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
 
       double time = 0;
       double sumAmplitudes = 0;
@@ -78,7 +78,7 @@ namespace Belle2 {
 
     double SVDCoG6Time::getClusterTimeError()
     {
-      std::vector<Belle2::SVD::stripInCluster> strips = m_rawCluster.getStripsInCluster();
+      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
 
       double weightSum = 0;
 

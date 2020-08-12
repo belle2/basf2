@@ -21,9 +21,10 @@ namespace Belle2 {
     double SVDCoG6Time::getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples)
     {
 
+      //calculate weighted average time
+
       float averagetime = 0;
       float sumAmplitudes = 0;
-      //calculate weighted average time
       for (int k = 0; k < 6; k ++) {
         averagetime += k * samples[k];
         sumAmplitudes += samples[k];
@@ -42,8 +43,9 @@ namespace Belle2 {
     double SVDCoG6Time::getStripTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples, int noise)
     {
 
-      //assuming that noise of the samples are totally UNcorrelated
-      //in MC this hypothesis is correct
+      //assuming that:
+      // 1. noise of the samples are totally UNcorrelated (correct in MC)
+      // 2. error on sampling time is negligible
 
       //sum of samples amplitudes
       float Atot = 0;
@@ -63,6 +65,8 @@ namespace Belle2 {
     double SVDCoG6Time::getClusterTime()
     {
 
+      //as weighted average of the strip time with strip max sample
+
       std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
 
       double time = 0;
@@ -78,6 +82,9 @@ namespace Belle2 {
 
     double SVDCoG6Time::getClusterTimeError()
     {
+
+      //as error on weighted avearage, neglecting error on weights
+
       std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
 
       double weightSum = 0;

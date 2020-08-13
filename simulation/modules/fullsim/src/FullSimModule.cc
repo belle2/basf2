@@ -22,13 +22,11 @@
 #include <simulation/kernel/StackingAction.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <simulation/monopoles/G4MonopolePhysics.h>
@@ -36,23 +34,18 @@
 
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
-#include <G4VUserPhysicsList.hh>
 #include <G4PhysListFactory.hh>
 #include <G4ProcessVector.hh>
 #include <G4OpticalPhysics.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTable.hh>
-#include <G4DecayTable.hh>
 #include <G4EventManager.hh>
 #include <G4RunManager.hh>
 #include <G4UImanager.hh>
-#include <G4UIExecutive.hh>
 #include <G4VisExecutive.hh>
 #include <G4StepLimiter.hh>
 #include <G4EmParameters.hh>
 #include <G4HadronicProcessStore.hh>
-#include <G4CascadeChannelTables.hh>
-#include <G4CascadeChannel.hh>
 #include <G4InuclParticleNames.hh>
 
 #include <G4Mag_UsualEqRhs.hh>

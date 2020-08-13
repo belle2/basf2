@@ -69,7 +69,7 @@ namespace Belle2 {
       virtual void terminate() override;
 
     private:
-      StoreArray<He3tubeHit> m_he3tubeHit; /** Array for He3tubeHit */
+      StoreArray<He3tubeHit> m_he3tubeHit; /**< Array for He3tubeHit */
 
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

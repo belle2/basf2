@@ -13,7 +13,6 @@
 
 #include <globals.hh>
 #include <G4UserStackingAction.hh>
-#include <TRandom3.h>
 
 namespace Belle2 {
 

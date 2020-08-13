@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCCROSSTALKADDER_H
-#define CDCCROSSTALKADDER_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -87,5 +86,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCCROSSTALKADDER_H

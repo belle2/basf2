@@ -127,7 +127,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
   //
   // Show newly added variables for ver.2 format
   //
-  printf("IsHER %d TimeLastInj %u TimePrevTrg %u BunchNum %d FrameCnt %d \n",
+  printf("IsHER %d TimeLastInj %u TimePrevTrg %u BunchNum %u FrameCnt %u \n",
          rawftsw.GetIsHER(n),
          rawftsw.GetTimeSinceLastInjection(n),
          rawftsw.GetTimeSincePrevTrigger(n),
@@ -149,14 +149,14 @@ void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
   int* buf = rawftsw->GetBuffer(i);
 
 
-  int nword_header = buf[ 0 ];
-  unsigned int node_id = buf[ 6 ];
+  //int nword_header = buf[ 0 ];
+  //unsigned int node_id = buf[ 6 ];
   int runno_subrunno = buf[ 3 ] & 0x3fffff;
   int runno = (buf[ 3 ] >> 8) & 0x3fff;
   int subrunno = buf[ 3 ] & 0xff;
   int expno = (buf[ 3 ] >> 22) & 0x3ff;
   unsigned int eveno = (unsigned int)buf[ 4 ];
-  unsigned int magic_trl = (unsigned int)buf[ 21 ];
+  //unsigned int magic_trl = (unsigned int)buf[ 21 ];
   unsigned int ctime_trgtype = (unsigned int)buf[ 8 ];
   unsigned int utime = (unsigned int)buf[ 9 ];
   unsigned int ctime = (unsigned int)(buf[ 8 ] >> 4);
@@ -166,6 +166,7 @@ void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
 
   unsigned int frame_cnt = buf[ 11 ];
   unsigned int time_prevtrg = buf[ 12 ];
+  /* cppcheck-suppress shiftTooManyBitsSigned */
   int is_her = buf[ 13 ] >> 31;
   unsigned int time_lastinj = buf[ 13 ] & 0x7fffffff;
   unsigned int bunch_num = buf[ 14 ] & 0x7ff;
@@ -173,7 +174,7 @@ void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
   timeval tv;
   rawftsw->GetTTTimeVal(i , &tv);
 
-  int err_flag = 0;
+  //int err_flag = 0;
 
   if (rawftsw->GetBlockNwords(i) != 22) {
     B2FATAL("Nords " << rawftsw->GetBlockNwords(i));
@@ -215,7 +216,7 @@ void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
     B2FATAL("utime " << utime << " != " <<  rawftsw->GetTTUtime(i));
   }
 
-  if (ctime != rawftsw->GetTTCtime(i)) {
+  if (ctime != (unsigned int)rawftsw->GetTTCtime(i)) {
     B2FATAL("ctime " << ctime << " != " <<  rawftsw->GetTTCtime(i));
   }
 

@@ -14,17 +14,14 @@
 #ifndef TRGGRLUNPACKER_H
 #define TRGGRLUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
 #include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
 #include "trg/grl/dataobjects/TRGGRLUnpackerStore.h"
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {

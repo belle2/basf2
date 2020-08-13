@@ -8,8 +8,7 @@
 // Contirbutors: Anze Zupanc, Matic Lubej,
 //-
 
-#ifndef B2BII_CONVERT_MDST_H
-#define B2BII_CONVERT_MDST_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -428,5 +427,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

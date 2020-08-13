@@ -11,10 +11,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
-
-#include <vxd/dataobjects/VxdID.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 

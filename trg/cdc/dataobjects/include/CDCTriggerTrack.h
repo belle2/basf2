@@ -3,9 +3,7 @@
 
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
-#include <framework/gearbox/Const.h>
 #include <TVector3.h>
-#include <cmath>
 
 namespace Belle2 {
 
@@ -29,12 +27,15 @@ namespace Belle2 {
       Helix(0., phi0, omega, 0., 0.), m_chi2D(chi2), m_chi3D(0.), m_time(time), m_quadrant(quadrant), m_foundoldtrack(foundoldtrack),
       m_driftthreshold(driftthreshold), m_valstereobit(valstereobit), m_expert(expert), m_tsvector(9, false) { }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
     CDCTriggerTrack(double phi0, double omega, double chi2D, double z0, double cotTheta, double chi3D, std::vector<bool> foundoldtrack,
                     std::vector<bool> driftthreshold,
                     bool valstereobit, int expert, std::vector<bool> tsvector, short time = 0, short quadrant = -1):
       Helix(0., phi0, omega, z0, cotTheta), m_chi2D(chi2D), m_chi3D(chi3D), m_time(time), m_quadrant(quadrant),
       m_foundoldtrack(foundoldtrack),
       m_driftthreshold(driftthreshold), m_valstereobit(valstereobit), m_expert(expert), m_tsvector(tsvector) { }
+#pragma GCC diagnostic pop
 
     CDCTriggerTrack(double phi0, double omega, double chi2, short time = 0, short quadrant = -1):
       Helix(0., phi0, omega, 0., 0.), m_chi2D(chi2), m_chi3D(0.), m_time(time), m_quadrant(quadrant), m_foundoldtrack(6, false),

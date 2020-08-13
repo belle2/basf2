@@ -12,7 +12,6 @@
 
 #include <TObject.h>
 #include <vector>
-#include <cmath>
 
 namespace Belle2 {
 

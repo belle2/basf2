@@ -10,10 +10,7 @@
 
 #pragma once
 
-#include <svd/dataobjects/SVDCluster.h>
-
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <TTree.h>
 #include <TFile.h>

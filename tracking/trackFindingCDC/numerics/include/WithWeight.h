@@ -45,7 +45,9 @@ namespace Belle2 {
       /// Comparison operator establishing an ordering considering the pointer first and the weight second
       bool operator<(const WithWeight<T>& other) const
       {
+        // cppcheck-suppress constVariable
         const T& t(*this);
+        // cppcheck-suppress constVariable
         const T& otherT(other);
         return t < otherT or (not(otherT < t) and getWeight() < other.getWeight());
       }

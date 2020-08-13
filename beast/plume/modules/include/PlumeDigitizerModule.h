@@ -91,9 +91,9 @@ namespace Belle2 {
       float m_posmm_z;
 
       /** collection of PlumeHit saved in the datastore by the module*/
-      StoreArray<PlumeHit> m_plumeHits;
-      StoreArray<MCParticle> m_particles;
-      StoreArray<PlumeSimHit> m_plumeSimHits;
+      StoreArray<PlumeHit> m_plumeHits; /**< PLUME hits */
+      StoreArray<MCParticle> m_particles; /**< PLUME particles */
+      StoreArray<PlumeSimHit> m_plumeSimHits; /**< PLUME SimHits */
     };
 
   }

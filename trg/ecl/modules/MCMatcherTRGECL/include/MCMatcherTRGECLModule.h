@@ -23,18 +23,8 @@
 #include "trg/ecl/dataobjects/TRGECLDigi0MC.h"
 #include "trg/ecl/dataobjects/TRGECLHitMC.h"
 
-//#include <ecl/geometry/ECLGeometryPar.h>
-//#include <ecl/dataobjects/ECLSimHit.h>
-
 //C++/C standard lib elements.
-#include <string>
-#include <vector>
-#include <queue>
 #include <map>
-
-//ROOT
-#include <TRandom3.h>
-
 
 namespace Belle2 {
   //namespace ECL {

@@ -331,7 +331,7 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   int err_flag = 0;
   int flag = 0;
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
-  unsigned int temp_ctime_trgtype_footer = 0, temp_eve_footer = 0;
+  unsigned int temp_ctime_trgtype_footer, temp_eve_footer;
   unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
   char err_buf[500];
 
@@ -527,7 +527,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //   copper_buf[ POS_CH_C_DATA_LENGTH ], copper_buf[ POS_CH_D_DATA_LENGTH ], m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] );
 
   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = 0;
-  unsigned int ff55_higher_bits = 0, ff55_lower_bits = 0;
+  unsigned int ff55_higher_bits, ff55_lower_bits;
 
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
@@ -896,7 +896,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("[DEBUG] %s\n", err_buf);
 
-      string err_str = err_buf;
+      // string err_str = err_buf;
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
       PrintData(GetBuffer(datablock_id), TotalBufNwords());
 

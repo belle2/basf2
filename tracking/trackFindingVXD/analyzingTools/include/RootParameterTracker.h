@@ -94,7 +94,7 @@ namespace Belle2 {
     /** checks if ttree for given tcTypeName exists and creates it if not. returns ttree for given tcType */
     TTree* prepareTTree(std::string tcTypeName)
     {
-      if (m_file == NULL) {
+      if (m_file == nullptr) {
         B2FATAL("RootParameterTracker::prepareTTree(), Root file not initialized yet! Please call RootParameterTracker::initialize(...) first!");
       }
       m_file->cd();
@@ -102,7 +102,7 @@ namespace Belle2 {
 
       ///make sure that tree exists:
       TTree** tree4tcType = m_treeBox.find(tcTypeName);
-      if (tree4tcType == NULL) {
+      if (tree4tcType == nullptr) {
         m_treeBox.push_back({
           tcTypeName,
           new TTree(tcTypeName.c_str(), (std::string("collects data collected to tcType ") + tcTypeName).c_str())
@@ -135,7 +135,7 @@ namespace Belle2 {
   public:
 
     /** constructor setting standard values */
-    RootParameterTracker() : m_file(NULL) {}
+    RootParameterTracker() : m_file(nullptr) {}
 
 
     /** creates rootFile, first parameter is fileName, second one specifies how the file shall be treated. Valid values for fileTreatment: 'RECREATE' or 'UPDATE'.
@@ -149,7 +149,7 @@ namespace Belle2 {
                 ", which is invalid, please read the documentation!");
       }
 
-      if (m_file != NULL) {
+      if (m_file != nullptr) {
         B2FATAL("RootParameterTracker::initialize(), there was a file already linked to this ParameterTracker, which is invalid, please read the documentation!");
       }
       B2DEBUG(5, "RootParameterTracker::initialize(), given parameters are fileName/fileTreatment: " << fileName << "/" <<
@@ -238,7 +238,7 @@ namespace Belle2 {
     void terminate()
     {
       B2DEBUG(2, "RootParameterTracker::terminate(), Writing results to root-file and clean up heap.");
-      if (m_file == NULL) {
+      if (m_file == nullptr) {
         B2WARNING("RootParameterTracker::terminate(): no rootFile found! skipping writing data into root file!");
         return;
       }

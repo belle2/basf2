@@ -1,57 +1,58 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
+"""This steering file tests the 'ECLChargedPID' module.
 
-This steering file tests the ECLChargedPIDModule.
+Input:
+    It must run on DST files, or reduced DSTs containing
+    ECLShowers, Tracks, and all relevant relational containers:
 
-It must run on DST files, or reduced DSTs containing
-ECLShowers, Tracks and all relevant relational containers:
-
-'Tracks',
-'TrackFitResults',
-'ECLClusters',
-'ECLShowers',
-'TracksToECLClusters',
-'TracksToECLShowers',
-'ECLClustersToECLShowers',
-'ECLConnectedRegions',
-'ECLPidLikelihoods',
-'PIDLikelihoods',
-'TracksToECLPidLikelihoods',
-'TracksToPIDLikelihoods',
-
-Author: Marco Milesi (marco.milesi@unimelb.edu.au)
-Year: 2018
-
+        - Tracks
+        - TrackFitResults
+        - ECLClusters
+        - ECLShowers
+        - TracksToECLClusters
+        - TracksToECLShowers
+        - ECLClustersToECLShowers
+        - ECLConnectedRegions
+        - ECLPidLikelihoods
+        - PIDLikelihoods
+        - TracksToECLPidLikelihoods
+        - TracksToPIDLikelihoods
 Usage:
-
-basf2 -n N -i /path/to/input/DST/file.root EclChargedPidModuleTest.py
-
+    $ basf2 -i <path_to_input_file> -n <number_of_events>
+            EclChargedPidModuleTest.py
 """
 
-import basf2
+import basf2 as b2
 
-# Register necessary modules to this path.
-main_path = basf2.create_path()
+__author__ = 'Marco Milesi'
+__copyright__ = 'Copyright 2019 - Belle II Collaboration'
+__maintainer__ = 'Marco Milesi'
+__email__ = 'marco.milesi@unimelb.edu.au'
 
-# Add module to read input *DST file.
-simpleinput = basf2.register_module('RootInput')
-main_path.add_module(simpleinput)
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
 
-# Add the module to the path.
-eclid = basf2.register_module('ECLChargedPID')
-main_path.add_module(eclid)
-# Set debug options for this module.
-eclid.logging.log_level = basf2.LogLevel.DEBUG
-eclid.logging.debug_level = 20
+# Register and add 'RootInput' module to read input DST file.
+inputFile = b2.register_module('RootInput')
+mainPath.add_module(inputFile)
 
-# Print the data model objects in the store.
-printcolls = basf2.register_module('PrintCollections')
-main_path.add_module(printcolls)
+# Register and add 'ECLChargedPID' module
+eclChargedPID = b2.register_module('ECLChargedPID')
+mainPath.add_module(eclChargedPID)
 
-# Start processing events.
-basf2.process(main_path)
+# Set debug options for 'ECLChargedPID' module.
+eclChargedPID.logging.log_level = b2.LogLevel.DEBUG
+eclChargedPID.logging.debug_level = 20
 
-# Get some statistics about the booked modules.
-print(basf2.statistics)
+"""Register and add 'PrintCollections' module.
+   This prints the data model objects in the store.
+"""
+printCollections = b2.register_module('PrintCollections')
+mainPath.add_module(printCollections)
+
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
+print(b2.statistics)

@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Const.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/SensorPlane.h>
@@ -59,7 +58,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDTrueHit* hit, const genfit::TrackCandHit*, f
 }
 
 SVDRecoHit2D::SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v, double sigmaU, double sigmaV):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(NULL), m_uCluster(0), m_vCluster(0),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_sensorID(vxdid), m_trueHit(nullptr), m_uCluster(0), m_vCluster(0),
   m_energyDep(0)//, m_energyDepError(0)
 {
   //If no error is given, estimate the error by dividing the pixel size by sqrt(12)
@@ -81,7 +80,7 @@ SVDRecoHit2D::SVDRecoHit2D(VxdID::baseType vxdid, const double u, const double v
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(NULL), m_uCluster(&uHit), m_vCluster(&vHit),
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(nullptr), m_uCluster(&uHit), m_vCluster(&vHit),
   m_energyDep(0)
 {
   if ((uHit.getRawSensorID() != vHit.getRawSensorID()) || !uHit.isUCluster() || vHit.isUCluster())
@@ -118,7 +117,7 @@ SVDRecoHit2D::SVDRecoHit2D(const SVDCluster& uHit, const SVDCluster& vHit):
 }
 
 SVDRecoHit2D::SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHit):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(NULL), m_uCluster(0), m_vCluster(0), m_energyDep(0)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_trueHit(nullptr), m_uCluster(0), m_vCluster(0), m_energyDep(0)
 {
   const SVDCluster& uHit = *(uRecoHit.getCluster());
   const SVDCluster& vHit = *(vRecoHit.getCluster());

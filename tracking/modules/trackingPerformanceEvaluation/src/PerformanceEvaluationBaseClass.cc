@@ -208,7 +208,7 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
     the_other1 = hden->GetXaxis();
     the_other2 = hden->GetYaxis();
   } else
-    return NULL;
+    return nullptr;
 
 
   TH1F* h;
@@ -271,7 +271,7 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
 void  PerformanceEvaluationBaseClass::addInefficiencyPlots(TList* histoList, TH3F* h3_xPerMCParticle, TH3F* h3_MCParticle)
 {
 
-  if ((h3_xPerMCParticle == NULL) || (h3_MCParticle == NULL))
+  if ((h3_xPerMCParticle == nullptr) || (h3_MCParticle == nullptr))
     return;
 
   //normalized to MCParticles
@@ -291,7 +291,7 @@ void  PerformanceEvaluationBaseClass::addInefficiencyPlots(TList* histoList, TH3
 
 void  PerformanceEvaluationBaseClass::addEfficiencyPlots(TList* histoList, TH3F* h3_xPerMCParticle, TH3F* h3_MCParticle)
 {
-  if ((h3_xPerMCParticle == NULL) || (h3_MCParticle == NULL))
+  if ((h3_xPerMCParticle == nullptr) || (h3_MCParticle == nullptr))
     return;
 
   //normalized to MCParticles
@@ -313,7 +313,7 @@ void  PerformanceEvaluationBaseClass::addEfficiencyPlots(TList* histoList, TH3F*
 
 void  PerformanceEvaluationBaseClass::addPurityPlots(TList* histoList, TH3F* h3_MCParticlesPerX, TH3F* h3_X)
 {
-  if ((h3_X == NULL) || (h3_MCParticlesPerX == NULL))
+  if ((h3_X == nullptr) || (h3_MCParticlesPerX == nullptr))
     return;
 
   //purity histograms
@@ -372,7 +372,7 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_den, TH1F* h1_num, cons
 TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack, TH1F* h1_Track, const char* name,
                                                 const char* title, TList* histoList)
 {
-  if (h1_Track == NULL) B2INFO("h_Track missing");
+  if (h1_Track == nullptr) B2INFO("h_Track missing");
 
   std::string name1 = "_noGeoAcc";
   std::string name2 = "_withGeoAcc";
@@ -486,7 +486,7 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
 TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack, TH2F* h2_Track, const char* name,
                                                 const char* title, TList* histoList)
 {
-  if (h2_Track == NULL) B2INFO("h_Track missing");
+  if (h2_Track == nullptr) B2INFO("h_Track missing");
 
   std::string name1 = "_noGeoAcc";
   std::string name2 = "_withGeoAcc";

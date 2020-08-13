@@ -11,21 +11,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
-#include <stdlib.h>
-#include <iostream>
-#include <TFile.h>
-#include <TTree.h>
-#include <TString.h>
 #include <vector>
 
-#include <TF1.h>
-#include <TCanvas.h>
-#include <RooWorkspace.h>
-#include <RooDataHist.h>
-#include <RooPlot.h>
-#include <RooFitResult.h>
-#include <RooAbsPdf.h>
 #include <TH1.h>
 
 

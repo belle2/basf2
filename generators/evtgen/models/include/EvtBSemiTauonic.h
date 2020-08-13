@@ -52,7 +52,7 @@ namespace Belle2 {
     EvtDecayBase* clone();
 
     /** The function evaluates the decay amplitude of the parent particle.
-     * @param a pointer to the parent particle
+     * @param p a pointer to the parent particle
      */
     void decay(EvtParticle* p);
 

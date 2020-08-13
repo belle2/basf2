@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
 """
-This module contains classes to work with validity intervals. Theres a class
+conditions_db.iov
+-----------------
+
+This module contains classes to work with validity intervals. There's a class
 for a single interval, `IntervalOfValidity` and a class to manage a set of
 validities, `IoVSet`, which can be used to manipulate iov ranges
 """

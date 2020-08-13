@@ -10,5 +10,7 @@
 #pragma link C++ class Belle2::MagneticFieldComponent+; // checksum=0x8f4b7a53, version=1
 #pragma link C++ class Belle2::MagneticFieldComponentConstant+; // checksum=0xb387820a, version=1
 #pragma link C++ class Belle2::MagneticField+; // checksum=0x1f3e9954, version=1
+#pragma link C++ class Belle2::HardwareClockSettings+; // checksum=0xf93fb086, version=2
+
 
 #endif

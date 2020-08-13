@@ -62,12 +62,12 @@ namespace {
   {
     StoreArray<Particle> myParticles;
     B2INFO("Cos: " << cosThetaBetweenParticleAndNominalB(myParticles[2]));
-    EXPECT_FLOAT_EQ(7.9078646, REC_q2BhSimple(myParticles[2])); // B-meson
+    EXPECT_FLOAT_EQ(7.9083395, REC_q2BhSimple(myParticles[2])); // B-meson
   }
   TEST_F(SpecificKinematicVariablesTest, REC_q2Bh)
   {
     StoreArray<Particle> myParticles;
-    EXPECT_FLOAT_EQ(7.8774295, REC_q2Bh(myParticles[2])); // B-meson
+    EXPECT_FLOAT_EQ(7.8781433, REC_q2Bh(myParticles[2])); // B-meson
   }
   TEST_F(SpecificKinematicVariablesTest, REC_MissM2)
   {

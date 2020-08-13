@@ -4887,7 +4887,7 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (-158.414,-207.063,52.42)
-  getEnergy(): 0.542074
+  getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -4903,7 +4903,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 7
   getLayers(): 1
-  getMomentum(): (-0.128076,-0.167408,0.042381,0.542074)
+  getMomentum(): (-0.128076,-0.167408,0.042381,0.542072)
   getMomentumMag(): 0.215
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)
@@ -4915,7 +4915,7 @@ KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (-149.5,52.3,283.9)
-  getEnergy(): 0.965667
+  getEnergy(): 0.965665
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -4931,7 +4931,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 3
-  getMomentum(): (-0.38058,0.133139,0.72272,0.965667)
+  getMomentum(): (-0.38058,0.133139,0.72272,0.965665)
   getMomentumMag(): 0.827582
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)
@@ -12134,7 +12134,7 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (-204.037,32.912,16.7)
-  getEnergy(): 0.542074
+  getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -12150,7 +12150,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 1
-  getMomentum(): (-0.211567,0.0341266,0.0173163,0.542074)
+  getMomentum(): (-0.211567,0.0341266,0.0173163,0.542072)
   getMomentumMag(): 0.215
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)

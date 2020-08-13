@@ -14,7 +14,6 @@
 #ifndef TRGECL_FLAG_
 #define TRGECL_FLAG_
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include "trg/ecl/TrgEclCluster.h"
@@ -30,9 +29,6 @@
 //
 namespace Belle2 {
 //
-//
-  /** ETM class */
-  class TrgEclMaster;
 //
 //
 //

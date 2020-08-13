@@ -32,7 +32,7 @@ import mdst
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       nCDCHitsMax=6000, nSVDShaperDigitsMax=70000):
+                       abort_path=None):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -55,17 +55,19 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param nCDCHitsMax: the max number of CDC hits for an event to be reconstructed.
-    :param nSVDShaperDigitsMax: the max number of SVD shaper digits for an event to be reconstructed.
+    :param abort_path: the path to use when the reconstruction is aborted. If None an empty path will be used.
     """
 
     # Check components.
     check_components(components)
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    empty_path = create_path()
-    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=nCDCHitsMax, nSVDShaperDigitsMax=nSVDShaperDigitsMax)
-    doom.if_true(empty_path, AfterConditionPath.END)
+    if abort_path is None:
+        abort_path = create_path()
+    doom = path.add_module('EventsOfDoomBuster')
+    doom.if_true(abort_path, AfterConditionPath.END)
+    abort_path.add_module('EventErrorFlag',
+                          errorFlag=Belle2.EventMetaData.c_ReconstructionAbort)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,
@@ -275,7 +277,7 @@ def add_pretracking_reconstruction(path, components=None):
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                                    add_muid_hits=False, cosmics=False):
+                                    add_muid_hits=False, cosmics=False, for_cdst_analysis=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -286,17 +288,26 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to reduce
         execution time.
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
-    :param cosmics: if True, steer TOP for cosmic reconstruction
+    :param cosmics: if True, steer TOP for cosmic reconstruction.
+    :param for_cdst_analysis: if True, dEdx, EventT0 and PruneTracks modules are not added to the path.
+           This is only needed by prepare_cdst_analysis().
     """
 
-    add_dedx_modules(path, components)
+    # Not add dEdx modules in prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        add_dedx_modules(path, components)
+
     add_ext_module(path, components)
+
     add_top_modules(path, components, cosmics=cosmics)
+
     add_arich_modules(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_PID')
 
-    path.add_module("EventT0Combiner")
+    # Not add EventT0Combiner module in prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        path.add_module("EventT0Combiner")
 
     add_ecl_finalizer_module(path, components)
 
@@ -307,9 +318,13 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     add_klm_mc_matcher_module(path, components)
 
     add_muid_module(path, add_hits_to_reco_track=add_muid_hits, components=components)
+
     add_ecl_track_cluster_modules(path, components)
+
     add_ecl_cluster_properties_modules(path, components)
+
     add_ecl_chargedpid_module(path, components)
+
     add_pid_module(path, components)
 
     if addClusterExpertModules:
@@ -319,8 +334,10 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     add_ecl_track_brem_finder(path, components)
 
     # Prune tracks as soon as the post-tracking steps are complete
-    if pruneTracks:
-        add_prune_tracks(path, components)
+    # Not add prune tracks modules in prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        if pruneTracks:
+            add_prune_tracks(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_Clustering')
 
@@ -531,17 +548,17 @@ def add_top_modules(path, components=None, cosmics=False):
 
 def add_cluster_expert_modules(path, components=None):
     """
-    Add the cluster expert modules to the path.
+    Add the KLMExpert and ClusterMatcher modules to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    # klong id and cluster matcher, whcih also builds "cluster"
+    # KLMExpert (needed for KlId) ClusterMatcher (needed for Cluster)
     if components is None or ('KLM' in components and 'ECL' in components):
-        KLMClassifier = register_module('KLMExpert')
-        path.add_module(KLMClassifier)
-        ClusterMatch = register_module('ClusterMatcher')
-        path.add_module(ClusterMatch)
+        klm_expert = register_module('KLMExpert')
+        path.add_module(klm_expert)
+        cluster_matcher = register_module('ClusterMatcher')
+        path.add_module(cluster_matcher)
 
 
 def add_pid_module(path, components=None):
@@ -592,9 +609,19 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     :param add_hits_to_reco_track: Add the found KLM hits also to the RecoTrack. Make sure to refit the track afterwards.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'KLM' in components:
+    # Muid is needed for muonID computation and ECLCluster-Track matching.
+    if components is None or ('CDC' in components and 'ECL' in components and 'KLM' in components):
         muid = register_module('Muid', addHitsToRecoTrack=add_hits_to_reco_track)
         path.add_module(muid)
+    if components is not None and 'CDC' in components:
+        if ('ECL' not in components and 'KLM' in components):
+            B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
+                      'for correct muonID computation, will not be added to your reconstruction path. '
+                      'Make sure that this is fine for your purposes, otherwise please include also ECL.')
+        if ('ECL' in components and 'KLM' not in components):
+            B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
+                      'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
+                      ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
 
 
 def add_ecl_modules(path, components=None):
@@ -786,17 +813,5 @@ def prepare_cdst_analysis(path, components=None):
     # check, this one may not be needed...
     path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
-    # from here on mostly a replica of add_posttracking_reconstruction without dE/dx, prunetracks and eventT0 modules
-    add_ext_module(path, components)
-    add_top_modules(path, components)
-    add_arich_modules(path, components)
-    add_ecl_finalizer_module(path, components)
-    add_ecl_mc_matcher_module(path, components)
-    add_klm_modules(path, components)
-    add_klm_mc_matcher_module(path, components)
-    add_muid_module(path, components=components)
-    add_ecl_track_cluster_modules(path, components)
-    add_ecl_cluster_properties_modules(path, components)
-    add_ecl_chargedpid_module(path, components)
-    add_pid_module(path, components)
-    add_ecl_track_brem_finder(path, components)
+    # add the posttracking modules needed for cdst analysis
+    add_posttracking_reconstruction(path, components=components, for_cdst_analysis=True)

@@ -21,12 +21,9 @@
 #include "trg/trg/Time.h"
 #include "trg/trg/State.h"
 #include "trg/trg/Signal.h"
-#include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/gdl/TRGGDL.h"
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
@@ -34,7 +31,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <TH2I.h>
 #include <TH1I.h>
 
 #define N_TIMING_REGISTERS 4

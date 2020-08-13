@@ -11,7 +11,6 @@
 #pragma once
 
 #include <top/dbobjects/TOPGeoBase.h>
-#include <vector>
 
 namespace Belle2 {
 

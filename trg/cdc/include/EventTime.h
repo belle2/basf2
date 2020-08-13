@@ -13,14 +13,8 @@
 #ifndef TRGCDCEventTime_FLAG_
 #define TRGCDCEventTime_FLAG_
 
-#include <vector>
-#include <string>
-#include "trg/cdc/Segment.h"
-#include "trg/cdc/SegmentHit.h"
-#include "trg/cdc/Cell.h"
 #include <TFile.h>
 #include <TTree.h>
-#include <TBranch.h>
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCEventTime TRGCDCEventTime
@@ -28,8 +22,6 @@
 
 namespace Belle2 {
   class TRGCDC;
-  class TRGCDCSegmentHit;
-  class TRGCDCLink;
 
   /// A class of TRGCDC Event Time
   class TRGCDCEventTime {

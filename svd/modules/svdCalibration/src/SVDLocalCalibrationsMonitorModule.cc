@@ -11,7 +11,6 @@
 #include <svd/modules/svdCalibration/SVDLocalCalibrationsMonitorModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -536,7 +535,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
   //void SVDLocalCalibrationsMonitorModule::terminate()
   //{
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
 
     m_rootFilePtr->cd();
 

@@ -11,19 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <string>
-#include <map>
 
 #include <framework/datastore/StoreArray.h>
-#include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPDigit.h>
-
-#include <framework/database/DBObjPtr.h>
-#include <top/dbobjects/TOPCalTimebase.h>
-#include <top/dbobjects/TOPCalChannelT0.h>
-#include <top/dbobjects/TOPCalModuleT0.h>
-#include <top/dbobjects/TOPCalCommonT0.h>
-
 
 namespace Belle2 {
   /**

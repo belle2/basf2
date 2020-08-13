@@ -33,17 +33,19 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     Convert2RawDetModule();
+    //! Destructor
     virtual ~Convert2RawDetModule();
-
-    //! Module functions to be called from main process
+    //! Called at the beginning of data processing.
     virtual void initialize() override;
-
-    //! Module functions to be called from event process
+    //! Called when entering a new run.
     virtual void beginRun() override;
+    //! Called for each event.
     virtual void event() override;
+    //! Called if the current run ends.
     virtual void endRun() override;
+    //! Called at the end of data processing.
     virtual void terminate() override;
 
   protected:

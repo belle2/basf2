@@ -86,7 +86,6 @@ namespace Belle2 {
       TH1F* hrawROIDCsizeU = nullptr; /** Histogram  */
 
       TH2F* hrawROINrDCvsNrHLT = nullptr; /** Histogram  */
-      TH2F* hrawROIEVTsWithOneSource = nullptr; /** Histogram  */
 
     };//end class declaration
 

@@ -8,20 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXSCANMODULE_H
-#define CDCDEDXSCANMODULE_H
-
-#include <reconstruction/dataobjects/DedxConstants.h>
+#pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
-
-#include <string>
-#include <vector>
-#include <TFile.h>
-#include <TTree.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -57,5 +47,4 @@ namespace Belle2 {
     StoreArray<CDCDedxTrack> m_dedxArray; /**< array of output dE/dx tracks */
 
   };
-} // Belle2 namespace
-#endif
+} // Belle2 namespac

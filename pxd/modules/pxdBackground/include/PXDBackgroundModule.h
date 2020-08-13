@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDBackgroundMODULE_H_
-#define PXDBackgroundMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Unit.h>
@@ -185,5 +184,4 @@ namespace Belle2 {
     }
   } // namespace PXD
 } // namespace Belle2
-#endif
 

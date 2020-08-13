@@ -312,7 +312,9 @@ class Script:
         """
 
         # Read the file as a whole
-        with open(self.path, "r") as data:
+        # We specify encoding and errors here to avoid exceptions for people
+        # with strange preferred encoding settings in their OS
+        with open(self.path, "r", encoding="utf-8", errors="replace") as data:
             steering_file_content = data.read()
 
         # Define the regex to extract everything between the <header>-tags

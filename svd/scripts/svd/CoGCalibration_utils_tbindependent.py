@@ -91,7 +91,8 @@ class SVDCoGTimeCalibrationImporterModule(basf2.Module):
         hasTimezero = self.cdcEventT0.hasEventT0()
         # print("Time: " + str(hasTimezero))
         if hasTimezero:
-            TBClusters = svdRecoDigits_rel_Clusters.getModeByte().getTriggerBin()
+            svdEventInfo = Belle2.PyStoreObj("SVDEventInfo")
+            TBClusters = svdEventInfo.getModeByte().getTriggerBin()
             TBIndex = ord(TBClusters)
             tZero = self.cdcEventT0.getEventT0()
             # tZero_err = self.cdcEventT0.getEventT0Uncertainty()

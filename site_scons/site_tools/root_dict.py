@@ -10,6 +10,11 @@ import re
 from SCons.Builder import Builder
 from SCons.Scanner.C import CScanner
 
+# Classes outside of namespace Belle2.
+# Such classes can be linked using comment "// global".
+linkdef_global = \
+    re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+([\w]*).*[+-]?\!?;\s*//.*global.*$', re.M)
+
 # everything that has #pragma link C++ .* Belle2::.*
 linkdef_everything = \
     re.compile(r'^#pragma\s+link\s+C\+\+\s+[\w]*\s+Belle2::.*$', re.M)
@@ -41,6 +46,20 @@ def linkdef_emitter(target, source, env):
     # loop over class names and construct the corresponding header file names
     contents = linkdef.get_text_contents()
     for line in contents.split('\n'):
+        # Classes outside of namespace Belle2.
+        match = linkdef_global.match(line)
+        if match is not None:
+            classname = match.group(1)
+            if classname is not None:
+                include_base = classname + '.h'
+                header_file = os.path.join(source_dir, include_base)
+                if os.path.isfile(header_file):
+                    include_file = os.path.join(include_dir, include_base)
+                    if include_file not in source:
+                        source.append(include_file)
+                else:
+                    print(f'Cannot find header file for the line "{line}".')
+
         # first check if this is looks like an actual request to create a dictionary
         if linkdef_everything.search(line) is None:
             continue

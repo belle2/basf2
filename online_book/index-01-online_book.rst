@@ -2,7 +2,8 @@
 Online textbook
 ===============
 
-This online textbook aims to help new Belle II members to get started with the software.
+This online textbook aims to help new Belle II members to get started with 
+the software by following through a series of hands-on lessons.
 
 .. note::
    **We want YOU to contribute to this book!**
@@ -15,8 +16,10 @@ This online textbook aims to help new Belle II members to get started with the s
    :maxdepth: 2
    :numbered: 3
 
+   welcome
+   fundamentals
+   prerequisites
    basf2
-   computing
-   detector
    analysis
+   computing
 

@@ -1,3 +1,5 @@
+import functools
+from concurrent.futures import ProcessPoolExecutor
 from collections import defaultdict
 from basf2 import B2INFO, B2ERROR, B2WARNING, LogPythonInterface
 from basf2.utils import pretty_print_table
@@ -47,6 +49,14 @@ def get_all_iovsets(existing_payloads, run_range=None):
     return result
 
 
+def create_iov_wrapper(db, globaltag_id, payload):
+    """
+    Wrapper function for adding payloads into a given globaltag.
+    """
+    for iov in payload.iov:
+        db.create_iov(globaltag_id, payload.payload_id, *iov.tuple)
+
+
 def command_tag_merge(args, db=None):
     """
     Merge a list of globaltags in the order they are given.
@@ -56,10 +66,14 @@ def command_tag_merge(args, db=None):
     present in earlier globaltags.
 
     The result is equivalent to having multiple globaltags setup in the conditions
-    access for basf2 (highest goes first).
+    access for basf2 (highest priority goes first).
 
     Warning:
-      This command requires all globaltags are overlap free.
+      The order of the globaltags is highest priority first, so payloads from
+      globaltags earlier on the command line will be taken with before globaltags
+      from later tags.
+
+      This command requires that all globaltags are overlap free.
 
     For each globaltag in the list we copy all payloads to the output globaltag
     if there is no payload of that name valid for the given interval of validity
@@ -89,7 +103,7 @@ def command_tag_merge(args, db=None):
         payload1, rev 1, valid from 1,11 to 1,19
         payload1, rev 3, valid from 1,20 to 1,22
         payload1, rev 1, valid from 1,23 to 1,30
-        payload2, rev 2, valid ftom 0,1 to 0,-1
+        payload2, rev 2, valid from 0,1 to 0,-1
         payload2, rev 1, valid from 1,0 to 1,-1
 
     When finished, this command will print a table of payloads and their
@@ -105,7 +119,7 @@ def command_tag_merge(args, db=None):
         payload1, rev 3, valid from 1,20 to 1,21
         payload2, rev 1, valid from 1,0 to 1,21
 
-    .. versionadded:: release-05-00-00
+    .. versionadded:: release-05-01-00
     """
 
     if db is None:
@@ -119,6 +133,9 @@ def command_tag_merge(args, db=None):
                           help="Can be for numbers to limit the run range to put"
                           "in the output globaltag: All iovs will be limited to "
                           "be in this range.")
+        args.add_argument("-j", type=int, default=1, dest="nprocess",
+                          help="Number of concurrent processes to use for "
+                          "creating payloads into the output globaltag.")
         return
 
     # prepare some colors for easy distinction of source tag
@@ -139,7 +156,9 @@ def command_tag_merge(args, db=None):
         # make sure output tag exists
         output_id = db.get_globalTagInfo(args.output)
         if output_id is None:
+            B2ERROR("Output globaltag doesn't exist. Please create it first with a proper description")
             return False
+
         output_id = output_id["globalTagId"]
 
         # check all globaltags exist
@@ -180,18 +199,12 @@ def command_tag_merge(args, db=None):
 
         pretty_print_table(table, columns, transform=color_row)
 
-    # Ok, we're still alive, create all payloads and print a message every 100 IoVs copied,
-    # since it can take a lot of time
+    # Ok, we're still alive, create all the payloads using multiple processes.
     if not args.dry_run:
-        total_iovs = len(final) * len(payload.iov.iovs)
-        count = 0
-        B2INFO(f'Now copying {total_iovs} payloads into {args.output}.')
-        for payload in final:
-            for iov in payload.iov:
-                db.create_iov(output_id, payload.payload_id, *iov.tuple)
-                count += 1
-                if (count % 100 == 0):
-                    B2INFO(f'Copied {count}/{total_iovs} payloads.')
+        B2INFO(f'Now copying the payloads into {args.output}...')
+        create_iov = functools.partial(create_iov_wrapper, db, output_id)
+        with ProcessPoolExecutor(max_workers=args.nprocess) as pool:
+            pool.map(create_iov, final)
 
     return 0
 

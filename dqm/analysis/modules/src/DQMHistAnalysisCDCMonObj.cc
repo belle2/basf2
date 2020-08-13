@@ -385,7 +385,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   m_cMain->cd(1);
   hADCMean->SetMinimum(0);
-  hADCMean->SetMaximum(200);
+  hADCMean->SetMaximum(300);
   hADCMean->Draw();
 
   m_cMain->cd(2);

@@ -3,14 +3,13 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
 #include <string>
-#include <iostream>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 
 namespace TreeFitter {
@@ -42,7 +41,8 @@ namespace TreeFitter {
                 mass,
                 massEnergy,
                 merged,
-                ntypes
+                ntypes,
+                helix
               };
 
     /** operator used to sort the constraints */
@@ -69,7 +69,6 @@ namespace TreeFitter {
     /** constructor  */
     Constraint() :
       m_node(0),
-      m_chi2(1e10),
       m_depth(0),
       m_type(unknown),
       m_dim(0),
@@ -83,7 +82,6 @@ namespace TreeFitter {
                unsigned int dim,
                int maxniter = 1) :
       m_node(node),
-      m_chi2(1e10),
       m_depth(depth),
       m_type(type),
       m_dim(dim),
@@ -97,7 +95,10 @@ namespace TreeFitter {
     virtual ErrCode project(const FitParams& fitpar, Projection& p) const;
 
     /** filter this constraint */
-    virtual ErrCode filter(FitParams* fitpar);
+    virtual ErrCode filter(FitParams& fitpar);
+
+    /** filter this constraint */
+    virtual ErrCode filterWithReference(FitParams& fitpar, const FitParams& oldState);
 
     /** get name of constraint  */
     std::string name() const;
@@ -107,15 +108,11 @@ namespace TreeFitter {
      * */
     [[gnu::unused]] void setWeight(int w) { m_weight = w < 0 ? -1 : 1; }
 
-    /** get chi2 of last kalman iteration for this constraint */
-    double getChi2() const {return m_chi2;}
-
   protected:
 
     /**  constructor */
-    Constraint(Constraint::Type type) :
+    explicit Constraint(Constraint::Type type) :
       m_node(0),
-      m_chi2(1e10),
       m_depth(0),
       m_type(type),
       m_dim(0),
@@ -134,7 +131,6 @@ namespace TreeFitter {
     const ParticleBase* m_node;
 
     /** chi2 coming from the constraint */
-    double m_chi2;
 
     /** depth of the constraint in the tree
      * (determines for example the order of the track constraints)  */

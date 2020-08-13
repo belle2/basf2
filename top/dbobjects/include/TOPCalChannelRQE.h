@@ -18,7 +18,6 @@ namespace Belle2 {
   /**
    * Class to store relative quantum efficiency of channels w.r.t initial one measured in PMT QA
    * QE is expected to decrease during the experiment due to aging induced by acuumulated charge
-   * Default is set to 1.0
    */
   class TOPCalChannelRQE: public TObject {
   public:
@@ -78,7 +77,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns the relative QE for a single channel
+     * Returns the relative QE for a single channel (1.0 if status is c_Default)
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      * @return relative quantum efficieny (absolute value, not in %)
@@ -94,6 +93,7 @@ namespace Belle2 {
         B2WARNING("Invalid channel number, returning 0 (" << ClassName() << ")");
         return 0;
       }
+      if (m_status[module][channel] == c_Default) return 1.0;
       return m_relQE[module][channel];
     }
 
@@ -149,7 +149,8 @@ namespace Belle2 {
       c_numChannels = 512 /**< number of channels per module */
     };
 
-    float m_relQE[c_numModules][c_numChannels] = {{1.0}};    /**< relative quantum efficiency */
+    // Note: if initialization list is too short others are set to 0 (see comment in TOPCalChannelMask)
+    float m_relQE[c_numModules][c_numChannels] = {{0.0}};    /**< relative quantum efficiency */
     EStatus m_status[c_numModules][c_numChannels] = {{c_Default}}; /**< calibration status */
 
     ClassDef(TOPCalChannelRQE, 1); /**< ClassDef */

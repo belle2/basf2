@@ -5,7 +5,7 @@
 This module contains various utility functions for the CAF and Job submission Backends to use.
 """
 
-from basf2 import *
+from basf2 import B2INFO, B2WARNING, B2DEBUG
 import os
 from collections import deque
 from collections import OrderedDict
@@ -17,6 +17,7 @@ from functools import singledispatch, update_wrapper
 import contextlib
 import enum
 import shutil
+import itertools
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm, IntervalOfValidity
@@ -37,6 +38,34 @@ def B2INFO_MULTILINE(lines):
     """
     log_string = b2info_newline.join(lines)
     B2INFO(log_string)
+
+
+def grouper(n, iterable):
+    it = iter(iterable)
+    while True:
+        chunk = tuple(itertools.islice(it, n))
+        if not chunk:
+            return
+        yield chunk
+
+
+def pairwise(iterable):
+    """
+    Iterate through a sequence by pairing up the current and next entry.
+    Note that when you hit the last one you don't get a (last, null), the
+    final iteration gives you (last-1, last) and then finishes. If you only
+    have one entry in the sequence this may be important as you will not get any
+    looping.
+
+    Parameters:
+        iterable (sequence): The iterable object we will loop over
+
+    Returns:
+        list(tuple)
+    """
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
 
 
 def find_gaps_in_iov_list(iov_list):
@@ -109,7 +138,7 @@ class IoV(namedtuple('IoV_Factory', ['exp_low', 'run_low', 'exp_high', 'run_high
     Uses the C++ framework IntervalOfValidity internally to do various comparisons.
     It is derived from a namedtuple created class.
 
-    We use the name 'ExpRun_Factory' in the factory creation so that
+    We use the name 'IoV_Factory' in the factory creation so that
     the MRO doesn't contain two of the same class names which is probably fine
     but feels wrong.
 
@@ -165,18 +194,92 @@ class AlgResult(enum.Enum):
 IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
 
 
+class LocalDatabase():
+    """
+    Simple class to hold the information about a basf2 Local database.
+    Does a bit of checking that the file path entered is valid etc.
+
+    Paramters:
+        filepath (str): The file path of the database.txt file of the localdb
+
+    Keyword Arguments:
+        payload_dir (str): If the payload directory is different to the directory containing the filepath, you can set it here.
+    """
+    db_type = "local"
+
+    def __init__(self, filepath, payload_dir=''):
+        f = pathlib.Path(filepath)
+        if f.exists():
+            self.filepath = f.resolve()
+            if not payload_dir:
+                self.payload_dir = pathlib.Path(self.filepath.parent)
+            else:
+                p = pathlib.Path(payload_dir)
+                if p.exists():
+                    self.payload_dir = p.resolve()
+                else:
+                    raise ValueError("The LocalDatabase payload_dir: {} does not exist.".format(p))
+        else:
+            raise ValueError("The LocalDatabase filepath: {} does not exist.".format(f))
+
+
+class CentralDatabase():
+    """
+    Simple class to hold the information about a bas2 Central database.
+    Does no checking that a global tag exists.
+    This class could be made much simpler, but it's made to be similar to LocalDatabase.
+
+    Parameters:
+        global_tag (str): The Global Tag of the central database
+    """
+    db_type = "central"
+
+    def __init__(self, global_tag):
+        self.global_tag = global_tag
+
+
+def split_runs_by_exp(runs):
+    """
+    Parameters:
+      runs (list[ExpRun]): Ordered list of ExpRuns we want to split by Exp value
+
+    Returns:
+      list[list[ExpRun]]: Same as original list but sublists are generated for each Exp value
+    """
+    split_by_runs = []
+    current_exp = runs[0].exp
+    exp_list = []
+    for exprun in runs:
+        if exprun.exp != current_exp:
+            split_by_runs.append(exp_list)
+            exp_list = [exprun]
+        else:
+            exp_list.append(exprun)
+        current_exp = exprun.exp
+    else:
+        split_by_runs.append(exp_list)
+    return split_by_runs
+
+
 def runs_overlapping_iov(iov, runs):
     """
-    Takes an overall IoV() object and a list of Exp,Run tuples (i,j)
-    and returns the list of Exp,Run tuples containing only those runs that overlap
-    with the IoV range.
+    Takes an overall IoV() object and a list of ExpRun
+    and returns the set of ExpRun containing only those runs that overlap
+    with the IoV.
+
+    Parameters:
+        iov (IoV): IoV to compare overlaps with
+        runs list(ExpRun): The available runs to check if them overlap with the IoV
+
+    Return:
+        set
     """
-    overlapping_runs = []
+    overlapping_runs = set()
     for run in runs:
         # Construct an IOV of one run
-        run_iov = IoV(run[0], run[1], run[0], run[1])
+        run_iov = run.make_iov()
         if run_iov.overlaps(iov):
-            overlapping_runs.append(run)
+            overlapping_runs.add(run)
     return overlapping_runs
 
 
@@ -189,7 +292,7 @@ def iov_from_runs(runs):
         exprun_low, exprun_high = runs[0], runs[-1]
     else:
         exprun_low, exprun_high = runs[0], runs[0]
-    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+    return IoV(exprun_low.exp, exprun_low.run, exprun_high.exp, exprun_high.run)
 
 
 def iov_from_runvector(iov_vector):
@@ -199,20 +302,75 @@ def iov_from_runvector(iov_vector):
     an IoV() object. It assumes that the vector was in order to begin with.
     """
     import copy
-    exprun_list = [list((iov.first, iov.second)) for iov in iov_vector]
+    exprun_list = [list(ExpRun(iov.first, iov.second)) for iov in iov_vector]
     if len(exprun_list) > 1:
         exprun_low, exprun_high = exprun_list[0], exprun_list[-1]
     else:
         exprun_low, exprun_high = exprun_list[0], copy.deepcopy(exprun_list[0])
-    return IoV(exprun_low[0], exprun_low[1], exprun_high[0], exprun_high[1])
+    return IoV(exprun_low.exp, exprun_low.run, exprun_high.exp, exprun_high.run)
+
+
+def vector_from_runs(runs):
+    """
+    Convert a sequence of `ExpRun` to a std vector<pair<int,int>>
+
+    Parameters:
+        runs list(ExpRun): The runs to convert
+
+    Returns:
+        ROOT.vector(ROOT.pair(int,int))
+    """
+    exprun_type = ROOT.pair(int, int)
+    run_vec = ROOT.vector(exprun_type)()
+    run_vec.reserve(len(runs))
+    for run in runs:
+        run_vec.push_back(exprun_type(run.exp, run.run))
+    return run_vec
 
 
 def runs_from_vector(exprun_vector):
     """
     Takes a vector of ExpRun from CalibrationAlgorithm and returns
     a Python list of (exp,run) tuples in the same order.
+
+    Parameters:
+        exprun_vector (ROOT.vector(ROOT.pair(int,int))): Vector of expruns for conversion
+
+    Return:
+        list(ExpRun)
     """
-    return [(exprun.first, exprun.second) for exprun in exprun_vector]
+    return [ExpRun(exprun.first, exprun.second) for exprun in exprun_vector]
+
+
+def find_run_lists_from_boundaries(boundaries, runs):
+    """
+    Takes a list of starting ExpRun boundaries and a list of available ExpRuns and finds
+    the runs that are contained in the IoV of each boundary interval. We assume that this
+    is occuring in only one Experiment! We also assume that after the last boundary start
+    you want to include all runs that are higher than this starting ExpRun.
+
+    Note that the output ExpRuns in their lists will be sorted. So the ordering may be
+    different than the overall input order.
+
+    Parameters:
+        boundaries list(ExpRun): Starting boundary ExpRuns to tell us where to start an IoV
+        runs list(ExpRun): The available runs to chunk into boundaries
+
+    Return:
+        dict(IoV,list(ExpRun))
+    """
+    boundary_iov_to_runs = {}
+    # Find the boundary IoVs
+    for start_current, start_next in pairwise(boundaries):
+        # We can safely assume the run-1 because we aren't doing this across multiple experiment numbers
+        boundary_iov = IoV(*start_current, start_next.exp, start_next.run-1)
+        boundary_runs = sorted(runs_overlapping_iov(boundary_iov, runs))
+        boundary_iov_to_runs[boundary_iov] = boundary_runs
+    # The final boundary start won't get iterated above because there's no 'next' boundary. So we add the remaining runs here
+    boundary_iov = IoV(*boundaries[-1], boundaries[-1].exp, -1)
+    boundary_runs = sorted(runs_overlapping_iov(boundary_iov, runs))
+    boundary_iov_to_runs[boundary_iov] = boundary_runs
+    return boundary_iov_to_runs
 
 
 def find_sources(dependencies):
@@ -488,7 +646,7 @@ def get_file_iov_tuple(file_path):
     return (file_path, get_iov_from_file(file_path))
 
 
-def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
+def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None, filterfalse=None):
     """
     Takes a list of file path patterns (things that glob would understand) and runs b2file-metadata-show over them to
     extract the IoV.
@@ -501,10 +659,19 @@ def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None):
         pool: Optional Pool object used to multprocess the b2file-metadata-show subprocesses.
             We don't close or join the Pool as you might want to use it yourself, we just wait until the results are ready.
 
+        filterfalse (`function`): An optional function object that will be called on each absolute filepath found from your
+            patterns. If True is returned the file will have its metadata returned. If False it will be skipped. The filter function
+            should take the filepath string as its only argument.
+
     Returns:
-        dict: Maping of matching input file paths (Key) to their IoV (Value)
+        dict: Mapping of matching input file paths (Key) to their IoV (Value)
     """
     absolute_file_paths = find_absolute_file_paths(file_path_patterns)
+    # Optionally filter out files matching our filter function
+    if filterfalse:
+        import itertools
+        absolute_file_paths = list(itertools.filterfalse(filterfalse, absolute_file_paths))
+
     file_to_iov = {}
     if not pool:
         for file_path in absolute_file_paths:
@@ -577,15 +744,60 @@ def parse_raw_data_iov(file_path):
     # We'll try and extract the exp and run from both the directory and filename
     # That wil let us check that everything is as we expect
 
-    reduced_path = file_path.relative_to("/hsm/belle2/bdata/Data/Raw")
-    path_exp = int(reduced_path.parts[0][1:])
-    path_run = int(reduced_path.parts[1][1:])
+    try:
+        reduced_path = file_path.relative_to("/hsm/belle2/bdata/Data/Raw")
+    # Second try for the calibration data path
+    except ValueError:
+        reduced_path = file_path.relative_to("/group/belle2/dataprod/Data/Raw")
 
-    split_filename = reduced_path.name.split(".")
-    filename_exp = int(split_filename[1])
-    filename_run = int(split_filename[2])
+    try:
+        path_exp = int(reduced_path.parts[0][1:])
+        path_run = int(reduced_path.parts[1][1:])
+
+        split_filename = reduced_path.name.split(".")
+        filename_exp = int(split_filename[1])
+        filename_run = int(split_filename[2])
+    except ValueError as e:
+        raise ValueError("Wrong file path: {}".format(file_path)) from e
 
     if path_exp == filename_exp and path_run == filename_run:
         return IoV(path_exp, path_run, path_exp, path_run)
     else:
         raise ValueError("Filename and directory gave different IoV after parsing for: {}".format(file_path))
+
+
+def create_directories(path, overwrite=True):
+    """
+    Creates a new directory path. If it already exists it will either leave it as is (including any contents),
+    or delete it and re-create it fresh. It will only delete the end point, not any intermediate directories created
+    """
+    # Delete if overwriting and it exists
+    if (path.exists() and overwrite):
+        shutil.rmtree(path)
+    # If it never existed or we just deleted it, make it now
+    if not path.exists():
+        os.makedirs(path)
+
+
+def find_int_dirs(dir_path):
+    """
+    If you previously ran a Calibration and are now re-running after failure, you may have iteration directories
+    from iterations above your current one. This function will find directories that match an integer.
+
+    Parameters:
+        dir_path(`pathlib.Path`): The dircetory to search inside.
+
+    Returns:
+        list[`pathlib.Path`]: The matching Path objects to the directories that are valid ints
+    """
+    paths = []
+    all_dirs = [sub_dir for sub_dir in dir_path.glob("*") if sub_dir.is_dir()]
+    for directory in all_dirs:
+        try:
+            int(directory.name)
+            paths.append(directory)
+        except ValueError as err:
+            pass
+    return paths
+
+UNBOUND_EXPRUN = ExpRun(-1, -1)

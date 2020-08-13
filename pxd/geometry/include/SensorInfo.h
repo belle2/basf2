@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_SENSORINFO_H
-#define PXD_SENSORINFO_H
+#pragma once
 
 #include <vxd/geometry/SensorInfoBase.h>
-#include <algorithm>
 
 #include <root/TVector3.h>
 
@@ -238,4 +236,3 @@ namespace Belle2 {
 
   }
 } //Belle2 namespace
-#endif

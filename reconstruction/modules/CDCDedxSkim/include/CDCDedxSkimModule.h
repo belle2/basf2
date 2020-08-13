@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXSKIMMODULE_H
-#define CDCDEDXSKIMMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -17,11 +16,7 @@
 
 #include <mdst/dataobjects/Track.h>
 
-#include <map>
-#include <string>
 #include <vector>
-#include <utility>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -43,13 +38,13 @@ namespace Belle2 {
     virtual ~CDCDedxSkimModule();
 
     /** Initialize routine **/
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Check the event and track quality and apply clean up cuts */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** A method to check whether a track passes some nominal cuts */
     bool isGoodTrack(const Track* track, const Const::ChargedStable& chargedStable);
@@ -77,5 +72,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

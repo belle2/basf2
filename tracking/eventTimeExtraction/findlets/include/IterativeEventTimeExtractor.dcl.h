@@ -38,8 +38,12 @@ namespace Belle2 {
     void apply(std::vector<RecoTrack*>& recoTracks) override final;
 
   private:
-    /// Parameter: how many iterations should be done?
-    unsigned int m_param_iterations = 2;
+    /// Parameter: how many iterations should be done maximally?
+    unsigned int m_param_maxIterations = 10;
+    /// Parameter: how many iterations should be done minimally?
+    unsigned int m_param_minIterations = 1;
+    /// Parameter: What is the final precision?
+    double m_param_minimalDeltaT0 = 0.2;
     /// Parameter: abort if a single iteration is not working
     bool m_param_abortOnUnsuccessfulStep = true;
     /// Parameter: use the last event t0 instead of the best one

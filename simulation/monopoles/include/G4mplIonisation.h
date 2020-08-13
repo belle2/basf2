@@ -14,10 +14,8 @@
 
 #include <G4VEnergyLossProcess.hh>
 #include <globals.hh>
-#include <G4VEmModel.hh>
 
 class G4Material;
-class G4VEmFluctuationModel;
 
 namespace Belle2 {
 
@@ -52,6 +50,12 @@ namespace Belle2 {
        * @return true
        */
       virtual G4bool IsApplicable(const G4ParticleDefinition& p) override;
+
+      /**
+       * Threshold for zero value
+       */
+      virtual G4double MinPrimaryEnergy(const G4ParticleDefinition* p,
+                                        const G4Material*, G4double cut) final;
 
       /**
        * Print out of the class parameters

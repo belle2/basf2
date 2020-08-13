@@ -10,11 +10,10 @@
 
 // Own include
 #include <analysis/modules/ParticleWeightingLookUpCreator/ParticleWeightingLookUpCreatorModule.h>
-#include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/database/DBImportObjPtr.h>
-
 
 // framework aux
+#include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
 
 
@@ -51,14 +50,14 @@ namespace Belle2 {
   /**
    * Some massaging of python input is needed
    */
-  NDBin ParticleWeightingLookUpCreatorModule::NDBinTupleToNDBin(NDBinTuple bin_tuple)
+  NDBin ParticleWeightingLookUpCreatorModule::NDBinTupleToNDBin(const NDBinTuple& bin_tuple)
   {
     NDBin binning;
     for (auto bin_1d : bin_tuple) {
       std::string axis_name = bin_1d.first;
       double min_val = std::get<0>(bin_1d.second);
       double max_val = std::get<1>(bin_1d.second);
-      ParticleWeightingBinLimits* lims = new ParticleWeightingBinLimits(min_val, max_val);
+      lims = new ParticleWeightingBinLimits(min_val, max_val);
       binning.insert(std::make_pair(axis_name, lims));
     }
     return binning;
@@ -100,6 +99,13 @@ namespace Belle2 {
     importer.construct(table);
     importer.import(Belle2::IntervalOfValidity(m_experimentLow, m_runLow, m_experimentHigh, m_runHigh));
 
+  }
+
+  void ParticleWeightingLookUpCreatorModule::terminate()
+  {
+    if (lims != nullptr) {
+      delete lims;
+    }
   }
 
 } // end Belle2 namespace

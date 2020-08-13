@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDDEDXPIDMODULE_H
-#define VXDDEDXPIDMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -22,25 +21,16 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
-#include <string>
 #include <vector>
-#include <TVector3.h>
-#include <TH2F.h>
 
-class TH2F;
 
 namespace Belle2 {
-  class PXDCluster;
-  class SVDCluster;
-  class VXDDedxTrack;
   class HelixHelper;
 
   /** Extract dE/dx from fitted tracks.
@@ -67,14 +57,14 @@ namespace Belle2 {
     virtual ~VXDDedxPIDModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -147,8 +137,7 @@ namespace Belle2 {
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
-    double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
-    double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */
+    //no need to define highest and lowest truncated value as we laways remove highest 2 dE/dx values from 8 dE/dx value.
 
     //parameters: technical stuff
     double m_trackDistanceThreshhold; /**< Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off. */
@@ -164,4 +153,3 @@ namespace Belle2 {
 
   };
 } // Belle2 namespace
-#endif

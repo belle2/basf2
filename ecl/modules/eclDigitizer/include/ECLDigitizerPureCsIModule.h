@@ -20,12 +20,8 @@
 //ECL
 #include <ecl/digitization/EclConfigurationPure.h>
 
-
-class TH1F;
-
 namespace Belle2 {
 
-  class ECLWaveformData;
   class ECLNoiseData;
   class ECLDsp;
   class ECLHit;
@@ -56,26 +52,26 @@ namespace Belle2 {
 
 
     /** Initialize variables  */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Nothing so far.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Actual digitization of all pure CsI hits in the ECL.
      *
      *  The digitized hits are written into the DataStore.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Nothing so far. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Free memory. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     /** ECL ring ID. */
-    int m_thetaID[ECL::EclConfigurationPure::m_nch];
+    int m_thetaID[ECL::EclConfigurationPure::m_nch] {};
     /** Returns ring ID for a certain crystal. */
     void mapGeometry();
     /** Returns 1 if corresponding crystal is set as pure CsI crystal. */
@@ -125,10 +121,8 @@ namespace Belle2 {
     std::vector<ECLNoiseData> m_noise;
     /** read Shaper-DSP data from root file. */
     void readDSPDB();
-
     /** Event number */
-    int    m_nEvent;
-
+    int m_nEvent = 0;
     /** Module parameters. */
     /** Ring ID of first pure CsI ring. */
     int m_thetaIdMin;

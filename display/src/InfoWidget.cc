@@ -6,10 +6,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/HTML.h>
 #include <framework/utilities/ColorPalette.h>
 
 #include <utility>
@@ -59,6 +57,7 @@ void InfoWidget::update()
   //check if the object given by lastURI exists in the new event, too.
   //array pages are ok, too
   if (lastURI != "") {
+    // cppcheck-suppress unreadVariable
     URI parsedURI(lastURI);
     if (!parsedURI.object and !lastURI.EndsWith("/")) {
       //doesn't exist, go to main page
@@ -284,7 +283,7 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
   {
     //relations from this
     const RelationVector<TObject> relatedObjects(DataStore::Instance().getRelationsWith(DataStore::c_ToSide, obj, storeEntry, index,
-                                                 TObject::Class(), "ALL"));
+                                                 TObject::Class(), "ALL", ""));
     const TString pref = "this <b>-&gt;</b> ";
     for (size_t i = 0; i < relatedObjects.size(); i++) {
       const TObject* relObj = relatedObjects.object(i);
@@ -303,7 +302,7 @@ TString InfoWidget::getRelatedInfo(const TObject* obj)
   {
     //relations to this
     const RelationVector<TObject> relatedObjects(DataStore::Instance().getRelationsWith(DataStore::c_FromSide, obj, storeEntry, index,
-                                                 TObject::Class(), "ALL"));
+                                                 TObject::Class(), "ALL", ""));
 
     const TString pref = "this <b>&lt;-</b> ";
     for (size_t i = 0; i < relatedObjects.size(); i++) {

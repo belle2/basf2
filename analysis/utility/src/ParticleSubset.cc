@@ -21,7 +21,7 @@ namespace {
 void ParticleSubset::removeParticlesNotInLists(const std::vector<std::string>& listNames)
 {
   std::unordered_set<int> indicesToKeep;
-  for (auto l : listNames) {
+  for (const auto& l : listNames) {
     StoreObjPtr<ParticleList> list(l);
     if (!list)
       continue;
@@ -33,7 +33,8 @@ void ParticleSubset::removeParticlesNotInLists(const std::vector<std::string>& l
         keepParticle(p, &indicesToKeep);
       }
     } else {
-      B2ERROR("ParticleList " << l << " uses Particle array '" << list->getParticleCollectionName() << "', but ParticleSubset uses different array '" << m_set->getName() << "'!");
+      B2ERROR("ParticleList " << l << " uses Particle array '" << list->getParticleCollectionName() <<
+              "', but ParticleSubset uses different array '" << m_set->getName() << "'!");
     }
   }
 
@@ -48,7 +49,7 @@ void ParticleSubset::removeParticlesNotInLists(const std::vector<std::string>& l
 void ParticleSubset::fixParticles(const std::map<int, int>& oldToNewMap)
 {
   TClonesArray* arrayPtr = m_set->getPtr();
-  for (Particle & p : *m_set) {
+  for (Particle& p : *m_set) {
     unsigned int n = p.m_daughterIndices.size();
     for (unsigned int i = 0; i < n; i++) {
       p.m_daughterIndices[i] = oldToNewMap.at(p.m_daughterIndices[i]);
@@ -61,11 +62,11 @@ void ParticleSubset::fixParticles(const std::map<int, int>& oldToNewMap)
 void ParticleSubset::fixParticleLists(const std::map<int, int>& oldToNewMap)
 {
   const auto& entryMap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
-  for (const auto & entry : entryMap) {
+  for (const auto& entry : entryMap) {
     if (!entry.second.ptr or !entry.second.object->InheritsFrom(ParticleList::Class()))
       continue;
 
-    ParticleList* list = static_cast<ParticleList*>(entry.second.ptr);
+    auto* list = static_cast<ParticleList*>(entry.second.ptr);
     if (list->getParticleCollectionName() == m_set->getName()) {
       fixVector(list->m_scList, oldToNewMap);
       fixVector(list->m_fsList, oldToNewMap);

@@ -18,9 +18,10 @@
 
 namespace Belle2 {
 
-  // tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit)
+  /** tuple of Chip ID (2 bit), Row (10 bit), Common Mode (6 bit) */
   typedef std::tuple<uint8_t, uint16_t, uint8_t> PXDDAQDHPComMode;
   using Belle2::PXD::PXDError::PXDErrorFlags;
+  using Belle2::PXD::PXDError::EPXDErrMask;
 
   /**
    * The PXD DAQ DHE Status class
@@ -34,7 +35,8 @@ namespace Belle2 {
 
     /** Default constructor for the ROOT IO. */
     PXDDAQDHEStatus() : m_errorMask(0), m_critErrorMask(0), m_usable(true), m_sensorID(0), m_dheID(0), m_triggerGate(0), m_frameNr(0),
-      m_rawCount(0), m_redCount(0) {}
+      m_dhp_found_mask(0),
+      m_rawCount(0), m_redCount(0), m_errorinfo(0) {}
 
     /** constructor setting the error mask, dheid, raw and reduced data counters, ...
      * @param id VxdID of sensor
@@ -45,13 +47,17 @@ namespace Belle2 {
      */
     PXDDAQDHEStatus(VxdID id, int dheid, PXDErrorFlags mask, unsigned short tg,
                     unsigned short fn) : m_errorMask(mask), m_critErrorMask(0), m_usable(true), m_sensorID(id), m_dheID(dheid),
-      m_triggerGate(tg), m_frameNr(fn), m_rawCount(0), m_redCount(0)
+      m_triggerGate(tg), m_frameNr(fn), m_dhp_found_mask(0), m_rawCount(0), m_redCount(0), m_errorinfo(0)
     {}
 
     /** Return Usability of data
      * @return conclusion if data is useable
      */
     bool isUsable() const { return m_usable; }
+
+    /** Mark Data in DHE as Unusable
+     */
+    void markUnusable() { m_usable = false; m_errorMask |= EPXDErrMask::c_UNUSABLE_DATA;}
 
     /** Set Error bit mask
      * @param m Bit Mask to set
@@ -78,7 +84,7 @@ namespace Belle2 {
      * the PXD data from this DHE is not usable for analysis
      * TODO Maybe this decision needs improvement.
      */
-    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0;}
+    void Decide(void) {m_usable = (m_errorMask & m_critErrorMask) == 0ull && (m_errorMask & EPXDErrMask::c_UNUSABLE_DATA) == 0ull;}
 
     /** Set VxdID and DHE ID of sensor */
     void setDHEID(VxdID id, int dheid) { m_sensorID = id; m_dheID = dheid;};
@@ -106,6 +112,17 @@ namespace Belle2 {
     /** get Readout Frame number */
     unsigned short getFrameNr(void) const { return  m_frameNr;};
 
+
+    /** get Mask for found DHPs with valid data */
+    unsigned short getDHPFoundMask(void) { return m_dhp_found_mask;};
+    /** set Mask for found DHPs with valid data */
+    void setDHPFoundMask(unsigned short dhpmask) { m_dhp_found_mask = dhpmask;};
+
+    /** set erroinfo from the DHE END **/
+    void setEndErrorInfo(uint32_t e) { m_errorinfo = e;};
+    /** get erroinfo from the DHE END **/
+    uint32_t getEndErrorInfo(void) const { return m_errorinfo;};
+
     /** Add DHP information
      * @param daqdhp DHP Status Object
      */
@@ -125,6 +142,11 @@ namespace Belle2 {
     std::vector<PXDDAQDHPStatus>::iterator begin()  { return m_pxdDHP.begin(); };
     /** iterator-based iteration for DHPs */
     std::vector<PXDDAQDHPStatus>::iterator end()  { return m_pxdDHP.end(); };
+
+    /** const iterator-based iteration for DHPs */
+    std::vector<PXDDAQDHPStatus>::const_iterator cbegin() const { return m_pxdDHP.cbegin(); };
+    /** const iterator-based iteration for DHPs */
+    std::vector<PXDDAQDHPStatus>::const_iterator cend() const { return m_pxdDHP.cend(); };
     /** Returns PXDDAQDHPStatus for the last DHP */
     PXDDAQDHPStatus& dhp_back()  { return m_pxdDHP.back(); };
     /** Returns number of DHPs */
@@ -143,6 +165,12 @@ namespace Belle2 {
     PXDDAQDHPComMode& cm_back()  { return m_commode.back(); };
     /** Returns number of Common Mode blocks in this event */
     size_t cm_size() const { return m_commode.size(); };
+    /** Returns CM DHP ID at position i */
+    int get_cm_dhp(int i) const { return std::get<0>(m_commode[i]); };
+    /** Returns CM row at position i */
+    int get_cm_row(int i) const { return std::get<1>(m_commode[i]); };
+    /** Returns CM value at position i */
+    int get_cm_value(int i) const { return std::get<2>(m_commode[i]); };
 
   private:
     PXDErrorFlags m_errorMask; /**< errors found in this DHE/sensor */
@@ -153,8 +181,10 @@ namespace Belle2 {
     unsigned short m_dheID;/**< DHE ID as delivered by DAQ.*/
     unsigned short m_triggerGate; /**< Trigger Gate ("Startrow") from DHE header */
     unsigned short m_frameNr; /**< Frame number (low bits) from DHE header */
+    unsigned short m_dhp_found_mask; /**< Mask for DHP with valid data */
     uint32_t m_rawCount; /**< raw byte count for monitoring */
     uint32_t m_redCount; /**< reduced byte count for monitoring */
+    uint32_t m_errorinfo; /**< erroinfo from the DHE END **/
 
     /** Vector of DHP informations belonging to this event */
     std::vector< PXDDAQDHPStatus> m_pxdDHP;
@@ -162,7 +192,8 @@ namespace Belle2 {
     /** Vector of Common Mode informations belonging to this event */
     std::vector < PXDDAQDHPComMode> m_commode;
 
-    ClassDef(PXDDAQDHEStatus, 4);
+    /** necessary for ROOT */
+    ClassDef(PXDDAQDHEStatus, 7);
 
   }; // class PXDDAQDHEStatus
 

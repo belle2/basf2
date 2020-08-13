@@ -8,15 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CRY_H
-#define CRY_H
+#pragma once
 
 #include "cry/CRYGenerator.h"
 #include "cry/CRYSetup.h"
 
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <utility>
-#include <TRandom3.h>
 
 namespace Belle2 {
   /**
@@ -95,12 +92,12 @@ namespace Belle2 {
     /** Sets the directory that holds cosmic data.
      * @param cosmicdatadir directory that holds the data.
      */
-    void setCosmicDataDir(std::string cosmicdatadir) { m_cosmicDataDir = cosmicdatadir; }
+    void setCosmicDataDir(const std::string& cosmicdatadir) { m_cosmicDataDir = cosmicdatadir; }
 
     /** Sets the setup file.
      * @param setupfile setup file.
      */
-    void setSetupFile(std::string setupfile) { m_setupFile = setupfile; }
+    void setSetupFile(const std::string& setupfile) { m_setupFile = setupfile; }
 
     /** Sets the height of the accept box.
      * @param acceptheight height of the accept box.
@@ -216,4 +213,3 @@ namespace Belle2 {
 
   };
 } // end namespace Belle2
-#endif /* CRY_H */

@@ -11,15 +11,10 @@
 #include <beast/cave/geometry/CaveCreator.h>
 #include <beast/cave/simulation/SensitiveDetector.h>
 
-#include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-//#include <cave/simulation/SensitiveDetector.h>
 
-#include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -28,14 +23,8 @@
 #include <G4PVPlacement.hh>
 
 //Shapes
-#include <G4Trap.hh>
 #include <G4Box.hh>
-#include <G4Polycone.hh>
-#include "G4UnionSolid.hh"
-#include "G4SubtractionSolid.hh"
 #include <G4UserLimits.hh>
-#include <G4RegionStore.hh>
-#include "G4Tubs.hh"
 
 using namespace std;
 using namespace boost;
@@ -51,7 +40,7 @@ namespace Belle2 {
 
     CaveCreator::CaveCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     CaveCreator::~CaveCreator()
@@ -61,6 +50,9 @@ namespace Belle2 {
 
     void CaveCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       G4double density;
       G4double A;
       G4int Z;

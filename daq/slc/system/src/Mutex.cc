@@ -2,17 +2,17 @@
 
 using namespace Belle2;
 
-Mutex::Mutex() throw()
+Mutex::Mutex()
 {
   pthread_mutexattr_init(&m_attr);
   pthread_mutex_init(&m_mu, &m_attr);
 }
 
-Mutex::~Mutex() throw()
+Mutex::~Mutex()
 {
 }
 
-bool Mutex::lock() throw()
+bool Mutex::lock()
 {
   if (pthread_mutex_lock(&m_mu) != 0) {
     return false;
@@ -20,7 +20,7 @@ bool Mutex::lock() throw()
   return true;
 }
 
-bool Mutex::unlock() throw()
+bool Mutex::unlock()
 {
   if (pthread_mutex_unlock(&m_mu) != 0) {
     return false;

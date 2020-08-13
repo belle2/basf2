@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GENERATORS_MODULES_AAFHINPUT_AAFHINPUTMODULE_H
-#define GENERATORS_MODULES_AAFHINPUT_AAFHINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -20,7 +19,6 @@
 #include <generators/utilities/InitialParticleGeneration.h>
 
 #include <string>
-#include <TLorentzRotation.h>
 
 namespace Belle2 {
   /**
@@ -36,13 +34,13 @@ namespace Belle2 {
     AafhInputModule();
 
     /** initialize generator */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** generate event */
-    virtual void event();
+    virtual void event() override;
 
     /** calculate cross section */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     /** Generator mode */
@@ -89,4 +87,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* GENERATORS_MODULES_AAFHINPUT_AAFHINPUTMODULE_H */

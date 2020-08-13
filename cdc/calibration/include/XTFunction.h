@@ -98,7 +98,7 @@ namespace Belle2 {
       /**
        * Initialized with TH1D histogram and mode
        */
-      XTFunction(TH1D* h1, int mode)
+      XTFunction(TH1F* h1, int mode)
       {
         m_h1 = (TProfile*)h1->Clone();
         m_h1->SetDirectory(0);
@@ -111,11 +111,72 @@ namespace Belle2 {
       }
 
       /**
+       * Copy constructor.
+       */
+      XTFunction(const XTFunction& x) :
+        m_h1(x.m_h1),
+        m_mode(x.m_mode),
+        m_debug(x.m_debug),
+        m_draw(x.m_draw),
+        m_bField(x.m_bField),
+        m_minRequiredEntry(x.m_minRequiredEntry),
+        m_fitflag(x.m_fitflag),
+        m_Prob(x.m_Prob),
+        m_tmin(x.m_tmin),
+        m_tmax(x.m_tmax)
+      {
+        m_fitFunc = (TF1*) x.m_fitFunc->Clone();
+        for (int i = 0; i < 8; ++i) {
+          m_XTParam[i] = x.m_XTParam[i];
+          m_FittedXTParams[i] = x.m_XTParam[i];
+        }
+      }
+
+      /**
+       *  Assignment operator.
+       */
+      XTFunction& operator=(const XTFunction& x)
+      {
+        if (this != &x) {
+          m_h1 = x.m_h1;
+          m_fitFunc = x.m_fitFunc;
+          m_mode = x.m_mode;
+          m_debug = x.m_debug;
+          m_draw = x.m_draw;
+          m_bField = x.m_bField;
+          m_minRequiredEntry = x.m_minRequiredEntry;
+          m_fitflag = x.m_fitflag;
+          m_Prob = x.m_Prob;
+          m_tmin = x.m_tmin;
+          m_tmax = x.m_tmax;
+
+          for (int i = 0; i < 8; ++i) {
+            m_XTParam[i] = x.m_XTParam[i];
+            m_FittedXTParams[i] = x.m_XTParam[i];
+          }
+        }
+        return *this;
+      }
+
+
+      /**
        * Set Parameter 6 for polynomia fit.
        */
       void  setP6(double p6)
       {
         m_XTParam[6] = p6;
+      }
+
+      /**
+       * Is valid.
+       */
+      bool isValid()
+      {
+        if (m_fitFunc->IsValid() == true) {
+          return true;
+        } else {
+          return false;
+        }
       }
 
       /**
@@ -230,6 +291,11 @@ namespace Belle2 {
        * Fit xt histogram incase 5th order Chebeshev polynomial is used.
        */
       void FitChebyshev();
+      /**
+       * Validate the xt has proper shape.
+       * Suppose to be bad xt if |xt(0)| > 0.2.
+       */
+      bool validate();
     private:
 
       TProfile* m_h1;  /**< Histogram of xt relation. */
@@ -274,7 +340,7 @@ namespace Belle2 {
       double p1 = f1->GetParameter(1);
       double f10 = f1->Eval(10);
       /****************************/
-      int in = 0; /*how many time inner part change fit limit*/
+      //int in = 0; /*how many time inner part change fit limit*/
       int out = 0; /*how many time outer part change fit limit*/
       m_fitFunc->SetParameters(p0, p1, 0, 0, 0, 0, m_XTParam[6], 0);
       double p6default = m_XTParam[6];
@@ -310,7 +376,7 @@ namespace Belle2 {
         if (fabs(par[0] - p0) > max_dif || fabs(f10 - m_fitFunc->Eval(10)) > max_dif2) {
           m_fitflag = 3;
           if (i == 9) std::cout << "ERROR XT FIT inner part" << std::endl;
-          in += 1;
+          //in += 1;
           m_fitFunc->SetParameters(p0, p1, 0, 0, 0, 0, p6default, 0);
           m_fitFunc->SetParLimits(1, 0, 0.08);
           m_tmin -= 0.5;
@@ -346,9 +412,25 @@ namespace Belle2 {
       }
     }
 
-    void XTFunction::FitChebyshev()
+    bool XTFunction::validate()
     {
 
+      const double p6 = m_fitFunc->GetParameter(6);
+      if (fabs(m_fitFunc->Eval(0))  > 0.2) {
+        B2WARNING("Bad xt function");
+        m_fitflag = 0;
+        return false;
+      } else if (p6 < 100.0) {
+        B2WARNING("Unrealistic p6");
+        m_fitflag = 0;
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+    void XTFunction::FitChebyshev()
+    {
       if (m_mode != c_Chebyshev) {
         B2ERROR("Fitting function is wrong");
       }
@@ -359,29 +441,37 @@ namespace Belle2 {
       }
       //  m_tmax = m_XTParam[6] + 100;
       //xtCheb5->SetParameters(0.0, 0.005, 0., 0., 0., 0., m_XTParam[6], 0.001);
-      double p[6];
       double par[8];
-      m_fitFunc->SetParLimits(7, 0., 0.001);
-      m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
-      m_h1->GetFunction("chebyshev5")->GetParameters(p);
-      m_fitFunc->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], m_XTParam[6], 0.000);
-
+      m_fitFunc->SetParLimits(7, 0.0001, 0.001);
+      int fitresult = m_h1->Fit("chebyshev5", "QME", "", m_tmin, m_XTParam[6]);
+      if (fitresult >= 0) {
+        m_h1->GetFunction("chebyshev5")->GetParameters(par);
+        m_fitFunc->SetParameters(par[0], par[1], par[2], par[3], par[4], par[5], m_XTParam[6], 0.000);
+      }
       double stat;
       for (int i = 0; i < 10; ++i) {
         stat = m_h1->Fit(m_fitFunc, "MQ", "0", m_tmin, m_tmax);
         if (stat == 0) {
-          m_fitFunc->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], m_XTParam[6] - 20, 0.000);
+          m_fitFunc->SetParameters(par[0], par[1], par[2], par[3], par[4], par[5], m_XTParam[6] - 20, 0.000);
           m_tmax -= 10;
           continue;
         }
         m_fitFunc->GetParameters(par);
+        if (par[1] < 0) { // negative c1
+          // std::cout << " neg c1 converted" << std::endl;
+          par[1] *= -1.0;
+          m_fitFunc->SetParLimits(1, 0., 0.01);
+          m_tmin += 10.0;
+          continue;
+        }
+
         /*Eval outer region,*/
         double fp6 = m_fitFunc->Eval(par[6]);
         double fbehindp6 = m_fitFunc->Eval(par[6] - 10) - 0.005;
         if (fp6 < fbehindp6 || fp6 > 1) { /*may be change to good value*/
           m_fitflag = 2;
           //      out += 1;
-          m_fitFunc->SetParameters(p[0], p[1], p[2], p[3], p[4], p[5], par[6] - 20, 0.000);
+          m_fitFunc->SetParameters(par[0], par[1], par[2], par[3], par[4], par[5], par[6] - 20, 0.000);
           m_fitFunc->SetParLimits(6, par[6] - 50,  par[6] - 10);
           m_tmax -= 10;
           //      if (m_tmax < p6default + 30) {
@@ -393,8 +483,10 @@ namespace Belle2 {
         //    m_tmax +=10;
         //if (stat != 0) break;
       }
-      m_fitFunc->GetParameters(m_FittedXTParams);
-      m_Prob = m_fitFunc->GetProb();
+      if (par[1] > 0) {
+        m_fitFunc->GetParameters(m_FittedXTParams);
+        m_Prob = m_fitFunc->GetProb();
+      }
       if (stat == 0)
         m_fitflag = 0;
       else

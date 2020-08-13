@@ -1,8 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['pyload'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', 'daq_slc_pyb2daq', 
-				 '$PGSQL_LIBS', 'framework', 'boost_python','$ROOT_LIBS', '$PYTHON_LIBS']
-env['TOOLS_LIBS']['b2daqtest'] = ['pthread', 'daq', 'nsm2_b2lib', 'nsm2_corelib', 'daq_slc_pyb2daq', 
-				 '$PGSQL_LIBS', 'framework', 'boost_python','$ROOT_LIBS', '$PYTHON_LIBS']
-Return('env')
-

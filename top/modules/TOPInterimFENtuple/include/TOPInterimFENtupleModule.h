@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
-#include <framework/gearbox/Const.h>
 
 #include <TTree.h>
 
@@ -39,35 +37,35 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * Module funcions to define histograms
      */
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
 

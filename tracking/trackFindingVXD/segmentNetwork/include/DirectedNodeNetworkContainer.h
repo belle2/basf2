@@ -9,14 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
 #include <deque>
 
 #include <framework/datastore/RelationsObject.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 #include <tracking/trackFindingVXD/segmentNetwork/Segment.h>
@@ -48,15 +46,15 @@ namespace Belle2 {
       m_ActiveSectorNetwork(DirectedNodeNetwork<ActiveSector<StaticSectorType, Belle2::TrackNode>, Belle2::VoidMetaInfo>()),
       m_HitNetwork(DirectedNodeNetwork<Belle2::TrackNode, Belle2::VoidMetaInfo>()),
       m_SegmentNetwork(DirectedNodeNetwork<Belle2::Segment<Belle2::TrackNode>, Belle2::CACell>()),
-      m_VirtualInteractionPoint(NULL),
-      m_VIPSpacePoint(NULL) {}
+      m_VirtualInteractionPoint(nullptr),
+      m_VIPSpacePoint(nullptr) {}
 
 
     /** Destructor */
     ~DirectedNodeNetworkContainer()
     {
-      if (m_VirtualInteractionPoint != NULL) { delete m_VirtualInteractionPoint; }
-      if (m_VIPSpacePoint != NULL) { delete m_VIPSpacePoint; }
+      if (m_VirtualInteractionPoint != nullptr) { delete m_VirtualInteractionPoint; }
+      if (m_VIPSpacePoint != nullptr) { delete m_VIPSpacePoint; }
     }
 
 
@@ -185,7 +183,7 @@ namespace Belle2 {
     /** Stores the actual Segments, since the SegmentNetwork does only keep references. */
     std::deque<Segment<TrackNode>> m_segments;
 
-    /** Stores a SpacePoint representing the virtual interaction point if set, NULL if not. */
+    /** Stores a SpacePoint representing the virtual interaction point if set, nullptr if not. */
     Belle2::TrackNode* m_VirtualInteractionPoint;
 
     /** Stores the SpacePoint needed for the virtual IP */

@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-import logging
-import os
-import subprocess
-import stat
-import shutil
+# std
 import sys
 
+# ours
 from clustercontrolbase import ClusterBase
+from validationscript import Script
 
 
 class Cluster(ClusterBase):
@@ -29,7 +26,8 @@ class Cluster(ClusterBase):
             import drmaa
             return True
         except ImportError:
-            print("drmaa library is not installed, please ues 'pip3 install drmaa'")
+            print("drmaa library is not installed, please ues 'pip3 install "
+                  "drmaa'")
             return False
         except RuntimeError as re:
             print("drmaa library not properly configured")
@@ -60,25 +58,29 @@ class Cluster(ClusterBase):
         """
 
         #: The command to submit a job. 'LOGFILE' will be replaced by the
-        # actual log file name
-        self.native_spec = ('-l h_vmem={requirement_vmem}G,h_fsize={requirement_storage}G '
+        #: actual log file name
+        self.native_spec = ('-l h_vmem={requirement_vmem}G,h_fsize={'
+                            'requirement_storage}G '
                             '-q {queuename} -V')
 
-        #: required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
-        # to memory consumption
+        #: required vmem by the job in GB, required on DESY NAF, otherwise
+        #: jobs get killed due to memory consumption
         self.requirement_vmem = 4
 
-        #: the storage IO in GB which can be performed by each job. By default, this is 3GB at
-        # DESY which is to small for some validation scripts
+        #: the storage IO in GB which can be performed by each job. By
+        #: default, this is 3GB at DESY which is to small for some validation
+        #:  scripts
         self.requirement_storage = 50
 
         #: Queue best suitable for execution at DESY NAF
         self.queuename = "short.q"
 
-        # call the base constructor, which will setup the batch cluster common stuff
+        # call the base constructor, which will setup the batch cluster
+        # common stuff
         super().__init__()
 
-    def adjust_path(self, path):
+    # noinspection PyMethodMayBeStatic
+    def adjust_path(self, path: str):
         """!
         This method can be used if path names are different on submission
         and execution hosts.
@@ -88,6 +90,7 @@ class Cluster(ClusterBase):
 
         return path
 
+    # noinspection PyMethodMayBeStatic
     def available(self):
         """!
         The cluster should always be available to accept new jobs.
@@ -96,7 +99,7 @@ class Cluster(ClusterBase):
 
         return True
 
-    def execute(self, job, options='', dry=False, tag='current'):
+    def execute(self, job: Script, options='', dry=False, tag='current'):
         """!
         Takes a Script object and a string with options and runs it on the
         cluster, either with ROOT or with basf2, depending on the file type.
@@ -121,11 +124,16 @@ class Cluster(ClusterBase):
 
             shell_script_name = self.prepareSubmission(job, options, tag)
 
-            # native specification with all the good settings for the batch server
-            native_spec_string = self.native_spec.format(requirement_storage=self.requirement_storage,
-                                                         requirement_vmem=self.requirement_vmem,
-                                                         queuename=self.queuename)
-            print('Creating job template for wrapper script {}'.format(shell_script_name))
+            # native specification with all the good settings for the batch
+            # server
+            native_spec_string = self.native_spec.format(
+                requirement_storage=self.requirement_storage,
+                requirement_vmem=self.requirement_vmem,
+                queuename=self.queuename
+            )
+            print(
+                f'Creating job template for wrapper script {shell_script_name}'
+            )
             jt = session.createJobTemplate()
             jt.remoteCommand = shell_script_name
             jt.joinFiles = True
@@ -133,48 +141,56 @@ class Cluster(ClusterBase):
 
             if not dry:
                 jobid = session.runJob(jt)
-                self.logger.debug("Script {} started with job id {}".format(job.name, jobid))
-                job.cluster_drmaa_jobid = jobid
+                self.logger.debug(
+                    f"Script {job.name} started with job id {jobid}"
+                )
+                job.job_id = jobid
 
             session.deleteJobTemplate(jt)
         return
 
-    def is_job_finished(self, job):
+    def is_job_finished(self, job: Script):
         """!
         Checks whether the '.done'-file has been created for a job. If so, it
         returns True, else it returns False.
         Also deletes the .done-File once it has returned True.
 
         @param job: The job of which we want to know if it finished
-        @return: True if the job has finished, otherwise False
+        @return: (True if the job has finished, exit code). If we can't find the
+            exit code in the '.done'-file, the returncode will be -666.
+            If the job is not finished, the exit code is returned as 0.
         """
 
         # import here first so the whole module can also be imported on python
         # installations which have no drmaa at all
         import drmaa
 
-        if not hasattr(job, 'cluster_drmaa_jobid'):
-            print("Job has not been started with cluster drmaaa because cluster_drmaa_jobid is missing")
+        if job.job_id is None:
+            print("Job has not been started with cluster drmaaa because "
+                  "job id is missing")
             sys.exit(0)
 
         with drmaa.Session() as session:
 
-            status = None
             # some batch server will forget completed jobs right away
             try:
-                status = session.jobStatus(job.cluster_drmaa_jobid)
+                status = session.jobStatus(job.job_id)
             except drmaa.errors.InvalidJobException:
-                print("Job info for jobid {} cannot be retrieved, assuming job has terminated".format(job.cluster_drmaa_jobid))
+                print("Job info for jobid {} cannot be retrieved, assuming "
+                      "job has terminated".format(job.job_id))
 
-                (donefile_exists, donefile_returncode) = self.checkDoneFile(job)
+                (donefile_exists, donefile_returncode) = \
+                    self.checkDoneFile(job)
 
-                # always return the job es complete even if there is no done file
-                # at this ponint tho job is also not longer running/queued on the cluster
+                # always return the job es complete even if there is no done
+                #  file at this ponint tho job is also not longer
+                # running/queued on the cluster
                 return [True, donefile_returncode]
 
             # Return that the job is finished + the return code for it
-            # depending when we look for the job this migh never be used, because
-            # the jobs disappear from qstat before we can query them ..
+            # depending when we look for the job this migh never be used,
+            # because the jobs disappear from qstat before we can query them
+            #  ..
             if status == drmaa.JobState.DONE:
                 # todo: return code
                 return [True, 0]

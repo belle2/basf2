@@ -12,24 +12,18 @@
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 #include <tracking/trackFindingCDC/display/BoundingBox.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -39,17 +33,14 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <TMatrixDSym.h>
 
 #include <cmath>
-#include <exception>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -770,7 +761,7 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
         }
         const genfit::MeasuredStateOnPlane& state = fittedResult->getFittedState();
         state.getPosMomCov(pos, mom, cov);
-      } catch (genfit::Exception) {
+      } catch (const genfit::Exception&) {
         B2WARNING("Skipping state with strange pos, mom or cov");
         continue;
       }

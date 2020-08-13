@@ -1,26 +1,19 @@
 #include <cdc/calibration/T0Correction.h>
-//#include <calibration/CalibrationAlgorithm.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
 
 #include <TError.h>
 #include <TROOT.h>
-#include <TH1F.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
 #include <TFile.h>
 #include <TChain.h>
-#include <TTree.h>
-#include "iostream"
-#include "string"
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/Logger.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace CDC;
@@ -65,6 +58,16 @@ void T0Correction::CreateHisto()
   tree->SetBranchAddress("weight", &w);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
+
+  /* Disable unused branch */
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf"};
+  tree->SetBranchStatus("*", 0);
+
+  for (TString brname : list_vars) {
+    tree->SetBranchStatus(brname, 1);
+  }
+
+
   double halfCSize[56];
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   for (int i = 0; i < 56; ++i) {
@@ -122,9 +125,8 @@ bool T0Correction::calibrate()
 
   B2INFO("Gaus fitting for whole channel");
   double par[3];
-  double mean = 0.;
   m_hTotal->SetDirectory(0);
-  mean = m_hTotal->GetMean();
+  double mean = m_hTotal->GetMean();
   m_hTotal->Fit("g1", "Q", "", mean - 15, mean + 15);
   g1->GetParameters(par);
 

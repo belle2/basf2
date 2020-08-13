@@ -14,4 +14,4 @@ serves them.
 if __name__ == '__main__':
     # run validation server with default settings and 
     # parse command line input in any case
-    validationserver.run_server(parseCommandLine=True)
+    validationserver.run_server(parse_command_line=True)

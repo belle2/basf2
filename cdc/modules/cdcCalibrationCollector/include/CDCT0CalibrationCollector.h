@@ -10,12 +10,16 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <calibration/CalibrationCollectorModule.h>
 
-#include <framework/datastore/RelationIndex.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TrackFitResult.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
+
 #include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreArray.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -41,24 +45,27 @@ namespace Belle2 {
       /**
        * Initializes the Module.
        */
-      virtual void prepare();
+      void prepare() override;
 
 
       /**
        * Event action, collect information for calibration.
        */
 
-      virtual void collect();
+      void collect() override;
 
       /**
        * Termination action.
        */
-      virtual void finish();
+      void finish() override;
 
     private:
 
-
-      StoreObjPtr<EventT0> m_eventTimeStoreObject; /**<Event t0 object */
+      StoreObjPtr<EventT0> m_eventTimeStoreObject;  /**< Event t0 object */
+      StoreArray<Track> m_Tracks;                   /**< Tracks. */
+      StoreArray<RecoTrack> m_RecoTracks;           /**< Tracks. */
+      StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
+      StoreArray<CDCHit> m_CDCHits;                 /**< CDC hits. */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName ;         /**< Belle2::CDCHit StoreArray name. */
       std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */

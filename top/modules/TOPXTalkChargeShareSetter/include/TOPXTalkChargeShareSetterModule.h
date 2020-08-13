@@ -11,19 +11,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <string>
-#include <map>
 
 #include <framework/datastore/StoreArray.h>
-#include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPDigit.h>
-
-#include <framework/database/DBObjPtr.h>
-#include <top/dbobjects/TOPCalTimebase.h>
-#include <top/dbobjects/TOPCalChannelT0.h>
-#include <top/dbobjects/TOPCalModuleT0.h>
-#include <top/dbobjects/TOPCalCommonT0.h>
-
 
 namespace Belle2 {
   /**
@@ -77,7 +67,8 @@ namespace Belle2 {
 
     bool m_sumChargeShare = false;          /**< sum charge of PrimaryChargeShare and SecondaryChargeShare */
     float m_timeCut = 1;                  /**< cut range of hittiming for chargeshare */
-    double m_nCrossTalkRingingSamples;  /**< the number of samples to identify the hit as a cross talk hit when there is another cross talk hit in this number of samples before */
+    double m_nCrossTalkRingingSamples =
+      0;  /**< the number of samples to identify the hit as a cross talk hit when there is another cross talk hit in this number of samples before */
     int m_preValleyDepthLoose = 20; /**< loose threshold for depth of pre valley [ADC counts], for corss talk identification */
     int m_preValleyDepthTight =
       50; /**< tight threshold for depth of pre valley [ADC counts], identified as cross talk with loose threshold for the second peak amplitude */

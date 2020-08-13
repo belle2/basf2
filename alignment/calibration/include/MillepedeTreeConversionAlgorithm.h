@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALIGNMENT_MILLEPEDETREECONVERSIONALGORITHM_H
-#define ALIGNMENT_MILLEPEDETREECONVERSIONALGORITHM_H
+#pragma once
 
-/* Belle2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
@@ -38,7 +36,7 @@ namespace Belle2 {
     /**
      * Calibration.
      */
-    CalibrationAlgorithm::EResult calibrate();
+    CalibrationAlgorithm::EResult calibrate() override;
 
     /**
      * Set output file name.
@@ -53,6 +51,4 @@ namespace Belle2 {
   };
 
 }
-
-#endif
 

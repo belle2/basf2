@@ -8,24 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTGENINTERFACE_H
-#define EVTGENINTERFACE_H
+#pragma once
 
 
 #include <EvtGen/EvtGen.hh>
-#include <EvtGenBase/EvtCPUtil.hh>
 #include <EvtGenBase/EvtParticle.hh>
-#include <EvtGenBase/EvtParticleFactory.hh>
-#include <EvtGenBase/EvtRandom.hh>
 #include <EvtGenBase/EvtVector4R.hh>
 #include <generators/evtgen/EvtGenFwRandEngine.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <framework/logging/Logger.h>
 #include <framework/utilities/IOIntercept.h>
 
 #include <string>
-#include <fstream>
 
 namespace Belle2 {
 
@@ -42,14 +36,15 @@ namespace Belle2 {
      * - Make sure Random engine is setup correctly
      * - Create evt.pdl on the fly from current contents of particle database
      * - Add photos/all models
-     * - Use Coherent mixing
+     * - Use Coherent mixing unless set otherwise
      */
-    static EvtGen* createEvtGen(const std::string& decayFileName);
+    static EvtGen* createEvtGen(const std::string& decayFileName, bool coherentMixing);
 
     /**
      * Constructor.
      */
     EvtGenInterface(): m_parent(0), m_Generator(0), m_pinit(0, 0, 0, 0),
+      m_ParentInitialized(false),
       m_logCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100) {}
 
     /**
@@ -59,19 +54,24 @@ namespace Belle2 {
 
     /** Setup evtgen with the given decay files  */
     int setup(const std::string& decayFileName, const std::string& parentParticle,
-              const std::string& userFileName = std::string(""));
+              const std::string& userFileName = std::string(""), bool coherentMixing = true);
 
     /** Generate a single event */
     int simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle,
                       TVector3 pPrimaryVertex, int inclusiveType, const std::string& inclusiveParticle);
 
+    /** Simulate a particle decay. */
+    int simulateDecay(MCParticleGraph& graph,
+                      MCParticleGraph::GraphParticle& parent);
+
   private:
     /** Convert EvtParticle structure to flat MCParticle list */
-    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex);
+    int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex,
+                           MCParticleGraph::GraphParticle* parent, double timeOffset = 0);
 
     /** Copy parameters from EvtParticle to MCParticle */
-    void updateGraphParticle(EvtParticle* eParticle,
-                             MCParticleGraph::GraphParticle* gParticle, TVector3 pPrimaryVertex);
+    void updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
+                             TVector3 pPrimaryVertex, double timeOffset = 0);
 
   protected:
     EvtParticle* m_parent;      /**<Variable needed for parent particle.  */
@@ -79,9 +79,9 @@ namespace Belle2 {
     EvtGen* m_Generator;        /**<Variable needed for EvtGen generator. */
     EvtVector4R m_pinit;        /**<Variable needed for initial momentum. */
     EvtId m_ParentParticle;     /**<Variable needed for parent particle ID. */
+    bool m_ParentInitialized;   /**< Whether parent particle is initialized. */
     IOIntercept::OutputToLogMessages m_logCapture; /**< Capture evtgen log and transform into basf2 logging. */
   }; //! end of EvtGen Interface
 
 } //! end of Belle2 namespace
 
-#endif //EVTGENINTERFACE_H

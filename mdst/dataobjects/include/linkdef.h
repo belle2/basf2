@@ -15,31 +15,45 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::Cluster+;
+#pragma link C++ class Belle2::Cluster+; // checksum=0xa21d75ce, version=1
 
-#pragma link C++ class Belle2::MCParticle+;
-#pragma link C++ class vector<Belle2::MCParticle*>+;
-#pragma link C++ class Belle2::PIDLikelihood+;
-#pragma link C++ class Belle2::ECLCluster+;
+#pragma link C++ class Belle2::MCParticle+; // checksum=0x3dc6fb35, version=5
+#pragma link C++ class vector<Belle2::MCParticle*>+; // checksum=0xd52f5001, version=6
+#pragma link C++ class Belle2::PIDLikelihood+; // checksum=0x22bf2bf, version=3
+#pragma link C++ class Belle2::ECLCluster+; // checksum=0x3796684e, version=14
 
-#pragma link C++ class Belle2::KLMCluster+;
-#pragma link C++ class Belle2::KlId+;
+#pragma link C++ class Belle2::KLMCluster+; // checksum=0x9be09a36, version=2
+#pragma link C++ class Belle2::KlId+; // checksum=0xdc073aa, version=2
 
-#pragma link C++ class Belle2::EventLevelClusteringInfo+;
+#pragma link C++ class Belle2::EventLevelClusteringInfo+; // checksum=0x9b632f9, version=1
 
-#pragma link C++ class Belle2::Track+;
-#pragma link C++ class Belle2::HitPatternCDC+;
-#pragma link C++ class Belle2::HitPatternVXD+;
-#pragma link C++ class Belle2::TrackFitResult+;
-#pragma link C++ class Belle2::V0+;
-#pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+;
-#pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+;
-#pragma link C++ class pair<short, short>+;
-#pragma link C++ class Belle2::EventLevelTrackingInfo+;
+#pragma link C++ class Belle2::Track+; // checksum=0x320e0cd9, version=4
+#pragma link C++ class Belle2::HitPatternCDC+; // checksum=0x8d86d89e, version=-1
+#pragma link C++ class Belle2::HitPatternVXD+; // checksum=0x5599d6f5, version=-1
+#pragma link C++ class Belle2::TrackFitResult+; // checksum=0x1379b29f, version=7
+#pragma link C++ class Belle2::V0+; // checksum=0xeecaa9c4, version=3
+#pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+; // checksum=0x62cc1b16, version=-1
+#pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+; // checksum=0x43730546, version=-1
+#pragma link C++ class pair<short, short>+; // checksum=0x7069a6e4, version=-1
+#pragma link C++ class Belle2::EventLevelTrackingInfo+; // checksum=0x6360bfbf, version=2
 
-#pragma link C++ class Belle2::TRGSummary+;
-#pragma link C++ class Belle2::SoftwareTriggerResult+;
+#pragma link C++ class Belle2::TRGSummary+; // checksum=0x96c83b9b, version=5
+#pragma link C++ class Belle2::SoftwareTriggerResult+; // checksum=0xe5e47e9, version=5
 
+// ----------------------------------------------------------------------------
+// SoftwareTriggerResult
+// As of version 5, the result consists of a pair of prescaled - non prescaled result, not only a prescaled result.
+// We pad the non-prescaled one with 0, which is equal to "no result".
+#pragma read sourceClass="Belle2::SoftwareTriggerResult" version="[-4]" \
+  source="std::map<std::string, int> m_results" \
+  targetClass="Belle2::SoftwareTriggerResult" target="m_results" \
+  code="{ \
+    for(const auto& [key, prescaledResult] : onfile.m_results) { \
+      m_results[key] = std::make_pair(prescaledResult, 0); \
+    } \
+	}"
+
+// ----------------------------------------------------------------------------
 // Allow reading PIDLikelihood version <=2 (less particle types, different order)
 //
 // schema evolution rule as described in "Support For Significant Evolutions of the User Data Model In ROOT Files"
@@ -235,5 +249,12 @@
   source="float m_Error[6]" \
   targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_22" \
   code="{m_sqrtcovmat_22 = onfile.m_Error[5];}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-12]" \
+  source="int m_hypothesisId" \
+  targetClass="Belle2::ECLCluster" target="m_hypotheses" \
+  code="{ if(onfile.m_hypothesisId == 5) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_nPhotons); \
+        else if(onfile.m_hypothesisId == 6) m_hypotheses = static_cast<unsigned short>(Belle2::ECLCluster::EHypothesisBit::c_neutralHadron); \
+        else m_hypotheses = 0;}"
 
 #endif

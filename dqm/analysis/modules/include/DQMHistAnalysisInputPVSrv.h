@@ -4,7 +4,7 @@
 //
 // Author : B. Spruck
 // Date : 25 - Mar - 2017
-// based on wrok from Tomoyuki Konno, Tokyo Metropolitan Univerisity
+// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
 //-
 
 #pragma once
@@ -51,19 +51,21 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisInputPVSrvModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     // Data members
   private:
-    //! Hist memory
+    /** The refresh interval in ms. */
     int m_interval;
+    /** Whether to use EPICS callback for changes. */
     bool m_callback;
+    /** Whether to start http server on port 8082. */
     bool m_server;
     //THttpServer* m_serv{0};
     //int m_nhist = 0;
@@ -75,12 +77,15 @@ namespace Belle2 {
     std::vector<MYNODE*> pmynode;
 #endif
 
+    /** The metadata for each event. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
-    //! Exp number, Run number
-    unsigned int m_expno;
-    unsigned int m_runno;
-    unsigned int m_count;
+    /** Exp number */
+    unsigned int m_expno = 0;
+    /** Run number */
+    unsigned int m_runno = 0;
+    /** Event number */
+    unsigned int m_count = 0;
   };
 } // end namespace Belle2
 

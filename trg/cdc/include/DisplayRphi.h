@@ -63,10 +63,10 @@ namespace Belle2 {
 
   private: // Actions
     virtual void on_scale_value_changed(void);
-    virtual void on_positionReset(void);
+    virtual void on_positionReset(void) override;
     virtual void on_axial(void);
     virtual void on_stereo(void);
-    virtual void on_wireName(void);
+    virtual void on_wireName(void) override;
     virtual void on_BelleCDC(void);
 
   public: // Access to drawing area.

@@ -39,30 +39,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -79,6 +79,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_inputFileNames; /**< list of file names */
     std::string m_extensionName; /**< name added to default branch names */
+    std::string m_BackgroundInfoInstanceName = ""; /**< name BackgroundInfo name */
 
     TChain* m_tree = 0;            /**< tree pointer */
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */

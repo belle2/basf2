@@ -5,7 +5,7 @@
  * See .h file for a description.                                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -161,7 +161,7 @@ void ECLSplitterN2Module::event()
     aECLShower->setNumberOfCrystals(weightSum);
 
     aECLShower->setShowerId(iShower);
-    aECLShower->setHypothesisId(Belle2::ECLCluster::c_neutralHadron);
+    aECLShower->setHypothesisId(Belle2::ECLShower::c_neutralHadron);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
     B2DEBUG(175, "N2 shower " << iShower);

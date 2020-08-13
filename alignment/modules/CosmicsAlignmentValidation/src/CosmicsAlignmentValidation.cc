@@ -1,13 +1,9 @@
+
 #include <alignment/modules/CosmicsAlignmentValidation/CosmicsAlignmentValidation.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationVector.h>
-
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/Track.h>
 
 #include <genfit/Track.h>
 

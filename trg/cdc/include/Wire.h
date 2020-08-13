@@ -29,12 +29,19 @@ namespace Belle2 {
 
   typedef HepGeom::Point3D<double> Point3D;
   typedef HepGeom::Vector3D<double> Vector3D;
+/// type of the wire
 #define WireInnerLeft 0
+/// type of the wire
 #define WireInnerRight 1
+/// type of the wire
 #define WireLeft 2
+/// type of the wire
 #define WireRight 3
+/// type of the wire
 #define WireOuterLeft 4
+/// type of the wire
 #define WireOuterRight 5
+/// Max number of neighbors
 #define MaxNeighbors 6
 
   class TRGCDC;
@@ -81,16 +88,16 @@ namespace Belle2 {
     int localIdForMinus(void) const;
 
     /// returns name.
-    std::string name(void) const;
+    std::string name(void) const override;
 
     /// dumps debug information.
     void dump(const std::string& message = std::string(""),
-              const std::string& prefix = std::string("")) const;
+              const std::string& prefix = std::string("")) const override;
 
   public:// Modifiers
 
     /// clears information.
-    void clear(void);
+    void clear(void) override;
 
     /// returns a pointer to a TRGCDCWireHit.
     const TRGCDCWireHit* hit(const TRGCDCWireHit*);
@@ -104,7 +111,7 @@ namespace Belle2 {
   public:// TRG
 
     /// returns an input to the trigger. This is sync'ed to 1GHz clock.
-    const TRGSignal& signal(void) const;
+    const TRGSignal& signal(void) const override;
 
   private:
 

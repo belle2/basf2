@@ -7,19 +7,25 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  *                                                                        *
- * Read payloads ECLRefAmpl and ECLRefTime and use them to derive         *
- * payloads ECLCrystalElectronics or ECLCrystalElectronicsTime            *
+ * Standard usage is to read payloads ECLRefAmpl, ECLRefAmplNom,          *
+ * ECLRefTime and ECLRefTimeNom and use them to derive payloads           *
+ * ECLCrystalElectronics or ECLCrystalElectronicsTime                     *
+ *                                                                        *
+ * Alternatively, find new payloads ECLRefAmplNom or ECLRefTimeNom  to    *
+ * keep ECLCrystalElectronics or ECLCrystalElectronicsTime constant       *
  *                                                                        *
  * Also performs a comparison of new and existing calibration values and  *
  * writes these to a root file.                                           *
  *                                                                        *
  * Payloads are read from localdb if present, otherwise from              *
- * Calibration_Offline_Development, or Data_Taking_HLT.                   *
+ * ECL_localrun_data                                                      *
  * They are written to localdb with iov = exp,run,-1,-1                   *
  *                                                                        *
  * Usage:                                                                 *
  * eclElectronicsPayloads payloadName exp run [writeToDB]                 *
- * where payloadName = ECLCrystalElectronics or ECLCrystalElectronicsName *
+ * where payloadName = ECLCrystalElectronics, ECLCrystalElectronicsName,  *
+ * ECLRefAmplNom, or ECLRefTimeNom                                        *
+ *                                                                        *
  * exp and run specify the start of the iov, and are used to read         *
  * the reference amplitudes and times                                     *
  * Option argument writeToDB = 0 to not write output to database          *
@@ -32,14 +38,10 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/Database.h>
-#include <framework/database/LocalDatabase.h>
-#include <framework/database/DatabaseChain.h>
-#include <framework/database/ConditionsDatabase.h>
+#include <framework/database/Configuration.h>
 #include <framework/logging/LogSystem.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <iostream>
-#include <fstream>
 #include <TFile.h>
 #include <TH1F.h>
 
@@ -71,13 +73,10 @@ int main(int argc, char** argv)
     return -1;
   }
   std::string payloadName = argv[1];
-  bool findAmpl = false;
-  if (payloadName == "ECLCrystalElectronics") {
-    findAmpl = true;
-  } else if (payloadName == "ECLCrystalElectronicsTime") {
-    findAmpl = false;
-  } else {
-    std::cout << "First argument must be ECLCrystalElectronics or ECLCrystalElectronicsTime" << std::endl;
+  if (payloadName != "ECLCrystalElectronics" and payloadName != "ECLCrystalElectronicsTime" and payloadName != "ECLRefAmplNom"
+      and payloadName != "ECLRefTimeNom") {
+    std::cout << "First argument must be ECLCrystalElectronics, ECLCrystalElectronicsTime, ECLRefAmplNom, or ECLRefTimeNom" <<
+              std::endl;
     return -1;
   }
   int experiment = std::stoi(argv[2]);
@@ -89,12 +88,9 @@ int main(int argc, char** argv)
 
   //------------------------------------------------------------------------
   //..Specify database
-  Database::reset();
-  bool resetIovs = false;
-  DatabaseChain::createInstance(resetIovs);
-  ConditionsDatabase::createDefaultInstance("Data_Taking_HLT", LogConfig::c_Debug);
-  ConditionsDatabase::createInstance("Calibration_Offline_Development", "", "", "", LogConfig::c_Debug);
-  LocalDatabase::createInstance("localdb/database.txt", "", LogConfig::c_Debug);
+  auto& conf = Conditions::Configuration::getInstance();
+  conf.prependGlobalTag("ECL_localrun_data");
+  conf.prependTestingPayloadLocation("localdb/database.txt");
 
   //..set debug level
   LogConfig* logging = LogSystem::Instance().getLogConfig();
@@ -109,47 +105,64 @@ int main(int argc, char** argv)
   //..Read input and existing output payloads from database
   DBObjPtr<Belle2::ECLCrystalCalib> existingObject(payloadName);
   DBObjPtr<Belle2::ECLCrystalCalib> InputAmpl("ECLRefAmpl");
+  DBObjPtr<Belle2::ECLCrystalCalib> InputAmplNom("ECLRefAmplNom");
   DBObjPtr<Belle2::ECLCrystalCalib> InputTime("ECLRefTime");
+  DBObjPtr<Belle2::ECLCrystalCalib> InputTimeNom("ECLRefTimeNom");
+  DBObjPtr<Belle2::ECLCrystalCalib> CurrentElec("ECLCrystalElectronics");
+  DBObjPtr<Belle2::ECLCrystalCalib> CurrentTime("ECLCrystalElectronicsTime");
 
   //..Print out some information about the existing payload
-  std::cout << "Reading ECLRefAmpl, ECLRefTime, and " << payloadName << std::endl;
+  std::cout << "Reading ECLRefAmpl, ECLRefAmplNom, ECLRefTime, ECLRefTimeNom, ECLCrystalElectronics, and ECLCrystalElectronicsTime" <<
+            std::endl;
+  std::cout << "Dumping " << payloadName << std::endl;
   existingObject->Dump();
 
   //..Get vectors of values from the payloads
-  std::vector<float> currentValues;
-  std::vector<float> currentUnc;
-  currentValues = existingObject->getCalibVector();
-  currentUnc = existingObject->getCalibUncVector();
+  std::vector<float> currentValues = existingObject->getCalibVector();
+  std::vector<float> currentUnc = existingObject->getCalibUncVector();
 
-  std::vector<float> refAmpl;
-  std::vector<float> refAmplUnc;
-  refAmpl = InputAmpl->getCalibVector();
-  refAmplUnc = InputAmpl->getCalibUncVector();
+  std::vector<float> refAmpl = InputAmpl->getCalibVector();
+  std::vector<float> refAmplUnc = InputAmpl->getCalibUncVector();
 
-  std::vector<float> refTime;
-  std::vector<float> refTimeUnc;
-  refTime = InputTime->getCalibVector();
-  refTimeUnc = InputTime->getCalibUncVector();
+  std::vector<float> refAmplNom = InputAmplNom->getCalibVector();
+
+  std::vector<float> refTime = InputTime->getCalibVector();
+  std::vector<float> refTimeUnc = InputTime->getCalibUncVector();
+
+  std::vector<float> refTimeNom = InputTimeNom->getCalibVector();
+
+  std::vector<float> crysElec = CurrentElec->getCalibVector();
+
+  std::vector<float> crysTime = CurrentTime->getCalibVector();
+
 
   //..Print out a few values for quality control
   std::cout << std::endl << "Reference amplitudes and times read from database " << std::endl;
   for (int ic = 0; ic < 9000; ic += 1000) {
-    std::cout << "cellID " << ic + 1 << " ref amplitude = " << refAmpl[ic] << " +/- " << refAmplUnc[ic] << " ref time = " << refTime[ic]
-              << " +/- " << refTimeUnc[ic] << std::endl;
+    std::cout << "cellID " << ic + 1 << " ref amplitude = " << refAmpl[ic] << " +/- " << refAmplUnc[ic] << " nom = " << refAmplNom[ic]
+              << " ref time = " << refTime[ic]
+              << " +/- " << refTimeUnc[ic] << " nom = " << refTimeNom[ic] << std::endl;
   }
 
   //------------------------------------------------------------------------
-  //..Calculate the new values for ECLCrystalElectronics or ECLCrystalElectronicsTime
+  //..Calculate the new values for requested payload
   std::vector<float> newValues;
   std::vector<float> newUnc;
   for (int ic = 0; ic < 8736; ic++) {
-    if (findAmpl) {
-      newValues.push_back(17750. / refAmpl[ic]);
+    if (payloadName == "ECLCrystalElectronics") {
+      newValues.push_back(refAmplNom[ic] / refAmpl[ic]);
       newUnc.push_back(newValues[ic]*refAmplUnc[ic] / refAmpl[ic]);
-    } else {
-      newValues.push_back(refTime[ic]);
+    } else if (payloadName == "ECLCrystalElectronicsTime") {
+      newValues.push_back(refTime[ic] - refTimeNom[ic]);
       newUnc.push_back(refTimeUnc[ic]);
+    } else if (payloadName == "ECLRefAmplNom") {
+      newValues.push_back(crysElec[ic]*refAmpl[ic]);
+      newUnc.push_back(0.);
+    } else if (payloadName == "ECLRefTimeNom") {
+      newValues.push_back(refTime[ic] - crysTime[ic]);
+      newUnc.push_back(0.);
     }
+
   }
 
   //------------------------------------------------------------------------
@@ -159,6 +172,7 @@ int main(int argc, char** argv)
     std::cout << "cellID " << ic + 1 << " existing = " << currentValues[ic] << " +/- " << currentUnc[ic] << " new = " << newValues[ic]
               << " +/- " << newUnc[ic] << std::endl;
   }
+  std::cout << std::endl;
 
   TString payloadTitle = payloadName;
   payloadTitle += "_";
@@ -171,15 +185,30 @@ int main(int argc, char** argv)
   TString htitle = payloadTitle;
   htitle += " existing calibration values;cellID";
   TH1F* existingCalib = new TH1F("existingCalib", htitle, 8736, 1, 8737);
+
   htitle = payloadTitle;
   htitle += " new calibration values;cellID";
   TH1F* newCalib = new TH1F("newCalib", htitle, 8736, 1, 8737);
+
   htitle = payloadTitle;
   htitle += " ratio";
   TH1F* calibRatio = new TH1F("calibRatio", htitle, 200, 0.9, 1.1);
+
   htitle = payloadTitle;
   htitle += " difference";
   TH1F* calibDiff = new TH1F("calibDiff", htitle, 200, -100, 100);
+
+  htitle = payloadTitle;
+  htitle += " reference";
+  TH1F* refValues = new TH1F("refValues", htitle, 8736, 1, 8737);
+
+  htitle = payloadTitle;
+  htitle += " ratio vs cellID;cellID;new/old";
+  TH1F* ratioVsCellID = new TH1F("ratioVsCellID", htitle, 8736, 1, 8737);
+
+  htitle = payloadTitle;
+  htitle += " diff vs cellID;cellID;new - old";
+  TH1F* diffVsCellID = new TH1F("diffVsCellID", htitle, 8736, 1, 8737);
 
   for (int cellID = 1; cellID <= 8736; cellID++) {
     float oldValue = currentValues[cellID - 1];
@@ -196,13 +225,33 @@ int main(int argc, char** argv)
     newCalib->SetBinContent(cellID, newValue);
     newCalib->SetBinError(cellID, newUnc[cellID - 1]);
     calibRatio->Fill(ratio);
+    ratioVsCellID->SetBinContent(cellID, ratio);
+    ratioVsCellID->SetBinError(cellID, 0);
     calibDiff->Fill(newValue - oldValue);
+    diffVsCellID->SetBinContent(cellID, newValue - oldValue);
+    diffVsCellID->SetBinError(cellID, 0);
+    if (payloadName == "ECLCrystalElectronics" or payloadName == "ECLRefAmplNom") {
+      refValues->SetBinContent(cellID, refAmpl[cellID - 1]);
+      refValues->SetBinError(cellID, refAmplUnc[cellID - 1]);
+    } else {
+      refValues->SetBinContent(cellID, refTime[cellID - 1]);
+      refValues->SetBinError(cellID, refTimeUnc[cellID - 1]);
+    }
+
+    //..Note any large changes
+    if ((payloadName == "ECLCrystalElectronics" or payloadName == "ECLRefAmplNom") and (ratio<0.99 or ratio>1.01)) {
+      std::cout << "Ratio = " << ratio << " for cellID = " << cellID << " refAmpl = " << refAmpl[cellID - 1] << " refAmplNom = " <<
+                refAmplNom[cellID - 1] << std::endl;
+    } else if (abs(newValue - oldValue) > 20.) {
+      std::cout << "Difference = " << newValue - oldValue << " for cellID = " << cellID << " refTime = " << refTime[cellID - 1] <<
+                " refTimeNom = " << refTimeNom[cellID - 1] << std::endl;
+    }
   }
 
   hfile.cd();
   hfile.Write();
   hfile.Close();
-  std::cout << "Comparison of existing and new calibration values written to " << fname << std::endl;
+  std::cout << std::endl << "Comparison of existing and new calibration values written to " << fname << std::endl;
 
   //------------------------------------------------------------------------
   //..Write out to localdb if requested

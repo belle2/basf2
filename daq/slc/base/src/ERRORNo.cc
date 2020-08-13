@@ -9,7 +9,7 @@ const ERRORNo ERRORNo::NSMMEMOPEN(13, "SENOPEN");
 const ERRORNo ERRORNo::NSMINIT(14, "NSMINIT");
 const ERRORNo ERRORNo::DATABASE(31, "DATABASE");
 
-const ERRORNo& ERRORNo::operator=(const std::string& label) throw()
+const ERRORNo& ERRORNo::operator=(const std::string& label)
 {
   if (label == NSMSENDREQ.getLabel()) {
     return NSMSENDREQ;
@@ -26,7 +26,7 @@ const ERRORNo& ERRORNo::operator=(const std::string& label) throw()
   }
 }
 
-const ERRORNo& ERRORNo::operator=(int id) throw()
+const ERRORNo& ERRORNo::operator=(int id)
 {
   if (id == NSMSENDREQ.getId()) {
     return NSMSENDREQ;
@@ -42,7 +42,7 @@ const ERRORNo& ERRORNo::operator=(int id) throw()
   return UNKNOWN;
 }
 
-const ERRORNo& ERRORNo::operator=(const char* label) throw()
+const ERRORNo& ERRORNo::operator=(const char* label)
 {
   if (label != NULL)  *this = std::string(label);
   else *this = Enum::UNKNOWN;

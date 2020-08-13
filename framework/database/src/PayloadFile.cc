@@ -10,7 +10,6 @@
 
 #include <framework/database/PayloadFile.h>
 #include <framework/logging/Logger.h>
-#include <iostream>
 #include <fstream>
 
 using namespace std;

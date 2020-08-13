@@ -1,12 +1,12 @@
 #include "daq/slc/database/MonitorDB.h"
 
+#include <daq/slc/database/DBHandlerException.h>
 #include <daq/slc/system/LogFile.h>
 
 using namespace Belle2;
 
 void MonitorDB::add(DBInterface& db, const std::string& table,
                     const std::string& vname, int val)
-throw(DBHandlerException)
 {
   try {
     createTable(db, table);
@@ -20,7 +20,6 @@ throw(DBHandlerException)
 
 void MonitorDB::add(DBInterface& db, const std::string& table,
                     const std::string& vname, float val)
-throw(DBHandlerException)
 {
   try {
     createTable(db, table);
@@ -34,7 +33,6 @@ throw(DBHandlerException)
 
 void MonitorDB::add(DBInterface& db, const std::string& table,
                     const std::string& vname, const std::string& val)
-throw(DBHandlerException)
 {
   try {
     createTable(db, table);

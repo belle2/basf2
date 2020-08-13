@@ -12,6 +12,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <TDirectory.h>
+#include <boost/format.hpp>
 #include <string>
 
 using namespace std;
@@ -35,7 +36,7 @@ PXDRawDQMModule::PXDRawDQMModule() : HistoModule() , m_storeRawPxdrarray() , m_s
   //Set module properties
   setDescription("Monitor raw PXD");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("histgramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("pxdraw"));
 
   addParam("RawPXDsName", m_storeRawPxdrarrayName, "The name of the StoreArray of RawPXDs to be processed", string(""));
@@ -68,9 +69,7 @@ void PXDRawDQMModule::defineHisto()
 
     // Check if sensor exist
     if (Belle2::VXD::GeoCache::getInstance().validSensorID(Belle2::VxdID(layer, ladder, sensor))) {
-      //cppcheck-suppress zerodiv
       string s = str(format("Sensor %d:%d:%d (DHH ID %02Xh)") % layer % ladder % sensor % i);
-      //cppcheck-suppress zerodiv
       string s2 = str(format("_%d.%d.%d") % layer % ladder % sensor);
 
       hrawPxdHitMap[i] = new TH2F(("hrawPxdHitMap" + s2).c_str(),
@@ -150,7 +149,7 @@ void PXDRawDQMModule::event()
     auto dhh_id = dhe->getDHEID();
     auto startGate = dhe->getTriggerGate();
 
-    if (dhh_id <= 0 || dhh_id >= 64) {
+    if (dhh_id == 0 || dhh_id >= 64) {
       B2ERROR("SensorId (DHH ID) out of range: " << dhh_id);
       continue;
     }

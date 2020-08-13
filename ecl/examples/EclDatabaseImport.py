@@ -1,50 +1,71 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# This steering file shows how to use the EclDatabaseImport
-# to import dummy data (as TH1) into a payload ROOT file
-#
-# The user should provide input and output root filname
-# as first and second argument respectively. Comment
-# in the importer you need at the end.Upload the local DB
-# afterwards.
-#
-# Example steering file - 2015 Belle II Collaboration
-# Author(s): Torben Ferber (ferber@physics.ubc.ca)
-#            Alon Hershenhorn (hersehn@physics.ubc.ca)
-#
-########################################################
+"""This steering file shows how to use the EclDatabaseImport
+   to import dummy data (as TH1) into a payload ROOT file.
 
-from basf2 import *
+The user should provide input and output root file name as
+first and second argument, respectively. Comment in the
+importer you need at the end. Upload the local DB afterwards.
+"""
+
+import sys
+import glob
+import basf2 as b2
 import ROOT
 from ROOT.Belle2 import ECLDatabaseImporter
-import glob
-import sys
+
+__authors__ = ['Torben Ferber', 'Alon Hershenhorn',
+               'Frank Meier']
+__copyright__ = 'Copyright 2018 - Belle II Collaboration'
+__maintainer__ = '--'
+__emails__ = '--'
+
+if len(sys.argv) != 3:
+    print('Usage: basf2 {} inputFile outputFile'.format(sys.argv[0]))
+    sys.exit(1)
 
 inputFile = sys.argv[1]
 outputFile = sys.argv[2]
 
-# register event info setter
-eventinfo = register_module('EventInfoSetter')
-eventinfo.initialize()
+# Register 'EventInfoSetter' module
+eventInfoSetter = b2.register_module('EventInfoSetter')
+eventInfoSetter.initialize()
 
-# register gearbox
-gearbox = register_module('Gearbox')
+# Register 'Gearbox' module
+gearbox = b2.register_module('Gearbox')
 gearbox.initialize()
 
 rootFiles = ROOT.vector('string')()
 [rootFiles.push_back(name) for name in glob.glob(inputFile)]
 eclDBImporter = ECLDatabaseImporter(rootFiles, outputFile)
 
-# Import ECL energy calibration constants to the database (examples/CreateEclDigitTestPayload.C)
+"""Import ECL energy calibration constants to the database
+(examples/CreateEclDigitTestPayload.C)
+"""
 eclDBImporter.importDigitEnergyCalibration()
 
-# Import ECL time calibration constants to the database (input file from Chris Hearty)
+"""Import ECL time calibration constants to the database
+(input file from Chris Hearty)
+"""
 # eclDBImporter.importDigitTimeCalibration()
 
-# Import ECL shower shape corrections to second moment to the database (input file from Savino Longo)
+"""Import ECL shower shape corrections to second moment
+to the database (input file from Savino Longo)
+"""
 # eclDBImporter.importShowerShapesSecondMomentCorrections()
 
-# Import ECL leakage corrections to showers (input file from Suman Koirala)
+"""Import ECL leakage corrections to showers
+(input file from Suman Koirala)
+"""
 # eclDBImporter.importShowerCorrectorLeakageCorrections()
+
+"""Import threshold values for track ECL cluster matching
+(input file from Frank Meier)
+"""
+# eclDBImporter.importTrackClusterMatchingThresholds()
+
+"""Import RMS parameterizations for track ECL cluster matching
+(input file from Frank Meier)
+"""
+# eclDBImporter.importTrackClusterMatchingParameterizations()

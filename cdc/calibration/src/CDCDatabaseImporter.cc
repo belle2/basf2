@@ -12,20 +12,16 @@
 #include <cdc/calibration/CDCDatabaseImporter.h>
 
 // framework - Database
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
 #include <framework/database/DBImportObjPtr.h>
 
-// framework - xml
-#include <framework/gearbox/GearDir.h>
-
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+// framework timer
+#include <framework/utilities/Utils.h>
 
 // DB objects
 #include <cdc/dataobjects/WireID.h>
@@ -36,19 +32,28 @@
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
+#include <cdc/dbobjects/CDCFudgeFactorsForSigma.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
+#include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <cdc/dbobjects/CDCWireHitRequirements.h>
+#include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
-
+#include <TFile.h>
+#include <TTreeReader.h>
+#include <TH1F.h>
 #include <iostream>
 #include <fstream>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -128,6 +133,7 @@ void CDCDatabaseImporter::importChannelMap(std::string fileName)
 
 }
 
+
 void CDCDatabaseImporter::importFEElectronics(std::string fileName)
 {
   std::ifstream stream;
@@ -140,14 +146,17 @@ void CDCDatabaseImporter::importFEElectronics(std::string fileName)
 
   DBImportArray<CDCFEElectronics> cf;
 
-  short width, delay, aTh, tThmV, tTheV, l1late;
+  //  short width, delay, aTh, tThmV, tTheV, l1late;
+  short ib, width, delay, aTh, tThmV;
 
   //  int i=-1;
-  while (stream >> width) {
-    stream >> delay >> aTh >> tThmV >> tTheV >> l1late;
+  while (stream >> ib) {
+    //    stream >> delay >> aTh >> tThmV >> tTheV >> l1late;
+    stream >> width >> delay >> aTh >> tThmV;
     //    ++i;
     //    std::cout << i <<" "<< width << std::endl;
-    cf.appendNew(width, delay, aTh, tThmV, tTheV, l1late);
+    //    cf.appendNew(width, delay, aTh, tThmV, tTheV, l1late);
+    cf.appendNew(ib, width, delay, aTh, tThmV);
   }
   stream.close();
 
@@ -156,9 +165,60 @@ void CDCDatabaseImporter::importFEElectronics(std::string fileName)
 
   cf.import(iov);
 
-  B2RESULT("FEElectronics imported to database.");
-
+  B2RESULT("FEEElectronics imported to database.");
 }
+
+
+void CDCDatabaseImporter::importEDepToADC(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCEDepToADCConversions> etoa;
+  etoa.construct();
+
+  unsigned short paramMode(0), nParams(0);
+  stream >> paramMode >> nParams;
+  etoa->setParamMode(paramMode);
+
+  unsigned short groupId(0);
+  stream >> groupId;
+  B2INFO(paramMode << " " << nParams << " " << groupId);
+  if (groupId > 1) B2FATAL("invalid groupId now !");
+  etoa->setGroupID(groupId);
+
+  unsigned short id = 0;
+  std::vector<float> coeffs(nParams);
+  int nRead = 0;
+
+  while (stream >> id) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
+    }
+    ++nRead;
+    etoa->setParams(id, coeffs);
+  }
+  stream.close();
+
+  unsigned short nId = 9;
+  if (groupId == 1) {
+    nId = MAX_N_SLAYERS;
+  } else if (groupId == 2) {
+    nId = 14336;
+  }
+  if (nRead != nId) B2FATAL("#lines read-in (=" << nRead << ") is not equal #ids (=" << nId << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  etoa.import(iov);
+  B2RESULT("EDep-toADC table imported to database.");
+}
+
 
 void CDCDatabaseImporter::importBadWire(std::string fileName)
 {
@@ -174,14 +234,15 @@ void CDCDatabaseImporter::importBadWire(std::string fileName)
   bw.construct();
 
   int iL(0), iC(0), nRead(0);
+  double effi(0.);
 
   while (true) {
-    stream >> iL >> iC;
+    stream >> iL >> iC >> effi;
     if (stream.eof()) break;
     ++nRead;
-    bw->setWire(WireID(iL, iC));
+    bw->setWire(WireID(iL, iC), effi);
     //      if (m_debug) {
-    //  std::cout << iL << " " << iC << std::endl;
+    //  std::cout << iL << " " << iC << " " << effi << std::endl;
     //      }
   }
   stream.close();
@@ -505,6 +566,48 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
 }
 
 
+void CDCDatabaseImporter::importFFactor(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCFudgeFactorsForSigma> etoa;
+  etoa.construct();
+
+  unsigned short groupId(0), nParams(0);
+  stream >> groupId >> nParams;
+  B2INFO(groupId << " " << nParams);
+  if (groupId != 0) B2FATAL("invalid groupId now !");
+  etoa->setGroupID(groupId);
+
+  unsigned short id = 0;
+  std::vector<float> coeffs(nParams);
+  int nRead = 0;
+
+  while (stream >> id) {
+    for (unsigned short i = 0; i < nParams; ++i) {
+      stream >> coeffs[i];
+    }
+    ++nRead;
+    etoa->setFactors(id, coeffs);
+  }
+  stream.close();
+
+  unsigned short nId = 1;
+  if (nRead != nId) B2FATAL("#lines read-in (=" << nRead << ") is not equal #ids (=" << nId << ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  etoa.import(iov);
+  B2RESULT("Fudge factor table imported to database.");
+}
+
+
 void CDCDatabaseImporter::importDisplacement(std::string fileName)
 {
   //read alpha bins
@@ -638,12 +741,18 @@ void CDCDatabaseImporter::printFEElectronics()
 {
   DBArray<CDCFEElectronics> fEElectronics;
   for (const auto& cf : fEElectronics) {
-    std::cout << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay() << " "
-              << cf.getADCThresh() << " "
-              << cf.getTDCThreshInMV() << " "
-              << cf.getTDCThreshInEV() << " "
-              << cf.getL1TrgLatency() << std::endl;
+    std::cout << cf.getBoardID() << " " << cf.getWidthOfTimeWindow() << " " << cf.getTrgDelay() << " " << cf.getADCThresh() << " " <<
+              cf.getTDCThreshInMV() << std::endl;
   }
+  //              << cf.getTDCThreshInMV() << " "
+  //              << cf.getTDCThreshInEV() << " "
+  //              << cf.getL1TrgLatency() << std::endl;
+}
+
+void CDCDatabaseImporter::printEDepToADC()
+{
+  DBObjPtr<CDCEDepToADCConversions> etoa;
+  etoa->dump();
 }
 
 void CDCDatabaseImporter::printTimeZero()
@@ -688,6 +797,12 @@ void CDCDatabaseImporter::printSigma()
 {
   DBObjPtr<CDCSpaceResols> sgm;
   sgm->dump();
+}
+
+void CDCDatabaseImporter::printFFactor()
+{
+  DBObjPtr<CDCFudgeFactorsForSigma> ff;
+  ff->dump();
 }
 
 void CDCDatabaseImporter::printDisplacement()
@@ -778,6 +893,166 @@ void CDCDatabaseImporter::printADCDeltaPedestal()
   DBObjPtr<CDCADCDeltaPedestals> dbPed;
   dbPed->dump();
 }
+
+void CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& jsonFileName) const
+{
+
+  // Create a property tree
+  boost::property_tree::ptree tree;
+
+  try {
+
+    // Load the json file in this property tree.
+    B2INFO("Loading json file: " << jsonFileName);
+    boost::property_tree::read_json(jsonFileName, tree);
+
+  } catch (boost::property_tree::ptree_error& e) {
+    B2FATAL("Error when loading json file: " << e.what());
+  }
+
+  DBImportObjPtr<CDCWireHitRequirements> dbWireHitReq;
+  dbWireHitReq.construct(tree);
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbWireHitReq.import(iov);
+
+  B2RESULT("CDCWireHit requirements imported to database.");
+}
+
+void CDCDatabaseImporter::printCDCWireHitRequirements() const
+{
+
+  DBObjPtr<CDCWireHitRequirements> dbWireHitReq;
+  if (dbWireHitReq.isValid()) {
+    dbWireHitReq->dump();
+  } else {
+    B2WARNING("DBObjPtr<CDCWireHitRequirements> not valid for the current run.");
+  }
+}
+
+void CDCDatabaseImporter::importCDCCrossTalkLibrary(const std::string& rootFileName) const
+{
+  DBImportObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLibrary;
+  dbCDCCrossTalkLibrary.construct();
+
+  TFile fIn = TFile(rootFileName.c_str());
+  TTreeReader reader("my_ttree", &fIn);
+  TTreeReaderValue<UChar_t> Board(reader, "Board");
+  TTreeReaderValue<UChar_t> Channel(reader, "Channel");
+  TTreeReaderValue<Short_t> Asic_ADC0(reader, "Asic_ADC0");
+  TTreeReaderValue<Short_t> Asic_TDC0(reader, "Asic_TDC0");
+  TTreeReaderValue<Short_t> Asic_TOT0(reader, "Asic_TOT0");
+  TTreeReaderValue<Short_t> Asic_ADC1(reader, "Asic_ADC1");
+  TTreeReaderValue<Short_t> Asic_TDC1(reader, "Asic_TDC1");
+  TTreeReaderValue<Short_t> Asic_TOT1(reader, "Asic_TOT1");
+  TTreeReaderValue<Short_t> Asic_ADC2(reader, "Asic_ADC2");
+  TTreeReaderValue<Short_t> Asic_TDC2(reader, "Asic_TDC2");
+  TTreeReaderValue<Short_t> Asic_TOT2(reader, "Asic_TOT2");
+  TTreeReaderValue<Short_t> Asic_ADC3(reader, "Asic_ADC3");
+  TTreeReaderValue<Short_t> Asic_TDC3(reader, "Asic_TDC3");
+  TTreeReaderValue<Short_t> Asic_TOT3(reader, "Asic_TOT3");
+  TTreeReaderValue<Short_t> Asic_ADC4(reader, "Asic_ADC4");
+  TTreeReaderValue<Short_t> Asic_TDC4(reader, "Asic_TDC4");
+  TTreeReaderValue<Short_t> Asic_TOT4(reader, "Asic_TOT4");
+  TTreeReaderValue<Short_t> Asic_ADC5(reader, "Asic_ADC5");
+  TTreeReaderValue<Short_t> Asic_TDC5(reader, "Asic_TDC5");
+  TTreeReaderValue<Short_t> Asic_TOT5(reader, "Asic_TOT5");
+  TTreeReaderValue<Short_t> Asic_ADC6(reader, "Asic_ADC6");
+  TTreeReaderValue<Short_t> Asic_TDC6(reader, "Asic_TDC6");
+  TTreeReaderValue<Short_t> Asic_TOT6(reader, "Asic_TOT6");
+  TTreeReaderValue<Short_t> Asic_ADC7(reader, "Asic_ADC7");
+  TTreeReaderValue<Short_t> Asic_TDC7(reader, "Asic_TDC7");
+  TTreeReaderValue<Short_t> Asic_TOT7(reader, "Asic_TOT7");
+
+  while (reader.Next()) {
+    asicChannels record{
+      asicChannel{*Asic_TDC0, *Asic_ADC0, *Asic_TOT0},
+      asicChannel{*Asic_TDC1, *Asic_ADC1, *Asic_TOT1},
+      asicChannel{*Asic_TDC2, *Asic_ADC2, *Asic_TOT2},
+      asicChannel{*Asic_TDC3, *Asic_ADC3, *Asic_TOT3},
+      asicChannel{*Asic_TDC4, *Asic_ADC4, *Asic_TOT4},
+      asicChannel{*Asic_TDC5, *Asic_ADC5, *Asic_TOT5},
+      asicChannel{*Asic_TDC6, *Asic_ADC6, *Asic_TOT6},
+      asicChannel{*Asic_TDC7, *Asic_ADC7, *Asic_TOT7}
+    };
+    // Determine ADC of the signal
+    UChar_t asicCh = *Channel % 8;
+    Short_t ADC = record[asicCh].ADC;
+    dbCDCCrossTalkLibrary->addAsicRecord(asicCh, ADC, record);
+  }
+
+  // Now also get the x-talk probability
+  double probs[8196];
+  TH1F* prob;
+  fIn.GetObject("ProbXTalk", prob);
+  for (size_t a = 1; a <= 8196; a += 1) {
+    probs[a - 1] = prob->GetBinContent(a);
+  }
+  fIn.Close();
+  dbCDCCrossTalkLibrary->setPCrossTalk(probs);
+
+  dbCDCCrossTalkLibrary->dump(0);
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbCDCCrossTalkLibrary.import(iov);
+  B2RESULT("CDCCrossTalkLibrary requirements imported to database.");
+}
+
+void CDCDatabaseImporter::printCDCCrossTalkLibrary() const
+{
+  DBObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLib;
+  if (dbCDCCrossTalkLib.isValid()) {
+    dbCDCCrossTalkLib->dump(1);
+  } else {
+    B2ERROR("DBObjPtr<CDCCrossTalkLibrary> not valid for the current run.");
+  }
+}
+
+void CDCDatabaseImporter::testCDCCrossTalkLibrary(bool spotChecks) const
+{
+  DBObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLib;
+
+  if (dbCDCCrossTalkLib.isValid()) {
+
+    if (! spotChecks) {
+      B2INFO("Performing CDCCrossTalkLibrary checks");
+      auto timer = new Utils::Timer("CDCCrossTalkLibrary checks took"); // use "new" to avoid cpp-check warning
+      int counter = 0;
+      int size = 0;
+      for (Short_t ADC = 0; ADC < 8196; ADC += 1) {
+        for (Short_t channel = 0; channel < 48; channel += 1) {
+          for (size_t rep = 0; rep < 100; rep += 1) {
+            auto xtalk = dbCDCCrossTalkLib->getLibraryCrossTalk(channel, 4999, ADC, 5, 0, false);
+            counter += 1;
+            size += xtalk.size();
+          }
+        }
+      }
+      B2INFO("CDCCrossTalkLibrary called " << counter << " times. Total number of cross talk hits " << size);
+      delete timer;
+      return;
+    }
+
+
+    Short_t ADC_spot_checks[5] = {2, 100, 500, 1000, 5000};
+    for (auto ADC :  ADC_spot_checks) {
+      B2INFO("CHECK ADC=" << ADC);
+
+      size_t NRep = ADC < 50 ? 100 : 10;
+      for (size_t rep = 0; rep < NRep; rep += 1) {
+        auto xtalk = dbCDCCrossTalkLib->getLibraryCrossTalk(0, 4999, ADC, 5, 0, true);
+        B2INFO("Size = " << xtalk.size());
+        for (auto [channel, rec] : xtalk) {
+          B2INFO("Channel:" << channel << " TDC,ADC,TOT:" << rec.TDC << "," << rec.ADC << "," << rec.TOT);
+        }
+      }
+    }
+  } else {
+    B2ERROR("DBObjPtr<CDCCrossTalkLibrary> not valid for the current run.");
+  }
+}
+
 
 //Note; the following function is no longer needed
 #if 0

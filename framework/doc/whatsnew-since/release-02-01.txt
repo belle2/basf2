@@ -1,0 +1,217 @@
+Changes in the framework package
+--------------------------------
+
+Python Interface
+++++++++++++++++
+
+The `basf2` python interface has been restructured into multiple files to ease
+maintenance. For the user this should be transparent. Some changes the user
+might notice are
+
+* There is now a new utility function `basf2.find_file` to allow looking for
+  files in the release directory or separate examples or validation
+  directories.
+
+* There is now an automatic Jupyter_ integration: Calling `basf2.process` in a
+  Jupyter_ notebook should now automatically run the processing in a separate
+  process and show a nice progress bar.
+
+* The obsolete "fw" object has been deprecated and all functionality which
+  previously was accessed using ``basf2.fw.*`` is now directly accessible as
+  ``basf2.*``. If you use ``basf2.fw`` you will get a deprecation warning.
+
+* When using ``from basf2 import *`` the `sys` and `os` packages were also
+  silently imported and available in the current script. This has been
+  deprecated. In general, using ``import *`` is **not recommended** but if you
+  have to use it and use the `sys` or `os` module in the script please make
+  sure you import them yourself **after** ``from basf2 import *``
+
+* Display and colouring of log messages in Jupyter_ has been significantly
+  improved and should now be much faster.
+
+* There's a new implementation for `pager.Pager <terminal_utils.Pager>` which
+  can also show output from C++ programs and will display the output
+  incrementally instead of waiting for all output before showing everything.
+
+Command Line Tools
+++++++++++++++++++
+
+* :ref:`b2file-check <b2file-check>` now supports files with zero events correctly.
+
+* :ref:`b2file-merge <b2file-merge>` now checks that real/MC data flag is consistent for all
+  input files and refuse to merge mixed real/MC files.
+
+* The subcommands ``iov`` and ``diff`` of :ref:`b2conditionsdb <b2conditionsdb>`
+  have improved output and learned the new option ``--human-readable`` to
+  convert the IntervalOfValidity numbers to easier to read strings.
+
+* There is a new sub command ``dump`` for :ref:`b2conditionsdb <b2conditionsdb>`
+  to dump the contents of a payload file in a human readable form on the
+  terminal for quick inspection.
+
+* There is a new command :ref:`b2conditionsdb-extract <b2conditionsdb-extract>`
+  which allows to convert a payload to a TTree with one entry per requested run
+  number. This allows to easily monitor how payloads change over the course of
+  time.
+
+* There is a new command :ref:`b2conditionsdb-recommend <b2conditionsdb-recommend>`
+  which will recommend users a global tag to use when processing a given input
+  file.
+
+* There is a new command :ref:`b2conditionsdb-request <b2conditionsdb-request>`
+  to allow requesting the inclusion of locally prepared database payload into
+  the official global tags.
+
+
+Core Framework
+++++++++++++++
+
+* ``Environment::isMC()`` is now available to consistently distinguish
+  between real and MC data. To use it in C++ please use
+
+  .. code-block:: c++
+
+      #include <framework/core/Environment.h>
+      bool isMC = Environment::Instance().isMC();
+
+  and for use in python
+
+  .. code-block:: python
+
+      from ROOT import Belle2
+      isMC = Belle2.Environment.Instance().isMC();
+
+* We have now a new prototype for advanced multi processing using ZMQ.
+  It is disabled by default but can be activated using
+
+  .. code-block:: python
+
+      from ROOT import Belle2
+      env = Belle2.Environment.Instance().setUseZMQ(True)
+
+  .. seealso::
+
+      Pull request `[PR#2790] <https://stash.desy.de/projects/B2/repos/software/pull-requests/2790>`_
+
+
+* There is now support for named relations to allow multiple relations
+  between the same pair of ``StoreArray``.
+
+Core Modules
+++++++++++++
+
+* The :b2:mod:`ProgressBar` module will now notice if the output is written to a log file
+  instead of the terminal and behave accordingly which should clean up
+  logfiles considerably when this module is used.
+
+* The :b2:mod:`RootOutput` module now allows to split output files after a
+  certain file size is reached using the ``outputSplitSize`` parameter.
+
+  .. warning:: This will set the amount of generated events stored in the
+        file metadata to zero as it is not possible to determine which fraction
+        ends up in which output file.
+
+  Also the user can now choose the compression algorithm to choose either no
+  compression, zlib, LZMA or LZ4 compression. LZ4 is a newer compression
+  standard with slightly worse compression than zlib but much faster
+  decompression speed.
+
+* removed ``CrashHandler`` module
+* removed ``FileLogger`` module
+
+.. rubric:: Conditions Database:
+
+* Database objects are now immutable (``const``) to prevent accidental
+  modification of conditions data.
+* The old and outdated fallback database in ``framework/data/database.txt``
+  has been removed. If you still set this by hand in your steering file your
+  script will fail. Please use ``/cvmfs/belle.cern.ch/conditions`` if you
+  really have to set a fallback database manually.
+* The ``RunInfo`` database object which is supposed to contain all necessary
+  information about each run now has support to contain the trigger pre-scale
+  information.
+
+Logging System
+++++++++++++++
+
+* We now have "Log message variables" which allow to send the same log
+  message with varying content. This greatly helps with filtering log
+  messages as it allows to group messages which have the same content and
+  just differ in their variables. In C++ they can be used by adding a
+  ``LogVar`` instance to the output,
+
+  .. code-block:: c++
+
+     B2INFO("This is a log message" << LogVar("number", 3.14) << LogVar("text", "some text"));
+
+  while in python the variables can be given as additional keyword arguments,
+
+  .. code-block:: python
+
+     basf2.B2INFO("This is a log message", number=3.14, text="some text")
+
+  In both cases the names of the variables can be chosen feely and the output
+  should be something like
+
+  .. code-block:: text
+
+     [INFO] This is a log message
+             number = 3.14
+             text = some text
+
+  .. seealso:: :ref:`logging_logvariables`
+
+* The logging system is now able to send its message to python `sys.stdout`
+  objects to allow intercepting log messages in python. To enable please set
+  `basf2.logging.enable_python_logging <basf2.LogPythonInterface.enable_python_logging>` to `True`.
+  This is automatically enabled when running inside of a jupyter notebook.
+
+* Log messages can also be formatted as json objects where each log message
+  will be printed as a one line json object to allow parsing of logfiles
+  using scripts.
+
+  .. seealso:: `basf2.logging.add_json() <basf2.LogPythonInterface.add_json>`
+
+Utilities
++++++++++
+
+* We have a new and advanced formula parser implementation in the framework
+  package. It manages to handle ``**`` correctly as in python and now allows
+  using normal parenthesis for grouping operations in addition to square
+  brackets.
+
+  .. seealso:: :b2:var:`formula` variable
+
+* We now provide a variety of `RAII <https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization>`_
+  scope guards to free or restore a resource or value when the guard object
+  goes out of scope. For example to make sure a
+  variable is reset to is original value one could use
+
+  .. code-block:: c++
+
+      #include <framework/utilities/ScopeGuard.h>
+
+      int main() {
+        int myValue{5};
+        {
+          auto guard = Belle2::ScopeGuard::guardValue(myValue, 32);
+          // now myValue is 32
+        }
+        // now myValue is reverted to 5 independently of how the scope
+        // is left (normal, return statement, exception)
+      }
+
+  We provide convenience functions to guard simple values, pointer deletion,
+  output stream flags and the current working directory but the interface is
+  general enough that almost anything can be guarded by this ``ScopeGuard``
+  object.
+
+* There is now ``RootFileManager`` to allow multiple modules to write to the
+  same root output file. It will take care to open the file when the first
+  module requests it and close it when the last module is finished with the
+  root file. The primary use case is for the :b2:mod:`VariablesToNtuple` and
+  similar modules to allow having multiple ntuples or trees in the same root file.
+
+* We now have a implementation of the c++17 `std::visit overloaded pattern <https://en.cppreference.com/w/cpp/utility/variant/visit>`_ in ``framework/utils/Utils.h`` called ``Belle2::Utils::VisitOverload``.
+
+.. _Jupyter: https://jupyter.org/

@@ -5,10 +5,13 @@ import ROOT
 import re
 import functools
 import numpy as np
+#: ignore invalid floating-point operations
 np.seterr(invalid='ignore')
 
 import sys
+#: largest possible floating-point value
 flt_max = sys.float_info.max
+#: smallest possible floating-point value
 flt_min = sys.float_info.min
 
 import collections
@@ -35,10 +38,12 @@ except ImportError:
 
 
 class defaults:
-
     """Default values of the plotting options"""
+    #: default style
     style = "bmh"
+    #: show legend by default
     legend = True
+    #: show label by default
     label = True
 
 #: A list of classes that are implemented as plotable
@@ -922,6 +927,7 @@ def is_root_latex_directive(text_part):
 
 
 def common_bounds(matplot_bounds, root_bounds):
+    """Assign the common lower and upper bounds for a plot"""
     lower_bound, upper_bound = matplot_bounds
     root_lower_bound, root_upper_bound = root_bounds
 

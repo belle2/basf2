@@ -18,6 +18,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /// Convert between TMatrix and CovarianceMatrix representations
     struct TMatrixConversion {
 
       /// Create a covariance matrix from a TMatrix representation

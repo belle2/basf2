@@ -13,7 +13,6 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <svd/dataobjects/SVDRecoDigit.h>
@@ -22,15 +21,10 @@
 #include <tracking/dataobjects/SVDIntercept.h>
 
 #include <unordered_map>
-#include <map>
-#include <vector>
 #include <utility>
 #include <functional>
 #include <TH1.h>
 #include <TH1F.h>
-#include <TH2F.h>
-#include <TFile.h>
-#include <iostream>
 
 namespace Belle2 {
 
@@ -43,11 +37,11 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDROIDQMModule();
 
-    void initialize(); /**< register histograms*/
+    void initialize() override; /**< register histograms*/
 
-    void event();/**< fill per-event histograms*/
+    void event() override;/**< fill per-event histograms*/
 
-    void endRun(); /**< fill per-run histograms*/
+    void endRun() override; /**< fill per-run histograms*/
 
   private:
 
@@ -102,7 +96,7 @@ namespace Belle2 {
     TH1F* hCellV; /**< V cells */
     int n_events; /**< number of events*/
 
-    void defineHisto(); /**< define histograms*/
+    void defineHisto() override; /**< define histograms*/
 
   };//end class declaration
 

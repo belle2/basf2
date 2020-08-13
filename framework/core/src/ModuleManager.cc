@@ -64,11 +64,7 @@ void ModuleManager::addModuleSearchPath(const string& path)
       }
     }
     //put modules into central map, if they haven't been  added yet
-    for (auto& entry : moduleNameLibMap) {
-      if (m_moduleNameLibMap.count(entry.first) == 0) {
-        m_moduleNameLibMap[entry.first] = entry.second;
-      }
-    }
+    m_moduleNameLibMap.insert(moduleNameLibMap.begin(), moduleNameLibMap.end());
   }
 }
 
@@ -87,7 +83,7 @@ const map<string, string>& ModuleManager::getAvailableModules() const
 
 ModulePtr ModuleManager::registerModule(const string& moduleName, std::string sharedLibPath) noexcept(false)
 {
-  map<string, ModuleProxyBase*>::iterator moduleIter =  m_registeredProxyMap.find(moduleName);
+  auto moduleIter =  m_registeredProxyMap.find(moduleName);
 
   // Print an error message and then raise the exception ...
   auto error = [&moduleName](const std::string & text) -> void {
@@ -100,7 +96,7 @@ ModulePtr ModuleManager::registerModule(const string& moduleName, std::string sh
   if (moduleIter == m_registeredProxyMap.end()) {
     // no library specified, try to find it from map of known modules
     if (sharedLibPath.empty()) {
-      map<string, string>::const_iterator libIter = m_moduleNameLibMap.find(moduleName);
+      auto libIter = m_moduleNameLibMap.find(moduleName);
       if (libIter != m_moduleNameLibMap.end()) {
         sharedLibPath = libIter->second;
       } else {
@@ -147,7 +143,7 @@ ModulePtrList ModuleManager::getModulesByProperties(const ModulePtrList& moduleP
 
 bool ModuleManager::allModulesHaveFlag(const ModulePtrList& list, unsigned int flag)
 {
-  for (auto m : list) {
+  for (const auto& m : list) {
     if (!m->hasProperties(flag))
       return false;
   }
@@ -174,15 +170,12 @@ void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& mod
   string currentLine;
 
   //Read each line of the map file and use boost regular expression to find the module name string in brackets.
-  string::const_iterator start, end;
   std::regex expression("^REG_MODULE\\((.+)\\)$");
   std::match_results<std::string::const_iterator> matchResult;
 
   int lineNr{0};
   while (getline(mapFile, currentLine)) {
     ++lineNr;
-    start = currentLine.begin();
-    end = currentLine.end();
 
     if (!std::regex_match(currentLine, matchResult, expression)) {
       B2ERROR("Problem parsing map file " << mapPath << ": Invalid entry in line " << lineNr << ", skipping remaining file");
@@ -203,18 +196,11 @@ void ModuleManager::fillModuleNameLibMap(std::map<std::string, std::string>& mod
   mapFile.close();
 }
 
-ModuleManager::ModuleManager()
-{
+ModuleManager::ModuleManager() = default;
 
-}
-
-
-ModuleManager::~ModuleManager()
-{
-}
+ModuleManager::~ModuleManager() = default;
 
 void ModuleManager::reset()
 {
   m_createdModulesList.clear();
 }
-

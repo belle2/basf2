@@ -5,12 +5,11 @@
  * Returns the list of neighbours for a given cell ID.                    *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLNEIGHBOURS_H
-#define ECLNEIGHBOURS_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -33,6 +32,9 @@ namespace Belle2 {
 
       /** Return the neighbours for a given cell ID.*/
       const std::vector<short int>& getNeighbours(short int cid) const;
+
+      /** return number of crystals in a given theta ring */
+      short int getCrystalsPerRing(const short int thetaid) const { return m_crystalsPerRing[thetaid]; }
 
     private:
       /** list of list of neighbour cids. */
@@ -86,4 +88,3 @@ namespace Belle2 {
   } // end of namespace ECL
 } // end of namespace Belle2
 
-#endif

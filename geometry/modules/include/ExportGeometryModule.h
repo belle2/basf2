@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOSAVERMODULE_H_
-#define GEOSAVERMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -41,10 +40,10 @@ namespace Belle2 {
      * Checks the validity of the module parameters.
      * Checks if the filepath of the given filename exists.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Saves the geometry to a root file for every run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
 
   protected:
@@ -58,5 +57,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif /* GEOSAVERMODULE_H_ */

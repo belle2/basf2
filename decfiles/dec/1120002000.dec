@@ -1,0 +1,26 @@
+# EventType: 1120002000
+# Descriptor: [B0 -> K*0 pi0]
+# NickName: Bd_K*0pi0
+# Documentation: Channel considered as background for B->K*gamma
+# Tested: Yes
+# Physics WG: EWP
+# Responsible: Borys Knysh
+# Email: borys.knysh@gmail.com
+# Cuts: None
+# Date: 20190701
+
+Alias MyB0 B0
+Alias Myanti-B0 anti-B0
+ChargeConj MyB0 Myanti-B0
+
+Decay Upsilon(4S)
+1.0     MyB0 Myanti-B0 B0 anti-B0	             	VSS_BMIX dm;
+Enddecay
+
+Decay MyB0
+1.000        K*0    pi0               SVS;
+Enddecay
+CDecay Myanti-B0
+
+End
+

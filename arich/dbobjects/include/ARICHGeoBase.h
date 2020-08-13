@@ -13,8 +13,6 @@
 #include <TObject.h>
 #include <geometry/dbobjects/GeoOpticalSurface.h>
 #include <string>
-#include <framework/gearbox/Unit.h>
-
 
 namespace Belle2 {
 
@@ -28,6 +26,25 @@ namespace Belle2 {
      * Default constructor
      */
     ARICHGeoBase() {};
+
+    /**
+     * Constructor with name
+     * @param name object name
+     */
+    explicit ARICHGeoBase(const std::string& name): m_name(name)
+    {}
+
+    /**
+     * Sets object name
+     * @param name object name
+     */
+    void setName(const std::string& name) {m_name = name;}
+
+    /**
+     * Returns object name
+     * @return object name
+     */
+    const std::string& getName() const {return m_name;}
 
     /**
      * Check for consistency of data members
@@ -60,10 +77,11 @@ namespace Belle2 {
 
   protected:
 
+    std::string m_name; /**< geometry object name */
     static double s_unit; /**< conversion unit for length */
     static std::string s_unitName; /**< conversion unit name */
 
-    ClassDef(ARICHGeoBase, 1); /**< ClassDef */
+    ClassDef(ARICHGeoBase, 2); /**< ClassDef */
 
   };
 

@@ -10,12 +10,9 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDDigit.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/database/DBObjPtr.h>
 #include <set>
@@ -88,16 +85,16 @@ namespace Belle2 {
 
     private:
 
-      /* Return reference to the head pixel in pixel set. */
+      /** Return reference to the head pixel in pixel set. */
       const Pixel& getHeadPixel(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
 
-      /* Return reference to the tail pixel in pixel set. */
+      /** Return reference to the tail pixel in pixel set. */
       const Pixel& getTailPixel(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
 
-      /* Return reference to the last pixel in pixel set with given vOffset from vStart. */
+      /** Return reference to the last pixel in pixel set with given vOffset from vStart. */
       const Pixel& getLastPixelWithVOffset(const std::set<Pixel>& pixels, int vStart, int vOffset) const;
 
-      /* Return reference to the first pixel in pixel set with given vOffset from vStart. */
+      /** Return reference to the first pixel in pixel set with given vOffset from vStart. */
       const Pixel& getFirstPixelWithVOffset(const std::set<Pixel>& pixels, int vStart, int vOffset) const;
 
       /** Singleton class, hidden constructor */

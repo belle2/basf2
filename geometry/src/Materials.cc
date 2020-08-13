@@ -45,7 +45,7 @@ namespace Belle2 {
             string name;
             try {
               name = property.getString("@name");
-            } catch (gearbox::PathEmptyError) {
+            } catch (gearbox::PathEmptyError&) {
               B2ERROR("Property at " << property.getPath() << " does not have a name attribute, ignoring");
               continue;
             }
@@ -66,8 +66,8 @@ namespace Belle2 {
 
     G4MaterialPropertiesTable* Materials::createProperties(const std::vector<GeoMaterialProperty>& props)
     {
-      if (!props.size()) return 0;
-      G4MaterialPropertiesTable* table = new G4MaterialPropertiesTable();
+      if (!props.size()) return nullptr;
+      auto* table = new G4MaterialPropertiesTable();
       m_PropTables.push_back(table);
       for (const GeoMaterialProperty& prop : props) {
         std::vector<double> energies = prop.getEnergies();
@@ -100,9 +100,9 @@ namespace Belle2 {
       }
     }
 
-    G4Material* Materials::getMaterial(const string& name, bool showErrors)
+    G4Material* Materials::findMaterial(const string& name)
     {
-      G4Material* mat;
+      G4Material* mat{nullptr};
       if (m_materialCache.retrieve(name, mat)) {
         return mat;
       }
@@ -111,10 +111,6 @@ namespace Belle2 {
 
       //Try different combinations of the Material name to fallback to predefined G4 Elements
       if (!mat && name.substr(0, 3) != "G4_") {
-        if (showErrors) {
-          B2DEBUG(100, "Could not find Material '" << name << "', searching Geant4 names G4_"
-                  << name << " and G4_" << boost::to_upper_copy(name));
-        }
         //Mainly for materials from single elements, e.g. G4_Al, G4_Si
         mat = m_nistMaterialBuilder->FindOrBuildMaterial("G4_" + name);
         //For predefined materials, e.g. G4_AIR, G4_TEFLON
@@ -123,8 +119,28 @@ namespace Belle2 {
 
       //Insert into cache
       m_materialCache.insert(name, mat);
+      return mat;
+    }
 
+    G4Material* Materials::getMaterial(const string& name, bool showErrors)
+    {
+      G4Material* mat = findMaterial(name);
       if (!mat && showErrors) B2ERROR("Material '" << name << "' could not be found");
+      // There is a chance that we want to scale densities of all materials for studies.
+      // Now we have the original so we can look to the scaled one or create it if it's missing
+      if (m_densityScale) {
+        if (m_ignoreScaling.count(name) > 0) return mat;
+        if (name.substr(0, 7) == "scaled:")
+          B2WARNING("Requested an already scaled material ... scaling once more" << LogVar("material", name));
+        std::string scaled = "scaled:" + std::to_string(*m_densityScale) + ":" + name;
+        G4Material* scaledMat = findMaterial(scaled);
+        if (!scaledMat) {
+          scaledMat = new G4Material(scaled, mat->GetDensity() * *m_densityScale, mat,
+                                     mat->GetState(), mat->GetTemperature(), mat->GetPressure());
+          m_materialCache.insert(scaled, scaledMat);
+        }
+        return scaledMat;
+      }
       return mat;
     }
 
@@ -162,12 +178,12 @@ namespace Belle2 {
           if (component.getIselement()) {
             B2ERROR("createMaterial " << parameters.getName()
                     << ": Cannot calculate density when adding elements, please provde a density");
-            return 0;
+            return nullptr;
           }
           G4Material* mat = getMaterial(component.getName());
           if (!mat) {
             B2ERROR("createMaterial " << parameters.getName() << ": Material '" << component.getName() << "' not found");
-            return 0;
+            return nullptr;
           }
           density += mat->GetDensity() * component.getFraction();
         }
@@ -182,14 +198,14 @@ namespace Belle2 {
           G4Element* cmp = getElement(component.getName());
           if (!cmp) {
             B2ERROR("Cannot create material " << parameters.getName() << ": element " << component.getName() << " not found");
-            return 0;
+            return nullptr;
           }
           mat->AddElement(cmp, component.getFraction());
         } else {
           G4Material* cmp = getMaterial(component.getName());
           if (!cmp) {
             B2ERROR("Cannot create material " << parameters.getName() << ": material " << component.getName() << " not found");
-            return 0;
+            return nullptr;
           }
           mat->AddMaterial(cmp, component.getFraction());
         }
@@ -370,7 +386,7 @@ namespace Belle2 {
       for (G4Element* elm : elements) delete elm;
       elements.clear();
       B2DEBUG(50, "Cleaning G4Isotopes");
-      G4IsotopeTable& isotopes = const_cast<G4IsotopeTable&>(*G4Isotope::GetIsotopeTable());
+      auto& isotopes = const_cast<G4IsotopeTable&>(*G4Isotope::GetIsotopeTable());
       for (G4Isotope* iso : isotopes) delete iso;
       isotopes.clear();
       // delete material and element builder as they keep indices to materials they created :/

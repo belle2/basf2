@@ -16,6 +16,7 @@ CDCTriggerMLP::CDCTriggerMLP():
               -1., 1.,
               -1., 11.,
               -1., 1.},
+  et_option("etf_or_fastestpriority"),
   T0fromHits(false)
 {
   weights.assign(nWeightsCal(), 0.);
@@ -31,7 +32,8 @@ CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nodes,
                              unsigned long pattern,
                              unsigned long patternMask,
                              unsigned short tmax,
-                             bool calcT0):
+                             bool calcT0,
+                             std::string  etoption):
   nNodes(nodes), trained(false), targetVars(targets), outputScale(outputscale),
   phiRange(phirange), invptRange(invptrange), thetaRange(thetarange),
   maxHitsPerSL(maxHits), SLpattern(pattern), SLpatternMask(patternMask),
@@ -45,6 +47,7 @@ CDCTriggerMLP::CDCTriggerMLP(std::vector<unsigned short>& nodes,
               -1., 1.,
               -1., 11.,
               -1., 1.},
+  et_option(etoption),
   T0fromHits(calcT0)
 {
   weights.assign(nWeightsCal(), 0.);

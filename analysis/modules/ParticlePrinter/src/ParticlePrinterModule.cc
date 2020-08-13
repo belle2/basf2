@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
@@ -71,8 +70,6 @@ namespace Belle2 {
 
   void ParticlePrinterModule::event()
   {
-    B2INFO("[ParticlePrinterModule] START ------------------------------");
-
     bool includingVars = !(m_variables.empty());
 
     // print event based variables (particle list is empty)
@@ -88,6 +85,10 @@ namespace Belle2 {
       return;
     }
 
+    if (!m_listName.empty() && plist->getListSize() == 0) return;
+
+    B2INFO("[ParticlePrinterModule] START ------------------------------");
+
     plist->print();
 
     for (unsigned i = 0; i < plist->getListSize(); i++) {
@@ -97,7 +98,7 @@ namespace Belle2 {
       }
       if (includingVars) {
         B2INFO(" - " << particle->getArrayIndex() << " = " << particle->getPDGCode() << "[" << i << "]");
-        if (particle->getParticleType() == Particle::EParticleType::c_Composite) {
+        if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) {
           std::string s;
           for (int idx : particle->getDaughterIndices())
             s += " " + std::to_string(idx);

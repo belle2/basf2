@@ -16,9 +16,7 @@
 
 #include <string>
 #include "framework/core/Module.h"
-#include "trg/trg/BitStream.h"
 #include "trg/cdc/TRGCDC.h"
-#include "trg/cdc/SteppingAction.h"
 
 namespace Belle2 {
 
@@ -34,19 +32,19 @@ namespace Belle2 {
     virtual ~TRGCDCTSStreamModule();
 
     /// Initilizes TRGCDCTSStreamModule.
-    virtual void initialize();
+    virtual void initialize() override;
 
     /// Called when new run started.
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /// Called event by event.
-    virtual void event();
+    virtual void event() override;
 
     /// Called when run ended.
-    virtual void endRun();
+    virtual void endRun() override;
 
     /// Called when processing ended.
-    virtual void terminate();
+    virtual void terminate() override;
 
   public:
 

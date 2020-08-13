@@ -60,11 +60,11 @@ namespace Belle2 {
       }
 
       //...Sorting...
-      for (unsigned i = 0; i < n - 1; i++) {
+      for (unsigned k = 0; k < n - 1; k++) {
         for (unsigned j = i + 1; j < n; j++) {
-          if (_pairs[i]->second < _pairs[j]->second) {
-            const pair<unsigned, unsigned>* tmp = _pairs[i];
-            _pairs[i] = _pairs[j];
+          if (_pairs[k]->second < _pairs[j]->second) {
+            const pair<unsigned, unsigned>* tmp = _pairs[k];
+            _pairs[k] = _pairs[j];
             _pairs[j] = tmp;
           }
         }

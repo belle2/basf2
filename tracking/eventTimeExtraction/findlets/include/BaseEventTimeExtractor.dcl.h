@@ -15,6 +15,7 @@
 #include <framework/dataobjects/EventT0.h>
 
 namespace Belle2 {
+  /// Class to extract the event t0
   template<class ... AIOTypes>
   class BaseEventTimeExtractor : public TrackFindingCDC::Findlet<AIOTypes...> {
 
@@ -36,6 +37,7 @@ namespace Belle2 {
     virtual void beginEvent() override;
 
   protected:
+    /// Reset the t0 value to cached value if it exists or clear it otherwise
     void resetEventT0() const;
 
     /// Pointer to the storage of the eventwise T0 estimation in the data store.

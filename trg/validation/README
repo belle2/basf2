@@ -1,0 +1,16 @@
+2018/11/26
+
+TRGValidationGen.py: 
+Generates 1000 e+/e- particlegun to barrel region with full simulation and all sub-triggers.
+
+TRGValidationGen.root:
+Output root file of TRGValidationGen.py.
+
+TRGValidation.C:
+Makes histograms for validation with TRGValidationGen.root.
+The output histograms are stored in TRGValidation.root.
+
+TRGValidation.root:
+Stores the histograms for validation.
+
+

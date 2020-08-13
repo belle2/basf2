@@ -14,8 +14,6 @@
 #include <pxd/dataobjects/PXDDAQPacketStatus.h>
 #include <TObject.h>
 #include <pxd/dataobjects/PXDErrorFlags.h>
-#include <memory>
-
 
 namespace Belle2 {
 
@@ -123,6 +121,11 @@ namespace Belle2 {
       /*return*/ m_pxdPacket.emplace_back(std::forward<Args>(params)...);
       return m_pxdPacket.back();
     }
+
+    /** Return map of module usability
+     * @return map of VxdID with usable flags
+     */
+    std::map <VxdID , bool> getUsable() const;
 
 
     /** iterator-based iteration for packets */

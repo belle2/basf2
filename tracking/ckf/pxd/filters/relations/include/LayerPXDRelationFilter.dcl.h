@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,16 +12,9 @@
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-
-#include <vxd/dataobjects/VxdID.h>
-
 namespace Belle2 {
   /// Base filter for CKF PXD states
-  template <class AFilter>
+  template <class AFilter, class APrefilter = AFilter>
   class LayerPXDRelationFilter : public TrackFindingCDC::RelationFilter<CKFToPXDState> {
     /// The parent class
     using Super = TrackFindingCDC::RelationFilter<CKFToPXDState>;
@@ -47,5 +40,7 @@ namespace Belle2 {
     int m_param_hitJumping = 0;
     /// Filter for rejecting the states
     AFilter m_filter;
+    /// Loose pre-filter to reject possibleTos
+    APrefilter m_prefilter;
   };
 }

@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -22,19 +22,19 @@ namespace TreeFitter {
     updateParams();
   }
 
-  ErrCode RecoComposite::initParticleWithMother(FitParams* fitparams)
+  ErrCode RecoComposite::initParticleWithMother(FitParams& fitparams)
   {
     return initTau(fitparams);
   }
 
-  ErrCode RecoComposite::initMotherlessParticle(FitParams* fitparams)
+  ErrCode RecoComposite::initMotherlessParticle(FitParams& fitparams)
   {
     const int posindex = posIndex();
     const int momindex = momIndex();
 
-    fitparams->getStateVector().segment(posindex, 3) = m_params.segment(0, 3);
+    fitparams.getStateVector().segment(posindex, 3) = m_params.segment(0, 3);
 
-    fitparams->getStateVector().segment(momindex, 4) = m_params.segment(3, 4);
+    fitparams.getStateVector().segment(momindex, 4) = m_params.segment(3, 4);
 
     return ErrCode(ErrCode::Status::success) ;
   }

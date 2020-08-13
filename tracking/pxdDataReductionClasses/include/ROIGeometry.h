@@ -10,16 +10,9 @@
 
 #pragma once
 
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/PXDIntercept.h>
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 #include <list>
-
-//class ROIDetPlane;
-
 
 namespace Belle2 {
 
@@ -45,6 +38,7 @@ namespace Belle2 {
 
     void fillPlaneList(double toleranceZ, double tolerancePhi); /**< fill the list of planes*/
 
+    /** Append to selectedPlanes those in the internal list for which a sensor is near the RecoTrack position */
     void appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition, int layer);
 
   };

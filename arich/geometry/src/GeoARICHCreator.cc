@@ -10,16 +10,17 @@
  **************************************************************************/
 
 #include <arich/geometry/GeoARICHCreator.h>
+#include <arich/dbobjects/tessellatedSolidStr.h>
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/utilities.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <arich/simulation/SensitiveDetector.h>
 #include <arich/simulation/SensitiveAero.h>
 #include <simulation/background/BkgSensitiveDetector.h>
+#include <arich/dbobjects/ARICHPositionElement.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -30,24 +31,22 @@
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
 #include <G4AssemblyVolume.hh>
+#include <G4UnionSolid.hh>
 #include <G4LogicalSkinSurface.hh>
 #include <G4OpticalSurface.hh>
-#include <G4LogicalVolumeStore.hh>
 
 // Geant4 Shapes
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Trap.hh>
-#include <G4TwoVector.hh>
-#include <G4ExtrudedSolid.hh>
 #include <G4Torus.hh>
+#include <G4TessellatedSolid.hh>
+#include <G4TriangularFacet.hh>
 
-#include <G4Polyhedra.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 #include <G4Material.hh>
-#include <TVector2.h>
 #include <TVector3.h>
-#include <TGraph2D.h>
 
 using namespace std;
 using namespace boost;
@@ -108,13 +107,33 @@ namespace Belle2 {
       G4LogicalVolume* masterLV = new G4LogicalVolume(envelopeTube, material, "ARICH.masterVolume");
       setVisibility(*masterLV, false);
 
-      G4RotationMatrix rotMaster;
-      rotMaster.rotateX(m_config.getMasterVolume().getRotationX());
-      rotMaster.rotateY(m_config.getMasterVolume().getRotationY());
-      rotMaster.rotateZ(m_config.getMasterVolume().getRotationZ());
+      // Set up region for production cuts
+      G4Region* aRegion = new G4Region("ARICHEnvelope");
+      masterLV->SetRegion(aRegion);
+      aRegion->AddRootLogicalVolume(masterLV);
 
-      G4ThreeVector transMaster(m_config.getMasterVolume().getPosition().X(), m_config.getMasterVolume().getPosition().Y(),
-                                m_config.getMasterVolume().getPosition().Z());
+      G4RotationMatrix rotMaster;
+      double rot_x = m_config.getMasterVolume().getRotationX();
+      double rot_y = m_config.getMasterVolume().getRotationX();
+      double rot_z = m_config.getMasterVolume().getRotationX();
+      double tr_x = m_config.getMasterVolume().getPosition().X();
+      double tr_y = m_config.getMasterVolume().getPosition().Y();
+      double tr_z = m_config.getMasterVolume().getPosition().Z();
+
+      if (m_config.useGlobalDisplacement()) {
+        rot_x += m_config.getGlobalDisplacement().getAlpha();
+        rot_y += m_config.getGlobalDisplacement().getBeta();
+        rot_z += m_config.getGlobalDisplacement().getGamma();
+        tr_x +=  m_config.getGlobalDisplacement().getX();
+        tr_y +=  m_config.getGlobalDisplacement().getY();
+        tr_z +=  m_config.getGlobalDisplacement().getZ();
+        B2WARNING("ARICH global displacement parameters from DB will be taken into account.");
+      }
+      rotMaster.rotateX(rot_x);
+      rotMaster.rotateX(rot_y);
+      rotMaster.rotateX(rot_z);
+
+      G4ThreeVector transMaster(tr_x, tr_y, tr_z);
 
       new G4PVPlacement(G4Transform3D(rotMaster, transMaster), masterLV, "ARICH.MasterVolume", &topVolume, false, 1);
 
@@ -134,7 +153,7 @@ namespace Belle2 {
       G4LogicalVolume* cablesLV = buildCables(m_config.getCablesEnvelope());
 
       // Build cooling system assembly envelope plane
-      G4LogicalVolume* coolingLV = buildCoolingEnvelopePlane(m_config.getCoolingGeometry());
+      //G4LogicalVolume* coolingLV = buildCoolingEnvelopePlane(m_config.getCoolingGeometry());
 
       // Build aerogel logical volume
       G4LogicalVolume* aeroPlaneLV;
@@ -201,11 +220,12 @@ namespace Belle2 {
 
       new G4PVPlacement(G4Transform3D(rotDetPlane, transDetPlane), detPlaneLV, "ARICH.detPlane", masterLV, false, 1);
       new G4PVPlacement(G4Transform3D(rotDetPlane, transDetSupportPlate), detSupportPlateLV, "ARICH.detSupportPlane", masterLV, false, 1);
-      new G4PVPlacement(G4Transform3D(rotMergerPlane, transMergerPlate), mergerLV, "ARICH.mergerPlane", masterLV, false, 1);
+      if (mergerLV) new G4PVPlacement(G4Transform3D(rotMergerPlane, transMergerPlate), mergerLV, "ARICH.mergerPlane", masterLV, false, 1);
       new G4PVPlacement(G4Transform3D(rotCablesPlane, transCablesPlate), cablesLV, "ARICH.cablesPlane", masterLV, false, 1);
-      new G4PVPlacement(G4Transform3D(rotCoolingPlane, transCoolingPlate), coolingLV, "ARICH.coolingPlane", masterLV, false, 1);
+      //new G4PVPlacement(G4Transform3D(rotCoolingPlane, transCoolingPlate), coolingLV, "ARICH.coolingPlane", masterLV, false, 1);
       new G4PVPlacement(G4Transform3D(rotAeroPlane, transAeroPlane), aeroPlaneLV, "ARICH.aeroPlane", masterLV, false, 1);
 
+      /*
       // build and place cooling test  plates
       G4LogicalVolume* coolingTestPlatesLV = buildCoolingTestPlate(m_config.getCoolingGeometry());
       double coolingTestPlateAngle = 0.0;
@@ -221,6 +241,7 @@ namespace Belle2 {
         new G4PVPlacement(G4Transform3D(rotCoolingTestPlate, transCoolingTestPlate), coolingTestPlatesLV, "ARICH.coolingTestPlates",
                           masterLV, false, i);
       }
+      */
 
       // build and place mirrors
       G4LogicalVolume* mirrorLV = buildMirror(m_config);
@@ -231,10 +252,28 @@ namespace Belle2 {
 
       double angl = mirStart;
       double dphi = 2 * M_PI / nMirrors;
+      if (m_config.useMirrorDisplacement()) B2WARNING("ARICH mirrors displacement parameters from DB will be used.");
       for (int i = 1; i < nMirrors + 1; i++) {
+        double mrot_x = 0;
+        double mrot_y = 0;
+        double mrot_z = angl;
+        double mtr_x  = mirRad * cos(angl);
+        double mtr_y  = mirRad * sin(angl);
+        double mtr_z  = mirZPos + zShift;
+        if (m_config.useMirrorDisplacement()) {
+          const ARICHPositionElement& displ = m_config.getMirrorDisplacement().getDisplacementElement(i);
+          mrot_x += displ.getAlpha();
+          mrot_y += displ.getBeta();
+          mrot_z += displ.getGamma();
+          mtr_x += displ.getX();
+          mtr_y += displ.getY();
+          mtr_z += displ.getZ();
+        }
         G4RotationMatrix rotMirror;
-        rotMirror.rotateZ(angl);
-        G4ThreeVector transMirror(mirRad * cos(angl), mirRad * sin(angl), mirZPos + zShift);
+        rotMirror.rotateX(mrot_x);
+        rotMirror.rotateY(mrot_y);
+        rotMirror.rotateZ(mrot_z);
+        G4ThreeVector transMirror(mtr_x, mtr_y, mtr_z);
         new G4PVPlacement(G4Transform3D(rotMirror, transMirror), mirrorLV, "ARICH.mirrorPlate", masterLV, false, i);
         angl += dphi;
       }
@@ -421,7 +460,6 @@ namespace Belle2 {
       //supportTubeLV->SetSensitiveDetector(m_sensitiveAero);
 
       unsigned nLayer = aeroGeo.getNLayers();
-      G4Transform3D transform = G4Translate3D(0., 0., thick / 2.);
 
       // loop over layers
       double zLayer = 0;
@@ -654,7 +692,7 @@ namespace Belle2 {
         // loop over layers
         int icopyNumber = 0;
         for (unsigned iLayer = 1; iLayer < nLayer + 1; iLayer++) {
-          int iSlot = 1;
+          //int iSlot = 1;
           double iphi = 0;
 
           int iicolumn = 0;
@@ -695,23 +733,22 @@ namespace Belle2 {
             G4ThreeVector trans(r * cos(iphi), r * sin(iphi), (thick - imgTubeLen) / 2.);
             G4RotationMatrix Ra;
             Ra.rotateZ(iphi);
-            if (iLayer == 1)
+            if (iLayer == 1) {
               new G4PVPlacement(G4Transform3D(Ra, trans),          //transformation
                                 wallLV,                            //its logical
                                 string("ARICH.") + wallName.str(), //name
                                 aerogelPlaneLV,                    //mother logical
                                 false,                             //always false
                                 icopyNumber);                      //should be set to 0 for the first volume of a given type.
-            ///////////////////////////////
+              ///////////////////////////////
 
-            // In case of individual thickness
-            // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 1) or
-            // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 2)
-            // of the tiles we need to define compensation volume with ARICH air.
-            // This volume situated between aerogel tile and image plane (imgTube).
-            // This volume have same shape as earogel tile but different thickness.
-            // Build Compensation tiles only one time
-            if (iLayer == 1) {
+              // In case of individual thickness
+              // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 1) or
+              // (if aeroGeo.getFullAerogelMaterialDescriptionKey() == 2)
+              // of the tiles we need to define compensation volume with ARICH air.
+              // This volume situated between aerogel tile and image plane (imgTube).
+              // This volume have same shape as earogel tile but different thickness.
+              // Build Compensation tiles only one time
               // Compensation tile shape
               double compTileUpThick = wallHeight - tileUpThick - tileDownThick;
               std::stringstream compTileName;
@@ -779,7 +816,7 @@ namespace Belle2 {
             //////////////////////////////////
 
             iphi += dphi;
-            iSlot++;
+            //iSlot++;
             icopyNumber++;
             iicolumn++;
           }
@@ -933,35 +970,190 @@ namespace Belle2 {
     G4LogicalVolume* GeoARICHCreator::buildMerger(const ARICHGeoMerger& mergerGeo)
     {
 
-      G4Box* merger_solid = new G4Box("merger_solid", mergerGeo.getSizeW() * mm / 2.0, mergerGeo.getSizeL() * mm / 2.0,
-                                      mergerGeo.getThickness() * mm / 2.0);
-      return new G4LogicalVolume(merger_solid, Materials::get(mergerGeo.getMergerPCBMaterialName()), "ARICH.mergerPCB");
+      // This is a screw hole on the merger board.
+      // This high precision of the geometry description is needed
+      // only for the correct placement of the merger cooling bodies.
+      // Volume to subtract (screw hole on the merger board)
+      double screwholeR = mergerGeo.getMergerPCBscrewholeR() * mm;
+      double screwholedY = mergerGeo.getMergerPCBscrewholePosdY() * mm;
+      double screwholedX1 = mergerGeo.getMergerPCBscrewholePosdX1() * mm;
+      double screwholedX2 = mergerGeo.getMergerPCBscrewholePosdX2() * mm;
 
+      G4VSolid* screwHoleTubeSubtracted_solid = new G4Tubs("screwHoleTubeSubtracted_solid",
+                                                           0.0,
+                                                           screwholeR,
+                                                           mergerGeo.getThickness() * mm / 2.0,
+                                                           0, 360.0 * deg);
+
+      // Volume to add (merger box)
+      G4Box* merger_solid = new G4Box("merger_solid",
+                                      mergerGeo.getSizeW() * mm / 2.0,
+                                      mergerGeo.getSizeL() * mm / 2.0,
+                                      mergerGeo.getThickness() * mm / 2.0);
+
+      G4RotationMatrix Ra_sub;
+      G4ThreeVector Ta_sub;
+      G4Transform3D Tr_sub;
+      Ta_sub.setX(-mergerGeo.getSizeW() * mm / 2.0 + screwholedX1);
+      Ta_sub.setY(mergerGeo.getSizeL() * mm / 2.0 - screwholedY);
+      Ta_sub.setZ(0.0);
+      Tr_sub = G4Transform3D(Ra_sub, Ta_sub);
+      G4SubtractionSolid* substraction_solid = new G4SubtractionSolid("substraction_solid", merger_solid, screwHoleTubeSubtracted_solid,
+          Tr_sub);
+      Ta_sub.setX(mergerGeo.getSizeW() * mm / 2.0 - screwholedX2);
+      Ta_sub.setY(mergerGeo.getSizeL() * mm / 2.0 - screwholedY);
+      Ta_sub.setZ(0.0);
+      Tr_sub = G4Transform3D(Ra_sub, Ta_sub);
+      substraction_solid = new G4SubtractionSolid("substraction_solid", substraction_solid, screwHoleTubeSubtracted_solid, Tr_sub);
+      Ta_sub.setX(mergerGeo.getSizeW() * mm / 2.0 - screwholedX2);
+      Ta_sub.setY(-mergerGeo.getSizeL() * mm / 2.0 + screwholedY);
+      Ta_sub.setZ(0.0);
+      Tr_sub = G4Transform3D(Ra_sub, Ta_sub);
+      substraction_solid = new G4SubtractionSolid("substraction_solid", substraction_solid, screwHoleTubeSubtracted_solid, Tr_sub);
+      Ta_sub.setX(-mergerGeo.getSizeW() * mm / 2.0 + screwholedX1);
+      Ta_sub.setY(-mergerGeo.getSizeL() * mm / 2.0 + screwholedY);
+      Ta_sub.setZ(0.0);
+      Tr_sub = G4Transform3D(Ra_sub, Ta_sub);
+      substraction_solid = new G4SubtractionSolid("substraction_solid", substraction_solid, screwHoleTubeSubtracted_solid, Tr_sub);
+
+      return new G4LogicalVolume(substraction_solid, Materials::get(mergerGeo.getMergerPCBMaterialName()), "ARICH.mergerPCB");
+    }
+
+
+    G4LogicalVolume* GeoARICHCreator::buildMergerCooling(unsigned iType)
+    {
+
+      if (!m_mergerCooling) {
+        B2WARNING("ARICH geometry: no data available for merger " << iType << " cooling body geometry. Cooling body will not be placed.");
+        return NULL;
+      }
+
+      std::stringstream shpName;
+      shpName << "TessellatedSolid_" <<  + iType;
+
+      G4TessellatedSolid* volume_solid = new G4TessellatedSolid(shpName.str().c_str());
+
+      G4ThreeVector point_1;
+      G4ThreeVector point_2;
+      G4ThreeVector point_3;
+
+      tessellatedSolidStr mergerCoolingStr = m_mergerCooling->getMergerCoolingBodiesInfo(iType);
+
+      if (mergerCoolingStr.nCells == 0) {
+        B2WARNING("ARICH geometry: no data available for merger " << iType << " cooling body geometry. Cooling body will not be placed.");
+        return NULL;
+      }
+
+      for (unsigned int i = 0; i < mergerCoolingStr.nCells; i++) {
+        //
+        point_1.setX(mergerCoolingStr.posV1[0][i]);
+        point_1.setY(mergerCoolingStr.posV1[1][i]);
+        point_1.setZ(mergerCoolingStr.posV1[2][i]);
+        //
+        point_2.setX(mergerCoolingStr.posV2[0][i]);
+        point_2.setY(mergerCoolingStr.posV2[1][i]);
+        point_2.setZ(mergerCoolingStr.posV2[2][i]);
+        //
+        point_3.setX(mergerCoolingStr.posV3[0][i]);
+        point_3.setY(mergerCoolingStr.posV3[1][i]);
+        point_3.setZ(mergerCoolingStr.posV3[2][i]);
+        //
+        G4TriangularFacet* facet = new G4TriangularFacet(point_1, point_2, point_3, ABSOLUTE);
+        volume_solid->AddFacet((G4VFacet*) facet);
+      }
+
+      volume_solid->SetSolidClosed(true);
+      std::stringstream volName;
+      volName << "ARICH.mergerCooling_" <<  + iType;
+      G4LogicalVolume* volume_logical = new G4LogicalVolume(volume_solid,
+                                                            Materials::get(m_mergerCooling->getMergerCoolingBodiesMaterialName()), volName.str().c_str());
+
+      setColor(*volume_logical, "rgb(0.6,0.0,0.2,1.0)"); //From the top (farther from IP, downstream)
+
+      return volume_logical;
+    }
+
+    G4LogicalVolume* GeoARICHCreator::buildMergerEnvelope(const ARICHGeoMerger& mergerGeo, int iType)
+    {
+      // Volume to add single merger and merger cooling body envelope box
+      G4Box* singlemergerenvelope_solid = new G4Box("singlemergerenvelope_solid",
+                                                    mergerGeo.getSingleMergerEnvelopeSizeW() * mm / 2.0,
+                                                    mergerGeo.getSingleMergerEnvelopeSizeL() * mm / 2.0,
+                                                    mergerGeo.getSingleMergerEnvelopeThickness() * mm / 2.0);
+      std::stringstream volName;
+      volName << "ARICH.singleMergerEnvelope_" <<  + iType;
+      return new G4LogicalVolume(singlemergerenvelope_solid, Materials::get("ARICH_Air"), volName.str().c_str());
     }
 
     G4LogicalVolume* GeoARICHCreator::buildMergerPCBEnvelopePlane(const ARICHGeometryConfig& detectorGeo)
     {
 
       const ARICHGeoMerger& mergerGeo = detectorGeo.getMergerGeometry();
-      G4LogicalVolume* merger_logical = buildMerger(mergerGeo);
+
+      if (mergerGeo.getSingleMergerEnvelopeSizeW() < 1e-9) {
+        B2WARNING("GeoARICHCreator: Merger and merger cooling geometry will not be build as it is not availible in geometry configuration (ARICHGeometryConfig with ClasDef>4 is needed).");
+        return NULL;
+      }
 
       G4Tubs* envelope_solid = new G4Tubs("envelope_solid", mergerGeo.getEnvelopeInnerRadius() * mm,
                                           mergerGeo.getEnvelopeOuterRadius() * mm, mergerGeo.getEnvelopeThickness() * mm / 2.0, 0.0, 2.0 * M_PI);
+
       G4LogicalVolume* envelope_logical = new G4LogicalVolume(envelope_solid, Materials::get("ARICH_Air"), "ARICH.mergerEnvelope");
 
+
+      G4LogicalVolume* merger_logical = buildMerger(mergerGeo);
+      G4LogicalVolume* mergerCooling_logical[12] = {NULL};
+      G4LogicalVolume* mergerEnvelope_logical[12] = {NULL};
+      G4ThreeVector TaPCB(mergerGeo.getSingleMergeEnvelopePosition().X() * mm, mergerGeo.getSingleMergeEnvelopePosition().Y() * mm,
+                          mergerGeo.getSingleMergeEnvelopePosition().Z() * mm);
+      G4RotationMatrix RaPCB;
+      G4ThreeVector TaMergerCooling(mergerGeo.getSingleMergeEnvelopePosition().X() * mm,
+                                    mergerGeo.getSingleMergeEnvelopePosition().Y() * mm, -mergerGeo.getSingleMergeEnvelopePosition().Z() * mm);
+      G4RotationMatrix RaMergerCooling;
+      RaMergerCooling.rotateY(180 * deg);
+      RaMergerCooling.rotateZ(-90 * deg);
+
+      // build 12 different merger+cooling body volumes
+      for (int iType = 1; iType < 13; iType++) {
+        mergerCooling_logical[iType - 1] = buildMergerCooling(iType);
+        mergerEnvelope_logical[iType - 1 ] = buildMergerEnvelope(mergerGeo, iType); //Single merger and merger cooling body envelope box
+        setColor(*mergerEnvelope_logical[iType - 1], "rgb(0.0,0.0,1.0,1.0)");
+
+        new G4PVPlacement(G4Transform3D(RaPCB, TaPCB), //Transformation
+                          merger_logical,              //its logical volume
+                          "ARICH.mergerPCB",           //its name
+                          mergerEnvelope_logical[iType - 1], //its mother  volume
+                          false,                       //no boolean operation
+                          iType);                      //copy number
+
+        if (mergerCooling_logical[iType - 1] == NULL) continue;
+
+        new G4PVPlacement(G4Transform3D(RaMergerCooling, TaMergerCooling), //Transformation
+                          mergerCooling_logical[iType - 1],                 //its logical volume
+                          "ARICH.mergerCooling",                           //its name
+                          mergerEnvelope_logical[iType - 1],                         //its mother  volume
+                          false,                                           //no boolean operation
+                          iType);                                          //copy number
+      }
+
+      // place all 72 merger+cooling body packages
       for (unsigned iSlot = 0; iSlot < mergerGeo.getMergerSlotID().size(); iSlot++) {
-        //cout<<" "<<iSlot<<" "<<mergerGeo.getMergerSlotID().at(iSlot)<<" "<<mergerGeo.getMergerPosR().at(iSlot)<<" "<<mergerGeo.getMergerAngle().at(iSlot)<<endl;
-        G4ThreeVector Ta(mergerGeo.getMergerPosR().at(iSlot) * mm * cos(mergerGeo.getMergerAngle().at(iSlot)*deg),
-                         mergerGeo.getMergerPosR().at(iSlot) * mm * sin(mergerGeo.getMergerAngle().at(iSlot)*deg),
-                         0);
+
+        int type = 1; // if no merger cooling is available...
+        if (m_mergerCooling) type = (int)m_mergerCooling->getMergerCoolingPositionID().at(iSlot);
+
+        //Placement of the single volume envelope
+        G4ThreeVector Ta(mergerGeo.getMergerPosR().at(iSlot) * mm * cos(mergerGeo.getMergerAngle().at(iSlot) * deg),
+                         mergerGeo.getMergerPosR().at(iSlot) * mm * sin(mergerGeo.getMergerAngle().at(iSlot) * deg),
+                         mergerGeo.getSingleMergerenvelopeDeltaZ().at(iSlot) * mm);
         G4RotationMatrix Ra;
-        Ra.rotateZ(mergerGeo.getMergerAngle().at(iSlot) * deg);
-        new G4PVPlacement(G4Transform3D(Ra, Ta), //Transformation
-                          merger_logical,        //its logical volume
-                          "ARICH.mergerPCB",     //its name
-                          envelope_logical,      //its mother  volume
-                          false,                 //no boolean operation
-                          iSlot);                //copy number
+        Ra.rotateZ(mergerGeo.getMergerAngle().at(iSlot) * deg + mergerGeo.getMergerOrientation().at(iSlot) * deg);
+        new G4PVPlacement(G4Transform3D(Ra, Ta),        //Transformation
+                          mergerEnvelope_logical[type - 1],     //its logical volume
+                          "ARICH.singleMergerEnvelope", //its name
+                          envelope_logical,             //its mother  volume
+                          false,                        //no boolean operation
+                          iSlot);                       //copy number
       }
 
       return envelope_logical;
@@ -985,6 +1177,119 @@ namespace Belle2 {
 
     }
 
+    G4LogicalVolume* GeoARICHCreator::buildFEBCoolingBody(const ARICHGeoFEBCooling& coolingv2Geo)
+    {
+
+      //FEB aluminum cooling envelope for single object
+      double feb_alcooling_singleObjectEnvelope_sizeX = (2 * coolingv2Geo.getSmallSquareSize() + coolingv2Geo.getBigSquareSize() + 2.0) *
+                                                        mm;
+      double feb_alcooling_singleObjectEnvelope_sizeY = feb_alcooling_singleObjectEnvelope_sizeX * mm;
+      double feb_alcooling_singleObjectEnvelope_sizeZ = (coolingv2Geo.getSmallSquareThickness() + coolingv2Geo.getRectangleThickness()) *
+                                                        mm;
+
+      double feb_alcooling_box1_sizeX = coolingv2Geo.getSmallSquareSize() * mm;
+      double feb_alcooling_box1_sizeY = feb_alcooling_box1_sizeX;
+      double feb_alcooling_box1_sizeZ = coolingv2Geo.getSmallSquareThickness() * mm;
+
+      double feb_alcooling_box2_sizeX = coolingv2Geo.getBigSquareSize() * mm;
+      double feb_alcooling_box2_sizeY = feb_alcooling_box2_sizeX;
+      double feb_alcooling_box2_sizeZ = coolingv2Geo.getBigSquareThickness() * mm;
+
+      double feb_alcooling_box3_sizeX = coolingv2Geo.getRectangleW() * mm;
+      double feb_alcooling_box3_sizeY = coolingv2Geo.getRectangleL() * mm;
+      double feb_alcooling_box3_sizeZ = coolingv2Geo.getRectangleThickness() * mm;
+
+      double feb_alcooling_box1_X0 = feb_alcooling_box2_sizeX / 2.0 + feb_alcooling_box1_sizeX / 2.0;
+      double feb_alcooling_box1_Y0 = feb_alcooling_box2_sizeY / 2.0 + feb_alcooling_box1_sizeY / 2.0;
+      double feb_alcooling_box1_Z0 = 0.0 * mm;
+
+      //double feb_alcooling_box2_X0 = 0.0*mm;
+      //double feb_alcooling_box2_Y0 = 0.0*mm;
+      //double feb_alcooling_box2_Z0 = 0.0*mm;
+
+      double feb_alcooling_box3_X0 = coolingv2Geo.getRectangleDistanceFromCenter() / sqrt(2.0) * mm;
+      double feb_alcooling_box3_Y0 = feb_alcooling_box3_X0;
+      double feb_alcooling_box3_Z0 = feb_alcooling_box1_sizeZ / 2.0 + feb_alcooling_box3_sizeZ / 2.0;
+      double feb_alcooling_box3_angle = 45.0 * deg;
+
+      G4RotationMatrix Ra;
+      G4ThreeVector Ta;
+      G4Transform3D Tr;
+
+      //
+      // Define single FEB aluminum cooling envelope
+      //
+      G4VSolid* feb_alcoolingEnvelope_solid = new G4Box("feb_alcoolingEnvelope_solid",
+                                                        feb_alcooling_singleObjectEnvelope_sizeX / 2.0,
+                                                        feb_alcooling_singleObjectEnvelope_sizeY / 2.0,
+                                                        feb_alcooling_singleObjectEnvelope_sizeZ / 2.0);
+      G4LogicalVolume* feb_alcoolingEnvelope_logical = new G4LogicalVolume(feb_alcoolingEnvelope_solid, Materials::get("Air"),
+          "feb_alcoolingEnvelope_logical");
+
+      G4VSolid* feb_alcooling_box1_solid = new G4Box("feb_alcooling_box1_solid", feb_alcooling_box1_sizeX / 2.0,
+                                                     feb_alcooling_box1_sizeY / 2.0, feb_alcooling_box1_sizeZ / 2.0);
+      G4VSolid* feb_alcooling_box2_solid = new G4Box("feb_alcooling_box2_solid", feb_alcooling_box2_sizeX / 2.0,
+                                                     feb_alcooling_box2_sizeY / 2.0, feb_alcooling_box2_sizeZ / 2.0);
+      G4VSolid* feb_alcooling_box3_solid = new G4Box("feb_alcooling_box3_solid", feb_alcooling_box3_sizeX / 2.0,
+                                                     feb_alcooling_box3_sizeY / 2.0, feb_alcooling_box3_sizeZ / 2.0);
+
+      //
+      //Box 1 A
+      //
+      Ta.setX(feb_alcooling_box1_X0);
+      Ta.setY(feb_alcooling_box1_Y0);
+      Ta.setZ(feb_alcooling_box1_Z0);
+      Tr = G4Transform3D(Ra, Ta);
+      G4UnionSolid* feb_alcooling_assembly01_solid = new G4UnionSolid("feb_alcooling_assembly01_solid", feb_alcooling_box2_solid,
+          feb_alcooling_box1_solid, Tr);
+      //
+      //Box 1 B
+      //
+      Ta.setX(-feb_alcooling_box1_X0);
+      Ta.setY(-feb_alcooling_box1_Y0);
+      Ta.setZ(feb_alcooling_box1_Z0);
+      Tr = G4Transform3D(Ra, Ta);
+      G4UnionSolid* feb_alcooling_assembly02_solid = new G4UnionSolid("feb_alcooling_assembly02_solid", feb_alcooling_assembly01_solid,
+          feb_alcooling_box1_solid, Tr);
+      //
+      //Box 3 A
+      //
+      Ta.setX(feb_alcooling_box3_X0);
+      Ta.setY(feb_alcooling_box3_Y0);
+      Ta.setZ(feb_alcooling_box3_Z0);
+      Ra.rotateZ(-feb_alcooling_box3_angle);
+      Tr = G4Transform3D(Ra, Ta);
+      G4UnionSolid* feb_alcooling_assembly03_solid = new G4UnionSolid("feb_alcooling_assembly03_solid", feb_alcooling_assembly02_solid,
+          feb_alcooling_box3_solid, Tr);
+      Ra.rotateZ(feb_alcooling_box3_angle);
+      //
+      //Box 3 B
+      //
+      Ta.setX(-feb_alcooling_box3_X0);
+      Ta.setY(-feb_alcooling_box3_Y0);
+      Ta.setZ(feb_alcooling_box3_Z0);
+      Ra.rotateZ(-feb_alcooling_box3_angle);
+      Tr = G4Transform3D(Ra, Ta);
+      G4UnionSolid* feb_alcooling_assembly_solid = new G4UnionSolid("feb_alcooling_assembly_solid", feb_alcooling_assembly03_solid,
+          feb_alcooling_box3_solid, Tr);
+      Ra.rotateZ(feb_alcooling_box3_angle);
+
+      G4LogicalVolume* feb_alcooling_assembly_logical = new G4LogicalVolume(feb_alcooling_assembly_solid, Materials::get("Al"),
+          "feb_alcooling_assembly_logical");
+      Ta.setX(0.0);
+      Ta.setY(0.0);
+      Ta.setZ(-feb_alcooling_box3_sizeZ / 2.0);
+
+      Tr  = G4Transform3D(Ra, Ta);
+      new G4PVPlacement(Tr,                             //Transformation
+                        feb_alcooling_assembly_logical, //its logical volume
+                        "feb_alcooling_assembly",       //its name
+                        feb_alcoolingEnvelope_logical,  //its mother  volume
+                        false,                          //no boolean operation
+                        0);                             //copy number
+
+      return feb_alcoolingEnvelope_logical;
+    }
 
     G4LogicalVolume* GeoARICHCreator::buildCoolingTube(const unsigned i_volumeID, const ARICHGeoCooling& coolingGeo)
     {
@@ -1216,7 +1521,13 @@ namespace Belle2 {
       G4SubtractionSolid* substraction = NULL;
       unsigned nSlots = detGeo.getNSlots();
 
+      if (nSlots > detectorGeo.getFEBCoolingGeometry().getFebcoolingv2GeometryID().size()) {
+        B2WARNING("GeoARICHCreator: No FEB colling body geometry available so they will not be placed (ARICHGeometryConfig with ClasDef>4 is needed).");
+        return detSupportLV;
+      }
+
       // drill holes in support plate
+      // add FEB cooling bodies
       for (unsigned iSlot = 1; iSlot < nSlots + 1; iSlot++) {
         unsigned iRing = detGeo.getSlotRing(iSlot);
         double r = (wallR[iRing] + wallR[iRing - 1]) / 2. - (thickR[iRing] - thickR[iRing - 1]) / 2.;
@@ -1225,6 +1536,7 @@ namespace Belle2 {
         G4ThreeVector trans(r * cos(phi), r * sin(phi), 0);
         G4RotationMatrix Ra;
         Ra.rotateZ(phi);
+
         new G4PVPlacement(G4Transform3D(Ra, trans),  holeLV, "hole", hapdSupportPlateLV, false, iSlot);
         if (substraction) substraction = new G4SubtractionSolid("Box+CylinderMoved", substraction, hole, G4Transform3D(Ra, trans));
         else substraction = new G4SubtractionSolid("Box+CylinderMoved", supportPlate, hole, G4Transform3D(Ra, trans));
@@ -1234,6 +1546,35 @@ namespace Belle2 {
         G4RotationMatrix RaBack;
         RaBack.rotateZ(phi);
         new G4PVPlacement(G4Transform3D(RaBack, transBack), hapdBackRadialWallLV[iRing - 1], "hapdBack", detSupportLV, false, iSlot);
+
+        // add FEB cooling bodies
+        G4ThreeVector febCoolingTa;
+        G4Transform3D febCoolingTr;
+        febCoolingTa.setX(r * cos(detGeo.getSlotPhi(iSlot)));
+        febCoolingTa.setY(r * sin(detGeo.getSlotPhi(iSlot)));
+
+        double supportTube_envelope_dZ = (detGeo.getSupportThickness() +  detGeo.getSupportBackWallHeight());
+        double febCooling_envelope_dZ = (detectorGeo.getFEBCoolingGeometry().getBigSquareThickness() +
+                                         detectorGeo.getFEBCoolingGeometry().getRectangleThickness());
+        double febCooling_envelope_Z0 = -supportTube_envelope_dZ / 2.0 + febCooling_envelope_dZ / 2.0 + detGeo.getSupportThickness();
+        febCoolingTa.setZ(febCooling_envelope_Z0);
+
+        int febcoolingv2GeometryID = detectorGeo.getFEBCoolingGeometry().getFebcoolingv2GeometryID().at(iSlot - 1);
+
+        if (febcoolingv2GeometryID == 2) Ra.rotateZ(90.0 * deg);
+
+        febCoolingTr = G4Transform3D(Ra, febCoolingTa);
+
+        if (febcoolingv2GeometryID != 0) {
+          G4LogicalVolume* febCoolingLV = buildFEBCoolingBody(detectorGeo.getFEBCoolingGeometry());
+
+          new G4PVPlacement(febCoolingTr,   //Transformation
+                            febCoolingLV,   //its logical volume
+                            "febCoolingLV", //its name
+                            detSupportLV,   //its mother  volume
+                            false,          //no boolean operation
+                            iSlot);         //copy number
+        }
       }
 
       // G4LogicalVolume* hapdSupportPlateLV = new G4LogicalVolume(substraction, supportMaterial, "hapdSupport");

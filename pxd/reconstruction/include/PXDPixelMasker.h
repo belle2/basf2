@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
 #include <pxd/dbobjects/PXDMaskedPixelPar.h>
 #include <pxd/dbobjects/PXDDeadPixelPar.h>
 #include <framework/database/DBObjPtr.h>

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,17 +17,12 @@
 #include <tracking/ckf/general/findlets/TreeSearcher.icc.h>
 #include <tracking/ckf/general/findlets/OverlapResolver.icc.h>
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>
-#include <tracking/ckf/general/findlets/OnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LimitedOnStateApplier.icc.h>
-#include <tracking/ckf/general/findlets/LayerToggledApplier.icc.h>
 #include <tracking/ckf/general/findlets/ResultStorer.icc.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 #include <tracking/ckf/svd/filters/relations/LayerSVDRelationFilter.icc.h>
 
 #include <framework/core/ModuleParamList.h>
-
-#include <tracking/ckf/general/utilities/ClassMnemomics.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -75,6 +70,8 @@ void CKFToSVDFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
 
   moduleParamList->getParameter<std::string>("hitFilter").setDefaultValue("sensor");
   moduleParamList->getParameter<std::string>("seedFilter").setDefaultValue("all");
+  moduleParamList->getParameter<std::string>("preSeedFilter").setDefaultValue("loose");
+  moduleParamList->getParameter<std::string>("preHitFilter").setDefaultValue("loose");
 
   moduleParamList->getParameter<std::string>("hitsSpacePointsStoreArrayName").setDefaultValue("SVDSpacePoints");
 

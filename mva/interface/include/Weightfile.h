@@ -13,10 +13,8 @@
 #define INCLUDE_GUARD_BELLE2_MVA_WEIGHTFILE_HEADER
 
 #include <mva/interface/Options.h>
-#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
 #include <framework/database/IntervalOfValidity.h>
-#include <framework/database/Database.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <boost/property_tree/ptree.hpp>
@@ -24,7 +22,6 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <cerrno>
 
 namespace Belle2 {
 
@@ -120,7 +117,7 @@ namespace Belle2 {
       /**
        * Add a vector to the xml tree
        * @param identifier identifier of the vector
-       * @param element the std::vector
+       * @param vector the std::vector
        */
       template<class T>
       void addVector(const std::string& identifier, const std::vector<T>& vector)
@@ -166,6 +163,7 @@ namespace Belle2 {
       /**
        * Returns a stored element from the xml tree
        * @param identifier of the stored element
+       * @param default_value default value of the stored element
        */
       template<class T>
       T getElement(const std::string& identifier, const T& default_value) const
@@ -192,6 +190,7 @@ namespace Belle2 {
        * Static function which saves a Weightfile to a file
        * @param weightfile to store
        * @param filename of the file or identifier of the database
+       * @param iov IntervalOfValidity of the Weightfile
        */
       static void save(Weightfile& weightfile, const std::string& filename,
                        const Belle2::IntervalOfValidity& iov = Belle2::IntervalOfValidity(0, 0, -1, -1));
@@ -220,6 +219,7 @@ namespace Belle2 {
       /**
        * Static function which loads a Weightfile from a file or fomr the database
        * @param filename of the file containing our serialized Weightfile
+       * @param emd EventMetaData
        */
       static Weightfile load(const std::string& filename, const Belle2::EventMetaData& emd = Belle2::EventMetaData(0, 0, 0));
 
@@ -255,6 +255,15 @@ namespace Belle2 {
        */
       static void saveToDatabase(Weightfile& weightfile, const std::string& identifier,
                                  const Belle2::IntervalOfValidity& iov = Belle2::IntervalOfValidity(0, 0, -1, -1));
+
+      /**
+       * Static function which saves an array of Weightfile objects in the basf2 condition database
+       * @param weightfiles vector of weightfiles to save
+       * @param identifier in the database
+       * @param iov interval of validity of this weightfile
+       */
+      static void saveArrayToDatabase(const std::vector<Weightfile>& weightfiles, const std::string& identifier,
+                                      const Belle2::IntervalOfValidity& iov = Belle2::IntervalOfValidity(0, 0, -1, -1));
 
       /**
        * Static function which loads a Weightfile from the basf2 condition database

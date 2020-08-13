@@ -1,7 +1,7 @@
 Testing Tools
 +++++++++++++
 
-These tools are used to run the continous integration tests. We have unittests and script tests.
+These tools are used to run the continuous integration tests. We have unittests and script tests.
 
 .. index::
     single: tools; b2test-units
@@ -15,7 +15,7 @@ These tools are used to run the continous integration tests. We have unittests a
 This program runs all unittests of the Belle2 Software. It is based on `Google
 Test <https://github.com/google/googletest>`_. Usually it's enough to call it
 without arguments. Here we just document the most useful arguments, please use
-``--help`` to get a more detailed list of avialable options.
+``--help`` to get a more detailed list of available options.
 
 .. rubric:: Optional Arguments
 

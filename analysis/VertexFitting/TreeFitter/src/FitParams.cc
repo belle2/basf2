@@ -3,26 +3,27 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/logging/Logger.h>
-
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
-#include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
+#include <analysis/VertexFitting/TreeFitter/FitParameterDimensionException.h>
+#include <string>
 
 namespace TreeFitter {
 
-  FitParams::FitParams(int dim)
-    : m_globalState(dim),
-      m_globalCovariance(dim, dim),
-      m_dim(dim),
-      m_chiSquare(1e10),
-      m_nConstraints(0),
-      m_dimensionReduction(0),
-      m_nConstraintsVec(dim, 0)
+
+  FitParams::FitParams(const int dim)
+    :
+    m_dim(dim),
+    m_chiSquare(1e10),
+    m_nConstraints(0),
+    m_dimensionReduction(0),
+    m_nConstraintsVec(dim, 0),
+    m_globalState(dim),
+    m_globalCovariance(dim, dim)
   {
     resetStateVector();
     resetCovariance();
@@ -45,11 +46,12 @@ namespace TreeFitter {
 
   bool FitParams::testCovariance() const
   {
-    bool okay = true;
-    for (int row = 0; row < m_dim && okay; ++row) {
-      okay = (m_globalCovariance(row, row) > 0);
+    bool ok = true;
+    for (int row = 0; row < m_dim; ++row) {
+      ok = (m_globalCovariance(row, row) > 0);
+      if (!ok) break;
     }
-    return okay;
+    return ok;
   }
 
   double FitParams::chiSquare() const
@@ -59,12 +61,16 @@ namespace TreeFitter {
 
   int FitParams::nDof() const
   {
-    const double ndf = nConstraints() - dim();
-    const double ndf_reduced = ndf - m_dimensionReduction;
-    if (ndf < 1) { B2FATAL("Not enough constraints for this fit. Add a mass or a beamcosntraint. n constraints (equations) " << nConstraints() << " free parameters " << dim()); }
-    if (ndf_reduced < 1) { B2WARNING("Potentially underconstraint topology. Will try to fit this anyway. Degrees of freedom (in theory) " << ndf_reduced);}
+    const int nConstr = nConstraints();
+    const int nPars = dim();
+    const int ndf = nConstr - nPars;
+    if (ndf < 1) {
+      const std::string error_string =
+        "Not enough constraints for this fit. Try adding a mass or beam cosntraint. constraints: " + std::to_string(
+          nConstr) + " parameters to extract: " + std::to_string(nPars) + " ndf: " + std::to_string(ndf);
+      throw FitParameterDimensionException(error_string);
+    }
     return ndf;
   }
-
 
 } //TreeFitter namespace

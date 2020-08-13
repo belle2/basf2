@@ -1,0 +1,14 @@
+
+Alias MyJ/psi J/psi
+
+Decay vpho
+1.0 MyJ/psi eta_c HELAMP 1.0 0.0 0.0 0.0 -1.0 0.0;
+Enddecay
+
+Decay MyJ/psi
+0.5 mu+ mu- PHOTOS VLL;
+0.5 e+ e-   PHOTOS VLL;
+Enddecay
+
+End
+

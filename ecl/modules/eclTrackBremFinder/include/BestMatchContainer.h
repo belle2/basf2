@@ -40,7 +40,7 @@ namespace Belle2 {
     = [](TEstimator currentBest, TEstimator newEst) {return newEst < currentBest;}
             )
     {
-      if (!m_oneMatch) {
+      if (!hasMatch()) {
         // not best match yet, take this one !
         setBestMatch(item , est);
         return true;
@@ -60,7 +60,7 @@ namespace Belle2 {
      */
     bool hasMatch() const
     {
-      return m_oneMatch;
+      return static_cast<bool>(m_bestMatch);
     }
 
     /**
@@ -69,7 +69,7 @@ namespace Belle2 {
      */
     TItem const& getBestMatch() const
     {
-      return m_bestMatch;
+      return *m_bestMatch;
     }
 
   private:
@@ -81,14 +81,10 @@ namespace Belle2 {
     {
       m_bestMatch = item;
       m_bestEstimator = est;
-      m_oneMatch = true;
     }
 
     /// Stores the best matched item
-    TItem m_bestMatch;
-
-    // stores if at least match item has been set
-    bool m_oneMatch = false;
+    std::optional<TItem> m_bestMatch;
 
     /// Stores the estimator value of the best match
     TEstimator m_bestEstimator = TEstimator();

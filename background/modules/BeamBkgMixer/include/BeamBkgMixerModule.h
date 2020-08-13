@@ -12,13 +12,11 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <simulation/dataobjects/SimHitBase.h>
 #include <simulation/background/BeamBGTypes.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <string>
 #include <map>
 
-#include "TFile.h"
 #include "TChain.h"
 #include "TClonesArray.h"
 
@@ -46,30 +44,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -100,13 +98,13 @@ namespace Belle2 {
      * structure to hold samples of a particular background type
      */
     struct BkgFiles {
-      SimHitBase::BG_TAG tag;  /**< background tag */
+      BackgroundMetaData::BG_TAG tag;  /**< background tag */
       std::string type;        /**< background type */
       double realTime;         /**< real time of BG samlpe */
       double scaleFactor;      /**< scale factor for the rate */
       std::vector<std::string> fileNames;     /**< file names */
       BackgroundMetaData::EFileType fileType; /**< file type */
-      TChain* tree;            /**< tree pointer */
+      std::unique_ptr<TChain> tree; /**< tree pointer */
       unsigned numFiles;       /**< number of files connected to TChain */
       unsigned numEvents;      /**< number of events (tree entries) in the sample */
       unsigned eventCount;     /**< current event (tree entry) */
@@ -116,9 +114,9 @@ namespace Belle2 {
       /**
        * default constructor
        */
-      BkgFiles(): tag(SimHitBase::bg_none), realTime(0.0), scaleFactor(1.0),
+      BkgFiles(): tag(BackgroundMetaData::bg_none), realTime(0.0), scaleFactor(1.0),
         fileType(BackgroundMetaData::c_Usual),
-        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(0)
+        tree(nullptr), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(0)
       {}
       /**
        * usefull constructor
@@ -130,7 +128,7 @@ namespace Belle2 {
        * @param fileTyp file type
        * @param indx index of this element in the std::vector
        */
-      BkgFiles(SimHitBase::BG_TAG bkgTag,
+      BkgFiles(BackgroundMetaData::BG_TAG bkgTag,
                const std::string& bkgType,
                const std::string& fileName,
                double time,
@@ -139,7 +137,7 @@ namespace Belle2 {
                unsigned indx = 0):
         tag(bkgTag), type(bkgType), realTime(time), scaleFactor(scaleFac),
         fileType(fileTyp),
-        tree(0), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(indx)
+        tree(nullptr), numFiles(0), numEvents(0), eventCount(0), rate(0.0), index(indx)
       {
         fileNames.push_back(fileName);
       }
@@ -170,7 +168,7 @@ namespace Belle2 {
         SIMHIT* simHit = simHits.appendNew(*bkgSimHit);
         simHit->shiftInTime(timeShift);
         if (simHit->getBackgroundTag() == 0) // should be properly set at bkg simulation
-          simHit->setBackgroundTag(SimHitBase::bg_other);
+          simHit->setBackgroundTag(BackgroundMetaData::bg_other);
         if (m_wrapAround) {
           double time = simHit->getGlobalTime();
           if (time > maxTime) {
@@ -195,8 +193,9 @@ namespace Belle2 {
     void addBeamBackHits(StoreArray<HIT>& hits, TClonesArray* cloneArray,
                          double timeShift, double minTime, double maxTime)
     {
-      //Match SubDet id from BeamBackHits to whether we keep it or not
-      bool keep[] = {false, m_PXD, m_SVD, m_CDC, m_ARICH, m_TOP, m_ECL, m_EKLM, m_BKLM};
+      // Match SubDet id from BeamBackHits to whether we keep it or not
+      // KLM is a single component, but it has different hits for BKLM and EKLM.
+      bool keep[] = {false, m_PXD, m_SVD, m_CDC, m_ARICH, m_TOP, m_ECL, m_KLM, m_KLM};
       if (!cloneArray) return;
       if (!hits.isValid()) return;
       // this is basically a copy of addSimHits but we only add the
@@ -240,7 +239,7 @@ namespace Belle2 {
      * @param realTime real time that corresponds to background sample
      * @param fileTyp file type
      */
-    void appendSample(SimHitBase::BG_TAG bkgTag,
+    void appendSample(BackgroundMetaData::BG_TAG bkgTag,
                       const std::string& bkgType,
                       const std::string& fileName,
                       double realTime,
@@ -277,8 +276,7 @@ namespace Belle2 {
     bool m_TOP = false; /**< true if found in m_components */
     bool m_ARICH = false; /**< true if found in m_components */
     bool m_ECL = false; /**< true if found in m_components */
-    bool m_BKLM = false; /**< true if found in m_components */
-    bool m_EKLM = false; /**< true if found in m_components */
+    bool m_KLM = false; /**< true if found in m_components */
     bool m_BeamBackHits = false; /**<  if true add also background hits */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */

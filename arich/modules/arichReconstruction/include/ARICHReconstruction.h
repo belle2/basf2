@@ -13,15 +13,19 @@
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHReconstructionPar.h>
+#include <arich/dbobjects/ARICHChannelMask.h>
+#include <arich/dbobjects/ARICHChannelMapping.h>
+#include <arich/dbobjects/ARICHGlobalAlignment.h>
+#include <arich/dbobjects/ARICHMirrorAlignment.h>
+#include <arich/dbobjects/ARICHAeroTilesAlignment.h>
 #include "framework/datastore/StoreArray.h"
 #include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
 #include "arich/dataobjects/ARICHLikelihood.h"
 #include <framework/database/DBObjPtr.h>
 
+
 #include <TVector3.h>
-#include <cmath>
-#include <boost/format.hpp>
 
 namespace Belle2 {
   /** Internal ARICH track reconstruction
@@ -61,12 +65,21 @@ namespace Belle2 {
     void transformTrackToLocal(ARICHTrack& arichTrack, bool align);
 
     //! Computes the value of identity likelihood function for different particle hypotheses.
-    int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
+    int likelihood2(ARICHTrack& arichTrack, const StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
 
     //! Sets track position resolution (from tracking)
     void setTrackPositionResolution(double pRes);
     //! Sets track direction resolution (from tracking)
     void setTrackAngleResolution(double aRes);
+
+    //! use mirror alignment or not
+    void useMirrorAlignment(bool align)
+    {
+      m_alignMirrors = align;
+    };
+
+    //! correct mean emission point z position
+    void correctEmissionPoint(int tileID, double r);
 
   private:
 
@@ -76,9 +89,18 @@ namespace Belle2 {
 
     DBObjPtr<ARICHGeometryConfig> m_arichgp; /**< geometry configuration parameters from the DB */
     DBObjPtr<ARICHReconstructionPar> m_recPars; /**< reconstruction parameters from the DB */
+    DBObjPtr<ARICHChannelMask> m_chnMask; /**< map of masked channels from the DB */
+    DBObjPtr<ARICHChannelMapping> m_chnMap; /**< map x,y channels to asic channels from the DB */
+    DBObjPtr<ARICHGlobalAlignment> m_alignp; /**< global alignment parameters from the DB */
+    DBObjPtr<ARICHMirrorAlignment> m_mirrAlign; /**< global alignment parameters from the DB */
+    OptionalDBObjPtr<ARICHAeroTilesAlignment> m_tileAlign; /**< alignment of aerogel tiles from DB */
+
+    std::vector<TVector3> m_mirrorPoints; /**< vector of points on all mirror plates */
+    std::vector<TVector3> m_mirrorNorms;  /**< vector of nomal vectors of all mirror plates */
 
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */
+    bool   m_alignMirrors; /**< if set to true mirror alignment constants from DB are used*/
 
     unsigned int m_nAerogelLayers; /**< number of aerogel layers */
     double  m_refractiveInd[c_noOfAerogels]; /**< refractive indices of aerogel layers */
@@ -88,6 +110,7 @@ namespace Belle2 {
     double  m_n0[c_noOfAerogels];  /**< number of emmited photons per unit length */
     TVector3 m_anorm[c_noOfAerogels]; /**< normal vector of the aerogle plane */
     int m_storePhot; /**< set to 1 to store individual reconstructed photon information */
+    double m_tilePars[124][2] = {0};
 
     //! Returns 1 if vector "a" lies on "copyno"-th detector active surface of detector and 0 else.
     int InsideDetector(TVector3 a, int copyno);
@@ -149,7 +172,11 @@ namespace Belle2 {
     //! Returns track direction at point with z coordinate "zout" (assumes straight track).
     TVector3 getTrackPositionAtZ(const ARICHTrack& track, double zout);
 
+    //! Returns point on the mirror plate with id mirrorID
+    TVector3 getMirrorPoint(int mirrorID);
 
+    //! Returns normal vector of the mirror plate with id mirrorID
+    TVector3 getMirrorNorm(int mirrorID);
 
   };
 

@@ -93,6 +93,10 @@ display.param('automatic', False)
 # change to True to show the full TGeo geometry instead of simplified extract
 display.param('fullGeometry', False)
 
+# set to any downloaded/created extract (=simplified geometry + 2D projections)
+# Default extract (for Phase 3) is stored in display/data
+display.param('customGeometryExtractPath', '')
+
 # Objects which are to be hidden (can be manually re-enabled in tree view).
 # Names correspond to the object names in the 'Event'. (Note that this won't
 # work for objects somewhere deep in the tree, only for those immediately

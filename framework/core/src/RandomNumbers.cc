@@ -14,6 +14,7 @@
 
 #include <framework/core/RandomNumbers.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/pcore/ProcHelper.h>
 #include <framework/logging/Logger.h>
 
 
@@ -51,7 +52,7 @@ void RandomNumbers::initialize(const std::string& seed)
   if (!s_runRng) {
     s_runRng = new RandomGenerator();
   }
-  RandomGenerator* gen = dynamic_cast<RandomGenerator*>(gRandom);
+  auto* gen = dynamic_cast<RandomGenerator*>(gRandom);
   if (!gen) {
     delete gRandom;
     B2DEBUG(100, "Replacing gRandom from " << gRandom << " to " << gen);
@@ -62,9 +63,14 @@ void RandomNumbers::initialize(const std::string& seed)
   s_runRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
 }
 
+bool RandomNumbers::isInitialized()
+{
+  return (s_evtRng != nullptr);
+}
+
 void RandomNumbers::barrier()
 {
-  RandomGenerator* gen = dynamic_cast<RandomGenerator*>(gRandom);
+  auto* gen = dynamic_cast<RandomGenerator*>(gRandom);
   if (!gen) {
     B2ERROR("Random Generator gRandom is not Belle2::RandomGenerator, cannot increase barrier");
   } else {

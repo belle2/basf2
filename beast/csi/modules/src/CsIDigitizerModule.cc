@@ -16,15 +16,12 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <stdint.h> //< For fixed-size integers
 #include <vector>
-#include <TFile.h>
 #include <TGraph.h>
 #include <TH1F.h>
 #include <TH1I.h>
 #include <framework/core/RandomNumbers.h>
 #include <TVector3.h>
-#include <TVectorD.h>
 #include <math.h>
 
 #define PI 3.14159265358979323846
@@ -255,11 +252,11 @@ uint16_t  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16
   int iFirstTrigger = 0;
   list<int> baselineBuffer;
   vector<int>::iterator it;
-  float tempBaseline = 0.0;
+  float tempBaseline;
 
   // Saving inverse number of samples used for baseline averaging (avoid division)
   const double invMaxNavgBL = 1.0 / _NsamBL; /**< 1 / N_samples used for baseline averaging for most of the signal*/
-  double invNavgBL = 0.0;                   /**< 1 / N_samples used for baseline averaging (at beginning of signal)*/
+  double invNavgBL;                   /**< 1 / N_samples used for baseline averaging (at beginning of signal)*/
 
   _Waveform->resize(nSam, 0);
   _DPPCIBits->resize(nSam, 0);

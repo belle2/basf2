@@ -1,9 +1,6 @@
 #include "daq/storage/ONSENBinData.h"
 
-#include <daq/slc/base/StringUtil.h>
-
 #include <arpa/inet.h>
-#include <cstring>
 
 using namespace Belle2;
 

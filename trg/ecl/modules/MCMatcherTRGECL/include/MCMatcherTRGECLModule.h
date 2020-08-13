@@ -23,18 +23,8 @@
 #include "trg/ecl/dataobjects/TRGECLDigi0MC.h"
 #include "trg/ecl/dataobjects/TRGECLHitMC.h"
 
-//#include <ecl/geometry/ECLGeometryPar.h>
-//#include <ecl/dataobjects/ECLSimHit.h>
-
 //C++/C standard lib elements.
-#include <string>
-#include <vector>
-#include <queue>
 #include <map>
-
-//ROOT
-#include <TRandom3.h>
-
 
 namespace Belle2 {
   //namespace ECL {
@@ -50,22 +40,22 @@ namespace Belle2 {
     virtual ~MCMatcherTRGECLModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Nothing so far.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Actual digitization of all hits in the ECL.
      *
      *  The digitized hits are written into the DataStore.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Nothing so far. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Stopping of CPU clock.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** define a map for Primary Track*/
     typedef std::map< int, int>  PrimaryTrackMap;
@@ -80,11 +70,11 @@ namespace Belle2 {
 
 
     /** CPU time     */
-    double m_timeCPU;
+    double m_timeCPU = 0.;
     /** Run number   */
-    int    m_nRun;
+    int    m_nRun = 0;
     /** Event number */
-    int    m_nEvent;
+    int    m_nEvent = 0;
     /** object of TC Mapping*/
     TrgEclMapping* _TCMap;
     /** TCId  */

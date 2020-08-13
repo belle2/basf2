@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HEPEVTOUTPUTMODULE_H
-#define HEPEVTOUTPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
-#include <iostream>
 #include <fstream>
 #include <string>
 
@@ -37,13 +35,13 @@ namespace Belle2 {
     virtual ~HepevtOutputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Terminates the module. */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:
@@ -62,4 +60,3 @@ namespace Belle2 {
 } // end namespace Belle2
 
 
-#endif /* HEPEVTOUTPUTMODULE_H */

@@ -3,7 +3,7 @@
 
 from basf2 import *
 from optparse import OptionParser
-
+import os
 # Options from command line
 parser = OptionParser()
 parser.add_option('-n', '--nevents', dest='nevents', default=100,

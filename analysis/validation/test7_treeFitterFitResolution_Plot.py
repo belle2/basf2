@@ -3,18 +3,18 @@
 
 """
 <header>
-  <input>TreeFitted_B0ToJPsiKs.root</input>
-  <output>test_TreeFitterOutput.root</output>
+  <input>../TreeFitted_B0ToJPsiKs.root</input>
+  <output>test7_TreeFitterOutput.root</output>
   <contact>Jo-Frederik Krohn; jo-frederik.krohn@desy.de</contact>
-  <description> Bto J/Psi Ks(Pi+Pi-) is fitted and the resolution of the vertex positions/E/P/pVal is plotted. </description>
   <interval>nightly</interval>
 </header>
 """
+# Bto J/Psi Ks(Pi+Pi-) is fitted and the resolution of the vertex
+# positions/E/P/pVal is plotted.
 
 import ROOT
 import sysconfig
 ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
-from basf2 import *
 
 import glob
 
@@ -75,12 +75,12 @@ bkgCut = ROOT.TCut("(isSignal<1)")
 histOperationStrings = [
     "(E - mcE) / E_uncertainty>>B0_E_pull_s",
     "(p - mcP) / pErr>>B0_p_pull_s",
-    "(x - mcDX) / x_uncertainty>>B0_vertex_pullx_s",
-    "(y - mcDY) / y_uncertainty>>B0_vertex_pully_s",
-    "(z - mcDZ) / z_uncertainty>>B0_vertex_pullz_s",
-    "(x - mcDX)*10000>>B0_vertex_resolutionx_s",
-    "(y - mcDY)*10000>>B0_vertex_resolutiony_s",
-    "(z - mcDZ)*10000>>B0_vertex_resolutionz_s",
+    "(x - mcDecayVertexX) / x_uncertainty>>B0_vertex_pullx_s",
+    "(y - mcDecayVertexY) / y_uncertainty>>B0_vertex_pully_s",
+    "(z - mcDecayVertexZ) / z_uncertainty>>B0_vertex_pullz_s",
+    "(x - mcDecayVertexX)*10000>>B0_vertex_resolutionx_s",
+    "(y - mcDecayVertexY)*10000>>B0_vertex_resolutiony_s",
+    "(z - mcDecayVertexZ)*10000>>B0_vertex_resolutionz_s",
     "chiProb>>pVal_s",
     "chiProb>>pVal_b",
 ]

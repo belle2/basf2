@@ -1,18 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2011-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Poyuan Chen, Alexei Sibidanov                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- *                                                                        *
- * 7/31: Poyuan                                                           *
- *                                                                        *
- *                                                                        *
  **************************************************************************/
-#ifndef ECLGEOMETRYPAR_H
-#define ECLGEOMETRYPAR_H
+
+#pragma once
 
 #include <vector>
 #include <map>
@@ -71,10 +67,10 @@ namespace Belle2 {
       /** Get Phi Id */
       int GetPhiID() {return mPar_phiID;};
       /** Get Cell Id (LEP: new way)*/
-      int ECLVolumeToCellID(const G4VTouchable*); // Mapping from G4VTouchable copyNumbers to Crystal CellID
-      int TouchableToCellID(const G4VTouchable*); // The same as above but without sanity checks
+      int ECLVolumeToCellID(const G4VTouchable*); /**< Mapping from G4VTouchable copyNumbers to Crystal CellID */
+      int TouchableToCellID(const G4VTouchable*); /**< The same as above but without sanity checks */
 
-      int TouchableDiodeToCellID(const G4VTouchable*); // Mapping from G4VTouchable copyNumbers to Crystal CellID
+      int TouchableDiodeToCellID(const G4VTouchable*); /**< Mapping from G4VTouchable copyNumbers to Crystal CellID */
 
       /** The Position of crystal*/
       G4ThreeVector getCrystalPos(int cid)
@@ -108,11 +104,15 @@ namespace Belle2 {
 
       double time2sensor(int cid, const G4ThreeVector& hit_pos);
     private:
+      /** initialise the crystal */
       void InitCrystal(int cid);
+      /** crystal geometry */
       struct CrystalGeom_t {
         G4ThreeVector pos, dir;
       };
+      /** the crystals */
       std::vector<CrystalGeom_t> m_crystals;
+      /** the current crystal */
       CrystalGeom_t m_current_crystal;
       /** The Cell ID information*/
       int mPar_cellID;
@@ -120,6 +120,7 @@ namespace Belle2 {
       int mPar_thetaID;
       /** The Phi ID information*/
       int mPar_phiID;
+      /** . */
       int m_ini_cid;
       /** Pointer that saves the instance of this class. */
       static ECLGeometryPar* m_B4ECLGeometryParDB;
@@ -144,6 +145,7 @@ namespace Belle2 {
         const std::vector< Identifier >::size_type aNearSize
       ) ;
 
+      /** destructor */
       virtual ~EclNbr();
 
       // member functions
@@ -172,11 +174,11 @@ namespace Belle2 {
       void printNbr();
       //! Mapping theta, phi Id
       void Mapping(int cid);
-      int GetCellID(int ThetaId, int PhiId);//! Get Cell Id
+      int GetCellID(int ThetaId, int PhiId);/**< Get Cell Id */
 
-      int GetCellID() {return mNbr_cellID;};//! Get Cell Id
-      int GetThetaID() {return mNbr_thetaID;};//! Get Theta Id
-      int GetPhiID() {return mNbr_phiID;};//! Get Phi Id
+      int GetCellID() {return mNbr_cellID;};/**< Get Cell Id */
+      int GetThetaID() {return mNbr_thetaID;};/**< Get Theta Id */
+      int GetPhiID() {return mNbr_phiID;};/**< Get Phi Id */
 
     protected:
       // protected member functions
@@ -191,11 +193,11 @@ namespace Belle2 {
       // private const member functions
 
       /** data members */
-      int mNbr_cellID;           /** The Cell ID information*/
-      int mNbr_thetaID;          /** The Theta ID information*/
-      int mNbr_phiID;            /** The Phi ID information*/
-      std::vector< Identifier >&           m_nbrs     ; /** id  of m_brs */
-      std::vector< Identifier >::size_type m_nearSize ;/**  size of near brs*/
+      int mNbr_cellID;           /**< The Cell ID information*/
+      int mNbr_thetaID;          /**< The Theta ID information*/
+      int mNbr_phiID;            /**< The Phi ID information*/
+      std::vector< Identifier >&           m_nbrs     ; /**< id  of m_brs */
+      std::vector< Identifier >::size_type m_nearSize ;/**<  size of near brs*/
 
       // static data members
 
@@ -227,7 +229,7 @@ namespace Belle2 {
         : fId(hid), fEnergy(energy), fCellId(cid)
       {
       }
-      ///
+      /// destructor
       virtual ~TEclEnergyHit() { }
 
       /// assignment operator(s)
@@ -368,9 +370,9 @@ namespace Belle2 {
       // private const member functions
 
       /** data members */
-      Identifier fId; /**  Id  */
-      EclGeV fEnergy; /**  Energy  */
-      int fCellId;    /**  Cell Id  */
+      Identifier fId; /**< Id  */
+      EclGeV fEnergy; /**< Energy  */
+      int fCellId;    /**< Cell Id  */
       // static data members
 
     };
@@ -381,4 +383,3 @@ namespace Belle2 {
 
   } // end of namespace ECL
 } // end of namespace Belle2
-#endif

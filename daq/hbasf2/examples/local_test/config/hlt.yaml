@@ -1,0 +1,57 @@
+---
+programs:
+  - ["b2hlt_distributor",
+     "--input", "tcp://localhost:5000",
+     "--output", "tcp://*:4000",
+     "--monitor", "tcp://*:8000"]
+
+  - ["python3", "steering/steering.py",
+     "--input", "tcp://localhost:4000",
+     "--output", "tcp://localhost:4001",
+     "--dqm", "tcp://localhost:6000"]
+  - ["python3", "steering/steering.py",
+     "--input", "tcp://localhost:4000",
+     "--output", "tcp://localhost:4001",
+     "--dqm", "tcp://localhost:6001"]
+
+  - ["b2hlt_collector",
+     "--input", "tcp://*:4001",
+     "--output", "tcp://*:4002",
+     "--monitor", "tcp://*:8001"]
+
+  - ["python3", "steering/steering.py",
+     "--input", "tcp://localhost:4002",
+     "--output", "tcp://localhost:4003",
+     "--raw"]
+
+  - ["b2hlt_finalcollector",
+     "--input", "tcp://*:4003",
+     "--output", "tcp://localhost:5001",
+     "--monitor", "tcp://*:8002"]
+
+  - ["b2hlt_socket2read", "5001", "--raw"]
+
+  - ["b2hlt_proxyhistoserver",
+     "--input", "tcp://*:6000",
+     "--output", "tcp://localhost:7000",
+     "--monitor", "tcp://*:8003",
+     "--timeout", "30"]
+  - ["b2hlt_proxyhistoserver",
+     "--input", "tcp://*:6001",
+     "--output", "tcp://localhost:7000",
+     "--monitor", "tcp://*:8004",
+     "--timeout", "30"]
+
+  - ["b2hlt_finalhistoserver",
+     "--input", "tcp://*:7000",
+     "--rootFileName", "root_dqm_{run_number}_{experiment_number}.root",
+     "--monitor", "tcp://*:8005"]
+
+input: 5000
+monitor:
+  distributor: "tcp://localhost:8000"
+  collector: "tcp://localhost:8001"
+  final_collector: "tcp://localhost:8002"
+  proxyhistoserver1: "tcp://localhost:8003"
+  proxyhistoserver2: "tcp://localhost:8004"
+  dqmserver: "tcp://localhost:8005"

@@ -19,7 +19,6 @@
 
 #include <vector>
 #include <string>
-#include <memory>
 #include <cassert>
 
 namespace Belle2 {

@@ -13,7 +13,6 @@
 
 // ROOT
 #include <TObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -32,6 +31,7 @@ namespace Belle2 {
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
+     * @param detNb detector number
      */
     Ph1bpipeSimHit(float energyDep, int detNb):
       m_energyDep(energyDep), m_detNb(detNb) {}

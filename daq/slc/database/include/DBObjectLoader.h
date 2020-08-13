@@ -4,6 +4,8 @@
 #include <daq/slc/database/DBObject.h>
 #include <daq/slc/database/DBInterface.h>
 
+#include <daq/slc/system/Mutex.h>
+
 #include <daq/slc/base/StringUtil.h>
 #include <daq/slc/base/ConfigFile.h>
 
@@ -34,6 +36,9 @@ namespace Belle2 {
                           DBInterface* db = NULL);
     static bool add(DBObject& obj, StringList& str,
                     const std::string& name_in, const DBObject& cobj);
+
+
+    static Mutex m_mutex;
 
   };
 

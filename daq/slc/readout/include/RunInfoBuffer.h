@@ -41,38 +41,38 @@ namespace Belle2 {
     ~RunInfoBuffer() {}
 
   public:
-    size_t size() throw();
+    size_t size() ;
     bool open(const std::string& nodename,
               int nodeid = 0, bool recreate = false);
     bool init();
     bool close();
     bool unlink();
-    bool lock() throw();
-    bool unlock() throw();
-    bool wait() throw();
-    bool wait(int time) throw();
-    bool notify() throw();
+    bool lock() ;
+    bool unlock() ;
+    bool wait() ;
+    bool wait(int time) ;
+    bool notify() ;
     void clear();
 
   public:
-    const std::string getName() const throw() { return m_nodename; }
-    const std::string getPath() const throw() { return m_path; }
-    bool isAvailable() const throw() { return m_info != NULL; }
-    ronode_info* get() throw() { return m_info; }
-    unsigned int getNodeId() const throw() { return m_info->nodeid; }
-    unsigned int getState() const throw() { return m_info->state; }
-    unsigned int getErrorFlag() const throw() { return m_info->eflag; }
-    unsigned int getExpNumber() const throw() { return m_info->expno; }
-    unsigned int getRunNumber() const throw() { return m_info->runno; }
-    unsigned int getSubNumber() const throw() { return m_info->subno; }
-    int getInputPort() const throw() { return m_info->io[0].port; }
-    int getInputAddress() const throw() { return m_info->io[0].addr; }
-    unsigned int getInputCount() const throw() { return m_info->io[0].count; }
-    unsigned long long getInputNBytes() const throw() { return m_info->io[0].nbyte; }
-    int getOutputPort() const throw() { return m_info->io[1].port; }
-    int getOutputAddress() const throw() { return m_info->io[1].addr; }
-    unsigned int getOutputCount() const throw() { return m_info->io[1].count; }
-    unsigned long long getOutputNBytes() const throw() { return m_info->io[1].nbyte; }
+    const std::string getName() const  { return m_nodename; }
+    const std::string getPath() const  { return m_path; }
+    bool isAvailable() const  { return m_info != NULL; }
+    ronode_info* get()  { return m_info; }
+    unsigned int getNodeId() const  { return m_info->nodeid; }
+    unsigned int getState() const  { return m_info->state; }
+    unsigned int getErrorFlag() const  { return m_info->eflag; }
+    unsigned int getExpNumber() const  { return m_info->expno; }
+    unsigned int getRunNumber() const  { return m_info->runno; }
+    unsigned int getSubNumber() const  { return m_info->subno; }
+    int getInputPort() const  { return m_info->io[0].port; }
+    int getInputAddress() const  { return m_info->io[0].addr; }
+    unsigned int getInputCount() const  { return m_info->io[0].count; }
+    unsigned long long getInputNBytes() const  { return m_info->io[0].nbyte; }
+    int getOutputPort() const  { return m_info->io[1].port; }
+    int getOutputAddress() const  { return m_info->io[1].addr; }
+    unsigned int getOutputCount() const  { return m_info->io[1].count; }
+    unsigned long long getOutputNBytes() const  { return m_info->io[1].nbyte; }
     void setNodeId(unsigned int id) { m_info->nodeid = id; }
     void setState(State state) { m_info->state = (unsigned int)state; }
     void setErrorFlag(EFlag eflag) { m_info->eflag = (unsigned int)eflag; }
@@ -93,12 +93,12 @@ namespace Belle2 {
     void addOutputNBytes(unsigned long long nbyte) { m_info->io[1].nbyte += nbyte; }
     event_header& getEventHeader() { return m_info->header; }
     void copyEventHeader(int* buf);
-    bool isNotReady() throw() { return (m_info) && m_info->state == NOTREADY; }
-    bool isReady() throw() { return (m_info) && m_info->state == READY; }
-    bool isRunning() throw() { return (m_info) && m_info->state == RUNNING; }
-    bool isPausing() throw() { return (m_info) && m_info->state == PAUSING; }
-    bool isPaused() throw() { return (m_info) && m_info->state == PAUSED; }
-    bool isResuming() throw() { return (m_info) && m_info->state == RESUMING; }
+    bool isNotReady()  { return (m_info) && m_info->state == NOTREADY; }
+    bool isReady()  { return (m_info) && m_info->state == READY; }
+    bool isRunning()  { return (m_info) && m_info->state == RUNNING; }
+    bool isPausing()  { return (m_info) && m_info->state == PAUSING; }
+    bool isPaused()  { return (m_info) && m_info->state == PAUSED; }
+    bool isResuming()  { return (m_info) && m_info->state == RESUMING; }
 
     bool waitRunning(int timeout);
     bool waitReady(int timeout);

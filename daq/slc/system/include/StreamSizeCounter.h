@@ -9,13 +9,13 @@ namespace Belle2 {
 
   public:
     StreamSizeCounter() : m_count(0) {}
-    virtual ~StreamSizeCounter() throw() {}
+    virtual ~StreamSizeCounter() {}
 
   public:
-    virtual size_t write(const void*, size_t) throw(IOException);
-    virtual bool available() throw() { return true; }
-    void reset() throw() { m_count = 0; }
-    int count() const throw() { return m_count; }
+    virtual size_t write(const void*, size_t);
+    virtual bool available() { return true; }
+    void reset() { m_count = 0; }
+    int count() const { return m_count; }
 
   private:
     size_t m_count;

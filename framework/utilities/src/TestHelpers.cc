@@ -21,7 +21,7 @@ void TestWithGearbox::SetUpTestCase()
   Gearbox& gearbox = Gearbox::getInstance();
 
   std::vector<std::string> backends;
-  backends.push_back("file:");
+  backends.emplace_back("file:");
   gearbox.setBackends(backends);
 
   B2INFO("Start open gearbox.");

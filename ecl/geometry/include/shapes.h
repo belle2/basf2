@@ -1,5 +1,14 @@
-#ifndef __h_shapes
-#define __h_shapes
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Alexei Sibidanov                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
 #include <string>
 #include <vector>
 #include <G4VSolid.hh>
@@ -55,4 +64,3 @@ namespace Belle2 {
 
   }
 }
-#endif //__h_shapes

@@ -11,27 +11,16 @@
 #ifndef REPROCESSORMODULE_H
 #define REPROCESSORMODULE_H
 
-#include <mdst/dataobjects/MCParticleGraph.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <framework/core/Module.h>
-#include <string>
-#include <vector>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 #include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
-
-
-//ROOT
-#include <TRandom3.h>
-#include <TMath.h>
-#include <TF1.h>
-#include <TVector3.h>
-
 
 namespace Belle2 {
   //  namespace reprocessor {
@@ -50,22 +39,39 @@ namespace Belle2 {
      */
     ReprocessorModule();
 
-    /**  */
+    /**
+     * Destructor
+     */
     virtual ~ReprocessorModule();
 
-    /**  */
-    virtual void initialize();
+    /**
+     * Initialize the Module.
+     * This method is called at the beginning of data processing.
+     */
+    virtual void initialize() override;
 
-    /**  */
-    virtual void beginRun();
+    /**
+     * Called when entering a new run.
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
+    virtual void beginRun() override;
 
-    /**  */
-    virtual void event();
+    /**
+     * Event processor.
+     */
+    virtual void event() override;
 
-    /**  */
-    virtual void endRun();
-    /**  */
-    virtual void terminate();
+    /**
+     * End-of-run action.
+     * Save run-related stuff, such as statistics.
+     */
+    virtual void endRun() override;
+
+    /**
+     * Termination action.
+     * Clean-up, close files, summarize statistics, etc.
+     */
+    virtual void terminate() override;
 
 
   private:

@@ -16,7 +16,9 @@ WireHitPreparer::WireHitPreparer()
 {
   this->addProcessingSignalListener(&m_wireHitCreator);
   this->addProcessingSignalListener(&m_wireHitBackgroundBlocker);
+  this->addProcessingSignalListener(&m_wireHitBackgroundDetector);
   this->addProcessingSignalListener(&m_wireHitMCMultiLoopBlocker);
+  this->addProcessingSignalListener(&m_asicBackgroundDetector);
 }
 
 std::string WireHitPreparer::getDescription()
@@ -28,12 +30,16 @@ void WireHitPreparer::exposeParameters(ModuleParamList* moduleParamList, const s
 {
   m_wireHitCreator.exposeParameters(moduleParamList, prefix);
   m_wireHitBackgroundBlocker.exposeParameters(moduleParamList, prefix);
+  m_wireHitBackgroundDetector.exposeParameters(moduleParamList, prefix);
   m_wireHitMCMultiLoopBlocker.exposeParameters(moduleParamList, prefix);
+  m_asicBackgroundDetector.exposeParameters(moduleParamList, prefix);
 }
 
 void WireHitPreparer::apply(std::vector<CDCWireHit>& outputWireHits)
 {
   m_wireHitCreator.apply(outputWireHits);
   m_wireHitBackgroundBlocker.apply(outputWireHits);
+  m_wireHitBackgroundDetector.apply(outputWireHits);
   m_wireHitMCMultiLoopBlocker.apply(outputWireHits);
+  m_asicBackgroundDetector.apply(outputWireHits);
 }

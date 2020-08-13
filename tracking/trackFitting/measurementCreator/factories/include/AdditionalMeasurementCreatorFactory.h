@@ -10,8 +10,6 @@
 #pragma once
 
 #include <tracking/trackFitting/measurementCreator/factories/MeasurementCreatorFactory.h>
-#include <tracking/trackFitting/measurementCreator/creators/CoordinateMeasurementCreator.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   /** Add measurement creators that do not rely on a specific hit type,

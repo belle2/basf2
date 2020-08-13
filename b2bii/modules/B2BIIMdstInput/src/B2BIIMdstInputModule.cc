@@ -12,6 +12,7 @@
 
 #include <framework/core/Environment.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/database/Configuration.h>
 
 // Belle tables
 #include "belle_legacy/tables/belletdf.h"
@@ -65,6 +66,7 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
 
   m_nevt = -1;
   m_current_file_position = -1;
+  m_current_file_entry = -1;
 
   //Parameter definition
   addParam("inputFileName", m_inputFileName, "Belle MDST input file name. "
@@ -139,7 +141,9 @@ void B2BIIMdstInputModule::initialize()
   // open the first file
   openNextFile();
 
-  B2DEBUG(1, "B2BIIMdstInput: initialized.");
+  // Also, make sure we register a filemetadata object. We don't have most information
+  // to go into it but we need it for real/MC flag
+  m_fileMetadata.registerInDataStore();
 }
 
 void B2BIIMdstInputModule::initializeDataStore()
@@ -222,18 +226,17 @@ void B2BIIMdstInputModule::event()
 
   // Fill EventMetaData
   StoreObjPtr<EventMetaData> evtmetadata;
-  evtmetadata.create();
 
   // Read next event: We try to read the next event from the current file
   // if thist fails, open the next file and try again
   // if we cannot open the next file then stop processing
   while (!readNextEvent()) {
     if (!openNextFile()) {
-      evtmetadata->setEndOfData(); // stop event processing
       B2DEBUG(99, "[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << m_nevt << ". No more files");
       return;
     }
   }
+  evtmetadata.create();
 
   // Convert the Belle_event -> EventMetaData
   // Get Belle_event_Manager
@@ -289,7 +292,23 @@ void B2BIIMdstInputModule::event()
   evtmetadata->setEvent(evt.EvtNo() & 0x0fffffff);
 
   // set generated weight (>0 for MC; <0 for real DATA)
-  evtmetadata->setGeneratedWeight((evt.ExpMC() == 2) ? 1.0 : -1.0);
+  bool realData = evt.ExpMC() != 2;
+  evtmetadata->setGeneratedWeight(realData ? -1.0 : 1.0);
+
+  // no file metadata yet? apparently first event, make sure the real/MC data flag is correct
+  if (!m_fileMetadata) {
+    m_fileMetadata.create();
+    if (realData) m_fileMetadata->declareRealData();
+    // this happens for the first event so now is a good time to tell the framework
+    // which globaltags we want to use ...
+    std::string tag = realData ? "B2BII" : "B2BII_MC";
+    Conditions::Configuration::getInstance().setInputGlobaltags({tag});
+  } else {
+    // Make sure we don't process real data and MC in the same process
+    if (realData == m_fileMetadata->isMC()) {
+      B2FATAL("Information whether we process real or simulated data has changed. Refusing to continue");
+    }
+  }
 
   B2DEBUG(90, "[B2BIIMdstInputModule] Convert exp/run/evt: " << evt.ExpNo() << "/" << evt.RunNo() << "/" << int(
             evt.EvtNo() & 0x0fffffff));
@@ -306,4 +325,3 @@ void B2BIIMdstInputModule::terminate()
   delete m_fd;
   B2INFO("B2BIIMdstInput: terminate called");
 }
-

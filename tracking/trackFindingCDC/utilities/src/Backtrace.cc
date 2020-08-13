@@ -17,7 +17,6 @@
 #include <execinfo.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 using namespace Belle2;
 
@@ -32,7 +31,7 @@ void TrackFindingCDC::printBacktrace(LogConfig::ELogLevel logLevel, int nFrames)
 
   traceLines = backtrace_symbols(rawBuffer, traceSize);
 
-  if (traceLines == NULL) {
+  if (traceLines == nullptr) {
     B2LOG(logLevel, 0, "no backtrace obtained");
   }
 

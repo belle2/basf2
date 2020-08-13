@@ -9,10 +9,9 @@
  **************************************************************************/
 
 #include <cdc/dbobjects/CDCGeometry.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 #include <boost/format.hpp>
+
 using namespace Belle2;
 using namespace std;
 using namespace boost;

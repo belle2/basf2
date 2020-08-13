@@ -1,0 +1,29 @@
+Changes in the framework package since release-04-00-00
+-------------------------------------------------------
+
+Conditions Database
++++++++++++++++++++
+
+* :ref:`b2conditionsdb` has been optimized to work with larger globaltags.
+* ``b2conditionsdb-diff`` and ``b2conditionsdb-iov`` by default don't show any database internal ids anymore but those can be re-enabled with ``--show-ids``
+* ``b2conditionsdb-dump`` has learned a new argument to show the content of a payload valid for a given run in a given globaltag
+* There are new python classes to handle iovs, see `conditions_db.iov`
+
+
+Logging
++++++++
+
+* Added support to escape newlines in all log messages by setting
+  `logging.enable_escape_newlines <basf2.LogPythonInterface.enable_escape_newlines>`.
+* Added support to suppress messages if they repeated for a certain number of times.
+  This is disabled by default but can be enabled with
+  `logging.max_repetitions <basf2.LogPythonInterface.max_repetitions>`.
+
+Miscellaneous
++++++++++++++
+
+ * Added support for writing ``udst`` files as output from BGxN N>0 files in light releases (see :issue:`BII-3622`). This means skimming is fully supported with a light release.
+ * Added support for b2bii in light releases. However, this comes at the cost of no longer being able to convert ExtHits and ECLHits.
+ * The :b2:mod:`RootInput` will now by default skip events which have an error flag set. This can be changed with the ``discardErrorEvents`` parameter.
+ * Added the function `basf2.get_file_metadata` to quickly obtain the FileMetaData object of a given basf2 output file.
+ * Added the tools ``b2code-sphinx-build`` and ``b2code-sphinx-warnings`` to build the sphinx documentation or check for warnings when building the documentation.

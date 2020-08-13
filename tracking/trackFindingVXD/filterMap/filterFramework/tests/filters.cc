@@ -376,7 +376,6 @@ namespace VXDTFfilterTest {
     EXPECT_FALSE(filterMin2.accept(x1, x2));
     EXPECT_TRUE(filterMin2.accept(x1, x4));
 
-    // cppcheck-suppress compareBoolExpressionWithInt
     auto filterRange = (0. < SquaredDistance3D() < 1);
     EXPECT_FALSE(filterRange.accept(x1, x1));
     EXPECT_TRUE(filterRange.accept(x1, x2));
@@ -437,7 +436,6 @@ namespace VXDTFfilterTest {
     );
 
     spacePoint x1(0.0f , 0.0f, 0.0f);
-    spacePoint x2(1.0f , 0.0f, 0.0f);
     spacePoint x3(2.0f , 0.0f, 0.0f);
 
     counter< SquaredDistance3D   >::N = 0;

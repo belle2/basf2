@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <alignment/GlobalLabel.h>
+
 #include <iostream>
 
 using namespace std;
@@ -23,12 +24,12 @@ GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
   if (globalLabel > maxLabel)
     return;
   gid = globalLabel;
-  pid = gid % eidOffest / pidOffset;
   tif = gid / tifOffset;
+  pid = gid % eidOffest / pidOffset;
 
-  if (!tif)
+  if (!tif) {
     eid = gid % tifOffset / eidOffest;
-  else {
+  } else {
     // Time-dep label
     gidTYPE teid = gid % tidOffset / teidOffset;
     gidTYPE teidpid = makeTEIDPID(teid, pid);
@@ -41,31 +42,6 @@ GlobalLabel::GlobalLabel(GlobalLabel::gidTYPE globalLabel) :
     eid = eidpid / eidOffest;
     tid = gid % tifOffset / tidOffset;
   }
-}
-
-GlobalLabel::GlobalLabel(VxdID vxdid, GlobalLabel::gidTYPE paramId): gid(0),
-  eid(0), pid(0), tid(0), tif(0)
-{
-  construct(vxdid.getID() + vxdOffset, paramId);
-}
-
-GlobalLabel::GlobalLabel(WireID cdcid, GlobalLabel::gidTYPE paramId): gid(0),
-  eid(0), pid(0), tid(0), tif(0)
-{
-  construct(cdcid.getEWire() + cdcOffset, paramId);
-}
-
-GlobalLabel::GlobalLabel(BKLMElementID bklmid, GlobalLabel::gidTYPE paramId):
-  gid(0), eid(0), pid(0), tid(0), tif(0)
-{
-  construct(bklmid.getID() + bklmOffset, paramId);
-}
-
-GlobalLabel::GlobalLabel(EKLMElementID eklmElement,
-                         GlobalLabel::gidTYPE paramId):
-  gid(0), eid(0), pid(0), tid(0), tif(0)
-{
-  construct(eklmElement.getGlobalNumber() + eklmOffset, paramId);
 }
 
 void GlobalLabel::registerTimeDependent(GlobalLabel::gidTYPE start,
@@ -104,34 +80,6 @@ GlobalLabel::gidTYPE GlobalLabel::setParameterId(GlobalLabel::gidTYPE paramId)
   return label();
 }
 
-VxdID GlobalLabel::getVxdID() const
-{
-  if (eid >= cdcOffset)
-    return VxdID();
-  return VxdID(eid - vxdOffset);
-}
-
-WireID GlobalLabel::getWireID() const
-{
-  if (eid < cdcOffset)
-    return WireID();
-  return WireID(eid - cdcOffset);
-}
-
-BKLMElementID GlobalLabel::getBklmID() const
-{
-  if (eid < bklmOffset)
-    return BKLMElementID();
-  return BKLMElementID(eid - bklmOffset);
-}
-
-EKLMElementID GlobalLabel::getEklmID() const
-{
-  if (!isEKLM())
-    B2FATAL("Attempt to call GlobalLabel::getEklmID() for non-EKLM label.");
-  return EKLMElementID(eid - eklmOffset);
-}
-
 void GlobalLabel::construct(GlobalLabel::gidTYPE elementId,
                             GlobalLabel::gidTYPE paramId)
 {
@@ -149,6 +97,8 @@ void GlobalLabel::construct(GlobalLabel::gidTYPE elementId,
 
   if (teidpid)
     tif = 1;
+  else
+    tif = 0;
 
   if (!tif)
     gid = (tif * tifOffset + eid * eidOffest + pid * pidOffset);

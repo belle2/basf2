@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                *
+ * Contributors: Andreas Moll, Thomas Kuhr, Thomas Hauth                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,8 +13,8 @@
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogSystem.h>
+#include <framework/logging/LogVariableStream.h>
 
-#include <sstream>
 
 /**
  * \def _B2_DO_NOTHING()
@@ -44,16 +44,16 @@
 #define FUNCTIONNAME() "???"
 #endif
 
-/** send generic log message. */
-#define _B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line) { \
-    std::ostringstream stringBuffer; stringBuffer << streamText; \
-    Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(loglevel, stringBuffer.str(), package, function, file, line, debuglevel)); \
+/** Send generic log message which uses the << operator to provide text and variables */
+#define _B2LOGMESSAGE(loglevel, debuglevel, logTextAndVariables, package, function, file, line) { \
+    LogVariableStream varStream; varStream << logTextAndVariables; \
+    Belle2::LogSystem::Instance().sendMessage(Belle2::LogMessage(loglevel, std::move(varStream), package, function, file, line, debuglevel)); \
   }
 
-/** send generic log message if the log level is enabled. */
-#define _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, streamText, package, function, file, line) do { \
+/** send generic log message via the << operator if the log level is enabled. */
+#define _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, logTextAndVariables, package, function, file, line) do { \
     if (Belle2::LogSystem::Instance().isLevelEnabled(loglevel, debuglevel, package)) { \
-      _B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line); \
+      _B2LOGMESSAGE(loglevel, debuglevel, logTextAndVariables, package, function, file, line); \
     } } while(false)
 
 /** send generic log message if the log level is enabled. */

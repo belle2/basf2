@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <framework/dataobjects/UncertainHelix.h>
-#include <framework/logging/Logger.h>
 
 #include <TVector3.h>
 
-#include <boost/math/special_functions/sign.hpp>
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace HelixParameterIndex;

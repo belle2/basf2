@@ -8,14 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CONTINUUMSUPPRESSION_H
-#define CONTINUUMSUPPRESSION_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
 #include <TVector3.h>
 #include <vector>
-#include <set>
 
 namespace Belle2 {
 
@@ -53,79 +51,79 @@ namespace Belle2 {
     /**
      * Add ROE thrust axis.
      *
-     * @param TVector3 B thrust axis
+     * @param thrustB B thrust axis
      */
-    void addThrustB(TVector3 thrustB);
+    void addThrustB(const TVector3& thrustB);
 
     /**
      * Add ROE thrust axis.
      *
-     * @param TVector3 ROE thrust axis
+     * @param thrustO ROE thrust axis
      */
-    void addThrustO(TVector3 thrustO);
+    void addThrustO(const TVector3& thrustO);
 
     /**
      * Add magnitude of B thrust axis.
      *
-     * @param Float magnitude of B thrust axis
+     * @param thrustBm magnitude of B thrust axis
      */
     void addThrustBm(float thrustBm);
 
     /**
      * Add magnitude of ROE thrust axis.
      *
-     * @param Float magnitude of ROE thrust axis
+     * @param thrustOm magnitude of ROE thrust axis
      */
     void addThrustOm(float thrustOm);
 
     /**
      * Add cosine of the angle between the thrust axis of the B and the thrust axis of the ROE.
      *
-     * @param Float cosine of the angle between the thrust axis of the B and the thrust axis of the ROE
+     * @param cosTBTO cosine of the angle between the thrust axis of the B and the thrust axis of the ROE
      */
     void addCosTBTO(float cosTBTO);
 
     /**
      * Add cosine of the angle between the thrust axis of the B and the z-axis.
      *
-     * @param Float cosine of the angle between the thrust axis of the B and the z-axis
+     * @param cosTBz cosine of the angle between the thrust axis of the B and the z-axis
      */
     void addCosTBz(float cosTBz);
 
     /**
      * Add reduced Fox-Wolfram moment R2.
      *
-     * @param Float reduced Fox-Wolfram moment R2
+     * @param R2 reduced Fox-Wolfram moment
      */
     void addR2(float R2);
 
     /**
      * Add vector of KSFW moments, Et, and mm2 for final state = 0.
      *
-     * @param vector of KSFW moments, Et, and mm2 for final state = 0
+     * @param ksfwFS0 vector of KSFW moments, Et, and mm2 for final state = 0
      */
-    void addKsfwFS0(std::vector<float> ksfwFS0);
+    void addKsfwFS0(const std::vector<float>& ksfwFS0);
 
     /**
      * Add vector of KSFW moments, Et, and mm2 for final state = 1.
      *
-     * @param vector of KSFW moments, Et, and mm2 for final state = 1
+     * @param ksfwFS1 vector of KSFW moments, Et, and mm2 for final state = 1
      */
-    void addKsfwFS1(std::vector<float> ksfwFS1);
+    void addKsfwFS1(const std::vector<float>& ksfwFS1);
 
     /**
      * Add vector of Cleo Cones constructed of all final state particles
      *
-     * @param vector of Cleo Cones constructed of all final state particles
+     * @param cleoConesALL vector of Cleo Cones constructed of all final state particles
      */
-    void addCleoConesALL(std::vector<float> cleoConesALL);
+    void addCleoConesALL(const std::vector<float>& cleoConesALL);
 
     /**
      * Add vector of Cleo Cones constructed of only ROE particles
      *
-     * @param vector of Cleo Cones constructed of only ROE particles
+     * @param cleoConesROE vector of Cleo Cones constructed of only ROE particles
      */
-    void addCleoConesROE(std::vector<float> cleoConesROE);
+    void addCleoConesROE(const std::vector<float>& cleoConesROE);
 
     // getters
     /**
@@ -263,5 +261,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-
-#endif

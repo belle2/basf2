@@ -29,6 +29,7 @@ REG_MODULE(PXDInjectionVetoEmulator)
 //-----------------------------------------------------------------
 
 PXDInjectionVetoEmulatorModule::PXDInjectionVetoEmulatorModule() : Module()
+  , m_nGates(0)
 {
   // Set module properties
   setDescription("The module emulates the timing for gated mode operation of PXD.");

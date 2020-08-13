@@ -46,7 +46,7 @@ def main(argv):
     cal_fw.add_calibration(cal_test)
 
     # Let's only calibrate a subset of the data
-    iov_to_calibrate = IoV(exp_low=1, run_low=2, exp_high=1, run_high=3)
+    iov_to_calibrate = IoV(exp_low=0, run_low=2, exp_high=0, run_high=3)
     cal_fw.run(iov=iov_to_calibrate)
     print("End of CAF processing.")
 

@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
@@ -139,7 +138,7 @@ void WireHitCreator::initialize()
   }
 
   if (not m_param_useSuperLayers.empty()) {
-    for (const ISuperLayer& iSL : m_param_useSuperLayers) {
+    for (const ISuperLayer iSL : m_param_useSuperLayers) {
       m_useSuperLayers.at(iSL) = true;
     }
   } else {

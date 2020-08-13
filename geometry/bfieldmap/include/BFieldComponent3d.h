@@ -7,12 +7,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENT3D_H
-#define BFIELDCOMPONENT3D_H
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
-#include <boost/array.hpp>
 #include <string>
 
 namespace Belle2 {
@@ -45,7 +43,7 @@ namespace Belle2 {
      * Initializes the magnetic field component.
      * This method opens the magnetic field map file.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Calculates the magnetic field vector at the specified space point.
@@ -54,13 +52,13 @@ namespace Belle2 {
      * @return The magnetic field vector at the given space point in [T].
      *         Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual B2Vector3D calculate(const B2Vector3D& point) const;
+    virtual B2Vector3D calculate(const B2Vector3D& point) const override;
 
     /**
      * Terminates the magnetic field component.
      * This method closes the magnetic field map file.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * Sets the filename of the magnetic field map.
@@ -118,7 +116,7 @@ namespace Belle2 {
      * @param minR    The left (min) border of the magnetic field map region in r [m] -> [cm].
      * @param maxR    The right (max) border of the magnetic field map region in r [m] -> [cm].
      * @param errBr   The size of the error on Br, Br_new = errBr*Br [fraction].
-     * @param errBPhi The size of the error on Bphi, Bphi_new = errBphi*Bphi [fraction].
+     * @param errBphi The size of the error on Bphi, Bphi_new = errBphi*Bphi [fraction].
      * @param errBz   The size of the error on Bz, Bz_new = errBz*Bz [fraction].
      */
     void setErrorRegionR(double minR = -1., double maxR = -1., double errBr = 0.0, double errBphi = 0.0, double errBz = 0.0)
@@ -130,7 +128,7 @@ namespace Belle2 {
     void mirrorPhi(bool mirrorPhi = 0.) { m_mirrorPhi = mirrorPhi; }
 
     /**
-     * @param mapEnable Flag to switch on/off interpolation
+     * @param interpolate Flag to switch on/off interpolation
      */
     void doInterpolation(bool interpolate = true) { m_interpolate = interpolate; }
 
@@ -138,7 +136,7 @@ namespace Belle2 {
      * Optino to reduce 3D to 2D map (in coordinates, _NOT_ Br, Bphi, Bz components)
      * @param mapEnable List of dimensions to enable: "rphiz", "rphi", "phiz" or "rz"
      */
-    void enableCoordinate(std::string mapEnable = "rphiz") { m_mapEnable = mapEnable; }
+    void enableCoordinate(const std::string& mapEnable = "rphiz") { m_mapEnable = mapEnable; }
   protected:
 
   private:
@@ -183,5 +181,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENT3D_H */

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <string>
 
@@ -38,30 +39,31 @@ namespace Belle2 {
       /**
        * Initializes the Module.
        */
-      virtual void initialize();
+      void initialize() override;
 
       /**
        * Begin run action.
        */
-      virtual void beginRun();
+      void beginRun() override;
       /**
        * Event action (main routine).
        */
-      virtual void event();
+      void event() override;
       /**
        * End run action.
        */
-      virtual void endRun();
+      void endRun() override;
       /**
        * Termination action.
        */
-      virtual void terminate();
+      void terminate() override;
 
 
     private:
       std::string m_recoTrackArrayName ;                  /**< Belle2::RecoTrack StoreArray name */
       std::vector<unsigned short> m_excludeSLayer;        /**< Super layers (0-8) not used in the track fitting. */
-      std::vector<unsigned short> m_excludeICLayer;        /**< IClayers (0-55) not used in the track fitting. */
+      std::vector<unsigned short> m_excludeICLayer;       /**< IClayers (0-55) not used in the track fitting. */
+      StoreArray<RecoTrack> m_RecoTracks;                 /**< Tracks. */
     };
   }
 }

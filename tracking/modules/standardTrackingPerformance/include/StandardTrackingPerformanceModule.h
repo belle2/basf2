@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef STANDARDTRACKINGPERFORMANCEMODULE_H_
-#define STANDARDTRACKINGPERFORMANCEMODULE_H_
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/modules/standardTrackingPerformance/ParticleProperties.h>
@@ -19,9 +19,6 @@ class TFile;
 
 namespace Belle2 {
   class MCParticle;
-  class Track;
-  class TrackFitResult;
-  class RecoTrack;
 
   template< class T >
   class StoreArray;
@@ -54,25 +51,25 @@ namespace Belle2 {
     TFile* m_outputFile; /**< output root file */
     TTree* m_dataTree; /**< root tree with all output data. Tree will be written to the output root file */
 
-    /**< vector with all interesting charged stable MCParticles in the event */
+    /** vector with all interesting charged stable MCParticles in the event */
     std::vector<const MCParticle*> m_interestingChargedStableMcParcticles;
 
-    /**< vector with all MCParticles of the searched signal decay */
+    /** vector with all MCParticles of the searched signal decay */
     std::vector<MCParticle*> m_signalMCParticles;
 
-    /**< properties of a reconstructed track */
+    /** properties of a reconstructed track */
     ParticleProperties m_trackProperties;
 
-    /**< pValue of track fit */
+    /** pValue of track fit */
     double m_pValue;
 
-    /**< total number of genrated charged stable MCParticles */
+    /** total number of genrated charged stable MCParticles */
     double m_nGeneratedChargedStableMcParticles;
 
-    /**< total number of reconstructed track candidates */
+    /** total number of reconstructed track candidates */
     double m_nReconstructedChargedStableTracks;
 
-    /**< total number of fitted tracks */
+    /** total number of fitted tracks */
     double m_nFittedChargedStabletracks;
 
     /**
@@ -138,7 +135,3 @@ namespace Belle2 {
 
 
 } // end of namespace
-
-
-
-#endif /* STANDARDTRACKINGPERFORMANCEMODULE_H_ */

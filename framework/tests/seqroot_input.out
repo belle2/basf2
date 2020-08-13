@@ -2,6 +2,7 @@
 [INFO] The random number seed is set to "something important"
 Trying 01-ok.sroot ...
 [INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -940,6 +941,7 @@ Trying 03-1+5b.sroot ...
 [FATAL] SeqRootInput : Error in reading first event
 Trying 04-2+1b.sroot ...
 [INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -967,6 +969,7 @@ truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
 [INFO] ========================================================================
 Trying 05-2+5b.sroot ...
 [INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -994,6 +997,7 @@ truehit 1 => hits 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32
 [INFO] ========================================================================
 Trying 05-ok.sroot.gz ...
 [INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------
@@ -1936,6 +1940,7 @@ Trying 08-nogz.sroot.gz ...
 [FATAL] SeqRootInput : Error in reading first event
 Trying 09-cut.sroot.gz ...
 [INFO] Starting event processing, random seed is set to 'something important'
+[INFO] Global tag override is in effect: input globaltags and default globaltag will be ignored
 [INFO] ========================================================================
 [INFO] >>> Start new run: 1
 [INFO] ------------------------------------------------------------------------

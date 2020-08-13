@@ -9,14 +9,28 @@
 #include "daq/rfarm/manager/RFDqmServer.h"
 #include "daq/rfarm/manager/RFNSM.h"
 
+#include <csignal>
+
 using namespace std;
 using namespace Belle2;
+
+static RFDqmServer* dqm = NULL;
+
+extern "C" void sighandler(int sig)
+{
+  printf("SIGTERM handler here\n");
+  dqm->cleanup();
+}
 
 int main(int argc, char** argv)
 {
   RFConf conf(argv[1]);
 
-  RFDqmServer* dqm = new RFDqmServer(argv[1]);
+  //  RFDqmServer* dqm = new RFDqmServer(argv[1]);
+  dqm = new RFDqmServer(argv[1]);
+
+  signal(SIGINT, sighandler);
+  signal(SIGTERM, sighandler);
 
   RFNSM nsm(conf.getconf("dqmserver", "nodename"), dqm);
   nsm.AllocMem(conf.getconf("system", "nsmdata"));

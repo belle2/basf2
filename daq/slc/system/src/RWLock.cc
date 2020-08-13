@@ -2,11 +2,11 @@
 
 using namespace Belle2;
 
-RWLock::RWLock() throw() : m_lock() {}
+RWLock::RWLock() : m_lock() {}
 
-RWLock::~RWLock() throw() {}
+RWLock::~RWLock() {}
 
-bool RWLock::init() throw()
+bool RWLock::init()
 {
   pthread_rwlockattr_t attr;
   pthread_rwlockattr_init(&attr);
@@ -16,7 +16,7 @@ bool RWLock::init() throw()
   return true;
 }
 
-bool RWLock::rdlock() throw()
+bool RWLock::rdlock()
 {
   if (pthread_rwlock_rdlock(&m_lock) != 0) {
     return false;
@@ -25,7 +25,7 @@ bool RWLock::rdlock() throw()
   }
 }
 
-bool RWLock::wrlock() throw()
+bool RWLock::wrlock()
 {
   if (pthread_rwlock_wrlock(&m_lock) != 0) {
     return false;
@@ -33,7 +33,7 @@ bool RWLock::wrlock() throw()
   return true;
 }
 
-bool RWLock::unlock() throw()
+bool RWLock::unlock()
 {
   if (pthread_rwlock_unlock(&m_lock) != 0) {
     return true;
@@ -42,7 +42,7 @@ bool RWLock::unlock() throw()
   }
 }
 
-bool RWLock::destroy() throw()
+bool RWLock::destroy()
 {
   if (pthread_rwlock_destroy(&m_lock) != 0) {
     return true;

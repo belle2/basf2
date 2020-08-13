@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #include <top/simulation/SensitiveBar.h>
-#include <top/dataobjects/TOPBarHit.h>
-#include <top/geometry/TOPGeometryPar.h>
 
 #include <simulation/kernel/UserInfo.h>
 #include <G4Step.hh>
@@ -19,10 +17,6 @@
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTypes.hh>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -41,15 +35,12 @@ namespace Belle2 {
 
       // registration of store arrays and relations
 
-      StoreArray<MCParticle> mcParticles;
-      StoreArray<TOPBarHit>  barHits;
-      barHits.registerInDataStore();
-      mcParticles.registerRelationTo(barHits);
+      m_barHits.registerInDataStore();
+      m_mcParticles.registerRelationTo(m_barHits);
 
       // additional registration of MCParticle relation (required for correct relations)
 
-      RelationArray  relation(mcParticles, barHits);
-      registerMCParticleRelation(relation, RelationArray::c_deleteElement);
+      registerMCParticleRelation(m_relParticleHit, RelationArray::c_deleteElement);
 
       const auto* geo = m_topgp->getGeometry();
       m_trackIDs.resize(geo->getNumModules(), 0);
@@ -72,10 +63,9 @@ namespace Belle2 {
         if (!info) return false;
         if (info->getStatus() < 2) {
           double energy = aTrack->GetKineticEnergy() * Unit::MeV / Unit::eV;
-          const auto* geo = m_topgp->getGeometry();
-          double qeffi = geo->getNominalQE().getEfficiency(energy);
+          double qeffi = m_topgp->getPMTEfficiencyEnvelope(energy);
           double fraction = info->getFraction();
-          if (gRandom->Uniform() * fraction > qeffi) {
+          if (qeffi == 0 or gRandom->Uniform() * fraction > qeffi) {
             aTrack->SetTrackStatus(fStopAndKill);
             return false;
           }
@@ -85,26 +75,29 @@ namespace Belle2 {
         return false;
       }
 
-      // continue for other particles
+      // continue for other particles, if they enter the volume for the first time
 
       G4StepPoint* PrePosition =  aStep->GetPreStepPoint();
-      if (PrePosition->GetStepStatus() != fGeomBoundary) return false;
+      if (PrePosition->GetStepStatus() != fGeomBoundary) return false; // not on boundary
 
-      StoreArray<TOPBarHit> barHits;
-      if (barHits.getEntries() == 0) {
+      if (m_barHits.getEntries() == 0) {
         for (auto& trackID : m_trackIDs) trackID = -1; // reset on new event
       }
 
       int moduleID = PrePosition->GetTouchableHandle()->GetReplicaNumber(m_replicaDepth);
       const auto* geo = m_topgp->getGeometry();
       if (!geo->isModuleIDValid(moduleID)) {
-        B2ERROR("SensitiveBar: undefined module ID = " << moduleID);
+        B2ERROR("TOP::SensitiveBar: undefined module ID."
+                << LogVar("moduleID", moduleID));
         return false;
       }
 
       int trackID = aTrack->GetTrackID();
-      if (trackID == m_trackIDs[moduleID - 1]) return false;
+      if (trackID == m_trackIDs[moduleID - 1]) return false; // not first time on boundary
       m_trackIDs[moduleID - 1] = trackID;
+
+      // particle other than optical photon entered the volume for the first time
+      // convert to basf2 units and write-out the hit
 
       G4ThreeVector worldPosition = PrePosition->GetPosition();
       double tracklength = aTrack->GetTrackLength() - aStep->GetStepLength();
@@ -132,14 +125,12 @@ namespace Belle2 {
       int PDG = (int)(particle->GetPDGEncoding());
 
       // write hit to datastore
-      TOPBarHit* hit = barHits.appendNew(moduleID, PDG, TOrigin, TPosition, TMomentum,
-                                         globalTime, tracklength, locPosition,
-                                         theta, phi);
+      auto* hit = m_barHits.appendNew(moduleID, PDG, TOrigin, TPosition, TMomentum,
+                                      globalTime, tracklength, locPosition,
+                                      theta, phi);
 
       // set the relation
-      StoreArray<MCParticle> mcParticles;
-      RelationArray rel(mcParticles, barHits);
-      rel.add(trackID, hit->getArrayIndex());
+      m_relParticleHit.add(trackID, hit->getArrayIndex());
 
       return true;
     }

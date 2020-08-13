@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cstdarg>
 #include <cstdio>
-#include <cstring>
 #include <unistd.h>
 
 using namespace Belle2;
@@ -41,7 +40,7 @@ void Executor::addArg(const std::string& arg)
 
 bool Executor::execute(bool isdaemon)
 {
-  char* argv[30];
+  char* argv[256];
   argv[0] = (char*)m_path.c_str();
   std::cerr << "" << argv[0] << " ";
   for (size_t i = 0; i < m_arg_v.size(); i++) {

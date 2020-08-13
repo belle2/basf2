@@ -2,7 +2,6 @@ import os
 import re
 
 import hep_ipython_tools.ipython_handler_basf2.viewer
-from hep_ipython_tools import viewer
 from hep_ipython_tools.information import EnvironmentInformation
 
 
@@ -42,9 +41,9 @@ class Basf2ModulesInformation:
         """
         Initialize with the module list from the framework.
         """
-        from basf2 import fw
+        from basf2 import list_available_modules
         #: A cached module list for faster lookup.
-        self.module_list = fw.list_available_modules()
+        self.module_list = list_available_modules()
 
     def search(self, regex_string):
         """

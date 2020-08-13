@@ -11,13 +11,13 @@ namespace Belle2 {
 
     // constructors & destructors
   public:
-    Mutex() throw();
-    ~Mutex() throw();
+    Mutex();
+    ~Mutex();
 
     // member methods
   public:
-    bool lock() throw();
-    bool unlock() throw();
+    bool lock();
+    bool unlock();
 
     // member data
   private:

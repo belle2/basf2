@@ -1,16 +1,15 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Kuhr                                              *
+ * Contributors: Thomas Kuhr, Christian Pulvermacher, Thomas Hauth,       *
+ *               Martin Ritter                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include <framework/logging/LogConnectionFilter.h>
-
-#include <sstream>
 
 using namespace Belle2;
 using namespace std;
@@ -26,7 +25,6 @@ LogConnectionFilter::LogConnectionFilter(LogConnectionBase* logConnection) :
 LogConnectionFilter::~LogConnectionFilter()
 {
   printRepetitions();
-  delete m_logConnection;
 }
 
 

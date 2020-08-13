@@ -12,13 +12,11 @@
 #define BACKSENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <simulation/dataobjects/BeamBackHit.h>
-#include <TString.h>
 
 namespace Belle2 {
 
-  //! The Class for ARICH Sensitive Detector
-  /*! In this class, every variable defined in ARICHSimHit will be calculated,
+  //! The Class for BeamBackground Sensitive Detector
+  /*! In this class, every variable defined in BeamBackHit will be calculated,
     and stored in datastore.
   */
   class BkgSensitiveDetector : public Simulation::SensitiveDetectorBase {
@@ -31,14 +29,14 @@ namespace Belle2 {
      * @param iden identifier of subdetector component (optional, 0 by default)
      */
 
-    BkgSensitiveDetector(const char* subDet, int iden = 0);
+    explicit BkgSensitiveDetector(const char* subDet, int iden = 0);
 
     /**
      * Process each step and calculate variables defined in PXDSimHit.
      * @param aStep Current Geant4 step in the sensitive medium.
      * @result true if a hit was stored, o.w. false.
      */
-    bool step(G4Step* aStep, G4TouchableHistory*);
+    bool step(G4Step* aStep, G4TouchableHistory*) override;
 
 
   private:

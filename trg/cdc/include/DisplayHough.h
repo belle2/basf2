@@ -58,7 +58,7 @@ namespace Belle2 {
     virtual void on_scale_value_changed(void);
 
     /// On position.
-    virtual void on_positionReset(void);
+    virtual void on_positionReset(void) override;
 
   public: // Access to drawing area.
 

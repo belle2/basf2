@@ -9,6 +9,7 @@
 # ----------------------------------------------------------------------------
 
 from basf2 import *
+import os
 import math
 
 # particle parameters (given in local bar frame) - change as you like
@@ -47,7 +48,7 @@ main = create_path()
 
 # Set number of events to generate
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [1000], 'runList': [1]})
+eventinfosetter.param('evtNumList', [1000])
 main.add_module(eventinfosetter)
 
 # Histogram manager immediately after master module
@@ -61,6 +62,7 @@ main.add_module(gearbox)
 
 # Geometry (only TOP and B-field)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['MagneticField', 'TOP'])
 main.add_module(geometry)
 

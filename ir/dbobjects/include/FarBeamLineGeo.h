@@ -11,10 +11,7 @@
 #pragma once
 
 #include <ir/dbobjects/IRGeoBase.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-#include <map>
 
 namespace Belle2 {
 

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDIGITIZER_H
-#define CDCDIGITIZER_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -21,14 +20,15 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
-#include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <reconstruction/dbobjects/CDCDedxRunGain.h>
+//#include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <cdc/dbobjects/CDCCrossTalkLibrary.h>
 
 //C++/C standard lib elements.
 #include <string>
-#include <vector>
-#include <queue>
-#include <map>
+//#include <queue>
 #include <limits>
 
 namespace Belle2 {
@@ -51,34 +51,31 @@ namespace Belle2 {
     CDCDigitizerModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    void initialize();
+    void initialize() override;
 
     /** Actual digitization of all hits in the CDC.
      *
      *  The digitized hits are written into the DataStore.
      */
-    void event();
+    void event() override;
 
     /** Terminate func. */
-    void terminate()
+    void terminate() override
     {
       if (m_fEElectronicsFromDB) delete m_fEElectronicsFromDB;
-      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
+      //      if (m_eDepToADCConversionsFromDB) delete m_eDepToADCConversionsFromDB;
+      if (m_runGainFromDB) delete m_runGainFromDB;
+      if (m_xTalkFromDB) delete m_xTalkFromDB;
     };
 
   private:
     /** Method used to smear the drift length.
      *
      *  @param driftLength The value of drift length.
-     *  @param fraction Fraction of the first Gaussian used to smear drift length.
-     *  @param mean1 Mean value of the first Gassian used to smear drift length.
-     *  @param resolution1 Resolution of the first Gassian used to smear drift length.
-     *  @param mean2 Mean value of the second Gassian used to smear drift length.
-     *  @param resolution2 Resolution of the second Gassian used to smear drift length.
-     *
+     *  @param dDdt        dD/dt (drift velocity).
      *  @return Drift length after smearing.
      */
-    float smearDriftLength(float driftLength, float dDdt);
+    double smearDriftLength(double driftLength, double dDdt);
 
 
     /** The method to get dD/dt
@@ -90,7 +87,7 @@ namespace Belle2 {
      *  @return dDdt.
      *
      */
-    float getdDdt(float driftLength);
+    double getdDdt(double driftLength);
 
 
     /** The method to get drift time based on drift length
@@ -104,17 +101,24 @@ namespace Belle2 {
      *  @return Drift time.
      *
      */
-    float getDriftTime(float driftLength, bool addTof, bool addDelay);
+    double getDriftTime(double driftLength, bool addTof, bool addDelay);
 
 
     /** Edep to ADC Count converter */
-    unsigned short getADCCount(unsigned short id, double edep, double dx, double costh);
+    //    unsigned short getADCCount(unsigned short layer, unsigned short cell, double edep, double dx, double costh);
+    unsigned short getADCCount(const WireID& wid, double edep, double dx, double costh);
 
     /** Set FEE parameters (from DB) */
     void setFEElectronics();
 
+    /** Set run-gain (from DB) */
+    void setRunGain();
+
+    /** Add crosstalk */
+    void addXTalk();
+
     /** Set edep-to-ADC conversion params. (from DB) */
-    void setEDepToADCConversions();
+    //    void setEDepToADCConversions();
 
     StoreArray<MCParticle> m_mcParticles; /**< MCParticle array */
     StoreArray<CDCSimHit>  m_simHits;     /**< CDCSimHit  array */
@@ -138,19 +142,20 @@ namespace Belle2 {
     double m_tdcThreshold4Outer; /**< TDC threshold for outer layers in unit of eV */
     double m_tdcThreshold4Inner; /**< TDC threshold for inner layers in unit of eV */
     double m_gasToGasWire;      /**< Approx. ratio of dE(gas) to dE(gas+wire) */
-    bool   m_whichToCorrectThOrDE; /**< Flag to coorect threshold or enegy-deposit for gas+wire case */
-    int m_adcThreshold;         /**< Threshold for ADC in unit of count */
+    double m_scaleFac = 1.;     /**< Factor to mutiply to edep */
+    int    m_adcThreshold;      /**< Threshold for ADC in unit of count */
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
     double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
     //    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
     double m_trigTimeJitter;   /**< Magnitude of trigger timing jitter (ns). */
 
-    CDC::CDCGeometryPar* m_cdcgp;  /**< Pointer to CDCGeometryPar */
+    CDC::CDCGeometryPar* m_cdcgp;  /**< Cached Pointer to CDCGeometryPar */
+    CDC::CDCGeoControlPar* m_gcp;  /**< Cached pointer to CDCGeoControlPar */
     CDCSimHit* m_aCDCSimHit;    /**< Pointer to CDCSimHit */
     WireID m_wireID;            /**< WireID of this hit */
     unsigned short m_posFlag;   /**< left or right flag of this hit */
-    unsigned short m_boardID;   /**< FEE board ID */
+    unsigned short m_boardID = 0; /**< FEE board ID */
     TVector3 m_posWire;         /**< wire position of this hit */
     TVector3 m_posTrack;        /**< track position of this hit */
     TVector3 m_momentum;        /**< 3-momentum of this hit */
@@ -165,9 +170,18 @@ namespace Belle2 {
     double m_driftVInv;         /**< m_driftV^-1 (in ns/cm)*/
     double m_propSpeedInv;      /**< Inv. of nominal signal propagation speed in a wire (in ns/cm)*/
 
+    double m_tdcThresholdOffset; /**< Offset for TDC(digital) threshold (mV)*/
+    double m_analogGain;         /**< analog gain (V/pC) */
+    double m_digitalGain;        /**< digital gain (V/pC) */
+    double m_adcBinWidth;        /**< ADC bin width (mV) */
+
+    double m_addFudgeFactorForSigma; /**< additional fudge factor for space resol. */
+    double m_totalFudgeFactor = 1.;  /**< total fudge factor for space resol. */
+
+    double m_runGain = 1.;  /**< run gain. */
+    double m_overallGainFactor = 1.;  /**< Overall gain factor. */
     //--- Universal digitization parameters -------------------------------------------------------------------------------------
     bool m_doSmearing; /**< A switch to control drift length smearing */
-    //    bool m_2015AprRun; /**< A flag indicates cosmic runs in April 2015. */
     bool m_addTimeWalk; /**< A switch used to control adding time-walk delay into the total drift time or not */
     bool m_addInWirePropagationDelay; /**< A switch used to control adding propagation delay into the total drift time or not */
     bool m_addTimeOfFlight;     /**< A switch used to control adding time of flight into the total drift time or not */
@@ -181,32 +195,56 @@ namespace Belle2 {
 
     bool m_useDB4FEE;             /**< Fetch FEE params from DB */
     DBArray<CDCFEElectronics>* m_fEElectronicsFromDB = nullptr; /*!< Pointer to FE electronics params. from DB. */
-    float m_lowEdgeOfTimeWindow[nBoards]; /*!< Lower edge of time-window */
-    float m_uprEdgeOfTimeWindow[nBoards]; /*!< Upper edge of time-window */
-    float m_tdcThresh          [nBoards]; /*!< Threshold for timing-signal */
-    float m_adcThresh          [nBoards]; /*!< Threshold for FADC */
+    float m_lowEdgeOfTimeWindow[nBoards] = {0}; /*!< Lower edge of time-window */
+    float m_uprEdgeOfTimeWindow[nBoards] = {0}; /*!< Upper edge of time-window */
+    float m_tdcThresh          [nBoards] = {0}; /*!< Threshold for timing-signal */
+    float m_adcThresh          [nBoards] = {0}; /*!< Threshold for FADC */
+    unsigned short m_widthOfTimeWindow  [nBoards] = {0}; /*!< Width of time window */
 
     bool m_useDB4EDepToADC;             /**< Fetch edep-to-ADC conversion params. from DB */
-    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
-    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
+    bool m_useDB4RunGain;               /**< Fetch run gain from DB */
+    bool m_spaceChargeEffect;           /**< Space charge effect */
+
+    DBObjPtr<CDCDedxRunGain>* m_runGainFromDB = nullptr; /*!< Pointer to run gain from DB. */
+    //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
+    //    float m_eDepToADCParams[MAX_N_SLAYERS][4]; /*!< edep-to-ADC conv. params. */
+
+    bool m_addXTalk;           /**< Flag to switch on/off crosstalk */
+    bool m_issue2ndHitWarning; /**< Flag to switch on/off a warning on the 2nd TDC hit */
+    bool m_includeEarlyXTalks; /**< Flag to switch on/off xtalks earlier than the hit */
+    int  m_debugLevel4XTalk;   /**< Debug level for crosstalk */
+    DBObjPtr<CDCCrossTalkLibrary>* m_xTalkFromDB = nullptr; /*!< Pointer to cross-talk from DB. */
 
     /** Structure for saving the signal information. */
     struct SignalInfo {
       /** Constructor that initializes all members. */
-      SignalInfo(int simHitIndex = 0, float driftTime = 0, float charge = 0, int simHitIndex2 = -1,
+      SignalInfo(int simHitIndex = 0, float driftTime = 0, float charge = 0, float maxDriftL = 0, float minDriftL = 0,
+                 int simHitIndex2 = -1,
                  float driftTime2 = std::numeric_limits<float>::max(), int simHitIndex3 = -1, float driftTime3 = std::numeric_limits<float>::max()) :
-        m_simHitIndex(simHitIndex), m_driftTime(driftTime), m_charge(charge), m_simHitIndex2(simHitIndex2), m_driftTime2(driftTime2),
+        m_simHitIndex(simHitIndex), m_driftTime(driftTime), m_charge(charge), m_maxDriftL(maxDriftL), m_minDriftL(minDriftL),
+        m_simHitIndex2(simHitIndex2), m_driftTime2(driftTime2),
         m_simHitIndex3(simHitIndex3), m_driftTime3(driftTime3) {}
       int            m_simHitIndex;   /**< SimHit Index number. */
       float          m_driftTime;     /**< Shortest drift time of any SimHit in the cell. */
       float          m_charge;        /**< Sum of charge for all SimHits in the cell. */
+      float          m_maxDriftL;      /**< Max of drift length. */
+      float          m_minDriftL;      /**< Min of drift length. */
       int            m_simHitIndex2;   /**< SimHit index for 2nd drift time. */
       float          m_driftTime2;     /**< 2nd-shortest drift time in the cell. */
       int            m_simHitIndex3;   /**< SimHit index for 3rd drift time. */
       float          m_driftTime3;     /**< 3rd-shortest drift time in the cell. */
     };
+
+    /** Structure for saving the x-talk information. */
+    struct XTalkInfo {
+      /** Constructor that initializes all members. */
+      XTalkInfo(unsigned short tdc, unsigned short adc, unsigned short tot, unsigned short status) :
+        m_tdc(tdc), m_adc(adc), m_tot(tot), m_status(status) {}
+      unsigned short m_tdc; /**< TDC count */
+      unsigned short m_adc; /**< ADC count */
+      unsigned short m_tot; /**< TOT       */
+      unsigned short m_status; /**< status */
+    };
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCDIGITIZER_H

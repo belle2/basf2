@@ -96,27 +96,36 @@ def DeltaR(path, particleID, P):
 
 
 class ElossHarvestingRun(HarvestingRun):
+    """Harvester to generate, postprocess and inspect MC events for energy-loss evaluation"""
+    #: number of events to generate
     n_events = 10000
+    #: use the eloss_gun particle generator
     generator_module = "eloss_gun"
+    #: use the tracking-detector subset with constant magnetic field for the geometry
     detector_setup = "TrackingDetectorConstB"
 
     @property
     def output_file_name(self):
+        """Get the output ROOT filename"""
         return 'eloss.root'
 
     def harvesting_module(self, path=None):
+        """Harvest and post-process the generated events"""
         harvesting_module = ElossHarvestingModule(self.output_file_name)
         if path:
             path.add_module(harvesting_module)
         return harvesting_module
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
         argument_parser = super().create_argument_parser(**kwds)
         return argument_parser
 
     def create_path(self):
-        # Sets up a path that plays back pregenerated events or generates events
-        # based on the properties in the base class.
+        """
+        Sets up a path that plays back pregenerated events or generates events
+        based on the properties in the base class.
+        """
         path = super().create_path()
 
         path.add_module("TFCDC_WireHitPreparer",
@@ -140,26 +149,36 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
     compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
+        """Constructor"""
         super().__init__(foreach='CDCTrackVector',
                          output_file_name=output_file_name)
 
+        #: by default, there is no method to find matching MC tracks
         self.mc_track_lookup = None
 
         origin_track_fitter = TFCDC.CDCRiemannFitter()
         origin_track_fitter.setOriginConstrained()
+        #: Use the CDCReimannFitter with a constrained origin for track fitting
         self.track_fitter = origin_track_fitter
 
     def initialize(self):
+        """Receive signal at the start of event processing"""
         super().initialize()
+        #: Method to find matching MC tracks
         self.mc_track_lookup = TFCDC.CDCMCTrackLookUp.getInstance()
+        #: Method to find matching MC hits
         self.mc_hit_lookup = TFCDC.CDCMCHitLookUp.getInstance()
+        #: Method to estimate dE/dx in the CDC
         self.eloss_estimator = TFCDC.EnergyLossEstimator.forCDC()
+        #: Method to interrogate the magnetic field values
         self.bfield = TFCDC.CDCBFieldUtil
 
     def prepare(self):
+        """Initialize the MC-hit lookup method"""
         TFCDC.CDCMCHitLookUp.getInstance().fill()
 
     def pick(self, track):
+        """Select tracks with at least 4 segments and associated primary MC particle with pt >= 0.25 GeV/c"""
         if track.size() < 4:
             return False
 
@@ -176,6 +195,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         return is_primary(mc_particle)
 
     def peel(self, track):
+        """Aggregate the track and MC information for dE/dx analysis"""
         mc_track_lookup = self.mc_track_lookup
         mc_hit_lookup = self.mc_hit_lookup
 
@@ -363,13 +383,16 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
                 # loss_disp2D_estimate3=loss_disp2D_estimate3,
             )
 
-    # Refiners to be executed at the end of the harvesting / termination of the module
+    #: Refiners to be executed at the end of the harvesting / termination of the module
+    #: Save a tree of all collected variables in a sub folder
     save_tree = refiners.save_tree()
+    #: Save histograms in a sub folder
     save_histograms = refiners.save_histograms(
         outlier_z_score=5.0,
         allow_discrete=True,
     )
 
+    #: Save the histograms, stacked by charge, in a sub folder
     save_histograms_stackby_charge = refiners.save_histograms(
         select=[
             # "mc_disp2D",
@@ -383,6 +406,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         groupby="charge",
     )
 
+    #: Save the scatterplots in a sub folder
     save_scatter = refiners.save_scatters(
         x=['mc_s2D'],
         y=[
@@ -394,6 +418,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         filter_on="pdg_code",
     )
 
+    #: Save the profile histograms to the output ROOT file
     save_profiles = refiners.save_profiles(
         x=['mc_s2D'],
         y=[
@@ -404,6 +429,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         groupby=[None, "charge"],
     )
 
+    #: Save the magnetic-field profile histogram in a sub folder
     save_bz_profiles = refiners.save_profiles(
         x='r',
         y='bz',
@@ -412,6 +438,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
     # Loss displacement #
     # ################# #
 
+    #: Save the eloss-displacement histograms in a sub folder
     save_cid_histogram = refiners.save_histograms(
         select=[
             # 'mc_disp2D',
@@ -426,6 +453,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         # stackby="pdg_code",
     )
 
+    #: Save the eloss-displacement profile histograms in a sub folder
     save_cid_profiles = refiners.save_profiles(
         x=["mc_pt"],
         y=[
@@ -439,6 +467,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         stackby="pdg_code",
     )
 
+    #: Save the eloss-displacement scatterplots in a sub folder
     save_cid_scatters = refiners.save_scatters(
         x=["mc_pt"],
         y=[
@@ -454,6 +483,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
 
     # Energy loss #
     # ########### #
+    #: Save the eloss histograms in a sub folder
     save_energy_cid_histogram = refiners.save_histograms(
         select=[
             'pdg_code',
@@ -466,6 +496,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         folder_name='energy/{groupby_addition}',
     )
 
+    #: Save the eloss profile histograms in a sub folder
     save_energy_cid_profiles = refiners.save_profiles(
         x=["mc_pt"],
         y=[
@@ -478,6 +509,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         folder_name='energy/{groupby_addition}',
     )
 
+    #: Save the eloss profile scatterplots in a sub folder
     save_energy_cid_scatters = refiners.save_scatters(
         x=["mc_pt"],
         y=[

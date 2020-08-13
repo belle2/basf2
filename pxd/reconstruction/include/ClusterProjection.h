@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_ClusterProjection_H
-#define PXD_ClusterProjection_H
+#pragma once
 
 namespace Belle2 {
 
@@ -39,7 +38,8 @@ namespace Belle2 {
        */
       void add(unsigned int cell, float position, float charge);
       /** Finish calculation of center of gravity and set correct cluster size. Should only be used once */
-      void finalize() {
+      void finalize()
+      {
         m_pos /= m_charge;
         m_size = m_max - m_min + 1;
       }
@@ -123,5 +123,3 @@ namespace Belle2 {
   } // PXD namespace
 
 } // Belle2 namespace
-
-#endif //PXD_ClusterProjection_H

@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Petric                                             *
+ * Contributors: Marko Petric, Marko Staric                               *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,6 +12,13 @@
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
 #include <top/geometry/TOPGeometryPar.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <top/dataobjects/TOPSimHit.h>
+#include <top/dataobjects/TOPSimPhoton.h>
+
 
 namespace Belle2 {
   namespace TOP {
@@ -32,7 +39,7 @@ namespace Belle2 {
        * @param aStep Current Geant4 step in the sensitive medium.
        * @return true if optical photon detected.
        */
-      bool step(G4Step* aStep, G4TouchableHistory*);
+      bool step(G4Step* aStep, G4TouchableHistory*) override;
 
       /**
        * Sets replica depth of PMT volume
@@ -51,6 +58,11 @@ namespace Belle2 {
       int m_pmtReplicaDepth = 2;    /**< replica depth of PMT volume */
       int m_moduleReplicaDepth = 5; /**< replica depth of module volume */
       TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< geometry parameters */
+
+      StoreArray<MCParticle> m_mcParticles; /**< collection of MC particles */
+      StoreArray<TOPSimHit> m_simHits; /**< collection of simulated hits */
+      StoreArray<TOPSimPhoton> m_simPhotons; /**< collection of simulated photons */
+      RelationArray m_relParticleHit {m_mcParticles, m_simHits}; /**< relations */
 
     };
   } // end of namespace TOP

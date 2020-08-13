@@ -7,9 +7,13 @@ from tracking.harvest.peelers import format_crop_keys
 
 
 class VxdCdcMergerHarvesterMCSide(HarvestingModule):
+    """Gather the MC VXD-CDC-merger results into ROOT file"""
+
     def __init__(self, output_file_name):
         """
         Init harvester
+        Arguments:
+            output_file_name (str): name of the output ROOT file
         """
         HarvestingModule.__init__(self, foreach="MCParticles", output_file_name=output_file_name)
 
@@ -19,6 +23,7 @@ class VxdCdcMergerHarvesterMCSide(HarvestingModule):
         self.mc_track_matcher_vxd = Belle2.TrackMatchLookUp("MCRecoTracks", "SVDRecoTracks")
 
     def pick(self, mc_particle):
+        """Return true if the MCParticle has a related MCRecoTrack"""
         # mc_track = mc_particle.getRelated("MCRecoTracks")
         # return mc_track != None
         mc_track = mc_particle.getRelatedFrom("MCRecoTracks")
@@ -28,6 +33,7 @@ class VxdCdcMergerHarvesterMCSide(HarvestingModule):
             return False
 
     def peel(self, mc_particle):
+        """Collect information related to the MCParticle into a dictionary"""
         mc_track = mc_particle.getRelatedFrom("MCRecoTracks")
 
         event_info = Belle2.PyStoreObj("EventMetaData")
@@ -139,6 +145,7 @@ class VxdCdcMergerHarvesterMCSide(HarvestingModule):
 
         return result
 
+    #: Save the results dictionary to the output ROOT file
     save_tree = refiners.SaveTreeRefiner()
 
 
@@ -174,15 +181,26 @@ def peel_matching_information(pr_track_and_mc_track_matcher, key="{part_name}"):
 
 
 class VxdCdcMergerHarvesterPRSide(HarvestingModule):
+    """Gather the reconstructed VXD-CDC-merger results into ROOT file"""
     def __init__(self, foreach, others, output_file_name):
+        """
+        Init harvester
+        Arguments:
+            others (str): name of other-tracks collection related to the reconstructed tracks
+            output_file_name (str): name of the output ROOT file
+        """
         super().__init__(foreach, output_file_name)
 
+        #: cached copy of the 'others' argument
         self.others = others
 
+        #: function to find the MCRecoTrack related to a reconstructed track
         self.mc_track_matcher = Belle2.TrackMatchLookUp("MCRecoTracks", foreach)
+        #: function to find the MCRecoTrack related to an other-tracks entry
         self.mc_track_matcher_other = Belle2.TrackMatchLookUp("MCRecoTracks", others)
 
     def peel(self, pr_track):
+        """Collect information related to the reconstructed track into a dictionary"""
         event_info = Belle2.PyStoreObj("EventMetaData")
 
         result = peelers.peel_reco_track_hit_content(pr_track)
@@ -213,4 +231,5 @@ class VxdCdcMergerHarvesterPRSide(HarvestingModule):
 
         return result
 
+    #: Save the results dictionary to the output ROOT file
     save_tree = refiners.SaveTreeRefiner()

@@ -28,10 +28,8 @@ SwitchDataStoreModule::SwitchDataStoreModule() : Module()
   addParam("mergeBack", m_mergeBack, "if given, copy the given objects/arrays over even if doCopy is fals.", std::vector<std::string> {});
 }
 
-SwitchDataStoreModule::~SwitchDataStoreModule()
-{
-}
-void SwitchDataStoreModule::init(std::string to, bool doCopy, std::vector<std::string> mergeBack)
+SwitchDataStoreModule::~SwitchDataStoreModule() = default;
+void SwitchDataStoreModule::init(const std::string& to, bool doCopy, const std::vector<std::string>& mergeBack)
 {
   m_to = to;
   m_doCopy = doCopy;

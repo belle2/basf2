@@ -120,6 +120,7 @@ namespace Belle2 {
     /** Vector of DHC informations beloning to this event */
     std::vector <PXDDAQDHCStatus> m_pxdDHC;
 
+    /** necessary for ROOT */
     ClassDef(PXDDAQPacketStatus, 2);
 
   }; // class PXDDAQPacketStatus

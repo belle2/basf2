@@ -1,15 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2012 - Belle II Collaboration                             *
- *                                                                                             *
- * Author: The Belle II Collaboration                                          *
- * Contributors: CDC group                                                      *
- *                                                                                              *
- * This software is provided "as is" without any warranty.         *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: CDC group                                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCGEOCONTROLPAR_H
-#define CDCGEOCONTROLPAR_H
+#pragma once
 
 #include <string>
 
@@ -128,6 +127,14 @@ namespace Belle2 {
       }
 
       /**
+       * Set input type for fudge factor
+       */
+      void setFFactorInputType(bool input)
+      {
+        m_fFactorInputType = input;
+      }
+
+      /**
        * Set input type for prop. speed
        */
       void setPropSpeedInputType(bool input)
@@ -168,9 +175,17 @@ namespace Belle2 {
       }
 
       /**
+       * Set input type for edep-to-adc
+       */
+      void setEDepToADCInputType(bool input)
+      {
+        m_eDepToADCInputType = input;
+      }
+
+      /**
        * Set input file name for wire displacement
        */
-      void setDisplacementFile(std::string& input)
+      void setDisplacementFile(const std::string& input)
       {
         m_displacementFile = input;
       }
@@ -178,7 +193,7 @@ namespace Belle2 {
       /**
        * Set input file name for wire alignment
        */
-      void setAlignmentFile(std::string& input)
+      void setAlignmentFile(const std::string& input)
       {
         m_alignmentFile = input;
       }
@@ -186,7 +201,7 @@ namespace Belle2 {
       /**
        * Set input file name for wire misalignment
        */
-      void setMisalignmentFile(std::string& input)
+      void setMisalignmentFile(const std::string& input)
       {
         m_misalignmentFile = input;
       }
@@ -194,7 +209,7 @@ namespace Belle2 {
       /**
        * Set input file name for xt-relation
        */
-      void setXtFile(std::string& input)
+      void setXtFile(const std::string& input)
       {
         m_xtFile = input;
       }
@@ -202,15 +217,23 @@ namespace Belle2 {
       /**
        * Set input file name for sigma
        */
-      void setSigmaFile(std::string& input)
+      void setSigmaFile(const std::string& input)
       {
         m_sigmaFile = input;
       }
 
       /**
+       * Set input file name for fudge factor
+       */
+      void setFFactorFile(const std::string& input)
+      {
+        m_fFactorFile = input;
+      }
+
+      /**
        * Set input file name for prop-speed
        */
-      void setPropSpeedFile(std::string& input)
+      void setPropSpeedFile(const std::string& input)
       {
         m_propSpeedFile = input;
       }
@@ -218,7 +241,7 @@ namespace Belle2 {
       /**
        * Set input file name for t0
        */
-      void setT0File(std::string& input)
+      void setT0File(const std::string& input)
       {
         m_t0File = input;
       }
@@ -226,7 +249,7 @@ namespace Belle2 {
       /**
        * Set input file name for time-walk
        */
-      void setTwFile(std::string& input)
+      void setTwFile(const std::string& input)
       {
         m_twFile = input;
       }
@@ -234,7 +257,7 @@ namespace Belle2 {
       /**
        * Set input file name for bad wire
        */
-      void setBwFile(std::string& input)
+      void setBwFile(const std::string& input)
       {
         m_bwFile = input;
       }
@@ -242,9 +265,17 @@ namespace Belle2 {
       /**
        * Set input file name for channel map
        */
-      void setChMapFile(std::string& input)
+      void setChMapFile(const std::string& input)
       {
         m_chMapFile = input;
+      }
+
+      /**
+       * Set input file name for edep-to-adc
+       */
+      void setEDepToADCFile(const std::string& input)
+      {
+        m_eDepToADCFile = input;
       }
 
       /**
@@ -253,6 +284,22 @@ namespace Belle2 {
       void setMaxSpaceResolution(double input)
       {
         m_maxSpaceResol = input;
+      }
+
+      /**
+       * Set additional fudge factor for space resol. for data
+       */
+      void setAddFudgeFactorForSigmaForData(double input)
+      {
+        m_addFudgeFactorForSigmaForData = input;
+      }
+
+      /**
+       * Set additional fudge factor for space resol. for MC
+       */
+      void setAddFudgeFactorForSigmaForMC(double input)
+      {
+        m_addFudgeFactorForSigmaForMC = input;
       }
 
       /**
@@ -369,6 +416,14 @@ namespace Belle2 {
       }
 
       /**
+       * Get input type for fuge factor
+       */
+      bool getFFactorInputType()
+      {
+        return m_fFactorInputType;
+      }
+
+      /**
        * Get input type for prop. speed
        */
       bool getPropSpeedInputType()
@@ -406,6 +461,14 @@ namespace Belle2 {
       bool getChMapInputType()
       {
         return m_chMapInputType;
+      }
+
+      /**
+       * Get input type for edeptoadc
+       */
+      bool getEDepToADCInputType()
+      {
+        return m_eDepToADCInputType;
       }
 
       /**
@@ -449,6 +512,14 @@ namespace Belle2 {
       }
 
       /**
+       * Get input file name for fudge factor
+       */
+      std::string getFFactorFile() const
+      {
+        return m_fFactorFile;
+      }
+
+      /**
        * Get input file name for prop-speed
        */
       std::string getPropSpeedFile() const
@@ -489,11 +560,35 @@ namespace Belle2 {
       }
 
       /**
+       * Get input file name for edeptoadc
+       */
+      std::string getEDepToADCFile() const
+      {
+        return m_eDepToADCFile;
+      }
+
+      /**
        * Get max. space resolution
        */
       double getMaxSpaceResolution()
       {
         return m_maxSpaceResol;
+      }
+
+      /**
+       * Get additional fudge factor for space resol for data
+       */
+      double getAddFudgeFactorForSigmaForData() const
+      {
+        return m_addFudgeFactorForSigmaForData;
+      }
+
+      /**
+       * Get additional fudge factor for space resol for MC
+       */
+      double getAddFudgeFactorForSigmaForMC() const
+      {
+        return m_addFudgeFactorForSigmaForMC;
       }
 
       /**
@@ -535,13 +630,17 @@ namespace Belle2 {
       bool m_misalignmentInputType = true;  /**< Input type for misalignment. */
       bool m_xtInputType = true;  /**< Input type for xt. */
       bool m_sigmaInputType = true;  /**< Input type for sigma. */
+      bool m_fFactorInputType = true;  /**< Input type for fudge factor. */
       bool m_propSpeedInputType = true;  /**< Input type for prop. speed. */
       bool m_t0InputType = true;  /**< Input type for t0. */
       bool m_twInputType = true;  /**< Input type for time-walk. */
       bool m_bwInputType = true;  /**< Input type for bad wire. */
       bool m_chMapInputType = true;  /**< Input type for channel map. */
+      bool m_eDepToADCInputType = true;  /**< Input type for edep-to-adc. */
 
       double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
+      double m_addFudgeFactorForSigmaForData = 1.; /**< Additional fudge factor for space resol. for data */
+      double m_addFudgeFactorForSigmaForMC = 1.; /**< Additional fudge factor for space resol. for MC */
       bool m_mapperGeometry = false;  /**< B-field mapper geometry flag. */
       double m_mapperPhiAngle = 16.7; /**< B-field mapper phi-angle (deg). */
 
@@ -550,16 +649,16 @@ namespace Belle2 {
       std::string m_misalignmentFile = "misalignment_v2.dat";  /**< Misalignment file. */
       std::string m_xtFile = "xt_v3_chebyshev.dat.gz";  /**< Xt file. */
       std::string m_sigmaFile = "sigma_v2.dat";  /**< Sigma file. */
+      std::string m_fFactorFile = "fFactor.dat";  /**< Fudge factor file. */
       std::string m_propSpeedFile = "propspeed_v0.dat";  /**< Prop-apeed file. */
       std::string m_t0File = "t0_v1.dat";  /**< T0 file. */
       std::string m_twFile = "tw_off.dat";  /**< Time walk file. */
       std::string m_bwFile = "badwire_v1.dat";  /**< Bad wire file. */
       std::string m_chMapFile = "ch_map.dat";  /**< Channel map file. */
+      std::string m_eDepToADCFile = "edeptoadc.dat";  /**< Edep-to-adc file. */
 
       static CDCGeoControlPar* m_pntr;  /*!< Pointer that saves the instance of this class. */
     };
 
   } // end of namespace CDC
 } // end of namespace Belle2
-
-#endif

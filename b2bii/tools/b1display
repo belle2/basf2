@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
     path = create_path()
     setupB2BIIDatabase(True)
     files = glob.glob("*.mdst")
-    convertBelleMdstToBelleIIMdst(files, applyHadronBJSkim=True, path=path)
+    convertBelleMdstToBelleIIMdst(files, applySkim=True, path=path)
     path.add_module('RootOutput', outputFileName='b1display_temp.root')
     process(path)
 

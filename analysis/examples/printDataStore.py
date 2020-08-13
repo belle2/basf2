@@ -1,23 +1,23 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-from basf2 import *
-from modularAnalysis import *
+# Doxygen should skip this script
+# @cond
 
-# ----------------------------------------------------------------------------------
-# This script loads specified ROOT file and prints the content of the DataStore
-# for each event. To be used for debugging.
-#
-# Execute script with:
-#
-#
-# basf2 printDataStore.py -i [input_ROOT_file]
-#
-# ----------------------------------------------------------------------------------
+"""
+This script loads specified ROOT file and prints the content of the DataStore
+for each event. To be used for debugging.
 
-analysis_main.add_module('RootInput')
+Execute script with:
+  $> basf2 printDataStore.py -i [input_ROOT_file]
 
-printDataStore()
+"""
 
-# Process the events
-process(analysis_main)
+import basf2
+from modularAnalysis import printDataStore
+
+path = basf2.Path()
+path.add_module('RootInput')
+printDataStore(path=path)
+basf2.process(path)
+
+# @endcond

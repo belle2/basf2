@@ -6,7 +6,7 @@
 # Physics WG: TDCPV
 # Responsible: L. Li Gioi
 # Cuts: None
-# Date: 20150814
+# Date: 20190208
 #
 #
 Alias        K_S0sig   K_S0
@@ -19,7 +19,7 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-1.000   K_S0sig      J/psisig   SSD_CP 0.502e12 0.0 1.0 -0.775 1.0 0. -1.0 0.;
+1.000   K_S0sig      J/psisig   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0. -1.0 0.;
 Enddecay
 CDecay anti-B0sig
 #

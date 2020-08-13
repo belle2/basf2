@@ -1,0 +1,51 @@
+{
+    "__Preamble__" :
+    {
+        "Allowed values" : "ADC and TOT are read as short integers and ADCOverTOT as float.",
+        "Comment" : "By convention, a value of -1 for an upper limit stands for unbounded."
+    },
+    "FirstSuperLayer" :
+    {
+        "ADC" :
+        {
+            "min" : 1,
+            "max" : -1
+        },
+        "TOT" :
+        {
+            "min" : 1,
+            "max" : -1
+        },
+        "ADCOverTOT" :
+        {
+            "min" : 0,
+            "max" : -1
+        },
+        "MaxADCGivenTOT" : 
+        [
+            {"givenTOT": 0, "maxADC": -1}
+        ]
+    },
+    "OuterSuperLayers" :
+    {
+        "ADC" :
+        {
+            "min" : 1,
+            "max" : -1
+        },
+        "TOT" :
+        {
+            "min" : 1,
+            "max" : -1
+        },
+        "ADCOverTOT" :
+        {
+            "min" : 0,
+            "max" : -1
+        },
+        "MaxADCGivenTOT" : 
+        [
+            {"givenTOT": 0, "maxADC": -1}
+        ]
+    }
+}

@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOUSCHEKTURTLEINPUTMODULE_H_
-#define TOUSCHEKTURTLEINPUTMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <TGeoMatrix.h>
 #include <string>
@@ -46,10 +44,16 @@ namespace Belle2 {
      * Checks the validity of the module parameters.
      * Checks if the filepath of the given filename exists.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Reads the data and stores it into the MCParticle collection. */
-    virtual void event();
+    virtual void event() override;
+
+    /** no copy */
+    TouschekTURTLEInputModule(const TouschekTURTLEInputModule&) = delete;
+
+    /** no assignment */
+    TouschekTURTLEInputModule& operator=(const TouschekTURTLEInputModule&) = delete;
 
 
   protected:
@@ -69,4 +73,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif /* TOUSCHEKTURTLEINPUTMODULE_H_ */

@@ -119,6 +119,7 @@ void eclGammaGammaECollectorModule::prepare()
   thetaLabMax = m_thetaLabMaxDeg / TMath::RadToDeg();
   B2INFO("minPairMass: " << m_minPairMass);
   B2INFO("mindPhi: " << m_mindPhi);
+  B2INFO("maxTime: " << m_maxTime);
   B2INFO("measureTrueEnergy: " << m_measureTrueEnergy);
   B2INFO("requireL1: " << m_requireL1);
 
@@ -230,12 +231,13 @@ void eclGammaGammaECollectorModule::collect()
 
   //------------------------------------------------------------------------
   /** Find the two maximum energy photon clusters */
+  const ECLCluster::EHypothesisBit usePhotons = ECLCluster::EHypothesisBit::c_nPhotons;
   int icMax[2] = { -1, -1};
   double maxClustE[2] = { -1., -1.};
   int nclust = m_eclClusterArray.getEntries();
   for (int ic = 0; ic < nclust; ic++) {
-    if (m_eclClusterArray[ic]->getHypothesisId() == Belle2::ECLCluster::c_nPhotons) {
-      double eClust = m_eclClusterArray[ic]->getEnergy();
+    if (m_eclClusterArray[ic]->hasHypothesis(usePhotons)) {
+      double eClust = m_eclClusterArray[ic]->getEnergy(usePhotons);
       if (eClust > maxClustE[0]) {
         maxClustE[1] = maxClustE[0];
         icMax[1] = icMax[0];
@@ -272,13 +274,13 @@ void eclGammaGammaECollectorModule::collect()
   TVector3 p30(0., 0., maxClustE[0]);
   p30.SetTheta(theta0);
   p30.SetPhi(phi0);
-  const TLorentzVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex);
+  const TLorentzVector p40 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[0]], clustervertex, usePhotons);
 
   double phi1 = m_eclClusterArray[icMax[1]]->getPhi();
   TVector3 p31(0., 0., maxClustE[1]);
   p31.SetTheta(theta1);
   p31.SetPhi(phi1);
-  const TLorentzVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex);
+  const TLorentzVector p41 = cUtil.Get4MomentumFromCluster(m_eclClusterArray[icMax[1]], clustervertex, usePhotons);
 
   double pairmass = (p40 + p41).M();
   if (pairmass < m_minPairMass) {return;}

@@ -8,14 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HEPEVTINPUTMODULE_H
-#define HEPEVTINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
 #include <string>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <generators/hepevt/HepevtReader.h>
@@ -41,10 +39,10 @@ namespace Belle2 {
     virtual ~HepevtInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
 
@@ -70,4 +68,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // HEPEVTINPUTMODULE_H

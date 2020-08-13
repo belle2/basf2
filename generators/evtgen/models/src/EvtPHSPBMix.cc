@@ -29,7 +29,6 @@
 #include <stdlib.h>
 #include "EvtGenBase/EvtConst.hh"
 #include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
 #include "EvtGenBase/EvtPDL.hh"
 #include "EvtGenBase/EvtReport.hh"
 #include "EvtGenBase/EvtVector4C.hh"
@@ -37,7 +36,9 @@
 #include <generators/evtgen/EvtGenModelRegister.h>
 #include "EvtGenBase/EvtId.hh"
 #include <string>
+#include <sstream>
 #include "EvtGenBase/EvtRandom.hh"
+
 using std::endl;
 
 B2_EVTGEN_REGISTER_MODEL(EvtPHSPBBMix);

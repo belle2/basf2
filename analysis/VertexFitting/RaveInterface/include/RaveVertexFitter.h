@@ -8,14 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#ifndef RaveVertexFitter_H
-#define RaveVertexFitter_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 
-//#include <tracking/dataobjects/TrackFitResult.h>
 //std
 #include <string>
 #include <iostream>
@@ -149,4 +146,3 @@ namespace Belle2 {
 
 }
 
-#endif

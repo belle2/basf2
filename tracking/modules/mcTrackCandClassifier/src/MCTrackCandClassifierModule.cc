@@ -8,22 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-#include <boost/foreach.hpp>
-
-#include <framework/datastore/RelationArray.h>
-
 #include <tracking/modules/mcTrackCandClassifier/MCTrackCandClassifierModule.h>
-
-#include <genfit/FieldManager.h>
-#include <genfit/MaterialEffects.h>
-#include <genfit/TGeoMaterialInterface.h>
-#include <genfit/Track.h>
-
-#include <geometry/GeometryManager.h>
-#include <mdst/dataobjects/Track.h>
-#include <TGeoManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 
 #include <pxd/dataobjects/PXDTrueHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
@@ -31,8 +16,15 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <framework/geometry/B2Vector3.h>
+#include <framework/geometry/BFieldManager.h>
 
+#include <genfit/TrackCand.h>
 
+#include <boost/foreach.hpp>
+
+#include <TH2F.h>
 
 using namespace std;
 using namespace Belle2;
@@ -42,7 +34,7 @@ REG_MODULE(MCTrackCandClassifier)
 
 /// Implementation
 MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
-  , m_rootFilePtr(NULL)
+  , m_rootFilePtr(nullptr)
 {
   //Set module properties
   setDescription("This module is meant to classify the MCTrackCands as either ideal, fine and nasty");
@@ -238,7 +230,7 @@ void MCTrackCandClassifierModule::event()
   StoreArray<PXDCluster> pxdClusters;
   StoreArray<SVDCluster> svdClusters;
 
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   //1.a retrieve the MCTrackCands
   BOOST_FOREACH(genfit::TrackCand & mcTrackCand, mcTrackCands) {
@@ -524,7 +516,7 @@ void MCTrackCandClassifierModule::terminate()
   addEfficiencyPlots(m_histoList);
   addInefficiencyPlots(m_histoList);
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TIter nextH(m_histoList);
@@ -534,13 +526,6 @@ void MCTrackCandClassifierModule::terminate()
 
     m_rootFilePtr->Close();
   }
-}
-
-
-double MCTrackCandClassifierModule::getXintersect(double d0, double omega, double R)
-{
-  double Xc = d0 + 1 / omega;
-  return (R * R + Xc * Xc - 1 / omega / omega) / 2 / Xc;
 }
 
 
@@ -769,7 +754,7 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
     the_other1 = hden->GetXaxis();
     the_other2 = hden->GetYaxis();
   } else
-    return NULL;
+    return nullptr;
 
 
   TH1F* h;
@@ -781,15 +766,13 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
 
   h->GetYaxis()->SetRangeUser(0.00001, 1);
 
-  double num = 0;
-  double den = 0;
   Int_t bin = 0;
   Int_t nBins = 0;
 
   for (int the_bin = 1; the_bin < the_axis->GetNbins() + 1; the_bin++) {
 
-    num = 0;
-    den = 0 ;
+    double num = 0;
+    double den = 0 ;
 
     for (int other1_bin = 1; other1_bin < the_other1->GetNbins() + 1; other1_bin++)
       for (int other2_bin = 1; other2_bin < the_other2->GetNbins() + 1; other2_bin++) {

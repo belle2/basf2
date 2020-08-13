@@ -32,19 +32,19 @@ namespace Belle2 {
       CsiModule();
 
       /** Init the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** Called for every begin run */
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /** Called for every end run */
-      virtual void event();
+      virtual void event() override;
 
       /** Called for every end run */
-      virtual void endRun();
+      virtual void endRun() override;
 
       /** Called on termination */
-      virtual void terminate();
+      virtual void terminate() override;
 
     protected:
       /** Useless variable showing how to create integer parameters */

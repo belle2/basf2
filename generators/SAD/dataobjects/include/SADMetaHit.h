@@ -8,16 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SADMETAHIT_H
-#define SADMETAHIT_H
+#pragma once
 
 #include <simulation/dataobjects/SimHitBase.h>
-//#include <framework/metastore/RelationsObject.h>
-
-// ROOT
-#include <TObject.h>
-#include <TVector3.h>
-#include <vector>
 
 namespace Belle2 {
   /**
@@ -144,4 +137,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

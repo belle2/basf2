@@ -15,9 +15,7 @@
 #include <trg/ecl/modules/MCMatcherTRGECL/MCMatcherTRGECLModule.h>
 
 //framework headers
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 //ecl package header
 #include <ecl/dataobjects/ECLHit.h>
@@ -36,10 +34,7 @@
 
 //C++ STL
 #include <cstdlib>
-#include <iomanip>
-#include <math.h>
 #include <time.h>
-#include <iomanip>
 #include <utility> //contains pair
 
 

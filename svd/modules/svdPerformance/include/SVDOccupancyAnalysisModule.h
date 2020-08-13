@@ -8,32 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SVD_OCCUPANCY_H_
-#define SVD_OCCUPANCY_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDHistograms.h>
+#include <svd/dataobjects/SVDSummaryPlots.h>
 #include <framework/dataobjects/EventMetaData.h>
+
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <svd/calibration/SVDNoiseCalibrations.h>
 
 
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
-#include <TCollection.h>
-#include <TList.h>
-#include <TH3F.h>
-
-// forward declarations
-class TTree;
-class TFile;
 
 namespace Belle2 {
 
@@ -48,64 +42,64 @@ namespace Belle2 {
     SVDOccupancyAnalysisModule();
 
     virtual ~SVDOccupancyAnalysisModule();
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     /* user-defined parameters */
-    std::string m_rootFileName;   /**< root file name */
-    std::string m_ShaperDigitName;   /**< root file name */
+    std::string m_rootFileName = "";   /**< root file name */
+    std::string m_ShaperDigitName = "SVDShaperDigits";   /**< ShaperDigit StoreArray name */
 
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-    float m_group = 10000;
-    float m_minZS = 3;
-    float m_maxZS = 6;
-    int m_pointsZS = 7;
-    bool m_FADCmode;
+    float m_group = 10000; /**<number of events to comput occupancy for occ VS time*/
+    float m_minZS = 3; /**<minimum zero suppresion cut*/
+    float m_maxZS = 6; /**max zero suppression cut*/
+    int m_pointsZS = 7; /**<num,ner of steps for different ZS cuts*/
+    bool m_FADCmode = true; /**if true, ZS done with same algorithm as on FADC*/
 
   private:
 
-    int m_nEvents;
-    StoreArray<SVDShaperDigit> m_svdShapers;
-    StoreObjPtr<EventMetaData> m_eventMetaData;
+    /// Store Object for reading the trigger decision.
+    StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+    bool m_skipRejectedEvents = false; /**< if true skip events rejected by HLT*/
 
-    SVDNoiseCalibrations m_NoiseCal;
+    int m_nEvents = 0; /**< number of events*/
+    StoreArray<SVDShaperDigit> m_svdShapers; /**<SVDShaperDigit StoreArray*/
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**<Event Meta Data StoreObjectPointer*/
 
-    static const int m_nLayers = 4;
-    static const int m_nSensors = 5;
-    static const int m_nSides = 2;
+    SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
 
-    unsigned int sensorsOnLayer[4];
 
-    TList* m_histoList_shaper[m_nLayers];
+    //! IDs of all SVD Modules to iterate over
+    std::vector<VxdID> m_SVDModules;
+
+    //layer summary
+    float m_distr_Nbins = 10000; /**< number of bins of occupancy distributions*/
+    float m_distr_min = 0; /**< min of occupancy distributions*/
+    float m_distr_max = 100; /**< max of occupancy distributions*/
+
+    TH1F* m_occ_L3U = nullptr; /**< occupancy distribution for L3 U-side sensors*/
+    TH1F* m_occ_L3V = nullptr; /**< occupancy distribution for L3 V-side sensors*/
+    TH1F* m_occ_L4U = nullptr; /**< occupancy distribution for L4 U-side sensors*/
+    TH1F* m_occ_L4V = nullptr; /**< occupancy distribution for L4 V-side sensors*/
+    TH1F* m_occ_L5U = nullptr; /**< occupancy distribution for L5 U-side sensors*/
+    TH1F* m_occ_L5V = nullptr; /**< occupancy distribution for L5 V-side sensors*/
+    TH1F* m_occ_L6U = nullptr; /**< occupancy distribution for L6 U-side sensors*/
+    TH1F* m_occ_L6V = nullptr; /**< occupancy distribution for L6 V-side sensors*/
 
     //SHAPER
-    TH1F* h_occ[m_nLayers][m_nSensors][m_nSides]; //number per event
-    TH1F* h_zsOcc[m_nLayers][m_nSensors][m_nSides]; //number per event
-    TH1F* h_zsOccSQ[m_nLayers][m_nSensors][m_nSides]; //number per event
-
-    TH2F* h_occtdep[m_nLayers][m_nSensors][m_nSides]; //number per event
-    int getSensor(int sensor)
-    {
-      return sensor - 1;;
-    }
-
-    //list of functions to create histograms:
-    TH1F* createHistogram1D(const char* name, const char* title,
-                            Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = NULL);  /**< thf */
-    TH2F* createHistogram2D(const char* name, const char* title,
-                            Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
-                            Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            TList* histoList = NULL);  /**< thf */
-
+    SVDSummaryPlots* m_hit = nullptr; /**<hit number summary histogram*/
+    SVDHistograms<TH1F>* m_histo_dist = nullptr; /**<occupancy distribution histograms*/
+    SVDHistograms<TH1F>* m_histo_occ = nullptr; /**<occupancy histograms*/
+    SVDHistograms<TH1F>* m_histo_zsOcc = nullptr; /**<occupancy VS ZScut histograms*/
+    SVDHistograms<TH1F>* m_histo_zsOccSQ = nullptr; /**< occupancy VS ZS cut swuared histograms*/
+    SVDHistograms<TH2F>* m_histo_occtdep = nullptr; /**< occupancy VS event number*/
 
   };
 }
 
-#endif /* SVDOccupancyAnalysisModule_H_ */
 

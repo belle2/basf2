@@ -17,7 +17,7 @@ using namespace TrackFindingCDC;
 template class TrackFindingCDC::MVAFilter<MVARealisticSegmentPairVarSet>;
 
 MVARealisticSegmentPairFilter::MVARealisticSegmentPairFilter()
-  : Super("tracking/data/trackfindingcdc_RealisticSegmentPairFilter.xml", 0.02)
+  : Super("trackfindingcdc_RealisticSegmentPairFilter", 0.02)
 {
   this->addProcessingSignalListener(&m_feasibleSegmentPairFilter);
 }

@@ -13,14 +13,14 @@
 #pragma once
 #include <mdst/dataobjects/TRGSummary.h>
 #include <TObject.h>
-#include <TVector3.h>
+
 namespace Belle2 {
 
   class TRGGDLDST : public TObject {
   public:
 
     /**! The Class title*/
-    ClassDef(TRGGDLDST, 1); /*< the class title */
+    ClassDef(TRGGDLDST, 2); /*< the class title */
 
     TRGGDLDST() {}
 

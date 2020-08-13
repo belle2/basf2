@@ -68,8 +68,8 @@ namespace Belle2 {
        */
       virtual MayBePtr<Float_t> find(std::string name)
       {
-        size_t index = getNameIndex(name.c_str());
-        return (index < size()) ? &(operator[](index)) : nullptr;
+        size_t nameindex = getNameIndex(name.c_str());
+        return (nameindex < size()) ? &(operator[](nameindex)) : nullptr;
       }
 
       /// Reference getter for the value of the ith part.

@@ -9,32 +9,22 @@
  **************************************************************************/
 
 #include <tracking/modules/trackingPerformanceEvaluation/V0findingPerformanceEvaluationModule.h>
-#include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
+
+#include <tracking/dataobjects/MCParticleInfo.h>
+#include <tracking/dataobjects/V0ValidationVertex.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/datastore/RelationVector.h>
-#include <framework/datastore/RelationsObject.h>
 
-#include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
 
 #include <framework/geometry/BFieldManager.h>
 
-#include <vxd/geometry/GeoCache.h>
-
-#include <root/TTree.h>
 #include <root/TAxis.h>
 #include <root/TObject.h>
 
 #include <boost/foreach.hpp>
 #include <vector>
-#include <utility>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 
@@ -328,7 +318,7 @@ void V0findingPerformanceEvaluationModule::terminate()
 
   //  addPurityPlots(m_histoList_purity, m_h3_MCParticlesPerV0, m_h3_V0s);
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;

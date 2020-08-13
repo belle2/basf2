@@ -15,7 +15,6 @@
 #define TRGCDC_SHORT_NAMES
 
 #include <stdlib.h>
-#include "framework/datastore/StoreArray.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/WireHit.h"
 
@@ -45,6 +44,7 @@ namespace Belle2 {
                     driftRightError,
                     mcLRflag,
                     fudgeFactor),
+             _mc(), //2019/07/31 by ytlai
              _iCDCSimHit(indexCDCSimHit)
   {
   }

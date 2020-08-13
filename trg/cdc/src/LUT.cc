@@ -14,11 +14,8 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <sstream>
 #include <fstream>
-#include "trg/trg/Debug.h"
 #include "trg/cdc/LUT.h"
-//#include "trg/cdc/TrackSegment.h"
 #include "trg/cdc/Track.h"
 #include "trg/cdc/Link.h"
 #include <cstdlib>
@@ -35,7 +32,8 @@ namespace Belle2 {
     return string("TRGCDCLUT 1.00");
   }
 
-  TRGCDCLUT::TRGCDCLUT()
+  TRGCDCLUT::TRGCDCLUT() :
+    m_data{}, m_bitsize(), m_name() // 2019/07/31 by ytlai
   {
   }
 

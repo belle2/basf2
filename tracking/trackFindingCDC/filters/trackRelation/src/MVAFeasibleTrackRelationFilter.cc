@@ -17,6 +17,6 @@ using namespace TrackFindingCDC;
 template class TrackFindingCDC::MVA<BaseTrackRelationFilter>;
 
 MVAFeasibleTrackRelationFilter::MVAFeasibleTrackRelationFilter()
-  : Super(std::make_unique<VarSet>(), "tracking/data/trackfindingcdc_FeasibleTrackRelationFilter.xml", 0.03)
+  : Super(std::make_unique<VarSet>(), "trackfindingcdc_FeasibleTrackRelationFilter", 0.03)
 {
 }

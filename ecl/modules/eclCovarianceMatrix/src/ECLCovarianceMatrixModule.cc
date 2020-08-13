@@ -6,7 +6,7 @@
  * The matrix depends on the shower region (FWD, Bartel, BWD)             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,7 +18,6 @@
 #include "TMath.h"
 
 // MDST
-#include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 // ECL
@@ -76,8 +75,8 @@ void ECLCovarianceMatrixModule::event()
   // loop over all ECLShowers
   for (auto& eclShower : m_eclShowers) {
 
-    // Only correct for photon showers and high energey electrons
-    if (eclShower.getHypothesisId() == ECLCluster::c_nPhotons) {
+    // Only calculate for photon showers
+    if (eclShower.getHypothesisId() == ECLShower::c_nPhotons) {
 
       const double energy = eclShower.getEnergy();
 

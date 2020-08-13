@@ -8,27 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCCRTestModule_H_
-#define CDCCRTestModule_H_
+#pragma once
 
 #include <framework/core/HistoModule.h>
 
 #include <cdc/dataobjects/WireID.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRecoHit.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 
 #include <string>
 
-#include <framework/datastore/RelationIndex.h>
+#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <genfit/DetPlane.h>
-#include <genfit/StateOnPlane.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreArray.h>
 #include "TH1.h"
 #include "TH2.h"
-#include "TFile.h"
 #include "TProfile.h"
 #include "TTree.h"
 
@@ -56,34 +50,34 @@ namespace Belle2 {
       /**
        * Initializes the Module.
        */
-      virtual void initialize();
+      void initialize() override;
 
       /**
        * Begin run action.
        */
-      virtual void beginRun();
+      void beginRun() override;
 
       /**
        * Event action (main routine).
        */
 
-      virtual void event();
+      void event() override;
       /**
        * End run action.
        */
 
-      virtual void endRun();
+      void endRun() override;
 
       /**
        * Termination action.
        */
-      virtual void terminate();
+      void terminate() override;
 
       /**
        *  Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
        *  to be placed in this function.
        */
-      virtual void defineHisto();
+      void defineHisto() override;
 
     private:
 
@@ -195,6 +189,19 @@ namespace Belle2 {
        * Event timing. The event time is fetched from the data store using this pointer.
        */
       StoreObjPtr<EventT0> m_eventTimeStoreObject;
+
+      /** Tracks. */
+      StoreArray<Track> m_Tracks;
+
+      /** Tracks. */
+      StoreArray<RecoTrack> m_RecoTracks;
+
+      /** Track fit results. */
+      StoreArray<TrackFitResult> m_TrackFitResults;
+
+      /** CDC hits. */
+      StoreArray<CDCHit> m_CDCHits;
+
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName ;         /**< Belle2::CDCHit StoreArray name. */
       std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
@@ -301,4 +308,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

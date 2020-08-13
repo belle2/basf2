@@ -13,42 +13,31 @@
 
 // kinfitter
 #include <analysis/modules/ParticleKinematicFitter/ParticleKinematicFitterModule.h>
-#include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
-#include <analysis/OrcaKinFit/JetFitObject.h>
-#include <analysis/OrcaKinFit/TextTracer.h>
 #include <analysis/OrcaKinFit/BaseFitter.h>
 #include <analysis/OrcaKinFit/BaseFitObject.h>
+#include <analysis/OrcaKinFit/OPALFitterGSL.h>
+#include <analysis/OrcaKinFit/JetFitObject.h>
+#include <analysis/OrcaKinFit/NewtonFitterGSL.h>
+#include <analysis/OrcaKinFit/NewFitterGSL.h>
+#include <analysis/OrcaKinFit/PxPyPzMFitObject.h>
+#include <analysis/OrcaKinFit/TextTracer.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
 
-// framework datastore
-#include <framework/datastore/StoreArray.h>
-
 // framework utilities
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // analysis dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 
-// analysis utilities (uses beamparameters)
+// analysis utilities
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
 
-
-// others
-#include <Math/SMatrix.h>
-#include <TMath.h>
-#include <TMatrixD.h>
-
 // CLHEP
-#include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
-#include <CLHEP/Geometry/Point3D.h>
 
 using namespace CLHEP;
 using namespace std;
@@ -69,7 +58,8 @@ namespace Belle2 {
     //                 Implementation
     //-----------------------------------------------------------------
 
-    ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_eventextrainfo("", DataStore::c_Event)
+    ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_textTracer(nullptr), m_eventextrainfo("",
+          DataStore::c_Event)
     {
       setDescription("Kinematic fitter for modular analysis");
       setPropertyFlags(c_ParallelProcessingCertified);
@@ -98,11 +88,10 @@ namespace Belle2 {
     {
       m_eventextrainfo.registerInDataStore();
 
-      if (m_decayString != "")
+      if (m_decayString != "") {
         m_decaydescriptor.init(m_decayString);
-
-      if (m_decayString != "")
         B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
+      }
     }
 
 
@@ -124,7 +113,7 @@ namespace Belle2 {
 
     void ParticleKinematicFitterModule::event()
     {
-      B2INFO("ParticleKinematicFitterModule::event");
+      B2DEBUG(17, "ParticleKinematicFitterModule::event");
 
       StoreObjPtr<ParticleList> plist(m_listName);
       if (!plist) {
@@ -154,7 +143,7 @@ namespace Belle2 {
     bool ParticleKinematicFitterModule::doKinematicFit(Particle* mother)
     {
 
-      B2INFO("ParticleKinematicFitterModule::doKinematicFit");
+      B2DEBUG(17, "ParticleKinematicFitterModule::doKinematicFit");
 
       bool ok = false;
 
@@ -185,7 +174,7 @@ namespace Belle2 {
 
       }
       // invalid fitter
-      else if (m_kinematicFitter != "OrcaKinFit") {
+      else {
         B2FATAL("ParticleKinematicFitter: " << m_kinematicFitter << " is an invalid kinematic fitter!");
       }
 
@@ -230,8 +219,11 @@ namespace Belle2 {
         (dynamic_cast<NewFitterGSL*>(pfitter))->setDebug(debugfitter);
       } else {
         B2FATAL("ParticleKinematicFitterModule:  " << m_orcaFitterEngine << " is an invalid OrcaKinFit fitter engine!");
+        return false;
       }
-      BaseFitter& fitter = *pfitter;
+
+      if (!pfitter) return false;
+      BaseFitter& fitter(*pfitter);
 
       // reset fitter
       resetFitter(fitter);
@@ -289,11 +281,10 @@ namespace Belle2 {
       // if we added an unmeasured photon, add the kinematics to the mother - at some point we may want to create a particle list from this?
       if (m_addUnmeasuredPhoton) {
         std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
-        for (unsigned iChild = 0; iChild < fitObjectContainer->size(); iChild++) {
-          BaseFitObject* fo = fitObjectContainer->at(iChild);
+        for (auto fo : *fitObjectContainer) {
           const std::string name = fo->getName();
           if (name == "unmeasured") {
-            ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+            auto* fitobject = static_cast<ParticleFitObject*>(fo);
             TLorentzVector tlv = getTLorentzVector(fitobject);
             mother->addExtraInfo("OrcaKinFitUnmeasuredTheta", tlv.Theta());
             mother->addExtraInfo("OrcaKinFitUnmeasuredPhi", tlv.Phi());
@@ -309,14 +300,14 @@ namespace Belle2 {
         }
       }
 
-      if (pfitter) delete pfitter;
+      delete pfitter;
       return true;
     }
 
     bool ParticleKinematicFitterModule::fillFitParticles(Particle* mother, std::vector<Particle*>& particleChildren)
     {
       for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
-        Particle* child = const_cast<Particle*>(mother->getDaughter(ichild));
+        auto* child = const_cast<Particle*>(mother->getDaughter(ichild));
 
         if (child->getNDaughters() > 0) {
           bool err = fillFitParticles(child, particleChildren);
@@ -339,7 +330,7 @@ namespace Belle2 {
     {
       TMatrixFSym MomentumVertexErrorMatrix(7);
       for (unsigned ichild = 0; ichild < mother->getNDaughters(); ichild++) {
-        Particle* child = const_cast<Particle*>(mother->getDaughter(ichild));
+        auto* child = const_cast<Particle*>(mother->getDaughter(ichild));
 
         if (child->getPValue() > 0) {
           MomentumVertexErrorMatrix += child->getMomentumVertexErrorMatrix();
@@ -359,14 +350,14 @@ namespace Belle2 {
 
     void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, Particle* particle, const int index)
     {
-      B2INFO("ParticleKinematicFitterModule: adding a particle to the fitter!");
+      B2DEBUG(17, "ParticleKinematicFitterModule: adding a particle to the fitter!");
 
       if (m_add3CPhoton && index == 0) {
         if (particle -> getPDGCode() != 22) {
           B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
         }
 
-        double startingE = particle -> getECLCluster() -> getEnergy();
+        double startingE = particle -> getECLCluster() -> getEnergy(particle -> getECLClusterEHypothesisBit());
         double startingPhi = particle -> getECLCluster() -> getPhi();
         double startingTheta = particle -> getECLCluster() -> getTheta();
 
@@ -398,7 +389,6 @@ namespace Belle2 {
 
         // error matrix
         CLHEP::HepSymMatrix clhepmomentumerrormatrix = getCLHEPMomentumErrorMatrix(particle);
-        CLHEP::HepSymMatrix clhepmomentumvertexerrormatrix = getCLHEPMomentumVertexErrorMatrix(particle);
 
         // create the fit object (ParticleFitObject is the base class)
         ParticleFitObject* pfitobject;
@@ -514,7 +504,7 @@ namespace Belle2 {
 
       if (m_orcaConstraint == "HardBeam") {
         PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
+        const TLorentzVector boost = T.getBeamFourMomentum();
 
         m_hardConstraintPx = MomentumConstraint(0, 1, 0, 0, boost.Px());
         m_hardConstraintPy = MomentumConstraint(0, 0, 1, 0, boost.Py());
@@ -533,7 +523,7 @@ namespace Belle2 {
 
       } else if (m_orcaConstraint == "RecoilMass") {
         PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
+        const TLorentzVector boost = T.getBeamFourMomentum();
 
         m_hardConstraintRecoilMass = RecoilMassConstraint(m_recoilMass, boost.Px(), boost.Py(), boost.Pz(), boost.E());
 
@@ -541,9 +531,6 @@ namespace Belle2 {
         m_hardConstraintRecoilMass.setName("Recoil Mass [hard]");
 
       } else if (m_orcaConstraint == "Mass") {
-        PCmsLabTransform T;
-        const TLorentzVector boost = T.getBoostVector();
-
         m_hardConstraintMass = MassConstraint(m_invMass);
 
         m_hardConstraintMass.resetFOList();
@@ -556,7 +543,7 @@ namespace Belle2 {
 
     void ParticleKinematicFitterModule::resetFitter(BaseFitter& fitter)
     {
-      B2INFO("ParticleKinematicFitterModule: Resetting the fitter");
+      B2DEBUG(17, "ParticleKinematicFitterModule: Resetting the fitter");
       fitter.reset();
     }
 
@@ -644,13 +631,19 @@ namespace Belle2 {
 
       const unsigned nd = bDau.size();
       unsigned l = 0;
-      std::vector<std::vector<unsigned>> u(nd);
+      std::vector<std::vector<unsigned>> pars;
+      std::vector<Particle*> allparticles;
       for (unsigned ichild = 0; ichild < nd; ichild++) {
         const Particle* daughter = mother->getDaughter(ichild);
+        std::vector<unsigned> pard;
         if (daughter->getNDaughters() > 0) {
-          updateMapofTrackandDaughter(u[ichild], l, daughter);
+          updateMapOfTrackAndDaughter(l, pars, pard, allparticles, daughter);
+          pars.push_back(pard);
+          allparticles.push_back(bDau[ichild]);
         } else {
-          u[ichild].push_back(l);
+          pard.push_back(l);
+          pars.push_back(pard);
+          allparticles.push_back(bDau[ichild]);
           l++;
         }
       }
@@ -658,29 +651,25 @@ namespace Belle2 {
       if (l == fitObjectContainer->size() - m_addUnmeasuredPhoton) {
 
         if (fitter.getError() == 0) {
-          for (unsigned iDaug = 0; iDaug < bDau.size(); iDaug++) {
+          for (unsigned iDaug = 0; iDaug < allparticles.size(); iDaug++) {
             TLorentzVector tlv ;
             TMatrixFSym errMatrixU(7);
-            if (u[iDaug].size() > 0) {
-              for (unsigned iChild = 0; iChild < u[iDaug].size(); iChild++) {
-                BaseFitObject* fo = fitObjectContainer->at(u[iDaug][iChild]);
-                ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+            if (pars[iDaug].size() > 0) {
+              for (unsigned int iChild : pars[iDaug]) {
+                BaseFitObject* fo = fitObjectContainer->at(iChild);
+                auto* fitobject = static_cast<ParticleFitObject*>(fo);
                 TLorentzVector tlv_sub = getTLorentzVector(fitobject);
                 TMatrixFSym errMatrixU_sub = getCovMat7(fitobject);
                 tlv = tlv + tlv_sub;
                 errMatrixU = errMatrixU + errMatrixU_sub;
               }
             } else {
-              BaseFitObject* fo = fitObjectContainer->at(iDaug);
-              ParticleFitObject* fitobject = (ParticleFitObject*) fo;
-              tlv = getTLorentzVector(fitobject);
-
-              errMatrixU = getCovMat7(fitobject);
+              B2FATAL("ParticleKinematicFitterModule:   no fitObject could be used to update the daughter!");
             }
-            TVector3 pos          = bDau[iDaug]->getVertex(); // we dont update the vertex yet
-            TMatrixFSym errMatrix = bDau[iDaug]->getMomentumVertexErrorMatrix();
-            TMatrixFSym errMatrixMom = bDau[iDaug]->getMomentumErrorMatrix();
-            TMatrixFSym errMatrixVer = bDau[iDaug]->getVertexErrorMatrix();
+            TVector3 pos          = allparticles[iDaug]->getVertex(); // we dont update the vertex yet
+            TMatrixFSym errMatrix = allparticles[iDaug]->getMomentumVertexErrorMatrix();
+            TMatrixFSym errMatrixMom = allparticles[iDaug]->getMomentumErrorMatrix();
+            TMatrixFSym errMatrixVer = allparticles[iDaug]->getVertexErrorMatrix();
 
             for (int i = 0; i < 3; i++) {
               for (int j = i; j < 3; j++) {
@@ -688,9 +677,9 @@ namespace Belle2 {
               }
             }
 
-            bDau[iDaug]->set4Vector(tlv);
-            bDau[iDaug]->setVertex(pos);
-            bDau[iDaug]->setMomentumVertexErrorMatrix(errMatrixU);
+            allparticles[iDaug]->set4Vector(tlv);
+            allparticles[iDaug]->setVertex(pos);
+            allparticles[iDaug]->setMomentumVertexErrorMatrix(errMatrixU);
           }
         }
 
@@ -702,14 +691,23 @@ namespace Belle2 {
 
     }
 
-    void ParticleKinematicFitterModule::updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l,
-        const       Particle* daughter)
+    void ParticleKinematicFitterModule::updateMapOfTrackAndDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars,
+        std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
     {
+      std::vector <Belle2::Particle*> dDau = daughter->getDaughters();
       for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
         const Particle* child = daughter->getDaughter(ichild);
-        if (child->getNDaughters() > 0) updateMapofTrackandDaughter(ui, l, child);
-        else {
-          ui.push_back(l);
+        std::vector<unsigned> pard;
+        if (child->getNDaughters() > 0) {
+          updateMapOfTrackAndDaughter(l, pars, pard, allparticles, child);
+          parm.insert(parm.end(), pard.begin(), pard.end());
+          pars.push_back(pard);
+          allparticles.push_back(dDau[ichild]);
+        } else {
+          pard.push_back(l);
+          parm.push_back(l);
+          pars.push_back(pard);
+          allparticles.push_back(dDau[ichild]);
           l++;
         }
       }
@@ -720,7 +718,6 @@ namespace Belle2 {
                                                                Particle* mother)
     {
       // get old values
-      TLorentzVector mom    = mother->get4Vector();
       TVector3 pos          = mother->getVertex();
       TMatrixFSym errMatrix = mother->getMomentumVertexErrorMatrix();
       float pvalue          = mother->getPValue();
@@ -731,7 +728,7 @@ namespace Belle2 {
       std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
       for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++) {
         BaseFitObject* fo = fitObjectContainer->at(iChild);
-        ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+        auto* fitobject = static_cast<ParticleFitObject*>(fo);
         TLorentzVector tlv = getTLorentzVector(fitobject);
         momnew += tlv;
       }
@@ -743,7 +740,7 @@ namespace Belle2 {
     }
 
 
-    bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(std::string prefix, BaseFitter& fitter,
+    bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter,
         std::vector<Particle*>& particleChildren, Particle* mother)
     {
       bool updated = false;
@@ -751,7 +748,7 @@ namespace Belle2 {
 
       for (unsigned iChild = 0; iChild < particleChildren.size(); iChild++) {
         BaseFitObject* fo = fitObjectContainer->at(iChild);
-        ParticleFitObject* fitobject = (ParticleFitObject*) fo;
+        auto* fitobject = static_cast<ParticleFitObject*>(fo);
         TLorentzVector tlv = getTLorentzVector(fitobject);
 
         // name of extra variables
@@ -781,7 +778,7 @@ namespace Belle2 {
     float ParticleKinematicFitterModule::getFitObjectError(ParticleFitObject* fitobject, int ilocal)
     {
       //check if it is a PxPyPzMFitObject
-      PxPyPzMFitObject* pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
+      auto* pxpypzmfitobject = static_cast<PxPyPzMFitObject*>(fitobject);
       if (pxpypzmfitobject) {
         return fitobject->getError(ilocal);
       } else {
@@ -794,7 +791,7 @@ namespace Belle2 {
     {
 
       //check if it is a PxPyPzMFitObject
-      PxPyPzMFitObject* pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
+      auto* pxpypzmfitobject = static_cast<PxPyPzMFitObject*>(fitobject);
       if (pxpypzmfitobject) {
 
         TMatrixFSym errMatrix(3);
@@ -820,7 +817,7 @@ namespace Belle2 {
 
       if (strcmp(fitobject->getParamName(0), "E") == 0) {
         //check if it is a JetFitObject
-        JetFitObject* jetfitObject = (JetFitObject*) fitobject;
+        auto* jetfitObject = static_cast<JetFitObject*>(fitobject);
         if (jetfitObject) {
 
           fitCovMatrix = getFitObjectCovMat(fitobject);
@@ -858,7 +855,7 @@ namespace Belle2 {
         }
       } else {
         //check if it is a PxPyPzMFitObject
-        PxPyPzMFitObject* pxpypzmfitobject = (PxPyPzMFitObject*) fitobject;
+        auto* pxpypzmfitobject = static_cast<PxPyPzMFitObject*>(fitobject);
         if (pxpypzmfitobject) {
 
           fitCovMatrix = getFitObjectCovMat(fitobject);
@@ -892,5 +889,4 @@ namespace Belle2 {
 
 
   }// end OrcaKinFit namespace
-
 } // end Belle2 namespace

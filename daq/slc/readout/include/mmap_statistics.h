@@ -2,9 +2,7 @@
 #define MMAP_STATISTICS_H
 
 #include <unistd.h>
-#include <stdlib.h>
 #include <fcntl.h>
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
 #include <stdint.h>
@@ -68,6 +66,8 @@ public:
 
   ~eb_statistics()
   {
+    munmap(m_stat_u, m_len_u);
+    munmap(m_stat_d, m_len_d);
     close(m_fd_u);
     close(m_fd_d);
   };

@@ -10,13 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
-#include <tracking/trackFindingVXD/segmentNetwork/VoidMetaInfo.h>
-#include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 
 #include <fstream>
 #include <string>
-#include <sstream>
 
 namespace Belle2 {
 
@@ -24,12 +21,8 @@ namespace Belle2 {
   namespace DNN {
 
     /** TODO
-     *
      * - code isSeed and getState to colors for fill and for border
-     *
      * */
-
-
 
     /** function for printing networks with CACells:
      *
@@ -38,16 +31,14 @@ namespace Belle2 {
      * prerequisite for NodeEntryType:
      * - std::string getName()
      */
-    template<class NodeEntryType>
-    void printCANetwork(DirectedNodeNetwork<NodeEntryType, CACell>& network, std::string fName/*, bool useGetName = false*/)
+    template<class NodeEntryType> // cppcheck-suppress constParameter
+    void printCANetwork(DirectedNodeNetwork<NodeEntryType, CACell>& network, const std::string& fName)
     {
       std::string fullOut = "digraph G {\n";
       fullOut +=
         "ranksep=\"0.2\" edge[labelfontsize=\"8\" fontsize=\"8\" arrowsize=\"0.9\"] nodesep=\"0.2\" node[shape=\"box\" width=\"0\" height=\"0\" fontsize=\"10\"]\n";
       // write vertices:
       for (auto* node : network) {
-        std::stringstream  outStream;
-
         fullOut += "\"" + node->getEntry().getName() + "\"" +
                    " [label=\"" +
                    node->getEntry().getName() +
@@ -75,10 +66,9 @@ namespace Belle2 {
     };
 
 
-
     /** overloaded print-version for typical activeSector-networks without CACell-stuff */
-    template<class NodeEntryType, class AnyMetaInfo>
-    void printNetwork(DirectedNodeNetwork<NodeEntryType, AnyMetaInfo>& network, std::string fName/*, bool useGetName = false*/)
+    template<class NodeEntryType, class AnyMetaInfo> // cppcheck-suppress constParameter
+    void printNetwork(DirectedNodeNetwork<NodeEntryType, AnyMetaInfo>& network, const std::string& fName)
     {
       std::string fullOut = "digraph G {\n";
       fullOut +=
@@ -86,7 +76,6 @@ namespace Belle2 {
 
       // write vertices:
       for (auto* node : network) {
-        std::stringstream  outStream;
         fullOut += "\"" + node->getEntry().getName() + "\"" +
                    " [label=\"" +
                    node->getEntry().getName() +

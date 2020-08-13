@@ -27,7 +27,7 @@ namespace Belle2 {
 
   public:
     BinData(void* buf = NULL);
-    ~BinData() throw();
+    ~BinData() noexcept;
 
   public:
     int getExpNumber() const { return (m_header->exp_run >> 22) & 0x3FF; };
@@ -83,12 +83,12 @@ namespace Belle2 {
     void setNodeId(int id) { m_header->node_id = id; };
 
   public:
-    unsigned int recvEvent(TCPSocket& socket) throw(IOException);
-    unsigned int sendEvent(TCPSocket& socket) const throw(IOException);
+    unsigned int recvEvent(TCPSocket& socket);
+    unsigned int sendEvent(TCPSocket& socket) const;
     int* getBuffer() { return m_buf; }
     const int* getBuffer() const { return m_buf; }
     void setBuffer(void* buf);
-    void print() throw();
+    void print() noexcept;
 
   public:
     BinHeader* getHeader() { return m_header; };

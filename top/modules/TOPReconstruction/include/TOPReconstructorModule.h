@@ -14,7 +14,6 @@
 #include <framework/gearbox/Const.h>
 #include <string>
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 // Hit classes
@@ -51,34 +50,34 @@ namespace Belle2 {
      *
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      *
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      *
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      *
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      *
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   private:
@@ -93,6 +92,9 @@ namespace Belle2 {
     double m_minTime = 0;      /**< optional lower time limit for photons */
     double m_maxTime = 0;      /**< optional upper time limit for photons */
     int m_PDGCode = 0;   /**< PDG code of hypothesis to construct pulls */
+    std::string m_topDigitCollectionName; /**< name of the collection of TOPDigits */
+    std::string m_topLikelihoodCollectionName; /**< name of the collection of created TOPLikelihoods */
+    std::string m_topPullCollectionName; /**< name of the collection of created TOPPulls */
 
     // others
     int m_debugLevel = 0;       /**< debug level from logger */

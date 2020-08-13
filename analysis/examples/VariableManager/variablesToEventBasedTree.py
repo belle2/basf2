@@ -1,38 +1,41 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-# The VariablesToEventBasedTree module saves variables from the VariableManager to an event-based TTree
+# The VariablesToEventBasedTree module saves variables from the VariableManager
+# to an event-based TTree
+#
+# Thomas Keck and Sam Cunliffe
+#
+# For full documentation please refer to https://software.belle2.org
+# Anything unclear? Ask questions at https://questions.belle2.org
 
-from basf2 import *
-from modularAnalysis import *
+import basf2
+import modularAnalysis as ma  # a shorthand for the analysis tools namespace
 
-import os
-if os.path.isfile('mdst.root'):
-    filename = 'mdst.root'
-elif os.path.isfile('/storage/jbod/tkeck/MC7/evtgen-charged/sub00/mdst_000240_prod00000788_task00000685.root'):
-    filename = '/storage/jbod/tkeck/MC7/evtgen-charged/sub00/mdst_000240_prod00000788_task00000685.root'
-elif os.path.isfile('/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000788/s00/e0000/4S/r00000/'
-                    'charged/sub00/mdst_000240_prod00000788_task00000685.root'):
-    filename = '/ghi/fs01/belle2/bdata/MC/release-00-07-02/DBxxxxxxxx/MC7/prod00000788/s00/e0000/4S/r00000/'\
-               'charged/sub00/mdst_000240_prod00000788_task00000685.root'
-else:
-    raise RuntimeError("Please copy an mdst file from KEKCC into this directory named mdst.root")
+mypath = basf2.Path()  # create a new path
 
-inputMdstList('MC7', [filename])
-
-fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')])
-reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95')
-matchMCTruth('D0')
+# add input data and ParticleLoader modules to the path
+ma.inputMdstList('default', [basf2.find_file('analysis/tests/mdst.root')], path=mypath)
+ma.fillParticleLists([('K-', 'kaonID > 0.2'), ('pi+', 'pionID > 0.2')], path=mypath)
+ma.reconstructDecay('D0 -> K- pi+', '1.750 < M < 1.95', path=mypath)
+ma.matchMCTruth('D0', path=mypath)
 
 # This will write out one row per event in the TTree
 # The branches of the TTree are arrays containing the variables for each D0 candidate in the event
 # The event_variables are handled differently, the branches of these event_variables are just floats,
 # you can use this to write out candidate independent information (aka event-based variables)
-analysis_main.add_module('VariablesToEventBasedTree',
-                         particleList='D0',
-                         variables=['dM', 'isSignal', 'mcErrors', 'p', 'E',
-                                    'daughter(0, kaonID)', 'daughter(1, pionID)'],
-                         event_variables=['nTracks', 'expNum', 'runNum', 'evtNum'])
+mypath.add_module('VariablesToEventBasedTree',
+                  particleList='D0',
+                  variables=['dM', 'isSignal', 'mcErrors', 'p', 'E',
+                             'daughter(0, kaonID)', 'daughter(1, pionID)'],
+                  event_variables=['nTracks', 'isMC'])
+# It's possible to have multiple event-based trees in the same output file.
+# Of course their names have to be different.
+mypath.add_module('VariablesToEventBasedTree',
+                  particleList='K-',
+                  treeName='kaon',
+                  variables=['isSignal', 'mcErrors', 'p', 'E', 'kaonID'],
+                  event_variables=['nTracks', 'isMC'])
 
-process(analysis_main)
-print(statistics)
+# process the data
+basf2.process(mypath)
+print(basf2.statistics)

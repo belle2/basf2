@@ -12,8 +12,6 @@
 #include <analysis/modules/ParticleCombiner/ParticleCombinerModule.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // dataobjects
@@ -24,10 +22,10 @@
 
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/EvtPDLUtil.h>
 #include <analysis/utility/PCmsLabTransform.h>
-#include <framework/dbobjects/BeamParameters.h>
 
-#include <algorithm>
+#include <memory>
 
 using namespace std;
 
@@ -53,7 +51,7 @@ namespace Belle2 {
 
     // Add parameters
     addParam("decayString", m_decayString,
-             "Input DecayDescriptor string (see https://confluence.desy.de/display/BI/Physics+DecayString).");
+             "Input DecayDescriptor string (see :ref:`DecayString`).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
     addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
              "Max. number of candidates reconstructed. By default, if the limit is reached no candidates will be produced.\n"
@@ -68,18 +66,23 @@ namespace Belle2 {
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
     addParam("recoilParticleType", m_recoilParticleType,
              "If not equal 0, the mother Particle is reconstructed in the recoil against the daughter particles.\n"
-             "In the case of the following decay chain M -> D1 D2 ... Dn and\n"
-             " a) recoilParticleType = 1: \n"
-             "   - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)\n"
-             "   - D1, D2, ..., DN are attached as daughters of M\n"
-             " b) recoilParticleType = 2: \n"
-             "   - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
-             "   - D1, D2, ..., DN are attached as daughters of M\n" , 0);
+             "In the case of the following decay chain M -> D1 D2 ... Dn and\n\n"
+             ""
+             "  a) recoilParticleType = 1: \n\n"
+             "    - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)\n"
+             "    - D1, D2, ..., DN are attached as daughters of M\n\n"
+             "  b) recoilParticleType = 2: \n\n"
+             "    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
+             "    - D1, D2, ..., DN are attached as daughters of M\n\n" , 0);
+    addParam("chargeConjugation", m_chargeConjugation,
+             "If true, the charge-conjugated mode will be reconstructed as well", true);
+    addParam("allowChargeViolation", m_allowChargeViolation,
+             "If true the decay string does not have to conserve electric charge", false);
 
-    // initializing the rest of private memebers
+    // initializing the rest of private members
     m_pdgCode   = 0;
-    m_isSelfConjugatedParticle = 0;
-    m_generator = 0;
+    m_isSelfConjugatedParticle = false;
+    m_generator = nullptr;
   }
 
   void ParticleCombinerModule::initialize()
@@ -104,18 +107,35 @@ namespace Belle2 {
 
     // Daughters
     int nProducts = m_decaydescriptor.getNDaughters();
+    int daughtersNetCharge = 0;
     for (int i = 0; i < nProducts; ++i) {
       const DecayDescriptorParticle* daughter =
         m_decaydescriptor.getDaughter(i)->getMother();
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
+      int daughterPDGCode = daughter->getPDGCode();
+      if (m_recoilParticleType == 2 && i == 0) {
+        daughtersNetCharge -= EvtPDLUtil::charge(daughterPDGCode);
+      } else {
+        daughtersNetCharge += EvtPDLUtil::charge(daughterPDGCode);
+      }
     }
 
-    m_generator = std::unique_ptr<ParticleGenerator>(new ParticleGenerator(m_decayString, m_cutParameter));
+    if (daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {
+      if (!m_allowChargeViolation) {
+        B2FATAL("Your decay string " << m_decayString << " violates electric charge conservation!\n"
+                "If you want to allow this you can set the argument 'allowChargeViolation' to True. Something like:\n"
+                "modularAnalysis.reconstructDecay(" << m_decayString << ", your_cuts, allowChargeViolation=True, path=mypath)");
+      }
+      B2WARNING("Your decay string " << m_decayString << " violates electric charge conservation!\n"
+                "Processing is continued assuming that you allowed this deliberately, e.g. for systematic studies etc.");
+    }
+
+    m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
 
     StoreObjPtr<ParticleList> particleList(m_listName);
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
     particleList.registerInDataStore(flags);
-    if (!m_isSelfConjugatedParticle) {
+    if (!m_isSelfConjugatedParticle && m_chargeConjugation) {
       StoreObjPtr<ParticleList> antiParticleList(m_antiListName);
       antiParticleList.registerInDataStore(flags);
     }
@@ -133,7 +153,7 @@ namespace Belle2 {
     outputList.create();
     outputList->initialize(m_pdgCode, m_listName);
 
-    if (!m_isSelfConjugatedParticle) {
+    if (!m_isSelfConjugatedParticle && m_chargeConjugation) {
       StoreObjPtr<ParticleList> outputAntiList(m_antiListName);
       outputAntiList.create();
       outputAntiList->initialize(-1 * m_pdgCode, m_antiListName);
@@ -144,7 +164,7 @@ namespace Belle2 {
     m_generator->init();
 
     int numberOfCandidates = 0;
-    while (m_generator->loadNext()) {
+    while (m_generator->loadNext(m_chargeConjugation)) {
 
       Particle&& particle = m_generator->getCurrentParticle();
 
@@ -159,13 +179,13 @@ namespace Belle2 {
       //    - p(mother) = p(daughter_0) - Sum_i p(daughter_i) (where i > 0)
       if (m_recoilParticleType == 1) {
         PCmsLabTransform T;
-        TLorentzVector recoilMomentum = T.getBeamParams().getHER() + T.getBeamParams().getLER() - particle.get4Vector();
+        TLorentzVector recoilMomentum = T.getBeamFourMomentum() - particle.get4Vector();
         particle.set4Vector(recoilMomentum);
       } else if (m_recoilParticleType == 2) {
         const std::vector<Particle*> daughters = particle.getDaughters();
 
         if (daughters.size() < 2)
-          B2FATAL("Reconstructing particle as a duaghter of a recoil with less then 2 daughters!");
+          B2FATAL("Reconstructing particle as a daughter of a recoil with less then 2 daughters!");
 
         TLorentzVector pDaughters;
         for (unsigned i = 1; i < daughters.size(); i++) {
@@ -189,9 +209,8 @@ namespace Belle2 {
       }
 
       Particle* newParticle = particles.appendNew(particle);
-      int iparticle = particles.getEntries() - 1;
 
-      outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
+      outputList->addParticle(newParticle);
 
       // append to the created particle the user specified decay mode ID
       newParticle->addExtraInfo("decayModeID", m_decayModeID);

@@ -12,9 +12,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
-#include <simulation/dataobjects/SimHitBase.h>
 #include <simulation/background/BeamBGTypes.h>
-#include <background/dataobjects/BackgroundMetaData.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <string>
 
 // SimHits
@@ -25,8 +24,8 @@
 #include <arich/dataobjects/ARICHSimHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
-#include <bklm/dataobjects/BKLMSimHit.h>
-#include <eklm/dataobjects/EKLMSimHit.h>
+#include <klm/dataobjects/bklm/BKLMSimHit.h>
+#include <klm/dataobjects/eklm/EKLMSimHit.h>
 
 // BEAST SimHits
 #include <beast/beamabort/dataobjects/BeamabortSimHit.h>
@@ -45,7 +44,8 @@
 namespace Belle2 {
 
   /**
-   * A module that sets m_backgroundTag variable in SimHits (see SimHitBase.h).
+   * A module that sets m_backgroundTag variable in SimHits (see
+   * BackgroundMetaData.h).
    * @return true if at least one SimHit store array has entries.
    */
   class BeamBkgTagSetterModule : public Module {
@@ -66,30 +66,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -99,7 +99,7 @@ namespace Belle2 {
     std::string m_specialFor; /**< ordinary or special file for ECL, PXD */
 
     background::BeamBGTypes m_bgTypes;  /**< defined BG types */
-    SimHitBase::BG_TAG m_backgroundTag; /**< background tag to set (from BG type) */
+    BackgroundMetaData::BG_TAG m_backgroundTag; /**< background tag to set (from BG type) */
     BackgroundMetaData::EFileType m_fileType; /**< file type to set */
 
     StoreArray<PXDSimHit> m_pxdSimHits; /**< PXD simulated hits */

@@ -15,7 +15,7 @@ const RCCommand RCCommand::ABORT(108, "RC_ABORT");
 const RCCommand RCCommand::BOOT(109, "RC_BOOT");
 const RCCommand RCCommand::STATUS(110, "RC_STATUS");
 
-const RCCommand& RCCommand::operator=(const std::string& label) throw()
+const RCCommand& RCCommand::operator=(const std::string& label)
 {
   if (NSMCommand::operator=(label) != Enum::UNKNOWN) return *this;
   else if (label == CONFIGURE.getLabel()) *this = CONFIGURE;
@@ -32,7 +32,7 @@ const RCCommand& RCCommand::operator=(const std::string& label) throw()
   return *this;
 }
 
-const RCCommand& RCCommand::operator=(int id) throw()
+const RCCommand& RCCommand::operator=(int id)
 {
   if (NSMCommand::operator=(id) != Enum::UNKNOWN) return *this;
   else if (id == CONFIGURE.getId()) *this = CONFIGURE;
@@ -49,14 +49,14 @@ const RCCommand& RCCommand::operator=(int id) throw()
   return *this;
 }
 
-const RCCommand& RCCommand::operator=(const char* label) throw()
+const RCCommand& RCCommand::operator=(const char* label)
 {
   if (label != NULL)  *this = std::string(label);
   else *this = Enum::UNKNOWN;
   return *this;
 }
 
-int RCCommand::isAvailable(const RCState& state) const throw()
+int RCCommand::isAvailable(const RCState& state) const
 {
   const RCCommand& cmd(*this);
   if ((cmd == LOAD || cmd == CONFIGURE) &&
@@ -86,7 +86,7 @@ int RCCommand::isAvailable(const RCState& state) const throw()
   }
 }
 
-RCState RCCommand::nextState() const throw()
+RCState RCCommand::nextState() const
 {
   const RCCommand& cmd(*this);
   if (cmd == LOAD) return RCState::READY_S;
@@ -101,7 +101,7 @@ RCState RCCommand::nextState() const throw()
   else return Enum::UNKNOWN;
 }
 
-RCState RCCommand::nextTState() const throw()
+RCState RCCommand::nextTState() const
 {
   const RCCommand& cmd(*this);
   if (cmd == CONFIGURE) return RCState::CONFIGURING_TS;

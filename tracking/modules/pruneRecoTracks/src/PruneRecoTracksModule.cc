@@ -26,6 +26,9 @@ PruneRecoTracksModule::PruneRecoTracksModule() :
            "Name of the StoreArray which is pruned",
            m_storeArrayName);
 
+  addParam("removeHits", m_do_remove_hits,
+           "Remove hits in the module or leave it for PruneRecoHitsModule"
+           , m_do_remove_hits);
 }
 
 void PruneRecoTracksModule::initialize()
@@ -48,9 +51,11 @@ void PruneRecoTracksModule::event()
       t.prune();
     }
 
-    m_subsetOfUnprunedRecoHitInformation.select([](const RecoHitInformation * recoHitInformation) {
-      return recoHitInformation->getFlag() != RecoHitInformation::RecoHitFlag::c_pruned;
-    });
+    if (m_do_remove_hits) {
+      m_subsetOfUnprunedRecoHitInformation.select([](const RecoHitInformation * recoHitInformation) {
+        return recoHitInformation->getFlag() != RecoHitInformation::RecoHitFlag::c_pruned;
+      });
+    }
   }
 }
 

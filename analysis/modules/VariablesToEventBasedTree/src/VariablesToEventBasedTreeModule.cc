@@ -16,10 +16,10 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
+#include <framework/utilities/RootFileCreationManager.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cmath>
-#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -29,8 +29,7 @@ REG_MODULE(VariablesToEventBasedTree)
 
 
 VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
-  Module(),
-  m_tree("", DataStore::c_Persistent)
+  Module(), m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TTree. The Tree is event-based, meaning that the variables of each candidate for each event are saved in an array of a branch of the Tree.");
@@ -56,18 +55,19 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
   addParam("sampling", m_sampling,
            "Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal events and every 10th background event. Variable must be event-based.",
            default_sampling);
-
-  m_file = nullptr;
 }
 
 void VariablesToEventBasedTreeModule::initialize()
 {
+  m_eventMetaData.isRequired();
   StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
-  // Initializing the output root file
-  m_file = new TFile(m_fileName.c_str(), "RECREATE");
-  if (!m_file->IsOpen()) {
-    B2WARNING("Could not create file " << m_fileName);
+  // See if there is already a file in which case add a new tree to it ...
+  // otherwise create a new file (all handled by framework)
+  m_file =  RootFileCreationManager::getInstance().getFile(m_fileName);
+  if (!m_file) {
+    B2ERROR("Could not create file \"" << m_fileName <<
+            "\". Please set a vaild root output file name (\"fileName\" module parameter).");
     return;
   }
 
@@ -75,7 +75,7 @@ void VariablesToEventBasedTreeModule::initialize()
 
   // check if TTree with that name already exists
   if (m_file->Get(m_treeName.c_str())) {
-    B2WARNING("Tree with this name already exists: " << m_fileName);
+    B2FATAL("Tree with the name " << m_treeName << " already exists in the file " << m_fileName);
     return;
   }
 
@@ -88,11 +88,21 @@ void VariablesToEventBasedTreeModule::initialize()
   m_values.resize(m_variables.size());
   m_event_values.resize(m_event_variables.size());
 
+  m_tree->get().Branch("__event__", &m_event, "__event__/I");
+  m_tree->get().Branch("__run__", &m_run, "__run__/I");
+  m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
   m_tree->get().Branch("__ncandidates__", &m_ncandidates, "__ncandidates__/I");
   m_tree->get().Branch("__weight__", &m_weight, "__weight__/F");
 
   for (unsigned int i = 0; i < m_event_variables.size(); ++i) {
     auto varStr = m_event_variables[i];
+
+    if (Variable::isCounterVariable(varStr)) {
+      B2WARNING("The counter '" << varStr
+                << "' is handled automatically by VariablesToEventBasedTree, you don't need to add it.");
+      continue;
+    }
+
     m_tree->get().Branch(makeROOTCompatible(varStr).c_str(), &m_event_values[i], (makeROOTCompatible(varStr) + "/D").c_str());
 
     //also collection function pointers
@@ -158,6 +168,10 @@ float VariablesToEventBasedTreeModule::getInverseSamplingRateWeight()
 
 void VariablesToEventBasedTreeModule::event()
 {
+  // get counter numbers
+  m_event = m_eventMetaData->getEvent();
+  m_run = m_eventMetaData->getRun();
+  m_experiment = m_eventMetaData->getExperiment();
 
   StoreObjPtr<ParticleList> particlelist(m_particleList);
   m_ncandidates = particlelist->getListSize();
@@ -186,16 +200,12 @@ void VariablesToEventBasedTreeModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     B2INFO("Writing TTree " << m_treeName);
-    m_tree->write(m_file);
+    TDirectory::TContext directoryGuard(m_file.get());
+    m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
     if (writeError) {
-      //m_file deleted first so we have a chance of closing it (though that will probably fail)
-      delete m_file;
       B2FATAL("A write error occured while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
-
-    B2INFO("Closing file " << m_fileName);
-    delete m_file;
   }
 }

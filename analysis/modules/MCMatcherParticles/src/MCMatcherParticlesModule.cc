@@ -45,7 +45,7 @@ namespace Belle2 {
                    "the loose algorithm will find the common mother of the majority of daughter\n"
                    "particles while the normal algorithm finds the common mother of all daughters.\n"
                    "The results of loose mc matching algorithm are stored to the following extraInfo\n"
-                   "items:\n"
+                   "items:\n\n"
                    " - looseMCMotherPDG: PDG code of most common mother\n"
                    " - looseMCMotherIndex: 1-based StoreArray<MCParticle> index of most common mother\n"
                    " - looseMCWrongDaughterN: number of daughters that don't originate from the most\n"
@@ -54,7 +54,7 @@ namespace Belle2 {
                    "                            the most common mother \n"
                    "                            (only if looseMCWrongDaughterN = 1)\n"
                    " - looseMCWrongDaughterBiB: 1 if the wrong daughter is Beam Induced Background\n"
-                   "                            Particle\n");
+                   "                            Particle\n\n");
 
     setPropertyFlags(c_ParallelProcessingCertified);
 

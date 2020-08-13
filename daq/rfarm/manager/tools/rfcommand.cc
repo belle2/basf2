@@ -7,14 +7,12 @@
 //-
 
 #include <stdio.h>
-#include <string.h>
 #include <unistd.h>
 
 #include <string>
 
 extern "C" {
 #include <nsm2/nsm2.h>
-#include <nsm2/nsmlib2.h>
 #include <nsm2/belle2nsm.h>
 }
 

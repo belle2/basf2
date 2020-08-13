@@ -40,22 +40,24 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     Convert2RawDetModule();
+    //! Destructor
     virtual ~Convert2RawDetModule();
-
-    //! Module functions to be called from main process
-    virtual void initialize();
-
-    //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    //! Called at the beginning of data processing.
+    virtual void initialize() override;
+    //! Called when entering a new run.
+    virtual void beginRun() override;
+    //! Called for each event.
+    virtual void event() override;
+    //! Called if the current run ends.
+    virtual void endRun() override;
+    //! Called at the end of data processing.
+    virtual void terminate() override;
 
   protected:
     //! function to register data buffer in DataStore as RawDetector
-    virtual void convertDataObject(RawDataBlock* raw_dblk);
+    virtual void convertDataObject(RawDataBlock* raw_dblk, std::vector<unsigned int>& cpr_id);
 
     //! No. of sent events
     int m_nevt;
@@ -72,7 +74,6 @@ namespace Belle2 {
     StoreArray<RawKLM>        m_rawKLM       ; /** Array for RawKLM      */
     StoreArray<RawTRG>        m_rawTRG       ; /** Array for RawTRG      */
     StoreArray<RawFTSW>       m_rawFTSW      ; /** Array for RawFTSW     */
-
 
   };
 

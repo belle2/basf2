@@ -83,6 +83,7 @@ namespace Belle2 {
     virtual bool extract(const BaseSVDStateFilter::Object* pair) override;
 
   private:
+    /// Kalman stepper (CKF) for SVD
     SVDKalmanStepper m_kalmanStepper;
   };
 }

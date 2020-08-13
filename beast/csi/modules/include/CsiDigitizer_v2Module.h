@@ -12,18 +12,8 @@
 #define CSIDIGITIZER_V2MODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/csi/dataobjects/CsiHit_v2.h>
-#include <string>
-#include <vector>
-
-//ROOT
-#include <TRandom3.h>
-#include <TMath.h>
-#include <TF1.h>
-#include <TVector3.h>
-
 
 namespace Belle2 {
   namespace csi {
@@ -42,26 +32,43 @@ namespace Belle2 {
        */
       CsiDigitizer_v2Module();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~CsiDigitizer_v2Module();
 
-      /**  */
-      virtual void initialize();
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
+      virtual void initialize() override;
 
-      /**  */
-      virtual void beginRun();
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
+      virtual void beginRun() override;
 
-      /**  */
-      virtual void event();
+      /**
+       * Event processor.
+       */
+      virtual void event() override;
 
-      /**  */
-      virtual void endRun();
-      /**  */
-      virtual void terminate();
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
+      virtual void endRun() override;
+
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
+      virtual void terminate() override;
 
 
     private:
-      StoreArray<CsiHit_v2> m_csiHit_v2; /** array for CsiHit_v2 */
+      StoreArray<CsiHit_v2> m_csiHit_v2; /**< array for CsiHit_v2 */
 
       /** reads data from CSI.xml: threshold in MeV, range in MeV, and resolution in % */
       virtual void getXMLData();

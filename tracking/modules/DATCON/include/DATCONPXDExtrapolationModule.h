@@ -18,11 +18,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <root/TVector2.h>
-
-#include <vxd/dataobjects/VxdID.h>
-
-
 namespace Belle2 {
 
   /** The DATCONPXDExtrapolationModule does an extrapolation to the
@@ -44,9 +39,9 @@ namespace Belle2 {
     virtual ~DATCONPXDExtrapolationModule() = default;
 
     /** Initialize the module and check module parameters */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Run tracking */
-    virtual void event();
+    virtual void event() override;
 
   protected:
 

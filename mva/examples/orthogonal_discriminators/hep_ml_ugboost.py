@@ -26,6 +26,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
 
 if __name__ == "__main__":
+    from basf2 import conditions
+    # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
+    conditions.testing_payloads = [
+        'localdb/database.txt'
+    ]
+
     variables = ['p', 'pt', 'pz', 'phi',
                  'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
                  'daughter(1, p)', 'daughter(1, pz)', 'daughter(1, pt)', 'daughter(1, phi)',

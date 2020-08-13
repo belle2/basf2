@@ -115,7 +115,7 @@ namespace Belle2 {
      * @param area component description of the active area
      * @param placement placement description of the active area
      */
-    void setActive(const VXDGeoComponent area, const VXDGeoPlacement& placement)
+    void setActive(const VXDGeoComponent& area, const VXDGeoPlacement& placement)
     {
       m_activeArea = area; m_activePlacement = placement;
     }

@@ -10,7 +10,6 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <gtest/gtest.h>
-#include <TRandom.h>
 
 using namespace std;
 

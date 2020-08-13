@@ -11,7 +11,6 @@
 #include <mva/methods/FANN.h>
 
 #include <framework/logging/Logger.h>
-#include <TFormula.h>
 
 #ifdef HAS_OPENMP
 #include <parallel_fann.hpp>
@@ -34,8 +33,8 @@ namespace Belle2 {
 
       std::vector<unsigned int> hiddenLayers = m_specific_options.getHiddenLayerNeurons(numberOfFeatures);
       unsigned int number_of_layers = 2;
-      for (unsigned int i = 0; i < hiddenLayers.size(); ++i) {
-        if (hiddenLayers[i] > 0) {
+      for (unsigned int hiddenLayer : hiddenLayers) {
+        if (hiddenLayer > 0) {
           number_of_layers++;
         }
       }

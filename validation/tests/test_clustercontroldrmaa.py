@@ -15,7 +15,7 @@ class TestClusterControlDrmaa(unittest.TestCase):
     """
     Test for for the DRMAA-backend of the clustercontrol
     """
-    class SessionMock():
+    class SessionMock:
         """
         Class to mock a DRMAA session
         """
@@ -91,7 +91,7 @@ class TestClusterControlDrmaa(unittest.TestCase):
             cc.execute(job)
 
             # check if job id has been set
-            self.assertTrue(job.cluster_drmaa_jobid)
+            self.assertTrue(job.job_id)
 
             # check on job, not finished yet
             self.assertFalse(cc.is_job_finished(job)[0])
@@ -102,7 +102,8 @@ class TestClusterControlDrmaa(unittest.TestCase):
 
             self.assertTrue(cc.is_job_finished(job)[0])
 
-            cc.terminate()
+            cc.terminate(job)
+
 
 if __name__ == "__main__":
     unittest.main()

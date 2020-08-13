@@ -12,12 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
 
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <framework/core/Module.h>
-
-#include <tuple>
 #include <type_traits>
 
 namespace Belle2 {
@@ -42,9 +36,9 @@ namespace Belle2 {
 
     public:
 
-      // this will be something like RecoTrack const * , so string the pointer
+      /// this will be something like RecoTrack const * , so string the pointer
       using DataStoreInputTypePtrType = typename std::tuple_element<0, typename TWrappedFindlet::IOTypes>::type;
-      // same as reference
+      /// same as reference
       using DataStoreInputTypeRefType = typename std::remove_pointer<DataStoreInputTypePtrType>::type;
 
       /// Create a new instance of the module.

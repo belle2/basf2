@@ -8,13 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <ir/dbobjects/FarBeamLineGeo.h>
-
-#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -51,4 +46,22 @@ void FarBeamLineGeo::initialize(const GearDir& content)
     bendingSections += name;
   }
   addParameter("Bending", bendingSections);
+
+  std::string collimators;
+  for (const GearDir& coll : content.getNodes("Collimator")) {
+    std::string name = coll.getString("@name");
+    addParameters(coll, name);
+    if (!collimators.empty()) collimators += " ";
+    collimators += name;
+  }
+  addParameter("Collimator", collimators);
+
+  std::string collimatorShields;
+  for (const GearDir& collShield : content.getNodes("CollimatorShield")) {
+    std::string name = collShield.getString("@name");
+    addParameters(collShield, name);
+    if (!collimatorShields.empty()) collimatorShields += " ";
+    collimatorShields += name;
+  }
+  addParameter("CollimatorShield", collimatorShields);
 }

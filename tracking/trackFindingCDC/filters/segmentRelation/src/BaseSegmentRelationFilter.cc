@@ -69,7 +69,7 @@ Weight BaseSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>&
     }
   }
 
-  if (1.0 * nOverlap / from->size() > 0.8 or 1.0 * nOverlap / from->size() > 0.8) {
+  if (1.0 * nOverlap / from->size() > 0.8) {
     return NAN;
   }
 

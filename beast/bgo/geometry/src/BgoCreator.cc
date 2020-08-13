@@ -11,15 +11,10 @@
 #include <beast/bgo/geometry/BgoCreator.h>
 #include <beast/bgo/simulation/SensitiveDetector.h>
 
-#include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-//#include <bgo/simulation/SensitiveDetector.h>
 
-#include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -29,13 +24,7 @@
 
 //Shapes
 #include <G4Trap.hh>
-#include <G4Box.hh>
-#include <G4Polycone.hh>
-#include "G4UnionSolid.hh"
-#include "G4SubtractionSolid.hh"
 #include <G4UserLimits.hh>
-#include <G4RegionStore.hh>
-#include "G4Tubs.hh"
 #include "G4NistManager.hh"
 
 using namespace std;
@@ -52,7 +41,7 @@ namespace Belle2 {
 
     BgoCreator::BgoCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     BgoCreator::~BgoCreator()
@@ -62,6 +51,9 @@ namespace Belle2 {
 
     void BgoCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       // **Materials from the NIST database**
       G4NistManager* man = G4NistManager::Instance();
 

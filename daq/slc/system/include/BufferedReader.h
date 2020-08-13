@@ -9,23 +9,23 @@ namespace Belle2 {
 
     // constructors & destructors
   public:
-    BufferedReader() throw();
-    BufferedReader(size_t size, unsigned char* memory = NULL) throw();
-    BufferedReader(const BufferedReader& r) throw();
-    virtual ~BufferedReader() throw();
+    BufferedReader();
+    BufferedReader(size_t size, unsigned char* memory = NULL);
+    BufferedReader(const BufferedReader& r);
+    virtual ~BufferedReader();
 
     // member methods implemented
   public:
-    void seekTo(size_t pos) throw() { m_pos = pos; }
-    unsigned char* ptr() throw() { return m_memory; }
-    size_t count() const throw() { return m_pos; }
-    size_t size() const throw() { return m_size; }
-    void copy(const void*, size_t) throw(IOException);
-    virtual size_t read(void*, size_t) throw(IOException);
-    virtual bool available() throw() { return true; }
+    void seekTo(size_t pos) { m_pos = pos; }
+    unsigned char* ptr() { return m_memory; }
+    size_t count() const { return m_pos; }
+    size_t size() const { return m_size; }
+    void copy(const void*, size_t);
+    virtual size_t read(void*, size_t);
+    virtual bool available() { return true; }
 
   public:
-    const BufferedReader& operator = (const BufferedReader&) throw();
+    const BufferedReader& operator = (const BufferedReader&);
 
     // member data
   protected:

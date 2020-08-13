@@ -25,16 +25,16 @@ namespace Belle2 {
      *
      * @param rbuf Use the given RingBuffer for data
      */
-    RxModule(RingBuffer* rbuf);
+    explicit RxModule(RingBuffer* rbuf);
     virtual ~RxModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     /** Disable handling of Mergeable objects. Useful for special applications like AsyncWrapper. */
     void disableMergeableHandling(bool disable = true) { m_handleMergeable = !disable; }

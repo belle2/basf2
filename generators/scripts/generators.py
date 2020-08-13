@@ -11,47 +11,154 @@ Contact: Torben Ferber (ferber@physics.ubc.ca)
 from basf2 import *
 from ROOT import Belle2
 import os
+import pdg
 
 
 def get_default_decayfile():
     """Return the default DECAY.dec for Belle2"""
-    return Belle2.FileSystem.findFile("generators/evtgen/decayfiles/DECAY_BELLE2.DEC")
+    return Belle2.FileSystem.findFile("decfiles/dec/DECAY_BELLE2.DEC")
 
 
-def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, subweights=[], maxsubweight=1, maxfinalweight=3.0):
+def add_generator_preselection(
+        path,
+        emptypath,
+        nChargedMin=0,
+        nChargedMax=999,
+        MinChargedP=-1.0,
+        MinChargedPt=-1.0,
+        MinChargedTheta=0.0,
+        MaxChargedTheta=180.0,
+        nPhotonMin=0,
+        nPhotonMax=999,
+        MinPhotonEnergy=-1,
+        MinPhotonTheta=0.0,
+        MaxPhotonTheta=180.0,
+        applyInCMS=False):
+    """
+        Adds generator preselection.
+        Should be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules
+        It uses all particles from the event generator (i.e. primary, non-virtual, non-initial particles).
+        It checks if the required conditions are fullfilled.
+        If not, the events are given to the emptypath.
+        The main usecase is a reduction of simulation time.
+        Note that you have to multiply the generated cross section by the retention fraction of the preselection.
+
+        Parameters:
+            path (basf2.Path): path where the generator should be added
+            emptypath (basf2.Path): path where the skipped events are given to
+            nChargedMin (int): minimum number of charged particles
+            nChargedMax (int): maximum number of charged particles
+            MinChargedP (float): minimum charged momentum [GeV]
+            MinChargedPt (float): minimum charged transverse momentum (pt) [GeV]
+            MinChargedTheta (float): minimum polar angle of charged particle [deg]
+            MaxChargedTheta (float): maximum polar angle of charged particle [deg]
+            nPhotonMin (int): minimum number of photons
+            nPhotonMax (int): maximum number of photons
+            MinPhotonEnergy (float): minimum photon energy [GeV]
+            MinPhotonTheta (float): minimum polar angle of photon [deg]
+            MaxPhotonTheta (float): maximum polar angle of photon [deg]
+            applyInCMS (bool): if true apply the P,Pt,theta, and energy cuts in the center of mass frame
+    """
+
+    generatorpreselection = path.add_module('GeneratorPreselection',
+                                            nChargedMin=nChargedMin,
+                                            nChargedMax=nChargedMax,
+                                            MinChargedP=MinChargedP,
+                                            MinChargedPt=MinChargedPt,
+                                            MinChargedTheta=MinChargedTheta,
+                                            MaxChargedTheta=MaxChargedTheta,
+                                            nPhotonMin=nPhotonMin,
+                                            nPhotonMax=nPhotonMax,
+                                            MinPhotonEnergy=MinPhotonEnergy,
+                                            MinPhotonTheta=MinPhotonTheta,
+                                            MaxPhotonTheta=MaxPhotonTheta
+                                            )
+
+    # empty path for unwanted events
+    generatorpreselection.if_value('<11', emptypath)
+
+
+def add_aafh_generator(
+        path,
+        finalstate='',
+        preselection=False,
+        enableTauDecays=True,
+        minmass=0.5,
+        subweights=[],
+        maxsubweight=1,
+        maxfinalweight=3.0):
     """
     Add the default two photon generator for four fermion final states
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate (str): either "e+e-e+e-" or "e+e-mu+mu-"
+        finalstate (str): either "e+e-e+e-", "e+e-mu+mu-", "e+e-tau+tau-", "mu+mu-mu+mu-" or "mu+mu-tau+tau-"
         preselection (bool): if True, select events with at least one medium pt particle in the CDC acceptance
+        enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
     """
 
-    aafh = register_module('AafhInput')
-    aafh_mode = 5
-    if not subweights:  # default subweights are for minmass=0.5
-        aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
-    else:
-        aafh_subgeneratorWeights = subweights
-    aafh_maxSubgeneratorWeight = maxsubweight
-    aafh_maxFinalWeight = maxfinalweight
-
-    if abs(minmass - 0.5) > 0.01 and not subweights:
-        B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
-
     if finalstate == 'e+e-e+e-':
-        pass
+        aafh_mode = 5
+        if not subweights:  # default subweights are for minmass=0.5
+            aafh_subgeneratorWeights = [1.0, 7.986e+01, 5.798e+04, 3.898e+05, 1.0, 1.664e+00, 2.812e+00, 7.321e-01]
+        else:
+            aafh_subgeneratorWeights = subweights
+        if abs(minmass - 0.5) > 0.01 and not subweights:
+            B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
     elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
-        if not subweights:
+        if not subweights:  # default subweights are for minmass=0.5
             aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
         else:
             aafh_subgeneratorWeights = subweights
+        if abs(minmass - 0.5) > 0.01 and not subweights:
+            B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
+    elif finalstate == 'e+e-tau+tau-':
+        aafh_mode = 4
+        particle = 'tau-'
+        minmass = 0
+        if not subweights:
+            aafh_subgeneratorWeights = [1.000e+00, 2.214e+00, 1.202e+01, 1.536e+01, 1.000e+00, 1.664e+00, 1.680e+01, 6.934e+00]
+        else:
+            aafh_subgeneratorWeights = subweights
+        if preselection:
+            B2WARNING(
+                f"You requested a generator preselection for the final state {finalstate}: "
+                "please consider to remove it, since the cross section is small.")
+    elif finalstate == 'mu+mu-mu+mu-':
+        aafh_mode = 2
+        minmass = 0
+        maxsubweight = 3
+        if not subweights:
+            aafh_subgeneratorWeights = [0.000e+00, 0.000e+00, 1.000e+00, 3.726e+00, 1.000e+00, 1.778e+00, 1.000e+00, 1.094e+00]
+        else:
+            aafh_subgeneratorWeights = subweights
+        if preselection:
+            B2WARNING(
+                f"You requested a generator preselection for the final state {finalstate}: "
+                "please consider to remove it, since the cross section is small.")
+    elif finalstate == 'mu+mu-tau+tau-':
+        aafh_mode = 1
+        particle = 'tau-'
+        minmass = 0
+        maxsubweight = 3
+        if not subweights:
+            aafh_subgeneratorWeights = [0.000e+00, 0.000e+00, 1.000e+00, 1.715e+00, 1.000e+00, 1.778e+00, 1.000e+00, 6.257e-01]
+        else:
+            aafh_subgeneratorWeights = subweights
+        if preselection:
+            B2WARNING(
+                f"You requested a generator preselection for the final state {finalstate}: "
+                "please consider to remove it, since the cross section is small.")
+    elif finalstate == 'tau+tau-tau+tau-':
+        B2FATAL(f"AAFH is not able to generate the {finalstate} final state. Please use KoralW instead.")
     else:
-        B2FATAL("add_aafh_generator final state not supported: {}".format(finalstate))
+        B2FATAL(f"add_aafh_generator final state not supported: {finalstate}")
 
-    aafh = path.add_module(
+    aafh_maxSubgeneratorWeight = maxsubweight
+    aafh_maxFinalWeight = maxfinalweight
+
+    path.add_module(
         'AafhInput',
         mode=aafh_mode,
         rejection=2,
@@ -63,16 +170,20 @@ def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, sub
     )
 
     if preselection:
-        generatorpreselection = path.add_module(
-            'GeneratorPreselection',
+        generator_emptypath = create_path()
+        add_generator_preselection(
+            path=path,
+            emptypath=generator_emptypath,
             nChargedMin=1,
             MinChargedPt=0.1,
             MinChargedTheta=17.0,
-            MaxChargedTheta=150.0
-        )
+            MaxChargedTheta=150.0)
 
-        generator_emptypath = create_path()
-        generatorpreselection.if_value('!=11', generator_emptypath)
+    if 'tau+tau-' in finalstate:
+        if enableTauDecays:
+            path.add_module('EvtGenDecay')
+        else:
+            B2WARNING("The tau decays will not be generated.")
 
 
 def add_kkmc_generator(path, finalstate=''):
@@ -115,15 +226,24 @@ def add_kkmc_generator(path, finalstate=''):
     )
 
 
-def add_evtgen_generator(path, finalstate='', signaldecfile=None):
+def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing=True, parentParticle='Upsilon(4S)'):
     """
     Add EvtGen for mixed and charged BB
 
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate (str): Either "charged" for B+/B- or "mixed" for B0/anti-B0
+        coherentMixing: Either True or False. Switches on or off the coherent decay of the B0-B0bar pair.
+                        It should always be True,  unless you are generating Y(5,6S) -> BBar. In the latter case,
+                        setting it False solves the interla limiation of Evtgen that allows to make a
+                        coherent decay only starting from the Y(4S).
+        parentParticle (str): initial state (used only if it is not Upsilon(4S).
     """
     evtgen_userdecfile = Belle2.FileSystem.findFile('data/generators/evtgen/charged.dec')
+
+    if parentParticle != 'Upsilon(3S)' and parentParticle != 'Upsilon(4S)'\
+            and parentParticle != 'Upsilon(5S)' and parentParticle != 'Upsilon(6S)':
+        B2FATAL("add_evtgen_generator initial state not supported: {}".format(parentParticle))
 
     if finalstate == 'charged':
         pass
@@ -138,9 +258,39 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None):
         B2WARNING("ignoring decfile: {}".format(signaldecfile))
 
     # use EvtGen
+    if parentParticle == 'Upsilon(3S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING("add_evtgen_generator initial state {} has no BB mixing, now switching coherentMixing OFF"
+                      .format(parentParticle))
+
+    if parentParticle == 'Upsilon(5S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING(
+                "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
+                .format(parentParticle))
+        pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y5S.pdl'))
+
+    if parentParticle == 'Upsilon(6S)':
+        if finalstate != 'signal':
+            B2FATAL("add_evtgen_generator initial state {} is supported only with 'signal' final state".format(parentParticle))
+        if coherentMixing:
+            coherentMixing = False
+            B2WARNING(
+                "add_evtgen_generator initial state {} is supported only with false coherentMixing, now switching it OFF"
+                .format(parentParticle))
+        pdg.load(Belle2.FileSystem.findFile('decfiles/dec/Y6S.pdl'))
+
     evtgen = path.add_module(
         'EvtGenInput',
-        userDECFile=evtgen_userdecfile
+        userDECFile=evtgen_userdecfile,
+        CoherentMixing=coherentMixing,
+        ParentParticle=parentParticle
     )
 
 
@@ -266,7 +416,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
     # fragmentation failure as is this currently not supported by do_while
     add_continuum_generator(loop_path, finalstate, userdecfile, useevtgenparticledata, skip_on_failure=False)
     # check for the particles we want
-    loop_path.add_module("InclusiveParticleChecker", particles=particles)
+    loop_path.add_module("InclusiveParticleChecker", particles=particles, includeConjugates=include_conjugates)
     # Done, add this to the path and iterate it until we found our particle
     path.do_while(loop_path, max_iterations=max_iterations)
 
@@ -354,6 +504,42 @@ def add_phokhara_generator(path, finalstate=''):
         phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
     else:
         B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
+
+
+def add_koralw_generator(path, finalstate='', enableTauDecays=True):
+    """
+    Add KoralW generator for radiative four fermion final states (only four leptons final states are currently supported).
+
+    Parameters:
+        path (basf2.Path): path where the generator should be added
+        finalstate (str): either 'e+e-e+e-', 'e+e-mu+mu-', 'e+e-tau+tau-', 'mu+mu-mu+mu-', 'mu+mu-tau+tau-' or 'tau+tau-tau+tau-'
+        enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
+    """
+
+    decayFile = ''
+    if finalstate == 'e+e-e+e-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeee.data')
+    elif finalstate == 'e+e-mu+mu-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeMuMu.data')
+    elif finalstate == 'e+e-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_eeTauTau.data')
+    elif finalstate == 'mu+mu-mu+mu-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_MuMuMuMu.data')
+    elif finalstate == 'mu+mu-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_MuMuTauTau.data')
+    elif finalstate == 'tau+tau-tau+tau-':
+        decayFile = Belle2.FileSystem.findFile('data/generators/koralw/KoralW_TauTauTauTau.data')
+    else:
+        B2FATAL(f'add_koralw_generator final state not supported: {finalstate}')
+
+    path.add_module('KoralWInput',
+                    UserDataFile=decayFile)
+
+    if 'tau+tau-' in finalstate:
+        if enableTauDecays:
+            path.add_module('EvtGenDecay')
+        else:
+            B2WARNING('The tau decays will not be generated.')
 
 
 def add_cosmics_generator(path, components=None,
@@ -462,3 +648,44 @@ def add_cosmics_generator(path, components=None,
 
         empty_path = create_path()
         cosmics_selector.if_false(empty_path)
+
+
+def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
+    """
+    Add TREPS generator to produce hadronic two-photon processes.
+
+    Parameters:
+        path (basf2.Path):           path where the generator should be added
+        finalstate(str):             "e+e-pi+pi-", "e+e-K+K-" or "e+e-ppbar"
+        useDiscreteAndSortedW(bool): if True, wListTableFile is used for discrete and sorted W. evtNumList must be set proper value.
+    """
+
+    if finalstate == 'e+e-pi+pi-':
+        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_pipi.dat')
+        differentialCrossSectionFile = Belle2.FileSystem.findFile('generators/treps/data/differentialCrossSectionFiles/pipidcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_pipi.dat')
+    elif finalstate == 'e+e-K+K-':
+        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_kk.dat')
+        differentialCrossSectionFile = Belle2.FileSystem.findFile('generators/treps/data/differentialCrossSectionFiles/kkdcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_kk.dat')
+    elif finalstate == 'e+e-ppbar':
+        parameterFile = Belle2.FileSystem.findFile('generators/treps/data/parameterFiles/treps_par_ppbar.dat')
+        differentialCrossSectionFile = Belle2.FileSystem.findFile(
+            'generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat')
+        wListTableFile = Belle2.FileSystem.findFile('generators/treps/data/wListFiles/wlist_table_ppbar.dat')
+    else:
+        B2FATAL("add_treps_generator final state not supported: {}".format(finalstate))
+
+    # use TREPS to generate two-photon events.
+    trepsinput = path.add_module(
+        'TrepsInput',
+        ParameterFile=parameterFile,
+        DifferentialCrossSectionFile=differentialCrossSectionFile,
+        WListTableFile=wListTableFile,
+        UseDiscreteAndSortedW=useDiscreteAndSortedW,
+        MaximalQ2=1.0,
+        MaximalAbsCosTheta=1.01,
+        ApplyCosThetaCutCharged=True,
+        MinimalTransverseMomentum=0,
+        ApplyTransverseMomentumCutCharged=True,
+        )

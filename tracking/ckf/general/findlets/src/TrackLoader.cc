@@ -45,6 +45,10 @@ void TrackLoader::exposeParameters(ModuleParamList* moduleParamList, const std::
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "relationCheckForDirection"),
                                 m_param_relationCheckForDirectionAsString,
                                 "Check for this direction when checking for related tracks.");
+
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ignoreTracksWithCDChits"),
+                                m_noCDChits, "Do not consider tracks containing CDC hits.", false);
+
 }
 
 void TrackLoader::initialize()
@@ -68,6 +72,11 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
   seeds.reserve(seeds.size() + m_inputRecoTracks.getEntries());
 
   for (auto& item : m_inputRecoTracks) {
+
+    if (m_noCDChits) {
+      if (item.hasCDCHits()) continue;
+    }
+
     if (m_param_relationCheckForDirection != TrackFindingCDC::EForwardBackward::c_Invalid) {
       const auto& relatedTracksWithWeight = item.template getRelationsWith<RecoTrack>(m_param_relationRecoTrackStoreArrayName);
       bool hasAlreadyRelation = false;

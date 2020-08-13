@@ -43,7 +43,7 @@ namespace Belle2 {
       /// Default destructor
       ~OnVarSet();
 
-      // No reassignment of variable set possible for now
+      /// No reassignment of variable set possible for now
       void initialize() override;
 
       /// Checks if any variables need Monte Carlo information.

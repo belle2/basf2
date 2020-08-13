@@ -84,8 +84,8 @@ CurlingTrackCandSplitterModule::CurlingTrackCandSplitterModule()
 
   // initialize other variables to some default values to avoid unintended behaviour
   m_saveCompleteCurler = false;
-  m_treePtr = NULL;
-  m_rootFilePtr = NULL;
+  m_treePtr = nullptr;
+  m_rootFilePtr = nullptr;
 }
 
 // ================================================= INITIALIZE =========================================================
@@ -234,8 +234,8 @@ void CurlingTrackCandSplitterModule::initialize()
       m_treePtr->Branch(name.c_str(), &m_rootMisMatchMomZ.at(layer));
     }
   } else {
-    m_rootFilePtr = NULL;
-    m_treePtr = NULL;
+    m_rootFilePtr = nullptr;
+    m_treePtr = nullptr;
   }
 }
 
@@ -342,7 +342,7 @@ void CurlingTrackCandSplitterModule::terminate()
          m_noDecisionPossibleCtr << " cases no decision could be made. There were " << m_NoSingleTrueHitCtr <<
          " SpacePoints that were related to more than one TrueHit");
   // do ROOT file stuff
-  if (m_treePtr != NULL) {
+  if (m_treePtr != nullptr) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
     m_treePtr->Write();
     m_rootFilePtr->Close();
@@ -383,7 +383,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
       PXDTrueHit* pxdTrueHit =
         pxdCluster->getRelatedTo<PXDTrueHit>("ALL"); // COULDDO: search only certain PXDTrueHit arrays -> new parameter for module
 
-      if (pxdTrueHit == NULL) {
+      if (pxdTrueHit == nullptr) {
         B2DEBUG(1, "Found no PXDTrueHit for PXDCluster " << pxdCluster->getArrayIndex() << " from Array " << pxdCluster->getArrayName() <<
                 ". This PXDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
         throw FoundNoTrueHit();
@@ -527,6 +527,8 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
 }
 
 // ======================================= GET GLOBAL POSITION AND MOMENTUM ============================================================
+
+/// Helper class to retrieve the global position and momentum of a TrueHit
 template<class TrueHit>
 std::pair<const Belle2::B2Vector3<double>, const Belle2::B2Vector3<double> >
 CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
@@ -557,13 +559,11 @@ CurlingTrackCandSplitterModule::getGlobalPositionAndMomentum(TrueHit* aTrueHit)
 // ======================================= GET DIRECTION OF FLIGHT ======================================================================
 bool CurlingTrackCandSplitterModule::getDirectionOfFlight(const
                                                           std::pair<const B2Vector3<double>, const B2Vector3<double>>& hitPosAndMom,
-                                                          const B2Vector3<double> origin)
+                                                          const B2Vector3<double>& origin)
 {
   B2Vector3<double> originToHit = hitPosAndMom.first - origin;
   B2Vector3<double> momentumAtHit = hitPosAndMom.second + originToHit;
 
-  // additional debug output from developement to find a possible B2Vector3 bug
-//   B2DEBUG(250, "hitPosMom.first (" << hitPosAndMom.first.X() << "," << hitPosAndMom.first.Y() << "," << hitPosAndMom.first.Z() << "). hitPosAndMom.second: (" << hitPosAndMom.second.X() << "," << hitPosAndMom.second.Y() << "," << hitPosAndMom.second.Z() << "). origin: (" << origin.X() << "," << origin.Y() << "," << origin.Z() << ")");
 
   B2DEBUG(100, "Position of hit relative to origin is (" << originToHit.X() << "," << originToHit.Y() << "," << originToHit.Z() <<
           "). Momentum relative to hit (relative to origin) (" << momentumAtHit.X() << "," << momentumAtHit.Y() << "," << momentumAtHit.Z() <<
@@ -733,7 +733,7 @@ void CurlingTrackCandSplitterModule::getValuesForRoot(const Belle2::SpacePoint* 
 }
 
 // =================================== WRITE TO ROOT ===============================================================================
-void CurlingTrackCandSplitterModule::writeToRoot(RootVariables& rootVariables)
+void CurlingTrackCandSplitterModule::writeToRoot(const RootVariables& rootVariables)
 {
   m_rootGlobalPosResiduals = rootVariables.PosResiduesGlobal;
   m_rootLocalPosResiduals = rootVariables.PosResiduesLocal;

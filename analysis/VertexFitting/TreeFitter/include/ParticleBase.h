@@ -4,7 +4,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,7 +13,7 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/Projection.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
-#include <analysis/VertexFitting/TreeFitter/MassConstraintConfig.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <Eigen/Core>
 
 #include <analysis/dataobjects/Particle.h>
@@ -21,6 +21,7 @@
 namespace TreeFitter {
 
   class FitParams;
+  class ConstraintConfiguration;
 
   /** base class for all particles */
   class ParticleBase {
@@ -37,11 +38,17 @@ namespace TreeFitter {
                          kResonance,
                          kRecoPhoton,
                          kRecoKlong,
-                         kMissingParticle
+                         kMissingParticle,
+                         kFeedthroughParticle,
+                         kInternalTrack
                         };
 
     /** default constructor  */
+    ParticleBase(Belle2::Particle* particle, const ParticleBase* mother, const ConstraintConfiguration* config) ;
+
+    /** constructor used for final states */
     ParticleBase(Belle2::Particle* particle, const ParticleBase* mother) ;
+
 
     /** constructor only used by inter action point (ip constraint)  */
     ParticleBase(const std::string& name);
@@ -58,24 +65,24 @@ namespace TreeFitter {
     /** create the according treeFitter particle obj for a basf2 particle type  */
     static ParticleBase* createParticle(Belle2::Particle* particle,
                                         const ParticleBase* mother,
-                                        bool forceFitAll = false);
+                                        const ConstraintConfiguration& config,
+                                        bool forceFitAll = false
+                                       );
 
     /** create a custom origin particle or a beamspot*/
     static ParticleBase* createOrigin(Belle2::Particle* daughter,
-                                      bool forceFitAll,
-                                      const std::vector<double> customOriginVertex,
-                                      const std::vector<double> customOriginCovariance,
-                                      const bool isBeamSpot
+                                      const ConstraintConfiguration& config,
+                                      bool forceFitAll
                                      );
 
     /** init particle that does not need a mother vertex  */
-    virtual ErrCode initMotherlessParticle(FitParams*) = 0;
+    virtual ErrCode initMotherlessParticle(FitParams&) = 0;
 
     /** init particle that does need a mother vertex  */
-    virtual ErrCode initParticleWithMother(FitParams*) = 0;
+    virtual ErrCode initParticleWithMother(FitParams&) = 0;
 
     /** init covariance matrix */
-    virtual ErrCode initCovariance(FitParams*) const;
+    virtual ErrCode initCovariance(FitParams&) const;
 
     /**  get dimension of constraint */
     virtual int dim() const = 0 ;
@@ -96,7 +103,7 @@ namespace TreeFitter {
     int index() const { return m_index ; }
 
     /** getMother() / hasMother() */
-    const ParticleBase* mother() const { return m_mother ; }
+    const ParticleBase* mother() const;
 
     /**  get name of the particle */
     const std::string& name() const { return m_name ; }
@@ -112,7 +119,6 @@ namespace TreeFitter {
 
     /** project mass constraint abstract */
     virtual ErrCode projectMassConstraint(const FitParams&, Projection&) const ;
-
 
     /** project constraint.   */
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const;
@@ -143,7 +149,7 @@ namespace TreeFitter {
     int eneIndex() const { return hasEnergy() ? momIndex() + 3 : -1 ; }
 
     /**  get chi2 */
-    virtual double chiSquare(const FitParams*) const;
+    virtual double chiSquare(const FitParams&) const;
 
     /** get pdg mass  */
     double pdgMass() const { return m_pdgMass ; }
@@ -161,7 +167,7 @@ namespace TreeFitter {
     int charge() const { return m_charge ; }
 
     /** add daughter  */
-    virtual ParticleBase* addDaughter(Belle2::Particle*, bool forceFitAll = false);
+    virtual ParticleBase* addDaughter(Belle2::Particle*, const ConstraintConfiguration& config, bool forceFitAll = false);
 
     /** remove daughter */
     virtual void removeDaughter(const ParticleBase* pb);
@@ -184,7 +190,6 @@ namespace TreeFitter {
     /** set the relation to basf2 particle type */
     void setParticle(Belle2::Particle* particle) { m_particle = particle ; }
 
-
   protected:
 
     /** just an alias */
@@ -202,7 +207,7 @@ namespace TreeFitter {
     static double bFieldOverC();
 
     /** initialises tau as a length  */
-    ErrCode initTau(FitParams* par) const ;
+    ErrCode initTau(FitParams& par) const ;
 
     /** set Index (in statevector) */
     void setIndex(int i) { m_index = i ; }
@@ -215,6 +220,12 @@ namespace TreeFitter {
 
     /** daughter container  */
     std::vector<ParticleBase*> m_daughters;
+
+    /** decay length less than 1 micron  */
+    bool m_isStronglyDecayingResonance;
+
+    /** has all the constraint config */
+    const ConstraintConfiguration* m_config;
 
   private:
     /** index */

@@ -1,5 +1,0 @@
-#!/bin/bash
-
-sed "s/$1/$2/g" $3/include/$1.h > $4/include/$2.h
-sed "s/$1/$2/g" $3/src/$1.cc > $4/src/$2.cc
-

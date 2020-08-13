@@ -1,11 +1,14 @@
-//
-// Contributors: Caitlin MacQueen, Marco Milesi
-// Contact: cmq.centaurus@gmail.com
-// Last Modified: June 2018
-//
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2018 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Caitlin MacQueen, Marco Milesi                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#ifndef eclChargedPidSelector_h
-#define eclChargedPidSelector_h
+#pragma once
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -22,9 +25,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <TCut.h>
-
-// Header file for the classes stored in the TTree if any.
-#include <vector>
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
@@ -146,7 +146,7 @@ public :
   void SetOutputDir(const char* outpath); /**< Set output directory */
 
   /** Constructor */
-  eclChargedPidSelector(TTree* = 0) :
+  explicit eclChargedPidSelector(TTree* tree = 0) :
     fChain(0),
     eclShowerEnergy(0),
     eclShowerTheta(0),
@@ -295,5 +295,3 @@ Bool_t eclChargedPidSelector::Notify()
 
   return kTRUE;
 }
-
-#endif // #ifdef eclChargedPidSelector_cxx

@@ -9,8 +9,15 @@ env.Dictionary()['SUBLIB'] = True
 env['LIBS'] = [
     'tracking',
     'tracking_trackFindingCDC',
+    'tracking_dataobjects',
     'framework',
     'genfit2',
+    'cdc', 'cdc_dataobjects',
+    'pxd', 'pxd_dataobjects',
+    'svd', 'svd_dataobjects',
+    'vxd', 'vxd_dataobjects',
+    'ecl_dataobjects',
+    'mdst_dataobjects',
     '$ROOT_LIBS',
     ]
 

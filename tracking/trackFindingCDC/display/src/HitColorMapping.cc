@@ -12,7 +12,6 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
 #include <cdc/dataobjects/CDCHit.h>
@@ -133,24 +132,24 @@ std::string BackgroundTagColorMap::map(int index __attribute__((unused)), const 
   CDCSimHit* cdcSimHit = hit.getRelated<CDCSimHit>("CDCSimHits");
   short backgroundtag = cdcSimHit->getBackgroundTag();
   switch (backgroundtag) {
-    case SimHitBase::BG_TAG::bg_none: return "orange";
-    case SimHitBase::BG_TAG::bg_Coulomb_LER: return "red";
-    case SimHitBase::BG_TAG::bg_Coulomb_HER: return "darkred";
-    case SimHitBase::BG_TAG::bg_RBB_LER: return "blue";
-    case SimHitBase::BG_TAG::bg_RBB_HER: return "darkblue";
-    case SimHitBase::BG_TAG::bg_Touschek_LER: return "green";
-    case SimHitBase::BG_TAG::bg_Touschek_HER: return "darkgreen";
-    case SimHitBase::BG_TAG::bg_twoPhoton: return "violet";
-    case SimHitBase::BG_TAG::bg_RBB_gamma: return "skyblue";
-    case SimHitBase::BG_TAG::bg_RBB_LER_far: return "turquoise";
-    case SimHitBase::BG_TAG::bg_RBB_HER_far: return "darkturquoise";
-    case SimHitBase::BG_TAG::bg_Touschek_LER_far: return "olivergreen";
-    case SimHitBase::BG_TAG::bg_Touschek_HER_far: return "darkolivegreen";
-    case SimHitBase::BG_TAG::bg_SynchRad_LER: return "goldenrod";
-    case SimHitBase::BG_TAG::bg_SynchRad_HER: return "darkgoldenrod";
-    case SimHitBase::BG_TAG::bg_BHWide_LER: return "cyan";
-    case SimHitBase::BG_TAG::bg_BHWide_HER: return "darkcyan";
-    case SimHitBase::BG_TAG::bg_other: return "orange";
+    case BackgroundMetaData::BG_TAG::bg_none: return "orange";
+    case BackgroundMetaData::BG_TAG::bg_Coulomb_LER: return "red";
+    case BackgroundMetaData::BG_TAG::bg_Coulomb_HER: return "darkred";
+    case BackgroundMetaData::BG_TAG::bg_RBB_LER: return "blue";
+    case BackgroundMetaData::BG_TAG::bg_RBB_HER: return "darkblue";
+    case BackgroundMetaData::BG_TAG::bg_Touschek_LER: return "green";
+    case BackgroundMetaData::BG_TAG::bg_Touschek_HER: return "darkgreen";
+    case BackgroundMetaData::BG_TAG::bg_twoPhoton: return "violet";
+    case BackgroundMetaData::BG_TAG::bg_RBB_gamma: return "skyblue";
+    case BackgroundMetaData::BG_TAG::bg_RBB_LER_far: return "turquoise";
+    case BackgroundMetaData::BG_TAG::bg_RBB_HER_far: return "darkturquoise";
+    case BackgroundMetaData::BG_TAG::bg_Touschek_LER_far: return "olivergreen";
+    case BackgroundMetaData::BG_TAG::bg_Touschek_HER_far: return "darkolivegreen";
+    case BackgroundMetaData::BG_TAG::bg_SynchRad_LER: return "goldenrod";
+    case BackgroundMetaData::BG_TAG::bg_SynchRad_HER: return "darkgoldenrod";
+    case BackgroundMetaData::BG_TAG::bg_BHWide_LER: return "cyan";
+    case BackgroundMetaData::BG_TAG::bg_BHWide_HER: return "darkcyan";
+    case BackgroundMetaData::BG_TAG::bg_other: return "orange";
     default:
       B2INFO("Background tag " << backgroundtag << " not associated with a color.\n");
       return ("orange");
@@ -248,7 +247,7 @@ MCParticleColorMap::MCParticleColorMap()
 std::string MCParticleColorMap::info()
 {
   std::ostringstream oss;
-  for (const std::pair<int, std::string>& colorForMCParticleID : m_usedColors) {
+  for (const std::pair<int, std::string> colorForMCParticleID : m_usedColors) {
     oss << "MCParticle " << colorForMCParticleID.first << " -> " << colorForMCParticleID.second << "\n";
   }
   return oss.str();

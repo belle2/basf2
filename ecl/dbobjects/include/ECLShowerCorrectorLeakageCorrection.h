@@ -5,7 +5,7 @@
  * Leakage corrections for ECL showers (N1).                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *               Alon Hershenhorn (hershen@physics.ubc.ca)                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -15,7 +15,6 @@
 
 //Root
 #include <TObject.h>
-#include <TTree.h>
 
 namespace Belle2 {
 

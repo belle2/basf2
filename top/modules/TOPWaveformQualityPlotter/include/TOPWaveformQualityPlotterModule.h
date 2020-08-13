@@ -11,7 +11,6 @@
 
 // from basf2
 #include <framework/core/HistoModule.h>
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <top/dataobjects/TOPRawWaveform.h>
 
@@ -19,7 +18,6 @@
 #include <string>
 #include <set>
 #include <map>
-#include <utility>
 
 // ROOT
 #include "TH1F.h"
@@ -43,35 +41,35 @@ namespace Belle2 {
     /**
      * Books the empty histograms
      */
-    void defineHisto();
+    void defineHisto() override;
 
     /**
      * Module initialization, calls defineHisto and gets waveform
      */
-    void initialize();
+    void initialize() override;
 
     /**
      * Event processor.
      */
-    void event();
+    void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    void endRun();
+    void endRun() override;
 
     /**
      * Draws the full waveforms onto the TProfiles
      * @param rawwave the raw waveform
      */
-    void drawWaveforms(const TOPRawWaveform&);
+    void drawWaveforms(const TOPRawWaveform& rawwave);
 
     /**
      * Fills the debugging 1D histograms and hitmaps
      * @param rawwave the raw waveform
      */
-    void basicDebuggingPlots(const TOPRawWaveform&);
+    void basicDebuggingPlots(const TOPRawWaveform& rawwave);
 
   private:
     int m_iEvent = -1;             /**< keeps track of iterations within run */

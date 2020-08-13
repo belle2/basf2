@@ -9,11 +9,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCSensitiveDetector_H
-#define CDCSensitiveDetector_H
+#pragma once
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
+
+#include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/WireID.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <vector>
 #include <map>
@@ -41,16 +45,16 @@ namespace Belle2 {
       ~CDCSensitiveDetector() {}
 
       //! Register CDC hits collection into G4HCofThisEvent
-      void Initialize(G4HCofThisEvent*);
+      void Initialize(G4HCofThisEvent*) override;
 
       //! Process each step and calculate variables defined in CDCB4VHit
-      bool step(G4Step* aStep, G4TouchableHistory* history);
+      bool step(G4Step* aStep, G4TouchableHistory* history) override;
 
       //!  Do what you want to do at the beginning of each event (why this is not called ?)
       //      void BeginOfEvent(G4HCofThisEvent*);
 
       //!  Do what you want to do at the end of each event
-      void EndOfEvent(G4HCofThisEvent*);
+      void EndOfEvent(G4HCofThisEvent*) override;
 
       //! Save CDCSimHit into datastore
       void saveSimHit(const G4int layerId,
@@ -238,6 +242,12 @@ namespace Belle2 {
                                   const WireID& otherWireId) const;
 
 
+      /** MC particles. */
+      StoreArray<MCParticle> m_MCParticles;
+
+      /** CDC simulation hits. */
+      StoreArray<CDCSimHit> m_CDCSimHits;
+
       /**
        * Magnetic field is on or off.
        */
@@ -294,5 +304,3 @@ namespace Belle2 {
     };
   }
 } // end of namespace Belle2
-
-#endif

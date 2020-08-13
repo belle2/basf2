@@ -9,11 +9,8 @@
  **************************************************************************/
 
 #pragma once
-#ifndef PXD_DATAOBJECTS_PXDOCCUPANCYEVENT_H
-#define PXD_DATAOBJECTS_PXDOCCUPANCYEVENT_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <algorithm>
 
 namespace Belle2 {
   /** Class PXDOccupancyEvent:
@@ -63,5 +60,3 @@ namespace Belle2 {
     ClassDef(PXDOccupancyEvent, 2)
   };
 } // end namespace Belle2
-
-#endif

@@ -1,5 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['hbasf2'] = ['daq', 'EG', '$ROOT_LIBS', 'framework']
-
-Return('env')

@@ -1,20 +1,14 @@
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 
-#include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <ecl/dbobjects/ECLChargedPidPDFs.h>
 
 #include <utility>
 #include <gtest/gtest.h>
 
-#include <TH2F.h>
 #include <TF1.h>
-#include <TMath.h>
 
 namespace Belle2 {
 
@@ -56,16 +50,16 @@ namespace Belle2 {
     auto* lk = ecl_likelihoods.appendNew();
 
     lk->setLogLikelihood(Const::electron, 0.12);
+    lk->setLogLikelihood(Const::muon, 0.58);
     lk->setLogLikelihood(Const::pion, 0.28);
     lk->setLogLikelihood(Const::kaon, 0.38);
     lk->setLogLikelihood(Const::proton, 0.48);
-    lk->setLogLikelihood(Const::muon, 0.58);
 
     EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::electron), 0.12);
+    EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::muon), 0.58);
     EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::pion), 0.28);
     EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::kaon), 0.38);
     EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::proton), 0.48);
-    EXPECT_FLOAT_EQ(lk->getLogLikelihood(Const::muon), 0.58);
 
   } // Testcases for ECLPidLikelihood setters and getters.
 
@@ -75,8 +69,8 @@ namespace Belle2 {
 
     ECLChargedPidPDFs eclPdfs;
 
-    float pmin_vals[]     = {300.0, 400.0, 500.0, 750.0, 1000.0, 1500.0, 2000.0, 3000.0, 4000.0, 4500.0, 5000.0, 5500.0};
-    float thetamin_vals[] = {0.0, 17.0, 31.4, 32.2, 44.0, 117.0, 128.7, 130.7, 150.0, 180.0};
+    float pmin_vals[]     = {0.2, 0.6, 1.0, 100.0};
+    float thetamin_vals[] = {0.21, 0.56, 2.24, 2.70};
 
     TH2F histgrid("binsgrid",
                   "bins grid",
@@ -85,76 +79,79 @@ namespace Belle2 {
                   sizeof(pmin_vals) / sizeof(float) - 1,
                   pmin_vals);
 
-    eclPdfs.setEnergyUnit(Unit::MeV);
-    eclPdfs.setAngularUnit(Unit::deg);
+    eclPdfs.setEnergyUnit(Unit::GeV);
+    eclPdfs.setAngularUnit(Unit::rad);
 
-    std::vector<int> pdgIds = {11, -11, 13, -13, 211, -211, 321, -321, 2212, -2212};
+    eclPdfs.setPdfCategories(&histgrid);
 
-    for (const auto& pdgId : pdgIds) {
-      eclPdfs.setBinsHist(pdgId, histgrid);
-    }
+    // Create a set of fictitious (normalised) PDFs of E/p, for various signed particle hypotheses.
+    // The first element in the pair is the true charge.
 
-    // Create a set of fictitious (normalised) PDFs of E/p=x, for various signed particle hypotheses.
-    TF1 pdf_el("pdf_el", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
-    TF1 pdf_elanti("pdf_elanti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
+    typedef std::pair<int, TF1> pdfSet;
 
-    TF1 pdf_mu("pdf_mu", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.0);
-    TF1 pdf_muanti("pdf_muanti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.0);
+    pdfSet pdf_el = std::make_pair(-1, TF1("pdf_el", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.3));
+    pdfSet pdf_elanti = std::make_pair(1, TF1("pdf_elanti", "TMath::Gaus(x, 0.9, 0.2, true)", 0.0, 1.2));
 
-    TF1 pdf_pi("pdf_pi", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
-    TF1 pdf_pianti("pdf_pianti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
+    pdfSet pdf_mu = std::make_pair(-1, TF1("pdf_mu", "TMath::Gaus(x, 0.3, 0.2, true)", 0.0, 1.0));
+    pdfSet pdf_muanti = std::make_pair(1, TF1("pdf_muanti", "TMath::Gaus(x, 0.35, 0.22, true)", 0.0, 1.0));
 
-    TF1 pdf_k("pdf_k", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.2);
-    TF1 pdf_kanti("pdf_kanti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
+    pdfSet pdf_pi = std::make_pair(1, TF1("pdf_pi", "TMath::Gaus(x, 0.4, 0.1, true)", 0.0, 1.0));
+    pdfSet pdf_pianti = std::make_pair(-1, TF1("pdf_pianti", "TMath::Gaus(x, 0.38, 0.15, true)", 0.0, 1.0));
 
-    TF1 pdf_p("pdf_p", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 1.6);
-    TF1 pdf_panti("pdf_panti", "TMath::Gaus(x, 1.0, 0.2, true)", 0.0, 2.0);
+    pdfSet pdf_k = std::make_pair(1, TF1("pdf_k", "TMath::Gaus(x, 0.38, 0.2, true)", 0.0, 1.0));
+    pdfSet pdf_kanti = std::make_pair(-1, TF1("pdf_kanti", "TMath::Gaus(x, 0.5, 0.22, true)", 0.0, 1.0));
 
-    std::map<int, TF1> pdfs = {
-      {11, pdf_el},
-      { -11, pdf_elanti},
-      {13, pdf_mu},
-      { -13, pdf_muanti},
-      {211, pdf_pi},
-      { -211, pdf_pianti},
-      {321, pdf_k},
-      { -321, pdf_kanti},
-      {2212, pdf_p},
-      { -2212, pdf_panti}
+    pdfSet pdf_p = std::make_pair(1, TF1("pdf_p", "TMath::Gaus(x, 1.0, 0.4, true)", 0.0, 1.6));
+    pdfSet pdf_panti = std::make_pair(-1, TF1("pdf_panti", "TMath::Gaus(x, 1.3, 0.5, true)", 0.0, 2.0));
+
+    pdfSet pdf_d = std::make_pair(1, TF1("pdf_d", "TMath::Gaus(x, 1.1, 0.45, true)", 0.0, 1.6));
+    pdfSet pdf_danti = std::make_pair(-1, TF1("pdf_danti", "TMath::Gaus(x, 1.2, 0.6, true)", 0.0, 2.0));
+
+    std::map<unsigned int, std::vector<pdfSet>> pdfs = {
+      {Const::electron.getPDGCode(), std::vector<pdfSet>{pdf_el, pdf_elanti}},
+      {Const::muon.getPDGCode(), std::vector<pdfSet>{pdf_mu, pdf_muanti}},
+      {Const::pion.getPDGCode(), std::vector<pdfSet>{pdf_pi, pdf_pianti}},
+      {Const::kaon.getPDGCode(), std::vector<pdfSet>{pdf_k, pdf_kanti}},
+      {Const::proton.getPDGCode(), std::vector<pdfSet>{pdf_p, pdf_panti}},
+      {Const::deuteron.getPDGCode(), std::vector<pdfSet>{pdf_d, pdf_danti}},
     };
+
+    // E/p is the only variable considered in the test.
+    std::vector<ECLChargedPidPDFs::InputVar> varids = {ECLChargedPidPDFs::InputVar::c_EoP};
+
+    // Fill the DB PDF map.
+    // (Use the same PDF for all (clusterTheta, p) bins for simplicity).
+    for (auto& [pdg, pdf_setlist] : pdfs) {
+      for (auto& pdf_set : pdf_setlist) {
+        for (int ip(1); ip <= histgrid.GetNbinsY(); ++ip) {
+          for (int jth(1); jth <= histgrid.GetNbinsX(); ++jth) {
+            for (const auto& varid : varids) {
+              eclPdfs.add(pdg, pdf_set.first, ip, jth, varid, &pdf_set.second);
+            }
+          }
+        }
+      }
+    }
 
     // Store the value of the PDFs in here, and pass it to the ECLPidLikelihood object later on.
     float likelihoods_plus[Const::ChargedStable::c_SetSize];
     float likelihoods_minus[Const::ChargedStable::c_SetSize];
 
-    // Choose an arbitrary set of (P,theta), and of E/P.
-    double theta = 1.047; // (X) --> theta [rad] = 60 [deg] --> [44,117] deg
-    double p     = 0.85;  // (Y) --> P [GeV] = 850 [MeV] --> [750,1000] MeV
+    // Choose an arbitrary set of (clusterTheta, p), and of E/p.
+    double clusterTheta = 1.047; // (X) --> clusterTheta [rad] = 60 [deg]
+    double p     = 0.85;  // (Y) --> P [GeV] = 850 [MeV]
     double eop   = 0.87;
 
-    std::cout << "Theta = " << theta << " [rad]" << std::endl;
-    std::cout << "P = " << p << " [GeV]" << std::endl;
-
-    // Fill the DB PDF map.
-    for (const auto& pdf : pdfs) {
-      for (int ip(1); ip <= histgrid.GetNbinsY(); ++ip) {
-        for (int jth(1); jth <= histgrid.GetNbinsX(); ++jth) {
-          eclPdfs.setPDFsInternalMap(pdf.first, ip, jth, pdf.second);
+    // Now read the PDFs.
+    for (const auto& [pdg, pdf_setlist] : pdfs) {
+      for (const auto& pdf_set : pdf_setlist) {
+        float pdfval = eclPdfs.getPdf(pdg, pdf_set.first, p, clusterTheta, varids.at(0))->Eval(eop);
+        EXPECT_NEAR(pdf_set.second.Eval(eop), pdfval, 0.001);
+        if (pdf_set.first < 0) {
+          likelihoods_minus[Const::chargedStableSet.find(pdg).getIndex()] = log(pdfval);
+        } else {
+          likelihoods_plus[Const::chargedStableSet.find(pdg).getIndex()] = log(pdfval);
         }
-      }
-      eclPdfs.setPDFsMap(pdf.first);
-    }
-
-    float pdfval(-1);
-    int abspdgId(0);
-    for (const auto& pdf : pdfs) {
-      pdfval = eclPdfs.getPdf(pdf.first, p, theta)->Eval(eop);
-      EXPECT_NEAR(pdf.second.Eval(eop), pdfval, 0.001);
-      abspdgId = abs(pdf.first);
-      if (pdf.first < 0) {
-        likelihoods_minus[Const::chargedStableSet.find(abspdgId).getIndex()] = log(pdfval);
-      } else {
-        likelihoods_plus[Const::chargedStableSet.find(abspdgId).getIndex()] = log(pdfval);
       }
     }
 
@@ -164,15 +161,17 @@ namespace Belle2 {
     StoreArray<ECLPidLikelihood> ecl_likelihoods_plus;
     const auto* lk_plus = ecl_likelihoods_plus.appendNew(likelihoods_plus);
 
-    float logl(-700), logl_expect(-700);
-    for (const auto& pdf : pdfs) {
-      logl_expect = log(pdf.second.Eval(eop));
-      if (pdf.first < 0) {
-        logl = lk_minus->getLogLikelihood(Const::chargedStableSet.find(abs(pdf.first)));
-      } else {
-        logl = lk_plus->getLogLikelihood(Const::chargedStableSet.find(abs(pdf.first)));
+    for (const auto& [pdg, pdf_setlist] : pdfs) {
+      for (const auto& pdf_set : pdf_setlist) {
+        float logl;
+        float logl_expect = log(pdf_set.second.Eval(eop));
+        if (pdf_set.first < 0) {
+          logl = lk_minus->getLogLikelihood(Const::chargedStableSet.find(pdg));
+        } else {
+          logl = lk_plus->getLogLikelihood(Const::chargedStableSet.find(pdg));
+        }
+        EXPECT_NEAR(logl_expect, logl, 0.01);
       }
-      EXPECT_NEAR(logl_expect, logl, 0.01);
     }
 
   } // Testcases for ECL PDFs.

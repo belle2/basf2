@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import create_path, pretty_print_table, B2ERROR, B2INFO
+from basf2 import create_path, B2ERROR, B2INFO
+from basf2.utils import pretty_print_table
 import os
 import glob
 
@@ -53,7 +54,7 @@ def get_background_files(folder=None, output_file_info=True):
     return bg
 
 
-def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.root'):
+def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.root', excludeBranches=[]):
     '''
     A function to be used for output of BG simulation.
     @param path path name
@@ -135,5 +136,5 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
     # Output to file. We don't need a TTreeIndex for background files and memory
     # consumption can be improved by setting a lower autoFlushSize so that
     # fewer and or smaller amounts of data have to be read for each GetEntry()
-    path.add_module('RootOutput', outputFileName=fileName, branchNames=branches,
+    path.add_module('RootOutput', outputFileName=fileName, branchNames=branches, excludeBranchNames=excludeBranches,
                     buildIndex=False, autoFlushSize=-500000)

@@ -44,7 +44,7 @@ namespace Belle2 {
      * Does a check of the parameters and gives an error of the parameters
      * were not correctly set by the user.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Advances member variables to the next event (which is given by m_evtNumber). */
     bool advanceEventCounter();
@@ -57,7 +57,7 @@ namespace Belle2 {
      *
      * No object is created when the end of of processing is reached.
      */
-    virtual void event();
+    virtual void event() override;
 
 
   protected:

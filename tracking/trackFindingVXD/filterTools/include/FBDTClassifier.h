@@ -18,7 +18,6 @@
 #include <array>
 #include <vector>
 #include <iostream>
-#include <iomanip>
 
 #if FastBDT_VERSION_MAJOR >= 3
 typedef FastBDT::Forest<unsigned int> FBDTForest;
@@ -44,8 +43,8 @@ namespace Belle2 {
     FBDTClassifier() { ; }// = default; /**< default constructor */
 
     /** constructor from three main parts. (for testing purposes mainly) */
-    FBDTClassifier(FBDTForest forest, std::vector<FastBDT::FeatureBinning<double> > fB, Belle2::DecorrelationMatrix<9> dM) :
-      m_forest(forest), m_featBins(fB), m_decorrMat(dM) { ; }
+    FBDTClassifier(const FBDTForest& forest, const std::vector<FastBDT::FeatureBinning<double> >& fB,
+                   const Belle2::DecorrelationMatrix<9>& dM) : m_forest(forest), m_featBins(fB), m_decorrMat(dM) { ; }
 
     ~FBDTClassifier() { ; } /**< TODO destructor */
 

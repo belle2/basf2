@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCCHANNELDATA_H
-#define CDCCHANNELDATA_H
+#pragma once
 
 namespace Belle2 {
 
@@ -58,6 +57,7 @@ namespace Belle2 {
         m_tot = tot;
         m_adc = adc;
         m_tdc = tdc;
+        m_tdc2 = 0;
         m_f2ndHit = false;
       }
 
@@ -182,5 +182,3 @@ namespace Belle2 {
 
   } //end CDC namespace;
 } // end namespace Belle2
-
-#endif // CDCCHANNELDATA_H

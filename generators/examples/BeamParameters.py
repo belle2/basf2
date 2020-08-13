@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2
 from beamparameters import add_beamparameters
 
 # small example to show how to set BeamParameters
 
-main = create_path()
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=10000)
+main = basf2.create_path()
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=10000)
+
 # add beamparameters with named preset
 beamparameters = add_beamparameters(main, "Y4S")
+
 # override preset however you like
 beamparameters.param("covHER", [0.01, 0.01, 0.01])
 beamparameters.param("smearDirection", False)
+
 # print parameters to be used
-print_params(beamparameters)
+basf2.print_params(beamparameters)
+
 # add generator, simulation, analysis, and so forth
 main.add_module("RootOutput", outputFileName="BeamParameters.root")
-process(main)
+
+basf2.process(main)

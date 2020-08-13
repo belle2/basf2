@@ -12,27 +12,8 @@
 
 #include "TH3.h"
 
-#include <cstdio>
-#include <stdio.h>
-#include <stdlib.h>
 #include "TFile.h"
-#include <TCanvas.h>
-#include <iostream>
-#include <fstream>
 #include <string>
-#include "TH1.h"
-#include "TF1.h"
-#include "TH2.h"
-#include "TF2.h"
-#include "TMath.h"
-#include "TFitResult.h"
-#include "TString.h"
-#include "TLatex.h"
-#include <algorithm>
-#include <functional>
-
-
-
 
 using namespace Belle2;
 

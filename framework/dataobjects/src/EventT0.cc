@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <framework/dataobjects/EventT0.h>
 
+#include <framework/logging/Logger.h>
+
 #include <algorithm>
 #include <iterator>
 
@@ -31,7 +33,7 @@ double EventT0::getEventT0() const
 boost::optional<EventT0::EventT0Component> EventT0::getEventT0Component() const
 {
   if (hasEventT0()) {
-    return boost::make_optional<EventT0Component>(m_eventT0);
+    return boost::make_optional(m_eventT0);
   }
 
   return {};

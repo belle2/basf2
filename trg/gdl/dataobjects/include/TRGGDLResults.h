@@ -12,14 +12,14 @@
 //-----------------------------------------------------------
 #pragma once
 #include <TObject.h>
-#include <TVector3.h>
+
 namespace Belle2 {
 
   class TRGGDLResults : public TObject {
   public:
 
     /**! The Class title*/
-    ClassDef(TRGGDLResults, 1); /*< the class title */
+    ClassDef(TRGGDLResults, 2); /*< the class title */
     TRGGDLResults(): m_L1TriggerResults(0) {}
     ~TRGGDLResults() {}
 

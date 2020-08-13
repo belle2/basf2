@@ -21,21 +21,22 @@ namespace Belle2 {
     // Public functions
   public:
 
-    //! Constructor / Destructor
+    //! Constructor
     Root2BinaryModule();
+    //! Destructor
     virtual ~Root2BinaryModule();
 
-    //!
-    virtual void initialize();
+    //! Called at the beginning of data processing
+    virtual void initialize() override;
 
-    //!
-    virtual void event();
+    //! Called for each event
+    virtual void event() override;
 
-    //!
-    virtual void endRun();
+    //! Called if the current run ends
+    virtual void endRun() override;
 
-    //!
-    virtual void terminate();
+    //! Called at the end of data processing
+    virtual void terminate() override;
 
     //! write the contents of an event
     virtual void writeEvent(RawDataBlock* raw_dblk, int* first_flag, int* break_flag,

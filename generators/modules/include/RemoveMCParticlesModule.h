@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REMOVEMCPARTICLESMODULE_H
-#define REMOVEMCPARTICLESMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -36,13 +35,13 @@ namespace Belle2 {
     virtual ~RemoveMCParticlesModule() {}
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Terminates the module. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Apply cuts on a Particle and call for all daugthers recursively.
      * @param particle Particle to check
@@ -71,4 +70,3 @@ namespace Belle2 {
 } // end namespace Belle2
 
 
-#endif /* REMOVEMCPARTICLESMODULE_H */

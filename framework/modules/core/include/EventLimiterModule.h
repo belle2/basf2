@@ -30,13 +30,13 @@ namespace Belle2 {
     virtual ~EventLimiterModule() {};
 
     /** Initialization states required data objects (EventMetaData) */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Checks if we've reached the maximum number of events yet and sets the return value to False if we have */
-    virtual void event();
+    virtual void event() override;
 
     /** Resets our event counter to zero and return value to True */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
   private:
     /** Datastore pointers */

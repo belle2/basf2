@@ -9,22 +9,7 @@
 #ifndef ROOT2RAW_H
 #define ROOT2RAW_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 #include <framework/core/Module.h>
-#include <daq/dataobjects/SendHeader.h>
-#include <daq/dataobjects/SendTrailer.h>
-#include <rawdata/dataobjects/RawSVD.h>
-#include <rawdata/dataobjects/RawFTSW.h>
-
-#include <rawdata/dataobjects/RawHeader_v0.h>
-#include <rawdata/dataobjects/RawTrailer_v0.h>
-
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
-
 
 #define MAXEVTSIZE 4000000
 

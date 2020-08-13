@@ -27,10 +27,10 @@ namespace Belle2 {
     virtual ~PrescaleModule() {};
 
     /** No Initialization necessary */
-    virtual void initialize() {};
+    virtual void initialize() override {};
 
     /** Sets the return value by running a RNG vs. the prescale value */
-    virtual void event();
+    virtual void event() override;
 
   private:
     /** Prescale module parameter, this fraction of events will return True. [0.0 -> 1.0] */

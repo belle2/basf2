@@ -8,10 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef IRSIMHIT_H
-#define IRSIMHIT_H
+#pragma once
 
-#include <TObject.h>
 #include <TVector3.h>
 #include <string>
 #include <simulation/dataobjects/SimHitBase.h>
@@ -40,17 +38,15 @@ namespace Belle2 {
       TVector3 momOut,
       int PDGcode,
       float depEnergy,
-      std::string Volname
-    )
-    {
-      m_posIn = posIn;
-      m_momIn = momIn;
-      m_posOut = posOut;
-      m_momOut = momOut;
-      m_PDGcode = PDGcode;
-      m_depEnergy = depEnergy;
-      m_Volname = Volname;
-    }
+      const std::string& Volname
+    ) :
+      m_posIn(posIn),
+      m_momIn(momIn),
+      m_posOut(posOut),
+      m_momOut(momOut),
+      m_PDGcode(PDGcode),
+      m_depEnergy(depEnergy),
+      m_Volname(Volname) {}
 
     ~IRSimHit();
 
@@ -61,7 +57,7 @@ namespace Belle2 {
     void setmomOut(TVector3 momOut); /** Set momentum at end point */
     void setPDGcode(int PDGcode);    /** Set PDF code */
     void setdepEnergy(float depEnergy); /** Set deposited energy */
-    void setVolname(std::string Volname); /** Set volume name */
+    void setVolname(const std::string& Volname); /** Set volume name */
 
     /** The method to get.*/
     TVector3 getposIn();  /** return position at start point*/
@@ -90,5 +86,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

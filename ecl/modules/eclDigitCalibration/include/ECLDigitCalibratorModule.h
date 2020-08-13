@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Digit Calibration.                                                     *
  *                                                                        *
@@ -10,8 +10,9 @@
  * out of time digits above a certain energy threshold.                   *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *               Chris Hearty (hearty@physics.ubc.ca) (CH)                *
+ *               Ewan Hill (ehill@mail.ubc.ca)                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -27,7 +28,9 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
-class TH1D;
+#include <ecl/utility/ECLTimingUtilities.h>
+
+class TH1F;
 class TFile;
 
 namespace Belle2 {
@@ -35,7 +38,6 @@ namespace Belle2 {
   class EventLevelClusteringInfo;
 
   class ECLCrystalCalib;
-  class ECLPureCsIInfo;
   class ECLDigit;
   class ECLDsp;
   class ECLCalDigit;
@@ -55,20 +57,20 @@ namespace Belle2 {
     ~ECLDigitCalibratorModule();
 
     /** Initialize variables. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** begin run.*/
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** event per event.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** end run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminate.*/
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Name of the ECLDigit.*/
     virtual const char* eclDigitArrayName() const
@@ -116,6 +118,11 @@ namespace Belle2 {
     std::vector < float > v_calibrationCrystalTimeOffsetUnc;  /**< single crystal time calibration offset as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalTimeOffset;  /**< single crystal time calibration offset*/
 
+    std::vector < float > v_calibrationCrateTimeOffset;  /**< single crate time calibration offset as vector (per crystal) */
+    std::vector < float > v_calibrationCrateTimeOffsetUnc;  /**< single crate time calibration offset as
+                                                                 vector uncertainty (per crystal) */
+    DBObjPtr<ECLCrystalCalib> m_calibrationCrateTimeOffset;  /**< single crate time calibration offset (per crystal) */
+
     std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
     std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
@@ -137,35 +144,41 @@ namespace Belle2 {
     void callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<float>& constants,
                              std::vector<float>& constantsUnc); /**< reads calibration constants */
 
-
-
-//      double getCalibratedEnergy(const int cellid, const int energy) const; /**< energy calibration */
-//      double getCalibratedTime(const int cellid, const int time, const bool fitfailed) const; /**< timing correction. */
     double getT99(const int cellid, const double energy, const bool fitfailed, const int bgcount) const; /**< t99%. */
-//      double getInterpolatedTimeResolution(const double x, const int bin) const; /**< timing resolution interpolation. */
-//      void prepareEnergyCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
-//      void prepareTimeCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
     int determineBackgroundECL(); /**< count out of time digits to determine baclground levels */
 
-    double m_timeResolutionPointResolution[4]; /**< Time resolution calibration interpolation parameter "Resolution". */
-    double m_timeResolutionPointX[4];  /**< Time resolution calibration interpolation parameter "x = 1/E (GeV)". */
     const double c_timeResolutionForFitFailed  = 1.0e9; /**< Time resolution for failed fits". */
     const double c_timeForFitFailed            = 0.0; /**< Time for failed fits". */
 
     // new time calibration from Kim and Chris
     std::string m_fileBackgroundName; /**< Background filename. */
-    TFile* m_fileBackground; /**< Background file. */
-    TH1D* m_th1dBackground; /**< Background histogram. */
+    TFile* m_fileBackground{nullptr}; /**< Background file. */
+    TH1F* m_th1fBackground{nullptr}; /**< Background histogram. */
 
     const double c_pol2Var1 = 1684.0; /**< 2-order fit for p1 Var1 + Var2*bg + Var3*bg^2. */
     const double c_pol2Var2 = 3080.0; /**< 2-order fit for p1. */
     const double c_pol2Var3 = -613.9; /**< 2-order fit for p1. */
-    double m_pol2Max; /** < Maximum of p1 2-order fit to limit values */
+    double m_pol2Max; /**< Maximum of p1 2-order fit to limit values */
     const int c_nominalBG = 183; /**< Number of out of time digits at BGx1.0. */
-    double m_averageBG; /** < Average dose per crystal calculated from m_th1dBackground */
-    const double c_minT99 = 3.5;
+    double m_averageBG; /**< Average dose per crystal calculated from m_th1dBackground */
+    const double c_minT99 = 3.5; /**< The minimum t99 */
 
-    bool m_simulatePure = 0; /** < Flag to set pure CsI simulation option */
+    bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
+
+
+    std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =
+      std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
+
+    // For the energy dependence correction to the time
+    // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
+    // Only change the time walk function paramters if they change away from the below dummy values
+    double m_energyDependenceTimeOffsetFitParam_p1 = -999;     /**< p1 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p2 = -999;     /**< p2 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p3 = -999;     /**< p3 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p4 = -999;     /**< p4 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p5 = -999;     /**< p5 in "energy dependence equation" */
+    double m_energyDependenceTimeOffsetFitParam_p6 = -999;     /**< p6 in "energy dependence equation" */
+
   };
 
   /** Class derived from ECLDigitCalibratorModule, only difference are the names */
@@ -186,7 +199,6 @@ namespace Belle2 {
     /** PureCsI Name of the EventLevelClusteringInfoPureCsI.*/
     virtual const char* eventLevelClusteringInfoName() const override
     { return "EventLevelClusteringInfoPureCsI" ; }
-
 
   };
 

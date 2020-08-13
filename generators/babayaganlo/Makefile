@@ -15,7 +15,6 @@ FFLAGS = -O3
 #-v
 #FFLAGS = -g
 
-FPCHECK = trapfpe.c
 FPCHECK =
 
 EXTRADEPS = #Makefile
@@ -37,7 +36,7 @@ SAVEDIR = release
 RELEASEDIR = BabaYaga
 pack: # use only to release BABAYAGA
 	mkdir -p $(RELEASEDIR)/form &&\
-        cp -r Makefile README input-test-pack shared.inc trapfpe.c\
+        cp -r Makefile README input-test-pack shared.inc \
         main.f cuts.f sv.f matrix_model.f mapmomenta.f vpol_novosibirsk.dat\
         routines.f sampling.f phasespace.f distributions.f $(VPHLMNT).f\
         hadr5n12.f hadr5n.f ranlux.f userinterface.f intpl.f Rteubner.f\

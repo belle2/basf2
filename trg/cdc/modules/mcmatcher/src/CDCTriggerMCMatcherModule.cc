@@ -9,7 +9,7 @@ namespace {
   //with range based for
   template<class Iter>
   struct iter_pair_range : std::pair<Iter, Iter> {
-    iter_pair_range(std::pair<Iter, Iter> const& x) : std::pair<Iter, Iter>(x) {}
+    explicit iter_pair_range(std::pair<Iter, Iter> const& x) : std::pair<Iter, Iter>(x) {}
     Iter begin() const {return this->first;}
     Iter end()   const {return this->second;}
   };
@@ -105,8 +105,8 @@ CDCTriggerMCMatcherModule::event()
   for (int imc = 0; imc < m_mcParticles.getEntries(); ++imc) {
     MCParticle* mcParticle = m_mcParticles[imc];
 
-    // minimum requirement: charged and seen in CDC
-    if (!mcParticle->hasSeenInDetector(Const::CDC) || mcParticle->getCharge() == 0)
+    // minimum requirement: seen in CDC, unless monopoles
+    if (!mcParticle->hasSeenInDetector(Const::CDC) || (mcParticle->getCharge() == 0 && abs(mcParticle->getPDG()) != 99666))
       continue;
 
     // reject secondaries

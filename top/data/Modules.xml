@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Modules descr="definition of TOP modules">
+
+  <Module slotID="1">
+    <ConstructionNumber>17</ConstructionNumber>
+    <Prism descr="serial number">451252</Prism>
+    <BarSegment2 descr="serial number">452339</BarSegment2>
+    <BarSegment1 descr="serial number">452338</BarSegment1>
+    <Mirror descr="serial number">SN-020</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">11.25</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="2">
+    <ConstructionNumber>16</ConstructionNumber>
+    <Prism descr="serial number">450946</Prism>
+    <BarSegment2 descr="serial number">450689</BarSegment2>
+    <BarSegment1 descr="serial number">451368</BarSegment1>
+    <Mirror descr="serial number">SN-019</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">33.75</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="3">
+    <ConstructionNumber>11</ConstructionNumber>
+    <Prism descr="serial number">450939</Prism>
+    <BarSegment2 descr="serial number">450687</BarSegment2>
+    <BarSegment1 descr="serial number">450690</BarSegment1>
+    <Mirror descr="serial number">SN-013</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">56.25</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="4">
+    <ConstructionNumber>12</ConstructionNumber>
+    <Prism descr="serial number">450942</Prism>
+    <BarSegment2 descr="serial number">451635</BarSegment2>
+    <BarSegment1 descr="serial number">451849</BarSegment1>
+    <Mirror descr="serial number">SN-014</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">78.75</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="5">
+    <ConstructionNumber>15</ConstructionNumber>
+    <Prism descr="serial number">450945</Prism>
+    <BarSegment2 descr="serial number">451370</BarSegment2>
+    <BarSegment1 descr="serial number">452291</BarSegment1>
+    <Mirror descr="serial number">SN-018</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">101.25</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="6">
+    <ConstructionNumber>2</ConstructionNumber>
+    <Prism descr="serial number">449009</Prism>
+    <BarSegment2 descr="serial number">OOW:SN-02</BarSegment2>
+    <BarSegment1 descr="serial number">OOW:SN-04</BarSegment1>
+    <Mirror descr="serial number">SN-004</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">123.75</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="7">
+    <ConstructionNumber>14</ConstructionNumber>
+    <Prism descr="serial number">450944</Prism>
+    <BarSegment2 descr="serial number">450694</BarSegment2>
+    <BarSegment1 descr="serial number">451369</BarSegment1>
+    <Mirror descr="serial number">SN-016</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">146.25</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="8">
+    <ConstructionNumber>7</ConstructionNumber>
+    <Prism descr="serial number">450935</Prism>
+    <BarSegment2 descr="serial number">450681</BarSegment2>
+    <BarSegment1 descr="serial number">450481</BarSegment1>
+    <Mirror descr="serial number">SN-010</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">168.75</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="9">
+    <ConstructionNumber>5</ConstructionNumber>
+    <Prism descr="serial number">450932</Prism>
+    <BarSegment2 descr="serial number">Zygo:SN-01</BarSegment2>
+    <BarSegment1 descr="serial number">450478</BarSegment1>
+    <Mirror descr="serial number">SN-007</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">191.25</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="10">
+    <ConstructionNumber>13</ConstructionNumber>
+    <Prism descr="serial number">450943</Prism>
+    <BarSegment2 descr="serial number">450691</BarSegment2>
+    <BarSegment1 descr="serial number">450693</BarSegment1>
+    <Mirror descr="serial number">SN-015</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">213.75</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="11">
+    <ConstructionNumber>8</ConstructionNumber>
+    <Prism descr="serial number">450941</Prism>
+    <BarSegment2 descr="serial number">450683</BarSegment2>
+    <BarSegment1 descr="serial number">450680</BarSegment1>
+    <Mirror descr="serial number">SN-011</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">236.25</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="12">
+    <ConstructionNumber>6</ConstructionNumber>
+    <Prism descr="serial number">450937</Prism>
+    <BarSegment2 descr="serial number">450479</BarSegment2>
+    <BarSegment1 descr="serial number">450480</BarSegment1>
+    <Mirror descr="serial number">SN-008</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">258.75</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="13">
+    <ConstructionNumber>9</ConstructionNumber>
+    <Prism descr="serial number">450938</Prism>
+    <BarSegment2 descr="serial number">450688</BarSegment2>
+    <BarSegment1 descr="serial number">450685</BarSegment1>
+    <Mirror descr="serial number">SN-017</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">281.25</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="14">
+    <ConstructionNumber>4</ConstructionNumber>
+    <Prism descr="serial number">449010</Prism>
+    <BarSegment2 descr="serial number">Zygo:SN-02</BarSegment2>
+    <BarSegment1 descr="serial number">Zygo:SN-04</BarSegment1>
+    <Mirror descr="serial number">SN-006</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">303.75</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="15">
+    <ConstructionNumber>3</ConstructionNumber>
+    <Prism descr="serial number">449008</Prism>
+    <BarSegment2 descr="serial number">Zygo:SN-03</BarSegment2>
+    <BarSegment1 descr="serial number">Zygo:SN-05</BarSegment1>
+    <Mirror descr="serial number">SN-003</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">326.25</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  <Module slotID="16">
+    <ConstructionNumber>10</ConstructionNumber>
+    <Prism descr="serial number">450936</Prism>
+    <BarSegment2 descr="serial number">450684</BarSegment2>
+    <BarSegment1 descr="serial number">450686</BarSegment1>
+    <Mirror descr="serial number">SN-012</Mirror>
+    <Radius descr="radius of the bar central plane" unit="cm">120.0</Radius>
+    <Phi descr="azimuthal angle" unit="deg">348.75</Phi>
+    <BackwardZ descr="position of prism-bar joint" unit="cm">-69.5</BackwardZ>
+  </Module>
+  
+  <Glue>
+    <GlueMaterial>TOPglueNOA61</GlueMaterial>
+    <Thicknes1 desc="glue thicknes quartz-wedge" unit="mm">0.05</Thicknes1>
+    <Thicknes2 desc="glue thicknes quartz-quartz" unit="mm">0.05</Thicknes2>
+    <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.05</Thicknes3>
+  </Glue>
+  
+  <Surface name="QuartzSurface_17" descr="slot1">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99922</value>
+        <value energy="2.0">0.99922</value>
+        <value energy="3.0">0.99922</value>
+        <value energy="4.0">0.99922</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_16" descr="slot2">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99906</value>
+        <value energy="2.0">0.99906</value>
+        <value energy="3.0">0.99906</value>
+        <value energy="4.0">0.99906</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_11" descr="slot3">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99875</value>
+        <value energy="2.0">0.99875</value>
+        <value energy="3.0">0.99875</value>
+        <value energy="4.0">0.99875</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_12" descr="slot4">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99905</value>
+        <value energy="2.0">0.99905</value>
+        <value energy="3.0">0.99905</value>
+        <value energy="4.0">0.99905</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_15" descr="slot5">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99914</value>
+        <value energy="2.0">0.99914</value>
+        <value energy="3.0">0.99914</value>
+        <value energy="4.0">0.99914</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_2" descr="slot6">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99909</value>
+        <value energy="2.0">0.99909</value>
+        <value energy="3.0">0.99909</value>
+        <value energy="4.0">0.99909</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_14" descr="slot7">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99898</value>
+        <value energy="2.0">0.99898</value>
+        <value energy="3.0">0.99898</value>
+        <value energy="4.0">0.99898</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_7" descr="slot8">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99881</value>
+        <value energy="2.0">0.99881</value>
+        <value energy="3.0">0.99881</value>
+        <value energy="4.0">0.99881</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_5" descr="slot9">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99917</value>
+        <value energy="2.0">0.99917</value>
+        <value energy="3.0">0.99917</value>
+        <value energy="4.0">0.99917</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_13" descr="slot10">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99893</value>
+        <value energy="2.0">0.99893</value>
+        <value energy="3.0">0.99893</value>
+        <value energy="4.0">0.99893</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_8" descr="slot11">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99897</value>
+        <value energy="2.0">0.99897</value>
+        <value energy="3.0">0.99897</value>
+        <value energy="4.0">0.99897</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_6" descr="slot12">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99886</value>
+        <value energy="2.0">0.99886</value>
+        <value energy="3.0">0.99886</value>
+        <value energy="4.0">0.99886</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_9" descr="slot13">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99899</value>
+        <value energy="2.0">0.99899</value>
+        <value energy="3.0">0.99899</value>
+        <value energy="4.0">0.99899</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_4" descr="slot14">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99921</value>
+        <value energy="2.0">0.99921</value>
+        <value energy="3.0">0.99921</value>
+        <value energy="4.0">0.99921</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_3" descr="slot15">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99892</value>
+        <value energy="2.0">0.99892</value>
+        <value energy="3.0">0.99892</value>
+        <value energy="4.0">0.99892</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_10" descr="slot16">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99907</value>
+        <value energy="2.0">0.99907</value>
+        <value energy="3.0">0.99907</value>
+        <value energy="4.0">0.99907</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+</Modules>

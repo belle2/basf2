@@ -36,6 +36,7 @@
 #include <G4Polycone.hh>
 #include <G4UnionSolid.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4Region.hh>
 
 using namespace std;
 using namespace boost;
@@ -170,11 +171,11 @@ namespace Belle2 {
                               (envelopeParams.getNodes("InnerPoints/point").size() > 0)
                              );
 
-      for (const GearDir point : envelopeParams.getNodes("InnerPoints/point")) {
+      for (const GearDir& point : envelopeParams.getNodes("InnerPoints/point")) {
         pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
         envelope.getInnerPoints().push_back(ZXPoint);
       }
-      for (const GearDir point : envelopeParams.getNodes("OuterPoints/point")) {
+      for (const GearDir& point : envelopeParams.getNodes("OuterPoints/point")) {
         pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
         envelope.getOuterPoints().push_back(ZXPoint);
       }
@@ -339,6 +340,11 @@ namespace Belle2 {
         setVisibility(*envelope, false);
         physEnvelope = new G4PVPlacement(getAlignment(parameters.getAlignment(m_prefix)), envelope, m_prefix + ".Envelope",
                                          &topVolume, false, 1);
+
+        // Set up region for production cuts
+        G4Region* aRegion = new G4Region("SVDEnvelope");
+        envelope->SetRegion(aRegion);
+        aRegion->AddRootLogicalVolume(envelope);
       }
 
       //Read the definition of all sensor types
@@ -499,7 +505,7 @@ namespace Belle2 {
       }
     }
 
-    void GeoSVDCreator::readHalfShellSupport(GearDir support, SVDGeometryPar& svdGeometryPar)
+    void GeoSVDCreator::readHalfShellSupport(const GearDir& support, SVDGeometryPar& svdGeometryPar)
     {
       if (!support) return;
 
@@ -513,11 +519,11 @@ namespace Belle2 {
                                              (params.getNodes("InnerPoints/point").size() > 0)
                                             );
 
-        for (const GearDir point : params.getNodes("InnerPoints/point")) {
+        for (const GearDir& point : params.getNodes("InnerPoints/point")) {
           pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
           rotationSolidPar.getInnerPoints().push_back(ZXPoint);
         }
-        for (const GearDir point : params.getNodes("OuterPoints/point")) {
+        for (const GearDir& point : params.getNodes("OuterPoints/point")) {
           pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
           rotationSolidPar.getOuterPoints().push_back(ZXPoint);
         }
@@ -526,7 +532,7 @@ namespace Belle2 {
       return;
     }
 
-    void GeoSVDCreator::readLayerSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar)
+    void GeoSVDCreator::readLayerSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar)
     {
       if (!support) return;
 
@@ -571,7 +577,7 @@ namespace Belle2 {
       return;
     }
 
-    void GeoSVDCreator::readLadderSupport(int layer, GearDir support, SVDGeometryPar& svdGeometryPar)
+    void GeoSVDCreator::readLadderSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar)
     {
       if (!support) return;
 

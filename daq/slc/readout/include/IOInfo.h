@@ -1,7 +1,6 @@
 #ifndef _Belle2_IOInfo_h
 #define _Belle2_IOInfo_h
 
-#include <string>
 #include <vector>
 
 namespace Belle2 {
@@ -13,7 +12,7 @@ namespace Belle2 {
 
   public:
     IOInfo() {}
-    ~IOInfo() throw() {}
+    ~IOInfo() {}
 
   public:
     const char* getLocalIP() const;

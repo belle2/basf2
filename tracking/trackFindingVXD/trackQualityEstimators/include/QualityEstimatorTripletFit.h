@@ -40,6 +40,19 @@ namespace Belle2 {
     std::vector<double> m_sigmaR3DSquareds; /**< squared error of 3D radius*/
 
     double m_averageR3D = 0; /**< average 3D radius */
+
+    /// Triplet Fit hyper parameters
+
+    /** Scaling factor for material budget which is applied to the radiation length
+     *  value X/X_0 = 0.57% which is taken from the Belle II TDR page 156.
+     *  This scaling factor is optimized to achieve the best performance on MC.
+     */
+    double m_materialBudgetFactor = 1.45;
+
+    /** Cut off value for 3D Radius calculated in Triplet Fit.
+     *  This value is a hyper parameter of the Triplet Fit which is tuned on MC.
+     */
+    double m_maxPt = 0.01;
   };
 }
 

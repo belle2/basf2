@@ -23,7 +23,7 @@ namespace Belle2 {
   }
 
   template <class AState>
-  void StateCreatorWithReversal<AState>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+  void StateCreatorWithReversal<AState>::exposeParameters(ModuleParamList* moduleParamList, const std::string&)
   {
     moduleParamList->addParameter("reverseSeed",
                                   m_param_reverseSeed,

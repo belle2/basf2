@@ -35,9 +35,12 @@ namespace Belle2 {
      *
      * @param fileName The name of the file to be registered.
      * @param metaData The meta data information of the file to be registered. Will be updated.
+     * @param oldLFN If not empty, update the file catalog: only register the
+     *    file if the oldLFN is found in the catalog and if so, also remove any
+     *    file with the old LFN from the catalog.
      * @return True if the registration succeeded.
      */
-    virtual bool registerFile(std::string fileName, FileMetaData& metaData);
+    virtual bool registerFile(const std::string& fileName, FileMetaData& metaData, const std::string& oldLFN = "");
 
     /**
      * Get the metadata of a file with given (logical) file name.
@@ -54,7 +57,7 @@ namespace Belle2 {
      * @param lfn The logical file name.
      * @return the physical file name or an empty string if the lfn is not in the catalog.
      */
-    virtual std::string getPhysicalFileName(std::string lfn);
+    virtual std::string getPhysicalFileName(const std::string& lfn);
 
   private:
 

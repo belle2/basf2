@@ -42,6 +42,8 @@ class FacetFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRun):
         return "trackfindingcdc_FacetFilter.xml"
 
     def create_argument_parser(self, **kwds):
+        """Convert command-line arguments to basf2 argument list"""
+
         argument_parser = super().create_argument_parser(**kwds)
 
         argument_parser.add_argument(
@@ -63,8 +65,14 @@ class FacetFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRun):
         return argument_parser
 
     def create_path(self):
+        """
+        Sets up a path that plays back pregenerated events or generates events
+        based on the properties in the base class.
+        """
+
         path = super().create_path()
 
+        #: Post-process events according to the user's desired task (train, eval, explore)
         if self.task == "train":
             var_sets = [
                 "mva",
@@ -90,7 +98,7 @@ class FacetFilterTrainingRun(TrainingRunMixin, StandardEventGenerationRun):
                 "filter(chi2)",
             ]
 
-            # Signal some variables to select in the classification analysis
+            #: Signal some variables to select in the classification analysis
             self.variables = [
                 "curv",
                 "curv_pull",

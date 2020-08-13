@@ -12,9 +12,6 @@
 
 #include <string>
 #include <vector>
-#include <utility>
-
-#include <TFile.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -25,14 +22,10 @@
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
-#include <tracking/dataobjects/SectorMapConfig.h>
 #include <tracking/trackFindingVXD/filterMap/map/FiltersContainer.h>
-#include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
-
 
 namespace Belle2 {
   /** The Segment Network Producer Module.
@@ -134,6 +127,9 @@ namespace Belle2 {
 
     /// Name for network container data store object created by this module.
     std::string m_PARAMNetworkOutputName;
+
+    /// Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding)
+    std::string m_PARAMEventLevelTrackingInfoName;
 
     /// Boolean to set whether to add an additional SpacePoint as a virtual interaction point.
     bool m_PARAMAddVirtualIP = false;

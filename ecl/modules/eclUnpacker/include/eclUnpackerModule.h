@@ -1,40 +1,50 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Shebalin Vasily                                          *
+ * Contributors: Vasily Shebalin, Mikhail Remnev                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
 
+// Framework
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
-#include "ecl/utility/ECLChannelMapper.h"
+
+// ECL
+#include <ecl/utility/ECLChannelMapper.h>
 
 namespace Belle2 {
 
+  class EventMetaData;
   class RawECL;
   class ECLDigit;
   class ECLTrig;
   class ECLDsp;
 
+  /** the ECL unpacker module */
   class ECLUnpackerModule : public Module {
   public:
+    /** constructor */
     ECLUnpackerModule();
+    /** destructor */
     virtual ~ECLUnpackerModule();
 
     /** initialize */
-    virtual void initialize();
+    virtual void initialize() override;
     /** beginRun */
-    virtual void beginRun();
+    virtual void beginRun() override;
     /** event */
-    virtual void event();
+    virtual void event() override;
     /** endRun */
-    virtual void endRun();
+    virtual void endRun() override;
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** exeption should be thrown when the unexpected      */
     BELLE2_DEFINE_EXCEPTION(Unexpected_end_of_FINESSE_buffer,
@@ -43,12 +53,24 @@ namespace Belle2 {
 
     BELLE2_DEFINE_EXCEPTION(Bad_ShaperDSP_header, "Corrupted Shaper DSP header");
 
+    /** ECL unpacker run-dependent parameters (per channel) */
+    enum ECLUnpack {
+      /** Skip ECLDigit unpacking */
+      ECL_DISCARD_DSP_DATA   = 0x00000001,
+      /** Keep ECLDigits for quality flag 0 even if ECL_DISCARD_DSP_DATA is set */
+      ECL_KEEP_GOOD_DSP_DATA = 0x00000002,
+      /** Get ECLDigits from offline waveform fit */
+      ECL_OFFLINE_ADC_FIT = 0x00000004,
+    };
+
   protected:
 
 
   private:
-    /** Event number */
-    int    m_EvtNum;
+    /** event number from EventMetaData */
+    int m_globalEvtNum;
+    /** Internally counted event number */
+    int m_localEvtNum;
 
     /** pointer to data from COPPER */
     unsigned int* m_bufPtr;
@@ -61,12 +83,61 @@ namespace Belle2 {
 
     /** flag for whether or not to store collection with trigger times */
     bool m_storeTrigTime;
-    /** flag for whether or not to store ECLDsp data for unmapped channels*/
+    /** flag for whether or not to store ECLDsp data for unmapped channels */
     bool m_storeUnmapped;
-    /* report only once about problem with different trg tags*/
-    bool m_tagsReported;
-    /* report only once about problem with different trg phases*/
-    bool m_phasesReported;
+    /** Use ECLUnpackingParameters payload for run-dependent unpacking */
+    bool m_useUnpackingParameters;
+
+    /** report only once per crate about inconsistency between trg tag and evt number */
+    long m_evtNumReportedMask = 0;
+    /** report only once per crate about problem with different trg tags */
+    long m_tagsReportedMask = 0;
+    /** report only once per crate about problem with different trg phases */
+    long m_phasesReportedMask = 0;
+    /** report only once per crate about problem with shaper header */
+    long m_badHeaderReportedMask = 0;
+
+    /**
+     * Report the problem with inconsistency between trg tag and evt number.
+     * Exclude the crate from further reports of this type.
+     */
+    void doEvtNumReport(unsigned int iCrate, int tag, int evt_number);
+    /**
+     * Report the problem with trigger tags and exclude the crate
+     * from further reports of this type.
+     */
+    void doTagsReport(unsigned int iCrate, int tag0, int tag1);
+    /**
+     * Report the problem with trigger phases and exclude the crate
+     * from further reports of this type.
+     */
+    void doPhasesReport(unsigned int iCrate, int phase0, int phase1);
+    /**
+     * Report the problem with bad shaper header and exclude the crate
+     * from further reports of this type.
+     */
+    void doBadHeaderReport(unsigned int iCrate);
+
+    /**
+     * Check if the problem with trg tag <-> evt number inconsistency was
+     * already reported for crate iCrate.
+     */
+    bool evtNumReported(unsigned int iCrate) { return m_evtNumReportedMask & (1L << (iCrate - 1)); }
+    /**
+     * Check if the problem with different trigger tags was already reported
+     * for crate iCrate.
+     */
+    bool tagsReported(unsigned int iCrate) { return m_tagsReportedMask & (1L << (iCrate - 1)); }
+    /**
+     * Check if the problem with different trigger phases was already reported
+     * for crate iCrate.
+     */
+    bool phasesReported(unsigned int iCrate) { return m_phasesReportedMask & (1L << (iCrate - 1)); }
+    /**
+     * Check if the problem with bad shaper header was already reported
+     * for crate iCrate.
+     */
+    bool badHeaderReported(unsigned int iCrate) { return m_badHeaderReportedMask & (1L << (iCrate - 1)); }
 
     /** name of output collection for ECLDigits  */
     std::string m_eclDigitsName;
@@ -80,15 +151,27 @@ namespace Belle2 {
     /** ECL channel mapper **/
     ECL::ECLChannelMapper m_eclMapper;
 
-    /** Output data  */
+    /** Run-dependent unpacking parameters for each channel */
+    DBObjPtr<ECLChannelMap> m_unpackingParams;
+
+    /*   Input data   */
+
+    /** store array for RawECL**/
+    StoreArray<RawECL>   m_rawEcl;
+    /** store objptr for EventMetaData **/
+    StoreObjPtr<EventMetaData> m_eventMetaData;
+
+    /*   Output data  */
+
     /** store array for digitized gits**/
     StoreArray<ECLDigit> m_eclDigits;
     /** store array for eclTrigs data (trigger time and tag)**/
     StoreArray<ECLTrig>  m_eclTrigs;
     /** store array for waveforms**/
     StoreArray<ECLDsp>   m_eclDsps;
-    /** store array for RawECL**/
-    StoreArray<RawECL>   m_rawEcl;
+
+    /** Cached debug level from LogSystem */
+    int m_debugLevel;
 
     /** read nex word from COPPER data, check if the end of data is reached  */
     unsigned int readNextCollectorWord();
@@ -96,6 +179,8 @@ namespace Belle2 {
     unsigned int readNBits(int bitsToRead);
     /** read raw data from COPPER and fill output m_eclDigits container */
     void readRawECLData(RawECL* rawCOPPERData, int n);
+    /** Check if DSP data should be saved to datastore */
+    bool isDSPValid(int cellID, int crate, int shaper, int channel, int amp, int time, int quality);
 
   };
 }//namespace Belle2

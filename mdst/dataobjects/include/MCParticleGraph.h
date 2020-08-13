@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCPARTICLEGRAPH_H
-#define MCPARTICLEGRAPH_H
+#pragma once
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/MemoryPool.h>
@@ -40,16 +39,16 @@ namespace Belle2 {
     //Exception definition
 
     /** The exception is thrown if a cyclic reference in the graph was detected. */
-    BELLE2_DEFINE_EXCEPTION(CyclicReferenceError, "Cyclic decay, cannot continue")
+    BELLE2_DEFINE_EXCEPTION(CyclicReferenceError, "Cyclic decay, cannot continue");
     /** The exception is thrown if two particles do not belong to the same graph. */
-    BELLE2_DEFINE_EXCEPTION(NotSameGraphError, "Particles not from same graph")
+    BELLE2_DEFINE_EXCEPTION(NotSameGraphError, "Particles not from same graph");
     /** The exception is thrown if a non-physical decay was detected in the graph. */
-    BELLE2_DEFINE_EXCEPTION(NonContinousDaughtersError, "Can not represent decay graph, non continuous indices for daughters")
+    BELLE2_DEFINE_EXCEPTION(NonContinousDaughtersError, "Can not represent decay graph, non continuous indices for daughters");
     /** The exception is thrown if a daughter already has a mother assigned to it. */
     BELLE2_DEFINE_EXCEPTION(DaughterHasMotherError,
-                            "A daughter particle was already assigned to a mother. A particle can't have two mothers!")
+                            "A daughter particle was already assigned to a mother. A particle can't have two mothers!");
     /** The exception is thrown if the specified index is out of range. */
-    BELLE2_DEFINE_EXCEPTION(OutOfRangeError, "Index out of range")
+    BELLE2_DEFINE_EXCEPTION(OutOfRangeError, "Index out of range");
 
     /** Type representing a decay in the graph. */
     typedef std::pair<unsigned int, unsigned int> DecayLine;
@@ -156,15 +155,14 @@ namespace Belle2 {
     private:
 
       /**
-       * Private constructor. This class gets instantiated by MCParticleGraph::addParticle()
+       * No default constructor. This class gets instantiated by MCParticleGraph::addParticle()
        */
-      GraphParticle() {}
+      GraphParticle() = delete;
 
       /**
-       * No copying allowed.
-       * @param copy Reference to the particle which should be copied.
+       * No copy constructor.
        */
-      GraphParticle(const GraphParticle& copy): MCParticle(copy) {}
+      GraphParticle(const GraphParticle&) = delete;
 
       /**
        * Hide MCParticle "almost copy" constructor.
@@ -175,10 +173,10 @@ namespace Belle2 {
        * Internally used constructor. Create a new Particle with given index and a pointer
        * to the containing graph.
        * @param graph Pointer to the graph the particle is part of.
-       * @param index The vertex id of the particle in the graph.
+       * @param vertexId The vertex id of the particle in the graph.
        */
       GraphParticle(MCParticleGraph* graph, unsigned int vertexId): MCParticle(),
-        m_graph(graph), m_vertexId(vertexId), m_ignore(false), m_primary(true), m_trackID(0)
+        m_graph(graph), m_vertexId(vertexId)
       {
         //The pointer to the TClonesArray the MCParticle is stored in makes no
         //sense inside the Graph so we set it to some invalid value to avoid
@@ -192,11 +190,11 @@ namespace Belle2 {
        */
       void setIndex(int index) { m_index = index; }
 
-      MCParticleGraph* m_graph; /**< internal pointer to the graph this particle belongs to */
-      unsigned int m_vertexId;  /**< vertex id in the graph */
-      bool m_ignore;            /**< ignore particle when writing MCParticle list ? */
-      bool m_primary;           /**< Is this a primary particle ? */
-      int m_trackID;            /**< The track ID from geant4 that created this particle. */
+      MCParticleGraph* m_graph{0}; /**< internal pointer to the graph this particle belongs to */
+      unsigned int m_vertexId{0};  /**< vertex id in the graph */
+      bool m_ignore{false};        /**< ignore particle when writing MCParticle list ? */
+      bool m_primary{true};        /**< Is this a primary particle ? */
+      int m_trackID{0};            /**< The track ID from geant4 that created this particle. */
 
       friend class MCParticleGraph;
       friend class ParticleSorter;
@@ -308,5 +306,3 @@ namespace Belle2 {
   }
 
 } // end namespace Belle2
-
-#endif //MCPARTICLEGRAPH_H

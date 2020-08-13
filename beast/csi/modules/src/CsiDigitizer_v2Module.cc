@@ -11,30 +11,14 @@
 #include <beast/csi/modules/CsiDigitizer_v2Module.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
 
-#include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/core/RandomNumbers.h>
 
 //c++
-#include <cmath>
-#include <boost/foreach.hpp>
 #include <string>
-#include <sstream>
-#include <iostream>
 #include <fstream>
 #include <vector>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 using namespace std;
 using namespace Belle2;

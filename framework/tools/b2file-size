@@ -53,27 +53,32 @@ def get_argument_parser():
 
     create eventsize.pdf with a bar chart showing the kb/event required for each
     top level object in the file filename.root::
+
         %(prog)s filename.root
 
     in addition, create a chart for each top level object showing the disk space
     required per event by each member. Omit the EventMetaData object and all
     relations from the output::
+
         %(prog)s --show-member -s EventMetaData --skip-relations filename.root
 
     show the top level objects for three files and give them nice labels. In
     addition, create a chart which shows the reduction factor compared to the
     first file and save to 'compare.pdf'::
+
         %(prog)s -o compare.pdf --show-reduction file0.root "before update" \\
             -f file1.root "after update" -f file2.root "after second update"
 
     show gains by using file compression. Notice the + after the filename to
     indicate that uncompressed size should be shown. Put the legend always in the
     upper left corner::
+
         %(prog)s -o compare.pdf --legend='upper left' --show-reduction \\
             file.root+ "uncompressed" -f file.root "compressed"
 
     if you want the charts as one page per pdf file I recommend the program
     ``pdftk`` to split the pdf after creation::
+
         pdftk eventsize.pdf burst output eventsize-%%02d.pdf
     """)
     )

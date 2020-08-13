@@ -79,7 +79,7 @@ namespace Belle2 {
 
     Belle::Mdst_charged_Manager& ChgMgr = Belle::Mdst_charged_Manager::get_manager();
     for (std::vector<Belle::Mdst_charged>::iterator it = ChgMgr.begin();
-         it != ChgMgr.end(); it++) {
+         it != ChgMgr.end(); ++it) {
       Belle::Mdst_charged& Chg = *it;
       if (Chg) {
         // Get mdst_tof table for the track

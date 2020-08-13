@@ -15,7 +15,7 @@
 # Example steering file - 2012 the Belle II Collaboration
 ##############################################################################
 
-from basf2 import *
+from basf2 import set_log_level, LogLevel, register_module, create_path, process, statistics, set_random_seed, print_params
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)

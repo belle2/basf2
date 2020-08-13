@@ -65,7 +65,7 @@ double PlaneTriggerTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInform
 
   const double arcLengthAtPosition = h.getArcLength2DAtXY(position.X(), position.Y());
 
-  double arcLengthOfIntersection;
+  double arcLengthOfIntersection = NAN;
 
   TVector3 triggerPlanePosition(m_param_triggerPlanePosition[0], m_param_triggerPlanePosition[1], m_param_triggerPlanePosition[2]);
   TVector3 triggerPlaneNormalDirection(m_param_triggerPlaneNormalDirection[0], m_param_triggerPlaneNormalDirection[1],

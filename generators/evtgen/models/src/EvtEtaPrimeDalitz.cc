@@ -24,17 +24,13 @@
 //------------------------------------------------------------------------
 //
 #include <generators/evtgen/EvtGenModelRegister.h>
-#include "EvtGenBase/EvtPatches.hh"
-#include <stdlib.h>
 #include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
 #include "generators/evtgen/models/EvtEtaPrimeDalitz.h"
-#include "EvtGenBase/EvtReport.hh"
 #include <string>
 
 namespace Belle2 {
 
+  /** register the model in EvtGen */
   B2_EVTGEN_REGISTER_MODEL(EvtEtaPrimeDalitz);
 
 

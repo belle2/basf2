@@ -14,9 +14,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
-#include <tracking/trackFindingCDC/ca/Clusterizer.h>
-
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <tracking/trackFindingCDC/utilities/Functional.h>
@@ -25,8 +22,6 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
-
-#include <memory>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -227,7 +222,7 @@ void CDCMCTrackStore::fillMCSegments()
 
       auto segmentRanges = unique_ranges(superLayerRun.begin(), superLayerRun.end(), areNeighbors);
 
-      for (const ConstVectorRange<const CDCHit*> segmentRange : segmentRanges) {
+      for (const ConstVectorRange<const CDCHit*>& segmentRange : segmentRanges) {
         mcSegments.emplace_back(segmentRange.begin(), segmentRange.end());
       }
     } // end for superLayerRuns
@@ -281,7 +276,7 @@ void CDCMCTrackStore::arrangeMCTrack(CDCHitVector& mcTrack) const
 void CDCMCTrackStore::fillInTrackId()
 {
 
-  for (const std::pair<ITrackType, CDCHitVector>& mcTrackAndMCParticleIdx : getMCTracksByMCParticleIdx()) {
+  for (const std::pair<ITrackType, CDCHitVector> mcTrackAndMCParticleIdx : getMCTracksByMCParticleIdx()) {
 
     const CDCHitVector& mcTrack = mcTrackAndMCParticleIdx.second;
 
@@ -297,7 +292,7 @@ void CDCMCTrackStore::fillInTrackId()
 
 void CDCMCTrackStore::fillInTrackSegmentId()
 {
-  for (const std::pair<ITrackType, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
+  for (const std::pair<ITrackType, std::vector<CDCHitVector> > mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
 
     int iSegment = -1;
@@ -315,7 +310,7 @@ void CDCMCTrackStore::fillInTrackSegmentId()
 void CDCMCTrackStore::fillNLoopsAndNPassedSuperLayers()
 {
 
-  for (const std::pair<ITrackType, std::vector<CDCHitVector> >& mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
+  for (const std::pair<ITrackType, std::vector<CDCHitVector> > mcSegmentsAndMCParticleIdx : getMCSegmentsByMCParticleIdx()) {
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
 
     const CDCHitVector* ptrLastMCSegment = nullptr;

@@ -1,0 +1,33 @@
+[INFO] Steering file: framework/tests/root_output_split.py
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Persistent branches might not be stored as expected when splitting the output by size
+	branch = TestChunkData  { module: RootOutput }
+[INFO] RootOutput: Opened file for writing
+	filename = "test_noext.f00000.root"
+[WARNING] Number of MC Events cannot be saved when splitting output files by size, setting to 0  { module: RootOutput }
+[INFO] RootOutput: Finished writing file.
+	filename = test_noext.f00000.root
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Persistent branches might not be stored as expected when splitting the output by size
+	branch = TestChunkData  { module: RootOutput }
+[INFO] RootOutput: Opened file for writing
+	filename = "test_otherext.f00000.root"
+[WARNING] Number of MC Events cannot be saved when splitting output files by size, setting to 0  { module: RootOutput }
+[INFO] RootOutput: Finished writing file.
+	filename = test_otherext.f00000.root
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Persistent branches might not be stored as expected when splitting the output by size
+	branch = TestChunkData  { module: RootOutput }
+[INFO] RootOutput: Opened file for writing
+	filename = "test_param.f00000.root?foo=bar"
+[WARNING] Number of MC Events cannot be saved when splitting output files by size, setting to 0  { module: RootOutput }
+[INFO] RootOutput: Finished writing file.
+	filename = test_param.f00000.root
+[INFO] Starting event processing, random seed is set to 'something important'
+[WARNING] Persistent branches might not be stored as expected when splitting the output by size
+	branch = TestChunkData  { module: RootOutput }
+[INFO] RootOutput: Opened file for writing
+	filename = "test_anchor.f00000.root#foo"
+[WARNING] Number of MC Events cannot be saved when splitting output files by size, setting to 0  { module: RootOutput }
+[INFO] RootOutput: Finished writing file.
+	filename = test_anchor.f00000.root

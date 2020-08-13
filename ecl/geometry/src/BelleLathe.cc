@@ -7,13 +7,9 @@
 
 #include "G4VPVParameterisation.hh"
 
-#include "Randomize.hh"
-
 #include "G4VGraphicsScene.hh"
 
-#include "G4GenericPolycone.hh"
-
-#include <map>
+#include "CLHEP/Random/RandFlat.h"
 
 using namespace std;
 using namespace Belle2;
@@ -246,7 +242,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
   };
   fshape = getpolycone(GetName(), phi0, dphi, fcontour);
 #else
-  fshape = NULL;
+  fshape = nullptr;
 #endif
 //  StreamInfo(G4cout);
 }

@@ -9,20 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/gearbox/Const.h>
-
 #include <string>
 #include <TVector3.h>
 
 namespace Belle2 {
 
-  class Track;
   class RecoTrack;
-  class TrackFitResult;
-  class HitPatternVXD;
-  class HitPatternCDC;
 
-  /*** TrackBuilder class to create the Track/TrackFitResult mdst output from the RecoTrack.
+  /** TrackBuilder class to create the Track/TrackFitResult mdst output from the RecoTrack.
    *
    * To use this class, iterate over all Reco tracks and call trackBuilder.storeTrackFromRecoTrack.
    * All fitted hypotheses will be stored into one Track with the TrackFitResult array indices stored in the Track.

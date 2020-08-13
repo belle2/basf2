@@ -11,14 +11,6 @@
 #pragma once
 
 #include "TH1F.h"
-#include "TVectorT.h"
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <vector>
-#include <set>
-#include <memory>
-#include <algorithm>
-#include <numeric>
 
 namespace Belle2 {
 
@@ -55,7 +47,7 @@ namespace Belle2 {
       * @param ratio Ratio of acquired events to reference events.
       * @param hist Histogram of sources.
       * @param refhist Reference histogram.
-      * @param flag Histogram of flags.
+      * @param flaghist Histogram of flags.
       * @return Indication of succes of realizing of condition, 1: OK.
       */
     static int SetFlag(int Type, int bin, const double* pars, double ratio, TH1F* hist, TH1F* refhist, TH1I* flaghist);
@@ -81,7 +73,7 @@ namespace Belle2 {
       * @param ratio Ratio of acquired events to reference events.
       * @param hist Histogram of sources.
       * @param refhist Reference histogram.
-      * @param flag Histogram of flags.
+      * @param flaghist Histogram of flags.
       * @return Indication of succes of realizing of condition, 1: OK.
       */
     static int SetFlag(int Type, int bin, const double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
@@ -97,12 +89,12 @@ namespace Belle2 {
 
     /** Function for filling of group of TH1F histogram to database.
       * @param HistoBD Histogram for DB.
-      * @param Number Number of histograms to glue to one.
+      * @param number Number of histograms to glue to one.
       */
     static void CreateDBHistoGroup(TH1F** HistoBD, int number);
     /** Function for filling of group of TH1I histogram to database.
       * @param HistoBD Histogram for DB.
-      * @param Number Number of histograms to glue to one.
+      * @param number Number of histograms to glue to one.
       */
     static void CreateDBHistoGroup(TH1I** HistoBD, int number);
 
@@ -119,13 +111,13 @@ namespace Belle2 {
 
     /** Function for loading of group of TH1F histogram from database.
       * @param HistoBD Histogram for DB.
-      * @param Number Number of histograms to extract from DB.
+      * @param number Number of histograms to extract from DB.
       * @return Indication of succes of realizing of condition, 1: OK.
       */
     static int LoadDBHistoGroup(TH1F** HistoBD, int number);
     /** Function for loading of group of TH1I histogram from database.
       * @param HistoBD Histogram for DB.
-      * @param Number Number of histograms to extract from DB.
+      * @param number Number of histograms to extract from DB.
       * @return Indication of succes of realizing of condition, 1: OK.
       */
     static int LoadDBHistoGroup(TH1I** HistoBD, int number);

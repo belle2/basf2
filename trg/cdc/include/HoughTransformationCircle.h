@@ -28,31 +28,29 @@ namespace Belle2 {
 
   public:
     /// Contructor.
-    TRGCDCHoughTransformationCircle(const std::string& name);
+    explicit TRGCDCHoughTransformationCircle(const std::string& name);
 
     /// Destructor
     virtual ~TRGCDCHoughTransformationCircle();
 
   public:// Selectors
     /// returns Y coordinate in a Hough parameter plane.
-    virtual float y(float xReal, float yReal, float x) const;
+    virtual float y(float xReal, float yReal, float x) const override;
 
     /// returns true if Y diverges in given region.
-    virtual bool diverge(float xReal, float yReal, float x0, float x1) const;
+    virtual bool diverge(float xReal, float yReal, float x0, float x1) const override;
 
     /// returns true if Y diverges in given region.
-    virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1)
-    const;
+    virtual bool positiveDiverge(float xReal, float yReal, float x0, float x1) const override;
 
     /// returns true if Y diverges in given region.
-    virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1)
-    const;
+    virtual bool negativeDiverge(float xReal, float yReal, float x0, float x1) const override;
 
     /// returns Point2D(phi, r) of a circle in real plane.
     virtual TRGPoint2D circleCenter(const TRGPoint2D&) const;
 
     /// converts Point2D(phi, r) in real plane into Point2D(phi, r) in Hough plane.
-    virtual TRGPoint2D convert(const TRGPoint2D&) const;
+    virtual TRGPoint2D convert(const TRGPoint2D&) const override;
   };
 
 } // namespace Belle2

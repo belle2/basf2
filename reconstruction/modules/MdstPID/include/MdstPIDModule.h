@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MDSTPIDMODULE
-#define MDSTPIDMODULE
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -22,19 +21,9 @@
 #include <reconstruction/dataobjects/CDCDedxLikelihood.h>
 #include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <tracking/dataobjects/Muid.h>
-
-#include <string>
+#include <klm/dataobjects/KLMMuidLikelihood.h>
 
 namespace Belle2 {
-
-  class PIDLikelihood;
-  class TOPLikelihood;
-  class ARICHLikelihood;
-  class CDCDedxLikelihood;
-  class VXDDedxLikelihood;
-  class ECLPidLikelihood;
-  class Muid;
 
   /**
    * a module to fill PIDLikelihoods
@@ -58,28 +47,28 @@ namespace Belle2 {
      * Initialize the module.
      * data store registration of PIDLikelihoods and relations to Tracks
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when a new run is started.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Called for each event.
      * loop over Tracks, collect likelihoods and fill PIDLikelihoods
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * Called when run ended.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Terminates the module.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -93,7 +82,7 @@ namespace Belle2 {
     StoreArray<CDCDedxLikelihood> m_cdcDedxLikelihoods; /**< Optional array for CDCDedxLikelihoods */
     StoreArray<VXDDedxLikelihood> m_vxdDedxLikelihoods; /**< Optional array for VXDDedxLikelihoods */
     StoreArray<ECLPidLikelihood> m_eclLikelihoods; /**< Optional array for ECLPidLikelihoods */
-    StoreArray<Muid> m_muid; /**< Optional array for Muid */
+    StoreArray<KLMMuidLikelihood> m_muid; /**< Optional array for KLMMuidLikelihood */
 
     /**
      * Set TOP log likelihoods and corresponding reconstruction flag
@@ -127,17 +116,15 @@ namespace Belle2 {
 
     /**
      * Set KLM log likelihoods and corresponding reconstruction flag
-     * @param muid Muid pointer
+     * @param muid KLMMuidLikelihood pointer
      */
-    void setLikelihoods(const Muid* muid);
+    void setLikelihoods(const KLMMuidLikelihood* muid);
 
     PIDLikelihood* m_pid; /**< pointer to the object to be filled */
 
   };
 
 } // Belle2 namespace
-
-#endif
 
 
 

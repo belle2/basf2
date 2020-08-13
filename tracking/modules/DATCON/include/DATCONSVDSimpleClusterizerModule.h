@@ -17,13 +17,9 @@
 
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <svd/geometry/SensorInfo.h>
 
 #include <tracking/modules/DATCON/DATCONSVDSimpleClusterCandidate.h>
 #include <tracking/dataobjects/DATCONSVDDigit.h>
-
-#include <vxd/dataobjects/VxdID.h>
-#include <vxd/geometry/GeoCache.h>
 
 namespace Belle2 {
 

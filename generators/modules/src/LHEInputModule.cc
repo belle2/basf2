@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2015  Belle II Collaboration                         *
+ * Copyright(C) 2015  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber      Yefan Tao                             *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -14,10 +14,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
 
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
+#include <TF1.h>
 
 using namespace std;
 using namespace Belle2;
@@ -31,7 +29,11 @@ REG_MODULE(LHEInput)
 //                 Implementation
 //-----------------------------------------------------------------
 
-LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
+LHEInputModule::LHEInputModule() : Module(),
+  m_nInitial(0),
+  m_nVirtual(0),
+  m_evtNum(-1),
+  m_initial(0)
 {
   //Set module properties
   setDescription("LHE file input. This module loads an event record from LHE format and store the content into the MCParticle collection. LHE format is a standard event record format to contain an event record in a Monte Carlo-independent format.");
@@ -40,26 +42,33 @@ LHEInputModule::LHEInputModule() : Module(), m_evtNum(-1) , m_initial(0)
   //Parameter definition
   addParam("inputFileList", m_inputFileNames, "List of names of LHE files");
   addParam("makeMaster", m_makeMaster, "Boolean to indicate whether the event numbers from input file should be used.", false);
-  addParam("runNum", m_runNum, "run number (should be set if makeMaster=true)", 0);
-  addParam("expNum", m_expNum, "ExpNum (should be set if makeMaster=true)", 0);
+  addParam("runNum", m_runNum, "Run number (should be set if makeMaster=true)", 0);
+  addParam("expNum", m_expNum, "Experiment number (should be set if makeMaster=true)", 0);
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated (not implemented yet).", false);
-  addParam("nInitialParticles", m_nInitial, "Number of particles at the beginning of the events that should be made initial.", 0);
-  addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
+  addParam("nInitialParticles", m_nInitial, "Number of MCParticles at the beginning of the events that should be flagged c_Initial.",
+           0);
+  addParam("nVirtualParticles", m_nVirtual,
+           "Number of MCParticles at the beginning of the events that should be flagged c_IsVirtual.", 0);
   addParam("boost2Lab", m_boost2Lab, "Boolean to indicate whether the particles should be boosted from CM frame to lab frame", false);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", true);
+  addParam("meanDecayLength", m_meanDecayLength,
+           "Mean decay length(mean lifetime * c) between displaced vertex to IP, default to be zero, unit in cm", 0.);
+  addParam("Rmin", m_Rmin, "Minimum of distance between displaced vertex to IP", 0.);
+  addParam("Rmax", m_Rmax, "Maximum of distance between displaced vertex to IP", 1000000.);
+  addParam("pdg_displaced", m_pdg_displaced, "PDG code of the displaced particle being studied", 9000008);
 }
 
 
 void LHEInputModule::initialize()
 {
-  //Beam Parameters, initial particl
+  //Beam Parameters, initial particles
   m_initial.initialize();
 
   m_iFile = 0;
   if (m_inputFileNames.size() == 0) {
     //something is wrong with the file list.
-    B2FATAL("invalid list of input files. No entries found.");
+    B2FATAL("Invalid list of input files. No entries found.");
   } else {
     //let's start with the first file:
     m_inputFileName = m_inputFileNames[m_iFile];
@@ -71,8 +80,8 @@ void LHEInputModule::initialize()
   } catch (runtime_error& e) {
     B2FATAL(e.what());
   }
-  m_lhe.m_nVirtual    = m_nVirtual;
-  m_lhe.m_nInitial    = m_nInitial;
+  m_lhe.setInitialIndex(m_nInitial);
+  m_lhe.setVirtualIndex(m_nInitial + m_nVirtual);
   m_lhe.m_wrongSignPz = m_wrongSignPz;
 
   //boost
@@ -80,6 +89,20 @@ void LHEInputModule::initialize()
     MCInitialParticles& initial = m_initial.generate();
     TLorentzRotation boost = initial.getCMSToLab();
     m_lhe.m_labboost = boost;
+  }
+
+  //pass displaced vertex to LHEReader
+  m_lhe.m_meanDecayLength = m_meanDecayLength;
+  m_lhe.m_Rmin = m_Rmin;
+  m_lhe.m_Rmax = m_Rmax;
+  m_lhe.m_pdgDisplaced = m_pdg_displaced;
+  //print out warning information if default R range is change
+  if (m_Rmin != 0 || m_Rmax != 1000000) {
+    TF1 fr("fr", "exp(-x/[0])", 0, 1000000);
+    double factor;
+    factor = fr.Integral(m_Rmin, m_Rmax) / fr.Integral(0, 1000000);
+    B2WARNING("Default range of R is changed, new range is from " << m_Rmin << "cm to " << m_Rmax <<
+              " cm. This will change the cross section by a factor of " << factor);
   }
 
   //are we the master module? And do we have all infos?
@@ -125,7 +148,7 @@ void LHEInputModule::event()
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
     mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-  } catch (LHEReader::LHEEmptyEventError) {
+  } catch (LHEReader::LHEEmptyEventError&) {
     B2DEBUG(100, "Reached end of LHE file.");
     m_lhe.closeCurrentInputFile();
     m_iFile++;

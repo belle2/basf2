@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <cmath>
-#include <cstdio>
 #include <vector>
 #include <math.h>
 #include <iomanip>
@@ -15,8 +13,20 @@ using namespace Belle2;
 #define NAME          "HoughMapping"
 #define VERSION       "version 0.01"
 
-struct XY {double x; double y;};
-struct Plane {unsigned x; unsigned y;};
+/// Point
+struct XY {
+  /// x of the point
+  double x;
+  /// y of the point
+  double y;
+};
+/// Plane
+struct Plane {
+  /// x of the plane
+  unsigned x;
+  /// y of the point
+  unsigned y;
+};
 
 void printHeader(ofstream& out, const string& function);
 void superLayer(const unsigned id);

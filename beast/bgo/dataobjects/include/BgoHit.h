@@ -14,9 +14,7 @@
 #include <simulation/dataobjects/SimHitBase.h>
 
 // ROOT
-#include <TObject.h>
 #include <TVector3.h>
-#include <vector>
 
 namespace Belle2 {
 
@@ -43,17 +41,9 @@ namespace Belle2 {
       TVector3 Momentum,     /**< Momentum */
       TVector3 Position,     /**< Position */
       float Erecdep          /**< Deposit energy digitized */
-    ): SimHitBase()
+    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep), m_Momentum(Momentum),
+      m_Position(Position), m_Erecdep(Erecdep)
     {
-      m_CellId = CellId;
-      m_TrackId = TrackId;
-      m_Pdg = Pdg;
-      m_FlightTime = FlightTime;
-      m_Edep = Edep;
-      m_Momentum = Momentum;
-      m_Position = Position;
-      m_Erecdep = Erecdep;
-
     }
 
 
@@ -141,7 +131,7 @@ namespace Belle2 {
     /** Shift the Hit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) {  m_FlightTime += delta; }
+    void shiftInTime(float delta) override {  m_FlightTime += delta; }
 
 
   private:
@@ -154,7 +144,7 @@ namespace Belle2 {
     TVector3 m_Position;     /**< Position */
     float m_Erecdep;         /**< Deposit energy reconstructed*/
 
-    ClassDef(BgoHit, 1)
+    ClassDefOverride(BgoHit, 1)
   };
 
 } // end namespace Belle2

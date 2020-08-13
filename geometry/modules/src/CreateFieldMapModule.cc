@@ -10,7 +10,6 @@
 
 #include <geometry/modules/CreateFieldMapModule.h>
 #include <framework/geometry/BFieldManager.h>
-#include <boost/algorithm/string.hpp>
 #include <framework/utilities/Utils.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/geometry/B2Vector3.h>
@@ -18,6 +17,9 @@
 #include <TFile.h>
 #include <TH2D.h>
 #include <TTree.h>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 using namespace Belle2;
 

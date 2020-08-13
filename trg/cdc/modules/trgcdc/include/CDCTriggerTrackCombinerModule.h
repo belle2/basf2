@@ -22,10 +22,10 @@ namespace Belle2 {
     virtual ~CDCTriggerTrackCombinerModule() {}
 
     /** Initialize the module and register DataStore arrays. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Combine tracks. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** name of the 2D finder track list */

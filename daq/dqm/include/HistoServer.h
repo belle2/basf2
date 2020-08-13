@@ -10,11 +10,8 @@
 
 #include <string>
 
-#include <daq/dataflow/SocketLib.h>
 #include <daq/dataflow/EvtSocket.h>
 #include <daq/dataflow/EvtSocketManager.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 
 #include <daq/dqm/DqmMemFile.h>
 

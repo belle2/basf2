@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
 
 #include <framework/datastore/StoreArray.h>
@@ -24,8 +25,6 @@
 #include <tuple>
 
 #include <unordered_map> // needed for typedef of defaultMap
-
-#include <numeric> // std::accumulate
 
 // root output
 #include <TFile.h>
@@ -48,7 +47,7 @@ namespace Belle2 {
     TrueHitInfo() : m_Id(-1), m_wU(0.), m_wV(0.), m_U(false), m_V(false) { }
 
     /** ctor using Id-only */
-    TrueHitInfo(int Id) : m_Id(Id), m_wU(0.), m_wV(0.), m_U(false), m_V(false) { }
+    explicit TrueHitInfo(int Id) : m_Id(Id), m_wU(0.), m_wV(0.), m_U(false), m_V(false) { }
 
     // /** ctor with full information */
     // TrueHitInfo(int Id, double wU, double wV, bool U, bool V) :
@@ -266,7 +265,7 @@ namespace Belle2 {
     /** Number of SpacePoints that contained a Cluster to which no TrueHit could be found (i.e. counts how many times the NoTrueHitToCluster exception gets thrown) */
     std::vector<unsigned int> m_noTrueHitCtr;
 
-    /** Number of SpacePoints that were not related to a TrueHit (i.e. getTHwithWeight returned NULL) */
+    /** Number of SpacePoints that were not related to a TrueHit (i.e. getTHwithWeight returned nullptr) */
     std::vector<unsigned int> m_rejectedRelsCtr;
 
     unsigned int m_weightTooSmallCtr; /**< Count the omitted relations because of a too small weight */
@@ -307,7 +306,7 @@ namespace Belle2 {
      * + if there are more than one TrueHits with two weights associated, return the one with the biggest sum of weights (.second = 2)
      * + if there are only TrueHits with one weight associated, return the one with the biggest weight ONLY if the SpacePoint is related to only one Cluster (e.g. PXD). .second is either 1 (PXD), 11 or 21 (U-/V-cluster SP)
      * NOTE: as this method is rather specific, it is not very much templated!
-     * NOTE: the possible return of a NULL pointer has to be handled!
+     * NOTE: the possible return of a nullptr pointer has to be handled!
      */
     template <typename MapType, typename TrueHitType>
     std::pair<TrueHitType*, double> getTHwithWeight(const MapType& aMap, Belle2::StoreArray<TrueHitType> trueHits,
@@ -425,8 +424,10 @@ namespace Belle2 {
   class simpleBitfield {
 
   public:
-    simpleBitfield() { __bits = T(); } /**< default constructor */
-    simpleBitfield(const simpleBitfield<T>& __otherBitfield) { __bits = __otherBitfield.__bits; } /**< constructor from other bitfield */
+    simpleBitfield() : __bits()  { } /**< default constructor */
+
+    simpleBitfield(const simpleBitfield<T>& __otherBitfield) = delete; /**< not needed */
+    simpleBitfield<T>& operator = (simpleBitfield<T>&) = delete; /**< not needed */
 
     /** check if a certain status has been set to the bitfield */
     const T hasStatus(T __statusBits) const { return (__bits & __statusBits) == __statusBits; }

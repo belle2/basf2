@@ -66,6 +66,9 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments
         for (const CDCRecoHit2D& recoHit2D : segment) {
           if (recoHit2D.getWireHit()->hasMaskedFlag()) ++nMasked;
         }
+        // code above could be replaced by the following line, but needs to be tested
+        //nMasked = std::count_if( segment.begin(), segment.end(), [](const CDCRecoHit2D& recoHit2D)->bool{ return recoHit2D.getWireHit()->hasMaskedFlag(); });
+
         // Relaxed requirement of only 20% of hits masked by other tracks
         if (nMasked > segment.size() * 0.2) continue;
       }

@@ -15,6 +15,7 @@
 
 namespace Belle2 {
 
+  /** contains the parameter of the APV pulse*/
   struct SVDStripCalAmp {
 
     /** gain is expressed in ADC counts / # electrons injected in the channel
@@ -31,7 +32,7 @@ namespace Belle2 {
      */
     float pulseWidth;
 
-    ClassDef(SVDStripCalAmp, 1);
+    ClassDef(SVDStripCalAmp, 1); /**< needed by root*/
 
   };
 

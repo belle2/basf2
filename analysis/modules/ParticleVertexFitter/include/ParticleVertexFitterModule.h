@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEVERTEXFITTERMODULE_H
-#define PARTICLEVERTEXFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -19,16 +18,17 @@
 #include <framework/database/DBObjPtr.h>
 
 // DataObjects
-#include <framework/dbobjects/BeamParameters.h>
+#include <mdst/dbobjects/BeamSpot.h>
 
-// kfitter
-#include <analysis/KFit/MassFitKFit.h>
-#include <analysis/KFit/FourCFitKFit.h>
-#include <analysis/KFit/MassVertexFitKFit.h>
-#include <analysis/KFit/VertexFitKFit.h>
-#include <analysis/KFit/MakeMotherKFit.h>
+// KFit
+#include <analysis/VertexFitting/KFit/MassFitKFit.h>
+#include <analysis/VertexFitting/KFit/FourCFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassPointingVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MassVertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+#include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 
-// rave
+// Rave
 #include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 #include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
@@ -77,148 +77,127 @@ namespace Belle2 {
     std::string m_decayString;    /**< daughter particles selection */
     bool m_updateDaughters;       /**< flag for daughters update */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of decays to look for. */
+    bool m_hasCovMatrix = false;      /**< flag for mother covariance matrix (PseudoFitter)*/
     TVector3 m_BeamSpotCenter;    /**< Beam spot position */
     TMatrixDSym m_beamSpotCov;    /**< Beam spot covariance matrix */
-    DBObjPtr<BeamParameters> m_beamParams;/**< Beam parameters */
+    DBObjPtr<BeamSpot> m_beamSpotDB;/**< Beam spot database object */
+    double m_smearing;            /**< smearing width applied to IP tube */
 
     /**
      * Main steering routine
      * @param p pointer to particle
-     * @return true for successfull fit and prob(chi^2,ndf) > m_confidenceLevel
+     * @return true for successful fit and prob(chi^2,ndf) > m_confidenceLevel
      */
     bool doVertexFit(Particle* p);
 
     /**
-     * Unconstrained vertex fit using Kfitter
+     * Unconstrained vertex fit using KFit
      * @param p pointer to particle
-     * @return true for successfull fit
+     * @return true for successful fit
      */
     bool doKVertexFit(Particle* p, bool ipProfileConstraint, bool ipTubeConstraint);
 
     /**
-     * Mass-constrained vertex fit using Kfitter
+     * Mass-constrained vertex fit using KFit
      * @param p pointer to particle
-     * @return true for successfull fit
+     * @return true for successful fit
      */
     bool doKMassVertexFit(Particle* p);
 
     /**
-     * Mass fit using Kfitter
+     * Mass-constrained vertex fit with additional pointing constraint using KFit
      * @param p pointer to particle
-     * @return true for successfull fit
+     * @return true for successful fit
+     */
+    bool doKMassPointingVertexFit(Particle* p);
+
+    /**
+     * Mass fit using KFit
+     * @param p pointer to particle
+     * @return true for successful fit
      */
     bool doKMassFit(Particle* p);
 
     /**
-     * FourC fit using Kfitter
+     * FourC fit using KFit
      * @param p pointer to particle
-     * @return true for successfull fit
+     * @return true for successful fit
      */
     bool doKFourCFit(Particle* p);
 
     /**
-     * Update mother particle after unconstrained vertex fit using Kfitter
-     * @param kv reference to Kfitter VertexFit object
+     * Update mother particle after unconstrained vertex fit using KFit
+     * @param kv reference to KFit VertexFit object
      * @param p pointer to particle
-     * @return true for successfull construction of mother
+     * @return true for successful construction of mother
      */
     bool makeKVertexMother(analysis::VertexFitKFit& kv, Particle* p);
 
-
     /**
-     * Update mother particle after mass-constrained vertex fit using Kfitter
-     * @param kv reference to Kfitter MassVertexFit object
+     * Update mother particle after mass-constrained vertex fit using KFit
+     * @param kv reference to KFit MassVertexFit object
      * @param p pointer to particle
-     * @return true for successfull construction of mother
+     * @return true for successful construction of mother
      */
     bool makeKMassVertexMother(analysis::MassVertexFitKFit& kv, Particle* p);
 
+    /**
+     * Update mother particle after mass-constrained vertex fit with additional pointing constraint using KFit
+     * @param kv reference to KFit MassPointingVertexFit object
+     * @param p pointer to particle
+     * @return true for successful construction of mother
+     */
+    bool makeKMassPointingVertexMother(analysis::MassPointingVertexFitKFit& kv, Particle* p);
 
     /**
-     * Update mother particle after mass fit using Kfitter
-     * @param kv reference to Kfitter MassFit object
+     * Update mother particle after mass fit using KFit
+     * @param kv reference to KFit MassFit object
      * @param p pointer to particle
-     * @return true for successfull construction of mother
+     * @return true for successful construction of mother
      */
     bool makeKMassMother(analysis::MassFitKFit& kv, Particle* p);
 
     /**
-     * Update mother particle after FourC fit using Kfitter
-     * @param kv reference to Kfitter MassFit object
+     * Update mother particle after FourC fit using KFit
+     * @param kv reference to KFit MassFit object
      * @param p pointer to particle
-     * @return true for successfull construction of mother
+     * @return true for successful construction of mother
      */
     bool makeKFourCMother(analysis::FourCFitKFit& kv, Particle* p);
 
     /**
-    * update the map of daughter and tracks, find out wich tracks belong to each daugther.
-    * @param ui store the tracks ID of each daughter
-    * @param l represent the tracks ID
-    * @param p pointer to particle
+     * update the map of daughter and tracks, find out which tracks belong to each daughter.
+     * @param l represent the tracks ID
+     * @param pars map of all parameters
+     * @param pard vector of parameters
+     * @param allparticles vector of all particles
+     * @param daughter pointer to particle
      */
-    void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
-
-    /**
-     * Adds given particle to the VertexFitKFit.
-     * @param kv reference to Kfitter VertexFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::VertexFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the MassVertexFitKFit.
-     * @param kv reference to Kfitter MassVertexFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::MassVertexFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the MassFitKFit.
-     * @param kv reference to Kfitter MassFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::MassFitKFit& kv, const Particle* particle);
-
-    /**
-     * Adds given particle to the FourCFitKFit.
-     * @param kv reference to Kfitter FourCFit object
-     * @param particle pointer to particle
-     */
-    void addParticleToKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
+    void updateMapOfTrackAndDaughter(unsigned& l, std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+                                     std::vector<Particle*>&  allparticles, const Particle* daughter);
 
     /**
      * Adds given particle's child to the FourCFitKFit.
-     * @param kv reference to Kfitter FourCFit object
+     * @param kv reference to KFit FourCFit object
      * @param particle pointer to particle
      */
-    bool addChildofParticletoKfitter(analysis::FourCFitKFit& kv, const Particle* particle);
-
-
-    /**
-     * Returns particle's 4-momentum as a HepLorentzVector
-     */
-    CLHEP::HepLorentzVector getCLHEPLorentzVector(const Particle* particle);
+    bool addChildofParticletoKFit(analysis::FourCFitKFit& kv, const Particle* particle);
 
     /**
-     * Returns particle's position as a HepPoint3D
+     * Adds IPProfile constraint to the vertex fit using KFit.
      */
-    HepPoint3D getCLHEPPoint3D(const Particle* particle);
+    void addIPProfileToKFit(analysis::VertexFitKFit& kv);
 
     /**
-     * Returns particle's 7x7 momentum-vertex-error matrix as a HepSymMatrix
+     * Adds IPTube constraint to the vertex fit using KFit.
      */
-    CLHEP::HepSymMatrix getCLHEPSymMatrix(const Particle* particle);
-
-    /**
-     * Adds IPProfile constraint to the vertex fit using kfitter.
-     */
-    void addIPProfileToKFitter(analysis::VertexFitKFit& kv);
+    void addIPTubeToKFit(analysis::VertexFitKFit& kv);
 
     /**
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
      * Pi0 particles are treated separately so they are filled to another vector.
      */
-    bool fillFitParticles(const Particle* mother, std::vector<unsigned>& fitChildren, std::vector<unsigned>& pi0Children);
+    bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren, std::vector<const Particle*>& pi0Children);
 
     /**
      * Performs mass refit of pi0 assuming that pi0 originates from the point given by VertexFit.
@@ -227,18 +206,20 @@ namespace Belle2 {
 
     /**
      * Fit using Rave
-     * @param p pointer to particle
-     * @return true for successfull fit and update of mother
+     * @param mother pointer to particle
+     * @return true for successful fit and update of mother
      */
     bool doRaveFit(Particle* mother);
 
-    /**  check if all the Daughters (o grand-daugthers) are selected for the vertex fit*/
-    bool allSelectedDaughters(const Particle* mother, std::vector<const Particle*> tracksVertex);
+    /**  check if all the Daughters (o grand-daughters) are selected for the vertex fit*/
+    bool allSelectedDaughters(const Particle* mother, const std::vector<const Particle*>& tracksVertex);
 
-    /**  calculate iptube constraint (quasi cilinder along boost direction) for RAVE fit*/
+    /**  calculate iptube constraint (quasi cylinder along boost direction) for RAVE fit*/
     void findConstraintBoost(double cut);
+
+    /** smear beam spot covariance */
+    void smearBeamSpot(double width);
   };
 
 } // Belle2 namespace
 
-#endif

@@ -1,0 +1,11 @@
+Import('env')
+
+env['LIBS'] = ['framework',
+               'trg_trg',
+               'mdst_dataobjects',
+               'cdc_dataobjects',
+               'cdc',
+               'trg_cdc',
+               'trg_cdc_dataobjects', '$ROOT_LIBS']
+env['SUBLIB'] = True
+Return('env')

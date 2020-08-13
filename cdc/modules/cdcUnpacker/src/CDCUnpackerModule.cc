@@ -10,30 +10,17 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcUnpacker/CDCUnpackerModule.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRawHit.h>
-#include <cdc/dataobjects/CDCRawHitWaveForm.h>
 // DB objects
 #include <cdc/dbobjects/CDCChannelMap.h>
 
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 // framework - Database
-#include <framework/database/Database.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/DBImportArray.h>
 
-
-#include <sstream>
 #include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <cstring>
 
 using namespace std;
 using namespace Belle2;
@@ -92,20 +79,14 @@ void CDCUnpackerModule::initialize()
     B2INFO("CDCUnpacker: initialize() Called.");
   }
 
-
   m_rawCDCs.isRequired(m_rawCDCName);
-  StoreArray<CDCRawHitWaveForm> storeCDCRawHitWFs(m_cdcRawHitWaveFormName);
-  storeCDCRawHitWFs.registerInDataStore();
-
-  StoreArray<CDCRawHit> storeCDCRawHits(m_cdcRawHitName);
-  storeCDCRawHits.registerInDataStore();
-
-  StoreArray<CDCHit> storeDigit(m_cdcHitName);
-  storeDigit.registerInDataStore();
+  m_CDCRawHitWaveForms.registerInDataStore(m_cdcRawHitWaveFormName);
+  m_CDCRawHits.registerInDataStore(m_cdcRawHitName);
+  m_CDCHits.registerInDataStore(m_cdcHitName);
 
   // Relation.
-  storeDigit.registerRelationTo(storeCDCRawHitWFs);
-  storeDigit.registerRelationTo(storeCDCRawHits);
+  m_CDCHits.registerRelationTo(m_CDCRawHitWaveForms);
+  m_CDCHits.registerRelationTo(m_CDCRawHits);
 
   // Set default names for the relations.
   m_relCDCRawHitToCDCHitName = DataStore::relationName(
@@ -142,18 +123,14 @@ void CDCUnpackerModule::event()
   int tdcCountTrig = m_tdcOffset;
 
   // Create Data objects.
+  m_CDCHits.clear();
 
-  StoreArray<CDCRawHitWaveForm> cdcRawHitWFs(m_cdcRawHitWaveFormName);
-  StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
-  StoreArray<CDCHit> cdcHits(m_cdcHitName);
-  cdcHits.clear();
-
-  RelationArray rawCDCsToCDCHits(cdcRawHits, cdcHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
-  RelationArray rawCDCWFsToCDCHits(cdcRawHitWFs, cdcHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
+  RelationArray rawCDCsToCDCHits(m_CDCRawHits, m_CDCHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
+  RelationArray rawCDCWFsToCDCHits(m_CDCRawHitWaveForms, m_CDCHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
 
   if (m_enableStoreCDCRawHit == true) {
-    cdcRawHits.clear();
-    cdcRawHitWFs.clear();
+    m_CDCRawHits.clear();
+    m_CDCRawHitWaveForms.clear();
   }
 
   //
@@ -200,7 +177,6 @@ void CDCUnpackerModule::event()
         }
 
         const int c_headearWords = 3;
-
         if (nWord < c_headearWords) {
           if (m_enablePrintOut == true) {
             B2WARNING("CDCUnpacker : No CDC block header.");
@@ -221,9 +197,10 @@ void CDCUnpackerModule::event()
 
 
         if (dataLength != (nWord - c_headearWords)) {
-          B2ERROR("Inconsistent data size between COPPER and CDC FEE.");
-          B2ERROR("data length " << dataLength << " nWord " << nWord);
-          B2ERROR("CDCUnpacker : Node ID " << iNode << ", Finness ID " << iFiness);
+          B2ERROR("Inconsistent data size between COPPER and CDC FEE."
+                  << LogVar("data length", dataLength) << LogVar("nWord", nWord)
+                  << LogVar("Node ID", iNode) << LogVar("Finness ID", iFiness));
+
           continue;
         }
         if (m_enablePrintOut == true) {
@@ -294,7 +271,7 @@ void CDCUnpackerModule::event()
               if (m_enableStoreCDCRawHit == true) {
                 // Store to the CDCRawHitWaveForm object.
                 const unsigned short status = 0;
-                cdcRawHitWFs.appendNew(status, trgNumber, iNode, iFiness, board, iCh, iSample, trgTime, fadc, tdc);
+                m_CDCRawHitWaveForms.appendNew(status, trgNumber, iNode, iFiness, board, iCh, iSample, trgTime, fadc, tdc);
               }
 
             }
@@ -308,11 +285,17 @@ void CDCUnpackerModule::event()
               } else {
                 tdc1 = trgTime - tdc1;
               }
-              CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
+              CDCHit* firstHit = m_CDCHits.appendNew(tdc1, fadcSum, wireId);
               if (m_enable2ndHit == true) {
-                CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                CDCHit* secondHit = m_CDCHits.appendNew(tdc2, fadcSum, wireId);
                 secondHit->setOtherHitIndices(firstHit);
                 secondHit->set2ndHitFlag();
+              }
+              if (m_enableStoreCDCRawHit == true) {
+                for (int iSample = 0; iSample < nSamples; ++iSample) {
+                  m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(m_CDCRawHitWaveForms[m_CDCRawHitWaveForms.getEntries() - 1 + iSample -
+                                                                       (nSamples - 1) ]);
+                }
               }
             }
 
@@ -365,8 +348,8 @@ void CDCUnpackerModule::event()
 
             if (!((length == 4) || (length == 5))) {
               B2ERROR("CDCUnpacker : data length should be 4 or 5 words.");
-              B2ERROR("CDCUnpacker : length " << length << " words.");
-              B2ERROR("board= " << board << " ch= " << ch);
+              B2ERROR("CDCUnpacker : length " << LogVar("data length", length) << " words.");
+              B2ERROR("board= " << LogVar("board id", board) << " ch= " << LogVar("channel", ch));
               it += length;
               break;
             }
@@ -409,10 +392,12 @@ void CDCUnpackerModule::event()
                 if (board == m_boardIDTrig && ch == m_channelTrig) {
                   tdcCountTrig = tdc1;
                 } else {
-                  CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
+                  CDCHit* firstHit = m_CDCHits.appendNew(tdc1, fadcSum, wireId,
+                                                         0, tot);
                   if (length == 5) {
                     if (m_enable2ndHit == true) {
-                      CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                      CDCHit* secondHit = m_CDCHits.appendNew(tdc2, fadcSum, wireId,
+                                                              0, tot);
                       secondHit->setOtherHitIndices(firstHit);
                       secondHit->set2ndHitFlag();
                     }
@@ -421,23 +406,23 @@ void CDCUnpackerModule::event()
 
                 if (m_enableStoreCDCRawHit == true) {
                   // Store to the CDCRawHit object.
-                  CDCRawHit* rawHit = cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
-                                                           trgTime, fadcSum, tdc1, tdc2, tot);
-                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(rawHit);
+                  CDCRawHit* rawHit = m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                                             trgTime, fadcSum, tdc1, tdc2, tot);
+                  m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(rawHit);
                   if (m_enable2ndHit == true) {
-                    cdcHits[cdcHits.getEntries() - 2]->addRelationTo(rawHit);
+                    m_CDCHits[m_CDCHits.getEntries() - 2]->addRelationTo(rawHit);
                   }
                 }
 
               } else {
-                B2WARNING("Undefined board id is fired: " << board << " " << ch);
+                B2WARNING("Undefined board id is fired: " << LogVar("board id", board) << " " << LogVar("channel", ch));
               }
             }
             it += static_cast<int>(length);
           }
 
         } else {
-          B2WARNING("CDCUnpacker :  Undefined CDC Data Block : Block #  " << i);
+          B2WARNING("CDCUnpacker :  Undefined CDC Data Block : Block #  " << LogVar("block id", i));
         }
       }
     }
@@ -447,7 +432,7 @@ void CDCUnpackerModule::event()
   // t0 correction w.r.t. the timing of the trigger counter.
   //
   if (m_subtractTrigTiming == true) {
-    for (auto& hit : cdcHits) {
+    for (auto& hit : m_CDCHits) {
       int tdc = hit.getTDCCount();
       if (hit.is2ndHit()) {
         if (tdc != 0) {
@@ -495,7 +480,7 @@ void CDCUnpackerModule::loadMap()
     std::string fileName = FileSystem::findFile(m_xmlMapFileName);
     std::cout << fileName << std::endl;
     if (fileName == "") {
-      B2ERROR("CDC unpacker can't find a filename: " << fileName);
+      B2ERROR("CDC unpacker can't find a filename: " << LogVar("file name", fileName));
       exit(1);
     }
 

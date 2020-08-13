@@ -49,13 +49,13 @@ namespace Belle2 {
       virtual ~MassConstraint();
 
       /// Returns the value of the constraint
-      virtual double getValue() const;
+      virtual double getValue() const override;
 
       /// Get first order derivatives.
       /// Call this with a predefined array "der" with the necessary number of entries!
       virtual void getDerivatives(int idim,      ///< First dimension of the array
                                   double der[]   ///< Array of derivatives, at least idim x idim
-                                 ) const;
+                                 ) const override;
 
       /// Get the actual invariant mass of the fit objects with a given flag
       virtual double getMass(int flag = 1        ///< The flag
@@ -65,7 +65,7 @@ namespace Belle2 {
       virtual void setMass(double mass_            ///< The new mass
                           );
 
-      virtual int getVarBasis() const;
+      virtual int getVarBasis() const override;
 
     protected:
 
@@ -75,12 +75,12 @@ namespace Belle2 {
       virtual bool secondDerivatives(int i,                         ///< number of 1st FitObject
                                      int j,                        ///< number of 2nd FitObject
                                      double* derivatives           ///< The result 4x4 matrix
-                                    ) const;
+                                    ) const override;
 
       /// First derivatives with respect to the 4-vector of Fit objects i; result false if all derivatives are zero
       virtual bool firstDerivatives(int i,                         ///< number of 1st FitObject
                                     double* derivatives           ///< The result 4-vector
-                                   ) const;
+                                   ) const override;
 
       enum { VAR_BASIS = 0 }; // this means that the constraint knows about E,px,py,pz
 

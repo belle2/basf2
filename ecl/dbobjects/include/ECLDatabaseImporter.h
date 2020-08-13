@@ -3,20 +3,17 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber    (ferber@physics.ubc.ca)                   *
+ * Contributors: Torben Ferber    (torben.ferber@desy.de)                   *
  *               Alon Hershenhorn (hershen@phsa.ubc.ca)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLDATABASEIMPORTER_H
-#define ECLDATABASEIMPORTER_H
+#pragma once
 
 //framework
 #include <framework/logging/Logger.h>
 
 //Root
-#include <TObject.h>
-#include <TGraph.h>
 #include <TFile.h>
 
 namespace Belle2 {
@@ -32,7 +29,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    ECLDatabaseImporter(std::vector<std::string> inputFileNames, std::string m_name);
+    ECLDatabaseImporter(std::vector<std::string> inputFileNames, const std::string& m_name);
 
     /**
      * Destructor.
@@ -68,6 +65,16 @@ namespace Belle2 {
     * For each line, the theta value used is the average of theta-min and theta-max
     */
     void importShowerEnergyCorrectionTemporary();
+
+    /**
+     * Import threshold values for track ECL cluster matching to the database
+     */
+    void importTrackClusterMatchingThresholds();
+
+    /**
+     * Import parameterizations for the RMS between tracks and ECL clusters to the database
+     */
+    void importTrackClusterMatchingParameterizations();
 
   private:
 
@@ -116,15 +123,7 @@ namespace Belle2 {
     std::string m_numOfReg2ThetaBinsBranchName = "numOfReg2ThetaBins"; /**< numOfReg2ThetaBins branch name  */
     std::string m_numOfReg3ThetaBinsBranchName = "numOfReg3ThetaBins"; /**< numOfReg3ThetaBins branch name  */
     std::string m_phiPeriodicityBranchName = "phiPeriodicity"; /**< phiPeriodicity branch name  */
-    /**
-     * 1: Initial version.
-     * 2: Added time calibration.
-     * 3: Added Second moment importer.
-     * 4: Added shower leakage corrections importer.
-     * 5: Added ECLShowerEnergyCorrectionTemporary importer.
-     */
-    ClassDef(ECLDatabaseImporter, 5);
+
   };
 
 } // Belle2 namespace
-#endif

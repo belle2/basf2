@@ -10,11 +10,8 @@
 
 #include <generators/modules/EventT0ShifterModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

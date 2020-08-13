@@ -1,0 +1,64 @@
+Changes in the analysis package since release-04-00
+---------------------------------------------------
+
+Variables
++++++++++
+ * Now vertex variables ``dr, dx, dy, dz, dphi, dcosTheta...`` take into account the nontrivial
+   transformation of track parameters relative to IP when used for tracks.
+   `dr` did not center at zero before and now it does.
+ * Added :b2:var:`isDescendantOfList` and :b2:var:`isMCDescendantOfList` meta variables that allow to check whether the
+   particle is the descendant of the list (or if it is matched to the descendant of the list) at any generation.
+   The variables have recursive search inside, they extend :b2:var:`isDaughterOfList` and :b2:var:`isGrandDaughterOfList`.
+ * Added :b2:var:`mcParticleIsInMCList` which checks the underlying MC particles (either matched or generator level).
+ * Fixed bug and renamed ``mcFlavorOfOtherB0`` variable to :b2:var:`mcFlavorOfOtherB`, which accepts now neutral and charged B
+   candidates.
+ * Removed ``clusterCRID`` which duplicates :b2:var:`clusterConnectedRegionID`.
+ * Fixed ``goodBelleLambda`` and now it returns ``extraInfo(goodLambda)`` on Belle data.
+ * Allow use of meta variables in creation of aliases by replacing non
+   alphanumeric characters with underscores in the alias name
+ * Modified :b2:var:`daughterAngle` to accept generalized variable indices instead of simple indices. A
+   generalized index is a column-separated string of daughter indexes belonging to different generations,
+   starting from the root particle. For example, ``0:2:1`` indicates the second daughter (0) of the third daughter
+   (2) of the first daughter (0) of the particle. Of course, conventional indexes are still working as expected:
+   ``1`` still indicates the second daughter of the particle.
+ * Added :b2:var:`daughterCombination`, that returns a variable calculated on the sum
+   of an arbitrary number of daughters. Generalized indexes are supported. This variable is mostly intended
+   to calculate the invariant mass or the recoil mass of any set of particles belonging to a decay tree.
+ * Fixed :b2:var:`isSignal`, which always accepted ``c_MissingResonance`` and ``c_MissFSR``/``c_MissPHOTOS`` even if one used
+   ``=direct=>``, ``=norad=>``, or ``=exact=>``.
+   Now it correctly respects the decay string grammar. The other isSignal* variables, such as :b2:var:`isSignalAcceptMissing`, are
+   also fixed.
+ * Added :b2:var:`useAlternativeDaughterHypothesis`, that returns a variable re-calculated using alternative mass assumptions for
+   the particle's daughters.
+ * Restructured the ``mc_flight_info`` collection by removing the non-sense
+   error variables and replacing ``mc_flightTime`` and ``mc_flightDistance``,
+   which were aliases created using `matchedMC`, with the dedicated variables
+   `mcFlightTime` and `mcFlightDistance`, respectively.
+ * Removed ``output_variable`` option in the :ref:`DeepFlavorTagger` and introduced a standard variable ``DNN_qrCombined`` for the
+   output.
+   The new variable returns the flavor times the dilution factor as the category-based :ref:`FlavorTagger` output variables
+   ``FBDT_qrCombined`` and ``FANN_qrCombined`` do.
+   Now we can evaluate the output of both taggers in the same way.
+ * Bug fix to guard against range exceptions in :b2:var:`KSFWVariables` (see :issue:`BII-6138`).
+
+Modules
++++++++
+
+ * In :b2:mod:`TreeFitter` fixed a bug in life time calculation. A constant in the jacobian was missing. As a result the
+   propagated error was slightly overestimated.
+ * Fix to nested RestOfEvent objects (see :issue:`BII-5649`)
+ * Fixed bugs in :b2:mod:`MCDecayFinder` and `findMCDecay`.
+   Inefficiency and large background when one used ``=direct=>`` or sub-decay such as ``D*+ -> [D0 -> pi+ pi- pi0] pi+`` are fixed.
+   But still the module has some bugs if one uses K_S0.
+
+Conditions DB
++++++++++++++
+
+ * In ``ChargedPidMVAWeights`` payload class, added MVA category cut strings in basf2-compliant format.
+
+Full Event Interpretation
++++++++++++++++++++++++++
+
+ * Addition of hadronic FEI channels involving baryons. This includes the addition to default channels the following particles: p,
+   Lambda_c+, Sigma+ and Lambda0. Baryonic modes must be switched on when calling particles = fei.get_default_channels(baryonic =
+   True) using a flag (baryonic = True).

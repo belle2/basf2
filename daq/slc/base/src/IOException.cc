@@ -2,11 +2,10 @@
 
 #include <cstdarg>
 #include <cstdio>
-#include <cstdlib>
 
 using namespace Belle2;
 
-IOException::IOException(const std::string& format, ...) throw()
+IOException::IOException(const std::string& format, ...)
 {
   va_list ap;
   char ss[1024 * 100];
@@ -16,7 +15,7 @@ IOException::IOException(const std::string& format, ...) throw()
   m_comment = ss;
 }
 
-IOException::IOException(int err, const std::string& format, ...) throw()
+IOException::IOException(int err, const std::string& format, ...)
 {
   m_err = err;
   va_list ap;

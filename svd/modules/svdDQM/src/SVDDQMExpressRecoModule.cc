@@ -3,21 +3,18 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Peter Kodys                                              *
- *                                                                        *
- * Prepared for Belle II geometry                                         *
+ * Contributors: Peter Kodys, Giulia Casarosa, Giuliana Rizzo             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 #include "svd/modules/svdDQM/SVDDQMExpressRecoModule.h"
 
-#include <framework/datastore/DataStore.h>
+#include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 
-#include <svd/dataobjects/SVDDAQDiagnostic.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 
@@ -31,6 +28,7 @@
 using namespace std;
 using boost::format;
 using namespace Belle2;
+using namespace SoftwareTrigger;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -52,15 +50,23 @@ SVDDQMExpressRecoModule::SVDDQMExpressRecoModule() : HistoModule()
                 );
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
-
-  addParam("ShowAllHistos", m_ShowAllHistos,
-           "Flag to show all histos in DQM, default = 0 ", m_ShowAllHistos);
+  addParam("offlineZSShaperDigits", m_storeSVDShaperDigitsName, "ShaperDigits StoreArray name", std::string("SVDShaperDigitsZS5"));
+  addParam("ShaperDigits", m_storeNoZSSVDShaperDigitsName, "not zero-suppressed ShaperDigits StoreArray name",
+           std::string("SVDShaperDigits"));
+  addParam("skipHLTRejectedEvents", m_skipRejectedEvents, "If TRUE skip events rejected by HLT", bool(true));
+  addParam("ShowAllHistos", m_ShowAllHistos, "Flag to show all histos in DQM, default = 0 ", int(0));
+  addParam("desynchronizeSVDTime", m_desynchSVDTime,
+           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
+  addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
+           "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
   addParam("CutSVDCharge", m_CutSVDCharge,
-           "cut for accepting to hitmap histogram, using strips only, default = 0 ADU ", m_CutSVDCharge);
+           "cut for accepting to hitmap histogram, using strips only", float(0));
   addParam("CutSVDClusterCharge", m_CutSVDClusterCharge,
-           "cut for accepting clusters to hitmap histogram, default = 5 ke- ", m_CutSVDClusterCharge);
+           "cut for accepting clusters to hitmap histogram", float(0));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDExpReco"));
+
+  m_histoList = new TList();
 }
 
 
@@ -94,24 +100,33 @@ void SVDDQMExpressRecoModule::defineHisto()
   int nSVDSensors = gTools->getNumberOfSVDSensors();
   int nSVDChips = gTools->getTotalSVDChips();
 
+  // number of events counter
+  m_nEvents = new TH1F("SVDDQM_nEvents", "SVD Number of Events", 1, -0.5, 0.5);
+  m_nEvents->GetYaxis()->SetTitle("N events");
+  m_histoList->Add(m_nEvents);
+
   // Create basic histograms:
   // basic counters per sensor:
-  m_hitMapCountsU = new TH1I("DQMER_SVD_StripCountsU", "DQM ER SVD Integrated number of fired U strips per sensor",
+  m_hitMapCountsU = new TH1F("SVDDQM_StripCountsU", "SVD Integrated Number of ZS5 Fired U-Strips per sensor",
                              nSVDSensors, 0, nSVDSensors);
   m_hitMapCountsU->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCountsU->GetYaxis()->SetTitle("counts");
-  m_hitMapCountsV = new TH1I("DQMER_SVD_StripCountsV", "DQM ER SVD Integrated number of fired V strips per sensor",
+  m_histoList->Add(m_hitMapCountsU);
+  m_hitMapCountsV = new TH1F("SVDDQM_StripCountsV", "SVD Integrated Number of ZS5 Fired V-Strips per sensor",
                              nSVDSensors, 0, nSVDSensors);
   m_hitMapCountsV->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapCountsV->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsU = new TH1I("DQMER_SVD_ClusterCountsU", "DQM ER SVD Integrated number of U clusters per sensor",
+  m_histoList->Add(m_hitMapCountsV);
+  m_hitMapClCountsU = new TH1F("SVDDQM_ClusterCountsU", "SVD Integrated Number of U-Clusters per sensor",
                                nSVDSensors, 0, nSVDSensors);
   m_hitMapClCountsU->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsU->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsV = new TH1I("DQMER_SVD_ClusterCountsV", "DQM ER SVD Integrated number of V clusters per sensor",
+  m_histoList->Add(m_hitMapClCountsU);
+  m_hitMapClCountsV = new TH1F("SVDDQM_ClusterCountsV", "SVD Integrated Number of V-Clusters per sensor",
                                nSVDSensors, 0, nSVDSensors);
   m_hitMapClCountsV->GetXaxis()->SetTitle("Sensor ID");
   m_hitMapClCountsV->GetYaxis()->SetTitle("counts");
+  m_histoList->Add(m_hitMapClCountsV);
   for (int i = 0; i < nSVDSensors; i++) {
     VxdID id = gTools->getSensorIDFromSVDIndex(i);
     int iLayer = id.getLayerNumber();
@@ -125,32 +140,33 @@ void SVDDQMExpressRecoModule::defineHisto()
   }
 
   // basic counters per chip:
-  m_hitMapCountsChip = new TH1I("DQMER_SVD_StripCountsChip", "DQM ER SVD Integrated number of fired strips per chip",
+  m_hitMapCountsChip = new TH1F("SVDDQM_StripCountsChip", "SVD Integrated Number of ZS5 Fired Strips per chip",
                                 nSVDChips, 0, nSVDChips);
-  m_hitMapCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapCountsChip->GetYaxis()->SetTitle("counts");
-  m_hitMapClCountsChip = new TH1I("DQMER_SVD_ClusterCountsChip", "DQM ER SVD Integrated number of clusters per chip",
+  m_histoList->Add(m_hitMapCountsChip);
+  m_hitMapClCountsChip = new TH1F("SVDDQM_ClusterCountsChip", "SVD Integrated Number of Clusters per chip",
                                   nSVDChips, 0, nSVDChips);
-  m_hitMapClCountsChip->GetXaxis()->SetTitle("Sensor ID");
+  m_hitMapClCountsChip->GetXaxis()->SetTitle("Chip ID");
   m_hitMapClCountsChip->GetYaxis()->SetTitle("counts");
-
+  m_histoList->Add(m_hitMapClCountsChip);
 
   m_firedU = new TH1F*[nSVDSensors];
   m_firedV = new TH1F*[nSVDSensors];
   m_clustersU = new TH1F*[nSVDSensors];
   m_clustersV = new TH1F*[nSVDSensors];
 
-  /*
-  m_CounterAPVErrors = new TH1I*[c_nFADC];
-  m_CounterFTBErrors = new TH1I*[c_nFADC];
-  m_CounterApvErrorORErrors = new TH1I*[c_nFADC];
-  m_CounterFTBFlags = new TH1I*[c_nFADC];
-  */
 
   m_clusterChargeU = new TH1F*[nSVDSensors];
   m_clusterChargeV = new TH1F*[nSVDSensors];
+  m_clusterSNRU = new TH1F*[nSVDSensors];
+  m_clusterSNRV = new TH1F*[nSVDSensors];
   m_stripSignalU = new TH1F*[nSVDSensors];
   m_stripSignalV = new TH1F*[nSVDSensors];
+  m_stripCountU = new TH1F*[nSVDSensors];
+  m_stripCountV = new TH1F*[nSVDSensors];
+  m_onlineZSstripCountU = new TH1F*[nSVDSensors];
+  m_onlineZSstripCountV = new TH1F*[nSVDSensors];
   m_clusterSizeU = new TH1F*[nSVDSensors];
   m_clusterSizeV = new TH1F*[nSVDSensors];
   m_clusterTimeU = new TH1F*[nSVDSensors];
@@ -158,78 +174,197 @@ void SVDDQMExpressRecoModule::defineHisto()
 
   int ChargeBins = 80;
   float ChargeMax = 80;
-  int TimeBins = 50;
-  float TimeMin = -100;
-  float TimeMax = 100;
+  int SNRBins = 50;
+  float SNRMax = 100;
+  int TimeBins = 200;
+  float TimeMin = -60;
+  float TimeMax = 140;
+  if (m_isSVDTimeCalibrated) {
+    TimeMin = -100 ;
+    TimeMax =  100 ;
+  }
+
+  int MaxBinBins = 6;
+  int MaxBinMax = 6;
+
+  TString refFrame = "in FTSW reference";
+  if (m_desynchSVDTime)
+    refFrame = "in SVD reference";
+
+
   //----------------------------------------------------------------
   // Charge of clusters for all sensors
   //----------------------------------------------------------------
-  string name = str(format("DQMER_SVD_ClusterChargeUAll"));
-  string title = str(format("DQM ER SVD Cluster charge in U for all sensors"));
+  string name = str(format("SVDDQM_ClusterChargeUAll"));
+  string title = str(format("SVD U-Cluster Charge for all sensors"));
   m_clusterChargeUAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-  m_clusterChargeUAll->GetXaxis()->SetTitle("charge of u clusters [ke-]");
+  m_clusterChargeUAll->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeUAll->GetYaxis()->SetTitle("count");
-  name = str(format("DQMER_SVD_ClusterChargeVAll"));
-  title = str(format("DQM ER SVD Cluster charge in V for all sensors"));
+  m_histoList->Add(m_clusterChargeUAll);
+  name = str(format("SVDDQM_ClusterChargeVAll"));
+  title = str(format("SVD V-Cluster Charge for all sensors"));
   m_clusterChargeVAll = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-  m_clusterChargeVAll->GetXaxis()->SetTitle("charge of v clusters [ke-]");
+  m_clusterChargeVAll->GetXaxis()->SetTitle("cluster charge [ke-]");
   m_clusterChargeVAll->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeVAll);
+  //----------------------------------------------------------------
+  // Charge of clusters for L3/L456 sensors
+  //----------------------------------------------------------------
+  name = str(format("SVDDQM_ClusterChargeU3"));
+  title = str(format("SVD U-Cluster Charge for layer 3 sensors"));
+  m_clusterChargeU3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeU3->GetXaxis()->SetTitle("cluster charge [ke-]");
+  m_clusterChargeU3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeU3);
+  name = str(format("SVDDQM_ClusterChargeV3"));
+  title = str(format("SVD V-Cluster Charge for layer 3 sensors"));
+  m_clusterChargeV3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeV3->GetXaxis()->SetTitle("cluster charge [ke-]");
+  m_clusterChargeV3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeV3);
 
+  name = str(format("SVDDQM_ClusterChargeU456"));
+  title = str(format("SVD U-Cluster Charge for layers 4,5,6 sensors"));
+  m_clusterChargeU456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeU456->GetXaxis()->SetTitle("cluster charge [ke-]");
+  m_clusterChargeU456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeU456);
+
+  name = str(format("SVDDQM_ClusterChargeV456"));
+  title = str(format("SVD V-Cluster Charge for layers 4,5,6 sensors"));
+  m_clusterChargeV456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
+  m_clusterChargeV456->GetXaxis()->SetTitle("cluster charge [ke-]");
+  m_clusterChargeV456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterChargeV456);
+
+  //----------------------------------------------------------------
+  // SNR of clusters for all sensors
+  //----------------------------------------------------------------
+  name = str(format("SVDDQM_ClusterSNRUAll"));
+  title = str(format("SVD U-Cluster SNR for all sensors"));
+  m_clusterSNRUAll = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);  // max = ~ 60
+  m_clusterSNRUAll->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRUAll->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRUAll);
+  name = str(format("SVDDQM_ClusterSNRVAll"));
+  title = str(format("SVD V-Cluster SNR for all sensors"));
+  m_clusterSNRVAll = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRVAll->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRVAll->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRVAll);
+  //----------------------------------------------------------------
+  // SNR of clusters for L3/L456 sensors
+  //----------------------------------------------------------------
+  name = str(format("SVDDQM_ClusterSNRU3"));
+  title = str(format("SVD U-Cluster SNR for layer 3 sensors"));
+  m_clusterSNRU3 = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRU3->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRU3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRU3);
+  name = str(format("SVDDQM_ClusterSNRV3"));
+  title = str(format("SVD V-Cluster SNR for layer 3 sensors"));
+  m_clusterSNRV3 = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRV3->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRV3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRV3);
+
+  name = str(format("SVDDQM_ClusterSNRU456"));
+  title = str(format("SVD U-Cluster SNR for layers 4,5,6 sensors"));
+  m_clusterSNRU456 = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRU456->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRU456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRU456);
+  name = str(format("SVDDQM_ClusterSNRV456"));
+  title = str(format("SVD V-Cluster SNR for layers 4,5,6 sensors"));
+  m_clusterSNRV456 = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+  m_clusterSNRV456->GetXaxis()->SetTitle("cluster SNR");
+  m_clusterSNRV456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterSNRV456);
   //----------------------------------------------------------------
   // Cluster time distribution for all sensors
   //----------------------------------------------------------------
-  name = str(format("DQMER_SVD_ClusterTimeUAll"));
-  title = str(format("DQM ER SVD Cluster time in U for all sensors"));
-  m_clusterTimeUAll = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeUAll->GetXaxis()->SetTitle("time of u clusters [ns]");
+  TString Name = "SVDDQM_ClusterTimeUAll";
+  TString Title = Form("SVD U-Cluster Time %s for all sensors", refFrame.Data());
+  m_clusterTimeUAll = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeUAll->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeUAll->GetYaxis()->SetTitle("count");
-  name = str(format("DQMER_SVD_ClusterTimeVAll"));
-  title = str(format("DQM ER SVD Cluster time in V for all sensors"));
-  m_clusterTimeVAll = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-  m_clusterTimeVAll->GetXaxis()->SetTitle("time of v clusters [ns]");
+  m_histoList->Add(m_clusterTimeUAll);
+  Name = "SVDDQM_ClusterTimeVAll";
+  Title = Form("SVD V-Cluster Time %s for all sensors", refFrame.Data());
+  m_clusterTimeVAll = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeVAll->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeVAll->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeVAll);
+  //----------------------------------------------------------------
+  // Time of clusters for L3/L456 sensors
+  //----------------------------------------------------------------
+  Name = "SVDDQM_ClusterTimeU3";
+  Title = Form("SVD U-Cluster Time %s for layer 3 sensors", refFrame.Data());
+  m_clusterTimeU3 = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeU3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeU3);
+  name = str(format("SVDDQM_ClusterTimeV3"));
+  Title = Form("SVD V-Cluster Time %s for layer 3 sensors", refFrame.Data());
+  m_clusterTimeV3 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeV3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeV3);
 
-  /*
-  for (int i = 0; i < c_nFADC; i++) {
-    //----------------------------------------------------------------
-    // Counter of APV errors (16) per FADC
-    //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_FADC_%1%_CounterOfAPVErrors") % i);
-    title = str(format("DQM ER SVD FADC %1% Counter of APV errors") % i);
-    m_CounterAPVErrors[i] = new TH1I(name.c_str(), title.c_str(), 16, 0, 16);
-    m_CounterAPVErrors[i]->GetXaxis()->SetTitle("Error ID");
-    m_CounterAPVErrors[i]->GetYaxis()->SetTitle("counts");
-    //----------------------------------------------------------------
-    // Counter of FTB errors (256) per FADC
-    //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_FADC_%1%_CounterOfFTBErrors") % i);
-    title = str(format("DQM ER SVD FADC %1% Counter of FTB errors") % i);
-    m_CounterFTBErrors[i] = new TH1I(name.c_str(), title.c_str(), 256, 0, 256);
-    m_CounterFTBErrors[i]->GetXaxis()->SetTitle("Error ID");
-    m_CounterFTBErrors[i]->GetYaxis()->SetTitle("counts");
-    //----------------------------------------------------------------
-    // Counter of apvErrorOR (4) per FADC
-    //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_FADC_%1%_CounterOfApvErrorOR") % i);
-    title = str(format("DQM ER SVD FADC %1% Counter of ApvErrorOR") % i);
-    m_CounterApvErrorORErrors[i] = new TH1I(name.c_str(), title.c_str(), 5, 0, 5);
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetTitle("Error ID");
-    m_CounterApvErrorORErrors[i]->GetYaxis()->SetTitle("counts");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(1, "No errors");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(2, "APV error OR");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(3, "FADC FIFO full OR");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(4, "Frame error OR");
-    m_CounterApvErrorORErrors[i]->GetXaxis()->SetBinLabel(5, "Detection error OR");
-    //----------------------------------------------------------------
-    // Counter of FTB Flags (32) per FADC
-    //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_FADC_%1%_CounterFTBFlags") % i);
-    title = str(format("DQM ER SVD FADC %1% Counter of FTB flags") % i);
-    m_CounterFTBFlags[i] = new TH1I(name.c_str(), title.c_str(), 32, 0, 32);
-    m_CounterFTBFlags[i]->GetXaxis()->SetTitle("Flag");
-    m_CounterFTBFlags[i]->GetYaxis()->SetTitle("counts");
-  }
-  */
+  name = str(format("SVDDQM_ClusterTimeU456"));
+  Title = Form("SVD U-Cluster Time %s for layers 4,5,6 sensors", refFrame.Data());
+  m_clusterTimeU456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeU456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeU456);
+  name = str(format("SVDDQM_ClusterTimeV456"));
+  Title = Form("SVD V-Cluster Time %s for layers 4,5,6 sensors", refFrame.Data());
+  m_clusterTimeV456 = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+  m_clusterTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeV456->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_clusterTimeV456);
+
+  //----------------------------------------------------------------
+  // MaxBin of strips for all sensors (offline ZS)
+  //----------------------------------------------------------------
+  name = str(format("SVDDQM_StripMaxBinUAll"));
+  title = str(format("SVD U-Strip MaxBin for all sensors"));
+  m_stripMaxBinUAll = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  m_stripMaxBinUAll->GetXaxis()->SetTitle("max bin");
+  m_stripMaxBinUAll->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_stripMaxBinUAll);
+  name = str(format("SVDDQM_StripMaxBinVAll"));
+  title = str(format("SVD V-Strip MaxBin for all sensors"));
+  m_stripMaxBinVAll = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  m_stripMaxBinVAll->GetXaxis()->SetTitle("max bin");
+  m_stripMaxBinVAll->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_stripMaxBinVAll);
+
+  name = str(format("SVDDQM_StripMaxBinU3"));
+  title = str(format("SVD U-Strip MaxBin for layer 3 sensors"));
+  m_stripMaxBinU3 = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  m_stripMaxBinU3->GetXaxis()->SetTitle("max bin");
+  m_stripMaxBinU3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_stripMaxBinU3);
+  name = str(format("SVDDQM_StripMaxBinV3"));
+  title = str(format("SVD V-Strip MaxBin for layer 3 sensors"));
+  m_stripMaxBinV3 = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  m_stripMaxBinV3->GetXaxis()->SetTitle("max bin");
+  m_stripMaxBinV3->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_stripMaxBinV3);
+
+  name = str(format("SVDDQM_StripMaxBinU6"));
+  title = str(format("SVD U-Strip MaxBin for layer 6 sensors"));
+  m_stripMaxBinU6 = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  m_stripMaxBinU6->GetXaxis()->SetTitle("max bin");
+  m_stripMaxBinU6->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_stripMaxBinU6);
+  name = str(format("SVDDQM_StripMaxBinV6"));
+  title = str(format("SVD V-Strip MaxBin for layer 6 sensors"));
+  m_stripMaxBinV6 = new TH1F(name.c_str(), title.c_str(), MaxBinBins, 0, MaxBinMax);
+  m_stripMaxBinV6->GetXaxis()->SetTitle("max bin");
+  m_stripMaxBinV6->GetYaxis()->SetTitle("count");
+  m_histoList->Add(m_stripMaxBinV6);
 
   for (int i = 0; i < nSVDSensors; i++) {
     VxdID id = gTools->getSensorIDFromSVDIndex(i);
@@ -242,81 +377,138 @@ void SVDDQMExpressRecoModule::defineHisto()
     //----------------------------------------------------------------
     // Number of fired strips per sensor
     //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_%1%_FiredU") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Fired strips in U") % sensorDescr);
+    name = str(format("SVDDQM_%1%_FiredU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Number of Fired U-Strips") % sensorDescr);
     m_firedU[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
-    m_firedU[i]->GetXaxis()->SetTitle("# of fired u strips");
+    m_firedU[i]->GetXaxis()->SetTitle("# fired strips");
     m_firedU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("DQMER_SVD_%1%_FiredV") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Fired strips in V") % sensorDescr);
+    m_histoList->Add(m_firedU[i]);
+    name = str(format("SVDDQM_%1%_FiredV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Number of Fired V-Strips") % sensorDescr);
     m_firedV[i] = new TH1F(name.c_str(), title.c_str(), 50, 0, 50);
-    m_firedV[i]->GetXaxis()->SetTitle("# of fired v strips");
+    m_firedV[i]->GetXaxis()->SetTitle("# fired strips");
     m_firedV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_firedV[i]);
     //----------------------------------------------------------------
     // Number of clusters per sensor
     //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_%1%_ClustersU") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Number of clusters in U") % sensorDescr);
+    name = str(format("SVDDQM_%1%_ClustersU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Number of U-Clusters") % sensorDescr);
     m_clustersU[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
-    m_clustersU[i]->GetXaxis()->SetTitle("# of u clusters");
+    m_clustersU[i]->GetXaxis()->SetTitle("# clusters");
     m_clustersU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("DQMER_SVD_%1%_ClustersV") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Number of clusters in V") % sensorDescr);
+    m_histoList->Add(m_clustersU[i]);
+    name = str(format("SVDDQM_%1%_ClustersV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Number of V-Clusters") % sensorDescr);
     m_clustersV[i] = new TH1F(name.c_str(), title.c_str(), 20, 0, 20);
-    m_clustersV[i]->GetXaxis()->SetTitle("# of v clusters");
+    m_clustersV[i]->GetXaxis()->SetTitle("# clusters");
     m_clustersV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clustersV[i]);
     //----------------------------------------------------------------
     // Charge of clusters
     //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_%1%_ClusterChargeU") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Cluster charge in U") % sensorDescr);
+    name = str(format("SVDDQM_%1%_ClusterChargeU") % sensorDescr);
+    title = str(format("SVD Sensor %1% U-Cluster Charge") % sensorDescr);
     m_clusterChargeU[i] = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-    m_clusterChargeU[i]->GetXaxis()->SetTitle("charge of u clusters [ke-]");
+    m_clusterChargeU[i]->GetXaxis()->SetTitle("cluster charge [ke-]");
     m_clusterChargeU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("DQMER_SVD_%1%_ClusterChargeV") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Cluster charge in V") % sensorDescr);
+    m_histoList->Add(m_clusterChargeU[i]);
+    name = str(format("SVDDQM_%1%_ClusterChargeV") % sensorDescr);
+    title = str(format("SVD Sensor %1% V-Cluster Charge") % sensorDescr);
     m_clusterChargeV[i] = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-    m_clusterChargeV[i]->GetXaxis()->SetTitle("charge of v clusters [ke-]");
+    m_clusterChargeV[i]->GetXaxis()->SetTitle("cluster charge [ke-]");
     m_clusterChargeV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clusterChargeV[i]);
+    //----------------------------------------------------------------
+    // SNR of clusters
+    //----------------------------------------------------------------
+    name = str(format("SVDDQM_%1%_ClusterSNRU") % sensorDescr);
+    title = str(format("SVD Sensor %1% U-Cluster SNR") % sensorDescr);
+    m_clusterSNRU[i] = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+    m_clusterSNRU[i]->GetXaxis()->SetTitle("cluster SNR");
+    m_clusterSNRU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clusterSNRU[i]);
+    name = str(format("SVDDQM_%1%_ClusterSNRV") % sensorDescr);
+    title = str(format("SVD Sensor %1% V-Cluster SNR") % sensorDescr);
+    m_clusterSNRV[i] = new TH1F(name.c_str(), title.c_str(), SNRBins, 0, SNRMax);
+    m_clusterSNRV[i]->GetXaxis()->SetTitle("cluster SNR");
+    m_clusterSNRV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clusterSNRV[i]);
     //----------------------------------------------------------------
     // Charge of strips
     //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_%1%_StripChargeU") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Strip charge in U") % sensorDescr);
-    m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 256);
-    m_stripSignalU[i]->GetXaxis()->SetTitle("charge of u strips [ADU]");
+    name = str(format("SVDDQM_%1%_ADCStripU") % sensorDescr);
+    title = str(format("SVD Sensor %1% U-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
+    m_stripSignalU[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
+    m_stripSignalU[i]->GetXaxis()->SetTitle("signal ADC");
     m_stripSignalU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("DQMER_SVD_%1%_StripChargeV") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Strip charge in V") % sensorDescr);
-    m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 200, 0, 256);
-    m_stripSignalV[i]->GetXaxis()->SetTitle("charge of v strips [ADU]");
+    m_histoList->Add(m_stripSignalU[i]);
+    name = str(format("SVDDQM_%1%_ADCStripV") % sensorDescr);
+    title = str(format("SVD Sensor %1% V-Strip signal in ADC Counts, all 6 APV samples") % sensorDescr);
+    m_stripSignalV[i] = new TH1F(name.c_str(), title.c_str(), 256, -0.5, 255.5);
+    m_stripSignalV[i]->GetXaxis()->SetTitle("signal ADC");
     m_stripSignalV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripSignalV[i]);
+    //----------------------------------------------------------------
+    // Strips Counts
+    //----------------------------------------------------------------
+    name = str(format("SVDDQM_%1%_StripCountU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired U-Strip vs Strip Number") % sensorDescr);
+    m_stripCountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_stripCountU[i]->GetXaxis()->SetTitle("cellID");
+    m_stripCountU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripCountU[i]);
+    name = str(format("SVDDQM_%1%_StripCountV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired V-Strip vs Strip Number") % sensorDescr);
+    m_stripCountV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_stripCountV[i]->GetXaxis()->SetTitle("cellID");
+    m_stripCountV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_stripCountV[i]);
+    //----------------------------------------------------------------
+    // Strips Counts with online ZS
+    //----------------------------------------------------------------
+    name = str(format("SVDDQM_%1%_OnlineZSStripCountU") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired U-Strip vs Strip Number") % sensorDescr);
+    m_onlineZSstripCountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_onlineZSstripCountU[i]->GetXaxis()->SetTitle("cellID");
+    m_onlineZSstripCountU[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_onlineZSstripCountU[i]);
+    name = str(format("SVDDQM_%1%_OnlineZSStripCountV") % sensorDescr);
+    title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired V-Strip vs Strip Number") % sensorDescr);
+    m_onlineZSstripCountV[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
+    m_onlineZSstripCountV[i]->GetXaxis()->SetTitle("cellID");
+    m_onlineZSstripCountV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_onlineZSstripCountV[i]);
     //----------------------------------------------------------------
     // Cluster size distribution
     //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_%1%_ClusterSizeU") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Cluster size in U") % sensorDescr);
-    m_clusterSizeU[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_clusterSizeU[i]->GetXaxis()->SetTitle("size of u clusters");
+    name = str(format("SVDDQM_%1%_ClusterSizeU") % sensorDescr);
+    title = str(format("SVD Sensor %1% U-Cluster Size") % sensorDescr);
+    m_clusterSizeU[i] = new TH1F(name.c_str(), title.c_str(), 9, 1, 10);
+    m_clusterSizeU[i]->GetXaxis()->SetTitle("cluster size");
     m_clusterSizeU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("DQMER_SVD_%1%_ClusterSizeV") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Cluster size in V") % sensorDescr);
-    m_clusterSizeV[i] = new TH1F(name.c_str(), title.c_str(), 10, 0, 10);
-    m_clusterSizeV[i]->GetXaxis()->SetTitle("size of v clusters");
+    m_histoList->Add(m_clusterSizeU[i]);
+    name = str(format("SVDDQM_%1%_ClusterSizeV") % sensorDescr);
+    title = str(format("SVD Sensor %1% V-Cluster Size") % sensorDescr);
+    m_clusterSizeV[i] = new TH1F(name.c_str(), title.c_str(), 9, 1, 10);
+    m_clusterSizeV[i]->GetXaxis()->SetTitle("cluster size");
     m_clusterSizeV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clusterSizeV[i]);
     //----------------------------------------------------------------
     // Cluster time distribution
     //----------------------------------------------------------------
-    name = str(format("DQMER_SVD_%1%_ClusterTimeU") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Cluster time in U") % sensorDescr);
-    m_clusterTimeU[i] = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-    m_clusterTimeU[i]->GetXaxis()->SetTitle("time of u clusters [ns]");
+    name = str(format("SVDDQM_%1%_ClusterTimeU") % sensorDescr);
+    Title = Form("SVD Sensor %s U-Cluster Time %s", sensorDescr.c_str(), refFrame.Data());
+    m_clusterTimeU[i] = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+    m_clusterTimeU[i]->GetXaxis()->SetTitle("cluster time (ns)");
     m_clusterTimeU[i]->GetYaxis()->SetTitle("count");
-    name = str(format("DQMER_SVD_%1%_ClusterTimeV") % sensorDescr);
-    title = str(format("DQM ER SVD Sensor %1% Cluster time in V") % sensorDescr);
-    m_clusterTimeV[i] = new TH1F(name.c_str(), title.c_str(), TimeBins, TimeMin, TimeMax);
-    m_clusterTimeV[i]->GetXaxis()->SetTitle("time of v clusters [ns]");
+    m_histoList->Add(m_clusterTimeU[i]);
+    name = str(format("SVDDQM_%1%_ClusterTimeV") % sensorDescr);
+    Title = Form("SVD Sensor %s V-Cluster Time %s", sensorDescr.c_str(), refFrame.Data());
+    m_clusterTimeV[i] = new TH1F(name.c_str(), Title.Data(), TimeBins, TimeMin, TimeMax);
+    m_clusterTimeV[i]->GetXaxis()->SetTitle("cluster time (ns)");
     m_clusterTimeV[i]->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_clusterTimeV[i]);
   }
 
   for (int i = 0; i < nSVDChips; i++) {
@@ -333,36 +525,16 @@ void SVDDQMExpressRecoModule::defineHisto()
     m_hitMapClCountsChip->GetXaxis()->SetBinLabel(i + 1, AxisTicks.Data());
   }
 
+
+
   //----------------------------------------------------------------
   // Additional histograms for out of ExpressReco
   //----------------------------------------------------------------
 
   if (m_ShowAllHistos == 1) {
-    TDirectory* dirShowAll = NULL;
+    TDirectory* dirShowAll = nullptr;
     dirShowAll = oldDir->mkdir("SVDDQMAll");
     dirShowAll->cd();
-
-    name = str(format("DQMER_SVD_ClusterChargeU3"));
-    title = str(format("DQM ER SVD Cluster charge in U for layer 3 sensors"));
-    m_clusterChargeU3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-    m_clusterChargeU3->GetXaxis()->SetTitle("charge of u clusters [ke-]");
-    m_clusterChargeU3->GetYaxis()->SetTitle("count");
-    name = str(format("DQMER_SVD_ClusterChargeV3"));
-    title = str(format("DQM ER SVD Cluster charge in V for layer 3 sensors"));
-    m_clusterChargeV3 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-    m_clusterChargeV3->GetXaxis()->SetTitle("charge of v clusters [ke-]");
-    m_clusterChargeV3->GetYaxis()->SetTitle("count");
-
-    name = str(format("DQMER_SVD_ClusterChargeU456"));
-    title = str(format("DQM ER SVD Cluster charge in U for layers 4,5,6 sensors"));
-    m_clusterChargeU456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-    m_clusterChargeU456->GetXaxis()->SetTitle("charge of u clusters [ke-]");
-    m_clusterChargeU456->GetYaxis()->SetTitle("count");
-    name = str(format("DQMER_SVD_ClusterChargeV456"));
-    title = str(format("DQM ER SVD Cluster charge in V for layers 4,5,6 sensors"));
-    m_clusterChargeV456 = new TH1F(name.c_str(), title.c_str(), ChargeBins, 0, ChargeMax);
-    m_clusterChargeV456->GetXaxis()->SetTitle("charge of v clusters [ke-]");
-    m_clusterChargeV456->GetYaxis()->SetTitle("count");
 
     m_hitMapU = new TH2F*[nSVDSensors];
     m_hitMapV = new TH2F*[nSVDSensors];
@@ -387,6 +559,7 @@ void SVDDQMExpressRecoModule::defineHisto()
       m_hitMapU[i]->GetXaxis()->SetTitle("u position [pitch units]");
       m_hitMapU[i]->GetYaxis()->SetTitle("timebin [time units]");
       m_hitMapU[i]->GetZaxis()->SetTitle("hits");
+      m_histoList->Add(m_hitMapU[i]);
       name = str(format("SVD_%1%_StripHitmapV") % sensorDescr);
       title = str(format("SVD Sensor %1% Strip Hitmap in V") % sensorDescr);
       nStrips = SensorInfo.getVCells();
@@ -395,6 +568,7 @@ void SVDDQMExpressRecoModule::defineHisto()
       m_hitMapV[i]->GetXaxis()->SetTitle("v position [pitch units]");
       m_hitMapV[i]->GetYaxis()->SetTitle("timebin [time units]");
       m_hitMapV[i]->GetZaxis()->SetTitle("hits");
+      m_histoList->Add(m_hitMapV[i]);
       //----------------------------------------------------------------
       // Hitmaps: Number of clusters by coordinate
       //----------------------------------------------------------------
@@ -404,12 +578,14 @@ void SVDDQMExpressRecoModule::defineHisto()
       m_hitMapUCl[i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
       m_hitMapUCl[i]->GetXaxis()->SetTitle("u position [pitch units]");
       m_hitMapUCl[i]->GetYaxis()->SetTitle("hits");
+      m_histoList->Add(m_hitMapUCl[i]);
       name = str(format("SVD_%1%_HitmapClstV") % sensorDescr);
       title = str(format("SVD Sensor %1% Hitmap Clusters in V") % sensorDescr);
       nStrips = SensorInfo.getVCells();
       m_hitMapVCl[i] = new TH1F(name.c_str(), title.c_str(), nStrips, 0, nStrips);
       m_hitMapVCl[i]->GetXaxis()->SetTitle("v position [pitch units]");
       m_hitMapVCl[i]->GetYaxis()->SetTitle("hits");
+      m_histoList->Add(m_hitMapVCl[i]);
     }
   }
 
@@ -425,14 +601,15 @@ void SVDDQMExpressRecoModule::initialize()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() != 0) {
     //Register collections
-    StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
+    StoreArray<SVDShaperDigit> storeNoZSSVDShaperDigits(m_storeNoZSSVDShaperDigitsName);
     StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
     StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
     m_storeSVDClustersName = storeSVDClusters.getName();
 
-    m_svdDAQDiagnosticsListName = storeDAQDiagnostics.getName();
     storeSVDClusters.isOptional();
     storeSVDShaperDigits.isOptional();
+    m_svdEventInfo.isOptional();
+    storeNoZSSVDShaperDigits.isOptional();
 
     //Store names to speed up creation later
     m_storeSVDShaperDigitsName = storeSVDShaperDigits.getName();
@@ -441,71 +618,45 @@ void SVDDQMExpressRecoModule::initialize()
 
 void SVDDQMExpressRecoModule::beginRun()
 {
+  StoreObjPtr<EventMetaData> evtMetaData;
+  m_expNumber = evtMetaData->getExperiment();
+  m_runNumber = evtMetaData->getRun();
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-  // Just to make sure, reset all the histograms.
-  if (m_hitMapCountsU != NULL) m_hitMapCountsU->Reset();
-  if (m_hitMapCountsV != NULL) m_hitMapCountsV->Reset();
-  if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Reset();
-  if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Reset();
-
-  if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Reset();
-  if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Reset();
-
-  /*  for (int i = 0; i < c_nFADC; i++) {
-    if (m_CounterAPVErrors[i] != NULL) m_CounterAPVErrors[i]->Reset();
-    if (m_CounterFTBErrors[i] != NULL) m_CounterFTBErrors[i]->Reset();
-    if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Reset();
-    if (m_CounterFTBFlags[i] != NULL) m_CounterFTBFlags[i]->Reset();
-  }
-  */
-  if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Reset();
-  if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Reset();
-  if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Reset();
-  if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Reset();
-  for (int i = 0; i < gTools->getNumberOfSVDSensors(); i++) {
-    if (m_firedU[i] != NULL) m_firedU[i]->Reset();
-    if (m_firedV[i] != NULL) m_firedV[i]->Reset();
-    if (m_clustersU[i] != NULL) m_clustersU[i]->Reset();
-    if (m_clustersV[i] != NULL) m_clustersV[i]->Reset();
-    if (m_clusterChargeU[i] != NULL) m_clusterChargeU[i]->Reset();
-    if (m_clusterChargeV[i] != NULL) m_clusterChargeV[i]->Reset();
-    if (m_stripSignalU[i] != NULL) m_stripSignalU[i]->Reset();
-    if (m_stripSignalV[i] != NULL) m_stripSignalV[i]->Reset();
-    if (m_clusterSizeU[i] != NULL) m_clusterSizeU[i]->Reset();
-    if (m_clusterSizeV[i] != NULL) m_clusterSizeV[i]->Reset();
-    if (m_clusterTimeU[i] != NULL) m_clusterTimeU[i]->Reset();
-    if (m_clusterTimeV[i] != NULL) m_clusterTimeV[i]->Reset();
-  }
-  if (m_ShowAllHistos == 1) {
-    if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Reset();
-    if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Reset();
-    if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Reset();
-    if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Reset();
-    for (int i = 0; i < gTools->getNumberOfSVDSensors(); i++) {
-      if (m_hitMapU[i] != NULL) m_hitMapU[i]->Reset();
-      if (m_hitMapV[i] != NULL) m_hitMapV[i]->Reset();
-      if (m_hitMapUCl[i] != NULL) m_hitMapUCl[i]->Reset();
-      if (m_hitMapVCl[i] != NULL) m_hitMapVCl[i]->Reset();
+  // Add experiment and run number to the title of selected histograms (CR shifter plots)
+  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
+  TObject* obj;
+  TIter nextH(m_histoList);
+  while ((obj = nextH()))
+    if (obj->InheritsFrom("TH1")) {
+      ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
+      if (obj != nullptr)((TH1F*)obj)->Reset();
     }
-  }
+
 }
 
 void SVDDQMExpressRecoModule::event()
 {
+
+  //check HLT decision and increase number of events only if the event has been accepted
+
+  if (m_skipRejectedEvents && (m_resultStoreObjectPointer.isValid())) {
+    const bool eventAccepted = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_resultStoreObjectPointer);
+    if (!eventAccepted) return;
+  }
+  m_nEvents->Fill(0);
+
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
+  const StoreArray<SVDShaperDigit> storeNoZSSVDShaperDigits(m_storeNoZSSVDShaperDigitsName);
+
   const StoreArray<SVDShaperDigit> storeSVDShaperDigits(m_storeSVDShaperDigitsName);
   const StoreArray<SVDCluster> storeSVDClusters(m_storeSVDClustersName);
-  StoreArray<SVDDAQDiagnostic> storeDAQDiagnostics(m_svdDAQDiagnosticsListName);
 
-  //vector<SVDDAQDiagnostic*> diagnosticVector;
-  //SVDDAQDiagnostic* currentDAQDiagnostic;
-  //map<SVDShaperDigit, SVDDAQDiagnostic*> diagnosticMap;
-
-  if (!storeSVDShaperDigits || !storeSVDShaperDigits.getEntries()) {
+  if (!storeSVDShaperDigits.isValid() || !storeSVDShaperDigits.getEntries()) {
     return;
   }
 
@@ -513,30 +664,7 @@ void SVDDQMExpressRecoModule::event()
   int lastSVDLayer = gTools->getLastSVDLayer();
   int nSVDSensors = gTools->getNumberOfSVDSensors();
 
-  // SVD basic histograms:
-  // DAQ Diagnostic
-  /*
-  // if object exist and is mapped on expected size:
-  if (storeDAQDiagnostics.getEntries() == c_nFADC) {
-    int i = 0;
-    for (auto& DAQDiag : storeDAQDiagnostics) {
-      // for (int i = 0; i < c_nFADC; i++) {
-      if (m_CounterAPVErrors[i] != NULL) m_CounterAPVErrors[i]->Fill((int)(DAQDiag.getAPVError()));
-      if (m_CounterFTBErrors[i] != NULL) m_CounterFTBErrors[i]->Fill((int)DAQDiag.getFTBError());
-      int APVErr = (int)DAQDiag.getAPVErrorOR();
-      if (APVErr == 0)
-        if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Fill(1);
-      if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Fill(2, APVErr & 1);
-      if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Fill(3, (APVErr & 2) >> 1);
-      if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Fill(4, (APVErr & 4) >> 2);
-      if (m_CounterApvErrorORErrors[i] != NULL) m_CounterApvErrorORErrors[i]->Fill(5, (APVErr & 8) >> 3);
-      if (m_CounterFTBFlags[i] != NULL) m_CounterFTBFlags[i]->Fill((int)DAQDiag.getFTBFlags());
-      i++;
-    }
-  }
-  */
-
-  // Fired strips
+  // Fired strips offline ZS
   vector< set<int> > uStrips(nSVDSensors); // sets to eliminate multiple samples per strip
   vector< set<int> > vStrips(nSVDSensors);
   for (const SVDShaperDigit& digitIn : storeSVDShaperDigits) {
@@ -548,6 +676,19 @@ void SVDDQMExpressRecoModule::event()
     int index = gTools->getSVDSensorIndex(sensorID);
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
     if (digitIn.isUStrip()) {
+
+      //      B2DEBUG(29, digitIn.toString().c_str() );
+
+      //fill strip count first
+      if (m_stripCountU[index] != nullptr) m_stripCountU[index]->Fill(digitIn.getCellID());
+
+      //fill max bin
+      if (m_stripMaxBinUAll != nullptr) m_stripMaxBinUAll->Fill(digitIn.getMaxTimeBin());
+      if (iLayer == 3)
+        if (m_stripMaxBinU3 != nullptr) m_stripMaxBinU3->Fill(digitIn.getMaxTimeBin());
+      if (iLayer == 6)
+        if (m_stripMaxBinU6 != nullptr) m_stripMaxBinU6->Fill(digitIn.getMaxTimeBin());
+
       uStrips.at(index).insert(digitIn.getCellID());
       int Chip = (int)(digitIn.getCellID() / gTools->getSVDChannelsPerChip()) + 1;
       int indexChip = gTools->getSVDChipIndex(sensorID, kTRUE, Chip);
@@ -555,19 +696,30 @@ void SVDDQMExpressRecoModule::event()
       SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
       int isSample = 0;
       for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
-        if (m_stripSignalU[index] != NULL) m_stripSignalU[index]->Fill(samples[i]);
+        if (m_stripSignalU[index] != nullptr) m_stripSignalU[index]->Fill(samples[i]);
         if (samples[i] > m_CutSVDCharge) {
           isSample = 1;
           if (m_ShowAllHistos == 1) {
-            if (m_hitMapU[index] != NULL) m_hitMapU[index]->Fill(digitIn.getCellID(), i);
+            if (m_hitMapU[index] != nullptr) m_hitMapU[index]->Fill(digitIn.getCellID(), i);
           }
         }
       }
       if (isSample) {
-        if (m_hitMapCountsU != NULL) m_hitMapCountsU->Fill(index);
-        if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+        if (m_hitMapCountsU != nullptr) m_hitMapCountsU->Fill(index);
+        if (m_hitMapCountsChip != nullptr) m_hitMapCountsChip->Fill(indexChip);
       }
     } else {
+      //fill strip count first
+      if (m_stripCountV[index] != nullptr) m_stripCountV[index]->Fill(digitIn.getCellID());
+
+      //fill max bin
+      if (m_stripMaxBinVAll != nullptr) m_stripMaxBinVAll->Fill(digitIn.getMaxTimeBin());
+
+      if (iLayer == 3)
+        if (m_stripMaxBinV3 != nullptr) m_stripMaxBinV3->Fill(digitIn.getMaxTimeBin());
+      if (iLayer == 6)
+        if (m_stripMaxBinV6 != nullptr) m_stripMaxBinV6->Fill(digitIn.getMaxTimeBin());
+
       vStrips.at(index).insert(digitIn.getCellID());
       int Chip = (int)(digitIn.getCellID() / gTools->getSVDChannelsPerChip()) + 1;
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE, Chip);
@@ -575,26 +727,43 @@ void SVDDQMExpressRecoModule::event()
       SVDShaperDigit::APVFloatSamples samples = digitIn.getSamples();
       int isSample = 0;
       for (size_t i = 0; i < SVDShaperDigit::c_nAPVSamples; ++i) {
-        if (m_stripSignalV[index] != NULL) m_stripSignalV[index]->Fill(samples[i]);
+        if (m_stripSignalV[index] != nullptr) m_stripSignalV[index]->Fill(samples[i]);
         if (samples[i] > m_CutSVDCharge) {
           isSample = 1;
           if (m_ShowAllHistos == 1) {
-            if (m_hitMapV[index] != NULL) m_hitMapV[index]->Fill(digitIn.getCellID(), i);
+            if (m_hitMapV[index] != nullptr) m_hitMapV[index]->Fill(digitIn.getCellID(), i);
           }
         }
       }
       if (isSample) {
-        if (m_hitMapCountsV != NULL) m_hitMapCountsV->Fill(index);
-        if (m_hitMapCountsChip != NULL) m_hitMapCountsChip->Fill(indexChip);
+        if (m_hitMapCountsV != nullptr) m_hitMapCountsV->Fill(index);
+        if (m_hitMapCountsChip != nullptr) m_hitMapCountsChip->Fill(indexChip);
       }
     }
   }
   for (int i = 0; i < nSVDSensors; i++) {
-    if ((m_firedU[i] != NULL) && (uStrips[i].size() > 0))
+    if ((m_firedU[i] != nullptr) && (uStrips[i].size() > 0))
       m_firedU[i]->Fill(uStrips[i].size());
-    if ((m_firedV[i] != NULL) && (vStrips[i].size() > 0))
+    if ((m_firedV[i] != nullptr) && (vStrips[i].size() > 0))
       m_firedV[i]->Fill(vStrips[i].size());
   }
+
+  // Fired strips ONLINE ZS
+  if (storeNoZSSVDShaperDigits.isValid())
+    for (const SVDShaperDigit& digitIn : storeNoZSSVDShaperDigits) {
+      int iLayer = digitIn.getSensorID().getLayerNumber();
+      if ((iLayer < firstSVDLayer) || (iLayer > lastSVDLayer)) continue;
+      int iLadder = digitIn.getSensorID().getLadderNumber();
+      int iSensor = digitIn.getSensorID().getSensorNumber();
+      VxdID sensorID(iLayer, iLadder, iSensor);
+      int index = gTools->getSVDSensorIndex(sensorID);
+      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      if (digitIn.isUStrip()) {
+        if (m_onlineZSstripCountU[index] != nullptr) m_onlineZSstripCountU[index]->Fill(digitIn.getCellID());
+      } else {
+        if (m_onlineZSstripCountV[index] != nullptr) m_onlineZSstripCountV[index]->Fill(digitIn.getCellID());
+      }
+    }
 
   vector< set<int> > countsU(nSVDSensors); // sets to eliminate multiple samples per strip
   vector< set<int> > countsV(nSVDSensors);
@@ -608,44 +777,76 @@ void SVDDQMExpressRecoModule::event()
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getSVDSensorIndex(sensorID);
     SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+
+    float time = cluster.getClsTime();
+    if (m_desynchSVDTime && m_svdEventInfo.isValid())
+      time = time - m_svdEventInfo->getSVD2FTSWTimeShift(cluster.getFirstFrame());
+
     if (cluster.isUCluster()) {
       countsU.at(index).insert(SensorInfo.getUCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kTRUE,
                                               (int)(SensorInfo.getUCellID(cluster.getPosition()) / gTools->getSVDChannelsPerChip()) + 1);
-      if (m_hitMapClCountsU != NULL) m_hitMapClCountsU->Fill(index);
-      if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
-      if (m_clusterChargeU[index] != NULL) m_clusterChargeU[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-      if (m_clusterChargeUAll != NULL) m_clusterChargeUAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-      if (m_clusterSizeU[index] != NULL) m_clusterSizeU[index]->Fill(cluster.getSize());
-      if (m_clusterTimeU[index] != NULL) m_clusterTimeU[index]->Fill(cluster.getClsTime());
-      if (m_clusterTimeUAll != NULL) m_clusterTimeUAll->Fill(cluster.getClsTime());
-      if (m_ShowAllHistos == 1) {
-        if (iLayer == 3) if (m_clusterChargeU3 != NULL) m_clusterChargeU3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-        if (iLayer != 3) if (m_clusterChargeU456 != NULL) m_clusterChargeU456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-        if (m_hitMapUCl[index] != NULL) m_hitMapUCl[index]->Fill(SensorInfo.getUCellID(cluster.getPosition()));
+      if (m_hitMapClCountsU != nullptr) m_hitMapClCountsU->Fill(index);
+      if (m_hitMapClCountsChip != nullptr) m_hitMapClCountsChip->Fill(indexChip);
+      if (m_clusterChargeU[index] != nullptr) m_clusterChargeU[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterSNRU[index] != nullptr) m_clusterSNRU[index]->Fill(cluster.getSNR());
+      if (m_clusterChargeUAll != nullptr) m_clusterChargeUAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterSNRUAll != nullptr) m_clusterSNRUAll->Fill(cluster.getSNR());
+      if (m_clusterSizeU[index] != nullptr) m_clusterSizeU[index]->Fill(cluster.getSize());
+      if (m_clusterTimeU[index] != nullptr) m_clusterTimeU[index]->Fill(time);
+      if (m_clusterTimeUAll != nullptr) m_clusterTimeUAll->Fill(time);
+      if (iLayer == 3) {
+        if (m_clusterChargeU3 != nullptr) m_clusterChargeU3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+        if (m_clusterSNRU3 != nullptr) m_clusterSNRU3->Fill(cluster.getSNR());
+        if (m_clusterTimeU3 != nullptr) m_clusterTimeU3->Fill(time);
+      } else {
+        if (m_clusterChargeU456 != nullptr) m_clusterChargeU456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+        if (m_clusterSNRU456 != nullptr) m_clusterSNRU456->Fill(cluster.getSNR());
+        if (m_clusterTimeU456 != nullptr) m_clusterTimeU456->Fill(time);
       }
+
+      if (m_ShowAllHistos == 1)
+        if (m_hitMapUCl[index] != nullptr) m_hitMapUCl[index]->Fill(SensorInfo.getUCellID(cluster.getPosition()));
     } else {
       countsV.at(index).insert(SensorInfo.getVCellID(cluster.getPosition()));
       int indexChip = gTools->getSVDChipIndex(sensorID, kFALSE,
                                               (int)(SensorInfo.getVCellID(cluster.getPosition()) / gTools->getSVDChannelsPerChip()) + 1);
-      if (m_hitMapClCountsV != NULL) m_hitMapClCountsV->Fill(index);
-      if (m_hitMapClCountsChip != NULL) m_hitMapClCountsChip->Fill(indexChip);
-      if (m_clusterChargeV[index] != NULL) m_clusterChargeV[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-      if (m_clusterChargeVAll != NULL) m_clusterChargeVAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-      if (m_clusterSizeV[index] != NULL) m_clusterSizeV[index]->Fill(cluster.getSize());
-      if (m_clusterTimeV[index] != NULL) m_clusterTimeV[index]->Fill(cluster.getClsTime());
-      if (m_clusterTimeVAll != NULL) m_clusterTimeVAll->Fill(cluster.getClsTime());
-      if (m_ShowAllHistos == 1) {
-        if (iLayer == 3) if (m_clusterChargeV3 != NULL) m_clusterChargeV3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-        if (iLayer != 3) if (m_clusterChargeV456 != NULL) m_clusterChargeV456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
-        if (m_hitMapVCl[index] != NULL) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));
+      if (m_hitMapClCountsV != nullptr) m_hitMapClCountsV->Fill(index);
+      if (m_hitMapClCountsChip != nullptr) m_hitMapClCountsChip->Fill(indexChip);
+      if (m_clusterChargeV[index] != nullptr) m_clusterChargeV[index]->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterSNRV[index] != nullptr) m_clusterSNRV[index]->Fill(cluster.getSNR());
+      if (m_clusterChargeVAll != nullptr) m_clusterChargeVAll->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+      if (m_clusterSNRVAll != nullptr) m_clusterSNRVAll->Fill(cluster.getSNR());
+      if (m_clusterSizeV[index] != nullptr) m_clusterSizeV[index]->Fill(cluster.getSize());
+      if (m_clusterTimeV[index] != nullptr) m_clusterTimeV[index]->Fill(time);
+      if (m_clusterTimeVAll != nullptr) m_clusterTimeVAll->Fill(time);
+      if (iLayer == 3) {
+        if (m_clusterChargeV3 != nullptr) m_clusterChargeV3->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+        if (m_clusterSNRV3 != nullptr) m_clusterSNRV3->Fill(cluster.getSNR());
+        if (m_clusterTimeV3 != nullptr) m_clusterTimeV3->Fill(time);
+      } else {
+        if (m_clusterChargeV456 != nullptr) m_clusterChargeV456->Fill(cluster.getCharge() / 1000.0);  // in kelectrons
+        if (m_clusterSNRV456 != nullptr) m_clusterSNRV456->Fill(cluster.getSNR());
+        if (m_clusterTimeV456 != nullptr) m_clusterTimeV456->Fill(time);
       }
+      if (m_ShowAllHistos == 1)
+        if (m_hitMapVCl[index] != nullptr) m_hitMapVCl[index]->Fill(SensorInfo.getVCellID(cluster.getPosition()));
+
     }
   }
   for (int i = 0; i < nSVDSensors; i++) {
-    if ((m_clustersU[i] != NULL) && (countsU[i].size() > 0))
+    if ((m_clustersU[i] != nullptr) && (countsU[i].size() > 0))
       m_clustersU[i]->Fill(countsU[i].size());
-    if ((m_clustersV[i] != NULL) && (countsV[i].size() > 0))
+    if ((m_clustersV[i] != nullptr) && (countsV[i].size() > 0))
       m_clustersV[i]->Fill(countsV[i].size());
   }
+}
+
+
+void SVDDQMExpressRecoModule::terminate()
+{
+
+  //  m_histoList->Delete();
+  delete m_histoList;
+
 }

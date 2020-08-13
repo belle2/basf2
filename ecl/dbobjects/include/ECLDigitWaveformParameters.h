@@ -14,13 +14,10 @@
 #pragma once
 
 #include <TObject.h>
-#include <vector>
-#include <framework/logging/Logger.h>
-
-/** DB object to store photon, hadron and diode shape parameters. */
 
 namespace Belle2 {
 
+  /** DB object to store photon, hadron and diode shape parameters. */
   class ECLDigitWaveformParameters: public TObject {
   public:
 

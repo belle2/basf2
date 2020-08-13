@@ -8,14 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "EvtGenBase/EvtPatches.hh"
-#include <stdlib.h>
 #include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
 #include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtConst.hh"
-#include "EvtGenBase/EvtIdSet.hh"
 #include <string>
 #include "EvtGenBase/EvtSemiLeptonicScalarAmp.hh"
 #include "EvtGenBase/EvtSemiLeptonicVectorAmp.hh"
@@ -69,10 +63,10 @@ void EvtLLSW::decay(EvtParticle* p)
 void EvtLLSW::initProbMax()
 {
 
-  EvtId parnum, mesnum, lnum;
+  EvtId lnum; //parnum, mesnum;
 
-  parnum = getParentId();
-  mesnum = getDaug(0);
+  //parnum = getParentId();
+  //mesnum = getDaug(0);
   lnum = getDaug(1);
 
   // Leptons

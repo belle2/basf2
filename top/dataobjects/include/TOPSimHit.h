@@ -11,8 +11,7 @@
 #pragma once
 
 #include <simulation/dataobjects/SimHitBase.h>
-#include <TObject.h>
-#include <TVector3.h>
+#include <TVector2.h>
 
 namespace Belle2 {
 
@@ -98,7 +97,7 @@ namespace Belle2 {
      * Returns detection time (implementation of base class function)
      * @return detection time
      */
-    float getGlobalTime() const { return m_globalTime; }
+    float getGlobalTime() const override { return m_globalTime; }
 
     /**
      * Returns photon energy
@@ -110,7 +109,7 @@ namespace Belle2 {
      * Shift SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) { m_globalTime += delta; }
+    void shiftInTime(float delta) override { m_globalTime += delta; }
 
   private:
 
@@ -121,7 +120,7 @@ namespace Belle2 {
     float m_globalTime = 0;   /**< detection time */
     float m_energy = 0;       /**< photon energy in [eV] */
 
-    ClassDef(TOPSimHit, 3); /**< ClassDef */
+    ClassDefOverride(TOPSimHit, 3); /**< ClassDef */
 
   };
 

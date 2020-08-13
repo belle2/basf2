@@ -1,7 +1,5 @@
 #include "daq/slc/nsm/NSMCommand.h"
 
-#include "daq/slc/nsm/NSMState.h"
-
 using namespace Belle2;
 
 const NSMCommand NSMCommand::OK(1, "OK");
@@ -24,7 +22,7 @@ const NSMCommand NSMCommand::DBLISTSET(405, "DBLISTSET");
 const NSMCommand NSMCommand::DBLISTGET(406, "DBLISTGET");
 const NSMCommand NSMCommand::LOGLIST(407, "LOGLIST");
 
-const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
+const NSMCommand& NSMCommand::operator=(const std::string& label)
 {
   if (label == LOG.getLabel()) *this = LOG;
   else if (label == OK.getLabel()) *this = OK;
@@ -50,7 +48,7 @@ const NSMCommand& NSMCommand::operator=(const std::string& label) throw()
   return *this;
 }
 
-const NSMCommand& NSMCommand::operator=(int id) throw()
+const NSMCommand& NSMCommand::operator=(int id)
 {
   if (id == LOG.getId()) *this = LOG;
   else if (id == OK.getId()) *this = OK;
@@ -76,7 +74,7 @@ const NSMCommand& NSMCommand::operator=(int id) throw()
   return *this;
 }
 
-const NSMCommand& NSMCommand::operator=(const char* label) throw()
+const NSMCommand& NSMCommand::operator=(const char* label)
 {
   if (label != NULL)  *this = std::string(label);
   else *this = Enum::UNKNOWN;

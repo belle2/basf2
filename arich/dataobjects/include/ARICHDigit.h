@@ -68,7 +68,7 @@ namespace Belle2 {
      * Enables BG overlay module to identify uniquely the physical channel of this Digit.
      * @return unique channel ID, composed of channel ID (1-512) and bar ID (1-16)
      */
-    unsigned int getUniqueChannelID() const {return m_channelID + (m_moduleID << 16);}
+    unsigned int getUniqueChannelID() const override {return m_channelID + (m_moduleID << 16);}
 
     /**
      * Implementation of the base class function
@@ -78,7 +78,7 @@ namespace Belle2 {
      * NOTE: Implementation is provisional (number of "1"s in channel bitmap is equal to number of p.e. that hit channel).
      * Should be updated together with digitizer update, to emulate more proper response.
      */
-    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg);
+    DigitBase::EAppendStatus addBGDigit(const DigitBase* bg) override;
 
     /*
     //! Set ID number of module that registered hit
@@ -95,7 +95,7 @@ namespace Belle2 {
     int m_moduleID;           /**< ID number of module that registered hit */
     int m_channelID;          /**< ID number of hit channel */
     uint8_t m_bitmap;          /**< bitmap */
-    ClassDef(ARICHDigit, 3); /**< the class title */
+    ClassDefOverride(ARICHDigit, 3); /**< the class title */
 
   };
 

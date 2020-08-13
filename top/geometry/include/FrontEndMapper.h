@@ -12,8 +12,6 @@
 
 #include <top/dbobjects/TOPFrontEndMap.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/IntervalOfValidity.h>
 
@@ -162,6 +160,12 @@ namespace Belle2 {
       {}
 
       /**
+       * assignment operator
+       */
+      FrontEndMapper& operator=(const FrontEndMapper&)
+      {return *this;}
+
+      /**
        * Clear
        */
       void clear();
@@ -177,7 +181,7 @@ namespace Belle2 {
       bool m_fromDB = false;                      /**< true, if from database */
 
       std::unordered_set<unsigned int> m_copperIDs; /**< COPPER ID's */
-      const TOPFrontEndMap* m_fromModule[c_numModules][c_numColumns]; /**< conversion */
+      const TOPFrontEndMap* m_fromModule[c_numModules][c_numColumns] = {{0}}; /**< conversion */
       std::map<unsigned short, const TOPFrontEndMap*> m_fromScrod; /**< conversion */
       std::map<unsigned int, const TOPFrontEndMap*> m_fromCopper;  /**< conversion */
 

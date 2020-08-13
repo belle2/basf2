@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIGNALSIDEPARTICLELISTCREATORMODULE_H
-#define SIGNALSIDEPARTICLELISTCREATORMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -47,10 +46,10 @@ namespace Belle2 {
     SignalSideParticleListCreatorModule();
 
     /**  initialize method */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**  event method */
-    virtual void event();
+    virtual void event() override;
 
 
   private:
@@ -71,4 +70,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* SIGNALSIDEPARTICLELISTCREATORMODULE_H */

@@ -26,13 +26,13 @@ namespace Belle2 {
       VXDMisalignmentModule();
 
       /** Initialize the module and check the parameters */
-      virtual void initialize() {}
+      virtual void initialize() override {}
       /** Initialize the list of existing VXD Sensors */
-      virtual void beginRun();
+      virtual void beginRun() override;
       /** Digitize one event */
-      virtual void event() {}
+      virtual void event() override {}
       /** Terminate the module */
-      virtual void terminate() {}
+      virtual void terminate() override {}
 
     protected:
       /** Name of the xml filename with misalignment data */

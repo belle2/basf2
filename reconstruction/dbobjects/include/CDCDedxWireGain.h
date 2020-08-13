@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 
 #include <TObject.h>
-#include <map>
 
 namespace Belle2 {
 
@@ -33,7 +32,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    explicit CDCDedxWireGain(std::vector<double>& wiregains): m_wiregains(wiregains) {};
+    explicit CDCDedxWireGain(const std::vector<double>& wiregains): m_wiregains(wiregains) {};
 
     /**
      * Destructor
@@ -49,6 +48,16 @@ namespace Belle2 {
         m_wiregains[bin] *= rhs.getWireGain(bin);
       }
       return *this;
+    }
+
+    /**
+     * Set wire gain
+     **/
+    void setWireGain(int wire, double gain)
+    {
+      if (wire < 0 || (unsigned)wire >= m_wiregains.size())
+        B2WARNING("Asking for a CDC Wire that is not found!");
+      else m_wiregains[wire] = gain;
     }
 
     /** Return wire gain
@@ -72,6 +81,6 @@ namespace Belle2 {
     std::vector<double> m_wiregains; /**< dE/dx gains for each wire */
 
 
-    ClassDef(CDCDedxWireGain, 4); /**< ClassDef */
+    ClassDef(CDCDedxWireGain, 5); /**< ClassDef */
   };
 } // end namespace Belle2

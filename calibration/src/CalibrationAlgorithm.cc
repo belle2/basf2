@@ -4,6 +4,7 @@
 #include <boost/python.hpp>
 #include <boost/python/list.hpp>
 #include <boost/filesystem.hpp>
+#include <TChain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/PyObjConvUtils.h>
@@ -27,7 +28,6 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
       B2DEBUG(29, "ExpRun was a Python sequence which didn't have exactly 2 entries!");
       return false;
     }
-    long value1, value2;
     PyObject* item1, *item2;
     item1 = PySequence_GetItem(pyObj, 0);
     item2 = PySequence_GetItem(pyObj, 1);
@@ -38,6 +38,7 @@ bool CalibrationAlgorithm::checkPyExpRun(PyObject* pyObj)
     }
     // Are they longs?
     if (PyLong_Check(item1) && PyLong_Check(item2)) {
+      long value1, value2;
       value1 = PyLong_AsLong(item1);
       value2 = PyLong_AsLong(item2);
       if (((value1 == -1) || (value2 == -1)) && PyErr_Occurred()) {
@@ -208,9 +209,12 @@ void CalibrationAlgorithm::setInputFileNames(vector<string> inputFileNames)
   if (setInputFileNames.empty()) {
     B2WARNING("No valid files specified!");
     return;
+  } else {
+    // Reset the run -> files map as our files are likely different
+    m_runsToInputFiles.clear();
   }
 
-  //Open TFile to check they can be accessed by ROOT
+  // Open TFile to check they can be accessed by ROOT
   TDirectory* dir = gDirectory;
   for (const string& fileName : setInputFileNames) {
     unique_ptr<TFile> f;
@@ -249,7 +253,7 @@ string CalibrationAlgorithm::getExpRunString(ExpRun& expRun) const
   return expRunString;
 }
 
-string CalibrationAlgorithm::getFullObjectPath(string name, ExpRun expRun) const
+string CalibrationAlgorithm::getFullObjectPath(const string& name, ExpRun expRun) const
 {
   string dirName = getPrefix() + "/" + name;
   string objName = name + "_" + getExpRunString(expRun);
@@ -316,19 +320,49 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromAllData() const
   return getRunRangeFromAllData().getIntervalOfValidity();
 }
 
-RunRange CalibrationAlgorithm::getRunRangeFromAllData() const
+void CalibrationAlgorithm::fillRunToInputFilesMap()
 {
+  m_runsToInputFiles.clear();
   // Save TDirectory to change back at the end
   TDirectory* dir = gDirectory;
-  RunRange runRange;
-  RunRange* runRangeOther;
+  RunRange* runRange;
   // Construct the TDirectory name where we expect our objects to be
   string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
   for (const auto& fileName : m_inputFileNames) {
     //Open TFile to get the objects
     unique_ptr<TFile> f;
     f.reset(TFile::Open(fileName.c_str(), "READ"));
-    runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+    runRange = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+    if (runRange) {
+      // Insert or extend the run -> file mapping for this ExpRun
+      auto expRuns = runRange->getExpRunSet();
+      for (const auto& expRun : expRuns) {
+        auto runFiles = m_runsToInputFiles.find(expRun);
+        if (runFiles != m_runsToInputFiles.end()) {
+          (runFiles->second).push_back(fileName);
+        } else {
+          m_runsToInputFiles.insert(std::make_pair(expRun, std::vector<std::string> {fileName}));
+        }
+      }
+    } else {
+      B2WARNING("Missing a RunRange object for file: " << fileName);
+    }
+  }
+  dir->cd();
+}
+
+RunRange CalibrationAlgorithm::getRunRangeFromAllData() const
+{
+  // Save TDirectory to change back at the end
+  TDirectory* dir = gDirectory;
+  RunRange runRange;
+  // Construct the TDirectory name where we expect our objects to be
+  string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
+  for (const auto& fileName : m_inputFileNames) {
+    //Open TFile to get the objects
+    unique_ptr<TFile> f;
+    f.reset(TFile::Open(fileName.c_str(), "READ"));
+    RunRange* runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
     if (runRangeOther) {
       runRange.merge(runRangeOther);
     } else {
@@ -351,13 +385,23 @@ string CalibrationAlgorithm::getGranularityFromData() const
   f.reset(TFile::Open(fileName.c_str(), "READ"));
   runRange = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
   if (!runRange) {
-    B2FATAL("The input file " << fileName << "does not conatin a RunRange object at "
+    B2FATAL("The input file " << fileName << " does not contain a RunRange object at "
             << runRangeObjName << ". Please set your input files to exclude it.");
     return "";
   }
   string granularity = runRange->getGranularity();
   dir->cd();
   return granularity;
+}
+
+void CalibrationAlgorithm::updateDBObjPtrs(const unsigned int event = 1, const int run = 0, const int experiment = 0)
+{
+  // Construct an EventMetaData object but NOT in the Datastore
+  EventMetaData emd(event, run, experiment);
+  // Explicitly update while avoiding registering a Datastore object
+  DBStore::Instance().update(emd);
+  // Also update the intra-run objects to the event at the same time (maybe unnessary...)
+  DBStore::Instance().updateEvent(event);
 }
 
 // Have to put the explicit template specialization in the enclosing namespace
@@ -369,7 +413,7 @@ namespace Belle2 {
   shared_ptr<TTree> CalibrationAlgorithm::getObjectPtr<TTree>(const string& name,
                                                               const vector<ExpRun>& requestedRuns)
   {
-    // Check if this object already exists in our map
+    // Check if this object already exists
     RunRange runRangeRequested(requestedRuns);
     std::shared_ptr<TTree> objOutputPtr = std::dynamic_pointer_cast<TTree>(m_data.getCalibObj(name, runRangeRequested));
     if (objOutputPtr)
@@ -380,38 +424,45 @@ namespace Belle2 {
     chain->SetDirectory(0);
     // Construct the TDirectory names where we expect our objects to be
     string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
+
     if (strcmp(getGranularity().c_str(), "run") == 0) {
-      RunRange* runRangeData;
-      for (const auto& fileName : m_inputFileNames) {
-        //Open TFile to get the objects
-        unique_ptr<TFile> f;
-        f.reset(TFile::Open(fileName.c_str(), "READ"));
-        runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
-        if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-          B2DEBUG(29, "Found requested data in file: " << fileName);
-          // Loop over runs in data and check if they exist in our requested ones, then add if they do
-          for (auto expRunData : runRangeData->getExpRunSet()) {
-            for (auto expRunRequested : requestedRuns) {
-              if (expRunData == expRunRequested) {
-                string objDirName = getFullObjectPath(name, expRunData);
-                TDirectory* objDir = f->GetDirectory(objDirName.c_str());
-                // Annoyingly GetPath() returns a string that isn't useful to TChain.Add(), it contains a
-                // filename.root:/path/to/dir  instead of filename.root/path/to/dir
-                // So we have to construct the path explicitly
-                string objDirPath = objDir->GetPath();
-                // Find all the objects inside, there may be more than one
-                for (auto key : * (objDir->GetListOfKeys())) {
-                  string keyName = key->GetName();
-                  string objectPath = fileName + "/" + objDirName + "/" + keyName;
-                  B2DEBUG(29, "Adding TTree " << objectPath);
-                  chain->Add(objectPath.c_str());
-                }
-              }
+      // Loop over our runs requested for the right files
+      for (auto expRunRequested : requestedRuns) {
+        // Find the relevant files for this ExpRun
+        auto searchFiles = m_runsToInputFiles.find(expRunRequested);
+        if (searchFiles == m_runsToInputFiles.end()) {
+          B2WARNING("No input file found with data collected from run "
+                    "(" << expRunRequested.first << "," << expRunRequested.second << ")");
+          continue;
+        } else {
+          auto files = searchFiles->second;
+          for (auto fileName : files) {
+            RunRange* runRangeData;
+            //Open TFile to get the objects
+            std::unique_ptr<TFile> f;
+            f.reset(TFile::Open(fileName.c_str(), "READ"));
+            runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+            // Check that nothing went wrong in the mapping and that this file definitely contains this run's data
+            auto runSet = runRangeData->getExpRunSet();
+            if (runSet.find(expRunRequested) == runSet.end()) {
+              B2WARNING("Something went wrong with the mapping of ExpRun -> Input Files. "
+                        "(" << expRunRequested.first << "," << expRunRequested.second << ") not in " << fileName);
+            }
+            // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
+            std::string objDirName = getFullObjectPath(name, expRunRequested);
+            TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+            if (!objDir) {
+              B2ERROR("Directory for requested object " << name << " not found: " << objDirName);
+              return nullptr;
+            }
+            // Find all the objects inside, there may be more than one
+            for (auto key : * (objDir->GetListOfKeys())) {
+              string keyName = key->GetName();
+              string objectPath = fileName + "/" + objDirName + "/" + keyName;
+              B2DEBUG(29, "Adding TTree " << objectPath);
+              chain->Add(objectPath.c_str());
             }
           }
-        } else {
-          B2DEBUG(29, "No overlapping data found in file: " << fileName);
-          continue;
         }
       }
     } else {
@@ -434,4 +485,67 @@ namespace Belle2 {
     B2DEBUG(29, "Passing back merged data " << name);
     return objOutputPtr;
   }
+}
+
+bool CalibrationAlgorithm::loadInputJson(const std::string& jsonString)
+{
+  try {
+    auto jsonInput = nlohmann::json::parse(jsonString);
+    // Input string has an object (dict) as the top level object?
+    if (jsonInput.is_object()) {
+      m_jsonExecutionInput = jsonInput;
+      return true;
+    } else {
+      B2ERROR("JSON input string isn't an object type i.e. not a '{}' at the top level.");
+      return false;
+    }
+  } catch (nlohmann::json::parse_error&) {
+    B2ERROR("Parsing of JSON input string failed");
+    return false;
+  }
+}
+
+const std::vector<ExpRun> CalibrationAlgorithm::findPayloadBoundaries(std::vector<ExpRun> runs, int iteration)
+{
+  m_boundaries.clear();
+  if (m_inputFileNames.empty()) {
+    B2ERROR("There aren't any input files set. Please use CalibrationAlgorithm::setInputFiles()");
+    return m_boundaries;
+  }
+  // Reset the internal execution data just in case something is hanging around
+  m_data.reset();
+  if (runs.empty()) {
+    // Want to loop over all runs we could possibly know about
+    runs = getRunListFromAllData();
+  }
+  // Let's check that we have some now
+  if (runs.empty()) {
+    B2ERROR("No collected data in input files.");
+    return m_boundaries;
+  }
+  // In order to find run boundaries we must have collected with data granularity == 'run'
+  if (strcmp(getGranularity().c_str(), "all") == 0) {
+    B2ERROR("The data is collected with granularity='all' (exp=-1,run=-1), and we can't use that to find run boundaries.");
+    return m_boundaries;
+  }
+  m_data.setIteration(iteration);
+  // User defined setup function
+  boundaryFindingSetup(runs, iteration);
+  std::vector<ExpRun> runList;
+  // Loop over run list and call derived class "isBoundaryRequired" member function
+  for (auto currentRun : runs) {
+    runList.push_back(currentRun);
+    m_data.setRequestedRuns(runList);
+    // After here, the getObject<...>(...) helpers start to work
+    if (isBoundaryRequired(currentRun)) {
+      m_boundaries.push_back(currentRun);
+    }
+    // Only want run-by-run
+    runList.clear();
+    // Don't want memory hanging around
+    m_data.clearCalibrationData();
+  }
+  m_data.reset();
+  boundaryFindingTearDown();
+  return m_boundaries;
 }

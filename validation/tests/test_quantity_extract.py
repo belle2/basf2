@@ -3,7 +3,6 @@
 
 import unittest
 import ROOT
-import math
 
 from quantity_extract import RootQuantityExtract, default_extractor
 

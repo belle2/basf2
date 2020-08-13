@@ -9,10 +9,8 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcCosmicSelector/CDCCosmicSelectorModule.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
-#include <utility>
 #include <iostream>
 
 using namespace std;

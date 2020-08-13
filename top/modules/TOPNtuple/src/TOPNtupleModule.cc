@@ -11,15 +11,13 @@
 // Own include
 #include <top/modules/TOPNtuple/TOPNtupleModule.h>
 
-
+#include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -66,7 +64,7 @@ namespace Belle2 {
   void TOPNtupleModule::initialize()
   {
 
-    m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
+    m_file = TFile::Open(m_outputFileName.c_str(), "RECREATE");
     if (m_file->IsZombie()) {
       B2FATAL("Couldn't open file '" << m_outputFileName << "' for writing!");
       return;

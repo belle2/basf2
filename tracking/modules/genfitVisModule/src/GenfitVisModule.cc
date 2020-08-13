@@ -13,9 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <geometry/GeometryManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 #include <genfit/Track.h>
-#include <genfit/GFRaveVertex.h>
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
 
@@ -47,7 +45,7 @@ void GenfitVisModule::initialize()
   if (!genfit::MaterialEffects::getInstance()->isInitialized())
     B2FATAL("No material effects setup.  Please use SetupGenfitExtrapolationModule.");
 
-  if (gGeoManager == NULL) {
+  if (gGeoManager == nullptr) {
     B2INFO("Setting up TGeo geometry for visualization.");
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();

@@ -35,28 +35,28 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -72,7 +72,6 @@ namespace Belle2 {
     int m_hysteresis; /**< pulse height threshold hysteresis [ADC counts] */
     int m_gateWidth;  /**< width of discriminator gate [samples] */
     int m_samplingPhase;  /**< sampling phase [samples] */
-    int m_bunchTimeStamp; /**< time stamp of the interaction (see addParam for more) */
   };
 
 } // Belle2 namespace

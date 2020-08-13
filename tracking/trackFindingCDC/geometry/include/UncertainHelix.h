@@ -84,10 +84,10 @@ namespace Belle2 {
       }
 
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
-      UncertainHelix(const Helix& helix,
-                     const HelixCovariance& helixCovariance = HelixUtil::identity(),
-                     const double chi2 = 0.0,
-                     std::size_t ndf = 0)
+      explicit UncertainHelix(const Helix& helix,
+                              const HelixCovariance& helixCovariance = HelixUtil::identity(),
+                              const double chi2 = 0.0,
+                              std::size_t ndf = 0)
         : m_helix(helix)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)

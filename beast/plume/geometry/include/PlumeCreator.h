@@ -12,23 +12,8 @@
 #define PLUMECREATOR_H_
 
 #include <geometry/CreatorBase.h>
-#include "G4VUserDetectorConstruction.hh"
-#include "globals.hh"
-#include "TString.h"
-#include "Riostream.h"
 
-class G4Box;
-class G4Tubs;
 class G4LogicalVolume;
-class G4VPhysicalVolume;
-class G4Material;
-class G4UniformMagField;
-class DetectorMessenger;
-class G4ProductionCuts;
-class G4Region;
-class G4VSolid;
-class G4UnionSolid;
-class G4SubtractionSolid;
 class G4AssemblyVolume;
 
 namespace Belle2 {
@@ -40,15 +25,31 @@ namespace Belle2 {
     /** The creator for the PLUME geometry. */
     class PlumeCreator : public geometry::CreatorBase {
     public:
+      /**
+       * Constructor
+       */
       PlumeCreator();
+      /**
+       * Destructor
+       */
       virtual ~PlumeCreator();
+      /**
+       * Creation of the detector geometry from Gearbox (XML).
+       * @param[in] content   XML data directory.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
+       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
       /**  SensitiveDetector PLUME */
       SensitiveDetector* m_sensitive;
+      /**  Volume of support1 */
       G4AssemblyVolume* buildSupport1();
+      /**  Volume of support2 */
       G4AssemblyVolume* buildSupport2();
+      /**  Volume of support3 */
       G4AssemblyVolume* buildSupport3();
+      /**  Volume of support4 */
       G4AssemblyVolume* buildSupport4();
     };
 

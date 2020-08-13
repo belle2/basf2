@@ -36,10 +36,10 @@ using namespace analysis;
 
 
 
-RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_motherParticlePtr(NULL), m_raveAlgorithm(""),
+RaveKinematicVertexFitter::RaveKinematicVertexFitter(): m_useBeamSpot(false), m_motherParticlePtr(nullptr), m_raveAlgorithm(""),
   m_massConstFit(false), m_vertFit(true)
 {
-  if (RaveSetup::getRawInstance() == NULL) {
+  if (RaveSetup::getRawInstance() == nullptr) {
     B2FATAL("RaveSetup::initialize was not called. It has to be called before RaveSetup or RaveKinematicVertexFitter are used");
   }
   m_useBeamSpot = RaveSetup::getRawInstance()->m_useBeamSpot;
@@ -52,9 +52,7 @@ IOIntercept::InterceptorScopeGuard<IOIntercept::OutputToLogMessages> RaveKinemat
 }
 
 
-RaveKinematicVertexFitter::~RaveKinematicVertexFitter()
-{
-}
+RaveKinematicVertexFitter::~RaveKinematicVertexFitter() = default;
 
 
 void RaveKinematicVertexFitter::setMassConstFit(bool isConstFit)
@@ -116,7 +114,7 @@ void RaveKinematicVertexFitter::addMother(const Particle* aMotherParticlePtr)
   }
 
   //store input pointer so fit results can be written to the mother particle after the fit
-  Particle* tmp = const_cast<Particle*>(aMotherParticlePtr);
+  auto* tmp = const_cast<Particle*>(aMotherParticlePtr);
   m_motherParticlePtr = tmp;
 
 }
@@ -124,7 +122,7 @@ void RaveKinematicVertexFitter::addMother(const Particle* aMotherParticlePtr)
 
 void RaveKinematicVertexFitter::setMother(const Particle* aMotherParticlePtr)
 {
-  Particle* tmp = const_cast<Particle*>(aMotherParticlePtr);
+  auto* tmp = const_cast<Particle*>(aMotherParticlePtr);
   m_motherParticlePtr = tmp;
 }
 
@@ -454,7 +452,7 @@ TMatrixDSym RaveKinematicVertexFitter::getVertexErrorMatrix()
 }
 
 
-TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixMassToEnergy(TLorentzVector p4, TMatrixDSym MassErr)
+TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixMassToEnergy(const TLorentzVector& p4, const TMatrixDSym& MassErr)
 {
 
   TMatrix jac(7, 7);
@@ -484,7 +482,7 @@ TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixMassToEnergy(TLorentzVector p4
   return EnergyErr;
 }
 
-TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixEnergyToMass(TLorentzVector p4, TMatrixDSym EnergyErr)
+TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixEnergyToMass(const TLorentzVector& p4, const TMatrixDSym& EnergyErr)
 {
 
   TMatrix jac(7, 7);
@@ -512,4 +510,3 @@ TMatrixDSym RaveKinematicVertexFitter::ErrorMatrixEnergyToMass(TLorentzVector p4
 
   return MassErr;
 }
-

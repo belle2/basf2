@@ -15,10 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -127,7 +123,7 @@ void HepevtInputModule::event()
     if (m_useWeights)
       eventMetaDataPtr->setGeneratedWeight(weight);
     mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
-  } catch (HepevtReader::HepEvtEmptyEventError) {
+  } catch (HepevtReader::HepEvtEmptyEventError&) {
     B2DEBUG(100, "Reached end of HepEvt file.");
     m_hepevt.closeCurrentInputFile();
     m_iFile++;

@@ -24,7 +24,7 @@ namespace Belle2 {
       /** Enums for used error bits (out of maximum).
        * used for e.g. plotting ranges
        */
-      enum { ONSEN_USED_TYPE_ERR = 60};
+      enum { ONSEN_USED_TYPE_ERR = 64};
 
       /** Typedef the flag variable type (uint64_t)
        */
@@ -36,8 +36,9 @@ namespace Belle2 {
        */
       enum EPXDErrMask : uint64_t {
         c_NO_ERROR = 0ull,
+        c_ALL_ERROR = ~0ull,
         //
-        c_XXXXTB_IDS = 1ull << 0,
+        c_EVENT_STRUCT = 1ull << 0,
         c_FRAME_TNR_MM = 1ull << 1,
         c_META_MM = 1ull << 2,
         c_ONSEN_TRG_FIRST = 1ull << 3,
@@ -53,7 +54,7 @@ namespace Belle2 {
         c_DHE_CRC = 1ull << 11,
         //
         c_DHC_UNKNOWN = 1ull << 12,
-        c_XXXMERGER_CRC = 1ull << 13,
+        c_HEADERTYPE_INV = 1ull << 13,
         c_PACKET_SIZE = 1ull << 14,
         c_MAGIC = 1ull << 15,
         //
@@ -112,7 +113,11 @@ namespace Belle2 {
         c_DHP_ROW_WO_PIX = 1ull << 58,
         c_DHE_START_THIRD = 1ull << 59,
         //
-        // 60, 61, 62, 63 unused
+        c_FAKE_NO_FAKE_DATA = 1ull << 60,
+        c_UNUSABLE_DATA = 1ull << 61,
+        c_DHH_END_ERRORBITS  = 1ull << 62,
+        c_DHH_MISC_ERROR  = 1ull << 63,
+        // all used up!
       };
 
       /** Get the description for the given error bit set above

@@ -13,7 +13,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/core/Environment.h>
-#include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 
 #include <string>
@@ -98,10 +97,13 @@ namespace Belle2 {
     void readPersistentEntry(long fileEntry);
 
     /** Check if we warn the user or abort after an entry was missing after changing files. */
-    void entryNotFound(std::string entryOrigin, std::string name, bool fileChanged = true);
+    void entryNotFound(const std::string& entryOrigin, const std::string& name, bool fileChanged = true);
 
     /** For index files, this creates TEventList/TEntryListArray to enable better cache use. */
     void addEventListForIndexFile(const std::string& parentLfn);
+
+    /** Correct isMC flag for raw data recorded before experiment 8 run 2364. */
+    void realDataWorkaround(FileMetaData& metaData);
 
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */
@@ -145,10 +147,6 @@ namespace Belle2 {
 
     /** experiment, run, event number of first event to load */
     std::vector<int> m_skipToEvent;
-
-    /** Try recovery when reading corrupted files. Might allow reading some of the data (FileMetaData likely to be missing) */
-    bool m_recovery;
-
 
     //then those for purely internal use:
 
@@ -217,6 +215,9 @@ namespace Belle2 {
 
     /** Input ROOT File Cache size in MB, <0 means default */
     int m_cacheSize{0};
+
+    /** Discard events that have an error flag != 0 */
+    bool m_discardErrorEvents{true};
 
     /** Set to true if we process the input files completely: No skip events or sequences or -n parameters */
     bool m_processingAllEvents{true};

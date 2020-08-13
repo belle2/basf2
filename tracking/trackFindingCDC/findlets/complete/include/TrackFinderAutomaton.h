@@ -16,8 +16,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>

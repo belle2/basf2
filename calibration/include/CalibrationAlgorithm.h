@@ -13,12 +13,15 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
+#include <any>
 #include <utility>
 #include <list>
+#include <nlohmann/json.hpp>
 #include <TClonesArray.h>
 #include <TDirectory.h>
 #include <TFile.h>
-#include <TChain.h>
+#include <TTree.h>
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/logging/Logger.h>
@@ -58,6 +61,11 @@ namespace Belle2 {
         m_result = c_Undefined;
         m_payloads.clear();
         m_iov = IntervalOfValidity();
+        clearCalibrationData();
+      }
+      /// Clear calibration data
+      void clearCalibrationData()
+      {
         m_mapCalibData.clear();
       }
       /// Returns the vector of ExpRuns
@@ -67,7 +75,11 @@ namespace Belle2 {
       /// Getter for current iteration
       int getIteration() const {return m_iteration;}
       /// Setter for current iteration
-      void setIteration(int iteration) {m_iteration = iteration;}
+      void setIteration(int iteration)
+      {
+        B2DEBUG(29, "Setting Iteration of Algorithm to " << iteration);
+        m_iteration = iteration;
+      }
       /// Getter for current result
       EResult getResult() const {return m_result;}
       /// Setter for current iteration
@@ -167,6 +179,9 @@ namespace Belle2 {
     /// Get the complete IoV from inspection of collected data
     IntervalOfValidity getIovFromAllData() const;
 
+    /// Fill the mapping of ExpRun -> Files
+    void fillRunToInputFilesMap();
+
     /// Get the granularity of collected data
     std::string getGranularity() const {return m_granularityOfData;};
 
@@ -198,11 +213,50 @@ namespace Belle2 {
     /// Get the description of the algoithm (set by developers in constructor)
     const std::string& getDescription() const {return m_description;}
 
+    /// Load the m_inputJson variable from a string (useful from Python interface). The rturn bool indicates success or failure
+    //  of JSON object creation. Failure probably means that your JSON string was badly formatted.
+    bool loadInputJson(const std::string& jsonString);
+
+    /// Dump the JSON string of the output JSON object.
+    const std::string dumpOutputJson() const {return m_jsonExecutionOutput.dump();}
+
+    /// Used to discover the ExpRun boundaries that you want the Python CAF to execute on. This is optional and only used in some
+    //  areas of the CAF. Basically you search for features in the data that you want to find and make sure that the CAF knows
+    //  there is a boundary where payloads should probably start/end. The output boundaries should be the starting ExpRun
+    //  of the new boundary.
+    const std::vector<Calibration::ExpRun> findPayloadBoundaries(std::vector<Calibration::ExpRun> runs, int iteration = 0);
+
   protected:
     // Developers implement this function ------------
 
     /// Run algo on data - pure virtual: needs to be implemented
     virtual EResult calibrate() = 0;
+
+    /// Given the current collector data, make a decision about whether or not this run should be the start of a payload boundary
+    //  Implementing this is optional because most people will never call findPayloadBoundaries in their CAF job.
+    //  It returns false by default so that the boundaries vector is empty if you forgot to implement this.
+    //
+    //  We omit the names of arguments here so that we don't generate lots of compiler warnings in algorithms that don't
+    //  implement this function.
+    virtual bool isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/)
+    {
+      B2ERROR("You didn't implement a isBoundaryRequired() member function in your CalibrationAlgorithm but you are calling it!");
+      return false;
+    }
+
+    /// If you need to make some changes to your algorithm class before 'findPayloadBoundaries' is run, make them in this function
+    //  We omit the names of arguments here so that we don't generate lots of compiler warnings in algorithms that don't
+    //  implement this function.
+    virtual void boundaryFindingSetup(std::vector<Calibration::ExpRun> /*runs*/, int /*iteration = 0*/) {};
+
+    /// Put your algorithm back into a state ready for normal execution if you need to.
+    //  This runs right after 'findPayloadBoundaries' and is supposed to  correct any changes you made in 'boundaryFindingSetup'
+    //  or 'isBoundaryRequired'.
+    virtual void boundaryFindingTearDown() {};
+
+    // When using the boundaries functionality from isBoundaryRequired, this is used to store the boundaries. It is cleared when
+    // calling findPayloadBoundaries, before boundaryFindingSetup is called.
+    std::vector<Calibration::ExpRun> m_boundaries;
 
     // Helpers ---------------- Data retrieval -------
 
@@ -228,6 +282,8 @@ namespace Belle2 {
     template<class T>
     std::shared_ptr<T> getObjectPtr(std::string name)
     {
+      if (m_runsToInputFiles.size() == 0)
+        fillRunToInputFilesMap();
       return getObjectPtr<T>(name, m_data.getRequestedRuns());
     }
 
@@ -254,13 +310,52 @@ namespace Belle2 {
     /// Store DB payload with given name and custom IOV
     void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
 
+    /// Updates any DBObjPtrs by calling update(event) for DBStore
+    void updateDBObjPtrs(const unsigned int event, const int run, const int experiment);
+
     // -----------------------------------------------
 
     /// Set algorithm description (in constructor)
     void setDescription(const std::string& description) {m_description = description;}
 
+    /// Clear calibration data
+    void clearCalibrationData() {m_data.clearCalibrationData();}
+
     /// Returns the Exp,Run pair that means 'Everything'. Currently unused.
     Calibration::ExpRun getAllGranularityExpRun() const {return m_allExpRun;}
+
+    /// Clears the m_inputJson member variable.
+    void resetInputJson() {m_jsonExecutionInput.clear();}
+
+    /// Clears the m_outputJson member variable.
+    void resetOutputJson() {m_jsonExecutionOutput.clear();}
+
+    /// Set a key:value pair for the outputJson object, expected to used interally during calibrate()
+    template<class T>
+    void setOutputJsonValue(const std::string& key, const T& value) {m_jsonExecutionOutput[key] = value;}
+
+    /// Get a value using a key from the JSON output object, not sure why you would want to do this.
+    //  No attempt to catch exceptions is made here.
+    template<class T>
+    const T getOutputJsonValue(const std::string& key) const
+    {
+      return m_jsonExecutionOutput.at(key);
+    }
+
+    /// Get an input JSON value using a key. The normal exceptions are raised when the key doesn't exist.
+    //  No attempt to catch them is made here.
+    template<class T>
+    const T getInputJsonValue(const std::string& key) const
+    {
+      return m_jsonExecutionInput.at(key);
+    }
+
+    /// Get the entire top level JSON object. We explicitly say this must be of object type so that we might pick
+    //  up on weird errors where someone snuck an array into the member variable.
+    const nlohmann::json& getInputJsonObject() const {return m_jsonExecutionInput;}
+
+    /// Test for a key in the input JSON object
+    bool inputJsonKeyExists(const std::string& key) const {return m_jsonExecutionInput.count(key);}
 
   private:
 
@@ -270,10 +365,13 @@ namespace Belle2 {
     std::string getExpRunString(Calibration::ExpRun& expRun) const;
 
     /// constructs the full TDirectory + Key name of an object in a TFile based on its name and exprun
-    std::string getFullObjectPath(std::string name, Calibration::ExpRun expRun) const;
+    std::string getFullObjectPath(const std::string& name, Calibration::ExpRun expRun) const;
 
     /// List of input files to the Algorithm, will initially be user defined but then gets the wildcards expanded during execute()
     std::vector<std::string> m_inputFileNames;
+
+    /// Map of Runs to input files. Gets filled when you call getRunRangeFromAllData, gets cleared when setting input files again
+    std::map<Calibration::ExpRun, std::vector<std::string>> m_runsToInputFiles;
 
     /// Granularity of input data. This only changes when the input files change so it isn't specific to an execution
     std::string m_granularityOfData;
@@ -286,6 +384,21 @@ namespace Belle2 {
 
     /// The name of the TDirectory the collector objects are contained within
     std::string m_prefix{""};
+
+    /// Optional input JSON  object used to make decisions about how to execute the algorithm code.
+    //  We initialise to "{}" rather than allowing a JSON array/value as the top level type. This forces the user
+    //  to use "key":value for storing data in this object. You should test for empty(), is_null() will always
+    //  return false due to the empty top level object.
+    //  Functionally similar to simple member variables for configuration of the algorithm.
+    //  However these input values are easier to use from Python code without needing to know the details of the algorithm.
+    //  These values are intended to be used for a single execution, not reused
+    nlohmann::json m_jsonExecutionInput = nlohmann::json::object();
+
+    /// Optional output JSON object that can be set during the execution by the underlying algorithm code.
+    //  As for input we initialise to an empty "{}" JSON object. Testing for empty() returns true, but is_null() does not.
+    //  Nothing is done with these by default, however a calling process may decide to capture these values and use them
+    //  as input to a following execution.
+    nlohmann::json m_jsonExecutionOutput = nlohmann::json::object();
 
   };  // End of CalibrationAlgorithm definition
 
@@ -318,46 +431,62 @@ namespace Belle2 {
     // Construct the TDirectory names where we expect our objects to be
     std::string runRangeObjName(getPrefix() + "/" + Calibration::RUN_RANGE_OBJ_NAME);
 
-    for (const auto& fileName : m_inputFileNames) {
-      RunRange* runRangeData;
-      //Open TFile to get the objects
-      std::unique_ptr<TFile> f;
-      f.reset(TFile::Open(fileName.c_str(), "READ"));
-      runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
-
-      if (strcmp(getGranularity().c_str(), "run") == 0) {
-        if (runRangeData->getIntervalOfValidity().overlaps(runRangeRequested.getIntervalOfValidity())) {
-          B2DEBUG(100, "Found requested ExpRun in file: " << fileName);
-          // Loop over runs in data and check if they exist in our requested ones, then add if they do
-          for (auto expRunData : runRangeData->getExpRunSet()) {
-            for (auto expRunRequested : requestedRuns) {
-              if (expRunData == expRunRequested) {
-                // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
-                std::string objDirName = getFullObjectPath(name, expRunData);
-                TDirectory* objDir = f->GetDirectory(objDirName.c_str());
-                // Find all the objects inside, there may be more than one
-                for (auto key : * (objDir->GetListOfKeys())) {
-                  std::string keyName = key->GetName();
-                  B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
-                  T* objOther = (T*)objDir->Get(keyName.c_str());
-                  if (objOther) {
-                    if (mergedEmpty) {
-                      mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
-                      mergedObjPtr->SetDirectory(0);
-                      mergedEmpty = false;
-                    } else {
-                      list.Add(objOther);
-                    }
-                  }
+    if (strcmp(getGranularity().c_str(), "run") == 0) {
+      // Loop over our runs requested for the right files
+      for (auto expRunRequested : requestedRuns) {
+        // Find the relevant files for this ExpRun
+        auto searchFiles = m_runsToInputFiles.find(expRunRequested);
+        if (searchFiles == m_runsToInputFiles.end()) {
+          B2WARNING("No input file found with data collected from run "
+                    "(" << expRunRequested.first << "," << expRunRequested.second << ")");
+          continue;
+        } else {
+          auto files = searchFiles->second;
+          for (auto fileName : files) {
+            RunRange* runRangeData;
+            //Open TFile to get the objects
+            std::unique_ptr<TFile> f;
+            f.reset(TFile::Open(fileName.c_str(), "READ"));
+            runRangeData = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+            // Check that nothing went wrong in the mapping and that this file definitely contains this run's data
+            auto runSet = runRangeData->getExpRunSet();
+            if (runSet.find(expRunRequested) == runSet.end()) {
+              B2WARNING("Something went wrong with the mapping of ExpRun -> Input Files. "
+                        "(" << expRunRequested.first << "," << expRunRequested.second << ") not in " << fileName);
+            }
+            // Get the path/directory of the Exp,Run TDirectory that holds the object(s)
+            std::string objDirName = getFullObjectPath(name, expRunRequested);
+            TDirectory* objDir = f->GetDirectory(objDirName.c_str());
+            if (!objDir) {
+              B2ERROR("Directory for requested object " << name << " not found: " << objDirName);
+              return nullptr;
+            }
+            // Find all the objects inside, there may be more than one
+            for (auto key : * (objDir->GetListOfKeys())) {
+              std::string keyName = key->GetName();
+              B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
+              T* objOther = (T*)objDir->Get(keyName.c_str());
+              if (objOther) {
+                if (mergedEmpty) {
+                  mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
+                  mergedObjPtr->SetDirectory(0);
+                  mergedEmpty = false;
+                } else {
+                  list.Add(objOther);
                 }
               }
             }
+            if (!mergedEmpty)
+              mergedObjPtr->Merge(&list);
+            list.Clear();
           }
-        } else {
-          B2DEBUG(100, "No overlapping data found in file: " << fileName);
-          continue;
         }
-      } else {
+      }
+    } else {
+      for (auto fileName : m_inputFileNames) {
+        //Open TFile to get the objects
+        std::unique_ptr<TFile> f;
+        f.reset(TFile::Open(fileName.c_str(), "READ"));
         Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
         std::string objDirName = getFullObjectPath(name, allGranExpRun);
         std::string objPath = objDirName + "/" + name + "_1";
@@ -372,10 +501,10 @@ namespace Belle2 {
             list.Add(objOther);
           }
         }
+        if (!mergedEmpty)
+          mergedObjPtr->Merge(&list);
+        list.Clear();
       }
-      if (!mergedEmpty)
-        mergedObjPtr->Merge(&list);
-      list.Clear();
     }
     dir->cd();
     objOutputPtr = mergedObjPtr;
@@ -390,4 +519,13 @@ namespace Belle2 {
     B2DEBUG(100, "Passing back merged data " << name);
     return objOutputPtr;
   }
+
+  /**
+   * Specialization of getObjectPtr<TTree>.
+   */
+  template<> std::shared_ptr<TTree>
+  CalibrationAlgorithm::getObjectPtr(
+    const std::string& name,
+    const std::vector<Calibration::ExpRun>& requestedRuns);
+
 } // namespace Belle2

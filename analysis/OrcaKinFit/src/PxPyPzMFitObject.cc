@@ -24,7 +24,7 @@ namespace Belle2 {
   namespace OrcaKinFit {
 
 // constructor
-    PxPyPzMFitObject::PxPyPzMFitObject(CLHEP::HepLorentzVector& particle, CLHEP::HepSymMatrix& covmatrix)
+    PxPyPzMFitObject::PxPyPzMFitObject(CLHEP::HepLorentzVector& particle, const CLHEP::HepSymMatrix& covmatrix)
       : cachevalid(false), chi2(0), dEdpx(0), dEdpy(0), dEdpz(0),
         dE2dpxdpx(0), dE2dpxdpy(0), dE2dpxdpz(0), dE2dpydpy(0), dE2dpydpz(0), dE2dpzdpz(0)
     {
@@ -53,7 +53,7 @@ namespace Belle2 {
     }
 
 // destructor
-    PxPyPzMFitObject::~PxPyPzMFitObject() {}
+    PxPyPzMFitObject::~PxPyPzMFitObject() = default;
 
     PxPyPzMFitObject::PxPyPzMFitObject(const PxPyPzMFitObject& rhs)
       : ParticleFitObject(rhs), cachevalid(false), chi2(0), dEdpx(0), dEdpy(0), dEdpz(0),
@@ -78,7 +78,7 @@ namespace Belle2 {
 
     PxPyPzMFitObject& PxPyPzMFitObject::assign(const BaseFitObject& source)
     {
-      if (const PxPyPzMFitObject* psource = dynamic_cast<const PxPyPzMFitObject*>(&source)) {
+      if (const auto* psource = dynamic_cast<const PxPyPzMFitObject*>(&source)) {
         if (psource != this) {
           ParticleFitObject::assign(source);
           // only mutable data members, need not to be copied, if cache is invalid
@@ -249,7 +249,7 @@ namespace Belle2 {
       double px2 = px * px;
       double py2 = py * py;
       double pz2 = pz * pz;
-      double p  = px + py + pz;
+      double p  = std::sqrt(px2 + py2 + pz2);
       assert(p != 0);
 
       double mass2 = mass * mass;
@@ -276,5 +276,4 @@ namespace Belle2 {
     }
   }// end OrcaKinFit namespace
 } // end Belle2 namespace
-
 

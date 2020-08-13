@@ -320,7 +320,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
 
   size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
   if (nObservationsWithDriftRadius > 0) {
-    resultCircle = ::fit(s, isLineConstrained(), isOriginConstrained());
+    resultCircle = UncertainPerigeeCircle(::fit(s, isLineConstrained(), isOriginConstrained()));
     chi2 = calcChi2(resultCircle, s);
   } else {
     if (not isOriginConstrained()) {
@@ -335,10 +335,10 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
       // Covariance matrix
       Eigen::Matrix< double, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
 
-      resultCircle = fitSeperateOffset(meansNoL, cNoL, isLineConstrained());
+      resultCircle = UncertainPerigeeCircle(fitSeperateOffset(meansNoL, cNoL, isLineConstrained()));
 
     } else {
-      resultCircle = ::fit(sNoL, isLineConstrained(), isOriginConstrained());
+      resultCircle = UncertainPerigeeCircle(::fit(sNoL, isLineConstrained(), isOriginConstrained()));
     }
 
     chi2 = calcChi2(resultCircle, sNoL);

@@ -52,19 +52,24 @@ namespace Belle2 {
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get Detector buffer length
-    int GetDetectorNwords(int n, int finesse_num);
+    /* cppcheck-suppress missingOverride */
+    int GetDetectorNwords(int n, int finesse_num) OVERRIDE_CPP17;
 
     //! get Detector buffer of slot A
-    int* Get1stDetectorBuffer(int n);
+    /* cppcheck-suppress missingOverride */
+    int* Get1stDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot B
-    int* Get2ndDetectorBuffer(int n);
+    /* cppcheck-suppress missingOverride */
+    int* Get2ndDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot C
-    int* Get3rdDetectorBuffer(int n);
+    /* cppcheck-suppress missingOverride */
+    int* Get3rdDetectorBuffer(int n) OVERRIDE_CPP17;
 
     //! get Detector Buffer of slot D
-    int* Get4thDetectorBuffer(int n);
+    /* cppcheck-suppress missingOverride */
+    int* Get4thDetectorBuffer(int n) OVERRIDE_CPP17;
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
@@ -74,13 +79,16 @@ namespace Belle2 {
     // Get information from 13words "COPPER header" attached by COPPER board
     //
     //! get COPPER counter(not event number)
-    unsigned int GetCOPPERCounter(int n);
+    /* cppcheck-suppress missingOverride */
+    unsigned int GetCOPPERCounter(int n) OVERRIDE_CPP17;
 
     //! get # of offset words for FINESSE slot A buffer position
-    int GetOffset1stFINESSE(int n);
+    /* cppcheck-suppress missingOverride */
+    int GetOffset1stFINESSE(int n) OVERRIDE_CPP17;
 
     //! get data size of  FINESSE buffer
-    int GetFINESSENwords(int n, int finesse);
+    /* cppcheck-suppress missingOverride */
+    int GetFINESSENwords(int n, int finesse) OVERRIDE_CPP17;
 
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
@@ -89,50 +97,63 @@ namespace Belle2 {
     //    virtual int* GetFTSW2Words(int n);
 
     //! get b2l block from "FEE b2link header"
-    virtual int* GetExpRunSubrunBuf(int n);
+    /* cppcheck-suppress missingOverride */
+    virtual int* GetExpRunSubrunBuf(int n) OVERRIDE_CPP17;
 
     //! get b2l block from "FEE b2link header"
-    virtual unsigned int GetB2LFEE32bitEventNumber(int n);
+    /* cppcheck-suppress missingOverride */
+    virtual unsigned int GetB2LFEE32bitEventNumber(int n) OVERRIDE_CPP17;
 
     //
     // read magic word to check data
     //
     //! get magic word of  COPPER driver header
-    unsigned int GetMagicDriverHeader(int n);
+    /* cppcheck-suppress missingOverride */
+    unsigned int GetMagicDriverHeader(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER FPGA header
-    unsigned int GetMagicFPGAHeader(int n);
+    /* cppcheck-suppress missingOverride */
+    unsigned int GetMagicFPGAHeader(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER FPGA trailer
-    unsigned int GetMagicFPGATrailer(int n);
+    /* cppcheck-suppress missingOverride */
+    unsigned int GetMagicFPGATrailer(int n) OVERRIDE_CPP17;
 
     //! get magic word of  COPPER driver trailer
-    unsigned int GetMagicDriverTrailer(int n);
+    /* cppcheck-suppress missingOverride */
+    unsigned int GetMagicDriverTrailer(int n) OVERRIDE_CPP17;
 
     //! Get checksum in RawTrailer
-    unsigned int GetTrailerChksum(int  n);
+    /* cppcheck-suppress missingOverride */
+    unsigned int GetTrailerChksum(int  n) OVERRIDE_CPP17;
 
     //! Check if COPPER Magic words are correct
-    bool CheckCOPPERMagic(int n);
+    /* cppcheck-suppress missingOverride */
+    bool CheckCOPPERMagic(int n) OVERRIDE_CPP17;
 
     //! should be called by DeSerializerCOPPER.cc and fill contents in RawHeader
+    /* cppcheck-suppress missingOverride */
     unsigned int FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
-                                       unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
+                                       unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) OVERRIDE_CPP17;
 
     //! read COPPER driver's checksum value
-    unsigned int GetDriverChkSum(int n);
+    /* cppcheck-suppress missingOverride */
+    unsigned int GetDriverChkSum(int n) OVERRIDE_CPP17;
 
     //! calc COPPER driver's checksum value
-    unsigned int CalcDriverChkSum(int n);
+    /* cppcheck-suppress missingOverride */
+    unsigned int CalcDriverChkSum(int n) OVERRIDE_CPP17;
 
     //! check data contents
+    /* cppcheck-suppress missingOverride */
     void CheckData(int n,
                    unsigned int prev_evenum, unsigned int* cur_evenum,
                    unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no);
+                   unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no) OVERRIDE_CPP17;
 
     //! check data contents
-    void CheckUtimeCtimeTRGType(int n);
+    /* cppcheck-suppress missingOverride */
+    void CheckUtimeCtimeTRGType(int n) OVERRIDE_CPP17;
 
     //! check magic words
     int CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords);
@@ -141,12 +162,13 @@ namespace Belle2 {
     int CheckCRC16(int n, int finesse_num);
 
     //! Pack data (format ver. = -1 -> Select the latest format version)
+    /* cppcheck-suppress missingOverride */
     int* PackDetectorBuf(int* packed_buf_nwords,
                          int* detector_buf_1st, int nwords_1st,
                          int* detector_buf_2nd, int nwords_2nd,
                          int* detector_buf_3rd, int nwords_3rd,
                          int* detector_buf_4th, int nwords_4th,
-                         RawCOPPERPackerInfo rawcprpacker_info);
+                         RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
 
     //
     // size of "COPPER front header" and "COPPER trailer"
@@ -198,7 +220,7 @@ namespace Belle2 {
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
-    //    ClassDef(PostRawCOPPERFormat_v1, 2);
+    //    ClassDefOverride(PostRawCOPPERFormat_v1, 2);
 
   };
 

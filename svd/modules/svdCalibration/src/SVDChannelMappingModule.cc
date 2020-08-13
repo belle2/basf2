@@ -11,6 +11,8 @@
 #include <svd/modules/svdCalibration/SVDChannelMappingModule.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <TH2F.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -485,11 +487,11 @@ void SVDChannelMappingModule::createHistosDictionaries()
                                );
         m_histoList_clusters->Add(tmp2D);
 
-        itSvdSensors++;
+        ++itSvdSensors;
       }
-      itSvdLadders++;
+      ++itSvdLadders;
     }
-    itSvdLayers++;
+    ++itSvdLayers;
   }
 
 }
@@ -509,7 +511,7 @@ void SVDChannelMappingModule::fillSensorInterHistos(const SVDIntercept* inter)
 void SVDChannelMappingModule::terminate()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
 

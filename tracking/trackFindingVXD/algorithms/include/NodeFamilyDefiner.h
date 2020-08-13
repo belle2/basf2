@@ -11,9 +11,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <string>
-#include <vector>
-
 namespace Belle2 {
 
   /** This class assigns a common family identifier to all CACells in the network that are connected.
@@ -39,6 +36,7 @@ namespace Belle2 {
      * Performs a width first flood fill algorithm.
      * Returns total number of defined families.
      */
+    // cppcheck-suppress constParameter
     short defineFamilies(ContainerType& aNetwork)
     {
       short currentFamily = 0;

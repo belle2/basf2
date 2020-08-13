@@ -220,7 +220,7 @@ namespace Belle2 {
     ~FilterID() {}
 
     /** converts existing string with name of filter type into suitable enum value. */
-    static filterTypes getFilterType(std::string filterString);
+    static filterTypes getFilterType(const std::string& filterString);
 
     /** converts existing int with filter type-compativble value into suitable enum value. */
     static filterTypes getFilterType(int filterInt);
@@ -235,7 +235,7 @@ namespace Belle2 {
     static std::string getTypeName(filterTypes filterType);
 
     /** returns type of given name, needed for compatibility with other modules. */
-    static filterTypes getTypeEnum(std::string filterString) {return getFilterType(filterString); }
+    static filterTypes getTypeEnum(const std::string& filterString) {return getFilterType(filterString); }
 
   protected:
   }; //end class FilterID

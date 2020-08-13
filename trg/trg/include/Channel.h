@@ -16,12 +16,10 @@
 #define TRGChannel_FLAG_
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 
   class TRGSignalBundle;
-  class TRGClock;
   class TRGBoard;
 
 /// A class to represent a serial link between trigger hardware modules
@@ -51,6 +49,7 @@ namespace Belle2 {
     void dump(const std::string& message = "",
               const std::string& pre = "") const;
 
+    /// sender TRG board
     const TRGBoard& sender(void) const;
 
   public:// Modifiers.

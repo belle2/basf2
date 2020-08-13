@@ -107,8 +107,8 @@ void ProfileModule::event()
   m_nEvents++;
 }
 
-void ProfileModule::storeMemoryGraph(std::string name, std::string title, std::string yAxisName,
-                                     std::string imgOutput, MemoryExtractLambda lmdMemoryExtract)
+void ProfileModule::storeMemoryGraph(const std::string& name, const std::string& title, const std::string& yAxisName,
+                                     const std::string& imgOutput, const MemoryExtractLambda& lmdMemoryExtract)
 {
   // Create and save a plot of the memory usage vs. time
   int nPoints = m_nEvents / m_step;
@@ -116,8 +116,8 @@ void ProfileModule::storeMemoryGraph(std::string name, std::string title, std::s
   if (!imgOutput.empty()) {
     TDirectory* saveDir = gDirectory;
     gROOT->cd();
-    TCanvas* can = new TCanvas();
-    TGraph* graph = new TGraph(nPoints);
+    auto* can = new TCanvas();
+    auto* graph = new TGraph(nPoints);
     for (int i = 0; i < nPoints; i++) {
       graph->SetPoint(i, m_eventInfo[i].time, lmdMemoryExtract(m_eventInfo[i]) * factorMB);
     }
@@ -136,8 +136,8 @@ void ProfileModule::storeMemoryGraph(std::string name, std::string title, std::s
   // Create a histogram of the memory usage vs. number of events and add it to the DataStore
   StoreObjPtr<TH1D> profileHistogram(name, DataStore::c_Persistent);
   profileHistogram.assign(new TH1D(name.c_str(), title.c_str(),  nPoints + 1, 0 - 0.5 * m_step, m_nEvents + 0.5 * m_step), true);
-  profileHistogram->SetDirectory(0);
-  profileHistogram->SetStats(0);
+  profileHistogram->SetDirectory(nullptr);
+  profileHistogram->SetStats(false);
   profileHistogram->GetYaxis()->SetTitle(yAxisName.c_str());
   profileHistogram->GetXaxis()->SetTitle("Event");
   profileHistogram->SetBinContent(1, lmdMemoryExtract(m_initializeInfo) * factorMB);

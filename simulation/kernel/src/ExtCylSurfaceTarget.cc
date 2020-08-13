@@ -23,17 +23,12 @@ ExtCylSurfaceTarget::ExtCylSurfaceTarget(const G4double& radius,
                                          const G4double& zmax) :
   m_radius(radius),
   m_zmin(zmin),
-  m_zmax(zmax)
+  m_zmax(zmax),
+  m_tolerance(1000.0 * G4GeometryTolerance::GetInstance()->GetSurfaceTolerance())
 {
   theType = G4ErrorTarget_CylindricalSurface;
-  m_tolerance = 1000.0 * G4GeometryTolerance::GetInstance()->GetSurfaceTolerance();
   B2DEBUG(1, "Simulation::ExtCylSurfaceTarget created with radius "
           << m_radius << " zmin " << zmin << " zmax " << zmax);
-  // Force a reference to unused functions to avoid cppcheck remarks. (always skipped)
-  if (m_tolerance < 0.0) {
-    GetTangentPlane(G4ThreeVector(m_radius, 0.0, 0.0));
-    Dump("");
-  }
 }
 
 ExtCylSurfaceTarget::~ExtCylSurfaceTarget()

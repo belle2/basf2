@@ -10,9 +10,8 @@
 
 #pragma once
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <TObject.h>
-
+#include <TVector3.h>
 
 namespace Belle2 {
   /**  This class collects some information of a TrueHit, using

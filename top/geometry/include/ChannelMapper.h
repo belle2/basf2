@@ -12,7 +12,6 @@
 
 #include <top/dbobjects/TOPChannelMap.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/DBArray.h>
 #include <framework/database/IntervalOfValidity.h>
 
@@ -163,6 +162,13 @@ namespace Belle2 {
       int getPixelID(unsigned channel) const;
 
       /**
+       * Returns PMT ID (1-based)
+       * @param pixel pixelID (1-based)
+       * @return PMT ID (or 0 for invalid pixel)
+       */
+      int getPmtID(int pixel) const;
+
+      /**
        * Print mappings to terminal screen
        */
       void print() const;
@@ -175,10 +181,17 @@ namespace Belle2 {
     private:
 
       /**
-       * copy constructor
+       * Copy constructor
        */
       ChannelMapper(const ChannelMapper&)
       {}
+
+      /**
+       * Assignment operator
+       */
+      ChannelMapper& operator=(const ChannelMapper&)
+      {return *this;}
+
 
       /**
        * Clear
@@ -197,8 +210,8 @@ namespace Belle2 {
       bool m_valid = false;                    /**< true if mapping available */
       bool m_fromDB = false;                   /**< true, if from database */
 
-      const TOPChannelMap* m_channels[c_numRows][c_numColumns]; /**< conversion array */
-      const TOPChannelMap* m_pixels[c_numAsics][c_numChannels]; /**< conversion array */
+      const TOPChannelMap* m_channels[c_numRows][c_numColumns] = {{0}}; /**< conversion array */
+      const TOPChannelMap* m_pixels[c_numAsics][c_numChannels] = {{0}}; /**< conversion array */
 
     };
 

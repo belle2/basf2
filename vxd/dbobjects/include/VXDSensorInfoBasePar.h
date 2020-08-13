@@ -11,8 +11,6 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <cmath>
-#include <float.h>
 #include <TObject.h>
 
 namespace Belle2 {

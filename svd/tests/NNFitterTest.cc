@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/simulation/SVDSimulationTools.h>
 #include <svd/reconstruction/NNWaveFitter.h>
 #include <svd/reconstruction/NNWaveFitTool.h>
@@ -18,8 +17,6 @@
 #include <sstream>
 #include <string>
 #include <tuple>
-#include <cmath>
-#include <functional>
 
 using namespace std;
 
@@ -78,21 +75,15 @@ namespace Belle2 {
         getline(sline, cell, ','); // index
         getline(sline, cell, ','); // test
 
-// Declare variables as unused and suppress compiler warnings.
-#define UNUSED(x) [&x]{}()
-
-        // true values
+        // true values. Read from the file, though not used.
         getline(sline, cell, ',');
-        double true_amp = stod(cell);
-        UNUSED(true_amp); // Read from the fule, though not used.
+        [[maybe_unused]] double true_amp = stod(cell);
         getline(sline, cell, ',');
-        double true_t0 = stod(cell);
-        UNUSED(true_t0);
+        [[maybe_unused]] double true_t0 = stod(cell);
         getline(sline, cell, ',');
-        double width = stod(cell);
+        [[maybe_unused]] double width = stod(cell);
         getline(sline, cell, ',');
-        double noise = stod(cell);
-        UNUSED(noise);
+        [[maybe_unused]] double noise = stod(cell);
 
         // normalized samples
         apvSamples normedSamples;
@@ -119,14 +110,11 @@ namespace Belle2 {
         getline(sline, cell, ',');
         double fitPy_ampSigma = stod(cell);
         getline(sline, cell, ',');
-        double fitPy_chi2 = stod(cell);
-        UNUSED(fitPy_chi2); // Read from file but not used.
+        [[maybe_unused]] double fitPy_chi2 = stod(cell);
         getline(sline, cell, ',');
         double fitPy_t0 = stod(cell);
         getline(sline, cell, ',');
         double fitPy_t0Sigma = stod(cell);
-
-#undef UNUSED
 
         // now do the Cpp fit
         const shared_ptr<nnFitterBinData> ProbsCpp = fitter.getFit(normedSamples, width);

@@ -1,5 +1,4 @@
 #include <framework/utilities/Stream.h>
-#include <framework/logging/Logger.h>
 #include <framework/dataobjects/RelationContainer.h>
 #include <framework/dataobjects/RelationElement.h>
 #include <framework/datastore/DataStore.h>
@@ -18,11 +17,12 @@ namespace {
   /** create a more or less complex RelationContainer. */
   RelationContainer* createObject()
   {
-    RelationContainer* relCont = new RelationContainer;
+    auto* relCont = new RelationContainer;
     relCont->setFromName("a");
     relCont->setToName("b");
     relCont->setFromDurability(DataStore::c_Event);
     relCont->setToDurability(DataStore::c_Event);
+    // cppcheck-suppress constVariable ; cppcheck doesn't understand the weird new placement clonesarry thing
     TClonesArray& relations = relCont->elements();
     //let's make this a bit larger (very small objects are never compressed)
     for (int i = 0; i < 100; i++)
@@ -47,7 +47,7 @@ namespace {
   /** common content checks for data retrieved from Gearbox. */
   void checkGbContents()
   {
-    Gearbox& gb = Gearbox::getInstance();
+    const Gearbox& gb = Gearbox::getInstance();
 
     checkObject(dynamic_cast<const RelationContainer*>(gb.getTObject("/A/RelationContainer")));
 
@@ -65,7 +65,7 @@ namespace {
 
     //restore
     TObject* obj = Stream::deserializeEncodedRawData(vStr);
-    TVector3* v2 = dynamic_cast<TVector3*>(obj);
+    auto* v2 = dynamic_cast<TVector3*>(obj);
     ASSERT_NE(v2, nullptr);
     EXPECT_TRUE(*v2 == v);
 
@@ -90,7 +90,7 @@ namespace {
     // which it casts to unsigned int.
     std::string truncated = vStr.substr(0, 12);
     TObject* broken_obj = Stream::deserializeEncodedRawData(truncated);
-    EXPECT_TRUE(broken_obj == NULL);
+    EXPECT_TRUE(broken_obj == nullptr);
   }
 
   /** Read things from gearbox. */
@@ -98,7 +98,7 @@ namespace {
   {
     Gearbox& gb = Gearbox::getInstance();
     vector<string> backends;
-    backends.push_back("file:/framework/tests/");
+    backends.emplace_back("file:/framework/tests/");
     gb.setBackends(backends);
     gb.open("object_base64.xml");
 

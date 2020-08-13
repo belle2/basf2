@@ -36,16 +36,20 @@ namespace Belle2 {
     /// CONSTRUCTORS
 
     /** standard constructor */
-    StaticSector() : m_secID(FullSecID()), m_compactSecIDsMap(nullptr) { }
+    StaticSector() :
+      m_secID(FullSecID()), m_compactSecIDsMap(nullptr)
+    {}
 
     /** constructor */
-    StaticSector(FullSecID secID) : m_secID(secID), m_compactSecIDsMap(nullptr) {}
+    explicit StaticSector(FullSecID secID) :
+      m_secID(secID), m_compactSecIDsMap(nullptr)
+    {}
 
 
     // ACCESSOR FUNCTIONS
 
     /** Get the pionter to the 2 Space Point filter assigned to the
-    friendship relation among this sector; will return NULL if filter is not found
+    friendship relation among this sector; will return nullptr if filter is not found
     @param innerSector one */
     const Filter2sp* getFilter2sp(FullSecID innerSector) const
     {
@@ -57,7 +61,7 @@ namespace Belle2 {
     }
 
     /** Get the pionter to the 3 Space Point filter assigned to the
-    friendship relation among this sector; will return NULL if filter is not found
+    friendship relation among this sector; will return nullptr if filter is not found
     @param centerID : FullSecID for the sector between the inner and this sector
     @param innerID : FullSecID for the inner sector*/
     const Filter3sp* getFilter3sp(const FullSecID& centerID, const  FullSecID& innerID) const
@@ -71,7 +75,7 @@ namespace Belle2 {
 
 
     /** Get the pionter to the 4 Space Point filter assigned to the
-    WARNING: not implemented yet. Will return a NULL pointer in any case!
+    WARNING: not implemented yet. Will return a nullptr pointer in any case!
     */
     const Filter4sp* getFilter4sp(const FullSecID& /*outerCenterID*/, const FullSecID& /*innerCenterID*/,
                                   const FullSecID& /*innerID*/) const
@@ -242,9 +246,9 @@ namespace Belle2 {
         char typeID = accessor[index].first;
         void* valuePtr = accessor[index].second;
         if (typeID == TBranchLeafType(double())) x = *((double*)valuePtr);
-        else if (typeID == TBranchLeafType(int())) x = *((int*)valuePtr);
-        else if (typeID == TBranchLeafType(float())) x = *((float*)valuePtr);
-        else if (typeID == TBranchLeafType(bool())) x = *((bool*)valuePtr);
+        else if (typeID == TBranchLeafType(int())) x = (double)(*((int*)valuePtr));
+        else if (typeID == TBranchLeafType(float())) x = (double)(*((float*)valuePtr));
+        else if (typeID == TBranchLeafType(bool())) x = (double)(*((bool*)valuePtr));
         else {
           B2FATAL("Unrecognized type : " << typeID);
         } // end else if

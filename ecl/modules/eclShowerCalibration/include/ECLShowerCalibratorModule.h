@@ -6,7 +6,7 @@
  * corrects for differences between data and MC: corr = data / MC         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -33,19 +33,19 @@ namespace Belle2 {
     ~ECLShowerCalibratorModule();
 
     /** Initialize. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Begin run. */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event. */
-    virtual void event();
+    virtual void event() override;
 
     /** End run. */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** Terminate. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
     /** StoreArray ECLShower */

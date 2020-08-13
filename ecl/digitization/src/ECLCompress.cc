@@ -11,8 +11,6 @@
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <math.h>
-#include <assert.h>
-#include <stdio.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -278,7 +276,7 @@ void ECLDCTCompress::uncompress(BitStream& in, int* adc)
 
 ECLCompress* Belle2::ECL::selectAlgo(int compAlgo)
 {
-  ECLCompress* comp = NULL;
+  ECLCompress* comp = nullptr;
   if (compAlgo == 1) {
     comp = new ECLBaseCompress;
   } else if (compAlgo == 2) {

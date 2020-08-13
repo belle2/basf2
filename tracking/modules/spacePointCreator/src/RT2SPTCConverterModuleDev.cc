@@ -135,7 +135,7 @@ void RT2SPTCConverterModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCounter = eventMetaDataPtr->getEvent();
-  B2DEBUG(1, "RT2SPTCConverter::event(). Processing event " << eventCounter << " --------");
+  B2DEBUG(20, "RT2SPTCConverter::event(). Processing event " << eventCounter << " --------");
 
   StoreArray<RecoTrack> m_recoTracks(m_RecoTracksName);
   StoreArray<SpacePointTrackCand> spacePointTrackCands(m_SPTCName); // output StoreArray
@@ -165,7 +165,7 @@ void RT2SPTCConverterModule::event()
     // NOTE: in RecoTracks there is also a function to get sorted SVD hits only but this uses not the same code as getRecoHitInformations!
     if (m_ignorePXDHits) {
       std::vector<RecoHitInformation*> hitInfos_buff;
-      for (std::vector<RecoHitInformation*>::iterator it = hitInfos.begin(); it < hitInfos.end(); it++) {
+      for (std::vector<RecoHitInformation*>::iterator it = hitInfos.begin(); it < hitInfos.end(); ++it) {
         if ((*it)->getTrackingDetector() != RecoHitInformation::c_PXD) hitInfos_buff.push_back(*it);
       }
       hitInfos = hitInfos_buff;
@@ -181,11 +181,12 @@ void RT2SPTCConverterModule::event()
     } else {
       spacePointStatePair = getSpacePointsFromRecoHitInformations(hitInfos);
     }
-    B2DEBUG(10, "RT2SPTCConverter::event: Number of SpacePoints: " << spacePointStatePair.first.size() << "State: " <<
+    B2DEBUG(20, "RT2SPTCConverter::event: Number of SpacePoints: " << spacePointStatePair.first.size() << "State: " <<
             spacePointStatePair.second);
 
     if (int(spacePointStatePair.first.size()) < m_minSP) {
-      B2DEBUG(1, "RT2SPTCConverter::event: Not enough number of SpacePoints: " << spacePointStatePair.first.size() << " Required Number: "
+      B2DEBUG(20, "RT2SPTCConverter::event: Not enough number of SpacePoints: " << spacePointStatePair.first.size() <<
+              " Required Number: "
               << m_minSP);
       m_minSPCtr++;
       continue; /**< skip this recoTrack */
@@ -254,8 +255,8 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
       continue;
 
 
-    const VXDTrueHit* relatedTrueHit = NULL;
-    RelationsObject* cluster = NULL;
+    const VXDTrueHit* relatedTrueHit = nullptr;
+    RelationsObject* cluster = nullptr;
 
     // SVD case
     if (hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) {
@@ -279,7 +280,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
 
     if (!relatedTrueHit) {
       state.set(c_undefinedError);
-      B2DEBUG(10, "RT2SPTCConverter::getSpacePointsFromClustersViaTrueHits: TrueHit missing.");
+      B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClustersViaTrueHits: TrueHit missing.");
       if (m_skipProblematicCluster) continue;
       else break;
     }
@@ -305,7 +306,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
 
     if (!relatedSpacePoint) {
       state.set(c_undefinedError);
-      B2DEBUG(10, "RT2SPTCConverter::getSpacePointsFromClustersViaTrueHits: SpacePoint missing.");
+      B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClustersViaTrueHits: SpacePoint missing.");
       if (m_skipProblematicCluster) continue;
       else break;
     }
@@ -316,7 +317,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vec
       finalSpacePoints.push_back(relatedSpacePoint);
     }
   }
-  B2DEBUG(10, "RT2SPTCConverter::getSpacePointsFromClustersViaTrueHits: Number of SpacePoints: " << finalSpacePoints.size());
+  B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClustersViaTrueHits: Number of SpacePoints: " << finalSpacePoints.size());
   return std::make_pair(finalSpacePoints, state);
 }
 
@@ -341,7 +342,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
       // simple case PXD : there is a one to one relation between cluster and SpacePoint
       if (hitInfos[iHit]->getTrackingDetector() == RecoHitInformation::c_PXD) {
         PXDCluster* pxdCluster = hitInfos.at(iHit)->getRelated<PXDCluster>();
-        SpacePoint* relatedPXDSP = NULL;
+        SpacePoint* relatedPXDSP = nullptr;
         if (pxdCluster) relatedPXDSP = pxdCluster->getRelated<SpacePoint>(*m_pxdSpacePointsStoreArrayName);
         // if found a spacepoint one is already done!
         if (relatedPXDSP) {
@@ -366,7 +367,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
       RelationVector<SpacePoint> relatedSpacePointsA = clusterA->getRelationsFrom<SpacePoint>(
                                                          *m_svdSpacePointsStoreArrayName);
 
-      SVDCluster* clusterB = NULL;
+      SVDCluster* clusterB = nullptr;
       if (iHit + 1 < hitInfos.size()) clusterB = hitInfos.at(iHit + 1)->getRelated<SVDCluster>();
 
       B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClusters: Number of SpacePoints related to first cluster: " <<
@@ -403,7 +404,7 @@ RT2SPTCConverterModule::getSpacePointsFromRecoHitInformations(std::vector<RecoHi
       }
     } // second case
 
-    B2DEBUG(10, "RT2SPTCConverter::getSpacePointsFromClusters: Conversion state is: " << state);
+    B2DEBUG(20, "RT2SPTCConverter::getSpacePointsFromClusters: Conversion state is: " << state);
 
     if (spacePointCandidates.size() != 1) {
       state.set(c_undefinedError);

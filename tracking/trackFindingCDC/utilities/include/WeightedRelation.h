@@ -11,13 +11,10 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/utilities/GetValueType.h>
-
 #include <algorithm>
 #include <utility>
 #include <type_traits>
 #include <cassert>
-#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

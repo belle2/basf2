@@ -184,8 +184,7 @@ def run_reconstruction(path, output_file_name, input_file_name=''):
         path.add_module(gearbox)
 
         geometry = register_module('Geometry')
-        if get_reconstruction_components() is not None:
-            geometry.param('components', get_reconstruction_components())
+        geometry.param("useDB", True)
         path.add_module(geometry)
 
     add_reconstruction(path, get_reconstruction_components(), pruneTracks=0)

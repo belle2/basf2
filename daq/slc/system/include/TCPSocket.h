@@ -15,29 +15,29 @@ namespace Belle2 {
     TCPSocket() : m_ip(""), m_port(0) {}
     TCPSocket(const std::string& ip, unsigned short port)
       : m_ip(ip), m_port(port) {}
-    virtual ~TCPSocket() throw() {}
+    virtual ~TCPSocket() {}
 
   private:
     TCPSocket(int fd) : FileDescriptor(fd), m_ip(""), m_port(0) {}
 
   public:
-    void setIP(const std::string& ip) throw() { m_ip = ip; }
-    void setPort(unsigned short port) throw() { m_port = port; }
-    const std::string& getIP() const throw() { return m_ip; }
-    unsigned short getPort() const throw() { return m_port; }
-    int connect() throw(IOException);
-    int connect(const std::string& ip, unsigned short port) throw(IOException);
-    void setBufferSize(int size) throw(IOException);
+    void setIP(const std::string& ip) { m_ip = ip; }
+    void setPort(unsigned short port) { m_port = port; }
+    const std::string& getIP() const { return m_ip; }
+    unsigned short getPort() const { return m_port; }
+    int connect();
+    int connect(const std::string& ip, unsigned short port);
+    void setBufferSize(int size);
     void print();
     const std::string getLocalIP();
     int getLocalAddress();
     int getLocalPort();
-    unsigned int getAddress() throw(IOException);
+    unsigned int getAddress();
 
   public:
-    virtual size_t write(const void* v, size_t count) throw(IOException);
-    virtual size_t read(void* v, size_t count) throw(IOException);
-    size_t read_once(void* v, size_t count) throw(IOException);
+    virtual size_t write(const void* v, size_t count);
+    virtual size_t read(void* v, size_t count);
+    size_t read_once(void* v, size_t count);
 
   private:
     std::string m_ip;

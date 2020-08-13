@@ -165,10 +165,10 @@ namespace Belle2 {
      * @{
      * no Unit instances allowed.
      */
-    Unit();
-    Unit(const Unit&);
-    Unit& operator=(const Unit&);
-    ~Unit() {};
+    Unit() = delete;
+    Unit(const Unit&) = delete;
+    Unit& operator=(const Unit&) = delete;
+    ~Unit() = delete;
     /** @} */
   };
 

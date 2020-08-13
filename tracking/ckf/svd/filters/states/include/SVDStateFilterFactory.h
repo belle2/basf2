@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/ckf/svd/entities/CKFToSVDState.h>
-
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
@@ -25,7 +23,7 @@ namespace Belle2 {
 
   public:
     /// Constructor forwarding the default filter name
-    SVDStateFilterFactory(const std::string& defaultFilterName = "all");
+    explicit SVDStateFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
     ~SVDStateFilterFactory();

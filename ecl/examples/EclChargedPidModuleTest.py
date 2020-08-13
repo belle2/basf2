@@ -1,66 +1,58 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# This steering file tests the eclChargedPID/ECLChargedPIDModule.
-# It must run on DST files, or reduced DSTs containing
-# ECLShowers, Tracks and all relevant relational containers:
-#
-# 'Tracks',
-# 'TrackFitResults',
-# 'ECLClusters',
-# 'ECLShowers',
-# 'TracksToECLClusters',
-# 'TracksToECLShowers',
-# 'ECLClustersToECLShowers',
-# 'ECLConnectedRegions',
-# 'ECLPidLikelihoods',
-# 'PIDLikelihoods',
-# 'TracksToECLPidLikelihoods',
-# 'TracksToPIDLikelihoods',
-#
-# Author: Marco Milesi (marco.milesi@unimelb.edu.au)
-# Year: 2018
-#
-# Usage:
-#
-# basf2 ecl/examples/EclChargedPIDModuleTest.py /path/to/input/DST/file.root -n N
-#
-########################################################
+"""This steering file tests the 'ECLChargedPID' module.
 
-from basf2 import *
-from ROOT import Belle2
-from modularAnalysis import *
-import os
-import sys
+Input:
+    It must run on DST files, or reduced DSTs containing
+    ECLShowers, Tracks, and all relevant relational containers:
 
-# Choose the DB
-use_local_database("localdb/database.txt")
+        - Tracks
+        - TrackFitResults
+        - ECLClusters
+        - ECLShowers
+        - TracksToECLClusters
+        - TracksToECLShowers
+        - ECLClustersToECLShowers
+        - ECLConnectedRegions
+        - ECLPidLikelihoods
+        - PIDLikelihoods
+        - TracksToECLPidLikelihoods
+        - TracksToPIDLikelihoods
+Usage:
+    $ basf2 -i <path_to_input_file> -n <number_of_events>
+            EclChargedPidModuleTest.py
+"""
 
-# Register necessary modules to this path.
-main_path = create_path()
+import basf2 as b2
 
-if len(sys.argv) != 2:
-    os.sys.exit("ERROR: input file not given. Specify it as an argument")
+__author__ = 'Marco Milesi'
+__copyright__ = 'Copyright 2019 - Belle II Collaboration'
+__maintainer__ = 'Marco Milesi'
+__email__ = 'marco.milesi@unimelb.edu.au'
 
-# Add module to read input *DST file.
-inputfile = sys.argv[1]
-simpleinput = register_module('RootInput')
-simpleinput.param('inputFileNames', inputfile)
-main_path.add_module(simpleinput)
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
 
-# Add eclChargedPID/ECLChargedPIDModule.
-eclid = register_module('ECLChargedPID')
-main_path.add_module(eclid)
-eclid.logging.log_level = LogLevel.DEBUG
-eclid.logging.debug_level = 10
+# Register and add 'RootInput' module to read input DST file.
+inputFile = b2.register_module('RootInput')
+mainPath.add_module(inputFile)
 
-# Print the datamodel objects in the store.
-printcolls = register_module('PrintCollections')
-main_path.add_module(printcolls)
+# Register and add 'ECLChargedPID' module
+eclChargedPID = b2.register_module('ECLChargedPID')
+mainPath.add_module(eclChargedPID)
 
-# This line allows to study events one-by-one, interactively
-# main_path.add_module('Interactive')
+# Set debug options for 'ECLChargedPID' module.
+eclChargedPID.logging.log_level = b2.LogLevel.DEBUG
+eclChargedPID.logging.debug_level = 20
 
-process(main_path)
-print(statistics)
+"""Register and add 'PrintCollections' module.
+   This prints the data model objects in the store.
+"""
+printCollections = b2.register_module('PrintCollections')
+mainPath.add_module(printCollections)
+
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
+print(b2.statistics)

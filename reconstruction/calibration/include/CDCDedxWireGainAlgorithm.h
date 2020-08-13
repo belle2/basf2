@@ -12,8 +12,9 @@
 
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
 #include <calibration/CalibrationAlgorithm.h>
-#include <cdc/dataobjects/WireID.h>
 #include <framework/database/DBObjPtr.h>
+#include <string>
+#include <vector>
 
 namespace Belle2 {
   /**
@@ -34,12 +35,28 @@ namespace Belle2 {
      */
     virtual ~CDCDedxWireGainAlgorithm() {}
 
+    /**
+    * function to decide merge vs relative gains
+    */
+    void setMergePayload(bool value = true) {isMergePayload = value;}
+
+    /**
+    * function to finally store new payload after full calibration
+    */
+    void generateNewPayloads(std::vector<double> dedxTruncmean);
+
+    /**
+    * funtion to set flag active for plotting
+    */
+    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+
+
   protected:
 
     /**
-     * Run algorithm
+     * Wire gain algorithm
      */
-    virtual EResult calibrate();
+    virtual EResult calibrate() override;
 
 
   private:
@@ -50,7 +67,11 @@ namespace Belle2 {
      * @param removeLowest      lowest fraction of hits to remove (0.05)
      * @param removeHighest     highest fraction of hits to remove (0.25)
      */
-    double calculateMean(const std::vector<double>& dedx, double removeLowest, double removeHighest) const;
+    std::string m_badWireFPath; /**< path of bad wire file */
+    std::string m_badWireFName; /**< name of bad wire file */
+    bool isMakePlots; /**< produce plots for status */
+    bool isMergePayload; /**< merge payload at the of calibration */
 
+    DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
   };
 } // namespace Belle2

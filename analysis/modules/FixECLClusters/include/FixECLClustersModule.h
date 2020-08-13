@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef FIXECLCLUSTERSMODULE_H
-#define FIXECLCLUSTERSMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -39,10 +38,10 @@ namespace Belle2 {
     FixECLClustersModule();
 
     /** Register input and output data */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Event function */
-    virtual void event();
+    virtual void event() override;
 
 
   private:
@@ -51,4 +50,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* FIXECLCLUSTERSMODULE_H */

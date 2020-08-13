@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <pxd/dataobjects/PXDRawHit.h>
@@ -19,7 +18,6 @@
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <string>
-//#include <map>
 #include <TH2.h>
 
 namespace Belle2 {
@@ -66,25 +64,25 @@ namespace Belle2 {
       StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
       /** Histogram number of raw packets */
-      TH1F* hrawPxdPackets;
+      TH1F* hrawPxdPackets = nullptr;
       /** Histogram raw packet size */
-      TH1F* hrawPxdPacketSize;
+      TH1F* hrawPxdPacketSize = nullptr;
       /** Histogram pixelcount/??? */
-      TH1F* hrawPxdHitsCount;
+      TH1F* hrawPxdHitsCount = nullptr;
       /** Histogram 2d hitmap (all)*/
-      TH2F* hrawPxdHitMapAll;
+      TH2F* hrawPxdHitMapAll = nullptr;
       /** Histogram Adc 2d hitmap (full frames only) (all pxd) */
-      TH2F* hrawPxdAdcMapAll;
+      TH2F* hrawPxdAdcMapAll = nullptr;
       /** Histogram 2d hitmap */
-      TH2F* hrawPxdHitMap[64];
+      TH2F* hrawPxdHitMap[64] = {};
       /** Histogram 2d chargemap */
-      TH2F* hrawPxdChargeMap[64];
+      TH2F* hrawPxdChargeMap[64] = {};
       /** Histogram raw pixel charge */
-      TH1F* hrawPxdHitsCharge[64];
+      TH1F* hrawPxdHitsCharge[64] = {};
       /** Histogram raw pixel hit "time" window */
-      TH1F* hrawPxdHitTimeWindow[64];
+      TH1F* hrawPxdHitTimeWindow[64] = {};
       /** Histogram raw pixel trigger gate window */
-      TH1F* hrawPxdGateTimeWindow[64];
+      TH1F* hrawPxdGateTimeWindow[64] = {};
 
     };//end class declaration
 

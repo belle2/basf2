@@ -50,7 +50,7 @@ namespace Belle2 {
      * @param thickness glue thickness
      * @param material glue material name
      */
-    void setGlue(double thickness, const std::string& material)
+    virtual void setGlue(double thickness, const std::string& material)
     {
       m_glueThickness = thickness;
       m_glueMaterial = material;
@@ -62,7 +62,8 @@ namespace Belle2 {
      * @param angle angle of the delaminated surface
      * @param material material name to simulate the delaminated glue
      */
-    void setGlueDelamination(double fraction, double angle, const std::string& material)
+    virtual void setGlueDelamination(double fraction, double angle,
+                                     const std::string& material)
     {
       m_brokenFraction = fraction;
       m_brokenAngle = angle;
@@ -163,6 +164,16 @@ namespace Belle2 {
     const GeoOpticalSurface& getSurface() const {return m_surface;}
 
     /**
+     * Returns surface reflectivity at given photon energy
+     * @param energy photon energy in [eV]
+     * @return reflectivity
+     */
+    double getSurfaceReflectivity(double energy) const
+    {
+      return TOPGeoBase::getReflectivity(m_surface, energy);
+    }
+
+    /**
      * Returns geant4 parameter describing surface roughness
      * @return surface roughness
      */
@@ -184,14 +195,14 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    virtual bool isConsistent() const;
+    virtual bool isConsistent() const override;
 
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    virtual void print(const std::string& title = "Bar segment geometry parameters") const;
+    virtual void print(const std::string& title = "Bar segment geometry parameters") const override;
 
   protected:
 
@@ -220,7 +231,7 @@ namespace Belle2 {
     std::string m_vendor; /**< vendor's name */
     std::string m_serialNumber; /**< serial number */
 
-    ClassDef(TOPGeoBarSegment, 3); /**< ClassDef */
+    ClassDefOverride(TOPGeoBarSegment, 3); /**< ClassDef */
 
   };
 

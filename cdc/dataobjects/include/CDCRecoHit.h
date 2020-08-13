@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCRECOHIT_H
-#define CDCRECOHIT_H
+#pragma once
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
@@ -60,7 +59,13 @@ namespace Belle2 {
     /** Methods that actually interface to Genfit.
      */
     genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane& state) const override;
+
+    /** build MeasurementsOnPlane
+    */
     std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
+
+    /** construct error matrix
+     */
     virtual const genfit::HMatrixU* constructHMatrix(const genfit::AbsTrackRep*) const override;
 
     /** Get the time derivative of the MesuredStateOnPlane (derived from the track fit).  */
@@ -79,7 +84,7 @@ namespace Belle2 {
      * is not bent).
      */
     bool getFlyByDistanceVector(B2Vector3D& pointingVector, B2Vector3D& trackDir,
-                                const genfit::AbsTrackRep* rep = NULL,
+                                const genfit::AbsTrackRep* rep = nullptr,
                                 bool usePlaneFromFit = false);
 
     /**
@@ -90,11 +95,13 @@ namespace Belle2 {
      * where the wire direction is pointing towards +z except for small
      * corrections such as stereo angle, sagging
      */
-    virtual void setLeftRightResolution(int lr) { m_leftRight = lr; }
+    void setLeftRightResolution(int lr) { m_leftRight = lr; }
 
-    virtual bool isLeftRightMeasurement() const override { return true; }
+    /** CDC RecoHits always have left-right ambiguity */
+    bool isLeftRightMeasurement() const override { return true; }
+
     /** Getter for left/right passage flag. */
-    virtual int getLeftRightResolution() const override { return m_leftRight; }
+    int getLeftRightResolution() const override { return m_leftRight; }
 
 
     /** get the pointer to the CDCHit object that was used to create this CDCRecoHit object.
@@ -155,4 +162,3 @@ namespace Belle2 {
     //        derives from genfit::WireMeasurement.
   };
 }
-#endif

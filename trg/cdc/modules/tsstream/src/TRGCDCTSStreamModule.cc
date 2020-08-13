@@ -13,7 +13,6 @@
 
 #define TRGCDC_SHORT_NAMES
 
-#include <stdlib.h>
 #include <iostream>
 #include <fstream>
 
@@ -28,6 +27,7 @@ using namespace std;
 
 namespace Belle2 {
 
+  /// register the basf2 TRGCDCTSStream module
   REG_MODULE(TRGCDCTSStream);
 
   string
@@ -175,8 +175,8 @@ namespace Belle2 {
           val = stream.size();
           _out->write((char*) & val, 4);
           for (unsigned i = 0; i < stream.sizeInChar(); i++) {
-            char c = stream.c(i);
-            _out->write(& c, 1);
+            char cs = stream.c(i);
+            _out->write(& cs, 1);
           }
         }
 

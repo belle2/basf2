@@ -1,15 +1,14 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald                                         *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#ifndef DECAYSTRING_H
-#define DECAYSTRING_H
+#pragma once
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <boost/variant/recursive_variant.hpp>
 
@@ -22,4 +21,3 @@ namespace Belle2 {
   typedef boost::variant< boost::recursive_wrapper<DecayStringDecay>, DecayStringParticle > DecayString;
 }
 
-#endif // DECAYSTRING_H

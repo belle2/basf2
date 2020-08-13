@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
+#include <map>
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -33,20 +33,22 @@ namespace Belle2 {
     /**
      * Set the wire in the list
      * @param wid wire-id to be registered
+     * @param eff wire efficiency; specify 0 <= eff < 1 for dead wire; eff > 1 for hot/noisy wire
      */
-    void setWire(const WireID& wid)
+    void setWire(const WireID& wid, double eff = 0)
     {
-      m_wires.push_back((wid.getEWire()));
+      m_wires.insert(std::pair(wid.getEWire(), eff));
     }
 
     /**
      * Set the wire in the list
      * @param iCLayer (continuous) layer-id of badwire
      * @param iWire   wire-id of badwire
+     * @param eff wire efficiency; specify 0 <= eff < 1 for dead wire; eff > 1 for hot/noisy wire
      */
-    void setWire(unsigned short iCLayer, unsigned short iWire)
+    void setWire(unsigned short iCLayer, unsigned short iWire, double eff = 0)
     {
-      m_wires.push_back(WireID(iCLayer, iWire).getEWire());
+      m_wires.insert(std::pair(WireID(iCLayer, iWire).getEWire(), eff));
     }
 
     /**
@@ -60,21 +62,56 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::vector<unsigned short> getWires() const
+    std::map<unsigned short, float> getWires() const
     {
       return m_wires;
     }
 
     /**
-     * Check if the wire is bad
+     * Check if the wire is totally-dead (eff=0); to be replaced by isDeadWire() in future...
      * @param  wid wire id to be checked
-     * @return true if badwire; false if not
+     * @return true if dead wire; false if not
      */
     bool isBadWire(const WireID& wid) const
     {
-      std::vector<unsigned short>::const_iterator it = std::find(m_wires.begin(), m_wires.end(), wid.getEWire());
-      bool torf = (it != m_wires.end()) ? true : false;
-      return torf;
+      std::map<unsigned short, float>::const_iterator it = m_wires.find(wid.getEWire());
+      if (it != m_wires.end() && it->second == 0.) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    /**
+     * Check if dead wire
+     * @param  wid wire id to be checked
+     * @param  eff efficiency of the wirte
+     * @return true if dead wire; false if not
+     */
+    bool isDeadWire(const WireID& wid, double& eff) const
+    {
+      std::map<unsigned short, float>::const_iterator it = m_wires.find(wid.getEWire());
+      if (it != m_wires.end() && 0. <= it->second && it->second < 1.) {
+        eff = it->second;
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    /**
+     * Check if the wire is hot/noisy
+     * @param  wid wire id to be checked
+     * @return true if hot wire; false if not
+     */
+    bool isHotWire(const WireID& wid) const
+    {
+      std::map<unsigned short, float>::const_iterator it = m_wires.find(wid.getEWire());
+      if (it != m_wires.end() && it->second > 1.) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
     /**
@@ -88,7 +125,7 @@ namespace Belle2 {
       std::cout << "in order of ICLayer and IWire and EWire" << std::endl;
 
       for (auto const ent : m_wires) {
-        std::cout << WireID(ent).getICLayer() << " " << WireID(ent).getIWire() << " " << ent << std::endl;
+        std::cout << WireID(ent.first).getICLayer() << " " << WireID(ent.first).getIWire() << " " << ent.second << std::endl;
       }
     }
 
@@ -103,16 +140,17 @@ namespace Belle2 {
         B2ERROR("Specified output file could not be opened!");
       } else {
         for (auto const ent : m_wires) {
-          fout << std::setw(2) << std::right << WireID(ent).getICLayer() << "  " << std::setw(3) << WireID(ent).getIWire() << std::endl;
+          fout << std::setw(2) << std::right << WireID(ent.first).getICLayer() << "  " << std::setw(3) << WireID(
+                 ent.first).getIWire() << " " << ent.second << std::endl;
         }
         fout.close();
       }
     }
 
   private:
-    std::vector<unsigned short> m_wires; /**< badwire list*/
+    std::map<unsigned short, float> m_wires; /**< badwire list*/
 
-    ClassDef(CDCBadWires, 1); /**< ClassDef */
+    ClassDef(CDCBadWires, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2

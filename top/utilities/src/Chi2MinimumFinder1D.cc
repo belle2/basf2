@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <top/utilities/Chi2MinimumFinder1D.h>
+
+#include <framework/logging/Logger.h>
+
 #include <math.h>
 
 namespace Belle2 {
@@ -34,13 +37,53 @@ namespace Belle2 {
       m_chi2.resize(m_x.size(), 0);
     }
 
+    Chi2MinimumFinder1D::Chi2MinimumFinder1D(const std::shared_ptr<TH1D> h)
+    {
+      m_xmin = h->GetXaxis()->GetXmin();
+      m_xmax = h->GetXaxis()->GetXmax();
+      m_dx = h->GetBinWidth(1);
+      for (int i = 0; i < h->GetNbinsX(); i++) {
+        m_x.push_back(h->GetBinCenter(i + 1));
+        m_chi2.push_back(h->GetBinContent(i + 1));
+      }
+      m_entries = h->GetEntries() / h->GetNbinsX();
+    }
+
+    void Chi2MinimumFinder1D::clear()
+    {
+      for (auto& chi2 : m_chi2) chi2 = 0;
+      m_entries = 0;
+      m_searched = false;
+    }
+
 
     void Chi2MinimumFinder1D::add(unsigned i, double chi2)
     {
       if (i < m_chi2.size()) {
         m_chi2[i] += chi2;
         m_searched = false;
-      } else B2WARNING("Chi2MinimumFinder1D::add: index out of range");
+        if (i == 0) m_entries++;
+      } else {
+        B2WARNING("Chi2MinimumFinder1D::add: index out of range");
+      }
+    }
+
+
+    Chi2MinimumFinder1D& Chi2MinimumFinder1D::add(const Chi2MinimumFinder1D& other)
+    {
+      if (other.getXmin() !=  m_xmin or other.getXmax() !=  m_xmax or
+          other.getBinCenters().size() != m_x.size()) {
+        B2ERROR("Chi2MinimumFinder1D::add: finders with different ranges or binning "
+                "can't be added");
+        return *this;
+      }
+      const auto& chi2 = other.getChi2Values();
+      for (unsigned i = 0; i < m_chi2.size(); i++) {
+        m_chi2[i] += chi2[i];
+      }
+      m_entries += other.getEntries();
+      m_searched = false;
+      return *this;
     }
 
 

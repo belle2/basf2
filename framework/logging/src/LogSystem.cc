@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 Belle II Collaboration                          *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Thomas Kuhr                                *
+ * Contributors: Andreas Moll, Thomas Kuhr, Martin Ritter                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,12 +12,11 @@
 #include <framework/logging/LogMessage.h>
 #include <framework/logging/LogConnectionBase.h>
 #include <framework/logging/LogConnectionFilter.h>
-#include <framework/logging/LogConnectionFileDescriptor.h>
-#include <framework/logging/Logger.h>
+#include <framework/logging/LogConnectionConsole.h>
 #include <framework/datastore/DataStore.h>
 
 #include <TROOT.h>
-#include <signal.h>
+#include <csignal>
 
 #include <cstdio>
 #include <iostream>
@@ -43,27 +42,33 @@ void LogSystem::addLogConnection(LogConnectionBase* logConnection)
 
 void LogSystem::resetLogConnections()
 {
-  for (unsigned int i = 0; i < m_logConnections.size(); i++) {
-    delete m_logConnections[i];
+  for (auto connection : m_logConnections) {
+    delete connection;
   }
   m_logConnections.clear();
 }
 
 
-bool LogSystem::isLevelEnabled(LogConfig::ELogLevel level, int debugLevel, const char* package) const
+bool LogSystem::deliverMessageToConnections(const LogMessage& message)
 {
-  const LogConfig& config = getCurrentLogConfig(package);
-  LogConfig::ELogLevel logLevelLimit = config.getLogLevel();
-  int debugLevelLimit = config.getDebugLevel();
-
-  return logLevelLimit <= level && (level != LogConfig::c_Debug || debugLevelLimit >= debugLevel);
+  bool messageSent = false;
+  for (auto con : m_logConnections) {
+    messageSent |= con->sendMessage(message);
+  }
+  return messageSent;
 }
 
+void LogSystem::showText(LogConfig::ELogLevel level, const std::string& txt, int info)
+{
+  LogMessage customText(level, txt, "", "", "", 0);
+  customText.setLogInfo(info);
+  deliverMessageToConnections(customText);
+}
 
-bool LogSystem::sendMessage(LogMessage message)
+bool LogSystem::sendMessage(LogMessage&& message)
 {
   LogConfig::ELogLevel logLevel = message.getLogLevel();
-  map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(message.getPackage());
+  auto packageLogConfig = m_packageLogConfigs.find(message.getPackage());
   if ((packageLogConfig != m_packageLogConfigs.end()) && packageLogConfig->second.getLogInfo(logLevel)) {
     message.setLogInfo(packageLogConfig->second.getLogInfo(logLevel));
   } else if (m_moduleLogConfig && m_moduleLogConfig->getLogInfo(logLevel)) {
@@ -74,22 +79,51 @@ bool LogSystem::sendMessage(LogMessage message)
 
   message.setModule(m_moduleName);
 
-  bool messageSent = false;
-  for (unsigned int i = 0; i < m_logConnections.size(); i++) {
-    if (m_logConnections[i]->sendMessage(message)) {
-      messageSent = true;
+  // We want to count it whether we've seen it or not
+  incMessageCounter(logLevel);
+
+  // add message to list of message or increase repetition value
+  bool lastTime(false);
+  if (m_printErrorSummary || m_maxErrorRepetition > 0) {
+    unsigned int repetition{0};
+    if (m_messageLog.size() >= c_errorSummaryMaxLines) {
+      // we already have maximum size of the error log so don't add more messages.
+      // but we might want to increase the counter if it already exists
+      /* cppcheck-suppress stlIfFind */
+      if (auto it = m_messageLog.find(message); it != m_messageLog.end()) {
+        repetition = ++(it->second);
+      }
+    } else if (logLevel >= LogConfig::c_Warning or m_maxErrorRepetition > 0) {
+      // otherwise we only keep warnings or higher unless we suppress repetitions,
+      // then we keep everything
+      repetition = ++m_messageLog[message];
+    }
+    lastTime = m_maxErrorRepetition > 0 and repetition == m_maxErrorRepetition;
+    if (m_maxErrorRepetition > 0 and repetition > m_maxErrorRepetition) {
+      // We've seen this message more than once before so it cannot be an abort
+      // level message. So we can just not do anything here except counting ...
+      ++m_suppressedMessages;
+      // However we should warn from time to time that messages are being
+      // suppressed ... but not too often otherwise we don't gain anything so
+      // let's warn first each 100, then each 1000 suppressed messages.
+      if ((m_suppressedMessages < 1000 and m_suppressedMessages % 100 == 0) or
+          (m_suppressedMessages < 10000 and m_suppressedMessages % 1000 == 0) or
+          (m_suppressedMessages % 10000 == 0)) {
+        showText(LogConfig::c_Warning, "... " + std::to_string(m_suppressedMessages) + " log messages suppressed due to repetition ...");
+      }
+      return true;
     }
   }
 
-  if (messageSent) {
-    incMessageCounter(logLevel);
-  }
-  if (m_printErrorSummary && logLevel >= LogConfig::c_Warning && m_errorLog.size() < c_errorSummaryMaxLines) {
-    m_errorLog.push_back(message);
-  }
+  // Ok we want to see the message
+  bool messageSent = deliverMessageToConnections(message);
 
   if (logLevel >= m_logConfig.getAbortLevel()) {
     printErrorSummary();
+    // make sure loc connections are finalized to not loose output
+    for (auto connection : m_logConnections) {
+      connection->finalizeOnAbort();
+    }
     DataStore::Instance().reset(); // ensure we are executed before ROOT's exit handlers
 
     //in good tradition, ROOT signal handlers are unsafe.
@@ -102,16 +136,26 @@ bool LogSystem::sendMessage(LogMessage message)
     exit(1);
   }
 
+  // And if it is the last time we show it let's add a trailer for good measure
+  if (messageSent and lastTime) {
+    showText(max(message.getLogLevel(), LogConfig::c_Warning),
+             "The previous message has occurred " + std::to_string(m_maxErrorRepetition) +
+             " times and will be suppressed in future",
+             LogConfig::c_Level | LogConfig::c_Message);
+  }
+
   return messageSent;
 }
 
 
 void LogSystem::resetMessageCounter()
 {
-  for (int i = 0; i < LogConfig::c_Default; ++i) {
-    m_messageCounter[i] = 0;
+  for (int& i : m_messageCounter) {
+    i = 0;
   }
-  m_errorLog.clear();
+  m_suppressedMessages = 0;
+  m_messageLog.clear();
+  m_messageLog.reserve(100);
 }
 
 
@@ -121,36 +165,15 @@ int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel) const
 }
 
 
-const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
-{
-  //module specific config?
-  if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
-    return *m_moduleLogConfig;
-  }
-
-  //package specific config?
-  if (package) {
-    const map<string, LogConfig>::const_iterator& packageLogConfig = m_packageLogConfigs.find(package);
-    if (packageLogConfig != m_packageLogConfigs.end()) {
-      const LogConfig& logConfig = packageLogConfig->second;
-      if (logConfig.getLogLevel() != LogConfig::c_Default)
-        return logConfig;
-    }
-  }
-
-  //global config
-  return m_logConfig;
-}
-
-
 //============================================================================
 //                              Private methods
 //============================================================================
 
 LogSystem::LogSystem() :
   m_logConfig(LogConfig::c_Info),
-  m_moduleLogConfig(0),
-  m_printErrorSummary(false)
+  m_moduleLogConfig(nullptr),
+  m_printErrorSummary(false),
+  m_messageCounter{0}
 {
   resetLogging();
 }
@@ -175,10 +198,8 @@ void LogSystem::resetLogging()
 
   resetMessageCounter();
   resetLogConnections();
-  addLogConnection(new LogConnectionFilter(new LogConnectionFileDescriptor(STDOUT_FILENO)));
+  addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 
-  m_errorLog.clear();
-  m_errorLog.reserve(100);
   m_printErrorSummary = false;
 }
 
@@ -189,9 +210,21 @@ void LogSystem::printErrorSummary()
 
   int numLogWarn = getMessageCounter(LogConfig::c_Warning);
   int numLogError = getMessageCounter(LogConfig::c_Error);
-  unsigned int numLines = m_errorLog.size();
-  if (numLines == 0)
+
+  // ok, only errors and warnings in the error summary
+  std::vector<std::pair<LogMessage, unsigned int>> messages;
+  for (auto && value : m_messageLog) {
+    if (value.first.getLogLevel() < LogConfig::c_Warning) continue;
+    messages.emplace_back(std::move(value));
+  }
+  // but show them sorted by severity and occurrence
+  std::stable_sort(messages.begin(), messages.end(), [](const auto & a, const auto & b) {
+    return a.first.getLogLevel() > b.first.getLogLevel() or
+           (a.first.getLogLevel() == b.first.getLogLevel() and  a.second > b.second);
+  });
+  if (messages.size() == 0) {
     return; //nothing to do
+  }
 
   // save configuration
   const LogConfig oldConfig = m_logConfig;
@@ -213,38 +246,42 @@ void LogSystem::printErrorSummary()
   m_logConfig.setLogInfo(LogConfig::c_Fatal, logInfo);
   m_logConfig.setLogLevel(LogConfig::c_Info);
 
-  B2INFO("================================================================================");
-  B2INFO("Error summary: " << numLogError << " errors and " << numLogWarn << " warnings occurred.");
-
-
-  // start with 100 entries in hash map
-  std::function<size_t (const LogMessage&)> hashFunction = &hash;
-  std::unordered_map<LogMessage, int, decltype(hashFunction)> errorCount(100, hashFunction);
-
-  // log in chronological order, with repetitions removed
-  std::vector<LogMessage> uniqueLog;
-  uniqueLog.reserve(100);
-
-  for (const LogMessage& msg : m_errorLog) {
-    int count = errorCount[msg]++;
-
-    if (count == 0) // this is the first time we see this message
-      uniqueLog.push_back(msg);
-  }
-  m_errorLog.clear(); // only do this once (e.g. not again when used through python)
-
-  for (const LogMessage& msg : uniqueLog) {
-    sendMessage(msg);
-
-    int count = errorCount[msg];
-    if (count != 1) {
-      B2INFO(" (last message occurred " << count << " times in total)");
+  // and then show all the messages
+  showText(LogConfig::c_Info, "===Error Summary================================================================",
+           LogConfig::c_Message | LogConfig::c_Level);
+  for (auto & [msg, count] : messages) {
+    const bool multiple = count > 1;
+    // don't show variables if the message appeared more than once, could have different values/variables
+    msg.setLogInfo(m_logConfig.getLogInfo(msg.getLogLevel()) | (multiple ? LogConfig::c_NoVariables : 0));
+    // and directly print the message as it was saved.
+    deliverMessageToConnections(msg);
+    // and also tell us the count
+    if (multiple) {
+      showText(LogConfig::c_Info, "    (last message occurred " + std::to_string(count) + " times)");
     }
   }
-  B2INFO("================================================================================\n");
-  if (numLines == c_errorSummaryMaxLines) {
-    B2WARNING("Note: The error log was truncated to " << c_errorSummaryMaxLines << " messages");
+  showText(LogConfig::c_Info, "================================================================================",
+           LogConfig::c_Message | LogConfig::c_Level);
+  if (numLogError) {
+    showText(LogConfig::c_Error, "in total, " + std::to_string(numLogError) + " errors occurred during processing",
+             LogConfig::c_Message | LogConfig::c_Level);
   }
+  if (numLogWarn) {
+    showText(LogConfig::c_Warning, "in total, " + std::to_string(numLogWarn) + " warnings occurred during processing",
+             LogConfig::c_Message | LogConfig::c_Level);
+  }
+  if (m_messageLog.size() == c_errorSummaryMaxLines) {
+    showText(LogConfig::c_Warning, "Note: The error summary was truncated to " +
+             std::to_string(c_errorSummaryMaxLines) + " (distinct) messages",
+             LogConfig::c_Message | LogConfig::c_Level);
+  }
+  if (m_suppressedMessages) {
+    showText(LogConfig::c_Warning, std::to_string(m_suppressedMessages) + " log messages were suppressed",
+             LogConfig::c_Message | LogConfig::c_Level);
+  }
+
+  // and then clear the log
+  m_messageLog.clear();
 
   // restore old configuration
   m_logConfig = oldConfig;

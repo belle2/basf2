@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SADINPUTMODULE_H_
-#define SADINPUTMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -17,8 +16,6 @@
 #include <generators/SAD/ReaderSAD.h>
 
 #include <string>
-
-class TGeoMatrix;
 
 namespace Belle2 {
 
@@ -47,10 +44,10 @@ namespace Belle2 {
      * Checks the validity of the module parameters.
      * Checks if the filepath of the given filename exists.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Reads the data and stores it into the MCParticle collection. */
-    virtual void event();
+    virtual void event() override;
 
 
   protected:
@@ -87,4 +84,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif /* SADINPUTMODULE_H_ */

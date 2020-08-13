@@ -21,18 +21,17 @@
 #include "trg/trg/Time.h"
 #include "trg/trg/State.h"
 #include "trg/trg/Signal.h"
-#include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/gdl/TRGGDL.h"
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
 #include <trg/grl/dataobjects/TRGGRLInfo.h>
 
 #include <framework/logging/Logger.h>
+
+#include <TH1I.h>
 
 #define N_TIMING_REGISTERS 4
 
@@ -41,7 +40,8 @@ using namespace std;
 namespace Belle2 {
 
   void ftd_0_01(bool* b, bool* i);
-  void dotrigger(std::vector<int>& res, std::vector<int> ob);
+  /**do the final trigger decision*/
+  //void dotrigger(std::vector<int>& res, std::vector<int> ob);
 
   TRGGDL*
   TRGGDL::_gdl = 0;
@@ -66,7 +66,10 @@ namespace Belle2 {
                     unsigned simulationMode,
                     unsigned fastSimulationMode,
                     unsigned firmwareSimulationMode,
-                    const std::string& Phase)
+                    const std::string& Phase,
+                    bool algFromDB,
+                    const std::string& algFilePath,
+                    int debugLevel)
   {
     if (_gdl) {
       //delete _gdl;
@@ -78,7 +81,10 @@ namespace Belle2 {
                         simulationMode,
                         fastSimulationMode,
                         firmwareSimulationMode,
-                        Phase);
+                        Phase,
+                        algFromDB,
+                        algFilePath,
+                        debugLevel);
     } else {
       cout << "TRGGDL::getTRGGDL ... good-bye" << endl;
       //        delete _gdl;
@@ -100,17 +106,22 @@ namespace Belle2 {
                  unsigned simulationMode,
                  unsigned fastSimulationMode,
                  unsigned firmwareSimulationMode,
-                 const std::string& Phase)
-    : _debugLevel(0),
+                 const std::string& Phase,
+                 bool algFromDB,
+                 const std::string& algFilePath,
+                 int debugLevel)
+    : _debugLevel(debugLevel),
       _configFilename(configFile),
       _simulationMode(simulationMode),
       _fastSimulationMode(fastSimulationMode),
       _firmwareSimulationMode(firmwareSimulationMode),
       _Phase(Phase),
+      _algFilePath(algFilePath),
       _clock(Belle2_GDL::GDLSystemClock),
       _offset(15.3),
       _isb(0),
-      _osb(0)
+      _osb(0),
+      _algFromDB(algFromDB)
   {
 
     if (TRGDebug::level()) {
@@ -125,11 +136,31 @@ namespace Belle2 {
       cout << "TRGGDL ... TRGGDL created with " << _configFilename << endl;
       _clock.dump();
     }
+
+    for (int i = 0; i < m_InputBitsDB->getninbit(); i++) {
+      _inpBitNames.push_back(std::string(m_InputBitsDB->getinbitname(i)));
+    }
+
+    for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
+      _oupBitNames.push_back(std::string(m_FTDLBitsDB->getoutbitname(i)));
+    }
+
   }
 
   void
   TRGGDL::initialize(void)
   {
+    if (_debugLevel > 19) {
+      for (int i = 0; i < m_InputBitsDB->getninbit(); i++) {
+        B2DEBUG(20, "TRGGDL::initialize, inputBits: " << i << ", " << m_InputBitsDB->getinbitname(i));
+      }
+      for (int i = 0; i < m_FTDLBitsDB->getnoutbit(); i++) {
+        B2DEBUG(20, "TRGGDL::initialize, outputBits: " << i << ", " << m_FTDLBitsDB->getoutbitname(i));
+      }
+      for (int i = 0; i < db_algs->getnalgs(); i++) {
+        B2DEBUG(20, "TRGGDL::initialize, algs: " << i << ", " << db_algs->getalg(i));
+      }
+    }
     //if it is firmware simulation, do the cofigurnation
     //fastsimulation doesn't use the configuration currently
     if (_simulationMode == 2) configure();
@@ -168,12 +199,14 @@ namespace Belle2 {
   void
   TRGGDL::update(bool)
   {
+    /*
     TRGDebug::enterStage("TRGGDL update");
 
     if (TRGDebug::level())
       cout << TRGDebug::tab() << name() << " do nothing..." << endl;
 
     TRGDebug::leaveStage("TRGGDL update");
+    */
   }
 
   TRGGDL::~TRGGDL()
@@ -184,17 +217,21 @@ namespace Belle2 {
   void
   TRGGDL::simulate(void)
   {
-    const bool fast = (_simulationMode & 1);
-    const bool firm = (_simulationMode & 2);
+    const bool fast = (_simulationMode == 1);
+    const bool firm = (_simulationMode == 2);
+    const bool data = (_simulationMode == 3);
     if (fast)
       fastSimulation();
     if (firm)
       firmwareSimulation();
+    if (data)
+      dataSimulation();
   }
 
   void
   TRGGDL::fastSimulation(void)
   {
+    B2DEBUG(20, "TRGGDL::fastSimulation starts.");
     TRGDebug::enterStage("TRGGDL fastSim");
 
     if (TRGDebug::level())
@@ -202,207 +239,310 @@ namespace Belle2 {
 
     TRGDebug::leaveStage("TRGGDL fastSim");
 
+    if (!m_InputBitsDB) B2INFO("no database of gdl input bits");
+    int N_InputBits = m_InputBitsDB->getninbit();
+    if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
+    int N_OutputBits = m_FTDLBitsDB->getnoutbit();
+    if (!m_PrescalesDB)  B2INFO("no database of gdl prescale");
+
     StoreObjPtr<TRGSummary> GDLResult;
     if (GDLResult) {
-      B2WARNING("TRGSummary exist already, check it!!!!");
+      B2WARNING("TRGGDL::fastSimulation(): TRGSummary exist already, check it!!!!");
       return;
     } else {
-      //TRGGDLResults* GDLResult = L1TrgResults.appendNew();
       GDLResult.create();
       StoreObjPtr<TRGGRLInfo> grlinfo("TRGGRLObjects");
       if (!grlinfo) {
         B2WARNING("TRGGRLInfo doesn't exist!!!!");
         return;
-      }
-
-      //get the objects defined in GRL, the name have to be unified to the name in TriggerMenufile
-      std::vector<int> obj;
-      int nTrk3D = (grlinfo->getN3Dfittertrk()); //0
-      int nTrkZ10 = (grlinfo->getN3DfittertrkZ10()); //1
-      int nTrkZ25 = (grlinfo->getN3DfittertrkZ25()); //2
-      int nClust = (grlinfo->getNcluster()); //3
-      int n300MeV = (grlinfo->getNhig300cluster());
-      int n1GeV415 = (grlinfo->getNhigh1GeVcluster415()); //4
-      int n1GeV2316 = (grlinfo->getNhigh1GeVcluster2316()); //5
-      //int n1GeV117 = (grlinfo->getNhigh1GeVcluster117()); //6 // Since it is not used, commanded to reduce warning
-      int n2GeV = (grlinfo->getNhigh2GeVcluster()); //7
-      int n2GeV414 = (grlinfo->getNhigh2GeVcluster414()); //8
-      int n2GeV231516 = (grlinfo->getNhigh2GeVcluster231516()); //9
-      int n2GeV117 = (grlinfo->getNhigh2GeVcluster117()); //10
-      int nTrkBhabha = (grlinfo->getBhabhaVeto()); //11
-      int nECLBhabha = (grlinfo->geteclBhabhaVeto()); //12
-      int nPhiPairHigh = (grlinfo->getPhiPairHigh()); //13
-      int nPhiPairLow = (grlinfo->getPhiPairLow()); //14
-      int n3DPair = (grlinfo->get3DPair()); //15
-      int nSameHem1Trk = (grlinfo->getNSameHem1Trk()); //16
-      int nOppHem1Trk = (grlinfo->getNOppHem1Trk()); //17
-      int eed = (grlinfo->geteed()); //18
-      int fed = (grlinfo->getfed()); //19
-      int fp = (grlinfo->getfp()); //20
-      int eeb = (grlinfo->geteeb()); //21
-      int fep = (grlinfo->getfep()); //22
-
-
-      const int ntrg = 23;
-      bool passBeforePrescale[ntrg];
-      int sf[ntrg];
-      bool Phase2 = (_Phase == "Phase2");
-
-      int itrig = 0;
-      passBeforePrescale[itrig] = nTrk3D >= 3;
-      sf[itrig] = 1;
-
-      itrig = 1;
-      if (Phase2) {
-        passBeforePrescale[itrig] = nTrk3D == 2 && nTrkZ25 >= 1 && nTrkBhabha == 0;
       } else {
-        passBeforePrescale[itrig] = nTrk3D == 2 && nTrkZ10 >= 1 && nTrkBhabha == 0;
-      }
-      sf[itrig] = 1;
-
-      itrig = 2;
-      passBeforePrescale[itrig] = nTrk3D == 2 && nTrkBhabha == 0;
-      sf[itrig] = 20;
-
-      itrig = 3;
-      passBeforePrescale[itrig] = nTrk3D == 2 && nTrkBhabha > 0;
-      if (Phase2) sf[itrig] = 1;
-      else sf[itrig] = 2;
-
-      itrig = 4;
-      if (Phase2) {
-        passBeforePrescale[itrig] = nTrk3D == 1 && nTrkZ25 == 1 && nSameHem1Trk >= 1 && n2GeV == 0;
-      } else {
-        passBeforePrescale[itrig] = nTrk3D == 1 && nTrkZ10 == 1 && nSameHem1Trk >= 1 && n2GeV == 0;
-      }
-      sf[itrig] = 1;
-
-      itrig = 5;
-      if (Phase2) {
-        passBeforePrescale[itrig] = nTrk3D == 1 && nTrkZ25 == 1 && nOppHem1Trk >= 1 && n2GeV == 0;
-      } else {
-        passBeforePrescale[itrig] = nTrk3D == 1 && nTrkZ10 == 1 && nOppHem1Trk >= 1 && n2GeV == 0;
-      }
-      sf[itrig] = 1;
-
-      itrig = 6;
-      if (Phase2) {
-        passBeforePrescale[itrig] = nClust >= 3 && n300MeV >= 1 && nECLBhabha == 0;
-      } else {
-        passBeforePrescale[itrig] = nClust >= 3 && n300MeV >= 2 && nECLBhabha == 0;
-      }
-      sf[itrig] = 1;
-
-      itrig = 7;
-      passBeforePrescale[itrig] = n2GeV414 >= 1 && nTrkBhabha == 0;
-      sf[itrig] = 1;
-
-      itrig = 8;
-      passBeforePrescale[itrig] = n2GeV414 >= 1 && nTrkBhabha >= 1;
-      if (Phase2)sf[itrig] = 1;
-      else sf[itrig] = 2;
-
-      itrig = 9;
-      passBeforePrescale[itrig] = n2GeV231516 >= 1 && nTrkBhabha == 0 && nECLBhabha == 0;
-      sf[itrig] = 1;
-
-      itrig = 10;
-      passBeforePrescale[itrig] = n2GeV231516 >= 1 && (nTrkBhabha >= 1 || nECLBhabha >= 1);
-      sf[itrig] = 1;
-
-      itrig = 11;
-      passBeforePrescale[itrig] = n2GeV117 >= 1 && nTrkBhabha == 0 && nECLBhabha == 0;
-      if (Phase2)sf[itrig] = 10;
-      else sf[itrig] = 20;
-
-      itrig = 12;
-      passBeforePrescale[itrig] = n2GeV117 >= 1 && (nTrkBhabha >= 1 || nECLBhabha >= 1);
-      if (Phase2)sf[itrig] = 10;
-      else sf[itrig] = 20;
-
-      itrig = 13;
-      passBeforePrescale[itrig] = n1GeV415 == 1 && n300MeV == 1;
-      sf[itrig] = 1;
-
-      itrig = 14;
-      passBeforePrescale[itrig] = n1GeV2316 == 1 && n300MeV == 1;
-      if (Phase2)sf[itrig] = 1;
-      else sf[itrig] = 5;
-
-      itrig = 15;
-      passBeforePrescale[itrig] = nPhiPairHigh >= 1 && n2GeV == 0;
-      sf[itrig] = 1;
-
-      itrig = 16;
-      if (Phase2) {
-        passBeforePrescale[itrig] = nPhiPairLow >= 1 && n2GeV == 0;
-        sf[itrig] = 1;
-      } else {
-        passBeforePrescale[itrig] = nPhiPairLow >= 1 && n2GeV == 0 && nTrkZ25 == nTrk3D;
-        sf[itrig] = 3;
+        if (_debugLevel > 89) printf("TRGGDL:TRGGRLInfo found.\n");
       }
 
-      itrig = 17;
-      passBeforePrescale[itrig] = n3DPair >= 1 && n2GeV == 0;
-      if (Phase2)sf[itrig] = 1;
-      else sf[itrig] = 5;
-
-      itrig = 18;
-      passBeforePrescale[itrig] = eed == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
-      sf[itrig] = 1;
-
-      itrig = 19;
-      passBeforePrescale[itrig] = fed == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
-      sf[itrig] = 1;
-
-      itrig = 20;
-      passBeforePrescale[itrig] = fp == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
-      sf[itrig] = 1;
-
-      itrig = 21;
-      passBeforePrescale[itrig] = eeb == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
-      sf[itrig] = 1;
-
-      itrig = 22;
-      passBeforePrescale[itrig] = fep == 1 && nTrkBhabha == 0 && nECLBhabha == 0;
-      sf[itrig] = 1;
-
+      _inpBits.clear();
+      int input_summary = 0;
+      for (int i = 0; i < N_InputBits; i++) {
+        if (_debugLevel > 89) printf("TRGGDL:ABC:i(%d)\n", i);
+        if ((i % 32) == 0) {
+          if (i > 0) {
+            GDLResult->setInputBits(i / 32 - 1, input_summary);
+          }
+          input_summary = 0;
+        }
+        if (grlinfo->getInputBits(i)) input_summary |= (1 << (i % 32));
+        _inpBits.push_back(grlinfo->getInputBits(i));
+        if (i == N_InputBits - 1) {
+          GDLResult->setInputBits(i / 32, input_summary);
+        }
+      }
 
       int L1Summary = 0;
       int L1Summary_psnm = 0;
-      //std::vector<int> trgres;
-      //dotrigger(trgres, obj);
-      for (unsigned int i = 0; i < ntrg; i++) {
-        int bitval = 0;
-        int bitval_psnm = 0;
-        if (passBeforePrescale[i]) bitval_psnm = doprescale(sf[i]);
-        bitval = passBeforePrescale[i];
-        L1Summary = L1Summary | (bitval << i);
-        L1Summary_psnm = L1Summary_psnm | (bitval_psnm << i);
-        GDLResult->setPreScale(0, i, sf[i]);
+      std::string str;
+      std::vector<std::string> algs;
+      std::ifstream isload(_algFilePath.c_str(), std::ios::in);
+      int index = 0;
+      while (std::getline(isload, str)) {
+        algs.push_back(str);
+        index++;
       }
-      //GDLResult->setTRGSummary(0, L1Summary);
-      GDLResult->setFtdlBits(0, L1Summary);
-      GDLResult->setPsnmBits(0, L1Summary_psnm);
+      isload.close();
+
+      for (int i = 0; i < N_OutputBits; i++) {
+        if (_debugLevel > 89) printf("TRGGDL:ABB:i(%d)\n", i);
+        if ((i % 32) == 0) {
+          if (i > 0) {
+            GDLResult->setFtdlBits(i / 32 - 1, L1Summary);
+            GDLResult->setPsnmBits(i / 32 - 1, L1Summary_psnm);
+          }
+          L1Summary = 0;
+          L1Summary_psnm = 0;
+        }
+        std::string alg = _algFromDB ? db_algs->getalg(i) : algs[i];
+        if (_debugLevel > 89) printf("TRGGDL:i(%d), alg(%s)\n", i, db_algs->getalg(i).c_str());
+        if (isFiredFTDL(_inpBits, alg)) {
+          L1Summary |= (1 << (i % 32));
+          if (doprescale(m_PrescalesDB->getprescales(i))) {
+            L1Summary_psnm |= (1 << (i % 32));
+          }
+        }
+        GDLResult->setPreScale((i / 32), (i % 32), m_PrescalesDB->getprescales(i));
+        if (i == N_OutputBits - 1) {
+          GDLResult->setFtdlBits(i / 32, L1Summary);
+          GDLResult->setPsnmBits(i / 32, L1Summary_psnm);
+        }
+      }
     }
   }
 
-  int TRGGDL::doprescale(int f)
+  void
+  TRGGDL::dataSimulation(void)
   {
-    int Val = 0;
+//  B2DEBUG(20,"TRGGDL::dataSimulation starts.");
+    StoreObjPtr<EventMetaData> bevt;
+    /*
+    unsigned _exp = bevt->getExperiment();
+    unsigned _run = bevt->getRun();
+    */
+    if (_debugLevel > 9) printf("TRGGDL:dataSimulation Start\n");
+    unsigned _evt = bevt->getEvent();
+//  TRGDebug::enterStage("TRGGDL dataSim");
+
+//  if (TRGDebug::level())
+//    cout << TRGDebug::tab() << name() << " do nothing..." << endl;
+
+    if (!m_InputBitsDB) B2INFO("no database of gdl input bits");
+    int N_InputBits = m_InputBitsDB->getninbit();
+    if (!m_FTDLBitsDB)  B2INFO("no database of gdl ftdl bits");
+    int N_OutputBits = m_FTDLBitsDB->getnoutbit();
+    if (!m_PrescalesDB) B2INFO("no database of gdl prescale");
+
+    if (_debugLevel > 19)
+      printf("TRGGDL:N_InputBits(%d), N_OutputBits(%d)\n", N_InputBits, N_OutputBits);
+
+    StoreObjPtr<TRGSummary> GDLResult;
+    if (! GDLResult) {
+      B2WARNING("TRGGDL::dataSimulation(): TRGSummary not found. Check it!!!!");
+      return;
+    } else {
+
+      if (_debugLevel > 89) printf("TRGGDL:TRGSummary Found.\n");
+      _inpBits.clear();
+      _ftdBits.clear();
+      _psnBits.clear();
+      for (int i = 0; i < N_InputBits; i++) {
+        _inpBits.push_back(GDLResult->testInput(i));
+      }
+
+      if (_algFromDB) {
+
+        int L1Summary = 0;
+        int L1Summary_psnm = 0;
+
+        for (int i = 0; i < N_OutputBits; i++) {
+          bool ftdl_fired = isFiredFTDL(_inpBits, db_algs->getalg(i));
+          bool psnm_fired = false;
+          _ftdBits.push_back(ftdl_fired);
+          if (ftdl_fired) {
+            L1Summary |= (1 << i);
+            if (doprescale(m_PrescalesDB->getprescales(i))) {
+              L1Summary_psnm |= (1 << i);
+              psnm_fired = true;
+            }
+          }
+          psnm_fired ? _psnBits.push_back(true) : _psnBits.push_back(false);
+          GDLResult->setPreScale((i / 32), (i % 32), m_PrescalesDB->getprescales(i));
+          if (! strcmp(m_FTDLBitsDB->getoutbitname(i), "hie")) {
+            if (_debugLevel == 971 && ftdl_fired) {
+              int i_ehigh    = m_InputBitsDB->getinbitnum("ehigh");
+              int i_bha_veto = m_InputBitsDB->getinbitnum("bha_veto");
+              printf("TRGGDL:hie:i=%d,evt=%d,ps=%d,ehigh=%d,bha_veto=%d,ftdl_fired=%d,psnm_fired=%d,i_ehigh=%d,i_bha_veto=%d,obitname=%s\n",
+                     i, _evt, m_PrescalesDB->getprescales(i),
+                     _inpBits[i_ehigh] ? 1 : 0,
+                     _inpBits[i_bha_veto] ? 1 : 0,
+                     ftdl_fired ? 1 : 0,
+                     psnm_fired ? 1 : 0,
+                     i_ehigh,
+                     i_bha_veto,
+                     m_FTDLBitsDB->getoutbitname(i));
+            }
+          }
+        }
+
+      } else {
+
+        int L1Summary = 0;
+        int L1Summary_psnm = 0;
+        std::string str;
+        std::vector<std::string> algs;
+        std::ifstream isload(_algFilePath.c_str(), std::ios::in);
+        int index = 0;
+        while (std::getline(isload, str)) {
+          algs.push_back(str);
+          index++;
+        }
+        isload.close();
+
+        for (int i = 0; i < N_OutputBits; i++) {
+          bool ftdl_fired = isFiredFTDL(_inpBits, algs[i]);
+          bool psnm_fired = false;
+          _ftdBits.push_back(ftdl_fired);
+          if (ftdl_fired) {
+            L1Summary |= (1 << i);
+            if (doprescale(m_PrescalesDB->getprescales(i))) {
+              L1Summary_psnm |= (1 << i);
+              psnm_fired = true;
+            }
+          }
+          psnm_fired ? _psnBits.push_back(true) : _psnBits.push_back(false);
+          GDLResult->setPreScale((i / 32), (i % 32), m_PrescalesDB->getprescales(i));
+        }
+
+      }
+
+
+    }
+  }
+
+  bool
+  TRGGDL::isFiredFTDL(std::vector<bool> input, std::string alg)
+  {
+    if (alg.length() == 0) return true;
+    const char* cst = alg.c_str();
+    bool reading_word = false;
+    bool result_the_term = true; // init value must be true
+    bool not_flag = false;
+    unsigned begin_word = 0;
+    unsigned word_length = 0;
+    // notation steeing side must follow
+    //  no blank between '!' and word
+    for (unsigned i = 0; i < alg.length(); i++) {
+      if (('0' <= cst[i] && cst[i] <= '9') ||
+          ('_' == cst[i]) || ('!' == cst[i])) {
+        if (reading_word) { // must not be '!'
+          word_length++;
+          if (i == alg.length() - 1) {
+            bool fired = input[atoi(alg.substr(begin_word, word_length).c_str())];
+            B2DEBUG(20,
+                    alg.substr(begin_word, word_length).c_str()
+                    << "(" << fired << ")");
+            if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
+              return true;
+            }
+          }
+        } else {
+          // start of new word
+          reading_word = true;
+          if ('!' == cst[i]) {
+            begin_word = i + 1;
+            not_flag = true;
+            word_length = 0;
+          } else {
+            begin_word = i;
+            not_flag = false;
+            word_length = 1;
+            if (i == alg.length() - 1) {
+              // one char bit ('f',...) comes end of conditions, 'xxx+f'
+              bool fired = input[atoi(alg.substr(begin_word, word_length).c_str())];
+              B2DEBUG(20,
+                      alg.substr(begin_word, word_length).c_str()
+                      << "(" << fired << ")");
+              if (((!not_flag && fired) || (not_flag && !fired)) && result_the_term) {
+                return true;
+              }
+            }
+          }
+        }
+      } else if ('+' == cst[i] || i == alg.length() - 1) {
+        // End of the term.
+        if (reading_word) { // 'xxx+'
+          if (result_the_term) {
+            bool fired = input[atoi(alg.substr(begin_word, word_length).c_str())];
+            B2DEBUG(20,
+                    alg.substr(begin_word, word_length).c_str()
+                    << "(" << fired << ")");
+            if ((!not_flag && fired) || (not_flag && !fired)) {
+              return true;
+            } else {
+              // this term is denied by the latest bit
+            }
+          } else {
+            // already false.
+          }
+          reading_word = false;
+        } else {
+          // prior char is blank, 'xxx  +'
+          if (result_the_term) {
+            return true;
+          } else {
+            // already false
+          }
+        }
+        result_the_term = true; //  go to next term
+      } else {
+        // can be blank (white space) or any delimiter.
+        if (reading_word) {
+          // end of a word, 'xxxx '
+          reading_word = false;
+          if (result_the_term) {
+            // worth to try
+            bool fired = input[atoi(alg.substr(begin_word, word_length).c_str())];
+            B2DEBUG(20,
+                    alg.substr(begin_word, word_length).c_str()
+                    << "(" << fired << ")");
+            if ((!not_flag && fired) || (not_flag && !fired)) {
+              // go to next word
+            } else {
+              result_the_term = false;
+            }
+          } else {
+            // already false
+          }
+          reading_word = false;
+        } else {
+          // 2nd blank 'xx  ' or leading blanck '^ '
+        }
+      }
+    }
+    return false;
+  }
+
+  bool TRGGDL::doprescale(int f)
+  {
+    if (f == 0) return false;
+    if (f == 1) return true;
     double ran = gRandom->Uniform(f);
-    if (ceil(ran) == f) Val = 1;
-    return Val;
+    return (ceil(ran) == f);
   }
 
 
   void
   TRGGDL::firmwareSimulation(void)
   {
-    TRGDebug::enterStage("TRGGDL firmSim");
+//  TRGDebug::enterStage("TRGGDL firmSim");
 
-    if (TRGDebug::level())
-      cout << TRGDebug::tab() << "Making dummy input signals" << endl;
+//  if (TRGDebug::level())
+//    cout << TRGDebug::tab() << "Making dummy input signals" << endl;
 
     //...Clear signal bundles...
     if (_isb) {
@@ -556,17 +696,6 @@ namespace Belle2 {
     if (ftd == "ftd_0.01") {
       _ftd = ftd_0_01;
     }
-    /*
-      //get trigger menu file
-      const string fmenu = _configFilename+".menu"
-      ifstream menufile(fmenu.c_str(), ios::in);
-      if(menufile.fail()){
-      cout<<"trigger menufile "<<fmenu<<"  can not open"<<endl;
-      return;
-      }
-      getTriggerMenu(menufile);
-      menufile.close();
-     */
 
     //...Summary...
     if (TRGDebug::level()) {
@@ -604,11 +733,6 @@ namespace Belle2 {
       if (w1.size())
         _input.push_back(w1);
 
-
-      // if (TRGDebug::level()) {
-      //     cout << w0 << "," << w1 << endl;
-      // }
-
       ++lines;
     }
 
@@ -636,10 +760,6 @@ namespace Belle2 {
 
       if (w1.size())
         _output.push_back(w1);
-
-      // if (TRGDebug::level()) {
-      //     cout << w0 << "," << w1 << endl;
-      // }
 
       ++lines;
     }
@@ -673,33 +793,10 @@ namespace Belle2 {
       if (w2.size())
         _algorithm.push_back(w2);
 
-      // if (TRGDebug::level()) {
-      //     cout << w0 << "," << w1 << "," << w2 << endl;
-      // }
-
       ++lines;
     }
 
   }
-
-  /*void
-  TRGGDL::getTriggerMenu(ifstream & menuf){
-
-  std::string sline;
-  std::string scut;
-  int prescaf;
-  int index;
-  if(menf.is_open()){
-  while(!menuf.eof())
-  {
-  std::getline(menuf, sline);
-  //sscanf(sline, " %i %s %i", &index, scut, &prescaf)
-  _trgmenu.push_back(scut);
-  //_prescale.push_back(prescaf);
-  }
-  }
-  }
-  */
 
   TRGState
   TRGGDL::decision(const TRGState& input)
@@ -847,6 +944,30 @@ namespace Belle2 {
 
     //...Termination...
     return out;
+  }
+
+  void
+  TRGGDL::accumulateInp(TH1I* h)
+  {
+    for (std::size_t i = 0; i < _inpBits.size(); i++) {
+      if (_inpBits[i]) h->Fill(i);
+    }
+  }
+
+  void
+  TRGGDL::accumulateFtd(TH1I* h)
+  {
+    for (std::size_t i = 0; i < _ftdBits.size(); i++) {
+      if (_ftdBits[i]) h->Fill(i);
+    }
+  }
+
+  void
+  TRGGDL::accumulatePsn(TH1I* h)
+  {
+    for (std::size_t i = 0; i < _psnBits.size(); i++) {
+      if (_psnBits[i]) h->Fill(i);
+    }
   }
 
 } // namespace Belle2

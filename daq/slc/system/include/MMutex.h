@@ -17,27 +17,27 @@ namespace Belle2 {
     friend class MCond;
 
   public:
-    static size_t size() throw() { return sizeof(pthread_mutex_t); }
+    static size_t size() { return sizeof(pthread_mutex_t); }
 
     // constructors and destructor
   public:
-    MMutex() throw();
-    MMutex(void*) throw();
-    MMutex(const MMutex&) throw();
-    ~MMutex() throw();
+    MMutex();
+    MMutex(void*);
+    MMutex(const MMutex&);
+    ~MMutex();
 
     // member functions;
   public:
-    bool init(void*) throw();
-    bool init() throw();
-    bool set(void*) throw();
-    bool lock() throw();
-    bool trylock() throw();
-    bool unlock() throw();
-    bool destroy() throw();
+    bool init(void*);
+    bool init();
+    bool set(void*);
+    bool lock();
+    bool trylock();
+    bool unlock();
+    bool destroy();
 
   public:
-    const MMutex& operator=(const MMutex&) throw();
+    const MMutex& operator=(const MMutex&);
 
     // data members;
   private:

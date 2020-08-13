@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/ROIid.h>
@@ -26,7 +25,7 @@ namespace Belle2 {
 
     /** Constructor.
      */
-    ROIStripTranslator(const ROIinfo*  theROIinfo);
+    explicit ROIStripTranslator(const ROIinfo*  theROIinfo);
 
     /** Second Constructor.
      */

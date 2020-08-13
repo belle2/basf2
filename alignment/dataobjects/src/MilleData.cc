@@ -1,9 +1,9 @@
+
 #include <alignment/dataobjects/MilleData.h>
 
 #include <framework/utilities/FileSystem.h>
-#include <framework/logging/Logger.h>
-#include <limits.h>
-#include <stdlib.h>
+
+#include <cstdlib>
 
 char* full_path = realpath("foo.dat", NULL);
 using namespace std;
@@ -41,6 +41,7 @@ MilleData& MilleData::operator=(const MilleData& other)
   close();
   m_files = other.m_files;
   m_doublePrecision = other.m_doublePrecision;
+  m_absFilePaths = other.m_absFilePaths;
   m_numRecords = other.m_numRecords;
   return *this;
 }

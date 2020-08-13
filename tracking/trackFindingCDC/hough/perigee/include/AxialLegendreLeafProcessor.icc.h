@@ -15,13 +15,11 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
 #include <tracking/trackFindingCDC/hough/perigee/OffOrigin.h>
-#include <tracking/trackFindingCDC/hough/algorithms/InPhi0CurvBox.h>
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
 
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
@@ -107,7 +105,7 @@ namespace Belle2 {
         foundWireHits.push_back(&rlWireHit.getWireHit());
       }
 
-      AxialTrackUtil::addCandidateFromHitsWithPostprocessing(foundWireHits, m_axialWireHits, m_tracks);
+      AxialTrackUtil::addCandidateFromHits(foundWireHits, m_axialWireHits, m_tracks, true);
 
       // Sync up the marks with the used hits
       for (WithSharedMark<CDCRLWireHit>& markableRLWireHit : leaf->getTree()->getTopNode()) {

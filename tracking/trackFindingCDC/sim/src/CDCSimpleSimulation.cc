@@ -18,7 +18,6 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
@@ -112,7 +111,6 @@ CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> 
         ++nSameWire;
       } else {
         nSameWire = 1;
-        // cppcheck-suppress unreadVariable
         lastWire = &(simpleSimHit.m_wireHit.getWire());
       }
       return nSameWire > maxNHitOnWire ? true : false;

@@ -11,10 +11,8 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <math.h>
-#include <root/TObject.h>
-#include <root/TVector3.h>
-
+#include <TObject.h>
+#include <TVector2.h>
 
 namespace Belle2 {
 
@@ -31,9 +29,6 @@ namespace Belle2 {
     /** Constructor for extrapolated hit (MPH) providing sensor ID and local coordinate */
     DATCONMostProbableHit(VxdID sensorID, TVector2 localCoordinate, double qualityOfHit):
       m_sensorID(sensorID), m_localCoordinate(localCoordinate), m_qualityOfHit(qualityOfHit) {}
-
-    /** Basic destructor */
-    ~DATCONMostProbableHit() {}
 
     /** Get sensor ID */
     VxdID getSensorID()           { return m_sensorID; }

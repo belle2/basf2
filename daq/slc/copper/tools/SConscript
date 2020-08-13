@@ -1,5 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['cinitecl'] = ['daq', 'framework', '$PGSQL_LIBS', 'ttrx', 'mgt']
-
-Return('env')

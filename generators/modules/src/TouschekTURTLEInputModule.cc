@@ -10,10 +10,7 @@
 
 #include <generators/modules/TouschekTURTLEInputModule.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
@@ -21,10 +18,6 @@
 #include <framework/utilities/FileSystem.h>
 
 #include <generators/touschek/TouschekReaderTURTLE.h>
-
-#include <TGeoManager.h>
-#include <TGeoVolume.h>
-#include <TGeoNode.h>
 
 #include <fstream>
 
@@ -103,10 +96,10 @@ void TouschekTURTLEInputModule::initialize()
 
 void TouschekTURTLEInputModule::event()
 {
-  int readHERParticles = 0;
-  int readLERParticles = 0;
-
   try {
+    int readHERParticles = 0;
+    int readLERParticles = 0;
+
     //Read the data
     MCParticleGraph mpg;
     if (m_readHER) readHERParticles = m_readerHER->getParticles(m_maxParticles, mpg); //HER: electrons

@@ -70,16 +70,19 @@ namespace Belle2 {
     virtual ~PrintDataTemplateModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void event();
+    virtual void event() override;
 
     //! print the contents of a RawCOPPER event
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);
 
     //! print the contents of a RawFTSW event
     virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
+
+    //! check the contents of a RawFTSW event ver.2
+    virtual void checkFTSWver2(RawFTSW* raw_array, int i);
 
     //! print a buffer
     virtual void printBuffer(int* buf, int nwords);

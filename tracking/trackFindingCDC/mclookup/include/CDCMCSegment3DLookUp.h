@@ -23,6 +23,12 @@ namespace Belle2 {
     public:
       /// Getter for the singletone instance
       static const CDCMCSegment3DLookUp& getInstance();
+
+      /// Default constructor, needs to be public for initialization in CDCMCManager
+      CDCMCSegment3DLookUp() = default;
+      /// Singleton: Delete copy constructor and assignment operator
+      CDCMCSegment3DLookUp(CDCMCSegment3DLookUp&) = delete;
+      CDCMCSegment3DLookUp& operator=(const CDCMCSegment3DLookUp&) = delete;
     };
   }
 }

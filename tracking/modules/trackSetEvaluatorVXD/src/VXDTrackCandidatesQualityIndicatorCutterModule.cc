@@ -9,9 +9,7 @@
  **************************************************************************/
 
 #include "tracking/modules/trackSetEvaluatorVXD/VXDTrackCandidatesQualityIndicatorCutterModule.h"
-#include <framework/logging/Logger.h>
 #include <vector>
-#include <numeric>
 
 using namespace Belle2;
 
@@ -55,6 +53,7 @@ void VXDTrackCandidatesQualityIndicatorCutterModule::deactivateCandidates()
   for (SpacePointTrackCand& sptc : m_spacePointTrackCands) {
     if (sptc.getQualityIndicator() < m_minRequiredQuality) {
       sptc.removeRefereeStatus(SpacePointTrackCand::c_isActive);
+      // Note: assignment state of individual hits does not have to be changed here (assignment not set until SPTC2RTConverterModule)
     }
   }
 }

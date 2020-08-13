@@ -1,0 +1,8 @@
+{
+    "caf_script": "example_complex.py",
+    "database_chain": ["online", "data_reprocessing_prompt"],
+    "backend_args": {"queue": "s"},
+    "requested_iov" : [12,900,12,2000],
+    "expert_config" : {"max_files_per_run": 4,
+                       "payload_boundaries": [[11,900], [12,3], [12,950], [12,1002], [12,1013], [12,1015], [12,1024], [12,1060], [13,1]]}
+}

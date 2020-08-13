@@ -16,8 +16,6 @@
 
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Functional.h>
 
@@ -25,7 +23,6 @@
 
 #include <vector>
 #include <string>
-#include <cmath>
 #include <cassert>
 
 using namespace Belle2;

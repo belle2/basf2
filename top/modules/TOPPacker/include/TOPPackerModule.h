@@ -38,42 +38,49 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
     /**
-     * Pack in format Production draft
+     * Pack in format: c_Draft (tentative production format)
+     * this format was never implemented in firmware!
      */
     void packProductionDraft();
 
     /**
-     * Pack in format Feature-extracted data
+     * Pack in format: c_Type0Ver16 (Feature-extracted data)
+     * this format was never implemented in firmware!
      */
     void packType0Ver16();
+
+    /**
+     * Pack in format: Production Debugging Data Format 01
+     */
+    void packProductionDebug();
 
     /**
      * sum both 16-bit words of 32-bit integer

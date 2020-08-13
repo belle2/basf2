@@ -45,8 +45,6 @@ namespace {
                                   expectedCov6,
                                   pValue);
 
-    const TMatrixDSym cov5 = uncertainHelix.getCovariance();
-
     const TVector3 position = uncertainHelix.getPerigee();
     const TVector3 momentum = uncertainHelix.getMomentum(bZ);
     const double charge = uncertainHelix.getChargeSign();
@@ -100,8 +98,6 @@ namespace {
                                   bZ,
                                   expectedCov6,
                                   pValue);
-
-    const TMatrixDSym cov5 = uncertainHelix.getCovariance();
 
     const TVector3 position = uncertainHelix.getPerigee();
     const TVector3 momentum = uncertainHelix.getMomentum(bZ);
@@ -173,8 +169,6 @@ namespace {
                                     bZ,
                                     expectedCov6,
                                     pValue);
-
-      const TMatrixDSym cov5 = uncertainHelix.getCovariance();
 
       const TVector3 position = uncertainHelix.getPerigee();
       const TVector3 momentum = uncertainHelix.getMomentum(bZ);
@@ -263,7 +257,7 @@ namespace {
       EXPECT_NEAR(z0, uncertainHelix2.getZ0(), 1e-7);
       EXPECT_NEAR(tanLambda, uncertainHelix2.getTanLambda(), 1e-7);
 
-      const TMatrixDSym cov5 = uncertainHelix2.getCovariance();
+      const TMatrixDSym& cov5 = uncertainHelix2.getCovariance();
       EXPECT_EQ(-1, charge);
 
       for (int j : irange(0, 5)) {
@@ -344,7 +338,7 @@ namespace {
     EXPECT_NEAR(helixParams[3], uncertainHelix2.getZ0(), 1e-7);
     EXPECT_NEAR(helixParams[4], uncertainHelix2.getTanLambda(), 1e-7);
 
-    const TMatrixDSym cov5 = uncertainHelix2.getCovariance();
+    const TMatrixDSym& cov5 = uncertainHelix2.getCovariance();
     EXPECT_EQ(1, charge);
 
     for (int i : boost::irange(0, 5)) {
@@ -435,7 +429,7 @@ namespace {
     EXPECT_NEAR(z0, uncertainHelix2.getZ0(), 1e-7);
     EXPECT_NEAR(tanLambda, uncertainHelix2.getTanLambda(), 1e-7);
 
-    const TMatrixDSym cov5 = uncertainHelix2.getCovariance();
+    const TMatrixDSym& cov5 = uncertainHelix2.getCovariance();
     EXPECT_EQ(-1, charge);
 
     for (int i : irange(0, 5)) {
@@ -484,7 +478,7 @@ namespace {
                                        cov6,
                                        pValue);
 
-    const TMatrixDSym cov5 = movedUncertainHelix.getCovariance();
+    const TMatrixDSym& cov5 = movedUncertainHelix.getCovariance();
 
     // Execute the move in perigee coordinates
     UncertainHelix expectedMovedUncertainHelix = uncertainHelix;

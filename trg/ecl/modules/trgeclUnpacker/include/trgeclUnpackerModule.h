@@ -10,23 +10,23 @@
 //---------------------------------------------------------------
 // 1.00 : 2017/05/06 : First version
 // 1.01 : 2017/07/17 : Add FTSW clock from FAM, fine timing
+// 2.00 : 2018/02/17 : 8 window data (ETM Ver. 100)
+// 3.00 : 2018/07/31 : ETM version dependence included
 //---------------------------------------------------------------
 
 #ifndef TRGECLUNPACKER_H
 #define TRGECLUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
-#include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
+#include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerStore.h"
+#include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
+#include "trg/ecl/dataobjects/TRGECLCluster.h"
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -65,36 +65,32 @@ namespace Belle2 {
     /** Unpacker main function.*/
     virtual void checkBuffer(int*, int);
 
+    /** Unpacker main function for upto version 136.*/
+    virtual void checkBuffer_v136(int*, int);
+
   protected :
     /** Event number */
     int n_basf2evt;
+    //! ETM Version
+    int etm_version = 0;
+    //! Node Id
+    unsigned int nodeid = 0;
+    //! N Word
+    int nwords = 0;
+    //! Finess
+    int iFiness = 0;
+    //! Trigger Type
+    int trgtype = 0;
 
   private :
-    /** */
-    int m_revo;
-    /** */
-    int m_gdl;
-    /** */
-    int m_ntc;
-    /** */
-    int m_tcid;
-    /** */
-    int m_time;
-    /** */
-    int m_caltime;
-    /** */
-    int m_evttime;
-    /** */
-    int m_energy;
-    /** */
-    int m_checksum;
-    /** */
-    int m_hitwin;
-    /** */
-    int m_hitNum;
-    /** */
-    StoreArray<TRGECLUnpackerStore> m_TRGECLUnpackerArray;
-
+    //! ECL Trigger Unpacker TC output
+    StoreArray<TRGECLUnpackerStore>     m_TRGECLTCArray;
+    //! ECL Trigger Unpacker Summary output
+    StoreArray<TRGECLUnpackerSumStore>  m_TRGECLSumArray;
+    //! ECL Trigger Unpacker Event output
+    StoreArray<TRGECLUnpackerEvtStore>  m_TRGECLEvtArray;
+    //! ECL Trigger Cluster output
+    StoreArray<TRGECLCluster>  m_TRGECLClusterArray;
   };
 
 } // end namespace Belle2

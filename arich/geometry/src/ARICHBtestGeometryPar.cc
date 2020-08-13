@@ -8,17 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/geometry/ARICHBtestGeometryPar.h>
 
-#include <cmath>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
-#include <TGraph.h>
 
 using namespace std;
 using namespace boost;
@@ -49,11 +44,20 @@ namespace Belle2 {
   }
 
 
-  ARICHBtestGeometryPar::ARICHBtestGeometryPar(const ARICHBtestGeometryPar& arichPar)
+  ARICHBtestGeometryPar::ARICHBtestGeometryPar(const ARICHBtestGeometryPar& arichPar) :
+    m_trackingShift(arichPar.m_trackingShift),
+    m_rotationCenter(arichPar.m_rotationCenter),
+    m_frameRotation(arichPar.m_frameRotation),
+    m_hapdmap(arichPar.m_hapdmap),
+    m_hapdeid(arichPar.m_hapdeid)
   {
-    *this = arichPar;
+    m_averageAgel = arichPar.m_averageAgel;
+    m_nPads = arichPar.m_nPads;
+    m_init = arichPar.m_init;
+    m_simple = arichPar.m_simple;
     m_mwpc = new ARICHTracking();
     *m_mwpc = *arichPar.m_mwpc;
+    p_B4ARICHBtestGeometryParDB = this;
   }
 
   ARICHBtestGeometryPar::~ARICHBtestGeometryPar()
@@ -94,7 +98,7 @@ namespace Belle2 {
     return m_hapdeid.size();
   }
 
-  void ARICHBtestGeometryPar::setTrackingShift(TVector3& v)
+  void ARICHBtestGeometryPar::setTrackingShift(const TVector3& v)
   {
     m_trackingShift = v;
     B2INFO("ARICHBtestGeometryPar::setTrackingShift=" << m_trackingShift.x() << ","  << m_trackingShift.y() << ","  <<
@@ -108,7 +112,7 @@ namespace Belle2 {
     return m_trackingShift;
   }
 
-  void ARICHBtestGeometryPar::setRotationCenter(TVector3& v)
+  void ARICHBtestGeometryPar::setRotationCenter(const TVector3& v)
   {
     m_rotationCenter = v;
     B2INFO("ARICHBtestGeometryPar::setRotationCenter=" << m_rotationCenter.x() << ","  << m_rotationCenter.y() << ","  <<
@@ -155,7 +159,7 @@ namespace Belle2 {
     m_rotationCenter  = TVector3();
   }
 
-  void ARICHBtestGeometryPar::setOffset(TVector3& v)
+  void ARICHBtestGeometryPar::setOffset(const TVector3& v)
   {
     m_offset = v;
     B2INFO("ARICHBtestGeometryPar::setOffset=" << m_offset.x() << ","  << m_offset.y() << ","  <<  m_offset.z());
@@ -172,6 +176,5 @@ namespace Belle2 {
   {
 
   }
-
 
 } // namespace Belle2

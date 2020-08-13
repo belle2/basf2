@@ -41,7 +41,6 @@ double Belle2::ECL::Sv123(double t, double t01, double tb1, double t02, double t
     }
   }
 
-  if (t < 0.) return 0;
 
 
 

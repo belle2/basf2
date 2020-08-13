@@ -8,22 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALIGNABLECDCRECOHIT_H
-#define ALIGNABLECDCRECOHIT_H
-
+#pragma once
 
 #include <cdc/dataobjects/CDCRecoHit.h>
-#include <cdc/dataobjects/CDCHit.h>
-
-#include <genfit/AbsMeasurement.h>
-#include <genfit/MeasurementOnPlane.h>
-#include <genfit/TrackCandHit.h>
-#include <genfit/HMatrixU.h>
 
 #include <genfit/ICalibrationParametersDerivatives.h>
-
-#include <memory>
-
 
 namespace Belle2 {
   /// This class is used to transfer CDC information to the track fit and Millepede.
@@ -31,7 +20,11 @@ namespace Belle2 {
 
   public:
     /// Static enabling(true) or disabling(false) addition of local derivative for track T0
-    static bool s_enableEventT0LocalDerivative;
+    static bool s_enableTrackT0LocalDerivative;
+    /// Static enabling(true) or disabling(false) addition of global derivative for wire sagging coefficient (per wire)
+    static bool s_enableWireSaggingGlobalDerivative;
+    /// Static enabling(true) or disabling(false) addition of global derivatives for wire-by-wire alignment
+    static bool s_enableWireByWireAlignmentGlobalDerivatives;
 
     /// Inherit constructors
     using CDCRecoHit::CDCRecoHit;
@@ -40,7 +33,7 @@ namespace Belle2 {
     ~AlignableCDCRecoHit() {}
 
     /// Creating a copy of this hit.
-    AlignableCDCRecoHit* clone() const
+    AlignableCDCRecoHit* clone() const override
     {
       return new AlignableCDCRecoHit(*this);
     }
@@ -76,7 +69,7 @@ namespace Belle2 {
      * @return pair<vector<int>, TMatrixD> With matrix with #rows = dimension of residual, #columns = number of parameters.
      * #columns must match vector<int>.size().
      */
-    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop);
+    virtual std::pair<std::vector<int>, TMatrixD> globalDerivatives(const genfit::StateOnPlane* sop) override;
 
     /**
      * @brief Derivatives for (local) fit parameters
@@ -84,11 +77,10 @@ namespace Belle2 {
      * @param sop State on virtual plane to calculate derivatives
      * @return TMatrixD of local derivatives, #columns=#params, #row=2 (or measurement dimension if > 2)
      */
-    virtual TMatrixD localDerivatives(const genfit::StateOnPlane* sop);
+    virtual TMatrixD localDerivatives(const genfit::StateOnPlane* sop) override;
 
   private:
     /** ROOT Macro.*/
-    ClassDef(AlignableCDCRecoHit, 1);
+    ClassDefOverride(AlignableCDCRecoHit, 1);
   };
 }
-#endif

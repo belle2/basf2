@@ -35,7 +35,7 @@ typedef struct NSMparse_struct NSMparse;
 
 NSMparse* nsmlib_parsefile(const char* datname, int revision,
                            const char* incpath, char* fmtstr, int* revisionp);
-
+void nsmlib_parsefree(NSMparse*);
 const char* nsmlib_parseerr(int* code);
 
 #if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)

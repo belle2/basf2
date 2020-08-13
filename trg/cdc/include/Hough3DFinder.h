@@ -28,6 +28,7 @@ namespace Belle2 {
   class TRGCDCSegmentHit;
   class TRGCDCLink;
 
+  /// class of TRGCDCHough3DFinder
   class TRGCDCHough3DFinder {
   public:
     /// Contructor.

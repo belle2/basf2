@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2019 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributor: Alexei Sibidanov e-mail:sibid@uvic.ca                     *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,6 @@
 #include "G4Transform3D.hh"
 #include "G4PVPlacement.hh"
 #include "G4SDManager.hh"
-#include "G4NistManager.hh"
 #include "G4UserLimits.hh"
 #include <G4VisAttributes.hh>
 #include <G4Box.hh>
@@ -19,7 +18,6 @@
 #include <ecl/geometry/GeoECLCreator.h>
 #include <ecl/geometry/shapes.h>
 #include <ecl/simulation/SensitiveDetector.h>
-#include <simulation/background/BkgSensitiveDetector.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
 #include <framework/gearbox/GearDir.h>
@@ -47,7 +45,7 @@ CreatorFactory<GeoECLCreator> GeoECLFactory("ECLCreator");
 
 GeoECLCreator::GeoECLCreator(): m_sap(0), m_overlap(0)
 {
-  m_sensediode = NULL;
+  m_sensediode = nullptr;
   m_sensitive  = new SensitiveDetector("ECLSensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
   G4SDManager::GetSDMpointer()->AddNewDetector(m_sensitive);
   defineVisAttributes();
@@ -112,7 +110,7 @@ G4LogicalVolume* GeoECLCreator::wrapped_crystal(const shape_t* s, const std::str
   G4Translate3D tw;
   G4VSolid* wrapped_crystal = s->get_solid(prefix, wrapthickness, tw);
   std::string name("lv_"); name += endcap + "_wrap_" + std::to_string(s->nshape);
-  G4Material* wrap = NULL;
+  G4Material* wrap = nullptr;
   if (wrapthickness < 0.170)
     wrap = Materials::get("WRAP170");
   else if (wrapthickness < 0.200)
@@ -131,7 +129,7 @@ G4LogicalVolume* GeoECLCreator::wrapped_crystal(const shape_t* s, const std::str
   crystal_logical->SetVisAttributes(att("cryst"));
   crystal_logical->SetSensitiveDetector(m_sensitive);
 
-  new G4PVPlacement(NULL, G4ThreeVector(), crystal_logical, name.c_str(), wrapped_logical, false, 0, 0);
+  new G4PVPlacement(nullptr, G4ThreeVector(), crystal_logical, name.c_str(), wrapped_logical, false, 0, 0);
   return wrapped_logical;
 }
 
@@ -162,8 +160,8 @@ const G4VisAttributes* GeoECLCreator::att(const std::string& n) const
 
 G4LogicalVolume* GeoECLCreator::get_preamp() const
 {
-  static G4LogicalVolume* lv_preamplifier = NULL;
-  if (lv_preamplifier == NULL) {
+  static G4LogicalVolume* lv_preamplifier = nullptr;
+  if (lv_preamplifier == nullptr) {
     G4VSolid* sv_preamplifier = new G4Box("sv_preamplifier", 58. / 2, 51. / 2, get_pa_box_height() / 2);
     lv_preamplifier = new G4LogicalVolume(sv_preamplifier, Materials::get("A5052"), "lv_preamplifier", 0, 0, 0);
     G4VSolid* sv_diode = new G4Box("sv_diode", 20. / 2, 20. / 2, 0.3 / 2);

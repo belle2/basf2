@@ -8,10 +8,12 @@
 
 #include "daq/rfarm/manager/RFSharedMem.h"
 
+#include <strings.h>
+
 using namespace std;
 using namespace Belle2;
 
-RFSharedMem::RFSharedMem(char* name) : SharedMem(name, sizeof(RfShm_Data))
+RFSharedMem::RFSharedMem(const char* name) : SharedMem(name, sizeof(RfShm_Data))
 {
   RfShm_Data* rfshm = (RfShm_Data*) ptr();
   if (SharedMem::IsCreated()) {

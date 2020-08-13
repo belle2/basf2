@@ -10,8 +10,6 @@
 
 #include <arich/dataobjects/ARICHRawDigit.h>
 
-#include <string.h>
-
 using namespace Belle2;
 
 void ARICHRawDigit::set(int type, int ver, int boardid, int febno, unsigned int length, unsigned int trgno)

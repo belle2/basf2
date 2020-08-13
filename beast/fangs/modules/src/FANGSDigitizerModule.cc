@@ -12,25 +12,13 @@
 #include <beast/fangs/dataobjects/FANGSSimHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-//#include <framework/gearbox/Unit.h>
 #include <framework/core/RandomNumbers.h>
 
 //c++
 #include <cmath>
-#include <boost/foreach.hpp>
 #include <vector>
-
-// ROOT
-#include <TH1.h>
-#include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 using namespace Belle2;
 using namespace fangs;
@@ -132,11 +120,13 @@ void FANGSDigitizerModule::event()
       m_dchip_trkID_map.clear();
     }
 
+    // There is some issue with these cuts! please check, remove for now!
     //check if ionization within sensitive volume
-    if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
+    /*if ((-m_ChipColumnX < chipPosition.X() && chipPosition.X() < m_ChipColumnX) &&
         (-m_ChipRowY < chipPosition.Y() && chipPosition.Y() <  m_ChipRowY) &&
         (0. < chipPosition.Z() && chipPosition.Z() <  m_sensor_width) &&
-        (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {
+        (m_lowerTimingCut < T0[detNb] && T0[detNb] < m_upperTimingCut)) {*/
+    if (1) {
 
       if (edep <  m_Workfct) break;
       ////////////////////////////////

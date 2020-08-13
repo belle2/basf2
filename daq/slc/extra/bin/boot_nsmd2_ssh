@@ -1,5 +1,0 @@
-#!/bin/bash
-
-dir=$BELLE2_LOCAL_DIR/daq/slc/extra/bin
-echo "booting nsmd2 in $1"
-ssh $1 "${dir}/boot_nsmd2 "`getconfig $1 logfile.dir nsm.${2}.host nsm.${2}.port`

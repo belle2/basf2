@@ -1,5 +1,3 @@
-#include <framework/utilities/TestHelpers.h>
-#include <framework/logging/Logger.h>
 #include <framework/utilities/Angle.h>
 
 #include <gtest/gtest.h>

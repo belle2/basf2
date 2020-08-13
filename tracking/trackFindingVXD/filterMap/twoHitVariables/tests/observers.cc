@@ -14,32 +14,20 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DSquared.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance1DZ.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/SlopeRZ.h>
-#include <tracking/trackFindingVXD/filterMap/twoHitVariables/Distance3DNormed.h>
 
 #include <tracking/trackFindingVXD/filterMap/filterFramework/Shortcuts.h>
 
-#include <tracking/vxdCaTracking/TwoHitFilters.h>
-
 #include <svd/dataobjects/SVDCluster.h>
 #include <pxd/dataobjects/PXDCluster.h>
-#include <pxd/dataobjects/PXDTrueHit.h>
-#include <svd/dataobjects/SVDTrueHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/dataobjects/ProfileInfo.h>
-#include <framework/datastore/RelationsObject.h>
 
-#include <tuple>
 #include <utility>
 #include <map>
 #include <string>
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 #include <functional>
 
@@ -317,7 +305,7 @@ namespace VXDTFObserversTest {
 
 
     /** for easy printing of results collected so far */
-    void PrintResults(string identifier = "unknown")
+    void PrintResults(const string& identifier = "unknown")
     {
       for (auto& entry : m_container) {
         B2WARNING(" for " << identifier << "-combination: " <<
@@ -781,7 +769,7 @@ namespace VXDTFObserversTest {
       RelationVector<PXDCluster> pxDClusters = aSP.getRelationsTo<PXDCluster>();
       for (PXDCluster& aCluster : pxDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
-        if (aParticle == NULL) { nullptrTrap = 1; }
+        if (aParticle == nullptr) { nullptrTrap = 1; }
         EXPECT_EQ(0, nullptrTrap);
 
         EXPECT_EQ(aSP.getArrayIndex(), aCluster.getArrayIndex());
@@ -796,7 +784,7 @@ namespace VXDTFObserversTest {
       RelationVector<SVDCluster> svDClusters = aSP.getRelationsTo<SVDCluster>();
       for (SVDCluster& aCluster : svDClusters) {
         MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
-        if (aParticle == NULL) { nullptrTrap = 2; }
+        if (aParticle == nullptr) { nullptrTrap = 2; }
         EXPECT_EQ(0, nullptrTrap);
 
         EXPECT_EQ(aSP.getArrayIndex(), 2 + aCluster.getArrayIndex() / 2);
@@ -925,7 +913,7 @@ namespace VXDTFObserversTest {
                                         &CountUsedObserver::notify), std::placeholders::_1, std::placeholders::_2, Distance3DSquared<SpacePoint>(),
                                        std::placeholders::_3);
 
-    char* realname(NULL);
+    char* realname(nullptr);
     int status(0);
     realname = abi::__cxa_demangle(typeid(storeFuncVariantB).name(), 0, 0, &status);
     std::string name(realname);

@@ -23,7 +23,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 

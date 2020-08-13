@@ -14,14 +14,10 @@
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
-#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
-#include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
-
 #include <vxd/geometry/SensorInfoBase.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationsObject.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
@@ -133,8 +129,6 @@ namespace DirectedNodeNetworkTests {
       vector<const SpacePoint*> sps4TC5 = { allSpacePoints.at(2), allSpacePoints.at(4)};
       SpacePointTrackCand* aSPTC5 = m_spacePointTrackCandData.appendNew((sps4TC5)); // shares a hit with tc2 and tc3
       aSPTC5->setQualityIndicator(0.65);
-      // false positive due to new with placement (cppcheck issue #7163)
-      // cppcheck-suppress memleak
     }
 
     /** TearDown environment - clear datastore */
@@ -333,10 +327,10 @@ namespace DirectedNodeNetworkTests {
       int oldOuterInt = oldOuterMostNode->getEntry();
       onTheFlyCreatedInts.push_back(42);
       int& newInnerInt = onTheFlyCreatedInts.back();
-      EXPECT_TRUE(NULL == intNetwork.getNode(newInnerInt));
+      EXPECT_TRUE(nullptr == intNetwork.getNode(newInnerInt));
       intNetwork.addNode(newInnerInt, newInnerInt);
       intNetwork.linkNodes(newInnerInt, oldOuterInt);
-      EXPECT_FALSE(NULL == intNetwork.getNode(newInnerInt));
+      EXPECT_FALSE(nullptr == intNetwork.getNode(newInnerInt));
       EXPECT_EQ(14, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
       std::vector<DirectedNode<int, VoidMetaInfo>*> newOuterEnds = intNetwork.getOuterEnds();
@@ -354,11 +348,11 @@ namespace DirectedNodeNetworkTests {
       std::vector<DirectedNode<int, VoidMetaInfo>*> oldInnerEnds = intNetwork.getInnerEnds();
 
       EXPECT_EQ(3, oldOuterEnds.size());
-      EXPECT_TRUE(NULL == intNetwork.getNode(newOuterInt));
+      EXPECT_TRUE(nullptr == intNetwork.getNode(newOuterInt));
       unsigned int sizeB4 = intNetwork.size();
       intNetwork.addNode(newOuterInt, newOuterInt);
       intNetwork.linkNodes(newOuterInt, existingInt);
-      EXPECT_FALSE(NULL == intNetwork.getNode(newOuterInt));
+      EXPECT_FALSE(nullptr == intNetwork.getNode(newOuterInt));
       EXPECT_EQ(sizeB4 + 1, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
       DirectedNode<int, VoidMetaInfo>* existingNode = intNetwork.getNode(existingInt);

@@ -14,9 +14,7 @@
 #include <simulation/dataobjects/SimHitBase.h>
 
 // ROOT
-#include <TObject.h>
 #include <TVector3.h>
-#include <vector>
 
 namespace Belle2 {
 
@@ -32,8 +30,7 @@ namespace Belle2 {
   public:
     /** default constructor for ROOT */
     QcsmonitorSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0),
-      m_Position(0, 0,
-                 0) {;}
+      m_Position(0, 0, 0) {;}
     //! Useful Constructor
     QcsmonitorSimHit(
       int CellId,            /**< Cell ID */
@@ -43,16 +40,9 @@ namespace Belle2 {
       float Edep,            /**< Deposit energy */
       TVector3 Momentum,     /**< Momentum */
       TVector3 Position        /**< Position */
-    ): SimHitBase()
+    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep), m_Momentum(Momentum),
+      m_Position(Position)
     {
-      m_CellId = CellId;
-      m_TrackId = TrackId;
-      m_Pdg = Pdg;
-      m_FlightTime = FlightTime;
-      m_Edep = Edep;
-      m_Momentum = Momentum;
-      m_Position = Position;
-
     }
 
 
@@ -135,7 +125,7 @@ namespace Belle2 {
     /** Shift the SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
      */
-    void shiftInTime(float delta) {  m_FlightTime += delta; }
+    void shiftInTime(float delta) override {  m_FlightTime += delta; }
 
 
   private:
@@ -147,7 +137,7 @@ namespace Belle2 {
     TVector3 m_Momentum;     /**< Momentum */
     TVector3 m_Position;        /**< Position */
 
-    ClassDef(QcsmonitorSimHit, 1)
+    ClassDefOverride(QcsmonitorSimHit, 1)
   };
 
 } // end namespace Belle2

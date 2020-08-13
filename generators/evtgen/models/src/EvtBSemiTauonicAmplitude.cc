@@ -10,9 +10,6 @@
 
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
-#include "EvtGenBase/EvtTensor4C.hh"
-#include "EvtGenBase/EvtVector4C.hh"
 #include "EvtGenBase/EvtScalarParticle.hh"
 #include "EvtGenBase/EvtDiracSpinor.hh"
 #include "EvtGenBase/EvtId.hh"
@@ -145,7 +142,7 @@ namespace Belle2 {
     double erho, prho, costl;
 
     double maxfoundprob = 0.0;
-    double prob = -10.0;
+    double prob;
     int massiter;
 
     for (massiter = 0; massiter < 3; massiter++) {

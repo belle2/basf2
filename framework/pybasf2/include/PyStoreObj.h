@@ -108,7 +108,7 @@ namespace Belle2 {
      *  @param storeFlags  ORed combination of DataStore::EStoreFlags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
-    bool registerInDataStore(std::string name = "",
+    bool registerInDataStore(const std::string& name = "",
                              DataStore::EStoreFlags storeFlags = DataStore::EStoreFlags::c_WriteOut);
 
     /** Ensure this object has been registered previously.
@@ -155,10 +155,6 @@ namespace Belle2 {
      *  @return          True if the assignment succeeded. If false, assign() will delete 'object', do not use it afterwards.
      **/
     bool assign(TObject* object, bool replace = false);
-
-  private:
-    /** Ensure that contained TObject has been created on the DataStore. */
-    void ensureCreated();
 
   public:
     /** Create default constructed object in the DataStore.

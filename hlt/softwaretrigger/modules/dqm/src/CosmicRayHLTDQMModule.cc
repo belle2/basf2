@@ -6,27 +6,20 @@
 // Date : 19 - May - 2017
 //-
 #include <hlt/softwaretrigger/modules/dqm/CosmicRayHLTDQMModule.h>
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
-#include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 
 #include <TDirectory.h>
 
-#include <map>
 #include <string>
-#include <iostream>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -159,11 +152,11 @@ void CosmicRayHLTDQMModule::event()
 
   //Monitor ECL N1 Clusters
   StoreArray<ECLCluster> eclClusters;
-  int nECLClusters = 0;
   if (eclClusters.isValid()) {
+    int nECLClusters = 0;
     for (const auto& eclCluster : eclClusters) {
-      if (eclCluster.getHypothesisId() == 5) {
-        h_e_eclcluster->Fill(eclCluster.getEnergy());
+      if (eclCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
+        h_e_eclcluster->Fill(eclCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons));
         h_phi_eclcluster->Fill(eclCluster.getPhi());
         h_theta_eclcluster->Fill(eclCluster.getTheta());
         h_E1oE9_eclcluster->Fill(eclCluster.getE1oE9());
@@ -176,10 +169,10 @@ void CosmicRayHLTDQMModule::event()
 
   // Monitor ECL N1 Showers (without timing and energy cut)
   StoreArray<ECLShower> eclShowers;
-  int nECLShowers = 0;
   if (eclShowers.isValid()) {
+    int nECLShowers = 0;
     for (const auto& eclShower : eclShowers) {
-      if (eclShower.getHypothesisId() == 5) {
+      if (eclShower.getHypothesisId() == ECLShower::c_nPhotons) {
         h_e_eclshower->Fill(eclShower.getEnergy());
         h_time_eclshower->Fill(eclShower.getTime());
         nECLShowers++;

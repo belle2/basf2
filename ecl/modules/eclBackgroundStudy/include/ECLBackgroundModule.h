@@ -35,6 +35,7 @@ namespace Belle2 {
   class ARICHGeometryPar;
 #endif
 
+  /** A module to study background campaigns and produce histograms */
   class ECLBackgroundModule : public HistoModule {
 
   public:
@@ -46,22 +47,22 @@ namespace Belle2 {
     virtual ~ECLBackgroundModule();
 
     /** Initialize variables. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** beginRun */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** Event method  */
-    virtual void event();
+    virtual void event() override;
 
     /** endRun */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /** terminate */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Initalize the histograms*/
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   private:
 
@@ -87,57 +88,57 @@ namespace Belle2 {
     std::vector<int> m_CryInt;
 
     /** Event counter */
-    int    m_nEvent;
+    int m_nEvent{0};
 
     /** ECL Sim Hits */
-    TH1F* h_nECLSimHits;
+    TH1F* h_nECLSimHits{nullptr};
 
     /** Crystal Radiation Dose, actual Theta*/
-    TH1F* h_CrystalRadDoseTheta;
+    TH1F* h_CrystalRadDoseTheta{nullptr};
     /** Crystal Radiation Dose*/
-    TH1F* h_CrystalRadDose;
+    TH1F* h_CrystalRadDose{nullptr};
     /** Crystal Radiation Dose, ThetaID=2*/
-    TH1F* h_CrystalThetaID2;
+    TH1F* h_CrystalThetaID2{nullptr};
     /** Crystal Radiation Dose, ThetaID=67*/
-    TH1F* h_CrystalThetaID67;
+    TH1F* h_CrystalThetaID67{nullptr};
     /** Hit locations*/
-    TH2F* h_HitLocations;
+    TH2F* h_HitLocations{nullptr};
     /** Crystal Radiation Dose in Barrel, 12<thetaID<59*/
-    TH1F* h_BarrelDose;
+    TH1F* h_BarrelDose{nullptr};
 
     /** Energy averaged per ring */
-    TH1F* hEdepPerRing;
+    TH1F* hEdepPerRing{nullptr};
 
     /** Event counter averaged per ring (theta-id)*/
-    TH1F* hNevtPerRing;
+    TH1F* hNevtPerRing{nullptr};
 
 
 
     /**Diode Radiation Dose */
-    TH1F* h_DiodeRadDose;
+    TH1F* h_DiodeRadDose{nullptr};
     /** Neutron Flux in Diodes*/
-    TH1F* h_NeutronFlux;
+    TH1F* h_NeutronFlux{nullptr};
     /** Neutron flux in Diodes, ThetaID=2*/
-    TH1F* h_NeutronFluxThetaID2;
+    TH1F* h_NeutronFluxThetaID2{nullptr};
     /** Neutron flux in Diodes, ThetaID=67*/
-    TH1F* h_NeutronFluxThetaID67;
+    TH1F* h_NeutronFluxThetaID67{nullptr};
     /** Neutron Energy*/
-    TH1F* h_NeutronE;
+    TH1F* h_NeutronE{nullptr};
     /** Neutron Energy, First Crystal*/
-    TH1F* h_NeutronEThetaID0;
+    TH1F* h_NeutronEThetaID0{nullptr};
     /** Photon Energy */
-    TH1F* h_PhotonE;
+    TH1F* h_PhotonE{nullptr};
 
 
     /** Shower Energy distribution vs theta*/
-    TH2F* h_ShowerVsTheta;
+    TH2F* h_ShowerVsTheta{nullptr};
     /** Shower Energy distribution*/
-    TH1F* h_Shower;
+    TH1F* h_Shower{nullptr};
 
     /** Production Vertex*/
-    TH1F* h_ProdVert;
+    TH1F* h_ProdVert{nullptr};
     /** Production Vertex vs thetaID*/
-    TH2F* h_ProdVertvsThetaId;
+    TH2F* h_ProdVertvsThetaId{nullptr};
 
     /** us in a year*/
     const double usInYr = 1e13;
@@ -147,7 +148,7 @@ namespace Belle2 {
     //from Alex Beaulieu's implementation
 
     /**  Store crystal geometry and mass data*/
-    ECLCrystalData* Crystal[8736];
+    ECLCrystalData* Crystal[8736] {0};
 
     /** Populate ARICH HAPD dose and flux histograms (from the BeamBack hits array)**/
     int FillARICHBeamBack(BeamBackHit* aBBHit);
@@ -191,7 +192,7 @@ namespace Belle2 {
 
     /** ARICH geometry paramaters */
 #ifdef DOARICH
-    ARICHGeometryPar* m_arichgp;    /**< Geometry parameters of ARICH. */
+    ARICHGeometryPar* m_arichgp {0};   /**< Geometry parameters of ARICH. */
 #endif
 
     //Below are the density for the BOARDS (not the HAPD themselves)
@@ -215,52 +216,52 @@ namespace Belle2 {
     // For shield studies
 
     /** Radiation Dose per cell*/
-    TH1F* hEMDose;
+    TH1F* hEMDose{nullptr};
 
     /** Energy per cell */
-    TH1F* hEnergyPerCrystal;
+    TH1F* hEnergyPerCrystal{nullptr};
 
     /**Diode Neutron Flux per cell */
-    TH1F* hDiodeFlux;
+    TH1F* hDiodeFlux{nullptr};
 
     /**Log Spectrum of the photons hitting the crystals / 1 MeV */
-    TH1F* hEgamma;
+    TH1F* hEgamma{nullptr};
     /**Log Spectrum of the neutrons hitting the diodes / 1 MeV */
-    TH1F* hEneu  ;
+    TH1F* hEneu{nullptr};
 
 
     /** ARICH Yearly dose (rad) vs module index. Based on energy of all BeamBackgrounds */
-    TH1F* hARICHDoseBB;
+    TH1F* hARICHDoseBB{nullptr};
     /** ARICH Yearly neutron flux vs module index. Based on energy of all BeamBackgrounds */
-    TH1F* hHAPDFlux;
+    TH1F* hHAPDFlux{nullptr};
 
     /**Energy per crystal Forward Calorimeter*/
-    TH2F* hEnergyPerCrystalECF;
+    TH2F* hEnergyPerCrystalECF{nullptr};
     /**Energy per crystal Backward Calorimeter*/
-    TH2F* hEnergyPerCrystalECB;
+    TH2F* hEnergyPerCrystalECB{nullptr};
     /**Energy per crystal Barrel*/
-    TH2F* hEnergyPerCrystalBAR;
+    TH2F* hEnergyPerCrystalBAR{nullptr};
     /**Energy per crystal Wide bins*/
-    TH1F* hEnergyPerCrystalWideTID;
+    TH1F* hEnergyPerCrystalWideTID{nullptr};
 
 
     /**Radiation Dose Forward Calorimeter*/
-    TH2F* hEMDoseECF;
+    TH2F* hEMDoseECF{nullptr};
     /**Radiation Dose Backward Calorimeter*/
-    TH2F* hEMDoseECB;
+    TH2F* hEMDoseECB{nullptr};
     /**Radiation Dose Barrel*/
-    TH2F* hEMDoseBAR;
+    TH2F* hEMDoseBAR{nullptr};
     /**Radiation Dose Wide bins*/
-    TH1F* hEMDoseWideTID;
+    TH1F* hEMDoseWideTID{nullptr};
 
     /**Diode Neutron Flux Forward Calorimeter*/
-    TH2F* hDiodeFluxECF;
+    TH2F* hDiodeFluxECF{nullptr};
     /**Diode Neutron Flux Backward Calorimeter*/
-    TH2F* hDiodeFluxECB;
+    TH2F* hDiodeFluxECB{nullptr};
     /**Diode Neutron Flux Barrel*/
-    TH2F* hDiodeFluxBAR;
+    TH2F* hDiodeFluxBAR{nullptr};
     /**Diode Neutron Flux Wide bins*/
-    TH1F* hDiodeFluxWideTID;
+    TH1F* hDiodeFluxWideTID{nullptr};
 
   };
 

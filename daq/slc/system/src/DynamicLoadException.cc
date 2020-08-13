@@ -2,11 +2,10 @@
 
 #include <cstdarg>
 #include <cstdio>
-#include <cstdlib>
 
 using namespace Belle2;
 
-DynamicLoadException::DynamicLoadException(const std::string& format, ...) throw()
+DynamicLoadException::DynamicLoadException(const std::string& format, ...)
 {
   va_list ap;
   char ss[1024 * 100];

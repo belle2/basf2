@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef INCLUSIVEBTAGRECONSTRUCTIONMODULE_H
-#define INCLUSIVEBTAGRECONSTRUCTIONMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
@@ -32,19 +31,14 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /** Constructor */
     InclusiveBtagReconstructionModule();
-
-    /**  */
+    /** Destructor */
     virtual ~InclusiveBtagReconstructionModule();
-
-    /**  */
-    virtual void initialize();
-
-    /**  */
-    virtual void event();
+    /** initialize the module (setup the data store) */
+    virtual void initialize() override;
+    /** process event */
+    virtual void event() override;
 
 
   private:
@@ -97,4 +91,3 @@ namespace Belle2 {
   };
 }
 
-#endif /* INCLUSIVEBTAGRECONSTRUCTIONMODULE_H */

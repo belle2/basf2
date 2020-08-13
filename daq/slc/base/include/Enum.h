@@ -11,27 +11,27 @@ namespace Belle2 {
     const static Enum UNKNOWN;
 
   public:
-    ~Enum() throw() {}
+    ~Enum() {}
 
   protected:
     Enum(int id, const std::string& label)
-    throw() : m_id(id), m_label(label) {}
-    Enum(const Enum& e) throw() :
+      : m_id(id), m_label(label) {}
+    Enum(const Enum& e) :
       m_id(e.m_id), m_label(e.m_label) {}
-    Enum() throw() : m_id(UNKNOWN.m_id),
+    Enum() : m_id(UNKNOWN.m_id),
       m_label(UNKNOWN.m_label) {}
 
   public:
-    int getId() const throw() { return m_id; }
-    const char* getLabel() const throw() { return m_label.c_str(); }
-    const std::string& getLabelString() const throw() { return m_label; }
+    int getId() const { return m_id; }
+    const char* getLabel() const { return m_label.c_str(); }
+    const std::string& getLabelString() const { return m_label; }
 
   public:
-    bool operator==(const Enum& e) const throw();
-    bool operator!=(const Enum& e) const throw();
-    const Enum& operator=(const Enum& e) throw();
-    bool operator==(const std::string& label) const throw();
-    bool operator!=(const std::string& label) const throw();
+    bool operator==(const Enum& e) const;
+    bool operator!=(const Enum& e) const;
+    const Enum& operator=(const Enum& e);
+    bool operator==(const std::string& label) const;
+    bool operator!=(const std::string& label) const;
 
   private:
     int m_id;
@@ -39,25 +39,25 @@ namespace Belle2 {
 
   };
 
-  inline bool Enum::operator==(const Enum& e) const throw()
+  inline bool Enum::operator==(const Enum& e) const
   {
     return (m_id == e.m_id);
   }
-  inline bool Enum::operator!=(const Enum& e) const throw()
+  inline bool Enum::operator!=(const Enum& e) const
   {
     return (m_id != e.m_id);
   }
-  inline const Enum& Enum::operator=(const Enum& e) throw()
+  inline const Enum& Enum::operator=(const Enum& e)
   {
     m_id = e.m_id;
     m_label = e.m_label;
     return *this;
   }
-  inline bool Enum::operator==(const std::string& label) const throw()
+  inline bool Enum::operator==(const std::string& label) const
   {
     return m_label == label;
   }
-  inline bool Enum::operator!=(const std::string& label) const throw()
+  inline bool Enum::operator!=(const std::string& label) const
   {
     return m_label != label;
   }

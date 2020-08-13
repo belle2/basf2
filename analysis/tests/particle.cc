@@ -3,12 +3,15 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/V0.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <analysis/utility/ParticleCopy.h>
+
+#include <TDatabasePDG.h>
 
 #include <gtest/gtest.h>
 
@@ -21,7 +24,7 @@ namespace {
   class ParticleTest : public ::testing::Test {
   protected:
     /** register Particle array + ParticleExtraInfoMap object. */
-    virtual void SetUp()
+    void SetUp() override
     {
       DataStore::Instance().setInitializeActive(true);
       StoreObjPtr<ParticleExtraInfoMap> particleExtraInfo;
@@ -29,18 +32,22 @@ namespace {
       StoreArray<MCParticle> mcparticles;
       StoreArray<RestOfEvent> roes;
       StoreArray<ECLCluster> eclClusters;
+      StoreArray<KLMCluster> klmClusters;
+      StoreArray<V0> v0s;
       particleExtraInfo.registerInDataStore();
       particles.registerInDataStore();
       mcparticles.registerInDataStore();
       eclClusters.registerInDataStore();
       roes.registerInDataStore();
+      klmClusters.registerInDataStore();
+      v0s.registerInDataStore();
       particles.registerRelationTo(mcparticles);
       particles.registerRelationTo(roes);
       DataStore::Instance().setInitializeActive(false);
     }
 
     /** clear datastore */
-    virtual void TearDown()
+    void TearDown() override
     {
       DataStore::Instance().reset();
     }
@@ -53,7 +60,7 @@ namespace {
       Particle p;
       EXPECT_EQ(0, p.getPDGCode());
       EXPECT_TRUE(TLorentzVector(0, 0, 0, 0) == p.get4Vector());
-      EXPECT_EQ(Particle::c_Undefined, p.getParticleType());
+      EXPECT_EQ(Particle::c_Undefined, p.getParticleSource());
     }
     {
       TLorentzVector momentum(1, 2, 3, 4);
@@ -64,7 +71,7 @@ namespace {
       EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
       EXPECT_FLOAT_EQ(momentum.Energy(), p.getEnergy());
       EXPECT_FLOAT_EQ(momentum.M(), p.getMass());
-      EXPECT_EQ(Particle::c_Undefined, p.getParticleType());
+      EXPECT_EQ(Particle::c_Undefined, p.getParticleSource());
     }
     {
       TLorentzVector momentum(1, 2, 3, 4);
@@ -74,8 +81,39 @@ namespace {
       EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
       EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-      EXPECT_EQ(Particle::c_MCParticle, p.getParticleType());
+      EXPECT_EQ(Particle::c_MCParticle, p.getParticleSource());
       EXPECT_EQ(123u, p.getMdstArrayIndex());
+    }
+    {
+      // test constructor from ECLClusters
+      // (for now we can only create a photon this way)
+      StoreArray<ECLCluster> clusters;
+      ECLCluster* cluster = clusters.appendNew(ECLCluster());
+      cluster->setIsTrack(false);
+      cluster->addHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cluster->setEnergy(1337);
+
+      Particle p(cluster);
+      EXPECT_EQ(22, p.getPDGCode());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_EQ(Particle::c_ECLCluster, p.getParticleSource());
+      EXPECT_FLOAT_EQ(1337, p.getEnergy());
+      EXPECT_EQ(cluster, p.getECLCluster());
+      EXPECT_EQ(nullptr, p.getTrack());
+    }
+    {
+      // test constructor used for V0s (there is not actually a V0 constructor,
+      // the heavy-lifting is done in the particle loader), but this is V0-style
+      // construction with EParticleSourceObject::V0 and the correct getters
+      StoreArray<V0> v0s;
+      V0* v0 = v0s.appendNew(V0());
+      TLorentzVector momentum(1, 2, 3, 4);
+      Particle p(momentum, 310, Particle::c_Unflavored, Particle::c_V0, 0);
+      EXPECT_EQ(310, p.getPDGCode());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_EQ(Particle::c_V0, p.getParticleSource());
+      EXPECT_EQ(0u, p.getMdstArrayIndex());
+      EXPECT_EQ(p.getV0(), v0); // pointers should be same
     }
   }
 
@@ -98,17 +136,63 @@ namespace {
     EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
     EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
     EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-    EXPECT_EQ(Particle::c_Composite, p.getParticleType());
+    EXPECT_EQ(Particle::c_Composite, p.getParticleSource());
     EXPECT_EQ(0u, p.getMdstArrayIndex());
     EXPECT_EQ((unsigned int)nDaughters, p.getNDaughters());
     EXPECT_EQ((unsigned int)nDaughters, p.getDaughters().size());
     EXPECT_EQ((unsigned int)nDaughters, p.getFinalStateDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, p.getDaughterProperties().size());
 
     const Particle pLocal(momentum, 411, Particle::c_Unflavored, daughterIndices, particles.getPtr());
     EXPECT_DOUBLE_EQ(p.getMass(), pLocal.getMass());
     EXPECT_EQ((unsigned int)nDaughters, pLocal.getNDaughters());
     EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughters().size());
     EXPECT_EQ((unsigned int)nDaughters, pLocal.getFinalStateDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughterProperties().size());
+
+    Particle outsideArray;
+    EXPECT_TRUE(outsideArray.getArrayPointer() == nullptr);
+    EXPECT_B2FATAL(Particle p2 = Particle(momentum, 411, Particle::c_Unflavored, daughterIndices));
+  }
+
+  TEST_F(ParticleTest, DaughterProperties)
+  {
+    TLorentzVector momentum;
+    const int nDaughters = 6;
+    StoreArray<Particle> particles;
+    std::vector<int> daughterIndices;
+    std::vector<int> daughterProperties;
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
+    }
+
+    const Particle& p = *(particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices));
+    EXPECT_EQ(411, p.getPDGCode());
+    EXPECT_FLOAT_EQ(0.0, momentum.DeltaPhi(p.get4Vector()));
+    EXPECT_FLOAT_EQ(0.0, momentum.DeltaR(p.get4Vector()));
+    EXPECT_FLOAT_EQ(momentum.Energy(), p.get4Vector().Energy());
+    EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+    EXPECT_EQ(Particle::c_Composite, p.getParticleSource());
+    EXPECT_EQ(0u, p.getMdstArrayIndex());
+    EXPECT_EQ((unsigned int)nDaughters, p.getNDaughters());
+    EXPECT_EQ((unsigned int)nDaughters, p.getDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, p.getFinalStateDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, p.getDaughterProperties().size());
+    EXPECT_EQ(Particle::PropertyFlags::c_Ordinary, (p.getDaughterProperties())[0]);
+
+
+    const Particle pLocal(momentum, 411, Particle::c_Unflavored, daughterIndices,
+                          Particle::PropertyFlags::c_Ordinary, daughterProperties,
+                          particles.getPtr());
+    EXPECT_DOUBLE_EQ(p.getMass(), pLocal.getMass());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getNDaughters());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getFinalStateDaughters().size());
+    EXPECT_EQ((unsigned int)nDaughters, pLocal.getDaughterProperties().size());
 
     Particle outsideArray;
     EXPECT_TRUE(outsideArray.getArrayPointer() == nullptr);
@@ -197,23 +281,24 @@ namespace {
   TEST_F(ParticleTest, Copies)
   {
     StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcparticles;
     StoreArray<ECLCluster> eclClusters;
     ECLCluster* eclGamma1 = eclClusters. appendNew(ECLCluster());
     eclGamma1->setConnectedRegionId(1);
     eclGamma1->setClusterId(1);
-    eclGamma1->setHypothesisId(5);
+    eclGamma1->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma2 = eclClusters. appendNew(ECLCluster());
     eclGamma2->setConnectedRegionId(1);
     eclGamma2->setClusterId(2);
-    eclGamma2->setHypothesisId(5);
+    eclGamma2->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclGamma3 = eclClusters. appendNew(ECLCluster());
     eclGamma3->setConnectedRegionId(2);
     eclGamma3->setClusterId(1);
-    eclGamma3->setHypothesisId(5);
+    eclGamma3->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
     ECLCluster* eclKL = eclClusters. appendNew(ECLCluster());
     eclKL->setConnectedRegionId(2);
     eclKL->setClusterId(1);
-    eclKL->setHypothesisId(6);
+    eclKL->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
 
 
 
@@ -243,6 +328,10 @@ namespace {
     // T4KL
     Particle* T4KL       = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 130, Particle::c_Unflavored, Particle::c_ECLCluster,
                                                         3));
+    MCParticle* MC1Pion = mcparticles. appendNew(MCParticle());
+    MC1Pion->setPDG(211);
+    MC1Pion->set4Vector(TLorentzVector(0, 0, 0, 0));
+    Particle* T1PionFromMC     = particles.appendNew(Particle(MC1Pion));
 
     EXPECT_TRUE(T3Gamma->overlapsWith(T4KL));
     EXPECT_FALSE(T3Gamma->overlapsWith(T2Gamma));
@@ -254,6 +343,13 @@ namespace {
     EXPECT_FALSE(T1Pion->isCopyOf(T1Gamma));
     EXPECT_FALSE(T2Gamma->isCopyOf(T1Gamma));
 
+    //detailed comparison
+    EXPECT_TRUE(T1Pion->isCopyOf(T1PionCopy,      true));
+    EXPECT_TRUE(T1Pion->isCopyOf(T1Kaon,          true));
+    EXPECT_FALSE(T2Gamma->isCopyOf(T1Gamma,       true));
+    EXPECT_TRUE(T3Gamma->isCopyOf(T4KL,           true));
+    EXPECT_FALSE(T1PionFromMC->isCopyOf(T1Pion, true));
+    EXPECT_FALSE(T1Pion->isCopyOf(T1PionFromMC, true));
     // Construct composite particles
     Particle* D0Pi1Pi2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
     D0Pi1Pi2->appendDaughter(T1Pion);
@@ -433,6 +529,8 @@ namespace {
     MC3->setPDG(3);
     T3Kaon->addExtraInfo("test_var", 3.0);
     T3Kaon->addRelationTo(MC3);
+    Particle* ROEPion    = particles.appendNew(Particle(TLorentzVector(3.5, 3.5, 3.5, 3.5),  211, Particle::c_Flavored,
+                                                        Particle::c_Track, 4));
 
     // Construct composite particles
     Particle* D0KK = particles.appendNew(Particle(TLorentzVector(4, 4, 4, 4), 421));
@@ -444,21 +542,21 @@ namespace {
     B0->appendDaughter(T1Pion);
 
     RestOfEvent* roe = roes.appendNew(RestOfEvent());
-    std::vector<int> roeTracks = {4, 5, 6, 7};
-    roe->addTracks(roeTracks);
+
+    roe->addParticles({ROEPion});
     B0->addRelationTo(roe);
 
     // Perform tests
     // First sanity check
-    // at this point the size of Particle/MCParticle/ROE StoreArray should be 5/3/1
-    EXPECT_EQ(particles.getEntries(), 5);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 6/3/1
+    EXPECT_EQ(particles.getEntries(), 6);
     EXPECT_EQ(mcparticles.getEntries(), 3);
     EXPECT_EQ(roes.getEntries(), 1);
 
     // now make a copy of B0
     Particle* B0_copy = copyParticle(B0);
-    // at this point the size of Particle/MCParticle/ROE StoreArray should be 10/3/1
-    EXPECT_EQ(particles.getEntries(), 10);
+    // at this point the size of Particle/MCParticle/ROE StoreArray should be 11/3/1
+    EXPECT_EQ(particles.getEntries(), 11);
     EXPECT_EQ(mcparticles.getEntries(), 3);
     EXPECT_EQ(roes.getEntries(), 1);
 
@@ -508,7 +606,7 @@ namespace {
     EXPECT_TRUE(mc2orig->getPDG() == mc2copy->getPDG());
     EXPECT_TRUE(mc3orig->getPDG() == mc3copy->getPDG());
 
-    EXPECT_TRUE(roeorig->getNTracks() == roecopy->getNTracks());
+    EXPECT_TRUE(roeorig->hasParticle(ROEPion) && roecopy->hasParticle(ROEPion));
 
     // modify original and check the copy
     MCParticle* MC4      = mcparticles. appendNew(MCParticle());
@@ -544,4 +642,92 @@ namespace {
 
   }
 
+  /** test cluster based functionality: hypotheses and such */
+  TEST_F(ParticleTest, ECLClusterBased)
+  {
+    StoreArray<ECLCluster> eclclusters;
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_nPhotons);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster);
+      EXPECT_FLOAT_EQ(1., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(1., p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_nPhotons, p.getECLClusterEHypothesisBit());
+      EXPECT_FLOAT_EQ(0, p.getMass());
+    }
+
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster, Const::Klong);
+      EXPECT_EQ(130, p.getPDGCode());
+      EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(std::sqrt(4. + 0.497614 * 0.497614), p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
+      int pdg = Const::Klong.getPDGCode();
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+      EXPECT_FLOAT_EQ(m, p.getMass());
+    }
+
+    {
+      ECLCluster* cluster = eclclusters.appendNew(ECLCluster());
+      cluster->setHypothesis(ECLCluster::EHypothesisBit::c_neutralHadron);
+      cluster->setEnergy(1.);
+      cluster->setEnergyRaw(2.);
+
+      Particle p(cluster, Const::neutron);
+      EXPECT_EQ(2112, p.getPDGCode());
+      EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
+      EXPECT_FLOAT_EQ(std::sqrt(4. + 0.93956536 * 0.93956536), p.getEnergy());
+      EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
+      int pdg = Const::neutron.getPDGCode();
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+      EXPECT_FLOAT_EQ(m, p.getMass());
+    }
+  }
+
+  /** test particle creation from KLMCluster */
+  TEST_F(ParticleTest, KLMClusterBased)
+  {
+    StoreArray<KLMCluster> klmClusters;
+    {
+      KLMCluster* cluster = klmClusters.appendNew(KLMCluster());
+      cluster->setTime(1.1);
+      cluster->setClusterPosition(1.1, 1.1, 1.0);
+      cluster->setLayers(1);
+      cluster->setInnermostLayer(1);
+      cluster->setMomentumMag(1.0);
+
+      Particle p(cluster);
+      int pdg = Const::Klong.getPDGCode();
+      EXPECT_EQ(pdg, p.getPDGCode());
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+      EXPECT_FLOAT_EQ(sqrt(1. + m * m), p.getEnergy());
+      EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
+      EXPECT_FLOAT_EQ(m, p.getMass());
+    }
+
+    {
+      KLMCluster* cluster = klmClusters.appendNew(KLMCluster());
+      cluster->setTime(1.1);
+      cluster->setClusterPosition(1.1, 1.1, 1.0);
+      cluster->setLayers(1);
+      cluster->setInnermostLayer(1);
+      cluster->setMomentumMag(1.0);
+
+      Particle p(cluster, Const::neutron.getPDGCode());
+      int pdg = Const::neutron.getPDGCode();
+      EXPECT_EQ(pdg, p.getPDGCode());
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+      EXPECT_FLOAT_EQ(sqrt(1. + m * m), p.getEnergy());
+      EXPECT_EQ(Particle::c_Flavored, p.getFlavorType());
+      EXPECT_FLOAT_EQ(m, p.getMass());
+    }
+  }
 }  // namespace

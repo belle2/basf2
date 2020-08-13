@@ -8,17 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
-#include <arich/dbobjects/ARICHModulesInfo.h>
+#include <arich/dbobjects/tessellatedSolidStr.h>
+
 #include <geometry/Materials.h>
 #include <arich/dbobjects/ARICHGeoHAPD.h>
 
 #include <cmath>
+#include <fstream>
 
 using namespace std;
 using namespace Belle2;
@@ -41,6 +42,15 @@ void ARICHGeometryConfig::read(const GearDir& content)
   m_masterVolume.setPlacement(envParams.getLength("xPosition"), envParams.getLength("yPosition"),
                               envParams.getLength("zPosition") + envParams.getLength("length") / 2., envParams.getAngle("xRotation"),
                               envParams.getAngle("yRotation"), envParams.getAngle("zRotation"));
+
+  GearDir displParams(content, "GlobalDisplacement");
+  m_displaceGlobal = !displParams.getBool("Disable");
+  m_globalDispl.setX(displParams.getLength("x"));
+  m_globalDispl.setY(displParams.getLength("y"));
+  m_globalDispl.setZ(displParams.getLength("z"));
+  m_globalDispl.setAlpha(displParams.getAngle("alpha"));
+  m_globalDispl.setBeta(displParams.getAngle("beta"));
+  m_globalDispl.setGamma(displParams.getAngle("gamma"));
 
   auto& materials = geometry::Materials::getInstance();
 
@@ -72,11 +82,24 @@ void ARICHGeometryConfig::read(const GearDir& content)
   m_merger.setMergerPCBLenght(mergerParams.getDouble("merger/sizeL"));
   m_merger.setMergerPCBWidth(mergerParams.getDouble("merger/sizeW"));
   m_merger.setMergerPCBThickness(mergerParams.getDouble("merger/thickness"));
+  m_merger.setMergerPCBscrewholeR(mergerParams.getDouble("merger/mergerPCBscrewholeR"));
+  m_merger.setMergerPCBscrewholePosdY(mergerParams.getDouble("merger/mergerPCBscrewholePosdY"));
+  m_merger.setMergerPCBscrewholePosdX1(mergerParams.getDouble("merger/mergerPCBscrewholePosdX1"));
+  m_merger.setMergerPCBscrewholePosdX2(mergerParams.getDouble("merger/mergerPCBscrewholePosdX2"));
+  m_merger.setSingleMergerEnvelopeSizeL(mergerParams.getDouble("merger/envelopeSizeL"));
+  m_merger.setSingleMergerEnvelopeSizeW(mergerParams.getDouble("merger/envelopeSizeW"));
+  m_merger.setSingleMergerEnvelopeThickness(mergerParams.getDouble("merger/envelopeThickness"));
+  m_merger.setSingleMergerenvelopeDeltaZ(mergerParams.getArray("merger/envelopeDeltaZ"));
   m_merger.setMergerSlotID(mergerParams.getArray("merger/mergerSlotID"));
   m_merger.setMergerPosR(mergerParams.getArray("merger/mergerPosR"));
   m_merger.setMergerAngle(mergerParams.getArray("merger/mergerAngle"));
-  m_merger.setEnvelopeCenterPosition(mergerParams.getDouble("mergerEnvelope/x0"), mergerParams.getDouble("mergerEnvelope/y0"),
+  m_merger.setMergerOrientation(mergerParams.getArray("merger/mergerOrientation"));
+  m_merger.setEnvelopeCenterPosition(mergerParams.getDouble("mergerEnvelope/x0"),
+                                     mergerParams.getDouble("mergerEnvelope/y0"),
                                      mergerParams.getDouble("mergerEnvelope/z0"));
+  m_merger.setSingleMergeEnvelopePosition(mergerParams.getDouble("merger/envelopePosX0"),
+                                          mergerParams.getDouble("merger/envelopePosY0"),
+                                          mergerParams.getDouble("merger/envelopePosZ0"));
   m_merger.setEnvelopeOuterRadius(mergerParams.getDouble("mergerEnvelope/outerRadius"));
   m_merger.setEnvelopeInnerRadius(mergerParams.getDouble("mergerEnvelope/innerRadius"));
   m_merger.setEnvelopeThickness(mergerParams.getDouble("mergerEnvelope/thickness"));
@@ -125,6 +148,19 @@ void ARICHGeometryConfig::read(const GearDir& content)
   m_cooling.checkCoolingSystemDataConsistency();
   //m_cooling.print();
 
+  GearDir coolingFEBParams(content, "febcoolingv2");
+  // read ARICH cooling system (v2) parameters
+  // FEB cooling bodies
+  m_coolingv2.setSmallSquareSize(coolingFEBParams.getDouble("smallSquareSize"));
+  m_coolingv2.setSmallSquareThickness(coolingFEBParams.getDouble("smallSquareThickness"));
+  m_coolingv2.setBigSquareSize(coolingFEBParams.getDouble("bigSquareSize"));
+  m_coolingv2.setBigSquareThickness(coolingFEBParams.getDouble("bigSquareThickness"));
+  m_coolingv2.setRectangleL(coolingFEBParams.getDouble("rectangleL"));
+  m_coolingv2.setRectangleW(coolingFEBParams.getDouble("rectangleW"));
+  m_coolingv2.setRectangleThickness(coolingFEBParams.getDouble("rectangleThickness"));
+  m_coolingv2.setRectangleDistanceFromCenter(coolingFEBParams.getDouble("rectangleDistanceFromCenter"));
+  m_coolingv2.setFebcoolingv2GeometryID(coolingFEBParams.getArray("febcoolingv2GeometryID"));
+
   // read detector plane parameters
   modulesPosition(content);
 
@@ -140,6 +176,23 @@ void ARICHGeometryConfig::read(const GearDir& content)
     m_mirrors.initializeDefault();
   }
 
+  GearDir mirrDisplParams(content, "MirrorDisplacement");
+  if (mirrDisplParams) {
+    m_displaceMirrors = !mirrDisplParams.getBool("Disable");
+    for (auto plate : mirrDisplParams.getNodes("Plate")) {
+      int id = plate.getInt("@id");
+      double r = plate.getLength("r");
+      double phi = plate.getAngle("phi");
+      double z = plate.getLength("z");
+      double alpha = plate.getLength("alpha");
+      double beta = plate.getLength("beta");
+      double gamma = plate.getLength("gamma");
+      double origPhi = m_mirrors.getPoint(id).Phi();
+      ARICHPositionElement displEl(r * cos(origPhi + phi), r * sin(origPhi + phi), z, alpha, beta, gamma);
+      m_mirrorDispl.setDisplacementElement(id, displEl);
+      // displEl.print();
+    }
+  }
   // read and prepare aerogel plane parameters
   GearDir aerogel(content, "Aerogel");
 
@@ -180,15 +233,25 @@ void ARICHGeometryConfig::read(const GearDir& content)
 
   // Aerogel tiles
   GearDir aerotilesDir(content, "AerogelTiles");
-  for (auto tileNode : aerotilesDir.getNodes("Tiles/Tile")) {
-    int ring = tileNode.getInt("ring");
-    int column = tileNode.getInt("column");
-    int layerN = tileNode.getInt("layer");
-    double n = tileNode.getDouble("n");
-    double transmL = tileNode.getDouble("transmL");
-    double thick = tileNode.getDouble("thick");
-    std::string materialName = tileNode.getString("material");
-    m_aerogelPlane.addTileParameters(ring, column, layerN, n, transmL, thick, materialName);
+  for (int il = 0; il < ilayer - 1; il++) {
+    int iring = 0;
+    for (auto ns_ring :  nAeroSlotsIndividualRing) {
+      iring++;
+      for (int islot = 1; islot < ns_ring + 1; islot++) {
+        for (auto tileNode : aerotilesDir.getNodes("Tiles/Tile")) {
+          int ring = tileNode.getInt("ring");
+          int column = tileNode.getInt("column");
+          int layerN = tileNode.getInt("layer");
+          if (iring == ring && column == islot && il == layerN) {
+            double n = tileNode.getDouble("n");
+            double transmL = tileNode.getDouble("transmL");
+            double thick = tileNode.getDouble("thick");
+            std::string materialName = tileNode.getString("material");
+            m_aerogelPlane.addTileParameters(ring, column, layerN, n, transmL, thick, materialName);
+          }
+        }
+      }
+    }
   }
 
   if (m_aerogelPlane.getFullAerogelMaterialDescriptionKey() == 0) {

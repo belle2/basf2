@@ -9,6 +9,13 @@
 
 #include "daq/rfarm/manager/RFEventServer.h"
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <csignal>
+#include <cstring>
 #include <iostream>
 
 #define RFEVSOUT stdout
@@ -53,6 +60,11 @@ RFEventServer::RFEventServer(string conffile)
 
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
+
+  // 7. Clear PID list
+  m_pid_recv = 0;
+  for (int i = 0; i < m_nnodes; i++)
+    m_pid_sender[i] = 0 ;
 
 }
 
@@ -104,7 +116,6 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
   char* sender = m_conf->getconf("distributor", "sender", "script");
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
 
-
   char hostname[512], idname[3], shmid[3];
   for (int i = 0; i < maxnodes; i++) {
     sprintf(idname, "%2.2d", idbase + i);
@@ -140,6 +151,9 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
     char* nnodechr = m_conf->getconf("distributor", "nnodes");
     m_pid_recv = m_proc->Execute(filein, (char*)ringbuf.c_str(), file, nnodechr);
   }
+
+  m_rbufin->forceClear();
+
   // else none
   return 0;
 }
@@ -156,7 +170,7 @@ int RFEventServer::UnConfigure(NSMmsg*, NSMcontext*)
     if (m_pid_sender[i] != 0) {
       printf("RFEventServer:: killing sender pid=%d\n", m_pid_sender[i]);
       //      kill(m_pid_sender[i], SIGINT);
-      kill(m_pid_sender[i], SIGKILL);
+      kill(m_pid_sender[i], SIGINT);
       waitpid(m_pid_sender[i], &status, 0);
     }
   }
@@ -179,7 +193,7 @@ int RFEventServer::Start(NSMmsg*, NSMcontext*)
 
 int RFEventServer::Stop(NSMmsg*, NSMcontext*)
 {
-  //  m_rbufin->clear();
+  m_rbufin->clear();
   return 0;
 }
 
@@ -252,5 +266,22 @@ void RFEventServer::server()
   }
 }
 
-
+void RFEventServer::cleanup()
+{
+  printf("RFEventServer : cleaning up\n");
+  UnConfigure(NULL, NULL);
+  /*
+  kill ( m_pid_recv, SIGINT );
+  int status;
+  waitpid ( m_pid_recv, &status, 0 );
+  printf ( "RFEventServer : receiver terminated.\n" );
+  for ( int i=0; i<m_nnodes; i++ ) {
+    kill ( m_pid_sender[i], SIGINT );
+    waitpid ( m_pid_sender[i], &status, 0 );
+    printf ( "RFEventServer : sender [%d] terminated.\n", i );
+  }
+  */
+  printf("RFEventServer: Done. Exitting\n");
+  exit(-1);
+}
 

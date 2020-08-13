@@ -4,28 +4,28 @@
 
 using namespace Belle2;
 
-MCond::MCond() throw() {}
+MCond::MCond() {}
 
-MCond::MCond(const MCond& cond) throw()
+MCond::MCond(const MCond& cond)
 {
   *this = cond;
 }
 
-MCond::MCond(void* addr) throw()
+MCond::MCond(void* addr)
 {
   set((pthread_cond_t*)addr);
 }
 
-MCond::~MCond() throw() {}
+MCond::~MCond() {}
 
-bool MCond::init(void* addr) throw()
+bool MCond::init(void* addr)
 {
   set(addr);
   init();
   return true;
 }
 
-bool MCond::init() throw()
+bool MCond::init()
 {
   pthread_condattr_t attr;
   pthread_condattr_init(&attr);
@@ -35,31 +35,31 @@ bool MCond::init() throw()
   return true;
 }
 
-bool MCond::set(void* addr) throw()
+bool MCond::set(void* addr)
 {
   m_cond = (pthread_cond_t*)addr;
   return true;
 }
 
-bool MCond::destroy() throw()
+bool MCond::destroy()
 {
   pthread_cond_destroy(m_cond);
   return true;
 }
 
-bool MCond::signal() throw()
+bool MCond::signal()
 {
   if (pthread_cond_signal(m_cond) == 0) return true;
   else return false;
 }
 
-bool MCond::broadcast() throw()
+bool MCond::broadcast()
 {
   if (pthread_cond_broadcast(m_cond) == 0) return true;
   else return false;
 }
 
-bool MCond::wait(MMutex& cond) throw()
+bool MCond::wait(MMutex& cond)
 {
   if (pthread_cond_wait(m_cond, cond.m_mu) != 0) {
     return false;
@@ -68,7 +68,7 @@ bool MCond::wait(MMutex& cond) throw()
 }
 
 bool MCond::wait(MMutex& mutex, const unsigned int sec,
-                 const unsigned int msec) throw()
+                 const unsigned int msec)
 {
   struct timeval now;
   struct timespec timeout;
@@ -82,7 +82,7 @@ bool MCond::wait(MMutex& mutex, const unsigned int sec,
   return true;
 }
 
-const MCond& MCond::operator=(const MCond& cond) throw()
+const MCond& MCond::operator=(const MCond& cond)
 {
   m_cond = cond.m_cond;
   return *this;

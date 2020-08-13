@@ -22,10 +22,10 @@ namespace Belle2 {
     virtual ~TRGGDLCosmicRunModule() {}
 
     /** Initialize the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Check the trigger condition and set return value. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** name of track segment hit list */

@@ -16,8 +16,6 @@
 
 #include <vector>
 #include "CLHEP/Vector/LorentzVector.h"
-#include "trg/trg/Utilities.h"
-#include "trg/cdc/TRGCDC.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCTBase TRGCDCTrackBase
@@ -88,7 +86,7 @@ namespace Belle2 {
     /// set track ID.
     void setTrackID(int trackID);
 
-    // get track ID.
+    /// get track ID.
     int getTrackID();
 
     /// returns object type.

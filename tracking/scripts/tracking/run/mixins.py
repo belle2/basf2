@@ -16,9 +16,13 @@ class RunMixin(EmptyRun):
 
 
 class PostProcessingRunMixin(EmptyRun):
+    """Post-process the basf2 job output"""
+
+    #: By default, browse the output TFile too
     postprocess_only = False
 
     def create_argument_parser(self, **kwds):
+        """Parse the command-line post-processing arguments"""
         argument_parser = super().create_argument_parser(**kwds)
         postprocess_argument_group = argument_parser.add_argument_group("Postprocessing arguments")
         postprocess_argument_group.add_argument(
@@ -32,20 +36,27 @@ class PostProcessingRunMixin(EmptyRun):
         return argument_parser
 
     def run(self, path):
+        """Post-process the basf2 job output"""
         if not self.postprocess_only:
             super().run(path)
 
         self.postprocess()
 
     def postprocess(self):
+        """By default, do nothing. (may be overridden)"""
         pass
 
 
 class BrowseTFileOnTerminateRunMixin(PostProcessingRunMixin):
+    """Browse interactively the basf2 job output"""
+
+    #: There is no default for the name of the output TFile
     output_file_name = None
+    #: By default, do not show the browsing results
     show_results = False
 
     def create_argument_parser(self, **kwds):
+        """Parse the command-line TFile-browsing arguments"""
         argument_parser = super().create_argument_parser(**kwds)
 
         postprocess_argument_group = argument_parser
@@ -65,6 +76,7 @@ class BrowseTFileOnTerminateRunMixin(PostProcessingRunMixin):
         return argument_parser
 
     def postprocess(self):
+        """Browse the TFile interactively"""
         if self.show_results and self.output_file_name:
             with root_utils.root_open(self.output_file_name) as tfile:
                 root_utils.root_browse(tfile)
@@ -74,9 +86,13 @@ class BrowseTFileOnTerminateRunMixin(PostProcessingRunMixin):
 
 
 class RootOutputRunMixin(RunMixin):
+    """Configure for basf2 job output ROOT TFile"""
+
+    #: There is no default for the name of the output TFile
     root_output_file = None
 
     def create_argument_parser(self, **kwds):
+        """Parse the command-line output-file-specification argument"""
         argument_parser = super().create_argument_parser(**kwds)
         argument_parser.add_argument(
             'root_output_file',
@@ -86,6 +102,7 @@ class RootOutputRunMixin(RunMixin):
         return argument_parser
 
     def create_path(self):
+        """Create a new basf2 path and add the RootOutput module to it"""
         path = super().create_path()
 
         path.add_module(

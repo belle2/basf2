@@ -30,7 +30,7 @@ namespace Belle2 {
     PrintBeamParametersModule();
 
     /** print the Beam Parameters if they changed */
-    void event();
+    void event() override;
 
   private:
     /** print a covariance matrix and simplify it to three elements if the off diagonals are zero */

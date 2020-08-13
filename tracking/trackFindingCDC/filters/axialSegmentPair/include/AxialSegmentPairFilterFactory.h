@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Constructor forwarding the default filter name
-      AxialSegmentPairFilterFactory(const std::string& defaultFilterName = "realistic");
+      explicit AxialSegmentPairFilterFactory(const std::string& defaultFilterName = "realistic");
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

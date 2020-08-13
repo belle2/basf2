@@ -67,6 +67,7 @@ namespace Belle2 {
     /** Constructor expecting a pointer to a B2Vector3 */
     explicit B2Vector3(const B2Vector3<DataType>* b2Vec3): m_coordinates {b2Vec3->X(), b2Vec3->Y(), b2Vec3->Z()} {};
     /** Constructor expecting a B2Vector3 of different type*/
+    // cppcheck-suppress noExplicitConstructor
     template <typename OtherType> B2Vector3(const B2Vector3<OtherType>& b2Vec3):
       m_coordinates {static_cast<DataType>(b2Vec3.X()), static_cast<DataType>(b2Vec3.Y()), static_cast<DataType>(b2Vec3.Z())} {};
     /** Constructor expecting a pointer to a B2Vector3 of different type */
@@ -370,6 +371,20 @@ namespace Belle2 {
         m_coordinates[0] = -m_coordinates[0];
         m_coordinates[2] = -m_coordinates[2];
       }
+    }
+
+    /** Rotation around an arbitrary axis v with angle alpha.
+     * With n = (n1, n2, n3)^T being the unit vector of v, the rotation matrix R(n, alpha) with ca = cos(alpha) and sa = sin(alpha) reads
+     *                /  n1^2*(1-ca)+ca       n1*n2*(1-ca)-n3*sa    n1*n3*(1-ca)+n2*sa \
+     * R(n, alpha) = |  n2*n1*(1-ca)+n3*sa     n2^2*(1-ca)+ca       n2*n3*(1-ca)-n1*sa  |
+     *                \ n3*n1*(1-ca)-n2*sa    n3*n2*(1-ca)+n1*sa     n3^2*(1-ca)+ca    /  .
+     * Using this rotation matrix, the full rotation of a vector b (= this) around the axis v by angle alpha can be written as
+     * R(n, alpha)*b = n(n*b) + cos(alpha) * (n x b) x n + sin(alpha) * (n x b).
+     */
+    void Rotate(DataType alpha, const B2Vector3<DataType>& v)
+    {
+      B2Vector3<DataType> n = v.Unit();
+      *this = (n * (n.Dot(*this)) + cos(alpha) * ((n.Cross(*this)).Cross(n)) + sin(alpha) * (n.Cross(*this)));
     }
 
     /** calculates the absolute value of the coordinates element-wise */

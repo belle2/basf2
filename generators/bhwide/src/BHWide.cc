@@ -10,7 +10,6 @@
 
 #include <generators/bhwide/BHWide.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
 #include <TLorentzVector.h>

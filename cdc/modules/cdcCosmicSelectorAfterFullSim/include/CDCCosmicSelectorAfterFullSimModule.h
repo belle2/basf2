@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCCOSMICSELECTORAFTERFULLSIM_H
-#define CDCCOSMICSELECTORAFTERFULLSIM_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -32,13 +31,13 @@ namespace Belle2 {
     CDCCosmicSelectorAfterFullSimModule();
 
     /** Initialize variables, print info, and start CPU clock. */
-    void initialize();
+    void initialize() override;
 
     /** Actual digitization of all hits in the CDC.
      *
      *  The digitized hits are written into the DataStore.
      */
-    void event();
+    void event() override;
 
   private:
     StoreArray<MCParticle> m_mcParticles; /**< array of MCParticle */
@@ -50,5 +49,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCCOSMICSELECTORAFTERFULLSIM_H

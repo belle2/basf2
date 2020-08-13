@@ -3,8 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:                                                          *
- *                                                                        *
+ * Contributors: Hiroyuki Nakayama, Luka Santelj                          *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,10 +13,7 @@
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/utilities.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 #include <ir/simulation/SensitiveDetector.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
@@ -28,19 +24,16 @@
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
-#include <G4AssemblyVolume.hh>
 
 //Shapes
-#include <G4Trd.hh>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Torus.hh>
 #include <G4Polycone.hh>
+#include <G4Trd.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
-
-#include "CLHEP/Units/PhysicalConstants.h"
 
 using namespace std;
 using namespace boost;
@@ -124,6 +117,8 @@ namespace Belle2 {
       //define geometry
       tubeR.geo = new G4Polycone("geo_TubeR_name", 0.0, 2 * M_PI, TubeR_N, &(TubeR_Z[0]), &(TubeR_r[0]), &(TubeR_R[0]));
 
+      tubeR.logi = NULL;
+
       elements["TubeR"] = tubeR;
 
       //--------------
@@ -159,6 +154,8 @@ namespace Belle2 {
 
       //define geometry
       tubeL.geo = new G4Polycone("geo_TubeL_name", 0.0, 2 * M_PI, TubeL_N, &(TubeL_Z[0]), &(TubeL_r[0]), &(TubeL_R[0]));
+
+      tubeL.logi = NULL;
 
       elements["TubeL"] = tubeL;
 
@@ -201,7 +198,7 @@ namespace Belle2 {
         string geo_polyconex_name = "geo_" + name + "x_name";
         string geo_polycone_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_polyconexx(NULL), *geo_polyconex(NULL), *geo_polycone(NULL);
+        G4VSolid* geo_polyconexx(NULL), *geo_polycone(NULL);
 
         if (subtract != "" || intersect != "")
           if (type == "pipe") // for pipes inner space will be created as vacuum
@@ -215,8 +212,8 @@ namespace Belle2 {
 
 
         if (subtract != "" && intersect != "") {
-          geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
-                                                 polycone.transform.inverse()*elements[subtract].transform);
+          G4VSolid* geo_polyconex = new G4SubtractionSolid(geo_polyconex_name, geo_polyconexx, elements[subtract].geo,
+                                                           polycone.transform.inverse()*elements[subtract].transform);
           geo_polycone = new G4IntersectionSolid(geo_polycone_name, geo_polyconex, elements[intersect].geo,
                                                  polycone.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "")
@@ -235,6 +232,8 @@ namespace Belle2 {
         G4LogicalVolume* logi_polycone = new G4LogicalVolume(polycone.geo, mat_polycone, logi_polycone_name);
         setColor(*logi_polycone, "#CC0000");
         setVisibility(*logi_polycone, false);
+
+        polycone.logi = logi_polycone;
 
         //put volume
         string phys_polycone_name = "phys_" + name + "_name";
@@ -270,6 +269,8 @@ namespace Belle2 {
           if (flag_limitStep) logi_vacuum->SetUserLimits(new G4UserLimits(stepMax));
           setColor(*logi_vacuum, "#000000");
           setVisibility(*logi_vacuum, false);
+
+          vacuum.logi = logi_vacuum;
 
           //put volume
           string phys_vacuum_name = "phys_" + nameVac + "_name";
@@ -311,7 +312,7 @@ namespace Belle2 {
         string geo_torusx_name = "geo_" + name + "x_name";
         string geo_torus_name = "geo_" + name + "_name";
 
-        G4VSolid* geo_torusxx(NULL), *geo_torusx(NULL), *geo_torus(NULL);
+        G4VSolid* geo_torusxx(NULL), *geo_torus(NULL);
 
         if (subtract != "" || intersect != "")
           if (type == "pipe") // for pipes inner space will be created as vacuum
@@ -324,8 +325,8 @@ namespace Belle2 {
           geo_torus = new G4Torus(geo_torus_name, torus_r, torus_R, torus_RT, torus_SPHI, torus_DPHI);
 
         if (subtract != "" && intersect != "") {
-          geo_torusx = new G4SubtractionSolid(geo_torusx_name, geo_torusxx, elements[subtract].geo,
-                                              torus.transform.inverse()*elements[subtract].transform);
+          G4VSolid* geo_torusx = new G4SubtractionSolid(geo_torusx_name, geo_torusxx, elements[subtract].geo,
+                                                        torus.transform.inverse()*elements[subtract].transform);
           geo_torus = new G4IntersectionSolid(geo_torus_name, geo_torusx, elements[intersect].geo,
                                               torus.transform.inverse()*elements[intersect].transform);
         } else if (subtract != "")
@@ -344,6 +345,8 @@ namespace Belle2 {
         G4LogicalVolume* logi_torus = new G4LogicalVolume(torus.geo, mat_torus, logi_torus_name);
         setColor(*logi_torus, "#CC0000");
         setVisibility(*logi_torus, false);
+
+        torus.logi = logi_torus;
 
         //put volume
         string phys_torus_name = "phys_" + name + "_name";
@@ -376,6 +379,8 @@ namespace Belle2 {
           if (flag_limitStep) logi_vacuum->SetUserLimits(new G4UserLimits(stepMax));
           setColor(*logi_vacuum, "#000000");
           setVisibility(*logi_vacuum, false);
+
+          vacuum.logi = logi_vacuum;
 
           //put volume
           string phys_vacuum_name = "phys_" + nameVac + "_name";
@@ -427,7 +432,6 @@ namespace Belle2 {
       new G4PVPlacement(transform_ROT, logi_GateShield, "phys_GateShield_name", &topVolume, false, 0);
 
 
-      bool radiation_study = false;
 
       //--------------
       //-   Tube (virtual tube for radiation level study)
@@ -440,6 +444,8 @@ namespace Belle2 {
       //put volume
       setColor(*logi_Tube, "#CC0000");
       //setVisibility(*logi_Tube, false);
+      bool radiation_study = false;
+      // cppcheck-suppress knownConditionTrueFalse
       if (radiation_study) {
         new G4PVPlacement(transform_ROT, logi_Tube, "phys_Tube_name", &topVolume, false, 0);
       }
@@ -607,10 +613,178 @@ namespace Belle2 {
       //logi_GateShield->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1005));
 
       //virtual material outsire gate-shield
+
+      // cppcheck-suppress knownConditionTrueFalse
       if (radiation_study) {
         logi_Tube->SetSensitiveDetector(new BkgSensitiveDetector("IR", 1006));
       }
 
+
+      //------------------
+      //-   Collimators
+
+      std::vector<std::string> collimators;
+      boost::split(collimators, m_config.getParameterStr("Collimator"), boost::is_any_of(" "));
+      for (const auto& name : collimators) {
+        //-   Collamators consist of two independent jaws (trapezoids), identical in shape but differently positioned
+
+        prep = name + ".";
+
+        string type = m_config.getParameterStr(prep + "type");
+        string motherVolume = m_config.getParameterStr(prep + "MotherVolume");
+        string motherVolumeVacuum = motherVolume + "Vac";
+
+        // If zz < 0 (positioned at negative z) collimator is flipped when rotated into Mother Volume system
+        G4Scale3D scale;
+        G4Rotate3D rotation;
+        G4Translate3D translation;
+        elements[motherVolumeVacuum].transform.getDecomposition(scale, rotation, translation);
+        double zz = rotation.zz();
+
+        double collimator_d1 = m_config.getParameter(prep + "d1") * unitFactor;
+        double collimator_d2 = m_config.getParameter(prep + "d2") * unitFactor;
+        double collimator_dx1 = m_config.getParameter(prep + "dx1") * unitFactor;
+        double collimator_dx2 = m_config.getParameter(prep + "dx2") * unitFactor;
+        double collimator_dy1 = m_config.getParameter(prep + "dy1") * unitFactor;
+        double collimator_dy2 = m_config.getParameter(prep + "dy2") * unitFactor;
+        double collimator_dz = m_config.getParameter(prep + "dz") * unitFactor;
+        double collimator_Z = m_config.getParameter(prep + "Z") * unitFactor;
+
+        // storable elements
+        FarBeamLineElement collimator_jaw1;
+        FarBeamLineElement collimator_jaw2;
+
+        // move collimator to its position on beam line
+        G4Transform3D place_collimator = G4Translate3D(0.0, 0.0, collimator_Z);
+
+        collimator_jaw1.transform = place_collimator;
+        collimator_jaw2.transform = place_collimator;
+
+        // rotate and move collimator jaws to their relative positions
+        if (type == "vertical") {
+          collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(0.0, -collimator_dz + collimator_d1, 0.0);
+          collimator_jaw1.transform = collimator_jaw1.transform * G4RotateX3D(-M_PI / 2 / Unit::rad);
+
+          collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(0.0, collimator_dz + collimator_d2, 0.0);
+          collimator_jaw2.transform = collimator_jaw2.transform * G4RotateX3D(M_PI / 2 / Unit::rad);
+        } else {
+          if (zz > 0) {
+            collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(-collimator_dz + collimator_d1, 0.0, 0.0);
+            collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(collimator_dz + collimator_d2, 0.0, 0.0);
+          } else {
+            collimator_jaw1.transform = collimator_jaw1.transform * G4Translate3D(-collimator_dz - collimator_d2, 0.0, 0.0);
+            collimator_jaw2.transform = collimator_jaw2.transform * G4Translate3D(collimator_dz - collimator_d1, 0.0, 0.0);
+          }
+          collimator_jaw1.transform = collimator_jaw1.transform * G4RotateY3D(M_PI / 2 / Unit::rad);
+          collimator_jaw2.transform = collimator_jaw2.transform * G4RotateY3D(-M_PI / 2 / Unit::rad);
+        }
+
+        // define geometry
+        string geo_collimatorx_name = "geo_" + name + "x_name";
+
+        string geo_collimator_jaw1_name = "geo_" + name + "jaw1_name";
+        string geo_collimator_jaw2_name = "geo_" + name + "jaw2_name";
+
+        G4VSolid* geo_collimatorx = new G4Trd(geo_collimatorx_name, collimator_dx1, collimator_dx2, collimator_dy1, collimator_dy2,
+                                              collimator_dz);
+
+        G4VSolid* geo_collimator_jaw1 = new G4IntersectionSolid(geo_collimator_jaw1_name, geo_collimatorx, elements[motherVolumeVacuum].geo,
+                                                                collimator_jaw1.transform.inverse());
+        G4VSolid* geo_collimator_jaw2 = new G4IntersectionSolid(geo_collimator_jaw2_name, geo_collimatorx, elements[motherVolumeVacuum].geo,
+                                                                collimator_jaw2.transform.inverse());
+
+        collimator_jaw1.geo = geo_collimator_jaw1;
+        collimator_jaw2.geo = geo_collimator_jaw2;
+
+        // define logical volume
+        string strMat_collimator = m_config.getParameterStr(prep + "Material");
+        G4Material* mat_collimator = Materials::get(strMat_collimator);
+        string logi_collimator_jaw1_name = "logi_" + name + "_jaw1_name";
+        string logi_collimator_jaw2_name = "logi_" + name + "_jaw2_name";
+        G4LogicalVolume* logi_collimator_jaw1 = new G4LogicalVolume(geo_collimator_jaw1, mat_collimator, logi_collimator_jaw1_name);
+        G4LogicalVolume* logi_collimator_jaw2 = new G4LogicalVolume(geo_collimator_jaw2, mat_collimator, logi_collimator_jaw2_name);
+        setColor(*logi_collimator_jaw1, "#CC0000");
+        setColor(*logi_collimator_jaw2, "#CC0000");
+        setVisibility(*logi_collimator_jaw1, false);
+        setVisibility(*logi_collimator_jaw2, false);
+
+        collimator_jaw1.logi = logi_collimator_jaw1;
+        collimator_jaw2.logi = logi_collimator_jaw2;
+
+        // put volume
+        string phys_collimator_jaw1_name = "phys_" + name + "_jaw1" + "_name";
+        string phys_collimator_jaw2_name = "phys_" + name + "_jaw2" + "_name";
+        new G4PVPlacement(collimator_jaw1.transform, logi_collimator_jaw1, phys_collimator_jaw1_name, elements[motherVolumeVacuum].logi,
+                          false, 0);
+        new G4PVPlacement(collimator_jaw2.transform, logi_collimator_jaw2, phys_collimator_jaw2_name, elements[motherVolumeVacuum].logi,
+                          false, 0);
+
+        //to use it later in "intersect" and "subtract"
+        collimator_jaw1.transform = collimator_jaw1.transform * elements[motherVolumeVacuum].transform;
+        collimator_jaw2.transform = collimator_jaw2.transform * elements[motherVolumeVacuum].transform;
+
+        string name_jaw1 = name + "_jaw1";
+        string name_jaw2 = name + "_jaw2";
+        elements[name_jaw1] = collimator_jaw1;
+        elements[name_jaw2] = collimator_jaw2;
+      }
+
+      //-----------------------
+      //-   Collimator shields
+
+      std::vector<std::string> collimatorShields;
+      boost::split(collimatorShields, m_config.getParameterStr("CollimatorShield"), boost::is_any_of(" "));
+      for (const auto& name : collimatorShields) {
+        //-   Collamator shield made as box with subtracted inner space
+
+        prep = name + ".";
+
+        double collShield_X0 = m_config.getParameter(prep + "X0") * unitFactor;
+        double collShield_Z0 = m_config.getParameter(prep + "Z0") * unitFactor;
+        double collShield_PHI = m_config.getParameter(prep + "PHI");
+        double collShield_W = m_config.getParameter(prep + "W") * unitFactor;
+        double collShield_H = m_config.getParameter(prep + "H") * unitFactor;
+        double collShield_L = m_config.getParameter(prep + "L") * unitFactor;
+        double collShield_d = m_config.getParameter(prep + "d") * unitFactor;
+
+        // storable element
+        FarBeamLineElement collShield;
+
+        // move collimator to its position on beam line
+        collShield.transform = G4Translate3D(collShield_X0, 0.0, collShield_Z0);
+        collShield.transform = collShield.transform * G4RotateY3D(collShield_PHI / Unit::rad);
+
+        G4Transform3D transform_collShieldInner = G4Translate3D(0.0, -collShield_d / 2.0, 0.0);
+
+        // define geometry
+        string geo_collShieldx_name = "geo_" + name + "x_name";
+        string geo_collShieldInner_name = "geo_" + name + "Inner" + "_name";
+        string geo_collShield_name = "geo_" + name + "_name";
+
+        G4Box* geo_collShieldx = new G4Box(geo_collShieldx_name, collShield_W / 2.0, collShield_H / 2.0, collShield_L / 2.0);
+        G4Box* geo_collShieldInner = new G4Box(geo_collShieldInner_name, collShield_W / 2.0 - collShield_d,
+                                               collShield_H / 2.0 - collShield_d / 2.0, collShield_L / 2.0);
+        G4SubtractionSolid* geo_collShield = new G4SubtractionSolid(geo_collShield_name, geo_collShieldx, geo_collShieldInner,
+                                                                    transform_collShieldInner);
+
+        collShield.geo = geo_collShield;
+
+        // define logical volume
+        string strMat_collShield = m_config.getParameterStr(prep + "Material");
+        G4Material* mat_collShield = Materials::get(strMat_collShield);
+        string logi_collShield_name = "logi_" + name + "_name";
+        G4LogicalVolume* logi_collShield = new G4LogicalVolume(geo_collShield, mat_collShield, logi_collShield_name);
+        setColor(*logi_collShield, "#CC0000");
+        setVisibility(*logi_collShield, false);
+
+        collShield.logi = logi_collShield;
+
+        // put volume
+        string phys_collShield_name = "phys_" + name + "_name";
+        new G4PVPlacement(collShield.transform, logi_collShield, phys_collShield_name, &topVolume, false, 0);
+
+        elements[name] = collShield;
+      }
     }
   }
 }

@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEKINEMATICFITTERMODULE_H
-#define PARTICLEKINEMATICFITTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -18,16 +17,12 @@
 
 // OrcaKinFit
 #include <analysis/OrcaKinFit/BaseFitter.h>
-#include <analysis/OrcaKinFit/OPALFitterGSL.h>
-#include <analysis/OrcaKinFit/NewtonFitterGSL.h>
-#include <analysis/OrcaKinFit/NewFitterGSL.h>
 #include <analysis/OrcaKinFit/TextTracer.h>
 
 // Constraints
 #include <analysis/OrcaKinFit/MomentumConstraint.h>
 #include <analysis/OrcaKinFit/RecoilMassConstraint.h>
 #include <analysis/OrcaKinFit/MassConstraint.h>
-#include <analysis/OrcaKinFit/SoftGaussMomentumConstraint.h>
 
 // Fitobjects
 #include <analysis/OrcaKinFit/ParticleFitObject.h>
@@ -36,22 +31,15 @@
 #include <analysis/dataobjects/EventExtraInfo.h>
 
 // framework datastore
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // ROOT
 #include <TLorentzVector.h>
 #include <TMatrixFSym.h>
-#include <TH1D.h>
-#include <TFile.h>
 
 // CLHEOP
-#include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/ThreeVector.h>
 #include <CLHEP/Vector/LorentzVector.h>
-#include <CLHEP/Geometry/Point3D.h>
-
 
 namespace Belle2 {
   class Particle;
@@ -154,7 +142,7 @@ namespace Belle2 {
 
       /**
        * Added four vectors and calcuated a covariance matrix for a combined particles
-       * @param particle pointer to particle
+       * @param mother pointer to particle
       */
       bool AddFour(Particle* mother);
 
@@ -211,7 +199,7 @@ namespace Belle2 {
       /**
        * Update the mother: momentum is sum of daughters TODO update covariance matrix
        * @param fitter reference to OrcaKinFit fitter object
-       * @param particleChildren list of daughter particls
+       * @param particleChildren list of daughter particles
        * @param mother mother particle
        */
       void updateOrcaKinFitMother(BaseFitter& fitter, std::vector<Particle*>& particleChildren, Particle* mother);
@@ -225,21 +213,25 @@ namespace Belle2 {
       bool updateOrcaKinFitDaughters(BaseFitter& fitter, Particle* mother);
 
       /**
-        * update the map of daughter and tracks, find out wich tracks belong to each daugther.
-        * @param ui store the tracks ID of each daughter
-        * @param l represent the tracks ID
-        * @param p pointer to particle
-        */
-      void updateMapofTrackandDaughter(std::vector<unsigned>& ui, unsigned& l, const Particle* daughter);
-
+       * update the map of daughter and tracks, find out which tracks belong to each daughter.
+       * @param l represent the tracks ID
+       * @param pars map of all parameters
+       * @param pard vector of parameters
+       * @param allparticles vector of all particles
+       * @param daughter pointer to particle
+       */
+      void updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars, std::vector<unsigned>& pard,
+                                       std::vector<Particle*>&  allparticles, const Particle* daughter);
 
       /**
        * store fit object information as ExtraInfo
-       * @param prefix can be used to distinguis e.g. "Fitted" and "Measured"
-       * @param particleChildren list of all particle childen
+       * @param prefix can be used to distinguish e.g. "Fitted" and "Measured"
+       * @param fitter reference to OrcaKinFit fitter object
+       * @param particleChildren list of all particle children
        * @param mother mother particle
        */
-      bool storeOrcaKinFitParticles(std::string prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren, Particle* mother);
+      bool storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren,
+                                    Particle* mother);
 
 
       /**
@@ -267,7 +259,7 @@ namespace Belle2 {
       TLorentzVector getTLorentzVector(ParticleFitObject* fitobject);
 
       /**
-       * Returns fit object error on the paramater ilocal
+       * Returns fit object error on the parameter ilocal
        * @param fitobject reference to OrcaKinFit fit object
        * @param ilocal internal local ID
        */
@@ -300,4 +292,3 @@ namespace Belle2 {
   }// end OrcaKinFit namespace
 } // Belle2 namespace
 
-#endif

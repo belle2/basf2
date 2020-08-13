@@ -13,9 +13,7 @@
 #ifndef TRGECLFAMFIT_H
 #define TRGECLFAMFIT_H
 
-#include <iostream>
 #include <TObject.h>
-#include <TVector3.h>
 #include "trg/ecl/TrgEclMapping.h"
 #include <trg/ecl/TrgEclDataBase.h>
 
@@ -47,7 +45,10 @@ namespace Belle2 {
     /** Set flag for saving analysis table*/
     void SetAnaTagFlag(int anatagflag) {_AnaTag = anatagflag;}
     /** Set Threshold */
-    void SetThreshold(int threshold) {_Threshold = threshold;}
+    void SetThreshold(std::vector<int> threshold)
+    {
+      Threshold = threshold;
+    };
     /** Set Beam Background Tag */
     void SetBeamBkgTag();
 
@@ -96,7 +97,7 @@ namespace Belle2 {
     /** Fill Analysis table */
     int _AnaTag;
     /** Threshold (MeV) */
-    double _Threshold;
+    std::vector<int> Threshold;
     /** Fill Analysis table */
     int EventId;
 

@@ -8,27 +8,27 @@
 # Example steering file
 ########################################################
 
-from basf2 import *
+import basf2
 from ROOT import Belle2
 
 # Set the global log level
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
 # Set random seed
-set_random_seed(888)
+basf2.set_random_seed(888)
 
-main = create_path()
+main = basf2.create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = basf2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [100])  # we want to process 100 events
 eventinfosetter.param('runList', [1])  # from run number 1
-eventinfosetter.param('expList', [1])  # and experiment number 1
+eventinfosetter.param('expList', [0])  # and experiment number 0
 
 # Register the geometry module
-geometry = register_module('Geometry')
+geometry = basf2.register_module('Geometry')
 
 # Register the CRY module
-cry = register_module('CRYInput')
+cry = basf2.register_module('CRYInput')
 
 # cosmic data input
 cry.param('CosmicDataDir', Belle2.FileSystem.findFile('data/generators/modules/cryinput/'))
@@ -36,13 +36,17 @@ cry.param('CosmicDataDir', Belle2.FileSystem.findFile('data/generators/modules/c
 # user input file
 cry.param('SetupFile', 'cry.setup')
 
-# acceptance half-lengths - at least one particle has to enter that box to use that event
+# acceptance half-lengths - at least one particle has to enter that box
+# (without simulation, based on generaor kinematics only!) to use that
+# event
 cry.param('acceptLength', 6.0)
 cry.param('acceptWidth', 6.0)
 cry.param('acceptHeight', 6.0)
 cry.param('maxTrials', 100000)
 
-# keep half-lengths - all particles that do not enter the box are removed (keep box >= accept box)
+# keep half-lengths - all particles that do not enter the box are removed
+# (keep box >= accept box)  (without simulation, based on generaor
+# kinematics only!)
 cry.param('keepLength', 6.0)
 cry.param('keepWidth', 6.0)
 cry.param('keepHeight', 6.0)
@@ -51,14 +55,12 @@ cry.param('keepHeight', 6.0)
 cry.param('kineticEnergyThreshold', 0.01)
 
 # Register the Progress module and the Python histogram module
-progress = register_module('Progress')
+progress = basf2.register_module('Progress')
 
 # output
-output = register_module('RootOutput')
+output = basf2.register_module('RootOutput')
 output.param('outputFileName', './cry-outfile-test.root')
 
-# Create the main path and add the modules
-main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(progress)
 
@@ -76,7 +78,7 @@ main.add_module(output)
 # main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

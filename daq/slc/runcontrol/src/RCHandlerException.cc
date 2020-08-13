@@ -2,16 +2,15 @@
 
 #include <cstdarg>
 #include <cstdio>
-#include <cstdlib>
 
 using namespace Belle2;
 
-RCHandlerException::RCHandlerException(const std::string& comment) throw()
+RCHandlerException::RCHandlerException(const std::string& comment)
 {
   m_comment = comment;
 }
 
-RCHandlerException::RCHandlerException(const char* format, ...) throw()
+RCHandlerException::RCHandlerException(const char* format, ...)
 {
   va_list ap;
   char ss[1024 * 100];

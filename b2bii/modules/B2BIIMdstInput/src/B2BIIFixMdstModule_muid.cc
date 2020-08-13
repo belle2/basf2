@@ -167,7 +167,6 @@ namespace Belle2 {
       double       py        = chg.py();
       double       pz        = chg.pz();
       double       p         = sqrt(px * px + py * py + pz * pz);
-      double       eEcl      = -1.0;
       double       muon      = iMuex->Muon_likelihood();
       double       pion      = iMuex->Pion_likelihood();
       double       kaon      = iMuex->Kaon_likelihood();
@@ -222,7 +221,7 @@ namespace Belle2 {
           Belle::Mdst_ecl& ecl = iEclTrk->ecl();
           if (ecl) {
             if (ecl.match() >= 1) {
-              eEcl  = ecl.energy();
+              double eEcl = ecl.energy();
               if ((eEcl > 0.0) && (p > 0.25)) {
                 double muonE = m_muonprob->probECL(eEcl, p);
                 double pionE = m_pionprob->probECL(eEcl, p);
@@ -289,7 +288,6 @@ namespace Belle2 {
   {
 
     double dx;    // bin size
-    double probSum; // normalization denominator
 
     if (expNo == 0) return;   // do nothing if pdf file was not found previously
 
@@ -350,7 +348,7 @@ namespace Belle2 {
     B2INFO("eEcl ");
     dx = kEEclMax / kEEcl;
     for (int k = 0; k < kPTrk; k++) {
-      probSum = 0.0;
+      double probSum = 0.0; // normalization denominator
       for (int i = 0; i < kEEcl; i++) {
         probDB >> fEEcl[k][i];
         probSum += fEEcl[k][i];

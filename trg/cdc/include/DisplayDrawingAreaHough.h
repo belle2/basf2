@@ -40,21 +40,21 @@ namespace Belle2 {
 
     double scale(double);
     double scale(void) const;
-    void resetPosition(void);
+    void resetPosition(void) override;
     bool wireName(void) const;
     bool wireName(bool);
     bool oldCDC(void) const;
     bool oldCDC(bool);
 
-    void clear(void);
+    void clear(void) override;
 
-    virtual bool on_expose_event(GdkEventExpose*);
-    virtual bool on_button_press_event(GdkEventButton*);
+    virtual bool on_expose_event(GdkEventExpose*) override;
+    virtual bool on_button_press_event(GdkEventButton*) override;
 
     void append(const TRGCDCHoughPlane* const);
 
   private:
-    virtual void on_realize();
+    virtual void on_realize() override;
     void draw(void);
 
     /// Coordinate transformations.

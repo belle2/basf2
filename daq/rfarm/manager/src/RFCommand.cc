@@ -11,7 +11,7 @@ const RFCommand RFCommand::PAUSE(606, "RF_PAUSE");
 const RFCommand RFCommand::RESUME(607, "RF_RESUME");
 const RFCommand RFCommand::STATUS(608, "RF_STATUS");
 
-const RFCommand& RFCommand::operator=(const std::string& label) throw()
+const RFCommand& RFCommand::operator=(const std::string& label)
 {
   if (label == CONFIGURE.getLabel()) *this = CONFIGURE;
   else if (label == UNCONFIGURE.getLabel()) *this = UNCONFIGURE;
@@ -27,7 +27,7 @@ const RFCommand& RFCommand::operator=(const std::string& label) throw()
   return *this;
 }
 
-const RFCommand& RFCommand::operator=(const char* label) throw()
+const RFCommand& RFCommand::operator=(const char* label)
 {
   if (label != NULL)  *this = std::string(label);
   else *this = Enum::UNKNOWN;

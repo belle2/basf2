@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HELIXHELPER_H
-#define HELIXHELPER_H
+#pragma once
 
 #include <TVector3.h>
 #include <Math/Functor.h>
@@ -159,10 +158,10 @@ namespace Belle2 {
 
     /** user supplied point we're trying to find the nearest helix point to */
     static TVector3 minimize_distance_to_point;
-    // @{
-    /** user supplied line we're trying to find the nearest helix point to */
-    static TVector3 minimize_distance_to_line_a, minimize_distance_to_line_b;
-    //@}
+    /** first user supplied line we're trying to find the nearest helix point to */
+    static TVector3 minimize_distance_to_line_a;
+    /** second user supplied line we're trying to find the nearest helix point to */
+    static TVector3 minimize_distance_to_line_b;
     /** keep a 'this' pointer around for minimization */
     static HelixHelper const* helix_object;
   };
@@ -172,4 +171,3 @@ namespace Belle2 {
   TVector3 HelixHelper::minimize_distance_to_line_b(0.0, 0.0, 0.0);
   HelixHelper const* HelixHelper::helix_object(0);
 }
-#endif

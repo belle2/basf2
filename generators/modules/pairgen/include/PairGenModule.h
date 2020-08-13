@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
@@ -33,10 +32,10 @@ namespace Belle2 {
     virtual ~PairGenModule() {}
 
     /** Initializes the module. */
-    void initialize();
+    void initialize() override;
 
     /** Method is called for each event. */
-    void event();
+    void event() override;
 
   protected:
     int m_PDG; /**< Particles PDG code */

@@ -12,13 +12,11 @@
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 
 #include <genfit/FitStatus.h>
-#include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/Track.h>
 #include <genfit/TrackPoint.h>
@@ -128,14 +126,10 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     } else {
       B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
     }
-    // false positive due to new with placement (cppcheck issue #7163)
-    // cppcheck-suppress memleak
     return true;
   } else {
     B2DEBUG(200, "Relation to MCParticle not set. No related MCParticle to RecoTrack.");
   }
-  // false positive due to new with placement (cppcheck issue #7163)
-  // cppcheck-suppress memleak
   return true;
 }
 

@@ -12,6 +12,8 @@
   20140917 -1 to skip revision check
   20140918 nsmparse_struct fix (uninitialized malloc for ->next)
   20140919 bytes is added to NSMparse
+  20180708 free fix all upon error
+  20180709 memory leak fix on define_t
  */
 
 #include <stdio.h>
@@ -48,11 +50,38 @@ define_t *define_ptr = &define_top;
 
 #define isa_num(a) (isalnum(a) || (a) == '_')
 
+/* -- 2018.0709.0435 memory leak search
+static int nsmparse_alloccnt1 = 0;
+static int nsmparse_alloccnt2 = 0;
+*/
+
+/* -- free ------------------------------------------------------------ */
+static void
+nsmparse_free(void *ptr)
+{
+  int32_t siz = *(int32_t *)((char *)ptr - 4);
+  if (! ptr) {
+    printf("nsmparse_free: freeing null pointer\n");
+    exit(1);
+  }
+  if (siz == 0) {
+    printf("nsmparse_free: possible double free attempt\n");
+    exit(1);
+  }
+
+  /* -- 2018.0709.0435 memory leak search
+  nsmparse_alloccnt1--;
+  if (siz != sizeof(NSMparse)) nsmparse_alloccnt2--;
+  */
+  
+  *(int32_t *)((char *)ptr - 4) = 0;
+  free((char *)ptr-4);
+}
 /* -- malloc ---------------------------------------------------------- */
 static char *
 nsmparse_malloc(size_t siz, const char *where, const char *text)
 {
-  char *p = (char *)malloc(siz);
+  char *p = (char *)malloc(siz+4);
   if (! p) {
     printf("nsmparse_malloc: can't malloc %d bytes%s%s%s%s\n",
 	   (int)siz,
@@ -60,8 +89,33 @@ nsmparse_malloc(size_t siz, const char *where, const char *text)
 	   text  ? ": "   : "", text  ? text  : "");
     exit(1);
   }
-  memset(p, 0, siz);
-  return p;
+  memset(p, 0, siz+4);
+
+  /* -- 2018.0709.0435 memory leak search
+  {
+    static int callcnt1 = 0;
+    static int callcnt2 = 0;
+    nsmparse_alloccnt1++;
+    callcnt1++;
+    if (siz != sizeof(NSMparse)) {
+      nsmparse_alloccnt2++;
+      callcnt2++;
+      if (callcnt2 < 20) {
+        printf("nsmparse_malloc where=%s text=%s\n",
+               where ? where : "(nowhere?)",
+               text ? text : "(notext?)");
+      }
+    }
+    if ((callcnt2 % 100) == 0) {
+      printf("nsmparse_malloc +%d / %d (+%d / %d)\n",
+             nsmparse_alloccnt1, callcnt1,
+             nsmparse_alloccnt2, callcnt2);
+    }
+  }
+  */
+
+  *(int32_t *)p = (int32_t)siz;
+  return p+4;
 }
 /* -- eval ------------------------------------------------------------- *\
    this can be extended to evaluate a math expression
@@ -112,7 +166,7 @@ nsmparse_readfile(const char *file, off_t *filelenp)
     if (len != siz) {
       printf("can't read at %d bytes\n", i + (len > 0 ? len : 0));
       close(fd);
-      free(filebuf);
+      nsmparse_free(filebuf);
       return 0;
     }
   }
@@ -214,7 +268,7 @@ nsmparse_error(char *fmt, const char *file, char *filebuf, char *p)
   token[q - p] = 0;
   sprintf(nsmparse_errstr, "Error:%s:%d: ", file, line);
   sprintf(nsmparse_errstr+strlen(nsmparse_errstr), fmt, token);
-  free(token);
+  nsmparse_free(token);
 }
 /* -- getname ---------------------------------------------------------- *\
 \* --------------------------------------------------------------------- */
@@ -552,7 +606,7 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	n_same = 0;
 	if (strlen(fmtstr) > fmtlen) {
 	  nsmparse_error("struct size exceeded", file, filebuf, ptr);
-	  return 0;
+	  goto parseerr_return;
 	}
       }
       sym_prev = typep->sym;
@@ -599,14 +653,16 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
   if (fmtout) strcpy(fmtout, fmtstr);
   if (fmtsiz) *fmtsiz = offset;
   if (endp) *endp = ptr;
+
   return parsetop;
 
  parseerr_return:
   while (parsetop) {
     parsep = parsetop->next;
-    free(parsetop);
+    nsmparse_free(parsetop);
     parsetop = parsep;
   }
+
   if (fmtout) *fmtout = 0;
   return 0;
 }
@@ -634,7 +690,7 @@ nsmparse_findfile(const char *name, const char *incpath)
 	if (stat(path, &statbuf) == 0) {
 	  return path;
 	}
-	free(path);
+	nsmparse_free(path);
 	if (! *q) break;
 	p = q+1;
       }
@@ -666,13 +722,13 @@ nsmlib_parsestr(const char *datname, int revision,
   
   if (nsmparse_cleanup(parsebuf, &filelen)) {
     nsmparse_errcode = NSMEPARSECOM;
-    free(parsebuf);
+    nsmparse_free(parsebuf);
     return 0;
   }
 
   if ((ret = nsmparse_revision(filepath, parsebuf, datname)) <= 0) {
     nsmparse_errcode = NSMEPARSENOREV;
-    free(parsebuf);
+    nsmparse_free(parsebuf);
     return 0;
   }
 
@@ -680,7 +736,7 @@ nsmlib_parsestr(const char *datname, int revision,
     nsmparse_errcode = NSMEPARSENOREV;
     sprintf(nsmparse_errstr, "revision mismatch, found %d while expecting %d",
 	    ret, revision);
-    free(parsebuf);
+    nsmparse_free(parsebuf);
     return 0;
   }
 
@@ -688,20 +744,31 @@ nsmlib_parsestr(const char *datname, int revision,
   
   if (! (strbegin = nsmparse_struct(parsebuf, datname))) {
     nsmparse_errcode = NSMEPARSENOSTR;
-    free(parsebuf);
+    nsmparse_free(parsebuf);
     return 0;
   }
   
   if (! (parsep = nsmparse_scan(filepath, parsebuf, strbegin, 0, fmtstr, 0))) {
     nsmparse_errcode = NSMEPARSEITEM;
-    free(parsebuf);
+    nsmparse_free(parsebuf);
     return 0;
   }
   
-  free(parsebuf);
+  nsmparse_free(parsebuf);
+
   return parsep;
 }
-/* -- nsmlib_parse ---------------------------------------------------- */
+/* -- nsmlib_parseree ------------------------------------------------ */
+void
+nsmlib_parsefree(NSMparse *parsep)
+{
+  while (parsep) {
+    NSMparse *nextp = parsep->next;
+    nsmparse_free(parsep);
+    parsep = nextp;
+  }
+}
+/* -- nsmlib_parsefile ------------------------------------------------ */
 NSMparse *
 nsmlib_parsefile(const char *datname, int revision, const char *incpath,
 		 char *fmtstr, int *revisionp)
@@ -720,13 +787,27 @@ nsmlib_parsefile(const char *datname, int revision, const char *incpath,
 
   filebuf = nsmparse_readfile(filepath, 0); /* no need to retreive length */
   
-  if (! filebuf) return 0;
+  if (! filebuf) {
+    nsmparse_free(filepath);
+    return 0;
+  }
 
   parsep = nsmlib_parsestr(datname, revision, filebuf, filepath, fmtstr,
                            revisionp);
-  free(filebuf);
-  free(filepath);
+  nsmparse_free(filebuf);
+  nsmparse_free(filepath);
 
+  while (define_top.next) {
+    define_t *ptr = define_top.next;
+    char *namep   = define_top.name;
+    nsmparse_free((void *)namep);
+    define_top.next = ptr->next;
+    define_top.name = ptr->name;
+    nsmparse_free((void *)ptr);
+  }
+  define_top.name = 0;
+  define_ptr = &define_top;
+  
   return parsep;
 }
 /* -- nsmlib_parseerr ------------------------------------------------- */

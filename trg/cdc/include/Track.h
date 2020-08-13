@@ -15,7 +15,6 @@
 #define TRGCDCTrack_FLAG_
 
 #include "trg/cdc/TrackBase.h"
-#include "trg/cdc/WireHit.h"
 #include "trg/cdc/Helix.h"
 
 #ifdef TRGCDC_SHORT_NAMES
@@ -51,7 +50,7 @@ namespace Belle2 {
     TRGCDCTrack();
 
     /// Constructor from a Circle.
-    TRGCDCTrack(const TRGCDCCircle&);
+    explicit TRGCDCTrack(const TRGCDCCircle&);
 
     /// Destructor
     virtual ~TRGCDCTrack();
@@ -66,13 +65,13 @@ namespace Belle2 {
     int approach(TRGCDCLink&, bool sagCorrection = false) const;
 
     /// returns momentum vector.
-    virtual const CLHEP::Hep3Vector& p(void) const;
+    virtual const CLHEP::Hep3Vector& p(void) const override;
 
     /// returns Pt.
-    virtual double pt(void) const;
+    virtual double pt(void) const override;
 
     /// returns position vector.
-    virtual const CLHEP::Hep3Vector& x(void) const;
+    virtual const CLHEP::Hep3Vector& x(void) const override;
 
     /// Set 2D fit chi2
     void set2DFitChi2(double);

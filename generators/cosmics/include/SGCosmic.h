@@ -9,12 +9,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SGCOSMIC_H
-#define SGCOSMIC_H
+#pragma once
 
-#include <framework/core/FrameworkExceptions.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
-#include <TRandom3.h>
 
 namespace Belle2 {
 
@@ -217,4 +214,3 @@ namespace Belle2 {
 
 } //end namespace Belle2
 
-#endif //SGCOSMIC_H

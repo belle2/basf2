@@ -12,14 +12,14 @@
 
 import sys
 import math
-from basf2 import *
+import basf2
 
 # reenable GUI thread for our canvas
 from ROOT import PyConfig
 PyConfig.StartGuiThread = True
 
 # Set the global log level
-logging.log_level = LogLevel.WARNING
+basf2.logging.log_level = basf2.LogLevel.WARNING
 
 # Load the required libraries
 import ROOT
@@ -46,7 +46,7 @@ h_vertex = ROOT.TH2D(
 )
 
 
-class ShowMCParticles(Module):
+class ShowMCParticles(basf2.Module):
 
     """Simple module to collect some information about MCParticles"""
 
@@ -69,14 +69,15 @@ class ShowMCParticles(Module):
                 h_vertex.Fill(mc.getProductionVertex().X(),
                               mc.getProductionVertex().Y())
 
+
 # Create the main path and add the modules
-main = create_path()
+main = basf2.create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
 
 # Register the BHWideInput module
-bhwide = register_module('BHWideInput')
+bhwide = basf2.register_module('BHWideInput')
 
 # Set the min and max values for the theta scattering angle of the Positrons
 bhwide.param('ScatteringAngleRangePositron', [5.7, 174.3])
@@ -86,7 +87,7 @@ bhwide.param('ScatteringAngleRangeElectron', [5.7, 174.3])
 
 # Set the logging level for the BHWide module to INFO in order to see the total
 # cross section
-bhwide.set_log_level(LogLevel.INFO)
+bhwide.set_log_level(basf2.LogLevel.INFO)
 
 # Register the Progress module and the Python histogram module
 showMCPart = ShowMCParticles()
@@ -96,10 +97,10 @@ main.add_module(bhwide)
 main.add_module(showMCPart)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)
 
 # Create a Canvas to show histograms
 c = ROOT.TCanvas('Canvas', 'Canvas', 1536, 768)

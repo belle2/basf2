@@ -34,8 +34,7 @@ namespace Belle2 {
     {}
 
 // destructor
-    SoftGaussMassConstraint::~SoftGaussMassConstraint()
-    {}
+    SoftGaussMassConstraint::~SoftGaussMassConstraint() = default;
 
 // calulate current value of constraint function
     double SoftGaussMassConstraint::getValue() const
@@ -219,4 +218,3 @@ namespace Belle2 {
     }
   }// end OrcaKinFit namespace
 } // end Belle2 namespace
-

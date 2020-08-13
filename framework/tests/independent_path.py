@@ -3,12 +3,11 @@
 
 # @cond
 
-import os
-from basf2 import *
+import basf2
 from ROOT import Belle2
 
 
-class CreateData(Module):
+class CreateData(basf2.Module):
 
     """create some data"""
 
@@ -30,7 +29,7 @@ class CreateData(Module):
             self.array.appendNew()
 
 
-class CheckData(Module):
+class CheckData(basf2.Module):
 
     """check output of CreateData"""
 
@@ -47,7 +46,7 @@ class CheckData(Module):
         assert self.array.getEntries() == 13
 
 
-class CheckAbsence(Module):
+class CheckAbsence(basf2.Module):
 
     """check output of CreateData"""
 
@@ -63,24 +62,24 @@ class CheckAbsence(Module):
         assert not Belle2.PyStoreObj('obj').obj()
 
 
-main = create_path()
+main = basf2.Path()
 main.add_module('EventInfoSetter')
 main.add_module(CheckAbsence())
 
-indep = create_path()
+indep = basf2.Path()
 indep.add_module(CreateData())
 indep.add_module(CheckData()).set_name("checkdata 1")
 main.add_independent_path(indep)
 main.add_module(CheckAbsence())
 
-indep2 = create_path()
+indep2 = basf2.Path()
 indep2.add_module(CheckAbsence())
 indep2.add_module(CreateData())
 indep2.add_module(CheckData()).set_name("checkdata 2")
 main.add_independent_path(indep2, merge_back_event=['obj', 'array'])
 main.add_module(CheckData()).set_name("checkdata 3")
 
-process(main)
+basf2.process(main)
 
-print(statistics)
+print(basf2.statistics)
 # @endcond

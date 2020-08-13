@@ -8,17 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef COSMICSMODULE_H
-#define COSMICSMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/cosmics/SGCosmic.h>
-
-#include <string>
-#include <vector>
 
 namespace Belle2 {
 
@@ -43,12 +38,12 @@ namespace Belle2 {
     /**
      * Initializes the module
      */
-    void initialize();
+    void initialize() override;
 
     /**
      * Method is called for each event
      */
-    void event();
+    void event() override;
 
   protected:
 
@@ -69,4 +64,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // COSMICSMODULE_H

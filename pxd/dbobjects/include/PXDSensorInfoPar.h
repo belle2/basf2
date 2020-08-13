@@ -9,12 +9,7 @@
  **************************************************************************/
 #pragma once
 
-
-#include <TObject.h>
-#include <string>
-
 #include <vxd/dbobjects/VXDSensorInfoBasePar.h>
-
 
 namespace Belle2 {
 

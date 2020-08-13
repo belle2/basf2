@@ -21,10 +21,10 @@ namespace Belle2 {
     virtual ~CDCTriggerRecoMatcherModule() {}
 
     /** Initialize the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called once for each event. */
-    virtual void event();
+    virtual void event() override;
 
   protected:
     /** Name of the RecoTrack StoreArray to be matched */
@@ -41,6 +41,8 @@ namespace Belle2 {
     double m_minEfficiency;
     /** switch for creating relations for clones and merged tracks */
     bool m_relateClonesAndMerged;
+    /** switch for creating hit relations based on wire ID */
+    bool m_relateHitsByID;
 
     /** list of hits that are used for the matching */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;

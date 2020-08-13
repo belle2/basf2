@@ -51,11 +51,17 @@ QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::
   return bestMatch;
 }
 
-double QualityEstimatorMC::calculateQualityIndicator(int nClusters, MatchInfo& match)
+double QualityEstimatorMC::calculateQualityIndicator(unsigned int nClusters, MatchInfo& match)
 {
   double qualityIndicator = 0;
-  if (m_strictQualityIndicator) {
-    if (nClusters == match.second) qualityIndicator = 1 - (1. / nClusters);
+  if (m_mva_target) {
+    if (nClusters == m_mcRecoTracks[match.first]->getNumberOfSVDHits()) {
+      qualityIndicator = 1 - (1. / nClusters);
+    }
+  } else if (m_strictQualityIndicator) {
+    if (nClusters == match.second) {
+      qualityIndicator = 1 - (1. / nClusters);
+    }
   } else {
     int nRecoTrackClusters =  m_mcRecoTracks[match.first]->getNumberOfSVDHits();
     qualityIndicator = std::pow(match.second, 3) / (nRecoTrackClusters * nClusters * nClusters);

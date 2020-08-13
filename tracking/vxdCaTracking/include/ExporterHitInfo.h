@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
 #include <TVector3.h>
 

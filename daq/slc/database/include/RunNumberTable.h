@@ -11,20 +11,20 @@ namespace Belle2 {
 
   public:
     RunNumberTable(DBInterface& db) : m_db(db) {}
-    ~RunNumberTable() throw() {}
+    ~RunNumberTable() {}
 
   public:
-    RunNumber add(const std::string& config, int expno,
-                  int runno, int subno, bool istart = true);
+    RunNumber add(const std::string& node,
+                  const std::string& runtype,
+                  int expno, int runno);
     RunNumber add(const RunNumber& info);
-    int getRunNumber(int expno);
-    int getExpNumber(const std::string& config = "");
+    int getRunNumber(const std::string& node, int expno);
+    int getExpNumber(const std::string& node);
     void create();
 
   public:
-    RunNumberList get(int expno, bool started, int runno_min = 0, int runno_max = -1);
+    RunNumberList get(const std::string& node, int expno, int runno_min = 0, int runno_max = -1);
     RunNumberList get(int expno, int runno_min = 0, int runno_max = -1);
-    RunNumberList get(const std::string& type, int expno, int runno_min = 0, int runno_max = -1);
 
   private:
     DBInterface& m_db;

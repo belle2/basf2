@@ -69,5 +69,7 @@ namespace Belle2 {
     // Store Arrays
     /// Output Reco Tracks Store Array
     StoreArray<RecoTrack> m_inputRecoTracks;
+    /// Ignore tracks with CDC hits attached
+    bool m_noCDChits = false;
   };
 }

@@ -4,7 +4,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -32,10 +32,13 @@ namespace TreeFitter {
     );
 
     /** update statevector */
-    void updateState(FitParams* fitparams);
+    void updateState(FitParams& fitparams);
+
+    /** update statevector */
+    void updateState(FitParams& fitparams, FitParams& oldState);
 
     /** update the statevectors covariance */
-    void updateCovariance(FitParams* fitparams);
+    void updateCovariance(FitParams& fitparams);
 
     /** get chi2 of this iteration */
     double getChiSquare() { return m_chisq;}
@@ -44,7 +47,7 @@ namespace TreeFitter {
     ErrCode calculateGainMatrix(
       const Eigen::Matrix < double, -1, 1, 0, 5, 1 > & residuals,
       const Eigen::Matrix < double, -1, -1, 0, 5, MAX_MATRIX_SIZE > & G,
-      const FitParams* fitparams,
+      const FitParams& fitparams,
       const Eigen::Matrix < double, -1, -1, 0, 5, 5 > * V = 0,
       double weight = 1);
 
@@ -57,9 +60,6 @@ namespace TreeFitter {
   private:
     /** dimension of the constraint  */
     int m_constrDim;
-
-    /**  dimension of the statevector */
-    int m_stateDim; // dimension of the state
 
     /**  chi2 */
     double m_chisq;

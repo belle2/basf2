@@ -55,12 +55,23 @@ namespace Belle2 {
     double getChipNegativeCrosstalk() const {return (double)m_chipNegativeCrosstalk;}
 
     /**
+     * Get number of flat background hits/hapd/event to be added in digitizer
+     */
+    double getNBkgHits() const {return (double)m_nBkgHits;}
+
+    /**
      * Set QE curve
      * @param lambdaFirst curve starting wavelength in nm
      * @param lambdaStep step between points
      * @param qe vector of QE values
      */
     void setQECurve(float lambdaFirst, float lambdaStep, const std::vector<float>& qe);
+
+    /**
+     * Set number of flat background hits/hapd/event to be added in digitizer
+     * @param number of background hits/hapd/event
+     */
+    void setNBkgHits(float nbkg) { m_nBkgHits = nbkg;}
 
     /**
     * Set QE scaling factor for photons internally reflected in HAPD window
@@ -102,14 +113,15 @@ namespace Belle2 {
     float m_qeScale = 0;                   /*!< QE scale factor for photons internally reflected in HAPD window */
     float m_windowAbsorbtion = 0;          /*!< absorbtion probability for photons internally reflected in HAPD window */
     float m_chipNegativeCrosstalk = 0;     /*!< to simulate opposite polarity crosstalk among channels on chip */
-    float m_peakQE = 0;
+    float m_peakQE = 0;                    /*!< maximal peak QE of all HAPDs */
 
     std::vector<float> m_qe;               /*!< quantum efficiency curve */
     float m_colEff = 0;                    /*!< collection efficiency */
     float m_lambdaFirst = 0;               /*!< wavelength [nm]: first QE data point */
     float m_lambdaStep = 0;                /*!< wavelength [nm]: step */
+    float m_nBkgHits = 0;                    /*!< number if flat background hits/hapd/event to be added in digitizer */
 
-    ClassDef(ARICHSimulationPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(ARICHSimulationPar, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 

@@ -16,8 +16,6 @@
 #include <top/dataobjects/TOPDigit.h>
 
 class TH1F;
-class TF1;
-class TTree;
 
 namespace Belle2 {
   /**
@@ -41,28 +39,28 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Output MC extraction
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -73,7 +71,7 @@ namespace Belle2 {
           c_maxLaserFibers = 9
          };
 
-    TH1F* m_histo[c_NumChannels]; /**< profile histograms */
+    TH1F* m_histo[c_NumChannels] = {0}; /**< profile histograms */
 
     std::vector<double> m_fitRange; /**< fit range [nbins, xmin, xmax] */
     std::string m_outputFile; /**< output root file name */

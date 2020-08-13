@@ -1,15 +1,14 @@
 #include "daq/slc/nsm/NSMNodeDaemon.h"
 
 #include "daq/slc/nsm/NSMCommunicator.h"
+#include "daq/slc/base/TimeoutException.h"
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/Time.h>
 
 #include <daq/slc/base/StringUtil.h>
-#include <daq/slc/base/Date.h>
 #include <daq/slc/base/ConfigFile.h>
 
-#include <unistd.h>
 #include <cstdlib>
 #include <cstdio>
 #include <fstream>
@@ -40,7 +39,7 @@ void NSMNodeDaemon::add(NSMCallback* callback,
   }
 }
 
-void NSMNodeDaemon::run() throw()
+void NSMNodeDaemon::run()
 {
   NSMCommunicatorList& com_v(NSMCommunicator::get());
   try {

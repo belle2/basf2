@@ -12,46 +12,25 @@
 #include <arich/utility/ARICHAerogelHist.h>
 
 //c, c++
-#include <stdio.h>
-//#include <assert.h>
-#include <stdlib.h>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <iomanip>
-#include <time.h>
-#include <math.h>
 #include <vector>
 
 //root
 #include <TVector2.h>
-#include <TPolyLine.h>
-#include <TLine.h>
 #include <TCanvas.h>
-#include <TGraph.h>
-#include <TText.h>
 #include <TMath.h>
-#include <TH2F.h>
-#include <TLegend.h>
-#include <TCrown.h>
-#include <TArc.h>
-#include <TROOT.h>
-#include <TRandom3.h>
-#include <TStyle.h>
 #include <TPad.h>
 #include <TString.h>
 #include <TFile.h>
 #include <TAxis.h>
-#include <TVector2.h>
 
 using namespace std;
 using namespace Belle2;
 
-ARICHAerogelHist::ARICHAerogelHist(const char* name, const char* title) : TH2Poly()
+ARICHAerogelHist::ARICHAerogelHist(const char* name, const char* title) : TH2Poly(), m_histName(name), m_histTitle(title)
 {
-
-  m_histName = name;
-  m_histTitle = title;
   SetName(m_histName.Data());
   SetTitle(m_histTitle.Data());
   SetInitialParametersByDefault();
@@ -180,7 +159,7 @@ void ARICHAerogelHist::dumpVerticesMap()
 
 void ARICHAerogelHist::SetUpVerticesMap()
 {
-  double dPhi = -999.0;
+
   for (unsigned int i = 0; i < m_nTiles.size(); i++) {
     std::vector<TVector2> vecTvec;
     int nTiles = m_nTiles[i];
@@ -200,7 +179,7 @@ void ARICHAerogelHist::SetUpVerticesMap()
     vecTvec.push_back(v2);
     //Add circular points from outer radious (clockwise added)
     if (m_nCircularPoints > 0) {
-      dPhi = phimax / (m_nCircularPoints + 1);
+      double dPhi = phimax / (m_nCircularPoints + 1);
       for (int j = 0; j < m_nCircularPoints; j++) {
         TVector2 v;
         v.SetMagPhi(rmax, (phimax / 2.0 - dPhi * (j + 1)));
@@ -218,7 +197,7 @@ void ARICHAerogelHist::SetUpVerticesMap()
     vecTvec.push_back(v4);
     //Add circular points inner radious
     if (m_nCircularPoints > 0) {
-      dPhi = phimin / (m_nCircularPoints + 1);
+      double dPhi = phimin / (m_nCircularPoints + 1);
       for (int j = 0; j < m_nCircularPoints; j++) {
         TVector2 v;
         v.SetMagPhi(rmin, (-phimax / 2.0 + dPhi * (j + 1)));

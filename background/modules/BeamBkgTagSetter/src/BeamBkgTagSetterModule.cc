@@ -18,15 +18,11 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // MetaData
 #include <framework/dataobjects/EventMetaData.h>
-#include <background/dataobjects/BackgroundMetaData.h>
 
-#include <unordered_map>
 using namespace std;
 
 namespace Belle2 {
@@ -42,7 +38,7 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   BeamBkgTagSetterModule::BeamBkgTagSetterModule() : Module(),
-    m_backgroundTag(SimHitBase::bg_none), m_fileType(BackgroundMetaData::c_Usual)
+    m_backgroundTag(BackgroundMetaData::bg_none), m_fileType(BackgroundMetaData::c_Usual)
 
   {
     // set module description (e.g. insert text)
@@ -80,7 +76,7 @@ namespace Belle2 {
     if (m_backgroundTag == 0) {
       B2ERROR("Unknown beam background type: " << m_backgroundType << "\n"
               "Possible are: " + m_bgTypes.getBGTypes());
-      m_backgroundTag = SimHitBase::bg_other;
+      m_backgroundTag = BackgroundMetaData::bg_other;
     }
 
     if (m_specialFor != "") {

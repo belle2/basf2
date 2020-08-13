@@ -34,6 +34,7 @@ namespace Belle2 {
     public:
       Impl() = default;
 
+      /// Add name, description and values to the module's parameter list
       void addParameter(ModuleParamList* moduleParamList, const std::string& name, const std::string& description)
       {
         moduleParamList->addParameter(name,
@@ -42,17 +43,20 @@ namespace Belle2 {
                                       m_param_filterParameters);
       }
 
+      /// Assign values to the module-parameters in the module's list
       void assignTo(ModuleParamList* filterModuleParamList)
       {
         AssignParameterVisitor::update(filterModuleParamList, m_param_filterParameters);
       }
 
+      /// Retrieve the parameter (name,value) pairs
       std::map<std::string, FilterParamVariant> getValues() const
       {
         return m_param_filterParameters;
       }
 
     private:
+      /// Parameter values
       std::map<std::string, FilterParamVariant> m_param_filterParameters;
     };
   }

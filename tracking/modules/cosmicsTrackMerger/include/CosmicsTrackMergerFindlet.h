@@ -14,7 +14,6 @@
 #include <tracking/modules/cosmicsTrackMerger/PhiRecoTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
 
 #include <tracking/modules/cosmicsTrackMerger/CellularRecoTrack.h>
 #include <tracking/dataobjects/RecoTrack.h>

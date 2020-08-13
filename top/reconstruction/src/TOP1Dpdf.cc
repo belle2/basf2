@@ -10,7 +10,6 @@
 
 #include <top/reconstruction/TOP1Dpdf.h>
 #include <algorithm>
-#include <top/geometry/TOPGeometryPar.h>
 #include <math.h>
 
 namespace Belle2 {

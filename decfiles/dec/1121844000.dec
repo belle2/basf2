@@ -1,0 +1,61 @@
+# EventType: 1121844000
+# Descriptor: [B0 -> Jpsi [ -> e+ e-] K*0 [ -> K+ pi-] ]cc
+# NickName: Bd_J/psiK*0_K+_pi-
+# Documentation: Study of CKM with TDCPV analysis
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: Kenkichi Miyabayashi, Miho Fujii
+# Email: miyabaya@cc.nara-wu.ac.jp
+# Cuts: None
+# Date: 20180918
+# Comments:
+
+#This is for MC B0 -> J/Psi K*0, K*0 -> K- pi+.
+#And this is two body decay.
+#|H+|,|H-|=0.0, |H0|=1.0
+# Decay table to generate
+# Upsilon(4S) -> B0 anti-B0 -> Generic
+#                |
+#                 -> J/Psi K*0
+#                    |     |  
+#                    |      -> K+ pi-
+#                    | 
+#                      -> e+e- or mu+mu-.
+#
+Alias MYB0      B0
+Alias MYanti-B0 anti-B0
+ChargeConj MYB0 MYanti-B0
+Alias MYPSI     J/psi
+Alias MYKstar   K*0
+Alias MYanti-Kstar anti-K*0
+ChargeConj MYKstar MYanti-Kstar
+#
+# B0-B0bar mixing Delta m in PDG2018
+Define dm 0.5064e12
+#
+Decay Upsilon(4S)
+1.000 B0 anti-B0 MYB0 MYanti-B0 VSS_BMIX dm;
+Enddecay
+#
+Decay MYB0
+1.000 MYPSI MYKstar SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
+Enddecay
+#
+Decay MYanti-B0
+1.000 MYPSI MYanti-Kstar SVV_HELAMP 0.6417 3.1633 0.7556 0.0 0.1312 0.0199;
+Enddecay
+#
+Decay MYPSI
+0.500 e+ e-           PHOTOS VLL;
+0.500 mu+ mu-         PHOTOS VLL;
+Enddecay
+#
+Decay MYKstar 
+1.000 K+ pi-          PHOTOS VSS;
+Enddecay
+#
+Decay MYanti-Kstar 
+1.000 K- pi+          PHOTOS VSS;
+Enddecay
+#
+End

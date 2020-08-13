@@ -217,13 +217,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    virtual void print(const std::string& title = "QBB geometry parameters") const;
+    virtual void print(const std::string& title = "QBB geometry parameters") const override;
 
     /**
      * Print forward contour (polygon) - for debugging
@@ -273,7 +273,7 @@ namespace Belle2 {
     TOPGeoEndPlate m_endPlate; /**< forward end plate */
     TOPGeoColdPlate m_coldPlate; /**< cold plate */
 
-    ClassDef(TOPGeoQBB, 2); /**< ClassDef */
+    ClassDefOverride(TOPGeoQBB, 2); /**< ClassDef */
 
   };
 

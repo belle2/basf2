@@ -11,42 +11,20 @@
 #include <reconstruction/modules/CDCDedxPID/CDCDedxScanModule.h>
 #include <reconstruction/modules/CDCDedxPID/LineHelper.h>
 
-#include <framework/gearbox/Const.h>
-#include <framework/utilities/FileSystem.h>
-
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
+#include <reconstruction/dataobjects/DedxConstants.h>
 
-#include <cdc/dataobjects/CDCHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <vxd/geometry/GeoCache.h>
-#include <geometry/GeometryManager.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
 
-#include <genfit/TrackCand.h>
-#include <genfit/Track.h>
-#include <genfit/AbsTrackRep.h>
-#include <genfit/Exception.h>
-#include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/StateOnPlane.h>
-
-#include <TGeoManager.h>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
-#include <cassert>
 #include <cmath>
-#include <algorithm>
-#include <utility>
 #include <stdlib.h>
 #include <time.h>
-
-#include "TMath.h"
-#include "TFile.h"
-#include "TH2F.h"
 
 using namespace Belle2;
 using namespace CDC;
@@ -108,9 +86,9 @@ void CDCDedxScanModule::event()
     double cellHeight = outer - inner;
     double topHeight = outer - wirePosF.Perp();
     double bottomHeight = wirePosF.Perp() - inner;
-    double topHalfWidth = PI * outer / nWires;
-    double bottomHalfWidth = PI * inner / nWires;
-    double cellHalfWidth = PI * wirePosF.Perp() / nWires;
+    double topHalfWidth = M_PI * outer / nWires;
+    double bottomHalfWidth = M_PI * inner / nWires;
+    double cellHalfWidth = M_PI * wirePosF.Perp() / nWires;
 
     // first construct the boundary lines, then create the cell
     const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);
@@ -124,11 +102,20 @@ void CDCDedxScanModule::event()
         double doca = j * cellHalfWidth / 50.0 - cellHalfWidth;
         double entAng = k * 3.14159265 / 100.0 - 3.14159265 / 2.0;
 
+        // re-scaled (RS) doca and entAng variable: map to square cell
+        double cellR = 2 * cellHalfWidth / cellHeight;
+        double tana = 100.0;
+        if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01)tana = 100 * (entAng / std::abs(entAng)); //avoid infinity at pi/2
+        else tana =  std::tan(entAng);
+        double docaRS = doca * std::sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
+        double entAngRS = std::atan(tana / cellR);
+
         // now calculate the path length for this hit
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxTrack->addHit(0, 0, i, doca, entAng, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0, 1.0);
+        dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
+                          1.0, 0, 0.0, 0.0, 0.0);
       }
     }
     m_dedxArray.appendNew(*dedxTrack);

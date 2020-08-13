@@ -16,8 +16,6 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <string>
-#include <map>
-#include <vector>
 #include <memory>
 
 namespace Belle2 {
@@ -38,7 +36,7 @@ namespace Belle2 {
 
     public:
       /// Setup the chooseable filter with available choices from the factory
-      Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory);
+      explicit Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory);
 
       /// Setup the chooseable filter with available choices from the factory and a default name
       Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory,
@@ -62,6 +60,16 @@ namespace Belle2 {
        *             NAN if the object is rejected.
        */
       Weight operator()(const Object& object) final;
+
+      /// Const version of operator
+      Weight operator()(const Object& object) const;
+
+    public:
+      /// Return name of the selected filter
+      std::string getFilterName() const
+      {
+        return m_param_filterName;
+      }
 
     private:
       /// Parameters : Name of the selected filter
@@ -96,7 +104,7 @@ namespace Belle2 {
       ChooseableFilter();
 
       /// Constructor of the chooseable filter taking the default filter name
-      ChooseableFilter(const std::string& filterName);
+      explicit ChooseableFilter(const std::string& filterName);
     };
   }
 }

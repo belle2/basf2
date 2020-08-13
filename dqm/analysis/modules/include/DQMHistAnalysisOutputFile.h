@@ -25,21 +25,21 @@ namespace Belle2 {
     virtual ~DQMHistAnalysisOutputFileModule();
 
     //! Module functions to be called from main process
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Module functions to be called from event process
-    virtual void beginRun();
-    virtual void event();
-    virtual void endRun();
-    virtual void terminate();
+    virtual void beginRun() override;
+    virtual void event() override;
+    virtual void endRun() override;
+    virtual void terminate() override;
 
     // Data members
   private:
 
-    std::string m_filename;//! file name of root file
-    std::string m_histogramDirectoryName;//! Directory name within root file where to place things
-    bool m_saveHistos;//! Write all Histos to file
-    bool m_saveCanvases;//! Write all Canvases to file
+    std::string m_filename;/**< file name of root file */
+    std::string m_histogramDirectoryName;/**< Directory name within root file where to place things */
+    bool m_saveHistos;/**< Write all Histos to file */
+    bool m_saveCanvases;/**< Write all Canvases to file */
   };
 } // end namespace Belle2
 

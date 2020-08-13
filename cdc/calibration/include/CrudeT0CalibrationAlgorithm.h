@@ -12,7 +12,6 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <TH1F.h>
 #include "vector"
-#include "string"
 namespace Belle2 {
   namespace CDC {
     /**
@@ -73,7 +72,7 @@ namespace Belle2 {
       void saveHisto();
     protected:
       /// Run algo on data
-      virtual EResult calibrate();
+      EResult calibrate() override;
       ///create histo for each channel
       virtual void createHisto(StoreObjPtr<EventMetaData>& evtPtr);
       /// write outut or store db

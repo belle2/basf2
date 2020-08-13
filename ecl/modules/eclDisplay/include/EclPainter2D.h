@@ -34,6 +34,16 @@ namespace Belle2 {
      * Constructor for EclPainter subclass.
      */
     EclPainter2D(EclData* data, Type type);
+
+    /**
+     * Copy constructor.
+     */
+    EclPainter2D(const EclPainter2D& other) : EclPainter(other) { cloneFrom(other); }
+    /**
+     * Assignment operator.
+     */
+    EclPainter2D& operator=(const EclPainter2D& other) { cloneFrom(other); return *this; }
+
     /**
      * Destructor for EclPainter subclass.
      */
@@ -50,6 +60,10 @@ namespace Belle2 {
     /**  Grid pad, drawn in drawGrid(). */
     TPad* grid;
 
+    /**
+     * Clone attributes from other EclPainter2D
+     */
+    void cloneFrom(const EclPainter2D& other);
     /**
      * Update histogram titles.
      */
@@ -85,7 +99,7 @@ namespace Belle2 {
      * @param px X coordinate of mouse cursor.
      * @param py Y coordinate of mouse cursor.
      */
-    virtual void getInformation(int px, int py, MultilineWidget* panel);
+    virtual void getInformation(int px, int py, MultilineWidget* panel) override;
 
     /**
      * Return subtype of ECLPainter2D.
@@ -95,6 +109,6 @@ namespace Belle2 {
     /**
      * Redraw the canvas.
      */
-    virtual void Draw();
+    virtual void Draw() override;
   };
 }

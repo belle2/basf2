@@ -20,6 +20,9 @@ from ROOT import Belle2
 from unittest import TestCase
 import itertools
 
+from b2test_utils import skip_test_if_light
+skip_test_if_light()  # light builds don't contain ECLCalDigits
+
 set_random_seed(42)
 
 # global variable that holds expected number of out of time digits
@@ -151,7 +154,7 @@ addECLCalDigits.logging.log_level = LogLevel.DEBUG
 addECLCalDigits.logging.debug_level = 10
 
 # Set number of events according to number of different combination in addECLCalDigits
-eventinfosetter.param({'evtNumList': [len(addECLCalDigits.digitParams)], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [len(addECLCalDigits.digitParams)], 'runList': [0]})
 
 ECLDigitCalibrator = register_module('ECLDigitCalibrator')
 main.add_module(ECLDigitCalibrator)

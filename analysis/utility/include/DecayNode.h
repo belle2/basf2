@@ -1,4 +1,5 @@
-/* BASF2 (Belle Analysis Framework 2)                                     *
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -10,17 +11,10 @@
 
 #pragma once
 
-#ifndef ANALYSIS_UTILITY_INCLUDE_DECAYNODE_H_
-#define ANALYSIS_UTILITY_INCLUDE_DECAYNODE_H_
-
 #include <vector>
-#include <list>
 #include <string>
-#include <algorithm>
-#include <memory>
 
 namespace Belle2 {
-
   /**
    * DecayNode describes the decay of a particle identified by its pdg code,
    * into list of daughters.
@@ -53,7 +47,6 @@ namespace Belle2 {
     std::vector<DecayNode> daughters; /**< daughter decay nodes */
   };
 
-
   /**
    * Compare two Decay Nodes: They are equal if
    * All daughter decay nodes are equal
@@ -71,8 +64,4 @@ namespace Belle2 {
    * Not equal: See operator==
    */
   bool operator!=(const DecayNode& node1, const DecayNode& node2);
-
 }
-
-
-#endif /* ANALYSIS_UTILITY_INCLUDE_DECAYNODE_H_ */

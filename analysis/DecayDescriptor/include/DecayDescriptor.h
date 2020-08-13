@@ -1,18 +1,18 @@
 /**************************************************************************
-* BASF2 (Belle Analysis Framework 2)                                     *
-* Copyright(C) 2010 - Belle II Collaboration                             *
-*                                                                        *
-* Author: The Belle II Collaboration                                     *
-* Contributors: Christian Oswald                                         *
-*                                                                        *
-* This software is provided "as is" without any warranty.                *
-**************************************************************************/
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald, Yo Sato                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
-#ifndef DECAYDESCRIPTOR_H
-#define DECAYDESCRIPTOR_H
+#pragma once
 
 #include <analysis/DecayDescriptor/DecayString.h>
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
+#include <analysis/dataobjects/Particle.h>
 
 #include <vector>
 #include <string>
@@ -37,29 +37,56 @@ namespace Belle2 {
     int m_iDaughter_p;
     /** Direct daughters of the decaying particle. */
     std::vector<DecayDescriptor> m_daughters;
-    /** Ignore radiated photons? */
-    bool m_isIgnorePhotons;
-    /** Ignore intermediate particles or resonances? */
-    bool m_isIgnoreIntermediate;
-    /** Is this decay inclusive? */
-    bool m_isInclusive;
+    /** Particle property. Flags are defined in Particle::PropertyFlags */
+    int m_properties;
     /** Is this the NULL object? */
     bool m_isNULL;
     /** Internally called by match(Particle*) and match(MCParticle*) function. */
     template <class T>
     int match(const T* p, int iDaughter_p);
+    /** Collection of hierarchy pathes of selected particles.
+    Hierarchy path is vector of pairs of relative daughter numbers and particle names.
+    For instance, in decay
+    B+ -> [ D+ -> ^K+ pi0 ] pi0
+    decay path of K+ is
+    [(0, B), (0, D), (0 K)]
+    Every selected particle has its own hierarchy path and
+    they are stored as a vector in this variable:
+    For the decayString
+    B+ -> [ D+ -> ^K+ pi0 ] ^pi0
+    m_hierarchy, once filled, is
+    [[(0, B), (0, D), (0, K)],
+    [(0, B), (1, pi0)]]
+    */
+    std::vector<std::vector<std::pair<int, std::string>>> m_hierarchy;
+
+    /** Is this object initialized correctly? **/
+    bool m_isInitOK;
+
   public:
     /** Singleton object representing NULL. */
     const static DecayDescriptor& s_NULL;
+
     /** Dereference operator. */
     operator DecayDescriptor* ()
     {
       return m_isNULL ? nullptr : this;
     }
-    /** Defaut ctor. */
+    /** Default ctor. */
     DecayDescriptor();
-    /** Copy ctor. */
-    DecayDescriptor(const DecayDescriptor& other);
+
+    /** Want the default copy ctor. */
+    DecayDescriptor(const DecayDescriptor&) = default;
+
+    /** Want the default assignment operator */
+    DecayDescriptor& operator=(const DecayDescriptor&) = default;
+
+    /** Function to get hierarchy of selected particles  and their names (for python use) */
+    std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected();
+
+    /** Helper function to get hierarchy of selected particles  and their names. Called iteratively and get hierarchy path of a particle as an argument */
+    std::vector<std::vector<std::pair<int, std::string>>>  getHierarchyOfSelected(const std::vector<std::pair<int, std::string>>&
+        currentPath);
 
     /** Initialise the DecayDescriptor from given string.
         Typically, the string is a parameter of an analysis module. */
@@ -70,12 +97,12 @@ namespace Belle2 {
     in the init(const std::string) function. */
     bool init(const DecayString& s);
 
-    /** Checy if the DecayDescriptor matches with the given Particle.
+    /** Check if the DecayDescriptor matches with the given Particle.
     0 = no match
     1 = matches DecayDescriptor
     2 = matches charge conjugated DecayDescriptor
     3 = matches DeacyDescriptor AND charge conjugated DecayDescriptor
-    -1, -2, -3 : same, but match is not unambigous. */
+    -1, -2, -3 : same, but match is not unambiguous. */
     int match(const Particle* p) {return match<Particle>(p, -1);}
 
     /** See match(const Particle* p). */
@@ -106,26 +133,52 @@ namespace Belle2 {
     /** return i-th daughter (0 based index). */
     const DecayDescriptor* getDaughter(int i) const
     {
-      return (i < getNDaughters()) ? &(m_daughters[i]) : NULL;
+      return (i < getNDaughters()) ? &(m_daughters[i]) : nullptr;
     }
-    /** Check if additional photons shall be ignored. */
-    bool isIgnorePhotons() const
+    /** return property of the particle. */
+    int getProperty() const
     {
-      return m_isIgnorePhotons;
+      return m_properties;
+    }
+    /** Check if additional radiated photons shall be ignored. */
+    bool isIgnoreRadiatedPhotons() const
+    {
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons) > 0;
     }
     /** Check if intermediate resonances/particles shall be ignored. */
     bool isIgnoreIntermediate() const
     {
-      return m_isIgnoreIntermediate;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreIntermediate) > 0;
     }
-    /** Is the decay inclusive? */
-    bool isInclusive() const
+    /** Check if missing massive final state particles shall be ignored. */
+    bool isIgnoreMassive() const
     {
-      return m_isInclusive;
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreMassive) > 0;
+    }
+    /** Check if missing neutrinos shall be ignored. */
+    bool isIgnoreNeutrino() const
+    {
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreNeutrino) > 0;
+    }
+    /** Check if missing gammas shall be ignored. */
+    bool isIgnoreGamma() const
+    {
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreGamma) > 0;
+    }
+    /** Check if added Brems gammas shall be ignored. */
+    bool isIgnoreBrems() const
+    {
+      return (m_properties & Particle::PropertyFlags::c_IsIgnoreBrems) > 0;
     }
 
     /** Is the decay or the particle self conjugated */
     bool isSelfConjugated() const;
+
+    /** Check if the object initialized correctly. */
+    bool isInitOK() const
+    {
+      return m_isInitOK;
+    }
 
     /** Takes as input argument a (reconstructed) Particle, tries to match with
     this DecayDescriptorElement and returns true when matched. */
@@ -136,4 +189,3 @@ namespace Belle2 {
 
 }
 
-#endif // DECAYDESCRIPTOR_H

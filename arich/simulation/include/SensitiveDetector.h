@@ -12,7 +12,6 @@
 #define ARICHSENSITIVEDETECTOR_H
 
 #include <simulation/kernel/SensitiveDetectorBase.h>
-#include <arich/dataobjects/ARICHSimHit.h>
 #include <framework/database/DBObjPtr.h>
 #include <arich/dbobjects/ARICHSimulationPar.h>
 
@@ -37,7 +36,7 @@ namespace Belle2 {
        * @param aStep Current Geant4 step in the sensitive medium.
        * @result true if a hit was stored, o.w. false.
        */
-      bool step(G4Step* aStep, G4TouchableHistory*);
+      bool step(G4Step* aStep, G4TouchableHistory*) override;
 
 
     private:

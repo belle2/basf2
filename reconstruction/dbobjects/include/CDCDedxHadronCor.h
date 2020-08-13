@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxHadronCor(short version, std::vector<double>& hadronpars): m_version(version), m_hadronpars(hadronpars) {};
+    CDCDedxHadronCor(short version, const std::vector<double>& hadronpars): m_version(version), m_hadronpars(hadronpars) {};
 
     /**
      * Destructor
@@ -67,9 +67,9 @@ namespace Belle2 {
     void setHadronPar(int par, double value) {m_hadronpars[par] = value; };
 
   private:
-    short m_version; /**< version number for hadron saturation parameterization */
+    short m_version{ -1}; /**< version number for hadron saturation parameterization */
     std::vector<double> m_hadronpars; /**< dE/dx hadron correction parameters */
 
-    ClassDef(CDCDedxHadronCor, 1); /**< ClassDef */
+    ClassDef(CDCDedxHadronCor, 2); /**< ClassDef */
   };
 } // end namespace Belle2

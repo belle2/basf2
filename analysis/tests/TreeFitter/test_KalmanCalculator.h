@@ -1,11 +1,13 @@
-#include "analysis/VertexFitting/TreeFitter/FitParams.h"
-#include "analysis/VertexFitting/TreeFitter/KalmanCalculator.h"
-#include <Eigen/Core>
+#pragma once
 
+#include <Eigen/Core>
 #include <gtest/gtest.h>
 
+#include "analysis/VertexFitting/TreeFitter/FitParams.h"
+#include "analysis/VertexFitting/TreeFitter/KalmanCalculator.h"
 
-namespace Belle2 {
+namespace {
+
   /** Test fixture. */
   class TreeFitterKalmanCalculatorTest : public ::testing::Test {
   protected:
@@ -23,9 +25,8 @@ namespace Belle2 {
 
     Eigen::Matrix<double, 3, 6> G;
 
-    G << 1, 0, 0, 1, 0, 0,
-    0, 1, 0, 0, 1, 0,
-    0, 0, 1, 0, 0, 1;
+    // cppcheck-suppress constStatement
+    G << 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1;
 
     const  Eigen::Matrix<double, 3, 6>& c_G = G;
 
@@ -38,23 +39,27 @@ namespace Belle2 {
     //  0   0    0.5
     //
     Eigen::Matrix<double, 3, 1> residuals;
+    // cppcheck-suppress constStatement
     residuals << .1, .2, .3;
     const Eigen::Matrix<double, 3, 1>& c_r = residuals;
 
-    kalman.calculateGainMatrix(c_r, c_G, &fitParDim6, nullptr, 0);
+    kalman.calculateGainMatrix(c_r, c_G, fitParDim6, nullptr, 0);
 
-    kalman.updateState(&fitParDim6);
+    kalman.updateState(fitParDim6);
 
     Eigen::Matrix<double, 6, 1> expectedUpdatedFitpars;
+    // cppcheck-suppress constStatement
     expectedUpdatedFitpars << -0.05, -0.1, -0.15, -0.05, -0.1, -0.15;
 
     EXPECT_TRUE(expectedUpdatedFitpars.isApprox(fitParDim6.getStateVector().segment(0, 6))) << "fitpar update failed.";
 
     Eigen::Matrix<double, 6, 6> expectedUpdatedCov = Eigen::Matrix<double, 6, 6>::Identity(6, 6);
+    // cppcheck-suppress constStatement
     expectedUpdatedCov.diagonal < -3 > () << -1, -1, -1;
+    // cppcheck-suppress constStatement
     expectedUpdatedCov.diagonal<3>() << -1, -1, -1;
 
-    kalman.updateCovariance(&fitParDim6);
+    kalman.updateCovariance(fitParDim6);
     Eigen::Matrix<double, 6, 6> updatedCov = fitParDim6.getCovariance().selfadjointView<Eigen::Lower>();
 
 

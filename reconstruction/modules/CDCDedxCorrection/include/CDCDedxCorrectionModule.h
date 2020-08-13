@@ -8,20 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXCORRECTIONMODULE_H
-#define CDCDEDXCORRECTIONMODULE_H
-
-#include <reconstruction/modules/CDCDedxCorrection/CDCDedxCorrectionParameters.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
-#include <framework/dataobjects/EventMetaData.h>
+#pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
@@ -30,13 +22,9 @@
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
-#include <reconstruction/dbobjects/CDCDedxMeanPars.h>
-#include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 
-#include <string>
 #include <vector>
-#include <map>
 
 namespace Belle2 {
   class CDCDedxTrack;
@@ -59,14 +47,14 @@ namespace Belle2 {
     /** Initialize the Module.
      * This method is called only once before the actual event processing
      * starts. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event. All processing of the event
      * has to take place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Perform a run gain correction */
     void RunGainCorrection(double& dedx) const;
@@ -140,16 +128,15 @@ namespace Belle2 {
     double m_removeHighest;
 
     /** saturation correction parameter: alpha */
-    double  m_alpha;
+    double  m_alpha{ -1.};
     /** saturation correction parameter: gamma */
-    double  m_gamma;
+    double  m_gamma{ -1.};
     /** saturation correction parameter: delta */
-    double  m_delta;
+    double  m_delta{ -1.};
     /** saturation correction parameter: power on cos(theta) */
-    double  m_power;
+    double  m_power{ -1.};
     /** saturation correction parameter: ratio */
-    double  m_ratio;
+    double  m_ratio{ -1.};
 
   };
 } // Belle2 namespace
-#endif

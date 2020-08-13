@@ -15,7 +15,8 @@
 #define TRGCDCCIRCLEFITTER_FLAG_
 
 #include "trg/cdc/Fitter.h"
-#include "trg/cdc/Helix.h"
+
+#include "CLHEP/Geometry/Point3D.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCCFitter TRGCDCCircleFitter
@@ -23,15 +24,12 @@
 
 namespace Belle2 {
 
-  class TLink;
-  class TRGCDCCircle;
-
 /// A class to fit a TTrackBase object to a circle.
   class TRGCDCCircleFitter : public TRGCDCFitter {
 
   public:
     /// Constructor.
-    TRGCDCCircleFitter(const std::string& name);
+    explicit TRGCDCCircleFitter(const std::string& name);
 
     /// Destructor
     virtual ~TRGCDCCircleFitter();
@@ -42,11 +40,15 @@ namespace Belle2 {
               const std::string& prefix = std::string("")) const;
 
   public:// Modifiers
-    virtual int fit(TRGCDCTrackBase&) const;
+    /// Fitter
+    virtual int fit(TRGCDCTrackBase&) const override;
 
   private:
+    /// charge
     mutable double _charge;
+    /// radius
     mutable double _radius;
+    /// center
     mutable HepGeom::Point3D<double> _center;
   };
 

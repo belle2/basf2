@@ -8,12 +8,13 @@ from ROOT import TH2F, TFile
 
 # ------------------------------------------------------------------------
 # example of making histograms of pixel hits coming from individual fibers
-# needs as input the file produced by top/tools/simLaserCalibration.py
+# needs as input the file produced by top/analysis/simLaserCalibration.py
 # ------------------------------------------------------------------------
 
 inputFile = 'laserSimulation.root'
 if not os.path.exists(inputFile):
-    print(inputFile + ': file not found')
+    B2ERROR(inputFile + ': file not found')
+    B2INFO('File can be generated with top/analysis/simLaserCalibration.py')
     sys.exit()
 
 

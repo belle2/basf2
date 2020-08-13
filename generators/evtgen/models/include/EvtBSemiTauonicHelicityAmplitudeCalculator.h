@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <assert.h>
 #include "EvtGenBase/EvtComplex.hh"
 
 namespace Belle2 {
@@ -124,6 +123,7 @@ namespace Belle2 {
     /** The function to calculate the Hadronic Amplitudes of left handed (V-A) type contribution.
      *@param Dhel helicity of the daughter D(*) meson {+1,0,1} for D* and 2 for D.
      *@param whel helicity of the virtual vector boson {+1,0,1,2}.
+     *@param w   velocity transfer variable.
      *@return calculated amplitude value.
      */
     double HadV1(int Dhel, int whel, double w) const; // V-A
@@ -407,7 +407,7 @@ namespace Belle2 {
     double q2min(double mtau) const {return mtau * mtau;}
 
     /** Maximum value of the q^2.
-     *@param mtau daughter lepton mass.
+     *@param Dhel helicity of the D(*) meson in the rest frame of the parent meson {+1,0,-1} for D* and 2 for D.
      *@return calcualted q^2 maximum.
      */
     double q2max(int Dhel) const {return (m_mB - mD(Dhel)) * (m_mB - mD(Dhel));}
@@ -515,19 +515,19 @@ namespace Belle2 {
     void setMCharm(double m) {m_mCharm = m;}
 
     /** Sets the Wilson coeffcient CV1.   */
-    void setCV1(EvtComplex v) {m_CV1 = v;}
+    void setCV1(const EvtComplex& v) {m_CV1 = v;}
 
     /** Sets the Wilson coeffcient CV2.   */
-    void setCV2(EvtComplex v) {m_CV2 = v;}
+    void setCV2(const EvtComplex& v) {m_CV2 = v;}
 
     /** Sets the Wilson coeffcient CS1.   */
-    void setCS1(EvtComplex v) {m_CS1 = v;}
+    void setCS1(const EvtComplex& v) {m_CS1 = v;}
 
     /** Sets the Wilson coeffcient CS2.   */
-    void setCS2(EvtComplex v) {m_CS2 = v;}
+    void setCS2(const EvtComplex& v) {m_CS2 = v;}
 
     /** Sets the Wilson coeffcient CT.   */
-    void setCT(EvtComplex v) {m_CT = v;}
+    void setCT(const EvtComplex& v) {m_CT = v;}
 
   private:
     // Parameters

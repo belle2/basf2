@@ -41,6 +41,9 @@ namespace Belle2 {
     /// We use SelectSubset here to delete all pruned RecoHitInformation.
     SelectSubset<RecoHitInformation> m_subsetOfUnprunedRecoHitInformation;
 
+    /// Remove pruned reco hits or leave this for PruneRecoHitsModule
+    bool m_do_remove_hits{false};
+
   }; // end class
 } // end namespace Belle2
 

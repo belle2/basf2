@@ -47,18 +47,19 @@ DATCONTrackingModule::layerFilter(bool* layer)
 */
 int
 DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2 v1_s,
-                                            TVector2 v2_s, TVector2 v3_s, TVector2 v4_s,
+                                            TVector2 v2_s,
+                                            TVector2 v4_s,
                                             unsigned int iterations, unsigned int maxIterations)
 {
   int hitID;
   unsigned int countLayer;
   double unitX, unitY;
-  double y1 = 0., y2 = 0.;
+  double y1, y2;
   double m, a;
   houghPair hp;
   VxdID sensor;
   vector<unsigned int> candidateIDList;
-  double xdiff = -10.0, ydiff = -10.0;  /**< differences used to fill the ArrayOfActiveSectors */
+  double xdiff, ydiff;  /**< differences used to fill the ArrayOfActiveSectors */
   int sectorX, sectorY;
   double baseX, baseY;
   int maxSectorX, maxSectorY;
@@ -91,7 +92,7 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
 
       candidateIDList.clear();
       bool layerHit[4] = {false}; /* For layer filter */
-      for (auto& hit : hits) {
+      for (const auto& hit : hits) {
         hitID = hit.first;
         hp = hit.second;
         sensor = hp.first;
@@ -130,10 +131,8 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
         if (layerFilter(layerHit)) {
           // recursive / iterative call of fastInterceptFinder2d, until iterations = critIterations (critIterations-1),
           // actual values for v1...v4 are new startingpoints
-          if (iterations != maxIterations /*critIterations*/) {
-//             fastInterceptFinder2d(hits, uSide, v1, v2, v3, v4,
-//                                   iterations + 1, maxIterations);
-            fastInterceptFinder2d(containedHits, uSide, v1, v2, v3, v4,
+          if (iterations != maxIterations) {
+            fastInterceptFinder2d(containedHits, uSide, v1, v2, v4,
                                   iterations + 1, maxIterations);
           } else {
             if (!uSide) {
@@ -182,9 +181,7 @@ DATCONTrackingModule::fastInterceptFinder2d(houghMap& hits, bool uSide, TVector2
                 }
                 ArrayOfActiveSectorsPhiHS[sectorY][sectorX] = -1;
                 uHoughSpaceClusterCand.push_back(DATCONHoughSpaceClusterCand(candidateIDList, TVector2(sectorX, sectorY)));
-              }
 
-              if (m_useHoughSpaceClustering) {
                 activeSectorVectorPhi.push_back(true);
               }
             }
@@ -224,7 +221,7 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
   int hitID;
   unsigned int countLayer;
   double unitX, unitY;
-  double y1 = 0, y2 = 0;
+  double y1, y2;
   double m, a;
   houghPair hp;
   VxdID sensor;
@@ -273,7 +270,7 @@ DATCONTrackingModule::slowInterceptFinder2d(houghMap& hits, bool uSide)
 
       candidateIDList.clear();
       bool layerHit[4] = {false}; /* For layer filter */
-      for (auto& hit : hits) {
+      for (const auto& hit : hits) {
         hitID = hit.first;
         hp = hit.second;
         sensor = hp.first;

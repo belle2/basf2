@@ -17,18 +17,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/gearbox/GearDir.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/IOIntercept.h>
 
-#include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 
-#include <TRandom.h>
 #include <stdio.h>
 
 using namespace std;
@@ -102,7 +96,7 @@ void KKGenInputModule::event()
     MCParticleGraph::GraphParticle* p = &mpg[i];
     int moID = 0;
     char buf[200];
-    sprintf(buf, "IntC: %3d %4d %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
+    sprintf(buf, "IntC: %3d %4u %8d %4d %4d %4d %9.4f %9.4f %9.4f %9.4f",
             p->getIndex(), p->getStatus(), p->getPDG(), moID,
             p->getFirstDaughter(), p->getLastDaughter(),
             p->get4Vector().Px(), p->get4Vector().Py(),

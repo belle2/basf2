@@ -13,34 +13,19 @@
 #include <top/modules/TOPLaserCalibrator/LaserCalibratorFit.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// framework - Database
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/Database.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // DataStore classes
 //#include <framework/dataobjects/EventMetaData.h>
 #include <top/dataobjects/TOPDigit.h>
 
-// database classes
-#include <framework/database/DBStore.h>
-#include <top/dbobjects/TOPASICChannel.h>
-
-#include <Math/PdfFuncMathCore.h>
 #include <TFile.h>
 #include <TH1F.h>
-#include <TF1.h>
 #include <TMath.h>
 #include <TTree.h>
-#include <TClonesArray.h>
 #include <sstream>
 
 
@@ -85,6 +70,7 @@ namespace Belle2 {
 
   void TOPLaserCalibratorModule::initialize()
   {
+    B2WARNING("You are using an old version of the laser fitter, now deprecated. This module has been superseded by the CAF collector TOPLaserCalibratorCollector and the CAF fitter TOPLocalCalFitter.");
     m_digits.isRequired();
   }
 
@@ -150,7 +136,7 @@ namespace Belle2 {
 
     //read laser propagation time from MC (TOPChannelT0MC)
     auto mcFile = new TFile(m_mcInput.c_str());
-    auto tree = (TTree*)mcFile->Get("t0MC");
+    auto tree = static_cast<TTree*>(mcFile->Get("t0MC"));
     int channel_mc;
     double maxpos;
 

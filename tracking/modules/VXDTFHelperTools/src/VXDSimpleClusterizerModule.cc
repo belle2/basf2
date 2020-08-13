@@ -28,8 +28,6 @@ using std::sin;
 using std::cos;
 using std::sqrt;
 
-#include <iostream>
-
 //root stuff
 #include <TRandom.h>
 
@@ -161,13 +159,13 @@ void VXDSimpleClusterizerModule::event()
     const MCParticle* aMcParticle = aPxdTrueHit->getRelatedFrom<MCParticle>();
     unsigned int particleID = std::numeric_limits<unsigned int>::max();
 
-    if (aMcParticle != NULL) { particleID = aMcParticle->getArrayIndex(); }
+    if (aMcParticle != nullptr) { particleID = aMcParticle->getArrayIndex(); }
 
     double energy = aPxdTrueHit->getEnergyDep();
 
 
     if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
-      if (aMcParticle == NULL or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+      if (aMcParticle == nullptr or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
         m_fakePXDHitCtr++;
         discardedPXDFake++;
         continue; // jump to next pxdTrueHit
@@ -248,14 +246,14 @@ void VXDSimpleClusterizerModule::event()
     unsigned int particleID = std::numeric_limits<unsigned int>::max();
 
     if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
-      if (aMcParticle == NULL or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
+      if (aMcParticle == nullptr or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
         m_fakeSVDHitCtr++;
         discardedSVDFake++;
         continue; // jump to next svdTrueHit
       }
     }
 
-    if (aMcParticle != NULL) { particleID = aMcParticle->getArrayIndex(); }
+    if (aMcParticle != nullptr) { particleID = aMcParticle->getArrayIndex(); }
     double energy = aSvdTrueHit->getEnergyDep();
 
     B2DEBUG(100, " SVD, current TrueHit " << currentTrueHit << " connected to " << particleID << " has an energy deposit of " <<

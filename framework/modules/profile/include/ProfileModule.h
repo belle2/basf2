@@ -50,19 +50,19 @@ namespace Belle2 {
      *
      * Creates the ProfileInfo objects in the data store and starts the profiling.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Event profiling.
      *
      * Records the event profiling information.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Terminate the Module.
      *
      * Records the final profiling information.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -124,8 +124,8 @@ namespace Belle2 {
      * @param lmdMemoryExtract Lambda expression to extrat the plotted memory quantity from the MemTime
      *                         data structure. Use either m_extractVirtualMem or m_extractRssMem here
      */
-    void storeMemoryGraph(std::string name, std::string title, std::string xAxisName, std::string imgOutput,
-                          MemoryExtractLambda lmdMemoryExtract);
+    void storeMemoryGraph(const std::string& name, const std::string& title, const std::string& xAxisName, const std::string& imgOutput,
+                          const MemoryExtractLambda& lmdMemoryExtract);
 
     double m_timeOffset;      /**< time at module creation */
     MemTime m_initializeInfo; /**< memory usage and time at initialization */

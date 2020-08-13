@@ -11,8 +11,12 @@ from trackfindingcdc.run.training import TrainingRunMixin
 
 class BackgroundClusterFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsRun):
     """Run to record clusters encountered at the ClusterBackgroundDetector and retrain its mva method"""
+
+    #: number of events to generate
     n_events = 1000
+    #: use the generic event generator
     generator_module = "generic"
+    #: overlay background hits from the events in these files
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     def create_path(self):
@@ -21,6 +25,7 @@ class BackgroundClusterFilterTrainingRun(TrainingRunMixin, ReadOrGenerateEventsR
         path.add_module("TFCDC_WireHitPreparer",
                         flightTimeEstimation="outwards")
 
+        #: Process each event according to the user's desired task (train, eval, explore)
         if self.task == "train":
             varSets = [
                 "basic",

@@ -8,14 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SIGNALSIDEPARTICLEFILTERMODULE_H
-#define SIGNALSIDEPARTICLEFILTERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <analysis/VariableManager/Utility.h>
-
-#include <analysis/dataobjects/ParticleList.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 #include <memory>
@@ -33,26 +29,20 @@ namespace Belle2 {
 
   public:
 
-    /**
-     * Constructor: Sets the description, the properties and the parameters of the module.
-     */
+    /** constructor */
     SignalSideParticleFilterModule();
-
-    /**  */
-    virtual void initialize();
-
-    /**  */
-    virtual void event();
+    /** initialize the module (setup the data store) */
+    virtual void initialize() override;
+    /** process event */
+    virtual void event() override;
 
 
   private:
 
     std::vector<std::string> m_particleLists;  /**< Name of the input particle lists */
-
     std::string m_selection;  /**< Additional selection criteria */
     std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
   };
 }
 
-#endif /* SIGNALSIDEPARTICLEFILTERMODULE_H */

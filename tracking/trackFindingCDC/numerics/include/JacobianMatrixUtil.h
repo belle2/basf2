@@ -18,8 +18,6 @@
 
 #include <Eigen/Core>
 
-#include <type_traits>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 

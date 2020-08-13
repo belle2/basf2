@@ -85,7 +85,7 @@ namespace Belle2 {
     public:
       OPALFitterGSL();
       virtual ~OPALFitterGSL();
-      virtual double fit();
+      virtual double fit() override;
 
       /// Return error code
       /** Error code meanings:
@@ -97,16 +97,16 @@ namespace Belle2 {
        *  - 5: (keep going)
        */
       /// Get the error code of the last fit: 0=OK, 1=failed
-      virtual int getError() const;
+      virtual int getError() const override;
 
       /// Get the fit probability of the last fit
-      virtual double getProbability() const;
+      virtual double getProbability() const override;
       /// Get the chi**2 of the last fit
-      virtual double getChi2() const;
+      virtual double getChi2() const override;
       /// Get the number of degrees of freedom of the last fit
-      virtual int    getDoF() const;
+      virtual int    getDoF() const override;
       /// Get the number of iterations of the last fit
-      virtual int  getIterations() const;
+      virtual int  getIterations() const override;
 
       /// Get the number of hard constraints of the last fit
       virtual int    getNcon() const;
@@ -120,7 +120,7 @@ namespace Belle2 {
       /// Get the number of unmeasured parameters of the last fit
       virtual int    getNunm() const;
 
-      virtual bool initialize();
+      virtual bool initialize() override;
 
       /// Set the Debug Level
       virtual void setDebug(int debuglevel);

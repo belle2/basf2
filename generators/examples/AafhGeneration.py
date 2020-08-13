@@ -8,7 +8,7 @@
 # Example steering file
 ########################################################
 
-from basf2 import *
+from basf2 import set_log_level, LogLevel, create_path, process, register_module
 import os
 import sys
 
@@ -18,7 +18,7 @@ set_log_level(LogLevel.WARNING)
 main = create_path()
 
 # event info setter
-main.add_module("EventInfoSetter", expList=1, runList=1, evtNumList=100)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=100)
 
 # generator
 aafh = register_module('AafhInput')

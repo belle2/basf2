@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Christian Oswald, Yo Sato                                *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 #include <analysis/DecayDescriptor/DecayStringParticle.h>
 #include <framework/logging/Logger.h>
@@ -12,22 +22,25 @@ using namespace boost::algorithm;
 DecayDescriptorParticle::DecayDescriptorParticle() :
   m_strName(""),
   m_isSelected(false),
+  m_properties(0),
   m_strLabel(""),
   m_iPDGCode(0)
-{}
-
-DecayDescriptorParticle::DecayDescriptorParticle(const DecayDescriptorParticle& other) :
-  m_strName(other.m_strName),
-  m_isSelected(other.m_isSelected),
-  m_strLabel(other.m_strLabel),
-  m_iPDGCode(other.m_iPDGCode)
 {}
 
 bool DecayDescriptorParticle::init(const DecayStringParticle& p)
 {
   // Set member variables from the information in the DecayStringParticle p
   m_strName = p.m_strName;
-  m_isSelected = !p.m_strSelector.empty();
+  if (!p.m_strSelector.empty()) {
+    m_isSelected    = (p.m_strSelector.find('^') != std::string::npos);
+
+    if (p.m_strSelector.find('@') != std::string::npos)
+      m_properties |= Particle::PropertyFlags::c_IsUnspecified;
+    if (p.m_strSelector.find("(misID)") != std::string::npos)
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreMisID;
+    if (p.m_strSelector.find("(decay)") != std::string::npos)
+      m_properties |= Particle::PropertyFlags::c_IsIgnoreDecayInFlight;
+  }
   if (!p.m_strLabel.empty()) m_strLabel = p.m_strLabel;
   // Determine PDG code using the particle names defined in evt.pdl
   TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(m_strName.c_str());

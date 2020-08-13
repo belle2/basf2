@@ -12,17 +12,9 @@
 #define HE3TUBESTUDYMODULE_H
 
 #include <framework/core/HistoModule.h>
-#include <string>
-#include <vector>
 
-
-#include <TVector3.h>
-#include <TRandom.h>
 #include <TH1.h>
 #include <TH2.h>
-#include <TH3.h>
-#include <TFile.h>
-
 
 namespace Belle2 {
   namespace he3tube {
@@ -41,26 +33,42 @@ namespace Belle2 {
        */
       He3tubeStudyModule();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~He3tubeStudyModule();
 
-      /**  */
-      virtual void initialize();
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
+      virtual void initialize() override;
 
-      /**  */
-      virtual void beginRun();
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
+      virtual void beginRun() override;
 
-      /**  */
-      virtual void event();
+      /**
+       * Event processor.
+       */
+      virtual void event() override;
 
-      /**  */
-      virtual void endRun();
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
+      virtual void endRun() override;
 
-      /**  */
-      virtual void terminate();
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
+      virtual void terminate() override;
 
       /** Defines the histograms*/
-      virtual void defineHisto();
+      virtual void defineHisto() override;
 
 
     private:

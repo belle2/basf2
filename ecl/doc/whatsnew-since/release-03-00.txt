@@ -1,0 +1,7 @@
+Changes in the ecl package
+-------------------------------
+
+Modules
++++++++
+
+* Remove all getHypothesisId() calls and logic by a new logic that allows clusters to have multiple flags to indicate their hypothesis. This is used to remove duplicate clusters that are identical under different hypothesis.

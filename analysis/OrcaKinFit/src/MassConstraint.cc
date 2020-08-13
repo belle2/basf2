@@ -25,7 +25,6 @@
 #include<cassert>
 
 namespace Belle2 {
-
   namespace OrcaKinFit {
 
 
@@ -35,8 +34,7 @@ namespace Belle2 {
     {}
 
 // destructor
-    MassConstraint::~MassConstraint()
-    {}
+    MassConstraint::~MassConstraint() = default;
 
 // calulate current value of constraint function
     double MassConstraint::getValue() const
@@ -47,7 +45,7 @@ namespace Belle2 {
       double totpz[2] = {0, 0};
       for (unsigned int i = 0; i < fitobjects.size(); i++) {
         int index = (flags[i] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+        auto* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
         assert(pfo);
         totE[index]  += pfo->getE();
         totpx[index] += pfo->getPx();
@@ -75,7 +73,7 @@ namespace Belle2 {
       for (unsigned int i = 0; i < fitobjects.size(); i++) {
         int index = (flags[i] == 1) ? 0 : 1; // default is 1, but 2 may indicate fitobjects for a second W -> equal mass constraint!
         valid[index] = true;
-        ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+        auto* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
         assert(pfo);
         totE[index]  += pfo->getE();
         totpx[index] += pfo->getPx();
@@ -94,7 +92,7 @@ namespace Belle2 {
             int jndex = (flags[j] == 1) ? 0 : 1;
             if (jndex == index) {
 
-              ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[j]);
+              auto* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[j]);
               assert(pfo);
               B2ERROR(pfo->getName() <<
                       ": E =" << pfo->getE() <<
@@ -117,7 +115,7 @@ namespace Belle2 {
             assert(iglobal >= 0 && iglobal < idim);
             if (m2[index] != 0) {
 
-              ParticleFitObject* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
+              auto* pfo = dynamic_cast < ParticleFitObject* >(fitobjects[i]);
               assert(pfo);
 
               der[iglobal] =   totE[index]  * pfo->getDE(ilocal)
@@ -242,4 +240,3 @@ namespace Belle2 {
     }
   }// end OrcaKinFit namespace
 } // end Belle2 namespace
-

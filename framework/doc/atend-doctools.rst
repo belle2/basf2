@@ -50,15 +50,15 @@ the following rules:
    something like
 
    .. code-block:: rst
- 
+
      Analysis Package
      ================
- 
+
      Some text describing the structure of the package
- 
+
      .. toctree:
         :glob:
- 
+
         variables
         variable_groups/*
 
@@ -71,7 +71,7 @@ the following rules:
 6. Every file can limit the depth to which the table of contents is expanded by
    adding ``:tocdepth: N`` at the top of the file. The global table of contents
    is limited to two levels.
-   
+
    .. note:: This will not have any effect on latex output. For the PDF output
       the depth of the table of contents is always set to 3 levels
 
@@ -125,7 +125,7 @@ For example, in order to create a reference to this section this code was used
 .. code-block:: rst
 
   .. _referencing_things:
-  
+
   Referencing Components
   ----------------------
 
@@ -135,6 +135,11 @@ For example, in order to create a reference to this section this code was used
 We can then make a reference to this section by using ``:ref:`referencing_things``` which displays as :ref:`referencing_things`.
 If you prefer to have a numbered reference, we could instead use ``:numref:`referencing_things``` which displays as
 :numref:`referencing_things`.
+
+We also have enabled a extension to automatically define references for all
+sections. So without adding anything this section could also be referenced by
+``:ref:`framework/doc/atend-doctools:Referencing Components``` which still
+result in :ref:`framework/doc/atend-doctools:Referencing Components`.
 
 Inserting Figures
 -----------------
@@ -151,7 +156,7 @@ you can then place the image (in this case ``cat.jpg``) into the documentation b
   .. figure:: cat.jpg
     :width: 40em
     :align: center
-  
+
     Why is it always cats?
 
 where we have also included the reference ``cat_picture`` to use later.
@@ -254,7 +259,7 @@ The known sections you can and should use if appropriate are
 * ``Yields``
 
 
-You can see a more complete example of this format at 
+You can see a more complete example of this format at
 http://www.sphinx-doc.org/en/stable/ext/example_google.html
 
 .. _Google style docstrings: http://www.sphinx-doc.org/en/stable/ext/napoleon.html
@@ -291,7 +296,7 @@ Basf2 Module documentation can be added to sphinx automatically using
 
   .. rst:role:: modules
 
-    Explicitely choose the modules to document with a comma separated list of modules:
+    Explicitly choose the modules to document with a comma separated list of modules:
 
     .. code-block:: rst
 
@@ -318,6 +323,12 @@ Basf2 Module documentation can be added to sphinx automatically using
 
     if present it will try to include a graph showing the required, optional
     and registered DataStore elements.
+
+  .. rst:role:: noindex
+
+    if present the modules will not be added to the index. This is useful if
+    the same module is documented multiple times to select which of these
+    should show up in the index.
 
 
 For this automatic documentation to work all documentation strings passed to
@@ -357,7 +368,7 @@ We can also add documentation for basf2 variables with a very similar syntax to 
 
   .. rst:role:: regex-filter
 
-     Can be used to filter the selected variables by a pyton
+     Can be used to filter the selected variables by a python
      :py:mod:`regular expression <re>` For example to show all variables in
      the group "Kinematics" which begin with x
 
@@ -366,6 +377,13 @@ We can also add documentation for basf2 variables with a very similar syntax to 
         .. b2-variables::
            :group: Kinematics
            :regex-filter: ^x.*
+
+  .. rst:role:: noindex
+
+    if present the variables will not be added to the index. This is useful if
+    the same variable is documented multiple times to select which of these
+    should show up in the index.
+
 
 For this automatic documentation to work all documentation strings passed to
 ``REGISTER_VARIABLE()`` should be valid reStructuredText_ (see
@@ -385,10 +403,169 @@ Additional Features
 * All documented basf2 modules and variables are automatically added to a
   separate, alphabetic index page for easy lookup. They can be referenced with
 
-  - ``:ref:`b2-modindex``` (:ref:`b2-modindex`)  
+  - ``:ref:`b2-modindex``` (:ref:`b2-modindex`)
   - ``:ref:`b2-varindex``` (:ref:`b2-varindex`)
 
 * We have support for easy linking to JIRA issues by using
   ``:issue:`BII-XXXX```, for example ``:issue:`BII-8``` (:issue:`BII-8`)
 
+
+Additional boxes for the online lessons
+---------------------------------------
+
+.. sidebar:: Overview
+    :class: overview
+
+    **Teaching**: 10 min
+
+    **Exercises**: 5 min
+
+    **Prerequisites**: None
+
+    **Questions**:
+
+        * What is a particle list?
+        * What are final state particles?
+        * How can I specify decays?
+
+    **Objectives**:
+
+        * Reconstruct particles
+
+.. code:: rst
+
+    .. sidebar:: Overview
+        :class: overview
+
+        **Teaching**: 10 min
+
+        **Exercises**: 5 min
+
+        **Prerequisites**: None
+
+        **Questions**:
+
+            * What is a particle list?
+            * What are final state particles?
+            * How can I specify decays?
+
+        **Objectives**:
+
+            * Reconstruct particles
+
+
+No hands-on training without some nice exercises:
+
+.. code:: rst
+
+    .. admonition:: Question
+       :class: exercise stacked
+
+       What's the object-oriented way to get rich?
+
+    .. admonition:: Hint
+       :class: toggle xhint stacked
+
+       Think about relationships between classes!
+
+    .. admonition:: Solution
+       :class: toggle solution
+
+       Inheritance.
+
+.. admonition:: Question
+   :class: exercise stacked
+
+   What's the object-oriented way to get rich?
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   Think about relationships between classes!
+
+.. admonition:: Solution
+   :class: toggle solution
+
+   Inheritance.
+
+**Notes**:
+
+* You can also use ``.. admonition:: Exercise`` for an exercise rather than a question
+  (in general the content after ``admonition::`` will always be the title).
+* The ``stacked`` class removes the space after the question block, so that the solution
+  block is directly joined. If you want to write some text after your question, simply
+  remove this class.
+* Note that the class for the hint box is ``xhint`` (short for exercise-hint),
+  not ``hint`` (the latter is already in use for "normal" hint boxes)
+
+.. code:: rst
+
+    .. admonition:: Key points
+        :class: key-points
+
+        * There are 10 kinds of people in this world:
+          Those who understand binary, those who don't,
+          and those who weren't expecting a base 3 joke.
+
+.. admonition:: Key points
+    :class: key-points
+
+    * There are 10 kinds of people in this world:
+      Those who understand binary, those who don't,
+      and those who weren't expecting a base 3 joke.
+
+
+How to test locally
+-------------------
+
+You can test locally your changes in the Sphinx documentation by compiling your
+code with the following command:
+
+.. code:: bash
+
+    scons --sphinx html
+
+The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
+navigate it with your favorite browser to check if the output is what you
+expect.
+
+Alternatively you can also build the sphinx documentation without building any
+code with
+
+.. code:: bash
+
+    b2code-sphinx-build
+
+which will be slightly faster. If you're only interested in sphinx warnings,
+use
+
+.. code:: bash
+
+    b2code-sphinx-warnings
+
+If you are working on a remote server with port ``8XXXX`` forwarded to your local
+machine (as when running a Jupyter notebook), you can also start a tiny web server on
+the remote machine and access it from your local machine to view the rendered
+documentation:
+
+.. code:: bash
+
+    # log in to remote with port forwarding
+    # (8XXX is a unique number of your choice)
+    ssh login.cc.kek.jp -L 8XXX:localhost:8XXX
+    # set up basf2
+    cd ${BELLE2_LOCAL_DIR}/build/html
+    python3 -m http.server 8XXX
+
+Now navigate to ``http://0.0.0.0:8XXX`` on your local machine to see the rendered
+web pages.
+
+Previewing documentation changes in a pull request
+--------------------------------------------------
+
+1. Open your PR
+2. Wait for it to build
+3. click on the build status and open the detailed build results
+4. open the "Artifacts" tab
+5. click "Sphinx Documentation"
 

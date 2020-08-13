@@ -36,22 +36,22 @@ namespace Belle2 {
     static const int DISABLED = 0;
 
   public:
-    NSMCommand() throw() {}
-    NSMCommand(const Enum& e) throw() : Enum(e) {}
-    NSMCommand(const NSMCommand& cmd) throw() : Enum(cmd) {}
-    NSMCommand(const char* label) throw() { *this = label; }
-    NSMCommand(const std::string& label) throw() { *this = label; }
-    NSMCommand(int id) throw() { *this = id; }
-    ~NSMCommand() throw() {}
+    NSMCommand() {}
+    NSMCommand(const Enum& e) : Enum(e) {}
+    NSMCommand(const NSMCommand& cmd) : Enum(cmd) {}
+    NSMCommand(const char* label) { *this = label; }
+    NSMCommand(const std::string& label) { *this = label; }
+    NSMCommand(int id) { *this = id; }
+    ~NSMCommand() {}
 
   public:
-    NSMCommand(int id, const char* label) throw()
+    NSMCommand(int id, const char* label)
       : Enum(id, label) {}
 
   public:
-    const NSMCommand& operator=(const std::string& label) throw();
-    const NSMCommand& operator=(const char* label) throw();
-    const NSMCommand& operator=(int id) throw();
+    const NSMCommand& operator=(const std::string& label);
+    const NSMCommand& operator=(const char* label);
+    const NSMCommand& operator=(int id);
 
   };
 

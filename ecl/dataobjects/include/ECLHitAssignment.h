@@ -8,13 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLHITASSIGNMENT_H
-#define ECLHITASSIGNMENT_H
+#pragma once
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationsObject.h>
-
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -67,4 +63,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

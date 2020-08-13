@@ -14,18 +14,12 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <svd/dataobjects/SVDHistograms.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
-#include <TList.h>
-
-// forward declarations
-class TTree;
-class TFile;
-
 
 namespace Belle2 {
   /**
@@ -41,46 +35,32 @@ namespace Belle2 {
      */
     SVDLatencyCalibrationModule();
 
-    /**  */
-    virtual void initialize();
+    /**  initialize */
+    virtual void initialize() override;
 
-    /**  */
-    virtual void event();
+    /**  begin run*/
+    virtual void beginRun() override;
 
-    /**  */
-    virtual void terminate();
+    /**  event*/
+    virtual void event() override;
+
+    /**  end run */
+    virtual void endRun() override;
+
+
+  private:
 
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
 
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
 
-    TH1F* h_maxAmplitudeU; /**< histogram containing the maximum of the 6 samples of the U SVDShaperDigit*/
-    TH1F* h_maxAmplitudeV; /**< histogram containing the maximum of the 6 samples of the V SVDShaperDigit*/
-    TH1F* h_ladder;
 
-    TH1F* h_maxAmplitudeU_L3fw;
-    TH1F* h_maxAmplitudeV_L3fw;
-    TH1F* h_maxAmplitudeU_L3bw;
-    TH1F* h_maxAmplitudeV_L3bw;
-    TH1F* h_maxAmplitudeU_L4bw;
-    TH1F* h_maxAmplitudeV_L4bw;
-    TH1F* h_maxAmplitudeU_L5bw;
-    TH1F* h_maxAmplitudeV_L5bw;
-    TH1F* h_maxAmplitudeU_L6bw;
-    TH1F* h_maxAmplitudeV_L6bw;
-
-    TList* m_histoList;
-
-  private:
+    SVDHistograms<TH1F>* m_histo_maxAmplitude = nullptr; /**<vector of histograms containing the max bin distribution*/
 
     std::string m_shapersListName; /**< shapers list name */
     StoreArray<SVDShaperDigit> m_digits; /**< SVD digits*/
-
-    TH1F* createHistogram1D(const char* name, const char* title,
-                            Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList);
 
   };
 }

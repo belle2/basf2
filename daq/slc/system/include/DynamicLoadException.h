@@ -8,7 +8,7 @@ namespace Belle2 {
   class DynamicLoadException : public Exception {
 
   public:
-    DynamicLoadException(const std::string& format, ...) throw();
+    DynamicLoadException(const std::string& format, ...);
 
   };
 

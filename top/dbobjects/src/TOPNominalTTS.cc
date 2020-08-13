@@ -10,7 +10,6 @@
 
 #include <top/dbobjects/TOPNominalTTS.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
 #include <iostream>
 #include <TRandom.h>
 
@@ -71,6 +70,7 @@ namespace Belle2 {
       cout << " -> vector is empty!" << endl;
       return;
     }
+    cout << " PMT type: " << m_type << endl;
 
     int i = 0;
     for (const auto& tts : m_tts) {

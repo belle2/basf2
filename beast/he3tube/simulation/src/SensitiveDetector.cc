@@ -12,11 +12,8 @@
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
 #include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
 
-
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>

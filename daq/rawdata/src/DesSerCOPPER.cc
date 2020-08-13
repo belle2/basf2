@@ -9,6 +9,10 @@
 #include <daq/rawdata/modules/copper.h>
 #include <daq/rawdata/DesSerCOPPER.h>
 
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
 using namespace std;
 using namespace Belle2;
 

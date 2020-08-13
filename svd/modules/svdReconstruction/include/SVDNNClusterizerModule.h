@@ -13,13 +13,11 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/RelationArray.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/reconstruction/NNWaveFitter.h>
 #include <map>
 #include <vector>
-#include <memory>
 
 namespace Belle2 {
 
@@ -46,10 +44,10 @@ namespace Belle2 {
       SVDNNClusterizerModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
 
     protected:
 

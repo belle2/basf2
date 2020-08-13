@@ -10,9 +10,7 @@
 
 #pragma once
 #include <TObject.h>
-#include <TH2F.h>
 #include <string>
-#include <TGraph.h>
 #include <TTimeStamp.h>
 
 namespace Belle2 {

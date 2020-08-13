@@ -18,6 +18,11 @@
 ######################################################
 
 from basf2 import *
+from basf2 import conditions as b2conditions
+
+# For some runs, this script stops without this.
+b2conditions.override_globaltags()
+
 
 # Set the log level to show only error and fatal messages
 # set_log_level(LogLevel.ERROR)

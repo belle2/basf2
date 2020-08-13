@@ -8,17 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef KORALWINPUTMODULE_H
-#define KORALWINPUTMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
+/* KoralW header. */
 #include <generators/koralw/KoralW.h>
 
-#include <mdst/dataobjects/MCParticle.h>
+/* Belle 2 headers. */
+#include <framework/core/Module.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
-#include <generators/utilities/InitialParticleGeneration.h>
-
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {
@@ -41,22 +41,20 @@ namespace Belle2 {
     virtual ~KoralWInputModule();
 
     /** Initializes the module. */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Method is called for each event. */
-    virtual void event();
+    virtual void event() override;
 
     /** Method is called at the end of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
 
   protected:
 
     /** Module parameters */
-    int m_boostMode;             /**< The mode of the boost (0 = no boost, 1 = Belle II, 2 = Belle). */
     std::string m_dataPath;      /**< The path to the KoralW input data files. */
     std::string m_userDataFile;  /**< The filename of the user KoralW input data file. */
-    int m_seed;                  /**< The random seed of the generator. */
 
     /** Variables */
     KoralW m_generator;        /**< The KoralW generator. */
@@ -75,6 +73,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-
-#endif /* KORALWINPUTMODULE_H */

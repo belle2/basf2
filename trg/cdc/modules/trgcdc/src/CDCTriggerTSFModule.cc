@@ -60,6 +60,10 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_outerTrueLRTableFilename,
            "Filename for the true left/right table for the outer super layers.",
            string("outerTrueLRTable.dat"));
+  addParam("Deadchannel",
+           m_deadchflag,
+           "Mask dead channels based on database. True:mask False:unmask",
+           false);
 }
 
 void
@@ -98,7 +102,8 @@ CDCTriggerTSFModule::initialize()
   int is = -1;
   int ias = -1;
   int iss = -1;
-  unsigned axialStereoLayerId = 0;
+  /* cppcheck-suppress variableScope */
+  unsigned axialStereoLayerId;
   unsigned axialStereoSuperLayerId = 0;
   unsigned nWires = 0;
   for (unsigned i = 0; i < nLayers; i++) {
@@ -251,6 +256,28 @@ CDCTriggerTSFModule::initialize()
       layer->push_back(ts);
     }
   }
+
+  if (m_deadchflag) {
+    if (!m_db_deadchannel) {
+      B2INFO("No database for CDCTRG dead channel mapping. Channel masking is skipped.");
+      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+        for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
+          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+            deadch_map[i][j][k] = true;
+          }
+        }
+      }
+    } else {
+      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+        for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
+          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+            deadch_map[i][j][k] = m_db_deadchannel->getdeadch(i, j, k);
+          }
+        }
+      }
+    }
+  }
+
 }
 
 void
@@ -264,6 +291,12 @@ CDCTriggerTSFModule::event()
   for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
     // get the wire
     const CDCHit& h = *m_cdcHits[i];
+    // mask dead channel
+    if (m_deadchflag) {
+      if (!deadch_map[h.getISuperLayer()][h.getILayer()][h.getIWire()]) {
+        continue;
+      }
+    }
     TRGCDCWire& w =
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
 
@@ -284,6 +317,23 @@ CDCTriggerTSFModule::event()
     w.hit(hit);
   }
 
+
+
+  // neibor supression
+  unsigned neibor_hit[10][1000] = {};
+  for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
+    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
+      TRGCDCSegment& s = (TRGCDCSegment&) tsLayers[isl]->cell(its);
+      // simulate with logicLUTFlag = true
+      // TODO: either add parameter or remove the option in Segment::simulate()
+      s.simulate(m_clockSimulation, true,
+                 m_CDCHitCollectionName, m_TSHitCollectionName);
+      if (!m_clockSimulation && s.signal().active() && s.priorityPosition() == 3) {
+        neibor_hit[isl][its] = 1;
+      }
+    }
+  }
+
   // simulate track segments and create track segment hits
   for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
     for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
@@ -296,6 +346,11 @@ CDCTriggerTSFModule::event()
       // for clock simulation already done in simulate
       // TODO: move it to simulate also for simulateWithoutClock?
       if (!m_clockSimulation && s.signal().active()) {
+
+        //neibor supression
+        if (s.priorityPosition() != 3 && (neibor_hit[isl][(its - 1) % tsLayers[isl]->nCells()] == 1
+                                          || neibor_hit[isl][(its + 1) % tsLayers[isl]->nCells()] == 1))continue;
+
         const CDCHit* priorityHit = m_cdcHits[s.priority().hit()->iCDCHit()];
         const CDCTriggerSegmentHit* tsHit =
           m_segmentHits.appendNew(*priorityHit,
@@ -389,6 +444,7 @@ CDCTriggerTSFModule::terminate()
       outerFile << "\n";
     }
   }
+
 }
 
 void

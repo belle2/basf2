@@ -16,10 +16,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 
-#include <vxd/dataobjects/VxdID.h>
-
 #include <tracking/dataobjects/DATCONSVDSpacePoint.h>
-
 
 namespace Belle2 {
 
@@ -43,10 +40,10 @@ namespace Belle2 {
     *
     * prepares all store- and relationArrays.
     */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** eventWise jobs (e.g. storing spacepoints */
-    virtual void event();
+    virtual void event() override;
 
 
   protected:

@@ -33,7 +33,7 @@ namespace Belle2 {
      * @param xBest Maximal number of best candidates to be stored per family.
      * @param estimationMethod Quality estimator to be used.
      */
-    SPTCSelectorXBestPerFamily(unsigned short xBest = 5, std::string estimationMethod = std::string("tripletFit")):
+    SPTCSelectorXBestPerFamily(unsigned short xBest = 5, const std::string& estimationMethod = std::string("tripletFit")):
       m_xBest(xBest)
     {
       if (estimationMethod == "tripletFit") {

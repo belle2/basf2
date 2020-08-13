@@ -56,6 +56,7 @@ namespace {
   std::vector<CDCRLWireHit> getRLWireHitSegment(const CDCSegment3D& segment3D)
   {
     std::vector<CDCRLWireHit> result;
+    result.reserve(segment3D.size());
     for (const CDCRecoHit3D& recoHit3D : segment3D) {
       result.push_back(recoHit3D.getRLWireHit());
     }
@@ -149,7 +150,7 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   std::map<const CDCSegment3D*, InTracks> inTracksBySegment;
 
   // Split tracks into segments - break segment such that there will be matching pieces with the other tracks
-  for (const std::pair<std::pair<int, size_t>, const CDCTrack*>  rankedTrack : rankedTracks) {
+  for (const std::pair<std::pair<int, size_t>, const CDCTrack*>&  rankedTrack : rankedTracks) {
     // const std::pair<ISuperLayer, size_t> rank = rankedTrack.first;
     const CDCTrack* track = rankedTrack.second;
     std::vector<std::pair<InTracks, CDCSegment3D> > segmentsInTrack;

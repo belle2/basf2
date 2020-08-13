@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,16 +12,9 @@
 #include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
-
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-
-#include <vxd/dataobjects/VxdID.h>
-
 namespace Belle2 {
   /// Base filter for CKF SVD states
-  template <class AFilter>
+  template <class AFilter, class APrefilter = AFilter>
   class LayerSVDRelationFilter : public TrackFindingCDC::RelationFilter<CKFToSVDState> {
     /// The parent class
     using Super = TrackFindingCDC::RelationFilter<CKFToSVDState>;
@@ -54,6 +47,8 @@ namespace Belle2 {
     int m_param_hitJumping = 1;
     /// Filter for rejecting the states
     AFilter m_filter;
+    /// Loose pre-filter to reject possibleTos
+    APrefilter m_prefilter;
     /// Cached number of ladders per layer
     std::map<short, unsigned long> m_maximalLadderCache;
   };

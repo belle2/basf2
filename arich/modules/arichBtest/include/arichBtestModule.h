@@ -47,29 +47,29 @@ namespace Belle2 {
     /*! Function is called only once at the beginning of your job at the beginning of the corresponding module.
         Things that can be done here, should be done here, as it is relatively cheap in terms of CPU time.
     */
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! Called when entering a new run
     /*! At the beginning of each run, the function gives you the chance to change run dependent constants like alignment parameters, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     //! Running over all events
     /*! Function is called for each evRunning over all events
         This means, this function is called very often, and good performance of the code is of strong interest.
     */
-    virtual void event();
+    virtual void event() override;
 
     //! Is called after processing the last event of a run
     /*! Good e.g. for storing stuff, that you want to aggregate over one run.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     //! Is called at the end of your Module
     /*! Function is called only once at the end of your job at the end of the corresponding module.
         This function is for cleaning up, closing files, etc.
     */
-    virtual void terminate();
+    virtual void terminate() override;
 
   protected:
 
@@ -77,7 +77,7 @@ namespace Belle2 {
     //! Skip the data part of the record
     int skipdata(gzFile fp);
     //! Read the MWPC information from the data buffer
-    void readmwpc(unsigned int* dbuf, unsigned int len);
+    void readmwpc(unsigned int* dbuf, unsigned int len, int print = 0);
     //! Read the HAPD hits from the data buffer
     int readhapd(unsigned int len, unsigned int* data);
     //! Read the data from the file (can be compressed)

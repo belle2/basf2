@@ -47,6 +47,7 @@ void TrackLinker::apply(const std::vector<CDCTrack>& inputTracks, std::vector<CD
   m_cellularPathFinder.apply(trackPtrs, m_trackRelations, m_trackPaths);
 
   // Put the linked tracks together
+  outputTracks.reserve(outputTracks.size() + m_trackPaths.size());
   for (const std::vector<const CDCTrack*>& trackPath : m_trackPaths) {
     outputTracks.push_back(CDCTrack::condense(trackPath));
   }

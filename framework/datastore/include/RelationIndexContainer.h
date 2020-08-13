@@ -16,8 +16,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <string>
-
 namespace Belle2 {
 
   /** Baseclass for all RelationIndexContainers.
@@ -130,7 +128,7 @@ namespace Belle2 {
     void rebuild(bool force = false);
 
     /** Clear the index (at the end of an event) */
-    virtual void clear() { m_index.clear(); }
+    virtual void clear() override { m_index.clear(); }
 
     /** Instance of the index. */
     ElementIndex m_index;

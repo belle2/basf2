@@ -23,13 +23,8 @@ namespace Belle2 {
     public:
       /**
        * Constructor.
-       * @param animate Switch to make an animated event display by means of animated SVG.
-       *                Animate the display by uncovering the drawn objects in order of their time of flight
-       *                This can be seen in most standard browsers. Note however that you should switch of
-       *                the wires in this case to reduce the rendering load.
-       *                Switch to make an animated event display by means of animated SVG.
        */
-      explicit CDCSVGPlotter(bool animate = false, bool forwardFade = false);
+      CDCSVGPlotter(bool animate = false, bool forwardFade = false);
 
       /**
        * Make a copy of the current status of the plotter.
@@ -321,9 +316,6 @@ namespace Belle2 {
       void draw(const AObject& object, const AttributeMap& attributeMap);
 
     private:
-      /// Switch to activate the uncovering of hits by their (mc) time of flight.
-      bool m_animate = false;
-
       /// The plotter instance to translate event data objects to svg expressions.
       EventDataPlotter m_eventdataPlotter;
     };

@@ -14,7 +14,6 @@
 #ifndef TRGCDCCell_FLAG_
 #define TRGCDCCell_FLAG_
 
-#include <vector>
 #include "CLHEP/Geometry/Vector3D.h"
 #include "CLHEP/Geometry/Point3D.h"
 #include "trg/trg/Signal.h"
@@ -26,12 +25,13 @@
 
 namespace Belle2 {
 
+  //! 3D point
   typedef HepGeom::Point3D<double>  Point3D;
+  //! 3D Vector
   typedef HepGeom::Vector3D<double>  Vector3D;
 
   class TRGCDC;
   class TRGCDCCellHit;
-  class TRGCDCTrackSegment;
 
 /// A class to represent a wire in CDC.
   class TRGCDCCell {
@@ -105,10 +105,12 @@ namespace Belle2 {
 
     /// returns position in backward endplate.
     const HepGeom::Point3D<double>& backwardPosition(void) const;
+    /// position in backward endplate.
     double* backwardPosition(double p[3]) const;
 
     /// returns middle position of a wire. z componet is 0.
     const HepGeom::Point3D<double>& xyPosition(void) const;
+    /// middle position of a wire. z componet is 0.
     double* xyPosition(double p[3]) const;
 
     /// returns direction vector of the wire.

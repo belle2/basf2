@@ -46,26 +46,29 @@ gROOT.ProcessLine('struct EventData {\
     float cluster_pull;\
     float cluster_residual;\
     float truehit_position;\
+    float truehit_interstripPosition;\
     float truehit_deposEnergy;\
     float truehit_lossmomentum;\
+    float truehit_time;\
     };')
 
 from ROOT import EventData
 
 
 class SVDValidationTTree(Module):
+    '''class to produced the validation ttree '''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTree, self).__init__()
-        # Output ROOT file
-        self.file = ROOT.TFile('../SVDValidationTTree.root', 'recreate')
-        # TTrees for output data
-        self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
 
-        # Instance of the EventData class
+        self.file = ROOT.TFile('../SVDValidationTTree.root', 'recreate')
+        '''Output ROOT file'''
+        self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
+        '''TTrees for output data'''
         self.data = EventData()
+        '''Instance of the EventData class'''
 
         # Declare tree branches
         for key in EventData.__dict__:
@@ -122,10 +125,10 @@ class SVDValidationTTree(Module):
                 # Interstrip position calculations
                 if cluster.isUCluster():
                     strip_dir = 0
-                    strip_pitch = sensorInfo.getUPitch(cluster_position)
+                    strip_pitch = sensorInfo.getUPitch(truehit.getV())
                 else:
                     strip_dir = 1
-                    strip_pitch = sensorInfo.getVPitch(cluster_position)
+                    strip_pitch = sensorInfo.getVPitch(truehit.getU())
                 self.data.strip_dir = strip_dir
                 self.data.strip_pitch = strip_pitch
                 cluster_interstripPosition = cluster_position % strip_pitch / strip_pitch
@@ -172,8 +175,11 @@ class SVDValidationTTree(Module):
                 self.data.cluster_pull = cluster_pull
                 # Truehit information
                 self.data.truehit_position = truehitPos
+                truehit_interstripPosition = truehitPos % strip_pitch / strip_pitch
+                self.data.truehit_interstripPosition = truehit_interstripPosition
                 self.data.truehit_deposEnergy = truehit.getEnergyDep()
                 self.data.truehit_lossmomentum = truehit.getEntryMomentum().Mag() - truehit.getExitMomentum().Mag()
+                self.data.truehit_time = truehit.getGlobalTime()
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()

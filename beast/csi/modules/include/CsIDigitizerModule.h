@@ -48,22 +48,22 @@ namespace Belle2 {
       virtual ~CsIDigitizerModule();
 
       /** Register input and output data */
-      virtual void initialize();
+      virtual void initialize() override;
 
       /** To do before each runs. NOOP.*/
-      virtual void beginRun();
+      virtual void beginRun() override;
 
       /** Each event
        * This is where the actual digitization is done,
        * and the hits are written to the DataStore
        */
-      virtual void event();
+      virtual void event() override;
 
       /** Clean up. NOOP. */
-      virtual void endRun();
+      virtual void endRun() override;
 
       /** Final clean up. CPU clock stops */
-      virtual void terminate();
+      virtual void terminate() override;
 
 
     private:
@@ -102,7 +102,7 @@ namespace Belle2 {
        * @param _u: The input to the system
        * @param _y0: Initial value of the output
        * @param _dt: Integration step (in ns)
-       * @param _tau: Time constant of the system
+       * @param _tSlow: Time constant of the system
        * @param _delay: Time delay of the system (in ns)
        *
        * @return a Signal corresponding tot he time response
@@ -131,6 +131,7 @@ namespace Belle2 {
        * @param _TriggerHoldoff: Width of signal integration (in ns)
        * @param _GateWidth: Width of signal integration (in ns)
        * @param _GateOffset: Width of signal integration (in ns)
+       * @param _recordTraces: Record traces
        *
        * @return The maximum ADC value (to check for saturations)
        */

@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Marko Staric                                             *
+ * Contributors: Marko Staric , Andrii Natochii                           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,6 +16,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TRotation.h>
+#include <generators/SAD/ReaderSAD.h>
 
 namespace Belle2 {
 
@@ -40,30 +41,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -84,6 +85,16 @@ namespace Belle2 {
       double py = 0; /**< py at lost position [GeV] */
       double E = 0;  /**< E at lost position [GeV] (in fact momentum magnitude!) */
       double rate = 0; /**< lost rate [Hz] */
+      double ss = 0; /**< scattered position (|s|<Ltot/2) [m] */
+      int nturn = 0; /**< number of turns from scattered to lost */
+      double sraw = 0; /**< s at lost position [m] before matching G4 beam pipe inner surface */
+      double ssraw = 0; /**< scattered position [m] */
+      double xraw = 0; /**< x at lost position [m] before matching G4 beam pipe inner surface */
+      double yraw = 0; /**< y at lost position [m] before matching G4 beam pipe inner surface */
+      double r = 0; /**< sqrt(x*x+y*y) [m] */
+      double rr = 0; /**< sqrt(xraw*xraw+yraw*yraw) [m] */
+      double dp_over_p0 = 0; /**< momentum deviation of the lost particle */
+      double watt = 0; /**< loss wattage [W] */
     };
 
     std::string m_fileName; /**< name of the SAD file converted to root */
@@ -95,6 +106,9 @@ namespace Belle2 {
     TTree* m_tree = 0;  /**< root tree pointer */
     SADTree m_sad;      /**< TTree entry data */
     TRotation m_rotation; /**< rotation from SAD to Belle II frame */
+    ReaderSAD m_readerSAD;     /**< the transformation from SAD to Belle II system for the far beamline */
+    int m_ring = 0 ; /**< ring number, 1-HER, 2-LER */
+    std::vector<int> m_sectionOrdering; /**< superKEKB section ordering */
 
     std::vector<double> m_rates; /**< cumulative rates of SAD particles [Hz] */
     int m_numEvents = 0 ; /**< number of events to generate */

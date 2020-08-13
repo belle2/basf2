@@ -1,0 +1,23 @@
+# EventType: 1250920011
+# Descriptor: [B+ -> K+ tau- e+]cc
+# NickName: Bu_K+tau-e+
+# Documentation: b->sll' LFV process
+# Tested: 
+# Physics WG: EWP
+# Responsible: Trevor Shillington, Saurabh Sandilya
+# Email: trshillington@hep.physics.mcgill.ca, saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20181107
+#
+Decay Upsilon(4S)
+0.5   B+sig	B-         VSS;
+0.5   B-sig 	B+         VSS;
+Enddecay
+
+Decay B+sig
+1.0   K+	tau-	e+	PHOTOS	PHSP;
+Enddecay
+CDecay B-sig
+
+#
+End

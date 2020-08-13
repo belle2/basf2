@@ -19,18 +19,17 @@ using namespace Belle2;
 void
 DATCONTrackingModule::houghTrafo2d(svdHitMap& mapClusters, bool u_side)
 {
-  int hitID;
-  double rStrip;
-  TVector3 pos;
-  TVector2 hough, center;
-  VxdID sensorID;
+  TVector2 center;
 
   center.Set(m_trackCenterX, m_trackCenterY);
 
   for (auto& iter : mapClusters) {
-    hitID = iter.first;
-    sensorID = iter.second.first;
-    pos = iter.second.second;
+    double rStrip = 0;
+    int hitID = iter.first;
+    VxdID sensorID = iter.second.first;
+    TVector3 pos = iter.second.second;
+    TVector2 hough;
+
     if (!u_side) {
       if (m_usePhase2Simulation) {
         hough.Set(pos.X(), pos.Z());

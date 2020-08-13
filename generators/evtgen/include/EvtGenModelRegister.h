@@ -8,12 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTGENMODELREGISTER_H
-#define EVTGENMODELREGISTER_H
+#pragma once
 
 #include <list>
 #include <vector>
-#include <memory>
 
 class EvtDecayBase;
 
@@ -77,4 +75,3 @@ namespace Belle2 {
   }
 
 } //Belle2 namespace
-#endif

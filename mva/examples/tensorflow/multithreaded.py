@@ -130,6 +130,12 @@ def partial_fit(state, X, S, y, w, epoch):
 
 
 if __name__ == "__main__":
+    from basf2 import conditions
+    # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
+    conditions.testing_payloads = [
+        'localdb/database.txt'
+    ]
+
     import basf2_mva
     import json
 

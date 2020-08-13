@@ -4,7 +4,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,12 +12,13 @@
 
 #include <analysis/VertexFitting/TreeFitter/ParticleBase.h>
 #include <analysis/VertexFitting/TreeFitter/MergedConstraint.h>
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 
 namespace TreeFitter {
 
   class FitParams ;
   class ParticleBase ;
-
+  class ConstraintConfiguration;
   /** this class does a lot of stuff:
   Build decaytree structure allowing to index particles and handle the filtering of constraints across the tree
   */
@@ -30,21 +31,21 @@ namespace TreeFitter {
 
     /**  constructor   */
     DecayChain(Belle2::Particle* bc,
-               bool forceFitAll = false,
-               const bool ipConstraint = false,
-               const bool customOrigin = false,
-               const std::vector<double> customOriginVertex = {0, 0, 0},
-               const std::vector<double> customOriginCovariance = {0, 0, 0, 0, 0, 0, 0, 0, 0,}
+               const ConstraintConfiguration& config,
+               bool forceFitAll = false
               );
 
     /**  destructor   */
     ~DecayChain();
 
     /** initalize the chain */
-    ErrCode initialize(FitParams* par);
+    ErrCode initialize(FitParams& par);
 
     /** filter down the chain */
-    ErrCode filter(FitParams& par, bool firstpass);
+    ErrCode filter(FitParams& par);
+
+    /** filter with respect to a previous iteration for better stability */
+    ErrCode filterWithReference(FitParams& par, const FitParams& ref);
 
     /** get dimension   */
     int dim() const { return m_dim;}
@@ -52,8 +53,11 @@ namespace TreeFitter {
     /** init contraintlist   */
     void initConstraintList();
 
+    /** remove constraints from list */
+    void removeConstraintFromList();
+
     /** get the chi2 for the head of the chain */
-    double chiSquare(const FitParams* par) const;
+    double chiSquare(const FitParams& par) const;
 
     /** get mother */
     ParticleBase* mother() { return m_headOfChain ; }
@@ -82,16 +86,7 @@ namespace TreeFitter {
     /** !NOT IMPLEMENTED   */
     int momIndex() const ;
 
-    /** get chi2 sum for the constraints */
-    double getChi2Sum() const {return m_chi2SumConstraints; }
-
-    /** !DUPLICATED FUNCTION get the chi2 for the head of the chain */
-    double getChainsChi2(const FitParams* par)const {return m_headOfChain->chiSquare(par);}
-
   private:
-
-    /** chi2 sum for the constraints has to be devided by the number of constraints in the getter */
-    mutable double m_chi2SumConstraints;
 
     mutable int m_dim ; /**< the dimension of constraint */
 
@@ -102,12 +97,6 @@ namespace TreeFitter {
     /** list of constraints */
     ParticleBase::constraintlist m_constraintlist ;
 
-    ///** merged constraints */
-    //std::vector<Constraint*> m_mergedconstraintlist ;
-
-    ///**    */
-    //MergedConstraint mergedconstraint ;
-
     /** typedef for a map of a particle to a TreeFitter::ParticleBase */
     typedef std::map<Belle2::Particle*, const ParticleBase*> ParticleMap ;
 
@@ -116,6 +105,9 @@ namespace TreeFitter {
 
     /** internal class member to check if we own the chain */
     const bool m_isOwner ;
+
+    /** config container */
+    const ConstraintConfiguration m_config;
 
   };
 

@@ -1,2 +1,0 @@
-required lnet snmp libs ibs:
-sudo yum install net-snmp net-snmp-agent-libs net-snmp-utils net-snmp-gui net-snmp-python net-snmp-devel

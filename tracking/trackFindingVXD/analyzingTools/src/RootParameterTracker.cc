@@ -19,7 +19,7 @@ void RootParameterTracker::collectData4DoubleAlgorithms(std::string tcTypeName, 
   auto* foundTCTypeData = m_algoDataDouble.find(tcTypeName); // a KeyValBox with all algorithms and data collected to given tcTypeName
 
   // skip if there is nothing stored for this tcType:
-  if (foundTCTypeData == NULL) { return; }
+  if (foundTCTypeData == nullptr) { return; }
 
   // looping over algorithms:
   for (auto& entry : *foundTCTypeData) {
@@ -62,7 +62,7 @@ void RootParameterTracker::collectData4IntAlgorithms(std::string tcTypeName, con
   auto* foundTCTypeData = m_algoDataInt.find(tcTypeName); // a KeyValBox with all algorithms and data collected to given tcTypeName
 
   // skip if there is nothing stored for this tcType:
-  if (foundTCTypeData == NULL) { return; }
+  if (foundTCTypeData == nullptr) { return; }
 
   // looping over algorithms:
   for (auto& entry : *foundTCTypeData) {
@@ -106,7 +106,7 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
                             tcTypeName); // a KeyValBox with all algorithms and data collected to given tcTypeName
 
   // skip if there is nothing stored for this tcType:
-  if (foundTCTypeData == NULL) { return; }
+  if (foundTCTypeData == nullptr) { return; }
 
   // looping over algorithms:
   for (auto& entry : *foundTCTypeData) {
@@ -127,7 +127,14 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
     try {
       vector<double> calcVal = anAlgorithm->calcData(aTC);
       dataVector->push_back(calcVal);
-      auto printVec = [&]() -> string { string out; for (double val : calcVal) { out += (" " + to_string(val)); } return (out += "\n"); };
+      auto printVec = [&]() -> string {
+        string out;
+        for (double val : calcVal)
+        {
+          out += (" " + to_string(val));
+        }
+        return (out += "\n");
+      };
       B2DEBUG(20, "RootParameterTracker::collectData4VecDoubleAlgorithms(), tc with type " << tcTypeName <<
               " and applied algorithm " << algoName <<
               " and got: " << printVec() <<
@@ -179,7 +186,7 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
 
 /// make sure that container for algorithms of given tcType exists:
   auto* algorithms4tcType = m_algoDataDouble.find(tcTypeName);
-  if (algorithms4tcType == NULL) {
+  if (algorithms4tcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), tcType " << tcTypeName <<
             " not yet added to m_algoDataDouble, doing it now...");
     m_algoDataDouble.push_back({
@@ -193,7 +200,7 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
 
 /// make sure that algorithm and its dataStuff exists:
   auto* data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
-  if (data4AlgorithmOftcType == NULL) {
+  if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataDouble[tcType], doing it now...");
     AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactoryDouble<double, AnalizerTCInfo, TVector3>
@@ -209,7 +216,7 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
 
     /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination:
     auto* newBranch = tree4tcType->Branch(algorithmName.c_str(), data4AlgorithmOftcType->second);
-    if (newBranch == NULL) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
+    if (newBranch == nullptr) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
     // newBranch->Print();
   } else {
     B2WARNING("RootParameterTracker::addParameters4DoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<
@@ -237,7 +244,7 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
 
   /// make sure that container for algorithms of given tcType exists:
   auto* algorithms4tcType = m_algoDataInt.find(tcTypeName);
-  if (algorithms4tcType == NULL) {
+  if (algorithms4tcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), tcType " << tcTypeName <<
             " not yet added to m_algoDataInt, doing it now...");
     m_algoDataInt.push_back({
@@ -250,7 +257,7 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
 
   /// make sure that algorithm and its dataStuff exists:
   auto* data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
-  if (data4AlgorithmOftcType == NULL) {
+  if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataInt[tcType], doing it now...");
     AnalyzingAlgorithm<int>* newAlgorithm = AnalyzingAlgorithmFactoryInt<int, AnalizerTCInfo, TVector3>(AlgoritmType::getTypeEnum(
@@ -266,7 +273,7 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
 
     /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination:
     auto* newBranch = tree4tcType->Branch(algorithmName.c_str(), data4AlgorithmOftcType->second);
-    if (newBranch == NULL) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
+    if (newBranch == nullptr) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
     // newBranch->Print();
   } else {
     B2WARNING("RootParameterTracker::addParameters4DoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<
@@ -294,7 +301,7 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
 
   /// make sure that container for algorithms of given tcType exists:
   auto* algorithms4tcType = m_algoDataVecDouble.find(tcTypeName);
-  if (algorithms4tcType == NULL) {
+  if (algorithms4tcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), tcType " << tcTypeName <<
             " not yet added to m_algoDataVecDouble, doing it now...");
     m_algoDataVecDouble.push_back({
@@ -308,7 +315,7 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
 
   /// make sure that algorithm and its dataStuff exists:
   auto* data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
-  if (data4AlgorithmOftcType == NULL) {
+  if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataVecDouble[tcType], doing it now...");
     AnalyzingAlgorithm<vector<double>>* newAlgorithm = AnalyzingAlgorithmFactoryVecDouble<vector<double>, AnalizerTCInfo, TVector3>
@@ -324,7 +331,7 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
 
     /// make sure that there is a branch linked to the raw data stored for this tcType <-> algorithm combination:
     auto* newBranch = tree4tcType->Branch(algorithmName.c_str(), data4AlgorithmOftcType->second);
-    if (newBranch == NULL) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
+    if (newBranch == nullptr) B2ERROR("Could not create Branch " << algorithmName); // mainly to suppress compiler warning
     // newBranch->Print();
   } else {
     B2WARNING("RootParameterTracker::addParameters4VecDoubleAlgorithms() given tcTypeName/algorithmName: " << tcTypeName <<

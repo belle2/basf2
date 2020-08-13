@@ -22,10 +22,6 @@
 
 #include <framework/logging/Logger.h>
 
-#include <typeinfo>
-#include <cxxabi.h>
-
-#include <utility>      // std::move, std::replace
 #include <string>
 
 #include <TVector3.h>

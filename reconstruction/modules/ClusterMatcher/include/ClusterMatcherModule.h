@@ -1,5 +1,4 @@
-
-/***************************************************************************
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
@@ -8,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  *************************************************************************/
-#ifndef ClusterMatcherModule_H
-#define ClusterMatcherModule_H
+
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -35,10 +34,10 @@ namespace Belle2 {
     virtual ~ClusterMatcherModule();
 
     /** init */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** process event */
-    virtual void event();
+    virtual void event() override;
 
     /** cone angle for matching (whole cone) */
     float m_coneInRad = 0.26;
@@ -56,5 +55,3 @@ namespace Belle2 {
 
   }; // end class
 } // end namespace Belle2
-
-#endif

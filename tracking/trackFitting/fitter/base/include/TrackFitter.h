@@ -179,6 +179,11 @@ namespace Belle2 {
     bool fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const;
 
     /**
+     * Same as above, but hypothesis set by pdg code
+     */
+    bool fit(RecoTrack& recoTrack, const int pdgCode) const;
+
+    /**
      * Fit a reco track with the already present cardinal representation or with pion as default.
      *
      * If the cardinal particle hypothesis is already

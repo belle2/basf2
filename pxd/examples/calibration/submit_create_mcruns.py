@@ -4,9 +4,9 @@
 # Script using CAF backends to submit jobs for generating of mc files with PXDSimHits for
 # PXD gain calibration.
 #
-# basf2 submit_create_mcruns.py -- --backend='local' --outputdir='pxd_mc_phase2' --runLow=0 --runHigh=5000 --expNo=3
+# basf2 submit_create_mcruns.py -- --backend='local' --outputdir='pxd_mc_phase2' --runLow=4000 --runHigh=6522 --expNo=3
 #
-# author: benjamin.schwenker@pyhs.uni-goettingen.de
+# author: benjamin.schwenker@phys.uni-goettingen.de
 
 import sys
 import os
@@ -19,7 +19,13 @@ from caf.utils import IoV
 _tempdir_name = 'tmp_create_mc'
 
 #: Number of mc mixer sets to draw from
-_number_of_sets = 4
+_number_of_sets = 10
+
+#: Name of GT to be used for mc generation
+_tag = 'Calibration_Offline_Development'
+
+#: Path to mixer files
+_bg = '/group/belle2/BGFile/OfficialBKG/15thCampaign/phase2'
 
 
 def run_job_submission(backend, mc_iov_list):
@@ -38,6 +44,8 @@ def run_job_submission(backend, mc_iov_list):
                 'basf2',
                 'create_mcrun.py',
                 '--',
+                '--tag={}'.format(_tag),
+                '--bg={}'.format(_bg),
                 '--expNo={}'.format(expNo),
                 '--runNo={}'.format(runNo),
                 '--setNo={}'.format(setNo)]

@@ -3,7 +3,7 @@
  * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,7 +14,7 @@
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
-
+#include <mdst/dataobjects/Track.h>
 
 using std::vector;
 
@@ -40,18 +40,40 @@ namespace TreeFitter {
 
   InternalParticle::InternalParticle(Belle2::Particle* particle,
                                      const ParticleBase* mother,
-                                     bool forceFitAll) :
-    ParticleBase(particle, mother),
+                                     const ConstraintConfiguration& config,
+                                     bool forceFitAll
+                                    ) :
+    ParticleBase(particle, mother, &config),// config pointer here to allow final states not to have it
     m_massconstraint(false),
-    m_lifetimeconstraint(false)
+    m_lifetimeconstraint(false),
+    m_isconversion(false),
+    m_automatic_vertex_constraining(config.m_automatic_vertex_constraining)
   {
-
     if (particle) {
       for (auto daughter : particle->getDaughters()) {
-        addDaughter(daughter, forceFitAll);
+        addDaughter(daughter, config, forceFitAll);
       }
     } else {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
+    }
+
+    m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
+                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end();
+
+    if (!m_automatic_vertex_constraining) {
+      // if this is a hadronically decaying resonance it is usefule to constraint the decay vertex to its mothers decay vertex.
+      //
+      m_shares_vertex_with_mother  = std::find(config.m_fixedToMotherVertexListPDG.begin(),
+                                               config.m_fixedToMotherVertexListPDG.end(),
+                                               std::abs(m_particle->getPDGCode())) != config.m_fixedToMotherVertexListPDG.end() && this->mother();
+
+      // use geo constraint if this particle is in the list to constrain
+      m_geo_constraint = std::find(config.m_geoConstraintListPDG.begin(),
+                                   config.m_geoConstraintListPDG.end(),
+                                   std::abs(m_particle->getPDGCode())) != config.m_geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
+    } else {
+      m_shares_vertex_with_mother = this->mother() && m_isStronglyDecayingResonance;
+      m_geo_constraint = this->mother() && !m_shares_vertex_with_mother;
     }
   }
 
@@ -61,180 +83,126 @@ namespace TreeFitter {
     return lhs->particle()->getMomentum().Perp() > rhs->particle()->getMomentum().Perp();
   }
 
-  ErrCode InternalParticle::initMotherlessParticle(FitParams* fitparams)
+  ErrCode InternalParticle::initMotherlessParticle(FitParams& fitparams)
   {
     ErrCode status ;
-    int posindex = posIndex();
-
-    //FT: These aren't available yet
-    m_lifetimeconstraint = false;
-    m_isconversion = false;
-
-    // logic check: we do not want to call this routine for resonances.
-    assert(hasPosition());
-
-    // Start with origin
-    fitparams->getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 3, 1>::Zero(3);
-
-    // Step 1: pre-initialization of all daughters
     for (auto daughter : m_daughters) {
       status |= daughter->initMotherlessParticle(fitparams);
     }
-    // Step 2: initialize the vertex. if we are lucky, we had a
-    // recoresonant daughter, and we are already done.
-    // (vertex already exists)
-    if (fitparams->getStateVector()(posindex)  == 0 &&
-        fitparams->getStateVector()(posindex + 1) == 0 &&
-        fitparams->getStateVector()(posindex + 2) == 0) {
 
-      //otherwise, composites are initialized with a vertex at (0,0,0); if it's different, they were already vertexed; use that.
-      TVector3 vtx = particle()->getVertex();
-      if (vtx.Mag()) { //if it's not zero
-        fitparams->getStateVector()(posindex) = vtx.X();
-        fitparams->getStateVector()(posindex + 1) = vtx.Y();
-        fitparams->getStateVector()(posindex + 2) = vtx.Z();
-      } else {
+    int posindex = posIndex();
+    // FIXME update this and check if this position is already initialised
+    // lower stream vertices might be better
+    if (hasPosition()) {
+      fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 3, 1>::Zero(3);
 
-        // Case B: the hard way ... use the daughters to estimate the
-        // vertex. First we check if there are sufficient tracks
-        // attached to this vertex. If so, estimate the poca of the
-        // two tracks with the highest momentum. This will work for
-        // the majority of the cases. If there are not sufficient
-        // tracks, add the composites and take the two with the best
-        // doca.
+      if (fitparams.getStateVector()(posindex)  == 0 &&
+          fitparams.getStateVector()(posindex + 1) == 0 &&
+          fitparams.getStateVector()(posindex + 2) == 0) {
 
-        // create a vector with all daughters that constitute a
-        // 'trajectory' (ie tracks, composites and daughters of
-        // resonances.)
-        std::vector<ParticleBase*> alldaughters;
-        ParticleBase::collectVertexDaughters(alldaughters, posindex);
-
-        // select daughters that are either charged, or have an initialized vertex
-        std::vector<ParticleBase*> vtxdaughters;
-
-        vector<RecoTrack*> trkdaughters;
-        for (auto daughter : alldaughters) {
-          if (daughter->type() == ParticleBase::TFParticleType::kRecoTrack) {
-            trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
-          } else if (daughter->hasPosition()
-                     && fitparams->getStateVector()(daughter->posIndex()) != 0) {
-            vtxdaughters.push_back(daughter);
-          }
-        }
-
-        double flt1(0), flt2(0);
-        TVector3 v;
-
-        if (trkdaughters.size() >= 2) {
-          B2DEBUG(12, "Found at least two charged tracks to set initial vertex position for " << this->name());
-          // sort in pT. not very efficient, but it works.
-          if (trkdaughters.size() > 2) {
-            std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
-          }
-
-          // now, just take the first two ...
-          RecoTrack* dau1 = trkdaughters[0];
-          RecoTrack* dau2 = trkdaughters[1];
-
-          //Using pion hypothesis is fine for initialization purposes
-          Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
-          Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::pion)->getHelix();
-
-          HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
-
-
-          fitparams->getStateVector()(posindex)     = -v.x();
-          fitparams->getStateVector()(posindex + 1) = -v.y();
-          fitparams->getStateVector()(posindex + 2) = -v.z();
-
-          dau1->setFlightLength(flt1);
-          dau2->setFlightLength(flt2);
-          B2DEBUG(12, "flight time of " << dau1->name() << " is " << flt1);
-          B2DEBUG(12, "flight time of " << dau2->name() << " is " << flt2);
-
-          /** FIXME temporarily disabled */
-        } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
-          // that's unfortunate: no enough charged tracks from this
-          // vertex. need all daughters. create trajectories and use
-          // normal TrkPoca.
-
-          //JFK: FIXME 2017-09-25
-          //B2DEBUG("Internal particle l181 track + other daughter::Is this implementd?");
-          B2DEBUG(12, "VtkInternalParticle: Low # charged track initializaton. To be implemented!!");
-
-        } else if (mother() && mother()->posIndex() >= 0) {
-          // let's hope the mother was initialized
-          int posindexmother = mother()->posIndex();
-
-          fitparams->getStateVector().segment(posindex, 3) = fitparams->getStateVector().segment(posindexmother, 3);
-
+        TVector3 vtx = particle()->getVertex();
+        if (vtx.Mag()) { //if it's not zero
+          fitparams.getStateVector()(posindex) = vtx.X();
+          fitparams.getStateVector()(posindex + 1) = vtx.Y();
+          fitparams.getStateVector()(posindex + 2) = vtx.Z();
         } else {
-          // something is wrong!
-          //
-          fitparams->getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
+
+          std::vector<ParticleBase*> alldaughters;
+          ParticleBase::collectVertexDaughters(alldaughters, posindex);
+
+          std::vector<ParticleBase*> vtxdaughters;
+
+          vector<RecoTrack*> trkdaughters;
+          for (auto daughter : alldaughters) {
+            if (daughter->type() == ParticleBase::TFParticleType::kRecoTrack) {
+              trkdaughters.push_back(static_cast<RecoTrack*>(daughter));
+            } else if (daughter->hasPosition()
+                       && fitparams.getStateVector()(daughter->posIndex()) != 0) {
+              vtxdaughters.push_back(daughter);
+            }
+          }
+
+          TVector3 v;
+
+          if (trkdaughters.size() >= 2) {
+            std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
+
+            RecoTrack* dau1 = trkdaughters[0];
+            RecoTrack* dau2 = trkdaughters[1];
+
+            Belle2::Helix helix1 = dau1->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                     dau1->particle()->getPDGCode())))->getHelix();
+            Belle2::Helix helix2 = dau2->particle()->getTrack()->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
+                                     dau2->particle()->getPDGCode())))->getHelix();
+
+            double flt1(0), flt2(0);
+            HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
+
+            fitparams.getStateVector()(posindex)     = v.x();
+            fitparams.getStateVector()(posindex + 1) = v.y();
+            fitparams.getStateVector()(posindex + 2) = v.z();
+
+            dau1->setFlightLength(flt1);
+            dau2->setFlightLength(flt2);
+
+          } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
+            // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
+          } else if (mother() && mother()->posIndex() >= 0) {
+            const int posindexmother = mother()->posIndex();
+            const int dim = m_config->m_originDimension; //TODO acess mother
+            fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
+          } else {
+            /** (0,0,0) is the best guess in any other case */
+            fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
+          }
         }
       }
     }
 
-    // step 3: do the post initialization step of all daughters
     for (auto daughter :  m_daughters) {
       daughter->initParticleWithMother(fitparams);
     }
 
-    // step 4: initialize the momentum by adding up the daughter 4-vectors
     initMomentum(fitparams);
     return status;
   }
 
-
-
-  ErrCode InternalParticle::initParticleWithMother(FitParams* fitparams)
+  ErrCode InternalParticle::initParticleWithMother(FitParams& fitparams)
   {
-    // FIX ME: in the unfortunate case (the B-->D0K*- above) that our
-    // vertex is still the origin, we copy the mother vertex.
     int posindex = posIndex();
-    int posindexmom = 0;
-
     if (hasPosition() &&
         mother() &&
-        fitparams->getStateVector()(posindex) == 0 &&
-        fitparams->getStateVector()(posindex + 1) == 0 && \
-        fitparams->getStateVector()(posindex + 2) == 0) {
-
-      posindexmom = mother()->posIndex();
-      fitparams->getStateVector().segment(posindex , 3) = fitparams->getStateVector().segment(posindexmom, 3);
-
+        fitparams.getStateVector()(posindex) == 0 &&
+        fitparams.getStateVector()(posindex + 1) == 0 && \
+        fitparams.getStateVector()(posindex + 2) == 0) {
+      const int posindexmom = mother()->posIndex();
+      const int dim = m_config->m_originDimension; //TODO acess mother?
+      fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);
     }
-
     return initTau(fitparams);
   }
 
-  ErrCode InternalParticle::initMomentum(FitParams* fitparams) const
+  ErrCode InternalParticle::initMomentum(FitParams& fitparams) const
   {
     int momindex = momIndex();
-    fitparams->getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Zero(4);
-
-    int daumomindex = 0, maxrow = 0;
-    double e2 = 0, mass = 0;
+    fitparams.getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Zero(4);
 
     for (auto daughter : m_daughters) {
+      int daumomindex = daughter->momIndex();
+      int maxrow = daughter->hasEnergy() ? 4 : 3;
 
-      daumomindex = daughter->momIndex();
-      maxrow = daughter->hasEnergy() ? 4 : 3;
-
-      e2 = fitparams->getStateVector().segment(daumomindex, maxrow).squaredNorm();
-      fitparams->getStateVector().segment(momindex, maxrow) += fitparams->getStateVector().segment(daumomindex, maxrow);
+      double e2 = fitparams.getStateVector().segment(daumomindex, maxrow).squaredNorm();
+      fitparams.getStateVector().segment(momindex, maxrow) += fitparams.getStateVector().segment(daumomindex, maxrow);
 
       if (maxrow == 3) {
-        mass = daughter->pdgMass();
-        fitparams->getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
+        double mass = daughter->pdgMass();
+        fitparams.getStateVector()(momindex + 3) += std::sqrt(e2 + mass * mass);
       }
-
     }
     return ErrCode(ErrCode::Status::success);
   }
 
-  ErrCode InternalParticle::initCovariance(FitParams* fitparams) const
+  ErrCode InternalParticle::initCovariance(FitParams& fitparams) const
   {
     ErrCode status;
     ParticleBase::initCovariance(fitparams);
@@ -248,76 +216,47 @@ namespace TreeFitter {
   ErrCode InternalParticle::projectKineConstraint(const FitParams& fitparams,
                                                   Projection& p) const
   {
-    // first add the mother
-    int momindex = momIndex();
+    const int momindex = momIndex();
 
+    // `this` always has an energy row
     p.getResiduals().segment(0, 4) = fitparams.getStateVector().segment(momindex, 4);
+
     for (int imom = 0; imom < 4; ++imom) {
       p.getH()(imom, momindex + imom) = 1;
     }
 
-    // now add the daughters
-    const double posprecision = 1e-4; // 1mu
-
     for (const auto daughter : m_daughters) {
+      const int daumomindex = daughter->momIndex();
+      const Eigen::Matrix<double, 1, 3> p3_vec = fitparams.getStateVector().segment(daumomindex, 3);
 
-      int dautauindex = 0, daumomindex = 0, maxrow = 0;
-      double mass = 0, e2 = 0, px = 0, py = 0, energy = 0, tau = 0, lambda = 0, px0 = 0, py0 = 0, pt0 = 0, sinlt = 0, coslt = 0;
+      // three momentum is easy just substract the vectors
+      p.getResiduals().segment(0, 3) -= p3_vec;
 
-      dautauindex = daughter->tauIndex();
-      daumomindex = daughter->momIndex();
-      mass = daughter->pdgMass();
-      maxrow = daughter->hasEnergy() ? 4 : 3;
-      e2 = mass * mass;
+      // energy depends on the parametrisation!
+      if (daughter->hasEnergy()) {
+        p.getResiduals()(3) -= fitparams.getStateVector()(daumomindex + 3);
+        p.getH()(3, daumomindex + 3) = -1; // d/dE -E
+      } else {
+        // m^2 + p^2 = E^2
+        // so
+        // E = sqrt(m^2 + p^2)
+        const double mass = daughter->pdgMass();
+        const double p2 = p3_vec.squaredNorm();
+        const double energy = std::sqrt(mass * mass + p2);
+        p.getResiduals()(3) -= energy;
 
-      for (int imom = 0; imom < maxrow; ++imom) {
-        px = fitparams.getStateVector()(daumomindex + imom);
-        e2 += px * px;
-        p.getResiduals()(imom) += -px;
-        p.getH()(imom, daumomindex + imom) = -1;
-      }
-
-      if (maxrow == 3) {
-        // treat the energy for particles that are parameterized with p3
-        energy = sqrt(e2);
-        p.getResiduals()(3) += -energy;
-
-        for (int jmom = 0; jmom < 3; ++jmom) {
-          px = fitparams.getStateVector()(daumomindex + jmom);
-          p.getH()(3, daumomindex + jmom) = -px / energy;
-        }
-
-        //FIXME switched off linear approximation should be fine the stuff below uses a helix...
-      } else if (false && dautauindex >= 0 && daughter->charge() != 0) {
-
-        tau =  fitparams.getStateVector()(dautauindex);
-        lambda = bFieldOverC() * daughter->charge();
-
-        px0 = fitparams.getStateVector()(daumomindex);
-        py0 = fitparams.getStateVector()(daumomindex + 1);
-        pt0 = sqrt(px0 * px0 + py0 * py0);
-
-
-        if (fabs(pt0 * lambda * tau * tau) > posprecision) {
-          sinlt = sin(lambda * tau);
-          coslt = cos(lambda * tau);
-          px = px0 * coslt - py0 * sinlt;
-          py = py0 * coslt + px0 * sinlt;
-
-          p.getResiduals()(0) += px0 - px;
-          p.getResiduals()(1) += py0 - py;
-
-          p.getH()(0, daumomindex) += 1 - coslt  ;
-          p.getH()(0, daumomindex + 1) += sinlt      ;
-          p.getH()(0, dautauindex) += lambda * py;
-          p.getH()(1, daumomindex) -= sinlt      ;
-          p.getH()(1, daumomindex + 1) += 1 - coslt  ;
-          p.getH()(1, dautauindex) -= lambda * px;
+        for (unsigned i = 0; i < 3; ++i) {
+          // d/dpx_i sqrt(m^2 + p^2)
+          p.getH()(3, daumomindex + i) = -1 * p3_vec(i) / energy;
         }
       }
 
+      // this has to be in any case
+      // d/dp_i p_i
+      for (unsigned i = 0; i < 3; ++i) {
+        p.getH()(i, daumomindex + i) = -1;
+      }
     }
-
     return ErrCode(ErrCode::Status::success);
   }
 
@@ -344,6 +283,56 @@ namespace TreeFitter {
     return status;
   }
 
+  int InternalParticle::posIndex() const
+  {
+    // for example B0 and D* can share the same vertex
+    return m_shares_vertex_with_mother ? this->mother()->posIndex() : index();
+  }
+
+  int InternalParticle::dim() const
+  {
+    // { x, y, z, tau, px, py, pz, E }
+    // the last 4 always exists for composite particles
+    // tau index conly exist with a vertex and geo constraint
+    //
+    if (m_shares_vertex_with_mother) { return 4; }
+    if (!m_shares_vertex_with_mother && !m_geo_constraint) { return 7; }
+    if (!m_shares_vertex_with_mother && m_geo_constraint) { return 8; }
+
+    // this case should not appear
+    if (m_shares_vertex_with_mother && m_geo_constraint) { return -1; }
+    return -1;
+  }
+
+  int InternalParticle::tauIndex() const
+  {
+    /** only exists if particle is geo cosntraint and has a mother */
+    return m_geo_constraint ? index() + 3 : -1;
+  }
+
+  int InternalParticle::momIndex() const
+  {
+    /** indexing in { x, y, z, tau, px, py, pz, E }
+     * but tau is not existing for all InternalParticles
+     * */
+
+    if (m_geo_constraint && !m_shares_vertex_with_mother) { return this->index() + 4; }
+
+    if (m_shares_vertex_with_mother) { return this->index(); }
+
+    if (!m_shares_vertex_with_mother && !m_geo_constraint) {return index() + 3 ;}
+
+    // this will crash the initialisation
+    return -1;
+  }
+
+  bool InternalParticle::hasPosition() const
+  {
+    //  does this particle have a position index (decayvertex)
+    //  true in any case
+    return true;
+  }
+
   void InternalParticle::addToConstraintList(constraintlist& list,
                                              int depth) const
   {
@@ -351,57 +340,41 @@ namespace TreeFitter {
     for (auto daughter : m_daughters) {
       daughter->addToConstraintList(list, depth - 1);
     }
-
-
-    // the lifetime constraint
     if (tauIndex() >= 0 && m_lifetimeconstraint) {
       list.push_back(Constraint(this, Constraint::lifetime, depth, 1));
     }
-
-    // the kinematic constraint
     if (momIndex() >= 0) {
       list.push_back(Constraint(this, Constraint::kinematic, depth, 4, 3));
     }
-
-    // the geometric constraint
-    if (mother() && tauIndex() >= 0) {
-      list.push_back(Constraint(this, Constraint::geometric, depth, 3, 3));
+    if (m_geo_constraint) {
+      assert(m_config);
+      const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
+      list.push_back(Constraint(this, Constraint::geometric, depth, dim, 3));
     }
-
-    // the mass constraint
-    if (std::find(TreeFitter::massConstraintListPDG.begin(), TreeFitter::massConstraintListPDG.end(),
-                  std::abs(particle()->getPDGCode())) != TreeFitter::massConstraintListPDG.end()) {
+    if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
     }
-  }
 
+  }
 
   std::string InternalParticle::parname(int thisindex) const
   {
     int id = thisindex;
-    // skip the lifetime parameter if there is no mother
     if (!mother() && id >= 3) {++id;}
     return ParticleBase::parname(id);
   }
 
-  void InternalParticle::forceP4Sum(FitParams& fitparams) const //FT: this needs double checking
+  void InternalParticle::forceP4Sum(FitParams& fitparams) const
   {
-    // because things are not entirely linear, p4 is not exactly
-    // conserved at the end of fits that include mass
-    // constraints. this routine is called after the tree is fitted to
-    // ensure that p4 'looks' conserved.
-
-    // first the daughters
     for (const auto daughter : m_daughters) {
       daughter->forceP4Sum(fitparams);
     }
-
-    int momindex = momIndex();
+    const int momindex = momIndex();
     if (momindex > 0) {
-
-      Projection p(fitparams.getDimensionOfState(), 4);
+      const int dim = hasEnergy() ? 4 : 3;
+      Projection p(fitparams.getDimensionOfState(), dim);
       projectKineConstraint(fitparams, p);
-      fitparams.getStateVector().segment(momindex, 4) -= p.getResiduals().segment(momindex, 4);
+      fitparams.getStateVector().segment(momindex, dim) -= p.getResiduals().segment(0, dim);
     }
   }
 

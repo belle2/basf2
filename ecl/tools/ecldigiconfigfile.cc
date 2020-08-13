@@ -6,6 +6,9 @@
  * Program that record  cavariance matrices and other                     *
  * parameters in root file that needs for simulation                      *
  *                                                                        *
+ * NOTE: This tool is now deprecated, please use eclDigitizerConfigGen    *
+ *       instead                                                          *
+ *                                                                        *
  * Contributors: Alexander Bobrov (a.v.bobrov@inp.nsk.su) ,               *
  * Guglielmo De Nardo                                                     *
  *                                                                        *
@@ -14,23 +17,17 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
 #include <ecl/digitization/algorithms.h>
 #include <iostream>
-#include <TH1.h>
-#include <TF1.h>
-#include <TH2.h>
-#include <TMath.h>
-#include <math.h>
-#include <unistd.h>
 #include <stdio.h>
 #include "stdlib.h"
-#include <TChain.h>
 #include <string>
 #include <fstream>
 #include <vector>
 #include <cassert>
 #include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
@@ -339,7 +336,9 @@ void writeWF(int typ, char* dataFileDir, char* paramsDir)
 
     ifstream inputFile2(dataFileName, ios::binary | ios::in);
     for (int index = 0; index < 256; index++) {
-      inputFile2.read(reinterpret_cast< char*>(&ss1[index]), sizeof(double));
+      int i = index / 16;
+      int j = index % 16;
+      inputFile2.read(reinterpret_cast< char*>(&ss1[i][j]), sizeof(double));
     }
     inputFile2.close();
 
@@ -400,6 +399,7 @@ int main(int argc, char** argv)
 
 {
   assert(argc == 4 || argc == 1);
+  B2WARNING("This tool is now deprecated, please use eclDigitizerConfigGen instead");
   if (argc == 1) {
     cout << "Usage " << endl;
     cout << argv[0] << " <type>  <covar_mat_path> <parameters_path>" << endl;

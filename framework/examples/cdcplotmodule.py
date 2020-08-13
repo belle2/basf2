@@ -8,7 +8,7 @@
 # colours depending on associated MCParticle.
 ###############################################################################
 
-from basf2 import *
+from basf2 import Module, Path, process, B2INFO
 from simulation import add_simulation
 
 import matplotlib
@@ -132,11 +132,10 @@ param_pGun = {
 }
 
 # Create main path
-main = create_path()
+main = Path()
 main.add_module('EventInfoSetter', evtNumList=[5])
 main.add_module('ParticleGun', **param_pGun)
 add_simulation(main)
 main.add_module(CDCPlotModule())
 
 process(main)
-print(statistics)

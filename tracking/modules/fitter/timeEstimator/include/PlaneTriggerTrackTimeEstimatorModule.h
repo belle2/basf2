@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/modules/fitter/timeEstimator/BaseTrackTimeEstimatorModule.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -29,8 +28,8 @@ namespace Belle2 {
     std::vector<double> m_param_triggerPlaneNormalDirection = {1, 0, 0};
 
     /// Estimate the flight length to the given plane using the extrapolation of the fit.
-    double estimateFlightLengthUsingFittedInformation(genfit::MeasuredStateOnPlane& measuredStateOnPlane) const;
+    double estimateFlightLengthUsingFittedInformation(genfit::MeasuredStateOnPlane& measuredStateOnPlane) const override;
     /// Estimate the flight length using only the tracking seeds.
-    double estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const;
+    double estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const override;
   };
 }

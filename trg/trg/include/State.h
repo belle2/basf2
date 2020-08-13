@@ -18,12 +18,8 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
-#include <bitset>
-#include "trg/trg/Time.h"
 
 namespace Belle2 {
-
-  class TRGTime;
 
 /// A class to represent a state of multi bits
   class TRGState {
@@ -48,8 +44,8 @@ namespace Belle2 {
     /// Constructor. type: 0-> binary, 1->hex
     TRGState(const char*, unsigned type);
 
-    // /// Copy constructor.
-    // TRGState(const TRGState &);
+    /// Default copy constructor.
+    TRGState(const TRGState&) = default;
 
     /// Destructor
     virtual ~TRGState();
@@ -217,16 +213,15 @@ namespace Belle2 {
     unsigned n = _size / _bsu;
     if (_size % _bsu) ++n;
     const unsigned c = sizeof(unsigned long long);
+    if (n > c)
 #ifdef TRG_DEBUG
-    if (n > sizeof(unsigned long long))
       std::cout << "TRGState::operator unsigned long long() "
                 << "!!! bit size overflow"
                 << ":bit size=" << _size
                 << ",max bit size with unsigned long long="
                 << c << std::endl;
 #endif
-    if (n > c)
-      n = c;
+    n = c;
     unsigned long long a = 0;
     const unsigned s = _bsu;
     for (unsigned i = 0; i < n; i++) {

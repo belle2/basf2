@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDDigitSorterModule_H
-#define PXDDigitSorterModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <pxd/dataobjects/PXDDigit.h>
@@ -34,9 +33,9 @@ namespace Belle2 {
       PXDDigitSorterModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the sorting */
-      virtual void event();
+      virtual void event() override;
 
     private:
       /** Utility function to check pixel coordinates */
@@ -70,5 +69,3 @@ namespace Belle2 {
 
   } //end PXD namespace;
 } // end namespace Belle2
-
-#endif // PXDDigitSorterModule_H

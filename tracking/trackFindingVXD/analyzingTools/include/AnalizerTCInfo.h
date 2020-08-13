@@ -14,18 +14,12 @@
 #include <tracking/spacePointCreation/MCVXDPurityInfo.h>
 #include <tracking/trackFindingVXD/analyzingTools/TCType.h>
 
-// fw:
-#include <framework/logging/Logger.h>
-
 // root:
 #include <TVector3.h>
 
 // stl:
 #include <vector>
 #include <utility> // std::pair
-
-
-
 
 namespace Belle2 {
   /** simple class storing infos relevant for a TC for analizing it. */
@@ -52,12 +46,12 @@ namespace Belle2 {
     TCType::Type tcType;
 
 
-    /** constructor, makes sure that pointers are on NULL until set */
-    AnalizerTCInfo() : tC(NULL), assignedTC(NULL), tcType(TCType::Unclassified) {}
+    /** constructor, makes sure that pointers are on nullptr until set */
+    AnalizerTCInfo() : tC(nullptr), assignedTC(nullptr), tcType(TCType::Unclassified) {}
 
 
     /** static function for correctly creating TrackCandidates */
-    static AnalizerTCInfo createTC(bool isReference, MCVXDPurityInfo& iD, SpacePointTrackCand& aTC)
+    static AnalizerTCInfo createTC(bool isReference, const MCVXDPurityInfo& iD, SpacePointTrackCand& aTC)
     {
       AnalizerTCInfo newTC;
 
@@ -74,7 +68,7 @@ namespace Belle2 {
     static void markUnused(std::vector<AnalizerTCInfo>& tcs, TCType::Type newType)
     {
       for (AnalizerTCInfo& aTC : tcs) {
-        if (aTC.assignedTC == NULL) {
+        if (aTC.assignedTC == nullptr) {
           aTC.tcType = newType;
         }
       }
@@ -109,7 +103,7 @@ namespace Belle2 {
     void discardTC()
     {
       assignedTC->tcType = TCType::Clone;
-      assignedTC = NULL;
+      assignedTC = nullptr;
     }
 
 
@@ -125,7 +119,7 @@ namespace Belle2 {
     void pairUp(AnalizerTCInfo* otherTC)
     {
       // case: this TC was not assigned before
-      if (assignedTC == NULL) {
+      if (assignedTC == nullptr) {
         assignTCs(otherTC);
         return;
       }

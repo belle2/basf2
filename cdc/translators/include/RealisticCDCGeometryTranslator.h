@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REALISTICCDCGEOMETRYTRANSLATOR_H_
-#define REALISTICCDCGEOMETRYTRANSLATOR_H_
+#pragma once
 
 #include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -26,13 +25,13 @@ namespace Belle2 {
       ~RealisticCDCGeometryTranslator() {}
 
       /** Get wire position at forward end. */
-      const TVector3 getWireForwardPosition(const WireID& wireID)
+      const TVector3 getWireForwardPosition(const WireID& wireID) override
       {
         return CDCGeometryPar::Instance().wireForwardPosition(wireID, CDCGeometryPar::c_Aligned);
       }
 
       /** Get virtual wire position at forward end, corresponding to tangent line to wire at input z-position. */
-      const TVector3 getWireForwardPosition(const WireID& wireID, float z)
+      const TVector3 getWireForwardPosition(const WireID& wireID, float z) override
       {
         TVector3 wPos = (m_wireSag) ?
                         CDCGeometryPar::Instance().wireForwardPosition(wireID, z, CDCGeometryPar::c_Aligned) :
@@ -41,13 +40,13 @@ namespace Belle2 {
       }
 
       /** Get wire position at backward end. */
-      const TVector3 getWireBackwardPosition(const WireID& wireID)
+      const TVector3 getWireBackwardPosition(const WireID& wireID) override
       {
         return CDCGeometryPar::Instance().wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
       }
 
       /** Get virtual wire position at backward end, corresponding to tangent line to wire at input z-position. */
-      const TVector3 getWireBackwardPosition(const WireID& wireID, float z)
+      const TVector3 getWireBackwardPosition(const WireID& wireID, float z) override
       {
         TVector3 wPos = m_wireSag ?
                         CDCGeometryPar::Instance().wireBackwardPosition(wireID, z, CDCGeometryPar::c_Aligned) :
@@ -65,4 +64,3 @@ namespace Belle2 {
     };
   }
 }
-#endif /* REALISTICCDCGEOMETRYTRANSLATOR_H */

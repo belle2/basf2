@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/ClusterCache.h>
 #include <pxd/reconstruction/ClusterProjection.h>
 #include <pxd/reconstruction/NoiseMap.h>
@@ -46,9 +45,9 @@ namespace Belle2 {
       PXDClusterizerModule();
 
       /** Initialize the module */
-      virtual void initialize();
+      virtual void initialize() override;
       /** do the clustering */
-      virtual void event();
+      virtual void event() override;
 
     private:
       /** Create lookup maps for Relations

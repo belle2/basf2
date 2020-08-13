@@ -88,8 +88,11 @@ namespace Belle2 {
     virtual bool extract(const BaseSVDStateFilter::Object* object) override;
 
   private:
+    /// Instance of the circle-fit class
     QualityEstimatorCircleFit m_qualityCircle;
+    /// Instance of the Riemann helix-fit class
     QualityEstimatorRiemannHelixFit m_qualityHelix;
+    /// Instance of the triplet-fit class
     QualityEstimatorTripletFit m_qualityTriplet;
   };
 }

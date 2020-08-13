@@ -18,8 +18,10 @@
 #include <top/dbobjects/TOPNominalTTS.h>
 #include <top/dbobjects/TOPNominalTDC.h>
 #include <top/dbobjects/TOPSignalShape.h>
+#include <top/dbobjects/TOPWavelengthFilter.h>
 #include <framework/gearbox/Unit.h>
 #include <vector>
+#include <map>
 
 
 namespace Belle2 {
@@ -89,6 +91,19 @@ namespace Belle2 {
     void setNominalTTS(const TOPNominalTTS& nominalTTS) {m_nominalTTS = nominalTTS;}
 
     /**
+     * Appends time transition spread of a particular PMT type
+     * @param tts TTS of a particular PMT type
+     */
+    void appendTTS(const TOPNominalTTS& tts) {m_tts[tts.getPMTType()] = tts;}
+
+    /**
+     * Appends photon detection efficiency tuning factor of a particular PMT type
+     * @param type PMT type
+     * @param factor tuning factor
+     */
+    void appendPDETuningFactor(unsigned type, double factor) {m_tuneFactorsPDE[type] = factor;}
+
+    /**
      * Sets nominal time-to-digit conversion parameters
      * @param nominalTDC nominal TDC parameters
      */
@@ -105,6 +120,12 @@ namespace Belle2 {
      * @param shape calibration pulse shape
      */
     void setCalPulseShape(const TOPSignalShape& shape) {m_calPulseShape = shape;}
+
+    /**
+     * Sets wavelength filter transmittance
+     * @param filter wavelength filter transmittance
+     */
+    void setWavelengthFilter(const TOPWavelengthFilter& filter) {m_wavelengthFilter = filter;}
 
     /**
      * Returns number of modules
@@ -163,6 +184,32 @@ namespace Belle2 {
     const TOPNominalTTS& getNominalTTS() const {return m_nominalTTS;}
 
     /**
+     * Returns time transition spread of a given PMT type
+     * @param type PMT type
+     * @return TTS of a given PMT type if found, otherwise nominal TTS
+     */
+    const TOPNominalTTS& getTTS(unsigned type) const;
+
+    /**
+     * Returns photon detection efficiency tuning factor of a given PMT type
+     * @param type PMT type
+     * @return tuning factor
+     */
+    double getPDETuningFactor(unsigned type) const;
+
+    /**
+     * Check for empty PDE tuning factors
+     * @return true if empty
+     */
+    bool arePDETuningFactorsEmpty() const {return m_tuneFactorsPDE.empty();}
+
+    /**
+     * Returns PMT dependent time transition spreads
+     * @return a map of PMT dependent time transition spreads
+     */
+    const std::map<unsigned, TOPNominalTTS>& getTTSes() const {return m_tts;}
+
+    /**
      * Returns nominal time-to-digit conversion parameters
      * @return nominal TDC parameters
      */
@@ -179,6 +226,12 @@ namespace Belle2 {
      * @return calibration pulse shape
      */
     const TOPSignalShape& getCalPulseShape() const {return m_calPulseShape;}
+
+    /**
+     * Returns transmittance of wavelength filter
+     * @return transmittance of wavelength filter
+     */
+    const TOPWavelengthFilter& getWavelengthFilter() const {return m_wavelengthFilter;}
 
     /**
      * Returns inner radius of the volume devoted to TOP counter
@@ -214,13 +267,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const;
+    bool isConsistent() const override;
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "TOP geometry parameters") const;
+    void print(const std::string& title = "TOP geometry parameters") const override;
 
 
   private:
@@ -234,8 +287,11 @@ namespace Belle2 {
     TOPNominalTDC m_nominalTDC; /**< nominal time-to-digit conversion parameters */
     TOPSignalShape m_signalShape; /**< shape of single photon signal */
     TOPSignalShape m_calPulseShape; /**< shape of the calibration pulse */
+    TOPWavelengthFilter m_wavelengthFilter; /**< transmittance of wavelength filter */
+    std::map<unsigned, TOPNominalTTS> m_tts; /**< TTS of PMT types */
+    std::map<unsigned, float> m_tuneFactorsPDE; /**< PDE tuning factors of PMT types */
 
-    ClassDef(TOPGeometry, 5); /**< ClassDef */
+    ClassDefOverride(TOPGeometry, 8); /**< ClassDef */
 
   };
 

@@ -14,29 +14,19 @@
 #include <cdc/simulation/CDCSimControlPar.h>
 #include <cdc/simulation/Helix.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <cdc/geometry/GeoCDCCreator.h>
 #include <cdc/utilities/ClosestApproach.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/Unit.h>
-#include <cdc/dataobjects/CDCSimHit.h>
-
 
 #include "G4Step.hh"
-#include "G4SteppingManager.hh"
-#include "G4SDManager.hh"
 #include "G4TransportationManager.hh"
+#include "G4Field.hh"
 #include "G4FieldManager.hh"
-#include "G4MagneticField.hh"
 
 #include "CLHEP/Geometry/Vector3D.h"
 #include "CLHEP/Geometry/Point3D.h"
 
 #include "TVector3.h"
-
-//#include <iomanip>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
@@ -61,18 +51,16 @@ namespace Belle2 {
     m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0)
   {
-    StoreArray<MCParticle> mcParticles;
-    StoreArray<CDCSimHit> cdcSimHits;
-    RelationArray cdcSimHitRel(mcParticles, cdcSimHits);
+    RelationArray cdcSimHitRel(m_MCParticles, m_CDCSimHits);
     registerMCParticleRelation(cdcSimHitRel);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_doNothing);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_negativeWeight);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_deleteElement);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_zeroWeight);
-    cdcSimHits.registerInDataStore();
-    mcParticles.registerRelationTo(cdcSimHits);
+    m_CDCSimHits.registerInDataStore();
+    m_MCParticles.registerRelationTo(m_CDCSimHits);
 
-    CDCSimControlPar& cntlp = CDCSimControlPar::getInstance();
+    const CDCSimControlPar& cntlp = CDCSimControlPar::getInstance();
 
     m_thresholdEnergyDeposit = cntlp.getThresholdEnergyDeposit();
     m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
@@ -179,8 +167,6 @@ namespace Belle2 {
       //      std::cout <<"setignore=true for track= "<< t.GetTrackID() << std::endl;
     }
 
-    const G4double charge = t.GetDefinition()->GetPDGCharge();
-
     //    const G4double tof = t.GetGlobalTime(); //tof at post step point
     //    if (isnan(tof)) {
     //      B2ERROR("SensitiveDetector: global time is nan");
@@ -188,6 +174,7 @@ namespace Belle2 {
     //    }
 
     const G4int pid = t.GetDefinition()->GetPDGEncoding();
+    const G4double charge = t.GetDefinition()->GetPDGCharge();
     const G4int trackID = t.GetTrackID();
     //    std::cout << "pid,stepl,trackID,trackl,weight= " << pid <<" "<< stepLength <<" "<< trackID <<" "<< t.GetTrackLength() <<" "<< hitWeight << std::endl;
 
@@ -211,9 +198,9 @@ namespace Belle2 {
     const unsigned layerId = v.GetCopyNo();
     B2DEBUG(150, "LayerID in continuous counting method: " << layerId);
 
-    // If neutral particles, ignore them.
+    // If neutral particles, ignore them, unless monopoles.
 
-    if (charge == 0.) return false;
+    if ((charge == 0.) && (abs(pid) != 99666)) return false;
 
     // Calculate cell ID
     TVector3 tposIn(posIn.x() / CLHEP::cm, posIn.y() / CLHEP::cm, posIn.z() / CLHEP::cm);
@@ -282,7 +269,9 @@ namespace Belle2 {
       const HepPoint3D fwd(tfw3v.x(), tfw3v.y(), tfw3v.z());
       const HepPoint3D bck(tbw3v.x(), tbw3v.y(), tbw3v.z());
 
-      if (m_magneticField) {
+      if (m_magneticField && (abs(pid) != 99666)) {
+        // For monopoles a line segment approximation in the step volume is done,
+        // which is more reasonable, but should be done with a proper catenary FIXME
         // Cal. distance assuming helix track (still approximation)
         m_nonUniformField = 1;
         if (Bfield[0] == 0. && Bfield[1] == 0. &&
@@ -567,9 +556,9 @@ namespace Belle2 {
       //StoreArray<Relation> mcPartToSimHits(getRelationCollectionName());
       //StoreArray<MCParticle> mcPartArray(DEFAULT_MCPARTICLES);
       //if (saveIndex < 0) {B2FATAL("SimHit wasn't saved despite charge != 0");}
-      //StoreArray<CDCSimHit> cdcArray(DEFAULT_CDCSIMHITS);
+      //StoreArray<CDCSimHit> m_CDCSimHits(DEFAULT_CDCSIMHITS);
 
-      //new(mcPartToSimHits->AddrAt(saveIndex)) Relation(mcPartArray, cdcArray, trackID, saveIndex);
+      //new(mcPartToSimHits->AddrAt(saveIndex)) Relation(mcPartArray, m_CDCSimHits, trackID, saveIndex);
 
     } //end of wire loop
 
@@ -630,16 +619,11 @@ namespace Belle2 {
     }
 #endif
 
-    StoreArray<MCParticle> mcParticles;
+    RelationArray cdcSimHitRel(m_MCParticles, m_CDCSimHits);
 
-    StoreArray<CDCSimHit> cdcArray;
+    m_hitNumber = m_CDCSimHits.getEntries();
 
-    RelationArray cdcSimHitRel(mcParticles, cdcArray);
-
-    m_hitNumber = cdcArray.getEntries();
-
-    // cppcheck-suppress memleak
-    CDCSimHit* simHit =  cdcArray.appendNew();
+    CDCSimHit* simHit =  m_CDCSimHits.appendNew();
 
     simHit->setWireID(layerId, wireId);
     simHit->setTrackId(trackID);
@@ -678,7 +662,6 @@ namespace Belle2 {
     //    if (hitWeight < 0) m_nNegHits++;
     //    std::cout <<"trackID,HitNumber,weight,driftL,edep= "<< trackID <<" "<< m_hitNumber <<" "<< hitWeight <<" "<< distance <<" "<< edep << std::endl;
     //    return (m_hitNumber);
-    // cppcheck-suppress memleak
   }
 
 
@@ -1458,15 +1441,13 @@ line100:
     // N.B. MCParticle is incomplete at this stage; the relation betw it and
     // simHit is Okay.
     // MCParticle will be completed after all sub-detectors' EndOfEvent calls.
-    StoreArray<CDCSimHit>  simHits;
-    StoreArray<MCParticle> mcParticles;
-    RelationArray mcPartToSimHits(mcParticles, simHits);
+    RelationArray mcPartToSimHits(m_MCParticles, m_CDCSimHits);
     int nRelationsMinusOne = mcPartToSimHits.getEntries() - 1;
 
     if (nRelationsMinusOne == -1) return;
 
-    //    std::cout <<"#simHits= " << simHits.getEntries() << std::endl;
-    //    std::cout <<"#mcParticles= " << mcParticles.getEntries() << std::endl;
+    //    std::cout <<"#simHits= " << m_CDCSimHits.getEntries() << std::endl;
+    //    std::cout <<"#MCParticles= " << m_MCParticles.getEntries() << std::endl;
     //    std::cout <<"#mcPartToSimHits= " << mcPartToSimHits.getEntries() << std::endl;
 
     //reset some of negative weights to positive; this is needed for the hits
@@ -1498,7 +1479,7 @@ line100:
         //  std::cout <<"trackId,,iSimHit,wgtafterreset= "<<  trackId <<" "<< iSimHit <<" "<< mcPartToSimHit.getWeight(iRelation) << std::endl;
       }
 
-      CDCSimHit* sHit = simHits[mcPartToSimHit.getToIndex(iRelation)];
+      CDCSimHit* sHit = m_CDCSimHits[mcPartToSimHit.getToIndex(iRelation)];
 
       if (weight > 0.) {
         m_hitWithPosWeight.insert(std::pair<unsigned short, CDCSimHit*>(sHit->getWireID().getISuperLayer(), sHit));
@@ -1537,18 +1518,18 @@ line100:
   void CDCSensitiveDetector::reAssignLeftRightInfo()
   {
     CDCSimHit* sHit = nullptr;
-    WireID sWireId             = WireID();
-    TVector3 sPos              = TVector3();
+    WireID sWireId; //            = WireID();
+    TVector3 sPos;  //            = TVector3();
 
     CDCSimHit* pHit = nullptr;
-    WireID pWireId = WireID();
-    double minDistance2 = DBL_MAX;
-    double    distance2 = DBL_MAX;
+    WireID pWireId; // = WireID();
+    //   double minDistance2 = DBL_MAX;
+    //   double    distance2 = DBL_MAX;
     //    unsigned short bestNeighb = 0;
-    unsigned short neighb = 0;
+    // unsigned short neighb = 0;
 
-    std::multimap<unsigned short, CDCSimHit*>::iterator pItBegin = m_hitWithPosWeight.begin();
-    std::multimap<unsigned short, CDCSimHit*>::iterator pItEnd   = m_hitWithPosWeight.end();
+    // std::multimap<unsigned short, CDCSimHit*>::iterator pItBegin = m_hitWithPosWeight.begin();
+    // std::multimap<unsigned short, CDCSimHit*>::iterator pItEnd   = m_hitWithPosWeight.end();
 
     //    unsigned short sClayer     = 0;
     //    unsigned short sSuperLayer = 0;
@@ -1573,8 +1554,8 @@ line100:
       unsigned short sWire       = sWireId.getIWire();
       CDCSimHit*     fHit = sHit;
 
-      pItBegin = m_hitWithPosWeight.find(sSuperLayer);
-      pItEnd   = m_hitWithPosWeight.find(sSuperLayer + 1);
+      std::multimap<unsigned short, CDCSimHit*>::iterator pItBegin = m_hitWithPosWeight.find(sSuperLayer);
+      std::multimap<unsigned short, CDCSimHit*>::iterator pItEnd   = m_hitWithPosWeight.find(sSuperLayer + 1);
       /*
       if (sSuperLayer <= 8) {
       pItBegin = m_posWeightMapItBegin.at(sSuperLayer);
@@ -1584,7 +1565,7 @@ line100:
       }
       */
 
-      minDistance2 = DBL_MAX;
+      double minDistance2 = DBL_MAX;
       //      bestNeighb = 0;
 
       /*      for (std::multimap<unsigned short, CDCSimHit*>::iterator pIt = m_hitWithPosWeight.begin(); pIt != m_hitWithPosWeight.end(); ++pIt) {
@@ -1598,9 +1579,9 @@ line100:
         pHit = pIt->second;
         pWireId = pHit->getWireID();
         //      neigh = areNeighbors(sWireId, pWireId);
-        neighb = areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
+        unsigned short neighb = areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
         if (neighb != 0 || pWireId == sWireId) {
-          distance2 = (pHit->getPosTrack() - sPos).Mag2();
+          double distance2 = (pHit->getPosTrack() - sPos).Mag2();
           if (distance2 < minDistance2) {
             fHit = pHit;
             minDistance2 = distance2;

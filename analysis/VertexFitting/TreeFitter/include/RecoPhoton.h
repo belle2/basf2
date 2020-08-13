@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini, Jo-Frederik Krohn                     *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,40 +24,40 @@ namespace TreeFitter {
     virtual ~RecoPhoton() {};
 
     /** init particle with mother */
-    virtual ErrCode initParticleWithMother(FitParams* fitparams);
+    virtual ErrCode initParticleWithMother(FitParams& fitparams) override;
 
     /** init particle without mother */
-    virtual ErrCode initMotherlessParticle(FitParams* fitparams);
+    virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** init covariance */
-    ErrCode initCovariance(FitParams* fitparams) const;
+    ErrCode initCovariance(FitParams& fitparams) const override;
 
     /** update or init params */
     ErrCode initParams();
 
-    /** project photon consztraint */
-    ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const;
+    /** project photon constraint */
+    ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const override;
 
     /** sets the size of the corresponding residual projection */
-    virtual int dimM() const { return dim(); }
+    virtual int dimM() const override { return dim(); }
 
     /** how should the energy be calculated ? from momentum or from E ?  */
-    virtual bool hasEnergy() const { return false; }
+    virtual bool hasEnergy() const override { return false; }
 
     /**set the size of the particle in the statevector */
-    virtual int dim() const { return m_dim; }
+    virtual int dim() const override { return m_dim; }
 
     /** type */
-    virtual int type()     const { return kRecoPhoton ; }
+    virtual int type()     const override { return kRecoPhoton ; }
 
     /** add to list */
-    virtual void addToConstraintList(constraintlist& alist, int depth) const
+    virtual void addToConstraintList(constraintlist& alist, int depth) const override
     {
       alist.push_back(Constraint(this, Constraint::photon, depth, dimM())) ;
     }
 
-    /**  has energy in fit params? */
-    static bool useEnergy(Belle2::Particle& cand) ;
+    /** has energy in fit params? */
+    static bool useEnergy(const Belle2::Particle& cand) ;
 
   private:
 
@@ -70,11 +70,19 @@ namespace TreeFitter {
     /** has energy ins statevector */
     bool m_useEnergy ;
 
-    /** constains measured params (x_c, y_c, z_c, E_c) */
+    /** constrains measured params (x_c, y_c, z_c, E_c) */
     Eigen::Matrix<double, 1, 4> m_clusterPars;
 
     /** covariance (x_c,y_c,z_c,E_c) of measured pars */
     Eigen::Matrix<double, 4, 4> m_covariance;
+
+    /** index with the highest momentum. We have to make sure this does not change during the fit.  */
+    int m_i1;
+    /** random other index */
+    int m_i2;
+    /**  another random index */
+    int m_i3;
+
   };
 
 }

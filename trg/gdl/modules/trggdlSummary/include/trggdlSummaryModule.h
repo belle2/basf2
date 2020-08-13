@@ -6,13 +6,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
-#include <stdlib.h>
-#include <iostream>
-
-#include <TH2I.h>
-#include <TH1I.h>
-
-using namespace std;
+#include <framework/database/DBObjPtr.h>
+#include <mdst/dbobjects/TRGGDLDBPrescales.h>
+#include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
 
 namespace Belle2 {
 
@@ -26,19 +22,33 @@ namespace Belle2 {
 
   public:
     //! initialize
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin Run
-    virtual void beginRun() {}
+    virtual void beginRun() override {}
     //! Event
-    virtual void event();
+    virtual void event() override;
     //! End Run
-    virtual void endRun() {}
+    virtual void endRun() override {}
     //! terminate
-    virtual void terminate() {}
+    virtual void terminate() override {}
 
   private:
 
     StoreObjPtr<TRGSummary> GDLResult; /**< output for TRGSummary */
+
+    //condition database for unpacer
+    DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
+    //condition database for prescales
+    DBObjPtr<TRGGDLDBPrescales> m_prescales;
+    int LeafBitMap[320] = {0};
+    char LeafNames[320][100] = {{""}};
+    int _e_timtype = 0;
+    int ee_psn[10] = {0};
+    int ee_ftd[10] = {0};
+    int ee_itd[10] = {0};
+
+    /** Debug Level **/
+    int _debugLevel;
 
   };
 

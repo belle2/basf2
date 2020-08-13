@@ -54,11 +54,11 @@ void CheckErrorEventModule::checkCRCError(RawCOPPER* rawcpr, int i)
     m_packetCRCerr_cpr = + temp_packet;
     m_eventCRCerr_cpr = + temp_event;
     if (temp_packet) {
-      printf("Packet CRC error : block %d ent %d eve %.12d node %.8x\n", i, j,
+      printf("Packet CRC error : block %d ent %d eve %.12u node %.8x\n", i, j,
              rawcpr->GetEveNo(j), rawcpr->GetNodeID(j));
     }
     if (temp_event) {
-      printf("Packet EVE error : block %d ent %d eve %.12d node %.8x\n", i, j,
+      printf("Packet EVE error : block %d ent %d eve %.12u node %.8x\n", i, j,
              rawcpr->GetEveNo(j), rawcpr->GetNodeID(j));
     }
   }

@@ -1,84 +1,84 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-# Thomas Keck 2017
-
-from basf2 import *
-from modularAnalysis import *
-
-# In case you have problems with the conditions database you can use the localdb of the FEI directly
-# use_local_database('/home/belle2/tkeck/feiv4/Belle2_2017_MC7_Track14_2/localdb/database.txt',
-#                     '/home/belle2/tkeck/feiv4/Belle2_2017_MC7_Track14_2/localdb/', True, LogLevel.WARNING)
-
-path = create_path()
-inputMdstList('MC7', [], path)
+# William Sutcliffe 2019
 
 import fei
-particles = fei.get_default_channels()
-# You can turn on and off individual parts of the reconstruction without retraining!
-# particles = fei.get_default_channels(hadronic=True, semileptonic=True, chargedB=True, neutralB=True)
+import basf2 as b2
+import modularAnalysis as ma
 
-configuration = fei.config.FeiConfiguration(prefix='FEIv4_2017_MC7_Track14_2', training=False, monitor=False)
+# Create path
+path = b2.create_path()
+
+# Load input ROOT file
+ma.inputMdst(environmentType='default',
+             filename=b2.find_file('mdst12.root', 'validation', False),
+             path=path)
+
+# Add the necessary database
+# You can use the command b2conditionsdb-recommend
+# b2.conditions.globaltags = ['name of analysis global tag']
+b2.conditions.globaltags = ['analysis_tools_release-04-02']
+
+# Get FEI default channels.
+# Utilise the arguments to toggle on and off certain channels
+particles = fei.get_default_channels()
+
+# Set up FEI configuration specifying the FEI prefix
+configuration = fei.config.FeiConfiguration(prefix='FEIv4_2020_MC13_release_04_01_01', training=False, monitor=False, cache=0)
+
+# Get FEI path
 feistate = fei.get_path(particles, configuration)
+
+# Add FEI path to the path to be processed
 path.add_path(feistate.path)
 
+# Add MC matching when applying to MC. This is required for variables like isSignal and mcErrors below
 path.add_module('MCMatcherParticles', listName='B+:generic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
-variablesToNtuple('B+:generic',
-                  ['evtNum',
-                   'runNum',
-                   'expNum',
-                   'Mbc',
-                   'deltaE',
-                   'mcErrors',
-                   'extraInfo(decayModeID)',
-                   'extraInfo(uniqueSignal)',
-                   'extraInfo(SignalProbability)',
-                   'isSignal'],
-                  filename='B_charged_hadronic.root',
-                  path=path)
-variablesToNtuple('B+:semileptonic',
-                  ['evtNum',
-                   'runNum',
-                   'expNum',
-                   'cosThetaBetweenParticleAndTrueB',
-                   'mcErrors',
-                   'extraInfo(decayModeID)',
-                   'extraInfo(uniqueSignal)',
-                   'extraInfo(SignalProbability)',
-                   'isSignalAcceptMissingNeutrino'],
-                  filename='B_charged_semileptonic.root',
-                  path=path)
+# Store tag-side variables of interest.
+ma.variablesToNtuple('B+:generic',
+                     ['Mbc',
+                      'deltaE',
+                      'mcErrors',
+                      'extraInfo(decayModeID)',
+                      'extraInfo(uniqueSignal)',
+                      'extraInfo(SignalProbability)',
+                      'isSignal'],
+                     filename='B_charged_hadronic.root',
+                     path=path)
+ma.variablesToNtuple('B+:semileptonic',
+                     ['cosThetaBetweenParticleAndNominalB',
+                      'mcErrors',
+                      'extraInfo(decayModeID)',
+                      'extraInfo(uniqueSignal)',
+                      'extraInfo(SignalProbability)',
+                      'isSignalAcceptMissingNeutrino'],
+                     filename='B_charged_semileptonic.root',
+                     path=path)
 
-variablesToNtuple('B0:generic',
-                  ['evtNum',
-                   'runNum',
-                   'expNum',
-                   'Mbc',
-                   'deltaE',
-                   'mcErrors',
-                   'extraInfo(decayModeID)',
-                   'extraInfo(uniqueSignal)',
-                   'extraInfo(SignalProbability)',
-                   'isSignal'],
-                  filename='B_mixed_hadronic.root',
-                  path=path)
-variablesToNtuple('B0:semileptonic',
-                  ['evtNum',
-                   'runNum',
-                   'expNum',
-                   'cosThetaBetweenParticleAndTrueB',
-                   'mcErrors',
-                   'extraInfo(decayModeID)',
-                   'extraInfo(uniqueSignal)',
-                   'extraInfo(SignalProbability)',
-                   'isSignalAcceptMissingNeutrino'],
-                  filename='B_mixed_semileptonic.root',
-                  path=path)
+ma.variablesToNtuple('B0:generic',
+                     ['Mbc',
+                      'deltaE',
+                      'mcErrors',
+                      'extraInfo(decayModeID)',
+                      'extraInfo(uniqueSignal)',
+                      'extraInfo(SignalProbability)',
+                      'isSignal'],
+                     filename='B_mixed_hadronic.root',
+                     path=path)
+ma.variablesToNtuple('B0:semileptonic',
+                     ['cosThetaBetweenParticleAndNominalB',
+                      'mcErrors',
+                      'extraInfo(decayModeID)',
+                      'extraInfo(uniqueSignal)',
+                      'extraInfo(SignalProbability)',
+                      'isSignalAcceptMissingNeutrino'],
+                     filename='B_mixed_semileptonic.root',
+                     path=path)
 
-
-process(path)
-print(statistics)
+# Process 100 events
+b2.process(path, max_event=100)
+print(b2.statistics)

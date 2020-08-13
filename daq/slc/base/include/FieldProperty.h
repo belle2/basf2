@@ -33,13 +33,13 @@ namespace Belle2 {
       ~Property() {}
 
     public:
-      Type getType() const throw() { return m_type; }
-      int getLength() const throw() { return m_length; }
-      int getOffset() const throw() { return m_offset; }
-      void setType(Type type) throw() { m_type = type; }
-      void setLength(int length) throw() { m_length = length; }
+      Type getType() const { return m_type; }
+      int getLength() const { return m_length; }
+      int getOffset() const { return m_offset; }
+      void setType(Type type) { m_type = type; }
+      void setLength(int length) { m_length = length; }
 
-      int getTypeSize() const throw()
+      int getTypeSize() const
       {
         switch (m_type) {
           case BOOL:   return sizeof(bool);
@@ -54,7 +54,7 @@ namespace Belle2 {
         return 0;
       }
 
-      const std::string getTypeText() const throw()
+      const std::string getTypeText() const
       {
         switch (m_type) {
           case BOOL: return "bool";

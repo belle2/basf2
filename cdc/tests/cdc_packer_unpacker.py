@@ -68,7 +68,7 @@ class PackerUnpackerTestModule(Module):
 main = create_path()
 # Create Event information
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [10]})
 main.add_module(eventinfosetter)
 
 # to run the framework the used modules need to be registered
@@ -79,6 +79,7 @@ main.add_module(particlegun)
 
 # add simulation for CDC only
 simulation.add_simulation(main, components=['CDC'])
+set_module_parameters(main, type="Geometry", useDB=False, components=["CDC"])
 
 # add the packer which packs the CDCHits resulting from the simulation
 cdc_packer = register_module('CDCPacker')

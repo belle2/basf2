@@ -62,10 +62,10 @@ namespace Belle2 {
     std::vector<unsigned> hitList;
     /** Coordinate of rectangle for this candidate */
     coord2dPair coord;
-    /** Super layer count (number of hits from different super layers) */
-    unsigned short SLcount;
-    /** candidate number, for debugging */
-    unsigned id;
+    /** Super layer count (number of hits from different super layers). Initialized at 0 by the SW shifter */
+    unsigned short SLcount = 0;
+    /** candidate number, for debugging.  Initialized at 0 by the SW shifter.  */
+    unsigned id = 0;
   };
 
   /** Two cells are identical if they have the same coordinates */
@@ -75,17 +75,18 @@ namespace Belle2 {
             a.getCoord().first.Y() == b.getCoord().first.Y());
   }
 
+
   class CDCTrigger2DFinderModule : public Module {
   public:
     /** Constructor.  */
     CDCTrigger2DFinderModule();
 
     /** Initialize the module and check module parameters */
-    virtual void initialize();
+    virtual void initialize() override;
     /** Run tracking */
-    virtual void event();
+    virtual void event() override;
     /** Clean up */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** Fast intercept finder
      *  Divide Hough plane recursively to find cells with enough crossing lines.
@@ -134,7 +135,7 @@ namespace Belle2 {
 
     /** Combine Hough candidates to tracks by a fixed pattern algorithm.
      *  The Hough plane is first divided in 2 x 2 squares, then squares are combined. */
-    void patternClustering();
+    void patternClustering(const cdcMap& inputMap);
     /** Check for left/right connection of patterns in 2 x 2 squares */
     bool connectedLR(unsigned patternL, unsigned patternR);
     /** Check for up/down connection of patterns in 2 x 2 squares */
@@ -158,10 +159,11 @@ namespace Belle2 {
      *  @ return   index of corner within pattern */
     unsigned bottomLeftCorner(unsigned pattern);
 
-    /** Find all hits whose Hough curve crosses the rectangle
+    /** Find all hits in inputMap whose Hough curve crosses the rectangle
      *  with corners (x1, y1) and (x2, y2) and add the hit indices to list. */
     void findAllCrossingHits(std::vector<unsigned>& list,
-                             double x1, double x2, double y1, double y2);
+                             double x1, double x2, double y1, double y2,
+                             const cdcMap& inputMap);
     /** Select one hit per super layer.
      *  @param list        input list of hit Ids
      *  @param selected    selected hit Ids are added to selected
@@ -188,15 +190,15 @@ namespace Belle2 {
      *    0: no shift (same limits for negative and positive half)
      *  > 0: shift in positive direction (positive half is larger) */
     int m_shiftPt;
-    /** Hough plane limit in 1/r [1/cm] */
-    double maxR;
-    /** Hough plane shift in 1/r [1/cm] */
-    double shiftR;
+    /** Hough plane limit in 1/r [1/cm]. Initialized at 0 by the SW shifter*/
+    double maxR = 0.;
+    /** Hough plane shift in 1/r [1/cm]. Initialized at 0 by the SW shifter */
+    double shiftR = 0.;
     /** number of iterations for the fast peak finder,
-     *  smallest n such that 2^(n+1) > max(nCellsPhi, nCellsR) */
-    unsigned maxIterations;
-    /** number of cells for the fast peak finder: 2^(maxIterations + 1) */
-    unsigned nCells;
+     *  smallest n such that 2^(n+1) > max(nCellsPhi, nCellsR). Initialized at 0 by the SW shifter */
+    unsigned maxIterations = 0;
+    /** number of cells for the fast peak finder: 2^(maxIterations + 1). Initialized at 0 by the SW shifter */
+    unsigned nCells = 0;
 
     /** minimum number of hits from different super layers in a Hough cell
      *  to form a candidate */
@@ -218,6 +220,9 @@ namespace Belle2 {
     bool m_usePriority;
     /** switch to check separately for a hit in the innermost super layer */
     bool m_requireSL0;
+
+    /** switch to send only the first found track and suppress the subsequent clones */
+    bool m_suppressClone;
 
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */
@@ -244,15 +249,16 @@ namespace Belle2 {
     /** map of TS hits containing <iHit, <iSL, (x, y)>> with
      *  iHit: hit index in StoreArray
      *  iSL: super layer index
+
      *  (x, y): coordinates in conformal space */
     cdcMap hitMap;
     /** Hough Candidates */
     std::vector<CDCTriggerHoughCand> houghCand;
 
-    /** Radius of the CDC layers with priority wires (2 per super layer) */
-    double radius[9][2];
-    /** Number of track segments up to super layer */
-    unsigned TSoffset[10];
+    /** Radius of the CDC layers with priority wires (2 per super layer). Initialized at 0 by the SW shifter*/
+    double radius[9][2] = {{0.}};
+    /** Number of track segments up to super layer. Initialized at 0 by the SW shifter */
+    unsigned TSoffset[10] = {0};
 
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;

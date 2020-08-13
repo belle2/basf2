@@ -36,6 +36,10 @@ void RecoTracksCopierModule::initialize()
   RecoTrack::registerRequiredRelations(m_outputRecoTracks);
 
   m_outputRecoTracks.registerRelationTo(m_inputRecoTracks);
+
+  if (m_tracks.optionalRelationTo(m_inputRecoTracks)) {
+    m_tracks.registerRelationTo(m_outputRecoTracks);
+  }
 }
 
 void RecoTracksCopierModule::event()
@@ -47,6 +51,10 @@ void RecoTracksCopierModule::event()
     RecoTrack* newRecoTrack = recoTrack.copyToStoreArray(m_outputRecoTracks);
     newRecoTrack->addHitsFromRecoTrack(&recoTrack);
     newRecoTrack->addRelationTo(&recoTrack);
+
+    for (Track& track : recoTrack.getRelationsWith<Track>()) {
+      track.addRelationTo(newRecoTrack);
+    }
   }
 }
 

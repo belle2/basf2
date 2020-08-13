@@ -1,0 +1,21 @@
+Import('env')
+
+env['TOOLS_LIBS']['b2hlt_distributor'] = ['framework', 'hlt', 'daq_hbasf2', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_worker'] = ['framework', 'daq_hbasf2', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_collector'] = ['framework', 'daq_hbasf2', 'boost_system', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_proxycollector'] = ['framework', 'daq_hbasf2', 'boost_system', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_outputadapter'] = ['framework', 'daq_hbasf2', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_inputadapter'] = ['framework', 'daq_hbasf2', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_finalcollector'] = ['framework', 'daq_hbasf2', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_finalcollector_with_roi'] = ['framework', 'daq_hbasf2', 'boost_program_options', 'zmq']
+
+env['TOOLS_LIBS']['b2hlt_acceptor'] = ['framework', 'daq_hbasf2', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_readysender'] = ['framework', 'daq_hbasf2', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_sender'] = ['framework', 'daq_hbasf2', 'boost_program_options', 'zmq']
+env['TOOLS_LIBS']['b2hlt_finalhistoserver'] = ['$ROOT_LIBS', 'daq', 'daq_hbasf2', 'boost_program_options', 'framework', 'zmq']
+env['TOOLS_LIBS']['b2hlt_rawhistoserver'] = ['$ROOT_LIBS', 'daq', 'daq_hbasf2', 'boost_program_options', 'framework', 'zmq']
+env['TOOLS_LIBS']['b2hlt_proxyhistoserver'] = ['$ROOT_LIBS', 'daq_hbasf2', 'boost_program_options', 'framework', 'zmq']
+env['TOOLS_LIBS']['b2hlt_read_histos'] = ['$ROOT_LIBS', 'daq', 'daq_hbasf2', 'boost_program_options', 'framework', 'zmq']
+env['TOOLS_LIBS']['b2hlt_create_histos'] = ['$ROOT_LIBS', 'framework', 'daq_hbasf2', 'hlt_softwaretrigger_dataobjects', 'rawdata_dataobjects', 'daq_dataobjects', 'boost_program_options', 'tracking_dataobjects']
+
+Return('env')

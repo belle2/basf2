@@ -27,6 +27,7 @@ import original_basf2
 
 class BASF2StateRecorder(object):
     """ Drop-in replacement of the basf2 module, which keeps track of all functions calls """
+
     def __getattr__(self, name):
         """ Return attribute with the given name in the basf2 namespace """
         return getattr(original_basf2, name)
@@ -41,7 +42,7 @@ def process(path, max_event=0):
     sys.modules['basf2'] = original_basf2
     original_basf2.process(path, max_event)
     state = list(map(tuple, manager.mock_calls))
-    pickle_path = original_basf2.fw.get_pickle_path()
+    pickle_path = original_basf2.get_pickle_path()
     print("Path", path)
     print("State", state)
     if pickle_path != '' and path is not None:

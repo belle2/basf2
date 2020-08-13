@@ -40,11 +40,23 @@ output.param('branchNames', ['CDCHits', 'CDCRawHits'])
 
 
 class PrintTRGTime(Module):
+    """
+    Print TRG time
+    """
+
     def initialize(self):
+        """
+        set CDCHits and EventMetaData
+        """
+        #: EventMetaData
         self.event_info = Belle2.PyStoreObj('EventMetaData')
+        #: CDCHits
         self.cdc_hit = Belle2.PyStoreArray('CDCHits')
 
     def event(self):
+        """
+        Print TRG time of an event
+        """
         B2INFO('Event {}:'.format(self.event_info.getEvent()))
         for hit in self.cdc_hit:
             cdc_raw_hit = hit.getRelatedTo('CDCRawHits')

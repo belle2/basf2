@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <framework/logging/Logger.h>
-
 #include <TMath.h>
 
 #include <utility>

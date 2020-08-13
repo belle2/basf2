@@ -1,18 +1,17 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2017-2019 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CLUSTERUTILS_H
-#define CLUSTERUTILS_H
+#pragma once
 
-// BEAMPARAMETERS AND DATABASE
-#include <framework/dbobjects/BeamParameters.h>
+// BEAMSPOT AND DATABASE
+#include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/DBObjPtr.h>
 
 // MDST
@@ -40,42 +39,48 @@ namespace Belle2 {
     ClusterUtils();
 
     /**
-     * Returns four momentum vector
-     * @return const four momentum vector
+     * Returns cluster four momentum vector
+     * @return const cluster four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster);
+    const TLorentzVector GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex);
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+
+    /**
+     * Returns four momentum vector
+     * @return const four momentum vector
+     */
+    const TLorentzVector Get4MomentumFromCluster(const ECLCluster* cluster, const TVector3& vertex, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster);
+    const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 4x4 covariance matrix (px, py, pz, E)
      * @return const TMatrixDSym
      */
     const TMatrixDSym GetCovarianceMatrix4x4FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                        const TMatrixDSym& covmatvertex);
+                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 7x7 covariance matrix (px, py, pz, E, x, y, z)
      * @return const TMatrixDSym
      */
-    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster);
+    const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 7x7 covariance matrix (px, py, pz, E, x, y, z)
      * @return const TMatrixDSym
      */
     const TMatrixDSym GetCovarianceMatrix7x7FromCluster(const ECLCluster* cluster, const TVector3& vertex,
-                                                        const TMatrixDSym& covmatvertex);
+                                                        const TMatrixDSym& covmatvertex, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns default IP position from beam parameters
@@ -91,12 +96,7 @@ namespace Belle2 {
 
   private:
 
-    DBObjPtr<BeamParameters> m_beamParams; /**< BeamParameter. */
+    DBObjPtr<BeamSpot> m_beamSpotDB; /**< Beam spot database object */
   };
 
 } // Belle2 namespace
-
-#endif
-
-
-

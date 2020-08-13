@@ -8,7 +8,6 @@
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <string>
-#include <vector>
 #include <memory>
 #include <map>
 #include <vxd/background/niel_fun.h>
@@ -101,15 +100,15 @@ namespace Belle2 {
       virtual ~SVDBackgroundModule();
 
       /* Initialize module */
-      virtual void initialize();
+      virtual void initialize() override;
       /* Start-of-run initializations */
-      virtual void beginRun();
+      virtual void beginRun() override;
       /* Event processing */
-      virtual void event();
+      virtual void event() override;
       /* End-of-run tasks */
-      virtual void endRun();
+      virtual void endRun() override;
       /* Final summary and cleanup */
-      virtual void terminate();
+      virtual void terminate() override;
 
     private:
 
@@ -148,6 +147,7 @@ namespace Belle2 {
       /** Get number of sensors in a layer */
       inline int getNumSensors(int layerNum);
       /** Get total number of sensors */
+      // cppcheck-suppress unusedPrivateFunction
       inline int getTotalSensors();
 
       // Output directory

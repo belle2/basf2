@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENTCONSTANT_H
-#define BFIELDCOMPONENTCONSTANT_H
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
@@ -36,7 +35,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates (x,y,z) in [cm] at which the magnetic field vector should be calculated.
      * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual B2Vector3D calculate(const B2Vector3D& point) const;
+    virtual B2Vector3D calculate(const B2Vector3D& point) const override;
 
     /**
      * Sets the values for the homogeneous magnetic field vector.
@@ -59,5 +58,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENTCONSTANT_H */

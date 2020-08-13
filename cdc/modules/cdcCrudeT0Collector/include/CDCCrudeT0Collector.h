@@ -28,11 +28,16 @@ namespace Belle2 {
        */
       CDCCrudeT0CollectorModule();
 
-      virtual void prepare();
-      virtual void collect();
-      virtual void startRun();
-      virtual void closeRun();
-      virtual void finish();
+      /// initialization
+      void prepare() override;
+      /// collection
+      void collect() override;
+      /// start of run action
+      void startRun() override;
+      /// end of run action
+      void closeRun() override;
+      /// finalization
+      void finish() override;
 
     private:
       unsigned short m_lay;  /**< Layer ID */

@@ -50,49 +50,7 @@ REG_MODULE(ECLBackground)
 //-----------------------------------------------------------------
 
 
-ECLBackgroundModule::ECLBackgroundModule() :
-  HistoModule(),
-  m_nEvent(0),
-  h_nECLSimHits(0),
-  h_CrystalRadDoseTheta(0),
-  h_CrystalRadDose(0),
-  h_CrystalThetaID2(0),
-  h_CrystalThetaID67(0),
-  h_HitLocations(0),
-  h_BarrelDose(0),
-  h_DiodeRadDose(0),
-  h_NeutronFlux(0),
-  h_NeutronFluxThetaID2(0),
-  h_NeutronFluxThetaID67(0),
-  h_NeutronE(0),
-  h_NeutronEThetaID0(0),
-  h_PhotonE(0),
-  h_ShowerVsTheta(0),
-  h_Shower(0),
-  h_ProdVert(0),
-  h_ProdVertvsThetaId(0),
-  Crystal{0},
-  m_arichgp(0),
-  nHAPDperRing{0},
-  hEMDose(0),
-  hEnergyPerCrystal(0),
-  hDiodeFlux(0),
-  hEgamma(0),
-  hEneu(0),
-  hARICHDoseBB(0),
-  hHAPDFlux(0),
-  hEnergyPerCrystalECF(0),
-  hEnergyPerCrystalECB(0),
-  hEnergyPerCrystalBAR(0),
-  hEnergyPerCrystalWideTID(0),
-  hEMDoseECF(0),
-  hEMDoseECB(0),
-  hEMDoseBAR(0),
-  hEMDoseWideTID(0),
-  hDiodeFluxECF(0),
-  hDiodeFluxECB(0),
-  hDiodeFluxBAR(0),
-  hDiodeFluxWideTID(0)
+ECLBackgroundModule::ECLBackgroundModule() : HistoModule()
 {
   //Set module properties
   setDescription("Processes background campaigns and produces histograms. Requires HistoManager");
@@ -227,9 +185,8 @@ void ECLBackgroundModule::event()
 
 
   //some variables that will be used many times
-  int m_cellID, m_thetaID, m_phiID, pid, NperRing, SubDet;
-  double edep, theta, dose, damage, Energy, diodeDose, weightedFlux;
-  float Mass;
+  int m_cellID, m_thetaID, m_phiID, pid, NperRing;
+  double edep, theta, Energy, diodeDose, weightedFlux;
   TVector3 rHit;
 
   //ignore events with huge number of SimHits (usually a glitchy event)
@@ -262,15 +219,15 @@ void ECLBackgroundModule::event()
   int hitNum = m_eclArray.getEntries();
   for (int i = 0; i < hitNum; i++) { //loop over ECLSimHits
     ECLSimHit* aECLHit = m_eclArray[i];
-    m_cellID  = aECLHit->getCellId() - 1; //cell ID
-    edep      = aECLHit->getEnergyDep();  //energy deposited
+    m_cellID    = aECLHit->getCellId() - 1; //cell ID
+    edep        = aECLHit->getEnergyDep();  //energy deposited
     G4ThreeVector hitPosn   = aECLHit->getPosition();   //position of hit
-    pid       = aECLHit->getPDGCode();
-    Mass      = Crystal[m_cellID]->GetMass();
-    m_thetaID = Crystal[m_cellID]->GetThetaID();
-    m_phiID   = Crystal[m_cellID]->GetPhiID();
-    NperRing  = Crystal[m_cellID]->GetNperThetaID();   //number of crystals in this theta ring
-    theta     = Crystal[m_cellID]->GetTheta();
+    pid         = aECLHit->getPDGCode();
+    float Mass  = Crystal[m_cellID]->GetMass();
+    m_thetaID   = Crystal[m_cellID]->GetThetaID();
+    m_phiID     = Crystal[m_cellID]->GetPhiID();
+    NperRing    = Crystal[m_cellID]->GetNperThetaID();   //number of crystals in this theta ring
+    theta       = Crystal[m_cellID]->GetTheta();
 
 
     //get Track ID of photons which create the SimHits
@@ -285,7 +242,7 @@ void ECLBackgroundModule::event()
 
     //fill histograms
     //radiation dose for this SimHit
-    dose = edep * GeVtoJ * usInYr / (m_sampleTime * Mass);
+    double dose = edep * GeVtoJ * usInYr / (m_sampleTime * Mass);
 
     h_CrystalRadDoseTheta->Fill(theta, dose / NperRing);
     h_CrystalRadDose->AddBinContent(m_thetaID + 1,  dose / NperRing);
@@ -351,12 +308,12 @@ void ECLBackgroundModule::event()
 
     //get relevant values
     m_cellID = aBeamBackSimHit->getIdentifier();
-    damage   = aBeamBackSimHit->getNeutronWeight();
-    edep     = aBeamBackSimHit->getEnergyDeposit();
-    pid      = aBeamBackSimHit->getPDG();
-    SubDet   = aBeamBackSimHit->getSubDet();
-    Energy   = aBeamBackSimHit->getEnergy();
-    rHit     = aBeamBackSimHit->getPosition();
+    double damage = aBeamBackSimHit->getNeutronWeight();
+    edep          = aBeamBackSimHit->getEnergyDeposit();
+    pid           = aBeamBackSimHit->getPDG();
+    int SubDet    = aBeamBackSimHit->getSubDet();
+    Energy = aBeamBackSimHit->getEnergy();
+    rHit          = aBeamBackSimHit->getPosition();
 
 
     if (SubDet == 6) { //ECL
@@ -522,26 +479,17 @@ int ECLBackgroundModule::BuildECL()
 //Method used for debugging.
 int ECLBackgroundModule::SetPosHistos(TH1F* h, TH2F* hFWD, TH2F* hBAR, TH2F* hBWD)
 {
-  char FWDtitle[100];
-  char BWDtitle[100];
-  char BARtitle[100];
+  std::string FWDtitle = h->GetTitle() + std::string(" -- Forward Endcap");
+  std::string BWDtitle = h->GetTitle() + std::string(" -- Backward Endcap");
+  std::string BARtitle = h->GetTitle() + std::string(" -- Barrel");
 
-  char FWDname[16];
-  char BWDname[16];
-  char BARname[16];
+  std::string FWDname = h->GetTitle() + std::string("FWD");
+  std::string BWDname = h->GetTitle() + std::string("BWD");
+  std::string BARname = h->GetTitle() + std::string("BAR");
 
-  sprintf(FWDtitle, "%s -- Forward Endcap" , h->GetTitle());
-  sprintf(BWDtitle, "%s -- Backward Endcap", h->GetTitle());
-  sprintf(BARtitle, "%s -- Barrel",          h->GetTitle());
-
-  sprintf(FWDname, "%sFWD", h->GetName());
-  sprintf(BWDname, "%sBWD", h->GetName());
-  sprintf(BARname, "%sBAR", h->GetName());
-
-  float value = 0;
   // Fill 2D histograms with the values in the 1D histogram
   for (int i = 0; i < nECLCrystalTot; i++)  {
-    value = h->GetBinContent(i + 1);
+    float value = h->GetBinContent(i + 1);
 
     if (i < nECLCrystalECF) {
       hFWD->Fill(floor(Crystal[i]->GetX()), floor(Crystal[i]->GetY()), value);
@@ -561,17 +509,14 @@ TH2F* ECLBackgroundModule::BuildPosHisto(TH1F* h, const char* sub)
 {
 
   // Initialize variables
-  char _title[100];
-  char _name[16];
   TH2F* h_out;
-
   double value = 0;
 
-// Forward endcap value vs (x,y)
+  // Forward endcap value vs (x,y)
   if (!strcmp(sub, "forward")) {
-    sprintf(_name, "%sFWD", h->GetName());
-    sprintf(_title, "%s -- Forward Endcap;x(cm);y(cm)" , h->GetTitle());
-    h_out = new TH2F(_name, _title, 90, -150, 150, 90, -150, 150); //position in cm
+    std::string _name = h->GetName() + std::string("FWD");
+    std::string _title = h->GetTitle() + std::string(" -- Forward Endcap;x(cm);y(cm)");
+    h_out = new TH2F(_name.c_str(), _title.c_str(), 90, -150, 150, 90, -150, 150); //position in cm
     h_out->Sumw2();
     for (int i = 0; i < nECLCrystalECF; i++)  {
       value = h->GetBinContent(i + 1);
@@ -582,9 +527,9 @@ TH2F* ECLBackgroundModule::BuildPosHisto(TH1F* h, const char* sub)
 
     // Backward endcap value vs (x,y)
   } else if (!strcmp(sub, "backward")) {
-    sprintf(_name, "%sBWD", h->GetName());
-    sprintf(_title, "%s -- Backward Endcap;x(cm);y(cm)", h->GetTitle());
-    h_out = new TH2F(_name, _title, 90, -150, 150, 90, -150, 150); //position in cm
+    std::string _name = h->GetName() + std::string("BWD");
+    std::string _title = h->GetTitle() + std::string(" -- Backward Endcap;x(cm);y(cm)");
+    h_out = new TH2F(_name.c_str(), _title.c_str(), 90, -150, 150, 90, -150, 150); //position in cm
     h_out->Sumw2();
     for (int i = (nECLCrystalBAR + nECLCrystalECF); i < nECLCrystalTot; i++) {
       value = h->GetBinContent(i + 1);
@@ -596,9 +541,9 @@ TH2F* ECLBackgroundModule::BuildPosHisto(TH1F* h, const char* sub)
 
     // The rest: barrel value vs (theta_ID, phi_ID)
   } else if (!strcmp(sub, "barrel")) {
-    sprintf(_name, "%sBAR", h->GetName());
-    sprintf(_title, "%s -- Barrel;#theta_{ID};#phi_{ID}",          h->GetTitle());
-    h_out = new TH2F(_name, _title, 47, 12, 59, 144, 0, 144); //position in cm (along z and along r*phi)
+    std::string _name = h->GetName() + std::string("BAR");
+    std::string _title = h->GetTitle() + std::string(" -- Barrel;#theta_{ID};#phi_{ID}");
+    h_out = new TH2F(_name.c_str(), _title.c_str(), 47, 12, 59, 144, 0, 144); //position in cm (along z and along r*phi)
     h_out->Sumw2();
     for (int i = nECLCrystalECF; i < (nECLCrystalBAR + nECLCrystalECF); i++) {
       value = h->GetBinContent(i + 1);
@@ -617,9 +562,6 @@ TH2F* ECLBackgroundModule::BuildPosHisto(TH1F* h, const char* sub)
 TH1F*   ECLBackgroundModule::BuildThetaIDWideHisto(TH1F* h_cry)
 {
 
-  char _title[100];
-  char _name[64];
-
   //Define the boundaries of the bins
   static const int    _nbins = 21;
   static const double _xbins[] = { -0.5,  0.5,  4.5,  8.5, 11.5, 12.5,
@@ -629,11 +571,11 @@ TH1F*   ECLBackgroundModule::BuildThetaIDWideHisto(TH1F* h_cry)
                                  };
 
 
-  sprintf(_title, "%s vs #theta_{ID} -- averages" , h_cry->GetTitle());
-  sprintf(_name, "%svsTheWide", h_cry->GetName());
+  std::string _title = h_cry->GetTitle() + std::string(" vs #theta_{ID} -- averages");
+  std::string _name = h_cry->GetName() + std::string("vsTheWide");
 
   //New pointer to the returned histogram ...
-  TH1F* h_out  = new TH1F(_name, _title, 1, 0, 1);
+  TH1F* h_out  = new TH1F(_name.c_str(), _title.c_str(), 1, 0, 1);
   // ... but only temp variables to the temporary ones
   TH1F h_mass("h_mass", "Total Mass per Theta-ID", 1, 0, 1);
   TH1F h_N("h_N", "Entries (unweighted) per Theta-ID bin", 1, 0, 1);
@@ -643,7 +585,7 @@ TH1F*   ECLBackgroundModule::BuildThetaIDWideHisto(TH1F* h_cry)
   h_mass.SetBins(_nbins, _xbins);
   h_N.SetBins(_nbins, _xbins);
 
-  h_out->SetTitle(_title);
+  h_out->SetTitle(_title.c_str());
   h_out->Sumw2();
 
   //Make histo for total mass, then divide!

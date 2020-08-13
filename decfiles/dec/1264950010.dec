@@ -1,0 +1,53 @@
+# EventType: 1264950010
+# Descriptor: [B+ -> K+ tau l ]cc [B- -> D0 pi-, D0 -> K- pi, or B- -> Jpsi K- ] 
+# NickName: B_Ktaul_Bbar_Dpi_Jpsik
+# Documentation: b->sll' LFV process
+# Tested: Yes
+# Physics WG: EWP 
+# Responsible: Trevor Shillington, Saurabh Sandilya
+# Email: trshillington@hep.physics.mcgill.ca, saurabhsandilya@gmail.com
+# Cuts: None
+# Date: 20181010
+
+
+Alias  D0tag D0
+Alias  anti-D0tag anti-D0
+ChargeConj D0tag  anti-D0tag
+
+Alias myJpsi J/psi
+ChargeConj myJpsi myJpsi
+
+Alias B-tag B-
+Alias B+tag B+
+ChargeConj B-tag B+tag
+
+Decay Upsilon(4S)
+0.5 B+sig B-tag VSS;
+0.5 B-sig B+tag VSS;
+Enddecay
+
+Decay B+sig
+0.5   K+   tau- e+	PHOTOS	PHSP; 
+0.5   K+   tau- mu+	PHOTOS	PHSP;
+Enddecay
+CDecay B-sig
+
+Decay myJpsi
+0.05940 e+      e-                                      PHOTOS   VLL; 
+0.05930 mu+     mu-                                     PHOTOS   VLL; 
+Enddecay
+
+
+Decay B-tag
+0.004840000 D0tag  pi-	PHOTOS	PHSP;
+0.001026 myJpsi  K-	PHOTOS	SVS;
+Enddecay
+CDecay B+tag
+
+Decay D0tag
+1.00 K- pi+	PHOTOS	PHSP;
+Enddecay
+CDecay anti-D0tag 
+
+#
+End

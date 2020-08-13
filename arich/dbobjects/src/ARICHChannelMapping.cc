@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHChannelMapping.h>
 #include <iostream>

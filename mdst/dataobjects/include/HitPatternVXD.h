@@ -19,14 +19,12 @@ namespace Belle2 {
    * Hit pattern of the VXD within a track.
    * The pattern is stored using a std::bitset. This allows to use the STL, which is very efficiently programmed.
    *
-   * Only hits from the outgoing arm are stored.
-   * For each layer there are two bits. The layer counting is from
+   * Only hits from the outgoing arm are stored. For each layer there are two bits. The layer counting is:
+   *  - PXD: layers 1 and 2;
+   *  - SVD: layers 3, 4, 5 and 6.
    *
-   * XXX: The numbering scheme is not final.
-   * PXD layer: 0, 1
-   * SVD layer: 0, 1, 2, 3
-   * The numbering scheme in this class is _NOT_ equivalent to the one defined in [BELLE2-NOTE-TE-2015-010].
-   * --> https://d2comp.kek.jp/record/243/files/BELLE2-NOTE-TE-2015-010.pdf
+   * The numbering scheme in this class is equivalent to the one defined in the note BELLE2-NOTE-TE-2015-010:
+   * https://docs.belle2.org/record/243
    *
    * @sa HitPatternCDC
    *
@@ -77,7 +75,7 @@ namespace Belle2 {
 
     /**
      * Set the number of hits in a specific layer of the SVD.
-     * @param svdLayer SVD layer index.
+     * @param layerId SVD layer index.
      * @param uHits
      * @param vHits
      */
@@ -85,14 +83,14 @@ namespace Belle2 {
 
     /**
      * Get the number of hits in a specific layer of the SVD.
-     * @param svdLayer SVD layer index.
+     * @param layerId SVD layer index.
      * @return Pair of (u, v) hits in the SVD layer.
      */
     std::pair<const unsigned short, const unsigned short> getSVDLayer(const unsigned short layerId) const;
 
     /**
      * Reset the number of hits in a specific layer of the SVD.
-     * @param svdLayer SVD layer index.
+     * @param layerId SVD layer index.
      */
     void resetSVDLayer(const unsigned short layerId);
 
@@ -128,7 +126,7 @@ namespace Belle2 {
 
     /**
      * Set the number of hits in a specific layer of the PXD.
-     * @param nLayer PXD layer index.
+     * @param layerId PXD layer index.
      * @param nHits 0-3 hits possible
      * @param mode normal or gated
      * @sa HitPatternVXD::PXDMode
@@ -137,7 +135,7 @@ namespace Belle2 {
 
     /**
      * Get the number of hits in a specific layer of the PXD.
-     * @param nLayer PXD layer index.
+     * @param layerId PXD layer index.
      * @param mode normal or gated
      * @sa HitPatternVXD::PXDMode
      * @return Number of hits in the PXD layer.
@@ -146,7 +144,7 @@ namespace Belle2 {
 
     /**
      * Reset the number of hits in a specific layer of the PXD.
-     * @param nLayer PXD layer index.
+     * @param layerId PXD layer index.
      * @param mode normal or gated
      * @sa HitPatternVXD::PXDMode
      */
@@ -182,6 +180,9 @@ namespace Belle2 {
      * @return Index of last layer.
      */
     short getLastPXDLayer(const PXDMode& mode = PXDMode::normal) const;
+
+    /** String for printing in python.*/
+    std::string __repr__() const;
 
   private:
     /** Storing of actual hit pattern.

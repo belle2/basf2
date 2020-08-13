@@ -1,4 +1,13 @@
-#include <fstream>
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2012-2018 - Belle II Collaboration                        *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Jeremy Dalseno                                           *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <iomanip>
 #include <cmath>
 #include <string>
@@ -8,11 +17,11 @@
 #include "EvtGenBase/EvtTensor4C.hh"
 
 #include <generators/evtgen/EvtGenModelRegister.h>
-
 #include "generators/evtgen/models/EvtB0toKsKK.h"
 
 namespace Belle2 {
 
+  /** register the model in EvtGen */
   B2_EVTGEN_REGISTER_MODEL(EvtB0toKsKK);
 
   EvtB0toKsKK::~EvtB0toKsKK() {}
@@ -651,6 +660,7 @@ namespace Belle2 {
     return A_f0ks;
   }
 
+  /** minimum s13 */
   double s13_min(const double& s12, const double& M,
                  const double& m1, const double& m2, const double& m3)
   {
@@ -665,6 +675,7 @@ namespace Belle2 {
     return s23_min;
   }
 
+  /** maximum s13 */
   double s13_max(const double& s12, const double& M,
                  const double& m1, const double& m2, const double& m3)
   {

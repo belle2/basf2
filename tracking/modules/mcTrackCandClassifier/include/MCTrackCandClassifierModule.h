@@ -8,28 +8,20 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCTRACKCANDCLASSIFIER_H_
-#define MCTRACKCANDCLASSIFIER_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TList.h>
 #include <TH1F.h>
-#include <TH2F.h>
 #include <TH3F.h>
 #include <time.h>
 
-#include <framework/datastore/SelectSubset.h>
-#include <genfit/TrackCand.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/MCParticleInfo.h>
 #include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {
-
-  class  MCParticleInfo;
 
   /** The MCTrackCandClassifier Definition Module
    *
@@ -89,50 +81,42 @@ namespace Belle2 {
     double m_fraction;
 
     /// Counter for hits on wedged sensors.
-    int nWedge;
+    int nWedge = 0;
     /// Counter for hits on barrel sensors.
-    int nBarrel;
+    int nBarrel = 0;
 
     /// Pointer to root file used for storing histograms
-    TFile* m_rootFilePtr;
+    TFile* m_rootFilePtr = nullptr;
 
-    TList* m_histoList; /** Histogram */
-    TH3F* m_h3_MCParticle; /** Histogram */
-    TH3F* m_h3_idealMCTrackCand; /** Histogram */
-    TH3F* m_h3_MCTrackCand; /** Histogram */
+    TList* m_histoList = nullptr; /**< List of histograms */
+    TH3F* m_h3_MCParticle = nullptr; /**< Histogram */
+    TH3F* m_h3_idealMCTrackCand = nullptr; /**< Histogram */
+    TH3F* m_h3_MCTrackCand = nullptr; /**< Histogram */
 
-    TH1F* m_h1_thetaMS_SVD; /** Histogram */
-    TH1F* m_h1_thetaMS_PXD; /** Histogram */
-    TH1F* m_h1_dR; /** Histogram */
-    TH1F* m_h1_dRoverR; /** Histogram */
-    TH1F* m_h1_distOVERdR; /** Histogram */
-    TH1F* m_h1_hitRadius_accepted; /** Histogram */
-    TH1F* m_h1_hitRadius_rejected; /** Histogram */
-    TH1F* m_h1_hitDistance_accepted; /** Histogram */
-    TH1F* m_h1_hitDistance_rejected; /** Histogram */
+    TH1F* m_h1_thetaMS_SVD = nullptr; /**< Histogram */
+    TH1F* m_h1_thetaMS_PXD = nullptr; /**< Histogram */
+    TH1F* m_h1_dR = nullptr; /**< Histogram */
+    TH1F* m_h1_dRoverR = nullptr; /**< Histogram */
+    TH1F* m_h1_distOVERdR = nullptr; /**< Histogram */
+    TH1F* m_h1_hitRadius_accepted = nullptr; /**< Histogram */
+    TH1F* m_h1_hitRadius_rejected = nullptr; /**< Histogram */
+    TH1F* m_h1_hitDistance_accepted = nullptr; /**< Histogram */
+    TH1F* m_h1_hitDistance_rejected = nullptr; /**< Histogram */
 
-    TH1F* m_h1_MCTrackCandNhits; /** Histogram */
-    TH1F* m_h1_firstRejectedHit; /** Histogram */
-    TH1F* m_h1_firstRejectedOVERMCHit; /** Histogram */
+    TH1F* m_h1_MCTrackCandNhits = nullptr; /**< Histogram */
+    TH1F* m_h1_firstRejectedHit = nullptr; /**< Histogram */
+    TH1F* m_h1_firstRejectedOVERMCHit = nullptr; /**< Histogram */
 
-    TH1F* m_h1_lapTime; /** Histogram */
-    TH1F* m_h1_timeDifference; /** Histogram */
-    TH1F* m_h1_diffOVERlap; /** Histogram */
+    TH1F* m_h1_lapTime = nullptr; /**< Histogram */
+    TH1F* m_h1_timeDifference = nullptr; /**< Histogram */
+    TH1F* m_h1_diffOVERlap = nullptr; /**< Histogram */
 
-    TH1F* m_h1_nGoodTrueHits; /** Histogram */
-    TH1F* m_h1_nBadTrueHits; /** Histogram */
-    TH1F* m_h1_nGood1dInfo; /** Histogram */
-    TH1F* m_h1_nBad1dInfo; /** Histogram */
+    TH1F* m_h1_nGoodTrueHits = nullptr; /**< Histogram */
+    TH1F* m_h1_nBadTrueHits = nullptr; /**< Histogram */
+    TH1F* m_h1_nGood1dInfo = nullptr; /**< Histogram */
+    TH1F* m_h1_nBad1dInfo = nullptr; /**< Histogram */
 
   private:
-
-    /** Returns the x intersect. TODO: Function is never used...?
-    * @param d0: Point of closest approach in the r-phi-plane.
-    * @param omega: Signed curvature
-    * @param R: Radius
-    * @return x intersect
-    */
-    double getXintersect(double d0, double omega, double R);
 
     /** Function to get semiplane.
      * @param vertex: Vertex position
@@ -195,7 +179,7 @@ namespace Belle2 {
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             Int_t nbinsZ, Double_t minZ, Double_t maxZ, const char* titleZ,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
     /** Create a 3D ROOT Histogram.
      * @param name: name of histogram
@@ -216,7 +200,7 @@ namespace Belle2 {
                             Int_t nbinsX, Double_t* binsX, const char* titleX,
                             Int_t nbinsY, Double_t* binsY, const char* titleY,
                             Int_t nbinsZ, Double_t* binsZ, const char* titleZ,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
     /** Function to clone a histogram.
      * @param newname: new histogram name
@@ -226,7 +210,7 @@ namespace Belle2 {
      * @return the duplicated histogram
      */
     TH1* duplicateHistogram(const char* newname, const char* newtitle,
-                            TH1* h, TList* histoList = NULL);
+                            TH1* h, TList* histoList = nullptr);
 
     /** Function to create a ratio histogram from two histograms.
      * @param name: name of histogram
@@ -244,12 +228,12 @@ namespace Belle2 {
     /** Function to create efficiency plots and add them to list.
      * @param graphList: pointer to list to add the plots to
      */
-    void addEfficiencyPlots(TList* graphList = NULL);
+    void addEfficiencyPlots(TList* graphList = nullptr);
 
     /** Function to create inefficiency plots and add them to list.
      * @param graphList: pointer to list to add the plots to
      */
-    void addInefficiencyPlots(TList* graphList = NULL);
+    void addInefficiencyPlots(TList* graphList = nullptr);
 
     /** Calculate dR.
      * @param thetaMS: thetaMS of a hit
@@ -267,5 +251,3 @@ namespace Belle2 {
     float compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit);
   };
 }
-
-#endif /* MCTrackCandClassifierModule_H_ */

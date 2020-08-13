@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REALISTICTDCCOUNTTRANSLATOR_H
-#define REALISTICTDCCOUNTTRANSLATOR_H
+#pragma once
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
+#include <cdc/simulation/CDCSimControlPar.h>
 
 #include <framework/dataobjects/EventT0.h>
 
@@ -120,6 +120,11 @@ namespace Belle2 {
       const CDCGeoControlPar& m_gcp;
 
       /**
+       * Cached reference to CDC SimControlPar object.
+       */
+      const CDCSimControlPar& m_scp;
+
+      /**
        * Cached reference to CDC GeometryPar object.
        */
       const CDCGeometryPar& m_cdcp;
@@ -134,7 +139,11 @@ namespace Belle2 {
        * N.B. The declaration should be after m_cdcp for proper initialization.
        */
       const double m_tdcBinWidth;
+
+      /**
+       * Cached fudge factor for space resol.
+       */
+      double m_fudgeFactor = 1.;
     };
   }
 }
-#endif /* RealisticTDCCountTranslator_H_ */

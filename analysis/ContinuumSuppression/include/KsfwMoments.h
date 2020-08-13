@@ -62,8 +62,8 @@ namespace Belle2 {
                 std::vector<std::pair<TVector3, int>> p3_cms_q_sigA,
                 std::vector<std::pair<TVector3, int>> p3_cms_q_sigB,
                 std::vector<std::pair<TVector3, int>> p3_cms_q_roe,
-                TLorentzVector p_cms_missA,
-                TLorentzVector p_cms_missB,
+                const TLorentzVector& p_cms_missA,
+                const TLorentzVector& p_cms_missB,
                 double et[2]
                );
 

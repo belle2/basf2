@@ -11,9 +11,6 @@
 
 #include <tracking/modules/DATCON/DATCONSpacePointHelperFunctions.h>
 
-#include <framework/logging/Logger.h>
-
-
 using namespace std;
 using namespace Belle2;
 

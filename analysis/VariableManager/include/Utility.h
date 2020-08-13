@@ -1,9 +1,10 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2010-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Keck                                              *
+ *               Sam Cunliffe                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -40,5 +41,10 @@ namespace Belle2 {
      *
      */
     using Cut = GeneralCut<Belle2::Variable::Manager>;
+    /**
+     * A check if this variable string is a counter type variable to be handled
+     * by the VariablesTo* output modules directly.
+     */
+    bool isCounterVariable(const std::string& variableName);
   }
 }

@@ -22,15 +22,13 @@
 #include <framework/utilities/FileSystem.h>
 
 //ECL
-#include <ecl/digitization/shaperdsp.h>
 #include <ecl/digitization/ECLDspFitterPure.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
 
 using namespace std;
 using namespace Belle2;
@@ -134,7 +132,7 @@ void ECLDigitizerPureCsIModule::event()
         // hitE = gRandom->Gaus(hitE, 0.001 * m_photostatresolution * sqrt(hitE * 1000));
       }
       m_adc[j].AddHit(hitE , hitTime + deltaT, m_ss[m_tbl[j].iss]);
-      if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap[j].push_back(&eclHit);
+      if (eclHit.getBackgroundTag() == BackgroundMetaData::bg_none) hitmap[j].push_back(&eclHit);
     }
   }
 
@@ -168,9 +166,9 @@ void ECLDigitizerPureCsIModule::event()
     int  energyFit = 0; // fit output : Amplitude 18 bits
     double    tFit = 0; // fit output : T_ave     12 bits
     int qualityFit = 0; // fit output : quality    2 bits
-    double fitChi2 = 0;
 
     if (! m_calibration) {
+      double fitChi2 = 0;
       if (m_debug) {
         DSPFitterPure(m_fitparams[m_tbl[j].idn], FitA, m_testtrg, energyFit, tFit, fitChi2, qualityFit);
         /*

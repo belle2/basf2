@@ -8,12 +8,10 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#ifndef MCDECAYFINDERMODULE_H
-#define MCDECAYFINDERMODULE_H
+#pragma once
 #include <framework/core/Module.h>
 #include <analysis/modules/MCDecayFinder/DecayTree.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <vector>
 
 namespace Belle2 {
   /** Find decays in MCParticle list matching a given DecayString.
@@ -43,6 +41,9 @@ namespace Belle2 {
     DecayTree<MCParticle>* match(const MCParticle* mcp, const DecayDescriptor* d, bool isCC);
     /** Create Particle from matched MCParticle and write to Particle list. */
     int write(DecayTree<MCParticle>* decay);
+    /** Recursively gather all MC daughters of gen **/
+    void appendParticles(const MCParticle* gen, std::vector<const MCParticle*>& children);
+    /** Recursively get number of daughters of given DecayDescriptor **/
+    int getNDaughtersRecursive(const DecayDescriptor* d);
   };
 }
-#endif // MCDECAYFINDERMODULE_H

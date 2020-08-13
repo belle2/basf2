@@ -14,15 +14,8 @@
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/he3tube/dataobjects/He3tubeHit.h>
-#include <string>
-#include <vector>
-
-#include <TFile.h>
-#include <TTree.h>
-#include <TRandom.h>
 
 namespace Belle2 {
   namespace he3tube {
@@ -40,21 +33,43 @@ namespace Belle2 {
        * Constructor: Sets the description, the properties and the parameters of the module.
        */
       He3DigitizerModule();
-      /**  */
+
+      /**
+       * Destructor
+       */
       virtual ~He3DigitizerModule();
-      /**  */
-      virtual void initialize();
-      /**  */
-      virtual void beginRun();
-      /**  */
-      virtual void event();
-      /**  */
-      virtual void endRun();
-      /**  */
-      virtual void terminate();
+
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
+      virtual void initialize() override;
+
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
+      virtual void beginRun() override;
+
+      /**
+       * Event processor.
+       */
+      virtual void event() override;
+
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
+      virtual void endRun() override;
+
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
+      virtual void terminate() override;
 
     private:
-      StoreArray<He3tubeHit> m_he3tubeHit; /** Array for He3tubeHit */
+      StoreArray<He3tubeHit> m_he3tubeHit; /**< Array for He3tubeHit */
 
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

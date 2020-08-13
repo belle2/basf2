@@ -15,10 +15,6 @@
 // root:
 #include <TMath.h>
 
-// stl:
-#include <string>
-
-
 namespace Belle2 {
   /** INFO
    * This file contains all the algorithms calculating residuals of something.

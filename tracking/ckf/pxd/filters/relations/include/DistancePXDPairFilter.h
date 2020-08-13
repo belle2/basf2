@@ -16,6 +16,7 @@ namespace Belle2 {
   /// Base filter for CKF PXD states
   class DistancePXDPairFilter : public BasePXDPairFilter {
   public:
+    /// Return the weight based on azimuthal-angle separation
     TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
   };
 }

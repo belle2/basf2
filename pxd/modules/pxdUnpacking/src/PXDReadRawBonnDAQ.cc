@@ -32,20 +32,17 @@ REG_MODULE(PXDReadRawBonnDAQ)
 PXDReadRawBonnDAQModule::PXDReadRawBonnDAQModule() : Module()
 {
   fh = 0;
-  m_msghandler = 0;
   //Set module properties
   setDescription("Read a BonnDAQ file and stores it as RawPXD in Data Store");
-  //setPropertyFlags(c_Input | c_ParallelProcessingCertified);
-  //setPropertyFlags(c_Input);
+  //setPropertyFlags(c_Input | c_ParallelProcessingCertified); // not parallel processing!
 
   addParam("FileName", m_filename, "file name");
+  addParam("SubRunNr", m_subRunNr, "sub-run number", 0u);
   addParam("RunNr", m_runNr, "run number", 0u);
   addParam("ExpNr", m_expNr, "exp number", 0u);
-  m_nread = 0;
-  m_compressionLevel = 0;
   m_buffer = new int[MAXEVTSIZE];
 
-  B2DEBUG(0, "PXDReadRawBonnDAQModule: Constructor done.");
+  B2DEBUG(29, "PXDReadRawBonnDAQModule: Constructor done.");
 }
 
 
@@ -56,8 +53,7 @@ PXDReadRawBonnDAQModule::~PXDReadRawBonnDAQModule()
 
 void PXDReadRawBonnDAQModule::initialize()
 {
-  // Open receiver sockets
-//  m_recv = new EvtSocketSend(m_host, m_port);
+  // Open file
   fh = fopen(m_filename.c_str(), "rb");
   if (fh) {
     B2INFO("Read BonnDAQ Data from " << m_filename);
@@ -65,15 +61,12 @@ void PXDReadRawBonnDAQModule::initialize()
     B2ERROR("Could not open BonnDAQ Data: " << m_filename);
   }
 
-  // Open message handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
-
   // Register EvtMetaData
   m_eventMetaDataPtr.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
   // Register RawPXD
   m_rawPXD.registerInDataStore(DataStore::EStoreFlags::c_ErrorIfAlreadyRegistered);
 
-  B2DEBUG(0, "PXDReadRawBonnDAQModule: initialized.");
+  B2DEBUG(29, "PXDReadRawBonnDAQModule: initialized.");
 }
 
 int PXDReadRawBonnDAQModule::read_data(char* data, size_t len)
@@ -84,18 +77,6 @@ int PXDReadRawBonnDAQModule::read_data(char* data, size_t len)
   return l;
 }
 
-void PXDReadRawBonnDAQModule::endian_swapper(void* a, unsigned int len)
-{
-  // Quick and Dirty swapper for BonnDAQ
-  ubig16_t* p;
-  ulittle16_t* q;
-  p = (ubig16_t*)a;
-  q = (ulittle16_t*)a;
-  len /= 2;
-  for (unsigned int i = 0; i < len; i++, q++, p++) { *q = *p;}
-}
-
-
 int PXDReadRawBonnDAQModule::readOneEvent()
 {
   unsigned int triggernr = 0xFFFFFFFF;
@@ -103,6 +84,11 @@ int PXDReadRawBonnDAQModule::readOneEvent()
   struct EvtHeader {
     ulittle16_t size;
     ulittle16_t header;
+    unsigned int get_size(void) { return (unsigned int) size + (((unsigned int)(header & 0x000F)) << 16);};
+    unsigned int get_size_group(void) { return (unsigned int) size + (((unsigned int)((header & 0x003F) ^ 0x0020)) << 16);};
+    unsigned int get_header12(void) { return (header & 0xFFF0);};
+    unsigned int get_header10(void) { return (header & 0xFFC0);};
+    unsigned int get_header8(void) { return (header & 0xFF00);};
   };
 
   char* data = (char*)m_buffer;
@@ -114,41 +100,48 @@ int PXDReadRawBonnDAQModule::readOneEvent()
     // Read 8 bytes header (group)
     int br = read_data(data, 4);
     if (br <= 0) return br;
-    B2DEBUG(1, "Header $" << std::hex << evt->header << " Chunk size " << std::dec << evt->size);
-    if (evt->size <= 1) return 0;
-    br = read_data(data + 4, evt->size * 4 - 4);
+    unsigned int chunk_size = 0;
+    if (evt->get_header8() == 0) {
+      B2DEBUG(29, "Group Header $" << std::hex << evt->get_header10() << " Chunk size " << std::dec << evt->get_size());
+      chunk_size = evt->get_size_group();
+    } else {
+      B2DEBUG(29, "Header $" << std::hex << evt->get_header12() << " Chunk size " << std::dec << evt->get_size());
+      chunk_size = evt->get_size();
+    }
+    if (chunk_size <= 1) return 0;
+    br = read_data(data + 4, chunk_size * 4 - 4);
     if (br <= 0) return br;
-    if (evt->header == 0xe230) {
-      B2DEBUG(1, "File info " << std::hex << evt->header << " Events " << std::dec << data32[1]);
+    if (evt->get_header12() == 0xe230) {
+      B2DEBUG(29, "File info " << std::hex << evt->get_header12() << " Events " << std::dec << data32[1]);
       continue;
-    } else if (evt->header == 0xe100) {
-      B2DEBUG(1, "Info Event " << std::hex << evt->header << " RunNr $" << std::hex << data32[1]);
+    } else if (evt->get_header12() == 0xe100) {
+      B2DEBUG(29, "Info Event " << std::hex << evt->get_header12() << " RunNr $" << std::hex << data32[1]);
       if (m_runNr == 0) m_runNr = data32[1]; // we assume it will not change within one file
       continue;
-    } else if (evt->header == 0x0020) {
-      B2DEBUG(1, "Run Event Group " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
+    } else if (evt->get_header10() == 0x0000) { // war 0x0020
+      B2DEBUG(29, "Run Event Group " << std::hex << evt->get_header10() << " Magic $" << std::hex << data32[1]);
       continue;
-    } else if (evt->header == 0xbb00) {
-      B2DEBUG(1, "Run Event " << std::hex << evt->header << " Magic $" << std::hex << data32[1]);
+    } else if (evt->get_header12() == 0xbb00) {
+      B2DEBUG(29, "Run Event " << std::hex << evt->get_header12() << " Magic $" << std::hex << data32[1]);
       continue;
-    } else if (evt->header == 0x00a0) {
-      int togo = evt->size;
-      B2DEBUG(1, "Data Event Group " << std::hex << evt->header << " TriggerNr $" << std::hex << data32[1]);
+    } else if (evt->get_header10() == 0x0080) { // war 0x00A0
+      int togo = chunk_size;
+      B2DEBUG(29, "Data Event Group " << std::hex << evt->get_header10() << " TriggerNr $" << std::hex << data32[1]);
       triggernr = data32[1];
       togo -= 2;
       data32 += 2;
       data16 += 4;
       while (togo > 2) {
-        B2DEBUG(1, "TOGO: " << togo);
-        B2DEBUG(1, " ............... " << std::hex << data32[0] << " TriggerNr $" << std::hex << data32[1]);
+        B2DEBUG(29, "TOGO: " << togo);
+        B2DEBUG(29, " ............... " << std::hex << data32[0] << " TriggerNr $" << std::hex << data32[1]);
         if (triggernr != data32[1]) B2ERROR("Trigger Nr does not match!");
-        B2DEBUG(1, " ............... " << std::hex << data32[2]);
+        B2DEBUG(29, " ............... " << std::hex << data32[2]);
         togo -= 2;
         data32 += 2;
         data16 += 4;
         if ((data32[0] & 0xFFFF0000) == 0xCAFE0000) {
           int frames = (data32[0] & 0x3FF);
-          B2DEBUG(1, "Frames: " << frames);
+          B2DEBUG(29, "Frames: " << frames);
           int size = 0;
           bool nocrc = (data32[0] & 0x8000) != 0;
 
@@ -222,7 +215,7 @@ int PXDReadRawBonnDAQModule::readOneEvent()
 
       return 1;
     } else {
-      B2ERROR("Undefine Header $" << std::hex << evt->header);
+      B2ERROR("Undefine Header $" << std::hex << evt->get_header12());
       continue;
     }
     continue;
@@ -239,7 +232,7 @@ void PXDReadRawBonnDAQModule::event()
     return;
   }
 
-  // Get a record from socket
+  // Get a record from file
   int stat;
   do {
     stat = readOneEvent();
@@ -255,7 +248,6 @@ void PXDReadRawBonnDAQModule::event()
 
 void PXDReadRawBonnDAQModule::terminate()
 {
-  B2INFO("terminate called");
   if (fh) fclose(fh);
   fh = 0;
 }

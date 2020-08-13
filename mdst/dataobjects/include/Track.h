@@ -14,7 +14,6 @@
 #include <algorithm>
 
 namespace Belle2 {
-  class TrackFitResult;
   /** Class that bundles various TrackFitResults.
    *
    *  As the RecoTrack has a lot of information that is only necessary during the fit,
@@ -37,7 +36,7 @@ namespace Belle2 {
      *  which is an invalid index.
      *  @param qualityIndicator   Initialises m_qualityIndicator with 0, a value associated typically with fake tracks.
      */
-    Track(float qualityIndicator = 0.) : m_qualityIndicator(qualityIndicator)
+    explicit Track(float qualityIndicator = 0.) : m_qualityIndicator(qualityIndicator)
     {
       std::fill(m_trackFitIndices, m_trackFitIndices + Const::chargedStableSet.size(), -1);
     }
@@ -88,6 +87,7 @@ namespace Belle2 {
      *  The TrackFitResult itself should be saved separately in the DataStore.
      *
      *  @param chargedStable  Determines the hypothesis for which you want to store the index or unavailability-code.
+     *  @param index  index of track fir result (for positive values) or unavailability-code (with negative values)
      */
     void setTrackFitResultIndex(const Const::ChargedStable& chargedStable, short index)
     {

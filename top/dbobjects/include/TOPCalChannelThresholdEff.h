@@ -84,7 +84,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns the threshold efficiency of a single channel
+     * Returns the threshold efficiency of a single channel (1.0 if status is c_Default)
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      * @return ThrEff
@@ -100,6 +100,7 @@ namespace Belle2 {
         B2WARNING("Invalid channel number, returning 0 (" << ClassName() << ")");
         return 0;
       }
+      if (m_status[module][channel] == c_Default) return 1.0;
       return m_ThrEff[module][channel];
     }
 

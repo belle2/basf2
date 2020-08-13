@@ -18,7 +18,7 @@ template class TrackFindingCDC::MVA<BaseAxialSegmentPairFilter>;
 
 MVAFeasibleAxialSegmentPairFilter::MVAFeasibleAxialSegmentPairFilter()
   : Super(std::make_unique<VarSet>(),
-          "tracking/data/trackfindingcdc_FeasibleAxialSegmentPairFilter.xml",
+          "trackfindingcdc_FeasibleAxialSegmentPairFilter",
           0.04)
 {
 }

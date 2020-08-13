@@ -5,7 +5,7 @@
 <header>
   <input>EvtGenSimRec.root, EvtGenSimRec_B2Kpi.root</input>
   <output>TOPNtuple.root</output>
-  <contact>staric</contact>
+  <contact>marko.staric@ijs.si</contact>
   <description>Makes a flat ntuple with TOP PID, track info and MC truth </description>
 </header>
 """

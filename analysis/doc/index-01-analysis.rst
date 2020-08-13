@@ -1,10 +1,10 @@
-=========
+========
 Analysis
-=========
+========
 
 The analysis package collects modules and tools for high-level analysis of Belle II data.
 With analysis modules you are able to open mdst format files, create final state particles, and build more complicated decays.
-With these particle decay candidates, you can use high level tools such as `TreeFitter`, `FlavorTagger`, and the `FullEventInterpretation` (FEI).
+With these particle decay candidates, you can use high level tools such as :doc:`TreeFitter`, :doc:`FlavorTagger`, and the :doc:`FullEventInterpretation` (FEI).
 
 The core data objects of the ``basf2`` analysis package, are the `Particle`_ class, and the `ParticleList`_ class.
 Almost all analysis modules are concerned with the manipulation of `ParticleList`_ s.
@@ -31,9 +31,14 @@ To use them you need to use functions described in the standard particle lists.
 .. toctree:: StandardParticles
 
 Creation of new particle lists by combination of particles is essential part of almost any analysis job.
-The syntax used during this procedure is the `DecayString` and is described below:
+The syntax used during this procedure is the :doc:`DecayString` and is described below:
 
 .. toctree:: DecayString
+
+It is often desirable to apply selections to `ParticleList`_ s, and events.
+This is done with cut strings.
+
+.. toctree:: CutStrings
 
 
 Modular analysis convenience functions
@@ -49,30 +54,29 @@ There are also some more specialised python wrapper functions for vertex-fitting
 .. toctree:: Vertex
 .. toctree:: PhotonWrappers
 
+
 Variables
 =========
 
-While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate variables associated with a given candidate or event.
-Here is a list of variables known to ``basf2`` that can be used in cut strings or written out to file.
+While ``basf2`` operates on `ParticleList`_ s, it is also important to calculate physics quantities associated with a given candidate or event.
+
+In ``basf2`` analysis, variables are handled by the `VariableManager`.
+There are many variables available for use in analysis.
+Probably the most obvious, and useful are: :b2:var:`p`, :b2:var:`E`, :b2:var:`Mbc`, and :b2:var:`deltaE`.
+
+You can search the variables in an alphabetical :ref:`b2-varindex`, or browse :ref:`variablesByGroup`.
 
 .. toctree:: Variables
+
 
 Output for offline analysis
 ===========================
 
-For historical reasons, there are two ways to save information from analysis jobs (e.g. for offline analysis using python tools such as `pandas`_)
-The recommended method is to get output directly from the VariableManger.
-New users are encouraged to start with this.
+You can save information from analysis jobs directly from the ``VariableManager`` (e.g. for offline analysis using python tools such as `pandas`_) 
 
 .. _pandas: https://pandas.pydata.org/
 
 .. toctree:: VariableManagerOutput
-
-We also support `NtupleMaker` tools which were developed first.
-However we expect to deprecate this method in the next release, and eventually remove.
-The documentation is included here for backward compatibility.
-
-.. toctree:: NtupleMaker
 
 Event-based analysis
 ====================
@@ -84,25 +88,26 @@ Truth-matching
 
 .. toctree:: MCMatching
 
-How to Veto
-===========
-
-.. toctree:: HowToVeto
-
 Advanced Topics
 ===============
 
 .. toctree:: RestOfEvent
 
+.. toctree:: HowToVeto
+
 .. toctree:: FlavorTagger
 
+.. toctree:: DeepFlavorTagger
+
 .. toctree:: FullEventInterpretation
+
+.. toctree:: EventShape
 
 .. toctree:: ContinuumSuppression
 
 .. toctree:: TreeFitter
 
-.. toctree:: VertexFitter
+.. .. toctree:: VertexFitter
 
 .. toctree:: MVA
 
@@ -127,7 +132,7 @@ Typical physics analysis performed at B factories can be separated into well def
 #. write out all relevant info to ntuple for offline analysis.
 
 
-A measurement of time-dependent CP violation in B0 decays to a different final state, e.g. :math:`J/\psi K_S^0,\ D^+D^−` or :math:`K^{*0}\gamma`, would consist of conceptually identical analysis actions. Even within the same analysis sequence the same analysis action can appear several times. In the example above, the actions 2 and 4 are conceptually the same. In both cases new particle is created by combining others. The only difference is in the input. The only difference between differnet decay modes mentioned above is in the intermediate and final state particles. All other steps, like 5, 6, 7, 8, and 9 are in principle the same. The input is of course different, but the result is the same. Therefore, commonly used analysis tools need to be prepared in order to enable efficient and accurate data analysis. Each analysis action can then be performed by a separate analysis module, combined into an analysis sequence steered by a python script.
+A measurement of time-dependent CP violation in B0 decays to a different final state, e.g. :math:`J/\psi K_S^0,\ D^+D^−` or :math:`K^{*0}\gamma`, would consist of conceptually identical analysis actions. Even within the same analysis sequence the same analysis action can appear several times. In the example above, the actions 2 and 4 are conceptually the same. In both cases new particle is created by combining others. The only difference is in the input. The only difference between different decay modes mentioned above is in the intermediate and final state particles. All other steps, like 5, 6, 7, 8, and 9 are in principle the same. The input is of course different, but the result is the same. Therefore, commonly used analysis tools need to be prepared in order to enable efficient and accurate data analysis. Each analysis action can then be performed by a separate analysis module, combined into an analysis sequence steered by a python script.
 
 
 

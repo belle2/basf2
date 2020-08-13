@@ -14,29 +14,19 @@
 #include <simulation/monopoles/G4MonopoleEquation.h>
 
 #include <G4MagneticField.hh>
-#include <G4UniformMagField.hh>
 #include <G4FieldManager.hh>
 #include <G4TransportationManager.hh>
-#include <G4Mag_UsualEqRhs.hh>
 #include <G4MagIntegratorStepper.hh>
 #include <G4ChordFinder.hh>
 
-// #include "G4ExplicitEuler.hh"
-// #include "G4ImplicitEuler.hh"
-// #include "G4SimpleRunge.hh"
-// #include "G4SimpleHeum.hh"
 #include <G4ClassicalRK4.hh>
-// #include "G4HelixExplicitEuler.hh"
-// #include "G4HelixImplicitEuler.hh"
-// #include "G4HelixSimpleRunge.hh"
-// #include "G4CashKarpRKF45.hh"
-// #include "G4RKG3_Stepper.hh"
 
-#include <G4SystemOfUnits.hh>
+#include <CLHEP/Units/SystemOfUnits.h>
 
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Monopoles;
+using namespace CLHEP;
 
 G4MonopoleFieldSetup* G4MonopoleFieldSetup::fMonopoleFieldSetup = 0;
 

@@ -14,7 +14,6 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
-#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -55,6 +54,13 @@ namespace Belle2 {
     void erase_remove_if(Ts& ts, const APredicate& predicate)
     {
       ts.erase(std::remove_if(std::begin(ts), std::end(ts), predicate), std::end(ts));
+    }
+
+    template<class Ts>
+    void only_best_N(Ts& ts, const size_t N)
+    {
+      auto newEnd = std::next(ts.begin(), std::min(N, ts.size()));
+      ts.erase(newEnd, ts.end());
     }
 
     /**
@@ -273,8 +279,8 @@ namespace Belle2 {
     {
       using std::begin;
       using std::end;
-      std::size_t size = end(ts) - begin(ts);
-      std::vector<T*> result(size, nullptr);
+      std::size_t vsize = end(ts) - begin(ts);
+      std::vector<T*> result(vsize, nullptr);
       std::transform(begin(ts), end(ts), result.begin(), [](T & t) { return std::addressof<T>(t);});
       return result;
     }

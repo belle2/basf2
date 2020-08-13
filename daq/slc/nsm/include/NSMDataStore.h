@@ -47,14 +47,14 @@ namespace Belle2 {
   public:
     bool isOpend() { return m_buf != NULL; }
     bool open(unsigned short max = 0);
-    void init() throw();
+    void init();
     Entry* add(unsigned int addr,
                unsigned int size,
                unsigned int revision,
                const std::string& name,
                const std::string& format,
                unsigned int rid);
-    void unlink() throw();
+    void unlink();
     Header* getHeader() { return m_header; }
     Entry* get(const std::string& name);
     Entry* get(unsigned int id);

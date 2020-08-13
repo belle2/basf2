@@ -7,8 +7,18 @@
 //-
 
 #include "daq/rfarm/manager/RFLogManager.h"
-#include <iostream>
+#include "daq/rfarm/manager/RFNSM.h"
+
+#include <nsm2/belle2nsm.h>
+
+#include <fcntl.h>
+#include <sys/time.h>
 #include <time.h>
+#include <unistd.h>
+
+#include <cstdarg>
+#include <cstring>
+#include <iostream>
 
 using namespace Belle2;
 using namespace std;
@@ -17,7 +27,7 @@ using namespace std;
 
 // Constructor/Destructor
 
-RFLogManager::RFLogManager(char* id, char* lognode, char* logdir)
+RFLogManager::RFLogManager(const char* id, const char* lognode, const char* logdir)
 {
   strcpy(m_id, id);
 
@@ -89,7 +99,7 @@ int RFLogManager::SwitchLogFile()
 }
 
 
-int RFLogManager::WriteLog(char* prefix, char* msg)
+int RFLogManager::WriteLog(const char* prefix, const char* msg)
 {
   SwitchLogFile();
   char wbuf[1024];
@@ -106,12 +116,13 @@ void RFLogManager::timestamp(char* buf)
   //  struct tm      result;
   gettimeofday(&tb, NULL);
   tp = localtime(&tb.tv_sec);
-  sprintf(buf, "%02d:%02d:%02d.%03d ",
+  sprintf(buf, "[%04d-%02d-%02d %02d:%02d:%02d.%03d] ",
+          tp->tm_year + 1900, tp->tm_mon + 1, tp->tm_mday,
           tp->tm_hour, tp->tm_min, tp->tm_sec, (int)(tb.tv_usec / 1000));
   return;
 }
 
-char* RFLogManager::BuildMessage(char* fmt, ...)
+char* RFLogManager::BuildMessage(const char* fmt, ...)
 {
   va_list arg;
 
@@ -130,7 +141,7 @@ char* RFLogManager::BuildMessage(char* fmt, ...)
   */
 }
 
-void RFLogManager::Log(char* fmt, ...)
+void RFLogManager::Log(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
@@ -140,70 +151,78 @@ void RFLogManager::Log(char* fmt, ...)
   WriteLog("", msg);
 }
 
-void RFLogManager::Info(char* fmt, ...)
+void RFLogManager::Info(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[info]", msg);
-  int pars[2];
-  pars[0] = 2;
-  pars[1] = (int)time(NULL);
-  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  WriteLog("[INFO]", msg);
+  if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
+    int pars[2];
+    pars[0] = 2;
+    pars[1] = (int)time(NULL);
+    b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  }
 }
 
-void RFLogManager::Warning(char* fmt, ...)
+void RFLogManager::Warning(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[warning]", msg);
-  int pars[2];
-  pars[0] = 4;
-  pars[1] = (int)time(NULL);
-  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  WriteLog("[WARNING]", msg);
+  if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
+    int pars[2];
+    pars[0] = 4;
+    pars[1] = (int)time(NULL);
+    b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  }
 }
 
-void RFLogManager::Error(char* fmt, ...)
+void RFLogManager::Error(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[error]", msg);
-  int pars[2];
-  pars[0] = 5;
-  pars[1] = (int)time(NULL);
-  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  WriteLog("[ERROR]", msg);
+  if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
+    int pars[2];
+    pars[0] = 5;
+    pars[1] = (int)time(NULL);
+    b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  }
 }
 
-void RFLogManager::Fatal(char* fmt, ...)
+void RFLogManager::Fatal(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[fatal]", msg);
-  int pars[2];
-  pars[0] = 6;
-  pars[1] = (int)time(NULL);
-  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  WriteLog("[FATAL]", msg);
+  if (RFNSM_Status::Instance().get_state() == RFSTATE_RUNNING) {
+    int pars[2];
+    pars[0] = 6;
+    pars[1] = (int)time(NULL);
+    b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
+  }
 }
 
-void RFLogManager::Abort(char* fmt, ...)
+void RFLogManager::Abort(const char* fmt, ...)
 {
   va_list ap;
   char msg[1000];
 
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
-  WriteLog("[abort]", msg);
+  WriteLog("[ABORT]", msg);
   b2nsm_sendany(m_lognode, "LOG", 0, NULL, strlen(msg), msg, NULL);
   abort();
 }

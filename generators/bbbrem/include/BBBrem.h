@@ -8,15 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BBBREM_H
-#define BBBREM_H
+#pragma once
 
-#include <framework/gearbox/Unit.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 
 #include <TLorentzRotation.h>
-
-#include <string>
 
 namespace Belle2 {
 
@@ -199,4 +195,3 @@ namespace Belle2 {
 }
 
 
-#endif /* BBBREM_H */

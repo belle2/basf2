@@ -8,17 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PARTICLEGUNMODULE_H
-#define PARTICLEGUNMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <generators/particlegun/ParticleGun.h>
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 
@@ -38,10 +35,10 @@ namespace Belle2 {
     virtual ~ParticleGunModule() {}
 
     /** Initializes the module. */
-    void initialize();
+    void initialize() override;
 
     /** Method is called for each event. */
-    void event();
+    void event() override;
 
   protected:
     /** function to convert the strings the uses sets in the parameter list to the internal encoding */
@@ -57,6 +54,8 @@ namespace Belle2 {
     std::string m_phiDist;
     /** String representation of the polar angle distribution */
     std::string m_thetaDist;
+    /** String representation of the time distribution */
+    std::string m_timeDist;
     /** String representation of the vertex distribution */
     std::string m_vertexDist;
     /** String representation of the x vertex distribution */
@@ -71,4 +70,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // PARTICLEGUNMODULE_H

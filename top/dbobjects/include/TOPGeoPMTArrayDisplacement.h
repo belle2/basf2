@@ -61,13 +61,13 @@ namespace Belle2 {
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */
-    bool isConsistent() const {return true;}
+    bool isConsistent() const override {return true;}
 
     /**
      * Print the content of the class
      * @param title title to be printed
      */
-    void print(const std::string& title = "PMT array displacement parameters") const;
+    void print(const std::string& title = "PMT array displacement parameters") const override;
 
   private:
 
@@ -75,7 +75,7 @@ namespace Belle2 {
     float m_y = 0; /**< translation in y */
     float m_alpha = 0; /**< rotation angle around z */
 
-    ClassDef(TOPGeoPMTArrayDisplacement, 1); /**< ClassDef */
+    ClassDefOverride(TOPGeoPMTArrayDisplacement, 1); /**< ClassDef */
 
   };
 

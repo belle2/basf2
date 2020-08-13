@@ -22,11 +22,11 @@ namespace Belle2 {
     virtual ~HistoManagerModule();
 
     //! module functions
-    virtual void initialize();
-    virtual void beginRun();
-    virtual void endRun();
-    virtual void event();
-    virtual void terminate();
+    virtual void initialize() override;
+    virtual void beginRun() override;
+    virtual void endRun() override;
+    virtual void event() override;
+    virtual void terminate() override;
 
   private:
     std::string m_workdir; /**< Name of working directory. */

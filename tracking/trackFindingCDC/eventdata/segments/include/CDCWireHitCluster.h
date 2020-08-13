@@ -29,6 +29,7 @@ namespace Belle2 {
       CDCWireHitCluster(const CDCWireHitCluster& wireHitCluster) = default;
 
       /// Constructor from a bunch of wire hits
+      // cppcheck-suppress passedByValue
       explicit CDCWireHitCluster(std::vector<CDCWireHit*> wireHits)
         : Super(std::move(wireHits))
       {

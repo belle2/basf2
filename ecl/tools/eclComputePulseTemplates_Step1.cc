@@ -2,7 +2,6 @@
 #include <ecl/digitization/OfflineFitFunction.h>
 #include <TTree.h>
 #include <TFile.h>
-#include <TGraph.h>
 #include <iostream>
 #include <assert.h>
 

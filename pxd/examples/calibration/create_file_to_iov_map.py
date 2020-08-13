@@ -14,13 +14,15 @@
 #
 # Run this script by calling
 #
-# basf2 create_file_to_iov_map.py -- --option='metadata' --file_path_pattern='/home/benjamin/BeamRun18/r0*/**/*.root'
+# basf2 create_file_to_iov_map.py -- --option='metadata' --file_path_pattern='/hsm/belle2/bdata/Data/Raw/e0003/r*/**/*.root'
 
 
 import argparse
 parser = argparse.ArgumentParser(description="Make a mapping file of file paths -> IoV")
-parser.add_argument('--file_path_patterns', default='/home/benjamin/BeamRun18/r0*/**/*.root', type=str,
+parser.add_argument('--file_path_patterns', default='/hsm/belle2/bdata/Data/Raw/e0003/r*/**/*.root', type=str,
                     help='Lets take some file patterns. We could have put wildcards in more places but this is enough for testing.')
+parser.add_argument('--output', default='file_iov_map.pkl', type=str,
+                    help='Name of the output mapping file.')
 parser.add_argument(
     '--option',
     default='filepath',
@@ -71,7 +73,7 @@ def from_metadata_of_files(file_path_patterns):
         return mapping
 
     # return run_in_one_process()
-    return run_with_multiprocessing(max_processes=4)
+    return run_with_multiprocessing(max_processes=6)
 
 
 if args.option == "metadata":
@@ -88,7 +90,7 @@ pp.pprint(file_to_iov)
 
 import pickle
 # Save for later use
-with open("file_iov_map.pkl", 'bw') as iov_map_file:
+with open(args.output, 'bw') as iov_map_file:
     pickle.dump(file_to_iov, iov_map_file)
     print("Saved dictionary to a file for later use.")
 

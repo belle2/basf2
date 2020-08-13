@@ -12,29 +12,13 @@
 #include <top/modules/TOPChannelT0MC/TOPChannelT0MCModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// framework - Database
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/Database.h>
-
-// framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-
-// DataStore classes
-#include <framework/dataobjects/EventMetaData.h>
 
 // database classes
 #include <framework/database/DBStore.h>
-#include <top/dbobjects/TOPASICChannel.h>
 
 #include <TFile.h>
 #include <TH1F.h>
-#include <TF1.h>
 #include <TTree.h>
 #include <sstream>
 

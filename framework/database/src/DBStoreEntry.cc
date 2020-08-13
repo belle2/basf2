@@ -13,7 +13,6 @@
 #include <framework/database/IntraRunDependency.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <algorithm>
 #include <iomanip>
 #include <TFile.h>
 #include <TClonesArray.h>
@@ -69,7 +68,7 @@ namespace Belle2 {
     m_revision = 0;
     m_iov = IntervalOfValidity();
     m_keep = false;
-    m_checksum = "";
+    m_filename = "";
     m_checksum = "";
     // If the old object was intra run dependent then m_object is owned by the
     // intra run dependency object. So set the pointer to null to not delete the object.
@@ -99,12 +98,12 @@ namespace Belle2 {
     // and delete the old intra run dependency if it exists
     deleteAndSetNullptr(m_object, m_intraRunDependency, m_tfile);
     loadPayload(event);
-    B2DEBUG(34, "DBEntry " << std::quoted(m_name) << " changed: " << std::endl
-            << "    revision = " << m_revision << std::endl
-            << "    filename = " << m_filename << std::endl
-            << "    checksum = " << m_checksum << std::endl
-            << "    validity = " << m_iov << std::endl
-            << "  -> notifying accessors");
+    B2DEBUG(30, "DBEntry changed"
+            << LogVar("name", m_name)
+            << LogVar("revision", m_revision)
+            << LogVar("checksum", m_checksum)
+            << LogVar("filename", m_filename)
+            << LogVar("validity", m_iov));
     notifyAccessors();
   }
 

@@ -53,6 +53,7 @@ void SVDDatabaseTestModule::event()
    * print them
    */
   VxdID sensorID(3, 1, 1);
+  /*
   B2INFO("Noise L3_1_1 side V strip 0 = " << m_obj_noise.getNoise(sensorID, false, 0));
   B2INFO("Noise L3_1_1 side U strip 0 = " << m_obj_noise.getNoise(sensorID , true, 0));
   B2INFO("Test the retrieval of the noise in electrons:");
@@ -80,7 +81,17 @@ void SVDDatabaseTestModule::event()
   B2INFO("Peaking time [ns] L3_1_1 side U strip 0 = " << m_obj_pulseShape.getPeakTime(sensorID, true, 0));
   B2INFO("Pulse width [ns]  L3_1_1 side U strip 0 = " << m_obj_pulseShape.getWidth(sensorID, true, 0));
   B2INFO("Time Correction [ns]  L3_1_1 side V strip 0 = " << m_obj_pulseShape.getTimeShiftCorrection(sensorID, true, 0));
+  B2INFO("~~~~~~~~~~~~~~\n");
+  */
 
+  float beta = m_obj_cog.getCorrectedTime(sensorID, true, 0, 0, 0); //t_RAW = 0
+  float alfa = m_obj_cog.getCorrectedTime(sensorID, true, 0, 1, 0) - beta; //t_RAW = 1 - beta
+  B2INFO("CoG, alfa = " << alfa << ", beta = " << beta);
+
+  /*
+  B2INFO("~~~~~~~~~~~~~~\n");
   B2INFO("isBad = " << m_obj_badStrip->isBad(1, true, 1));
+  */
+
 
 }

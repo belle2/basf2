@@ -21,6 +21,7 @@
 #define TCHPlaneMulti2 TRGCDCHoughPlaneMulti2
 #endif
 
+/// number of layers
 #define N_LAYERS 6
 
 namespace Belle2 {
@@ -55,17 +56,17 @@ namespace Belle2 {
     /// returns pattern ID in a layer which activates specified cell.
     const std::vector<unsigned>& patternId(unsigned layer,
                                            unsigned cellId) const;
-    // Dumps debug information.
+    /// Dumps debug information.
     void dump(unsigned layerId) const;
 
-    // Dumps debug information.
+    /// Dumps debug information.
     void dump(const std::string& message = std::string(""),
-              const std::string& prefix = std::string("")) const;
+              const std::string& prefix = std::string("")) const override;
 
   public:// Modifiers
 
     /// Clears all entries and regions.
-    void clear(void);
+    void clear(void) override;
 
     /// Clears only specified layer ID.
     void clear(unsigned layerId);
@@ -74,6 +75,8 @@ namespace Belle2 {
     void clearCells(void);
 
     /// Voting.
+    using TRGCDCHoughPlaneBase::vote; // to be checked
+    /// Voting.
     void vote(float rx,
               float ry,
               int charge,
@@ -81,14 +84,20 @@ namespace Belle2 {
               int weight = 1);
 
     /// Voting.
+    // using TRGCDCHoughPlaneBase::vote; // to be checked
+    /// Voting.
     void vote(unsigned layerId, unsigned localId, int weight = 1);
 
+    /// Voting.
+    // using TRGCDCHoughPlaneBase::vote; // to be checked
     /// Voting.
     void vote(float rx,
               float ry,
               unsigned layerId,
               int weight = 1);
 
+    /// Sets entry.
+    using TRGCDCHoughPlane::setEntry; // to be checked
     /// Sets entry.
     unsigned setEntry(unsigned serialId, unsigned layerId, unsigned n);
 
@@ -101,6 +110,8 @@ namespace Belle2 {
     /// allocate memory for patterns.
     void preparePatterns(unsigned layerId, unsigned nPatterns);
 
+    /// registers a pattern..
+    using TRGCDCHoughPlane::registerPattern; // to be checked
     /// registers a pattern..
     void registerPattern(unsigned layerId, unsigned id);
 

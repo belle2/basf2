@@ -10,14 +10,7 @@
 
 #include <generators/modules/bhwideinput/BHWideInputModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/GearDir.h>
-
-#include <TLorentzVector.h>
 
 using namespace std;
 using namespace Belle2;
@@ -114,7 +107,6 @@ void BHWideInputModule::initializeGenerator()
   const BeamParameters& nominal = m_initial.getBeamParameters();
   double ecm = nominal.getMass();
 
-  //   m_generator.enableBoost(m_boostMode > 0);
   m_generator.setScatAnglePositron(vectorToPair(m_ScatteringAngleRangePositron, "ScatteringAngleRangePositron"));
   m_generator.setScatAngleElectron(vectorToPair(m_ScatteringAngleRangeElectron, "ScatteringAngleRangeElectron"));
 

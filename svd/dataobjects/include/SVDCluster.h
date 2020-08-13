@@ -41,12 +41,12 @@ namespace Belle2 {
      */
     SVDCluster(VxdID sensorID, bool isU, float position, float positionSigma,
                double clsTime, double clsTimeSigma, float clsCharge, float seedCharge,
-               unsigned short clsSize, float clsSN, float clsChi2):
+               unsigned short clsSize, float clsSN, float clsChi2, int firstFrame = 0):
       m_sensorID(sensorID), m_isU(isU),
       m_position(position), m_positionSigma(positionSigma),
       m_clsTime(clsTime), m_clsTimeSigma(clsTimeSigma), m_clsCharge(clsCharge),
       m_seedCharge(seedCharge), m_clsSize(clsSize), m_clsSN(clsSN),
-      m_clsChi2(clsChi2)
+      m_clsChi2(clsChi2), m_firstFrame(firstFrame)
     {}
 
     /** Default constructor for the ROOT IO. */
@@ -159,6 +159,39 @@ namespace Belle2 {
      */
     float getChi2() const { return m_clsChi2; }
 
+    /** Get firstFrame of the MaxSum algorithm.
+     * @return firstFrame of the MaxSum algorithm
+     */
+    int getFirstFrame() const { return m_firstFrame; }
+
+    /** Get cluster quality indicator
+    * @return probability that cluster is generated from signal hit.
+    */
+    double getQuality() const { return m_qualityIndicator; }
+
+    /** Get cluster quality indicator error
+    * @return error in probability that cluster is generated from signal hit.
+    */
+    double getQualityError() const { return m_qualityIndicatorError; }
+
+    /** Add quality indicator to object.
+    *
+    */
+    void setQualityIndicator(const double qualityIndicator)
+    {
+      m_qualityIndicator = qualityIndicator;
+    }
+
+    /** Add quality indicator error to object.
+    *
+    */
+    void setQualityIndicatorError(double qualityIndicatorError)
+    {
+      m_qualityIndicatorError = qualityIndicatorError;
+    }
+
+
+
     /** Get a string representation of the cluster. */
     std::string print() const
     {
@@ -169,7 +202,8 @@ namespace Belle2 {
          << " +/- " << m_positionSigma << " time: " << m_clsTime << " +/- "
          << m_clsTimeSigma << " charge: " << m_clsCharge << " seed charge: "
          << m_seedCharge << " size: " << m_clsSize << " S/N: " << m_clsSN
-         << " Fit Chi2: " << m_clsChi2 << std::endl;
+         << " Fit Chi2: " << m_clsChi2 <<  " Signal Prob.: " << m_qualityIndicator
+         << " Signal Prob. Error " << m_qualityIndicatorError << std::endl;
       return os.str();
     }
 
@@ -185,8 +219,11 @@ namespace Belle2 {
     unsigned short m_clsSize;  /**< Cluster size in pixels */
     float m_clsSN;             /**< Cluster S/N ratio */
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
+    int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
+    double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
+    double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 
-    ClassDef(SVDCluster, 5)
+    ClassDef(SVDCluster, 7)
 
   };
 

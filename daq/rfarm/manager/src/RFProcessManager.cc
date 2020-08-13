@@ -8,13 +8,17 @@
 
 #include "daq/rfarm/manager/RFProcessManager.h"
 #include "daq/rfarm/manager/RFNSM.h"
-#include "daq/slc/nsm/NSMCommunicator.h"
-#include <time.h>
+
+#include <fcntl.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+#include <cstring>
 
 extern "C" {
 #include <nsm2/nsmlib2.h>
-#include <nsm2/belle2nsm.h>
 }
 
 using namespace std;
@@ -29,7 +33,7 @@ using namespace Belle2;
 RFProcessManager::RFProcessManager(char* nodename)
 {
   // Create IO pipe for output logging
-  if (pipe(m_iopipe) < 0) {
+  if (pipe2(m_iopipe, O_NONBLOCK) < 0) {
     perror("pipe");
     m_iopipe[0] = -1; m_iopipe[1] = -1;
   }
@@ -169,24 +173,28 @@ int RFProcessManager::CheckOutput()
 
     if ((nfd = select(highest + 1, &fdset, NULL, NULL, &tv)) < 0) {
       switch (errno) {
-        case EINTR: continue;
+        case EINTR: continue; // why? if we get a signal, we can return, too
         case EAGAIN: continue;
         default:
           //close(m_iopipe[0]);
           //m_iopipe[0] = -1;
           return 0;
       }
-      if (errno == EINTR) continue;
     } else {
       if (nsmc && FD_ISSET(nsmc->sock, &fdset)) {
-        NSMCommunicator(nsmc).callContext();
+        //        NSMCommunicator(nsmc).callContext();
+        char buf[NSM_TCPMSGSIZ];
+        if (nsmlib_recv(nsmc, (NSMtcphead*)buf, 1000) < 0)
+          printf("RFProcessManager: Failed to read NSM context\n");
+        else
+          nsmlib_call(nsmc, (NSMtcphead*)buf);
       }
       if (m_iopipe[0] > 0 &&
           FD_ISSET(m_iopipe[0], &fdset)) {
         break;
       }
+      if (nfd == 0) break; // was a timeout -> return to do other stuff
     }
-    sleep(1);
   }
   // Return nfd
   //  time_t now = time ( NULL );
@@ -206,13 +214,12 @@ pid_t RFProcessManager::CheckProcess()
     pid_t pid = *it;
     int status;
     pid_t outpid = waitpid(pid, &status, WNOHANG);
-    if (outpid == -1) {
+    //    if (outpid == -1) {
+    if (outpid != 0 || outpid == pid) {
       m_pidlist.erase(it);
       return pid;
     }
   }
   return 0;
 }
-
-
 

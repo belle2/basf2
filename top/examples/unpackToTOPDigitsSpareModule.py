@@ -27,6 +27,7 @@ main.add_module(gearbox)
 
 # Geometry (only TOP needed)
 geometry = register_module('Geometry')
+geometry.param('useDB', False)
 geometry.param('components', ['TOP'])
 main.add_module(geometry)
 
@@ -45,7 +46,7 @@ converter.param('useSampleTimeCalibration', False)
 converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
-converter.param('lookBackWindows', 28)  # depends on the run (28 for local runs, 220 for GCR)
+converter.param('lookBackWindows', 28)  # depends on the run
 converter.param('calibrationChannel', 0)  # if set, cal pulses will be flagged
 converter.param('calpulseHeightMin', 450)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]

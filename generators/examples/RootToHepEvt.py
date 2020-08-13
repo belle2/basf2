@@ -7,32 +7,31 @@
 # Example steering file
 ########################################################
 
-from basf2 import *
+import basf2
 
 # Set the global log level
-set_log_level(LogLevel.INFO)
+basf2.set_log_level(basf2.LogLevel.INFO)
 
-main = create_path()
+main = basf2.create_path()
 
 # Register the input module
-myinput = register_module('RootInput')
+myinput = basf2.register_module('RootInput')
 myinput.param('inputFileName', './input.root')
 
 # Register the output module
-myoutput = register_module('HepevtOutput')
+myoutput = basf2.register_module('HepevtOutput')
 myoutput.param('OutputFilename', './output.hepevt')
 
 # Register the Progress module and the Python histogram module
-myprogress = register_module('Progress')
+myprogress = basf2.register_module('Progress')
 
-main = create_path()
 main.add_module(myprogress)
 main.add_module(myinput)
 main.add_module(myoutput)
-main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
+main.add_module("PrintMCParticles", logLevel=basf2.LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
-process(main)
+basf2.process(main)
 
 # show call statistics
-print(statistics)
+print(basf2.statistics)

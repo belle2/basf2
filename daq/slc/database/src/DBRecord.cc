@@ -6,62 +6,62 @@
 
 using namespace Belle2;
 
-const std::string DBRecord::get(const std::string& name) const throw()
+const std::string DBRecord::get(const std::string& name) const
 {
   if (m_value_m.find(name) != m_value_m.end()) return m_value_m[name];
   else return "";
 }
 
-const std::string DBRecord::get(int i) const throw()
+const std::string DBRecord::get(int i) const
 {
   if (i >= 0 && i < (int)m_name_v.size())
     return m_value_m[m_name_v[i]];
   else return "";
 }
 
-int DBRecord::getInt(const std::string& name) const throw()
+int DBRecord::getInt(const std::string& name) const
 {
   return atoi(get(name).c_str());
 }
 
-int DBRecord::getInt(int i) const throw()
+int DBRecord::getInt(int i) const
 {
   return atoi(get(i).c_str());
 }
 
-bool DBRecord::getBool(const std::string& name) const throw()
+bool DBRecord::getBool(const std::string& name) const
 {
   return get(name) == "t";
 }
 
-bool DBRecord::getBool(int i) const throw()
+bool DBRecord::getBool(int i) const
 {
   return get(i) == "t";
 }
 
-float DBRecord::getFloat(const std::string& name) const throw()
+float DBRecord::getFloat(const std::string& name) const
 {
   return atof(get(name).c_str());
 }
 
-float DBRecord::getFloat(int i) const throw()
+float DBRecord::getFloat(int i) const
 {
   return atof(get(i).c_str());
 }
 
-std::vector<std::string> DBRecord::getArray(const std::string& name) const throw()
+std::vector<std::string> DBRecord::getArray(const std::string& name) const
 {
   std::string value = StringUtil::replace(StringUtil::replace(get(name), "}", ""), "{", "");
   return StringUtil::split(value, ',');
 }
 
-std::vector<std::string> DBRecord::getArray(int i) const throw()
+std::vector<std::string> DBRecord::getArray(int i) const
 {
   std::string value = StringUtil::replace(StringUtil::replace(get(i), "}", ""), "{", "");
   return StringUtil::split(value, ',');
 }
 
-std::vector<int> DBRecord::getIntArray(const std::string& name) const throw()
+std::vector<int> DBRecord::getIntArray(const std::string& name) const
 {
   std::vector<int> value_i_v;
   std::vector<std::string> value_v = getArray(name);
@@ -71,7 +71,7 @@ std::vector<int> DBRecord::getIntArray(const std::string& name) const throw()
   return value_i_v;
 }
 
-std::vector<int> DBRecord::getIntArray(int i) const throw()
+std::vector<int> DBRecord::getIntArray(int i) const
 {
   std::vector<int> value_i_v;
   std::vector<std::string> value_v = getArray(i);
@@ -81,7 +81,7 @@ std::vector<int> DBRecord::getIntArray(int i) const throw()
   return value_i_v;
 }
 
-std::vector<float> DBRecord::getFloatArray(const std::string& name) const throw()
+std::vector<float> DBRecord::getFloatArray(const std::string& name) const
 {
   std::vector<float> value_i_v;
   std::vector<std::string> value_v = getArray(name);
@@ -91,7 +91,7 @@ std::vector<float> DBRecord::getFloatArray(const std::string& name) const throw(
   return value_i_v;
 }
 
-std::vector<float> DBRecord::getFloatArray(int i) const throw()
+std::vector<float> DBRecord::getFloatArray(int i) const
 {
   std::vector<float> value_i_v;
   std::vector<std::string> value_v = getArray(i);
@@ -101,13 +101,13 @@ std::vector<float> DBRecord::getFloatArray(int i) const throw()
   return value_i_v;
 }
 
-void DBRecord::add(std::string name, std::string value) throw()
+void DBRecord::add(std::string name, std::string value)
 {
   m_name_v.push_back(name);
   m_value_m.insert(DBFieldList::value_type(name, value));
 }
 
-const std::string DBRecord::getFieldName(int i) const throw()
+const std::string DBRecord::getFieldName(int i) const
 {
   if (i >= 0 && i < (int) m_name_v.size()) return m_name_v[i];
   return "";

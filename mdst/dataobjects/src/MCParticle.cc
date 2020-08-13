@@ -18,9 +18,6 @@
 
 #include <iostream>
 #include <sstream>
-#include <stdexcept>
-#include <cmath>
-
 
 using namespace std;
 using namespace Belle2;
@@ -30,7 +27,8 @@ const double MCParticle::c_epsilon = 10e-7;
 
 void MCParticle::setMassFromPDG()
 {
-  if (TDatabasePDG::Instance()->GetParticle(m_pdg) == NULL) throw(ParticlePDGNotKnownError() << m_pdg);
+  if (TDatabasePDG::Instance()->GetParticle(m_pdg) == nullptr)
+    throw(ParticlePDGNotKnownError() << m_pdg);
   m_mass = TDatabasePDG::Instance()->GetParticle(m_pdg)->Mass();
 }
 
@@ -42,7 +40,7 @@ float MCParticle::getCharge() const
     return 0.0;
   }
 
-  if (TDatabasePDG::Instance()->GetParticle(m_pdg) == NULL) {
+  if (TDatabasePDG::Instance()->GetParticle(m_pdg) == nullptr) {
     B2ERROR("PDG=" << m_pdg << " ***code unknown to TDatabasePDG");
     return 0.0;
   }

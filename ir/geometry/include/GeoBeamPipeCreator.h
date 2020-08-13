@@ -20,13 +20,8 @@
 #include <ir/dbobjects/BeamPipeGeo.h>
 #include <string>
 #include <vector>
-#include <map>
-#include <sstream>
 
-#include <G4Transform3D.hh>
 class G4LogicalVolume;
-class G4AssemblyVolume;
-class G4Polycone;
 
 namespace Belle2 {
   namespace ir {

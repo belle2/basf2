@@ -25,13 +25,11 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef EVTPHSPBMIX_HH
-#define EVTPHSPBMIX_HH
+#pragma once
 
 #include "EvtGenBase/EvtDecayAmp.hh"
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtComplex.hh"
-#include <sstream>
 
 /** The class provides routine to decay vector-> particle particle with B0 mixing, coherent B0B0-like mixing if any.
  */
@@ -119,4 +117,3 @@ private:
 
 };
 
-#endif

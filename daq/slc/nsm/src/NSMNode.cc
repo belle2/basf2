@@ -10,7 +10,7 @@ NSMNode::NSMNode(const std::string& name)
   m_id = -1;
 }
 
-void NSMNode::setName(const std::string& name) throw()
+void NSMNode::setName(const std::string& name)
 {
   m_name = StringUtil::toupper(name);
 }

@@ -185,6 +185,7 @@ namespace Belle2 {
       }
       cout << "TTRGCDCJLUT ... LUT(" << m_name << ") initilized with " << filename << endl;
     }
+    coeFile.close();
   }
 
   void TRGCDCJLUT::setFunction(function<int(int)> function)
@@ -441,6 +442,17 @@ namespace Belle2 {
     // Create file.
     ofstream coeFile;
     coeFile.open(t_fileName.c_str());
+
+    coeFile << "* [Information for COE " << fileName << " ]" << endl;
+    coeFile << "* in_real = in * " << m_inputMin.getToReal() << endl;
+    coeFile << "* LUT_in = (in - " << m_inputMin.getInt() << ") * 2^" << m_inputShiftBits << endl;
+    coeFile << "* x = (LUT_in + " << m_inputMin.getInt() << " * 2^" << m_inputShiftBits << ") * " << m_inputMin.shift(m_inputShiftBits,
+            0).getToReal() << endl;
+    coeFile << "* y_int = round( f(x) / " << m_shiftOutputMin.getToReal() << " - " << m_shiftOutputMin.getInt() << " )" << endl;
+    coeFile << "* LUT_out = Limit to 0 < y_int < " << m_shiftOffsetOutputMax.getInt() << endl;
+    coeFile << "* out = LUT_out + " << m_shiftOutputMin.getInt() << endl;
+    coeFile << "* out_Real = out * " << m_shiftOutputMin.getToReal() << endl;
+
     // Meta data for file.
     coeFile << "memory_initialization_radix=10;" << endl;
     coeFile << "memory_initialization_vector=" << endl;
@@ -500,11 +512,13 @@ namespace Belle2 {
 
     //cout<<"in"<<endl;
     //in.dump();
-    //cout<<"inMin"<<endl;
+    ////cout<<"inMin"<<endl;
+    ////m_inputMin.dump();
+    ////cout<<"inMax"<<endl;
+    ////m_inputMax.dump();
+    //cout<<"m_inputMin"<<endl;
     //m_inputMin.dump();
-    //cout<<"inMax"<<endl;
-    //m_inputMax.dump();
-    //cout<<"offsetIn"<<endl;
+    //cout<<"t_offsetInput"<<endl;
     //t_offsetInput.dump();
 
     // Set m_shiftOffsetInput.
@@ -522,8 +536,10 @@ namespace Belle2 {
     m_shiftOffsetInput.setPrintVhdl(in.getPrintVhdl());
     m_shiftOffsetInput.setVhdlOutputFile(in.getVhdlOutputFile());
 
-    //cout<<"offsetShiftIn"<<endl;
-    //t_offsetInput.dump();
+    //cout<<"m_inputShiftBits"<<endl;
+    //cout<<m_inputShiftBits<<endl;
+    //cout<<"m_offsetShiftInput"<<endl;
+    //m_shiftOffsetInput.dump();
 
     // Get output of LUT and invOffset it.
     signed long long intOutput = getOutput(m_shiftOffsetInput.getInt());
@@ -537,17 +553,22 @@ namespace Belle2 {
                                          m_shiftOffsetOutputMax.getActual(), t_finishClock, t_commonData, 1);
     t_offsetOutput.setName("lut_" + out.getName() + "_out");
 
-    //cout<<" JB:LUT::operate dump start"<<endl;
-    //cout<<"offset"<<endl;
+    ////cout<<" JB:LUT::operate dump start"<<endl;
+    //cout<<"t_offsetOutput"<<endl;
     //t_offsetOutput.dump();
-    //cout<<"min"<<endl;
-    //m_shiftOutputMin.dump();
-    //cout<<"max"<<endl;
-    //cout<<" JB:LUT::operate dump end"<<endl;
-    // Add offseted output signal with output min.
+    ////cout<<"min"<<endl;
+    ////m_shiftOutputMin.dump();
+    ////cout<<"max"<<endl;
+    ////cout<<" JB:LUT::operate dump end"<<endl;
+    //// Add offseted output signal with output min.
 
     //out <= t_offsetOutput.invOffset(m_shiftOutputMin,m_shiftOutputMin+m_shiftOffsetOutputMax);
     out <= t_offsetOutput.invOffset(m_shiftOutputMin);
+
+    //cout<<"m_shiftOutputMin"<<endl;
+    //m_shiftOutputMin.dump();
+    //cout<<"out"<<endl;
+    //out.dump();
 
     // Print Vhdl code.
     if (out.getPrintVhdl() == 1) {

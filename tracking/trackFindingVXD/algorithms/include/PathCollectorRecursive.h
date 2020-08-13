@@ -11,12 +11,9 @@
 
 #include <string>
 #include <vector>
-#include <utility>
-#include <memory>
 #include <sstream>
 
 #include <framework/logging/Logger.h>
-
 
 namespace Belle2 {
 
@@ -28,18 +25,18 @@ namespace Belle2 {
    * - must have begin() and end() with iterator pointing to pointers of entries ( = ContainerType< NodeType*>)
    *
    * Requirements for NodeType:
-   * - musst have function: bool NodeType::getMetaInfo().isSeed()
-   * - musst have function: NeighbourContainerType& NodeType::getInnerNodes()
-   * - musst have function: bool NodeType::getOuterNodes().empty()
+   * - must have function: bool NodeType::getMetaInfo().isSeed()
+   * - must have function: NeighbourContainerType& NodeType::getInnerNodes()
+   * - must have function: bool NodeType::getOuterNodes().empty()
    * - other requirements depend on NodeCompatibilityCheckerType used.
    *
    * Requirements for NeighbourContainerType:
-   * - musst have function: bool NeighbourContainerType::empty()
-   * - musst have function: unsigned int (or comparable) NeighbourContainerType::size()
-   * - musst have access operator:  NeighbourContainerType: operator [] returning a NodeType*
+   * - must have function: bool NeighbourContainerType::empty()
+   * - must have function: unsigned int (or comparable) NeighbourContainerType::size()
+   * - must have access operator:  NeighbourContainerType: operator [] returning a NodeType*
    *
    * Requirements for NodeCompatibilityCheckerType:
-   * - musst have function bool areCompatible(NodeType* outerNode, NodeType* innerNode);
+   * - must have function bool areCompatible(NodeType* outerNode, NodeType* innerNode);
    */
   template<class ContainerType, class NodeType, class NeighbourContainerType, class NodeCompatibilityCheckerType>
   class PathCollectorRecursive {
@@ -54,6 +51,7 @@ namespace Belle2 {
      * If storeSubsets is turned on, also the sub-paths are saved to vector 'paths'.
      * If a defined limit on the number of possible paths is exceeded, the search is aborted, and false is returned.
      */
+    // cppcheck-suppress constParameter
     bool findPaths(ContainerType& aNetwork, std::vector<Path>& paths, unsigned int pathLimit, bool storeSubsets = false)
     {
       m_storeSubsets = storeSubsets;
@@ -113,7 +111,7 @@ namespace Belle2 {
 
   protected:
     /// Copies path to create an identical one
-    Path clone(Path& aPath) const
+    Path clone(const Path& aPath) const
     {
       Path newPath = Path();
       for (auto* entry : aPath) {

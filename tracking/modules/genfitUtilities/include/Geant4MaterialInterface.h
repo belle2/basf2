@@ -32,11 +32,11 @@ namespace Belle2 {
         direction.  Returns true if the volume changed.
      */
     bool initTrack(double posX, double posY, double posZ,
-                   double dirX, double dirY, double dirZ);
+                   double dirX, double dirY, double dirZ) override;
 
     /** @brief Get material parameters in current material
      */
-    genfit::Material getMaterialParameters();
+    genfit::Material getMaterialParameters() override;
 
     /** @brief Make a step (following the curvature) until step length
      * sMax or the next boundary is reached.  After making a step to a
@@ -47,7 +47,7 @@ namespace Belle2 {
     double findNextBoundary(const genfit::RKTrackRep* rep,
                             const genfit::M1x7& state7,
                             double sMax,
-                            bool varField = true);
+                            bool varField = true) override;
 
   private:
 

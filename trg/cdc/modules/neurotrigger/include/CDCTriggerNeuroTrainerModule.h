@@ -25,15 +25,15 @@ namespace Belle2 {
     /** Initialize the module.
      * Initialize the networks and register datastore objects.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Called once for each event.
      * Prepare input and target for each track and store it.
      */
-    virtual void event();
+    virtual void event() override;
 
     /** Do the training for all sectors. */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /** calculate and set the relevant id range for given sector
      *  based on hit counters of the track segments. */
@@ -119,6 +119,8 @@ namespace Belle2 {
     int m_maxEpochs;
     /** Number of training runs with different random start weights. */
     int m_repeatTrain;
+    /** Use neurotracks instead of 2dtracks as input for the neurotrigger. */
+    bool m_neuroTrackInputMode;
 
     //other data
     /** Instance of the NeuroTrigger. */

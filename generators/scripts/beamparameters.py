@@ -5,7 +5,7 @@
 Scripts and functions to set the BeamParameters from known configurations
 """
 
-from basf2 import *
+from basf2 import B2FATAL, B2INFO
 import math
 import numpy as np
 
@@ -197,14 +197,31 @@ def add_beamparameters(path, name, E_cms=None, **argk):
 
     Additional keyword arguments will be passed directly to the module as parameters.
     """
+    # calculate all the parameter values from the preset
+    values = calculate_beamparameters(name, E_cms)
+    # add a BeamParametes module to the path
+    module = path.add_module("BeamParameters")
+    module.set_name("BeamParameters:%s" % name)
+    # finally, set all parameters and return the module
+    module.param(values)
+    # and override parameters with any additional keyword arguments
+    module.param(argk)
+    return module
+
+
+def calculate_beamparameters(name, E_cms=None):
+    """Get/calculate the necessary beamparameter values from the given preset name,
+    optionally scale it to achieve the given cms energy
+
+    Args:
+        name (str): name of the beamparameter settings to use
+        E_cms (float): center of mass energy. If not None the beamenergies will
+            be scaled accordingly to achieve E_cms
+    """
     if name not in beamparameter_presets:
         B2FATAL("Unknown beamparameter preset: '%s', use one of %s" %
                 (name, ", ".join(sorted(beamparameter_presets.keys()))))
         return None
-
-    # check if we have a BeamParameters module in the path. If not create one
-    module = path.add_module("BeamParameters")
-    module.set_name("BeamParameters:%s" % name)
 
     # copy the defaults
     values = beamparameter_defaults.copy()
@@ -234,7 +251,7 @@ def add_beamparameters(path, name, E_cms=None, **argk):
         ler_size = preset["bunchLER"]
         her_angle = values["angleHER"]
         ler_angle = values["angleLER"]
-        pos, cov = calculate_beamspot(
+        _, cov = calculate_beamspot(
             [0, 0, 0], [0, 0, 0], her_size, ler_size, her_angle, ler_angle
         )
         values["covVertex"] = list(cov.flat)
@@ -248,11 +265,7 @@ def add_beamparameters(path, name, E_cms=None, **argk):
         values["energyHER"] *= scale
         values["energyLER"] *= scale
 
-    # finally, set all parameters and return the module
-    module.param(values)
-    # and override parameters with any additional keyword arguments
-    module.param(argk)
-    return module
+    return values
 
 
 if __name__ == "__main__":

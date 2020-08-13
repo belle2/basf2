@@ -8,20 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXSCANMODULE_H
-#define CDCDEDXSCANMODULE_H
-
-#include <reconstruction/dataobjects/DedxConstants.h>
+#pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
-
-#include <string>
-#include <vector>
-#include <TFile.h>
-#include <TTree.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -42,14 +32,14 @@ namespace Belle2 {
     virtual ~CDCDedxScanModule();
 
     /** Initialize the module */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** This method is called for each event. All processing of the event
      * takes place in this method. */
-    virtual void event();
+    virtual void event() override;
 
     /** End of the event processing. */
-    virtual void terminate();
+    virtual void terminate() override;
 
   private:
 
@@ -57,5 +47,4 @@ namespace Belle2 {
     StoreArray<CDCDedxTrack> m_dedxArray; /**< array of output dE/dx tracks */
 
   };
-} // Belle2 namespace
-#endif
+} // Belle2 namespac

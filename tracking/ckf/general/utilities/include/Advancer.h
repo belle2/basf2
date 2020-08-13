@@ -36,7 +36,7 @@ namespace Belle2 {
   public:
     /// Extrapolate the mSoP of one plane to another plane and return the traveled distance or NAN, if travelling into the wrong direction.
     double extrapolateToPlane(genfit::MeasuredStateOnPlane& measuredStateOnPlane,
-                              const genfit::SharedPlanePtr& plane);
+                              const genfit::SharedPlanePtr& plane) const;
 
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);

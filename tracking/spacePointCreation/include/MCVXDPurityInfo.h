@@ -13,8 +13,8 @@
 #include <array>
 #include <utility> // std::pair
 #include <numeric>      // std::accumulate
+#include <sstream>
 #include <string>
-
 
 namespace Belle2 {
   /** The MC VXD Purity info container class

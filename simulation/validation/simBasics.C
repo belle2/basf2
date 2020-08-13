@@ -62,7 +62,9 @@ void numberOfParticles(TTree* tree)
   for (int i = 0; i < nbins; i++) xbins[i] = PDG[i] - 0.5;
   xbins[nbins] = PDG[nbins-1] + 0.5;
 
-  TH1F* h =  new TH1F("hLepton", "No. of leptons", nbins, xbins);
+  TH1F* h =  0;
+
+  h = new TH1F("hLepton", "No. of leptons", nbins, xbins);
   for (int i = 1; i <= nbins; i++) h->GetXaxis()->SetBinLabel(i, leptonNames[i - 1]);
   h->GetXaxis()->SetLabelSize(0.05);
   h->GetXaxis()->SetNdivisions(nbins, kFALSE);
@@ -148,6 +150,8 @@ void createVertexHistograms(TTree* tree, const char* particle, const char* info,
   string particleDetails = string(particle) + " " + info;
 
   string title = string("MC Vertex [") + "x" + "] of " + particleDetails;
+
+  TH1F* h = 0;
 
   h = new TH1F(name.c_str(), title.c_str(), 100, -400., 400.);
 
@@ -237,7 +241,7 @@ void createEnergyHistogram(TTree* tree, const char* particle, const char* info, 
 
   string title = string("MC Energy of ") + particleDetails;
 
-  h = new TH1F(name.c_str(), title.c_str(), 100, 0., xup);
+  TH1F* h = new TH1F(name.c_str(), title.c_str(), 100, 0., xup);
 
   title = string("[GeV]");
   h->GetXaxis()->SetTitle(title.c_str());

@@ -8,11 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALIGNMENTGENERATORMODULE_H
-#define ALIGNMENTGENERATORMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
-
 
 namespace Belle2 {
   /**
@@ -31,7 +29,7 @@ namespace Belle2 {
     AlignmentGeneratorModule();
 
     /** Generate misalignment and store in database */
-    virtual void initialize();
+    virtual void initialize() override;
 
 
   private:
@@ -42,5 +40,3 @@ namespace Belle2 {
     std::string m_payloadName;  /**< Name of generated misalignment in database */
   };
 }
-
-#endif /* ALIGNMENTGENERATORMODULE_H */

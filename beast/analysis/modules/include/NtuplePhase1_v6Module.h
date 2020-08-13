@@ -16,7 +16,6 @@
 #include <beast/analysis/modules/BEASTTree_v5.h>
 #include "TFile.h"
 #include "TChain.h"
-#include "Riostream.h"
 #include "TF1.h"
 
 namespace Belle2 {
@@ -42,30 +41,30 @@ namespace Belle2 {
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
      * Called when entering a new run.
      * Set run dependent things like run header parameters, alignment, etc.
      */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
      * Event processor.
      */
-    virtual void event();
+    virtual void event() override;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun();
+    virtual void endRun() override;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
      * Prints module parameters.
@@ -74,14 +73,14 @@ namespace Belle2 {
 
   private:
 
-    double m_input_Time_eqv;
+    double m_input_Time_eqv; /**< time stamp eqv */
 
     std::vector<Int_t> m_input_ts; /**< time stamp start and stop */
 
     std::vector<std::string> m_inputFileNames; /**< list of file names */
 
     Double_t m_input_Z_scaling[4]; /**< time stamp start and stop */
-    std::vector<Double_t> m_input_Z; /** input Z */
+    std::vector<Double_t> m_input_Z; /**< input Z */
     Int_t m_input_BGSol; /**< time stamp start and stop */
     Int_t m_input_ToSol; /**< time stamp start and stop */
     Int_t m_input_part; /**< which components to take into account */
@@ -279,10 +278,10 @@ namespace Belle2 {
     Double_t m_input_PIN_width; /**< PIN width */
     std::vector<Double_t> m_input_HE3_EfCor; /**< HE3 inefficiency correction */
 
-    TF1* fctRate_HB;  /** fct HB */
-    TF1* fctRate_HC;  /** fct HC */
-    TF1* fctRate_LB;  /** fct LB */
-    TF1* fctRate_LC;  /** fct LC */
+    TF1* fctRate_HB = nullptr;  /**< fct HB */
+    TF1* fctRate_HC = nullptr;  /**< fct HC */
+    TF1* fctRate_LB = nullptr;  /**< fct LB */
+    TF1* fctRate_LC = nullptr;  /**< fct LC */
 
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
     TTree* m_treeTruth = 0;   /**< Truth tree pointer */
@@ -291,14 +290,14 @@ namespace Belle2 {
     std::vector<std::string> m_inputHistoFileNames; /**< list of histo. file names */
     std::string m_outputFileName; /**< output file name */
     TFile* m_file;        /**< TFile */
-    BEAST_v5::BEASTTree_v5 m_beast; /** BEAST structure */
+    BEAST_v5::BEASTTree_v5 m_beast; /**< BEAST structure */
 
     int m_numEntries;     /**< number of ntuple entries */
     int m_entryCounter;   /**< entry counter */
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */
     unsigned m_eventCount = 0;     /**< current event (tree entry) */
     unsigned m_exp = 0;            /**< Date of the day */
-    Int_t m_DayBin;
+    Int_t m_DayBin; /**< day bin */
   };
 
 } // Belle2 namespace

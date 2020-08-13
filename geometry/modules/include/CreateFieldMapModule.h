@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef GEOMETRY_MODULES_CREATEFIELDMAPMODULE_H
-#define GEOMETRY_MODULES_CREATEFIELDMAPMODULE_H
 
 #include <framework/core/Module.h>
 
@@ -36,10 +34,10 @@ namespace Belle2 {
     CreateFieldMapModule();
 
     /** Check input parameters */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** Create the fieldmap */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
   private:
     /** output filename for the fieldmap */
@@ -69,5 +67,3 @@ namespace Belle2 {
     bool m_createTree{false};
   };
 }
-
-#endif /* GEOMETRY_MODULES_CREATEFIELDMAPMODULE_H */

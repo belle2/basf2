@@ -9,7 +9,7 @@
  * candidate will result in one shower/cluster in the end.                *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -24,7 +24,6 @@
 // FRAMEWORK
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
-#include <framework/datastore/RelationArray.h>
 
 // MDST
 #include <mdst/dataobjects/MCParticle.h>
@@ -121,8 +120,8 @@ void ECLLocalMaximumFinderModule::initialize()
   resetClassifierVariables();
 
   // Open output files and declare branches if in training mode. Each file will hold a flat ntuple of training data.
-  m_outfile = NULL;
-  m_tree = NULL;
+  m_outfile = nullptr;
+  m_tree = nullptr;
   if (m_isTrainingMode > 0) {
     const int cBufferLength = 500;
     char tmpBuffer[cBufferLength];
@@ -256,8 +255,6 @@ void ECLLocalMaximumFinderModule::event()
           }
 
           if (m_isTrainingMode > 0) { // This requires MC matching before this stage!
-            int motherpdg   = -1;
-            int motherindex = -1;
             int pi0index    = -1;
             int maxtype     = 0;
             int maxpos      = 0;
@@ -268,8 +265,8 @@ void ECLLocalMaximumFinderModule::event()
               const auto particle = relatedParticlePairs.object(irel);
               const double weight = relatedParticlePairs.weight(irel);
 
-              motherpdg = -1;
-              motherindex = -1;
+              int motherpdg = -1;
+              int motherindex = -1;
               pi0index = -1;
               getEnteringMother(*particle, motherpdg, motherindex, pi0index);
               addToSignalEnergy(motherpdg, motherindex, pi0index, weight);

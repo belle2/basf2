@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors:  Nils Braun                                              *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,7 +11,6 @@
 #include <tracking/ckf/general/entities/CKFState.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <genfit/SharedPlanePtr.h>
-#include <memory>
 
 namespace genfit {
   class MeasuredStateOnPlane;
@@ -29,7 +28,7 @@ namespace Belle2 {
     explicit CKFToSVDState(const SpacePoint* hit);
 
     /// Constructor setting the state to the position of the first CDC track seed hit
-    CKFToSVDState(const RecoTrack* seed, bool reversed = false);
+    explicit CKFToSVDState(const RecoTrack* seed, bool reversed = false);
 
     /// Extract the real layer this state sits on
     unsigned int getGeometricalLayer() const;
@@ -48,6 +47,11 @@ namespace Belle2 {
 
     /// Set the related SVD track, if we go along one of them (or a nullptr)
     void setRelatedSVDTrack(const RecoTrack* relatedSVDTrack);
+
+    /// Get the cached data of this state
+    const struct stateCache& getStateCache() const {
+      return m_stateCache;
+    }
 
   private:
     /// Precache the PXDRecoHits for runtime performance reasons.

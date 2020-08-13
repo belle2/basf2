@@ -35,21 +35,24 @@ namespace Belle2 {
 
     /** initialize from string expression (see class doc). Throws runtime_error if expression is invalid. */
     ModuleCondition(std::string expression, std::shared_ptr<Path> conditionPath, EAfterConditionPath afterConditionPath);
-    /** copy ctor (uses Path::clone()). */
-    ModuleCondition(const ModuleCondition& other);
-    ~ModuleCondition() { };
+    /** Destructor, nothing to see here */
+    ~ModuleCondition() = default;
+    /** default copy constructor. */
+    ModuleCondition(const ModuleCondition& other) = default;
+    /** and default assignment operator */
+    ModuleCondition& operator=(const ModuleCondition& other) = default;
 
     /** evaluate the condition using the given value. E.g. for a condition ">5", this would return "value>5" */
     bool evaluate(int value) const;
 
     /** Returns the path of the condition.  */
-    const std::shared_ptr<Path>& getPath() const {return m_conditionPath; };
+    const std::shared_ptr<Path>& getPath() const {return m_conditionPath; }
 
     /** Returns the value of the condition.  */
-    int getConditionValue() const {return m_conditionValue; };
+    int getConditionValue() const {return m_conditionValue; }
 
     /** Returns the value of the condition.  */
-    EConditionOperators getConditionOperator() const {return m_conditionOperator; };
+    EConditionOperators getConditionOperator() const {return m_conditionOperator; }
 
     /** What to do after a conditional path is finished. */
     EAfterConditionPath getAfterConditionPath() const { return m_afterConditionPath; }

@@ -37,7 +37,7 @@ namespace Belle2 {
     std::unordered_map<FilterType, RawDataCollectedMinMax>* m_rawDataCollected; /**< takes care of collecting the raw data. */
 
     /** set newID for this subgraph. */
-    void updateID(SubGraphID& newID)
+    void updateID(const SubGraphID& newID)
     { m_id = newID; }
   public:
 
@@ -77,6 +77,7 @@ namespace Belle2 {
     /** if both graphs have got the same IDs except the last one, they share a trunk. */
     bool checkSharesTrunk(const SubGraph<FilterType>& b) const { return (m_id.checkSharesTrunk(b.m_id)); }
 
+    /** "print" debugging information to a string */
     std::string print() const
     {
       std::string out = "id: " + m_id.print() + " was found " + std::to_string(m_found) + " times. Filters with values collected:\n";
@@ -145,7 +146,7 @@ namespace Belle2 {
     }
 
     /// returns vector containing all sectors for given sensor (if any) and empty vector if no sector of that sensor is here.
-    std::vector<FullSecID> getSectorsOfSensor(VxdID& sensor)
+    std::vector<FullSecID> getSectorsOfSensor(const VxdID& sensor)
     {
       std::vector<FullSecID> foundIDs;
 

@@ -38,7 +38,7 @@ namespace Belle2 {
      * @param file The file name where the message was sent from.
      * @param line The line number in the source code where the message was sent from.
      */
-    LogMethod(const char* package, const std::string& function, const std::string& file, unsigned int line);
+    LogMethod(const char* package, std::string  function, std::string  file, unsigned int line);
 
     /** The LogMethod destructor. */
     ~LogMethod();

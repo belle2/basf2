@@ -9,10 +9,7 @@
  **************************************************************************/
 
 #pragma once
-#include <calibration/CalibrationAlgorithm.h>
-//#include <cdc/geometry/CDCGeometryPar.h>
 #include <TH1F.h>
-#include "vector"
 #include "string"
 namespace Belle2 {
   namespace CDC {
@@ -59,7 +56,7 @@ namespace Belle2 {
       double m_xmin = 0.07;   /**< minimum drift length*/
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */
-      double t0[56][385] = {{0.}};     /**< t0 */
+      //double t0[56][385] = {{0.}};     /**< t0 */
       double dt[56][385] = {{0.}};     /**< dt of each channel */
       double err_dt[56][385] = {{0.}}; /**< error of dt of each channel*/
       double dtb[300] = {0.};        /**< dt of each board*/
@@ -74,7 +71,6 @@ namespace Belle2 {
       int m_firstRun; /**< First run. */
       int m_lastExperiment; /**< Last experiment */
       int m_lastRun; /**< Last run. */
-      ClassDef(T0Correction, 0); /**< class implementing T0 correction algorithm */
     };
   }// name space CDC
 } // namespace Belle2

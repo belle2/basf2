@@ -20,7 +20,7 @@ template class TrackFindingCDC::FilterVarSet<Chi2FacetFilter>;
 template class TrackFindingCDC::MVA<BaseFacetFilter>;
 
 MVAFacetFilter::MVAFacetFilter()
-  : Super(std::make_unique<MVAFacetVarSet>(), "tracking/data/trackfindingcdc_FacetFilter.xml", 2.805)
+  : Super(std::make_unique<MVAFacetVarSet>(), "trackfindingcdc_FacetFilter", 2.805)
 {
 }
 

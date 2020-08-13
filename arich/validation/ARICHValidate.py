@@ -36,7 +36,7 @@ main = create_path()
 
 # specify number of events to be generated
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [nevents], 'runList': [1]})
+eventinfosetter.param({'evtNumList': [nevents]})
 main.add_module(eventinfosetter)
 
 # Particle gun module
@@ -65,14 +65,12 @@ print_params(particlegun)
 main.add_module(particlegun)
 
 # Add simulation
-components = ['MagneticField', 'CDC', 'PXD', 'SVD', 'ARICH']
 # choose second line if you want to add background
-add_simulation(main, components)
+add_simulation(main)
 # add_simulation(main, components, bkgfiles=glob.glob('/sw/belle2/bkg/ARICH*.root'))
 
 # Add reconstruction
-components_nr = ['CDC', 'PXD', 'SVD', 'ARICH']
-add_mc_reconstruction(main, components_nr)
+add_mc_reconstruction(main)
 
 # Add module fpr ARICH efficiency analysis
 arichEfficiency = register_module('ARICHNtuple')

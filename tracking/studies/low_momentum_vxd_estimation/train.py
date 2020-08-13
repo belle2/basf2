@@ -9,16 +9,22 @@ from sklearn import tree
 
 
 class DEDXEstimationTrainer:
+    """Train a neural network for dE/dx-based particle identification"""
 
     def __init__(self):
+        """Constructor"""
+        #: by default, the dE/dx-particle-identification trainer has not run yet
         self.dedx_estimator_function = None
+        #: the default data column is 'dedx'
         self.dedx_column = "dedx"
 
     def train(self, data):
+        """Train on the input data"""
         # We have everything
         raise NotImplementedError("Use this class as a base class only")
 
     def test(self, data):
+        """Get the trained neural-network output value for test data"""
         if self.dedx_estimator_function is None:
             raise ValueError("Train the estimator first!")
 
@@ -26,11 +32,17 @@ class DEDXEstimationTrainer:
 
 
 class GroupedDEDXEstimationTrainer(DEDXEstimationTrainer):
+    """Train a neural network for dE/dx-based particle identification"""
+
+    #: number of dE/dx bins
     number_of_bins_in_dedx = 20
+    #: number of track-momentum bins
     number_of_bins_in_p = 29
+    #: number of head values in fit
     number_of_head_values_used_to_fit = 20
 
     def create_dedx_bins(self, data):
+        """Construct the dE/dx bins and then populate them with the data"""
         dedx_bins = np.linspace(
             data[
                 self.dedx_column].min(), data[
@@ -39,17 +51,20 @@ class GroupedDEDXEstimationTrainer(DEDXEstimationTrainer):
         return data.groupby(dedx_cuts), dedx_bins
 
     def create_p_bins(self, data):
+        """Construct the momentum bins and then populate them with the data"""
         p_bins = np.linspace(data.p.min(), data.p.max(), GroupedDEDXEstimationTrainer.number_of_bins_in_p)
         p_cuts = pd.cut(data.p, p_bins)
         return data.groupby(p_cuts), p_bins
 
     def use_only_the_highest_values(self, data, number_of_values=None):
+        """Sort the data then select only the highest N values"""
         if number_of_values is None:
             return data
         else:
             return data.sort("number_of_p_values", ascending=False).head(number_of_values).sort()
 
     def create_fit_data(self, dedx_bin):
+        """Fit track-momentum values"""
         p_binned_data, p_bins = self.create_p_bins(dedx_bin)
 
         number_of_p_values = pd.Series(p_binned_data.count().p.values, name="number_of_p_values")
@@ -61,20 +76,28 @@ class GroupedDEDXEstimationTrainer(DEDXEstimationTrainer):
         return fit_data
 
     def fit_p_to_dedx_bin(self, dedx_bin):
+        """Fit the track-momentum values in the selected dE/dx bin, then train on the fitted values"""
         fit_data = self.create_fit_data(dedx_bin)
         return self.train_function(fit_data)
 
 
 class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
+    """Train a neural network for dE/dx-based particle identification"""
 
     def __init__(self, result_function, use_sigma_for_result_fitting):
+        """Constructor"""
+
+        #: cached copy of the result function
         self.result_function = result_function
+        #: cached copy of the dictionary of fitting parameters for each dE/dx bin
         self.result_parameters_for_each_dedx_bin = {}
+        #: cached copy of the flag to add mean+/-sigma values to the output Dataframe
         self.use_sigma_for_result_fitting = use_sigma_for_result_fitting
 
         GroupedDEDXEstimationTrainer.__init__(self)
 
     def create_result_dataframe(self):
+        """Fit for the mean dE/dx and standard deviation, return the fit Dataframe"""
         result_df = pd.DataFrame([{"dedx_bin_center": dedx_bin_center,
                                    "mu": fit_parameters[1][1],
                                    "sigma": fit_parameters[0]} for dedx_bin_center,
@@ -93,6 +116,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         return result_df
 
     def fit_result_parameters(self):
+        """Define the parameters for the fit, assign initial guesses"""
         result_df = self.create_result_dataframe()
 
         p0 = (7e+08, -4e+04, 0.1, 0)
@@ -106,6 +130,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         return popt, lambda dedx: self.result_function(dedx, *popt)
 
     def train(self, data):
+        """Train the neural network using curated data"""
         dedx_binned_data, dedx_bins = self.create_dedx_bins(data)
 
         def fit_and_save_results(dedx_bin):
@@ -115,9 +140,11 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         for result in dedx_binned_data.apply(fit_and_save_results):
             self.result_parameters_for_each_dedx_bin.update(result)
 
+        #: cached copies of the fit parameters and estimator function
         self.dedx_estimator_parameters, self.dedx_estimator_function = self.fit_result_parameters()
 
     def plot_fit_result(self, data):
+        """Plot the fitted results"""
         plot_dedx_data = np.linspace(data[self.dedx_column].min(), data[self.dedx_column].max(), 100)
         result_df = self.create_result_dataframe()
 
@@ -132,6 +159,7 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
         plt.legend(frameon=True)
 
     def plot_grouped_result(self, data):
+        """Plot the fitted grouped results"""
         dedx_binned_data, dedx_bins = self.create_dedx_bins(data)
 
         # List to prevent bug in pd.DataFrame.apply
@@ -155,14 +183,20 @@ class FittedGroupedDEDXEstimatorTrainer(GroupedDEDXEstimationTrainer):
 
 
 class FunctionFittedGroupedDEDXEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification"""
 
     def __init__(self, fit_function, dimension_of_fit_function, result_function, use_sigma_for_result_fitting):
+        """Constructor"""
+
+        #: cached value of the degrees of freedom in the fit
         self.dimension_of_fit_function = dimension_of_fit_function
+        #: cached copy of the fitting function
         self.fit_function = fit_function
 
         FittedGroupedDEDXEstimatorTrainer.__init__(self, result_function, use_sigma_for_result_fitting)
 
         def train_function(fit_data):
+            """Train on the fit to curated-data highest values whose truth value is known"""
             max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
 
             if self.dimension_of_fit_function == 3:
@@ -174,9 +208,11 @@ class FunctionFittedGroupedDEDXEstimatorTrainer(FittedGroupedDEDXEstimatorTraine
 
             return [np.sqrt(np.diag(pcov)[1]), popt]
 
+        #: this class's training function
         self.train_function = train_function
 
     def plot_grouped_result(self, data):
+        """Plot the fitted grouped results"""
         FittedGroupedDEDXEstimatorTrainer.plot_grouped_result(self, data)
 
         dedx_binned_data, dedx_bins = self.create_dedx_bins(data)
@@ -203,8 +239,10 @@ class FunctionFittedGroupedDEDXEstimatorTrainer(FittedGroupedDEDXEstimatorTraine
 
 
 class GaussianEstimatorTrainer(FunctionFittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification using a Gaussian estimator"""
 
     def __init__(self):
+        """Constructor"""
         FunctionFittedGroupedDEDXEstimatorTrainer.__init__(
             self,
             fit_functions.norm,
@@ -214,8 +252,10 @@ class GaussianEstimatorTrainer(FunctionFittedGroupedDEDXEstimatorTrainer):
 
 
 class LandauEstimatorTrainer(FunctionFittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification using a Landau estimator"""
 
     def __init__(self):
+        """Constructor"""
         FunctionFittedGroupedDEDXEstimatorTrainer.__init__(
             self,
             fit_functions.landau,
@@ -225,36 +265,46 @@ class LandauEstimatorTrainer(FunctionFittedGroupedDEDXEstimatorTrainer):
 
 
 class MaximumEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification using only the highest values"""
 
     def __init__(self):
+        """Constructor"""
         FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_squared, use_sigma_for_result_fitting=False)
 
         def train_function(fit_data):
+            """Train on the curated-data highest values whose truth value is known"""
             max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
 
             return [None, [None, max_value, None]]
 
+        #: this class's training function
         self.train_function = train_function
 
 
 class MedianEstimatorTrainer(FittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification using only the median values"""
 
     def __init__(self):
+        """Constructor"""
         FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_squared, use_sigma_for_result_fitting=True)
 
         def train_function(fit_data):
+            """Train on the curated-data median values whose truth value is known"""
             weighted_p_values = fit_data.apply(lambda data: [data.p_bin_centers] * int(data.number_of_p_values), axis=1).sum()
             median_value = np.median(weighted_p_values)
             iqr = np.percentile(weighted_p_values, 75) - np.percentile(weighted_p_values, 50)
 
             return [iqr, [None, median_value, None]]
 
+        #: this class's training function
         self.train_function = train_function
 
 
 class GaussianEstimatorTrainerSQRT(FunctionFittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification using a Gaussian estimator"""
 
     def __init__(self):
+        """Constructor"""
         FunctionFittedGroupedDEDXEstimatorTrainer.__init__(
             self,
             fit_functions.norm,
@@ -264,8 +314,10 @@ class GaussianEstimatorTrainerSQRT(FunctionFittedGroupedDEDXEstimatorTrainer):
 
 
 class LandauEstimatorTrainerSQRT(FunctionFittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification using a Landau estimator"""
 
     def __init__(self):
+        """Constructor"""
         FunctionFittedGroupedDEDXEstimatorTrainer.__init__(
             self,
             fit_functions.landau,
@@ -275,40 +327,53 @@ class LandauEstimatorTrainerSQRT(FunctionFittedGroupedDEDXEstimatorTrainer):
 
 
 class MaximumEstimatorTrainerSQRT(FittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification using only the highest values"""
 
     def __init__(self):
+        """Constructor"""
         FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_sqrt, use_sigma_for_result_fitting=False)
 
         def train_function(fit_data):
+            """Train on the curated-data highest values whose truth value is known"""
             max_value = self.use_only_the_highest_values(fit_data, 1).p_bin_centers.values[0]
 
             return [None, [None, max_value, None]]
 
+        #: this class's training function
         self.train_function = train_function
 
 
 class MedianEstimatorTrainerSQRT(FittedGroupedDEDXEstimatorTrainer):
+    """Train a neural network for dE/dx-based particle identification using only the median values"""
 
     def __init__(self):
+        """Constructor"""
         FittedGroupedDEDXEstimatorTrainer.__init__(self, fit_functions.inverse_sqrt, use_sigma_for_result_fitting=True)
 
         def train_function(fit_data):
+            """Train on the curated-data median values whose truth value is known"""
             weighted_p_values = fit_data.apply(lambda data: [data.p_bin_centers] * int(data.number_of_p_values), axis=1).sum()
             median_value = np.median(weighted_p_values)
             iqr = np.percentile(weighted_p_values, 75) - np.percentile(weighted_p_values, 50)
 
             return [iqr, [None, median_value, None]]
 
+        #: this class's training function
         self.train_function = train_function
 
 
 class MVADEDXEstimationTrainer(DEDXEstimationTrainer):
+    """Train a neural network for dE/dx-based particle identification using multivariate data analysis"""
 
     def __init__(self):
+        """Constructor"""
+
+        #: cached copy of the MVA tool
         self.tree = tree.DecisionTreeRegressor()
         DEDXEstimationTrainer.__init__(self)
 
     def train(self, data):
+        """Train the neural network using curated data"""
 
         train_data = data.copy()
         del train_data["p"]
@@ -318,6 +383,7 @@ class MVADEDXEstimationTrainer(DEDXEstimationTrainer):
         self.tree.fit(train_data.values, p_values.values)
 
     def test(self, data):
+        """Get the trained neural-network output value for test data"""
 
         test_data = data.copy()
         del test_data["p"]

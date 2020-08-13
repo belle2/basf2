@@ -7,6 +7,7 @@ Utility functions for the ConditionsDB command line interface
 
 import re
 from basf2 import B2ERROR
+from . import PayloadInformation
 
 
 class ItemFilter:
@@ -17,6 +18,7 @@ class ItemFilter:
     This class defines -f,--filter/-e,--exclude/-r/--regex parameters which will
     be added to a :class:`argparse.ArgumentParser` when calling `add_arguments`.
     """
+
     def __init__(self, args):
         """initilization, just remember the arguments or parser"""
         #: arguments, either :class:`argparse.ArgumentParser` on initialization

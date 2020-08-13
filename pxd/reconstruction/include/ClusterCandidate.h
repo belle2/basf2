@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_CLUSTERCANDIDATE_H
-#define PXD_CLUSTERCANDIDATE_H
+#pragma once
 
 #include <pxd/reconstruction/Pixel.h>
 #include <vector>
@@ -36,12 +35,14 @@ namespace Belle2 {
       };
       /** Constructor to create an empty Cluster */
       ClusterCandidate():
-        m_merged(0), m_charge(0), m_seed() {
+        m_merged(0), m_charge(0), m_seed()
+      {
         m_pixels.reserve(c_defaultCapacity);
       }
 
       /** Clear the Cluster information (to reuse the same cluster instance) */
-      void clear() {
+      void clear()
+      {
         m_merged = 0;
         m_charge = 0;
         m_seed = Pixel();
@@ -93,5 +94,3 @@ namespace Belle2 {
   }
 
 }
-
-#endif //PXD_CLUSTERCANDIDATE_H

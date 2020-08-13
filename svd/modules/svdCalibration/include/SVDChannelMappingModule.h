@@ -12,10 +12,8 @@
 #define svdchannelmappingModule_H
 
 #include <framework/core/Module.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <tracking/dataobjects/SVDIntercept.h>
@@ -23,21 +21,15 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <unordered_map>
-#include <map>
-#include <vector>
 #include <utility>
 #include <functional>
 #include <TH1.h>
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TFile.h>
-#include <iostream>
 
 namespace Belle2 {
 
-  /** The HLT ROI DQM module.
+  /** The Channel Mapping Check Module
    *
-   * Creates basic DQM for ROI creation on HLT
    */
   class SVDChannelMappingModule : public Module {
 
@@ -46,9 +38,12 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDChannelMappingModule();
 
-    void initialize();
-    void event();
-    void terminate();
+    /**initialize*/
+    void initialize() override;
+    /** event*/
+    void event() override;
+    /** temrinate*/
+    void terminate() override;
 
     std::string m_SVDShaperDigitsName; /**< shaper digit list name*/
     std::string m_SVDClustersName; /**< reco digit list name*/
@@ -56,15 +51,15 @@ namespace Belle2 {
     /* user-defined parameters */
     std::string m_rootFileName;   /**< root file name */
     /* ROOT file related parameters */
-    TFile* m_rootFilePtr; /**< pointer at root file used for storing histograms */
-    TList* m_histoList_digits;
-    TList* m_histoList_clusters;
+    TFile* m_rootFilePtr = nullptr; /**< pointer at root file used for storing histograms */
+    TList* m_histoList_digits = nullptr; /**< list of histograms for the strips*/
+    TList* m_histoList_clusters = nullptr; /**< list of histograms for the clusters*/
 
   private:
 
-    StoreArray<SVDIntercept> m_Intercepts;
-    StoreArray<SVDCluster> m_clusters;
-    StoreArray<SVDShaperDigit> m_shapers;
+    StoreArray<SVDIntercept> m_Intercepts; /**< SVDintercept StoreArray*/
+    StoreArray<SVDCluster> m_clusters; /**< SVDClusters StoreArray*/
+    StoreArray<SVDShaperDigit> m_shapers; /**<SVDSHaperDigits StoreArray*/
 
     VXD::GeoCache& m_aGeometry = VXD::GeoCache::getInstance(); /**< the geometry */
 

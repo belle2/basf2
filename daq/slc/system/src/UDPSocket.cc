@@ -1,21 +1,14 @@
 #include "daq/slc/system/UDPSocket.h"
 
-#include <daq/slc/base/StringUtil.h>
+#include <daq/slc/base/IOException.h>
 
-#include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#include <cerrno>
-
-#include <sstream>
-#include <vector>
 
 #include <unistd.h>
 #include <errno.h>
 
 #include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/select.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
@@ -114,7 +107,6 @@ UDPSocket::UDPSocket(unsigned int port,
 
 int UDPSocket::bind(unsigned int port,
                     const std::string& hostname, bool broadcast)
-throw (IOException)
 {
   if (m_fd <= 0 && (m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     throw (IOException("Failed to create socket"));
@@ -143,7 +135,7 @@ throw (IOException)
   return bind();
 }
 
-int UDPSocket::bind() throw (IOException)
+int UDPSocket::bind()
 {
   if (::bind(m_fd, (struct sockaddr*)&m_addr, sizeof(m_addr)) < 0) {
     close();
@@ -153,7 +145,7 @@ int UDPSocket::bind() throw (IOException)
   return m_fd;
 }
 
-size_t UDPSocket::write(const void* buf, size_t count) throw(IOException)
+size_t UDPSocket::write(const void* buf, size_t count)
 {
   size_t c = 0;
   int ret;
@@ -179,7 +171,7 @@ size_t UDPSocket::write(const void* buf, size_t count) throw(IOException)
   return c;
 }
 
-size_t UDPSocket::read(void* buf, size_t count) throw(IOException)
+size_t UDPSocket::read(void* buf, size_t count)
 {
   size_t c = 0;
   int ret;
@@ -202,32 +194,32 @@ size_t UDPSocket::read(void* buf, size_t count) throw(IOException)
   return c;
 }
 
-const std::string UDPSocket::getHostName() const throw()
+const std::string UDPSocket::getHostName() const
 {
   return inet_ntoa(m_addr.sin_addr);
 }
 
-unsigned int UDPSocket::getAddress() const throw()
+unsigned int UDPSocket::getAddress() const
 {
   return m_addr.sin_addr.s_addr;
 }
 
-unsigned int UDPSocket::getPort() const throw()
+unsigned int UDPSocket::getPort() const
 {
   return ntohs(m_addr.sin_port);
 }
 
-const std::string UDPSocket::getRemoteHostName() const throw()
+const std::string UDPSocket::getRemoteHostName() const
 {
   return inet_ntoa(m_remote_addr.sin_addr);
 }
 
-unsigned int UDPSocket::getRemoteAddress() const throw()
+unsigned int UDPSocket::getRemoteAddress() const
 {
   return m_remote_addr.sin_addr.s_addr;
 }
 
-unsigned int UDPSocket::getRemotePort() const throw()
+unsigned int UDPSocket::getRemotePort() const
 {
   return ntohs(m_remote_addr.sin_port);
 }

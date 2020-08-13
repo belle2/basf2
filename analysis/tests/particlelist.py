@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
 from ROOT import gSystem
-gSystem.Load('libanalysis_dataobjects')
 from ROOT import Belle2
+gSystem.Load('libanalysis_dataobjects')
 
 bminus = Belle2.PyStoreObj(Belle2.ParticleList.Class(), "B-:test")
 assert bminus.registerInDataStore()

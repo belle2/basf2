@@ -10,6 +10,7 @@
 
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <vxd/geometry/GeoCache.h>
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 
@@ -40,6 +41,16 @@ float Belle2::PXD::PXDGainCalibrator::getGainCorrection(Belle2::VxdID id, unsign
   unsigned int vBin = vid / rowsPerBin;
   return m_gains.getContent(id.getID(), uBin, vBin);
 }
+
+float Belle2::PXD::PXDGainCalibrator::getADUToEnergy(Belle2::VxdID id, unsigned int uid, unsigned int vid) const
+{
+  // FIXME: These constants are hardcoded as intermediate solution.
+  // They should be obtained from GeoCache and ultimately from the condDB.
+  float ADCUnit = 130.0;
+  float Gq = 0.6;
+  return Const::ehEnergy * ADCUnit / Gq / getGainCorrection(id, uid, vid);
+}
+
 
 
 unsigned short Belle2::PXD::PXDGainCalibrator::getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU) const

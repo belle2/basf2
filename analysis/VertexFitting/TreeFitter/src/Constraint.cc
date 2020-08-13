@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributor: Francesco Tenchini,Jo-Frederik Krohn                      *
+ * Contributor: Wouter Hulsbergen, Francesco Tenchini, Jo-Frederik Krohn  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -13,41 +13,12 @@
 #include <analysis/VertexFitting/TreeFitter/Constraint.h>
 #include <analysis/VertexFitting/TreeFitter/KalmanCalculator.h>
 
-#include <framework/logging/Logger.h>
-
 namespace TreeFitter {
 
   bool Constraint::operator<(const Constraint& rhs) const
   {
-//    return m_depth < rhs.m_depth  ||
-//           (m_depth == rhs.m_depth && m_type < rhs.m_type);
-//  }
-    // the simple way
-    return m_type < rhs.m_type ||
-           (m_type == rhs.m_type && m_depth < rhs.m_depth);
-
-    // this is probably the second most complicated routine: how do we
-    // order the constraints. there is one very special case:
-    // Ks->pipi0 requires the pi0 mass constraints at the very
-    // end. otherwise, it just doesn't work. in all other cases, we
-    // prefer to fit 'down' the tree'. the 'external' constraints must
-    // be filtered first, but soft pions must be fitted after the
-    // geometric constraints of the D. You see, this is horrible.
-
-    // if either of the two is external, or either of the two is a
-    // mass constraint, we order by _type_
-
-    if ((m_type <= Constraint::composite ||
-         rhs.m_type <= Constraint::composite) ||
-        (m_type >= Constraint::mass ||
-         rhs.m_type >= Constraint::mass)) {
-      return m_type < rhs.m_type ||
-             (m_type == rhs.m_type && m_depth < rhs.m_depth);
-    }
-    // if not, we order by depth
     return m_depth < rhs.m_depth  ||
            (m_depth == rhs.m_depth && m_type < rhs.m_type);
-
   }
 
   ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
@@ -55,22 +26,25 @@ namespace TreeFitter {
     return m_node->projectConstraint(m_type, fitpar, p);
   }
 
-  ErrCode Constraint::filter(FitParams* fitpar)
+  ErrCode Constraint::filter(FitParams& fitpar)
   {
+    /**
+     * We don't have reference state yet so we use the k-1 last state
+     * to linearize non-linear constraints
+     * */
     ErrCode status;
-    Projection p(fitpar->getDimensionOfState(), m_dim);
-    KalmanCalculator kalman(m_dim, fitpar->getDimensionOfState());
+    Projection p(fitpar.getDimensionOfState(), m_dim);
+    KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
 
-    B2DEBUG(11, "Filtering: " << this->name() << " dim state " << fitpar->getDimensionOfState()
-            << " dim contr " << m_dim << "\n");
-    //std::cout << "Now " << this->name()  << std::endl;
     double chisq(0);
     int iter(0);
     bool finished(false) ;
+
+    double accumulated_chi2 = 0;
     while (!finished && !status.failure()) {
 
       p.resetProjection();
-      status |= project(*fitpar, p);
+      status |= project(fitpar, p);
 
       if (!status.failure()) {
 
@@ -79,13 +53,13 @@ namespace TreeFitter {
                     p.getH(),
                     fitpar,
                     &p.getV(),
-                    1 // weight
+                    1
                   );
 
         if (!status.failure()) {
-
           kalman.updateState(fitpar);
 
+          // r R^-1 r
           double newchisq = kalman.getChiSquare();
 
           double dchisqconverged = 0.001 ;
@@ -93,23 +67,58 @@ namespace TreeFitter {
           double dchisq = newchisq - chisq;
           bool diverging = iter > 0 && dchisq > 0;
           bool converged = std::abs(dchisq) < dchisqconverged;
-
           finished  = ++iter >= m_maxNIter || diverging || converged;
           chisq = newchisq;
+          accumulated_chi2 += newchisq;
         }
       }
     }
 
-    const unsigned int NDF = kalman.getConstraintDim();
-    fitpar->addChiSquare(kalman.getChiSquare(), NDF);
-    if (m_type == origin) {
-      fitpar->reduceNDF(3);
-    } else if (m_type == geometric) {
-      fitpar->reduceNDF(0);
-    }
+    const unsigned int number_of_constraints = kalman.getConstraintDim();
+    fitpar.addChiSquare(accumulated_chi2, number_of_constraints);
 
     kalman.updateCovariance(fitpar);
-    m_chi2 = kalman.getChiSquare();
+    return status;
+  }
+
+  ErrCode Constraint::filterWithReference(FitParams& fitpar, const FitParams& oldState)
+  {
+    /**
+     * We now linearise around the last iteration \alpha (const FitParams& oldState)
+     * In this implementation we can no longer linearize non-linear constraints
+     * but we ensured by the linearisation around the last state that the step size is small enough
+     * so we just use them as if they were linear
+     * */
+    ErrCode status;
+    Projection p(fitpar.getDimensionOfState(), m_dim);
+    KalmanCalculator kalman(m_dim, fitpar.getDimensionOfState());
+
+    p.resetProjection();
+    status |= project(oldState, p);
+
+    /** here we project the old state and use only the change with respect to the new state
+     * instead of the new state in the update . the advantage is more stable fit
+     * Downside: non-linear constraints cant be filtered multiple times anymore.
+     * */
+    p.getResiduals() += p.getH() * (fitpar.getStateVector() - oldState.getStateVector());
+    if (!status.failure()) {
+      status |= kalman.calculateGainMatrix(
+                  p.getResiduals(),
+                  p.getH(),
+                  fitpar,
+                  &p.getV(),
+                  1
+                );
+
+      if (!status.failure()) {
+        kalman.updateState(fitpar);
+      }
+    }
+
+    const unsigned int number_of_constraints = kalman.getConstraintDim();
+    fitpar.addChiSquare(kalman.getChiSquare(), number_of_constraints);
+
+    kalman.updateCovariance(fitpar);
     return status;
   }
 
@@ -117,7 +126,6 @@ namespace TreeFitter {
   {
     std::string rc = "unknown constraint!";
     switch (m_type) {
-
       case beamspot:     rc = "beamspot";   break;
       case beamenergy:   rc = "beamenergy"; break;
       case origin:       rc = "origin"; break;
@@ -133,6 +141,7 @@ namespace TreeFitter {
       case lifetime:     rc = "lifetime";   break;
       case merged:       rc = "merged";     break;
       case conversion:   rc = "conversion"; break;
+      case helix:        rc = "helix";      break;
       case ntypes:
       case unknown:
         break;

@@ -46,10 +46,10 @@ namespace Belle2 {
     virtual ~DummyDataPackerModule();
 
     //! initialization
-    virtual void initialize();
+    virtual void initialize() override;
 
     //! event module
-    virtual void event();
+    virtual void event() override;
 
 
   protected :

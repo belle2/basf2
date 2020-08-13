@@ -63,9 +63,8 @@ void RawCOPPERFormat_v1::CheckB2LFEEHeaderVersion(int n)
         char err_buf[500];
         sprintf(err_buf, "FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
-        string err_str = err_buf; throw (err_str);
-//         sleep(12345678);
-//         exit(-1);
+        printf("%s", err_buf); fflush(stdout);
+        B2FATAL(err_buf);
 #endif
       } else {
         // this word for 32bit unixtime
@@ -79,9 +78,8 @@ void RawCOPPERFormat_v1::CheckB2LFEEHeaderVersion(int n)
       char err_buf[500];
       sprintf(err_buf, "RawCOPPERFormat_v1 contains no FINESSE data. Exiting...\n %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      string err_str = err_buf; throw (err_str);
-//       sleep(12345678);
-//      exit(-1);
+      printf("%s", err_buf); fflush(stdout);
+      B2FATAL(err_buf);
 #endif
     }
   }

@@ -17,7 +17,6 @@
 #include <TH2D.h>
 #include <TGraph.h>
 
-#include <TROOT.h>
 #include <TClass.h>
 
 namespace Belle2 {

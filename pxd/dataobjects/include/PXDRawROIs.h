@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRAWROIS_H
-#define PXDRAWROIS_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -110,11 +109,12 @@ namespace Belle2 {
 
   private:
     unsigned int m_2timesNrROIs;/**< Number of ROIs times two (size of one ROI is 2*32bit) */
-    int* m_rois; // [m_2timesNrROIs] /**< Buffer of size 2*m_NrROIs ints  */
+    /** Buffer of size 2*m_NrROIs ints. */
+    int* m_rois; //[m_2timesNrROIs] // DONT MODIFY THIS COMMENT AS NECESSARY FOR ROOT STREAMER
 
+    /** necessary for ROOT */
     ClassDef(PXDRawROIs, 3)
   };
 
 
 } //Belle2 namespace
-#endif

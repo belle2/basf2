@@ -10,7 +10,7 @@
 # pragma once
 
 #include <framework/core/Module.h>
-// #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreArray.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
@@ -297,8 +297,8 @@ namespace Belle2 {
      * templated version to get a SpacePoint from a Cluster
      * @param arrayName name of the StoreArray to be searched, defaults to empty string
      * @param singleCluster singleCluster SpacePoint? (Can probably be done in another way as well)
-     * NOTE: returns NULL if no (appropriate) SpacePoint can be found!
-     * @returns .first is a pointer to the SpacePoint, .second is the status, if this is < 0, .first is NULL! (i.e. check .second first!)
+     * NOTE: returns nullptr if no (appropriate) SpacePoint can be found!
+     * @returns .first is a pointer to the SpacePoint, .second is the status, if this is < 0, .first is nullptr! (i.e. check .second first!)
      */
     template<typename ClusterType, typename TrueHitType>
     std::pair<Belle2::SpacePoint*, conversionStatus>
@@ -308,9 +308,9 @@ namespace Belle2 {
     /**
      * given a RelationVector with SpacePoints in it, it tries to get the appropriate one (see main documentation of module)
      * NOTE: marks hits as used!
-     * NOTE: if no appropriate SpacePoint can be found, returns a NULL pointer!
+     * NOTE: if no appropriate SpacePoint can be found, returns a nullptr pointer!
      * templated for easier handling of other ClusterTypes later, at the moment only SVDCluster needed!
-     * @returns .first is a pointer to the appropriate SpacePoint, .second is the conversion status, if this is <0 .first is NULL! (i.e. check .second first)
+     * @returns .first is a pointer to the appropriate SpacePoint, .second is the conversion status, if this is <0 .first is nullptr! (i.e. check .second first)
      */
     template<typename ClusterType>
     std::pair<Belle2::SpacePoint*, conversionStatus>

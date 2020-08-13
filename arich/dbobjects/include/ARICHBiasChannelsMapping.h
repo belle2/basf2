@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <vector>
 #include <TObject.h>
 #include <map>
 #include <vector>

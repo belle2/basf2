@@ -65,7 +65,7 @@ namespace Belle2 {
       * @param hit    SVDCluster to use as base.
       * FIXME: Parameter sigma is no longer used and will be removed.
      */
-    SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit* trackCandHit = NULL);
+    explicit SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit* trackCandHit = nullptr);
 
     /** Destructor. */
     virtual ~SVDRecoHit() {}
@@ -73,15 +73,15 @@ namespace Belle2 {
     /** Creating a deep copy of this hit.
      * Overrides the method inherited from GFRecoHit.
      */
-    genfit::AbsMeasurement* clone() const;
+    genfit::AbsMeasurement* clone() const override;
 
     /** Get the compact ID.*/
     VxdID getSensorID() const { return m_sensorID; }
 
-    /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
+    /** Get pointer to the TrueHit used when creating this RecoHit, can be nullptr if created from something else */
     const SVDTrueHit* getTrueHit() const { return m_trueHit; }
 
-    /** Get pointer to the Cluster used when creating this RecoHit, can be NULL if created from something else */
+    /** Get pointer to the Cluster used when creating this RecoHit, can be nullptr if created from something else */
     const SVDCluster* getCluster() const { return m_cluster; }
 
     /** Is the coordinate u or v? */
@@ -101,10 +101,10 @@ namespace Belle2 {
 
     /** Methods that actually interface to Genfit.  */
     //virtual genfit::SharedPlanePtr constructPlane(const genfit::StateOnPlane&) const;
-    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
+    virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const override;
 
     // TODO: use HMatrixPhi for wedge sensors instead of rotating the plane!
-    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { if (m_isU) return new genfit::HMatrixU(); else return new genfit::HMatrixV(); }
+    virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const override { if (m_isU) return new genfit::HMatrixU(); else return new genfit::HMatrixV(); }
 
   private:
 
@@ -123,7 +123,10 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(SVDRecoHit, 7)
+    /** Apply planar deformation of sensors */
+    TVectorD applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
+
+    ClassDefOverride(SVDRecoHit, 7)
   };
 
 } // namespace Belle2

@@ -12,15 +12,11 @@
 #include <simulation/kernel/RandomEngine.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/pcore/ProcHandler.h>
 
-#include <boost/foreach.hpp>
 #include <CLHEP/Random/Random.h>
 
 #include <G4LogicalVolumeStore.hh>
-#include <G4RegionStore.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4SolidStore.hh>
 #include <G4RegionStore.hh>

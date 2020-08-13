@@ -2,13 +2,6 @@
 #include "TH2D.h"
 #include "TH1D.h"
 #include "TF1.h"
-#include <framework/logging/Logger.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/IntervalOfValidity.h>
-//#include <framework/database/DBImportObjPtr.h>
-#include <cdc/dbobjects/CDCXtRelations.h>
 namespace Belle2 {
   namespace CDC {
     /**
@@ -42,6 +35,9 @@ namespace Belle2 {
       virtual void setMode(unsigned short mode = 1) {m_xtmode = mode;}
       /// set to store histogram or not.
       virtual void setStoreHisto(bool storeHist = false) {m_storeHisto = storeHist;}
+      /// Set LR separate mode (default is true).
+      void setLRSeparate(bool lr = true) {m_LRseparate = lr;}
+
 
       /// Run calibration
       void execute()
@@ -78,7 +74,7 @@ namespace Belle2 {
       bool m_useSliceFit = false; /**< Use slice fit or profile */
       bool m_BField = true;  /**< with b field or none*/
 
-      double m_XT_fit[56][2][18][7][8];  /**< Fitted parameter*/
+      //double m_XT_fit[56][2][18][7][8];  /**< Fitted parameter*/
       double xtold[56][2][18][7][8];     /**< Old paremeter */
       int fitflag[56][2][20][10];         /**< Fit flag */
       TF1* xtf5r[56][2][20][10];          /**< XTFunction */
@@ -101,10 +97,10 @@ namespace Belle2 {
       std::string m_profileFileName = "xt_profile";      /**<profile file name*/
       std::string m_xtfile = "cdc/data/xt.dat";          /**< Input xt file name, incase text mode*/
 
-      int m_firstExperiment; /**< First experiment. */
-      int m_firstRun; /**< First run. */
-      int m_lastExperiment; /**< Last experiment */
-      int m_lastRun; /**< Last run. */
+      //int m_firstExperiment; /**< First experiment. */
+      //int m_firstRun; /**< First run. */
+      //int m_lastExperiment; /**< Last experiment */
+      //int m_lastRun; /**< Last run. */
 
       //      double m_alpha[18][3];//alpha bin, 18bin, 0=low, 1 = up, 2 = alpha
       //double m_theta[10][3];//alpha bin, 18bin, 0=low, 1 = up, 2 = alpha
@@ -145,7 +141,6 @@ namespace Belle2 {
                            231, 243, 246, 256, 263, 300
                           };
 
-      ClassDef(XTCalibration, 0); /**< class implementing XT correction algorithm */
     };
   }
 }

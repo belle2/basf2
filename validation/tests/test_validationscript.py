@@ -2,10 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import metaoptions
-import ROOT
-import random
-import math
 import tempfile
 import validationscript
 
@@ -29,7 +25,7 @@ class ValidationScriptTest(unittest.TestCase):
                      b'<header>\n'
                      b'<interval>release</interval>'
                      b'<output>EvtGenSim.root</output>\n'
-                     b'<contact>tkuhr</contact>\n'
+                     b'<contact>Thomas Kuhr thomas.kuhr@lmu.de</contact>\n'
                      b'<description>description_text</description>\n'
                      b'</header>\n'
                      b'"""\n')
@@ -42,7 +38,7 @@ class ValidationScriptTest(unittest.TestCase):
             script.load_header()
 
             self.assertEqual("description_text", script.header["description"])
-            self.assertEqual("tkuhr", script.header["contact"][0])
+            self.assertEqual("Thomas Kuhr thomas.kuhr@lmu.de", script.header["contact"][0])
             self.assertEqual(1, len(script.header["output"]))
             self.assertEqual("EvtGenSim.root", script.header["output"][0])
             self.assertEqual("release", script.header["interval"])

@@ -6,16 +6,16 @@
 <output>validationTestColorScheme.root</output>
 <contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
 </header>
-"""
 
-"""
+
 To test the color scheme.
 Set generate_reference = True to generate the reference files.
 """
 
+
+import basf2
 from validationtest import add_properties
 from ROOT import TFile, TH1F, TNamed
-import basf2
 
 
 def generate_gaus(title, options, distort=0.):

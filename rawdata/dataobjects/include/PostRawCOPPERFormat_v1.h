@@ -11,15 +11,10 @@
 
 // Includes
 #include <stdio.h>
-#include <stdlib.h>
 #include <string>
-#include <sys/time.h>
 
 #include <rawdata/dataobjects/RawCOPPERFormat_v1.h>
 #include <rawdata/CRCCalculator.h>
-
-
-#include <TObject.h>
 
 // version #
 #define POST_RAWCOPPER_FORMAT_VER1 1

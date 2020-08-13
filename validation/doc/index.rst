@@ -1,13 +1,13 @@
 Tools for Physics Validation of the Software
 ++++++++++++++++++++++++++++++++++++++++++++
 
-The ``validation`` package is used the validate the physics performance of
+The ``validation`` package is used to validate the physics performance of
 the software. As the software is constantly developed further, algorithms are
 changed and we want to make sure that they don't perform worse than before
 (e.g. lower reconstruction efficiencies or slower runtime) and that they work
 as intended.
 
-To that end, the every software package has a ``validation`` subdirectory that
+To that end, every software package has a ``validation`` subdirectory that
 contains a number of simple steering files. The ``validation`` package collects
 these steering files and runs them. The resulting output ``*.root`` files can then be compared
 across software versions ("revisions") to spot performance degradations and other problems.

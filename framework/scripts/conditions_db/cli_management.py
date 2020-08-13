@@ -1,7 +1,7 @@
 import functools
 from concurrent.futures import ProcessPoolExecutor
 from collections import defaultdict
-from basf2 import B2INFO, B2ERROR, B2WARNING, LogPythonInterface
+from basf2 import B2INFO, B2ERROR, B2WARNING, LogPythonInterface  # noqa
 from basf2.utils import pretty_print_table
 from terminal_utils import Pager
 from conditions_db.iov import IoVSet, IntervalOfValidity
@@ -260,7 +260,7 @@ def command_tag_runningupdate(args, db=None):
 
         running tag contains ::
 
-            payload1, rev 1, valid from 0,1 to 1,1
+            payload1, rev 1, valid from 0,1 to 1,0
             payload1, rev 2, valid from 1,1 to -1,-1
             payload2, rev 1, valid from 0,1 to -1,-1
             payload3, rev 1, valid from 0,1 to 1,0
@@ -276,7 +276,7 @@ def command_tag_runningupdate(args, db=None):
         Then running ``b2conditionsdb tag runningupdate running staging --run 1 2 --allow-closed``,
         the running globaltag after the update will contain ::
 
-            payload1, rev 1, valid from 0,1 to 1,1
+            payload1, rev 1, valid from 0,1 to 1,0
             payload1, rev 2, valid from 1,1 to 1,1
             payload1, rev 3, valid from 1,2 to 1,8
             payload1, rev 4, valid from 1,9 to 1,20
@@ -340,6 +340,11 @@ def command_tag_runningupdate(args, db=None):
         B2ERROR(e, **e.extra_vars)
         return 1
 
+    # make sure we exit if we have nothing to do
+    if not operations:
+        B2INFO("Nothing to do, please check the globaltags given are correct")
+        return 1
+
     # show operations in a table and some summary
     table = []
     last_valid = tuple(args.run)
@@ -393,7 +398,7 @@ def command_tag_runningupdate(args, db=None):
         pretty_print_table(table, columns, transform=color_row)
 
     if args.dry_run:
-        B2INFO("Running in dry mode, not applying ant changes.", **summary)
+        B2INFO("Running in dry mode, not applying any changes.", **summary)
         return 0
 
     B2WARNING("Applying these changes cannot be undone and further updates to "
@@ -410,6 +415,7 @@ def command_tag_runningupdate(args, db=None):
     # Ok, all set ... apply the update
     try:
         updater.apply_update()
+        B2INFO("done")
         return 0
     except RunningTagUpdaterError as e:
         B2ERROR(e, **e.extra_vars)

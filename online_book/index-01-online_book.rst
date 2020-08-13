@@ -13,8 +13,6 @@ the software by following through a series of hands-on lessons.
 
 .. toctree::
    :glob:
-   :maxdepth: 2
-   :numbered: 3
 
    welcome
    fundamentals

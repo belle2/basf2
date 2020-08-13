@@ -4,9 +4,6 @@ Welcome!
 ========
 
 .. toctree::
-   :glob:
-   :maxdepth: 2
-   :numbered: 3
 
    welcome/collaborative_tools
    

@@ -1,3 +1,5 @@
+.. _onlinebook_generating_mc:
+
 Generating MC
 =============
 

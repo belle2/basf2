@@ -1,3 +1,5 @@
+.. _onlinebook_bash:
+
 Bash
 ====
 

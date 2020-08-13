@@ -1,3 +1,5 @@
+.. _onlinebook_various_additions:
+
 Various additions
 =================
 

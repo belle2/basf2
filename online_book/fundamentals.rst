@@ -1,4 +1,4 @@
-.. _onlinebookfundamentals:
+.. _onlinebook_fundamentals:
 
 Fundamentals
 ============

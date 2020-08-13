@@ -1,4 +1,4 @@
-.. _computing:
+.. _onlinebook_computing:
 
 Data model and computing
 ========================

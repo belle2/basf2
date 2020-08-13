@@ -1,3 +1,5 @@
+.. _onlinebook_b2bii:
+
 B2BII
 =====
 

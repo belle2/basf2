@@ -1,3 +1,5 @@
+.. _onlinebook_roe:
+
 The Rest of Event (ROE)
 =======================
 

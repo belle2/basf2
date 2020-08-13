@@ -1,4 +1,4 @@
-.. _toolbox:
+.. _onlinebook_toolbox:
 
 Useful links
 ============

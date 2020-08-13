@@ -1,4 +1,4 @@
-.. _analysis:
+.. _onlinebook_offline_analysis:
 
 Offline analysis
 ================

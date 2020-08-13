@@ -1,3 +1,5 @@
+.. _onlinebook_python:
+
 Python
 ======
 

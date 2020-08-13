@@ -1,3 +1,5 @@
+.. _onlinebook_vertex_fitting:
+
 Vertex fitting
 ==============
 

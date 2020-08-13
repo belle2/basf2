@@ -1,3 +1,5 @@
+.. _onlinebook_flavor_tagging:
+
 Flavor tagging
 ==============
 

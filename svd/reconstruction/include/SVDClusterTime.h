@@ -89,7 +89,7 @@ namespace Belle2 {
       double m_apvClockPeriod = 16000. / 509;
 
       /** trigger bin */
-      int m_triggerBin;
+      int m_triggerBin = -1;
 
       /** raw cluster used to compute the time*/
       Belle2::SVD::RawCluster m_rawCluster;

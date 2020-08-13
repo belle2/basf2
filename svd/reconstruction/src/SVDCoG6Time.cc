@@ -18,29 +18,34 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDCoG6Time::getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples)
+    double SVDCoG6Time::getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples, VxdID sensorID, bool isU, int cellID)
     {
 
-      //calculate weighted average time
-
-      float averagetime = 0;
+      //calculate weighted average
+      float time = 0;
       float sumAmplitudes = 0;
       for (int k = 0; k < 6; k ++) {
-        averagetime += k * samples[k];
+        time += k * samples[k];
         sumAmplitudes += samples[k];
       }
       if (sumAmplitudes != 0) {
-        averagetime /= (sumAmplitudes);
-        averagetime *= m_apvClockPeriod;
+        time /= (sumAmplitudes);
+        time *= m_apvClockPeriod;
       } else {
-        averagetime = -1;
+        time = -1;
         B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
       }
 
-      return averagetime;
+      // correct by the CalPeak
+      time -= m_PulseShapeCal.getPeakTime(sensorID, isU, cellID);
+
+      // calibrate
+      time =  m_CoG6TimeCal.getCorrectedTime(sensorID, isU, -1, time, cellID);
+
+      return time;
     }
 
-    double SVDCoG6Time::getStripTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples, int noise)
+    double SVDCoG6Time::getStripTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples, int noise, int cellID)
     {
 
       //assuming that:
@@ -54,13 +59,23 @@ namespace Belle2 {
 
       for (int k = 0; k < 6; k ++) {
         Atot  += samples[k];
-        tmpResSq += TMath::Power(k * m_apvClockPeriod - getStripTime(samples), 2);
+        tmpResSq += TMath::Power(k * m_apvClockPeriod -  getStripTime(samples, m_rawCluster.getSensorID(), m_rawCluster.isUSide(), cellID),
+                                 2);
       }
 
-      return noise / Atot * TMath::Sqrt(tmpResSq);
+      double rawTimeError = noise / Atot * TMath::Sqrt(tmpResSq);
+
+      double timeError = m_CoG6TimeCal.getCorrectedTimeError(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), cellID, getClusterTime(),
+                                                             rawTimeError, 0);
+
+      return timeError;
 
     }
 
+    int SVDCoG6Time::getFirstFrame()
+    {
+      return 0;
+    }
 
     double SVDCoG6Time::getClusterTime()
     {
@@ -73,7 +88,7 @@ namespace Belle2 {
       double sumAmplitudes = 0;
 
       for (auto s : strips) {
-        time += s.maxSample * getStripTime(s.samples);
+        time += s.maxSample * getStripTime(s.samples, m_rawCluster.getSensorID(), m_rawCluster.isUSide(), s.cellID);
         sumAmplitudes += s.maxSample;
       }
 
@@ -83,14 +98,14 @@ namespace Belle2 {
     double SVDCoG6Time::getClusterTimeError()
     {
 
-      //as error on weighted avearage, neglecting error on weights
+      //as error on weighted average, neglecting error on weights
 
       std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
 
       double weightSum = 0;
 
       for (auto s : strips)
-        weightSum += getStripTimeError(s.samples, s.noise) * getStripTimeError(s.samples, s.noise);
+        weightSum += getStripTimeError(s.samples, s.noise, s.cellID) * getStripTimeError(s.samples, s.noise, s.cellID);
 
       return 1. / TMath::Sqrt(weightSum);
     }

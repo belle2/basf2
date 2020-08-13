@@ -18,6 +18,11 @@ namespace Belle2 {
 
   namespace SVD {
 
+    int SVDCoG3Time::getFirstFrame()
+    {
+      return m_rawCluster.getMaxSum3Samples().first;
+    }
+
     double SVDCoG3Time::getClusterTime()
     {
 
@@ -33,13 +38,17 @@ namespace Belle2 {
       }
       float rawtime = retval / norm;
 
-      return rawtime;
+      double time = m_CoG3TimeCal.getCorrectedTime(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), -1, rawtime, -1);
+
+      return time;
 
     }
 
 
     double SVDCoG3Time::getClusterTimeError()
     {
+
+      //NOTE: computed with the same algorithm as COG6 strip raw time error, does not take into account calibration!
 
       //take the MaxSum 3 samples
       std::vector<float> clustered3s = m_rawCluster.getMaxSum3Samples().second;

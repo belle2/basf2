@@ -90,15 +90,6 @@ namespace Belle2 {
       std::pair<int, std::vector<float>> getMaxSum3Samples() const;
 
       /**
-       * @return the first frame
-       * applying the MaxSum algorithm
-       */
-      int getFirstFrame()
-      {
-        return getMaxSum3Samples().first;
-      }
-
-      /**
        * @return the cluster size (number of strips of the cluster)
        */
       int getSize() const { return m_strips.size(); }
@@ -117,19 +108,19 @@ namespace Belle2 {
       bool m_isUside;
 
       /** SNR above which the strip can be considered as seed*/
-      double m_cutSeed;
+      double m_cutSeed = 5;
 
       /** SNR above which the strip can be considered for clustering*/
-      double m_cutAdjacent;
+      double m_cutAdjacent = 3;
 
       /** ADC MaxSample of the seed strip */
-      int m_seedMaxSample;
+      int m_seedMaxSample = -1;
 
       /** SNR (using MaxSample) of the seed strip */
-      float m_seedSNR;
+      float m_seedSNR = -1;
 
       /** SVDShaperDigit index of the seed strip of the cluster */
-      int m_seedIndex;
+      int m_seedIndex = -1;
 
       /** vector containing the strips in the cluster */
       std::vector<stripInRawCluster> m_strips;

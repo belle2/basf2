@@ -25,7 +25,9 @@ namespace Belle2 {
 
     public:
 
-      /** Constructor to create an empty Cluster Time Object */
+      /**
+       * Constructor to create an empty Cluster Time Object
+       */
       SVDClusterTime() {};
 
       /**
@@ -41,8 +43,14 @@ namespace Belle2 {
       /**
        * set the RawCluster
        */
-      void setRawCluster(Belle2::SVD::RawCluster& rawCluster)
+      void setRawCluster(const Belle2::SVD::RawCluster& rawCluster)
       { m_rawCluster = rawCluster; };
+
+
+      /**
+       * get the first frame
+       */
+      virtual int getFirstFrame() = 0;
 
       /**
        * @return the cluster time
@@ -71,16 +79,17 @@ namespace Belle2 {
 
     protected:
 
-      double m_apvClockPeriod = 31.44; /** APV clock period*/
+      /** APV clock period*/
+      double m_apvClockPeriod = 16000. / 509;
 
       /** raw cluster used to compute the time*/
       Belle2::SVD::RawCluster m_rawCluster;
 
       /** VxdID of the cluster */
-      VxdID m_vxdID;
+      VxdID m_vxdID = 0;
 
       /** side of the cluster */
-      bool m_isUside;
+      bool m_isUside = 0;
 
     };
 

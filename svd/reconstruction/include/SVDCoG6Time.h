@@ -12,6 +12,10 @@
 
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterTime.h>
+
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDCoGTimeCalibrations.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -27,29 +31,39 @@ namespace Belle2 {
     public:
 
       /**
-       * @return the cluster time
-       */
-      double getClusterTime();
-
-      /**
        * @return the strip time
        */
-      double getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples);
+      double getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples, VxdID sensorID, bool isU, int cellID);
 
       /**
        * @return the strip time error
        */
-      double getStripTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples, int noise);
+      double getStripTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples, int noise, int cellID);
+
+      /**
+       * @return the first frame
+       */
+      int getFirstFrame() override;
+
+      /**
+       * @return the cluster time
+       */
+      double getClusterTime() override;
 
       /**
        * @return the cluster time error
        */
-      double getClusterTimeError();
+      double getClusterTimeError() override;
 
       /**
        * virtual destructor
        */
-      //    virtual ~SVDCoG6Time();
+      //      virtual ~SVDCoG6Time();
+
+    private:
+
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibration wrapper*/
+      SVDCoGTimeCalibrations m_CoG6TimeCal; /**< SVD CoG6 Time calibration wrapper*/
 
     };
 

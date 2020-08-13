@@ -12,6 +12,9 @@
 
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterTime.h>
+
+#include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -27,19 +30,24 @@ namespace Belle2 {
     public:
 
       /**
+       * @return the first frame
+       */
+      int getFirstFrame() override;
+
+      /**
        * @return the cluster time
        */
-      double getClusterTime();
+      double getClusterTime() override;
 
       /**
        * @return the cluster time error
        */
-      double getClusterTimeError();
+      double getClusterTimeError() override;
 
-      /**
-       * virtual destructor
-       */
-      //    virtual ~SVDCoG3Time();
+
+    private:
+
+      SVD3SampleCoGTimeCalibrations m_CoG3TimeCal; /**< SVD CoG3 Time calibration wrapper*/
 
     };
 

@@ -7,7 +7,8 @@ necessary updates for a running globaltag
 
 from enum import Enum
 from collections import defaultdict
-from basf2 import B2ERROR, B2WARNING, B2INFO
+from basf2 import B2ERROR, B2WARNING, B2INFO  # noqa
+from . import ConditionsDB
 from .iov import IntervalOfValidity, IoVSet
 
 
@@ -315,4 +316,21 @@ class RunningTagUpdater:
         if self._operations is None:
             raise RunningTagUpdaterError("Update needs to be calculated first")
 
-        raise RunningTagUpdaterError("not implemented yet")
+        operations = []
+        for op, payload in self._operations:
+            if op == "CLOSE":
+                operations.append({"operation": "MODIFY", "data": [payload.iov_id] + list(payload.iov[2:])})
+            elif op == "CREATE":
+                operations.append({"operation": "CREATE", "data": [payload.payload_id] + list(payload.iov)})
+            else:
+                raise RunningTagUpdaterError(f"Unknown operation type: {op}")
+
+        if not operations:
+            return
+
+        tag = self._running_info['name']
+        try:
+            self._db.request("POST", f"/globalTagPayload/{tag}/updateRunningPayloads",
+                             f"updating running tag {tag}", json=operations)
+        except ConditionsDB.RequestError as e:
+            raise RunningTagUpdaterError(f"Cannot update running tag {tag}", error=e) from e

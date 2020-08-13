@@ -82,6 +82,10 @@ class Pager(object):
         self._original_stdout = None
         #: Original sys.__stderr__ before entering the context
         self._original_stderr = None
+        #: Original sys.stdout.isatty
+        self._original_stdout_isatty = None
+        #: Original sys.stderr.isatty
+        self._original_stderr_isatty = None
 
     def __enter__(self):
         """ entering context """
@@ -115,6 +119,13 @@ class Pager(object):
         # redirected sys.stdout and sys.stderr ...
         sys.__stdout__ = io.TextIOWrapper(os.fdopen(self._original_stdout_fd, "wb"))
         sys.__stderr__ = io.TextIOWrapper(os.fdopen(self._original_stderr_fd, "wb"))
+
+        # also monkey patch the isatty() function of stdout to actually keep
+        # returning True even if we moved the file descriptor
+        self._original_stdout_isatty = sys.stdout.isatty
+        sys.stdout.isatty = lambda: True
+        self._original_stderr_isatty = sys.stderr.isatty
+        sys.stderr.isatty = lambda: True
 
         # fine, everything is saved, start the pager
         pager_cmd = [self._pager]
@@ -157,6 +168,9 @@ class Pager(object):
         # close the copied file descriptors
         sys.__stderr__ = self._original_stderr
         sys.__stdout__ = self._original_stdout
+        # and clean up our monkey patch of isatty
+        sys.stdout.isatty = self._original_stdout_isatty
+        sys.stderr.isatty = self._original_stderr_isatty
 
         # wait for pager
         self._pager_process.communicate()

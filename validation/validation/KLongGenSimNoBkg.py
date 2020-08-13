@@ -60,7 +60,7 @@ process(main)
 # Print call statistics
 print(statistics)
 
-from validation import *
+from validation import *  # noqa
 statistics_plots(
     'KLongGenSimNoBkg_statistics.root',
     contact='Software team b2soft@mail.desy.de',

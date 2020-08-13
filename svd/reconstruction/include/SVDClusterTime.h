@@ -46,6 +46,12 @@ namespace Belle2 {
       void setRawCluster(const Belle2::SVD::RawCluster& rawCluster)
       { m_rawCluster = rawCluster; };
 
+      /**
+       * set the trigger bin
+       */
+      void setTriggerBin(const int triggerBin)
+      { m_triggerBin = triggerBin; };
+
 
       /**
        * get the first frame
@@ -81,6 +87,9 @@ namespace Belle2 {
 
       /** APV clock period*/
       double m_apvClockPeriod = 16000. / 509;
+
+      /** trigger bin */
+      int m_triggerBin;
 
       /** raw cluster used to compute the time*/
       Belle2::SVD::RawCluster m_rawCluster;

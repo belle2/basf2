@@ -38,7 +38,7 @@ namespace Belle2 {
       }
       float rawtime = retval / norm;
 
-      double time = m_CoG3TimeCal.getCorrectedTime(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), -1, rawtime, -1);
+      double time = m_CoG3TimeCal.getCorrectedTime(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), -1, rawtime, m_triggerBin);
 
       return time;
 

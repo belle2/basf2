@@ -40,7 +40,7 @@ namespace Belle2 {
                      -2 * m_apvClockPeriod / tau) * (*(begin + 2))) / (*begin + std::exp(-m_apvClockPeriod / tau) * (*(begin + 1)) / 2);
       float rawtime = - num / denom;
 
-      double time = m_ELS3TimeCal.getCorrectedTime(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), -1, rawtime, -1);
+      double time = m_ELS3TimeCal.getCorrectedTime(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), -1, rawtime, m_triggerBin);
       return time;
 
     }

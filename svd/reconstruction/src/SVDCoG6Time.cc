@@ -40,7 +40,7 @@ namespace Belle2 {
       time -= m_PulseShapeCal.getPeakTime(sensorID, isU, cellID);
 
       // calibrate
-      time =  m_CoG6TimeCal.getCorrectedTime(sensorID, isU, -1, time, cellID);
+      time =  m_CoG6TimeCal.getCorrectedTime(sensorID, isU, cellID, time, m_triggerBin);
 
       return time;
     }
@@ -66,7 +66,7 @@ namespace Belle2 {
       double rawTimeError = noise / Atot * TMath::Sqrt(tmpResSq);
 
       double timeError = m_CoG6TimeCal.getCorrectedTimeError(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), cellID, getClusterTime(),
-                                                             rawTimeError, 0);
+                                                             rawTimeError, m_triggerBin);
 
       return timeError;
 

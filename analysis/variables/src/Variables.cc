@@ -1130,7 +1130,7 @@ Note that this is context-dependent variable and can take different values depen
                       "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
 
     MAKE_DEPRECATED("trackMatchType", false,
-                    "Use better variables like: `trackNECLClusters`, `clusterTrackMatch` and `nECLClusterTrackMatches`");
+                    "Use better variables like trackNECLClusters, clusterTrackMatch, and nECLClusterTrackMatches");
 
   }
 }

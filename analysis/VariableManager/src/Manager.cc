@@ -291,7 +291,7 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
   if (varIter == m_deprecated.end())
     m_deprecated.insert(std::make_pair(name, std::make_pair(make_fatal, description)));
   else
-    B2FATAL("Could not create depreciation waring.");
+    B2FATAL("Could not create depreciation warning.");
 
 }
 
@@ -305,9 +305,9 @@ void Variable::Manager::deprecateVariable(const std::string& name)
     bool make_fatal = varIter->second.first;
     std::string message = varIter->second.second;
     if (make_fatal)
-      B2FATAL("DEPRECATED VAEIABLE " + message);
+      B2FATAL("Variable " << name << " is deprecated. " << message);
     else
-      B2WARNING("DEPRECATED VAEIABLE " + message);
+      B2WARNING("Variable " << name << " is deprecated. " << message);
   }
 }
 

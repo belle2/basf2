@@ -1652,6 +1652,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     if (m_convertTrkExtra) {
       auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_z(), trk_fit.first_z(),
                                                     trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z());
+      track->addRelationTo(cdcExtraInfo);
     }
     // conversion of the SVD hit pattern
     int svdHitPattern = trk_fit.hit_svd();

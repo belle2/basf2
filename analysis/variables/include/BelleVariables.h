@@ -32,6 +32,20 @@ namespace Belle2 {
      */
     double goodBelleGamma(const Particle* particle);
 
+
+    /** Returns first_x from mdst_trk_fit */
+    double BelleTrkFirstX(const Particle* particle);
+    /** Returns first_y from mdst_trk_fit */
+    double BelleTrkFirstY(const Particle* particle);
+    /** Returns first_z from mdst_trk_fit */
+    double BelleTrkFirstZ(const Particle* particle);
+
+    /** Returns last_x from mdst_trk_fit */
+    double BelleTrkLastX(const Particle* particle);
+    /** Returns last_y from mdst_trk_fit */
+    double BelleTrkLastY(const Particle* particle);
+    /** Returns last_z from mdst_trk_fit */
+    double BelleTrkLastZ(const Particle* particle);
   }
 }
 

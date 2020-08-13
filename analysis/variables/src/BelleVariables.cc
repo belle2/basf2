@@ -26,6 +26,9 @@
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
+#include <framework/datastore/StoreArray.h>
+#include <b2bii/dataobjects/BelleTrkExtra.h>
+
 #include <limits>
 
 namespace Belle2 {
@@ -135,6 +138,92 @@ namespace Belle2 {
       return (double) isGoodBelleGamma(region, energy);
     }
 
+    BelleTrkExtra* getBelleTrkExtraInfoFromParticle(Particle const* particle)
+    {
+      const Track* track = particle->getTrack();
+      if (!track) {
+        return nullptr;
+      }
+      auto belleTrkExtra = track->getRelatedTo<BelleTrkExtra>();
+      if (!belleTrkExtra) {
+        return nullptr;
+      }
+      return belleTrkExtra;
+    }
+
+    double BelleTrkFirstX(const Particle* particle)
+    {
+      /*
+      const Track* track = particle->getTrack();
+      if (!track) {
+        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+
+      auto belleTrkExtra = track->getRelatedTo<BelleTrkExtra>();
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      */
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackFirstX();
+    }
+
+    double BelleTrkFirstY(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackFirstY();
+    }
+
+    double BelleTrkFirstZ(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackFirstZ();
+    }
+
+    double BelleTrkLastX(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackLastX();
+    }
+
+    double BelleTrkLastY(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackLastY();
+    }
+
+    double BelleTrkLastZ(const Particle* particle)
+    {
+      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      if (!belleTrkExtra) {
+        B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
+        return std::numeric_limits<int>::quiet_NaN();
+      }
+      return belleTrkExtra->getTrackLastZ();
+    }
+
     VARIABLE_GROUP("Belle Variables");
 
     REGISTER_VARIABLE("goodBelleKshort", goodBelleKshort, R"DOC(
@@ -172,6 +261,30 @@ See Also:
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma, R"DOC(
 [Legacy] Returns 1.0 if photon candidate passes simple region dependent
 energy selection for Belle data and MC (50/100/150 MeV).
+)DOC");
+
+    REGISTER_VARIABLE("BelleTrkFirstX", BelleTrkFirstX, R"DOC(
+[Legacy] Returns x component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleTrkFirstY", BelleTrkFirstY, R"DOC(
+[Legacy] Returns y component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleTrkFirstZ", BelleTrkFirstZ, R"DOC(
+[Legacy] Returns z component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleTrkLastX", BelleTrkLastX, R"DOC(
+[Legacy] Returns x component of end point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleTrkLastY", BelleTrkLastY, R"DOC(
+[Legacy] Returns y component of end point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+)DOC");
+
+    REGISTER_VARIABLE("BelleTrkLastZ", BelleTrkLastZ, R"DOC(
+[Legacy] Returns z component of end point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
     // this is defined in ECLVariables.{h,cc}

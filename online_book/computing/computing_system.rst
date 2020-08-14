@@ -1,3 +1,5 @@
+.. _onlinebook_computing_system:
+
 The computing system
 ====================
 

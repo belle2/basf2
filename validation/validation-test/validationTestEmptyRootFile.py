@@ -5,11 +5,13 @@
 <header>
 <output>validationTestEmptyRootFile.root</output>
 <contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
-</header>
 
 
+<description>
 This file will not generate an output root file to probe
 the validation suite properly handles this case.
+</description>
+</header>
 """
 
 from ROOT import TFile

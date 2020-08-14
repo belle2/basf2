@@ -4,11 +4,13 @@
 """
 <header>
 <contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
-</header>
 
 
+<description>
 This file will exit with an exit code != 0 to probe the
 validation correctly detects and reports this.
+</description>
+</header>
 """
 
 

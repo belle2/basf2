@@ -5,11 +5,12 @@
 <header>
 <output>validationTestPlots.root, validationTestPlotsExpertOnly.root</output>
 <contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
-</header>
 
-
+<description>
 This file will generate various output into a root-file to have
 a fast turn-around during development
+</description>
+</header>
 """
 
 
@@ -35,12 +36,12 @@ tntuple.Fill(array_of_values)
 
 tntuple.SetAlias('Description', r"This is a description test. "
                  r"Lorem ipsum sit dolor amet.  We also support $\LaTeX$! "
-                 r"\n <br> \n For example, here is the infamous "
-                 r"Einstein-Pythagoras-theorem: \n "
-                 r"$$a^2 + b^2 = \\frac{E}{m}$$ \n Of course, you can also"
-                 r"do other things, like $\\theta = 90^\circ$ or $D^- "
-                 r"\\rightarrow D^0 \pi^- \pi^+$. \n Sometimes it is "
-                 r"necessary to escape commands with a double backslash, "
+                 "\n <br> \n For example, here is the infamous "
+                 "Einstein-Pythagoras-theorem: \n "
+                 r"$$a^2 + b^2 = \frac{E}{m}$$ "
+                 "\n Of course, you can also do other things, "
+                 r"like $\theta = 90^\circ$ or $D^- \rightarrow D^0 \pi^- \pi^+$. "
+                 "\n Sometimes it is necessary to escape commands with a double backslash, "
                  r"because e.g. \\theta will be interpreted as [tab]heta.")
 tntuple.SetAlias('Check', "This is the check text.")
 tntuple.SetAlias('Contact', "Name of the contact person.")

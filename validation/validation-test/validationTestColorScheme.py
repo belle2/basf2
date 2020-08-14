@@ -5,11 +5,13 @@
 <header>
 <output>validationTestColorScheme.root</output>
 <contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
-</header>
 
 
+<description>
 To test the color scheme.
 Set generate_reference = True to generate the reference files.
+</description>
+</header>
 """
 
 

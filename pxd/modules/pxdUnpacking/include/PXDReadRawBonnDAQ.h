@@ -25,7 +25,7 @@ namespace Belle2 {
   namespace PXD {
     //! Module to Load Raw PXD Data from DHH network-dump file and store it as RawPXD in Data Store
     //! This is meant for lab use (standalone testing, debugging) without an event builder.
-    class PXDReadRawBonnDAQModule : public Module {
+    class PXDReadRawBonnDAQModule final : public Module {
       enum {MAXEVTSIZE = 4 * 1024 * 1024 + 256 * 4 + 16};
 
     public:

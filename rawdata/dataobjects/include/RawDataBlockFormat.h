@@ -10,10 +10,6 @@
 #define RAWDATABLOCKFORMAT_H
 
 // Includes
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
-#include <string.h>
 #include <rawdata/switch_basf2_standalone.h>
 
 namespace Belle2 {

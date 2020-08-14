@@ -8,7 +8,7 @@ How to run the SVD CoG calibration using CAF:
    
    -Inside the script there is the path of the input data used, 
     it is necessary to change it if you want to run the script over a different set of data.
-   -It creates a folder with one txt file for each run that cointains the list of the files for that run
+   -It creates a folder with one txt file for each run that contains the list of the files for that run
    -This lists of files are used by the script described in 3) to run the check of the calibration for all runs inside this folder
 
 3) run source SVDCoGTimeCalibrationCheck.sh <exp_number> <txt_folder produced in 2)> <localDB produced in 1)> <log files output folder>

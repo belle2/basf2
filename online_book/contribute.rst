@@ -1,3 +1,5 @@
+.. _onlinebook_contribute:
+
 We want YOU to contribute to this book!
 ---------------------------------------
 

@@ -9,8 +9,6 @@
 #include <TSystem.h>
 #include <stdlib.h>
 
-#include "framework/datastore/StoreObjPtr.h"
-
 // #define DESY
 
 using namespace std;

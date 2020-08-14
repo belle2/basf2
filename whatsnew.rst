@@ -55,9 +55,11 @@ reconstruct decay modes based on MC information.
 The DecayStringGrammar has been extended with new exception markers for
 Bremsstrahlung, decay in flight, and misidentification.
 
-.. warning:: There are two known issues in the MC matching: Exceptions for the MC matching
-             of daughter particles are not propagated to the mother particle and some
-             photons produced by PHOTOS are misinterpreted as other radiated photons
+Exceptions for the MC matching of daughter particles with the DecayStringGrammar are propagated 
+to the mother particle. 
+
+.. warning:: There is a known issue in the MC matching: Some photons produced by PHOTOS
+             are misinterpreted as other radiated photons.
 
 .. rubric:: Redefinition of angle variables
 

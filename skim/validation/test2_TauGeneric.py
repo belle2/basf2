@@ -1,6 +1,7 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
+import ROOT
 import basf2 as b2
 import modularAnalysis as ma
 from variables import variables as vm
@@ -48,7 +49,6 @@ print(b2.statistics)
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
-import ROOT
 
 f = ROOT.TFile.Open('TauGeneric_Validation.root', 'update')
 

@@ -449,7 +449,7 @@ namespace Belle2 {
 
       G4VSolid* get_tesselatedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
-        if (nshape != 36) return NULL; // only one crystal has pentagon shape
+        if (nshape != 36) return nullptr; // only one crystal has pentagon shape
 
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -524,7 +524,7 @@ namespace Belle2 {
 
       G4VSolid* get_trapezoid(const string& prefix, double wrapthick, G4Translate3D& shift) const override
       {
-        if (nshape != 36) return NULL; // only one crystal has pentagon shape
+        if (nshape != 36) return nullptr; // only one crystal has pentagon shape
 
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
 
@@ -628,7 +628,7 @@ namespace Belle2 {
         vector<string> t;
         copy(istream_iterator<string>(iss),  istream_iterator<string>(),  back_inserter(t));
         if (t.size() > 0) {
-          shape_t* shape = NULL;
+          shape_t* shape = nullptr;
           if (t.size() == 21) {
             shape = new quadrilateral_endcap_t();
             quadrilateral_endcap_t& trap = static_cast<quadrilateral_endcap_t&>(*shape);
@@ -754,7 +754,7 @@ namespace Belle2 {
         vector<string> t;
         copy(istream_iterator<string>(iss),  istream_iterator<string>(),  back_inserter(t));
         if (t.size() > 0) {
-          shape_t* shape = NULL;
+          shape_t* shape = nullptr;
           if (t.size() == 21) {
             shape = new quadrilateral_endcap_t();
             quadrilateral_endcap_t& trap = static_cast<quadrilateral_endcap_t&>(*shape);

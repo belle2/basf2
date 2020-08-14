@@ -49,7 +49,7 @@ class printPIDLikelihoods(Module):
             try:
                 print('logLikelihoods:')
                 likelihood.printArray()
-            except:
+            except BaseException:
                 print('--> No relation to PIDLikelihood')
             print()
 
@@ -59,7 +59,7 @@ class printPIDLikelihoods(Module):
             Q = 0
             abc = input('Type <CR> to continue or Q to quit ')
             evtMetaData.obj().setEndOfData()
-        except:
+        except BaseException:
             abc = ''  # dummy line to terminate try-except
 
 

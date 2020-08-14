@@ -342,7 +342,7 @@ void ECLDigitizerModule::makeWaveforms()
   BitStream out(ec.m_nch * ec.m_nsmp * 18 / 32);
   out.putNBits(m_compAlgo & 0xff, 8);
   ECLCompress* comp = selectAlgo(m_compAlgo & 0xff);
-  if (comp == NULL)
+  if (comp == nullptr)
     B2FATAL("Unknown compression algorithm: " << m_compAlgo);
 
   int FitA[ec.m_nsmp]; // buffer for the waveform fitter
@@ -380,7 +380,7 @@ void ECLDigitizerModule::event()
 
   bool isBGOverlay = m_eclWaveforms.isValid(), isTrigTime = false;
   BitStream out;
-  ECLCompress* comp = NULL;
+  ECLCompress* comp = nullptr;
 
   // check background overlay
   if (isBGOverlay) {
@@ -388,7 +388,7 @@ void ECLDigitizerModule::event()
     out.setPos(0);
     unsigned int compAlgo = out.getNBits(8);
     comp = selectAlgo(compAlgo & 0x7f);
-    if (comp == NULL)
+    if (comp == nullptr)
       B2FATAL("Unknown compression algorithm: " << compAlgo);
     isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrived
     if (isTrigTime) {

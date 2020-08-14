@@ -5,7 +5,7 @@
  * This module calculates shower shape variables.                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
  *               Alon Hershenhorn   (hershen@phas.ubc.ca)                 *
  *                                                                        *

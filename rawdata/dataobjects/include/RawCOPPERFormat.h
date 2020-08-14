@@ -11,8 +11,6 @@
 // Includes
 #include <stdio.h>
 #include <string>
-#include <stdlib.h>
-#include <sys/time.h>
 
 #include <rawdata/RawCOPPERPackerInfo.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>

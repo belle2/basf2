@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SHAPERDSP_T_H
-#define SHAPERDSP_T_H
+#pragma once
 
 #include <vector>
 #include <utility>
@@ -193,4 +192,3 @@ namespace Belle2 {
     };
   }
 }
-#endif//SHAPERDSP_T_H

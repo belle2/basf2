@@ -6,7 +6,7 @@ Description of the steps needed to extract charge-dependent PDFs for ECL charged
 
 Step 1: Generation of MC with Particle Gun in DST format:
 	Using `./ecl/examples/MakeMC.py` MC can be generated for the user's choice of PDG Code (including antiparticle codes).
-	Here the user can set the beam background hypothesis to be overlayed.
+	Here the user can set the beam background hypothesis to be overlaid.
 
 Step 2: Processing of DST file to NTup:
 	Using `./ecl/examples/EclChargedPidAnalysis.py` the DST file is read in and an NTuple is created (ROOT TTree).

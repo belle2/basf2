@@ -44,8 +44,8 @@ namespace Belle2 {
     /// Constructor. type: 0-> binary, 1->hex
     TRGState(const char*, unsigned type);
 
-    // /// Copy constructor.
-    // TRGState(const TRGState &);
+    /// Default copy constructor.
+    TRGState(const TRGState&) = default;
 
     /// Destructor
     virtual ~TRGState();

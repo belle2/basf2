@@ -1,6 +1,12 @@
 Changes in the analysis package since release-05-00
 ---------------------------------------------------
 
+Vertex Fitting
+++++++++++++++
+
+ * KFit has been extended to be able to handle vertex fits (with and without mass constraint) that involve an eta particle
+   reconstructed in ``eta -> gamma gamma``.
+
 Variables
 +++++++++
 

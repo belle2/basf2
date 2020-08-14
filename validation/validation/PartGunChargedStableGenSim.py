@@ -11,6 +11,10 @@ runs the fullsim w/ mixed in background, and dumps full output (*Digits containe
 </header>
 """
 
+from ROOT import Belle2
+from background import get_background_files
+from simulation import add_simulation
+import basf2
 import argparse
 
 parser = argparse.ArgumentParser(description=__doc__,
@@ -22,12 +26,6 @@ parser.add_argument("--bkg_dir",
                     "If not set, basf2 will search for the 'BELLE2_BACKGROUND_DIR' env variable by default,\n"
                     "which is defined on the validation server.")
 args = parser.parse_args()
-
-
-import basf2
-from simulation import add_simulation
-from background import get_background_files
-from ROOT import Belle2
 
 
 # Pdg code of the charged stable particles & antiparticles.

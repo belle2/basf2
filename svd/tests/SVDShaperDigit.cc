@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <vector>
 #include <string>
@@ -34,8 +33,6 @@ namespace Belle2 {
       for (auto sample : samples)
         EXPECT_EQ(SVDShaperDigit::APVFloatSampleType(0), sample);
       EXPECT_EQ(0.0, digit.getFADCTime());
-      EXPECT_EQ(SVDModeByte::c_DefaultID, digit.getModeByte().getID());
-      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
     }
 
     /**
@@ -47,10 +44,9 @@ namespace Belle2 {
       VxdID sensorID(3, 4, 1);
       short int cellID = 132;
       char digitFADCTime(-16);
-      SVDModeByte digitModeByte(151);
 
       std::vector<int> init_samples({0, 5, 10, 9, 6, 5});
-      SVDShaperDigit digit(sensorID, false, cellID, init_samples, digitFADCTime, digitModeByte);
+      SVDShaperDigit digit(sensorID, false, cellID, init_samples, digitFADCTime);
       // Test getters
       EXPECT_EQ(sensorID, digit.getSensorID());
       EXPECT_FALSE(digit.isUStrip());
@@ -60,8 +56,6 @@ namespace Belle2 {
         EXPECT_EQ(static_cast<SVDShaperDigit::APVFloatSampleType>(init_samples[isample]),
                   samples[isample]);
       EXPECT_EQ(static_cast<float>(digitFADCTime), digit.getFADCTime());
-      EXPECT_EQ(digitModeByte, digit.getModeByte());
-      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
     }
 
     /**
@@ -73,13 +67,11 @@ namespace Belle2 {
       VxdID sensorID(3, 4, 1);
       short int cellID = 132;
       char digitFADCTime(-16);
-      unsigned char digitModeByte(151);
 
       // floats must work, too.
       float init_samples[SVDShaperDigit::c_nAPVSamples] = {0, 5, 10, 9, 6, 5};
       SVDShaperDigit digit(
-        sensorID, false, cellID, init_samples, digitFADCTime, digitModeByte
-      );
+        sensorID, false, cellID, init_samples, digitFADCTime);
       // Test getters
       EXPECT_EQ(sensorID, digit.getSensorID());
       EXPECT_FALSE(digit.isUStrip());
@@ -89,8 +81,6 @@ namespace Belle2 {
         EXPECT_EQ(static_cast<SVDShaperDigit::APVFloatSampleType>(init_samples[isample]),
                   samples[isample]);
       EXPECT_EQ(static_cast<float>(digitFADCTime), digit.getFADCTime());
-      EXPECT_EQ(digitModeByte, digit.getModeByte());
-      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
     }
     /**
      * Check standard object creation without FADC time and mode information.
@@ -105,8 +95,6 @@ namespace Belle2 {
       SVDShaperDigit digit(sensorID, false, cellID, init_samples);
       // Test that time and error are set correctly.
       EXPECT_EQ(0.0, digit.getFADCTime());
-      EXPECT_EQ(SVDModeByte::c_DefaultID, digit.getModeByte());
-      EXPECT_EQ("0-suppr/global/6 samples/???", std::string(digit.getModeByte()));
     }
 
     /** test sample trimming*/

@@ -1,18 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2011-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Poyuan Chen, Alexei Sibidanov                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- *                                                                        *
- * 7/31: Poyuan                                                           *
- *                                                                        *
- *                                                                        *
  **************************************************************************/
-#ifndef ECLGEOMETRYPAR_H
-#define ECLGEOMETRYPAR_H
+
+#pragma once
 
 #include <vector>
 #include <map>
@@ -387,4 +383,3 @@ namespace Belle2 {
 
   } // end of namespace ECL
 } // end of namespace Belle2
-#endif

@@ -9,8 +9,7 @@
 //-----------------------------------------------------------------------------
 //*****************************************************************************
 
-#ifndef _TOPf77fun_h
-#define _TOPf77fun_h
+#pragma once
 
 extern "C" {
   // fortran functions defined in top_geo.F
@@ -94,11 +93,9 @@ extern "C" {
   float cher_angle_(float*, float*, float*);
   void getnum_pulls_(int*);
   void get_pulls_(int*, float*, float*, float*, float*, float*, int*);
-  float get_pdf_(int*, float*, float*, float*);
+  float get_pdf_(int*, float*, float*, float*, int*);
 
 }
-
-#endif
 
 
 

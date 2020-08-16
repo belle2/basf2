@@ -1638,14 +1638,12 @@ namespace Belle2 {
 
       auto func = [maskName](const Particle * particle) -> double {
 
-        double result = -1;
+        double result = 0;
 
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (not roe.isValid())
-          return result;
+          return std::numeric_limits<float>::quiet_NaN();
 
-        if (maskName == "")
-          return 1.0;
         if (roe->hasParticle(particle, maskName))
         {
           return 1.0;
@@ -2186,7 +2184,7 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "Returns missing mass squared over missing energy");
 
     REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
-                      "Returns boolean value if track or eclCluster type particle passes a certain mask or not. Only to be used in for_each path");
+                      "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path, otherwise returns quiet NaN.");
 
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");

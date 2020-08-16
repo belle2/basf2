@@ -14,9 +14,7 @@
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
-#include <geometry/utilities.h>
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -26,16 +24,11 @@
 #include <framework/database/IntervalOfValidity.h>
 
 #include <cmath>
-#include <boost/format.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
 #include <G4Tubs.hh>
-#include <G4Polyhedra.hh>
-#include <G4Box.hh>
-#include <G4SubtractionSolid.hh>
 #include <G4Transform3D.hh>
-#include <G4UserLimits.hh>
 #include <G4VisAttributes.hh>
 
 #include <iostream>

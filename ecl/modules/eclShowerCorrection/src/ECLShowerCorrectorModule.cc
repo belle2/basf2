@@ -6,7 +6,7 @@
  * longitudinal leakage): corr = raw * correctionfactor.                  *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *               Alon Hershenhorn (hershen@physics.ubc.ca) (AH)           *
  *               Suman Koirala (Suman Koirala <suman@ntu.edu.tw>) (SK)    *
  *                                                                        *

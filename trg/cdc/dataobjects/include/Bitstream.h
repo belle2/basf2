@@ -1,6 +1,5 @@
 #pragma once
 #include <TObject.h>
-#include <bitset>
 
 #define MERGER_WIDTH 256
 #define NUM_MERGER 146
@@ -18,8 +17,6 @@
 
 
 namespace Belle2 {
-
-  class CDCTriggerUnpackerModule;
 
   /**
    * Class to hold one clock cycle of raw bit content

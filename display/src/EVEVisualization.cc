@@ -1545,7 +1545,7 @@ void EVEVisualization::addEKLMHit2d(const EKLMHit2d* eklm2dhit)
 
 void EVEVisualization::addROI(const ROIid* roi)
 {
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
 
   VxdID sensorID = roi->getSensorID();
   const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(sensorID);

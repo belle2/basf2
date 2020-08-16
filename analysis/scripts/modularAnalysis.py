@@ -586,6 +586,39 @@ def cutAndCopyList(outputListName, inputListName, cut, writeOut=False, path=None
     cutAndCopyLists(outputListName, [inputListName], cut, writeOut, path)
 
 
+def trackingEfficiency(inputListNames, fraction, path=None):
+    """
+    Randomly remove tracks from the provided particle lists to estimate the tracking efficiency.
+    Takes care of the duplicates, if any.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        fraction (float): fraction of particles to be removed randomly
+        path (basf2.Path): module is added to this path
+    """
+
+    trackingefficiency = register_module('TrackingEfficiency')
+    trackingefficiency.param('particleLists', inputListNames)
+    trackingefficiency.param('frac', fraction)
+    path.add_module(trackingefficiency)
+
+
+def trackingMomentum(inputListNames, scale, path=None):
+    """
+    Scale momenta of the particles (based on charged tracks) according to the scaling factor scale.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        scale (float): scaling factor (1.0 -- no scaling)
+        path (basf2.Path): module is added to this path
+    """
+
+    trackingmomentum = register_module('TrackingMomentum')
+    trackingmomentum.param('particleLists', inputListNames)
+    trackingmomentum.param('scale', scale)
+    path.add_module(trackingmomentum)
+
+
 def mergeListsWithBestDuplicate(outputListName,
                                 inputListNames,
                                 variable,
@@ -1320,6 +1353,27 @@ def rankByLowest(particleList,
     path.add_module(bcs)
 
 
+def applyRandomCandidateSelection(particleList, path=None):
+    """
+    If there are multiple candidates in the provided particleList, all but one of them are removed randomly.
+    This is done on a event-by-event basis.
+
+    @param particleList     ParticleList for which the random candidate selection should be applied
+    @param path             module is added to this path
+    """
+
+    rcs = register_module('BestCandidateSelection')
+    rcs.set_name('RandomCandidateSelection_' + particleList)
+    rcs.param('particleList', particleList)
+    rcs.param('variable', 'random')
+    rcs.param('selectLowest', False)
+    rcs.param('allowMultiRank', False)
+    rcs.param('numBest', 1)
+    rcs.param('cut', '')
+    rcs.param('outputVariable', '')
+    path.add_module(rcs)
+
+
 def printDataStore(eventNumber=-1, path=None):
     """
     Prints the contents of DataStore in the first event (or a specific event number or all events).
@@ -1769,8 +1823,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
     fillParticleList('pi+:roe_default', '', path=path)
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(chargedPIDPriors, path=path)
-        inputParticlelists = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
+        stdMostLikely(chargedPIDPriors, '_roe', path=path)
+        inputParticlelists = ['%s:mostlikely_roe' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+']]
     if not belle_sources:
         fillParticleList('gamma:roe_default', '', path=path)
         fillParticleList('K_L0:roe_default', 'isFromKLM > 0', path=path)
@@ -2041,30 +2095,27 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
     path.add_module(updateMask)
 
 
-def printROEInfo(mask_names=[], which_mask='both', full_print=False, path=None):
+def printROEInfo(mask_names=[], full_print=False,
+                 unpackComposites=True, path=None):
     """
     This function prints out the information for the current ROE, so it should only be used in the for_each path.
     It prints out basic ROE object info.
 
-    If mask names are provided, specific information for those masks will be printed out. By default, basic
-    ECLCluster and Track mask info will be printed out, but it is possible to do this only for one, if needed.
+    If mask names are provided, specific information for those masks will be printed out.
 
-    It is also possible to print out the specific mask values for each Track and ECLCluster by setting the 'full_print'
-    option to True.
+    It is also possible to print out all particles in a given mask if the
+    'full_print' is set to True.
 
-    @param mask_names   array of ROEMask names for printing out info
-    @param which_mask   print out info for Tracks ('track'), ECLClusters ('cluster') or ('both')
-    @param full_print   print out mask values for each Track/ECLCLuster in mask
-    @param path         modules are added to this path
+    @param mask_names         array of ROEMask names for printing out info
+    @param unpackComposites   if true, replace composite particles by their daughters
+    @param full_print         print out particles in mask
+    @param path               modules are added to this path
     """
-    if not isinstance(path, Path):
-        B2FATAL("Error from printROEInfo, please add this to the for_each path")
-
     printMask = register_module('RestOfEventPrinter')
     printMask.set_name('RestOfEventPrinter')
     printMask.param('maskNames', mask_names)
-    printMask.param('whichMask', which_mask)
     printMask.param('fullPrint', full_print)
+    printMask.param('unpackComposites', unpackComposites)
     path.add_module(printMask)
 
 
@@ -2452,7 +2503,7 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildEventKinematics(inputListNames=[], default_cleanup=True,
+def buildEventKinematics(inputListNames=[], default_cleanup=True, custom_cuts=None,
                          chargedPIDPriors=None, fillWithMostLikely=False, path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
@@ -2471,6 +2522,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
     @param default_cleanup    if True and either inputListNames empty or fillWithMostLikely True, default clean up cuts are applied
+    @param custom_cuts        tuple of selection cut strings of form (trackCuts, photonCuts), default is None,
+                              which would result in a standard predefined selection cuts
     @param path               modules are added to this path
     """
     trackCuts = 'pt > 0.1'
@@ -2480,17 +2533,19 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
 
     gammaCuts = 'E > 0.05'
     gammaCuts += ' and thetaInCDCAcceptance'
+    if (custom_cuts is not None):
+        trackCuts, gammaCuts = custom_cuts
 
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
-        stdMostLikely(chargedPIDPriors, path=path)
-        inputListNames = ['%s:mostlikely' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
+        stdMostLikely(chargedPIDPriors, '_evtkin', path=path)
+        inputListNames = ['%s:mostlikely_evtkin' % ptype for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']]
         fillParticleList('gamma:evtkin', '', path=path)
         inputListNames += ['gamma:evtkin']
         if default_cleanup:
             B2INFO("Using default cleanup in EventKinematics module.")
             for ptype in ['K+', 'p+', 'e+', 'mu+', 'pi+']:
-                applyCuts(f'{ptype}:mostlikely', trackCuts, path=path)
+                applyCuts(f'{ptype}:mostlikely_evtkin', trackCuts, path=path)
             applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
             B2INFO("No cleanup in EventKinematics module.")
@@ -2500,7 +2555,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
         fillParticleList('gamma:evtkin', '', path=path)
         particleLists = ['pi+:evtkin', 'gamma:evtkin']
         if default_cleanup:
-            B2INFO("Using default cleanup in EventKinematics module.")
+            if (custom_cuts is not None):
+                B2INFO("Using default cleanup in EventKinematics module.")
             applyCuts('pi+:evtkin', trackCuts, path=path)
             applyCuts('gamma:evtkin', gammaCuts, path=path)
         else:
@@ -2509,13 +2565,44 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True,
         particleLists = inputListNames
 
     eventKinematicsModule = register_module('EventKinematics')
-    eventKinematicsModule.set_name('EventKinematics_')
+    eventKinematicsModule.set_name('EventKinematics_reco')
     eventKinematicsModule.param('particleLists', particleLists)
+    path.add_module(eventKinematicsModule)
+
+
+def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
+    """
+    Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
+    using generated particles. If no ParticleList is provided, default generated ParticleLists are used.
+
+    @param inputListNames     list of ParticleLists used to calculate the global event kinematics.
+                              If the list is empty, default ParticleLists are filled.
+    @param selectionCut       optional selection cuts
+    @param path               Path to append the eventKinematics module to.
+    """
+    if (len(inputListNames) == 0):
+        # Type of particles to use for EventKinematics
+        # K_S0 and Lambda0 are added here because some of them have interacted
+        # with the detector material
+        types = ['gamma', 'e+', 'mu+', 'pi+', 'K+', 'p+',
+                 'K_S0', 'Lambda0']
+        for t in types:
+            fillParticleListFromMC("%s:evtkin_default_gen" % t,   'mcPrimary > 0 and nDaughters == 0',
+                                   True, True, path=path)
+            if (selectionCut != ''):
+                applyCuts("%s:evtkin_default_gen" % t, selectionCut, path=path)
+            inputListNames += ["%s:evtkin_default_gen" % t]
+
+    eventKinematicsModule = register_module('EventKinematics')
+    eventKinematicsModule.set_name('EventKinematics_gen')
+    eventKinematicsModule.param('particleLists', inputListNames)
+    eventKinematicsModule.param('usingMC', True)
     path.add_module(eventKinematicsModule)
 
 
 def buildEventShape(inputListNames=[],
                     default_cleanup=True,
+                    custom_cuts=None,
                     allMoments=False,
                     cleoCones=True,
                     collisionAxis=True,
@@ -2557,6 +2644,8 @@ def buildEventShape(inputListNames=[],
     @param default_cleanup    If True, applies standard cuts on pt and cosTheta when
                               defining the internal lists. This option is ignored if the
                               particleLists are provided by the user.
+    @param custom_cuts        tuple of selection cut strings of form (trackCuts, photonCuts), default is None,
+                              which would result in a standard predefined selection cuts
     @param path               Path to append the eventShape modules to.
     @param thrust             Enables the calculation of thrust-related quantities (CLEO
                               cones, Harmonic moments, jets).
@@ -2576,6 +2665,16 @@ def buildEventShape(inputListNames=[],
                               is quite time consuming, instead of using it consider sanitizing
                               the lists you are passing to the function.
     """
+    trackCuts = 'pt > 0.1'
+    trackCuts += ' and thetaInCDCAcceptance'
+    trackCuts += ' and abs(dz) < 3.0'
+    trackCuts += ' and dr < 0.5'
+
+    gammaCuts = 'E > 0.05'
+    gammaCuts += ' and thetaInCDCAcceptance'
+    if (custom_cuts is not None):
+        trackCuts, gammaCuts = custom_cuts
+
     if not inputListNames:
         B2INFO("Creating particle lists pi+:evtshape and gamma:evtshape to get the event shape variables.")
         fillParticleList('pi+:evtshape', '', path=path)
@@ -2583,15 +2682,10 @@ def buildEventShape(inputListNames=[],
         particleLists = ['pi+:evtshape', 'gamma:evtshape']
 
         if default_cleanup:
-            B2INFO("Applying standard cuts")
-            trackCuts = 'pt > 0.1'
-            trackCuts += ' and thetaInCDCAcceptance'
-            trackCuts += ' and abs(dz) < 3.0'
-            trackCuts += ' and dr < 0.5'
+            if (custom_cuts is not None):
+                B2INFO("Applying standard cuts")
             applyCuts('pi+:evtshape', trackCuts, path=path)
 
-            gammaCuts = 'E > 0.05'
-            gammaCuts += ' and thetaInCDCAcceptance'
             applyCuts('gamma:evtshape', gammaCuts, path=path)
         else:
             B2WARNING("Creating the default lists with no cleanup.")
@@ -2848,7 +2942,7 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     to the slow pion direction. The charge of the given pion list has to be consistent
     with the D* charge
 
-    @param decayString Decay string, must be of form `D* -> pi`
+    @param decayString Decay string, must be of form ``D* -> pi``
     @param slowPionCut Cut applied to the input pion list to identify slow pions
     @param DstarCut Cut applied to the output D* list
     @param path the module is added to this path
@@ -2858,6 +2952,7 @@ def addInclusiveDstarReconstruction(decayString, slowPionCut, DstarCut, path):
     incl_dstar.param("slowPionCut", slowPionCut)
     incl_dstar.param("DstarCut", DstarCut)
     path.add_module(incl_dstar)
+
 
 if __name__ == '__main__':
     from basf2.utils import pretty_print_module

@@ -33,8 +33,12 @@ namespace Belle2 {
 
     /** Constructor */
     SVDDQMExpressRecoModule();
+    /** Copy constructor (disabled) */
+    SVDDQMExpressRecoModule(const SVDDQMExpressRecoModule&) = delete;
     /* Destructor */
     virtual ~SVDDQMExpressRecoModule();
+    /** Operator = (disabled) */
+    SVDDQMExpressRecoModule& operator=(const SVDDQMExpressRecoModule&) = delete;
 
     /** Module function initialize */
     void initialize() override final;
@@ -55,7 +59,7 @@ namespace Belle2 {
 
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     /** if TRUE: svdTime back in SVD time reference*/
-    bool m_desynchSVDTime = true;
+    bool m_desynchSVDTime = false;
 
     /** parameter to change the range of the time histograms*/
     bool m_isSVDTimeCalibrated = false;

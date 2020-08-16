@@ -10,26 +10,19 @@
 
 // needed to build variables here
 #include <reconstruction/variables/DedxVariables.h>
-#include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
 
 // framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <reconstruction/dataobjects/VXDDedxTrack.h>
 
-#include <iostream>
-#include <algorithm>
 #include <cmath>
 
 namespace Belle2 {

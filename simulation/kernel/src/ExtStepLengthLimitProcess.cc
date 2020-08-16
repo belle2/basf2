@@ -12,8 +12,6 @@
 #include <simulation/kernel/ExtStepLengthLimitProcess.h>
 #include <G4Track.hh>
 
-#include <framework/logging/Logger.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace Belle2::Simulation;

@@ -13,6 +13,8 @@
 
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
+#include <iostream>
+
 using namespace std;
 using namespace Belle2;
 using namespace GDL;

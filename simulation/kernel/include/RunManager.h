@@ -14,10 +14,6 @@
 #include <G4RunManager.hh>
 #include <G4AssemblyVolume.hh>
 
-#include <string>
-#include <map>
-#include <set>
-
 namespace Belle2 {
 
   namespace Simulation {

@@ -15,6 +15,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
+#include <numeric>
+
 using namespace Belle2;
 using namespace SoftwareTrigger;
 

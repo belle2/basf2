@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-
-#include <TObject.h>
 #include <string>
 #include <vector>
 

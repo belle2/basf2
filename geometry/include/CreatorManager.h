@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CREATORMANAGER_H
-#define CREATORMANAGER_H
+#pragma once
 
 #include <string>
 #include <map>
@@ -64,5 +63,3 @@ namespace Belle2 {
 
   }
 } //end of namespace Belle2
-
-#endif /* CREATORMANAGER_H_ */

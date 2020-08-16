@@ -403,6 +403,8 @@ Decay B0
 #                               variables mX, q2, and El (=> 512 weights total).
 #                               The list of weights is included as ModelAlias
 #                               once per B charge state.
+# March 1, 2018 A. Ermakov updated charmless semileptonic BFs to PDG 2017 values
+
 # NOTE: - The specified parameters for model VUBHYBRID are:
 #         mb, a, alpha_s, nbins_mX, nbins_q2, nbins_El,
 #         list of threshold values for mX, q2, El in ascending order.
@@ -1335,16 +1337,44 @@ Decay B0
 0.0001     chi_c0  K0  pi0  pi0     PHSP;
 0.0001     chi_c0  K+  pi-  pi0     PHSP;
 
+# B0 -> chi_c1 X
+
+# B0 -> chi_c1 K0 (PDG 2019 data)
 0.0001965000 chi_c1 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #CPV included, Oberhof 09/11/2017
 0.0001965000 chi_c1 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   #CPV included, Oberhof 09/11/2017
 
-#0.000222000 chi_c1  K*0  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus;
-0.000040 K*S chi_c1       SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
-0.000040 K*L chi_c1       SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
-0.000159 chi_c1 K*0T      SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11/2017
+# B0 -> chi_c1 pi- K+ (PDG 2019 data)
+#
+# Branching fraction: 0.000497
+#
+# Using branching fractions:
+# Br(B0 -> chi_c1 K*(892)0) = 0.000238
+# Br(K*(892)0 -> (K pi)0) = 0.99754
+#
+# Partial branching fractions:
+# 1) Br(B0 -> chi_c1 K*(892)0) * Br(K*(892)0 -> K+ pi-)) =
+#    0.000238 * 0.99754 * (2/3) = 0.00015828
+# 2) Br(B0 -> chi_c1 K+ pi-) = 0.000497 - 0.00015828 = 0.00033872
+0.00015828   chi_c1  K*0T      SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11
+0.00033872   chi_c1  K+  pi-   PHSP;
 
-0.000497   chi_c1  K+  pi-         PHSP;
-0.0002     chi_c1  K0  pi0         PHSP;
+# B0 -> chi_c1 pi0 K0 (PDG 2019 data).
+#
+# Branching fraction (estimated from B0 -> chi_c1 pi- K+ asuming decay via
+# K* resonances): 4.97e-4 / 2 = 0.0002485
+#
+# Using branching fractions:
+# Br(B0 -> chi_c1 K*(892)0) = 0.000238
+# Br(K*(892)0 -> (K pi)0) = 0.99754
+#
+# Partial branching fractions:
+# 1) Br(B0 -> chi_c1 K*(892)0) * Br(K*(892)0 -> K0 pi0) =
+#    0.000238 * 0.99754 * (1/3) = 0.00007914
+# 2) Br(B0 -> chi_c1 K0 pi0) = 0.0002485 - 0.00007914 = 0.00016936
+0.00003957   K*S chi_c1        SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
+0.00003957   K*L chi_c1        SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
+0.00016936   chi_c1  K0  pi0   PHSP;
+
 0.00032    chi_c1  K0  pi-  pi+    PHSP;
 0.0002     chi_c1  K0  pi0  pi0    PHSP;
 0.00035    chi_c1  K+  pi-  pi0    PHSP;
@@ -1599,8 +1629,6 @@ Decay B0
 0.000170000 K0      D0      anti-D0 pi0                     PHSP;
 0.000620000 psi(2S) K0                                      PHSP;
 0.000140000 chi_c0  K0                                      PHSP;
-0.000390000 chi_c1  K0                                      PHSP;
-0.000158000 chi_c1  K-      pi+                             PHSP;
 0.000004700 K0 rho0                                         PHSP;
 0.000011000 eta     K_0*0                                   PHSP;
 0.000009600 eta     K_2*0                                   PHSP;
@@ -2656,16 +2684,44 @@ Decay anti-B0
 0.0001     chi_c0  anti-K0   pi0  pi0     PHSP;
 0.0001     chi_c0  K-  pi+  pi0           PHSP;
 
+# anti-B0 -> chi_c1 X
+
+# anti-B0 -> chi_c1 anti-K0 (PDG 2019 data)
 0.000196500 chi_c1 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #CPV included, Oberhof 09/11/2017
 0.000196500 chi_c1 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #CPV included, Oberhof 09/11/2017
 
-#0.000222000 chi_c1  anti-K*0  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
-0.000040 K*S chi_c1            SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
-0.000040 K*L chi_c1            SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
-0.000159 chi_c1 anti-K*0T      SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #CPV included, Oberhof 09/11/2017
+# anti-B0 -> chi_c1 pi+ K- (PDG 2019 data)
+#
+# Branching fraction: 0.000497
+#
+# Using branching fractions:
+# Br(B0 -> chi_c1 K*(892)0) = 0.000238
+# Br(K*(892)0 -> (K pi)0) = 0.99754
+#
+# Partial branching fractions:
+# 1) Br(B0 -> chi_c1 K*(892)0) * Br(K*(892)0 -> K+ pi-)) =
+#    0.000238 * 0.99754 * (2/3) = 0.00015828
+# 2) Br(B0 -> chi_c1 K+ pi-) = 0.000497 - 0.00015828 = 0.00033872
+0.00015828   chi_c1  anti-K*0T  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #CPV included, Oberhof 09/11/2017
+0.00033872   chi_c1  K-  pi+    PHSP;
 
-0.000497   chi_c1  K-  pi+               PHSP;
-0.0002     chi_c1  anti-K0   pi0         PHSP;
+# anti-B0 -> chi_c1 pi0 K0 (PDG 2019 data)
+#
+# Branching fraction (estimated from B0 -> chi_c1 pi- K+ asuming decay via
+# K* resonances): 4.97e-4 / 2 = 0.0002485
+#
+# Using branching fractions:
+# Br(B0 -> chi_c1 K*(892)0) = 0.000238
+# Br(K*(892)0 -> (K pi)0) = 0.99754
+#
+# Partial branching fractions:
+# 1) Br(B0 -> chi_c1 K*(892)0) * Br(K*(892)0 -> K0 pi0) =
+#    0.000238 * 0.99754 * (1/3) = 0.00007914
+# 2) Br(B0 -> chi_c1 K0 pi0) = 0.0002485 - 0.00007914 = 0.00016936
+0.00003957   K*S chi_c1             SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
+0.00003957   K*L chi_c1             SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
+0.00016936   chi_c1  anti-K0  pi0   PHSP;
+
 0.00032    chi_c1  anti-K0   pi+  pi-    PHSP;
 0.0002     chi_c1  anti-K0   pi0  pi0    PHSP;
 0.00035    chi_c1  K-  pi+  pi0          PHSP;
@@ -2920,8 +2976,6 @@ Decay anti-B0
 0.000170000 anti-K0 anti-D0 D0      pi0                     PHSP;
 0.000620000 psi(2S) anti-K0                                 PHSP;
 0.000140000 chi_c0  anti-K0                                 PHSP;
-0.000390000 chi_c1  anti-K0                                 PHSP;
-0.000158000 chi_c1  K+      pi-                             PHSP;
 0.000004700 anti-K0 rho0                                    PHSP;
 0.000011000 eta     anti-K_0*0                              PHSP;
 0.000009600 eta     anti-K_2*0                              PHSP;
@@ -3772,10 +3826,40 @@ Decay B+
 0.0001   chi_c0  K+  pi0  pi0           PHSP;
 0.0001   chi_c0  K0  pi+  pi0           PHSP;
 
-0.000497 chi_c1  K+                     SVS; #[Reconstructed PDG2018]
+# B+ -> chi_c1 X
+
+# B+ -> chi_c1 K+ (PDG 2019 data)
+0.000484 chi_c1  K+                     SVS; #[PDG2019]
+
+# B+ -> chi_c1 K0 pi+ (PDG 2019 data)
+#
+# Branching fraction: 0.00058
+#
+# Using branching fractions:
+# Br(B+ -> chi_c1 K*(892)+) = 0.0003
+# Br(K*(892)+ -> (K pi)+) = 0.99901
+#
+# Partial branching fractions:
+# 1) Br(B+ -> chi_c1 K*(892)0) * Br(K*(892)0 -> K0 pi+) =
+#    0.0003 * 0.99901 * (2/3) = 0.0001998
+# 2) Br(B+ -> chi_c1 K0 pi+) = 0.00058 - 0.0001998 = 0.0003802
 0.000300 chi_c1  K*+                    SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
-0.00058  chi_c1  K0   pi+               PHSP;
-0.000329 chi_c1  K+   pi0               PHSP;
+0.0003802 chi_c1  K0   pi+              PHSP;
+
+# B+ -> chi_c1 K+ pi0 (PDG 2019 data)
+#
+# Branching fraction: 0.000329
+#
+# Using branching fractions:
+# Br(B+ -> chi_c1 K*(892)+) = 0.0003
+# Br(K*(892)+ -> (K pi)+) = 0.99901
+#
+# Partial branching fractions:
+# 1) Br(B+ -> chi_c1 K*(892)0) * Br(K*(892)0 -> K+ pi0) =
+#    0.0003 * 0.99901 * (1/3) = 0.0000999
+# 2) Br(B+ -> chi_c1 K+ pi0) = 0.000329 - 0.0000999 = 0.0002291
+0.0002291 chi_c1  K+   pi0              PHSP;
+
 0.000374 chi_c1  K+   pi+  pi-          PHSP;
 0.0002   chi_c1  K+  pi0  pi0           PHSP;
 0.0002   chi_c1  K0  pi+  pi0           PHSP;
@@ -4809,10 +4893,40 @@ Decay B-
 0.0001   chi_c0  K-  pi0  pi0               PHSP;
 0.0001   chi_c0  anti-K0   pi-  pi0         PHSP;
 
-0.000497 chi_c1  K-                         SVS; #[Reconstructed PDG2018]
+# B- -> chi_c1 X
+
+# B- -> chi_c1 K- (PDG 2019 data)
+0.000484 chi_c1  K-                         SVS; #[PDG2019]
+
+# B- -> chi_c1 anti-K0 pi- (PDG 2019 data)
+#
+# Branching fraction: 0.00058
+#
+# Using branching fractions:
+# Br(B+ -> chi_c1 K*(892)+) = 0.0003
+# Br(K*(892)+ -> (K pi)+) = 0.99901
+#
+# Partial branching fractions:
+# 1) Br(B+ -> chi_c1 K*(892)0) * Br(K*(892)0 -> K0 pi+) =
+#    0.0003 * 0.99901 * (2/3) = 0.0001998
+# 2) Br(B+ -> chi_c1 K0 pi+) = 0.00058 - 0.0001998 = 0.0003802
 0.000300 chi_c1  K*-                        SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #[Reconstructed PDG2011]
-0.00058  chi_c1  anti-K0   pi-              PHSP;
-0.000329 chi_c1  K-  pi0                    PHSP;
+0.0003802 chi_c1  anti-K0   pi-             PHSP;
+
+# B- -> chi_c1 K- pi0 (PDG 2019 data)
+#
+# Branching fraction: 0.000329
+#
+# Using branching fractions:
+# Br(B+ -> chi_c1 K*(892)+) = 0.0003
+# Br(K*(892)+ -> (K pi)+) = 0.99901
+#
+# Partial branching fractions:
+# 1) Br(B+ -> chi_c1 K*(892)0) * Br(K*(892)0 -> K+ pi0) =
+#    0.0003 * 0.99901 * (1/3) = 0.0000999
+# 2) Br(B+ -> chi_c1 K+ pi0) = 0.000329 - 0.0000999 = 0.0002291
+0.0002291 chi_c1  K-   pi0                  PHSP;
+
 0.000374 chi_c1  K-  pi+  pi-               PHSP;
 0.0002   chi_c1  K-  pi0  pi0               PHSP;
 0.0002   chi_c1  anti-K0   pi-  pi0         PHSP;
@@ -5062,28 +5176,27 @@ Enddecay
 ##########          B*+ B*-,  B*0 anti-B*0,  B_s*0 anti-B_s*0           ##########
 ##########                                                              ##########
 ##################################################################################
+
+# B*+
 Decay B*+
 1.0000    B+  gamma             VSP_PWAVE;
 Enddecay
-Decay B*-
-1.0000    B-  gamma             VSP_PWAVE;
-Enddecay
+
+CDecay B*-
+
+# B*0
 Decay B*0
 1.0000    B0  gamma             VSP_PWAVE;
 Enddecay
-Decay anti-B*0
-1.0000    anti-B0 gamma         VSP_PWAVE;
-Enddecay
+
+CDecay anti-B*0
+
+# B_s*0
 Decay B_s*0
 1.0000    B_s0  gamma           VSP_PWAVE;
 Enddecay
-Decay anti-B_s*0
-1.0000    anti-B_s0 gamma       VSP_PWAVE;
-Enddecay
 
-
-
-
+CDecay anti-B_s*0
 
 
 
@@ -6015,6 +6128,8 @@ Enddecay
 #
 # Updated to PDG 2011
 #
+
+# tau-
 Decay tau-
 0.154002925 e-      anti-nu_e nu_tau                        TAULNUNU;
 0.170000000 mu-     anti-nu_mu nu_tau                       TAULNUNU;
@@ -6091,35 +6206,31 @@ CDecay tau+
 #
 #   Updated PDG 2011
 #
+
+# D*+
 Decay D*+
 0.6770    D0  pi+                        VSS;
 0.3070    D+  pi0                        VSS;
 0.0160    D+  gamma                      VSP_PWAVE;
 Enddecay
-Decay D*-
-0.6770    anti-D0 pi-                    VSS;
-0.3070    D-  pi0                        VSS;
-0.0160    D-  gamma                      VSP_PWAVE;
-Enddecay
 
+CDecay D*-
+
+# D*0
 Decay D*0
 0.6190    D0      pi0                    VSS;
 0.3810    D0      gamma                  VSP_PWAVE;
 Enddecay
-Decay anti-D*0
-0.6190    anti-D0  pi0                   VSS;
-0.3810    anti-D0  gamma                 VSP_PWAVE;
-Enddecay
 
+CDecay anti-D*0
+
+# D_s*+
 Decay D_s*+
 0.9420    D_s+    gamma                  VSP_PWAVE;
 0.0580    D_s+    pi0                    VSS;
 Enddecay
-Decay D_s*-
-0.9420    D_s-    gamma                  VSP_PWAVE;
-0.0580    D_s-    pi0                    VSS;
-Enddecay
 
+CDecay D_s*-
 
 
 
@@ -7401,24 +7512,22 @@ Enddecay
 ##########                D_0*+ D_0*-,  D_0*0 anti-D_0*0                ##########
 ##########                                                              ##########
 ##################################################################################
+
+# D_0*(2300)+
 Decay D_0*+
 0.3333   D+  pi0                         PHSP;
 0.6667   D0  pi+                         PHSP;
 Enddecay
-Decay D_0*-
-0.3333   D-  pi0                         PHSP;
-0.6667   anti-D0 pi-                     PHSP;
-Enddecay
 
+CDecay D_0*-
+
+# D_0*(2300)0
 Decay D_0*0
 0.3333   D0  pi0                         PHSP;
 0.6667   D+  pi-                         PHSP;
 Enddecay
-Decay anti-D_0*0
-0.3333   anti-D0 pi0                     PHSP;
-0.6667   D-  pi+                         PHSP;
-Enddecay
 
+CDecay anti-D_0*0
 
 
 
@@ -7437,6 +7546,7 @@ SetLineshapePW D_10 D*+ pi- 2
 SetLineshapePW anti-D_10 anti-D*0 pi0 2
 SetLineshapePW anti-D_10 D*- pi+ 2
 
+# D_1(2420)+
 # Updated on March 2018 with the measured D_1->Dpi+pi- modes from  PHYSICAL REVIEW D 84, 092001 (2011).
 # The modes with neutral pions are inferred from assuming isospin invariance. The latter may strongly
 # vary if intermediate resonances are present, which is unknown up to now.
@@ -7447,14 +7557,10 @@ Decay D_1+
 0.1145    D+ pi0 pi0                     PHSP;
 0.1145    D0 pi+ pi0                     PHSP;
 Enddecay
-Decay D_1-
-0.1997    D*- pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.3994    anti-D*0 pi-                   VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.1719    D- pi+ pi-                     PHSP;
-0.1145    D- pi0 pi0                     PHSP;
-0.1145    anti-D0 pi- pi0                PHSP;
-Enddecay
 
+CDecay D_1-
+
+# D_1(2420)0
 Decay D_10
 0.1997    D*0 pi0                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
 0.3994    D*+ pi-                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
@@ -7462,32 +7568,24 @@ Decay D_10
 0.1145    D0 pi0 pi0                     PHSP;
 0.1145    D+ pi- pi0                     PHSP;
 Enddecay
-Decay anti-D_10
-0.1997    anti-D*0 pi0                   VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.3994    D*- pi+                        VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.1719    anti-D0 pi+ pi-                PHSP;
-0.1145    anti-D0 pi0 pi0                PHSP;
-0.1145    D- pi+ pi0                     PHSP;
-Enddecay
 
+CDecay anti-D_10
+
+# D_1(2430)+
 Decay D'_1+
 0.3333    D*+ pi0                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 0.6667    D*0 pi+                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
-Decay D'_1-
-0.3333    D*- pi0                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
-0.6667    anti-D*0 pi-                   VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
 
+CDecay D'_1-
+
+# D_1(2430)0
 Decay D'_10
 0.6667    D*+ pi-                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 0.3333    D*0 pi0                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
-Decay anti-D'_10
-0.3333    anti-D*0 pi0                   VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
-0.6667    D*- pi+                        VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
 
+CDecay anti-D'_10
 
 
 
@@ -7506,6 +7604,7 @@ SetLineshapePW D_2*0 D*+ pi- 2
 SetLineshapePW anti-D_2*0 anti-D*0 pi0 2
 SetLineshapePW anti-D_2*0 D*- pi+ 2
 
+# D_2*(2460)+
 # March 2018: Updated the ratio of DPi/D*Pi decays to PDG 2017, it is now 1.498
 Decay D_2*+
 0.1334     D*+ pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
@@ -7513,26 +7612,18 @@ Decay D_2*+
 0.1999     D+  pi0                        TSS;
 0.3998     D0  pi+                        TSS;
 Enddecay
-Decay D_2*-
-0.1334     D*- pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2669     anti-D*0 pi-                   TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.1999     D-  pi0                        TSS;
-0.3998     anti-D0 pi-                    TSS;
-Enddecay
 
+CDecay D_2*-
+
+# D_2*(2460)0
 Decay D_2*0
 0.1334     D*0 pi0                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
 0.2669     D*+ pi-                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
 0.1999     D0  pi0                        TSS;
 0.3998     D+  pi-                        TSS;
 Enddecay
-Decay anti-D_2*0
-0.1334     anti-D*0 pi0                   TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.2669     D*- pi+                        TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.1999     anti-D0 pi0                    TSS;
-0.3998     D-  pi+                        TSS;
-Enddecay
 
+CDecay anti-D_2*0
 
 
 
@@ -7541,52 +7632,43 @@ Enddecay
 ##########  D_s0*+ D_s0*-,  D'_s1+ D'_s1-,  D_s1+ D_s1-,  D_s2*+ D_s2*- ##########
 ##########                                                              ##########
 ##################################################################################
+
+# D_s0*(2317)
 Decay D_s0*+
 # 0.5000   D+ K0                           PHSP;
 # 0.5000   D0 K+                           PHSP;
 1.000      D_s+ pi0                        PHSP;
 Enddecay
-Decay D_s0*-
-# 0.5000   D- anti-K0                      PHSP;
-# 0.5000   anti-D0 K-                      PHSP;
-1.000      D_s- pi0                        PHSP;
-Enddecay
 
+CDecay D_s0*-
+
+# D_s1(2536)
 Decay D'_s1+
 0.5000   D*+ K0                            VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
 0.5000   D*0 K+                            VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
 0.0000   gamma D_s*+                       PHSP;
 0.0000   gamma D_s+                        PHSP;
 Enddecay
-Decay D'_s1-
-0.5000   D*- anti-K0                       VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.5000   anti-D*0 K-                       VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
-0.0000   gamma D_s*-                       PHSP;
-0.0000   gamma D_s-                        PHSP;
-Enddecay
 
+CDecay D'_s1-
+
+# D_s1(2460)
 Decay D_s1+
 0.80000  D_s*+ pi0                         PARTWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.20000  D_s+ gamma                        VSP_PWAVE;
 Enddecay
-Decay D_s1-
-0.80000  D_s*- pi0                         PARTWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.20000  D_s- gamma                        VSP_PWAVE;
-Enddecay
 
+CDecay D_s1-
+
+# D_s2*(2573)
 Decay D_s2*+
 0.0500    D*+ K0                           TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
 0.0500    D*0 K+                           TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
 0.4300    D+  K0                           TSS;
 0.4700    D0  K+                           TSS;
 Enddecay
-Decay D_s2*-
-0.0500    D*- anti-K0                      TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.0500    anti-D*0 K-                      TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
-0.4300    D-  anti-K0                      TSS;
-0.4700    anti-D0 K-                       TSS;
-Enddecay
 
+CDecay D_s2*-
 
 
 
@@ -7595,50 +7677,42 @@ Enddecay
 ##########           Charm Mesons: Radially Excited States              ##########
 ##########                                                              ##########
 ##################################################################################
+
+# D(2550)0
 Decay D(2S)0
 0.6667    D*+ pi-                        SVS;
 0.3333    D*0 pi0                        SVS;
 Enddecay
-Decay anti-D(2S)0
-0.3333    anti-D*0 pi0                   SVS;
-0.6667    D*- pi+                        SVS;
-Enddecay
 
+CDecay anti-D(2S)0
+
+# D(2550)+
 Decay D(2S)+
 0.3333    D*+ pi0                        SVS;
 0.6667    D*0 pi+                        SVS;
 Enddecay
-Decay D(2S)-
-0.3333    D*- pi0                        SVS;
-0.6667    anti-D*0 pi-                   SVS;
-Enddecay
 
+CDecay D(2S)-
+
+# D_J*(2600)0
 Decay D*(2S)0
 0.3333    D*+ pi-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.1667    D*0 pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.1667    D0  pi0                        VSS;
 0.3333    D+  pi-                        VSS;
 Enddecay
-Decay anti-D*(2S)0
-0.1667    anti-D*0 pi0                   VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.3333    D*- pi+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1667    anti-D0  pi0                   VSS;
-0.3333    D-  pi+                        VSS;
-Enddecay
 
+CDecay anti-D*(2S)0
+
+# D_J*(2600)+
 Decay D*(2S)+
 0.1667    D*+ pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.3333    D*0 pi+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.1667    D+  pi0                        VSS;
 0.3333    D0  pi+                        VSS;
 Enddecay
-Decay D*(2S)-
-0.1667    D*- pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.3333    anti-D*0 pi-                   VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1667    D-  pi0                        VSS;
-0.3333    anti-D0  pi-                   VSS;
-Enddecay
 
+CDecay D*(2S)-
 
 
 
@@ -7664,36 +7738,32 @@ Enddecay
 
 # K_L0 is decayed in GEANT
 
+# K0
 Decay K0
 0.500     K_L0                             PHSP;
 0.500     K_S0                             PHSP;
 Enddecay
-Decay anti-K0
-0.500     K_L0                             PHSP;
-0.500     K_S0                             PHSP;
-Enddecay
 
+CDecay anti-K0
+
+# K*(892)0
 Decay K*0
 0.6657      K+  pi-                        VSS;
 0.3323      K0  pi0                        VSS;
 0.0020      K0  gamma                      VSP_PWAVE;
 Enddecay
-Decay anti-K*0
-0.6657      K-  pi+                        VSS;
-0.3323      anti-K0   pi0                  VSS;
-0.0020      anti-K0   gamma                VSP_PWAVE;
+
+CDecay anti-K*0
+
+# K*(892)+
+# PDG 2020 data.
+Decay K*+
+0.66600667  K0  pi+                        VSS;
+0.33300333  K+  pi0                        VSS;
+0.00099     K+  gamma                      VSP_PWAVE;
 Enddecay
 
-Decay K*+
-0.6657      K0  pi+                        VSS;
-0.3323      K+  pi0                        VSS;
-0.0020      K+  gamma                      VSP_PWAVE;
-Enddecay
-Decay K*-
-0.6657      anti-K0   pi-                  VSS;
-0.3323      K-  pi0                        VSS;
-0.0020      K-  gamma                      VSP_PWAVE;
-Enddecay
+CDecay K*-
 
 
 
@@ -7718,35 +7788,32 @@ Enddecay
 Decay K*0T
 1.0000      pi- K+                        VSS;
 Enddecay
-Decay anti-K*0T
-1.0000      pi+ K-                        VSS;
-Enddecay
 
+CDecay anti-K*0T
+
+# K_0*(1430)+
 Decay K_0*+
 0.6667      K0  pi+                       PHSP;
 0.3333      K+  pi0                       PHSP;
 Enddecay
-Decay K_0*-
-0.6667      anti-K0   pi-                 PHSP;
-0.3333      K-  pi0                       PHSP;
-Enddecay
 
+CDecay K_0*-
+
+# K_0*(1430)0
 Decay K_0*0
 0.6667      K+  pi-                       PHSP;
 0.3333      K0  pi0                       PHSP;
 Enddecay
-Decay anti-K_0*0
-0.6667      K-  pi+                       PHSP;
-0.3333      anti-K0   pi0                 PHSP;
-Enddecay
+
+CDecay anti-K_0*0
 
 Decay K_0*0N
 1.0000      K0  pi0                       PHSP;
 Enddecay
-Decay anti-K_0*0N
-1.0000      anti-K0   pi0                 PHSP;
-Enddecay
 
+CDecay anti-K_0*0N
+
+# K_1(1270)0
 Decay K_10
 0.2800   rho-  K+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.1400   rho0  K0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
@@ -7759,19 +7826,9 @@ Decay K_10
 0.0412   K0    pi0 pi0                   PHSP;
 Enddecay
 
-Decay anti-K_10
-0.2800   rho+  K-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1400   rho0  anti-K0                   VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1067   K*-   pi+                       VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0533   anti-K*0   pi0                  VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-#Too large masses can cause infinite loops
-0.1100   omega  anti-K0                  VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1444   anti-K0    pi+ pi-              PHSP;
-0.1244   K-    pi+ pi0                   PHSP;
-0.0412   anti-K0    pi0 pi0              PHSP;
-Enddecay
+CDecay anti-K_10
 
-
+# K_1(1270)+
 Decay K_1+
 0.2800   rho+  K0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.1400   rho0  K+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
@@ -7784,19 +7841,9 @@ Decay K_1+
 0.0412   K+    pi0 pi0                   PHSP;
 Enddecay
 
-Decay K_1-
-0.2800   rho-  anti-K0                   VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1400   rho0  K-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1067   anti-K*0   pi-                  VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0533   K*-   pi0                       VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-#Too large masses can cause infinite loops
-0.1100   omega  K-                       VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1444   K-    pi+ pi-                   PHSP;
-0.1244   anti-K0    pi- pi0              PHSP;
-0.0412   K-    pi0 pi0                   PHSP;
-Enddecay
+CDecay K_1-
 
-
+# K_1(1400)+
 Decay K'_1+
 0.6300   K*0  pi+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.3100   K*+  pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
@@ -7807,17 +7854,9 @@ Decay K'_1+
 0.0067   K+  pi0  pi0                    PHSP;
 Enddecay
 
-Decay K'_1-
-0.6300   anti-K*0  pi-                   VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.3100   K*-  pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0200   rho- anti-K0                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0100   rho0 K-                         VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0100   omega K-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0133   K-  pi+  pi-                    PHSP;
-0.0067   K-  pi0  pi0                    PHSP;
-Enddecay
+CDecay K'_1-
 
-
+# K_1(1400)0
 Decay K'_10
 0.6300   K*+  pi-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.3100   K*0  pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
@@ -7828,17 +7867,9 @@ Decay K'_10
 0.0067   K0  pi0  pi0                    PHSP;
 Enddecay
 
-Decay anti-K'_10
-0.6300   K*- pi+                         VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.3100   anti-K*0 pi0                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0200   rho+ K-                         VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0100   rho0 anti-K0                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0100   omega anti-K0                   VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0133   anti-K0   pi+  pi-              PHSP;
-0.0067   anti-K0   pi0  pi0              PHSP;
-Enddecay
+CDecay anti-K'_10
 
-
+# K_2*(1430)+
 Decay K_2*+
 0.3340   K0  pi+                         TSS;
 0.1670   K+  pi0                         TSS;
@@ -7852,20 +7883,9 @@ Decay K_2*+
 0.0290   omega K+                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 Enddecay
 
-Decay K_2*-
-0.3340   anti-K0   pi-                   TSS;
-0.1670   K-  pi0                         TSS;
-0.1645   anti-K*0 pi-                    TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0835   K*- pi0                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0450   anti-K*0 pi- pi0                PHSP;
-0.0450   K*- pi+ pi-                     PHSP;
-0.0450   K*- pi0 pi0                     PHSP;
-0.0580   rho- K0                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0290   rho0 K-                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0290   omega K-                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-Enddecay
+CDecay K_2*-
 
-
+# K_2*(1430)0
 Decay K_2*0
 0.3340   K+  pi-                         TSS;
 0.1670   K0  pi0                         TSS;
@@ -7879,40 +7899,9 @@ Decay K_2*0
 0.0290   omega K0                        TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 Enddecay
 
-Decay anti-K_2*0
-0.3340   K-  pi+                         TSS;
-0.1670   anti-K0   pi0                   TSS;
-0.1645   K*- pi+                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0835   anti-K*0 pi0                    TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0450   anti-K*0 pi+ pi-                PHSP;
-0.0450   anti-K*0 pi0 pi0                PHSP;
-0.0450   K*- pi+ pi0                     PHSP;
-0.0580   rho+ K-                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0290   rho0 anti-K0                    TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.0290   omega anti-K0                   TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-Enddecay
+CDecay anti-K_2*0
 
-
-# Decay K*(1410)
-Decay K'*0
-0.0467   K+  pi-                     VSS;
-0.0233   K0  pi0                     VSS;
-0.5760   K*+ pi-                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.2880   K*0 pi0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0440   rho- K+                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0220   rho0 K0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
-
-Decay anti-K'*0
-0.0467   K-  pi+                     VSS;
-0.0233   anti-K0   pi0               VSS;
-0.5760   K*- pi+                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.2880   anti-K*0 pi0                VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0440   rho+ K-                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0220   rho0 anti-K0                VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
-
-
+# K*(1410)+
 Decay K'*+
 0.0467   K0  pi+                     VSS;
 0.0233  K+  pi0                      VSS;
@@ -7922,36 +7911,21 @@ Decay K'*+
 0.0220   rho0 K+                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
-Decay K'*-
-0.0467   anti-K0   pi-               VSS;
-0.0233   K-  pi0                     VSS;
-0.5760   anti-K*0 pi-                VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.2880   K*- pi0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0440   rho- K0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0220  rho0 K-                      VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+CDecay K'*-
+
+# K*(1410)0
+Decay K'*0
+0.0467   K+  pi-                     VSS;
+0.0233   K0  pi0                     VSS;
+0.5760   K*+ pi-                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.2880   K*0 pi0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.0440   rho- K+                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.0220   rho0 K0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
+CDecay anti-K'*0
 
-# Decay K*(1680)
-Decay K''*0
-0.2580   K+  pi-                     VSS;
-0.1290   K0  pi0                     VSS;
-0.2093   K*+ pi-                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1047   K*0 pi0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1993   rho- K+                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0997   rho0 K0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
-
-Decay anti-K''*0
-0.2580   K-  pi+                     VSS;
-0.1290   anti-K0   pi0               VSS;
-0.2093   K*- pi+                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1047   anti-K*0 pi0                VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1993   rho+ K-                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0997   rho0 anti-K0                VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
-
-
+# K*(1680)+
 Decay K''*+
 0.2580   K0  pi+                     VSS;
 0.1290   K+  pi0                     VSS;
@@ -7961,38 +7935,37 @@ Decay K''*+
 0.0997   rho0 K+                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
-Decay K''*-
-0.2580   anti-K0   pi-               VSS;
-0.1290   K-  pi0                     VSS;
-0.2093   anti-K*0 pi-                VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1047   K*- pi0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.1993   rho- K0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0997   rho0 K-                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+CDecay K''*-
+
+# K*(1680)0
+Decay K''*0
+0.2580   K+  pi-                     VSS;
+0.1290   K0  pi0                     VSS;
+0.2093   K*+ pi-                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.1047   K*0 pi0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.1993   rho- K+                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.0997   rho0 K0                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
+CDecay anti-K''*0
 
 Decay Xsd
 1.00000     d anti-s  PYTHIA 11;
 Enddecay
-Decay anti-Xsd
-1.00000     anti-d s  PYTHIA 11;
-Enddecay
+
+CDecay anti-Xsd
 
 Decay Xsu
 1.00000     u anti-s  PYTHIA 11;
 Enddecay
-Decay anti-Xsu
-1.00000     anti-u s  PYTHIA 11;
-Enddecay
+
+CDecay anti-Xsu
 
 Decay Xss
 1.00000     s anti-s  PYTHIA 11;
 Enddecay
-Decay anti-Xss
-1.00000     anti-s s  PYTHIA 11;
-Enddecay
 
-
+CDecay anti-Xss
 
 
 
@@ -8032,14 +8005,13 @@ Decay rho0 #  Edited by U. Tamponi, March 2016
 0.000047000 e+      e-                           VLL;
 Enddecay
 
+# rho(770)+
 Decay rho+ # Edited by U. Tamponi, March 2016
 0.999550000 pi+     pi0                          VSS;
 0.000450000 pi+     gamma                        VSP_PWAVE;
 Enddecay
-Decay rho- # Edited by U. Tamponi, March 2016
-0.999550000 pi-     pi0                          VSS;
-0.000450000 pi-     gamma                        VSP_PWAVE;
-Enddecay
+
+CDecay rho-
 
 Decay omega # Edited by U. Tamponi, October 2016
 0.903000000 pi-     pi+    pi0                   OMEGA_DALITZ;  # 1-Sum(other modes). PDG reports 0.892 \pm 0.07
@@ -8108,15 +8080,13 @@ Decay a_00 #  Edited by U. Tamponi, March 2016
 0.0003      gamma   gamma                        PHSP;
 Enddecay
 
+# a_0(980)+
 Decay a_0+ #  Edited by U. Tamponi, March 2016
 0.8453      eta     pi+                          PHSP;
 0.1547      anti-K0 K+                           PHSP;
 Enddecay
 
-Decay a_0- #  Edited by U. Tamponi, March 2016
-0.8453      eta      pi-                         PHSP;
-0.1547      K0  K-                               PHSP;
-Enddecay
+CDecay a_0-
 
 # a_1's
 #
@@ -8135,6 +8105,7 @@ Decay a_10 #  Edited by U. Tamponi, March 2016
 0.0250   K+ K- pi0                        PHSP; #placeholder for K* K final states, which are off-shell
 Enddecay
 
+# a_1(1260)+
 Decay a_1+ #  Edited by U. Tamponi, March 2016
 0.30875   rho0 pi+                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
 0.30875   rho+ pi0                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
@@ -8146,19 +8117,9 @@ Decay a_1+ #  Edited by U. Tamponi, March 2016
 0.1473    pi+ pi+ pi-                     PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
 Enddecay
 
-Decay a_1- #  Edited by U. Tamponi, March 2016
-0.30875   rho0 pi-                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
-0.30875   rho- pi0                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
-#0.01300   rho(2S)0 pi-                   VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave  # off mass shell, removed to speed up simulation
-#0.01300   rho(2S)- pi0                   VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave  # off mass shell, removed to speed up simulation
-0.1618    sigma_0 pi-                     PHSP;
-0.0250    K- anti-K0 pi0     	          PHSP; #placeholder for K* K final states, which are off-shell
-0.0250    anti-K0 K0 pi-                  PHSP; #placeholder for K* K final states, which are off-shell
-0.1473    pi+ pi- pi-                     PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
-Enddecay
+CDecay a_1-
 
-# a_2's
-#
+# a_2(1320)+
 Decay a_2+ #  Checked by U. Tamponi, October 2016
 0.3500   rho0 pi+                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 0.3500   rho+ pi0                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
@@ -8169,15 +8130,7 @@ Decay a_2+ #  Checked by U. Tamponi, October 2016
 0.0053   eta' pi+                         TSS;
 Enddecay
 
-Decay a_2- #  Checked by U. Tamponi, October 2016
-0.3500   rho0 pi-                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.3500   rho- pi0                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
-0.1430   eta  pi-                         TSS;
-0.1000   omega pi- pi0                    PHSP;
-0.0490   anti-K0   K-                     TSS;
-0.0027   pi-  gamma                       PHSP;
-0.0053   eta' pi-                         TSS;
-Enddecay
+CDecay a_2-
 
 Decay a_20 #  Checked by U. Tamponi, October 2016
 0.3500   rho+ pi-                         TVS_PWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
@@ -8191,15 +8144,13 @@ Decay a_20 #  Checked by U. Tamponi, October 2016
 0.0053   eta' pi0                         TSS;
 Enddecay
 
+# b_1(1235)+
 Decay b_1+ #  Checked by U. Tamponi, October 2016
 0.9984   omega pi+                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 0.0016   pi+  gamma                       VSP_PWAVE;
 Enddecay
 
-Decay b_1- #  Checked by U. Tamponi, October 2016
-0.9984   omega pi-                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
-0.0016   pi-  gamma                       VSP_PWAVE;
-Enddecay
+CDecay b_1-
 
 Decay b_10 #  Checked by U. Tamponi, October 2016
 0.9984   omega pi0                        VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
@@ -8332,6 +8283,7 @@ Enddecay
 # rho(2S) are  PHSP. Substructure are present but not understood enough
 # to be included in the simulation
 
+# rho(1450)+
 # Checked by U. Tamponi, october 2016. No changes are needed
 Decay rho(2S)+
 0.4000   pi+ pi0                         PHSP;
@@ -8339,12 +8291,7 @@ Decay rho(2S)+
 0.2000   pi+ pi0 pi0 pi0                 PHSP;
 Enddecay
 
-# Checked by U. Tamponi, october 2016. No changes are needed
-Decay rho(2S)-
-0.4000   pi- pi0                         PHSP;
-0.4000   pi- pi+ pi- pi0                 PHSP;
-0.2000   pi- pi0 pi0 pi0                 PHSP;
-Enddecay
+CDecay rho(2S)-
 
 # Checked by U. Tamponi, october 2016. No changes are needed
 Decay rho(2S)0
@@ -8358,6 +8305,7 @@ Enddecay
 # The origin of these modes is unknown (Pythia fragmentation?) and not referenced. The decay table has been
 # simplified according to the PDG report and the Belle Decay table
 
+# rho(1700)+
 Decay rho(3S)+ # Edited by U. Tamponi October 2016
 0.1700   pi+   pi0   pi0   pi0       PHSP;
 0.4340   pi+   pi+   pi-   pi0       PHSP;
@@ -8365,12 +8313,7 @@ Decay rho(3S)+ # Edited by U. Tamponi October 2016
 0.1600   omega pi+                   VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
-Decay rho(3S)- # Edited by U. Tamponi October 2016
-0.1700   pi-   pi0   pi0   pi0       PHSP;
-0.4340   pi+   pi-   pi-   pi0       PHSP;
-0.2360   pi-   pi0                   VSS;
-0.1600   omega pi-                   VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
-Enddecay
+CDecay rho(3S)-
 
 Decay rho(3S)0 # Edited by U. Tamponi October 2016
 0.3020   pi+   pi-   pi+   pi-       PHSP;
@@ -8415,7 +8358,6 @@ Decay omega(2S) # Edited by U. Tamponi October 2016
 0.100   b_1-  pi+                   HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
 0.100   b_10  pi0                   HELAMP 1.0 0.0  0.0 0.0  -1.0 0.0;
 Enddecay
-
 
 
 
@@ -9454,6 +9396,7 @@ Enddecay
 ####################        Charm Baryons        ####################
 ####################                             ####################
 #####################################################################
+# Lambda_c+
 Decay Lambda_c+
 0.021000 e+      nu_e    Lambda0                         PYTHIA         42; #[Reconstructed PDG2011]
 0.005000 e+      nu_e    Sigma0                          PYTHIA         42;
@@ -9567,38 +9510,38 @@ Decay c-hadron
 0.76000         u       anti-d     s     specflav   PYTHIA 11;
 0.08000         u       anti-s     s     specflav   PYTHIA 11;
 Enddecay
+
 CDecay anti-c-hadron
 
-
+# Sigma_c(2455)0
 Decay Sigma_c0
 1.0000    Lambda_c+  pi-                     PHSP;
 Enddecay
-Decay anti-Sigma_c0
-1.0000    anti-Lambda_c- pi+                     PHSP;
-Enddecay
 
+CDecay anti-Sigma_c0
+
+# Sigma_c(2455)+
 Decay Sigma_c+
 1.0000    Lambda_c+  pi0                     PHSP;
 Enddecay
-Decay anti-Sigma_c-
-1.0000    anti-Lambda_c- pi0                     PHSP;
-Enddecay
 
+CDecay anti-Sigma_c-
+
+# Sigma_c(2455)++
 Decay Sigma_c++
 1.0000    Lambda_c+  pi+                     PHSP;
 Enddecay
-Decay anti-Sigma_c--
-1.0000    anti-Lambda_c- pi-                     PHSP;
-Enddecay
 
+CDecay anti-Sigma_c--
 
+# Xi_c0
 Decay Xi_c0
 1.000        PYTHIA         84;
 Enddecay
-Decay anti-Xi_c0
-1.000          PYTHIA       84;
-Enddecay
 
+CDecay anti-Xi_c0
+
+# Xi_c+
 Decay Xi_c+
 0.079535513                                                 PYTHIA         84; #[Reconstructed PDG2011]
 0.079535513 Sigma*+ anti-K0                                 PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -9638,22 +9581,23 @@ Decay anti-Xi_c-
 0.011930327 anti-Sigma- K-      K+                          PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
 
-
+# Xi'_c+
 Decay Xi'_c+
 1.0000   Xi_c+           gamma                           PHSP; # [PDG2019]
 Enddecay
-Decay anti-Xi'_c-
-1.0000   anti-Xi_c-      gamma                           PHSP; # [PDG2019]
-Enddecay
 
+CDecay anti-Xi'_c-
+
+# Xi'_c0
 Decay Xi'_c0
 1.0000   Xi_c0           gamma                           PHSP; # [PDG2019]
 Enddecay
-Decay anti-Xi'_c0
-1.0000   anti-Xi_c0      gamma                           PHSP; # [PDG2019]
-Enddecay
+
+CDecay anti-Xi'_c0
 
 
+
+# Lambda_c(2595)+
 #  Add excited Lambda_c decays (R.J. Tesarek  12/9/03)
 Decay Lambda_c(2593)+
 0.2400   Sigma_c++       pi-                             PHSP; # [PDG2019]
@@ -9663,29 +9607,25 @@ Decay Lambda_c(2593)+
 0.0900   Lambda_c+       pi0       pi0                   PHSP; # [PDG2019]
 0.0100   Lambda_c+       gamma                           PHSP; # [PDG2019]
 Enddecay
-Decay anti-Lambda_c(2593)-
-0.2400   anti-Sigma_c--  pi+                             PHSP; # [PDG2019]
-0.2400   anti-Sigma_c0   pi-                             PHSP; # [PDG2019]
-0.2400   anti-Sigma_c-   pi0                             PHSP; # [PDG2019]
-0.1800   anti-Lambda_c-  pi+       pi-                   PHSP; # [PDG2019]
-0.0900   anti-Lambda_c-  pi0       pi0                   PHSP; # [PDG2019]
-0.0100   anti-Lambda_c-  gamma                           PHSP; # [PDG2019]
-Enddecay
+
+CDecay anti-Lambda_c(2593)-
+
+# Lambda_c(2625)+
 Decay Lambda_c(2625)+
 0.6600   Lambda_c+       pi+       pi-                   PHSP; # [PDG2019]
 0.3300   Lambda_c+       pi0       pi0                   PHSP; # [PDG2019]
 0.0100   Lambda_c+       gamma                           PHSP; # [PDG2019]
 Enddecay
-Decay anti-Lambda_c(2625)-
-0.6600   anti-Lambda_c-  pi+       pi-                   PHSP; # [PDG2019]
-0.3300   anti-Lambda_c-  pi0       pi0                   PHSP; # [PDG2019]
-0.0100   anti-Lambda_c-  gamma                           PHSP; # [PDG2019]
-Enddecay
+
+CDecay anti-Lambda_c(2625)-
 
 
 #
 #   Light Baryons
-#   Lambda0 updated Feb 2009
+#
+
+# Lambda0
+# Updated Feb 2009
 Decay Lambda0
 0.638719992 p+      pi-                                     PHSP; #[Reconstructed PDG2011]
 0.357719992 n0      pi0                                     PHSP; #[Reconstructed PDG2011]
@@ -9694,28 +9634,19 @@ Decay Lambda0
 0.000831216 p+      e-      anti-nu_e                        PHSP; #[Reconstructed PDG2011]
 0.000155040 p+      mu-     anti-nu_mu                       PHSP; #[Reconstructed PDG2011]
 Enddecay
-#
-Decay anti-Lambda0
-0.638719992 anti-p- pi+                                     PHSP; #[Reconstructed PDG2011]
-0.357719992 anti-n0 pi0                                     PHSP; #[Reconstructed PDG2011]
-0.001741600 anti-n0 gamma                                   PHSP; #[Reconstructed PDG2011]
-0.000832160 anti-p- pi+     gamma                           PHSP; #[Reconstructed PDG2011]
-0.000831216 anti-p- e+      nu_e                             PHSP; #[Reconstructed PDG2011]
-0.000155040 anti-p- mu+     nu_mu                             PHSP; #[Reconstructed PDG2011]
-Enddecay
-#
+
+CDecay anti-Lambda0
+
+# Lambda(1405)0
 Decay Lambda(1405)0
 0.3333    Sigma+   pi-    PHSP;
 0.3333    Sigma-   pi+    PHSP;
 0.3333    Sigma0   pi0    PHSP;
 Enddecay
-#
-Decay anti-Lambda(1405)0
-0.3333    anti-Sigma+   pi-   PHSP;
-0.3333    anti-Sigma-   pi+   PHSP;
-0.3333    anti-Sigma0   pi0   PHSP;
-Enddecay
-#
+
+CDecay anti-Lambda(1405)0
+
+# Lambda(1520)0
 Decay Lambda(1520)0
 0.23   p+     K-    PHSP;
 0.23   n0   anti-K0    PHSP;
@@ -9730,22 +9661,10 @@ Decay Lambda(1520)0
 0.002   Sigma0   pi+  pi-   PHSP;
 0.011   Lambda0  gamma    PHSP;
 Enddecay
-#
-Decay anti-Lambda(1520)0
-0.23 anti-p-     K+    PHSP;
-0.23 anti-n0     K0    PHSP;
-0.14    anti-Sigma-   pi+   PHSP;
-0.14    anti-Sigma+   pi-   PHSP;
-0.14    anti-Sigma0   pi0   PHSP;
-0.0333  anti-Lambda0  pi0  pi0                  PHSP;
-0.0667  anti-Lambda0  pi+  pi-                  PHSP;
-0.003   anti-Sigma+   pi-  pi0   PHSP;
-0.003   anti-Sigma-   pi+  pi0   PHSP;
-0.001   anti-Sigma0   pi0  pi0   PHSP;
-0.002   anti-Sigma0   pi+  pi-   PHSP;
-0.011   anti-Lambda0  gamma   PHSP;
-Enddecay
-#
+
+CDecay anti-Lambda(1520)0
+
+# Lambda(1600)0
 Decay Lambda(1600)0
 0.176   p+     K-    PHSP;
 0.176   n0   anti-K0    PHSP;
@@ -9753,15 +9672,10 @@ Decay Lambda(1600)0
 0.216    Sigma-   pi+    PHSP;
 0.216    Sigma0   pi0    PHSP;
 Enddecay
-#
-Decay anti-Lambda(1600)0
-0.176   anti-p-     K+   PHSP;
-0.176   anti-n0   K0    PHSP;
-0.216    anti-Sigma+   pi-   PHSP;
-0.216   anti-Sigma-   pi+   PHSP;
-0.216   anti-Sigma0   pi0   PHSP;
-Enddecay
-#
+
+CDecay anti-Lambda(1600)0
+
+# Lambda(1670)0
 Decay Lambda(1670)0
 0.10   p+     K-    PHSP;
 0.10   n0   anti-K0    PHSP;
@@ -9770,16 +9684,10 @@ Decay Lambda(1670)0
 0.16    Sigma0   pi0    PHSP;
 0.32    Lambda0  eta                            PHSP;
 Enddecay
-#
-Decay anti-Lambda(1670)0
-0.10   anti-p-     K+   PHSP;
-0.10   anti-n0   K0    PHSP;
-0.16    anti-Sigma+   pi-   PHSP;
-0.16    anti-Sigma-   pi+   PHSP;
-0.16    anti-Sigma0   pi0   PHSP;
-0.32    anti-Lambda0   eta                       PHSP;
-Enddecay
-#
+
+CDecay anti-Lambda(1670)0
+
+# Lambda(1690)0
 Decay Lambda(1690)0
 0.125   p+     K-    PHSP;
 0.125   n0   anti-K0    PHSP;
@@ -9793,21 +9701,10 @@ Decay Lambda(1690)0
 0.022   Sigma0   pi0  pi0   PHSP;
 0.044   Sigma0   pi+  pi-   PHSP;
 Enddecay
-#
-Decay anti-Lambda(1690)0
-0.125   anti-p-     K+    PHSP;
-0.125   anti-n0   K0    PHSP;
-0.10    anti-Sigma+   pi-    PHSP;
-0.10    anti-Sigma-   pi+    PHSP;
-0.10    anti-Sigma0   pi0    PHSP;
-0.0833  anti-Lambda0  pi0  pi0                       PHSP;
-0.1667  anti-Lambda0  pi+  pi-                       PHSP;
-0.067   anti-Sigma+   pi-  pi0   PHSP;
-0.067   anti-Sigma-   pi+  pi0   PHSP;
-0.022   anti-Sigma0   pi0  pi0   PHSP;
-0.044   anti-Sigma0   pi+  pi-   PHSP;
-Enddecay
-#
+
+CDecay anti-Lambda(1690)0
+
+# Lambda(1800)0
 Decay Lambda(1800)0
 0.165   p+     K-    PHSP;
 0.165   n0   anti-K0    PHSP;
@@ -9820,20 +9717,10 @@ Decay Lambda(1800)0
 0.21   p+     K*-    PHSP;
 0.21   n0   anti-K*0    PHSP;
 Enddecay
-#
-Decay anti-Lambda(1800)0
-0.165   anti-p-     K+    PHSP;
-0.165   anti-n0   K0    PHSP;
-0.08    anti-Sigma+   pi-    PHSP;
-0.08    anti-Sigma-   pi+    PHSP;
-0.08    anti-Sigma0   pi0    PHSP;
-0.003    anti-Sigma*+   pi-    PHSP;
-0.003    anti-Sigma*-   pi+    PHSP;
-0.004    anti-Sigma*0   pi0    PHSP;
-0.21   anti-p-     K*+    PHSP;
-0.21   anti-n0   K*0    PHSP;
-Enddecay
-#
+
+CDecay anti-Lambda(1800)0
+
+# Lambda(1810)0
 Decay Lambda(1810)0
 0.165   p+     K-    PHSP;
 0.165   n0   anti-K0    PHSP;
@@ -9846,20 +9733,10 @@ Decay Lambda(1810)0
 0.21   p+     K*-    PHSP;
 0.21   n0   anti-K*0    PHSP;
 Enddecay
-#
-Decay anti-Lambda(1810)0
-0.165   anti-p-     K+    PHSP;
-0.165   anti-n0   K0    PHSP;
-0.08    anti-Sigma+   pi-    PHSP;
-0.08    anti-Sigma-   pi+    PHSP;
-0.08    anti-Sigma0   pi0    PHSP;
-0.003    anti-Sigma*+   pi-    PHSP;
-0.003    anti-Sigma*-   pi+    PHSP;
-0.004    anti-Sigma*0   pi0    PHSP;
-0.21   anti-p-     K*+    PHSP;
-0.21   anti-n0   K*0    PHSP;
-Enddecay
-#
+
+CDecay anti-Lambda(1810)0
+
+# Lambda(1820)0
 Decay Lambda(1820)0
 0.34     p+     K-                             PHSP;
 0.34     n0   anti-K0                          PHSP;
@@ -9875,23 +9752,10 @@ Decay Lambda(1820)0
 0.001   Sigma0   pi0  pi0                       PHSP;
 0.002   Sigma0   pi+  pi-                       PHSP;
 Enddecay
-#
-Decay anti-Lambda(1820)0
-0.34     anti-p-     K+                             PHSP;
-0.34     anti-n0   K0                          PHSP;
-0.06    anti-Sigma+   pi-                            PHSP;
-0.06    anti-Sigma-   pi+                            PHSP;
-0.06    anti-Sigma0   pi0                            PHSP;
-0.04    anti-Sigma*+   pi-                            PHSP;
-0.04    anti-Sigma*-   pi+                            PHSP;
-0.04    anti-Sigma*0   pi0                            PHSP;
-0.01    anti-Lambda0  eta                            PHSP;
-0.003  anti-Sigma+   pi-  pi0                       PHSP;
-0.004  anti-Sigma-   pi+  pi0                       PHSP;
-0.001  anti-Sigma0   pi0  pi0                       PHSP;
-0.002  anti-Sigma0   pi+  pi-                       PHSP;
-Enddecay
-#
+
+CDecay anti-Lambda(1820)0
+
+# Lambda(1830)0
 Decay Lambda(1830)0
 0.05     p+     K-                             PHSP;
 0.05     n0   anti-K0                          PHSP;
@@ -9902,19 +9766,10 @@ Decay Lambda(1830)0
 0.06    Sigma*-   pi+                            PHSP;
 0.06    Sigma*0   pi0                            PHSP;
 Enddecay
-#
-Decay anti-Lambda(1830)0
-0.05     anti-p-     K+                             PHSP;
-0.05     anti-n0   K0                          PHSP;
-0.24    anti-Sigma+   pi-                            PHSP;
-0.24    anti-Sigma-   pi+                            PHSP;
-0.24    anti-Sigma0   pi0                            PHSP;
-0.06    anti-Sigma*+   pi-                            PHSP;
-0.06    anti-Sigma*-   pi+                            PHSP;
-0.06    anti-Sigma*0   pi0                            PHSP;
-Enddecay
-#
-#
+
+CDecay anti-Lambda(1830)0
+
+# Sigma(1660)0
 Decay Sigma(1660)0
 0.07     p+     K-                             PHSP;
 0.07     n0   anti-K0                          PHSP;
@@ -9922,15 +9777,10 @@ Decay Sigma(1660)0
 0.35    Sigma+   pi-                            PHSP;
 0.35    Sigma-   pi+         PHSP;
 Enddecay
-#
-Decay anti-Sigma(1660)0
-0.07     anti-p-     K+                             PHSP;
-0.07     anti-n0   K0                          PHSP;
-0.16   anti-Lambda0 pi0                             PHSP;
-0.35    anti-Sigma+   pi-                            PHSP;
-0.35    anti-Sigma-   pi+      PHSP;
-Enddecay
-#
+
+CDecay anti-Sigma(1660)0
+
+# Sigma(1670)0
 Decay Sigma(1670)0
 0.07     p+     K-                             PHSP;
 0.07     n0   anti-K0                          PHSP;
@@ -9938,15 +9788,10 @@ Decay Sigma(1670)0
 0.35    Sigma+   pi-                            PHSP;
 0.35    Sigma-   pi+         PHSP;
 Enddecay
-#
-Decay anti-Sigma(1670)0
-0.07     anti-p-     K+                             PHSP;
-0.07     anti-n0   K0                          PHSP;
-0.16   anti-Lambda0 pi0                             PHSP;
-0.35    anti-Sigma+   pi-                            PHSP;
-0.35    anti-Sigma-   pi+      PHSP;
-Enddecay
-#
+
+CDecay anti-Sigma(1670)0
+
+# Sigma(1775)0
 Decay Sigma(1775)0
 0.215     p+     K-                             PHSP;
 0.215     n0   anti-K0                          PHSP;
@@ -9957,17 +9802,10 @@ Decay Sigma(1775)0
 0.055  Sigma*-   pi+         PHSP;
 0.22   Lambda(1520)0 pi0                             PHSP;
 Enddecay
-#
-Decay anti-Sigma(1775)0
-0.215     anti-p-     K+                             PHSP;
-0.215     anti-n0   K0                          PHSP;
-0.20   anti-Lambda0 pi0                             PHSP;
-0.02  anti-Sigma+   pi-                            PHSP;
-0.02  anti-Sigma-   pi+         PHSP;
-0.055  anti-Sigma*+   pi-                            PHSP;
-0.055  anti-Sigma*-   pi+         PHSP;
-0.22   anti-Lambda(1520)0 pi0                             PHSP;
-Enddecay
+
+CDecay anti-Sigma(1775)0
+
+# Sigma+
 Decay Sigma+
 0.515454300 p+      pi0                                     PHSP; #[Reconstructed PDG2011]
 0.482854300 n0      pi+                                     PHSP; #[Reconstructed PDG2011]
@@ -9982,52 +9820,48 @@ Decay anti-Sigma-
 0.000445905 anti-n0 pi-     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000019590 anti-Lambda0 e-      anti-nu_e                  PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
-#
+
+# Delta(1232)+
 Decay Delta+
 0.6630    p+  pi0                       PHSP;
 0.3310    n0  pi+                       PHSP;
 0.0060    p+  gamma                      PHSP;
 Enddecay
-Decay anti-Delta-
-0.6630    anti-p-  pi0                      PHSP;
-0.3310    anti-n0  pi-                      PHSP;
-0.0060    anti-p-  gamma                     PHSP;
-Enddecay
-#
+
+CDecay anti-Delta-
+
+# Delta(1232)++
 Decay Delta++
 1.0000    p+  pi+                       PHSP;
 Enddecay
-Decay anti-Delta--
-1.0000    anti-p- pi-                       PHSP;
-Enddecay
-#
+
+CDecay anti-Delta--
+
+# Xi*0
 Decay Xi*0
 0.3330    Xi0   pi0                     PHSP;
 0.6670    Xi-   pi+                     PHSP;
 Enddecay
-Decay anti-Xi*0
-0.3330    anti-Xi0   pi0                    PHSP;
-0.6670    anti-Xi+   pi-                    PHSP;
-Enddecay
-#
+
+CDecay anti-Xi*0
+
+# Delta(1232)0
 Decay Delta0
 0.3310    p+    pi-                     PHSP;
 0.6630    n0    pi0                     PHSP;
 0.0060    n0    gamma                    PHSP;
 Enddecay
-Decay anti-Delta0
-0.3310    anti-p-   pi+                     PHSP;
-0.6630    anti-n0   pi0                     PHSP;
-0.0060    anti-n0   gamma                    PHSP;
-Enddecay
-#
+
+CDecay anti-Delta0
+
+# Delta(1232)-
 Decay Delta-
 1.0000    n0    pi-                     PHSP;
 Enddecay
-Decay anti-Delta+
-1.0000    anti-n0   pi+                     PHSP;
-Enddecay
-#
+
+CDecay anti-Delta+
+
+# Sigma-
 Decay Sigma-
 0.998015700 n0      pi-                                     PHSP; #[Reconstructed PDG2011]
 0.000460000 n0      pi-     gamma                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -10042,49 +9876,42 @@ Decay anti-Sigma+
 0.000450000 anti-n0 mu+     nu_mu                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000057300 anti-Lambda0 e+      nu_e                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
-#
+
 Decay Sigma0
 0.995024876 gamma   Lambda0                                 PHSP; #[Reconstructed PDG2011]
 0.004975124 Lambda0 e+      e-                              PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
-Decay anti-Sigma0
-0.995024876 gamma   anti-Lambda0                            PHSP; #[Reconstructed PDG2011]
-0.004975124 anti-Lambda0 e-      e+                         PHSP;  #[New mode added] #[Reconstructed PDG2011]
-Enddecay
-#
+
+CDecay anti-Sigma0
+
+# Sigma(1385)-
 Decay Sigma*-
 0.8800    Lambda0   pi-                     PHSP;
 0.0600    Sigma0  pi-                     PHSP;
 0.0600    Sigma-  pi0                     PHSP;
 Enddecay
-Decay anti-Sigma*+
-0.8800    anti-Lambda0  pi+                    PHSP;
-0.0600    anti-Sigma0  pi+                    PHSP;
-0.0600    anti-Sigma+  pi0                    PHSP;
-Enddecay
-#
+
+CDecay anti-Sigma*+
+
+# Sigma(1385)+
 Decay Sigma*+
 0.8800    Lambda0   pi+                     PHSP;
 0.0600    Sigma+  pi0                     PHSP;
 0.0600    Sigma0  pi+                     PHSP;
 Enddecay
-Decay anti-Sigma*-
-0.8800    anti-Lambda0  pi-                    PHSP;
-0.0600    anti-Sigma-  pi0                    PHSP;
-0.0600    anti-Sigma0  pi-                    PHSP;
-Enddecay
-#
+
+CDecay anti-Sigma*-
+
+# Sigma(1385)0
 Decay Sigma*0
 0.8800    Lambda0   pi0                     PHSP;
 0.0600    Sigma+  pi-                     PHSP;
 0.0600    Sigma-  pi+                     PHSP;
 Enddecay
-Decay anti-Sigma*0
-0.8800    anti-Lambda0  pi0                    PHSP;
-0.0600    anti-Sigma-  pi+                    PHSP;
-0.0600    anti-Sigma+  pi-                    PHSP;
-Enddecay
-#
+
+CDecay anti-Sigma*0
+
+# Xi0
 Decay Xi0
 0.995242400 Lambda0 pi0                                     PHSP; #[Reconstructed PDG2011]
 0.001162400 Lambda0 gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -10101,7 +9928,8 @@ Decay anti-Xi0
 0.000253000 anti-Sigma- e+      nu_e                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000004600 anti-Sigma- mu+     nu_mu                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
-#
+
+# Xi-
 Decay Xi-
 0.998870000 Lambda0 pi-                                     PHSP; #[Reconstructed PDG2011]
 0.000127000 Sigma-  gamma                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
@@ -10116,16 +9944,16 @@ Decay anti-Xi+
 0.000350000 anti-Lambda0 mu+     nu_mu                      PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.000087000 anti-Sigma0 e+      nu_e                        PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
-#
+
+# Xi*-
 Decay Xi*-
 0.6670    Xi0   pi-                     PHSP;
 0.3330    Xi-   pi0                     PHSP;
 Enddecay
-Decay anti-Xi*+
-0.6670    anti-Xi0  pi+                     PHSP;
-0.3330    anti-Xi+  pi0                     PHSP;
-Enddecay
-#
+
+CDecay anti-Xi*+
+
+# Omega-
 Decay Omega-
 0.675949296 Lambda0 K-                                      PHSP; #[Reconstructed PDG2011]
 0.233949296 Xi0     pi-                                     PHSP; #[Reconstructed PDG2011]
@@ -10134,6 +9962,7 @@ Decay Omega-
 0.000493521 Xi*0    pi-                                     PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.004779718 Xi0     e-      anti-nu_e                       PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
+
 Decay anti-Omega+
 0.675949296 anti-Lambda0 K+                                 PHSP; #[Reconstructed PDG2011]
 0.233949296 anti-Xi0 pi+                                    PHSP; #[Reconstructed PDG2011]
@@ -10142,47 +9971,59 @@ Decay anti-Omega+
 0.000493521 anti-Xi*0 pi+                                   PHSP;  #[New mode added] #[Reconstructed PDG2011]
 0.004779718 anti-Xi0 e+      nu_e                           PHSP;  #[New mode added] #[Reconstructed PDG2011]
 Enddecay
-#
-#
+
+# Sigma_c(2520)0
 Decay Sigma_c*0
 1.0000    Lambda_c+  pi-                     PHSP;
 Enddecay
+
 CDecay anti-Sigma_c*0
-#
+
+# Sigma_c(2520)+
 Decay Sigma_c*+
 1.0000    Lambda_c+  pi0                     PHSP;
 Enddecay
+
 CDecay anti-Sigma_c*-
-#
+
+# Sigma_c(2520)++
 Decay Sigma_c*++
 1.0000    Lambda_c+  pi+                     PHSP;
 Enddecay
+
 CDecay anti-Sigma_c*--
-#
+
+# Xi_c(2645)*0
 Decay Xi_c*0
 0.5000    Xi_c0  pi0                     PHSP;
 0.5000    Xi_c0  gamma                   PHSP;
 Enddecay
+
 CDecay anti-Xi_c*0
-#
+
+# Xi_c(2645)*+
 Decay Xi_c*+
 0.5000    Xi_c+  pi0                     PHSP;
 0.5000    Xi_c+  gamma                   PHSP;
 Enddecay
+
 CDecay anti-Xi_c*-
-#
+
+# Omega_c0
 Decay   Omega_c0
 1.00000        PYTHIA 84;
 Enddecay
-#
+
 CDecay  anti-Omega_c0
-#
+
+# Omega_c(2770)0
 Decay Omega_c*0
 1.0000    Omega_c0  gamma                   PHSP;
 Enddecay
-#
+
 CDecay anti-Omega_c*0
-#
+
+
 Decay Xu0
 #                    X_u^0 -> u anti-u
 #
@@ -10372,7 +10213,6 @@ Decay Xi_b-
   0.00018    D0         Lambda0   pi-                     PHSP;
   0.00020    Sigma_c0   K-                                PHSP;
   0.00020    Omega_c0   K-                                PHSP;
-#
 #  aaa 10/19/05 Do not if this is correct but filling out with inclusives
 0.38757         d       anti-u          d       cs_0    PYTHIA         13;
 0.16995         d       anti-u          d       cs_1    PYTHIA         13;
@@ -10450,6 +10290,7 @@ Decay Xi_b0
 Enddecay
 
 Decay anti-Xi_b0
+#                  SemiLeptonic Decays
   0.05460    anti-Xi_c-      e+    nu_e                   PHSP;
   0.05460    anti-Xi_c-      mu+   nu_mu                  PHSP;
   0.02000    anti-Xi_c-      tau+  nu_tau                 PHSP;
@@ -10585,7 +10426,6 @@ Decay B_c-
 0.000016   eta_c(2S)  tau-    anti-nu_tau               PHSP;
 0.00002    anti-D0    tau-    anti-nu_tau               PHSP;
 0.00008    anti-D*0   tau-    anti-nu_tau               PHSP;
-#
 #
 #                  Hadronic Decays
 0.00200    eta_c      pi-                   PHSP;

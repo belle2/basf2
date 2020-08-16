@@ -8,15 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXTRACK_H
-#define CDCDEDXTRACK_H
-
-#include <reconstruction/dataobjects/DedxConstants.h>
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
-
-#include <TVector3.h>
 
 #include <vector>
 
@@ -37,7 +32,7 @@ namespace Belle2 {
       RelationsObject(),
       m_track(0), m_charge(0), m_cosTheta(0), m_p(0), m_pCDC(0),
       m_length(0.0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
-      m_scale(0), m_cosCor(0), m_runGain(0),
+      m_scale(0), m_cosCor(0), m_cosEdgeCor(0), m_runGain(0),
       m_lNHitsUsed(0)
     {
       m_simDedx = m_dedxAvg = m_dedxAvgTruncated = m_dedxAvgTruncatedNoSat = m_dedxAvgTruncatedErr = 0.0;
@@ -64,9 +59,9 @@ namespace Belle2 {
     }
 
     /** Add a single hit to the object */
-    void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS, int adcCount, double dE,
-                double path, double dedx,
-                double cellHeight, double cellHalfWidth, int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
+    void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS,
+                int adcCount, int adcbaseCount, double dE, double path, double dedx, double cellHeight, double cellHalfWidth,
+                int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
                 double onedcor, int foundByTrackFinder, double weightPionHypo, double weightKaonHypo, double weightProtHypo)
     {
 
@@ -76,6 +71,7 @@ namespace Belle2 {
       m_hPath.push_back(path);
       m_hDedx.push_back(dedx);
       m_hADCCount.push_back(adcCount);
+      m_hADCBaseCount.push_back(adcbaseCount);
       m_hDoca.push_back(doca);
       m_hDocaRS.push_back(docaRS);
       m_hEnta.push_back(enta);
@@ -130,6 +126,9 @@ namespace Belle2 {
 
     /** Return the cosine correction for this track */
     double getCosineCorrection() const { return m_cosCor; }
+
+    /** Return the cosine correction for this track */
+    double getCosEdgeCorrection() const { return m_cosEdgeCor; }
 
     /** Return the run gain for this track */
     double getRunGain() const { return m_runGain; }
@@ -200,6 +199,9 @@ namespace Belle2 {
 
     /** Return the adcCount for this hit */
     int getADCCount(int i) const { return m_hADCCount[i]; }
+
+    /** Return the base adcCount (no non-linearity) for this hit */
+    int getADCBaseCount(int i) const { return m_hADCBaseCount[i]; }
 
     /** Return the distance of closest approach to the sense wire for this hit */
     double getDoca(int i) const { return m_hDoca[i]; }
@@ -289,6 +291,7 @@ namespace Belle2 {
     // calibration constants
     double m_scale; /**< scale factor to make electrons ~1 */
     double m_cosCor;  /**< calibration cosine correction */
+    double m_cosEdgeCor;  /**< calibration cosine edge correction */
     double m_runGain; /**< calibration run gain */
     std::vector<double> m_hWireGain; /**< calibration hit gain (indexed on number of hits) */
     std::vector<double> m_hTwodCor;  /**< calibration 2-D correction (indexed on number of hits) */
@@ -320,6 +323,7 @@ namespace Belle2 {
     std::vector<double> m_hPath;    /**< path length in the CDC cell */
     std::vector<double> m_hDedx;  /**< charge per path length (dE/dx) */
     std::vector<int> m_hADCCount; /**< adcCount per hit */
+    std::vector<int> m_hADCBaseCount; /**< adcCount base count (uncorrected) per hit */
     std::vector<double> m_hDoca;  /**< distance of closest approach to sense wire */
     std::vector<double> m_hEnta;  /**< entrance angle in CDC cell */
     std::vector<double> m_hDocaRS;/**< distance of closest approach to sense wire after rescalling cell L=W */
@@ -336,7 +340,6 @@ namespace Belle2 {
     std::vector<double> m_hCellHeight;    /**< height of the CDC cell */
     std::vector<double> m_hCellHalfWidth; /**< half-width of the CDC cell */
 
-    ClassDef(CDCDedxTrack, 14); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 15); /**< Debug output for CDCDedxPID module. */
   };
 }
-#endif

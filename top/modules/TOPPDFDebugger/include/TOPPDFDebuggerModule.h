@@ -3,7 +3,7 @@
  * Copyright(C) 2018 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Jan strube, Marko Staric                                 *
+ * Contributors: Jan strube, Marko Staric, Connor Hainje                  *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -11,13 +11,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPPDFCollection.h>
 #include <top/dataobjects/TOPAssociatedPDF.h>
+#include <top/dataobjects/TOPPixelLikelihood.h>
 
 #include <string>
 #include <top/reconstruction/TOPreco.h>
@@ -109,6 +109,7 @@ namespace Belle2 {
     StoreArray<TOPDigit> m_digits; /**< collection of digits */
     StoreArray<Track> m_tracks;  /**< collection of tracks */
 
+    StoreArray<TOPPixelLikelihood> m_pixelData; /**< collection of per-pixel data */
   };
 
 } // Belle2 namespace

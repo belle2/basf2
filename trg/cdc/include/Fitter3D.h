@@ -28,7 +28,6 @@ namespace Belle2 {
 
   class TRGCDC;
   class TRGCDCTrack;
-  class TRGCDCEventTime;
   class TRGCDCSegmentHit;
   class TRGCDCJSignal;
   class TRGCDCJLUT;

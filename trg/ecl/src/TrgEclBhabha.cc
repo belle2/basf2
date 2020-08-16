@@ -58,7 +58,6 @@
 
 
 #include <trg/ecl/TrgEclBhabha.h>
-#include <framework/logging/Logger.h>
 
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 

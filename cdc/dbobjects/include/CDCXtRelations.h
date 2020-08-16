@@ -282,7 +282,7 @@ namespace Belle2 {
         }
         ++ibin;
       }
-      if (iAlpha == 999) B2FATAL("Alpha bin not found !");
+      if (iAlpha == 999) B2FATAL("Alpha bin not found ! " << alpha);
 
       return getXtID(iCLayer, iLR, iAlpha, iTheta);
     }
@@ -408,22 +408,37 @@ namespace Belle2 {
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
     static unsigned short getGlobalUniqueID() {return 29;}
-    /// Get global parameter FIXME does nothing because CDC is not ready
-    double getGlobalParam(unsigned short xtId, unsigned short xtParam) const
+    /// Get global parameter for i-th component of the specified xtId
+    double getGlobalParam(unsigned short xtId, unsigned short i) const
     {
-      return getXtParams(xtId).at(xtParam);
+      return getXtParams(xtId).at(i);
     }
-    /// Set global parameter FIXME does nothing because CDC is not ready
-    void setGlobalParam(double value, unsigned short xtId, unsigned short xtParam)
+    /// Set global parameter for i-th component of the specified xtId
+    void setGlobalParam(double value, unsigned short xtId, unsigned short i)
     {
-      std::vector<float> allParams = getXtParams(xtId);
-      allParams.at(xtParam) = value;
-      setXtParams(xtId, allParams);
+
+      std::map<XtID, std::vector<float>>::const_iterator it = m_xts.find(xtId);
+      if (it != m_xts.end()) {
+        std::vector<float> allParams =  it->second;
+        allParams.at(i) = value;
+        setXtParams(xtId, allParams);
+      } else {
+        B2INFO("Specified xt params. not found in getXtParams.");
+        std::vector<float> allParams {0., 0., 0., 0., 0., 0., 0., 0.};
+        allParams.at(i) = value;
+        setXtParams(xtId, allParams);
+      }
     }
     /// list stored global parameters TODO FIXME CDC not ready
     std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() const
     {
-      return {};
+      std::vector<std::pair<unsigned short, unsigned short>> result;
+      for (auto ixt : m_xts) {
+        for (int i = 0; i < 8; ++i) {
+          result.push_back({ixt.first, i});
+        }
+      }
+      return result;
     }
   private:
     unsigned short m_xtParamMode;    /*!< Mode for xt parameterization */

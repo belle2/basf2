@@ -598,7 +598,7 @@ bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoi
 {
   TrueHitType* trueHit = spacePoint->template getRelatedTo<TrueHitType>("ALL"); // COULDDO: search only certain arrays
 
-  if (trueHit == NULL) { B2ERROR("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
+  if (trueHit == nullptr) { B2ERROR("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
 
   // get SensorId - needed for transforming local to global coordinates
   VxdID vxdID = trueHit->getSensorID();

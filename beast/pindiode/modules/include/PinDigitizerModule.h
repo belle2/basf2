@@ -68,7 +68,7 @@ namespace Belle2 {
 
 
     private:
-      StoreArray<PindiodeHit> m_pindiodeHit; /** Array for PindiodeHit */
+      StoreArray<PindiodeHit> m_pindiodeHit; /**< Array for PindiodeHit */
 
       /** Cremat gain */
       double m_CrematGain;

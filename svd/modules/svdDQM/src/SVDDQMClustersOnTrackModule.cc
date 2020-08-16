@@ -16,14 +16,12 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
 
 #include <boost/format.hpp>
@@ -57,7 +55,7 @@ SVDDQMClustersOnTrackModule::SVDDQMClustersOnTrackModule() : HistoModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
            std::string("SVDClsTrk"));
   addParam("desynchronizeSVDTime", m_desynchSVDTime,
-           "if TRUE (default): svdTime back in SVD time reference, and eventT0 in eventT0synch", bool(true));
+           "if TRUE (default is FALSE): svdTime back in SVD time reference", bool(false));
   addParam("isSVDTimeCalibrated", m_isSVDTimeCalibrated,
            "TRUE if SVD Time is calibrated, this parameter changes the range of time histograms", bool(false));
 
@@ -269,7 +267,7 @@ void SVDDQMClustersOnTrackModule::beginRun()
   while ((obj = nextH()))
     if (obj->InheritsFrom("TH1")) {
       ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-      if (obj != NULL)((TH1F*)obj)->Reset();
+      if (obj != nullptr)((TH1F*)obj)->Reset();
     }
 
 }
@@ -333,13 +331,13 @@ void SVDDQMClustersOnTrackModule::event()
         m_clsTrkTimeUEvtT0->Fill(time, eventT0);
 
         if (iLayer == 3) {
-          if (m_clsTrkChargeU3 != NULL) m_clsTrkChargeU3->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
-          if (m_clsTrkSNRU3 != NULL) m_clsTrkSNRU3->Fill(svdClustersTrack[cl]->getSNR());
-          if (m_clsTrkTimeU3 != NULL) m_clsTrkTimeU3->Fill(time);
+          if (m_clsTrkChargeU3 != nullptr) m_clsTrkChargeU3->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRU3 != nullptr) m_clsTrkSNRU3->Fill(svdClustersTrack[cl]->getSNR());
+          if (m_clsTrkTimeU3 != nullptr) m_clsTrkTimeU3->Fill(time);
         } else {
-          if (m_clsTrkChargeU456 != NULL) m_clsTrkChargeU456->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
-          if (m_clsTrkSNRU456 != NULL) m_clsTrkSNRU456->Fill(svdClustersTrack[cl]->getSNR());
-          if (m_clsTrkTimeU456 != NULL) m_clsTrkTimeU456->Fill(time);
+          if (m_clsTrkChargeU456 != nullptr) m_clsTrkChargeU456->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRU456 != nullptr) m_clsTrkSNRU456->Fill(svdClustersTrack[cl]->getSNR());
+          if (m_clsTrkTimeU456 != nullptr) m_clsTrkTimeU456->Fill(time);
         }
 
         RelationVector<SVDRecoDigit> recoDigits = svdClustersTrack[cl]->getRelationsTo<SVDRecoDigit>();
@@ -348,7 +346,7 @@ void SVDDQMClustersOnTrackModule::event()
         for (UInt_t re = 0; re < recoDigits.size(); re++) {
 
           RelationVector<SVDShaperDigit> shaper = recoDigits[re]->getRelationsTo<SVDShaperDigit>();
-          if (m_stripMaxBinUAll != NULL) m_stripMaxBinUAll->Fill(shaper[0]->getMaxTimeBin());
+          if (m_stripMaxBinUAll != nullptr) m_stripMaxBinUAll->Fill(shaper[0]->getMaxTimeBin());
         }
 
 
@@ -357,13 +355,13 @@ void SVDDQMClustersOnTrackModule::event()
         m_clsTrkTimeVEvtT0->Fill(time, eventT0);
 
         if (iLayer == 3) {
-          if (m_clsTrkChargeV3 != NULL) m_clsTrkChargeV3->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
-          if (m_clsTrkSNRV3 != NULL) m_clsTrkSNRV3->Fill(svdClustersTrack[cl]->getSNR());
-          if (m_clsTrkTimeV3 != NULL) m_clsTrkTimeV3->Fill(time);
+          if (m_clsTrkChargeV3 != nullptr) m_clsTrkChargeV3->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRV3 != nullptr) m_clsTrkSNRV3->Fill(svdClustersTrack[cl]->getSNR());
+          if (m_clsTrkTimeV3 != nullptr) m_clsTrkTimeV3->Fill(time);
         } else {
-          if (m_clsTrkChargeV456 != NULL) m_clsTrkChargeV456->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
-          if (m_clsTrkSNRV456 != NULL) m_clsTrkSNRV456->Fill(svdClustersTrack[cl]->getSNR());
-          if (m_clsTrkTimeV456 != NULL) m_clsTrkTimeV456->Fill(time);
+          if (m_clsTrkChargeV456 != nullptr) m_clsTrkChargeV456->Fill(svdClustersTrack[cl]->getCharge() / 1000.0);  // in kelectrons
+          if (m_clsTrkSNRV456 != nullptr) m_clsTrkSNRV456->Fill(svdClustersTrack[cl]->getSNR());
+          if (m_clsTrkTimeV456 != nullptr) m_clsTrkTimeV456->Fill(time);
         }
 
         RelationVector<SVDRecoDigit> recoDigits = svdClustersTrack[cl]->getRelationsTo<SVDRecoDigit>();
@@ -372,7 +370,7 @@ void SVDDQMClustersOnTrackModule::event()
         for (UInt_t re = 0; re < recoDigits.size(); re++) {
 
           RelationVector<SVDShaperDigit> shaper = recoDigits[re]->getRelationsTo<SVDShaperDigit>();
-          if (m_stripMaxBinVAll != NULL) m_stripMaxBinVAll->Fill(shaper[0]->getMaxTimeBin());
+          if (m_stripMaxBinVAll != nullptr) m_stripMaxBinVAll->Fill(shaper[0]->getMaxTimeBin());
 
         }
 

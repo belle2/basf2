@@ -21,19 +21,10 @@ class G4MagneticField;
 class G4Mag_UsualEqRhs;
 class G4MagIntegratorStepper;
 class G4ChordFinder;
-class G4VUserPrimaryGeneratorAction;
 class G4VisManager;
 class G4StepLimiter;
 
 namespace Belle2 {
-
-  namespace Simulation {
-    class PhysicsList;
-    class EventAction;
-    class TrackingAction;
-    class SteppingAction;
-    class StackingAction;
-  }
 
   /** The full Geant4 simulation module.
    *

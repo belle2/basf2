@@ -616,4 +616,38 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   if (nKshort != 0) Kshort = 1;
 
   calculationResult["Kshort"] = Kshort;
+
+  // 4 leptons skim
+  int nFourLep = 0;
+  double fourLep = 0.;
+
+  const double visibleEnergyCMS = visibleEnergyCMSnorm * BeamEnergyCMS() * 2.0;
+  const unsigned int n_particles = m_pionHadParticles->getListSize();
+
+  if (n_particles >= 2) {
+    for (unsigned int i = 0; i < n_particles - 1; i++) {
+      Particle* par1 = m_pionHadParticles->getParticle(i);
+      for (unsigned int j = i + 1; j < n_particles; j++) {
+        Particle* par2 = m_pionHadParticles->getParticle(j);
+        const auto chSum = par1->getCharge() + par2->getCharge();
+        const TLorentzVector V4p1 = par1->get4Vector();
+        const TLorentzVector V4p2 = par2->get4Vector();
+        const double opAng = V4p1.Theta() - V4p2.Theta();
+        const TLorentzVector V4pSum = V4p1 + V4p2;
+        const TLorentzVector V4pSumCMS = PCmsLabTransform::labToCms(V4pSum);
+        const double ptCMS = V4pSumCMS.Pt();
+        const double pzCMS = V4pSumCMS.Pz();
+        const double mSum = V4pSum.M();
+
+        const bool fourLepCand = chSum == 0 && (V4p1.P() > 0.4 && V4p2.P() > 0.4) && cos(opAng) > -0.997 && ptCMS < 0.15 && abs(pzCMS) < 2.5
+                                 && mSum < 6;
+
+        if (fourLepCand)  nFourLep++;
+      }
+    }
+  }
+
+  if (nFourLep != 0 && visibleEnergyCMS < 6) fourLep = 1;
+
+  calculationResult["FourLep"] = fourLep;
 }

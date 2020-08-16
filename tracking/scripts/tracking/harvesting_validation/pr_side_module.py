@@ -249,6 +249,40 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         bins=50
     )
 
+    #: Charge dependent histograms
+    #: Make profile of the clone rate versus seed transverse momentum
+    save_clone_rate_by_seed_pt_profile_groupbyCharge = refiners.save_profiles(
+        filter_on="is_clone_or_match",
+        select={
+            'is_clone': 'clone rate',
+            'seed_pt_estimate': 'seed p_{t}',
+        },
+        y='clone rate',
+        y_binary=True,
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
+        bins=50
+    )
+
+    #: Charge dependent histograms
+    #: Make profile of the clone rate versus seed tan(lambda)
+    save_clone_rate_by_seed_tan_lambda_profile_groupbyCharge = refiners.save_profiles(
+        filter_on="is_clone_or_match",
+        select={
+            'is_clone': 'clone rate',
+            'seed_tan_lambda_estimate': 'seed tan #lambda',
+        },
+        y='clone rate',
+        y_binary=True,
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+        bins=50
+    )
+
     #: Save RecoTrack fake-rate information
     save_fake_rate = refiners.save_fom(
         name="{module.id}_overview_figures_of_merit",
@@ -301,6 +335,38 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
         upper_bound=1.7,
     )
 
+    #: Charge dependent histograms
+    #: Make profile of the fake rate versus seed tan(lambda)
+    save_fake_rate_by_seed_tan_lambda_profile_groupbyCharge = refiners.save_profiles(
+        filter_on="has_trackFitResult",
+        select={
+            'is_fake': 'fake rate',
+            'seed_tan_lambda_estimate': 'seed tan #lambda',
+        },
+        y='fake rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+        groupby=[("track_charge", [0.])],
+    )
+
+    #: Charge dependent histograms
+    #: Make profile of the fake rate versus seed transverse momentum
+    save_fake_rate_by_seed_pt_profile_groupbyCharge = refiners.save_profiles(
+        filter_on="has_trackFitResult",
+        select={
+            'is_fake': 'fake rate',
+            'seed_pt_estimate': 'seed p_{t}',
+        },
+        y='fake rate',
+        y_binary=True,
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
+        groupby=[("track_charge", [0.])],
+    )
+
     #: Hit counts in each sub detector by the true pt value
     save_hit_counts_by_pt_profile = refiners.save_profiles(
         filter_on="is_matched",
@@ -314,7 +380,10 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             "pxd hits",
             "svd hits",
             "cdc hits",
-        ]
+        ],
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
     )
 
     #: Hit efficiency in each sub detector by the true pt value
@@ -330,7 +399,10 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             "pxd hit efficiency",
             "svd hit efficiency",
             "cdc hit efficiency",
-        ]
+        ],
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
     )
 
     #: Hit purity in each sub detector by the true pt value
@@ -346,7 +418,10 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             "pxd hit purity",
             "svd hit purity",
             "cdc hit purity",
-        ]
+        ],
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
     )
 
     #: Hit counts in each sub detector by the true tanlambda value
@@ -362,7 +437,10 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             "pxd hits",
             "svd hits",
             "cdc hits",
-        ]
+        ],
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
     )
 
     #: Hit efficiency in each sub detector by the true tanlambda value
@@ -378,7 +456,10 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             "pxd hit efficiency",
             "svd hit efficiency",
             "cdc hit efficiency",
-        ]
+        ],
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
     )
 
     #: Hit purity in each sub detector by the true tanlambda value
@@ -394,7 +475,94 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             "pxd hit purity",
             "svd hit purity",
             "cdc hit purity",
-        ]
+        ],
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+    )
+
+    #: Charge dependent histograms
+    #: Hit counts in each sub detector by the true pt value
+    save_hit_counts_by_pt_profile_groupbyCharge = refiners.save_profiles(
+        filter_on="is_matched",
+        select={
+            "pt_truth": "true p_{t}",
+            "n_pxd_hits": "pxd hits",
+            "n_svd_hits": "svd hits",
+            "n_cdc_hits": "cdc hits",
+        },
+        y=[
+            "pxd hits",
+            "svd hits",
+            "cdc hits",
+        ],
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
+    )
+
+    #: Charge dependent histograms
+    #: Hit counts in each sub detector by the true tan lambda value
+    save_hit_counts_by_tanlambda_profile_groupbyCharge = refiners.save_profiles(
+        filter_on="is_matched",
+        select={
+            "tan_lambda_truth": "true tan #lambda",
+            "n_pxd_hits": "pxd hits",
+            "n_svd_hits": "svd hits",
+            "n_cdc_hits": "cdc hits",
+        },
+        y=[
+            "pxd hits",
+            "svd hits",
+            "cdc hits",
+        ],
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
+    )
+
+    #: Charge dependent histograms
+    #: Hit efficiency in each sub detector by the true pt value
+    save_hit_efficiency_by_pt_profile_groupbyCharge = refiners.save_profiles(
+        filter_on="is_matchedPrimary",
+        select={
+            "pt_truth": "true p_{t}",
+            "mc_pxd_hit_efficiency": "pxd hit efficiency",
+            "mc_svd_hit_efficiency": "svd hit efficiency",
+            "mc_cdc_hit_efficiency": "cdc hit efficiency",
+        },
+        y=[
+            "pxd hit efficiency",
+            "svd hit efficiency",
+            "cdc hit efficiency",
+        ],
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        lower_bound=0,
+        upper_bound=1.7,
+    )
+
+    #: Charge dependent histograms
+    #: Hit efficiency in each sub detector by the true tan lambda value
+    save_hit_efficiency_by_tanlambda_profile = refiners.save_profiles(
+        filter_on="is_matchedPrimary",
+        select={
+            "tan_lambda_truth": "true tan #lambda",
+            "mc_pxd_hit_efficiency": "pxd hit efficiency",
+            "mc_svd_hit_efficiency": "svd hit efficiency",
+            "mc_cdc_hit_efficiency": "cdc hit efficiency",
+        },
+        y=[
+            "pxd hit efficiency",
+            "svd hit efficiency",
+            "cdc hit efficiency",
+        ],
+        groupby=[("charge_truth", [0.])],
+        outlier_z_score=5.0,
+        lower_bound=-1.73,
+        upper_bound=3.27,
     )
 
     #: Save simple FOM

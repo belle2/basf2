@@ -1,6 +1,23 @@
 Tools for Physics Validation of the Software
 ++++++++++++++++++++++++++++++++++++++++++++
 
+The ``validation`` package is used to validate the physics performance of
+the software. As the software is constantly developed further, algorithms are
+changed and we want to make sure that they don't perform worse than before
+(e.g. lower reconstruction efficiencies or slower runtime) and that they work
+as intended.
+
+To that end, every software package has a ``validation`` subdirectory that
+contains a number of simple steering files. The ``validation`` package collects
+these steering files and runs them. The resulting output ``*.root`` files can then be compared
+across software versions ("revisions") to spot performance degradations and other problems.
+
+To provide a simple user interface, the ``validation`` package contains a small webserver,
+that can also be run locally to show the comparison plots.
+
+The validation framework is also run centrally on a nightly basis.
+The results are shown at `https://validation.belle2.org/ <https://validation.belle2.org/>`_.
+
 Command line utilities
 ======================
 
@@ -31,7 +48,7 @@ were generated using ``b2validation`` and generate comparison plots:
     :nogroupsections:
     :absolutecommand:
 
-``b2validation-server``: Run Webserver Displaying the Phyiscs Validation Results
+``b2validation-server``: Run Webserver Displaying the Physics Validation Results
 --------------------------------------------------------------------------------
 
 With ``b2validation-server`` you can run a local webserver to display the

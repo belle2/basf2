@@ -1,15 +1,7 @@
 #include <svd/modules/svdPerformance/SVDB4CommissioningPlotsModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <geometry/GeometryManager.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <time.h>
-#include <list>
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <boost/foreach.hpp>
@@ -285,7 +277,7 @@ void SVDB4CommissioningPlotsModule::endRun()
 {
   B2INFO("SVDB4CommissioningPlotsModule::endRun(), writing the histograms");
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TDirectory* oldDir = gDirectory;

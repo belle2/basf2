@@ -10,7 +10,6 @@
 
 #include <top/dbobjects/TOPSignalShape.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 #include <math.h>
 
 using namespace std;

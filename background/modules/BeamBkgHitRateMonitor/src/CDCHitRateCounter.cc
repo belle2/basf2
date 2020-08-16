@@ -40,14 +40,16 @@ namespace Belle2 {
       //tree->Branch("cdc", &m_rates, "averageRate/F:numEvents/I:valid/O");
       stringstream leafList;
       leafList
-          << "layerHitRate[" << f_nLayer << "]/F:"
-          << "superLayerHitRate[" << f_nSuperLayer << "]/F:"
           << "averageRate/F:"
+          << "superLayerHitRate[" << f_nSuperLayer << "]/F:"
+          << "layerHitRate[" << f_nLayer << "]/F:"
+          << "layerPhiHitRate[" << f_nLayer << "][" << f_nPhiDivision << "]/F:"
           << "timeWindowForSmallCell/I:"
           << "timeWindowForNormalCell/I:"
-          << "nActiveWireInLayer[" << f_nLayer << "]/I:"
-          << "nActiveWireInSuperLayer[" << f_nSuperLayer << "]/I:"
           << "nActiveWireInTotal/I:"
+          << "nActiveWireInSuperLayer[" << f_nSuperLayer << "]/I:"
+          << "nActiveWireInLayer[" << f_nLayer << "]/I:"
+          << "nActiveWireInLayerPhi[" << f_nLayer << "][" << f_nPhiDivision << "]/I:"
           << "numEvents/I:"
           << "valid/O";
       tree->Branch("cdc", &m_rates, leafList.str().c_str());
@@ -104,8 +106,10 @@ namespace Belle2 {
         if (m_enableBadWireTreatment && geometryPar.isBadWire(wireID))
           continue;
 
-        const int iLayer         = hit.getICLayer();
-        const int iSuperLayer    = hit.getISuperLayer();
+        const unsigned short iSuperLayer  = hit.getISuperLayer();
+        const unsigned short iLayer       = hit.getICLayer();
+        const unsigned short iWireInLayer = hit.getIWire();
+        const unsigned short iPhiBin      = getIPhiBin(iSuperLayer, iWireInLayer);
         const unsigned short adc = hit.getADCCount();
         const short tdc          = hit.getTDCCount();
 
@@ -128,9 +132,10 @@ namespace Belle2 {
           continue;
 
 
-        rates.layerHitRate[iLayer] += 1;
-        rates.superLayerHitRate[iSuperLayer] += 1;
         rates.averageRate += 1;
+        rates.superLayerHitRate[iSuperLayer] += 1;
+        rates.layerHitRate[iLayer] += 1;
+        rates.layerPhiHitRate[iLayer][iPhiBin] += 1;
       }
 
       // set flag to true to indicate the rates are valid
@@ -171,33 +176,48 @@ namespace Belle2 {
         } else {
           m_rates.layerHitRate[iLayer] /= m_nActiveWireInLayer[iLayer];
         }
-      for (int i = 0 ; i < f_nLayer ; ++i)
-        m_rates.nActiveWireInLayer[i] = m_nActiveWireInLayer[i];
+      ///// average hit rate per wire [kHz] in phi in Layer
+      for (int iLayer = 0 ; iLayer < f_nLayer ; ++iLayer)
+        for (int iPhi = 0 ; iPhi < f_nPhiDivision ; ++iPhi)
+          if (m_nActiveWireInLayerPhi[iLayer][iPhi] == 0) {
+            m_rates.layerPhiHitRate[iLayer][iPhi] = 0;
+          } else {
+            m_rates.layerPhiHitRate[iLayer][iPhi] /= m_nActiveWireInLayerPhi[iLayer][iPhi];
+          }
+
+      /// copy nActiveWire
+      m_rates.nActiveWireInTotal = m_nActiveWireInTotal;
       for (int i = 0 ; i < f_nSuperLayer ; ++i)
         m_rates.nActiveWireInSuperLayer[i] = m_nActiveWireInSuperLayer[i];
-      m_rates.nActiveWireInTotal = m_nActiveWireInTotal;
+      for (int i = 0 ; i < f_nLayer ; ++i)
+        m_rates.nActiveWireInLayer[i] = m_nActiveWireInLayer[i];
+      for (int i = 0 ; i < f_nLayer ; ++i)
+        for (int j = 0 ; j < f_nPhiDivision ; ++j)
+          m_rates.nActiveWireInLayerPhi[i][j] = m_nActiveWireInLayerPhi[i][j];
     }
 
 
     void CDCHitRateCounter::countActiveWires_countAll()
     {
-      const int nlayer_in_SL[f_nSuperLayer] = { 8, 6, 6,
-                                                6, 6, 6,
-                                                6, 6, 6
-                                              };
-      const int nwire_in_layer[f_nSuperLayer] = { 160, 160, 192,
-                                                  224, 256, 288,
-                                                  320, 352, 384
-                                                };
+      static const unsigned short nlayer_in_SL[f_nSuperLayer] = { 8, 6, 6,
+                                                                  6, 6, 6,
+                                                                  6, 6, 6
+                                                                };
+      static const unsigned short nwire_in_layer[f_nSuperLayer] = { 160, 160, 192,
+                                                                    224, 256, 288,
+                                                                    320, 352, 384
+                                                                  };
 
       m_nActiveWireInTotal = 0; ///// initialize
       int contLayerID = 0;//// continuous layer numbering
       for (int iSL = 0 ; iSL < f_nSuperLayer ; ++iSL) {
         m_nActiveWireInSuperLayer[iSL] = 0; //// initialize
         for (int i = 0 ; i < nlayer_in_SL[iSL] ; ++i) {
-          m_nActiveWireInLayer[contLayerID] = nwire_in_layer[iSL];
-          m_nActiveWireInSuperLayer[iSL]   += nwire_in_layer[iSL];
           m_nActiveWireInTotal             += nwire_in_layer[iSL];
+          m_nActiveWireInSuperLayer[iSL]   += nwire_in_layer[iSL];
+          m_nActiveWireInLayer[contLayerID] = nwire_in_layer[iSL];
+          for (int j = 0 ; j < f_nPhiDivision ; ++j)
+            m_nActiveWireInLayerPhi[contLayerID][j] = nwire_in_layer[iSL] / f_nPhiDivision;
           ++contLayerID;
         }
       }
@@ -207,14 +227,14 @@ namespace Belle2 {
 
     void CDCHitRateCounter::countActiveWires()
     {
-      const int nlayer_in_SL[f_nSuperLayer] = { 8, 6, 6,
-                                                6, 6, 6,
-                                                6, 6, 6
-                                              };
-      const int nwire_in_layer[f_nSuperLayer] = { 160, 160, 192,
-                                                  224, 256, 288,
-                                                  320, 352, 384
-                                                };
+      static const unsigned short nlayer_in_SL[f_nSuperLayer] = { 8, 6, 6,
+                                                                  6, 6, 6,
+                                                                  6, 6, 6
+                                                                };
+      static const unsigned short nwire_in_layer[f_nSuperLayer] = { 160, 160, 192,
+                                                                    224, 256, 288,
+                                                                    320, 352, 384
+                                                                  };
 
       CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
 
@@ -225,10 +245,15 @@ namespace Belle2 {
         m_nActiveWireInSuperLayer[iSL] = 0; //// initialize
         for (int iL = 0 ; iL < nlayer_in_SL[iSL] ; ++iL) { //// iL: layerID in SL
           m_nActiveWireInLayer[contLayerID] = 0;//// initialize
+          for (int iPhi = 0 ; iPhi < f_nPhiDivision ; ++iPhi)
+            m_nActiveWireInLayerPhi[contLayerID][iPhi] = 0;//// initialize
+
           for (int i = 0 ; i < nwire_in_layer[iSL] ; ++i) {
             WireID wireID(iSL, iL, i);
-            if (not geometryPar.isBadWire(wireID))
+            if (not geometryPar.isBadWire(wireID)) {
+              ++m_nActiveWireInLayerPhi[contLayerID][getIPhiBin(iSL, i)];
               ++m_nActiveWireInLayer[contLayerID];
+            }
           }/// end i loop
           m_nActiveWireInSuperLayer[iSL] += m_nActiveWireInLayer[contLayerID];
           ++contLayerID;
@@ -251,6 +276,16 @@ namespace Belle2 {
         }
       }
 
+    }
+
+
+    unsigned short CDCHitRateCounter::getIPhiBin(unsigned short iSL, unsigned short iWireInLayer)
+    {
+      static const unsigned short nwire_in_layer[f_nSuperLayer] = { 160, 160, 192,
+                                                                    224, 256, 288,
+                                                                    320, 352, 384
+                                                                  };
+      return iWireInLayer / (nwire_in_layer[iSL] / f_nPhiDivision);
     }
 
 

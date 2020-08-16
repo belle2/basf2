@@ -132,18 +132,14 @@ def get_calibrations(input_data, **kwargs):
         name='VXDCDCAlignment_stage0',
         dbobjects=['VXDAlignment', 'CDCAlignment'],
         collections=[
-          mpc.make_collection("physics", create_std_path(), tracks=["RecoTracks"]),
-          mpc.make_collection("hlt_cosmic", create_cosmics_path(), tracks=["RecoTracks"])
+          mpc.make_collection("physics", path=create_std_path(), tracks=["RecoTracks"]),
+          mpc.make_collection("hlt_cosmic", path=create_cosmics_path(), tracks=["RecoTracks"])
           ],
         tags=None,
         files=dict(
             physics=input_files_physics,
             hlt_cosmic=input_files_hlt_cosmic),
         timedep=[],
-        init_event=(
-            0,
-            requested_iov.run_low,
-            requested_iov.exp_low),
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
             alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False)

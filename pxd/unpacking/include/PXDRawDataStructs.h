@@ -254,7 +254,7 @@ namespace Belle2 {
       const dhc_frame_header_word0 word0;
       const ubig16_t trigger_nr_lo;
       const ubig32_t wordsinevent;
-      const unsigned int errorinfo;
+      const ubig32_t errorinfo;
       const unsigned int crc32;
       // fixed length
 
@@ -275,7 +275,7 @@ namespace Belle2 {
       const ubig16_t trigger_nr_lo;
       const ubig16_t wordsineventlo; ///< words swapped... because of DHE 16 bit handling
       const ubig16_t wordsineventhi;
-      const unsigned int errorinfo;///< not well defined yet
+      const ubig32_t errorinfo;///< not well defined yet
       const unsigned int crc32;
       // fixed length
 

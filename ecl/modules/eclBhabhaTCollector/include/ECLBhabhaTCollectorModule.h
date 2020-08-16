@@ -10,8 +10,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLBHABHATCOLLECTORMODULE_H
-#define ECLBHABHATCOLLECTORMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <ecl/utility/ECLChannelMapper.h>
@@ -111,8 +110,6 @@ namespace Belle2 {
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evtNum;    /**< Event number for debug TTree output*/
     int m_tree_cid;     /**< ECL Cell ID (1..8736) for debug TTree output */
-    double m_tree_phi;     /**< phi position for debug TTree output */
-    double m_tree_theta;     /**< theta position for debug TTree output */
     int m_tree_amp;     /**< Fitting amplitude from ECL for debug TTree output */
     double m_tree_en;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
     double m_tree_E1Etot;     /**< Energy of crystal with maximum energy within
@@ -204,18 +201,5 @@ namespace Belle2 {
 
     std::unique_ptr< Belle2::ECL::ECLTimingUtilities > m_ECLTimeUtil =
       std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
-
-
-    double m_energyDependenceTimeOffsetFitParam_p1 = 0;                /**< p1 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p2 = 88449.;           /**< p2 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p3 = 0.20867E+06;      /**< p3 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p4 = 3.1482;           /**< p4 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p5 = 7.4747;           /**< p5 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p6 = 1279.3;           /**< p6 in "energy dependence equation" */
-
-
   };
 }
-
-#endif /* ECLBHABHATCOLLECTORMODULE_H */
-

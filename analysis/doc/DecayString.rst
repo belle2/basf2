@@ -29,8 +29,8 @@ On the right side, particles can be replaced by decaying particles which have to
 
 Selection
 ---------
-Particles can be selected with a preceeding upper carret symbol, :code:`'^'`. 
-This line selectes B+, anti-D0 and pi+ from the anti-D0 decay:
+Particles can be selected with a preceding upper carret symbol, :code:`'^'`. 
+This line selects B+, anti-D0 and pi+ from the anti-D0 decay:
 
 :code:`'^B+ -> [^anti-D0 -> K- ^pi+] pi^+'`
 
@@ -109,7 +109,7 @@ If one put the following keywords at the end of the decay string, :b2:var:`isSig
 
 These are useful to analyze inclusive processes with fully-inclusive method. 
 
-Keywords must be placed at the end of the decay string. It is not allowed to put keywords in front of particles. Here is an exapmle of use:
+Keywords must be placed at the end of the decay string. It is not allowed to put keywords in front of particles. Here is an example of use:
 
 .. code-block:: python
  
@@ -135,7 +135,7 @@ In addition to the common arrow :code:`'->'`, one can use different types of arr
 * :code:`'=norad=>'` radiated photons are considered but intermediate resonances are ignored
 * :code:`'=exact=>'` exact match of the decay including intermediate resonances and radiated photons
 
-Here is an exapmle of use:
+Here is an example of use:
 
 .. code-block:: python
  

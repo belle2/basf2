@@ -130,8 +130,9 @@ namespace Belle2 {
       // set single mass hypothesis
       int Num = 1;
       float mass = hypothesis.getMass();
+      int pdg = hypothesis.getPDGCode();
       rtra_set_hypo_(&Num, &mass);
-      rtra_set_hypid_(&Num, &HYP);
+      rtra_set_hypid_(&Num, &pdg);
 
       // set PDF option
       set_pdf_opt_(&m_opt, &m_NP, &m_NC);

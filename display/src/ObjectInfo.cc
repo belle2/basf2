@@ -84,7 +84,7 @@ std::pair<std::string, int> ObjectInfo::getDataStorePosition(const TObject* obj)
   }
   if (index == -1) {
     //this thing might be in a StoreObjPtr...
-    for (const auto pair : DataStore::Instance().getStoreEntryMap(DataStore::c_Event)) {
+    for (const auto& pair : DataStore::Instance().getStoreEntryMap(DataStore::c_Event)) {
       if (pair.second.object == obj) {
         name = pair.second.name;
         break;

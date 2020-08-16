@@ -12,22 +12,18 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
 
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 
 
 #include "TH1D.h"
-#include "TH2D.h"
 #include "TF1.h"
 #include "TList.h"
 #include "TFile.h"

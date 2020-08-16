@@ -9,8 +9,12 @@
  **************************************************************************/
 
 #include <svd/modules/svdPerformance/SVDShaperDigitsFromTracksModule.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
+
+#include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDRecoDigit.h>
+
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <framework/datastore/StoreArray.h>
 

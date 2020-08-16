@@ -5,13 +5,9 @@
 #pragma clang optimize off
 #endif
 
-#include <iostream>
 #include <fstream>
-#include <cmath>
-#include <cstdio>
-#include <vector>
-#include <math.h>
 #include <iomanip>
+
 using namespace std;
 
 

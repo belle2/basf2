@@ -12,8 +12,6 @@
 //---------------------------------------------------------------
 
 #include <trg/cdc/modules/trgcdct3dUnpacker/TRGCDCT3DUnpackerModule.h>
-#include <bitset>
-#include <iomanip>
 
 using namespace std;
 using namespace Belle2;

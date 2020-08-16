@@ -63,7 +63,6 @@ CKFToSVDState::CKFToSVDState(const SpacePoint* hit) : CKFState<RecoTrack, SpaceP
 {
   m_recoHits.reserve(2);
   for (const SVDCluster& svdCluster : hit->getRelationsTo<SVDCluster>()) {
-    // cppcheck-suppress useStlAlgorithm
     m_recoHits.emplace_back(&svdCluster);
   }
   m_stateCache.isHitState = true;

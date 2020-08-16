@@ -38,11 +38,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.input:
-        # The prescales are only valid when using the online database!
+        # For data, the prescales are only valid when using the online database!
         basf2.reset_database()
         if args.override:
             basf2.conditions.override_globaltags()
-        basf2.use_central_database("online")
+            basf2.use_central_database("online")
 
         path = basf2.Path()
 
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 
     df_print["Prescaled"] = df_cuts["Prescaled"].apply(lambda x: format(x, df_cuts["Prescaled"]["total events"]))
     df_print["Non Prescaled"] = df_cuts["Non Prescaled"].apply(lambda x: format(x, df_cuts["Non Prescaled"]["total events"]))
-    df_print["Prescales"] = df_prescales.fillna("")
+    df_print["Prescales"] = df_prescales.fillna("NaN")
     df_print = df_print[["Prescaled", "Non Prescaled", "Prescales"]]
 
     if args.format == "list":

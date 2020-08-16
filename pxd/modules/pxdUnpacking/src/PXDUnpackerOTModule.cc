@@ -694,6 +694,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
     0;// TODO just count the active DHEs. Until now, it is not possible to check for the bit mask. we would need the info on which DHE connects to which DHC at which port from gearbox/geometry?
   static int mask_active_dhp = 0;// DHP active mask, 4 bit, per current DHE
   static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHE END frame if it matches
+  static int found_good_mask_active_dhp = 0;// mask which DHP send useful data
   static unsigned int dhe_first_readout_frame_id_lo = 0;
   static unsigned int dhe_first_triggergate = 0;
   static unsigned int currentDHCID = 0xFFFFFFFF;
@@ -722,6 +723,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
     nr_active_dhe = 0;
     mask_active_dhp = 0;
     found_mask_active_dhp = 0;
+    found_good_mask_active_dhp = 0;
   }
 
   dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
@@ -879,6 +881,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
         B2ERROR("Second DHP data packet for " << LogVar("DHE", currentDHEID) << LogVar("DHP", dhc.data_direct_readout_frame->getDHPPort()));
       }
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
+      found_good_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();// only this frametype has useful data
       if (m_checkPaddingCRC) m_errorMask |= dhc.check_padding(); // isUnfiltered_event
 
 
@@ -1090,6 +1093,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
       countedDHEStartFrames++;
 
       found_mask_active_dhp = 0;
+      found_good_mask_active_dhp = 0;
       mask_active_dhp = dhc.data_dhe_start_frame->getActiveDHPMask();
 
       if ((((unsigned int)dhc.data_dhe_start_frame->getEventNrHi() << 16) | dhc.data_dhe_start_frame->getEventNrLo()) != (unsigned int)(
@@ -1282,6 +1286,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
           daqpktstat.dhc_back().dhe_back().setErrorMask(m_errorMaskDHE);
           // B2DEBUG(98,"** DHC "<<currentDHEID<<" Raw "<<dhc.data_dhe_end_frame->get_words() * 2 <<" Red"<<countedBytesInDHE);
           daqpktstat.dhc_back().dhe_back().setCounters(dhc.data_dhe_end_frame->get_words() * 2, countedBytesInDHE);
+          daqpktstat.dhc_back().dhe_back().setDHPFoundMask(found_good_mask_active_dhp);
           daqpktstat.dhc_back().dhe_back().setEndErrorInfo(dhc.data_dhe_end_frame->getErrorInfo());
         }
       }

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCCRTestModule_H_
-#define CDCCRTestModule_H_
+#pragma once
 
 #include <framework/core/HistoModule.h>
 
@@ -17,9 +16,11 @@
 
 #include <string>
 
+#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreArray.h>
 #include "TH1.h"
 #include "TH2.h"
 #include "TProfile.h"
@@ -188,6 +189,19 @@ namespace Belle2 {
        * Event timing. The event time is fetched from the data store using this pointer.
        */
       StoreObjPtr<EventT0> m_eventTimeStoreObject;
+
+      /** Tracks. */
+      StoreArray<Track> m_Tracks;
+
+      /** Tracks. */
+      StoreArray<RecoTrack> m_RecoTracks;
+
+      /** Track fit results. */
+      StoreArray<TrackFitResult> m_TrackFitResults;
+
+      /** CDC hits. */
+      StoreArray<CDCHit> m_CDCHits;
+
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_cdcHitArrayName ;         /**< Belle2::CDCHit StoreArray name. */
       std::string m_recoTrackArrayName ;      /**< Belle2::RecoTrack StoreArray nam.e */
@@ -294,4 +308,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

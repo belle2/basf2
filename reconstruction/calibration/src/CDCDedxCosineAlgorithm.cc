@@ -11,10 +11,8 @@
 #include <reconstruction/calibration/CDCDedxCosineAlgorithm.h>
 
 #include <TF1.h>
-#include <TH1D.h>
 #include <TLine.h>
 #include <TCanvas.h>
-#include <framework/core/HistoModule.h>
 
 using namespace Belle2;
 

@@ -23,8 +23,6 @@
 #include "G4Track.hh"
 #include "G4Step.hh"
 #include "G4ParticleChangeForTransport.hh"
-#include <framework/core/Module.h>
-#include <framework/logging/Logger.h>
 
 class G4SafetyHelper;
 class G4CoupledTransportation;

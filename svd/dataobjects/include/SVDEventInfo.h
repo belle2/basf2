@@ -80,6 +80,23 @@ namespace Belle2 {
      *  for clusters, additional information of the first frame is
      *  used to improve the precision
      */
+
+    /** returns the number of samples, 6, 3 or 1 */
+    int getNSamples() const
+    {
+
+      int mode = (int)SVDModeByte(m_modeByte).getDAQMode();
+
+      if (mode == 2)
+        return 6;
+      else if (mode == 1)
+        return 3;
+      else if (mode == 0)
+        return 1;
+
+      return -1;
+    }
+
     float getSVD2FTSWTimeShift(int firstFrame) const
     { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
 

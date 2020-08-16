@@ -10,6 +10,8 @@
 
 #include <reconstruction/calibration/CDCDedxMomentumAlgorithm.h>
 
+#include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
+
 #include <TF1.h>
 #include <TH1F.h>
 #include <TCanvas.h>

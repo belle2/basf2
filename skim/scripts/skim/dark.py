@@ -13,10 +13,11 @@ __authors__ = [
 
 
 import basf2 as b2
-import pdg
 import modularAnalysis as ma
+import pdg
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
-
+from stdCharged import stdE, stdMu
+from stdPhotons import stdPhotons
 
 __liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
 
@@ -34,11 +35,8 @@ class SinglePhotonDark(BaseSkim):
     __description__ = "Single photon skim list for the dark photon analysis."
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         # no good tracks in the event
@@ -74,8 +72,6 @@ class ALP3Gamma(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
-
-    RequiredStandardLists = None
 
     def addALPToPDG(self):
         """Adds the ALP codes to the basf2 pdg instance """
@@ -153,11 +149,8 @@ class DimuonPlusMissingEnergy(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdMu": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         dimuon_list = []
@@ -192,12 +185,9 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         """
@@ -235,11 +225,9 @@ class LFVZpVisible(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all", "loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdE("loose", path=path)
 
     def build_lists(self, path):
         """
@@ -279,6 +267,57 @@ class LFVZpVisible(BaseSkim):
 
 
 @fancy_skim_header
+class EGammaControlDark(BaseSkim):
+    """
+    **Physics channel**: ee → eγ
+    """
+
+    __authors__ = ["Sam Cunliffe", "Torben Ferber"]
+    __description__ = (
+        "Electron-gamma skim list for study of the ee backgrounds at high dark "
+        "photon mass, as part of the dark photon analysis"
+    )
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector, control-channel"
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+
+        # long-winded names for the particle lists to avoid clash
+        internal_skim_label = "forEGammaSkim"
+        skim_output_label = "EGammaControl"
+
+        # want exactly 1 good quality track in the event
+        # (not one good electron, one good anything)
+        phys_perf_good_track = 'abs(dr) < 1 and abs(dz) < 3 and pt > 0.15'  # cm, cm, GeV/c
+        one_good_track = f'[nCleanedTracks({phys_perf_good_track}) == 1]'
+
+        # exactly 1 good photon in the event
+        photon_energy_cut = '0.45'
+        good_photon = 'theta > 0.296706 and theta < 2.61799' +\
+            f' and useCMSFrame(E) > {photon_energy_cut}'
+        ma.cutAndCopyList(f'gamma:{internal_skim_label}', 'gamma:all', good_photon, path=path)
+        one_good_photon = f'[eventCached(nParticlesInList(gamma:{internal_skim_label})) == 1]'
+
+        # apply the event-level cuts
+        event_cuts = f'{one_good_photon} and {one_good_track}'
+        path = self.skim_event_cuts(event_cuts, path=path)
+
+        # fill electron lists (tighter than previous selection)
+        good_track_w_hie_cluster_match = '%s and clusterE > 2.0' % phys_perf_good_track
+        ma.cutAndCopyList(f'e+:{internal_skim_label}', 'e+:all', good_track_w_hie_cluster_match, path=path)
+
+        # reconstruct decay
+        ma.reconstructDecay(
+            f'vpho:{skim_output_label} -> e+:{internal_skim_label} gamma:{internal_skim_label}',
+            '', 1, allowChargeViolation=True, path=path)
+        self.SkimLists = [f"vpho:{skim_output_label}"]
+
+
+@fancy_skim_header
 class GammaGammaControlKLMDark(BaseSkim):
     """
     **Physics channel**: ee → γγ
@@ -306,11 +345,8 @@ class GammaGammaControlKLMDark(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector, control-channel"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
 
     TestFiles = [get_test_file("MC13_ggBGx1")]
 
@@ -396,11 +432,8 @@ class DielectronPlusMissingEnergy(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
 
     TestFiles = [get_test_file("MC13_mumuBGx1")]
 

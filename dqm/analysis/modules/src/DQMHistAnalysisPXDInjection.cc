@@ -42,7 +42,7 @@ void DQMHistAnalysisPXDInjectionModule::initialize()
                                    TString("/c_PXDInjectionHER")); // which makes this hist for ALL detectors (SVD, ECl, TOP)
   m_hInjectionLERPXD = new TH1F("HitInjectionLERPXD", "PXD Hits after LER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
   m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0 , 20000);
-  VXD::GeoCache& vxdGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& vxdGeometry = VXD::GeoCache::getInstance();
   std::vector<VxdID> vxdsensors = vxdGeometry.getListOfSensors();
   for (VxdID& avxdid : vxdsensors) {
     VXD::SensorInfoBase info = vxdGeometry.getSensorInfo(avxdid);
@@ -89,10 +89,9 @@ void DQMHistAnalysisPXDInjectionModule::beginRun()
 void DQMHistAnalysisPXDInjectionModule::event()
 {
   TH1* Triggers = nullptr;
+  // cppcheck-suppress unreadVariable
   TString locationHits = "";
-  TString locationTriggers = "";
-
-  locationTriggers = "PXDEOccInjLER";
+  TString locationTriggers = "PXDEOccInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }

@@ -275,7 +275,7 @@ def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
     return module
 
 
-def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
+def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=None):
     """
     Add given path at the end of this path and ensure all modules there
     do not influence the main DataStore. You can thus use modules in
@@ -289,6 +289,8 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
       merge_back_event: is a list of object/array names (of event durability)
         that will be merged back into the main path.
     """
+    if merge_back_event is None:
+        merge_back_event = []
     self._add_independent_path(skim_path, ds_ID, merge_back_event)
 
 

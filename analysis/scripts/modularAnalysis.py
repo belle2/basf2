@@ -164,7 +164,7 @@ def outputMdst(filename, path):
     mdst.add_mdst_output(path, mc=True, filename=filename)
 
 
-def outputUdst(filename, particleLists=[], includeArrays=[], path=None, dataDescription=None):
+def outputUdst(filename, particleLists=None, includeArrays=None, path=None, dataDescription=None):
     """
     Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
@@ -177,6 +177,11 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=None, dataDesc
 
     import mdst
     import pdg
+
+    if particleLists is None:
+        particleLists = []
+    if includeArrays is None:
+        includeArrays = []
     # also add anti-particle lists
     plSet = set(particleLists)
     for List in particleLists:
@@ -199,8 +204,8 @@ def outputUdst(filename, particleLists=[], includeArrays=[], path=None, dataDesc
                                 dataDescription=dataDescription)
 
 
-def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[],
-                   includeArrays=[], path=None, *,
+def skimOutputUdst(skimDecayMode, skimParticleLists=None, outputParticleLists=None,
+                   includeArrays=None, path=None, *,
                    outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
@@ -224,6 +229,13 @@ def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[],
     """
 
     from basf2 import AfterConditionPath
+
+    if skimParticleLists is None:
+        skimParticleLists = []
+    if outputParticleLists is None:
+        outputParticleLists = []
+    if includeArrays is None:
+        includeArrays = []
     # if no outputfile is specified, set it to the skim name
     if outputFile is None:
         outputFile = skimDecayMode
@@ -255,7 +267,7 @@ def skimOutputUdst(skimDecayMode, skimParticleLists=[], outputParticleLists=[],
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)
 
 
-def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
+def outputIndex(filename, path, includeArrays=None, keepParents=False, mc=True):
     """
     Write out all particle lists as an index file to be reprocessed using parentLevel flag.
     Additional branches necessary for file to be read are automatically included.
@@ -270,6 +282,8 @@ def outputIndex(filename, path, includeArrays=[], keepParents=False, mc=True):
         in the output index file. Useful if you are only adding more information to another index file
     @param bool mc whether the input data is MC or not
     """
+    if includeArrays is None:
+        includeArrays = []
 
     # Module to mark all branches to not be saved except particle lists
     onlyPLists = register_module('OnlyWriteOutParticleLists')
@@ -1149,7 +1163,7 @@ def reconstructMissingKlongDecayExpert(decayString,
     path.add_module(rmake)
 
 
-def replaceMass(replacerName, particleLists=[], pdgCode=22, path=None):
+def replaceMass(replacerName, particleLists=None, pdgCode=22, path=None):
     """
     replaces the mass of the particles inside the given particleLists
     with the invariant mass of the particle corresponding to the given pdgCode.
@@ -1158,6 +1172,8 @@ def replaceMass(replacerName, particleLists=[], pdgCode=22, path=None):
     @param pdgCode PDG   code for mass reference
     @param path          modules are added to this path
     """
+    if particleLists is None:
+        particleLists = []
 
     # first copy original particles to the new ParticleList
     pmassupdater = register_module('ParticleMassUpdater')
@@ -1456,7 +1472,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
 
 def variablesToHistogram(decayString,
                          variables,
-                         variables_2d=[],
+                         variables_2d=None,
                          filename='ntuple.root',
                          path=None, *,
                          directory=None,
@@ -1475,7 +1491,8 @@ def variablesToHistogram(decayString,
         prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
             programmatic naming of the structure in the file.
     """
-
+    if variables_2d is None:
+        variables_2d = []
     output = register_module('VariablesToHistogram')
     output.set_name('VariablesToHistogram_' + decayString)
     output.param('particleList', decayString)
@@ -1615,11 +1632,12 @@ def signalRegion(particleList, cut, path=None, name="isSignalRegion", blind_data
         applyCuts(particleList, f"{name}==0 or isMC==1", path=path)
 
 
-def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=None):
+def removeExtraInfo(particleLists=None, removeEventExtraInfo=False, path=None):
     """
     Removes the ExtraInfo of the given particleLists. If specified (removeEventExtraInfo = True) also the EventExtraInfo is removed.
     """
-
+    if particleLists is None:
+        particleLists = []
     mod = register_module('ExtraInfoRemover')
     mod.param('particleLists', particleLists)
     mod.param('removeEventExtraInfo', removeEventExtraInfo)
@@ -1798,7 +1816,7 @@ def looseMCTruth(list_name, path):
     path.add_module(mcMatch)
 
 
-def buildRestOfEvent(target_list_name, inputParticlelists=[],
+def buildRestOfEvent(target_list_name, inputParticlelists=None,
                      belle_sources=False, fillWithMostLikely=False,
                      chargedPIDPriors=None, path=None):
     """
@@ -1820,6 +1838,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=[],
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
+    if inputParticlelists is None:
+        inputParticlelists = []
     fillParticleList('pi+:roe_default', '', path=path)
     if fillWithMostLikely:
         from stdCharged import stdMostLikely
@@ -1853,7 +1873,7 @@ def buildNestedRestOfEvent(target_list_name, maskName='', path=None):
     path.add_module(roeBuilder)
 
 
-def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
+def buildRestOfEventFromMC(target_list_name, inputParticlelists=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     @param target_list_name   name of the input ParticleList
@@ -1862,6 +1882,8 @@ def buildRestOfEventFromMC(target_list_name, inputParticlelists=[], path=None):
                               target_list_name are excluded from ROE object
     @param path               modules are added to this path
     """
+    if inputParticlelists is None:
+        inputParticlelists = []
     if (len(inputParticlelists) == 0):
         # Type of particles to use for ROEBuilder
         # K_S0 and Lambda0 are added here because some of them have interacted
@@ -2095,7 +2117,7 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
     path.add_module(updateMask)
 
 
-def printROEInfo(mask_names=[], full_print=False,
+def printROEInfo(mask_names=None, full_print=False,
                  unpackComposites=True, path=None):
     """
     This function prints out the information for the current ROE, so it should only be used in the for_each path.
@@ -2111,6 +2133,8 @@ def printROEInfo(mask_names=[], full_print=False,
     @param full_print         print out particles in mask
     @param path               modules are added to this path
     """
+    if mask_names is None:
+        mask_names = []
     printMask = register_module('RestOfEventPrinter')
     printMask.set_name('RestOfEventPrinter')
     printMask.param('maskNames', mask_names)
@@ -2503,7 +2527,7 @@ def writePi0EtaVeto(
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
-def buildEventKinematics(inputListNames=[], default_cleanup=True, custom_cuts=None,
+def buildEventKinematics(inputListNames=None, default_cleanup=True, custom_cuts=None,
                          chargedPIDPriors=None, fillWithMostLikely=False, path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
@@ -2526,6 +2550,8 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, custom_cuts=No
                               which would result in a standard predefined selection cuts
     @param path               modules are added to this path
     """
+    if inputListNames is None:
+        inputListNames = []
     trackCuts = 'pt > 0.1'
     trackCuts += ' and thetaInCDCAcceptance'
     trackCuts += ' and abs(dz) < 3'
@@ -2570,7 +2596,7 @@ def buildEventKinematics(inputListNames=[], default_cleanup=True, custom_cuts=No
     path.add_module(eventKinematicsModule)
 
 
-def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
+def buildEventKinematicsFromMC(inputListNames=None, selectionCut='', path=None):
     """
     Calculates the global kinematics of the event (visible energy, missing momentum, missing mass...)
     using generated particles. If no ParticleList is provided, default generated ParticleLists are used.
@@ -2580,6 +2606,8 @@ def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
     @param selectionCut       optional selection cuts
     @param path               Path to append the eventKinematics module to.
     """
+    if inputListNames is None:
+        inputListNames = []
     if (len(inputListNames) == 0):
         # Type of particles to use for EventKinematics
         # K_S0 and Lambda0 are added here because some of them have interacted
@@ -2600,7 +2628,7 @@ def buildEventKinematicsFromMC(inputListNames=[], selectionCut='', path=None):
     path.add_module(eventKinematicsModule)
 
 
-def buildEventShape(inputListNames=[],
+def buildEventShape(inputListNames=None,
                     default_cleanup=True,
                     custom_cuts=None,
                     allMoments=False,
@@ -2665,6 +2693,8 @@ def buildEventShape(inputListNames=[],
                               is quite time consuming, instead of using it consider sanitizing
                               the lists you are passing to the function.
     """
+    if inputListNames is None:
+        inputListNames = []
     trackCuts = 'pt > 0.1'
     trackCuts += ' and thetaInCDCAcceptance'
     trackCuts += ' and abs(dz) < 3.0'

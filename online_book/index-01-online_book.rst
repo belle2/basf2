@@ -11,7 +11,7 @@ the software by following through a series of hands-on lessons.
    **We want YOU to contribute to this book!**
 
 .. include:: contribute.rst
-   :start-line: 2
+   :start-line: 6
 
 .. toctree::
    :glob:

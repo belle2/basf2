@@ -15,7 +15,6 @@
 #define TRGECLTIMING_H
 
 #include <TObject.h>
-#include <TVector3.h>
 
 namespace Belle2 {
 

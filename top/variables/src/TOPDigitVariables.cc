@@ -11,9 +11,7 @@
 
 // // framework
 #include <framework/gearbox/Const.h>
-// #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
-// #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 
 // // dataobjects
@@ -24,7 +22,6 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPRecBunch.h>
-#include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
 #include <top/dataobjects/TOPBarHit.h>
 #include <mdst/dataobjects/MCParticle.h>

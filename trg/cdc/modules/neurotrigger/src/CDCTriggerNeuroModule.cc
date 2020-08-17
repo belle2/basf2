@@ -1,9 +1,5 @@
 #include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroModule.h"
 
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <framework/gearbox/Const.h>
-
 #include <cmath>
 
 using namespace Belle2;
@@ -40,8 +36,12 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "Name of the event time object.",
            string(""));
   addParam("inputCollectionName", m_inputCollectionName,
-           "Name of the StoreArray holding the 2D input tracks.",
+           "Name of the StoreArray holding the 2D input tracks or Neurotracks.",
            string("TRGCDC2DFinderTracks"));
+  addParam("realinputCollectionName", m_realinputCollectionName,
+           "Name of the StoreArray holding the 2D input tracks in case "
+           "Neurotracks were used for the inputCollectionName.",
+           string("CDCTriggerNNInput2DFinderTracks"));
   addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the output tracks with neural "
            "network estimates.",
@@ -57,7 +57,7 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            "option on how to obtain the event time. When left blank, the value "
            "is loaded from the Conditions Database. Possibilities are: "
            "'etf_only', 'fastestpriority', 'zero', 'etf_or_fastestpriority', "
-           "'etf_or_zero'.",
+           "'etf_or_zero', 'etf_or_fastest2d', 'fastest2d'.",
            string(""));
   addParam("writeMLPinput", m_writeMLPinput,
            "if true, the MLP input vector will be written to the datastore "
@@ -65,6 +65,9 @@ CDCTriggerNeuroModule::CDCTriggerNeuroModule() : Module()
            false);
   addParam("hardwareCompatibilityMode", m_hardwareCompatibilityMode,
            "Switch to mimic an apparent bug in the hardware preprocessing",
+           false);
+  addParam("NeuroHWTrackInputMode", m_neuroTrackInputMode,
+           "use Neurotracks instead of 2DTracks as input",
            false);
 }
 
@@ -94,6 +97,10 @@ CDCTriggerNeuroModule::initialize()
   m_tracks2D.registerRelationTo(m_tracksNN);
   m_tracks2D.requireRelationTo(m_segmentHits);
   m_tracksNN.registerRelationTo(m_segmentHits);
+  if (m_neuroTrackInputMode) {
+    m_realtracks2D.isRequired(m_realinputCollectionName);
+    m_realtracks2D.registerRelationTo(m_tracksNN);
+  }
   if (m_writeMLPinput) {
     m_mlpInput.registerInDataStore(m_outputCollectionName + "Input");
     m_tracksNN.registerRelationTo(m_mlpInput, DataStore::c_Event);
@@ -129,15 +136,26 @@ CDCTriggerNeuroModule::event()
                                 atan2(1., m_tracks2D[itrack]->getCotTheta()));
     if (geoSectors.size() == 0) continue;
     // read out or determine event time
-    m_NeuroTrigger.getEventTime(geoSectors[0], *m_tracks2D[itrack], m_et_option);
+    m_NeuroTrigger.getEventTime(geoSectors[0], *m_tracks2D[itrack], m_et_option, m_neuroTrackInputMode);
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
-      m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack]);
+      m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
+    // get the complete hit pattern for debug purposes
+    unsigned long chitPattern =
+      m_NeuroTrigger.getCompleteHitPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
+    // get the pure driftthreshold vector
+    unsigned long puredriftth =
+      m_NeuroTrigger.getPureDriftThreshold(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
     // get the MLP that matches the hit pattern
-    int isector = m_NeuroTrigger.selectMLPbyPattern(geoSectors, hitPattern);
+    int isector = m_NeuroTrigger.selectMLPbyPattern(geoSectors, hitPattern, m_neuroTrackInputMode);
     if (isector < 0) continue;
     // get the input for the MLP
-    vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks2D[itrack]);
+    vector<unsigned> hitIds;
+    if (m_neuroTrackInputMode) {
+      hitIds = m_NeuroTrigger.selectHitsHWSim(isector, *m_tracks2D[itrack]);
+    } else {
+      hitIds = m_NeuroTrigger.selectHits(isector, *m_tracks2D[itrack]);
+    }
     vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds);
     if (m_hardwareCompatibilityMode) {
       for (unsigned isl = 0; isl < 9; isl++) {
@@ -156,12 +174,45 @@ CDCTriggerNeuroModule::event()
     double z = (zIndex >= 0) ? target[zIndex] : 0.;
     int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
     double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
+    bool valtrack = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getValidStereoBit() : true;
+    std::vector<bool> tsvector;
+    for (int k = 0; k < 9; k++) {
+      tsvector.push_back(bool ((chitPattern & (1 << k)) >> k));
+    }
+    tsvector = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getTSVector() : tsvector;
+    std::vector<bool> driftthreshold;
+    for (int k = 8; k >= 0; k--) {
+      driftthreshold.push_back(!tsvector[k] | bool ((puredriftth & (1 << k)) >> k));
+    }
+    int expert = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getExpert() : isector;
+    short quadrant;
+    double tphi = m_tracks2D[itrack]->getPhi0();
+    if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 0; }
+    else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 1; }
+    else if (tphi >  3 * M_PI_4 || tphi < -3 * M_PI_4) { quadrant = 2; }
+    else if (tphi > -3 * M_PI_4 && tphi < -1 * M_PI_4) { quadrant = 3; }
+
+
+
+
+
     const CDCTriggerTrack* NNtrack =
       m_tracksNN.appendNew(m_tracks2D[itrack]->getPhi0(),
                            m_tracks2D[itrack]->getOmega(),
                            m_tracks2D[itrack]->getChi2D(),
-                           z, cot, 0.);
+                           z, cot, 0.,
+                           m_tracks2D[itrack]->getFoundOldTrack(),
+                           driftthreshold,
+                           valtrack,
+                           expert,
+                           tsvector,
+                           m_tracks2D[itrack]->getTime(),
+                           quadrant //quadrant simulated from phi
+                          );
     m_tracks2D[itrack]->addRelationTo(NNtrack);
+    if (m_neuroTrackInputMode) {
+      m_tracks2D[itrack]->getRelatedFrom<CDCTriggerTrack>(m_realinputCollectionName)->addRelationTo(NNtrack);
+    }
     // relations to hits used in MLP
     for (unsigned i = 0; i < hitIds.size(); ++i) {
       NNtrack->addRelationTo(m_segmentHits[hitIds[i]]);

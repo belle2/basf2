@@ -4,6 +4,7 @@
 ! units: GeV, GeV/c, cm, ns, cm/ns, T, nm
 ! mar-2017: change in some commons
 ! oct-2018: change in some commons
+! may-2020: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE PDF_YSKEN(I0,K0,K1,K2,K3,XD,DXCH,ZB,ZD,IX,IPMTX,LR,TYP)
@@ -129,18 +130,20 @@
          TL=TL0+DTLDE*DEL_E
          TIM=TL*GROUP_INDEX(E0(K))/C0+TOF
          WID=WID0+SIGE2(K)*DTDE**2
-         FOT=FOT0*DFI*SUM(K)*GET_LOSSES(E0(K),TL,CTH,NX(1),NY(1),TYP)
+         FOT=FOT0*DFI*SUM(K)*GET_LOSSES(E0(K),TL,CTH,NX(1),NY(1),TYP,
+     &        MODUL)
          FIC=FIC0+DFICDE*DEL_E
          CALL TO_FIRST_PERIOD(FIC)
          YD=YD0+DYDDE*DEL_E
          CALL PATT_PUSH(ICHA(K),TIM,WID,FOT,FIC,E0(K),SIGE2(K),TYP,
-     &        NX,NY,XD,YD)
+     &        NX,NY,XD,YD,I0,K4)
       ENDDO
 
       END
 
 
-      SUBROUTINE PATT_PUSH(ICH,TIM,WID,FOT,FIC,E,SIGE2,TYP,NX,NY,XD,YD)
+      SUBROUTINE PATT_PUSH(ICH,TIM,WID,FOT,FIC,E,SIGE2,TYP,NX,NY,XD,YD,
+     &     I0,K4)
 
       IMPLICIT NONE
       INTEGER ICH
@@ -149,8 +152,10 @@
       INTEGER TYP
       INTEGER NX(3), NY(3)
       REAL XD, YD
+      INTEGER I0, K4
 #include "TOP_PIK.fi"
 #include "TOP_TDC.fi"
+#include "TOP_TOPF.fi"
       INTEGER N
       
       IF(TIM.LT.T_MIN.OR.TIM.GT.T_MAX) RETURN
@@ -182,11 +187,17 @@
       PIK_XD(N,ICH)=XD
       PIK_YD(N,ICH)=YD
       PIK_TYP(N,ICH)=TYP
+      PIK_KXE(N,ICH)=F_KX(I0,K4)
+      PIK_KYE(N,ICH)=F_KY(I0,K4)
+      PIK_KZE(N,ICH)=F_KZ(I0,K4)
+      PIK_KXD(N,ICH)=F_DIR(1)
+      PIK_KYD(N,ICH)=F_DIR(2)
+      PIK_KZD(N,ICH)=F_DIR(3)
 
       END
 
 
-      REAL FUNCTION GET_LOSSES(E,X,CTH,NX,NY,TYP)
+      REAL FUNCTION GET_LOSSES(E,X,CTH,NX,NY,TYP,MDN)
 
 c--   get losses due to:
 c--   mirror reflectivity, total internal reflectivity, bulk absorption
@@ -197,16 +208,13 @@ c--   mirror reflectivity, total internal reflectivity, bulk absorption
       REAL CTH                  ! cos of impact angle to PMT
       INTEGER NX, NY            ! number of reflections
       INTEGER TYP               ! 0=not reflected, 1=PLM, 2=CYL, 3=SPH
-#include "TOP_PAR.fi"
-#include "TOP_CONS.fi"
+      INTEGER MDN               ! module number
+
       REAL LOST
+      REAL MIRROR_REFL, ABSPT_LENG, SURFACE_REFL
 
-      REAL MIRROR_REFL, ABSPT_LENG
-      REAL TOTREFL
-      DATA TOTREFL /0.9994/
-
-      LOST=TOTREFL**(ABS(NX)+ABS(NY))
-      IF(TYP.NE.0) LOST=LOST*MIRROR_REFL(E)
+      LOST=SURFACE_REFL(MDN)**(ABS(NX)+ABS(NY))
+      IF(TYP.NE.0) LOST=LOST*MIRROR_REFL(MDN)
       LOST=LOST*EXP(-X/ABSPT_LENG(E))
 
       GET_LOSSES=LOST

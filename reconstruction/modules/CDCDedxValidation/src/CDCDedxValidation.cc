@@ -8,9 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-
 #include <reconstruction/modules/CDCDedxValidation/CDCDedxValidation.h>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+
+#include <TH2D.h>
 
 using namespace Belle2;
 
@@ -105,6 +108,7 @@ void CDCDedxValidationModule::event()
       continue;
     }
 
+    if (dedxTrack->getNLayerHits() <= 20) continue;
 
     const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
     if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {

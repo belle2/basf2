@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTGENINTERFACE_H
-#define EVTGENINTERFACE_H
+#pragma once
 
 
 #include <EvtGen/EvtGen.hh>
@@ -68,11 +67,11 @@ namespace Belle2 {
   private:
     /** Convert EvtParticle structure to flat MCParticle list */
     int addParticles2Graph(EvtParticle* particle, MCParticleGraph& graph, TVector3 pPrimaryVertex,
-                           MCParticleGraph::GraphParticle* parent);
+                           MCParticleGraph::GraphParticle* parent, double timeOffset = 0);
 
     /** Copy parameters from EvtParticle to MCParticle */
-    void updateGraphParticle(EvtParticle* eParticle,
-                             MCParticleGraph::GraphParticle* gParticle, TVector3 pPrimaryVertex);
+    void updateGraphParticle(EvtParticle* eParticle, MCParticleGraph::GraphParticle* gParticle,
+                             TVector3 pPrimaryVertex, double timeOffset = 0);
 
   protected:
     EvtParticle* m_parent;      /**<Variable needed for parent particle.  */
@@ -86,4 +85,3 @@ namespace Belle2 {
 
 } //! end of Belle2 namespace
 
-#endif //EVTGENINTERFACE_H

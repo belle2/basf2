@@ -5,6 +5,7 @@
 ! mar-2017: change in some commons
 ! dec-2017: change in some commons
 ! oct-2018: change in some commons
+! feb-2020: change in some commons
 !-----------------------------------------------------------------------
 
       SUBROUTINE TOP_RECO
@@ -19,7 +20,8 @@
       INTEGER ITRA, K, I
       REAL HLX(10)
       LOGICAL OK, ALL_INACTIVE
-
+      INTEGER HYPIDS(NHYP_SIZ)
+      
       CALL CLEAR_PULLS
       DO ITRA=1,N_RTRA
          DO K=1,NHYP
@@ -54,7 +56,14 @@
          ENDDO
          RTRA_TLEN(ITRA)=T_LEN
          RTRA_TOFC0(ITRA)=TOF_C0
-         CALL LIKELIHOOD(NHYP,RTRA_MASS,RTRA_HYPID,
+         DO I=1,NHYP
+            HYPIDS(I)=ABS(RTRA_HYPID(I))
+            IF(HYPIDS(I).LT.20) HYPIDS(I)=-HYPIDS(I)
+            IF(RTRA_CHARGE(ITRA).LT.0) THEN
+               HYPIDS(I)=-HYPIDS(I)
+            ENDIF
+         ENDDO
+         CALL LIKELIHOOD(NHYP,RTRA_MASS,HYPIDS,
      &        RTRA_T0(ITRA),RTRA_HYP(ITRA),
      &        RTRA_PLKH(1,ITRA),RTRA_NFOT(ITRA),RTRA_SFOT(1,ITRA),
      &        RTRA_BFOT(ITRA))
@@ -252,43 +261,41 @@
       REAL BFOT                 ! expected num of bg. photons [out]
 
       INTEGER I
-      
+
       CALL SET_PHTIMES(.FALSE.)
 
       DO I=1,NHYP
-         CALL TOP_SET_PDF(MASS(I),T0)
-         CALL FILL_LKH(PLKH(I),NFOT,SFOT(I),BFOT,HYPID(I).EQ.HYP)
+         CALL TOP_SET_PDF(MASS(I),HYPID(I),T0)
+         CALL FILL_LKH(PLKH(I),NFOT,SFOT(I),BFOT,HYPID(I),HYP)
       ENDDO
 
       END
 
 
-      SUBROUTINE FILL_LKH(PLKH,NFOT,SFOT,BFOT,FLAG)
+      SUBROUTINE FILL_LKH(PLKH,NFOT,SFOT,BFOT,HYPID,HYP)
 
       IMPLICIT NONE
       REAL PLKH
       INTEGER NFOT
       REAL SFOT
       REAL BFOT
-      LOGICAL FLAG
+      INTEGER HYPID
+      INTEGER HYP
 #include "TOP_DATA.fi"
 #include "TOP_TRACK.fi"
-#include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
 #include "TOP_GEO.fi"
 #include "TOP_PMTTYPE.fi"
-     
       INTEGER I, ICH, M, NUMCH, TYP
-      REAL P, T, TERR, F
-      REAL TOP_SIGNAL, TOP_BGR, POIS_LOG
+      REAL T, TERR, F
+      REAL FUNC_PDF, POIS_LOG
 
       PLKH=0.
       NFOT=0
-      SFOT=STFS+STFB
+      SFOT=STFS+STFD+STFB
       BFOT=STFB
       IF(SFOT.EQ.0) RETURN
       NUMCH=NCH(0)+NCH(1)
-      P=STFS/SFOT
       DO I=1,N_DATA
          M=DATA_MOD(I)
          IF(M.EQ.MODUL) THEN
@@ -299,9 +306,9 @@
             IF(T.LT.T_MIN.OR.T.GT.T_MAX) CYCLE
             NFOT=NFOT+1
             TYP=PMT_TYPE(ICH,M)
-            F=P*TOP_SIGNAL(T,TERR,ICH,TYP)+(1-P)*TOP_BGR(T,ICH)
+            F=FUNC_PDF(T,TERR,ICH,TYP,0.0)/SFOT
             PLKH=PLKH+LOG(F)
-            IF(FLAG) CALL STORE_PULLS(T,TERR,ICH,TYP)
+            IF(ABS(HYPID).EQ.ABS(HYP)) CALL STORE_PULLS(T,TERR,ICH,TYP)
          ENDIF
       ENDDO
       PLKH=PLKH+POIS_LOG(SFOT,FLOAT(NFOT))
@@ -319,13 +326,12 @@
 #include "TOP_DATA.fi"
 #include "TOP_RTRA.fi"
 #include "TOP_TRACK.fi"
-#include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
 #include "TOP_GEO.fi"
 #include "TOP_PMTTYPE.fi"
       INTEGER I, ICH, M, NUMCH, NFOT, TYP
-      REAL P, T, TERR, F, SFOT, PLKH, PS, PB
-      REAL TOP_SIGNAL1, TOP_BGR, POIS_LOG
+      REAL T, TERR, F, SFOT, PLKH, PS, PD, PB
+      REAL FUNC_PDF, POIS_LOG
       REAL PS_CH(0:NUM_CHA-1)
       
       GET_LOGL=0.
@@ -337,14 +343,13 @@
          TMIN=T_MIN
       ENDIF
       
-      CALL  GET_NEW_NORM(T0,TMIN,TMAX,PS,PB,PS_CH)
-      SFOT=STFS*PS+STFB*PB
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      SFOT=STFS*PS+STFD*PD+STFB*PB
       IF(SFOT.EQ.0) RETURN
 
       PLKH=0.
       NFOT=0
       NUMCH=NCH(0)+NCH(1)
-      P=STFS*PS/SFOT
       DO I=1,N_DATA
          M=DATA_MOD(I)
          IF(M.EQ.MODUL) THEN
@@ -355,8 +360,7 @@
             IF(T.LT.TMIN.OR.T.GT.TMAX) CYCLE
             NFOT=NFOT+1
             TYP=PMT_TYPE(ICH,M)
-            F=P*TOP_SIGNAL1(T-T0,TERR,ICH,TYP,SIGT) +
-     &           (1-P)*TOP_BGR(T-T0,ICH)
+            F=FUNC_PDF(T-T0,TERR,ICH,TYP,SIGT)/SFOT
             PLKH=PLKH+LOG(F)
          ENDIF
       ENDDO
@@ -377,13 +381,12 @@
 #include "TOP_DATA.fi"
 #include "TOP_RTRA.fi"
 #include "TOP_TRACK.fi"
-#include "TOP_TDC.fi"
 #include "TOP_PIK.fi"
 #include "TOP_GEO.fi"
 #include "TOP_PMTTYPE.fi"
       INTEGER I, ICH, M, NUMCH, NFOT, TYP
-      REAL P, T, TERR, F, SFOT, PS, PB
-      REAL TOP_SIGNAL1, TOP_BGR, POIS_LOG
+      REAL T, TERR, F, SFOT, PS, PD, PB
+      REAL FUNC_PDF, POIS_LOG
       REAL PS_CH(0:NUM_CHA-1)
       REAL SFOT_CH(0:NUM_CHA-1)
       INTEGER NFOT_CH(0:NUM_CHA-1)
@@ -396,16 +399,16 @@
          TMIN=T_MIN
       ENDIF
       
-      CALL  GET_NEW_NORM(T0,TMIN,TMAX,PS,PB,PS_CH)
-      SFOT=STFS*PS+STFB*PB
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      SFOT=STFS*PS+STFD*PD+STFB*PB
       IF(SFOT.EQ.0) RETURN
       
       NFOT=0
       NUMCH=NCH(0)+NCH(1)
-      P=STFS*PS/SFOT
 
       DO ICH=0,NUMCH-1
-         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFB*PIK_BGR(ICH)*(TMAX-TMIN)
+         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)+
+     &        STFB*PIK_BGR(ICH)*(TMAX-TMIN)
          NFOT_CH(ICH)=0
       ENDDO
       
@@ -420,8 +423,7 @@
             NFOT=NFOT+1
             NFOT_CH(ICH)=NFOT_CH(ICH)+1
             TYP=PMT_TYPE(ICH,M)
-            F=P*TOP_SIGNAL1(T-T0,TERR,ICH,TYP,SIGT) +
-     &           (1-P)*TOP_BGR(T-T0,ICH)
+            F=FUNC_PDF(T-T0,TERR,ICH,TYP,SIGT)/SFOT
             PLKH(ICH)=PLKH(ICH)+LOG(F)
          ENDIF
       ENDDO
@@ -434,17 +436,123 @@
       END
 
 
-      SUBROUTINE GET_NEW_NORM(T0,TMIN,TMAX,PS,PB,PS_CH)
+      SUBROUTINE GET_LOGL_CH_SFOT(T0,TMIN,TMAX,SIGT,PLKH,SFOT_CH)
+
+      IMPLICIT NONE
+      REAL T0                   ! time shift
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
+      REAL SIGT                 ! additional time smearing
+      REAL PLKH(0:*)            ! channel log likelihoods
+      REAL SFOT_CH(0:*)         ! channel exp. signal photons
+#include "TOP_DATA.fi"
+#include "TOP_RTRA.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PIK.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+      INTEGER I, ICH, M, NUMCH, NFOT, TYP
+      REAL T, TERR, F, SFOT, PS, PD, PB
+      REAL FUNC_PDF, POIS_LOG
+      REAL PS_CH(0:NUM_CHA-1)
+      INTEGER NFOT_CH(0:NUM_CHA-1)
+      
+      IF(N_RTRA.NE.1) RETURN
+      IF(RTRA_FLAG(1).NE.1) RETURN
+
+      IF(TMAX.LE.TMIN) THEN
+         TMAX=T_MAX
+         TMIN=T_MIN
+      ENDIF
+      
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      SFOT=STFS*PS+STFD*PD+STFB*PB
+      IF(SFOT.EQ.0) RETURN
+      
+      NFOT=0
+      NUMCH=NCH(0)+NCH(1)
+
+      DO ICH=0,NUMCH-1
+         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)+
+     &        STFB*PIK_BGR(ICH)*(TMAX-TMIN)
+         NFOT_CH(ICH)=0
+      ENDDO
+      
+      DO I=1,N_DATA
+         M=DATA_MOD(I)
+         IF(M.EQ.MODUL) THEN
+            ICH=DATA_ICH(I)
+            IF(ICH.LT.0.OR.ICH.GE.NUMCH) CYCLE
+            T=DATA_TIME(I)
+            TERR=DATA_TERR(I)
+            IF(T.LT.TMIN.OR.T.GT.TMAX) CYCLE
+            NFOT=NFOT+1
+            NFOT_CH(ICH)=NFOT_CH(ICH)+1
+            TYP=PMT_TYPE(ICH,M)
+            F=FUNC_PDF(T-T0,TERR,ICH,TYP,SIGT)/SFOT
+            PLKH(ICH)=PLKH(ICH)+LOG(F)
+         ENDIF
+      ENDDO
+      DO ICH=0,NUMCH-1
+         PLKH(ICH)=PLKH(ICH)+POIS_LOG(SFOT_CH(ICH),FLOAT(NFOT_CH(ICH)))
+      ENDDO
+      
+      RTRA_NFOT(1)=NFOT
+      
+      END
+
+
+      SUBROUTINE GET_SFOT(T0,TMIN,TMAX,SFOT_CH)
+
+      IMPLICIT NONE
+      REAL T0                   ! time shift
+      REAL TMIN                 ! time window lower edge
+      REAL TMAX                 ! time window upper edge
+      REAL SFOT_CH(0:*)         ! channel exp. signal photons
+#include "TOP_DATA.fi"
+#include "TOP_RTRA.fi"
+#include "TOP_TRACK.fi"
+#include "TOP_PIK.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+      INTEGER ICH, NUMCH
+      REAL SFOT, PS, PD, PB
+      REAL PS_CH(0:NUM_CHA-1)
+      
+      IF(N_RTRA.NE.1) RETURN
+      IF(RTRA_FLAG(1).NE.1) RETURN
+
+      IF(TMAX.LE.TMIN) THEN
+         TMAX=T_MAX
+         TMIN=T_MIN
+      ENDIF
+      
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      SFOT=STFS*PS+STFD*PD+STFB*PB
+      IF(SFOT.EQ.0) RETURN
+      
+      NUMCH=NCH(0)+NCH(1)
+
+      DO ICH=0,NUMCH-1
+         SFOT_CH(ICH)=STFS*PS_CH(ICH)+STFD*PD*PIK_DELTA(ICH)+
+     &        STFB*PIK_BGR(ICH)*(TMAX-TMIN)
+      ENDDO
+      
+      END
+
+
+      SUBROUTINE GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
       
       IMPLICIT NONE
       REAL T0                   ! time shift
       REAL TMIN                 ! time window lower edge
       REAL TMAX                 ! time window upper edge
-      REAL PS, PB               ! new normalizations for signal and background
+      REAL PS, PD, PB           ! new normalizations for signal, delta-ray and background
       REAL PS_CH(0:*)           ! per channel
 #include "TOP_PIK.fi"
       INTEGER ICH, NUMCH, K
-
+      REAL NORM_DELTA
+      
       PS=0.
       NUMCH=NCH(0)+NCH(1)
       DO ICH=0,NUMCH-1
@@ -458,28 +566,50 @@
       ENDDO
 
       PB=(TMAX-TMIN)/(T_MAX-T_MIN)
-      IF(PB.LT.0) PB=0.
+      PD=NORM_DELTA(TMIN-T0,TMAX-T0)/NORM_DELTA(T_MIN,T_MAX)
       
       END
 
 
-      REAL FUNCTION TOP_SIGNAL(T,TERR,ICH,TYP)
-
+      REAL FUNCTION FUNC_PDF(T,TERR,ICH,TYP,SIGT)
+      
+c--   complete PDF normalized to number of photons
+      
       IMPLICIT NONE
       REAL T, TERR              ! photon time and uncertainty
       INTEGER ICH               ! channel (e.g pixel-1)
       INTEGER TYP               ! PMT type
+      REAL SIGT                 ! additional time smearing
+#include "TOP_PIK.fi"
+      REAL TOP_SIGNAL, PDF_DELTA, TOP_BGR
+      
+      FUNC_PDF=STFS*TOP_SIGNAL(T,TERR,ICH,TYP,SIGT)+
+     &     STFD*PDF_DELTA(T,ICH)+STFB*TOP_BGR(T,ICH)
+      
+      END
+      
+
+      REAL FUNCTION TOP_SIGNAL(T,TERR,ICH,TYP,SIGT)
+
+c--   signal PDF normalized to 1
+      
+      IMPLICIT NONE
+      REAL T, TERR              ! photon time and uncertainty
+      INTEGER ICH               ! channel (e.g pixel-1)
+      INTEGER TYP               ! PMT type
+      REAL SIGT                 ! additional time smearing
 #include "TOP_PIK.fi"
 #include "TOP_PMT.fi"
       INTEGER K, I
-      REAL X, F, SIG
+      REAL X, F, SIG, SIG0
       REAL SQPI
       PARAMETER (SQPI=2.50662827463)
 
+      SIG0=TERR**2+SIGT**2
       TOP_SIGNAL=0.
       DO K=1,NUM_PIK(ICH)
          DO I=1,TTS_NG(TYP)
-            SIG=PIK_WID(K,ICH)+TTS_SIG(I,TYP)**2+TERR**2
+            SIG=PIK_WID(K,ICH)+TTS_SIG(I,TYP)**2+SIG0
             X=(T-PIK_POZ(K,ICH)-TTS_T0(I,TYP))**2/SIG
             IF(X.GT.10) CYCLE
             SIG=SQRT(SIG)
@@ -491,37 +621,10 @@
       END
      
 
-      REAL FUNCTION TOP_SIGNAL1(T,TERR,ICH,TYP,SIGT)
-
-      IMPLICIT NONE
-      REAL T, TERR              ! photon time and uncertainty
-      INTEGER ICH               ! channel (e.g pixel-1)
-      INTEGER TYP               ! PMT type
-      REAL SIGT                 ! additional time smearing
-#include "TOP_PIK.fi"
-#include "TOP_PMT.fi"
-      INTEGER K, I
-      REAL X, F, SIG
-      REAL SQPI
-      PARAMETER (SQPI=2.50662827463)
-
-      TOP_SIGNAL1=0.
-      DO K=1,NUM_PIK(ICH)
-         DO I=1,TTS_NG(TYP)
-            SIG=PIK_WID(K,ICH)+TTS_SIG(I,TYP)**2+TERR**2+SIGT**2
-            X=(T-PIK_POZ(K,ICH)-TTS_T0(I,TYP))**2/SIG
-            IF(X.GT.10) CYCLE
-            SIG=SQRT(SIG)
-            F=PIK_NPH(K,ICH)*TTS_FRAC(I,TYP)/SQPI/SIG*EXP(-X/2)
-            TOP_SIGNAL1=TOP_SIGNAL1+F
-         ENDDO
-      ENDDO
-
-      END
-     
-
       REAL FUNCTION TOP_BGR(T,ICH)
 
+c--   background PDF normalized to 1
+      
       IMPLICIT NONE
       REAL T
       INTEGER ICH
@@ -615,7 +718,7 @@
       REAL W(MAX_G,MAX_PIK), SIGMA(MAX_G,MAX_PIK)
       REAL SFOT, P
       REAL S, BGR, XX, SIG, T0_MIN
-      REAL TOP_BGR
+      REAL TOP_BGR, PDF_DELTA
       real SQPI
       PARAMETER (SQPI=2.50662827463)
       
@@ -626,7 +729,7 @@
       INTEGER CHID(NB)
       SAVE NT, TIME, T0, WID, FIC, WT, CHID
 
-      SFOT=STFS+STFB
+      SFOT=STFS+STFD+STFB
       IF(SFOT.EQ.0) RETURN
       P=STFS/SFOT
 
@@ -643,7 +746,7 @@
             S=S+W(I,K)
          ENDDO
       ENDDO
-      BGR=(1-P)*TOP_BGR(T,ICH)
+      BGR=(STFD*PDF_DELTA(T,ICH)+STFB*TOP_BGR(T,ICH))/SFOT ! delta's counted here as bkg
       S=S+BGR
       IF(S.EQ.0) RETURN
 
@@ -696,12 +799,12 @@
 
 
 
-      REAL FUNCTION GET_PDF(ICH,T,TERR,MASS)
+      REAL FUNCTION GET_PDF(ICH,T,TERR,MASS,PDG)
 
       IMPLICIT NONE
       INTEGER ICH
       REAL T, TERR, MASS
-
+      INTEGER PDG
 #include "TOP_RTRA.fi"     
 #include "TOP_PIK.fi"
 #include "TOP_PHTIM.fi"
@@ -709,8 +812,8 @@
 #include "TOP_PMTTYPE.fi"
       
       INTEGER NUMCH, TYP
-      REAL SFOT, P
-      REAL TOP_SIGNAL, TOP_BGR
+      REAL SFOT
+      REAL FUNC_PDF
 
       GET_PDF=0.
       IF(N_RTRA.NE.1) RETURN
@@ -720,19 +823,29 @@
 
       IF(BETA_RQ.GT.0) THEN
          IF(BETA_RQ.NE.BETA.OR..NOT.FORCE_SCAN) THEN
-            CALL SET_PHTIMES(.TRUE.)
-            CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+            CALL REDO_PDF(MASS,PDG)
          ENDIF
       ELSE
-         IF(MASS.NE.MASS_HYP.OR..NOT.FORCE_SCAN) THEN
-            CALL SET_PHTIMES(.TRUE.)
-            CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+         IF(MASS.NE.MASS_HYP.OR.PDG.NE.PDG_HYP.OR..NOT.FORCE_SCAN) THEN
+            CALL REDO_PDF(MASS,PDG)
          ENDIF
       ENDIF
-      SFOT=STFS+STFB
-      P=STFS/SFOT
+      SFOT=STFS+STFD+STFB
       TYP=PMT_TYPE(ICH,RTRA_MOD(1))
-      GET_PDF=P*TOP_SIGNAL(T,TERR,ICH,TYP)+(1-P)*TOP_BGR(T,ICH)
+      GET_PDF=FUNC_PDF(T,TERR,ICH,TYP,0.0)/SFOT
+
+      END
+
+
+      SUBROUTINE REDO_PDF(MASS,PDG)
+      
+      IMPLICIT NONE
+      REAL MASS
+      INTEGER PDG
+#include "TOP_RTRA.fi"     
+
+      CALL SET_PHTIMES(.TRUE.)
+      CALL TOP_SET_PDF(MASS,PDG,RTRA_T0(1))
 
       END
 
@@ -763,14 +876,13 @@
       END
 
 
-      SUBROUTINE REDO_PDF(MASS)
-      
-      IMPLICIT NONE
-      REAL MASS
-#include "TOP_RTRA.fi"     
+      SUBROUTINE SET_STORE_OPT(OPT)
 
-      CALL SET_PHTIMES(.TRUE.)
-      CALL TOP_SET_PDF(MASS,RTRA_T0(1))
+      IMPLICIT NONE
+      INTEGER OPT               ! 0 reduced, 1 full
+#include "TOP_PIK.fi"
+
+      STORE_OPT=OPT.EQ.0
 
       END
 
@@ -817,3 +929,402 @@
       END
 
 
+      REAL FUNCTION GET_BGR(ICH)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_BGR=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      GET_BGR=STFB*PIK_BGR(ICH) ! number of background hits in channel per nano second
+
+      END
+
+      
+      INTEGER FUNCTION GET_PIK_TYP(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_TYP=0 ! unknown
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      IF(PIK_TYP(K,ICH).EQ.0) THEN
+         GET_PIK_TYP=1 ! direct
+      ELSE
+         GET_PIK_TYP=2 ! reflected
+      ENDIF
+
+      END
+
+
+      REAL FUNCTION GET_PIK_FIC(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_FIC=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_FIC=PIK_FIC(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_E(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_E=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_E=PIK_E(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_SIGE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_SIGE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_SIGE=PIK_SIGE(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NX(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NX=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NX=PIK_NX(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NY(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NY=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NY=PIK_NY(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NXM(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NXM=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NXM=PIK_NXM(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NYM(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NYM=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NYM=PIK_NYM(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NXE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NXE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NXE=PIK_NXE(K, ICH)
+
+      END
+
+
+      INTEGER FUNCTION GET_PIK_NYE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_NYE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_NYE=PIK_NYE(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_XD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_XD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_XD=PIK_XD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_YD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_YD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_YD=PIK_YD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KXE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KXE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KXE=PIK_KXE(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KYE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KYE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KYE=PIK_KYE(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KZE(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KZE=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KZE=PIK_KZE(K, ICH)
+
+      END
+
+      
+      REAL FUNCTION GET_PIK_KXD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KXD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KXD=PIK_KXD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KYD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KYD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KYD=PIK_KYD(K, ICH)
+
+      END
+
+
+      REAL FUNCTION GET_PIK_KZD(ICH, K)
+
+      IMPLICIT NONE
+      INTEGER ICH               ! channel (e.g. pixelID-1)
+      INTEGER K                 ! peak count
+#include "TOP_PIK.fi"
+      INTEGER NUMCH
+
+      GET_PIK_KZD=0
+      NUMCH=NCH(0)+NCH(1)
+      IF(ICH.LT.0.OR.ICH.GE.NUMCH) RETURN
+      IF(K.LT.1.OR.K.GT.NUM_PIK(ICH)) RETURN
+      GET_PIK_KZD=PIK_KZD(K, ICH)
+
+      END
+
+
+      SUBROUTINE PRINT_NORM
+
+c--   for debugging only - very much time consuming
+
+      IMPLICIT NONE
+#include "TOP_TRACK.fi"
+#include "TOP_PIK.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+      INTEGER NUMCH, ICH, I, TYP
+      INTEGER N /1000/
+      REAL T, DT, S, S1, SFOT
+      REAL FUNC_PDF, PDF_DELTA
+      
+      DT=(T_MAX-T_MIN)/N
+      NUMCH=NCH(0)+NCH(1)
+      SFOT=STFS+STFD+STFB
+      S=0
+      S1=0
+      DO ICH=0,NUMCH-1
+         TYP=PMT_TYPE(ICH,MODUL)
+         T=T_MIN+DT/2
+         DO I=1,N
+            S=S+FUNC_PDF(T,0.1,ICH,TYP,0.0)/SFOT
+            S1=S1+PDF_DELTA(T,ICH)
+            T=T+DT
+         ENDDO
+      ENDDO      
+      S=S*DT
+      S1=S1*DT
+      PRINT*,PDG_HYP,T_R0(3),SFOT,STFD,S,S1
+      
+      END
+
+      
+      SUBROUTINE PRINT_NORM1(T0,TMIN,TMAX)
+
+c--   for debugging only - very much time consuming
+
+      IMPLICIT NONE
+      REAL T0
+      REAL TMIN,TMAX
+#include "TOP_TRACK.fi"
+#include "TOP_PIK.fi"
+#include "TOP_GEO.fi"
+#include "TOP_PMTTYPE.fi"
+      INTEGER NUMCH, ICH, I, TYP
+      INTEGER N /1000/
+      REAL T, DT, S, S1, SFOT
+      REAL PS, PD, PB, PS_CH(0:NUM_CHA-1)
+      REAL FUNC_PDF, PDF_DELTA
+      
+      DT=(TMAX-TMIN)/N
+      NUMCH=NCH(0)+NCH(1)
+      CALL GET_NEW_NORM(T0,TMIN,TMAX,PS,PD,PB,PS_CH)
+      SFOT=STFS*PS+STFD*PD+STFB*PB
+      S=0
+      S1=0
+      DO ICH=0,NUMCH-1
+         TYP=PMT_TYPE(ICH,MODUL)
+         T=TMIN+DT/2
+         DO I=1,N
+            S=S+FUNC_PDF(T-T0,0.1,ICH,TYP,0.0)/SFOT
+            S1=S1+PDF_DELTA(T-T0,ICH)/PD
+            T=T+DT
+         ENDDO
+      ENDDO      
+      S=S*DT
+      S1=S1*DT
+      PRINT*,T_R0(3),SFOT,STFD*PD,S,S1,PD
+      
+      END
+
+      

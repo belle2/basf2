@@ -18,10 +18,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
 
-
-#include "trg/ecl/TrgEclMaster.h"
 #include "trg/ecl/dataobjects/TRGECLHit.h"
 #include "trg/ecl/dataobjects/TRGECLTrg.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"

@@ -11,6 +11,7 @@ import basf2
 import sys
 import glob
 from rawdata import add_unpackers
+from svd import add_svd_reconstruction
 from ROOT import Belle2
 
 # Argument parsing
@@ -93,15 +94,27 @@ main.add_module('ARICHFillHits')
 main.add_module('TOPChannelMasker')
 main.add_module('ActivatePXDGainCalibrator')
 main.add_module('PXDClusterizer')
-main.add_module('SVDZeroSuppressionEmulator', SNthreshold=5, ShaperDigits='SVDShaperDigits', ShaperDigitsIN='SVDShaperDigitsZSed')
-main.add_module('SVDStripMasking', ShaperDigits='SVDShaperDigitsZSed', ShaperDigitsUnmasked='SVDShaperDigitsUnmasked')
+add_svd_reconstruction(main, applyMasking=True)
+main.add_module(
+    'SVDZeroSuppressionEmulator',
+    SNthreshold=5,
+    ShaperDigits='SVDShaperDigitsUnmasked',
+    ShaperDigitsIN='SVDShaperDigitsZS5')
+main.add_module('TFCDC_WireHitPreparer',
+                wirePosition='aligned',
+                flightTimeEstimation='outwards',
+                filter='cuts_from_DB')
 
 # Beam background rate monitor: output to flat ntuple
 main.add_module(
     'BeamBkgHitRateMonitor',
     outputFileName=outputFile,
     trgTypes=trigTypes,
-    svdShaperDigitsName='SVDShaperDigitsUnmasked')
+    svdShaperDigitsName='SVDShaperDigitsZS5',
+    cdcTimeWindowLowerEdgeSmallCell=4720,
+    cdcTimeWindowUpperEdgeSmallCell=5020,
+    cdcTimeWindowLowerEdgeNormalCell=4720,
+    cdcTimeWindowUpperEdgeNormalCell=5020)
 
 # Process events
 basf2.process(main)

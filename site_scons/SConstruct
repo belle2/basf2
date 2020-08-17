@@ -30,7 +30,13 @@ AddOption('--create-json', dest="create_json", action="store_true", default=Fals
 SetOption('warn', 'no-fortran-cxx-mix')
 try:
     import multiprocessing
-    SetOption('num_jobs', multiprocessing.cpu_count())
+    num_jobs = multiprocessing.cpu_count()
+    if 'BELLE2_MAX_BUILDS' in os.environ:
+        if os.environ['BELLE2_MAX_BUILDS'] == 'LOAD':
+            num_jobs = max(int(num_jobs / (1. + os.getloadavg()[1])), 1)
+        else:
+            num_jobs = min(num_jobs, int(os.environ['BELLE2_MAX_BUILDS']))
+    SetOption('num_jobs', num_jobs)
 except:
     pass
 
@@ -54,7 +60,7 @@ extsubdir = os.environ.get('BELLE2_EXTERNALS_SUBDIR', subdir)
 
 # check for root
 if 'ROOTSYS' not in os.environ:
-    print('root is not set up.')
+    print('ROOT is not set up.')
     print(setup_message)
     Exit(1)
 
@@ -62,8 +68,7 @@ if GetOption("check_externals"):
     if "BELLE2_EXTERNALS_VERSION" in os.environ and os.path.exists(".externals"):
         ext_version = open(".externals").read().strip()
         if ext_version != os.environ["BELLE2_EXTERNALS_VERSION"]:
-            print("externals version (%s) differs from the one defined in .externals (%s)" \
-                % (os.environ["BELLE2_EXTERNALS_VERSION"], ext_version))
+            print(f"externals version ({os.environ['BELLE2_EXTERNALS_VERSION']}) differs from the one defined in .externals ({ext_version})")
             print("Please run b2setup again.")
             Exit(1)
 
@@ -202,7 +207,7 @@ elif option == 'clang':
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
-    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wshadow', '-Wno-unused-command-line-argument'],
+    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
     # system ones. First we disable the default c++ include path
@@ -234,7 +239,7 @@ if(not GetOption('no-debuginfo')):
 override_from_environment = ['CC', 'CXX', 'LD']
 for v in override_from_environment:
     if v in os.environ:
-        print("Note: Overriding variable %s ('%s') from environment ($%s='%s')." % (v, global_env[v], v, os.environ[v]))
+        print(f"Note: overriding variable {v} ('{global_env[v]}') from environment (${v}='{os.environ[v]}').")
         global_env[v] = os.environ[v]
 
 if os.environ.get("BELLE2_USE_CCACHE", "no").lower() in ["yes", "true", "on", "1"]:
@@ -262,8 +267,8 @@ if (not global_env.GetOption('clean')) and (not global_env.GetOption('help')):
 
 # cling remembers include paths to be able to find them at run-time, so only use -I here
 # remove all compiler warnings
-global_env['CLINGFLAGS'] = ["-std=c++17"] + [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
-                                             if not (s.startswith("-W") or s.startswith('-wd'))] + \
+global_env['CLINGFLAGS'] = [s.replace('-isystem', '-I') for s in global_env['CCFLAGS']
+                            if not (s.startswith("-W") or s.startswith('-wd')) and s not in ['-g', '-O3', '-flto']] + \
                            ["-noIncludePaths"]
 
 special_targets = ['tests', 'b2test-units', 'include', 'lib', 'bin', 'modules', 'data', 'scripts']
@@ -272,11 +277,6 @@ explicit_package_targets = [p.rstrip('/') for p in COMMAND_LINE_TARGETS if p.rst
 
 # make the static library containing the main() function for test executables
 global_env.Library(os.path.join(global_env['LIBDIR'], 'test_main'), "$BUILDDIR/site_scons/test_main.cc")
-
-# figure out where we don't want sphinx to look for documentation. Mostly not
-# in output directories. But depending on whether or not we do a light build we
-# don't want to look in any non-light packages
-sphinx_exclude_pattern = set()
 
 # process the analysis directory
 if analysis:
@@ -287,8 +287,7 @@ if analysis:
 # process the package directories
 else:
     # loop over directory entries and select package directories
-    exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
-    sphinx_exclude_pattern |= set(exclude_dirs)
+    exclude_dirs = {'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons'}
     available_packages = set()
     for entry in os.listdir(os.getcwd()):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_dirs:
@@ -298,7 +297,6 @@ else:
     # retain only packages specified in the .light file if the light option is given
     if GetOption('light'):
         light_packages = set([entry.strip('/') for entry in open('.light').read().split() if entry.endswith('/')])
-        sphinx_exclude_pattern |= available_packages.difference(light_packages)
         available_packages = available_packages.intersection(light_packages)
 
     # we looped over all of them and know what's available so let's compile
@@ -338,20 +336,11 @@ if len(global_env['TEST_FILES']) > 0:
 # build sphinx documentation if the --sphinx option is used
 AddOption("--sphinx", dest="sphinx", action="store_true", default=False, help="if given sphinx documentation will be generated")
 if global_env.GetOption("sphinx"):
-    tools_doc = global_env.Command('build/tools_doc', [], 'ln -sf %s/doc $TARGET' % os.environ.get('BELLE2_TOOLS'))
+    light_option = " --light " if GetOption('light') else ""
     sphinx_targets = ['html', 'latex', 'json']
-    # we place the tools doc in the build directory so obviously we don't want
-    # to exclude all of that
-    sphinx_exclude_pattern.remove('build')
-    # but we can exclude most of it ...
-    sphinx_exclude_pattern |= {'build/Linux*', 'build/doctrees'} | {f'build/{e}' for e in sphinx_targets}
-    # and convert to a proper argument for sphinx-build
-    sphinx_exclude_pattern = shlex.quote("exclude_patterns=" + ",".join(sphinx_exclude_pattern))
     for sphinx_target in sphinx_targets:
-        sphinx = global_env.Command(f'build/{sphinx_target}', 'index.rst', f"sphinx-build -b {sphinx_target} "
-                                    f"-ENT -D {sphinx_exclude_pattern} "
-                                    "-c site_scons/sphinx -d build/doctrees . $TARGET")
-        global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin', tools_doc])
+        sphinx = global_env.Command(f'build/{sphinx_target}', 'index.rst', f"b2code-sphinx-build {light_option} -t {sphinx_target}")
+        global_env.Depends(sphinx, ['scripts', 'data', 'lib', 'bin'])
         global_env.SideEffect('PreventParallelSphinxBuilds', sphinx)
         global_env.AlwaysBuild(sphinx)
         global_env.Alias(sphinx_target, sphinx)

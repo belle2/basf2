@@ -39,7 +39,7 @@ namespace Belle2 {
     using ConstIterator = typename std::vector<BoxEntry>::const_iterator;
 
 
-    /** for given key a pointer to the value is returned. If key was invalid, a NULL-ptr will be returned */
+    /** for given key a pointer to the value is returned. If key was invalid, a nullptr-ptr will be returned */
     ValueType* find(const KeyType& aKey)
     {
       Iterator foundPos = std::find_if(

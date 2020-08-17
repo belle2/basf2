@@ -55,6 +55,7 @@ namespace Belle2 {
     //! prefix for EPICS PVs
     std::string m_pvPrefix;
 
+    //! Clean up PVs
     void cleanPVs(void);
 
     //! PXD Hits
@@ -77,6 +78,10 @@ namespace Belle2 {
     TH1F* m_hInjectionLERECL = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionLERECL = nullptr;
+    //! ECL Bursts
+    TH1F* m_hBurstLERECL = nullptr;
+    //! Final Canvas
+    TCanvas* m_cBurstLERECL = nullptr;
     //! TOP Occ
     TH1F* m_hInjectionLERTOP = nullptr;
     //! Final Canvas
@@ -101,6 +106,10 @@ namespace Belle2 {
     TH1F* m_hInjectionHERECL = nullptr;
     //! Final Canvas
     TCanvas* m_cInjectionHERECL = nullptr;
+    //! ECL Bursts
+    TH1F* m_hBurstHERECL = nullptr;
+    //! Final Canvas
+    TCanvas* m_cBurstHERECL = nullptr;
     //! TOP Occ
     TH1F* m_hInjectionHERTOP = nullptr;
     //! Final Canvas

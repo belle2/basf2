@@ -155,7 +155,7 @@ namespace Belle2 {
       // Lorentz force (without E-field) direction
       B2Vector3D F_dir = v.Cross(bField);
       // ... projected to sensor coordinates:
-      genfit::StateOnPlane localForce(*sop);
+      genfit::StateOnPlane localForce = *sop;
       localForce.setPosMom(sop->getPos(), F_dir);
       B2Vector3D lorentzLocal(localForce.getState()[3], localForce.getState()[4], 0); // or 0,1?
       // Lorentz shift = parameter(layer) * B_local

@@ -6,13 +6,10 @@
 // Date : 26 - Nov - 2013
 //-
 
-#include <string>
+#include <cstdlib>
+#include <cstring>
 #include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
-#include "nsm2/nsm2.h"
 #include "nsm2/belle2nsm.h"
 
 #include "daq/rfarm/manager/RFConf.h"

@@ -45,9 +45,9 @@ namespace Belle2 {
     /** Creator creates the BEAMABORT geometry */
     geometry::CreatorFactory <BeamabortCreator> BeamabortFactory("BEAMABORTCreator");
 
-    BeamabortCreator::BeamabortCreator() : m_sensitive(0)
+    BeamabortCreator::BeamabortCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     BeamabortCreator::~BeamabortCreator()
@@ -58,6 +58,8 @@ namespace Belle2 {
     void BeamabortCreator::create(const GearDir& content, G4LogicalVolume& topVolume,
                                   geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
 
       B2INFO("BeamabortCreator phase2");
       //Visualization Attributes
@@ -84,14 +86,14 @@ namespace Belle2 {
         std::vector<double> svdAngle;
         std::vector<double> r;
         std::vector<double> deltaX;
-        int dimz = 0;
+        unsigned int dimz = 0;
 
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
           z_pos.push_back(z);
           dimz++;
         }
-        int dimThetaZ = 0;
+
         for (double ThetaZ : activeParams.getArray("ThetaZ", {0})) {
           thetaZ.push_back(ThetaZ);
         }
@@ -150,7 +152,7 @@ namespace Belle2 {
         G4LogicalVolume* l_pa = new G4LogicalVolume(s_pa, G4Material::GetMaterial("Al6061"), "l_pa");
         l_pa->SetVisAttributes(magenta);
         G4Transform3D transform;
-        for (int i = 0; i < dimz; i++) {
+        for (unsigned int i = 0; i < dimz; i++) {
           B2INFO("DIA-" << i << "RotateZ3D phi: " << phi[i]);
 
           if (phase == 1) {
@@ -178,7 +180,7 @@ namespace Belle2 {
         l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));
         l_BEAMABORT->SetVisAttributes(orange);
 
-        for (int i = 0; i < dimz; i++) {
+        for (unsigned int i = 0; i < dimz; i++) {
 
           if (phase == 1)
             transform = G4Translate3D(x_pos[i], y_pos[i],

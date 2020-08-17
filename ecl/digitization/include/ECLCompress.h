@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCOMPRESS_H
-#define ECLCOMPRESS_H
+#pragma once
 
 #include <algorithm>
 #include <vector>
@@ -160,9 +159,8 @@ namespace Belle2 {
 
     /** The compression algorithm selector function
      *  @param compAlgo compression algorithm -- 1 - BASE, 2 - DELTA, 3 - DCT
-     *  @return pointer to the selected algorithm or NULL in case of the wrong parameter
+     *  @return pointer to the selected algorithm or nullptr in case of the wrong parameter
      */
     ECLCompress* selectAlgo(int compAlgo);
   }
 }
-#endif

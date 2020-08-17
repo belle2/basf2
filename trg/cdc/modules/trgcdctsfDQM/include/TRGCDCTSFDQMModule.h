@@ -2,13 +2,10 @@
 #define TRCCDCTSFDQMMODULE_h
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
 #include <trg/cdc/dataobjects/TRGCDCTSFUnpackerStore.h>
-#include <trg/cdc/modules/trgcdctsfUnpacker/trgcdctsfUnpackerModule.h>
-#include <stdlib.h>
-#include <iostream>
 #include <string>
 
-#include <TH2I.h>
 #include <TH1I.h>
 
 namespace Belle2 {
@@ -24,17 +21,17 @@ namespace Belle2 {
 
   public:
     //! initialize
-    virtual void initialize();
+    virtual void initialize() override;
     //! begin Run
-    virtual void beginRun();
+    virtual void beginRun() override;
     //! Event
-    virtual void event();
+    virtual void event() override;
     //! End Run
-    virtual void endRun();
+    virtual void endRun() override;
     //! terminate
-    virtual void terminate() {}
+    virtual void terminate() override {}
     //! Define Histogram
-    virtual void defineHisto();
+    virtual void defineHisto() override;
 
   protected:
     //! Total number of TSF hits per event in each superlayer

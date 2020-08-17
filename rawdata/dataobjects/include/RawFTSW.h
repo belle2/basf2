@@ -98,6 +98,13 @@ namespace Belle2 {
       return m_access->GetTTTimeVal(n, tv);
     }
 
+    //! Get timeval obtained from gettimeval()
+    void GetPCTimeVal(int n, struct timeval* tv)
+    {
+      CheckVersionSetBuffer();
+      return m_access->GetPCTimeVal(n, tv);
+    }
+
     //! Get magic number for data corruption check
     unsigned int GetMagicTrailer(int n)
     {

@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -21,31 +21,33 @@ DistanceSVDPairFilter::operator()(const std::pair<const CKFToSVDState*, const CK
   const CKFToSVDState& fromState = *(relation.first);
   const CKFToSVDState& toState = *(relation.second);
 
-  const SpacePoint* fromSpacePoint = fromState.getHit();
-  const SpacePoint* toSpacePoint = toState.getHit();
+  const CKFToSVDState::stateCache& fromStateCache = fromState.getStateCache();
+  const CKFToSVDState::stateCache& toStateCache = toState.getStateCache();
 
-  B2ASSERT("You have filled the wrong states into this!", toSpacePoint);
+  B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  if (not fromSpacePoint) {
+  double phiDiff = fromStateCache.phi - toStateCache.phi;
+  while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
+  while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
+
+  if (not fromStateCache.isHitState) {
     // We are coming from a CDC track, so we can use its position to only look for matching ladders
-    // TODO: implement a better way, e.g. using
-    // const RecoTrack* seed = fromState.getSeed();
-    // const auto& cdcPosition = fromState.getMSoPPosition();
+    if (fabs(phiDiff) < 0.2 and fabs(fromStateCache.theta - toStateCache.theta) < 0.2) {
+      return 1.0;
+    }
+    // If the current state (fromState) is a RecoTrack-based state, but no relations could be created
+    // don't proceed but return
+    return NAN;
+  }
+
+  if (fromStateCache.geoLayer == toStateCache.geoLayer and
+      fromStateCache.sensorID.getSensorNumber() == toStateCache.sensorID.getSensorNumber()) {
+    // TODO: Checking for equality of sensor numbers seems not to harm the hit efficiency,
+    // but maybe it's safer to allow for a sensor number difference of 1?
     return 1.0;
   }
 
-  const VxdID& fromVXDID = fromSpacePoint->getVxdID();
-  const VxdID& toVXDID = toSpacePoint->getVxdID();
-
-  if (fromVXDID.getLayerNumber() == toVXDID.getLayerNumber()) {
-    // TODO: Also check for sensors?
-    return 1.0;
-  }
-
-  const double fromPhi = fromSpacePoint->getPosition().Phi();
-  const double toPhi = toSpacePoint->getPosition().Phi();
-
-  if (abs(fromPhi - toPhi) < 0.2) {
+  if (abs(phiDiff) < 0.2) {
     return 1.0;
   }
 

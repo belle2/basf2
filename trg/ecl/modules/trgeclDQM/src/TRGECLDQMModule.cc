@@ -12,16 +12,11 @@
 #include <trg/ecl/modules/trgeclDQM/TRGECLDQMModule.h>
 #include <trg/ecl/TrgEclMapping.h>
 #include <trg/ecl/TrgEclCluster.h>
-#include <trg/ecl/TrgEclMaster.h>
 #include <trg/ecl/TrgEclDataBase.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-
 #include <TDirectory.h>
-#include <TRandom3.h>
-#include <unistd.h>
 
 using namespace Belle2;
 
@@ -115,8 +110,10 @@ void TRGECLDQMModule::event()
   FineTiming.clear();
 
   //    StoreArray<TRGECLUnpackerStore> trgeclHitArray;
-  double HitTiming = 0;
-  double HitEnergy = 0;
+  /* cppcheck-suppress variableScope */
+  double HitTiming;
+  /* cppcheck-suppress variableScope */
+  double HitEnergy;
   double HitRevoFam = 0;
   double HitRevoTrg = 0;
   double HitFineTiming = 0;
@@ -164,18 +161,30 @@ void TRGECLDQMModule::event()
   //
   if (TCId.size() == 0) {return;}
 
-  int phy    = 0;
-  int b1     = 0;
-  int b2v    = 0;
-  int b2s    = 0;
-  int mu     = 0;
-  int pre    = 0;
-  int clover = 0;
-  int tsource = 0;
-  int b1type = 0;
-  int etot = 0;
-  int vlm = 0;
-  int eclburst = 0;
+  /* cppcheck-suppress variableScope */
+  int phy;
+  /* cppcheck-suppress variableScope */
+  int b1;
+  /* cppcheck-suppress variableScope */
+  int b2v;
+  /* cppcheck-suppress variableScope */
+  int b2s;
+  /* cppcheck-suppress variableScope */
+  int mu;
+  /* cppcheck-suppress variableScope */
+  int pre;
+  /* cppcheck-suppress variableScope */
+  int clover;
+  /* cppcheck-suppress variableScope */
+  int tsource;
+  /* cppcheck-suppress variableScope */
+  int b1type;
+  /* cppcheck-suppress variableScope */
+  int etot;
+  /* cppcheck-suppress variableScope */
+  int vlm;
+  /* cppcheck-suppress variableScope */
+  int eclburst;
   //  int s_hit_win= 0;
   std::vector<int> trgbit ;
   trgbit.resize(44, 0);
@@ -345,7 +354,7 @@ void TRGECLDQMModule::event()
   TrgEclMapping* a = new TrgEclMapping();
   double max = 0;
   double caltrgtiming = 0;
-  double timing = 0;
+  double timing;
   double trgtiming = 0;
 
   for (int ihit = 0; ihit < NofTCHit ; ihit ++) {

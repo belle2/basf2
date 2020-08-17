@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ###################################################################
 # This tutorial demonstrates how to perform four momentum constraint

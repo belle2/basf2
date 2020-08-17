@@ -41,8 +41,7 @@ g4sim = register_module('FullSim')
 
 # KLM modules.
 klmDigitizer = register_module('KLMDigitizer')
-bklmReconstructor = register_module('BKLMReconstructor')
-eklmReconstructor = register_module('EKLMReconstructor')
+klmReconstructor = register_module('KLMReconstructor')
 klmClustersReconstructor = register_module('KLMClustersReconstructor')
 mc_matcher = register_module('MCMatcherKLMClusters')
 
@@ -62,8 +61,7 @@ main.add_module(geometry)
 main.add_module(g4sim)
 
 main.add_module(klmDigitizer)
-main.add_module(bklmReconstructor)
-main.add_module(eklmReconstructor)
+main.add_module(klmReconstructor)
 main.add_module(klmClustersReconstructor)
 main.add_module(mc_matcher)
 

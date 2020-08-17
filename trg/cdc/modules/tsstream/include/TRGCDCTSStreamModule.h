@@ -16,9 +16,7 @@
 
 #include <string>
 #include "framework/core/Module.h"
-#include "trg/trg/BitStream.h"
 #include "trg/cdc/TRGCDC.h"
-#include "trg/cdc/SteppingAction.h"
 
 namespace Belle2 {
 

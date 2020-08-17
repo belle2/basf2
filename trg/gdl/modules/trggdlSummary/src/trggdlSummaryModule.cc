@@ -12,14 +12,11 @@
 //---------------------------------------------------------------
 #include <trg/gdl/modules/trggdlSummary/trggdlSummaryModule.h>
 
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
 
 #include <string.h>
-#include <unistd.h>
 
 
 using namespace Belle2;
@@ -33,11 +30,14 @@ TRGGDLSummaryModule::TRGGDLSummaryModule()
 
   setDescription("Fill experiment data to TRGSummary");
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("debugLevel", _debugLevel, "Debug Level", 0);
 
 }
 
 void TRGGDLSummaryModule::initialize()
 {
+
+  if (_debugLevel > 9) printf("TRGGDLSummaryModule::initialize() start\n");
 
   GDLResult.registerInDataStore();
   for (int i = 0; i < 320; i++) {
@@ -88,11 +88,13 @@ void TRGGDLSummaryModule::initialize()
   }
 
 
+  if (_debugLevel > 9) printf("TRGGDLSummaryModule::initialize() end\n");
 }
 
 void TRGGDLSummaryModule::event()
 {
 
+  if (_debugLevel > 9) printf("TRGGDLSummaryModule::event() start\n");
 
   int n_leafs = 0;
   n_leafs  = m_unpacker->getnLeafs();
@@ -103,8 +105,9 @@ void TRGGDLSummaryModule::event()
   int nword_input  = m_unpacker->get_nword_input();
   int nword_output = m_unpacker->get_nword_output();
 
-
-
+  if (_debugLevel > 89)
+    printf("trggdlSummaryModule:n_leafs(%d), n_leafsExtra(%d), n_clocks(%d), nconf(%d), nword_input(%d), nword_output(%d)\n",
+           n_leafs, n_leafsExtra, n_clocks, nconf, nword_input, nword_output);
 
   StoreArray<TRGGDLUnpackerStore> entAry;
   if (!entAry || !entAry.getEntries()) return;
@@ -114,6 +117,8 @@ void TRGGDLSummaryModule::event()
   for (int i = 0; i < 320; i++) {
     if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) clk_map = i;
   }
+  if (_debugLevel > 89)
+    printf("trggdlSummaryModule:clk_map(%d)\n", clk_map);
 
   std::vector<std::vector<int> > _data(n_leafs + n_leafsExtra);
   for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
@@ -123,14 +128,26 @@ void TRGGDLSummaryModule::event()
 
   // fill "bit vs clk" for the event
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
+    if (_debugLevel > 89)
+      printf("trggdlSummaryModule:a:ii(%d)\n", ii);
     std::vector<int*> Bits(n_leafs + n_leafsExtra);
     //set pointer
     for (int i = 0; i < 320; i++) {
       if (LeafBitMap[i] != -1) {
         Bits[LeafBitMap[i]] = &(entAry[ii]->m_unpacker[i]);
+        if (_debugLevel > 89)
+          printf("trggdlSummaryModule:ab:i(%d), LeafBitMap[i](%d), *Bits[LeafBitMap[i]](%d)\n",
+                 i, LeafBitMap[i], *Bits[LeafBitMap[i]]);
+      } else {
+        if (_debugLevel > 89)
+          printf("trggdlSummaryModule:ab:i(%d), LeafBitMap[i](%d)\n",
+                 i, LeafBitMap[i]);
       }
     }
     for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
+      if (_debugLevel > 89)
+        printf("trggdlSummaryModule:ad:leaf(%d),ii(%d),clk_map(%d),*Bits[leaf](%d), entAry[ii]->m_unpacker[clk_map](%d)\n",
+               leaf, ii, clk_map, *Bits[leaf], entAry[ii]->m_unpacker[clk_map]);
       _data[leaf][entAry[ii]->m_unpacker[clk_map]] =  *Bits[leaf];
     }
   }
@@ -140,11 +157,14 @@ void TRGGDLSummaryModule::event()
   unsigned ored = 0;
 
   for (int j = 0; j < (int)nword_input; j++) {
+    if (_debugLevel > 89) printf("b:j(%d),", j);
     ored = 0;
     for (int clk = 0; clk < n_clocks; clk++) {
+      if (_debugLevel > 89) printf("clk(%d),", clk);
       ored |= _data[ee_itd[j]][clk];
     }
     GDLResult->setInputBits(j, ored);
+    if (_debugLevel > 89) printf("\n");
   }
 
   if (nconf == 0) {

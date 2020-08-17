@@ -10,13 +10,8 @@
 
 #include "cdc/modules/cdcCalibrationCollector/CDCT0CalibrationCollector.h"
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/MeasuredStateOnPlane.h>
@@ -51,14 +46,12 @@ CDCT0CalibrationCollectorModule::~CDCT0CalibrationCollectorModule()
 
 void CDCT0CalibrationCollectorModule::prepare()
 {
-  StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
-  StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  RelationArray relRecoTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  m_Tracks.isRequired(m_trackArrayName);
+  m_RecoTracks.isRequired(m_recoTrackArrayName);
+  m_TrackFitResults.isRequired(m_trackFitResultArrayName);
+  m_CDCHits.isRequired(m_cdcHitArrayName);
+  RelationArray relRecoTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
   //Store names to speed up creation later
-  m_recoTrackArrayName = recoTracks.getName();
-  m_trackFitResultArrayName = storeTrackFitResults.getName();
   m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
   auto m_hNDF = new TH1D("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
@@ -96,19 +89,15 @@ void CDCT0CalibrationCollectorModule::prepare()
 
 void CDCT0CalibrationCollectorModule::collect()
 {
-  const StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  const StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  const StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  const StoreArray<Belle2::RecoTrack> recoTracks(m_recoTrackArrayName);
-  const RelationArray relTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  const RelationArray relTrackTrack(m_RecoTracks, m_Tracks, m_relRecoTrackTrackName);
 
   /* CDCHit distribution */
   //  make evt t0 in case we don't use evt t0
   double evtT0 = 0;
-  const int nTr = recoTracks.getEntries();
+  const int nTr = m_RecoTracks.getEntries();
 
   for (int i = 0; i < nTr; ++i) {
-    RecoTrack* track = recoTracks[i];
+    RecoTrack* track = m_RecoTracks[i];
     if (track->getDirtyFlag()) continue;
     if (!track->getTrackFitStatus()->isFitted()) continue;
     const genfit::FitStatus* fs = track->getTrackFitStatus();

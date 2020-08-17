@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # William Sutcliffe 2019
 # Mortz Gelb 2017
@@ -40,13 +39,13 @@ ma.fillParticleList(
     path=path)
 ma.reconstructDecay(
     'B+:sig_e -> gamma e+',
-    '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6',
+    '1.000 < M < 6.000 and cos(useRestFrame(daughterAngle(0, 1))) < 0.6',
     dmID=1,
     writeOut=True,
     path=path)
 ma.reconstructDecay(
     'B+:sig_mu -> gamma mu+',
-    '1.000 < M < 6.000 and useRestFrame(daughterAngle(0, 1)) < 0.6',
+    '1.000 < M < 6.000 and cos(useRestFrame(daughterAngle(0, 1))) < 0.6',
     dmID=2,
     writeOut=True,
     path=path)
@@ -73,13 +72,13 @@ path.add_module(skimfilter)
 # fei_tag = 'my_specFEI'
 
 # Here we use a prefix of an existing FEI training
-fei_tag = 'FEIv4_2019_MC12_release_03_01_01'
+fei_tag = 'FEIv4_2020_MC13_release_04_01_01'
 
 # Add the necessary database
 # b2.conditions.globaltags = ['name of database containing the specific training']
 
 # Here we use a generic FEI training to demonstrate applying the FEI in an ROE of the signal
-b2.conditions.globaltags = ['analysis_tools_release-04']
+b2.conditions.globaltags = ['analysis_tools_release-04-02']
 
 belle_particles = fei.get_default_channels(KLong=False,
                                            chargedB=True,

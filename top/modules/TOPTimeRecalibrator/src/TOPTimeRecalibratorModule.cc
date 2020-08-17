@@ -13,13 +13,10 @@
 #include <top/geometry/TOPGeometryPar.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 
@@ -60,6 +57,8 @@ namespace Belle2 {
              "if true, use module T0 calibration", true);
     addParam("useCommonT0Calibration", m_useCommonT0Calibration,
              "if true, use common T0 calibration", true);
+    addParam("useTimeWalkCalibration", m_useTimeWalkCalibration,
+             "if true, use time-walk calibration", true);
     addParam("subtractBunchTime", m_subtractBunchTime,
              "if true, subtract reconstructed bunch time", true);
 
@@ -120,6 +119,14 @@ namespace Belle2 {
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
+    if (m_useTimeWalkCalibration) {
+      if (not m_timeWalk.isValid()) {
+        // B2FATAL("Time-walk calibration requested but not available for run "
+        B2WARNING("Time-walk calibration is not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment());
+      }
+    }
 
     if (not m_feSetting.isValid()) {
       B2FATAL("Front-end settings are not available for run "
@@ -173,6 +180,11 @@ namespace Belle2 {
       double time = sampleTimes->getTime(window, rawTimeLeading) - timeOffset;
 
       // apply other calibrations
+      if (m_useTimeWalkCalibration and m_timeWalk.isValid()) {
+        if (m_timeWalk->isCalibrated()) {
+          time -= m_timeWalk->getTimeWalk(digit.getPulseHeight());
+        }
+      }
       if (m_useChannelT0Calibration) {
         const auto& cal = m_channelT0;
         if (cal->isCalibrated(moduleID, channel)) {

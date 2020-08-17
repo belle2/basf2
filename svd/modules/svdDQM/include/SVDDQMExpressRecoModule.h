@@ -18,6 +18,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 #include <vector>
 #include "TList.h"
 #include "TH1F.h"
@@ -32,8 +33,12 @@ namespace Belle2 {
 
     /** Constructor */
     SVDDQMExpressRecoModule();
+    /** Copy constructor (disabled) */
+    SVDDQMExpressRecoModule(const SVDDQMExpressRecoModule&) = delete;
     /* Destructor */
     virtual ~SVDDQMExpressRecoModule();
+    /** Operator = (disabled) */
+    SVDDQMExpressRecoModule& operator=(const SVDDQMExpressRecoModule&) = delete;
 
     /** Module function initialize */
     void initialize() override final;
@@ -51,6 +56,13 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
+
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
+    /** if TRUE: svdTime back in SVD time reference*/
+    bool m_desynchSVDTime = false;
+
+    /** parameter to change the range of the time histograms*/
+    bool m_isSVDTimeCalibrated = false;
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;

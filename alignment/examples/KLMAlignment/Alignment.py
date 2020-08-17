@@ -7,7 +7,7 @@ import sys
 import basf2
 import ROOT
 from ROOT import Belle2
-from ROOT.Belle2 import KLMChannelIndex, KLMElementNumbers, EKLMElementNumbers
+from ROOT.Belle2 import KLMChannelIndex, KLMElementNumbers
 import numpy as np
 from alignment import MillepedeCalibration
 
@@ -53,7 +53,7 @@ while (index != index2.endEKLM()):
 
 # Execute the algorithm over all collected data (auto-merged).
 input_files = sys.argv[1:]
-calibration = millepede.create('eklm_alignment', input_files)
+calibration = millepede.create('klm_alignment', input_files)
 millepede.algo.setInputFileNames(input_files)
 millepede.algo.ignoreUndeterminedParams(True)
 millepede.algo.invertSign()

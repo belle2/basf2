@@ -230,9 +230,12 @@ void DisplayModule::event()
   }
 
   if (m_showTriggerObjects) {
-    StoreArray<CDCTriggerSegmentHit> tshits;
-    for (auto& hit : tshits)
-      m_visualizer->addCDCTriggerSegmentHit(&hit);
+    const auto arrayList = StoreArray<CDCTriggerSegmentHit>::getArrayList();
+    for (const auto& i : arrayList) {
+      StoreArray<CDCTriggerSegmentHit> tshits(i);
+      for (auto& hit : tshits)
+        m_visualizer->addCDCTriggerSegmentHit(i, &hit);
+    }
 
     //add all possible track candidate arrays
     const auto trgTrackArrays = StoreArray<CDCTriggerTrack>::getArrayList();

@@ -106,7 +106,7 @@ def configure_logging_for_tests(user_replacements=None):
 
         * the current working directory in log messaged with ``${cwd}``
         * the current default globaltags with ``${default_globaltag}``
-        * the contents of the following environment varibles with their name
+        * the contents of the following environment variables with their name
           (or the listed replacement string):
 
             - :envvar:`BELLE2_TOOLS`
@@ -135,11 +135,11 @@ def configure_logging_for_tests(user_replacements=None):
         basf2.logging.set_info(level, basf2.LogInfo.LEVEL | basf2.LogInfo.MESSAGE)
 
     # now create dictionary of string replacements. Since each key can only be
-    # present once oder is kind of important so the less portable ones like
+    # present once order is kind of important so the less portable ones like
     # current directory should go first and might be overridden if for example
     # the BELLE2_LOCAL_DIR is identical to the current working directory
     replacements = OrderedDict()
-    replacements[",".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
+    replacements[", ".join(basf2.conditions.default_globaltags)] = "${default_globaltag}"
     # Let's be lazy and take the environment variables from the docstring so we don't have to repeat them here
     for env_name, replacement in re.findall(":envvar:`(.*?)`(?:.*``(.*?)``)?", configure_logging_for_tests.__doc__):
         if not replacement:
@@ -155,7 +155,7 @@ def configure_logging_for_tests(user_replacements=None):
 
 @contextmanager
 def working_directory(path):
-    """temprarily change the working directory to path
+    """temporarily change the working directory to path
 
     >>> with working_directory("testing"):
     >>>     # now in subdirectory "./testing/"
@@ -235,8 +235,8 @@ def safe_process(*args, **kwargs):
 
 
 def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=None):
-    """Calls the `tool` with argument `package` and check that the output is
-    error-free. Optionally `filter` the output in case of error messages that
+    """Calls the ``tool`` with argument ``package`` and check that the output is
+    error-free. Optionally ``filter`` the output in case of error messages that
     can be ignored.
 
     In case there is some output left, then prints the error message and exits
@@ -264,22 +264,27 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
     if "BELLE2_LOCAL_DIR" not in os.environ:
         skip_test("No local release is setup")
 
+    args = [tool]
+    if toolopts:
+        args += toolopts
+    if package is not None:
+        args += [package]
+
     with local_software_directory():
         try:
-            output = subprocess.check_output(
-                [tool] + toolopts + [package] if toolopts else [tool, package],
-                encoding="utf8")
+            output = subprocess.check_output(args, encoding="utf8")
         except subprocess.CalledProcessError as error:
             print(error)
             output = error.output
 
     clean_log = [e for e in output.splitlines() if e and not filter(e)]
     if len(clean_log) > 0:
+        subject = f"{package} package" if package is not None else "repository"
         print(f"""\
-The {package} package has some {toolname} issues, which is now not allowed.
+The {subject} has some {toolname} issues, which is now not allowed.
 Please run:
 
-  $ {tool} {package}
+  $ {" ".join(args)}
 
 and fix any issues you have introduced. Here is what {toolname} found:\n""")
         print("\n".join(clean_log))

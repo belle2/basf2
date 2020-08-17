@@ -6,6 +6,6 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::CalibrationAlgorithm-;
-#pragma link C++ class Belle2::DBObjCalibrationConstMapBase+;
+#pragma link C++ class Belle2::DBObjCalibrationConstMapBase+; // checksum=0x8a075f5f, version=1
 
 #endif

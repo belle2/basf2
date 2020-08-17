@@ -37,26 +37,43 @@ namespace Belle2 {
        */
       QcsmonitorDigitizerModule();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~QcsmonitorDigitizerModule();
 
-      /**  */
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
 
-      /**  */
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
 
-      /**  */
+      /**
+       * Event processor.
+       */
       virtual void event() override;
 
-      /**  */
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
-      /**  */
+
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
 
     private:
-      StoreArray<QcsmonitorHit> m_qcsmonitorHit; /** Array for QcsmonitorHit */
+      StoreArray<QcsmonitorHit> m_qcsmonitorHit; /**< Array for QcsmonitorHit */
 
       /** reads data from QCSMONITOR.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

@@ -31,50 +31,50 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0.
      */
-    EventKinematics() :  m_missingMomentum(0.0, 0.0, 0.0), m_missingMomentumCMS(0.0, 0.0, 0.0),
-      m_missingEnergyCMS(0.0), m_missingMass2(0.0), m_visibleEnergyCMS(0.0), m_photonsEnergy(0.0) {};
+    EventKinematics(bool builtFromMC = false) :  m_missingMomentum(0.0, 0.0, 0.0), m_missingMomentumCMS(0.0, 0.0, 0.0),
+      m_missingEnergyCMS(0.0), m_missingMass2(0.0), m_visibleEnergyCMS(0.0), m_photonsEnergy(0.0), m_builtFromMC(builtFromMC) {};
 
     // setters
 
     /**
      * Add the missing momentum vector in lab.
      *
-     * @param TVector3 missing momentum
+     * @param missingMomentum missing momentum vector
      */
     void addMissingMomentum(const TVector3& missingMomentum);
 
     /**
      * Add the missing momentum vector in CMS.
      *
-     * @param TVector3 missing momentum
+     * @param missingMomentumCMS missing momentum vector
      */
     void addMissingMomentumCMS(const TVector3& missingMomentumCMS);
 
     /**
      * Add missing energy in CMS.
      *
-     * @param Float missing energy
+     * @param missingEnergyCMS missing energy
      */
     void addMissingEnergyCMS(float missingEnergyCMS);
 
     /**
      * Add missing mass squared.
      *
-     * @param Float missing mass squared
+     * @param missingMass2 missing mass squared
      */
     void addMissingMass2(float missingMass2);
 
     /**
      * Add visible energy of the event in CMS.
      *
-     * @param Float visible energy
+     * @param visibleEnergyCMS visible energy
      */
     void addVisibleEnergyCMS(float visibleEnergyCMS);
 
     /**
      * Add total energy of photons in the event.
      *
-     * @param Float visible energy
+     * @param totalPhotonsEnergy total photon energy
      */
     void addTotalPhotonsEnergy(float totalPhotonsEnergy);
 
@@ -156,7 +156,8 @@ namespace Belle2 {
 
     float m_photonsEnergy; /**< Total energy of photons in lab */
 
-    ClassDef(EventKinematics, 1) /**< class definition */
+    bool m_builtFromMC; /**< Is from MC switch */
+    ClassDef(EventKinematics, 2) /**< class definition */
 
   };
 

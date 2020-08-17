@@ -89,7 +89,7 @@ namespace Belle2 {
      * Private helper function which calls the estimateFlightLengthUsingSeedInformation
      * and computes the flight time correctly.
      */
-    double estimateTimeSeedUsingSeedInformation(RecoTrack& recoTrack, const Const::ChargedStable& particleHypothesis) const;
+    double estimateTimeSeedUsingSeedInformation(const RecoTrack& recoTrack, const Const::ChargedStable& particleHypothesis) const;
 
     /// Overload this function to implement a specific extrapolation mechanism for fitted tracks. The measured state is afterwards used for a momentum calculation.
     virtual double estimateFlightLengthUsingFittedInformation(genfit::MeasuredStateOnPlane& measuredStateOnPlane) const = 0;

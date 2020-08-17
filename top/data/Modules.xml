@@ -170,13 +170,13 @@
     <Thicknes3 desc="glue thicknes quartz-mirror section" unit="mm">0.05</Thicknes3>
   </Glue>
   
-  <Surface name="QuartzSurface">
+  <Surface name="QuartzSurface_17" descr="slot1">
     <Properties>
       <Property name="REFLECTIVITY" unit="eV">
-        <value energy="1.0">0.99984</value>
-        <value energy="2.0">0.99984</value>
-        <value energy="3.0">0.99984</value>
-        <value energy="4.0">0.99984</value>
+        <value energy="1.0">0.99922</value>
+        <value energy="2.0">0.99922</value>
+        <value energy="3.0">0.99922</value>
+        <value energy="4.0">0.99922</value>
       </Property>
       <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
       <Property name="SPECULARLOBECONSTANT" unit="eV">
@@ -202,4 +202,500 @@
     <Finish>ground</Finish>
     <Model>unified</Model>
   </Surface>
+
+  <Surface name="QuartzSurface_16" descr="slot2">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99906</value>
+        <value energy="2.0">0.99906</value>
+        <value energy="3.0">0.99906</value>
+        <value energy="4.0">0.99906</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_11" descr="slot3">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99875</value>
+        <value energy="2.0">0.99875</value>
+        <value energy="3.0">0.99875</value>
+        <value energy="4.0">0.99875</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_12" descr="slot4">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99905</value>
+        <value energy="2.0">0.99905</value>
+        <value energy="3.0">0.99905</value>
+        <value energy="4.0">0.99905</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_15" descr="slot5">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99914</value>
+        <value energy="2.0">0.99914</value>
+        <value energy="3.0">0.99914</value>
+        <value energy="4.0">0.99914</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_2" descr="slot6">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99909</value>
+        <value energy="2.0">0.99909</value>
+        <value energy="3.0">0.99909</value>
+        <value energy="4.0">0.99909</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_14" descr="slot7">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99898</value>
+        <value energy="2.0">0.99898</value>
+        <value energy="3.0">0.99898</value>
+        <value energy="4.0">0.99898</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_7" descr="slot8">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99881</value>
+        <value energy="2.0">0.99881</value>
+        <value energy="3.0">0.99881</value>
+        <value energy="4.0">0.99881</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_5" descr="slot9">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99917</value>
+        <value energy="2.0">0.99917</value>
+        <value energy="3.0">0.99917</value>
+        <value energy="4.0">0.99917</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_13" descr="slot10">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99893</value>
+        <value energy="2.0">0.99893</value>
+        <value energy="3.0">0.99893</value>
+        <value energy="4.0">0.99893</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_8" descr="slot11">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99897</value>
+        <value energy="2.0">0.99897</value>
+        <value energy="3.0">0.99897</value>
+        <value energy="4.0">0.99897</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_6" descr="slot12">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99886</value>
+        <value energy="2.0">0.99886</value>
+        <value energy="3.0">0.99886</value>
+        <value energy="4.0">0.99886</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_9" descr="slot13">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99899</value>
+        <value energy="2.0">0.99899</value>
+        <value energy="3.0">0.99899</value>
+        <value energy="4.0">0.99899</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_4" descr="slot14">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99921</value>
+        <value energy="2.0">0.99921</value>
+        <value energy="3.0">0.99921</value>
+        <value energy="4.0">0.99921</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_3" descr="slot15">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99892</value>
+        <value energy="2.0">0.99892</value>
+        <value energy="3.0">0.99892</value>
+        <value energy="4.0">0.99892</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
+  <Surface name="QuartzSurface_10" descr="slot16">
+    <Properties>
+      <Property name="REFLECTIVITY" unit="eV">
+        <value energy="1.0">0.99907</value>
+        <value energy="2.0">0.99907</value>
+        <value energy="3.0">0.99907</value>
+        <value energy="4.0">0.99907</value>
+      </Property>
+      <!-- SPECULARLOBECONSTANT, SPECULARSPIKECONSTANT, Diffuse lobe constant (implicitly calculated), and BACKSCATTERCONSTANT must sum to unity-->
+      <Property name="SPECULARLOBECONSTANT" unit="eV">
+        <value energy="1.0">1.0</value>
+        <value energy="2.0">1.0</value>
+        <value energy="3.0">1.0</value>
+        <value energy="4.0">1.0</value>
+      </Property>
+      <Property name="SPECULARSPIKECONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+      <Property name="BACKSCATTERCONSTANT" unit="eV">
+        <value energy="1.0">0.0</value>
+        <value energy="2.0">0.0</value>
+        <value energy="3.0">0.0</value>
+        <value energy="4.0">0.0</value>
+      </Property>
+    </Properties>
+    <Type>dielectric_dielectric</Type>
+    <Finish>ground</Finish>
+    <Model>unified</Model>
+  </Surface>
+
 </Modules>

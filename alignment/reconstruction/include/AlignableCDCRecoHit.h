@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALIGNABLECDCRECOHIT_H
-#define ALIGNABLECDCRECOHIT_H
+#pragma once
 
 #include <cdc/dataobjects/CDCRecoHit.h>
 
@@ -85,4 +84,3 @@ namespace Belle2 {
     ClassDefOverride(AlignableCDCRecoHit, 1);
   };
 }
-#endif

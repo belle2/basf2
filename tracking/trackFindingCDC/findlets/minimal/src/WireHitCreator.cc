@@ -138,7 +138,7 @@ void WireHitCreator::initialize()
   }
 
   if (not m_param_useSuperLayers.empty()) {
-    for (const ISuperLayer& iSL : m_param_useSuperLayers) {
+    for (const ISuperLayer iSL : m_param_useSuperLayers) {
       m_useSuperLayers.at(iSL) = true;
     }
   } else {

@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <math.h>
 #include <TVector3.h>
 #include <framework/gearbox/Const.h>
 

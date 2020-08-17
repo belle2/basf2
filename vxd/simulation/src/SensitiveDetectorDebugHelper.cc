@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <vxd/simulation/SensitiveDetectorDebugHelper.h>
-#include <vxd/dataobjects/VXDElectronDeposit.h>
 #include <framework/gearbox/Unit.h>
 #include <cassert>
 
@@ -60,7 +59,7 @@ namespace Belle2 {
 
       //add all steps if there is enough space
       assert(traversal.size() <= MAX_STEPS);
-      for (const StepInformation & step : traversal) {
+      for (const StepInformation& step : traversal) {
         m_info.stepInfo[m_info.stepN + 0] = step.position.x();
         m_info.stepInfo[m_info.stepN + 1] = step.position.y();
         m_info.stepInfo[m_info.stepN + 2] = step.position.z();

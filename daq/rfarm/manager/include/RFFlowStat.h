@@ -10,7 +10,6 @@
 //-
 
 #include <sys/time.h>
-#include <stdlib.h>
 
 #include "framework/pcore/RingBuffer.h"
 #include "daq/rfarm/manager/RFSharedMem.h"

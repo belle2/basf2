@@ -33,7 +33,7 @@ namespace Belle2 {
       /** Shape of the fitted function. */
       std::vector<long long> fit;
       /** Chi^2 from the fit */
-      int chi2;
+      unsigned long long chi2;
     } ECLShapeFit;
 
     /**

@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
+# std
 import pprint
+from typing import Optional, List
+
 
 pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 
 
+# todo: this could be implemented so so so much easier and also it has triple
+#  docstrings for everything
 class RootObject:
 
     """!
@@ -31,9 +36,21 @@ class RootObject:
         or not
     """
 
-    def __init__(self, revision, package, rootfile, key, root_object,
-                 root_object_type, date, description, check, contact,
-                 metaoptions, is_reference):
+    def __init__(
+            self,
+            revision: str,
+            package: str,
+            rootfile: str,
+            key: str,
+            root_object,
+            root_object_type: str,
+            date: Optional[int],
+            description: str,
+            check: str,
+            contact: str,
+            metaoptions: List[str],
+            is_reference: bool,
+    ):
         """!
         The constructor. Sets the element up and store the information in a
         dict, but also sets up object variables for simplified access.

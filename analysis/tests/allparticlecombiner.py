@@ -6,7 +6,7 @@ import basf2
 import b2test_utils
 import modularAnalysis as ma
 from variables import variables
-from vertex import KFit
+from vertex import kFit
 from ROOT import Belle2
 from ROOT import TFile
 from ROOT import TNtuple
@@ -41,7 +41,7 @@ class TestAllParticleCombiner(unittest.TestCase):
 
         ma.combineAllParticles(['pi+:fromPV'], 'vpho:PVFit', path=main)
 
-        KFit('vpho:PVFit', conf_level=-1, fit_type='vertex', constraint='iptube', path=main)
+        kFit('vpho:PVFit', conf_level=-1, fit_type='vertex', constraint='iptube', path=main)
 
         variables.addAlias('PVX', 'x')
         variables.addAlias('PVY', 'y')

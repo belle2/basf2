@@ -18,7 +18,7 @@ Python Interface
   automate a code quality (or indeed any) tool check. It requires
   execution without any output as part of the unit tests. For example the
   analysis package now requires no doxygen or cppcheck warnings.
-* Additional utility function `b2test_utils.configure_logging_for_rests` to
+* Additional utility function `b2test_utils.configure_logging_for_tests` to
   improve reproducibility of log output for testing purposes by replacing
   certain setup dependent names of directories with placeholders.
 * The `Pager <terminal_utils.Pager>` class has been moved to a new module

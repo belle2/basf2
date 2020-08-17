@@ -33,9 +33,6 @@ SVDCoGTimeEstimatorModule::SVDCoGTimeEstimatorModule() : Module()
            "ShaperDigits collection name", string(""));
   addParam("RecoDigits", m_storeRecoDigitsName,
            "RecoDigits collection name", string(""));
-  addParam("FixedTimeError", m_FixedTimeError, "Fixed error on the estimated time, corresponding to the Width of the 3rd time shift",
-           float(6.0));
-
   addParam("StripPeakTimeCorrection", m_corrPeakTime,
            "Correct for the different peaking times of the strips, obtained from local run calibration", true);
   addParam("CalibrationWithEventT0", m_calEventT0,
@@ -161,9 +158,12 @@ void SVDCoGTimeEstimatorModule::event()
     m_weightedMeanTime = CalculateWeightedMeanPeakTime(samples_vec);
     if (m_StopCreationReco)
       continue;
-    m_weightedMeanTimeError = CalculateWeightedMeanPeakTimeError();
     m_amplitude = CalculateAmplitude(samples_vec);
     m_amplitudeError = CalculateAmplitudeError(thisSensorID, thisSide, thisCellID);
+
+    //need the amplitudeError in ADC as the noise of the strip to computer the error on time
+    m_weightedMeanTimeError = CalculateWeightedMeanPeakTimeError(samples_vec);
+
     m_chi2 = CalculateChi2();
 
     //check too high ADC
@@ -179,8 +179,11 @@ void SVDCoGTimeEstimatorModule::event()
       m_weightedMeanTime -= m_PulseShapeCal.getPeakTime(thisSensorID, thisSide, thisCellID);
     SVDModeByte::baseType triggerBin = modeByte.getTriggerBin();
 
-    if (m_calEventT0)
+    if (m_calEventT0) {
       m_weightedMeanTime = m_TimeCal.getCorrectedTime(thisSensorID, thisSide, thisCellID, m_weightedMeanTime, triggerBin);
+      m_weightedMeanTimeError = m_TimeCal.getCorrectedTimeError(thisSensorID, thisSide, thisCellID, m_weightedMeanTime,
+                                                                m_weightedMeanTimeError, triggerBin);
+    }
 
     //check high charges and too high ADC
     if (m_amplitude > 100000) {
@@ -196,7 +199,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     //recording of the RecoDigit
     m_storeReco.appendNew(SVDRecoDigit(shaper.getSensorID(), shaper.isUStrip(), shaper.getCellID(), m_amplitude, m_amplitudeError,
-                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2, modeByte));
+                                       m_weightedMeanTime, m_weightedMeanTimeError, probabilities, m_chi2));
 
     //Add digit to the RecoDigit->ShaperDigit relation list
     int recoDigitIndex = m_storeReco.getEntries() - 1;
@@ -261,11 +264,11 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaper
   }
   if (sumAmplitudes != 0) {
     averagetime /= (sumAmplitudes);
-    averagetime *= DeltaT;
+    averagetime *= m_DeltaT;
   } else {
     averagetime = -1;
     m_StopCreationReco = true;
-    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is NULL! Skipping this SVDShaperDigit!");
+    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
   }
 
   return averagetime;
@@ -283,9 +286,24 @@ float SVDCoGTimeEstimatorModule::CalculateAmplitude(Belle2::SVDShaperDigit::APVF
   return amplitude;
 }
 
-float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError()
+float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples)
 {
-  return m_FixedTimeError;
+
+  //assuming that noise of the samples are totally UNcorrelated
+  //in MC this hypothesis is correct
+
+  //sum of samples amplitudes
+  float Atot = 0;
+  //sum of time residuals squared
+  float tmpResSq = 0;
+
+  for (int k = 0; k < m_NumberOfAPVSamples; k ++) {
+    Atot  += samples[k];
+    tmpResSq += TMath::Power(k * m_DeltaT - m_weightedMeanTime, 2);
+  }
+
+  return m_amplitudeError / Atot * TMath::Sqrt(tmpResSq);
+
 }
 
 float SVDCoGTimeEstimatorModule::CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID)

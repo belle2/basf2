@@ -15,10 +15,10 @@
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vector>
+#include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/Track.h>
+#include <svd/dataobjects/SVDEventInfo.h>
+#include <framework/dataobjects/EventT0.h>
 #include "TList.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -32,8 +32,12 @@ namespace Belle2 {
 
     /** Constructor */
     SVDDQMClustersOnTrackModule();
+    /** Copy constructor (disabled) */
+    SVDDQMClustersOnTrackModule(const SVDDQMClustersOnTrackModule&) = delete;
     /* Destructor */
     virtual ~SVDDQMClustersOnTrackModule();
+    /** Operator = (disabled) */
+    SVDDQMClustersOnTrackModule& operator=(const SVDDQMClustersOnTrackModule&) = delete;
 
     /** Module function initialize */
     void initialize() override final;
@@ -49,10 +53,25 @@ namespace Belle2 {
 
   private:
 
+    /** if TRUE: svdTime back in SVD time reference*/
+    bool m_desynchSVDTime = false;
+
+    /** parameter to change the range of the time histograms*/
+    bool m_isSVDTimeCalibrated = false;
+
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
+    StoreObjPtr<EventT0> m_eventT0 ;  /**< EventT0 data object */
+
+    /** StoreArray of the Tracks*/
+    StoreArray<Track> m_storeTracks;
+
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
+
     /** if true skip events rejected by HLT (default)*/
     bool m_skipRejectedEvents = true;
+
+    int m_tb = -1; /**< choose one trigger bin, or none if the value is -1*/
 
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;
@@ -88,6 +107,10 @@ namespace Belle2 {
     /** v MaxBin of strips related to tracks for all sensors*/
     TH1F* m_stripMaxBinVAll = nullptr;
 
+    /** u Time of clusters related to tracks vs EventT0 */
+    TH2F* m_clsTrkTimeUEvtT0 = nullptr;
+    /** v Time of clusters related to tracks vs EventT0 */
+    TH2F* m_clsTrkTimeVEvtT0 = nullptr;
     /** u Time of clusters related to tracks for layer 3 sensors */
     TH1F* m_clsTrkTimeU3 = nullptr;
     /** v Time of clusters related to tracks for layer 3  sensors */

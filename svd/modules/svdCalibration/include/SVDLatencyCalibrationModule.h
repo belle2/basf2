@@ -18,15 +18,8 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 
 #include <string>
-#include <TTree.h>
 #include <TFile.h>
 #include <TH1F.h>
-#include <TList.h>
-
-// forward declarations
-class TTree;
-class TFile;
-
 
 namespace Belle2 {
   /**

@@ -24,8 +24,20 @@ namespace Belle2 {
     /** The creator for the PINDIODE geometry. */
     class PindiodeCreator : public geometry::CreatorBase {
     public:
+      /**
+       * Constructor
+       */
       PindiodeCreator();
+      /**
+       * Destructor
+       */
       virtual ~PindiodeCreator();
+      /**
+       * Creation of the detector geometry from Gearbox (XML).
+       * @param[in] content   XML data directory.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
+       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
       /**  SensitiveDetector PINDIODE */

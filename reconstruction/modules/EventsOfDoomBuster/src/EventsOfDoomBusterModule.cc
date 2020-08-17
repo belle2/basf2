@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <reconstruction/modules/EventsOfDoomBuster/EventsOfDoomBusterModule.h>
 
-#include <framework/logging/LogMethod.h>
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 
@@ -54,21 +54,21 @@ void EventsOfDoomBusterModule::event()
   const bool doomSVD = nSVDShaperDigits > m_nSVDShaperDigitsMax;
 
   if (doomCDC) {
-    B2WARNING("Skip event --> Too much occupancy for reco!" <<
-              LogVar("event", m_eventInfo->getEvent()) <<
-              LogVar("run", m_eventInfo->getRun()) <<
-              LogVar("exp", m_eventInfo->getExperiment()) <<
-              LogVar("nCDCHits", nCDCHits) <<
-              LogVar("nCDCHitsMax", m_nCDCHitsMax));
+    B2ERROR("Skip event --> Too much occupancy for reco!" <<
+            LogVar("event", m_eventInfo->getEvent()) <<
+            LogVar("run", m_eventInfo->getRun()) <<
+            LogVar("exp", m_eventInfo->getExperiment()) <<
+            LogVar("nCDCHits", nCDCHits) <<
+            LogVar("nCDCHitsMax", m_nCDCHitsMax));
   }
 
   if (doomSVD) {
-    B2WARNING("Skip event --> Too much occupancy for reco!" <<
-              LogVar("event", m_eventInfo->getEvent()) <<
-              LogVar("run", m_eventInfo->getRun()) <<
-              LogVar("exp", m_eventInfo->getExperiment()) <<
-              LogVar("nSVDShaperDigits", nSVDShaperDigits) <<
-              LogVar("nSVDShaperDigitsMax", m_nSVDShaperDigitsMax));
+    B2ERROR("Skip event --> Too much occupancy for reco!" <<
+            LogVar("event", m_eventInfo->getEvent()) <<
+            LogVar("run", m_eventInfo->getRun()) <<
+            LogVar("exp", m_eventInfo->getExperiment()) <<
+            LogVar("nSVDShaperDigits", nSVDShaperDigits) <<
+            LogVar("nSVDShaperDigitsMax", m_nSVDShaperDigitsMax));
   }
 
   setReturnValue(doomCDC or doomSVD);

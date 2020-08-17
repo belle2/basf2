@@ -1,20 +1,10 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <unistd.h>
-#include <sys/types.h>
-
 #include <daq/slc/runcontrol/RCCallback.h>
 
 #include <daq/slc/base/ConfigFile.h>
-#include <daq/slc/base/StringUtil.h>
 
 #include "daq/dqm/DqmMemFile.h"
-#include "TH1.h"
-#include "TFile.h"
-#include "TMemFile.h"
 
 namespace Belle2 {
 

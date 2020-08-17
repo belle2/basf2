@@ -61,7 +61,10 @@ namespace Belle2 {
     //! Line in the Canvas to guide the eye
     TLine* m_line2 = nullptr;
     //! Line in the Canvas to guide the eye
-    TLine* m_line3 = nullptr;
+//     TLine* m_line3 = nullptr;
+
+    /** Monitoring Object */
+    MonitoringObject* m_monObj {};
 
 #ifdef _BELLE2_EPICS
     //! epics PVs

@@ -36,7 +36,7 @@ namespace {
       // have some useful defaults for the beam parameters
       beamparams.setHER(7.004, 0.0415, {2.63169e-05, 1e-5, 1e-5});
       beamparams.setLER(4.002, -0.0415, {5.64063e-06, 1e-5, 1e-5});
-      beamparams.setVertex({0, 0, 0}, {4.10916e-07, 0, -2.64802e-06, 0, 1.7405e-11, 0, -2.64802e-06, 0, 0.000237962});
+      beamparams.setVertex({0, 1, 2}, {4.10916e-07, 0, -2.64802e-06, 0, 1.7405e-11, 0, -2.64802e-06, 0, 0.000237962});
     }
 
     /** reset datastore and dbstore */
@@ -207,5 +207,62 @@ namespace {
         last = initial;
       }
     }
+  }
+
+  /** Test the functionality of the valid flag. */
+  TEST_F(InitialParticleGenerationTests, TestValidFlag)
+  {
+    beamparams.setGenerationFlags(0);
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
+
+    MCInitialParticles& initial = generator.generate();
+    TLorentzVector her = initial.getHER();
+    TLorentzVector ler = initial.getLER();
+    TVector3 vertex = initial.getVertex();
+    for (int i = 0; i < 10; ++i) {
+      initial = generator.generate();
+      EXPECT_EQ(her, initial.getHER());
+      EXPECT_EQ(ler, initial.getLER());
+      EXPECT_EQ(vertex, initial.getVertex());
+    }
+    beamparams.setGenerationFlags(BeamParameters::c_smearALL);
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
+    for (int i = 0; i < 10; ++i) {
+      initial = generator.generate();
+      EXPECT_NE(her, initial.getHER());
+      EXPECT_NE(ler, initial.getLER());
+      EXPECT_NE(vertex, initial.getVertex());
+      her = initial.getHER();
+      ler = initial.getLER();
+      vertex = initial.getVertex();
+    }
+  }
+
+  TEST_F(InitialParticleGenerationTests, UpdateVertex)
+  {
+    beamparams.setGenerationFlags(BeamParameters::c_smearBeam);
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
+    // first run but no smearing allowed, should return the nominal vertex
+    TVector3 shift = generator.updateVertex();
+    EXPECT_EQ(shift, TVector3(0, 1, 2));
+    // create a new initial particle. Particle exists now, no smearing allowed so no change in shift
+    MCInitialParticles& initial = generator.generate();
+    auto nominal = initial.getVertex();
+    shift = generator.updateVertex();
+    EXPECT_EQ(shift, TVector3(0, 0, 0));
+    // ok, allow smearing, now we expect shift
+    beamparams.setGenerationFlags(BeamParameters::c_smearALL);
+    DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
+    shift = generator.updateVertex();
+    EXPECT_NE(shift, TVector3(0, 0, 0));
+    EXPECT_EQ(nominal + shift, initial.getVertex());
+    // but running again should not shift again
+    shift = generator.updateVertex();
+    EXPECT_EQ(shift, TVector3(0, 0, 0));
+    // unless we force regeneration
+    auto previous = initial.getVertex();
+    shift = generator.updateVertex(true);
+    EXPECT_NE(shift, TVector3(0, 0, 0));
+    EXPECT_EQ(previous + shift, initial.getVertex());
   }
 }

@@ -251,41 +251,108 @@ def peel_event_level_tracking_info(event_level_tracking_info, key="{part_name}")
     if not event_level_tracking_info:
         return dict(
             has_vxdtf2_failure_flag=False,
+            has_svdckf_failure_flag=False,
+            has_pxdckf_failure_flag=False,
             has_unspecified_trackfinding_failure=False,
         )
     return dict(has_vxdtf2_failure_flag=event_level_tracking_info.hasVXDTF2AbortionFlag(),
+                has_svdckf_failure_flag=event_level_tracking_info.hasSVDCKFAbortionFlag(),
+                has_pxdckf_failure_flag=event_level_tracking_info.hasPXDCKFAbortionFlag(),
                 has_unspecified_trackfinding_failure=event_level_tracking_info.hasUnspecifiedTrackFindingFailure(),
                 )
 
-#: create a dictionary from RecoTrack's and its related SPTrackCand's quality indicators
 
+#: create a dictionary from RecoTrack's and its related SPTrackCand's quality indicator
 
 @format_crop_keys
 def peel_quality_indicators(reco_track, key="{part_name}"):
     nan = float("nan")
 
     svd_qi = nan
-    space_point_track_cand = reco_track.getRelated('SPTrackCands')
+    cdc_qi = nan
+    qi = nan
 
-    if not space_point_track_cand:
-        svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
-        if svd_cdc_track_cand:
-            svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
+    if reco_track:
+        qi = reco_track.getQualityIndicator()
+        space_point_track_cand = reco_track.getRelated('SPTrackCands')
+
+        # adjust relations if SVD->CDC CKF enabled
+        if not space_point_track_cand:
+            svd_track_cand = reco_track.getRelated('SVDRecoTracks')
+            if not svd_track_cand:
+                svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
+                if svd_cdc_track_cand:
+                    svd_track_cand = svd_cdc_track_cand.getRelated('SVDRecoTracks')
+                    if not svd_track_cand:
+                        temp_svd_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
+                        if temp_svd_track_cand:
+                            svd_track_cand = temp_svd_track_cand.getRelated('SVDRecoTracks')
             if svd_track_cand:
                 space_point_track_cand = svd_track_cand.getRelated('SPTrackCands')
 
-    if space_point_track_cand:
-        svd_qi = space_point_track_cand.getQualityIndicator()
+        if space_point_track_cand:
+            svd_qi = space_point_track_cand.getQualityIndicator()
+
+        cdc_track_cand = reco_track.getRelated('CDCRecoTracks')
+        if not cdc_track_cand:
+            svd_cdc_track_cand = reco_track.getRelated('SVDCDCRecoTracks')
+            if svd_cdc_track_cand:
+                cdc_track_cand = svd_cdc_track_cand.getRelated('CDCRecoTracks')
+                if not cdc_track_cand:
+                    cdc_track_cand = svd_cdc_track_cand.getRelated('CKFCDCRecoTracks')
+                if not cdc_track_cand:
+                    temp_cdc_track_cand = svd_cdc_track_cand.getRelated('SVDPlusCDCStandaloneRecoTracks')
+                    if temp_cdc_track_cand:
+                        cdc_track_cand = temp_cdc_track_cand.getRelated('CDCRecoTracks')
+
+        if cdc_track_cand:
+            cdc_qi = cdc_track_cand.getQualityIndicator()
 
     crops = dict(
-        quality_indicator=reco_track.getQualityIndicator(),
+        quality_indicator=qi,
         svd_quality_indicator=svd_qi,
+        cdc_qualityindicator=cdc_qi,
     )
 
     return crops
 
-#: create a dictionary from RecoTrack fit status
 
+#: create a dictionary that shows used trackfinders
+
+@format_crop_keys
+def peel_trackfinder(reco_track, key="{part_name}"):
+    used_CDCTrackFinder = False
+    used_VXDTrackFinder = False
+    used_SVDtoCDCCKF = False
+    used_ECLtoCDCCKF = False
+    used_CDCtoSVDCKF = False
+
+    if reco_track:
+        if reco_track.getNumberOfSVDHits() > 0:
+            info = get_reco_hit_information(reco_track, reco_track.getSVDHitList()[0])
+            svd_tf = info.getFoundByTrackFinder()
+            used_VXDTrackFinder = svd_tf == Belle2.RecoHitInformation.c_VXDTrackFinder
+            used_CDCtoSVDCKF = svd_tf == Belle2.RecoHitInformation.c_CDCtoSVDCKF
+
+        if reco_track.getNumberOfCDCHits() > 0:
+            info = get_reco_hit_information(reco_track, reco_track.getCDCHitList()[0])
+            cdc_tf = info.getFoundByTrackFinder()
+            used_CDCTrackFinder = cdc_tf == Belle2.RecoHitInformation.c_CDCTrackFinder
+            used_SVDtoCDCCKF = cdc_tf == Belle2.RecoHitInformation.c_SVDtoCDCCKF
+            used_ECLtoCDCCKF = cdc_tf == Belle2.RecoHitInformation.c_ECLtoCDCCKF
+
+    crops = dict(
+        foundby_CDCTrackFinder=used_CDCTrackFinder,
+        foundby_VXDTrackFinder=used_VXDTrackFinder,
+        foundby_SVDtoCDCCKF=used_SVDtoCDCCKF,
+        foundby_CDCtoSVDCKF=used_CDCtoSVDCKF,
+        foundby_ECLtoCDCCKF=used_ECLtoCDCCKF,
+    )
+
+    return crops
+
+
+#: create a dictionary from RecoTrack fit status
 
 @format_crop_keys
 def peel_fit_status(reco_track, key="{part_name}"):
@@ -344,6 +411,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
         pt_resolution = np.divide(pt_variance, pt_estimate)
 
         fit_crops = dict(
+            has_trackFitResult=True,
             d0_estimate=track_fit_result.getD0(),
             d0_variance=track_fit_result.getCov()[0],
             phi0_estimate=track_fit_result.getPhi() % (2.0 * math.pi),
@@ -366,6 +434,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pt_variance=pt_variance,
             pt_resolution=pt_resolution,
 
+            track_charge=track_fit_result.getChargeSign(),
             b_field=Belle2.BFieldManager.getField(pos).Z(),
 
             px_estimate=mom.X(),
@@ -380,6 +449,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
 
     else:
         fit_crops = dict(
+            has_trackFitResult=False,
             d0_estimate=nan,
             d0_variance=nan,
             phi0_estimate=nan,
@@ -402,6 +472,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pt_variance=nan,
             pt_resolution=nan,
 
+            track_charge=nan,
             b_field=nan,
 
             px_estimate=nan,

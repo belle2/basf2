@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/bklm/geometry/Module.h>
 
 #include <genfit/PlanarMeasurement.h>

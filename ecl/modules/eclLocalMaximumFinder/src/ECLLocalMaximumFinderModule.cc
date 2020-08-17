@@ -9,7 +9,7 @@
  * candidate will result in one shower/cluster in the end.                *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -120,8 +120,8 @@ void ECLLocalMaximumFinderModule::initialize()
   resetClassifierVariables();
 
   // Open output files and declare branches if in training mode. Each file will hold a flat ntuple of training data.
-  m_outfile = NULL;
-  m_tree = NULL;
+  m_outfile = nullptr;
+  m_tree = nullptr;
   if (m_isTrainingMode > 0) {
     const int cBufferLength = 500;
     char tmpBuffer[cBufferLength];

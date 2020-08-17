@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPGeoPMTArray.h>
-#include <math.h>
 #include <iostream>
 #include <TRandom.h>
 

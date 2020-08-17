@@ -138,7 +138,7 @@ namespace Belle2 {
       return muid->getLogL_d();
     }
 
-    //! @return outcome of the extrapolation: 0=missed KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
+    //! @return outcome of muon extrapolation (see MuidElementNumbers for the complete list of the outcome values)
     double muidOutcomeExtTrack(const Particle* particle)
     {
       KLMMuidLikelihood* muid = getMuid(particle);
@@ -287,7 +287,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("muidDeuteronLogLikelihood", muidDeuteronLogLikelihood,
                       "[Calibration] Returns the deuteron log-likelihood stored in the KLMMuidLikelihood dataobject");
     REGISTER_VARIABLE("muidOutcomeExtTrack", muidOutcomeExtTrack,
-                      "[Calibration] Returns outcome of muon extrapolation: 0=missed KLM, 1=BKLM stop, 2=EKLM stop, 3=BKLM exit, 4=EKLM exit");
+                      "[Calibration] Returns outcome of muon extrapolation (see MuidElementNumbers for the complete list of the outcome values)");
     REGISTER_VARIABLE("muidChiSquared", muidChiSquared,
                       "[Calibration] Returns chi-squared for this extrapolation");
     REGISTER_VARIABLE("muidDegreesOfFreedom", muidDegreesOfFreedom,

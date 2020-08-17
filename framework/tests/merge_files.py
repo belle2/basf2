@@ -361,6 +361,36 @@ def check_22_real_mc():
     return merge_files("test1.root", "test2.root") != 0
 
 
+def check_23_legacy_ip():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="test_globaltag")
+    create_testfile_direct("test2.root", global_tag="test_globaltag,Legacy_IP_Information")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == "test_globaltag"
+
+
+def check_24_legacy_ip_middle():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="test_globaltag,other")
+    create_testfile_direct("test2.root", global_tag="test_globaltag,Legacy_IP_Information,other")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == "test_globaltag,other"
+
+
+def check_25_legacy_ip_only():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="")
+    create_testfile_direct("test2.root", global_tag="Legacy_IP_Information")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == ""
+
+
 def check_XX_filemetaversion():
     """Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't

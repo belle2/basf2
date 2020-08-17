@@ -138,7 +138,7 @@ namespace Belle2 {
     {
       if (!m_wrapped) return;
 
-      m_wrapped->SetDirectory(NULL);
+      m_wrapped->SetDirectory(nullptr);
       //if we are the only owner, this becomes unnecessary
       gROOT->GetListOfCleanups()->Remove(this);
     }

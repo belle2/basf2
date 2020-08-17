@@ -9,8 +9,11 @@
 #include <daq/rawdata/modules/DeSerializerPC.h>
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
+#include <rawdata/dataobjects/RawTLU.h>
 
-#include <sys/mman.h>
+#include <netdb.h>
+#include <netinet/tcp.h>
+
 //#define MAXEVTSIZE 400000000
 #define CHECKEVT 5000
 

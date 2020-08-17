@@ -14,7 +14,6 @@
 #define VXD_SIMULATION_SENSITIVEDETECTOR_H
 
 #include <vxd/simulation/SensitiveDetectorBase.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <array>

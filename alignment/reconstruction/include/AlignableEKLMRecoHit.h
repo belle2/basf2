@@ -8,11 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ALIGNABLEEKLMRECOHIT_H
-#define ALIGNABLEEKLMRECOHIT_H
+#pragma once
 
 #include <framework/geometry/B2Vector3.h>
-#include <klm/eklm/dataobjects/EKLMAlignmentHit.h>
+#include <klm/dataobjects/eklm/EKLMAlignmentHit.h>
 
 #include <genfit/ICalibrationParametersDerivatives.h>
 #include <genfit/PlanarMeasurement.h>
@@ -109,6 +108,4 @@ namespace Belle2 {
   };
 
 }
-
-#endif
 

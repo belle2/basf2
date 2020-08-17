@@ -2113,7 +2113,7 @@ TrackFitResult#28:
   getTransverseMomentum(): 0.184814
   getZ0(): -0.540354
 TrackFitResult#29:
-  get4Momentum(): (0.132843,0.15874,0.050298,0.254667)
+  get4Momentum(): (0.132843,0.15874,0.050298,0.254668)
   getChargeSign(): 1
   getCotTheta(): 0.242995
   getCov(): size(15)
@@ -2146,7 +2146,7 @@ TrackFitResult#29:
      5.078670e-04  3.889877e-04  1.983555e-04 -4.525312e-05  4.563236e-05 -1.867182e-05 
     -2.307368e-06  4.397452e-06 -2.350209e-04 -1.587849e-05 -1.867182e-05  1.027560e-04 
   getD0(): 2.01929
-  getEnergy(): 0.254667
+  getEnergy(): 0.254668
   getHitPatternCDC(): 0110101100000000000011111111111111111111111111111100000011001111
   getHitPatternVXD(): 00000000010100000101000000000000
   getMomentum(): (0.132843,0.15874,0.050298)
@@ -2961,7 +2961,7 @@ TrackFitResult#44:
   getTransverseMomentum(): 0.108562
   getZ0(): -2.34466
 TrackFitResult#45:
-  get4Momentum(): (0.0556415,0.0153348,-0.0628894,0.163603)
+  get4Momentum(): (0.0556415,0.0153348,-0.0628894,0.163604)
   getChargeSign(): -1
   getCotTheta(): -1.08964
   getCov(): size(15)
@@ -2994,7 +2994,7 @@ TrackFitResult#45:
      3.385301e-05 -1.098659e-04 -3.692756e-05  6.155858e-06  8.294406e-06 -6.823645e-06 
     -1.216708e-05  3.899634e-05 -1.033711e-04 -1.524959e-05 -6.823645e-06  2.345131e-05 
   getD0(): 0.0312644
-  getEnergy(): 0.163603
+  getEnergy(): 0.163604
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0556415,0.0153348,-0.0628894)
@@ -3279,7 +3279,7 @@ TrackFitResult#50:
   getTransverseMomentum(): 0.185153
   getZ0(): 0.0373628
 TrackFitResult#51:
-  get4Momentum(): (0.200882,-0.0243639,-0.244799,0.990569)
+  get4Momentum(): (0.200882,-0.0243639,-0.244799,0.99057)
   getChargeSign(): 1
   getCotTheta(): -1.20976
   getCov(): size(15)
@@ -3312,7 +3312,7 @@ TrackFitResult#51:
     -1.179225e-03 -2.005259e-03  1.090781e-03 -9.100686e-04  3.349508e-04  1.126874e-03 
     -3.452003e-03 -7.651171e-03  2.043967e-03 -4.298123e-03  1.126874e-03  5.424534e-03 
   getD0(): -0.843407
-  getEnergy(): 0.990569
+  getEnergy(): 0.99057
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.200882,-0.0243639,-0.244799)
@@ -17398,7 +17398,7 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (91.0741,-197.265,44.7)
-  getEnergy(): 0.542074
+  getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -17414,7 +17414,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 1
-  getMomentum(): (0.0882724,-0.191196,0.0433249,0.542074)
+  getMomentum(): (0.0882724,-0.191196,0.0433249,0.542072)
   getMomentumMag(): 0.215
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)
@@ -17426,7 +17426,7 @@ KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (124.9,-92.9,-199)
-  getEnergy(): 0.512146
+  getEnergy(): 0.512143
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -17442,7 +17442,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 2
   getLayers(): 1
-  getMomentum(): (0.0598841,-0.0445415,-0.0954119,0.512146)
+  getMomentum(): (0.0598841,-0.0445415,-0.0954119,0.512143)
   getMomentumMag(): 0.121134
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)
@@ -17454,7 +17454,7 @@ KLMCluster#2:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): True
   getClusterPosition(): (150.583,-137.98,177.3)
-  getEnergy(): 0.542074
+  getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -17470,7 +17470,7 @@ KLMCluster#2:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 1
-  getMomentum(): (0.119705,-0.109686,0.140943,0.542074)
+  getMomentum(): (0.119705,-0.109686,0.140943,0.542072)
   getMomentumMag(): 0.215
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(1)
@@ -20085,7 +20085,7 @@ V0#3:
     -> Tracks#4
   getV0Hypothesis(): <type: anti-Lambda0>
 TrackFitResult#0:
-  get4Momentum(): (0.160134,0.129692,-0.0190537,0.249611)
+  get4Momentum(): (0.160134,0.129692,-0.0190537,0.249612)
   getChargeSign(): -1
   getCotTheta(): -0.0924641
   getCov(): size(15)
@@ -20118,7 +20118,7 @@ TrackFitResult#0:
      1.716366e-04 -2.243819e-03 -2.491100e-05 -6.458154e-05  8.370212e-05  9.379206e-06 
     -1.342342e-05 -2.851428e-06 -2.520839e-03  9.975253e-06  9.379206e-06  1.500362e-04 
   getD0(): -2.49331
-  getEnergy(): 0.249611
+  getEnergy(): 0.249612
   getHitPatternCDC(): 1000000100000000000000111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101000000000000
   getMomentum(): (0.160134,0.129692,-0.0190537)
@@ -20191,7 +20191,7 @@ TrackFitResult#1:
   getTransverseMomentum(): 0.206092
   getZ0(): -11.188
 TrackFitResult#2:
-  get4Momentum(): (0.133888,0.0417008,0.015126,0.198427)
+  get4Momentum(): (0.133888,0.0417008,0.015126,0.198428)
   getChargeSign(): 1
   getCotTheta(): 0.107865
   getCov(): size(15)
@@ -20224,7 +20224,7 @@ TrackFitResult#2:
      4.166492e-06 -1.300461e-05  4.673604e-07 -4.513972e-07  1.749235e-06 -4.556716e-08 
     -1.383567e-09  5.269387e-09 -1.445117e-05 -1.597705e-07 -4.556716e-08  1.890008e-06 
   getD0(): 0.00861226
-  getEnergy(): 0.198427
+  getEnergy(): 0.198428
   getHitPatternCDC(): 0110111100000000000000000000000000011111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.133888,0.0417008,0.015126)

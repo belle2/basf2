@@ -263,6 +263,7 @@ Additional Functions
 --------------------
 
 .. autofunction:: find_file
+.. autofunction:: get_file_metadata
 
 .. autofunction:: get_random_seed
 

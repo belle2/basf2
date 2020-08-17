@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from basf2 import create_path, process
+from basf2 import create_path, process, statistics
 from rawdata import add_unpackers
 from reconstruction import add_reconstruction, add_cosmics_reconstruction
+from validation_gt import get_validation_globaltags
 
 from basf2 import conditions
-conditions.override_globaltags(['validation_2019-11-29'])
+conditions.override_globaltags(get_validation_globaltags())
+conditions.prepend_globaltag("add_your_test_GT_here")
 
 main = create_path()
 
@@ -21,3 +23,4 @@ else:
     add_reconstruction(main)
 
 process(main)
+print(statistics)

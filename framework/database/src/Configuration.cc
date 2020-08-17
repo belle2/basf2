@@ -23,7 +23,7 @@
 #include <TPython.h>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "master_2019-11-29"
+#define CURRENT_DEFAULT_TAG "master_2020-05-13"
 
 namespace py = boost::python;
 
@@ -492,7 +492,7 @@ List of metadata providers to use when looking for payload metadata. There are c
 
 This list should rarely need to be changed. The only exception is for users who
 want to be able to use the software without internet connection after they
-downloaded a snapshot of the necessary globaltags with `b2conditionsdb snapshot`
+downloaded a snapshot of the necessary globaltags with ``b2conditionsdb download``
 to point to this location.
 )DOC")
     .add_property("payload_locations", &Configuration::getPayloadLocationsPy, &Configuration::setPayloadLocationsPy, R"DOC(
@@ -562,7 +562,7 @@ Parameters:
       from the central server. This could be a user defined directory, otherwise
       empty string defaults to ``$TMPDIR/basf2-conditions`` where ``$TMPDIR`` is the
       temporary directories defined in the system. Newly downloaded payloads will
-      be stored in this directory in a hashed structure, see `payload_providers`
+      be stored in this directory in a hashed structure, see `payload_locations`
   download_lock_timeout (int): How many seconds to wait for a write lock when
       concurrently downloading the same payload between different processes.
       If locking fails the payload will be downloaded to a temporary file

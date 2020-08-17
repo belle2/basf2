@@ -65,7 +65,7 @@ namespace Belle2 {
     void transformTrackToLocal(ARICHTrack& arichTrack, bool align);
 
     //! Computes the value of identity likelihood function for different particle hypotheses.
-    int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
+    int likelihood2(ARICHTrack& arichTrack, const StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
 
     //! Sets track position resolution (from tracking)
     void setTrackPositionResolution(double pRes);
@@ -93,7 +93,7 @@ namespace Belle2 {
     DBObjPtr<ARICHChannelMapping> m_chnMap; /**< map x,y channels to asic channels from the DB */
     DBObjPtr<ARICHGlobalAlignment> m_alignp; /**< global alignment parameters from the DB */
     DBObjPtr<ARICHMirrorAlignment> m_mirrAlign; /**< global alignment parameters from the DB */
-    DBObjPtr<ARICHAeroTilesAlignment> m_tileAlign; /**< alignment of aerogel tiles from DB */
+    OptionalDBObjPtr<ARICHAeroTilesAlignment> m_tileAlign; /**< alignment of aerogel tiles from DB */
 
     std::vector<TVector3> m_mirrorPoints; /**< vector of points on all mirror plates */
     std::vector<TVector3> m_mirrorNorms;  /**< vector of nomal vectors of all mirror plates */

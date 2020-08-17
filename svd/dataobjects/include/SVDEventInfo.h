@@ -74,6 +74,32 @@ namespace Belle2 {
     SVDModeByte getModeByte() const
     { return m_modeByte; }
 
+    /** returns the time shift between SVD reference
+     *  and FTSW (Trigger) reference:
+     *  time in FTSW reference = time in SVD reference + time shift
+     *  for clusters, additional information of the first frame is
+     *  used to improve the precision
+     */
+
+    /** returns the number of samples, 6, 3 or 1 */
+    int getNSamples() const
+    {
+
+      int mode = (int)SVDModeByte(m_modeByte).getDAQMode();
+
+      if (mode == 2)
+        return 6;
+      else if (mode == 1)
+        return 3;
+      else if (mode == 0)
+        return 1;
+
+      return -1;
+    }
+
+    float getSVD2FTSWTimeShift(int firstFrame) const
+    { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
+
     /** SVDTriggerType getter
      *  Gets the type of SVDTrigger for the event
      */

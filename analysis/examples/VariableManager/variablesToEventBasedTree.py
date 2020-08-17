@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # The VariablesToEventBasedTree module saves variables from the VariableManager
 # to an event-based TTree
@@ -9,7 +8,6 @@
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 
-import os
 import basf2
 import modularAnalysis as ma  # a shorthand for the analysis tools namespace
 
@@ -29,6 +27,13 @@ mypath.add_module('VariablesToEventBasedTree',
                   particleList='D0',
                   variables=['dM', 'isSignal', 'mcErrors', 'p', 'E',
                              'daughter(0, kaonID)', 'daughter(1, pionID)'],
+                  event_variables=['nTracks', 'isMC'])
+# It's possible to have multiple event-based trees in the same output file.
+# Of course their names have to be different.
+mypath.add_module('VariablesToEventBasedTree',
+                  particleList='K-',
+                  treeName='kaon',
+                  variables=['isSignal', 'mcErrors', 'p', 'E', 'kaonID'],
                   event_variables=['nTracks', 'isMC'])
 
 # process the data

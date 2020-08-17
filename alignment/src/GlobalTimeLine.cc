@@ -60,7 +60,7 @@ namespace Belle2 {
         return std::get<EventHeader>(timeTable).at(timeid);
       }
 
-      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, GlobalParamVector& vector)
+      PayloadsTable TimeIdsTable2PayloadsTable(TimeTable& timeTable, const GlobalParamVector& vector)
       {
         PayloadsTable payloadsTable;
 
@@ -111,8 +111,8 @@ namespace Belle2 {
             int endExp = endEvent.getExperiment();
             //int endRun = endEvent.getRun();
             int endRun = std::max(0, endEvent.getRun() - 1);
-            // The last run will be the same as this run
-            if (endEvent.getRun() == run && endExp == exp) {
+            // Last IoV open:
+            if (iCol == static_cast<int>(std::get<EventHeader>(timeTable).size()) - 1) {
               endRun = -1;
               endExp = -1;
             }
@@ -216,7 +216,7 @@ namespace Belle2 {
       // GlobalParamTimeLine class -------------------------------------------------------------------------------------
 
       GlobalParamTimeLine::GlobalParamTimeLine(const std::vector< EventMetaData >& events, GlobalLabel& label,
-                                               GlobalParamVector& vector) : timeTable(makeInitialTimeTable(events, label))
+                                               const GlobalParamVector& vector) : timeTable(makeInitialTimeTable(events, label))
       {
         finalizeTimeTable(timeTable);
         payloadsTable = TimeIdsTable2PayloadsTable(timeTable, vector);

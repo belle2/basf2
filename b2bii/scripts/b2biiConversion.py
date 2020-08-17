@@ -7,6 +7,7 @@ import os
 import re
 import requests
 import http
+from ctypes import cdll
 
 
 def setupBelleDatabaseServer():
@@ -63,17 +64,42 @@ def setupB2BIIDatabase(isMC=False):
         use_local_database("%s/dbcache.txt" % payloaddir, payloaddir, False, LogLevel.WARNING)
 
 
-def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
+def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   useBelleDBServer=None,
                                   generatorLevelReconstruction=False,
                                   generatorLevelMCMatching=False,
                                   path=None, entrySequences=None,
                                   matchType2E9oE25Threshold=-1.1,
-                                  enableNisKsFinder=True):
+                                  enableNisKsFinder=True,
+                                  HadronA=True, HadronB=True,
+                                  enableRecTrg=False, enableEvtcls=True):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
+
+    Args:
+        inputBelleMDSTFile (str): Name of the file(s) to be loaded.
+        applySkim (bool): Apply skim conditions in B2BIIFixMdst.
+        useBelleDBServer (str): None to use the recommended BelleDB server.
+        generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
+        generatorLevelMCMatching (bool): Enables to switch MCTruth matching to generator-level particles.
+        path (basf2.Path): Path to add modules in.
+        entrySequences (list(str)): The number sequences (e.g. 23:42,101) defining
+            the entries which are processed for each inputFileName.
+        matchType2E9oE25Threshold (float): Clusters with a E9/E25 value above this threshold are classified as neutral
+            even if tracks are matched to their connected region (matchType == 2 in basf).
+        enableNisKsFinder (bool): Enables to convert nisKsFinder information.
+        HadronA (bool): Enables to switch on HadronA skim in B2BIIFixMdst module.
+        HadronB (bool): Enables to switch on HadronB skim in B2BIIFixMdst module.
+        enableRecTrg (bool): Enables to convert RecTrg_summary3 table.
+        enableEvtcls (bool): Enables to convert Evtcls and Evtcls_hadronic tables.
     """
+
+    # If we are on KEKCC make sure we load the correct NeuroBayes library
+    try:
+        cdll.LoadLibrary('/sw/belle/local/neurobayes-4.3.1/lib/libNeuroBayesCore_shared.so')
+    except:
+        pass
 
     if useBelleDBServer is None:
         setupBelleDatabaseServer()
@@ -105,19 +131,32 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True,
         fix = register_module('B2BIIFixMdst')
         # fix.logging.set_log_level(LogLevel.DEBUG)
         # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        # Hadron skim settings
+        fix.param('HadronA', HadronA)
+        fix.param('HadronB', HadronB)
+        if (HadronA is not True and HadronB is True):
+            B2WARNING('The Hadron A skim is turned off.'
+                      'However, its requirements are still applied since the HadronB(J) skim, which includes them, is turned on.')
         path.add_module(fix)
 
-        if(applyHadronBJSkim):
+        if(applySkim):
             emptypath = create_path()
             # discard 'bad events' marked by fixmdst
             fix.if_value('<=0', emptypath)
-
+        else:
+            B2INFO('applySkim is set to be False.'
+                   'No bad events marked by fixmdst will be discarded.'
+                   'Corrections will still be applied.')
+    else:
+        B2INFO('Perform generator level reconstruction, no corrections or skims in fix_mdst will be applied.')
     # Convert MDST Module
     convert = register_module('B2BIIConvertMdst')
     if (generatorLevelMCMatching):
         convert.param('mcMatchingMode', 'GeneratorLevel')
     convert.param("matchType2E9oE25Threshold", matchType2E9oE25Threshold)
     convert.param("nisKsInfo", enableNisKsFinder)
+    convert.param("RecTrg", enableRecTrg)
+    convert.param("convertEvtcls", enableEvtcls)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)

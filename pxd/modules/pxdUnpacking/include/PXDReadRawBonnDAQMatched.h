@@ -25,7 +25,11 @@ namespace Belle2 {
 
   namespace PXD {
 
-    class PXDReadRawBonnDAQMatchedModule : public Module {
+    /**
+     * Module to Load BonnDAQ file and store it as RawPXD in Data Store
+     * This is meant for lab use (standalone testing, debugging) without an event builder.
+     */
+    class PXDReadRawBonnDAQMatchedModule final : public Module {
       enum {MAXEVTSIZE = 4 * 1024 * 1024 + 256 * 4 + 16};
       // Public functions
     public:

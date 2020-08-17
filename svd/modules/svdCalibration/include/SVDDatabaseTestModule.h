@@ -13,15 +13,8 @@
 
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 
-#include <svd/calibration/SVDNoiseCalibrations.h>
-#include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
-#include <svd/dbobjects/SVDLocalRunBadStrips.h>
-
-#include <vxd/dataobjects/VxdID.h>
-
 
 namespace Belle2 {
 

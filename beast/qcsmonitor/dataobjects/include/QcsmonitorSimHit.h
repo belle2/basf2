@@ -30,8 +30,7 @@ namespace Belle2 {
   public:
     /** default constructor for ROOT */
     QcsmonitorSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0),
-      m_Position(0, 0,
-                 0) {;}
+      m_Position(0, 0, 0) {;}
     //! Useful Constructor
     QcsmonitorSimHit(
       int CellId,            /**< Cell ID */
@@ -41,16 +40,9 @@ namespace Belle2 {
       float Edep,            /**< Deposit energy */
       TVector3 Momentum,     /**< Momentum */
       TVector3 Position        /**< Position */
-    ): SimHitBase()
+    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep), m_Momentum(Momentum),
+      m_Position(Position)
     {
-      m_CellId = CellId;
-      m_TrackId = TrackId;
-      m_Pdg = Pdg;
-      m_FlightTime = FlightTime;
-      m_Edep = Edep;
-      m_Momentum = Momentum;
-      m_Position = Position;
-
     }
 
 

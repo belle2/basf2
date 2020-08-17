@@ -18,9 +18,7 @@
 #include <trg/klm/dataobjects/KLMTriggerTrack.h>
 #include <framework/dataobjects/BinnedEventT0.h>
 #include <trg/ecl/TrgEclMapping.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/StoreArray.h>
-#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/logging/Logger.h>
@@ -29,10 +27,8 @@
 
 #include <TLorentzVector.h>
 #include <TMath.h>
-#include <TRandom3.h>
 
 #include <iostream>
-#include <bitset>
 #include <fstream>
 
 
@@ -182,7 +178,7 @@ void TRGGRLProjectsModule::initialize()
     TC1GeV.push_back(1. / CellCOM.E());
   }
 
-  m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
+  //m_TRGGRLInfo.registerInDataStore(m_TrgGrlInformationName);
 
 }
 
@@ -212,7 +208,7 @@ void TRGGRLProjectsModule::event()
   StoreArray<TRGGRLPHOTON> grlphoton("TRGGRLPhotons");
   StoreObjPtr<BinnedEventT0> m_eventTime;
   StoreObjPtr<TRGGRLInfo> trgInfo(m_TrgGrlInformationName);
-  trgInfo.create();
+  //trgInfo.create();
   //---------------------------------------------------------------------
   //..Use only clusters within 100 ns of event timing (from ECL).
   int ntrgArray = trgArray.getEntries();
@@ -238,10 +234,12 @@ void TRGGRLProjectsModule::event()
   int nTrk3D = cdc3DTrkArray.getEntries();
   int nTrkZ10 = 0;
   int nTrkZ25 = 0;
+  int nTrkZ40 = 0;
   for (int itrk = 0; itrk < nTrk3D; itrk++) {
     double z0 = cdc3DTrkArray[itrk]->getZ0();
     if (abs(z0) < 10.) {nTrkZ10++;}
     if (abs(z0) < 25.) {nTrkZ25++;}
+    if (abs(z0) < 40.) {nTrkZ40++;}
   }
 
   trgInfo->setN3Dfittertrk(nTrk3D);
@@ -613,17 +611,26 @@ void TRGGRLProjectsModule::event()
   bool klm_0 = (klmtracklist.getEntries() & (1 << 0)) != 0;
   bool klm_1 = (klmtracklist.getEntries() & (1 << 1)) != 0;
   bool klm_2 = (klmtracklist.getEntries() & (1 << 2)) != 0;
-  bool klm_3 = (klmtracklist.getEntries() & (1 << 3)) != 0;
 
-  bool cdcklm_0 = (trackKLMmatch.getEntries() & (1 << 0)) != 0;
-  bool cdcklm_1 = (trackKLMmatch.getEntries() & (1 << 1)) != 1;
-  bool cdcklm_2 = (trackKLMmatch.getEntries() & (1 << 2)) != 2;
-  bool cdcklm_3 = (trackKLMmatch.getEntries() & (1 << 3)) != 3;
+  bool cdcklm_0 = (trackKLMmatch.getEntries() == 1);
+  bool cdcklm_1 = (trackKLMmatch.getEntries() == 2);
+  bool cdcklm_2 = (trackKLMmatch.getEntries() == 3);
+  bool cdcklm_3 = (trackKLMmatch.getEntries() > 3);
 
-  bool cdcecl_0 = (trackphimatch.getEntries() & (1 << 0)) != 0;
-  bool cdcecl_1 = (trackphimatch.getEntries() & (1 << 1)) != 0;
-  bool cdcecl_2 = (trackphimatch.getEntries() & (1 << 2)) != 0;
-  bool cdcecl_3 = (trackphimatch.getEntries() & (1 << 3)) != 0;
+  bool cdcecl_0 = (trackphimatch.getEntries() == 1);
+  bool cdcecl_1 = (trackphimatch.getEntries() == 2);
+  bool cdcecl_2 = (trackphimatch.getEntries() == 3);
+  bool cdcecl_3 = (trackphimatch.getEntries() > 3);
+
+  int n_c2gev = 0;
+  for (int i = 0; i < trackphimatch.getEntries(); i++) {
+    if (trackphimatch[i]->get_e() >= 2.0) {n_c2gev++;}
+  }
+
+  bool c2gev_0 = (n_c2gev == 1);
+  bool c2gev_1 = (n_c2gev == 2);
+  bool c2gev_2 = (n_c2gev == 3);
+  bool c2gev_3 = (n_c2gev > 3);
 
   int N_KLMb2b = 0;
   for (int i = 0; i < klmtracklist.getEntries(); i++) {
@@ -635,9 +642,9 @@ void TRGGRLProjectsModule::event()
     }
   }
 
-  bool klmb2b_0 = (N_KLMb2b & (1 << 0)) != 0;
-  bool klmb2b_1 = (N_KLMb2b & (1 << 1)) != 0;
-  bool klmb2b_2 = (N_KLMb2b & (1 << 2)) != 0;
+  bool klmb2b_0 = (N_KLMb2b == 1);
+  bool klmb2b_1 = (N_KLMb2b == 2);
+  bool klmb2b_2 = (N_KLMb2b > 2);
 
   int N_clst1 = 0, N_clst2 = 0;
   for (int i = 0 ; i < grlphoton.getEntries() ; i++) {
@@ -645,15 +652,29 @@ void TRGGRLProjectsModule::event()
     if (grlphoton[i]->get_e() > 2.0) { N_clst2++; }
   }
 
-  bool nclst1_0 = (N_clst1 & (1 << 0)) != 0;
-  bool nclst1_1 = (N_clst1 & (1 << 1)) != 0;
-  bool nclst1_2 = (N_clst1 & (1 << 2)) != 0;
-  bool nclst1_3 = (N_clst1 & (1 << 3)) != 0;
+  bool nclst1_0 = (N_clst1 == 1);
+  bool nclst1_1 = (N_clst1 == 2);
+  bool nclst1_2 = (N_clst1 == 3);
+  bool nclst1_3 = (N_clst1 > 3);
 
-  bool nclst2_0 = (N_clst2 & (1 << 0)) != 0;
-  bool nclst2_1 = (N_clst2 & (1 << 1)) != 0;
-  bool nclst2_2 = (N_clst2 & (1 << 2)) != 0;
-  bool nclst2_3 = (N_clst2 & (1 << 3)) != 0;
+  bool nclst2_0 = (N_clst2 == 1);
+  bool nclst2_1 = (N_clst2 == 2);
+  bool nclst2_2 = (N_clst2 == 3);
+  bool nclst2_3 = (N_clst2 > 3);
+
+  int N_ST = trgInfo->getNshorttrk();
+  int s2s3 = trgInfo->gets2s3();
+  int s2s5 = trgInfo->gets2s5();
+  int s2so = trgInfo->gets2so();
+  int s2f3 = trgInfo->gets2f3();
+  int s2f5 = trgInfo->gets2f5();
+  int s2fo = trgInfo->gets2fo();
+  int bwdsb  = trgInfo->getbwdsb();
+  int bwdnb  = trgInfo->getbwdnb();
+  int fwdsb  = trgInfo->getfwdsb();
+  int fwdnb  = trgInfo->getfwdnb();
+  int brlfb  = trgInfo->getbrlfb();
+  int brlnb  = trgInfo->getbrlnb();
 
   //---------------------------------------------------------------------
   //..Filling InputBits
@@ -668,20 +689,38 @@ void TRGGRLProjectsModule::event()
     std::string bitname(m_InputBitsDB->getinbitname(i));
 
     bool bit = false;
-    if (bitname == "t3_0") {bit = nTrk3D == 0;}
-    else if (bitname == "t3_1") {bit = nTrk3D == 1;}
-    else if (bitname == "t3_2") {bit = nTrk3D == 2;}
-    else if (bitname == "t3_3") {bit = nTrk3D >= 3;}
-    else if (bitname == "t2_0") {bit = nTrk2D == 0;}
-    else if (bitname == "t2_1") {bit = nTrk2D == 1;}
-    else if (bitname == "t2_2") {bit = nTrk2D == 2;}
-    else if (bitname == "t2_3") {bit = nTrk2D >= 3;}
+    if (bitname == "t3_0") {bit = nTrkZ40 == 1;}
+    else if (bitname == "t3_1") {bit = nTrkZ40 == 2;}
+    else if (bitname == "t3_2") {bit = nTrkZ40 == 3;}
+    else if (bitname == "t3_3") {bit = nTrkZ40 > 3;}
+    else if (bitname == "t2_0") {bit = nTrk2D == 1;}
+    else if (bitname == "t2_1") {bit = nTrk2D == 2;}
+    else if (bitname == "t2_2") {bit = nTrk2D == 3;}
+    else if (bitname == "t2_3") {bit = nTrk2D > 3;}
+    else if (bitname == "ts_0") {bit = N_ST == 1;}
+    else if (bitname == "ts_1") {bit = N_ST == 2;}
+    else if (bitname == "ts_2") {bit = N_ST == 3;}
+    else if (bitname == "ts_3") {bit = N_ST > 3;}
     else if (bitname == "cdc_open90") {bit = Trk_open90 == 1;}
     else if (bitname == "cdc_active") {bit = cdc_active;}
     else if (bitname == "cdc_b2b3") {bit = Trk_b2b_1to3;}
     else if (bitname == "cdc_b2b5") {bit = Trk_b2b_1to5;}
     else if (bitname == "cdc_b2b7") {bit = Trk_b2b_1to7;}
     else if (bitname == "cdc_b2b9") {bit = Trk_b2b_1to9;}
+    else if (bitname == "s2s3") {bit = s2s3 > 0;}
+    else if (bitname == "s2s5") {bit = s2s5 > 0;}
+    else if (bitname == "s2so") {bit = s2so > 0;}
+    else if (bitname == "s2f3") {bit = s2f3 > 0;}
+    else if (bitname == "s2f5") {bit = s2f5 > 0;}
+    else if (bitname == "s2fo") {bit = s2fo > 0;}
+    else if (bitname == "bwdsb") {bit = bwdsb > 0;}
+    else if (bitname == "bwdnb") {bit = bwdnb > 0;}
+    else if (bitname == "fwdsb") {bit = fwdsb > 0;}
+    else if (bitname == "fwdnb") {bit = fwdnb > 0;}
+    else if (bitname == "brlfb1") {bit = brlfb == 1;}
+    else if (bitname == "brlfb2") {bit = brlfb == 2;}
+    else if (bitname == "brlnb1") {bit = brlnb == 1;}
+    else if (bitname == "brlnb2") {bit = brlnb == 2;}
     else if (bitname == "ehigh") {bit = ehigh;}
     else if (bitname == "elow") {bit = elow;}
     else if (bitname == "elum") {bit = elum;}
@@ -700,10 +739,10 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "bha_11") {bit = bha_type11;}
     else if (bitname == "bha_12") {bit = bha_type12;}
     else if (bitname == "bha_13") {bit = bha_type13;}
-    else if (bitname == "c_0") {bit = nclst_0;}
-    else if (bitname == "c_1") {bit = nclst_1;}
-    else if (bitname == "c_2") {bit = nclst_2;}
-    else if (bitname == "c_3") {bit = nclst_3;}
+    else if (bitname == "clst_0") {bit = nclst_0;}
+    else if (bitname == "clst_1") {bit = nclst_1;}
+    else if (bitname == "clst_2") {bit = nclst_2;}
+    else if (bitname == "clst_3") {bit = nclst_3;}
     else if (bitname == "ebg_0") {bit = ecl_bg_0;}
     else if (bitname == "ebg_1") {bit = ecl_bg_1;}
     else if (bitname == "ebg_2") {bit = ecl_bg_2;}
@@ -714,17 +753,18 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_phys") {bit = ecl_phys;}
     else if (bitname == "ecl_oflo") {bit = ecl_oflo;}
     else if (bitname == "ecl_3dbha") {bit = ecl_3dbha;}
-    else if (bitname == "lml_0") {bit = ecl_lml_0;}
-    else if (bitname == "lml_1") {bit = ecl_lml_1;}
-    else if (bitname == "lml_2") {bit = ecl_lml_2;}
-    else if (bitname == "lml_3") {bit = ecl_lml_3;}
-    else if (bitname == "lml_4") {bit = ecl_lml_4;}
-    else if (bitname == "lml_5") {bit = ecl_lml_5;}
-    else if (bitname == "lml_6") {bit = ecl_lml_6;}
-    else if (bitname == "lml_7") {bit = ecl_lml_7;}
-    else if (bitname == "lml_8") {bit = ecl_lml_8;}
-    else if (bitname == "lml_9") {bit = ecl_lml_9;}
-    else if (bitname == "lml_10") {bit = ecl_lml_10;}
+    else if (bitname == "bha_veto") {bit = ecl_3dbha;}
+    else if (bitname == "ecl_lml_0") {bit = ecl_lml_0;}
+    else if (bitname == "ecl_lml_1") {bit = ecl_lml_1;}
+    else if (bitname == "ecl_lml_2") {bit = ecl_lml_2;}
+    else if (bitname == "ecl_lml_3") {bit = ecl_lml_3;}
+    else if (bitname == "ecl_lml_4") {bit = ecl_lml_4;}
+    else if (bitname == "ecl_lml_5") {bit = ecl_lml_5;}
+    else if (bitname == "ecl_lml_6") {bit = ecl_lml_6;}
+    else if (bitname == "ecl_lml_7") {bit = ecl_lml_7;}
+    else if (bitname == "ecl_lml_8") {bit = ecl_lml_8;}
+    else if (bitname == "ecl_lml_9") {bit = ecl_lml_9;}
+    else if (bitname == "ecl_lml_10") {bit = ecl_lml_10;}
     else if (bitname == "top_0") {bit = false;}
     else if (bitname == "top_1") {bit = false;}
     else if (bitname == "top_2") {bit = false;}
@@ -734,7 +774,6 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "klm_0") {bit = klm_0;}
     else if (bitname == "klm_1") {bit = klm_1;}
     else if (bitname == "klm_2") {bit = klm_2;}
-    else if (bitname == "klm_3") {bit = klm_3;}
     else if (bitname == "klmb2b_0") {bit = klmb2b_0;}
     else if (bitname == "klmb2b_1") {bit = klmb2b_1;}
     else if (bitname == "klmb2b_2") {bit = klmb2b_2;}
@@ -749,32 +788,38 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "veto") {bit = false;}
     else if (bitname == "samhem") {bit = nSameHem1Trk > 0;}
     else if (bitname == "opohem") {bit = nOppHem1Trk > 0;}
-    else if (bitname == "n1_0") {bit = nclst1_0;}
-    else if (bitname == "n1_1") {bit = nclst1_1;}
-    else if (bitname == "n1_2") {bit = nclst1_2;}
-    else if (bitname == "n1_3") {bit = nclst1_3;}
-    else if (bitname == "n2_0") {bit = nclst2_0;}
-    else if (bitname == "n2_1") {bit = nclst2_1;}
-    else if (bitname == "n2_2") {bit = nclst2_2;}
-    else if (bitname == "n2_3") {bit = nclst2_3;}
+    else if (bitname == "n1gev_0") {bit = nclst1_0;}
+    else if (bitname == "n1gev_1") {bit = nclst1_1;}
+    else if (bitname == "n1gev_2") {bit = nclst1_2;}
+    else if (bitname == "n1gev_3") {bit = nclst1_3;}
+    else if (bitname == "n2gev_0") {bit = nclst2_0;}
+    else if (bitname == "n2gev_1") {bit = nclst2_1;}
+    else if (bitname == "n2gev_2") {bit = nclst2_2;}
+    else if (bitname == "n2gev_3") {bit = nclst2_3;}
     else if (bitname == "cdcecl_0") {bit = cdcecl_0;}
     else if (bitname == "cdcecl_1") {bit = cdcecl_1;}
     else if (bitname == "cdcecl_2") {bit = cdcecl_2;}
     else if (bitname == "cdcecl_3") {bit = cdcecl_3;}
+    else if (bitname == "c2gev_0") {bit = c2gev_0;}
+    else if (bitname == "c2gev_1") {bit = c2gev_1;}
+    else if (bitname == "c2gev_2") {bit = c2gev_2;}
+    else if (bitname == "c2gev_3") {bit = c2gev_3;}
     else if (bitname == "cdcklm_0") {bit = cdcklm_0;}
     else if (bitname == "cdcklm_1") {bit = cdcklm_1;}
     else if (bitname == "cdcklm_2") {bit = cdcklm_2;}
     else if (bitname == "cdcklm_3") {bit = cdcklm_3;}
-    else if (bitname == "d_b2b3") {bit = cluster_b2b_1to3 > 0;}
-    else if (bitname == "d_b2b5") {bit = cluster_b2b_1to5 > 0;}
-    else if (bitname == "d_b2b7") {bit = cluster_b2b_1to7 > 0;}
-    else if (bitname == "d_b2b9") {bit = cluster_b2b_1to9 > 0;}
-    else if (bitname == "p_b2b3") {bit = Trkcluster_b2b_1to3 > 0;}
-    else if (bitname == "p_b2b5") {bit = Trkcluster_b2b_1to5 > 0;}
-    else if (bitname == "p_b2b7") {bit = Trkcluster_b2b_1to7 > 0;}
-    else if (bitname == "p_b2b9") {bit = Trkcluster_b2b_1to9 > 0;}
+    else if (bitname == "d3") {bit = cluster_b2b_1to3 > 0;}
+    else if (bitname == "d5") {bit = cluster_b2b_1to5 > 0;}
+    else if (bitname == "d7") {bit = cluster_b2b_1to7 > 0;}
+    else if (bitname == "d9") {bit = cluster_b2b_1to9 > 0;}
+    else if (bitname == "p3") {bit = Trkcluster_b2b_1to3 > 0;}
+    else if (bitname == "p5") {bit = Trkcluster_b2b_1to5 > 0;}
+    else if (bitname == "p7") {bit = Trkcluster_b2b_1to7 > 0;}
+    else if (bitname == "p9") {bit = Trkcluster_b2b_1to9 > 0;}
     else if (bitname == "track") {bit = false;}
     else if (bitname == "trkfit") {bit = false;}
+
+    else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
 
     trgInfo->setInputBits(i, bit);
   }

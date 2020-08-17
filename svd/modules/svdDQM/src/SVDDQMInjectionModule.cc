@@ -53,6 +53,9 @@ void SVDDQMInjectionModule::defineHisto()
                                    20000);
   m_hMaxOccAfterInjHER  = new TH1F("SVDMaxOccInjHER", "SVDMaxOccInjHER/Time;Time in #mus;Triggers/Time (5 #mus bins)", 4000, 0,
                                    20000);
+  m_hBunchNumVSNStrips  = new TH2F("SVDBunchNumVSNStrips", "SVDBunchNumVSNStrips;Bunch No.;Number of fired strips", 1280, 0, 1280, 10,
+                                   0,
+                                   10000);
 
 
   // cd back to root directory
@@ -62,8 +65,9 @@ void SVDDQMInjectionModule::defineHisto()
 void SVDDQMInjectionModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
-  m_digits.isRequired(m_SVDShaperDigitsName);
+
+  m_rawTTD.isOptional();
+  m_digits.isOptional(m_SVDShaperDigitsName);
 }
 
 void SVDDQMInjectionModule::beginRun()
@@ -75,10 +79,22 @@ void SVDDQMInjectionModule::beginRun()
   m_hTrgOccAfterInjHER->Reset();
   m_hMaxOccAfterInjLER->Reset();
   m_hMaxOccAfterInjHER->Reset();
+  m_hBunchNumVSNStrips->Reset();
 }
 
 void SVDDQMInjectionModule::event()
 {
+
+  if (!m_rawTTD.isValid()) {
+    B2WARNING("Missing RawFTSW, SVDDQMInjection is skipped.");
+    return;
+  }
+
+  if (!m_digits.isValid()) {
+    B2WARNING("Missing " << m_SVDShaperDigitsName << ", SVDDQMInjection is skipped.");
+    return;
+  }
+
 
   for (auto& it : m_rawTTD) {
     B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
@@ -123,6 +139,7 @@ void SVDDQMInjectionModule::event()
         if (counter > value) m_hMaxOccAfterInjLER->SetBinContent(bin, counter);
 
       }
+      m_hBunchNumVSNStrips->Fill(it.GetBunchNumber(0), allU + allV);
     }
 
     break;

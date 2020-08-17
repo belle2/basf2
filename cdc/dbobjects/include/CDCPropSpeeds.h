@@ -45,7 +45,7 @@ namespace Belle2 {
 
     /**
      * Update the speed in the list.
-     * @param iClayer (continuous) layer-id,
+     * @param iCLayer (continuous) layer-id,
      * @param delta   delta-speed for the layer
      */
     void addSpeed(unsigned short iCLayer, float delta)

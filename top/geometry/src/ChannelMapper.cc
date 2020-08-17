@@ -269,6 +269,14 @@ namespace Belle2 {
 
     }
 
+    int ChannelMapper::getPmtID(int pixel) const
+    {
+      if (not isPixelIDValid(pixel)) return 0;
+      pixel--;
+      int pmtRow = pixel / 256;
+      int pmtCol = (pixel % 64) / 4;
+      return pmtRow * 16 + pmtCol + 1;
+    }
 
     void ChannelMapper::print() const
     {

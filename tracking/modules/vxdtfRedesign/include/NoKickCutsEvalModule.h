@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef NOKICKCUTSEVAL_H
-#define NOKICKCUTSEVAL_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/dataobjects/hitXP.h>
@@ -130,4 +129,3 @@ namespace Belle2 {
     };
   };
 }
-#endif

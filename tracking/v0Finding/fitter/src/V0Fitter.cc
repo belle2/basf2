@@ -27,6 +27,7 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
   if (m_validation) {
     B2DEBUG(300, "Register DataStore for validation.");
     m_validationV0s.registerInDataStore(v0ValidationVerticesName, DataStore::c_ErrorIfAlreadyRegistered);
+    m_v0s.registerRelationTo(m_validationV0s);
   }
 
   B2ASSERT(genfit::MaterialEffects::getInstance()->isInitialized(),
@@ -248,8 +249,8 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, stMinus, Bz, trackHypotheses.second);
 
   B2DEBUG(100, "Creating new V0.");
-  m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
-                  std::make_pair(trackMinus, tfrMinusVtx));
+  auto v0 = m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
+                            std::make_pair(trackMinus, tfrMinusVtx));
 
   if (m_validation) {
     B2DEBUG(300, "Create StoreArray and Output for validation.");
@@ -257,15 +258,16 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
     // Reconstruct invariant mass.
     lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());
     lv1.SetVectM(tr1->getMom(), trackHypotheses.second.getMass());
-    m_validationV0s.appendNew(
-      std::make_pair(trackPlus, tfrPlusVtx),
-      std::make_pair(trackMinus, tfrMinusVtx),
-      vert.getPos(),
-      vert.getCov(),
-      (lv0 + lv1).P(),
-      (lv0 + lv1).M(),
-      vert.getChi2()
-    );
+    auto validationV0 = m_validationV0s.appendNew(
+                          std::make_pair(trackPlus, tfrPlusVtx),
+                          std::make_pair(trackMinus, tfrMinusVtx),
+                          vert.getPos(),
+                          vert.getCov(),
+                          (lv0 + lv1).P(),
+                          (lv0 + lv1).M(),
+                          vert.getChi2()
+                        );
+    v0->addRelationTo(validationV0);
 
   }
   return true;

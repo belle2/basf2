@@ -14,11 +14,6 @@
 #include <TTree.h>
 #include <TMath.h>
 
-//Framework
-#include <framework/gearbox/Const.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/DataStore.h>
-
 //TOP
 #include <top/dataobjects/TOPDigit.h>
 #include <top/dataobjects/TOPRawDigit.h>

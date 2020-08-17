@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPPmtGainPar.h>
-#include <framework/logging/Logger.h>
 #include <iostream>
 #include <iomanip>
 

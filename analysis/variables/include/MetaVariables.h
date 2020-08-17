@@ -23,7 +23,7 @@ namespace Belle2 {
     /**
      * Returns function which returns extra info of a given particle
      * First argument in the argument vector must be the name of the extra info
-     * If the extraInfo does not exist -999 is returned.
+     * If the extraInfo does not exist NaN is returned.
      */
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments);
 
@@ -52,10 +52,22 @@ namespace Belle2 {
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments);
 
     /**
+     * Set certain bits in a variable to zero
+     */
+    Manager::FunctionPtr unmask(const std::vector<std::string>& arguments);
+
+
+    /**
      * Returns 1 if the same mdst source object was used to create a particle in
      * the list (0 if not and -1 for non-mdst source based particles
      */
     Manager::FunctionPtr sourceObjectIsInList(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns 1 if the same matched mcparticle is matched to a particle in
+     * the list (0 if not). Also works for lists filled from mcparticles.
+     */
+    Manager::FunctionPtr mcParticleIsInMCList(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns 1 if the given particle is a daughter of at least one of the particles of the
@@ -104,7 +116,6 @@ namespace Belle2 {
      * See also mostB2BInList.
      */
     Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
-
 
     /**
      * Returns function which returns the product of a variable over all daughters of the given particle
@@ -212,7 +223,14 @@ namespace Belle2 {
      * which is the sum of the first two daughter momenta.
      * The arguments in the argument vector must be generalized daughter indices.
      */
-    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments);
+    Manager::FunctionPtr daughterAngle(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the angle between the granddaughter particle's
+     * and the reverted particle's momentum vector in the daughter particle's rest frame.
+     * Two arguments representing the indices of the daughter and granddaughter have to be provided as arguments.
+     */
+    Manager::FunctionPtr grandDaughterDecayAngle(const std::vector<std::string>& arguments);
 
     /**
      * Returns function which returns the angle between clusters associated to the two daughters.
@@ -316,7 +334,7 @@ namespace Belle2 {
      * daughters, one might need to write out additional information to identify the Monte Carlo Daugther
      * particles.
      * Second argument must be a valid variable.
-     * If the particle is not matched to a MC particle or does not have a nth MC daughter -999 is returned.
+     * If the particle is not matched to a MC particle or does not have a nth MC daughter NaN is returned.
      */
     Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments);
 
@@ -325,7 +343,7 @@ namespace Belle2 {
      * Returns function which returns the variable for the Monte Carlo mother of the given particle.
      * The argument of the function must be a valid variable name.
      * If the particle is not matched with a Monte Carlo particle, or does not have a Monte Carlo
-     * mother, -999 will be returned.
+     * mother, NaN will be returned.
      */
     Manager::FunctionPtr mcMother(const std::vector<std::string>& arguments);
 
@@ -334,7 +352,7 @@ namespace Belle2 {
      * The arguments of the function must be
      *     argument 1: Index of the particle in the MCParticle Array
      *     argument 2: Valid basf2 function name of the function that shall be evaluated.
-     * If the provided index goes beyond the length of the mcParticles array, -999 will be returned.
+     * If the provided index goes beyond the length of the mcParticles array, NaN will be returned.
      */
     Manager::FunctionPtr genParticle(const std::vector<std::string>& arguments);
 
@@ -342,7 +360,7 @@ namespace Belle2 {
      * Returns function which returns the variable for the generator level Upsilon(4S).
      * The argument of the function must be a valid basf2 function name of the function
      * that shall be evaluated.
-     * If no generator level Upsilon(4S) exists for this event, -999 will be returned.
+     * If no generator level Upsilon(4S) exists for this event, NaN will be returned.
      */
     Manager::FunctionPtr genUpsilon4S(const std::vector<std::string>& arguments);
 
@@ -401,6 +419,11 @@ namespace Belle2 {
     Manager::FunctionPtr maxPtInList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns maximum opening angle in the given particle Lists.
+     */
+    Manager::FunctionPtr maxOpeningAngleInList(const std::vector<std::string>& arguments);
+
+    /**
     * Returns function which returns if at least one track is related to the cluster of the particle and this track satisfies the given condition.
     */
     Manager::FunctionPtr eclClusterTrackMatchedWithCondition(const std::vector<std::string>& arguments);
@@ -435,6 +458,10 @@ namespace Belle2 {
     */
     Manager::FunctionPtr  useAlternativeDaughterHypothesis(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns variable of particle's gen-level ancestor of given type
+     */
+    Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments);
 
   }
 }

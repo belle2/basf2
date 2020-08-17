@@ -63,7 +63,8 @@ namespace Belle2 {
     //! Get magic number for data corruption check
     unsigned int GetMagicTrailer(int n) OVERRIDE_CPP17;
 
-
+    //! Get stored information of getimeofday in a PC
+    void GetPCTimeVal(int n, struct timeval* tv) OVERRIDE_CPP17;
 
     //! check the data contents
     void CheckData(int n,
@@ -121,7 +122,9 @@ namespace Belle2 {
       POS_FRAME_COUNT = 11,
       POS_TIME_SINCE_PREV_TRG = 12,
       POS_INJECTION_INFO = 13,
-      POS_BUNCH_NUM = 14
+      POS_BUNCH_NUM = 14,
+      POS_TVSEC_FROM_PC = 15,
+      POS_TVUSEC_FROM_PC = 16
     };
 
     //!trailer format

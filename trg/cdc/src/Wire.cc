@@ -14,7 +14,6 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include "trg/trg/Debug.h"
 #include "trg/trg/Clock.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"

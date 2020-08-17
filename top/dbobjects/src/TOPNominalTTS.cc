@@ -10,7 +10,6 @@
 
 #include <top/dbobjects/TOPNominalTTS.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
 #include <iostream>
 #include <TRandom.h>
 

@@ -51,6 +51,7 @@ namespace Belle2 {
     std::vector<std::string> m_particleListsInput;  /**< Name of the input particle lists of pi+ gamma and Klongs*/
     std::string m_nestedROEArrayName; /**< Name of the nested ROE */
     bool m_createNestedROE; /**< Should we create nested ROE? */
+    bool m_fromMC; /**< Should we create MC ROE? */
     /**
     * Adds all particles from input particle lists that are not used in reconstruction of given particle.
     *

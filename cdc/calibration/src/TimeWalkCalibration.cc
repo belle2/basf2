@@ -300,7 +300,7 @@ void TimeWalkCalibration::readTW()
     }
   } else {
     //For text mode
-    std::string fileName1 = "/cdc/data/" + m_InputTWFileName;
+    std::string fileName1 = "/data/cdc" + m_InputTWFileName;
     std::string fileName = FileSystem::findFile(fileName1);
     ifstream ifs;
     if (fileName == "") {

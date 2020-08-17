@@ -13,12 +13,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDCluster.h>
 
 #include <svd/online/SVDOnlineToOfflineMap.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/database/PayloadFile.h>
 
 namespace Belle2 {
@@ -57,6 +54,8 @@ namespace Belle2 {
       float m_charge = 20000; /**< total charge of the cluster, in e-*/
       float m_SNR = 15; /**< SNR of the cluster*/
       int m_size = 128; /**< size of the cluster*/
+      int m_firstFrame = 0; /**< first frame*/
+      int m_nFakeClusters = 4; /**< number of fake clusters*/
 
       /** Collection of SVDClusters */
       StoreArray<SVDCluster> m_storeClusters;

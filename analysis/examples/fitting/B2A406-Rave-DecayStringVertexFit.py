@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ########################################################
 #
@@ -30,9 +29,7 @@ import basf2 as b2
 from modularAnalysis import inputMdst
 from modularAnalysis import reconstructDecay
 from modularAnalysis import matchMCTruth
-from vertex import vertexRave
-from vertex import massVertexRave
-from vertex import vertexRaveDaughtersUpdate
+from vertex import raveFit
 from stdCharged import stdPi, stdK
 from modularAnalysis import variablesToNtuple
 import variables.collections as vc
@@ -64,17 +61,17 @@ reconstructDecay('D0:du -> K-:loose pi+:loose', '1.8 < M < 1.9', path=my_path)
 
 # perform D0 vertex fit
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-massVertexRave('D0:kpi', 0.0, path=my_path)
+raveFit('D0:kpi', 0.0, fit_type='massvertex', path=my_path)
 
 # perform D0 single track fit (production vertex)
 # D0 vertex and covariance matrix must be defined
-vertexRave('D0:st', 0.0, path=my_path)
+raveFit('D0:st', 0.0, path=my_path)
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D0:st', 0.0, '^D0 -> K- pi+', 'ipprofile', path=my_path)
+raveFit('D0:st', 0.0, decay_string='^D0 -> K- pi+', constraint='ipprofile', path=my_path)
 
 # perform D0 vertex fit updating daughters
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRaveDaughtersUpdate('D0:du', 0.0, path=my_path)
+raveFit('D0:du', 0.0, daughtersUpdate=True, path=my_path)
 
 # reconstruct 3 times the D*+ -> D0 pi+ decay
 # keep only candidates with Q = M(D0pi) - M(D0) - M(pi) < 20 MeV
@@ -93,15 +90,15 @@ matchMCTruth('D*+:3', path=my_path)
 
 # perform D*+ kinematic vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+:1', 0.0, path=my_path)
+raveFit('D*+:1', 0.0, path=my_path)
 
 # perform D*+ kinematic beam spot constrained vertex fit using the D0 and the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+:2', 0.0, '', 'ipprofile', path=my_path)
+raveFit('D*+:2', 0.0, constraint='ipprofile', path=my_path)
 
 # perform D*+ kinematic beam spot constrained vertex fit using only the pi+
 # keep candidates only passing C.L. value of the fit > 0.0 (no cut)
-vertexRave('D*+:3', 0.0, 'D*+ -> D0 ^pi+', 'ipprofile', path=my_path)
+raveFit('D*+:3', 0.0, decay_string='D*+ -> D0 ^pi+', constraint='ipprofile', path=my_path)
 
 # Select variables that we want to store to ntuple
 dstar_vars = vc.inv_mass + vc.mc_truth + \

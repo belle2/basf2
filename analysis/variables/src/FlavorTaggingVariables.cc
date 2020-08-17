@@ -108,7 +108,7 @@ namespace Belle2 {
           // Here we skip tracks with 0 charge
           if (track->getTrackFitResultWithClosestMass(charged)->getChargeSign() == 0) continue;
           Particle particle(track, charged);
-          if (particle.getParticleType() == Particle::c_Track) {
+          if (particle.getParticleSource() == Particle::c_Track) {
             TLorentzVector p_cms = T.rotateLabToCms() * particle.get4Vector();
             if (p_cms != p_cms) continue;
             if (p_cms.Rho() > P_MAX) continue;
@@ -596,7 +596,7 @@ namespace Belle2 {
         for (unsigned int i = 0; i < Y->getListSize(); ++i)
         {
           const auto& oParticle = Y->getParticle(i);
-          result = particle->overlapsWith(oParticle);
+          result = (double)particle->overlapsWith(oParticle);
           if (result == 1.0)
             return 1;
         }
@@ -933,6 +933,33 @@ namespace Belle2 {
 
 //  Target Variables ----------------------------------------------------------------------------------------------
 
+    // Lists used in target variables
+    std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
+
+    std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
+                                      4414, 4424, 4432, 4434, 4444
+                                    };
+
+    std::vector<int> qqbarMesons = {// light qqbar
+      111, 9000111, 100111, 10111, 200111, 113, 10113, 20113, 9000113, 100113, 9010113, 9020113, 30113, 9030113, 9040113,
+      115, 10115, 100115, 9000115, 117, 9000117, 9010117, 119,
+      // ssbar Mesons
+      221, 331, 9000221, 9010221, 100221, 10221, 100331, 9020221, 10331, 200221, 9030221, 9040221, 9050221, 9060221, 9070221, 223, 333, 10223, 20223,
+      10333, 20333, 100223, 9000223, 9010223, 30223, 100333, 225, 9000225, 335, 9010225, 9020225, 10225, 9030225, 10335, 9040225, 100225, 100335,
+      9050225, 9060225, 9070225, 227, 337, 229, 9000339, 9000229,
+      // ccbar Mesons
+      441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443, 9010443, 9020443, 445, 9000445
+    };
+
+    std::vector<int> flavorConservingMesons = {// Excited light mesons that can decay into hadrons conserving flavor
+      9000211, 100211, 10211, 200211, 213, 10213, 20213, 9000213, 100213, 9010213, 9020213, 30213, 9030213, 9040213,
+      215, 10215, 100215, 9000215, 217, 9000217, 9010217, 219,
+      // Excited K Mesons that hadronize conserving flavor
+      30343, 10311, 10321, 100311, 100321, 200311, 200321, 9000311, 9000321, 313, 323, 10313, 10323, 20313, 20323, 100313, 100323,
+      9000313, 9000323, 30313, 30323, 315, 325, 9000315, 9000325, 10315, 10325, 20315, 20325, 100315, 100325, 9010315,
+      9010325, 317, 327, 9010317, 9010327, 319, 329, 9000319, 9000329
+    };
+
     Manager::FunctionPtr isRightTrack(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -990,8 +1017,6 @@ namespace Belle2 {
 
           bool isCharmedMesonInChain = false;
 
-          std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
-
           if ((index == 6) && mothersPDG.size() > 1)
           {
 
@@ -1008,10 +1033,6 @@ namespace Belle2 {
 
           bool isCharmedBaryonInChain = false;
 
-          std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
-                                            4414, 4424, 4432, 4434, 4444
-                                          };
-
           if ((index == 6 || index == 9) && mothersPDG.size() > 1)
           {
 
@@ -1026,17 +1047,6 @@ namespace Belle2 {
           // ----------------  Is neutral qqbar Meson in the decay chain  --------------------------------
 
           bool isQQbarMesonInChain = false;
-
-          std::vector<int> qqbarMesons = {// light qqbar
-            111, 9000111, 100111, 10111, 200111, 113, 10113, 20113, 9000113, 100113, 9010113, 9020113, 30113, 9030113, 9040113,
-            115, 10115, 100115, 9000115, 117, 9000117, 9010117, 119,
-            // ssbar Mesons
-            221, 331, 9000221, 9010221, 100221, 10221, 100331, 9020221, 10331, 200221, 9030221, 9040221, 9050221, 9060221, 9070221, 223, 333, 10223, 20223,
-            10333, 20333, 100223, 9000223, 9010223, 30223, 100333, 225, 9000225, 335, 9010225, 9020225, 10225, 9030225, 10335, 9040225, 100225, 100335,
-            9050225, 9060225, 9070225, 227, 337, 229, 9000339, 9000229,
-            // ccbar Mesons
-            441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443, 9010443, 9020443, 445, 9000445
-          };
 
           if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 8) && mothersPDG.size() > 1)
           {
@@ -1053,15 +1063,6 @@ namespace Belle2 {
           // --------------  Is the Hadron a descendent of a Meson that conserves flavor  --------------------------
 
           bool isB0DaughterConservingFlavor = false;
-
-          std::vector<int> flavorConservingMesons = {// Excited light mesons that can decay into hadrons conserving flavor
-            9000211, 100211, 10211, 200211, 213, 10213, 20213, 9000213, 100213, 9010213, 9020213, 30213, 9030213, 9040213,
-            215, 10215, 100215, 9000215, 217, 9000217, 9010217, 219,
-            // Excited K Mesons that hadronize conserving flavor
-            30343, 10311, 10321, 100311, 100321, 200311, 200321, 9000311, 9000321, 313, 323, 10313, 10323, 20313, 20323, 100313, 100323,
-            9000313, 9000323, 30313, 30323, 315, 325, 9000315, 9000325, 10315, 10325, 20315, 20325, 100315, 100325, 9010315,
-            9010325, 317, 327, 9010317, 9010327, 319, 329, 9000319, 9000329
-          };
 
           if ((index == 8) && mothersPDG.size() > 1)
           {
@@ -1210,8 +1211,6 @@ namespace Belle2 {
 
           bool isCharmedMesonInChain = false;
 
-          std::vector<int> charmMesons = { 411, 421, 10411, 10421, 413, 423, 10413, 10423, 20413, 20423, 415, 425, 431, 10431, 433, 10433, 20433, 435};
-
           if ((index == 6) && mothersPDG.size() > 1)
           {
 
@@ -1228,10 +1227,6 @@ namespace Belle2 {
 
           bool isCharmedBaryonInChain = false;
 
-          std::vector<int> charmBaryons = { 4122, 4222, 4212, 4112, 4224, 4214, 4114, 4232, 4132, 4322, 4312, 4324, 4314, 4332, 4334, 4412, 4422,
-                                            4414, 4424, 4432, 4434, 4444
-                                          };
-
           if ((index == 6 || index == 12) && mothersPDG.size() > 1)
           {
 
@@ -1246,17 +1241,6 @@ namespace Belle2 {
           // ----------------  Is neutral qqbar Meson in the decay chain  --------------------------------
 
           bool isQQbarMesonInChain = false;
-
-          std::vector<int> qqbarMesons = {// light qqbar
-            111, 9000111, 100111, 10111, 200111, 113, 10113, 20113, 9000113, 100113, 9010113, 9020113, 30113, 9030113, 9040113,
-            115, 10115, 100115, 9000115, 117, 9000117, 9010117, 119,
-            // ssbar Mesons
-            221, 331, 9000221, 9010221, 100221, 10221, 100331, 9020221, 10331, 200221, 9030221, 9040221, 9050221, 9060221, 9070221, 223, 333, 10223, 20223,
-            10333, 20333, 100223, 9000223, 9010223, 30223, 100333, 225, 9000225, 335, 9010225, 9020225, 10225, 9030225, 10335, 9040225, 100225, 100335,
-            9050225, 9060225, 9070225, 227, 337, 229, 9000339, 9000229,
-            // ccbar Mesons
-            441, 10441, 100441, 443, 10443, 20443, 100443, 30443, 9000443, 9010443, 9020443, 445, 9000445
-          };
 
           if ((index == 1 || index == 3 || index == 5 || index == 6 || index == 8 || index == 11) && mothersPDG.size() > 1)
           {
@@ -1273,15 +1257,6 @@ namespace Belle2 {
           // --------------  Is the Hadron a descendent of a Meson that conserves flavor  --------------------------
 
           bool isB0DaughterConservingFlavor = false;
-
-          std::vector<int> flavorConservingMesons = {// Excited light mesons that can decay into hadrons conserving flavor
-            9000211, 100211, 10211, 200211, 213, 10213, 20213, 9000213, 100213, 9010213, 9020213, 30213, 9030213, 9040213,
-            215, 10215, 100215, 9000215, 217, 9000217, 9010217, 219,
-            // Excited K Mesons that hadronize conserving flavor
-            30343, 10311, 10321, 100311, 100321, 200311, 200321, 9000311, 9000321, 313, 323, 10313, 10323, 20313, 20323, 100313, 100323,
-            9000313, 9000323, 30313, 30323, 315, 325, 9000315, 9000325, 10315, 10325, 20315, 20325, 100315, 100325, 9010315,
-            9010325, 317, 327, 9010317, 9010327, 319, 329, 9000319, 9000329
-          };
 
           if ((index == 8) && mothersPDG.size() > 1)
           {
@@ -1890,10 +1865,8 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")
               output = flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined();
-            }
           }
           return output;
         };
@@ -1914,10 +1887,8 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert")
               output = TMath::Sign(1, flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined());
-            }
           }
           return output;
         };
@@ -1938,8 +1909,7 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert") {
               double r = std::abs(flavorTaggerInfo->getMethodMap(combinerMethod)->getQrCombined());
               if (r < 0.1) output = 0;
               if (r > 0.1 && r < 0.25) output = 1;
@@ -1969,8 +1939,7 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert") {
               std::map<std::string, float> iQpCategories = flavorTaggerInfo->getMethodMap("FBDT")->getQpCategory();
               if (iQpCategories.find(categoryName) != iQpCategories.end()) output = iQpCategories.at(categoryName);
               else if (iQpCategories.size() != 0) B2FATAL("qpCategory: Category with name " << categoryName
@@ -1996,8 +1965,7 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert") {
               std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo->getMethodMap("FBDT")->getIsTrueCategory();
               if (iIsTrueCategories.find(categoryName) != iIsTrueCategories.end()) output = iIsTrueCategories.at(categoryName);
               else if (iIsTrueCategories.size() != 0) B2FATAL("isTrueFTCategory: Category with name " << categoryName
@@ -2023,8 +1991,7 @@ namespace Belle2 {
 
           if (flavorTaggerInfo != nullptr)
           {
-            if (Variable::hasRestOfEventTracks(particle) > 0) {
-              if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") B2FATAL("The Flavor Tagger is not in Expert Mode");
+            if (flavorTaggerInfo->getUseModeFlavorTagger() == "Expert") {
               std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo->getMethodMap("FBDT")->getHasTrueTarget();
               if (iHasTrueTargets.find(categoryName) != iHasTrueTargets.end()) output = iHasTrueTargets.at(categoryName);
               else if (iHasTrueTargets.size() != 0) B2FATAL("hasTrueTargets: Category with name " << categoryName
@@ -2069,7 +2036,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,
                       "-1 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the reco side.");
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,
-                      "-1 (1) if current RestOfEvent is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the reco side.");
+                      "[Eventbased] -1 (1) if current RestOfEvent is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the reco side.");
     REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
                       "checks the decay chain of the given particle upwards up to the Y(4S) resonance.Output is 0 (1) if an ancestor is found to be a B0bar (B0), if not -2.");
     REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "mcErrors MCMatching Flag on the reconstructed B0_cp.");

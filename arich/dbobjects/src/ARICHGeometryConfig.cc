@@ -13,10 +13,13 @@
 #include <framework/gearbox/Unit.h>
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <arich/dbobjects/tessellatedSolidStr.h>
+
 #include <geometry/Materials.h>
 #include <arich/dbobjects/ARICHGeoHAPD.h>
 
 #include <cmath>
+#include <fstream>
 
 using namespace std;
 using namespace Belle2;
@@ -79,11 +82,24 @@ void ARICHGeometryConfig::read(const GearDir& content)
   m_merger.setMergerPCBLenght(mergerParams.getDouble("merger/sizeL"));
   m_merger.setMergerPCBWidth(mergerParams.getDouble("merger/sizeW"));
   m_merger.setMergerPCBThickness(mergerParams.getDouble("merger/thickness"));
+  m_merger.setMergerPCBscrewholeR(mergerParams.getDouble("merger/mergerPCBscrewholeR"));
+  m_merger.setMergerPCBscrewholePosdY(mergerParams.getDouble("merger/mergerPCBscrewholePosdY"));
+  m_merger.setMergerPCBscrewholePosdX1(mergerParams.getDouble("merger/mergerPCBscrewholePosdX1"));
+  m_merger.setMergerPCBscrewholePosdX2(mergerParams.getDouble("merger/mergerPCBscrewholePosdX2"));
+  m_merger.setSingleMergerEnvelopeSizeL(mergerParams.getDouble("merger/envelopeSizeL"));
+  m_merger.setSingleMergerEnvelopeSizeW(mergerParams.getDouble("merger/envelopeSizeW"));
+  m_merger.setSingleMergerEnvelopeThickness(mergerParams.getDouble("merger/envelopeThickness"));
+  m_merger.setSingleMergerenvelopeDeltaZ(mergerParams.getArray("merger/envelopeDeltaZ"));
   m_merger.setMergerSlotID(mergerParams.getArray("merger/mergerSlotID"));
   m_merger.setMergerPosR(mergerParams.getArray("merger/mergerPosR"));
   m_merger.setMergerAngle(mergerParams.getArray("merger/mergerAngle"));
-  m_merger.setEnvelopeCenterPosition(mergerParams.getDouble("mergerEnvelope/x0"), mergerParams.getDouble("mergerEnvelope/y0"),
+  m_merger.setMergerOrientation(mergerParams.getArray("merger/mergerOrientation"));
+  m_merger.setEnvelopeCenterPosition(mergerParams.getDouble("mergerEnvelope/x0"),
+                                     mergerParams.getDouble("mergerEnvelope/y0"),
                                      mergerParams.getDouble("mergerEnvelope/z0"));
+  m_merger.setSingleMergeEnvelopePosition(mergerParams.getDouble("merger/envelopePosX0"),
+                                          mergerParams.getDouble("merger/envelopePosY0"),
+                                          mergerParams.getDouble("merger/envelopePosZ0"));
   m_merger.setEnvelopeOuterRadius(mergerParams.getDouble("mergerEnvelope/outerRadius"));
   m_merger.setEnvelopeInnerRadius(mergerParams.getDouble("mergerEnvelope/innerRadius"));
   m_merger.setEnvelopeThickness(mergerParams.getDouble("mergerEnvelope/thickness"));
@@ -131,6 +147,19 @@ void ARICHGeometryConfig::read(const GearDir& content)
   m_cooling.setCoolingTestPlatePosZ0(coolingParams.getArray("coolingTestPlate/coolingTestPlatePosZ0"));
   m_cooling.checkCoolingSystemDataConsistency();
   //m_cooling.print();
+
+  GearDir coolingFEBParams(content, "febcoolingv2");
+  // read ARICH cooling system (v2) parameters
+  // FEB cooling bodies
+  m_coolingv2.setSmallSquareSize(coolingFEBParams.getDouble("smallSquareSize"));
+  m_coolingv2.setSmallSquareThickness(coolingFEBParams.getDouble("smallSquareThickness"));
+  m_coolingv2.setBigSquareSize(coolingFEBParams.getDouble("bigSquareSize"));
+  m_coolingv2.setBigSquareThickness(coolingFEBParams.getDouble("bigSquareThickness"));
+  m_coolingv2.setRectangleL(coolingFEBParams.getDouble("rectangleL"));
+  m_coolingv2.setRectangleW(coolingFEBParams.getDouble("rectangleW"));
+  m_coolingv2.setRectangleThickness(coolingFEBParams.getDouble("rectangleThickness"));
+  m_coolingv2.setRectangleDistanceFromCenter(coolingFEBParams.getDouble("rectangleDistanceFromCenter"));
+  m_coolingv2.setFebcoolingv2GeometryID(coolingFEBParams.getArray("febcoolingv2GeometryID"));
 
   // read detector plane parameters
   modulesPosition(content);

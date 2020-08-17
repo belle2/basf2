@@ -19,14 +19,16 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
-#include <klm/bklm/dataobjects/BKLMElementNumbers.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <ir/dbobjects/BeamPipeGeo.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
-#include <klm/dbobjects/MuidParameters.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dbobjects/KLMLikelihoodParameters.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+#include <structure/dbobjects/COILGeometryPar.h>
 
 /* Geant4 headers. */
 #include <G4ErrorTrajErr.hh>
@@ -34,6 +36,7 @@
 #include <G4TouchableHandle.hh>
 
 /* C++ headers. */
+#include <map>
 #include <string>
 #include <vector>
 
@@ -353,6 +356,12 @@ namespace Belle2 {
     //! virtual "target" cylinder for MUID (boundary beyond which extrapolation ends)
     Simulation::ExtCylSurfaceTarget* m_TargetMuid;
 
+    //! Conditions-database object for COIL geometry
+    DBObjPtr<COILGeometryPar> m_COILGeometryPar;
+
+    //! Conditions-database object for beam pipe geometry
+    DBObjPtr<BeamPipeGeo> m_BeamPipeGeo;
+
     //! Minimum squared radius (cm) outside of which extrapolation will continue
     double m_MinRadiusSq;
 
@@ -417,47 +426,11 @@ namespace Belle2 {
     //! hit-plane z (cm) of each IP layer relative to KLM midpoint
     double m_EndcapModuleMiddleZ[BKLMElementNumbers::getMaximalLayerNumber() + 1];
 
-    //! experiment number for the current set of particle-hypothesis PDFs
-    int m_ExpNo;
-
     //! Parameter to add the found hits also to the reco tracks or not. Is turned off by default.
     bool m_addHitsToRecoTrack = false;
 
-    //! probability density function for positive-muon hypothesis
-    MuidBuilder* m_MuonPlusPar;
-
-    //! probability density function for negative-muon hypothesis
-    MuidBuilder* m_MuonMinusPar;
-
-    //! probability density function for positive-pion hypothesis
-    MuidBuilder* m_PionPlusPar;
-
-    //! probability density function for negative-pion hypothesis
-    MuidBuilder* m_PionMinusPar;
-
-    //! probability density function for positive-kaon hypothesis
-    MuidBuilder* m_KaonPlusPar;
-
-    //! probability density function for negative-kaon hypothesis
-    MuidBuilder* m_KaonMinusPar;
-
-    //! probability density function for proton hypothesis
-    MuidBuilder* m_ProtonPar;
-
-    //! probability density function for antiproton hypothesis
-    MuidBuilder* m_AntiprotonPar;
-
-    //! probability density function for deuteron hypothesis
-    MuidBuilder* m_DeuteronPar;
-
-    //! probability density function for antideuteron hypothesis
-    MuidBuilder* m_AntideuteronPar;
-
-    //! probability density function for electron hypothesis
-    MuidBuilder* m_ElectronPar;
-
-    //! probability density function for positron hypothesis
-    MuidBuilder* m_PositronPar;
+    //! PDF for the charged final state particle hypotheses
+    std::map<int, MuidBuilder*> m_MuidBuilderMap;
 
     //! KLM element numbers.
     const KLMElementNumbers* m_klmElementNumbers;
@@ -471,8 +444,8 @@ namespace Belle2 {
     //! Conditions-database object for KLM strip efficiency
     DBObjPtr<KLMStripEfficiency> m_klmStripEfficiency;
 
-    //! Conditions-database object for Muid parameters
-    DBObjPtr<MuidParameters> m_muidParameters;
+    //! Conditions-database object for KLM likelihood parameters
+    DBObjPtr<KLMLikelihoodParameters> m_klmLikelihoodParameters;
 
     //! ECL clusters
     StoreArray<ECLCluster> m_eclClusters;

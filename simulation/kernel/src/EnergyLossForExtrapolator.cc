@@ -308,7 +308,7 @@ void EnergyLossForExtrapolator::Initialisation()
   m_InvRangeDeuteron = PrepareTable();
   m_MscatElectron    = PrepareTable();
 
-  G4LossTableBuilder builder;
+  G4LossTableBuilder& builder = *(G4LossTableManager::Instance()->GetTableBuilder());
 
   B2DEBUG(10, "EnergyLossForExtrapolator Builds electron tables");
   ComputeElectronDEDX(m_Electron, m_DedxElectron);

@@ -24,7 +24,9 @@
 #pragma link C++ class Belle2::TOPTriggerMCInfo+;
 #pragma link C++ class Belle2::TOPPull+;
 #pragma link C++ class Belle2::TOPPDFCollection+;
+#pragma link C++ class Belle2::TOPPixelLikelihood+;
 #pragma link C++ class Belle2::TOPAsicMask+;
+#pragma link C++ class Belle2::TOPAssociatedPDF+;
 
 // schema evolution rules to allow reading of old class versions
 

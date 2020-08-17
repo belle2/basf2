@@ -10,11 +10,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLBHABHATCOLLECTORMODULE_H
-#define ECLBHABHATCOLLECTORMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/utility/ECLTimingUtilities.h>
 
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
@@ -72,6 +72,11 @@ namespace Belle2 {
      */
     StoreObjPtr<EventT0> m_eventT0;
 
+    /** electronics amplitude calibration from database
+        Scale amplitudefor each crystal and for dead pre-amps*/
+    DBObjPtr<ECLCrystalCalib> m_ElectronicsDB; /**< database object */
+    std::vector<float> m_Electronics; /**< vector obtained from DB object */
+
     /** Time offset from electronics calibration from database */
     DBObjPtr<ECLCrystalCalib> m_ElectronicsTimeDB; /**< database object */
     std::vector<float> m_ElectronicsTime; /**< vector obtained from DB object */
@@ -105,8 +110,6 @@ namespace Belle2 {
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evtNum;    /**< Event number for debug TTree output*/
     int m_tree_cid;     /**< ECL Cell ID (1..8736) for debug TTree output */
-    double m_tree_phi;     /**< phi position for debug TTree output */
-    double m_tree_theta;     /**< theta position for debug TTree output */
     int m_tree_amp;     /**< Fitting amplitude from ECL for debug TTree output */
     double m_tree_en;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
     double m_tree_E1Etot;     /**< Energy of crystal with maximum energy within
@@ -196,19 +199,7 @@ namespace Belle2 {
     // For the energy dependence correction to the time
     // t-t0 = p1 + pow( (p3/(amplitude+p2)), p4 ) + p5*exp(-amplitude/p6)      ("Energy dependence equation")
 
-    /* Function to calculate "energy dependence equation using Alex function" */
-    double energyDependentTimeOffsetElectronic(const double amplitude);
-
-    double m_energyDependenceTimeOffsetFitParam_p1 = 0;                /**< p1 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p2 = 88449.;           /**< p2 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p3 = 0.20867E+06;      /**< p3 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p4 = 3.1482;           /**< p4 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p5 = 7.4747;           /**< p5 in "energy dependence equation" */
-    double m_energyDependenceTimeOffsetFitParam_p6 = 1279.3;           /**< p6 in "energy dependence equation" */
-
-
+    std::unique_ptr< Belle2::ECL::ECLTimingUtilities > m_ECLTimeUtil =
+      std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
   };
 }
-
-#endif /* ECLBHABHATCOLLECTORMODULE_H */
-

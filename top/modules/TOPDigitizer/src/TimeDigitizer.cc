@@ -19,11 +19,12 @@ using namespace std;
 namespace Belle2 {
   namespace TOP {
 
-    unsigned TimeDigitizer::m_storageDepth = 0;
-    unsigned TimeDigitizer::m_readoutWindows = 0;
-    int TimeDigitizer::m_offsetWindows = 0;
-    unsigned TimeDigitizer::m_window = 0;
-    bool TimeDigitizer::m_maskSamples = false;
+    unsigned TimeDigitizer::s_storageDepth = 0;
+    unsigned TimeDigitizer::s_readoutWindows = 0;
+    int TimeDigitizer::s_offsetWindows = 0;
+    unsigned TimeDigitizer::s_window = 0;
+    bool TimeDigitizer::s_maskSamples = false;
+    DBObjPtr<TOPCalTimeWalk>* TimeDigitizer::s_timeWalk = 0;
 
     TimeDigitizer::TimeDigitizer(int moduleID, int pixelID, double timeOffset,
                                  double calErrorsSq, int shift, double rmsNoise,
@@ -188,7 +189,7 @@ namespace Belle2 {
         rawDigit->setCarrierNumber(m_carrier);
         rawDigit->setASICNumber(m_asic);
         rawDigit->setASICChannel(m_chan);
-        rawDigit->setASICWindow(m_window);
+        rawDigit->setASICWindow(s_window);
         rawDigit->setSampleRise(sampleRise);
         rawDigit->setDeltaSamplePeak(samplePeak - sampleRise);
         rawDigit->setDeltaSampleFall(sampleFall - sampleRise);
@@ -256,12 +257,12 @@ namespace Belle2 {
       // generate waveform
 
       std::vector<unsigned short> windowNumbers;
-      int offsetWindows = m_offsetWindows + m_windowShift;
-      int winnum = m_window + offsetWindows;
-      if (winnum < 0) winnum += m_storageDepth;
+      int offsetWindows = s_offsetWindows + m_windowShift;
+      int winnum = s_window + offsetWindows;
+      if (winnum < 0) winnum += s_storageDepth;
       windowNumbers.push_back(winnum);
-      for (unsigned i = 1; i < m_readoutWindows; i++) {
-        windowNumbers.push_back((windowNumbers.back() + 1) % m_storageDepth);
+      for (unsigned i = 1; i < s_readoutWindows; i++) {
+        windowNumbers.push_back((windowNumbers.back() + 1) % s_storageDepth);
       }
       std::vector<double> baselines(windowNumbers.size(), 0);
       std::vector<double> rmsNoises(windowNumbers.size(), m_rmsNoise);
@@ -292,7 +293,7 @@ namespace Belle2 {
         unsigned iwin = sampleRise / TOPRawWaveform::c_WindowSize;
         if (iwin >= windowNumbers.size()) continue;
         sampleRise -= iwin * TOPRawWaveform::c_WindowSize; // should fit raw data bits
-        if (m_maskSamples and (sampleRise % 64) > 55) continue;
+        if (s_maskSamples and (sampleRise % 64) > 55) continue;
 
         unsigned DsamplePeak = feature.samplePeak - feature.sampleRise;
         if ((DsamplePeak & 0x0F) != DsamplePeak) continue; // does not fit raw data bits
@@ -336,24 +337,30 @@ namespace Belle2 {
         rawTimeLeading += nwin * TOPRawDigit::c_WindowSize;
         rawTimeFalling += nwin * TOPRawDigit::c_WindowSize;
 
-        double cfdTime = m_sampleTimes->getTime(m_window, rawTimeLeading) - m_timeOffset;
-        double width = m_sampleTimes->getDeltaTime(m_window,
+        double cfdTime = m_sampleTimes->getTime(s_window, rawTimeLeading) - m_timeOffset;
+        double width = m_sampleTimes->getDeltaTime(s_window,
                                                    rawTimeFalling,
                                                    rawTimeLeading);
         int sample = static_cast<int>(rawTimeLeading);
         if (rawTimeLeading < 0) sample--;
-        double timeError = rawTimeErr * m_sampleTimes->getTimeBin(m_window, sample);
-        timeError = sqrt(timeError * timeError + m_calErrorsSq);
+        double timeError = rawTimeErr * m_sampleTimes->getTimeBin(s_window, sample);
+        double timeErrorSq = timeError * timeError + m_calErrorsSq;
+        int pulseHeight = rawDigit->getValuePeak();
+
+        if (s_timeWalk) {
+          cfdTime -= (*s_timeWalk)->getTimeWalk(pulseHeight);
+          timeErrorSq += (*s_timeWalk)->getSigmaSq(pulseHeight);
+        }
 
         // append new digit and set it
         auto* digit = digits.appendNew(m_moduleID, m_pixelID, rawTimeLeading);
         digit->setTime(cfdTime);
-        digit->setTimeError(timeError);
-        digit->setPulseHeight(rawDigit->getValuePeak());
+        digit->setTimeError(sqrt(timeErrorSq));
+        digit->setPulseHeight(pulseHeight);
         digit->setIntegral(rawDigit->getIntegral());
         digit->setPulseWidth(width);
         digit->setChannel(m_channel);
-        digit->setFirstWindow(m_window);
+        digit->setFirstWindow(s_window);
         if (m_sampleTimes->isCalibrated()) {
           digit->addStatus(TOPDigit::c_TimeBaseCalibrated);
         }
@@ -468,10 +475,16 @@ namespace Belle2 {
         double pulseHeight = hit.second.pulseHeight;
         const auto* pulseShape = hit.second.shape;
         if (not pulseShape) continue;
+        double timeWalk = 0;
+        if (s_timeWalk) {
+          double t = (*s_timeWalk)->getTimeWalk(pulseHeight);
+          double sig = (*s_timeWalk)->getSigma(pulseHeight);
+          timeWalk = gRandom->Gaus(t, sig);
+        }
         int size = waveform.size();
         for (int sample = 0; sample < size; sample++) {
-          double t = m_sampleTimes->getTime(m_window, sample - startSample) - m_timeOffset;
-          waveform[sample] += pulseHeight * pulseShape->getValue(t - hitTime);
+          double t = m_sampleTimes->getTime(s_window, sample - startSample) - m_timeOffset;
+          waveform[sample] += pulseHeight * pulseShape->getValue(t - timeWalk - hitTime);
         }
       }
 

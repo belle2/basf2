@@ -64,6 +64,7 @@
 #include "belle_legacy/benergy/BeamEnergy.h"
 #include "belle_legacy/ip/IpProfile.h"
 #include "belle_legacy/tables/evtcls.h"
+#include "belle_legacy/tables/trg.h"
 
 
 #include <cmath>
@@ -173,6 +174,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
 
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
+  addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
 
   m_realData = false;
 
@@ -214,7 +216,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   extraInfoMap.registerInDataStore();
 
-  if (m_convertEvtcls) m_evtCls.registerInDataStore();
+  if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
 
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
@@ -348,6 +350,9 @@ void B2BIIConvertMdstModule::event()
 
   // 11. Convert Evtcls panther table information
   if (m_convertEvtcls) convertEvtclsTable();
+
+  // 12. Convert trigger information from rectrg_summary3
+  if (m_convertRecTrg) convertRecTrgTable();
 
 }
 
@@ -591,7 +596,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixP(i, j) = error7x7P[i][j];
 
-        daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP, pTypeP);
+        daughterP = Particle(trackID[0] - 1, tmpTFR, pTypeP);
         daughterP.updateMomentum(TLorentzVector(momentumP.px(), momentumP.py(), momentumP.pz(), momentumP.e()),
                                  TVector3(positionP.x(), positionP.y(), positionP.z()),
                                  errMatrixP, 0.5);
@@ -614,7 +619,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         trackFitPIndex = trackFitP->getArrayIndex();
 
-        daughterP = Particle(trackID[0] - 1, trackFitP, pTypeP, pTypeP);
+        daughterP = Particle(trackID[0] - 1, trackFitP, pTypeP);
         // set momentum/positions at pivot = V0 decay vertex
         getHelixParameters(trk_fit, pTypeP.getMass(), dauPivot,
                            helixParam,  error5x5,
@@ -646,7 +651,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           for (unsigned j = 0; j < 7; j++)
             errMatrixM(i, j) = error7x7M[i][j];
 
-        daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM, pTypeM);
+        daughterM = Particle(trackID[1] - 1, tmpTFR, pTypeM);
         daughterM.updateMomentum(TLorentzVector(momentumM.px(), momentumM.py(), momentumM.pz(), momentumM.e()),
                                  TVector3(positionM.x(), positionM.y(), positionM.z()),
                                  errMatrixM, 0.5);
@@ -669,7 +674,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         trackFitMIndex = trackFitM->getArrayIndex();
 
-        daughterM = Particle(trackID[1] - 1, trackFitM, pTypeM, pTypeM);
+        daughterM = Particle(trackID[1] - 1, trackFitM, pTypeM);
         // set momentum/positions at pivot = V0 decay vertex
         getHelixParameters(trk_fit, pTypeM.getMass(), dauPivot,
                            helixParam,  error5x5,
@@ -1082,6 +1087,16 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
     B2Pi0->appendDaughter(B2Gamma1);
     B2Pi0->appendDaughter(B2Gamma2);
 
+    // Add chisq of mass-constrained Kfit
+    B2Pi0->addExtraInfo("chiSquared", mdstPi0.chisq());
+
+    // Ndf of a pi0 mass-constrained kinematic fit is 1
+    B2Pi0->addExtraInfo("ndf", 1);
+
+    // Add p-value to extra Info
+    double prob = TMath::Prob(mdstPi0.chisq(), 1);
+    B2Pi0->setPValue(prob);
+
     // Add particle to particle list
     plist->addParticle(B2Pi0);
   }
@@ -1175,8 +1190,8 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
 void B2BIIConvertMdstModule::convertEvtclsTable()
 {
   // Create StoreObj if it is not valid
-  if (not m_evtCls.isValid()) {
-    m_evtCls.create();
+  if (not m_evtInfo.isValid()) {
+    m_evtInfo.create();
   }
   // Pull Evtcls_flag(2) from manager
   Belle::Evtcls_flag_Manager& EvtFlagMgr = Belle::Evtcls_flag_Manager::get_manager();
@@ -1200,22 +1215,47 @@ void B2BIIConvertMdstModule::convertEvtclsTable()
     std::string iVar = name + std::to_string(index);
     // 0-9 corresponding to evtcls_flag.flag(0-9)
     if (index < 10) {
-      m_evtCls->addExtraInfo(iVar, (*eflagIterator).flag(index));
+      m_evtInfo->addExtraInfo(iVar, (*eflagIterator).flag(index));
     } else {
       // 10-19 corresponding to evtcls_flag2.flag(0-9)
-      m_evtCls->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
+      m_evtInfo->addExtraInfo(iVar, (*eflag2Iterator).flag(index - 10));
     }
-    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+    B2DEBUG(99, "evtcls_flag(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
   }
 
   // Converting evtcls_hadronic_flag
   for (int index = 0; index < 6; ++index) {
     std::string iVar = name_had + std::to_string(index);
-    m_evtCls->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
-    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtCls->getExtraInfo(iVar));
+    m_evtInfo->addExtraInfo(iVar, (*ehadflagIterator).hadronic_flag(index));
+    B2DEBUG(99, "evtcls_hadronic_flag(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
   }
 
 }
+
+void B2BIIConvertMdstModule::convertRecTrgTable()
+{
+
+  // Create StoreObj if it is not valid
+  if (not m_evtInfo.isValid()) {
+    m_evtInfo.create();
+  }
+
+  // Pull rectrg_summary3 from manager
+  Belle::Rectrg_summary3_Manager& RecTrgSummary3Mgr = Belle::Rectrg_summary3_Manager::get_manager();
+
+  std::string name = "rectrg_summary3_m_final";
+  // Only one entry in each event
+  std::vector<Belle::Rectrg_summary3>::iterator eflagIterator = RecTrgSummary3Mgr.begin();
+
+  // Converting m_final(3)
+  for (int index = 0; index < 3; ++index) {
+    std::string iVar = name + std::to_string(index);
+    m_evtInfo->addExtraInfo(iVar, (*eflagIterator).final(index));
+    B2DEBUG(99, "m_final(" << index << ") = " << m_evtInfo->getExtraInfo(iVar));
+  }
+
+}
+
 
 //-----------------------------------------------------------------------------
 // CONVERT OBJECTS

@@ -1,5 +1,4 @@
-#ifndef SPLITGLVIEW_H
-#define SPLITGLVIEW_H
+#pragma once
 
 #include <TQObject.h>
 #include <TEveProjectionManager.h>
@@ -81,4 +80,3 @@ namespace Belle2 {
     ClassDef(SplitGLView, 0)
   };
 }
-#endif

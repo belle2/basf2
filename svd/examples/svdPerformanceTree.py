@@ -4,7 +4,9 @@ from basf2 import *
 from basf2 import conditions as b2conditions
 import rawdata as raw
 import tracking as trk
+import simulation as sim
 import glob
+import modularAnalysis as ma
 
 ##################################################################################
 #
@@ -14,7 +16,7 @@ import glob
 ###################################################################################
 
 
-useSimulation = False
+useSimulation = True
 
 # set this string to identify the output rootfiles
 tag = "_test"
@@ -31,7 +33,7 @@ if useSimulation:
     bkgFiles = None  # uncomment to remove  background
     simulateJitter = False
     ROIfinding = False
-    MCTracking = True
+    MCTracking = False
     eventinfosetter = register_module('EventInfoSetter')
     eventinfosetter.param('expList', expList)
     eventinfosetter.param('runList', [0])
@@ -40,16 +42,17 @@ if useSimulation:
     # main.add_module('EventInfoPrinter')
     main.add_module('EvtGenInput')
 
-    add_simulation(
+    sim.add_simulation(
         main,
         bkgfiles=bkgFiles,
+        forceSetPXDDataReduction=True,
         usePXDDataReduction=ROIfinding,
         simulateT0jitter=simulateJitter)
 else:
     # setup database
     b2conditions.reset()
     b2conditions.override_globaltags()
-    b2conditions.globaltags = ['data_reprocessing_proc10', "online"]
+    b2conditions.globaltags = ["online"]
 
     # input root files
     main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs'])
@@ -62,18 +65,19 @@ else:
     # main.add_module("SVDZeroSuppressionEmulator",SNthreshold=5,ShaperDigits="SVDShaperDigitsZS3",ShaperDigitsIN="SVDShaperDigits")
 
 # now do reconstruction:
-add_tracking_reconstruction(
+trk.add_tracking_reconstruction(
     main,
     mcTrackFinding=MCTracking,
-    trackFitHypotheses=[211],
-    skipHitPreparerAdding=True)
+    trackFitHypotheses=[211])  # ,
+#    skipHitPreparerAdding=True)
 
+'''
 # skim mu+mu- events:
-applyEventCuts("nTracks ==2", path=main)
+ma.applyEventCuts("nTracks ==2", path=main)
 
 mySelection = 'pt>1.0 and abs(dz)<0.5 and dr<0.4'
-fillParticleList('mu+:DQM', mySelection, path=main)
-reconstructDecay('Upsilon(4S):IPDQM -> mu+:DQM mu-:DQM', '10<M<11', path=main)
+ma.fillParticleList('mu+:DQM', mySelection, path=main)
+ma.reconstructDecay('Upsilon(4S):IPDQM -> mu+:DQM mu-:DQM', '10<M<11', path=main)
 
 skimfilter = register_module('SkimFilter')
 skimfilter.set_name('SkimFilter_MUMU')
@@ -81,6 +85,7 @@ skimfilter.param('particleLists', ['Upsilon(4S):IPDQM'])
 main.add_module(skimfilter)
 filter_path = create_path()
 skimfilter.if_value('=1', filter_path, AfterConditionPath.CONTINUE)
+'''
 
 # fill TTrees
 main.add_module('SVDPerformanceTTree', outputFileName="SVDPerformanceTree"+str(tag)+".root")

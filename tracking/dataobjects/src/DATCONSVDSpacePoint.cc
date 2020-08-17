@@ -37,7 +37,7 @@ DATCONSVDSpacePoint::DATCONSVDSpacePoint(std::vector<const SVDCluster*>& cluster
   m_vxdID = clusters[0]->getSensorID();
 
   //We need some handle to translate IDs to local and global coordinates.
-  if (aSensorInfo == NULL) {
+  if (aSensorInfo == nullptr) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_vxdID);
   }
 
@@ -48,7 +48,7 @@ DATCONSVDSpacePoint::DATCONSVDSpacePoint(std::vector<const SVDCluster*>& cluster
   double vCoord =  0; // 0 = center of Sensor
   m_assignedDATCONSVDClusters.clear();
 
-  const SVDCluster* vCluster(NULL), *uCluster(NULL);
+  const SVDCluster* vCluster(nullptr), *uCluster(nullptr);
   for (const SVDCluster* aCluster : clusters) {
     m_assignedDATCONSVDClusters.push_back(*aCluster);
     if (aCluster->isUCluster() == true) {
@@ -63,7 +63,7 @@ DATCONSVDSpacePoint::DATCONSVDSpacePoint(std::vector<const SVDCluster*>& cluster
   }
 
   if (aSensorInfo->getBackwardWidth() > aSensorInfo->getForwardWidth() &&
-      vCluster != NULL && uCluster != NULL) // is a WedgeSensor and we do have a vCluster
+      vCluster != nullptr && uCluster != nullptr) // is a WedgeSensor and we do have a vCluster
     uCoord = uCluster->getPosition(vCoord);
 
   m_position = aSensorInfo->pointToGlobal(TVector3(uCoord, vCoord, 0));
@@ -78,7 +78,7 @@ std::pair<double, double> DATCONSVDSpacePoint::convertLocalToNormalizedCoordinat
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
-  if (aSensorInfo == NULL) {
+  if (aSensorInfo == nullptr) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 
@@ -107,7 +107,7 @@ std::pair<double, double> DATCONSVDSpacePoint::convertNormalizedToLocalCoordinat
 {
   //We need some handle to translate IDs to local and global
   // coordinates.
-  if (aSensorInfo == NULL) {
+  if (aSensorInfo == nullptr) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 
@@ -131,7 +131,7 @@ B2Vector3<double> DATCONSVDSpacePoint::getGlobalCoordinates(std::pair<double, do
                                                             VXD::SensorInfoBase const* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global coordinates.
-  if (aSensorInfo == NULL) {
+  if (aSensorInfo == nullptr) {
     aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
   }
 

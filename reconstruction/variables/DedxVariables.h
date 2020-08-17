@@ -31,6 +31,26 @@ namespace Belle2 {
     double pCDC(const Particle* part);
 
     /**
+     * returns the costh valid in the CDC
+     */
+    double costhCDC(const Particle* part);
+
+    /**
+     * returns the ndedx hits to dedx tracks
+     */
+    double CDCdEdx_nhits(const Particle* part);
+
+    /**
+     * returns the ndedx hits layer to dedx tracks
+     */
+    double CDCdEdx_lnhits(const Particle* part);
+
+    /**
+     * returns the ndedx hit layer used to dedx tracks
+     */
+    double CDCdEdx_lnhitsused(const Particle* part);
+
+    /**
      * returns the chi value for electrons from CDC dEdx
      */
     double CDCdEdx_chiE(const Particle* part);
@@ -59,6 +79,7 @@ namespace Belle2 {
      * returns the chi value for duetrons from CDC dEdx
      */
     double CDCdEdx_chiD(const Particle* part);
+
     /**
      * returns the momentum valid in the SVD
      */

@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # An example/test of using the formula() metavariable
-# note: it's the pion momentum + the number of tracks in the event which is total nonsense
 #
 # James Kahn and Sam Cunliffe
 #
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 
-import os
 import basf2
 from modularAnalysis import inputMdstList
 from stdCharged import stdPi

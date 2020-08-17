@@ -779,8 +779,8 @@ class Calibration(CalibrationBase):
         if isinstance(value, CalibrationAlgorithm):
             self._algorithms = [Algorithm(value)]
         else:
-            B2ERROR((f"Something other than CalibrationAlgorithm instance passed in ({type(value)})."
-                     "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".))
+            B2ERROR(f"Something other than CalibrationAlgorithm instance passed in ({type(value)}). "
+                    "Algorithm needs to inherit from Belle2::CalibrationAlgorithm")
 
     @algorithms.fset.register(tuple)
     @algorithms.fset.register(list)

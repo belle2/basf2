@@ -667,7 +667,7 @@ class SequentialBoundaries(AlgorithmStrategy):
         if not self.is_valid():
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
         self.queue = queue
-        B2INFO(f"Setting up {self.__class__.__name__} strategy for {self.algorithm.name)}.")
+        B2INFO(f"Setting up {self.__class__.__name__} strategy for {self.algorithm.name}.")
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
         machine_params["database_chain"] = self.database_chain
@@ -680,7 +680,7 @@ class SequentialBoundaries(AlgorithmStrategy):
         # Start moving through machine states
         self.machine.setup_algorithm(iteration=iteration)
         # After this point, the logging is in the stdout of the algorithm
-        B2INFO(f"Beginning execution of {self.algorithm.name)} using strategy {self.__class__.__name__}.")
+        B2INFO(f"Beginning execution of {self.algorithm.name} using strategy {self.__class__.__name__}.")
         runs_to_execute = []
         all_runs_collected = runs_from_vector(self.algorithm.algorithm.getRunListFromAllData())
         # If we were given a specific IoV to calibrate we just execute over runs in that IoV

@@ -642,7 +642,7 @@ class Local(Backend):
         The function that is used by multiprocessing.Pool.map during process creation. This runs a
         shell command in a subprocess and captures the stdout and stderr of the subprocess to files.
         """
-        B2INFO(f"Starting Sub Process: {name}.".)
+        B2INFO(f"Starting Sub Process: {name}.")
         from subprocess import PIPE, STDOUT, Popen
         stdout_file_path = os.path.join(working_dir, 'stdout')
         # Create unix command to redirect stdour and stderr

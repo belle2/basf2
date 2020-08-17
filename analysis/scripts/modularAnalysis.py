@@ -2347,7 +2347,8 @@ def writePi0EtaVeto(
     mode='standard',
     downloadFlag=True,
     selection='',
-    path=None
+    path=None,
+    suffix=''
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -2377,7 +2378,10 @@ def writePi0EtaVeto(
     * cluster: loose energy cut and clusterNHits cut are applied to soft photon
     * both: tight energy cut and clusterNHits cut are applied to soft photon
 
-    One can obtain the result of pi0/eta veto from `pi0Prob`/`etaProb`
+    The final probability of the pi0/eta veto is stored as an extraInfo. If no suffix is set it can be obtained from the variables
+    `pi0Prob`/`etaProb`. Otherwise, it is available as '{Pi0, Eta}ProbOrigin', '{Pi0, Eta}ProbTightEnergyThreshold', '{Pi0,
+    Eta}ProbLargeClusterSize', or '{Pi0, Eta}ProbTightEnergyThresholdAndLargeClusterSize'} for the four modes described above, with
+    the chosen suffix appended.
 
     NOTE:
       Please don't use following ParticleList names elsewhere:
@@ -2395,15 +2399,31 @@ def writePi0EtaVeto(
     @param downloadFlag 	whether download default weight files or not
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
+    @param suffix           optional suffix to be appended to the usual extraInfo name
     """
 
     import os
     import basf2_mva
 
+    renameSuffix = False
+
+    for module in path.modules():
+        if module.type() == "SubEvent" and not renameSuffix:
+            for subpath in [p.values for p in module.available_params() if p.name == "path"]:
+                if renameSuffix:
+                    break
+                for submodule in subpath.modules():
+                    print(submodule.name())
+                    if f'gamma:HardPhoton{suffix}' in submodule.name():
+                        suffix += '_0'
+                        B2WARNING("Same extension already used in writePi0EtaVeto, append '_0'")
+                        renameSuffix = True
+                        break
+
     roe_path = create_path()
     deadEndPath = create_path()
     signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
-    fillSignalSideParticleList('gamma:HardPhoton', decayString, path=roe_path)
+    fillSignalSideParticleList(f'gamma:HardPhoton{suffix}', decayString, path=roe_path)
     if not os.path.isdir(workingDirectory):
         os.mkdir(workingDirectory)
         B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
@@ -2485,14 +2505,14 @@ def writePi0EtaVeto(
     pi0 veto
     """
     # define the particleList name for soft photon
-    pi0soft = 'gamma:Pi0Soft' + ListName + '_' + particleList.replace(':', '_')
+    pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     # fill the particleList for soft photon with energy cut
     fillParticleList(pi0soft, Pi0EnergyCut, path=roe_path)
     # apply an additional cut for soft photon
     applyCuts(pi0soft, TimingAndNHitsCut, path=roe_path)
     # reconstruct pi0
-    reconstructDecay('pi0:Pi0Veto' + ListName + ' -> gamma:HardPhoton ' + pi0soft, '', path=roe_path)
-    # if you don't have wight files in your workingDirectory,
+    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> gamma:HardPhoton{suffix} ' + pi0soft, '', path=roe_path)
+    # if you don't have weight files in your workingDirectory,
     # these files are downloaded from database to your workingDirectory automatically.
     if not os.path.isfile(workingDirectory + '/' + Pi0WeightFileName):
         if downloadFlag:
@@ -2505,24 +2525,24 @@ def writePi0EtaVeto(
     rankByHighest('pi0:Pi0Veto' + ListName, 'extraInfo(' + Pi0ExtraInfoName + ')', numBest=1, path=roe_path)
     # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
     variableToSignalSideExtraInfo('pi0:Pi0Veto' + ListName,
-                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoRename}, path=roe_path)
+                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoRename + suffix}, path=roe_path)
 
     """
     eta veto
     """
-    etasoft = 'gamma:EtaSoft' + ListName + '_' + particleList.replace(':', '_')
+    etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaEnergyCut, path=roe_path)
     applyCuts(etasoft, TimingAndNHitsCut, path=roe_path)
-    reconstructDecay('eta:EtaVeto' + ListName + ' -> gamma:HardPhoton ' + etasoft, '', path=roe_path)
+    reconstructDecay('eta:EtaVeto' + ListName + f' -> gamma:HardPhoton{suffix} ' + etasoft, '', path=roe_path)
     if not os.path.isfile(workingDirectory + '/' + EtaWeightFileName):
         if downloadFlag:
             basf2_mva.download(EtaPayloadName, workingDirectory + '/' + EtaWeightFileName)
-            B2INFO('writePi0EtaVeto: ' + EtaWeightFileName + 'has been downloaded from database to workingDirectory.')
+            B2INFO('writePi0EtaVeto: ' + EtaWeightFileName + ' has been downloaded from database to workingDirectory.')
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],
                         extraInfoName=EtaExtraInfoName, identifier=workingDirectory + '/' + EtaWeightFileName)
     rankByHighest('eta:EtaVeto' + ListName, 'extraInfo(' + EtaExtraInfoName + ')', numBest=1, path=roe_path)
     variableToSignalSideExtraInfo('eta:EtaVeto' + ListName,
-                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoRename}, path=roe_path)
+                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoRename + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

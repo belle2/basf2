@@ -30,7 +30,14 @@ namespace Belle2 {
     /// Run algo on data
     virtual EResult calibrate() override;
 
+    /// Decide if a run should be a payload boundary. Only used in certain Python Algorithm Starategies.
+    virtual bool isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/) override;
+
   private:
+
+    /// During findPayloadBoundaries and isBoundaryRequired this is used to define the boundaries we want.
+    std::vector<Calibration::ExpRun> m_requestedBoundaries;
+    std::optional<long double> m_previousRunEndTime; //time when the previous run finished
 
 
   };

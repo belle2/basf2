@@ -35,6 +35,10 @@ namespace Belle2 {
      */
     void add(unsigned int event, TObject* object);
 
+    std::vector<unsigned int> getEventNumbers() const { return m_eventNumbers;}
+
+    TObject* getObjectByIndex(int indx) const {return m_objects.At(indx);}
+
   protected:
     /**
      * Get the index of the object that is valid for the given event.
@@ -42,6 +46,8 @@ namespace Belle2 {
      * @return        array index of the object valid for the given event.
      */
     virtual int getIndex(const EventMetaData& event) const override;
+
+
 
   private:
     /** Vector of event number boundaries. */

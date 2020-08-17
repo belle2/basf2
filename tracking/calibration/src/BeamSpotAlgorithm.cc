@@ -11,18 +11,30 @@
 
 #include <mdst/dbobjects/BeamSpot.h>
 
+#include <framework/database/EventDependency.h>
+
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/Database.h>
+#include <framework/database/IntervalOfValidity.h>
+
+
+
 #include <TH1F.h>
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
 
 BeamSpotAlgorithm::BeamSpotAlgorithm() : CalibrationAlgorithm("BeamSpotCollector")
 {
+  cout << "Radek is here " << __LINE__ << endl;
   setDescription("BeamSpot calibration algorithm");
 }
 
 CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 {
+  cout << "Radek is here " << __LINE__ << endl;
+  /*
   int minVertices = 300;
   int nSigmacut = 6;
 
@@ -85,16 +97,113 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 
   // if size y NAN, set it to expected size for beta_star_y = 1 mm:
   if (vertexSize[1][1] < 0) vertexSize[1][1] = 0.3 * 1e-4 * 0.3 * 1e-4;
+  */
+
+  auto tracks = getObjectPtr<TTree>("tracks");
+  cout << "Tracks size " << tracks->GetEntries() << endl;
+
+  //IP position
+  auto vertexPos = TVector3(0.1, -0.2, 0.3);
+  auto vertexPos2 = TVector3(0.3, -0.3, 0.3);
+
+
+
+  //IP error
+  double ipXerr2 = 0;
+  double ipYerr2 = 0;
+  double ipZerr2 = 0;
+
+  auto vertexCov = TMatrixDSym(3);
+
+  vertexCov[0][1] = vertexCov[1][0] = 0;
+  vertexCov[0][2] = vertexCov[2][0] = 0;
+  vertexCov[1][2] = vertexCov[2][1] = 0;
+  vertexCov[0][0] = ipXerr2;
+  vertexCov[1][1] = ipYerr2;
+  vertexCov[2][2] = ipZerr2;
+
+  //BeamSpot size
+  double sizeX2 = pow(10e-4, 2);
+  double sizeY2 = pow(1e-4, 2);
+  double sizeZ2 = pow(200e-4, 2);
+
+
+  auto vertexSize = TMatrixDSym(3);
+  vertexSize[0][1] = vertexSize[1][0] = 0;
+  vertexSize[0][2] = vertexSize[2][0] = 0;
+  vertexSize[1][2] = vertexSize[2][1] = 0;
+  vertexSize[0][0] = sizeX2;
+  vertexSize[1][1] = sizeY2;
+  vertexSize[2][2] = sizeZ2;
+
+
 
   auto payload = new BeamSpot();
-
   payload->setIP(vertexPos, vertexCov);
   payload->setSizeCovMatrix(vertexSize);
 
-  saveCalibration(payload);
+
+  auto payload2 = new BeamSpot();
+  payload2->setIP(vertexPos2, vertexCov);
+  payload2->setSizeCovMatrix(vertexSize);
+
+
+
+  //saveCalibration(payload);
+
+
+
+  TObject* obj  = static_cast<TObject*>(payload);
+  TObject* obj2 = static_cast<TObject*>(payload2);
+
+// add objects with different validity
+  EventDependency intraRun(obj);
+  intraRun.add(500, obj2);   // valid from event number 500
+  //intraRun.add(1000, agelObj[2]);  // valid from event number 1000
+
+  // store under user defined name
+  auto m_iov = IntervalOfValidity(0, 0, -1, -1);
+  cout << "Saving BeamSpotEventDep " << endl;
+  Database::Instance().storeData("BeamSpotEventDep", &intraRun, m_iov);
+
+
+
+
 
   // probably not needed - would trigger re-doing the collection
   //if ( ... too large corrections ... ) return c_Iterate;
 
   return c_OK;
+}
+
+
+bool BeamSpotAlgorithm::isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/)
+{
+  const double maxTimeGap = 3600; //maximal time gap in seconds
+
+  auto tracks = getObjectPtr<TTree>("tracks");
+  cout << "Tracks size " << tracks->GetEntries() << endl;
+
+  double time;
+  tracks->SetBranchAddress("time", &time);
+
+  double timeMin = 1e50, timeMax = -1e50;
+  for (int i = 0; i < tracks->GetEntries(); ++i) {
+    tracks->GetEntry(i);
+    timeMin = min(timeMin, time);
+    timeMax = max(timeMax, time);
+  }
+
+  if (!m_previousRunEndTime) {
+    B2INFO("This is the first run encountered, let's say it is a boundary.");
+    B2INFO("Initial timeMax was " << timeMax);
+    m_previousRunEndTime.emplace(timeMax);
+    return true;
+  } else if (timeMin - m_previousRunEndTime.value() > maxTimeGap) {
+    B2INFO("time gap " << timeMin - m_previousRunEndTime.value() << " is more than allowed");
+    m_previousRunEndTime.emplace(timeMax);
+    return true;
+  } else {
+    return false;
+  }
 }

@@ -27,12 +27,12 @@ def BeamSpotCalibration(files, tags):
 
     path.add_module('RootInput')
 
-    muSelection = 'p>1.0'
-    muSelection += ' and abs(dz)<2.0 and dr<0.5'
+    muSelection = '[p>1.0]'
+    muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=path)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=path)
-    vx.KFit('Upsilon(4S):BS', conf_level=0, path=path)
+    # vx.kFit('Upsilon(4S):BS', conf_level=0, path=path)
 
     collector = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm = BeamSpotAlgorithm()
@@ -48,7 +48,8 @@ def BeamSpotCalibration(files, tags):
                               backend_args=None
                               )
 
-    calibration.strategies = strategies.SequentialRunByRun
+    # calibration.strategies = strategies.SequentialRunByRun
+    calibration.strategies = strategies.SequentialBoundaries
 
     return calibration
 
@@ -62,7 +63,7 @@ if __name__ == "__main__":
         print("See: basf2 -h")
         sys.exit(1)
 
-    beamspot = BeamSpotCalibration(input_files, ['data_reprocessing_prompt_rel4_patchb', 'data_reprocessing_proc10'])
+    beamspot = BeamSpotCalibration(input_files, ['data_reprocessing_prompt', 'online_bucket9'])
     # beamspot.max_iterations = 0
 
     cal_fw = CAF()
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     cal_fw.backend = backends.LSF()
 
     # Try to guess if we are at KEKCC and change the backend to Local if not
-    if multiprocessing.cpu_count() < 10:
+    if multiprocessing.cpu_count() < 10 or True:
         cal_fw.backend = backends.Local(8)
 
     cal_fw.run()

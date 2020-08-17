@@ -104,8 +104,8 @@ namespace Belle2 {
 
     int m_evt, m_exp, m_run;
     double m_time;
-    double m_mu0_d0, m_mu0_z0, m_mu0_phi0, m_mu0_tanlambda;
-    double m_mu1_d0, m_mu1_z0, m_mu1_phi0, m_mu1_tanlambda;
+    double m_mu0_d0, m_mu0_z0, m_mu0_phi0, m_mu0_tanlambda, m_mu0_omega;
+    double m_mu1_d0, m_mu1_z0, m_mu1_phi0, m_mu1_tanlambda, m_mu1_omega;
 
 
 

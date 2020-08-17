@@ -12,6 +12,7 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 using namespace Belle2;
 using namespace std;
@@ -76,57 +77,52 @@ void BeamSpotCollectorModule::startRun()
 
 void BeamSpotCollectorModule::closeRun()
 {
+  cout << "Closing run Radek " << __LINE__ << endl;
 
 }
 
 void BeamSpotCollectorModule::collect()
 {
-  cout << "Radek start of collect " << endl;
   //describeProcess("CaTest::collect()");
-  m_evt = m_emd->getEvent();
-  m_run = m_emd->getRun();
-  m_exp = m_emd->getExperiment();
+  m_evt  = m_emd->getEvent();
+  m_run  = m_emd->getRun();
+  m_exp  = m_emd->getExperiment();
+  m_time = m_emd->getTime();
 
 
-  cout << "Radek list name " << m_Y4SPListName << endl;
   StoreObjPtr<ParticleList> Y4SParticles(m_Y4SPListName);
   const auto& frame = ReferenceFrame::GetCurrent();
 
   //for(int i = 0; i < Y4SParticles.getNDaughters(); ++i)
 
-  cout << "Radek is here " << __LINE__ << endl;
   if (!Y4SParticles.isValid() || abs(Y4SParticles->getPDGCode()) != 300553)
     return;
-  cout << "Radek is here " << __LINE__ << endl;
-  cout << "Size of the Y4SParticles " << Y4SParticles->getListSize() << endl;
+  //cout << "Radek is here " << __LINE__ << endl;
+  //cout << "Size of the Y4SParticles " << Y4SParticles->getListSize() << endl;
   if (Y4SParticles->getListSize() !=  1)
     return;
-  cout << "Radek is here " << __LINE__ << endl;
 
 
-  const std::vector<int> indxes =  Y4SParticles->getParticle(0)->getDaughterIndices();
+  std::vector<int> indxes =  Y4SParticles->getParticle(0)->getDaughterIndices();
   if (indxes.size() != 2) return;
-  cout << "Radek is here " << __LINE__ << endl;
 
-  Particle* part1 = Y4SParticles->getParticle(indxes[0]);
-  Particle* part2 = Y4SParticles->getParticle(indxes[1]);
+  const Particle* part0 = Y4SParticles->getParticle(0)->getDaughter(0);
+  const Particle* part1 = Y4SParticles->getParticle(0)->getDaughter(1);
+  const TrackFitResult* tr0 = part0->getTrackFitResult();
+  const TrackFitResult* tr1 = part1->getTrackFitResult();
 
-
-
-  m_mu0_d0   = 42;
-  m_mu0_z0   = 42;
-  m_mu0_phi0 = 42;
-  m_mu0_tanlambda = 42;
-
-  m_mu1_d0   = 42;
-  m_mu1_z0   = 42;
-  m_mu1_phi0 = 42;
-  m_mu1_tanlambda = 42;
+  m_mu0_d0        = tr0->getD0();
+  m_mu0_z0        = tr0->getZ0();
+  m_mu0_phi0      = tr0->getPhi0();
+  m_mu0_tanlambda = tr0->getTanLambda();
+  m_mu0_omega     = tr0->getOmega();
 
 
-  cout << "Radek is here " << __LINE__ << endl;
-
-
+  m_mu1_d0        = tr1->getD0();
+  m_mu1_z0        = tr1->getZ0();
+  m_mu1_phi0      = tr1->getPhi0();
+  m_mu1_tanlambda = tr1->getTanLambda();
+  m_mu1_omega     = tr1->getOmega();
 
 
   getObjectPtr<TTree>("tracks")->Fill();

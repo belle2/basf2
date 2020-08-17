@@ -33,7 +33,7 @@ namespace Belle2 {
       /**
        * @return the strip time
        */
-      double getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples, VxdID sensorID, bool isU, int cellID);
+      double getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples, int cellID);
 
       /**
        * @return the strip time error

@@ -27,7 +27,7 @@ namespace Belle2 {
     {
       float rawtime = getClusterRawTime();
 
-      double time = m_ELS3TimeCal.getCorrectedTime(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), -1, rawtime, m_triggerBin);
+      double time = m_ELS3TimeCal.getCorrectedTime(m_vxdID, m_isUside, -1, rawtime, m_triggerBin);
 
       return time;
 

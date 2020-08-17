@@ -18,7 +18,7 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDCoG6Time::getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples, VxdID sensorID, bool isU, int cellID)
+    double SVDCoG6Time::getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples, int cellID)
     {
 
       //calculate weighted average
@@ -37,10 +37,10 @@ namespace Belle2 {
       }
 
       // correct by the CalPeak
-      time -= m_PulseShapeCal.getPeakTime(sensorID, isU, cellID);
+      time -= m_PulseShapeCal.getPeakTime(m_vxdID, m_isUside, cellID);
 
       // calibrate
-      time =  m_CoG6TimeCal.getCorrectedTime(sensorID, isU, cellID, time, m_triggerBin);
+      time =  m_CoG6TimeCal.getCorrectedTime(m_vxdID, m_isUside, cellID, time, m_triggerBin);
 
       return time;
     }
@@ -59,13 +59,12 @@ namespace Belle2 {
 
       for (int k = 0; k < 6; k ++) {
         Atot  += samples[k];
-        tmpResSq += TMath::Power(k * m_apvClockPeriod -  getStripTime(samples, m_rawCluster.getSensorID(), m_rawCluster.isUSide(), cellID),
-                                 2);
+        tmpResSq += TMath::Power(k * m_apvClockPeriod -  getStripTime(samples, cellID), 2);
       }
 
       double rawTimeError = noise / Atot * TMath::Sqrt(tmpResSq);
 
-      double timeError = m_CoG6TimeCal.getCorrectedTimeError(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), cellID, getClusterTime(),
+      double timeError = m_CoG6TimeCal.getCorrectedTimeError(m_vxdID, m_isUside, cellID, getClusterTime(),
                                                              rawTimeError, m_triggerBin);
 
       return timeError;
@@ -88,7 +87,7 @@ namespace Belle2 {
       double sumAmplitudes = 0;
 
       for (auto s : strips) {
-        time += s.maxSample * getStripTime(s.samples, m_rawCluster.getSensorID(), m_rawCluster.isUSide(), s.cellID);
+        time += s.maxSample * getStripTime(s.samples, s.cellID);
         sumAmplitudes += s.maxSample;
       }
 

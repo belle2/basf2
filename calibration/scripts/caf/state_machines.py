@@ -712,7 +712,7 @@ class CalibrationMachine(Machine):
             if "fail" in possible_transitions:
                 getattr(self, "fail")()
             else:
-                raise MachineError(("Failed to automatically transition out of {self.state} state."))
+                raise MachineError(f"Failed to automatically transition out of {self.state} state.")
 
     def _make_output_dir(self):
         """
@@ -785,7 +785,7 @@ class CalibrationMachine(Machine):
             # We can assume that the databases exist as we can't be here until they have returned
             for dependency in self.calibration.dependencies:
                 database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
-                B2INFO("Adding local database from {dependency.name} for use by {self.calibration.name}.")
+                B2INFO(f"Adding local database from {dependency.name} for use by {self.calibration.name}.")
                 list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
 
             # Add previous iteration databases from this calibration
@@ -793,7 +793,7 @@ class CalibrationMachine(Machine):
                 previous_iteration_dir = self.root_dir.joinpath(str(self.iteration - 1))
                 database_dir = os.path.join(previous_iteration_dir, self.calibration.alg_output_dir, 'outputdb')
                 list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
-                B2INFO("Adding local database from previous iteration of {self.calibration.name}.")
+                B2INFO(f"Adding local database from previous iteration of {self.calibration.name}.")
 
             # Let's use a directory to store some files later for input to the collector jobs. Should already exist from
             # collector path

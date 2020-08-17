@@ -683,8 +683,8 @@ class Batch(Backend):
         Should be implemented in a derived class to write a batch submission script to the job.working_dir.
         You should think about where the stdout/err should go, and set the queue name.
         """
-        raise NotImplementedError((f"Need to implement a _add_batch_directives(self, job, file) "
-                                   "method in {self.__class__.__name__} backend."))
+        raise NotImplementedError(("Need to implement a _add_batch_directives(self, job, file) "
+                                   f"method in {self.__class__.__name__} backend."))
 
     def _make_submit_file(self, job, submit_file_name):
         """

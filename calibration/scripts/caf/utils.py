@@ -220,7 +220,7 @@ class LocalDatabase():
                 else:
                     raise ValueError(f"The LocalDatabase payload_dir: {p} does not exist.")
         else:
-            raise ValueError("The LocalDatabase filepath: {f} does not exist.")
+            raise ValueError(f"The LocalDatabase filepath: {f} does not exist.")
 
 
 class CentralDatabase():

@@ -10,5 +10,7 @@
 #pragma link C++ class Belle2::DecayTree-;
 #pragma link C++ class Belle2::DecayForest-;
 #pragma link C++ class Belle2::PCmsLabTransform-;
-
+#pragma link C++ class Belle2::GenBTagTool-;
+#pragma link C++ class Belle2::GenDTagTool-;
+#pragma link C++ class Belle2::GenTKTagTool-;
 #endif

@@ -18,9 +18,6 @@
 #include <mdst/dataobjects/TRGSummary.h>
 
 #include "TH1F.h"
-#include "TDirectory.h"
-using std::vector;
-using std::string;
 
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -58,7 +55,7 @@ namespace Belle2 {
   private:
 
     /** if TRUE: svdTime back in SVD time reference*/
-    bool m_desynchSVDTime = true;
+    bool m_desynchSVDTime = false;
 
     /** parameter to change the range of the time histograms*/
     bool m_isSVDTimeCalibrated = false;

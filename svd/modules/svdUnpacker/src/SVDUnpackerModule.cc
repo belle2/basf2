@@ -14,15 +14,12 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
+
+#include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
+#define CRC16POLYREV 0x8005   // CRC-16 polynomial, normal representation 
 
 #include <arpa/inet.h>
-#include <boost/crc.hpp>      // for boost::crc_basic, boost::augmented_crc
-#include <boost/cstdint.hpp>  // for boost::uint16_t
-#define CRC16POLYREV 0x8005   // CRC-16 polynomial, normal representation 
 
 #include <sstream>
 #include <iomanip>
@@ -386,7 +383,7 @@ void SVDUnpackerModule::event()
             }
 
             // Generating SVDShaperDigit object
-            SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0, m_SVDModeByte);
+            SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0);
             if (newShaperDigit) {
               diagnosticMap.insert(make_pair(*newShaperDigit, currentDAQDiagnostic));
               delete newShaperDigit;

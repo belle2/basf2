@@ -104,7 +104,7 @@ namespace Belle2 {
       void clearTracks()
       {
         m_inputParticles.clear();
-        m_motherParticlePtr = NULL;
+        m_motherParticlePtr = nullptr;
       }
 
       /** Set mass constrained fit   */

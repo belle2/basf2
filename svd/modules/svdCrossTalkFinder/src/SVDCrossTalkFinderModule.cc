@@ -11,6 +11,8 @@
 #include <svd/modules/svdCrossTalkFinder/SVDCrossTalkFinderModule.h>
 #include <svd/modules/svdCrossTalkFinder/SVDCrossTalkFinderHelperFunctions.h>
 
+#include <vxd/geometry/GeoCache.h>
+
 using namespace std;
 using namespace Belle2;
 

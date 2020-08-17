@@ -18,7 +18,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 // ROOT

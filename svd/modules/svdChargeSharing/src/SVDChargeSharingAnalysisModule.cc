@@ -15,10 +15,7 @@
 #include <reconstruction/dataobjects/VXDDedxTrack.h>
 #include <vxd/geometry/GeoCache.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <tracking/dataobjects/SVDIntercept.h>
 
-#include <cmath>
 #include <boost/foreach.hpp>
 
 #include <TCanvas.h>
@@ -26,9 +23,6 @@
 #include <TLegend.h>
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TLatex.h>
-#include <TGaxis.h>
-#include <TPaveLabel.h>
 
 
 /* --------------- WARNING ---------------------------------------------- *

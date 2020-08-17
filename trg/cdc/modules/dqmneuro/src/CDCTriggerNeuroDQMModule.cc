@@ -10,7 +10,6 @@
 
 #include "trg/cdc/modules/dqmneuro/CDCTriggerNeuroDQMModule.h"
 
-#include <framework/datastore/RelationArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include "TDirectory.h"

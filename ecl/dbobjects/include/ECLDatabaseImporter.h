@@ -123,15 +123,7 @@ namespace Belle2 {
     std::string m_numOfReg2ThetaBinsBranchName = "numOfReg2ThetaBins"; /**< numOfReg2ThetaBins branch name  */
     std::string m_numOfReg3ThetaBinsBranchName = "numOfReg3ThetaBins"; /**< numOfReg3ThetaBins branch name  */
     std::string m_phiPeriodicityBranchName = "phiPeriodicity"; /**< phiPeriodicity branch name  */
-    /**
-     * 1: Initial version.
-     * 2: Added time calibration.
-     * 3: Added Second moment importer.
-     * 4: Added shower leakage corrections importer.
-     * 5: Added ECLShowerEnergyCorrectionTemporary importer.
-     * 6: Added importer for TrackClusterMatchingThresholds and TrackClusterMatchingParameterizations.
-     */
-    ClassDef(ECLDatabaseImporter, 6);
+
   };
 
 } // Belle2 namespace

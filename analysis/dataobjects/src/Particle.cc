@@ -720,7 +720,10 @@ bool Particle::isCopyOf(const Particle* oParticle, bool doDetailedComparison) co
        and oParticle->getParticleSource() != EParticleSourceObject::c_MCParticle)
       or (this->getParticleSource() != EParticleSourceObject::c_MCParticle
           and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle)) {
-    B2FATAL("Something went wrong: MCParticle is compared to a non MC Particle. Please check your script!");
+    B2WARNING("Something went wrong: MCParticle is being compared to a non MC Particle. Please check your script!\n"
+              "                              If the MCParticle <-> Particle comparison happens in the RestOfEventBuilder,\n"
+              "                              the Rest Of Event may contain signal side particles.");
+    return false;
   }
   if (this->getParticleSource() == EParticleSourceObject::c_MCParticle
       and oParticle->getParticleSource() == EParticleSourceObject::c_MCParticle) {
@@ -1045,6 +1048,7 @@ void Particle::setFlavorType()
   if (m_pdgCode == 22) {m_flavorType = c_Unflavored; return;} // gamma
   if (m_pdgCode == 310) {m_flavorType = c_Unflavored; return;} // K_s
   if (m_pdgCode == 130) {m_flavorType = c_Unflavored; return;} // K_L
+  if (m_pdgCode == 43) {m_flavorType = c_Unflavored; return;} // Xu0
   int nnn = m_pdgCode / 10;
   int q3 = nnn % 10; nnn /= 10;
   int q2 = nnn % 10; nnn /= 10;

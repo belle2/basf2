@@ -102,7 +102,7 @@ namespace Belle2 {
        * @param _u: The input to the system
        * @param _y0: Initial value of the output
        * @param _dt: Integration step (in ns)
-       * @param _tau: Time constant of the system
+       * @param _tSlow: Time constant of the system
        * @param _delay: Time delay of the system (in ns)
        *
        * @return a Signal corresponding tot he time response
@@ -131,6 +131,7 @@ namespace Belle2 {
        * @param _TriggerHoldoff: Width of signal integration (in ns)
        * @param _GateWidth: Width of signal integration (in ns)
        * @param _GateOffset: Width of signal integration (in ns)
+       * @param _recordTraces: Record traces
        *
        * @return The maximum ADC value (to check for saturations)
        */

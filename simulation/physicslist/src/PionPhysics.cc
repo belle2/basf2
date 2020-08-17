@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <simulation/physicslist/PionPhysics.h>
-#include "G4MesonConstructor.hh"
 
 #include "G4ProcessManager.hh"
 #include "G4PionPlusInelasticProcess.hh"

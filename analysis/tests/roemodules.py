@@ -73,4 +73,4 @@ roe_path.add_module('ParticlePrinter', listName=nested_list, fullPrint=True)
 testpath.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
 ###############################################################################
 
-process(testpath, 3)
+process(testpath, 5)

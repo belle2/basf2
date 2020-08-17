@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <cmath>
-#include <cstdio>
 #include <vector>
 #include <math.h>
 #include <iomanip>

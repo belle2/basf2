@@ -11,17 +11,12 @@
 // Own include
 #include <top/modules/TOPMCTrackMaker/TOPMCTrackMakerModule.h>
 
-
-
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <framework/geometry/BFieldManager.h>
 
 // dataobjects

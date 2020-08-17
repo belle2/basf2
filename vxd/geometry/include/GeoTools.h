@@ -12,10 +12,7 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <vector>
-#include <set>
-#include <memory>
 #include <algorithm>
-#include <numeric>
 
 namespace Belle2 {
   namespace VXD {

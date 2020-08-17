@@ -13,33 +13,19 @@
 
 #include <calibration/CalibrationCollectorModule.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <string>
 #include "TH1F.h"
-#include "TPaveStats.h"
-#include <TString.h>
 
 #include <svd/dataobjects/SVDHistograms.h>
-#include <framework/core/Module.h>
-#include <vxd/dataobjects/VxdID.h>
 
 #include "TH2F.h"
-#include "TTree.h"
-
-#include <vxd/geometry/GeoCache.h>
-#include <svd/geometry/SensorInfo.h>
-
-#include <analysis/utility/ReferenceFrame.h>
-#include <iostream>
-#include <framework/logging/Logger.h>
 
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <framework/dataobjects/EventT0.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 
 namespace Belle2 {
   /**
@@ -95,6 +81,8 @@ namespace Belle2 {
     TH1F* m_hEventT0FromCDST = NULL; /**< EventT0 distribution read by the cDST*/
     TH1F* m_hEventT0FromCDSTSync = NULL; /**< EventT0 distribution read by the cDST and then synchronized*/
     TH1F* m_hRawCoGTimeL3V = NULL; /**< Raw_CoG distribution of layer3 V-side */
+
+    double m_rawCoGBinWidth = 2; /**< Raw_CoG Bin Width [ns] for 2D-histogram */
   };
 
 } // end namespace Belle2

@@ -7,15 +7,8 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
-#include <trg/ecl/TrgEclCluster.h>
-#include <stdlib.h>
-#include <iostream>
-
 
 #include <TH1F.h>
-#include <TH2F.h>
-
-//using namespace std;
 
 namespace Belle2 {
 

@@ -11,7 +11,6 @@
 
 #include <vxd/dbobjects/VXDPolyConePar.h>
 #include <TObject.h>
-#include <string>
 #include <vector>
 
 

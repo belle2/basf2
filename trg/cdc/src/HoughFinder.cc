@@ -20,19 +20,12 @@
 #include <map>
 #include <iostream>
 #include <fstream>
-#include "TFile.h"
-#include "TTree.h"
-#include "framework/datastore/StoreArray.h"
-#include "framework/datastore/RelationArray.h"
 #include "cdc/geometry/CDCGeometryPar.h"
-#include "cdc/dataobjects/CDCHit.h"
-#include "cdc/dataobjects/CDCSimHit.h"
 #include "trg/trg/Debug.h"
 #include "trg/trg/Utilities.h"
 #include "trg/trg/Time.h"
 #include "trg/trg/Signal.h"
 #include "trg/trg/Constants.h"
-#include "trg/trg/Channel.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Layer.h"
 #include "trg/cdc/Cell.h"
@@ -48,7 +41,6 @@
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Helix.h"
-#include "trg/cdc/FpgaUtility.h"
 #include "trg/cdc/JLUT.h"
 #include "trg/cdc/JSignal.h"
 #include "trg/cdc/JSignalData.h"

@@ -24,7 +24,7 @@ namespace Belle2 {
     /**
      *  Implements the weighted cellular automaton algorithm
      */
-    template<class ACellHolder, template<class> class WeightedRelationClass>
+    template<class ACellHolder>
     class CellularAutomaton {
 
     private:
@@ -39,7 +39,7 @@ namespace Belle2 {
        *  @return                        The cell holder with the highest cell state found.
        */
       ACellHolder* applyTo(const std::vector<ACellHolder*>& cellHolders,
-                           const std::vector<WeightedRelationClass<ACellHolder>>& cellHolderRelations) const
+                           const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations) const
       {
         B2ASSERT("Expected the relations to be sorted",
                  std::is_sorted(cellHolderRelations.begin(), cellHolderRelations.end()));
@@ -95,7 +95,7 @@ namespace Belle2 {
        *  Throws CycleException if it encounters a cycle in the graph.
        */
       Weight getFinalCellState(ACellHolder* cellHolder,
-                               const std::vector<WeightedRelationClass<ACellHolder>>& cellHolderRelations) const
+                               const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations) const
       {
         AutomatonCell& cell = cellHolder->getAutomatonCell();
 
@@ -122,7 +122,7 @@ namespace Belle2 {
 
       /// Updates the state of a cell considering all continuations recursively
       Weight updateState(ACellHolder* cellHolder,
-                         const std::vector<WeightedRelationClass<ACellHolder>>& cellHolderRelations) const
+                         const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations) const
       {
         AutomatonCell& cell = cellHolder->getAutomatonCell();
 
@@ -143,7 +143,7 @@ namespace Belle2 {
                                std::equal_range(cellHolderRelations.begin(), cellHolderRelations.end(), cellHolder));
 
         // Check neighbors now
-        for (const WeightedRelationClass<ACellHolder>& relation : continuations) {
+        for (const WeightedRelation<ACellHolder>& relation : continuations) {
           // Advance to valid neighbor
           ACellHolder* neighborCellHolder = relation.getTo();
 

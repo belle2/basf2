@@ -37,7 +37,7 @@ def get_test_file(sampleName):
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
-        sampleFileName (str): The path to the test file on KEKCC.
+        The path to the test file on KEKCC.
     """
     sampleInfo = _get_test_sample_info(sampleName)
 
@@ -56,7 +56,7 @@ def get_total_infiles(sampleName):
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
-        nInFiles (int): Total number of input files for sample.
+        Total number of input files for sample.
     """
     sampleInfo = _get_test_sample_info(sampleName)
 
@@ -74,7 +74,7 @@ def get_events_per_file(sampleName):
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
-        nEventsPerFile (int): The average number of events in file of the given sample type.
+        The average number of events in file of the given sample type.
     """
     sampleInfo = _get_test_sample_info(sampleName)
 
@@ -450,7 +450,7 @@ class BaseSkim(ABC):
     def build_lists(self, path):
         """Create the skim lists to be saved in the output uDST. This function is where
         the main skim cuts should be applied. At the end of this method, the attribute
-        ``SkimLists`` must be set so it can be used by `output_udst`.
+        ``SkimLists`` must be set so it can be used by `BaseSkim.output_udst`.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -498,9 +498,9 @@ class BaseSkim(ABC):
             path (basf2.Path): Skim path to be processed.
 
         Returns:
-            ConditionalPath (basf2.Path): Path on which the rest of this skim should be
-                processed. On this path, only events which passed the event-level cut
-                will be processed further.
+            Path on which the rest of this skim should be processed.
+            On this path, only events which passed the event-level cut will
+            be processed further.
 
         .. Tip::
             If running this function in `BaseSkim.additional_setup` or
@@ -508,6 +508,7 @@ class BaseSkim(ABC):
             `BaseSkim.skim_event_cuts`, *e.g.*
 
             .. code-block:: python
+
                 def build_lists(self, path):
                     path = self.skim_event_cuts("nTracks>4", path=path)
                     # rest of skim list building...
@@ -712,7 +713,7 @@ class CombinedSkim(BaseSkim):
     merged, removing duplicates. This way, `load_particle_lists` will load all the
     required lists of each skim, without accidentally loading a list twice.
 
-    The heavy-lifting functions `additional_setup`, `build_lists` and `output_udst` are
+    The heavy-lifting functions `additional_setup`, `build_lists` and `BaseSkim.output_udst` are
     modified to loop over the corresponding functions of each invididual skim. Calling
     an instance of the `CombinedSkim` class will load all the required particle lists,
     then run all the setup steps, then the list building functions, and then all the

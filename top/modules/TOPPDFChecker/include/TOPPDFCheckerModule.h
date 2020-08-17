@@ -13,8 +13,6 @@
 #include <framework/core/HistoModule.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <string>
-#include <vector>
 #include <set>
 #include <TH2F.h>
 #include <TVector3.h>

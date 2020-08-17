@@ -17,13 +17,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/Track.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDEventInfo.h>
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <framework/dataobjects/EventT0.h>
-#include <vector>
 #include "TList.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -55,7 +50,7 @@ namespace Belle2 {
   private:
 
     /** if TRUE: svdTime back in SVD time reference*/
-    bool m_desynchSVDTime = true;
+    bool m_desynchSVDTime = false;
 
     /** parameter to change the range of the time histograms*/
     bool m_isSVDTimeCalibrated = false;

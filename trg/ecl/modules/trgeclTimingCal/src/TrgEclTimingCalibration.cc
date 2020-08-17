@@ -14,6 +14,10 @@
 
 #include "trg/ecl/modules/trgeclTimingCal/TrgEclTimingCalibration.h"
 
+#include "TDecompLU.h"
+#include "TFile.h"
+#include "TTree.h"
+
 using namespace Belle2;
 using namespace std;
 

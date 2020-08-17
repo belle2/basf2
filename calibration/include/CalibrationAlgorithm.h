@@ -254,6 +254,10 @@ namespace Belle2 {
     //  or 'isBoundaryRequired'.
     virtual void boundaryFindingTearDown() {};
 
+    // When using the boundaries functionality from isBoundaryRequired, this is used to store the boundaries. It is cleared when
+    // calling findPayloadBoundaries, before boundaryFindingSetup is called.
+    std::vector<Calibration::ExpRun> m_boundaries;
+
     // Helpers ---------------- Data retrieval -------
 
     /// Get the list of runs for which calibration is called
@@ -361,7 +365,7 @@ namespace Belle2 {
     std::string getExpRunString(Calibration::ExpRun& expRun) const;
 
     /// constructs the full TDirectory + Key name of an object in a TFile based on its name and exprun
-    std::string getFullObjectPath(std::string name, Calibration::ExpRun expRun) const;
+    std::string getFullObjectPath(const std::string& name, Calibration::ExpRun expRun) const;
 
     /// List of input files to the Algorithm, will initially be user defined but then gets the wildcards expanded during execute()
     std::vector<std::string> m_inputFileNames;

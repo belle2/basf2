@@ -246,6 +246,45 @@ payload files themselves before running the software:
        export BELLE2_CONDB_PAYLOADS=/path/where/to/download
 
 
+.. _cdb_payload_creation:
+
+Creation of new payloads
+========================
+
+New payloads can be created by calling ``Belle2::Database::storeData()`` from
+either C++ or python. It takes a ``TObject*`` or ``TClonesArray*`` pointer to
+the payload data and an interval of validity. Optionally, the first argument can
+be the name to store the Payload with which usually defaults to the classname of
+the object.
+
+.. code-block:: c++
+
+   #include <framework/database/Database.h>
+   #include <framework/database/IntervalOfValidity.h>
+   #include <framework/dbobjects/BeamParameters.h>
+
+   std::unique_ptr<BeamParameters> beamParams(new BeamParameters());
+   Database::Instance().storeData(beamParams.get(), IntervalOfValidity::always());
+
+In python the name of the payload cannot be inferred so it always needs to be
+specified explicitly
+
+.. code-block:: python
+
+   from ROOT import Belle2
+   beam_params = Belle2.BeamParameters()
+   iov = Belle2.IntervalOfValidity(0,0,3,-1)
+   Belle2.Database.Instance().storeData("BeamParameters", beam_params, iov)
+
+By default this will create new payload files in the subdirectory "localdb"
+relative to the current working directory and also create a text file
+containing the metadata for the payload files.
+
+These payloads can then be tested by adding the filename of the text file to
+`conditions.testing_payloads <basf2.ConditionsConfiguration.testing_payloads>`
+and once satisfied can be uploaded with :ref:`b2conditionsdb-upload <b2conditionsdb>`
+or :ref:`b2conditionsdb-request <b2conditionsdb-request>`
+
 .. _cdb_config_transition:
 
 Transition from older releases
@@ -265,8 +304,8 @@ settings like custom log levels and database parameters are no longer supported.
 
 * `basf2.use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
 
-* the payloads in `localdb/database.txt` are no longer used by default, you have to explicitly enable that
-  using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.preprend_testing_payloads>`
+* the payloads in ``localdb/database.txt`` are no longer used by default, you have to explicitly enable that
+  using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.prepend_testing_payloads>`
 
 * you can now inspect what are the settings (``print(conditions.globaltags)``)
   and also edit that list (``conditions.globaltags += ["some", "other", "tags"]``).

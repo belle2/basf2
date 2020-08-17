@@ -22,13 +22,11 @@
 #include <simulation/kernel/StackingAction.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
 
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <simulation/monopoles/G4MonopolePhysics.h>
@@ -36,23 +34,18 @@
 
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
-#include <G4VUserPhysicsList.hh>
 #include <G4PhysListFactory.hh>
 #include <G4ProcessVector.hh>
 #include <G4OpticalPhysics.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTable.hh>
-#include <G4DecayTable.hh>
 #include <G4EventManager.hh>
 #include <G4RunManager.hh>
 #include <G4UImanager.hh>
-#include <G4UIExecutive.hh>
 #include <G4VisExecutive.hh>
 #include <G4StepLimiter.hh>
 #include <G4EmParameters.hh>
 #include <G4HadronicProcessStore.hh>
-#include <G4CascadeChannelTables.hh>
-#include <G4CascadeChannel.hh>
 #include <G4InuclParticleNames.hh>
 
 #include <G4Mag_UsualEqRhs.hh>
@@ -356,7 +349,8 @@ void FullSimModule::initialize()
   while ((*partIter)()) {
     G4ParticleDefinition* currParticle = partIter->value();
     G4ProcessVector& currProcList = *currParticle->GetProcessManager()->GetProcessList();
-    for (int iProcess = 0; iProcess < currProcList.size(); ++iProcess) {
+    assert(currProcList.size() < INT_MAX);
+    for (int iProcess = 0; iProcess < static_cast<int>(currProcList.size()); ++iProcess) {
       G4Transportation* transport = dynamic_cast<G4Transportation*>(currProcList[iProcess]);
       if (transport != nullptr) {
         //Geant4 energy unit is MeV
@@ -383,7 +377,8 @@ void FullSimModule::initialize()
       G4ProcessManager* processManager = currParticle->GetProcessManager();
       if (processManager) {
         G4ProcessVector* processList = processManager->GetProcessList();
-        for (int i = 0; i < processList->size(); ++i) {
+        assert(processList->size() < INT_MAX);
+        for (int i = 0; i < static_cast<int>(processList->size()); ++i) {
           if (((*processList)[i]->GetProcessName() == "Cerenkov") ||
               ((*processList)[i]->GetProcessName() == "Scintillation") ||
               ((*processList)[i]->GetProcessName() == "hFritiofCaptureAtRest")) {

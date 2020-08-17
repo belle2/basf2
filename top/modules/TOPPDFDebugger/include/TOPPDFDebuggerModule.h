@@ -11,7 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <mdst/dataobjects/Track.h>

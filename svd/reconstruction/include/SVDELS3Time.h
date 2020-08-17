@@ -35,6 +35,11 @@ namespace Belle2 {
       int getFirstFrame() override;
 
       /**
+       * @return the cluster raw time
+       */
+      double getClusterRawTime();
+
+      /**
        * @return the cluster time
        */
       double getClusterTime() override;
@@ -44,8 +49,15 @@ namespace Belle2 {
        */
       double getClusterTimeError() override;
 
+      /**
+       * @return the ELS time constant
+       */
+      double getTau() {return m_tau;};
+
 
     private:
+
+      double m_tau = 55; /**< ELS time constant*/
 
       SVD3SampleELSTimeCalibrations m_ELS3TimeCal; /**< SVD ELS3 Time calibration wrapper*/
 

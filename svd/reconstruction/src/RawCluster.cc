@@ -31,6 +31,7 @@ namespace Belle2 {
       , m_seedMaxSample(-1)
       , m_seedSNR(-1)
       , m_seedIndex(-1)
+      , m_seedInternalIndex(-1)
       , m_strips(4)
       , m_storeShaperDigitsName("SVDShaperDigits")
     {m_strips.clear();};
@@ -43,6 +44,7 @@ namespace Belle2 {
       , m_seedMaxSample(-1)
       , m_seedSNR(-1)
       , m_seedIndex(-1)
+      , m_seedInternalIndex(-1)
       , m_strips(4)
       , m_storeShaperDigitsName(storeShaperDigitsName)
     {m_strips.clear();};
@@ -76,7 +78,8 @@ namespace Belle2 {
         if (aStrip.maxSample > m_seedMaxSample) {
           m_seedMaxSample = aStrip.maxSample;
           m_seedSNR = (float)aStrip.maxSample / aStrip.noise;
-          m_seedIndex = m_strips.size() - 1;
+          m_seedInternalIndex = m_strips.size() - 1;
+          m_seedIndex = aStrip.shaperDigitIndex;
         }
       }
       return added;

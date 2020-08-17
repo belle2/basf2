@@ -25,6 +25,15 @@ namespace Belle2 {
 
     double SVDELS3Time::getClusterTime()
     {
+      float rawtime = getClusterRawTime();
+
+      double time = m_ELS3TimeCal.getCorrectedTime(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), -1, rawtime, m_triggerBin);
+
+      return time;
+
+    }
+    double SVDELS3Time::getClusterRawTime()
+    {
 
       //take the MaxSum 3 samples
       std::vector<float> clustered3s = m_rawCluster.getMaxSum3Samples().second;
@@ -40,8 +49,7 @@ namespace Belle2 {
                      -2 * m_apvClockPeriod / tau) * (*(begin + 2))) / (*begin + std::exp(-m_apvClockPeriod / tau) * (*(begin + 1)) / 2);
       float rawtime = - num / denom;
 
-      double time = m_ELS3TimeCal.getCorrectedTime(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), -1, rawtime, m_triggerBin);
-      return time;
+      return rawtime;
 
     }
 

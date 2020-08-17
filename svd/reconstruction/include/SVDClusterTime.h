@@ -31,20 +31,14 @@ namespace Belle2 {
       SVDClusterTime() {};
 
       /**
-       * set the vxdID
-       */
-      void setSensorID(VxdID vxdID) {m_vxdID = vxdID;};
-
-      /**
-       * set the side
-       */
-      void setIsUside(bool isUside) {m_isUside = isUside;};
-
-      /**
-       * set the RawCluster
+       * set the RawCluster, including vxdID and isUside
        */
       void setRawCluster(const Belle2::SVD::RawCluster& rawCluster)
-      { m_rawCluster = rawCluster; };
+      {
+        m_rawCluster = rawCluster;
+        m_vxdID = m_rawCluster.getSensorID();
+        m_isUside = m_rawCluster.isUSide();
+      };
 
       /**
        * set the trigger bin
@@ -82,6 +76,12 @@ namespace Belle2 {
        * @return true if the cluster is on the U/P side
        */
       bool isUSide() {return m_isUside;}
+
+      /**
+       * @return APV clock in ns
+       */
+      double getAPVClockPeriod() {return m_apvClockPeriod;}
+
 
     protected:
 

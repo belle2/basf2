@@ -99,6 +99,16 @@ namespace Belle2 {
        */
       const std::vector<stripInRawCluster> getStripsInRawCluster() const { return m_strips; };
 
+      /**
+       * @return the max sample (in ADC) of the seed strip
+       */
+      int getSeedMaxSample() const {return m_seedMaxSample;};
+
+      /**
+       * @return the internal index (in the stripsInRawCluster vector) of the seed strip
+       */
+      int getSeedInternalIndex() const {return m_seedInternalIndex;};
+
     protected:
 
       /** VxdID of the cluster */
@@ -121,6 +131,9 @@ namespace Belle2 {
 
       /** SVDShaperDigit index of the seed strip of the cluster */
       int m_seedIndex = -1;
+
+      /** stripsInRawCluster index of the seed strip of the cluster */
+      int m_seedInternalIndex = -1;
 
       /** vector containing the strips in the cluster */
       std::vector<stripInRawCluster> m_strips;

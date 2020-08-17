@@ -493,7 +493,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   StoreArray<Track> tracks;
   nTracks = tracks.getEntries();
   PCmsLabTransform T;
-  TLorentzVector pIN = T.getBeamFourMomentum();
+  const TLorentzVector pIN = T.getBeamFourMomentum();
   const auto& fr = ReferenceFrame::GetCurrent();
 
   if (m_pionParticles->getListSize() == 2) {
@@ -517,7 +517,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit1) continue;
 
-      TLorentzVector V4p1 = trackFit1->get4Momentum();
+      const TLorentzVector V4p1 = trackFit1->get4Momentum();
       const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
 
       const double p1MomLab = V4p1.P();
@@ -530,11 +530,11 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const double p1isInCDC = Variable::inCDCAcceptance(part1);
       const double p1clusPhi = Variable::eclClusterPhi(part1);
 
-      double Pp1 = V3p1.Mag();
-      double Thetap1 = (V3p1).Theta() * TMath::RadToDeg();
-      double Phip1 = (V3p1).Phi() * TMath::RadToDeg();
+      const double Pp1 = V3p1.Mag();
+      const double Thetap1 = (V3p1).Theta() * TMath::RadToDeg();
+      const double Phip1 = (V3p1).Phi() * TMath::RadToDeg();
 
-      double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+      const double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
       const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.4 && p1Eop < maxEoP && p1CDChits > 0
                             && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC == 1;
@@ -558,7 +558,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
         if (!trackFit2) continue;
 
-        TLorentzVector V4p2 = trackFit2->get4Momentum();
+        const TLorentzVector V4p2 = trackFit2->get4Momentum();
         const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
 
         const double p2MomLab = V4p2.P();
@@ -571,14 +571,14 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const double p2isInCDC = Variable::inCDCAcceptance(part2);
         const double p2clusPhi = Variable::eclClusterPhi(part2);
 
-        double Pp2 = V3p2.Mag();
-        double Thetap2 = (V3p2).Theta() * TMath::RadToDeg();
-        double Phip2 = (V3p2).Phi() * TMath::RadToDeg();
+        const double Pp2 = V3p2.Mag();
+        const double Thetap2 = (V3p2).Theta() * TMath::RadToDeg();
+        const double Phip2 = (V3p2).Phi() * TMath::RadToDeg();
 
-        double acopPhi = fabs(180 - fabs(Phip1 - Phip2));
-        double acopTheta = fabs(fabs(Thetap1 + Thetap2) - 180);
+        const double acopPhi = fabs(180 - fabs(Phip1 - Phip2));
+        const double acopTheta = fabs(fabs(Thetap1 + Thetap2) - 180);
 
-        double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        const double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
         const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.4 && p2Eop < maxEoP && p2CDChits > 0
                               && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC == 1;

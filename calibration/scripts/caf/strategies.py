@@ -563,7 +563,7 @@ class SimpleRunByRun(AlgorithmStrategy):
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
         self.queue = queue
 
-        B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
+        B2INFO(f"Setting up {self.__class__.__name__} strategy for {self.algorithm.name}.")
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
         machine_params["database_chain"] = self.database_chain
@@ -574,10 +574,10 @@ class SimpleRunByRun(AlgorithmStrategy):
         machine_params["ignored_runs"] = self.ignored_runs
         self.machine.setup_from_dict(machine_params)
         # Start moving through machine states
-        B2INFO("Starting AlgorithmMachine of {}".format(self.algorithm.name))
+        B2INFO(f"Starting AlgorithmMachine of {self.algorithm.name}.")
         self.machine.setup_algorithm(iteration=iteration)
         # After this point, the logging is in the stdout of the algorithm
-        B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))
+        B2INFO(f"Beginning execution of {self.algorithm.name} using strategy {self.__class__.__name__}.")
 
         all_runs_collected = set(runs_from_vector(self.algorithm.algorithm.getRunListFromAllData()))
         # If we were given a specific IoV to calibrate we just execute all runs in that IoV at once
@@ -588,7 +588,7 @@ class SimpleRunByRun(AlgorithmStrategy):
 
         # Remove the ignored runs from our run list to execute
         if self.ignored_runs:
-            B2INFO("Removing the ignored_runs from the runs to execute for {}".format(self.algorithm.name))
+            B2INFO(f"Removing the ignored_runs from the runs to execute for {self.algorithm.name}.")
             runs_to_execute.difference_update(set(self.ignored_runs))
         # Sets aren't ordered so lets go back to lists and sort
         runs_to_execute = sorted(runs_to_execute)
@@ -600,26 +600,26 @@ class SimpleRunByRun(AlgorithmStrategy):
                 self.machine.setup_algorithm()
             current_runs = exprun
             apply_iov = iov_from_runs([current_runs])
-            B2INFO("Executing on IoV = {}".format(apply_iov))
+            B2INFO(f"Executing on IoV = {apply_iov}.")
             self.machine.execute_runs(runs=[current_runs], iteration=iteration, apply_iov=apply_iov)
             first_execution = False
-            B2INFO("Finished execution with result code {}".format(self.machine.result.result))
+            B2INFO(f"Finished execution with result code {self.machine.result.result}.")
             # Does this count as a successful execution?
             if (self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value):
                 # Commit the payloads and result
-                B2INFO("Committing payloads for {}.".format(iov_from_runs([current_runs])))
+                B2INFO(f"Committing payloads for {iov_from_runs([current_runs])}.")
                 self.machine.algorithm.algorithm.commit()
                 self.results.append(self.machine.result)
                 self.send_result(self.machine.result)
                 self.machine.complete()
             # If it wasn't successful, was it due to lack of data in the runs?
             elif (self.machine.result.result == AlgResult.not_enough_data.value):
-                B2INFO("There wasn't enough data in the IoV {}".format(iov_from_runs([current_runs])))
+                B2INFO(f"There wasn't enough data in the IoV {iov_from_runs([current_runs])}.")
                 self.results.append(self.machine.result)
                 self.send_result(self.machine.result)
                 self.machine.fail()
             elif self.machine.result.result == AlgResult.failure.value:
-                B2ERROR("Failure exit code in the IoV {}".format(iov_from_runs([current_runs])))
+                B2ERROR(f"Failure exit code in the IoV {iov_from_runs([current_runs])}.")
                 self.results.append(self.machine.result)
                 self.send_result(self.machine.result)
                 self.machine.fail()
@@ -667,7 +667,7 @@ class SequentialBoundaries(AlgorithmStrategy):
         if not self.is_valid():
             raise StrategyError("This AlgorithmStrategy was not set up correctly!")
         self.queue = queue
-        B2INFO("Setting up {} strategy for {}".format(self.__class__.__name__, self.algorithm.name))
+        B2INFO(f"Setting up {self.__class__.__name__} strategy for {self.algorithm.name)}.")
         # Now add all the necessary parameters for a strategy to run
         machine_params = {}
         machine_params["database_chain"] = self.database_chain
@@ -680,7 +680,7 @@ class SequentialBoundaries(AlgorithmStrategy):
         # Start moving through machine states
         self.machine.setup_algorithm(iteration=iteration)
         # After this point, the logging is in the stdout of the algorithm
-        B2INFO("Beginning execution of {} using strategy {}".format(self.algorithm.name, self.__class__.__name__))
+        B2INFO(f"Beginning execution of {self.algorithm.name)} using strategy {self.__class__.__name__}.")
         runs_to_execute = []
         all_runs_collected = runs_from_vector(self.algorithm.algorithm.getRunListFromAllData())
         # If we were given a specific IoV to calibrate we just execute over runs in that IoV
@@ -691,7 +691,7 @@ class SequentialBoundaries(AlgorithmStrategy):
 
         # Remove the ignored runs from our run list to execute
         if self.ignored_runs:
-            B2INFO("Removing the ignored_runs from the runs to execute for {}".format(self.algorithm.name))
+            B2INFO(f"Removing the ignored_runs from the runs to execute for {self.algorithm.name}.")
             runs_to_execute.difference_update(set(self.ignored_runs))
         # Sets aren't ordered so lets go back to lists and sort
         runs_to_execute = sorted(runs_to_execute)
@@ -705,7 +705,7 @@ class SequentialBoundaries(AlgorithmStrategy):
         # extend over multiple experiments, only multiple runs
         iov_coverage = None
         if "iov_coverage" in self.algorithm.params:
-            B2INFO("Detected that you have set iov_coverage to {}".format(self.algorithm.params["iov_coverage"]))
+            B2INFO(f"Detected that you have set iov_coverage to {self.algorithm.params['iov_coverage']}.")
             iov_coverage = self.algorithm.params["iov_coverage"]
 
         number_of_experiments = len(runs_to_execute)
@@ -774,8 +774,8 @@ class SequentialBoundaries(AlgorithmStrategy):
                     continue
                 # We are definitely dealiing with IoVs from one experiment so we can make assumptions here
                 if previous_boundary_iov.run_high != (boundary_iov.run_low-1):
-                    B2WARNING(("Gap in boundary IoVs found before execution! "
-                               "Will correct it by extending the previous boundary up to the next one."))
+                    B2WARNING("Gap in boundary IoVs found before execution! "
+                              "Will correct it by extending the previous boundary up to the next one.")
                     B2INFO(f"Original boundary IoV={previous_boundary_iov}")
                     previous_boundary_iov = IoV(previous_boundary_iov.exp_low, previous_boundary_iov.run_low,
                                                 previous_boundary_iov.exp_high, boundary_iov.run_low-1)
@@ -890,7 +890,7 @@ class SequentialBoundaries(AlgorithmStrategy):
                     self.machine.complete()
                     continue
                 elif self.machine.result.result == AlgResult.not_enough_data.value:
-                    B2INFO("Not Enough Data result")
+                    B2INFO("Not Enough Data result.")
                     # Just complete but leave the current runs alone for next loop
                     self.machine.complete()
                     continue
@@ -961,7 +961,7 @@ class SequentialBoundaries(AlgorithmStrategy):
                     # Commit previous values we were holding onto
                     B2INFO("Found a success.")
                     if last_successful_result:
-                        B2INFO("Can now commit the previous success")
+                        B2INFO("Can now commit the previous success.")
                         self.machine.algorithm.algorithm.commit(last_successful_payloads)
                         self.results.append(last_successful_result)
                         self.send_result(last_successful_result)
@@ -977,7 +977,7 @@ class SequentialBoundaries(AlgorithmStrategy):
                     self.machine.complete()
                     continue
                 elif self.machine.result.result == AlgResult.not_enough_data.value:
-                    B2INFO("Not Enough Data result")
+                    B2INFO("Not Enough Data result.")
                     # Just complete but leave the current runs alone for next loop
                     self.machine.complete()
                     continue
@@ -993,9 +993,9 @@ class SequentialBoundaries(AlgorithmStrategy):
         else:
             self.first_execution = False
 
-        B2INFO("Executing and applying {} to the payloads".format(iov))
+        B2INFO(f"Executing and applying {iov} to the payloads.")
         self.machine.execute_runs(runs=runs, iteration=iteration, apply_iov=iov)
-        B2INFO("Finished execution with result code {}".format(self.machine.result.result))
+        B2INFO(f"Finished execution with result code {self.machine.result.result}.")
 
     def alg_success(self):
         return ((self.machine.result.result == AlgResult.ok.value) or (self.machine.result.result == AlgResult.iterate.value))
@@ -1003,6 +1003,6 @@ class SequentialBoundaries(AlgorithmStrategy):
 
 class StrategyError(Exception):
     """
-    Basic Exception for this type of class
+    Basic Exception for this type of class.
     """
     pass

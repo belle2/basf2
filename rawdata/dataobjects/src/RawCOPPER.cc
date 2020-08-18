@@ -46,6 +46,7 @@ void RawCOPPER::SetVersion()
   }
 
   m_version = ((m_buffer[ POS_FORMAT_VERSION ]) & FORMAT_MASK) >> 8;
+
   switch (m_version) {
     case LATEST_POSTREDUCTION_FORMAT_VER :
       m_access = new PostRawCOPPERFormat_latest;
@@ -53,6 +54,14 @@ void RawCOPPER::SetVersion()
       break;
     case (0x80 + LATEST_POSTREDUCTION_FORMAT_VER) :
       m_access = new PreRawCOPPERFormat_latest;
+      //            printf("Calling PreRawCOPPERFormat_latest\n");
+      break;
+    case 0x2 :
+      m_access = new PostRawCOPPERFormat_v2;
+      //            printf("Calling PostRawCOPPERFormat_latest\n");
+      break;
+    case (0x80 + 0x2) :
+      m_access = new PreRawCOPPERFormat_v2;
       //            printf("Calling PreRawCOPPERFormat_latest\n");
       break;
     case 0x1 :

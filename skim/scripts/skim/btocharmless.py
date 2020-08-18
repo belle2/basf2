@@ -12,7 +12,7 @@ __authors__ = [
 import modularAnalysis as ma
 from skim.standardlists.lightmesons import loadStdLightMesons
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-from stdCharged import stdK, stdPi
+from stdCharged import stdK, stdPi, stdCharged
 from stdPhotons import stdPhotons
 from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts
@@ -43,13 +43,13 @@ class CharmlessHad2Body(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        loadStdLightMesons(path=path)
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
+        stdCharged("K", "loose", path=path)
+        stdCharged("pi", "loose", path=path)
         stdPhotons("loose", path=path)
         stdPi0s("eff40_Jan2020", path=path)
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
+        loadStdLightMesons(path=path)
 
     def CharmlessHad2BodyB0List(self, path):
         """
@@ -334,13 +334,14 @@ class CharmlessHad3Body(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        loadStdLightMesons(path=path)
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
+
+        stdCharged("K", "loose", path=path)
+        stdCharged("pi", "loose", path=path)
         stdPhotons("loose", path=path)
         stdPi0s("eff40_Jan2020", path=path)
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
+        loadStdLightMesons(path=path)
 
     def CharmlessHad3BodyB0List(self, path):
         """

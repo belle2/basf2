@@ -21,9 +21,6 @@
 //#include <framework/datastore/DataStore.h>
 //#include <TObject.h>
 
-// version #
-#define POST_RAWCOPPER_FORMAT_VER1 1
-
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
 namespace Belle2 {

@@ -1,0 +1,131 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Giulia Casarosa                                          *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
+
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+
+#include <svd/reconstruction/RawCluster.h>
+#include <svd/reconstruction/SVDClusterTime.h>
+//#include <svd/reconstruction/SVDClusterCharge.h>
+
+#include <mdst/dataobjects/MCParticle.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <svd/dataobjects/SVDTrueHit.h>
+
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDClusterCalibrations.h>
+//#include <svd/dbobjects/SVDRecoConfiguration.h>
+
+namespace Belle2 {
+
+  namespace SVD {
+
+    /** The SVD Clusterizer
+     *
+     * This module produces SVDClusters from SVDShaperDigits
+     */
+    class SVDClusterizerModule : public Module {
+
+    public:
+
+      /** Constructor defining the parameters */
+      SVDClusterizerModule();
+
+      /** Initialize the module */
+      virtual void initialize() override;
+
+      /** Initialize the module */
+      virtual void beginRun() override;
+
+      /** does the actual clustering */
+      virtual void event() override;
+
+    protected:
+
+      //1. Collections and relations Names
+      /** Name of the collection to use for the SVDShaperDigits */
+      std::string m_storeShaperDigitsName;
+      /** Name of the collection to use for the SVDClusters */
+      std::string m_storeClustersName;
+      /** Name of the collection to use for the SVDTrueHits */
+      std::string m_storeTrueHitsName;
+      /** Name of the collection to use for the MCParticles */
+      std::string m_storeMCParticlesName;
+      /** Name of the relation between SVDShaperDigits and MCParticles */
+      std::string m_relShaperDigitMCParticleName;
+      /** Name of the relation between SVDClusters and MCParticles */
+      std::string m_relClusterMCParticleName;
+      /** Name of the relation between SVDClusters and SVDShaperDigits */
+      std::string m_relClusterShaperDigitName;
+      /** Name of the relation between SVDShaperDigits and SVDTrueHits */
+      std::string m_relShaperDigitTrueHitName;
+      /** Name of the relation between SVDClusters and SVDTrueHits */
+      std::string m_relClusterTrueHitName;
+
+      /** Collection of SVDClusters */
+      StoreArray<SVDCluster> m_storeClusters;
+      /** Collection of SVDShaperDigits */
+      StoreArray<SVDShaperDigit> m_storeDigits;
+      /** Collection of SVDTrueHits */
+      StoreArray<SVDTrueHit> m_storeTrueHits;
+      /** Collection of MCParticles */
+      StoreArray<MCParticle> m_storeMCParticles;
+
+      // 2. Clustering
+      /** Seed cut in units of noise. DEPRECATED - useDB */
+      double m_cutSeed = 5;
+      /** Adjacent cut in units of noise. DEPRECATED - useDB*/
+      double m_cutAdjacent = 3;
+      /** Cluster cut in units of m_elNoise, not included (yet?) */
+      double m_cutCluster = 0;
+      /** if true takes the clusterizer cuts and reconstruction configuration from the DB objects*/
+      bool m_useDB = true;
+
+      // 3. Cluster Reconstruction Configuration:
+      int m_numberOfAcquiredSamples = 0; /**< number of acquired samples, can be 6,3 or 1*/
+      std::string m_timeRecoWith6SamplesAlgorithm = "not set";
+      std::string m_timeRecoWith3SamplesAlgorithm = "not set";
+      //      std::string m_chargeRecoWith6SamplesAlgorithm = "not set";
+      //      std::string m_chargeRecoWith3SamplesAlgorithm = "not set";
+
+      SVDClusterTime* m_time6SampleClass = nullptr; /**< cluster time class for the 6-sample acquisition mode*/
+      SVDClusterTime* m_time3SampleClass = nullptr; /**< cluster time class for the 3-sample acquisition mode*/
+      //      SVDClusterCharge *m_charge6SampleClass = nullptr; /**< cluster charge class for the 6-sample acquisition mode*/
+      //      SVDClusterCharge *m_charge3SampleClass = nullptr; /**< cluster charge class for the 3-sample acquisition mode*/
+
+
+      // 4. Calibration Objects
+      //      DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< */
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/
+      SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
+      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations db object*/
+
+
+      /**
+       * computes charge, position and time of the raw cluster
+       * and appends the new SVDCluster to the StoreArray
+       */
+      void finalizeCluster(Belle2::SVD::RawCluster& rawCluster);
+
+      /**
+       * writes the relations of the SVDClusters with the other StoreArrays
+       */
+      void writeClusterRelations(Belle2::SVD::RawCluster& rawCluster);
+
+    };// end class declarations
+
+
+  } //end SVD namespace;
+} // end namespace Belle2

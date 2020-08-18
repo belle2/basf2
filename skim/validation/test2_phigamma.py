@@ -7,7 +7,7 @@ from glob import glob
 import modularAnalysis as ma
 from variables import variables as vm
 
-inputFiles = 'phigamma_*_skimmed.udst.root'
+inputFiles = '../phigamma_*_skimmed.udst.root'
 histoRootFile = 'phigamma_Validation.root'
 inputFileList = glob(inputFiles)
 

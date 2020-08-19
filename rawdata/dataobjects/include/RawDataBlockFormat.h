@@ -12,6 +12,9 @@
 // Includes
 #include <rawdata/switch_basf2_standalone.h>
 
+// Max channels of PCIe40 board
+#define MAX_PCIE40_CH 48
+
 namespace Belle2 {
 
   /**

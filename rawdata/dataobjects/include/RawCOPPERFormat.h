@@ -20,7 +20,6 @@
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
-#define MAX_PCIE40_CH 48
 
 #define DETECTOR_MASK 0xFF000000 // tentative
 #define COPPERID_MASK 0x00FFFFFF // tentative

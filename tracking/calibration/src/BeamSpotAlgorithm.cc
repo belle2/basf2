@@ -31,6 +31,12 @@ BeamSpotAlgorithm::BeamSpotAlgorithm() : CalibrationAlgorithm("BeamSpotCollector
   setDescription("BeamSpot calibration algorithm");
 }
 
+double getMaxGap(map<pair<int, int>, pair<double, double>> runsInfo);
+map<pair<int, int>, pair<double, double>> getRunInfo();
+pair<double, double> getMinMaxTime();
+
+
+
 CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 {
   cout << "Radek is here " << __LINE__ << endl;
@@ -137,7 +143,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   vertexSize[2][2] = sizeZ2;
 
 
-
+  /*
   auto payload = new BeamSpot();
   payload->setIP(vertexPos, vertexCov);
   payload->setSizeCovMatrix(vertexSize);
@@ -146,17 +152,37 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   auto payload2 = new BeamSpot();
   payload2->setIP(vertexPos2, vertexCov);
   payload2->setSizeCovMatrix(vertexSize);
-
+  */
 
 
   //saveCalibration(payload);
 
+  map<pair<int, int>, pair<double, double>> runsInfo = getRunInfo();
+  double maxGap = getMaxGap(runsInfo);
+  auto tMinMax =  getMinMaxTime();
 
+  for (auto el : runsInfo) {
+    pair<int, int> iov = el.first;
 
+    auto payload = new BeamSpot();
+    vertexPos(0) = maxGap;
+    vertexPos(1) = tMinMax.first;
+    vertexPos(2) = tMinMax.second;
+    payload->setIP(vertexPos, vertexCov);
+    payload->setSizeCovMatrix(vertexSize);
+
+    TObject* obj  = static_cast<TObject*>(payload);
+
+    EventDependency intraRun(obj);
+    auto m_iov = IntervalOfValidity(iov.first, iov.second, iov.first, iov.second);
+    Database::Instance().storeData("BeamSpotEventDep", &intraRun, m_iov);
+  }
+
+  /*
   TObject* obj  = static_cast<TObject*>(payload);
   TObject* obj2 = static_cast<TObject*>(payload2);
 
-// add objects with different validity
+  // add objects with different validity
   EventDependency intraRun(obj);
   intraRun.add(500, obj2);   // valid from event number 500
   //intraRun.add(1000, agelObj[2]);  // valid from event number 1000
@@ -165,9 +191,9 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   auto m_iov = IntervalOfValidity(0, 0, -1, -1);
   cout << "Saving BeamSpotEventDep " << endl;
   Database::Instance().storeData("BeamSpotEventDep", &intraRun, m_iov);
-
-
-
+  auto m_iov2 = IntervalOfValidity(12, 1797, 12, 1797);
+  Database::Instance().storeData("BeamSpotEventDep", &intraRun, m_iov2);
+  */
 
 
   // probably not needed - would trigger re-doing the collection
@@ -176,11 +202,59 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   return c_OK;
 }
 
-
-bool BeamSpotAlgorithm::isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/)
+double getMaxGap(map<pair<int, int>, pair<double, double>> runsInfo)
 {
-  const double maxTimeGap = 3600; //maximal time gap in seconds
+  auto f = begin(runsInfo);
+  auto s = f;
+  ++s;
+  if (s == end(runsInfo))
+    return 0;
 
+  double maxGap = 0;
+  while (s != end(runsInfo)) {
+    double t1End   = f->second.second;
+    double t2Start = f->second.first;
+
+    maxGap = max(maxGap, t2Start - t1End);
+  }
+
+  return maxGap;
+}
+
+
+map<pair<int, int>, pair<double, double>> BeamSpotAlgorithm::getRunInfo()
+{
+  auto tracks = getObjectPtr<TTree>("tracks");
+  cout << "Tracks size " << tracks->GetEntries() << endl;
+
+  double time;
+  int run, exp;
+  tracks->SetBranchAddress("time", &time);
+  tracks->SetBranchAddress("run", &run);
+  tracks->SetBranchAddress("exp", &exp);
+
+  map<pair<int, int>, pair<double, double>> runsInfo;
+
+  for (int i = 0; i < tracks->GetEntries(); ++i) {
+    tracks->GetEntry(i);
+    if (runsInfo.count({exp, run})) {
+      double tMin, tMax;
+      tie(tMin, tMax) = runsInfo.at({exp, run});
+      tMin = min(tMin, time);
+      tMax = max(tMax, time);
+      runsInfo.at({exp, run}) = {tMin, tMax};
+    }
+    else {
+      runsInfo[ {exp, run}] = {time, time};
+    }
+
+  }
+  return runsInfo;
+}
+
+
+pair<double, double> BeamSpotAlgorithm::getMinMaxTime()
+{
   auto tracks = getObjectPtr<TTree>("tracks");
   cout << "Tracks size " << tracks->GetEntries() << endl;
 
@@ -193,6 +267,20 @@ bool BeamSpotAlgorithm::isBoundaryRequired(const Calibration::ExpRun& /*currentR
     timeMin = min(timeMin, time);
     timeMax = max(timeMax, time);
   }
+  return {timeMin, timeMax};
+}
+
+
+
+
+
+
+bool BeamSpotAlgorithm::isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/)
+{
+  const double maxTimeGap = 3600; //maximal time gap in seconds
+
+  double timeMin, timeMax;
+  tie(timeMin, timeMax) = getMinMaxTime();
 
   if (!m_previousRunEndTime) {
     B2INFO("This is the first run encountered, let's say it is a boundary.");

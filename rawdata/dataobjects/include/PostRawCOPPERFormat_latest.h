@@ -26,8 +26,8 @@
 namespace Belle2 {
 
   /**
-   * The Raw COPPER class ver.1 ( the latest version since May, 2014 )
-   * This class stores data received by COPPER via belle2linkt
+   * The Raw COPPER class ver. 4 (the 1st ver. for PCIe40 data format)
+   * This class stores data received by PCIe40 via belle2linkt
    * Data from all detectors except PXD are stored in this class
    */
   class PostRawCOPPERFormat_latest : public RawCOPPERFormat_latest {
@@ -191,7 +191,7 @@ namespace Belle2 {
       SIZE_COPPER_TRAILER = 0
     };
 
-    // Data Format : "B2Link HSLB Header"
+    // Data Format : "B2Link PCIe40 ch Header"
     enum {
       POS_B2LHSLB_MAGIC = 0,
       SIZE_B2LHSLB_HEADER = 1
@@ -214,7 +214,8 @@ namespace Belle2 {
     // Data Format : "B2Link HSLB Trailer"
     //
     enum {
-      SIZE_B2LHSLB_TRAILER = 0
+      POS_B2HSLB_TRL_MAGIC = 1,
+      SIZE_B2LHSLB_TRAILER = 1
     };
 
 

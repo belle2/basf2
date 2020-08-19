@@ -175,7 +175,7 @@ namespace Belle2 {
     };
 
     enum {
-      RAWHEADER_NWORDS = 12
+      RAWHEADER_NWORDS = 56
     };
 
     enum {
@@ -192,10 +192,7 @@ namespace Belle2 {
       POS_TTUTIME = 5,
       POS_NODE_ID = 6,
       POS_TRUNC_MASK_DATATYPE = 7,
-      POS_OFFSET_1ST_FINESSE = 8,
-      POS_OFFSET_2ND_FINESSE = 9,
-      POS_OFFSET_3RD_FINESSE = 10,
-      POS_OFFSET_4TH_FINESSE = 11,
+      POS_CH_POS_TABLE = 8
     };
 
 

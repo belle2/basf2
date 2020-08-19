@@ -312,105 +312,143 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
                                                  int* detector_buf_4th,  int nwords_4th,
                                                  RawCOPPERPackerInfo rawcpr_info)
 {
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+
+int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
+                                                 int* (&detector_buf_ch)[MAX_PCIE40_CH],
+                                                 int (&nwords_ch)[MAX_PCIE40_CH],
+                                                 RawCOPPERPackerInfo rawcpr_info)
+{
   int* packed_buf = NULL;
 
-  int poswords_to = 0;
-  int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
-  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
+  // int poswords_to = 0;
+  // int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
+  // int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
 
-  // calculate the event length
-  int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
+  // // calculate the event length
+  // int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
 
-  for (int i = 0; i < 4; i++) {
-    if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
-    length_nwords += nwords[ i ];
-    length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
-                     + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
-  }
+  // for (int i = 0; i < 4; i++) {
+  //   if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
+  //   length_nwords += nwords[ i ];
+  //   length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
+  //                    + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  // }
 
-  // allocate buffer
-  packed_buf = new int[ length_nwords ];
-  memset(packed_buf, 0, sizeof(int) * length_nwords);
+  // // allocate buffer
+  // packed_buf = new int[ length_nwords ];
+  // memset(packed_buf, 0, sizeof(int) * length_nwords);
 
-  //
-  // Fill RawHeader
-  //
-  tmp_header.SetBuffer(packed_buf);
+  // //
+  // // Fill RawHeader
+  // //
+  // tmp_header.SetBuffer(packed_buf);
 
-  packed_buf[ tmp_header.POS_NWORDS ] = length_nwords; // total length
-  packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] =
-    0x7f7f0000
-    | ((DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) & tmp_header.FORMAT_VERSION__MASK)
-    | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
-  packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
-                                            | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
-  packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
-  packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
-  packed_buf[ tmp_header.POS_TTUTIME ] = rawcpr_info.tt_utime; // tt_utime
-  packed_buf[ tmp_header.POS_NODE_ID ] = rawcpr_info.node_id; // node ID
+  // packed_buf[ tmp_header.POS_NWORDS ] = length_nwords; // total length
+  // packed_buf[ tmp_header.POS_VERSION_HDRNWORDS ] =
+  //   0x7f7f0000
+  //   | ((DATA_FORMAT_VERSION << tmp_header.FORMAT_VERSION_SHIFT) & tmp_header.FORMAT_VERSION__MASK)
+  //   | tmp_header.RAWHEADER_NWORDS; // ver.#, header length
+  // packed_buf[ tmp_header.POS_EXP_RUN_NO ] = (rawcpr_info.exp_num << 22)
+  //                                           | (rawcpr_info.run_subrun_num & 0x003FFFFF);   // exp. and run #
+  // packed_buf[ tmp_header.POS_EVE_NO ] = rawcpr_info.eve_num; // eve #
+  // packed_buf[ tmp_header.POS_TTCTIME_TRGTYPE ] = (rawcpr_info.tt_ctime & 0x7FFFFFF) << 4;   // tt_ctime
+  // packed_buf[ tmp_header.POS_TTUTIME ] = rawcpr_info.tt_utime; // tt_utime
+  // packed_buf[ tmp_header.POS_NODE_ID ] = rawcpr_info.node_id; // node ID
 
-  // fill the positions of finesse buffers
-  packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+  // // fill the positions of finesse buffers
+  // packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
 
-  packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ];
-  if (nwords[ 0 ] > 0) {
-    packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] +=
-      nwords[ 0 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
-  }
+  // packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ];
+  // if (nwords[ 0 ] > 0) {
+  //   packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] +=
+  //     nwords[ 0 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  // }
 
-  packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ];
-  if (nwords[ 1 ] > 0) {
-    packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] +=
-      nwords[ 1 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
-  }
+  // packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ];
+  // if (nwords[ 1 ] > 0) {
+  //   packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] +=
+  //     nwords[ 1 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  // }
 
-  packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ];
-  if (nwords[ 2 ] > 0) {
-    packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER +
-                                                       SIZE_B2LHSLB_TRAILER;
-  }
-  poswords_to += tmp_header.GetHdrNwords();
+  // packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ];
+  // if (nwords[ 2 ] > 0) {
+  //   packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER +
+  //                                                      SIZE_B2LHSLB_TRAILER;
+  // }
+  // poswords_to += tmp_header.GetHdrNwords();
 
-  // Fill COPPER header
-  poswords_to += SIZE_COPPER_HEADER;
+  // // Fill COPPER header
+  // poswords_to += SIZE_COPPER_HEADER;
 
-  // Fill FINESSE buffer
-  for (int i = 0; i < 4; i++) {
+  // // Fill FINESSE buffer
+  // for (int i = 0; i < 4; i++) {
 
-    if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;     // for an empty FINESSE slot
+  //   if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;     // for an empty FINESSE slot
 
-    // Fill b2link HSLB header
-    packed_buf[ poswords_to + POS_B2LHSLB_MAGIC ] = 0xffaa0000 | (0xffff & rawcpr_info.eve_num);
-    poswords_to += SIZE_B2LHSLB_HEADER;
+  //   // Fill b2link HSLB header
+  //   packed_buf[ poswords_to + POS_B2LHSLB_MAGIC ] = 0xffaa0000 | (0xffff & rawcpr_info.eve_num);
+  //   poswords_to += SIZE_B2LHSLB_HEADER;
 
-    // Fill b2link FEE header
-    packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x7FFFFFF) << 4;
-    poswords_to += SIZE_B2LFEE_HEADER;
+  //   // Fill b2link FEE header
+  //   packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x7FFFFFF) << 4;
+  //   poswords_to += SIZE_B2LFEE_HEADER;
 
-    // copy the 1st Detector Buffer
-    memcpy(packed_buf + poswords_to, detector_buf[ i ], nwords[ i ]*sizeof(int));
-    poswords_to += nwords[ i ];
+  //   // copy the 1st Detector Buffer
+  //   memcpy(packed_buf + poswords_to, detector_buf[ i ], nwords[ i ]*sizeof(int));
+  //   poswords_to += nwords[ i ];
 
-    // Fill b2link FEE trailer
-    unsigned int crc16 = 0;
-    packed_buf[ poswords_to + POS_B2LFEE_ERRCNT_CRC16 ] =  crc16 &
-                                                           0xffff; // Error count is stored in this buffer for ver.2 format but it is set to zero here.
-    poswords_to += SIZE_B2LFEE_TRAILER;
+  //   // Fill b2link FEE trailer
+  //   unsigned int crc16 = 0;
+  //   packed_buf[ poswords_to + POS_B2LFEE_ERRCNT_CRC16 ] =  crc16 &
+  //                                                          0xffff; // Error count is stored in this buffer for ver.2 format but it is set to zero here.
+  //   poswords_to += SIZE_B2LFEE_TRAILER;
 
-    // Fill b2link HSLB trailer
-    poswords_to += SIZE_B2LHSLB_TRAILER;
+  //   // Fill b2link HSLB trailer
+  //   poswords_to += SIZE_B2LHSLB_TRAILER;
 
-  }
+  // }
 
-  // Fill COPPER trailer
-  poswords_to += SIZE_COPPER_TRAILER;
+  // // Fill COPPER trailer
+  // poswords_to += SIZE_COPPER_TRAILER;
 
-  // Fill RawTrailer
-  packed_buf[ poswords_to + tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
-  poswords_to += tmp_trailer.GetTrlNwords();
+  // // Fill RawTrailer
+  // packed_buf[ poswords_to + tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
+  // poswords_to += tmp_trailer.GetTrlNwords();
 
-  *packed_buf_nwords = poswords_to;
+  // *packed_buf_nwords = poswords_to;
 
   return packed_buf;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

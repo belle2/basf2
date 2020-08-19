@@ -20,6 +20,8 @@
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
+#define MAX_PCIE40_CH 48
+
 #define DETECTOR_MASK 0xFF000000 // tentative
 #define COPPERID_MASK 0x00FFFFFF // tentative
 #define SVD_ID  0x01000000 // tentative
@@ -324,6 +326,13 @@ namespace Belle2 {
                                  int* detector_buf_3rd, int nwords_3rd,
                                  int* detector_buf_4th, int nwords_4th,
                                  RawCOPPERPackerInfo rawcprpacker_info) = 0;
+
+    //! Pack data for PCIe40 data-format
+    virtual int* PackDetectorBuf(int* packed_buf_nwords,
+                                 int* (&detector_buf_ch)[MAX_PCIE40_CH],
+                                 int (&nwords_ch)[MAX_PCIE40_CH],
+                                 RawCOPPERPackerInfo rawcpr_info);
+
 
   protected :
 

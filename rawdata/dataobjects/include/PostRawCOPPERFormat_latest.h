@@ -171,6 +171,13 @@ namespace Belle2 {
                          int* detector_buf_4th, int nwords_4th,
                          RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
 
+    //! Pack data for PCIe40 data-format
+    /* cppcheck-suppress missingOverride */
+    int* PackDetectorBuf(int* packed_buf_nwords,
+                         int* (&detector_buf_ch)[MAX_PCIE40_CH],
+                         int (&nwords_ch)[MAX_PCIE40_CH],
+                         RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
+
     //
     // size of "COPPER front header" and "COPPER trailer"
     //

@@ -213,6 +213,34 @@ void RawCOPPER::PackDetectorBuf(
   return;
 }
 
+void RawCOPPER::PackDetectorBuf(int* packed_buf_nwords,
+                                int* (&detector_buf_ch)[MAX_PCIE40_CH],
+                                int (&nwords_ch)[MAX_PCIE40_CH],
+                                RawCOPPERPackerInfo rawcprpacker_info)
+{
+
+  if (m_access != NULL) {
+    delete m_access;
+  }
+  m_access = new PostRawCOPPERFormat_latest;
+  m_version = LATEST_POSTREDUCTION_FORMAT_VER;
+  m_num_events = 1;
+  m_num_nodes = 1;
+
+  int* packed_buf = NULL;
+  packed_buf = m_access->PackDetectorBuf(&m_nwords,
+                                         detector_buf_ch, nwords_ch,
+                                         rawcprpacker_info);
+
+  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
+  SetBuffer(packed_buf, m_nwords, delete_flag, m_num_events, m_num_nodes);
+
+  delete_flag = 0; // For m_access, need not to delete m_buffer
+  m_access->SetBuffer(m_buffer, m_nwords, delete_flag, m_num_events, m_num_nodes);
+
+  return;
+}
+
 
 void RawCOPPER::PackDetectorBuf4DummyData(
   int* detector_buf_1st, int nwords_1st,

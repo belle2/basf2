@@ -306,6 +306,12 @@ namespace Belle2 {
                                    int* detector_buf_4th, int nwords_4th,
                                    RawCOPPERPackerInfo rawcprpacker_info);
 
+    //! Pack data for PCIe40 data-format
+    void PackDetectorBuf(int* packed_buf_nwords,
+                         int* (&detector_buf_ch)[MAX_PCIE40_CH],
+                         int (&nwords_ch)[MAX_PCIE40_CH],
+                         RawCOPPERPackerInfo  rawcprpacker_info);
+
 
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;

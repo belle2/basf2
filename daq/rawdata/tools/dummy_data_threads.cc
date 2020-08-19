@@ -1,3 +1,4 @@
+#ifdef USE_DUMMY_DATA_THREADS
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -629,3 +630,10 @@ int main(int argc, char** argv)
 
 
 }
+#else
+
+int main()
+{
+  return 0;
+}
+#endif

@@ -361,7 +361,6 @@ namespace Belle2 {
     }
     return -1;
   }
-
 }
 
 #endif

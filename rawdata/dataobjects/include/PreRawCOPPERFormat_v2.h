@@ -406,10 +406,5 @@ namespace Belle2 {
     int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM;
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
-
-
-
-
-
 }
 #endif

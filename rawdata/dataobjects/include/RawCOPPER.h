@@ -201,9 +201,6 @@ namespace Belle2 {
     //! get data size of  FINESSE slot D buffer
     int Get4thFINESSENwords(int n);
 
-    //! For copying FTSW word1 (FEE header)
-    unsigned int GetB2LHeaderWord(int n, int finesse_buffer_pos);
-
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
     //
@@ -714,12 +711,6 @@ namespace Belle2 {
   {
     CheckVersionSetBuffer();
     return m_access->CheckUtimeCtimeTRGType(n);
-  }
-
-  inline  unsigned int RawCOPPER::GetB2LHeaderWord(int n, int finesse_buffer_pos)
-  {
-    CheckVersionSetBuffer();
-    return m_access->GetB2LHeaderWord(n, finesse_buffer_pos);
   }
 
   inline  unsigned int RawCOPPER::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,

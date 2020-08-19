@@ -239,9 +239,6 @@ namespace Belle2 {
     //! get data size of  FINESSE slot D buffer
     virtual int Get4thFINESSENwords(int n) = 0;
 
-    //! For copying FTSW word1 (FEE header)
-    virtual unsigned int GetB2LHeaderWord(int n, int finesse_buffer_pos);
-
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
     //

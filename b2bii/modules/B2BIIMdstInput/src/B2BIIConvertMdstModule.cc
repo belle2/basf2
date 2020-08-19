@@ -1650,7 +1650,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
 
     // conversion of track position in CDC layers
     if (m_convertTrkExtra) {
-      auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_z(), trk_fit.first_z(),
+      auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_y(), trk_fit.first_z(),
                                                     trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z());
       track->addRelationTo(cdcExtraInfo);
     }

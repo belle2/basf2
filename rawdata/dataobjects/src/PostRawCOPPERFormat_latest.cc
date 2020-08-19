@@ -335,7 +335,7 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   // // calculate the event length
   // int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
 
-  // for (int i = 0; i < 4; i++) {
+  // for (int i = 0; i < MAX_PCIE40_CH; i++) {
   //   if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
   //   length_nwords += nwords[ i ];
   //   length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
@@ -389,7 +389,7 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   // poswords_to += SIZE_COPPER_HEADER;
 
   // // Fill FINESSE buffer
-  // for (int i = 0; i < 4; i++) {
+  // for (int i = 0; i < MAX_PCIE40_CH; i++) {
 
   //   if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;     // for an empty FINESSE slot
 

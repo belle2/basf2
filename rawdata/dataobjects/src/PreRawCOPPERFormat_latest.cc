@@ -63,7 +63,7 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
     printf("[DEBUG] %s", err_buf); fflush(stdout);
     PrintData(m_buffer, m_nwords);
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < MAX_PCIE40_CH; i++) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
       if (GetFINESSENwords(n, i) > 0) {
         CheckCRC16(n, i);
@@ -112,7 +112,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   unsigned int eve_num = 0;
   int flag = 0;
   unsigned int eve[4];
-  for (int i = 0; i < 4 ; i++) {
+  for (int i = 0; i < MAX_PCIE40_CH; i++) {
     eve[ i ] = 0xbaadf00d;
     if (GetFINESSENwords(n, i) > 0) {
       int pos_nwords = GetOffsetFINESSE(n, i) + SIZE_B2LHSLB_HEADER + POS_TT_TAG;
@@ -144,7 +144,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s\n", err_buf);
     PrintData(m_buffer, m_nwords);
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < MAX_PCIE40_CH; i++) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
       if (GetFINESSENwords(n, i) > 0) {
         CheckCRC16(n, i);
@@ -235,7 +235,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
       if (*cur_evenum_rawcprhdr != 0) {
 
         unsigned int eve[4];
-        for (int i = 0; i < 4 ; i++) {
+        for (int i = 0; i < MAX_PCIE40_CH ; i++) {
           eve[ i ] = 0xbaadf00d;
           if (GetFINESSENwords(n, i) > 0) {
             int pos_nwords = GetOffsetFINESSE(n, i) + SIZE_B2LHSLB_HEADER + POS_TT_TAG;
@@ -293,7 +293,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     printf("%s", err_buf); fflush(stdout);
     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < MAX_PCIE40_CH; i++) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
       if (GetFINESSENwords(n, i) > 0) {
         CheckCRC16(n, i);
@@ -341,7 +341,7 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   memset(exprun, 0, sizeof(exprun));
 
 
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < MAX_PCIE40_CH; i++) {
     int finesse_nwords = GetFINESSENwords(n, i);
     if (finesse_nwords > 0) {
       int offset_finesse = GetOffsetFINESSE(n, i);
@@ -364,7 +364,7 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
         if (temp_ctime_trgtype != ctime_trgtype[ i ] || temp_utime != utime[ i ] ||
             temp_eve != eve[ i ] || temp_exprun != exprun[ i ]) {
           if (err_flag == 0) {
-            for (int j = 0; j < 4; j++) {
+            for (int j = 0; j < MAX_PCIE40_CH; j++) {
               printf("[DEBUG] FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n",
                      j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
             }
@@ -389,7 +389,7 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   }
 
   if (err_flag != 0) {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < MAX_PCIE40_CH; i++) {
       if (GetFINESSENwords(n, i) > 0) {
         printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
         CheckCRC16(n, i);
@@ -421,7 +421,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 void PreRawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
 {
   int* temp_buf;
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < MAX_PCIE40_CH; i++) {
     if (GetFINESSENwords(n, i) > 0) {
       temp_buf = GetFINESSEBuffer(n, i);
       if ((temp_buf[ 3 ] & 0x40000000) == 0) {
@@ -539,37 +539,12 @@ void PreRawCOPPERFormat_latest::CopyReducedData(int* bufin, int nwords, int num_
 
 int PreRawCOPPERFormat_latest::CalcReducedNwords(int n)
 {
-  //
-  // Calculate reduced length for one data block which is a part of a RawDataBlock
-  //
-
-  int nwords_to = 0;
-
-  //RawCOPPER header
-  nwords_to += tmp_header.RAWHEADER_NWORDS;
-
-  for (int j = 0; j < 4; j++) {
-
-    int finesse_nwords = GetFINESSENwords(n, j);
-    if (finesse_nwords > 0) {
-      //
-      // B2L(HSLB/FEE) header and trailers are resized
-      // m_reduced_rawcpr should be PostRawCOPPERFormat_latest
-      //
-      nwords_to +=
-        finesse_nwords
-        - (SIZE_B2LHSLB_HEADER -  m_reduced_rawcpr.SIZE_B2LHSLB_HEADER)
-        - (SIZE_B2LFEE_HEADER -   m_reduced_rawcpr.SIZE_B2LFEE_HEADER)
-        - (SIZE_B2LFEE_TRAILER -  m_reduced_rawcpr.SIZE_B2LFEE_TRAILER)
-        - (SIZE_B2LHSLB_TRAILER - m_reduced_rawcpr.SIZE_B2LHSLB_TRAILER);
-    }
-
-  }
-
-  //RawCOPPER Trailer
-  nwords_to += tmp_trailer.GetTrlNwords();
-
-  return nwords_to;
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return -1;
 }
 
 
@@ -580,7 +555,7 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  return 0;
+  return -1;
 }
 
 

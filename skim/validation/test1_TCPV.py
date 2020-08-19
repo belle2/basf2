@@ -4,8 +4,8 @@
 
 """
 <header>
-  <input>../TDCP.dst.root</input>
-  <output>../TDCP.udst.root</output>
+  <input>../TCPV.dst.root</input>
+  <output>../TCPV.udst.root</output>
   <contact>reem.rasheed@iphc.cnrs.fr</contact>
 </header>
 """

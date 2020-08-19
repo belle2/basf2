@@ -332,6 +332,8 @@ namespace Belle2 {
                                  int (&nwords_ch)[MAX_PCIE40_CH],
                                  RawCOPPERPackerInfo rawcpr_info);
 
+    //! Get the max number of channels in a readout board
+    virtual int GetMaxNumOfCh(int n) = 0;
 
   protected :
 

@@ -312,6 +312,8 @@ namespace Belle2 {
                          int (&nwords_ch)[MAX_PCIE40_CH],
                          RawCOPPERPackerInfo  rawcprpacker_info);
 
+    //! Get the max number of channels in a readout board
+    int GetMaxNumOfCh(int n);
 
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;
@@ -744,6 +746,13 @@ namespace Belle2 {
     }
     m_access->SetBuffer(m_buffer, m_nwords, 0, m_num_events, m_num_nodes);
   }
+
+  inline int RawCOPPER::GetMaxNumOfCh(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetMaxNumOfCh(n);
+  }
+
 }
 
 #endif

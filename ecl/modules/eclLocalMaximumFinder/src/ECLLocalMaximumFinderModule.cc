@@ -23,6 +23,7 @@
 
 // FRAMEWORK
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // MDST
@@ -525,16 +526,17 @@ void ECLLocalMaximumFinderModule::addToSignalEnergy(int& motherpdg, int& motheri
       int idpos = getIdPosition(0, motherindex);
       m_signalEnergy[0][idpos] += weight; // photon from another source
     }
-  } else if (abs(motherpdg) == 11) { // electron
+  } else if (abs(motherpdg) == Const::electron.getPDGCode()) { // electron
     int idpos = getIdPosition(2, motherindex);
     m_signalEnergy[2][idpos] += weight;
-  } else if (abs(motherpdg) == 13) { // muon
+  } else if (abs(motherpdg) == Const::muon.getPDGCode()) { // muon
     int idpos = getIdPosition(3, motherindex);
     m_signalEnergy[3][idpos] += weight;
-  } else if (abs(motherpdg) == 130 or abs(motherpdg) == 2112) { // neutral hadron
+  } else if (abs(motherpdg) == Const::Klong.getPDGCode() or abs(motherpdg) == Const::neutron.getPDGCode()) { // neutral hadron
     int idpos = getIdPosition(4, motherindex);
     m_signalEnergy[4][idpos] += weight;
-  } else if (abs(motherpdg) == 211 or abs(motherpdg) == 321 or abs(motherpdg) == 2212) { // charged hadron
+  } else if (abs(motherpdg) == Const::pion.getPDGCode() or abs(motherpdg) == Const::kaon.getPDGCode()
+             or abs(motherpdg) == Const::proton.getPDGCode()) { // charged hadron
     int idpos = getIdPosition(5, motherindex);
     m_signalEnergy[5][idpos] += weight;
   } else { // everything else

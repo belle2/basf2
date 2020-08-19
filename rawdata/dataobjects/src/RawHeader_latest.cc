@@ -136,8 +136,8 @@ void RawHeader_latest::CheckHeader(int* buf)
 void RawHeader_latest::SetOffset1stFINESSE(int offset_1st_FINESSE)
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return 0;
@@ -146,8 +146,8 @@ void RawHeader_latest::SetOffset1stFINESSE(int offset_1st_FINESSE)
 void RawHeader_latest::SetOffset2ndFINESSE(int offset_2nd_FINESSE)
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return 0;
@@ -156,8 +156,8 @@ void RawHeader_latest::SetOffset2ndFINESSE(int offset_2nd_FINESSE)
 void RawHeader_latest::SetOffset3rdFINESSE(int offset_3rd_FINESSE)
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return 0;
@@ -166,8 +166,8 @@ void RawHeader_latest::SetOffset3rdFINESSE(int offset_3rd_FINESSE)
 void RawHeader_latest::SetOffset4thFINESSE(int offset_4th_FINESSE)
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return 0;
@@ -176,8 +176,8 @@ void RawHeader_latest::SetOffset4thFINESSE(int offset_4th_FINESSE)
 int RawHeader_latest::GetOffset1stFINESSE()
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return 0;
@@ -186,8 +186,8 @@ int RawHeader_latest::GetOffset1stFINESSE()
 int RawHeader_latest::GetOffset2ndFINESSE()
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return 0;
@@ -196,8 +196,8 @@ int RawHeader_latest::GetOffset2ndFINESSE()
 int RawHeader_latest::GetOffset3rdFINESSE()
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return 0;
@@ -206,8 +206,8 @@ int RawHeader_latest::GetOffset3rdFINESSE()
 int RawHeader_latest::GetOffset4thFINESSE()
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return 0;

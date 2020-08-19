@@ -179,7 +179,7 @@ namespace Belle2 {
 
     /// Format version number
     enum {
-      DATA_FORMAT_VERSION = 2
+      DATA_FORMAT_VERSION = 4
     };
 
     //! header ( not recorded )

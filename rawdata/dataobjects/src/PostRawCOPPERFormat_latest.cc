@@ -313,8 +313,8 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
                                                  RawCOPPERPackerInfo rawcpr_info)
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
-          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
   return NULL;

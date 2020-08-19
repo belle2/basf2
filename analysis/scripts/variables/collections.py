@@ -327,6 +327,16 @@ event_kinematics = [
     "totalPhotonsEnergyOfEvent"
 ]
 
+#: BelleTrkExtra variables
+belle_trk_hit = [
+    "BelleTrkFirstX",
+    "BelleTrkFirstY",
+    "BelleTrkFirstZ",
+    "BelleTrkLastX",
+    "BelleTrkLastY",
+    "BelleTrkLastZ"
+]
+
 # now register all the variables declared in this file as collections
 # TODO: this is still not optimal but better than before. Should we not just
 # get rid of the collections in the manager?

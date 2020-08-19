@@ -32,7 +32,7 @@ namespace Belle2 {
      *  Start point of the track near the 1st CDC hit
      *  point. x-comp. (cm).
      *
-     *  @param firstx for a track
+     *  @param first_x for a track
      */
     void setTrackFirstX(double first_x);
 

@@ -153,23 +153,10 @@ namespace Belle2 {
 
     double BelleTrkFirstX(const Particle* particle)
     {
-      /*
-      const Track* track = particle->getTrack();
-      if (!track) {
-        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return std::numeric_limits<int>::quiet_NaN();
-      }
-
-      auto belleTrkExtra = track->getRelatedTo<BelleTrkExtra>();
-      if (!belleTrkExtra) {
-        B2WARNING("Cannot find tau decay ID, did you forget to run TauDecayMarkerModule?");
-        return std::numeric_limits<int>::quiet_NaN();
-      }
-      */
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<int>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return belleTrkExtra->getTrackFirstX();
     }
@@ -179,7 +166,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<int>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return belleTrkExtra->getTrackFirstY();
     }
@@ -189,7 +176,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<int>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return belleTrkExtra->getTrackFirstZ();
     }
@@ -199,7 +186,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<int>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return belleTrkExtra->getTrackLastX();
     }
@@ -209,7 +196,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<int>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return belleTrkExtra->getTrackLastY();
     }
@@ -219,7 +206,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<int>::quiet_NaN();
+        return std::numeric_limits<double>::quiet_NaN();
       }
       return belleTrkExtra->getTrackLastZ();
     }
@@ -276,15 +263,15 @@ energy selection for Belle data and MC (50/100/150 MeV).
 )DOC");
 
     REGISTER_VARIABLE("BelleTrkLastX", BelleTrkLastX, R"DOC(
-[Legacy] Returns x component of end point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+[Legacy] Returns x component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
     REGISTER_VARIABLE("BelleTrkLastY", BelleTrkLastY, R"DOC(
-[Legacy] Returns y component of end point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+[Legacy] Returns y component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
     REGISTER_VARIABLE("BelleTrkLastZ", BelleTrkLastZ, R"DOC(
-[Legacy] Returns z component of end point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+[Legacy] Returns z component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
     // this is defined in ECLVariables.{h,cc}

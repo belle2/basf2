@@ -454,7 +454,7 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     **Decay Modes**:
 
     * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\pi^{0}`
-    * :math:`WS: D^{*-}\\to \\pi^- D^{0}, D^{0}\\to K^- \\pi^+ \\pi^{0}`
+    * :math:`WS: D^{*-}\\to \\pi^- \\overline{D}^{0}, \\overline{D}^{0}\\to K^- \\pi^+ \\pi^{0}`
 
 
     **Additional Cuts**:
@@ -640,7 +640,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     **Decay Modes**:
 
     * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\eta, eta\\to \\gamma \\gamma`
-    * :math:`WS: D^{*-}\\to \\pi^- D^{0}, D^{0}\\to K^- \\pi^+ \\eta, eta\\to \\gamma \\gamma`
+    * :math:`WS: D^{*-}\\to \\pi^- \\overline{D}^{0}, \\overline{D}^{0}\\to K^- \\pi^+ \\eta, eta\\to \\gamma \\gamma`
 
 
     **Additional Cuts**:

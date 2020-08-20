@@ -133,7 +133,7 @@ If any of the following verbose arrows are used, :b2:var:`isSignal` will behave 
 
 * :code:`'->'` decays that proceed via intermediate resonances and/or with radiated photons are counted as signal even if they weren't exactly specified in the decay string
 * :code:`'=direct=>'` decays with intermediate resonances are not counted as signal unless included in the decay string, but decays with radiated photons are counted as signal even if they are not specified in the decay string
-* :code:`'=norad=>'` radiated photons are not counted as signal but decays via are intermediate resonance are
+* :code:`'=norad=>'` radiated photons are not counted as signal but decays via an intermediate resonance are
 * :code:`'=exact=>'` exact match of the decay forbidding any intermediate resonances and radiated photons unless explicitly specified in the decay string
 
 Here is an example of use:

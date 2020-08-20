@@ -42,7 +42,7 @@ namespace Belle2 {
   }
 
 
-  unsigned BunchStructure::generate() const
+  unsigned BunchStructure::generateBucketNumber() const
   {
     if (m_fillPattern.empty()) return (gRandom->Integer(c_RFBuckets / 2) * 2);
 

@@ -72,7 +72,7 @@ namespace Belle2 {
      * Generates RF bucket number according to the fill pattern
      * @return bucket number
      */
-    unsigned generate() const;
+    unsigned generateBucketNumber() const;
 
 
   private:

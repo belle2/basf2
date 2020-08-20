@@ -11,12 +11,15 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <cmath>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/dataobjects/MCInitialParticles.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+#include <framework/dbobjects/BunchStructure.h>
 
 
 namespace Belle2 {
@@ -56,10 +59,13 @@ namespace Belle2 {
     double m_fixedT0 = NAN; /**< if set, a fixed t0 value is used instead of a gaussian distrubtion */
     double m_maximumT0 = NAN; /**< if set, randomize between -maximum and maximum */
 
-    // other
-    double m_bunchTimeSep = 0;         /**< time between two bunches */
+    // datastore collections
     StoreArray<MCParticle> m_mcParticles; /**< MC particles */
     StoreObjPtr<MCInitialParticles> m_initialParticles; /**< beam particles */
+
+    // conditions DB objects
+    DBObjPtr<HardwareClockSettings> m_clockSettings; /**< hardware clock settings */
+    DBObjPtr<BunchStructure> m_bunchStructure; /**< bunch structure (fill pattern) */
 
   };
 

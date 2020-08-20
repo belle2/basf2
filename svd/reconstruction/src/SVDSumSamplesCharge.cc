@@ -75,10 +75,10 @@ namespace Belle2 {
       std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
 
       double weightSum = 0;
-      double noise = 0;
+
       for (int i = 0; i < (int)strips.size(); i++) {
-        noise = getStripChargeError(i);
-        weightSum = noise * noise;
+        double noise = getStripChargeError(i);
+        weightSum += noise * noise;
       }
 
       return TMath::Sqrt(weightSum);

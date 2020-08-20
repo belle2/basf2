@@ -409,7 +409,7 @@ class LambdacTopHpJm(BaseSkim):
 
     * :math:`\\Lambda_c^+ \\to p \\pi^- \\pi^+`
     * :math:`\\Lambda_c^+ \\to p K^- \\pi^+`
-    * :math:`\\Lambda_c^+ \\to p pi^- \\K^+`
+    * :math:`\\Lambda_c^+ \\to p \\pi^- K^+`
     * :math:`\\Lambda_c^+ \\to p K^- K^+`
 
     **Additional Cuts**:
@@ -801,10 +801,10 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     """
     **Decay Modes**:
 
-    * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to \\pi^+ \\pi^- \\eta, eta\\to \\gamma \\gamma`
-    * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\eta, eta\\to \\gamma \\gamma`
-    * :math:`WS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ \\pi^- \\eta, eta\\to \\gamma \\gamma`
-    * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to K^+ K^- \\eta, eta\\to \\gamma \\gamma`
+    * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to \\pi^+ \\pi^- \\eta, \\eta\\to \\gamma \\gamma`
+    * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\eta, \\eta\\to \\gamma \\gamma`
+    * :math:`WS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ \\pi^- \\eta, \\eta\\to \\gamma \\gamma`
+    * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to K^+ K^- \\eta, \\eta\\to \\gamma \\gamma`
 
 
     **Additional Cuts**:

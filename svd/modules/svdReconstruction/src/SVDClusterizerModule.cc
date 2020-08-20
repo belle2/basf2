@@ -184,7 +184,6 @@ void SVDClusterizerModule::event()
     m_cutCluster = m_ClusterCal.getMinClusterSNR(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip());
   }
 
-  //giulia
   //create a dummy cluster just to start
   RawCluster rawCluster(m_storeDigits[0]->getSensorID(), m_storeDigits[0]->isUStrip(), m_cutSeed, m_cutAdjacent,
                         m_storeShaperDigitsName);
@@ -245,7 +244,6 @@ void SVDClusterizerModule::event()
     finalizeCluster(rawCluster);
 
   B2DEBUG(1, "Number of clusters: " << m_storeClusters.getEntries());
-  //giulia
 }
 
 
@@ -274,9 +272,9 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   //--------------
   // CLUSTER TIME
   //--------------
-  double time = -99;
-  double timeError = -99;
-  int firstFrame = -99;
+  double time = std::numeric_limits<double>::quiet_NaN();
+  double timeError = std::numeric_limits<double>::quiet_NaN();
+  int firstFrame = std::numeric_limits<int>::quiet_NaN();
 
   // cluster time computation
   if (m_numberOfAcquiredSamples == 6) {
@@ -300,16 +298,16 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   // CLUSTER POSITION
   //-----------------
 
-  float position = 0;
-  float positionError = 0;
+  float position = std::numeric_limits<float>::quiet_NaN();
+  float positionError = std::numeric_limits<float>::quiet_NaN();
   //  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());  double time = 0;
 
 
   //----------------
   // CLUSTER CHARGE
   //----------------
-  float charge = 0;
-  float seedCharge = 0;
+  float charge = std::numeric_limits<float>::quiet_NaN();
+  float seedCharge = std::numeric_limits<float>::quiet_NaN();
 
   /*
   // cluster charge computation
@@ -399,4 +397,4 @@ void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawClu
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 
 }
-//giulia
+

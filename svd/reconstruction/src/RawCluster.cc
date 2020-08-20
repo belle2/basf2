@@ -103,7 +103,7 @@ namespace Belle2 {
     {
 
       if (m_strips.size() == 0)
-        B2ERROR(" you are asking fo the cluster samples for a cluster candidate with no strips, it make no sense to ask for the cluster time!");
+        B2ERROR("oopps ... you are asking for the cluster samples of a cluster candidate with no strips");
 
       //steps:
       //1.loop on m_strips
@@ -117,7 +117,7 @@ namespace Belle2 {
 
       for (auto istrip : m_strips) {
         const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
-        if (!shaperdigit) B2ERROR("No shaperdigit for strip!?");
+        if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
         Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();
         for (int iSample = 0; iSample < static_cast<int>(APVsamples.size()); ++iSample)
           returnSamples.at(iSample) += APVsamples.at(iSample);

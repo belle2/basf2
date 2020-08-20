@@ -327,10 +327,10 @@ namespace DirectedNodeNetworkTests {
       int oldOuterInt = oldOuterMostNode->getEntry();
       onTheFlyCreatedInts.push_back(42);
       int& newInnerInt = onTheFlyCreatedInts.back();
-      EXPECT_TRUE(NULL == intNetwork.getNode(newInnerInt));
+      EXPECT_TRUE(nullptr == intNetwork.getNode(newInnerInt));
       intNetwork.addNode(newInnerInt, newInnerInt);
       intNetwork.linkNodes(newInnerInt, oldOuterInt);
-      EXPECT_FALSE(NULL == intNetwork.getNode(newInnerInt));
+      EXPECT_FALSE(nullptr == intNetwork.getNode(newInnerInt));
       EXPECT_EQ(14, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
       std::vector<DirectedNode<int, VoidMetaInfo>*> newOuterEnds = intNetwork.getOuterEnds();
@@ -348,11 +348,11 @@ namespace DirectedNodeNetworkTests {
       std::vector<DirectedNode<int, VoidMetaInfo>*> oldInnerEnds = intNetwork.getInnerEnds();
 
       EXPECT_EQ(3, oldOuterEnds.size());
-      EXPECT_TRUE(NULL == intNetwork.getNode(newOuterInt));
+      EXPECT_TRUE(nullptr == intNetwork.getNode(newOuterInt));
       unsigned int sizeB4 = intNetwork.size();
       intNetwork.addNode(newOuterInt, newOuterInt);
       intNetwork.linkNodes(newOuterInt, existingInt);
-      EXPECT_FALSE(NULL == intNetwork.getNode(newOuterInt));
+      EXPECT_FALSE(nullptr == intNetwork.getNode(newOuterInt));
       EXPECT_EQ(sizeB4 + 1, intNetwork.size());
       EXPECT_EQ(3, intNetwork.getInnerEnds().size());
       DirectedNode<int, VoidMetaInfo>* existingNode = intNetwork.getNode(existingInt);

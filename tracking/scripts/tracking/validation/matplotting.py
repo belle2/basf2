@@ -509,8 +509,10 @@ def get_stats_from_th(th):
     return stats
 
 
-def compose_stats_label(title, additional_stats={}):
+def compose_stats_label(title, additional_stats=Nnoe):
     """Render the summary statistics to a label string."""
+    if additional_stats is None:
+        additional_stats = {}
     keys = list(additional_stats.keys())
     labeled_value_template = "{0:<9}: {1:.3g}"
     labeled_string_template = "{0:<9}: {1:>9s}"

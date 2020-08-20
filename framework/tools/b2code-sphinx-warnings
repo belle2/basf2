@@ -15,4 +15,4 @@ tmpdir=`mktemp -d`
 # remove temporary directory on exit
 trap "rm -rf $tmpdir" EXIT
 # build sphinx documentation with html option
-b2code-sphinx-build --output ${tmpdir} -t html -q "$@" 2>&1 | grep WARNING && exit 1 || exit 0
+b2code-sphinx-build --output-dir ${tmpdir} -t html -q "$@" 2>&1 | grep WARNING && exit 1 || exit 0

@@ -38,11 +38,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.input:
-        # The prescales are only valid when using the online database!
+        # For data, the prescales are only valid when using the online database!
         basf2.reset_database()
         if args.override:
             basf2.conditions.override_globaltags()
-        basf2.use_central_database("online")
+            basf2.use_central_database("online")
 
         path = basf2.Path()
 

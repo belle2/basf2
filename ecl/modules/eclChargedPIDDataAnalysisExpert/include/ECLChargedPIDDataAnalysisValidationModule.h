@@ -250,7 +250,7 @@ namespace Belle2 {
      * Binning w/ variable bin size for track polar angle (in [rad]).
      * It follows the ECL geometry (although ECL gaps are not accounted for).
      */
-    std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.561996, 2.2462387, 2.7070057, 3.1415926};
+    std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.385, 0.561996, 1.13, 1.57, 1.88, 2.2462387, 2.47, 2.7070057, 3.1415926};
 
     /**
      * Dump PID vars.

@@ -242,10 +242,10 @@ def partial_fit(state, X, S, y, w, epoch):
         Callback to print AUC after every epoch.
         """
 
-        def on_train_begin(self, logs={}):
+        def on_train_begin(self, logs=None):
             self.val_aucs = []
 
-        def on_epoch_end(self, epoch, logs={}):
+        def on_epoch_end(self, epoch, logs=None):
             val_y_pred = state.model.predict(state.Xtest).flatten()
             val_auc = roc_auc_score(state.ytest, val_y_pred)
             print('\nTest AUC: {}\n'.format(val_auc))
@@ -257,7 +257,7 @@ def partial_fit(state, X, S, y, w, epoch):
         Callback to train Adversary
         """
 
-        def on_batch_end(self, batch, logs={}):
+        def on_batch_end(self, batch, logs=None):
             v_X, v_y, v_S = state.batch_gen.next_batch(500 * state.K)
             target_adversary = build_adversary_target(v_y, v_S)
             state.adv_model.fit(v_X, target_adversary, verbose=0, batch_size=500)

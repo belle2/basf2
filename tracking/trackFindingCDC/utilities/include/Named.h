@@ -38,7 +38,9 @@ namespace Belle2 {
       /// Comparison operator establishing an ordering considering the name and the object
       bool operator<(const Named<T>& other) const
       {
+        // cppcheck-suppress constVariable
         const T& t(*this);
+        // cppcheck-suppress constVariable
         const T& otherT(other);
         return getName() < other.getName() or (not(other.getName() < getName()) and t < otherT);
       }

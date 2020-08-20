@@ -54,3 +54,18 @@
 #pragma link C++ class Belle2::SVDGlobalConfigParameters +; // checksum=0x77c15d0d, version=1
 
 #endif
+
+
+// ----------------------------------------------------------------------------
+// SVDGlobalConfigParameters
+// As of version 2, a new data member is added
+// classDef = 1 -> classDef = 2
+// x ->  float m_hv
+// when classDef = 1 m_hv = 50
+#pragma read \
+  source="float m_hv"\
+  sourceClass="Belle2::SVDGlobalConfigParameters"\
+  version="[-1]" \
+  targetClass="Belle2::SVDGlobalConfigParameters"\
+  target="m_hv"          \
+  code="{ m_hv = 50;}" \

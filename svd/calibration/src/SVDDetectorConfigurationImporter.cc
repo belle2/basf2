@@ -70,6 +70,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   float  zeroSuppression = 0;
   float  latency = 0;
   std::string systemClock = "";
+  float hv = 0;
 
   for (ptree::value_type const& cfgDocumentChild :
        pt.get_child("cfg_document")) {
@@ -101,6 +102,14 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
 
     }
   }
+  for (ptree::value_type const& cfgDocumentChild :
+       pt.get_child("cfg_document.ps_setup.hv_config")) {
+    if (cfgDocumentChild.first == "config") {
+      hv = cfgDocumentChild.second.get<float>("<xmlattr>.v_conf") ;
+      std::cout << " HV    = " << hv << endl;
+    }
+
+  }
 
   DBImportObjPtr<SVDDetectorConfiguration::t_svdGlobalConfig_payload> svdGlobalConfig(SVDDetectorConfiguration::svdGlobalConfig_name);
 
@@ -110,6 +119,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   svdGlobalConfig->setLatency(latency);
   svdGlobalConfig->setMaskFilter(maskFilter);
   svdGlobalConfig->setAPVClockInRFCUnits(systemClock);
+  svdGlobalConfig->setHV(hv);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);

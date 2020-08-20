@@ -35,6 +35,8 @@ def get_calibrations(input_data, **kwargs):
       list(caf.framework.Calibration): All of the calibration objects we want to assign to the CAF process
     """
     import basf2
+    # basf2.set_debug_level(100)
+    basf2.set_log_level(basf2.LogLevel.DEBUG)
     # Set up config options
 
     # In this script we want to use one sources of input data.
@@ -44,7 +46,7 @@ def get_calibrations(input_data, **kwargs):
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 100
+    max_files_per_run = 10000
 
     # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
@@ -76,6 +78,7 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
     from caf.strategies import SequentialRunByRun
+    from caf.strategies import SequentialBoundaries
 
     # module to be run prior the collector
     rec_path_1 = create_path()
@@ -84,7 +87,7 @@ def get_calibrations(input_data, **kwargs):
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=rec_path_1)
-    vx.kFit('Upsilon(4S):BS', conf_level=0, path=rec_path_1)
+    # vx.kFit('Upsilon(4S):BS', conf_level=0, path=rec_path_1)
 
     collector_bs = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm_bs = BeamSpotAlgorithm()
@@ -97,7 +100,8 @@ def get_calibrations(input_data, **kwargs):
                                  output_patterns=None,
                                  max_files_per_collector_job=1)
 
-    calibration_bs.strategies = SequentialRunByRun
+    # calibration_bs.strategies = SequentialRunByRun
+    calibration_bs.strategies = SequentialBoundaries
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun

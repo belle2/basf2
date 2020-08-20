@@ -21,6 +21,7 @@
 
 #include <TH1F.h>
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -105,14 +106,13 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   if (vertexSize[1][1] < 0) vertexSize[1][1] = 0.3 * 1e-4 * 0.3 * 1e-4;
   */
 
-  auto tracks = getObjectPtr<TTree>("tracks");
-  cout << "Tracks size " << tracks->GetEntries() << endl;
 
   //IP position
   auto vertexPos = TVector3(0.1, -0.2, 0.3);
   auto vertexPos2 = TVector3(0.3, -0.3, 0.3);
 
 
+  //cout << "Radek is here " << __LINE__ << endl;
 
   //IP error
   double ipXerr2 = 0;
@@ -128,6 +128,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   vertexCov[1][1] = ipYerr2;
   vertexCov[2][2] = ipZerr2;
 
+  //cout << "Radek is here " << __LINE__ << endl;
   //BeamSpot size
   double sizeX2 = pow(10e-4, 2);
   double sizeY2 = pow(1e-4, 2);
@@ -142,6 +143,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   vertexSize[1][1] = sizeY2;
   vertexSize[2][2] = sizeZ2;
 
+  //cout << "Radek is here " << __LINE__ << endl;
 
   /*
   auto payload = new BeamSpot();
@@ -154,12 +156,24 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   payload2->setSizeCovMatrix(vertexSize);
   */
 
+  //cout << "Radek is here " << __LINE__ << endl;
+  auto tracks = getObjectPtr<TTree>("tracks");
+  if (!tracks || tracks->GetEntries() < 5) {
+    cout << "Too few data" << endl;
+    return c_NotEnoughData;
+  }
+  cout << "Tracks size " << tracks->GetEntries() << endl;
 
   //saveCalibration(payload);
 
+
+  //cout << "Radek is here " << __LINE__ << endl;
   map<pair<int, int>, pair<double, double>> runsInfo = getRunInfo();
+  //cout << "Radek is here " << __LINE__ << endl;
   double maxGap = getMaxGap(runsInfo);
+  //cout << "Radek is here " << __LINE__ << endl;
   auto tMinMax =  getMinMaxTime();
+  //cout << "Radek is here " << __LINE__ << endl;
 
   for (auto el : runsInfo) {
     pair<int, int> iov = el.first;
@@ -168,14 +182,20 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
     vertexPos(0) = maxGap;
     vertexPos(1) = tMinMax.first;
     vertexPos(2) = tMinMax.second;
+    vertexCov(0, 0) = iov.second;
+    vertexCov(1, 1) = el.second.first;
+    vertexCov(2, 2) = el.second.second;
+
     payload->setIP(vertexPos, vertexCov);
     payload->setSizeCovMatrix(vertexSize);
 
+    //cout << "Radek is here " << __LINE__ << endl;
     TObject* obj  = static_cast<TObject*>(payload);
 
     EventDependency intraRun(obj);
     auto m_iov = IntervalOfValidity(iov.first, iov.second, iov.first, iov.second);
-    Database::Instance().storeData("BeamSpotEventDep", &intraRun, m_iov);
+    Database::Instance().storeData("BeamSpot", &intraRun, m_iov);
+    cout << "Radek is here " << __LINE__ << endl;
   }
 
   /*
@@ -204,6 +224,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 
 double getMaxGap(map<pair<int, int>, pair<double, double>> runsInfo)
 {
+  cout << "Radek inside " << __LINE__ << endl;
   auto f = begin(runsInfo);
   auto s = f;
   ++s;
@@ -211,11 +232,17 @@ double getMaxGap(map<pair<int, int>, pair<double, double>> runsInfo)
     return 0;
 
   double maxGap = 0;
-  while (s != end(runsInfo)) {
+  cout << "Radek inside " << __LINE__ << runsInfo.size() << endl;
+  int i = 0;
+  while (f != end(runsInfo) && s != end(runsInfo)) {
     double t1End   = f->second.second;
-    double t2Start = f->second.first;
+    double t2Start = s->second.first;
 
     maxGap = max(maxGap, t2Start - t1End);
+    ++f;
+    ++s;
+    //cout << "Radek inside loop " << __LINE__ << i << endl;
+    ++i;
   }
 
   return maxGap;
@@ -256,7 +283,8 @@ map<pair<int, int>, pair<double, double>> BeamSpotAlgorithm::getRunInfo()
 pair<double, double> BeamSpotAlgorithm::getMinMaxTime()
 {
   auto tracks = getObjectPtr<TTree>("tracks");
-  cout << "Tracks size " << tracks->GetEntries() << endl;
+  if (!tracks || tracks->GetEntries() < 1) return { -1, -1};
+  //cout << "Tracks size " << tracks->GetEntries() << endl;
 
   double time;
   tracks->SetBranchAddress("time", &time);
@@ -275,23 +303,33 @@ pair<double, double> BeamSpotAlgorithm::getMinMaxTime()
 
 
 
-bool BeamSpotAlgorithm::isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/)
+bool BeamSpotAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
 {
   const double maxTimeGap = 3600; //maximal time gap in seconds
 
   double timeMin, timeMax;
   tie(timeMin, timeMax) = getMinMaxTime();
+  if (timeMin < 0) {
+    cout << "Marketka " << currentRun.second << " Nogap" << endl;
+    return false; //if dummy
+  }
 
   if (!m_previousRunEndTime) {
     B2INFO("This is the first run encountered, let's say it is a boundary.");
     B2INFO("Initial timeMax was " << timeMax);
+    cout << "Marketka " << currentRun.second << " Gap" << endl;
     m_previousRunEndTime.emplace(timeMax);
     return true;
   } else if (timeMin - m_previousRunEndTime.value() > maxTimeGap) {
     B2INFO("time gap " << timeMin - m_previousRunEndTime.value() << " is more than allowed");
+    cout << "Marketka " << setprecision(10) << currentRun.second << " Gap : " << timeMin << " " << timeMax << " & " <<
+         m_previousRunEndTime.value()  << endl;
     m_previousRunEndTime.emplace(timeMax);
     return true;
   } else {
+    cout << "Marketka " << setprecision(10) << currentRun.second << " Nogap : " << timeMin << " " << timeMax << " & " <<
+         m_previousRunEndTime.value()  << endl;
+    m_previousRunEndTime.emplace(timeMax);
     return false;
   }
 }

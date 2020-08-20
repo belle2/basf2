@@ -131,9 +131,9 @@ Arrows
 In addition to the common arrow :code:`'->'`, one can use different types of arrows. 
 If any of the following verbose arrows are used, :b2:var:`isSignal` will behave differently with additional (unspecified) radiated photons and/or unspecified intermediate resonances. 
 
-* :code:`'->'` decays that proceed via intermediate resonances and with radiated photons are counted as signal even if they weren't exactly specified in the decay string
-* :code:`'=direct=>'` decays with intermediate resonances are not counted as signal unless included in the decay string, but with radiated photons are
-* :code:`'=norad=>'` radiated photons are not counted as signal but decays via some intermediate resonance are
+* :code:`'->'` decays that proceed via intermediate resonances and/or with radiated photons are counted as signal even if they weren't exactly specified in the decay string
+* :code:`'=direct=>'` decays with intermediate resonances are not counted as signal unless included in the decay string, but decays with radiated photons are counted as signal even if they are not specified in the decay string
+* :code:`'=norad=>'` radiated photons are not counted as signal but decays via are intermediate resonance are
 * :code:`'=exact=>'` exact match of the decay forbidding any intermediate resonances and radiated photons unless explicitly specified in the decay string
 
 Here is an example of use:
@@ -164,3 +164,4 @@ Here is an example of use:
 	# isSignal(B+:norad)   == 0 Because the radiated photon is missed.
 	# isSignal(B+:exact)   == 0 Because the intermediate resonance (Jpsi) and the radiated photon are missed.
 
+.. warning:: There is a known issue in the MC matching: Some photons produced by PHOTOS are misinterpreted as other radiated photons (see :issue:`BII-5934`).

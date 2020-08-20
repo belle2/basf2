@@ -87,7 +87,7 @@ RegisteredSkims = [
     ("17240500", "charm", "DstToD0Pi_D0ToHpJmEta"),
     # D* -> D0 -> pi0 pi0/Ks pi0/Ks Ks
     ("17240600", "charm", "DstToD0Pi_D0ToNeutrals"),
-    ("17240700", "charm", "DstToD0Pi_D0ToHpHmKs"),  # D* -> D0 -> h h Ks
+    ("17240700", "charm", "DstToD0Pi_D0ToHpJmKs"),  # D* -> D0 -> h h Ks
     # D* -> D0 -> K- pi+ pi0 (""+WS)
     ("17240800", "charm", "EarlyData_DstToD0Pi_D0ToHpJmPi0"),
     ("17240900", "charm", "EarlyData_DstToD0Pi_D0ToHpHmPi0"),  # D* -> D0 -> h h pi0

@@ -1111,7 +1111,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
   // Create and initialize particle list
   StoreObjPtr<ParticleList> plist("K_L0:mdst");
   plist.create();
-  plist->initialize(130, "K_L0:mdst");
+  plist->initialize(Const::Klong.getPDGCode(), "K_L0:mdst");
 
   Belle::Mdst_klong_Manager& klong_manager = Belle::Mdst_klong_Manager::get_manager();
   for (Belle::Mdst_klong_Manager::iterator klong_Ite = klong_manager.begin(); klong_Ite != klong_manager.end(); ++klong_Ite) {
@@ -1153,7 +1153,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
 
     for (Belle::Gen_hepevt_Manager::iterator klong_hep_it = GenMgr.begin(); klong_hep_it != GenMgr.end(); ++klong_hep_it) {
 
-      if (abs((*klong_hep_it).idhep()) == 130 && klong_hep_it->isthep() > 0) {
+      if (abs((*klong_hep_it).idhep()) == Const::Klong.getPDGCode() && klong_hep_it->isthep() > 0) {
 
         CLHEP::HepLorentzVector gp4(klong_hep_it->PX(), klong_hep_it->PY(), klong_hep_it->PZ(), klong_hep_it->E());
         double sum(0.0);

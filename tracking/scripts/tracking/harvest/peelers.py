@@ -607,7 +607,9 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
 
 #: Peeler for module statistics
 @format_crop_keys
-def peel_module_statistics(modules=[], key="{part_name}"):
+def peel_module_statistics(modules=None, key="{part_name}"):
+    if modules is None:
+        modules = []
     module_stats = dict()
 
     for module in basf2.statistics.modules:

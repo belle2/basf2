@@ -10,12 +10,9 @@
 #define PRERAWCOPPERFORMAT_LATEST_H
 
 // Includes
-//#include <framework/datastore/DataStore.h>
-//#include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/PostRawCOPPERFormat_latest.h>
 #include <rawdata/CRCCalculator.h>
 
-//#include <TObject.h>
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
 

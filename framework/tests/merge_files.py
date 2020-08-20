@@ -14,8 +14,10 @@ import basf2
 from b2test_utils import clean_working_directory, skip_test_if_light
 
 
-def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[], **argk):
+def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=None, **argk):
     """Create a test file from a steering string"""
+    if branchNames is None:
+        branchNames = []
     global testfile_steering
     env = dict(os.environ)
     env.update(argk)

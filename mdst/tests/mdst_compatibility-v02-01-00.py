@@ -24,7 +24,7 @@ CHANGES since release-02-01-00:
     energies corresponding to the measured momenta became slightly different.
 """
 
-from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging
+from basf2 import create_path, process, set_random_seed, find_file
 from b2test_utils import configure_logging_for_tests
 from mdst import add_mdst_dump
 

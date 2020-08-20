@@ -611,7 +611,7 @@ class SystematicsPhiGamma(BaseSkim):
 @fancy_skim_header
 class Random(BaseSkim):
     __authors__ = "Phil Grace"
-    __contact__ = "Phil Grace <philip.grace@adelaide.edu.au"
+    __contact__ = "Phil Grace <philip.grace@adelaide.edu.au>"
     __description__ = "Random skim to select a fixed fraction of events."
     __category__ = "systematics, random"
 
@@ -645,6 +645,8 @@ class Random(BaseSkim):
         ma.applyRandomCandidateSelection(f"gamma:{label}", path=path)
 
         # Select fraction of events
-        path = self.skim_event_cuts(f"eventRandom <= {self.KeepPercentage/100}")
+        path = self.skim_event_cuts(
+            f"eventRandom <= {self.KeepPercentage/100}", path=path
+        )
 
         self.SkimLists = [f"pi+:{label}", f"gamma:{label}"]

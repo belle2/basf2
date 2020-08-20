@@ -784,9 +784,9 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
         Dstcuts = "0 < Q < 0.022 and useCMSFrame(p) > 2.0"
 
         D0_Channels = ["pi-:hpjmks pi+:hpjmks K_S0:merged",
-                       "K-:hpjmks pi+:hpjmks K_S0:merged"
-                       "pi-:hpjmks K+:hpjmks K_S0:merged"
-                       "K-:hpjmks K+:hpjmks K_S0:merged"
+                       "K-:hpjmks pi+:hpjmks K_S0:merged",
+                       "pi-:hpjmks K+:hpjmks K_S0:merged",
+                       "K-:hpjmks K+:hpjmks K_S0:merged",
                        ]
         DstList = []
 

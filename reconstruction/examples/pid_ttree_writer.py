@@ -25,7 +25,6 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
-from ROOT import TreeStruct
 
 # Define a ROOT struct to hold output data in the TTree.
 gROOT.ProcessLine('struct TreeStruct {\
@@ -40,6 +39,7 @@ gROOT.ProcessLine('struct TreeStruct {\
                   )
 
 
+from ROOT import TreeStruct  # noqa
 # define the python module to save the PID information
 
 

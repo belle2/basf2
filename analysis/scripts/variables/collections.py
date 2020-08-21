@@ -337,14 +337,14 @@ mc_event_kinematics = [
     'genVisibleEnergyOfEventCMS'
 ]
 
-#: BelleTrkExtra variables
-belle_trk_hit = [
-    "BelleTrkFirstX",
-    "BelleTrkFirstY",
-    "BelleTrkFirstZ",
-    "BelleTrkLastX",
-    "BelleTrkLastY",
-    "BelleTrkLastZ"
+#: Belle Track CDC hit variables
+belle_track_hit = [
+    "BelleFirstCDCHitX",
+    "BelleFirstCDCHitY",
+    "BelleFirstCDCHitZ",
+    "BelleLastCDCHitX",
+    "BelleLastCDCHitY",
+    "BelleLastCDCHitZ"
 ]
 
 # now register all the variables declared in this file as collections

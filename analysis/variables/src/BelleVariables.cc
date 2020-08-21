@@ -151,7 +151,7 @@ namespace Belle2 {
       return belleTrkExtra;
     }
 
-    double BelleTrkFirstX(const Particle* particle)
+    double BelleFirstCDCHitX(const Particle* particle)
     {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
@@ -161,7 +161,7 @@ namespace Belle2 {
       return belleTrkExtra->getTrackFirstX();
     }
 
-    double BelleTrkFirstY(const Particle* particle)
+    double BelleFirstCDCHitY(const Particle* particle)
     {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
@@ -171,7 +171,7 @@ namespace Belle2 {
       return belleTrkExtra->getTrackFirstY();
     }
 
-    double BelleTrkFirstZ(const Particle* particle)
+    double BelleFirstCDCHitZ(const Particle* particle)
     {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
@@ -181,7 +181,7 @@ namespace Belle2 {
       return belleTrkExtra->getTrackFirstZ();
     }
 
-    double BelleTrkLastX(const Particle* particle)
+    double BelleLastCDCHitX(const Particle* particle)
     {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
@@ -191,7 +191,7 @@ namespace Belle2 {
       return belleTrkExtra->getTrackLastX();
     }
 
-    double BelleTrkLastY(const Particle* particle)
+    double BelleLastCDCHitY(const Particle* particle)
     {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
@@ -201,7 +201,7 @@ namespace Belle2 {
       return belleTrkExtra->getTrackLastY();
     }
 
-    double BelleTrkLastZ(const Particle* particle)
+    double BelleLastCDCHitZ(const Particle* particle)
     {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
@@ -250,27 +250,27 @@ See Also:
 energy selection for Belle data and MC (50/100/150 MeV).
 )DOC");
 
-    REGISTER_VARIABLE("BelleTrkFirstX", BelleTrkFirstX, R"DOC(
+    REGISTER_VARIABLE("BelleFirstCDCHitX", BelleFirstCDCHitX, R"DOC(
 [Legacy] Returns x component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
-    REGISTER_VARIABLE("BelleTrkFirstY", BelleTrkFirstY, R"DOC(
+    REGISTER_VARIABLE("BelleFirstCDCHitY", BelleFirstCDCHitY, R"DOC(
 [Legacy] Returns y component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
-    REGISTER_VARIABLE("BelleTrkFirstZ", BelleTrkFirstZ, R"DOC(
+    REGISTER_VARIABLE("BelleFirstCDCHitZ", BelleFirstCDCHitZ, R"DOC(
 [Legacy] Returns z component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
-    REGISTER_VARIABLE("BelleTrkLastX", BelleTrkLastX, R"DOC(
+    REGISTER_VARIABLE("BelleLastCDCHitX", BelleLastCDCHitX, R"DOC(
 [Legacy] Returns x component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
-    REGISTER_VARIABLE("BelleTrkLastY", BelleTrkLastY, R"DOC(
+    REGISTER_VARIABLE("BelleLastCDCHitY", BelleLastCDCHitY, R"DOC(
 [Legacy] Returns y component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
-    REGISTER_VARIABLE("BelleTrkLastZ", BelleTrkLastZ, R"DOC(
+    REGISTER_VARIABLE("BelleLastCDCHitZ", BelleLastCDCHitZ, R"DOC(
 [Legacy] Returns z component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 

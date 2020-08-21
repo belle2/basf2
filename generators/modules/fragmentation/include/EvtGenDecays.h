@@ -625,6 +625,8 @@ void EvtGenDecays::updateEvent(Pythia8::Particle* pyPro, EvtParticle* egPro,
         egDtr->deleteDaughters();
       }
       if (osc) pyDtr->status(94);
+      if (egDtr->getAttribute("FSR"))
+        pyDtr->status(202);
       if (egDtr->getNDaug() > 0)
         moms.push_back(std::pair<EvtParticle*, int>(egDtr, idx));
     }

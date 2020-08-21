@@ -288,7 +288,7 @@ void FragmentationModule::event()
       }
 
       // Set PHOTOS flag from PYTHIA-EvtGen
-      if (pythia->event[iPythiaPart].status() == 94 && pythia->event[iPythiaPart].id() == 22) {
+      if (pythia->event[iPythiaPart].status() == 202 && pythia->event[iPythiaPart].id() == 22) {
         p->addStatus(MCParticleGraph::GraphParticle::c_IsPHOTOSPhoton);
       }
 

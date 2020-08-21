@@ -17,6 +17,8 @@ from basf2 import *
 
 from ROOT import Belle2
 from ROOT import TH1F, TH2F, TCanvas
+from simulation import add_simulation
+from reconstruction import add_reconstruction
 
 # the histograms to fill
 hist = [TH2F(
@@ -120,8 +122,6 @@ main.add_module(eventinfosetter)
 main.add_module('EvtGenInput')
 
 # do full simulation and reconstruction
-from simulation import add_simulation
-from reconstruction import add_reconstruction
 add_simulation(main)
 add_reconstruction(main)
 

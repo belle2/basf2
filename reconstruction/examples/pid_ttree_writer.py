@@ -25,6 +25,7 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
+from ROOT import TreeStruct
 
 # Define a ROOT struct to hold output data in the TTree.
 gROOT.ProcessLine('struct TreeStruct {\
@@ -38,7 +39,6 @@ gROOT.ProcessLine('struct TreeStruct {\
 };'
                   )
 
-from ROOT import TreeStruct
 
 # define the python module to save the PID information
 
@@ -116,7 +116,7 @@ class TreeWriterModule(Module):
                 # Fill tree
                 self.file.cd()
                 self.tree.Fill()
-            except:
+            except BaseException:
 
                 # some tracks don't have an mcparticle (fixed now)
                 B2WARNING('problems with track <-> mcparticle relations')
@@ -129,6 +129,7 @@ class TreeWriterModule(Module):
         self.file.cd()
         self.file.Write()
         self.file.Close()
+
 
 # create path
 main = create_path()

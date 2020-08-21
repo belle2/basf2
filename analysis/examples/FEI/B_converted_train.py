@@ -4,7 +4,6 @@
 
 # William Sutcliffe 2019
 
-# To properly read the Belle database the user name is set to g0db
 import os
 
 import basf2 as b2
@@ -14,6 +13,7 @@ import b2biiConversion
 
 import fei
 
+# To properly read the Belle database the user name is set to g0db
 os.environ['PGUSER'] = 'g0db'
 # Get FEI default channels for Belle conversion
 # Utilise the arguments to toggle on and off certain channels

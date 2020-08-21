@@ -399,7 +399,7 @@ class GammaGammaControlKLMDark(BaseSkim):
         prescale = f"[ {probe_high} ] or [ {probe_low} ]"
 
         # ~back-to-back in phi in the CMS (3.1066... radians = 178 degrees)
-        delta_phi_cut = "daughterDiffOfPhiCMS(0, 1) > 3.1066860685499065"
+        delta_phi_cut = "abs(daughterDiffOfPhiCMS(0, 1)) > 3.1066860685499065"
 
         # sum theta in the cms 178 --> 182 degrees
         sum_th = "daughterSumOf(useCMSFrame(theta))"

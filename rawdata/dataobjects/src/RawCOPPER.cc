@@ -214,8 +214,8 @@ void RawCOPPER::PackDetectorBuf(
 }
 
 void RawCOPPER::PackDetectorBuf(int* packed_buf_nwords,
-                                int* (&detector_buf_ch)[MAX_PCIE40_CH],
-                                int (&nwords_ch)[MAX_PCIE40_CH],
+                                const int* (&detector_buf_ch)[MAX_PCIE40_CH],
+                                const int (&nwords_ch)[MAX_PCIE40_CH],
                                 RawCOPPERPackerInfo rawcprpacker_info)
 {
 

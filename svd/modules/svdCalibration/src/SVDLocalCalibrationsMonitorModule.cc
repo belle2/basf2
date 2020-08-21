@@ -180,7 +180,7 @@ void SVDLocalCalibrationsMonitorModule::beginRun()
   ///NOISE ADC
   TH1F hNoise("noiseADC_L@layerL@ladderS@sensor@view",
               "noise in ADC in @layer.@ladder.@sensor @view/@side",
-              80, -0.5, 9.5);
+              160, -0.5, 19.5);
   hNoise.GetXaxis()->SetTitle("strip noise (ADC)");
   m_hNoise = new SVDHistograms<TH1F>(hNoise);
 

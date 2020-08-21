@@ -13,7 +13,7 @@
 # Example steering file - 2011 Belle II Collaboration
 #############################################################
 
-from basf2 import *
+import basf2 as b2
 
 from ROOT import Belle2
 from ROOT import TH1F, TH2F, TCanvas
@@ -40,7 +40,7 @@ hist[3].SetTitle('True kaons, TOP')
 # define the python module to extract and plot PID information
 
 
-class MinModule(Module):
+class MinModule(b2.Module):
 
     """
     Get LL differences from PIDLikelihood and fill them into histograms
@@ -113,10 +113,10 @@ class MinModule(Module):
 
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # define number of events
-eventinfosetter = register_module('EventInfoSetter')
+eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [20])
 main.add_module(eventinfosetter)
 main.add_module('EvtGenInput')
@@ -129,5 +129,5 @@ add_reconstruction(main)
 main.add_module(MinModule())
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

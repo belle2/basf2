@@ -19,7 +19,7 @@
 
 import sys
 import math
-from basf2 import *
+import basf2 as b2
 
 # Some ROOT tools
 import ROOT
@@ -43,7 +43,7 @@ from ROOT import TreeStruct  # noqa
 # define the python module to save the PID information
 
 
-class TreeWriterModule(Module):
+class TreeWriterModule(b2.Module):
 
     """
     This module writes its output to a ROOT tree.
@@ -132,14 +132,14 @@ class TreeWriterModule(Module):
 
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # use the input file defined via command line
-main.add_module(register_module('RootInput'))
+main.add_module(b2.register_module('RootInput'))
 
 # add the python module defined above
 main.add_module(TreeWriterModule())
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

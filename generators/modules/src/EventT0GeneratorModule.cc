@@ -62,6 +62,7 @@ namespace Belle2 {
   {
     m_mcParticles.isRequired();
     m_initialParticles.registerInDataStore();
+    m_simClockState.registerInDataStore();
 
     if (not std::isnan(m_maximumT0) and not std::isnan(m_fixedT0)) {
       B2ERROR("You can not set both the maximum T0 and the fixed T0 option.");
@@ -118,7 +119,11 @@ namespace Belle2 {
     unsigned revo9range = (m_bunchStructure->getRFBucketsPerRevolution() / 4) * 9;
     revo9count %= revo9range;
     if (revo9count < 0) revo9count += revo9range;
-    // to be done ...
+
+    m_simClockState.create();
+    m_simClockState->setRevo9Count(revo9count);
+    m_simClockState->setBucketNumber(bucket);
+    m_simClockState->setBeamCycleNumber(beamRevo9Cycle);
 
   }
 

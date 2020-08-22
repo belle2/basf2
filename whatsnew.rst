@@ -58,9 +58,6 @@ Bremsstrahlung, decay in flight, and misidentification.
 Exceptions for the MC matching of daughter particles with the DecayStringGrammar are propagated 
 to the mother particle. 
 
-.. warning:: There is a known issue in the MC matching: Some photons produced by PHOTOS
-             are misinterpreted as other radiated photons.
-
 .. rubric:: Redefinition of angle variables
 
 The kinematic variables :b2:var:`decayAngle`, :b2:var:`daughterAngle` and

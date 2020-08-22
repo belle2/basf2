@@ -1,6 +1,12 @@
 Changes in the analysis package since release-05-00
 ---------------------------------------------------
 
+MC Matching
++++++++++++
+
+ * Fixed the issue where PHOTOS photons were not correctly flagged (:issue:`BII-5934`).
+   (This was present in ``release-05-00-00``) 
+
 Vertex Fitting
 ++++++++++++++
 

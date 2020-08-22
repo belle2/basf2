@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <generators/utilities/GeneratorConst.h>
 #include "Pythia8/Pythia.h"
 #include "EvtGen/EvtGen.hh"
 #include "EvtGenBase/EvtRandomEngine.hh"
@@ -626,7 +627,7 @@ void EvtGenDecays::updateEvent(Pythia8::Particle* pyPro, EvtParticle* egPro,
       }
       if (osc) pyDtr->status(94);
       if (egDtr->getAttribute("FSR"))
-        pyDtr->status(202);
+        pyDtr->status(Belle2::GeneratorConst::FSR_STATUS_CODE);
       if (egDtr->getNDaug() > 0)
         moms.push_back(std::pair<EvtParticle*, int>(egDtr, idx));
     }

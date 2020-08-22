@@ -14,6 +14,7 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <generators/utilities/GeneratorConst.h>
 #include <framework/utilities/FileSystem.h>
 
 #include <TRandom3.h>
@@ -288,7 +289,7 @@ void FragmentationModule::event()
       }
 
       // Set PHOTOS flag from PYTHIA-EvtGen
-      if (pythia->event[iPythiaPart].status() == 202 && pythia->event[iPythiaPart].id() == 22) {
+      if (pythia->event[iPythiaPart].status() ==  GeneratorConst::FSR_STATUS_CODE && pythia->event[iPythiaPart].id() == 22) {
         p->addStatus(MCParticleGraph::GraphParticle::c_IsPHOTOSPhoton);
       }
 

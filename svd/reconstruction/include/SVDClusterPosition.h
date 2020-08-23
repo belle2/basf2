@@ -88,7 +88,7 @@ namespace Belle2 {
     protected:
 
       /** min SNR of a strip to be considered for clustering*/
-      float m_cutAdjacent;
+      float m_cutAdjacent = 3;
 
       /** raw cluster used to compute the position*/
       Belle2::SVD::RawCluster m_rawCluster;

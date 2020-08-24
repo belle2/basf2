@@ -1,6 +1,5 @@
 
 #include <analysis/variables/Variables.h>
-#include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/BasicParticleInformation.h>
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/PIDVariables.h>

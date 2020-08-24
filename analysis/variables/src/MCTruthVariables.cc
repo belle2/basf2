@@ -955,7 +955,7 @@ namespace Belle2 {
                       "The mass recoiling against the particles attached as particle's daughters calculated using MC truth values.");
     REGISTER_VARIABLE("mcCosThetaBetweenParticleAndNominalB",
                       particleMCCosThetaBetweenParticleAndNominalB,
-                      "Cosine of the angle in CMS between momentum the particle and a nominal B particle. In this calculation, the momenta of all descendant neutrinos is subtracted from the B momentum.");
+                      "Cosine of the angle in CMS between momentum the particle and a nominal B particle. In this calculation, the momenta of all descendant neutrinos are subtracted from the B momentum.");
 
 
     REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess,

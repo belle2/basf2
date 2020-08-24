@@ -1,5 +1,6 @@
 
 #include <analysis/variables/Variables.h>
+#include <analysis/variables/MCTruthVariables.h>
 #include <analysis/variables/BasicParticleInformation.h>
 #include <analysis/variables/VertexVariables.h>
 #include <analysis/variables/PIDVariables.h>
@@ -496,6 +497,76 @@ namespace {
       DataStore::Instance().reset();
     }
   };
+
+  TEST_F(MCTruthVariablesTest, mcCosThetaBetweenParticleAndNominalB)
+  {
+    DataStore::Instance().reset();
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<MCParticle> mcParticles;
+    StoreArray<Particle> particles;
+    particles.registerInDataStore();
+    mcParticles.registerInDataStore();
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(false);
+
+    // Create MC graph for B- -> (D0 ->  K- e+ nu_e) pi-
+    MCParticleGraph mcGraph;
+
+    MCParticleGraph::GraphParticle& graphParticleMother = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleDaughter2 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleGranddaughter1 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleGranddaughter2 = mcGraph.addParticle();
+    MCParticleGraph::GraphParticle& graphParticleGranddaughter3 = mcGraph.addParticle();
+
+    graphParticleDaughter1.comesFrom(graphParticleMother);
+    graphParticleDaughter2.comesFrom(graphParticleMother);
+    graphParticleGranddaughter1.comesFrom(graphParticleDaughter1);
+    graphParticleGranddaughter2.comesFrom(graphParticleDaughter1);
+    graphParticleGranddaughter3.comesFrom(graphParticleDaughter1);
+
+    graphParticleMother.setPDG(-521);
+    graphParticleDaughter1.setPDG(421);
+    graphParticleDaughter2.setPDG(-211);
+    graphParticleGranddaughter1.setPDG(-321);
+    graphParticleGranddaughter2.setPDG(-11);
+    graphParticleGranddaughter3.setPDG(12);
+
+    // Create the two 4-vectors that will factor into calculation, and set a mass that corresponds
+    // to the length of the 4-vector
+    PCmsLabTransform T;
+    graphParticleMother.set4Vector(T.rotateCmsToLab() * TLorentzVector({ 3.0, 4.0, 5.0, 18.0 }));
+    graphParticleGranddaughter3.set4Vector(T.rotateCmsToLab() * TLorentzVector({ 0.0, 0.0, 5.0, 5.0 }));
+
+    graphParticleMother.setMass(16.55294535724685);
+
+    mcGraph.generateList();
+
+    // Create mockup particles and add relations to MC particles
+    TLorentzVector zeroes(0, 0, 0, 0);
+    auto* pMother = particles.appendNew(zeroes, -521);
+    pMother->addRelationTo(mcParticles[0]);
+
+    particles.appendNew(zeroes, 421)->addRelationTo(mcParticles[1]);
+    particles.appendNew(zeroes, -211)->addRelationTo(mcParticles[2]);
+    particles.appendNew(zeroes, -321)->addRelationTo(mcParticles[3]);
+    particles.appendNew(zeroes, -11)->addRelationTo(mcParticles[4]);
+    particles.appendNew(zeroes, 12)->addRelationTo(mcParticles[5]);
+
+    double E_B = T.getCMSEnergy() / 2.0;
+    double M_B = pMother->getPDGMass();
+    double p_B = std::sqrt(E_B * E_B - M_B * M_B);
+
+    double E_Y = 13.0; // E_Mother - E_Granddaughter3
+    double p_Y = 5.0; // |p_Mother - p_Granddaughter3|
+    double M_Y = 12.0; // sqrt((p4_Mother - p4_Granddaughter3)^2)
+
+    double expectedCosBY = (2 * E_B * E_Y - M_B * M_B - M_Y * M_Y) / (2 * p_B * p_Y);
+
+    const auto* mcCosBY = Manager::Instance().getVariable("mcCosThetaBetweenParticleAndNominalB");
+
+    EXPECT_NEAR(mcCosBY->function(pMother), expectedCosBY, 1e-4);
+  }
 
   TEST_F(MCTruthVariablesTest, ECLMCMatchWeightVariable)
   {

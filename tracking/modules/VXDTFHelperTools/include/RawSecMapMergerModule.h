@@ -52,7 +52,7 @@ namespace Belle2 {
     /** If true, the full trained graphs will be printed to screen. WARNING: produces a lot of output for full detector-cases! */
     bool m_PARAMprintFullGraphs;
 
-    /** Relative threshold for puning the sector maps (in %). */
+    /** Relative threshold for pruning the sector maps (in %). */
     int m_RelThreshold;
     // ///////////////////////////////////////////////////////////////////////////////// member variables END:
   public:

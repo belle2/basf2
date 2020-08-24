@@ -173,6 +173,12 @@ namespace Belle2 {
         h_nfound->Fill(graph.getFound());
       }
 
+      if (h_nfound->GetEntries() == 0) {
+        B2ERROR("nfound histogram empty.");
+        delete h_nfound;
+        return 0;
+      }
+
       TH1* hc_nfound = h_nfound->GetCumulative();
       hc_nfound->Scale(1 / h_nfound->GetEntries());
 
@@ -187,6 +193,8 @@ namespace Belle2 {
 
       // In case no value for nfound is found
       B2ERROR("No nfound value found.");
+      delete h_nfound;
+      delete hc_nfound;
       return 0;
     }
 
@@ -214,14 +222,14 @@ namespace Belle2 {
       return killed;
     }
 
-    /* Output in a txt file id & nfound of subgraphs */
+    /** Output in a txt file id & nfound of subgraphs */
     void output_nfound()
     {
       std::ofstream out;
       out.open("output_nfound.txt");
       for (auto& subGraphEntry : m_subgraphs) {
         SubGraph<FilterType>& graph = subGraphEntry.second;
-        out << graph.output() << std::endl;
+        out << graph.print() << std::endl;
       }
       out.close();
     }

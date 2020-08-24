@@ -14,7 +14,7 @@ import sys
 import math
 from basf2 import *
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = 1
+PyConfig.IgnoreCommandLineOptions = 1  # noqa
 from svd import *
 from pxd import *
 import ROOT
@@ -173,6 +173,7 @@ class ClusterEfficiency(Module):
             self.fill_truehits(math.degrees(p.Phi()), p_gen, pxdtruehits)
             svdtruehits = mcp.getRelationsTo("SVDTrueHits")
             self.fill_truehits(math.degrees(p.Phi()), p_gen, svdtruehits)
+
 
 # Now let's create a path to simulate our events. We need a bit of statistics but
 # that's not too bad since we only simulate single muons

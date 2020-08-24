@@ -101,6 +101,7 @@ class dbImporterModule(basf2.Module):
     :param calibfile: path to the xml file containing the local calibrations
     :type calibfile: string
     """
+
     def beginRun(self):
         """
         Function to call the dbImporter methods to upload the different local payloads
@@ -129,6 +130,7 @@ class dbImporterModule(basf2.Module):
                     print(colored("V) Global Run Configuration xml payload file Imported", 'green'))
                 else:
                     print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
+
 
 main.add_module(dbImporterModule())
 

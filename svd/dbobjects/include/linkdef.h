@@ -51,7 +51,7 @@
 #pragma link C++ class Belle2::SVDLocalConfigParameters +; // checksum=0x56a63232, version=1
 
 
-#pragma link C++ class Belle2::SVDGlobalConfigParameters +; // checksum=0x77c15d0d, version=1
+#pragma link C++ class Belle2::SVDGlobalConfigParameters +; // checksum=0xa86e7ddd, version=2
 
 #endif
 

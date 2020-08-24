@@ -63,8 +63,8 @@
 // x ->  float m_hv
 // when classDef = 1 m_hv = 50
 #pragma read \
-  source="float m_hv"\
   sourceClass="Belle2::SVDGlobalConfigParameters"\
+  source=""\
   version="[-1]" \
   targetClass="Belle2::SVDGlobalConfigParameters"\
   target="m_hv"          \

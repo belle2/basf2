@@ -11,8 +11,10 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDShaperDigith>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/reconstruction/RawCluster.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -20,22 +22,22 @@ namespace Belle2 {
   namespace SVD {
 
     /**
-     * Abstract Class representing the SVD strip time
+     * Abstract Class representing the SVD strip charge
      */
-    class SVDStripTime {
+    class SVDStripCharge {
 
     public:
 
       /**
        * Constructor to create a Strip from the SVDShaperDigit
        */
-      SVDStripTime(const SVDShaperDigit& shaper)
+      SVDStripCharge(const SVDShaperDigit& shaper)
       {
         m_samples = shaper.getSamples();
         m_vxdID = shaper.getSensorID();
         m_isUside = shaper.isUStrip();
         m_cellID = shaper.getCellID();
-        ///        SVDELS3Time helper;
+        //        SVDELS3Charge helper;
         //        m_apvClockPeriod = helper.getAPVClockPeriod();
         //        m_ELS3tau = helper.getTau();
       };
@@ -43,27 +45,22 @@ namespace Belle2 {
       /**
        * Constructor to create a strip from a stripInRawCluster
        */
-      SVDStripTime(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU, int cellID)
+      SVDStripCharge(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU, int cellID)
       {
         m_samples = aStrip.samples;
         m_vxdID = sensorID;
         m_isUside = isU;
         m_cellID = cellID;
-        //        SVDELS3Time helper;
+        //        SVDELS3Charge helper;
         //        m_apvClockPeriod = helper.getAPVClockPeriod();
         //        m_ELS3tau = helper.getTau();
       };
 
-      /**
-       * set the trigger bin
-       */
-      void setTriggerBin(const int triggerBin)
-      { m_triggerBin = triggerBin; };
 
       /**
        * virtual destructor
        */
-      virtual ~SVDStripTime() {};
+      virtual ~SVDStripCharge() {};
 
       /**
        * @return the VxdID of the strip sensor
@@ -75,15 +72,23 @@ namespace Belle2 {
        */
       bool isUSide() {return m_isUside;}
 
-      /** CoG6 Time */
-      double getCoG6StripTime() {return 0;}
-      double getCoG6StripTimeError() {return 0;}
-      /** CoG3 Time */
-      double getCoG3StripTime() {return 0;}
-      double getCoG3StripTimeError() {return 0;}
-      /** ELS3 Time */
-      double getELS3StripTime() {return 0;}
-      double getELS3StripTimeError() {return 0;}
+      /** get strip charge as set in SVDRecoConfiguration payload*/
+      double getStripCharge();
+      /** get strip charge error as set in SVDRecoConfiguration payload*/
+      double getStripChargeError();
+
+      /** CoG6 Charge */
+      double getMaxSampleCharge();
+      /** CoG6 Charge Error*/
+      double getMaxSampleChargeError();
+      /** CoG3 Charge */
+      double getSumSamplesCharge();
+      /** CoG3 Charge Error*/
+      double getSumSamplesChargeError();
+      /** ELS3 Charge */
+      double getELS3StripCharge() {return 0;}
+      /** ELS3 Charge Error */
+      double getELS3StripChargeError() {return 0;}
 
     protected:
 
@@ -91,9 +96,6 @@ namespace Belle2 {
       double m_apvClockPeriod = 0;
       /** ELS3 tau constant*/
       double m_ELS3tau = 0;
-
-      /** trigger bin */
-      int m_triggerBin = -1;
 
       /** strip samples*/
       Belle2::SVDShaperDigit::APVFloatSamples m_samples; /** ADC of the acquired samples*/
@@ -106,6 +108,9 @@ namespace Belle2 {
 
       /**cell ID */
       int m_cellID = 0;
+
+      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibration wrapper*/
+
     };
 
   }

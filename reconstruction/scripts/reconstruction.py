@@ -214,7 +214,7 @@ def add_cosmics_reconstruction(
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    if reconstruct_cdst == 'rawFormat':
+    if reconstruct_cdst:
         # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
         if not components or ('PXD' in components):
             path.add_module("PXDClustersFromTracks")

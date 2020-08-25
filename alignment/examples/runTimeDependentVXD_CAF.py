@@ -1,5 +1,4 @@
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -21,6 +20,7 @@ import vertex as vx
 from simulation import add_simulation
 from L1trigger import add_tsim
 
+set_log_level(LogLevel.INFO)
 # Generate 4 runs, with run number 4, 5, 6, 7
 runList = [4, 5, 6, 7]
 # all runs in experiment 0 (default final Phase3 config)
@@ -53,7 +53,7 @@ components = ['PXD', 'SVD', 'CDC']
 
 def PXDHalfShellsAlignment(files, tags):
 
-        # Set-up re-processing path
+    # Set-up re-processing path
     path = create_path()
 
     path.add_module('Progress')
@@ -196,6 +196,7 @@ def generate_test_data(filename):
     process(main)
     print(statistics)
     return os.path.abspath(filename)
+
 
 if __name__ == "__main__":
     input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]

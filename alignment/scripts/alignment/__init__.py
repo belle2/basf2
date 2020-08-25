@@ -1,5 +1,4 @@
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import sys
 import ROOT
@@ -9,6 +8,7 @@ from caf.framework import Calibration
 
 from collections import OrderedDict
 
+set_log_level(LogLevel.INFO)
 UVWABC = [1, 2, 3, 4, 5, 6]
 
 

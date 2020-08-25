@@ -103,8 +103,8 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   //m_monObj->addCanvas(m_cTDCs);
 
 
-  m_cBadWire = new TCanvas("badwire", "Bad wires", 1000, 1000);
-  m_monObj->addCanvas(m_cBadWire);
+  //  m_cBadWire = new TCanvas("badwire", "Bad wires", 1000, 1000);
+  // m_monObj->addCanvas(m_cBadWire);
   B2DEBUG(20, "DQMHistAnalysisCDCMonObj: initialized.");
 
 }
@@ -453,8 +453,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     l0->Draw();
     //cout<<i<<" "<<tdcEdges[i]<<endl;
   }
-  /*
-  m_cBadWire->cd();
+
+  //  m_cBadWire->cd();
+  m_cMain->cd(9);
   h2p->Draw("col");
   float superLayerR[10] = {16.3, 24.3, 35.66, 46.63, 57.55, 68.47,
                            79.39, 90.31, 101.23, 112.05
@@ -469,6 +470,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     circs[i]->Draw("same");
   }
 
+  /*
   std::string comment = "";
   m_monObj->setVariable("comment", comment); // tentative no comments
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0) / means.size());

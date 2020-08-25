@@ -108,7 +108,7 @@ namespace Belle2 {
   protected:
     //TObjects for DQM analysis
     TCanvas* m_cMain = nullptr; /**< main panel */
-    TCanvas* m_cBadWire = nullptr; /**< bad wire panel */
+    //TCanvas* m_cBadWire = nullptr; /**< bad wire panel */
     TCanvas* m_cADC = nullptr; /**< main panel */
     TCanvas* m_cTDC = nullptr; /**< bad wire panel */
     TCanvas* m_cHit = nullptr; /**< main panel */

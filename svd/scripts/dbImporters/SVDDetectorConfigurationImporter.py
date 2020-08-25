@@ -68,7 +68,7 @@ reset_database()
 use_database_chain()
 # central DB needed for the channel mapping DB object
 # GLOBAL_TAG = "vxd_commissioning_20181030"
-GLOBAL_TAG = "svd_Belle2_20181221"
+GLOBAL_TAG = "online"
 use_central_database(GLOBAL_TAG)
 use_local_database("localDB_test/database.txt", "localDB_test", invertLogging=True)
 

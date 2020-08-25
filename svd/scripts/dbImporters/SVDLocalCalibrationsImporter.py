@@ -6,6 +6,7 @@ SVD Database importer.
 Script to Import Calibrations into a local DB
 """
 
+import basf2
 from basf2 import *
 import ROOT
 from ROOT.Belle2 import SVDLocalCalibrationsImporter
@@ -74,7 +75,7 @@ reset_database()
 use_database_chain()
 # central DB needed for the channel mapping DB object
 # GLOBAL_TAG = "vxd_commissioning_20181030"
-GLOBAL_TAG = "svd_Belle2_20181221"
+GLOBAL_TAG = "online"
 use_central_database(GLOBAL_TAG)
 use_local_database("localDB/database.txt", "localDB", invertLogging=True)
 
@@ -101,6 +102,7 @@ class dbImporterModule(basf2.Module):
     :param calibfile: path to the xml file containing the local calibrations
     :type calibfile: string
     """
+
     def beginRun(self):
         """
         Function to call the dbImporter methods to upload the different local payloads

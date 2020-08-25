@@ -199,7 +199,7 @@ namespace Belle2 {
     }
 
     /** returns removed occurances. */
-    unsigned pruneGraphAfterTraining(int absThreshold)
+    unsigned pruneGraphBeforeTraining(int absThreshold)
     {
       if (absThreshold == 0) {return 0;}
 

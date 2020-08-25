@@ -203,6 +203,14 @@ namespace Belle2 {
         subgraph.second.prepareDataCollection(config.quantiles); // TODO small-sample-case!
       }
 
+      // Get the absolute threshold (nfound) from the relative threshold
+      int absThreshold = mainGraph.getAbsThreshold(m_RelThreshold);
+
+      // Prune the sector map
+      nKilled += mainGraph.pruneGraphBeforeTraining(absThreshold);
+
+      B2INFO("processSectorCombinations: nKilled before the training: " << nKilled);
+
       trainGraph(mainGraph, chain, sectorBranches, filterBranches);
       /// TODO next steps: implement nice and neat way to take care of the ram-threshold!
       /**
@@ -212,14 +220,6 @@ namespace Belle2 {
        * per subgraph space available: (2GB - 40 MB) / 100.000 = 20 MB per graph. (double)-> 2.500.000 values max. / 20 Filters
        * 125k value-sets max.
        * */
-
-      // Get the absolute threshold (nfound) from the relative threshold
-      int absThreshold = mainGraph.getAbsThreshold(m_RelThreshold);
-
-      // Prune the sector map
-      nKilled += mainGraph.pruneGraphAfterTraining(absThreshold);
-
-      B2INFO("processSectorCombinations: nKilled after the training: " << nKilled);
 
       // checks for sectors which have inner neighbour and updates the sublayerID of the sensors.
       // TODO: check if all FullSecIDs are updated and not only those in the corresponding graphs as this may cause problems in a later step

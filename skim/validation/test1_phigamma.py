@@ -8,6 +8,13 @@
 #
 #######################################################
 
+"""
+<header>
+    <input>../phigamma_neutral.dst.root</input>
+    <output>../phigamma_neutral_skimmed.udst.root</output>
+    <contact>giuseppe.finocchiaro@lnf.infn.it</contact>
+</header>
+"""
 
 import basf2 as b2
 import modularAnalysis as ma

@@ -40,13 +40,13 @@
 #pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,3>+; // checksum=0xd3a06597, version=-1
 #pragma link C++ class Eigen::internal::plain_array<double,3,0,0>+; // checksum=0xa73f796a, version=-1
 
-#pragma read                                    \
-  sourceClass="Belle2::Particle"                \
-  source="int m_particleType"                   \
-  version="[11]"                                \
-  targetClass="Belle2::FileMetaData"            \
-  target="m_particleSource"                     \
-  code="{m_particleSource = m_particleType;}"   \
+#pragma read                                                      \
+  sourceClass="Belle2::Particle"                                  \
+  source="Belle2::Particle::EParticleSourceObject m_particleType" \
+  version="[-11]"                                                 \
+  targetClass="Belle2::Particle"                                  \
+  target="m_particleSource"                                       \
+  code="{m_particleSource = onfile.m_particleType;}"              \
 
 
 #pragma read                                    \

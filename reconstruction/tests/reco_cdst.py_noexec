@@ -19,11 +19,11 @@ def store_cdst(rawdata_file_name, cdst_file_name, data_type, number_of_events):
     raw.add_unpackers(path=child)
     if data_type == 'cosmic':
         rec.add_cosmics_reconstruction(path=child,
-                                       reconstruct_cdst='rawFormat')
+                                       reconstruct_cdst=True)
     else:
         rec.add_reconstruction(path=child,
                                reconstruct_cdst='rawFormat')
-    rec.add_cdst_output(child,
+    rec.add_cdst_output(path=child,
                         mc=False,
                         filename=cdst_file_name,
                         rawFormat=True)

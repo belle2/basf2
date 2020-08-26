@@ -9,13 +9,13 @@ import numpy as np
 
 import ROOT
 
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
-Belle2.RecoTrack.getRightLeftInformation("Belle2::CDCHit")
 
 import basf2
 from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
+Belle2.RecoTrack.getRightLeftInformation("Belle2::CDCHit")
+ROOT.gSystem.Load("libtracking")
 #: string formatter that handles missing keys gracefully
 formatter = TolerateMissingKeyFormatter()
 

@@ -60,10 +60,10 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   addParam("ClusterSN", m_cutCluster,
            "minimum value of the SNR of the cluster", m_cutCluster);
   addParam("timeAlgorithm6Samples", m_timeRecoWith6SamplesAlgorithm,
-           " choose time algorithm:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",
+           " choose time algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",
            m_timeRecoWith6SamplesAlgorithm);
   addParam("timeAlgorithm3Samples", m_timeRecoWith3SamplesAlgorithm,
-           " choose time algorithm:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",
+           " choose time algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",
            m_timeRecoWith3SamplesAlgorithm);
   /*  addParam("chargeAlgorithm6Samples", m_chargeRecoWith6SamplesAlgorithm,
            " choose charge algorithm:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",

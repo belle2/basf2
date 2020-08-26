@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+ * Basf2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -95,10 +95,12 @@ namespace Belle2 {
 
       // 3. Cluster Reconstruction Configuration:
       int m_numberOfAcquiredSamples = 0; /**< number of acquired samples, can be 6,3 or 1*/
-      std::string m_timeRecoWith6SamplesAlgorithm = "not set";
-      std::string m_timeRecoWith3SamplesAlgorithm = "not set";
-      //      std::string m_chargeRecoWith6SamplesAlgorithm = "not set";
-      //      std::string m_chargeRecoWith3SamplesAlgorithm = "not set";
+      std::string m_timeRecoWith6SamplesAlgorithm =
+        "not set"; /**< string storing the cluster time reconstruction algorithm in 6-sample DAQ mode*/
+      std::string m_timeRecoWith3SamplesAlgorithm =
+        "not set"; /**< string storing the cluster time reconstruction algorithm in 3-sample DAQ mode*/
+      //      std::string m_chargeRecoWith6SamplesAlgorithm = "not set"; /**< string storing the cluster charge reconstruction algorithm in 6-sample DAQ mode*/
+      //      std::string m_chargeRecoWith3SamplesAlgorithm = "not set"; /**< string storing the cluster charge reconstruction algorithm in 3-sample DAQ mode*/
 
       SVDClusterTime* m_time6SampleClass = nullptr; /**< cluster time class for the 6-sample acquisition mode*/
       SVDClusterTime* m_time3SampleClass = nullptr; /**< cluster time class for the 3-sample acquisition mode*/

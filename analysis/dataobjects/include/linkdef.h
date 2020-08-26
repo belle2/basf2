@@ -49,14 +49,6 @@
   code="{m_particleSource = m_particleType;}"   \
 
 #pragma read                                    \
-  sourceClass="Belle2::Particle"                \
-  source=""                                     \
-  version="[-12]"                               \
-  targetClass="Belle2::Particle"                \
-  target="m_momentumScale"                      \
-  code="{m_momentumScale = 1.0;}"               \
-
-#pragma read                                    \
   sourceClass="Belle2::TagVertex"               \
   source="float m_MCdeltaT"                     \
   version="[-3]"                                \

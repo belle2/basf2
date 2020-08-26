@@ -403,7 +403,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 
   m_cMain->cd(5);
   hBadChannelBC->Draw("col");
-  m_cMain->cd(6);
+  m_cMain->cd(9);
   hHitPerLayer->Draw();
   m_cMain->cd(7);
   hADC1000->Draw();
@@ -455,7 +455,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
   //  m_cBadWire->cd();
-  m_cMain->cd(9);
+  m_cMain->cd(6);
   h2p->Draw("col");
   float superLayerR[10] = {16.3, 24.3, 35.66, 46.63, 57.55, 68.47,
                            79.39, 90.31, 101.23, 112.05

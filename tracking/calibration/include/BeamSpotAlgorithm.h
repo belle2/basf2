@@ -33,8 +33,6 @@ namespace Belle2 {
     /// Decide if a run should be a payload boundary. Only used in certain Python Algorithm Starategies.
     virtual bool isBoundaryRequired(const Calibration::ExpRun& /*currentRun*/) override;
 
-    std::map<std::pair<int, int>, std::pair<double, double>> getRunInfo();
-    std::pair<double, double> getMinMaxTime();
 
 
   private:

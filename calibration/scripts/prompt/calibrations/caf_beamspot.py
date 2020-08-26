@@ -79,6 +79,7 @@ def get_calibrations(input_data, **kwargs):
     from caf.framework import Calibration
     from caf.strategies import SequentialRunByRun
     from caf.strategies import SequentialBoundaries
+    from caf.strategies import SimpleRunByRun
 
     # module to be run prior the collector
     rec_path_1 = create_path()
@@ -101,7 +102,8 @@ def get_calibrations(input_data, **kwargs):
                                  max_files_per_collector_job=1)
 
     # calibration_bs.strategies = SequentialRunByRun
-    calibration_bs.strategies = SequentialBoundaries
+    # calibration_bs.strategies = SequentialBoundaries
+    calibration_bs.strategies = SimpleRunByRun
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun

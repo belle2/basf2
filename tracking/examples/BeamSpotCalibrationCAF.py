@@ -49,7 +49,8 @@ def BeamSpotCalibration(files, tags):
                               )
 
     # calibration.strategies = strategies.SequentialRunByRun
-    calibration.strategies = strategies.SequentialBoundaries
+    calibration.strategies = strategies.SimpleRunByRun
+    # calibration.strategies = strategies.SequentialBoundaries
 
     return calibration
 

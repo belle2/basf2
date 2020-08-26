@@ -17,6 +17,7 @@
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 
+#include <tracking/calibration/analyzeTime.h>
 
 
 #include <TH1F.h>
@@ -33,9 +34,20 @@ BeamSpotAlgorithm::BeamSpotAlgorithm() : CalibrationAlgorithm("BeamSpotCollector
 }
 
 double getMaxGap(map<pair<int, int>, pair<double, double>> runsInfo);
-map<pair<int, int>, pair<double, double>> getRunInfo();
-pair<double, double> getMinMaxTime();
 
+std::map<std::pair<int, int>, std::pair<double, double>> getRunInfo(const std::vector<event>& evts);
+std::pair<double, double> getMinMaxTime(std::map<std::pair<int, int>, std::pair<double, double>> runsInfo);
+pair<double, double> getMinMaxTime(const vector<event>& evts);
+
+
+void encodeStartEndTime(TMatrixDSym& vtxErrMat, pair<double, double> StartEnd, int nDiv, int i)
+{
+  double start = StartEnd.first + (StartEnd.second - StartEnd.first) / nDiv  * i;
+  double end   = StartEnd.first + (StartEnd.second - StartEnd.first) / nDiv  * (i + 1);
+
+  vtxErrMat(0, 1) = start / 1e20;
+  vtxErrMat(0, 2) = end / 1e20;
+}
 
 
 CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
@@ -158,44 +170,96 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 
   //cout << "Radek is here " << __LINE__ << endl;
   auto tracks = getObjectPtr<TTree>("tracks");
-  if (!tracks || tracks->GetEntries() < 5) {
-    cout << "Too few data" << endl;
+  if (!tracks || tracks->GetEntries() < 15) {
+    if (tracks)
+      cout << "Too few data : " << tracks->GetEntries() <<  endl;
     return c_NotEnoughData;
   }
   cout << "Tracks size " << tracks->GetEntries() << endl;
 
-  //saveCalibration(payload);
+
+  vector<event> evts = getEvents(tracks.get());
 
 
-  //cout << "Radek is here " << __LINE__ << endl;
-  map<pair<int, int>, pair<double, double>> runsInfo = getRunInfo();
-  //cout << "Radek is here " << __LINE__ << endl;
+  cout << "Radek is here " << __LINE__ << endl;
+  map<pair<int, int>, pair<double, double>> runsInfo = getRunInfo(evts);
+  cout << "Radek is here " << __LINE__ << endl;
   double maxGap = getMaxGap(runsInfo);
-  //cout << "Radek is here " << __LINE__ << endl;
-  auto tMinMax =  getMinMaxTime();
-  //cout << "Radek is here " << __LINE__ << endl;
+  cout << "Radek is here " << __LINE__ << endl;
+  auto tMinMax =  getMinMaxTime(runsInfo);
+  cout << "Radecek is here " << __LINE__ << endl;
 
+
+  const double tDiv = 1800; //in seconds
+  auto StartEnd = getMinMaxTime(evts);
+  double nSplits = max(1, static_cast<int>(round((StartEnd.second - StartEnd.first) / tDiv)));
+
+  vector<double> splitPoints;
+  for (int i = 1; i < nSplits; ++i) {
+    splitPoints.push_back((i * 1.) / nSplits);
+  }
+
+  //vector<double> splitPoints = {0.7};
+  vector<ExpRunEvt> breakPoints = convertSplitPoints(evts, splitPoints);
+  cout << "Radecek is here " << __LINE__ << endl;
+
+
+  vector<TVector3> ipVec;
+  vector<TMatrixDSym> ipUncVec;
+  TMatrixDSym  sizeMat(3);
+
+  tie(ipVec, ipUncVec, sizeMat) = runBeamSpotAnalysis(evts, splitPoints);
+  cout << "Radecek is here " << __LINE__ << endl;
+
+
+  // hack to store the time into the payload
+  for (unsigned i = 0; i < ipUncVec.size(); ++i)
+    encodeStartEndTime(ipUncVec.at(i), StartEnd, ipUncVec.size(), i);
+
+  //Loop over all runs
+  int payloadID = 0;
   for (auto el : runsInfo) {
     pair<int, int> iov = el.first;
 
+    //vertexPos(0) = maxGap;
+    //vertexPos(1) = tMinMax.first;
+    //vertexPos(2) = tMinMax.second;
+    //vertexCov(0, 0) = iov.second;
+    //vertexCov(1, 1) = el.second.first;
+    //vertexCov(2, 2) = el.second.second;
+
     auto payload = new BeamSpot();
-    vertexPos(0) = maxGap;
-    vertexPos(1) = tMinMax.first;
-    vertexPos(2) = tMinMax.second;
-    vertexCov(0, 0) = iov.second;
-    vertexCov(1, 1) = el.second.first;
-    vertexCov(2, 2) = el.second.second;
 
-    payload->setIP(vertexPos, vertexCov);
-    payload->setSizeCovMatrix(vertexSize);
+    payload->setIP(ipVec.at(payloadID), ipUncVec.at(payloadID));
+    payload->setSizeCovMatrix(sizeMat);
+    TObject* obj  = static_cast<TObject*>(payload); //TODO try withou static_cast
 
-    //cout << "Radek is here " << __LINE__ << endl;
-    TObject* obj  = static_cast<TObject*>(payload);
-
+    cout << "Radecek is here " << __LINE__ << endl;
     EventDependency intraRun(obj);
+
+    cout << "Radek inside " << iov.second << " : " << payloadID <<  endl;
+    cout << "Radecek is here " << __LINE__ << endl;
+    while (payloadID < breakPoints.size() &&  breakPoints.at(payloadID).exp == iov.first
+           && breakPoints.at(payloadID).run == iov.second) {
+      ++payloadID;
+      auto payloadNow = new BeamSpot();
+      payloadNow->setIP(ipVec.at(payloadID), ipUncVec.at(payloadID));
+      payloadNow->setSizeCovMatrix(sizeMat);
+      TObject* objNow  = static_cast<TObject*>(payloadNow); //TODO try withou static_cast
+
+      cout << "Radek inside inside : " << payloadID << endl;
+      cout << "Radecek is here " << __LINE__ << endl;
+      cout <<  "Radek " << breakPoints.size() << endl;
+      cout << breakPoints.at(payloadID - 1).evt << endl;
+      intraRun.add(breakPoints.at(payloadID - 1).evt, objNow); // valid from event number 500
+
+      cout << "Radecek is here " << __LINE__ << endl;
+    }
+
+    cout << "Radecek is here " << __LINE__ << endl;
     auto m_iov = IntervalOfValidity(iov.first, iov.second, iov.first, iov.second);
     Database::Instance().storeData("BeamSpot", &intraRun, m_iov);
-    cout << "Radek is here " << __LINE__ << endl;
+    cout << "Radecek is here " << __LINE__ << endl;
   }
 
   /*
@@ -249,9 +313,10 @@ double getMaxGap(map<pair<int, int>, pair<double, double>> runsInfo)
 }
 
 
-map<pair<int, int>, pair<double, double>> BeamSpotAlgorithm::getRunInfo()
+map<pair<int, int>, pair<double, double>> getRunInfo(const vector<event>& evts)
 {
-  auto tracks = getObjectPtr<TTree>("tracks");
+  /*
+  //auto tracks = getObjectPtr<TTree>("tracks");
   cout << "Tracks size " << tracks->GetEntries() << endl;
 
   double time;
@@ -259,11 +324,15 @@ map<pair<int, int>, pair<double, double>> BeamSpotAlgorithm::getRunInfo()
   tracks->SetBranchAddress("time", &time);
   tracks->SetBranchAddress("run", &run);
   tracks->SetBranchAddress("exp", &exp);
+  */
 
   map<pair<int, int>, pair<double, double>> runsInfo;
 
-  for (int i = 0; i < tracks->GetEntries(); ++i) {
-    tracks->GetEntry(i);
+  for (auto& evt : evts) {
+    int exp = evt.exp;
+    int run = evt.run;
+    double time = evt.t;
+    //tracks->GetEntry(i);
     if (runsInfo.count({exp, run})) {
       double tMin, tMax;
       tie(tMin, tMax) = runsInfo.at({exp, run});
@@ -280,24 +349,31 @@ map<pair<int, int>, pair<double, double>> BeamSpotAlgorithm::getRunInfo()
 }
 
 
-pair<double, double> BeamSpotAlgorithm::getMinMaxTime()
-{
-  auto tracks = getObjectPtr<TTree>("tracks");
-  if (!tracks || tracks->GetEntries() < 1) return { -1, -1};
-  //cout << "Tracks size " << tracks->GetEntries() << endl;
 
-  double time;
-  tracks->SetBranchAddress("time", &time);
+pair<double, double> getMinMaxTime(map<pair<int, int>, pair<double, double>> runsInfo)
+{
 
   double timeMin = 1e50, timeMax = -1e50;
-  for (int i = 0; i < tracks->GetEntries(); ++i) {
-    tracks->GetEntry(i);
-    timeMin = min(timeMin, time);
-    timeMax = max(timeMax, time);
+
+  for (auto ri : runsInfo) {
+    timeMin = min(timeMin, ri.second.first);
+    timeMax = max(timeMax, ri.second.second);
   }
+
   return {timeMin, timeMax};
 }
 
+
+pair<double, double> getMinMaxTime(const vector<event>& evts)
+{
+  double tMin = 1e40, tMax = -1e40;
+  for (const auto& evt : evts) {
+    double time = evt.tAbs;
+    tMin = min(tMin, time);
+    tMax = max(tMax, time);
+  }
+  return {tMin, tMax};
+}
 
 
 
@@ -307,8 +383,8 @@ bool BeamSpotAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun
 {
   const double maxTimeGap = 3600; //maximal time gap in seconds
 
-  double timeMin, timeMax;
-  tie(timeMin, timeMax) = getMinMaxTime();
+  double timeMin = 0, timeMax = 100000;
+  //tie(timeMin, timeMax) = getMinMaxTime();
   if (timeMin < 0) {
     cout << "Marketka " << currentRun.second << " Nogap" << endl;
     return false; //if dummy

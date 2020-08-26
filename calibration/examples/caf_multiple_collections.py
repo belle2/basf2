@@ -3,7 +3,6 @@
 # different Collector module configs, different input files etc.
 
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -13,6 +12,8 @@ from ROOT.Belle2 import TestCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF, Collection
 from caf import backends
+
+set_log_level(LogLevel.INFO)
 
 
 def main(argv):

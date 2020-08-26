@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from caf import backends
+from pathlib import Path
+from basf2 import B2INFO
+import time
 
 pbs = backends.PBS()
 pbs.release = "/coepp/cephfs/mel/ddossett/software/release"
 pbs.queue = "short"
 
-from pathlib import Path
 
 job1 = backends.Job("TestJob1")
 job1.output_dir = str(Path('testing_pbs', job1.name).absolute())
@@ -34,8 +36,6 @@ job2.max_files_per_subjob = -1
 jobs = [job1, job2]
 pbs.submit(jobs)
 
-from basf2 import B2INFO
-import time
 
 ready = False
 while not ready:

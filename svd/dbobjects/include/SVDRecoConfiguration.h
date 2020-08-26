@@ -24,12 +24,16 @@ namespace Belle2 {
     */
     SVDRecoConfiguration(const TString& uniqueID = "")
       : m_uniqueID(uniqueID)
-      , m_timeRecoWith6Samples("not set")
-      , m_timeRecoWith3Samples("not set")
-      , m_chargeRecoWith6Samples("not set")
-      , m_chargeRecoWith3Samples("not set")
-      , m_positionRecoWith6Samples("not set")
-      , m_positionRecoWith3Samples("not set")
+      , m_timeRecoWith6Samples("CoG6")
+      , m_timeRecoWith3Samples("CoG3")
+      , m_chargeRecoWith6Samples("MaxSample")
+      , m_chargeRecoWith3Samples("MaxSample")
+      , m_positionRecoWith6Samples("CoG")
+      , m_positionRecoWith3Samples("CoG")
+      , m_stripTimeRecoWith6Samples("CoG6")
+      , m_stripTimeRecoWith3Samples("CoG3")
+      , m_stripChargeRecoWith6Samples("MaxSample")
+      , m_stripChargeRecoWith3Samples("MaxSample")
     {};
 
     /**
@@ -66,6 +70,27 @@ namespace Belle2 {
     TString getPositionRecoWith3Samples() const { return m_positionRecoWith3Samples; };
 
 
+    /**
+     * Returns the TString corresponding to the algorithm to be used
+     * for the strip time computation in 6-sample acquisition mode
+     **/
+    TString getStripTimeRecoWith6Samples() const { return m_stripTimeRecoWith6Samples; };
+    /**
+     * Returns the TString corresponding to the algorithm to be used
+     * for the strip time computation in 3-sample acquisition mode
+     **/
+    TString getStripTimeRecoWith3Samples() const { return m_stripTimeRecoWith3Samples; };
+
+    /**
+     * Returns the TString corresponding to the algorithm to be used
+     * for the strip charge computation in 6-sample acquisition mode
+     **/
+    TString getStripChargeRecoWith6Samples() const { return m_stripChargeRecoWith6Samples; };
+    /**
+     * Returns the TString corresponding to the algorithm to be used
+     * for the strip charge computation in 3-sample acquisition mode
+     **/
+    TString getStripChargeRecoWith3Samples() const { return m_stripChargeRecoWith3Samples; };
 
 
     /**
@@ -120,17 +145,52 @@ namespace Belle2 {
     }
 
 
+    /**
+     * Set the algorithm to be used for
+     * strip time computation in 6-sample acquisition mode
+     */
+    void setStripTimeRecoWith6Samples(TString timeStripRecoWith6Samples)
+    {
+      m_stripTimeRecoWith6Samples = TString(timeStripRecoWith6Samples);
+    }
+    /**
+     * Set the algorithm to be used for
+     * strip time computation in 3-sample acquisition mode
+     */
+    void setStripTimeRecoWith3Samples(TString timeStripRecoWith3Samples)
+    {
+      m_stripTimeRecoWith3Samples = TString(timeStripRecoWith3Samples);
+    }
+
+    /**
+     * Set the algorithm to be used for
+     * strip charge computation in 6-sample acquisition mode
+     */
+    void setStripChargeRecoWith6Samples(TString chargeStripRecoWith6Samples)
+    {
+      m_stripChargeRecoWith6Samples = TString(chargeStripRecoWith6Samples);
+    }
+    /**
+     * Set the algorithm to be used for
+     * strip charge computation in 3-sample acquisition mode
+     */
+    void setStripChargeRecoWith3Samples(TString chargeStripRecoWith3Samples)
+    {
+      m_stripChargeRecoWith3Samples = TString(chargeStripRecoWith3Samples);
+    }
 
     /**
      * Get the unique ID  of the calibration
      */
     TString get_uniqueID() const {return m_uniqueID;}
 
+    /** name of the payload */
     static std::string name;
 
   private:
 
-    TString m_uniqueID;   /**< Add a string as unique identifier of the SVD reconstruction algorithms*/
+    /** unique identifier of the SVD reconstruction configuration payload */
+    TString m_uniqueID;
 
     /** cluster time reconstruction algorithm used in 6-sample acquisition mode */
     TString m_timeRecoWith6Samples;
@@ -146,8 +206,21 @@ namespace Belle2 {
     /** cluster position reconstruction algorithm used in 3-sample acquisition mode */
     TString m_positionRecoWith3Samples;
 
+
+    /** strip time reconstruction algorithm used in 6-sample acquisition mode */
+    TString m_stripTimeRecoWith6Samples;
+    /** strip time reconstruction algorithm used in 3-sample acquisition mode */
+    TString m_stripTimeRecoWith3Samples;
+    /** strip charge reconstruction algorithm used in 6-sample acquisition mode */
+    TString m_stripChargeRecoWith6Samples;
+    /** strip charge reconstruction algorithm used in 3-sample acquisition mode */
+    TString m_stripChargeRecoWith3Samples;
+
     ClassDef(SVDRecoConfiguration, 1); /**< needed by root*/
 
   };
 
 }
+
+/*  LocalWords:  TString
+ */

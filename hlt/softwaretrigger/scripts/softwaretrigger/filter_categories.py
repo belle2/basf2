@@ -46,6 +46,7 @@ PHYSICS = [
     "filter ggBarrelLoose",
     "filter singleTagLowMass",
     "filter singleTagHighMass",
+    "filter b2b phi photons",
 ]
 
 # QED channels
@@ -63,10 +64,11 @@ QED = [
     "filter selee1leg1clst",
     "filter selee1leg1trk",
     "filter eexxSelect",
-    "filter radiative Bhabha",
+    "filter rad Bhabha 1trk",
     "filter selectmumu",
     "filter single muon",
     "filter cosmic",
+    "filter radiative Bhabha",
 ]
 
 # L1 Passthrough channels

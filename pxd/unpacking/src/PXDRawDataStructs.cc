@@ -181,7 +181,7 @@ namespace Belle2 {
               wordsineventlo << " ERR $" << std::hex << errorinfo << " CRC " << std::hex << crc32);
     };
 
-    unsigned int dhc_dhe_end_frame::getErrorDHEStateMachine(int dhpid)
+    unsigned int dhc_dhe_end_frame::getErrorStateMachineDHP(int dhpid)
     {
       switch (dhpid) {
         case 0: return (errorinfo >> 24) & 0xFF;

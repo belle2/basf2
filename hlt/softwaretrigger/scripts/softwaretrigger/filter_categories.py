@@ -64,11 +64,11 @@ QED = [
     "filter selee1leg1clst",
     "filter selee1leg1trk",
     "filter eexxSelect",
-    "filter rad Bhabha 1trk",
+    "filter radiative Bhabha",
     "filter selectmumu",
     "filter single muon",
     "filter cosmic",
-    "filter radiative Bhabha",
+    "filter rad Bhabha 1trk",
 ]
 
 # L1 Passthrough channels

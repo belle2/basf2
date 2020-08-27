@@ -7,8 +7,6 @@
 
 from basf2 import *
 
-set_log_level(LogLevel.INFO)
-
 import os
 import sys
 import multiprocessing
@@ -25,6 +23,7 @@ import rawdata as raw
 
 from basf2 import conditions
 
+set_log_level(LogLevel.INFO)
 input_branches = [
     'RawSVDs'
 ]

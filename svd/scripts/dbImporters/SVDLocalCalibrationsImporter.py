@@ -132,6 +132,7 @@ class dbImporterModule(basf2.Module):
                 else:
                     print(colored("X) Global Run Configuration xml payload file is NOT imported.", 'red'))
 
+
 main.add_module(dbImporterModule())
 
 process(main)

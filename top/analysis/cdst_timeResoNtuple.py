@@ -81,7 +81,7 @@ int_arrays = ['channel', 'pixel', 'pulseHeight', 'sample', 'status', 'type', 'nx
 float_arrays = ['time', 'timeErr', 'pulseWidth', 't0', 'wid0', 't1', 't_pdf', 'alpha',
                 'xd', 'yd', 'xm', 'kx', 'ky']
 
-from ROOT import TreeStruct
+from ROOT import TreeStruct  # noqa
 
 
 class Ntuple(Module):
@@ -193,7 +193,7 @@ class Ntuple(Module):
         lorentzLab.SetXYZM(mom.X(), mom.Y(), mom.Z(), mass)
         T = Belle2.PCmsLabTransform()
         lorentzCms = T.labToCms(lorentzLab)
-        return [lorentzCms.Energy(), T.getCMSEnergy()/2]
+        return [lorentzCms.Energy(), T.getCMSEnergy() / 2]
 
     def trackSelected(self):
         ''' returns true if track fulfills selection criteria  '''
@@ -260,7 +260,7 @@ class Ntuple(Module):
             self.data.tof = self.getTOF(track, 13, self.data.slot)
             try:
                 tfit = track.getTrackFitResultWithClosestMass(Belle2.Const.muon)
-            except:
+            except BaseException:
                 B2ERROR("No trackFitResult available")
                 continue
             self.data.charge = tfit.getChargeSign()
@@ -279,7 +279,7 @@ class Ntuple(Module):
                 timeZero = extHit.getRelated('TOPTimeZeros')
                 self.data.rec_t0 = timeZero.getTime()
                 self.data.valid_t0 = timeZero.isValid()
-            except:
+            except BaseException:
                 self.data.rec_t0 = 0
                 self.data.valid_t0 = 0
 
@@ -296,7 +296,7 @@ class Ntuple(Module):
             self.h_Ecms.Fill(Ecms[0])
             try:
                 pdf = pdfs.getHypothesisPDF(13)
-            except:
+            except BaseException:
                 B2ERROR("No PDF available for PDG = 13")
                 continue
             self.data.itrk += 1

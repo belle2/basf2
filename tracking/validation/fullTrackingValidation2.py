@@ -19,12 +19,12 @@ import tracking
 from tracking.validation.run import TrackingValidationRun
 
 test_cuts = [0.0, 0.25, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
-with open("fullVal_cut_iterator.txt", "r") as cut_file:
+with open("fullVal_cut_iterator2.txt", "r") as cut_file:
     iterator = 9 - int(cut_file.read())
 cut = test_cuts[iterator]
 print("The cut value of the CDC QI is:", cut)
 print(str(int(cut*100)).zfill(3))
-VALIDATION_OUTPUT_FILE = 'ftv_reco_qi_N1000_wNEWvxd_withCA_cdcQi' + str(int(cut*100)).zfill(3) + '.root'
+VALIDATION_OUTPUT_FILE = 'ftv_reco_qi_N1000_wNEWvxd_cdcQi' + str(int(cut*100)).zfill(3) + '.root'
 
 
 # cut = 0.0
@@ -41,7 +41,7 @@ class Full(TrackingValidationRun):
     generator_module = 'generic'
     #: no background overlay
     # root_input_file = '../EvtGenSim_1k_exp1003_run2_new.root'
-    root_input_file = 'generated_mc_N1000_BBBAR_test.root'
+    root_input_file = 'generated_mc_N1000_BBBAR_test2.root'
     #: use the complete track-reconstruction chain
     #: finder_module = staticmethod(tracking.add_tracking_reconstruction)
 
@@ -51,7 +51,7 @@ class Full(TrackingValidationRun):
         # Replace weightfile identifiers from defaults (CDB payloads) to new
         # weightfiles created by the b2luigi script
         cdc_qe_mva_filter_parameters = {
-            "identifier": 'cdc_mva_qe_nTrees350_nCuts6_nLevels5_shrin10_withCA.weights.xml',
+            "identifier": 'trackfindingcdc_TrackQualityIndicator_nTrees350_nCuts6_nLevels5_shrin10_skimmedVar.weights.xml',
             "cut": cut}
         basf2.set_module_parameters(
             path,
@@ -66,8 +66,8 @@ class Full(TrackingValidationRun):
         basf2.set_module_parameters(
             path,
             name="TrackQualityEstimatorMVA",
-            WeightFileIdentifier="recotrack_mva_qe_nTrees350_nCuts6_nLevels5_shrin10_useVXD_deleteCDCQI"
-            + str(int(cut*100)).zfill(3) + ".weights.xml",
+            WeightFileIdentifier="recotrack_mva_qe_nTrees350_nCuts6_nLevels5_shrin10_deleteCDCQI" + str(int(cut*100)).zfill(3)
+                                 + "_useCDC.weights.xml",
             )
 
     #: Define the user parameters for the track-finding module

@@ -127,6 +127,7 @@ class WriteData(Module):
         """Writes data to given output file."""
         awk.save(opts.output, self.data, mode="w")
 
+
 # Suppress messages and warnings during processing:
 set_log_level(LogLevel.ERROR)
 

@@ -251,15 +251,15 @@ energy selection for Belle data and MC (50/100/150 MeV).
 )DOC");
 
     REGISTER_VARIABLE("BelleFirstCDCHitX", BelleFirstCDCHitX, R"DOC(
-[Legacy] Returns x component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+[Legacy] Returns x component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
     REGISTER_VARIABLE("BelleFirstCDCHitY", BelleFirstCDCHitY, R"DOC(
-[Legacy] Returns y component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+[Legacy] Returns y component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
     REGISTER_VARIABLE("BelleFirstCDCHitZ", BelleFirstCDCHitZ, R"DOC(
-[Legacy] Returns z component of starting point of the track near the 1st CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+[Legacy] Returns z component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
 )DOC");
 
     REGISTER_VARIABLE("BelleLastCDCHitX", BelleLastCDCHitX, R"DOC(

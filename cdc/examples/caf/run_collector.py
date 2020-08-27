@@ -14,6 +14,10 @@ from caf.framework import Calibration, CAF
 from caf import backends
 from cdc.cr import *
 
+# The backend creates a file with the input data file paths inside it and places it in the job's working directory.
+# This function reads the file automatically to get a list of input file paths
+from caf.backends import get_input_data
+
 probcut = float(sys.argv[1]) if len(sys.argv) == 2 else 0.001
 data_period = 'phase2'
 
@@ -23,11 +27,6 @@ use_central_database("332_COPY-OF_GT_gen_prod_004.11_Master-20171213-230000", Lo
 use_central_database("MagneticFieldPhase2QCSoff")
 use_local_database("/home/belle/muchida/basf2/release/cdc/examples/caf/localDB/database.txt")
 # use_local_database("/home/belle/muchida/basf2/work/caf/gcr2/test7/localDB/database.txt")
-
-
-# The backend creates a file with the input data file paths inside it and places it in the job's working directory.
-# This function reads the file automatically to gte a list of input file paths
-from caf.backends import get_input_data
 
 input_data = get_input_data()
 output_file_name = 'CollectorOutput.root'

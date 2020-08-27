@@ -6,6 +6,55 @@ from basf2 import *
 from ROOT import Belle2
 
 
+def add_svd_new_reconstruction(path, isROIsimulation=False, applyMasking=False):
+    if(isROIsimulation):
+        clusterizerName = '__ROISVDClusterizer'
+        dataFormatName = '__ROISVDDataFormat'
+        clusterName = '__ROIsvdClusters'
+        shaperDigitsName = ""
+        missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
+    else:
+        clusterizerName = 'SVDClusterizer'
+        dataFormatName = 'SVDDataFormat'
+        clusterName = ""
+        shaperDigitsName = ""
+        missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
+
+# add strip masking if needed
+    if(applyMasking):
+        if(isROIsimulation):
+            shaperDigitsName = '__ROISVDShaperDigitsUnmasked'
+            maskingName = '__ROISVDStripMasking'
+        else:
+            shaperDigitsName = 'SVDShaperDigitsUnmasked'
+            maskingName = 'SVDStripMasking'
+
+        if maskingName not in [e.name() for e in path.modules()]:
+            masking = register_module('SVDStripMasking')
+            masking.set_name(maskingName)
+            masking.param('ShaperDigitsUnmasked', shaperDigitsName)
+            path.add_module(masking)
+
+    if dataFormatName not in [e.name() for e in path.modules()]:
+        dataFormat = register_module('SVDDataFormatCheck')
+        dataFormat.param('ShaperDigits', shaperDigitsName)
+
+    if clusterizerName not in [e.name() for e in path.modules()]:
+        clusterizer = register_module('SVDClusterizer')
+        clusterizer.set_name(clusterizerName)
+        clusterizer.param('Clusters', clusterName)
+        clusterizer.param('useDB', True)
+        path.add_module(clusterizer)
+
+    if missingAPVsClusterCreatorName not in [e.name() for e in path.modules()]:
+        missingAPVCreator = register_module('SVDMissingAPVsClusterCreator')
+        missingAPVCreator.set_name(missingAPVsClusterCreatorName)
+        path.add_module(missingAPVCreator)
+
+    # Add SVDSpacePointCreator
+    add_svd_SPcreation(path, isROIsimulation)
+
+
 def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):
 
     if(useNN and useCoG):

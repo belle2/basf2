@@ -125,7 +125,7 @@ class SVDClustersQuickCheck(basf2.Module):
 
 # b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 # b2conditions.prepend_globaltag("svd_NOCoGCorrections")
-b2conditions.prepend_globaltag("svd_test_svdRecoConfiguration")
+# b2conditions.prepend_globaltag("svd_test_svdRecoConfiguration")
 
 main = create_path()
 
@@ -151,10 +151,10 @@ for mod in main.modules():
 clusterizer = register_module('SVDClusterizer')
 clusterizer.param('timeAlgorithm6Samples', "CoG6")
 clusterizer.param('timeAlgorithm3Samples', "CoG6")
-clusterizer.param('chargeAlgorithm6Samples', "MaxSum")
-clusterizer.param('chargeAlgorithm3Samples', "MaxSum")
+clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
+clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
 clusterizer.param('Clusters', "SVDNewClusters")
-clusterizer.param('useDB', False)
+clusterizer.param('useDB', True)
 main.add_module(clusterizer)
 
 main.add_module(SVDClustersQuickCheck())

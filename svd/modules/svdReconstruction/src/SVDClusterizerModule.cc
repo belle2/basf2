@@ -60,46 +60,50 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   addParam("ClusterSN", m_cutCluster,
            "minimum value of the SNR of the cluster", m_cutCluster);
   addParam("timeAlgorithm6Samples", m_timeRecoWith6SamplesAlgorithm,
-           " choose time algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",
+           " choose time algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default), CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS",
            m_timeRecoWith6SamplesAlgorithm);
   addParam("timeAlgorithm3Samples", m_timeRecoWith3SamplesAlgorithm,
-           " choose time algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",
+           " choose time algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG, CoG3 = 3-sample CoG (default),  ELS3 = 3-sample ELS",
            m_timeRecoWith3SamplesAlgorithm);
-  /*  addParam("chargeAlgorithm6Samples", m_chargeRecoWith6SamplesAlgorithm,
-           " choose charge algorithm:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",
+  addParam("chargeAlgorithm6Samples", m_chargeRecoWith6SamplesAlgorithm,
+           " choose charge algorithm for 6-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS",
            m_chargeRecoWith6SamplesAlgorithm);
   addParam("chargeAlgorithm3Samples", m_chargeRecoWith3SamplesAlgorithm,
-           " choose charge algorithm:  CoG6 = 6-sample CoG (default for 6-sample acquisition mode), CoG3 = 3-sample CoG (default for 3-sample acquisition mode),  ELS3 = 3-sample ELS",
+           " choose charge algorithm for 3-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS",
            m_chargeRecoWith3SamplesAlgorithm);
-  */
+
   addParam("useDB", m_useDB,
            "if false use clustering and reconstruction configuration module parameters", m_useDB);
-
 
 }
 
 void SVDClusterizerModule::beginRun()
 {
 
-  /*if (! useDB) {
-  if(!m_recoConfig.isValid())
-    B2ERROR("no valid configuration found for SVD reconstruction");
-  else
-    B2INFO("SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
-
-  m_recoConfig.addCallback([this](){
+  if (m_useDB) {
+    if (!m_recoConfig.isValid())
+      B2ERROR("no valid configuration found for SVD reconstruction");
+    else
       B2INFO("SVDRecoConfiguration: from now on we are using " << m_recoConfig->get_uniqueID());
-    } );
 
-  m_timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
-  B2INFO(" m_timeRecoWith6SamplesAlgorithm = "<<m_timeRecoWith6SamplesAlgorithm);
-  } else {
-  */
+    m_timeRecoWith6SamplesAlgorithm = m_recoConfig->getTimeRecoWith6Samples();
+    m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getTimeRecoWith3Samples();
+    m_chargeRecoWith6SamplesAlgorithm = m_recoConfig->getChargeRecoWith6Samples();
+    m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getChargeRecoWith3Samples();
+
+  }
 
   m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm);
   m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm);
   //  m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
   //  m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
+
+
+  B2INFO("SVD  6-sample DAQ, time algorithm:" << m_timeRecoWith6SamplesAlgorithm <<  ", charge algorithm: " <<
+         m_chargeRecoWith6SamplesAlgorithm);
+
+  B2INFO("SVD  3-sample DAQ, time algorithm:" << m_timeRecoWith3SamplesAlgorithm <<  ", charge algorithm: " <<
+         m_chargeRecoWith3SamplesAlgorithm);
 }
 
 void SVDClusterizerModule::initialize()

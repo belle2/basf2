@@ -26,7 +26,7 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
-//#include <svd/dbobjects/SVDRecoConfiguration.h>
+#include <svd/dbobjects/SVDRecoConfiguration.h>
 
 namespace Belle2 {
 
@@ -95,12 +95,14 @@ namespace Belle2 {
 
       // 3. Cluster Reconstruction Configuration:
       int m_numberOfAcquiredSamples = 0; /**< number of acquired samples, can be 6,3 or 1*/
-      std::string m_timeRecoWith6SamplesAlgorithm =
-        "not set"; /**< string storing the cluster time reconstruction algorithm in 6-sample DAQ mode*/
-      std::string m_timeRecoWith3SamplesAlgorithm =
-        "not set"; /**< string storing the cluster time reconstruction algorithm in 3-sample DAQ mode*/
-      //      std::string m_chargeRecoWith6SamplesAlgorithm = "not set"; /**< string storing the cluster charge reconstruction algorithm in 6-sample DAQ mode*/
-      //      std::string m_chargeRecoWith3SamplesAlgorithm = "not set"; /**< string storing the cluster charge reconstruction algorithm in 3-sample DAQ mode*/
+      /** string storing the cluster time reconstruction algorithm in 6-sample DAQ mode*/
+      std::string m_timeRecoWith6SamplesAlgorithm = "not set";
+      /** string storing the cluster time reconstruction algorithm in 3-sample DAQ mode*/
+      std::string m_timeRecoWith3SamplesAlgorithm = "not set";
+      /** string storing the cluster charge reconstruction algorithm in 6-sample DAQ mode*/
+      std::string m_chargeRecoWith6SamplesAlgorithm = "not set";
+      /**string storing the cluster charge reconstruction algorithm in 3-sample DAQ mode*/
+      std::string m_chargeRecoWith3SamplesAlgorithm = "not set";
 
       SVDClusterTime* m_time6SampleClass = nullptr; /**< cluster time class for the 6-sample acquisition mode*/
       SVDClusterTime* m_time3SampleClass = nullptr; /**< cluster time class for the 3-sample acquisition mode*/
@@ -109,7 +111,7 @@ namespace Belle2 {
 
 
       // 4. Calibration Objects
-      //      DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< */
+      DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
       SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShape calibrations db object*/
       SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibrations db object*/
       SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations db object*/

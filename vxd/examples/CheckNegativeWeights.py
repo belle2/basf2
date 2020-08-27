@@ -3,6 +3,8 @@
 
 import basf2 as b2
 from ROOT import Belle2
+import svd
+import pxd
 
 b2.logging.log_level = b2.LogLevel.WARNING
 
@@ -141,7 +143,7 @@ class CheckNegativeWeights(b2.Module):
 
     def terminate(self):
         """ Write results """
-        B2INFO(
+        b2.B2INFO(
             '\nResults for PXD: \n{pxd}\nResults for SVD: \n{svd}\n'.format(
                 pxd=str(self.sign_stats_pxd),
                 svd=str(self.sign_stats_svd)
@@ -186,20 +188,6 @@ particlegun.param({
     'independentVertices': False,
 })
 
-pxd_digitizer = b2.register_module('PXDDigitizer')
-pxd_digitizer.param('PoissonSmearing', True)
-pxd_digitizer.param('ElectronicEffects', True)
-
-pxd_clusterizer = b2.register_module('PXDClusterizer')
-
-svd_digitizer = b2.register_module('SVDDigitizer')
-svd_digitizer.param('PoissonSmearing', True)
-svd_digitizer.param('ElectronicEffects', True)
-
-svd_clusterizer = b2.register_module('SVDClusterizerDirect')
-
-# Select subdetectors to be built
-geometry.param('components', ['MagneticField', 'PXD', 'SVD'])
 
 # create processing path
 main = b2.create_path()
@@ -209,10 +197,10 @@ main.add_module(particlegun)
 main.add_module(gearbox)
 main.add_module(geometry)
 main.add_module(simulation)
-main.add_module(pxd_digitizer)
-main.add_module(svd_digitizer)
-main.add_module(pxd_clusterizer)
-main.add_module(svd_clusterizer)
+pxd.add_pxd_simulation(main)
+svd.add_svd_simulation(main)
+pxd.add_pxd_reconstruction(main)
+svd.add_svd_reconstruction(main)
 main.add_module(printWeights)
 
 # generate events

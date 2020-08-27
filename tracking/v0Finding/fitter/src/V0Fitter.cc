@@ -460,11 +460,8 @@ bool V0Fitter::fitAndStore2(const Track* trackPlus, const Track* trackMinus,
   /// if failflag==true, revert back to the original vertex fit with the original tracks.
   if (failflag) {
     bool forcestore = true;
-    if (vertexFitWithRecoTracks(trackPlus, trackMinus, recoTrackPlus, recoTrackMinus, v0Hypothesis,
-                                hasInnerHitStatus, vertexPos, forcestore)) {
-      recoTrackPlus_forRefit  = recoTrackPlus;
-      recoTrackMinus_forRefit = recoTrackMinus;
-    } else {
+    if (not vertexFitWithRecoTracks(trackPlus, trackMinus, recoTrackPlus, recoTrackMinus, v0Hypothesis,
+                                    hasInnerHitStatus, vertexPos, forcestore)) {
       B2WARNING("original vertex fit fails. this should not happen.");
       return false;
     }

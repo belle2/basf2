@@ -285,6 +285,8 @@ namespace Belle2 {
       inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
       inline unsigned int getErrorInfo(void) const {return errorinfo;};
       unsigned int getErrorStateMachineDHP(int dhpid);
+      unsigned int getErrorStateMachineStartDHP(int dhpid);
+      unsigned int getErrorStateMachineEndDHP(int dhpid);
     };
 
 

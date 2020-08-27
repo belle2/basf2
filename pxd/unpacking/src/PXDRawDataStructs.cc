@@ -192,6 +192,27 @@ namespace Belle2 {
       }
     };
 
+    unsigned int dhc_dhe_end_frame::getErrorStateMachineStartDHP(int dhpid)
+    {
+      switch (dhpid) {
+        case 0: return (errorinfo >> 24) & 0x0F;
+        case 1: return (errorinfo >> 16) & 0x0F;
+        case 2: return (errorinfo >> 8) & 0x0F;
+        case 3: return (errorinfo) & 0x0F;
+        default: return 0;
+      }
+    };
+
+    unsigned int dhc_dhe_end_frame::getErrorStateMachineEndDHP(int dhpid)
+    {
+      switch (dhpid) {
+        case 0: return (errorinfo >> 28) & 0x0F;
+        case 1: return (errorinfo >> 20) & 0x0F;
+        case 2: return (errorinfo >> 12) & 0x0F;
+        case 3: return (errorinfo >> 4) & 0x0F;
+        default: return 0;
+      }
+    };
 
     PXDError::PXDErrorFlags dhc_frames::check_padding(void)
     {

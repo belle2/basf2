@@ -507,34 +507,6 @@ namespace Belle2 {
       std::vector<std::string> new_arguments = arguments;
       new_arguments.push_back(std::string("1"));
       return isDescendantOfList(new_arguments);
-//       if (arguments.size() > 0) {
-//         auto listNames = arguments;
-//         auto func = [listNames](const Particle * particle) -> double {
-//           double output = 0;
-
-//           for (auto& iListName : listNames)
-//           {
-
-//             StoreObjPtr<ParticleList> listOfParticles(iListName);
-
-//             if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isDaughterOfList");
-
-//             for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
-//               Particle* iParticle = listOfParticles->getParticle(i);
-//               for (unsigned j = 0; j < iParticle->getNDaughters(); ++j) {
-//                 if (particle == iParticle->getDaughter(j)) {
-//                   output = 1; goto endloop;
-//                 }
-//               }
-//             }
-//           }
-// endloop:
-//           return output;
-//         };
-//         return func;
-//       } else {
-//         B2FATAL("Wrong number of arguments for meta function isDaughterOfList");
-//       }
     }
 
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments)
@@ -543,39 +515,6 @@ namespace Belle2 {
       std::vector<std::string> new_arguments = arguments;
       new_arguments.push_back(std::string("2"));
       return isDescendantOfList(new_arguments);
-//       if (arguments.size() > 0) {
-//         auto listNames = arguments;
-//         auto func = [listNames](const Particle * particle) -> double {
-//           double output = 0;
-
-//           for (auto& iListName : listNames)
-//           {
-
-//             StoreObjPtr<ParticleList> listOfParticles(iListName);
-
-//             if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isGrandDaughterOfList");
-
-//             for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
-//               Particle* iParticle = listOfParticles->getParticle(i);
-//               for (unsigned j = 0; j < iParticle->getNDaughters(); ++j) {
-//                 const Particle* jDaughter = iParticle->getDaughter(j);
-//                 for (unsigned k = 0; k < jDaughter->getNDaughters(); ++k) {
-
-//                   if (particle == jDaughter->getDaughter(k)) {
-//                     output = 1; goto endloop;
-//                   }
-//                 }
-//               }
-//             }
-
-//           }
-// endloop:
-//           return output;
-//         };
-//         return func;
-//       } else {
-//         B2FATAL("Wrong number of arguments for meta function isGrandDaughterOfList");
-//       }
     }
 
     Manager::FunctionPtr isDescendantOfList(const std::vector<std::string>& arguments)
@@ -604,7 +543,7 @@ namespace Belle2 {
               {
                 const Particle* daughter = m->getDaughter(i);
                 if ((flag == 1.) or (flag < 0)) {
-                  if (p->getArrayIndex() == daughter->getArrayIndex()) {
+                  if (p->isCopyOf(daughter)) {
                     return 1;
                   }
                 }
@@ -2919,7 +2858,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
                       "E.g. ``matchedMC(p)`` returns the total momentum of the related MCParticle.\n"
                       "Returns NaN if no matched MCParticle exists.");
-    REGISTER_VARIABLE("countInList(particleList, cut='')", countInList,
+    REGISTER_VARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"

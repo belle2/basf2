@@ -249,7 +249,7 @@ void ECLMatchingPerformanceExpertModule::terminate()
 
 void ECLMatchingPerformanceExpertModule::setupTree()
 {
-  if (m_dataTree == NULL) {
+  if (m_dataTree == nullptr) {
     B2FATAL("Data tree was not created.");
   }
   addVariableToTree("expNo", m_iExperiment);
@@ -319,7 +319,7 @@ void ECLMatchingPerformanceExpertModule::setupTree()
 
 void ECLMatchingPerformanceExpertModule::writeData()
 {
-  if (m_dataTree != NULL) {
+  if (m_dataTree != nullptr) {
     TDirectory* oldDir = gDirectory;
     if (m_outputFile)
       m_outputFile->cd();
@@ -327,7 +327,7 @@ void ECLMatchingPerformanceExpertModule::writeData()
     oldDir->cd();
     delete m_dataTree;
   }
-  if (m_outputFile != NULL) {
+  if (m_outputFile != nullptr) {
     m_outputFile->Close();
     delete m_outputFile;
   }

@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPSampleTimes.h>
+
+#include <framework/logging/Logger.h>
+
 #include <iostream>
 
 using namespace std;

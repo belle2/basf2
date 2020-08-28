@@ -10,7 +10,7 @@ from prompt import CalibrationSettings
 settings = CalibrationSettings(name="BeamSpot Calibrations",
                                expert_username="casarosa",
                                description=__doc__,
-                               input_data_formats=["mdst"],
+                               input_data_formats=["cdst"],
                                input_data_names=["hlt_mumu"],
                                depends_on=[])
 

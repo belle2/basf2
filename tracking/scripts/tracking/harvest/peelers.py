@@ -411,6 +411,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
         pt_resolution = np.divide(pt_variance, pt_estimate)
 
         fit_crops = dict(
+            has_trackFitResult=True,
             d0_estimate=track_fit_result.getD0(),
             d0_variance=track_fit_result.getCov()[0],
             phi0_estimate=track_fit_result.getPhi() % (2.0 * math.pi),
@@ -433,6 +434,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pt_variance=pt_variance,
             pt_resolution=pt_resolution,
 
+            track_charge=track_fit_result.getChargeSign(),
             b_field=Belle2.BFieldManager.getField(pos).Z(),
 
             px_estimate=mom.X(),
@@ -447,6 +449,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
 
     else:
         fit_crops = dict(
+            has_trackFitResult=False,
             d0_estimate=nan,
             d0_variance=nan,
             phi0_estimate=nan,
@@ -469,6 +472,7 @@ def peel_track_fit_result(track_fit_result, key="{part_name}"):
             pt_variance=nan,
             pt_resolution=nan,
 
+            track_charge=nan,
             b_field=nan,
 
             px_estimate=nan,
@@ -603,7 +607,9 @@ def peel_hit_information(hit_info, reco_track, key="{part_name}"):
 
 #: Peeler for module statistics
 @format_crop_keys
-def peel_module_statistics(modules=[], key="{part_name}"):
+def peel_module_statistics(modules=None, key="{part_name}"):
+    if modules is None:
+        modules = []
     module_stats = dict()
 
     for module in basf2.statistics.modules:

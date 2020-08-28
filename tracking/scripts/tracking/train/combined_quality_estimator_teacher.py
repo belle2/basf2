@@ -202,7 +202,7 @@ def my_basf2_mva_teacher(
     tree_name,
     weightfile_identifier,
     target_variable="truth",
-    exclude_variables=[],
+    exclude_variables=None,
     fast_bdt_option=[200, 8, 3, 0.1]  # nTrees, nCuts, nLevels, shrinkage
 ):
     """
@@ -219,6 +219,8 @@ def my_basf2_mva_teacher(
     :param exclude_variables: List of collected variables to not use in the training of the QE MVA classifier.
            In addition to variables containing the "truth" substring, which are excluded by default.
     """
+    if exclude_variables is None:
+        exclude_variables = []
 
     weightfile_extension = Path(weightfile_identifier).suffix
     if weightfile_extension not in {".xml", ".root"}:

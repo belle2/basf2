@@ -438,7 +438,7 @@ void SVGPrimitivePlotter::writeAttributes(std::ostream& outputStream,
                                           const AttributeMap& attributeMap)
 {
   bool first = true;
-  for (const std::pair<std::string, std::string>& attribute : attributeMap) {
+  for (const std::pair<std::string, std::string> attribute : attributeMap) {
 
     const std::string& key = attribute.first;
     const std::string& value = attribute.second;

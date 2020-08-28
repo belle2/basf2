@@ -11,7 +11,6 @@
 #pragma once
 
 #include <calibration/CalibrationAlgorithm.h>
-#include <TH1.h>
 
 namespace Belle2 {
 

@@ -12,43 +12,21 @@
 // Own include
 #include <svd/calibration/SVDDatabaseImporter.h>
 
-// Map from the online world (FADC id, ADC id, APV ch id)
-// to the offline world (layer, ladder, sensor, view, cell)
-#include <svd/online/SVDOnlineToOfflineMap.h>
-
 // framework - Database
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/PayloadFile.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/utilities/FileSystem.h>
-
 // wrapper objects
-#include <svd/calibration/SVDNoiseCalibrations.h>
-#include <svd/calibration/SVDPedestalCalibrations.h>
-#include <svd/calibration/SVDPulseShapeCalibrations.h>
-#include <svd/calibration/SVDHotStripsCalibrations.h>
-#include <svd/calibration/SVDFADCMaskedStrips.h>
-#include <svd/dbobjects/SVDLocalRunBadStrips.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 
-#include <vxd/dataobjects/VxdID.h>
-
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <TFile.h>
-#include <TVectorF.h>
 
 using namespace std;
 using namespace Belle2;

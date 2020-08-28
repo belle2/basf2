@@ -9,9 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-
-#include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/topology/EStereoKind.h>
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
@@ -27,6 +24,8 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
     class CDCTrajectory2D;
+    class CDCWireHit;
+    class CDCWire;
     class Vector3D;
     class Vector2D;
 
@@ -108,7 +107,7 @@ namespace Belle2 {
       /// Equality comparison based on wire hit, left right passage information.
       bool operator==(const CDCRLWireHit& rhs) const
       {
-        return getWireHit() == rhs.getWireHit() and getRLInfo() == rhs.getRLInfo();
+        return &getWireHit() == &rhs.getWireHit() and getRLInfo() == rhs.getRLInfo();
       }
 
       /**
@@ -117,20 +116,20 @@ namespace Belle2 {
        */
       bool operator<(const CDCRLWireHit& rhs) const
       {
-        return getWireHit() < rhs.getWireHit() or
-               (getWireHit() == rhs.getWireHit() and (getRLInfo() < rhs.getRLInfo()));
+        return &getWireHit() < &rhs.getWireHit() or
+               (&getWireHit() == &rhs.getWireHit() and (getRLInfo() < rhs.getRLInfo()));
       }
 
       /// Defines wires and oriented wire hits to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCRLWireHit& rlWireHit, const CDCWire& wire)
       {
-        return rlWireHit.getWire() < wire;
+        return &rlWireHit.getWire() < &wire;
       }
 
       /// Defines oriented wire hits and wires to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCWire& wire, const CDCRLWireHit& rlWireHit)
       {
-        return wire < rlWireHit.getWire();
+        return &wire < &rlWireHit.getWire();
       }
 
       /**

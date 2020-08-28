@@ -11,9 +11,10 @@
 #pragma once
 
 #include <TObject.h>
-#include <functional>
+
+#include <cmath>
 #include <vector>
-#include <framework/logging/Logger.h>
+
 namespace Belle2 {
 
   /** class to contain the cut on svd hit time at SP creation step*/
@@ -27,6 +28,7 @@ namespace Belle2 {
     /** returns whether the hit came on time or not */
     bool isInTime(double svdTime, double svdTimeError = 0, double t0 = 0 , double t0Error = 0)
     {
+      // cppcheck-suppress assignBoolToPointer
       selFunction f = m_implementations[m_current];
       return (this->*f)(svdTime, svdTimeError, t0, t0Error) ;
     }
@@ -34,7 +36,7 @@ namespace Belle2 {
     /** returns whether the uCluster time is compatible with the vClsuter time */
     bool areClustersInTime(double uTime, double vTime)
     {
-      if (abs(uTime - vTime) > m_maxUVTimeDifference)
+      if (std::abs(uTime - vTime) > m_maxUVTimeDifference)
         return false;
       return true;
     }

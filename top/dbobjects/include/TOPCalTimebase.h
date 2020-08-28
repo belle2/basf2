@@ -10,10 +10,12 @@
 
 #pragma once
 
-#include <TObject.h>
-#include <vector>
 #include <top/dbobjects/TOPSampleTimes.h>
-#include <framework/logging/Logger.h>
+
+#include <TObject.h>
+
+#include <map>
+#include <vector>
 
 namespace Belle2 {
 

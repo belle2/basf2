@@ -8,41 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPBACKGROUND_H
-#define TOPBACKGROUND_H
+#pragma once
 
 #include <framework/core/Module.h>
 
 #include <string>
 
-
-#include <TVector3.h>
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TTree.h>
-#include <TCanvas.h>
-#include <TStyle.h>
-#include <TMath.h>
-#include <TBox.h>
-#include <TSystem.h>
-#include <TROOT.h>
-#include <TPad.h>
-#include <TGaxis.h>
-#include <TLatex.h>
-#include <TRandom1.h>
 #include <TGraph.h>
-#include <TGraphPainter.h>
-#include <THistPainter.h>
-#include <TColor.h>
-#include <TMultiGraph.h>
-#include <TLegend.h>
-
-#include <top/dataobjects/TOPDigit.h>
-#include <top/dataobjects/TOPBarHit.h>
-#include <top/dataobjects/TOPSimHit.h>
-#include <simulation/dataobjects/BeamBackHit.h>
-#include <mdst/dataobjects/MCParticle.h>
 
 
 namespace Belle2 {
@@ -163,5 +139,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif // TOPBACKGROUND_H

@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_PIXEL_H
-#define PXD_PIXEL_H
+#pragma once
 
 #include <pxd/dataobjects/PXDRawHit.h>
 #include <pxd/dataobjects/PXDDigit.h>
@@ -85,5 +84,3 @@ namespace Belle2 {
 
   } // PXD namespace
 } // Belle2 namespace
-
-#endif //PXD_PIXEL_H

@@ -5,13 +5,10 @@
 #include <trg/gdl/dataobjects/TRGGDLUnpackerStore.h>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 #include <trg/gdl/TrgBit.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
-#include <stdlib.h>
-#include <iostream>
 #include <string>
 
 #include <TH2I.h>
@@ -131,7 +128,7 @@ namespace Belle2 {
     //private:
     //StoreArray<TRGGDLUnpackerStore> store;
 
-    static const int n_output_extra = 42;
+    static const int n_output_extra = 62;
     static const char* output_extra[n_output_extra];
 
     //condition database for unpacker

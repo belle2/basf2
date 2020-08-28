@@ -18,8 +18,7 @@
 
 
 
-#ifndef PACKAGE_PARTICLE_ARRAY_H_INCLUDED
-#define PACKAGE_PARTICLE_ARRAY_H_INCLUDED
+#pragma once
 
 #include <TLorentzVector.h>
 
@@ -58,5 +57,4 @@ namespace Belle2 {
   };
 } // namespace Belle
 
-#endif /* PACKAGE_PARTICLE_ARRAY_H_INCLUDED */
 

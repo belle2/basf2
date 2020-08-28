@@ -23,7 +23,6 @@
 #include "trg/gdl/TRGGDL.h"
 #include <TDirectory.h>
 #include <TH1I.h>
-#include <TH2I.h>
 
 namespace Belle2 {
 

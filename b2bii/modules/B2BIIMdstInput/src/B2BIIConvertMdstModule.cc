@@ -718,12 +718,27 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TLorentzVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
     TVector3 v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
 
+    /*
+     * Documentation of Mdst_vee2 vertex fit:
+     *      /sw/belle/belle/b20090127_0910/share/tables/mdst.tdf (L96-L125)
+     */
+    auto appendVertexFitInfo = [](Belle::Mdst_vee2 & _belle_V0, Particle & _belle2_V0) {
+      // Add chisq of vertex fit. chiSquared=10^10 means the fit fails.
+      _belle2_V0.addExtraInfo("chiSquared", _belle_V0.chisq());
+      // Ndf of the vertex kinematic fit is 1
+      _belle2_V0.addExtraInfo("ndf", 1);
+      // Add p-value to extra Info
+      double prob = TMath::Prob(_belle_V0.chisq(), 1);
+      _belle2_V0.setPValue(prob);
+    };
+
     Particle* newV0 = nullptr;
     if (belleV0.kind() == 1) { // K0s -> pi+ pi-
       Particle KS(v0Momentum, 310);
       KS.appendDaughter(newDaugP);
       KS.appendDaughter(newDaugM);
       KS.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, KS);
       newV0 = m_particles.appendNew(KS);
       ksPList->addParticle(newV0);
 
@@ -771,6 +786,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.appendDaughter(newDaugP);
       Lambda0.appendDaughter(newDaugM);
       Lambda0.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, Lambda0);
       newV0 = m_particles.appendNew(Lambda0);
       lambda0PList->addParticle(newV0);
 
@@ -783,6 +799,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       antiLambda0.appendDaughter(newDaugM);
       antiLambda0.appendDaughter(newDaugP);
       antiLambda0.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, antiLambda0);
       newV0 = m_particles.appendNew(antiLambda0);
       antiLambda0PList->addParticle(newV0);
 
@@ -795,6 +812,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       gamma.appendDaughter(newDaugP);
       gamma.appendDaughter(newDaugM);
       gamma.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, gamma);
       newV0 = m_particles.appendNew(gamma);
       convGammaPList->addParticle(newV0);
     }
@@ -1111,7 +1129,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
   // Create and initialize particle list
   StoreObjPtr<ParticleList> plist("K_L0:mdst");
   plist.create();
-  plist->initialize(130, "K_L0:mdst");
+  plist->initialize(Const::Klong.getPDGCode(), "K_L0:mdst");
 
   Belle::Mdst_klong_Manager& klong_manager = Belle::Mdst_klong_Manager::get_manager();
   for (Belle::Mdst_klong_Manager::iterator klong_Ite = klong_manager.begin(); klong_Ite != klong_manager.end(); ++klong_Ite) {
@@ -1153,7 +1171,7 @@ void B2BIIConvertMdstModule::convertMdstKLongTable()
 
     for (Belle::Gen_hepevt_Manager::iterator klong_hep_it = GenMgr.begin(); klong_hep_it != GenMgr.end(); ++klong_hep_it) {
 
-      if (abs((*klong_hep_it).idhep()) == 130 && klong_hep_it->isthep() > 0) {
+      if (abs((*klong_hep_it).idhep()) == Const::Klong.getPDGCode() && klong_hep_it->isthep() > 0) {
 
         CLHEP::HepLorentzVector gp4(klong_hep_it->PX(), klong_hep_it->PY(), klong_hep_it->PZ(), klong_hep_it->E());
         double sum(0.0);

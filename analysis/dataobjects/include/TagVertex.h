@@ -400,8 +400,8 @@ namespace Belle2 {
     float m_deltaTErr;                  /**< Delta t error */
     TVector3 m_mcTagV;                  /**< generated Btag vertex */
     int m_mcPDG;                        /**< generated tag side B flavor (PDG code) */
-    float m_mcDeltaTau;                 /**< generated Delta t */
-    float m_mcDeltaT;                   /**< generated Delta t approximated */
+    float m_mcDeltaTau;                 /**< generated Delta t: difference between signal and tag flight times */
+    float m_mcDeltaT;                   /**< generated Delta t approximated: true Delta L divided by Upsilon(4S)'s boost */
     int m_FitType;                      /**< Fit algo used */
     int m_NTracks;                      /**< Number of tracks used in the fit */
     float m_tagVl;                      /**< tagV component in the boost direction  */
@@ -436,7 +436,8 @@ namespace Belle2 {
      */
     void resetConstraintCov();
 
-    ClassDef(TagVertex, 4) /**<
+    ClassDef(TagVertex, 5) /**<
+           5. Renamed variables related to DeltaZ and DeltaT
            4. Add info related to fit tracks, rave weights
            3. Add NDF, Chi2, Chi2IP
            2. Name to contain "Tag"

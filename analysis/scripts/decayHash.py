@@ -10,15 +10,15 @@ import basf2
 import pybasf2
 # inspect is also used by LogPythonInterface. Do not remove
 import inspect
-logging = pybasf2.LogPythonInterface()
-
 import numpy as np
 import collections
-
 import ROOT
+from ROOT import Belle2
+
+logging = pybasf2.LogPythonInterface()
+
 ROOT.gSystem.Load("libanalysis.so")
 ROOT.gSystem.Load("libanalysis_utility.so")
-from ROOT import Belle2
 
 
 def _bitwiseConversion(value, i='f', o='i'):
@@ -130,7 +130,7 @@ def _pdg_to_name(x):
     pdg_string = str(pdg_code)
     try:
         pdg_string = pdg.to_name(pdg_code)
-    except:
+    except BaseException:
         pass
 
     if selected:

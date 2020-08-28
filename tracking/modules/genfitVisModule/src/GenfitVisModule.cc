@@ -45,7 +45,7 @@ void GenfitVisModule::initialize()
   if (!genfit::MaterialEffects::getInstance()->isInitialized())
     B2FATAL("No material effects setup.  Please use SetupGenfitExtrapolationModule.");
 
-  if (gGeoManager == NULL) {
+  if (gGeoManager == nullptr) {
     B2INFO("Setting up TGeo geometry for visualization.");
     geometry::GeometryManager& geoManager = geometry::GeometryManager::getInstance();
     geoManager.createTGeoRepresentation();

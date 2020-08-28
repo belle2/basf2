@@ -14,13 +14,10 @@
 #ifndef TRGECLCLUSTER_FLAG_
 #define TRGECLCLUSTER_FLAG_
 
-#include <iostream>
-#include <string>
 #include <vector>
 
 //#include "trg/ecl/TrgEclFAM.h"
 #include "trg/ecl/TrgEclMapping.h"
-#include "TVector3.h"
 //
 //
 //

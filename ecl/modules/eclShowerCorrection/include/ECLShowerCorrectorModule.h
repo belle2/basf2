@@ -6,7 +6,7 @@
  * leakage): corr = (Reconstructed / Truth).                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *               Alon Hershenhorn (hersehn@physics.ubc.ca)                *
  *               Suman Koirala (suman@ntu.edu.tw)                         *
  *                                                                        *

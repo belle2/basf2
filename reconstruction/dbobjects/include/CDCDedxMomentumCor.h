@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    explicit CDCDedxMomentumCor(std::vector<double>& momcor): m_momcor(momcor) {};
+    explicit CDCDedxMomentumCor(const std::vector<double>& momcor): m_momcor(momcor) {};
 
     /**
      * Destructor
@@ -65,7 +65,7 @@ namespace Belle2 {
     std::vector<double> getMomCor() const {return m_momcor; };
 
     /** Return dE/dx mean value for given bin
-     * @param cos(theta) bin
+     * @param bin for const from bin number
      */
     double getMean(unsigned int bin) const
     {
@@ -74,7 +74,7 @@ namespace Belle2 {
     }
 
     /** Return dE/dx mean value for given cos(theta)
-     * @param cos(theta)
+     * @param mom for const from momemtum value
      */
     double getMean(double mom) const
     {
@@ -92,6 +92,6 @@ namespace Belle2 {
 
     std::vector<double> m_momcor; /**< dE/dx gains in momentum bins */
 
-    ClassDef(CDCDedxMomentumCor, 4); /**< ClassDef */
+    ClassDef(CDCDedxMomentumCor, 5); /**< ClassDef */
   };
 } // end namespace Belle2

@@ -15,7 +15,6 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 
 #include <fstream>

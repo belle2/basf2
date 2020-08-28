@@ -38,16 +38,20 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            10);
   addParam("MinHitsForFlagging", m_MinHitsForFlagging, "Minimal number of hits in a channel required to flag it as 'Masked' or 'Hot'",
            50);
+  addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
+           "Minimal number of processed events required to print error messages", 10000.);
 
+  m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
+  m_ProcessedEvents = 0.;
   m_ChannelArrayIndex = &(KLMChannelArrayIndex::Instance());
   m_SectorArrayIndex = &(KLMSectorArrayIndex::Instance());
   m_ElementNumbers = &(KLMElementNumbers::Instance());
   m_eklmElementNumbers = &(EKLMElementNumbers::Instance());
-  m_PlaneLine.SetLineColor(8); // dark green
+  m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
   m_PlaneLine.SetLineStyle(2); // dashed
-  m_PlaneText.SetTextAlign(22); // centred, middle
-  m_PlaneText.SetTextColor(8); // dark green
+  m_PlaneText.SetTextAlign(22); // centered, middle
+  m_PlaneText.SetTextColor(kMagenta);
   m_PlaneText.SetTextFont(42); // Helvetica regular
   m_PlaneText.SetTextSize(0.02); // 2% of TPad's full height
 }
@@ -72,12 +76,27 @@ void DQMHistAnalysisKLMModule::beginRun()
 {
   if (!m_ElectronicsMap.isValid())
     B2FATAL("No KLM electronics map.");
-  m_NewMaskedChannels.clear();
+  m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
+  m_ProcessedEvents = 0.;
+  m_DeadBarrelModules.clear();
+  m_DeadEndcapModules.clear();
   m_MaskedChannels.clear();
 }
 
 void DQMHistAnalysisKLMModule::endRun()
 {
+}
+
+double DQMHistAnalysisKLMModule::getProcessedEvents()
+{
+  TH1* histogram = findHist("DAQ/Nevent");
+  if (histogram == nullptr) {
+    B2WARNING("DAQ DQM histogram DAQ/Nevent is not found.");
+    /* Set the minimal number of processed events to 0 if we can't determine the processed events. */
+    m_MinProcessedEventsForMessages = 0.;
+    return 0.;
+  }
+  return histogram->GetEntries();
 }
 
 void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
@@ -89,19 +108,19 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   int i, n;
   std::map<uint16_t, double> moduleHitMap;
   std::map<uint16_t, double>::iterator it;
-  double nHits, nHitsPerModule, average;
+  double average = 0;
   int channelSubdetector, channelSection, channelSector;
   int layer, plane, strip;
   std::string str;
   canvas->Clear();
   canvas->cd();
+  histogram->SetStats(false);
   histogram->Draw();
-  average = 0;
   n = histogram->GetXaxis()->GetNbins();
   for (i = 1; i <= n; i++) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
-    nHitsPerModule = histogram->GetBinContent(i);
+    double nHitsPerModule = histogram->GetBinContent(i);
     average = average + nHitsPerModule;
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
@@ -120,12 +139,13 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   }
   unsigned int activeModuleChannels = 0;
   for (it = moduleHitMap.begin(); it != moduleHitMap.end(); ++it) {
+    uint16_t moduleNumber = it->first;
     if (it->second != 0) {
-      activeModuleChannels += m_ElementNumbers->getNChannelsModule(it->first);
+      activeModuleChannels += m_ElementNumbers->getNChannelsModule(moduleNumber);
       continue;
     }
     m_ElementNumbers->moduleNumberToElementNumbers(
-      it->first, &channelSubdetector, &channelSection, &channelSector, &layer);
+      moduleNumber, &channelSubdetector, &channelSection, &channelSector, &layer);
     /* Channel with plane = 1, strip = 1 exists for any BKLM or EKLM module. */
     uint16_t channel = m_ElementNumbers->channelNumber(
                          channelSubdetector, channelSection, channelSector,
@@ -145,6 +165,25 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     str += ", lane " + std::to_string(electronicsChannel->getLane());
     latex.DrawLatexNDC(x, y, str.c_str());
     y -= 0.05;
+    /* Store the module number, used later in processPlaneHistogram
+     * to color the canvas with red and to raise up an alarm. */
+    if (channelSubdetector == KLMElementNumbers::c_BKLM) {
+      std::vector<uint16_t>::iterator ite = std::find(m_DeadBarrelModules.begin(),
+                                                      m_DeadBarrelModules.end(),
+                                                      moduleNumber);
+      if (ite == m_DeadBarrelModules.end())
+        m_DeadBarrelModules.push_back(moduleNumber);
+    } else {
+      std::vector<uint16_t>::iterator ite = std::find(m_DeadEndcapModules.begin(),
+                                                      m_DeadEndcapModules.end(),
+                                                      moduleNumber);
+      if (ite == m_DeadEndcapModules.end()) {
+        /* FIXME: remove this hard-coded selection for EB3, layer 6. */
+        if (moduleNumber != 24) {
+          m_DeadEndcapModules.push_back(moduleNumber);
+        }
+      }
+    }
   }
   if (activeModuleChannels == 0)
     return;
@@ -152,7 +191,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   for (i = 1; i <= n; ++i) {
     uint16_t channelIndex = std::round(histogram->GetBinCenter(i));
     uint16_t channelNumber = m_ChannelArrayIndex->getNumber(channelIndex);
-    nHits = histogram->GetBinContent(i);
+    double nHits = histogram->GetBinContent(i);
     m_ElementNumbers->channelNumberToElementNumbers(
       channelNumber, &channelSubdetector, &channelSection, &channelSector,
       &layer, &plane, &strip);
@@ -163,7 +202,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
                                                       m_MaskedChannels.end(),
                                                       channelNumber);
       if (ite == m_MaskedChannels.end())
-        m_NewMaskedChannels.push_back(channelNumber);
+        m_MaskedChannels.push_back(channelNumber);
+      B2DEBUG(20, "KLM@MaskMe " << channelNumber);
     } else if ((nHits > average * m_ThresholdForHot) && (nHits > m_MinHitsForFlagging)) {
       channelStatus = "Hot";
     }
@@ -205,12 +245,13 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
     B2ERROR("KLM DQM histogram canvas KLM/c_" << histName << " is not found.");
     return;
   }
+  histogram->Clear();
   canvas->Clear();
   canvas->cd();
-  if (m_NewMaskedChannels.size() > 0) {
+  if (m_MaskedChannels.size() > 0) {
     int channelSubdetector, channelSection, channelSector;
     int layer, plane, strip;
-    for (uint16_t channel : m_NewMaskedChannels) {
+    for (uint16_t channel : m_MaskedChannels) {
       m_ElementNumbers->channelNumberToElementNumbers(
         channel, &channelSubdetector, &channelSection, &channelSector,
         &layer, &plane, &strip);
@@ -221,22 +262,23 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
         sectorNumber = m_ElementNumbers->sectorNumberEKLM(channelSection, channelSector);
       uint16_t sectorIndex = m_SectorArrayIndex->getIndex(sectorNumber);
       histogram->Fill(sectorIndex);
-      m_MaskedChannels.push_back(channel);
     }
   }
-  m_NewMaskedChannels.clear();
   histogram->SetStats(false);
   histogram->Draw();
   canvas->Modified();
 }
 
 void DQMHistAnalysisKLMModule::processPlaneHistogram(
-  const std::string& histName)
+  const std::string& histName, TLatex& latex)
 {
-  std::string name;
+  std::string name, alarm;
   const double histMinNDC = 0.1;
   const double histMaxNDC = 0.9;
   const double histRangeNDC = histMaxNDC - histMinNDC;
+  int moduleSubdetector, moduleSection, moduleSector, moduleLayer;
+  double xAlarm = 0.15;
+  double yAlarm = 0.8;
   TH1* histogram = findHist("KLM/" + histName);
   if (histogram == nullptr) {
     B2ERROR("KLM DQM histogram KLM/" << histName << " is not found.");
@@ -253,6 +295,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   histogram->Draw();
   canvas->Modified();
   if (histName.find("bklm") != std::string::npos) {
+    /* First draw the vertical lines and the sector names. */
     const double maximalSector = BKLMElementNumbers::getMaximalSectorGlobalNumber();
     for (int sector = 0; sector < BKLMElementNumbers::getMaximalSectorGlobalNumber(); ++sector) {
       double xLineNDC = histMinNDC + (histRangeNDC * sector) / maximalSector;
@@ -268,7 +311,27 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       name += std::to_string(sector % 8);
       m_PlaneText.DrawTextNDC(xTextNDC, yTextNDC, name.c_str());
     }
+    /* Then, color the canvas with red if there is a dead module
+     * and write an error message. */
+    if (m_DeadBarrelModules.size() == 0) {
+      canvas->Pad()->SetFillColor(kWhite);
+      canvas->Update();
+    } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
+      canvas->Pad()->SetFillColor(kRed);
+      for (uint16_t module : m_DeadBarrelModules) {
+        m_ElementNumbers->moduleNumberToElementNumbers(
+          module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
+        alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
+        alarm += ", layer " + std::to_string(moduleLayer);
+        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        yAlarm -= 0.05;
+      }
+      alarm = "Call the KLM experts immediately!";
+      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+      canvas->Update();
+    }
   } else {
+    /* First draw the vertical lines and the sector names. */
     const double maximalLayer = EKLMElementNumbers::getMaximalLayerGlobalNumber();
     for (int layerGlobal = 1; layerGlobal <= maximalLayer; ++layerGlobal) {
       double xLineNDC = histMinNDC + (histRangeNDC * layerGlobal) / maximalLayer;
@@ -286,6 +349,25 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       name += std::to_string(layer);
       m_PlaneText.DrawTextNDC(xTextNDC, yTextNDC, name.c_str());
     }
+    /* Then, color the canvas with red if there is a dead module
+     * and write an error message. */
+    if (m_DeadEndcapModules.size() == 0) {
+      canvas->Pad()->SetFillColor(kWhite);
+      canvas->Update();
+    } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
+      canvas->Pad()->SetFillColor(kRed);
+      for (uint16_t module : m_DeadEndcapModules) {
+        m_ElementNumbers->moduleNumberToElementNumbers(
+          module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
+        alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
+        alarm += ", layer " + std::to_string(moduleLayer);
+        latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+        yAlarm -= 0.05;
+      }
+      alarm = "Call the KLM experts immediately!";
+      latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
+      canvas->Update();
+    }
   }
 }
 
@@ -293,9 +375,10 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 {
   TIter nextkey(gROOT->GetListOfCanvases());
   TObject* obj = nullptr;
-  while ((obj = (TObject*)nextkey())) {
+  while ((obj = static_cast<TObject*>(nextkey()))) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
-      if (obj->GetName() == canvasName) return (TCanvas*)obj;
+      if (obj->GetName() == canvasName)
+        return static_cast<TCanvas*>(obj);
     }
   }
   return nullptr;
@@ -304,6 +387,11 @@ TCanvas* DQMHistAnalysisKLMModule::findCanvas(const std::string& canvasName)
 
 void DQMHistAnalysisKLMModule::event()
 {
+  /* Make sure that the vectors are cleared at each DQM refresh. */
+  m_DeadBarrelModules.clear();
+  m_DeadEndcapModules.clear();
+  m_MaskedChannels.clear();
+  m_ProcessedEvents = getProcessedEvents();
   std::string str, histogramName, canvasName;
   TLatex latex;
   latex.SetTextColor(kRed);
@@ -339,7 +427,8 @@ void DQMHistAnalysisKLMModule::event()
     }
   }
   fillMaskedChannelsHistogram("masked_channels");
-  processPlaneHistogram("plane_bklm_phi");
-  processPlaneHistogram("plane_bklm_z");
-  processPlaneHistogram("plane_eklm");
+  latex.SetTextColor(kBlue);
+  processPlaneHistogram("plane_bklm_phi", latex);
+  processPlaneHistogram("plane_bklm_z", latex);
+  processPlaneHistogram("plane_eklm", latex);
 }

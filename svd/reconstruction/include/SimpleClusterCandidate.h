@@ -43,6 +43,13 @@ namespace Belle2 {
       SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent, double cutSNR,
                              int timeAlgorithm);
 
+      /** You can specify the name of StoreArray<SVDShaperDigit> and StoreArray<SVDRecoDigit> */
+      /** which are needed to get clustered samples. */
+      SimpleClusterCandidate(VxdID vxdID, bool isUside, int sizeHeadTail, double cutSeed, double cutAdjacent, double cutSNR,
+                             int timeAlgorithm,
+                             const std::string& storeShaperDigitsName,
+                             const std::string& storeRecoDigitsName);
+
       /**
        * Add a Strip to the current cluster.
        * Update the cluster seed seed.
@@ -233,6 +240,12 @@ namespace Belle2 {
 
       /** vector containing the strips in the cluster */
       std::vector<stripInCluster> m_strips;
+
+      /** Name of the collection to use for the SVDShaperDigits */
+      std::string m_storeShaperDigitsName;
+
+      /** Name of the collection to use for the SVDRecoDigits */
+      std::string m_storeRecoDigitsName;
 
     };
 

@@ -20,8 +20,6 @@
 #include <G4StateManager.hh>
 
 
-static const bool debug = false;
-
 using namespace Belle2;
 
 namespace Belle2 {
@@ -370,17 +368,15 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
   // No boundary in sight?
   if (safety > fabs(sMax)) {
-    if (debug)
-      std::cout << "   next boundary is farther away than sMax \n";
+    B2DEBUG(20, "   next boundary is farther away than sMax ");
     return stepSign * safety; // sMax
   }
 
   // Are we at the boundary?
   if (slDist < delta) {
-    if (debug)
-      std::cout << "   very close to the boundary -> return @ it " << it
-                << " stepSign*slDist = "
-                << stepSign << "*" << slDist << "\n";
+    B2DEBUG(20, "   very close to the boundary -> return @ it " << it
+            << " stepSign*slDist = "
+            << stepSign << "*" << slDist);
     return stepSign * slDist;
   }
   double step = slDist;
@@ -401,7 +397,7 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
     // Always propagate complete way from original start to avoid
     // inconsistent extrapolations.  This is always a single RK step.
     state7 = stateOrig;
-    rep->RKPropagate(state7, NULL, SA, stepSign * (s + step), varField);
+    rep->RKPropagate(state7, nullptr, SA, stepSign * (s + step), varField);
 
     G4ThreeVector pos(state7[0] * CLHEP::cm, state7[1] * CLHEP::cm, state7[2] * CLHEP::cm);
     G4ThreeVector dir(stepSign * state7[3], stepSign * state7[4], stepSign * state7[5]);
@@ -480,10 +476,9 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
         // Are we at the boundary?
         if (slDist < delta) {
-          if (debug)
-            std::cout << "   very close to the boundary -> return @ it " << it
-                      << " stepSign*(s + slDist) = "
-                      << stepSign << "*(" << s + slDist << ")\n";
+          B2DEBUG(20, "   very close to the boundary -> return @ it " << it
+                  << " stepSign*(s + slDist) = "
+                  << stepSign << "*(" << s + slDist << ")");
           return stepSign * (s + slDist);
         }
 
@@ -516,17 +511,15 @@ Geant4MaterialInterface::findNextBoundary(const genfit::RKTrackRep* rep,
 
     // No boundary in sight?
     if (s + safety > fabs(sMax)) {
-      if (debug)
-        std::cout << "   next boundary is farther away than sMax \n";
+      B2DEBUG(20, "   next boundary is farther away than sMax");
       return stepSign * (s + safety); // sMax
     }
 
     // Are we at the boundary?
     if (slDist < delta) {
-      if (debug)
-        std::cout << "   very close to the boundary -> return @ it " << it
-                  << " stepSign*(s + slDist) = "
-                  << stepSign << "*(" << s + slDist << ")\n";
+      B2DEBUG(20, "   very close to the boundary -> return @ it " << it
+              << " stepSign*(s + slDist) = "
+              << stepSign << "*(" << s + slDist << ")");
       return stepSign * (s + slDist);
     }
   }

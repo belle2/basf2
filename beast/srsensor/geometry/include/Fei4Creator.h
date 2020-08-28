@@ -24,8 +24,20 @@ namespace Belle2 {
     /** The creator for the FEI4 geometry. */
     class Fei4Creator : public geometry::CreatorBase {
     public:
+      /**
+       * Constructor
+       */
       Fei4Creator();
+      /**
+       * Destructor
+       */
       virtual ~Fei4Creator();
+      /**
+       * Creation of the detector geometry from Gearbox (XML).
+       * @param[in] content   XML data directory.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
+       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
       /**  SensitiveDetector FEI4 */

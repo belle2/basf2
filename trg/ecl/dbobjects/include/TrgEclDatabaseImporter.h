@@ -13,15 +13,11 @@
 #ifndef TRGECLDATABASEIMPORTER_H
 #define TRGECLDATABASEIMPORTER_H
 
+#include <Rtypes.h>
 
-#include <iostream>
-#include <TObject.h>
-#include <TVector3.h>
-
+#include <string>
 
 namespace Belle2 {
-  /// Database importer of TRGECL
-  class TrgEclDatabaseImporter;
   /// Database importer of TRGECL
   class TrgEclDatabaseImporter {
 
@@ -67,8 +63,6 @@ namespace Belle2 {
     int endExp;
     //! End Run Number
     int endRun;
-    //! Class Def
-    ClassDef(TrgEclDatabaseImporter, 1);
   };
 } // End namespace Belle2
 #endif

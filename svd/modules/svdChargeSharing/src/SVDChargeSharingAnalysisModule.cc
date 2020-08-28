@@ -15,10 +15,7 @@
 #include <reconstruction/dataobjects/VXDDedxTrack.h>
 #include <vxd/geometry/GeoCache.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
-#include <svd/dataobjects/SVDTrueHit.h>
-#include <tracking/dataobjects/SVDIntercept.h>
 
-#include <cmath>
 #include <boost/foreach.hpp>
 
 #include <TCanvas.h>
@@ -26,9 +23,6 @@
 #include <TLegend.h>
 #include <TROOT.h>
 #include <TStyle.h>
-#include <TLatex.h>
-#include <TGaxis.h>
-#include <TPaveLabel.h>
 
 
 /* --------------- WARNING ---------------------------------------------- *
@@ -69,6 +63,7 @@ SVDChargeSharingAnalysisModule::~SVDChargeSharingAnalysisModule()
 
 void SVDChargeSharingAnalysisModule::initialize()
 {
+  // cppcheck-suppress publicAllocationError
   m_outputRootFile = new TFile((m_outputDirName + "/" + m_outputRootFileName).c_str(), "RECREATE");
 
   //StoreArrays
@@ -189,7 +184,7 @@ void SVDChargeSharingAnalysisModule::event()
 
     h_nTracks->Fill(m_Tracks.getEntries());
     // Obtaining track momentum, P value & SVD hits, track hypothesis made for pions(or electrons in case of TB)
-    const TrackFitResult* tfr = NULL;
+    const TrackFitResult* tfr = nullptr;
     tfr = track.getTrackFitResult(Const::pion);
 
     if (tfr) {
@@ -285,7 +280,7 @@ void SVDChargeSharingAnalysisModule::terminate()
     }
   }
   // save to .root file
-  if (m_outputRootFile != NULL) {
+  if (m_outputRootFile != nullptr) {
     m_outputRootFile->cd();
     TDirectory* oldDir = gDirectory;
 
@@ -335,6 +330,9 @@ void SVDChargeSharingAnalysisModule::terminate()
     }
     m_outputRootFile->Close();
   }
+
+  delete m_outputRootFile;
+
 } //terminate
 
 TH1F* SVDChargeSharingAnalysisModule::createHistogram1D(const char* name, const char* title,

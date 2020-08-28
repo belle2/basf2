@@ -36,22 +36,38 @@ namespace Belle2 {
     /**  */
     virtual ~AnalysisPhase1StudyModule();
 
-    /**  */
+    /**
+     * Initialize the Module.
+     * This method is called at the beginning of data processing.
+     */
     virtual void initialize() override;
 
-    /**  */
+    /**
+     * Called when entering a new run.
+     * Set run dependent things like run header parameters, alignment, etc.
+     */
     virtual void beginRun() override;
 
-    /**  */
+    /**
+     * Event processor.
+     */
     virtual void event() override;
 
-    /**  */
+    /**
+     * End-of-run action.
+     * Save run-related stuff, such as statistics.
+     */
     virtual void endRun() override;
 
-    /**  */
+    /**
+     * Termination action.
+     * Clean-up, close files, summarize statistics, etc.
+     */
     virtual void terminate() override;
 
-    /** Defines the histograms*/
+    /**
+     * Defines the histograms
+     */
     virtual void defineHisto() override;
 
   private:
@@ -64,7 +80,9 @@ namespace Belle2 {
     TH2F* h_decavtx[10] = {nullptr};
     /** kin v z */
     TH2F* h_kineticvz[10] = {nullptr};
+    /** kin v z1 */
     TH2F* h_kineticvz1[10] = {nullptr};
+    /** kin v z2 */
     TH2F* h_kineticvz2[10] = {nullptr};
     /** kin v z */
     TH2F* h_kineticvz_zoom[10] = {nullptr};
@@ -76,7 +94,9 @@ namespace Belle2 {
     TH2F* h_thetavz[10] = {nullptr};
     /** phi v z */
     TH2F* h_phivz[10] = {nullptr};
+    /** phi v e */
     TH2F* h_phive[10] = {nullptr};
+    /** r v e */
     TH2F* h_rve[10] = {nullptr};
     /** sad xy */
     TH2F* h_sad_xy[2] = {nullptr};

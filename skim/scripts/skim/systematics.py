@@ -11,9 +11,12 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
-from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 import vertex
-
+from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
+from stdPi0s import stdPi0s
+from stdV0s import stdKshorts
 
 # TODO: Add liaison name and email address
 __liaison__ = ""
@@ -30,12 +33,9 @@ class Systematics(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdK("all", path=path)
+        stdPi("all", path=path)
 
     TestFiles = [get_test_file("MC13_ccbarBGx1")]
 
@@ -110,15 +110,10 @@ class SystematicsTracking(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["loose"],
-            "stdPi": ["loose"],
-        },
-        "stdPi0s": {
-            "stdPi0s": ["eff40_Jan2020"]
-        }
-    }
+    def load_standard_lists(self, path):
+        stdK("loose", path=path)
+        stdPi("loose", path=path)
+        stdPi0s("eff40_Jan2020", path=path)
 
     def build_lists(self, path):
         lists = [
@@ -213,17 +208,12 @@ class Resonance(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["loose"],
-            "stdMu": ["loose"],
-            "stdPi": ["loose"],
-            "stdPr": ["loose"],
-        },
-        "stdPi0s": {
-            "stdPi0s": ["eff40_Jan2020Fit"]
-        }
-    }
+    def load_standard_lists(self, path):
+        stdK("loose", path=path)
+        stdMu("loose", path=path)
+        stdPi("loose", path=path)
+        stdPr("loose", path=path)
+        stdPi0s("eff40_Jan2020Fit", path=path)
 
     def build_lists(self, path):
         lists = [
@@ -386,11 +376,8 @@ class SystematicsRadMuMu(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics, photon calibration"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdMu": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         # the tight selection starts with all muons, but they  must be cluster-matched and not be an electron
@@ -432,11 +419,8 @@ class SystematicsEELL(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics, lepton ID"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
 
     def build_lists(self, path):
         # At skim level we avoid any PID-like requirements and just select events
@@ -478,11 +462,8 @@ class SystematicsRadEE(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics, photon calibration"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
 
     def __init__(self, prescale_all=1, prescale_fwd_electron=1, **kwargs):
         """
@@ -556,8 +537,6 @@ class SystematicsLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    RequiredStandardLists = None
-
     def build_lists(self, path):
         LambdaCuts = "M < 1.2"
 
@@ -582,3 +561,47 @@ class SystematicsLambda(BaseSkim):
             LambdaList.append("Lambda0:syst" + str(chID))
 
         self.SkimLists = LambdaList
+
+
+@fancy_skim_header
+class SystematicsPhiGamma(BaseSkim):
+    """
+    Uses the ``gamma:loose`` list and a cut on the number of tracks.
+
+    Cuts applied:
+
+    * :math:`E_{\\gamma}> 3\\,\\text{GeV}` AND
+    * :math:`E_{\\gamma}< 8\\,\\text{GeV}`
+    * :math:`n_{\\text{tracks}} \\geq 2` AND :math:`n_{\\text{tracks}} \\leq 4`
+    * at least 1 candidate in the K_S0:merged or in the phi->K+:all K-:all lists
+    """
+    __authors__ = ["Giuseppe Finocchiaro", "Benjamin Oberhof"]
+    __description__ = (
+        "Skim for ISR - phi gamma analyses, "
+        ":math:`e^+ e^- \\to \\phi \\gamma ` and "
+        ":math:`\\phi` decays into two charged tracks "
+        "(:math:`K^+K^-` or :math:`K_S K_L` with :math:`K_S\\to \\pi^+\\pi^-`)"
+    )
+    __contact__ = __liaison__
+    __category__ = "systematics"
+
+    def load_standard_lists(self, path):
+        stdPhotons("loose", path=path)
+        stdK("all", path=path)
+        stdKshorts("merged", path=path)
+
+    TestFiles = [get_test_file("phigamma_neutral")]
+
+    def build_lists(self, path):
+        EventCuts = [
+            "[nTracks>=2] and [nTracks<=4]",
+            "[nParticlesInList(gamma:PhiSystematics) > 0]",
+            "[[nParticlesInList(phi:charged) > 0] or [nParticlesInList(K_S0:PhiSystematics) > 0]]"
+        ]
+
+        ma.cutAndCopyList("gamma:PhiSystematics", "gamma:loose", "3 < E < 8", writeOut=True, path=path)
+        ma.reconstructDecay('phi:charged -> K+:all K-:all', '0.9 < M < 1.2', path=path)
+        ma.copyList('K_S0:PhiSystematics', 'K_S0:merged', writeOut=True, path=path)
+
+        path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
+        self.SkimLists = ["gamma:PhiSystematics"]

@@ -10,7 +10,6 @@
 
 #include <simulation/physicslist/Belle2PhysicsList.h>
 #include "G4SystemOfUnits.hh"
-#include "G4UnitsTable.hh"
 #include "G4RegionStore.hh"
 #include "G4ProductionCuts.hh"
 
@@ -18,7 +17,6 @@
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
 #include "G4OpticalPhysics.hh"
-#include "G4EmParameters.hh"
 #include "G4DecayPhysics.hh"
 #include <simulation/physicslist/Geant4ePhysics.h>
 

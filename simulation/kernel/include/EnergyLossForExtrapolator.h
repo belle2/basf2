@@ -13,7 +13,6 @@
 #ifndef ENERGYLOSSFOREXTRAPOLATOR_H_
 #define ENERGYLOSSFOREXTRAPOLATOR_H_
 
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <globals.hh>

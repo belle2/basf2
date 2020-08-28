@@ -37,22 +37,38 @@ namespace Belle2 {
        */
       MicrotpcStudyModule();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~MicrotpcStudyModule();
 
-      /**  */
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
 
-      /**  */
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
 
-      /**  */
+      /**
+       * Event processor.
+       */
       virtual void event() override;
 
-      /**  */
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
 
-      /**  */
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
       /** Defines the histograms*/
@@ -84,7 +100,7 @@ namespace Belle2 {
       TH1F* h_tpc_rate[20];
       /** Neutron kin energy dis */
       TH2F* h_mctpc_kinetic[20];
-      /* Neutron kin energy dis */
+      /** Neutron kin energy dis */
       TH2F* h_mctpc_kinetic_zoom[20];
       /** theta v phi dis */
       TH2F* h_mctpc_tvp[20];

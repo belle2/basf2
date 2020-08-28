@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HELIX_H
-#define HELIX_H
+#pragma once
 
 #include <string>
 
@@ -507,5 +506,3 @@ namespace Belle2 {
 #undef inline
   }
 } // end of namespace Belle2
-
-#endif /* HELIX_H */

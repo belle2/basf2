@@ -13,13 +13,11 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/RelationArray.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/reconstruction/NNWaveFitter.h>
 #include <map>
 #include <vector>
-#include <memory>
 
 namespace Belle2 {
 

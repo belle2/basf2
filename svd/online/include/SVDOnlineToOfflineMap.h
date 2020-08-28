@@ -11,9 +11,7 @@
 #ifndef FADC_APV_MAPPER_H_
 #define FADC_APV_MAPPER_H_
 
-#include <iostream>
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <boost/property_tree/ptree.hpp>
 #include <unordered_map>
@@ -170,8 +168,7 @@ namespace Belle2 {
      * on SVDShaperDigit and its interface.
      */
     SVDShaperDigit* NewShaperDigit(unsigned char FADC, unsigned char APV25,
-                                   unsigned char channel, short samples[6], float time = 0.0,
-                                   SVDModeByte mode = SVDModeByte());
+                                   unsigned char channel, short samples[6], float time = 0.0);
 
     /** Get SensorInfo for a given FADC/APV combination.
      * @param FADC is FADC number from the SVDRawCopper data.

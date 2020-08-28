@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef PXD_DATAOBJECTS_PXDTRUEHIT_H
-#define PXD_DATAOBJECTS_PXDTRUEHIT_H
 
 #include <vxd/dataobjects/VXDTrueHit.h>
 
@@ -55,5 +53,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

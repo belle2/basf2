@@ -13,20 +13,16 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/dataobjects/VxdID.h>
 
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include "TString.h"
-#include "TH1D.h"
 #include "TH2D.h"
 
 namespace Belle2 {

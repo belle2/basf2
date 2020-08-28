@@ -541,7 +541,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cherry_config["/static"] = {
         'tools.staticdir.on': True,
         # only serve js, css, html and png files
-        'tools.staticdir.match': "^.*\.(js|css|html|png|js.map)$",
+        'tools.staticdir.match': r"^.*\.(js|css|html|png|js.map)$",
         'tools.staticdir.dir': static_folder
     }
     setup_gzip_compression("/static", cherry_config)
@@ -550,7 +550,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
     cherry_config["/plots"] = {
         'tools.staticdir.on': True,
         # only serve json and png files
-        'tools.staticdir.match': "^.*\.(png|json|pdf)$",
+        'tools.staticdir.match': r"^.*\.(png|json|pdf)$",
         'tools.staticdir.dir': comparison_folder
     }
     setup_gzip_compression("/plots", cherry_config)
@@ -560,7 +560,7 @@ def run_server(ip='127.0.0.1', port=8000, parse_command_line=False,
         'tools.staticdir.on': True,
         'tools.staticdir.dir': results_folder,
         # only serve root files
-        'tools.staticdir.match': "^.*\.(log|root)$",
+        'tools.staticdir.match': r"^.*\.(log|root)$",
         # server the log files as plain text files, and make sure to use
         # utf-8 encoding. Firefox might decide different, if the files
         # are located on a .jp domain and use Shift_JIS

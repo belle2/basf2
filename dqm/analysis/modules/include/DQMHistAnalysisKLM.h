@@ -78,6 +78,11 @@ namespace Belle2 {
   protected:
 
     /**
+     * Get number of processed events.
+     */
+    double getProcessedEvents();
+
+    /**
      * Analyse channel hit histogram.
      * @param[in]  subdetector  Subdetector.
      * @param[in]  section      Section.
@@ -92,9 +97,10 @@ namespace Belle2 {
 
     /**
      * Process histogram containing the number of hits in plane.
-     * @param[in] histName  Histogram name.
+     * @param[in]  histName  Histogram name.
+     * @param[out] latex     TLatex to draw messages.
      */
-    void processPlaneHistogram(const std::string& histName);
+    void processPlaneHistogram(const std::string& histName, TLatex& latex);
 
     /**
      * Fill histogram containing masked channels per sector.
@@ -109,6 +115,9 @@ namespace Belle2 {
      */
     TCanvas* findCanvas(const std::string& canvasName);
 
+    /** Number of processed events. */
+    double m_ProcessedEvents;
+
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
@@ -121,10 +130,19 @@ namespace Belle2 {
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 
-    /** Vector of new channels to be masked. */
-    std::vector<uint16_t> m_NewMaskedChannels;
+    /** Input parameter for minimal number of processed events for error messages. */
+    double m_MinProcessedEventsForMessagesInput;
 
-    /** Vector of channels already masked. */
+    /** Minimal number of processed events for error messages. */
+    double m_MinProcessedEventsForMessages;
+
+    /** Vector of dead barrel modules. */
+    std::vector<uint16_t> m_DeadBarrelModules;
+
+    /** Vector of dead endcap modules. */
+    std::vector<uint16_t> m_DeadEndcapModules;
+
+    /** Vector of masked channels. */
     std::vector<uint16_t> m_MaskedChannels;
 
     /** KLM channel array index. */

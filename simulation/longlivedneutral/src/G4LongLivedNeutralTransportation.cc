@@ -10,19 +10,16 @@
 
 // modified from GEANT4 G4Transportation class
 
+#include <framework/logging/Logger.h>
+
 #include "G4TransportationProcessType.hh"
 
 #include "G4PhysicalConstants.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4ProductionCutsTable.hh"
-#include "G4ParticleTable.hh"
 #include "G4PrimaryParticle.hh"
 
-#include "G4ChargeState.hh"
-#include "G4EquationOfMotion.hh"
-
 #include "G4FieldManagerStore.hh"
-#include "G4CoupledTransportation.hh"
 #include <simulation/longlivedneutral/G4LongLivedNeutralTransportation.h>
 
 class G4VSensitiveDetector;

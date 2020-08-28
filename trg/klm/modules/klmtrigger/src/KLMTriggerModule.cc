@@ -11,10 +11,8 @@
 #include <trg/klm/modules/klmtrigger/KLMTriggerModule.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/RelationArray.h>
 
 // event data
 #include <framework/dataobjects/EventMetaData.h>

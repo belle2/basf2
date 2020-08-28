@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ASYNCDISPLAYMODULE_H
-#define ASYNCDISPLAYMODULE_H
+#pragma once
 
 #include <framework/pcore/AsyncWrapper.h>
 
@@ -25,5 +24,3 @@ namespace Belle2 {
     ~AsyncDisplayModule() { } //< dtor
   };
 }
-
-#endif

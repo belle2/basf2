@@ -17,6 +17,7 @@
 #include <unordered_map>
 
 #define nmxhep 4000
+/** HEPEVT common block of PYTHIA6. */
 struct hepevt_type {
   int nevhep;               /**< serial number. */
   int nhep;                 /**< number of particles. */
@@ -26,14 +27,15 @@ struct hepevt_type {
   int jdahep[nmxhep][2];    /**< childreen particles. */
   double phep[nmxhep][5];   /**< four-momentum, mass [GeV]. */
   double vhep[nmxhep][4];   /**<  vertex [mm]. */
-}; /**< /HEPEVT/ common block of PYTHIA6. */
+};
 
+/** PYDAT2 common block of PYTHIA6. */
 struct pydat2_type {
   int KCHG[4][500];  /**< particle information such as spin, charge... */
   double PMAS[4][500]; /**< particle information such as mass, width... */
   double PARF[2000]; /**< parametrization of dd-uu-ss flavor mixing. */
   double VCKM[4][4]; /**< squared CKM matrix elements. */
-}; /**< /PYDAT2/ common block of PYTHIA6. */
+};
 
 extern hepevt_type hepevt_;
 extern pydat2_type pydat2_;

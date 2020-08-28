@@ -17,8 +17,8 @@ classifiers, the actual final MVA track quality estimator and the two quality
 estimators for the intermediate standalone track finders that it depends on.
 
     - Final MVA track quality estimator:
-      The final quality estimator for fully merged and fitted tracks. Its
-      classifier uses features from the track fitting, merger, hit pattern, ...
+      The final quality estimator for fully merged and fitted tracks (RecoTracks).
+      Its classifier uses features from the track fitting, merger, hit pattern, ...
       But it also uses the outputs from respective intermediate quality
       estimators for the VXD and the CDC track finding as inputs. It provides
       the final quality indicator (QI) exported to the track objects.
@@ -32,8 +32,17 @@ estimators for the intermediate standalone track finders that it depends on.
 Each classifier requires for its training a different training data set and they
 need to be validated on a separate testing data set. Further, the final quality
 estimator can only be trained, when the trained weights for the intermediate
-quality estimators are available. To avoid mistakes, b2luigi is used to create a
-task chain for a combined training and validation of all classifiers.
+quality estimators are available. If the final estimator shall be trained without
+one or both previous estimators, the requirements have to be commented out in the
+__init__.py file of tracking.
+For all estimators, a list of variables to be ignored is specified in the MasterTask.
+The current choice is mainly based on pure data MC agreement in these quantities or
+on outdated implementations. It was decided to leave them in the hardcoded "ugly" way
+in here to remind future generations that they exist in principle and they should and
+could be added to the estimator, once their modelling becomes better in future or an
+alternative implementation is programmed.
+To avoid mistakes, b2luigi is used to create a task chain for a combined training and
+validation of all classifiers.
 
 b2luigi: Understanding the steering file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -203,7 +212,7 @@ def my_basf2_mva_teacher(
     weightfile_identifier,
     target_variable="truth",
     exclude_variables=None,
-    fast_bdt_option=[200, 8, 3, 0.1]  # nTrees, nCuts, nLevels, shrinkage
+    fast_bdt_option=[200, 8, 3, 0.1]
 ):
     """
     My custom wrapper for basf2 mva teacher.  Adapted from code in ``trackfindingcdc_teacher``.
@@ -218,6 +227,7 @@ def my_basf2_mva_teacher(
     :param target_variable: Feature/variable to use as truth label in the quality estimator MVA classifier.
     :param exclude_variables: List of collected variables to not use in the training of the QE MVA classifier.
            In addition to variables containing the "truth" substring, which are excluded by default.
+    :param fast_bdt_option: specified fast BDT options, defaut: [200, 8, 3, 0.1] [nTrees, nCuts, nLevels, shrinkage]
     """
     if exclude_variables is None:
         exclude_variables = []
@@ -354,7 +364,8 @@ class GenerateSimTask(Basf2PathTask):
     n_events = b2luigi.IntParameter()
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Random basf2 seed.
+    #: Random basf2 seed. It is further used to read of the production process to preserve
+    # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(hashed=True)
@@ -470,7 +481,8 @@ class SplitNMergeSimTask(Basf2Task):
     n_events = b2luigi.IntParameter()
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Random basf2 seed.
+    #: Random basf2 seed. It is further used to read of the production process to preserve
+    # clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
     #: Directory with overlay background root files
     bkgfiles_dir = b2luigi.Parameter(hashed=True)
@@ -554,7 +566,8 @@ class VXDQEDataCollectionTask(Basf2PathTask):
     n_events = b2luigi.IntParameter()
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Random basf2 seed used by the GenerateSimTask.
+    #: Random basf2 seed used by the GenerateSimTask. It is further used to read of the
+    # production process to preserve clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
     queue = 'l'
 
@@ -681,7 +694,8 @@ class CDCQEDataCollectionTask(Basf2PathTask):
     n_events = b2luigi.IntParameter()
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Random basf2 seed used by the GenerateSimTask.
+    #: Random basf2 seed used by the GenerateSimTask. It is further used to read of the
+    # production process to preserve clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
     queue = 'l'
 
@@ -795,7 +809,8 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
     n_events = b2luigi.IntParameter()
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
-    #: Random basf2 seed used by the GenerateSimTask.
+    #: Random basf2 seed used by the GenerateSimTask. It is further used to read of the
+    # production process to preserve clearness in the b2luigi output.
     random_seed = b2luigi.Parameter()
     #: Feature/variable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
@@ -1013,8 +1028,8 @@ class TrackQETeacherBaseTask(Basf2Task):
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
-    # reconstructing DATA or already simulated files (USESIMBB/EE) or running on existing
-    # reconstructed files (USERECBB/EE)
+    # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
+    # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
     process_type = b2luigi.Parameter(default="BBBAR")
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
     training_target = b2luigi.Parameter(default="truth")
@@ -1238,8 +1253,8 @@ class HarvestingValidationBaseTask(Basf2PathTask):
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
-    # reconstructing DATA or already simulated files (USESIMBB/EE) or running on existing
-    # reconstructed files (USERECBB/EE)
+    # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
+    # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
     process_type = b2luigi.Parameter(default="BBBAR")
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
@@ -1572,8 +1587,8 @@ class TrackQEEvaluationBaseTask(Task):
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
-    # reconstructing DATA or already simulated files (USESIMBB/EE) or running on existing
-    # reconstructed files (USERECBB/EE)
+    # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
+    # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
     process_type = b2luigi.Parameter(default="BBBAR")
     #: Feature/variable to use as truth label in the quality estimator MVA classifier.
     training_target = b2luigi.Parameter(default="truth")
@@ -1810,8 +1825,8 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
-    # reconstructing DATA or already simulated files (USESIMBB/EE) or running on existing
-    # reconstructed files (USERECBB/EE)
+    # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
+    # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
     process_type = b2luigi.Parameter(default="BBBAR")
     #: List of collected variables to not use in the training of the QE MVA classifier.
     # In addition to variables containing the "truth" substring, which are excluded by default.
@@ -2148,8 +2163,8 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
     #: Experiment number of the conditions database, e.g. defines simulation geometry
     experiment_number = b2luigi.IntParameter()
     #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
-    # reconstructing DATA or already simulated files (USESIMBB/EE) or running on existing
-    # reconstructed files (USERECBB/EE)
+    # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
+    # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
     process_type = b2luigi.Parameter(default="BBBAR")
     #: Feature/vaiable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
@@ -2280,8 +2295,7 @@ class MasterTask(b2luigi.WrapperTask):
     #: list of variables to exclude for the cdc mva.
     exclude_variables_cdc = [
         "has_matching_segment",
-        "n_tracks",
-        "size",
+        "n_cdc_hits",
         "avg_hit_dist",
         "drift_length_sum",
         "drift_length_mean",

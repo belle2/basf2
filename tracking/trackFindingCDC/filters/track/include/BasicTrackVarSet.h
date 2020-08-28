@@ -31,11 +31,10 @@ namespace Belle2 {
     constexpr
     static char const* const basicTrackVarNames[] = {
       "pt",
-      "size",
+      "n_cdc_hits",
       "hits_per_layer",
-      "n_tracks",
 
-      "sz_slope",
+      "tan_lambda",
       "z0",
       "s_range",
       "avg_hit_dist",
@@ -68,12 +67,6 @@ namespace Belle2 {
       "drift_length_max",
       "drift_length_min",
       "drift_length_sum",
-
-      "norm_drift_length_mean",
-      "norm_drift_length_variance",
-      "norm_drift_length_max",
-      "norm_drift_length_min",
-      "norm_drift_length_sum",
 
       "adc_mean",
       "adc_variance",

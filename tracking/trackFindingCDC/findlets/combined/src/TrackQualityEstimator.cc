@@ -60,9 +60,6 @@ void TrackQualityEstimator::exposeParameters(ModuleParamList* moduleParamList, c
 
 void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
 {
-  for (CDCTrack& track : tracks) {
-    track.setNTracks(tracks.size());
-  }
 
   if (m_needsTruthInformation) { m_mcCloneLookUpFiller.apply(tracks); }
   for (CDCTrack& track : tracks) {

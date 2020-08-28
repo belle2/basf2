@@ -187,7 +187,6 @@ def add_simulation(
     # CDC digitization
     if components is None or 'CDC' in components:
         cdc_digitizer = register_module('CDCDigitizer')
-        cdc_digitizer.param("AddXTalk", True)
         cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 

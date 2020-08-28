@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /** Constructor. */
     explicit SVDEventInfo(SVDModeByte mode = SVDModeByte(), SVDTriggerType type = SVDTriggerType()):
-      m_modeByte(mode.getID()), m_triggerType(type.getType()) {m_ModeByteMatch = true; m_TriggerTypeMatch = true; m_Xtalk = false;}
+      m_modeByte(mode.getID()), m_triggerType(type.getType()) {m_ModeByteMatch = true; m_TriggerTypeMatch = true; m_Xtalk = false; m_RelativeShift = 0;}
 
     /** Destructor. */
     ~SVDEventInfo() {}
@@ -58,6 +58,12 @@ namespace Belle2 {
      */
     void setCrossTalk(bool xtalk) {m_Xtalk = xtalk;}
 
+    /** relative 3/6 shift
+     *  Sets the relative shift in latency in data taken in 3/6 samples
+     *  number between 0 and 15 (shift is 0*7.9 .... 15*7.9 in ns)
+     */
+    void setRelativeShift(int relativeShift) {m_RelativeShift = relativeShift;}
+
     /** Match TriggerType getter
      *  Gets the flag telling us if the SVDTriggerType object is the same for each FADCs in the event
      */
@@ -69,7 +75,7 @@ namespace Belle2 {
     bool getMatchModeByte() {return m_ModeByteMatch;}
 
     /** SVDModeByte getter
-     *  Gets the SVDModeByte info for the event
+    int  *  Gets the SVDModeByte info for the event
      */
     SVDModeByte getModeByte() const
     { return m_modeByte; }
@@ -100,6 +106,31 @@ namespace Belle2 {
     float getSVD2FTSWTimeShift(int firstFrame) const
     { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
 
+    /** getRelativeShiftNs
+     * return the relative shift of the latency, in ns, in data taken in 3/6 samples
+     * number between 0 and 15 (in xml) -> shift is 0*7.9 .... 15*7.9 in ns
+     */
+    float getRelativeShiftNs(int m_RelativeShift) const
+    {
+      int mode = (int)SVDModeByte(m_modeByte).getDAQMode();
+
+      if (mode == 2)
+        return 0;
+      else if (mode == 1)
+        return m_RelativeShift * 4000. / 509.;
+      else if (mode == 0)
+        return 0;
+
+      return -999;
+    }
+
+    /** getRelativeShift
+     * return the relative shift in data taken in 3/6 samples
+     * number between 0 and 15 as written in the xml file
+     */
+    int getRelativeShift(int m_RelativeShift) const
+    {return m_RelativeShift;}
+
     /** SVDTriggerType getter
      *  Gets the type of SVDTrigger for the event
      */
@@ -121,6 +152,7 @@ namespace Belle2 {
       bool thisModeMatch(m_ModeByteMatch);
       bool thisTriggerMatch(m_TriggerTypeMatch);
       bool thisXtalk(m_Xtalk);
+      bool thisRelativeShift(m_RelativeShift);
 
       std::ostringstream os;
 
@@ -132,6 +164,7 @@ namespace Belle2 {
       os << " Trigger Type: " << (unsigned int)thisType.getType() << std::endl;
       os << " TriggerType Match: " << thisTriggerMatch << std::endl;
       os << " Cross Talk: " << (thisXtalk ? "true" : "false") << std::endl;
+      os << " Relative Shift 3/6: " << (unsigned int)thisRelativeShift << std::endl;
       return os.str();
     }
 
@@ -142,6 +175,7 @@ namespace Belle2 {
     bool m_ModeByteMatch; /**< flag telling if the SVDModeByte object is the same for each FADCs in the event */
     bool m_TriggerTypeMatch; /**< flag telling if the SVDTriggerType object is the same for each FADCs in the event */
     bool m_Xtalk = false;    /**< information on the x-talk */
+    int m_RelativeShift = 0; /**< relative shift between 3/6 samples in mixed mode */
 
     /**class def needed by root*/
     ClassDef(SVDEventInfo, 1);

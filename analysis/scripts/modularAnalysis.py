@@ -2117,6 +2117,60 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
     path.add_module(updateMask)
 
 
+def updateROEUsingV0Lists(target_particle_list, mask_names, default_cleanup=True, selection_cuts=None,
+                          apply_mass_fit=False, fitter='tree', path=None):
+    """
+    This function creates V0 particle lists (photons, :math:`K^0_S` and :math:`\\Lambda^0`)
+    and it uses V0 candidates to update the Rest Of Event, which is associated to the target particle list.
+    It is possible to apply a standard or customized selection and mass fit to the V0 candidates.
+
+
+    @param target_particle_list  name of the input ParticleList
+    @param mask_names            array of ROEMasks to be updated
+    @param default_cleanup       if True, a predefined cuts on V0 lists will be applied
+    @param selection_cuts        a single string of selection cuts or tuple of three strings (photon_cuts, K_S0_cuts, Lambda0_cuts),
+                                 which will be applied to the V0 lists. These cuts will have a priority over the default ones.
+    @param apply_mass_fit        if True, a mass fit will be applied to the V0 particles
+    @param fitter                string, that represent a fitter choice: "tree" for TreeFitter and "kfit" for KFit
+    @param path                  modules are added to this path
+    """
+    roe_path = create_path()
+    deadEndPath = create_path()
+    signalSideParticleFilter(target_particle_list, '', roe_path, deadEndPath)
+
+    if (default_cleanup and selection_cuts is None):
+        B2INFO("Using default cleanup in updateROEUsingV0Lists.")
+        selection_cuts = 'abs(dM) < 0.1 '
+        selection_cuts += 'and daughter(0,particleID) > 0.2 and daughter(1,particleID) > 0.2 '
+        selection_cuts += 'and daughter(0,thetaInCDCAcceptance) and daughter(1,thetaInCDCAcceptance)'
+    if (selection_cuts is None or selection_cuts == ''):
+        B2INFO("No cleanup in updateROEUsingV0Lists.")
+        selection_cuts = ('True', 'True', 'True')
+    if (isinstance(selection_cuts, str)):
+        selection_cuts = (selection_cuts, selection_cuts, selection_cuts)
+    # The isInRestOfEvent variable will be applied on FSPs of composite particles automatically:
+    roe_cuts = 'isInRestOfEvent > 0'
+    fillConvertedPhotonsList('gamma:v0_roe -> e+ e-', f'{selection_cuts[0]} and {roe_cuts}',
+                             path=roe_path)
+    fillParticleList('K_S0:v0_roe -> pi+ pi-', f'{selection_cuts[1]} and {roe_cuts}',
+                     path=roe_path)
+    fillParticleList('Lambda0:v0_roe -> p+ pi-', f'{selection_cuts[2]} and {roe_cuts}',
+                     path=roe_path)
+    fitter = fitter.lower()
+    if (fitter != 'tree' and fitter != 'kfit'):
+        B2WARNING('Argument "fitter" in updateROEUsingV0Lists has only "tree" and "kfit" options, '
+                  f'but "{fitter}" was provided! TreeFitter will be used instead.')
+        fitter = "tree"
+    from vertex import kFit, treeFit
+    for v0 in ['gamma:v0_roe', 'K_S0:v0_roe', 'Lambda0:v0_roe']:
+        if (apply_mass_fit and fitter == 'kfit'):
+            kFit(v0, conf_level=0.0, fit_type='mass', path=roe_path)
+        if (apply_mass_fit and fitter == 'tree'):
+            treeFit(v0, conf_level=0.0, massConstraint=[v0.split(':')[0]], path=roe_path)
+        optimizeROEWithV0(v0, mask_names, '', path=roe_path)
+    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
 def printROEInfo(mask_names=None, full_print=False,
                  unpackComposites=True, path=None):
     """

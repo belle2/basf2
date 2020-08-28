@@ -40,15 +40,20 @@
 #pragma link C++ class Eigen::DenseCoeffsBase<Eigen::Matrix<double,3,1,0,3,1>,3>+; // checksum=0xd3a06597, version=-1
 #pragma link C++ class Eigen::internal::plain_array<double,3,0,0>+; // checksum=0xa73f796a, version=-1
 
-#pragma read                                    \
-  sourceClass="Belle2::Particle"                \
-  source="int m_particleType"                   \
-  version="[11]"                                \
-  targetClass="Belle2::FileMetaData"            \
-  target="m_particleSource"                     \
-  code="{m_particleSource = m_particleType;}"   \
+// ----------------------------------------------------------------------------
+// Particle evolution
+// In version 12 the member m_particleType has been renamed to m_particleSource.
+#pragma read                                                      \
+  sourceClass="Belle2::Particle"                                  \
+  source="Belle2::Particle::EParticleSourceObject m_particleType" \
+  version="[-11]"                                                 \
+  targetClass="Belle2::Particle"                                  \
+  target="m_particleSource"                                       \
+  code="{m_particleSource = onfile.m_particleType;}"              \
 
-
+// ----------------------------------------------------------------------------
+// TagVertex evolution
+// In version 4 the member m_MCdeltaT has been renamed to m_mcDeltaT.
 #pragma read                                    \
   sourceClass="Belle2::TagVertex"               \
   source="float m_MCdeltaT"                     \
@@ -57,7 +62,7 @@
   target="m_mcDeltaT"                           \
   code="{m_mcDeltaT = onfile.m_MCdeltaT;}"      \
 
-
+// In version 4 the member m_MCdeltaT has been renamed to m_mcDeltaT.
 #pragma read                                    \
   sourceClass="Belle2::TagVertex"               \
   source="TVector3 m_MCtagV"                    \
@@ -66,6 +71,8 @@
   target="m_mcTagV"                             \
   code="{m_mcTagV = onfile.m_MCtagV;}"          \
 
+// In version 4 the data type of the member m_tagVertexErrMatrix has been
+// changed from TMatrixFSym to TMatrixDSym
 #pragma read                                                   \
   sourceClass="Belle2::TagVertex"                              \
   source="TMatrixFSym m_tagVertexErrMatrix"                    \
@@ -74,6 +81,10 @@
   target="m_tagVertexErrMatrix"                                \
   code="{m_tagVertexErrMatrix = onfile.m_tagVertexErrMatrix;}" \
 
+// ----------------------------------------------------------------------------
+// EventKinematics evolution
+// In version 2 the new member m_builtFromMC is introduced. Since the MC
+// functionality was not present before it is set to false for version 1.
 #pragma read                                   \
   sourceClass="Belle2::EventKinematics"        \
   source="bool m_builtFromMC"                  \

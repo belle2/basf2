@@ -175,6 +175,13 @@ namespace Belle2 {
                          int* detector_buf_4th, int nwords_4th,
                          RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
 
+    //! Pack data (format ver. = -1 -> Select the latest format version)
+    /* cppcheck-suppress missingOverride */
+    int* PackDetectorBuf(int* packed_buf_nwords,
+                         const int* (&detector_buf_ch)[MAX_PCIE40_CH],
+                         const int (&nwords_ch)[MAX_PCIE40_CH],
+                         RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
+
     //! Copy one datablock to buffer
 
 

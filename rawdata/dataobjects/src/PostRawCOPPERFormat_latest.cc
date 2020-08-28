@@ -365,7 +365,7 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ tmp_header.POS_CH_POS_TABLE + ch ] = tmp_header.RAWHEADER_NWORDS;
   for (int i = 1; i < MAX_PCIE40_CH; i++) {
     ch = i;
-    if (nword_ch[ ch - 1 ] == 0) {
+    if (nwords_ch[ ch - 1 ] == 0) {
       packed_buf[ tmp_header.POS_CH_POS_TABLE + ch ] = packed_buf[ tmp_header.POS_CH_POS_TABLE + (ch - 1) ];
     } else {
       packed_buf[ tmp_header.POS_CH_POS_TABLE + ch ] = packed_buf[ tmp_header.POS_CH_POS_TABLE + (ch - 1) ] +

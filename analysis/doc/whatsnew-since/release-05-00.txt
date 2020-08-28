@@ -9,15 +9,15 @@ Variables
  * Variable ``TagVmcLBoost`` renamed to :b2:var:`mcTagVLBoost` and variable ``TagVmcOBoost`` renamed to :b2:var:`mcTagVOBoost`
  * Variable ``mcDeltaL`` renamed to :b2:var:`mcDeltaBoost` as it represents mc-truth version of :b2:var:`DeltaBoost` variable
  * Added variables to get track information of V0 daughters from TrackFitResult in V0 objects:
-  :b2:var:`v0DaughterNCDCHits(i)`, :b2:var:`v0DaughterNSVDHits(i)`, :b2:var:`v0DaughterNPXDHits(i)`, :b2:var:`v0DaughterNVXDHits(i)`,
-  :b2:var:`v0DaughterFirstSVDLayer(i)`, :b2:var:`v0DaughterFirstPXDLayer(i)`, :b2:var:`v0DaughterFirstCDCLayer(i)`, :b2:var:`v0DaughterLastCDCLayer(i)`,
-  :b2:var:`v0DaughterPValue(i)`,
-  :b2:var:`v0DaughterD0(i)`, :b2:var:`v0DaughterPhi0(i)`, :b2:var:`v0DaughterOmega(i)`, :b2:var:`v0DaughterZ0(i)`, :b2:var:`v0DaughterTanLambda(i)`,
-  :b2:var:`v0DaughterD0Error(i)`, :b2:var:`v0DaughterPhi0Error(i)`, :b2:var:`v0DaughterOmegaError(i)`, :b2:var:`v0DaughterZ0Error(i)`, :b2:var:`v0DaughterTanLambdaError(i)`,
-  :b2:var:`v0DaughterD0PullWithTrueVertexAsPivot(i)`, :b2:var:`v0DaughterPhi0PullWithTrueVertexAsPivot(i)`, :b2:var:`v0DaughterOmegaPullWithTrueVertexAsPivot(i)`, :b2:var:`v0DaughterZ0PullWithTrueVertexAsPivot(i)`, :b2:var:`v0DaughterTanLambdaPullWithTrueVertexAsPivot(i)`,
-  :b2:var:`v0DaughterD0PullWithOriginAsPivot(i)`, :b2:var:`v0DaughterPhi0PullWithOriginAsPivot(i)`, :b2:var:`v0DaughterOmegaPullWithOriginAsPivot(i)`, :b2:var:`v0DaughterZ0PullWithOriginAsPivot(i)`, :b2:var:`v0DaughterTanLambdaPullWithOriginAsPivot(i)`,
-  :b2:var:`v0DaughterTau(i,j)`, :b2:var:`v0DaughterCov(i,j)` in a new variable group ``V0Daughter``.
-  These variables can be used for the V0s from reconstructDecay, but the information are taken from the TrackFitResult of daughters.
+   :b2:var:`v0DaughterNCDCHits`, :b2:var:`v0DaughterNSVDHits`, :b2:var:`v0DaughterNPXDHits`, :b2:var:`v0DaughterNVXDHits`,
+   :b2:var:`v0DaughterFirstSVDLayer`, :b2:var:`v0DaughterFirstPXDLayer`, :b2:var:`v0DaughterFirstCDCLayer`, :b2:var:`v0DaughterLastCDCLayer`,
+   :b2:var:`v0DaughterPValue`,
+   :b2:var:`v0DaughterD0`, :b2:var:`v0DaughterPhi0`, :b2:var:`v0DaughterOmega`, :b2:var:`v0DaughterZ0`, :b2:var:`v0DaughterTanLambda`,
+   :b2:var:`v0DaughterD0Error`, :b2:var:`v0DaughterPhi0Error`, :b2:var:`v0DaughterOmegaError`, :b2:var:`v0DaughterZ0Error`, :b2:var:`v0DaughterTanLambdaError`,
+   :b2:var:`v0DaughterD0PullWithTrueVertexAsPivot`, :b2:var:`v0DaughterPhi0PullWithTrueVertexAsPivot`, :b2:var:`v0DaughterOmegaPullWithTrueVertexAsPivot`, :b2:var:`v0DaughterZ0PullWithTrueVertexAsPivot`, :b2:var:`v0DaughterTanLambdaPullWithTrueVertexAsPivot`,
+   :b2:var:`v0DaughterD0PullWithOriginAsPivot`, :b2:var:`v0DaughterPhi0PullWithOriginAsPivot`, :b2:var:`v0DaughterOmegaPullWithOriginAsPivot`, :b2:var:`v0DaughterZ0PullWithOriginAsPivot`, :b2:var:`v0DaughterTanLambdaPullWithOriginAsPivot`,
+   :b2:var:`v0DaughterTau`, :b2:var:`v0DaughterCov` in a new variable group ``V0Daughter``.
+   These variables can also be used for the V0s from reconstructDecay, but the information are taken from the TrackFitResult of daughters.
 
 Modules
 +++++++

@@ -24,7 +24,7 @@ from caf.strategies import SequentialBoundaries
 
 now = datetime.datetime.now()
 
-settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
+settings = CalibrationSettings(name="SVD3SampleCoGTimeCalibrationPrompt",
                                expert_username="gdujany",
                                description=__doc__,
                                input_data_formats=["cdst"],

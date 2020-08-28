@@ -157,6 +157,13 @@ namespace Belle2 {
               " CRC $");
     };
 
+    unsigned short dhc_ghost_frame::getErrorBits(void) const
+    {
+      unsigned short value = (word0.data >> 2) & 0x3; // lower two bits
+      if (word0.data & 0x0400) value |= 0x4; // high bit
+      return value;
+    };
+
     bool dhc_end_frame::isFakedData(void) const
     {
       if (word0.data != 0x6000) return false;

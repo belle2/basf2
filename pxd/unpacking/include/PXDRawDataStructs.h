@@ -244,6 +244,7 @@ namespace Belle2 {
       void print(void) const;
       inline unsigned short getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
       inline unsigned short getDHPPort(void) const {return (word0.getMisc()) & 0x3;};
+      unsigned short dhc_ghost_frame::getErrorBits(void) const;
     };
 
     /** DHC End frame data struct.

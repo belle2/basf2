@@ -46,7 +46,7 @@ namespace Belle2 {
       c_UNUSED_A = 0xA,
     };
 
-    /** Enums for DHE DHP StaeMachine Error States.
+    /** Enums for DHE DHP StateMachine Error States.
      * 4 bits value;
      * Currently the same definitions as the ones encoded in ghost frame (new! but 3 bit only)
      * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/

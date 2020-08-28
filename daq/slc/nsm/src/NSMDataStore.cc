@@ -6,7 +6,10 @@
 
 #include <cstdio>
 #include <cstring>
+#include <sys/types.h>
 #include <sys/mman.h>
+#include <fcntl.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <daq/slc/system/LockGuard.h>

@@ -1,20 +1,25 @@
 #include "daq/slc/nsm/NSMMessage.h"
 
+// 20191004 nakao
+// duplicating the NSM2 library function in a user function
+// NSMMessage::read(NSMcontext* nsmc)
+// is really a bad idea, need to be revised.
+// Until then, nsmsys2.h is needed.
+#include <nsm2/nsmsys2.h>
+
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
 
 #include <daq/slc/nsm/NSMData.h>
-#include <daq/slc/nsm/NSMHandlerException.h>
+
+#include <daq/slc/system/BufferedReader.h>
+#include <daq/slc/system/BufferedWriter.h>
+#include <daq/slc/system/StreamSizeCounter.h>
 
 #include <daq/slc/base/Reader.h>
 #include <daq/slc/base/Writer.h>
-
-#include <nsm2/nsmlib2.h>
-#include <nsm2/nsmsys2.h>
-
-#include <arpa/inet.h>
 
 using namespace Belle2;
 

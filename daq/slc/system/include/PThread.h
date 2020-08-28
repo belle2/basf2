@@ -6,6 +6,8 @@
 #include <pthread.h>
 #include <signal.h>
 #include <cstdio>
+#include <exception>
+#include <iostream>
 
 namespace Belle2 {
 

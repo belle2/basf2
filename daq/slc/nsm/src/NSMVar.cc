@@ -1,7 +1,10 @@
 #include "daq/slc/nsm/NSMVar.h"
 
 #include <string.h>
+#include <unistd.h>
+#include <errno.h>
 #include <stdlib.h>
+#include <iostream>
 
 #include <daq/slc/base/Reader.h>
 #include <daq/slc/base/Writer.h>
@@ -146,7 +149,8 @@ void NSMVar::readObject(Reader& reader)
       } break;
       case TEXT: {
         char* v = (char*)m_value;
-        for (int i = 0; i < len; i++) {
+        // Use m_len condition instead of len due to empty string problem
+        for (int i = 0; i < m_len; i++) {
           v[i] = reader.readChar();
         }
       } break;
@@ -197,7 +201,7 @@ float NSMVar::getFloat() const
 
 const char* NSMVar::getText() const
 {
-  return (m_type == TEXT && m_len > 0) ? (const char*)m_value : "";
+  return (m_type == TEXT && m_len > 0 && m_value != NULL) ? (const char*)m_value : "";
 }
 
 int NSMVar::getInt(int i) const

@@ -8,8 +8,8 @@ namespace Belle2 {
   class LogListener {
 
   public:
-    LogListener(ProcessController* con, int pipe[2])
-      : m_con(con)
+    LogListener(ProcessController* con, int pipe[2], bool enableUnescapeNewlines = true)
+      : m_con(con), m_enableUnescapeNewlines(enableUnescapeNewlines)
     {
       m_pipe[0] = pipe[0];
       m_pipe[1] = pipe[1];
@@ -22,6 +22,8 @@ namespace Belle2 {
   private:
     ProcessController* m_con;
     int m_pipe[2];
+
+    bool m_enableUnescapeNewlines;
 
   };
 

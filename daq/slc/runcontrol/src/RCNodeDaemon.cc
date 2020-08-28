@@ -1,8 +1,10 @@
 #include "daq/slc/runcontrol/RCNodeDaemon.h"
 
 #include <daq/slc/system/LogFile.h>
+#include <daq/slc/system/Daemon.h>
 
 #include <daq/slc/base/ConfigFile.h>
+#include <daq/slc/base/StringUtil.h>
 
 using namespace Belle2;
 

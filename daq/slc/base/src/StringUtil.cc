@@ -2,6 +2,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <sstream>
 #include <cctype>
 #include <algorithm>
@@ -58,9 +59,9 @@ std::string StringUtil::replace(const std::string& source,
 std::string StringUtil::form(const std::string& str, ...)
 {
   va_list ap;
-  static char ss[1024 * 10];
+  static __thread char ss[1024 * 10];
   va_start(ap, str);
-  vsprintf(ss, str.c_str(), ap);
+  vsnprintf(ss, sizeof(ss), str.c_str(), ap);
   va_end(ap);
   return ss;
 }

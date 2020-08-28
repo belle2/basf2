@@ -1,5 +1,7 @@
 #include "daq/slc/base/Exception.h"
 
+#include <sstream>
+
 using namespace Belle2;
 
 Exception::Exception()

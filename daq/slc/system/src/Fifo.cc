@@ -1,8 +1,9 @@
 #include "daq/slc/system/Fifo.h"
 
-#include <daq/slc/base/IOException.h>
+#include <daq/slc/base/StringUtil.h>
 
 #include <unistd.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 

@@ -3,7 +3,6 @@
 
 #include "daq/slc/system/FileDescriptor.h"
 
-#include <string>
 #include <vector>
 
 namespace Belle2 {

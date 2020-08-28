@@ -1,6 +1,8 @@
 #ifndef _Belle2_FileWriter_hh
 #define _Belle2_FileWriter_hh
 
+#include "daq/slc/system/FileDescriptor.h"
+
 #include "daq/slc/base/Writer.h"
 
 namespace Belle2 {

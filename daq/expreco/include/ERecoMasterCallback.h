@@ -1,12 +1,18 @@
 #ifndef _Belle2_RFMasterCallback_h
 #define _Belle2_RFMasterCallback_h
 
+#include "daq/rfarm/manager/RFConf.h"
+
 #include <daq/slc/runcontrol/RCState.h>
 #include <daq/slc/runcontrol/RCCallback.h>
 
+#include <daq/slc/nsm/NSMData.h>
+
+#include <daq/slc/base/ConfigFile.h>
 #include <daq/slc/base/StringUtil.h>
 
 #include <vector>
+#include <map>
 
 namespace Belle2 {
 
@@ -15,7 +21,7 @@ namespace Belle2 {
   class ERecoMasterCallback : public RCCallback {
 
   public:
-    ERecoMasterCallback();
+    ERecoMasterCallback(ConfigFile& config);
     virtual ~ERecoMasterCallback() {}
 
   public:
@@ -43,7 +49,8 @@ namespace Belle2 {
     StringList m_dataname;
     typedef std::vector<NSMNode> NSMNodeList;
     NSMNodeList m_nodes;
-
+    NSMNode m_rcnode;
+    std::string m_script;
   };
 
 }

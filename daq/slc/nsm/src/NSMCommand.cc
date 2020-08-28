@@ -1,5 +1,7 @@
 #include "daq/slc/nsm/NSMCommand.h"
 
+#include "daq/slc/nsm/NSMState.h"
+
 using namespace Belle2;
 
 const NSMCommand NSMCommand::OK(1, "OK");

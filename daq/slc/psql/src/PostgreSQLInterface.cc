@@ -5,9 +5,11 @@
 #include <pgsql/libpq-fe.h>
 #endif
 
-#include <daq/slc/base/StringUtil.h>
-#include <daq/slc/database/DBHandlerException.h>
+#include <daq/slc/system/LogFile.h>
 
+#include <daq/slc/base/StringUtil.h>
+
+#include <iostream>
 #include <daq/slc/system/LockGuard.h>
 
 using namespace Belle2;
@@ -39,15 +41,20 @@ void PostgreSQLInterface::connect()
 {
 #ifndef NOT_USE_PSQL
   if (isConnected()) return;
-  LockGuard lockGuard(m_mutex);
-  m_sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s port=%d",
-                                           m_host.c_str(), m_database.c_str(),
-                                           m_user.c_str(), m_password.c_str(),
-                                           m_port).c_str());
+
+  {
+    LockGuard lockGuard(m_mutex);
+    m_sq_conn = PQconnectdb(StringUtil::form("host=%s dbname=%s user=%s password=%s port=%d",
+                                             m_host.c_str(), m_database.c_str(),
+                                             m_user.c_str(), m_password.c_str(),
+                                             m_port).c_str());
+  }
+
   if (PQstatus(m_sq_conn) == CONNECTION_BAD) {
+    DBHandlerException exception("Failed to connect to the database : %s",
+                                 PQerrorMessage(m_sq_conn));
     close();
-    throw (DBHandlerException("Failed to connect to the database : (%s)",
-                              PQerrorMessage(m_sq_conn)));
+    throw exception;
   }
 #else
   throw (DBHandlerException("PGLIB is not available"));

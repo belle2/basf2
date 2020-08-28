@@ -3,6 +3,10 @@
 
 #include "daq/slc/nsm/NSMNode.h"
 
+#include "daq/slc/runcontrol/RCCommand.h"
+#include "daq/slc/runcontrol/RCState.h"
+
+
 namespace Belle2 {
 
   class RCNode : public NSMNode {

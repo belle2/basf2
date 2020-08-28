@@ -1,5 +1,7 @@
 #include "daq/slc/database/DAQLogMessage.h"
 
+#include <daq/slc/nsm/NSMMessage.h>
+
 #include <daq/slc/base/Date.h>
 
 using namespace Belle2;

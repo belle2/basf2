@@ -1,6 +1,8 @@
 #include "daq/slc/base/Date.h"
 
 #include <cstring>
+#include <sstream>
+#include <iostream>
 
 using namespace Belle2;
 

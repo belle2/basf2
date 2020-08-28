@@ -3,11 +3,13 @@
 #include <daq/slc/system/LogFile.h>
 
 #include <daq/slc/base/StringUtil.h>
-#include <daq/slc/database/DBHandlerException.h>
+#include <daq/slc/base/ConfigFile.h>
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <cstdio>
+#include <cstdlib>
 #include <stdexcept>
 
 using namespace Belle2;

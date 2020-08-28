@@ -1,6 +1,5 @@
 #include "daq/slc/database/MonitorDB.h"
 
-#include <daq/slc/database/DBHandlerException.h>
 #include <daq/slc/system/LogFile.h>
 
 using namespace Belle2;

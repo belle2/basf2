@@ -7,6 +7,8 @@
 
 #include <daq/slc/nsm/NSMNodeDaemon.h>
 
+#include <daq/slc/system/Daemon.h>
+
 #include <daq/slc/base/ConfigFile.h>
 
 namespace Belle2 {

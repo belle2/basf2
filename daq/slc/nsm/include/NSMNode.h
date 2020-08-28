@@ -1,8 +1,10 @@
 #ifndef _Belle2_NSMNode_hh
 #define _Belle2_NSMNode_hh
 
+#include <daq/slc/base/Connection.h>
 #include <daq/slc/base/Date.h>
 
+#include "daq/slc/nsm/NSMCommand.h"
 #include "daq/slc/nsm/NSMState.h"
 
 namespace Belle2 {

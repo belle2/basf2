@@ -1,12 +1,7 @@
 #include "daq/slc/runcontrol/RCCallback.h"
 
-#include <daq/slc/database/DBHandlerException.h>
 #include <daq/slc/database/DBInterface.h>
 #include <daq/slc/database/DBObjectLoader.h>
-
-#include <daq/slc/runcontrol/RCCommand.h>
-#include <daq/slc/runcontrol/RCHandlerException.h>
-#include <daq/slc/runcontrol/RCHandlerFatalException.h>
 
 #include <daq/slc/system/LogFile.h>
 #include <daq/slc/system/TCPSocket.h>
@@ -17,6 +12,7 @@
 
 #include <sstream>
 
+#include <cstring>
 #include <cstdlib>
 
 double tabort = 0;
@@ -113,7 +109,7 @@ bool RCCallback::perform(NSMCommunicator& com)
   RCState tstate(cmd.nextTState());
   try {
     if (tstate != Enum::UNKNOWN) {
-      log(LogFile::DEBUG, "RC request %s from %s", msg.getNodeName(), msg.getRequestName());
+      log(LogFile::DEBUG, "RC request %s from %s", msg.getRequestName(), msg.getNodeName());
       setState(tstate);
       std::string nodename = getNode().getName();
       bool ismaster = nodename == "RUNCONTROL" ||

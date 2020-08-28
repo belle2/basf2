@@ -2,8 +2,6 @@
 
 #include "daq/slc/base/Serializable.h"
 
-#include <unistd.h>
-
 #define __ENDIAN_L__
 
 using namespace Belle2;

@@ -3,8 +3,10 @@
 
 extern "C" {
 #include <nsm2/nsm2.h>
+#include <nsm2/nsmlib2.h>
 }
 
+#include "daq/slc/nsm/NSMHandlerException.h"
 #include "daq/slc/nsm/NSMCommand.h"
 #include "daq/slc/nsm/NSMNode.h"
 #include "daq/slc/nsm/NSMVar.h"
@@ -14,8 +16,6 @@ extern "C" {
 #include <daq/slc/system/Buffer.h>
 
 #include <daq/slc/base/Serializable.h>
-
-#include <string>
 
 namespace Belle2 {
 

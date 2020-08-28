@@ -5,6 +5,8 @@
 
 #include "daq/slc/system/LogFile.h"
 
+#include "daq/slc/database/DBObject.h"
+
 #include <string>
 
 namespace Belle2 {

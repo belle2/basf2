@@ -46,6 +46,8 @@ Modules
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
+ * The new argument ``suffix`` has been added to the `writePi0EtaVeto` function to allow calculating this veto for multiple
+   photons.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

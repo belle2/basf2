@@ -52,6 +52,8 @@ namespace Belle2 {
 
       /**
        * @return the cluster charge error
+       * the SVDCluster does not have the chargeError data member
+       * but this method maybe useful for position error estimate
        */
       virtual double getClusterChargeError() = 0;
 

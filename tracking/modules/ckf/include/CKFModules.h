@@ -45,8 +45,7 @@ namespace Belle2 {
     /// Set description
     CDCToSVDSeedCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extrapolating CDC tracks into "
-                     "SVD and create merged tracks.");
+      setDescription("Combinatorical Kalman Filter used for merging existing CDC tracks and SVD tracks.");
     }
   };
 

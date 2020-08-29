@@ -38,6 +38,7 @@ bool PXDStateTruthVarSet::extract(const BasePXDStateFilter::Object* pair)
   var<named("truth_momentum_y")>() = 0;
   var<named("truth_momentum_z")>() = 0;
   var<named("truth")>() = 0;
+  var<named("truth_inverted")>() = 1;
 
   if (not m_mcUtil.allStatesCorrect(allStates)) {
     // Keep all variables set to false and return.
@@ -50,6 +51,7 @@ bool PXDStateTruthVarSet::extract(const BasePXDStateFilter::Object* pair)
   const RecoTrack* cdcMCTrack = mcCDCMatchLookUp.getRelatedMCRecoTrack(*seedTrack);
 
   var<named("truth")>() = 1;
+  var<named("truth_inverted")>() = 0;
 
   var<named("truth_position_x")>() = cdcMCTrack->getPositionSeed().X();
   var<named("truth_position_y")>() = cdcMCTrack->getPositionSeed().Y();

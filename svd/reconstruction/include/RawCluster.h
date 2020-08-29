@@ -80,14 +80,14 @@ namespace Belle2 {
        * @return the APVFloatSamples obtained summing
        * sample-by-sample all the strips on the cluster
        */
-      Belle2::SVDShaperDigit::APVFloatSamples getClsSamples() const;
+      Belle2::SVDShaperDigit::APVFloatSamples getClsSamples(bool inElectrons) const;
 
       /**
        * @return the float vector of clustered 3-samples
        * selected by the MaxSum method
        * with First Frame of the selection
        */
-      std::pair<int, std::vector<float>> getMaxSum3Samples() const;
+      std::pair<int, std::vector<float>> getMaxSum3Samples(bool inElectrons = false) const;
 
       /**
        * @return the cluster size (number of strips of the cluster)

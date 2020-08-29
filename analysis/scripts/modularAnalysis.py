@@ -2118,7 +2118,7 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
 
 
 def updateROEUsingV0Lists(target_particle_list, mask_names, default_cleanup=True, selection_cuts=None,
-                          apply_mass_fit=False, fitter='tree', path=None):
+                          apply_mass_fit=False, fitter='treefit', path=None):
     """
     This function creates V0 particle lists (photons, :math:`K^0_S` and :math:`\\Lambda^0`)
     and it uses V0 candidates to update the Rest Of Event, which is associated to the target particle list.

@@ -31,30 +31,22 @@ namespace Belle2 {
       /**
        * Constructor to create a Strip from the SVDShaperDigit
        */
-      SVDStripCharge(const SVDShaperDigit& shaper)
-      {
-        m_samples = shaper.getSamples();
-        m_vxdID = shaper.getSensorID();
-        m_isUside = shaper.isUStrip();
-        m_cellID = shaper.getCellID();
-        //        SVDELS3Charge helper;
-        //        m_apvClockPeriod = helper.getAPVClockPeriod();
-        //        m_ELS3tau = helper.getTau();
-      };
+      explicit SVDStripCharge(const SVDShaperDigit& shaper)
+        : m_samples(shaper.getSamples())
+        , m_vxdID(shaper.getSensorID())
+        , m_isUside(shaper.isUStrip())
+        , m_cellID(shaper.getCellID())
+      { };
 
       /**
        * Constructor to create a strip from a stripInRawCluster
        */
       SVDStripCharge(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU, int cellID)
-      {
-        m_samples = aStrip.samples;
-        m_vxdID = sensorID;
-        m_isUside = isU;
-        m_cellID = cellID;
-        //        SVDELS3Charge helper;
-        //        m_apvClockPeriod = helper.getAPVClockPeriod();
-        //        m_ELS3tau = helper.getTau();
-      };
+        : m_vxdID(sensorID)
+        , m_samples(aStrip.samples)
+        , m_isUside(isU)
+        , m_cellID(cellID)
+      { };
 
 
       /**
@@ -93,9 +85,10 @@ namespace Belle2 {
     protected:
 
       /** APV clock period*/
-      double m_apvClockPeriod = 0;
+      double m_apvClockPeriod = 16000. / 509;
+
       /** ELS3 tau constant*/
-      double m_ELS3tau = 0;
+      double m_ELS3tau = 55;
 
       /** strip samples*/
       Belle2::SVDShaperDigit::APVFloatSamples m_samples; /** ADC of the acquired samples*/

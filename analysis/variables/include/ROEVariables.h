@@ -144,7 +144,7 @@ namespace Belle2 {
     Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments);
 
     /**
-     * Returns number of photons in the related RestOfEvent object that pass the selection criteria
+     * Returns number of V0s in the related RestOfEvent object that pass the selection criteria
      */
     Manager::FunctionPtr nROE_Composites(const std::vector<std::string>& arguments);
 

@@ -2126,12 +2126,12 @@ def updateROEUsingV0Lists(target_particle_list, mask_names, default_cleanup=True
 
 
     @param target_particle_list  name of the input ParticleList
-    @param mask_names            array of ROEMasks to be updated
-    @param default_cleanup       if True, a predefined cuts on V0 lists will be applied
+    @param mask_names            array of ROE masks to be applied
+    @param default_cleanup       if True, predefined cuts will be applied on the V0 lists
     @param selection_cuts        a single string of selection cuts or tuple of three strings (photon_cuts, K_S0_cuts, Lambda0_cuts),
                                  which will be applied to the V0 lists. These cuts will have a priority over the default ones.
     @param apply_mass_fit        if True, a mass fit will be applied to the V0 particles
-    @param fitter                string, that represent a fitter choice: "tree" for TreeFitter and "kfit" for KFit
+    @param fitter                string, that represent a fitter choice: "treefit" for TreeFitter and "kfit" for KFit
     @param path                  modules are added to this path
     """
     roe_path = create_path()
@@ -2157,15 +2157,15 @@ def updateROEUsingV0Lists(target_particle_list, mask_names, default_cleanup=True
     fillParticleList('Lambda0:v0_roe -> p+ pi-', f'{selection_cuts[2]} and {roe_cuts}',
                      path=roe_path)
     fitter = fitter.lower()
-    if (fitter != 'tree' and fitter != 'kfit'):
+    if (fitter != 'treefit' and fitter != 'kfit'):
         B2WARNING('Argument "fitter" in updateROEUsingV0Lists has only "tree" and "kfit" options, '
                   f'but "{fitter}" was provided! TreeFitter will be used instead.')
-        fitter = "tree"
+        fitter = 'treefit'
     from vertex import kFit, treeFit
     for v0 in ['gamma:v0_roe', 'K_S0:v0_roe', 'Lambda0:v0_roe']:
         if (apply_mass_fit and fitter == 'kfit'):
-            kFit(v0, conf_level=0.0, fit_type='mass', path=roe_path)
-        if (apply_mass_fit and fitter == 'tree'):
+            kFit(v0, conf_level=0.0, fit_type='massvertex', path=roe_path)
+        if (apply_mass_fit and fitter == 'treefit'):
             treeFit(v0, conf_level=0.0, massConstraint=[v0.split(':')[0]], path=roe_path)
         optimizeROEWithV0(v0, mask_names, '', path=roe_path)
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

@@ -47,7 +47,7 @@ Modules
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
- * A new helper method `updateROEUsingV0Lists` has been added to facilite application of V0Finder results in Rest Of Event.
+ * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

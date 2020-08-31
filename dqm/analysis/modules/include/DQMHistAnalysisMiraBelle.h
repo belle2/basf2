@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MiraBelleDQMANALYSISMODULE_H
-#define MiraBelleDQMANALYSISMODULE_H
-
 #pragma once
 
 //DQM
@@ -94,5 +91,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

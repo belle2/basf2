@@ -31,6 +31,7 @@ int main(int argc, char* argv[])
   }
   /* Print the error messages when needed. */
   int nChannels = argc - 1;
+  /* cppcheck-suppress knownConditionTrueFalse */
   if (nChannels == 0) {
     B2ERROR("There are no channels to convert.");
     return 0;

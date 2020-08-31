@@ -11,7 +11,8 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-
+from stdCharged import stdE, stdMu, stdPi
+from stdPhotons import stdPhotons
 
 __liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
 
@@ -35,11 +36,8 @@ class BottomoniumEtabExclusive(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         # create and fill hard photon
@@ -97,11 +95,8 @@ class BottomoniumUpsilon(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         Ycuts = ""
@@ -173,13 +168,10 @@ class ISRpipicc(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["loose"],
-            "stdMu": ["loose"],
-            "stdPi": ["loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("loose", path=path)
+        stdMu("loose", path=path)
+        stdPi("loose", path=path)
 
     def build_lists(self, path):
         # intermediate state J/psi and psi(2S) are reconstructed

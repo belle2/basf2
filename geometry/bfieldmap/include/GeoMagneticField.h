@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOMAGNETICFIELD_H
-#define GEOMAGNETICFIELD_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 #include <framework/dbobjects/MagneticField.h>
@@ -112,5 +111,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* GEOMAGNETICFIELD_H */

@@ -180,9 +180,7 @@ if __name__ == "__main__":
 
     # Apply masking of hot channels
     if not disable_masking:
-        globaltags_string = ''
-        for globaltag in globaltags:
-            globaltags_string += f'{globaltag} '
+        globaltags_string = ' '.join(globaltags)
         command = 'b2klm-mask-dqm '
         command += f'--exp {exp_number} '
         command += f'--run {run_number} '

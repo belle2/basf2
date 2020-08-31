@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef LINEARGLOBALADCCOUNTTRANSLATOR_H
-#define LINEARGLOBALADCCOUNTTRANSLATOR_H
+#pragma once
 
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
 
@@ -45,4 +44,3 @@ namespace Belle2 {
     };
   }
 }
-#endif /* LINEARGLOBALADCCOUNTTRANSLATOR_H */

@@ -94,6 +94,7 @@ RegisteredSkims = [
     ("18020100", "dark", "SinglePhotonDark"),
     ("18020200", "dark", "GammaGammaControlKLMDark"),
     ("18020300", "dark", "ALP3Gamma"),
+    ("18020400", "dark", "EGammaControlDark"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
@@ -147,7 +148,7 @@ class SkimRegistry:
             SkimName (str): Name of the skim as it appears in `skim.registry.RegisteredSkims`.
 
         Returns:
-            SkimModule (str): The name of the skim module which contains the skim.
+            The name of the skim module which contains the skim.
         """
         lookup = {name: module for _, module, name in self.registry}
         try:
@@ -168,7 +169,7 @@ class SkimRegistry:
                 ``skim.btocharmless`` or ``btocharmless.py``).
 
         Returns:
-            ExpectedSkims (list(str)): The skims listed in the registry as belonging to ``SkimModule``.
+            The skims listed in the registry as belonging to ``SkimModule``.
         """
         if SkimModule not in self.modules:
             B2ERROR(f"Unrecognised skim module {SkimModule}.")
@@ -191,7 +192,7 @@ class SkimRegistry:
             SkimName (str): Name of the skim to be found.
 
         Returns:
-            SkimFunction: The class constructor for the given skim.
+            The class constructor for the given skim.
         """
         ModuleName = self.get_skim_module(SkimName)
         SkimModule = import_module(f"skim.{ModuleName}")
@@ -204,7 +205,7 @@ class SkimRegistry:
             SkimName (str): Name of the skim as it appears in `skim.registry.RegisteredSkims`.
 
         Returns:
-            SkimCode (str): 8 digit skim code assigned to the given skim.
+            8 digit skim code assigned to the given skim.
         """
         lookup = {name: code for code, _, name in self.registry}
         try:
@@ -226,7 +227,7 @@ class SkimRegistry:
             SkimCode (str): 8 digit skim code assigned to some skim.
 
         Returns:
-            SkimName (str): Name of the corresponding skim as it appears in
+            Name of the corresponding skim as it appears in
             `skim.registry.RegisteredSkims`.
         """
         lookup = {code: name for code, _, name in self.registry}

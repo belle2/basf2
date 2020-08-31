@@ -165,6 +165,7 @@ void alignmentFit(){
   
 
   // Draw plots and fit curve
+  // cppcheck-suppress unreadVariable
   TF1 *f1 = new TF1("f1", "[0]*cos(x+[1])", -M_PI, M_PI); //parameter 0~5
 
   TCanvas*c1=new TCanvas("c1");

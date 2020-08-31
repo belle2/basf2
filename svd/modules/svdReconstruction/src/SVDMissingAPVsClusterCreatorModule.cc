@@ -49,6 +49,8 @@ SVDMissingAPVsClusterCreatorModule::SVDMissingAPVsClusterCreatorModule()
   addParam("charge", m_charge, "cluster charge (in e-)", float(20000));
   addParam("SNR", m_SNR, "cluster SNR", float(15));
   addParam("size", m_size, "cluster size", int(128));
+  addParam("firstFrame", m_firstFrame, "first frame, needed to build the cluster", int(0));
+  addParam("nFakeClusters", m_nFakeClusters, "number of fake clusters equally distributed in the dead area", int(4));
 }
 
 void SVDMissingAPVsClusterCreatorModule::beginRun()
@@ -97,8 +99,8 @@ void SVDMissingAPVsClusterCreatorModule::event()
     float floatingStrip = tmp_missingAPV.m_halfStrip;
     double pitch = isU ? info.getUPitch(0) : info.getVPitch(0);
 
-    float position = isU ? info.getUCellPosition(floatingStrip) : info.getVCellPosition(floatingStrip);
-    const int Nstrips = 128; //mnumber of strips in each APV
+    float halfChip_position = isU ? info.getUCellPosition(floatingStrip) : info.getVCellPosition(floatingStrip);
+    const int Nstrips = 128; //number of strips in each APV
     float positionError = Nstrips * pitch / sqrt(12);
 
     //time
@@ -111,13 +113,25 @@ void SVDMissingAPVsClusterCreatorModule::event()
     float size = m_size;
     float SNR = m_SNR;
 
-    //  Store Cluster into Datastore
+    // Built m_nFakeClusters equally distributed
+    float fakeCluster_width = pitch * Nstrips / m_nFakeClusters;
+    float chip_halfWidth = pitch * Nstrips / 2;
+    float firstStrip_position = halfChip_position - chip_halfWidth;
+
+    //position of the first fake cluster:
+    float fakeCluster_position = firstStrip_position + fakeCluster_width / 2;
+    //store first fake cluster:
     m_storeClusters.appendNew(SVDCluster(
-                                sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1
+                                sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size, SNR, m_firstFrame
                               ));
+    //  Store all other Fake Clusters into DataStore
+    for (int i = 1; i < m_nFakeClusters; i++) {
+      fakeCluster_position = fakeCluster_position + fakeCluster_width;
+      m_storeClusters.appendNew(SVDCluster(
+                                  sensorID, isU, fakeCluster_position, positionError, time, timeError, charge, seedCharge, size, SNR, m_firstFrame
+                                ));
+    }
   }
-
-
   B2DEBUG(1, "Number of clusters: " << m_storeClusters.getEntries());
 }
 

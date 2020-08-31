@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLWAVEFORMDATA_H
-#define ECLWAVEFORMDATA_H
+#pragma once
 
 #include <cassert>
 #include <vector>
@@ -237,4 +236,3 @@ namespace Belle2 {
   };
 
 }
-#endif

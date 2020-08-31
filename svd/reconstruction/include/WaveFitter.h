@@ -195,6 +195,7 @@ namespace Belle2 {
       /** Calculate fitted data. */
       void calculateFittedData();
       /** High-order Gauss-Legendre quadrature for likelihood integrals */
+      // cppcheck-suppress unusedPrivateFunction
       double integral12(double lower, double upper, std::function<double(double)> f);
       /** High-order Gauss-Legendre quadrature for likelihood integrals */
       double integral20(double lower, double upper, std::function<double(double)> f);

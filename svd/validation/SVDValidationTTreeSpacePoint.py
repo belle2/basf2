@@ -34,7 +34,7 @@ gROOT.ProcessLine('struct EventDataSpacePoint {\
     float time_v;\
     };')
 
-from ROOT import EventDataSpacePoint
+from ROOT import EventDataSpacePoint  # noqa
 
 
 class SVDValidationTTreeSpacePoint(Module):

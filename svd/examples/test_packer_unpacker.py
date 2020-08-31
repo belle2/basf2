@@ -3,6 +3,9 @@
 
 from basf2 import *
 
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+
 numEvents = 10
 nodeid = 0
 eventinfosetter = register_module('EventInfoSetter')
@@ -11,9 +14,6 @@ eventinfosetter.param('runList', [1])
 eventinfosetter.param('evtNumList', [numEvents])
 
 evtgeninput = register_module('EvtGenInput')
-
-from simulation import add_simulation
-from reconstruction import add_reconstruction
 
 rootoutput = register_module('RootOutput')
 

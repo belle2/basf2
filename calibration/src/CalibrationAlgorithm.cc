@@ -253,7 +253,7 @@ string CalibrationAlgorithm::getExpRunString(ExpRun& expRun) const
   return expRunString;
 }
 
-string CalibrationAlgorithm::getFullObjectPath(string name, ExpRun expRun) const
+string CalibrationAlgorithm::getFullObjectPath(const string& name, ExpRun expRun) const
 {
   string dirName = getPrefix() + "/" + name;
   string objName = name + "_" + getExpRunString(expRun);
@@ -356,14 +356,13 @@ RunRange CalibrationAlgorithm::getRunRangeFromAllData() const
   // Save TDirectory to change back at the end
   TDirectory* dir = gDirectory;
   RunRange runRange;
-  RunRange* runRangeOther;
   // Construct the TDirectory name where we expect our objects to be
   string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
   for (const auto& fileName : m_inputFileNames) {
     //Open TFile to get the objects
     unique_ptr<TFile> f;
     f.reset(TFile::Open(fileName.c_str(), "READ"));
-    runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+    RunRange* runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
     if (runRangeOther) {
       runRange.merge(runRangeOther);
     } else {

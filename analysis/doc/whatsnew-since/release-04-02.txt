@@ -1,4 +1,4 @@
-Changes in the analysis package since release-04-01
+Changes in the analysis package since release-04-02
 ---------------------------------------------------
 
  .. warning:: Global includes like ``from basf2 import *`` are almost completely removed from the analysis package.
@@ -17,17 +17,18 @@ Vertex Fitting
     with the mother constrained to the beam four-momentum
     (``fit_type=fourC``).
 
- * Added ``smearing`` parameter to `vertex.kFit`. 
-   When you perform vertex fit with IP tube constraint (``fit_type=vertex`` and ``constraint=iptube``), IP profile is smeared by
-   the given value. 
-   The IP tube is defined by a neutral track pointing towards boost direction starting from the smeared IP profile.
+ * Added ``smearing`` parameter to `vertex.kFit`.
+   When you perform a vertex fit with an IP tube constraint (``fit_type=vertex`` and ``constraint=iptube``), the IP profile is
+   smeared by the given value.
+   The IP tube is defined by a neutral track pointing towards the boost direction starting from the smeared IP profile.
    Setting ``smearing=0`` gives the original ``iptube`` option, which is an elongated ellipsoid in boost direction.
 
  * Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`BII-6336`).
 
  * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.treeFit`.
    This now provides compatibility of TreeFitter with the bremsstrahlung recovery modules.
-   TreeFitter can now be used for decays for which Bremsstrahlung correction has been run.
+   In principle, TreeFitter can now be used for decays for which Bremsstrahlung correction has been applied. However, there are
+   massive performance issues. Do not blindly use TreeFit but cross-check your results with KFit. Further improvements are planned.
 
 Standard Particle Lists
 +++++++++++++++++++++++
@@ -218,6 +219,29 @@ Modules
    option :code:`useRollBack = True` switches that on.
  * Added an argument to the `ParticleCombiner` module that allows to deactivate the automatic reconstruction of the
    charge-conjugated mode. In `reconstructDecay` the option is called ``chargeConjugation``, which is ``True`` by default.
+ * The MC matching with the :ref:`DecayString` properly works in hierarchical decay. For example,
+
+   .. code-block:: python
+
+        from modularAnalysis import reconstructDecay, matchMCTruth
+        reconstructDecay('B0:signal      -> mu+ mu- ... ?gamma',   '', path=mypath)
+        reconstructDecay('B0:generic     -> D*-:Dpi pi+:all',      '', path=mypath)
+        reconstructDecay('Upsilon(4S):BB -> B0:generic B0:signal', '', path=mypath)
+        matchMCTruth('Upsilon(4S)', path=mypath)
+
+   In the above case, missing daughters (massive FSP and gamma) of ``B0:signal`` are accepted for not only ``B0:signal`` but also ``Upsilon(4S)``, so that `isSignal` can be 1.
+   Another example,
+
+   .. code-block:: python
+
+        reconstructDecay('D-:pipi0 -> pi-:all pi0:all',      '', path=mypath)
+	reconstructDecay('B0:Dpi   -> D-:pipi0 pi+:all ...', '', path=mypath)
+        matchMCTruth('B0:Dpi', path=mypath)
+
+   In this case, one wants to accept missing massive daughters in ``B0:Dpi`` decay but not in ``D-:pipi0`` decay.
+   So, if the decay of ``D-:pipi0`` in the MC truth level is ``D- -> pi+ pi- pi- pi0``, `isSignal` of ``D-:pipi0`` and ``B0:Dpi`` will be 0, 
+   since there are missing daughters in ``D-:pipi0`` decay. If one wants to accept missing daughters in ``D-:pipi0``, please use the 
+   :ref:`DecayString` grammar in the reconstruction of ``D-:pipi0`` or use `isSignalAcceptMissing` variable instead of `isSignal`.
 
 Utilities and core objects
 ++++++++++++++++++++++++++

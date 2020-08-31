@@ -53,7 +53,8 @@ void PrintMCParticlesModule::event()
   //Loop over the top level particles (no mother particle exists)
   for (int i = 0; i < m_mcparticles.getEntries(); i++) {
     MCParticle& mc = *m_mcparticles[i];
-    if (mc.getMother() != NULL) continue;
+    if (mc.getMother() != nullptr)
+      continue;
     printTree(mc, 0);
   }
 }

@@ -18,19 +18,19 @@
 #                                                                                          *
 # ******************************************************************************************
 
+import random
+import math
+import glob
+import sys
+import pylab
+from array import array
+import matplotlib.pyplot as plt
+from defaultEvaluationParameters import categories, rbins, r_subsample, r_size
 import ROOT
 import numpy as np
 import matplotlib as mpl
 mpl.use('Agg')
 mpl.rcParams['text.usetex'] = True
-from defaultEvaluationParameters import categories, rbins, r_subsample, r_size
-import matplotlib.pyplot as plt
-from array import array
-import pylab
-import sys
-import glob
-import math
-import random
 
 
 PATH = "."
@@ -1032,15 +1032,15 @@ for treename in treenames:
     signalCurve.SetFillColor(ROOT.kWhite)
     continuumCurve.SetFillColor(ROOT.kWhite)
 
-    l = ROOT.TLegend(0.25, 0.43, 0.5, 0.89)
-    l.AddEntry(dots, "Belle data")
-    l.AddEntry(modelCurve, 'Fit result')
-    l.AddEntry(signalCurve, "Signal")
-    l.AddEntry(continuumCurve, 'Continuum')
+    legend = ROOT.TLegend(0.25, 0.43, 0.5, 0.89)
+    legend.AddEntry(dots, "Belle data")
+    legend.AddEntry(modelCurve, 'Fit result')
+    legend.AddEntry(signalCurve, "Signal")
+    legend.AddEntry(continuumCurve, 'Continuum')
 
-    l.SetTextSize(0.055)
+    legend.SetTextSize(0.055)
 
-    plotWithResiduals(mbcFrame, B0_mbc, dots, modelCurve, "[GeV/#it{c}^{2}]", "Mbc", l, False)
+    plotWithResiduals(mbcFrame, B0_mbc, dots, modelCurve, "[GeV/#it{c}^{2}]", "Mbc", legend, False)
 
     signalData = ROOT.RooDataSet("signalData", "signalData", fitData, fitData.get(), "", "mbcSignYield_sw")
 

@@ -579,24 +579,24 @@ namespace {
 
 
     // -
-    EXPECT_FLOAT_EQ(exp->function(NULL), 1337.);
-    EXPECT_FLOAT_EQ(run->function(NULL), 12345.);
-    EXPECT_FLOAT_EQ(evt->function(NULL), 54321.);
-    EXPECT_FLOAT_EQ(date->function(NULL), 20101101.);
-    EXPECT_FLOAT_EQ(year->function(NULL), 2010.);
-    EXPECT_FLOAT_EQ(time->function(NULL), 1288569600);
+    EXPECT_FLOAT_EQ(exp->function(nullptr), 1337.);
+    EXPECT_FLOAT_EQ(run->function(nullptr), 12345.);
+    EXPECT_FLOAT_EQ(evt->function(nullptr), 54321.);
+    EXPECT_FLOAT_EQ(date->function(nullptr), 20101101.);
+    EXPECT_FLOAT_EQ(year->function(nullptr), 2010.);
+    EXPECT_FLOAT_EQ(time->function(nullptr), 1288569600);
   }
 
   TEST_F(EventVariableTest, TestGlobalCounters)
   {
     StoreArray<MCParticle> mcParticles; // empty
     const Manager::Var* var = Manager::Instance().getVariable("nMCParticles");
-    EXPECT_FLOAT_EQ(var->function(NULL), 0.0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 0.0);
 
     for (unsigned i = 0; i < 10; ++i)
       mcParticles.appendNew();
 
-    EXPECT_FLOAT_EQ(var->function(NULL), 10.0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 10.0);
 
     // TODO: add other counters nTracks etc in here
   }
@@ -3383,10 +3383,10 @@ namespace {
 
     // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi)
 
-    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 0);
+    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 1);
+    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 2);
+    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 3);
 
     D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
     D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
@@ -3409,10 +3409,10 @@ namespace {
 
     // Creation of B decay B -> D(->K0s(->pi pi) pi) pi
 
-    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 4);
+    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 5);
+    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 6);
+    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 7);
 
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_0->getArrayIndex());
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_1->getArrayIndex());
@@ -3431,8 +3431,7 @@ namespace {
     BList->addParticle(B_m);
 
     // Particle that is not an child
-    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211);
-
+    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 8);
 
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest)");

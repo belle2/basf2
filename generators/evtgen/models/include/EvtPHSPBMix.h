@@ -25,8 +25,7 @@
 //
 //------------------------------------------------------------------------
 
-#ifndef EVTPHSPBMIX_HH
-#define EVTPHSPBMIX_HH
+#pragma once
 
 #include "EvtGenBase/EvtDecayAmp.hh"
 #include "EvtGenBase/EvtParticle.hh"
@@ -118,4 +117,3 @@ private:
 
 };
 
-#endif

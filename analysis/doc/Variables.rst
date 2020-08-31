@@ -130,6 +130,14 @@ Here is a list of track variables:
 .. b2-variables::
    :group: Tracking
 
+V0 Tracking
+~~~~~~~~~~~
+
+Here is a list of track variables for V0 daughters:
+
+.. b2-variables::
+   :group: V0Daughter
+
 PID
 ~~~
 

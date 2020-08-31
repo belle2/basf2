@@ -603,6 +603,42 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr nROE_Composites(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = "";
+
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      }
+      if (arguments.size() > 1) {
+        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_Composites");
+      }
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = getRelatedROEObject(particle);
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+        int result = 0;
+        auto particles = roe->getParticles(maskName, false);
+
+        for (auto roeParticle : particles)
+        {
+          if (roeParticle->getParticleSource() == Particle::c_Composite or
+          roeParticle->getParticleSource() == Particle::c_V0) {
+            result++;
+          }
+        }
+        return result;
+      };
+      return func;
+    }
+
+
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
       std::string pListName;
@@ -2068,6 +2104,9 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
                       "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.");
+
+    REGISTER_VARIABLE("nROE_Composites(maskName)", nROE_Composites,
+                      "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.");
 
     REGISTER_VARIABLE("nROE_ParticlesInList(pListName)", nROE_ParticlesInList,
                       "Returns the number of particles in ROE from the given particle list.\n"

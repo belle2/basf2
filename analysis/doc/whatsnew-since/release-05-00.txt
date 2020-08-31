@@ -37,6 +37,7 @@ Variables
    descendants of an existing list or exclude them.
  * Added new B2BII variables for the first and last hit position in the tracking system :b2:var:`BelleFirstCDCHitX`,
    :b2:var:`BelleLastCDCHitX`, etc. and a new variable collection ``belle_track_hit``.
+ * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
 
 Modules
 +++++++
@@ -50,6 +51,7 @@ Modules
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
  * The new argument ``suffix`` has been added to the `writePi0EtaVeto` function to allow calculating this veto for multiple
    photons.
+ * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

@@ -626,10 +626,10 @@ namespace Belle2 {
         int result = 0;
         auto particles = roe->getParticles(maskName, false);
 
-        for (auto particle : particles)
+        for (auto roeParticle : particles)
         {
-          if (particle->getParticleSource() == Particle::c_Composite or
-          particle->getParticleSource() == Particle::c_V0) {
+          if (roeParticle->getParticleSource() == Particle::c_Composite or
+          roeParticle->getParticleSource() == Particle::c_V0) {
             result++;
           }
         }

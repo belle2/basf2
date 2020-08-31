@@ -35,6 +35,7 @@ Variables
    and a corresponding collection ``mc_event_kinematics``.
  * Fixed the variable :b2:var:`isDescendantOfList`, which did not work if the ParticleLoader was used to fill a ParticleList with
    descendants of an existing list or exclude them.
+ * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
 
 Modules
 +++++++
@@ -46,6 +47,7 @@ Modules
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
+ * A new helper method `updateROEUsingV0Lists` has been added to facilite application of V0Finder results in Rest Of Event.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

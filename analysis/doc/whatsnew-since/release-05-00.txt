@@ -35,6 +35,8 @@ Variables
    and a corresponding collection ``mc_event_kinematics``.
  * Fixed the variable :b2:var:`isDescendantOfList`, which did not work if the ParticleLoader was used to fill a ParticleList with
    descendants of an existing list or exclude them.
+ * Added new B2BII variables for the first and last hit position in the tracking system :b2:var:`BelleFirstCDCHitX`,
+   :b2:var:`BelleLastCDCHitX`, etc. and a new variable collection ``belle_track_hit``.
 
 Modules
 +++++++

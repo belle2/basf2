@@ -174,8 +174,8 @@ namespace Belle2 {
     //! Pack data for PCIe40 data-format
     /* cppcheck-suppress missingOverride */
     int* PackDetectorBuf(int* packed_buf_nwords,
-                         const int* (&detector_buf_ch)[MAX_PCIE40_CH],
-                         const int (&nwords_ch)[MAX_PCIE40_CH],
+                         int* const(&detector_buf_ch)[MAX_PCIE40_CH],
+                         int const(&nwords_ch)[MAX_PCIE40_CH],
                          RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
 
     //

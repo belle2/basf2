@@ -213,12 +213,10 @@ void RawCOPPER::PackDetectorBuf(
   return;
 }
 
-void RawCOPPER::PackDetectorBuf(int* packed_buf_nwords,
-                                const int* (&detector_buf_ch)[MAX_PCIE40_CH],
-                                const int (&nwords_ch)[MAX_PCIE40_CH],
+void RawCOPPER::PackDetectorBuf(int* const(&detector_buf_ch)[MAX_PCIE40_CH],
+                                int const(&nwords_ch)[MAX_PCIE40_CH],
                                 RawCOPPERPackerInfo rawcprpacker_info)
 {
-
   if (m_access != NULL) {
     delete m_access;
   }

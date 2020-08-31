@@ -304,9 +304,8 @@ namespace Belle2 {
                                    RawCOPPERPackerInfo rawcprpacker_info);
 
     //! Pack data for PCIe40 data-format
-    void PackDetectorBuf(int* packed_buf_nwords,
-                         const int* (&detector_buf_ch)[MAX_PCIE40_CH],
-                         const int (&nwords_ch)[MAX_PCIE40_CH],
+    void PackDetectorBuf(int* const(&detector_buf_ch)[MAX_PCIE40_CH],
+                         int const(&nwords_ch)[MAX_PCIE40_CH],
                          RawCOPPERPackerInfo  rawcprpacker_info);
 
     //! Get the max number of channels in a readout board

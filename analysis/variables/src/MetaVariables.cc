@@ -763,8 +763,7 @@ namespace Belle2 {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (std::invalid_argument&) {
-          B2WARNING("First two arguments of mcDaughterDiffOf meta function must be integers!");
-          return nullptr;
+          B2FATAL("First two arguments of mcDaughterDiffOf meta function must be integers!");
         }
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
         auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
@@ -866,8 +865,7 @@ namespace Belle2 {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (std::invalid_argument&) {
-          B2WARNING("The two arguments of mcDaughterDiffOfPhi meta function must be integers!");
-          return nullptr;
+          B2FATAL("The two arguments of mcDaughterDiffOfPhi meta function must be integers!");
         }
 
         const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
@@ -1074,8 +1072,7 @@ namespace Belle2 {
           iDaughterNumber = Belle2::convertString<int>(arguments[0]);
           jDaughterNumber = Belle2::convertString<int>(arguments[1]);
         } catch (std::invalid_argument&) {
-          B2WARNING("The two arguments of mcDaughterDiffOfPhiCMS meta function must be integers!");
-          return nullptr;
+          B2FATAL("The two arguments of mcDaughterDiffOfPhiCMS meta function must be integers!");
         }
 
         const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(phi)");

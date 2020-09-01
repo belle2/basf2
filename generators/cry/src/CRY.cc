@@ -18,10 +18,6 @@
 #include <TDatabasePDG.h>
 #include <TRandom3.h>
 
-//#include <G4Orb.hh>
-//#include <G4Tubs.hh>
-//#include <CLHEP/Vector/LorentzVector.h>
-//#include <CLHEP/Vector/ThreeVector.h>
 #include <VecGeom/volumes/UnplacedBox.h>
 #include <VecGeom/volumes/UnplacedOrb.h>
 #include <VecGeom/volumes/UnplacedTube.h>
@@ -94,7 +90,6 @@ namespace Belle2 {
       ev.clear();
       m_cryGenerator->genEvent(&ev);
       // check all particles
-      //B2INFO("Trial " << iTrial << ", " << ev.size() << " particles");
       for (auto* p : ev) {
         const int pdg = p->PDGid();
         const double kineticEnergy = p->ke() * Unit::MeV;
@@ -119,7 +114,6 @@ namespace Belle2 {
 
         vecgeom::Vector3D<double> pos(vx, vy, vz);
         vecgeom::LorentzVector<double> mom(px, py, pz, etot);
-        //B2INFO(pdg << " pos: " << pos << " , mom: " << mom << " mom.mag: " << mom.vect().mag() << " ptot: " << ptot);
         const double speed = (mass == 0 ? 1 : mom.Beta()) * Const::speedOfLight;
 
         // Project on the boundary of the world box

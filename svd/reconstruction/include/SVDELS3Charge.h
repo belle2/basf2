@@ -44,11 +44,6 @@ namespace Belle2 {
        */
       double getClusterChargeError() override;
 
-
-    private:
-
-      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibration wrapper*/
-
     };
 
   }

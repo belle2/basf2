@@ -2158,7 +2158,7 @@ def updateROEUsingV0Lists(target_particle_list, mask_names, default_cleanup=True
                      path=roe_path)
     fitter = fitter.lower()
     if (fitter != 'treefit' and fitter != 'kfit'):
-        B2WARNING('Argument "fitter" in updateROEUsingV0Lists has only "tree" and "kfit" options, '
+        B2WARNING('Argument "fitter" in updateROEUsingV0Lists has only "treefit" and "kfit" options, '
                   f'but "{fitter}" was provided! TreeFitter will be used instead.')
         fitter = 'treefit'
     from vertex import kFit, treeFit

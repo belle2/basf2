@@ -362,7 +362,7 @@ namespace {
 
     var = Manager::Instance().getVariable("weXiZ()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.27249247);
+    EXPECT_FLOAT_EQ(var->function(part), 0.31121328);
 
     var = Manager::Instance().getVariable("weQ2lnuSimple(my_mask,0)");
     ASSERT_NE(var, nullptr);

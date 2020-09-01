@@ -1446,9 +1446,13 @@ namespace Belle2 {
           energy += recTrackParticle->getEnergy();
         }
 
-        // "Loop" the ROE side
-        pz += roe->get4VectorTracks(maskName).Vect().Pz();
-        energy += roe->get4VectorTracks(maskName).Energy();
+        // Loop the ROE side
+        auto roeParticles = roe->getChargedParticles(maskName);
+        for (auto* roeParticle : roeParticles)
+        {
+          pz += roeParticle->getPz();
+          energy += roeParticle->getEnergy();
+        }
 
         return pz / energy;
       };

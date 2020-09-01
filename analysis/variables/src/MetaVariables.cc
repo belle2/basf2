@@ -2972,8 +2972,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The extraInfo has to be set first by another module like MVAExpert in event mode.\n"
                       "If nothing is set under this name, NaN is returned.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
-		      "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
-		      "The result of second call to this variable in the same event will be provided from the cache.\n"
+		                  "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
+		                  "The result of second call to this variable in the same event will be provided from the cache.\n"
                       "It is recommended to use this variable in order to declare custom aliases as event-based. This is "
                       "necessary if using the eventwise mode of variablesToNtuple).");
     REGISTER_VARIABLE("particleCached(variable)", particleCached,

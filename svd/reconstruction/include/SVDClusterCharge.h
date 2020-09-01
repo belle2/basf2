@@ -98,8 +98,6 @@ namespace Belle2 {
       /** side of the cluster */
       bool m_isUside = 0;
 
-    private:
-
       /**SVDPulseShaper calibration wrapper*/
       SVDPulseShapeCalibrations m_PulseShapeCal;
 

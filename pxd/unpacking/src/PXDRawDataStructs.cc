@@ -191,10 +191,10 @@ namespace Belle2 {
     unsigned int dhc_dhe_end_frame::getErrorStateMachineDHP(int dhpid) const
     {
       switch (dhpid) {
-        case 0: return (errorinfo & 0xFF000000) >> 24;
-        case 1: return (errorinfo & 0x00FF0000) >> 16;
-        case 2: return (errorinfo & 0x0000FF00) >> 8;
-        case 3: return (errorinfo & 0x000000FF);
+        case 0: return ((uint32_t)errorinfo >> 24) & 0xFF;
+        case 1: return ((uint32_t)errorinfo >> 16) & 0xFF;
+        case 2: return ((uint32_t)errorinfo >>  8) & 0xFF;
+        case 3: return errorinfo & 0xFF;
         default: return 0;
       }
     };
@@ -202,10 +202,10 @@ namespace Belle2 {
     unsigned int dhc_dhe_end_frame::getErrorStateMachineStartDHP(int dhpid) const
     {
       switch (dhpid) {
-        case 0: return (errorinfo & 0x0F000000) >> 24;
-        case 1: return (errorinfo & 0x000F0000) >> 16;
-        case 2: return (errorinfo & 0x00000F00) >> 8;
-        case 3: return (errorinfo & 0x0000000F);
+        case 0: return ((uint32_t)errorinfo >> 24) & 0xF;
+        case 1: return ((uint32_t)errorinfo >> 16) & 0xF;
+        case 2: return ((uint32_t)errorinfo >>  8) & 0xF;
+        case 3: return errorinfo & 0xF;
         default: return 0;
       }
     };
@@ -213,10 +213,10 @@ namespace Belle2 {
     unsigned int dhc_dhe_end_frame::getErrorStateMachineEndDHP(int dhpid) const
     {
       switch (dhpid) {
-        case 0: return (errorinfo & 0xF0000000) >> 28;
-        case 1: return (errorinfo & 0x00F00000) >> 20;
-        case 2: return (errorinfo & 0x0000F000) >> 12;
-        case 3: return (errorinfo & 0x000000F0) >> 4;
+        case 0: return ((uint32_t)errorinfo >> 28) & 0xF;
+        case 1: return ((uint32_t)errorinfo >> 20) & 0xF;
+        case 2: return ((uint32_t)errorinfo >> 12) & 0xF;
+        case 3: return ((uint32_t)errorinfo >>  4) & 0xF;
         default: return 0;
       }
     };

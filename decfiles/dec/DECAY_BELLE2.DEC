@@ -8109,8 +8109,8 @@ Enddecay
 Decay a_1+ #  Edited by U. Tamponi, March 2016
 0.30875   rho0 pi+                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
 0.30875   rho+ pi0                        VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
-0.01300   rho(2S)0 pi+                    VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave. #off mass shell, removed to speed up simulation
-0.01300   rho(2S)+ pi0                    VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, removed to speed up simulation
+0.01300   rho(2S)0 pi+                    VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
+0.01300   rho(2S)+ pi0                    VVS_PWAVE .2154 0.0 0.0 0.0 .7846 0.0; # S- and D-wave # off mass shell, included back into the simulation on request of Pablo Goldenzweig
 0.1618    sigma_0 pi+                     PHSP;
 0.0250    K+ K0 pi0                       PHSP; #placeholder for K* K final states, which are off-shell
 0.0250    anti-K0 K0 pi+                  PHSP; #placeholder for K* K final states, which are off-shell

@@ -536,21 +536,31 @@ namespace {
     PCmsLabTransform T;
     graphParticleMother.set4Vector(T.rotateCmsToLab() * TLorentzVector({ 3.0, 4.0, 5.0, 18.0 }));
     graphParticleGranddaughter3.set4Vector(T.rotateCmsToLab() * TLorentzVector({ 0.0, 0.0, 5.0, 5.0 }));
-
     graphParticleMother.setMass(16.55294535724685);
+
+    // The following masses and momenta do not factor into the calculation, but we will set them non-zero
+    TLorentzVector dummyP4(1, 2, 1, 5);
+    double dummyM = 4.3589;
+    graphParticleDaughter1.set4Vector(dummyP4);
+    graphParticleDaughter1.setMass(dummyM);
+    graphParticleDaughter2.set4Vector(dummyP4);
+    graphParticleDaughter2.setMass(dummyM);
+    graphParticleGranddaughter1.set4Vector(dummyP4);
+    graphParticleGranddaughter1.setMass(dummyM);
+    graphParticleGranddaughter2.set4Vector(dummyP4);
+    graphParticleGranddaughter2.setMass(dummyM);
 
     mcGraph.generateList();
 
     // Create mockup particles and add relations to MC particles
-    TLorentzVector zeroes(0, 0, 0, 0);
-    auto* pMother = particles.appendNew(zeroes, -521);
+    auto* pMother = particles.appendNew(dummyP4, -521);
     pMother->addRelationTo(mcParticles[0]);
 
-    particles.appendNew(zeroes, 421)->addRelationTo(mcParticles[1]);
-    particles.appendNew(zeroes, -211)->addRelationTo(mcParticles[2]);
-    particles.appendNew(zeroes, -321)->addRelationTo(mcParticles[3]);
-    particles.appendNew(zeroes, -11)->addRelationTo(mcParticles[4]);
-    particles.appendNew(zeroes, 12)->addRelationTo(mcParticles[5]);
+    particles.appendNew(dummyP4, 421)->addRelationTo(mcParticles[1]);
+    particles.appendNew(dummyP4, -211)->addRelationTo(mcParticles[2]);
+    particles.appendNew(dummyP4, -321)->addRelationTo(mcParticles[3]);
+    particles.appendNew(dummyP4, -11)->addRelationTo(mcParticles[4]);
+    particles.appendNew(dummyP4, 12)->addRelationTo(mcParticles[5]);
 
     double E_B = T.getCMSEnergy() / 2.0;
     double M_B = pMother->getPDGMass();

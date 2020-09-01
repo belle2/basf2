@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <framework/dbobjects/BunchStructure.h>
+#include <algorithm>
 #include <TRandom.h>
 
 
@@ -19,6 +20,7 @@ namespace Belle2 {
     if (m_fillPattern.empty()) m_fillPattern.resize(c_RFBuckets, false);
 
     m_fillPattern[i % c_RFBuckets] = true;
+    m_filledBuckets.clear();
   }
 
 
@@ -34,11 +36,7 @@ namespace Belle2 {
   {
     if (m_fillPattern.empty()) return (c_RFBuckets / 2);
 
-    unsigned n = 0;
-    for (auto x : m_fillPattern) {
-      if (x) n++;
-    }
-    return n;
+    return std::count(m_fillPattern.begin(), m_fillPattern.end(), true);
   }
 
 
@@ -46,26 +44,14 @@ namespace Belle2 {
   {
     if (m_fillPattern.empty()) return (gRandom->Integer(c_RFBuckets / 2) * 2);
 
-    if (m_cumulative.empty()) {
-      m_cumulative.push_back(0);
-      for (auto x : m_fillPattern) {
-        if (x) m_cumulative.push_back(1 + m_cumulative.back());
-        else m_cumulative.push_back(m_cumulative.back());
+    if (m_filledBuckets.empty()) {
+      for (unsigned i = 0; i < c_RFBuckets; ++i) {
+        if (m_fillPattern[i]) m_filledBuckets.push_back(i);
       }
     }
 
-    double random = gRandom->Uniform(m_cumulative.back());
-    int i1 = 0;
-    int i2 = m_cumulative.size() - 1;
-    while (i2 - i1 > 1) {
-      int i = (i1 + i2) / 2;
-      if (random > m_cumulative[i]) {
-        i1 = i;
-      } else {
-        i2 = i;
-      }
-    }
-    return i1;
+    int index = gRandom->Integer(m_filledBuckets.size());
+    return m_filledBuckets[index];
   }
 
 } //Belle2 namespace

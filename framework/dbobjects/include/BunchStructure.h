@@ -84,8 +84,8 @@ namespace Belle2 {
 
     std::vector<bool> m_fillPattern; /**< fill pattern, true means the bucket is filled */
 
-    /** cache for the cumulative distribution of fill pattern */
-    mutable std::vector<double> m_cumulative; //! dont't write out
+    /** cache for the filled bucket numbers */
+    mutable std::vector<unsigned> m_filledBuckets; //! dont't write out
 
     ClassDef(BunchStructure, 1); /**< ClassDef */
 

@@ -128,7 +128,7 @@ namespace Belle2 {
       double deltaa = 0;
       SVDNoiseCalibrations noise;
       for (auto strip : strips)
-        deltaa += noise.getNoiseInElectrons(m_vxdID, m_isUside, strip.cellID);
+        deltaa += TMath::Power(noise.getNoiseInElectrons(m_vxdID, m_isUside, strip.cellID), 2);
       deltaa = std::sqrt(deltaa);
 
       // up to here COPIED from SVDELS3Time::getClusterTimeError
@@ -142,30 +142,16 @@ namespace Belle2 {
       double dAda0 = - (1 + 2 * E2) / denominator - factor * dwda0;
 
       //computing dAda1
-      double dAda1 = - (1. / E - E3) / denominator - factor * dwda1;
+      double dAda1 = (1. / E - E3) / denominator - factor * dwda1;
 
       //computing dAda2
-      double dAda2 = - (2 + E2) / denominator - factor * dwda2;
+      double dAda2 = (2 + E2) / denominator - factor * dwda2;
 
       double chargeError = std::abs(deltaa) * std::sqrt(dAda0 * dAda0 + dAda1 * dAda1 + dAda2 * dAda2);
 
       return  chargeError;
     }
 
-
-    double SVDELS3Charge::getClusterSeedCharge()
-    {
-
-      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
-
-      double rawSeedCharge = m_rawCluster.getSeedMaxSample();
-      double seedCellID = strips.at(m_rawCluster.getSeedInternalIndex()).cellID;
-
-      double seedCharge = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, seedCellID, rawSeedCharge);
-
-      return seedCharge;
-
-    }
 
   }  //SVD namespace
 } //Belle2 namespace

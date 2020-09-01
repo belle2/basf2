@@ -44,10 +44,6 @@ namespace Belle2 {
        */
       double getClusterChargeError() override;
 
-      /**
-       * @return the cluster seed charge
-       */
-      double getClusterSeedCharge() override;
 
     private:
 

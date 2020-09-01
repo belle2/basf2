@@ -103,7 +103,7 @@ namespace Belle2 {
       double deltaa = 0;
       SVDNoiseCalibrations noise;
       for (auto strip : strips)
-        deltaa += noise.getNoiseInElectrons(m_vxdID, m_isUside, strip.cellID);
+        deltaa += TMath::Power(noise.getNoiseInElectrons(m_vxdID, m_isUside, strip.cellID), 2);
       deltaa = std::sqrt(deltaa);
 
       double timeError = std::abs(deltaa * dTdw) * std::sqrt(dwda0 * dwda0 + dwda1 * dwda1 + dwda2 * dwda2);

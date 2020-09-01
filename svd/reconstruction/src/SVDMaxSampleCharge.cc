@@ -81,18 +81,5 @@ namespace Belle2 {
       return TMath::Sqrt(noiseSquared);
     }
 
-    double SVDMaxSampleCharge::getClusterSeedCharge()
-    {
-
-      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
-
-      double rawSeedCharge = m_rawCluster.getSeedMaxSample();
-      double seedCellID = strips.at(m_rawCluster.getSeedInternalIndex()).cellID;
-
-      double seedCharge = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, seedCellID, rawSeedCharge);
-
-      return seedCharge;
-
-    }
   }  //SVD namespace
 } //Belle2 namespace

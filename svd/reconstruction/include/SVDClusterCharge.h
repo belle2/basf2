@@ -12,6 +12,9 @@
 
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/RawCluster.h>
+
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -43,7 +46,19 @@ namespace Belle2 {
       /**
        * @return the cluster seed charge  (as strip max sample)
        */
-      virtual double getClusterSeedCharge() = 0;
+      double getClusterSeedCharge()
+      {
+
+        std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
+
+        double rawSeedCharge = m_rawCluster.getSeedMaxSample();
+        double seedCellID = strips.at(m_rawCluster.getSeedInternalIndex()).cellID;
+
+        double seedCharge = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, seedCellID, rawSeedCharge);
+
+        return seedCharge;
+
+      }
 
       /**
        * @return the cluster charge
@@ -82,6 +97,11 @@ namespace Belle2 {
 
       /** side of the cluster */
       bool m_isUside = 0;
+
+    private:
+
+      /**SVDPulseShaper calibration wrapper*/
+      SVDPulseShapeCalibrations m_PulseShapeCal;
 
     };
 

@@ -13,8 +13,6 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterCharge.h>
 
-#include <svd/calibration/SVDPulseShapeCalibrations.h>
-
 #include <vector>
 
 namespace Belle2 {
@@ -50,18 +48,10 @@ namespace Belle2 {
       double getClusterChargeError() override;
 
       /**
-       * @return the cluster seed charge
-       */
-      double getClusterSeedCharge() override;
-
-      /**
        * virtual destructor
        */
       //      virtual ~SVDMaxSampleQCharge();
 
-    private:
-
-      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibration wrapper*/
 
     };
 

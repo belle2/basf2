@@ -38,6 +38,7 @@ Variables
  * Added new B2BII variables for the first and last hit position in the tracking system :b2:var:`BelleFirstCDCHitX`,
    :b2:var:`BelleLastCDCHitX`, etc. and a new variable collection ``belle_track_hit``.
  * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
+ * Added meta variables corresponding to existing variables that access the MC matched particles of given daughters :b2:var:`mcDaughterDiffOf` , :b2:var:`mcDaughterDiffOfPhi`, :b2:var:`mcDaughterDiffOfPhiCMS`, :b2:var:`mcDaughterAngle`.
 
 Modules
 +++++++

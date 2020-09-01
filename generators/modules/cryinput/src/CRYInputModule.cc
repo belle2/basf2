@@ -12,6 +12,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <string>
 #include <vector>
@@ -35,65 +36,40 @@ CRYInputModule::CRYInputModule() : Module()
   //Set module properties
   setDescription("Generates cosmic showers with CRY");
   addParam("CosmicDataDir", m_cosmicdatadir, "Directory that holds the cosmic data for CRY.", std::string(""));
-  addParam("SetupFile", m_setupfile, "User setup file for CRY.", std::string(""));
-  addParam("acceptLength", m_acceptLength, "Length of the acceptance box [m]", 10.);
-  addParam("acceptWidth", m_acceptWidth, "Width of the acceptance box [m]", 10.);
-  addParam("acceptHeight", m_acceptHeight, "Height of the acceptance box [m]", 10.);
-  addParam("keepLength", m_keepLength, "Length of the keepance box [m]", 10.);
-  addParam("keepWidth", m_keepWidth, "Width of the keepance box [m]", 10.);
-  addParam("keepHeight", m_keepHeight, "Height of the keepance box [m]", 10.);
+  addParam("acceptance", m_acceptance, R"DOC(Size of the acceptance volume. This can be either be:
+1. one value being the radius of a sphere
+2. two values for the radius (in xy) and the half-length (in z) of a cylinder
+3. three values for x,y,z half-length of a box
+
+All values are in cm)DOC", m_acceptance);
   addParam("maxTrials", m_maxTrials, "Maximum number of trials per event", 1000);
   addParam("kineticEnergyThreshold", m_kineticEnergyThreshold, "Energy threshold [GeV]", 0.01);
   addParam("timeOffset", m_timeOffset, "Time offset [s]", 0.0);
-
-  m_keepLength = m_keepLength * Belle2::Unit::m;
-  m_keepWidth = m_keepWidth * Belle2::Unit::m;
-  m_keepLength = m_keepLength * Belle2::Unit::m;
-  m_acceptLength = m_acceptLength * Belle2::Unit::m;
-  m_acceptWidth = m_acceptWidth * Belle2::Unit::m;
-  m_acceptHeight = m_acceptHeight * Belle2::Unit::m;
-  m_timeOffset = m_timeOffset * Belle2::Unit::s;
-  m_kineticEnergyThreshold = m_kineticEnergyThreshold * Belle2::Unit::GeV;
 }
-
-
-CRYInputModule::~CRYInputModule()
-{
-
-}
-
 
 void CRYInputModule::initialize()
 {
+  if (m_cosmicdatadir.empty()) {
+    m_cosmicdatadir = FileSystem::findFile("data/generators/modules/cryinput/");
+  }
+
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
 
-  m_generator.setSetupFile(m_setupfile);
   m_generator.setCosmicDataDir(m_cosmicdatadir);
-  m_generator.setAcceptLength(m_acceptLength);
-  m_generator.setAcceptWidth(m_acceptWidth);
-  m_generator.setAcceptHeight(m_acceptHeight);
-  m_generator.setKeepLength(m_keepLength);
-  m_generator.setKeepWidth(m_keepWidth);
-  m_generator.setKeepHeight(m_keepHeight);
+  m_generator.setAcceptance(m_acceptance);
   m_generator.setMaxTrials(m_maxTrials);
   m_generator.setKineticEnergyThreshold(m_kineticEnergyThreshold);
   m_generator.setTimeOffset(m_timeOffset);
-
   m_generator.init();
-
 }
-
 
 void CRYInputModule::event()
 {
   m_mcGraph.clear();
-
   m_generator.generateEvent(m_mcGraph);
-
-  m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+  m_mcGraph.generateList();
 }
-
 
 void CRYInputModule::terminate()
 {

@@ -35,7 +35,7 @@ namespace Belle2 {
     CRYInputModule();
 
     /** Destructor. */
-    virtual ~CRYInputModule();
+    virtual ~CRYInputModule() = default;
 
     /** Initializes the module. */
     virtual void initialize() override;
@@ -47,24 +47,14 @@ namespace Belle2 {
     virtual void terminate() override;
 
   protected:
-    /** Module parameters */
-    std::string m_setupfile; /**< user setupfile. */
     std::string m_cosmicdatadir; /**< cosmic data (used by CRY for interpolation). */
-    double m_acceptLength;  /**< length of a box used to reject quickly non detector particles. */
-    double m_acceptWidth;  /**< width of a box used to count particle into acceptance box quickly non detector particles. */
-    double m_acceptHeight;  /**< height of a box used to count particle into acceptance box quickly non detector particles. */
-    double m_keepLength;  /**< length of a box used to count particle into acceptance box quickly non detector particles. */
-    double m_keepWidth;  /**< width of a box used to reject quickly non detector particles. */
-    double m_keepHeight;  /**< height of a box used to reject quickly non detector particles. */
+    std::vector<double> m_acceptance; /**< Shape parameters for the acceptance box */
     double m_kineticEnergyThreshold;  /**< kinetic energy threshold. */
     double m_timeOffset;  /**< time offset. */
     int m_maxTrials;  /**< maximum number of trials. */
 
     CRY m_generator;   /**< The CRY generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */
-
-  private:
-
   };
 
 

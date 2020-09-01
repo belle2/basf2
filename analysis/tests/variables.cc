@@ -566,9 +566,10 @@ namespace {
     double M_B = pMother->getPDGMass();
     double p_B = std::sqrt(E_B * E_B - M_B * M_B);
 
-    double E_Y = 13.0; // E_Mother - E_Granddaughter3
-    double p_Y = 5.0; // |p_Mother - p_Granddaughter3|
-    double M_Y = 12.0; // sqrt((p4_Mother - p4_Granddaughter3)^2)
+    TLorentzVector p4_Y_CMS = T.rotateLabToCms() * (graphParticleMother.get4Vector() - graphParticleGranddaughter3.get4Vector());
+    double E_Y = p4_Y_CMS.E(); // E_Mother - E_Granddaughter3
+    double p_Y = p4_Y_CMS.Rho(); // |p_Mother - p_Granddaughter3|
+    double M_Y = p4_Y_CMS.M(); // sqrt((p4_Mother - p4_Granddaughter3)^2)
 
     double expectedCosBY = (2 * E_B * E_Y - M_B * M_B - M_Y * M_Y) / (2 * p_B * p_Y);
 

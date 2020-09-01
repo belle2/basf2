@@ -118,7 +118,7 @@ Format: layerID (0-55), wireID(0-)
 * badwire_sample.dat: Just a sample file. <- obsolete
 * badwire_off.dat   : Empty file; the file for turning-off badwire effect.
 * badwire_v1.dat    : contains bad wires known as of Oct.21 2016.
-* badwire_v2.dat    : contains bad wires known as of Feburary, 2017.
+* badwire_v2.dat    : contains bad wires known as of February, 2017.
 
 # time-walk
 
@@ -145,7 +145,7 @@ Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward 
 
 * misalignment_v2.dat: assume (dx,dy,dz)=0 and measured tensions for all wires = 0  -> deleted.
 * alignment_v2.dat:  : = misalignment_v2.dat
-* alignment_v3.dat: introduced so that this plus displacement_v2.2.1 can reproduce the wire positons which are produced from displacement_v1.1 plus align_201702.dat (by Thanh).
+* alignment_v3.dat: introduced so that this plus displacement_v2.2.1 can reproduce the wire positions which are produced from displacement_v1.1 plus align_201702.dat (by Thanh).
 
 # tentative correction for the difference betw. old design and final design
 

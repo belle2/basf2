@@ -24,13 +24,13 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
         -o|--output-dir)
-        OUTPUT=$(realpath $2)
+        OUTPUT=$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$2")
         shift 2
         ;;
         -h|--help)
         cat <<EOT
 This script will run sphinx with the appropriate arguments to build the user
-documentation and optionally only show the warnings.
+documentation.
 
 Optional Arguments:
   --light           Create documentation only for the light release, that is only

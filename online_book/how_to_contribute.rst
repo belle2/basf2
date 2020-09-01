@@ -1,4 +1,4 @@
-.. _how_to_contribute:
+.. _onlinebook_how_to_contribute:
 
 Why contribute? Read our propaganda at :doc:`/online_book/contribute`.
 

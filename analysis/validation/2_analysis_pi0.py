@@ -12,9 +12,6 @@
 </header>
 """
 
-INPUT_FILENAME = "../GenericB_GENSIMRECtoDST.dst.root"
-OUTPUT_FILENAME = "Pi0_Validation.root"
-
 import basf2
 import ROOT
 import array
@@ -24,6 +21,9 @@ from stdPi0s import stdPi0s
 from validation_tools.metadata import create_validation_histograms
 from validation_tools.metadata import validation_metadata_update
 from variables import variables as vm
+
+INPUT_FILENAME = "../GenericB_GENSIMRECtoDST.dst.root"
+OUTPUT_FILENAME = "Pi0_Validation.root"
 
 main = basf2.Path()
 inputMdst('default', INPUT_FILENAME, path=main)
@@ -132,7 +132,7 @@ totalPdf.plotOn(frame1, ROOT.RooFit.Components("sigcb"), ROOT.RooFit.LineStyle(R
 totalPdf.plotOn(frame1, ROOT.RooFit.Components("bkg"), ROOT.RooFit.LineStyle(3), ROOT.RooFit.LineColor(ROOT.kBlue))
 # totalPdf.paramOn(frame1,ROOT.RooFit.Parameters(ROOT.RooArgSet(sig1,mean,nsig)),ROOT.RooFit.Format("NELU",ROOT.RooFit.AutoPrecision(2)),ROOT.RooFit.Layout(0.5,0.9,0.9))
 # frame1.getAttText().SetTextSize(0.5)
-frame1.SetMaximum(Mrecohist.GetMaximum()*1.5)
+frame1.SetMaximum(Mrecohist.GetMaximum() * 1.5)
 frame1.GetXaxis().SetTitleOffset(1.4)
 frame1.GetYaxis().SetTitleOffset(1.5)
 meanval = mean.getVal()
@@ -172,7 +172,7 @@ totalPdf.plotOn(frame2, ROOT.RooFit.Components("sigcb"), ROOT.RooFit.LineStyle(R
 totalPdf.plotOn(frame2, ROOT.RooFit.Components("bkg"), ROOT.RooFit.LineStyle(3), ROOT.RooFit.LineColor(ROOT.kBlue))
 # totalPdf.paramOn(frame2,ROOT.RooFit.Parameters(ROOT.RooArgSet(sig1,mean,nsig)),ROOT.RooFit.Format("NELU",ROOT.RooFit.AutoPrecision(2)),ROOT.RooFit.Layout(0.5,0.9,0.9))
 # frame2.getAttText().SetTextSize(0.5)
-frame2.SetMaximum(Mmchist.GetMaximum()*1.5)
+frame2.SetMaximum(Mmchist.GetMaximum() * 1.5)
 frame2.GetXaxis().SetTitleOffset(1.4)
 frame2.GetYaxis().SetTitleOffset(1.5)
 meanval_mc = mean.getVal()

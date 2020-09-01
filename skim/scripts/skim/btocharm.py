@@ -16,8 +16,24 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
+                                      loadD0_Kspi0_loose, loadD0_Kspipipi0,
+                                      loadKForBtoHadrons, loadPiForBtoHadrons,
+                                      loadStdD0_Kpi, loadStdD0_Kpipi0,
+                                      loadStdD0_Kpipipi, loadStdDplus_Kpipi,
+                                      loadStdDplus_Kspi,
+                                      loadStdDstar0_D0pi0_Kpi,
+                                      loadStdDstar0_D0pi0_Kpipi0,
+                                      loadStdDstar0_D0pi0_Kpipipi,
+                                      loadStdDstarPlus_D0pi_Kpi,
+                                      loadStdDstarPlus_D0pi_Kpipi0,
+                                      loadStdDstarPlus_D0pi_Kpipipi)
+from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
+                                            loadStdPi0ForBToHadrons)
 from skimExpertFunctions import BaseSkim, fancy_skim_header
-
+from stdCharged import stdK, stdPi
+from stdPi0s import stdPi0s
+from stdV0s import stdKshorts
 
 __liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
 
@@ -45,21 +61,12 @@ class BtoD0h_Kspi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-        },
-        "skim.standardlists.charm": {
-            "loadD0_Kspi0_loose": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdK("all", path=path)
+        stdPi("all", path=path)
+        stdKshorts(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadD0_Kspi0_loose(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -113,25 +120,14 @@ class BtoD0h_Kspipipi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdK": ["all"],
-            "stdPi": ["all"],
-        },
-        "stdPi0s": {
-            "stdPi0s": ["eff40_Jan2020Fit"]
-        },
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadD0_Kspipipi0": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdK("all", path=path)
+        stdPi("all", path=path)
+        stdPi0s("eff40_Jan2020Fit", path=path)
+        stdKshorts(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadD0_Kspipipi0(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.2"
@@ -184,13 +180,10 @@ class B0toDpi_Kpipi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdDplus_Kpipi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
@@ -222,18 +215,11 @@ class B0toDpi_Kspi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdV0s": {
-            "stdKshorts": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadStdDplus_Kspi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadStdDplus_Kspi(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -264,14 +250,11 @@ class B0toDstarPi_D0pi_Kpi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpi": [],
-            "loadStdDstarPlus_D0pi_Kpi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpi(path=path)
+        loadStdDstarPlus_D0pi_Kpi(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
@@ -299,19 +282,14 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpipi0": [],
-            "loadStdD0_Kpipipi": [],
-            "loadStdDstarPlus_D0pi_Kpipi0": [],
-            "loadStdDstarPlus_D0pi_Kpipipi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadStdPi0ForBToHadrons(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpipi0(path=path)
+        loadStdD0_Kpipipi(path=path)
+        loadStdDstarPlus_D0pi_Kpipi0(path=path)
+        loadStdDstarPlus_D0pi_Kpipipi(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
@@ -352,20 +330,13 @@ class B0toDrho_Kpipi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdDplus_Kpipi": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-            "loadStdAllRhoPlus": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadStdAllRhoPlus(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -399,22 +370,13 @@ class B0toDrho_Kspi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "stdV0s": {
-            "stdKshorts": []
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadStdDplus_Kspi": [],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-            "loadStdAllRhoPlus": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdKshorts(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadStdDplus_Kspi(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadStdAllRhoPlus(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -450,21 +412,14 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-            "loadStdAllRhoPlus": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpi": [],
-            "loadStdDstarPlus_D0pi_Kpi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadStdAllRhoPlus(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpi(path=path)
+        loadStdDstarPlus_D0pi_Kpi(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -502,23 +457,16 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-            "loadStdAllRhoPlus": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpipi0": [],
-            "loadStdD0_Kpipipi": [],
-            "loadStdDstarPlus_D0pi_Kpipi0": [],
-            "loadStdDstarPlus_D0pi_Kpipipi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadStdAllRhoPlus(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpipi0(path=path)
+        loadStdD0_Kpipipi(path=path)
+        loadStdDstarPlus_D0pi_Kpipi0(path=path)
+        loadStdDstarPlus_D0pi_Kpipipi(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -567,13 +515,10 @@ class BtoD0h_hh(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadD0_hh_loose": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadD0_hh_loose(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -632,13 +577,10 @@ class BtoD0h_Kpi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpi(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.5"
@@ -683,19 +625,14 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpipi0": [],
-            "loadStdD0_Kpipipi": [],
-            "loadStdDstar0_D0pi0_Kpipipi": [],
-            "loadStdDstar0_D0pi0_Kpipi0": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        loadStdPi0ForBToHadrons(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpipi0(path=path)
+        loadStdD0_Kpipipi(path=path)
+        loadStdDstar0_D0pi0_Kpipipi(path=path)
+        loadStdDstar0_D0pi0_Kpipi0(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -753,16 +690,11 @@ class BtoD0h_Kshh(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdV0s": {
-            "stdKshorts": []
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadD0_Kshh_loose": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadD0_Kshh_loose(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -820,21 +752,14 @@ class BtoD0rho_Kpi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-            "loadStdAllRhoPlus": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpi": [],
-            "loadStdDstar0_D0pi0_Kpi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadStdAllRhoPlus(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpi(path=path)
+        loadStdDstar0_D0pi0_Kpi(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -884,23 +809,16 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdPi0ForBToHadrons": [],
-            "loadStdAllRhoPlus": [],
-        },
-        "skim.standardlists.charm": {
-            "loadPiForBtoHadrons": [],
-            "loadKForBtoHadrons": [],
-            "loadStdD0_Kpipi0": [],
-            "loadStdD0_Kpipipi": [],
-            "loadStdDstar0_D0pi0_Kpipi0": [],
-            "loadStdDstar0_D0pi0_Kpipipi": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        loadStdAllRhoPlus(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpipi0(path=path)
+        loadStdD0_Kpipipi(path=path)
+        loadStdDstar0_D0pi0_Kpipi0(path=path)
+        loadStdDstar0_D0pi0_Kpipipi(path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3 and cosHelicityAngle(1,0) < 0.9 and 0.6 <= daughter(1,M) <= 0.9"

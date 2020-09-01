@@ -1,6 +1,12 @@
 Changes in the analysis package since release-05-00
 ---------------------------------------------------
 
+Vertex Fitting
+++++++++++++++
+
+ * KFit has been extended to be able to handle vertex fits (with and without mass constraint) that involve an eta particle
+   reconstructed in ``eta -> gamma gamma``.
+
 Variables
 +++++++++
 
@@ -19,6 +25,19 @@ Variables
  * Variables `clusterThetaID` and `clusterPhiID` have both been added as a new variable
  * Event-based variables from ``cluster`` collection have been moved into a new ``event_level_cluster`` collection, 
    collections of ROE and recoil variables have been expanded
+ * Added the variable :b2:var:`binaryPID`, which takes two PID codes as arguments and calculates the binary PID between them. A few
+   binary PID variables have been added to the PID variable collection.
+
+   .. hint:: The hadron PID group recommends to try out the binary PID in analyses and compare the performance with the global PID.
+
+ * Added new generated event kinematics variables :b2:var:`genMissingMass2OfEvent`,  :b2:var:`genMissingEnergyOfEventCMS`, 
+   :b2:var:`genMissingMomentumOfEventCMS`, :b2:var:`genTotalPhotonsEnergyOfEvent`, :b2:var:`genVisibleEnergyOfEventCMS` 
+   and a corresponding collection ``mc_event_kinematics``.
+ * Fixed the variable :b2:var:`isDescendantOfList`, which did not work if the ParticleLoader was used to fill a ParticleList with
+   descendants of an existing list or exclude them.
+ * Added new B2BII variables for the first and last hit position in the tracking system :b2:var:`BelleFirstCDCHitX`,
+   :b2:var:`BelleLastCDCHitX`, etc. and a new variable collection ``belle_track_hit``.
+ * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
 
 Modules
 +++++++
@@ -29,3 +48,12 @@ Modules
    beamspot is added.
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
+ * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
+ * The new argument ``suffix`` has been added to the `writePi0EtaVeto` function to allow calculating this veto for multiple
+   photons.
+ * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
+
+Full Event Interpretation
++++++++++++++++++++++++++
+
+ * Added option to reconstruct strange B mesons (at Y(5S)) in 51 decay channels. Can be switched on with the ``strangeB`` flag in `fei.get_default_channels()`.

@@ -140,11 +140,9 @@ double AxialTrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   std::vector<const CDCWireHit*> combinedWireHits;
   combinedWireHits.reserve(track1.size() + track2.size());
   for (const CDCRecoHit3D& hit : track1) {
-    // cppcheck-suppress useStlAlgorithm
     combinedWireHits.push_back(&(hit.getWireHit()));
   }
   for (const CDCRecoHit3D& hit : track2) {
-    // cppcheck-suppress useStlAlgorithm
     combinedWireHits.push_back(&(hit.getWireHit()));
   }
 

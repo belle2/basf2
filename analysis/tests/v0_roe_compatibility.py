@@ -61,5 +61,7 @@ roe_path.add_module('RestOfEventPrinter',
                     fullPrint=False)
 testpath.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
 ###############################################################################
+testpath.add_module('ParticlePrinter', listName=signal_side_name, fullPrint=False,
+                    variables=['nROE_Composites(cleanMask)'])
 
 process(testpath, 2)

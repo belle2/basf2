@@ -29,6 +29,7 @@ class SetMetaTimeModule(Module):
         if not self.meta:
             B2FATAL("no EventMetaData object")
             return
+        #: list of raw dataobjects
         self.raws = [Belle2.PyStoreArray(f"Raw{e}s") for e in self.detectorlist.split()]
 
     def calc_time(self, it):

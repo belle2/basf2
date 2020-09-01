@@ -3383,10 +3383,10 @@ namespace {
 
     // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi)
 
-    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 0);
+    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 1);
+    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 2);
+    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 3);
 
     D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
     D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
@@ -3409,10 +3409,10 @@ namespace {
 
     // Creation of B decay B -> D(->K0s(->pi pi) pi) pi
 
-    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 4);
+    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 5);
+    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 6);
+    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 7);
 
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_0->getArrayIndex());
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_1->getArrayIndex());
@@ -3431,8 +3431,7 @@ namespace {
     BList->addParticle(B_m);
 
     // Particle that is not an child
-    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211);
-
+    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 8);
 
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest)");

@@ -14,7 +14,7 @@
 
 import ROOT
 import sysconfig
-ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
+ROOT.gROOT.ProcessLine(".include " + sysconfig.get_path("include"))  # noqa
 
 import glob
 
@@ -52,9 +52,9 @@ histsAndLabels = {
     B0_vertex_pullx_s: "pull of B^{0} vertex X ",
     B0_vertex_pully_s: "pull of B^{0} vertex Y ",
     B0_vertex_pullz_s: "pull of B^{0} vertex Z ",
-    B0_vertex_resolutionx_s: "meas-mc of B^{0} vertex X [\mum]",
-    B0_vertex_resolutiony_s: "meas-mc of B^{0} vertex Y [\mum]",
-    B0_vertex_resolutionz_s: "meas-mc of B^{0} vertex Z [\mum]",
+    B0_vertex_resolutionx_s: r"meas-mc of B^{0} vertex X [\mum]",
+    B0_vertex_resolutiony_s: r"meas-mc of B^{0} vertex Y [\mum]",
+    B0_vertex_resolutionz_s: r"meas-mc of B^{0} vertex Z [\mum]",
     pVal_b: "pValue",
     pVal_s: "pValue",
 }

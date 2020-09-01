@@ -75,7 +75,7 @@ namespace Belle2 {
     bool getMatchModeByte() {return m_ModeByteMatch;}
 
     /** SVDModeByte getter
-    int  *  Gets the SVDModeByte info for the event
+     *  Gets the SVDModeByte info for the event
      */
     SVDModeByte getModeByte() const
     { return m_modeByte; }

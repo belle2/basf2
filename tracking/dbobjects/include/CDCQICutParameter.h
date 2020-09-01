@@ -39,7 +39,7 @@ namespace Belle2 {
 
   private:
     /** store the CDC QI cut value */
-    bool m_CDCQIcutvalue;
+    double m_CDCQIcutvalue;
 
     ClassDef(CDCQICutParameter, 1);  /**< ClassDef, necessary for ROOT */
   };

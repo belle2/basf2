@@ -106,11 +106,11 @@ namespace Belle2 {
     float getSVD2FTSWTimeShift(int firstFrame) const
     { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
 
-    /** getRelativeShiftNs
+    /** getRelativeShiftInNs
      * return the relative shift of the latency, in ns, in data taken in 3/6 samples
      * number between 0 and 15 (in xml) -> shift is 0*7.9 .... 15*7.9 in ns
      */
-    float getRelativeShiftNs(int m_RelativeShift) const
+    float getRelativeShiftInNs(int m_RelativeShift) const
     {
       int mode = (int)SVDModeByte(m_modeByte).getDAQMode();
 
@@ -175,7 +175,7 @@ namespace Belle2 {
     bool m_ModeByteMatch; /**< flag telling if the SVDModeByte object is the same for each FADCs in the event */
     bool m_TriggerTypeMatch; /**< flag telling if the SVDTriggerType object is the same for each FADCs in the event */
     bool m_Xtalk = false;    /**< information on the x-talk */
-    int m_RelativeShift = 0; /**< relative shift between 3/6 samples in mixed mode */
+    int m_RelativeShift = 0; /**< relative shift in units of APV-clock/4 between 3/6 samples */
 
     /**class def needed by root*/
     ClassDef(SVDEventInfo, 1);

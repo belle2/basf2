@@ -159,7 +159,7 @@ namespace Belle2 {
 
     unsigned short dhc_ghost_frame::getErrorBits(void) const
     {
-      unsigned short value = (word0.data >> 2) & 0x3; // lower two bits
+      unsigned short value = (word0.data & 0xC) >> 2;  // lower two bits
       if (word0.data & 0x0400) value |= 0x4; // high bit
       return value;
     };

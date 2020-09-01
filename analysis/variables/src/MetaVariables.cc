@@ -2973,7 +2973,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "If nothing is set under this name, NaN is returned.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
-                      "The result of second call to this variable in the same event will be provided from the cache.");
+                      "The result of second call to this variable in the same event will be provided from the cache.\n"
+		      "It is recommended to use this variable in order to declare custom aliases as event-based. This is "
+		      "necessary if using the eventwise mode of variablesToNtuple).");
     REGISTER_VARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
                       "The result of second call to this variable on the same particle will be provided from the cache.");

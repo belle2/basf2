@@ -392,8 +392,9 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
 
     // Fill b2link FEE trailer
     unsigned int crc16 = 0;
-    packed_buf[ poswords_to + POS_B2LFEE_ERRCNT_CRC16 ] =  crc16 &
-                                                           0xffff; // Error count is stored in this buffer for ver.2 format but it is set to zero here.
+    packed_buf[ poswords_to + POS_B2LFEE_ERRCNT_CRC16 ] =
+      ((0xffff & rawcpr_info.eve_num) << 16) | (crc16 &
+                                                0xffff);       // Error count is stored in this buffer for ver.2 format but it is set to zero here.
     poswords_to += SIZE_B2LFEE_TRAILER;
 
     // Fill b2link HSLB trailer

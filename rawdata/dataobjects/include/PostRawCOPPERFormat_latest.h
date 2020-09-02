@@ -221,7 +221,7 @@ namespace Belle2 {
     // Data Format : "B2Link HSLB Trailer"
     //
     enum {
-      POS_B2LHSLB_TRL_MAGIC = 1,
+      POS_B2LHSLB_TRL_MAGIC = 0,
       SIZE_B2LHSLB_TRAILER = 1
     };
 

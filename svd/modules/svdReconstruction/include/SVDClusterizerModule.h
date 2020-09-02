@@ -16,7 +16,7 @@
 
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterTime.h>
-//#include <svd/reconstruction/SVDClusterCharge.h>
+#include <svd/reconstruction/SVDClusterCharge.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -106,8 +106,8 @@ namespace Belle2 {
 
       SVDClusterTime* m_time6SampleClass = nullptr; /**< cluster time class for the 6-sample acquisition mode*/
       SVDClusterTime* m_time3SampleClass = nullptr; /**< cluster time class for the 3-sample acquisition mode*/
-      //      SVDClusterCharge *m_charge6SampleClass = nullptr; /**< cluster charge class for the 6-sample acquisition mode*/
-      //      SVDClusterCharge *m_charge3SampleClass = nullptr; /**< cluster charge class for the 3-sample acquisition mode*/
+      SVDClusterCharge* m_charge6SampleClass = nullptr; /**< cluster charge class for the 6-sample acquisition mode*/
+      SVDClusterCharge* m_charge3SampleClass = nullptr; /**< cluster charge class for the 3-sample acquisition mode*/
 
 
       // 4. Calibration Objects

@@ -19,7 +19,7 @@
 #include <svd/dataobjects/SVDEventInfo.h>
 
 #include <svd/reconstruction/SVDRecoTimeFactory.h>
-//#include <svd/reconstruction/SVDRecoChargeFactory.h>
+#include <svd/reconstruction/SVDRecoChargeFactory.h>
 
 using namespace std;
 using namespace Belle2;
@@ -95,8 +95,8 @@ void SVDClusterizerModule::beginRun()
 
   m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm);
   m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm);
-  //  m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
-  //  m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
+  m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
+  m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
 
 
   B2INFO("SVD  6-sample DAQ, time algorithm:" << m_timeRecoWith6SamplesAlgorithm <<  ", charge algorithm: " <<
@@ -298,6 +298,25 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
 
 
+  //----------------
+  // CLUSTER CHARGE
+  //----------------
+  float charge = std::numeric_limits<float>::quiet_NaN();
+  float seedCharge = std::numeric_limits<float>::quiet_NaN();
+  float SNR = std::numeric_limits<float>::quiet_NaN();
+
+  // cluster charge computation
+  if (m_numberOfAcquiredSamples == 6) {
+    m_charge6SampleClass->setRawCluster(rawCluster);
+    charge = m_charge6SampleClass->getClusterCharge();
+    seedCharge = m_charge6SampleClass->getClusterSeedCharge();
+  } else if (m_numberOfAcquiredSamples == 3) {
+    m_charge3SampleClass->setRawCluster(rawCluster);
+    charge = m_charge3SampleClass->getClusterCharge();
+    seedCharge = m_charge3SampleClass->getClusterSeedCharge();
+  } else
+    B2ERROR("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
+
   //-----------------
   // CLUSTER POSITION
   //-----------------
@@ -306,36 +325,11 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   float positionError = std::numeric_limits<float>::quiet_NaN();
   //  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());  double time = 0;
 
-
-  //----------------
-  // CLUSTER CHARGE
-  //----------------
-  float charge = std::numeric_limits<float>::quiet_NaN();
-  float seedCharge = std::numeric_limits<float>::quiet_NaN();
-
-  /*
-  // cluster charge computation
-  if(m_numberOfAcquiredSamples == 6)
-    {
-      m_charge6SampleClass->setRawCluster(rawCluster);
-      charge = m_charge6SampleClass->getClusterCharge();
-      seedCharge = m_charge6SampleClass->getClusterSeedCharge();
-    }
-  else
-    if(m_numberOfAcquiredSamples == 3)
-      {
-  m_charge3SampleClass->setRawCluster(rawCluster);
-  charge = m_charge3SampleClass->getClusterCharge();
-  seedCharge = m_charge3SampleClass->getClusterSeedCharge();
-      } else
-      B2ERROR("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
-  */
-
-  float SNR = 0;
-
+  //append the new cluster to the StoreArray
   m_storeClusters.appendNew(SVDCluster(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
                                        firstFrame));
 
+  // write relations
   writeClusterRelations(rawCluster);
 }
 

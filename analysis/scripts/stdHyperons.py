@@ -11,7 +11,7 @@ from stdPi0s import stdPi0s
 
 
 def stdXi(fitter='TreeFit', b2bii=False, path=None):
-    """
+    r"""
     Reconstruct the standard :math:`\Xi^-` ``ParticleList`` named ``Xi-:std``.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
@@ -72,7 +72,7 @@ def stdXi(fitter='TreeFit', b2bii=False, path=None):
 
 
 def stdXi0(gammatype='eff40', b2bii=False, path=None):
-    """
+    r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
@@ -148,7 +148,7 @@ def stdXi0(gammatype='eff40', b2bii=False, path=None):
 
 
 def stdOmega(fitter='TreeFit', b2bii=False, path=None):
-    """
+    r"""
     Reconstruct the standard :math:`\Omega^-` ``ParticleList`` named ``Omega-:std``.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
@@ -224,7 +224,7 @@ def stdOmega(fitter='TreeFit', b2bii=False, path=None):
 
 
 def goodXi(xitype='loose', path=None):
-    """
+    r"""
     Select the standard good :math:`\Xi^-` ``ParticleList`` named ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``
     from the reconstructed ``Xi-:std``.
 
@@ -268,7 +268,7 @@ def goodXi(xitype='loose', path=None):
 
 
 def goodXi0(xitype='loose', path=None):
-    """
+    r"""
     Select the standard good :math:`\Xi^0` ``ParticleList`` named ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``
     from the reconstructed ``Xi0:std``.
 
@@ -314,7 +314,7 @@ def goodXi0(xitype='loose', path=None):
 
 
 def goodOmega(omegatype='loose', path=None):
-    """
+    r"""
     Select the standard good :math:`\Omega^-` ``ParticleList`` named ``Omega-:veryloose``, ``Omega-:loose``,
     or ``Omega-:tight`` from the reconstructed ``Omega-:std``.
 

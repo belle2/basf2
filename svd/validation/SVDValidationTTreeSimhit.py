@@ -35,7 +35,7 @@ gROOT.ProcessLine('struct EventDataSimhit {\
     float simhit_dEdx;\
     };')
 
-from ROOT import EventDataSimhit
+from ROOT import EventDataSimhit  # noqa
 
 
 class SVDValidationTTreeSimhit(Module):

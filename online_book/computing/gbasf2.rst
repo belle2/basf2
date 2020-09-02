@@ -1,3 +1,5 @@
+.. _onlinebook_gbasf2:
+
 gbasf2
 ======
 

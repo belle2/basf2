@@ -6,7 +6,7 @@
 import numpy as np
 try:
     import tensorflow as tf
-except:
+except BaseException:
     pass
 import basf2_mva
 import basf2_mva_util

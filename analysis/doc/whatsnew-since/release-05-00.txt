@@ -1,6 +1,12 @@
 Changes in the analysis package since release-05-00
 ---------------------------------------------------
 
+Vertex Fitting
+++++++++++++++
+
+ * KFit has been extended to be able to handle vertex fits (with and without mass constraint) that involve an eta particle
+   reconstructed in ``eta -> gamma gamma``.
+
 Variables
 +++++++++
 
@@ -27,6 +33,12 @@ Variables
  * Added new generated event kinematics variables :b2:var:`genMissingMass2OfEvent`,  :b2:var:`genMissingEnergyOfEventCMS`, 
    :b2:var:`genMissingMomentumOfEventCMS`, :b2:var:`genTotalPhotonsEnergyOfEvent`, :b2:var:`genVisibleEnergyOfEventCMS` 
    and a corresponding collection ``mc_event_kinematics``.
+ * Fixed the variable :b2:var:`isDescendantOfList`, which did not work if the ParticleLoader was used to fill a ParticleList with
+   descendants of an existing list or exclude them.
+ * Added new B2BII variables for the first and last hit position in the tracking system :b2:var:`BelleFirstCDCHitX`,
+   :b2:var:`BelleLastCDCHitX`, etc. and a new variable collection ``belle_track_hit``.
+ * Added a new variable :b2:var:`nROE_Composites` to count V0 particles in ROE.
+ * Added meta variables corresponding to existing variables that access the MC matched particles of given daughters :b2:var:`mcDaughterDiffOf` , :b2:var:`mcDaughterDiffOfPhi`, :b2:var:`mcDaughterDiffOfPhiCMS`, :b2:var:`mcDaughterAngle`.
 
 Modules
 +++++++
@@ -38,28 +50,9 @@ Modules
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
- * The MC matching with the :ref:`DecayString` properly works in hierarchical decay. For example, 
-
-   .. code-block:: python
-
-        from modularAnalysis import reconstructDecay, matchMCTruth
-        reconstructDecay('B0:signal      -> mu+ mu- ... ?gamma',   '', path=mypath)
-        reconstructDecay('B0:generic     -> D*-:Dpi pi+:all',      '', path=mypath)
-        reconstructDecay('Upsilon(4S):BB -> B0:generic B0:signal', '', path=mypath)
-        matchMCTruth('Upsilon(4S)', path=mypath)
-
-   In the above case, missing daughters (massive FSP and gamma) of ``B0:signal`` are accepted for not only ``B0:signal`` but also ``Upsilon(4S)``, so that `isSignal` can be 1.
-   Another example,
-
-   .. code-block:: python
-
-        reconstructDecay('D-:pipi0 -> pi-:all pi0:all',      '', path=mypath)
-        reconstructDecay('B0:Dpi   -> D-:pipi0 pi+:all ...', '', path=mypath)
-        matchMCTruth('B0:Dpi', path=mypath)
-
-   In this case, one wants to accept missing massive daughters in ``B0:Dpi`` decay but not in ``D-:pipi0`` decay.
-   So, if the decay of ``D-:pipi0`` in the MC truth level is ``D- -> pi+ pi- pi- pi0``, `isSignal` of ``D-:pipi0`` and ``B0:Dpi`` will be 0, since there are missing daughters in ``D-:pipi0`` decay.
-   If one wants to accept missing daughters in ``D-:pipi0``, please use the :ref:`DecayString` grammar in the reconstruction of ``D-:pipi0`` or use `isSignalAcceptMissing` variable instead of `isSignal`.
+ * The new argument ``suffix`` has been added to the `writePi0EtaVeto` function to allow calculating this veto for multiple
+   photons.
+ * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

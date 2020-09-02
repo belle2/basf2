@@ -9,5 +9,6 @@
 
 #pragma link C++ class Belle2::CDCTriggerNeuroConfig+;
 #pragma link C++ class Belle2::CDCTrigger2DConfig+;
+#pragma link C++ class Belle2::CDCTriggerDeadch+;
 
 #endif

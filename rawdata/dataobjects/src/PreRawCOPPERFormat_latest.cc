@@ -176,7 +176,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
 
-  char err_buf[500];
+  char err_buf[1000];
   int err_flag = 0;
   //
   // check Magic words
@@ -331,9 +331,9 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   int err_flag = 0;
   int flag = 0;
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
-  unsigned int temp_ctime_trgtype_footer = 0, temp_eve_footer = 0;
+  unsigned int temp_ctime_trgtype_footer, temp_eve_footer;
   unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
-  char err_buf[500];
+  char err_buf[1000];
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
@@ -369,7 +369,12 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
                      j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
             }
           }
-          sprintf(err_buf, "[FATAL] ERROR_EVENT : mismatch header value over FINESSEs. Exiting...\n %s %s %d\n",
+          sprintf(err_buf,
+                  "[FATAL] ERROR_EVENT : mismatch header value over FINESSEs. Exiting... FINESSE #=0 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=1 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=2 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=3 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n %s %s %d\n",
+                  GetFINESSENwords(n, 0), ctime_trgtype[ 0 ], utime[ 0 ], eve[ 0 ], exprun[ 0 ],
+                  GetFINESSENwords(n, 1), ctime_trgtype[ 1 ], utime[ 1 ], eve[ 1 ], exprun[ 1 ],
+                  GetFINESSENwords(n, 2), ctime_trgtype[ 2 ], utime[ 2 ], eve[ 2 ], exprun[ 2 ],
+                  GetFINESSENwords(n, 3), ctime_trgtype[ 3 ], utime[ 3 ], eve[ 3 ], exprun[ 3 ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
 
@@ -527,7 +532,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //   copper_buf[ POS_CH_C_DATA_LENGTH ], copper_buf[ POS_CH_D_DATA_LENGTH ], m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] );
 
   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = 0;
-  unsigned int ff55_higher_bits = 0, ff55_lower_bits = 0;
+  unsigned int ff55_higher_bits, ff55_lower_bits;
 
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
     ff55_higher_bits = (unsigned int)(m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ]) &
@@ -896,7 +901,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("[DEBUG] %s\n", err_buf);
 
-      string err_str = err_buf;
+      // string err_str = err_buf;
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
       PrintData(GetBuffer(datablock_id), TotalBufNwords());
 
@@ -1345,7 +1350,7 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     PrintData(GetBuffer(n), *(GetBuffer(n) + tmp_header.POS_NWORDS));
-    printf("[FATAL] ERROR_EVENT : PRE CRC16 error : slot %c B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
+    printf("[FATAL] ERROR_EVENT : PRE CRC16 error : slot %c : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
            65 + finesse_num, *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
@@ -1358,8 +1363,8 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     fflush(stdout);
     char err_buf[500];
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
-            (unsigned short)(*buf & 0xFFFF), temp_crc16,
+            "[FATAL] ERROR_EVENT : slot %c : B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
+            65 + finesse_num, (unsigned short)(*buf & 0xFFFF), temp_crc16,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf); // to reduce multiple error messages

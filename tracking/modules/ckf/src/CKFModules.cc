@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/cdcToVXDExtrapolator/CKFModules.h>
+#include <tracking/modules/ckf/CKFModules.h>
 
 using namespace Belle2;
 

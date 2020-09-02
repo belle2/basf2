@@ -29,7 +29,7 @@ namespace Belle2 {
     /// Set description
     CDCToSVDSpacePointCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extracting CDC tracks into "
+      setDescription("Combinatorical Kalman Filter used for extrapolating CDC tracks into "
                      "SVD and create merged tracks.");
     }
   };
@@ -45,8 +45,7 @@ namespace Belle2 {
     /// Set description
     CDCToSVDSeedCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extracting CDC tracks into "
-                     "SVD and create merged tracks.");
+      setDescription("Combinatorical Kalman Filter used for merging existing CDC tracks and SVD tracks.");
     }
   };
 
@@ -61,7 +60,7 @@ namespace Belle2 {
     /// Set description
     ToPXDCKFModule()
     {
-      setDescription("Combinatorical Kalman Filter used for extracting SVD/CDC tracks into "
+      setDescription("Combinatorical Kalman Filter used for extrapolating SVD/CDC tracks into "
                      "PXD and create merged tracks.");
     }
   };
@@ -77,7 +76,7 @@ namespace Belle2 {
     /// Set description
     ToCDCCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFindlet>( {"CDCWireHitVector"})
     {
-      setDescription("Combinatorical Kalman Filter used for extracting SVD tracks into "
+      setDescription("Combinatorical Kalman Filter used for extrapolating SVD tracks into "
                      "CDC and create merged tracks.");
     }
   };
@@ -93,7 +92,7 @@ namespace Belle2 {
     /// Set description
     ToCDCFromEclCKFModule() : TrackFindingCDC::FindletModule<CKFToCDCFromEclFindlet>( {"CDCWireHitVector"})
     {
-      setDescription("Combinatorical Kalman Filter used for extracting Ecl showers into "
+      setDescription("Combinatorical Kalman Filter used for extrapolating ECL showers into "
                      "CDC and create merged tracks.");
     }
   };

@@ -144,8 +144,6 @@ def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
             pruneTracks=False,
             add_trigger_calculation=False,
             components=components,
-            nCDCHitsMax=constants.DOOM_NCDCHITSMAX,
-            nSVDShaperDigitsMax=constants.DOOM_NSVDSHAPERDIGITSMAX,
             abort_path=abort_path,
             **kwargs)
 

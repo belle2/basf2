@@ -1,3 +1,8 @@
+# parameters in this file:
+# crystalID alpha theta0 phi0 R theta1 phi1
+# a crystal is rotated around the axis (sin(theta0)*cos(phi0),sin(theta0)*sin(phi0),cos(theta0)) by the alpha angle
+# and then the center of the crystal is moved by the vector R*(sin(theta1)*cos(phi1),sin(theta1)*sin(phi1),cos(theta1))
+# R is in millimetres
 # crystal position with wrapping 170 um
 29 3.17639896297 0.294245437514 1.59608549688 2504.48654911 0.574961472735 1.59418447736
 29 3.14145506509 0.293807724782 1.57026253971 2505.9336776 0.574595280314 1.55082313425
@@ -106,7 +111,7 @@
 
 # transformation of the whole barrel with the supporting structures as a solid body
 # default barrel placement
-1001 0 0 0 0 0 0 0
+1001 0 0 0 0 0 0
 
 # barrel displaced by 2 mm toward forward endcap
 # 1001 0 0 0 2 0 0

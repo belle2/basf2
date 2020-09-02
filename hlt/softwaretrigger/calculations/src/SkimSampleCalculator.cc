@@ -710,8 +710,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   calculationResult["FourLep"] = fourLep;
 
   // nLambda
-  int nLambda = 0;
-  double Lambda = 0.;
+  unsigned int nLambda = 0;
 
   if (m_LambdaParticles.isValid()) {
     for (unsigned int i = 0; i < m_LambdaParticles->getListSize(); i++) {
@@ -728,7 +727,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     }
   }
 
-  if (nLambda != 0) Lambda = 1;
-
-  calculationResult["Lambda"] = Lambda;
+  if (nLambda > 0) {
+    calculationResult["Lambda"] = 1;
+  } else {
+    calculationResult["Lambda"] = 0;
+  }
 }

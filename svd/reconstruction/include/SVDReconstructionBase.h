@@ -15,6 +15,9 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDCoGTimeCalibrations.h>
+#include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
+#include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
 
 #include <vector>
@@ -32,6 +35,7 @@ namespace Belle2 {
 
       /**
        * Constructor with the SVDShaperDigit
+       * for strip reconstruction by the SVDRecoDigitCreator
        */
       explicit SVDReconstructionBase(const SVDShaperDigit& shaper)
         : m_samples(shaper.getSamples())
@@ -44,7 +48,8 @@ namespace Belle2 {
       };
 
       /**
-       * Constructor with the stripInRawCluster
+       * Constructor with the stripInRawCluster,
+       * for strip reconstruction in cluster reconstruction
        */
       SVDReconstructionBase(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU, int cellID,
                             bool samplesInElectrons = false)
@@ -56,7 +61,9 @@ namespace Belle2 {
       { };
 
       /**
-       * Constructor with the SVDShaperDIgit::APVFloatSamples
+       * Constructor with the SVDShaperDigit::APVFloatSamples,
+       * for clustered sample reconstruction
+       * cellID data member not significant
        */
       SVDReconstructionBase(const Belle2::SVDShaperDigit::APVFloatSamples samples, VxdID sensorID, bool isU,
                             bool samplesInElectrons = false)
@@ -72,6 +79,12 @@ namespace Belle2 {
        * virtual destructor
        */
       virtual ~SVDReconstructionBase() {};
+
+      /**
+       * set the trigger bin
+       */
+      void setTriggerBin(const int triggerBin)
+      { m_triggerBin = triggerBin; };
 
       /**
        * @return the VxdID of the strip sensor
@@ -114,6 +127,12 @@ namespace Belle2 {
       /** true is m_samples is in electrons*/
       bool m_samplesInElectrons = false;
 
+      /** trigger bin */
+      int m_triggerBin = -1;
+
+      /** first frame */
+      int m_firstFrame = -1;
+
       /** set containing the available time algorithms */
       std::set<TString> m_timeAlgorithms;
 
@@ -125,6 +144,7 @@ namespace Belle2 {
         m_timeAlgorithms.insert("ELS3");
       }
 
+
       /**Reconstruction Configuration dbobject*/
       DBObjPtr<SVDRecoConfiguration> m_recoConfig;
 
@@ -132,6 +152,13 @@ namespace Belle2 {
       SVDPulseShapeCalibrations m_PulseShapeCal;
       /** Noise calibration wrapper*/
       SVDNoiseCalibrations m_noiseCal;
+
+      /** CoG6 time calibration wrapper*/
+      SVDCoGTimeCalibrations m_CoG6TimeCal;
+      /** CoG3 time calibration wrapper*/
+      SVD3SampleCoGTimeCalibrations m_CoG3TimeCal;
+      /** ELS3 time calibration wrapper*/
+      SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
 
     };
 

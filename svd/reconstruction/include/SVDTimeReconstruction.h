@@ -11,9 +11,6 @@
 #pragma once
 
 #include <svd/reconstruction/SVDReconstructionBase.h>
-#include <svd/calibration/SVDCoGTimeCalibrations.h>
-#include <svd/calibration/SVD3SampleCoGTimeCalibrations.h>
-#include <svd/calibration/SVD3SampleELSTimeCalibrations.h>
 #include <vector>
 
 namespace Belle2 {
@@ -28,20 +25,14 @@ namespace Belle2 {
     public:
 
       /**
-       * set the trigger bin
-       */
-      void setTriggerBin(const int triggerBin)
-      { m_triggerBin = triggerBin; };
-
-      /**
        * virtual destructor
        */
       virtual ~SVDTimeReconstruction() {};
 
-      /** get strip time as set in SVDRecoConfiguration payload*/
-      double getStripTime();
-      /** get strip time error as set in SVDRecoConfiguration payload*/
-      double getStripTimeError();
+      /** get strip time as set in SVDRecoConfiguration payload if timeAlgo = inRecoDBObjcte*/
+      double getStripTime(TString timeAlgo);
+      /** get strip time error as set in SVDRecoConfiguration payload if timeAlgo = inRecoDBObjcte*/
+      double getStripTimeError(TString timeAlgo);
 
       /**get first frame*/
       int getFirstFrame() { return m_firstFrame; };
@@ -55,21 +46,6 @@ namespace Belle2 {
       /** ELS3 Time */
       double getELS3Time() {return 0;}
       double getELS3TimeError() {return 0;}
-
-    protected:
-
-      /** trigger bin */
-      int m_triggerBin = -1;
-
-      /** first frame */
-      int m_firstFrame = -1;
-
-      /** CoG6 time calibration wrapper*/
-      SVDCoGTimeCalibrations m_CoG6TimeCal;
-      /** CoG3 time calibration wrapper*/
-      SVD3SampleCoGTimeCalibrations m_CoG3TimeCal;
-      /** ELS3 time calibration wrapper*/
-      SVD3SampleELSTimeCalibrations m_ELS3TimeCal;
 
     };
 

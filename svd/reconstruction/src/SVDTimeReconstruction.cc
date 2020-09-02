@@ -19,25 +19,34 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDTimeReconstruction::getStripTime()
+    double SVDTimeReconstruction::getStripTime(TString timeAlgo = "fromRecoDBObject")
     {
 
-      StoreObjPtr<SVDEventInfo> eventInfo;
+      StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+      std::string m_svdEventInfoName = "SVDEventInfo";
+      if (!temp_eventinfo.isValid())
+        m_svdEventInfoName = "SVDEventInfoSim";
+      StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+      if (!eventinfo) B2ERROR("No SVDEventInfo!");
+
 
       //default
       TString stripTimeReco = "CoG6";
 
       if (m_recoConfig.isValid()) {
-        if (eventInfo->getNSamples() == 6)
+        if (eventinfo->getNSamples() == 6)
           stripTimeReco = m_recoConfig->getStripTimeRecoWith6Samples();
         else
           stripTimeReco = m_recoConfig->getStripTimeRecoWith3Samples();
       }
 
+      if (! timeAlgo.EqualTo("fromRecoDBObject"))
+        stripTimeReco = timeAlgo;
+
       if (m_timeAlgorithms.find(stripTimeReco) != m_timeAlgorithms.end()) {
-        if (stripTimeReco.EqualTo("COG6"))
+        if (stripTimeReco.EqualTo("CoG6"))
           return getCoG6Time();
-        if (stripTimeReco.EqualTo("COG3"))
+        if (stripTimeReco.EqualTo("CoG3"))
           return getCoG3Time();
         if (stripTimeReco.EqualTo("ELS3"))
           return getELS3Time();
@@ -49,25 +58,33 @@ namespace Belle2 {
     }
 
 
-    double SVDTimeReconstruction::getStripTimeError()
+    double SVDTimeReconstruction::getStripTimeError(TString timeAlgo = "fromRecoDBObject")
     {
 
-      StoreObjPtr<SVDEventInfo> eventInfo;
+      StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
+      std::string m_svdEventInfoName = "SVDEventInfo";
+      if (!temp_eventinfo.isValid())
+        m_svdEventInfoName = "SVDEventInfoSim";
+      StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
+      if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
       //default
       TString stripTimeReco = "CoG6";
 
       if (m_recoConfig.isValid()) {
-        if (eventInfo->getNSamples() == 6)
+        if (eventinfo->getNSamples() == 6)
           stripTimeReco = m_recoConfig->getStripTimeRecoWith6Samples();
         else
           stripTimeReco = m_recoConfig->getStripTimeRecoWith3Samples();
       }
 
+      if (! timeAlgo.EqualTo("fromRecoDBObject"))
+        stripTimeReco = timeAlgo;
+
       if (m_timeAlgorithms.find(stripTimeReco) != m_timeAlgorithms.end()) {
-        if (stripTimeReco.EqualTo("COG6"))
+        if (stripTimeReco.EqualTo("CoG6"))
           return getCoG6TimeError();
-        if (stripTimeReco.EqualTo("COG3"))
+        if (stripTimeReco.EqualTo("CoG3"))
           return getCoG3TimeError();
         if (stripTimeReco.EqualTo("ELS3"))
           return getELS3TimeError();

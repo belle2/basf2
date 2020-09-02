@@ -30,10 +30,10 @@ namespace Belle2 {
       virtual ~SVDChargeReconstruction() {};
 
 
-      /** get strip charge as set in SVDRecoConfiguration payload*/
-      double getStripCharge();
-      /** get strip charge error as set in SVDRecoConfiguration payload*/
-      double getStripChargeError();
+      /** get strip charge as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObjcte*/
+      double getStripCharge(TString chargeAlgo);
+      /** get strip charge error as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObjcte*/
+      double getStripChargeError(TString chargeAlgo);
 
       /** CoG6 Charge */
       double getMaxSampleCharge();

@@ -18,13 +18,13 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDChargeReconstruction::getStripCharge()
+    double SVDChargeReconstruction::getStripCharge(TString chargeAlgo = "fromRecoDBObject")
     {
 
       return getMaxSampleCharge();
     }
 
-    double SVDChargeReconstruction::getStripChargeError()
+    double SVDChargeReconstruction::getStripChargeError(TString chargeAlgo = "fromRecoDBObject")
     {
 
       return getMaxSampleChargeError();

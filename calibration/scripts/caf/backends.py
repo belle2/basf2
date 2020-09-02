@@ -1690,9 +1690,7 @@ class LSF(Batch):
     def _create_job_result(cls, job, batch_output):
         """
         """
-        job_id = batch_output.split(" ")[1]
-        for wrap in ["<", ">"]:
-            job_id = job_id.replace(wrap, "")
+        job_id = re.findall("Job <([0-9]*)>", batch_output)[0]
         B2INFO(f"Job ID of {job} recorded as: {job_id}")
         job.result = cls.LSFResult(job, job_id)
 

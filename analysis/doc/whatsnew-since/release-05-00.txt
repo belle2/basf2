@@ -53,6 +53,7 @@ Modules
  * The new argument ``suffix`` has been added to the `writePi0EtaVeto` function to allow calculating this veto for multiple
    photons.
  * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
+ * In :b2:mod:`TagVertex`, all charged particles from the ROE are loaded to be included in the tag vertex fit (and not only those with a pion hypothesis)
 
 Full Event Interpretation
 +++++++++++++++++++++++++

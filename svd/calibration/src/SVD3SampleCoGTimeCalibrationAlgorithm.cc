@@ -50,13 +50,8 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 
   FileStat_t info;
   int cal_rev = 1;
-  while (gSystem->GetPathInfo(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev), info) == 0) {
-    // std::unique_ptr<TFile> f_check(new TFile(Form("algorithm_3SampleCoG_output_rev_%d.root",cal_rev)));
-    // if(f_check->Get(Form("rev_%d", cal_rev)))
+  while (gSystem->GetPathInfo(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev), info) == 0)
     cal_rev++;
-    // else
-    //   break;
-  }
   std::unique_ptr<TFile> f(new TFile(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev), "RECREATE"));
 
   auto m_tree = new TTree(Form("rev_%d", cal_rev), "RECREATE");
@@ -113,7 +108,6 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
           // pfx->SetErrorOption("S");
-          // pfx->Fit("pol3", "RQ");
           TFitResultPtr tfr = pfx->Fit("pol3", "RQS");
           double par[4];
           pol3->GetParameters(par);

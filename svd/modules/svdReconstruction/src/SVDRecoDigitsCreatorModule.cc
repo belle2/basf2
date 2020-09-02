@@ -180,10 +180,11 @@ void SVDRecoDigitCreatorModule::event()
 
   while (i < nDigits) {
 
-    float time = std::numeric_limits<double>::quiet_NaN();
-    float timeError = std::numeric_limits<double>::quiet_NaN();
-    float charge = std::numeric_limits<double>::quiet_NaN();
-    float chargeError = std::numeric_limits<double>::quiet_NaN();
+    float time = std::numeric_limits<float>::quiet_NaN();
+    float timeError = std::numeric_limits<float>::quiet_NaN();
+    float charge = std::numeric_limits<float>::quiet_NaN();
+    float chargeError = std::numeric_limits<float>::quiet_NaN();
+    int firstFrame = std::numeric_limits<int>::quiet_NaN();
     std::vector<float> probabilities = {0.5};
 
     double chi2 = std::numeric_limits<double>::quiet_NaN();
@@ -198,11 +199,13 @@ void SVDRecoDigitCreatorModule::event()
     if (numberOfAcquiredSamples == 6) {
       time = timeReco->getStripTime(m_timeRecoWith6SamplesAlgorithm);
       timeError = timeReco->getStripTimeError(m_timeRecoWith6SamplesAlgorithm);
+      firstFrame = timeReco->getFirstFrame();
       charge = chargeReco->getStripCharge(m_chargeRecoWith6SamplesAlgorithm);
       chargeError = chargeReco->getStripChargeError(m_chargeRecoWith6SamplesAlgorithm);
     } else if (numberOfAcquiredSamples == 3) {
       time = timeReco->getStripTime(m_timeRecoWith3SamplesAlgorithm);
       timeError = timeReco->getStripTimeError(m_timeRecoWith3SamplesAlgorithm);
+      firstFrame = timeReco->getFirstFrame();
       charge = chargeReco->getStripCharge(m_chargeRecoWith3SamplesAlgorithm);
       chargeError = chargeReco->getStripChargeError(m_chargeRecoWith3SamplesAlgorithm);
     } else

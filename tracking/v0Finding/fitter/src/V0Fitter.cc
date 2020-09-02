@@ -297,10 +297,6 @@ bool V0Fitter::fitAndStore0(const Track* trackPlus, const Track* trackMinus,
   stPlus  = gfTrackPlus.getFittedState();
   stMinus = gfTrackMinus.getFittedState();
 
-  ///// these two lines can be moved to inside the "if(m_validation){..." parenthesis ?
-  const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
-  const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
-
   const TVector3& posVert(vert.getPos());
 
   // Apply cuts. We have one set of cuts inside the beam pipe,
@@ -337,6 +333,8 @@ bool V0Fitter::fitAndStore0(const Track* trackPlus, const Track* trackMinus,
 
   if (m_validation) {
     B2DEBUG(300, "Create StoreArray and Output for validation.");
+    const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
+    const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
     TLorentzVector lv0, lv1;
     // Reconstruct invariant mass.
     lv0.SetVectM(tr0->getMom(), trackHypotheses.first.getMass());

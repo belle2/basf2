@@ -43,6 +43,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   addParam("triggerBin", m_triggerBin, "Trigger bin 0/1/2/3 - useful for timing studies. The default is random.", int(999));
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
   addParam("crossTalk", m_xTalk, "Defines the cross-talk flag for the event", bool(false));
+  addParam("relativeShift", m_relativeShift, "Relative shift between 3- and 6-sample events, in units of APV clock / 4", int(0));
 
   // default ModeByte settings: 10 0 10 000 (144)
 }
@@ -77,6 +78,7 @@ void SVDEventInfoSetterModule::event()
   m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
   m_svdEventInfoPtr->setMatchTriggerType(m_TriggerTypeMatch);
   m_svdEventInfoPtr->setCrossTalk(m_xTalk);
+  m_svdEventInfoPtr->setRelativeShift(m_relativeShift);
 }
 
 

@@ -91,7 +91,7 @@ def find_gaps_in_iov_list(iov_list):
             current_lowest = ExpRun(current_iov.exp_low, current_iov.run_low)
             iov_gap = previous_highest.find_gap(current_lowest)
             if iov_gap:
-                B2DEBUG(29, "Gap found between {} and {} = {}".format(previous_iov, current_iov, iov_gap))
+                B2DEBUG(29, f"Gap found between {previous_iov} and {current_iov} = {iov_gap}.")
                 gaps.append(iov_gap)
         previous_iov = current_iov
     return gaps
@@ -120,7 +120,7 @@ class ExpRun(namedtuple('ExpRun_Factory', ['exp', 'run'])):
 
     def find_gap(self, other):
         """
-        Finds the IoV gap bewteen these two ExpRuns
+        Finds the IoV gap bewteen these two ExpRuns.
         """
         lower, upper = sorted((self, other))
         if lower.exp == upper.exp and lower.run != upper.run:
@@ -145,19 +145,19 @@ class IoV(namedtuple('IoV_Factory', ['exp_low', 'run_low', 'exp_high', 'run_high
     Default construction is an 'empty' IoV of -1,-1,-1,-1
     e.g. i = IoV() => IoV(exp_low=-1, run_low=-1, exp_high=-1, run_high=-1)
 
-    For an IoV that encompasses all experiments and runs use 0,0,-1,-1
+    For an IoV that encompasses all experiments and runs use 0,0,-1,-1.
     """
 
     def __new__(cls, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
         """
         The special method to create the tuple instance. Returning the instance
-        calls the __init__ method
+        calls the __init__ method.
         """
         return super().__new__(cls, exp_low, run_low, exp_high, run_high)
 
     def __init__(self, exp_low=-1, run_low=-1, exp_high=-1, run_high=-1):
         """
-        Called after __new__
+        Called after __new__.
         """
         self._cpp_iov = IntervalOfValidity(self.exp_low, self.run_low, self.exp_high, self.run_high)
 
@@ -218,9 +218,9 @@ class LocalDatabase():
                 if p.exists():
                     self.payload_dir = p.resolve()
                 else:
-                    raise ValueError("The LocalDatabase payload_dir: {} does not exist.".format(p))
+                    raise ValueError(f"The LocalDatabase payload_dir: {p} does not exist.")
         else:
-            raise ValueError("The LocalDatabase filepath: {} does not exist.".format(f))
+            raise ValueError(f"The LocalDatabase filepath: {f} does not exist.")
 
 
 class CentralDatabase():
@@ -375,7 +375,7 @@ def find_run_lists_from_boundaries(boundaries, runs):
 
 def find_sources(dependencies):
     """
-    Returns a deque of node names that have no input dependencies
+    Returns a deque of node names that have no input dependencies.
     """
     # Create an OrderedDict to make sure that our sources are
     # in the same order that we started with
@@ -408,7 +408,7 @@ def topological_sort(dependencies):
     >>> print(sorted)
     ['c', 'b', 'a']
     """
-    # We find the In-degree (number of dependencies) for each node
+    # We find the in-degree (number of dependencies) for each node
     # and store it.
     in_degrees = {k: 0 for k in dependencies}
     for node, adjacency_list in dependencies.items():
@@ -433,7 +433,7 @@ def topological_sort(dependencies):
     if len(order) == len(dependencies):  # Check if all nodes were ordered
         return order                     # If not, then there was a cyclic dependence
     else:
-        B2WARNING('Cyclic dependency detected, check CAF.add_dependency() calls')
+        B2WARNING("Cyclic dependency detected, check CAF.add_dependency() calls.")
         return []
 
 
@@ -559,7 +559,7 @@ class PathExtras():
 
     def __init__(self, path=None):
         """
-        Initialising with a path
+        Initialising with a path.
         """
         if path:
             #: Attribute to hold path object that this class wraps
@@ -610,7 +610,7 @@ def merge_local_databases(list_database_dirs, output_database_dir):
     with open(database_file_path, 'w') as db_file:
         for directory in list_database_dirs:
             if not os.path.exists(directory):
-                B2WARNING("Database directory {0} requested by collector but it doesn't exist!".format(directory))
+                B2WARNING(f"Database directory {directory} requested by collector but it doesn't exist!")
                 continue
             else:
                 # Get only the files, not directories
@@ -640,9 +640,9 @@ def get_iov_from_file(file_path):
 
 def get_file_iov_tuple(file_path):
     """
-    Simple little function to return both the input file path and the relevant IoV, instead of just the IoV
+    Simple little function to return both the input file path and the relevant IoV, instead of just the IoV.
     """
-    B2INFO("Finding IoV for {}".format(file_path))
+    B2INFO(f"Finding IoV for {file_path}.")
     return (file_path, get_iov_from_file(file_path))
 
 
@@ -675,7 +675,7 @@ def make_file_to_iov_dictionary(file_path_patterns, polling_time=10, pool=None, 
     file_to_iov = {}
     if not pool:
         for file_path in absolute_file_paths:
-            B2INFO("Finding IoV for {}".format(file_path))
+            B2INFO(f"Finding IoV for {file_path}.")
             file_to_iov[file_path] = get_iov_from_file(file_path)
     else:
         import time
@@ -713,14 +713,14 @@ def find_absolute_file_paths(file_path_patterns):
         if file_pattern[:7] != "root://":
             input_files = glob.glob(file_pattern)
             if not input_files:
-                B2WARNING("No files matching {0} can be found, it will be skipped!".format(file_pattern))
+                B2WARNING(f"No files matching {file_pattern} can be found, it will be skipped!")
             else:
                 for file_path in input_files:
                     file_path = os.path.abspath(file_path)
                     if os.path.isfile(file_path):
                         existing_file_paths.add(file_path)
         else:
-            B2INFO(("Found an xrootd file path {0} it will not be checked for validity.".format(input_file_path)))
+            B2INFO(f"Found an xrootd file path {input_file_path} it will not be checked for validity.")
             existing_file_paths.add(file_pattern)
 
     abs_file_paths = list(existing_file_paths)
@@ -758,18 +758,18 @@ def parse_raw_data_iov(file_path):
         filename_exp = int(split_filename[1])
         filename_run = int(split_filename[2])
     except ValueError as e:
-        raise ValueError("Wrong file path: {}".format(file_path)) from e
+        raise ValueError(f"Wrong file path: {file_path}.") from e
 
     if path_exp == filename_exp and path_run == filename_run:
         return IoV(path_exp, path_run, path_exp, path_run)
     else:
-        raise ValueError("Filename and directory gave different IoV after parsing for: {}".format(file_path))
+        raise ValueError(f"Filename and directory gave different IoV after parsing for: {file_path}.")
 
 
 def create_directories(path, overwrite=True):
     """
     Creates a new directory path. If it already exists it will either leave it as is (including any contents),
-    or delete it and re-create it fresh. It will only delete the end point, not any intermediate directories created
+    or delete it and re-create it fresh. It will only delete the end point, not any intermediate directories created.
     """
     # Delete if overwriting and it exists
     if (path.exists() and overwrite):

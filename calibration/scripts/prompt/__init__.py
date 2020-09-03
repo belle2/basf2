@@ -79,7 +79,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
         if depends_on:
             for calibration_settings in depends_on:
                 if not isinstance(calibration_settings, cls):
-                    raise TypeError("A list of {str(cls)} object is required when setting the 'depends_on' keyword.")
+                    raise TypeError(f"A list of {str(cls)} object is required when setting the 'depends_on' keyword.")
         else:
             depends_on = []
 

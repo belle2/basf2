@@ -35,10 +35,10 @@ def run_collectors():
 
     for db_type, database in config["database_chain"]:
         if db_type == "local":
-            B2INFO("Adding Local Database {} to head of chain of local databases.".format(database[0]))
+            B2INFO(f"Adding Local Database {database[0]} to head of chain of local databases.")
             b2conditions.prepend_testing_payloads(database[0])
         else:
-            B2INFO("Using Global Tag {}".format(database))
+            B2INFO(f"Using Global Tag {database}.")
             b2conditions.prepend_globaltag(database)
 
     # create a path with all modules needed before calibration path is run.

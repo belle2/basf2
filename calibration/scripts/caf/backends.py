@@ -369,7 +369,7 @@ class Job:
 
     def __repr__(self):
         """
-        Representation of Job class (what happens when you print a Job() instance)
+        Representation of Job class (what happens when you print a Job() instance).
         """
         return f"Job({self.name})"
 
@@ -434,6 +434,7 @@ class Job:
     @status.setter
     def status(self, status):
         """
+        Sets the status of this Job.
         """
         B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
@@ -1093,7 +1094,7 @@ class Batch(Backend):
         You should think about where the stdout/err should go, and set the queue name.
         """
         raise NotImplementedError(("Need to implement a _add_batch_directives(self, job, file) "
-                                   "method in {} backend.".format(self.__class__.__name__)))
+                                   f"method in {self.__class__.__name__} backend."))
 
     def _make_submit_file(self, job, submit_file_path):
         """
@@ -1274,7 +1275,7 @@ class Batch(Backend):
 
 class PBS(Batch):
     """
-    Backend for submitting calibration processes to a qsub batch system
+    Backend for submitting calibration processes to a qsub batch system.
     """
     #: Working directory directive
     cmd_wkdir = "#PBS -d"
@@ -1537,7 +1538,7 @@ class PBS(Batch):
 
 class LSF(Batch):
     """
-    Backend for submitting calibration processes to a qsub batch system
+    Backend for submitting calibration processes to a qsub batch system.
     """
     #: Working directory directive
     cmd_wkdir = "#BSUB -cwd"
@@ -1561,7 +1562,7 @@ class LSF(Batch):
 
     def _add_batch_directives(self, job, batch_file):
         """
-        Adds LSF BSUB directives for the job to a script
+        Adds LSF BSUB directives for the job to a script.
         """
         job_backend_args = {**self.backend_args, **job.backend_args}  # Merge the two dictionaries, with the job having priority
         batch_queue = job_backend_args["queue"]
@@ -1836,7 +1837,7 @@ class LSF(Batch):
 
 class HTCondor(Batch):
     """
-    Backend for submitting calibration processes to a HTCondor batch system
+    Backend for submitting calibration processes to a HTCondor batch system.
     """
     #: HTCondor batch script (different to the wrapper script of `Batch.submit_script`)
     batch_submit_script = "submit.sub"
@@ -1856,7 +1857,7 @@ class HTCondor(Batch):
 
     def _make_submit_file(self, job, submit_file_path):
         """
-        Fill HTCondor submission file
+        Fill HTCondor submission file.
         """
         # Find all files/directories in the working directory to copy on the worker node
 
@@ -2175,7 +2176,7 @@ class HTCondor(Batch):
 
 class DIRAC(Backend):
     """
-    Backend for submitting calibration processes to the grid
+    Backend for submitting calibration processes to the grid.
     """
     pass
 
@@ -2196,6 +2197,6 @@ class JobError(Exception):
 
 class SplitterError(Exception):
     """
-    Base xceptio class for SubjobSplitter objects.
+    Base exception class for SubjobSplitter objects.
     """
     pass

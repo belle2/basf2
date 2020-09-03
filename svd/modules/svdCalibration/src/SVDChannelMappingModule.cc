@@ -511,7 +511,7 @@ void SVDChannelMappingModule::fillSensorInterHistos(const SVDIntercept* inter)
 void SVDChannelMappingModule::terminate()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
 

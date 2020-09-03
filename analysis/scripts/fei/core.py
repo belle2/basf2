@@ -43,11 +43,11 @@
 # FEI defines own command line options, therefore we disable
 # the ROOT command line options, which otherwise interfere sometimes.
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
+PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 # FEI uses multi-threading for parallel execution of tasks therefore
 # the ROOT gui-thread is disabled, which otherwise interferes sometimes
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 import ROOT
 from ROOT import Belle2
 
@@ -244,7 +244,9 @@ class TrainingData(object):
 
                 nBackground = self.mc_counts[0]['sum'] * channel.preCutConfig.bestCandidateCut
                 inverseSamplingRates = {}
-                if nBackground > Teacher.MaximumNumberOfMVASamples:
+                # For some very pure channels (Jpsi), this sampling can be too aggressive and training fails.
+                # It can therefore be disabled in the preCutConfig.
+                if nBackground > Teacher.MaximumNumberOfMVASamples and not channel.preCutConfig.noBackgroundSampling:
                     inverseSamplingRates[0] = int(nBackground / Teacher.MaximumNumberOfMVASamples) + 1
                 if nSignal > Teacher.MaximumNumberOfMVASamples:
                     inverseSamplingRates[1] = int(nSignal / Teacher.MaximumNumberOfMVASamples) + 1
@@ -503,17 +505,17 @@ class PostReconstruction(object):
                                         variables_2d=config.variables2binnings_2d(hist_variables_2d),
                                         filename=config.removeJPsiSlash(filename), path=path)
 
-                if 'B' in particle.identifier:
-                    variables = ['extraInfo(SignalProbability)', 'Mbc', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                                 'cosThetaBetweenParticleAndNominalB', 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
-                else:
-                    variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
-                                 'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+                variables = ['extraInfo(SignalProbability)', 'mcErrors', 'mcParticleStatus', particle.mvaConfig.target,
+                             'extraInfo(uniqueSignal)', 'extraInfo(decayModeID)']
+
+                if 'B_s0' == particle.name:
+                    variables += ['Mbc']
+                elif 'B' in particle.name:
+                    variables += ['Mbc', 'cosThetaBetweenParticleAndNominalB']
 
                 filename = f'Monitor_Final_{particle.identifier}.root'
                 ma.variablesToNtuple(particle.identifier, variables, treename='variables',
                                      filename=config.removeJPsiSlash(filename), path=path)
-
         return path
 
 
@@ -612,25 +614,25 @@ class Teacher(object):
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
-                    l = [m for m in f.GetListOfKeys()]
-                    if not l:
+                    keys = [m for m in f.GetListOfKeys()]
+                    if not keys:
                         B2WARNING(f"Training of MVC failed. ROOT file does not contain a tree. "
                                   "Ignoring channel {channel.label}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
-                    tree = l[0].ReadObj()
+                    tree = keys[0].ReadObj()
                     nSig = tree.GetEntries(channel.mvaConfig.target + ' == 1.0')
                     nBg = tree.GetEntries(channel.mvaConfig.target + ' != 1.0')
                     if nSig < Teacher.MinimumNumberOfMVASamples:
                         B2WARNING(f"Training of MVC failed."
-                                  "Tree contains too few signal events {nSig}. Ignoring channel.")
+                                  "Tree contains too few signal events {nSig}. Ignoring channel {channel}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
                     if nBg < Teacher.MinimumNumberOfMVASamples:
                         B2WARNING(f"Training of MVC failed."
-                                  "Tree contains too few bckgrd events {nBg}. Ignoring channel.")
+                                  "Tree contains too few bckgrd events {nBg}. Ignoring channel {channel}.")
                         self.create_fake_weightfile(channel.label)
                         self.upload(channel.label)
                         continue
@@ -700,7 +702,7 @@ def get_stages_from_particles(particles: typing.Sequence[config.Particle]):
         [p for p in particles if p.name in ['K_S0', 'Sigma+']],
         [p for p in particles if p.name in ['D+', 'D0', 'D_s+', 'Lambda_c+']],
         [p for p in particles if p.name in ['D*+', 'D*0', 'D_s*+']],
-        [p for p in particles if p.name in ['B0', 'B+']],
+        [p for p in particles if p.name in ['B0', 'B+', 'B_s0']],
         []
     ]
 
@@ -774,7 +776,7 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
     @param particles list of config.Particle objects
     @param config config.FeiConfiguration object
     """
-    print("""
+    print(r"""
     ____ _  _ _    _       ____ _  _ ____ _  _ ___    _ _  _ ___ ____ ____ ___  ____ ____ ___ ____ ___ _ ____ _  _
     |___ |  | |    |       |___ |  | |___ |\ |  |     | |\ |  |  |___ |__/ |__] |__/ |___  |  |__|  |  | |  | |\ |
     |    |__| |___ |___    |___  \/  |___ | \|  |     | | \|  |  |___ |  \ |    |  \ |___  |  |  |  |  | |__| | \|

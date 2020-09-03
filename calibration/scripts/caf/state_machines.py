@@ -53,7 +53,7 @@ class State():
 
     def __init__(self, name, enter=None, exit=None):
         """
-        Initialise State with a name and optional lists of callbacks
+        Initialise State with a name and optional lists of callbacks.
         """
         #: Name of the State
         self.name = name
@@ -100,20 +100,20 @@ class State():
         if callable(callback):
             attribute.append(callback)
         else:
-            B2ERROR("Something other than a function (callable) passed into State {0}.".format(self.name))
+            B2ERROR(f"Something other than a function (callable) passed into State {self.name}.")
 
     @_add_callbacks.register(tuple)
     @_add_callbacks.register(list)
     def _(self, callbacks, attribute):
         """
-        Alternate method for lists and tuples of function objects
+        Alternate method for lists and tuples of function objects.
         """
         if callbacks:
             for function in callbacks:
                 if callable(function):
                     attribute.append(function)
                 else:
-                    B2ERROR("Something other than a function (callable) passed into State {0}.".format(self.name))
+                    B2ERROR(f"Something other than a function (callable) passed into State {self.name}.")
 
     def __str__(self):
         """
@@ -123,7 +123,7 @@ class State():
     def __repr__(self):
         """
         """
-        return "State(name={0})".format(self.name)
+        return f"State(name={self.name})"
 
     def __eq__(self, other):
         """
@@ -168,7 +168,7 @@ class Machine():
 
     def __init__(self, states=None, initial_state="default_initial"):
         """
-        Basic Setup of states and initial_state
+        Basic Setup of states and initial_state.
         """
         #: Valid states for this machine
         self.states = {}
@@ -199,9 +199,9 @@ class Machine():
             if state.name not in self.states.keys():
                 self.states[state.name] = state
             else:
-                B2WARNING("You asked to add a state {0} but it was already in the machine states.".format(state))
+                B2WARNING(f"You asked to add a state {state} but it was already in the machine states.")
         else:
-            B2WARNING("You asked to add a state ({0}) but it wasn't a State or str object".format(state))
+            B2WARNING(f"You asked to add a state {state} but it wasn't a State or str object")
 
     @property
     def initial_state(self):
@@ -219,7 +219,7 @@ class Machine():
             #: Current state (private)
             self._state = self.states[state]
         else:
-            raise KeyError("Attempted to set state to '{0}' which is not in the 'states' attribute!".format(state))
+            raise KeyError(f"Attempted to set state to '{state}' which is not in the 'states' attribute!")
 
     @property
     def state(self):
@@ -250,7 +250,7 @@ class Machine():
             # Set the state
             self._state = state
         except KeyError:
-            raise MachineError("Attempted to set state to '{0}' which not in the 'states' attribute!".format(state))
+            raise MachineError(f"Attempted to set state to '{state}' which not in the 'states' attribute!")
 
     @staticmethod
     def default_condition(**kwargs):
@@ -309,14 +309,14 @@ class Machine():
         """
         possible_transitions = self.get_transitions(self.state)
         if name not in possible_transitions:
-            raise AttributeError("{0} does not exist in transitions for state {1}".format(name, self.state))
+            raise AttributeError(f"{name} does not exist in transitions for state {self.state}.")
         transition_dict = self.get_transition_dict(self.state, name)
         return partial(self._trigger, name, transition_dict, **kwargs)
 
     def _trigger(self, transition_name, transition_dict, **kwargs):
         """
         Runs the transition logic. Callbacks are evaluated in the order:
-        conditions -> before -> <new state set here> -> after
+        conditions -> before -> <new state set here> -> after.
         """
         source, dest, conditions, before_callbacks, after_callbacks = (transition_dict["source"],
                                                                        transition_dict["dest"],
@@ -332,19 +332,19 @@ class Machine():
             for after_func in after_callbacks:
                 self._callback(after_func, **kwargs)
         else:
-            raise ConditionError(("Transition '{0}' called for but one or more conditions "
-                                  "evaluated False".format(transition_name)))
+            raise ConditionError((f"Transition '{transition_name}' called for but one or more conditions "
+                                  "evaluated False"))
 
     @staticmethod
     def _callback(func, **kwargs):
         """
-        Calls a condition/before/after.. function using arguments passed (or not)
+        Calls a condition/before/after.. function using arguments passed (or not).
         """
         return func(**kwargs)
 
     def get_transitions(self, source):
         """
-        Returns allowed transitions from a given state
+        Returns allowed transitions from a given state.
         """
         possible_transitions = []
         for transition, transition_dicts in self.transitions.items():
@@ -355,18 +355,18 @@ class Machine():
 
     def get_transition_dict(self, state, transition):
         """
-        Returns the transition dictionary for a state and transition out of it
+        Returns the transition dictionary for a state and transition out of it.
         """
         transition_dicts = self.transitions[transition]
         for transition_dict in transition_dicts:
             if transition_dict["source"] == state:
                 return transition_dict
         else:
-            raise KeyError("No transition from state {0} with the name {1}".format(state, transition))
+            raise KeyError(f"No transition from state {state} with the name {transition}.")
 
     def save_graph(self, filename, graphname):
         """
-        Does a simple dot file creation to visualise states and transiitons
+        Does a simple dot file creation to visualise states and transiitons.
         """
         with open(filename, "w") as dotfile:
             dotfile.write("digraph " + graphname + " {\n")
@@ -392,7 +392,7 @@ class CalibrationMachine(Machine):
     def __init__(self, calibration, iov_to_calibrate=None, initial_state="init", iteration=0):
         """
         Takes a Calibration object from the caf framework and lets you
-        set the initial state
+        set the initial state.
         """
         #: States that are defaults to the `CalibrationMachine` (could override later)
         self.default_states = [State("init", enter=[self._update_cal_state,
@@ -480,7 +480,7 @@ class CalibrationMachine(Machine):
     def files_containing_iov(self, file_paths, files_to_iovs, iov):
         """
         Lookup function that returns all files from the file_paths that
-        overlap with this IoV
+        overlap with this IoV.
         """
         # Files that contain an Exp,Run range that overlaps with given IoV
         overlapping_files = set()
@@ -522,10 +522,10 @@ class CalibrationMachine(Machine):
         """
         """
         if self.iov_to_calibrate:
-            B2DEBUG(20, "Overall IoV {0} requested for calibration: {1}".format(str(self.iov_to_calibrate), self.calibration.name))
+            B2DEBUG(20, f"Overall IoV {self.iov_to_calibrate} requested for calibration: {self.calibration.name}.")
             return True
         else:
-            B2DEBUG(20, "No overall IoV requested for calibration: {0}".format(self.calibration.name))
+            B2DEBUG(20, f"No overall IoV requested for calibration: {self.calibration.name}.")
             return False
 
     def _resolve_file_paths(self):
@@ -534,7 +534,7 @@ class CalibrationMachine(Machine):
         if isinstance(self.collector_backend, Local) or \
            isinstance(self.collector_backend, PBS) or \
            isinstance(self.collector_backend, LSF):
-            B2INFO("Resolving absolute paths of input files for calibration: {0}".format(self.calibration.name))
+            B2INFO(f"Resolving absolute paths of input files for calibration: {self.calibration.name}.")
             for collection in self.calibration.collections.values():
                 collection.input_files = [Path(p) for p in find_absolute_file_paths(collection.input_files)]
 
@@ -546,19 +546,18 @@ class CalibrationMachine(Machine):
         if iov_requested or self.calibration.ignored_runs:
             for coll_name, collection in self.calibration.collections.items():
                 if not collection.files_to_iovs:
-                    B2INFO(("Creating IoV dictionaries to map files to (Exp,Run) ranges for Calibration '{}' "
-                            "and Collection '{}'."
-                            " Filling dictionary from input file metadata."
-                            " If this is slow, set the 'files_to_iovs' attribute of each "
-                            "Collection before running.".format(self.calibration.name, coll_name)))
+                    B2INFO("Creating IoV dictionaries to map files to (Exp,Run) ranges for"
+                           f" Calibration '{self.calibration.name} and Collection '{coll_name}'."
+                           " Filling dictionary from input file metadata."
+                           " If this is slow, set the 'files_to_iovs' attribute of each Collection before running.")
 
                     files_to_iovs = {}
                     for file_path in collection.input_files:
                         files_to_iovs[file_path] = get_iov_from_file(file_path)
                     collection.files_to_iovs = files_to_iovs
                 else:
-                    B2INFO(("Using File to IoV mapping from 'files_to_iovs' attribute for Calibration '{}' "
-                            "and Collection '{}'".format(self.calibration.name, coll_name)))
+                    B2INFO("Using File to IoV mapping from 'files_to_iovs' attribute for "
+                           f"Calibration '{self.calibration.name}' and Collection '{coll_name}'.")
         else:
             B2INFO("No File to IoV mapping required.")
 
@@ -577,7 +576,7 @@ class CalibrationMachine(Machine):
         """
         Did all the collections succeed?
         """
-        B2DEBUG(29, "Checking for failed collector job")
+        B2DEBUG(29, "Checking for failed collector job.")
         if self._collector_jobs_ready():
             return all([job.status == "completed" for job in self._collector_jobs.values()])
 
@@ -585,7 +584,7 @@ class CalibrationMachine(Machine):
         """
         Did any of the collections fail?
         """
-        B2DEBUG(29, "Checking for failed collector job")
+        B2DEBUG(29, "Checking for failed collector job.")
         if self._collector_jobs_ready():
             return any([job.status == "failed" for job in self._collector_jobs.values()])
 
@@ -618,10 +617,8 @@ class CalibrationMachine(Machine):
                 if job.subjobs:
                     num_completed = sum((subjob.status in subjob.exit_statuses) for subjob in job.subjobs.values())
                     total_subjobs = len(job.subjobs)
-                    B2INFO("{}/{} Collector SubJobs finished in Calibration {} Job {}".format(num_completed,
-                                                                                              total_subjobs,
-                                                                                              self.calibration.name,
-                                                                                              job.name))
+                    B2INFO(f"{num_completed}/{total_subjobs} Collector SubJobs finished in"
+                           f" Calibration {self.calibration.name} Job {job.name}.")
         return all([job.ready() for job in self._collector_jobs.values()])
 
     def _submit_collections(self):
@@ -637,7 +634,7 @@ class CalibrationMachine(Machine):
         if self._require_iteration() and self._below_max_iterations():
             return False
         elif self._require_iteration() and not self._below_max_iterations():
-            B2INFO("Reached maximum number of iterations ({0}), will complete now.".format(self.calibration.max_iterations))
+            B2INFO(f"Reached maximum number of iterations ({self.calibration.max_iterations}), will complete now.")
             return True
         elif not self._require_iteration():
             return True
@@ -658,7 +655,7 @@ class CalibrationMachine(Machine):
     def _log_new_state(self, **kwargs):
         """
         """
-        B2INFO("Calibration Machine {0} moved to state {1}".format(self.calibration.name, kwargs["new_state"].name))
+        B2INFO(f"Calibration Machine {self.calibration.name} moved to state {kwargs['new_state'].name}.")
 
     def dependencies_completed(self):
         """
@@ -687,11 +684,11 @@ class CalibrationMachine(Machine):
             if "fail" in possible_transitions:
                 getattr(self, "fail")()
             else:
-                raise MachineError(("Failed to automatically transition out of {0} state.".format(self.state)))
+                raise MachineError(f"Failed to automatically transition out of {self.state} state.")
 
     def _make_output_dir(self):
         """
-        Creates the overall root directory of the Calibration. Wil not overwrite if it already exists.
+        Creates the overall root directory of the Calibration. Will not overwrite if it already exists.
         Also creates s
         """
         create_directories(self.root_dir, overwrite=False)
@@ -718,7 +715,7 @@ class CalibrationMachine(Machine):
     def _make_pre_collector_path(self, name, collection):
         """
         Creates a basf2 path for the collectors setup path (Collection.pre_collector_path) and serializes it in the
-        self.output_dir/<calibration_name>/<iteration>/<colector_output>/<name> directory
+        self.output_dir/<calibration_name>/<iteration>/<colector_output>/<name> directory.
         """
         path_output_dir = self.root_dir.joinpath(str(self.iteration), self.collector_input_dir, name)
         coll_path = collection.pre_collector_path
@@ -742,10 +739,8 @@ class CalibrationMachine(Machine):
             job.working_dir = iteration_dir.joinpath(self.collector_output_dir, collection_name)
             # Remove previous failed attempt to avoid problems
             if job.output_dir.exists():
-                B2INFO("Previous output directory for {} collector {} exists. "
-                       "Deleting {} before re-submitting.".format(self.calibration.name,
-                                                                  collection_name,
-                                                                  str(job.output_dir)))
+                B2INFO(f"Previous output directory for {self.calibration.name} collector {collection_name} exists."
+                       f"Deleting {job.output.dir} before re-submitting.")
                 shutil.rmtree(job.output_dir)
             job.cmd = collection.job_cmd
             job.append_current_basf2_setup_cmds()
@@ -763,7 +758,7 @@ class CalibrationMachine(Machine):
             # We can assume that the databases exist as we can't be here until they have returned
             for dependency in self.calibration.dependencies:
                 database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
-                B2INFO('Adding local database from {0} for use by {1}'.format(dependency.name, self.calibration.name))
+                B2INFO(f"Adding local database from {dependency.name} for use by {self.calibration.name}.")
                 list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
 
             # Add previous iteration databases from this calibration
@@ -771,7 +766,7 @@ class CalibrationMachine(Machine):
                 previous_iteration_dir = self.root_dir.joinpath(str(self.iteration - 1))
                 database_dir = os.path.join(previous_iteration_dir, self.calibration.alg_output_dir, 'outputdb')
                 list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
-                B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
+                B2INFO(f"Adding local database from previous iteration of {self.calibration.name}.")
 
             # Let's use a directory to store some files later for input to the collector jobs. Should already exist from
             # collector path
@@ -788,7 +783,7 @@ class CalibrationMachine(Machine):
                 elif database.db_type == 'central':
                     json_db_chain.append(('central', database.global_tag))
                 else:
-                    raise ValueError("Unknown database type {}".format(database.db_type))
+                    raise ValueError(f"Unknown database type {database.db_type}.")
             # CAF created ones for dependent calibrations and previous iterations of this calibration
             for database in list_dependent_databases:
                 json_db_chain.append(('local', database))
@@ -812,28 +807,27 @@ class CalibrationMachine(Machine):
                 for input_file in input_data_files:
                     file_iov = self.calibration.files_to_iovs[input_file]
                     if file_iov == exprun.make_iov():
-                        B2INFO("You have asked for {} to be ignored for Calibration '{}'. "
-                               "Therefore the input file '{}' from Collection '{}' "
-                               "is being removed from input files list.".format(exprun, self.calibration.name,
-                                                                                input_file, collection_name))
+                        B2INFO(f"You have asked for {exprun} to be ignored for Calibration '{self.calibration.name}'. "
+                               f"Therefore the input file '{input_file}' from Collection '{collection_name}' "
+                               "is being removed from input files list.")
                         files_to_ignore.add(input_file)
             input_data_files.difference_update(files_to_ignore)
 
             if not input_data_files:
-                raise MachineError("No valid input files for Calibration '{}' and Collection '{}'".format(self.calibration.name,
-                                                                                                          collection_name))
+                raise MachineError(f"No valid input files for Calibration '{self.calibration.name}' "
+                                   f" and Collection '{collection_name}'.")
             job.input_files = list(input_data_files)
 
             job.splitter = collection.splitter
             job.backend_args = collection.backend_args
             # Output patterns to be returned from collector job
             job.output_patterns = collection.output_patterns
-            B2DEBUG(20, "Collector job for {}:{}:\n{}".format(self.calibration.name, collection_name, str(job)))
+            B2DEBUG(20, f"Collector job for {self.calibration.name}:{collection_name}:\n{job}")
             self._collector_jobs[collection_name] = job
 
     def _check_valid_collector_output(self):
         B2INFO("Checking that Collector output exists for all colector jobs "
-               "using {}.output_patterns.".format(self.calibration.name))
+               f"using {self.calibration.name}.output_patterns.")
         if not self._collector_jobs:
             B2INFO("We're restarting so we'll recreate the collector Job object.")
             self._recover_collector_jobs()
@@ -867,11 +861,10 @@ class CalibrationMachine(Machine):
         output_database_dir = algorithm_output_dir.joinpath("outputdb")
         # Remove it, if we failed previously, to start clean
         if algorithm_output_dir.exists():
-            B2INFO("Output directory for {} already exists from a previous CAF attempt. "
-                   "Deleting and recreating {}".format(self.calibration.name,
-                                                       algorithm_output_dir))
+            B2INFO(f"Output directory for {self.calibration.name} already exists from a previous CAF attempt. "
+                   f"Deleting and recreating {algorithm_output_dir}.")
         create_directories(algorithm_output_dir)
-        B2INFO("Output local database for {} will be stored at {}".format(self.calibration.name, output_database_dir))
+        B2INFO(f"Output local database for {self.calibration.name} will be stored at {output_database_dir}.")
         algs_runner.output_database_dir = output_database_dir
         algs_runner.output_dir = self.root_dir.joinpath(str(self.iteration), self.calibration.alg_output_dir)
         input_files = []
@@ -895,7 +888,7 @@ class CalibrationMachine(Machine):
         list_dependent_databases = []
         for dependency in self.calibration.dependencies:
             database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
-            B2INFO('Adding local database from {0} for use by {1}'.format(dependency.name, self.calibration.name))
+            B2INFO(f"Adding local database from {dependancy.name} for use by {self.calibration.name}.")
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
 
         # Add previous iteration databases from this calibration
@@ -903,7 +896,7 @@ class CalibrationMachine(Machine):
             previous_iteration_dir = self.root_dir.joinpath(str(self.iteration - 1))
             database_dir = os.path.join(previous_iteration_dir, self.calibration.alg_output_dir, 'outputdb')
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
-            B2INFO('Adding local database from previous iteration of {}'.format(self.calibration.name))
+            B2INFO(f"Adding local database from previous iteration of {self.calibration.name}.")
         algs_runner.dependent_databases = list_dependent_databases
 
         algs_runner.ignored_runs = self.calibration.ignored_runs
@@ -927,7 +920,7 @@ class CalibrationMachine(Machine):
                                                    'outputdb')
         final_database_location = self.root_dir.joinpath('outputdb')
         if final_database_location.exists():
-            B2INFO("Removing previous final output database for {} before copying new one.".format(self.calibration.name))
+            B2INFO(f"Removing previous final output database for {self.calibration.name} before copying new one.")
             shutil.rmtree(final_database_location)
         shutil.copytree(database_location, final_database_location)
 
@@ -1014,12 +1007,12 @@ class AlgorithmMachine(Machine):
         # Check if we're somehow missing a required attribute (should be impossible since they get initialised in init)
         for attribute_name in self.required_attrs:
             if not hasattr(self, attribute_name):
-                B2ERROR("AlgorithmMachine attribute {} doesn't exist.".format(attribute_name))
+                B2ERROR(f"AlgorithmMachine attribute {attribute_name} doesn't exist.")
                 return False
         # Check if any attributes that need actual values haven't been set or were empty
         for attribute_name in self.required_true_attrs:
             if not getattr(self, attribute_name):
-                B2ERROR("AlgorithmMachine attribute {} returned False.".format(attribute_name))
+                B2ERROR(f"AlgorithmMachine attribute {attribute_name} returned False.")
                 return False
         return True
 
@@ -1031,7 +1024,7 @@ class AlgorithmMachine(Machine):
 
     def _setup_database_chain(self, **kwargs):
         """
-        Apply all databases in the correct order
+        Apply all databases in the correct order.
         """
         # We deliberately override the normal database ordering because we don't want input files GTs to affect
         # the processing. Only explicit GTs and intermediate local DBs made by the CAF should be added here.
@@ -1041,33 +1034,28 @@ class AlgorithmMachine(Machine):
         # Apply all the databases in order, starting with the user-set chain for this Calibration
         for database in self.database_chain:
             if database.db_type == 'local':
-                B2INFO("Adding Local Database {} to head of chain of local databases, for {}.".format(
-                       database.filepath.as_posix(),
-                       self.algorithm.name))
-
+                B2INFO(f"Adding Local Database {database.filepath.as_posix()} to head of chain of local databases, "
+                       f"for {self.algorithm.name}.")
                 b2conditions.prepend_testing_payloads(database.filepath.as_posix())
             elif database.db_type == 'central':
-                B2INFO("Adding Central database tag {} to head of GT chain, for {}".format(
-                       database.global_tag,
-                       self.algorithm.name))
+                B2INFO(f"Adding Central database tag {database.global_tag} to head of GT chain, "
+                       f"for {self.algorithm.name}.")
                 b2conditions.prepend_globaltag(database.global_tag)
             else:
-                raise ValueError("Unknown database type {}".format(database.db_type))
+                raise ValueError(f"Unknown database type {database.db_type}.")
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
         for filename, directory in self.dependent_databases:
-            B2INFO(("Adding Local Database {} to head of chain of local databases created by"
-                    " a dependent calibration, for {}").format(filename, self.algorithm.name))
+            B2INFO((f"Adding Local Database {filename} to head of chain of local databases created by"
+                    f" a dependent calibration, for {self.algorithm.name}."))
             b2conditions.prepend_testing_payloads(filename)
 
         # Create a directory to store the payloads of this algorithm
         create_directories(Path(self.output_database_dir), overwrite=False)
 
         # add local database to save payloads
-        B2INFO("Output local database for {} stored at {}".format(
-               self.algorithm.name,
-               self.output_database_dir))
+        B2INFO(f"Output local database for {self.algorithm.name} stored at {self.output_database_dir}.")
         # Things have changed. We now need to do the expert settings to create a database directly.
         # LocalDB is readonly without this but we don't need 'use_local_database' during writing.
         b2conditions.expert_settings(save_payloads=str(self.output_database_dir.joinpath("database.txt")))
@@ -1077,22 +1065,20 @@ class AlgorithmMachine(Machine):
         """
         # add logfile for output
         log_file = os.path.join(self.output_dir, self.algorithm.name + '_stdout')
-        B2INFO('Output log file at {}'.format(log_file))
+        B2INFO(f"Output log file at {log_file}.")
         basf2.reset_log()
         basf2.set_log_level(basf2.LogLevel.INFO)
-#        basf2.set_log_level(basf2.LogLevel.DEBUG)
-#        basf2.set_debug_level(100)
         basf2.log_to_file(log_file)
 
     def _change_working_dir(self, **kwargs):
         """
         """
-        B2INFO("Changing current working directory to {}".format(self.output_dir))
+        B2INFO(f"Changing current working directory to {self.output_dir}.")
         os.chdir(self.output_dir)
 
     def _pre_algorithm(self, **kwargs):
         """
-        Call the user defined algorithm setup function
+        Call the user defined algorithm setup function.
         """
         B2INFO("Running Pre-Algorithm function (if exists)")
         if self.algorithm.pre_algorithm:
@@ -1102,16 +1088,16 @@ class AlgorithmMachine(Machine):
 
     def _execute_over_iov(self, **kwargs):
         """
-        Does the actual execute of the algorithm on an IoV and records the result
+        Does the actual execute of the algorithm on an IoV and records the result.
         """
-        B2INFO("Running {0} in working directory {1}".format(self.algorithm.name, os.getcwd()))
+        B2INFO(f"Running {self.algorithm.name} in working directory {os.getcwd()}.")
 
         runs_to_execute = kwargs["runs"]
         iov = kwargs["apply_iov"]
         iteration = kwargs["iteration"]
         if not iov:
             iov = iov_from_runs(runs_to_execute)
-        B2INFO("Execution will use {} for labelling payloads by default.".format(iov))
+        B2INFO(f"Execution will use {iov} for labelling payloads by default.")
         alg_result = self.algorithm.algorithm.execute(runs_to_execute, iteration, iov._cpp_iov)
         self.result = IoV_Result(iov, alg_result)
 
@@ -1121,20 +1107,20 @@ class AlgorithmMachine(Machine):
 
 class MachineError(Exception):
     """
-    Base exception class for this module
+    Base exception class for this module.
     """
     pass
 
 
 class ConditionError(MachineError):
     """
-    Exception for when conditions fail during a transition
+    Exception for when conditions fail during a transition.
     """
     pass
 
 
 class TransitionError(MachineError):
     """
-    Exception for when transitions fail
+    Exception for when transitions fail.
     """
     pass

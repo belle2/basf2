@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCRAWHIT_H
-#define CDCRAWHIT_H
+#pragma once
 
 // Includes
 #include <framework/datastore/RelationsObject.h>
@@ -175,5 +174,3 @@ namespace Belle2 {
     ClassDef(CDCRawHit, 2);
   };
 }
-
-#endif

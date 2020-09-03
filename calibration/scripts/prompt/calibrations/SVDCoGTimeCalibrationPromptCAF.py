@@ -1,6 +1,5 @@
 import basf2
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -22,6 +21,7 @@ import svd as svd
 import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 
+set_log_level(LogLevel.INFO)
 now = datetime.datetime.now()
 
 settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",

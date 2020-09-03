@@ -14,7 +14,7 @@ import numpy
 from array import array
 from basf2 import *
 from ROOT import gROOT
-gROOT.SetBatch(True)
+gROOT.SetBatch(True)  # noqa
 from ROOT import TFile, TTree, TMath
 
 
@@ -93,6 +93,7 @@ def gainana_pixelToPmt(inputRoot, outputRoot, maxHitTiming=-8., nMinEntries=100)
     f_out.cd()
     tr_out.Write()
     f_out.Close()
+
 
 if __name__ == '__main__':
 

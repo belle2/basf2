@@ -1,5 +1,4 @@
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2 as b2
 
 import os
 import sys
@@ -21,6 +20,7 @@ import vertex as vx
 from simulation import add_simulation
 from L1trigger import add_tsim
 
+b2.set_log_level(b2.LogLevel.INFO)
 # Generate 4 runs, with run number 4, 5, 6, 7
 runList = [4, 5, 6, 7]
 # all runs in experiment 0 (default final Phase3 config)
@@ -53,8 +53,8 @@ components = ['PXD', 'SVD', 'CDC']
 
 def PXDHalfShellsAlignment(files, tags):
 
-        # Set-up re-processing path
-    path = create_path()
+    # Set-up re-processing path
+    path = b2.create_path()
 
     path.add_module('Progress')
     # Remove all non-raw data to run the full reco again
@@ -67,15 +67,15 @@ def PXDHalfShellsAlignment(files, tags):
     reco.add_mc_reconstruction(path, pruneTracks=False, components=components)
     path.add_module('DAFRecoFitter')
 
-    collector = register_module('MillepedeCollector',
-                                tracks=['RecoTracks'],
-                                primaryVertices=[],
-                                calibrateVertex=True, components=db_components,
-                                granularity='all',  # time dependence needs granularity=all
-                                useGblTree=False,
-                                absFilePaths=True,
-                                timedepConfig=timedep
-                                )
+    collector = b2.register_module('MillepedeCollector',
+                                   tracks=['RecoTracks'],
+                                   primaryVertices=[],
+                                   calibrateVertex=True, components=db_components,
+                                   granularity='all',  # time dependence needs granularity=all
+                                   useGblTree=False,
+                                   absFilePaths=True,
+                                   timedepConfig=timedep
+                                   )
 
     algorithm = MillepedeAlgorithm()
     algorithm.invertSign(True)
@@ -172,13 +172,13 @@ def PXDHalfShellsAlignment(files, tags):
 
 
 def generate_test_data(filename):
-    kkgeninput = register_module('KKGenInput')
+    kkgeninput = b2.register_module('KKGenInput')
     kkgeninput.param('tauinputFile', Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat'))
     kkgeninput.param('KKdefaultFile', Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat'))
     kkgeninput.param('taudecaytableFile', '')
     kkgeninput.param('kkmcoutputfilename', 'kkmc_mumu.txt')
 
-    main = create_path()
+    main = b2.create_path()
 
     main.add_module("EventInfoSetter", evtNumList=evtNumList, runList=runList, expList=expList)
     # add_beamparameters(main, "Y4S")
@@ -193,9 +193,10 @@ def generate_test_data(filename):
     main.add_module("RootOutput", outputFileName=filename)
     main.add_module("Progress")
 
-    process(main)
-    print(statistics)
+    b2.process(main)
+    print(b2.statistics)
     return os.path.abspath(filename)
+
 
 if __name__ == "__main__":
     input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
@@ -210,7 +211,7 @@ if __name__ == "__main__":
 
         input_files = [generate_test_data(outfile)]
 
-    tags = conditions.default_globaltags
+    tags = b2.conditions.default_globaltags
     mp2_beamspot = PXDHalfShellsAlignment(input_files, tags)
     mp2_beamspot.max_iterations = 1
 

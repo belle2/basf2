@@ -365,7 +365,7 @@ namespace Belle2 {
     std::string getExpRunString(Calibration::ExpRun& expRun) const;
 
     /// constructs the full TDirectory + Key name of an object in a TFile based on its name and exprun
-    std::string getFullObjectPath(std::string name, Calibration::ExpRun expRun) const;
+    std::string getFullObjectPath(const std::string& name, Calibration::ExpRun expRun) const;
 
     /// List of input files to the Algorithm, will initially be user defined but then gets the wildcards expanded during execute()
     std::vector<std::string> m_inputFileNames;

@@ -100,6 +100,9 @@ BOOST_PYTHON_MODULE(pybasf2)
   RandomNumbers::exposePythonAPI();
   Database::exposePythonAPI();
   FileMetaData::exposePythonAPI();
+
+  //don't show c++ signature in python doc to keep it simple
+  docstring_options options(true, true, false);
   def("update_file_metadata", &updateFileMetaData);
   def("get_file_metadata", &getFileMetadata, R"DOC(
 Return the FileMetaData object for the given output file.

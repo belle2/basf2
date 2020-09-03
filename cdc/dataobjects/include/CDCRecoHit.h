@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCRECOHIT_H
-#define CDCRECOHIT_H
+#pragma once
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
@@ -85,7 +84,7 @@ namespace Belle2 {
      * is not bent).
      */
     bool getFlyByDistanceVector(B2Vector3D& pointingVector, B2Vector3D& trackDir,
-                                const genfit::AbsTrackRep* rep = NULL,
+                                const genfit::AbsTrackRep* rep = nullptr,
                                 bool usePlaneFromFit = false);
 
     /**
@@ -163,4 +162,3 @@ namespace Belle2 {
     //        derives from genfit::WireMeasurement.
   };
 }
-#endif

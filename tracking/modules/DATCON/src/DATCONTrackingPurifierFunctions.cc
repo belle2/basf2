@@ -44,6 +44,7 @@ DATCONTrackingModule::purifyTrackCandsList()
       x += hc.first.X() + hc.second.X();
       y += hc.first.Y() + hc.second.Y();
       ++cand_cnt;
+      // cppcheck-suppress knownConditionTrueFalse
       if (useMerger) {
         mergeIdList(merged_idList, idList);
       } else {
@@ -87,6 +88,7 @@ DATCONTrackingModule::purifyTrackCandsList()
       x += hc.first.X() + hc.second.X();
       y += hc.first.Y() + hc.second.Y();
       ++cand_cnt;
+      // cppcheck-suppress knownConditionTrueFalse
       if (useMerger) {
         mergeIdList(merged_idList, idList);
       } else {

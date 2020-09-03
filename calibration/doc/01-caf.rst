@@ -3,7 +3,7 @@ The Calibration Framework (CAF)
 ===============================
 
 The Python CAF is a set of Python modules and classes which work together to provide users with a
-convienient interface to running calibration jobs. It is assumed that you are using the C++
+convenient interface to running calibration jobs. It is assumed that you are using the C++
 calibration framework classes e.g. the CalibrationCollectorModule and CalibrationAlgorithm
 class in the calibration package. These provide a consistent interface for running calibration
 jobs on input data which the Python CAF can automate for you.

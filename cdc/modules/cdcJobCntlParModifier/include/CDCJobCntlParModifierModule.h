@@ -3,13 +3,12 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: CDC group                                    *
+ * Contributors: CDC group                                                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCJOBCNTLPARMODIFIER_H
-#define CDCJOBCNTLPARMODIFIER_H
+#pragma once
 
 //basf2 framework headers
 #include <framework/core/Module.h>
@@ -91,5 +90,3 @@ namespace Belle2 {
   };
 
 } // end of Belle2 namespace
-
-#endif // CDCJOBCNTLPARMODIFIER_H

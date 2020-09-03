@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLWAVEFORMS_H
-#define ECLWAVEFORMS_H
+#pragma once
 
 #include <TObject.h>
 
@@ -30,4 +29,3 @@ namespace Belle2 {
     ClassDef(ECLWaveforms, 1); /**< ClassDef */
   };
 }
-#endif

@@ -9,8 +9,7 @@
 //-----------------------------------------------------------------------------
 //*****************************************************************************
 
-#ifndef _TOPf77fun_h
-#define _TOPf77fun_h
+#pragma once
 
 extern "C" {
   // fortran functions defined in top_geo.F
@@ -97,8 +96,6 @@ extern "C" {
   float get_pdf_(int*, float*, float*, float*, int*);
 
 }
-
-#endif
 
 
 

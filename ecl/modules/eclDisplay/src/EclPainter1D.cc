@@ -176,7 +176,7 @@ EclPainter* EclPainter1D::handleClick(int px, int py)
   Float_t upy = gPad->AbsPixeltoY(py);
   Float_t y   = gPad->PadtoY(upy);
 
-  if (y < 0) return NULL;
+  if (y < 0) return nullptr;
 
   if (m_type == SHAPER) {
     EclPainter1D* ret = new EclPainter1D(getData(), CHANNEL);
@@ -195,7 +195,7 @@ EclPainter* EclPainter1D::handleClick(int px, int py)
     return ret;
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void EclPainter1D::setXRange(int xmin, int xmax)

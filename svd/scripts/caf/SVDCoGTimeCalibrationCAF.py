@@ -1,5 +1,4 @@
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -21,6 +20,7 @@ import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 import svd as svd
 
+set_log_level(LogLevel.INFO)
 input_branches = [
     'SVDShaperDigitsFromTracks',
     'EventT0',
@@ -111,6 +111,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
     calibration.strategies = strategies.SequentialBoundaries
 
     return calibration
+
 
 if __name__ == "__main__":
 

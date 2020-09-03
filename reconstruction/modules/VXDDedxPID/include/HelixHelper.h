@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HELIXHELPER_H
-#define HELIXHELPER_H
+#pragma once
 
 #include <TVector3.h>
 #include <Math/Functor.h>
@@ -172,4 +171,3 @@ namespace Belle2 {
   TVector3 HelixHelper::minimize_distance_to_line_b(0.0, 0.0, 0.0);
   HelixHelper const* HelixHelper::helix_object(0);
 }
-#endif

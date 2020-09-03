@@ -178,11 +178,13 @@ namespace {
     }
     for (unsigned int i = 20; i < 28; i += 2) {
       EXPECT_FLOAT_EQ(boost_weights[i], 0.8 / 0.2 / 4.0);
+      // cppcheck-suppress duplicateExpression
       EXPECT_FLOAT_EQ(boost_weights[i + 1], 0.2 / 0.2 / 4.0);
     }
     EXPECT_FLOAT_EQ(boost_weights[28], 1.0 / 0.3 / 4.0);
     EXPECT_FLOAT_EQ(boost_weights[29], 0.0 / 0.3 / 4.0);
     EXPECT_FLOAT_EQ(boost_weights[30], 0.8 / 0.2 / 4.0);
+    // cppcheck-suppress duplicateExpression
     EXPECT_FLOAT_EQ(boost_weights[31], 0.2 / 0.2 / 4.0);
     for (unsigned int i = 32; i < 40; i += 2) {
       EXPECT_FLOAT_EQ(boost_weights[i], 1.0 / 0.3 / 4.0);

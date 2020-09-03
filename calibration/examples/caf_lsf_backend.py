@@ -6,9 +6,6 @@
 # Not all of the configuration is strictly necessary, it's just to show some options
 
 from basf2 import *
-set_log_level(LogLevel.INFO)
-# set_log_level(LogLevel.DEBUG)
-# set_debug_level(29)
 
 import os
 import sys
@@ -17,6 +14,8 @@ import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
+
+set_log_level(LogLevel.INFO)
 
 
 def main(argv):

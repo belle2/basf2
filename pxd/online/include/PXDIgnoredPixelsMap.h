@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_IGNORED_PIXELS_MAP_H_
-#define PXD_IGNORED_PIXELS_MAP_H_
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 
@@ -89,5 +88,4 @@ namespace Belle2 {
   };
 
 } // namespace Belle2
-#endif
 

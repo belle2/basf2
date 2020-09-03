@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef COMBINEDPIDPERFORMANCEMODULE_H_
-#define COMBINEDPIDPERFORMANCEMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <TFile.h>
@@ -115,5 +114,3 @@ namespace Belle2 {
 
   };
 } // end of namespace
-
-#endif

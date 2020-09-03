@@ -43,7 +43,7 @@ namespace Belle2 {
       /// chitest
       double chiTest(TGraphAsymmErrors* graph1, TGraphAsymmErrors* graph2, double minVale, double maxValue);
     private:
-      TList* m_efficiencyList = new TList();
+      TList* m_efficiencyList = new TList(); /**< TList of efficiencies */
       std::string m_outputFileName = "wire_efficiencies.root"; /**< name of the output file */
       DBObjPtr<CDCGeometry> m_cdcGeo; /**< Geometry of CDC */
       CDCBadWires* m_badWireList = new CDCBadWires(); /**< BadWireList that willbe built */

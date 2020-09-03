@@ -8,13 +8,6 @@ import math
 
 import numpy
 import numpy as np
-import matplotlib
-
-# Do not use standard backend TkAgg, because it is NOT thread-safe
-# You will get an RuntimeError: main thread is not in main loop otherwise!
-matplotlib.use("svg")
-matplotlib.rcParams.update({'font.size': 36})
-
 import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
@@ -28,6 +21,12 @@ from . import histogram
 from basf2 import *
 
 import basf2_mva_util
+import matplotlib
+
+# Do not use standard backend TkAgg, because it is NOT thread-safe
+# You will get an RuntimeError: main thread is not in main loop otherwise!
+matplotlib.use("svg")
+matplotlib.rcParams.update({'font.size': 36})
 
 
 class Plotter(object):
@@ -699,7 +698,7 @@ class Box(Plotter):
         self.plots.append(p)
         self.labels.append(column)
         self.x_axis_label = column
-        """
+        r"""
         self.axis.text(0.1, 0.9, (r'$     \mu = {:.2f}$' + '\n' + r'$median = {:.2f}$').format(x.mean(), x.median()),
                        fontsize=28, verticalalignment='top', horizontalalignment='left', transform=self.axis.transAxes)
         self.axis.text(0.4, 0.9, (r'$  \sigma = {:.2f}$' + '\n' + r'$IQD = {:.2f}$').format(x.std(),

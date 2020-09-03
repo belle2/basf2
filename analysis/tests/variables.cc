@@ -579,24 +579,24 @@ namespace {
 
 
     // -
-    EXPECT_FLOAT_EQ(exp->function(NULL), 1337.);
-    EXPECT_FLOAT_EQ(run->function(NULL), 12345.);
-    EXPECT_FLOAT_EQ(evt->function(NULL), 54321.);
-    EXPECT_FLOAT_EQ(date->function(NULL), 20101101.);
-    EXPECT_FLOAT_EQ(year->function(NULL), 2010.);
-    EXPECT_FLOAT_EQ(time->function(NULL), 1288569600);
+    EXPECT_FLOAT_EQ(exp->function(nullptr), 1337.);
+    EXPECT_FLOAT_EQ(run->function(nullptr), 12345.);
+    EXPECT_FLOAT_EQ(evt->function(nullptr), 54321.);
+    EXPECT_FLOAT_EQ(date->function(nullptr), 20101101.);
+    EXPECT_FLOAT_EQ(year->function(nullptr), 2010.);
+    EXPECT_FLOAT_EQ(time->function(nullptr), 1288569600);
   }
 
   TEST_F(EventVariableTest, TestGlobalCounters)
   {
     StoreArray<MCParticle> mcParticles; // empty
     const Manager::Var* var = Manager::Instance().getVariable("nMCParticles");
-    EXPECT_FLOAT_EQ(var->function(NULL), 0.0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 0.0);
 
     for (unsigned i = 0; i < 10; ++i)
       mcParticles.appendNew();
 
-    EXPECT_FLOAT_EQ(var->function(NULL), 10.0);
+    EXPECT_FLOAT_EQ(var->function(nullptr), 10.0);
 
     // TODO: add other counters nTracks etc in here
   }
@@ -1748,6 +1748,59 @@ namespace {
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
+
+
+  TEST_F(MetaVariableTest, mcDaughterDiffOf)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    TLorentzVector momentum;
+    const int nDaughters = 4;
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcParticles;
+    particles.registerRelationTo(mcParticles);
+    std::vector<int> daughterIndices;
+    DataStore::Instance().setInitializeActive(false);
+
+    for (int i = 0; i < nDaughters; i++) {
+      Particle d(TLorentzVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
+      momentum += d.get4Vector();
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices.push_back(newDaughters->getArrayIndex());
+      auto* mcParticle = mcParticles.appendNew();
+      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+      newDaughters->addRelationTo(mcParticle);
+    }
+    const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
+
+    const Manager::Var* var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -222);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 0, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 222);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), -200);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(1, 3, abs(PDG))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 2, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
+  }
+
+
 
   TEST_F(MetaVariableTest, daughterClusterAngleInBetween)
   {
@@ -3211,6 +3264,109 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, mcDaughterVariables)
+  {
+
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    StoreArray<MCParticle> mcParticles;
+    particles.registerRelationTo(mcParticles);
+    DataStore::Instance().setInitializeActive(true);
+    // make a 1 -> 3 particle
+
+    TLorentzVector momentum_1(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_1;
+    std::vector<int> daughterIndices_1;
+
+    for (int i = 0; i < 3; i++) {
+      TLorentzVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_1.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_1.push_back(mom);
+      momentum_1 = momentum_1 + mom;
+
+      auto* mcParticle = mcParticles.appendNew();
+      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+      mcParticle->set4Vector(mom);
+      newDaughters->addRelationTo(mcParticle);
+    }
+
+    const Particle* compositeDau_1 = particles.appendNew(momentum_1, 411, Particle::c_Flavored, daughterIndices_1);
+    auto* mcCompositeDau_1 = mcParticles.appendNew();
+    mcCompositeDau_1->setPDG(411);
+    mcCompositeDau_1->setStatus(MCParticle::c_PrimaryParticle);
+    mcCompositeDau_1->set4Vector(momentum_1);
+    compositeDau_1->addRelationTo(mcCompositeDau_1);
+
+    // make a 1 -> 2 particle
+
+    TLorentzVector momentum_2(0, 0, 0, 0);
+    std::vector<TLorentzVector> daughterMomenta_2;
+    std::vector<int> daughterIndices_2;
+
+    for (int i = 0; i < 2; i++) {
+      TLorentzVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
+      Particle d(mom, (i % 2) ? -11 : 211);
+      Particle* newDaughters = particles.appendNew(d);
+      daughterIndices_2.push_back(newDaughters->getArrayIndex());
+      daughterMomenta_2.push_back(mom);
+      momentum_2 = momentum_2 + mom;
+
+      auto* mcParticle = mcParticles.appendNew();
+      mcParticle->setPDG((i % 2) ? -11 : 211);
+      mcParticle->setStatus(MCParticle::c_PrimaryParticle);
+      mcParticle->set4Vector(mom);
+      newDaughters->addRelationTo(mcParticle);
+    }
+
+    const Particle* compositeDau_2 = particles.appendNew(momentum_2, 411, Particle::c_Flavored, daughterIndices_2);
+    auto* mcCompositeDau_2 = mcParticles.appendNew();
+    mcCompositeDau_2->setPDG(411);
+    mcCompositeDau_2->setStatus(MCParticle::c_PrimaryParticle);
+    mcCompositeDau_2->set4Vector(momentum_2);
+    compositeDau_2->addRelationTo(mcCompositeDau_2);
+
+    // make the composite particle
+    std::vector<int> daughterIndices = {compositeDau_1->getArrayIndex(), compositeDau_2->getArrayIndex()};
+    const Particle* p = particles.appendNew(momentum_2 + momentum_1, 111, Particle::c_Unflavored, daughterIndices);
+
+
+    // Test mcDaughterAngle
+    const Manager::Var* var = Manager::Instance().getVariable("mcDaughterAngle(0, 1)");
+    double v_test = momentum_1.Vect().Angle(momentum_2.Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    var = Manager::Instance().getVariable("mcDaughterAngle(0:0, 1:0)");
+    v_test = daughterMomenta_1[0].Vect().Angle(daughterMomenta_2[0].Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    var = Manager::Instance().getVariable("mcDaughterAngle( 1, -1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+    var = Manager::Instance().getVariable("mcDaughterAngle(1, 0:1:0:0:1)");
+    EXPECT_B2WARNING(var->function(p));
+    EXPECT_TRUE(std::isnan(var->function(p)));
+
+    // Test mcDaughterDiffOf
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(p), 0);
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
+
+
+    // Test mcDaughterDiffOfPhi
+    var = Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, 1)");
+    ASSERT_NE(var, nullptr);
+    v_test = momentum_2.Vect().DeltaPhi(momentum_1.Vect());
+    EXPECT_FLOAT_EQ(var->function(p), v_test);
+
+    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOfPhi(0, NOTINT)"));
+
+  }
 
   TEST_F(MetaVariableTest, varForFirstMCAncestorOfType)
   {
@@ -3383,10 +3539,10 @@ namespace {
 
     // Creation of D decay: D->K0s(->pi pi) K0s(->pi pi)
 
-    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* D_gd_0_0 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 0);
+    const Particle* D_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 1);
+    const Particle* D_gd_1_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 2);
+    const Particle* D_gd_1_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 3);
 
     D_grandDaughterIndices_0.push_back(D_gd_0_0->getArrayIndex());
     D_grandDaughterIndices_0.push_back(D_gd_0_1->getArrayIndex());
@@ -3409,10 +3565,10 @@ namespace {
 
     // Creation of B decay B -> D(->K0s(->pi pi) pi) pi
 
-    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211);
-    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211);
-    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211);
-    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211);
+    const Particle* B_d_1 = particles.appendNew(TLorentzVector(0.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 4);
+    const Particle* B_gd_0_1 = particles.appendNew(TLorentzVector(1.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 5);
+    const Particle* B_ggd_0_0_0 = particles.appendNew(TLorentzVector(2.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 6);
+    const Particle* B_ggd_0_0_1 = particles.appendNew(TLorentzVector(3.0, 1, 1, 1), -211, Particle::c_Flavored, Particle::c_Track, 7);
 
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_0->getArrayIndex());
     B_grandGrandDaughterIndices.push_back(B_ggd_0_0_1->getArrayIndex());
@@ -3431,8 +3587,7 @@ namespace {
     BList->addParticle(B_m);
 
     // Particle that is not an child
-    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211);
-
+    const Particle* not_child = particles.appendNew(TLorentzVector(5.0, 1, 1, 1), 211, Particle::c_Flavored, Particle::c_Track, 8);
 
 
     const Manager::Var* var_0 = Manager::Instance().getVariable("isDescendantOfList(D0:vartest)");

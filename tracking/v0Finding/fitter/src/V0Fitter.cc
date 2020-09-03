@@ -411,8 +411,8 @@ bool V0Fitter::fitAndStore2(const Track* trackPlus, const Track* trackMinus,
   unsigned int nRemoveHitsPlus  = 0;
   unsigned int nRemoveHitsMinus = 0;
 
-  RecoTrack* recoTrackPlus_forRefit  = recoTrackPlus;
-  RecoTrack* recoTrackMinus_forRefit = recoTrackMinus;
+  RecoTrack* recoTrackPlus_forRefit  = copyRecoTrack(recoTrackPlus, pdg_trackPlus);
+  RecoTrack* recoTrackMinus_forRefit = copyRecoTrack(recoTrackMinus, pdg_trackMinus);
 
   while (hasInnerHitStatus != 0) {
     /// If the track has a hit inside the V0 vertex position, use refitted RecoTrack with removing inner hits
@@ -421,11 +421,9 @@ bool V0Fitter::fitAndStore2(const Track* trackPlus, const Track* trackMinus,
     /// for plus-charged track
     if (hasInnerHitStatus & 0x1) {
       ++nRemoveHitsPlus;
-      recoTrackPlus_forRefit = copyRecoTrackRemovingInnerHits(recoTrackPlus,
-                                                              pdg_trackPlus, nRemoveHitsPlus);
       /// if the track refit fails, break out of this loop and
       /// revert back to the original vertex fit with the original tracks.
-      if (recoTrackPlus_forRefit == nullptr) {
+      if (not removeInnerHits(recoTrackPlus, recoTrackPlus_forRefit, pdg_trackPlus, nRemoveHitsPlus)) {
         failflag = true;
         break;
       }
@@ -434,11 +432,9 @@ bool V0Fitter::fitAndStore2(const Track* trackPlus, const Track* trackMinus,
     /// for minus-charged track
     if (hasInnerHitStatus & 0x2) {
       ++nRemoveHitsMinus;
-      recoTrackMinus_forRefit = copyRecoTrackRemovingInnerHits(recoTrackMinus,
-                                                               -1 * pdg_trackMinus, nRemoveHitsMinus);
       /// if the track refit fails, break out of this loop and
       /// revert back to the original vertex fit with the original tracks.
-      if (recoTrackMinus_forRefit == nullptr) {
+      if (not removeInnerHits(recoTrackMinus, recoTrackMinus_forRefit, -1 * pdg_trackMinus, nRemoveHitsMinus)) {
         failflag = true;
         break;
       }
@@ -599,23 +595,28 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   return true;
 }
 
-RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(RecoTrack* origRecoTrack,
-                                                    const int trackPDG, unsigned int& nRemoveHits)
+RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG)
+{
+  RecoTrack* newRecoTrack = origRecoTrack->copyToStoreArray(m_copiedRecoTracks);
+  newRecoTrack->addHitsFromRecoTrack(origRecoTrack);
+  newRecoTrack->addRelationTo(origRecoTrack);
+
+  return newRecoTrack;
+}
+
+bool V0Fitter::removeInnerHits(RecoTrack* origRecoTrack, RecoTrack* recoTrack,
+                               const int trackPDG, unsigned int& nRemoveHits)
 {
   /// original track information
   Const::ChargedStable particleUsedForFitting(std::abs(trackPDG));
   const genfit::AbsTrackRep* origTrackRep = origRecoTrack->getTrackRepresentationForPDG(std::abs(
                                               trackPDG));/// only a positive PDG number is allowed for the input
 
-  RecoTrack* newRecoTrack = origRecoTrack->copyToStoreArray(m_copiedRecoTracks);
-  newRecoTrack->addHitsFromRecoTrack(origRecoTrack);
-  newRecoTrack->addRelationTo(origRecoTrack);
-
   /// disable inner hits
-  const std::vector<RecoHitInformation*>& recoHitInformations = newRecoTrack->getRecoHitInformations(true);/// true for sorted info.
+  const std::vector<RecoHitInformation*>& recoHitInformations = recoTrack->getRecoHitInformations(true);/// true for sorted info.
   if (recoHitInformations.size() < nRemoveHits) {/// N removed hits should not exceed N hits in the track
     B2WARNING("N removed hits exceeds N hits in the track.");
-    return nullptr;
+    return false;
   }
   for (unsigned int i = 0 ; i < nRemoveHits ; ++i) {
     recoHitInformations[i]->setUseInFit(false);
@@ -625,7 +626,7 @@ RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(RecoTrack* origRecoTrack,
   if (recoHitInformations[nRemoveHits - 1]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
     if (recoHitInformations.size() < nRemoveHits + 1) { /// N removed hits should not exceed N hits in the track
       B2WARNING("N removed hits exceeds N hits in the track.");
-      return nullptr;
+      return false;
     }
     if (recoHitInformations[nRemoveHits]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
       const SVDCluster* lastRemovedSVDHit = recoHitInformations[nRemoveHits - 1]->getRelatedTo<SVDCluster>();
@@ -651,15 +652,15 @@ RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(RecoTrack* origRecoTrack,
     }
   }
 
-  /// fit newRecoTrack
+  /// fit recoTrack
   TrackFitter fitter;
-  if (not fitter.fit(*newRecoTrack, particleUsedForFitting)) {
+  if (not fitter.fit(*recoTrack, particleUsedForFitting)) {
     B2WARNING("track fit failed.");
     /// check fit status of original track
     if (not origRecoTrack->wasFitSuccessful(origTrackRep))
       B2WARNING("\t original track fit was also failed.");
-    return nullptr;
+    return false;
   }
 
-  return newRecoTrack;
+  return true;
 }

@@ -1850,7 +1850,8 @@ class HTCondor(Batch):
                             "requirements": "OpSysAndVer == \"CentOS7\"",
                             "universe": "vanilla",
                             "getenv": "false",
-                            "extra_lines": []  # These should be other HTCondor submit script lines like 'request_memory = 64 GB'
+                            "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
+                            "extra_lines": []  # These should be other HTCondor submit script lines like 'request_cpus = 2'
                            }
     #: Default ClassAd attributes to return from commands like condor_q
     default_class_ads = ["GlobalJobId", "JobStatus", "Owner"]
@@ -1874,6 +1875,7 @@ class HTCondor(Batch):
             print(f'universe = {job_backend_args["universe"]}', file=submit_file)
             print(f'requirements = {job_backend_args["requirements"]}', file=submit_file)
             print(f'getenv = {job_backend_args["getenv"]}', file=submit_file)
+            print(f'request_memory = {job_backend_args["request_memory"]}', file=submit_file)
             print('should_transfer_files = Yes', file=submit_file)
             print('when_to_transfer_output = ON_EXIT', file=submit_file)
             # Any other lines in the backend args that we don't deal with explicitly but maybe someone wants to insert something

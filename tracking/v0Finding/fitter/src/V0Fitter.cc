@@ -66,7 +66,7 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
 void V0Fitter::setFitterMode(int fitterMode)
 {
   if (not(0 <= fitterMode && fitterMode <= 3)) {
-    B2ERROR("invalid fitter mode! set fitter mode as 0");
+    B2FATAL("Invalid fitter mode!");
   } else {
     m_v0FitterMode = fitterMode;
     if (fitterMode == 3)
@@ -170,8 +170,7 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
     /// This shouldn't ever happen, but I can see the extrapolation
     /// code trying several windings before giving up, so this happens occasionally.
     /// Something more stable would perhaps be desirable.
-    B2DEBUG(200, "Could not extrapolate track to vertex.");
-    //B2WARNING("extrapolateToPoint was failed");
+    B2DEBUG(20, "Could not extrapolate track to vertex.");
     return false;
   }
   return true;
@@ -554,7 +553,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     }
   }
 
-  B2DEBUG(200, "Vertex accepted.");
+  B2DEBUG(20, "Vertex accepted.");
 
   if (not extrapolateToVertex(stPlus, stMinus, posVert, hasInnerHitStatus)) {
     return false;
@@ -571,7 +570,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     TrackFitResult* tfrPlusVtx =  buildTrackFitResult(gfTrackPlus, stPlus,  Bz, trackHypotheses.first);
     TrackFitResult* tfrMinusVtx = buildTrackFitResult(gfTrackMinus, stMinus, Bz, trackHypotheses.second);
 
-    B2DEBUG(100, "Creating new V0.");
+    B2DEBUG(20, "Creating new V0.");
     auto v0 = m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
                               std::make_pair(trackMinus, tfrMinusVtx));
 

@@ -90,10 +90,10 @@ void SVDRecoDigitCreatorModule::beginRun()
   }
 
 
-  B2INFO("SVD  6-sample DAQ, strip time algorithm:" << m_timeRecoWith6SamplesAlgorithm <<  ", strip charge algorithm: " <<
+  B2INFO("SVD  6-sample DAQ, strip time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", strip charge algorithm: " <<
          m_chargeRecoWith6SamplesAlgorithm);
 
-  B2INFO("SVD  3-sample DAQ, strip time algorithm:" << m_timeRecoWith3SamplesAlgorithm <<  ", strip charge algorithm: " <<
+  B2INFO("SVD  3-sample DAQ, strip time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", strip charge algorithm: " <<
          m_chargeRecoWith3SamplesAlgorithm);
 }
 
@@ -180,6 +180,10 @@ void SVDRecoDigitCreatorModule::event()
 
   while (i < nDigits) {
 
+    VxdID sensorID = m_storeDigits[i]->getSensorID();
+    bool isU =  m_storeDigits[i]->isUStrip();
+    int cellID = m_storeDigits[i]->getCellID();
+
     float time = std::numeric_limits<float>::quiet_NaN();
     float timeError = std::numeric_limits<float>::quiet_NaN();
     float charge = std::numeric_limits<float>::quiet_NaN();
@@ -192,6 +196,8 @@ void SVDRecoDigitCreatorModule::event()
     SVDReconstructionBase* timeBase = new SVDReconstructionBase(*m_storeDigits[i]);
     SVDTimeReconstruction* timeReco = (SVDTimeReconstruction*)timeBase;
     timeReco->setTriggerBin(triggerBin);
+    float averageNoise =  m_NoiseCal.getNoise(sensorID, isU, cellID);
+    timeReco->setAverageNoise(averageNoise);
 
     SVDReconstructionBase* chargeBase = new SVDReconstructionBase(*m_storeDigits[i]);
     SVDChargeReconstruction* chargeReco = (SVDChargeReconstruction*) chargeBase;
@@ -214,21 +220,16 @@ void SVDRecoDigitCreatorModule::event()
     // now go into FTSW reference frame
     time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
 
-    B2INFO("time = " << time);
-    B2INFO("timeError = " << timeError);
-    B2INFO("charge = " << charge);
-    B2INFO("chargeError = " << chargeError);
-
     //append the new SVDRecoDigit to the StoreArray
-    m_storeRecoDigits.appendNew(SVDRecoDigit(m_storeDigits[i]->getSensorID(), m_storeDigits[i]->isUStrip(),
-                                             m_storeDigits[i]->getCellID(), charge, chargeError, time, timeError, probabilities, chi2));
+    m_storeRecoDigits.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));
 
     // write relations
+    // TO DO
 
     i++;
   } //exit loop on ShaperDigits
 
-  B2DEBUG(1, "Number of strips: " << m_storeRecoDigits.getEntries());
+  B2DEBUG(25, "Number of strips: " << m_storeRecoDigits.getEntries());
 }
 
 

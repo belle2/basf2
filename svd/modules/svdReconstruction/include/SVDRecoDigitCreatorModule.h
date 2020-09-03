@@ -24,7 +24,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 
 //#include <svd/calibration/SVDPulseShapeCalibrations.h>
-//#include <svd/calibration/SVDNoiseCalibrations.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/dbobjects/SVDRecoConfiguration.h>
 
 namespace Belle2 {
@@ -100,6 +100,7 @@ namespace Belle2 {
       // 4. Calibration Objects
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
 
+      SVDNoiseCalibrations m_NoiseCal; /**< wrapper of the noise calibrations*/
     };// end class declarations
 
 

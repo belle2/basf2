@@ -47,43 +47,6 @@ unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
 }
 
 
-int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
-{
-
-  // check if finesse_num is in a range
-  if (finesse_num < 0 || finesse_num >= MAX_PCIE40_CH) {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] Invalid finesse # (=%d): %s %s %d\n", finesse_num,
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-    B2FATAL(err_buf);
-    return 0;
-  }
-
-  int pos_nwords_0;
-  int nwords;
-
-  pos_nwords_0 = GetBufferPos(n) + (tmp_header.POS_CH_POS_TABLE + finesse_num);
-  if (finesse_num == (MAX_PCIE40_CH - 1)) {
-    nwords = GetBlockNwords(n) - tmp_trailer.GetTrlNwords() - m_buffer[ pos_nwords_0 ];
-  } else {
-    nwords = m_buffer[ pos_nwords_0 + 1 ] - m_buffer[ pos_nwords_0 ];
-  }
-
-  if (nwords < 0 || nwords > 1e6) {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : # of words is strange. %d (ch=%d) : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
-            nwords, finesse_num,
-            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-    B2FATAL(err_buf);
-  }
-
-  return nwords;
-
-}
-
 
 
 

@@ -51,58 +51,6 @@ int PreRawCOPPERFormat_latest::GetDetectorNwords(int n, int finesse_num)
 
 }
 
-
-int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
-{
-  if (!CheckCOPPERMagic(n)) {
-    char err_buf[500];
-    sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format. : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
-            65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s", err_buf); fflush(stdout);
-    PrintData(m_buffer, m_nwords);
-
-    for (int i = 0; i < MAX_PCIE40_CH; i++) {
-      printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
-      if (GetFINESSENwords(n, i) > 0) {
-        CheckCRC16(n, i);
-      }
-    }
-    printf("[DEBUG] ========== No CRC error. : block %d =========\n", n);
-    // string err_str = err_buf;   throw (err_str);
-    B2FATAL(err_buf); // to reduce multiple error messages
-  }
-  int pos_nwords;
-  switch (finesse_num) {
-    case 0 :
-      pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + POS_CH_A_DATA_LENGTH;
-      break;
-    case 1 :
-      pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + POS_CH_B_DATA_LENGTH;
-      break;
-    case 2 :
-      pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + POS_CH_C_DATA_LENGTH;
-      break;
-    case 3 :
-      pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + POS_CH_D_DATA_LENGTH;
-      break;
-    default :
-      char err_buf[500];
-      sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : Specifined FINESSE number( = %d ) is invalid. Exiting... : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
-              finesse_num,
-              65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
-              __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printf("%s", err_buf); fflush(stdout);
-      //      string err_str = err_buf;    throw (err_str);
-      B2FATAL(err_buf); // to reduce multiple error messages
-  }
-  return m_buffer[ pos_nwords ];
-
-}
-
-
 unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 {
 

@@ -175,10 +175,16 @@ namespace Belle2 {
     void GetTTTimeVal(int n, struct timeval* tv) OVERRIDE_CPP17;
 
     //! Get the max number of channels in a readout board
+    /* cppcheck-suppress missingOverride */
     int GetMaxNumOfCh(int n) OVERRIDE_CPP17;
 
     //! Get a pointer to a FINESSE buffer
+    /* cppcheck-suppress missingOverride */
     int* GetFINESSEBuffer(int n, int finesse_num) OVERRIDE_CPP17;
+
+    //! Get the size of a finesse buffer
+    /* cppcheck-suppress missingOverride */
+    int GetFINESSENwords(int n, int finesse_num) OVERRIDE_CPP17;
 
     /// Format version number
     enum {

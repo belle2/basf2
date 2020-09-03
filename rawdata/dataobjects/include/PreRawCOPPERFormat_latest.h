@@ -77,10 +77,6 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     int GetOffset1stFINESSE(int n) OVERRIDE_CPP17;
 
-    //! get data size of  FINESSE buffer
-    /* cppcheck-suppress missingOverride */
-    int GetFINESSENwords(int n, int finesse) OVERRIDE_CPP17;
-
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
     //

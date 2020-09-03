@@ -51,7 +51,7 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
   // set module description (e.g. insert text)
   setDescription("Modify and analyze the data quality histograms of CDCMonObj");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("Filename", m_filename, "Output root filename (if not set monCDC_e{exp}r{run}.root is used", std::string(""));
+  // addParam("Filename", m_filename, "Output root filename (if not set monCDC_e{exp}r{run}.root is used", std::string(""));
 }
 
 DQMHistAnalysisCDCMonObjModule::~DQMHistAnalysisCDCMonObjModule()
@@ -83,14 +83,14 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   gStyle->SetPadBottomMargin(0.1);
   gStyle->SetPadLeftMargin(0.15);
 
-  m_cMain = new TCanvas("main", "main", 1500, 1000);
+  m_cMain = new TCanvas("cdc_main", "cdc_main", 1500, 1000);
   m_monObj->addCanvas(m_cMain);
 
-  m_cADC = new TCanvas("adc", "adc", 2000, 10000);
+  m_cADC = new TCanvas("cdc_adc", "cdc_adc", 2000, 10000);
   m_monObj->addCanvas(m_cADC);
-  m_cTDC = new TCanvas("tdc", "tdc", 2000, 10000);
+  m_cTDC = new TCanvas("cdc_tdc", "cdc_tdc", 2000, 10000);
   m_monObj->addCanvas(m_cTDC);
-  m_cHit = new TCanvas("hit", "hit", 1500, 6000);
+  m_cHit = new TCanvas("cdc_hit", "cdc_hit", 1500, 6000);
   m_monObj->addCanvas(m_cHit);
   //m_cADC1000 = new TCanvas("ADC1000", "ADC1000", 1500, 1000);
   //m_monObj->addCanvas(m_cADC1000);
@@ -492,11 +492,12 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_monObj->setVariable("nBadWires", m_badChannels.size());
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0.0) / means.size());
   m_monObj->setVariable("nDeadADC", nDeadADC);
-  m_monObj->setVariable("nADC(n_0/n_tot>0.9)", nBadADC); //????
+  m_monObj->setVariable("nBadADC", nBadADC); //???? n_0/n_tot>0.9
   m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / tdcEdges.size());
   m_monObj->setVariable("nDeadTDC", nDeadTDC);
   m_monObj->setVariable("tdcSlope", std::accumulate(tdcSlopes.begin(), tdcSlopes.end(), 0.0) / tdcSlopes.size());
 
+  /*
   TString fname;
   //  if (m_filename.length()) fname = m_filename;
   //else fname = "cdc_mon_output.root";
@@ -515,6 +516,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     B2WARNING("File " << fname << "already exists and it will not be rewritten. If desired please delete file and re-run.");
     return;
   }
+
   // get list of existing monitoring objects
   const MonObjList& objts =  getMonObjList();
   // write them to the output file
@@ -522,7 +524,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_cMain->Write();
 
   f.Close();
-
+  */
 }
 
 void DQMHistAnalysisCDCMonObjModule::terminate()

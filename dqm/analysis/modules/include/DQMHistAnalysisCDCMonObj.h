@@ -119,7 +119,7 @@ namespace Belle2 {
     //TCanvas* m_cHitL = nullptr;
     //TCanvas* m_cADC1000 = nullptr;
 
-    std::string m_filename; /**< output file name */
+    // std::string m_filename; /**< output file name */
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
 
     TH1F* m_hNEvent = nullptr; /**< Histogram of num. event */

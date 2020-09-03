@@ -178,25 +178,6 @@ namespace Belle2 {
                          int const(&nwords_ch)[MAX_PCIE40_CH],
                          RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
 
-    //
-    // size of "COPPER front header" and "COPPER trailer"
-    //
-    //! Copper data words = ( total_data_length in COPPER header ) + COPPER_HEADER_TRAILER_NWORDS
-
-    enum {
-      SIZE_COPPER_DRIVER_HEADER = 0,
-      SIZE_COPPER_DRIVER_TRAILER = 0
-    };
-
-    // Data Format : "COPPER header"
-    enum {
-      SIZE_COPPER_HEADER = 0
-    };
-
-    // Data Format : "COPPER Trailer"
-    enum {
-      SIZE_COPPER_TRAILER = 0
-    };
 
     // Data Format : "B2Link PCIe40 ch Header"
     enum {

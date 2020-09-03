@@ -182,49 +182,6 @@ namespace Belle2 {
                          int const(&nwords_ch)[MAX_PCIE40_CH],
                          RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
 
-    //! Copy one datablock to buffer
-
-
-    //
-    // size of "COPPER front header" and "COPPER trailer"
-    //
-    //! Copper data words = ( total_data_length in COPPER header ) + COPPER_HEADER_TRAILER_NWORDS
-    enum {
-      SIZE_COPPER_DRIVER_HEADER = 7,
-      SIZE_COPPER_DRIVER_TRAILER = 2
-    };
-
-    //
-    // Data Format : "COPPER header"
-    //
-    enum {
-      POS_MAGIC_COPPER_1 = 0,
-      POS_EVE_NUM_COPPER = 1,
-      POS_SUBSYSTEM_ID = 2,
-      POS_CRATE_ID = 3,
-      POS_SLOT_ID = 4,
-      POS_MAGIC_COPPER_2 = 7,
-      POS_DATA_LENGTH = 8,
-      POS_CH_A_DATA_LENGTH = 9,
-      POS_CH_B_DATA_LENGTH = 10,
-      POS_CH_C_DATA_LENGTH = 11,
-      POS_CH_D_DATA_LENGTH = 12,
-
-      SIZE_COPPER_HEADER = 13
-    };
-
-
-
-    //
-    // Data Format : "COPPER Trailer"
-    //
-    enum {
-      POS_MAGIC_COPPER_3 = 0,
-      POS_CHKSUM_COPPER = 1,
-      POS_MAGIC_COPPER_4 = 2,
-
-      SIZE_COPPER_TRAILER = 3
-    };
 
     //
     // Data Format : "B2Link HSLB Header"
@@ -264,19 +221,6 @@ namespace Belle2 {
       POS_CHKSUM_B2LHSLB = 0,
       SIZE_B2LHSLB_TRAILER = 1
     };
-
-
-
-    //
-    // COPPER magic words
-    //
-    enum {
-      COPPER_MAGIC_DRIVER_HEADER = 0x7FFF0008,
-      COPPER_MAGIC_FPGA_HEADER = 0xFFFFFAFA,
-      COPPER_MAGIC_FPGA_TRAILER = 0xFFFFF5F5,
-      COPPER_MAGIC_DRIVER_TRAILER = 0x7FFF0009
-    };
-
 
     //
     // magic words attached by HSLB
@@ -365,14 +309,22 @@ namespace Belle2 {
 
   inline unsigned int PreRawCOPPERFormat_latest::GetMagicDriverHeader(int n)
   {
-    int pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + POS_MAGIC_COPPER_1;
-    return (unsigned int)(m_buffer[ pos_nwords ]);
+    char err_buf[500];
+    sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[DEBUG] %s\n", err_buf);
+    B2FATAL(err_buf);
+    return 0;
   }
 
   inline unsigned int PreRawCOPPERFormat_latest::GetMagicFPGAHeader(int n)
   {
-    int pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + POS_MAGIC_COPPER_2;
-    return (unsigned int)(m_buffer[ pos_nwords ]);
+    char err_buf[500];
+    sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[DEBUG] %s\n", err_buf);
+    B2FATAL(err_buf);
+    return 0;
   }
 
   inline unsigned int PreRawCOPPERFormat_latest::GetMagicFPGATrailer(int n)
@@ -401,8 +353,12 @@ namespace Belle2 {
 
   inline unsigned int PreRawCOPPERFormat_latest::GetCOPPERCounter(int n)
   {
-    int pos_nwords = GetBufferPos(n) + POS_EVE_NUM_COPPER + tmp_header.RAWHEADER_NWORDS;
-    return (unsigned int)(m_buffer[ pos_nwords ]);
+    char err_buf[500];
+    sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[DEBUG] %s\n", err_buf);
+    B2FATAL(err_buf);
+    return 0;
   }
 
 

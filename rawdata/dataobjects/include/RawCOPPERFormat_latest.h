@@ -182,6 +182,24 @@ namespace Belle2 {
       DATA_FORMAT_VERSION = 4
     };
 
+    //
+    // size of "COPPER front header" and "COPPER trailer" (Common for pre/post format)
+    //
+    enum {
+      SIZE_COPPER_DRIVER_HEADER = 0,
+      SIZE_COPPER_DRIVER_TRAILER = 0
+    };
+
+    // Data Format : "COPPER header"
+    enum {
+      SIZE_COPPER_HEADER = 0
+    };
+
+    // Data Format : "COPPER Trailer"
+    enum {
+      SIZE_COPPER_TRAILER = 0
+    };
+
     //! header ( not recorded )
     RawHeader_latest tmp_header;
 

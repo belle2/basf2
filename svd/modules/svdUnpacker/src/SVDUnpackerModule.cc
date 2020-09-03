@@ -11,6 +11,7 @@
 ******************************************************************************/
 
 #include <svd/modules/svdUnpacker/SVDUnpackerModule.h>
+#include <svd/calibration/SVDDetectorConfiguration.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -125,6 +126,11 @@ void SVDUnpackerModule::beginRun()
   nEventInfoMatchErrors = -1;
 
   seenHeadersAndTrailers = 0;
+
+  //get the relative time shift
+  SVDDetectorConfiguration detectorConfig;
+  m_relativeTimeShift = detectorConfig.getRelativeTimeShift();
+
 }
 
 #ifndef __clang__
@@ -323,6 +329,8 @@ void SVDUnpackerModule::event()
               m_svdEventInfoPtr->setModeByte(m_SVDModeByte);
               m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
 
+              //set relative time shift
+              m_svdEventInfoPtr->setRelativeShift(m_relativeTimeShift);
               // set X-talk info online from Raw Data
               m_svdEventInfoPtr->setCrossTalk(m_MainHeader.xTalk);
 

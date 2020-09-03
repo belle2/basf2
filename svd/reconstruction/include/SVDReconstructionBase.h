@@ -87,6 +87,12 @@ namespace Belle2 {
       { m_triggerBin = triggerBin; };
 
       /**
+       * set the average noise
+       */
+      void setAverageNoise(const int averageNoise)
+      { m_averageNoise = averageNoise; };
+
+      /**
        * @return the VxdID of the strip sensor
        */
       VxdID getSensorID() {return m_vxdID;}
@@ -133,6 +139,9 @@ namespace Belle2 {
       /** first frame */
       int m_firstFrame = -1;
 
+      /** average noise */
+      float m_averageNoise = -1;
+
       /** set containing the available time algorithms */
       std::set<TString> m_timeAlgorithms;
 
@@ -151,7 +160,7 @@ namespace Belle2 {
       /**SVDPulseShape calibration wrapper*/
       SVDPulseShapeCalibrations m_PulseShapeCal;
       /** Noise calibration wrapper*/
-      SVDNoiseCalibrations m_noiseCal;
+      SVDNoiseCalibrations m_NoiseCal;
 
       /** CoG6 time calibration wrapper*/
       SVDCoGTimeCalibrations m_CoG6TimeCal;

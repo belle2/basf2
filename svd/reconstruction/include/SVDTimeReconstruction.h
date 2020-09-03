@@ -41,11 +41,11 @@ namespace Belle2 {
       double getCoG6Time();
       double getCoG6TimeError();
       /** CoG3 Time */
-      double getCoG3Time() {return 0;}
-      double getCoG3TimeError() {return 0;}
+      double getCoG3Time();
+      double getCoG3TimeError();
       /** ELS3 Time */
-      double getELS3Time() {return 0;}
-      double getELS3TimeError() {return 0;}
+      double getELS3Time();
+      double getELS3TimeError();
 
     };
 

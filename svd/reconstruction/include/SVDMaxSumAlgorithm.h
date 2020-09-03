@@ -11,7 +11,7 @@
 #pragma once
 
 #include <vxd/dataobjects/VxdID.h>
-#include <svd/dataobjects/SVDShaperDigith>
+#include <svd/dataobjects/SVDShaperDigit.h>
 #include <vector>
 
 namespace Belle2 {
@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace SVD {
 
     /**
-     * Class MaxSum algorithm
+     * Class implementing the MaxSum algorithm
      */
     class SVDMaxSumAlgorithm {
 
@@ -27,11 +27,12 @@ namespace Belle2 {
 
 
       /**
-       * Constructor to create a strip from a stripInRawCluster
+       * Constructor with the APVFloatSamples
        */
-      SVDMaxSumAlgorithm(const Belle2::SVD::ShaperDigit::APVFloatSamples samples)
+      explicit SVDMaxSumAlgorithm(const Belle2::SVDShaperDigit::APVFloatSamples samples)
+        : m_samples(samples)
       {
-        m_samples = samples;
+        //        m_samples = samples;
         applyAlgorithm();
       };
 
@@ -42,12 +43,12 @@ namespace Belle2 {
       virtual ~SVDMaxSumAlgorithm() {};
 
       /**
-       * @return the VxdID of the strip sensor
+       * @return the first frame of the 3 selected samples
        */
       int getFirstFrame() {return m_result.first;}
 
       /**
-       * @return true if the strip is on the U/P side
+       * @return the 3 selected sample
        */
       std::vector<float> getSelectedSamples() {return m_result.second;}
 
@@ -71,14 +72,15 @@ namespace Belle2 {
         auto itSum = std::max_element(std::begin(Sum2bin), std::end(Sum2bin));
         int ctrFrame = std::distance(std::begin(Sum2bin), itSum);
         if (ctrFrame == 0) ctrFrame = 1;
-        std::vector<float> clustered3s = {m_samples.at(ctrFrame - 1), m_samples.at(ctrFrame), m_samples.at(ctrFrame + 1)};
+        std::vector<float> selectedSamples = {m_samples.at(ctrFrame - 1), m_samples.at(ctrFrame), m_samples.at(ctrFrame + 1)};
 
         m_result.first = ctrFrame - 1;
-        m_result.second =  clustered3s;
+        m_result.second =  selectedSamples;
 
       };
 
-    }
+    };
 
   }
+}
 

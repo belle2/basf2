@@ -56,9 +56,9 @@ void DQMHistAnalysisARICHMonObjModule::initialize()
 
   // make canvases to be added to MonitoringObject
   m_c_main = new TCanvas("arich_main", "main", 1500, 800);
-  m_c_mask = new TCanvas("mask", "mask", 750, 1600);
-  m_c_mirror = new TCanvas("mirror", "mirror", 1000, 1000);
-  m_c_tracks = new TCanvas("tracks", "tracks", 500, 500);
+  m_c_mask = new TCanvas("arich_mask", "mask", 750, 1600);
+  m_c_mirror = new TCanvas("arich_mirror", "mirror", 1000, 1000);
+  m_c_tracks = new TCanvas("arich_tracks", "tracks", 500, 500);
 
   m_apdHist = new ARICHChannelHist("tmpApdHist", "tmpApdHist", 2); /**<ARICH TObject to draw hit map for each APD*/
   //m_chHist = new ARICHChannelHist("tmpChHist", "tmpChHist", 0); /**<ARICH TObject to draw hit map for each channel*/
@@ -274,12 +274,13 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
     flash->Scale(1. / nevt);
   }
   int nhot = 0, ndead = 0;
-  TH2F* hotCh = new TH2F("hot", "Number of channels in APD with >0.5% occ.", 42, 0.5, 42.5, 40, 0.5, 40.5);
-  TH2F* hotCh1 = new TH2F("hot1", "Number of channels in APD with >0.5% occ. after mask", 42, 0.5, 42.5, 40, 0.5, 40.5);
-  TH2F* deadCh = new TH2F("dead", "Number of channels in APD with no hits", 42, 0.5, 42.5, 40, 0.5, 40.5);
-  TH2F* falseCh = new TH2F("false", "Number of wrongly masked channels in APD (masked but not dead/hot)", 42, 0.5, 42.5, 40, 0.5,
+  TH2F* hotCh = new TH2F("arich_hot", "Number of channels in APD with >0.5% occ.", 42, 0.5, 42.5, 40, 0.5, 40.5);
+  TH2F* hotCh1 = new TH2F("arich_hot1", "Number of channels in APD with >0.5% occ. after mask", 42, 0.5, 42.5, 40, 0.5, 40.5);
+  TH2F* deadCh = new TH2F("arich_dead", "Number of channels in APD with no hits", 42, 0.5, 42.5, 40, 0.5, 40.5);
+  TH2F* falseCh = new TH2F("arich_false", "Number of wrongly masked channels in APD (masked but not dead/hot)", 42, 0.5, 42.5, 40,
+                           0.5,
                            40.5);
-  TH1F* occ = new TH1F("occ", "nhits / nevt for all channels; nhits/nevt;# of chn", 500, 0, 0.005);
+  TH1F* occ = new TH1F("arich_occ", "nhits / nevt for all channels; nhits/nevt;# of chn", 500, 0, 0.005);
 
   int ndeadHapd = 0;
   if (chDigit != NULL) {

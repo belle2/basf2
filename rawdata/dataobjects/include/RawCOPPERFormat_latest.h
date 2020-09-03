@@ -177,6 +177,9 @@ namespace Belle2 {
     //! Get the max number of channels in a readout board
     int GetMaxNumOfCh(int n) OVERRIDE_CPP17;
 
+    //! Get a pointer to a FINESSE buffer
+    int* GetFINESSEBuffer(int n, int finesse_num) OVERRIDE_CPP17;
+
     /// Format version number
     enum {
       DATA_FORMAT_VERSION = 4

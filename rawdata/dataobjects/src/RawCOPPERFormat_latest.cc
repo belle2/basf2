@@ -37,6 +37,20 @@ int RawCOPPERFormat_latest::GetNumFINESSEBlock(int n)
   return cnt;
 }
 
+int* RawCOPPERFormat_latest::GetFINESSEBuffer(int n, int finesse_num)
+{
+  if (finesse_num >= MAX_PCIE40_CH || finesse_num < 0) {
+    char err_buf[500];
+    sprintf(err_buf, "[FATAL] Invalid finesse # : %s %s %d\n",
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[DEBUG] %s\n", err_buf);
+    B2FATAL(err_buf);
+    return NULL;
+  }
+  int cur_pos = GetBufferPos(n) + (tmp_header.POS_CH_POS_TABLE + finesse_num);
+  return (m_buffer + cur_pos);
+}
+
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 void RawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
 {

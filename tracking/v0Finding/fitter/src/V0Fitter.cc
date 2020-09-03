@@ -618,7 +618,7 @@ RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(const Track* origTrack, Reco
   for (unsigned int i = 0 ; i < nRemoveHits ; ++i) {
     recoHitInformations[i]->setUseInFit(false);
   }
-  /// if the last removed hit is a SVD U-hit, remove the next hit (SVU V-hit as the pair) in addition
+  /// if the last removed hit is a SVD U-hit, remove the next hit (SVD V-hit as the pair) in addition
   ///    note: for the SVD pair hits, U-hit should be first and the V-hit the next in the sorted RecoHitInformation array.
   if (recoHitInformations[nRemoveHits - 1]->getTrackingDetector() == RecoHitInformation::RecoHitDetector::c_SVD) {
     if (recoHitInformations.size() < nRemoveHits + 1) { /// N removed hits should not exceed N hits in the track
@@ -653,7 +653,7 @@ RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(const Track* origTrack, Reco
   TrackFitter fitter;
   if (not fitter.fit(*newRecoTrack, particleUsedForFitting)) {
     B2WARNING("track fit failed.");
-    /// check fit statust of original track
+    /// check fit status of original track
     if (not origRecoTrack->wasFitSuccessful(origTrackRep))
       B2WARNING("\t original track fit was also failed.");
     return nullptr;

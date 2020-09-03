@@ -421,7 +421,7 @@ bool V0Fitter::fitAndStore2(const Track* trackPlus, const Track* trackMinus,
     /// for plus-charged track
     if (hasInnerHitStatus & 0x1) {
       ++nRemoveHitsPlus;
-      recoTrackPlus_forRefit = copyRecoTrackRemovingInnerHits(trackPlus, recoTrackPlus,
+      recoTrackPlus_forRefit = copyRecoTrackRemovingInnerHits(recoTrackPlus,
                                                               pdg_trackPlus, nRemoveHitsPlus);
       /// if the track refit fails, break out of this loop and
       /// revert back to the original vertex fit with the original tracks.
@@ -434,7 +434,7 @@ bool V0Fitter::fitAndStore2(const Track* trackPlus, const Track* trackMinus,
     /// for minus-charged track
     if (hasInnerHitStatus & 0x2) {
       ++nRemoveHitsMinus;
-      recoTrackMinus_forRefit = copyRecoTrackRemovingInnerHits(trackMinus, recoTrackMinus,
+      recoTrackMinus_forRefit = copyRecoTrackRemovingInnerHits(recoTrackMinus,
                                                                -1 * pdg_trackMinus, nRemoveHitsMinus);
       /// if the track refit fails, break out of this loop and
       /// revert back to the original vertex fit with the original tracks.
@@ -599,7 +599,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   return true;
 }
 
-RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(const Track* origTrack, RecoTrack* origRecoTrack,
+RecoTrack* V0Fitter::copyRecoTrackRemovingInnerHits(RecoTrack* origRecoTrack,
                                                     const int trackPDG, unsigned int& nRemoveHits)
 {
   /// original track information

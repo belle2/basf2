@@ -106,7 +106,7 @@ namespace Belle2 {
      * @param nRemoveHits the number of removed hits. This can be incremented in the function if the outermost removed hit is an SVD U-hit.
      * @return
      */
-    RecoTrack* copyRecoTrackRemovingInnerHits(const Track* origTrack, RecoTrack* origRecoTrack,
+    RecoTrack* copyRecoTrackRemovingInnerHits(RecoTrack* origRecoTrack,
                                               const int trackPDG, unsigned int& nRemoveHits);
 
 

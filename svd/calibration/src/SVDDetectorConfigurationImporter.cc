@@ -70,6 +70,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   float  latency = 0;
   std::string systemClock = "";
   float hv = 0;
+  int relativeTimeShift = 0;
 
   for (ptree::value_type const& cfgDocumentChild :
        pt.get_child("cfg_document")) {
@@ -96,7 +97,18 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
       B2INFO(" APV clock units = " << systemClock);
 
     }
+
+    if (cfgDocumentChild.first == "controller") {
+      relativeTimeShift = cfgDocumentChild.second.get<int>("<xmlattr>.mix_trg_delay") ;
+      B2INFO(" delay of 3-sample VS 6-sample in units of APV clock /4 = " << relativeTimeShift);
+      if ((relativeTimeShift < 0) || (relativeTimeShift > 15)) {
+        B2ERROR("OOPS!! the relative time shift = " << relativeTimeShift <<
+                " is not allowed! It must be an int between 0 and 15 included. Please check the global xml. For the moment we set it to 0");
+        relativeTimeShift = 0;
+      }
+    }
   }
+
   for (ptree::value_type const& cfgDocumentChild :
        pt.get_child("cfg_document.ps_setup.hv_config")) {
     if (cfgDocumentChild.first == "config") {
@@ -115,6 +127,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   svdGlobalConfig->setMaskFilter(maskFilter);
   svdGlobalConfig->setAPVClockInRFCUnits(systemClock);
   svdGlobalConfig->setHV(hv);
+  svdGlobalConfig->setRelativeTimeShift(relativeTimeShift);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);

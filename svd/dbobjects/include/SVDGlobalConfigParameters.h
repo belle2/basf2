@@ -85,6 +85,13 @@ namespace Belle2 {
      */
     float getHV(void) const  { return m_hv; };
 
+    /**
+     * Returns the relative time shift between the 3-sample and 6-sampe acquired events in units of APV clock/4
+     * @param none
+     * @return int [0,15] corresponding to relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4
+     */
+    int getRelativeTimeShift(void) const  { return m_relativeTimeShift; };
+
 
     /**
      * Set the zero suppression
@@ -141,6 +148,16 @@ namespace Belle2 {
     {
       m_hv = hv;
     }
+    /**
+     * Set the Relative time shift between 3- and 6- sample acquired events in units of APV clock / 4
+     * Input:
+     * @param int relative time shift
+     *
+     */
+    void setRelativeTimeShift(float relativeTimeShift)
+    {
+      m_relativeTimeShift = relativeTimeShift;
+    }
 
 
     /**
@@ -168,11 +185,15 @@ namespace Belle2 {
      */
     float m_hv = 0;
 
+    /** relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4 [0,15]
+     */
+    float m_relativeTimeShift = 0;
+
     /** APVclock
      */
     std::string m_APVClockInRFCUnits;
 
-    ClassDef(SVDGlobalConfigParameters, 2); /**< needed by root*/
+    ClassDef(SVDGlobalConfigParameters, 3); /**< needed by root*/
 
   };
 

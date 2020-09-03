@@ -78,7 +78,7 @@
 #pragma read \
   sourceClass="Belle2::SVDGlobalConfigParameters"\
   source=""\
-  version="[-1]" \
+  version="[-2]" \
   targetClass="Belle2::SVDGlobalConfigParameters"\
   target="m_relativeTimeShift"          \
   code="{ m_relativeTimeShift = 0;}" \

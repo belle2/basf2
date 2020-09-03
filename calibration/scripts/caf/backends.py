@@ -1690,7 +1690,12 @@ class LSF(Batch):
     def _create_job_result(cls, job, batch_output):
         """
         """
-        job_id = re.findall("Job <([0-9]*)>", batch_output)[0]
+        m = re.search(r"Job <(\d+)>", str(batch_output))
+        if m:
+            job_id = m.group(1)
+        else:
+            raise BackendError(f"Failed to get the batch job ID of {job}. LSF output was:\n{batch_output}")
+
         B2INFO(f"Job ID of {job} recorded as: {job_id}")
         job.result = cls.LSFResult(job, job_id)
 

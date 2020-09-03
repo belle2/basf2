@@ -147,12 +147,9 @@ namespace Belle2 {
     double getBzAtVertex(const TVector3& vertexPosition);
 
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
-    TrackFitResult* buildTrackFitResult(const genfit::Track& track, const genfit::MeasuredStateOnPlane& msop, const double Bz,
+    TrackFitResult* buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
+                                        const genfit::MeasuredStateOnPlane& msop, const double Bz,
                                         const Const::ParticleType& trackHypothesis);
-
-    /// Get the HitPattern in the VXD. copied from TrackBuilder and modified
-    uint32_t getHitPatternVXDInitializer(const genfit::Track& track) const;
-    uint64_t getHitPatternCDCInitializer(const genfit::Track& track) const;
 
 
   private:

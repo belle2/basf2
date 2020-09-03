@@ -134,7 +134,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 }
 
 
-uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack) const
+uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack)
 {
   HitPatternVXD hitPatternVXD;
 
@@ -191,7 +191,7 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack) c
 }
 
 
-uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack) const
+uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack)
 {
   HitPatternCDC hitPatternCDC;
 

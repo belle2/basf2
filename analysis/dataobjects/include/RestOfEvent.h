@@ -173,8 +173,8 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    explicit RestOfEvent(int pdgCode = 0, bool isNested = false, bool isFromMC = false):
-      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC) { };
+    explicit RestOfEvent(int pdgCode = 0, bool isNested = false, bool isFromMC = false, bool useKLMEnergy = false):
+      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC), m_useKLMEnergy(useKLMEnergy) { };
     // setters
     /**
      * Add StoreArray indices of given Particles to the list of unused particles in the event.
@@ -375,6 +375,7 @@ namespace Belle2 {
     int m_pdgCode;                     /**< PDG code of the 'ROE particle' if we are going to create one */
     bool m_isNested;                   /**< Nested ROE indicator */
     bool m_isFromMC;                   /**< MC ROE indicator */
+    bool m_useKLMEnergy;               /**< Include KLM energy into ROE 4-vector */
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list
@@ -389,7 +390,7 @@ namespace Belle2 {
      * Prints indices in the given set in a single line
      */
     void printIndices(const std::string& maskName = "", bool unpackComposite = true, const std::string& tab = " - ") const;
-    ClassDef(RestOfEvent, 5) /**< class definition */
+    ClassDef(RestOfEvent, 6) /**< class definition */
 
   };
 

@@ -93,6 +93,18 @@
   target="m_builtFromMC"                       \
   code="{m_builtFromMC = false;}"              \
 
+// ----------------------------------------------------------------------------
+// RestOfEvent evolution
+// In version 6 the new member m_useKLMEnergy is introduced. Since this
+// functionality was not present before it is set to false for versions < 6.
+#pragma read                                   \
+  sourceClass="Belle2::RestOfEvent"            \
+  source="bool m_useKLMEnergy"                 \
+  version="[-5]"                               \
+  targetClass="Belle2::RestOfEvent"            \
+  target="m_useKLMEnergy"                      \
+  code="{m_useKLMEnergy = false;}"             \
+
 
 
 #endif

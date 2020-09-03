@@ -1818,7 +1818,7 @@ def looseMCTruth(list_name, path):
 
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
                      belle_sources=False, fillWithMostLikely=False,
-                     chargedPIDPriors=None, path=None):
+                     chargedPIDPriors=None, useKLMEnergy=False, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1835,6 +1835,8 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
+    @param useKLMEnergy       experimental option to include the KLM-based particles into
+                              ROE 4-vector computation
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
@@ -1851,10 +1853,14 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
         inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
     else:
         inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
+    if useKLMEnergy:
+        B2WARNING(f'*** The ROE for {target_list_name} list will have KLM energy included into its 4-momentum. ***\n'
+                  '          *** This is an experimental option, please do NOT use it for publications. ***')
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('useKLMEnergy', useKLMEnergy)
     path.add_module(roeBuilder)
 
 
@@ -1907,6 +1913,7 @@ def appendROEMask(list_name,
                   mask_name,
                   trackSelection,
                   eclClusterSelection,
+                  klmClusterSelection='',
                   path=None):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
@@ -1916,7 +1923,7 @@ def appendROEMask(list_name,
 
        >>> appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
 
-    - append a ROE mask with only ECLClusters that pass as good photon candidates
+    - append a ROE mask with only ECL-based particles that pass as good photon candidates
 
        >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
@@ -1924,43 +1931,51 @@ def appendROEMask(list_name,
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
-    @param trackSelection        decay string for the tracks in ROE
-    @param eclClusterSelection   decay string for the tracks in ROE
+    @param trackSelection        decay string for the track-based partticles in ROE
+    @param eclClusterSelection   decay string for the ECL-based particles in ROE
+    @param klmClusterSelection   decay string for the KLM-based particles in ROE
     @param path                  modules are added to this path
     """
 
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection)])
+    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection, klmClusterSelection)])
     path.add_module(roeMask)
 
 
 def appendROEMasks(list_name, mask_tuples, path=None):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
-    selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
+    selection criteria for track-, ECL- and KLM-based particles which will be used by ROE variables.
 
     The multiple ROE masks with their own selection criteria are specified
-    via list of tuples (mask_name, trackSelection, eclClusterSelection) or
+    via list of tuples (mask_name, trackParticleSelection, eclParticleSelection, klmParticleSelection) or
     (mask_name, trackSelection, eclClusterSelection) in case with fractions.
 
     - Example for two tuples, one with and one without fractions
 
-       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', '')
        >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons)
-       >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
+       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, '')
+       >>> goodROEKLM     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', 'nKLMClusterTrackMatches == 0')
+       >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM])
 
     @param list_name             name of the input ParticleList
     @param mask_tuples           array of ROEMask list tuples to be appended
     @param path                  modules are added to this path
     """
-
+    compatible_masks = []
+    for mask in mask_tuples:
+        # add emply KLM-based selection if it's absent:
+        if len(mask) == 3:
+            compatible_masks += [(*mask, '')]
+        else:
+            compatible_masks += [mask]
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + 'MaskList')
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasks', mask_tuples)
+    roeMask.param('ROEMasks', compatible_masks)
     path.add_module(roeMask)
 
 

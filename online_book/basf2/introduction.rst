@@ -13,9 +13,9 @@ The basics.
     **Prerequisites**: 
     	
         * An internet browser
-        * Collaborative services tutorial
         * DESY accounts
-        * An ``ssh`` client
+        * :ref:`onlinebook_collaborative_tools` lesson.
+        * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
     	* Basic bash
 
     **Questions**:
@@ -31,7 +31,8 @@ The basics.
         * Run basf2 and display a list of variables
         * Run basf2 in interactive ipython shell mode.
         * Access the help in 3 different ways.
-
+        * Confidently read the source code for a `modularAnalysis` convenience
+          function.
 
 The Belle II software is called basf2.
 It is an abbreviation for "Belle II Analysis Software Framework".
@@ -41,9 +42,20 @@ you will probably wonder why it has "analysis" in the name (it does much more
 than analysis)? 
 Well historic reasons: Belle had BASF, we have basf2.
 
-Basf2 is used in all aspects of the data-processing chain except, perhaps, for
-the very final "offline" analysis.
-There is a citeable reference:
+Basf2 is used in all aspects of the data-processing chain at Belle II:
+
+* simulation of MC,
+* unpacking of real raw data,
+* reconstruction (tracking, clustering, ...),
+* and high-level "analysis" reconstruction (such as applying cuts, 
+  vertex-fitting, ...).
+
+Basf2 is not normally used for the final analysis steps (histogramming, fitting
+1D distributions, ...).
+These final steps are usually called the "offline" analysis and will be covered 
+in later lessons :ref:`onlinebook_offline_analysis`.
+
+There is a citable reference for basf2:
 
 Kuhr, T. *et al*. *Comput Softw Big Sci* **3**, 1 (2019)
 https://doi.org/10.1007/s41781-018-0017-9
@@ -58,22 +70,23 @@ https://doi.org/10.1007/s41781-018-0017-9
     The basf2 logo.
 
 Pragmatically, you will encounter two separate objects named ``basf2``.
-It is both a **command-line executable which you can envoke**, and a **python
+It is both a **command-line executable which you can invoke**, and a **python
 module** from which you import functions.
 
 You will soon be running commands that look like:
 
-.. code:: bash
+.. code-block:: bash
 
         basf2 myScript -i myInputFile.root
 
 ... and *inside* the scripts you might see code like:
 
-.. code:: python
+.. code-block:: python
 
         from basf2 import Path
         mypath = Path()
 
+.. _onlinebook_basf2basics_coreconcepts:
 
 Core concepts
 -------------
@@ -94,25 +107,25 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Find the Belle II Glossary.
+     Find the Belle II Glossary (again).
 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     You might need to revisit the tutorial pages about Collaborative services.
+     You might need to revisit the tutorial pages about 
+     :ref:`onlinebook_collaborative_tools`.
 
 .. admonition:: Solution
      :class: toggle solution
-
-     It's on confluence! 
+ 
      `Belle II Glossary <https://confluence.desy.de/display/BI/Main+Glossary>`_
 
 Basf2 modules
 ~~~~~~~~~~~~~
 
-A basf2 module is piece of (usually) C++ code that does a specific "unit" of
+A basf2 module is a piece of (usually) C++ code that does a specific "unit" of
 data processing.
-The full documentation for module can be found here in this website under
+The full documentation can be found here in this website under
 the section :ref:`general_modpath`.
 
 .. warning:: 
@@ -152,7 +165,7 @@ It is a python object: `basf2.Path`.
 .. admonition:: Solution
      :class: toggle solution
 
-     Take a look at the :doc:`Belle II Python Interface` page.
+     Take a look at the :ref:`general_modpath` page.
      The diagram is `here <framework_modpath_diagram>`.
 
 
@@ -168,6 +181,9 @@ We try to give them meaningful names (tracking, reconstruction, ...)
 or name the package after the subdetector that they are related to (ecl, klm,
 cdc, top, ...).
 
+During these lessons, you will mostly interact with the analysis package.
+You will meet this at the end of this lesson.
+
 .. admonition:: Exercise
      :class: exercise stacked
 
@@ -176,7 +192,8 @@ cdc, top, ...).
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     You might need to revisit the tutorial pages about collaborative services.
+     You might need to revisit the tutorial pages about
+     :ref:`onlinebook_collaborative_tools`.
      
 
 .. admonition:: Solution
@@ -184,44 +201,76 @@ cdc, top, ...).
 
      The source code is online at https://stash.desy.de/projects/B2/software
      The list of **packages** is simply the list of directories in the software
-     director.
+     directory.
 
 Steering
 ~~~~~~~~
 
 A steering file or a steering script is some python code that sets up some
 analysis or data-processing task.
-A typical steering file will declare a path, configure basf2 modules, and then
-add them to the path.
+A typical steering file will declare a `basf2.Path`, configure basf2 modules,
+and then add them to the path.
 Then it will call `basf2.process` and maybe print some information.
 We use the word "steering" since no real data **processing** is done in python.
 
-Generally speaking, the heavy data processing tasks are done in C++, and python
-is used as a userfriendly and readable language for configuration.
-There are some exceptions, some modules are written in python for instance, 
-but they are not very common.
+.. figure:: introduction/cpp_and_python_logos.svg
+    :align: center
+    :width: 600px
+    :alt: C++ and python
 
-The conditions database / CondDB
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The C++ and python logos.
 
-This is one more concept that you might hear people talk about.
-You probably do not need to know this right now, but be aware of this jargon.
-Ideally you, as a user, should not need to worry about this and definitely not
-at the start.
+.. admonition:: Question
+     :class: exercise stacked
 
-But! You now have the skills to find and read the documentation for this.
+     Why do we use both C++ and python?
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     Generally speaking, the heavy data processing tasks are done in C++.
+     This is because of the performance.
+     Python is used as a userfriendly and readable language for configuration.
+
+     .. note:: 
+
+         There are some exceptions, some modules are written in python for
+         instance, but they are not very common.
+
+Databases
+~~~~~~~~~
+
+There are a couple more concepts that you might come across: 
+
+* the **conditions database**
+* and the **run database**.
+
+For these lessons and exercises you should not need to know too much but it's
+good to be aware of the jargon.
+
+.. The **conditions database** is a web-hosted database which collects all of the
+.. run- and experiment-dependent metadata (calibrations, beam energies, etc) that
+.. are needed to reconstruct and process data.
+
+.. The **run database** collects data about specific runs (the luminosity, if all
+.. Subdetectors were working, etc)
+
+.. seealso:: :ref:`conditionsdb_overview`
+
+.. seealso:: https://rundb.belle2.org
+
+.. seealso:: "rundb" in the glossary (no link this time, you should have it bookmarked!)
 
 .. admonition:: Key points
     :class: key-points
 
     * basf2 is the name of the Belle II software.
     * You work in basf2 by adding modules to a path.
-    * Most basf2 modules are written in C++.
-    * Data processing happens when you process the path.
-    * You do this configuration of the path, and then call `basf2.process` in 
+    * *Most* basf2 modules are written in C++.
+    * Data-processing happens when you process the path.
+    * You do all of this configuration of the path, etc in python in 
       a *steering file*.
-    * You can navigate this online documentation and search for things the
-      confluence pages.
+    * You can navigate this online documentation.
 
 .. seealso:: 
 
@@ -231,6 +280,7 @@ But! You now have the skills to find and read the documentation for this.
 
     By that stage everything should be clear.
 
+.. _onlinebook_basf2basics_gettingstarted:
 
 Getting started, and getting help interactively
 -----------------------------------------------
@@ -260,7 +310,7 @@ b2setup
 To set up your environment to work with ``basf2`` you first have to source the
 setup script...
 
-.. code:: bash
+.. code-block:: bash
 
         source /cvmfs/belle.cern.ch/tools/b2setup
 
@@ -270,7 +320,7 @@ You are welcome to do this if you like.
 So now you have a Belle II environment.
 You might have noticed that you still don't have the ``basf2`` executable:
 
-.. code:: bash
+.. code-block:: bash
 
         $> source /cvmfs/belle.cern.ch/tools/b2setup
         Belle II software tools set up at: /cvmfs/belle.cern.ch/tools
@@ -284,34 +334,34 @@ full release or the latest light release.
 There is a command-line tool to help with this.
 Try:
 
-.. code:: bash
+.. code-block:: bash
 
         b2help-releases --help
 
 or just:
 
-.. code:: bash
+.. code-block:: bash
 
         b2help-releases
 
-To setup the release of your choice simply call :doc:`b2setup` again.
-Once you've called it once, the :doc:`b2setup` executable will be in your
-``PATH``:
+To setup the release of your choice simply call ``b2setup`` again.
+Once you've set up the environment, the ``b2setup`` executable itself will be 
+in your ``PATH``:
 
-.. code:: bash
+.. code-block:: bash
 
         b2setup <your choice of release>
 
 If you already know what release you want, you can do it all at once:
 
-.. code:: bash
+.. code-block:: bash
 
         source /cvmfs/belle.cern.ch/tools/b2setup <your choice of release>
 
 Note that if you setup an unsupported, old, or strange release you should see a
 warning:
 
-.. code:: bash
+.. code-block:: bash
 
         $> b2setup release-01-02-09
         Environment setup for release: release-01-02-09
@@ -398,19 +448,68 @@ It is also true that using the latest supported release makes you cool.
      For more information:
      `Do light releases break backward compatibility? <https://questions.belle2.org/question/2841/do-light-releases-break-backward-compatibility/>`_.
 
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Typically there are two supported full releases.
+     What are they?
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     .. code-block:: bash
+
+         b2help-releases # no arguments
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     It will be the current recommended full release and the one previous.
+     So execute:
+
+     .. code-block:: bash
+
+         b2help-releases
+
+     And then subtract one from the major version number.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Find the source code for the recommended full release.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     We use git to tags a release.
+     You might need to revisit the lesson on collaborative tools.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     1. Go to https://stash.desy.de/projects/B2/
+     2. Click on "source".
+     3. At the top it probably says "master". Choose the drop-down menu.
+     4. Click on "tags" and search for the release tag.
+
+     .. image:: introduction/find_a_tag.png
+         :width: 300px
+
+
 A useful command
 ~~~~~~~~~~~~~~~~
 
-If you're ever stuck and you are writing in a B2Questions or an email to an
-expert they will always want to know what version you are using.
+If you're ever stuck and you are writing a post on `questions.belle2.org 
+<https://questions.belle2.org>`_ or an email to an expert they will always want
+to know what version you are using.
 
 Try 
 
-.. code:: bash
+.. code-block:: bash
 
     basf2 --info
 
-to check everything was set up corrctly.
+to check everything was set up correctly.
 If that worked, then paste the information at the bottom (after the ascii art)
 into any correspondence with experts.
 
@@ -424,21 +523,21 @@ The Belle II environment supports
 
 Try:
 
-.. code:: bash
+.. code-block:: bash
 
     pydoc3 basf2.Path
 
 You should notice that this is the same documentation that you will find by
 clicking on: `basf2.Path` here in this online documentation.
 
-There are some basf2-specific command-line tools.
+In addition, there are some basf2-specific commands.
 
 Listing the basf2 modules
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To find information about a basf2 module, try:
 
-.. code:: bash
+.. code-block:: bash
 
     basf2 -m # this lists all of them
     basf2 -m | grep "Particle"
@@ -449,7 +548,7 @@ Listing the basf2 variables
 
 To check the list of basf2 variables known to the :doc:`VariableManager`, run
 
-.. code:: bash
+.. code-block:: bash
 
     basf2 variables.py
     basf2 variables.py | grep "invariant"
@@ -457,17 +556,19 @@ To check the list of basf2 variables known to the :doc:`VariableManager`, run
 There is a :doc:`variables` section in this documentation which you might find
 more helpful than the big dump.
 
+.. _onlinebook_basf2basics_modularanalysis_help:
+
 Listing the modular analysis convenience functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We have a python module full of useful shorthand functions which configure
 basf2 modules in the recommended way.
 It is called `modularAnalysis`.
-In a later lesson you will *use* these convenience functions.
+More on this later.
 
 For now, you can list them all with:
 
-.. code:: bash
+.. code-block:: bash
     
     basf2 modularAnalysis.py
 
@@ -477,7 +578,7 @@ Basf2 particles
 To show information about all the particles and properties known to basf2,
 there is a tool `b2help-particles`.
 
-.. code:: bash
+.. code-block:: bash
 
     b2help-particles B_s      # what was the pdg cod of the B-sub-s meson again?
     b2help-particles Sigma_b- # I've forgotten the mass of the Sigma_b- !
@@ -490,45 +591,51 @@ If you just execute basf2 without any arguments, you will start an
 `IPython <https://ipython.org>`_ session with many basf2 functions imported.
 Try just:
 
-.. code:: bash
+.. code-block:: bash
 
     basf2
 
-You can also try the basf2 python interface to the `PDG <https://pdg.lbl.gov>`_
-database:
+In your IPython session, you can try the basf2 python interface to the `PDG
+<https://pdg.lbl.gov>`_ database:
 
-.. code:: python
+.. code-block:: python
 
-   import pdg
-   whatisthis = pdg.get(11)
-   print(whatisthis.GetName(), whatisthis.Mass())
+    import pdg
+    whatisthis = pdg.get(11)
+    print(whatisthis.GetName(), whatisthis.Mass())
+
 
 You should also make use of IPython's built-in documentation features.
 
-.. code:: python
+.. code-block:: ipython
 
-   import modularAnalysis 
-   modularAnalysis.inputMdst?
-   # the question mark brings up the function documentation
+    import modularAnalysis 
+    modularAnalysis.reconstructDecay?
+    # the question mark brings up the function documentation in IPython
+    
+    print(dir(modularAnalysis)) # the python dir() function will also show you all functions' names
 
-   print(dir(modularAnalysis)) # the python dir() function will also show you all functions' names
 
 You can remind yourself of the documentation for a `basf2.Path` in yet another way:
 
-.. code:: python
+.. code-block:: ipython
 
-   Path?
-   # the question mark brings up the function documentation
+    import basf2
+    basf2.Path?
+    # the question mark brings up the function documentation in IPython
+    
+    # this is equivalent to...
+    print(help(basf2.Path))
 
-   print(help(Path))
 
 To leave interactive basf2 / IPython, simply:
 
-.. code:: python
+.. code-block:: ipython
 
-   exit()
-   # or just
-   exit 
+    exit()
+    # or just
+    exit 
+
 
 .. admonition:: Question
      :class: exercise stacked
@@ -544,21 +651,21 @@ To leave interactive basf2 / IPython, simply:
 .. admonition:: Another hint
      :class: toggle xhint stacked
 
-     .. code:: bash 
+     .. code-block:: bash 
          
          b2info-<tab>
 
 .. admonition:: Are you sure you really need another hint?
      :class: toggle xhint stacked
 
-     .. code:: bash 
+     .. code-block:: bash 
      
           b2info-luminosity --help
 
 .. admonition:: Solution
      :class: toggle solution
 
-     .. code:: bash
+     .. code-block:: bash
 
           $> b2info-luminosity  --exp 8 --what offline
           Read 697 runs for experiment 8
@@ -578,11 +685,167 @@ To leave interactive basf2 / IPython, simply:
     * ``basf2`` without any tools gets you into a basf2-flavoured IPython shell.
 
 
+The basf2 analysis package
+--------------------------
+
+The analysis package of basf2 contains python functions and C++ basf2 modules 
+to help you perform your specific analysis on *reconstructed dataobjects*.
+It will probably become your favourite package.
+
+The collection of "reconstructed dataobjects" is actually a well-defined list.
+You will hear people call these "mdst dataobjects".
+The "mdst" is both a file-format and another basf2 package containing the 
+post-reconstruction dataobjects.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Find the documentation for the analysis package and read the first two 
+     sections.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     There is no hint. You've got this.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     :ref:`analysis`
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Find a list of mdst dataobjects.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     There are (at least) two ways to do this.
+
+     * You can look at the function source code for `mdst.add_mdst_output`.
+     * You can browse the mdst/dataobjects directory in the basf2 source code:
+       https://stash.desy.de/projects/B2/repos/software/browse/mdst/dataobjects/include
+
+     The important mdst dataobjects are:
+
+      * Track (and TrackFitResult)
+      * ECLCluster
+      * KLMCluster
+      * PIDLikelihood
+      * MCParticle
+
+.. seealso:: 
+
+    `What is the difference between an mdst and a dst?
+    <https://questions.belle2.org/question/219/what-is-the-difference-between-an-mdst-and-a-dst/>`_
+
+.. seealso:: "mdst" in the glossary
+
+You will meet mdst data format files in the next lesson.
+An important point to understand is that the analysis package interprets
+collections of these dataobjects as particle *candidates*.
+
+In brief:
+
+* A track (with or without a cluster and with or without PID information)
+  is interpreted as a charged particle 
+  (:math:`e^\pm`, :math:`\mu^\pm`, :math:`\pi^\pm`, :math:`K^\pm`, or 
+  :math:`p^\pm`).
+* A cluster with no track is interpreted as a photon or a :math:`K_L^0`.
+
+* Two or more of the above particles can be combined to make *composite* 
+  particle candidates.
+  For example:
+
+  * Two photons can be combined to create :math:`\pi^0\to\gamma\gamma` 
+    candidates.
+  * Two tracks can be combined to create :math:`K_S^0\to\pi^+\pi^-` 
+    candidates.
+
+  ... And so on.
+
+In fact, the analysis package mostly operates on **ParticleList**s.
+A **ParticleList** is just the list of all such particle candidates in each 
+event.
+In the next lesson you will make your own particle lists and use analysis 
+package tools to manipulate them.
+
+Making your life easier
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Suggested configuration of the analysis package **basf2 modules** is *usually*
+done for you in so-called "convenience functions".
+Certainly all the modules needed for these lessons.
+
+The **python module** containing these functions is called `modularAnalysis`.
+You have already met the `modularAnalysis` convenience functions 
+earlier in this lesson: :ref:`onlinebook_basf2basics_modularanalysis_help`.
+
+You are encouraged to look at the source code for the `modularAnalysis` 
+convenience functions that you find yourself using often.
+In pseudo-python you will see they are very often of the form:
+
+.. code-block:: python
+
+        import basf2
+
+        def doAnAnalysisTask( <arguments>, path ):
+            """A meaningful and clear docstring."""
+            # register a module...
+            this_module = basf2.register_module("AnalysisTaskModule")
+            # configure the parameters...
+            this_module.param('someModuleParamter', someValue)
+            # add it to the path...
+            path.add_module(this_module)
+
+.. admonition:: Question
+     :class: exercise stacked
+
+     What is the ParticleCombiner module?
+     What does it do?
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     You can use either
+
+     .. code-block:: bash
+
+         basf2 -m ParticleCombiner
+
+     or browse this online documentation.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     The :b2:mod:`ParticleCombiner` takes one or more **ParticleList**s
+     and combines **Particles** from the inputs to create *composite* particle
+     candidates.
+
+      .. seealso::
+
+           `Particle combiner how does it work?
+           <https://questions.belle2.org/question/4318/particle-combiner-how-does-it-work/>`_
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Find the `modularAnalysis` convenience function that wraps the :b2:mod:`ParticleCombiner` module?
+     Read the function.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     You want the `modularAnalysis.reconstructDecay` function.
+     You could either read the source code for that on stash,
+     or find it here in this documentation and click "[source]".
+
 Congratulations!
 You are now ready to write your first steering file.
 Good luck.
 
 .. topic:: Author of this lesson
 
-    Sam Cunliffe (sam.cunliffe@desy.de)
+    Sam Cunliffe
 

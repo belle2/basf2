@@ -399,15 +399,17 @@ struct unknownPars {
     //Store the vertex position
     int nVals = x.spls[0].vals.size();
 
+    const double toCm = 1e-4;
+
     for (int i = 0; i < nVals; ++i) {
       //vertex position
-      TVector3 vtx(x.spls[0].vals[i], y.spls[0].vals[i], z.spls[0].vals[i]);
+      TVector3 vtx(x.spls[0].vals[i]*toCm, y.spls[0].vals[i]*toCm, z.spls[0].vals[i]*toCm);
 
       //vertex error matrix (symetric)
       TMatrixDSym mS(3);
-      mS(0, 0) = Sqr(x.spls[0].errs[i]);
-      mS(1, 1) = Sqr(y.spls[0].errs[i]);
-      mS(2, 2) = Sqr(z.spls[0].errs[i]);
+      mS(0, 0) = Sqr(x.spls[0].errs[i] * toCm);
+      mS(1, 1) = Sqr(y.spls[0].errs[i] * toCm);
+      mS(2, 2) = Sqr(z.spls[0].errs[i] * toCm);
 
       vtxPos.push_back(vtx);
       vtxErr.push_back(mS);
@@ -416,13 +418,13 @@ struct unknownPars {
     //BeamSpot size matrix (from iteration 0)
 
     sizeMat.ResizeTo(3, 3);
-    sizeMat(0, 0) = Sqr(matXX.vars[0]);
-    sizeMat(1, 1) = Sqr(matYY.vars[0]);
-    sizeMat(2, 2) = Sqr(matZZ.vars[0]);
+    sizeMat(0, 0) = Sqr(matXX.vars[0] * toCm);
+    sizeMat(1, 1) = Sqr(matYY.vars[0] * toCm);
+    sizeMat(2, 2) = Sqr(matZZ.vars[0] * toCm);
 
-    sizeMat(0, 1) = Sqr(matXY.vars[0]);
-    sizeMat(0, 2) = Sqr(matXZ.vars[0]);
-    sizeMat(1, 2) = Sqr(matYZ.vars[0]);
+    sizeMat(0, 1) = Sqr(matXY.vars[0] * toCm);
+    sizeMat(0, 2) = Sqr(matXZ.vars[0] * toCm);
+    sizeMat(1, 2) = Sqr(matYZ.vars[0] * toCm);
 
     sizeMat(1, 0) = sizeMat(0, 1);
     sizeMat(2, 0) = sizeMat(0, 2);
@@ -2261,6 +2263,51 @@ vector<ExpRunEvt> convertSplitPoints(const vector<event>& events, vector<double>
   }
   return breakPos;
 }
+
+
+map<pair<int, int>, pair<double, double>> getRunInfo(const vector<event>& evts)
+{
+  map<pair<int, int>, pair<double, double>> runsInfo;
+
+  for (auto& evt : evts) {
+    int Exp = evt.exp;
+    int Run = evt.run;
+    double time = evt.t;
+    //tracks->GetEntry(i);
+    if (runsInfo.count({Exp, Run})) {
+      double tMin, tMax;
+      tie(tMin, tMax) = runsInfo.at({Exp, Run});
+      tMin = min(tMin, time);
+      tMax = max(tMax, time);
+      runsInfo.at({Exp, Run}) = {tMin, tMax};
+    }
+    else {
+      runsInfo[ {Exp, Run}] = {time, time};
+    }
+
+  }
+  return runsInfo;
+}
+
+
+
+
+
+pair<double, double> getMinMaxTime(const vector<event>& evts)
+{
+  double tMin = 1e40, tMax = -1e40;
+  for (const auto& evt : evts) {
+    double time = evt.tAbs;
+    tMin = min(tMin, time);
+    tMax = max(tMax, time);
+  }
+  return {tMin, tMax};
+}
+
+
+
+
+
 
 
 // Returns tuple with the beamspot parameters

@@ -50,7 +50,7 @@ class BtoPi0Pi0(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        loadStdPi0ForBToCharmless
+        loadStdPi0ForBToCharmless(path=path)
 
     def build_lists(self, path):
         Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'

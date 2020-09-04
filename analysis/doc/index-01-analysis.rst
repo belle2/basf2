@@ -59,6 +59,7 @@ For vertex-fitter functions see the later section on :ref:`analysis_vertexfittin
 There are also some more specialised python wrapper functions for dealing with photons.
 
 .. toctree:: PhotonWrappers
+.. toctree:: KinFit
 
 
 .. _analysis_variables:

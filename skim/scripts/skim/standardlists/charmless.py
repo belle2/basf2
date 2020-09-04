@@ -4,6 +4,27 @@
 import modularAnalysis as ma
 
 
+def loadStdVeryLooseTracks(particletype, path):
+    """
+    Function to prepare veryLoose charged particle lists. We require only fiducial the cuts
+    :b2:var:`thetaInCDCAcceptance` and :b2:var:`chiProb` :math:`> 0` and
+    abs(:b2:var:`dr`) :math:`< 0.5~{\\rm cm}` and abs(dz) :math:` < 3~{\\rm cm}`.
+
+    @param particletype type of charged particle to make a list of
+    @param path         modules are added to this path
+    """
+
+    # basic quality cut strings
+    trackQuality = 'thetaInCDCAcceptance and chiProb > 0 '
+    ipCut = 'abs(dr) < 0.5 and abs(dz) < 3'
+    goodTrack = trackQuality + ' and ' + ipCut
+
+    if particletype not in ['pi', 'K', 'p', 'e', 'mu']:
+        B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
+
+    ma.fillParticleList(particletype + '+:veryLoose', goodTrack, True, path=path)
+
+
 def loadStdVeryLooseKstar0(path):
     """
     Create a list of 'K*0:veryLoose' list from 'pi-:veryLoose K+:veryLoose' with :math:`0.74 < M < 1.04~GeV`

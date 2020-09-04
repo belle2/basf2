@@ -16,6 +16,7 @@ from skim.standardlists.lightmesons import (
     loadStdAllRhoPlus,
     loadStdPi0ForBToHadrons)
 from skim.standardlists.charmless import (
+    loadStdVeryLooseTracks,
     loadStdPi0ForBToCharmless,
     loadStdVeryLooseKstar0,
     loadStdVeryLooseRho0,
@@ -85,8 +86,8 @@ class BtoHad2Tracks(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        stdK("veryLoose", path=path)
-        stdPi("veryLoose", path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
 
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
@@ -134,8 +135,8 @@ class BtoHad3Tracks(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        stdK("veryLoose", path=path)
-        stdPi("veryLoose", path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
         stdKshorts(path=path)
 
     def build_lists(self, path):
@@ -193,8 +194,8 @@ class BtoHad4Tracks(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        stdK("veryLoose", path=path)
-        stdPi("veryLoose", path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
         stdKshorts(path=path)
         loadStdVeryLooseKstar0(path=path)
         loadStdVeryLooseRho0(path=path)
@@ -252,8 +253,8 @@ class BtoHad4TracksFSPonly(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        stdK("veryLoose", path=path)
-        stdPi("veryLoose", path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
@@ -298,8 +299,8 @@ class BtoHad4TracksKS(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        stdK("veryLoose", path=path)
-        stdPi("veryLoose", path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
         stdKshorts(path=path)
         loadStdVeryLooseKstar0(path=path)
         loadStdVeryLooseRho0(path=path)
@@ -347,8 +348,8 @@ class BtoHad4TracksKstar(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        stdK("veryLoose", path=path)
-        stdPi("veryLoose", path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
         loadStdVeryLooseKstar0(path=path)
 
     def build_lists(self, path):
@@ -434,8 +435,8 @@ class BtoHad5Tracks(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        stdK("veryLoose", path=path)
-        stdPi("veryLoose", path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
         loadStdVeryLooseKstarPlus(path=path)
 
     def build_lists(self, path):
@@ -522,8 +523,8 @@ class BtoHad2Tracks1Pi0(BaseSkim):
     def load_standard_lists(self, path):
         loadStdPi0ForBToCharmless(path=path)
         stdKshorts(path=path)
-        stdK("veryLoose", path)
-        stdPi("veryLoose", path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
@@ -570,8 +571,8 @@ class BtoHad3Tracks1Pi0(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        stdK("veryLoose", path)
-        stdPi("veryLoose", path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
         loadStdPi0ForBToCharmless(path=path)
         stdKshorts(path=path)
         loadStdVeryLooseRho0(path=path)

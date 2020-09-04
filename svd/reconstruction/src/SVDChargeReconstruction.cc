@@ -53,6 +53,7 @@ namespace Belle2 {
           return getELS3Charge();
       }
 
+      //we should NEVER get here, if we do, we should check better at the step before (SVDRecoDigitCreator or cluster reconstruction classes
       B2WARNING("strip charge algorithm specified in SVDRecoConfiguration not found, using CoG6");
       return getMaxSampleCharge();
     }
@@ -90,6 +91,7 @@ namespace Belle2 {
           return getELS3ChargeError();
       }
 
+      //we should NEVER get here, if we do, we should check better at the step before (SVDRecoDigitCreator or cluster reconstruction classes
       B2WARNING("strip charge algorithm specified in SVDRecoConfiguration not found, using CoG6");
 
       return getMaxSampleChargeError();

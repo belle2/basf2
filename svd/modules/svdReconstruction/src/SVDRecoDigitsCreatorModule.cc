@@ -86,9 +86,28 @@ void SVDRecoDigitCreatorModule::beginRun()
     m_timeRecoWith3SamplesAlgorithm = m_recoConfig->getStripTimeRecoWith3Samples();
     m_chargeRecoWith6SamplesAlgorithm = m_recoConfig->getStripChargeRecoWith6Samples();
     m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getStripChargeRecoWith3Samples();
-
   }
 
+  //check that all algorithms are available, otherwise use the default one
+  SVDReconstructionBase recoBase;
+
+  if (!recoBase.isTimeAlgorithmAvailable(m_timeRecoWith6SamplesAlgorithm)) {
+    B2WARNING("strip time algorithm " << m_timeRecoWith6SamplesAlgorithm << " is NOT available, using CoG6");
+    m_timeRecoWith6SamplesAlgorithm = "CoG6";
+  };
+
+  if (!recoBase.isTimeAlgorithmAvailable(m_timeRecoWith3SamplesAlgorithm)) {
+    B2WARNING("strip time algorithm " << m_timeRecoWith3SamplesAlgorithm << " is NOT available, using CoG3");
+    m_timeRecoWith3SamplesAlgorithm = "CoG3";
+  };
+  if (!recoBase.isChargeAlgorithmAvailable(m_chargeRecoWith6SamplesAlgorithm)) {
+    B2WARNING("strip charge algorithm " << m_chargeRecoWith6SamplesAlgorithm << " is NOT available, using MaxSample");
+    m_chargeRecoWith6SamplesAlgorithm = "MaxSample";
+  };
+  if (!recoBase.isChargeAlgorithmAvailable(m_chargeRecoWith3SamplesAlgorithm)) {
+    B2WARNING("strip charge algorithm " << m_chargeRecoWith3SamplesAlgorithm << " is NOT available, using MaxSample");
+    m_chargeRecoWith3SamplesAlgorithm = "MaxSample";
+  };
 
   B2INFO("SVD  6-sample DAQ, strip time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", strip charge algorithm: " <<
          m_chargeRecoWith6SamplesAlgorithm);
@@ -220,13 +239,13 @@ void SVDRecoDigitCreatorModule::event()
       charge = chargeReco->getStripCharge(m_chargeRecoWith3SamplesAlgorithm);
       chargeError = chargeReco->getStripChargeError(m_chargeRecoWith3SamplesAlgorithm);
     } else
-      B2ERROR("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
+      B2ERROR("SVD Reconstruction not available for this strip: not supported number of acquired APV samples!!");
 
     // now go into FTSW reference frame
     time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
 
-    B2INFO("time = (" << time << " ± " << timeError << ") ns");
-    B2INFO("charge = (" << charge << " ± " << chargeError << ") e-");
+    //    B2INFO("time = (" << time << " ± " << timeError << ") ns");
+    //    B2INFO("charge = (" << charge << " ± " << chargeError << ") e-");
 
     //append the new SVDRecoDigit to the StoreArray
     m_storeRecoDigits.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));

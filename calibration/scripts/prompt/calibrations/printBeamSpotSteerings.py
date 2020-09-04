@@ -30,9 +30,11 @@ def storeSteering(name, tag):
 
     fOut.write('{"hlt_mumu": [')  # , end ="")
 
-    for r in res:
-        n = getRun
-        fOut.write('["' + r + '", [12, '+str(n)+']], ')  # , end =" ")
+    for i, r in enumerate(res):
+        n = getRun(r)
+        fOut.write('["' + r + '", [12, '+str(n)+']]')  # , end =" ")
+        if i != len(res) - 1:
+            fOut.write(', ')
 
     fOut.write(']}')  # , end ="")
     fOut.close()
@@ -57,17 +59,20 @@ def storeSteering2(name, tag):
 
     fOut.write('{"hlt_mumu": [')  # , end ="")
 
-    for r in res:
+    for i, r in enumerate(res):
         n = getRun(r)
-        fOut.write('["' + r + '", [12, '+str(n)+']], ')  # , end =" ")
+        exp = 12 if tag == 'bucket12' else int(tag)
+        fOut.write('["' + r + '", ['+str(exp)+', '+str(n)+']]')
+        if i != len(res) - 1:
+            fOut.write(', ')
 
     fOut.write(']}')  # , end ="")
     fOut.close()
 
 
-storeSteering2('steerings/exp7.json',  '07')
-storeSteering2('steerings/exp8.json',  '08')
-storeSteering2('steerings/exp10.json', '10')
+storeSteering2('steerings/input_data_exp7.json',  '07')
+storeSteering2('steerings/input_data_exp8.json',  '08')
+storeSteering2('steerings/input_data_exp10.json', '10')
 
 storeSteering('steerings/input_data_bucket9.json', 71)
 storeSteering('steerings/input_data_bucket10.json', 91)

@@ -42,7 +42,7 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    std::vector<std::tuple<std::string, std::string, std::string>> emptyROEMask;
+    std::vector<std::tuple<std::string, std::string, std::string, std::string>> emptyROEMask;
 
     addParam("particleList", m_particleList, "Name of the ParticleList");
 
@@ -68,13 +68,16 @@ namespace Belle2 {
       std::string maskName = get<0>(ROEMask);
       std::string trackSelection = get<1>(ROEMask);
       std::string eclClusterSelection = get<2>(ROEMask);
+      std::string klmClusterSelection = get<3>(ROEMask);
 
       std::shared_ptr<Variable::Cut> trackCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(trackSelection));
       std::shared_ptr<Variable::Cut> eclClusterCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(eclClusterSelection));
+      std::shared_ptr<Variable::Cut> klmClusterCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(klmClusterSelection));
 
       m_maskNames.push_back(maskName);
       m_trackCuts.insert(stringAndCutMap::value_type(maskName, trackCut));
       m_eclClusterCuts.insert(stringAndCutMap::value_type(maskName, eclClusterCut));
+      m_klmClusterCuts.insert(stringAndCutMap::value_type(maskName, klmClusterCut));
 
       B2INFO("RestOfEventInterpreter added ROEMask with specific fractions under name \'" << maskName << "\' with track cuts: " <<
              trackSelection << " and eclCluster cuts: " << eclClusterSelection);
@@ -94,7 +97,7 @@ namespace Belle2 {
         if (!m_update) {
           roe->initializeMask(maskName, "ROEInterpreterModule");
         }
-        roe->updateMaskWithCuts(maskName, m_trackCuts.at(maskName), m_eclClusterCuts.at(maskName), nullptr, m_update);
+        roe->updateMaskWithCuts(maskName, m_trackCuts.at(maskName), m_eclClusterCuts.at(maskName), m_klmClusterCuts.at(maskName), m_update);
       }
     }
   }

@@ -26,6 +26,17 @@ def loadStdVeryLooseRho0(path):
     return 'rho0:veryLoose'
 
 
+def loadStdVeryLooseRhoPlus(path):
+    """
+    Create a list of 'rho+:veryLoose' list from 'pi0:charmlessFit pi+:veryLoose' with :math:`0.47 < M < 1.15~GeV`
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+    ma.reconstructDecay('rho+:veryLoose -> pi+:veryLoose pi0:charmlessFit', '0.47 < M < 1.15', 1, path=path)
+    return 'rho+:veryLoose'
+
+
 def loadStdPi0ForBToCharmless(path):
     """
     Creates a list 'pi0:charmlessFit' for :math:`B\\to {\\rm charmless}` skims, based on recommendations of

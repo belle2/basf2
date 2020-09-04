@@ -27,7 +27,7 @@
       REAL TOPF_DTL, TOPF_DYD, TOPF_DYB, TOPF_DFIC
       INTEGER TOPF_RAYTR
 
-      INTEGER K4, K, NX(3), NY(3)
+      INTEGER K4, K, NX(3), NY(3), NYB
       REAL TL0, YD0, YB0, FIC0
       REAL KY
       
@@ -91,8 +91,9 @@
             DYBDL=TOPF_DYB(I0,K0,K2)
             DYBDE=TOPF_DYB(I0,K0,K3)
             IF(EXT_SHAPE(QBAR_EXT(LR,MODUL)).EQ.2) THEN
-               KY=SIGN(F_DIRB(2),F_KY(I0,K4)) ! unfold in y
-               DYDZ=KY/F_DIRB(3) ! at entrance to prism
+               DYDZ=F_DIRB(2)/F_DIRB(3) ! at prism entrance
+               NYB=F_NY(I0,K4)-F_NYM(I0,K4)-F_NYE(I0,K4)
+               IF(MOD(NYB,2).NE.0) DYDZ=-DYDZ ! unfold up to mirror
                CALL YSKENX(IX,IPMTX,LR,MODUL,
      &              YD0,DYDDE,DYDDL,DYDDX,DYDZ,
      &              YB0,DYBDE,DYBDL,DYBDX,

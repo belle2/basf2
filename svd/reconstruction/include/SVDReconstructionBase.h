@@ -34,6 +34,11 @@ namespace Belle2 {
     public:
 
       /**
+       * default copy constructor
+       */
+      SVDReconstructionBase(const SVDReconstructionBase&) = default;
+
+      /**
        * Constructor with the SVDShaperDigit
        * for strip reconstruction by the SVDRecoDigitCreator
        */

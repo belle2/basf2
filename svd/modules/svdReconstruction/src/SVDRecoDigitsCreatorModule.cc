@@ -194,24 +194,19 @@ void SVDRecoDigitCreatorModule::event()
     std::vector<float> probabilities = {0.5};
     double chi2 = std::numeric_limits<double>::quiet_NaN();
 
-    /*
-    // let's make this work
-    SVDReconstructionBase* recoBase = new SVDReconstructionBase(*m_storeDigits[i]);
-    recoBase->setAverageNoise(averageNoiseInADC,averageNoiseInElectrons);
-    recoBase->setTriggerBin(triggerBin);
-    SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(&recoBase);
-    SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(*recoBase);
-    */
 
+    // build SVDTimeReconstrcution and SVDChargeRecosntruction using the base class constructor
     SVDReconstructionBase* timeBase = new SVDReconstructionBase(*m_storeDigits[i]);
+    timeBase->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
+    timeBase->setTriggerBin(triggerBin);
     SVDTimeReconstruction* timeReco = (SVDTimeReconstruction*)timeBase;
-    timeReco->setTriggerBin(triggerBin);
-    timeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
 
-    SVDReconstructionBase* chargeBase = new SVDReconstructionBase(*m_storeDigits[i]);
+
+    SVDReconstructionBase* chargeBase = new SVDReconstructionBase(*timeBase);
     SVDChargeReconstruction* chargeReco = (SVDChargeReconstruction*) chargeBase;
-    chargeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
 
+
+    // get strip time and charge and their errors
     if (numberOfAcquiredSamples == 6) {
       time = timeReco->getStripTime(m_timeRecoWith6SamplesAlgorithm);
       timeError = timeReco->getStripTimeError(m_timeRecoWith6SamplesAlgorithm);

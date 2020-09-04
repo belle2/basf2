@@ -59,6 +59,7 @@ def BtoPi0Pi0(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad2Tracks(BaseSkim):
     """
     Reconstructed decay modes:
@@ -102,6 +103,7 @@ def BtoHad2Tracks(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad3Tracks(BaseSkim):
     """
 
@@ -154,6 +156,7 @@ def BtoHad3Tracks(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad4Tracks(BaseSkim):
     """
 
@@ -220,6 +223,7 @@ def BtoHad4Tracks(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad4TracksFSPonly(BaseSkim):
     """
 
@@ -267,6 +271,7 @@ def BtoHad4TracksFSPonly(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad4TracksKS(BaseSkim):
     """
 
@@ -316,6 +321,7 @@ def BtoHad4TracksKS(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad4TracksKstar(BaseSkim):
     """
 
@@ -362,6 +368,7 @@ def BtoHad4TracksKstar(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad4TracksRho(BaseSkim):
     """
 
@@ -402,6 +409,7 @@ def BtoHad4TracksRho(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad5Tracks(BaseSkim):
     """
     Reconstructed decay modes:
@@ -445,6 +453,7 @@ def BtoHad5Tracks(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad1Track1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
@@ -484,6 +493,7 @@ def BtoHad1Track1Pi0(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad2Tracks1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
@@ -532,6 +542,7 @@ def BtoHad2Tracks1Pi0(BaseSkim):
         self.SkimLists = BsigList
 
 
+@fancy_skim_header
 def BtoHad3Tracks1Pi0(BaseSkim):
     """
     Reconstructed decay modes:

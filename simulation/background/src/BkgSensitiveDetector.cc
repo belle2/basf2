@@ -11,18 +11,13 @@
 #include <simulation/background/BkgSensitiveDetector.h>
 #include <simulation/background/BkgNeutronWeight.h>
 #include <simulation/dataobjects/BeamBackHit.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
 #include <G4Track.hh>
 #include <G4Step.hh>
-#include <G4TrackingManager.hh>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <TVector3.h>
 
 using namespace std;

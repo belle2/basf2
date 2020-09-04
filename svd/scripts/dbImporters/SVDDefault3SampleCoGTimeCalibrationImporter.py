@@ -62,6 +62,7 @@ class defaultCoGTimeCalibrationImporter_pol3TBindep(basf2.Module):
 
         Belle2.Database.Instance().storeData(Belle2.SVD3SampleCoGTimeCalibrations.name, payload, iov)
 
+
 b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = create_path()

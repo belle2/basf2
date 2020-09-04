@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/core/HistoModule.h>
-#include <framework/gearbox/Const.h>
 
 #include <TTree.h>
 

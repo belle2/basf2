@@ -13,12 +13,10 @@
 #include <trg/gdl/modules/trggdlSummary/trggdlSummaryModule.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/DataStore.h>
 
 #include <mdst/dataobjects/TRGSummary.h>
 
 #include <string.h>
-#include <unistd.h>
 
 
 using namespace Belle2;

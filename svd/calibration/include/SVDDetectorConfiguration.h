@@ -11,17 +11,11 @@
 
 #pragma once
 
-#include <vxd/dataobjects/VxdID.h>
-#include <svd/dbobjects/SVDCalibrationsBase.h>
-#include <svd/dbobjects/SVDCalibrationsScalar.h>
 #include <svd/dbobjects/SVDLocalConfigParameters.h>
 #include <svd/dbobjects/SVDGlobalConfigParameters.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <string>
-
-
-#include <math.h>
 
 namespace Belle2 {
 
@@ -60,7 +54,7 @@ namespace Belle2 {
         B2INFO("SVDDetectorConfiguration, LOCAL run parameters: from now on we are using " <<
         this->m_svdLocalConfig_aDBObjPtr -> get_uniqueID()); });
     }
-  private:
+
     /** LOCAL CONFIGURATION PARAMETERS:
      * Return the charge injected on each strip for the pulse
      *  shape calibration during the calibration local runs
@@ -70,6 +64,7 @@ namespace Belle2 {
      *
      * Output: float corresponding to the injected charge [e]
      */
+    // cppcheck-suppress unusedPrivateFunction
     float getInjectedCharged()
     {
       return m_svdLocalConfig_aDBObjPtr->getInjectedCharge();
@@ -156,6 +151,18 @@ namespace Belle2 {
       return m_svdGlobalConfig_aDBObjPtr->getAPVClockInRFCUnits();
     }
 
+    /** GLOBAL CONFIGURATION PARAMETERS:
+     * Return the HV applied during data taking
+     *
+     * Input:
+     * no input parameters are required since it is a detector based payload
+     *
+     * Output: float corresponding to the HV = Vbias/2 applied during data taking
+     */
+    float getHV()
+    {
+      return m_svdGlobalConfig_aDBObjPtr->getHV();
+    }
 
     /** returns the unique ID of the payload */
     //    TString getUniqueID() { return m_svdLocalConfig_aDBObjPtr->get_uniqueID(); }

@@ -18,7 +18,6 @@
 #include <fstream>
 #include <string>
 #include "trg/trg/BitStream.h"
-#include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #ifdef TRGCDC_DISPLAY
 #include "framework/gearbox/Gearbox.h"

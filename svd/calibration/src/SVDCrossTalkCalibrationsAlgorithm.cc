@@ -10,6 +10,9 @@
 
 #include <svd/calibration/SVDCrossTalkCalibrationsAlgorithm.h>
 #include <svd/calibration/SVDCrossTalkStripsCalibrations.h>
+
+#include <TH1F.h>
+
 #include <iostream>
 
 using namespace std;

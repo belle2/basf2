@@ -25,12 +25,16 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMReconstructionParameters();
+    EKLMReconstructionParameters()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~EKLMReconstructionParameters();
+    ~EKLMReconstructionParameters()
+    {
+    }
 
     /**
      * Get time resolution (of reconstructed time, not ADC).

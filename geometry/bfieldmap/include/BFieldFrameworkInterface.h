@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef GEOMETRY_BFIELDMAP_BFIELDFRAMEWORKINTERFACE_H
-#define GEOMETRY_BFIELDMAP_BFIELDFRAMEWORKINTERFACE_H
 
 #include <framework/dbobjects/MagneticFieldComponent.h>
 #include <framework/gearbox/Unit.h>
@@ -31,4 +29,3 @@ namespace Belle2 {
     }
   };
 }
-#endif // GEOMETRY_BFIELDMAP_FRAMEWORKINTERFACE_H

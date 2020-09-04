@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PIDTREE_H
-#define PIDTREE_H
+#pragma once
 
 #include <TTree.h>
 
@@ -115,6 +114,4 @@ namespace Belle2 {
     }; // struct PIDTree
   } // PID namespace
 } // Belle2 namespace
-
-#endif
 

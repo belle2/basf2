@@ -10,7 +10,6 @@
 
 #include <top/dbobjects/TOPGeoPrismEnclosure.h>
 #include <framework/gearbox/Unit.h>
-#include <math.h>
 #include <iostream>
 
 using namespace std;

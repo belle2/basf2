@@ -10,9 +10,6 @@
  **************************************************************************/
 
 #pragma once
-#include <vector>
-
-#include <svd/dbobjects/SVDCalibrationsBase.h>
 
 namespace Belle2 {
 

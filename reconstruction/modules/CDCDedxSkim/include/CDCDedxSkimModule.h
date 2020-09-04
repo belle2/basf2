@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXSKIMMODULE_H
-#define CDCDEDXSKIMMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
@@ -17,11 +16,7 @@
 
 #include <mdst/dataobjects/Track.h>
 
-#include <map>
-#include <string>
 #include <vector>
-#include <utility>
-#include <TVector3.h>
 
 namespace Belle2 {
 
@@ -77,5 +72,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

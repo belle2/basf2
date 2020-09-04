@@ -13,8 +13,6 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/reconstruction/SimpleClusterCandidate.h>
 
 #include <mdst/dataobjects/MCParticle.h>
@@ -62,6 +60,8 @@ namespace Belle2 {
       std::string m_storeTrueHitsName;
       /** Name of the collection to use for the MCParticles */
       std::string m_storeMCParticlesName;
+      /** Name of the collection to use for the SVDShaperDigits */
+      std::string m_storeShaperDigitsName;
       /** Name of the relation between SVDRecoDigits and MCParticles */
       std::string m_relRecoDigitMCParticleName;
       /** Name of the relation between SVDClusters and MCParticles */

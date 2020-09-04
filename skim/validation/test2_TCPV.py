@@ -3,8 +3,8 @@
 
 """
 <header>
-  <input>../TDCP.udst.root</input>
-  <output>../TCPV_Validation.root</output>
+  <input>../TCPV.udst.root</input>
+  <output>TCPV_Validation.root</output>
   <contact>reem.rasheed@iphc.cnrs.fr</contact>
 </header>
 """

@@ -103,7 +103,7 @@ void SVDMaxStripTTreeModule::event()
 void SVDMaxStripTTreeModule::terminate()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     m_t->Write();
     m_rootFilePtr->Close();

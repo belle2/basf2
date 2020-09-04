@@ -10,9 +10,6 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcUnpacker/CDCUnpackerModule.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/CDCRawHit.h>
-#include <cdc/dataobjects/CDCRawHitWaveForm.h>
 // DB objects
 #include <cdc/dbobjects/CDCChannelMap.h>
 
@@ -82,20 +79,14 @@ void CDCUnpackerModule::initialize()
     B2INFO("CDCUnpacker: initialize() Called.");
   }
 
-
   m_rawCDCs.isRequired(m_rawCDCName);
-  StoreArray<CDCRawHitWaveForm> storeCDCRawHitWFs(m_cdcRawHitWaveFormName);
-  storeCDCRawHitWFs.registerInDataStore();
-
-  StoreArray<CDCRawHit> storeCDCRawHits(m_cdcRawHitName);
-  storeCDCRawHits.registerInDataStore();
-
-  StoreArray<CDCHit> storeDigit(m_cdcHitName);
-  storeDigit.registerInDataStore();
+  m_CDCRawHitWaveForms.registerInDataStore(m_cdcRawHitWaveFormName);
+  m_CDCRawHits.registerInDataStore(m_cdcRawHitName);
+  m_CDCHits.registerInDataStore(m_cdcHitName);
 
   // Relation.
-  storeDigit.registerRelationTo(storeCDCRawHitWFs);
-  storeDigit.registerRelationTo(storeCDCRawHits);
+  m_CDCHits.registerRelationTo(m_CDCRawHitWaveForms);
+  m_CDCHits.registerRelationTo(m_CDCRawHits);
 
   // Set default names for the relations.
   m_relCDCRawHitToCDCHitName = DataStore::relationName(
@@ -132,18 +123,14 @@ void CDCUnpackerModule::event()
   int tdcCountTrig = m_tdcOffset;
 
   // Create Data objects.
+  m_CDCHits.clear();
 
-  StoreArray<CDCRawHitWaveForm> cdcRawHitWFs(m_cdcRawHitWaveFormName);
-  StoreArray<CDCRawHit> cdcRawHits(m_cdcRawHitName);
-  StoreArray<CDCHit> cdcHits(m_cdcHitName);
-  cdcHits.clear();
-
-  RelationArray rawCDCsToCDCHits(cdcRawHits, cdcHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
-  RelationArray rawCDCWFsToCDCHits(cdcRawHitWFs, cdcHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
+  RelationArray rawCDCsToCDCHits(m_CDCRawHits, m_CDCHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
+  RelationArray rawCDCWFsToCDCHits(m_CDCRawHitWaveForms, m_CDCHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
 
   if (m_enableStoreCDCRawHit == true) {
-    cdcRawHits.clear();
-    cdcRawHitWFs.clear();
+    m_CDCRawHits.clear();
+    m_CDCRawHitWaveForms.clear();
   }
 
   //
@@ -284,7 +271,7 @@ void CDCUnpackerModule::event()
               if (m_enableStoreCDCRawHit == true) {
                 // Store to the CDCRawHitWaveForm object.
                 const unsigned short status = 0;
-                cdcRawHitWFs.appendNew(status, trgNumber, iNode, iFiness, board, iCh, iSample, trgTime, fadc, tdc);
+                m_CDCRawHitWaveForms.appendNew(status, trgNumber, iNode, iFiness, board, iCh, iSample, trgTime, fadc, tdc);
               }
 
             }
@@ -298,15 +285,16 @@ void CDCUnpackerModule::event()
               } else {
                 tdc1 = trgTime - tdc1;
               }
-              CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId);
+              CDCHit* firstHit = m_CDCHits.appendNew(tdc1, fadcSum, wireId);
               if (m_enable2ndHit == true) {
-                CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId);
+                CDCHit* secondHit = m_CDCHits.appendNew(tdc2, fadcSum, wireId);
                 secondHit->setOtherHitIndices(firstHit);
                 secondHit->set2ndHitFlag();
               }
               if (m_enableStoreCDCRawHit == true) {
                 for (int iSample = 0; iSample < nSamples; ++iSample) {
-                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(cdcRawHitWFs[cdcRawHitWFs.getEntries() - 1 + iSample - (nSamples - 1) ]);
+                  m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(m_CDCRawHitWaveForms[m_CDCRawHitWaveForms.getEntries() - 1 + iSample -
+                                                                       (nSamples - 1) ]);
                 }
               }
             }
@@ -404,12 +392,12 @@ void CDCUnpackerModule::event()
                 if (board == m_boardIDTrig && ch == m_channelTrig) {
                   tdcCountTrig = tdc1;
                 } else {
-                  CDCHit* firstHit = cdcHits.appendNew(tdc1, fadcSum, wireId,
-                                                       0, tot);
+                  CDCHit* firstHit = m_CDCHits.appendNew(tdc1, fadcSum, wireId,
+                                                         0, tot);
                   if (length == 5) {
                     if (m_enable2ndHit == true) {
-                      CDCHit* secondHit = cdcHits.appendNew(tdc2, fadcSum, wireId,
-                                                            0, tot);
+                      CDCHit* secondHit = m_CDCHits.appendNew(tdc2, fadcSum, wireId,
+                                                              0, tot);
                       secondHit->setOtherHitIndices(firstHit);
                       secondHit->set2ndHitFlag();
                     }
@@ -418,11 +406,11 @@ void CDCUnpackerModule::event()
 
                 if (m_enableStoreCDCRawHit == true) {
                   // Store to the CDCRawHit object.
-                  CDCRawHit* rawHit = cdcRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
-                                                           trgTime, fadcSum, tdc1, tdc2, tot);
-                  cdcHits[cdcHits.getEntries() - 1]->addRelationTo(rawHit);
+                  CDCRawHit* rawHit = m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                                             trgTime, fadcSum, tdc1, tdc2, tot);
+                  m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(rawHit);
                   if (m_enable2ndHit == true) {
-                    cdcHits[cdcHits.getEntries() - 2]->addRelationTo(rawHit);
+                    m_CDCHits[m_CDCHits.getEntries() - 2]->addRelationTo(rawHit);
                   }
                 }
 
@@ -444,7 +432,7 @@ void CDCUnpackerModule::event()
   // t0 correction w.r.t. the timing of the trigger counter.
   //
   if (m_subtractTrigTiming == true) {
-    for (auto& hit : cdcHits) {
+    for (auto& hit : m_CDCHits) {
       int tdc = hit.getTDCCount();
       if (hit.is2ndHit()) {
         if (tdc != 0) {

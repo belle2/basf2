@@ -7,9 +7,12 @@
 #include <mdst/dataobjects/V0.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 #include <framework/utilities/TestHelpers.h>
 
 #include <analysis/utility/ParticleCopy.h>
+
+#include <TDatabasePDG.h>
 
 #include <gtest/gtest.h>
 
@@ -324,7 +327,8 @@ namespace {
     Particle* T3Gamma    = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
                                                         2));
     // T4KL
-    Particle* T4KL       = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 130, Particle::c_Unflavored, Particle::c_ECLCluster,
+    Particle* T4KL       = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), Const::Klong.getPDGCode(), Particle::c_Unflavored,
+                                                        Particle::c_ECLCluster,
                                                         3));
     MCParticle* MC1Pion = mcparticles. appendNew(MCParticle());
     MC1Pion->setPDG(211);
@@ -346,8 +350,8 @@ namespace {
     EXPECT_TRUE(T1Pion->isCopyOf(T1Kaon,          true));
     EXPECT_FALSE(T2Gamma->isCopyOf(T1Gamma,       true));
     EXPECT_TRUE(T3Gamma->isCopyOf(T4KL,           true));
-    EXPECT_B2FATAL(T1PionFromMC->isCopyOf(T1Pion, true));
-    EXPECT_B2FATAL(T1Pion->isCopyOf(T1PionFromMC, true));
+    EXPECT_FALSE(T1PionFromMC->isCopyOf(T1Pion, true));
+    EXPECT_FALSE(T1Pion->isCopyOf(T1PionFromMC, true));
     // Construct composite particles
     Particle* D0Pi1Pi2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 421));
     D0Pi1Pi2->appendDaughter(T1Pion);
@@ -668,7 +672,9 @@ namespace {
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
       EXPECT_FLOAT_EQ(std::sqrt(4. + 0.497614 * 0.497614), p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
-      EXPECT_FLOAT_EQ(0.497614, p.getMass());
+      int pdg = Const::Klong.getPDGCode();
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+      EXPECT_FLOAT_EQ(m, p.getMass());
     }
 
     {
@@ -682,7 +688,9 @@ namespace {
       EXPECT_FLOAT_EQ(2., p.getECLClusterEnergy());
       EXPECT_FLOAT_EQ(std::sqrt(4. + 0.93956536 * 0.93956536), p.getEnergy());
       EXPECT_EQ(ECLCluster::EHypothesisBit::c_neutralHadron, p.getECLClusterEHypothesisBit());
-      EXPECT_FLOAT_EQ(0.93956536, p.getMass());
+      int pdg = Const::neutron.getPDGCode();
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+      EXPECT_FLOAT_EQ(m, p.getMass());
     }
   }
 
@@ -699,10 +707,12 @@ namespace {
       cluster->setMomentumMag(1.0);
 
       Particle p(cluster);
-      EXPECT_EQ(130, p.getPDGCode());
-      EXPECT_FLOAT_EQ(sqrt(1. + 0.497614 * 0.497614), p.getEnergy());
+      int pdg = Const::Klong.getPDGCode();
+      EXPECT_EQ(pdg, p.getPDGCode());
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+      EXPECT_FLOAT_EQ(sqrt(1. + m * m), p.getEnergy());
       EXPECT_EQ(Particle::c_Unflavored, p.getFlavorType());
-      EXPECT_FLOAT_EQ(0.497614, p.getMass());
+      EXPECT_FLOAT_EQ(m, p.getMass());
     }
 
     {
@@ -714,10 +724,12 @@ namespace {
       cluster->setMomentumMag(1.0);
 
       Particle p(cluster, Const::neutron.getPDGCode());
-      EXPECT_EQ(2112, p.getPDGCode());
-      EXPECT_FLOAT_EQ(sqrt(1. + 0.93956536 * 0.93956536), p.getEnergy());
+      int pdg = Const::neutron.getPDGCode();
+      EXPECT_EQ(pdg, p.getPDGCode());
+      double m = TDatabasePDG::Instance()->GetParticle(pdg)->Mass();
+      EXPECT_FLOAT_EQ(sqrt(1. + m * m), p.getEnergy());
       EXPECT_EQ(Particle::c_Flavored, p.getFlavorType());
-      EXPECT_FLOAT_EQ(0.93956536, p.getMass());
+      EXPECT_FLOAT_EQ(m, p.getMass());
     }
   }
 }  // namespace

@@ -61,9 +61,9 @@ namespace Belle2 {
     int getMaskFilter(void) const { return m_maskFilter; };
 
     /**
-     * Returns the masking bitmap used to mask the strips at FADC level (only for CM-section)
+     * Returns the APV clock
      * @param none
-     * @return flaot corresponding to the APV clock units in [ns]
+     * @return float corresponding to the APV clock units in [ns]
      */
     float getAPVClockInRFCUnits(void) const
     {
@@ -78,6 +78,12 @@ namespace Belle2 {
       return APVClockUnitsCoeff;
     }
 
+    /**
+     * Returns the HV = Vbias/2
+     * @param none
+     * @return float corresponding to the HV = Vbias/2
+     */
+    float getHV(void) const  { return m_hv; };
 
 
     /**
@@ -125,6 +131,17 @@ namespace Belle2 {
       m_APVClockInRFCUnits = APVClockUnits;
     }
 
+    /**
+     * Set the HV (in V)
+     * Input:
+     * @param float hv
+     *
+     */
+    void setHV(float hv)
+    {
+      m_hv = hv;
+    }
+
 
     /**
      * Get the unique ID  of the calibration
@@ -147,11 +164,15 @@ namespace Belle2 {
      */
     int m_maskFilter;
 
+    /** HV = Vbias/2 in V
+     */
+    float m_hv = 0;
+
     /** APVclock
      */
     std::string m_APVClockInRFCUnits;
 
-    ClassDef(SVDGlobalConfigParameters, 1); /**< needed by root*/
+    ClassDef(SVDGlobalConfigParameters, 2); /**< needed by root*/
 
   };
 

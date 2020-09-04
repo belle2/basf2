@@ -13,60 +13,10 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdMu
 from variables import variables as vm
-from validation_tools.metadata import create_validation_histograms
 
-
-def LeptonicList(path):
-    """
-    Note:
-        * **Skim description**: Skim for leptonic analyses,
-          :math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`.
-        * **Skim LFN code**: 11130300
-        * **Working Group**: (Semi-)Leptonic and Missing Energy
-          Working Group (WG1)
-
-    Build leptonic untagged skim lists, and supply the name of the
-    lists. Uses the standard electron and muon particle lists, so
-    these must be added to the path first.
-
-    Example usage:
-
-    >>> from stdCharged import stdE, stdMu
-    >>> from skim.leptonic import LeptonicList
-    >>> stdE('all', path=path)
-    >>> stdMu('all', path=path)
-    >>> LeptonicList(path)
-    ['B-:L0', 'B-:L1']
-
-    Reconstructed decays
-        * :math:`B^- \\to e^-`
-        * :math:`B^- \\to \\mu^-`
-
-    Cuts applied
-        * :math:`p_{\\ell}^{*} > 2\\,\\text{GeV}` in CMS Frame
-        * :math:`\\text{electronID} > 0.5`
-        * :math:`\\text{muonID} > 0.5`
-        * :math:`n_{\\text{tracks}} \geq 3`
-
-    Parameters:
-        path (`basf2.Path`): the path to add the skim list builders.
-
-    Returns:
-        ``lepList`` (list(str)): A list containing the names of the skim particle lists.
-    """
-    __authors__ = [
-        "Phillip Urquijo"
-    ]
-
-    ma.cutAndCopyList('e-:highP', 'e-:all', 'useCMSFrame(p) > 2.0 and electronID > 0.5', True, path=path)
-    ma.cutAndCopyList('mu-:highP', 'mu-:all', 'useCMSFrame(p) > 2.0 and muonID > 0.5', True, path=path)
-    ma.reconstructDecay('B-:LeptonicUntagged_0 -> e-:highP', '', 1, path=path)
-    ma.reconstructDecay('B-:LeptonicUntagged_1 -> mu-:highP', '', 2, path=path)
-    ma.applyCuts('B-:LeptonicUntagged_0', 'nTracks>=3', path=path)
-    ma.applyCuts('B-:LeptonicUntagged_1', 'nTracks>=3', path=path)
-    lepList = ['B-:LeptonicUntagged_0', 'B-:LeptonicUntagged_1']
-    return lepList
+__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 
 
 @fancy_skim_header
@@ -84,19 +34,16 @@ class LeptonicUntagged(BaseSkim):
     """
 
     __authors__ = ["Phillip Urquijo"]
-    __contact__ = ""
+    __contact__ = __liaison__
     __description__ = (
         "Skim for leptonic analyses, "
         ":math:`B_{\\text{sig}}^-\\to\\ell\\nu`, where :math:`\\ell=e,\\mu`"
     )
     __category__ = "physics, leptonic"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"]
-        }
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         ma.cutAndCopyList(
@@ -121,9 +68,13 @@ class LeptonicUntagged(BaseSkim):
         self.SkimLists = lepList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.cutAndCopyLists("B-:LeptonicUntagged", ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"], "", path=path)
 
-        ma.buildRestOfEvent("B-:LeptonicUntaggedeptonicUntagged", path=path)
+        ma.buildRestOfEvent("B-:LeptonicUntagged", path=path)
         ma.appendROEMask(
             "B-:LeptonicUntagged",
             "basic",

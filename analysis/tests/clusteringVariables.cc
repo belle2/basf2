@@ -97,6 +97,7 @@ namespace {
       e1->setClusterId(1);
       e1->setTime(1);
       e1->setDeltaTime99(0.1);
+      e1->setConnectedRegionId(1);
       // leave this guy with default theta and phi
       ECLCluster* e2 = eclclusters.appendNew(ECLCluster());
       e2->setEnergy(0.6);
@@ -107,6 +108,7 @@ namespace {
       e2->setClusterId(2);
       e2->setTime(2);
       e2->setDeltaTime99(0.2);
+      e2->setConnectedRegionId(2);
       ECLCluster* e3 = eclclusters.appendNew(ECLCluster());
       e3->setEnergy(0.15);
       e3->setTheta(0.2); // somewhere in the fwd endcap
@@ -120,6 +122,7 @@ namespace {
       e3->setClusterId(3);
       e3->setTime(3);
       e3->setDeltaTime99(0.3);
+      e3->setConnectedRegionId(1); // shares the connected region with cluster 1
 
       // aaand add clusters related to the tracks
       ECLCluster* e4 = eclclusters.appendNew(ECLCluster());
@@ -322,6 +325,36 @@ namespace {
       }
   }
 
+  TEST_F(ECLVariableTest, ECLThetaAndPhiId)
+  {
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> clusters;
+    StoreArray<ECLCluster> eclclusters;
+    // make a particle from cluster #1
+    const Particle* p = particles.appendNew(Particle(eclclusters[0]));
+
+    // get the variables to test
+    const Manager::Var* clusterThetaID = Manager::Instance().getVariable("clusterThetaID");
+    const Manager::Var* clusterPhiID = Manager::Instance().getVariable("clusterPhiID");
+
+    {
+      clusters[0]->setMaxECellId(1);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 0);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 0);
+    }
+    {
+      clusters[0]->setMaxECellId(6903);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 52);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 134);
+    }
+    {
+      clusters[0]->setMaxECellId(8457);
+      EXPECT_FLOAT_EQ(clusterThetaID->function(p), 65);
+      EXPECT_FLOAT_EQ(clusterPhiID->function(p), 8);
+    }
+  }
+
+
   TEST_F(ECLVariableTest, WholeEventClosure)
   {
     // we need the particles, tracks, and ECLClusters StoreArrays
@@ -516,6 +549,68 @@ namespace {
     EXPECT_FLOAT_EQ(maxDist->function(pionslist->getParticle(0)), 4.0);
   }
 
+  TEST_F(ECLVariableTest, photonHasOverlap)
+  {
+    // declare StoreArrays of Particles and ECLClusters
+    StoreArray<Particle> particles;
+    StoreArray<ECLCluster> eclclusters;
+    StoreArray<Track> tracks;
+
+    // create a photon and the pion lists
+    StoreObjPtr<ParticleList> gammalist("gamma:all");
+    StoreObjPtr<ParticleList> pionlist("pi+:all");
+    StoreObjPtr<ParticleList> piminuslist("pi-:all");
+
+    // register the particle lists in the datastore
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(DataStore::c_DontWriteOut);
+    pionlist.registerInDataStore(DataStore::c_DontWriteOut);
+    piminuslist.registerInDataStore(DataStore::c_DontWriteOut);
+    DataStore::Instance().setInitializeActive(false);
+
+    // initialise the photon list
+    gammalist.create();
+    gammalist->initialize(22, gammalist.getName());
+
+    // make the photons from clusters
+    for (int i = 0; i < eclclusters.getEntries(); ++i) {
+      if (!eclclusters[i]->isTrack()) {
+        const Particle* p = particles.appendNew(Particle(eclclusters[i]));
+        gammalist->addParticle(p);
+      }
+    }
+
+    // initialize the pion lists
+    pionlist.create();
+    pionlist->initialize(211, pionlist.getName());
+    piminuslist.create();
+    piminuslist->initialize(-211, piminuslist.getName());
+    piminuslist->bindAntiParticleList(*(pionlist));
+
+    // fill the pion list with the tracks
+    for (int i = 0; i < tracks.getEntries(); ++i) {
+      const Particle* p = particles.appendNew(Particle(tracks[i], Const::pion));
+      pionlist->addParticle(p);
+    }
+
+    // check overlap without any arguments
+    const Manager::Var* photonHasOverlapNoArgs = Manager::Instance().getVariable("photonHasOverlap()");
+    // the track list e-:all is missing so NaN is returned
+    EXPECT_TRUE(std::isnan(photonHasOverlapNoArgs->function(particles[0])));
+
+    // check overlap without any requirement on other photons
+    const Manager::Var* photonHasOverlapAll = Manager::Instance().getVariable("photonHasOverlap(, gamma:all, pi+:all)");
+    // cluster 3 and cluster 1 share the connected region
+    EXPECT_TRUE(photonHasOverlapAll->function(particles[0]));
+    // photonHasOverlap is designed for photons, so calling it for a pion returns NaN
+    EXPECT_TRUE(std::isnan(photonHasOverlapAll->function(particles[3])));
+
+    // check overlap with photons in barrel
+    const Manager::Var* photonHasOverlapBarrel = Manager::Instance().getVariable("photonHasOverlap(clusterReg==2, gamma:all, pi+:all)");
+    // cluster 3 is in the forward end cap so it doesn't matter that it has the same connected region like cluster 1
+    EXPECT_FALSE(photonHasOverlapBarrel->function(particles[0]));
+  }
+
   class KLMVariableTest : public ::testing::Test {
   protected:
     /** register Particle and KLMCluster arrays. */
@@ -572,11 +667,11 @@ namespace {
 
     // initialise the lists
     kLongList.create();
-    kLongList->initialize(130, kLongList.getName());
+    kLongList->initialize(Const::Klong.getPDGCode(), kLongList.getName());
     muonsList.create();
-    muonsList->initialize(13, muonsList.getName());
+    muonsList->initialize(Const::muon.getPDGCode(), muonsList.getName());
     amuonsList.create();
-    amuonsList->initialize(-13, amuonsList.getName());
+    amuonsList->initialize(-Const::muon.getPDGCode(), amuonsList.getName());
     amuonsList->bindAntiParticleList(*(muonsList));
 
     // add some tracks

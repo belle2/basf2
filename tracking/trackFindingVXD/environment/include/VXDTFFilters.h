@@ -8,8 +8,8 @@
  *                                                                              *
  * This software is provided "as is" without any warranty.                      *
  *******************************************************************************/
-#ifndef VXDTFFILTERS_HH
-#define VXDTFFILTERS_HH
+
+#pragma once
 
 #include <tracking/dataobjects/FullSecID.h>
 
@@ -638,6 +638,3 @@ namespace Belle2 {
   };
 
 }
-
-
-#endif

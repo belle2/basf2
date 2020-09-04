@@ -36,6 +36,7 @@ namespace Belle2 {
      * Performs a width first flood fill algorithm.
      * Returns total number of defined families.
      */
+    // cppcheck-suppress constParameter
     short defineFamilies(ContainerType& aNetwork)
     {
       short currentFamily = 0;

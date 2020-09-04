@@ -225,7 +225,7 @@ namespace Belle2 {
     void make_pi0_primary_vertex(int, double, double, const HepPoint3D&,
                                  const CLHEP::HepSymMatrix&); /**< Fill Mdst_pi0 based on the fit result. */
     void correct_ecl_primary_vertex(const HepPoint3D&,
-                                    const CLHEP::HepSymMatrix&); /**< */
+                                    const CLHEP::HepSymMatrix&); /**< Correct ecl using primary vertex */
     /** Treat pi0 mass width as a func. of pi0 momentum. */
     static double pi0resol(double, double, const char*, bool, int, int);
 

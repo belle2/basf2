@@ -1,6 +1,5 @@
 import basf2
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -22,6 +21,7 @@ import svd as svd
 import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 
+set_log_level(LogLevel.INFO)
 now = datetime.datetime.now()
 
 settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
@@ -64,6 +64,7 @@ def get_calibrations(input_data, **kwargs):
         if moda.name() == 'SVDCoGTimeEstimator':
             moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("CalibrationWithEventT0", False)
         if moda.name() == 'SVDSimpleClusterizer':
             moda.param("Clusters", 'SVDClustersFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
@@ -109,7 +110,8 @@ def get_calibrations(input_data, **kwargs):
     # collector setup
     collector = register_module('SVDCoGTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
-    collector.param("SVDRecoDigitsFromTracksName", "SVDRecoDigitsFromTracks")
+    collector.param("SVDEventInfoName", "SVDEventInfo")
+    collector.param("EventT0Name", "EventT0")
     collector.param("granularity", "run")
 
     # algorithm setup
@@ -130,6 +132,6 @@ def get_calibrations(input_data, **kwargs):
     calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in calibration.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
+        algorithm.params = {"iov_coverage": output_iov}
 
     return [calibration]

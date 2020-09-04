@@ -50,7 +50,7 @@ namespace Belle2 {
 
     PlumeCreator::PlumeCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     PlumeCreator::~PlumeCreator()
@@ -60,6 +60,8 @@ namespace Belle2 {
 
     void PlumeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
 
       //color attributions
       G4VisAttributes* FoamVisAtt  = new G4VisAttributes(G4Colour::Blue());

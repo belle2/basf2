@@ -236,7 +236,7 @@ namespace Belle2 {
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
-        return -1;
+        return std::numeric_limits<float>::quiet_NaN();
       }
 
       return roe->getNKLMClusters();
@@ -445,7 +445,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getNTracks(maskName);
@@ -472,7 +472,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getNECLClusters(maskName);
@@ -499,7 +499,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         // Get unused ECLClusters in ROE
@@ -534,7 +534,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getPhotons(maskName).size();
@@ -560,7 +560,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getHadrons(maskName).size();
@@ -595,13 +595,49 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->getChargedParticles(maskName, abs(pdgCode)).size();
       };
       return func;
     }
+
+    Manager::FunctionPtr nROE_Composites(const std::vector<std::string>& arguments)
+    {
+      std::string maskName = "";
+
+      if (arguments.size() == 1) {
+        maskName = arguments[0];
+      }
+      if (arguments.size() > 1) {
+        B2FATAL("Wrong number of arguments (1 required) for meta function nROE_Composites");
+      }
+      auto func = [maskName](const Particle * particle) -> double {
+
+        // Get related ROE object
+        const RestOfEvent* roe = getRelatedROEObject(particle);
+
+        if (!roe)
+        {
+          B2ERROR("Relation between particle and ROE doesn't exist!");
+          return std::numeric_limits<float>::quiet_NaN();
+        }
+        int result = 0;
+        auto particles = roe->getParticles(maskName, false);
+
+        for (auto roeParticle : particles)
+        {
+          if (roeParticle->getParticleSource() == Particle::c_Composite or
+          roeParticle->getParticleSource() == Particle::c_V0) {
+            result++;
+          }
+        }
+        return result;
+      };
+      return func;
+    }
+
 
     Manager::FunctionPtr nROE_ParticlesInList(const std::vector<std::string>& arguments)
     {
@@ -625,7 +661,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         int nPart = 0;
@@ -666,7 +702,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         // Get tracks in ROE
@@ -702,7 +738,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
@@ -735,7 +771,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
         auto roephotons = roe->getPhotons(maskName);
         TLorentzVector total4vector;
@@ -764,7 +800,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
@@ -792,7 +828,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return roe->get4Vector(maskName).Mag();
@@ -819,7 +855,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -848,7 +884,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -877,7 +913,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -906,7 +942,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -935,7 +971,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -964,7 +1000,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -993,7 +1029,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         PCmsLabTransform T;
@@ -1022,7 +1058,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         PCmsLabTransform T;
@@ -1195,21 +1231,6 @@ namespace Belle2 {
       return func;
     }
 
-    double REC_MissM2(const Particle* particle)
-    {
-      PCmsLabTransform T;
-      TLorentzVector rec4vecLAB = particle->get4Vector();
-      TLorentzVector rec4vec = T.rotateLabToCms() * rec4vecLAB;
-
-      TLorentzVector miss4vec;
-      double E_beam_cms = T.getCMSEnergy() / 2.0;
-
-      miss4vec.SetVect(-rec4vec.Vect());
-      miss4vec.SetE(E_beam_cms - rec4vec.Energy());
-
-      return miss4vec.Mag2();
-    }
-
     Manager::FunctionPtr WE_MissPTheta(const std::vector<std::string>& arguments)
     {
       std::string maskName;
@@ -1232,7 +1253,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Theta();
@@ -1262,7 +1283,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Vect().Mag();
@@ -1292,7 +1313,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Vect().Px();
@@ -1322,7 +1343,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Vect().Py();
@@ -1352,7 +1373,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Vect().Pz();
@@ -1382,7 +1403,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         return missing4Vector(particle, maskName, opt).Energy();
@@ -1409,7 +1430,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         double pz = 0;
@@ -1425,9 +1446,13 @@ namespace Belle2 {
           energy += recTrackParticle->getEnergy();
         }
 
-        // "Loop" the ROE side
-        pz += roe->get4VectorTracks(maskName).Vect().Pz();
-        energy += roe->get4VectorTracks(maskName).Energy();
+        // Loop the ROE side
+        auto roeParticles = roe->getChargedParticles(maskName);
+        for (auto* roeParticle : roeParticles)
+        {
+          pz += roeParticle->getPz();
+          energy += roeParticle->getEnergy();
+        }
 
         return pz / energy;
       };
@@ -1453,7 +1478,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         PCmsLabTransform T;
@@ -1463,104 +1488,6 @@ namespace Belle2 {
         return missing4Vector(particle, maskName, "5").Mag2() / (2.0 * missing4Vector(particle, maskName, "5").Energy());
       };
       return func;
-    }
-
-    double REC_q2BhSimple(const Particle* particle)
-    {
-      // calculates q^2 = (p_B - p_h) in decays of B -> h_1 .. h_n ell nu_ell,
-      // where p_h = Sum_i^n p_h_i is the 4-momentum of hadrons in the final
-      // state. The calculation is performed in the CMS system, where B-meson
-      // is assumed to be at rest p_B = (m_B, 0).
-
-      TLorentzVector hadron4vec;
-
-      int n = particle->getNDaughters();
-
-      if (n < 1)
-        return std::numeric_limits<float>::quiet_NaN();
-
-      // TODO: avoid hardocoded values
-      for (unsigned i = 0; i < particle->getNDaughters(); i++) {
-        int absPDG = abs(particle->getDaughter(i)->getPDGCode());
-        if (absPDG == 11 || absPDG == 13 || absPDG == 15)
-          continue;
-
-        hadron4vec += particle->getDaughter(i)->get4Vector();
-      }
-
-      // boost to CMS
-      PCmsLabTransform T;
-      TLorentzVector phCMS = T.rotateLabToCms() * hadron4vec;
-      TLorentzVector pBCMS;
-      pBCMS.SetXYZM(0.0, 0.0, 0.0, particle->getPDGMass());
-
-      return (pBCMS - phCMS).Mag2();
-    }
-
-    double REC_q2Bh(const Particle* particle)
-    {
-      // calculates q^2 = (p_B - p_h) in decays of B -> h_1 .. h_n ell nu_ell,
-      // where p_h = Sum_i^n p_h_i is the 4-momentum of hadrons in the final
-      // state. The calculation is performed in the CMS system,
-      // with a weighter average in a cone around the true B direction
-
-      TLorentzVector hadron4vec;
-
-      int n = particle->getNDaughters();
-
-      if (n < 1)
-        return std::numeric_limits<float>::quiet_NaN();
-
-      for (unsigned i = 0; i < particle->getNDaughters(); i++) {
-        int absPDG = abs(particle->getDaughter(i)->getPDGCode());
-        if (absPDG == 11 || absPDG == 13 || absPDG == 15)
-          continue;
-
-        hadron4vec += particle->getDaughter(i)->get4Vector();
-      }
-
-      // boost to CMS
-      PCmsLabTransform T;
-      TLorentzVector had_cm = T.rotateLabToCms() * hadron4vec;
-      TLorentzVector Y_cm = T.rotateLabToCms() * particle->get4Vector();
-
-      // Recycled code from Uwe Gebauer <uwe.gebauer@phys.uni-goettingen.de>
-
-      double bmass = particle->getPDGMass();
-
-      // B theta angle
-      double cos_cone_angle = Variable::cosThetaBetweenParticleAndNominalB(particle);
-
-      if (abs(cos_cone_angle) > 1) {
-        //makes no sense in this case, return simple value
-        return Variable::REC_q2BhSimple(particle);
-      }
-
-      double thetaBY = TMath::ACos(cos_cone_angle);
-      const double E_B = T.getCMSEnergy() / 2.0;
-      const double p_B = sqrt(E_B * E_B - bmass * bmass);
-
-      double phi_start = gRandom->Uniform(0, TMath::Pi() / 2);
-
-      double q2 = 0;
-      double denom = 0;
-
-      for (int around_the_cone = 0; around_the_cone < 4; around_the_cone++) {
-        TLorentzVector one_B(1, 1, 1, E_B);
-        double B_theta = Y_cm.Theta() + thetaBY * cos(phi_start + around_the_cone / 2.*TMath::Pi());
-        double B_phi = Y_cm.Phi() + thetaBY * sin(phi_start + around_the_cone / 2.*TMath::Pi());
-        one_B.SetTheta(B_theta);
-        one_B.SetPhi(B_phi);
-        one_B.SetRho(p_B);
-        one_B.SetE(E_B);
-        double this_q2 = (one_B - had_cm).Mag2();
-        q2 += this_q2 * sin(B_theta) * sin(B_theta);
-        denom += sin(B_theta) * sin(B_theta);
-      }
-
-      q2 /= denom;
-
-      return q2;
     }
 
     Manager::FunctionPtr WE_q2lnuSimple(const std::vector<std::string>& arguments)
@@ -1585,7 +1512,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         int n = particle->getNDaughters();
@@ -1626,7 +1553,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return -1;
+          return std::numeric_limits<float>::quiet_NaN();
         }
 
         int n = particle->getNDaughters();
@@ -1751,14 +1678,12 @@ namespace Belle2 {
 
       auto func = [maskName](const Particle * particle) -> double {
 
-        double result = -1;
+        double result = 0;
 
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (not roe.isValid())
-          return result;
+          return std::numeric_limits<float>::quiet_NaN();
 
-        if (maskName == "")
-          return 1.0;
         if (roe->hasParticle(particle, maskName))
         {
           return 1.0;
@@ -2069,7 +1994,8 @@ namespace Belle2 {
 
     double isInThisRestOfEvent(const Particle* particle, const RestOfEvent* roe, const std::string& maskName)
     {
-      if (particle->getParticleSource() == Particle::c_Composite) {
+      if (particle->getParticleSource() == Particle::c_Composite or
+          particle->getParticleSource() == Particle::c_V0) {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
         for (auto& i : fspDaug) {
           if (isInThisRestOfEvent(i, roe, maskName) == 0)
@@ -2183,6 +2109,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
                       "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.");
 
+    REGISTER_VARIABLE("nROE_Composites(maskName)", nROE_Composites,
+                      "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.");
+
     REGISTER_VARIABLE("nROE_ParticlesInList(pListName)", nROE_ParticlesInList,
                       "Returns the number of particles in ROE from the given particle list.\n"
                       "Use of variable aliases is advised.");
@@ -2235,10 +2164,6 @@ namespace Belle2 {
     REGISTER_VARIABLE("weMissM2(maskName, opt)", WE_MissM2,
                       "Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options)");
 
-    REGISTER_VARIABLE("recMissM2", REC_MissM2,
-                      "Returns the invariant mass squared of the missing momentum calculated assumings the"
-                      "reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\\nu = p_B - p_\\mathrm{had} - p_\\mathrm{lep}`");
-
     REGISTER_VARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta,
                       "Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options)");
 
@@ -2287,16 +2212,6 @@ The neutrino momentum is calculated from ROE taking into account the specified m
     
 )DOC");
 
-    REGISTER_VARIABLE("recQ2BhSimple", REC_q2BhSimple,
-                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
-                      "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1 ... H_n \\ell \\nu_\\ell`.\n"
-                      "The B meson momentum in CMS is assumed to be 0.");
-
-    REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
-                      "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
-                      "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`.\n"
-                      "This calculation uses a weighted average of the B meson around the reco B cone");
-
     REGISTER_VARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
@@ -2312,7 +2227,7 @@ The neutrino momentum is calculated from ROE taking into account the specified m
                       "Returns missing mass squared over missing energy");
 
     REGISTER_VARIABLE("passesROEMask(maskName)", passesROEMask,
-                      "Returns boolean value if track or eclCluster type particle passes a certain mask or not. Only to be used in for_each path");
+                      "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path, otherwise returns quiet NaN.");
 
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");

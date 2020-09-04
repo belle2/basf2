@@ -11,8 +11,6 @@
 // basf2
 #include <framework/core/HistoModule.h>
 #include <top/modules/TOPWaveformQualityPlotter/TOPWaveformQualityPlotterModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/pcore/RbTuple.h>
 
 // stl
 #include <utility>

@@ -279,7 +279,7 @@ namespace Belle2 {
   }
 
   bool ParticleVertexFitterModule::fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren,
-                                                    std::vector<const Particle*>& pi0Children)
+                                                    std::vector<const Particle*>& twoPhotonChildren)
   {
     if (m_decayString.empty()) {
       // if decayString is empty, just use all primary daughters
@@ -304,18 +304,20 @@ namespace Belle2 {
         B2WARNING("Daughter with PDG code " << child->getPDGCode() << " does not have a valid error matrix.");
         return false; // error matrix not valid
       }
-      bool isPi0 = false;
+      bool isTwoPhotonParticle = false;
       if (m_hasCovMatrix == false) {
-        if (child->getPDGCode() == Const::pi0.getPDGCode() && child->getNDaughters() == 2) {
-          if (child->getDaughter(0)->getPDGCode() == Const::photon.getPDGCode()
-              && child->getDaughter(1)->getPDGCode() == Const::photon.getPDGCode()) {
-            isPi0 = true;
+        if (child->getPDGCode() == Const::pi0.getPDGCode() or child->getPDGCode() == 221) { // pi0 or eta
+          if (child->getNDaughters() == 2) {
+            if (child->getDaughter(0)->getPDGCode() == Const::photon.getPDGCode()
+                && child->getDaughter(1)->getPDGCode() == Const::photon.getPDGCode()) {
+              isTwoPhotonParticle = true;
+            }
           }
         }
       }
-      if (isPi0) {
-        // move children from fitChildren to pi0Children
-        pi0Children.push_back(child);
+      if (isTwoPhotonParticle) {
+        // move children from fitChildren to twoPhotonChildren
+        twoPhotonChildren.push_back(child);
         itr = fitChildren.erase(itr);
       } else {
         itr++;
@@ -325,13 +327,14 @@ namespace Belle2 {
     return true;
   }
 
-  bool ParticleVertexFitterModule::redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit& kv)
+  bool ParticleVertexFitterModule::redoTwoPhotonDaughterMassFit(Particle* postFit, const Particle* preFit,
+      const analysis::VertexFitKFit& kv)
   {
     // TODO: something like setGammaError is necessary
     // this is just workaround for the moment
 
-    const Particle* g1Orig = pi0Orig->getDaughter(0);
-    const Particle* g2Orig = pi0Orig->getDaughter(1);
+    const Particle* g1Orig = preFit->getDaughter(0);
+    const Particle* g2Orig = preFit->getDaughter(1);
     Particle g1Temp(g1Orig->get4Vector(), 22);
     Particle g2Temp(g2Orig->get4Vector(), 22);
 
@@ -352,7 +355,7 @@ namespace Belle2 {
     g1Temp.updateMomentum(g1Orig->get4Vector(), pos, g1ErrMatrix, 1.0);
     g2Temp.updateMomentum(g2Orig->get4Vector(), pos, g2ErrMatrix, 1.0);
 
-    // perform the mass fit for pi0
+    // perform the mass fit for the two-photon particle
     analysis::MassFitKFit km;
     km.setMagneticField(m_Bfield);
 
@@ -361,17 +364,17 @@ namespace Belle2 {
 
     km.setVertex(kv.getVertex());
     km.setVertexError(kv.getVertexError());
-    km.setInvariantMass(pi0Orig->getPDGMass());
+    km.setInvariantMass(preFit->getPDGMass());
 
     int err = km.doFit();
     if (err != 0) {
       return false;
     }
 
-    // The update of the daughters is disabled for the pi0 mass fit.
+    // The update of the daughters is disabled for this mass fit.
     bool updateDaughters = m_updateDaughters;
     m_updateDaughters = false;
-    bool ok = makeKMassMother(km, pi0Temp);
+    bool ok = makeKMassMother(km, postFit);
     m_updateDaughters = updateDaughters;
 
     return ok;
@@ -382,14 +385,14 @@ namespace Belle2 {
     if ((mother->getNDaughters() < 2 && !ipTubeConstraint) || mother->getNDaughters() < 1) return false;
 
     std::vector<const Particle*> fitChildren;
-    std::vector<const Particle*> pi0Children;
-    bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
+    std::vector<const Particle*> twoPhotonChildren;
+    bool validChildren = fillFitParticles(mother, fitChildren, twoPhotonChildren);
 
     if (!validChildren)
       return false;
 
-    if (pi0Children.size() > 1) {
-      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFit does not support fit with multiple pi0s (yet).");
+    if (twoPhotonChildren.size() > 1) {
+      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] Vertex fit using KFit does not support fit with multiple particles decaying to two photons like pi0 (yet).");
     }
 
     if ((fitChildren.size() < 2 && !ipTubeConstraint) || fitChildren.size() < 1) {
@@ -416,17 +419,18 @@ namespace Belle2 {
       return false;
 
     bool ok = false;
-    if (pi0Children.size() == 0)
+    if (twoPhotonChildren.size() == 0)
       // in the case daughters do not include pi0 - this is it (fit done)
       ok = makeKVertexMother(kv, mother);
-    else if (pi0Children.size() == 1) {
-      // the daughters contain pi0:
-      // 1. refit pi0 to previously determined vertex
-      // 2. redo the fit using all particles (including pi0 this time)
+    else if (twoPhotonChildren.size() == 1) {
+      // there is a daughter reconstructed from two photons so without position information
+      // 1. determine vertex based on all other valid daughters
+      // 2. set position and error matrix of two-photon daughter to previously determined vertex
+      // 3. redo the fit using all particles (including two-photon particle this time)
 
-      const Particle* pi0 = pi0Children[0];
-      Particle pi0Temp(pi0->get4Vector(), 111);
-      ok = redoPi0MassFit(&pi0Temp, pi0, kv) ;
+      const Particle* twoPhotonDaughter = twoPhotonChildren[0];
+      Particle fixedTwoPhotonDaughter(twoPhotonDaughter->get4Vector(), twoPhotonDaughter->getPDGCode());
+      ok = redoTwoPhotonDaughterMassFit(&fixedTwoPhotonDaughter, twoPhotonDaughter, kv);
       if (!ok)
         return false;
 
@@ -437,7 +441,7 @@ namespace Belle2 {
       for (auto& child : fitChildren)
         kv2.addParticle(child);
 
-      kv2.addParticle(&pi0Temp);
+      kv2.addParticle(&fixedTwoPhotonDaughter);
 
       if (ipProfileConstraint)
         addIPProfileToKFit(kv2);
@@ -458,14 +462,14 @@ namespace Belle2 {
     if (mother->getNDaughters() < 2) return false;
 
     std::vector<const Particle*> fitChildren;
-    std::vector<const Particle*> pi0Children;
-    bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
+    std::vector<const Particle*> twoPhotonChildren;
+    bool validChildren = fillFitParticles(mother, fitChildren, twoPhotonChildren);
 
     if (!validChildren)
       return false;
 
-    if (pi0Children.size() > 1) {
-      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFit does not support fit with multiple pi0s (yet).");
+    if (twoPhotonChildren.size() > 1) {
+      B2FATAL("[ParticleVertexFitterModule::doKVertexFit] MassVertex fit using KFit does not support fit with multiple particles decaying to two photons like pi0 (yet).");
     }
 
     if (fitChildren.size() < 2) {
@@ -474,7 +478,7 @@ namespace Belle2 {
     }
 
     bool ok = false;
-    if (pi0Children.size() == 0) {
+    if (twoPhotonChildren.size() == 0) {
       // Initialise the Fitter
       analysis::MassVertexFitKFit kmv;
       kmv.setMagneticField(m_Bfield);
@@ -487,12 +491,13 @@ namespace Belle2 {
       if (err != 0)
         return false;
 
-      // in the case daughters do not include pi0 - this is it (fit done)
+      // in the case daughters do not include particles with two photon daughters like pi0 - this is it (fit done)
       ok = makeKMassVertexMother(kmv, mother);
-    } else if (pi0Children.size() == 1) {
-      // the daughters contain pi0:
-      // 1. refit pi0 to previously determined vertex
-      // 2. redo the fit using all particles (including pi0 this time)
+    } else if (twoPhotonChildren.size() == 1) {
+      // there is a daughter reconstructed from two photons so without position information
+      // 1. determine vertex based on all other valid daughters
+      // 2. set position and error matrix of two-photon daughter to previously determined vertex
+      // 3. redo the fit using all particles (including two-photon particle this time)
 
       analysis::VertexFitKFit kv;
       kv.setMagneticField(m_Bfield);
@@ -505,9 +510,9 @@ namespace Belle2 {
       if (err != 0)
         return false;
 
-      const Particle* pi0 = pi0Children[0];
-      Particle pi0Temp(pi0->get4Vector(), 111);
-      ok = redoPi0MassFit(&pi0Temp, pi0, kv) ;
+      const Particle* twoPhotonDaughter = twoPhotonChildren[0];
+      Particle fixedTwoPhotonDaughter(twoPhotonDaughter->get4Vector(), twoPhotonDaughter->getPDGCode());
+      ok = redoTwoPhotonDaughterMassFit(&fixedTwoPhotonDaughter, twoPhotonDaughter, kv);
       if (!ok)
         return false;
 
@@ -517,7 +522,7 @@ namespace Belle2 {
 
       for (auto child : fitChildren)
         kmv2.addParticle(child);
-      kmv2.addParticle(&pi0Temp);
+      kmv2.addParticle(&fixedTwoPhotonDaughter);
 
       kmv2.setInvariantMass(mother->getPDGMass());
       err = kmv2.doFit();
@@ -541,14 +546,14 @@ namespace Belle2 {
     if (mother->getNDaughters() < 2) return false;
 
     std::vector<const Particle*> fitChildren;
-    std::vector<const Particle*> pi0Children;
-    bool validChildren = fillFitParticles(mother, fitChildren, pi0Children);
+    std::vector<const Particle*> twoPhotonChildren;
+    bool validChildren = fillFitParticles(mother, fitChildren, twoPhotonChildren);
 
     if (!validChildren)
       return false;
 
-    if (pi0Children.size() > 0) {
-      B2FATAL("[ParticleVertexFitterModule::doKMassPointingVertexFit] MassPointingVertex fit using KFit does not support fit with pi0s (yet).");
+    if (twoPhotonChildren.size() > 0) {
+      B2FATAL("[ParticleVertexFitterModule::doKMassPointingVertexFit] MassPointingVertex fit using KFit does not support fit with two-photon daughters (yet).");
     }
 
     if (fitChildren.size() < 2) {

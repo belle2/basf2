@@ -67,7 +67,7 @@ void ROIPayloadAssemblerModule::initialize()
 
 void ROIPayloadAssemblerModule::event()
 {
-  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+  const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
   unsigned int evtNr = m_eventMetaData->getEvent();
   unsigned int countROIs = 0;
   bool accepted = true;

@@ -1,12 +1,13 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
+import ROOT
 import basf2 as b2
 import modularAnalysis as ma
 from variables import variables as vm
 from stdCharged import stdPi
 from stdPhotons import stdPhotons
-from skim.taupair import SetTauGenericSkimVariables
+from skim.taupair import TauGeneric
 
 """
 <header>
@@ -24,7 +25,7 @@ stdPi('all', path=taugenericskim)
 stdPhotons('all', path=taugenericskim)
 
 # set variables
-SetTauGenericSkimVariables(path=taugenericskim)
+TauGeneric().additional_setup(path=taugenericskim)
 
 vm.addAlias('Theta_miss', 'formula(missingMomentumOfEvent_theta*180/3.14159)')
 
@@ -48,7 +49,6 @@ print(b2.statistics)
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
-import ROOT
 
 f = ROOT.TFile.Open('TauGeneric_Validation.root', 'update')
 

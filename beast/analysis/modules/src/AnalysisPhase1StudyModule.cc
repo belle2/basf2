@@ -123,7 +123,7 @@ void AnalysisPhase1StudyModule::event()
   double s = 0;
   //double xraw = 0;
   //double yraw = 0;
-  double sraw = 0;
+  //double sraw = 0;
   double E = 0;
   double rate = 0;
   StoreArray<SADMetaHit> sadMetaHits;
@@ -135,7 +135,7 @@ void AnalysisPhase1StudyModule::event()
     s = sadMetaHit.gets();
     //xraw = sadMetaHit.getxraw();
     //yraw = sadMetaHit.getyraw();
-    sraw = sadMetaHit.getsraw();
+    double sraw = sadMetaHit.getsraw();
     E = sadMetaHit.getE();
     rate = sadMetaHit.getrate();
     h_sad_sir[0]->Fill(s / 100., rate);

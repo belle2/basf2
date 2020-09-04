@@ -1,0 +1,7 @@
+Import('env')
+
+# env['LIBS'] = ['framework','rawdata' ,'trg', 'trg_gdl_dataobjects','rawdata_dataobjects']
+# env['LIBS'] = ['framework', 'mdst_dataobjects', 'rawdata' ,'analysis', 'trg', 'trg_trg', 'trg_gdl_dataobjects','rawdata_dataobjects']
+env['LIBS'] = ['framework', 'mdst_dataobjects', 'trg', 'trg_gdl_dataobjects', 'rawdata_dataobjects']
+
+Return('env')

@@ -12,6 +12,7 @@
 #include <map>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <TObject.h>
 #include <cdc/dataobjects/WireID.h>
@@ -84,6 +85,7 @@ namespace Belle2 {
     /**
      * Check if dead wire
      * @param  wid wire id to be checked
+     * @param  eff efficiency of the wirte
      * @return true if dead wire; false if not
      */
     bool isDeadWire(const WireID& wid, double& eff) const

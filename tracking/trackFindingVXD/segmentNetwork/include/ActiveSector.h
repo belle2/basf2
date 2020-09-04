@@ -41,7 +41,7 @@ namespace Belle2 {
     /** ************************* CONSTRUCTORS ************************* */
 
     /** Default constructor for root compatibility */
-    ActiveSector(): m_staticSector(NULL), m_identifier(-1) {}
+    ActiveSector(): m_staticSector(nullptr), m_identifier(-1) {}
 
     /** Constructor.
      * @param staticSector pointer to static sector associated with this one.
@@ -119,7 +119,7 @@ namespace Belle2 {
 
 
     /** adds new several new hits to vector of hits  */
-    inline void addHits(std::vector<HitType*>& newHits)
+    inline void addHits(const std::vector<HitType*>& newHits)
     {
       for (HitType* aHit : newHits) { addHit(aHit); }
     }

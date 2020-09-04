@@ -8,9 +8,9 @@
 
 # avoid race conditions beetween pyroot and GUI thread
 from ROOT import PyConfig
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 from ROOT import gROOT
-gROOT.SetBatch()
+gROOT.SetBatch()  # noqa
 
 from basf2 import *
 import sys

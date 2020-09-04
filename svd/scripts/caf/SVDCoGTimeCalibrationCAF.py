@@ -1,5 +1,4 @@
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -21,6 +20,7 @@ import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 import svd as svd
 
+set_log_level(LogLevel.INFO)
 input_branches = [
     'SVDShaperDigitsFromTracks',
     'EventT0',
@@ -62,6 +62,7 @@ def pre_collector():
         if moda.name() == 'SVDCoGTimeEstimator':
             moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+            moda.param("CalibrationWithEventT0", False)
         if moda.name() == 'SVDSimpleClusterizer':
             moda.param("Clusters", 'SVDClustersFromTracks')
             moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
@@ -110,6 +111,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
     calibration.strategies = strategies.SequentialBoundaries
 
     return calibration
+
 
 if __name__ == "__main__":
 

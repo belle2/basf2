@@ -13,12 +13,10 @@
 
 #include <trg/cdc/modules/trgcdct3dConverter/TRGCDCT3DConverterModule.h>
 #include <bitset>
-#include <iomanip>
 #include "trg/cdc/Fitter3D.h"
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/JSignal.h"
 #include "trg/cdc/JSignalData.h"
-#include "trg/cdc/JLUT.h"
 
 using namespace std;
 using namespace Belle2;

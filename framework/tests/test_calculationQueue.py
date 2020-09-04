@@ -60,6 +60,7 @@ class TestCalculationQueue(TestCase):
         self.assertIn("TestItem", self.calculation_queue.get_keys())
         self.assertIn("TestItem2", self.calculation_queue.get_keys())
 
+
 if __name__ == "__main__":
     main()
 # @endcond

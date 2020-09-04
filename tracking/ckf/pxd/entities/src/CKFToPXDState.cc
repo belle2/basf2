@@ -62,15 +62,13 @@ const std::vector<PXDRecoHit>& CKFToPXDState::getRecoHits() const
 CKFToPXDState::CKFToPXDState(const SpacePoint* hit) : CKFState<RecoTrack, SpacePoint>(hit)
 {
   for (const PXDCluster& pxdCluster : hit->getRelationsTo<PXDCluster>()) {
-    // cppcheck-suppress useStlAlgorithm
     m_recoHits.emplace_back(&pxdCluster);
   }
   m_stateCache.isHitState = true;
   m_stateCache.sensorID = hit->getVxdID();
   m_stateCache.geoLayer = this->getGeometricalLayer();
   m_stateCache.ladder = m_stateCache.sensorID.getLadderNumber();
-  VXD::GeoCache& geoCache = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensorInfo = geoCache.getSensorInfo(hit->getVxdID());
+  const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(hit->getVxdID());
   m_stateCache.sensorCenterPhi = sensorInfo.pointToGlobal(TVector3(0., 0., 0.), true).Phi();
   m_stateCache.phi = hit->getPosition().Phi();
   m_stateCache.theta = hit->getPosition().Theta();

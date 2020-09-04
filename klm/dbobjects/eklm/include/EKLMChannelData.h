@@ -25,12 +25,16 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EKLMChannelData();
+    EKLMChannelData()
+    {
+    }
 
     /**
      * Destructor.
      */
-    ~EKLMChannelData();
+    ~EKLMChannelData()
+    {
+    }
 
     /**
      * Get pedestal.

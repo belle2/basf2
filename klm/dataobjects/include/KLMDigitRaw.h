@@ -140,7 +140,7 @@ namespace Belle2 {
      */
     uint16_t getCtime() const
     {
-      return KLM::RawData::unpackCtime(m_word2);
+      return KLM::RawData::unpackCTime(m_word2);
     }
 
     /**
@@ -148,7 +148,7 @@ namespace Belle2 {
      */
     uint16_t getTdc()
     {
-      return KLM::RawData::unpackTdc(m_word3);
+      return KLM::RawData::unpackTDC(m_word3);
     }
 
     /**

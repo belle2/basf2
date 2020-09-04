@@ -24,12 +24,10 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDEventInfo.h>
-#include <boost/tuple/tuple.hpp>
 #include <fstream>
 #include <sstream>
 #include <regex>
 #include <algorithm>
-#include <numeric>
 #include <deque>
 #include <cmath>
 #include <root/TMath.h>
@@ -60,6 +58,7 @@ REG_MODULE(SVDDigitizer)
 
 std::string Belle2::SVD::SVDDigitizerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 SVDDigitizerModule::SVDDigitizerModule() : Module(),
+  m_currentSensor(nullptr),
   m_mapping(m_xmlFileName)
 {
   //Set module properties
@@ -670,17 +669,8 @@ void SVDDigitizerModule::saveDigits()
   //Get SVD config from SVDEventInfo
   //  int runType = (int) modeByte.getRunType();
   //  int eventType = (int) modeByte.getEventType();
-  int daqMode = (int) modeByte.getDAQMode();
 
-  int nAPV25Samples = 0;
-  if (daqMode == 2)
-    nAPV25Samples = 6;
-  else if (daqMode == 1)
-    nAPV25Samples = 3;
-  else if (daqMode == 0)
-    nAPV25Samples = 1;
-  else
-    B2ERROR("daqMode not recongized, check SVDEventInfoSetter parameters");
+  int nAPV25Samples = storeSVDEvtInfo->getNSamples();
 
   // ... to store digit-digit relations
   vector<pair<unsigned int, float> > digit_weights;
@@ -729,6 +719,8 @@ void SVDDigitizerModule::saveDigits()
           samples.push_back(addNoise(s(t), elNoiseU));
           t += m_samplingTime;
         }
+        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+          samples.push_back(0);
       }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
@@ -757,7 +749,7 @@ void SVDDigitizerModule::saveDigits()
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0, modeByte));
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, true, iStrip, rawSamples, 0));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {
@@ -808,6 +800,8 @@ void SVDDigitizerModule::saveDigits()
           samples.push_back(addNoise(s(t), elNoiseV));
           t += m_samplingTime;
         }
+        for (int iSample = nAPV25Samples; iSample < 6; iSample++)
+          samples.push_back(0);
       }
 
       SVDSignal::relations_map particles = s.getMCParticleRelations();
@@ -836,7 +830,7 @@ void SVDDigitizerModule::saveDigits()
 
       // 3. Save as a new digit
       int digIndex = storeShaperDigits.getEntries();
-      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0, modeByte));
+      storeShaperDigits.appendNew(SVDShaperDigit(sensorID, false, iStrip, rawSamples, 0));
 
       //If the digit has any relations to MCParticles, add the Relation
       if (particles.size() > 0) {

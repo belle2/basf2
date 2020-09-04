@@ -10,8 +10,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLCrystalsShapeAndPosition_H
-#define ECLCrystalsShapeAndPosition_H
+#pragma once
 #include <TObject.h>
 
 namespace Belle2 {
@@ -104,4 +103,3 @@ namespace Belle2 {
     ClassDef(ECLCrystalsShapeAndPosition, 1); /**< ClassDef */
   };
 } // end namespace Belle2
-#endif

@@ -4,9 +4,6 @@
 #include <math.h>
 #include <utility>
 #include <boost/math/tools/minima.hpp>
-#include <boost/math/tools/roots.hpp>
-#include <CLHEP/Matrix/Matrix.h>
-#include <CLHEP/Matrix/SymMatrix.h>
 
 using namespace Belle2::SVD;
 using namespace std;

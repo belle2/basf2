@@ -10,18 +10,7 @@
 
 #include <reconstruction/modules/CombinedPIDPerformance/CombinedPIDPerformanceModule.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationVector.h>
-
-#include <root/TTree.h>
-#include <root/TAxis.h>
 #include <root/TObject.h>
-
-#include <boost/foreach.hpp>
-
-#include <typeinfo>
-#include <cxxabi.h>
 
 using namespace Belle2;
 
@@ -193,9 +182,8 @@ void CombinedPIDPerformanceModule::event()
     }
 
     const MCParticle* mcParticle = track.getRelated<MCParticle>();
-    int pdg = 0;
     if (!mcParticle) continue;
-    if (mcParticle) pdg = mcParticle->getPDG();
+    int pdg = mcParticle->getPDG();
 
     // apply some loose cuts on track quality and production vertex
     if (trackFit->getPValue() < 0.001) continue;

@@ -52,7 +52,7 @@ gROOT.ProcessLine('struct EventDataCluster {\
 };')
 
 
-from ROOT import EventDataCluster
+from ROOT import EventDataCluster  # noqa
 
 
 class SVDValidationTTreeCluster(Module):

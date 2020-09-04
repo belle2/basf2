@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef VXDDEDXLIKELIHOOD_H
-#define VXDDEDXLIKELIHOOD_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
@@ -56,4 +55,3 @@ namespace Belle2 {
     ClassDef(VXDDedxLikelihood, 1); /**< Container for likelihoods obtained by the VXD dE/dx PID (VXDDedxPIDModule). */
   };
 }
-#endif

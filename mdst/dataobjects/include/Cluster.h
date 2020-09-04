@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CLUSTER_H
-#define CLUSTER_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
@@ -153,5 +152,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

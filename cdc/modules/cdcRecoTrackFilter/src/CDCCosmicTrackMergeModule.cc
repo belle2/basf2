@@ -36,29 +36,22 @@ CDCCosmicTrackMergerModule::CDCCosmicTrackMergerModule() : Module()
 
 void CDCCosmicTrackMergerModule::initialize()
 {
-  StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  recoTracks.isRequired();
-
-  StoreArray<RecoTrack> MergedRecoTracks(m_param_MergedRecoTracksStoreArrayName);
-  MergedRecoTracks.registerInDataStore();
-
-  RecoTrack::registerRequiredRelations(MergedRecoTracks);
+  m_RecoTracks.isRequired(m_param_recoTracksStoreArrayName);
+  m_MergedRecoTracks.registerInDataStore(m_param_MergedRecoTracksStoreArrayName);
+  RecoTrack::registerRequiredRelations(m_MergedRecoTracks);
 }
 
 void CDCCosmicTrackMergerModule::event()
 {
-  StoreArray<RecoTrack> recoTrackStoreArray(m_param_recoTracksStoreArrayName);
-  StoreArray<RecoTrack> MergedRecoTracks(m_param_MergedRecoTracksStoreArrayName);
-
-  if (recoTrackStoreArray.getEntries() == 2) {
-    if (recoTrackStoreArray[0]->getNumberOfCDCHits() > m_MinimumNumHitCut
-        && recoTrackStoreArray[1]->getNumberOfCDCHits() > m_MinimumNumHitCut) {
+  if (m_RecoTracks.getEntries() == 2) {
+    if (m_RecoTracks[0]->getNumberOfCDCHits() > m_MinimumNumHitCut
+        && m_RecoTracks[1]->getNumberOfCDCHits() > m_MinimumNumHitCut) {
       //  if(recoTrackStoreArray[0].getPositionSeed().Y() * recoTrackStoreArray[1].getPositionSeed().Y() >0) continue;
 
       std::vector<RecoTrack*> recoTracks;
-      recoTracks.reserve(static_cast<unsigned int>(recoTrackStoreArray.getEntries()));
+      recoTracks.reserve(static_cast<unsigned int>(m_RecoTracks.getEntries()));
 
-      for (RecoTrack& recoTrack : recoTrackStoreArray) {
+      for (RecoTrack& recoTrack : m_RecoTracks) {
         recoTracks.push_back(&recoTrack);
       }
 
@@ -70,9 +63,9 @@ void CDCCosmicTrackMergerModule::event()
       RecoTrack* lowerTrack = recoTracks[1];
       B2DEBUG(99, "upper track posSeed :" << upperTrack->getPositionSeed().Y());
       B2DEBUG(99, "Lowee track posSeed :" << lowerTrack->getPositionSeed().Y());
-      RecoTrack* MergedRecoTrack = MergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
-                                                              upperTrack->getMomentumSeed(),
-                                                              upperTrack->getChargeSeed());
+      RecoTrack* MergedRecoTrack = m_MergedRecoTracks.appendNew(upperTrack->getPositionSeed(),
+                                                                upperTrack->getMomentumSeed(),
+                                                                upperTrack->getChargeSeed());
       // retain the seed time of the original track. Important for t0 extraction.
       MergedRecoTrack->setTimeSeed(upperTrack->getTimeSeed());
       MergedRecoTrack->addHitsFromRecoTrack(upperTrack);

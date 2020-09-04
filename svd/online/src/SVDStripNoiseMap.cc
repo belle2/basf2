@@ -11,7 +11,6 @@
 #include <svd/online/SVDStripNoiseMap.h>
 #include <framework/logging/Logger.h>
 
-#include <iostream>
 #include <cstdlib>
 #include <fstream>
 
@@ -46,7 +45,7 @@ int SVDStripNoiseMap::initializeMap(const string& noisefilename)
     return 0;
   }
 
-  if (m_onl2offl_map_ptr == NULL) {
+  if (m_onl2offl_map_ptr == nullptr) {
     B2ERROR("SVDOnlineToOfflineMap is not assigned correctly.");
     return -1;
   }

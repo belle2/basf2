@@ -151,6 +151,7 @@ void PXDPostErrorCheckerModule::event()
   bool had_dhe = false;
   unsigned short triggergate = 0;
   unsigned short dheframenr = 0;
+  std::map <int, int> found_dhe;
   PXDErrorFlags mask = EPXDErrMask::c_NO_ERROR;
   B2DEBUG(25, "Iterate PXD Packets for this Event");
   for (auto& pkt : *m_storeDAQEvtStats) {
@@ -159,6 +160,7 @@ void PXDPostErrorCheckerModule::event()
       B2DEBUG(25, "Iterate DHE in DHC " << dhc.getDHCID());
       for (auto& dhe : dhc) {
         B2DEBUG(25, "Iterate DHP in DHE " << dhe.getDHEID() << " TrigGate " << dhe.getTriggerGate() << " FrameNr " << dhe.getFrameNr());
+        found_dhe[dhe.getDHEID()]++;
         if (had_dhe) {
           if (dhe.getTriggerGate() != triggergate) {
             if (!m_ignoreTriggerGate) B2WARNING("Trigger Gate of DHEs not identical" << LogVar("Triggergate 1",
@@ -194,6 +196,23 @@ void PXDPostErrorCheckerModule::event()
       }
     }
   }
+
+  /// the following does only work with the overlapping trigger firmware.
+  /// TODO make this check depending on firmware version database object (not yet existing)
+  for (auto& a : found_dhe) {
+    if (a.second > 1) B2WARNING("More than one packet for same DHE ID " << a.first);
+  }
+  /// the following checks would require the (not yet existing) database object which marks the available modules
+//  for (auto& a : found_dhe) {
+//    if (!m_dhe_expected[a.first]) B2ERROR("This DHE ID was not expected " << a.first);
+//  }
+//  for (auto& a : m_dhe_expected) {
+//    if (a.second) {
+//      if (found_dhe[a.first] == 0) B2ERROR("DHE packet missing for DHE ID " << a.first);
+//    } else {
+//      if (found_dhe[a.first] > 0) B2ERROR("This DHE ID was not expected " << a.first);
+//    }
+//  }
   m_storeDAQEvtStats->addErrorMask(mask);
   m_storeDAQEvtStats->setCritErrorMask(m_criticalErrorMask);
   m_storeDAQEvtStats->Decide();

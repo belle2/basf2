@@ -47,7 +47,7 @@ namespace Belle2 {
 
     MicrotpcCreator::MicrotpcCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     MicrotpcCreator::~MicrotpcCreator()
@@ -57,6 +57,9 @@ namespace Belle2 {
 
     void MicrotpcCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
+
       G4String symbol;
       G4double a, z;
       G4double density, fractionmass;

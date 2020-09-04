@@ -4,6 +4,7 @@
 from basf2 import B2ERROR, B2WARNING, B2INFO, B2FATAL, B2DEBUG
 from basf2 import conditions as b2conditions
 import os
+import re
 from abc import ABC, abstractmethod
 import pickle
 import configparser
@@ -86,27 +87,34 @@ class Job:
         @property
         def output_dir(self):
             """
-            Getter for output_dir of SubJob. Accesses the parent Job output_dir to infer this."""
+            Getter for output_dir of SubJob. Accesses the parent Job output_dir to infer this.
+            """
             return os.path.join(self.parent.output_dir, str(self.id))
 
         @property
         def working_dir(self):
-            """Getter for working_dir of SubJob. Accesses the parent Job working_dir to infer this."""
+            """
+            Getter for working_dir of SubJob. Accesses the parent Job working_dir to infer this.
+            """
             return os.path.join(self.parent.working_dir, str(self.id))
 
         @property
         def name(self):
-            """Getter for name of SubJob. Accesses the parent Job name to infer this."""
+            """
+            Getter for name of SubJob. Accesses the parent Job name to infer this.
+            """
             return "_".join((self.parent.name, str(self.id)))
 
         @property
         def subjobs(self):
-            """Getter for subjobs of SubJob object. Always returns None, used to prevent accessing the parent job by mistake"""
+            """
+            Getter for subjobs of SubJob object. Always returns None, used to prevent accessing the parent job by mistake.
+            """
             return None
 
         def ready(self):
             """
-            Returns the ready() status from the result of this SubJob
+            Returns the ready() status from the result of this SubJob.
             """
             return self.result.ready()
 
@@ -120,13 +128,16 @@ class Job:
         @status.setter
         def status(self, status):
             """
+            Set the status of this SubJob.
             """
-            B2INFO("Setting {} status to {}".format(self.name, status))
+            B2INFO(f"Setting {self.name} status to {status}.")
             self._status = status
 
         @property
         def max_files_per_subjob(self):
-            """Always returns -1, used to prevent accessing the parent job by mistake"""
+            """
+            Always returns -1, used to prevent accessing the parent job by mistake.
+            """
             return -1
 
         def __getattr__(self, attribute):
@@ -200,7 +211,7 @@ class Job:
 
     def __repr__(self):
         """
-        Representation of Job class (what happens when you print a Job() instance)
+        Representation of Job class (what happens when you print a Job() instance).
         """
         return self.name
 
@@ -244,12 +255,12 @@ class Job:
         Returns the SubJob object at the end.
         """
         if i not in self.subjobs:
-            B2INFO('Creating Job({}).Subjob({})'.format(self.name, i))
+            B2INFO(f"Creating Job({self.name}).Subjob({i}).")
             subjob = Job.SubJob(self, i)
             self.subjobs[i] = subjob
             return subjob
         else:
-            B2WARNING("Job({}) already contains SubJob({})! This will not be created.".format(self.name, i))
+            B2WARNING(f"Job({self.name}) already contains SubJob({i})! This will not be created.")
 
     @property
     def status(self):
@@ -274,35 +285,36 @@ class Job:
     @status.setter
     def status(self, status):
         """
+        Sets the status of this Job.
         """
-        B2INFO("Setting {} status to {}".format(self.name, status))
+        B2INFO(f"Setting {self.name} status to {status}")
         self._status = status
 
     @property
     def basf2_release(self):
         """
-        Getter for basf2 release version string. Pulls in the value from the configparser
+        Getter for basf2 release version string. Pulls in the value from the configparser.
         """
         return self.config.get("BASF2", "Release")
 
     @basf2_release.setter
     def basf2_release(self, release):
         """
-        Setter for basf2 release version string, it actually sets the value in the configparser
+        Setter for basf2 release version string, it actually sets the value in the configparser.
         """
         self.config.set("BASF2", "Release", release)
 
     @property
     def basf2_tools(self):
         """
-        Getter for basf2 tools location path. Pulls in the value from the configparser
+        Getter for basf2 tools location path. Pulls in the value from the configparser.
         """
         return self.config.get("BASF2", "Tools")
 
     @basf2_tools.setter
     def basf2_tools(self, tools_location):
         """
-        Setter for basf2 tools location path, it actually sets the value in the configparser
+        Setter for basf2 tools location path, it actually sets the value in the configparser.
         """
         self.config.set("BASF2", "Tools", tools_location)
 
@@ -413,7 +425,7 @@ class Result():
         method to check the status. Only runs `update_status` if it has never returned True before,
         otherwise it just returns True.
         """
-        B2DEBUG(29, "Calling {}.result.ready()".format(self.job.name))
+        B2DEBUG(29, f"Calling {self.job.name}.result.ready().")
         if self._is_ready:
             return True
         self.update_status()
@@ -517,7 +529,7 @@ class Local(Backend):
         global _pool
         if _pool:
             self.join()
-        B2INFO('Starting up new Pool with {0} processes'.format(self.max_processes))
+        B2INFO(f"Starting up new Pool with {self.max_processes} processes.")
         _pool = mp.Pool(processes=self.max_processes)
 
     @method_dispatch
@@ -535,7 +547,7 @@ class Local(Backend):
         global _pool
         if isinstance(job, Job):
             if job.max_files_per_subjob == 0:
-                B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
+                B2FATAL(f"When submitting Job({job.name}) files per subjob was 0!")
 
             # Check if we have any valid input files
             existing_input_files = set()
@@ -543,19 +555,19 @@ class Local(Backend):
                 if input_file_pattern[:7] != "root://":
                     input_files = glob.glob(input_file_pattern)
                     if not input_files:
-                        B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+                        B2WARNING(f"No files matching {input_file_pattern} can be found, it will be skipped!")
                     else:
                         for file_path in input_files:
                             file_path = os.path.abspath(file_path)
                             if os.path.isfile(file_path):
                                 existing_input_files.add(file_path)
                 else:
-                    B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                            " before collector submission.".format(input_file_pattern)))
+                    B2INFO(f"Found an xrootd file path {input_file_pattern} it will not be checked for validity"
+                           " before collector submission.")
                     existing_input_files.add(input_file_pattern)
 
             if not existing_input_files:
-                B2INFO("No valid input file paths found for job {0}".format(job.name))
+                B2INFO(f"No valid input file paths found for job {job.name}.")
 
             if job.max_files_per_subjob > 0 and existing_input_files:
                 for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
@@ -576,7 +588,7 @@ class Local(Backend):
                 with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                     self._add_setup(job, batch_file)
                     print(" ".join(job.cmd), file=batch_file)
-                B2INFO("Submitting Job({})".format(job.name))
+                B2INFO(f"Submitting Job({job.name}).")
                 job.result = Local.LocalResult(job,
                                                _pool.apply_async(self.run_job,
                                                                  (job.name,
@@ -585,7 +597,7 @@ class Local(Backend):
                                                                   self.submit_script)
                                                                  )
                                                )
-                B2INFO('Job {0} submitted'.format(job.name))
+                B2INFO(f"Job {job.name} submitted.")
             else:
                 self.submit(list(job.subjobs.values()))
 
@@ -603,7 +615,7 @@ class Local(Backend):
             with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                 self._add_setup(job, batch_file)
                 print(" ".join(job.cmd), file=batch_file)
-            B2INFO("Submitting Job({})".format(job.name))
+            B2INFO(f"Submitting Job({job.name}).")
             job.result = Local.LocalResult(job,
                                            _pool.apply_async(self.run_job,
                                                              (job.name,
@@ -612,7 +624,7 @@ class Local(Backend):
                                                               self.submit_script)
                                                              )
                                            )
-            B2INFO('Job {0} submitted'.format(job.name))
+            B2INFO(f"Job {job.name} submitted.")
 
     @submit.register(list)
     def _(self, jobs):
@@ -622,7 +634,7 @@ class Local(Backend):
         # Submit the jobs to PBS
         for job in jobs:
             self.submit(job)
-        B2INFO('All Requested Jobs Submitted')
+        B2INFO("All Requested Jobs Submitted.")
 
     @staticmethod
     def run_job(name, working_dir, output_dir, script):
@@ -630,11 +642,11 @@ class Local(Backend):
         The function that is used by multiprocessing.Pool.map during process creation. This runs a
         shell command in a subprocess and captures the stdout and stderr of the subprocess to files.
         """
-        B2INFO('Starting Sub Process: {0}'.format(name))
+        B2INFO(f"Starting Sub Process: {name}.")
         from subprocess import PIPE, STDOUT, Popen
         stdout_file_path = os.path.join(working_dir, 'stdout')
         # Create unix command to redirect stdour and stderr
-        B2INFO('Log files for SubProcess {0} visible at:\n\t{1}'.format(name, stdout_file_path))
+        B2INFO(f"Log files for SubProcess {name} visible at:\n\t{stdout_file_path}")
         with open(stdout_file_path, 'w', buffering=1) as f_out:
             with Popen(["/bin/bash", script],
                        stdout=PIPE,
@@ -644,7 +656,7 @@ class Local(Backend):
                        cwd=working_dir) as p:
                 for line in p.stdout:
                     print(line, end='', file=f_out)
-        B2INFO('Sub Process {0} Finished.'.format(name))
+        B2INFO(f"Sub Process {name} Finished.")
         return p.returncode
 
 
@@ -672,7 +684,15 @@ class Batch(Backend):
         You should think about where the stdout/err should go, and set the queue name.
         """
         raise NotImplementedError(("Need to implement a _add_batch_directives(self, job, file) "
-                                   "method in {} backend.".format(self.__class__.__name__)))
+                                   f"method in {self.__class__.__name__} backend."))
+
+    def _make_submit_file(self, job, submit_file_name):
+        """
+        Useful for the HTCondor backend where a submit is needed instead of batch
+        directives pasted directly into the submission script. It should be overwritten
+        if needed.
+        """
+        pass
 
     @classmethod
     @abstractmethod
@@ -691,7 +711,7 @@ class Batch(Backend):
         Should set a Result object as an attribute of the job. Result object should allow a 'ready' member method to
         be called from it which queries the batch system and the job id about whether or not the job has finished.
         """
-        B2INFO("Submitting job {}".format(job.name))
+        B2INFO(f"Submitting job {job.name}.")
         # Make sure the output directory of the job is created
         job_output_path = pathlib.Path(job.output_dir)
         job_output_path.mkdir(parents=True, exist_ok=True)
@@ -702,10 +722,10 @@ class Batch(Backend):
         if isinstance(job, Job):
             if 'queue' not in job.backend_args:
                 job.backend_args['queue'] = self.config[self.default_config_section]["Queue"]
-                B2INFO('Setting Job queue {}'.format(job.backend_args['queue']))
+                B2INFO(f"Setting Job queue {job.backend_args['queue']}.")
 
             if job.max_files_per_subjob == 0:
-                B2FATAL("When submitting Job({}) files per subjob was 0!".format(job.name))
+                B2FATAL(f"When submitting Job({job.name}) files per subjob was 0!")
 
             # Check if we have any valid input files
             existing_input_files = set()
@@ -713,19 +733,19 @@ class Batch(Backend):
                 if input_file_pattern[:7] != "root://":
                     input_files = glob.glob(input_file_pattern)
                     if not input_files:
-                        B2WARNING("No files matching {0} can be found, it will be skipped!".format(input_file_pattern))
+                        B2WARNING(f"No files matching {input_file_pattern} can be found, it will be skipped!")
                     else:
                         for file_path in input_files:
                             file_path = os.path.abspath(file_path)
                             if os.path.isfile(file_path):
                                 existing_input_files.add(file_path)
                 else:
-                    B2INFO(("Found an xrootd file path {0} it will not be checked for validity"
-                            " before collector submission.".format(input_file_pattern)))
+                    B2INFO((f"Found an xrootd file path {input_file_pattern} it will not be checked for validity"
+                            " before collector submission."))
                     existing_input_files.add(input_file_pattern)
 
             if not existing_input_files:
-                B2INFO("No valid input file paths found for job {0}".format(job.name))
+                B2INFO(f"No valid input file paths found for job {job.name}.")
 
             if job.max_files_per_subjob > 0 and existing_input_files:
                 for i, subjob_input_files in enumerate(grouper(job.max_files_per_subjob, existing_input_files)):
@@ -743,11 +763,15 @@ class Batch(Backend):
                             shutil.copy(file_path, job.working_dir)
 
                 self._dump_input_data(job)
+
+                # Make submission file if needed
+                self._make_submit_file(job, os.path.join(job.working_dir, self.submit_script).replace('.sh', '.sub'))
+
                 with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                     self._add_batch_directives(job, batch_file)
                     self._add_setup(job, batch_file)
                     print(" ".join(job.cmd), file=batch_file)
-                B2INFO("Submitting Job({})".format(job.name))
+                B2INFO(f"Submitting Job({job.name}).")
 
                 script_path = os.path.join(job.working_dir, self.submit_script)
                 cmd = self._create_cmd(script_path)
@@ -768,11 +792,15 @@ class Batch(Backend):
                         shutil.copy(file_path, job.working_dir)
 
             self._dump_input_data(job)
+
+            # Make submission file if needed
+            self._make_submit_file(job, os.path.join(job.working_dir, self.submit_script).replace('.sh', '.sub'))
+
             with open(os.path.join(job.working_dir, self.submit_script), "w") as batch_file:
                 self._add_batch_directives(job, batch_file)
                 self._add_setup(job, batch_file)
                 print(" ".join(job.cmd), file=batch_file)
-            B2INFO("Submitting SubJob({})".format(job.name))
+            B2INFO(f"Submitting SubJob({job.name}).")
             script_path = os.path.join(job.working_dir, self.submit_script)
             cmd = self._create_cmd(script_path)
             output = self._submit_to_batch(cmd)
@@ -784,10 +812,10 @@ class Batch(Backend):
         """
         Submit method of Batch Backend that takes a list of jobs instead of just one and submits each one.
         """
-        B2INFO("Submitting a list of jobs to a Batch backend")
+        B2INFO("Submitting a list of jobs to a Batch backend.")
         for job in jobs:
             self.submit(job)
-        B2INFO('All Requested Jobs Submitted')
+        B2INFO("All Requested Jobs Submitted.")
 
     @classmethod
     @abstractmethod
@@ -806,7 +834,7 @@ class Batch(Backend):
 
 class PBS(Batch):
     """
-    Backend for submitting calibration processes to a qsub batch system
+    Backend for submitting calibration processes to a qsub batch system.
     """
     #: Working directory directive
     cmd_wkdir = "#PBS -d"
@@ -848,7 +876,7 @@ class PBS(Batch):
         """
         """
         job_id = batch_output.replace("\n", "")
-        B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
+        B2INFO(f"Job ID of Job({job.name}) recorded as: {job_id}.")
         job.result = cls.PBSResult(job, job_id)
 
     @classmethod
@@ -900,7 +928,7 @@ class PBS(Batch):
             """
             Update the job's status by calling bjobs.
             """
-            B2DEBUG(29, "Calling {}.result.update_status()".format(self.job.name))
+            B2DEBUG(29, f"Calling {self.job_name}.result.update_status()")
             # Run qstat
             try:
                 output = subprocess.check_output(["qstat", "-r", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
@@ -913,7 +941,7 @@ class PBS(Batch):
                         self.job.status = new_job_status
                     return
                 else:
-                    B2ERROR("'qstat' command failed for {} but for an unknown reason.".format(self.job.name))
+                    B2ERROR(f"'qstat' command failed for {self.job_name} but for an unknown reason.")
                     # If it was some other error just re-raise
                     raise cpe
             # If it didn't error, parse the output
@@ -921,7 +949,7 @@ class PBS(Batch):
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError("Unidentified backend status found for Job({}): {}".format(self.job.name, backend_status))
+                raise BackendError(f"Unidentified backend status found for Job({self.job.name}): {backend_status}.")
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
 
@@ -933,7 +961,7 @@ class PBS(Batch):
 
 class LSF(Batch):
     """
-    Backend for submitting calibration processes to a qsub batch system
+    Backend for submitting calibration processes to a qsub batch system.
     """
     #: Working directory directive
     cmd_wkdir = "#BSUB -cwd"
@@ -952,7 +980,7 @@ class LSF(Batch):
 
     def _add_batch_directives(self, job, batch_file):
         """
-        Adds LSF BSUB directives for the job to a script
+        Adds LSF BSUB directives for the job to a script.
         """
         if "queue" in job.backend_args:
             batch_queue = job.backend_args["queue"]
@@ -1013,18 +1041,18 @@ class LSF(Batch):
             """
             Update the job's status by calling bjobs.
             """
-            B2DEBUG(29, "Calling {}.result.update_status()".format(self.job.name))
+            B2DEBUG(29, f"Calling {self.job.name}.result.update_status()")
             output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             backend_status = self._get_status_from_output(output)
             try:
                 new_job_status = self.backend_code_to_status[backend_status]
             except KeyError as err:
-                raise BackendError("Unidentified backend status found for Job({}): {}".format(self.job, backend_status))
+                raise BackendError(f"Unidentified backend status found for Job({self.job}): {backend_status}.")
             if new_job_status != self.job.status:
                 self.job.status = new_job_status
 
         def _get_status_from_output(self, output):
-            if output == "Job <{}> is not found\n".format(self.job_id):
+            if output == f"Job <{self.job_id}> is not found\n":
                 return "FINISHED"
             else:
                 stat_line = output.split("\n")[1]
@@ -1038,19 +1066,153 @@ class LSF(Batch):
         job_id = batch_output.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")
-        B2INFO("Job ID of Job({}) recorded as: {}".format(job.name, job_id))
+        B2INFO(f"Job ID of Job({job.name}) recorded as: {job_id}.")
         job.result = cls.LSFResult(job, job_id)
+
+
+class HTCondor(Batch):
+    """
+    Backend for submitting calibration processes to a HTCondor batch system.
+    """
+    default_config_section = "HTCondor"
+    submission_cmds = ["condor_submit"]
+
+    def _make_submit_file(self, job, submit_file_name):
+        """
+        Fill HTCondor submission file.
+        """
+        # Find all files in the working directory to copy on the worker node
+
+        files_to_transfer = [str(os.path.join(job.working_dir, i)) for i in os.listdir(job.working_dir)]
+
+        if 'universe' not in job.backend_args:
+            job.backend_args['universe'] = self.config[self.default_config_section]['universe']
+        if 'requirements' not in job.backend_args:
+            job.backend_args['requirements'] = self.config[self.default_config_section]['requirements']
+        if 'getenv' not in job.backend_args:
+            job.backend_args['getenv'] = self.config[self.default_config_section]['getenv']
+
+        with open(submit_file_name, 'w') as submit_file:
+            print(f'executable = {submit_file_name.replace(".sub", ".sh")}', file=submit_file)
+            print(f'log = {os.path.join(job.output_dir, "htcondor.log")}', file=submit_file)
+            print(f'output = {os.path.join(job.output_dir, "stdout")}', file=submit_file)
+            print(f'error = {os.path.join(job.output_dir, "stderr")}', file=submit_file)
+            print(f'transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
+            print(f'universe = {job.backend_args["universe"]}', file=submit_file)
+            print(f'requirements = {job.backend_args["requirements"]}', file=submit_file)
+            print(f'getenv = {job.backend_args["getenv"]}', file=submit_file)
+            print('should_transfer_files = Yes', file=submit_file)
+            print('when_to_transfer_output = ON_EXIT', file=submit_file)
+            print('queue', file=submit_file)
+
+    def _add_batch_directives(self, job, batch_file):
+        """
+        For HTCondor leave empty as the directives are already included in the submit file
+        add instead basf2 setup directives.
+        """
+        print('#!/bin/bash', file=batch_file)
+        if 'BELLE2_TOOLS' not in os.environ:
+            raise BackendError('No BELLE2_TOOLS found in environment')
+        if 'BELLE2_RELEASE' in os.environ:
+            print(f'source {os.environ["BELLE2_TOOLS"]}/b2setup {os.environ["BELLE2_RELEASE"]}', file=batch_file)
+        elif 'BELLE2_LOCAL_DIR' in os.environ:
+            print('cwd=$(pwd)', file=batch_file)
+            print(f'cd {os.environ["BELLE2_LOCAL_DIR"]}', file=batch_file)
+            print(f'source {os.environ["BELLE2_TOOLS"]}/b2setup', file=batch_file)
+            print('cd $cwd', file=batch_file)
+        else:
+            raise BackendError('No BELLE2_RELEASE nor BELLE2_LOCAL_DIR found in environment')
+
+    @classmethod
+    def _create_cmd(cls, script_path):
+        """
+        """
+        submission_cmd = cls.submission_cmds[:]
+        submission_cmd.append(script_path.replace('.sh', '.sub'))
+        return submission_cmd
+
+    @classmethod
+    def _submit_to_batch(cls, cmd):
+        """
+        Do the actual batch submission command and collect the output to find out the job id for later monitoring.
+        """
+        os.chmod(cmd[-1].replace('.sub', '.sh'), 0o755)
+        job_dir = os.path.dirname(cmd[-1])
+        sub_out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, cwd=job_dir)
+        return int(re.findall('submitted to cluster ([0-9]+).\n', sub_out)[0])
+
+    class HTCondorResult(Result):
+        """
+        Simple class to help monitor status of jobs submitted by HTCondor Backend.
+
+        You pass in a `Job` object and job id from a condor_submit command.
+        When you call the `ready` method it runs condor_q and, if needed, condor_history to see whether or not the job has finished.
+        """
+
+        #: HTCondor statuses mapped to Job statuses
+        backend_code_to_status = {'0': "submitted",
+                                  '1': "submitted",
+                                  '2': "running",
+                                  '3': "failed",
+                                  '4': "completed",
+                                  '5': "submitted",
+                                  '6': "failed"
+                                  }
+
+        def __init__(self, job, job_id):
+            """
+            Pass in the job object and the job id to allow the result to do monitoring and perform
+            post processing of the job.
+            """
+            super().__init__(job)
+            #: job id given by HTCondor
+            self.job_id = job_id
+
+        def update_status(self):
+            """
+            Update the job's status by calling condor_h and, if needed, condor_history.
+            """
+            B2DEBUG(29, f"Calling {self.job.name}.result.update_status().")
+            backend_status = subprocess.check_output(
+                ["condor_q", str(self.job_id), '-af', 'JobStatus'], stderr=subprocess.STDOUT, universal_newlines=True).strip()
+            # if job is held (backend_status = 5) then report why then kill the job
+            if backend_status == '5':
+                hold_reason = subprocess.check_output(["condor_q", str(self.job_id), '-af',
+                                                       'HoldReason'], stderr=subprocess.STDOUT, universal_newlines=True)
+                B2WARNING(f"Job {self.job.name} on hold because of {hold_reason}. Killing it.")
+                subprocess.check_output(["condor_rm", str(self.job_id)], stderr=subprocess.STDOUT, universal_newlines=True)
+            # If no backend status is returned then the job already left the queue
+            # check in the history to see if it suceeded or failed
+            if backend_status == '':
+                backend_status = subprocess.check_output(["condor_history", str(
+                    self.job_id), '-af', 'JobStatus'], stderr=subprocess.STDOUT, universal_newlines=True).strip()
+            if backend_status == '':
+                # This should not happen so, for paranoia, mark the job as failed
+                backend_status = '6'
+            try:
+                new_job_status = self.backend_code_to_status[backend_status]
+            except KeyError as err:
+                raise BackendError(f"Unidentified backend status found for Job({self.job}): {backend_status}.")
+            if new_job_status != self.job.status:
+                self.job.status = new_job_status
+
+    @classmethod
+    def _create_job_result(cls, job, job_id):
+        """
+        """
+        B2INFO(f"Job ID of Job({job.name}) recorded as: {job_id}.")
+        job.result = cls.HTCondorResult(job, job_id)
 
 
 class DIRAC(Backend):
     """
-    Backend for submitting calibration processes to the grid
+    Backend for submitting calibration processes to the grid.
     """
     pass
 
 
 class BackendError(Exception):
     """
-    Base exception class for this module
+    Base exception class for this module.
     """
     pass

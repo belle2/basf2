@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCHIT_H
-#define CDCHIT_H
+#pragma once
 
 #include <framework/logging/Logger.h>
 #include <cdc/dataobjects/WireID.h>
@@ -297,5 +296,3 @@ namespace Belle2 {
     ClassDefOverride(CDCHit, 8);
   };
 } // end namespace Belle2
-
-#endif

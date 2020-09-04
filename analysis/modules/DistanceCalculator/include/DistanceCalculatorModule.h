@@ -12,10 +12,13 @@
 
 #pragma once
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <string>
+#include <TMatrixFSym.h>
 
+#include <Eigen/Core>
 
+#include <analysis/dataobjects/Btube.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 
@@ -30,6 +33,7 @@ namespace Belle2 {
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
     DistanceCalculatorModule();
+
     /** Destructor */
     virtual ~DistanceCalculatorModule();
 
@@ -41,10 +45,21 @@ namespace Belle2 {
 
   private:
 
+    /** returns the distance between tracks or vertex objects (depending on the m_mode) */
+    void getDistance(const Particle* p1, const Particle* p2);
+    /** returns the error on the distance between tracks or vertex objects (depending on the m_mode) */
+    void getDistanceErrors(const Particle* p1, const Particle* p2);
+    /** returns the distance between the btube and the object (depending on m_mode) */
+    void getBtubeDistance(const Particle* p, const Btube* t);
+    /** returns the error on the distance between the btube and the object (depending on m_mode) */
+    void getBtubeDistanceErrors(const Particle* p, const Btube* t);
+
     std::string m_listName; /**< name of particle list */
     std::string m_decayString;  /**< decay string */
     DecayDescriptor m_decayDescriptor;  /**< decay descriptor which specifies which particles are used to calculate the distance */
     std::string m_mode; /**< option string */
+    Eigen::Vector3d m_distance; /**< distance between two objects (track/vertex/Btube and vertex/track) */
+    TMatrixFSym m_distanceCovMatrix; /**< covariance matrix of distance */
   };
 }
 

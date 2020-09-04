@@ -63,7 +63,7 @@ skimDecayMode
 -l LFN, --lfn LFN  logical file name
 -d KEYVALUE, --description KEYVALUE
                    data description to set of the form key=value. If the
-                   argument does not contain an equal sign it's interpeted as a
+                   argument does not contain an equal sign it's interpreted as a
                    key to delete from the dataDescriptions.
 
 .. _b2file-catalog-add:
@@ -128,7 +128,7 @@ ROOT ``hadd`` but does correctly update the metadata in the file and merges the
 objects in the persistent tree correctly.
 
 This tool is intended to only merge output files from identical jobs which were
-just split into smaller ones for convinience. As such the following
+just split into smaller ones for convenience. As such the following
 restrictions apply:
 
 * The files have to be created with the same release and steering file

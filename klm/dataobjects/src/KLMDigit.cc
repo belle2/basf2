@@ -46,7 +46,7 @@ KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
   m_Layer(simHit->getLayer()),
   m_Plane(simHit->getPlane()),
   m_Strip(simHit->getStrip()),
-  m_LastStrip(simHit->getStrip()),
+  m_LastStrip(0),
   m_Charge(0),
   m_CTime(0),
   m_TDC(0),

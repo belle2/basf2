@@ -9,8 +9,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef PXD_DATAOBJECTS_PXDSIMHIT_H
-#define PXD_DATAOBJECTS_PXDSIMHIT_H
 
 #include <vxd/dataobjects/VXDSimHit.h>
 
@@ -41,5 +39,3 @@ namespace Belle2 {
     ClassDef(PXDSimHit, 3)
   };
 } // end namespace Belle2
-
-#endif

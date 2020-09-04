@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef SADMETAHIT_H
-#define SADMETAHIT_H
+#pragma once
 
 #include <simulation/dataobjects/SimHitBase.h>
 
@@ -138,4 +137,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif

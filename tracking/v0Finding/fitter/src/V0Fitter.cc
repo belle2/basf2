@@ -414,6 +414,9 @@ bool V0Fitter::fitAndStore2(const Track* trackPlus, const Track* trackMinus,
   RecoTrack* recoTrackPlus_forRefit  = copyRecoTrack(recoTrackPlus, pdg_trackPlus);
   RecoTrack* recoTrackMinus_forRefit = copyRecoTrack(recoTrackMinus, pdg_trackMinus);
 
+  if ((recoTrackPlus_forRefit == nullptr) or (recoTrackMinus_forRefit == nullptr))
+    return false;
+
   while (hasInnerHitStatus != 0) {
     /// If the track has a hit inside the V0 vertex position, use refitted RecoTrack with removing inner hits
     /// in the next V0 vertex fit. Else, use the original RecoTrack.
@@ -597,9 +600,24 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
 
 RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG)
 {
+  /// original track information
+  Const::ChargedStable particleUsedForFitting(std::abs(trackPDG));
+  const genfit::AbsTrackRep* origTrackRep = origRecoTrack->getTrackRepresentationForPDG(std::abs(
+                                              trackPDG));/// only a positive PDG number is allowed for the input
+
   RecoTrack* newRecoTrack = origRecoTrack->copyToStoreArray(m_copiedRecoTracks);
   newRecoTrack->addHitsFromRecoTrack(origRecoTrack);
   newRecoTrack->addRelationTo(origRecoTrack);
+
+  /// fit newRecoTrack
+  TrackFitter fitter;
+  if (not fitter.fit(*newRecoTrack, particleUsedForFitting)) {
+    B2WARNING("track fit failed for copied RecoTrack.");
+    /// check fit status of original track
+    if (not origRecoTrack->wasFitSuccessful(origTrackRep))
+      B2WARNING("\t original track fit was also failed.");
+    return nullptr;
+  }
 
   return newRecoTrack;
 }

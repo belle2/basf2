@@ -98,7 +98,7 @@ namespace Belle2 {
     /** Create a copy of RecoTrack.
      * @param origRecoTrack original RecoTrack
      * @param trackPDG signed PDG used for the track fit hypothesis
-     * @return copied RecoTrack stored in the m_copiedRecoTracks
+     * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
      */
     RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG);
 

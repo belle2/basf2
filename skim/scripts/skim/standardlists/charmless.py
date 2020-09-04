@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import modularAnalysis as ma
+from vertex import massVertexKFit
+from stdPi0s import stdPi0s
 
 
 def loadStdVeryLooseTracks(particletype, path):
@@ -66,6 +68,7 @@ def loadStdPi0ForBToCharmless(path):
     and :math:`20~{\\rm MeV}` in the backward end cap. For the :math:`\\pi^{0}`, we require the mass to be
     :math:`105 < M < 150~{\\rm MeV}/c^2` and a massKFit to converge.
     """
+    stdPi0s('all', path)
     ma.cutAndCopyList(outputListName='pi0:charmlessFit', inputListName='pi0:all',
                       cut='[[daughter(0,clusterReg)==1 and daughter(0,E)> 0.0225] or ' +
                       '[daughter(0,clusterReg)==2 and daughter(0,E)> 0.020] or ' +
@@ -75,7 +78,7 @@ def loadStdPi0ForBToCharmless(path):
                       '[daughter(1,clusterReg)==3 and daughter(1,E)> 0.020]] and ' +
                       'M > 0.105 and M < 0.150 ',
                       path=path)
-    vx.massVertexKFit('pi0:charmlessFit', 0.0, path=path)
+    massVertexKFit('pi0:charmlessFit', 0.0, path=path)
 
 
 def loadStdVeryLooseKstarPlus(path):

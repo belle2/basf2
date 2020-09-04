@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import modularAnalysis as ma
-from vertex import massVertexKFit
+from vertex import kFit
 from stdPi0s import stdPi0s
 
 
@@ -78,7 +78,7 @@ def loadStdPi0ForBToCharmless(path):
                       '[daughter(1,clusterReg)==3 and daughter(1,E)> 0.020]] and ' +
                       'M > 0.105 and M < 0.150 ',
                       path=path)
-    massVertexKFit('pi0:charmlessFit', 0.0, path=path)
+    kFit('pi0:charmlessFit', 0.0, fit_type='vertex', path=path)
 
 
 def loadStdVeryLooseKstarPlus(path):

@@ -10,6 +10,8 @@ __authors__ = [
 ]
 
 import modularAnalysis as ma
+from stdCharged import stdK, stdPi
+from stdV0s import stdKshorts
 from skim.standardlists.lightmesons import (
     loadStdAllRhoPlus,
     loadStdPi0ForBToHadrons)

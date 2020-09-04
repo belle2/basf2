@@ -11,6 +11,7 @@ __authors__ = [
 
 import modularAnalysis as ma
 from stdCharged import stdK, stdPi
+from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from skim.standardlists.lightmesons import (
     loadStdAllRhoPlus,
@@ -54,11 +55,11 @@ class BtoPi0Pi0(BaseSkim):
     def build_lists(self, path):
         Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
         channels = ['pi0:charmlessFit pi0:charmlessFit']
-        B0sigList = []
+        BsigList = []
         for chID, channel in enumerate(channels):
             ma.reconstructDecay('B0:Pi0Pi0' + ' -> ' +
                                 channel, Bcuts, chID, path=path)
-            B0sigList.append(channel)
+            BsigList.append(channel)
         self.SkimLists = BsigList
 
 
@@ -302,8 +303,6 @@ class BtoHad4TracksKS(BaseSkim):
         loadStdVeryLooseTracks('K', path=path)
         loadStdVeryLooseTracks('pi', path=path)
         stdKshorts(path=path)
-        loadStdVeryLooseKstar0(path=path)
-        loadStdVeryLooseRho0(path=path)
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
@@ -394,6 +393,7 @@ class BtoHad4TracksRho(BaseSkim):
 
     def load_standard_lists(self, path):
         loadStdVeryLooseRho0(path=path)
+        loadStdVeryLooseTracks('pi', path=path)
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
@@ -437,6 +437,7 @@ class BtoHad5Tracks(BaseSkim):
     def load_standard_lists(self, path):
         loadStdVeryLooseTracks('K', path=path)
         loadStdVeryLooseTracks('pi', path=path)
+        stdKshorts(path=path)
         loadStdVeryLooseKstarPlus(path=path)
 
     def build_lists(self, path):
@@ -478,6 +479,8 @@ class BtoHad1Track1Pi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     def load_standard_lists(self, path):
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
         loadStdPi0ForBToCharmless(path=path)
 
     def build_lists(self, path):

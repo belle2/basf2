@@ -44,9 +44,9 @@ namespace Belle2 {
       /** CoG3 Charge Error*/
       double getSumSamplesChargeError();
       /** ELS3 Charge */
-      double getELS3StripCharge() {return 0;}
+      double getELS3Charge();
       /** ELS3 Charge Error */
-      double getELS3StripChargeError() {return 0;}
+      double getELS3ChargeError();
 
     protected:
 

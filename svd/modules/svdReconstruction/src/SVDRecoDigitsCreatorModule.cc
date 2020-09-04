@@ -183,6 +183,8 @@ void SVDRecoDigitCreatorModule::event()
     VxdID sensorID = m_storeDigits[i]->getSensorID();
     bool isU =  m_storeDigits[i]->isUStrip();
     int cellID = m_storeDigits[i]->getCellID();
+    float averageNoiseInADC =  m_NoiseCal.getNoise(sensorID, isU, cellID);
+    float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(sensorID, isU, cellID);
 
     float time = std::numeric_limits<float>::quiet_NaN();
     float timeError = std::numeric_limits<float>::quiet_NaN();
@@ -190,17 +192,25 @@ void SVDRecoDigitCreatorModule::event()
     float chargeError = std::numeric_limits<float>::quiet_NaN();
     int firstFrame = std::numeric_limits<int>::quiet_NaN();
     std::vector<float> probabilities = {0.5};
-
     double chi2 = std::numeric_limits<double>::quiet_NaN();
+
+    /*
+    // let's make this work
+    SVDReconstructionBase* recoBase = new SVDReconstructionBase(*m_storeDigits[i]);
+    recoBase->setAverageNoise(averageNoiseInADC,averageNoiseInElectrons);
+    recoBase->setTriggerBin(triggerBin);
+    SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(&recoBase);
+    SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(*recoBase);
+    */
 
     SVDReconstructionBase* timeBase = new SVDReconstructionBase(*m_storeDigits[i]);
     SVDTimeReconstruction* timeReco = (SVDTimeReconstruction*)timeBase;
     timeReco->setTriggerBin(triggerBin);
-    float averageNoise =  m_NoiseCal.getNoise(sensorID, isU, cellID);
-    timeReco->setAverageNoise(averageNoise);
+    timeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
 
     SVDReconstructionBase* chargeBase = new SVDReconstructionBase(*m_storeDigits[i]);
     SVDChargeReconstruction* chargeReco = (SVDChargeReconstruction*) chargeBase;
+    chargeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
 
     if (numberOfAcquiredSamples == 6) {
       time = timeReco->getStripTime(m_timeRecoWith6SamplesAlgorithm);
@@ -219,6 +229,9 @@ void SVDRecoDigitCreatorModule::event()
 
     // now go into FTSW reference frame
     time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
+
+    B2INFO("time = (" << time << " ± " << timeError << ") ns");
+    B2INFO("charge = (" << charge << " ± " << chargeError << ") e-");
 
     //append the new SVDRecoDigit to the StoreArray
     m_storeRecoDigits.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));

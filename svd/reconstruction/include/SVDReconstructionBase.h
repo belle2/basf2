@@ -42,7 +42,6 @@ namespace Belle2 {
         , m_vxdID(shaper.getSensorID())
         , m_isUside(shaper.isUStrip())
         , m_cellID(shaper.getCellID())
-        , m_samplesInElectrons(false)
       {
         buildAlgorithmSets();
       };
@@ -51,13 +50,11 @@ namespace Belle2 {
        * Constructor with the stripInRawCluster,
        * for strip reconstruction in cluster reconstruction
        */
-      SVDReconstructionBase(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU, int cellID,
-                            bool samplesInElectrons = false)
+      SVDReconstructionBase(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU, int cellID)
         : m_samples(aStrip.samples)
         , m_vxdID(sensorID)
         , m_isUside(isU)
         , m_cellID(cellID)
-        , m_samplesInElectrons(samplesInElectrons)
       { };
 
       /**
@@ -65,13 +62,11 @@ namespace Belle2 {
        * for clustered sample reconstruction
        * cellID data member not significant
        */
-      SVDReconstructionBase(const Belle2::SVDShaperDigit::APVFloatSamples samples, VxdID sensorID, bool isU,
-                            bool samplesInElectrons = false)
+      SVDReconstructionBase(const Belle2::SVDShaperDigit::APVFloatSamples samples, VxdID sensorID, bool isU)
         : m_samples(samples)
         , m_vxdID(sensorID)
         , m_isUside(isU)
         , m_cellID(-1)
-        , m_samplesInElectrons(samplesInElectrons)
       { };
 
 
@@ -89,8 +84,11 @@ namespace Belle2 {
       /**
        * set the average noise
        */
-      void setAverageNoise(const int averageNoise)
-      { m_averageNoise = averageNoise; };
+      void setAverageNoise(const int averageNoiseInADC, const int averageNoiseInElectrons)
+      {
+        m_averageNoiseInADC = averageNoiseInADC;
+        m_averageNoiseInElectrons = averageNoiseInElectrons;
+      };
 
       /**
        * @return the VxdID of the strip sensor
@@ -110,6 +108,14 @@ namespace Belle2 {
         return m_timeAlgorithms.find(timeAlg) != m_timeAlgorithms.end();
       }
 
+      /**
+       * @return true if the chargeAlg is implemented and available for reconstruction
+       */
+      bool isChargeAlgorithmAvailable(TString chargeAlg)
+      {
+        return m_chargeAlgorithms.find(chargeAlg) != m_chargeAlgorithms.end();
+      }
+
     protected:
 
       /** APV clock period*/
@@ -118,7 +124,7 @@ namespace Belle2 {
       /** ELS3 tau constant*/
       double m_ELS3tau = 55;
 
-      /** strip samples, can be in ADC or electrons, check m_sampleInElectrons*/
+      /** strip ADC sampless*/
       Belle2::SVDShaperDigit::APVFloatSamples m_samples;
 
       /** VxdID of the strip */
@@ -130,27 +136,34 @@ namespace Belle2 {
       /**cell ID */
       int m_cellID = 0;
 
-      /** true is m_samples is in electrons*/
-      bool m_samplesInElectrons = false;
-
       /** trigger bin */
       int m_triggerBin = -1;
 
       /** first frame */
       int m_firstFrame = -1;
 
-      /** average noise */
-      float m_averageNoise = -1;
+      /** average noise in ADC as sum in quadrature of noise of each strip*/
+      float m_averageNoiseInADC = -1;
+
+      /** average noise in electrons as sum in quadrature of noise of each strip*/
+      float m_averageNoiseInElectrons = -1;
 
       /** set containing the available time algorithms */
       std::set<TString> m_timeAlgorithms;
 
-      /** build the set containing the available time algorithms */
+      /** set containing the available charge algorithms */
+      std::set<TString> m_chargeAlgorithms;
+
+      /** build the sets containing the available time and charge algorithms */
       void buildAlgorithmSets()
       {
         m_timeAlgorithms.insert("CoG6");
         m_timeAlgorithms.insert("CoG3");
         m_timeAlgorithms.insert("ELS3");
+
+        m_chargeAlgorithms.insert("MaxSample");
+        m_chargeAlgorithms.insert("SumSamples");
+        m_chargeAlgorithms.insert("ELS3");
       }
 
 

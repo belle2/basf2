@@ -140,7 +140,7 @@ namespace Belle2 {
         tmpResSq += TMath::Power(k * m_apvClockPeriod -  getCoG6Time(), 2);
       }
 
-      double rawTimeError = m_averageNoise / Atot * TMath::Sqrt(tmpResSq);
+      double rawTimeError = m_averageNoiseInADC / Atot * TMath::Sqrt(tmpResSq);
 
       double timeError = m_CoG6TimeCal.getCorrectedTimeError(m_vxdID, m_isUside, m_cellID, getCoG6Time(),
                                                              rawTimeError, m_triggerBin);
@@ -204,7 +204,7 @@ namespace Belle2 {
 
       aveNoise = TMath::Sqrt(aveNoise);
       */
-      return m_averageNoise / Atot * TMath::Sqrt(tmpResSq);
+      return m_averageNoiseInADC / Atot * TMath::Sqrt(tmpResSq);
 
     }
 
@@ -284,8 +284,8 @@ namespace Belle2 {
       //error on a0,a1,a2 are equal (independent on the sample)
       //computing delta_a = sum in quadrature of the noise in electrons of the strips in the cluster = m_averageNoise
 
-      double timeError = std::abs(m_averageNoise * dTdw) * std::sqrt(dwda0 * dwda0 + dwda1 * dwda1 + dwda2 * dwda2);
-      //      B2INFO("m_averageNoise = " << m_averageNoise << ", dTdw = " << dTdw << ", dwda0 = " << dwda0 << ", dwda1 = " << dwda1 << ", dwda2 = " << dwda2);
+      double timeError = std::abs(m_averageNoiseInADC * dTdw) * std::sqrt(dwda0 * dwda0 + dwda1 * dwda1 + dwda2 * dwda2);
+      //      B2INFO("m_averageNoise = " << m_averageNoiseInADC << ", dTdw = " << dTdw << ", dwda0 = " << dwda0 << ", dwda1 = " << dwda1 << ", dwda2 = " << dwda2);
 
       return  timeError;
     }

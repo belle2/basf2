@@ -32,7 +32,6 @@ namespace Belle2 {
       explicit SVDMaxSumAlgorithm(const Belle2::SVDShaperDigit::APVFloatSamples samples)
         : m_samples(samples)
       {
-        //        m_samples = samples;
         applyAlgorithm();
       };
 
@@ -65,13 +64,20 @@ namespace Belle2 {
       {
 
         //Max Sum selection
-        if (m_samples.size() < 3) B2ERROR("APV25 samples less than 3!?");
+        if (m_samples.size() < 3)
+          B2ERROR("APV25 samples less than 3!?");
+
         std::vector<float> Sum2bin(m_samples.size() - 1, 0);
+
         for (int iBin = 0; iBin < static_cast<int>(m_samples.size()) - 1; ++iBin)
           Sum2bin.at(iBin) = m_samples.at(iBin) + m_samples.at(iBin + 1);
+
         auto itSum = std::max_element(std::begin(Sum2bin), std::end(Sum2bin));
+
         int ctrFrame = std::distance(std::begin(Sum2bin), itSum);
+
         if (ctrFrame == 0) ctrFrame = 1;
+
         std::vector<float> selectedSamples = {m_samples.at(ctrFrame - 1), m_samples.at(ctrFrame), m_samples.at(ctrFrame + 1)};
 
         m_result.first = ctrFrame - 1;

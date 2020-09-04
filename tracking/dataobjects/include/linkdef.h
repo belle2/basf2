@@ -5,51 +5,45 @@
 #pragma link C++ nestedclasses;
 // #pragma link C++ all namespaces;
 
-#pragma link C++ class Belle2::ExtHit+;
-#pragma link C++ class Belle2::TrackClusterSeparation+;
-#pragma link C++ class Belle2::V0ValidationVertex+;
-#pragma link C++ class Belle2::FullSecID+;
+#pragma link C++ class Belle2::ExtHit+; // checksum=0x6b296224, version=8
+#pragma link C++ class Belle2::TrackClusterSeparation+; // checksum=0x8d25ce5e, version=3
+#pragma link C++ class Belle2::V0ValidationVertex+; // checksum=0xceabe91f, version=1
+#pragma link C++ class Belle2::FullSecID+; // checksum=0xa4543536, version=-1
 
-#pragma link C++ class pair <bool, double>+;
-#pragma link C++ class pair <bool, int>+;
-#pragma link C++ class pair <unsigned int, pair < double, double > >+;
-#pragma link C++ class vector < pair <unsigned int, pair < double, double > > >+;
-#pragma link C++ class pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > >+;
-#pragma link C++ class vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > >+;
-#pragma link C++ class pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > >+;
-#pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > >+;
-#pragma link C++ class pair <unsigned int, list < double > >+;
-#pragma link C++ class vector < pair <unsigned int, list < double > > >+;
-#pragma link C++ class pair < unsigned int, vector < pair <unsigned int, list < double > > > >+;
-#pragma link C++ class vector < pair < unsigned int, vector < pair <unsigned int, list < double > > > > >+;
-#pragma link C++ class pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, list < double > > > > > >+;
-#pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, list < double > > > > > > >+;
-#pragma link C++ class pair <unsigned int, double >+;
-#pragma link C++ class vector < pair <unsigned int, double > >+;
+#pragma link C++ class pair <bool, double>+; // checksum=0x90c0afc6, version=-1
+#pragma link C++ class pair <bool, int>+; // checksum=0xe86a3d30, version=-1
+#pragma link C++ class pair <unsigned int, pair < double, double > >+; // checksum=0xea1f577c, version=-1
+#pragma link C++ class vector < pair <unsigned int, pair < double, double > > >+; // checksum=0x3073834d, version=6
+#pragma link C++ class pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > >+; // checksum=0x7a732554, version=-1
+#pragma link C++ class vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > >+; // checksum=0x80707160, version=6
+#pragma link C++ class pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > >+; // checksum=0x53c18924, version=-1
+#pragma link C++ class vector < pair < unsigned int, vector < pair < unsigned int, vector < pair <unsigned int, pair < double, double > > > > > > >+; // checksum=0x47fe6901, version=6
+#pragma link C++ class pair <unsigned int, double >+; // checksum=0x71a4cb1e, version=-1
+#pragma link C++ class vector < pair <unsigned int, double > >+; // checksum=0x6b073150, version=6
 
-#pragma link C++ class Belle2::ROIid+;
-#pragma link C++ class Belle2::ROIpayload+;
-#pragma link C++ class Belle2::VXDIntercept+;
-#pragma link C++ class Belle2::PXDIntercept+;
-#pragma link C++ class Belle2::SVDIntercept+;
-#pragma link C++ class Belle2::RecoTrack+;
-#pragma link C++ class Belle2::RecoHitInformation+;
-#pragma link C++ class Belle2::BremHit+;
-#pragma link C++ class Belle2::SectorMapConfig+;
-#pragma link C++ class Belle2::hitXP+;
-#pragma link C++ class Belle2::hitXPDerivate+;
-#pragma link C++ class Belle2::DATCONSVDDigit+;
-#pragma link C++ class Belle2::DATCONSVDSpacePoint+;
-#pragma link C++ class Belle2::DATCONMostProbableHit+;
-#pragma link C++ class Belle2::DATCONTrack+;
-#pragma link C++ class std::vector<Belle2::hitXP>+;
-#pragma link C++ class std::vector<Belle2::hitXPDerivate>+;
+#pragma link C++ class Belle2::ROIid+; // checksum=0x67e7bffd, version=1
+#pragma link C++ class Belle2::ROIpayload+; // checksum=0x24692265, version=2
+#pragma link C++ class Belle2::VXDIntercept+; // checksum=0xbb836403, version=1
+#pragma link C++ class Belle2::PXDIntercept+; // checksum=0x756ab835, version=2
+#pragma link C++ class Belle2::SVDIntercept+; // checksum=0x14d0197f, version=4
+#pragma link C++ class Belle2::RecoTrack+; // checksum=0xf6a2843, version=9
+#pragma link C++ class Belle2::RecoHitInformation+; // checksum=0xcf616f27, version=6
+#pragma link C++ class Belle2::BremHit+; // checksum=0x56052b3a, version=1
+#pragma link C++ class Belle2::SectorMapConfig+; // checksum=0x4ef40736, version=2
+#pragma link C++ class Belle2::hitXP+; // checksum=0xdd9d6ff4, version=1
+#pragma link C++ class Belle2::hitXPDerivate+; // checksum=0xfa2e4b3c, version=1
+#pragma link C++ class Belle2::DATCONSVDDigit+; // checksum=0x45b64e93, version=1
+#pragma link C++ class Belle2::DATCONSVDSpacePoint+; // checksum=0xb78110ca, version=1
+#pragma link C++ class Belle2::DATCONMostProbableHit+; // checksum=0x75b048b2, version=2
+#pragma link C++ class Belle2::DATCONTrack+; // checksum=0xa157a1e1, version=1
+#pragma link C++ class std::vector<Belle2::hitXP>+; // checksum=0x26380ecc, version=6
+#pragma link C++ class std::vector<Belle2::hitXPDerivate>+; // checksum=0x82b91048, version=6
 
-#pragma link C++ class Belle2::SpacePointInfo+;
-#pragma link C++ class Belle2::FilterInfo+;
-#pragma link C++ class std::vector<FilterInfo>+;
-#pragma link C++ class std::vector<SpacePointInfo>+;
-#pragma link C++ class Belle2::ObserverInfo+;
+#pragma link C++ class Belle2::SpacePointInfo+; // checksum=0xa7b6f75a, version=1
+#pragma link C++ class Belle2::FilterInfo+; // checksum=0xc33c4990, version=1
+#pragma link C++ class std::vector<Belle2::FilterInfo>+; // checksum=0x4718205b, version=6
+#pragma link C++ class std::vector<Belle2::SpacePointInfo>+; // checksum=0x8273c275, version=6
+#pragma link C++ class Belle2::ObserverInfo+; // checksum=0xb1e62507, version=1
 
 // ----------------------------------------------------------------------------
 

@@ -42,7 +42,7 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
   //Relation to RecoTracks from Tracks is already tested at the module level.
 
   if (m_validation) {
-    B2DEBUG(300, "Register DataStore for validation.");
+    B2DEBUG(24, "Register DataStore for validation.");
     m_validationV0s.registerInDataStore(v0ValidationVerticesName, DataStore::c_ErrorIfAlreadyRegistered);
     m_v0s.registerRelationTo(m_validationV0s);
   }
@@ -100,7 +100,7 @@ bool V0Fitter::rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::Mea
     stPlus.extrapolateToCylinder(Rstart);
     stMinus.extrapolateToCylinder(Rstart);
   } catch (...) {
-    B2DEBUG(200, "Extrapolation to cylinder failed.");
+    B2DEBUG(22, "Extrapolation to cylinder failed.");
     return true;
   }
 
@@ -126,12 +126,12 @@ bool V0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMin
   }
 
   if (vertexVector.size() != 1) {
-    B2DEBUG(150, "Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());
+    B2DEBUG(21, "Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());
     return false;
   }
 
   if ((*vertexVector[0]).getNTracks() != 2) {
-    B2DEBUG(100, "Wrong number of tracks in vertex.");
+    B2DEBUG(20, "Wrong number of tracks in vertex.");
     return false;
   }
 
@@ -158,7 +158,7 @@ bool V0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit:
     /// This shouldn't ever happen, but I can see the extrapolation
     /// code trying several windings before giving up, so this happens occasionally.
     /// Something more stable would perhaps be desirable.
-    B2DEBUG(20, "Could not extrapolate track to vertex.");
+    B2DEBUG(22, "Could not extrapolate track to vertex.");
     return false;
   }
   return true;
@@ -209,6 +209,7 @@ std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses
 bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
                            const Const::ParticleType& v0Hypothesis)
 {
+  /// Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackPlus  =  trackPlus->getRelated<RecoTrack>(m_recoTracksName);
   RecoTrack* recoTrackMinus = trackMinus->getRelated<RecoTrack>(m_recoTracksName);
 
@@ -314,7 +315,6 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
 {
   const auto trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
-  /// Existence of corresponding RecoTrack already checked at the module level;
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(
                                 *recoTrackPlus);/// make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
   const int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
@@ -324,7 +324,6 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     return false;
   }
 
-  /// Existence of corresponding RecoTrack already checked at the module level;
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(
                                  *recoTrackMinus);/// make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
   const int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
@@ -385,12 +384,12 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
     return false;
   } else {
     if (vert.getChi2() > m_vertexChi2CutOutside) {
-      B2DEBUG(200, "Vertex outside beam pipe, chi^2 too large.");
+      B2DEBUG(22, "Vertex outside beam pipe, chi^2 too large.");
       return false;
     }
   }
 
-  B2DEBUG(20, "Vertex accepted.");
+  B2DEBUG(22, "Vertex accepted.");
 
   if (not extrapolateToVertex(stPlus, stMinus, posVert, hasInnerHitStatus)) {
     return false;
@@ -412,7 +411,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
                               std::make_pair(trackMinus, tfrMinusVtx));
 
     if (m_validation) {
-      B2DEBUG(300, "Create StoreArray and Output for validation.");
+      B2DEBUG(24, "Create StoreArray and Output for validation.");
       const genfit::GFRaveTrackParameters* tr0 = vert.getParameters(0);
       const genfit::GFRaveTrackParameters* tr1 = vert.getParameters(1);
       TLorentzVector lv0, lv1;

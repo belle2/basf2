@@ -50,6 +50,7 @@ class BtoPi0Pi0(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
+        stdPi0s('all', path)
         loadStdPi0ForBToCharmless(path=path)
 
     def build_lists(self, path):
@@ -479,6 +480,7 @@ class BtoHad1Track1Pi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     def load_standard_lists(self, path):
+        stdPi0s('all', path)
         loadStdVeryLooseTracks('K', path=path)
         loadStdVeryLooseTracks('pi', path=path)
         loadStdPi0ForBToCharmless(path=path)
@@ -524,6 +526,7 @@ class BtoHad2Tracks1Pi0(BaseSkim):
     __category__ = "physics, hadronic B to charm"
 
     def load_standard_lists(self, path):
+        stdPi0s('all', path)
         loadStdPi0ForBToCharmless(path=path)
         stdKshorts(path=path)
         loadStdVeryLooseTracks('K', path=path)
@@ -574,6 +577,7 @@ class BtoHad3Tracks1Pi0(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
+        stdPi0s('all', path)
         loadStdVeryLooseTracks('K', path=path)
         loadStdVeryLooseTracks('pi', path=path)
         loadStdPi0ForBToCharmless(path=path)

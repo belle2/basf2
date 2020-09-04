@@ -1818,7 +1818,7 @@ def looseMCTruth(list_name, path):
 
 def buildRestOfEvent(target_list_name, inputParticlelists=None,
                      belle_sources=False, fillWithMostLikely=False,
-                     chargedPIDPriors=None, useKLMEnergy=False, path=None):
+                     chargedPIDPriors=None, path=None):
     """
     Creates for each Particle in the given ParticleList a RestOfEvent
     dataobject and makes BASF2 relation between them. User can provide additional
@@ -1835,8 +1835,6 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
                               amount of certain charged particle species, should be a list of
                               six floats if not None. The order of particle types is
                               the following: [e-, mu-, pi-, K-, p+, d+]
-    @param useKLMEnergy       experimental option to include the KLM-based particles into
-                              ROE 4-vector computation
     @param belle_sources boolean to indicate that the ROE should be built from Belle sources only
     @param path      modules are added to this path
     """
@@ -1853,14 +1851,10 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
         inputParticlelists += ['pi+:roe_default', 'gamma:roe_default', 'K_L0:roe_default']
     else:
         inputParticlelists += ['pi+:roe_default', 'gamma:mdst']
-    if useKLMEnergy:
-        B2WARNING(f'*** The ROE for {target_list_name} list will have KLM energy included into its 4-momentum. ***\n'
-                  '          *** This is an experimental option, please do NOT use it for publications. ***')
     roeBuilder = register_module('RestOfEventBuilder')
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('particleListsInput', inputParticlelists)
-    roeBuilder.param('useKLMEnergy', useKLMEnergy)
     path.add_module(roeBuilder)
 
 
@@ -1931,7 +1925,7 @@ def appendROEMask(list_name,
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
-    @param trackSelection        decay string for the track-based partticles in ROE
+    @param trackSelection        decay string for the track-based particles in ROE
     @param eclClusterSelection   decay string for the ECL-based particles in ROE
     @param klmClusterSelection   decay string for the KLM-based particles in ROE
     @param path                  modules are added to this path
@@ -1967,7 +1961,7 @@ def appendROEMasks(list_name, mask_tuples, path=None):
     """
     compatible_masks = []
     for mask in mask_tuples:
-        # add emply KLM-based selection if it's absent:
+        # add empty KLM-based selection if it's absent:
         if len(mask) == 3:
             compatible_masks += [(*mask, '')]
         else:
@@ -1983,6 +1977,7 @@ def updateROEMask(list_name,
                   mask_name,
                   trackSelection,
                   eclClusterSelection='',
+                  klmClusterSelection='',
                   path=None):
     """
     Update an existing ROE mask by applying additional selection cuts for
@@ -1992,15 +1987,16 @@ def updateROEMask(list_name,
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the ROEMask to update
-    @param trackSelection        decay string for the tracks in ROE
-    @param eclClusterSelection   decay string for the tracks in ROE
+    @param trackSelection        decay string for the track-based particles in ROE
+    @param eclClusterSelection   decay string for the ECL-based particles in ROE
+    @param klmClusterSelection   decay string for the KLM-based particles in ROE
     @param path                  modules are added to this path
     """
 
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection)])
+    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection, klmClusterSelection)])
     roeMask.param('update', True)
     path.add_module(roeMask)
 
@@ -2011,7 +2007,7 @@ def updateROEMasks(list_name, mask_tuples, path):
     and/or clusters.
 
     The multiple ROE masks with their own selection criteria are specified
-    via list tuples (mask_name, trackSelection, eclClusterSelection)
+    via list tuples (mask_name, trackSelection, eclClusterSelection, klmClusterSelection)
 
     See function `appendROEMasks`!
 
@@ -2019,11 +2015,18 @@ def updateROEMasks(list_name, mask_tuples, path):
     @param mask_tuples           array of ROEMask list tuples to be appended
     @param path                  modules are added to this path
     """
+    compatible_masks = []
+    for mask in mask_tuples:
+        # add empty KLM-based selection if it's absent:
+        if len(mask) == 3:
+            compatible_masks += [(*mask, '')]
+        else:
+            compatible_masks += [mask]
 
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + 'MaskList')
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasks', mask_tuples)
+    roeMask.param('ROEMasks', compatible_masks)
     roeMask.param('update', True)
     path.add_module(roeMask)
 

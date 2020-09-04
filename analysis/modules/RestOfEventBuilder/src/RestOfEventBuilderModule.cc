@@ -68,6 +68,9 @@ void RestOfEventBuilderModule::initialize()
     particles.registerRelationTo(nestedROEArray);
     roeArray.registerRelationTo(nestedROEArray);
   }
+  if (m_useKLMEnergy) {
+    B2WARNING("*** The ROE for " << m_particleList << " list will have KLM energy included into its 4-momentum. ***");
+  }
 }
 
 void RestOfEventBuilderModule::event()

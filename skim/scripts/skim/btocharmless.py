@@ -29,7 +29,7 @@ __liaison__ = "Benedikt Wach <benedikt.wach@desy.de>"
 
 
 @fancy_skim_header
-def BtoPi0Pi0(BaseSkim):
+class BtoPi0Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
@@ -62,7 +62,7 @@ def BtoPi0Pi0(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad2Tracks(BaseSkim):
+class BtoHad2Tracks(BaseSkim):
     """
     Reconstructed decay modes:
 
@@ -106,7 +106,7 @@ def BtoHad2Tracks(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad3Tracks(BaseSkim):
+class BtoHad3Tracks(BaseSkim):
     """
 
     Reconstructed decay modes:
@@ -159,7 +159,7 @@ def BtoHad3Tracks(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad4Tracks(BaseSkim):
+class BtoHad4Tracks(BaseSkim):
     """
 
     Reconstructed decay modes:
@@ -226,7 +226,7 @@ def BtoHad4Tracks(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad4TracksFSPonly(BaseSkim):
+class BtoHad4TracksFSPonly(BaseSkim):
     """
 
     Reconstructed decay modes:
@@ -274,7 +274,7 @@ def BtoHad4TracksFSPonly(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad4TracksKS(BaseSkim):
+class BtoHad4TracksKS(BaseSkim):
     """
 
     Reconstructed decay modes:
@@ -324,7 +324,7 @@ def BtoHad4TracksKS(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad4TracksKstar(BaseSkim):
+class BtoHad4TracksKstar(BaseSkim):
     """
 
     Reconstructed decay modes:
@@ -371,7 +371,7 @@ def BtoHad4TracksKstar(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad4TracksRho(BaseSkim):
+class BtoHad4TracksRho(BaseSkim):
     """
 
     Reconstructed decay modes:
@@ -412,7 +412,7 @@ def BtoHad4TracksRho(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad5Tracks(BaseSkim):
+class BtoHad5Tracks(BaseSkim):
     """
     Reconstructed decay modes:
 
@@ -456,7 +456,7 @@ def BtoHad5Tracks(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad1Track1Pi0(BaseSkim):
+class BtoHad1Track1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
@@ -496,7 +496,7 @@ def BtoHad1Track1Pi0(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad2Tracks1Pi0(BaseSkim):
+class BtoHad2Tracks1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
@@ -545,7 +545,7 @@ def BtoHad2Tracks1Pi0(BaseSkim):
 
 
 @fancy_skim_header
-def BtoHad3Tracks1Pi0(BaseSkim):
+class BtoHad3Tracks1Pi0(BaseSkim):
     """
     Reconstructed decay modes:
 

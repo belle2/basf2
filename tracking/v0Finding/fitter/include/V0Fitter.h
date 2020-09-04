@@ -79,11 +79,11 @@ namespace Belle2 {
      * Return true (false) if the vertex fit has done well (failed).
      * If RecoTracks have hits inside the fitted V0 vertex position, bits in hasInnerHitStatus are set.
      * If there are no inside hits, store the V0 to the DataStore.
-     * @param trackPlus
-     * @param trackMinus
-     * @param recoTrackPlus
-     * @param recoTrackMinus
-     * @param v0Hypothesis
+     * @param trackPlus Track of positively-charged daughter
+     * @param trackMinus Track of negatively-charged daughter
+     * @param recoTrackPlus RecoTrack of positively-charged daughter
+     * @param recoTrackMinus RecoTrack of negatively-charged daughter
+     * @param v0Hypothesis ParticleType used in vertex fitting
      * @param hasInnerHitStatus store a result of this function. if the plus(minus) track has hits inside the V0 vertex position, 0x1(0x2) bit is set.
      * @param vertexPos store a result of this function. the fitted vertex position is stored.
      * @param forceStore if true, store the fitted V0 to the DataStore even if there are some inside hits.
@@ -98,7 +98,7 @@ namespace Belle2 {
     /** Create a copy of RecoTrack.
      * @param origRecoTrack original RecoTrack
      * @param trackPDG signed PDG used for the track fit hypothesis
-     * @return
+     * @return copied RecoTrack stored in the m_copiedRecoTracks
      */
     RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack, const int trackPDG);
 
@@ -126,8 +126,8 @@ namespace Belle2 {
      * -- while still being part of the V0.  Unlikely, I didn't find
      * a single example in MC.  On the other hand it rejects
      * impossible candidates.
-     * @param stPlus
-     * @param stMinus
+     * @param stPlus MeasuredStateOnPlane of positively-charged daughter
+     * @param stMinus MeasuredStateOnPlane of negatively-charged daughter
      * @return
      */
     bool rejectCandidate(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus);

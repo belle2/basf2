@@ -12,11 +12,11 @@ __authors__ = [
 import modularAnalysis as ma
 from skim.standardlists.lightmesons import (
     loadStdAllRhoPlus,
-    loadStdPi0ForBToHadrons,
-    loadStdVeryLooseKstar0,
-    loadStdVeryLooseRho0)
+    loadStdPi0ForBToHadrons)
 from skim.standardlists.charmless import (
     loadStdPi0ForBToCharmless,
+    loadStdVeryLooseKstar0,
+    loadStdVeryLooseRho0,
     loadStdVeryLooseKstarPlus,
     loadStdVeryLooseKstarPlusPi0,
     loadStdVeryLooseRhoPlus)

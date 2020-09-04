@@ -44,31 +44,13 @@ namespace Belle2 {
 
     /// set V0 fitter mode.
     /// switch the mode of fitAndStore function.
-    ///   0: original
-    ///   1: original with vertexFitWithRecoTracks function
-    ///   2: remove hits inside the V0 vertex position
-    ///   3: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair (default)
+    ///   0: store V0 at the first vertex fit, regardless of inner hits
+    ///   1: remove hits inside the V0 vertex position
+    ///   2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
     void setFitterMode(int fitterMode);
 
     /// Fit V0 with given hypothesis and store if fit was successful.
-    bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis)
-    {
-      if (m_v0FitterMode == 0)      return fitAndStore0(trackPlus, trackMinus, v0Hypothesis);
-      else if (m_v0FitterMode == 1) return fitAndStore1(trackPlus, trackMinus, v0Hypothesis);
-      else if (m_v0FitterMode == 2) return fitAndStore2(trackPlus, trackMinus, v0Hypothesis);
-      else if (m_v0FitterMode == 3) return fitAndStore2(trackPlus, trackMinus, v0Hypothesis);
-      else                          return fitAndStore0(trackPlus, trackMinus, v0Hypothesis);
-    }
-
-    /// original fitAndStore function
-    bool fitAndStore0(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
-
-    /// original with vertexFitWithRecoTracks function
-    bool fitAndStore1(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
-
-    /// remove hits inside the V0 vertex position
-    bool fitAndStore2(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
-
+    bool fitAndStore(const Track* trackPlus, const Track* trackMinus, const Const::ParticleType& v0Hypothesis);
 
     /// Get track hypotheses for a given v0 hypothesis.
     std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const;
@@ -170,7 +152,8 @@ namespace Belle2 {
 
     double m_beamPipeRadius;  ///< Radius where inside/outside beampipe is defined.
     double m_vertexChi2CutOutside;  ///< Chi2 cut outside beampipe.
-    int    m_v0FitterMode;  /// 0: original, 1: original with new function, 2: remove hits inside the V0 vertex position, 3: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair
+    int    m_v0FitterMode;  ///0: store V0 at the first vertex fit, regardless of inner hits, 1: remove hits inside the V0 vertex position, 2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
+    bool   m_forcestore;/// true only if the V0Fitter mode is 1
     bool   m_useOnlyOneSVDHitPair;/// false only if the V0Fitter mode is 3
   };
 

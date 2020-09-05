@@ -12,6 +12,7 @@ from prompt import CalibrationSettings
 from caf.utils import IoV
 from itertools import groupby
 from itertools import chain
+from math import ceil
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
@@ -127,5 +128,19 @@ def get_calibrations(input_data, **kwargs):
         cal.algorithms[0].params = {"iov_coverage": specific_iov}  # Not valid when using SimpleRunByRun strategy
         cal_list.append(cal)
         iCal += 1
+
+    # The number of calibrations depends on the 'chunking' above. We would like to make sure that the total number of
+    # batch jobs submitted is approximately constant and reasonable, no matter how many files and chunks are used.
+    # So we define 1000 total jobs and split this between the calibrations depending on the fraction of total input files
+    # in the calibrations.
+
+    total_jobs = 1000
+    total_input_files = len(reduced_file_to_iov_physics) + len(reduced_file_to_iov_cosmics)
+
+    for cal in cal_list:
+        fraction_of_input_files = len(cal.input_files)/total_input_files
+        # Assign the max collector jobs to be roughly the same fraction of total jobs
+        cal.max_collector_jobs = ceil(fraction_of_input_files * total_jobs)
+        basf2.B2INFO(f"{cal.name} will submit a maximum of {cal.max_collector_jobs} batch jobs")
 
     return cal_list

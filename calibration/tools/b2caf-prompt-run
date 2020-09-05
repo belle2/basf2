@@ -92,7 +92,7 @@ Required format of JSON file:
     }
 
 The backend_args dictionary will be used to set up the `caf.backends.Backend` class and overrides the defaults of that class.
-If you set backend options via the command line e.g. `--queue l`, then this will override backend_args values in this JSON
+If you set backend options via the command line e.g. ``--queue l``, then this will override backend_args values in this JSON
 file. Individual `caf.framework.Collection` objects can also override these options by setting them. So the final priority order
 is (lowest -> highest): [Backend.default_backend_args -> caf_config.json
 -> b2caf-prompt-run command line options -> Collection.backend_args]

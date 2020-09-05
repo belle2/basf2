@@ -62,25 +62,25 @@ def monitor_jobs(args, jobs):
 
 
 class ArgumentsGenerator():
-    """
-    Simple little class to hold a generator (uninitialised) and the necessary args/kwargs to
-    initialise it. This lets us re-use a generator by setting it up again fresh. This is not
-    optimal for expensive calculations, but it is nice for making large sequences of
-    Job input arguments on the fly.
-
-    Parameters:
-        generator_function (generator): A function (callable) that contains a `yield` statement. This generator
-            should *not* be initialised i.e. you haven't called it with `generator_function(*args, **kwargs)`
-            yet. That will happen when accessing the `ArgumentsGenerator.generator` property.
-        args (tuple): The positional arguments you want to send into the intialisation of the generator.
-        kwargs (dict): The keyword arguments you want to send into the intialisation of the generator.
-    """
-
     def __init__(self, generator_function, *args, **kwargs):
         """
+        Simple little class to hold a generator (uninitialised) and the necessary args/kwargs to
+        initialise it. This lets us re-use a generator by setting it up again fresh. This is not
+        optimal for expensive calculations, but it is nice for making large sequences of
+        Job input arguments on the fly.
+
+        Parameters:
+            generator_function (py:function): A function (callable) that contains a ``yield`` statement. This generator
+                should *not* be initialised i.e. you haven't called it with ``generator_function(*args, **kwargs)``
+                yet. That will happen when accessing the `ArgumentsGenerator.generator` property.
+            args (tuple): The positional arguments you want to send into the intialisation of the generator.
+            kwargs (dict): The keyword arguments you want to send into the intialisation of the generator.
         """
+        #: Generator function that has not been 'primed'.
         self.generator_function = generator_function
+        #: Positional argument tuple used to 'prime' the `ArgumentsGenerator.generator_function`.
         self.args = args
+        #: Keyword argument dictionary used to 'prime' the `ArgumentsGenerator.generator_function`.
         self.kwargs = kwargs
 
     @property
@@ -88,7 +88,7 @@ class ArgumentsGenerator():
         """
         Returns:
             generator: The initialised generator (using the args and kwargs for initialisation). It should be ready
-            to have `next`/`send` called on it.
+            to have ``next``/``send`` called on it.
         """
         gen = self.generator_function(*self.args, **self.kwargs)
         gen.send(None)  # Prime it
@@ -128,13 +128,13 @@ def range_arguments(start=0, stop=None, step=1):
 class SubjobSplitter(ABC):
     """
     Abstract base class. This class handles the logic of creating subjobs for a `Job` object.
-    The `SubjobSplitter.create_subjobs` function should be implemented and used to construct
+    The `create_subjobs` function should be implemented and used to construct
     the subjobs of the parent job object.
 
     Parameters:
         arguments_generator (ArgumentsGenerator): Used to construct the generator function that will yield the argument
-            tuple for each `SubJob`. The splitter will iterate through the generator each time `SubjobSplitter.create_subjobs` is
-            called. The `SubJob` will be sent into the generator with `send(subjob)` so that the generator can decide what
+            tuple for each `SubJob`. The splitter will iterate through the generator each time `create_subjobs` is
+            called. The `SubJob` will be sent into the generator with ``send(subjob)`` so that the generator can decide what
             arguments to return.
     """
 
@@ -142,15 +142,19 @@ class SubjobSplitter(ABC):
         """
         Derived classes should call `super` to run this.
         """
+        #: The `ArgumentsGenerator` used when creating subjobs.
         self.arguments_generator = arguments_generator
 
     @abstractmethod
     def create_subjobs(self, job):
+        """
+        Implement this method in derived classes to generate the `SubJob` objects.
+        """
         pass
 
     def assign_arguments(self, job):
         """
-        Use the `self.arguments_generator` (if one exists) to assign the argument tuples to the
+        Use the `arguments_generator` (if one exists) to assign the argument tuples to the
         subjobs.
         """
         if self.arguments_generator:
@@ -183,9 +187,10 @@ class MaxFilesSplitter(SubjobSplitter):
     def __init__(self, *, arguments_generator=None, max_files_per_subjob=1):
         """
         Parameters:
-            max_files_per_subjob (int): The maximium number of input files used per subjob created.
+            max_files_per_subjob (int): The maximium number of input files used per `SubJob` created.
         """
         super().__init__(arguments_generator=arguments_generator)
+        #: The maximium number of input files that will be used for each `SubJob` created.
         self.max_files_per_subjob = max_files_per_subjob
 
     def create_subjobs(self, job):
@@ -214,12 +219,13 @@ class MaxSubjobsSplitter(SubjobSplitter):
             max_subjobs (int): The maximium number ofsubjobs that will be created.
         """
         super().__init__(arguments_generator=arguments_generator)
+        #: The maximum number of `SubJob` objects to be created, input files are split evenly between them.
         self.max_subjobs = max_subjobs
 
     def create_subjobs(self, job):
         """
         This function creates subjobs for the parent job passed in. It creates as many subjobs as required
-        by the number of input files up to the maximum set by `MaxSubjobSplitter.max_subjobs`. If there are
+        by the number of input files up to the maximum set by `MaxSubjobsSplitter.max_subjobs`. If there are
         more input files than `max_subjobs` it instead groups files by the minimum number per subjob in order to
         respect the subjob limit e.g. If you have 11 input files and a maximum number of subjobs of 4, then it
         will create 4 subjobs, 3 of them with 3 input files, and one with 2 input files.
@@ -253,14 +259,14 @@ class ArgumentsSplitter(SubjobSplitter):
     """
     Creates SubJobs based on the given argument generator. The generator will be called until a `StopIteration` is issued.
     Be VERY careful to not accidentally give an infinite generator! Otherwise it will simply create SubJobs until you run out
-    of memory. You can set the `max_subjobs` parameter to try and prevent this and throw an exception.
+    of memory. You can set the `ArgumentsSplitter.max_subjobs` parameter to try and prevent this and throw an exception.
 
     This splitter is useful for MC production jobs where you don't have any input files, but you want to control the exp/run
     numbers of subjobs. If you do have input files set for the parent `Job` objects, then the same input files will be
     assinged to every `SubJob`.
 
     Parameters:
-        arguments_generator (ArgumentsGnerator): The standard ArgumentsGenerator that is used to assign arguments
+        arguments_generator (ArgumentsGenerator): The standard ArgumentsGenerator that is used to assign arguments
     """
 
     def __init__(self, *, arguments_generator=None, max_subjobs=None):
@@ -273,9 +279,9 @@ class ArgumentsSplitter(SubjobSplitter):
     def create_subjobs(self, job):
         """
         This function creates subjobs for the parent job passed in. It creates subjobs until the
-        arguments_generator finishes.
+        `SubjobSplitter.arguments_generator` finishes.
 
-        If `ArgumentSplitter.max_subjobs` is set, then it will throw an exception if more than this number of
+        If `ArgumentsSplitter.max_subjobs` is set, then it will throw an exception if more than this number of
         subjobs are created.
         """
         arg_gen = self.arguments_generator.generator
@@ -336,7 +342,7 @@ class Job:
             self.output_patterns = []
             #: Command and arguments as a list that wil be run by the job on the backend
             self.cmd = []
-            #: The arguments that will be applied to the `self.cmd` (These are ignored by SubJobs as they have their own arguments)
+            #: The arguments that will be applied to the `cmd` (These are ignored by SubJobs as they have their own arguments)
             self.args = []
             #: Input files to job (`pathlib.Path`), a list of these is copied to the working directory.
             self.input_files = []
@@ -509,8 +515,8 @@ class Job:
     def job_dict(self):
         """
         Returns:
-            dict: A JSON serialisable representation of the `Job` and its `SubJob`s. `Path` objects are converted to
-            `string` via `Path.as_posix()`
+            dict: A JSON serialisable representation of the `Job` and its `SubJob` objects. `Path` objects are converted to
+            string via ``Path.as_posix()``.
         """
         job_dict = {}
         job_dict["name"] = self.name
@@ -581,7 +587,7 @@ class Job:
 
     def append_current_basf2_setup_cmds(self):
         """
-        This adds simple setup commands like `source /path/to/tools/b2setup` to your `Job`.
+        This adds simple setup commands like ``source /path/to/tools/b2setup`` to your `Job`.
         It should detect if you are using a local release or CVMFS and append the correct commands
         so that the job will have the same basf2 release environment.
 
@@ -669,7 +675,7 @@ class SubJob(Job):
         """
         Returns:
             dict: A JSON serialisable representation of the `SubJob`. `Path` objects are converted to
-            `string` via `Path.as_posix()`. Since Subjobs inherit most of the parent job's config
+            `string` via ``Path.as_posix()``. Since Subjobs inherit most of the parent job's config
             we only output the input files and arguments that are specific to this subjob and no other details.
         """
         job_dict = {}
@@ -863,7 +869,7 @@ class Local(Backend):
         """
         """
         super().__init__(backend_args=backend_args)
-        #: The actual `multiprocessing.Pool` object of this instance of the Backend.
+        #: The actual ``Pool`` object of this instance of the Backend.
         self.pool = None
         #: The size of the multiprocessing process pool.
         self.max_processes = max_processes
@@ -1451,7 +1457,7 @@ class PBS(Batch):
     @classmethod
     def qstat(cls, username="", job_ids=None):
         """
-        Simplistic interface to the `qstat` command. Lets you request information about all jobs or ones matching the filter
+        Simplistic interface to the ``qstat`` command. Lets you request information about all jobs or ones matching the filter
         ['job_id'] or for the username. The result is a JSON dictionary containing come of the useful job attributes returned
         by qstat.
 
@@ -1459,10 +1465,10 @@ class PBS(Batch):
         finished job is VERY hard to get. There are other commands that are sometimes included that may do a better job.
         This one should work for Melbourne's cloud computing centre.
 
-        Parameters:
+        Keyword Args:
             username (str): The username of the jobs we are interested in. Only jobs corresponding to the <username>@hostnames
                 will be in the output dictionary.
-            job_ids list(str): List of Job ID strings, each given by qstat during submission. If this argument is given then
+            job_ids (list[str]): List of Job ID strings, each given by qstat during submission. If this argument is given then
                 the output of this function will be only information about this jobs. If this argument is not given, then all jobs
                 matching the other filters will be returned.
 
@@ -1522,7 +1528,7 @@ class PBS(Batch):
         Creates a Job dictionary with various job information from the XML element returned by qstat.
 
         Parameters:
-            job_elem (Element): The XML Element of the Job
+            job_elem (xml.etree.ElementTree.Element): The XML Element of the Job
 
         Returns:
             dict: JSON serialisable dictionary of the Job information we are interested in.
@@ -1727,7 +1733,7 @@ class LSF(Batch):
     def bjobs(cls, output_fields=None, job_id="", username="", queue=""):
         """
         Simplistic interface to the `bjobs` command. lets you request information about all jobs matching the filters
-        'job_id', 'username', and 'queue'. The result is the JSON dictionary returned by output of the `-json` bjobs option.
+        'job_id', 'username', and 'queue'. The result is the JSON dictionary returned by output of the ``-json`` bjobs option.
 
         Parameters:
             output_fields (list[str]): A list of bjobs -o fields that you would like information about e.g. ['stat', 'name', 'id']
@@ -1735,7 +1741,7 @@ class LSF(Batch):
                 the output of this function will be only information about this job. If this argument is not given, then all jobs
                 matching the other filters will be returned.
             username (str): By default bjobs (and this function) return information about only the current user's jobs. By giving
-                a username you can access the job information of a specific user's jobs. By giving `username='all'` you will
+                a username you can access the job information of a specific user's jobs. By giving ``username='all'`` you will
                 receive job information from all known user jobs matching the other filters.
             queue (str): Set this argument to receive job information about jobs that are in the given queue and no other.
 
@@ -1787,7 +1793,7 @@ class LSF(Batch):
     def bqueues(cls, output_fields=None, queues=None):
         """
         Simplistic interface to the `bqueues` command. lets you request information about all queues matching the filters.
-        The result is the JSON dictionary returned by output of the `-json` bqueues option.
+        The result is the JSON dictionary returned by output of the ``-json`` bqueues option.
 
         Parameters:
             output_fields (list[str]): A list of bqueues -o fields that you would like information about
@@ -1839,7 +1845,7 @@ class HTCondor(Batch):
     """
     Backend for submitting calibration processes to a HTCondor batch system.
     """
-    #: HTCondor batch script (different to the wrapper script of `Batch.submit_script`)
+    #: HTCondor batch script (different to the wrapper script of `Backend.submit_script`)
     batch_submit_script = "submit.sub"
     #: Batch submission commands for HTCondor
     submission_cmds = ["condor_submit", "-terse"]
@@ -1921,7 +1927,8 @@ class HTCondor(Batch):
         Simple class to help monitor status of jobs submitted by HTCondor Backend.
 
         You pass in a `Job` object and job id from a condor_submit command.
-        When you call the `ready` method it runs condor_q and, if needed, condor_history to see whether or not the job has finished.
+        When you call the `ready` method it runs condor_q and, if needed, ``condor_history``
+        to see whether or not the job has finished.
         """
 
         #: HTCondor statuses mapped to Job statuses
@@ -1960,7 +1967,7 @@ class HTCondor(Batch):
             """
             In order to be slightly more efficient we pass in a previous call to condor_q to see if it can work.
             If it is there we update the job's status. If not we are forced to start calling condor_q and, if needed,
-            condor_history, etc.
+            ``condor_history``, etc.
 
             Parameters:
                 condor_q_output (dict): The JSON output of a previous call to `HTCondor.condor_q` which we can re-use to find the
@@ -2058,7 +2065,7 @@ class HTCondor(Batch):
         """
         Simplistic interface to the `condor_q` command. lets you request information about all jobs matching the filters
         'job_id' and 'username'. Note that setting job_id negates username so it is ignored.
-        The result is the JSON dictionary returned by output of the `-json` condor_q option.
+        The result is the JSON dictionary returned by output of the ``-json`` condor_q option.
 
         Parameters:
             class_ads (list[str]): A list of condor_q ClassAds that you would like information about.
@@ -2068,7 +2075,7 @@ class HTCondor(Batch):
                 If this argument is given then the output of this function will be only information about this job.
                 If this argument is not given, then all jobs matching the other filters will be returned.
             username (str): By default we return information about only the current user's jobs. By giving
-                a username you can access the job information of a specific user's jobs. By giving `username='all'` you will
+                a username you can access the job information of a specific user's jobs. By giving ``username='all'`` you will
                 receive job information from all known user jobs matching the other filters. This may be a LOT of jobs
                 so it isn't recommended.
 
@@ -2118,9 +2125,9 @@ class HTCondor(Batch):
     @classmethod
     def condor_history(cls, class_ads=None, job_id="", username=""):
         """
-        Simplistic interface to the `condor_history` command. lets you request information about all jobs matching the filters
-        'job_id' and 'username'. Note that setting job_id negates username so it is ignored.
-        The result is a JSON dictionary filled by output of the `-json` condor_history option.
+        Simplistic interface to the ``condor_history`` command. lets you request information about all jobs matching the filters
+        ``job_id`` and ``username``. Note that setting job_id negates username so it is ignored.
+        The result is a JSON dictionary filled by output of the ``-json`` ``condor_history`` option.
 
         Parameters:
             class_ads (list[str]): A list of condor_history ClassAds that you would like information about.
@@ -2130,7 +2137,7 @@ class HTCondor(Batch):
                 If this argument is given then the output of this function will be only information about this job.
                 If this argument is not given, then all jobs matching the other filters will be returned.
             username (str): By default we return information about only the current user's jobs. By giving
-                a username you can access the job information of a specific user's jobs. By giving `username='all'` you will
+                a username you can access the job information of a specific user's jobs. By giving ``username='all'`` you will
                 receive job information from all known user jobs matching the other filters. This is limited to 10000 records
                 and isn't recommended.
 

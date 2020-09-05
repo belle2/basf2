@@ -44,7 +44,10 @@ def grouper(n, iterable):
     """
     Parameters:
         n (int): Maximum size of the list that gets returned.
-        iterable: The original list that we want to return groups of size `n` from.
+        iterable (list): The original list that we want to return groups of size 'n' from.
+
+    Yields:
+        tuple
     """
     it = iter(iterable)
     while True:
@@ -63,10 +66,10 @@ def pairwise(iterable):
     looping.
 
     Parameters:
-        iterable (sequence): The iterable object we will loop over
+        iterable (list): The iterable object we will loop over
 
     Returns:
-        list(tuple)
+        list[tuple]
     """
     a, b = itertools.tee(iterable)
     next(b, None)
@@ -274,7 +277,7 @@ def runs_overlapping_iov(iov, runs):
 
     Parameters:
         iov (IoV): IoV to compare overlaps with
-        runs list(ExpRun): The available runs to check if them overlap with the IoV
+        runs (list[ExpRun]): The available runs to check if them overlap with the IoV
 
     Return:
         set
@@ -320,7 +323,7 @@ def vector_from_runs(runs):
     Convert a sequence of `ExpRun` to a std vector<pair<int,int>>
 
     Parameters:
-        runs list(ExpRun): The runs to convert
+        runs (list[ExpRun]): The runs to convert
 
     Returns:
         ROOT.vector(ROOT.pair(int,int))
@@ -335,14 +338,14 @@ def vector_from_runs(runs):
 
 def runs_from_vector(exprun_vector):
     """
-    Takes a vector of ExpRun from CalibrationAlgorithm and returns
+    Takes a vector of `ExpRun` from CalibrationAlgorithm and returns
     a Python list of (exp,run) tuples in the same order.
 
     Parameters:
-        exprun_vector (ROOT.vector(ROOT.pair(int,int))): Vector of expruns for conversion
+        exprun_vector (``ROOT.vector[ROOT.pair(int,int)]``): Vector of expruns for conversion
 
     Return:
-        list(ExpRun)
+        list[ExpRun]
     """
     return [ExpRun(exprun.first, exprun.second) for exprun in exprun_vector]
 
@@ -353,16 +356,15 @@ def find_run_lists_from_boundaries(boundaries, runs):
     the runs that are contained in the IoV of each boundary interval. We assume that this
     is occuring in only one Experiment! We also assume that after the last boundary start
     you want to include all runs that are higher than this starting ExpRun.
-
     Note that the output ExpRuns in their lists will be sorted. So the ordering may be
     different than the overall input order.
 
     Parameters:
-        boundaries list(ExpRun): Starting boundary ExpRuns to tell us where to start an IoV
-        runs list(ExpRun): The available runs to chunk into boundaries
+        boundaries (list[ExpRun]): Starting boundary ExpRuns to tell us where to start an IoV
+        runs (list[ExpRun]): The available runs to chunk into boundaries
 
     Return:
-        dict(IoV,list(ExpRun))
+        dict[IoV,list[ExpRun]]
     """
     boundary_iov_to_runs = {}
     # Find the boundary IoVs

@@ -143,6 +143,8 @@ b2caf-prompt-show
     :filename: calibration/tools/b2caf-prompt-show
     :func: get_argparser
     :prog: b2caf-prompt-show
+    :nodefaultconst:
+    :nogroupsections:
 
 .. _b2caf_prompt_run:
 
@@ -153,6 +155,8 @@ b2caf-prompt-run
     :filename: calibration/tools/b2caf-prompt-run
     :func: get_argparser
     :prog: b2caf-prompt-run
+    :nodefaultconst:
+    :nogroupsections:
 
 .. _b2caf_prompt_check:
 
@@ -163,6 +167,8 @@ b2caf-prompt-check
     :filename: calibration/tools/b2caf-prompt-check
     :func: get_argparser
     :prog: b2caf-prompt-check
+    :nodefaultconst:
+    :nogroupsections:
 
 
 Utility Functions

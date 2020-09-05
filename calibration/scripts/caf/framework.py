@@ -141,10 +141,11 @@ class Collection():
             for tag in reversed(b2conditions.default_globaltags):
                 self.use_central_database(tag)
 
-        #: The basf2 steering file that will be used for Collector jobs run by this collection. This script will be copied into
-        #  subjob directories as part of the input sandbox.
         self.job_script = Path(find_file("calibration/scripts/caf/run_collector_path.py")).absolute()
-        #: The Collector `caf.backends.Job.cmd` attribute. Probably using the `self.job_script` to run basf2.
+        """The basf2 steering file that will be used for Collector jobs run by this collection.
+This script will be copied into subjob directories as part of the input sandbox."""
+
+        #: The Collector `caf.backends.Job.cmd` attribute. Probably using the `job_script` to run basf2.
         self.job_cmd = ["basf2", self.job_script.name, "--job-information job_info.json"]
 
     def reset_database(self):
@@ -169,12 +170,12 @@ class Collection():
 
         Alternatively you could set an empty list as the input database_chain when adding the Collection to the Calibration.
 
-        NOTE!! Since release-04-00-00 the behaviour of basf2 conditions databases has changed.
+        NOTE!! Since ``release-04-00-00`` the behaviour of basf2 conditions databases has changed.
         All local database files MUST now be at the head of the 'chain', with all central database global tags in their own
         list which will be checked after all local database files have been checked.
 
-        So even if you ask for ["global_tag1", "localdb/database.txt", "global_tag2"] to be the database chain, the real order
-        that basf2 will use them is ["global_tag1", "global_tag2", "localdb/database.txt"] where the file is checked first.
+        So even if you ask for ``["global_tag1", "localdb/database.txt", "global_tag2"]`` to be the database chain, the real order
+        that basf2 will use them is ``["global_tag1", "global_tag2", "localdb/database.txt"]`` where the file is checked first.
         """
         central_db = CentralDatabase(global_tag)
         self.database_chain.append(central_db)
@@ -183,8 +184,6 @@ class Collection():
         """
         Parameters:
             filename (str): The path to the database.txt of the local database
-
-        Keyword Argumemts:
             directory (str): The path to the payloads directory for this local database.
 
         Append a local database to the chain for this collection.
@@ -415,9 +414,9 @@ class Calibration(CalibrationBase):
     Parameters:
         name (str): Name of this calibration. It should be unique for use in the `CAF`
     Keyword Arguments:
-        collector (str or `basf2.Module`): Should be set to a CalibrationCollectorModule() or a string with the module name.
-        algorithms (list or ``ROOT.Belle2.CalibrationAlgorithm``): The algorithm(s) to use for this `Calibration`.
-        input_files (str or list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
+        collector (str, `basf2.Module`): Should be set to a CalibrationCollectorModule() or a string with the module name.
+        algorithms (list, ``ROOT.Belle2.CalibrationAlgorithm``): The algorithm(s) to use for this `Calibration`.
+        input_files (str, list[str]): Input files for use by this Calibration. May contain wildcards useable by `glob.glob`
 
     A Calibration won't be valid in the `CAF` until it has all of these four attributes set. For example:
 

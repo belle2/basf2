@@ -52,32 +52,36 @@ Important services for you
 Here is a curated list of the services and tools that we think are most useful 
 right away (for newcomers) and that are needed in these lessons.
 
-* `confluence.desy.de <https://confluence.desy.de>`_ - Our "wiki". 
-  Editable, linked pages that can be easily edited. 
-  Used for many things from run planning to tracking progress through a
-  physics analysis.
+`confluence.desy.de <https://confluence.desy.de>`_
+    Our "wiki". 
+    Editable, linked pages that can be easily edited. 
+    Used for many things from run planning to tracking progress through a
+    physics analysis.
 
-* `stash.desy.de <https://stash.desy.de>`_ - Our git server. 
-  All code should go here, ideally under the Belle II "project". 
-  **It is a rule that your analysis code must be viewable to the rest of the 
-  collaboration.**
-  To make this less painful, you should get happy with git and the stash tool.
+`stash.desy.de <https://stash.desy.de>`_
+    Our git server. 
+    All code should go here, ideally under the Belle II "project". 
+    **It is a rule that your analysis code must be viewable to the rest of the
+    collaboration.**
+    To make this less painful, you should get happy with git and the stash tool.
 
-* `agira.desy.de <https://agira.desy.de>`_ - Our bug reporting and 
-  work-tracking system. 
-  Used to report problems, request features, request MC samples, and track
-  work. 
-  You will hear people refer to this as "JIRA".
+`agira.desy.de <https://agira.desy.de>`_
+    Our bug reporting and work-tracking system. 
+    Used to report problems, request features, request MC samples, and track
+    work. 
+    You will hear people refer to this as "JIRA".
 
-* `software.belle2.org <https://software.belle2.org>`_ - The documentation for
-  the Belle II software.
-  You might occasionally hear people refer to this as "sphinx".
+`software.belle2.org <https://software.belle2.org>`_
+    The documentation for
+    the Belle II software.
+    You might occasionally hear people refer to this as "sphinx".
 
-* `questions.belle2.org <https://questions.belle2.org>`_ - a Q&A forum. 
-  Something like stack exchange if you've ever used that.
+`questions.belle2.org <https://questions.belle2.org>`_
+    Our Q&A forum. 
+    Something like stack exchange if you've ever used that.
 
-* `chat.belle2.org <https://chat.belle2.org>`_ - For chatting with other
-  collaborators who are awake in your timezone.
+`chat.belle2.org <https://chat.belle2.org>`_
+    For chatting with other collaborators who are awake in your timezone.
 
 .. tip::
 

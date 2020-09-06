@@ -34,7 +34,7 @@ SSH - Secure Shell
 
 Secure Shell (SSH) is a protocol to access other computers. It was invented in
 1995 to make the old methods more secure but on first glance it still behaves
-similar remote shell or telnet from the eighties: You can connect to a remote
+similar to remote shell or telnet from the eighties: You can connect to a remote
 computer to enter commands in a terminal. In the simplest case you will just
 type the name of the computer you want to connect to:
 
@@ -43,7 +43,7 @@ type the name of the computer you want to connect to:
     ssh username@servername.domain
 
 However SSH has become much more powerful than this if you know how to use it
-correctly. so in this section we will try to go through all the helpful features
+correctly. So in this section we will try to go through all the helpful features
 you should know when working remotely.
 
 But first we need to talk a bit about security, especially encryption.
@@ -79,16 +79,29 @@ message again and vice versa. Now this example is obviously way too simple but
 this is actually rather close to the `RSA algorithm
 <https://en.wikipedia.org/wiki/RSA_(cryptosystem)>`_ still used today.
 
-In practice, we will now keep one of these keys private and publish the other
-on. This allows us to do two things. If Alice owns the private key and Bob has
-the public key
+In practice, we will now keep one of these keys private and publish the other.
+Let's say we have two people, Alice and Bob and Alice owns the private key and
+Bob has the public key. Then with this key pair they can perform two things:
 
-1. Bob can send confidential information only intended for Alice by encrypting
-   it with the public key. Only Alice has the private key to decrypt it. by
-   encrypting it with the public key
-2. Establish the identity of Alice: Bob can ask Alice to encrypt a given message
-   with her private key. Bob can then decrypt it with his public key to be sure
-   he talks to Alice as only she would have been able to encrypt the message.
+.. _fig:asymmetric_encryption:
+
+.. figure:: asymmetric_encryption.png
+   :align: center
+
+   The two use cases of public/private encryption using our very simple example.
+
+Confidentiality
+   Bob can send confidential information only intended for Alice by encrypting
+   it with the public key. Only Alice has the private key to decrypt it and
+   nobody else can see the content of the message (left side of
+   :numref:`fig:asymmetric_encryption`).
+
+Authentication
+   To establish the identity of Alice, Bob gives Alice a message to encrypt with
+   her private key. Bob can then decrypt it with his public key to be sure he
+   talks to Alice as only she would have been able to encrypt the message (right
+   side of :numref:`fig:asymmetric_encryption`).
+
 
 The second part here is the one you are using almost everywhere in the internet:
 Every https connection on the internet uses this principle to make sure that the
@@ -147,29 +160,40 @@ Once you are connected the next important step is to disconnect, just type
 ``exit`` and press return and your connection will be closed. If you're very
 impatient you can also press ``Ctrl-D`` as a shortcut.
 
-.. One final thing about host keys: After you connected to a server, ssh remembers
-.. the host key and will verify it on each connection. So you might see something
-.. like this::
+.. admonition:: Exercise
+   :class: exercise
 
-..     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-..     @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
-..     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-..     IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
-..     Someone could be eavesdropping on you right now (man-in-the-middle attack)!
-..     It is also possible that a host key has just been changed.
-..     The fingerprint for the RSA key sent by the remote host is
-..     SHA256:zyIMwlji8jqtD+UuSFuknQmevQPAUCiT39BfH/NrIbA.
-..     Please contact your system administrator.
+   Login to ``bastion.desy.de``, verify that the login succeeded with the
+   ``hostname`` command and log out again.
 
-.. This means the host presented a different key than it used to. This can
-.. sometimes happen if the server you want to connect to was reinstalled. So if
-.. **you know** that the server was reinstalled or upgraded you can tell ssh to
-.. forget the previous host key. For example to forget the host key for
-.. ``bastion.desy.de`` just use
+.. seealso::
+   :class: toggle
 
-.. .. code-block:: bash
+    One final thing about host keys: After you connected to a server, ssh
+    remembers the host key and will verify it on each connection. So you might
+    see something like this::
 
-..     ssh-keygen -R bastion.desy.de
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+        Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+        It is also possible that a host key has just been changed.
+        The fingerprint for the RSA key sent by the remote host is
+        SHA256:zyIMwlji8jqtD+UuSFuknQmevQPAUCiT39BfH/NrIbA.
+        Please contact your system administrator.
+
+    This means the host presented a different key than it used to. This can
+    sometimes happen if the server you want to connect to was reinstalled. So if
+    **you know** that the server was reinstalled or upgraded you can tell ssh to
+    forget the previous host key. For example to forget the host key for
+    ``bastion.desy.de`` just use
+
+    .. code-block:: bash
+
+        ssh-keygen -R bastion.desy.de
+
+.. rubric:: Copying Files
 
 In addition to just connection to a remote shell we can also ssh to copy files
 from one computer to another. Very similar to the ``cp`` command there is a
@@ -189,6 +213,24 @@ directory. In the same way
 
 will copy the file ``bastion-message`` from your local directory into your home
 directory on ``bastion.desy.de``.
+
+.. admonition:: Exercise
+   :class: exercise stacked
+
+   Copy a file from your local computer to your home directory on
+   ``bastion.desy.de``
+
+.. admonition:: Hint
+   :class: toggle xhint
+
+   You can use the ``touch`` command to create empty files
+
+.. admonition:: Exercise
+   :class: exercise
+
+   Copy a file from your home directory on ``bastion.desy.de`` to you local
+   directory
+
 
 .. admonition:: Question
    :class: exercise stacked
@@ -210,14 +252,27 @@ directory on ``bastion.desy.de``.
    using ``rsync``
 
 
+.. rubric:: Nested SSH connections
+
 You can also use ssh inside an ssh connection to "jump" from machine to machine.
 This sometimes is necessary as not all computers can be connected to directly
-from the internet. For example the login node for the KEK computing center cannot
-be accessed directly if your are not in the KEK network or using VPN.
+from the internet. For example the login node for the KEK computing center
+cannot be accessed directly if your are not in the KEK network or using VPN. The
+KEK network is rather complex so a very simplified layout is shown in
+:numref:`fig:keknetwork`.
+
+.. _fig:keknetwork:
+
+.. figure:: keknetwork.png
+   :align: center
+
+   Very simplified layout of the KEK network.
+
 
 .. note::
-   It is possible for your home institute to get direct access so you might not
-   be affected by this restriction while at work
+   It is possible for your home institute to get direct access to KEK network so
+   you might not be affected by this restriction while at work.
+
 
 So unless you are using VPN or are at KEK you most likely need to connect to the
 gateway servers first, either ``ssh1cc.kek.jp`` or ``ssh2cc.kek.jp``
@@ -256,7 +311,7 @@ SSH Configuration File
 
 Now you can already connect to a server but if your username or the server name
 is long you will have to type all of this every time you connect. Luckily we can
-automate this using the SSH configuration file in ``.ssh/config`` in your home
+automate this using the SSH configuration file ``.ssh/config`` in your home
 directory. Usually this file doesn't exist but you can simply create an empty
 file with that name.
 
@@ -299,6 +354,18 @@ configuration if we need to perform even more jumps. You should now be able to
 login to KEKCC by just typing ``ssh kekcc`` and also copy files directly with
 ``scp``. But you will have to enter your password two times, once when
 connecting to the gateway server and then when connecting to the KEKCC machine.
+
+.. admonition:: Excercise
+   :class: exercise stacked
+
+   Add a working kekcc configuration to your config file and verify that
+   you can login to kekcc by simply writing ``ssh kekcc``
+
+.. admonition:: Hint
+   :class: toggle xhint
+
+   Create the config file and take the above snippet. But make sure you replace
+   your own usernames for both servers
 
 .. admonition:: Key points
     :class: key-points
@@ -353,10 +420,10 @@ Next, it will ask you for a passphrase to protect the key. While technically you
 can create keys without a passphrase you should **never** do so as it would make
 it way to easy for others to get access to your key. This passphrase is not
 related to your account passwords and doesn't need to be changed but you should
-choose something safe, preferably a `sentence <https://xkcd.com/936/>`_. Don't
-worry, you don't have to type it all the time. After that it should just print
-some information on the key. Congratulations, you have created your very own SSH
-identity.
+choose something safe, preferably a `sequence of random words
+<https://xkcd.com/936/>`_. Don't worry, you don't have to type it all the time.
+After that it should just print some information on the key. Congratulations,
+you have created your very own SSH identity.
 
 .. admonition:: Question
    :class: exercise stacked
@@ -598,7 +665,7 @@ is not the case then the port you chose is already occupied and you need to stop
 the notebook (press ``Ctrl-C``), disconnect ssh and try with a different number.
 
 If it is the same number you're all good and you can just copy-paste the full
-link (including the characters after ``token=`` into your web browser and you
+link (including the characters after ``token=``) into your web browser and you
 should see a notebook interface open up.
 
 .. admonition:: Key points
@@ -636,12 +703,15 @@ case is
     rsync -vaz server:/folder/ localfolder
 
 which will efficiently copy everything in ``folder`` on ``server`` and put it in
-the directory ``localfolder``. The most common options are
+the directory ``localfolder`` (beware, it matters whether or not you put a slash
+at the end of the target)/ The most common options are
 
 -v          verbose mode, print file names as they are copied
 -a          archive mode, copy everything recursively and preserve file times
             and permissions
 -z          compress data while transmitting it
+-n          Only show which files would be copied instead of copying. Useful to
+            check everything works as expected before starting a big copy
 --exclude   exclude the given files from copying, useful for logfiles you might
             not need
 --delete    delete everything in ``localfolder`` that is not in the source folder

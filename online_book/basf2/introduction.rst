@@ -44,7 +44,7 @@ Well historic reasons: Belle had BASF, we have basf2.
 
 Basf2 is used in all aspects of the data-processing chain at Belle II:
 
-* simulation of MC,
+* generating simulated data,
 * unpacking of real raw data,
 * reconstruction (tracking, clustering, ...),
 * and high-level "analysis" reconstruction (such as applying cuts, 
@@ -230,7 +230,7 @@ We use the word "steering" since no real data **processing** is done in python.
 
      Generally speaking, the heavy data processing tasks are done in C++.
      This is because of the performance.
-     Python is used as a userfriendly and readable language for configuration.
+     Python is used as a user-friendly and readable language for configuration.
 
      .. note:: 
 
@@ -253,7 +253,7 @@ good to be aware of the jargon.
 .. are needed to reconstruct and process data.
 
 .. The **run database** collects data about specific runs (the luminosity, if all
-.. Subdetectors were working, etc)
+.. subdetectors were working, etc)
 
 .. seealso:: :ref:`conditionsdb_overview`
 
@@ -272,7 +272,7 @@ good to be aware of the jargon.
       a *steering file*.
     * You can navigate this online documentation.
 
-.. seealso:: 
+.. tip::
 
     After you've progressed a bit more through these lessons, you should
     revisit the :ref:`general_modpath` documentation page and
@@ -293,13 +293,14 @@ If you do not have a preference, you should connect to ``login.cc.kek.jp``.
 
 Before we start though...
 
-You shouldn't need to install anything
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+You shouldn't need to *install* anything
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A common misconception by newcommers (and even by senior people in the 
+A common misconception by newcomers (and even by senior people in the 
 collaboration), is that you need to "install" basf2 or "install a release".
 
-You almost certainly **do not** want or need to do this.
+It is possible to install from scratch, but you almost certainly **do not** 
+want or need to do this.
 If you are working at KEK (for certain) and at many many other sites, basf2
 is available preinstalled.
 It is distributed by something called `/cvmfs <https://cernvm.cern.ch/fs/>`_.
@@ -314,7 +315,8 @@ setup script...
 
         source /cvmfs/belle.cern.ch/tools/b2setup
 
-Some people like to put an alias to the setup script in their .bashrc file.
+Some people like to put an alias to the setup script in their .profile (or 
+.bashrc, .zshrc, ...) file.
 You are welcome to do this if you like.
 
 So now you have a Belle II environment.
@@ -327,7 +329,7 @@ You might have noticed that you still don't have the ``basf2`` executable:
         $> basf2
         command not found: basf2
 
-You need to choose a release (a specific version of of the software).
+You need to choose a release (a specific version of the software).
 If you don't know what release you want, you should take the latest stable
 full release or the latest light release.
 
@@ -379,7 +381,7 @@ It is also true that using the latest supported release makes you cool.
      :class: exercise stacked
 
      There is a detailed page in this documentation describing the differences
-     between a full releasee and a light release and also a Belle II question.
+     between a full release and a light release and also a Belle II question.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -418,7 +420,7 @@ It is also true that using the latest supported release makes you cool.
      :class: toggle solution
 
      **Yes**.
-     There should not be anything that breaks backward compativility between minor versions.
+     There should not be anything that breaks backward compatibility between minor versions.
 
 .. admonition:: Question
      :class: exercise stacked
@@ -481,7 +483,7 @@ It is also true that using the latest supported release makes you cool.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     We use git to tags a release.
+     We use git to tag releases.
      You might need to revisit the lesson on collaborative tools.
 
 .. admonition:: Solution
@@ -494,7 +496,6 @@ It is also true that using the latest supported release makes you cool.
 
      .. image:: introduction/find_a_tag.png
          :width: 300px
-
 
 A useful command
 ~~~~~~~~~~~~~~~~
@@ -512,6 +513,7 @@ Try
 to check everything was set up correctly.
 If that worked, then paste the information at the bottom (after the ascii art)
 into any correspondence with experts.
+
 
 Help at the command line
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -575,14 +577,21 @@ For now, you can list them all with:
 Basf2 particles
 ^^^^^^^^^^^^^^^
 
+Sometimes you will need to write particles' names in plain text format.
+Basf2 adopts the convention used by ROOT, the PDG, EvtGen, ...
+
 To show information about all the particles and properties known to basf2,
 there is a tool `b2help-particles`.
 
 .. code-block:: bash
 
-    b2help-particles B_s      # what was the pdg cod of the B-sub-s meson again?
-    b2help-particles Sigma_b- # I've forgotten the mass of the Sigma_b- !
-    #b2help-particles         # lists them all
+    b2help-particles --pdg 313 # how should I write the K*(892)?
+    b2help-particles B_s       # what was the pdg cod of the B-sub-s meson again?
+    b2help-particles Sigma_b-  # I've forgotten the mass of the Sigma_b- !
+    b2help-particles Upsi      # partial names are accepted
+    #b2help-particles          # lists them all (this is a lot of output)
+
+.. note:: In the next lesson you will need to use these names.
 
 Other useful features
 ^^^^^^^^^^^^^^^^^^^^^
@@ -598,7 +607,7 @@ Try just:
 In your IPython session, you can try the basf2 python interface to the `PDG
 <https://pdg.lbl.gov>`_ database:
 
-.. code-block:: python
+.. code-block:: ipython
 
     import pdg
     whatisthis = pdg.get(11)
@@ -672,6 +681,22 @@ To leave interactive basf2 / IPython, simply:
           TOTAL offline   : L = 5464553.60 /nb =  5464.55 /pb =    5.465 /fb =   0.0055 /ab
 
      So the answer is :math:`\sim 5.5\textrm{ fb}^{-1}`.
+
+
+Other useful things in your environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You might notice that setting up the basf2 environment means that you also have
+tools like ROOT, and (an up-to-date version of) git.
+
+These come via the Belle II **externals**.
+
+.. seealso::
+
+    If you are interested, you can browse the list of everything included in
+    the externals in `this README file
+    <https://stash.desy.de/projects/B2/repos/externals/browse/README.md>`_.
+
 
 .. admonition:: Key points
     :class: key-points
@@ -752,7 +777,8 @@ In brief:
   is interpreted as a charged particle 
   (:math:`e^\pm`, :math:`\mu^\pm`, :math:`\pi^\pm`, :math:`K^\pm`, or 
   :math:`p^\pm`).
-* A cluster with no track is interpreted as a photon or a :math:`K_L^0`.
+* A cluster with no track in close vicinity is interpreted as a photon 
+  or a :math:`K_L^0`.
 
 * Two or more of the above particles can be combined to make *composite* 
   particle candidates.
@@ -765,7 +791,7 @@ In brief:
 
   ... And so on.
 
-In fact, the analysis package mostly operates on **ParticleList**s.
+In fact, the analysis package mostly operates on **ParticleList** s.
 A **ParticleList** is just the list of all such particle candidates in each 
 event.
 In the next lesson you will make your own particle lists and use analysis 
@@ -790,8 +816,17 @@ In pseudo-python you will see they are very often of the form:
 
         import basf2
 
-        def doAnAnalysisTask( <arguments>, path ):
-            """A meaningful and clear docstring."""
+        def doAnAnalysisTask(<arguments>, path):
+            """
+            A meaningful and clear docstring. Sometimes quite long-winded. 
+            Occasionally longer than the active code in the function.
+
+            Details all of the function inputs...
+
+            Parameters:
+                foo (bar): some input argument
+                path (basf2.Path): modules are added to this path
+            """
             # register a module...
             this_module = basf2.register_module("AnalysisTaskModule")
             # configure the parameters...
@@ -819,8 +854,8 @@ In pseudo-python you will see they are very often of the form:
 .. admonition:: Solution
      :class: toggle solution
 
-     The :b2:mod:`ParticleCombiner` takes one or more **ParticleList**s
-     and combines **Particles** from the inputs to create *composite* particle
+     The :b2:mod:`ParticleCombiner` takes one or more **ParticleList** s
+     and combines **Particle** s from the inputs to create *composite* particle
      candidates.
 
       .. seealso::
@@ -831,7 +866,8 @@ In pseudo-python you will see they are very often of the form:
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Find the `modularAnalysis` convenience function that wraps the :b2:mod:`ParticleCombiner` module?
+     Find the `modularAnalysis` convenience function that wraps the 
+     :b2:mod:`ParticleCombiner` module?
      Read the function.
 
 .. admonition:: Solution

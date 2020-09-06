@@ -135,13 +135,14 @@
        pointer-events="all"
        id="rect973" />
     <path
-       d="M 308 71 L 480 71 L 480 237 L 493.76 237"
+       d="m 466,71 v 166 h 27.76"
        fill="none"
        stroke="#000000"
        stroke-width="2"
        stroke-miterlimit="10"
        pointer-events="stroke"
-       id="path977" />
+       id="path977"
+       sodipodi:nodetypes="ccc" />
     <path
        d="M 499.76 237 L 491.76 239.67 L 493.76 237 L 491.76 234.33 Z"
        fill="#000000"
@@ -167,7 +168,7 @@
        pointer-events="all"
        id="path983" />
     <g
-       transform="translate(-0.5 -0.5)"
+       transform="translate(-12.5,-0.5)"
        id="g989">
       <switch
          id="switch987">
@@ -213,7 +214,7 @@
        pointer-events="all"
        id="path993" />
     <g
-       transform="translate(-0.5 -0.5)"
+       transform="translate(-16.109375,-0.5)"
        id="g999">
       <switch
          id="switch997">
@@ -239,17 +240,18 @@
            font-family="hack"
            font-size="12px"
            text-anchor="middle"
-           id="text995">ssh cw01.kek.jp</text>
+           id="text995">ssh cw01.cc.kek.jp</text>
       </switch>
     </g>
     <path
-       d="M 308 71 L 480 71 L 480 147 L 493.76 147"
+       d="m 466,147 h 27.76"
        fill="none"
        stroke="#000000"
        stroke-width="2"
        stroke-miterlimit="10"
        pointer-events="stroke"
-       id="path1001" />
+       id="path1001"
+       sodipodi:nodetypes="cc" />
     <path
        d="M 499.76 147 L 491.76 149.67 L 493.76 147 L 491.76 144.33 Z"
        fill="#000000"
@@ -437,7 +439,7 @@
            font-family="hack"
            font-size="12px"
            text-anchor="middle"
-           id="text1039">cw01.kek.jp</text>
+           id="text1039">cw01.cc.kek.jp</text>
       </switch>
     </g>
     <rect
@@ -482,7 +484,7 @@
            font-family="hack"
            font-size="12px"
            text-anchor="middle"
-           id="text1049">cw02.kek.jp</text>
+           id="text1049">cw02.cc.kek.jp</text>
       </switch>
     </g>
     <rect

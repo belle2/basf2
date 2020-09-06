@@ -392,6 +392,8 @@ usually safer and more convenient than using the password directly.
     which will have almost the same effect.
 
 
+.. rubric:: Creating a key pair
+
 First, we need to create a private/public key pair to be used for SSH, called an
 identity. We want to do this on your **local machine**. There is an easy way to
 do this by just calling ``ssh-keygen``. Without any options this will just
@@ -463,6 +465,8 @@ you have created your very own SSH identity.
    the only real options are RSA and Ed25519. Ed25519 was added later and should
    be more secure but is not supported on old versions of SSH.
 
+.. rubric:: Using your new key
+
 Now that you have a key we want to use it. If you chose the default name, ssh
 will offer it to the remote server automatically. If you didn't choose the
 default name you need to tell ssh to use this key. While you can just tell ssh
@@ -508,6 +512,8 @@ You need to repeat these steps from all machines you work from, so your laptop
 and your workstation if you have both: Each machine you "own" should have it's
 own private/public key pair and those should be known to the servers you want to
 login to.
+
+.. rubric:: Making keys available on other machines
 
 Finally, you usually don't want to have private keys present on systems you
 don't really have control over for security reasons. But even more important
@@ -618,6 +624,8 @@ and is usually free. But any number is fine.
 
    We need to run ``ssh -L 8080:software.belle2.org:443 desy`` and then type
    ``https://localhost:8080`` in the browser.
+
+.. rubric:: Programs that open ports on the target machine
 
 One special case is running programs on the other side that directly open a port
 on the machine you're working on for you to connect. The most prominent example

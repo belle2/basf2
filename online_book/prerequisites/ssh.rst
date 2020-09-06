@@ -624,6 +624,13 @@ on the machine you're working on for you to connect. The most prominent example
 in our field are `Jupyter notebooks <https://jupyter.org/>`_ which offer a very
 nice python interface via web browser.
 
+.. warning::
+
+    Opening a port is not user specific but opens the port visible to **all
+    users on the network**. So whenever you open a port to listen to connections
+    you should make sure it cannot be misused. Jupyter does this for you with
+    passwords or token strings so you don't need to worry in this specific case.
+
 .. note::
 
     DESY offers a direct `weblogin

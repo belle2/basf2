@@ -782,3 +782,10 @@ There is an additional tool called `sshuttle
 where you have administration privileges but then it allows to use ssh to
 transparently connect your whole laptop to the network. This is then basically
 identical to a VPN connection.
+
+.. rubric:: Location aware SSH config file
+
+Sometimes you want to have your SSH config depend on where you are with your
+laptop. For example, while at KEK you don't need to jump through the gateway.
+This is indeed possible and explained in detail on `B2 Questions
+<https://questions.belle2.org/question/1247/sshconfig-dependent-on-network/>`_.

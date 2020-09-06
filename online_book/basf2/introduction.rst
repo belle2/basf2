@@ -609,41 +609,39 @@ In your IPython session, you can try the basf2 python interface to the `PDG
 
 .. code-block:: ipython
 
-    import pdg
-    whatisthis = pdg.get(11)
-    print(whatisthis.GetName(), whatisthis.Mass())
+    In [1]: import pdg
+    In [2]: whatisthis = pdg.get(11)
+    In [3]: print(whatisthis.GetName(), whatisthis.Mass())
 
 
 You should also make use of IPython's built-in documentation features.
 
 .. code-block:: ipython
 
-    import modularAnalysis 
-    modularAnalysis.reconstructDecay?
-    # the question mark brings up the function documentation in IPython
-    
-    print(dir(modularAnalysis)) # the python dir() function will also show you all functions' names
+    In [4]: import modularAnalysis 
+    In [5]: modularAnalysis.reconstructDecay?
+    In [6]: # the question mark brings up the function documentation in IPython
+    In [7]: print(dir(modularAnalysis)) # the python dir() function will also show you all functions' names
 
 
 You can remind yourself of the documentation for a `basf2.Path` in yet another way:
 
 .. code-block:: ipython
 
-    import basf2
-    basf2.Path?
-    # the question mark brings up the function documentation in IPython
-    
-    # this is equivalent to...
-    print(help(basf2.Path))
+   In [8]: import basf2
+   In [9]: basf2.Path?
+   In [10]: # the question mark brings up the function documentation in IPython
+   In [11]: # this is equivalent to...
+   In [12]: print(help(basf2.Path))
 
 
 To leave interactive basf2 / IPython, simply:
 
 .. code-block:: ipython
 
-    exit()
-    # or just
-    exit 
+   In [13]: # exit()
+   In [14]: # ... or just
+   In [15]: exit 
 
 
 .. admonition:: Question

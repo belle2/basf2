@@ -40,6 +40,7 @@ def stdCharged(particletype, listtype, path):
     Function to prepare one of several standardized types of charged particle lists:
       - 'all' with no cuts on track
       - 'good' high purity lists for data studies
+      - 'loosepid' loose selections for skimming, PID cut only
       - 'loose' loose selections for skimming
       - 'higheff' high efficiency list with loose global ID cut for data studies
       - 'mostlikely' list with the highest PID likelihood
@@ -74,6 +75,12 @@ def stdCharged(particletype, listtype, path):
         fillParticleList(
             particletype + '+:loose',
             _pidnames[_chargednames.index(particletype)] + ' > 0.1 and ' + goodTrack,
+            True,
+            path=path)
+    elif listtype == 'loosepid':
+        fillParticleList(
+            particletype + '+:loosepid',
+            _pidnames[_chargednames.index(particletype)] + ' > 0.1',
             True,
             path=path)
     elif listtype == 'higheff':

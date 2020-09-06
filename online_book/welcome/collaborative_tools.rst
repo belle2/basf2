@@ -1,7 +1,7 @@
 .. _onlinebook_collaborative_tools:
 
-Collaborative Tools
-===================
+Collaborative Tools.
+====================
 
 .. sidebar:: Overview
     :class: overview
@@ -14,7 +14,6 @@ Collaborative Tools
     	
     	* DESY accounts.
         * An internet browser.
-        * The git tutorial.
 
     **Questions**:
 
@@ -60,7 +59,7 @@ right away (for newcomers) and that are needed in these lessons.
 
 * `stash.desy.de <https://stash.desy.de>`_ - Our git server. 
   All code should go here, ideally under the Belle II "project". 
-  **It is a *rule* that your analysis code must be viewable to the rest of the 
+  **It is a rule that your analysis code must be viewable to the rest of the 
   collaboration.**
   To make this less painful, you should get happy with git and the stash tool.
 
@@ -102,9 +101,9 @@ This means that there is non-Belle II-specific help on the internet.
 .. admonition:: Solution
    :class: toggle solution
 
-   It's at `sphinx-doc.org <https://sphinx-doc.org>`_.
+   It's at `www.sphinx-doc.org <https://www.sphinx-doc.org>`_.
    There is also an English-language wikipedia page 
-   `here <https://en.wikipedia.org/wiki/Sphinx_(documentation_generator)>`_
+   `here <https://en.wikipedia.org/wiki/Sphinx_(documentation_generator)>`__.
 
 .. admonition:: Question
      :class: exercise stacked
@@ -114,7 +113,7 @@ This means that there is non-Belle II-specific help on the internet.
 .. admonition:: Solution
    :class: toggle solution
 
-   At support.atlassian.com !
+   At `support.atlassian.com <https://support.atlassian.com>`_!
    (You need to choose the tool and browse to "documentation".)
 
 .. admonition:: Question
@@ -196,25 +195,34 @@ Let's assume you are working with the grid when...
   - If you don't have any luck `ask a question <https://questions.belle2.org>`_
     or send an email to comp-users-forum@belle2.org.
 
+Some tips
+---------
+
 Confluence
 ~~~~~~~~~~
 
 Confluence is useful for easy documentation.
 We use it for glossaries, instructions, and planning.
+You will find: physics meetings discussion, the data-taking,
+data-reconstruction status, and much more on there.
 
-It's not reliable for software documentation, but you will find physics 
-meetings discussion, the data-taking, and data-reconstruction status there.
+It's not reliable for software documentation.
 
 .. admonition:: Exercise
     :class: exercise stacked
 
+    All Belle II data and simulation is centrally processed and reconstructed.
+    This is handled by the "data-production group".
     Find the current data-production status.
+    What data is processed? 
+    What is on-going?
 
 .. admonition:: Solution
     :class: toggle solution
    
     It's on confluence:
-    `Data Production Status <https://confluence.desy.de/display/BI/Data+Production+Status>`_
+    `Data Production Status
+    <https://confluence.desy.de/display/BI/Data+Production+Status>`_
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -227,6 +235,30 @@ meetings discussion, the data-taking, and data-reconstruction status there.
     It's on confluence:
     `Run Plan <https://confluence.desy.de/display/BI/Run+Plan>`_
 
+.. admonition:: Question
+    :class: exercise stacked
+
+    There are some Belle II-specific acronyms and jargon that you will 
+    encounter in these lessons.
+    What do the following mean?
+
+    * FEI
+    * ROE
+    * BCS
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    There is a glossary.
+    You should be able to find it.
+
+.. admonition:: Solution
+    :class: toggle solution
+   
+    Take a look at the `Main Glossary 
+    <https://confluence.desy.de/display/BI/Main+Glossary>`_
+    on confluence.
+
 There are some downsides to confluence. 
 Pages may be outdated (check the "last edited" message at the top) and
 sometimes links are broken or pages re-organised.
@@ -236,12 +268,26 @@ original author of the page will probably get back to you.
 If you are quite sure that something is outdated: please update it!
 You can always leave a comment asking experts to check your edit.
 
-We try to avoid documenting software on confluence because software
-changes between versions and pages can be outdated or not depending on the
-version of the software.
+We try to **avoid** documenting software on confluence because software
+changes between versions.
+Pages can be simultaneously outdated and not outdated depending on the version
+of the software you are using.
 
-Some tips
----------
+.. admonition:: Exercise
+    :class: exercise
+
+    There is a sandbox confluence page for you to experiment with adding 
+    material.
+    Go to the `Confluence Training Test Page <https://confluence.desy.de/display/BI/Confluence+Training+Test+Page>`_ and add some content.
+
+    Some inspiration:
+
+    * Link to a JIRA ticket.
+    * Link to another confluence page.
+    * Tag your colleagues.
+    * Add the date.
+    * Add your favourite picture of a cat / piece of art.
+
 
 How to ask a good question
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -251,14 +297,38 @@ only as good as the posts.
 Even though you have a problem and you want help quickly it is worthwile to
 take time on presentation.
 
-* Try to boil down the issue to the minimal (non)-working example, what you 
-  expect to happen, as well as instructions on how to run it.
-* Try to include all details that are needed to reproduce the issue but 
-  avoid walls of text.
-* Include full error messages and logs.
-* Make use of formatting (for code, logs, . . . ).
-* If you use data, include a path or a small example data file.
-* Choose an appropriate title, and use tags.
+0. Search for existing questions.
+1. Try to boil down the issue to the minimal (non)-working example, what you 
+   expect to happen, as well as instructions on how to run it.
+2. Try to include all details that are needed to reproduce the issue but 
+   avoid walls of text.
+3. Include full error messages and logs.
+4. Make use of formatting (for code, logs, . . . ).
+5. If you use data, include a path or a small example data file.
+6. Choose an appropriate title, and use tags.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    What is an MWE?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    This is jargon but it is not specific to Belle II.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    It stands for minimal working example.
+
+    .. seealso:: 
+
+         `This excellent stack overflow post
+         <https://stackoverflow.com/help/minimal-reproducible-example>`_ 
+         and `this English language wikipedia page
+         <https://en.wikipedia.org/wiki/Minimal_working_example>`_.
+
 
 .. seealso::
 
@@ -276,6 +346,7 @@ Code is indented by four spaces, and you can use latex!
 .. code:: markdown
 
         This is some normal text.
+        This is normal text with inline code `[ x*x for x in range(10) ]`.
 
             # this is code (or a log message), indented 4 spaces
             for i in range(1000):
@@ -292,6 +363,9 @@ Code is indented by four spaces, and you can use latex!
 This gets rendered something like:
 
 .. figure:: collaborative_tools/formatting.png
+   :width: 750px
+   :align: center
+   :alt: An example questions post.
 
 
 Housekeeping
@@ -304,10 +378,11 @@ You should also vote on other good questions.
 This helps everyone find relevant good information.
 
 .. figure:: collaborative_tools/close_and_upvote.png
-   :width: 15em
+   :width: 150px
    :align: center
+   :alt: Click on the circle to choose an answer.
 
-   Click on the circle to choose an answer.
+   Click on the circle with a check-mark to choose an answer.
    Click on the arrow to up-vote.
 
 Don't forget to answer!
@@ -315,6 +390,11 @@ Don't forget to answer!
 
 The forum is a Q& **A** forum. 
 If you know an answer to a question: answer it!
+
+.. tip::
+
+    If you *don't* know the answer, but know someone who you think might: 
+    please tag them in a comment.
 
 A bit more about working with stash and JIRA
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -335,7 +415,7 @@ A bit more about working with stash and JIRA
    We trust that you did it.
    The main software repository is:
    https://stash.desy.de/projects/B2/repos/software , and the list of commits 
-   is `here <https://stash.desy.de/projects/B2/repos/software/commits>`_.
+   is `here <https://stash.desy.de/projects/B2/repos/software/commits>`__.
 
 .. admonition:: Exercise
      :class: exercise stacked
@@ -355,20 +435,41 @@ A bit more about working with stash and JIRA
 Here is a rough workflow for working with stash and JIRA.
 
 1. Identify an issue: Feature requests, bug report, ...
+
    - If you don’t know if it's a real bug, you can always ask on questions.
+
 2. Open an issue on JIRA and assign someone to work on it
+
    - Click "create" and fill out the form.
-   - It can be reassigned, so just guess someone (e.g. the librarian of the package)
-3. Discuss there: Is this really a bug? Do we really need this feature?
-4. You (or someone else will) create a branch that references the issue
-   and add some commits to the branch
-5. You (or someone else will) open a pull request, add reviewers add a clear description
+
+   - It can be reassigned, so either guess someone or leave it as "Automatic".
+     If you leave assignee as Automatic but choose a "component" then the 
+     person in charge of the package is automatically assigned.
+
+3. Discuss there in comments: Is this really a bug? Do we really need this
+   feature?
+
+4. You (or someone else will) create a branch that references the issue,
+   write some code, and add some commits to the branch.
+
+5. You (or someone else will) open a pull request, add reviewers, and add a 
+   clear description.
+
+   - You (or someone else) can edit the text, title, and reviewers after a
+     first attempt.
+
 6. Reviewers look at the changes, leave comments on code and in general.
-7. The develor will react to reviewers
+
+7. The developer will react to reviewers
+
    - more commits to this branch
+
 8. After all reviewers agree: Merge!
 
-.. seealso:: `How do I send a JIRA ticket? <https://questions.belle2.org/question/1317/how-do-i-send-a-jira-ticket/>`_
+.. seealso:: 
+
+    `How do I send a JIRA ticket?
+    <https://questions.belle2.org/question/1317/how-do-i-send-a-jira-ticket/>`_
 
 .. tip:: 
 
@@ -397,7 +498,7 @@ The page you are now reading is written in sphinx.
 .. admonition:: Solution
    :class: toggle solution
 
-   It's here [FIXME]
+   It's `here <../../_sources/online_book/welcome/collaborative_tools.rst.txt>`__.
 
 If you discover an omission or a problem (or even a typo) you can actually 
 fix it quite easily yourself.
@@ -416,8 +517,8 @@ You can make a difference!
 
 People are nice: don't be too afraid to bother them or break stuff (chances are
 you won't, anyway).
-Ask for help on questions.belle2.org or leave a comment on a confluence page or
-on a JIRA ticket.
+Ask for help on `questions.belle2.org <https://questions.belle2.org>`_ or leave
+a comment on a confluence page or on a JIRA ticket.
 
 Help us out with documentation: as a beginner, you know best what is missing!
 
@@ -426,13 +527,15 @@ Help us out with documentation: as a beginner, you know best what is missing!
 
     * Software documentation → `software.belle2.org <https://software.belle2.org>`_.
     * Ask questions (and answer them) at `questions.belle2.org <https://questions.belle2.org>`_.
-      Good questions are also documentation and are also helpful!
     * `Confluence <https://confluence.desy.de>`_ is our wiki.
-    * Code → `stash.desy.de <https://stash.desy.de>`_ is where all code should go.
+    * Code → `stash.desy.de <https://stash.desy.de>`_.
     * Bugs, feature requests → `agira.desy.de <https://agira.desy.de>`_.
-      Bugs do exist, don't hesitate too much to report them
+
+.. tip:: Good questions are also documentation and are also helpful!
+
+.. tip:: Bugs do exist, don't hesitate too much to report them.
 
 .. topic:: Author(s) of this lesson
 
-     Kilian Lieret (kilian.lieret@campus.lmu.de),
-     Sam Cunliffe (sam.cunliffe@desy.de)
+     Kilian Lieret,
+     Sam Cunliffe

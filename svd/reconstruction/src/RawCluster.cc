@@ -16,6 +16,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/calibration/SVDPulseShapeCalibrations.h>
 
 using namespace std;
 
@@ -99,7 +100,7 @@ namespace Belle2 {
     };
 
 
-    Belle2::SVDShaperDigit::APVFloatSamples RawCluster::getClsSamples() const
+    Belle2::SVDShaperDigit::APVFloatSamples RawCluster::getClsSamples(bool inElectrons) const
     {
 
       if (m_strips.size() == 0)
@@ -115,22 +116,28 @@ namespace Belle2 {
 
       const StoreArray<SVDShaperDigit> m_storeShaperDigits(m_storeShaperDigitsName.c_str());
 
+      SVDPulseShapeCalibrations pulseShapeCal;
+
       for (auto istrip : m_strips) {
         const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
         if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
         Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();
         for (int iSample = 0; iSample < static_cast<int>(APVsamples.size()); ++iSample)
-          returnSamples.at(iSample) += APVsamples.at(iSample);
+          if (inElectrons)
+            returnSamples.at(iSample) += pulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, shaperdigit->getCellID(), APVsamples.at(iSample));
+          else
+            returnSamples.at(iSample) += APVsamples.at(iSample);
       }
+
 
       return returnSamples;
     }
 
-    std::pair<int, std::vector<float>> RawCluster::getMaxSum3Samples() const
+    std::pair<int, std::vector<float>> RawCluster::getMaxSum3Samples(bool inElectrons) const
     {
 
       //take the cluster samples
-      Belle2::SVDShaperDigit::APVFloatSamples clsSamples = getClsSamples();
+      Belle2::SVDShaperDigit::APVFloatSamples clsSamples = getClsSamples(inElectrons);
 
       //Max Sum selection
       if (clsSamples.size() < 3) B2ERROR("APV25 samples less than 3!?");

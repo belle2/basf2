@@ -18,6 +18,8 @@
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
+#include <svd/reconstruction/SVDReconstructionBase.h>
+
 #include <svd/reconstruction/SVDRecoTimeFactory.h>
 #include <svd/reconstruction/SVDRecoChargeFactory.h>
 
@@ -92,6 +94,33 @@ void SVDClusterizerModule::beginRun()
     m_chargeRecoWith3SamplesAlgorithm = m_recoConfig->getChargeRecoWith3Samples();
 
   }
+  //check that all algorithms are available, otherwise use the default one
+  SVDReconstructionBase recoBase;
+
+  if (!recoBase.isTimeAlgorithmAvailable(m_timeRecoWith6SamplesAlgorithm)) {
+    B2WARNING("cluster time algorithm " << m_timeRecoWith6SamplesAlgorithm << " is NOT available, using CoG6");
+    m_timeRecoWith6SamplesAlgorithm = "CoG6";
+  };
+
+  if (!recoBase.isTimeAlgorithmAvailable(m_timeRecoWith3SamplesAlgorithm)) {
+    B2WARNING("cluster time algorithm " << m_timeRecoWith3SamplesAlgorithm << " is NOT available, using CoG3");
+    m_timeRecoWith3SamplesAlgorithm = "CoG3";
+  };
+  if (!recoBase.isChargeAlgorithmAvailable(m_chargeRecoWith6SamplesAlgorithm)) {
+    B2WARNING("cluster charge algorithm " << m_chargeRecoWith6SamplesAlgorithm << " is NOT available, using MaxSample");
+    m_chargeRecoWith6SamplesAlgorithm = "MaxSample";
+  };
+  if (!recoBase.isChargeAlgorithmAvailable(m_chargeRecoWith3SamplesAlgorithm)) {
+    B2WARNING("cluster charge algorithm " << m_chargeRecoWith3SamplesAlgorithm << " is NOT available, using MaxSample");
+    m_chargeRecoWith3SamplesAlgorithm = "MaxSample";
+  };
+
+  B2INFO("SVD  6-sample DAQ, strip time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", strip charge algorithm: " <<
+         m_chargeRecoWith6SamplesAlgorithm);
+
+  B2INFO("SVD  3-sample DAQ, strip time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", strip charge algorithm: " <<
+         m_chargeRecoWith3SamplesAlgorithm);
+
 
   m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm);
   m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm);
@@ -99,10 +128,10 @@ void SVDClusterizerModule::beginRun()
   m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
 
 
-  B2INFO("SVD  6-sample DAQ, time algorithm:" << m_timeRecoWith6SamplesAlgorithm <<  ", charge algorithm: " <<
+  B2INFO("SVD  6-sample DAQ, cluster time algorithm:" << m_timeRecoWith6SamplesAlgorithm <<  ", cluster charge algorithm: " <<
          m_chargeRecoWith6SamplesAlgorithm);
 
-  B2INFO("SVD  3-sample DAQ, time algorithm:" << m_timeRecoWith3SamplesAlgorithm <<  ", charge algorithm: " <<
+  B2INFO("SVD  3-sample DAQ, cluster time algorithm:" << m_timeRecoWith3SamplesAlgorithm <<  ", cluster charge algorithm: " <<
          m_chargeRecoWith3SamplesAlgorithm);
 }
 

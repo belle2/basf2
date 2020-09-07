@@ -48,14 +48,19 @@ Belle2PhysicsList
 The second one is *Belle2PhysicsList*, optimized for the Belle II needs by the Geant4 experts. The details on the *Belle2PhysicsList* are explained below.
 
 .. toctree::
-
    Belle2PhysicsList 
 
 Secondary particles
 ===================
 
-For the details on secondary particles produced by Geant4, please refer to `this confluence page <https://confluence.desy.de/display/BI/Software+SecondaryParticles>`_.
+.. toctree::
+   Secondary
 
+FullSim
+=============
+
+.. toctree::
+   FullSim
 
 Functions in simulation.py
 ==========================
@@ -64,9 +69,4 @@ Functions in simulation.py
    :members:
    :undoc-members:
 
-
-FullSimTiming
-=============
-
-This module is used to count the CPU time consumed by each subdetector during simulation. The externals library should be compiled in the debug mode for the job execution, so usually only experts use this module.
 

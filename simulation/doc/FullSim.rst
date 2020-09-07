@@ -2,11 +2,11 @@ FullSim
 ========
 
 ``FullSim`` module provides the full *Geant4* simulation for the framework.
-It initializes Geant4, calls the converter to translate the `ROOT` TGeo
+It initializes Geant4, calls the converter to translate the **ROOT** TGeo
 volumes/materials to native Geant4 volumes/materials, initializes the
 physics processes and user actions.
 
-This module requires a valid geometry in memory (`gGeoManager`). Therefore,
+This module requires a valid geometry in memory (gGeoManager). Therefore,
 a geometry building module (e.g ``Geometry`` ) should have been executed before this module is called.
 
 .. b2-modules::

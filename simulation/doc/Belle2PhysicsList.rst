@@ -3,6 +3,7 @@ Belle2 Physics List
 
 .. _Geant4-provided reference physics lists : https://geant4.web.cern.ch/node/155
 .. _Belle2PhysicsList : https://stash.desy.de/projects/B2/repos/software/browse/simulation/physicslist/src/Belle2PhysicsList.cc
+.. _geant4/source/physics_lists/constructors : https://geant4.kek.jp/lxr/source/physics_lists/constructors/
 
 `Belle2PhysicsList`_ is a Geant4 modular physics list designed to fit the requirements of
 Belle2 simulation.  It is an alternative to the `Geant4-provided reference physics lists`_,
@@ -33,7 +34,7 @@ constructors.  In *Belle2PhysicsList* there are eleven such constructors:
 - GammaLeptoNuclearPhysics
 
 The first three physics constructors are part of the standard Geant4 distribution and
-can be found in `geant4/source/physics_lists/constructors`.
+can be found in `geant4/source/physics_lists/constructors`_ .
 They handle the purely electromagnetic interactions, weak and electromagnetic decays,
 and optical photon interactions, respectively.  The next seven constructors deal with
 purely hadronic interactions and the last one handles gamma-nuclear and lepto-nuclear
@@ -149,8 +150,8 @@ Using this physics list
 
 *Belle2PhysicsList* is currently invoked in **FullSimModule**.  It can be chosen by setting
 ``PhysicsList="Belle2"`` 
-in `main.add_module` for ``FullSim``.
-Secondary production thresholds may also be set in `main.add_module`.
+in ``main.add_module`` for ``FullSim``.
+Secondary production thresholds may also be set in ``main.add_module``.
 If no cut values are specified in this file, the default value of 0.07 cm is
 used everywhere in the Belle2 geometry.  This global default can be changed by setting 
 the parameter ``ProductionCut``.  Each detector envelope can have a cut value distinct from 

@@ -76,7 +76,7 @@ From time to time, you may want to save all the secondary particle information i
    g4sim.param('SecondariesEnergyCut', 1.0)
    path.add_module(g4sim)
 
-Since there could be too many very low energy secondaries which may blow up the size of the MCParticles block into an uncontrollable number, we have an additional parameter called `SecondaryEnergyCut`. The default value is 1.0 MeV. If the energy of a secondary particle is below this threshhold, the particle information will not be saved in the MCParticles block, even though the `StoreAllSecondaries` parameter is set to True. Otherwise, if you do not mind the size of the MCParticles block being too large, you can set this threshhold parameter as 0.
+Since there could be too many very low energy secondaries which may blow up the size of the MCParticles block into an uncontrollable number, we have an additional parameter called ``SecondaryEnergyCut``. The default value is 1.0 MeV. If the energy of a secondary particle is below this threshhold, the particle information will not be saved in the MCParticles block, even though the ``StoreAllSecondaries`` parameter is set to True. Otherwise, if you do not mind the size of the MCParticles block being too large, you can set this threshhold parameter as 0.
 
 Physics Process
 ----------------
@@ -88,7 +88,7 @@ The *Geant4* provides the information on via which physics process (and its subt
    MCParticle.getSecondaryPhysicsProcess();
 
 
-Between the physics process type and subtype, the subtype parameter gives more detailed information. What is implemented in ``basf2`` is the subtype information. Unfortunately, the *Geant4* people did not store the definition of subtypes in one file, so one should check several Geant4 files for these numbers. The following is the list of constants implemented in *Geant4 v9.6*. They used the same list for **v10**, too.
+Between the physics process type and subtype, the subtype parameter gives more detailed information. What is implemented in ``basf2`` is the subtype information. Unfortunately, the *Geant4* people did not store the definition of subtypes in one file, so one should check several Geant4 files for these numbers. The following is the list of constants implemented in *Geant4 v9.6*. They used the same list for v10, too.
 
 .. table:: Physics Process and its subtype
       :widths: auto

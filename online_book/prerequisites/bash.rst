@@ -35,8 +35,28 @@ once you get used to it.
 The good thing is that this is not Belle II specific so there are very good
 tutorials out there we can just use.
 
-The only thing you need to be able to follow these tutorials is to have a Bash
-available on your system. For MaxOSX and Linux this is basically always the case
+For this tutorial we want to focus on the Bash shell. This is the most popular
+command line interpreter and can be considered the standard so we stick with it.
+There is also `zsh` which behaves almost the same but has some advanced features
+so you are welcome to try it if you want after this tutorial.
+
+There's another type of command line interpreter called the C shell which tended
+to be popular among scientists in the nineties. However, in contrast to the Bash
+it has severe drawbacks when writing scripts (for more details you can look `here
+<https://en.wikipedia.org/wiki/C_shell#Reception>`_).
+
+The C shell is still around in high energy physics but support for it fading
+out: Many experiments start removing support to use their software with it. Also
+the also the Belle II Software will probably remove support in the near future.
+
+So if you already know C shell you probably should still continue with this
+tutorial. And If you're new to command lines and shells you should **definitely
+not learn C shell**. If your supervisor uses it that should not be your problem
+😉.
+
+
+The only thing you need to be able to follow this lecture is to have a Bash
+available on your system. For macOS and Linux this is basically always the case
 but for Windows you need to install it first.
 
 .. admonition:: Installation on Windows
@@ -57,13 +77,19 @@ but for Windows you need to install it first.
     makes working with the terminal *much* easier on windows and gives you
     basically the same features you would get on MaxOSX or Linux.
 
-Once you have a bash on your system please follow `this tutorial
-<http://swcarpentry.github.io/shell-novice/>`_ first and come back here when
-you're done.
+And since the folks at Software Carpentry have already prepared a very nice
+introduction to the `The Unix Shell <https://swcarpentry.github.io/shell-novice/>`_
+we would like you to go there and go through the introduction and then come back
+here when you are done.
 
-You know should have a basic understanding of the shell but one thing we need
-that was not covered in the introduction above is the use of environment
-variables. So let's expand a bit on variables in general.
+.. image:: swcarpentry_logo-blue.svg
+    :target: https://swcarpentry.github.io/shell-novice/
+    :alt: The Unix Shell
+
+
+After this introduction you know should have a basic understanding of the shell.
+One thing we need that was not covered in the introduction above and that is the
+use of environment variables. So let's expand a bit on variables in general.
 
 Shell Variables
 ---------------
@@ -85,7 +111,7 @@ define your own variables
 
     You cannot have any spaces between the name, the equal sign, and the value
 
-This can be very helpful when writing scripts as you can assign repeated Values
+This can be very helpful when writing scripts as you can assign repeated values
 or command line arguments to readable names. Now the values of these variables
 are "local" to the current shell: If you run a program it will not see variables
 defined in this way.
@@ -107,15 +133,11 @@ defined in this way.
 
     and run it with ``bash print_myvariable.sh``.
 
-    The variable should be empty so the output should just be.
+    The variable should be empty so the output should just be
 
     .. code-block:: bash
 
         The value of myvariable is
-
-    In fact it should not exist at all but the difference between empty and
-    doesn't exist is very small.
-
 
 You can tell the shell to export your variables to all programs you call with
 the ``export`` statement. It looks basically the same as the normal variable
@@ -141,16 +163,19 @@ definition
 
         The value of myvariable is Some value
 
-Exported variables are called environment variables any by convention they
+Exported variables are called environment variables and by convention they
 should be always be in capital letters, so in the example above we should have
-called it ``MYVARIABLE``.
+called it ``MYVARIABLE`` or maybe ``MY_VARIABLE``.
 
 .. note::
 
-    There is no way to modify the environment variables of the parent. A shell
-    script cannot have any effect on the shell that started it. In the example
-    above, there is no technical way that any script would modify the value of
-    ``$myvariable`` in your main shell.
+    It is technically impossible for sub process to modify the environment
+    variables of its parent process. So if you execute a script or run a program
+    it cannot modify the environment variables in your shell.
+
+    In the example above, if the script would modify
+    the value of ``$myvariable`` to something else this would not have any
+    affect on your the value in your current shell.
 
 
 Environment Variables
@@ -265,11 +290,11 @@ most important ones are
 
 Now to be able to use software not installed in the default locations, like for
 example the Belle II software, we need to change at least :envvar:`PATH` and
-:envvar:`LD_LIBRARY_PATH` but also set a few others.
+:envvar:`LD_LIBRARY_PATH` but usually also set a few others.
 
-Now we already discussed that a script cannot modify the environment variables
-of our current shell but it would be very inconvenient if everyone had to copy
-paste instructions what to set there all the time.
+Now we already discussed above that executing a script cannot modify the
+environment variables of our current shell but it would be very inconvenient if
+everyone had to copy paste instructions what to set there all the time.
 
 Luckily there is a way to modify the environment in our shell, it's called
 "sourcing" a script. It behaves almost like executing a script but all the
@@ -280,21 +305,21 @@ commands affect the current shell:
     source myenvvars.sh
 
 This will read the script ``myenvvars.sh`` and execute all the commands it finds
-in there in the current terminal. It is equivalent to copy pasting every single
-line into the terminal one by one.
+in there in the current terminal. It is exactly equivalent to copy pasting every
+single line into the terminal one by one and hitting return.
 
 .. warning::
 
-    While this looks almost identical in many cases to executing a script there
+    While in many cases this looks almost identical to executing a script there
     can be very big differences. For example if the script contains an ``exit``
     command it will close your current terminal and not just stop executing the
-    script.
+    script itself.
 
     You should only use sourcing if you really need to modify the current shell.
 
 There's also a short version which gets used very often but can be very
 misleading: The source command can be replaced by a single ``.``, so the above
-would be
+could also be written as
 
 .. code-block:: bash
 

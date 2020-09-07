@@ -47,10 +47,10 @@ it has severe drawbacks when writing scripts (for more details you can look `her
 
 The C shell is still around in high energy physics but support for it fading
 out: Many experiments start removing support to use their software with it. Also
-the also the Belle II Software will probably remove support in the near future.
+the Belle II Software is planning remove support in the near future.
 
 So if you already know C shell you probably should still continue with this
-tutorial. And If you're new to command lines and shells you should **definitely
+tutorial. And If you're new to command lines and shells you **should definitely
 not learn C shell**. If your supervisor uses it that should not be your problem
 😉.
 

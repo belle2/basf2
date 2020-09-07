@@ -9,7 +9,7 @@
 #include <daq/rawdata/modules/DeSerializerFILE.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
 #include <rawdata/dataobjects/RawFTSW.h>
-
+#define USE_PCIE40
 using namespace std;
 using namespace Belle2;
 
@@ -94,6 +94,13 @@ void DeSerializerFILEModule::initialize()
 
 int* DeSerializerFILEModule::readOneDataBlock(int* delete_flag, int* size_word, int* data_type)
 {
+#ifdef USE_PCIE40
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  exit(1);
+#else
   *delete_flag = 1;
   //
   // Read 1st word( data size ) of RawDataBlock
@@ -129,6 +136,14 @@ int* DeSerializerFILEModule::readOneDataBlock(int* delete_flag, int* size_word, 
 
   int start_word = 0, stop_word = 0;
   int* temp_buf = 0x0;
+
+
+  // Not checked if this part works for PCIe40 data-format
+  *data_type = RAW_DATABLOCK;
+  *size_word = temp_size_word;
+  start_word = 1;
+  stop_word = *size_word;
+  temp_buf = readfromFILE(m_fp_in, *size_word, start_word, stop_word);
   if (temp_size_word == 0x7fff0008) {
     // 0x7fff0008 -> 2.1Gword. So this is too large for the length of one RawDataBlock.
     *data_type = COPPER_DATABLOCK;
@@ -164,6 +179,7 @@ int* DeSerializerFILEModule::readOneDataBlock(int* delete_flag, int* size_word, 
     temp_buf = readfromFILE(m_fp_in, *size_word, start_word, stop_word);
   }
   return temp_buf;
+#endif
 }
 
 

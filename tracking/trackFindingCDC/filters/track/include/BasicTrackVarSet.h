@@ -31,10 +31,10 @@ namespace Belle2 {
     constexpr
     static char const* const basicTrackVarNames[] = {
       "pt",
-      "n_cdc_hits",
+      "size",
       "hits_per_layer",
 
-      "tan_lambda",
+      "sz_slope",
       "z0",
       "s_range",
       "avg_hit_dist",

@@ -47,7 +47,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   statistics_accumulator  cont_layer_acc;
   statistics_accumulator super_layer_acc;
 
-  unsigned int n_cdc_hits = track->size();
+  unsigned int size = track->size();
 
   std::vector<unsigned int> cont_layer;
   std::vector<unsigned int> super_layer;
@@ -77,7 +77,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   unsigned int super_layer_count = std::set<unsigned int>(super_layer.begin(), super_layer.end()).size();
   double super_layer_occupancy = (double)super_layer_count / (double)(super_layer_max - super_layer_min + 1);
 
-  double hits_per_layer = (double)n_cdc_hits / (double)cont_layer_count;
+  double hits_per_layer = (double)size / (double)cont_layer_count;
 
   // Extract empty_s (ArcLength2D gap) information
   double s_range = track->back().getArcLength2D() - track->front().getArcLength2D();
@@ -112,9 +112,9 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   double tot_variance = -1;
   double cont_layer_variance = -1;
   double super_layer_variance = -1;
-  if (n_cdc_hits > 1) {
+  if (size > 1) {
     // for more than two elements, calculate variance with bessel correction
-    double bessel_corr = (double)n_cdc_hits / (n_cdc_hits - 1.0);
+    double bessel_corr = (double)size / (size - 1.0);
     drift_length_variance = std::sqrt(bacc::variance(drift_length_acc) * bessel_corr);
     adc_variance = std::sqrt(bacc::variance(adc_acc) * bessel_corr);
     tot_variance = std::sqrt(bacc::variance(tot_acc) * bessel_corr);
@@ -132,10 +132,10 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   const CDCTrajectorySZ& trajectorySZ = trajectory3D.getTrajectorySZ();
 
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
-  var<named("n_cdc_hits")>() = n_cdc_hits;
+  var<named("size")>() = size;
   var<named("hits_per_layer")>() = hits_per_layer;
 
-  var<named("tan_lambda")>() = toFinite(trajectorySZ.getTanLambda(), 0);
+  var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
   var<named("z0")>() = toFinite(trajectorySZ.getZ0(), 0);
   var<named("s_range")>() = toFinite(s_range, 0);
   var<named("avg_hit_dist")>() = toFinite(avg_hit_dist, 0);

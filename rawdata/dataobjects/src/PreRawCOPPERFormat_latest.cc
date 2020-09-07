@@ -126,17 +126,6 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
 
   char err_buf[500];
   int err_flag = 0;
-  //
-  // check Magic words
-  //
-  if (!CheckCOPPERMagic(n)) {
-    sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
-            GetMagicDriverHeader(n), GetMagicFPGAHeader(n), GetMagicFPGATrailer(n), GetMagicDriverTrailer(n),
-            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    err_flag = 1;
-  }
 
   //
   // Event # check
@@ -258,16 +247,12 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
 
 bool PreRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
 {
-  if (GetMagicDriverHeader(n) != COPPER_MAGIC_DRIVER_HEADER) {
-    return false;
-  } else if (GetMagicFPGAHeader(n) != COPPER_MAGIC_FPGA_HEADER) {
-    return false;
-  } else if (GetMagicFPGATrailer(n) != COPPER_MAGIC_FPGA_TRAILER) {
-    return false;
-  } else if (GetMagicDriverTrailer(n) != COPPER_MAGIC_DRIVER_TRAILER) {
-    return false;
-  }
-  return true;
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+          __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return false;
 }
 
 void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)

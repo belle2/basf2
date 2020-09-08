@@ -43,12 +43,12 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
 
   std::unique_ptr<TF1> pol1pole(new TF1("pol1pole", "[0] + [1]*x + [2]/(x - [3])", -60,
                                         0)); // In the local study, Y. Uematsu tuned the range to (-21.5,0). Original value is (-10,80).
-  pol1pole->SetParameter(2, -100);
-  pol1pole->SetParameter(3, 10);
-  // pol1pole->SetParLimits(0, -50, 0);
-  // pol1pole->SetParLimits(1, 0, 1);
-  // pol1pole->SetParLimits(2, -2000, 0);
-  // pol1pole->SetParLimits(3, 0, 50);
+  pol1pole->SetParameter(1, 0.6);
+  pol1pole->SetParameter(2, -150);
+  pol1pole->SetParameter(3, 7);
+  pol1pole->SetParLimits(1, 0, 1);
+  pol1pole->SetParLimits(2, -300, 0);
+  pol1pole->SetParLimits(3, 0, 15);
 
   FileStat_t info;
   int cal_rev = 1;
@@ -110,7 +110,7 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           std::string name = "pfx_" + std::string(hEventT0vsELS->GetName());
           pfx->SetName(name.c_str());
           // pfx->SetErrorOption("S");
-          TFitResultPtr tfr = pfx->Fit("pol1pole", "RQS");
+          TFitResultPtr tfr = pfx->Fit("pol1pole", "QMRS");
           double par[4];
           pol1pole->GetParameters(par);
           // double meanT0 = hEventT0->GetMean();

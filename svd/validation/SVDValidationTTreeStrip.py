@@ -36,7 +36,7 @@ gROOT.ProcessLine('struct EventDataStrip {\
     int strip_noise;\
     };')
 
-from ROOT import EventDataStrip
+from ROOT import EventDataStrip  # noqa
 
 
 class SVDValidationTTreeStrip(Module):

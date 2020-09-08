@@ -443,7 +443,6 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
                                      PXDDAQPacketStatus& daqpktstat)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  bool printflag = false;
   ubig16_t* dhp_pix = (ubig16_t*)data;
 
   unsigned int dhp_readout_frame_lo = 0;
@@ -451,7 +450,10 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
   unsigned int dhp_reserved     = 0;
   unsigned int dhp_dhe_id       = 0;
   unsigned int dhp_dhp_id       = 0;
+  unsigned int wrap = 0; // workaround to recalc a relative frame number
+  int last_gate = -1; // workaround to recalc a relative frame number
 
+  // cppcheck-suppress unreadVariable
   unsigned int dhp_row = 0, dhp_col = 0, dhp_adc = 0, dhp_cm = 0;
 //   unsigned int dhp_offset = 0;
   bool rowflag = false;
@@ -463,22 +465,18 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
     return;
   }
 
-  if (printflag)
-    B2DEBUG(29, "HEADER -- $" << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
+  B2DEBUG(29, "HEADER -- $" << hex << dhp_pix[0] << hex << dhp_pix[1] << hex << dhp_pix[2] << hex << dhp_pix[3] << " -- ");
 
-  if (printflag)
-    B2DEBUG(29, "DHP Header   | $" << hex << dhp_pix[2] << " ( " << dec << dhp_pix[2] << " ) ");
+  B2DEBUG(29, "DHP Header   | $" << hex << dhp_pix[2] << " ( " << dec << dhp_pix[2] << " ) ");
   dhp_header_type  = (dhp_pix[2] & 0xE000) >> 13;
   dhp_reserved     = (dhp_pix[2] & 0x1F00) >> 8;
   dhp_dhe_id       = (dhp_pix[2] & 0x00FC) >> 2;
   dhp_dhp_id       =  dhp_pix[2] & 0x0003;
 
-  if (printflag) {
-    B2DEBUG(29, "DHP type     | $" << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
-    B2DEBUG(29, "DHP reserved | $" << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
-    B2DEBUG(29, "DHP DHE ID   | $" << hex << dhp_dhe_id << " ( " << dec << dhp_dhe_id << " ) ");
-    B2DEBUG(29, "DHP DHP ID   | $" << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
-  }
+  B2DEBUG(29, "DHP type     | $" << hex << dhp_header_type << " ( " << dec << dhp_header_type << " ) ");
+  B2DEBUG(29, "DHP reserved | $" << hex << dhp_reserved << " ( " << dec << dhp_reserved << " ) ");
+  B2DEBUG(29, "DHP DHE ID   | $" << hex << dhp_dhe_id << " ( " << dec << dhp_dhe_id << " ) ");
+  B2DEBUG(29, "DHP DHP ID   | $" << hex << dhp_dhp_id << " ( " << dec << dhp_dhp_id << " ) ");
 
   if (dhe_ID != dhp_dhe_id) {
     if (!(m_suppressErrorMask & c_DHE_DHP_DHEID)) {
@@ -508,8 +506,7 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
 //   dhp_offset = offtab[dhp_dhp_id];
 
   dhp_readout_frame_lo  = dhp_pix[3] & 0xFFFF;
-  if (printflag)
-    B2DEBUG(29, "DHP Frame Nr     |  $" << hex << dhp_readout_frame_lo << " ( " << dec << dhp_readout_frame_lo << " ) ");
+  B2DEBUG(29, "DHP Frame Nr     |  $" << hex << dhp_readout_frame_lo << " ( " << dec << dhp_readout_frame_lo << " ) ");
 
   /* // TODO removed because data format error is not to be fixed soon
   if (((dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F) > m_maxDHPFrameDiff) {
@@ -567,8 +564,7 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
   // Start with offset 4, thus skipping header words
   for (unsigned int i = 4; i < nr_words ; i++) {
 
-    if (printflag)
-      B2DEBUG(29, "-- $" << hex << dhp_pix[i] << " --   " << dec << i);
+    B2DEBUG(29, "-- $" << hex << dhp_pix[i] << " --   " << dec << i);
     {
       if (((dhp_pix[i] & 0x8000) >> 15) == 0) {
         rowflag = true;
@@ -579,6 +575,12 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
         pixelflag = false;
         dhp_row = (dhp_pix[i] & 0xFFC0) >> 5;
         dhp_cm  = dhp_pix[i] & 0x3F;
+        if (last_gate != -1 && (int)dhp_row / 4 < last_gate) {
+          // B2DEBUF(29,"Wrap " << LogVar("last", last_gate) << LogVar("curr", dhp_row / 4) << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
+          wrap++; // relies on the order of data before mapping and the fact that OT firmware delivers only one frame
+        }
+        last_gate = dhp_row / 4;
+
         if (dhp_cm == 63) { // fifo overflow
           B2WARNING("DHP data loss (CM=63) in " << LogVar("DHE", dhe_ID) << LogVar("DHP", dhp_dhp_id));
           /// FIXME TODO set an error bit ... but define one first
@@ -593,8 +595,7 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
             daqpktstat.dhc_back().dhe_back().addCM(cm);
           }
         }
-        if (printflag)
-          B2DEBUG(29, "SetRow: $" << hex << dhp_row << " CM $" << hex << dhp_cm);
+        B2DEBUG(29, "SetRow: $" << hex << dhp_row << " CM $" << hex << dhp_cm);
       } else {
         if (!rowflag) {
           if (!(m_suppressErrorMask & c_DHP_PIX_WO_ROW)) B2WARNING("DHP Unpacking: Pix without Row!!! skip dhp data ");
@@ -634,9 +635,8 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
             m_errorMask |= c_COL_OVERFLOW;
           }
           dhp_adc = dhp_pix[i] & 0xFF;
-          if (printflag)
-            B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
-                    << " CM $" << hex << dhp_cm);
+          B2DEBUG(29, "SetPix: Row $" << hex << dhp_row << " Col $" << hex << dhp_col << " ADC $" << hex << dhp_adc
+                  << " CM $" << hex << dhp_cm);
 
           /*if (m_verbose) {
             B2DEBUG(29, "raw    |   " << hex << d[i]);
@@ -646,24 +646,23 @@ void PXDUnpackerOTModule::unpack_dhp(void* data, unsigned int frame_len, unsigne
             B2DEBUG(29, "start-Frame-Nr " << dec << dhe_first_readout_frame_id_lo);
           };*/
 
+          // in new firmware, (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) would always been 0
           if (!m_doNotStore) m_storeRawHits.appendNew(vxd_id, v_cellID, u_cellID, dhp_adc,
-                                                        (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo) & 0x3F);
+                                                        (dhp_readout_frame_lo - dhe_first_readout_frame_id_lo + wrap) & 0x3F);
         }
       }
     }
   }
 
-  if (printflag) {
-    B2DEBUG(29, "(DHE) DHE_ID $" << hex << dhe_ID << " (DHE) DHP ID $" << hex << dhe_DHPport << " (DHP) DHE_ID $" << hex << dhp_dhe_id
-            << " (DHP) DHP ID $" << hex << dhp_dhp_id);
-    /*for (int i = 0; i < raw_nr_words ; i++) {
-      B2DEBUG(29, "RAW      |   " << hex << p_pix[i]);
-      printf("raw %08X  |  ", p_pix[i]);
-      B2DEBUG(29, "row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
-             << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
-            );
-    }*/
-  }
+  B2DEBUG(29, "(DHE) DHE_ID $" << hex << dhe_ID << " (DHE) DHP ID $" << hex << dhe_DHPport << " (DHP) DHE_ID $" << hex << dhp_dhe_id
+          << " (DHP) DHP ID $" << hex << dhp_dhp_id);
+  /*for (int i = 0; i < raw_nr_words ; i++) {
+    B2DEBUG(29, "RAW      |   " << hex << p_pix[i]);
+    printf("raw %08X  |  ", p_pix[i]);
+    B2DEBUG(29, "row " << hex << ((p_pix[i] >> 20) & 0xFFF) << dec << " ( " << ((p_pix[i] >> 20) & 0xFFF) << " ) " << " col " << hex << ((p_pix[i] >> 8) & 0xFFF)
+           << " ( " << dec << ((p_pix[i] >> 8) & 0xFFF) << " ) " << " adc " << hex << (p_pix[i] & 0xFF) << " ( " << (p_pix[i] & 0xFF) << " ) "
+          );
+  }*/
 };
 
 int PXDUnpackerOTModule::nr5bits(int i)
@@ -696,6 +695,7 @@ void PXDUnpackerOTModule::unpack_dhc_frame(void* data, const int len, const int 
   static int found_mask_active_dhp = 0;// mask which DHP send data and check on DHE END frame if it matches
   static int found_good_mask_active_dhp = 0;// mask which DHP send useful data
   static unsigned int dhe_first_readout_frame_id_lo = 0;
+  // cppcheck-suppress variableScope
   static unsigned int dhe_first_triggergate = 0;
   static unsigned int currentDHCID = 0xFFFFFFFF;
   static unsigned int currentDHEID = 0xFFFFFFFF;

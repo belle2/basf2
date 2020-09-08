@@ -4,6 +4,7 @@
 from basf2 import *
 from ROOT import Belle2
 
+import pathlib
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("input_data", help=("The path to the input data directory you want to use."
@@ -32,7 +33,6 @@ set_debug_level(100)
 
 algo = Belle2.TestDBAccessAlgorithm()
 
-import pathlib
 # Can use a Python list of input files/wildcards. It will resolve the existing files
 inputFileNames = [pathlib.Path(args.input_data, "CollectorOutput.root").absolute().as_posix()]
 algo.setInputFileNames(inputFileNames)

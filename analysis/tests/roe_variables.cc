@@ -121,8 +121,10 @@ namespace {
                                                         (Variable::Cut::compile("charge > 0")); // - exclude pi
       std::shared_ptr<Variable::Cut> photonSelection = std::shared_ptr<Variable::Cut>
                                                        (Variable::Cut::compile("p > 1.5")); // - exclude gamma
-      // Add mask, which should have 1 gamma, 1 pi+, 1 K_L0
-      savedROE->updateMaskWithCuts("my_mask",  chargedSelection,  photonSelection);
+      std::shared_ptr<Variable::Cut> klSelection = std::shared_ptr<Variable::Cut>
+                                                   (Variable::Cut::compile("E < 0")); // - exclude Klong
+      // Add mask, which should have 1 gamma, 1 pi+, 0 K_L0
+      savedROE->updateMaskWithCuts("my_mask",  chargedSelection,  photonSelection, klSelection);
       savedROE->print("my_mask");
       // Add pi0 from ROE to particle list
       pi0ParticleList->addParticle(5, 111, Particle::c_Unflavored);
@@ -170,6 +172,10 @@ namespace {
     var = Manager::Instance().getVariable("nROE_NeutralHadrons()");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(var->function(part), 1.0);
+
+    var = Manager::Instance().getVariable("nROE_NeutralHadrons(my_mask)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(var->function(part), 0.0);
 
   }
   /*
@@ -362,7 +368,7 @@ namespace {
 
     var = Manager::Instance().getVariable("weXiZ()");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), 0.27249247);
+    EXPECT_FLOAT_EQ(var->function(part), 0.31121328);
 
     var = Manager::Instance().getVariable("weQ2lnuSimple(my_mask,0)");
     ASSERT_NE(var, nullptr);

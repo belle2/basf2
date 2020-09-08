@@ -379,7 +379,7 @@ def list_functions(mod):
     return [func.__name__ for func in mod.__dict__.values() if is_mod_function(mod, func)]
 
 
-def pretty_print_module(module, module_name, replacements={}):
+def pretty_print_module(module, module_name, replacements=None):
     """Pretty print the contents of a python module.
     It will print all the functions defined in the given module to the console
 
@@ -393,6 +393,9 @@ def pretty_print_module(module, module_name, replacements={}):
     """
     from terminal_utils import Pager
     desc_list = []
+
+    if replacements is None:
+        replacements = {}
 
     # allow mod to be just the name of the module
     if isinstance(module, str):

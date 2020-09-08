@@ -41,6 +41,7 @@ def argparser():
                         'Default is False i.e. no beam background.')
     return parser
 
+
 args = argparser().parse_args()
 
 # Create path. Register necessary modules to this path.

@@ -22,13 +22,17 @@
 #include <numeric>
 #include <TDatabasePDG.h>
 #include <analysis/variables/BelleVariables.h>
+#include <analysis/variables/ECLVariables.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <analysis/variables/AcceptanceVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
-  m_KsParticles("K_S0:merged")
+  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged")
 {
 
 }
@@ -40,6 +44,7 @@ void SkimSampleCalculator::requireStoreArrays()
   m_pionHadParticles.isRequired();
   m_pionTauParticles.isRequired();
   m_KsParticles.isOptional();
+  m_LambdaParticles.isOptional();
 
 };
 
@@ -473,11 +478,12 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   calculationResult["Radee"] = radee;
 
-  // Dimuon skim (mumutight) taken from the offline skim
+  // Dimuon skim (mumutight) taken from the offline skim + Radiative dimuon (radmumu)
   double mumutight = 0.;
   double eMumuTotGammas = 0.;
   int nTracks = 0;
-
+  double radmumu = 0.;
+  const double maxEoP = 0.4;
   int nGammas = m_gammaParticles->getListSize();
 
   for (int t = 0; t < nGammas; t++) {
@@ -488,6 +494,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   StoreArray<Track> tracks;
   nTracks = tracks.getEntries();
+  PCmsLabTransform T;
+  const TLorentzVector pIN = T.getBeamFourMomentum();
+  const auto& fr = ReferenceFrame::GetCurrent();
 
   if (m_pionParticles->getListSize() == 2) {
 
@@ -510,12 +519,27 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit1) continue;
 
-      TLorentzVector V4p0 = trackFit1->get4Momentum();
-      const TVector3 V3p0 = (PCmsLabTransform::labToCms(V4p0)).Vect();
-      double Pp0 = V3p0.Mag();
-      double Thetap0 = (V3p0).Theta() * TMath::RadToDeg();
-      double Phip0 = (V3p0).Phi() * TMath::RadToDeg();
+      const TLorentzVector V4p1 = trackFit1->get4Momentum();
+      const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
 
+      const double p1MomLab = V4p1.P();
+      double highestP = p1MomLab;
+      const double p1Eop = Variable::eclClusterEoP(part1);
+      const double p1CDChits = trackFit1->getHitPatternCDC().getNHits();
+      const PIDLikelihood* p1Pid = part1->getPIDLikelihood();
+      bool p1hasKLMid = 0;
+      if (p1Pid) p1hasKLMid = p1Pid->isAvailable(Const::KLM);
+      const double p1isInCDC = Variable::inCDCAcceptance(part1);
+      const double p1clusPhi = Variable::eclClusterPhi(part1);
+
+      const double Pp1 = V3p1.Mag();
+      const double Thetap1 = (V3p1).Theta() * TMath::RadToDeg();
+      const double Phip1 = (V3p1).Phi() * TMath::RadToDeg();
+
+      const double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+
+      const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.4 && p1Eop < maxEoP && p1CDChits > 0
+                            && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC == 1;
 
       //------------Second track variables----------------
       for (unsigned int l = k + 1; l < m_pionParticles->getListSize(); l++) {
@@ -536,34 +560,68 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
         if (!trackFit2) continue;
 
-        TLorentzVector V4p1 = trackFit2->get4Momentum();
-        const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
-        double Pp1 = V3p1.Mag();
-        double Thetap1 = (V3p1).Theta() * TMath::RadToDeg();
-        double Phip1 = (V3p1).Phi() * TMath::RadToDeg();
+        const TLorentzVector V4p2 = trackFit2->get4Momentum();
+        const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
 
-        double acopPhi = fabs(180 - fabs(Phip0 - Phip1));
-        double acopTheta = fabs(fabs(Thetap0 + Thetap1) - 180);
+        const double p2MomLab = V4p2.P();
+        double lowestP = p2MomLab;
+        const double p2Eop = Variable::eclClusterEoP(part2);
+        const double p2CDChits = trackFit2->getHitPatternCDC().getNHits();
+        const PIDLikelihood* p2Pid = part2->getPIDLikelihood();
+        bool p2hasKLMid = 0;
+        if (p2Pid) p2hasKLMid = p2Pid->isAvailable(Const::KLM);
+        const double p2isInCDC = Variable::inCDCAcceptance(part2);
+        const double p2clusPhi = Variable::eclClusterPhi(part2);
 
-        double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-        double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        const double Pp2 = V3p2.Mag();
+        const double Thetap2 = (V3p2).Theta() * TMath::RadToDeg();
+        const double Phip2 = (V3p2).Phi() * TMath::RadToDeg();
+
+        const double acopPhi = fabs(180 - fabs(Phip1 - Phip2));
+        const double acopTheta = fabs(fabs(Thetap1 + Thetap2) - 180);
+
+        const double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+
+        const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.4 && p2Eop < maxEoP && p2CDChits > 0
+                              && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC == 1;
 
         double eTotMumuTracks = enECLTrack1 + enECLTrack2;
         double EMumutot = eTotMumuTracks + eMumuTotGammas;
 
         bool mumutight_tag = enECLTrack1 < 0.5 && enECLTrack2 < 0.5 && EMumutot < 2 && acopPhi < 10 && acopTheta < 10 && nTracks == 2
-                             && Pp0 > 0.5 && Pp1 > 0.5;
+                             && Pp1 > 0.5 && Pp2 > 0.5;
 
         if (mumutight_tag) mumutight = 1;
 
+        if (p1MomLab < p2MomLab) {
+          lowestP = highestP;
+          highestP = p2MomLab;
+        }
+
+        double diffPhi = p1clusPhi - p2clusPhi;
+        if (fabs(diffPhi) > M_PI) {
+          if (diffPhi > M_PI) {
+            diffPhi = diffPhi - 2 * M_PI;
+          } else {
+            diffPhi = 2 * M_PI + diffPhi;
+          }
+        }
+
+        const double recoilP = fr.getMomentum(pIN - V4p1 - V4p2).P();
+
+        const bool radmumu_tag = nTracks < 4 && goodTrk1 == 1 && goodTrk2 == 1 && highestP > 1 && lowestP < 3 && (p1hasKLMid == 1
+                                 || p2hasKLMid == 1) && abs(diffPhi) >= 0.5 * M_PI && recoilP > 0.1 && (enECLTrack1 <= 0.25 || enECLTrack2 <= 0.25);
+
+        if (radmumu_tag) radmumu = 1;
 
       }
     }
   }
 
   calculationResult["MumuTight"] = mumutight;
+  calculationResult["Radmumu"] = radmumu;
 
-  //Retrieve variables for HadronB skim
+  //Retrieve variables for HadronB skims
   double EsumPiHad = 0;
   double PzPiHad = 0;
   int nHadTracks = m_pionHadParticles->getListSize();
@@ -650,4 +708,28 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   if (nFourLep != 0 && visibleEnergyCMS < 6) fourLep = 1;
 
   calculationResult["FourLep"] = fourLep;
+
+  // nLambda
+  unsigned int nLambda = 0;
+
+  if (m_LambdaParticles.isValid()) {
+    for (unsigned int i = 0; i < m_LambdaParticles->getListSize(); i++) {
+      const Particle* mergeLambdaCand = m_LambdaParticles->getParticle(i);
+      const double flightDist = Variable::flightDistance(mergeLambdaCand);
+      const double flightDistErr = Variable::flightDistanceErr(mergeLambdaCand);
+      const double flightSign = flightDist / flightDistErr;
+      const Particle* protCand = mergeLambdaCand->getDaughter(0);
+      const Particle* pionCand = mergeLambdaCand->getDaughter(1);
+      const double protMom = protCand->getMomentum().Mag();
+      const double pionMom = pionCand->getMomentum().Mag();
+      const double asymPDaughters = (protMom - pionMom) / (protMom + pionMom);
+      if (flightSign > 10 && asymPDaughters > 0.41) nLambda++;
+    }
+  }
+
+  if (nLambda > 0) {
+    calculationResult["Lambda"] = 1;
+  } else {
+    calculationResult["Lambda"] = 0;
+  }
 }

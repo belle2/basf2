@@ -4,7 +4,7 @@
 # Import timeit module and start a timer. Allows to get the runtime of the
 # program at any given point
 import timeit
-g_start_time = timeit.default_timer()
+g_start_time = timeit.default_timer()  # noqa
 
 # std
 import argparse

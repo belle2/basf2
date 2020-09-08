@@ -30,7 +30,7 @@
       IMPLICIT NONE
 *
       INCLUDE 'BXformat.fi'
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
 *
       DOUBLE PRECISION  xpar(*)
       DOUBLE PRECISION  HvecDummy(4)
@@ -88,7 +88,7 @@ C switches of tau+ tau- decay modes !!
       IMPLICIT NONE
 *
       INCLUDE 'BXformat.fi'
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
 *
       DOUBLE PRECISION  HvecDummy(4)
       DOUBLE PRECISION   awt30,dwt30,WtSup30
@@ -117,7 +117,7 @@ C switches of tau+ tau- decay modes !!
 *//                                                                                 //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
 *-------------------------------------------------------------------------------------
       IF( m_IsInitialized .EQ. 0) RETURN
       CALL DEKAY(1,m_HvecTau1)
@@ -135,7 +135,7 @@ C switches of tau+ tau- decay modes !!
 *//                                                                                 //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
 *
       DOUBLE PRECISION       wt, wtmax, wt0,wt1,wt2
       DOUBLE PRECISION       HvecFer1(4), HvecFer2(4)
@@ -172,7 +172,7 @@ C switches of tau+ tau- decay modes !!
 *//                                                                                 //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
       DOUBLE PRECISION     p3(4),p4(4)
       INTEGER ih1,ih2
 
@@ -205,7 +205,7 @@ C switches of tau+ tau- decay modes !!
 *//   to frames  initialy used in the decay simulation.                             //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
 *
       DOUBLE PRECISION       KinLib_AngPhi
       DOUBLE PRECISION       Habs1,Habs2
@@ -293,7 +293,7 @@ C switches of tau+ tau- decay modes !!
 *//                                                                                 //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
 *
       INTEGER   Kto
       REAL                 P(4),Q(4),AM
@@ -377,7 +377,7 @@ C switches of tau+ tau- decay modes !!
 *//                                                                                 //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
       INTEGER KeyClone
 *
       m_KeyClone = KeyClone
@@ -395,7 +395,7 @@ C switches of tau+ tau- decay modes !!
 *//                                                                                 //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
       INTEGER IsInitialized
 *
       IsInitialized = m_IsInitialized
@@ -406,7 +406,7 @@ C switches of tau+ tau- decay modes !!
 *//   Geting clone of the tau lepton POLARIMETER vectors                            //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
       INTEGER k
       DOUBLE PRECISION  HvecFer1(4),HvecFer2(4)
 *
@@ -423,7 +423,7 @@ C switches of tau+ tau- decay modes !!
 *//                                                                                 //
 */////////////////////////////////////////////////////////////////////////////////////
       IMPLICIT NONE
-      INCLUDE 'Taupair.h'
+      INCLUDE 'Taupair.fi'
       INTEGER np1,np2
 *
       m_np1 = np1

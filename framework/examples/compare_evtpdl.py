@@ -6,7 +6,7 @@ import pdg
 from math import isclose
 import basf2
 
-pdg.load(basf2.find_file("decfiles/dec/evt.pdl"))
+pdg.load(basf2.find_file("data/framework/particledb/evt.pdl"))
 
 not_found = []
 all_pdgcodes = set()
@@ -16,7 +16,10 @@ for p in pdg.search():
         pdg = Particle.from_pdgid(p.PdgCode())
         names = ["mass", "width", "lifetime", "charge"]
         current = [p.Mass(), p.Width(), p.Lifetime(), p.Charge()/3]
-        nominal = [pdg.mass/1e3, pdg.width/1e3, pdg.lifetime/1e9 if pdg.width > 0 else 0, pdg.charge]
+        nominal = [pdg.mass/1e3 if pdg.mass is not None else 0,
+                   pdg.width/1e3 if pdg.width is not None else 0,
+                   pdg.lifetime/1e9 if pdg.lifetime is not None and pdg.width > 0 else 0,
+                   pdg.charge]
         for n, a, b in zip(names, current, nominal):
             if not isclose(a, b, rel_tol=0.05, abs_tol=1e-12):
                 print(f"{p.GetName()} difference in {n}: {a} != {b}")

@@ -101,7 +101,7 @@ def add_skim(label, lists, path):
     summaryOfLists(lists, path=path)
 
 
-def setSkimLogging(path, additional_modules=[]):
+def setSkimLogging(path, additional_modules=None):
     """
     Turns the log level to ERROR for  several modules to decrease
     the total size of the skim log files
@@ -111,6 +111,8 @@ def setSkimLogging(path, additional_modules=[]):
         additional_modules (list(str)): an optional list of extra noisy module
             names that should be silenced
     """
+    if additional_modules is None:
+        additional_modules = []
     noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
     for module in path.modules():
         if module.type() in noisy_modules:
@@ -150,7 +152,7 @@ def get_eventN(fileName):
         b2.B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
-def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
+def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=None, outputParticleLists=None, includeArrays=None, *,
                    outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
@@ -176,6 +178,13 @@ def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticl
     # the skim package, and importing this up the top hijacks the argparser of any
     # script which imports it.
     from mdst import add_mdst_output
+
+    if skimParticleLists is None:
+        skimParticleLists = []
+    if outputParticleLists is None:
+        outputParticleLists = []
+    if includeArrays is None:
+        includeArrays = []
 
     # if no outputfile is specified, set it to the skim name
     if outputFile is None:
@@ -632,7 +641,9 @@ class CombinedSkim(BaseSkim):
     __category__ = "combined"
     __contact__ = None
 
-    def __init__(self, *skims, NoisyModules=[], CombinedSkimName="CombinedSkim"):
+    def __init__(self, *skims, NoisyModules=None, CombinedSkimName="CombinedSkim"):
+        if NoisyModules is None:
+            NoisyModules = []
         # Check that we were passed only BaseSkim objects
         if not all([isinstance(skim, BaseSkim) for skim in skims]):
             raise NotImplementedError(

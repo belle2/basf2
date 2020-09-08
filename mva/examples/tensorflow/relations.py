@@ -36,6 +36,7 @@ class early_stopping():
                 return False
         return True
 
+
 EARLY_STOPPER = early_stopping()
 
 

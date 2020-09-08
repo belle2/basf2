@@ -82,6 +82,7 @@ class DumpSVDSensorParameters(Module):
 
 # ------------------------------------------------------------------------------
 
+
 # Particle gun module
 particlegun = register_module('ParticleGun')
 # Create Event information

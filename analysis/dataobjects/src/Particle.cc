@@ -1090,7 +1090,7 @@ std::string Particle::getInfoHTML() const
   stream << " <b>PDGMass</b>=" << getPDGMass();
   stream << "<br>";
   stream << " <b>flavorType</b>=" << m_flavorType;
-  stream << " <b>particleType</b>=" << m_particleSource;
+  stream << " <b>particleSource</b>=" << m_particleSource;
   stream << " <b>particleTypeUsedForFit</b>=" << m_pdgCodeUsedForFit;
   stream << "<br>";
 

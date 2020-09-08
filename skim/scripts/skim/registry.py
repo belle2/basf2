@@ -66,7 +66,8 @@ RegisteredSkims = [
     # --- WG5: Quarkonium ---
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
     ("15440100", "quarkonium", "BottomoniumUpsilon"),
-    ("16460100", "quarkonium", "ISRpipicc"),
+    # ("16460100", "quarkonium", "ISRpipicc"), Subset of 16460200, deleted.
+    ("16460200", "quarkonium", "CharmoniumPsi"),
 
     # --- WG7: Charm physics ---
     ("17230100", "charm", "XToD0_D0ToHpJm"),  # D0 -> K pi/pi pi/K K

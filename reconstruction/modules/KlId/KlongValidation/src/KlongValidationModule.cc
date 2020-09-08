@@ -22,9 +22,9 @@
 #include <TGraph.h>
 #include <cstring>
 
-using namespace Belle2;
-using namespace KlId;
 using namespace std;
+using namespace Belle2;
+using namespace Belle2::KlongId;
 
 REG_MODULE(KlongValidation);
 

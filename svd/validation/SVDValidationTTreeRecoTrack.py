@@ -34,7 +34,7 @@ gROOT.ProcessLine('struct EventDataRecoTrack {\
     int clusters_number;\
 };')
 
-from ROOT import EventDataRecoTrack
+from ROOT import EventDataRecoTrack  # noqa
 
 
 class SVDValidationTTreeRecoTrack(Module):

@@ -173,8 +173,8 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    explicit RestOfEvent(int pdgCode = 0, bool isNested = false, bool isFromMC = false):
-      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC) { };
+    explicit RestOfEvent(int pdgCode = 0, bool isNested = false, bool isFromMC = false, bool useKLMEnergy = false):
+      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC), m_useKLMEnergy(useKLMEnergy) { };
     // setters
     /**
      * Add StoreArray indices of given Particles to the list of unused particles in the event.
@@ -325,15 +325,6 @@ namespace Belle2 {
     TLorentzVector get4Vector(const std::string& maskName = "") const;
 
     /**
-     * OBSOLETE:
-     * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks in ROE.
-     *
-     * @param maskName Name of mask
-     * @return 4-momentum of unused Tracks and ECLClusters in ROE
-     */
-    TLorentzVector get4VectorTracks(const std::string& maskName = "") const;
-
-    /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all ECLClusters in ROE.
      *
      * @param maskName Name of mask
@@ -372,12 +363,6 @@ namespace Belle2 {
     std::vector<std::string> getMaskNames() const;
 
     /**
-     * OBSOLETE:
-     * Added helper function so creation of temporary particles and setting pid relations is not needed
-     */
-    double atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const;
-
-    /**
      * Prints the contents of a RestOfEvent object to screen
      */
     void print(const std::string& maskName = "", bool unpackComposite = true) const;
@@ -390,6 +375,7 @@ namespace Belle2 {
     int m_pdgCode;                     /**< PDG code of the 'ROE particle' if we are going to create one */
     bool m_isNested;                   /**< Nested ROE indicator */
     bool m_isFromMC;                   /**< MC ROE indicator */
+    bool m_useKLMEnergy;               /**< Include KLM energy into ROE 4-vector */
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list
@@ -404,7 +390,7 @@ namespace Belle2 {
      * Prints indices in the given set in a single line
      */
     void printIndices(const std::string& maskName = "", bool unpackComposite = true, const std::string& tab = " - ") const;
-    ClassDef(RestOfEvent, 5) /**< class definition */
+    ClassDef(RestOfEvent, 6) /**< class definition */
 
   };
 

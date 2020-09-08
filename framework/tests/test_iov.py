@@ -152,7 +152,7 @@ class TestIoVSet(unittest.TestCase):
         """Test intersecting two sets"""
         iovs = []
         for i in range(6):
-            iovs.append((i, 0, i+5, -1))
+            iovs.append((i, 0, i + 5, -1))
         result = {IntervalOfValidity(5, 0, 5, -1)}
         for _ in range(10):
             a = IoVSet([IntervalOfValidity.always()])
@@ -167,6 +167,7 @@ def load_tests(loader, tests, ignore):
     """Add the doctests to the list of tests"""
     tests.addTests(doctest.DocTestSuite(iov))
     return tests
+
 
 if __name__ == "__main__":
     # test everything

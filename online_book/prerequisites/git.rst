@@ -6,9 +6,11 @@ Version Control with Git
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**:
+    **External Training**: about 3 hours.
 
-    **Exercises**:
+    **Teaching**: 10 min
+
+    **Exercises**: 0 min
 
     **Prerequisites**:
 
@@ -64,7 +66,7 @@ changes over time and more importantly, is basically essential to be able to
 effectively work together with colleagues on the same project.
 
 Git is everywhere in the software industry but also in science it is by now the
-de-facto standard. It can and will make your live much, much easier but first
+de-facto standard. It can and will make your life much, much easier but first
 you will learn how to use it.
 
 Luckily there is a very large amount of good git tutorials out there. We'll

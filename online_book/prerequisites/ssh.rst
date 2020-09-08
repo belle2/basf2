@@ -756,7 +756,7 @@ local files. For example
   more information but this works similar in other desktop environments.
 * In addition many editors or development environments have their own support to
   work on a remote machine via ssh. There is a 
-  `guide on confluence <https://confluence.desy.de/display/BI/SSH+Deployment+IDE>`_
+  `guide on confluence <https://confluence.desy.de/x/XGJ8Cg>`_
   explaining the setup for some of them.
 
 .. rubric:: SSH multiplexing

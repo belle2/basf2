@@ -2829,12 +2829,14 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
                       or if the i-th MC daughter does not exist.\n
                       E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC
-                      particle of the reconstructed particle the function is applied to./n
+                      particle of the reconstructed particle the function is applied to.\n
                       The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.
                       
                       .. warning::
                         MC variables cannot be used in this function, i.e. ``mcDaughter(0, mcPDG)`` returns NaN, for example.
-                        This function gives 'variable of MC daughter' which are always MC truth.)DOC" );
+                        This function gives 'variable of MC daughter' which are always MC truth.
+
+                      )DOC");
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
                       R"DOC(Returns the value of the requested variable for the Monte Carlo mother of the particle.\n
                       Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
@@ -2845,7 +2847,9 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
 
                       .. warning::
                         MC variables cannot be used in this function, i.e. ``mcMother(mcPDG)`` returns NaN, for example.
-		        This function gives 'variable of MC mother' which are always MC truth.)DOC" );
+		        This function gives 'variable of MC mother' which are always MC truth.
+
+                      )DOC");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 

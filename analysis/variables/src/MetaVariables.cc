@@ -2825,27 +2825,27 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       "  - ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.\n\n"
                       "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
-                      "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
-                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
-                      "or if the i-th MC daughter does not exist.\n"
-                      "E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC"
-                      "particle of the reconstructed particle the function is applied to./n"
-                      "The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.
+                      R"DOC(Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n
+                      Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
+                      or if the i-th MC daughter does not exist.\n
+                      E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC
+                      particle of the reconstructed particle the function is applied to./n
+                      The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.
                       
                       .. warning::
                         MC variables cannot be used in this function, i.e. ``mcDaughter(0, mcPDG)`` returns NaN, for example.
-                        This function gives 'variable of MC daughter' which are always MC truth." );
+                        This function gives 'variable of MC daughter' which are always MC truth.)DOC" );
     REGISTER_VARIABLE("mcMother(variable)", mcMother,
-                      "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
-                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
-                      "or if the MC mother does not exist.\n"
-                      "E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC"
-                      "particle of the reconstructed particle the function is applied to.\n"
-                      "The meta variable can also be nested: ``mcMother(mcMother(PDG))``.
+                      R"DOC(Returns the value of the requested variable for the Monte Carlo mother of the particle.\n
+                      Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
+                      or if the MC mother does not exist.\n
+                      E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC
+                      particle of the reconstructed particle the function is applied to.\n
+                      The meta variable can also be nested: ``mcMother(mcMother(PDG))``.
 
                       .. warning::
                         MC variables cannot be used in this function, i.e. ``mcMother(mcPDG)`` returns NaN, for example.
-                        This function gives 'variable of MC mother' which are always MC truth." );
+		        This function gives 'variable of MC mother' which are always MC truth.)DOC" );
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 

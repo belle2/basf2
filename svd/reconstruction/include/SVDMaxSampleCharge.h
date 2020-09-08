@@ -28,16 +28,6 @@ namespace Belle2 {
     public:
 
       /**
-       * @return the strip charge
-       */
-      double getStripCharge(int indexInRawCluster);
-
-      /**
-       * @return the strip charge error
-       */
-      double getStripChargeError(int indexInRawCluster);
-
-      /**
        * @return the cluster charge
        */
       double getClusterCharge() override;

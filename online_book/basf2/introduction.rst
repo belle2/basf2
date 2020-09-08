@@ -436,6 +436,11 @@ It is also true that using the latest supported release makes you cool.
      Unfortunately there is no guarantee of backward compatibility between major versions.
      And for good reason: sometimes things need to be changed to introduce new features.
 
+.. admonition:: Question
+     :class: exercise stacked
+
+     If you have code that worked in ``light-5501-future`` will it work in
+     ``light-5602-reallyfarfuture`` ?
 
 .. admonition:: Solution
      :class: toggle solution

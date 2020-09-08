@@ -27,7 +27,7 @@ namespace Belle2 {
       /**
        * all constructors implemented in SVDReconstructionBase are available
        */
-      template<class ... T> SVDChargeReconstruction(T ... args): SVDReconstructionBase(args ...) {};
+      template<class ... T> explicit SVDChargeReconstruction(T ... args): SVDReconstructionBase(args ...) {};
 
       /**
        * virtual destructor

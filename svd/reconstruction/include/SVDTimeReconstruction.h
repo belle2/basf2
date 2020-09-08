@@ -27,7 +27,7 @@ namespace Belle2 {
       /**
        * all constructors implemented in SVDReconstructionBase are available
        */
-      template<class ... T> SVDTimeReconstruction(T ... args): SVDReconstructionBase(args ...) {};
+      template<class ... T> explicit SVDTimeReconstruction(T ... args): SVDReconstructionBase(args ...) {};
 
       /**
        * virtual destructor

@@ -56,7 +56,7 @@ namespace Belle2 {
       int* m_buffer;
 
       //! File handle
-      FILE* fh;
+      FILE* fh; // TODO PXDLocalDAQFile
 
       unsigned int m_expNr; //!< set by Param
       unsigned int m_runNr; //!< set by Param

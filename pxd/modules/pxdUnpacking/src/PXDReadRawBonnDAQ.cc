@@ -53,7 +53,7 @@ PXDReadRawBonnDAQModule::~PXDReadRawBonnDAQModule()
 
 void PXDReadRawBonnDAQModule::initialize()
 {
-  // Open file
+  // Open file TODO change to XPDLocalDAQFile class
   fh = fopen(m_filename.c_str(), "rb");
   if (fh) {
     B2INFO("Read BonnDAQ Data from " << m_filename);
@@ -71,6 +71,7 @@ void PXDReadRawBonnDAQModule::initialize()
 
 int PXDReadRawBonnDAQModule::read_data(char* data, size_t len)
 {
+  // this shoudl go into the PXDLocalDAQFile class TODO
   size_t l = 0;
   if (fh) l = fread(data, 1, len, fh);
   if (l != len) return 0;

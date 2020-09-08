@@ -1,0 +1,46 @@
+# EventType: 1211430011
+# Descriptor: [B+ -> Jpsi [ -> mu+ mu-] X+ ]cc
+# NickName: Bu_JpsiX_mumu
+# Tested: Yes
+# Physics WG: EWP
+# Responsible: Sviatoslav Bilokin
+# Email: sviatoslav.bilokin@desy.de
+# Cuts: None
+# Date: 20200908
+#
+Alias MyB+ B+
+Alias MyB- B-
+ChargeConj MyB+ MyB-
+Alias MyJ/psi J/psi
+ChargeConj MyJ/psi  MyJ/psi
+#
+Decay Upsilon(4S)
+0.5000 MyB+ B-    VSS;
+0.5000 B+ MyB-    VSS;
+Enddecay
+#
+Decay MyB+
+0.13610  MyJ/psi K+                   SVS; #[Reconstructed PDG2018]
+0.18970  MyJ/psi K*+                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
+0.00544  MyJ/psi pi+                  SVS; #[Reconstructed PDG2018]
+0.00663  MyJ/psi rho+                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
+0.14990  MyJ/psi K0   pi+             PHSP;
+0.01327  MyJ/psi K+  pi0              PHSP;
+0.01327  MyJ/psi K'_1+                SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+0.06633  MyJ/psi K_2*+                PHSP;
+0.23878  MyJ/psi K_1+                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
+0.10745  MyJ/psi K+ pi+ pi-           PHSP; #Added by Yubo Li 03/09/2018
+0.00447  MyJ/psi K+ K+ K-             PHSP; #Added by Yubo Li 03/09/2018
+0.01645  MyJ/psi eta  K+              PHSP; #Added by Yubo Li 03/09/2018
+0.00663  MyJ/psi phi  K+              PHSP; #Added by Yubo Li 03/09/2018
+0.04245  MyJ/psi omega  K+            PHSP; #Added by Yubo Li 03/09/2018
+0.00157  MyJ/psi pi- pi- pi+ pi+ pi+  PHSP; #Added by Yubo Li 03/09/2018
+0.00157  MyJ/psi p+ anti-Lambda0      PHSP; #Added by Yubo Li 03/09/2018
+Enddecay
+CDecay MyB-
+#
+Decay MyJ/psi
+1.000 mu+ mu-         PHOTOS VLL;
+Enddecay
+#
+End

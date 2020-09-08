@@ -10,13 +10,13 @@ The basics.
 
     **Exercises**: 10-20 min
 
-    **Prerequisites**: 
-    	
+    **Prerequisites**:
+
         * An internet browser
         * DESY accounts
         * :ref:`onlinebook_collaborative_tools` lesson.
         * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
-    	* Basic bash
+        * Basic bash
 
     **Questions**:
 
@@ -47,12 +47,12 @@ Basf2 is used in all aspects of the data-processing chain at Belle II:
 * generating simulated data,
 * unpacking of real raw data,
 * reconstruction (tracking, clustering, ...),
-* and high-level "analysis" reconstruction (such as applying cuts, 
+* and high-level "analysis" reconstruction (such as applying cuts,
   vertex-fitting, ...).
 
 Basf2 is not normally used for the final analysis steps (histogramming, fitting
 1D distributions, ...).
-These final steps are usually called the "offline" analysis and will be covered 
+These final steps are usually called the "offline" analysis and will be covered
 in later lessons :ref:`onlinebook_offline_analysis`.
 
 There is a citable reference for basf2:
@@ -117,7 +117,7 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
 
 .. admonition:: Solution
      :class: toggle solution
- 
+
      `Belle II Glossary <https://confluence.desy.de/display/BI/Main+Glossary>`_
 
 Basf2 modules
@@ -194,12 +194,12 @@ You will meet this at the end of this lesson.
 
      You might need to revisit the tutorial pages about
      :ref:`onlinebook_collaborative_tools`.
-     
+
 
 .. admonition:: Solution
      :class: toggle solution
 
-     The source code is online at https://stash.desy.de/projects/B2/software
+     The source code is online `here <https://stash.desy.de/projects/B2/software>`_.
      The list of **packages** is simply the list of directories in the software
      directory.
 
@@ -296,10 +296,10 @@ Before we start though...
 You shouldn't need to *install* anything
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A common misconception by newcomers (and even by senior people in the 
+A common misconception by newcomers (and even by senior people in the
 collaboration), is that you need to "install" basf2 or "install a release".
 
-It is possible to install from scratch, but you almost certainly **do not** 
+It is possible to install from scratch, but you almost certainly **do not**
 want or need to do this.
 If you are working at KEK (for certain) and at many many other sites, basf2
 is available preinstalled.
@@ -315,7 +315,7 @@ setup script...
 
         source /cvmfs/belle.cern.ch/tools/b2setup
 
-Some people like to put an alias to the setup script in their .profile (or 
+Some people like to put an alias to the setup script in their .profile (or
 .bashrc, .zshrc, ...) file.
 You are welcome to do this if you like.
 
@@ -347,7 +347,7 @@ or just:
         b2help-releases
 
 To setup the release of your choice simply call ``b2setup`` again.
-Once you've set up the environment, the ``b2setup`` executable itself will be 
+Once you've set up the environment, the ``b2setup`` executable itself will be
 in your ``PATH``:
 
 .. code-block:: bash
@@ -369,7 +369,7 @@ warning:
         Environment setup for release: release-01-02-09
         Central release directory    : /cvmfs/belle.cern.ch/el7/releases/release-01-02-09
         Warning: The release release-01-02-09 is not supported any more. Please update to ...
-        
+
 Sometimes people have good reason to use old releases but you should know that
 you will get limited help and support if you are using a very old version.
 
@@ -387,7 +387,7 @@ It is also true that using the latest supported release makes you cool.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     There is no hint. 
+     There is no hint.
      You've got this.
 
 .. admonition:: Solution
@@ -501,7 +501,7 @@ It is also true that using the latest supported release makes you cool.
 A useful command
 ~~~~~~~~~~~~~~~~
 
-If you're ever stuck and you are writing a post on `questions.belle2.org 
+If you're ever stuck and you are writing a post on `questions.belle2.org
 <https://questions.belle2.org>`_ or an email to an expert they will always want
 to know what version you are using.
 
@@ -583,7 +583,7 @@ More on this later.
 For now, you can list them all with:
 
 .. code-block:: bash
-    
+
     basf2 modularAnalysis.py
 
 Basf2 particles
@@ -670,15 +670,15 @@ To leave interactive basf2 / IPython, simply:
 .. admonition:: Another hint
      :class: toggle xhint stacked
 
-     .. code-block:: bash 
-         
+     .. code-block:: bash
+
          b2info-<tab>
 
 .. admonition:: Are you sure you really need another hint?
      :class: toggle xhint stacked
 
-     .. code-block:: bash 
-     
+     .. code-block:: bash
+
           b2info-luminosity --help
 
 .. admonition:: Solution
@@ -729,19 +729,19 @@ You will meet them in the :ref:`onlinebook_offline_analysis` lessons.
 The basf2 analysis package
 --------------------------
 
-The analysis package of basf2 contains python functions and C++ basf2 modules 
+The analysis package of basf2 contains python functions and C++ basf2 modules
 to help you perform your specific analysis on *reconstructed dataobjects*.
 It will probably become your favourite package.
 
 The collection of "reconstructed dataobjects" is actually a well-defined list.
 You will hear people call these "mdst dataobjects".
-The "mdst" is both a file-format and another basf2 package containing the 
+The "mdst" is both a file-format and another basf2 package containing the
 post-reconstruction dataobjects.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Find the documentation for the analysis package and read the first two 
+     Find the documentation for the analysis package and read the first two
      sections.
 
 .. admonition:: Hint

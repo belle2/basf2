@@ -35,7 +35,7 @@ Since we are so spread out, an important part of the collaboration itself
 are our channels and avenues of communication.
 
 Since you are reading this page, you have already 
-`registered as a member <https://confluence.desy.de/display/BI/Belle+II+Newcomers>`_
+`registered as a member <https://confluence.desy.de/x/ET0HAg>`_
 and obtained DESY credentials.
 These allow you to access private areas of the
 `belle2.org <https://belle2.org>`_ website.
@@ -136,13 +136,13 @@ That's not all
 It's not immediately relevant right now, but there are many other services.
 There is a full and complete list of all services on confluence.
 
-.. centered:: `Belle II Collaborative Services and Tools <https://confluence.desy.de/display/BI/Belle+II+Collaborative+Services+and+Tools>`_.
+.. centered:: `Belle II Collaborative Services and Tools <https://confluence.desy.de/x/96PwAw>`_.
 
 .. tip::
 
         You should probably bookmark the
         `Belle II Collaborative Services and Tools
-        <https://confluence.desy.de/display/BI/Belle+II+Collaborative+Services+and+Tools>`_
+        <https://confluence.desy.de/x/96PwAw>`_
         page.
 
 
@@ -226,7 +226,7 @@ It's not reliable for software documentation.
    
     It's on confluence:
     `Data Production Status
-    <https://confluence.desy.de/display/BI/Data+Production+Status>`_
+    <https://confluence.desy.de/x/fGCJC>`_
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -237,7 +237,7 @@ It's not reliable for software documentation.
     :class: toggle solution
    
     It's on confluence:
-    `Run Plan <https://confluence.desy.de/display/BI/Run+Plan>`_
+    `Run Plan <https://confluence.desy.de/x/Xgp0Bw>`_
 
 .. admonition:: Question
     :class: exercise stacked
@@ -260,7 +260,7 @@ It's not reliable for software documentation.
     :class: toggle solution
    
     Take a look at the `Main Glossary 
-    <https://confluence.desy.de/display/BI/Main+Glossary>`_
+    <https://confluence.desy.de/x/gwgWAg>`_
     on confluence.
 
 There are some downsides to confluence. 
@@ -282,7 +282,7 @@ of the software you are using.
 
     There is a sandbox confluence page for you to experiment with adding 
     material.
-    Go to the `Confluence Training Test Page <https://confluence.desy.de/display/BI/Confluence+Training+Test+Page>`_ and add some content.
+    Go to the `Confluence Training Test Page <https://confluence.desy.de/x/61Z8Cg>`_ and add some content.
 
     Some inspiration:
 

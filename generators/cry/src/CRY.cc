@@ -31,13 +31,13 @@ namespace Belle2 {
   void CRY::init()
   {
     std::stringstream setupString;
-    setupString << " returnGammas " << 1 << std::endl;
-    setupString << " returnKaons " << 1 << std::endl;
-    setupString << " returnPions " << 1 << std::endl;
-    setupString << " returnProtons " << 1 << std::endl;
-    setupString << " returnNeutrons " << 1 << std::endl;
-    setupString << " returnElectrons " << 1 << std::endl;
-    setupString << " returnMuons " << 1 << std::endl;
+    setupString << " returnGammas " << m_returnGammas << std::endl;
+    setupString << " returnKaons " << m_returnKaons << std::endl;
+    setupString << " returnPions " << m_returnPions << std::endl;
+    setupString << " returnProtons " << m_returnProtons << std::endl;
+    setupString << " returnNeutrons " << m_returnNeutrons << std::endl;
+    setupString << " returnElectrons " << m_returnElectrons << std::endl;
+    setupString << " returnMuons " << m_returnMuons << std::endl;
     setupString << " date " << "1-1-2019" << std::endl;
     setupString << " latitude " << 36.0 << std::endl;
     setupString << " altitude " << 0 << std::endl;

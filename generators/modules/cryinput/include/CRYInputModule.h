@@ -52,6 +52,14 @@ namespace Belle2 {
     double m_kineticEnergyThreshold;  /**< kinetic energy threshold. */
     double m_timeOffset;  /**< time offset. */
     int m_maxTrials;  /**< maximum number of trials. */
+    double m_boxLength{1000} /**< length of the sides of the square plane in which to generate cosmics */
+    bool m_returnGammas{true}; /**< Whether or not CRY should return gammas */
+    bool m_returnKaons{true}; /**< Whether or not CRY should return kaons */
+    bool m_returnPions{true}; /**< Whether or not CRY should return pions */
+    bool m_returnProtons{true}; /**< Whether or not CRY should return protons */
+    bool m_returnNeutrons{true}; /**< Whether or not CRY should return neutrons */
+    bool m_returnElectrons{true}; /**< Whether or not CRY should return electrons */
+    bool m_returnMuons{true}; /**< Whether or not CRY should return muons */
 
     CRY m_generator;   /**< The CRY generator. */
     MCParticleGraph m_mcGraph; /**< The MCParticle graph object. */

@@ -771,11 +771,11 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           else {
-            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
-            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
@@ -874,12 +874,12 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           else
           {
-            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
-            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
@@ -1081,12 +1081,12 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           else
           {
-            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
-            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
@@ -1320,7 +1320,7 @@ namespace Belle2 {
             if (dauPart == nullptr)
               return std::numeric_limits<double>::quiet_NaN();
 
-            const MCParticle* dauMcPart = dauPart->getRelated<MCParticle>();
+            const MCParticle* dauMcPart = dauPart->getMCParticle();
             if (dauMcPart == nullptr)
               return std::numeric_limits<double>::quiet_NaN();
 
@@ -1998,7 +1998,7 @@ namespace Belle2 {
         }
 
         auto func = [inputPDG](const Particle * particle) -> double{
-          const MCParticle* mcp = particle->getRelated<MCParticle>();
+          const MCParticle* mcp = particle->getMCParticle();
           if (!mcp)
             return 0.5;
 

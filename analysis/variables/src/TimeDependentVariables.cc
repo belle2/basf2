@@ -284,7 +284,7 @@ namespace Belle2 {
       static DBObjPtr<BeamParameters> beamParamsDB;
       TVector3 boostDir = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector().Unit();
 
-      const MCParticle* mcPart = part->getRelated<MCParticle>();
+      const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return realNaN;
       TVector3 pos = mcPart->getDecayVertex();
       return pos.Dot(boostDir);
@@ -296,7 +296,7 @@ namespace Belle2 {
       TVector3 boost = (beamParamsDB->getHER() + beamParamsDB->getLER()).BoostVector();
       TVector3 orthBoostDir = getUnitOrthogonal(boost);
 
-      const MCParticle* mcPart = part->getRelated<MCParticle>();
+      const MCParticle* mcPart = part->getMCParticle();
       if (!mcPart) return realNaN;
       TVector3 pos = mcPart->getDecayVertex();
       return pos.Dot(orthBoostDir);

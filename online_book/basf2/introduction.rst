@@ -372,8 +372,9 @@ warning:
         
 Sometimes people have good reason to use old releases but you should know that
 you will get limited help and support if you are using a very old version.
-And you expose yourself to strange bugs that will not be fixed (because they
-are fixed in some later release).
+
+And you expose yourself to strange bugs that will not be fixed in your version 
+(because they are fixed in some later release).
 
 It is also true that using the latest supported release makes you cool.
 
@@ -413,7 +414,7 @@ It is also true that using the latest supported release makes you cool.
 .. admonition:: Question
      :class: exercise stacked
 
-     If you have code that worked in ``release-AA-00-00`` will it work in
+     If you have **code** that worked in ``release-AA-00-00`` will it work in
      ``release-AA-01-00`` ?
 
 .. admonition:: Solution
@@ -425,7 +426,7 @@ It is also true that using the latest supported release makes you cool.
 .. admonition:: Question
      :class: exercise stacked
 
-     If you have code that worked in ``release-AA-00-00`` will it work in
+     If you have **code** that worked in ``release-AA-00-00`` will it work in
      ``release-BB-00-00`` ?
 
 .. admonition:: Solution
@@ -435,11 +436,6 @@ It is also true that using the latest supported release makes you cool.
      Unfortunately there is no guarantee of backward compatibility between major versions.
      And for good reason: sometimes things need to be changed to introduce new features.
 
-.. admonition:: Question
-     :class: exercise stacked
-
-     If you have code that worked in ``light-5501-future`` will it work in
-     ``light-5602-reallyfarfuture`` ?
 
 .. admonition:: Solution
      :class: toggle solution
@@ -548,15 +544,26 @@ To find information about a basf2 module, try:
 Listing the basf2 variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To check the list of basf2 variables known to the :doc:`VariableManager`, run
+In the next lessons, you will need to refer to physics quantities in plain 
+text format.
+Basf2 defines many **variables** for you.
+These variables are collected in something called the 
+:ref:`analysis_variablemanager_class`.
+
+To check the list of basf2 variables known to the :ref:`analysis_variablemanager_class`, run
 
 .. code-block:: bash
 
     basf2 variables.py
     basf2 variables.py | grep "invariant"
 
-There is a :doc:`variables` section in this documentation which you might find
+There is a :ref:`analysis_variables` section in this documentation which you might find
 more helpful than the big dump.
+
+
+.. seealso::
+
+    :ref:`b2-varindex`, or :ref:`variablesByGroup`.
 
 .. _onlinebook_basf2basics_modularanalysis_help:
 
@@ -688,6 +695,7 @@ You might notice that setting up the basf2 environment means that you also have
 tools like ROOT, and (an up-to-date version of) git.
 
 These come via the Belle II **externals**.
+We call software "external" if is not specific to Belle II but used *by* basf2.
 
 .. seealso::
 
@@ -695,6 +703,11 @@ These come via the Belle II **externals**.
     the externals in `this README file
     <https://stash.desy.de/projects/B2/repos/externals/browse/README.md>`_.
 
+Some python packages that are useful for final offline analysis are also 
+included in the externals for your convenience.
+These are tools such as `numpy <https://numpy.org>`_ and 
+`pandas <https://pandas.pydata.org>`_.
+You will meet them in the :ref:`onlinebook_offline_analysis` lessons.
 
 .. admonition:: Key points
     :class: key-points
@@ -765,7 +778,34 @@ post-reconstruction dataobjects.
 
 .. seealso:: "mdst" in the glossary
 
-You will meet mdst data format files in the next lesson.
+Earlier we asked some questions about **code** backward-compatibility.
+We can now take a brief diversion into the second kind of 
+backward-compatibility that is guaranteed in the software.
+
+.. centered:: Mdst backward-compatibility is guaranteed for the last two major releases.
+
+.. seealso:: 
+
+    The confluence page `Software Backward Compatibility 
+    <https://confluence.desy.de/display/BI/Backward+Compatibility>`_
+
+.. admonition:: Question
+     :class: exercise stacked
+
+     If you have an **mdst file** that was created in ``release-AA-00-00`` 
+     will you be able to open it with ``release-BB-00-00``?
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     **Yes**.
+     If BB is AA+1 (i.e. the next major release).
+     You should be able to open the old file, and your analysis code should work.
+
+
+You will use mdst data files in the next lesson.
+
+Let's get back to thinking about the reconstructed dataobjects.
 An important point to understand is that the analysis package interprets
 collections of these dataobjects as particle *candidates*.
 

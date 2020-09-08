@@ -70,6 +70,8 @@ namespace Belle2 {
     std::string m_listName;   /**< output particle list name */
     std::string m_antiListName;   /**< output anti-particle list name */
 
+    int m_decayModeID; /**< user specified decay mode identifier */
+
     std::vector<std::string> m_vector_listName;   /**< vector of output particle list name */
 
     bool m_isSelfConjugatedParticle; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
@@ -79,6 +81,8 @@ namespace Belle2 {
     std::unique_ptr<Variable::Cut> m_cut;  /**< cut object which performs the cuts */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
+
+    bool m_chargeConjugation; /**< boolean to control whether charge conjugated decay should be reconstructed as well */
 
   };
 

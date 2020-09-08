@@ -140,8 +140,8 @@ namespace Belle2 {
     double SVDChargeReconstruction::getELS3Charge()
     {
       //take the MaxSum 3 samples
+
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
 
       auto begin = selectedSamples.begin();
@@ -162,10 +162,12 @@ namespace Belle2 {
       auto rawtime_den =  1 - E4 - w * (2 + E2);
       float rawtime = - m_apvClockPeriod * rawtime_num / rawtime_den;
 
-      //convert samples in electrons
-      a0 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a0);
-      a1 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a1);
-      a2 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a2);
+      //convert samples in electrons if needed
+      if (!m_samplesInElectrons) {
+        a0 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a0);
+        a1 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a1);
+        a2 = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, m_cellID, a2);
+      }
 
 
       double num = (1. / E - E3) * a1 + (2 + E2) * a2 - (1 + 2 * E2) * a0;
@@ -180,7 +182,7 @@ namespace Belle2 {
     {
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
+      //      m_firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
 
       auto begin = selectedSamples.begin();

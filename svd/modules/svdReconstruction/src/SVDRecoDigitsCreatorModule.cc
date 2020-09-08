@@ -214,15 +214,12 @@ void SVDRecoDigitCreatorModule::event()
     double chi2 = std::numeric_limits<double>::quiet_NaN();
 
 
-    // build SVDTimeReconstrcution and SVDChargeRecosntruction using the base class constructor
-    SVDReconstructionBase* timeBase = new SVDReconstructionBase(*m_storeDigits[i]);
-    timeBase->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
-    timeBase->setTriggerBin(triggerBin);
-    SVDTimeReconstruction* timeReco = (SVDTimeReconstruction*)timeBase;
-
-
-    SVDReconstructionBase* chargeBase = new SVDReconstructionBase(*timeBase);
-    SVDChargeReconstruction* chargeReco = (SVDChargeReconstruction*) chargeBase;
+    // build SVDTimeReconstrcution and SVDChargeRecosntruct
+    SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(*m_storeDigits[i]);
+    timeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
+    timeReco->setTriggerBin(triggerBin);
+    SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(*m_storeDigits[i]);
+    chargeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
 
 
     // get strip time and charge and their errors

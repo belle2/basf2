@@ -25,6 +25,11 @@ namespace Belle2 {
     public:
 
       /**
+       * all constructors implemented in SVDReconstructionBase are available
+       */
+      template<class ... T> SVDTimeReconstruction(T ... args): SVDReconstructionBase(args ...) {};
+
+      /**
        * virtual destructor
        */
       virtual ~SVDTimeReconstruction() {};
@@ -35,7 +40,7 @@ namespace Belle2 {
       double getStripTimeError(TString timeAlgo);
 
       /**get first frame*/
-      int getFirstFrame() { return m_firstFrame; };
+      int getFirstFrame()  { return m_firstFrame; };
 
       /** CoG6 Time */
       double getCoG6Time();

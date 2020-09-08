@@ -18,21 +18,30 @@ namespace Belle2 {
   namespace SVD {
 
     /**
-     * Abstract Class representing the SVD strip charge
+     * Class for SVD Charge computation
      */
     class SVDChargeReconstruction : public SVDReconstructionBase {
 
     public:
 
       /**
+       * all constructors implemented in SVDReconstructionBase are available
+       */
+      template<class ... T> SVDChargeReconstruction(T ... args): SVDReconstructionBase(args ...) {};
+
+      /**
        * virtual destructor
        */
       virtual ~SVDChargeReconstruction() {};
 
+      /**
+       * set that samples are in electrons already
+       */
+      void setSamplesInElectrons() {m_samplesInElectrons = true;};
 
-      /** get strip charge as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObjcte*/
+      /** get strip charge as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObject*/
       double getStripCharge(TString chargeAlgo);
-      /** get strip charge error as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObjcte*/
+      /** get strip charge error as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObject*/
       double getStripChargeError(TString chargeAlgo);
 
       /** CoG6 Charge */
@@ -48,8 +57,9 @@ namespace Belle2 {
       /** ELS3 Charge Error */
       double getELS3ChargeError();
 
-    protected:
+    private:
 
+      bool m_samplesInElectrons = false;/**<if true m_samples is in electrons*/
     };
 
   }

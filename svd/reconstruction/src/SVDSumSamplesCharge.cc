@@ -10,6 +10,7 @@
 
 #include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDSumSamplesCharge.h>
+#include <svd/reconstruction/SVDChargeReconstruction.h>
 #include <TMath.h>
 
 using namespace std;
@@ -18,38 +19,6 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDSumSamplesCharge::getStripCharge(int indexInRawCluster)
-    {
-
-      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
-
-      double charge = 0 ;
-
-      //take the sum of the samples
-      for (int i = 0; i < 6; i++)
-        charge +=  strips.at(indexInRawCluster).samples[i];
-
-      int cellID = strips.at(indexInRawCluster).cellID;
-      // correct by the CalPeak
-      charge = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, cellID, charge);
-
-      return charge;
-    }
-
-    double SVDSumSamplesCharge::getStripChargeError(int indexInRawCluster)
-    {
-
-      //the strip charge error is simply the noise
-
-      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
-      //take the noise
-      double noise = strips.at(indexInRawCluster).noise;
-      int cellID = strips.at(indexInRawCluster).cellID;
-
-      noise = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, cellID, noise);
-      return noise;
-
-    }
 
     double SVDSumSamplesCharge::getClusterCharge()
     {
@@ -60,8 +29,20 @@ namespace Belle2 {
 
       double charge = 0;
 
-      for (int i = 0; i < (int)strips.size(); i++)
-        charge += getStripCharge(i);
+      for (int i = 0; i < (int)strips.size(); i++) {
+
+        Belle2::SVD::stripInRawCluster strip = strips.at(i);
+
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide(),
+            strip.cellID);
+
+        float noiseInADC = strip.noise;
+        float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), strip.cellID,
+                                                                  noiseInADC);
+        chargeReco->setAverageNoise(noiseInADC, noiseInElectrons);
+
+        charge += chargeReco->getSumSamplesCharge();
+      }
 
 
       return charge;
@@ -74,14 +55,25 @@ namespace Belle2 {
 
       std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
 
-      double weightSum = 0;
+      double noiseSquared = 0;
 
       for (int i = 0; i < (int)strips.size(); i++) {
-        double noise = getStripChargeError(i);
-        weightSum += noise * noise;
+
+        Belle2::SVD::stripInRawCluster strip = strips.at(i);
+
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide(),
+            strip.cellID);
+        float noiseInADC = strip.noise;
+        float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), strip.cellID,
+                                                                  noiseInADC);
+        chargeReco->setAverageNoise(noiseInADC, noiseInElectrons);
+
+        double noise = chargeReco->getSumSamplesChargeError();
+
+        noiseSquared += noise * noise;
       }
 
-      return TMath::Sqrt(weightSum);
+      return TMath::Sqrt(noiseSquared);
     }
 
   }  //SVD namespace

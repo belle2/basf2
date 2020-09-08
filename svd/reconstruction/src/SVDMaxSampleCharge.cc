@@ -30,14 +30,16 @@ namespace Belle2 {
       double charge = 0;
 
       for (int i = 0; i < (int)strips.size(); i++) {
+
         Belle2::SVD::stripInRawCluster strip = strips.at(i);
-        SVDReconstructionBase* chargeBase = new SVDReconstructionBase(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide(),
+
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide(),
             strip.cellID);
+
         float noiseInADC = strip.noise;
         float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), strip.cellID,
                                                                   noiseInADC);
-        chargeBase->setAverageNoise(noiseInADC, noiseInElectrons);
-        SVDChargeReconstruction* chargeReco = (SVDChargeReconstruction*)chargeBase;
+        chargeReco->setAverageNoise(noiseInADC, noiseInElectrons);
 
         charge += chargeReco->getMaxSampleCharge();
       }
@@ -56,14 +58,16 @@ namespace Belle2 {
       double noiseSquared = 0;
 
       for (int i = 0; i < (int)strips.size(); i++) {
+
         Belle2::SVD::stripInRawCluster strip = strips.at(i);
-        SVDReconstructionBase* chargeBase = new SVDReconstructionBase(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide(),
+
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide(),
             strip.cellID);
+
         float noiseInADC = strip.noise;
         float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), strip.cellID,
                                                                   noiseInADC);
-        chargeBase->setAverageNoise(noiseInADC, noiseInElectrons);
-        SVDChargeReconstruction* chargeReco = (SVDChargeReconstruction*)chargeBase;
+        chargeReco->setAverageNoise(noiseInADC, noiseInElectrons);
 
         double noise = chargeReco->getMaxSampleChargeError();
 

@@ -41,7 +41,7 @@ namespace Belle2 {
       /**
        * virtual destructor
        */
-      //      virtual ~SVDMaxSampleCharge();
+      virtual ~SVDMaxSampleCharge() {};
 
 
     };

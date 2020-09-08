@@ -30,6 +30,11 @@ namespace Belle2 {
     public:
 
       /**
+       * virtual destructor
+       */
+      virtual ~SVDELS3Charge() {};
+
+      /**
        * @return the cluster raw charge
        */
       double getClusterRawCharge();

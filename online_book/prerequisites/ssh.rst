@@ -755,7 +755,9 @@ local files. For example
   <https://help.gnome.org/users/gnome-help/stable/nautilus-connect.html.en>`_ for
   more information but this works similar in other desktop environments.
 * In addition many editors or development environments have their own support to
-  work on a remote machine via ssh.
+  work on a remote machine via ssh. There is a 
+  `guide on confluence <https://confluence.desy.de/display/BI/SSH+Deployment+IDE>`_
+  explaining the setup for some of them.
 
 .. rubric:: SSH multiplexing
 

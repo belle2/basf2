@@ -40,14 +40,15 @@ command line interpreter and can be considered the standard so we stick with it.
 There is also `zsh` which behaves almost the same but has some advanced features
 so you are welcome to try it if you want after this tutorial.
 
-There's another type of command line interpreter called the C shell which tended
-to be popular among scientists in the nineties. However, in contrast to the Bash
-it has severe drawbacks when writing scripts (for more details you can look `here
+There's another type of command line interpreter called the C shell (``csh``, or
+the improved version ``tcsh``) which tended to be popular among scientists in
+the nineties. However, in contrast to the Bash it has severe drawbacks when
+writing scripts (for more details you can look `here
 <https://en.wikipedia.org/wiki/C_shell#Reception>`_).
 
-The C shell is still around in high energy physics but support for it fading
+The C shell is still around in High Energy Physics but support for it fading
 out: Many experiments start removing support to use their software with it. Also
-the Belle II Software is planning remove support in the near future.
+Belle II is planning remove support in the near future.
 
 So if you already know C shell you probably should still continue with this
 tutorial. And If you're new to command lines and shells you **should definitely
@@ -69,13 +70,13 @@ but for Windows you need to install it first.
     applications on that page but that is optional for now.
 
     If you're interested in a more technical description of the Windows
-    subsystem for Linux please refer to the `Microsoft documentation
+    Subsystem for Linux (WSL) please refer to the `Microsoft documentation
     <https://docs.microsoft.com/en-us/windows/wsl/>`_
 
     We also *strongly* recommend that you install the `Windows Terminal
     <https://www.microsoft.com/en-us/p/windows-terminal/9n0dx20hk701>`_ as it
-    makes working with the terminal *much* easier on windows and gives you
-    basically the same features you would get on MaxOSX or Linux.
+    makes working with the terminal *much* easier on Windows and gives you
+    basically the same features you would get on macOS or Linux.
 
 And since the folks at Software Carpentry have already prepared a very nice
 introduction to the `The Unix Shell <https://swcarpentry.github.io/shell-novice/>`_
@@ -94,13 +95,13 @@ use of environment variables. So let's expand a bit on variables in general.
 Shell Variables
 ---------------
 
-You already learned about normal variables when learning about loops: Values
+You already learned about normal variables when learning about loops: values
 can be assigned to names and we can obtain the value by putting a ``$`` in front
 of the name. In the previous tutorial this was only used for loop variables and
 command line arguments (``$1``, ``$2``, ...).
 
 This concept can also be extend to user defined variables: you can very easily
-define your own variables
+define your own variables:
 
 .. code-block:: bash
 
@@ -109,23 +110,23 @@ define your own variables
 
 .. warning::
 
-    You cannot have any spaces between the name, the equal sign, and the value
+    You cannot have any spaces between the name, the equal sign, and the value.
 
 This can be very helpful when writing scripts as you can assign repeated values
 or command line arguments to readable names. Now the values of these variables
-are "local" to the current shell: If you run a program it will not see variables
+are "local" to the current shell: if you run a program it will not see variables
 defined in this way.
 
 .. admonition:: Exercise
     :class: exercise stacked
 
     Run the two lines above. Then write a shell script to just print the name
-    of the variable ``$myvariable``
+    of the variable ``$myvariable``.
 
 .. admonition:: Solution
     :class: toggle solution
 
-    Create a file ``print_myvariable.sh`` that just contains
+    Create a file ``print_myvariable.sh`` that just contains one line:
 
     .. code-block:: bash
 
@@ -141,7 +142,7 @@ defined in this way.
 
 You can tell the shell to export your variables to all programs you call with
 the ``export`` statement. It looks basically the same as the normal variable
-definition
+definition.
 
 .. code-block:: bash
 
@@ -188,7 +189,7 @@ some names have special meaning. The most important one is the variable
 .. admonition:: Exercise
     :class: exercise stacked
 
-    print the value of ``$PATH`` in your shell
+    Print the value of ``$PATH`` in your shell.
 
 .. admonition:: Solution
     :class: solution toggle
@@ -225,7 +226,7 @@ This command will print the full path to the program that would be called.
 
 You can modify this ``$PATH`` to look for programs in additional directories,
 for example to first look for programs in ``bin`` in your home directory you
-could use
+could use:
 
 .. code-block:: bash
 
@@ -234,7 +235,7 @@ could use
 .. admonition:: Question
     :class: exercise stacked
 
-    Why do we have ``$PATH`` in the value of the variable assignment
+    Why do we have ``$PATH`` in the value of the variable assignment?
 
 .. admonition:: Solution
     :class: solution toggle
@@ -244,21 +245,21 @@ could use
     programs.
 
 There are other important variables that affect the behavior of the shell. The
-most important ones are
+most important ones are:
 
 .. envvar:: PATH
 
-    Determines where to look for executables
+    Determines where to look for executables.
 
 .. envvar:: LD_LIBRARY_PATH
 
     Similar to :envvar:`PATH` this determines where to look for shared libraries
-    which might be needed by the executables
+    which might be needed by the executables.
 
 .. envvar:: PYTHONPATH
 
     Similar to :envvar:`PATH` this determines where the Python scripting
-    language will look for additional modules
+    language will look for additional modules.
 
 .. envvar:: LC_ALL
 
@@ -274,7 +275,7 @@ most important ones are
         export LC_ALL=de_DE.utf8
 
     You can find out which locales are available on your system by running
-    ``locale -a`` and you can see your current settings by running just ``locale``
+    ``locale -a`` and you can see your current settings by running just ``locale``.
 
     .. note::
 
@@ -319,7 +320,7 @@ single line into the terminal one by one and hitting return.
 
 There's also a short version which gets used very often but can be very
 misleading: The source command can be replaced by a single ``.``, so the above
-could also be written as
+could also be written as:
 
 .. code-block:: bash
 

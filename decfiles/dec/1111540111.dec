@@ -34,7 +34,6 @@ Decay MyB0
 0.01405 MyJ/psi K'_10           SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.07026 MyJ/psi K_2*0           PHSP;
 0.00689 MyJ/psi K0 phi          PHSP;  #Added by Yubo Li 03/09/2018
-0.00000 MyJ/psi K+ pi-          PHSP;
 0.01518 MyJ/psi eta K0          PHSP; #Added by Yubo Li 03/09/2018
 0.03232 MyJ/psi omega K0        PHSP; #Added by Yubo Li 03/09/2018
 0.00152 MyJ/psi eta             PHSP; #Added by Yubo Li 03/09/2018

@@ -48,6 +48,7 @@ SVDUnpackerDQMModule::SVDUnpackerDQMModule() : HistoModule(), m_mapping(m_xmlFil
            std::string("SVDUnpacker"));
   addParam("ShaperDigitsName", m_ShaperDigitName, "Name of ShaperDigit Store Array.", std::string(""));
   addParam("DiagnosticsName", m_SVDDAQDiagnosticsName, "Name of DAQDiagnostics Store Array.", std::string(""));
+  addParam("EventInfoName", m_SVDEventInfoName, "Name of SVDEventInfo object", std::string(""));
 
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
 }
@@ -88,6 +89,7 @@ void SVDUnpackerDQMModule::defineHisto()
 
   DQMUnpackerHisto = new TH2S("DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
   DQMEventFractionHisto = new TH1S("DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
+  DQMnSamplesHisto = new TH2S("DQMnSamplesHisto", "nAPVsamples VS DAQMode", 2, 1, 3, 3, 1, 4);
 
   DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
@@ -96,11 +98,20 @@ void SVDUnpackerDQMModule::defineHisto()
   DQMEventFractionHisto->GetYaxis()->SetTitleOffset(1.5);
   DQMEventFractionHisto->SetMinimum(0);
 
+  DQMnSamplesHisto->GetYaxis()->SetTitle("DAQ Mode");
+  DQMnSamplesHisto->GetXaxis()->SetTitle("number of APV samples");
+
   TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "EVTmatch", "missHead", "missTrail", "badMapping"};
 
+  TString Xsamples[2] = {"3", "6"};
+  TString Ysamples[3] = {"3 samples", "6 samples", "3/6 mixed"};
 
-  //preparing X axis of the histograms
+  //preparing X axis of the DQMUnpacker histograms
   for (unsigned short i = 0; i < nBits; i++) DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
+
+  //preparing X and Y axis of the DQMnSamples histograms
+  for (unsigned short i = 0; i < 2; i++) DQMnSamplesHisto->GetXaxis()->SetBinLabel(i + 1, Xsamples[i].Data());
+  for (unsigned short i = 0; i < 3; i++) DQMnSamplesHisto->GetYaxis()->SetBinLabel(i + 1, Ysamples[i].Data());
 
   DQMEventFractionHisto->GetXaxis()->SetBinLabel(1, "OK");
   DQMEventFractionHisto->GetXaxis()->SetBinLabel(2, "Error(s)");
@@ -113,6 +124,7 @@ void SVDUnpackerDQMModule::initialize()
 {
   m_eventMetaData.isRequired();
   m_svdDAQDiagnostics.isOptional(m_SVDDAQDiagnosticsName);
+  m_svdEventInfo.isOptional(m_SVDEventInfoName);
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -136,6 +148,10 @@ void SVDUnpackerDQMModule::beginRun()
 
   if (DQMEventFractionHisto != nullptr) {
     DQMEventFractionHisto->Reset();
+  }
+
+  if (DQMnSamplesHisto != nullptr) {
+    DQMnSamplesHisto->Reset();
   }
 
   shutUpNoData = false;
@@ -170,9 +186,23 @@ void SVDUnpackerDQMModule::event()
     return;
   }
 
+  if (!m_svdEventInfo.isValid() && (!shutUpNoData)) {
+    B2WARNING("There is no SVDEventInfo object saved by the Unpacker! SVD Data Format Monitoring disabled!");
+    shutUpNoData = true;
+    return;
+  }
+
   badEvent = 0;
   nEvents++;
 
+  // filling nSamplesHisto
+  int daqMode = m_svdEventInfo->getModeByte().getDAQMode();
+  int nSamples = m_svdEventInfo->getNSamples();
+
+  DQMnSamplesHisto->Fill(nSamples / 3, daqMode);
+
+
+  //filling DQMUnpackerHisto
   unsigned int nDiagnostics = m_svdDAQDiagnostics.getEntries();
 
   unsigned short bin_no = 0;

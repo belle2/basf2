@@ -175,6 +175,9 @@ void SVDUnpackerModule::event()
   // flag to set SVDEventInfo once per event
   bool isSetEventInfo = false;
 
+  //flag to set nAPVsamples in SVDEventInfo once per event
+  bool isSetNAPVsamples = false;
+
   unsigned short nAPVheaders = 999;
   set<short> seenAPVHeaders = {};
 
@@ -222,6 +225,7 @@ void SVDUnpackerModule::event()
       unsigned short apvErrorsOR = 0;
 
       bool is3sampleData = false;
+      bool is6sampleData = false;
 
       for (unsigned int buf = 0; buf < 4; buf++) { // loop over 4 buffers
 
@@ -305,7 +309,9 @@ void SVDUnpackerModule::event()
             badTrailer = false;
 
             is3sampleData = false;
+            is6sampleData = false;
             if (m_MainHeader.DAQMode == 1) is3sampleData = true;
+            if (m_MainHeader.DAQMode == 2) is6sampleData = true;
 
             if (
               m_MainHeader.trgNumber !=
@@ -374,20 +380,42 @@ void SVDUnpackerModule::event()
             sample[1] = m_data_A.sample2;
             sample[2] = m_data_A.sample3;
 
-
             sample[3] = 0;
             sample[4] = 0;
             sample[5] = 0;
 
-            if (not is3sampleData) {
+            // Let's check the next rawdata word to determine if we acquired 3 or 6 sample
+            data32_it++;
+            m_data32 = *data32_it;
 
-              data32_it++;
-              m_data32 = *data32_it; // 2nd frame with data
+            if (m_data_B.check == 0 && strip == m_data_B.stripNum) { // 2nd data frame with the same strip number -> six samples
+
+              if (!isSetNAPVsamples) {
+                m_svdEventInfoPtr->setNSamples(6);
+                isSetNAPVsamples = true;
+              } else {
+                if (is3sampleData)
+                  B2ERROR("DAQMode value (indicating 3-sample acquisition mode) doesn't correspond to the actual number of samples (6) in the data! The data might be corrupted!");
+              }
+
               crc16vec.push_back(m_data32);
 
               sample[3] = m_data_B.sample4;
               sample[4] = m_data_B.sample5;
               sample[5] = m_data_B.sample6;
+            }
+
+            else { // three samples
+              data32_it--;
+              m_data32 = *data32_it;
+
+              if (!isSetNAPVsamples) {
+                m_svdEventInfoPtr->setNSamples(3);
+                isSetNAPVsamples = true;
+              } else {
+                if (is6sampleData)
+                  B2ERROR("DAQMode value (indicating 6-sample acquisition mode) doesn't correspond to the actual number of samples (3) in the data! The data might be corrupted!");
+              }
             }
 
             // Generating SVDShaperDigit object

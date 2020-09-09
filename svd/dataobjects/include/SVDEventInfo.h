@@ -64,6 +64,11 @@ namespace Belle2 {
      */
     void setRelativeShift(int relativeShift) {m_relativeTimeShift = relativeShift;}
 
+    /** nAPVsamples setter
+     * Sets the number of acquired samples (3 or 6) found in the raw data
+     */
+    void setNSamples(int nAPVsamples) {m_nAPVsamples = nAPVsamples;}
+
     /** Match TriggerType getter
      *  Gets the flag telling us if the SVDTriggerType object is the same for each FADCs in the event
      */
@@ -89,19 +94,7 @@ namespace Belle2 {
 
     /** returns the number of samples, 6, 3 or 1 */
     int getNSamples() const
-    {
-
-      int mode = (int)SVDModeByte(m_modeByte).getDAQMode();
-
-      if (mode == 2)
-        return 6;
-      else if (mode == 1)
-        return 3;
-      else if (mode == 0)
-        return 1;
-
-      return -1;
-    }
+    { return m_nAPVsamples; }
 
     float getSVD2FTSWTimeShift(int firstFrame) const
     { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
@@ -176,9 +169,10 @@ namespace Belle2 {
     bool m_TriggerTypeMatch; /**< flag telling if the SVDTriggerType object is the same for each FADCs in the event */
     bool m_Xtalk = false;    /**< information on the x-talk */
     int m_relativeTimeShift = 0; /**< relative shift in units of APV-clock/4 between 3- and 6-sample acquired events */
+    int m_nAPVsamples = 0; /**< number of acquired samples */
 
     /**class def needed by root*/
-    ClassDef(SVDEventInfo, 2);
+    ClassDef(SVDEventInfo, 3);
 
   }; //class
 } // namespace Belle2

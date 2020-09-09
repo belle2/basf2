@@ -14,6 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
+#include <svd/dataobjects/SVDEventInfo.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
@@ -59,11 +60,17 @@ namespace Belle2 {
     /** Required input for EventMetaData */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
+    /** SVDEventInfo StoreObjectPointer */
+    StoreObjPtr<SVDEventInfo> m_svdEventInfo;
+
     /** SVDShaperDigits StoreArray name */
     std::string m_ShaperDigitName;
 
     /** SVD diagnostics module name */
     std::string m_SVDDAQDiagnosticsName;
+
+    /** SVDEventInfo name */
+    std::string m_SVDEventInfoName;
 
     /** mapping implementation */
     std::unique_ptr<SVDOnlineToOfflineMap> m_map;
@@ -106,6 +113,7 @@ namespace Belle2 {
     //histogram
     TH2S* DQMUnpackerHisto = nullptr; /**< TH2S histogram with Unpacking errors*/
     TH1S* DQMEventFractionHisto = nullptr; /**< TH1S histogram showing the fraction of events affected by errors*/
+    TH2S* DQMnSamplesHisto = nullptr; /**< TH2S histogram showing number of samples in data VS daqMode */
 
   };
 

@@ -771,11 +771,11 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           else {
-            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
-            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
@@ -874,12 +874,12 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           else
           {
-            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
-            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
@@ -1081,12 +1081,12 @@ namespace Belle2 {
             return std::numeric_limits<double>::quiet_NaN();
           if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
             return std::numeric_limits<double>::quiet_NaN();
-          if (particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>() == nullptr || particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>() == nullptr)
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
             return std::numeric_limits<double>::quiet_NaN();
           else
           {
-            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getRelated<MCParticle>();
-            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getRelated<MCParticle>();
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
             Particle iTmpPart(iMcDaughter);
             Particle jTmpPart(jMcDaughter);
             double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
@@ -1320,7 +1320,7 @@ namespace Belle2 {
             if (dauPart == nullptr)
               return std::numeric_limits<double>::quiet_NaN();
 
-            const MCParticle* dauMcPart = dauPart->getRelated<MCParticle>();
+            const MCParticle* dauMcPart = dauPart->getMCParticle();
             if (dauMcPart == nullptr)
               return std::numeric_limits<double>::quiet_NaN();
 
@@ -1998,7 +1998,7 @@ namespace Belle2 {
         }
 
         auto func = [inputPDG](const Particle * particle) -> double{
-          const MCParticle* mcp = particle->getRelated<MCParticle>();
+          const MCParticle* mcp = particle->getMCParticle();
           if (!mcp)
             return 0.5;
 
@@ -2819,25 +2819,36 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
 
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
-    REGISTER_VARIABLE("daughter(i, variable)", daughter,
-                      "Returns value of variable for the i-th daughter. E.g.\n"
-                      "  - ``daughter(0, p)`` returns the total momentum of the first daughter.\n"
-                      "  - ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.\n\n"
-                      "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
-    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
-                      "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
-                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
-                      "or if the i-th MC daughter does not exist.\n"
-                      "E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC"
-                      "particle of the reconstructed particle the function is applied to./n"
-                      "The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.");
-    REGISTER_VARIABLE("mcMother(variable)", mcMother,
-                      "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
-                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
-                      "or if the MC mother does not exist.\n"
-                      "E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC"
-                      "particle of the reconstructed particle the function is applied to.\n"
-                      "The meta variable can also be nested: ``mcMother(mcMother(PDG))``.");
+    REGISTER_VARIABLE("daughter(i, variable)", daughter, R"DOC(
+                      Returns value of variable for the i-th daughter. E.g.
+
+                      * ``daughter(0, p)`` returns the total momentum of the first daughter.
+                      * ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.
+
+                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).
+                      )DOC");
+    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter, R"DOC(
+                      Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.
+
+                      Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
+                      or if the i-th MC daughter does not exist.
+
+                      E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC
+                      particle of the reconstructed particle the function is applied to.
+
+                      The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.
+                      )DOC");
+    REGISTER_VARIABLE("mcMother(variable)", mcMother, R"DOC(
+                      Returns the value of the requested variable for the Monte Carlo mother of the particle.
+
+                      Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
+                      or if the MC mother does not exist.
+
+                      E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC
+                      particle of the reconstructed particle the function is applied to.
+
+                      The meta variable can also be nested: ``mcMother(mcMother(PDG))``.
+                      )DOC");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
@@ -2946,7 +2957,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC");
-    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"Mc matched version of the `daughterAngle` function.");     
+    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.");
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"

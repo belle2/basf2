@@ -654,7 +654,7 @@ namespace Belle2 {
       if (particle == nullptr)
         return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
 
-      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle = particle->getMCParticle();
 
       if (mcparticle == nullptr)
         return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
@@ -667,7 +667,7 @@ namespace Belle2 {
       if (particle == nullptr)
         return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
 
-      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle = particle->getMCParticle();
 
       if (mcparticle == nullptr)
         return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
@@ -704,13 +704,13 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle*  daughterReco = particle->getDaughter(daughterNumber);
           //get the MC DAUGHTER
-          const MCParticle*  daughter = daughterReco->getRelatedTo<MCParticle>();
+          const MCParticle*  daughter = daughterReco->getMCParticle();
 
           double flightDistanceMC =  std::numeric_limits<float>::quiet_NaN();
           if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters())
           {
             // Compute value between mother and granddaughter
-            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getRelatedTo<MCParticle>();
+            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getMCParticle();
 
             if (gdaughter != nullptr)
               flightDistanceMC = getMCFlightInfoBtw(gdaughter, "distance");
@@ -755,13 +755,13 @@ namespace Belle2 {
             return std::numeric_limits<float>::quiet_NaN(); // Daughter number or daughters are inconsistent
           const Particle*  daughterReco = particle->getDaughter(daughterNumber);
           //get the MC DAUGHTER
-          const MCParticle*  daughter = daughterReco->getRelatedTo<MCParticle>();
+          const MCParticle*  daughter = daughterReco->getMCParticle();
           // daughter MOMENTUM
 
           double flightTimeMC = std::numeric_limits<float>::quiet_NaN();
           if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters())
           {
-            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getRelatedTo<MCParticle>();
+            const MCParticle*  gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getMCParticle();
             if (gdaughter != nullptr)
               flightTimeMC = getMCFlightInfoBtw(gdaughter, "time");
           } else  {

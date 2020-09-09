@@ -49,9 +49,9 @@ namespace Belle2 {
   protected:
     std::string m_cosmicdatadir; /**< cosmic data (used by CRY for interpolation). */
     std::vector<double> m_acceptance; /**< Shape parameters for the acceptance box */
-    double m_kineticEnergyThreshold;  /**< kinetic energy threshold. */
-    double m_timeOffset;  /**< time offset. */
-    int m_maxTrials;  /**< maximum number of trials. */
+    double m_kineticEnergyThreshold{0.01};  /**< kinetic energy threshold. */
+    double m_timeOffset{0};  /**< time offset. */
+    int m_maxTrials{10000};  /**< maximum number of trials. */
     double m_boxLength{1000}; /**< length of the sides of the square plane in which to generate cosmics */
     bool m_returnGammas{true}; /**< Whether or not CRY should return gammas */
     bool m_returnKaons{true}; /**< Whether or not CRY should return kaons */

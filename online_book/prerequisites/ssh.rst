@@ -820,7 +820,7 @@ pre-installed on KEKCC and NAF.
 
 These programs create one or multiple new terminal sessions within your
 terminal, and these sessions run independently of the original terminal, even
-if it exits. You just have to re-connect and re-attach the old screen/tmux
+if it exits. You just have to re-connect and re-attach the old screen or tmux
 session. A terminal multiplexer allows for example to
 
 * Start a process (e.g. a download or compilation) on your work computer, log
@@ -843,7 +843,10 @@ recommend keeping a `cheat sheet <https://tmuxcheatsheet.com>`_ in your
 bookmarks. The commands that you need for the most basic use-case are
 
 tmux new-session
-    Creates and attaches a new tmux session
+    Creates and attaches a new tmux session. This is also the default behaviour
+    when just entering the ``tmux``. However, the ``new-session`` subcommand
+    allows for additional options such as naming sessions (see ``tmux
+    new-session --help``)
 
 tmux kill-session
     Kills the current tmux session. Use this when you finish your work and

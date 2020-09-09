@@ -13,7 +13,7 @@ SSH - Secure Shell
     **Prerequisites**:
 
         * The ssh client installed on your computer
-    	* To be able to enter simple commands on the terminal
+        * To be able to enter simple commands on the terminal
         * How to edit a text file on your computer
         * A DESY account
         * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
@@ -755,7 +755,7 @@ local files. For example
   <https://help.gnome.org/users/gnome-help/stable/nautilus-connect.html.en>`_ for
   more information but this works similar in other desktop environments.
 * In addition many editors or development environments have their own support to
-  work on a remote machine via ssh. There is a 
+  work on a remote machine via ssh. There is a
   `guide on confluence <https://confluence.desy.de/x/XGJ8Cg>`_
   explaining the setup for some of them.
 
@@ -799,3 +799,77 @@ Sometimes you want to have your SSH config depend on where you are with your
 laptop. For example, while at KEK you don't need to jump through the gateway.
 This is indeed possible and explained in detail on `B2 Questions
 <https://questions.belle2.org/question/1247/sshconfig-dependent-on-network/>`_.
+
+.. rubric:: Using a terminal multiplexer (e.g. tmux, screen)
+
+When you loose your ssh connection or your terminal window is closed, all
+processes that had been running in that terminal are also killed.In most cases
+that is the desired behaviour and for long-running computational tasks you
+should send a job to a batch system like the :ref:`grid <gbasf2>`.
+Ocasionally it still happens that non-computational processes take a while, for
+example when downloading a large dataset from the grid. Then, you can use a
+`terminal multiplexer <https://en.wikipedia.org/wiki/Terminal_multiplexer>`_
+program such as `GNU screen <https://www.gnu.org/software/screen/>`_ or the
+newer and more feature-rich `tmux <https://github.com/tmux/tmux/wiki>`_. Both
+are pre-installed on KEKCC and NAF.
+
+These programs create one or multiple new terminal sessions within your
+terminal, and these sessions run independently of the original terminal, even
+if it exits. You just have to re-connect and re-attach the old screen/tmux
+session. A terminal multiplexer allows for example to
+
+* Start a process (e.g. a download or compilation) in a tmux session on your
+  work computer, log out (which detaches the session) go home and from your
+  home desktop / notebook re-attach the session and check how your process is
+  doing.
+
+* Having multiple interactive shells in parallel on a remote host, without
+  needing to open multiple terminals and connecting from each one seperately.
+  Think of it like having multiple remote "tabs". Tmux can also act as a
+  terminal window manager and arange them side-by-side. This can be useful e.g.
+  for running a process in one pane and monitoring the processor load via
+  `htop <https://htop.dev/>`_.
+
+If you don't know either programs yet, I recommend learning how to use the
+newer tmux. Check out the official `getting started guide
+<https://github.com/tmux/tmux/wiki/Getting-Started>`_ from its `wiki
+<https://github.com/tmux/tmux/wiki>`_ or one of the various googable online
+guides such as `this one <https://linuxhandbook.com/tmux/>`_. And I also
+recommend keeping a `cheat sheet <https://tmuxcheatsheet.com>`_ in your
+bookmarks. The commands that you need for the most basic use-case are
+
+tmux new-session
+    Creates and attaches a new tmux session
+
+tmux kill-session
+    Kills the current tmux session. **Use this** when you
+    finish your work, the admins might not be happy when you leave long-running
+    processes doing nothing on various remote hosts.
+
+tmux detach
+    Detaches the current tmux session, so that you return your original
+    terminal session, but the tmux session keeps running in the background.
+    This happens automatically when you loose your connection or your terminal
+    is closed.
+
+tmux attach
+    Attaches a running but detached tmux session. When you log into KEKCC or
+    NAF to attach your previous tmux session, **make sure are on exactly the
+    same host** (i.e. machine, just check the terminal prompt or type
+    ``hostname``) as the one in which you started the initial tmux session.
+    This is because when you log in for example via ``login.cc.kek.jp``, you
+    get assigned to a random machine for load-balancing purposes. You can just
+    run or ``ssh ccwXY`` with ``XY`` being the specific host numbers to connect
+    to another machine.
+
+All these command take arguments to be able to handle multiple sessions and you
+might need more commands than those listed here, so check out the documentation
+links above.
+
+.. warning:: Rules of responsible tmux/screen usage
+
+    * Don't use screen/tmux for computations and other CPU/memory-heavy
+      processes.
+    * Avoid very long-running sessions, be tidy and kill them once you finished
+      your work
+    * Keep track of the exact host on which you run your terminal multiplexers

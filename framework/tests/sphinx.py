@@ -30,8 +30,6 @@ if __name__ == "__main__":
     ignoreduplicatecalibrationlabel = 'duplicate label calibration'
     #: ignore framework description of role warnings (should be fixed)
     ignoreduplicatedescriptionofrole = 'duplicate description of role'
-    #: ignore duplicate labels in mva package
-    ignoreduplicatemvalabel = 'duplicate label mva'
     #: ignore warning from tools repository
     ignorechoosingarelease = 'Choosing a release'
     #: ignore warning about not finding Geometry module ?!
@@ -57,7 +55,6 @@ if __name__ == "__main__":
                          re.findall(ignoreduplicatewhatsnewlabel, x) or
                          re.findall(ignoreduplicatecalibrationlabel, x) or
                          re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignoreduplicatemvalabel, x) or
                          re.findall(ignorechoosingarelease, x) or
                          re.findall(ignoreaddmdstoutput, x) or
                          re.findall(ignoreaddsimulation, x) or
@@ -77,7 +74,6 @@ if __name__ == "__main__":
                          re.findall(ignoreduplicatewhatsnewlabel, x) or
                          re.findall(ignoreduplicatecalibrationlabel, x) or
                          re.findall(ignoreduplicatedescriptionofrole, x) or
-                         re.findall(ignoreduplicatemvalabel, x) or
                          re.findall(ignorechoosingarelease, x) or
                          re.findall(ignoreonlinebook, x) or
                          re.findall(ignoregeometry, x)

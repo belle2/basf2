@@ -71,7 +71,7 @@ you will learn how to use it.
 
 Luckily there is a very large amount of good git tutorials out there. We'll
 stick with Software Carpentry and their `Version Control with Git
-<https://swcarpentry.github.io/git-novice/>`_  introduction. we would like you
+<https://swcarpentry.github.io/git-novice/>`_  introduction. We would like you
 to go there and go through the introduction and then come back here when you are
 done.
 

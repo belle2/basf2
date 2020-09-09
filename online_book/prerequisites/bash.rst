@@ -37,7 +37,7 @@ tutorials out there we can just use.
 
 For this tutorial we want to focus on the Bash shell. This is the most popular
 command line interpreter and can be considered the standard so we stick with it.
-There is also `zsh` which behaves almost the same but has some advanced features
+There is also ``zsh`` which behaves almost the same but has some advanced features
 so you are welcome to try it if you want after this tutorial.
 
 There's another type of command line interpreter called the C shell (``csh``, or
@@ -79,8 +79,8 @@ but for Windows you need to install it first.
     basically the same features you would get on macOS or Linux.
 
 And since the folks at Software Carpentry have already prepared a very nice
-introduction to the `The Unix Shell <https://swcarpentry.github.io/shell-novice/>`_
-we would like you to go there and go through the introduction and then come back
+introduction to the `The Unix Shell <https://swcarpentry.github.io/shell-novice/>`_.
+We would like you to go there and go through the introduction and then come back
 here when you are done.
 
 .. image:: swcarpentry_logo-blue.svg
@@ -213,7 +213,7 @@ This command will print the full path to the program that would be called.
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Find out in which directory the `ls` program is located.
+    Find out in which directory the ``ls`` program is located.
 
 .. admonition:: Solution
     :class: solution toggle

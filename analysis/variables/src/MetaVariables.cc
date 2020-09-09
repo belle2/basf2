@@ -2819,11 +2819,14 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
 
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
-    REGISTER_VARIABLE("daughter(i, variable)", daughter,
-                      "Returns value of variable for the i-th daughter. E.g.\n"
-                      "  - ``daughter(0, p)`` returns the total momentum of the first daughter.\n"
-                      "  - ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.\n\n"
-                      "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
+    REGISTER_VARIABLE("daughter(i, variable)", daughter, R"DOC(
+                      Returns value of variable for the i-th daughter. E.g.
+
+                      * ``daughter(0, p)`` returns the total momentum of the first daughter.
+                      * ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.
+
+                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).
+                      )DOC");
     REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter, R"DOC(
                       Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.
 

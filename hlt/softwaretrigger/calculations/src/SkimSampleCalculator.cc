@@ -25,13 +25,14 @@
 #include <analysis/variables/ECLVariables.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <analysis/variables/AcceptanceVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
-  m_KsParticles("K_S0:merged")
+  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged")
 {
 
 }
@@ -43,6 +44,7 @@ void SkimSampleCalculator::requireStoreArrays()
   m_pionHadParticles.isRequired();
   m_pionTauParticles.isRequired();
   m_KsParticles.isOptional();
+  m_LambdaParticles.isOptional();
 
 };
 
@@ -706,4 +708,28 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   if (nFourLep != 0 && visibleEnergyCMS < 6) fourLep = 1;
 
   calculationResult["FourLep"] = fourLep;
+
+  // nLambda
+  unsigned int nLambda = 0;
+
+  if (m_LambdaParticles.isValid()) {
+    for (unsigned int i = 0; i < m_LambdaParticles->getListSize(); i++) {
+      const Particle* mergeLambdaCand = m_LambdaParticles->getParticle(i);
+      const double flightDist = Variable::flightDistance(mergeLambdaCand);
+      const double flightDistErr = Variable::flightDistanceErr(mergeLambdaCand);
+      const double flightSign = flightDist / flightDistErr;
+      const Particle* protCand = mergeLambdaCand->getDaughter(0);
+      const Particle* pionCand = mergeLambdaCand->getDaughter(1);
+      const double protMom = protCand->getMomentum().Mag();
+      const double pionMom = pionCand->getMomentum().Mag();
+      const double asymPDaughters = (protMom - pionMom) / (protMom + pionMom);
+      if (flightSign > 10 && asymPDaughters > 0.41) nLambda++;
+    }
+  }
+
+  if (nLambda > 0) {
+    calculationResult["Lambda"] = 1;
+  } else {
+    calculationResult["Lambda"] = 0;
+  }
 }

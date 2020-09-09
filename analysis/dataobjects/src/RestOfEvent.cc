@@ -286,7 +286,8 @@ TLorentzVector RestOfEvent::get4Vector(const std::string& maskName) const
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
   for (const Particle* particle : myParticles) {
     // KLMClusters are discarded, because KLM energy estimation is based on hit numbers, therefore it is unreliable
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
+    // also, enable it as an experimental option:
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster and !m_useKLMEnergy) {
       continue;
     }
     roe4Vector += particle->get4Vector();
@@ -413,6 +414,9 @@ void RestOfEvent::print(const std::string& maskName, bool unpackComposite) const
     if (m_isFromMC) {
       B2INFO(tab << "ROE is build from generated particles");
     }
+  }
+  if (m_useKLMEnergy) {
+    B2WARNING("This ROE has KLM energy included into its 4-vector!");
   }
   if (!m_isFromMC) {
     unsigned int nCharged = getChargedParticles(maskName, 0, unpackComposite).size();

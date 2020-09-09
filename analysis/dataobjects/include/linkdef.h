@@ -8,7 +8,7 @@
 #pragma link C++ class Belle2::Particle+; // checksum=0x5a78ef64, version=13
 #pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
 #pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
-#pragma link C++ class Belle2::RestOfEvent+; // checksum=0xa87084c6, version=5
+#pragma link C++ class Belle2::RestOfEvent+; // checksum=0x47e1a2eb, version=6
 #pragma link C++ class Belle2::TagVertex+; // checksum=0xbc37ca67, version=5
 #pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0xccdb3c88, version=1
 #pragma link C++ class Belle2::FlavorTaggerInfo+; // checksum=0x2e59c562, version=3
@@ -92,5 +92,19 @@
   targetClass="Belle2::EventKinematics"        \
   target="m_builtFromMC"                       \
   code="{m_builtFromMC = false;}"              \
+
+// ----------------------------------------------------------------------------
+// RestOfEvent evolution
+// In version 6 the new member m_useKLMEnergy is introduced. Since this
+// functionality was not present before it is set to false for versions < 6.
+#pragma read                                   \
+  sourceClass="Belle2::RestOfEvent"            \
+  source="bool m_useKLMEnergy"                 \
+  version="[-5]"                               \
+  targetClass="Belle2::RestOfEvent"            \
+  target="m_useKLMEnergy"                      \
+  code="{m_useKLMEnergy = false;}"             \
+
+
 
 #endif

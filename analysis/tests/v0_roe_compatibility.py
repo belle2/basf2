@@ -34,7 +34,7 @@ testpath.add_module('ParticleCombiner',
 
 testpath.add_module('RestOfEventBuilder', particleList=signal_side_name,
                     particleListsInput=[fsp_tag_side])
-mask = ('cleanMask', '', '')
+mask = ('cleanMask', '', '', '')
 testpath.add_module('RestOfEventInterpreter', particleList=signal_side_name,
                     ROEMasks=mask)
 

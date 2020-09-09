@@ -101,7 +101,7 @@ void RawHeader_latest::CheckHeader(int* buf)
     B2FATAL(err_buf);
   }
 
-  for (int i = 1; i < 47; i++) {
+  for (int i = 1; i < (MAX_PCIE40_CH - 1); i++) {
     ch = i;
     if (buf[ POS_CH_POS_TABLE + ch ] < buf[ POS_CH_POS_TABLE + (ch - 1) ]) {
       char err_buf[500];
@@ -111,7 +111,7 @@ void RawHeader_latest::CheckHeader(int* buf)
       B2FATAL(err_buf);
     }
   }
-  ch = 47;
+  ch = MAX_PCIE40_CH - 1;
 
   if (buf[ POS_CH_POS_TABLE + ch ] < buf[ POS_CH_POS_TABLE + (ch - 1) ] ||
       buf[ POS_CH_POS_TABLE + ch ] > buf[ POS_NWORDS ]) {

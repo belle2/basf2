@@ -187,12 +187,12 @@ void RawCOPPER::PackDetectorBuf(
   int* detector_buf_4th, int nwords_4th,
   RawCOPPERPackerInfo rawcprpacker_info)
 {
-
+  // This function should be used for packing COPPER-format data.
   if (m_access != NULL) {
     delete m_access;
   }
-  m_access = new PostRawCOPPERFormat_latest;
-  m_version = LATEST_POSTREDUCTION_FORMAT_VER;
+  m_access = new PostRawCOPPERFormat_v2; // The latest version for COPPER-format
+  m_version = 2; // The latest version for COPPER-format
   m_num_events = 1;
   m_num_nodes = 1;
 
@@ -217,9 +217,17 @@ void RawCOPPER::PackDetectorBuf(int* const(&detector_buf_ch)[MAX_PCIE40_CH],
                                 int const(&nwords_ch)[MAX_PCIE40_CH],
                                 RawCOPPERPackerInfo rawcprpacker_info)
 {
+  if (LATEST_POSTREDUCTION_FORMAT_VER < 4) {
+    char err_buf[500];
+    sprintf(err_buf, "This function must be used for PCIe40 data(ver.4 or later). Exiting...");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
+  }
+
   if (m_access != NULL) {
     delete m_access;
   }
+
   m_access = new PostRawCOPPERFormat_latest;
   m_version = LATEST_POSTREDUCTION_FORMAT_VER;
   m_num_events = 1;
@@ -247,12 +255,13 @@ void RawCOPPER::PackDetectorBuf4DummyData(
   int* detector_buf_4th, int nwords_4th,
   RawCOPPERPackerInfo rawcprpacker_info)
 {
-
+  // This function should be used for packing COPPER-format data.
   if (m_access != NULL) {
     delete m_access;
   }
-  m_access = new PreRawCOPPERFormat_latest;
-  m_version = LATEST_POSTREDUCTION_FORMAT_VER;
+  m_access = new PostRawCOPPERFormat_v2; // The latest version for COPPER-format
+  m_version = 2; // The latest version for COPPER-format
+
   m_num_events = 1;
   m_num_nodes = 1;
 

@@ -40,8 +40,8 @@ enough to handle our data. So most students needed to start with C++ or even
 Fortran.
 
 And while there's nothing wrong with those languages once you mastered them, the
-learning curve is very long and steep and issues with the language took a major
-fraction of students time with frustrating issues like
+learning curve is very long and steep. Issues with the language have been known
+to take a major fraction of students time with frustrating issues like:
 
 * Why does it not compile?
 * It crashes with an error called "segmentation violation", what's that?
@@ -56,18 +56,23 @@ So in recent years HEP has started moving to Python for analysis use: It is very
 easy to learn and has very nice scientific libraries to do all kinds of things.
 Some people still say python is way too slow and if you misuse it that is
 certainly true. But if used correctly python is usually much easier to write and
-can achieve comparable if not better speeds when compared to C++.
+can achieve comparable if not better speeds when compared to naive C++
+implementations. Yes, if you are a master of C++ nothing can beat your execution
+speed but the language is very hard to master. In contrast Python offers
+sophisticated and optimized libraries for basically all relevant use cases.
+Usually these include optimizations that would take years to implement in C++,
+like GPU support.
 
 Think about it: almost all of the billion dollar industry that is machine
 learning is done in Python and they would not do that if it would not be
 efficient.
 
 Consequently in Belle II we make heavy use of Python which means you will need
-to be familiar with it. By know you probably know what's coming next.
+to be familiar with it. By now you probably know what's coming next.
 
 Luckily there is a very large amount of good python tutorials out there. We'll
 stick with Software Carpentry and their `Programming with Python
-<https://swcarpentry.github.io/python-novice-inflammation/>`_  introduction. we
+<https://swcarpentry.github.io/python-novice-inflammation/>`_  introduction. We
 would like you to go there and go through the introduction and then come back
 here when you are done.
 

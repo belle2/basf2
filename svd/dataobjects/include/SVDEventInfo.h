@@ -172,7 +172,7 @@ namespace Belle2 {
     int m_nAPVsamples = 0; /**< number of acquired samples */
 
     /**class def needed by root*/
-    ClassDef(SVDEventInfo, 3);
+    ClassDef(SVDEventInfo, 2);
 
   }; //class
 } // namespace Belle2

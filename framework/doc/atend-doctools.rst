@@ -147,7 +147,7 @@ Inserting Figures
 While properly documenting the code itself is the first step to take, you may want to include figures that explain
 overall concepts of a package, module, or class (see :numref:`framework_modpath_diagram`).
 To do this, first simply place the image file you would like to display into your ``<package>/doc>`` directory.
-you can then place the image (in this case ``cat.jpg``) into the documentation by using
+You can then place the image (in this case ``cat.jpg``) into the documentation by using
 
 .. code-block:: rst
 

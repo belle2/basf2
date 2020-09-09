@@ -1,4 +1,3 @@
-
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2015  Belle II Collaboration                              *
@@ -9,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CRYINPUTMODULE_H
-#define CRYINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -53,6 +51,7 @@ namespace Belle2 {
     double m_timeOffset{0};  /**< time offset. */
     int m_maxTrials{10000};  /**< maximum number of trials. */
     double m_boxLength{1000}; /**< length of the sides of the square plane in which to generate cosmics */
+    std::string m_date{"1-1-2019"}; /**< date used for generation. */
     bool m_returnGammas{true}; /**< Whether or not CRY should return gammas */
     bool m_returnKaons{true}; /**< Whether or not CRY should return kaons */
     bool m_returnPions{true}; /**< Whether or not CRY should return pions */
@@ -67,5 +66,3 @@ namespace Belle2 {
 
 
 } // end namespace Belle2
-
-#endif /*CRYINPUTMODULE_H */

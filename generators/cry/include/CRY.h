@@ -66,6 +66,11 @@ namespace Belle2 {
      */
     void setKineticEnergyThreshold(double kineticenergythreshold) { m_kineticEnergyThreshold = kineticenergythreshold; }
 
+    /** Sets the date used for generation (the cosmic-ray distribution is adjusted to account for the eleven year, sunspot cycle).
+     * @param date date used for generation (month-day-year).
+     */
+    void setDate(std::string date) { m_date = date; }
+
     /** Sets the maximum number of trials.
      * @param maxtrials maximum number of trials.
      */
@@ -136,6 +141,7 @@ namespace Belle2 {
     std::vector<double> m_acceptSize; /**< Shape parameters for the acceptance shape */
     double m_timeOffset{0};  /**< time offset in nanoseconds. */
     double m_kineticEnergyThreshold{0};  /**< kinetic energy threshold. */
+    std::string m_date{"1-1-2019"}; /**< date used for generation (month-day-year). */
     int m_maxTrials{0};   /**< number of trials per event. */
     int m_totalTrials{0}; /**< total number of thrown events. */
     bool m_returnGammas{true}; /**< Whether or not CRY should return gammas */

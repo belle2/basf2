@@ -34,7 +34,7 @@ REG_MODULE(CRYInput)
 CRYInputModule::CRYInputModule() : Module()
 {
   //Set module properties
-  setDescription(R"DOC(Generates cosmic showers with CRY
+  setDescription(R"DOC(Generates cosmic showers with CRY.
 
 The showers will be generated in the xz plane in a square plane of n bt n meters
 centered at the IP (n can be choosen with the boxLength parameter). Then the
@@ -64,6 +64,9 @@ the xz plane in which CRY will generate cosmics in cm. Will be rounded down to
 meters. According to the CRY documentation good values are 1, 3, 10, 30, 100 and
 300m but anything in between should work as well. The default is 100m and should
 be fine for almost all use cases.)DOC", m_boxLength);
+  addParam("date", m_date, R"DOC(Date used for the generation: a string in the form of
+'month-date-year'. The cosmic-ray distribution is adjusted to account for the eleven
+year, sunspot cycle (the default solar minimum date is January 1, 2008).)DOC", m_date);
   addParam("returnGammas", m_returnGammas,
            "Whether or not CRY should return gammas", m_returnGammas);
   addParam("returnKaons", m_returnKaons,
@@ -99,6 +102,7 @@ void CRYInputModule::initialize()
   m_generator.setKineticEnergyThreshold(m_kineticEnergyThreshold);
   m_generator.setTimeOffset(m_timeOffset);
   m_generator.setBoxLength(m_boxLength);
+  m_generator.setDate(m_date);
   m_generator.setReturnGammas(m_returnGammas);
   m_generator.setReturnKaons(m_returnKaons);
   m_generator.setReturnPions(m_returnPions);

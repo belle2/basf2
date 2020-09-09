@@ -38,7 +38,7 @@ namespace Belle2 {
     setupString << " returnNeutrons " << m_returnNeutrons << std::endl;
     setupString << " returnElectrons " << m_returnElectrons << std::endl;
     setupString << " returnMuons " << m_returnMuons << std::endl;
-    setupString << " date " << "1-1-2019" << std::endl;
+    setupString << " date " << m_date << std::endl;
     setupString << " latitude " << 36.0 << std::endl;
     setupString << " altitude " << 0 << std::endl;
     setupString << " subboxLength " << m_subboxLength << std::endl;

@@ -97,6 +97,9 @@ void SVDUnpackerModule::initialize()
 
 void SVDUnpackerModule::beginRun()
 {
+  if (!m_mapping.isValid())
+    B2FATAL("no valid SVD Channel Mapping. We stop here.");
+
   m_wrongFTBcrc = 0;
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
 
@@ -129,8 +132,12 @@ void SVDUnpackerModule::beginRun()
 
   //get the relative time shift
   SVDDetectorConfiguration detectorConfig;
-  m_relativeTimeShift = detectorConfig.getRelativeTimeShift();
-
+  if (detectorConfig.isValid())
+    m_relativeTimeShift = detectorConfig.getRelativeTimeShift();
+  else {
+    B2ERROR("SVDDetectorConfiguration not valid!! Setting relativeTimeShift to 0 for this reconstruction.");
+    m_relativeTimeShift = 0;
+  }
 }
 
 #ifndef __clang__

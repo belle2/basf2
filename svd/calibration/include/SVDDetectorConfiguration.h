@@ -183,7 +183,8 @@ namespace Belle2 {
     /** returns true if the m_aDBObtPtr is valid in the requested IoV */
     bool isValid()
     {
-      return m_svdLocalConfig_aDBObjPtr.isValid();
+      //      return m_svdLocalConfig_aDBObjPtr.isValid();
+      return m_svdGlobalConfig_aDBObjPtr.isValid();
     }
 
 

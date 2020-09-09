@@ -803,7 +803,7 @@ This is indeed possible and explained in detail on `B2 Questions
 .. rubric:: Using a terminal multiplexer (e.g. tmux, screen)
 
 When you loose your ssh connection or your terminal window is closed, all
-processes that had been running in that terminal are also killed.In most cases
+processes that had been running in that terminal are also killed. In most cases
 that is the desired behaviour and for long-running computational tasks you
 should send a job to a batch system like the :ref:`grid <gbasf2>`.
 Ocasionally it still happens that non-computational processes take a while, for

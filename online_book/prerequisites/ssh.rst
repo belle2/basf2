@@ -841,9 +841,9 @@ tmux new-session
     Creates and attaches a new tmux session
 
 tmux kill-session
-    Kills the current tmux session. **Use this** when you
-    finish your work, the admins might not be happy when you leave long-running
-    processes doing nothing on various remote hosts.
+    Kills the current tmux session. Use this when you finish your work and
+    don't require your session anymore, it is a polite thing to do on shared
+    resources like login nodes.
 
 tmux detach
     Detaches the current tmux session, so that you return your original

@@ -109,8 +109,19 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           TProfile* pfx = hEventT0vsELS->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsELS->GetName());
           pfx->SetName(name.c_str());
-          // pfx->SetErrorOption("S");
           TFitResultPtr tfr = pfx->Fit("pol1pole", "QMRS");
+          // There is small possibility that the chi2 minimization ends at the parameter boundary.
+          // In such case, we may get a completely wrong fit function, thus we refit w/o boundaries.
+          if (tfr->Chi2() > 500) {
+            B2WARNING("Correlation fit Chi2 is too large, refit with very wide parameter boundaries.");
+            pol1pole->SetParLimits(1, - 1e5, 1e5);
+            pol1pole->SetParLimits(2, - 1e7, 1e7);
+            pol1pole->SetParLimits(3, - 1e6, 1e6);
+            tfr = pfx->Fit("pol1pole", "QMRS");
+            pol1pole->SetParLimits(1, 0, 1);
+            pol1pole->SetParLimits(2, -300, 0);
+            pol1pole->SetParLimits(3, 0, 15);
+          }
           double par[4];
           pol1pole->GetParameters(par);
           // double meanT0 = hEventT0->GetMean();

@@ -224,7 +224,7 @@ namespace Belle2 {
     m_generator = std::make_unique<ParticleGenerator>(decaydescriptor, "");
     m_generator->init();
 
-    while (m_generator->loadNext()) {
+    while (m_generator->loadNext(m_chargeConjugation)) {
       Particle&& particle = m_generator->getCurrentParticle();
 
       Particle* newParticle = particles.appendNew(particle);

@@ -818,10 +818,9 @@ terminal, and these sessions run independently of the original terminal, even
 if it exits. You just have to re-connect and re-attach the old screen/tmux
 session. A terminal multiplexer allows for example to
 
-* Start a process (e.g. a download or compilation) in a tmux session on your
-  work computer, log out (which detaches the session) go home and from your
-  home desktop / notebook re-attach the session and check how your process is
-  doing.
+* Start a process (e.g. a download or compilation) on your work computer, log
+  out (which detaches the session) go home and from your home desktop /
+  notebook re-attach the session and check how your process is doing.
 
 * Having multiple interactive shells in parallel on a remote host, without
   needing to open multiple terminals and connecting from each one seperately.

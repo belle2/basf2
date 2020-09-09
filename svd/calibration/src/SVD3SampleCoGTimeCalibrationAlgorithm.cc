@@ -43,10 +43,9 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 
   std::unique_ptr<TF1> pol3(new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -10,
                                     80)); // In the local study, Y. Uematsu tuned the range to (31.5,48), because the correlation is not exactly like pol3. (The deviation appears at around 48, very naive.) However, original value (-10,80) also seems working.
-  // pol3->SetParLimits(0, -200, 0);
-  // pol3->SetParLimits(1, 0, 10);
-  // pol3->SetParLimits(2, -1, 0);
-  // pol3->SetParLimits(3, 0, 1);
+  // Here we don't need to set initial values and boundaries for the fit parameter,
+  // since for the pre-defined function like 'pol3' the fit internally set the optimal ones
+  // if you don't specify the option 'B'.
 
   FileStat_t info;
   int cal_rev = 1;
@@ -107,8 +106,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           TProfile* pfx = hEventT0vsCoG->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());
-          // pfx->SetErrorOption("S");
-          TFitResultPtr tfr = pfx->Fit("pol3", "RQS");
+          TFitResultPtr tfr = pfx->Fit("pol3", "QMRS");
           double par[4];
           pol3->GetParameters(par);
           // double meanT0 = hEventT0->GetMean();

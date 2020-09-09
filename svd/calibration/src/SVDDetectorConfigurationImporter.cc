@@ -102,7 +102,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
       relativeTimeShift = cfgDocumentChild.second.get<int>("<xmlattr>.mix_trg_delay") ;
       B2INFO(" delay of 3-sample VS 6-sample in units of APV clock /4 = " << relativeTimeShift);
       if ((relativeTimeShift < 0) || (relativeTimeShift > 15)) {
-        B2ERROR("OOPS!! the relative time shift = " << relativeTimeShift <<
+        B2FATAL("OOPS!! the relative time shift = " << relativeTimeShift <<
                 " is not allowed! It must be an int between 0 and 15 included. Please check the global xml. For the moment we set it to 0");
         relativeTimeShift = 0;
       }

@@ -2824,20 +2824,26 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
                       "  - ``daughter(0, p)`` returns the total momentum of the first daughter.\n"
                       "  - ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.\n\n"
                       "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
-    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
-                      R"DOC(Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n
+    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter, R"DOC(
+                      Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.
+
                       Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
-                      or if the i-th MC daughter does not exist.\n
+                      or if the i-th MC daughter does not exist.
+
                       E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC
-                      particle of the reconstructed particle the function is applied to.\n
+                      particle of the reconstructed particle the function is applied to.
+
                       The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.
                       )DOC");
-    REGISTER_VARIABLE("mcMother(variable)", mcMother,
-                      R"DOC(Returns the value of the requested variable for the Monte Carlo mother of the particle.\n
+    REGISTER_VARIABLE("mcMother(variable)", mcMother, R"DOC(
+                      Returns the value of the requested variable for the Monte Carlo mother of the particle.
+
                       Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
-                      or if the MC mother does not exist.\n
+                      or if the MC mother does not exist.
+
                       E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC
-                      particle of the reconstructed particle the function is applied to.\n
+                      particle of the reconstructed particle the function is applied to.
+
                       The meta variable can also be nested: ``mcMother(mcMother(PDG))``.
                       )DOC");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
@@ -2948,7 +2954,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC");
-    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"Mc matched version of the `daughterAngle` function.");     
+    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.");
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"

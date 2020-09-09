@@ -805,7 +805,8 @@ This is indeed possible and explained in detail on `B2 Questions
 When you loose your ssh connection or your terminal window is closed, all
 processes that had been running in that terminal are also killed. In most cases
 that is the desired behaviour and for long-running computational tasks you
-should send a job to a batch system like the :ref:`grid <gbasf2>`.
+should send a job to a batch system like the
+:ref:`grid <online_book/computing/gbasf2:gbasf2>`.
 Ocasionally it still happens that non-computational processes take a while, for
 example when downloading a large dataset from the grid. Then, you can use a
 `terminal multiplexer <https://en.wikipedia.org/wiki/Terminal_multiplexer>`_

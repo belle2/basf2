@@ -49,19 +49,35 @@ namespace Belle2 {
 
     //! get Detector buffer length of slot A
     /* cppcheck-suppress missingOverride */
-    int Get1stDetectorNwords(int n) OVERRIDE_CPP17;
+    int Get1stDetectorNwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get Detector buffer length of slot B
     /* cppcheck-suppress missingOverride */
-    int Get2ndDetectorNwords(int n) OVERRIDE_CPP17;
+    int Get2ndDetectorNwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get Detector buffer length of slot C
     /* cppcheck-suppress missingOverride */
-    int Get3rdDetectorNwords(int n) OVERRIDE_CPP17;
+    int Get3rdDetectorNwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get Detector buffer length of slot D
     /* cppcheck-suppress missingOverride */
-    int Get4thDetectorNwords(int n) OVERRIDE_CPP17;
+    int Get4thDetectorNwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
+
+    //! get Detector buffer of slot A
+    /* cppcheck-suppress missingOverride */
+    int* Get1stDetectorBuffer(int n) OVERRIDE_CPP17 FINAL_CPP17;
+
+    //! get Detector Buffer of slot B
+    /* cppcheck-suppress missingOverride */
+    int* Get2ndDetectorBuffer(int n) OVERRIDE_CPP17 FINAL_CPP17;
+
+    //! get Detector Buffer of slot C
+    /* cppcheck-suppress missingOverride */
+    int* Get3rdDetectorBuffer(int n) OVERRIDE_CPP17 FINAL_CPP17;
+
+    //! get Detector Buffer of slot D
+    /* cppcheck-suppress missingOverride */
+    int* Get4thDetectorBuffer(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -124,19 +140,19 @@ namespace Belle2 {
 
     //! get data size of  FINESSE slot A buffer
     /* cppcheck-suppress missingOverride */
-    int Get1stFINESSENwords(int n) OVERRIDE_CPP17;
+    int Get1stFINESSENwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get data size of  FINESSE slot B buffer
     /* cppcheck-suppress missingOverride */
-    int Get2ndFINESSENwords(int n) OVERRIDE_CPP17;
+    int Get2ndFINESSENwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get data size of  FINESSE slot C buffer
     /* cppcheck-suppress missingOverride */
-    int Get3rdFINESSENwords(int n) OVERRIDE_CPP17;
+    int Get3rdFINESSENwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get data size of  FINESSE slot D buffer
     /* cppcheck-suppress missingOverride */
-    int Get4thFINESSENwords(int n) OVERRIDE_CPP17;
+    int Get4thFINESSENwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
@@ -313,51 +329,6 @@ namespace Belle2 {
     return tmp_header.GetEventCRCError();
   }
 
-
-  inline int RawCOPPERFormat_latest::Get1stDetectorNwords(int n)
-  {
-    return GetDetectorNwords(n, 0);
-  }
-
-  inline int RawCOPPERFormat_latest::Get2ndDetectorNwords(int n)
-  {
-    return GetDetectorNwords(n, 1);
-  }
-
-  inline int RawCOPPERFormat_latest::Get3rdDetectorNwords(int n)
-  {
-    return GetDetectorNwords(n, 2);
-  }
-
-  inline int RawCOPPERFormat_latest::Get4thDetectorNwords(int n)
-  {
-    return GetDetectorNwords(n, 3);
-  }
-
-
-
-  inline int RawCOPPERFormat_latest::Get1stFINESSENwords(int n)
-  {
-    return GetFINESSENwords(n, 0);
-  }
-
-  inline int RawCOPPERFormat_latest::Get2ndFINESSENwords(int n)
-  {
-    return GetFINESSENwords(n, 1);
-  }
-
-  inline int RawCOPPERFormat_latest::Get3rdFINESSENwords(int n)
-  {
-    return GetFINESSENwords(n, 2);
-  }
-
-  inline int RawCOPPERFormat_latest::Get4thFINESSENwords(int n)
-  {
-    return GetFINESSENwords(n, 3);
-  }
-
-
-
   inline unsigned int RawCOPPERFormat_latest::GetTTCtimeTRGType(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
@@ -393,6 +364,8 @@ namespace Belle2 {
   {
     return MAX_PCIE40_CH;
   }
+
+
 
 }
 #endif

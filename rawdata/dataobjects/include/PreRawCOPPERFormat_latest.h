@@ -46,21 +46,6 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     int GetDetectorNwords(int n, int finesse_num) OVERRIDE_CPP17;
 
-    //! get Detector buffer of slot A
-    /* cppcheck-suppress missingOverride */
-    int* Get1stDetectorBuffer(int n) OVERRIDE_CPP17;
-
-    //! get Detector Buffer of slot B
-    /* cppcheck-suppress missingOverride */
-    int* Get2ndDetectorBuffer(int n) OVERRIDE_CPP17;
-
-    //! get Detector Buffer of slot C
-    /* cppcheck-suppress missingOverride */
-    int* Get3rdDetectorBuffer(int n) OVERRIDE_CPP17;
-
-    //! get Detector Buffer of slot D
-    /* cppcheck-suppress missingOverride */
-    int* Get4thDetectorBuffer(int n) OVERRIDE_CPP17;
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
@@ -240,56 +225,6 @@ namespace Belle2 {
   {
     int pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
     return pos_nwords;
-  }
-
-
-
-  inline int* PreRawCOPPERFormat_latest::Get1stDetectorBuffer(int n)
-  {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    if (Get1stFINESSENwords(n) > 0) {
-      int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-      return &(m_buffer[ pos_nwords ]);
-    }
-    return NULL;
-  }
-
-  inline int* PreRawCOPPERFormat_latest::Get2ndDetectorBuffer(int n)
-  {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    if (Get2ndFINESSENwords(n) > 0) {
-      int pos_nwords = GetOffset2ndFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-      return &(m_buffer[ pos_nwords ]);
-    }
-    return NULL;
-  }
-
-  inline int* PreRawCOPPERFormat_latest::Get3rdDetectorBuffer(int n)
-  {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    if (Get3rdFINESSENwords(n) > 0) {
-      int pos_nwords = GetOffset3rdFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-      return &(m_buffer[ pos_nwords ]);
-    }
-    return NULL;
-  }
-
-  inline int* PreRawCOPPERFormat_latest::Get4thDetectorBuffer(int n)
-  {
-#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
-    CheckB2LFEEHeaderVersion(n);
-#endif
-    if (Get4thFINESSENwords(n) > 0) {
-      int pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
-      return &(m_buffer[ pos_nwords ]);
-    }
-    return NULL;
   }
 
   inline int* PreRawCOPPERFormat_latest::GetExpRunSubrunBuf(int n)

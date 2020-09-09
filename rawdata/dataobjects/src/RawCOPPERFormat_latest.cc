@@ -138,3 +138,125 @@ void RawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
   return;
 }
 #endif
+
+int RawCOPPERFormat_latest::Get1stDetectorNwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get2ndDetectorNwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get3rdDetectorNwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get4thDetectorNwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+
+int RawCOPPERFormat_latest::Get1stFINESSENwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get2ndFINESSENwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get3rdFINESSENwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+int RawCOPPERFormat_latest::Get4thFINESSENwords(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return 0;
+}
+
+
+int* RawCOPPERFormat_latest::Get1stDetectorBuffer(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+int* RawCOPPERFormat_latest::Get2ndDetectorBuffer(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+int* RawCOPPERFormat_latest::Get3rdDetectorBuffer(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+int* RawCOPPERFormat_latest::Get4thDetectorBuffer(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}

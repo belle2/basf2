@@ -803,16 +803,20 @@ This is indeed possible and explained in detail on `B2 Questions
 .. rubric:: Using a terminal multiplexer (e.g. tmux, screen)
 
 When you loose your ssh connection or your terminal window is closed, all
-processes that had been running in that terminal are also killed. In most cases
-that is the desired behaviour and for long-running computational tasks you
-should send a job to a batch system like the
-:ref:`grid <online_book/computing/gbasf2:gbasf2>`.
-Ocasionally it still happens that non-computational processes take a while, for
-example when downloading a large dataset from the grid. Then, you can use a
-`terminal multiplexer <https://en.wikipedia.org/wiki/Terminal_multiplexer>`_
-program such as `GNU screen <https://www.gnu.org/software/screen/>`_ or the
-newer and more feature-rich `tmux <https://github.com/tmux/tmux/wiki>`_. Both
-are pre-installed on KEKCC and NAF.
+processes that had been running in that terminal are also killed, which is can
+be frustrating if it is a long-running process such compilation or a dataset
+download. Then, you can use a `terminal multiplexer
+<https://en.wikipedia.org/wiki/Terminal_multiplexer>`_ program such as `GNU
+screen <https://www.gnu.org/software/screen/>`_ or the newer and more
+feature-rich `tmux <https://github.com/tmux/tmux/wiki>`_. Both are
+pre-installed on KEKCC and NAF.
+
+.. hint::
+   For long-running computational jobs like processing a steering file, use a
+   batch submission system instead, such as the :ref:`grid
+   <online_book/computing/gbasf2:gbasf2>`, :ref:`LSF
+   <online_book/computing/batch:Batch submission>` or :ref:`htcondor
+   <online_book/computing/htcondor:htcondor>`.
 
 These programs create one or multiple new terminal sessions within your
 terminal, and these sessions run independently of the original terminal, even

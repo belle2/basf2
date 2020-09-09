@@ -26,8 +26,8 @@
 namespace Belle2 {
 
   /**
-   * The Raw COPPER class ver.2x
-   * This class stores data received by COPPER via belle2linkt
+   * The Raw COPPER class ver.2
+   * This class stores data received by COPPER via belle2link
    * Data from all detectors except PXD are stored in this class
    */
   class PostRawCOPPERFormat_v2 : public RawCOPPERFormat_v2 {

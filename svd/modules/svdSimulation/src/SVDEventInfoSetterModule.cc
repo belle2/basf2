@@ -79,6 +79,13 @@ void SVDEventInfoSetterModule::event()
   m_svdEventInfoPtr->setMatchTriggerType(m_TriggerTypeMatch);
   m_svdEventInfoPtr->setCrossTalk(m_xTalk);
   m_svdEventInfoPtr->setRelativeShift(m_relativeShift);
+
+  int nAPVsamples = 6;
+  if (m_daqMode == 1)
+    nAPVsamples = 3;
+
+  m_svdEventInfoPtr->setNSamples(nAPVsamples);
+
 }
 
 

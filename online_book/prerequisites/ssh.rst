@@ -843,6 +843,14 @@ session. A terminal multiplexer allows for example to
   for running a process in one pane and monitoring the processor load via
   `htop <https://htop.dev/>`_.
 
+
+.. figure:: tmux_on_kekcc.png
+   :width: 40em
+   :align: center
+
+   Tmux running in the local terminal and on KEKCC with multiple windows and
+   panes.
+
 If you don't know either programs yet, I recommend learning how to use the
 newer tmux. Check out the official `getting started guide
 <https://github.com/tmux/tmux/wiki/Getting-Started>`_ from its `wiki

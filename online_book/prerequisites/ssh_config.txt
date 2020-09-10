@@ -26,7 +26,8 @@ Host sshcc1.kek.jp
     IdentityFile ~/.ssh/id_kekccgateway
     IdentitiesOnly yes
 
-Host cc*
-    HostName %h.cc.kek.jp
+# Configuration for directly connecting to specific KEKCC nodes
+# useful for connecting to a terminal multiplexer on a specific node
+Host cc*.cc.kek.jp #
+    User YOUR_KEKCC_USERNAME
     ProxyJump sshcc1.kek.jp
-    # rest same to the configuration of "Host kekcc"

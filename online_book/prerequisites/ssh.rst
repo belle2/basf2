@@ -903,7 +903,7 @@ also find keyboard shortcuts for most of them.
    running on. From within the computing cluster, you can usually just use the
    node name for the ssh connection. For example, if your tmux session is
    running on ``ccw01.cc.kek.jp``, but you have been connected to ``ccw02``,
-   you can simply use
+   from ``ccw02`` you can simply use
 
    .. code-block:: bash
 
@@ -913,8 +913,16 @@ also find keyboard shortcuts for most of them.
    can directly connect to a specific host instead of the login node, but for
    that you might need to extend your `ssh config
    <online_book/prerequisites/ssh:SSH Configuration File>` to also use a
-   gateway server for the specific hosts in the cluster, e.g.
+   gateway server for the specific hosts in the cluster, e.g. for the KEKCC
+   worker nodes:
 
    .. literalinclude:: ssh_config.txt
-      :lines: 29-32
+      :lines: 31-33
       :linenos:
+
+   Then, you can directly to connect
+   to a specific node, e.g.
+
+   .. code-block:: bash
+
+       ssh ccw01.cc.kek.jp

@@ -902,7 +902,7 @@ also find keyboard shortcuts for most of them.
 
    When you connect to a computing cluster like KEKCC via a login node, e.g.
    ``login.cc.kek.jp``, you are connected to a random host (also called "node",
-   i.e. an individual computer) in that cluster for load-balancing purposes.
+   i.e. an individual server) in that cluster for load-balancing purposes.
    You can check the full host name with the ``hostname`` command. But you
    can also see the first part of the hostname (the current node)
    in your shell prompt (the string at the beginning of the command line).
@@ -926,11 +926,7 @@ also find keyboard shortcuts for most of them.
    gateway server for the specific nodes in the cluster, e.g. for the KEKCC:
 
    .. literalinclude:: ssh_config.txt
-      :lines: 31-33
+      :lines: 31-35
       :linenos:
 
-   Then, you can directly to connect to a specific node from outside KEKCC, e.g.
-
-   .. code-block:: bash
-
-       ssh ccw01.cc.kek.jp
+   Then ``ssh ccw01`` will also work from outside KEKCC.

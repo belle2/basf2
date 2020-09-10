@@ -136,6 +136,20 @@ namespace Belle2 {
        */
       const TOPNominalTTS& getTTS(int moduleID, int pmtID) const;
 
+      /**
+       * Returns phase refractive index of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return phase refractive index
+       */
+      double getPhaseIndex(double energy) const;
+
+      /**
+       * Returns group refractive index of quartz at given photon energy
+       * @param energy photon energy [eV]
+       * @return group refractive index
+       */
+      double getGroupIndex(double energy) const;
+
       static const double c_hc; /**< Planck constant times speed of light in [eV*nm] */
 
     private:
@@ -246,6 +260,14 @@ namespace Belle2 {
        */
       double integralOfQE(const std::vector<float>& qe, double ce,
                           double lambdaFirst, double lambdaStep) const;
+
+
+      /**
+       * Quartz refractive index (SellMeier equation)
+       * @param lambda photon wavelength [nm]
+       * @return refractive index
+       */
+      double refractiveIndex(double lambda) const;
 
       // Geometry
 

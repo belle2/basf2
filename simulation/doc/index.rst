@@ -40,7 +40,7 @@ The history of Geant4 version information in the ``basf2`` external library is a
 
 Physics list for Geant4
 =======================
-PhysicsList collects all the particles, physics processes and production thresholds to 
+PhysicsList collects information on all the particles, physics processes and production thresholds to 
 be used in the detector simulation. This class is passed to the Geant4 run manager as the 
 “physics configuration” of the application. 
 ``basf2`` has two options for the input physics list for Geant4. 
@@ -55,7 +55,12 @@ Belle2PhysicsList
 """""""""""""""""
 
 The second one is *Belle2PhysicsList*, optimized for the Belle II needs by the Geant4 experts. 
-The details on the *Belle2PhysicsList* are explained below.
+The details on the *Belle2PhysicsList* are explained below. 
+
+.. note:: 
+
+   The **Belle2PhysicsList** option became the default option with basf2 release 05-00-00.
+
 
 .. toctree::
    Belle2PhysicsList 

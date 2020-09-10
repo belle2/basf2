@@ -13,7 +13,6 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterTime.h>
 
-#include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDCoGTimeCalibrations.h>
 
 #include <vector>
@@ -31,24 +30,9 @@ namespace Belle2 {
     public:
 
       /**
-       * @return the strip time
+       * @return the first frame and the cluster time
        */
-      double getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples, int cellID);
-
-      /**
-       * @return the strip time error
-       */
-      double getStripTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples, int noise, int cellID);
-
-      /**
-       * @return the first frame
-       */
-      int getFirstFrame() override;
-
-      /**
-       * @return the cluster time
-       */
-      double getClusterTime() override;
+      std::pair<int, double> getFirstFrameAndClusterTime() override;
 
       /**
        * @return the cluster time error
@@ -58,11 +42,10 @@ namespace Belle2 {
       /**
        * virtual destructor
        */
-      //      virtual ~SVDCoG6Time();
+      virtual ~SVDCoG6Time() {};
 
     private:
 
-      SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibration wrapper*/
       SVDCoGTimeCalibrations m_CoG6TimeCal; /**< SVD CoG6 Time calibration wrapper*/
 
     };

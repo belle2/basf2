@@ -34,10 +34,6 @@ namespace Belle2 {
        */
       virtual ~SVDELS3Charge() {};
 
-      /**
-       * @return the cluster raw charge
-       */
-      double getClusterRawCharge();
 
       /**
        * @return the cluster charge

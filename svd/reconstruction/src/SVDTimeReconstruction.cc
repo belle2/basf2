@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDTimeReconstruction::getStripTime(TString timeAlgo = "fromRecoDBObject")
+    std::pair<int, double> SVDTimeReconstruction::getFirstFrameAndStripTime(TString timeAlgo = "fromRecoDBObject")
     {
 
       StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
@@ -46,16 +46,16 @@ namespace Belle2 {
 
       if (m_timeAlgorithms.find(stripTimeReco) != m_timeAlgorithms.end()) {
         if (stripTimeReco.EqualTo("CoG6"))
-          return getCoG6Time();
+          return std::make_pair(0, getCoG6Time());
         if (stripTimeReco.EqualTo("CoG3"))
-          return getCoG3Time();
+          return getCoG3FirstFrameAndTime();
         if (stripTimeReco.EqualTo("ELS3"))
-          return getELS3Time();
+          return getELS3FirstFrameAndTime();
       }
 
       //we should NEVER get here, if we do, we should check better at the step before (SVDRecoDigitCreator or cluster reconstruction classes
       B2WARNING("strip time algorithm specified in SVDRecoConfiguration not found, using CoG6");
-      return getCoG6Time();
+      return std::make_pair(0, getCoG6Time());
 
     }
 
@@ -100,8 +100,6 @@ namespace Belle2 {
 
     double SVDTimeReconstruction::getCoG6Time()
     {
-
-      m_firstFrame = 0;
 
       //calculate weighted average
       float time = 0;
@@ -151,12 +149,12 @@ namespace Belle2 {
 
     }
 
-    double SVDTimeReconstruction::getCoG3Time()
+    std::pair<int, double> SVDTimeReconstruction::getCoG3FirstFrameAndTime()
     {
 
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
+      int firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
 
       auto begin = selectedSamples.begin();
@@ -171,7 +169,7 @@ namespace Belle2 {
 
       double time = m_CoG3TimeCal.getCorrectedTime(m_vxdID, m_isUside, m_cellID, rawtime, m_triggerBin);
 
-      return time;
+      return std::make_pair(firstFrame, time);
 
     }
 
@@ -182,7 +180,6 @@ namespace Belle2 {
       //take the MaxSum 3 samples
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
 
       auto begin = selectedSamples.begin();
@@ -196,7 +193,7 @@ namespace Belle2 {
 
       for (auto step = 0.; begin != end; ++begin, step += m_apvClockPeriod) {
         Atot += static_cast<double>(*begin);
-        tmpResSq += TMath::Power(step - getCoG3Time(), 2);
+        tmpResSq += TMath::Power(step - getCoG3FirstFrameAndTime().second, 2);
       }
 
       //compute average noise
@@ -211,12 +208,12 @@ namespace Belle2 {
     }
 
 
-    double SVDTimeReconstruction::getELS3Time()
+    std::pair<int, double> SVDTimeReconstruction::getELS3FirstFrameAndTime()
     {
 
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
+      int firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
 
       auto begin = selectedSamples.begin();
@@ -237,7 +234,7 @@ namespace Belle2 {
 
       double time = m_ELS3TimeCal.getCorrectedTime(m_vxdID, m_isUside, m_cellID, rawtime, m_triggerBin);
 
-      return time;
+      return std::make_pair(firstFrame, time);
 
     }
 
@@ -247,7 +244,6 @@ namespace Belle2 {
 
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
       auto begin = selectedSamples.begin();
 

@@ -224,15 +224,17 @@ void SVDRecoDigitCreatorModule::event()
 
     // get strip time and charge and their errors
     if (numberOfAcquiredSamples == 6) {
-      time = timeReco->getStripTime(m_timeRecoWith6SamplesAlgorithm);
+      std::pair<int, double> FFandTime = timeReco->getFirstFrameAndStripTime(m_timeRecoWith6SamplesAlgorithm);
+      firstFrame = FFandTime.first;
+      time = FFandTime.second;
       timeError = timeReco->getStripTimeError(m_timeRecoWith6SamplesAlgorithm);
-      firstFrame = timeReco->getFirstFrame();
       charge = chargeReco->getStripCharge(m_chargeRecoWith6SamplesAlgorithm);
       chargeError = chargeReco->getStripChargeError(m_chargeRecoWith6SamplesAlgorithm);
     } else if (numberOfAcquiredSamples == 3) {
-      time = timeReco->getStripTime(m_timeRecoWith3SamplesAlgorithm);
+      std::pair<int, double> FFandTime = timeReco->getFirstFrameAndStripTime(m_timeRecoWith3SamplesAlgorithm);
+      firstFrame = FFandTime.first;
+      time = FFandTime.second;
       timeError = timeReco->getStripTimeError(m_timeRecoWith3SamplesAlgorithm);
-      firstFrame = timeReco->getFirstFrame();
       charge = chargeReco->getStripCharge(m_chargeRecoWith3SamplesAlgorithm);
       chargeError = chargeReco->getStripChargeError(m_chargeRecoWith3SamplesAlgorithm);
     } else

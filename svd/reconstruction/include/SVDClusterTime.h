@@ -46,16 +46,10 @@ namespace Belle2 {
       void setTriggerBin(const int triggerBin)
       { m_triggerBin = triggerBin; };
 
-
       /**
-       * get the first frame
+       * @return the first frame and the cluster time
        */
-      virtual int getFirstFrame() = 0;
-
-      /**
-       * @return the cluster time
-       */
-      virtual double getClusterTime() = 0;
+      virtual std::pair<int, double> getFirstFrameAndClusterTime() = 0;
 
       /**
        * @return the cluster time error
@@ -77,28 +71,20 @@ namespace Belle2 {
        */
       bool isUSide() {return m_isUside;}
 
-      /**
-       * @return APV clock in ns
-       */
-      double getAPVClockPeriod() {return m_apvClockPeriod;}
-
 
     protected:
 
-      /** APV clock period*/
-      double m_apvClockPeriod = 16000. / 509;
-
       /** trigger bin */
-      int m_triggerBin = -1;
+      int m_triggerBin = std::numeric_limits<int>::quiet_NaN();
 
       /** raw cluster used to compute the time*/
       Belle2::SVD::RawCluster m_rawCluster;
 
       /** VxdID of the cluster */
-      VxdID m_vxdID = 0;
+      VxdID m_vxdID = std::numeric_limits<int>::quiet_NaN();
 
       /** side of the cluster */
-      bool m_isUside = 0;
+      bool m_isUside = std::numeric_limits<bool>::quiet_NaN();
 
     };
 

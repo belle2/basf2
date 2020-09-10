@@ -33,8 +33,7 @@ namespace Belle2 {
 
         Belle2::SVD::stripInRawCluster strip = strips.at(i);
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide(),
-            strip.cellID);
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide());
 
         float noiseInADC = strip.noise;
         float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), strip.cellID,
@@ -61,8 +60,7 @@ namespace Belle2 {
 
         Belle2::SVD::stripInRawCluster strip = strips.at(i);
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide(),
-            strip.cellID);
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide());
 
         float noiseInADC = strip.noise;
         float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), strip.cellID,

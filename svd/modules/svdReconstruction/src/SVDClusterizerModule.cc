@@ -312,14 +312,16 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   // cluster time computation
   if (m_numberOfAcquiredSamples == 6) {
     m_time6SampleClass->setRawCluster(rawCluster);
-    time = m_time6SampleClass->getClusterTime();
+    std::pair<int, double> FFandTime = m_time6SampleClass->getFirstFrameAndClusterTime();
+    firstFrame = FFandTime.first;
+    time = FFandTime.second;
     timeError = m_time6SampleClass->getClusterTimeError();
-    firstFrame = m_time6SampleClass->getFirstFrame();
   } else if (m_numberOfAcquiredSamples == 3) {
     m_time3SampleClass->setRawCluster(rawCluster);
-    time = m_time3SampleClass->getClusterTime();
+    std::pair<int, double> FFandTime = m_time3SampleClass->getFirstFrameAndClusterTime();
+    firstFrame = FFandTime.first;
+    time = FFandTime.second;
     timeError = m_time3SampleClass->getClusterTimeError();
-    firstFrame = m_time3SampleClass->getFirstFrame();
   } else
     B2ERROR("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
 

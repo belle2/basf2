@@ -10,6 +10,8 @@
 
 #include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDCoG6Time.h>
+#include <svd/reconstruction/SVDTimeReconstruction.h>
+
 #include <TMath.h>
 
 using namespace std;
@@ -18,65 +20,8 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDCoG6Time::getStripTime(Belle2::SVDShaperDigit::APVFloatSamples samples, int cellID)
-    {
 
-      //calculate weighted average
-      float time = 0;
-      float sumAmplitudes = 0;
-      for (int k = 0; k < 6; k ++) {
-        time += k * samples[k];
-        sumAmplitudes += samples[k];
-      }
-      if (sumAmplitudes != 0) {
-        time /= (sumAmplitudes);
-        time *= m_apvClockPeriod;
-      } else {
-        time = -1;
-        B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
-      }
-
-      // correct by the CalPeak
-      time -= m_PulseShapeCal.getPeakTime(m_vxdID, m_isUside, cellID);
-
-      // calibrate
-      time =  m_CoG6TimeCal.getCorrectedTime(m_vxdID, m_isUside, cellID, time, m_triggerBin);
-
-      return time;
-    }
-
-    double SVDCoG6Time::getStripTimeError(Belle2::SVDShaperDigit::APVFloatSamples samples, int noise, int cellID)
-    {
-
-      //assuming that:
-      // 1. noise of the samples are totally UNcorrelated (correct in MC)
-      // 2. error on sampling time is negligible
-
-      //sum of samples amplitudes
-      float Atot = 0;
-      //sum of time residuals squared
-      float tmpResSq = 0;
-
-      for (int k = 0; k < 6; k ++) {
-        Atot  += samples[k];
-        tmpResSq += TMath::Power(k * m_apvClockPeriod -  getStripTime(samples, cellID), 2);
-      }
-
-      double rawTimeError = noise / Atot * TMath::Sqrt(tmpResSq);
-
-      double timeError = m_CoG6TimeCal.getCorrectedTimeError(m_vxdID, m_isUside, cellID, getClusterTime(),
-                                                             rawTimeError, m_triggerBin);
-
-      return timeError;
-
-    }
-
-    int SVDCoG6Time::getFirstFrame()
-    {
-      return 0;
-    }
-
-    double SVDCoG6Time::getClusterTime()
+    std::pair<int,  double> SVDCoG6Time::getFirstFrameAndClusterTime()
     {
 
       //as weighted average of the strip time with strip max sample
@@ -86,12 +31,22 @@ namespace Belle2 {
       double time = 0;
       double sumAmplitudes = 0;
 
-      for (auto s : strips) {
-        time += s.maxSample * getStripTime(s.samples, s.cellID);
-        sumAmplitudes += s.maxSample;
+      for (int i = 0; i < (int)strips.size(); i++) {
+
+        Belle2::SVD::stripInRawCluster strip = strips.at(i);
+
+        SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+        timeReco->setTriggerBin(m_triggerBin);
+
+        double stripTime = timeReco->getCoG6Time();
+
+        time += strip.maxSample * stripTime;
+        sumAmplitudes += strip.maxSample;
       }
 
-      return time / sumAmplitudes;
+      int firstFrame = 0;
+
+      return std::make_pair(firstFrame, time / sumAmplitudes);
     }
 
     double SVDCoG6Time::getClusterTimeError()
@@ -101,12 +56,21 @@ namespace Belle2 {
 
       std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
 
-      double weightSum = 0;
+      double variance = 0;
 
-      for (auto s : strips)
-        weightSum += getStripTimeError(s.samples, s.noise, s.cellID) * getStripTimeError(s.samples, s.noise, s.cellID);
+      for (int i = 0; i < (int)strips.size(); i++) {
 
-      return 1. / TMath::Sqrt(weightSum);
+        Belle2::SVD::stripInRawCluster strip = strips.at(i);
+
+        SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+        timeReco->setTriggerBin(m_triggerBin);
+
+        double stripTimeError = timeReco->getCoG6TimeError();
+
+        variance += stripTimeError * stripTimeError;
+      }
+
+      return 1. / TMath::Sqrt(variance);
     }
 
   }  //SVD namespace

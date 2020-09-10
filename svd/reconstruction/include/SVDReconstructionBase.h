@@ -61,11 +61,11 @@ namespace Belle2 {
        * Constructor with the stripInRawCluster,
        * for strip reconstruction in cluster reconstruction
        */
-      explicit SVDReconstructionBase(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU, int cellID)
+      explicit SVDReconstructionBase(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU)
         : m_samples(aStrip.samples)
         , m_vxdID(sensorID)
         , m_isUside(isU)
-        , m_cellID(cellID)
+        , m_cellID(aStrip.cellID)
       { };
 
       /**
@@ -150,9 +150,6 @@ namespace Belle2 {
 
       /** trigger bin */
       int m_triggerBin = -1;
-
-      /** first frame */
-      int m_firstFrame = -1;
 
       /** average noise in ADC as sum in quadrature of noise of each strip*/
       float m_averageNoiseInADC = -1;

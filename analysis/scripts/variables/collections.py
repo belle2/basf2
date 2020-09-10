@@ -328,6 +328,25 @@ event_kinematics = [
     "totalPhotonsEnergyOfEvent"
 ]
 
+#: Variables created by MC version of event kinematics module
+mc_event_kinematics = [
+    'genMissingMass2OfEvent',
+    'genMissingEnergyOfEventCMS',
+    'genMissingMomentumOfEventCMS',
+    'genTotalPhotonsEnergyOfEvent',
+    'genVisibleEnergyOfEventCMS'
+]
+
+#: Belle Track CDC hit variables
+belle_track_hit = [
+    "BelleFirstCDCHitX",
+    "BelleFirstCDCHitY",
+    "BelleFirstCDCHitZ",
+    "BelleLastCDCHitX",
+    "BelleLastCDCHitY",
+    "BelleLastCDCHitZ"
+]
+
 # now register all the variables declared in this file as collections
 # TODO: this is still not optimal but better than before. Should we not just
 # get rid of the collections in the manager?

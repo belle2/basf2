@@ -120,12 +120,13 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
     stdV0s.stdKshorts(path=path, fitter='KFit')
+    stdV0s.stdLambdas(path=path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
 
 
-def add_filter_reconstruction(path, run_type, components, **kwargs):
+def add_filter_reconstruction(path, run_type, components, abort_path, **kwargs):
     """
     Add everything needed to calculation a filter decision and if possible,
     also do the HLT filtering. This is only possible for beam runs (in the moment).
@@ -144,8 +145,7 @@ def add_filter_reconstruction(path, run_type, components, **kwargs):
             pruneTracks=False,
             add_trigger_calculation=False,
             components=components,
-            nCDCHitsMax=constants.DOOM_NCDCHITSMAX,
-            nSVDShaperDigitsMax=constants.DOOM_NSVDSHAPERDIGITSMAX,
+            abort_path=abort_path,
             **kwargs)
 
         add_filter_software_trigger(path, store_array_debug_prescale=1)

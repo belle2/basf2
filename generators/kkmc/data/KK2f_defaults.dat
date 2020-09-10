@@ -333,9 +333,9 @@ BeginX
  2009           -1e0      GA in tau decay
 **  Coefficients to fix ratio of:
 **    BRA1  -- A1 3CHARGED/ A1 1CHARGED 2 NEUTRALS MATRIX ELEMENTS (MASLESS LIM.)
-**    BRKS  -- PROBABILITY OF K0 TO BE KS
-**    BRK0  -- PROBABILITY OF K0B TO BE KS
-**    BRK0B -- RATIO OF COEFFICIENTS FOR K*--> K0 PI-
+**    BRK0  -- PROBABILITY OF K0 TO BE KS
+**    BRK0B -- PROBABILITY OF K0B TO BE KS
+**    BRKS  -- RATIO OF COEFFICIENTS FOR K*--> K0 PI-
 **  All coefficents should be in the range (0.0,1.0)
 **  They meaning is probability of the first choice only if one
 **  neglects mass-phase space effects

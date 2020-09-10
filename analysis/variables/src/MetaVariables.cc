@@ -507,34 +507,6 @@ namespace Belle2 {
       std::vector<std::string> new_arguments = arguments;
       new_arguments.push_back(std::string("1"));
       return isDescendantOfList(new_arguments);
-//       if (arguments.size() > 0) {
-//         auto listNames = arguments;
-//         auto func = [listNames](const Particle * particle) -> double {
-//           double output = 0;
-
-//           for (auto& iListName : listNames)
-//           {
-
-//             StoreObjPtr<ParticleList> listOfParticles(iListName);
-
-//             if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isDaughterOfList");
-
-//             for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
-//               Particle* iParticle = listOfParticles->getParticle(i);
-//               for (unsigned j = 0; j < iParticle->getNDaughters(); ++j) {
-//                 if (particle == iParticle->getDaughter(j)) {
-//                   output = 1; goto endloop;
-//                 }
-//               }
-//             }
-//           }
-// endloop:
-//           return output;
-//         };
-//         return func;
-//       } else {
-//         B2FATAL("Wrong number of arguments for meta function isDaughterOfList");
-//       }
     }
 
     Manager::FunctionPtr isGrandDaughterOfList(const std::vector<std::string>& arguments)
@@ -543,39 +515,6 @@ namespace Belle2 {
       std::vector<std::string> new_arguments = arguments;
       new_arguments.push_back(std::string("2"));
       return isDescendantOfList(new_arguments);
-//       if (arguments.size() > 0) {
-//         auto listNames = arguments;
-//         auto func = [listNames](const Particle * particle) -> double {
-//           double output = 0;
-
-//           for (auto& iListName : listNames)
-//           {
-
-//             StoreObjPtr<ParticleList> listOfParticles(iListName);
-
-//             if (!(listOfParticles.isValid())) B2FATAL("Invalid Listname " << iListName << " given to isGrandDaughterOfList");
-
-//             for (unsigned i = 0; i < listOfParticles->getListSize(); ++i) {
-//               Particle* iParticle = listOfParticles->getParticle(i);
-//               for (unsigned j = 0; j < iParticle->getNDaughters(); ++j) {
-//                 const Particle* jDaughter = iParticle->getDaughter(j);
-//                 for (unsigned k = 0; k < jDaughter->getNDaughters(); ++k) {
-
-//                   if (particle == jDaughter->getDaughter(k)) {
-//                     output = 1; goto endloop;
-//                   }
-//                 }
-//               }
-//             }
-
-//           }
-// endloop:
-//           return output;
-//         };
-//         return func;
-//       } else {
-//         B2FATAL("Wrong number of arguments for meta function isGrandDaughterOfList");
-//       }
     }
 
     Manager::FunctionPtr isDescendantOfList(const std::vector<std::string>& arguments)
@@ -604,7 +543,7 @@ namespace Belle2 {
               {
                 const Particle* daughter = m->getDaughter(i);
                 if ((flag == 1.) or (flag < 0)) {
-                  if (p->getArrayIndex() == daughter->getArrayIndex()) {
+                  if (p->isCopyOf(daughter)) {
                     return 1;
                   }
                 }
@@ -815,6 +754,40 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr mcDaughterDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (std::invalid_argument&) {
+          B2FATAL("First two arguments of mcDaughterDiffOf meta function must be integers!");
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          else {
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
+            Particle iTmpPart(iMcDaughter);
+            Particle jTmpPart(jMcDaughter);
+            double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughterDiffOf");
+      }
+    }
+
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 5) {
@@ -882,6 +855,51 @@ namespace Belle2 {
         B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
       }
     }
+
+    Manager::FunctionPtr mcDaughterDiffOfPhi(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (std::invalid_argument&) {
+          B2FATAL("The two arguments of mcDaughterDiffOfPhi meta function must be integers!");
+        }
+
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("phi");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          else
+          {
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
+            Particle iTmpPart(iMcDaughter);
+            Particle jTmpPart(jMcDaughter);
+            double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughterDiffOfPhi");
+      }
+    }
+
 
     Manager::FunctionPtr grandDaughterDiffOfPhi(const std::vector<std::string>& arguments)
     {
@@ -1042,6 +1060,50 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function daughterDiffOfPhi");
+      }
+    }
+
+    Manager::FunctionPtr mcDaughterDiffOfPhiCMS(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (std::invalid_argument&) {
+          B2FATAL("The two arguments of mcDaughterDiffOfPhiCMS meta function must be integers!");
+        }
+
+        const Variable::Manager::Var* var = Manager::Instance().getVariable("useCMSFrame(phi)");
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return std::numeric_limits<double>::quiet_NaN();
+          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+          else
+          {
+            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
+            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
+            Particle iTmpPart(iMcDaughter);
+            Particle jTmpPart(jMcDaughter);
+            double diff = var->function(&jTmpPart) - var->function(&iTmpPart);
+            if (fabs(diff) > M_PI)
+            {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
+              }
+            }
+            return diff;
+          }
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughterDiffOfPhiCMS");
       }
     }
 
@@ -1237,6 +1299,43 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("The meta variable grandDaughterDecayAngle needs exactly two integers as arguments!");
+      }
+    }
+
+    Manager::FunctionPtr mcDaughterAngle(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2 || arguments.size() == 3) {
+
+        auto func = [arguments](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return std::numeric_limits<double>::quiet_NaN();
+
+          std::vector<TLorentzVector> pDaus;
+          const auto& frame = ReferenceFrame::GetCurrent();
+
+          // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
+          for (auto& generalizedIndex : arguments)
+          {
+            const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
+            if (dauPart == nullptr)
+              return std::numeric_limits<double>::quiet_NaN();
+
+            const MCParticle* dauMcPart = dauPart->getMCParticle();
+            if (dauMcPart == nullptr)
+              return std::numeric_limits<double>::quiet_NaN();
+
+            pDaus.push_back(frame.getMomentum(dauMcPart->get4Vector()));
+          }
+
+          // Calculates the angle between the selected particles
+          if (pDaus.size() == 2)
+            return pDaus[0].Vect().Angle(pDaus[1].Vect());
+          else
+            return pDaus[2].Vect().Angle(pDaus[0].Vect() + pDaus[1].Vect());
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function mcDaughterAngle");
       }
     }
 
@@ -1899,7 +1998,7 @@ namespace Belle2 {
         }
 
         auto func = [inputPDG](const Particle * particle) -> double{
-          const MCParticle* mcp = particle->getRelated<MCParticle>();
+          const MCParticle* mcp = particle->getMCParticle();
           if (!mcp)
             return 0.5;
 
@@ -2720,25 +2819,36 @@ Returns 1.0 if the particle's matched MC particle is also matched to a particle 
 
     REGISTER_VARIABLE("isGrandDaughterOfList(particleListNames)", isGrandDaughterOfList,
                       "Returns 1 if the given particle is a grand daughter of at least one of the particles in the given particle Lists.");
-    REGISTER_VARIABLE("daughter(i, variable)", daughter,
-                      "Returns value of variable for the i-th daughter. E.g.\n"
-                      "  - ``daughter(0, p)`` returns the total momentum of the first daughter.\n"
-                      "  - ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.\n\n"
-                      "Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).");
-    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter,
-                      "Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.\n"
-                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
-                      "or if the i-th MC daughter does not exist.\n"
-                      "E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC"
-                      "particle of the reconstructed particle the function is applied to./n"
-                      "The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.");
-    REGISTER_VARIABLE("mcMother(variable)", mcMother,
-                      "Returns the value of the requested variable for the Monte Carlo mother of the particle.\n"
-                      "Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,"
-                      "or if the MC mother does not exist.\n"
-                      "E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC"
-                      "particle of the reconstructed particle the function is applied to.\n"
-                      "The meta variable can also be nested: ``mcMother(mcMother(PDG))``.");
+    REGISTER_VARIABLE("daughter(i, variable)", daughter, R"DOC(
+                      Returns value of variable for the i-th daughter. E.g.
+
+                      * ``daughter(0, p)`` returns the total momentum of the first daughter.
+                      * ``daughter(0, daughter(1, p)`` returns the total momentum of the second daughter of the first daughter.
+
+                      Returns NaN if particle is nullptr or if the given daughter-index is out of bound (>= amount of daughters).
+                      )DOC");
+    REGISTER_VARIABLE("mcDaughter(i, variable)", mcDaughter, R"DOC(
+                      Returns the value of the requested variable for the i-th Monte Carlo daughter of the particle.
+
+                      Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
+                      or if the i-th MC daughter does not exist.
+
+                      E.g. ``mcDaughter(0, PDG)`` will return the PDG code of the first MC daughter of the matched MC
+                      particle of the reconstructed particle the function is applied to.
+
+                      The meta variable can also be nested: ``mcDaughter(0, mcDaughter(1, PDG))``.
+                      )DOC");
+    REGISTER_VARIABLE("mcMother(variable)", mcMother, R"DOC(
+                      Returns the value of the requested variable for the Monte Carlo mother of the particle.
+
+                      Returns NaN if the particle is nullptr, if the particle is not matched to an MC particle,
+                      or if the MC mother does not exist.
+
+                      E.g. ``mcMother(PDG)`` will return the PDG code of the MC mother of the matched MC
+                      particle of the reconstructed particle the function is applied to.
+
+                      The meta variable can also be nested: ``mcMother(mcMother(PDG))``.
+                      )DOC");
     REGISTER_VARIABLE("genParticle(index, variable)", genParticle,  R"DOC(
 [Eventbased] Returns the ``variable`` for the ith generator particle.
 The arguments of the function must be the ``index`` of the particle in the MCParticle Array, 
@@ -2775,6 +2885,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "E.g. ``useRestFrame(daughterDiffOf(0, 1, p))`` returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns :math:`p_j - p_i`)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.");
+    REGISTER_VARIABLE("mcDaughterDiffOf(i, j, variable)", mcDaughterDiffOf,
+                      "MC matched version of the `daughterDiffOf` function."); 
     REGISTER_VARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
                       "E.g. ``useRestFrame(grandDaughterDiffOf(0, 1, p))`` returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
@@ -2785,6 +2897,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
+    REGISTER_VARIABLE("mcDaughterDiffOfPhi(i, j)", mcDaughterDiffOfPhi,
+                      "MC matched version of the `daughterDiffOfPhi` function."); 
     REGISTER_VARIABLE("grandDaughterDiffOfPhi(i, j)", grandDaughterDiffOfPhi,
                       "Returns the difference in :math:`\\phi` between the first daughters of the two given daughters.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
@@ -2805,6 +2919,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
                       "The function returns :math:`\\phi_j - \\phi_i`.\n"
                       "For a generic variable difference, see :b2:var:`daughterDiffOf`.");
+    REGISTER_VARIABLE("mcDaughterDiffOfPhiCMS(i, j)", daughterDiffOfPhiCMS,
+                      "MC matched version of the `daughterDiffOfPhiCMS` function.");      
     REGISTER_VARIABLE("daughterDiffOfClusterPhiCMS(i, j)", daughterDiffOfClusterPhiCMS,
                       "Returns the difference in :math:`\\phi` between the ECLClusters of two given daughters in the CMS frame.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"
@@ -2841,6 +2957,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC");
+    REGISTER_VARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,"MC matched version of the `daughterAngle` function.");
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"
@@ -2867,7 +2984,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "If nothing is set under this name, NaN is returned.");
     REGISTER_VARIABLE("eventCached(variable)", eventCached,
                       "[Eventbased] Returns value of event-based variable and caches this value in the EventExtraInfo.\n"
-                      "The result of second call to this variable in the same event will be provided from the cache.");
+                      "The result of second call to this variable in the same event will be provided from the cache.\n"
+                      "It is recommended to use this variable in order to declare custom aliases as event-based. This is "
+                      "necessary if using the eventwise mode of variablesToNtuple).");
     REGISTER_VARIABLE("particleCached(variable)", particleCached,
                       "Returns value of given variable and caches this value in the ParticleExtraInfo of the provided particle.\n"
                       "The result of second call to this variable on the same particle will be provided from the cache.");

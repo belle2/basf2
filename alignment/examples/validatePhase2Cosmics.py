@@ -10,17 +10,14 @@
 
 # *****************************************************************************
 
-from basf2 import *
-from modularAnalysis import *
-
-
 import sys
 import math
-from basf2 import *
+import basf2 as b2
 
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, AddressOf
+import reconstruction as reco
 
 gROOT.ProcessLine('struct TrackData {\
     float chi2;\
@@ -38,10 +35,10 @@ gROOT.ProcessLine('struct DEDXData {\
     float distanceKLM;\
 };')
 
-from ROOT import TrackData, DEDXData
+from ROOT import TrackData, DEDXData  # noqa
 
 
-class CosmicAnalysis(Module):
+class CosmicAnalysis(b2.Module):
 
     """A module to analyse residuals in overlaps of ladders."""
 
@@ -422,13 +419,13 @@ class CosmicAnalysis(Module):
         self.rootfile.Write()
         self.rootfile.Close()
 
-main = create_path()
+
+main = b2.create_path()
 
 main.add_module('RootInput')
 main.add_module('Gearbox')
 main.add_module('Geometry')
 
-import reconstruction as reco
 reco.add_cosmics_reconstruction(main, pruneTracks=False, merge_tracks=True)
 main.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
 main.add_module("CDCDedxPID")
@@ -436,10 +433,10 @@ main.add_module("CDCDedxPID")
 CosmicAnalysis = CosmicAnalysis()
 main.add_module(CosmicAnalysis)
 
-progress = register_module('ProgressBar')
+progress = b2.register_module('ProgressBar')
 main.add_module(progress)
 
-process(main)
+b2.process(main)
 
 # Print call statistics
-print(statistics)
+print(b2.statistics)

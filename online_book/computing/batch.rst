@@ -1,3 +1,5 @@
+.. _onlinebook_batch:
+
 Batch submission
 ================
 

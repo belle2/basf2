@@ -12,17 +12,15 @@
 </header>
 """
 
+import tracking
+from tracking.validation.run import TrackingValidationRun
+import logging
+import basf2
 VALIDATION_OUTPUT_FILE = 'SVDTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-import basf2
 basf2.set_random_seed(1337)
-
-import logging
-
-from tracking.validation.run import TrackingValidationRun
-import tracking
 
 
 def setupFinderModule(path):

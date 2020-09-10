@@ -9,6 +9,7 @@ from basf2 import LogLevel, set_log_level, set_debug_level, B2INFO
 from caf import backends
 import ROOT
 
+
 lsf = backends.LSF()
 ##############################
 # Simple Job that doesn't do
@@ -50,9 +51,6 @@ job2.backend_args['queue'] = 's'
 jobs = [job1, job2]
 lsf.submit(jobs)
 
-from basf2 import B2INFO
-import time
-
 
 def use_ready_only():
     ready = False
@@ -74,6 +72,7 @@ def use_update_status():
         readiness = [job.ready() for job in jobs]
         ready = all(readiness)
         time.sleep(10)
+
 
 # use_ready_only()
 use_update_status()

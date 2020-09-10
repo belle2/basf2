@@ -5,6 +5,7 @@ from basf2 import *
 from reconstruction import *
 from modularAnalysis import *
 from ROOT import Belle2
+from rawdata import add_unpackers
 
 # Create path
 main = create_path()
@@ -17,7 +18,6 @@ main.add_module(roinput)
 loadGearbox(main)
 main.add_module("Geometry")
 
-from rawdata import add_unpackers
 add_unpackers(main)
 
 printDataStore(path=main)

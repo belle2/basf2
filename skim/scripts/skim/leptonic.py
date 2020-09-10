@@ -13,8 +13,8 @@ __authors__ = [
 
 import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdMu
 from variables import variables as vm
-
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 
@@ -41,12 +41,9 @@ class LeptonicUntagged(BaseSkim):
     )
     __category__ = "physics, leptonic"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"]
-        }
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         ma.cutAndCopyList(

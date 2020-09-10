@@ -324,9 +324,10 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
 
   // MetaOptions string.
   std::string metaopts("pvalue-warn=0.1,pvalue-error=0.01");
+  std::string shifteropt("");
   // Electron plots should be visible to the shifter by default.
   if (sigHypo == Const::electron) {
-    metaopts = "shifter," + metaopts;
+    shifteropt = "shifter,";
   }
 
   // Add histogram info.
@@ -337,7 +338,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_pid->GetListOfFunctions()->Add(new TNamed("Check",
                                               "The more peaked at 1, the better. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely). Both cases result in PID=nan."));
   h_pid->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
+  h_pid->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Description",
                                                     TString::Format("Sample PDG = %i - ECL distribution of binary $\\Delta log(L)$ = log(L(%i)) - log(L(%i)). U/O flow is added to first (last) bin.",
@@ -347,7 +348,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Check",
                                                     "Basic metric for signal/bkg separation. The more negative, the better separation is achieved. Non-zero U-flow indicates a non-normal PDF value (of sig OR bkg) for some p,clusterTheta range, which might be due to a non-optimal definition of the x-axis range of the PDF templates. Non-zero O-flow indicates either failure of MC matching for reco tracks (unlikely), or failure of track-ECL-cluster matching (more likely)."));
   h_deltalogl->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-  h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
+  h_deltalogl->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Description",
                                                        TString::Format("Sample PDG = %i - Track-ECLCluster match flag distribution.",
@@ -392,6 +393,11 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
   TH1F* h_p_N = new TH1F(h_p_N_name.Data(), "h_p_N", 10, 0.0, 5.0);
   TH1F* h_p_D = new TH1F(h_p_D_name.Data(), "h_p_D", 10, 0.0, 5.0);
 
+  TString h_th_N_name = TString::Format("h_th_N_%i", sigHypoPdgId);
+  TString h_th_D_name = TString::Format("h_th_D_%i", sigHypoPdgId);
+  TH1F* h_th_N = new TH1F(h_th_N_name.Data(), "h_th_N", m_th_binedges.size() - 1, m_th_binedges.data());
+  TH1F* h_th_D = new TH1F(h_th_D_name.Data(), "h_th_D", m_th_binedges.size() - 1, m_th_binedges.data());
+
   TString h_eclreg_N_name = TString::Format("h_eclreg_N_%i", sigHypoPdgId);
   TString h_eclreg_D_name = TString::Format("h_eclreg_D_%i", sigHypoPdgId);
   TH1F* h_eclreg_N = new TH1F(h_eclreg_N_name.Data(), "h_eclreg_N", 5, -0.5, 4.5);
@@ -407,6 +413,9 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
   sampleTree->Project(h_p_N_name.Data(), "p", pidSigCut.Data());
   sampleTree->Project(h_p_D_name.Data(), "p");
 
+  sampleTree->Project(h_th_N_name.Data(), "clusterTheta", pidSigCut.Data());
+  sampleTree->Project(h_th_D_name.Data(), "clusterTheta");
+
   sampleTree->Project(h_eclreg_N_name.Data(), "clusterReg", pidSigCut.Data());
   sampleTree->Project(h_eclreg_D_name.Data(), "clusterReg");
   paintUnderOverflow(h_eclreg_N);
@@ -418,14 +427,16 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
   // Compute the efficiency/fake rate.
 
   TString pid_glob_ratio_p_name = TString::Format("pid_glob_%i_%s__VS_p", sigHypoPdgId, ratioType.c_str());
+  TString pid_glob_ratio_th_name = TString::Format("pid_glob_%i_%s__VS_th", sigHypoPdgId, ratioType.c_str());
   TString pid_glob_ratio_eclreg_name = TString::Format("pid_glob_%i_%s__VS_eclreg", sigHypoPdgId, ratioType.c_str());
   TString pid_glob_ratio_phi_name = TString::Format("pid_glob_%i_%s__VS_phi", sigHypoPdgId, ratioType.c_str());
 
   // MetaOptions string.
   std::string metaopts("pvalue-warn=0.01,pvalue-error=0.001,nostats");
+  std::string shifteropt("");
   // Electron plots should be visible to the shifter by default.
   if (sampleHypo == Const::electron || sigHypo == Const::electron) {
-    metaopts = "shifter," + metaopts;
+    shifteropt = "shifter,";
   }
 
   if (TEfficiency::CheckConsistency(*h_p_N, *h_p_D)) {
@@ -443,17 +454,41 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
                                                                  sampleHypoPdgId,
                                                                  ratioType.c_str(),
                                                                  sigHypoPdgId,
-                                                                 c_PID
-                                                                            ).Data()));
+                                                                 c_PID).Data()));
     t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("Check",
                                                              "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
     t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-    t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
+    t_pid_glob_ratio_p->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
     t_pid_glob_ratio_p->Write();
 
     delete t_pid_glob_ratio_p;
 
+  }
+  if (TEfficiency::CheckConsistency(*h_th_N, *h_th_D)) {
+
+    TEfficiency* t_pid_glob_ratio_th = new TEfficiency(*h_th_N, *h_th_D);
+    t_pid_glob_ratio_th->SetName(pid_glob_ratio_th_name.Data());
+    t_pid_glob_ratio_th->SetTitle(TString::Format("%s;#theta_{cluster} [rad];#varepsilon/f", pid_glob_ratio_th_name.Data()).Data());
+
+    t_pid_glob_ratio_th->SetConfidenceLevel(0.683);
+    t_pid_glob_ratio_th->SetStatisticOption(TEfficiency::kBUniform);
+    t_pid_glob_ratio_th->SetPosteriorMode();
+
+    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Description",
+                                                              TString::Format("Sample PDG = %i - %s of ECL global PID(%i) > %.2f as a function of $\\theta_{cluster}$.",
+                                                                  sampleHypoPdgId,
+                                                                  ratioType.c_str(),
+                                                                  sigHypoPdgId,
+                                                                  c_PID).Data()));
+    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Check",
+                                                              "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
+    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
+    t_pid_glob_ratio_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
+
+    t_pid_glob_ratio_th->Write();
+
+    delete t_pid_glob_ratio_th;
   }
   if (TEfficiency::CheckConsistency(*h_eclreg_N, *h_eclreg_D)) {
 
@@ -470,8 +505,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
                                                            sampleHypoPdgId,
                                                            ratioType.c_str(),
                                                            sigHypoPdgId,
-                                                           c_PID
-                                                                      ).Data()));
+                                                           c_PID).Data()));
     t_pid_glob_ratio_eclreg->GetListOfFunctions()->Add(new TNamed("Check",
                                                        "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
     t_pid_glob_ratio_eclreg->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
@@ -497,12 +531,11 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
                                                                    sampleHypoPdgId,
                                                                    ratioType.c_str(),
                                                                    sigHypoPdgId,
-                                                                   c_PID
-                                                                              ).Data()));
+                                                                   c_PID).Data()));
     t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("Check",
                                                                "Shape should be consistent. Obviously, check for decreasing efficiency / increasing fake rate."));
     t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Marco Milesi. marco.milesi@desy.de"));
-    t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
+    t_pid_glob_ratio_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
     t_pid_glob_ratio_phi->Write();
 
@@ -511,6 +544,8 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDEfficiencyFakeRate(TTree*
 
   delete h_p_N;
   delete h_p_D;
+  delete h_th_N;
+  delete h_th_D;
   delete h_eclreg_N;
   delete h_eclreg_D;
   delete h_phi_N;
@@ -564,9 +599,10 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
 
   // MetaOptions string.
   std::string metaopts("pvalue-warn=0.01,pvalue-error=0.001,nostats");
+  std::string shifteropt("");
   // Electron plots should be visible to the shifter by default.
   if (sampleHypo == Const::electron) {
-    metaopts = "shifter," + metaopts;
+    shifteropt = "shifter,";
   }
 
   if (TEfficiency::CheckConsistency(*h_pt_N, *h_pt_D)) {
@@ -586,7 +622,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-    t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
+    t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
     t_match_eff_pt->Write();
 
@@ -610,7 +646,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
+    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
     t_match_eff_th->Write();
 
@@ -633,7 +669,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check",
                                                           "Shape should be consistent. Obviously, check for decreasing efficiency."));
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
-    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
+    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
     t_match_eff_phi->Write();
 

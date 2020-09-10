@@ -23,6 +23,7 @@ def get_logger():
 # Standard run for generating or reading event #
 ################################################
 
+
 class ReadOrGenerateEventsRun(MinimalRun):
     """Read generated events or generate new events"""
 
@@ -370,6 +371,7 @@ def add_no_generator(path):
     # Nothing to do here since the background files are included in the add_simulation
     pass
 
+
 # Generator module names hashed by shorthand menomics. Includes
 # None as a special value for background only simulation
 generators_by_short_name = {
@@ -462,6 +464,7 @@ def setup_cdc_top_test(path):
 
     adjustments.adjust_module(path, "Geometry", components=components)
     return components
+
 
 detector_setups_by_short_name = {
     "Default": setup_default_detector,

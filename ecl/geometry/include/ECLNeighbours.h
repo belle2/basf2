@@ -59,7 +59,13 @@ namespace Belle2 {
       void initializeN(const int nneighbours);
 
       /**  initialize the mask neighbour list, remove corners. */
-      void initializeNC(const int nneighbours, const int corners);
+      void initializeNC(const int nneighbours);
+
+      /**  initialize the mask neighbour list, legacy code. */
+      void initializeNLegacy(const int nneighbours);
+
+      /**  initialize the mask neighbour list, remove corners, legacy code. */
+      void initializeNCLegacy(const int nneighbours, const int corners);
 
       /**  initialize the radius neighbour list. */
       void initializeR(const double radius);

@@ -14,14 +14,13 @@ from unittest import TestCase
 from ROOT import gRandom
 import simulation
 import itertools
+import random
 
 logLevel = LogLevel.INFO  # LogLevel.DEBUG #
 set_random_seed(42)
 
 eclDigitsDatastoreName = 'ECLDigits'
 unpackerOutputDatastoreName = 'someECLUnpackerDatastoreName'
-
-import random
 
 
 class addECLDigitsModule(Module):

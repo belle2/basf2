@@ -59,6 +59,7 @@ class SearchForHits(Module):
             print(hit.getMom().Phi())
             print(hit.getMom().Theta())
 
+
 # to run the framework the used modules need to be registered
 main = create_path()
 

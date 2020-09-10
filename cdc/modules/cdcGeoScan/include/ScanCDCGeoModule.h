@@ -15,19 +15,21 @@
 
 namespace Belle2 {
 
+  /** Test module to save CDC geometry information to ntuple file */
   class ScanCDCGeoModule: public Module {
 
   public:
 
+    /** constructor */
     ScanCDCGeoModule();
 
-    /** constructor */
+    /** destructor */
     virtual ~ScanCDCGeoModule() {};
 
-    /** init class */
+    /** init  */
     virtual void initialize() override;;
 
-    /** terminate class and save information */
+    /** terminate and save information */
     virtual void terminate() override;;
 
     /** Create the output TFiles and TTrees. */

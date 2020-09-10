@@ -99,13 +99,17 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
             gSystem->Unlink(Form("algorithm_3SampleELS_output_rev_%d.root", cal_rev));
             return c_NotEnoughData;
           }
-          for (int i = 1; i <= hEventT0vsELS->GetNbinsX(); i++) {
-            for (int j = 1; j <= hEventT0vsELS->GetNbinsY(); j++) {
-              if (hEventT0vsELS->GetBinContent(i, j) < int(hEventT0vsELS->GetEntries() * 0.001)) {
-                hEventT0vsELS->SetBinContent(i, j, 0);
-              }
-            }
-          }
+          // for (int i = 1; i <= hEventT0vsELS->GetNbinsX(); i++) {
+          //   for (int j = 1; j <= hEventT0vsELS->GetNbinsY(); j++) {
+          //     if (hEventT0vsELS->GetBinContent(i, j) < int(hEventT0vsELS->GetEntries() * 0.001)) {
+          //       hEventT0vsELS->SetBinContent(i, j, 0);
+          //     }
+          //   }
+          // }
+          for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++)
+            if (hEventT0vsCoG->Integral(i, i, 0, hEventT0vsCoG->GetNbinsY() + 1) <= max(2, int(hEventT0vsCoG->GetEntries() * 0.001)))
+              for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++)
+                hEventT0vsCoG->SetBinContent(i, j, 0);
           TProfile* pfx = hEventT0vsELS->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsELS->GetName());
           pfx->SetName(name.c_str());

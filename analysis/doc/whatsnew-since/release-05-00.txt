@@ -62,6 +62,9 @@ Modules
 
    .. warning:: The option ``useKLMEnergy`` of `RestOfEventBuilder` module is only meant for performance studies and NOT for a physics analysis.
 
+ * The :b2:mod:`ParticleCombinerFromMC` and the `reconstructMCDecay` function can set decayModeID extraInfo with an argument ``dmID``.
+   One can decide whether charge conjugated mode should be reconstructed with new boolean argument ``chargeConjugation`` (true by default).
+
 Full Event Interpretation
 +++++++++++++++++++++++++
 

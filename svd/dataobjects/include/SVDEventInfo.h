@@ -100,26 +100,23 @@ namespace Belle2 {
     { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
 
     /** getRelativeShiftInNs
-     * return the relative shift of the latency, in ns, in data taken in 3/6 samples
-     * number between 0 and 15 (in xml) -> shift is 0*7.9 .... 15*7.9 in ns
+     * returns the relative shift of the latency, in ns, in data taken in 3/6 samples.
+     * A number between 0 and 15 (in xml) -> shift is 0*7.9 .... 15*7.9 in ns.
+     * It returns the correct value in ns only if data have been collected in 3-sample DAQmode,
+     * otherwise it returns 0
      */
+
     float getRelativeShiftInNs() const
     {
-      int mode = (int)SVDModeByte(m_modeByte).getDAQMode();
-
-      if (mode == 2)
-        return 0;
-      else if (mode == 1)
+      if (m_nAPVsamples == 3)
         return m_relativeTimeShift * 4000. / 509.;
-      else if (mode == 0)
-        return 0;
 
-      return -999;
+      return 0;
     }
 
     /** getRelativeShift
-     * return the relative shift in data taken in 3/6 samples
-     * number between 0 and 15 as written in the xml file
+     * returns the relative shift in data taken in 3/6 samples
+     * A number between 0 and 15 as written in the xml file
      */
     int getRelativeShift() const
     {return m_relativeTimeShift;}

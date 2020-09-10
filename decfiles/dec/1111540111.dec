@@ -110,7 +110,7 @@ Decay chi_c2sig
 Enddecay
 #
 Decay J/psisig
-1.00000  mu+       mu-            PHOTOS VLL;
+1.00000  e+       e-            PHOTOS VLL;
 Enddecay
 #
 End

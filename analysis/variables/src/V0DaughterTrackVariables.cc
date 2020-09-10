@@ -229,12 +229,12 @@ namespace Belle2 {
       const int dID = int(std::lround(daughterID));
       if (not(dID == 0 || dID == 1)) { return std::numeric_limits<double>::quiet_NaN(); }
 
-      const MCParticle* mcparticle_v0 = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle_v0 = particle->getMCParticle();
       if (!mcparticle_v0) { return std::numeric_limits<double>::quiet_NaN(); }
 
       if (!(particle->getDaughter(dID))) { return std::numeric_limits<double>::quiet_NaN(); }
 
-      const MCParticle* mcparticle = particle->getDaughter(dID)->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle = particle->getDaughter(dID)->getMCParticle();
       if (!mcparticle) { return std::numeric_limits<double>::quiet_NaN(); }
 
       const TrackFitResult* trackFit = getTrackFitResultFromV0DaughterParticle(particle, daughterID);
@@ -304,12 +304,12 @@ namespace Belle2 {
       const int dID = int(std::lround(daughterID));
       if (not(dID == 0 || dID == 1)) { return std::numeric_limits<double>::quiet_NaN(); }
 
-      const MCParticle* mcparticle_v0 = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle_v0 = particle->getMCParticle();
       if (!mcparticle_v0) { return std::numeric_limits<double>::quiet_NaN(); }
 
       if (!(particle->getDaughter(dID))) { return std::numeric_limits<double>::quiet_NaN(); }
 
-      const MCParticle* mcparticle = particle->getDaughter(dID)->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle = particle->getDaughter(dID)->getMCParticle();
       if (!mcparticle) { return std::numeric_limits<double>::quiet_NaN(); }
 
       const TrackFitResult* trackFit = getTrackFitResultFromV0DaughterParticle(particle, daughterID);

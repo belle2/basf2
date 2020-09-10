@@ -878,6 +878,15 @@ also find keyboard shortcuts for most of them.
    Why should I keep track of the exact host on which the terminal multiplexer
    is run and how do I do that?
 
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   Check out the output of the ``hostname`` command in a computing cluster like
+   KEKCC. Why is it different from the hostname that you used to login (the
+   ``Hostname`` line in your `ssh config <online_book/prerequisites/ssh:SSH
+   Configuration File>`)? Could you have found out the host name without typing
+   any commands? How can you change the specific host?
+
 .. admonition:: Solution
    :class: toggle solution
 

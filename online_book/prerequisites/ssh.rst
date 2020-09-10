@@ -920,8 +920,7 @@ also find keyboard shortcuts for most of them.
       :lines: 31-33
       :linenos:
 
-   Then, you can directly to connect
-   to a specific node, e.g.
+   Then, you can directly to connect to a specific node from outside KEKCC, e.g.
 
    .. code-block:: bash
 

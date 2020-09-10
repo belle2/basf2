@@ -106,10 +106,10 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           //     }
           //   }
           // }
-          for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++)
-            if (hEventT0vsCoG->Integral(i, i, 0, hEventT0vsCoG->GetNbinsY() + 1) <= max(2, int(hEventT0vsCoG->GetEntries() * 0.001)))
-              for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++)
-                hEventT0vsCoG->SetBinContent(i, j, 0);
+          for (int i = 1; i <= hEventT0vsELS->GetNbinsX(); i++)
+            if (hEventT0vsELS->Integral(i, i, 0, hEventT0vsELS->GetNbinsY() + 1) <= max(2, int(hEventT0vsELS->GetEntries() * 0.001)))
+              for (int j = 1; j <= hEventT0vsELS->GetNbinsY(); j++)
+                hEventT0vsELS->SetBinContent(i, j, 0);
           TProfile* pfx = hEventT0vsELS->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsELS->GetName());
           pfx->SetName(name.c_str());

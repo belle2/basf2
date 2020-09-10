@@ -160,6 +160,18 @@ Once you are connected the next important step is to disconnect, just type
 ``exit`` and press return and your connection will be closed. If you're very
 impatient you can also press ``Ctrl-D`` as a shortcut.
 
+..  _batch system recommendation warning:
+.. warning::
+
+    Don't run long-running and CPU or memory heavy jobs on login nodes like
+    KEKCC and DESY where they have a dedicated batch systems (e.g.
+    :ref:`online_book/computing/gbasf2:gbasf2`, :ref:`LSF
+    <online_book/computing/batch:Batch submission>` or
+    :ref:`online_book/computing/htcondor:htcondor`). The login nodes are shared
+    resources for all users and it's not very polite and mostly also not
+    permitted to occupy them with calculations that could be done on dedicated
+    machines.
+
 .. admonition:: Exercise
    :class: exercise
 
@@ -812,11 +824,8 @@ feature-rich `tmux <https://github.com/tmux/tmux/wiki>`_. Both are
 pre-installed on KEKCC and NAF.
 
 .. hint::
-   For long-running computational jobs like processing a steering file, use a
-   batch submission system instead, such as the :ref:`grid
-   <online_book/computing/gbasf2:gbasf2>`, :ref:`LSF
-   <online_book/computing/batch:Batch submission>` or :ref:`htcondor
-   <online_book/computing/htcondor:htcondor>`.
+   For computational jobs like processing a steering file, use a
+   batch submission system instead (see :ref:`this warning <batch system recommendation warning>`).
 
 These programs create one or multiple new terminal sessions within your
 terminal, and these sessions run independently of the original terminal, even
@@ -884,7 +893,7 @@ also find keyboard shortcuts for most of them.
 
    Check out the output of the ``hostname`` command in a computing cluster like
    KEKCC. Why is it different from the hostname that you used to login (the
-   ``Hostname`` line in your `ssh config <online_book/prerequisites/ssh:SSH
+   ``Hostname`` line in your :ref:`ssh config <online_book/prerequisites/ssh:SSH
    Configuration File>`)? Could you have found out the host name without typing
    any commands? How can you change the specific host?
 
@@ -904,7 +913,7 @@ also find keyboard shortcuts for most of them.
    running on. From within the computing cluster, you can usually just use the
    node name for the ssh connection. For example, if your tmux session is
    running on ``ccw01.cc.kek.jp``, but you have been connected to ``ccw02``,
-   from ``ccw02`` you can simply use
+   from there you can simply use
 
    .. code-block:: bash
 
@@ -912,10 +921,9 @@ also find keyboard shortcuts for most of them.
 
    to connect to the other node. Alternatively, you
    can directly connect to a specific host instead of the login node, but for
-   that you might need to extend your `ssh config
+   that you might need to extend your :ref:`ssh config
    <online_book/prerequisites/ssh:SSH Configuration File>` to also use a
-   gateway server for the specific hosts in the cluster, e.g. for the KEKCC
-   worker nodes:
+   gateway server for the specific nodes in the cluster, e.g. for the KEKCC:
 
    .. literalinclude:: ssh_config.txt
       :lines: 31-33

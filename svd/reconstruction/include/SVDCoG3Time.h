@@ -32,12 +32,12 @@ namespace Belle2 {
       /**
        * @return the first frame and the cluster time
        */
-      std::pair<int, double> getFirstFrameAndClusterTime() override;
+      std::pair<int, double> getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster) override;
 
       /**
        * @return the cluster time error
        */
-      double getClusterTimeError() override;
+      double getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster) override;
 
       /**
        * virtual destructor

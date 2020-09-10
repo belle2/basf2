@@ -18,13 +18,13 @@ namespace Belle2 {
 
   namespace SVD {
 
-    std::pair<int, double> SVDELS3Time::getFirstFrameAndClusterTime()
+    std::pair<int, double> SVDELS3Time::getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster)
     {
 
       bool inElectrons = false;
 
-      SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(m_rawCluster.getClsSamples(inElectrons),
-                                                                  m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+      SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(rawCluster.getClsSamples(inElectrons),
+                                                                  rawCluster.getSensorID(), rawCluster.isUSide());
 
       timeReco->setTriggerBin(m_triggerBin);
 
@@ -32,13 +32,13 @@ namespace Belle2 {
 
     }
 
-    double SVDELS3Time::getClusterTimeError()
+    double SVDELS3Time::getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster)
     {
 
       bool inElectrons = false;
 
-      SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(m_rawCluster.getClsSamples(inElectrons),
-                                                                  m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+      SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(rawCluster.getClsSamples(inElectrons),
+                                                                  rawCluster.getSensorID(), rawCluster.isUSide());
 
       timeReco->setTriggerBin(m_triggerBin);
 

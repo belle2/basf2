@@ -20,12 +20,12 @@ namespace Belle2 {
   namespace SVD {
 
 
-    double SVDSumSamplesCharge::getClusterCharge()
+    double SVDSumSamplesCharge::getClusterCharge(const Belle2::SVD::RawCluster& rawCluster)
     {
 
       //as sum of the strip charges ( = sum of the samples)
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       double charge = 0;
 
@@ -33,10 +33,10 @@ namespace Belle2 {
 
         Belle2::SVD::stripInRawCluster strip = strips.at(i);
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
 
         float noiseInADC = strip.noise;
-        float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), strip.cellID,
+        float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID,
                                                                   noiseInADC);
         chargeReco->setAverageNoise(noiseInADC, noiseInElectrons);
 
@@ -47,12 +47,12 @@ namespace Belle2 {
       return charge;
     }
 
-    double SVDSumSamplesCharge::getClusterChargeError()
+    double SVDSumSamplesCharge::getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster)
     {
 
       //sum in quadrature of the strip charge errors
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       double noiseSquared = 0;
 
@@ -60,9 +60,9 @@ namespace Belle2 {
 
         Belle2::SVD::stripInRawCluster strip = strips.at(i);
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
         float noiseInADC = strip.noise;
-        float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(m_rawCluster.getSensorID(), m_rawCluster.isUSide(), strip.cellID,
+        float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID,
                                                                   noiseInADC);
         chargeReco->setAverageNoise(noiseInADC, noiseInElectrons);
 

@@ -69,12 +69,12 @@ namespace Belle2 {
       /**
        * @return the VxdID of the cluster sensor
        */
-      VxdID getSensorID() {return m_vxdID;}
+      VxdID getSensorID() const {return m_vxdID;}
 
       /**
        * @return true if the cluster is on the U/P side
        */
-      bool isUSide() {return m_isUside;}
+      bool isUSide() const {return m_isUside;}
 
       /**
        * @return the APVFloatSamples obtained summing

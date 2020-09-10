@@ -21,12 +21,12 @@ namespace Belle2 {
   namespace SVD {
 
 
-    std::pair<int,  double> SVDCoG6Time::getFirstFrameAndClusterTime()
+    std::pair<int,  double> SVDCoG6Time::getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster)
     {
 
       //as weighted average of the strip time with strip max sample
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       double time = 0;
       double sumAmplitudes = 0;
@@ -35,7 +35,7 @@ namespace Belle2 {
 
         Belle2::SVD::stripInRawCluster strip = strips.at(i);
 
-        SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+        SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
         timeReco->setTriggerBin(m_triggerBin);
 
         double stripTime = timeReco->getCoG6Time();
@@ -49,12 +49,12 @@ namespace Belle2 {
       return std::make_pair(firstFrame, time / sumAmplitudes);
     }
 
-    double SVDCoG6Time::getClusterTimeError()
+    double SVDCoG6Time::getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster)
     {
 
       //as error on weighted average, neglecting error on weights
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       double variance = 0;
 
@@ -62,7 +62,7 @@ namespace Belle2 {
 
         Belle2::SVD::stripInRawCluster strip = strips.at(i);
 
-        SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+        SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
         timeReco->setTriggerBin(m_triggerBin);
 
         double stripTimeError = timeReco->getCoG6TimeError();

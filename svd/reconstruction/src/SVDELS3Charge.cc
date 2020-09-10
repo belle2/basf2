@@ -23,12 +23,12 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDELS3Charge::getClusterCharge()
+    double SVDELS3Charge::getClusterCharge(const Belle2::SVD::RawCluster& rawCluster)
     {
       bool inElectrons = true;
 
-      SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(m_rawCluster.getClsSamples(inElectrons),
-          m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+      SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(rawCluster.getClsSamples(inElectrons),
+          rawCluster.getSensorID(), rawCluster.isUSide());
 
       chargeReco->setSamplesAreInElectrons();
 
@@ -39,13 +39,13 @@ namespace Belle2 {
     }
 
 
-    double SVDELS3Charge::getClusterChargeError()
+    double SVDELS3Charge::getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster)
     {
       bool inElectrons = true;
 
 
-      SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(m_rawCluster.getClsSamples(inElectrons),
-          m_rawCluster.getSensorID(), m_rawCluster.isUSide());
+      SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(rawCluster.getClsSamples(inElectrons),
+          rawCluster.getSensorID(), rawCluster.isUSide());
 
       chargeReco->setSamplesAreInElectrons();
 

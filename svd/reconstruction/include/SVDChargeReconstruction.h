@@ -37,7 +37,7 @@ namespace Belle2 {
       /**
        * set that samples are in electrons already
        */
-      void setSamplesInElectrons() {m_samplesInElectrons = true;};
+      void setSamplesAreInElectrons() {m_samplesAreInElectrons = true;};
 
       /** get strip charge as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObject*/
       double getStripCharge(TString chargeAlgo);
@@ -59,7 +59,7 @@ namespace Belle2 {
 
     private:
 
-      bool m_samplesInElectrons = false;/**<if true m_samples is in electrons*/
+      bool m_samplesAreInElectrons = false;/**<if true m_samples is in electrons*/
     };
 
   }

@@ -214,7 +214,7 @@ void SVDRecoDigitCreatorModule::event()
     double chi2 = std::numeric_limits<double>::quiet_NaN();
 
 
-    // build SVDTimeReconstrcution and SVDChargeRecosntruct
+    // build SVDTimeReconstuction and SVDChargeReconstruction classes with the SVDShaperDigit
     SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(*m_storeDigits[i]);
     timeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
     timeReco->setTriggerBin(triggerBin);
@@ -222,7 +222,7 @@ void SVDRecoDigitCreatorModule::event()
     chargeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
 
 
-    // get strip time and charge and their errors
+    // get first frame, strip time and charge and their errors
     if (numberOfAcquiredSamples == 6) {
       std::pair<int, double> FFandTime = timeReco->getFirstFrameAndStripTime(m_timeRecoWith6SamplesAlgorithm);
       firstFrame = FFandTime.first;

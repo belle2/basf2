@@ -77,7 +77,7 @@ namespace Belle2 {
         : m_samples(samples)
         , m_vxdID(sensorID)
         , m_isUside(isU)
-        , m_cellID(-1)
+        , m_cellID(std::numeric_limits<int>::quiet_NaN())
       { };
 
 
@@ -130,6 +130,22 @@ namespace Belle2 {
 
     protected:
 
+      /** check that the bare minimum set of informations are there */
+      bool weCanContinue()
+      {
+
+        bool weCanContinue = true;
+        if ((int)m_vxdID == 0) {
+          weCanContinue = false;
+          B2FATAL("OOPS, we can't continue, you are probably using the wrong SVDReconstructionBase constructor");
+        }
+
+        return weCanContinue;
+
+      };
+
+
+
       /** APV clock period*/
       double m_apvClockPeriod = 16000. / 509;
 
@@ -146,16 +162,16 @@ namespace Belle2 {
       bool m_isUside = 0;
 
       /**cell ID */
-      int m_cellID = 0;
+      int m_cellID = std::numeric_limits<int>::quiet_NaN();
 
       /** trigger bin */
-      int m_triggerBin = -1;
+      int m_triggerBin = std::numeric_limits<int>::quiet_NaN();
 
       /** average noise in ADC as sum in quadrature of noise of each strip*/
-      float m_averageNoiseInADC = -1;
+      float m_averageNoiseInADC = std::numeric_limits<int>::quiet_NaN();
 
       /** average noise in electrons as sum in quadrature of noise of each strip*/
-      float m_averageNoiseInElectrons = -1;
+      float m_averageNoiseInElectrons = std::numeric_limits<int>::quiet_NaN();
 
       /** set containing the available time algorithms */
       std::set<TString> m_timeAlgorithms;

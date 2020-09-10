@@ -872,3 +872,33 @@ for example if you want to have multiple windows (tmux "tabs") and panes in a
 tmux. To see those, check out the documentation links above, where you will
 also find keyboard shortcuts for most of them.
 
+.. admonition:: Question
+   :class: exercise stacked
+
+   Why should I keep track of the exact host on which the terminal multiplexer
+   is run and how do I do that?
+
+.. admonition:: Solution
+   :class: toggle solution
+
+   When you connect to a computing cluster like KEKCC via a login node,
+   ``login.cc.kek.jp``, you get a random host (also called "node", i.e. an
+   individual computer) in that cluster for load-balancing purposes. You can
+   check the full name with the ``hostname`` command. But you should also be
+   able to see the first part of the hostname, the current node in your shell
+   prompt (the string at the beginning of the command line).
+
+   If you disconnect and reconnect to the login node, you can be assigned a
+   different host, but your terminal multiplexer will still be running on the
+   old host, so you will have to connect to that specific host which it is
+   running on. From within your computing node, you can just use the node name
+   for the ssh connection. For example, if your tmux session is running on
+   ``ccw01.cc.kek.jp``, but you have been connected to ``ccw02``, you can use
+   ``ssh ccw01`` to connect to the other node. Alternatively, you can directly
+   connect to a specific host instead of the login node, but for that you
+   might need to extend your `ssh config <SSH Configuration File>` to also
+   use a gateway server for the specific hosts in the cluster, e.g.
+
+   .. literalinclude:: ssh_config.txt
+      :lines: 29-32
+      :linenos:

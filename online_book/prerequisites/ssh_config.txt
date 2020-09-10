@@ -25,3 +25,8 @@ Host sshcc1.kek.jp
     User YOUR_SSHLOGIN_USERNAME
     IdentityFile ~/.ssh/id_kekccgateway
     IdentitiesOnly yes
+
+Host cc*
+    HostName %h.cc.kek.jp
+    ProxyJump sshcc1.kek.jp
+    # rest same to the configuration of "Host kekcc"

@@ -860,6 +860,7 @@ tmux detach
     is closed.
 
 tmux attach
+    Short form: ``tmux a``.
     Attaches a running but detached tmux session. When you log into a cluster
     like KEKCC or NAF to attach your previous tmux session, make sure are on
     **exactly the same host** as the one in which you started

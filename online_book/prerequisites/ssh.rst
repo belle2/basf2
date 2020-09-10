@@ -846,7 +846,7 @@ tmux new-session
     Creates and attaches a new tmux session. This is also the default behaviour
     when just entering the ``tmux``. However, the ``new-session`` subcommand
     allows for additional options such as naming sessions (see ``tmux
-    new-session --help``)
+    new-session --help``).
 
 tmux kill-session
     Kills the current tmux session. Use this when you finish your work and
@@ -860,23 +860,15 @@ tmux detach
     is closed.
 
 tmux attach
-    Attaches a running but detached tmux session. When you log into KEKCC or
-    NAF to attach your previous tmux session, **make sure are on exactly the
-    same host** (i.e. machine, just check the terminal prompt or type
-    ``hostname``) as the one in which you started the initial tmux session.
-    This is because when you log in for example via ``login.cc.kek.jp``, you
-    get assigned to a random machine for load-balancing purposes. You can just
-    run or ``ssh ccwXY`` with ``XY`` being the specific host numbers to connect
-    to another machine.
+    Attaches a running but detached tmux session. When you log into a cluster
+    like KEKCC or NAF to attach your previous tmux session, make sure are on
+    **exactly the same host** as the one in which you started
+    the initial tmux session.
 
-All these command take arguments to be able to handle multiple sessions and you
-might need more commands than those listed here, so check out the documentation
-links above.
 
-.. warning:: Rules of responsible tmux/screen usage
+All these command take optional arguments to be able to handle multiple
+sessions and there are many more useful tmux commands than those listed here,
+for example if you want to have multiple windows (tmux "tabs") and panes in a
+tmux. To see those, check out the documentation links above, where you will
+also find keyboard shortcuts for most of them.
 
-    * Don't use screen/tmux for computations and other CPU/memory-heavy
-      processes.
-    * Avoid very long-running sessions, be tidy and kill them once you finished
-      your work
-    * Keep track of the exact host on which you run your terminal multiplexers

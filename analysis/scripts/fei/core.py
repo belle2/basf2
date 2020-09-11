@@ -178,9 +178,9 @@ class FSPLoader(object):
 
         if self.config.b2bii:
             ma.fillParticleLists([('K+:FSP', ''), ('pi+:FSP', ''), ('e+:FSP', ''),
-                                  ('mu+:FSP', ''), ('p+:FSP', ''), ('K_L0:FSP', '')], writeOut=True, path=path)
+                                  ('mu+:FSP', ''), ('p+:FSP', '')], writeOut=True, path=path)
             for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
-                                          ('Lambda0:V0', 'Lambda0:mdst'),
+                                          ('Lambda0:V0', 'Lambda0:mdst'), ('K_L0:FSP', 'K_L0:mdst'),
                                           ('pi0:FSP', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
                 ma.copyParticles(outputList, inputList, writeOut=True, path=path)
         else:

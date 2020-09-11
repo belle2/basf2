@@ -87,9 +87,6 @@ Build the Muid likelihoods starting from the hit pattern and the transverse scat
   :width: 40em
   :align: center
  
-  Likelihood-muon-pion-eff-fake-momentum     
-  
-
   
 
 .. see also:: `"MuidElementNumber Class" <https://b2-master.belle2.org/software/development/classBelle2_1_1MuidElementNumbers.html#abac5ea6b84578687bc483bb611738e35>`_

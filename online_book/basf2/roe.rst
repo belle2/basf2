@@ -105,7 +105,7 @@ at least one ECL cluster hit.
 The analyst can create as many ROE masks as needed and use them in different ROE-dependent 
 algorithms or variables, like ``roeM(my_mask)`` or ``roeE(my_mask)``. Also, one can call 
 :b2:var:`nROE_Charged` or :b2:var:`nROE_Photons` to know how many charged particles or 
-photons entered the ROE. 
+photons entered the ROE or the ROE mask. 
 
 .. tip::
 

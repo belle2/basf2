@@ -260,3 +260,46 @@ int* RawCOPPERFormat_latest::Get4thDetectorBuffer(int n)
   B2FATAL(err_buf);
   return NULL;
 }
+
+int RawCOPPERFormat_latest::GetOffset1stFINESSE(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+
+int RawCOPPERFormat_latest::GetOffset2ndFINESSE(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+
+int RawCOPPERFormat_latest::GetOffset3rdFINESSE(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+
+int RawCOPPERFormat_latest::GetOffset4thFINESSE(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("[DEBUG] %s\n", err_buf);
+  B2FATAL(err_buf);
+  return NULL;
+}
+

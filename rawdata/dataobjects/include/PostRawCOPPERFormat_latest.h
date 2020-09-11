@@ -64,10 +64,6 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     unsigned int GetCOPPERCounter(int n) OVERRIDE_CPP17;
 
-    //! get # of offset words for FINESSE slot A buffer position
-    /* cppcheck-suppress missingOverride */
-    int GetOffset1stFINESSE(int n) OVERRIDE_CPP17;
-
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
     //
@@ -194,12 +190,6 @@ namespace Belle2 {
     //    ClassDefOverride(PostRawCOPPERFormat_latest, 2);
 
   };
-
-  inline int PostRawCOPPERFormat_latest::GetOffset1stFINESSE(int n)
-  {
-    int pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
-    return pos_nwords;
-  }
 
   inline int* PostRawCOPPERFormat_latest::GetExpRunSubrunBuf(int n)
   {

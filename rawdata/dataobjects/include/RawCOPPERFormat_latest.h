@@ -154,6 +154,18 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     int Get4thFINESSENwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
+    //! get # of offset words for FINESSE slot A buffer position
+    int GetOffset1stFINESSE(int n) OVERRIDE_CPP17 FINAL_CPP17;
+
+    //! get # of offset words for FINESSE slot B buffer position
+    int GetOffset2ndFINESSE(int n) OVERRIDE_CPP17 FINAL_CPP17;
+
+    //! get # of offset words for FINESSE slot C buffer position
+    int GetOffset3rdFINESSE(int n) OVERRIDE_CPP17 FINAL_CPP17;
+
+    //! get # of offset words for FINESSE slot D buffer position
+    int GetOffset4thFINESSE(int n) OVERRIDE_CPP17 FINAL_CPP17;
+
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
     //

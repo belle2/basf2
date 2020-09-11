@@ -281,10 +281,10 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
   //
   int max_num_ch = raw_copper->GetMaxNumOfCh(i);
   for (int j = 0; j < max_num_ch ; j++) {
-    if (raw_copper->GetDetectorNwords(i, 0) > 0) {
-      printf("===== Detector Buffer(ch %d) 0x%x words \n", j,
-             raw_copper->GetDetectorNwords(i, j));
-      printBuffer(raw_copper->GetDetectorBuffer(i, 0), raw_copper->GetDetectorNwords(i, 0));
+    if (raw_copper->GetDetectorNwords(i, j) > 0) {
+      printf("===== Detector Buffer(ch %d) 0x%x words (finesse 0x%x) \n", j
+             , raw_copper->GetDetectorNwords(i, j), raw_copper->GetFINESSENwords(i, j));
+      printBuffer(raw_copper->GetDetectorBuffer(i, j), raw_copper->GetDetectorNwords(i, j));
     }
   }
   m_ncpr++;

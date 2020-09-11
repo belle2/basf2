@@ -87,7 +87,7 @@ void BeamSpotCollectorModule::collect()
   m_evt  = m_emd->getEvent();
   m_run  = m_emd->getRun();
   m_exp  = m_emd->getExperiment();
-  m_time = m_emd->getTime() / 1e9; //from ns to s
+  m_time = m_emd->getTime() / 1e9 / 3600.; //from ns to hours
 
 
   StoreObjPtr<ParticleList> Y4SParticles(m_Y4SPListName);

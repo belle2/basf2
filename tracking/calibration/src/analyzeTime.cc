@@ -34,8 +34,9 @@
 #include <functional>
 #include <vector>
 
-#include <tracking/calibration/tools.h>
-#include <tracking/calibration/analyzeTime.h>
+#include "tools.h"
+#include "analyzeTime.h"
+#include "Splitter.h"
 
 using namespace std;
 
@@ -675,11 +676,12 @@ vector<event> getEvents(TTree* tr)
   double start, stop;
   tie(start, stop) = getStartStop(events);
   for (auto& e : events) {
-    e.t = (e.tAbs - start) / (stop - start);
+    //e.t = (e.tAbs - start) / (stop - start);
+    e.t = e.tAbs;
     //e.tAbs /= 1e9;
   }
-  events[0].t += 1e-11;
-  events.back().t -= 1e-11;
+  //events[0].t += 1e-11;
+  //events.back().t -= 1e-11;
 
   //file->Close();
 
@@ -2236,7 +2238,7 @@ TMatrixD getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, d
 }
 
 
-ExpRunEvt getPostion(const vector<event>& events, double tRel)
+ExpRunEvt getPosition(const vector<event>& events, double tRel)
 {
   ExpRunEvt evt(-1, -1, -1);
   double tBreak = -1e10;
@@ -2258,31 +2260,30 @@ vector<ExpRunEvt> convertSplitPoints(const vector<event>& events, vector<double>
 
   vector<ExpRunEvt>  breakPos;
   for (auto p : splitPoints) {
-    auto pos = getPostion(events, p);
+    auto pos = getPosition(events, p);
     breakPos.push_back(pos);
   }
   return breakPos;
 }
 
 
-map<pair<int, int>, pair<double, double>> getRunInfo(const vector<event>& evts)
+map<ExpRun, pair<double, double>> getRunInfo(const vector<event>& evts)
 {
-  map<pair<int, int>, pair<double, double>> runsInfo;
+  map<ExpRun, pair<double, double>> runsInfo;
 
   for (auto& evt : evts) {
     int Exp = evt.exp;
     int Run = evt.run;
     double time = evt.t;
     //tracks->GetEntry(i);
-    if (runsInfo.count({Exp, Run})) {
+    if (runsInfo.count(ExpRun(Exp, Run))) {
       double tMin, tMax;
-      tie(tMin, tMax) = runsInfo.at({Exp, Run});
+      tie(tMin, tMax) = runsInfo.at(ExpRun(Exp, Run));
       tMin = min(tMin, time);
       tMax = max(tMax, time);
-      runsInfo.at({Exp, Run}) = {tMin, tMax};
-    }
-    else {
-      runsInfo[ {Exp, Run}] = {time, time};
+      runsInfo.at(ExpRun(Exp, Run)) = {tMin, tMax};
+    } else {
+      runsInfo[ExpRun(Exp, Run)] = {time, time};
     }
 
   }

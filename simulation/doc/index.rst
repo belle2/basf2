@@ -22,10 +22,13 @@ The Geant4 version information is stored in the variable ``G4Version`` in the Ge
  
 The history of Geant4 version information in the ``basf2`` external library is as follows:
 
+
 +------------------------+----------------+
 |   externals version    | Geant4 version |
 +========================+================+
-| v01-01-01 and later    |    10.1.2      |
+| v01-09-00 and later    |    10.6.1      |
++------------------------+----------------+
+| v01-01-01 to v01-08-00 |    10.1.2      |
 +------------------------+----------------+
 | v00-04-00 to v01-00-00 |     9.6.2      |
 +------------------------+----------------+
@@ -38,11 +41,17 @@ The history of Geant4 version information in the ``basf2`` external library is a
 | v00-00-01 to v00-00-04 |     9.3.0      |
 +------------------------+----------------+
 
+To check the externals version of your current ``basf2`` setup, use::
+
+  echo $BELLE2_EXTERNALS_VERSION 
+
+
 Physics list for Geant4
 =======================
+
 PhysicsList collects information on all the particles, physics processes and production thresholds to 
 be used in the detector simulation. This class is passed to the Geant4 run manager as the 
-“physics configuration” of the application. 
+"physics configuration” of the application. 
 ``basf2`` has two options for the input physics list for Geant4. 
 
 The default physics list

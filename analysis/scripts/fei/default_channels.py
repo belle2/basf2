@@ -67,10 +67,6 @@ def get_default_channels(
         # Using Belle specific Variables for e-ID, mu-ID and K-ID
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
-        # HOTFIX
-        from variables import variables
-        variables.addAlias('Kid_belle', 'atcPIDBelle(3,2)')
-        variables.addAlias('SigMBF', 'SigM')
 
         chargedVariables = ['eIDBelle',
                             'atcPIDBelle(3,2)',
@@ -168,11 +164,11 @@ def get_default_channels(
             pi0_cut += ' and isInRestOfEvent > 0.5'
 
         pi0 = Particle('pi0',
-                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(SigMBF)',
+                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(SigM)',
                                                    'daughterAngle(0,1)', 'pt', 'pz', 'E'],
                                         target='isSignal'),
                        PreCutConfiguration(userCut=pi0_cut,
-                                           bestCandidateVariable='abs(SigMBF)',
+                                           bestCandidateVariable='abs(SigM)',
                                            bestCandidateCut=20),
                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
         pi0.addChannel(['pi0:FSP'])
@@ -1223,11 +1219,11 @@ def get_fr_channels(convertedFromBelle=False):
     if convertedFromBelle:
 
         pi0 = Particle('pi0',
-                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(SigMBF)',
+                       MVAConfiguration(variables=['InvM', 'extraInfo(preCut_rank)', 'chiProb', 'abs(SigM)',
                                                    'daughterAngle(0,1)', 'pt', 'pz', 'E'],
                                         target='isSignal'),
                        PreCutConfiguration(userCut='0.08 < InvM < 0.18',
-                                           bestCandidateVariable='abs(SigMBF)',
+                                           bestCandidateVariable='abs(SigM)',
                                            bestCandidateCut=20),
                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
         pi0.addChannel(['pi0:FSP'])

@@ -167,7 +167,7 @@ def draw_bklmhists(file_chain):
 
     RPC_bklmdigits_tres = ROOT.TH1F('RPC_bklmdigits_tres', 'KLM Digits time resolution in RPC', 250, -25, 25)
     file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>RPC_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && BKLMHit2ds.inRPC()==1')
+                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() > 3')
     RPC_bklmdigits_tres.SetXTitle('ns')
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in RPC'))
     RPC_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))
@@ -185,7 +185,7 @@ def draw_bklmhists(file_chain):
 
     Sci_bklmdigits_tres = ROOT.TH1F('Sci_bklmdigits_tres', 'KLM Digits time resolution in Scintillators', 250, -25, 25)
     file_chain.Draw('KLMDigits.getTime()-KLMDigits.getMCTime()>>Sci_bklmdigits_tres',
-                    'KLMDigits.getSubdetector()==1 && BKLMHit2ds.inRPC()==0')
+                    'KLMDigits.getSubdetector()==1 && KLMDigits.getLayer() <= 3')
     Sci_bklmdigits_tres.SetXTitle('ns')
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Description', 'KLMDigits Time resolution in Scintillators'))
     Sci_bklmdigits_tres.GetListOfFunctions().Add(TNamed('Contact', contact))

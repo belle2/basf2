@@ -68,7 +68,7 @@ reset_database()
 use_database_chain()
 # central DB needed for the channel mapping DB object
 # GLOBAL_TAG = "vxd_commissioning_20181030"
-GLOBAL_TAG = "svd_Belle2_20181221"
+GLOBAL_TAG = "online"
 use_central_database(GLOBAL_TAG)
 use_local_database("localDB_test/database.txt", "localDB_test", invertLogging=True)
 
@@ -89,7 +89,11 @@ run = int(run)
 
 
 class configImporterToDBModule(Module):
+    '''detector configuration importer'''
+
     def beginRun(self):
+        '''begin run'''
+
         # call the importer class
         configImporterToDB = SVDDetectorConfigurationImporter(experiment, run, experiment, -1)
         if args.calib is not None:

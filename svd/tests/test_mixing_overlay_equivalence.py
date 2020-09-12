@@ -35,10 +35,13 @@ class SetAsideSimHits(basf2.Module):
         signal/background collisions."""
 
     def __init__(self):
+        '''initialize python module'''
         super().__init__()
         self.selected_sensorID = Belle2.VxdID(3, 1, 1)
+        '''selected sensor info'''
 
     def event(self):
+        '''event'''
         global xsimhits
         storesimhits = Belle2.PyStoreArray("SVDSimHits")
         for h in storesimhits:
@@ -47,16 +50,21 @@ class SetAsideSimHits(basf2.Module):
 
 
 class InjectSimHits(basf2.Module):
-    """Inject stored SVDSimHits"""
+    '''Inject stored SVDSimHits'''
 
     def __init__(self):
+        '''initialize python module'''
         super().__init__()
         self.simhits = Belle2.PyStoreArray("SVDSimHits")
+        '''sim hit store array'''
 
     def initialize(self):
+        '''initialize'''
         self.simhits.registerInDataStore()
 
     def event(self):
+        '''event'''
+
         global xsimhits
         for h in xsimhits:
             simhit = self.simhits.appendNew()
@@ -164,7 +172,6 @@ if __name__ == "__main__":
                 match = match and (d1.getCellID() == d2.getCellID())
                 for s1, s2 in zip(d1.getSamples(), d2.getSamples()):
                     match = match and (int(s1) == int(s2))
-                match = match and (d1.getModeByte() == d2.getModeByte())
                 if not match:
                     print(d1.toString())
                     print(d2.toString())

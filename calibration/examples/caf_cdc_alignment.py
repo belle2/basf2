@@ -1,5 +1,4 @@
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -17,6 +16,8 @@ import cdc.cr as gcr
 
 from alignment import MillepedeCalibration
 from alignment import setups
+
+set_log_level(LogLevel.INFO)
 
 
 def main(argv):

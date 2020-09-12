@@ -1,55 +1,103 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+"""Test implementation of pure CsI digitization and waveform fit
+
+Input:
+    No file is required
+
+Output:
+    Mdst file
+
+Usage:
+    $ basf2 TestNoiseCalibration.py -- --outputFileName <name>
+            --elecNoise <float> --photoStatResolution <float>
+            [--beamBkgPath <path_to_files>]
+"""
+
+import glob
+import argparse
+import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from reconstruction import add_mdst_output
-import sys
-import glob
 
-set_log_level(LogLevel.ERROR)
+__authors__ = ['Guglielmo De Nardo', 'Abtin Narimani Charan']
+__copyright__ = 'Copyright 2020 - Belle II Collaboration'
+__maintainer__ = 'Abtin Narimani Charan'
+__email__ = 'abtin.narimani.charan@desy.de'
 
-main = create_path()
 
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param({'evtNumList': [10], 'runList': [1]})
-main.add_module(eventinfosetter)
+def argparser():
 
-par = sys.argv
-argc = len(par)
-outfile = par[1]
-elenoise = float(par[2])
-photostat = float(par[3])
-if (argc == 5):
-    bgdir = par[4]
-#  bg = glob.glob('/home/denardo/belle2/bkg/*.root')
-    bg = glob.glob(bgdir + '/*.root')
-    add_simulation(main, bkgfiles=bg, components='ECL')
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--outputFileName',
+                        required=True,
+                        help='Output file name')
+
+    parser.add_argument('--elecNoise',
+                        type=float,
+                        required=True,
+                        help='Electronics noise energy equivalent in MeV')
+
+    parser.add_argument('--photoStatResolution',
+                        type=float,
+                        required=True,
+                        help='Sigma for 1 MeV energy deposit')
+
+    parser.add_argument('--beamBkgPath',
+                        help='If you want to add beam background, pass this'
+                        'option with path to beam background files.')
+    return parser
+
+
+args = argparser().parse_args()
+
+b2.set_log_level(b2.LogLevel.ERROR)
+
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
+
+# Register and add 'EventInfoSetter' module and settings
+eventInfoSetter = b2.register_module('EventInfoSetter')
+eventInfoSetter.param({'evtNumList': [10],
+                       'runList': [1],
+                       'expList': [0]})
+mainPath.add_module(eventInfoSetter)
+
+if args.beamBkgPath:
+    # Add beam background
+    bg = glob.glob(args.beamBkgPath + '/*.root')
+    # Add simulation
+    add_simulation(mainPath, bkgfiles=bgFiles, components='ECL')
 else:
-    add_simulation(main, components='ECL')
+    add_simulation(mainPath, components='ECL')
 
-# add_reconstruction(main)
+# Add reconstruction
+add_reconstruction(mainPath)
 
-eclpuredigi = register_module('ECLDigitizerPureCsI')
-eclpuredigi.param('Calibration', 1)
-eclpuredigi.param('elecNoise', elenoise)
-eclpuredigi.param('photostatresolution', photostat)
-eclpuredigi.param('sigmaTrigger', 0)
-eclpuredigi.param('LastRing', 12)
+# Register and add 'ECLDigitizerPureCsI' module and settings
+eclDigitizerPureCsI = b2.register_module('ECLDigitizerPureCsI')
+eclDigitizerPureCsI.param('Calibration', 1)
+eclDigitizerPureCsI.param('elecNoise', args.elecNoise)
+eclDigitizerPureCsI.param('photostatresolution',
+                          args.photoStatResolution)
+eclDigitizerPureCsI.param('sigmaTrigger', 0)
+eclDigitizerPureCsI.param('LastRing', 12)
+mainPath.add_module(eclDigitizerPureCsI)
 
-main.add_module(eclpuredigi)
+# Register and add 'EclCovMatrixNtuple' module and settings
+eclCovMatrixNtuple = b2.register_module('EclCovMatrixNtuple')
+eclCovMatrixNtuple.param('dspArrayName', 'ECLDspsPureCsI')
+eclCovMatrixNtuple.param('digiArrayName', 'ECLDigitsPureCsI')
+eclCovMatrixNtuple.param('outputFileName',
+                         args.outputFileName)
+mainPath.add_module(eclCovMatrixNtuple)
 
+add_mdst_output(mainPath, additionalBranches=['ECLDspsPureCsI'])
 
-EclCovMatrixNtuple = register_module('EclCovMatrixNtuple')
-EclCovMatrixNtuple.param('dspArrayName', 'ECLDspsPureCsI')
-EclCovMatrixNtuple.param('digiArrayName', 'ECLDigitsPureCsI')
-EclCovMatrixNtuple.param('outputFileName', outfile)
-main.add_module(EclCovMatrixNtuple)
-
-add_mdst_output(main, additionalBranches=['ECLDspsPureCsI'])
-progress = register_module('Progress')
-main.add_module(progress)
-
-process(main)
-print(statistics)
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
+print(b2.statistics)

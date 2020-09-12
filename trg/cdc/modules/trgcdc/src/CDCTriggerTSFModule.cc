@@ -60,6 +60,10 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_outerTrueLRTableFilename,
            "Filename for the true left/right table for the outer super layers.",
            string("outerTrueLRTable.dat"));
+  addParam("Deadchannel",
+           m_deadchflag,
+           "Mask dead channels based on database. True:mask False:unmask",
+           false);
 }
 
 void
@@ -98,7 +102,8 @@ CDCTriggerTSFModule::initialize()
   int is = -1;
   int ias = -1;
   int iss = -1;
-  unsigned axialStereoLayerId = 0;
+  /* cppcheck-suppress variableScope */
+  unsigned axialStereoLayerId;
   unsigned axialStereoSuperLayerId = 0;
   unsigned nWires = 0;
   for (unsigned i = 0; i < nLayers; i++) {
@@ -251,6 +256,28 @@ CDCTriggerTSFModule::initialize()
       layer->push_back(ts);
     }
   }
+
+  if (m_deadchflag) {
+    if (!m_db_deadchannel) {
+      B2INFO("No database for CDCTRG dead channel mapping. Channel masking is skipped.");
+      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+        for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
+          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+            deadch_map[i][j][k] = true;
+          }
+        }
+      }
+    } else {
+      for (unsigned int i = 0; i < nSuperLayers; i++) { //SL
+        for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
+          for (unsigned int k = 0; k < MAX_N_SCELLS; k++) { //
+            deadch_map[i][j][k] = m_db_deadchannel->getdeadch(i, j, k);
+          }
+        }
+      }
+    }
+  }
+
 }
 
 void
@@ -264,6 +291,12 @@ CDCTriggerTSFModule::event()
   for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
     // get the wire
     const CDCHit& h = *m_cdcHits[i];
+    // mask dead channel
+    if (m_deadchflag) {
+      if (!deadch_map[h.getISuperLayer()][h.getILayer()][h.getIWire()]) {
+        continue;
+      }
+    }
     TRGCDCWire& w =
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
 
@@ -411,6 +444,7 @@ CDCTriggerTSFModule::terminate()
       outerFile << "\n";
     }
   }
+
 }
 
 void

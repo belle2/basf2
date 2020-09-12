@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef GEOMETRYMANAGER_H
-#define GEOMETRYMANAGER_H
+#pragma once
 
 #include <vector>
 #include <set>
@@ -83,6 +82,7 @@ namespace Belle2 {
        * This function will convert a Gearbox representation of the geometry to
        * an object containing all necessary parameters
        * @param detectorDir GearDir pointing to the top element of the geometry parameters
+       * @param iov Interval of validity for the created object
        */
       GeoConfiguration createGeometryConfig(const GearDir& detectorDir, const IntervalOfValidity& iov);
 
@@ -199,4 +199,3 @@ namespace Belle2 {
   }
 
 } //Belle2 namespace
-#endif //GEOMETRYMANAGER_H

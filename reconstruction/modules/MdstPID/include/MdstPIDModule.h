@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MDSTPIDMODULE
-#define MDSTPIDMODULE
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -24,17 +23,7 @@
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-#include <string>
-
 namespace Belle2 {
-
-  class PIDLikelihood;
-  class TOPLikelihood;
-  class ARICHLikelihood;
-  class CDCDedxLikelihood;
-  class VXDDedxLikelihood;
-  class ECLPidLikelihood;
-  class KLMMuidLikelihood;
 
   /**
    * a module to fill PIDLikelihoods
@@ -136,8 +125,6 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif
 
 
 

@@ -13,9 +13,7 @@
 #ifndef TRGECLFAMFIT_H
 #define TRGECLFAMFIT_H
 
-#include <iostream>
 #include <TObject.h>
-#include <TVector3.h>
 #include "trg/ecl/TrgEclMapping.h"
 #include <trg/ecl/TrgEclDataBase.h>
 

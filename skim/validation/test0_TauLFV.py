@@ -9,6 +9,7 @@
 </header>
 """
 
+from beamparameters import add_beamparameters
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction, add_mdst_output
@@ -24,13 +25,12 @@ main = b2.create_path()
 
 # specify number of events to be generated
 eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [10000])
+eventinfosetter.param('evtNumList', [5000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 main.add_module(eventinfosetter)
 
 # beam parameters
-from beamparameters import add_beamparameters
 beamparameters = add_beamparameters(main, "Y4S")
 
 # generator

@@ -144,6 +144,11 @@ namespace Belle2 {
     Manager::FunctionPtr nROE_NeutralHadrons(const std::vector<std::string>& arguments);
 
     /**
+     * Returns number of V0s in the related RestOfEvent object that pass the selection criteria
+     */
+    Manager::FunctionPtr nROE_Composites(const std::vector<std::string>& arguments);
+
+    /**
      * Returns the number of particles in ROE from the given particle list.
      * Use of variable aliases is advised.
      */
@@ -235,12 +240,6 @@ namespace Belle2 {
     Manager::FunctionPtr WE_MissM2(const std::vector<std::string>& arguments);
 
     /**
-     * Returns the invariant mass squared of the missing momentum calculated
-     * assumings the reco B is at rest and calculating the neutrino ("missing") momentum from p_nu = pB - p_had - p_lep.
-     */
-    double REC_MissM2(const Particle* particle);
-
-    /**
      * Returns the polar angle of the missing momentum.
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
@@ -299,20 +298,6 @@ namespace Belle2 {
      * "WE" was to do with the "direction" of the W boson in semileptonic decays (the lepton-neutrino system).
      */
     Manager::FunctionPtr WE_MissM2OverMissE(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2,
-     * where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell
-     * The B meson momentum in CMS is assumed to be 0.
-     */
-    double REC_q2BhSimple(const Particle* particle);
-
-    /**
-     * Returns the momentum transfer squared, q^2, calculated in CMS as q^2 = (p_B - p_h)^2,
-     * where p_h is the CMS momentum of all hadrons in the decay B -> H_1 ... H_n ell nu_ell
-     * This calculation uses a weighted average of the B meson around the reco B cone
-     */
-    double REC_q2Bh(const Particle* particle);
 
     /**
      * Returns the momentum transfer squared, q^2, calculated in LAB as q^2 = (p_l + p_nu)^2,

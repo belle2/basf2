@@ -26,7 +26,7 @@ REG_MODULE(ROISender)
 //-----------------------------------------------------------------
 
 ROISenderModule::ROISenderModule() :
-  Module(), m_messageQueueNameCstring(NULL)
+  Module(), m_messageQueueNameCstring(nullptr)
 {
   //Set module properties
   setDescription("Send the ROI payload to the external ring buffer");
@@ -49,7 +49,7 @@ ROISenderModule::initialize()
 
   m_messageQueueNameCstring =  m_messageQueueName.c_str();
 
-  bool slashFree = (NULL == strchr(m_messageQueueNameCstring + 1 , '/'));
+  bool slashFree = (nullptr == strchr(m_messageQueueNameCstring + 1 , '/'));
 
   if (! slashFree || m_messageQueueNameCstring[0] != '/')
     B2FATAL(__FILE__ << ":" << __LINE__ <<

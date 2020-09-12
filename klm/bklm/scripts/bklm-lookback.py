@@ -89,7 +89,7 @@ if (options.window[0] < 0) or (options.window[1] < options.window[0]) or (option
     sys.exit()
 window = options.window
 
-inputName = re.sub("HLT.\.f0....", "HLT*.f*", options.infilename)
+inputName = re.sub(r"HLT.\.f0....", "HLT*.f*", options.infilename)
 fileList = glob.glob(inputName)
 if len(fileList) == 0:
     print("No file(s) match {0}".format(inputName))
@@ -122,7 +122,7 @@ main.add_module('ProgressBar')
 
 eventInspector = EventInspectorLookback(exp, run, histName, pdfName, mode, window)
 rawdata.add_unpackers(main, components=['KLM'])
-main.add_module('BKLMReconstructor')
+main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
 process(main)

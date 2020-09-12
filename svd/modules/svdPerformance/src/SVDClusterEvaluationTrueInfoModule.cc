@@ -10,23 +10,18 @@
 
 #include <svd/modules/svdPerformance/SVDClusterEvaluationTrueInfoModule.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDRecoDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
-#include <svd/dataobjects/SVDSimHit.h>
+
+#include <TCanvas.h>
 #include <TFile.h>
+#include <TGraphErrors.h>
 #include <TText.h>
-#include <TH1F.h>
-#include <TH2F.h>
 
 #include <string>
-#include "TMath.h"
-#include <algorithm>
-#include <functional>
 
 
 using namespace Belle2;
@@ -474,7 +469,7 @@ void SVDClusterEvaluationTrueInfoModule::endRun()
   //WRITE HISTOS AND GRAPHS//
   ///////////////////////////
 
-  if (m_outputFile != NULL) {
+  if (m_outputFile != nullptr) {
     m_outputFile->cd();
 
     TDirectory* oldDir = gDirectory;

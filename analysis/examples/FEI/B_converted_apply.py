@@ -1,21 +1,17 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # William Sutcliffe 2019
 
-# To properly read the Belle database the user name is set to g0db
 import os
-os.environ['PGUSER'] = 'g0db'
 
 import fei
 import basf2 as b2
 import modularAnalysis as ma
 
 import b2biiConversion
-import ROOT
-from ROOT import Belle2
 
-
+# To properly read the Belle database the user name is set to g0db
+os.environ['PGUSER'] = 'g0db'
 # Add the necessary database if required by default B2BII should be set up
 # You can use the command b2conditionsdb-recommend also to recommend databases
 # It is possible to chain an additional database with the command below
@@ -30,7 +26,8 @@ b2biiConversion.convertBelleMdstToBelleIIMdst(
         'analysis/mdstBelle1_exp65_charged.root',
         'validation',
         False),
-    applyHadronBJSkim=True,
+    applySkim=True,
+    enableNisKsFinder=False,
     path=path)
 ma.setAnalysisConfigParams({'mcMatchingVersion': 'Belle'}, path)
 

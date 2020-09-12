@@ -9,6 +9,10 @@
 #include "daq/dqm/DqmMemFile.h"
 #include <framework/pcore/MsgHandler.h>
 
+#include <TH1.h>
+#include <TKey.h>
+#include <TText.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -36,6 +40,31 @@ DqmMemFile::DqmMemFile(string name, string mode, int size)
     m_shm->lock();
     m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
     m_shm->unlock();
+    printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
+  } else
+    printf("DqmMemFile : TMemFile is opend in READ mode.\n");
+}
+
+DqmMemFile::DqmMemFile(int shm_id, int sem_id, string mode, int size)
+{
+  // Record parameters
+  m_size = size;
+  if (mode != "write" && mode != "WRITE")
+    m_mode = 0;
+  else
+    m_mode = 1;
+  m_name = "dqm_mem_file";
+  m_memfile = NULL;
+
+  // Allocate memory space for TMemFile
+  m_buf = (char*) new int[size];
+
+  // Allocate shared memory
+  m_shm = new SharedMem(shm_id, sem_id, size);
+
+  // Open TMemFile if write mode selected
+  if (m_mode == 1) {
+    m_memfile = new TMemFile(m_name.c_str(), m_buf, size * sizeof(int), "RECREATE");
     printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
   } else
     printf("DqmMemFile : TMemFile is opend in READ mode.\n");

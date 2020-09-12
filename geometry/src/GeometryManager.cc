@@ -66,7 +66,7 @@ namespace Belle2 {
     {
       G4VoxelLimits dummyLimits;
       double extent{0};
-      for (int i = 0; i < volume->GetNoDaughters(); ++i) {
+      for (size_t i = 0; i < volume->GetNoDaughters(); ++i) {
         G4VPhysicalVolume* daughter = volume->GetDaughter(i);
         G4AffineTransform trans(daughter->GetRotation(), daughter->GetTranslation());
         double vmin{0}, vmax{0};
@@ -314,7 +314,7 @@ namespace Belle2 {
             G4Region* region {nullptr};
             //We loop over all children of the top volume and check whether they
             //have the correct region assigned
-            for (int i = 0; i < top_log->GetNoDaughters(); ++i) {
+            for (size_t i = 0; i < top_log->GetNoDaughters(); ++i) {
               G4LogicalVolume* vol = top_log->GetDaughter(i)->GetLogicalVolume();
               //We only assign a region if there is not already one
               if (!vol->GetRegion()) {

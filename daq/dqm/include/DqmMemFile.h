@@ -14,15 +14,7 @@
 #include <framework/pcore/EvtMessage.h>
 
 #include "TMemFile.h"
-#include "TObject.h"
-#include "TText.h"
-#include "TChain.h"
-#include "TH1.h"
-#include "TTree.h"
-#include "TKey.h"
-#include "TIterator.h"
 #include "TDirectory.h"
-
 
 #define MEMFILESIZE 128000000
 
@@ -32,6 +24,8 @@ namespace Belle2 {
   class DqmMemFile {
   public:
     DqmMemFile(std::string name = "dqmhisto",
+               std::string mode = "readonly", int size = MEMFILESIZE);
+    DqmMemFile(int shm_id, int sem_id,
                std::string mode = "readonly", int size = MEMFILESIZE);
     ~DqmMemFile();
 

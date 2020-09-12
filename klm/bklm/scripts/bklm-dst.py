@@ -115,7 +115,7 @@ inputName = ''
 exp = ''
 run = ''
 if options.infilename != '':
-    inputName = re.sub("HLT.\.f0....", "HLT*.f*", options.infilename)
+    inputName = re.sub(r"HLT.\.f0....", "HLT*.f*", options.infilename)
     fileList = glob.glob(inputName)
     if len(fileList) == 0:
         print("No file(s) match {0}".format(inputName))
@@ -181,7 +181,7 @@ main.add_module('ProgressBar')
 eventInspector = EventInspector(exp, run, histName, pdfName, eventPdfName, verbosity,
                                 maxDisplays, minRPCHits, legacyTimes, singleEntry, view)
 rawdata.add_unpackers(main, components=['KLM'])
-main.add_module('BKLMReconstructor')
+main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
 process(main, max_event=maxCount)

@@ -14,12 +14,10 @@ cluster = [
     'clusterHasPulseShapeDiscrimination',
     'clusterNumberOfHadronDigits',
     'clusterDeltaLTemp',
-    'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
     'nECLClusterTrackMatches',
     'clusterZernikeMVA',
     'clusterReg',
-    'weightedAverageECLTime',
     'clusterAbsZernikeMoment40',
     'clusterAbsZernikeMoment51',
     'clusterBelleQuality',
@@ -47,6 +45,10 @@ cluster = [
     'clusterTiming',
     'clusterTrackMatch',
     'goodBelleGamma',
+]
+
+#: Cluster-related event variables
+event_level_cluster = [
     'nECLOutOfTimeCrystals',
     'nECLOutOfTimeCrystalsBWDEndcap',
     'nECLOutOfTimeCrystalsBarrel',
@@ -55,6 +57,12 @@ cluster = [
     'nRejectedECLShowersBWDEndcap',
     'nRejectedECLShowersBarrel',
     'nRejectedECLShowersFWDEndcap',
+]
+
+#: Cluster averages
+cluster_average = [
+    'maxWeightedDistanceFromAverageECLTime',
+    'weightedAverageECLTime'
 ]
 
 #: KLM cluster information
@@ -105,9 +113,9 @@ mc_variables = [
     'genMotherPDG',
     'genParticleID',
     'isCloneTrack',
-    'mcX',
-    'mcY',
-    'mcZ',
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
     'mcDecayTime',
     'mcE',
     'mcErrors',
@@ -124,14 +132,30 @@ mc_variables = [
 ]
 
 #: PID variables
-pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'deuteronID']
+pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'deuteronID',
+       'binaryPID(211, 13)', 'binaryPID(211, 321)', 'binaryPID(211, 2212)', 'binaryPID(321, 2212)']
 
 #: Replacement for ROEMultiplicities tool
-roe_multiplicities = ['nROE_KLMClusters']
+roe_multiplicities = [
+    'nROE_Charged()',
+    'nROE_Photons()',
+    'nROE_NeutralHadrons()'
+]
 
-#: Recoil kinematics relaed variables
+#: Rest-Of-Event kinematics
+roe_kinematics = [
+    'roeE()',
+    'roeM()',
+    'roeP()',
+    'roeMbc()',
+    'roeDeltae()'
+]
+
+#: Recoil kinematics related variables
 recoil_kinematics = [
     'pRecoil',
+    'eRecoil',
+    'mRecoil',
     'pRecoilPhi',
     'pRecoilTheta',
     'pxRecoil',
@@ -177,14 +201,14 @@ vertex = [
 
 #: Replacement for MCVertex tuple tool
 mc_vertex = [
-    'mcX',
-    'mcY',
-    'mcZ',
-    'mcDistance',
-    'mcRho',
-    'mcProdVertexX',
-    'mcProdVertexY',
-    'mcProdVertexZ'
+    'mcDecayVertexX',
+    'mcDecayVertexY',
+    'mcDecayVertexZ',
+    'mcDecayVertexFromIPDistance',
+    'mcDecayVertexRho',
+    'mcProductionVertexX',
+    'mcProductionVertexY',
+    'mcProductionVertexZ'
 ]
 
 #: CPV and Tag-side related variables
@@ -213,9 +237,11 @@ tag_vertex = [
 
 #: Tag-side  related MC true variables
 mc_tag_vertex = [
-    'MCDeltaT',
-    'TagVmcLBoost',
-    'TagVmcOBoost',
+    'mcDeltaTau',
+    'mcDeltaT',
+    'mcDeltaBoost',
+    'mcTagVLBoost',
+    'mcTagVOBoost',
     'mcLBoost',
     'mcOBoost',
     'mcTagVx',
@@ -282,6 +308,43 @@ event_shape = [
     "aplanarity",
     "thrust",
     "thrustAxisCosTheta",
+]
+
+#: Variables created by event kinematics module
+event_kinematics = [
+    "missingMomentumOfEvent",
+    "missingMomentumOfEvent_Px",
+    "missingMomentumOfEvent_Py",
+    "missingMomentumOfEvent_Pz",
+    "missingMomentumOfEvent_theta",
+    "missingMomentumOfEventCMS",
+    "missingMomentumOfEventCMS_Px",
+    "missingMomentumOfEventCMS_Py",
+    "missingMomentumOfEventCMS_Pz",
+    "missingMomentumOfEventCMS_theta",
+    "missingEnergyOfEventCMS",
+    "missingMass2OfEvent",
+    "visibleEnergyOfEventCMS",
+    "totalPhotonsEnergyOfEvent"
+]
+
+#: Variables created by MC version of event kinematics module
+mc_event_kinematics = [
+    'genMissingMass2OfEvent',
+    'genMissingEnergyOfEventCMS',
+    'genMissingMomentumOfEventCMS',
+    'genTotalPhotonsEnergyOfEvent',
+    'genVisibleEnergyOfEventCMS'
+]
+
+#: Belle Track CDC hit variables
+belle_track_hit = [
+    "BelleFirstCDCHitX",
+    "BelleFirstCDCHitY",
+    "BelleFirstCDCHitZ",
+    "BelleLastCDCHitX",
+    "BelleLastCDCHitY",
+    "BelleLastCDCHitZ"
 ]
 
 # now register all the variables declared in this file as collections

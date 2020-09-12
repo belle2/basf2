@@ -1,0 +1,16 @@
+Import('env')
+
+# Mark this folder as a sub library
+env.Dictionary()['SUBLIB'] = True
+
+env['LIBS'] = ['tracking_dataobjects',
+	       'cdc_dataobjects',
+	       'framework',
+	       'genfit2',
+	       'mdst_dataobjects',
+	       'pxd_dataobjects',
+	       'svd_dataobjects',
+	       'vxd'
+	      ]
+
+Return('env')

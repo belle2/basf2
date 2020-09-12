@@ -21,19 +21,10 @@ class G4MagneticField;
 class G4Mag_UsualEqRhs;
 class G4MagIntegratorStepper;
 class G4ChordFinder;
-class G4VUserPrimaryGeneratorAction;
 class G4VisManager;
 class G4StepLimiter;
 
 namespace Belle2 {
-
-  namespace Simulation {
-    class PhysicsList;
-    class EventAction;
-    class TrackingAction;
-    class SteppingAction;
-    class StackingAction;
-  }
 
   /** The full Geant4 simulation module.
    *
@@ -136,6 +127,9 @@ namespace Belle2 {
 
     int m_trajectoryStore;                 /**< If true, store the trajectories of all primary particles */
     double m_trajectoryDistanceTolerance;  /**< Maximum distance to actuall trajectory when merging points */
+    std::vector<float> m_absorbers;        /**< The absorbers defined at given radii where tracks across them will be destroyed.
+                                                This set is used in the PXD only simulation for PXD gain calibration.*/
+
 
 
   private:

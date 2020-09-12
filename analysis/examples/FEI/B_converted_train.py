@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Example which can be used to train the FEI
 
 # William Sutcliffe 2019
 
-# To properly read the Belle database the user name is set to g0db
 import os
-os.environ['PGUSER'] = 'g0db'
 
 import basf2 as b2
 import modularAnalysis as ma
 
 import b2biiConversion
-import ROOT
-from ROOT import Belle2
 
 import fei
 
+# To properly read the Belle database the user name is set to g0db
+os.environ['PGUSER'] = 'g0db'
 # Get FEI default channels for Belle conversion
 # Utilise the arguments to toggle on and off certain channels
 particles = fei.get_default_channels(convertedFromBelle=True)
@@ -38,7 +35,8 @@ if feistate.stage <= 0:
             'analysis/mdstBelle1_exp65_charged.root',
             'validation',
             False),
-        applyHadronBJSkim=True,
+        applySkim=True,
+        enableNisKsFinder=False,
         path=path)
 else:
     ma.inputMdstList('Belle', [], path)

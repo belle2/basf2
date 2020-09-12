@@ -75,7 +75,7 @@ std::string LogMessage::toJSON(bool complete) const
   if (logInfo & LogConfig::c_Message) {
     buffer << R"(,"message":")" << create_escapes(m_message.getMessage()) << '"';
     const auto& vars = m_message.getVariables();
-    if (vars.size() > 0 or complete) {
+    if ((vars.size() > 0 or complete) and !(logInfo & LogConfig::c_NoVariables)) {
       buffer << ",\"variables\":{";
       bool first{true};
       for (const auto& v : vars) {
@@ -127,7 +127,7 @@ std::ostream& LogMessage::print(std::ostream& out) const
     out << "(" << ProcHandler::EvtProcID() << ") ";
   }
   if (logInfo & LogConfig::c_Message) {
-    out << m_message.str();
+    out << m_message.str(!(logInfo & LogConfig::c_NoVariables));
   }
   // if there is no module or package or similar there's no need to print them
   if (m_module.empty()) logInfo &= ~LogConfig::c_Module;
@@ -167,19 +167,4 @@ std::ostream& LogMessage::print(std::ostream& out) const
 ostream& operator<< (ostream& out, const LogMessage& logMessage)
 {
   return logMessage.print(out);
-}
-
-namespace Belle2 {
-  size_t hash(const LogMessage& msg)
-  {
-    return (
-             std::hash<std::string>()(msg.m_message.str())
-             ^ std::hash<std::string>()(msg.m_module)
-             ^ std::hash<std::string>()(msg.m_package)
-             ^ std::hash<std::string>()(msg.m_function)
-             ^ std::hash<std::string>()(msg.m_file)
-             ^ msg.m_line
-             ^ msg.m_logLevel
-           );
-  }
 }

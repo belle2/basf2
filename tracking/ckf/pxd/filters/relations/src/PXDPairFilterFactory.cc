@@ -3,13 +3,14 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Nils Braun                                               *
+ * Contributors: Nils Braun, Christian Wessel                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/PXDPairFilterFactory.h>
-#include <tracking/ckf/pxd/filters/relations/SectorPXDPairFilter.h>
+#include <tracking/ckf/pxd/filters/relations/SensorPXDPairFilter.h>
 #include <tracking/ckf/pxd/filters/relations/DistancePXDPairFilter.h>
+#include <tracking/ckf/pxd/filters/relations/LoosePXDPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -34,7 +35,7 @@ std::string PXDPairFilterFactory::getIdentifier() const
 
 std::string PXDPairFilterFactory::getFilterPurpose() const
 {
-  return "Reject pxd pairs. ";
+  return "Reject PXD state pairs. ";
 }
 
 std::map<std::string, std::string> PXDPairFilterFactory::getValidFilterNamesAndDescriptions() const
@@ -44,6 +45,7 @@ std::map<std::string, std::string> PXDPairFilterFactory::getValidFilterNamesAndD
     {"none", "no combination is valid"},
     {"sensor", "use sensor/ladder information"},
     {"distance", "based on the position distance"},
+    {"loose", "loose prefilter"},
   };
 }
 
@@ -59,11 +61,15 @@ PXDPairFilterFactory::create(const std::string& filterName) const
   }
 
   if (filterName == "sensor") {
-    return std::make_unique<SectorPXDPairFilter>();
+    return std::make_unique<SensorPXDPairFilter>();
   }
 
   if (filterName == "distance") {
     return std::make_unique<DistancePXDPairFilter>();
+  }
+
+  if (filterName == "loose") {
+    return std::make_unique<LoosePXDPairFilter>();
   }
 
   return Super::create(filterName);

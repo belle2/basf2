@@ -8,28 +8,16 @@
 // Date : 27 - Jul - 2010
 //-
 
-
 #include <framework/core/Module.h>
 #include <daq/dataflow/EvtSocket.h>
 
-#include <framework/core/Environment.h>
-#include <framework/pcore/ProcHandler.h>
-#include <framework/pcore/RbTuple.h>
 #include <framework/pcore/MsgHandler.h>
-#include <framework/pcore/EvtMessage.h>
 
-#include "TChain.h"
-#include "TFile.h"
 #include "TH1.h"
-#include "TTree.h"
-#include "TKey.h"
-#include "TIterator.h"
 #include "TDirectory.h"
 
 #include <string>
-#include <iostream>
 #include <time.h>
-
 
 #define DQM_SOCKET 9899
 

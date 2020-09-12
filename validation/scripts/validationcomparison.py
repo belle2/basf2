@@ -64,12 +64,16 @@ class TooFewBins(Exception):
 # ==============================================================================
 
 
-def get_comparison(object_1, object_2, mop):
+def get_comparison(
+        object_1,
+        object_2,
+        mop: Optional[MetaOptionParser]
+) -> "ComparisonBase":
     """ Uses the metaoptions to determine which comparison algorithm is used
     and initializes the corresponding subclass of :class:`ComparisonBase` that
     implements the actual comparison and holds the results.
-    @param object_1
-    @param object_2
+    @param object_1 ROOT TObject
+    @param object_2 ROOT TObject
     @param mop Metaoption parser
     """
     if mop.has_option("kolmogorov"):

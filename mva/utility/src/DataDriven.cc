@@ -176,7 +176,7 @@ namespace Belle2 {
     }
 
 
-    std::vector<float> getSPlotWeights(Dataset& dataset, Binning& binning)
+    std::vector<float> getSPlotWeights(Dataset& dataset, const Binning& binning)
     {
       // TODO
       // Instead of calculating the covariance matrix directly one could do an actual fit here,
@@ -222,7 +222,7 @@ namespace Belle2 {
 
     }
 
-    std::vector<float> getBoostWeights(Dataset& dataset, Binning& binning)
+    std::vector<float> getBoostWeights(Dataset& dataset, const Binning& binning)
     {
 
       std::vector<float> boost_weights;
@@ -237,7 +237,7 @@ namespace Belle2 {
 
     }
 
-    std::vector<float> getAPlotWeights(Dataset& dataset, Binning& binning, const std::vector<float>& boost_predictions)
+    std::vector<float> getAPlotWeights(Dataset& dataset, const Binning& binning, const std::vector<float>& boost_predictions)
     {
 
       std::vector<float> splot_weights = getSPlotWeights(dataset, binning);

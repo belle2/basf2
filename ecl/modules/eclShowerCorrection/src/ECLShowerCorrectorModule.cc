@@ -6,7 +6,7 @@
  * longitudinal leakage): corr = raw * correctionfactor.                  *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
+ * Contributors: Torben Ferber (torben.ferber@desy.de) (TF)               *
  *               Alon Hershenhorn (hershen@physics.ubc.ca) (AH)           *
  *               Suman Koirala (Suman Koirala <suman@ntu.edu.tw>) (SK)    *
  *                                                                        *
@@ -355,7 +355,7 @@ double ECLShowerCorrectorModule::getLeakageCorrectionTemporary(const double thet
   // correctedEnergy = (rawEnergy + corr_theta_geo+corr_phi_geo ) *corr_theta_en*corr_phi_en
   // to use "corr" as multiplicative factor in ECLShowerCorrectorModule::event,
   // the following form should be returned
-  const double corr = (1 + (corr_theta_geo + corr_phi_geo) / energy) * corr_theta_en * corr_phi_en;
+  const double corr = (1 + (corr_theta_geo + corr_phi_geo) / energy_clip) * corr_theta_en * corr_phi_en;
 
   B2DEBUG(28, "Geometrical correction factors: corr_theta_geo=" << corr_theta_geo << ", corr_phi_geo=" << corr_phi_geo);
   B2DEBUG(28, "Energy correction factors:  corr_theta_en=" << corr_theta_en << ", corr_phi_en=" << corr_phi_en);

@@ -32,8 +32,6 @@
 
 #include <cmath>
 
-#include <boost/lexical_cast.hpp>
-
 
 namespace Belle2 {
   namespace Variable {
@@ -189,9 +187,8 @@ namespace Belle2 {
         int coneNumber = 0;
         try {
           coneNumber = Belle2::convertString<int>(arguments[0]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The first argument of the CleoCones meta function must be an integer!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("The first argument of the CleoConeCS meta function must be an integer!");
         }
 
         bool useROE = false;
@@ -221,32 +218,36 @@ namespace Belle2 {
     Manager::FunctionPtr transformedNetworkOutput(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        // have to tell cppcheck that these lines are fine, because it doesn't
-        // support the lambda function syntax and throws a (wrong) variableScope
-
-        // cppcheck-suppress variableScope
         double low = 0;
         double high = 0;
         try {
           low  = Belle2::convertString<double>(arguments[1]);
           high = Belle2::convertString<double>(arguments[2]);
-        } catch (boost::bad_lexical_cast&) {
-          B2WARNING("Second and third argument of transformedNetworkOutput meta function must be doubles!");
-          return nullptr;
+        } catch (std::invalid_argument&) {
+          B2FATAL("Second and third argument of transformedNetworkOutput meta function must be doubles!");
         }
+
         auto extraInfoName = arguments[0];
         auto func = [extraInfoName, low, high](const Particle * particle) -> double {
           if (particle == nullptr)
           {
             StoreObjPtr<EventExtraInfo> eventExtraInfo;
-            return eventExtraInfo->getExtraInfo(extraInfoName);
+            if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
+              return eventExtraInfo->getExtraInfo(extraInfoName);
+            } else {
+              return std::numeric_limits<double>::quiet_NaN();
+            }
           }
-          return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
+          if (particle->hasExtraInfo(extraInfoName))
+          {
+            return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
+          } else {
+            return std::numeric_limits<double>::quiet_NaN();
+          }
         };
         return func;
       } else {
-        B2WARNING("Wrong number of arguments for meta function transformedNetworkOutput");
-        return nullptr;
+        B2FATAL("Wrong number of arguments for meta function transformedNetworkOutput");
       }
     }
 
@@ -298,21 +299,21 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Continuum Suppression");
-    REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "Event-Level Reduced Fox-Wolfram moment R2");
+    REGISTER_VARIABLE("R2EventLevel", R2EventLevel, "[Eventbased] Event-Level Reduced Fox-Wolfram moment R2");
     REGISTER_VARIABLE("R2"          , R2          , "Reduced Fox-Wolfram moment R2");
     REGISTER_VARIABLE("thrustBm"    , thrustBm    , "Magnitude of the signal B thrust axis");
     REGISTER_VARIABLE("thrustOm"    , thrustOm    , "Magnitude of the ROE thrust axis");
     REGISTER_VARIABLE("cosTBTO"     , cosTBTO     , "Cosine of angle between thrust axis of the signal B and thrust axis of ROE");
     REGISTER_VARIABLE("cosTBz"      , cosTBz      , "Cosine of angle between thrust axis of the signal B and z-axis");
     REGISTER_VARIABLE("KSFWVariables(variable,string)", KSFWVariables,
-                      "Returns variable et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If string is set to FS1, the KSFW moment calculated from the B final state daughters is returned.");
+                      "Returns variable et, mm2, or one of the 16 KSFW moments. If only the variable is specified, the KSFW moment calculated from the B primary daughters is returned. If string is set to ``FS1``, the KSFW moment calculated from the B final state daughters is returned.");
     REGISTER_VARIABLE("CleoConeCS(integer,string)", CleoConesCS,
                       "Returns i-th cleo cones from the continuum suppression. If only the variable is specified, the CleoCones are calculated from all final state particles. If string is set to 'ROE', the CleoCones are calculated only from ROE particles.\n"
                       "Useful for ContinuumSuppression.\n"
                       "Given particle needs a related ContinuumSuppression object (built using the ContinuumSuppressionBuilder).\n"
-                      "Returns -999 if particle is nullptr or if particle has no related ContinuumSuppression object.");
+                      "Returns NaN if particle has no related ContinuumSuppression object.");
     REGISTER_VARIABLE("transformedNetworkOutput(name, low, high)", transformedNetworkOutput,
-                      "Transforms the network output C->C' via: C'=log((C-low)/(high-C))");
+                      "Transforms the network output :math:`C\\to C`' via: :math:`C'=\\operatorname{log}((C-\\mathrm{low})/(\\mathrm{high}-C))`");
     REGISTER_VARIABLE("useBThrustFrame(variable, mode)", useBThrustFrame,
                       "Returns the variable in respect to rotated coordinates, in which z lies on the specified thrust axis.\n"
                       "If mode is set to Signal it will use the thrust axis of the reconstructed B candidate, if mode is set to ROE it will use the ROE thrust axis.\n"

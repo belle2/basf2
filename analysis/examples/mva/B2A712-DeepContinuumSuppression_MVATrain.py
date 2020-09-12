@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -10,7 +9,7 @@
 # a mixture of reconstructed Bd->KsPi0 and qqbqr MC. The apply datasets are
 # pure signal and qqbar for running the expert as explained below.
 # The actual training model is described in B2A714.
-# Also have a look at https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+# Also have a look at the Continuum suppression section at https://software.belle2.org
 # The techniques are described in more detail in http://ekp-invenio.physik.uni-karlsruhe.de/record/48934
 #
 # Usage:

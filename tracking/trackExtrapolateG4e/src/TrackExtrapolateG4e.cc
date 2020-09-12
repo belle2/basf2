@@ -13,21 +13,19 @@
 
 /* Belle 2 headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/logging/Logger.h>
 #include <genfit/Exception.h>
-#include <klm/bklm/dataobjects/BKLMStatus.h>
+#include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMMuidHit.h>
-#include <klm/eklm/dataobjects/EKLMElementNumbers.h>
-#include <klm/eklm/geometry/GeometryData.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/muid/MuidBuilder.h>
+#include <klm/muid/MuidElementNumbers.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
@@ -61,7 +59,6 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <vector>
 
 #define TWOPI (2.0*M_PI)
 #define PI_8 (0.125*M_PI)
@@ -113,19 +110,6 @@ TrackExtrapolateG4e::TrackExtrapolateG4e() :
   m_OutermostActiveForwardEndcapLayer(0), // initialized later
   m_OutermostActiveBackwardEndcapLayer(0), // initialized later
   m_EndcapScintVariance(0.0), // initialized later
-  m_ExpNo(0), // modified later
-  m_MuonPlusPar(nullptr), // modified later
-  m_MuonMinusPar(nullptr), // modified later
-  m_PionPlusPar(nullptr), // modified later
-  m_PionMinusPar(nullptr), // modified later
-  m_KaonPlusPar(nullptr), // modified later
-  m_KaonMinusPar(nullptr), // modified later
-  m_ProtonPar(nullptr), // modified later
-  m_AntiprotonPar(nullptr), // modified later
-  m_DeuteronPar(nullptr), // modified later
-  m_AntideuteronPar(nullptr), // modified later
-  m_ElectronPar(nullptr), // modified later
-  m_PositronPar(nullptr), // modified later
   m_eklmTransformData(nullptr) // initialized later
 {
   for (int j = 0; j < BKLMElementNumbers::getMaximalLayerNumber() + 1; ++j) {
@@ -156,6 +140,7 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
   m_ExtInitialized = true;
 
   // Define required objects, register the new ones and relations
+  m_recoTracks.isRequired();
   m_tracks.isRequired();
   m_extHits.registerInDataStore();
   m_tracks.registerRelationTo(m_extHits);
@@ -179,16 +164,26 @@ void TrackExtrapolateG4e::initialize(double minPt, double minKE,
 
   // Set up the EXT-specific geometry (might have already been done by MUID)
   if (m_TargetExt == nullptr) {
-    GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
+    if (!m_COILGeometryPar.isValid())
+      B2FATAL("Coil geometry data are not available.");
+    double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+    double rMinCoil = m_COILGeometryPar->getCryoRmin();
+    double halfLength = m_COILGeometryPar->getCryoLength();
+    m_COILGeometryPar.addCallback([this, &offsetZ, &rMinCoil, &halfLength]() {
+      offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+      rMinCoil = m_COILGeometryPar->getCryoRmin();
+      halfLength = m_COILGeometryPar->getCryoLength();
+    });
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-    GearDir beampipeContent = GearDir("/Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
-    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
   }
+  if (!m_BeamPipeGeo.isValid())
+    B2FATAL("Beam pipe geometry data are not available.");
+  double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
+  m_BeamPipeGeo.addCallback([this, &beampipeRadius]() {
+    beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm;
+  });
+  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 }
 
 // Initialize for MUID
@@ -250,15 +245,26 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
 
   // Set up the EXT-specific geometry (might have already been done by EXT)
   if (m_TargetExt == nullptr) {
-    GearDir coilContent = GearDir("/Detector/DetectorComponent[@name=\"COIL\"]/Content/");
-    double offsetZ = coilContent.getLength("OffsetZ") * CLHEP::cm;
-    double rMaxCoil = coilContent.getLength("Cryostat/Rmin") * CLHEP::cm;
-    double halfLength = coilContent.getLength("Cryostat/HalfLength") * CLHEP::cm;
-    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMaxCoil, offsetZ - halfLength, offsetZ + halfLength);
-    GearDir beampipeContent = GearDir("/Detector/DetectorComponent[@name=\"BeamPipe\"]/Content/");
-    double beampipeRadius = beampipeContent.getLength("Lv2OutBe/R2", 1.20) * CLHEP::cm; // mm
-    m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
+    if (!m_COILGeometryPar.isValid())
+      B2FATAL("Coil geometry data are not available.");
+    double offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+    double rMinCoil = m_COILGeometryPar->getCryoRmin();
+    double halfLength = m_COILGeometryPar->getCryoLength();
+    m_COILGeometryPar.addCallback([this, &offsetZ, &rMinCoil, &halfLength]() {
+      offsetZ = m_COILGeometryPar->getGlobalOffsetZ();
+      rMinCoil = m_COILGeometryPar->getCryoRmin();
+      halfLength = m_COILGeometryPar->getCryoLength();
+    });
+    m_TargetExt = new Simulation::ExtCylSurfaceTarget(rMinCoil, offsetZ - halfLength, offsetZ + halfLength);
+    G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
   }
+  if (!m_BeamPipeGeo.isValid())
+    B2FATAL("Beam pipe geometry data are not available.");
+  double beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm; // mm
+  m_BeamPipeGeo.addCallback([this, &beampipeRadius]() {
+    beampipeRadius = m_BeamPipeGeo->getParameter("Lv2OutBe.R2") * CLHEP::cm;
+  });
+  m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 
   // Set up the MUID-specific geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
@@ -330,44 +336,25 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
 
 void TrackExtrapolateG4e::beginRun(bool byMuid)
 {
-  StoreObjPtr<EventMetaData> evtMetaData;
-  int expNo = evtMetaData->getExperiment();
-  B2DEBUG(20, (byMuid ? "muid" : "ext") << ": Experiment " << expNo << "  run " << evtMetaData->getRun());
+  B2DEBUG(20, (byMuid ? "muid" : "ext"));
   if (byMuid) {
     if (!m_klmChannelStatus.isValid())
       B2FATAL("KLM channel status data are not available.");
     if (!m_klmStripEfficiency.isValid())
       B2FATAL("KLM strip efficiency data are not available.");
-    if (!m_muidParameters.isValid())
-      B2FATAL("Muid parameters are not available.");
-    if (m_MuonPlusPar != nullptr) {
-      if (m_ExpNo == expNo) { return; }
-      delete m_MuonPlusPar;
-      delete m_MuonMinusPar;
-      delete m_PionPlusPar;
-      delete m_PionMinusPar;
-      delete m_KaonPlusPar;
-      delete m_KaonMinusPar;
-      delete m_ProtonPar;
-      delete m_AntiprotonPar;
-      delete m_DeuteronPar;
-      delete m_AntideuteronPar;
-      delete m_ElectronPar;
-      delete m_PositronPar;
+    if (!m_klmLikelihoodParameters.isValid())
+      B2FATAL("KLM likelihood parameters are not available.");
+    std::vector<int> muidPdgCodes = MuidElementNumbers::getPDGVector();
+    if (!m_MuidBuilderMap.empty()) {
+      if (m_klmLikelihoodParameters.hasChanged()) { /* Clear m_MuidBuilderMap if KLMLikelihoodParameters payload changed. */
+        for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
+          delete muidBuilder;
+        m_MuidBuilderMap.clear();
+      } else /* Return if m_MuidBuilderMap is already initialized. */
+        return;
     }
-    m_ExpNo = expNo;
-    m_MuonPlusPar = new MuidBuilder(expNo, "MuonPlus");
-    m_MuonMinusPar = new MuidBuilder(expNo, "MuonMinus");
-    m_PionPlusPar = new MuidBuilder(expNo, "PionPlus");
-    m_PionMinusPar = new MuidBuilder(expNo, "PionMinus");
-    m_KaonPlusPar = new MuidBuilder(expNo, "KaonPlus");
-    m_KaonMinusPar = new MuidBuilder(expNo, "KaonMinus");
-    m_ProtonPar = new MuidBuilder(expNo, "Proton");
-    m_AntiprotonPar = new MuidBuilder(expNo, "Antiproton");
-    m_DeuteronPar = new MuidBuilder(expNo, "Deuteron");
-    m_AntideuteronPar = new MuidBuilder(expNo, "Antideuteron");
-    m_ElectronPar = new MuidBuilder(expNo, "Electron");
-    m_PositronPar = new MuidBuilder(expNo, "Positron");
+    for (int pdg : muidPdgCodes)
+      m_MuidBuilderMap.insert(std::pair<int, MuidBuilder*>(pdg, new MuidBuilder(pdg)));
   }
 }
 
@@ -435,18 +422,8 @@ void TrackExtrapolateG4e::terminate(bool byMuid)
   if (m_DefaultHypotheses != nullptr) { delete m_DefaultHypotheses; }
   if (byMuid) {
     delete m_TargetMuid;
-    delete m_MuonPlusPar;
-    delete m_MuonMinusPar;
-    delete m_PionPlusPar;
-    delete m_PionMinusPar;
-    delete m_KaonPlusPar;
-    delete m_KaonMinusPar;
-    delete m_ProtonPar;
-    delete m_AntiprotonPar;
-    delete m_DeuteronPar;
-    delete m_AntideuteronPar;
-    delete m_ElectronPar;
-    delete m_PositronPar;
+    for (auto const& [pdg, muidBuilder] : m_MuidBuilderMap)
+      delete muidBuilder;
   }
   if (m_TargetExt != nullptr) {
     delete m_TargetExt;
@@ -585,7 +562,8 @@ void TrackExtrapolateG4e::swim(ExtState& extState, G4ErrorFreeTrajState& g4eStat
   if (klmClusterInfo != nullptr) {
     klmHit.resize(klmClusterInfo->size()); // initialize each to huge distance
   }
-  KLMMuidLikelihood* klmMuidLikelihood = m_klmMuidLikelihoods.appendNew(extState.pdgCode); // rest of this object will be filled later
+  KLMMuidLikelihood* klmMuidLikelihood = m_klmMuidLikelihoods.appendNew(); // rest of this object will be filled later
+  klmMuidLikelihood->setPDGCode(extState.pdgCode);
   if (extState.track != nullptr) { extState.track->addRelationTo(klmMuidLikelihood); }
   G4ErrorMode propagationMode = (extState.isCosmic ? G4ErrorMode_PropBackwards : G4ErrorMode_PropForwards);
   m_ExtMgr->InitTrackPropagation(propagationMode);
@@ -980,7 +958,7 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
       return;
     case VOLTYPE_EKLM:
       detID = Const::EDetector::EKLM;
-      copyID = EKLM::GeometryData::Instance().stripNumber(
+      copyID = EKLMElementNumbers::Instance().stripNumber(
                  touch->GetVolume(7)->GetCopyNo(),
                  touch->GetVolume(6)->GetCopyNo(),
                  touch->GetVolume(5)->GetCopyNo(),
@@ -1003,6 +981,12 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
     return extState;
   }
   const genfit::AbsTrackRep* trackRep = recoTrack->getCardinalRepresentation();
+  // check for a valid track fit
+  if (!recoTrack->wasFitSuccessful(trackRep)) {
+    B2WARNING("RecoTrack fit failed for cardinal representation: skipping extrapolation for this track.");
+    extState.pdgCode = 0; // prevent start of extrapolation in swim()
+    return extState;
+  }
   int charge = int(trackRep->getPDGCharge());
   if (charge != 0) {
     extState.pdgCode *= charge;
@@ -1815,17 +1799,12 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
 
 void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihood* klmMuidLikelihood, bool isForward)
 {
-
-  // Done with this track: compute likelihoods and fill the muid object
-
-  int lastExtLayer(extState.lastBarrelExtLayer + extState.lastEndcapExtLayer + 1);
-  // outcome: 0=didn't reach KLM, 1=barrel stop, 2=endcap stop, 3=barrel exit, 4=endcap exit
-  int outcome(0);
-  if ((extState.lastBarrelExtLayer >= 0) || (extState.lastEndcapExtLayer >= 0)) {
-    outcome = ((extState.lastEndcapExtLayer < 0) ? 1 : 2) + (extState.escaped ? 2 : 0);
-  }
-
+  /* Done with this track: compute KLM likelihoods and fill the relative dataobject. */
+  int lastExtLayer = extState.lastBarrelExtLayer + extState.lastEndcapExtLayer + 1;
+  unsigned int outcome = MuidElementNumbers::calculateExtrapolationOutcome(isForward, extState.escaped, extState.lastBarrelExtLayer,
+                         extState.lastEndcapExtLayer);
   klmMuidLikelihood->setOutcome(outcome);
+  klmMuidLikelihood->setIsForward(isForward);
   klmMuidLikelihood->setBarrelExtLayer(extState.lastBarrelExtLayer);
   klmMuidLikelihood->setEndcapExtLayer(extState.lastEndcapExtLayer);
   klmMuidLikelihood->setBarrelHitLayer(extState.lastBarrelHitLayer);
@@ -1838,73 +1817,28 @@ void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihoo
   klmMuidLikelihood->setDegreesOfFreedom(extState.nPoint);
   klmMuidLikelihood->setExtLayerPattern(extState.extLayerPattern);
   klmMuidLikelihood->setHitLayerPattern(extState.hitLayerPattern);
-
-// Do likelihood calculation
-
-  double junk = 0.0;
-  double muon = 0.0;
-  double pion = 0.0;
-  double kaon = 0.0;
-  double proton = 0.0;
-  double deuteron = 0.0;
-  double electron = 0.0;
-  double logL_mu = -1.0E20;
-  double logL_pi = -1.0E20;
-  double logL_K = -1.0E20;
-  double logL_p = -1.0E20;
-  double logL_d = -1.0E20;
-  double logL_e = -1.0E20;
-  if (outcome != 0) { // extrapolation reached KLM sensitive volume
-    int charge = (klmMuidLikelihood->getPDGCode() > 0);
-    if ((abs(klmMuidLikelihood->getPDGCode()) == Const::muon.getPDGCode()) ||
-        (abs(klmMuidLikelihood->getPDGCode()) == Const::electron.getPDGCode())) charge = -charge;
-    if (charge > 0) {
-      muon = m_MuonPlusPar->getPDF(klmMuidLikelihood, isForward);
-      pion = m_PionPlusPar->getPDF(klmMuidLikelihood, isForward);
-      kaon = m_KaonPlusPar->getPDF(klmMuidLikelihood, isForward);
-      proton = m_ProtonPar->getPDF(klmMuidLikelihood, isForward);
-      deuteron = m_DeuteronPar->getPDF(klmMuidLikelihood, isForward);
-      electron = m_PositronPar->getPDF(klmMuidLikelihood, isForward);
-    } else {
-      muon = m_MuonMinusPar->getPDF(klmMuidLikelihood, isForward);
-      pion = m_PionMinusPar->getPDF(klmMuidLikelihood, isForward);
-      kaon = m_KaonMinusPar->getPDF(klmMuidLikelihood, isForward);
-      proton = m_AntiprotonPar->getPDF(klmMuidLikelihood, isForward);
-      deuteron = m_AntideuteronPar->getPDF(klmMuidLikelihood, isForward);
-      electron = m_ElectronPar->getPDF(klmMuidLikelihood, isForward);
+  /* Do KLM likelihood calculation. */
+  if (outcome != MuidElementNumbers::c_NotReached) { /* Extrapolation reached KLM sensitive volume. */
+    double denom = 0.0;
+    int charge = klmMuidLikelihood->getCharge();
+    std::vector<int> signedPdgVector = MuidElementNumbers::getPDGVector(charge);
+    std::map<int, double> mapPdgPDF;
+    for (int pdg : signedPdgVector) {
+      auto search = m_MuidBuilderMap.find(pdg);
+      if (search == m_MuidBuilderMap.end())
+        B2FATAL("Something went wrong: PDF for PDG code " << pdg << " not found!");
+      double pdf = (search->second)->getPDF(klmMuidLikelihood);
+      denom += pdf;
+      mapPdgPDF.insert(std::pair<int, double>(std::abs(pdg), pdf));
     }
-    if (muon > 0.0) logL_mu = log(muon);
-    if (pion > 0.0) logL_pi = log(pion);
-    if (kaon > 0.0) logL_K = log(kaon);
-    if (proton > 0.0) logL_p = log(proton);
-    if (deuteron > 0.0) logL_d = log(deuteron);
-    if (electron > 0.0) logL_e = log(electron);
-    // normalize the PDF values
-    double denom = muon + pion + kaon + proton + deuteron + electron;
-    if (denom < 1.0E-20) {
-      junk = 1.0; // anomaly: should be very rare
-    } else {
-      muon /= denom;
-      pion /= denom;
-      kaon /= denom;
-      proton /= denom;
-      deuteron /= denom;
-      electron /= denom;
+    if (denom < 1.0E-20)
+      klmMuidLikelihood->setJunkPDFValue(true); /* Anomaly: should be very rare. */
+    else {
+      for (auto const& [pdg, pdf] : mapPdgPDF) {
+        klmMuidLikelihood->setPDFValue(pdf, std::abs(pdg));
+        if (pdf > 0.0)
+          klmMuidLikelihood->setLogL(std::log(pdf), std::abs(pdg));
+      }
     }
   }
-
-  klmMuidLikelihood->setJunkPDFValue(junk);
-  klmMuidLikelihood->setMuonPDFValue(muon);
-  klmMuidLikelihood->setPionPDFValue(pion);
-  klmMuidLikelihood->setKaonPDFValue(kaon);
-  klmMuidLikelihood->setProtonPDFValue(proton);
-  klmMuidLikelihood->setDeuteronPDFValue(deuteron);
-  klmMuidLikelihood->setElectronPDFValue(electron);
-  klmMuidLikelihood->setLogL_mu(logL_mu);
-  klmMuidLikelihood->setLogL_pi(logL_pi);
-  klmMuidLikelihood->setLogL_K(logL_K);
-  klmMuidLikelihood->setLogL_p(logL_p);
-  klmMuidLikelihood->setLogL_d(logL_d);
-  klmMuidLikelihood->setLogL_e(logL_e);
-
 }

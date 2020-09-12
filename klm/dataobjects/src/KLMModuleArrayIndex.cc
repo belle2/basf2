@@ -11,8 +11,8 @@
 /* Own header. */
 #include <klm/dataobjects/KLMModuleArrayIndex.h>
 
-/* Belle 2 headers. */
-#include <framework/logging/Logger.h>
+/* KLM headers. */
+#include <klm/dataobjects/KLMChannelIndex.h>
 
 using namespace Belle2;
 

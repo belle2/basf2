@@ -31,14 +31,13 @@ void T0CalibrationAlgorithm::createHisto()
 {
 
   B2INFO("Creating histograms");
-  float x;
-  float t_mea;
-  float w;
-  float t_fit;
-  float ndf;
-  float Pval;
-  int IWire;
-  int lay;
+  Float_t x;
+  Float_t t_mea;
+  Float_t t_fit;
+  Float_t ndf;
+  Float_t Pval;
+  UShort_t IWire;
+  UChar_t lay;
 
   auto tree = getObjectPtr<TTree>("tree");
   tree->SetBranchAddress("lay", &lay);
@@ -46,13 +45,12 @@ void T0CalibrationAlgorithm::createHisto()
   tree->SetBranchAddress("x_u", &x);
   tree->SetBranchAddress("t", &t_mea);
   tree->SetBranchAddress("t_fit", &t_fit);
-  tree->SetBranchAddress("weight", &w);
   tree->SetBranchAddress("ndf", &ndf);
   tree->SetBranchAddress("Pval", &Pval);
 
 
   /* Disable unused branch */
-  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit",  "weight", "Pval", "ndf"};
+  std::vector<TString> list_vars = {"lay", "IWire", "x_u", "t", "t_fit", "Pval", "ndf"};
   tree->SetBranchStatus("*", 0);
 
   for (TString brname : list_vars) {

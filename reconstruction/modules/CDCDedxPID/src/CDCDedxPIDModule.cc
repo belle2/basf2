@@ -10,8 +10,10 @@
 
 #include <reconstruction/modules/CDCDedxPID/CDCDedxPIDModule.h>
 
+#include <reconstruction/dataobjects/DedxConstants.h>
+#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
+
 #include <framework/gearbox/Const.h>
-#include <framework/utilities/FileSystem.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -20,23 +22,19 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <tracking/gfbfield/GFGeant4Field.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 
 #include <genfit/AbsTrackRep.h>
 #include <genfit/Exception.h>
 #include <genfit/MaterialEffects.h>
-#include <genfit/StateOnPlane.h>
+#include <genfit/KalmanFitterInfo.h>
 
-#include <TFile.h>
 #include <TH2F.h>
-#include <TMath.h>
 #include <TRandom.h>
 
 #include <memory>
-#include <cassert>
 #include <cmath>
 #include <algorithm>
-#include <utility>
 
 using namespace Belle2;
 using namespace CDC;
@@ -266,6 +264,12 @@ void CDCDedxPIDModule::event()
     // get the cosine correction only for data!
     dedxTrack->m_cosCor = (m_DBCosineCor && m_usePrediction && numMCParticles == 0) ? m_DBCosineCor->getMean(costh) : 1.0;
 
+    // get the cosine edge correction only for data!
+    bool isEdge = false;
+    if ((abs(costh + 0.860) < 0.010) || (abs(costh - 0.955) <= 0.005))isEdge = true;
+    dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && m_usePrediction && numMCParticles == 0
+                               && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
+
     // initialize a few variables to be used in the loop over track points
     double layerdE = 0.0; // total charge in current layer
     double layerdx = 0.0; // total path length in current layer
@@ -278,6 +282,7 @@ void CDCDedxPIDModule::event()
     // Get the TrackPoints, which contain the hit information we need.
     // Then iterate over each point.
     int tpcounter = 0;
+    const std::vector< genfit::AbsTrackRep* >& gftrackRepresentations = recoTrack->getRepresentations();
     const std::vector< genfit::TrackPoint* >& gftrackPoints = recoTrack->getHitPointsWithMeasurement();
     for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
          tp != gftrackPoints.end(); ++tp) {
@@ -303,6 +308,38 @@ void CDCDedxPIDModule::event()
       const int wire = wireID.getIWire(); // use getEWire() for encoded wire number
       int layer = cdcHit->getILayer(); // layer within superlayer
       int superlayer = cdcHit->getISuperLayer();
+
+      // check which algorithm found this hit
+      int foundByTrackFinder = 0;
+      const RecoHitInformation* hitInfo = recoTrack->getRecoHitInformation(cdcHit);
+      foundByTrackFinder = hitInfo->getFoundByTrackFinder();
+
+      // add weights for hypotheses
+      double weightPionHypo = 0;
+      double weightProtHypo = 0;
+      double weightKaonHypo = 0;
+      // loop over all the present hypotheses
+      for (std::vector<genfit::AbsTrackRep* >::const_iterator trep = gftrackRepresentations.begin();
+           trep != gftrackRepresentations.end(); ++trep) {
+        const int pdgCode = TMath::Abs((*trep)->getPDG());
+        // configured to only save weights for one of these 3
+        if (!(pdgCode == Const::pion.getPDGCode() ||
+              pdgCode == Const::kaon.getPDGCode() ||
+              pdgCode == Const::proton.getPDGCode())) continue;
+        const genfit::KalmanFitterInfo* kalmanFitterInfo = (*tp)->getKalmanFitterInfo(*trep);
+        if (kalmanFitterInfo == NULL) {
+          //B2WARNING("No KalmanFitterInfo for hit in "<<pdgCode<<" track representationt. Skipping.");
+          continue;
+        }
+
+        // there are always 2 hits, one of which is ~1, the other ~0; or both ~0. Store only the largest.
+        std::vector<double> weights = kalmanFitterInfo->getWeights();
+        const double maxWeight = weights[0] > weights[1] ? weights[0] : weights[1];
+        if (pdgCode == Const::pion.getPDGCode()) weightPionHypo = maxWeight;
+        else if (pdgCode == Const::kaon.getPDGCode()) weightKaonHypo = maxWeight;
+        else if (pdgCode == Const::proton.getPDGCode()) weightProtHypo = maxWeight;
+
+      }
 
       // continuous layer number
       int currentLayer = (superlayer == 0) ? layer : (8 + (superlayer - 1) * 6 + layer);
@@ -345,9 +382,9 @@ void CDCDedxPIDModule::event()
       double topHeight = outer - wirePosF.Perp();
       double bottomHeight = wirePosF.Perp() - inner;
       double cellHeight = topHeight + bottomHeight;
-      double topHalfWidth = PI * outer / nWires;
-      double bottomHalfWidth = PI * inner / nWires;
-      double cellHalfWidth = PI * wirePosF.Perp() / nWires;
+      double topHalfWidth = M_PI * outer / nWires;
+      double bottomHalfWidth = M_PI * inner / nWires;
+      double cellHalfWidth = M_PI * wirePosF.Perp() / nWires;
 
       // first construct the boundary lines, then create the cell
       const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);
@@ -407,7 +444,10 @@ void CDCDedxPIDModule::event()
         double entAngRS = std::atan(tana / cellR);
 
         LinearGlobalADCCountTranslator translator;
-        int adcCount = cdcHit->getADCCount(); // pedestal subtracted?
+        int adcbaseCount = cdcHit->getADCCount(); // pedestal subtracted?
+        int adcCount = (m_DBNonlADC && m_usePrediction
+                        && numMCParticles == 0) ? m_DBNonlADC->getCorrectedADC(adcbaseCount, currentLayer) : adcbaseCount;
+
         double hitCharge = translator.getCharge(adcCount, wireID, false, pocaOnWire.Z(), pocaMom.Phi());
         int driftT = cdcHit->getTDCCount();
 
@@ -440,7 +480,7 @@ void CDCDedxPIDModule::event()
           //       It is applied in two places below (hit level and layer level)
 
 
-          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * wiregain * twodcor * onedcor;
+          double correction = dedxTrack->m_runGain * dedxTrack->m_cosCor * dedxTrack->m_cosEdgeCor * wiregain * twodcor * onedcor;
           if (correction != 0) {
             dadcCount = dadcCount / correction;
 
@@ -465,9 +505,10 @@ void CDCDedxPIDModule::event()
             else cellDedx *= std::sin(trackMom.Theta());
 
             if (m_enableDebugOutput)
-              dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS, adcCount, hitCharge, celldx, cellDedx, cellHeight,
-                                cellHalfWidth, driftT,
-                                driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor);
+              dedxTrack->addHit(wire, iwire, currentLayer, doca, docaRS, entAng, entAngRS,
+                                adcCount, adcbaseCount, hitCharge, celldx, cellDedx, cellHeight, cellHalfWidth, driftT,
+                                driftDRealistic, driftDRealisticRes, wiregain, twodcor, onedcor,
+                                foundByTrackFinder, weightPionHypo, weightKaonHypo, weightProtHypo);
             nhitscombined++;
           }
         }
@@ -558,11 +599,11 @@ void CDCDedxPIDModule::event()
     double pidvalues[Const::ChargedStable::c_SetSize];
     Const::ParticleSet set = Const::chargedStableSet;
     if (m_usePrediction) {
-      for (const Const::ChargedStable& pdgIter : set) {
+      for (const Const::ChargedStable pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = -0.5 * dedxTrack->m_cdcChi[pdgIter.getIndex()] * dedxTrack->m_cdcChi[pdgIter.getIndex()];
       }
     } else {
-      for (const Const::ChargedStable& pdgIter : set) {
+      for (const Const::ChargedStable pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = dedxTrack->m_cdcLogl[pdgIter.getIndex()];
       }
     }
@@ -827,7 +868,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
-  for (const Const::ChargedStable& pdgIter : set) {
+  for (const Const::ChargedStable pdgIter : set) {
     double bg = p / pdgIter.getMass();
 
     // determine the predicted mean and resolution

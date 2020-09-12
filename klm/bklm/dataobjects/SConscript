@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['simulation_dataobjects', 'framework', 'CLHEP']
-
-Return('env')

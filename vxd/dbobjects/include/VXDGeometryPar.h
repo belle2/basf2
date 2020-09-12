@@ -24,7 +24,6 @@
 #include <vxd/dbobjects/VXDGeoSensorPar.h>
 #include <vxd/dbobjects/VXDGeoLadderPar.h>
 #include <vxd/dbobjects/VXDGeoRadiationSensorsPar.h>
-#include <vxd/dbobjects/VXDSensorInfoBasePar.h>
 
 namespace Belle2 {
 

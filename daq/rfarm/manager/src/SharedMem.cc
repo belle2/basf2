@@ -8,6 +8,15 @@
 
 #include "daq/rfarm/manager/SharedMem.h"
 
+#include <fcntl.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+#include <cstring>
+
 using namespace Belle2;
 using namespace std;
 
@@ -101,6 +110,19 @@ SharedMem::SharedMem(int shm_id)
     perror("SharedMem::shmat");
     return;
   }
+}
+
+SharedMem::SharedMem(int shm_id, int sem_id, int size)
+{
+  m_shmid = shm_id;
+  m_shmadr = (int*) shmat(m_shmid, 0, SHM_RDONLY);
+  if (m_shmadr == (int*) - 1) {
+    perror("SharedMem::shmat");
+    return;
+  }
+  m_shmsize = size;
+  m_semid = sem_id;
+  printf("SharedMem: open shmid = %d, semid = %d\n", m_shmid, m_semid);
 }
 
 SharedMem::~SharedMem(void)

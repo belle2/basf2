@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
-#define EVTBSEMITAUONICDECAYRATECALCULATOR_H_INCLUDED
+#pragma once
 
 #include <cstddef>
 
@@ -84,14 +83,14 @@ namespace Belle2 {
 
     /** Function calculates the SM decay rate Gamma for Dlnu decay, integrated for w and costau and summed for helicities.
      *@param BSTD helicity ampliutude calculator initialized properly by user.
-     *@param mtau daughter lepton mass (default is the electron mass).
+     *@param mlep daughter lepton mass (default is the electron mass).
      *Note that overall factor (GF/sqrt(2) Vcb)^2 is omitted.
      */
     double GammaSMD(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, const double mlep = 0.0005110);
 
     /** Function calculates the SM decay rate Gamma for D*lnu decay, integrated for w and costau and summed for helicities.
      *@param BSTD helicity ampliutude calculator initialized properly by user.
-     *@param mtau daughter lepton mass (default is the electron mass).
+     *@param mlep daughter lepton mass (default is the electron mass).
      *Note that overall factor (GF/sqrt(2) Vcb)^2 is omitted.
      */
     double GammaSMDstar(const EvtBSemiTauonicHelicityAmplitudeCalculator& BSTD, const double mlep = 0.0005110);
@@ -153,4 +152,3 @@ namespace Belle2 {
 
 } // namespace Belle2
 
-#endif

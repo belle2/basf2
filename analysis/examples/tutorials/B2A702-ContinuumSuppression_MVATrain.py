@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -20,7 +19,6 @@
 
 import basf2_mva
 import subprocess
-import sys
 
 if __name__ == "__main__":
 
@@ -40,7 +38,7 @@ if __name__ == "__main__":
     apply_qqbar_data = path + 'apply_qqbar.root'
 
     # Define the variables for training.
-    #  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+    #  For details, please see the Continuum suppression section at https://software.belle2.org
     #  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
     #  signal-B final state particles.
     #  CleoCone also takes the optional additional argument ROE, to return the cones calculated from ROE particles only.

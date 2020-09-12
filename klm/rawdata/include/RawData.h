@@ -21,30 +21,119 @@ namespace Belle2 {
   namespace KLM {
 
     /**
+     * Channel group.
+     */
+    struct ChannelGroup {
+
+      /** First channel in the group. */
+      int firstChannel = 0;
+
+      /** Last channel in the group (0 for single-strip hits). */
+      int lastChannel = 0;
+
+      /** Strip number corresponding to the first channel. */
+      int firstStrip = 0;
+
+      /** Strip number corresponding to the last channel. */
+      int lastStrip = 0;
+
+    };
+
+    /**
      * KLM raw data.
      */
-    struct RawData {
+    class RawData {
 
-      /** Lane (5 bits, but only 3 are really necessary). */
-      uint16_t lane;
+    public:
 
-      /** Axis (1 bit). */
-      uint16_t axis;
+      /**
+       * Constructor (unpack KLM raw data).
+       * @param[in]     copper        Copper identifier.
+       * @param[in]     slot          Slot number (1-based).
+       * @param[in]     buffer        Data buffer (to be unpacked).
+       * @param[in,out] klmDigitRaws  KLMDigitRaw array.
+       * @param[out]    newDigitRaw   New KLMRawDigit.
+       * @param[in]     fillDigitRaws Whether to fill klmDigitRaws.
+       */
+      RawData(
+        int copper, int slot, const int* buffer,
+        StoreArray<KLMDigitRaw>* klmDigitRaws, KLMDigitRaw** newDigitRaw,
+        bool fillDigitRaws);
 
-      /** Channel (7 bits). */
-      uint16_t channel;
+      /**
+       * Destructor.
+       */
+      ~RawData();
 
-      /** CTIME (16 bits). */
-      uint16_t ctime;
+      /**
+       * Get lane.
+       */
+      uint16_t getLane() const
+      {
+        return m_Lane;
+      }
 
-      /** Trigger bits (5 bits). */
-      uint16_t triggerBits;
+      /**
+       * Get axis.
+       */
+      uint16_t getAxis() const
+      {
+        return m_Axis;
+      }
 
-      /** TDC (11 bits). */
-      uint16_t tdc;
+      /**
+       * Get channel.
+       */
+      uint16_t getChannel() const
+      {
+        return m_Channel;
+      }
 
-      /** Charge (12 bits). */
-      uint16_t charge;
+      /**
+       * Get CTIME.
+       */
+      uint16_t getCTime() const
+      {
+        return m_CTime;
+      }
+
+      /**
+       * Get trigger bits.
+       */
+      uint16_t getTriggerBits() const
+      {
+        return m_TriggerBits;
+      }
+
+      /**
+       * Get TDC.
+       */
+      uint16_t getTDC() const
+      {
+        return m_TDC;
+      }
+
+      /**
+       * Get charge.
+       */
+      uint16_t getCharge() const
+      {
+        return m_Charge;
+      }
+
+      /**
+       * Check whether this hit corresponds to multiple strips.
+       */
+      bool multipleStripHit() const
+      {
+        return (m_TriggerBits & 0x10) != 0;
+      }
+
+      /**
+       * Get channel groups corresponding to this hit.
+       * @param[out] channelGroups Channel groups.
+       */
+      void getChannelGroups(std::vector<ChannelGroup>& channelGroups) const;
 
       /**
        * Unpack lane.
@@ -77,7 +166,7 @@ namespace Belle2 {
        * Unpack CTIME.
        * @param[in] raw Raw-data word.
        */
-      static uint16_t unpackCtime(uint16_t raw)
+      static uint16_t unpackCTime(uint16_t raw)
       {
         return raw;
       }
@@ -95,7 +184,7 @@ namespace Belle2 {
        * Unpack TDC.
        * @param[in] raw Raw-data word.
        */
-      static uint16_t unpackTdc(uint16_t raw)
+      static uint16_t unpackTDC(uint16_t raw)
       {
         return raw & 0x7FF;
       }
@@ -108,22 +197,30 @@ namespace Belle2 {
         return raw & 0xFFF;
       }
 
-    };
+    protected:
 
-    /**
-     * Unpack KLM raw data.
-     * @param[in]     copper        Copper identifier.
-     * @param[in]     slot          Slot number (1-based).
-     * @param[in]     buffer        Data buffer (to be unpacked).
-     * @param[out]    data          Unpacked data.
-     * @param[in,out] klmDigitRaws  KLMDigitRaw array.
-     * @param[out]    newDigitRaw   New KLMRawDigit.
-     * @param[in]     fillDigitRaws Whether to fill klmDigitRaws.
-     */
-    void unpackRawData(
-      int copper, int slot, const int* buffer, RawData* data,
-      StoreArray<KLMDigitRaw>* klmDigitRaws, KLMDigitRaw** newDigitRaw,
-      bool fillDigitRaws);
+      /** Lane (5 bits). */
+      uint16_t m_Lane;
+
+      /** Axis (1 bit). */
+      uint16_t m_Axis;
+
+      /** Channel (7 bits). */
+      uint16_t m_Channel;
+
+      /** CTIME (16 bits). */
+      uint16_t m_CTime;
+
+      /** Trigger bits (5 bits). */
+      uint16_t m_TriggerBits;
+
+      /** TDC (11 bits). */
+      uint16_t m_TDC;
+
+      /** Charge (12 bits). */
+      uint16_t m_Charge;
+
+    };
 
   }
 

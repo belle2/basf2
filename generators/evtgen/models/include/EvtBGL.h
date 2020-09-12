@@ -3,13 +3,13 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Lu Cao                                                   *
+ * Contributors: Lu Cao and Chaoyi Lyu                                    *
+ *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EvtBGL_HH
-#define EvtBGL_HH
+#pragma once
 
 #include "EvtGenBase/EvtDecayAmp.hh"
 #include "EvtGenBase/EvtSemiLeptonicFF.hh"
@@ -53,7 +53,6 @@ private:
   EvtSemiLeptonicAmp* calcamp;
 
 };
-#endif
 
 
 

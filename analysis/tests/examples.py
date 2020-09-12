@@ -17,7 +17,7 @@ class ExamplesTest(unittest.TestCase):
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")
     @unittest.skipIf(not os.getenv('BELLE2_VALIDATION_DATA_DIR'),
                      "$BELLE2_VALIDATION_DATA_DIR not found.")
-    def _test_examples_dir(self, path_to_glob, broken=[]):
+    def _test_examples_dir(self, path_to_glob, broken=None):
         """
         Internal function to test a directory full of example scripts with an optional list of broken scripts to be skipped.
 
@@ -25,6 +25,8 @@ class ExamplesTest(unittest.TestCase):
             path_to_glob (str): the path to search for scripts
             broken (list(str)): (optional) scripts that are known to be broken and can be skipped
         """
+        if broken is None:
+            broken = []
         all_egs = sorted(glob.glob(find_file(path_to_glob) + "*.py"))
         for eg in all_egs:
             filename = os.path.basename(eg)
@@ -55,11 +57,7 @@ class ExamplesTest(unittest.TestCase):
         Test supported FEI examples.
         """
 
-        if '/sw/belle/local/neurobayes-4.3.1/lib/' in os.getenv('LD_LIBRARY_PATH'):
-            self._test_examples_dir('analysis/examples/FEI/')
-        else:
-            skip_b2bii_examples = ['B_converted_apply.py', 'B_converted_train.py']
-            self._test_examples_dir('analysis/examples/FEI/', skip_b2bii_examples)
+        self._test_examples_dir('analysis/examples/FEI/')
 
     def test_fitting_examples(self):
         """
@@ -104,12 +102,8 @@ class ExamplesTest(unittest.TestCase):
         """
         Test supported tagging examples.
         """
-        # list of the broken examples (to be removed when they are individually fixed)
-        broken_tag_egs = ['BtagBsigReconstruction.py',  # BII-4281
-                          'KlongDecayReconstructionExample.py'  # BII-4281
-                          ]
 
-        self._test_examples_dir('analysis/examples/tagging/', broken_tag_egs)
+        self._test_examples_dir('analysis/examples/tagging/')
 
     def test_variablemanager_examples(self):
         """
@@ -117,6 +111,13 @@ class ExamplesTest(unittest.TestCase):
         """
 
         self._test_examples_dir('analysis/examples/VariableManager/')
+
+    def test_postmdstidentification_examples(self):
+        """
+        Test supported PostMdstIdentification examples.
+        """
+
+        self._test_examples_dir('analysis/examples/PostMdstIdentification/')
 
 
 if __name__ == '__main__':

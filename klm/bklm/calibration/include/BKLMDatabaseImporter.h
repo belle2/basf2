@@ -12,9 +12,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dbobjects/BKLMADCThreshold.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsChannel.h>
-#include <klm/bklm/dbobjects/BKLMTimeWindow.h>
+#include <klm/dbobjects/bklm/BKLMADCThreshold.h>
 
 namespace Belle2 {
 
@@ -32,46 +30,14 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~BKLMDatabaseImporter() {};
+    ~BKLMDatabaseImporter()
+    {
+    }
 
     /**
      * Set interval of validity.
      */
     void setIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
-
-    /**
-     * Load default electronics mapping.
-     *
-     * @param[in] isExperiment10
-     * Whether the map is created for experiment 10 or later.
-     */
-    void loadDefaultElectronicMapping(bool isExperiment10 = false);
-
-    /**
-     * Set non-default lane for all channels in a module.
-     * @param[in] section Section.
-     * @param[in] sector  Sector.
-     * @param[in] layer   Layer.
-     * @param[in] lane    Lane.
-     */
-    void setElectronicMappingLane(
-      int section, int sector, int layer, int lane);
-
-    /**
-     * Set non-default lane for all channels in a plane.
-     * @param[in] section Section.
-     * @param[in] sector  Sector.
-     * @param[in] layer   Layer.
-     * @param[in] plane   Plane.
-     * @param[in] lane    Lane.
-     */
-    void setElectronicMappingLane(
-      int section, int sector, int layer, int plane, int lane);
-
-    /**
-     * Import BKLM electronics mapping in the database.
-     */
-    void importElectronicMapping();
 
     /**
      * Import BKLM geometry parameters into the database
@@ -88,27 +54,19 @@ namespace Belle2 {
      */
     void importADCThreshold(BKLMADCThreshold* inputThreshold);
 
-    /**
-     * Import BKLM time window cuts into the database
-     */
-    void importTimeWindow(BKLMTimeWindow* inputWindow);
-
   private:
 
-    /** Electronics mapping. */
-    std::vector< std::pair<uint16_t, BKLMElectronicsChannel> > m_ElectronicsChannels;
-
     /** Low experiment. */
-    int m_ExperimentLow;
+    int m_ExperimentLow = 0;
 
     /** Low run. */
-    int m_RunLow;
+    int m_RunLow = 0;
 
     /** High experiment. */
-    int m_ExperimentHigh;
+    int m_ExperimentHigh = -1;
 
     /** High run. */
-    int m_RunHigh;
+    int m_RunHigh = -1;
 
   };
 

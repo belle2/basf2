@@ -36,7 +36,7 @@ if __name__ == '__main__':
            You can control the scons call with the --compile-options flag.
 
         3. Run the validation.
-           You can control the b2validation call with the --validateion-options flag.
+           You can control the b2validation call with the --validation-options flag.
            While running the validation, all files which match the regex EvtGen*.root will be reused
            from the first call to save some computing time.
 

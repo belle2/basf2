@@ -48,13 +48,13 @@ class TestStdHyperons(unittest.TestCase):
 
     def test_stdXi(self):
         """Check stdXi"""
-        for fitter, b2bii in product(['kfitter', 'treefitter'], [True, False]):
+        for fitter, b2bii in product(['KFit', 'TreeFit'], [True, False]):
             self.assertTrue(self._check_list(lambda path: stdXi(fitter=fitter, b2bii=b2bii, path=path), expected_lists=['Xi-:std']))
         # Also serves as a test for _check_list
         self.assertFalse(
             self._check_list(
                 lambda path: stdXi(
-                    fitter='treefitter',
+                    fitter='TreeFit',
                     b2bii=False,
                     path=path),
                 expected_lists=['Xi-:good']))
@@ -62,7 +62,7 @@ class TestStdHyperons(unittest.TestCase):
         self.assertTrue(
             self._check_list(
                 lambda path: stdXi(
-                    fitter='treefitter',
+                    fitter='TreeFit',
                     b2bii=False,
                     path=path),
                 expected_lists=['Xi-  : std']))
@@ -80,7 +80,7 @@ class TestStdHyperons(unittest.TestCase):
 
     def test_stdOmega(self):
         """Check stdXi"""
-        for fitter, b2bii in product(['kfitter', 'treefitter'], [True, False]):
+        for fitter, b2bii in product(['KFit', 'TreeFit'], [True, False]):
             self.assertTrue(
                 self._check_list(
                     lambda path: stdOmega(
@@ -93,7 +93,7 @@ class TestStdHyperons(unittest.TestCase):
         """Check goodXi lists: veryloose, loose, tight"""
         for xitype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdXi(fitter='treefitter', b2bii=False, path=path)
+                stdXi(fitter='TreeFit', b2bii=False, path=path)
                 goodXi(xitype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Xi-:std', f'Xi-:{xitype}']))
             # Should be no 'Xi' list. Make sure we did not make typos.
@@ -113,10 +113,11 @@ class TestStdHyperons(unittest.TestCase):
         """Check goodOmega lists: veryloose, loose, tight"""
         for omegatype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdOmega(fitter='treefitter', b2bii=False, path=path)
+                stdOmega(fitter='TreeFit', b2bii=False, path=path)
                 goodOmega(omegatype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Omega-:std', f'Omega-:{omegatype}']))
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Omega:{omegatype}']))
+
 
 if __name__ == '__main__':
     unittest.main()

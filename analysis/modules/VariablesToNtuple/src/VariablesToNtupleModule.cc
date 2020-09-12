@@ -131,6 +131,14 @@ void VariablesToNtupleModule::initialize()
     if (!var) {
       B2ERROR("Variable '" << varStr << "' is not available in Variable::Manager!");
     } else {
+      if (m_particleList.empty() && var->description.find("[Eventbased]") == string::npos) {
+        B2ERROR("Variable '" << varStr << "' is not an event-based variable, "
+                "but you are using VariablesToNtuple without a decay string, i.e. in the event-wise mode.\n"
+                "If you have created an event-based alias you can wrap your alias with `eventCached` to "
+                "declare it as event based, which avoids this error.\n\n"
+                "vm.addAlias('myAliasName', 'eventCached(myAlias)')");
+        continue;
+      }
       m_functions.push_back(var->function);
     }
     enumerate++;

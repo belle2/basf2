@@ -1,5 +1,13 @@
-# EventType: 2610030002
-# Descriptor: [ccbar Dstar2D0Pip D02PipPim]
+# EventType: 2610030002 (previously 2610030001)
+# Descriptor: [ccbar Dstarp2D0Pip D02KpKm]
+# NickName: DstpToD0Pip_D0ToKpKm
+# Cuts: None
+# Documentation: Potential charm signal request
+# Tested: No
+# PhysicsWG: Charm
+# Responsible: Emma Oxford
+# Email: emma.oxford@desy.de
+# Date: 20200409 (YYYYMMDD)
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 
@@ -35,10 +43,6 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-Alias MyD D0
-Alias MyAntiD anti-D0
-ChargeConj MyD MyAntiD
-
 Decay vpho
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")
@@ -46,16 +50,11 @@ Decay vpho
 Enddecay
 
 Decay D*+
-1.0 MyD  pi+  VSS;
+1.0000 D0sig   pi+     VSS;
 Enddecay
 
-Decay D*-
-1.0 MyAntiD pi- VSS;
+Decay D0sig
+1.0000 K+      K-      PHSP;
 Enddecay
-
-Decay MyD
-1.0 pi+ pi-  PHSP;
-Enddecay
-CDecay MyAntiD
 
 End

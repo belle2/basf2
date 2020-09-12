@@ -6,30 +6,25 @@
  * Contributors: Jo-Frederik Krohn                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- * **************************************************************************/
+ **************************************************************************/
 
 #pragma once
 
-
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <mdst/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
-
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Exception.h>
 #include <utility>
 #include <math.h>
-#include <TLorentzVector.h>
 
 /** Helper functions for all klid modules to improve readability of the code */
-namespace KlId {
+namespace Belle2::KlongId {
 
   /**get Belle stle track flag */
   int BelleTrackFlag(const Belle2::KLMCluster& cluster, const float angle = 0.26)
@@ -41,7 +36,7 @@ namespace KlId {
       const TVector3& trackPos = track.getPosition();
 
       if (trackPos.Angle(pos) < angle) {
-        B2DEBUG(150, "BelleFlagTracklAngle::" << trackPos.Angle(pos));
+        B2DEBUG(20, "BelleFlagTracklAngle::" << trackPos.Angle(pos));
         return 1;
       }
     }
@@ -60,7 +55,7 @@ namespace KlId {
       const TVector3& clusterPos = eclcluster.getClusterPosition();
 
       if (clusterPos.Angle(pos) < angle) {
-        B2DEBUG(150, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
+        B2DEBUG(20, "BelleFlagECLAngle::" << clusterPos.Angle(pos));
         return 1;
       }
     }
@@ -87,7 +82,7 @@ namespace KlId {
     bool stop = false;
     while (!stop) {
       ++hirachy_counter;
-      if (part -> getPDG() == 130) {
+      if (part -> getPDG() == Const::Klong.getPDGCode()) {
         return hirachy_counter;
       }
       if ((part -> getMother() == nullptr)) {
@@ -160,35 +155,35 @@ namespace KlId {
 
     bool stop = false;
     while (!stop) {
-      if (isMCParticlePDG(part, 130)) {
-        return 130;
+      if (isMCParticlePDG(part, Const::Klong.getPDGCode())) {
+        return Const::Klong.getPDGCode();
       }
-      if (isMCParticlePDG(part, 310)) {
-        return 310;
+      if (isMCParticlePDG(part, Const::Kshort.getPDGCode())) {
+        return Const::Kshort.getPDGCode();
       }
-      if (isMCParticlePDG(part, 321)) {
-        return 321;
+      if (isMCParticlePDG(part, Const::kaon.getPDGCode())) {
+        return Const::kaon.getPDGCode();
       }
-      if (isMCParticlePDG(part, 2112)) {
-        return 2112;
+      if (isMCParticlePDG(part, Const::neutron.getPDGCode())) {
+        return Const::neutron.getPDGCode();
       }
-      if (isMCParticlePDG(part, 2212)) {
-        return 2212;
+      if (isMCParticlePDG(part, Const::proton.getPDGCode())) {
+        return Const::proton.getPDGCode();
       }
-      if (isMCParticlePDG(part, 211)) {
-        return 211;
+      if (isMCParticlePDG(part, Const::pion.getPDGCode())) {
+        return Const::pion.getPDGCode();
       }
-      if (isMCParticlePDG(part, 111)) {
-        return 111;
+      if (isMCParticlePDG(part, Const::pi0.getPDGCode())) {
+        return Const::pi0.getPDGCode();
       }
-      if (isMCParticlePDG(part, 13)) {
-        return 13;
+      if (isMCParticlePDG(part, Const::muon.getPDGCode())) {
+        return Const::muon.getPDGCode();
       }
-      if (isMCParticlePDG(part, 11)) {
-        return 11;
+      if (isMCParticlePDG(part, Const::electron.getPDGCode())) {
+        return Const::electron.getPDGCode();
       }
-      if (isMCParticlePDG(part, 22)) {
-        return 22;
+      if (isMCParticlePDG(part, Const::photon.getPDGCode())) {
+        return Const::photon.getPDGCode();
       }
       if ((part -> getMother() == nullptr)) {
         stop = true;
@@ -199,22 +194,21 @@ namespace KlId {
     return part ->getPDG();
   }
 
-
-
-
-
-  /** find closest ECL Cluster and its distance */
+  /**
+   * Find the closest ECLCluster with a neutral hadron hypothesis, and return it with its distance.
+   * If there are no suitabile ECLClusters, a nullptr is returned.
+   */
   std::pair<Belle2::ECLCluster*, double> findClosestECLCluster(const TVector3& klmClusterPosition,
       const Belle2::ECLCluster::EHypothesisBit eclhypothesis = Belle2::ECLCluster::EHypothesisBit::c_neutralHadron)
   {
 
-    Belle2::ECLCluster* closestECL = nullptr ;
+    Belle2::ECLCluster* closestECL = nullptr;
     double closestECLAngleDist = 1e10;
     Belle2::StoreArray<Belle2::ECLCluster> eclClusters;
 
     if (eclClusters.getEntries() > 0) {
-      unsigned int index = 0;
-      unsigned int indexOfClosestCluster = 0;
+      int index = 0;
+      int indexOfClosestCluster = -1;
       for (Belle2::ECLCluster& eclcluster : eclClusters) {
 
         if (eclcluster.hasHypothesis(eclhypothesis)) {
@@ -223,15 +217,13 @@ namespace KlId {
           double angularDist = eclclusterPos.Angle(klmClusterPosition);
           if (angularDist < closestECLAngleDist) {
             closestECLAngleDist = angularDist;
-            // the problem here is one can not just use a refenrence to klmCluster because the next cluster will be written in the same address
-            // so that after the loop the reference would always point to the last cluster in the list...
-            // if you know a more elegant solution than using the index pls tell me (Jo)
             indexOfClosestCluster = index;
           }
         }
         ++index;
       }
-      closestECL = eclClusters[indexOfClosestCluster];
+      if (indexOfClosestCluster > -1)
+        closestECL = eclClusters[indexOfClosestCluster];
     }
     return std::make_pair(closestECL, closestECLAngleDist);
   }

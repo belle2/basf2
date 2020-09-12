@@ -12,19 +12,71 @@ be adapted when changing to the new release.
    :depth: 3
    :local:
 
+Changes since release-05
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-05-00.txt
+
 Changes since release-04
 ========================
 
 .. important changes should go here. Especially things that break backwards
       compatibility
 
-.. .. rubric:: Some important feature
+.. rubric:: Neutral hadrons from ECLClusters get momentum from the cluster energy
 
+Since ``release-04`` it has been possible to load ECLClusters under the neutral hadron hypothesis.
+Previously we assumed a mass when calculating the particle momentum, however this leads to problems when, for example, a :math:`K_L^0` deposits less than its mass energy in the ECL. This happens about 50% of the time.
+
+The momentum of neutral hadrons from the ECL is now set to the :b2:var:`clusterE`.
+
+.. rubric:: Bremsstrahlung correction
+
+The `BremsFinder` module has been developed to find relations between tracks
+and photons that are likely to have been emitted by these tracks via
+Bremsstrahlung. The matching quality figure of merit is based on the angular
+distance between the photon ECL cluster and the extrapolated hit position of
+the track at the ECL. The function `correctBrems` performs the actual
+correction. There is also a reimplementation of Belle's Bremsstrahlung
+correction approach of looking for photons in a cone around tracks
+(`correctBremsBelle`), which is recommended for ``b2bii`` analyses.
+
+.. warning:: While it is technically possible to perform a TreeFit after
+             applying Bremsstrahlung correction, the fit performance is unfortunately quite
+             bad. However, there is already an improvement in the pipeline that should fix
+             this issue. It will probably be available in one of the next light releases.
+
+.. rubric:: MC reconstruction and MC matching
+
+The :b2:mod:`ParticleCombinerFromMC` module and its corresponding wrapper
+function `reconstructMCDecay` should be used instead of `findMCDecay` to
+reconstruct decay modes based on MC information.
+
+The DecayStringGrammar has been extended with new exception markers for
+Bremsstrahlung, decay in flight, and misidentification.
+
+Exceptions for the MC matching of daughter particles with the DecayStringGrammar are propagated 
+to the mother particle. 
+
+.. warning:: There is a known issue in the MC matching: Some photons produced by PHOTOS
+             are misinterpreted as other radiated photons.
+
+.. rubric:: Redefinition of angle variables
+
+The kinematic variables :b2:var:`decayAngle`, :b2:var:`daughterAngle` and
+:b2:var:`pointingAngle` now return the angle instead of its cosine.
+
+.. rubric:: Protection of ParticleLists and particle combinations
+
+It is no longer allowed to use the label ``"all"`` for a particle list if a
+cut is applied. Reconstructed decays need to preserve electric charge.
+However, this can be deactivated if you know what you are doing, e.g. in
+searches for New Physics.
 
 .. Detailed changes for the analysis package first, that's
    what user will want to see
 
-.. include:: analysis/doc/whatsnew-since/release-04-01.txt
+.. include:: analysis/doc/whatsnew-since/release-04-02.txt
 
 .. include:: analysis/doc/whatsnew-since/release-04-00.txt
 
@@ -32,6 +84,14 @@ Changes since release-04
    move it directly in here
 
 .. include:: framework/doc/whatsnew-since/release-04-00.txt
+
+.. Changes for decfiles package
+
+.. include:: decfiles/doc/whatsnew-since/release-04-02.txt
+
+.. Changes for b2bii here.
+
+.. include:: b2bii/doc/whatsnew-since/release-04-01.txt
 
 Changes since release-03
 ========================
@@ -97,7 +157,7 @@ If you have a physics analysis sensitive to this change: please discuss with the
 .. note::
         As a consequence of this, there is now a **difference** between the variables
         ( :b2:var:`dx`, :b2:var:`dy`, :b2:var:`dz` ) compared to ( :b2:var:`x`, :b2:var:`y`, :b2:var:`z` );
-        and similarly for variables ( :b2:var:`mcDX`, :b2:var:`mcDY`, :b2:var:`mcDZ` )  compared to ( :b2:var:`mcX`, :b2:var:`mcY` and :b2:var:`mcZ` ).
+        and similarly for variables ( :b2:var:`mcDecayVertexX`, :b2:var:`mcDecayVertexY`, :b2:var:`mcDecayVertexZ` )  compared to ( :b2:var:`mcDecayVertexFromIPX`, :b2:var:`mcDecayVertexFromIPY` and :b2:var:`mcDecayVertexFromIPZ` ).
 
 .. rubric:: Redesign of the Conditions Database Interface
 
@@ -136,11 +196,11 @@ The (external) `RAVE <https://github.com/rave-package>`_ vertex fitter is not ma
 Its use in analysis is therefore deprecated.
 We do not expect to *remove* it, but *do not recommend* its use for any real physics analyses other than benchmarking or legacy studies.
 
-Instead we recommend you use either KFitter (`vertex.KFit`) for fast/simple fits, or TreeFitter (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
+Instead we recommend you use either KFit (`vertex.kFit`) for fast/simple fits, or TreeFit (`vertex.treeFit`) for more complex fits and fitting the full decay chain.
 Please check the :ref:`TreeFitter` pages for details about the constraints available.
 If you are unable to use TreeFitter because of missing functionality, please `submit a feature request <https://agira.desy.de/projects/BII>`_!
 
-.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFitter.
+.. warning:: The default fitter for `vertex.fitVertex` has been changed to KFit.
 
 
 .. rubric:: Tidy up and rename of Helicity variables.

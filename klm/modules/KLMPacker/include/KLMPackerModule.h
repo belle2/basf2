@@ -11,11 +11,9 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMDigit.h>
-#include <klm/bklm/dbobjects/BKLMElectronicsMap.h>
-#include <klm/eklm/dataobjects/EKLMDigit.h>
-#include <klm/eklm/dataobjects/ElementNumbersSingleton.h>
-#include <klm/eklm/dbobjects/EKLMElectronicsMap.h>
+#include <klm/dataobjects/KLMDigit.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
+#include <klm/dbobjects/KLMElectronicsMap.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -45,32 +43,32 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMPackerModule();
+    ~KLMPackerModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 
@@ -99,24 +97,14 @@ namespace Belle2 {
     /** Event meta data. */
     StoreObjPtr<EventMetaData> m_EventMetaData;
 
-    /* BKLM objects. */
+    /** Electronics map. */
+    DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
 
-    /** BKLM electronics map. */
-    DBObjPtr<BKLMElectronicsMap> m_BklmElectronicsMap;
+    /** Element numbers. */
+    const KLMElementNumbers* m_ElementNumbers;
 
-    /** BKLM digits. */
-    StoreArray<BKLMDigit> m_BklmDigits;
-
-    /* EKLM objects. */
-
-    /** EKLM element numbers. */
-    const EKLM::ElementNumbersSingleton* m_EklmElementNumbers;
-
-    /** EKLM electronics map. */
-    DBObjPtr<EKLMElectronicsMap> m_EklmElectronicsMap;
-
-    /** EKLM digits. */
-    StoreArray<EKLMDigit> m_EklmDigits;
+    /** KLM digits. */
+    StoreArray<KLMDigit> m_Digits;
 
   };
 

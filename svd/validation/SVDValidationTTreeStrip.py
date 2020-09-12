@@ -36,22 +36,22 @@ gROOT.ProcessLine('struct EventDataStrip {\
     int strip_noise;\
     };')
 
-from ROOT import EventDataStrip
+from ROOT import EventDataStrip  # noqa
 
 
 class SVDValidationTTreeStrip(Module):
+    '''class to create the strip ttree'''
 
     def __init__(self):
         """Initialize the module"""
 
         super(SVDValidationTTreeStrip, self).__init__()
-        # Output ROOT file
         self.file = ROOT.TFile('../SVDValidationTTreeStrip.root', 'recreate')
-        # TTrees for output data
+        '''Output ROOT file'''
         self.tree = ROOT.TTree('tree', 'Event data of SVD validation events')
-
-        # Instance of the EventDataStrip class
+        '''TTrees for output data'''
         self.data = EventDataStrip()
+        '''Instance of the EventDataStrip class'''
 
         # Declare tree branches
         for key in EventDataStrip.__dict__:
@@ -60,9 +60,6 @@ class SVDValidationTTreeStrip(Module):
                 if isinstance(self.data.__getattribute__(key), int):
                     formstring = '/I'
                 self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
-
-    def beginRun(self):
-        """ Does nothing """
 
     def event(self):
         """Find digit with a cluster and save needed information"""

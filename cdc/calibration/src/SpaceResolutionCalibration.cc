@@ -22,9 +22,8 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-SpaceResolutionCalibration::SpaceResolutionCalibration():
-  m_firstExperiment(0), m_firstRun(0),
-  m_lastExperiment(-1), m_lastRun(-1)
+SpaceResolutionCalibration::SpaceResolutionCalibration()
+// : m_firstExperiment(0), m_firstRun(0), m_lastExperiment(-1), m_lastRun(-1)
 {
   /*Space resolution calibration*/
 }
@@ -478,7 +477,7 @@ void SpaceResolutionCalibration::readSigma()
 void SpaceResolutionCalibration::readSigmaFromText()
 {
   ifstream ifs;
-  std::string fileName1 = "/cdc/data/" + m_sigmafile;
+  std::string fileName1 = "/data/cdc" + m_sigmafile;
   std::string fileName = FileSystem::findFile(fileName1);
   if (fileName == "") {
     fileName = FileSystem::findFile(m_sigmafile);

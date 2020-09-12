@@ -29,19 +29,24 @@ eventt0.param('coreGaussWidth', 10.0)  # 10 sigma of core gaussian [ns]
 # eventt0.param('fixedT0', nan)  If set, a fixed event t0 is used instead of simulating the bunch timing.
 eventt0.param('tailGaussFraction', 0.0)  # 0 fraction (by area) of tail gaussian
 eventt0.param('tailGaussWidth', 20.0)  # 20 sigma of tail gaussian [ns]
-main.add_module(eventt0)
+# main.add_module(eventt0)
 
 # detector simulation
 main.add_module('FullSim')
 
 # including the timing module
-main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=LogLevel.INFO)
+# main.add_module("FullSimTiming", rootFile="EvtGenTiming.root", logLevel=LogLevel.INFO)
 
 # SVD simulation
+svdevtinfoset = register_module("SVDEventInfoSetter")
+main.add_module(svdevtinfoset)
+
 digitizer = register_module('SVDDigitizer')
-digitizer.param('statisticsFilename', "digitizer.root")
+digitizer.param('statisticsFilename', "digitizer_debug2020.root")
 digitizer.param('storeWaveforms', True)
-digitizer.param('signalsList', "digitizer.txt")
+digitizer.param('signalsList', "digitizer_debug2020.txt")
+digitizer.set_log_level(LogLevel.DEBUG)
+digitizer.set_debug_level(30)
 main.add_module(digitizer)
 
 main.add_module('RootOutput')

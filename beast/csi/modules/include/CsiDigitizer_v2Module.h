@@ -32,26 +32,43 @@ namespace Belle2 {
        */
       CsiDigitizer_v2Module();
 
-      /**  */
+      /**
+       * Destructor
+       */
       virtual ~CsiDigitizer_v2Module();
 
-      /**  */
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
 
-      /**  */
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
 
-      /**  */
+      /**
+       * Event processor.
+       */
       virtual void event() override;
 
-      /**  */
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
-      /**  */
+
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
 
     private:
-      StoreArray<CsiHit_v2> m_csiHit_v2; /** array for CsiHit_v2 */
+      StoreArray<CsiHit_v2> m_csiHit_v2; /**< array for CsiHit_v2 */
 
       /** reads data from CSI.xml: threshold in MeV, range in MeV, and resolution in % */
       virtual void getXMLData();

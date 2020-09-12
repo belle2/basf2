@@ -78,17 +78,24 @@ def add_generator_preselection(
     generatorpreselection.if_value('<11', emptypath)
 
 
-def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, subweights=[], maxsubweight=1, maxfinalweight=3.0):
+def add_aafh_generator(
+        path,
+        finalstate='',
+        preselection=False,
+        enableTauDecays=True,
+        minmass=0.5,
+        subweights=[],
+        maxsubweight=1,
+        maxfinalweight=3.0):
     """
     Add the default two photon generator for four fermion final states
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate (str): either "e+e-e+e-", "e+e-mu+mu-" or "mu+mu-mu+mu-"
+        finalstate (str): either "e+e-e+e-", "e+e-mu+mu-", "e+e-tau+tau-", "mu+mu-mu+mu-" or "mu+mu-tau+tau-"
         preselection (bool): if True, select events with at least one medium pt particle in the CDC acceptance
+        enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
     """
-
-    aafh = register_module('AafhInput')
 
     if finalstate == 'e+e-e+e-':
         aafh_mode = 5
@@ -100,12 +107,24 @@ def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, sub
             B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
     elif finalstate == 'e+e-mu+mu-':
         aafh_mode = 3
-        if not subweights:
+        if not subweights:  # default subweights are for minmass=0.5
             aafh_subgeneratorWeights = [1.000e+00, 1.520e+01, 3.106e+03, 6.374e+03, 1.000e+00, 1.778e+00, 6.075e+00, 6.512e+00]
         else:
             aafh_subgeneratorWeights = subweights
         if abs(minmass - 0.5) > 0.01 and not subweights:
             B2WARNING("add_aafh_generator: non default invariant mass cut without updated subweights requested!")
+    elif finalstate == 'e+e-tau+tau-':
+        aafh_mode = 4
+        particle = 'tau-'
+        minmass = 0
+        if not subweights:
+            aafh_subgeneratorWeights = [1.000e+00, 2.214e+00, 1.202e+01, 1.536e+01, 1.000e+00, 1.664e+00, 1.680e+01, 6.934e+00]
+        else:
+            aafh_subgeneratorWeights = subweights
+        if preselection:
+            B2WARNING(
+                f"You requested a generator preselection for the final state {finalstate}: "
+                "please consider to remove it, since the cross section is small.")
     elif finalstate == 'mu+mu-mu+mu-':
         aafh_mode = 2
         minmass = 0
@@ -114,13 +133,32 @@ def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, sub
             aafh_subgeneratorWeights = [0.000e+00, 0.000e+00, 1.000e+00, 3.726e+00, 1.000e+00, 1.778e+00, 1.000e+00, 1.094e+00]
         else:
             aafh_subgeneratorWeights = subweights
+        if preselection:
+            B2WARNING(
+                f"You requested a generator preselection for the final state {finalstate}: "
+                "please consider to remove it, since the cross section is small.")
+    elif finalstate == 'mu+mu-tau+tau-':
+        aafh_mode = 1
+        particle = 'tau-'
+        minmass = 0
+        maxsubweight = 3
+        if not subweights:
+            aafh_subgeneratorWeights = [0.000e+00, 0.000e+00, 1.000e+00, 1.715e+00, 1.000e+00, 1.778e+00, 1.000e+00, 6.257e-01]
+        else:
+            aafh_subgeneratorWeights = subweights
+        if preselection:
+            B2WARNING(
+                f"You requested a generator preselection for the final state {finalstate}: "
+                "please consider to remove it, since the cross section is small.")
+    elif finalstate == 'tau+tau-tau+tau-':
+        B2FATAL(f"AAFH is not able to generate the {finalstate} final state. Please use KoralW instead.")
     else:
-        B2FATAL("add_aafh_generator final state not supported: {}".format(finalstate))
+        B2FATAL(f"add_aafh_generator final state not supported: {finalstate}")
 
     aafh_maxSubgeneratorWeight = maxsubweight
     aafh_maxFinalWeight = maxfinalweight
 
-    aafh = path.add_module(
+    path.add_module(
         'AafhInput',
         mode=aafh_mode,
         rejection=2,
@@ -140,6 +178,12 @@ def add_aafh_generator(path, finalstate='', preselection=False, minmass=0.5, sub
             MinChargedPt=0.1,
             MinChargedTheta=17.0,
             MaxChargedTheta=150.0)
+
+    if 'tau+tau-' in finalstate:
+        if enableTauDecays:
+            path.add_module('EvtGenDecay')
+        else:
+            B2WARNING("The tau decays will not be generated.")
 
 
 def add_kkmc_generator(path, finalstate=''):

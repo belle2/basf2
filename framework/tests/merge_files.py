@@ -14,8 +14,10 @@ import basf2
 from b2test_utils import clean_working_directory, skip_test_if_light
 
 
-def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=[], **argk):
+def create_testfile(name, release=None, exp=0, run=0, events=100, branchNames=None, **argk):
     """Create a test file from a steering string"""
+    if branchNames is None:
+        branchNames = []
     global testfile_steering
     env = dict(os.environ)
     env.update(argk)
@@ -76,8 +78,8 @@ def merge_files(*args, output="output.root", filter_modified=False):
     # do we want to filter the modified release warning?
     if filter_modified:
         # if so replace them using regular expression
-        process.stdout = re.sub(b"^\[WARNING\] File \"(.*?)\" created with modified software ([a-zA-Z0-9\-+]*?): "
-                                b"cannot verify that files are compatible\\n", b"", process.stdout, flags=re.MULTILINE)
+        process.stdout = re.sub(rb"^\[WARNING\] File \"(.*?)\" created with modified software ([a-zA-Z0-9\-+]*?): "
+                                rb"cannot verify that files are compatible\n", b"", process.stdout, flags=re.MULTILINE)
 
     # in any case print output
     sys.stdout.buffer.write(process.stdout)
@@ -345,8 +347,8 @@ def check_21_eventmetadata():
         return False
     # we expect to see the events from run 0 twice and the ones from run 1 once.
     # So create a dictionary which contains the expected counts
-    eventcount = {(0, 0, i+1): 2 for i in range(100)}
-    eventcount.update({(0, 1, i+1): 1 for i in range(100)})
+    eventcount = {(0, 0, i + 1): 2 for i in range(100)}
+    eventcount.update({(0, 1, i + 1): 1 for i in range(100)})
     for i in range(entries):
         events.GetEntry(i)
         e = events.EventMetaData
@@ -359,6 +361,36 @@ def check_22_real_mc():
     create_testfile_direct("test1.root")
     copyfile(basf2.find_file("framework/tests/fake_real.root"), "test2.root")
     return merge_files("test1.root", "test2.root") != 0
+
+
+def check_23_legacy_ip():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="test_globaltag")
+    create_testfile_direct("test2.root", global_tag="test_globaltag,Legacy_IP_Information")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == "test_globaltag"
+
+
+def check_24_legacy_ip_middle():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="test_globaltag,other")
+    create_testfile_direct("test2.root", global_tag="test_globaltag,Legacy_IP_Information,other")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == "test_globaltag,other"
+
+
+def check_25_legacy_ip_only():
+    """Check that we can merge if the Legacy_IP_Information is inconsistent"""
+    create_testfile_direct("test1.root", global_tag="")
+    create_testfile_direct("test2.root", global_tag="Legacy_IP_Information")
+    if merge_files("test1.root", "test2.root") != 0:
+        return False
+    meta = get_metadata()
+    return meta.getDatabaseGlobalTag() == ""
 
 
 def check_XX_filemetaversion():

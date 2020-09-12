@@ -92,7 +92,7 @@ namespace Belle2 {
 
     std::vector<std::string> m_treeNames;  /**< names of the trees that are stored in the root file */
     // ==================================================== COUNTERS ==============================================================
-    unsigned int m_noMcPartCtr; /**< Counter for NULL pointers to MC Particles (should always be zero. just a safety measure) */
+    unsigned int m_noMcPartCtr; /**< Counter for nullptr pointers to MC Particles (should always be zero. just a safety measure) */
 
     unsigned int m_skippedTCsCtr; /**< Counter for negative MC particle ids (should always be zero. safety measure) */
 

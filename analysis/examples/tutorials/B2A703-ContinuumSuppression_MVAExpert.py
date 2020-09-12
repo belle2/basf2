@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ################################################################################
 #
@@ -23,13 +22,13 @@
 import basf2 as b2
 import modularAnalysis as ma
 import sys
+import os
 
 
 # --I/O----------------------------------------------------------------------------------------
 if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
     sys.exit("usage:\n\tbasf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>")
 
-import os
 if not os.getenv('BELLE2_EXAMPLES_DATA_DIR'):
     b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
@@ -91,7 +90,7 @@ ma.buildContinuumSuppression(list_name='B0',
                              path=main)
 
 # Define the variables for training.
-#  For details, please see: https://confluence.desy.de/display/BI/Continuum+Suppression+Framework
+#  For details, please see the Continuum suppression section at https://software.belle2.org
 #  Note that KSFWVariables takes the optional additional argument FS1, to return the variables calculated from the
 #  signal-B final state particles.
 #  CleoCone also takes the optional additional argument ROE, to return the cones calculated from ROE particles only.

@@ -7,8 +7,16 @@
 //-
 
 #include <daq/rfarm/manager/RFRoiSender.h>
-#include <string>
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+#include <unistd.h>
+
+#include <csignal>
+#include <cstring>
+#include <string>
 
 using namespace Belle2;
 using namespace std;

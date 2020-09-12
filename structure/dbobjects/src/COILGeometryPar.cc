@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <structure/dbobjects/COILGeometryPar.h>
-#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 

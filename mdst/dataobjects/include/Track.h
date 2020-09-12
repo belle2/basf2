@@ -87,6 +87,7 @@ namespace Belle2 {
      *  The TrackFitResult itself should be saved separately in the DataStore.
      *
      *  @param chargedStable  Determines the hypothesis for which you want to store the index or unavailability-code.
+     *  @param index  index of track fir result (for positive values) or unavailability-code (with negative values)
      */
     void setTrackFitResultIndex(const Const::ChargedStable& chargedStable, short index)
     {

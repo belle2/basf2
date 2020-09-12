@@ -33,21 +33,43 @@ namespace Belle2 {
        * Constructor: Sets the description, the properties and the parameters of the module.
        */
       He3DigitizerModule();
-      /**  */
+
+      /**
+       * Destructor
+       */
       virtual ~He3DigitizerModule();
-      /**  */
+
+      /**
+       * Initialize the Module.
+       * This method is called at the beginning of data processing.
+       */
       virtual void initialize() override;
-      /**  */
+
+      /**
+       * Called when entering a new run.
+       * Set run dependent things like run header parameters, alignment, etc.
+       */
       virtual void beginRun() override;
-      /**  */
+
+      /**
+       * Event processor.
+       */
       virtual void event() override;
-      /**  */
+
+      /**
+       * End-of-run action.
+       * Save run-related stuff, such as statistics.
+       */
       virtual void endRun() override;
-      /**  */
+
+      /**
+       * Termination action.
+       * Clean-up, close files, summarize statistics, etc.
+       */
       virtual void terminate() override;
 
     private:
-      StoreArray<He3tubeHit> m_he3tubeHit; /** Array for He3tubeHit */
+      StoreArray<He3tubeHit> m_he3tubeHit; /**< Array for He3tubeHit */
 
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();

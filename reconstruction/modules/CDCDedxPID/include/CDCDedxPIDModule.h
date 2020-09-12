@@ -10,9 +10,6 @@
 
 #pragma once
 
-#include <reconstruction/modules/CDCDedxPID/LineHelper.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
@@ -22,11 +19,9 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBArray.h>
 
 #include <reconstruction/dbobjects/CDCDedxScaleFactor.h>
 #include <reconstruction/dbobjects/CDCDedxWireGain.h>
@@ -34,22 +29,17 @@
 #include <reconstruction/dbobjects/CDCDedxCosineCor.h>
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
+#include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h>
+#include <reconstruction/dbobjects/CDCDedxCosineEdge.h>
 #include <reconstruction/dbobjects/CDCDedxMeanPars.h>
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 #include <reconstruction/dbobjects/DedxPDFs.h>
 
-#include <string>
 #include <vector>
-#include <map>
-#include <TVector3.h>
 
-class TH2F;
 
 namespace Belle2 {
-  class PXDCluster;
-  class SVDCluster;
-  class CDCDedxTrack;
 
   /** Extract CDC dE/dx information from fitted tracks.
    *
@@ -140,6 +130,7 @@ namespace Belle2 {
     void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], double(&predmean)[Const::ChargedStable::c_SetSize],
                       double(&predres)[Const::ChargedStable::c_SetSize], double p, double dedx, double sin, int nhit) const;
 
+
     /** for all particles, save log-likelihood values into 'logl'.
      *
      * @param logl  array of log-likelihood to be modified
@@ -178,6 +169,8 @@ namespace Belle2 {
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
+    DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< non-lineary ACD correction DB object */
+    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-lineary ACD correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */

@@ -5,15 +5,12 @@
 <header>
   <input>../GenericB_GENSIMRECtoDST.dst.root</input>
   <output>Pi0_Validation.root</output>
-  <contact>Mario Merola (mario.merola@na.infn.it), Andrea Selce (andrea.selce@pg.infn.it)</contact>
+  <contact>Mario Merola (mario.merola@na.infn.it), Andrea Selce (selce@infn.it)</contact>
   <description>
   Check the calibration of the ECL in the MC by determining the measured pi0 invariant mass.
   </description>
 </header>
 """
-
-INPUT_FILENAME = "../GenericB_GENSIMRECtoDST.dst.root"
-OUTPUT_FILENAME = "Pi0_Validation.root"
 
 import basf2
 import ROOT
@@ -24,6 +21,9 @@ from stdPi0s import stdPi0s
 from validation_tools.metadata import create_validation_histograms
 from validation_tools.metadata import validation_metadata_update
 from variables import variables as vm
+
+INPUT_FILENAME = "../GenericB_GENSIMRECtoDST.dst.root"
+OUTPUT_FILENAME = "Pi0_Validation.root"
 
 main = basf2.Path()
 inputMdst('default', INPUT_FILENAME, path=main)
@@ -43,7 +43,7 @@ create_validation_histograms(
         (
             "Mreco", 40, 0.08, 0.18,
             "#pi^{0} reconstructed candidates, invariant mass",
-            "Mario Merola <mario.merola@desy.de>; Andrea Selce <andrea.selce@pg.infn.it>",
+            "Mario Merola <mario.merola@desy.de>; Andrea Selce <selce@infn.it>",
             r"The $pi^{0}$ invariant mass distribution with $E_{\gamma}>0.05\, \text{GeV}$",
             r"Distribution should be peaking at the nominal $\pi^{0}$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
@@ -61,7 +61,7 @@ create_validation_histograms(
         (
             "Mmc", 40, 0.08, 0.18,
             "#pi^{0} MC candidates, invariant mass",
-            "Mario Merola <mario.merola@desy.de>; Andrea Selce <andrea.selce@pg.infn.it>",
+            "Mario Merola <mario.merola@desy.de>; Andrea Selce <selce@infn.it>",
             r"The $pi^{0}$ invariant mass distribution for truth matched candidates",
             r"Distribution should be peaking at the nominal $\pi^{0}$ mass.",
             "M(#pi^{0}) [GeV/c^{2}]", "Candidates", "shifter"
@@ -132,7 +132,7 @@ totalPdf.plotOn(frame1, ROOT.RooFit.Components("sigcb"), ROOT.RooFit.LineStyle(R
 totalPdf.plotOn(frame1, ROOT.RooFit.Components("bkg"), ROOT.RooFit.LineStyle(3), ROOT.RooFit.LineColor(ROOT.kBlue))
 # totalPdf.paramOn(frame1,ROOT.RooFit.Parameters(ROOT.RooArgSet(sig1,mean,nsig)),ROOT.RooFit.Format("NELU",ROOT.RooFit.AutoPrecision(2)),ROOT.RooFit.Layout(0.5,0.9,0.9))
 # frame1.getAttText().SetTextSize(0.5)
-frame1.SetMaximum(Mrecohist.GetMaximum()*1.5)
+frame1.SetMaximum(Mrecohist.GetMaximum() * 1.5)
 frame1.GetXaxis().SetTitleOffset(1.4)
 frame1.GetYaxis().SetTitleOffset(1.5)
 meanval = mean.getVal()
@@ -172,7 +172,7 @@ totalPdf.plotOn(frame2, ROOT.RooFit.Components("sigcb"), ROOT.RooFit.LineStyle(R
 totalPdf.plotOn(frame2, ROOT.RooFit.Components("bkg"), ROOT.RooFit.LineStyle(3), ROOT.RooFit.LineColor(ROOT.kBlue))
 # totalPdf.paramOn(frame2,ROOT.RooFit.Parameters(ROOT.RooArgSet(sig1,mean,nsig)),ROOT.RooFit.Format("NELU",ROOT.RooFit.AutoPrecision(2)),ROOT.RooFit.Layout(0.5,0.9,0.9))
 # frame2.getAttText().SetTextSize(0.5)
-frame2.SetMaximum(Mmchist.GetMaximum()*1.5)
+frame2.SetMaximum(Mmchist.GetMaximum() * 1.5)
 frame2.GetXaxis().SetTitleOffset(1.4)
 frame2.GetYaxis().SetTitleOffset(1.5)
 meanval_mc = mean.getVal()
@@ -191,7 +191,7 @@ validation_metadata_update(
     output,
     "pi0_mass",
     title="Pi0 mass fit results",
-    contact="mario.merola@na.infn.it, andrea.selce@pg.infn.it",
+    contact="mario.merola@na.infn.it, selce@infn.it",
     description="Fit to the invariant mass of the reconstructed and truth matched pi0s",
     check="Consistent numerical fit results. Stable mean and width.",
     metaoptions="shifter")

@@ -15,30 +15,30 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::Cluster+;
+#pragma link C++ class Belle2::Cluster+; // checksum=0xa21d75ce, version=1
 
-#pragma link C++ class Belle2::MCParticle+;
-#pragma link C++ class vector<Belle2::MCParticle*>+;
-#pragma link C++ class Belle2::PIDLikelihood+;
-#pragma link C++ class Belle2::ECLCluster+;
+#pragma link C++ class Belle2::MCParticle+; // checksum=0x3dc6fb35, version=5
+#pragma link C++ class vector<Belle2::MCParticle*>+; // checksum=0xd52f5001, version=6
+#pragma link C++ class Belle2::PIDLikelihood+; // checksum=0x22bf2bf, version=3
+#pragma link C++ class Belle2::ECLCluster+; // checksum=0x3796684e, version=14
 
-#pragma link C++ class Belle2::KLMCluster+;
-#pragma link C++ class Belle2::KlId+;
+#pragma link C++ class Belle2::KLMCluster+; // checksum=0x9be09a36, version=2
+#pragma link C++ class Belle2::KlId+; // checksum=0xdc073aa, version=2
 
-#pragma link C++ class Belle2::EventLevelClusteringInfo+;
+#pragma link C++ class Belle2::EventLevelClusteringInfo+; // checksum=0x9b632f9, version=1
 
-#pragma link C++ class Belle2::Track+;
-#pragma link C++ class Belle2::HitPatternCDC+;
-#pragma link C++ class Belle2::HitPatternVXD+;
-#pragma link C++ class Belle2::TrackFitResult+;
-#pragma link C++ class Belle2::V0+;
-#pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+;
-#pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+;
-#pragma link C++ class pair<short, short>+;
-#pragma link C++ class Belle2::EventLevelTrackingInfo+;
+#pragma link C++ class Belle2::Track+; // checksum=0x320e0cd9, version=4
+#pragma link C++ class Belle2::HitPatternCDC+; // checksum=0x8d86d89e, version=-1
+#pragma link C++ class Belle2::HitPatternVXD+; // checksum=0x5599d6f5, version=-1
+#pragma link C++ class Belle2::TrackFitResult+; // checksum=0x1379b29f, version=7
+#pragma link C++ class Belle2::V0+; // checksum=0xeecaa9c4, version=3
+#pragma link C++ class pair<Belle2::TrackFitResult*, Belle2::TrackFitResult*>+; // checksum=0x62cc1b16, version=-1
+#pragma link C++ class pair<Belle2::Track*, Belle2::Track*>+; // checksum=0x43730546, version=-1
+#pragma link C++ class pair<short, short>+; // checksum=0x7069a6e4, version=-1
+#pragma link C++ class Belle2::EventLevelTrackingInfo+; // checksum=0x6360bfbf, version=2
 
-#pragma link C++ class Belle2::TRGSummary+;
-#pragma link C++ class Belle2::SoftwareTriggerResult+;
+#pragma link C++ class Belle2::TRGSummary+; // checksum=0x96c83b9b, version=5
+#pragma link C++ class Belle2::SoftwareTriggerResult+; // checksum=0xe5e47e9, version=5
 
 // ----------------------------------------------------------------------------
 // SoftwareTriggerResult

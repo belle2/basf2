@@ -24,11 +24,12 @@ namespace Belle2 {
    * in order to make accessing speed faster.
    */
 
+  /** strip noise map*/
   class SVDStripNoiseMap {
   public:
 
     /** Constructor */
-    SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr = NULL);
+    SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr = nullptr);
     /** Constructor including map initialization */
     SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr,
                      const std::string& noisefilename);
@@ -39,7 +40,7 @@ namespace Belle2 {
     /** Initialize maps with input noisefile */
     int initializeMap(const std::string& noisefilename = "");
 
-    /* Get pedestal, noise, and threshold values.
+    /** Get pedestal, noise, and threshold values.
      * @param id VxdID of the required sensor, with segment number 0 for v, 1 for u
      * @param is_u true: u-side (p-side), false: v-side (n-side)
      * @param strip Strip number
@@ -47,7 +48,7 @@ namespace Belle2 {
      */
     float getPedestal(VxdID id, bool is_u, short strip);
 
-    /* Get pedestal, noise, and threshold values.
+    /** Get pedestal, noise, and threshold values.
      * @param id VxdID of the required sensor, with segment number 0 for v, 1 for u
      * @param is_u true: u-side (p-side), false: v-side (n-side)
      * @param strip Strip number
@@ -55,7 +56,7 @@ namespace Belle2 {
      */
     float getNoise(VxdID id, bool is_u, short strip);
 
-    /* Get pedestal, noise, and threshold values.
+    /** Get pedestal, noise, and threshold values.
      * @param id VxdID of the required sensor, with segment number 0 for v, 1 for u
      * @param is_u true: u-side (p-side), false: v-side (n-side)
      * @param strip Strip number
@@ -63,7 +64,7 @@ namespace Belle2 {
      */
     float getThreshold(VxdID id, bool is_u, short strip);
 
-    /* Check whether the strip is available or not.
+    /** Check whether the strip is available or not.
      * @param id VxdID of the required sensor, with segment number 0 for v, 1 for u
      * @param is_u true: u-side (p-side), false: v-side (n-side)
      * @param strip Strip number
@@ -73,7 +74,7 @@ namespace Belle2 {
 
   private:
 
-    /* Pointer to SVDOnlineToOfflineMap.
+    /** Pointer to SVDOnlineToOfflineMap.
      * This map represents relationship between
      * ADC+APV and Layer+Ladder+Sensor and it is
      * necessary to convert the noise file to
@@ -82,19 +83,19 @@ namespace Belle2 {
      */
     SVDOnlineToOfflineMap* m_onl2offl_map_ptr;
 
-    /* Pedestal map for all strips in ladders.
+    /** Pedestal map for all strips in ladders.
      */
     float m_pedestalMap [SVDPar::nSensorID][SVDPar::maxStrip];
 
-    /* noise map for all strips in ladders.
+    /** noise map for all strips in ladders.
      */
     float m_noiseMap    [SVDPar::nSensorID][SVDPar::maxStrip];
 
-    /* threshold map for all strips in ladders.
+    /** threshold map for all strips in ladders.
      */
     float m_thresholdMap[SVDPar::nSensorID][SVDPar::maxStrip];
 
-    /* Good strip map
+    /** Good strip map
      */
     bool  m_goodStripMap[SVDPar::nSensorID][SVDPar::maxStrip];
 

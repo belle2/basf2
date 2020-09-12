@@ -33,9 +33,9 @@ namespace Belle2 {
 
     CLAWSCreator::CLAWSCreator(Simulation::SensitiveDetectorBase* sensitive): m_sensitive(sensitive)
     {
-      if (!m_sensitive) {
+      /*if (!m_sensitive) {
         m_sensitive = new SensitiveDetector();
-      }
+      }*/
     }
 
     CLAWSCreator::~CLAWSCreator()
@@ -47,6 +47,11 @@ namespace Belle2 {
     void CLAWSCreator::createShape(const std::string& prefix, const GearDir& params, G4LogicalVolume* parent, double roffset,
                                    bool check)
     {
+
+      if (!m_sensitive) {
+        m_sensitive = new SensitiveDetector();
+      }
+
       std::string name = params.getString("@name");
       if (!prefix.empty()) {
         name = prefix + "." + name;

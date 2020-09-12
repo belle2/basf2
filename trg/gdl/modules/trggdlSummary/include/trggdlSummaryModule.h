@@ -6,16 +6,9 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
-#include <stdlib.h>
-#include <iostream>
 #include <framework/database/DBObjPtr.h>
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
 #include <trg/gdl/dbobjects/TRGGDLDBUnpacker.h>
-
-#include <TH2I.h>
-#include <TH1I.h>
-
-//using namespace std;
 
 namespace Belle2 {
 
@@ -53,6 +46,9 @@ namespace Belle2 {
     int ee_psn[10] = {0};
     int ee_ftd[10] = {0};
     int ee_itd[10] = {0};
+
+    /** Debug Level **/
+    int _debugLevel;
 
   };
 

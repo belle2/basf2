@@ -1,0 +1,32 @@
+# EventType: 1113044000
+# Descriptor: [B0 -> [D*- [ D0 -> K- pi+ pi0] pi- ] rho+]
+# NickName: Bd_Dstrho+_DsttoDpi-_DtoK-pi+pi0
+# Documentation: Neutral B decay into D*- rho+ with D0 to K pi pi0 needed for phase3 data validation
+# Tested: Yes
+# Physics WG: BtoCharm(less)
+# Responsible: Chiara La Licata
+# Email: chiara.lalicata@ipmu.jp
+# Cuts: none
+# Data: 20202102
+
+Decay Upsilon(4S)
+0.500 B0sig anti-B0 VSS_BMIX dm;
+0.500 B0 anti-B0sig VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000 D*-sig rho+ SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47;
+Enddecay
+CDecay anti-B0sig
+
+Decay D*-sig
+1.000 anti-D0sig pi- PHOTOS VSS;
+Enddecay
+CDecay D*+sig
+
+Decay D0sig
+1.000 K- pi+ pi0 PHOTOS D_DALITZ;
+Enddecay
+CDecay anti-D0sig
+
+End

@@ -15,7 +15,7 @@
 using namespace std;
 using namespace Belle2;
 
-void ARICHGeoDetectorPlane::setRingPar(std::vector<std::pair<double, double>>& ringPar)
+void ARICHGeoDetectorPlane::setRingPar(const std::vector<std::pair<double, double>>& ringPar)
 {
   m_ringPar = ringPar;
 

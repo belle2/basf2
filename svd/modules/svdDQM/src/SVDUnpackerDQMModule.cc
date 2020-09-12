@@ -11,24 +11,17 @@
 #include "svd/modules/svdDQM/SVDUnpackerDQMModule.h"
 #include <svd/online/SVDOnlineToOfflineMap.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
-#include <vxd/geometry/GeoTools.h>
+#include <TDirectory.h>
+#include <TLine.h>
+#include <TStyle.h>
 
 #include <algorithm>
 #include <string>
-#include "TDirectory.h"
-
-#include <TROOT.h>
-#include <TStyle.h>
-#include <TLine.h>
 
 
 using namespace std;
@@ -46,7 +39,7 @@ REG_MODULE(SVDUnpackerDQM)
 
 std::string SVDUnpackerDQMModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 
-SVDUnpackerDQMModule::SVDUnpackerDQMModule() : HistoModule(), m_mapping(m_xmlFileName), FADCs(NULL)
+SVDUnpackerDQMModule::SVDUnpackerDQMModule() : HistoModule(), m_mapping(m_xmlFileName), FADCs(nullptr)
 {
   //Set module properties
   setDescription("DQM Histogram for the SVD Unpacker");
@@ -119,8 +112,7 @@ void SVDUnpackerDQMModule::defineHisto()
 void SVDUnpackerDQMModule::initialize()
 {
   m_eventMetaData.isRequired();
-  m_svdShapers.isRequired(m_ShaperDigitName);
-  m_svdDAQDiagnostics.isRequired(m_SVDDAQDiagnosticsName);
+  m_svdDAQDiagnostics.isOptional(m_SVDDAQDiagnosticsName);
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -137,15 +129,14 @@ void SVDUnpackerDQMModule::beginRun()
 
   TString histoTitle = TString::Format("SVD Data Format Monitor, Exp %d Run %d", expNumber, runNumber);
 
-  if (DQMUnpackerHisto != NULL) {
+  if (DQMUnpackerHisto != nullptr) {
     DQMUnpackerHisto->Reset();
     DQMUnpackerHisto->SetTitle(histoTitle.Data());
   }
 
-  if (DQMEventFractionHisto != NULL) {
+  if (DQMEventFractionHisto != nullptr) {
     DQMEventFractionHisto->Reset();
   }
-
 
   shutUpNoData = false;
 
@@ -173,10 +164,11 @@ void SVDUnpackerDQMModule::beginRun()
 
 void SVDUnpackerDQMModule::event()
 {
-  if (!m_svdDAQDiagnostics || !m_svdDAQDiagnostics.getEntries()) if (!shutUpNoData) {
-      B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
-      shutUpNoData = true;
-    }
+  if (!m_svdDAQDiagnostics.isValid() && (!shutUpNoData)) {
+    B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
+    shutUpNoData = true;
+    return;
+  }
 
   badEvent = 0;
   nEvents++;
@@ -273,7 +265,7 @@ void SVDUnpackerDQMModule::event()
   if (badEvent) nBadEvents++;
   errorFraction = 100 * float(nBadEvents) / float(nEvents);
 
-  if (DQMEventFractionHisto != NULL) {
+  if (DQMEventFractionHisto != nullptr) {
     TString histoFractionTitle = TString::Format("SVD bad events fraction: %f %%,  Exp %d Run %d", errorFraction, expNumber, runNumber);
     DQMEventFractionHisto->SetTitle(histoFractionTitle.Data());
   }

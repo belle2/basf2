@@ -11,8 +11,8 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit1d.h>
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -31,7 +31,7 @@
 namespace Belle2 {
 
   class BKLMSimHit;
-  class BKLMDigit;
+  class KLMDigit;
 
   //! Convert BKLM raw simulation hits to digitizations
   class BKLMSimHistogrammerModule : public Module {
@@ -42,22 +42,22 @@ namespace Belle2 {
     BKLMSimHistogrammerModule();
 
     //! Destructor
-    virtual ~BKLMSimHistogrammerModule();
+    ~BKLMSimHistogrammerModule();
 
     //! Initialize at start of job
-    virtual void initialize() override;
+    void initialize() override;
 
     //! Do any needed actions at the start of a simulation run
-    virtual void beginRun() override;
+    void beginRun() override;
 
     //! Digitize one event and write hits, digis, and relations into DataStore
-    virtual void event() override;
+    void event() override;
 
     //! Do any needed actions at the end of a simulation run
-    virtual void endRun() override;
+    void endRun() override;
 
     //! Terminate at the end of job
-    virtual void terminate() override;
+    void terminate() override;
 
   protected:
 
@@ -133,7 +133,7 @@ namespace Belle2 {
     //! BKLMSimHit StoreArray
     StoreArray<BKLMSimHit> simHits;
     //! digits StoreArray
-    StoreArray<BKLMDigit> digits;
+    StoreArray<KLMDigit> digits;
     //! mcParticles StoreArray
     StoreArray<MCParticle> mcParticles;
     //! hits2D StoreArray

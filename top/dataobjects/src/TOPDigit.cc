@@ -13,7 +13,6 @@
 #include <top/dataobjects/TOPSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/RelationVector.h>
-#include <framework/logging/Logger.h>
 
 using namespace std;
 

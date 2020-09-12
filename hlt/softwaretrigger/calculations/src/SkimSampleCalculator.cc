@@ -14,16 +14,25 @@
 #include <analysis/dataobjects/Particle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/Track.h>
+#include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <reconstruction/dataobjects/CDCDedxTrack.h>
+#include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <numeric>
+#include <TDatabasePDG.h>
+#include <analysis/variables/BelleVariables.h>
+#include <analysis/variables/ECLVariables.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <analysis/variables/AcceptanceVariables.h>
+#include <analysis/variables/FlightInfoVariables.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
-  m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim")
+  m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
+  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged")
 {
 
 }
@@ -32,6 +41,11 @@ void SkimSampleCalculator::requireStoreArrays()
 {
   m_pionParticles.isRequired();
   m_gammaParticles.isRequired();
+  m_pionHadParticles.isRequired();
+  m_pionTauParticles.isRequired();
+  m_KsParticles.isOptional();
+  m_LambdaParticles.isOptional();
+
 };
 
 void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
@@ -67,7 +81,10 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   // nTracksLE
   calculationResult["nTracksLE"] = m_pionParticles->getListSize();
 
-  // nTracksLE
+  // nTracksTAU
+  calculationResult["nTracksTAU"] = m_pionTauParticles->getListSize();
+
+  // nGammasLE
   calculationResult["nGammasLE"] = m_gammaParticles->getListSize();
 
   // P1CMSBhabhaLE
@@ -119,7 +136,11 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   //nECLClustersLE
   double neclClusters = -1.;
+  double eneclClusters = 0.;
   StoreArray<ECLCluster> eclClusters;
+  ClusterUtils Cl;
+  double PzGamma = 0.;
+  double EsumGamma = 0.;
   if (eclClusters.isValid()) {
     const unsigned int numberOfECLClusters = std::count_if(eclClusters.begin(), eclClusters.end(),
     [](const ECLCluster & eclcluster) {
@@ -129,6 +150,19 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
                 ECLCluster::EHypothesisBit::c_nPhotons) > 0.1);
     });
     neclClusters = numberOfECLClusters;
+
+    for (int ncl = 0; ncl < eclClusters.getEntries(); ncl++) {
+      if (eclClusters[ncl]->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)
+          && eclClusters[ncl]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) > 0.1) {
+        eneclClusters += eclClusters[ncl]->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+        if (!eclClusters[ncl]->getRelatedFrom<Track>()) {
+          TLorentzVector V4Gamma_CMS = PCmsLabTransform::labToCms(Cl.Get4MomentumFromCluster(eclClusters[ncl],
+                                                                  ECLCluster::EHypothesisBit::c_nPhotons));
+          EsumGamma += V4Gamma_CMS.E();
+          PzGamma += V4Gamma_CMS.Pz();
+        }
+      }
+    }
   }
   calculationResult["nECLClustersLE"] = neclClusters;
 
@@ -181,7 +215,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   calculationResult["AngleGTLE"] = angleGTLE;
 
-
   // AngleG1G2LE
   double angleG1G2CMSLE = -10.;
   if (gammaWithMaximumRho) {
@@ -198,6 +231,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // maxAngleTTLE
   double maxAngleTTLE = -10.;
+  int nJpsi = 0;
+  double Jpsi = 0.;
+  const double jPsiMasswindow = 0.11;
   if (m_pionParticles->getListSize() >= 2) {
     for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
       Particle* par1 = m_pionParticles->getParticle(i);
@@ -205,6 +241,11 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         Particle* par2 = m_pionParticles->getParticle(j);
         TLorentzVector V4p1 = par1->get4Vector();
         TLorentzVector V4p2 = par2->get4Vector();
+        TLorentzVector V4pSum = V4p1 + V4p2;
+        const auto chSum = par1->getCharge() + par2->getCharge();
+        const double mSum = V4pSum.M();
+        const double JpsidM = mSum - TDatabasePDG::Instance()->GetParticle(443)->Mass();
+        if (abs(JpsidM) < jPsiMasswindow && chSum == 0)  nJpsi++;
         const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
         const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
         const double temp = V3p1.Angle(V3p2);
@@ -213,10 +254,12 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     }
   }
 
+  if (nJpsi != 0) Jpsi = 1;
+
   calculationResult["maxAngleTTLE"] = maxAngleTTLE;
+  calculationResult["Jpsi"] = Jpsi;
 
   //maxAngleGGLE
-
   double maxAngleGGLE = -10.;
   if (m_gammaParticles->getListSize() >= 2) {
     for (unsigned int i = 0; i < m_gammaParticles->getListSize() - 1; i++) {
@@ -364,8 +407,8 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   // Radiative Bhabha skim (radee) for CDC dE/dx calib studies
   double radee = 0.;
-  const double lowdEdxEdge = 0.8, highdEdxEdge = 1.2;
-  const double lowEoPEdge = 0.8, highEoPEdge = 1.2;
+  const double lowdEdxEdge = 0.70, highdEdxEdge = 1.30;
+  const double lowEoPEdge = 0.70, highEoPEdge = 1.30;
 
   if (m_pionParticles->getListSize() == 2) {
 
@@ -435,4 +478,258 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
   calculationResult["Radee"] = radee;
 
+  // Dimuon skim (mumutight) taken from the offline skim + Radiative dimuon (radmumu)
+  double mumutight = 0.;
+  double eMumuTotGammas = 0.;
+  int nTracks = 0;
+  double radmumu = 0.;
+  const double maxEoP = 0.4;
+  int nGammas = m_gammaParticles->getListSize();
+
+  for (int t = 0; t < nGammas; t++) {
+    const Particle* part = m_gammaParticles->getParticle(t);
+    const auto& frame = ReferenceFrame::GetCurrent();
+    eMumuTotGammas += frame.getMomentum(part).E();
+  }
+
+  StoreArray<Track> tracks;
+  nTracks = tracks.getEntries();
+  PCmsLabTransform T;
+  const TLorentzVector pIN = T.getBeamFourMomentum();
+  const auto& fr = ReferenceFrame::GetCurrent();
+
+  if (m_pionParticles->getListSize() == 2) {
+
+    //------------First track variables----------------
+    for (unsigned int k = 0; k < m_pionParticles->getListSize() - 1; k++) {
+
+      Particle* part1 = m_pionParticles->getParticle(k);
+      if (!part1) continue;
+
+      const auto chargep1 = part1->getCharge();
+      if (abs(chargep1) != 1) continue;
+
+      const ECLCluster* eclTrack1 = part1->getECLCluster();
+      if (!eclTrack1) continue;
+      if (!eclTrack1->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+
+      const Track* track1 = part1->getTrack();
+      if (!track1) continue;
+
+      const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
+      if (!trackFit1) continue;
+
+      const TLorentzVector V4p1 = trackFit1->get4Momentum();
+      const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+
+      const double p1MomLab = V4p1.P();
+      double highestP = p1MomLab;
+      const double p1Eop = Variable::eclClusterEoP(part1);
+      const double p1CDChits = trackFit1->getHitPatternCDC().getNHits();
+      const PIDLikelihood* p1Pid = part1->getPIDLikelihood();
+      bool p1hasKLMid = 0;
+      if (p1Pid) p1hasKLMid = p1Pid->isAvailable(Const::KLM);
+      const double p1isInCDC = Variable::inCDCAcceptance(part1);
+      const double p1clusPhi = Variable::eclClusterPhi(part1);
+
+      const double Pp1 = V3p1.Mag();
+      const double Thetap1 = (V3p1).Theta() * TMath::RadToDeg();
+      const double Phip1 = (V3p1).Phi() * TMath::RadToDeg();
+
+      const double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+
+      const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.4 && p1Eop < maxEoP && p1CDChits > 0
+                            && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC == 1;
+
+      //------------Second track variables----------------
+      for (unsigned int l = k + 1; l < m_pionParticles->getListSize(); l++) {
+
+        Particle* part2 = m_pionParticles->getParticle(l);
+        if (!part2) continue;
+
+        const auto chargep2 = part2->getCharge();
+        if (abs(chargep2) != 1 || (chargep1 + chargep2 != 0)) continue;
+
+        const ECLCluster* eclTrack2 = part2->getECLCluster();
+        if (!eclTrack2) continue;
+        if (!eclTrack2->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) continue;
+
+        const Track* track2 = part2->getTrack();
+        if (!track2) continue;
+
+        const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
+        if (!trackFit2) continue;
+
+        const TLorentzVector V4p2 = trackFit2->get4Momentum();
+        const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+
+        const double p2MomLab = V4p2.P();
+        double lowestP = p2MomLab;
+        const double p2Eop = Variable::eclClusterEoP(part2);
+        const double p2CDChits = trackFit2->getHitPatternCDC().getNHits();
+        const PIDLikelihood* p2Pid = part2->getPIDLikelihood();
+        bool p2hasKLMid = 0;
+        if (p2Pid) p2hasKLMid = p2Pid->isAvailable(Const::KLM);
+        const double p2isInCDC = Variable::inCDCAcceptance(part2);
+        const double p2clusPhi = Variable::eclClusterPhi(part2);
+
+        const double Pp2 = V3p2.Mag();
+        const double Thetap2 = (V3p2).Theta() * TMath::RadToDeg();
+        const double Phip2 = (V3p2).Phi() * TMath::RadToDeg();
+
+        const double acopPhi = fabs(180 - fabs(Phip1 - Phip2));
+        const double acopTheta = fabs(fabs(Thetap1 + Thetap2) - 180);
+
+        const double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+
+        const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.4 && p2Eop < maxEoP && p2CDChits > 0
+                              && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC == 1;
+
+        double eTotMumuTracks = enECLTrack1 + enECLTrack2;
+        double EMumutot = eTotMumuTracks + eMumuTotGammas;
+
+        bool mumutight_tag = enECLTrack1 < 0.5 && enECLTrack2 < 0.5 && EMumutot < 2 && acopPhi < 10 && acopTheta < 10 && nTracks == 2
+                             && Pp1 > 0.5 && Pp2 > 0.5;
+
+        if (mumutight_tag) mumutight = 1;
+
+        if (p1MomLab < p2MomLab) {
+          lowestP = highestP;
+          highestP = p2MomLab;
+        }
+
+        double diffPhi = p1clusPhi - p2clusPhi;
+        if (fabs(diffPhi) > M_PI) {
+          if (diffPhi > M_PI) {
+            diffPhi = diffPhi - 2 * M_PI;
+          } else {
+            diffPhi = 2 * M_PI + diffPhi;
+          }
+        }
+
+        const double recoilP = fr.getMomentum(pIN - V4p1 - V4p2).P();
+
+        const bool radmumu_tag = nTracks < 4 && goodTrk1 == 1 && goodTrk2 == 1 && highestP > 1 && lowestP < 3 && (p1hasKLMid == 1
+                                 || p2hasKLMid == 1) && abs(diffPhi) >= 0.5 * M_PI && recoilP > 0.1 && (enECLTrack1 <= 0.25 || enECLTrack2 <= 0.25);
+
+        if (radmumu_tag) radmumu = 1;
+
+      }
+    }
+  }
+
+  calculationResult["MumuTight"] = mumutight;
+  calculationResult["Radmumu"] = radmumu;
+
+  //Retrieve variables for HadronB skims
+  double EsumPiHad = 0;
+  double PzPiHad = 0;
+  int nHadTracks = m_pionHadParticles->getListSize();
+  double hadronb = 0;
+  double hadronb1 = 0;
+  double hadronb2 = 0;
+  std::vector<TVector3> m_pionHadv3;
+
+  for (int nPiHad = 0; nPiHad < nHadTracks; nPiHad++) {
+    Particle* parPiHad = m_pionHadParticles->getParticle(nPiHad);
+    TLorentzVector V4PiHad = PCmsLabTransform::labToCms(parPiHad->get4Vector());
+    m_pionHadv3.push_back(parPiHad->getMomentum());
+    EsumPiHad += V4PiHad.E();
+    PzPiHad += V4PiHad.Pz();
+  }
+
+  double visibleEnergyCMSnorm = (EsumPiHad + EsumGamma) / (BeamEnergyCMS() * 2.0);
+  double EsumCMSnorm = eneclClusters / (BeamEnergyCMS() * 2.0);
+  double PzTotCMSnorm = (PzPiHad + PzGamma) / (BeamEnergyCMS() * 2.0);
+
+  bool hadronb_tag = nHadTracks >= 3 && visibleEnergyCMSnorm > 0.2 && abs(PzTotCMSnorm) < 0.5 && neclClusters > 1
+                     && EsumCMSnorm > 0.1 && EsumCMSnorm < 0.8;
+
+  if (hadronb_tag) {
+    hadronb = 1;
+    FoxWolfram fw(m_pionHadv3);
+    fw.calculateBasicMoments();
+    double R2 = fw.getR(2);
+    if (R2 < 0.4) hadronb1 = 1;
+    if (hadronb1 && nHadTracks >= 5) hadronb2 = 1;
+  }
+
+  calculationResult["HadronB"] = hadronb;
+  calculationResult["HadronB1"] = hadronb1;
+  calculationResult["HadronB2"] = hadronb2;
+
+  // nKshort
+  int nKshort = 0;
+  double Kshort = 0.;
+
+  if (m_KsParticles.isValid()) {
+    for (unsigned int i = 0; i < m_KsParticles->getListSize(); i++) {
+      const Particle* mergeKsCand = m_KsParticles->getParticle(i);
+      const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
+      const double KsCandMass = mergeKsCand->getMass();
+      if (KsCandMass > 0.468 && KsCandMass < 0.528 && isKsCandGood == 1.) nKshort++;
+    }
+  }
+
+  if (nKshort != 0) Kshort = 1;
+
+  calculationResult["Kshort"] = Kshort;
+
+  // 4 leptons skim
+  int nFourLep = 0;
+  double fourLep = 0.;
+
+  const double visibleEnergyCMS = visibleEnergyCMSnorm * BeamEnergyCMS() * 2.0;
+  const unsigned int n_particles = m_pionHadParticles->getListSize();
+
+  if (n_particles >= 2) {
+    for (unsigned int i = 0; i < n_particles - 1; i++) {
+      Particle* par1 = m_pionHadParticles->getParticle(i);
+      for (unsigned int j = i + 1; j < n_particles; j++) {
+        Particle* par2 = m_pionHadParticles->getParticle(j);
+        const auto chSum = par1->getCharge() + par2->getCharge();
+        const TLorentzVector V4p1 = par1->get4Vector();
+        const TLorentzVector V4p2 = par2->get4Vector();
+        const double opAng = V4p1.Theta() - V4p2.Theta();
+        const TLorentzVector V4pSum = V4p1 + V4p2;
+        const TLorentzVector V4pSumCMS = PCmsLabTransform::labToCms(V4pSum);
+        const double ptCMS = V4pSumCMS.Pt();
+        const double pzCMS = V4pSumCMS.Pz();
+        const double mSum = V4pSum.M();
+
+        const bool fourLepCand = chSum == 0 && (V4p1.P() > 0.4 && V4p2.P() > 0.4) && cos(opAng) > -0.997 && ptCMS < 0.15 && abs(pzCMS) < 2.5
+                                 && mSum < 6;
+
+        if (fourLepCand)  nFourLep++;
+      }
+    }
+  }
+
+  if (nFourLep != 0 && visibleEnergyCMS < 6) fourLep = 1;
+
+  calculationResult["FourLep"] = fourLep;
+
+  // nLambda
+  unsigned int nLambda = 0;
+
+  if (m_LambdaParticles.isValid()) {
+    for (unsigned int i = 0; i < m_LambdaParticles->getListSize(); i++) {
+      const Particle* mergeLambdaCand = m_LambdaParticles->getParticle(i);
+      const double flightDist = Variable::flightDistance(mergeLambdaCand);
+      const double flightDistErr = Variable::flightDistanceErr(mergeLambdaCand);
+      const double flightSign = flightDist / flightDistErr;
+      const Particle* protCand = mergeLambdaCand->getDaughter(0);
+      const Particle* pionCand = mergeLambdaCand->getDaughter(1);
+      const double protMom = protCand->getMomentum().Mag();
+      const double pionMom = pionCand->getMomentum().Mag();
+      const double asymPDaughters = (protMom - pionMom) / (protMom + pionMom);
+      if (flightSign > 10 && asymPDaughters > 0.41) nLambda++;
+    }
+  }
+
+  if (nLambda > 0) {
+    calculationResult["Lambda"] = 1;
+  } else {
+    calculationResult["Lambda"] = 0;
+  }
 }

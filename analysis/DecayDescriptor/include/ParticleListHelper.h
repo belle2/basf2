@@ -93,6 +93,7 @@ namespace Belle2 {
       // throws an erroneous warning about reassigning appendNew
       //
       // cppcheck-suppress redundantAssignment
+      // cppcheck-suppress redundantInitialization
       auto particle = m_particles.appendNew(std::forward<Args>(args)...);
       m_list->addParticle(index, particle->getPDGCode(), particle->getFlavorType());
       return *particle;

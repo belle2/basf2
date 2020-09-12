@@ -11,8 +11,6 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-#include <string>
 #include <map>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -66,12 +64,12 @@ namespace Belle2 {
   private:
 
     /**
-     * Return mass of the most probable charged stable particle according to dEdx
+     * Returns most probable charged stable particle according to dEdx
      * and predefined prior probabilities
      * @param track reconstructed track
-     * @return mass
+     * @return charged stable
      */
-    double getMostProbableMass(const Track& track);
+    Const::ChargedStable getMostProbable(const Track& track);
 
     // steering parameters
     int m_numBins;      /**< number of bins to which search region is divided */

@@ -15,16 +15,14 @@
 #define TRGCDCCIRCLEFITTER_FLAG_
 
 #include "trg/cdc/Fitter.h"
-#include "trg/cdc/Helix.h"
+
+#include "CLHEP/Geometry/Point3D.h"
 
 #ifdef TRGCDC_SHORT_NAMES
 #define TCCFitter TRGCDCCircleFitter
 #endif
 
 namespace Belle2 {
-
-  class TLink;
-  class TRGCDCCircle;
 
 /// A class to fit a TTrackBase object to a circle.
   class TRGCDCCircleFitter : public TRGCDCFitter {

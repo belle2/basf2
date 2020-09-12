@@ -1,10 +1,13 @@
 # EventType: 2610032002
 # Descriptor: [ccbar Dstarm2D0barPim D0bar2PipPimPi0]
-# NickName: 
+# NickName: DstmToD0barPim_D0barToPipPimPi0
 # Cuts: None
-# Documentation: 
+# Documentation: MC13a signal request
 # PhysicsWG: Charm
-# Test: Yes
+# Tested: Yes
+# Responsible: Emma Oxford
+# Email: emma.oxford@desy.de
+# Date: 20191117 (YYYYMMDD)
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 

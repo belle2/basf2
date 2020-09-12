@@ -2,7 +2,6 @@
 #define _Belle2_NSMCallback_hh
 
 #include "daq/slc/nsm/AbstractNSMCallback.h"
-#include "daq/slc/nsm/NSMHandlerException.h"
 #include "daq/slc/nsm/NSMCommand.h"
 #include "daq/slc/nsm/NSMData.h"
 

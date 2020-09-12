@@ -10,10 +10,7 @@
 
 #pragma once
 
-#include <svd/dataobjects/SVDCluster.h>
-
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -44,23 +41,28 @@ namespace Belle2 {
 
     TTree* m_t_U = nullptr; /**< tree containing info related to the U side clusters*/
     TTree* m_t_V = nullptr;  /**< tree containing info related to the V side clusters*/
-    /* Branches of SVD u-clusters tree */
+    /* Branches of SVD u and v clusters tree */
     float m_svdClCharge = 0;      /**< cluster charge */
     float m_svdClSNR = 0;      /**< cluster SNR */
     float m_svdClTime = 0;      /**< cluster time */
     float m_svdRes = 0;   /**< residual computed by genfit */
+    float m_svdClIntStrPos = 0;      /**< cluster interstrip position */
     float m_svdClPos = 0;      /**< cluster position */
     float m_svdClPosErr = 0;      /**< cluster position error */
     float m_svdTruePos = -99;      /**< true position */
     float m_svdClPhi = 0;   /**< cluster global phi */
     float m_svdClZ = 0;     /**< cluster global Z */
+    std::vector<float> m_svdStripCharge; /**< charge of the strips of the cluster*/
+    std::vector<float> m_svdStripTime; /**< time of the strips of the cluster*/
+    std::vector<float> m_svdStripPosition; /**< absolute position of the strips of the cluster*/
     int m_svdTrkPXDHits = 0; /**< number of PXD hits on the track*/
     int m_svdTrkSVDHits = 0; /**< number of SVD hits on the track*/
     int m_svdTrkCDCHits = 0; /**< number of CDC hits on the track*/
+    float m_svdTrkd0 = 0;     /**< d0 of the track*/
+    float m_svdTrkz0 = 0;     /**< z0 of the track*/
+    float m_svdTrkpT = 0;     /**< pT of the track*/
+    float m_svdTrkpCM = 0;     /**< pCM of the track*/
     float m_svdTrkTraversedLength = 0; /**< traversed length of the track in the sensor*/
-    float m_svdTrkSeedX = 0; /**< track position seed, X component*/
-    float m_svdTrkSeedY = 0; /**< track position seed, Y component*/
-    float m_svdTrkSeedZ = 0; /**< track position seed, Z component*/
     float m_svdTrkPos = 0; /**< track position*/
     float m_svdTrkPosOS = 0; /**< track position on the other side*/
     float m_svdTrkPosErr = 0; /**< track position error*/
@@ -76,6 +78,7 @@ namespace Belle2 {
     unsigned int m_svdLadder = 0; /**< ladder */
     unsigned int m_svdSensor = 0; /**< sensor */
     unsigned int m_svdSize = 0; /**< size */
+    unsigned int m_svdTB = 0; /**< trigger bin */
   };
 }
 

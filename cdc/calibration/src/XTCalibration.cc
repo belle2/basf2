@@ -27,9 +27,8 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 typedef std::array<float, 3> array3; /**< angle bin info. */
-XTCalibration::XTCalibration():
-  m_firstExperiment(0), m_firstRun(0),
-  m_lastExperiment(-1), m_lastRun(-1)
+XTCalibration::XTCalibration()
+// : m_firstExperiment(0), m_firstRun(0), m_lastExperiment(-1), m_lastRun(-1)
 {
   /*
    setDescription(
@@ -431,7 +430,7 @@ void XTCalibration::readXT()
 
 void XTCalibration::readXTFromText()
 {
-  std::string fileName1 = "/cdc/data/" + m_xtfile;
+  std::string fileName1 = "/data/cdc" + m_xtfile;
   std::string fileName = FileSystem::findFile(fileName1);
   boost::iostreams::filtering_istream ifs;
   if (fileName == "") {

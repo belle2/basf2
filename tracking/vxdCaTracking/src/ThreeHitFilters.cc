@@ -18,7 +18,7 @@ using namespace std;
 using namespace Belle2;
 using boost::math::sign;
 
-int ThreeHitFilters::calcSign(TVector3& a, TVector3& b, TVector3& c)
+int ThreeHitFilters::calcSign(const TVector3& a, const TVector3& b, const TVector3& c)
 {
   TVector3 ba = a - b; ba.SetZ(0.);
   TVector3 bc = b - c; bc.SetZ(0.);

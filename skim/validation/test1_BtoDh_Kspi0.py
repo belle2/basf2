@@ -16,37 +16,13 @@ __author__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
-from stdCharged import stdK, stdPi
-from stdPi0s import loadStdSkimPi0
-from stdV0s import stdKshorts
-import skimExpertFunctions as expert
-
+from skim.btocharm import BtoD0h_Kspi0
 
 path = b2.Path()
 
-skimCode = expert.encodeSkimName('BtoD0h_Kspi0')
-
 fileList = ['../BtoDh_Kspi0.dst.root']
-
 ma.inputMdstList('default', fileList, path=path)
 
-# Load particle lists
-stdPi('all', path=path)
-stdK('all', path=path)
-loadStdSkimPi0(path=path)
-stdKshorts(path=path)
-
-
-# Kspi0 skim
-from skim.btocharm import loadD0_Kspi0_loose, BsigToD0hToKspi0List
-loadD0_Kspi0_loose(path=path)
-BtoDhList = BsigToD0hToKspi0List(path=path)
-expert.skimOutputUdst(skimCode, BtoDhList, path=path)
-ma.summaryOfLists(BtoDhList, path=path)
-
-# Suppress noisy modules, and then process
-expert.setSkimLogging(path)
+skim = BtoD0h_Kspi0()
+skim(path)
 b2.process(path)
-
-# print out the summary
-print(b2.statistics)

@@ -459,7 +459,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(resultLocalMinMax.first, hitLocalMinMax.first);
     EXPECT_FLOAT_EQ(resultLocalMinMax.second, hitLocalMinMax.second);
   }
-  //     static pair<float, float> convertToLocalCoordinates(const pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = NULL);
+  //     static pair<float, float> convertToLocalCoordinates(const pair<float, float>& hitNormalized, VxdID::baseType vxdID, const VXD::SensorInfoBase* aSensorInfo = nullptr);
 
 
 

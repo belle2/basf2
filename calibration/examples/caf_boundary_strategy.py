@@ -3,7 +3,6 @@
 # and change the input data below.
 
 from basf2 import *
-set_log_level(LogLevel.DEBUG)
 
 import sys
 from pathlib import Path
@@ -15,11 +14,14 @@ from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
 
 
+set_log_level(LogLevel.DEBUG)
+
+
 def main(argv):
     if len(argv) == 1:
         data_dir = argv[0]
     else:
-        print("Usage: basf2 CAF_simplest.py <data directory>")
+        print("Usage: basf2 caf_boundary_strategy.py <data directory>")
         sys.exit(1)
 
     ###################################################

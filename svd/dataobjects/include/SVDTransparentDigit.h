@@ -45,17 +45,17 @@ namespace Belle2 {
                         const unsigned short fadcID,
                         const unsigned short apvID,
                         const unsigned short nSample = 0,
-                        const short** adc  = NULL,
-                        const short*  cmc1 = NULL,
-                        const short*  cmc2 = NULL,
-                        const short** corradc = NULL,
-                        const short** fine_cmc1 = NULL,
-                        const short** fine_cmc2 = NULL,
-                        const short** fine_corradc = NULL)
+                        const short** adc  = nullptr,
+                        const short*  cmc1 = nullptr,
+                        const short*  cmc2 = nullptr,
+                        const short** corradc = nullptr,
+                        const short** fine_cmc1 = nullptr,
+                        const short** fine_cmc2 = nullptr,
+                        const short** fine_corradc = nullptr)
       : m_sensorID(sensorID), m_isU(isU),
         m_fadcID(fadcID), m_apvID(apvID), m_nSample(nSample)
     {
-      if (adc != NULL) {
+      if (adc != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -66,7 +66,7 @@ namespace Belle2 {
         memset(m_ADC, 0, sizeof(m_ADC));
       }
 
-      if (cmc1 != NULL) {
+      if (cmc1 != nullptr) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
           m_cmc1[index] = cmc1[index];
@@ -75,7 +75,7 @@ namespace Belle2 {
         memset(m_cmc1, 0, sizeof(m_cmc1));
       }
 
-      if (cmc2 != NULL) {
+      if (cmc2 != nullptr) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
           m_cmc2[index] = cmc2[index];
@@ -84,7 +84,7 @@ namespace Belle2 {
         memset(m_cmc2, 0, sizeof(m_cmc2));
       }
 
-      if (corradc != NULL) {
+      if (corradc != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -95,7 +95,7 @@ namespace Belle2 {
         memset(m_corrADC, 0, sizeof(m_corrADC));
       }
 
-      if (fine_cmc1 != NULL) {
+      if (fine_cmc1 != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -106,7 +106,7 @@ namespace Belle2 {
         memset(m_fine_cmc1, 0, sizeof(m_fine_cmc1));
       }
 
-      if (fine_cmc2 != NULL) {
+      if (fine_cmc2 != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -117,7 +117,7 @@ namespace Belle2 {
         memset(m_fine_cmc2, 0, sizeof(m_fine_cmc2));
       }
 
-      if (fine_corradc != NULL) {
+      if (fine_corradc != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -127,12 +127,13 @@ namespace Belle2 {
       } else {
         memset(m_fine_corrADC, 0, sizeof(m_fine_corrADC));
       }
-
+      memset(m_cmc, 0, sizeof(m_cmc));
+      memset(m_fine_cmc, 0, sizeof(m_fine_cmc));
     }
 
     /** Default constructor for the ROOT IO. */
     SVDTransparentDigit()
-      : SVDTransparentDigit(0, true, 0, 0, 0, NULL, NULL, NULL, NULL)
+      : SVDTransparentDigit(0, true, 0, 0, 0, nullptr, nullptr, nullptr, nullptr)
     {}
 
     /** Get the sensor ID.
@@ -165,7 +166,7 @@ namespace Belle2 {
      */
     const short*  getADC(short channel) const
     {
-      if (channel < 0 || 128 <= channel) return NULL;
+      if (channel < 0 || 128 <= channel) return nullptr;
       else return m_ADC[channel];
     }
 
@@ -225,7 +226,7 @@ namespace Belle2 {
      */
     const short*  getFineCMC1(short channel) const
     {
-      if (channel < 0 || 128 <= channel) return NULL;
+      if (channel < 0 || 128 <= channel) return nullptr;
       return m_fine_cmc1[channel];
     }
     /** Get 1st fine commom-mode correction value.
@@ -243,7 +244,7 @@ namespace Belle2 {
      */
     const short*  getFineCMC2(short channel) const
     {
-      if (channel < 0 || 128 <= channel) return NULL;
+      if (channel < 0 || 128 <= channel) return nullptr;
       return m_fine_cmc2[channel];
     }
     /** Get 2nd fine commom-mode correction value.
@@ -261,7 +262,7 @@ namespace Belle2 {
      */
     const short*  getFineCMC(short channel) const
     {
-      if (channel < 0 || 128 <= channel) return NULL;
+      if (channel < 0 || 128 <= channel) return nullptr;
       return m_fine_cmc[channel];
     }
     /** Get total fine commom-mode correction value.
@@ -280,7 +281,7 @@ namespace Belle2 {
      */
     const short*  getCorrADC(short channel) const
     {
-      if (channel < 0 || 128 <= channel) return NULL;
+      if (channel < 0 || 128 <= channel) return nullptr;
       return m_corrADC[channel];
     }
     /** Get corrected ADC value with pedestal and common-mode.
@@ -299,7 +300,7 @@ namespace Belle2 {
      */
     const short*  getFineCorrADC(short channel) const
     {
-      if (channel < 0 || 128 <= channel) return NULL;
+      if (channel < 0 || 128 <= channel) return nullptr;
       return m_fine_corrADC[channel];
     }
     /** Get precisely corrected ADC value with pedestal and fine common-mode.
@@ -338,7 +339,7 @@ namespace Belle2 {
      */
     void setADC(short** adc)
     {
-      if (adc != NULL) {
+      if (adc != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -351,7 +352,7 @@ namespace Belle2 {
      */
     void setADC(short* adc, short channel)
     {
-      if (adc != NULL) {
+      if (adc != nullptr) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
           m_ADC[channel][index] = adc[index];
@@ -416,7 +417,7 @@ namespace Belle2 {
      */
     void setFineCMC1(short** fine_cmc1)
     {
-      if (fine_cmc1 != NULL) {
+      if (fine_cmc1 != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -429,7 +430,7 @@ namespace Belle2 {
      */
     void setFineCMC1(short* fine_cmc1, short channel)
     {
-      if (fine_cmc1 != NULL) {
+      if (fine_cmc1 != nullptr) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
           m_fine_cmc1[channel][index] = fine_cmc1[index];
@@ -448,7 +449,7 @@ namespace Belle2 {
      */
     void setFineCMC2(short** fine_cmc2)
     {
-      if (fine_cmc2 != NULL) {
+      if (fine_cmc2 != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -461,7 +462,7 @@ namespace Belle2 {
      */
     void setFineCMC2(short* fine_cmc2, short channel)
     {
-      if (fine_cmc2 != NULL) {
+      if (fine_cmc2 != nullptr) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
           m_fine_cmc2[channel][index] = fine_cmc2[index];
@@ -480,7 +481,7 @@ namespace Belle2 {
      */
     void setFineCMC(short** fine_cmc)
     {
-      if (fine_cmc != NULL) {
+      if (fine_cmc != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -493,7 +494,7 @@ namespace Belle2 {
      */
     void setFineCMC(short* fine_cmc, short channel)
     {
-      if (fine_cmc != NULL) {
+      if (fine_cmc != nullptr) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
           m_fine_cmc[channel][index] = fine_cmc[index];
@@ -512,7 +513,7 @@ namespace Belle2 {
      */
     void setCorrADC(short** corradc)
     {
-      if (corradc != NULL) {
+      if (corradc != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -525,7 +526,7 @@ namespace Belle2 {
      */
     void setCorrADC(short* corradc, short channel)
     {
-      if (corradc != NULL) {
+      if (corradc != nullptr) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
           m_corrADC[channel][index] = corradc[index];
@@ -544,7 +545,7 @@ namespace Belle2 {
      */
     void setFineCorrADC(short** corradc)
     {
-      if (corradc != NULL) {
+      if (corradc != nullptr) {
         for (int channel = 0; channel < 128; channel++) {
           //for(int index=0;index<SVDPar::maxSample;index++) {
           for (int index = 0; index < 6; index++) {
@@ -557,7 +558,7 @@ namespace Belle2 {
      */
     void setFineCorrADC(short* corradc, short channel)
     {
-      if (corradc != NULL) {
+      if (corradc != nullptr) {
         //for(int index=0;index<SVDPar::maxSample;index++) {
         for (int index = 0; index < 6; index++) {
           m_fine_corrADC[channel][index] = corradc[index];

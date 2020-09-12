@@ -11,7 +11,7 @@
 #pragma once
 
 /* KLM headers. */
-#include <klm/eklm/dataobjects/EKLMDigit.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
 /* Belle 2 headers. */
@@ -47,40 +47,43 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~EKLMDataCheckerModule();
+    ~EKLMDataCheckerModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
+
+    /** Element numbers. */
+    const EKLMElementNumbers* m_ElementNumbers;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_GeoDat;
 
     /** Digits. */
-    StoreArray<EKLMDigit> m_Digits;
+    StoreArray<KLMDigit> m_Digits;
 
     /** Map of strip data information. */
     std::map<int, struct StripData> m_StripDataMap;

@@ -1,5 +1,14 @@
-#ifndef ECLDSPFITTERPURE_H
-#define ECLDSPFITTERPURE_H
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Guglielmo De Nardo                                       *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+#pragma once
 
 #include <ecl/digitization/EclConfigurationPure.h>
 
@@ -16,5 +25,3 @@ namespace Belle2 {
                        int& amp, double& time, double& chi2, int& niter);
   }
 }
-
-#endif

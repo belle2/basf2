@@ -41,7 +41,7 @@ ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber)
 {
   FILE* fl;
   fl = fopen(filename, "rb");
-  if (fl == NULL) {
+  if (fl == nullptr) {
     B2ERROR("Can't open file " << filename);
   }
 
@@ -303,8 +303,6 @@ ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttri
   int Askip = thr_StoreDigit->getCalibVector()[cid - 1];
 
   //== Perform fit
-  int ampFit, timeFit, qualityFit;
-
   auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
                        Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2,
                        chi_thres);

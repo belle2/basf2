@@ -2,6 +2,7 @@ import basf2
 import ROOT
 import datetime
 import os
+import re
 import subprocess
 from basf2 import *
 from ROOT import Belle2
@@ -35,7 +36,6 @@ elif argc == 2:
 
 probcut = float(probcut)
 # print(probcut)
-import re
 
 rootdir = None
 prefix = None
@@ -92,7 +92,7 @@ if reUnpack:
                          # Enable/Disable to store the CDCRawHit Object.
                          enableStoreCDCRawHit=True,
                          enableDatabase=False,
-                         xmlMapFileName="cdc/data/ch_map_201702.dat",
+                         xmlMapFileName="data/cdc/ch_map_201702.dat",
                          # Enable/Disable print out the ADC/TDC data to the terminal.
                          enablePrintOut=False,
                          enable2ndHit=False,

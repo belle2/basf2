@@ -10,15 +10,15 @@
 
 #pragma once
 
-/* C++ headers. */
-#include <map>
+/* KLM headers. */
+#include <klm/dataobjects/KLMElementArrayIndex.h>
 
 namespace Belle2 {
 
   /**
    * KLM plane array index.
    */
-  class KLMPlaneArrayIndex {
+  class KLMPlaneArrayIndex : public KLMElementArrayIndex {
 
   public:
 
@@ -26,26 +26,6 @@ namespace Belle2 {
      * Instantiation.
      */
     static const KLMPlaneArrayIndex& Instance();
-
-    /**
-     * Get plane index.
-     * @param[in] number Plane number.
-     */
-    uint16_t getIndex(uint16_t number) const;
-
-    /**
-     * Get plane number.
-     * @param[in] index Plane index.
-     */
-    uint16_t getNumber(uint16_t index) const;
-
-    /**
-     * Get number of planes.
-     */
-    uint16_t getNPlanes() const
-    {
-      return m_NPlanes;
-    }
 
   private:
 
@@ -58,15 +38,6 @@ namespace Belle2 {
      * Destructor.
      */
     ~KLMPlaneArrayIndex();
-
-    /** Map KLM plane number - KLM plane index. */
-    std::map<uint16_t, uint16_t> m_MapNumberIndex;
-
-    /** Map KLM plane index - KLM plane number. */
-    std::map<uint16_t, uint16_t> m_MapIndexNumber;
-
-    /** Number of planes. */
-    uint16_t m_NPlanes;
 
   };
 

@@ -6,10 +6,10 @@
 // Date : 2 - Aug - 2013
 //-
 #include <daq/rawdata/modules/MonitorDataCOPPER.h>
+#include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawECL.h>
 
 #include <TDirectory.h>
-#include <cstdio>
 
 using namespace std;
 using namespace Belle2;

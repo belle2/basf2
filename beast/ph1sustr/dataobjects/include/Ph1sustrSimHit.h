@@ -31,6 +31,7 @@ namespace Belle2 {
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
+     * @param detID detector id
      */
     Ph1sustrSimHit(float energyDep, int detID):
       m_energyDep(energyDep), m_detID(detID) {}

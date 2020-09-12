@@ -195,19 +195,19 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[1;35m================================================================================\033[0m");
   B2INFO("\033[40;97m            ,.,                                                                 \033[0m");
   B2INFO("\033[40;97m           ;%&M%;_   ,..,                                                       \033[0m");
-  B2INFO("\033[40;97m             \"_ “__” % M % M %;          , ..., ,                               \033[0m");
-  B2INFO("\033[40;97m      , ..., __.\" --\"    , .,     _ - “ % &W % WM %;                            \033[0m");
-  B2INFO("\033[40;97m     ; % M&$M % ”___ \"_._   %M%”_.”” _ \"\"\"\"\"\"                                   \033[0m");
+  B2INFO("\033[40;97m             \"_ \"__\" % M % M %;          , ..., ,                               \033[0m");
+  B2INFO("\033[40;97m      , ..., __.\" --\"    , .,     _ - \" % &W % WM %;                            \033[0m");
+  B2INFO("\033[40;97m     ; % M&$M % \"___ \"_._   %M%\"_.\"\" _ \"\"\"\"\"\"                                   \033[0m");
   B2INFO("\033[40;97m       \"\"\"\"\"    \"\" , \\_.   \"_. .\"                                               \033[0m");
   B2INFO("\033[40;97m              , ., _\"__ \\__./ .\"                                                \033[0m");
   B2INFO("\033[40;97m          ___       __ |  y     , ..,     \033[97;40mThank you for using TreeFitter.       \033[0m");
   B2INFO("\033[40;97m         /)'\\    ''''| u  \\ %W%W%%;                                             \033[0m");
-  B2INFO("\033[40;97m     ___)/   \"---\\_ \\   |____”            \033[97;40mCite:                                 \033[0m");
-  B2INFO("\033[40;97m   ;&&%%;           (|__.|)./  ,..,           \033[97;40mhttps://arxiv.org/abs/1901.11198  \033[0m");
-  B2INFO("\033[40;97m             ,.., ___\\    |/     &&\"                                            \033[0m");
+  B2INFO("\033[40;97m     ___)/   \"---\\_ \\   |____\"            \033[97;40mPlease cite both:                     \033[0m");
+  B2INFO("\033[40;97m   ;&&%%;           (|__.|)./  ,..,           \033[97;40m10.1016/j.nima.2020.164269        \033[0m");
+  B2INFO("\033[40;97m             ,.., ___\\    |/     &&\"       \033[97;40m   10.1016/j.nima.2005.06.078        \033[0m");
   B2INFO("\033[40;97m           &&%%&    (| Uo /        '\"     \033[97;40mEmail:                                \033[0m");
   B2INFO("\033[40;97m            ''''     \\ 7 \\                   \033[97;40mfrancesco.tenchini@desy.de         \033[0m");
-  B2INFO("\033[40;97m  ._______________.-‘____””—.____.           \033[97;40mjo-frederik.krohn@desy.de          \033[0m");
+  B2INFO("\033[40;97m  ._______________.-'____\"\"-.____.           \033[97;40mjo-frederik.krohn@desy.de          \033[0m");
   B2INFO("\033[40;97m   \\                           /                                                \033[0m");
   B2INFO("\033[40;97m    \\       \033[0m\033[32;40mTREEFITTER\033[0m\033[40;97m        /                                                 \033[0m");
   B2INFO("\033[40;97m     \\_______________________/                                                  \033[0m");
@@ -216,7 +216,8 @@ void TreeFitterModule::plotFancyASCII()
   B2INFO("\033[1;35m============= TREEFIT STATISTICS ===============================================\033[0m");
   B2INFO("\033[1;39mCandidates before fit: " << m_nCandidatesBeforeFit << "\033[0m");
   B2INFO("\033[1;39mCandidates after fit:  " << m_nCandidatesAfter << "\033[0m");
-  B2INFO("\033[1;39mA total of " << m_nCandidatesBeforeFit - m_nCandidatesAfter << " candidates was removed during the fit.\033[0m");
+  B2INFO("\033[1;39mA total of " << m_nCandidatesBeforeFit - m_nCandidatesAfter <<
+         " candidates were removed during the fit.\033[0m");
   B2INFO("\033[1;39m" << (double)m_nCandidatesAfter / (double)m_nCandidatesBeforeFit * 100.0 <<
          "% of candidates survived the fit.\033[0m");
   B2INFO("\033[1;39m" << 100. - (double)m_nCandidatesAfter / (double)m_nCandidatesBeforeFit * 100.0 <<

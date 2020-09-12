@@ -16,12 +16,10 @@
 #define TRGChannel_FLAG_
 
 #include <string>
-#include <vector>
 
 namespace Belle2 {
 
   class TRGSignalBundle;
-  class TRGClock;
   class TRGBoard;
 
 /// A class to represent a serial link between trigger hardware modules

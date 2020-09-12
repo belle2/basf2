@@ -50,7 +50,7 @@ namespace Belle2 {
 
     PlumeCreator::PlumeCreator(): m_sensitive(0)
     {
-      m_sensitive = new SensitiveDetector();
+      //m_sensitive = new SensitiveDetector();
     }
 
     PlumeCreator::~PlumeCreator()
@@ -60,6 +60,8 @@ namespace Belle2 {
 
     void PlumeCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes /* type */)
     {
+
+      m_sensitive = new SensitiveDetector();
 
       //color attributions
       G4VisAttributes* FoamVisAtt  = new G4VisAttributes(G4Colour::Blue());
@@ -267,7 +269,7 @@ namespace Belle2 {
       double pipeZ = pipeParams.getLength("z") * CLHEP::cm;
       G4double alphaPipe = pipeParams.getAngle("alpha");
 
-      GearDir alignPars;
+      //GearDir alignPars;
       G4Box* s_sensors = new G4Box("s_sensors", flexlen / 2., flexwid / 2., dz_sensor + AirGap);
 
       for (auto ladder : content.getNodes("Placements/Ladder")) {
@@ -278,34 +280,38 @@ namespace Belle2 {
         assemblyLadder->AddPlacedAssembly(support, tra);
 
         for (auto pars : content.getNodes("SensorAlignment/ladder")) {
-          if (pars.getString("@id") == id) alignPars = pars;
-        }
+          if (pars.getString("@id") == id) {
+            GearDir alignPars(pars);
 
-        for (auto sidePars : alignPars.getNodes("side")) {
-          unsigned mirror = 0;
+            for (auto sidePars : alignPars.getNodes("side")) {
+              unsigned mirror = 0;
 
-          G4Transform3D transformSens;
-          if (sidePars.getString("@id") == "mirror") mirror = 1;
+              G4Transform3D transformSens;
+              if (sidePars.getString("@id") == "mirror") mirror = 1;
 
-          G4LogicalVolume* l_sensors = new G4LogicalVolume(s_sensors, geometry::Materials::get("G4_AIR"), "PLUME.l_sensors");
+              G4LogicalVolume* l_sensors = new G4LogicalVolume(s_sensors, geometry::Materials::get("G4_AIR"), "PLUME.l_sensors");
 
-          for (auto sensorPars : sidePars.getNodes("sensor")) {
-            double x = sensorPars.getLength("x") * CLHEP::cm + zshift;
-            double y = sensorPars.getLength("y") * CLHEP::cm;
-            int ids = sensorPars.getInt("id");
-            y = mirror ? -y : y;
-            y -= alwid / 2.;
-            double alpha1 = sensorPars.getAngle("alpha") * CLHEP::rad;
-            if (mirror) transformSens =  G4Translate3D(x, y,
-                                                         0) * G4RotateZ3D(alpha1) * G4RotateX3D(M_PI); // think if this is correct, rotation and pos shift for mirror side
-            else  transformSens =  G4Translate3D(x, y, 0) * G4RotateZ3D(-alpha1);
+              for (auto sensorPars : sidePars.getNodes("sensor")) {
+                double x = sensorPars.getLength("x") * CLHEP::cm + zshift;
+                double y = sensorPars.getLength("y") * CLHEP::cm;
+                int ids = sensorPars.getInt("id");
+                y = mirror ? -y : y;
+                y -= alwid / 2.;
+                double alpha1 = sensorPars.getAngle("alpha") * CLHEP::rad;
+                if (mirror) transformSens =  G4Translate3D(x, y,
+                                                             0) * G4RotateZ3D(alpha1) * G4RotateX3D(M_PI); // think if this is correct, rotation and pos shift for mirror side
+                else  transformSens =  G4Translate3D(x, y, 0) * G4RotateZ3D(-alpha1);
 
-            new G4PVPlacement(transformSens, l_sensor, "p_sensor", l_sensors, true,
-                              (ids + mirror * 6 + LadderID * 12));
+                new G4PVPlacement(transformSens, l_sensor, "p_sensor", l_sensors, true,
+                                  (ids + mirror * 6 + LadderID * 12));
+              }
+              transformSens = G4Translate3D(0, 0, mirror ? -zSens : zSens);
+              assemblyLadder->AddPlacedVolume(l_sensors, transformSens);
+            }
           }
-          transformSens = G4Translate3D(0, 0, mirror ? -zSens : zSens);
-          assemblyLadder->AddPlacedVolume(l_sensors, transformSens);
         }
+
+
 
         G4double thetaZ = ladder.getAngle("ThetaZ");
         G4double r = ladder.getLength("r_plume") * CLHEP::cm - zshift * sin(thetaZ);

@@ -11,7 +11,7 @@ payloads and iovs for a certain dataset is called a **globaltag** and is
 identified by a unique name.
 
 Payload
-    An atom of conditons data identified by name and revision number
+    An atom of conditions data identified by name and revision number
 
     * usually ROOT files containing custom objects
     * a payload cannot be modified after creation.
@@ -48,7 +48,7 @@ further to ensure reproducibility of analyses: different processing iterations
 will use different globaltags. The only exceptions are the globaltag used online
 during data taking and for prompt processing of data directly after data taking:
 These two globaltags are flagged as running and information for new runs is
-constantly added to them as more data becomes available. 
+constantly added to them as more data becomes available.
 
 All globaltags to be used in analysis need to be fixed. Globaltags which are
 not fixed, i.e. "OPEN", cannot be used for data processing. Otherwise it is not
@@ -82,7 +82,7 @@ By default the software will look for conditions data in
 1. user globaltags: Look in all globaltags provided by the user by setting `conditions.globaltags <ConditionsConfiguration.globaltags>`
 2. globaltag replay: Look in different base globaltags depending on the use case:
 
-    - **Procesing existing files (i.e. mdst)**: the globaltags specified in the input file are used.
+    - **Processing existing files (i.e. mdst)**: the globaltags specified in the input file are used.
     - **Generating and events**: the default globaltags for the current software version (`conditions.default_globaltags <ConditionsConfiguration.default_globaltags>` are used.
 
 The globaltag replay can be disabled by calling `conditions.override_globaltags() <ConditionsConfiguration.override_globaltags>`
@@ -246,6 +246,45 @@ payload files themselves before running the software:
        export BELLE2_CONDB_PAYLOADS=/path/where/to/download
 
 
+.. _cdb_payload_creation:
+
+Creation of new payloads
+========================
+
+New payloads can be created by calling ``Belle2::Database::storeData()`` from
+either C++ or python. It takes a ``TObject*`` or ``TClonesArray*`` pointer to
+the payload data and an interval of validity. Optionally, the first argument can
+be the name to store the Payload with which usually defaults to the classname of
+the object.
+
+.. code-block:: c++
+
+   #include <framework/database/Database.h>
+   #include <framework/database/IntervalOfValidity.h>
+   #include <framework/dbobjects/BeamParameters.h>
+
+   std::unique_ptr<BeamParameters> beamParams(new BeamParameters());
+   Database::Instance().storeData(beamParams.get(), IntervalOfValidity::always());
+
+In python the name of the payload cannot be inferred so it always needs to be
+specified explicitly
+
+.. code-block:: python
+
+   from ROOT import Belle2
+   beam_params = Belle2.BeamParameters()
+   iov = Belle2.IntervalOfValidity(0,0,3,-1)
+   Belle2.Database.Instance().storeData("BeamParameters", beam_params, iov)
+
+By default this will create new payload files in the subdirectory "localdb"
+relative to the current working directory and also create a text file
+containing the metadata for the payload files.
+
+These payloads can then be tested by adding the filename of the text file to
+`conditions.testing_payloads <basf2.ConditionsConfiguration.testing_payloads>`
+and once satisfied can be uploaded with :ref:`b2conditionsdb-upload <b2conditionsdb>`
+or :ref:`b2conditionsdb-request <b2conditionsdb-request>`
+
 .. _cdb_config_transition:
 
 Transition from older releases
@@ -255,18 +294,18 @@ The configuration interface changed for release-04 and the old configuration
 functions now create warnings but should still work in most cases. Only expert
 settings like custom log levels and database parameters are no longer supported.
 
-* `reset_database()`: Not really needed anymore as the default settings will be
+* `basf2.reset_database()`: Not really needed anymore as the default settings will be
   more suitable for everyone. Still works but behaves slightly different as it
   will reset to default settings instead of completely empty settings
 
-* `use_database_chain()` is no longer needed and can be removed. We now always have a list of globaltags.
+* `basf2.use_database_chain()` is no longer needed and can be removed. We now always have a list of globaltags.
 
-* `use_central_database()` should be replaced with `conditions.prepend_globaltag() <ConditionsConfiguration.prepend_globaltag>`
+* `basf2.use_central_database()` should be replaced with `conditions.prepend_globaltag() <ConditionsConfiguration.prepend_globaltag>`
 
-* `use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
+* `basf2.use_local_database()` should be replaced with `conditions.prepend_testing_payloads() <ConditionsConfiguration.prepend_testing_payloads>`
 
-* the payloads in `localdb/database.txt` are no longer used by default, you have to explicitly enable that
-  using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.preprend_testing_payloads>`
+* the payloads in ``localdb/database.txt`` are no longer used by default, you have to explicitly enable that
+  using `conditions.prepend_testing_payloads("localdb/database.txt") <ConditionsConfiguration.prepend_testing_payloads>`
 
 * you can now inspect what are the settings (``print(conditions.globaltags)``)
   and also edit that list (``conditions.globaltags += ["some", "other", "tags"]``).

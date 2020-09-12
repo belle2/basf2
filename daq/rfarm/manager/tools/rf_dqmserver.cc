@@ -9,6 +9,8 @@
 #include "daq/rfarm/manager/RFDqmServer.h"
 #include "daq/rfarm/manager/RFNSM.h"
 
+#include <csignal>
+
 using namespace std;
 using namespace Belle2;
 

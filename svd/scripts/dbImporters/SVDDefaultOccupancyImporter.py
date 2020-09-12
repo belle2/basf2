@@ -16,25 +16,16 @@ import os
 
 now = datetime.datetime.now()
 
-'''
-# Phase 3 - scaled with 375
-occupancy_L3_U = 2.48
-occupancy_L3_V = 1.81
-occupancy_bkw_U = 2.08
-occupancy_bkw_V = 1.81
-occupancy_origami_U = 2.40
-occupancy_origami_V = 1.33
-occupancy_fwd_U = 2.00
-occupancy_fwd_V = 1.81
-'''
-# Phase 3 - scaled with rescaled gain
+# Phase 3 - exp 10
 occupancy_L3 = 0.003
 occupancy_allOtherLayers = 0.002
 
 
 class defaultOccupancyImporter(basf2.Module):
+    ''' default importer of strip occupancy'''
 
     def beginRun(self):
+        '''begin run'''
 
         iov = Belle2.IntervalOfValidity.always()
 

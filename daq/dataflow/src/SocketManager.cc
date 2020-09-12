@@ -6,8 +6,15 @@
 // Date : 19 - Feb - 2013
 //-
 
-
 #include <daq/dataflow/SocketManager.h>
+
+#include <netinet/in.h>
+
+#include <algorithm>
+#include <cstdio>
+#include <cstring>
+#include <sys/socket.h>
+#include <unistd.h>
 
 using namespace Belle2;
 using namespace std;

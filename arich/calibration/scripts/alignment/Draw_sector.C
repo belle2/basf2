@@ -19,11 +19,10 @@ void Draw_sector(const char*file){
   ch->Draw("photons.m_nCosThetaCh_e:photons.m_phiCh_e>>h3","charge<0.0 && eop>0.9 && e9e21>0.95 && recHit.p>4.0");
 
   TH1D*pj[13];
-  Int_t first=0;
-  Int_t last=0;
+  
   for(Int_t i=0;i<13;i++){
-    first=h3->GetXaxis()->FindBin(-3.0+i*0.5-0.1);
-    last=h3->GetXaxis()->FindBin(-3.0+i*0.5+0.1);
+    int first=h3->GetXaxis()->FindBin(-3.0+i*0.5-0.1);
+    int last=h3->GetXaxis()->FindBin(-3.0+i*0.5+0.1);
     pj[i]=h3->ProjectionY(Form("pj_%d",i),first,last);
   }
   TF1*f1[13];
@@ -130,9 +129,6 @@ void Draw_sector(const char*file){
     Int_t first=0;
     Int_t last=0;
     TF1* fit[13];
-    Int_t N=13;
-    Float_t x[13],x_err[13];
-    Float_t y[13],y_err[13];
     Int_t j=0;
     //c4[k]=new TCanvas(Form("c4_%d",k));
     //c4[k]->Update();

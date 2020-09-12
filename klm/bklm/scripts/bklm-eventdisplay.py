@@ -158,7 +158,7 @@ main.add_module('ProgressBar')
 
 eventDisplayer = EventDisplayer(exp, run, eventPdfName, maxDisplays, minRPCHits, minMuidHits)
 rawdata.add_unpackers(main)
-main.add_module('BKLMReconstructor')
+main.add_module('KLMReconstructor')
 add_tracking_reconstruction(main)
 ext = main.add_module('Ext')
 ext.param('pdgCodes', [13])

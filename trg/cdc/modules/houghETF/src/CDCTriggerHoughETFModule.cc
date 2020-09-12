@@ -9,7 +9,6 @@
 
 #include <trg/cdc/modules/houghETF/CDCTriggerHoughETFModule.h>
 
-#include <framework/datastore/RelationArray.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -19,7 +18,6 @@
 #include <iterator>
 
 #include <root/TMatrix.h>
-#include <numeric>
 
 /* defines */
 #define CDC_SUPER_LAYERS 9
@@ -45,25 +43,34 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
 
   // Define module parameters
   // 2D ETF specified parameters
+  // ----- PARAMETERS : GRL t0 finder with fastest priority timing (current at 2020.2.7)-----
+  // t0CalcMethod = 0
+  // usePriorityPosition = true
+  // arrivalOrder = 0
+  //
   addParam("outputEventTimeName", m_EventTimeName,
            "Name of the output StoreObjPtr.",
            string(""));
   addParam("storeTracks", m_storeTracks,
            "store tracks",
            false);
-  addParam("t0CalcMethod", m_t0CalcMethod,
-           "0: average several hits around median."
-           "1: Nth fastest fastest time.",
-           (unsigned)(0));
-  addParam("nHitsAverage", m_nHitsAverage,
-           "If t0CalcMethod == 0, average X hits around median is used as T0.",
-           (unsigned)(3));
-  addParam("arrivalOrder", m_arrivalOrder,
-           "If t0CalcMethod == 1, Nth fastest ft is used as T0.",
-           (unsigned)(0));
   addParam("usePriorityTiming", m_usePriorityTiming,
-           "Use priority timing instead of fastest timing (FOR DEBUG).",
+           "Use priority timing instead of fastest timing.",
+           true);
+  addParam("t0CalcMethod", m_t0CalcMethod,
+           "0: Nth fastest fastest time."
+           "1: median of all timings."
+           "2: median of timings in timing window.",
            (unsigned)(0));
+  addParam("arrivalOrder", m_arrivalOrder,
+           "When t0CalcMethod == 0: Nth fastest ft is used as T0. (i.e. 0 is fastest)",
+           (unsigned)(0));
+  addParam("timeWindowStart", m_timeWindowStart,
+           "When t0CalcMethod == 2: start time of time window relative to median. (in ns)",
+           (short)(-64));
+  addParam("timeWindowEnd", m_timeWindowEnd,
+           "When t0CalcMethod == 2: end time of time window relative to median. (in ns)",
+           (short)(0));
 
   //common as CDCTrigger2DFinderModule
   addParam("hitCollectionName", m_hitCollectionName,

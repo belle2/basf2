@@ -12,8 +12,11 @@
 #include <klm/modules/KLMClusterEfficiency/KLMClusterEfficiencyModule.h>
 
 /* KLM headers. */
-#include <klm/bklm/dataobjects/BKLMHit2d.h>
-#include <klm/eklm/dataobjects/EKLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit2d.h>
+#include <klm/dataobjects/eklm/EKLMHit2d.h>
+
+/* Belle2 headers. */
+#include <framework/gearbox/Const.h>
 
 /* ROOT headers. */
 #include <TCanvas.h>
@@ -112,7 +115,7 @@ void KLMClusterEfficiencyModule::event()
       m_KLMClusters[i1]->getRelationsTo<MCParticle>();
     n2 = clusterMCParticles.size();
     for (i2 = 0; i2 < n2; i2++) {
-      if (clusterMCParticles[i2]->getPDG() == 130)
+      if (clusterMCParticles[i2]->getPDG() == Const::Klong.getPDGCode())
         haveKL0 = true;
     }
     if (haveKL0) {
@@ -211,7 +214,7 @@ void KLMClusterEfficiencyModule::event()
   }
   n1 = m_MCParticles.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
-    if (m_MCParticles[i1]->getPDG() != 130)
+    if (m_MCParticles[i1]->getPDG() != Const::Klong.getPDGCode())
       continue;
     decayVertex = m_MCParticles[i1]->getDecayVertex();
     m_DecayVertexX = decayVertex.X();

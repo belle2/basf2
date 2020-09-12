@@ -22,14 +22,15 @@ from top_calibration import commonT0_calibration_BF, commonT0_calibration_LL
 
 # ----- those parameters need to be adjusted before running -----------------------------
 #
-globalTags = ['data_reprocessing_prompt_rel4_patchb']  # highest priority first
+globalTags = ['Reco_master_patch', 'data_reprocessing_proc10']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
-data_dir = '/group/belle2/dataprod/Data/release-03-02-02/DB00000654/proc9/'
+data_dir = '/group/belle2/dataprod/Data/OfficialReco/proc10/'
 bhabha_skim_dir = 'skim/hlt_bhabha/cdst/sub00'
 dimuon_skim_dir = 'offskim/offskim_mumutop/cdst/sub00'
 main_output_dir = 'top_calibration'
 default_sample = 'bhabha'
 default_method = 'BF'
+new_cdst_format = False  # set to True for input in new cdst format
 #
 # ---------------------------------------------------------------------------------------
 
@@ -80,9 +81,9 @@ output_dir = f"{main_output_dir}/commonT0-{sample}-{method}-{expNo}-{run_range}"
 
 # Define calibration
 if method == 'BF':
-    cal = commonT0_calibration_BF(inputFiles, globalTags, localDBs)
+    cal = commonT0_calibration_BF(inputFiles, globalTags, localDBs, new_cdst_format)
 elif method == 'LL':
-    cal = commonT0_calibration_LL(inputFiles, sample, globalTags, localDBs)
+    cal = commonT0_calibration_LL(inputFiles, sample, globalTags, localDBs, new_cdst_format)
 else:
     B2ERROR('Invalid method name: ' + method)
     sys.exit()

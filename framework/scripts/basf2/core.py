@@ -18,7 +18,7 @@ if _sys.version_info[0] < 3:
 from basf2 import _override_print  # noqa
 
 # import the C++ library with the exported functions
-import pybasf2
+import pybasf2  # noqa
 # and also import all of them in current scope for ease of use
 from pybasf2 import *  # noqa
 
@@ -27,7 +27,7 @@ from basf2 import _constwrapper  # noqa
 
 
 basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
-basf2copyright = 'Copyright(C) 2010-2018  Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2020  Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2
@@ -275,7 +275,7 @@ def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
     return module
 
 
-def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
+def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=None):
     """
     Add given path at the end of this path and ensure all modules there
     do not influence the main DataStore. You can thus use modules in
@@ -289,6 +289,8 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
       merge_back_event: is a list of object/array names (of event durability)
         that will be merged back into the main path.
     """
+    if merge_back_event is None:
+        merge_back_event = []
     self._add_independent_path(skim_path, ds_ID, merge_back_event)
 
 
@@ -301,7 +303,7 @@ def get_default_global_tags():
     Return the list of default globaltags in one string separated with comma
 
     .. deprecated:: release-04-00-00
-       Please use `basf2.conditions.default_globaltags` instead
+       Please use `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>` instead
     """
     B2WARNING("basf2.get_default_global_tags() is deprecated, please use basf2.conditions.default_globaltags")
     return ",".join(conditions.default_globaltags)
@@ -312,7 +314,7 @@ def set_central_database_networkparams(**argk):
     Set some expert database connection details
 
     .. deprecated:: release-04-00-00
-       Please use `basf2.conditions.expert_settings` instead
+       Please use `basf2.conditions.expert_settings <ConditionsConfiguration.expert_settings>` instead
     """
     B2WARNING("basf2.set_central_database_networkparams() is deprecated, please use basf2.conditions.expert_settings()")
     return conditions.expert_settings(**argk)
@@ -323,7 +325,7 @@ def set_central_serverlist(serverlist):
     Set the list of database servers
 
     .. deprecated:: release-04-00-00
-       Please use `basf2.conditions.metadata_providers` instead
+       Please use `basf2.conditions.metadata_providers <ConditionsConfiguration.metadata_providers>` instead
     """
     B2WARNING("basf2.set_central_serverlist() is deprecated, please use basf2.conditions.metadata_providers instead")
     conditions.metadata_providers = serverlist + [e for e in conditions.metadata_providers if not e.startswith("http")]

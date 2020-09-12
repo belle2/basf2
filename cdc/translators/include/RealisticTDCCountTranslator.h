@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef REALISTICTDCCOUNTTRANSLATOR_H
-#define REALISTICTDCCOUNTTRANSLATOR_H
+#pragma once
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -148,4 +147,3 @@ namespace Belle2 {
     };
   }
 }
-#endif /* RealisticTDCCountTranslator_H_ */

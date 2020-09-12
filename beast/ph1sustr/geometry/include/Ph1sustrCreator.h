@@ -24,8 +24,20 @@ namespace Belle2 {
     /** The creator for the PH1SUSTR geometry. */
     class Ph1sustrCreator : public geometry::CreatorBase {
     public:
+      /**
+       * Constructor
+       */
       Ph1sustrCreator();
+      /**
+       * Destructor
+       */
       virtual ~Ph1sustrCreator();
+      /**
+       * Creation of the detector geometry from Gearbox (XML).
+       * @param[in] content   XML data directory.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
+       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     protected:
       /**  SensitiveDetector phase 1 support structure */

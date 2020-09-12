@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLTRIG_H
-#define ECLTRIG_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -45,7 +44,52 @@ namespace Belle2 {
     /*! Get Trig ID
      * @return trig ID
      */
-    int getTrigId() const { return m_TrigId; }
+    int getTrigId() const { return m_TrigId & 0x3F; }
+
+    /*!
+     * Burst suppression is an algorithm implemented in ECL ShaperDSP modules
+     * to prevent buffer overflow in cases of beam burst.
+     * In such case, ShaperDSP discards waveform data (ECLDsp) and sends
+     * only fit results (ECLDigit).
+     *
+     * ALGORITHM DESCRIPTION
+     *
+     *   Each saved waveform increases beam burst suppression
+     *   counter by 11 us.
+     *   When counter passes the threshold of 50 us, waveforms
+     *   are no longer saved until counter is below 50 us again.
+     *
+     *       ------------------>
+     *
+     *      \ +11 us /  \ +11 us /
+     *       \~~~~~~/    \~~~~~~/
+     *        \~~~~/      \~~~~/
+     *         \__/        \__/
+     *     =======================
+     *                            +   Value of beam   +
+     *                            + burst suppression +
+     *                            +      counter      +
+     *                            +                   +
+     *                            +                   +
+     *                            +                   +
+     *                            +                   +  Block waveform data
+     *                            +                   +  ^
+     *                            +                   +  |
+     *                      50 us +.......................
+     *                            +                   +  |
+     *                            +~~~~~~~~~~~~~~~~~~~+  v
+     *                            +~~~~~~~~~~~~~~~~~~~+  Do not block
+     *                            +~~~~~~~~~~~~~~~~~~~+  waveform data
+     *                            +~~~~~~~~~~~~~~~~~~~+
+     *                            +++++++++++++++++++++++>
+     *                                                   🌢 -1 us
+     *
+     *                                                   🌢 -1 us
+     *
+     * @brief Return burst suppression mask. 0--suppression inactive, 1--active.
+     * @return Burst suppression mask (12 bits, 1 bit per each ShaperDSP)
+     */
+    int getBurstSuppressionMask() const { return (m_TrigId >> 6) & 0xFFF; }
 
     /*! Get Trigger tag
      * Trigger tag word width is 16 bit (bits 0-15).
@@ -78,4 +122,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

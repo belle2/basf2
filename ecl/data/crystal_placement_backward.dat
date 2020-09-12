@@ -1,4 +1,11 @@
 # crystal position with wrapping 200 um
+#
+# a crystal is rotated around the axis (sin(theta0)*cos(phi0),sin(theta0)*sin(phi0),cos(theta0)) by the alpha angle
+# and then the center of the crystal is moved by the vector R (sin(theta1)*cos(phi1),sin(theta1)*sin(phi1),cos(theta1))
+# R is in millimetres
+#
+# parameters in this file:
+# crystalID alpha theta0 phi0 R theta1 phi1
 1 2.07624340314 0.53250095194 0.970097841763 1297.68158264 1.48196579296 0.370690032275
 2 2.0388031483 0.539184990092 0.949254151216 1297.60347953 1.4820034702 0.327184270495
 2 2.00170177703 0.546963090069 0.927194683251 1297.16471336 1.48207083048 0.283638460357

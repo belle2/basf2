@@ -31,7 +31,7 @@ extern "C" {
   } momset_;
 
   /** Replace internal random generator with the framework random generator */
-  double phokhara_rndm_(int*)
+  double phokhara_rndm()
   {
     double r = gRandom->Rndm();
     return r;
@@ -42,7 +42,7 @@ extern "C" {
    * @param drvec array to store the random numbers
    * @param lenght size of the array
    */
-  void phokhara_rndmarray_(double* drvec, int* lengt)
+  void phokhara_rndmarray(double* drvec, int* lengt)
   {
     for (int i = 0; i < *lengt; ++i) {
       drvec[i] = gRandom->Rndm();
@@ -50,11 +50,11 @@ extern "C" {
   }
 
   /** main FORTRAN routine*/
-  void phokhara_(int* mode, double* xpar, int* npar);
+  void phokhara(int* mode, double* xpar, int* npar);
 
   /** particle parameters and inputs used by PHOKHARA */
 //   void phokhara_setinputfile_(const char* inputfilename, size_t* length);
-  void phokhara_setparamfile_(const char* paramfilename, size_t* length);
+  void phokhara_set_parameter_file(const char* paramfilename);
 
   /** Callback to show error if event is rejected*/
   void phokhara_error_trials_(double* trials)
@@ -159,8 +159,7 @@ void Phokhara::init(const std::string& paramFile)
   B2INFO("Phokhara::init, using paramater file: " << paramFile);
 
   if (paramFile.empty()) B2FATAL("Phokhara: The specified param file is empty!");
-  size_t fileLength = paramFile.size();
-  phokhara_setparamfile_(paramFile.c_str(), &fileLength);
+  phokhara_set_parameter_file(paramFile.c_str());
 
 //   if (inputFile.empty()) B2FATAL("Phokhara: The specified input file is empty!")
 //   fileLength = inputFile.size();
@@ -177,7 +176,7 @@ void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentz
   int mode = 1;
   if (m_ForceMinInvMassHadronsCut) {
     while (1) {
-      phokhara_(&mode, m_xpar, m_npar);
+      phokhara(&mode, m_xpar, m_npar);
       double partMom[4] = {0, 0, 0, 0};
       for (int iPart = 0; iPart < momset_.bnhad; ++iPart) {
         for (int j = 0; j < 4; ++j)
@@ -189,7 +188,7 @@ void Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, TLorentz
         break;
     }
   } else
-    phokhara_(&mode, m_xpar, m_npar);
+    phokhara(&mode, m_xpar, m_npar);
 
   //Store the initial particles as virtual particles into the MCParticleGraph
   double eMom[4] = {momset_.bp1[1], momset_.bp1[2], momset_.bp1[3], momset_.bp1[0]};
@@ -251,7 +250,7 @@ void Phokhara::term()
 {
 
   int mode = 2;
-  phokhara_(&mode, m_xpar, m_npar);
+  phokhara(&mode, m_xpar, m_npar);
 
 //   B2INFO("> Crosssection ")
 //   B2INFO(">> xsec (weighted)   = (" << bresults_.rescross << " +/- " << bresults_.rescrosserr << ") nb")
@@ -311,7 +310,7 @@ void Phokhara::applySettings()
   m_xpar[23] = m_ScatteringAngleRangeFinalStates.second;
 
   int mode = -1; //use mode to control init/generation/finalize in FORTRAN code
-  phokhara_(&mode, m_xpar, m_npar);
+  phokhara(&mode, m_xpar, m_npar);
 }
 
 

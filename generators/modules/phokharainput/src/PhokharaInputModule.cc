@@ -71,8 +71,11 @@ PhokharaInputModule::PhokharaInputModule() : Module(), m_initial(BeamParameters:
   addParam("MinEnergyGamma", m_MinEnergyGamma, "Minimal photon energy/missing energy, must be greater than 0.0098 * CMS energy [GeV]",
            0.15);
 
-  addParam("ParameterFile", m_ParameterFile, "File that contain particle properties",
-           FileSystem::findFile("/data/generators/phokhara/const_and_model_paramall9.1.dat"));
+  std::string defaultParameterFile = std::getenv("BELLE2_EXTERNALS_DIR");
+  defaultParameterFile += "/share/phokhara/const_and_model_paramall10.0.dat";
+  addParam("ParameterFile", m_ParameterFile,
+           "File that contains particle properties.",
+           defaultParameterFile);
   addParam("BeamEnergySpread", m_BeamEnergySpread,
            "Simulate beam-energy spread (initializes PHOKHARA for every "
            "event - very slow).", false);

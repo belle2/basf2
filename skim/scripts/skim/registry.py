@@ -64,6 +64,7 @@ RegisteredSkims = [
     ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
 
     # --- WG5: Quarkonium ---
+    ("15410300", "quarkonium", "InclusiveLambda"),
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
     ("15440100", "quarkonium", "BottomoniumUpsilon"),
     # ("16460100", "quarkonium", "ISRpipicc"), Subset of 16460200, deleted.

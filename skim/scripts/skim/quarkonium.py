@@ -13,6 +13,8 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu, stdPi
 from stdPhotons import stdPhotons
+from stdV0s import stdLambdas
+from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
 
@@ -179,3 +181,60 @@ class CharmoniumPsi(BaseSkim):
 
         # Return the lists.
         self.SkimLists = ["J/psi:ee", "J/psi:mumu"]
+
+
+@fancy_skim_header
+class InclusiveLambda(BaseSkim):
+    """
+    Reconstructed decay
+    * :math:`\\Lambda \\to p \\pi^-` (and charge conjugate)
+
+    Selection criteria:
+    * proton
+    ``nCDCHits > 20``
+    ``nSVDHits < 13``
+    ``trackFitHypothesisPDG == 2212``
+    ``protonID > f1(p)``
+    * pion:
+    ``nCDCHits > 0``
+    * Lambda:
+    ``p > 0.4``
+    ``cosAngleBetweenMomentumAndVertexVector > 0.99``
+    ``flightDistance/flightDistanceErr > f2(p)
+    * ``0.6 < p,proton/p,Lambda < 1.0 GeV/c``
+
+    f1(p) and f2(p) are analytical functions, p being the Lambda momentum
+    (see https://indico.belle2.org/event/2419/contributions/12005/attachments/6228/9670/BottomoniumHyperons_B2GM.pdf)
+    """
+    __authors__ = ["Bianca Scavino"]
+    __description__ = "Inclusive Lambda skim"
+    __contact__ = __liaison__
+    __category__ = "physics, quarkonium"
+
+    def load_standard_lists(self, path):
+        stdLambdas(path=path)
+
+    def build_lists(self, path):
+
+        # Add useful alias
+        v.addAlias("nCDCHits_proton", "daughter(0, nCDCHits)")
+        v.addAlias("nSVDHits_proton", "daughter(0, nSVDHits)")
+        v.addAlias("fitHypo_proton", "daughter(0, trackFitHypothesisPDG)")
+        v.addAlias("protonID_proton", "daughter(0, protonID)")
+        v.addAlias("nCDCHits_pion", "daughter(1, nCDCHits)")
+        v.addAlias("momRatio_protonLambda", "formula(daughter(0, p)/p)")
+        v.addAlias('flightSignificance', 'formula(flightDistance/flightDistanceErr)')
+
+        # Apply selection to Lambdas
+        ma.applyCuts("Lambda0:merged", "nCDCHits_proton > 20 and nSVDHits_proton < 13 and fitHypo_proton == 2212", path=path)
+        ma.applyCuts("Lambda0:merged", "nCDCHits_pion > 0", path=path)
+        ma.applyCuts("Lambda0:merged", "p > 0.4 and cosAngleBetweenMomentumAndVertexVector > 0.99", path=path)
+        ma.applyCuts("Lambda0:merged", "0.6 < momRatio_protonLambda < 1.", path=path)
+        ma.applyCuts(
+            "Lambda0:merged",
+            "flightSignificance > formula(0.5946689 + 9.23346371*p - 3.62779178*p**2 + 0.39111658*p**3)",
+            path=path)
+        ma.applyCuts("Lambda0:merged", "protonID_proton > formula(5.48275333**(-1.*p) + 0.11802824)", path=path)
+
+        # Return the lists.
+        self.SkimLists = ["Lambda0:merged"]

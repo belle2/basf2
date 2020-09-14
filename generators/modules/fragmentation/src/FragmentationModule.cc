@@ -388,8 +388,6 @@ void FragmentationModule::loadEvtGenParticleData(Pythia8::Pythia* pythia)
      * are updated.
      */
     int pdg = EvtPDL::getStdHep(evtgenParticle);
-    if (pdg < 10)
-      continue;
     if (pdg <= 10 || (pdg > 20 && pdg <= 100))
       continue;
     EvtId evtgenAntiParticle = EvtPDL::chargeConj(evtgenParticle);

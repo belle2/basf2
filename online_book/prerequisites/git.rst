@@ -92,7 +92,7 @@ https://stash.desy.de.
 
 You should already have a ssh key (see :ref:`onlinebook_ssh`) and you should copy the the contents of the
 public key file and upload it `here
-<https://stash.desy.de/plugins/servlet/ssh/account/keys>`_.
+<https://stash.desy.de/plugins/servlet/ssh/account/keys>`__.
 
 You should also make sure that you configure your git to username and email to
 something your Collaborators can recognize. The best is to use the email address
@@ -114,19 +114,19 @@ more information and help in case of problems.
    with git. Find and clone them.
    
 .. admonition:: Hint
-   :class: xhint stacked
+   :class: xhint stacked toggle
    
-   The project lives `here <https://stash.desy.de/projects/B2T>`_.
+   The project lives `here <https://stash.desy.de/projects/B2T>`__.
  
 .. admonition:: Hint
-   :class: xhint stacked
+   :class: xhint stacked toggle
    
-   The repositories live `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space/browse>`_
-   and `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/browse>`_.
+   The repositories live `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space/browse>`__
+   and `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/browse>`__.
    You can find the URL to clone by clicking a button in the sidebar on your left.
 
 .. admonition:: Solution
-   :class: solution stacked
+   :class: solution toggle
    
    .. code-block:: bash
    
@@ -141,7 +141,7 @@ Now you should have both repositories on your local machine.
    Make a local change in ``b2-git-training-space``, commit and push.
    
 .. admonition:: Solution
-   :class: solution stacked
+   :class: solution toggle
    
    .. code-block:: bash
    
@@ -160,24 +160,26 @@ cannot just push changes there directly. Instead, you have to open a pull reques
    Open a PR for a similar change in ``b2-git-training-space-2``.
    
 .. admonition:: Hint
-   :class: xhint stacked
+   :class: xhint stacked toggle
    
    You need to create a new branch and start working from there.
  
 .. admonition:: Hint
-   :class: xhint stacked
+   :class: xhint stacked toggle
    
    After you created your branch, check it out, make some changes and commit. 
    Then push the branch to the remote.
    In the text that is printed on the command line, you are invited to click
    a link to open a PR.
+   Add the starterkit organizer as a reviewer.
 
-.. code-block:: bash
+.. admonition:: Solution
+   :class: solution toggle
 
    .. code-block:: bash
    
-      # Make sure your working repository is clean
-      git status
+      # Make sure your repository is up to date
+      git pull
       # Create a new branch (Important: pick a different name for your branch!)
       git branch my-new-branch
       # Switch to it
@@ -189,5 +191,15 @@ cannot just push changes there directly. Instead, you have to open a pull reques
       
    The output of the last command tells you to go to
    ``https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/my-new-change``.
-   Visist the page to open your PR.
+   Visit the page to open your PR.
+
+Now you have to wait for someone to approve your PR. Once they do, 
+you can click on the ``Merge`` button. Then your changes are finally
+in the repository (verify this by pulling!).
+
+.. admonition:: Exercise
+   :class: Exercise
+   
+   Check if there are any other open PRs. If there are, leave some comments!
+   You can also add yourself as the reviewer and approve them.
 

@@ -10,7 +10,7 @@ Version Control with Git
 
     **Teaching**: 10 min
 
-    **Exercises**: 0 min
+    **Exercises**: 15 min
 
     **Prerequisites**:
 

@@ -33,7 +33,7 @@ from softwaretrigger.path_utils import (
 
 now = datetime.datetime.now()
 
-settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
+settings = CalibrationSettings(name="caf_svd_time",
                                expert_username="gdujany",
                                description=__doc__,
                                input_data_formats=["raw"],

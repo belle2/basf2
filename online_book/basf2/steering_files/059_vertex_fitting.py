@@ -99,7 +99,7 @@ b_vars += vc.vertex + vc.mc_vertex
 # Variables for final states (electrons, positrons, pions)
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars
 b_vars += vu.create_aliases_for_selected(
-    [*fs_vars, "isBremsCorrected"],
+    fs_vars + ["isBremsCorrected"],
     "B0 -> [J/psi -> ^e+ ^e-] K_S0",
     prefix=["ep", "em"],
 )

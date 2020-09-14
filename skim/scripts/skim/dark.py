@@ -64,7 +64,7 @@ class SinglePhotonDark(BaseSkim):
 
 
 @fancy_skim_header
-class inelasticDarkMatter(BaseSkim):
+class InelasticDarkMatter(BaseSkim):
     """
     Skim list contains events with no tracks from IP, no high E tracks and only one high E photon.
     """

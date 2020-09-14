@@ -75,7 +75,7 @@ class inelasticDarkMatter(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPhotons("all", path=path)
-        stdElectrons("all", path=path)
+        stdE("all", path=path)
 
     def build_lists(self, path):
 
@@ -96,7 +96,7 @@ class inelasticDarkMatter(BaseSkim):
                         'nParticlesInList(e+:fromIP)==0 and '
                         'nParticlesInList(e+:highE) == 0 and '
                         'nParticlesInList(gamma:HE1) == 1 and '
-                        'nParticlesInList(gamma: HE3) < 4'
+                        'nParticlesInList(gamma:HE3) < 4'
                         )
 
         path = self.skim_event_cuts(idmEventCuts, path=path)

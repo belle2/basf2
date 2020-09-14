@@ -461,3 +461,44 @@ class DielectronPlusMissingEnergy(BaseSkim):
         # And return the dielectron list
         dielectron_list.append(dielectron_name)
         self.SkimLists = dielectron_list
+
+
+@fancy_skim_header
+class InelasticDarkMatter(BaseSkim):
+    """
+    Skim list contains events with no tracks from IP, no high E tracks and only one high E photon.
+    """
+    __authors__ = ["Savino Longo"]
+    __contact__ = __liaison__
+    __description__ = "iDM list for the iDM analysis."
+    __category__ = "physics, dark sector"
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+
+        IPtrack = 'abs(dr) < 0.05'  # cm
+        HighEtrack = 'useCMSFrame(p)>3.0'  # GeV
+        ma.cutAndCopyList("e+:TrackFromIP", "e+:all", IPtrack, path=path)
+        ma.cutAndCopyList("e+:HighEnergyTrack", "e+:all", HighEtrack, path=path)
+
+        signalPhoton = 'clusterReg==2 and clusterZernikeMVA > 0.3 and useCMSFrame(p) > 1.0'
+        photonVetoHE1 = 'useCMSFrame(p) > 0.6'
+        photonVetoHE3 = 'p>0.5'
+
+        ma.cutAndCopyList("gamma:ISR", "gamma:all", signalPhoton, path=path)
+        ma.cutAndCopyList("gamma:HighEnergyPhotons", "gamma:all", photonVetoHE1, path=path)
+        ma.cutAndCopyList("gamma:MediumEnergyPhotons", "gamma:all", photonVetoHE3, path=path)
+
+        idmEventCuts = ('nParticlesInList(gamma:ISR)==1 and '
+                        'nParticlesInList(e+:TrackFromIP)==0 and '
+                        'nParticlesInList(e+:HighEnergyTrack) == 0 and '
+                        'nParticlesInList(gamma:HighEnergyPhotons) == 1 and '
+                        'nParticlesInList(gamma:MediumEnergyPhotons) < 4'
+                        )
+
+        path = self.skim_event_cuts(idmEventCuts, path=path)
+
+        self.SkimLists = ["gamma:all", 'e-:all']

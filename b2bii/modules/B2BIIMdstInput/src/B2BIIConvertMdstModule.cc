@@ -175,6 +175,7 @@ B2BIIConvertMdstModule::B2BIIConvertMdstModule() : Module(),
   addParam("convertEvtcls", m_convertEvtcls, "Flag to switch on conversion of Mdst_evtcls", true);
   addParam("nisKsInfo", m_nisEnable, "Flag to switch on conversion of nisKsFinder info", true);
   addParam("RecTrg", m_convertRecTrg, "Flag to switch on conversion of rectrg_summary3", false);
+  addParam("TrkExtra", m_convertTrkExtra, " Flag to switch on conversion of first_x,y,z and last_x,y,z from Mdst_trk_fit", true);
 
   m_realData = false;
 
@@ -218,6 +219,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
 
   if (m_convertEvtcls || m_convertRecTrg) m_evtInfo.registerInDataStore();
 
+  if (m_convertTrkExtra) m_belleTrkExtra.registerInDataStore();
+
   StoreObjPtr<ParticleList> gammaParticleList("gamma:mdst");
   gammaParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> pi0ParticleList("pi0:mdst");
@@ -241,6 +244,7 @@ void B2BIIConvertMdstModule::initializeDataStore()
   //list here all Relations between Belle2 objects
   m_tracks.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_pidLikelihoods);
+  if (m_convertTrkExtra) m_tracks.registerRelationTo(m_belleTrkExtra);
   m_eclClusters.registerRelationTo(m_mcParticles);
   m_tracks.registerRelationTo(m_eclClusters);
   m_klmClusters.registerRelationTo(m_tracks);
@@ -718,12 +722,27 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
     TLorentzVector v0Momentum(belleV0.px(), belleV0.py(), belleV0.pz(), belleV0.energy());
     TVector3 v0Vertex(belleV0.vx(), belleV0.vy(), belleV0.vz());
 
+    /*
+     * Documentation of Mdst_vee2 vertex fit:
+     *      /sw/belle/belle/b20090127_0910/share/tables/mdst.tdf (L96-L125)
+     */
+    auto appendVertexFitInfo = [](Belle::Mdst_vee2 & _belle_V0, Particle & _belle2_V0) {
+      // Add chisq of vertex fit. chiSquared=10^10 means the fit fails.
+      _belle2_V0.addExtraInfo("chiSquared", _belle_V0.chisq());
+      // Ndf of the vertex kinematic fit is 1
+      _belle2_V0.addExtraInfo("ndf", 1);
+      // Add p-value to extra Info
+      double prob = TMath::Prob(_belle_V0.chisq(), 1);
+      _belle2_V0.setPValue(prob);
+    };
+
     Particle* newV0 = nullptr;
     if (belleV0.kind() == 1) { // K0s -> pi+ pi-
       Particle KS(v0Momentum, 310);
       KS.appendDaughter(newDaugP);
       KS.appendDaughter(newDaugM);
       KS.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, KS);
       newV0 = m_particles.appendNew(KS);
       ksPList->addParticle(newV0);
 
@@ -771,6 +790,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       Lambda0.appendDaughter(newDaugP);
       Lambda0.appendDaughter(newDaugM);
       Lambda0.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, Lambda0);
       newV0 = m_particles.appendNew(Lambda0);
       lambda0PList->addParticle(newV0);
 
@@ -783,6 +803,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       antiLambda0.appendDaughter(newDaugM);
       antiLambda0.appendDaughter(newDaugP);
       antiLambda0.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, antiLambda0);
       newV0 = m_particles.appendNew(antiLambda0);
       antiLambda0PList->addParticle(newV0);
 
@@ -795,6 +816,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
       gamma.appendDaughter(newDaugP);
       gamma.appendDaughter(newDaugM);
       gamma.setVertex(v0Vertex);
+      appendVertexFitInfo(belleV0, gamma);
       newV0 = m_particles.appendNew(gamma);
       convGammaPList->addParticle(newV0);
     }
@@ -1644,6 +1666,12 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     HitPatternCDC patternCdc;
     patternCdc.setNHits(cdcNHits);
 
+    // conversion of track position in CDC layers
+    if (m_convertTrkExtra) {
+      auto cdcExtraInfo = m_belleTrkExtra.appendNew(trk_fit.first_x(), trk_fit.first_y(), trk_fit.first_z(),
+                                                    trk_fit.last_x(), trk_fit.last_y(), trk_fit.last_z());
+      track->addRelationTo(cdcExtraInfo);
+    }
     // conversion of the SVD hit pattern
     int svdHitPattern = trk_fit.hit_svd();
     // use hits from 3: SVD-rphi, 4: SVD-z

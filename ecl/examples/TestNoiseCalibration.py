@@ -51,6 +51,7 @@ def argparser():
                         'option with path to beam background files.')
     return parser
 
+
 args = argparser().parse_args()
 
 b2.set_log_level(b2.LogLevel.ERROR)

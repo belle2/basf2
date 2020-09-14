@@ -10,13 +10,13 @@
 """
 
 import sys
+import basf2
+from modularAnalysis import outputUdst
+
 
 rootFileName = '../MDSTtoUDST'
 logFileName = rootFileName + '.log'
 sys.stdout = open(logFileName, 'w')
-
-import basf2
-from modularAnalysis import outputUdst
 
 main = basf2.create_path()
 input = basf2.register_module('RootInput')

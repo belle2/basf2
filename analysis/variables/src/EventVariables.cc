@@ -596,7 +596,7 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
 )DOC");
     REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the measured interaction point");
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the measured interaction point");
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point")
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point");
 
     REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
 [Eventbased] x coordinate of the interaction point used for the underlying **MC generation**.
@@ -608,16 +608,16 @@ Returns NAN for data.
     REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] z coordinate of the interaction point used for the underlying **MC generation**.");
 
     REGISTER_VARIABLE("date", eventYearMonthDay,
-                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
-                      " See also eventYear, provided for convenience."
-                      " For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n\n"
+                      "See also eventYear, provided for convenience.\n"
+                      "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
     REGISTER_VARIABLE("year", eventYear,
-                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
+                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n\n"
                       "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
                       "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
-                      "[Eventbased] Remainder of the event time in fractions of a second.\n"
+                      "[Eventbased] Remainder of the event time in fractions of a second.\n\n"
                       "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
 
     VARIABLE_GROUP("EventKinematics");

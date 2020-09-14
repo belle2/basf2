@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Descriptor: [ee -> ISR pi+pi- [J/psi -> mu+mu-]]
+# Descriptor: [J/psi psi(2S)]
 
 """
 <header>
-  <output>../ISRpipimumu.dst.root</output>
+  <output>../CharmoniumPsi.dst.root</output>
   <contact>jiasen@buaa.edu.cn</contact>
 </header>
 """
@@ -21,29 +21,30 @@ b2.set_random_seed(12345)
 bg = glob.glob('./BG/[A-Z]*.root')
 
 # create a new path
-ISRskimpath = b2.Path()
+path = b2.Path()
 
 # specify number of events to be generated
 eventinfosetter = b2.register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [5000])
+eventinfosetter.param('evtNumList', [500])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
-ISRskimpath.add_module(eventinfosetter)
+path.add_module(eventinfosetter)
 
+# generate BBbar events
 evtgeninput = b2.register_module('EvtGenInput')
-evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('/decfiles/dec/2411440000.dec'))
-ISRskimpath.add_module(evtgeninput)
+evtgeninput.param('userDECFile', Belle2.FileSystem.findFile('decfiles/dec/1211530000.dec'))
+path.add_module(evtgeninput)
 
 # detector simulation
-add_simulation(ISRskimpath)
+add_simulation(path)
 
 # reconstruction
-add_reconstruction(ISRskimpath)
+add_reconstruction(path)
 
 # Finally add mdst output
-output_filename = "../ISRpipimumu.dst.root"
-add_mdst_output(ISRskimpath, filename=output_filename)
+output_filename = "../CharmoniumPsi.dst.root"
+add_mdst_output(path, filename=output_filename)
 
 # process events and print call statistics
-b2.process(ISRskimpath)
+b2.process(path)
 print(b2.statistics)

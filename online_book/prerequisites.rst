@@ -9,8 +9,8 @@ and outside of academia, so you're learning for life, we promise!
 
 .. toctree::
 
-   prerequisites/ssh
    prerequisites/bash
+   prerequisites/ssh
    prerequisites/python
    prerequisites/git
 

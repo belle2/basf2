@@ -21,6 +21,10 @@ typedef double EclCM;
 typedef double EclRad;
 
 class G4VTouchable;
+namespace HepGeom {
+  class Transform3D;
+}
+typedef HepGeom::Transform3D G4Transform3D;
 
 namespace Belle2 {
   namespace ECL {
@@ -104,6 +108,8 @@ namespace Belle2 {
 
       double time2sensor(int cid, const G4ThreeVector& hit_pos);
     private:
+      /** Global transformations */
+      G4Transform3D* m_ECLForwardGlobalT = NULL, *m_ECLBackwardGlobalT = NULL, *m_ECLBarrelGlobalT = NULL;
       /** initialise the crystal */
       void InitCrystal(int cid);
       /** crystal geometry */

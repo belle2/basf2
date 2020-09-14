@@ -4,9 +4,6 @@
 # or just make your own any change the input data below.
 
 from basf2 import *
-# set_log_level(LogLevel.DEBUG)
-# set_debug_level(29)
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -18,6 +15,8 @@ from caf.framework import Calibration, CAF
 from caf import backends
 from caf.utils import ExpRun, IoV
 from caf.strategies import SimpleRunByRun
+
+set_log_level(LogLevel.INFO)
 
 
 def main(argv):

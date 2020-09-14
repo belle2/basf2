@@ -24,6 +24,7 @@ def is_power_of_two(x):
     else:
         return False
 
+
 assert(is_power_of_two(2048))
 
 
@@ -67,6 +68,7 @@ def main():
             curv_bounds_file.write('\n')
             curv_bounds_file.write(str(bin_bound[1]))
             curv_bounds_file.write('\n')
+
 
 if __name__ == '__main__':
     main()

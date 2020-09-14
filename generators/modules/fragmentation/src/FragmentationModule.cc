@@ -11,10 +11,11 @@
 #include <generators/modules/fragmentation/FragmentationModule.h>
 
 #include <generators/evtgen/EvtGenInterface.h>
+#include <generators/utilities/GeneratorConst.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
-#include <generators/utilities/GeneratorConst.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/utilities/FileSystem.h>
 
 #include <TRandom3.h>
@@ -61,8 +62,6 @@ FragmentationModule::FragmentationModule() : Module()
   nVpho   = 0;
   nAll    = 0;
   nGood   = 0;
-  pythia = nullptr;
-  PythiaEvent = nullptr;
 }
 
 
@@ -77,7 +76,7 @@ void FragmentationModule::terminate()
   // print internal pythia error statistics
   IOIntercept::OutputToLogMessages statLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 50, 100);
   statLogCapture.start();
-  pythia->stat();
+  m_Pythia->stat();
   statLogCapture.finish();
 
   if (nAll != nGood) {
@@ -101,7 +100,7 @@ void FragmentationModule::initialize()
 
   B2DEBUG(150, "Initialize PYTHIA8");
 
-  // Generator and the shorthand PythiaEvent = pythia->event are declared in .h file
+  // Generator and the shorthand m_PythiaEvent = pythia->event are declared in .h file
   // A simple way to collect all the changes is to store the parameter values in a separate file,
   // with one line per change. This should be done between the creation of the Pythia object
   // and the init call for it.
@@ -109,24 +108,28 @@ void FragmentationModule::initialize()
   IOIntercept::OutputToLogMessages initLogCapture("PYTHIA", LogConfig::c_Debug, LogConfig::c_Warning, 100, 100);
   initLogCapture.start();
 
-  pythia = new Pythia;
-  PythiaEvent = &pythia->event;
-  (*PythiaEvent) = 0;
+  m_Pythia = new Pythia;
+  m_PythiaEvent = &m_Pythia->event;
+  (*m_PythiaEvent) = 0;
+
+  // Load EvtGen particle data.
+  EvtGen* evtGen = EvtGenInterface::createEvtGen(m_DecFile, m_coherentMixing);
+  loadEvtGenParticleData(m_Pythia);
 
   // Switch off ProcessLevel
-  pythia->readString("ProcessLevel:all = off");
+  m_Pythia->readString("ProcessLevel:all = off");
 
   // Read the PYTHIA input file, overrides parameters
-  pythia->readFile(m_parameterfile);
+  m_Pythia->readFile(m_parameterfile);
 
   // Set framework generator
   FragmentationRndm* fragRndm = new FragmentationRndm();
-  pythia->setRndmEnginePtr(fragRndm);
+  m_Pythia->setRndmEnginePtr(fragRndm);
 
   // Initialize PYTHIA
-  pythia->init();
+  m_Pythia->init();
 
-  // Set EvtGen (after pythia->init())
+  // Set EvtGen (after m_Pythia->init())
   evtgen = 0;
 
   if (m_useEvtGen) {
@@ -141,7 +144,7 @@ void FragmentationModule::initialize()
     } else if (defaultDecFile != m_DecFile) {
       B2INFO("Using non-standard DECAY file \"" << m_DecFile << "\"");
     }
-    evtgen = new EvtGenDecays(pythia, EvtGenInterface::createEvtGen(m_DecFile, m_coherentMixing));
+    evtgen = new EvtGenDecays(m_Pythia, evtGen);
     evtgen->readDecayFile(m_UserDecFile);
 
     // Update pythia particle tables from evtgen
@@ -151,7 +154,7 @@ void FragmentationModule::initialize()
   }
 
   // List variable(s) that differ from their defaults
-  pythia->settings.listChanged();
+  m_Pythia->settings.listChanged();
 
   initLogCapture.finish();
 }
@@ -168,7 +171,7 @@ void FragmentationModule::event()
   // Reset PYTHIA event record to allow for new event
   IOIntercept::OutputToLogMessages resetLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 100, 100);
   resetLogCapture.start();
-  PythiaEvent->reset();
+  m_PythiaEvent->reset();
   resetLogCapture.finish();
 
   // Reset counter for added quarks and vphos
@@ -209,7 +212,7 @@ void FragmentationModule::event()
     B2WARNING("No virtual exchange particle given, no PYTHIA FSR in Decays");
   } else {
     // Adding QCD and QED FSR
-    pythia->forceTimeShower(2, 3, 20.00);
+    m_Pythia->forceTimeShower(2, 3, 20.00);
   }
 
   // Check needed if event is energetically possible
@@ -221,13 +224,13 @@ void FragmentationModule::event()
 
   IOIntercept::OutputToLogMessages eventLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 50, 100);
   eventLogCapture.start();
-  int success = pythia->next();
+  int success = m_Pythia->next();
   eventLogCapture.finish();
 
   if (!success) {
     IOIntercept::OutputToLogMessages listLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Error, 50, 100);
     listLogCapture.start();
-    PythiaEvent->list();
+    m_PythiaEvent->list();
     listLogCapture.finish();
 
     setReturnValue(-1); //return value becomes -1 if trials were not successfull
@@ -245,11 +248,11 @@ void FragmentationModule::event()
 
   // Loop over the PYTHIA list and assign the mother-daughter relation
   // Might not work if the mother appear below the daughter in the event record
-  for (int iPythiaPart = 0; iPythiaPart < pythia->event.size(); ++iPythiaPart) {
+  for (int iPythiaPart = 0; iPythiaPart < m_Pythia->event.size(); ++iPythiaPart) {
     auto oldindex = indexPYTHIA.find(iPythiaPart);
 
     //skip "system" particle generated by PYTHIA
-    if (pythia->event[iPythiaPart].id() == 90) continue;
+    if (m_Pythia->event[iPythiaPart].id() == 90) continue;
 
     if (oldindex == end(indexPYTHIA)) {
       // --> new particle
@@ -263,43 +266,43 @@ void FragmentationModule::event()
 
       // from PYTHIA manual: "<1: an empty entry, with no meaningful information and
       // therefore to be skipped unconditionally (should not occur in PYTHIA)"
-      if (pythia->event[iPythiaPart].statusHepMC() < 1)  continue;
+      if (m_Pythia->event[iPythiaPart].statusHepMC() < 1)  continue;
 
       // Set PDG code
-      p->setPDG(pythia->event[iPythiaPart].id());
+      p->setPDG(m_Pythia->event[iPythiaPart].id());
 
       // Set four vector
-      TLorentzVector p4(pythia->event[iPythiaPart].px(), pythia->event[iPythiaPart].py(), pythia->event[iPythiaPart].pz(),
-                        pythia->event[iPythiaPart].e());
+      TLorentzVector p4(m_Pythia->event[iPythiaPart].px(), m_Pythia->event[iPythiaPart].py(), m_Pythia->event[iPythiaPart].pz(),
+                        m_Pythia->event[iPythiaPart].e());
       p->set4Vector(p4);
-      p->setMass(pythia->event[iPythiaPart].m());
+      p->setMass(m_Pythia->event[iPythiaPart].m());
 
       // Set vertex
-      p->setProductionVertex(pythia->event[iPythiaPart].xProd() * Unit::mm, pythia->event[iPythiaPart].yProd() * Unit::mm,
-                             pythia->event[iPythiaPart].zProd() * Unit::mm);
-      p->setProductionTime(pythia->event[iPythiaPart].tProd() * Unit::mm / Const::speedOfLight);
+      p->setProductionVertex(m_Pythia->event[iPythiaPart].xProd() * Unit::mm, m_Pythia->event[iPythiaPart].yProd() * Unit::mm,
+                             m_Pythia->event[iPythiaPart].zProd() * Unit::mm);
+      p->setProductionTime(m_Pythia->event[iPythiaPart].tProd() * Unit::mm / Const::speedOfLight);
       p->setValidVertex(true);
 
       // Set all(!) particles from the generator to primary
       p->addStatus(MCParticleGraph::GraphParticle::c_PrimaryParticle);
 
       // Set FSR flag from PYTHIA TimeShower:QEDshowerByQ
-      if (pythia->event[iPythiaPart].status() == 51 && pythia->event[iPythiaPart].id() == 22) {
+      if (m_Pythia->event[iPythiaPart].status() == 51 && m_Pythia->event[iPythiaPart].id() == 22) {
         p->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
       }
 
       // Set PHOTOS flag from PYTHIA-EvtGen
-      if (pythia->event[iPythiaPart].status() ==  GeneratorConst::FSR_STATUS_CODE && pythia->event[iPythiaPart].id() == 22) {
+      if (m_Pythia->event[iPythiaPart].status() == GeneratorConst::FSR_STATUS_CODE && m_Pythia->event[iPythiaPart].id() == 22) {
         p->addStatus(MCParticleGraph::GraphParticle::c_IsPHOTOSPhoton);
       }
 
       // Set stable at generator level
-      if (pythia->event[iPythiaPart].statusHepMC() == 1) {
+      if (m_Pythia->event[iPythiaPart].statusHepMC() == 1) {
         p->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
       }
 
       //set mother
-      const int motherid = pythia->event[iPythiaPart].mother1();
+      const int motherid = m_Pythia->event[iPythiaPart].mother1();
 
       //check if mother exists in indexMCGraph
       auto motherindex = indexMCGraph.find(motherid);
@@ -322,7 +325,7 @@ void FragmentationModule::event()
   }
 
   // Print original PYTHIA list
-  if (m_listEvent) PythiaEvent->list();
+  if (m_listEvent) m_PythiaEvent->list();
 
   // Create new ParticleGraph
   mcParticleGraph.generateList(m_particleList,
@@ -357,21 +360,55 @@ int FragmentationModule::addParticleToPYTHIA(MCParticle& mcParticle)
   const TVector3& p   = mcParticle.getMomentum();
   const double energy = sqrt(mass * mass + p.Mag2());
 
-  //add this (anti)quark to the PythiaEvent
+  //add this (anti)quark to the m_PythiaEvent
   if (id == 23) {
-    PythiaEvent->append(23, -22, 0, 0, 2, 3, 0, 0, p.X(), p.Y(), p.Z(), energy, mass);
+    m_PythiaEvent->append(23, -22, 0, 0, 2, 3, 0, 0, p.X(), p.Y(), p.Z(), energy, mass);
     nVpho++;
   } else if (id > 0) {
-    PythiaEvent->append(id, 23, 1, 0, 0, 0, 101, 0, p.X(), p.Y(), p.Z(), energy, mass, 20.0);
+    m_PythiaEvent->append(id, 23, 1, 0, 0, 0, 101, 0, p.X(), p.Y(), p.Z(), energy, mass, 20.0);
     nQuarks++;
   } else if (id < 0) {
-    PythiaEvent->append(id, 23, 1, 0, 0, 0, 0, 101, p.X(), p.Y(), p.Z(), energy, mass, 20.0);
+    m_PythiaEvent->append(id, 23, 1, 0, 0, 0, 0, 101, p.X(), p.Y(), p.Z(), energy, mass, 20.0);
     nQuarks++;
   }
 
   nAdded++;
 
   return id;
+}
+
+void FragmentationModule::loadEvtGenParticleData(Pythia8::Pythia* pythia)
+{
+  Pythia8::ParticleData* particleData = &pythia->particleData;
+  int nParticles = EvtPDL::entries();
+  for (int i = 0; i < nParticles; ++i) {
+    EvtId evtgenParticle = EvtPDL::getEntry(i);
+    /*
+     * Pythia uses absolute value of the PDG code, thus, only positive codes
+     * are necessary. Only leptons (11 <= pdg <= 20) and hadrons (pdg > 100)
+     * are updated.
+     */
+    int pdg = EvtPDL::getStdHep(evtgenParticle);
+    if (pdg < 10)
+      continue;
+    if (pdg <= 10 || (pdg > 20 && pdg <= 100))
+      continue;
+    EvtId evtgenAntiParticle = EvtPDL::chargeConj(evtgenParticle);
+    if (particleData->isParticle(pdg)) {
+      particleData->setAll(pdg,
+                           EvtPDL::name(evtgenParticle),
+                           EvtPDL::name(evtgenAntiParticle),
+                           EvtPDL::getSpinType(evtgenParticle),
+                           EvtPDL::chg3(evtgenParticle),
+                           // colType == 0 for uncolored particles.
+                           0,
+                           EvtPDL::getMass(evtgenParticle),
+                           EvtPDL::getWidth(evtgenParticle),
+                           EvtPDL::getMinMass(evtgenParticle),
+                           EvtPDL::getMaxMass(evtgenParticle),
+                           EvtPDL::getctau(evtgenParticle));
+    }
+  }
 }
 
 //-----------------------------------------------------------------
@@ -381,6 +418,7 @@ FragmentationRndm::FragmentationRndm() : Pythia8::RndmEngine()
 {
 
 }
+
 double FragmentationRndm::flat()
 {
   double value = gRandom->Rndm();

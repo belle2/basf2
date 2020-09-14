@@ -1694,6 +1694,7 @@ def reconstructMCDecay(
     dmID=0,
     writeOut=False,
     path=None,
+    chargeConjugation=True,
 ):
     r"""
     Finds and creates a ``ParticleList`` from given decay string.
@@ -1713,15 +1714,19 @@ def reconstructMCDecay(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass given cuts (in VariableManager style) and rejected otherwise
                        isSignal==1 is always required by default.
+    @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
+    @param chargeConjugation boolean to decide whether charge conjugated mode should be reconstructed as well (on by default)
     """
 
     pmake = register_module('ParticleCombinerFromMC')
     pmake.set_name('ParticleCombinerFromMC_' + decayString)
     pmake.param('decayString', decayString)
     pmake.param('cut', cut)
+    pmake.param('decayMode', dmID)
     pmake.param('writeOut', writeOut)
+    pmake.param('chargeConjugation', chargeConjugation)
     path.add_module(pmake)
 
 
@@ -1907,6 +1912,7 @@ def appendROEMask(list_name,
                   mask_name,
                   trackSelection,
                   eclClusterSelection,
+                  klmClusterSelection='',
                   path=None):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
@@ -1916,7 +1922,7 @@ def appendROEMask(list_name,
 
        >>> appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
 
-    - append a ROE mask with only ECLClusters that pass as good photon candidates
+    - append a ROE mask with only ECL-based particles that pass as good photon candidates
 
        >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
        >>> appendROEMask('B+:sig', 'goodROEGamma', '', good_photons)
@@ -1924,43 +1930,51 @@ def appendROEMask(list_name,
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
-    @param trackSelection        decay string for the tracks in ROE
-    @param eclClusterSelection   decay string for the tracks in ROE
+    @param trackSelection        decay string for the track-based particles in ROE
+    @param eclClusterSelection   decay string for the ECL-based particles in ROE
+    @param klmClusterSelection   decay string for the KLM-based particles in ROE
     @param path                  modules are added to this path
     """
 
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection)])
+    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection, klmClusterSelection)])
     path.add_module(roeMask)
 
 
 def appendROEMasks(list_name, mask_tuples, path=None):
     """
     Loads the ROE object of a particle and creates a ROE mask with a specific name. It applies
-    selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
+    selection criteria for track-, ECL- and KLM-based particles which will be used by ROE variables.
 
     The multiple ROE masks with their own selection criteria are specified
-    via list of tuples (mask_name, trackSelection, eclClusterSelection) or
+    via list of tuples (mask_name, trackParticleSelection, eclParticleSelection, klmParticleSelection) or
     (mask_name, trackSelection, eclClusterSelection) in case with fractions.
 
     - Example for two tuples, one with and one without fractions
 
-       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', '')
        >>> good_photons = 'theta > 0.296706 and theta < 2.61799 and clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]'
-       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons)
-       >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
+       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', good_photons, '')
+       >>> goodROEKLM     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '', 'nKLMClusterTrackMatches == 0')
+       >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma, goodROEKLM])
 
     @param list_name             name of the input ParticleList
     @param mask_tuples           array of ROEMask list tuples to be appended
     @param path                  modules are added to this path
     """
-
+    compatible_masks = []
+    for mask in mask_tuples:
+        # add empty KLM-based selection if it's absent:
+        if len(mask) == 3:
+            compatible_masks += [(*mask, '')]
+        else:
+            compatible_masks += [mask]
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + 'MaskList')
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasks', mask_tuples)
+    roeMask.param('ROEMasks', compatible_masks)
     path.add_module(roeMask)
 
 
@@ -1968,6 +1982,7 @@ def updateROEMask(list_name,
                   mask_name,
                   trackSelection,
                   eclClusterSelection='',
+                  klmClusterSelection='',
                   path=None):
     """
     Update an existing ROE mask by applying additional selection cuts for
@@ -1977,15 +1992,16 @@ def updateROEMask(list_name,
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the ROEMask to update
-    @param trackSelection        decay string for the tracks in ROE
-    @param eclClusterSelection   decay string for the tracks in ROE
+    @param trackSelection        decay string for the track-based particles in ROE
+    @param eclClusterSelection   decay string for the ECL-based particles in ROE
+    @param klmClusterSelection   decay string for the KLM-based particles in ROE
     @param path                  modules are added to this path
     """
 
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + mask_name)
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection)])
+    roeMask.param('ROEMasks', [(mask_name, trackSelection, eclClusterSelection, klmClusterSelection)])
     roeMask.param('update', True)
     path.add_module(roeMask)
 
@@ -1996,7 +2012,7 @@ def updateROEMasks(list_name, mask_tuples, path):
     and/or clusters.
 
     The multiple ROE masks with their own selection criteria are specified
-    via list tuples (mask_name, trackSelection, eclClusterSelection)
+    via list tuples (mask_name, trackSelection, eclClusterSelection, klmClusterSelection)
 
     See function `appendROEMasks`!
 
@@ -2004,11 +2020,18 @@ def updateROEMasks(list_name, mask_tuples, path):
     @param mask_tuples           array of ROEMask list tuples to be appended
     @param path                  modules are added to this path
     """
+    compatible_masks = []
+    for mask in mask_tuples:
+        # add empty KLM-based selection if it's absent:
+        if len(mask) == 3:
+            compatible_masks += [(*mask, '')]
+        else:
+            compatible_masks += [mask]
 
     roeMask = register_module('RestOfEventInterpreter')
     roeMask.set_name('RestOfEventInterpreter_' + list_name + '_' + 'MaskList')
     roeMask.param('particleList', list_name)
-    roeMask.param('ROEMasks', mask_tuples)
+    roeMask.param('ROEMasks', compatible_masks)
     roeMask.param('update', True)
     path.add_module(roeMask)
 
@@ -2115,6 +2138,60 @@ def optimizeROEWithV0(list_name, mask_names, cut_string, path=None):
     updateMask.param('updateMasks', mask_names)
     updateMask.param('cutString', cut_string)
     path.add_module(updateMask)
+
+
+def updateROEUsingV0Lists(target_particle_list, mask_names, default_cleanup=True, selection_cuts=None,
+                          apply_mass_fit=False, fitter='treefit', path=None):
+    """
+    This function creates V0 particle lists (photons, :math:`K^0_S` and :math:`\\Lambda^0`)
+    and it uses V0 candidates to update the Rest Of Event, which is associated to the target particle list.
+    It is possible to apply a standard or customized selection and mass fit to the V0 candidates.
+
+
+    @param target_particle_list  name of the input ParticleList
+    @param mask_names            array of ROE masks to be applied
+    @param default_cleanup       if True, predefined cuts will be applied on the V0 lists
+    @param selection_cuts        a single string of selection cuts or tuple of three strings (photon_cuts, K_S0_cuts, Lambda0_cuts),
+                                 which will be applied to the V0 lists. These cuts will have a priority over the default ones.
+    @param apply_mass_fit        if True, a mass fit will be applied to the V0 particles
+    @param fitter                string, that represent a fitter choice: "treefit" for TreeFitter and "kfit" for KFit
+    @param path                  modules are added to this path
+    """
+    roe_path = create_path()
+    deadEndPath = create_path()
+    signalSideParticleFilter(target_particle_list, '', roe_path, deadEndPath)
+
+    if (default_cleanup and selection_cuts is None):
+        B2INFO("Using default cleanup in updateROEUsingV0Lists.")
+        selection_cuts = 'abs(dM) < 0.1 '
+        selection_cuts += 'and daughter(0,particleID) > 0.2 and daughter(1,particleID) > 0.2 '
+        selection_cuts += 'and daughter(0,thetaInCDCAcceptance) and daughter(1,thetaInCDCAcceptance)'
+    if (selection_cuts is None or selection_cuts == ''):
+        B2INFO("No cleanup in updateROEUsingV0Lists.")
+        selection_cuts = ('True', 'True', 'True')
+    if (isinstance(selection_cuts, str)):
+        selection_cuts = (selection_cuts, selection_cuts, selection_cuts)
+    # The isInRestOfEvent variable will be applied on FSPs of composite particles automatically:
+    roe_cuts = 'isInRestOfEvent > 0'
+    fillConvertedPhotonsList('gamma:v0_roe -> e+ e-', f'{selection_cuts[0]} and {roe_cuts}',
+                             path=roe_path)
+    fillParticleList('K_S0:v0_roe -> pi+ pi-', f'{selection_cuts[1]} and {roe_cuts}',
+                     path=roe_path)
+    fillParticleList('Lambda0:v0_roe -> p+ pi-', f'{selection_cuts[2]} and {roe_cuts}',
+                     path=roe_path)
+    fitter = fitter.lower()
+    if (fitter != 'treefit' and fitter != 'kfit'):
+        B2WARNING('Argument "fitter" in updateROEUsingV0Lists has only "treefit" and "kfit" options, '
+                  f'but "{fitter}" was provided! TreeFitter will be used instead.')
+        fitter = 'treefit'
+    from vertex import kFit, treeFit
+    for v0 in ['gamma:v0_roe', 'K_S0:v0_roe', 'Lambda0:v0_roe']:
+        if (apply_mass_fit and fitter == 'kfit'):
+            kFit(v0, conf_level=0.0, fit_type='massvertex', path=roe_path)
+        if (apply_mass_fit and fitter == 'treefit'):
+            treeFit(v0, conf_level=0.0, massConstraint=[v0.split(':')[0]], path=roe_path)
+        optimizeROEWithV0(v0, mask_names, '', path=roe_path)
+    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 
 def printROEInfo(mask_names=None, full_print=False,
@@ -2347,7 +2424,8 @@ def writePi0EtaVeto(
     mode='standard',
     downloadFlag=True,
     selection='',
-    path=None
+    path=None,
+    suffix=''
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -2377,7 +2455,10 @@ def writePi0EtaVeto(
     * cluster: loose energy cut and clusterNHits cut are applied to soft photon
     * both: tight energy cut and clusterNHits cut are applied to soft photon
 
-    One can obtain the result of pi0/eta veto from `pi0Prob`/`etaProb`
+    The final probability of the pi0/eta veto is stored as an extraInfo. If no suffix is set it can be obtained from the variables
+    `pi0Prob`/`etaProb`. Otherwise, it is available as '{Pi0, Eta}ProbOrigin', '{Pi0, Eta}ProbTightEnergyThreshold', '{Pi0,
+    Eta}ProbLargeClusterSize', or '{Pi0, Eta}ProbTightEnergyThresholdAndLargeClusterSize'} for the four modes described above, with
+    the chosen suffix appended.
 
     NOTE:
       Please don't use following ParticleList names elsewhere:
@@ -2395,15 +2476,31 @@ def writePi0EtaVeto(
     @param downloadFlag 	whether download default weight files or not
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
+    @param suffix           optional suffix to be appended to the usual extraInfo name
     """
 
     import os
     import basf2_mva
 
+    renameSuffix = False
+
+    for module in path.modules():
+        if module.type() == "SubEvent" and not renameSuffix:
+            for subpath in [p.values for p in module.available_params() if p.name == "path"]:
+                if renameSuffix:
+                    break
+                for submodule in subpath.modules():
+                    print(submodule.name())
+                    if f'gamma:HardPhoton{suffix}' in submodule.name():
+                        suffix += '_0'
+                        B2WARNING("Same extension already used in writePi0EtaVeto, append '_0'")
+                        renameSuffix = True
+                        break
+
     roe_path = create_path()
     deadEndPath = create_path()
     signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
-    fillSignalSideParticleList('gamma:HardPhoton', decayString, path=roe_path)
+    fillSignalSideParticleList(f'gamma:HardPhoton{suffix}', decayString, path=roe_path)
     if not os.path.isdir(workingDirectory):
         os.mkdir(workingDirectory)
         B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
@@ -2485,14 +2582,14 @@ def writePi0EtaVeto(
     pi0 veto
     """
     # define the particleList name for soft photon
-    pi0soft = 'gamma:Pi0Soft' + ListName + '_' + particleList.replace(':', '_')
+    pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     # fill the particleList for soft photon with energy cut
     fillParticleList(pi0soft, Pi0EnergyCut, path=roe_path)
     # apply an additional cut for soft photon
     applyCuts(pi0soft, TimingAndNHitsCut, path=roe_path)
     # reconstruct pi0
-    reconstructDecay('pi0:Pi0Veto' + ListName + ' -> gamma:HardPhoton ' + pi0soft, '', path=roe_path)
-    # if you don't have wight files in your workingDirectory,
+    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> gamma:HardPhoton{suffix} ' + pi0soft, '', path=roe_path)
+    # if you don't have weight files in your workingDirectory,
     # these files are downloaded from database to your workingDirectory automatically.
     if not os.path.isfile(workingDirectory + '/' + Pi0WeightFileName):
         if downloadFlag:
@@ -2505,24 +2602,24 @@ def writePi0EtaVeto(
     rankByHighest('pi0:Pi0Veto' + ListName, 'extraInfo(' + Pi0ExtraInfoName + ')', numBest=1, path=roe_path)
     # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
     variableToSignalSideExtraInfo('pi0:Pi0Veto' + ListName,
-                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoRename}, path=roe_path)
+                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoRename + suffix}, path=roe_path)
 
     """
     eta veto
     """
-    etasoft = 'gamma:EtaSoft' + ListName + '_' + particleList.replace(':', '_')
+    etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaEnergyCut, path=roe_path)
     applyCuts(etasoft, TimingAndNHitsCut, path=roe_path)
-    reconstructDecay('eta:EtaVeto' + ListName + ' -> gamma:HardPhoton ' + etasoft, '', path=roe_path)
+    reconstructDecay('eta:EtaVeto' + ListName + f' -> gamma:HardPhoton{suffix} ' + etasoft, '', path=roe_path)
     if not os.path.isfile(workingDirectory + '/' + EtaWeightFileName):
         if downloadFlag:
             basf2_mva.download(EtaPayloadName, workingDirectory + '/' + EtaWeightFileName)
-            B2INFO('writePi0EtaVeto: ' + EtaWeightFileName + 'has been downloaded from database to workingDirectory.')
+            B2INFO('writePi0EtaVeto: ' + EtaWeightFileName + ' has been downloaded from database to workingDirectory.')
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],
                         extraInfoName=EtaExtraInfoName, identifier=workingDirectory + '/' + EtaWeightFileName)
     rankByHighest('eta:EtaVeto' + ListName, 'extraInfo(' + EtaExtraInfoName + ')', numBest=1, path=roe_path)
     variableToSignalSideExtraInfo('eta:EtaVeto' + ListName,
-                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoRename}, path=roe_path)
+                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoRename + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

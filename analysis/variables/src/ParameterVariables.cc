@@ -65,7 +65,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       // If particle has no MC relation, MC chain doesn't exist
-      const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
+      const MCParticle* mcpart = part->getMCParticle();
       if (mcpart == nullptr)
         return std::numeric_limits<float>::quiet_NaN();
 
@@ -90,7 +90,7 @@ namespace Belle2 {
       }
 
       // Daughter obtained, get MC particle of daughter
-      const MCParticle* finalMCDaughter = curParticle->getRelatedTo<MCParticle>();
+      const MCParticle* finalMCDaughter = curParticle->getMCParticle();
       if (finalMCDaughter == nullptr)
         return std::numeric_limits<float>::quiet_NaN();
 
@@ -120,7 +120,7 @@ namespace Belle2 {
         return std::numeric_limits<float>::quiet_NaN();
 
       // If particle has no MC relation, MC chain doesn't exist
-      const MCParticle* mcpart = part->getRelatedTo<MCParticle>();
+      const MCParticle* mcpart = part->getMCParticle();
       if (mcpart == nullptr)
         return std::numeric_limits<float>::quiet_NaN();
 
@@ -203,7 +203,7 @@ namespace Belle2 {
         if (daughter >= nDaughters)
           return std::numeric_limits<float>::quiet_NaN();
 
-        const MCParticle* mcdaughter = daughters[daughter]->getRelated<MCParticle>();
+        const MCParticle* mcdaughter = daughters[daughter]->getMCParticle();
         if (!mcdaughter)
           return std::numeric_limits<float>::quiet_NaN();
 

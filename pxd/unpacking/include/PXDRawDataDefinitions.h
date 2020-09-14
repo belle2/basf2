@@ -45,6 +45,23 @@ namespace Belle2 {
       c_UNUSED_8 = 0x8,
       c_UNUSED_A = 0xA,
     };
+
+    /** Enums for DHE DHP StateMachine Error States.
+     * 4 bits value;
+     * Currently the same definitions as the ones encoded in ghost frame (new! but 3 bit only)
+     * See Data format definitions [BELLE2-NOTE-TE-2016-009] on https://docs.belle2.org/
+     */
+    enum EDHEStateMachineError {
+      c_DHESM_NO_ERROR = 0x0, // no errors
+      c_DHESM_MISS_DHP_FRM = 0x1, // missing DHPT frame
+      c_DHESM_TIMEOUT = 0x2, // timeout
+      c_DHESM_DHP_LINKDOWN = 0x3, // DHP link down
+      c_DHESM_DHP_MASKED = 0x4, // DHP masked
+      c_DHESM_EVTNR_MM = 0x5, // event number mismatch (between FSM_START and FSM_END; DHE error.)
+      c_DHESM_DHP_SIZE_OVERFLOW = 0x6, // DHPT frame bigger than maximum allowed, data truncated
+      /// others currently not defined
+    };
+
   }
 }
 

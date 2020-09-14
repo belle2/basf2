@@ -367,7 +367,7 @@ login to KEKCC by just typing ``ssh kekcc`` and also copy files directly with
 ``scp``. But you will have to enter your password two times, once when
 connecting to the gateway server and then when connecting to the KEKCC machine.
 
-.. admonition:: Excercise
+.. admonition:: Exercise
    :class: exercise stacked
 
    Add a working kekcc configuration to your config file and verify that
@@ -839,9 +839,9 @@ session. A terminal multiplexer allows for example to
   notebook re-attach the session and check how your process is doing.
 
 * Having multiple interactive shells in parallel on a remote host, without
-  needing to open multiple terminals and connecting from each one seperately.
+  needing to open multiple terminals and connecting from each one separately.
   Think of it like having multiple remote "tabs". Tmux can also act as a
-  terminal window manager and arange them side-by-side. This can be useful e.g.
+  terminal window manager and arrange them side-by-side. This can be useful e.g.
   for running a process in one pane and monitoring the processor load via
   `htop <https://htop.dev/>`_.
 

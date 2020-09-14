@@ -121,6 +121,22 @@ namespace Belle2 {
     int getRelativeShift() const
     {return m_relativeTimeShift;}
 
+    /** getTimeInFTSWReference(double time_in_SVD)
+     */
+    double getTimeInFTSWReference(double time, int firstFrame) const
+    {
+      double time_in_FTSW = time + getRelativeShiftInNs() + getSVD2FTSWTimeShift(firstFrame);
+      return time_in_FTSW;
+    }
+
+    /** getTimeInSVDReference(double time_in_FTSW)
+     */
+    double getTimeInSVDReference(double time_in_FTSW, int firstFrame) const
+    {
+      double time = time_in_FTSW - getRelativeShiftInNs() - getSVD2FTSWTimeShift(firstFrame);
+      return time;
+    }
+
     /** SVDTriggerType getter
      *  Gets the type of SVDTrigger for the event
      */

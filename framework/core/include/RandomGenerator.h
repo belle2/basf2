@@ -46,7 +46,7 @@ namespace Belle2 {
     };
 
     /** Default constructor, does not initialize the generator. */
-    RandomGenerator(const std::string& name);
+    explicit RandomGenerator(const std::string& name = "Belle2 Random Generator");
 
     /** Destructor to free the seed information */
     virtual ~RandomGenerator() {}

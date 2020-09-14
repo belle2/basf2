@@ -64,6 +64,47 @@ class SinglePhotonDark(BaseSkim):
 
 
 @fancy_skim_header
+class inelasticDarkMatter(BaseSkim):
+    """
+    Skim list contains events with no tracks from IP, no high E tracks and only one high E photon.
+    """
+    __authors__ = ["Savino Longo"]
+    __contact__ = __liaison__
+    __description__ = "iDM list for the iDM analysis."
+    __category__ = "physics, dark sector"
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        stdElectrons("all", path=path)
+
+    def build_lists(self, path):
+
+        IPtrack = 'abs(dr) < 0.05'  # cm
+        HighEtrack = 'useCMSFrame(p)>3.0'  # GeV
+        ma.cutAndCopyList("e+:fromIP", "e+:all", IPtrack, path=path)
+        ma.cutAndCopyList("e+:highE", "e+:all", HighEtrack, path=path)
+
+        signalPhoton = 'clusterReg==2 and clusterZernikeMVA > 0.3 and useCMSFrame(p) > 1.0'
+        photonVetoHE1 = 'useCMSFrame(p) > 0.6'
+        photonVetoHE3 = 'p>0.5'
+
+        ma.cutAndCopyList("gamma:signal", "gamma:all", signalPhoton, path=path)
+        ma.cutAndCopyList("gamma:HE1", "gamma:all", photonVetoHE1, path=path)
+        ma.cutAndCopyList("gamma:HE3", "gamma:all", photonVetoHE3, path=path)
+
+        idmEventCuts = ('nParticlesInList(gamma:signal)==1 and '
+                        'nParticlesInList(e+:fromIP)==0 and '
+                        'nParticlesInList(e+:highE) == 0 and '
+                        'nParticlesInList(gamma:HE1) == 1 and '
+                        'nParticlesInList(gamma: HE3) < 4'
+                        )
+
+        path = self.skim_event_cuts(idmEventCuts, path=path)
+
+        self.SkimLists = ["gamma:all", 'e-:all']
+
+
+@fancy_skim_header
 class ALP3Gamma(BaseSkim):
     __authors__ = ["Michael De Nuccio"]
     __description__ = (
@@ -83,7 +124,7 @@ class ALP3Gamma(BaseSkim):
         An list builder function for the ALP decays. Part of the `ALP3Gamma` skim.
 
         Parameters:
-            path (basf2.Path): the path to add the skim
+            path(basf2.Path): the path to add the skim
 
         Returns:
             list name of the ALP decays candidates
@@ -139,7 +180,7 @@ class ALP3Gamma(BaseSkim):
 @fancy_skim_header
 class DimuonPlusMissingEnergy(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-} \\, +` missing energy.
+    **Physics channel**:: math: `e^{+}e^{-} \\to \\mu^{+}\\mu^{-} \\, +` missing energy.
     """
     __authors__ = ["Giacomo De Pietro"]
     __description__ = (
@@ -191,7 +232,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: :math:`e^{+}e^{-} \\to e^{\\pm}\\mu^{\\mp} \\, +` missing energy
+        **Physics channel**:: math: `e^{+}e^{-} \\to e^{\\pm}\\mu^{\\mp} \\, +` missing energy
         """
         emu_list = []
         skim_label = "forElectronMuonMissingEnergySkim"
@@ -231,8 +272,7 @@ class LFVZpVisible(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: ee --> e mu Z'; Z' --> e mu
-        """
+        **Physics channel**: ee --> e mu Z'         Z' - -> e mu         """
         lfvzp_list = []
 
         # Here we just want four gpood tracks to be reconstructed
@@ -269,8 +309,7 @@ class LFVZpVisible(BaseSkim):
 @fancy_skim_header
 class EGammaControlDark(BaseSkim):
     """
-    **Physics channel**: ee → eγ
-    """
+    **Physics channel**: ee → eγ     """
 
     __authors__ = ["Sam Cunliffe", "Torben Ferber"]
     __description__ = (
@@ -321,20 +360,19 @@ class EGammaControlDark(BaseSkim):
 class GammaGammaControlKLMDark(BaseSkim):
     """
     **Physics channel**: ee → γγ
-
-    .. Note::
+    .. Note: :
         This skim can retain a lot of γγ events.
         In case this becomes unacceptable, we provide prescale parameters.
-        Prescales are given in standard trigger convention (reciprocal),
-        so prescale of 100 is 1% of events kept, etc.
+        Prescales are given in standard trigger convention(reciprocal),
+        so prescale of 100 is 1 % of events kept, etc.
 
-    .. Tip::
-        To prescale the higher-energy probe photons by 10%:
+    .. Tip: :
+        To prescale the higher-energy probe photons by 10 %:
 
-        >>> from skim.dark import GammaGammaControlKLMDark
-        >>> Skim = GammaGammaControlKLMDark(prescale_high=10)
-        >>> Skim(path)  # Add list-building function and uDST output module to path
-        >>> b2.process(path)
+        >> > from skim.dark import GammaGammaControlKLMDark
+        >> > Skim = GammaGammaControlKLMDark(prescale_high=10)
+        >> > Skim(path)  # Add list-building function and uDST output module to path
+        >> > b2.process(path)
     """
 
     __authors__ = ["Sam Cunliffe", "Miho Wakai"]
@@ -352,9 +390,8 @@ class GammaGammaControlKLMDark(BaseSkim):
 
     def __init__(self, prescale_high=1, prescale_low=1, **kwargs):
         """
-        Parameters:
-            prescale_high (int): the prescale for more energetic probe photon
-            prescale_low (int): the prescale for a less energetic probe photon
+        Parameters:             prescale_high(int): the prescale for more energetic probe photon
+           prescale_low (int): the prescale for a less energetic probe photon
             **kwargs: Passed to constructor of `BaseSkim`.
         """
         # Redefine __init__ to allow for additional optional arguments
@@ -418,7 +455,7 @@ class GammaGammaControlKLMDark(BaseSkim):
 @fancy_skim_header
 class DielectronPlusMissingEnergy(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}`
+    **Physics channel**: : math:`e^{+}e^{-} \\to e^{+}e^{-}`
 
     Warning:
         This skim is currently deactivated, since the retention rate is too high.

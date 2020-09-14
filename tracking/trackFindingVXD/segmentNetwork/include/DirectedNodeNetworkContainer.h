@@ -144,8 +144,8 @@ namespace Belle2 {
   private:
     /** This class does not need a streamer as it is not supposed to be stored.
       But for the base classes the streamer is needed for the case of parallel processing.
-      For this reason th version is set to 0 which does actually this. It will not create
-      the streamer for DirectedNodeNetworkContainer itself (the contained datamembers)
+      For this reason the version is set to 0 which does actually this. It will not create
+      the streamer for the data members of the  DirectedNodeNetworkContainer itself
       but it still creates the streamers for the base classes.
       Just for reference: the previous class version was 10.
     */

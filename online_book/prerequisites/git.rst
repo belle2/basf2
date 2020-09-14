@@ -90,7 +90,7 @@ this is rather similar to github in some regards. It is strongly advised to use
 ``ssh`` as access protocol and for that you need to upload your public key to
 https://stash.desy.de.
 
-You should already have a ssh key and you should copy the the contents of the
+You should already have a ssh key (see :ref:`onlinebook_ssh`) and you should copy the the contents of the
 public key file and upload it `here
 <https://stash.desy.de/plugins/servlet/ssh/account/keys>`_.
 
@@ -106,3 +106,88 @@ address you got with your account.
 
 We also have a `confluence page <https://confluence.desy.de/x/2o4iAg>`_ with
 more information and help in case of problems.
+
+.. admonition:: Exercise
+   :class: exercise stacked
+   
+   The *Belle II Training* project contains two training repositories for playing
+   with git. Find and clone them.
+   
+.. admonition:: Hint
+   :class: xhint stacked
+   
+   The project lives `here <https://stash.desy.de/projects/B2T>`_.
+ 
+.. admonition:: Hint
+   :class: xhint stacked
+   
+   The repositories live `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space/browse>`_
+   and `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/browse>`_.
+   You can find the URL to clone by clicking a button in the sidebar on your left.
+
+.. admonition:: Solution
+   :class: solution stacked
+   
+   .. code-block:: bash
+   
+      git clone ssh://git@stash.desy.de:7999/b2t/b2-git-training-space.git
+      git clone ssh://git@stash.desy.de:7999/b2t/b2-git-training-space-2.git
+
+Now you should have both repositories on your local machine.
+
+.. admonition:: Exercise
+   :class: exercise stacked
+   
+   Make a local change in ``b2-git-training-space``, commit and push.
+   
+.. admonition:: Solution
+   :class: solution stacked
+   
+   .. code-block:: bash
+   
+      # Example of a change (try something else)
+      echo "I'm a cat." >> my_story.txt
+      git add my_story.txt
+      git commit -m "Adding a story"
+      git push
+
+Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you 
+cannot just push changes there directly. Instead, you have to open a pull request (PR).
+
+.. admonition:: Exercise (advanced)
+   :class: exercise stacked
+   
+   Open a PR for a similar change in ``b2-git-training-space-2``.
+   
+.. admonition:: Hint
+   :class: xhint stacked
+   
+   You need to create a new branch and start working from there.
+ 
+.. admonition:: Hint
+   :class: xhint stacked
+   
+   After you created your branch, check it out, make some changes and commit. 
+   Then push the branch to the remote.
+   In the text that is printed on the command line, you are invited to click
+   a link to open a PR.
+
+.. code-block:: bash
+
+   .. code-block:: bash
+   
+      # Make sure your working repository is clean
+      git status
+      # Create a new branch (Important: pick a different name for your branch!)
+      git branch my-new-branch
+      # Switch to it
+      git checkout my-new-branch
+      # Example of a change (try something else)
+      echo "I'm a cat." >> my_story.txt
+      git commit -m "Adding a story"
+      git push --set-upstream origin my-new-branch 
+      
+   The output of the last command tells you to go to
+   ``https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/my-new-change``.
+   Visist the page to open your PR.
+

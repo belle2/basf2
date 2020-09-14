@@ -8,6 +8,7 @@ import flavorTagger as ft
 from variables import variables
 import variables.collections as vc
 import variables.utils as vu
+import vertex
 
 # get input file number from the command line
 filenumber = sys.argv[1]

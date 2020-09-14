@@ -81,22 +81,22 @@ class inelasticDarkMatter(BaseSkim):
 
         IPtrack = 'abs(dr) < 0.05'  # cm
         HighEtrack = 'useCMSFrame(p)>3.0'  # GeV
-        ma.cutAndCopyList("e+:fromIP", "e+:all", IPtrack, path=path)
-        ma.cutAndCopyList("e+:highE", "e+:all", HighEtrack, path=path)
+        ma.cutAndCopyList("e+:TrackFromIP", "e+:all", IPtrack, path=path)
+        ma.cutAndCopyList("e+:HighEnergyTrack", "e+:all", HighEtrack, path=path)
 
         signalPhoton = 'clusterReg==2 and clusterZernikeMVA > 0.3 and useCMSFrame(p) > 1.0'
         photonVetoHE1 = 'useCMSFrame(p) > 0.6'
         photonVetoHE3 = 'p>0.5'
 
-        ma.cutAndCopyList("gamma:signal", "gamma:all", signalPhoton, path=path)
-        ma.cutAndCopyList("gamma:HE1", "gamma:all", photonVetoHE1, path=path)
-        ma.cutAndCopyList("gamma:HE3", "gamma:all", photonVetoHE3, path=path)
+        ma.cutAndCopyList("gamma:ISR", "gamma:all", signalPhoton, path=path)
+        ma.cutAndCopyList("gamma:HighEnergyPhotons", "gamma:all", photonVetoHE1, path=path)
+        ma.cutAndCopyList("gamma:MediumEnergyPhotons", "gamma:all", photonVetoHE3, path=path)
 
-        idmEventCuts = ('nParticlesInList(gamma:signal)==1 and '
-                        'nParticlesInList(e+:fromIP)==0 and '
-                        'nParticlesInList(e+:highE) == 0 and '
-                        'nParticlesInList(gamma:HE1) == 1 and '
-                        'nParticlesInList(gamma:HE3) < 4'
+        idmEventCuts = ('nParticlesInList(gamma:ISR)==1 and '
+                        'nParticlesInList(e+:TrackFromIP)==0 and '
+                        'nParticlesInList(e+:HighEnergyTrack) == 0 and '
+                        'nParticlesInList(gamma:HighEnergyPhotons) == 1 and '
+                        'nParticlesInList(gamma:MediumEnergyPhotons) < 4'
                         )
 
         path = self.skim_event_cuts(idmEventCuts, path=path)

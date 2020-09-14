@@ -754,7 +754,7 @@ we could use
 
 .. rubric:: Editing files over SSH
 
-There are multiple ways to shows on a system connected to by ssh as if they were
+There are multiple ways to show files on a system connected to by ssh as if they were
 local files. For example
 
 * there is ``sshfs`` which lets you connect the files on a remote machine via the
@@ -815,9 +815,11 @@ This is indeed possible and explained in detail on `B2 Questions
 .. rubric:: Using a terminal multiplexer (e.g. tmux, screen)
 
 When you loose your ssh connection or your terminal window is closed, all
-processes that had been running in that terminal are also killed, which is can
+processes that had been running in that terminal are also killed. This can
 be frustrating if it is a long-running process such compilation or a dataset
-download. Then, you can use a `terminal multiplexer
+download.
+
+To avoid this you can use a `terminal multiplexer
 <https://en.wikipedia.org/wiki/Terminal_multiplexer>`_ program such as `GNU
 screen <https://www.gnu.org/software/screen/>`_ or the newer and more
 feature-rich `tmux <https://github.com/tmux/tmux/wiki>`_. Both are
@@ -851,8 +853,8 @@ session. A terminal multiplexer allows for example to
    Tmux running in the local terminal and on KEKCC with multiple windows and
    panes.
 
-If you don't know either programs yet, I recommend learning how to use the
-newer tmux. Check out the official `getting started guide
+If you don't know either programs yet: learn how to use (the newer) tmux.
+Check out the official `getting started guide
 <https://github.com/tmux/tmux/wiki/Getting-Started>`_ from its `wiki
 <https://github.com/tmux/tmux/wiki>`_ or one of the various googable online
 guides such as `this one <https://linuxhandbook.com/tmux/>`_. And I also
@@ -884,7 +886,7 @@ tmux attach
     the initial tmux session.
 
 
-All these command take optional arguments to be able to handle multiple
+All these commands take optional arguments to be able to handle multiple
 sessions and there are many more useful tmux commands than those listed here,
 for example if you want to have multiple windows (tmux "tabs") and panes in a
 tmux. To see those, check out the documentation links above, where you will

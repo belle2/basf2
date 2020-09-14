@@ -79,14 +79,6 @@ Build the Muid likelihoods starting from the hit pattern and the transverse scat
 **Parameters:**
 
 * pdg (*int*): PDG code of the particle hypothesis.
-
-
-.. eff_picture:
-
-.. figure:: /home/belle2/martina/development/klm/doc/figure.jpg
-  :width: 40em
-  :align: center
- 
   
 
 .. see also:: `"MuidElementNumber Class" <https://b2-master.belle2.org/software/development/classBelle2_1_1MuidElementNumbers.html#abac5ea6b84578687bc483bb611738e35>`_

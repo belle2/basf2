@@ -31,8 +31,6 @@ from softwaretrigger.path_utils import (
  add_skim_software_trigger
  )
 
-excluded_branches = ['Tracks', 'RecoTracks', 'V0s', 'SVDShaperDigitsFromTracks']
-
 now = datetime.datetime.now()
 
 settings = CalibrationSettings(name="SVDCoGTimeCalibrationPrompt",
@@ -61,19 +59,9 @@ def pre_collector():
 
     # Set-up re-processing path
     path = create_path()
-    path.add_module('RootInput', excludeBranchNames=excluded_branches)
-
-    path.add_module("Gearbox")
-    path.add_module("Geometry", useDB=True)
 
     # unpack raw svd data and produce: SVDEventInfo and SVDShaperDigits
     raw.add_unpackers(path)
-    reconstruction.add_ecl_modules(path)
-    reconstruction.add_ecl_finalizer_module(path)
-    add_filter_software_trigger(path)
-    add_skim_software_trigger(path)
-    # trigger_skim_module =path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
-    # trigger_skim_module.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     # run SVD reconstruction, changing names of StoreArray
     add_tracking_reconstruction(path)

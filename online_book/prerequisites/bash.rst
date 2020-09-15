@@ -6,13 +6,15 @@ Command Line Tutorial (Bash)
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: external tutorial + 30 min
+    **External training**: 4h30
 
-    **Exercises**: external tutorial + 10 min
+    **Teaching**: 30 min
+
+    **Exercises**: 10 min
 
     **Prerequisites**:
 
-    	* None
+        * None
 
     **Questions**:
 

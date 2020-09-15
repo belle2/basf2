@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef DISPLAYUI_H
-#define DISPLAYUI_H
+#pragma once
 
 #include <TQObject.h>
 
@@ -232,4 +231,3 @@ namespace Belle2 {
     ClassDef(DisplayUI, 0)
   };
 }
-#endif

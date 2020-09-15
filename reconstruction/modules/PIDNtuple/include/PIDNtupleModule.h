@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PIDNTUPLEMODULE_H
-#define PIDNTUPLEMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -99,5 +98,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

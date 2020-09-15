@@ -276,7 +276,7 @@ void ECLDCTCompress::uncompress(BitStream& in, int* adc)
 
 ECLCompress* Belle2::ECL::selectAlgo(int compAlgo)
 {
-  ECLCompress* comp = NULL;
+  ECLCompress* comp = nullptr;
   if (compAlgo == 1) {
     comp = new ECLBaseCompress;
   } else if (compAlgo == 2) {

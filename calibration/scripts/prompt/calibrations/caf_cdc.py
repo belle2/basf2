@@ -4,19 +4,18 @@
 
 from prompt import CalibrationSettings
 from prompt.utils import events_in_basf2_file
+import basf2
+from random import choice, seed
+from caf.framework import Calibration
 
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
-                               expert_username="uchida",
+                               expert_username="eberthol",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hlt_mumu", "hlt_hadron", "Bcosmics"],
                                depends_on=[])
-
-
-import basf2
-from random import choice, seed
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
@@ -74,6 +73,7 @@ def get_calibrations(input_data, **kwargs):
     max_events_per_calibration = 200000  # for t0, tw calib. 200k events for each skim
     max_events_per_calibration_for_xt_sr = 1000000  # for xt, sr calib. 1M events for each skim
     max_events_per_file = 5000
+    max_events_per_file_hadron = 2500
 
     reduced_file_to_iov_mumu = filter_by_max_files_per_run(file_to_iov_mumu, max_files_per_run, min_events_per_file)
     input_files_mumu = list(reduced_file_to_iov_mumu.keys())
@@ -84,8 +84,9 @@ def get_calibrations(input_data, **kwargs):
     reduced_file_to_iov_hadron = filter_by_max_files_per_run(file_to_iov_hadron, max_files_per_run, min_events_per_file)
     input_files_hadron = list(reduced_file_to_iov_hadron.keys())
     basf2.B2INFO(f"Total number of hlt_hadron files actually used as input = {len(input_files_hadron)}")
-    chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file)
-    chosen_files_hadron_for_xt_sr = select_files(input_files_hadron[:], max_events_per_calibration_for_xt_sr, max_events_per_file)
+    chosen_files_hadron = select_files(input_files_hadron[:], max_events_per_calibration, max_events_per_file_hadron)
+    chosen_files_hadron_for_xt_sr = select_files(input_files_hadron[:],
+                                                 max_events_per_calibration_for_xt_sr, max_events_per_file_hadron)
 
     reduced_file_to_iov_Bcosmics = filter_by_max_files_per_run(file_to_iov_Bcosmics, max_files_per_run, min_events_per_file)
     input_files_Bcosmics = list(reduced_file_to_iov_Bcosmics.keys())
@@ -333,9 +334,6 @@ def sr_algo():
     algo.setStoreHisto(True)
     algo.setThreshold(0.4)
     return algo
-
-
-from caf.framework import Calibration
 
 
 class CDCCalibration(Calibration):

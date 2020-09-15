@@ -9,7 +9,7 @@
 #pragma link C++ class Belle2::ECLCrystalsShapeAndPosition+;
 #pragma link C++ class Belle2::ECLDigitTimeConstants+;
 #pragma link C++ class Belle2::ECLDigitEnergyConstants+;
-#pragma link C++ class Belle2::ECLDatabaseImporter;
+#pragma link C++ class Belle2::ECLDatabaseImporter-;
 #pragma link C++ class Belle2::ECLShowerShapeSecondMomentCorrection;
 #pragma link C++ class Belle2::ECLShowerCorrectorLeakageCorrection;
 #pragma link C++ class Belle2::ECLShowerEnergyCorrectionTemporary;
@@ -28,5 +28,9 @@
 #pragma link C++ class Belle2::ECLChannelMap+;
 #pragma link C++ class Belle2::ECLCrystalLocalRunCalib;
 #pragma link C++ class Belle2::ECLLocalRunCalibRef;
+#pragma link C++ class Belle2::ECLWaveformData+;
+#pragma link C++ class Belle2::ECLWFAlgoParams+; // implicit
+#pragma link C++ class Belle2::ECLNoiseData+; // implicit
+#pragma link C++ class Belle2::ECLLookupTable+; // implicit
 #pragma link C++ class Belle2::ECLLeakageCorrections;
 #endif

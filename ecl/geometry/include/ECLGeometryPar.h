@@ -1,18 +1,14 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010 - Belle II Collaboration                             *
+ * Copyright(C) 2011-2018 - Belle II Collaboration                        *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Poyuan Chen                                              *
+ * Contributors: Poyuan Chen, Alexei Sibidanov                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
- *                                                                        *
- * 7/31: Poyuan                                                           *
- *                                                                        *
- *                                                                        *
  **************************************************************************/
-#ifndef ECLGEOMETRYPAR_H
-#define ECLGEOMETRYPAR_H
+
+#pragma once
 
 #include <vector>
 #include <map>
@@ -25,6 +21,10 @@ typedef double EclCM;
 typedef double EclRad;
 
 class G4VTouchable;
+namespace HepGeom {
+  class Transform3D;
+}
+typedef HepGeom::Transform3D G4Transform3D;
 
 namespace Belle2 {
   namespace ECL {
@@ -108,6 +108,8 @@ namespace Belle2 {
 
       double time2sensor(int cid, const G4ThreeVector& hit_pos);
     private:
+      /** Global transformations */
+      G4Transform3D* m_ECLForwardGlobalT = NULL, *m_ECLBackwardGlobalT = NULL, *m_ECLBarrelGlobalT = NULL;
       /** initialise the crystal */
       void InitCrystal(int cid);
       /** crystal geometry */
@@ -387,4 +389,3 @@ namespace Belle2 {
 
   } // end of namespace ECL
 } // end of namespace Belle2
-#endif

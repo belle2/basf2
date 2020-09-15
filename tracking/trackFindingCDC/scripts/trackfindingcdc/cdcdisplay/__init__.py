@@ -1,25 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from .svgdrawing import attributemaps
+from . import svgdrawing
+import itertools
+from datetime import datetime
+import subprocess
+import math
+import os.path
+import os
+from ROOT import std
+from ROOT import Belle2  # make Belle2 namespace available
 import basf2
 
 from ROOT import gSystem
 gSystem.Load('libframework')  # for PyStoreArray
 gSystem.Load('libcdc')  # for CDCSimHit
 gSystem.Load('libtracking')  # for CDCHit and so on
-
-from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
-
-import os
-import os.path
-import math
-
-import subprocess
-from datetime import datetime
-import itertools
-from . import svgdrawing
-from .svgdrawing import attributemaps
 
 
 class CDCSVGDisplayModule(basf2.Module):

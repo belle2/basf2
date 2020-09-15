@@ -8,8 +8,7 @@
 // Contirbutors: Anze Zupanc, Matic Lubej,
 //-
 
-#ifndef B2BII_CONVERT_MDST_H
-#define B2BII_CONVERT_MDST_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -34,6 +33,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <analysis/dataobjects/EventExtraInfo.h>
+#include <b2bii/dataobjects/BelleTrkExtra.h>
 
 // Replace BeamParameters
 #include <mdst/dbobjects/BeamSpot.h>
@@ -147,6 +147,8 @@ namespace Belle2 {
     bool m_nisEnable; /**< Flag to switch on conversion of nisKsFinder info */
 
     bool m_convertRecTrg; /**< Flag to switch on conversion of rectrg_summary3 */
+
+    bool m_convertTrkExtra; /**< Flag to switch on conversion of first(last)_{x,y,z} of mdst_trk_fit */
 
     /**
      * E9/E25 threshold value
@@ -390,6 +392,9 @@ namespace Belle2 {
     /** Particles. */
     StoreArray<Particle> m_particles;
 
+    /** Belle CDC extra information. */
+    StoreArray<BelleTrkExtra> m_belleTrkExtra;
+
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;
 
@@ -428,5 +433,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

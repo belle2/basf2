@@ -9,22 +9,13 @@
 #ifndef PRINTDATA_H
 #define PRINTDATA_H
 
-#include <stdlib.h>
-#include <string>
-#include <vector>
-
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-
-//#include <daq/dataflow/EvtSocket.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-
-
-
 
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -37,24 +28,7 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawPXD.h>
 
-//#include <daq/rawdata/modules/DAQConsts.h>
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-
-#include <sys/uio.h>
-
-
-
-#include "TROOT.h"
-#include "TNtuple.h"
-#include "TTree.h"
 #include "TFile.h"
-#include "TCanvas.h"
 #include "TH1.h"
 
 
@@ -89,6 +63,7 @@ namespace Belle2 {
     //! print a PXD event
     virtual void printPXDEvent(RawPXD* raw_pxd);
 
+    //! Called if the current run ends
     virtual void endRun() override;
 
   protected :

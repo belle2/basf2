@@ -123,6 +123,7 @@ namespace Belle2 {
     /** The function to calculate the Hadronic Amplitudes of left handed (V-A) type contribution.
      *@param Dhel helicity of the daughter D(*) meson {+1,0,1} for D* and 2 for D.
      *@param whel helicity of the virtual vector boson {+1,0,1,2}.
+     *@param w   velocity transfer variable.
      *@return calculated amplitude value.
      */
     double HadV1(int Dhel, int whel, double w) const; // V-A
@@ -406,7 +407,7 @@ namespace Belle2 {
     double q2min(double mtau) const {return mtau * mtau;}
 
     /** Maximum value of the q^2.
-     *@param mtau daughter lepton mass.
+     *@param Dhel helicity of the D(*) meson in the rest frame of the parent meson {+1,0,-1} for D* and 2 for D.
      *@return calcualted q^2 maximum.
      */
     double q2max(int Dhel) const {return (m_mB - mD(Dhel)) * (m_mB - mD(Dhel));}

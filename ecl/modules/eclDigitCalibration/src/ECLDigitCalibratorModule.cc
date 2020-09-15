@@ -263,7 +263,7 @@ void ECLDigitCalibratorModule::event()
     double calibratedEnergy = 0;
 
     if (m_simulatePure) {
-      if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName()) != NULL) {
+      if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName()) != nullptr) {
         if (aECLDigit.getRelated<ECLPureCsIInfo>(eclPureCsIInfoArrayName())->getPureCsI())
           is_pure_csi = 1;
       }

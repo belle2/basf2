@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MILLEPEDECOLLECTORMODULE_H
-#define MILLEPEDECOLLECTORMODULE_H
+#pragma once
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -235,5 +234,3 @@ namespace Belle2 {
     void updateMassWidthIfSet(std::string listName, double& mass, double& width);
   };
 }
-
-#endif /* MILLEPEDECOLLECTORMODULE_H */

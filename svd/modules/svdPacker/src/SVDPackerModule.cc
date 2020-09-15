@@ -320,9 +320,9 @@ void SVDPackerModule::event()
     unsigned int nwords_4th = 0;
 
     int* buf1 = new int[nwords_1st];
-    int* buf2 = NULL;
-    int* buf3 = NULL;
-    int* buf4 = NULL;
+    int* buf2 = nullptr;
+    int* buf3 = nullptr;
+    int* buf4 = nullptr;
 
     // filling buffers
     for (unsigned int j = 0; j < nwords_1st; j++) {

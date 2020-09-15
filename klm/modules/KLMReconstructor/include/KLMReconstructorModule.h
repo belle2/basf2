@@ -47,32 +47,32 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMReconstructorModule();
+    ~KLMReconstructorModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override;
 
     /**
      * Called for each event.
      */
-    virtual void event() override;
+    void event() override;
 
     /**
      * Called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override;
 
     /**
      * Called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override;
 
   private:
 

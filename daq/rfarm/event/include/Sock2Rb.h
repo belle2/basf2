@@ -14,19 +14,22 @@
 
 #define RBUFSIZE 100000000
 
-class Sock2Rb {
-public:
-  /*! Constuctor and Destructor */
-  Sock2Rb(std::string rbuf, int port);
-  ~Sock2Rb(void);
+namespace Belle2 {
 
-  /*! Event function */
-  int ReceiveEvent(void);
+  class Sock2Rb {
+  public:
+    /*! Constuctor and Destructor */
+    Sock2Rb(std::string rbuf, int port);
+    ~Sock2Rb(void);
 
-private:
-  RingBuffer* m_rbuf;
-  EvtSocketRecv* m_sock;
-  char* m_evtbuf;
+    /*! Event function */
+    int ReceiveEvent(void);
 
-};
+  private:
+    RingBuffer* m_rbuf;
+    EvtSocketRecv* m_sock;
+    char* m_evtbuf;
 
+  };
+
+}

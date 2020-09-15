@@ -1,5 +1,4 @@
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -21,6 +20,7 @@ import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 import svd as svd
 
+set_log_level(LogLevel.INFO)
 input_branches = [
     'SVDShaperDigitsFromTracks',
     'EventT0',
@@ -113,6 +113,7 @@ def SVDCoGTimeCalibration(files, tags, uniqueID):
 
     return calibration
 
+
 if __name__ == "__main__":
 
     input_files = [os.path.abspath(file) for file in Belle2.Environment.Instance().getInputFilesOverride()]
@@ -166,7 +167,7 @@ if __name__ == "__main__":
     conditions.override_globaltags()
     svdCoGCAF = SVDCoGTimeCalibration(good_input_files,
                                       [  # "online_proc11",
-                                       "online", "Reco_master_patch_rel5"],
+                                          "online", "Reco_master_patch_rel5"],
                                       # "data_reprocessing_proc11_baseline",
                                       # "staging_data_reprocessing_proc11",
                                       # "data_reprocessing_proc10",

@@ -63,7 +63,7 @@ namespace Belle2 { // make seperate sub-namespace for this?
       Belle2::MCParticle* mcPart = trueHits[iTH]->template getRelatedFrom<Belle2::MCParticle>("ALL");
 
       int mcPartId = -1; // default value for MCPartId (not found)
-      if (mcPart != NULL) {
+      if (mcPart != nullptr) {
         mcPartId = mcPart->getArrayIndex();
         B2DEBUG(4999, "TrueHit is related to MCParticle " << mcPartId);
       } else {

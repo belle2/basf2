@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXSCANMODULE_H
-#define CDCDEDXSCANMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -48,5 +47,4 @@ namespace Belle2 {
     StoreArray<CDCDedxTrack> m_dedxArray; /**< array of output dE/dx tracks */
 
   };
-} // Belle2 namespace
-#endif
+} // Belle2 namespac

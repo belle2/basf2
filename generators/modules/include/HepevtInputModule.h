@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef HEPEVTINPUTMODULE_H
-#define HEPEVTINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -69,4 +68,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // HEPEVTINPUTMODULE_H

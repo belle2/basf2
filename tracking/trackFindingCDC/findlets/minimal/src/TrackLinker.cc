@@ -49,7 +49,6 @@ void TrackLinker::apply(const std::vector<CDCTrack>& inputTracks, std::vector<CD
   // Put the linked tracks together
   outputTracks.reserve(outputTracks.size() + m_trackPaths.size());
   for (const std::vector<const CDCTrack*>& trackPath : m_trackPaths) {
-    // cppcheck-suppress useStlAlgorithm
     outputTracks.push_back(CDCTrack::condense(trackPath));
   }
 }

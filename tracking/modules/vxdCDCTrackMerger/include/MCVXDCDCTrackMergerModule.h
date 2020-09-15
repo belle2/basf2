@@ -38,7 +38,7 @@ namespace Belle2 {
     /// Get and write back the relations to the store array.
     StoreArrayMerger m_storeArrayMerger;
     /// Make a best candidate selection
-    TrackFindingCDC::BestMatchSelector<RecoTrack*, RecoTrack*, TrackFindingCDC::WeightedRelation> m_bestMatchSelector;
+    TrackFindingCDC::BestMatchSelector<RecoTrack*, RecoTrack*> m_bestMatchSelector;
     /// Use the weighted relations to turn them into real DataStore relations.
     TrackFindingCDC::RelationAdder<RecoTrack*, RecoTrack*> m_relationAdder;
 

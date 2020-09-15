@@ -1,6 +1,8 @@
 #!/usr/bin/env/python3
 # -*-coding: utf-8-*-
 
+import ROOT
+from skim.taupair import TauLFV
 import basf2 as b2
 import modularAnalysis as ma
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
@@ -30,7 +32,6 @@ loadStdAllKstar0(path=taulfvskim)
 loadStdAllPhi(path=taulfvskim)
 loadStdAllF_0(path=taulfvskim)
 
-from skim.taupair import TauLFV
 tauList = TauLFV().get_skim_list_names()
 ma.copyLists('tau+:LFV', tauList, path=taulfvskim)
 
@@ -48,7 +49,6 @@ print(b2.statistics)
 # add contact information to histogram
 contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
-import ROOT
 
 f = ROOT.TFile.Open('TauLFV_Validation.root', 'update')
 

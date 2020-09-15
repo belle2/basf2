@@ -3,7 +3,7 @@
 # Thomas Keck 2016
 
 from b2test_utils import skip_test_if_light
-skip_test_if_light()  # light builds don't contain generators; skip before trying to import
+skip_test_if_light()  # light builds don't contain generators; skip before trying to import  # noqa
 
 from basf2 import *
 

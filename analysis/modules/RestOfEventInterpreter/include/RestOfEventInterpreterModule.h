@@ -42,8 +42,8 @@ namespace Belle2 {
   private:
 
     std::string m_particleList;  /**< Name of the ParticleList */
-    std::vector<std::tuple<std::string, std::string, std::string>>
-                                                                m_ROEMasks; /**< Container for tuples */
+    std::vector<std::tuple<std::string, std::string, std::string, std::string>>
+        m_ROEMasks; /**< Container for tuples */
     typedef std::map<std::string, std::shared_ptr<Variable::Cut>>
                                                                stringAndCutMap; /**< Type definition helper for a map of string and cuts */
     typedef std::map<std::string, std::vector<double>>
@@ -58,6 +58,8 @@ namespace Belle2 {
     stringAndCutMap m_trackCuts; /**< Cut object which performs the cuts on the remaining tracks for a single ROE interpretation */
     stringAndCutMap
     m_eclClusterCuts; /**< Cut object which performs the cuts on the remaining ECL clusters for a single ROE interpretation */
+    stringAndCutMap
+    m_klmClusterCuts; /**< Cut object which performs the cuts on the remaining KLM clusters for a single ROE interpretation */
 
     bool m_update; /**< Set true for updating a-priori charged stable fractions. */
 

@@ -1,5 +1,4 @@
-#ifndef COSMICS_VAL_H
-#define COSMICS_VAL_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -112,4 +111,3 @@ namespace Belle2 {
 
   };
 }
-#endif

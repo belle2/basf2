@@ -38,7 +38,7 @@ namespace Belle2 {
     }
 
     //! Destructor
-    virtual ~BKLMSimHitPosition()
+    ~BKLMSimHitPosition()
     {
     }
 

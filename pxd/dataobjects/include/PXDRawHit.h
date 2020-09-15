@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXDRAWHIT_H
-#define PXDRAWHIT_H
-
+#pragma once
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
@@ -115,4 +113,3 @@ namespace Belle2 {
 
 
 } //Belle2 namespace
-#endif

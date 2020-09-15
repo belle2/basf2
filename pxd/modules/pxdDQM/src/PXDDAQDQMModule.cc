@@ -53,8 +53,9 @@ void PXDDAQDQMModule::defineHisto()
   hDAQErrorDHE = new TH2F("PXDDAQDHEError", "PXDDAQError/DHE;DHE ID;", 64, 0, 64, ONSEN_USED_TYPE_ERR, 0, ONSEN_USED_TYPE_ERR);
   hDAQUseableModule = new TH1F("PXDDAQUseableModule", "PXDDAQUseableModule/DHE;DHE ID;", 64, 0, 64);
   hDAQNotUseableModule = new TH1F("PXDDAQNotUseableModule", "PXDDAQNotUseableModule/DHE;DHE ID;", 64, 0, 64);
+  hDAQDHPDataMissing = new TH1F("PXDDAQDHPDataMissing", "PXDDAQDHPDataMissing/DHE*DHP;DHE ID;", 64 * 4, 0, 64);
   hDAQEndErrorDHC = new TH2F("PXDDAQDHCEndError", "PXDDAQEndError/DHC;DHC ID;", 16, 0, 16, 32, 0, 32);
-  hDAQEndErrorDHE = new TH2F("PXDDAQDHEEndError", "PXDDAQEndError/DHE;DHE ID;", 64, 0, 64, 32, 0, 32);
+  hDAQEndErrorDHE = new TH2F("PXDDAQDHEEndError", "PXDDAQEndError/DHE;DHE ID;", 64, 0, 64, 4 * 2 * 8, 0, 4 * 2 * 8);
 
   // histograms might get unreadable, but, if necessary, you can zoom in anyways.
   // we could use full alphanumeric histograms, but then, the labels would change (in the worst case) depending on observed errors
@@ -116,6 +117,7 @@ void PXDDAQDQMModule::beginRun()
   hDAQErrorDHE->Reset();
   hDAQUseableModule->Reset();
   hDAQNotUseableModule->Reset();
+  hDAQDHPDataMissing->Reset();
   hDAQEndErrorDHC->Reset();
   hDAQEndErrorDHE->Reset();
   for (auto& it : hDAQDHETriggerGate) if (it.second) it.second->Reset();
@@ -134,6 +136,7 @@ void PXDDAQDQMModule::event()
     PXDErrorFlags mask = (1ull << i);
     if ((evt_emask & mask) == mask) hDAQErrorEvent->Fill(getPXDBitErrorName(i).c_str(), 1);
   }
+  hDAQDHPDataMissing->Fill(-1); // to normalize to the number of events
   B2DEBUG(20, "Iterate PXD Packets, Err " << evt_emask);
   for (auto& pkt : evt) {
     B2DEBUG(20, "Iterate PXD DHC in Pkt " << pkt.getPktIndex());
@@ -167,11 +170,14 @@ void PXDDAQDQMModule::event()
         } else {
           hDAQNotUseableModule->Fill(dhe.getDHEID());
         }
-
+        for (int i = 0; i < 4; i++) {
+          if ((dhe.getDHPFoundMask() & (1 << i)) == 0) hDAQDHPDataMissing->Fill(dhe.getDHEID() + i * 0.25);
+        }
         unsigned int emask = dhe.getEndErrorInfo();
-        for (int i = 0; i < 32; i++) {
-          unsigned int mask = (1 << i);
-          if ((emask & mask) == mask) hDAQEndErrorDHE->Fill(dhe.getDHEID(), i);
+        for (int i = 0; i < 4 * 2; i++) {
+          auto sm = (emask >> i * 4) & 0xF;
+          if (sm >= 8) sm = 7; // clip unknow to 7, as value >6 undefined for now
+          if (sm > 0) hDAQEndErrorDHE->Fill(dhe.getDHEID(), i * 8 + sm); // we dont want to fill noerror=0
         }
 
         if (hDAQDHETriggerGate[dhe.getSensorID()]) hDAQDHETriggerGate[dhe.getSensorID()]->Fill(dhe.getTriggerGate());

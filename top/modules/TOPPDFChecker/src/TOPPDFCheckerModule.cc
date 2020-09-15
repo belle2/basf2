@@ -139,7 +139,8 @@ namespace Belle2 {
 
     int Nhyp = 1;
     double mass = Const::pion.getMass(); // pion used just to initialize
-    TOPreco reco(Nhyp, &mass);
+    int pdg = Const::pion.getPDGCode();
+    TOPreco reco(Nhyp, &mass, &pdg);
     reco.setPDFoption(TOPreco::c_Fine);
     reco.setTimeWindow(m_minTime, m_maxTime);
 
@@ -153,7 +154,8 @@ namespace Belle2 {
       if (!trk.getMCParticle()) continue;
       if (!trk.getBarHit()) continue;
       mass = trk.getMCParticle()->getMass();
-      reco.setMass(mass);
+      pdg = trk.getMCParticle()->getPDG();
+      reco.setMass(mass, pdg);
       reco.reconstruct(trk);
       if (reco.getFlag() != 1) continue; // track is not in the acceptance of TOP
       numTrk++;

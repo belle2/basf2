@@ -9,7 +9,10 @@
  **************************************************************************/
 #pragma once
 
+#include <cdc/dataobjects/CDCHit.h>
+
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <string>
 #include "TH1.h"
@@ -49,6 +52,8 @@ namespace Belle2 {
     void terminate() override;
 
   private:
+
+    StoreArray<CDCHit> m_CDCHits; /**< CDC hits. */
     TH1D* m_hTDC[56][400] = {{nullptr}}; /**< TDC distribution histo. */
     TH1D* m_hTDCBoard[300] = {nullptr}; /**< T0 distribution of each board. */
     TH1D* m_hT0All = nullptr;   /**< T0 distribution of all channel. */

@@ -286,7 +286,8 @@ TLorentzVector RestOfEvent::get4Vector(const std::string& maskName) const
   std::vector<const Particle*> myParticles = RestOfEvent::getParticles(maskName);
   for (const Particle* particle : myParticles) {
     // KLMClusters are discarded, because KLM energy estimation is based on hit numbers, therefore it is unreliable
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
+    // also, enable it as an experimental option:
+    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster and !m_useKLMEnergy) {
       continue;
     }
     roe4Vector += particle->get4Vector();
@@ -340,116 +341,23 @@ std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(const std::string& ma
   }
   return result;
 }
+
 int RestOfEvent::getNTracks(const std::string& maskName) const
 {
   int nTracks = getTracks(maskName).size();
   return nTracks;
 }
+
 int RestOfEvent::getNECLClusters(const std::string& maskName) const
 {
   int nROEECLClusters = getECLClusters(maskName).size();
   return nROEECLClusters;
 }
+
 int RestOfEvent::getNKLMClusters(const std::string& maskName) const
 {
   int nROEKLMClusters = getKLMClusters(maskName).size();
   return nROEKLMClusters;
-}
-//
-// Old methods:
-//
-TLorentzVector RestOfEvent::get4VectorTracks(const std::string& maskName) const
-{
-  StoreArray<Particle> particles;
-  std::vector<const Track*> roeTracks = RestOfEvent::getTracks(maskName);
-
-  // Collect V0 momenta
-  TLorentzVector roe4VectorTracks;
-  //TODO: untested: test and move this method to variables!
-  //std::vector<unsigned int> v0List = RestOfEvent::getV0IDList(maskName);
-  //for (unsigned int iV0 = 0; iV0 < v0List.size(); iV0++)
-  //  roe4VectorTracks += particles[v0List[iV0]]->get4Vector();
-  const unsigned int n = Const::ChargedStable::c_SetSize;
-  //auto fractions = getChargedStableFractions(maskName);
-  double fractions[n] = {0, 0, 1, 0, 0, 0};
-  //fillFractions(fractions, maskName);
-
-  // Add momenta from other tracks
-  for (auto& roeTrack : roeTracks) {
-
-    const Track* track = roeTrack;
-    const PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
-    const MCParticle* mcp = roeTrack->getRelatedTo<MCParticle>();
-
-    if (!pid) {
-      B2ERROR("Track with no PID information!");
-      continue;
-    }
-
-    double particlePDG;
-
-    // MC, if available
-    /////////////////////////////////////////
-    double mcChoice = Const::pion.getPDGCode();
-    if (mcp) {
-      int mcpdg = abs(mcp->getPDG());
-      if (Const::chargedStableSet.contains(Const::ParticleType(mcpdg))) {
-        mcChoice = mcpdg;
-      }
-    }
-
-    // PID for Belle
-    //////////////////////////////////////////
-    // Set variables
-    Const::PIDDetectorSet set = Const::ECL;
-    double eIDBelle = pid->getProbability(Const::electron, Const::pion, set);
-    double muIDBelle = 0.5;
-    if (pid->isAvailable(Const::KLM))
-      muIDBelle = exp(pid->getLogL(Const::muon, Const::KLM));
-    double atcPIDBelle_Kpi = atcPIDBelleKpiFromPID(pid);
-
-    // Check for leptons, else kaons or pions
-    double pidChoice;
-    if (eIDBelle > 0.9 and eIDBelle > muIDBelle)
-      pidChoice = Const::electron.getPDGCode();
-    else if (muIDBelle > 0.9 and eIDBelle < muIDBelle)
-      pidChoice = Const::muon.getPDGCode();
-    // Check for kaons, else pions
-    else if (atcPIDBelle_Kpi > 0.6)
-      pidChoice = Const::kaon.getPDGCode();
-    // Assume pions
-    else
-      pidChoice = Const::pion.getPDGCode();
-
-    // Most likely
-    //////////////////////////////////////////////
-    // TODO: SET TO PION UNTILL MOST LIKELY FUNCTION IS RELIABLE
-    double fracChoice = Const::pion.getPDGCode();
-
-    // Use MC mass hypothesis
-    if (fractions[0] == -1)
-      particlePDG = mcChoice;
-    // Use Belle case
-    else if (fractions[0] == -2)
-      particlePDG = pidChoice;
-    // Use fractions
-    else
-      particlePDG = fracChoice;
-
-    auto trackParticle = Const::ChargedStable(particlePDG);
-    const TrackFitResult* tfr = roeTrack->getTrackFitResultWithClosestMass(trackParticle);
-
-    // Set energy of track
-    double tempMass = trackParticle.getMass();
-    TVector3 tempMom = tfr->getMomentum();
-    TLorentzVector temp4Vector;
-    temp4Vector.SetVect(tempMom);
-    temp4Vector.SetE(TMath::Sqrt(tempMom.Mag2() + tempMass * tempMass));
-
-    roe4VectorTracks += temp4Vector;
-  }
-
-  return roe4VectorTracks;
 }
 
 TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& maskName) const
@@ -489,28 +397,56 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
   return maskNames;
 }
 
-void RestOfEvent::print() const
+void RestOfEvent::print(const std::string& maskName, bool unpackComposite) const
 {
-  B2INFO(" - Particles[" << m_particleIndices.size() << "] : ");
-  printIndices(m_particleIndices);
-  for (auto mask : m_masks) {
-    mask.print();
+  std::string tab = " - ";
+  if (maskName != "") {
+    // Disable possible B2FATAL in printing method, might be useful for tests
+    if (!hasMask(maskName)) {
+      B2WARNING("No mask with the name '" << maskName << "' exists in this ROE! Nothing else to print");
+      return;
+    }
+    tab = " - - ";
+  } else {
+    if (m_isNested) {
+      B2INFO(tab << "ROE is nested");
+    }
+    if (m_isFromMC) {
+      B2INFO(tab << "ROE is build from generated particles");
+    }
   }
-  if (m_isNested) {
-    B2INFO("This ROE is nested.");
+  if (m_useKLMEnergy) {
+    B2WARNING("This ROE has KLM energy included into its 4-vector!");
   }
+  if (!m_isFromMC) {
+    unsigned int nCharged = getChargedParticles(maskName, 0, unpackComposite).size();
+    unsigned int nPhotons = getPhotons(maskName, unpackComposite).size();
+    unsigned int nNeutralHadrons = getHadrons(maskName, unpackComposite).size();
+    B2INFO(tab << "No. of Charged particles in ROE: " << nCharged);
+    B2INFO(tab << "No. of Photons           in ROE: " << nPhotons);
+    B2INFO(tab << "No. of K_L0 and neutrons in ROE: " << nNeutralHadrons);
+  } else {
+    unsigned int nParticles = getParticles(maskName, unpackComposite).size();
+    B2INFO(tab << "No. of generated particles in ROE: " << nParticles);
+  }
+  printIndices(maskName, unpackComposite, tab);
 }
 
-void RestOfEvent::printIndices(const std::set<int>& indices) const
+void RestOfEvent::printIndices(const std::string& maskName, bool unpackComposite, const std::string& tab) const
 {
-  if (indices.empty())
+  auto particles = getParticles(maskName, unpackComposite);
+  if (particles.size() == 0) {
+    B2INFO(tab << "No indices to print");
     return;
-
-  std::string printout =  "     -> ";
-  for (const int index : indices) {
-    printout += std::to_string(index) +  ", ";
   }
-  B2INFO(printout);
+  std::string printoutIndex =  tab + "|";
+  std::string printoutPDG =  tab + "|";
+  for (const auto particle : particles) {
+    printoutIndex += std::to_string(particle->getArrayIndex()) +  " |  ";
+    printoutPDG   += std::to_string(particle->getPDGCode()) +  " | ";
+  }
+  B2INFO(printoutPDG);
+  B2INFO(printoutIndex);
 }
 
 Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCode, bool isSelfConjugated)
@@ -539,43 +475,3 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCod
                              source.end()), Particle::PropertyFlags::c_IsUnspecified);
 }
 
-double RestOfEvent::atcPIDBelleKpiFromPID(const PIDLikelihood* pid) const
-{
-  // ACC = ARICH
-  Const::PIDDetectorSet set = Const::ARICH;
-  double acc_sig = exp(pid->getLogL(Const::kaon, set));
-  double acc_bkg = exp(pid->getLogL(Const::pion, set));
-  double acc = 0.5; // Belle standard
-  if (acc_sig + acc_bkg  > 0.0)
-    acc = acc_sig / (acc_sig + acc_bkg);
-
-  // TOF = TOP
-  set = Const::TOP;
-  double tof_sig = exp(pid->getLogL(Const::kaon, set));
-  double tof_bkg = exp(pid->getLogL(Const::pion, set));
-  double tof = 0.5; // Belle standard
-  double tof_all = tof_sig + tof_bkg;
-  if (tof_all != 0) {
-    tof = tof_sig / tof_all;
-    if (tof < 0.001) tof = 0.001;
-    if (tof > 0.999) tof = 0.999;
-  }
-
-  // dE/dx = CDC
-  set = Const::CDC;
-  double cdc_sig = exp(pid->getLogL(Const::kaon, set));
-  double cdc_bkg = exp(pid->getLogL(Const::pion, set));
-  double cdc = 0.5; // Belle standard
-  double cdc_all = cdc_sig + cdc_bkg;
-  if (cdc_all != 0) {
-    cdc = cdc_sig / cdc_all;
-    if (cdc < 0.001) cdc = 0.001;
-    if (cdc > 0.999) cdc = 0.999;
-  }
-
-  // Combined
-  double pid_sig = acc * tof * cdc;
-  double pid_bkg = (1. - acc) * (1. - tof) * (1. - cdc);
-
-  return pid_sig / (pid_sig + pid_bkg);
-}

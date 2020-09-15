@@ -102,12 +102,12 @@ namespace Belle2 {
   public:
     /** Default constructor.
      */
-    RelationsInterface(): m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) {}
+    RelationsInterface(): m_cacheDataStoreEntry(nullptr), m_cacheArrayIndex(-1) {}
 
     /** Constructor, forwards all arguments to BASE constructor. */
     template<class ...Args> explicit RelationsInterface(Args&& ... params):
       BASE(std::forward<Args>(params)...),
-      m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) { }
+      m_cacheDataStoreEntry(nullptr), m_cacheArrayIndex(-1) { }
 
     /** Copy constructor.
      *
@@ -116,7 +116,7 @@ namespace Belle2 {
      */
     RelationsInterface(const RelationsInterface& relationsInterface):
       BASE(relationsInterface),
-      m_cacheDataStoreEntry(NULL), m_cacheArrayIndex(-1) { }
+      m_cacheDataStoreEntry(nullptr), m_cacheArrayIndex(-1) { }
 
     /** Assignment operator.
      *

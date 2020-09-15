@@ -13,13 +13,6 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <pxd/geometry/SensorInfo.h>
-#include <svd/geometry/SensorInfo.h>
-#include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/GeoTools.h>
-#include <pxd/unpacking/PXDMappingLookup.h>
-#include <vector>
 #include "TH1F.h"
 #include "TH2F.h"
 

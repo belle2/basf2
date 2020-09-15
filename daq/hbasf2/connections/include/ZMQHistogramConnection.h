@@ -65,7 +65,8 @@ namespace Belle2 {
     std::vector<zmq::socket_t*> getSockets() const final;
     /// There should be never incoming data, so raise an exception if called anyways.
     void handleIncomingData();
-
+    /// Return the connection string
+    std::string getEndPoint() const { return "file://" + m_rootFileName; }
   private:
     /// The SHM file. Please note that we do not call its destructor on purpose.
     SharedMem* m_sharedMemory = nullptr;
@@ -103,7 +104,8 @@ namespace Belle2 {
     bool isReady() const { return m_output.isReady(); }
     /// The sockets are passed from ZMQConfirmedOutput
     std::vector<zmq::socket_t*> getSockets() const final { return m_output.getSockets(); }
-
+    /// Return the connection string
+    std::string getEndPoint() const { return m_output.getEndPoint(); }
   private:
     /// The output connection used for sending the histograms
     ZMQConfirmedOutput m_output;
@@ -141,7 +143,8 @@ namespace Belle2 {
     bool isReady() const { return m_output.isReady(); }
     /// The sockets are passed from ZMQRawOutput
     std::vector<zmq::socket_t*> getSockets() const final { return m_output.getSockets(); }
-
+    /// Return the connection string
+    std::string getEndPoint() const { return m_output.getEndPoint(); }
   private:
     /// The output connection used for sending the histograms
     ZMQRawOutput m_output;

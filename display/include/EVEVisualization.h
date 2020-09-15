@@ -1,5 +1,4 @@
-#ifndef EVEVISUALIZATION_H
-#define EVEVISUALIZATION_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -372,4 +371,3 @@ namespace Belle2 {
     bool m_drawBackward = false;
   };
 }
-#endif

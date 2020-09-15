@@ -86,9 +86,9 @@ void CDCDedxScanModule::event()
     double cellHeight = outer - inner;
     double topHeight = outer - wirePosF.Perp();
     double bottomHeight = wirePosF.Perp() - inner;
-    double topHalfWidth = PI * outer / nWires;
-    double bottomHalfWidth = PI * inner / nWires;
-    double cellHalfWidth = PI * wirePosF.Perp() / nWires;
+    double topHalfWidth = M_PI * outer / nWires;
+    double bottomHalfWidth = M_PI * inner / nWires;
+    double cellHalfWidth = M_PI * wirePosF.Perp() / nWires;
 
     // first construct the boundary lines, then create the cell
     const DedxPoint tl = DedxPoint(-topHalfWidth, topHeight);
@@ -114,7 +114,7 @@ void CDCDedxScanModule::event()
         double celldx = c.dx(doca, entAng);
         if (!c.isValid()) continue;
 
-        dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
+        dedxTrack->addHit(0, 0, i, doca, docaRS, entAng, entAngRS, 0, 0, 0.0, celldx, 0.0, cellHeight, cellHalfWidth, 0, 0.0, 0.0, 1.0, 1.0,
                           1.0, 0, 0.0, 0.0, 0.0);
       }
     }

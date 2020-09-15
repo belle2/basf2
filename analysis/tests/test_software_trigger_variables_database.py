@@ -39,7 +39,7 @@ if __name__ == "__main__":
     trigger_variables += [f(shrt) for _, shrt in triggers_to_test for f in (swtr, swtp)]
 
     # test on some files
-    b2.set_random_seed("\m/")
+    b2.set_random_seed(r"\m/")
     b2tu.configure_logging_for_tests()
     check_file("mdst13.root", trigger_variables)
     # TODO: update this to check a data event when a suitable file is added

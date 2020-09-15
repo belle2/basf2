@@ -9,6 +9,8 @@
 # Provide all necessary hook functions (see below)
 
 import numpy as np
+import basf2_mva
+import basf2_mva_util
 
 
 class MyFancyClassifier(object):
@@ -25,10 +27,6 @@ class MyFancyClassifier(object):
     def predict(self, X):
         """ Always return 1, this will boost our signal efficiency to the max """
         return np.ones(len(X))
-
-
-import basf2_mva
-import basf2_mva_util
 
 
 # These are the hooks you should implement

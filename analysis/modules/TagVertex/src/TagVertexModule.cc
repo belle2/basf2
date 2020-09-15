@@ -354,7 +354,7 @@ namespace Belle2 {
   }
 
 
-  /*
+  /**
    * Get vector which is opposite to vIn in CMS ref frame
    * Be aware that input vIn and output are in the Lab frame
    */
@@ -619,7 +619,8 @@ namespace Belle2 {
     std::vector<const Particle*> fitParticles;
     const RestOfEvent* roe = Breco->getRelatedTo<RestOfEvent>();
     if (!roe) return fitParticles;
-    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, Const::pion.getPDGCode(), false);
+    //load all particles from the ROE
+    std::vector<const Particle*> ROEParticles = roe->getChargedParticles(m_roeMaskName, 0 , false);
     if (ROEParticles.size() == 0) return fitParticles;
 
     for (auto& ROEParticle : ROEParticles) {
@@ -750,8 +751,11 @@ namespace Belle2 {
     }
 
     //perform fit
+
+    int isGoodFit(-1);
+
     try {
-      int isGoodFit = rFit.fit("avf");
+      isGoodFit = rFit.fit("avf");
       // if problems
       if (isGoodFit < 1) return false;
     } catch (const rave::CheckedFloatException&) {
@@ -760,7 +764,12 @@ namespace Belle2 {
     }
 
     //save the track info for later use
+
+    for (unsigned int i(0); i < particleAndWeights.size() && isGoodFit >= 1; ++i)
+      particleAndWeights.at(i).weight = rFit.getWeight(i);
+
     //Tracks are sorted from highest rave weight to lowest
+
     fillParticles(particleAndWeights);
 
     //if the fit is good, save the infos related to the vertex

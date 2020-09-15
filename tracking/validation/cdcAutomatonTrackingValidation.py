@@ -13,17 +13,15 @@
 </header>
 """
 
+from tracking.validation.run import TrackingValidationRun
+import logging
+import basf2
 VALIDATION_OUTPUT_FILE = 'CDCAutomatonTrackingValidation.root'
 CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 1000
 ACTIVE = True
 
-import basf2
 basf2.set_random_seed(1337)
-
-import logging
-
-from tracking.validation.run import TrackingValidationRun
 
 
 class CDCAutomaton(TrackingValidationRun):

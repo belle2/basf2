@@ -247,7 +247,7 @@ MCParticleColorMap::MCParticleColorMap()
 std::string MCParticleColorMap::info()
 {
   std::ostringstream oss;
-  for (const std::pair<int, std::string>& colorForMCParticleID : m_usedColors) {
+  for (const std::pair<int, std::string> colorForMCParticleID : m_usedColors) {
     oss << "MCParticle " << colorForMCParticleID.first << " -> " << colorForMCParticleID.second << "\n";
   }
   return oss.str();

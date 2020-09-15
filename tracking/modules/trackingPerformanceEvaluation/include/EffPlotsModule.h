@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EFFPLOTSMODULE_H_
-#define EFFPLOTSMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
@@ -283,5 +282,3 @@ namespace Belle2 {
 
   };
 } // end of namespace
-
-#endif /* EFFPLOTSMODULE_H_*/

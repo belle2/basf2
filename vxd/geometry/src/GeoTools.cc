@@ -11,6 +11,8 @@
 #include <vxd/geometry/GeoTools.h>
 #include <vxd/geometry/GeoCache.h>
 
+#include <numeric>
+
 using namespace Belle2;
 using namespace Belle2::VXD;
 

@@ -65,6 +65,8 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "file, in which the results of the calculation are stored, if storeDebugOutput is "
            "turned on. Please note that already present files will be overridden. "
            "ATTENTION: This file debugging mode does not work in parallel processing.", m_param_debugOutputFileName);
+  addParam("useRandomNumbersForPreScale", m_param_useRandomNumbersForPreScale, "Flag to use random numbers (True) "
+           "or a counter (False) for applying the prescale.", m_param_useRandomNumbersForPreScale);
 }
 
 void SoftwareTriggerModule::initialize()
@@ -79,6 +81,10 @@ void SoftwareTriggerModule::initialize()
 void SoftwareTriggerModule::beginRun()
 {
   m_dbHandler->checkForChangedDBEntries();
+  // Initialize always the internal counters at the beginning of each run.
+  if (not m_param_useRandomNumbersForPreScale) {
+    initializeCounters();
+  }
 }
 
 void SoftwareTriggerModule::terminate()
@@ -141,6 +147,20 @@ void SoftwareTriggerModule::initializeDebugOutput()
   }
 }
 
+void SoftwareTriggerModule::initializeCounters()
+{
+  m_mapCounter.clear();
+  // Check all the cuts and store them in the map used for the internal counters...
+  for (const auto& cutWithName : m_dbHandler->getCutsWithNames()) {
+    // ... store only the "accept" cuts...
+    if (not(cutWithName.second)->isRejectCut()) {
+      // ... and initialize each counter with 1.
+      const std::string& cutIdentifier = cutWithName.first;
+      m_mapCounter.insert(std::pair<std::string, uint32_t>(cutIdentifier, 1));
+    }
+  }
+}
+
 void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject)
 {
   // Check all cuts with the prefilled object and write them back into the data store.
@@ -148,8 +168,24 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
-    const auto& [prescaledCutResult, nonPrescaledCutResult] = cut->check(prefilledObject);
+    uint32_t counter = 1;
+    if ((not m_param_useRandomNumbersForPreScale) and (not(cutWithName.second)->isRejectCut())) {
+      auto it = m_mapCounter.find(cutIdentifier);
+      if (it != m_mapCounter.end())
+        counter = it->second;
+      else
+        B2FATAL("Something went wrong during the initializazion of the internal counters!" <<
+                LogVar("Cut for which no counter is found", cutIdentifier));
+    }
+    const auto& [prescaledCutResult, nonPrescaledCutResult] = cut->check(prefilledObject, m_param_useRandomNumbersForPreScale, counter);
     m_resultStoreObjectPointer->addResult(cutIdentifier, prescaledCutResult, nonPrescaledCutResult);
+    // Increase by 1 the counter for each accepted cut.
+    if ((not m_param_useRandomNumbersForPreScale) and (not(cutWithName.second)->isRejectCut())) {
+      if (nonPrescaledCutResult == SoftwareTriggerCutResult::c_accept) {
+        // We know that the element exists.
+        m_mapCounter.at(cutIdentifier)++;
+      }
+    }
   }
 
   // Also add the module result ( = the result of all cuts with this basename) for later reference.
@@ -178,7 +214,8 @@ void SoftwareTriggerModule::makeDebugOutput()
     B2DEBUG(100, "Finished storing the debug output to file.");
   }
 
-  if (makePreScale(m_param_preScaleStoreDebugOutputToDataStore)) {
+  if (makePreScale(m_param_preScaleStoreDebugOutputToDataStore,
+                   true)) {
     B2DEBUG(100, "Storing debug output to DataStore as requested.");
     m_calculation->addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
   }

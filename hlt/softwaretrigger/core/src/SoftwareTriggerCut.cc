@@ -27,7 +27,7 @@ namespace Belle2 {
     }
 
     std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> SoftwareTriggerCut::check(const
-        SoftwareTriggerVariableManager::Object& prefilledObject) const
+        SoftwareTriggerVariableManager::Object& prefilledObject, bool useRandomNumbers, const uint32_t& counter) const
     {
       if (not m_cut) {
         B2FATAL("Software Trigger is not initialized!");
@@ -46,7 +46,7 @@ namespace Belle2 {
         // First check if the cut gives a positive result. If not, we can definitely return "noResult".
         if (cutCondition) {
           // if yes, we have to use the prescale factor to see, if the result is really yes.
-          if (makePreScale(getPreScaleFactor())) {
+          if (makePreScale(getPreScaleFactor(), useRandomNumbers, counter)) {
             return {SoftwareTriggerCutResult::c_accept, SoftwareTriggerCutResult::c_accept};
           } else {
             // This is the only case were prescaled and non-prescaled results are different.
@@ -60,7 +60,7 @@ namespace Belle2 {
 
     SoftwareTriggerCutResult SoftwareTriggerCut::checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const
     {
-      return check(prefilledObject).first;
+      return check(prefilledObject, true).first;
     }
   }
 }

@@ -12,7 +12,7 @@
 
 namespace Belle2 {
   namespace SoftwareTrigger {
-    bool makePreScale(const unsigned int& preScaleFactor)
+    bool makePreScale(const unsigned int& preScaleFactor, const bool useRandomNumbers, const uint32_t& counter)
     {
       // A prescale factor of one is always true...
       if (preScaleFactor == 1) {
@@ -22,10 +22,16 @@ namespace Belle2 {
         return false;
       } else {
         // All other cases are a bit more interesting
-        // We do this by drawing a random number between 0 and m_preScaleFactor - 1 and comparing it to 0.
-        // The probability to get back a true result is then given by 1/m_preScaleFactor.
-        const unsigned int randomNumber = gRandom->Integer(preScaleFactor);
-        return randomNumber == 0;
+        if (useRandomNumbers) {
+          // We do this by drawing a random number between 0 and m_preScaleFactor - 1 and comparing it to 0.
+          // The probability to get back a true result is then given by 1/m_preScaleFactor.
+          const unsigned int randomNumber = gRandom->Integer(preScaleFactor);
+          return randomNumber == 0;
+        } else {
+          // Similar as above, but using the remainder between the counter and the preScaleFactor.
+          const uint32_t remainder = counter % preScaleFactor;
+          return remainder == 0;
+        }
       }
     }
   }

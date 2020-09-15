@@ -1,6 +1,6 @@
 .. _onlinebook_bash:
 
-Command Line Toturial (Bash)
+Command Line Tutorial (Bash)
 ============================
 
 .. sidebar:: Overview
@@ -284,7 +284,7 @@ most important ones are:
 
 .. envvar:: EDITOR
 
-    Lets you set your preferred editor to start when a progam needs a text editor.
+    Lets you set your preferred editor to start when a program needs a text editor.
     Can be set to the executable of any editor you would like to use by default.
 
 .. rubric:: Modifying Environment Variables in the Shell

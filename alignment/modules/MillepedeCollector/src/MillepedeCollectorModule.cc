@@ -23,10 +23,14 @@
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
 #include <alignment/reconstruction/AlignableBKLMRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventT0.h>
 #include <framework/dataobjects/FileMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/pcore/ProcHandler.h>
@@ -157,14 +161,11 @@ MillepedeCollectorModule::MillepedeCollectorModule() : CalibrationCollectorModul
 
 void MillepedeCollectorModule::prepare()
 {
-  unsigned int i, n;
-  m_EventMetaData.isRequired();
-  m_EventT0.isOptional();
-  m_CDCHits.isRequired();
-  m_PXDHits.isRequired();
-  m_SVDHits.isRequired();
-  m_BKLMHits.isRequired();
-  m_EKLMHits.isRequired();
+  StoreObjPtr<EventMetaData> emd;
+  emd.isRequired();
+
+  StoreObjPtr<EventT0> eventT0;
+  //eventT0.isRequired();
 
   if (m_tracks.empty() &&
       m_particles.empty() &&
@@ -176,60 +177,35 @@ void MillepedeCollectorModule::prepare()
       m_primaryMassVertexTwoBodyDecays.empty())
     B2ERROR("You have to specify either arrays of single tracks or particle lists of single single particles or mothers with vertex constrained daughters.");
 
-  n = m_tracks.size();
-  if (n > 0) {
-    m_RecoTracks = new StoreArray<RecoTrack>[n];
-    for (i = 0; i < n; ++i)
-      m_RecoTracks[i].isOptional(m_tracks[i]);
+  if (!m_tracks.empty()) {
+    for (auto arrayName : m_tracks)
+      continue;
+    // StoreArray<RecoTrack>::required(arrayName);
   }
 
-  n = m_particles.size();
-  if (n > 0) {
-    m_ParticleLists = new StoreObjPtr<ParticleList>[n];
-    for (i = 0; i < n; ++i)
-      m_ParticleLists[i].isOptional(m_particles[i]);
+  if (!m_particles.empty() || !m_vertices.empty() || !m_primaryVertices.empty()) {
+    StoreArray<RecoTrack> recoTracks;
+    StoreArray<Track> tracks;
+    StoreArray<TrackFitResult> trackFitResults;
+
+    //recoTracks.isRequired();
+    //tracks.isRequired();
+    //trackFitResults.isRequired();
   }
 
-  n = m_vertices.size();
-  if (n > 0) {
-    m_VertexLists = new StoreObjPtr<ParticleList>[n];
-    for (i = 0; i < n; ++i)
-      m_VertexLists[i].isOptional(m_vertices[i]);
+  for (auto listName : m_particles) {
+    StoreObjPtr<ParticleList> list(listName);
+    //list.isRequired();
   }
 
-  n = m_primaryVertices.size();
-  if (n > 0) {
-    m_PrimaryVertexLists = new StoreObjPtr<ParticleList>[n];
-    for (i = 0; i < n; ++i)
-      m_PrimaryVertexLists[i].isOptional(m_primaryVertices[i]);
+  for (auto listName : m_vertices) {
+    StoreObjPtr<ParticleList> list(listName);
+    //list.isRequired();
   }
 
-  n = m_twoBodyDecays.size();
-  if (n > 0) {
-    m_TwoBodyDecayLists = new StoreObjPtr<ParticleList>[n];
-    for (i = 0; i < n; ++i)
-      m_TwoBodyDecayLists[i].isOptional(m_twoBodyDecays[i]);
-  }
-
-  n = m_primaryTwoBodyDecays.size();
-  if (n > 0) {
-    m_PrimaryTwoBodyDecayLists = new StoreObjPtr<ParticleList>[n];
-    for (i = 0; i < n; ++i)
-      m_PrimaryTwoBodyDecayLists[i].isOptional(m_primaryTwoBodyDecays[i]);
-  }
-
-  n = m_primaryMassTwoBodyDecays.size();
-  if (n > 0) {
-    m_PrimaryMassTwoBodyDecayLists = new StoreObjPtr<ParticleList>[n];
-    for (i = 0; i < n; ++i)
-      m_PrimaryMassTwoBodyDecayLists[i].isOptional(m_primaryMassTwoBodyDecays[i]);
-  }
-
-  n = m_primaryMassVertexTwoBodyDecays.size();
-  if (n > 0) {
-    m_PrimaryMassVertexTwoBodyDecayLists = new StoreObjPtr<ParticleList>[n];
-    for (i = 0; i < n; ++i)
-      m_PrimaryMassVertexTwoBodyDecayLists[i].isOptional(m_primaryMassVertexTwoBodyDecays[i]);
+  for (auto listName : m_primaryVertices) {
+    StoreObjPtr<ParticleList> list(listName);
+    //list.isRequired();
   }
 
   // Register Mille output
@@ -285,8 +261,9 @@ void MillepedeCollectorModule::prepare()
 
 void MillepedeCollectorModule::collect()
 {
-  unsigned int i, n;
-  alignment::GlobalCalibrationManager::getInstance().preCollect(*m_EventMetaData);
+  StoreObjPtr<EventMetaData> emd;
+  alignment::GlobalCalibrationManager::getInstance().preCollect(*emd);
+  StoreObjPtr<EventT0> eventT0;
 
   if (!m_useGblTree) {
     // Open new file on request (at start or after being closed)
@@ -301,12 +278,12 @@ void MillepedeCollectorModule::collect()
   int ndf = -1;
   float evt0 = -9999.;
 
-  n = m_tracks.size();
-  for (i = 0; i < n; ++i) {
-    if (!m_RecoTracks[i].isValid())
+  for (auto arrayName : m_tracks) {
+    StoreArray<RecoTrack> recoTracks(arrayName);
+    if (!recoTracks.isValid())
       continue;
 
-    for (auto& recoTrack : m_RecoTracks[i]) {
+    for (auto& recoTrack : recoTracks) {
 
       if (!fitRecoTrack(recoTrack))
         continue;
@@ -328,8 +305,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-        evt0 = m_EventT0->getEventT0();
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -339,13 +316,13 @@ void MillepedeCollectorModule::collect()
 
   }
 
-  n = m_particles.size();
-  for (i = 0; i < n; ++i) {
-    if (!m_ParticleLists[i].isValid())
+  for (auto listName : m_particles) {
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
       continue;
 
-    for (unsigned int iParticle = 0; iParticle < m_ParticleLists[i]->getListSize(); ++iParticle) {
-      for (auto& track : getParticlesTracks({m_ParticleLists[i]->getParticle(iParticle)}, false)) {
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
+      for (auto& track : getParticlesTracks({list->getParticle(iParticle)}, false)) {
         auto gblfs = dynamic_cast<genfit::GblFitStatus*>(track->getFitStatus());
 
         gbl::GblTrajectory trajectory(gbl->collectGblPoints(track, track->getCardinalRep()), gblfs->hasCurvature());
@@ -354,8 +331,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-          evt0 = m_EventT0->getEventT0();
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -365,13 +342,13 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  n = m_vertices.size();
-  for (i = 0; i < n; ++i) {
-    if (!m_VertexLists[i].isValid())
+  for (auto listName : m_vertices) {
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
       continue;
 
-    for (unsigned int iParticle = 0; iParticle < m_VertexLists[i]->getListSize(); ++iParticle) {
-      auto mother = m_VertexLists[i]->getParticle(iParticle);
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
+      auto mother = list->getParticle(iParticle);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       for (auto& track : getParticlesTracks(mother->getDaughters()))
@@ -387,8 +364,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-          evt0 = m_EventT0->getEventT0();
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -401,13 +378,13 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  n = m_primaryVertices.size();
-  for (i = 0; i < n; ++i) {
-    if (!m_PrimaryVertexLists[i].isValid())
+  for (auto listName : m_primaryVertices) {
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
       continue;
 
-    for (unsigned int iParticle = 0; iParticle < m_PrimaryVertexLists[i]->getListSize(); ++iParticle) {
-      auto mother = m_PrimaryVertexLists[i]->getParticle(iParticle);
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
+      auto mother = list->getParticle(iParticle);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
       TMatrixD extProjection(5, 3);
@@ -499,9 +476,9 @@ void MillepedeCollectorModule::collect()
           // Invert here only the 2D sub-matrix (rest is zero due to the foŕm of dLocal_dExt)
           TMatrixD locPrec = locCov.GetSub(3, 4, 3, 4).Invert();
           TMatrixDSym locPrec2D(2); locPrec2D.Zero();
-          for (int j = 0; j < 2; ++j)
-            for (int k = 0; k < 2; ++k)
-              locPrec2D(j, k) = locPrec(j, k);
+          for (int i = 0; i < 2; ++i)
+            for (int j = 0; j < 2; ++j)
+              locPrec2D(i, j) = locPrec(i, j);
 
           // Take the 2 last components also for residuals and global derivatives
           // (in local system of vertex point - defined during fitRecoTrack(..., particle) and using
@@ -524,8 +501,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-          if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-            evt0 = m_EventT0->getEventT0();
+          if (eventT0.isValid() && eventT0->hasEventT0()) {
+            evt0 =  eventT0->getEventT0();
             getObjectPtr<TH1F>("evt0")->Fill(evt0);
           }
 
@@ -540,8 +517,8 @@ void MillepedeCollectorModule::collect()
           getObjectPtr<TH1I>("ndf")->Fill(ndf);
           getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
           getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-          if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-            evt0 = m_EventT0->getEventT0();
+          if (eventT0.isValid() && eventT0->hasEventT0()) {
+            evt0 =  eventT0->getEventT0();
             getObjectPtr<TH1F>("evt0")->Fill(evt0);
           }
 
@@ -554,14 +531,14 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  n = m_twoBodyDecays.size();
-  for (i = 0; i < n; ++i) {
-    if (!m_TwoBodyDecayLists[i].isValid())
+  for (auto listName : m_twoBodyDecays) {
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
       continue;
 
-    for (unsigned int iParticle = 0; iParticle < m_TwoBodyDecayLists[i]->getListSize(); ++iParticle) {
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
-      auto mother = m_TwoBodyDecayLists[i]->getParticle(iParticle);
+      auto mother = list->getParticle(iParticle);
       auto track12 = getParticlesTracks(mother->getDaughters());
       if (track12.size() != 2) {
         B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
@@ -572,7 +549,7 @@ void MillepedeCollectorModule::collect()
       double motherMass = mother->getPDGMass();
       double motherWidth = pdgdb->GetParticle(mother->getPDGCode())->Width();
 
-      updateMassWidthIfSet(m_twoBodyDecays[i], motherMass, motherWidth);
+      updateMassWidthIfSet(listName, motherMass, motherWidth);
 
       //TODO: what to take as width for "real" particles? -> make a param for default detector mass resolution??
       if (motherWidth == 0.) {
@@ -604,8 +581,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-        evt0 = m_EventT0->getEventT0();
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -617,9 +594,9 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  n = m_primaryMassTwoBodyDecays.size();
-  for (i = 0; i < n; ++i) {
-    if (!m_PrimaryMassTwoBodyDecayLists[i].isValid())
+  for (auto listName : m_primaryMassTwoBodyDecays) {
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
       continue;
 
     DBObjPtr<BeamParameters> beam;
@@ -627,11 +604,11 @@ void MillepedeCollectorModule::collect()
     double motherMass = beam->getMass();
     double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
 
-    updateMassWidthIfSet(m_primaryMassTwoBodyDecays[i], motherMass, motherWidth);
+    updateMassWidthIfSet(listName, motherMass, motherWidth);
 
-    for (unsigned int iParticle = 0; iParticle < m_PrimaryMassTwoBodyDecayLists[i]->getListSize(); ++iParticle) {
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
-      auto mother = m_PrimaryMassTwoBodyDecayLists[i]->getParticle(iParticle);
+      auto mother = list->getParticle(iParticle);
       auto track12 = getParticlesTracks(mother->getDaughters());
       if (track12.size() != 2) {
         B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
@@ -660,8 +637,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-        evt0 = m_EventT0->getEventT0();
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -673,9 +650,9 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  n = m_primaryMassVertexTwoBodyDecays.size();
-  for (i = 0; i < n; ++i) {
-    if (!m_PrimaryMassVertexTwoBodyDecayLists[i].isValid())
+  for (auto listName : m_primaryMassVertexTwoBodyDecays) {
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
       continue;
 
     DBObjPtr<BeamParameters> beam;
@@ -683,11 +660,11 @@ void MillepedeCollectorModule::collect()
     double motherMass = beam->getMass();
     double motherWidth = sqrt((beam->getCovHER() + beam->getCovLER())(0, 0));
 
-    updateMassWidthIfSet(m_primaryMassVertexTwoBodyDecays[i], motherMass, motherWidth);
+    updateMassWidthIfSet(listName, motherMass, motherWidth);
 
-    for (unsigned int iParticle = 0; iParticle < m_PrimaryMassVertexTwoBodyDecayLists[i]->getListSize(); ++iParticle) {
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
-      auto mother = m_PrimaryMassVertexTwoBodyDecayLists[i]->getParticle(iParticle);
+      auto mother = list->getParticle(iParticle);
       auto track12 = getParticlesTracks(mother->getDaughters());
       if (track12.size() != 2) {
         B2ERROR("Did not get 2 fitted tracks. Skipping this mother.");
@@ -729,8 +706,8 @@ void MillepedeCollectorModule::collect()
       getObjectPtr<TH1I>("ndf")->Fill(ndf);
       getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
       getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-      if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-        evt0 = m_EventT0->getEventT0();
+      if (eventT0.isValid() && eventT0->hasEventT0()) {
+        evt0 =  eventT0->getEventT0();
         getObjectPtr<TH1F>("evt0")->Fill(evt0);
       }
 
@@ -742,11 +719,11 @@ void MillepedeCollectorModule::collect()
     }
   }
 
-  n = m_primaryTwoBodyDecays.size();
-  for (i = 0; i < n; ++i) {
+  for (auto listName : m_primaryTwoBodyDecays) {
     B2WARNING("This should NOT be used for production of calibration constants for the real detector (yet)!");
 
-    if (!m_PrimaryTwoBodyDecayLists[i].isValid())
+    StoreObjPtr<ParticleList> list(listName);
+    if (!list.isValid())
       continue;
 
     DBObjPtr<BeamParameters> beam;
@@ -763,17 +740,17 @@ void MillepedeCollectorModule::collect()
     double motherWidth = sqrt((E_HER / M) * (E_HER / M) * beam->getCovLER()(0, 0) + (E_LER / M) * (E_LER / M) * beam->getCovHER()(0,
                               0));
 
-    updateMassWidthIfSet(m_primaryTwoBodyDecays[i], motherMass, motherWidth);
+    updateMassWidthIfSet(listName, motherMass, motherWidth);
 
-    for (unsigned int iParticle = 0; iParticle < m_PrimaryTwoBodyDecayLists[i]->getListSize(); ++iParticle) {
+    for (unsigned int iParticle = 0; iParticle < list->getListSize(); ++iParticle) {
 
       B2WARNING("Two body decays with full kinematic constraint not yet correct - need to resolve strange covariance provided by BeamParameters!");
 
-      auto mother = m_PrimaryTwoBodyDecayLists[i]->getParticle(iParticle);
+      auto mother = list->getParticle(iParticle);
 
       auto track12 = getParticlesTracks(mother->getDaughters());
       if (track12.size() != 2) {
-        B2ERROR("Did not get exactly 2 fitted tracks. Skipping this mother in list " << m_primaryTwoBodyDecays[i]);
+        B2ERROR("Did not get exactly 2 fitted tracks. Skipping this mother in list " << listName);
         continue;
       }
 
@@ -803,9 +780,9 @@ void MillepedeCollectorModule::collect()
       dVect_dBoost(2, 0) = 0.;     dVect_dBoost(2, 1) = pz;      dVect_dBoost(2, 2) = 0.;
 
       TMatrixD covBoost(3, 3);
-      for (int j = 0; j < 3; ++j) {
-        for (int k = j; k < 3; ++k) {
-          covBoost(k, j) = covBoost(j, k) = (beam->getCovHER() + beam->getCovLER())(j, k);
+      for (int i = 0; i < 3; ++i) {
+        for (int j = i; j < 3; ++j) {
+          covBoost(j, i) = covBoost(i, j) = (beam->getCovHER() + beam->getCovLER())(i, j);
         }
       }
       //TODO: Temporary fix: if theta_x, theta_y covariance is zero, use arbitrary 10mrad^2
@@ -934,20 +911,20 @@ void MillepedeCollectorModule::collect()
         // It took me half a day to find out how to do this with 2 lines of code (3 with the include).
         // Source: ROOT macro example - actually found at:
         // <https://root.cern.ch/root/html/tutorials/matrix/solveLinear.C.html>
-        for (int j = 0; j < 7; ++j) {
-          for (int k = 0; k < 5; ++k) {
-            if (fabs(dExt_dLocal(j, k)) < 1.e-6)
-              dExt_dLocal(j, k) = 0.;
+        for (int i = 0; i < 7; ++i) {
+          for (int j = 0; j < 5; ++j) {
+            if (fabs(dExt_dLocal(i, j)) < 1.e-6)
+              dExt_dLocal(i, j) = 0.;
           }
         }
         const TVectorD locRes = dLocal_dExt * extMeasurements;
         const TMatrixD locPrec =  dLocal_dExt * extPrec * dExt_dLocal;
 
         TMatrixDSym locPrecSym(5); locPrecSym.Zero();
-        for (int j = 0; j < 5; ++j) {
-          for (int k = j; k < 5; ++k) {
+        for (int i = 0; i < 5; ++i) {
+          for (int j = i; j < 5; ++j) {
             //locPrecSym(j, i) = locPrecSym(i, j) = locPrec(i, j);
-            locPrecSym(k, j) = locPrecSym(j, k) = (fabs(locPrec(j, k)) > 1.e-6) ? locPrec(j, k) : 0.;
+            locPrecSym(j, i) = locPrecSym(i, j) = (fabs(locPrec(i, j)) > 1.e-6) ? locPrec(i, j) : 0.;
           }
         }
 
@@ -969,8 +946,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-          evt0 = m_EventT0->getEventT0();
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -989,8 +966,8 @@ void MillepedeCollectorModule::collect()
         getObjectPtr<TH1I>("ndf")->Fill(ndf);
         getObjectPtr<TH1F>("chi2_per_ndf")->Fill(chi2 / double(ndf));
         getObjectPtr<TH1F>("pval")->Fill(TMath::Prob(chi2, ndf));
-        if (m_EventT0.isValid() && m_EventT0->hasEventT0()) {
-          evt0 = m_EventT0->getEventT0();
+        if (eventT0.isValid() && eventT0->hasEventT0()) {
+          evt0 =  eventT0->getEventT0();
           getObjectPtr<TH1F>("evt0")->Fill(evt0);
         }
 
@@ -1033,22 +1010,6 @@ void MillepedeCollectorModule::finish()
     FileCatalog::Instance().registerFile(binary, milleMetaData);
   }
 
-  if (m_RecoTracks != nullptr)
-    delete[] m_RecoTracks;
-  if (m_ParticleLists != nullptr)
-    delete[] m_ParticleLists;
-  if (m_VertexLists != nullptr)
-    delete[] m_VertexLists;
-  if (m_PrimaryVertexLists != nullptr)
-    delete[] m_PrimaryVertexLists;
-  if (m_TwoBodyDecayLists != nullptr)
-    delete[] m_TwoBodyDecayLists;
-  if (m_PrimaryTwoBodyDecayLists != nullptr)
-    delete[] m_PrimaryTwoBodyDecayLists;
-  if (m_PrimaryMassTwoBodyDecayLists != nullptr)
-    delete[] m_PrimaryMassTwoBodyDecayLists;
-  if (m_PrimaryMassVertexTwoBodyDecayLists != nullptr)
-    delete[] m_PrimaryMassVertexTwoBodyDecayLists;
 }
 
 void MillepedeCollectorModule::storeTrajectory(gbl::GblTrajectory& trajectory)
@@ -1068,11 +1029,12 @@ void MillepedeCollectorModule::storeTrajectory(gbl::GblTrajectory& trajectory)
 
 std::string MillepedeCollectorModule::getUniqueMilleName()
 {
+  StoreObjPtr<EventMetaData> emd;
   string name = getName();
 
-  name += "-e"   + to_string(m_EventMetaData->getExperiment());
-  name += "-r"   + to_string(m_EventMetaData->getRun());
-  name += "-ev"  + to_string(m_EventMetaData->getEvent());
+  name += "-e"   + to_string(emd->getExperiment());
+  name += "-r"   + to_string(emd->getRun());
+  name += "-ev"  + to_string(emd->getEvent());
 
   if (ProcHandler::parallelProcessingUsed())
     name += "-pid" + to_string(ProcHandler::EvtProcID());
@@ -1140,37 +1102,44 @@ bool MillepedeCollectorModule::fitRecoTrack(RecoTrack& recoTrack, Particle* part
 
   MeasurementAdder factory("", "", "", "", "");
 
+  // We need the store arrays
+  StoreArray<RecoHitInformation::UsedCDCHit> cdcHits("");
+  StoreArray<RecoHitInformation::UsedPXDHit> pxdHits("");
+  StoreArray<RecoHitInformation::UsedSVDHit> svdHits("");
+  StoreArray<RecoHitInformation::UsedBKLMHit> bklmHits("");
+  StoreArray<RecoHitInformation::UsedEKLMHit> eklmHits("");
+
   // Create the genfit::MeasurementFactory
   genfit::MeasurementFactory<genfit::AbsMeasurement> genfitMeasurementFactory;
 
   // Add producer for alignable RecoHits to factory
-  if (m_PXDHits.isValid()) {
+  if (pxdHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedPXDHit, AlignablePXDRecoHit>* PXDProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedPXDHit, AlignablePXDRecoHit> (m_PXDHits.getPtr());
+    <RecoHitInformation::UsedPXDHit, AlignablePXDRecoHit> (pxdHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::PXD, PXDProducer);
   }
 
-  if (m_SVDHits.isValid())  {
+  if (svdHits.isOptional())  {
     genfit::MeasurementProducer <RecoHitInformation::UsedSVDHit, AlignableSVDRecoHit>* SVDProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedSVDHit, AlignableSVDRecoHit> (m_SVDHits.getPtr());
+    <RecoHitInformation::UsedSVDHit, AlignableSVDRecoHit> (svdHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::SVD, SVDProducer);
   }
 
-  if (m_CDCHits.isValid()) {
+  if (cdcHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedCDCHit, AlignableCDCRecoHit>* CDCProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedCDCHit, AlignableCDCRecoHit> (m_CDCHits.getPtr());
+    <RecoHitInformation::UsedCDCHit, AlignableCDCRecoHit> (cdcHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::CDC, CDCProducer);
   }
 
-  if (m_BKLMHits.isValid()) {
+  if (bklmHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedBKLMHit, AlignableBKLMRecoHit>* BKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedBKLMHit, AlignableBKLMRecoHit> (m_BKLMHits.getPtr());
+    <RecoHitInformation::UsedBKLMHit, AlignableBKLMRecoHit> (bklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::BKLM, BKLMProducer);
   }
 
-  if (m_EKLMHits.isValid()) {
+  if (eklmHits.isOptional()) {
     genfit::MeasurementProducer <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit>* EKLMProducer =  new genfit::MeasurementProducer
-    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (m_EKLMHits.getPtr());
+    <RecoHitInformation::UsedEKLMHit, AlignableEKLMRecoHit> (eklmHits.getPtr());
     genfitMeasurementFactory.addProducer(Const::EKLM, EKLMProducer);
   }
 

@@ -52,11 +52,81 @@ def remove_module(path, name):
             new_path.add_module(m)
     return new_path
 #####################################################################################################
-# Definition of the class
+
+NEW_RECO_DIGITS_NAME = "SVDRecoDigits_repeat"
+NEW_SHAPER_DIGITS_NAME = "SVDShaperDigits"
 
 
-def pre_collector():
+def create_collector(name="SVDCoGTimeCalibrationCollector",
+                     clusters="SVDClustersFromTracks",
+                     event_info="SVDEventInfo",
+                     event_t0="EventT0",
+                     granularity="run"):
+    """
+    Simply creates a SVDCoGTimeCalibrationCollector module with some options.
 
+    Returns:
+        pybasf2.Module
+    """
+
+    collector = register_module("SVDCoGTimeCalibrationCollector")
+    collector.set_name(name)
+    collector.param("SVDClustersFromTracksName", clusters)
+    collector.param("SVDEventInfoName", event_info)
+    collector.param("EventT0Name", event_t0)
+    collector.param("granularity", granularity)
+
+    return collector
+
+
+def create_algorithm(unique_id, prefix="", min_entries=10000):
+    """
+    Simply creates a SVDCoGTimeCalibrationAlgorithm class with some options.
+
+    Returns:
+        ROOT.Belle2.SVDCoGTimeCalibrationAlgorithm
+    """
+    algorithm = SVDCoGTimeCalibrationAlgorithm(unique_id)
+    if prefix:
+        algorithm.setPrefix(prefix)
+    algorithm.setMinEntries(10000)
+
+    return algorithm
+
+
+def create_svd_clusterizer(name="ClusterReconstruction",
+                           clusters="SVDClustersFromTracks",
+                           reco_digits=NEW_RECO_DIGITS_NAME,
+                           shaper_digits=NEW_SHAPER_DIGITS_NAME,
+                           time_algorithm=0):
+    """
+    Simply creates a SVDSimpleClusterizer module with some options.
+
+    Returns:
+        pybasf2.Module
+    """
+
+    cluster = register_module("SVDSimpleClusterizer")
+    cluster.set_name(name)
+    cluster.param("Clusters", clusters)
+    cluster.param("RecoDigits", reco_digits)
+    cluster.param("ShaperDigits", shaper_digits)
+    cluster.param("timeAlgorithm", time_algorithm)
+    return cluster
+
+
+def create_pre_collector_path(clusterizers):
+    """
+    Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
+    modules with different configurations. This way they re-use the same reconstructed objects.
+
+    Parameters:
+        clusterizers (list[pybasf2.Module]): All the differently configured SVDSimpleClusterizer modules.
+        They should output to different datastore objects.
+
+    returns:
+        pybasf2.Path
+    """
     # Set-up re-processing path
     path = create_path()
 
@@ -67,37 +137,40 @@ def pre_collector():
     add_tracking_reconstruction(path)
 
     for moda in path.modules():
-        if moda.name() == 'SVDCoGTimeEstimator':
+        if moda.name() == "SVDCoGTimeEstimator":
             moda.param("CalibrationWithEventT0", False)
 
-    path.add_module('SVDShaperDigitsFromTracks')
+    path.add_module("SVDShaperDigitsFromTracks")
 
     cog = register_module("SVDCoGTimeEstimator")
     cog.set_name("CoGReconstruction")
     path.add_module(cog)
 
-    cluster = register_module("SVDSimpleClusterizer")
-    cluster.set_name("ClusterReconstruction")
-    path.add_module(cluster)
+    # Debugging misconfigured Datastore names
+#    path.add_module("PrintCollections")
 
-    sp = register_module("SVDSpacePointCreator")
-    sp.set_name("SPCreator")
-    path.add_module(sp)
+    for cluster in clusterizers:
+        path.add_module(cluster)
+
+    # Do you also need different versions of SVDSpacePointCreator using the different "SVDClustersFromTracks"?
+    # I'm not sure the output SpacePoints are ever used, but maybe they affect other things...
+
+#    sp = register_module("SVDSpacePointCreator")
+#    sp.set_name("SPCreator")
+#    path.add_module(sp)
 
     for moda in path.modules():
-        if moda.name() == 'CoGReconstruction':
-            moda.param("ShaperDigits", 'SVDShaperDigitsFromTracks')
-            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
+        if moda.name() == "CoGReconstruction":
+            moda.param("ShaperDigits", NEW_SHAPER_DIGITS_NAME)
+            moda.param("RecoDigits", NEW_RECO_DIGITS_NAME)
             moda.param("CalibrationWithEventT0", False)
-        if moda.name() == 'ClusterReconstruction':
-            moda.param("Clusters", 'SVDClustersFromTracks')
-            moda.param("RecoDigits", 'SVDRecoDigitsFromTracks')
-            moda.param("timeAlgorithm", 0)
-        if moda.name() == 'SPCreator':
-            moda.param("SVDClusters", 'SVDClustersFromTracks')
-            moda.param("SpacePoints", 'SPacePointsFromTracks')
+#        if moda.name() == "SPCreator":
+#            moda.param("SVDClusters", "SVDClustersFromTracks")
+#            moda.param("SpacePoints", "SPacePointsFromTracks")
 
-    path = remove_module(path, 'SVDMissingAPVsClusterCreator')
+    path = remove_module(path, "SVDMissingAPVsClusterCreator")
+
+    return path
 
 
 def get_calibrations(input_data, **kwargs):
@@ -123,35 +196,81 @@ def get_calibrations(input_data, **kwargs):
         print("No good input files found! Check that the input files have entries != 0!")
         sys.exit(1)
 
-    uniqueID = "SVDCoGTimeCalibrations_Prompt_" + str(now.isoformat()) + "_INFO:_3rdOrderPol_TBindep_Exp" + \
-        str(expNum) + "_runsFrom" + str(firstRun) + "to" + str(lastRun)
-    print("")
-    print("UniqueID")
-    print("")
-    print(str(uniqueID))
-    print("")
+    unique_id = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
+                f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
+    print(f"\nUniqueID:\n{unique_id}")
 
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    # collector setup
-    collector = register_module('SVDCoGTimeCalibrationCollector')
-    collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
-    collector.param("SVDEventInfoName", "SVDEventInfo")
-    collector.param("EventT0Name", "EventT0")
-    collector.param("granularity", "run")
+    ####
+    # Build the clusterizers with the different options.
+    ####
 
-    # algorithm setup
-    algorithm = SVDCoGTimeCalibrationAlgorithm(uniqueID)
-    algorithm.setMinEntries(10000)
+    cog6_suffix = "_CoG6"
+    cog3_suffix = "_CoG3"
+    els3_suffix = "_ELS3"
+
+    cog6 = create_svd_clusterizer(name=f"ClusterReconstruction{cog6_suffix}",
+                                  clusters=f"SVDClustersFromTracks{cog6_suffix}",
+                                  reco_digits=NEW_RECO_DIGITS_NAME,   # Do you use the same RecoDigits object?
+                                  shaper_digits=NEW_SHAPER_DIGITS_NAME,  # Do you use the same ShaperDigits object?
+                                  time_algorithm=0)
+
+    cog3 = create_svd_clusterizer(name=f"ClusterReconstruction{cog3_suffix}",
+                                  clusters=f"SVDClustersFromTracks{cog3_suffix}",
+                                  reco_digits=NEW_RECO_DIGITS_NAME,
+                                  shaper_digits=NEW_SHAPER_DIGITS_NAME,
+                                  time_algorithm=1)
+
+    els3 = create_svd_clusterizer(name=f"ClusterReconstruction{els3_suffix}",
+                                  clusters=f"SVDClustersFromTracks{els3_suffix}",
+                                  reco_digits=NEW_RECO_DIGITS_NAME,
+                                  shaper_digits=NEW_SHAPER_DIGITS_NAME,
+                                  time_algorithm=2)
+
+    ####
+    # Build the Collectors and Algorithms with the different (but matching) options
+    ####
+
+    coll_cog6 = create_collector(name=f"SVDCoGTimeCalibrationCollector{cog6_suffix}",
+                                 clusters=f"SVDClustersFromTracks{cog6_suffix}",
+                                 event_info="SVDEventInfo",
+                                 event_t0="EventT0")
+
+    # Using the same unique_id for all 3 algorithms, is this bad?
+    algo_cog6 = create_algorithm(unique_id, prefix=coll_cog6.name(), min_entries=10000)
+
+    coll_cog3 = create_collector(name=f"SVDCoGTimeCalibrationCollector{cog3_suffix}",
+                                 clusters=f"SVDClustersFromTracks{cog3_suffix}",
+                                 event_info="SVDEventInfo",
+                                 event_t0="EventT0")
+
+    algo_cog3 = create_algorithm(unique_id, prefix=coll_cog3.name(), min_entries=10000)  # Same unique_id
+
+    coll_els3 = create_collector(name=f"SVDCoGTimeCalibrationCollector{els3_suffix}",
+                                 clusters=f"SVDClustersFromTracks{els3_suffix}",
+                                 event_info="SVDEventInfo",
+                                 event_t0="EventT0")
+
+    algo_els3 = create_algorithm(unique_id, prefix=coll_els3.name(), min_entries=10000)  # Same unique_id
+
+    ####
+    # Build the pre_collector_path for reconstruction BUT we also sneakily
+    # add the two cog collectors to it.
+    ####
+
+    pre_collector_path = create_pre_collector_path(clusterizers=[cog6, cog3, els3])
+    pre_collector_path.add_module(coll_cog6)
+    pre_collector_path.add_module(coll_cog3)
+    # We leave the coll_els3 to be the one "managed" by the CAF
 
     # calibration setup
-    calibration = Calibration('SVDCoGTime',
-                              collector=collector,
-                              algorithms=algorithm,
+    calibration = Calibration("SVDCoGTime",
+                              collector=coll_els3,   # The other collectors are in the pre_collector_path itself
+                              algorithms=[algo_cog6, algo_cog3, algo_els3],
                               input_files=good_input_files,
-                              pre_collector_path=pre_collector(),
-                              )
+                              pre_collector_path=pre_collector_path)
 
     # calibration.pre_algorithms = pre_alg
     # calibration.strategies = strategies.SequentialRunByRun

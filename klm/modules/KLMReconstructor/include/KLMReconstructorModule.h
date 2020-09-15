@@ -23,6 +23,8 @@
 #include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
+#include <klm/dataobjects/KLMChannelIndex.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -87,6 +89,7 @@ namespace Belle2 {
     void reconstructEKLMHits();
 
     /* EKLM methods. */
+    bool isHot(KLMDigit* d);
 
     /**
      * Get 2d hit time corresponding to EKLM digit.
@@ -164,6 +167,12 @@ namespace Belle2 {
 
     /** Alignment Hits. */
     StoreArray<EKLMAlignmentHit> m_eklmAlignmentHits;
+
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** Ignor hot channels during 2d hit reconstruction */
+    bool m_eklmIgnoreHotChannels;
 
   };
 } // end namespace Belle2

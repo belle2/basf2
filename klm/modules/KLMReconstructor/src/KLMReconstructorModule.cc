@@ -84,6 +84,9 @@ KLMReconstructorModule::KLMReconstructorModule() :
            false);
   addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
+  addParam("IgnoreHotChannels", m_eklmIgnoreHotChannels,
+           "Ignor hot channels during 2d hit reconstruction",
+           true);
 }
 
 KLMReconstructorModule::~KLMReconstructorModule()
@@ -234,8 +237,29 @@ double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
    */
 }
 
+bool KLMReconstructorModule::isHot(KLMDigit* d1)
+{
+  int subdetector = d1->getSubdetector();
+  int section = d1->getSection();
+  int sector = d1->getSector();
+  int layer = d1->getLayer();
+  int plane = d1->getPlane();
+  int strip = d1->getStrip();
+  KLMChannelIndex klmChannel(subdetector, section, sector, layer, plane, strip);
+  uint16_t channel = klmChannel.getKLMChannelNumber();
+  enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
+  if (status == KLMChannelStatus::c_Unknown)
+    B2FATAL("Incomplete KLM channel status data.");
+  else if (status == KLMChannelStatus::c_Normal)
+    return false;
+  else if (status == KLMChannelStatus::c_Hot)
+    return true;
+  return false;
+}
+
 void KLMReconstructorModule::reconstructEKLMHits()
 {
+  B2INFO("Starting EKLM reconstruction");
   int i, n;
   double d1, d2, t, t1, t2, sd;
   std::vector<KLMDigit*> digitVector;
@@ -341,6 +365,8 @@ void KLMReconstructorModule::reconstructEKLMHits()
             t1 = getTime(*it8, d1) + 0.5 * sd / Const::speedOfLight;
             t2 = getTime(*it9, d2) - 0.5 * sd / Const::speedOfLight;
             if (std::fabs(t1 - t2) > m_CoincidenceWindow)
+              continue;
+            if (m_eklmIgnoreHotChannels && (isHot(*it8) || isHot(*it9)))
               continue;
             t = (t1 + t2) / 2;
             EKLMHit2d* hit2d = m_eklmHit2ds.appendNew(*it8);

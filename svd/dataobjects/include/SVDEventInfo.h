@@ -122,6 +122,10 @@ namespace Belle2 {
     {return m_relativeTimeShift;}
 
     /** getTimeInFTSWReference(double time_in_SVD)
+     * it takes the time in SVD reference (in either 3 or 6-sample DAQ mode)
+     * and the firstFrame and provides the time in the FTWS reference
+     * In the SVD reference t=0 is the time of the first sample, regardless if the event is acquired in 3- o 6-sample DAQ mode
+
      */
     double getTimeInFTSWReference(double time, int firstFrame) const
     {
@@ -129,7 +133,11 @@ namespace Belle2 {
       return time_in_FTSW;
     }
 
-    /** getTimeInSVDReference(double time_in_FTSW)
+
+    /** getTimeInSVDReference
+     * it takes time in FTSW reference and provides
+     * the time the SVD reference for that event.
+     * In the SVD reference t=0 is the time of the first sample, regardless if the event is acquired in 3- o 6-sample DAQ mode
      */
     double getTimeInSVDReference(double time_in_FTSW, int firstFrame) const
     {

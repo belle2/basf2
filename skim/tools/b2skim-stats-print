@@ -638,6 +638,10 @@ def getAllSamples(mcCampaign):
         "proc9_exp3": "Data: proc9 exp. 3",
         "proc9_exp7": "Data: proc9 exp. 7",
         "proc9_exp8": "Data: proc9 exp. 8",
+        "bucket9_exp12": "Data: bucket9 exp. 12",
+        "bucket10_exp12": "Data: bucket10 exp. 12",
+        "bucket11_exp12": "Data: bucket11 exp. 12",
+        "bucket12_exp12_4S_offres": "Data: bucket12 exp. 12 off-res",
     }
 
     return mcSampleLabels, dataSampleLabels

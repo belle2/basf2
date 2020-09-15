@@ -6,6 +6,7 @@ This module defines functions to add analysis DQM modules.
 """
 
 from basf2 import *
+from stdPi0s import stdPi0s
 from modularAnalysis import *
 
 
@@ -22,7 +23,21 @@ def add_analysis_dqm(path):
 
 
 def add_mirabelle_dqm(path):
+    # MiraBelle di-muon
     fillParticleList('mu+:physMiraBelle', '', path=path)
     mirabelle = register_module('PhysicsObjectsMiraBelle')
     mirabelle.param('MuPListName', 'mu+:physMiraBelle')
     path.add_module(mirabelle)
+    # MiraBelle D*
+    fillParticleList('pi+:MiraBelleDst_pion', 'abs(d0)<0.5 and abs(z0)<3', path=path)
+    fillParticleList('K+:MiraBelleDst_kaon',  'abs(d0)<0.5 and abs(z0)<3', path=path)
+    stdPi0s(listtype='eff60_Jan2020', path=path)
+    reconstructDecay('D0:ch1 -> K-:MiraBelleDst_kaon pi+:MiraBelleDst_pion', '1.7 < M < 2.1', path=path)
+    reconstructDecay('D0:ch2 -> K-:MiraBelleDst_kaon pi+:MiraBelleDst_pion pi0:eff60_Jan2020', '1.7 < M < 2.1', path=path)
+    reconstructDecay('D*+:kpi -> D0:ch1 pi+:MiraBelleDst_pion', 'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
+    reconstructDecay('D*+:kpipi0 -> D0:ch2 pi+:MiraBelleDst_pion', 'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
+    listmode = ['D*+:kpi', 'D*+:kpipi0']
+    copyLists('D*+:MiraBelleDst', listmode, path=path)
+    mirabelleDst = register_module('PhysicsObjectsMiraBelleDst')
+    mirabelleDst.param('DstListName', 'D*+:MiraBelleDst')
+    path.add_module(mirabelleDst)

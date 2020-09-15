@@ -15,6 +15,7 @@
 #include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TFile.h>
+#include <TF1.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TCanvas.h>
@@ -55,16 +56,23 @@ void DQMHistAnalysisMiraBelleModule::initialize()
 
   //mon_mumu = new Belle2::MonitoringObject("mumu");
   mon_mumu = getMonitoringObject("mumu");
+  mon_dst = getMonitoringObject("dst");
 
   // make cavases to be added to MonitoringObject
   main = new TCanvas("main", "main", 0, 0, 800, 600);
   resolution = new TCanvas("resolution", "resolution", 0, 0, 800, 600);
   muon_val = new TCanvas("muon_val", "muon_val", 0, 0, 400, 400);
+  dst_mass = new TCanvas("dst_mass", "dst_mass", 0, 0, 1200, 400);
+  pi_val = new TCanvas("pi_val", "pi_val", 0, 0, 800, 400);
+  k_val = new TCanvas("k_val", "k_val", 0, 0, 800, 400);
 
   // add canvases to MonitoringObject
   mon_mumu->addCanvas(main);
   mon_mumu->addCanvas(resolution);
   mon_mumu->addCanvas(muon_val);
+  mon_dst->addCanvas(dst_mass);
+  mon_dst->addCanvas(pi_val);
+  mon_dst->addCanvas(k_val);
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle: initialized.");
 }
@@ -81,6 +89,7 @@ void DQMHistAnalysisMiraBelleModule::event()
 
 void DQMHistAnalysisMiraBelleModule::endRun()
 {
+  // ========== mumutight
   // get existing histograms produced by DQM modules
   TH1* m_h_npxd = findHist("PhysicsObjectsMiraBelle/m_h_npxd");
   TH1* m_h_nsvd = findHist("PhysicsObjectsMiraBelle/m_h_nsvd");
@@ -210,6 +219,254 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("nocdc_frac", nocdc_frac);
   mon_mumu->setVariable("notop_frac", notop_frac);
   mon_mumu->setVariable("noarich_frac", noarich_frac);
+
+
+  // ========== D*
+  // get existing histograms produced by DQM modules
+  TH1* m_h_D0_InvM = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_InvM");
+  TH1* m_h_delta_m = findHist("PhysicsObjectsMiraBelleDst/m_h_delta_m");
+  TH1* m_h_D0_softpi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_softpi_PID_ALL_pion");
+  TH1* m_h_D0_softpi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_softpi_PID_SVD_pion");
+  TH1* m_h_D0_softpi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_softpi_PID_CDC_pion");
+  TH1* m_h_D0_softpi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_softpi_PID_TOP_pion");
+  TH1* m_h_D0_softpi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_softpi_PID_ARICH_pion");
+  TH1* m_h_D0_softpi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_softpi_PID_ECL_pion");
+  TH1* m_h_D0_softpi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_softpi_PID_KLM_pion");
+  TH1* m_h_D0_pi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_pi_PID_ALL_pion");
+  TH1* m_h_D0_pi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_pi_PID_SVD_pion");
+  TH1* m_h_D0_pi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_pi_PID_CDC_pion");
+  TH1* m_h_D0_pi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_pi_PID_TOP_pion");
+  TH1* m_h_D0_pi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_pi_PID_ARICH_pion");
+  TH1* m_h_D0_pi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_pi_PID_ECL_pion");
+  TH1* m_h_D0_pi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_pi_PID_KLM_pion");
+  TH1* m_h_D0_K_PID_ALL_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_K_PID_ALL_kaon");
+  TH1* m_h_D0_K_PID_SVD_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_K_PID_SVD_kaon");
+  TH1* m_h_D0_K_PID_CDC_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_K_PID_CDC_kaon");
+  TH1* m_h_D0_K_PID_TOP_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_K_PID_TOP_kaon");
+  TH1* m_h_D0_K_PID_ARICH_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_K_PID_ARICH_kaon");
+  TH1* m_h_D0_K_PID_ECL_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_K_PID_ECL_kaon");
+  TH1* m_h_D0_K_PID_KLM_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_K_PID_KLM_kaon");
+  TH1* m_h_sideband_D0_softpi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_softpi_PID_ALL_pion");
+  TH1* m_h_sideband_D0_softpi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_softpi_PID_SVD_pion");
+  TH1* m_h_sideband_D0_softpi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_softpi_PID_CDC_pion");
+  TH1* m_h_sideband_D0_softpi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_softpi_PID_TOP_pion");
+  TH1* m_h_sideband_D0_softpi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_softpi_PID_ARICH_pion");
+  TH1* m_h_sideband_D0_softpi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_softpi_PID_ECL_pion");
+  TH1* m_h_sideband_D0_softpi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_softpi_PID_KLM_pion");
+  TH1* m_h_sideband_D0_pi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_pi_PID_ALL_pion");
+  TH1* m_h_sideband_D0_pi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_pi_PID_SVD_pion");
+  TH1* m_h_sideband_D0_pi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_pi_PID_CDC_pion");
+  TH1* m_h_sideband_D0_pi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_pi_PID_TOP_pion");
+  TH1* m_h_sideband_D0_pi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_pi_PID_ARICH_pion");
+  TH1* m_h_sideband_D0_pi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_pi_PID_ECL_pion");
+  TH1* m_h_sideband_D0_pi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_pi_PID_KLM_pion");
+  TH1* m_h_sideband_D0_K_PID_ALL_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_K_PID_ALL_kaon");
+  TH1* m_h_sideband_D0_K_PID_SVD_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_K_PID_SVD_kaon");
+  TH1* m_h_sideband_D0_K_PID_CDC_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_K_PID_CDC_kaon");
+  TH1* m_h_sideband_D0_K_PID_TOP_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_K_PID_TOP_kaon");
+  TH1* m_h_sideband_D0_K_PID_ARICH_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_K_PID_ARICH_kaon");
+  TH1* m_h_sideband_D0_K_PID_ECL_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_K_PID_ECL_kaon");
+  TH1* m_h_sideband_D0_K_PID_KLM_kaon = findHist("PhysicsObjectsMiraBelleDst/m_h_sideband_D0_K_PID_KLM_kaon");
+  TH1* m_h_D0_pi0_InvM = findHist("PhysicsObjectsMiraBelleDst/m_h_D0_pi0_InvM");
+
+  // Fit mass distributions for scale factor
+  TF1* f_InvM = new TF1("f_InvM", "[0]*TMath::Gaus(x,[1],[2])+[3]*pow(x-[4],2)+[5]", 1.81, 1.95);
+  f_InvM->SetParNames("Height", "#mu", "#sigma", "a", "b", "c");
+  f_InvM->SetParameters(m_h_D0_InvM->GetMaximum(), 1.86, 5e-3, 0., 1.86, 0.);
+  m_h_D0_InvM->Fit(f_InvM, "", "", 1.81, 1.95);
+  f_InvM->SetLineColor(kRed);
+
+  TF1* f_delta_m = new TF1("f_delta_m", "[0]*TMath::Gaus(x,[1],[2])+[3]*pow(x-[4],2)+[5]", 0.14, 0.16);
+  f_delta_m->SetParNames("Height", "#mu", "#sigma", "a", "b", "c");
+  f_delta_m->SetParameters(m_h_delta_m->GetMaximum(), 0.145, 5e-4, 0., 0.145, 0.);
+  m_h_delta_m->Fit(f_delta_m, "", "", 0.14, 0.16);
+  f_delta_m->SetLineColor(kRed);
+
+  TF1* f_pi0_InvM = new TF1("f_pi0_InvM", "[0]*TMath::Gaus(x,[1],[2])+[3]*pow(x-[4],2)+[5]", 0.09, 0.17);
+  f_pi0_InvM->SetParNames("Height", "#mu", "#sigma", "a", "b", "c");
+  f_pi0_InvM->SetParameters(m_h_D0_pi0_InvM->GetMaximum(), 0.13, 5e-3, 0., 0.13, 0.);
+  m_h_D0_pi0_InvM->Fit(f_pi0_InvM, "", "", 0.09, 0.17);
+  f_pi0_InvM->SetLineColor(kRed);
+
+  // Sumw2
+  m_h_D0_softpi_PID_ALL_pion->Sumw2();
+  m_h_D0_softpi_PID_SVD_pion->Sumw2();
+  m_h_D0_softpi_PID_CDC_pion->Sumw2();
+  m_h_D0_softpi_PID_TOP_pion->Sumw2();
+  m_h_D0_softpi_PID_ARICH_pion->Sumw2();
+  m_h_D0_softpi_PID_ECL_pion->Sumw2();
+  m_h_D0_softpi_PID_KLM_pion->Sumw2();
+  m_h_D0_pi_PID_ALL_pion->Sumw2();
+  m_h_D0_pi_PID_SVD_pion->Sumw2();
+  m_h_D0_pi_PID_CDC_pion->Sumw2();
+  m_h_D0_pi_PID_TOP_pion->Sumw2();
+  m_h_D0_pi_PID_ARICH_pion->Sumw2();
+  m_h_D0_pi_PID_ECL_pion->Sumw2();
+  m_h_D0_pi_PID_KLM_pion->Sumw2();
+  m_h_D0_K_PID_ALL_kaon->Sumw2();
+  m_h_D0_K_PID_SVD_kaon->Sumw2();
+  m_h_D0_K_PID_CDC_kaon->Sumw2();
+  m_h_D0_K_PID_TOP_kaon->Sumw2();
+  m_h_D0_K_PID_ARICH_kaon->Sumw2();
+  m_h_D0_K_PID_ECL_kaon->Sumw2();
+  m_h_D0_K_PID_KLM_kaon->Sumw2();
+  m_h_sideband_D0_softpi_PID_ALL_pion->Sumw2();
+  m_h_sideband_D0_softpi_PID_SVD_pion->Sumw2();
+  m_h_sideband_D0_softpi_PID_CDC_pion->Sumw2();
+  m_h_sideband_D0_softpi_PID_TOP_pion->Sumw2();
+  m_h_sideband_D0_softpi_PID_ARICH_pion->Sumw2();
+  m_h_sideband_D0_softpi_PID_ECL_pion->Sumw2();
+  m_h_sideband_D0_softpi_PID_KLM_pion->Sumw2();
+  m_h_sideband_D0_pi_PID_ALL_pion->Sumw2();
+  m_h_sideband_D0_pi_PID_SVD_pion->Sumw2();
+  m_h_sideband_D0_pi_PID_CDC_pion->Sumw2();
+  m_h_sideband_D0_pi_PID_TOP_pion->Sumw2();
+  m_h_sideband_D0_pi_PID_ARICH_pion->Sumw2();
+  m_h_sideband_D0_pi_PID_ECL_pion->Sumw2();
+  m_h_sideband_D0_pi_PID_KLM_pion->Sumw2();
+  m_h_sideband_D0_K_PID_ALL_kaon->Sumw2();
+  m_h_sideband_D0_K_PID_SVD_kaon->Sumw2();
+  m_h_sideband_D0_K_PID_CDC_kaon->Sumw2();
+  m_h_sideband_D0_K_PID_TOP_kaon->Sumw2();
+  m_h_sideband_D0_K_PID_ARICH_kaon->Sumw2();
+  m_h_sideband_D0_K_PID_ECL_kaon->Sumw2();
+  m_h_sideband_D0_K_PID_KLM_kaon->Sumw2();
+
+  // Scale the distributions in sideband
+  m_h_sideband_D0_softpi_PID_ALL_pion->Scale(scale);
+  m_h_sideband_D0_softpi_PID_SVD_pion->Scale(scale);
+  m_h_sideband_D0_softpi_PID_CDC_pion->Scale(scale);
+  m_h_sideband_D0_softpi_PID_TOP_pion->Scale(scale);
+  m_h_sideband_D0_softpi_PID_ARICH_pion->Scale(scale);
+  m_h_sideband_D0_softpi_PID_ECL_pion->Scale(scale);
+  m_h_sideband_D0_softpi_PID_KLM_pion->Scale(scale);
+  m_h_sideband_D0_pi_PID_ALL_pion->Scale(scale);
+  m_h_sideband_D0_pi_PID_SVD_pion->Scale(scale);
+  m_h_sideband_D0_pi_PID_CDC_pion->Scale(scale);
+  m_h_sideband_D0_pi_PID_TOP_pion->Scale(scale);
+  m_h_sideband_D0_pi_PID_ARICH_pion->Scale(scale);
+  m_h_sideband_D0_pi_PID_ECL_pion->Scale(scale);
+  m_h_sideband_D0_pi_PID_KLM_pion->Scale(scale);
+  m_h_sideband_D0_K_PID_ALL_kaon->Scale(scale);
+  m_h_sideband_D0_K_PID_SVD_kaon->Scale(scale);
+  m_h_sideband_D0_K_PID_CDC_kaon->Scale(scale);
+  m_h_sideband_D0_K_PID_TOP_kaon->Scale(scale);
+  m_h_sideband_D0_K_PID_ARICH_kaon->Scale(scale);
+  m_h_sideband_D0_K_PID_ECL_kaon->Scale(scale);
+  m_h_sideband_D0_K_PID_KLM_kaon->Scale(scale);
+
+  // BG subtraction
+  m_h_D0_softpi_PID_ALL_pion->Add(m_h_sideband_D0_softpi_PID_ALL_pion, -1);
+  m_h_D0_softpi_PID_SVD_pion->Add(m_h_sideband_D0_softpi_PID_SVD_pion, -1);
+  m_h_D0_softpi_PID_CDC_pion->Add(m_h_sideband_D0_softpi_PID_CDC_pion, -1);
+  m_h_D0_softpi_PID_TOP_pion->Add(m_h_sideband_D0_softpi_PID_TOP_pion, -1);
+  m_h_D0_softpi_PID_ARICH_pion->Add(m_h_sideband_D0_softpi_PID_ARICH_pion, -1);
+  m_h_D0_softpi_PID_ECL_pion->Add(m_h_sideband_D0_softpi_PID_ECL_pion, -1);
+  m_h_D0_softpi_PID_KLM_pion->Add(m_h_sideband_D0_softpi_PID_KLM_pion, -1);
+  m_h_D0_pi_PID_ALL_pion->Add(m_h_sideband_D0_pi_PID_ALL_pion, -1);
+  m_h_D0_pi_PID_SVD_pion->Add(m_h_sideband_D0_pi_PID_SVD_pion, -1);
+  m_h_D0_pi_PID_CDC_pion->Add(m_h_sideband_D0_pi_PID_CDC_pion, -1);
+  m_h_D0_pi_PID_TOP_pion->Add(m_h_sideband_D0_pi_PID_TOP_pion, -1);
+  m_h_D0_pi_PID_ARICH_pion->Add(m_h_sideband_D0_pi_PID_ARICH_pion, -1);
+  m_h_D0_pi_PID_ECL_pion->Add(m_h_sideband_D0_pi_PID_ECL_pion, -1);
+  m_h_D0_pi_PID_KLM_pion->Add(m_h_sideband_D0_pi_PID_KLM_pion, -1);
+  m_h_D0_K_PID_ALL_kaon->Add(m_h_sideband_D0_K_PID_ALL_kaon, -1);
+  m_h_D0_K_PID_SVD_kaon->Add(m_h_sideband_D0_K_PID_SVD_kaon, -1);
+  m_h_D0_K_PID_CDC_kaon->Add(m_h_sideband_D0_K_PID_CDC_kaon, -1);
+  m_h_D0_K_PID_TOP_kaon->Add(m_h_sideband_D0_K_PID_TOP_kaon, -1);
+  m_h_D0_K_PID_ARICH_kaon->Add(m_h_sideband_D0_K_PID_ARICH_kaon, -1);
+  m_h_D0_K_PID_ECL_kaon->Add(m_h_sideband_D0_K_PID_ECL_kaon, -1);
+  m_h_D0_K_PID_KLM_kaon->Add(m_h_sideband_D0_K_PID_KLM_kaon, -1);
+
+  // Make TCanvases
+  // --- D* -> D0pi mass resolution
+  dst_mass->Divide(3, 1);
+  dst_mass->cd(1);
+  m_h_D0_InvM->Draw();
+  f_InvM->Draw("SAME");
+  dst_mass->cd(2);
+  m_h_delta_m->Draw();
+  f_delta_m->Draw("SAME");
+  dst_mass->cd(3);
+  m_h_D0_pi0_InvM->Draw();
+  f_pi0_InvM->Draw("SAME");
+  // --- pi variables for D0 -> K pi
+  pi_val->Divide(4, 2);
+  pi_val->cd(1);  m_h_D0_pi_PID_ALL_pion->Draw();
+  pi_val->cd(2);  m_h_D0_pi_PID_SVD_pion->Draw();
+  pi_val->cd(3);  m_h_D0_pi_PID_CDC_pion->Draw();
+  pi_val->cd(4);  m_h_D0_pi_PID_TOP_pion->Draw();
+  pi_val->cd(5);  m_h_D0_pi_PID_ARICH_pion->Draw();
+  pi_val->cd(6);  m_h_D0_pi_PID_ECL_pion->Draw();
+  pi_val->cd(7);  m_h_D0_pi_PID_KLM_pion->Draw();
+  // --- K variables for D0 -> K pi
+  k_val->Divide(4, 2);
+  k_val->cd(1);  m_h_D0_K_PID_ALL_kaon->Draw();
+  k_val->cd(2);  m_h_D0_K_PID_SVD_kaon->Draw();
+  k_val->cd(3);  m_h_D0_K_PID_CDC_kaon->Draw();
+  k_val->cd(4);  m_h_D0_K_PID_TOP_kaon->Draw();
+  k_val->cd(5);  m_h_D0_K_PID_ARICH_kaon->Draw();
+  k_val->cd(6);  m_h_D0_K_PID_ECL_kaon->Draw();
+  k_val->cd(7);  m_h_D0_K_PID_KLM_kaon->Draw();
+
+  // calculate the values of monitoring variables
+  float mean_D0_InvM = f_InvM->GetParameter(1);
+  float width_D0_InvM = f_InvM->GetParameter(2);
+  float mean_delta_m = f_delta_m->GetParameter(1);
+  float width_delta_m = f_delta_m->GetParameter(2);
+  float mean_pi0_InvM = f_pi0_InvM->GetParameter(1);
+  float width_pi0_InvM = f_pi0_InvM->GetParameter(2);
+  float mean_D0_softpi_PID_ALL_pion = m_h_D0_softpi_PID_ALL_pion->GetMean();
+  float mean_D0_softpi_PID_SVD_pion = m_h_D0_softpi_PID_SVD_pion->GetMean();
+  float mean_D0_softpi_PID_CDC_pion = m_h_D0_softpi_PID_CDC_pion->GetMean();
+  float mean_D0_softpi_PID_TOP_pion = m_h_D0_softpi_PID_TOP_pion->GetMean();
+  float mean_D0_softpi_PID_ARICH_pion = m_h_D0_softpi_PID_ARICH_pion->GetMean();
+  float mean_D0_softpi_PID_ECL_pion = m_h_D0_softpi_PID_ECL_pion->GetMean();
+  float mean_D0_softpi_PID_KLM_pion = m_h_D0_softpi_PID_KLM_pion->GetMean();
+  float mean_D0_pi_PID_ALL_pion = m_h_D0_pi_PID_ALL_pion->GetMean();
+  float mean_D0_pi_PID_SVD_pion = m_h_D0_pi_PID_SVD_pion->GetMean();
+  float mean_D0_pi_PID_CDC_pion = m_h_D0_pi_PID_CDC_pion->GetMean();
+  float mean_D0_pi_PID_TOP_pion = m_h_D0_pi_PID_TOP_pion->GetMean();
+  float mean_D0_pi_PID_ARICH_pion = m_h_D0_pi_PID_ARICH_pion->GetMean();
+  float mean_D0_pi_PID_ECL_pion = m_h_D0_pi_PID_ECL_pion->GetMean();
+  float mean_D0_pi_PID_KLM_pion = m_h_D0_pi_PID_KLM_pion->GetMean();
+  float mean_D0_K_PID_ALL_kaon = m_h_D0_K_PID_ALL_kaon->GetMean();
+  float mean_D0_K_PID_SVD_kaon = m_h_D0_K_PID_SVD_kaon->GetMean();
+  float mean_D0_K_PID_CDC_kaon = m_h_D0_K_PID_CDC_kaon->GetMean();
+  float mean_D0_K_PID_TOP_kaon = m_h_D0_K_PID_TOP_kaon->GetMean();
+  float mean_D0_K_PID_ARICH_kaon = m_h_D0_K_PID_ARICH_kaon->GetMean();
+  float mean_D0_K_PID_ECL_kaon = m_h_D0_K_PID_ECL_kaon->GetMean();
+  float mean_D0_K_PID_KLM_kaon = m_h_D0_K_PID_KLM_kaon->GetMean();
+
+  // set values
+  mon_dst->setVariable("mean_D0_InvM", mean_D0_InvM);
+  mon_dst->setVariable("width_D0_InvM", width_D0_InvM);
+  mon_dst->setVariable("mean_delta_m", mean_delta_m);
+  mon_dst->setVariable("width_delta_m", width_delta_m);
+  mon_dst->setVariable("mean_pi0_InvM", mean_pi0_InvM);
+  mon_dst->setVariable("width_pi0_InvM", width_pi0_InvM);
+  mon_dst->setVariable("mean_D0_softpi_PID_ALL_pion", mean_D0_softpi_PID_ALL_pion);
+  mon_dst->setVariable("mean_D0_softpi_PID_SVD_pion", mean_D0_softpi_PID_SVD_pion);
+  mon_dst->setVariable("mean_D0_softpi_PID_CDC_pion", mean_D0_softpi_PID_CDC_pion);
+  mon_dst->setVariable("mean_D0_softpi_PID_TOP_pion", mean_D0_softpi_PID_TOP_pion);
+  mon_dst->setVariable("mean_D0_softpi_PID_ARICH_pion", mean_D0_softpi_PID_ARICH_pion);
+  mon_dst->setVariable("mean_D0_softpi_PID_ECL_pion", mean_D0_softpi_PID_ECL_pion);
+  mon_dst->setVariable("mean_D0_softpi_PID_KLM_pion", mean_D0_softpi_PID_KLM_pion);
+  mon_dst->setVariable("mean_D0_pi_PID_ALL_pion", mean_D0_pi_PID_ALL_pion);
+  mon_dst->setVariable("mean_D0_pi_PID_SVD_pion", mean_D0_pi_PID_SVD_pion);
+  mon_dst->setVariable("mean_D0_pi_PID_CDC_pion", mean_D0_pi_PID_CDC_pion);
+  mon_dst->setVariable("mean_D0_pi_PID_TOP_pion", mean_D0_pi_PID_TOP_pion);
+  mon_dst->setVariable("mean_D0_pi_PID_ARICH_pion", mean_D0_pi_PID_ARICH_pion);
+  mon_dst->setVariable("mean_D0_pi_PID_ECL_pion", mean_D0_pi_PID_ECL_pion);
+  mon_dst->setVariable("mean_D0_pi_PID_KLM_pion", mean_D0_pi_PID_KLM_pion);
+  mon_dst->setVariable("mean_D0_K_PID_ALL_kaon", mean_D0_K_PID_ALL_kaon);
+  mon_dst->setVariable("mean_D0_K_PID_SVD_kaon", mean_D0_K_PID_SVD_kaon);
+  mon_dst->setVariable("mean_D0_K_PID_CDC_kaon", mean_D0_K_PID_CDC_kaon);
+  mon_dst->setVariable("mean_D0_K_PID_TOP_kaon", mean_D0_K_PID_TOP_kaon);
+  mon_dst->setVariable("mean_D0_K_PID_ARICH_kaon", mean_D0_K_PID_ARICH_kaon);
+  mon_dst->setVariable("mean_D0_K_PID_ECL_kaon", mean_D0_K_PID_ECL_kaon);
+  mon_dst->setVariable("mean_D0_K_PID_KLM_kaon", mean_D0_K_PID_KLM_kaon);
+
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle : endRun called");
 }

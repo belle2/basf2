@@ -22,7 +22,8 @@ using namespace Belle2;
 TrackFitResult::TrackFitResult() :
   m_pdg(0), m_pValue(0),
   m_hitPatternCDCInitializer(0),
-  m_hitPatternVXDInitializer(0)
+  m_hitPatternVXDInitializer(0),
+  m_NDF(0)
 {
   memset(m_tau, 0, sizeof(m_tau));
   memset(m_cov5, 0, sizeof(m_cov5));
@@ -33,10 +34,12 @@ TrackFitResult::TrackFitResult(const TVector3& position, const TVector3& momentu
                                const Const::ParticleType& particleType, const float pValue,
                                const float bField,
                                const uint64_t hitPatternCDCInitializer,
-                               const uint32_t hitPatternVXDInitializer) :
+                               const uint32_t hitPatternVXDInitializer,
+                               const short int NDF) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
-  m_hitPatternVXDInitializer(hitPatternVXDInitializer)
+  m_hitPatternVXDInitializer(hitPatternVXDInitializer),
+  m_NDF(NDF)
 {
   UncertainHelix h(position, momentum, charge, bField, covariance, pValue);
 
@@ -60,10 +63,12 @@ TrackFitResult::TrackFitResult(const TVector3& position, const TVector3& momentu
 TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                                const Const::ParticleType& particleType, const float pValue,
                                const uint64_t hitPatternCDCInitializer,
-                               const uint32_t hitPatternVXDInitializer) :
+                               const uint32_t hitPatternVXDInitializer,
+                               const short int NDF) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
-  m_hitPatternVXDInitializer(hitPatternVXDInitializer)
+  m_hitPatternVXDInitializer(hitPatternVXDInitializer),
+  m_NDF(NDF)
 {
   if (tau.size() != c_NPars
       || cov5.size() != c_NCovEntries)
@@ -105,6 +110,7 @@ std::string TrackFitResult::getInfoHTML() const
   out << "<b>nPXDHits</b>: " << getHitPatternVXD().getNPXDHits() << "<br>";
   out << "<b>nSVDHits</b>: " << getHitPatternVXD().getNSVDHits() << "<br>";
   out << "<b>nCDCHits</b>: " << getHitPatternCDC().getNHits() << "<br>";
+  out << "<b>NDF</b>: " << m_NDF << "<br>";
   out << " <br>";
   out << "<b>d0</b>: " << m_tau[iD0] << " cm <br>";
   out << "<b>phi0</b>: " << m_tau[iPhi0] << " rad <br>";

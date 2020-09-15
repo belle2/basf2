@@ -94,7 +94,7 @@ dalitz_3body = [
 ]
 
 #: Tracking variables, replacement for Track tool
-track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue']
+track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue', 'nDF']
 
 #: Replacement for TrackHits tool
 track_hits = ['nCDCHits', 'nPXDHits', 'nSVDHits', 'nVXDHits']

@@ -953,7 +953,7 @@ namespace Belle2 {
                           tfr->getChargeSign(),
                           tfr->getParticleType(),
                           tfr->getPValue(),
-                          m_Bfield, 0, 0);
+                          m_Bfield, 0, 0, tfr->getNDF());
   }
 
   // static
@@ -979,7 +979,7 @@ namespace Belle2 {
                           tfr->getChargeSign(),
                           tfr->getParticleType(),
                           tfr->getPValue(),
-                          m_Bfield, 0, 0);
+                          m_Bfield, 0, 0, tfr->getNDF());
   }
 
   TVector3 TagVertexModule::getRollBackPoca(ParticleAndWeight const& paw)

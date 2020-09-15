@@ -131,7 +131,7 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
                                   msop.get6DCov(), msop.getCharge(),
                                   trackHypothesis,
                                   track.getFitStatus()->getPVal(),
-                                  Bz, 0, 0);
+                                  Bz, 0, 0, 0);
   return v0TrackFitResult;
 }
 

@@ -45,6 +45,11 @@ namespace Belle2 {
     double trackNVXDHits(const Particle* part);
 
     /**
+     * return NDF of the track fit which is equal to number of hits used in the fit (after outlier rejection) minus 5
+     */
+    double trackNDF(const Particle* part);
+
+    /**
      * returns the first activated SVD layer associated to the track
      */
     double trackFirstSVDLayer(const Particle* part);

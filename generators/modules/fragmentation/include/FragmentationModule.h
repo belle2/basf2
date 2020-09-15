@@ -65,6 +65,12 @@ namespace Belle2 {
      */
     void loadEvtGenParticleData(Pythia8::Pythia* pythia);
 
+    /**
+     * Add particle to Pythia event.
+     * @param[in] mcParticle MC particle.
+     */
+    int addParticleToPYTHIA(const MCParticle& mcParticle);
+
     /** Pythia generator. */
     Pythia8::Pythia* m_Pythia = nullptr;
 
@@ -88,7 +94,6 @@ namespace Belle2 {
     int nGood;   /**< number of events with successful fragmentation. */
 
     int nAdded;  /**< number of added particles. */
-    int addParticleToPYTHIA(MCParticle& mcParticle);   /**< picks particles and adds them to a pythia event. */
     int nQuarks; /**< number of quarks. */
     int nVpho; /**< number of virtual exchange particles. */
 

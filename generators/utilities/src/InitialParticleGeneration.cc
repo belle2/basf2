@@ -11,7 +11,6 @@
 #include <generators/utilities/InitialParticleGeneration.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/ScopeGuard.h>
 
 namespace Belle2 {
 
@@ -106,8 +105,10 @@ namespace Belle2 {
     }
     if (!m_event) {
       // generate a new mc initial particle without smearing except for the vertex
-      auto flagGuard = ScopeGuard::guardValue(m_allowedFlags, BeamParameters::c_smearVertex);
+      int oldFlags = m_allowedFlags;
+      m_allowedFlags = BeamParameters::c_smearVertex;
       generate();
+      m_allowedFlags = oldFlags;
       return m_event->getVertex();
     }
     if (!m_beamParams->hasGenerationFlags(BeamParameters::c_smearVertex) or

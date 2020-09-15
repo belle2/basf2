@@ -85,7 +85,7 @@ void KKGenInputModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
   //generate an MCInitialEvent (for vertex smearing)
-  MCInitialParticles& initial = m_initial.generate();
+  const MCInitialParticles& initial = m_initial.generate();
   TVector3 vertex = initial.getVertex();
 
   mpg.clear();
@@ -145,7 +145,7 @@ void KKGenInputModule::initializeGenerator()
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
                  m_taudecaytableFileName, m_KKMCOutputFileName);
 
-  MCInitialParticles& initial = m_initial.generate();
+  const MCInitialParticles& initial = m_initial.generate();
   TLorentzVector v_ler = initial.getLER();
   TLorentzVector v_her = initial.getHER();
 

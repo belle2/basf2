@@ -4,7 +4,7 @@
 //
 // Author : Uwe Gebauer
 // based on work from B. Spruck
-// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
+// based on work from Tomoyuki Konno, Tokyo Metropolitan University
 // Date : someday
 //-
 
@@ -41,6 +41,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
            std::string("PXDEFF"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
@@ -51,7 +52,9 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
 DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -67,10 +70,8 @@ void DQMHistAnalysisPXDEffModule::initialize()
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-    // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
-
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -159,9 +160,11 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_line_error->SetLineStyle(7);
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
@@ -424,9 +427,11 @@ void DQMHistAnalysisPXDEffModule::event()
   m_monObj->setVariable("nmodules", ieff);
 
 #ifdef _BELLE2_EPICS
-  double data = 0;
-  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    double data = 0;
+    SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 

@@ -3,7 +3,7 @@
 // Description : DQM module, which gives histograms showing the efficiency of PXD sensors
 //
 // Modified to efficiency by Uwe Gebauer
-// Based on work from: Tomoyuki Konno, Tokyo Metroplitan Univerisity
+// Based on work from: Tomoyuki Konno, Tokyo Metroplitan University
 // Date : 25  - Dec - 2015 ; first commit
 //-
 
@@ -92,6 +92,9 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
+
+    /** flag if to export to EPICS */
+    bool m_useEpics;
 
 #ifdef _BELLE2_EPICS
     //! one EPICS PV

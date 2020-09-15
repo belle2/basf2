@@ -2,7 +2,7 @@
 // File : DQMHistAnalysisPXDCM.cc
 // Description : Analysis of PXD Common Modes
 //
-// Author : Bjoern Spruck, Univerisity Mainz
+// Author : Bjoern Spruck, University Mainz
 // Date : 2018
 //-
 
@@ -32,13 +32,16 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
 DQMHistAnalysisPXDCMModule::~DQMHistAnalysisPXDCMModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -49,14 +52,12 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
-  //collect the list of all PXD Modules in the geometry here
+  // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-    // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
-
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -89,12 +90,14 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  mychid.resize(3);
-  SEVCHK(ca_create_channel((m_pvPrefix + "Outside").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-  SEVCHK(ca_create_channel((m_pvPrefix + "CM63").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    mychid.resize(3);
+    SEVCHK(ca_create_channel((m_pvPrefix + "Outside").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+    SEVCHK(ca_create_channel((m_pvPrefix + "CM63").data(), NULL, NULL, 10, &mychid[2]), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
   B2DEBUG(99, "DQMHistAnalysisPXDCM: initialized.");
 }
@@ -193,12 +196,14 @@ void DQMHistAnalysisPXDCMModule::event()
   m_cCommonMode->Modified();
   m_cCommonMode->Update();
 #ifdef _BELLE2_EPICS
-  double data = all > 0 ? (all_outside / all) : 0;
-  double data2 = all > 0 ? (all_cm / all) : 0;
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
-  SEVCHK(ca_put(DBR_INT, mychid[1], (void*)&status), "ca_set failure");
-  SEVCHK(ca_put(DBR_DOUBLE, mychid[2], (void*)&data2), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    double data = all > 0 ? (all_outside / all) : 0;
+    double data2 = all > 0 ? (all_cm / all) : 0;
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[0], (void*)&data), "ca_set failure");
+    SEVCHK(ca_put(DBR_INT, mychid[1], (void*)&status), "ca_set failure");
+    SEVCHK(ca_put(DBR_DOUBLE, mychid[2], (void*)&data2), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -207,8 +212,10 @@ void DQMHistAnalysisPXDCMModule::terminate()
   B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
   // should delete canvas here, maybe hist, too? Who owns it?
 #ifdef _BELLE2_EPICS
-  for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 

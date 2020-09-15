@@ -34,11 +34,6 @@ The Rest of Event (ROE) contains a lot of information, because in case of B-phys
 particles from the partner B-meson and in case of charm and tau analysis, it has the partner 
 charm and tau-lepton, respectively. 
 
-However, the ROE contains not only the partner particle, but also all other particles, like 
-hadron split-off particles, :math:`\delta`-rays, unused radiative photons, beam-induced background particles
-or products of kaon or pion decays. Thus, it is important to clean up the ROE particles 
-to get the best possible use of it.
-
 .. admonition:: Exercise
      :class: exercise stacked
 
@@ -85,8 +80,13 @@ Rest of Event masks
 The main philosophy of the Rest of Event is to include *every* particle in the event,
 that has not been associated to the signal candidate and it is up to the analyst to 
 decide what particles are actually matter for the analysis.
+That is why, a typical ROE contains not only the partner particle, but also all other particles, like 
+hadron split-off particles, :math:`\delta`-rays, unused radiative photons, beam-induced background particles
+or products of kaon or pion decays. Thus, it is important to clean up the ROE particles 
+to get the best possible use of it.
+
 That is why we have a concept of the ROE masks, which are just sets of selection cuts 
-to be applied on the ROE particles.
+to be applied on the ROE particles. The ROE masks can be created in the following way:
 
 .. code-block:: python
 

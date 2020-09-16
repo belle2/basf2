@@ -20,11 +20,10 @@
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
 #include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
-#include <klm/dbobjects/KLMChannelStatus.h>
-#include <klm/dataobjects/KLMChannelIndex.h>
 
 /* Belle 2 headers. */
 #include <framework/core/Module.h>
@@ -88,8 +87,12 @@ namespace Belle2 {
      */
     void reconstructEKLMHits();
 
+    /**
+     * Return false if channel is Hot
+     */
+    bool isNormal(KLMDigit* digit);
+
     /* EKLM methods. */
-    bool isHot(KLMDigit* d);
 
     /**
      * Get 2d hit time corresponding to EKLM digit.
@@ -140,6 +143,7 @@ namespace Belle2 {
 
     /** Element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_eklmGeoDat;
@@ -171,7 +175,7 @@ namespace Belle2 {
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
-    /** Ignor hot channels during 2d hit reconstruction */
+    /** Ignore hot channels during 2d hit reconstruction */
     bool m_eklmIgnoreHotChannels;
 
   };

@@ -69,7 +69,7 @@ b_vars += vu.create_aliases_for_selected(
 # Variables for J/Psi, KS
 jpsi_ks_vars = vc.inv_mass + standard_vars
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
-# Also add kinematic variables bossted to the center of mass frame (CMS)
+# Also add kinematic variables boosted to the center of mass frame (CMS)
 # for all particles
 cmskinematics = vu.create_aliases(
     vc.kinematics, "useCMSFrame({variable})", "CMS"

@@ -28,7 +28,7 @@ ma.inputMdstList(
 
 # fill final state particle lists
 ma.fillParticleList(
-    "e+:corrected",
+    "e+:uncorrected",
     "electronID > 0.1 and dr < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance",
     path=main,
 )
@@ -48,7 +48,7 @@ variables.addAlias(
     "goodGamma", "passesCut(goodFWDGamma or goodBRLGamma or goodBWDGamma)"
 )
 ma.fillParticleList("gamma:brems", "goodGamma", path=main)
-ma.correctBrems("e+:corrected", "e+:corrected", "gamma:brems", path=main)
+ma.correctBrems("e+:corrected", "e+:uncorrected", "gamma:brems", path=main)
 variables.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")
 
 # combine final state particles to form composite particles
@@ -88,6 +88,7 @@ standard_vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
 b_vars += vc.deltae_mbc
 b_vars += standard_vars
 b_vars += vc.roe_kinematics + vc.roe_multiplicities
+b_vars += ft.flavor_tagging
 
 # Variables for final states (electrons, positrons, pions)
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars
@@ -102,7 +103,7 @@ b_vars += vu.create_aliases_for_selected(
 # Variables for J/Psi, KS
 jpsi_ks_vars = vc.inv_mass + standard_vars
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
-# Also add kinematic variables bossted to the center of mass frame (CMS)
+# Also add kinematic variables boosted to the center of mass frame (CMS)
 # for all particles
 cmskinematics = vu.create_aliases(
     vc.kinematics, "useCMSFrame({variable})", "CMS"

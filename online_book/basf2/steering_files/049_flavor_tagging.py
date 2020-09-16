@@ -12,7 +12,7 @@ import variables.utils as vu
 # get input file number from the command line
 filenumber = sys.argv[1]
 
-# set analysis global tag
+# set analysis global tag (needed for flavor tagging)
 b2.use_central_database("analysis_tools_release-04-02")
 
 # create path

@@ -50,7 +50,7 @@ namespace Belle2 {
     double m_kineticEnergyThreshold{0.01};  /**< kinetic energy threshold. */
     double m_timeOffset{0};  /**< time offset. */
     int m_maxTrials{10000};  /**< maximum number of trials. */
-    double m_boxLength{1000}; /**< length of the sides of the square plane in which to generate cosmics */
+    double m_boxLength{10000}; /**< length of the sides of the square plane in which to generate cosmics */
     std::string m_date{"1-1-2019"}; /**< date used for generation. */
     bool m_returnGammas{true}; /**< Whether or not CRY should return gammas */
     bool m_returnKaons{true}; /**< Whether or not CRY should return kaons */

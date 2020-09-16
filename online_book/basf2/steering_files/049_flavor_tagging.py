@@ -70,6 +70,10 @@ ma.matchMCTruth("B0", path=main)
 
 # build the rest of the event
 ma.buildRestOfEvent("B0", fillWithMostLikely=True, path=main)
+track_based_cuts = 'thetaInCDCAcceptance and pt > 0.075'
+ecl_based_cuts = 'thetaInCDCAcceptance and E > 0.05'
+roe_mask = ('my_mask', track_based_cuts, ecl_based_cuts)
+ma.appendROEMasks('B0', [roe_mask], path=main)
 
 # call flavor tagging
 ft.flavorTagger("B0", path=main)

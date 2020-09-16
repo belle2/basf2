@@ -32,7 +32,7 @@ using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
-  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi")
+  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi"), m_offIpParticles("pi+:offip")
 {
 
 }
@@ -46,6 +46,7 @@ void SkimSampleCalculator::requireStoreArrays()
   m_KsParticles.isOptional();
   m_LambdaParticles.isOptional();
   m_DstParticles.isOptional();
+  m_offIpParticles.isRequired();
 
 };
 
@@ -769,5 +770,6 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
     calculationResult["Dstp3"] = 0;
   }
 
-
+  // nTracksOffIP
+  calculationResult["nTracksOffIP"] = m_offIpParticles->getListSize();
 }

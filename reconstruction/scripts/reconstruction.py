@@ -214,10 +214,15 @@ def add_cosmics_reconstruction(
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add only the dE/dx calculation and prune the tracks
     if reconstruct_cdst:
-        add_dedx_modules(main_path)
-        add_prune_tracks(main_path, components=components)
+        # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
+        if not components or ('PXD' in components):
+            path.add_module("PXDClustersFromTracks")
+        if not components or ('SVD' in components):
+            path.add_module("SVDShaperDigitsFromTracks")
+        # And add only the dE/dx calculation and prune the tracks
+        add_dedx_modules(path)
+        add_prune_tracks(path, components=components)
 
     else:
         # Add further reconstruction modules

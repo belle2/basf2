@@ -35,7 +35,7 @@ namespace Belle2 {
     // Generated vertex information
     double mcDecayVertexX(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         return mcparticle->getDecayVertex().X();
       }
@@ -44,7 +44,7 @@ namespace Belle2 {
 
     double mcDecayVertexY(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         return mcparticle->getDecayVertex().Y();
       }
@@ -53,7 +53,7 @@ namespace Belle2 {
 
     double mcDecayVertexZ(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         return mcparticle->getDecayVertex().Z();
       }
@@ -62,7 +62,7 @@ namespace Belle2 {
 
     double mcDecayVertexRho(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         return mcparticle->getDecayVertex().Perp();
       }
@@ -71,7 +71,7 @@ namespace Belle2 {
 
     double mcDecayVertexFromIPX(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         static DBObjPtr<BeamSpot> beamSpotDB;
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -82,7 +82,7 @@ namespace Belle2 {
 
     double mcDecayVertexFromIPY(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         static DBObjPtr<BeamSpot> beamSpotDB;
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -93,7 +93,7 @@ namespace Belle2 {
 
     double mcDecayVertexFromIPZ(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         static DBObjPtr<BeamSpot> beamSpotDB;
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -104,7 +104,7 @@ namespace Belle2 {
 
     double mcDecayVertexFromIPRho(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         static DBObjPtr<BeamSpot> beamSpotDB;
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -115,7 +115,7 @@ namespace Belle2 {
 
     double mcDecayVertexFromIPDistance(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         static DBObjPtr<BeamSpot> beamSpotDB;
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -126,7 +126,7 @@ namespace Belle2 {
 
     double mcProductionVertexX(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         return mcparticle->getProductionVertex().X();
       }
@@ -135,7 +135,7 @@ namespace Belle2 {
 
     double mcProductionVertexY(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         return mcparticle->getProductionVertex().Y();
       }
@@ -144,7 +144,7 @@ namespace Belle2 {
 
     double mcProductionVertexZ(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         return mcparticle->getProductionVertex().Z();
       }
@@ -153,7 +153,7 @@ namespace Belle2 {
 
     double mcProductionVertexFromIPX(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         static DBObjPtr<BeamSpot> beamSpotDB;
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -164,7 +164,7 @@ namespace Belle2 {
 
     double mcProductionVertexFromIPY(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         static DBObjPtr<BeamSpot> beamSpotDB;
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -175,7 +175,7 @@ namespace Belle2 {
 
     double mcProductionVertexFromIPZ(const Particle* part)
     {
-      auto* mcparticle = part->getRelatedTo<MCParticle>();
+      auto* mcparticle = part->getMCParticle();
       if (mcparticle) {
         static DBObjPtr<BeamSpot> beamSpotDB;
         const auto& frame = ReferenceFrame::GetCurrent();

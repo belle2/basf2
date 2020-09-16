@@ -1,22 +1,18 @@
+import vertex as vx
+import modularAnalysis as ana
+import reconstruction as reco
+import rawdata as raw
+from caf import strategies
+from caf import backends
+from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
+from ROOT.Belle2 import BeamSpotAlgorithm
+from ROOT import Belle2
+import ROOT
+import multiprocessing
+import sys
+import os
 from basf2 import *
 set_log_level(LogLevel.INFO)
-
-import os
-import sys
-import multiprocessing
-
-import ROOT
-from ROOT import Belle2
-from ROOT.Belle2 import BeamSpotAlgorithm
-
-from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
-from caf import backends
-from caf import strategies
-
-import rawdata as raw
-import reconstruction as reco
-import modularAnalysis as ana
-import vertex as vx
 
 
 def BeamSpotCalibration(files, tags):

@@ -4,7 +4,6 @@
 # and change the input data below.
 
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -12,6 +11,8 @@ import sys
 import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
+
+set_log_level(LogLevel.INFO)
 
 
 def main(argv):

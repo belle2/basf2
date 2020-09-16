@@ -36,6 +36,7 @@ class DQMModes(Enum):
     #: If not in HLT, just all all DQM modules
     dont_care = "dont_care"
 
+
 #: Always store those objects
 ALWAYS_SAVE_OBJECTS = ["EventMetaData", "SoftwareTriggerResult", "TRGSummary", "ROIpayload", "SoftwareTriggerVariables"]
 #: Objects to be left on output

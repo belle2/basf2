@@ -15,9 +15,9 @@ import argparse
 # make sure ROOT does not steal our command line arguments
 from ROOT import PyConfig
 #: Tell ROOT to not mangle our command line options
-PyConfig.IgnoreCommandLineOptions = True
+PyConfig.IgnoreCommandLineOptions = True  # noqa
 #: And we don't need a gui thread
-PyConfig.StartGuiThread = False
+PyConfig.StartGuiThread = False  # noqa
 # now we can import the Belle2 namespace
 from ROOT import Belle2
 from basf2 import B2FATAL, B2ERROR, B2DEBUG, B2INFO

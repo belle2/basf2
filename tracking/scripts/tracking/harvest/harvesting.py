@@ -525,5 +525,6 @@ def test():
 
     ExampleHarvestingRun().configure_and_execute_from_commandline()
 
+
 if __name__ == "__main__":
     test()

@@ -45,6 +45,10 @@ namespace Belle2 {
       StoreObjPtr<ParticleList> m_pionTauParticles;
       /// Internal storage of the K_S0's.
       StoreObjPtr<ParticleList> m_KsParticles;
+      /// Internal storage of the Lambda0's.
+      StoreObjPtr<ParticleList> m_LambdaParticles;
+      /// Internal storage of the D*'s.
+      StoreObjPtr<ParticleList> m_DstParticles;
     };
   }
 }

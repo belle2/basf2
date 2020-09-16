@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True
-PyConfig.StartGuiThread = False
+PyConfig.IgnoreCommandLineOptions = True  # noqa
+PyConfig.StartGuiThread = False  # noqa
 
 import basf2
 from argparse import ArgumentParser

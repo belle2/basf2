@@ -49,64 +49,65 @@ void PhysicsObjectsMiraBelleDstModule::defineHisto()
   TDirectory* oldDir = gDirectory;
   oldDir->mkdir("PhysicsObjectsMiraBelleDst")->cd();
   // Mass distributions
-  m_h_D0_InvM = new TH1F("m_h_D0_InvM", "Signal enhanced;m_h_D0_InvM;m_h_D0_InvM;", 50, 1.81, 1.95);
-  m_h_delta_m = new TH1F("m_h_delta_m", "Signal enhanced;delta_m;delta_m;", 50, 0.14, 0.16);
-  m_h_D0_pi0_InvM = new TH1F("m_h_D0_pi0_InvM", "D0_pi0_InvM;D0_pi0_InvM;", 50, 0.09, 0.17);
+  m_h_D0_InvM = new TH1F("hist_D0_InvM", "Signal enhanced;m_h_D0_InvM;", 50, 1.81, 1.95);
+  m_h_delta_m = new TH1F("hist_delta_m", "Signal enhanced;delta_m;", 50, 0.14, 0.16);
+  m_h_D0_pi0_InvM = new TH1F("hist_D0_pi0_InvM", "#pi^{0} mass of D^{*}#rightarrowK#pi#pi^{0};D0_pi0_InvM;", 50, 0.09, 0.17);
   // Soft pion
-  m_h_D0_softpi_PID_ALL_pion = new TH1F("m_h_D0_softpi_PID_ALL_pion", "D0_softpi_PID_ALL_pion;D0_softpi_PID_ALL_pion;", 50, 0, 1);
-  m_h_D0_softpi_PID_SVD_pion = new TH1F("m_h_D0_softpi_PID_SVD_pion", "D0_softpi_PID_SVD_pion;D0_softpi_PID_SVD_pion;", 50, 0, 1);
-  m_h_D0_softpi_PID_CDC_pion = new TH1F("m_h_D0_softpi_PID_CDC_pion", "D0_softpi_PID_CDC_pion;D0_softpi_PID_CDC_pion;", 50, 0, 1);
-  m_h_D0_softpi_PID_TOP_pion = new TH1F("m_h_D0_softpi_PID_TOP_pion", "D0_softpi_PID_TOP_pion;D0_softpi_PID_TOP_pion;", 50, 0, 1);
-  m_h_D0_softpi_PID_ARICH_pion = new TH1F("m_h_D0_softpi_PID_ARICH_pion", "D0_softpi_PID_ARICH_pion;D0_softpi_PID_ARICH_pion;", 50, 0,
+  m_h_D0_softpi_PID_ALL_pion = new TH1F("hist_D0_softpi_PID_ALL_pion", "D0_softpi_PID_ALL_pion;D0_softpi_PID_ALL_pion;", 50, 0, 1);
+  m_h_D0_softpi_PID_SVD_pion = new TH1F("hist_D0_softpi_PID_SVD_pion", "D0_softpi_PID_SVD_pion;D0_softpi_PID_SVD_pion;", 50, 0, 1);
+  m_h_D0_softpi_PID_CDC_pion = new TH1F("hist_D0_softpi_PID_CDC_pion", "D0_softpi_PID_CDC_pion;D0_softpi_PID_CDC_pion;", 50, 0, 1);
+  m_h_D0_softpi_PID_TOP_pion = new TH1F("hist_D0_softpi_PID_TOP_pion", "D0_softpi_PID_TOP_pion;D0_softpi_PID_TOP_pion;", 50, 0, 1);
+  m_h_D0_softpi_PID_ARICH_pion = new TH1F("hist_D0_softpi_PID_ARICH_pion", "D0_softpi_PID_ARICH_pion;D0_softpi_PID_ARICH_pion;", 50,
+                                          0,
                                           1);
-  m_h_D0_softpi_PID_ECL_pion = new TH1F("m_h_D0_softpi_PID_ECL_pion", "D0_softpi_PID_ECL_pion;D0_softpi_PID_ECL_pion;", 50, 0, 1);
-  m_h_D0_softpi_PID_KLM_pion = new TH1F("m_h_D0_softpi_PID_KLM_pion", "D0_softpi_PID_KLM_pion;D0_softpi_PID_KLM_pion;", 50, 0, 1);
-  m_h_sideband_D0_softpi_PID_ALL_pion = new TH1F("m_h_sideband_D0_softpi_PID_ALL_pion",
+  m_h_D0_softpi_PID_ECL_pion = new TH1F("hist_D0_softpi_PID_ECL_pion", "D0_softpi_PID_ECL_pion;D0_softpi_PID_ECL_pion;", 50, 0, 1);
+  m_h_D0_softpi_PID_KLM_pion = new TH1F("hist_D0_softpi_PID_KLM_pion", "D0_softpi_PID_KLM_pion;D0_softpi_PID_KLM_pion;", 50, 0, 1);
+  m_h_sideband_D0_softpi_PID_ALL_pion = new TH1F("hist_sideband_D0_softpi_PID_ALL_pion",
                                                  "D0_softpi_PID_ALL_pion;D0_softpi_PID_ALL_pion;", 50, 0, 1);
-  m_h_sideband_D0_softpi_PID_SVD_pion = new TH1F("m_h_sideband_D0_softpi_PID_SVD_pion",
+  m_h_sideband_D0_softpi_PID_SVD_pion = new TH1F("hist_sideband_D0_softpi_PID_SVD_pion",
                                                  "D0_softpi_PID_SVD_pion;D0_softpi_PID_SVD_pion;", 50, 0, 1);
-  m_h_sideband_D0_softpi_PID_CDC_pion = new TH1F("m_h_sideband_D0_softpi_PID_CDC_pion",
+  m_h_sideband_D0_softpi_PID_CDC_pion = new TH1F("hist_sideband_D0_softpi_PID_CDC_pion",
                                                  "D0_softpi_PID_CDC_pion;D0_softpi_PID_CDC_pion;", 50, 0, 1);
-  m_h_sideband_D0_softpi_PID_TOP_pion = new TH1F("m_h_sideband_D0_softpi_PID_TOP_pion",
+  m_h_sideband_D0_softpi_PID_TOP_pion = new TH1F("hist_sideband_D0_softpi_PID_TOP_pion",
                                                  "D0_softpi_PID_TOP_pion;D0_softpi_PID_TOP_pion;", 50, 0, 1);
-  m_h_sideband_D0_softpi_PID_ARICH_pion = new TH1F("m_h_sideband_D0_softpi_PID_ARICH_pion",
+  m_h_sideband_D0_softpi_PID_ARICH_pion = new TH1F("hist_sideband_D0_softpi_PID_ARICH_pion",
                                                    "D0_softpi_PID_ARICH_pion;D0_softpi_PID_ARICH_pion;", 50, 0, 1);
-  m_h_sideband_D0_softpi_PID_ECL_pion = new TH1F("m_h_sideband_D0_softpi_PID_ECL_pion",
+  m_h_sideband_D0_softpi_PID_ECL_pion = new TH1F("hist_sideband_D0_softpi_PID_ECL_pion",
                                                  "D0_softpi_PID_ECL_pion;D0_softpi_PID_ECL_pion;", 50, 0, 1);
-  m_h_sideband_D0_softpi_PID_KLM_pion = new TH1F("m_h_sideband_D0_softpi_PID_KLM_pion",
+  m_h_sideband_D0_softpi_PID_KLM_pion = new TH1F("hist_sideband_D0_softpi_PID_KLM_pion",
                                                  "D0_softpi_PID_KLM_pion;D0_softpi_PID_KLM_pion;", 50, 0, 1);
   // pi from D0
-  m_h_D0_pi_PID_ALL_pion = new TH1F("m_h_D0_pi_PID_ALL_pion", "D0_pi_PID_ALL_pion;D0_pi_PID_ALL_pion;", 50, 0, 1);
-  m_h_D0_pi_PID_SVD_pion = new TH1F("m_h_D0_pi_PID_SVD_pion", "D0_pi_PID_SVD_pion;D0_pi_PID_SVD_pion;", 50, 0, 1);
-  m_h_D0_pi_PID_CDC_pion = new TH1F("m_h_D0_pi_PID_CDC_pion", "D0_pi_PID_CDC_pion;D0_pi_PID_CDC_pion;", 50, 0, 1);
-  m_h_D0_pi_PID_TOP_pion = new TH1F("m_h_D0_pi_PID_TOP_pion", "D0_pi_PID_TOP_pion;D0_pi_PID_TOP_pion;", 50, 0, 1);
-  m_h_D0_pi_PID_ARICH_pion = new TH1F("m_h_D0_pi_PID_ARICH_pion", "D0_pi_PID_ARICH_pion;D0_pi_PID_ARICH_pion;", 50, 0, 1);
-  m_h_D0_pi_PID_ECL_pion = new TH1F("m_h_D0_pi_PID_ECL_pion", "D0_pi_PID_ECL_pion;D0_pi_PID_ECL_pion;", 50, 0, 1);
-  m_h_D0_pi_PID_KLM_pion = new TH1F("m_h_D0_pi_PID_KLM_pion", "D0_pi_PID_KLM_pion;D0_pi_PID_KLM_pion;", 50, 0, 1);
-  m_h_sideband_D0_pi_PID_ALL_pion = new TH1F("m_h_sideband_D0_pi_PID_ALL_pion", "D0_pi_PID_ALL_pion;D0_pi_PID_ALL_pion;", 50, 0, 1);
-  m_h_sideband_D0_pi_PID_SVD_pion = new TH1F("m_h_sideband_D0_pi_PID_SVD_pion", "D0_pi_PID_SVD_pion;D0_pi_PID_SVD_pion;", 50, 0, 1);
-  m_h_sideband_D0_pi_PID_CDC_pion = new TH1F("m_h_sideband_D0_pi_PID_CDC_pion", "D0_pi_PID_CDC_pion;D0_pi_PID_CDC_pion;", 50, 0, 1);
-  m_h_sideband_D0_pi_PID_TOP_pion = new TH1F("m_h_sideband_D0_pi_PID_TOP_pion", "D0_pi_PID_TOP_pion;D0_pi_PID_TOP_pion;", 50, 0, 1);
-  m_h_sideband_D0_pi_PID_ARICH_pion = new TH1F("m_h_sideband_D0_pi_PID_ARICH_pion", "D0_pi_PID_ARICH_pion;D0_pi_PID_ARICH_pion;", 50,
+  m_h_D0_pi_PID_ALL_pion = new TH1F("hist_D0_pi_PID_ALL_pion", "D0_pi_PID_ALL_pion;D0_pi_PID_ALL_pion;", 50, 0, 1);
+  m_h_D0_pi_PID_SVD_pion = new TH1F("hist_D0_pi_PID_SVD_pion", "D0_pi_PID_SVD_pion;D0_pi_PID_SVD_pion;", 50, 0, 1);
+  m_h_D0_pi_PID_CDC_pion = new TH1F("hist_D0_pi_PID_CDC_pion", "D0_pi_PID_CDC_pion;D0_pi_PID_CDC_pion;", 50, 0, 1);
+  m_h_D0_pi_PID_TOP_pion = new TH1F("hist_D0_pi_PID_TOP_pion", "D0_pi_PID_TOP_pion;D0_pi_PID_TOP_pion;", 50, 0, 1);
+  m_h_D0_pi_PID_ARICH_pion = new TH1F("hist_D0_pi_PID_ARICH_pion", "D0_pi_PID_ARICH_pion;D0_pi_PID_ARICH_pion;", 50, 0, 1);
+  m_h_D0_pi_PID_ECL_pion = new TH1F("hist_D0_pi_PID_ECL_pion", "D0_pi_PID_ECL_pion;D0_pi_PID_ECL_pion;", 50, 0, 1);
+  m_h_D0_pi_PID_KLM_pion = new TH1F("hist_D0_pi_PID_KLM_pion", "D0_pi_PID_KLM_pion;D0_pi_PID_KLM_pion;", 50, 0, 1);
+  m_h_sideband_D0_pi_PID_ALL_pion = new TH1F("hist_sideband_D0_pi_PID_ALL_pion", "D0_pi_PID_ALL_pion;D0_pi_PID_ALL_pion;", 50, 0, 1);
+  m_h_sideband_D0_pi_PID_SVD_pion = new TH1F("hist_sideband_D0_pi_PID_SVD_pion", "D0_pi_PID_SVD_pion;D0_pi_PID_SVD_pion;", 50, 0, 1);
+  m_h_sideband_D0_pi_PID_CDC_pion = new TH1F("hist_sideband_D0_pi_PID_CDC_pion", "D0_pi_PID_CDC_pion;D0_pi_PID_CDC_pion;", 50, 0, 1);
+  m_h_sideband_D0_pi_PID_TOP_pion = new TH1F("hist_sideband_D0_pi_PID_TOP_pion", "D0_pi_PID_TOP_pion;D0_pi_PID_TOP_pion;", 50, 0, 1);
+  m_h_sideband_D0_pi_PID_ARICH_pion = new TH1F("hist_sideband_D0_pi_PID_ARICH_pion", "D0_pi_PID_ARICH_pion;D0_pi_PID_ARICH_pion;", 50,
                                                0, 1);
-  m_h_sideband_D0_pi_PID_ECL_pion = new TH1F("m_h_sideband_D0_pi_PID_ECL_pion", "D0_pi_PID_ECL_pion;D0_pi_PID_ECL_pion;", 50, 0, 1);
-  m_h_sideband_D0_pi_PID_KLM_pion = new TH1F("m_h_sideband_D0_pi_PID_KLM_pion", "D0_pi_PID_KLM_pion;D0_pi_PID_KLM_pion;", 50, 0, 1);
+  m_h_sideband_D0_pi_PID_ECL_pion = new TH1F("hist_sideband_D0_pi_PID_ECL_pion", "D0_pi_PID_ECL_pion;D0_pi_PID_ECL_pion;", 50, 0, 1);
+  m_h_sideband_D0_pi_PID_KLM_pion = new TH1F("hist_sideband_D0_pi_PID_KLM_pion", "D0_pi_PID_KLM_pion;D0_pi_PID_KLM_pion;", 50, 0, 1);
   // K from D0
-  m_h_D0_K_PID_ALL_kaon = new TH1F("m_h_D0_K_PID_ALL_kaon", "D0_K_PID_ALL_kaon;D0_K_PID_ALL_kaon;", 50, 0, 1);
-  m_h_D0_K_PID_SVD_kaon = new TH1F("m_h_D0_K_PID_SVD_kaon", "D0_K_PID_SVD_kaon;D0_K_PID_SVD_kaon;", 50, 0, 1);
-  m_h_D0_K_PID_CDC_kaon = new TH1F("m_h_D0_K_PID_CDC_kaon", "D0_K_PID_CDC_kaon;D0_K_PID_CDC_kaon;", 50, 0, 1);
-  m_h_D0_K_PID_TOP_kaon = new TH1F("m_h_D0_K_PID_TOP_kaon", "D0_K_PID_TOP_kaon;D0_K_PID_TOP_kaon;", 50, 0, 1);
-  m_h_D0_K_PID_ARICH_kaon = new TH1F("m_h_D0_K_PID_ARICH_kaon", "D0_K_PID_ARICH_kaon;D0_K_PID_ARICH_kaon;", 50, 0, 1);
-  m_h_D0_K_PID_ECL_kaon = new TH1F("m_h_D0_K_PID_ECL_kaon", "D0_K_PID_ECL_kaon;D0_K_PID_ECL_kaon;", 50, 0, 1);
-  m_h_D0_K_PID_KLM_kaon = new TH1F("m_h_D0_K_PID_KLM_kaon", "D0_K_PID_KLM_kaon;D0_K_PID_KLM_kaon;", 50, 0, 1);
-  m_h_sideband_D0_K_PID_ALL_kaon = new TH1F("m_h_sideband_D0_K_PID_ALL_kaon", "D0_K_PID_ALL_kaon;D0_K_PID_ALL_kaon;", 50, 0, 1);
-  m_h_sideband_D0_K_PID_SVD_kaon = new TH1F("m_h_sideband_D0_K_PID_SVD_kaon", "D0_K_PID_SVD_kaon;D0_K_PID_SVD_kaon;", 50, 0, 1);
-  m_h_sideband_D0_K_PID_CDC_kaon = new TH1F("m_h_sideband_D0_K_PID_CDC_kaon", "D0_K_PID_CDC_kaon;D0_K_PID_CDC_kaon;", 50, 0, 1);
-  m_h_sideband_D0_K_PID_TOP_kaon = new TH1F("m_h_sideband_D0_K_PID_TOP_kaon", "D0_K_PID_TOP_kaon;D0_K_PID_TOP_kaon;", 50, 0, 1);
-  m_h_sideband_D0_K_PID_ARICH_kaon = new TH1F("m_h_sideband_D0_K_PID_ARICH_kaon", "D0_K_PID_ARICH_kaon;D0_K_PID_ARICH_kaon;", 50, 0,
+  m_h_D0_K_PID_ALL_kaon = new TH1F("hist_D0_K_PID_ALL_kaon", "D0_K_PID_ALL_kaon;D0_K_PID_ALL_kaon;", 50, 0, 1);
+  m_h_D0_K_PID_SVD_kaon = new TH1F("hist_D0_K_PID_SVD_kaon", "D0_K_PID_SVD_kaon;D0_K_PID_SVD_kaon;", 50, 0, 1);
+  m_h_D0_K_PID_CDC_kaon = new TH1F("hist_D0_K_PID_CDC_kaon", "D0_K_PID_CDC_kaon;D0_K_PID_CDC_kaon;", 50, 0, 1);
+  m_h_D0_K_PID_TOP_kaon = new TH1F("hist_D0_K_PID_TOP_kaon", "D0_K_PID_TOP_kaon;D0_K_PID_TOP_kaon;", 50, 0, 1);
+  m_h_D0_K_PID_ARICH_kaon = new TH1F("hist_D0_K_PID_ARICH_kaon", "D0_K_PID_ARICH_kaon;D0_K_PID_ARICH_kaon;", 50, 0, 1);
+  m_h_D0_K_PID_ECL_kaon = new TH1F("hist_D0_K_PID_ECL_kaon", "D0_K_PID_ECL_kaon;D0_K_PID_ECL_kaon;", 50, 0, 1);
+  m_h_D0_K_PID_KLM_kaon = new TH1F("hist_D0_K_PID_KLM_kaon", "D0_K_PID_KLM_kaon;D0_K_PID_KLM_kaon;", 50, 0, 1);
+  m_h_sideband_D0_K_PID_ALL_kaon = new TH1F("hist_sideband_D0_K_PID_ALL_kaon", "D0_K_PID_ALL_kaon;D0_K_PID_ALL_kaon;", 50, 0, 1);
+  m_h_sideband_D0_K_PID_SVD_kaon = new TH1F("hist_sideband_D0_K_PID_SVD_kaon", "D0_K_PID_SVD_kaon;D0_K_PID_SVD_kaon;", 50, 0, 1);
+  m_h_sideband_D0_K_PID_CDC_kaon = new TH1F("hist_sideband_D0_K_PID_CDC_kaon", "D0_K_PID_CDC_kaon;D0_K_PID_CDC_kaon;", 50, 0, 1);
+  m_h_sideband_D0_K_PID_TOP_kaon = new TH1F("hist_sideband_D0_K_PID_TOP_kaon", "D0_K_PID_TOP_kaon;D0_K_PID_TOP_kaon;", 50, 0, 1);
+  m_h_sideband_D0_K_PID_ARICH_kaon = new TH1F("hist_sideband_D0_K_PID_ARICH_kaon", "D0_K_PID_ARICH_kaon;D0_K_PID_ARICH_kaon;", 50, 0,
                                               1);
-  m_h_sideband_D0_K_PID_ECL_kaon = new TH1F("m_h_sideband_D0_K_PID_ECL_kaon", "D0_K_PID_ECL_kaon;D0_K_PID_ECL_kaon;", 50, 0, 1);
-  m_h_sideband_D0_K_PID_KLM_kaon = new TH1F("m_h_sideband_D0_K_PID_KLM_kaon", "D0_K_PID_KLM_kaon;D0_K_PID_KLM_kaon;", 50, 0, 1);
+  m_h_sideband_D0_K_PID_ECL_kaon = new TH1F("hist_sideband_D0_K_PID_ECL_kaon", "D0_K_PID_ECL_kaon;D0_K_PID_ECL_kaon;", 50, 0, 1);
+  m_h_sideband_D0_K_PID_KLM_kaon = new TH1F("hist_sideband_D0_K_PID_KLM_kaon", "D0_K_PID_KLM_kaon;D0_K_PID_KLM_kaon;", 50, 0, 1);
 
   oldDir->cd();
 }

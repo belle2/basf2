@@ -81,6 +81,7 @@ namespace Belle2 {
   protected:
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
+    double m_scale_dst; /** Scale factor "signal region" / "sideband", assuming uniform events */
     Belle2::DQMFileMetaData* dqm_data = nullptr; /**< DQM file meta data */
     Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
     Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for mumu events */
@@ -93,7 +94,6 @@ namespace Belle2 {
     TCanvas* dst_mass = nullptr; /** TCanvas object for D0 mass, delta mass, and pi0 mass */
     TCanvas* pi_val = nullptr; /** TCanvas object for PID distributions of pi */
     TCanvas* k_val = nullptr; /** TCanvas object for PID distributions of K */
-    const double scale = 0.09375; /** Scale factor "signal region" / "sideband", assuming uniform events */
 
   };
 

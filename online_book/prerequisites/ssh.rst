@@ -941,8 +941,8 @@ also find keyboard shortcuts for most of them.
 
    Then ``ssh ccw01`` will also work from outside KEKCC.
 
-
 .. topic:: Author(s) of this lesson
 
      Martin Ritter,
      Michael Eliachevitch
+

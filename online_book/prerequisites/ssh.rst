@@ -944,5 +944,5 @@ also find keyboard shortcuts for most of them.
 
 .. topic:: Author(s) of this lesson
 
-     Martin Ritter
+     Martin Ritter,
      Michael Eliachevitch

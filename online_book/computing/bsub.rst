@@ -5,10 +5,6 @@ Batch submission
 .. sidebar:: Overview
    :class: overview
 
-..    **Teaching**: 10 min
-
-..    **Exercise**: 5 min
-
     **Prerequisites**:
         * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
 
@@ -22,7 +18,8 @@ Batch submission
 
 
 A batch job is submitted from a work server at KEKCC, the job is scheduled by 
-LSF (Platform Load Sharing Facility developed by IBM) which will dispatches 
+`LSF <https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_welcome/lsf_kc_using.html>`_ 
+(Platform Load Sharing Facility developed by IBM) which will dispatches 
 and executes the job on a calculation server. It is important to select an 
 appropriate queue for your jobs.
 In this lession, we will go through some commands that often used in analysis.
@@ -37,9 +34,9 @@ the queue.
 
 To display the information about all batch queues:
 
-.. code-block:: tcsh
+.. code-block:: bash
 
-   bqueues [-u <user name>|<user group>]
+   bqueues [-u $USER]
 
 If no option is given, this returns the following information about all 
 queues: queue name, queue priority, queue status, task statistics, and 
@@ -48,62 +45,114 @@ job state statistics.
 This command also displays the current "Fairshare" values. Fairshare 
 defines the priorities of jobs that are dispatched.
 
-.. code-block:: tcsh
+.. code-block:: bash
 
    bqueues -l [<queue_name>]
 
-.. admonition:: Excercise
-      :class: exercise stacked
+Here the square brackets [...] indicate that the argument is optional 
+and <...> indicates that the value should be filled in by you.
 
-      Check your priorities on queue s. 
+.. admonition:: Exercise
+   :class: exercise stacked
 
-.. admonition:: Hint
-      :class: toggle xhint
+   Check your priorities on queue s. 
 
-      Try to specify queue name to get the relevant information.
+.. admonition:: Solution
+   :class: toggle solution
+
+   .. code-block:: bash
+
+      bqueues -l s [| grep $USER]
+
+   Provide queue name after ``-l``, and combine with ``grep``
+   command to get your information more quickly.
+   If you never use batch queue before, it should be 0.333.
+
+
+Every uses has the default value of 0.333 to start with.
+The more jobs you submit, the lower your Fairshare is.
 
 
 .. rubric:: Submit a job
 
-To submit a basf2 job to a batch queue
+With an example script as
 
-.. code-block:: tcsh
+.. code-block:: bash
+
+   #!/usr/bin/bash
+   echo "Hello world, this is script ${0}." >> batch_output.txt
+   sleep 20
+   echo "Finished!" >> batch_output.txt
+
+To submit a job to queue s
+
+.. code-block:: bash
+
+   bsub -q s "bash example.sh"
+
+and check the output
+
+.. code-block:: bash
+
+   $cat batch_output.txt
+   Hello world, this is script example.sh.
+   Finished!
+
+Use the same method you can submit python or basf2 scripts to bqueues!
+
+.. code-block:: bash
 
    bsub -q <queue name> "basf2 <your_working_script>"
 
 .. note::
    Always test your script before submitting large scale of jobs to batch system.
 
+
 .. rubric:: Display job status
 
 To check the job status
 
-.. code-block:: tcsh
+.. code-block:: bash
 
    bjobs [-q <queue name>] [<job_ID>]
+
+.. admonition:: Exercise
+   :class: exercise stacked
+
+      Submit a basf2 job to queue l, and then check the status of your jobs.
+
+.. admonition:: Solution
+   :class: toggle solution
+
+      Submission:
+
+      .. code-block:: bash
+
+         $bsub -q l "basf2 one_of_example.py"
+         Job <xxxxxxxx> is submitted to queue <l>.
+
+      Check status:
+
+      .. code-block:: bash
+         $bjobs
+
 
 .. rubric:: Cancel a job
 
 To cancel jobs
 
-.. code-block:: tcsh
+.. code-block:: bash
 
    bkill [<job_ID>]
 
 .. note::
 
-   Use ``0`` to kill all jobs. Use with caution.
+   Use ``0`` to kill all jobs. Use this with caution.
 
-In the case that the following situations occurred:
-
-* When executed bkill command, there is a message "Job <JOBID> is being 
-terminated"
-* ``bjobs`` keeps showing the job that should have been terminated
-
-.. code-block:: tcsh
-
-   bkill -r <job_ID>
-
+Sometimes ``bjob``s will still show the job after we tried to terminate it. 
+In this case we can use the ``-r`` option to force kill it. 
+More information is given `here 
+<https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_users_guide/job_kill_force.html>_`.
 
 Optional
 --------
@@ -115,7 +164,7 @@ is located, or updating analysis global tags that used in your jobs.
 
 To suspend unfinished jobs
 
-.. code-block:: tcsh
+.. code-block:: bash
 
    bstop <job_ID>
 
@@ -127,7 +176,7 @@ To suspend unfinished jobs
 
    To resumes suspended jobs
 
-.. code-block:: tcsh
+.. code-block:: bash
 
       bresume <job_ID>
 

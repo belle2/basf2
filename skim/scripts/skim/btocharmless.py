@@ -53,12 +53,9 @@ class BtoPi0Pi0(BaseSkim):
 
     def build_lists(self, path):
         Bcuts = '5.24 < Mbc < 5.29 and abs(deltaE) < 0.5'
-        channels = ['pi0:charmlessFit pi0:charmlessFit']
         BsigList = []
-        for chID, channel in enumerate(channels):
-            ma.reconstructDecay('B0:Pi0Pi0' + ' -> ' +
-                                channel, Bcuts, chID, path=path)
-            BsigList.append(channel)
+        ma.reconstructDecay('B0:Pi0Pi0 -> pi0:charmlessFit pi0:charmlessFit', Bcuts, path=path)
+        BsigList.append('B0:Pi0Pi0')
         self.SkimLists = BsigList
 
 

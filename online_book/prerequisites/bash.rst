@@ -344,3 +344,8 @@ could also be written as:
     * exported variables are called environment variables
     * there are a few important environment variables like :envvar:`PATH`
     * variables in the current shell can be modified by sourcing a script.
+
+
+.. topic:: Author of this lesson
+
+     Martin Ritter

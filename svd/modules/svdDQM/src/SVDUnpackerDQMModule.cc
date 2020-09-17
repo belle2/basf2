@@ -180,14 +180,16 @@ void SVDUnpackerDQMModule::beginRun()
 
 void SVDUnpackerDQMModule::event()
 {
-  if (!m_svdDAQDiagnostics.isValid() && (!shutUpNoData)) {
-    B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
+  if (!m_svdDAQDiagnostics.isValid()) {
+    if (!shutUpNoData)
+      B2WARNING("There are no SVDDAQDiagnostic objects saved by the Unpacker! SVD Data Format Monitoring disabled!");
     shutUpNoData = true;
     return;
   }
 
-  if (!m_svdEventInfo.isValid() && (!shutUpNoData)) {
-    B2WARNING("There is no SVDEventInfo object saved by the Unpacker! SVD Data Format Monitoring disabled!");
+  if (!m_svdEventInfo.isValid()) {
+    if (!shutUpNoData)
+      B2WARNING("There is no SVDEventInfo object saved by the Unpacker! SVD Data Format Monitoring disabled!");
     shutUpNoData = true;
     return;
   }

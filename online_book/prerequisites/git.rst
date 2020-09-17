@@ -106,3 +106,8 @@ address you got with your account.
 
 We also have a `confluence page <https://confluence.desy.de/x/2o4iAg>`_ with
 more information and help in case of problems.
+
+
+.. topic:: Author of this lesson
+
+     Martin Ritter

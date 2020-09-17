@@ -346,7 +346,7 @@ class XToDp_DpToHpHmJp(BaseSkim):
     **Additional Cuts**:
 
     * ``Tracks: from the standard loose list``
-    * ``1.7 < M(D+) < 2.2, pcms(D+) > 2.3``
+    * ``1.7 < M(D+) < 2.2, pcms(D+) > 2.0``
     """
 
     __authors__ = ["Aman Sangal"]
@@ -359,7 +359,7 @@ class XToDp_DpToHpHmJp(BaseSkim):
         stdPi("loose", path=path)
 
     def build_lists(self, path):
-        Dpcuts = "1.7 < M < 2.2 and useCMSFrame(p) > 2.3"
+        Dpcuts = "1.7 < M < 2.2 and useCMSFrame(p) > 2.0"
 
         Dp_Channels = ["pi+:loose pi-:loose pi+:loose",
                        "pi+:loose pi-:loose K+:loose",

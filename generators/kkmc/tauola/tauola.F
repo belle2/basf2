@@ -38,13 +38,12 @@ C JAK=8 nPI  MODE
 C
 C     called by : DEXAY
 C ----------------------------------------------------------------------
-      COMMON / TAUBRA / GAMPRT(30),JLIST(30),NCHAN
-
-C      REAL   CUMUL(20)
-
-      REAL   CUMUL(30),RRR(1)
+      include 'TAUDCD_size.inc'
+      REAL*8            GAMPRT,SUM,CUMUL(NBMC)
+      COMMON / TAUBRA / GAMPRT(NBMC),JLIST(NBMC),NCHAN
+      REAL     RRR(1)
 C
-      IF(NCHAN.LE.0.OR.NCHAN.GT.30) GOTO 902
+      IF(NCHAN.LE.0.OR.NCHAN.GT.NBMC) GOTO 902
       CALL KKMC_RANMAR(RRR,1)
       SUM=0
       DO 20 I=1,NCHAN
@@ -84,6 +83,7 @@ C JAK=7 K*  DECAY
 C JAK=8 NPI DECAY
 C JAK=0 INCLUSIVE:  JAK=1,2,3,4,5,6,7,8
 
+      include 'TAUDCD_size.inc'
       REAL  H(4)
       REAL*8 HX(4)
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
@@ -91,12 +91,10 @@ C JAK=0 INCLUSIVE:  JAK=1,2,3,4,5,6,7,8
       COMMON / IDFC  / IDF
 
       COMMON /TAUPOS/ NP1,NP2                
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
-      PARAMETER (NMODE=15,NM1=0,NM2=1,NM3=8,NM4=2,NM5=1,NM6=3)
 
-      COMMON / TAUDCD /IDFFIN(9,NMODE),MULPIK(NMODE)
-
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
       COMMON / INOUT / INUT,IOUT
@@ -121,14 +119,14 @@ C       first or second tau positions in HEPEVT as in KORALB/Z
         IF(JAK1.NE.-1.OR.JAK2.NE.-1) THEN
           CALL DADMEL(-1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4,PDUM5)
           CALL DADMMU(-1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4,PDUM5)
-          CALL DADMPI(-1,IDUM,PDUM,PDUM1,PDUM2)
+          CALL DADMPI(-1,IDUM,HDUM,PDUM1,PDUM2)
           CALL DADMRO(-1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4)
           CALL DADMAA(-1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4,PDUM5,JDUM)
-          CALL DADMKK(-1,IDUM,PDUM,PDUM1,PDUM2)
+          CALL DADMKK(-1,IDUM,HDUM,PDUM1,PDUM2)
           CALL DADMKS(-1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4,JDUM)
           CALL DADNEW(-1,IDUM,HDUM,PDUM1,PDUM2,PDUMX,JDUM)
         ENDIF
-        DO 21 I=1,30
+        DO 21 I=1,NBMC
         NEVDEC(I)=0
         GAMPMC(I)=0
  21     GAMPER(I)=0
@@ -171,10 +169,10 @@ C     =======================
         IF(JAK1.NE.-1.OR.JAK2.NE.-1) THEN
           CALL DADMEL( 1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4,PDUM5)
           CALL DADMMU( 1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4,PDUM5)
-          CALL DADMPI( 1,IDUM,PDUM,PDUM1,PDUM2)
+          CALL DADMPI( 1,IDUM,HDUM,PDUM1,PDUM2)
           CALL DADMRO( 1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4)
           CALL DADMAA( 1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4,PDUM5,JDUM)
-          CALL DADMKK( 1,IDUM,PDUM,PDUM1,PDUM2)
+          CALL DADMKK( 1,IDUM,HDUM,PDUM1,PDUM2)
           CALL DADMKS( 1,IDUM,HDUM,PDUM1,PDUM2,PDUM3,PDUM4,JDUM)
           CALL DADNEW( 1,IDUM,HDUM,PDUM1,PDUM2,PDUMX,JDUM)
           WRITE(IOUT,7010) NEV1,NEV2,NEVTOT
@@ -258,10 +256,10 @@ C     =====
       SUBROUTINE DEKAY1(IMOD,HH,ISGN)
 C     *******************************
 C THIS ROUTINE  SIMULATES TAU+  DECAY
-
+      include 'TAUDCD_size.inc'
       COMMON / DECP4 / PP1(4),PP2(4),KF1,KF2
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
 
       REAL  HH(4)
@@ -312,7 +310,7 @@ C     =================
       ELSEIF(IMD.EQ.1) THEN
 C     =====================
       NEV=NEV+1
-        IF (JAK.LT.31) THEN
+        IF (JAK.LT.NBMC+1) THEN
            NEVDEC(JAK)=NEVDEC(JAK)+1
          ENDIF
       DO 34 I=1,4
@@ -364,10 +362,10 @@ C     =====
       SUBROUTINE DEKAY2(IMOD,HH,ISGN)
 C     *******************************
 C THIS ROUTINE  SIMULATES TAU-  DECAY
-
+      include 'TAUDCD_size.inc'
       COMMON / DECP4 / PP1(4),PP2(4),KF1,KF2
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
 
       REAL  HH(4)
@@ -417,7 +415,7 @@ C     =================
       ELSEIF(IMD.EQ.1) THEN
 C     =====================
       NEV=NEV+1
-        IF (JAK.LT.31) THEN
+        IF (JAK.LT.NBMC+1) THEN
            NEVDEC(JAK)=NEVDEC(JAK)+1
          ENDIF
       DO 34 I=1,4
@@ -480,15 +478,14 @@ C KTO=100, PRINT FINAL REPORT (OPTIONAL).
 C
 C     called by : KORALZ
 C ----------------------------------------------------------------------
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      include 'TAUDCD_size.inc'
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
       COMMON / IDFC  / IDFF
       COMMON /TAUPOS/ NP1,NP2                
-      PARAMETER (NMODE=15,NM1=0,NM2=1,NM3=8,NM4=2,NM5=1,NM6=3)
 
-      COMMON / TAUDCD /IDFFIN(9,NMODE),MULPIK(NMODE)
-
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
       COMMON / INOUT / INUT,IOUT
@@ -521,7 +518,7 @@ C       first or second tau positions in HEPEVT as in KORALB/Z
           CALL DEXKS(-1,IDUM,PDUM,PDUM1,PDUM2,PDUM3,PDUM4,IDUM)
           CALL DEXNEW(-1,IDUM,PDUM,PDUM1,PDUM2,PDUMI,IDUM)
         ENDIF
-        DO 21 I=1,30
+        DO 21 I=1,NBMC
         NEVDEC(I)=0
         GAMPMC(I)=0
  21     GAMPER(I)=0
@@ -638,7 +635,8 @@ C THIS ROUTINE  SIMULATES TAU+-  DECAY
 C
 C     called by : DEXAY
 C ---------------------------------------------------------------------
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      include 'TAUDCD_size.inc'
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
       COMMON / INOUT / INUT,IOUT
       REAL  POL(4),POLAR(4)
@@ -772,6 +770,7 @@ C ----------------------------------------------------------------------
 C
 C     called by : DEXEL,(DEKAY,DEKAY1)
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
@@ -781,7 +780,7 @@ C
       REAL*4            AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
 
       REAL*4         PHX(4)
@@ -878,6 +877,7 @@ C     =====
       END
       SUBROUTINE DADMMU(MODE,ISGN,HHV,PNU,PWB,Q1,Q2,PHX)
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -887,7 +887,7 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
       COMMON / INOUT / INUT,IOUT
       REAL*4         PHX(4)
@@ -1440,6 +1440,7 @@ C     =====
       END
       SUBROUTINE DADMPI(MODE,ISGN,HV,PPI,PNU)
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -1449,7 +1450,7 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
       COMMON / INOUT / INUT,IOUT
       REAL  PPI(4),PNU(4),HV(4)
@@ -1555,6 +1556,7 @@ C     =====
       END
       SUBROUTINE DADMRO(MODE,ISGN,HHV,PNU,PRO,PIC,PIZ)
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -1564,7 +1566,7 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
       COMMON / INOUT / INUT,IOUT
       REAL  HHV(4)
@@ -1791,6 +1793,7 @@ C     =====
 C ----------------------------------------------------------------------
 * A1 DECAY UNWEIGHTED EVENTS
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -1800,7 +1803,7 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
       COMMON / INOUT / INUT,IOUT
       REAL  HHV(4)
@@ -1925,8 +1928,7 @@ C TYPE OF THE GENERATION:
        AMP2=AMPIZ
        AMP3=AMPI
       ENDIF
-      CALL
-     $   DPHTRE(DGAMT,HV,PN,PAA,PIM1,AMP1,PIM2,AMP2,PIPL,AMP3,KEYT,MNUM)
+      CALL DPHTRE(DGAMT,HV,PN,PAA,PIM1,AMP1,PIM2,AMP2,PIPL,AMP3,KEYT,MNUM)
       END
       SUBROUTINE DEXKK(MODE,ISGN,POL,PKK,PNU)
 C ----------------------------------------------------------------------
@@ -1962,7 +1964,7 @@ C     =====
       SUBROUTINE DADMKK(MODE,ISGN,HV,PKK,PNU)
 C ----------------------------------------------------------------------
 C FZ
-
+      include 'TAUDCD_size.inc'
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
 
@@ -1975,7 +1977,7 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST
 
 
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
       COMMON / INOUT / INUT,IOUT
       REAL  PKK(4),PNU(4),HV(4)
@@ -2088,6 +2090,7 @@ C     =====
       END
       SUBROUTINE DADMKS(MODE,ISGN,HHV,PNU,PKS,PKK,PPI,JKST)
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -2097,7 +2100,7 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
       COMMON / TAUKLE / BRA1,BRK0,BRK0B,BRKS
       REAL*4            BRA1,BRK0,BRK0B,BRKS
@@ -2389,6 +2392,7 @@ C ----------------------------------------------------------------------
 C IT SIMULATES MULTIPI DECAY IN TAU REST FRAME WITH
 C Z-AXIS OPPOSITE TO NEUTRINO MOMENTUM
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -2398,9 +2402,7 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
-      PARAMETER (NMODE=15,NM1=0,NM2=1,NM3=8,NM4=2,NM5=1,NM6=3)
-
-      COMMON / TAUDCD /IDFFIN(9,NMODE),MULPIK(NMODE)
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
       REAL*8 WETMAX(20)
@@ -2427,7 +2429,7 @@ C
      $  SQRT(MAX(0.D0,(A**2-(B+C)**2)*(A**2-(B-C)**2)))/(2.D0*A)
 
 C
-      AMPIK(I,J)=DCDMAS(IDFFIN(I,J))
+      AMPIK(I,J)=DCDMAS(IDFFIN(I,J),0)
 C
 C
 
@@ -2655,6 +2657,8 @@ C
       DATA INIT / 0 /                                                   
 C                          
         JNPI=JNP
+        IF(JNPI.GT.6) JNPI=6  ! warning we have no input for higher masses but we want
+                              ! dummy runs. This is to make it possible and trivial
         IF(JNP.EQ.4) JNPI=3                                             
         IF(JNP.EQ.3) JNPI=4
       IF(INIT.EQ.0) THEN                                                
@@ -2801,10 +2805,8 @@ C ----------------------------------------------------------------------
 * IT SIMULATES THREE PI (K) DECAY IN THE TAU REST FRAME
 * Z-AXIS ALONG HADRONIC SYSTEM
 C ----------------------------------------------------------------------
-      PARAMETER (NMODE=15,NM1=0,NM2=1,NM3=8,NM4=2,NM5=1,NM6=3)
-
-      COMMON / TAUDCD /IDFFIN(9,NMODE),MULPIK(NMODE)
-
+      include 'TAUDCD_size.inc'
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
 
@@ -2815,23 +2817,17 @@ C TYPE OF THE GENERATION:
       KEYT=4
       IF(JAA.EQ.7) KEYT=3
 C --- MASSES OF THE DECAY PRODUCTS
-       AMP1=DCDMAS(IDFFIN(1,JAA+NM4+NM5+NM6))
-       AMP2=DCDMAS(IDFFIN(2,JAA+NM4+NM5+NM6))
-       AMP3=DCDMAS(IDFFIN(3,JAA+NM4+NM5+NM6))
-      CALL
-     $   DPHTRE(DGAMT,HV,PN,PAA,PIM1,AMP1,PIM2,AMP2,PIPL,AMP3,KEYT,MNUM)
-            DO I=1,4
-              PNPI(I,1)=PIM1(I)
-              PNPI(I,2)=PIM2(I)
-              PNPI(I,3)=PIPL(I)
-            ENDDO
+      AMP1=DCDMAS(IDFFIN(1,JAA+NM4+NM5+NM6),0)
+      AMP2=DCDMAS(IDFFIN(2,JAA+NM4+NM5+NM6),0)
+      AMP3=DCDMAS(IDFFIN(3,JAA+NM4+NM5+NM6),0)
+      CALL DPHTRE(DGAMT,HV,PN,PAA,PIM1,AMP1,PIM2,AMP2,PIPL,AMP3,KEYT,MNUM)
+      DO I=1,4
+         PNPI(I,1)=PIM1(I)
+         PNPI(I,2)=PIM2(I)
+         PNPI(I,3)=PIPL(I)
+      ENDDO
       END
-
-
-
-
-      SUBROUTINE
-     $   DPHTRE(DGAMT,HV,PN,PAA,PIM1,AMPA,PIM2,AMPB,PIPL,AMP3,KEYT,MNUM)
+      SUBROUTINE DPHTRE(DGAMT,HV,PN,PAA,PIM1,AMPA,PIM2,AMPB,PIPL,AMP3,KEYT,MNUM)
 C ----------------------------------------------------------------------
 * IT SIMULATES A1  DECAY IN TAU REST FRAME WITH
 * Z-AXIS ALONG A1  MOMENTUM
@@ -3724,6 +3720,7 @@ C     =====
       END
       SUBROUTINE DADNEW(MODE,ISGN,HV,PNU,PWB,PNPI,JNPI)
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
@@ -3733,13 +3730,11 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
-      COMMON / TAUBMC / GAMPMC(30),GAMPER(30),NEVDEC(30)
+      COMMON / TAUBMC / GAMPMC(NBMC),GAMPER(NBMC),NEVDEC(NBMC)
       REAL*4            GAMPMC    ,GAMPER
 
       COMMON / INOUT / INUT,IOUT
-      PARAMETER (NMODE=15,NM1=0,NM2=1,NM3=8,NM4=2,NM5=1,NM6=3)
-
-      COMMON / TAUDCD /IDFFIN(9,NMODE),MULPIK(NMODE)
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
 
@@ -4278,7 +4273,7 @@ C
 	 	HADCUR(I) = HADCUR(I) + HADCUR1(I)
 	    ENDDO	
          ELSEIF(MNUM.EQ.2) THEN
-
+            IMOD = -1
             CALL CURR_BINP(MNUM,IMOD,PIM4,PIM3,PIM1,PIM2,HADCUR)
 
          ENDIF
@@ -4307,6 +4302,7 @@ C ----------------------------------------------------------------------
 * IT SIMULATES 5pi DECAY IN TAU REST FRAME WITH                         
 * Z-AXIS ALONG 5pi MOMENTUM                                             
 C ----------------------------------------------------------------------
+      include 'TAUDCD_size.inc'
       COMMON / PARMAS / AMTAU,AMNUTA,AMEL,AMNUE,AMMU,AMNUMU             
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1                
      *                 ,AMK,AMKZ,AMKST,GAMKST                           
@@ -4318,10 +4314,8 @@ C
      *                 ,AMK,AMKZ,AMKST,GAMKST                           
       COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL                
       REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL                
-      PARAMETER (NMODE=15,NM1=0,NM2=1,NM3=8,NM4=2,NM5=1,NM6=3)
 
-      COMMON / TAUDCD /IDFFIN(9,NMODE),MULPIK(NMODE)
-
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
       REAL  HV(4),PT(4),PN(4),PAA(4),PMULT(4,9) 
@@ -4355,11 +4349,11 @@ C D**3 P /2E/(2PI)**3 (2PI)**4 DELTA4(SUM P)
       PHSPAC=1./2**29/PI**14                                            
 c     PHSPAC=1./2**5/PI**2                                              
 C init 5pi decay mode (JNPI)                                            
-      AMP1=DCDMAS(IDFFIN(1,JNPI))
-      AMP2=DCDMAS(IDFFIN(2,JNPI))
-      AMP3=DCDMAS(IDFFIN(3,JNPI))
-      AMP4=DCDMAS(IDFFIN(4,JNPI))
-      AMP5=DCDMAS(IDFFIN(5,JNPI))
+      AMP1=DCDMAS(IDFFIN(1,JNPI),0)
+      AMP2=DCDMAS(IDFFIN(2,JNPI),0)
+      AMP3=DCDMAS(IDFFIN(3,JNPI),0)
+      AMP4=DCDMAS(IDFFIN(4,JNPI),0)
+      AMP5=DCDMAS(IDFFIN(5,JNPI),0)
 c                                                                       
 C TAU MOMENTUM                                                          
       PT(1)=0.                                                          
@@ -5127,10 +5121,8 @@ C
 C     called by : DEXAY,(DEKAY1,DEKAY2)
 C ----------------------------------------------------------------------
 C
-      PARAMETER (NMODE=15,NM1=0,NM2=1,NM3=8,NM4=2,NM5=1,NM6=3)
-
-      COMMON / TAUDCD /IDFFIN(9,NMODE),MULPIK(NMODE)
-
+      include 'TAUDCD_size.inc'
+      COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       COMMON /TAUPOS/ NP1,NP2
       CHARACTER NAMES(NMODE)*31
@@ -5792,7 +5784,7 @@ C 1    format(1x,a5)
       end
       SUBROUTINE TAUR3(MNUM,PT,PN,PIM1,PIM2,PIPL,AMPLIT,HV,DGAMT)
 C case of 3 scalars
-      REAL  PT(4),PN(4),PIM1(4),PIM2(4),PIPL(4),HV(4)
+      REAL  PT(4),PN(4),PIM1(4),PIM2(4),PIPL(4),HV(4),PIM3(4),PIM4(4)
       CALL TAUR(MNUM,3,PT,PN,PIM1,PIM2,PIPL,PIM3,PIM4,AMPLIT,HV,DGAMT)
       END
 

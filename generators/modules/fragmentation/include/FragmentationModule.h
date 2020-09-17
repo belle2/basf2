@@ -59,8 +59,18 @@ namespace Belle2 {
 
   protected:
 
-    Pythia8::Pythia* pythia; /**< PYTHIA generator. */
-    Pythia8::Event* PythiaEvent; /**< PYTHIA event. */
+    /**
+     * Load EvtGen particle data.
+     * @param[in,out] pythia Pythia generator.
+     */
+    void loadEvtGenParticleData(Pythia8::Pythia* pythia);
+
+    /** Pythia generator. */
+    Pythia8::Pythia* m_Pythia = nullptr;
+
+    /** Pythia event. */
+    Pythia8::Event* m_PythiaEvent = nullptr;
+
     EvtGenDecays* evtgen; /**< EvtGen decay engine inside PYTHIA8 */
 
     /** Module parameters */

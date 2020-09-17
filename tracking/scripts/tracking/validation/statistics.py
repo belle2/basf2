@@ -84,6 +84,7 @@ def is_binary_series(xs):
     is_one_or_zero = np.all((xs == 0) | (xs == 1) | ~np.isfinite(xs))
     return is_one_or_zero
 
+
 #: Constant defining how many unique values are allowed for a discrete quantity.
 default_max_n_unique_for_discrete = 20
 

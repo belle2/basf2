@@ -90,22 +90,14 @@ namespace Belle2 {
         }
       } else if (CSFull == 3) {
         if ((projU.getSize() == 2) && (projV.getSize() == 2)) {
-          int MisU;                  // missing pixel in "L" cluster - u marker
-          int MisV;                  // missing pixel in "L" cluster - v marker
-          int MissingU;              // missing pixel in "L" cluster - u
-          int MissingV;              // missing pixel in "L" cluster - v
-          MisU = 0;
-          MisV = 0;
+          int MisU = 0;                  // missing pixel in "L" cluster - u marker
+          int MisV = 0;                  // missing pixel in "L" cluster - v marker
           fCategU /= 3.0;
           fCategV /= 3.0;
-          MissingU = (int)fCategU;
           if ((fCategU - (int)fCategU) < 0.5) {
-            MissingU++;
             MisU = 1;
           }
-          MissingV = (int)fCategV;
           if ((fCategV - (int)fCategV) < 0.5) {
-            MissingV++;
             MisV = 1;
           }
           if ((MisU == 1) && (MisV == 1)) {

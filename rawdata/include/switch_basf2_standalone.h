@@ -6,8 +6,9 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <climits>
 #include <errno.h>
-#include <unistd.h>
 #define B2FATAL(a) {std::cerr << a << std::endl; exit(1);}
 #else
 #include <framework/logging/Logger.h>

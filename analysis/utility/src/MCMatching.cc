@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <unordered_set>
@@ -548,7 +549,7 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
       flags |= c_MissNeutrino;
     } else { //neither photon nor neutrino -> massive
       flags |= c_MissMassiveParticle;
-      if (absGeneratedPDG == 130)
+      if (absGeneratedPDG == Const::Klong.getPDGCode())
         flags |= c_MissKlong;
     }
   }

@@ -1,3 +1,5 @@
+.. _analysis:
+
 ========
 Analysis
 ========
@@ -54,6 +56,7 @@ There are also some more specialised python wrapper functions for vertex-fitting
 .. toctree:: Vertex
 .. toctree:: PhotonWrappers
 
+.. _analysis_variables:
 
 Variables
 =========

@@ -9,15 +9,8 @@
 #ifndef RAWTLU_H
 #define RAWTLU_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-
 #include <rawdata/dataobjects/RawDataBlock.h>
 #include <rawdata/dataobjects/RawTLUFormat.h>
-#include <framework/datastore/DataStore.h>
-
-#include <TObject.h>
 
 namespace Belle2 {
 

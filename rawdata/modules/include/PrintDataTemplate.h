@@ -9,14 +9,8 @@
 #ifndef PRINTDATATEMPLATE_H
 #define PRINTDATATEMPLATE_H
 
-#include <stdlib.h>
-#include <string>
-#include <vector>
-
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-
-//#include <daq/dataflow/EvtSocket.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -38,22 +32,6 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawPXD.h>
 #include <rawdata/dataobjects/RawTRG.h>
-
-//#include <daq/rawdata/modules/DAQConsts.h>
-
-/* #include <daq/dataobjects/SendHeader.h> */
-/* #include <daq/dataobjects/SendTrailer.h> */
-
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-#include <sys/resource.h>
-
-#include <sys/uio.h>
-
 
 
 namespace Belle2 {

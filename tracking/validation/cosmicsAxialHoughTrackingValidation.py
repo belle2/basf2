@@ -9,19 +9,16 @@
 </header>
 """
 
+from tracking.validation.run import TrackingValidationRun
+import logging
+import trackfindingcdc.cdcdisplay as cdcdisplay
+import os
+import basf2
 VALIDATION_OUTPUT_FILE = 'CosmicsAxialHoughTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = False
 
-import basf2
 basf2.set_random_seed(1337)
-
-import os
-import trackfindingcdc.cdcdisplay as cdcdisplay
-
-import logging
-
-from tracking.validation.run import TrackingValidationRun
 
 
 class CosmicsAxialHough(TrackingValidationRun):
@@ -70,6 +67,7 @@ class CosmicsAxialHough(TrackingValidationRun):
 def main():
     validation_run = CosmicsAxialHough()
     validation_run.configure_and_execute_from_commandline()
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

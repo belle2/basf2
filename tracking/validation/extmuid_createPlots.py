@@ -22,8 +22,8 @@
 
 import ROOT
 
-ROOT.PyConfig.IgnoreCommandLineOptions = True
-ROOT.gROOT.SetBatch(True)
+ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
+ROOT.gROOT.SetBatch(True)  # noqa
 
 from ROOT import TFile, TChain, TTree, TH1F, TH2F, TCanvas, TNamed, gStyle
 import sys
@@ -516,6 +516,7 @@ def draw_likelihoods(file_chain):
     fakerate_momentum.Write()
     fakerate_theta.Write()
     fakerate_phi.Write()
+
 
 ####################################################################
 # Entry point of this script: call the main() function             #

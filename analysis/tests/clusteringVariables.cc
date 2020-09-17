@@ -667,11 +667,11 @@ namespace {
 
     // initialise the lists
     kLongList.create();
-    kLongList->initialize(130, kLongList.getName());
+    kLongList->initialize(Const::Klong.getPDGCode(), kLongList.getName());
     muonsList.create();
-    muonsList->initialize(13, muonsList.getName());
+    muonsList->initialize(Const::muon.getPDGCode(), muonsList.getName());
     amuonsList.create();
-    amuonsList->initialize(-13, amuonsList.getName());
+    amuonsList->initialize(-Const::muon.getPDGCode(), amuonsList.getName());
     amuonsList->bindAntiParticleList(*(muonsList));
 
     // add some tracks

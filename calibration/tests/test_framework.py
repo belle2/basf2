@@ -3,9 +3,6 @@ import os
 import shutil
 import glob
 
-# show only Errors as we'll be setting off a lot of ugly deliberate warnings
-set_log_level(LogLevel.ERROR)
-
 import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm as PXDAlgo
@@ -15,6 +12,9 @@ from caf.backends import Local
 
 import unittest
 from unittest import TestCase
+
+# show only Errors as we'll be setting off a lot of ugly deliberate warnings
+set_log_level(LogLevel.ERROR)
 
 
 class TestCalibrationClass_Configure(TestCase):

@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDTimeReconstruction::getStripTime(TString timeAlgo = "fromRecoDBObject")
+    std::pair<int, double> SVDTimeReconstruction::getFirstFrameAndStripTime(TString timeAlgo = "fromRecoDBObject")
     {
 
       StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
@@ -46,16 +46,16 @@ namespace Belle2 {
 
       if (m_timeAlgorithms.find(stripTimeReco) != m_timeAlgorithms.end()) {
         if (stripTimeReco.EqualTo("CoG6"))
-          return getCoG6Time();
+          return std::make_pair(0, getCoG6Time());
         if (stripTimeReco.EqualTo("CoG3"))
-          return getCoG3Time();
+          return getCoG3FirstFrameAndTime();
         if (stripTimeReco.EqualTo("ELS3"))
-          return getELS3Time();
+          return getELS3FirstFrameAndTime();
       }
 
       //we should NEVER get here, if we do, we should check better at the step before (SVDRecoDigitCreator or cluster reconstruction classes
       B2WARNING("strip time algorithm specified in SVDRecoConfiguration not found, using CoG6");
-      return getCoG6Time();
+      return std::make_pair(0, getCoG6Time());
 
     }
 
@@ -101,7 +101,8 @@ namespace Belle2 {
     double SVDTimeReconstruction::getCoG6Time()
     {
 
-      m_firstFrame = 0;
+      //check if we can continue
+      weCanContinue();
 
       //calculate weighted average
       float time = 0;
@@ -118,9 +119,14 @@ namespace Belle2 {
         B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
       }
 
+      //check cellID
+      if (isnan(m_cellID) || isnan(m_triggerBin))
+        B2FATAL("OOPS, we can't continue, you are probably using the wrong SVDReconstructionBase constructor");
+
       // correct by the CalPeak
       time -= m_PulseShapeCal.getPeakTime(m_vxdID, m_isUside, m_cellID);
-      // calibrate
+
+      // calibrate (cellID not used)
       time =  m_CoG6TimeCal.getCorrectedTime(m_vxdID, m_isUside, m_cellID, time, m_triggerBin);
 
       return time;
@@ -128,6 +134,10 @@ namespace Belle2 {
 
     double SVDTimeReconstruction::getCoG6TimeError()
     {
+
+      //check if we can continue
+      weCanContinue();
+
       //assuming that:
       // 1. noise of the samples are totally UNcorrelated (correct in MC)
       // 2. error on sampling time is negligible
@@ -142,7 +152,18 @@ namespace Belle2 {
         tmpResSq += TMath::Power(k * m_apvClockPeriod -  getCoG6Time(), 2);
       }
 
+      if (isnan(m_averageNoiseInADC))
+        B2FATAL("OOPS, we can't continue, you have to set the average noise!");
+
       double rawTimeError = m_averageNoiseInADC / Atot * TMath::Sqrt(tmpResSq);
+
+      //cellID not used for calibration
+      if (isnan(m_cellID))
+        m_cellID = 1;
+
+      if (isnan(m_triggerBin))
+        B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+
 
       double timeError = m_CoG6TimeCal.getCorrectedTimeError(m_vxdID, m_isUside, m_cellID, getCoG6Time(),
                                                              rawTimeError, m_triggerBin);
@@ -151,12 +172,16 @@ namespace Belle2 {
 
     }
 
-    double SVDTimeReconstruction::getCoG3Time()
+    std::pair<int, double> SVDTimeReconstruction::getCoG3FirstFrameAndTime()
     {
+
+      //check if we can continue
+      weCanContinue();
+
 
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
+      int firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
 
       auto begin = selectedSamples.begin();
@@ -169,20 +194,29 @@ namespace Belle2 {
       }
       float rawtime = retval / norm;
 
+      if (isnan(m_cellID))
+        m_cellID = 1;
+
+      if (isnan(m_triggerBin))
+        B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+
+      //cellID not used for calibration
       double time = m_CoG3TimeCal.getCorrectedTime(m_vxdID, m_isUside, m_cellID, rawtime, m_triggerBin);
 
-      return time;
+      return std::make_pair(firstFrame, time);
 
     }
 
     double SVDTimeReconstruction::getCoG3TimeError()
     {
+
+      //check if we can continue
+      weCanContinue();
+
       //NOTE: computed with the same algorithm as COG6 strip raw time error, does not take into account calibration!
 
       //take the MaxSum 3 samples
-      //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
 
       auto begin = selectedSamples.begin();
@@ -196,7 +230,7 @@ namespace Belle2 {
 
       for (auto step = 0.; begin != end; ++begin, step += m_apvClockPeriod) {
         Atot += static_cast<double>(*begin);
-        tmpResSq += TMath::Power(step - getCoG3Time(), 2);
+        tmpResSq += TMath::Power(step - getCoG3FirstFrameAndTime().second, 2);
       }
 
       //compute average noise
@@ -206,17 +240,25 @@ namespace Belle2 {
 
       aveNoise = TMath::Sqrt(aveNoise);
       */
+
+      if (isnan(m_averageNoiseInADC))
+        B2FATAL("OOPS, we can't continue, you have to set the average noise!");
+
       return m_averageNoiseInADC / Atot * TMath::Sqrt(tmpResSq);
 
     }
 
 
-    double SVDTimeReconstruction::getELS3Time()
+    std::pair<int, double> SVDTimeReconstruction::getELS3FirstFrameAndTime()
     {
+
+      //check if we can continue
+      weCanContinue();
+
 
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
+      int firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
 
       auto begin = selectedSamples.begin();
@@ -235,9 +277,16 @@ namespace Belle2 {
 
       float rawtime = - m_apvClockPeriod * num / den;
 
+      //cellID is not used for calibration
+      if (isnan(m_cellID))
+        m_cellID = 1;
+
+      if (isnan(m_triggerBin))
+        B2FATAL("OOPS, we can't continue, you have to set the trigger bin!");
+
       double time = m_ELS3TimeCal.getCorrectedTime(m_vxdID, m_isUside, m_cellID, rawtime, m_triggerBin);
 
-      return time;
+      return std::make_pair(firstFrame, time);
 
     }
 
@@ -245,9 +294,11 @@ namespace Belle2 {
     double SVDTimeReconstruction::getELS3TimeError()
     {
 
+      //check if we can continue
+      weCanContinue();
+
       //take the MaxSum 3 samples
       SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(m_samples);
-      m_firstFrame = maxSum.getFirstFrame();
       std::vector<float> selectedSamples = maxSum.getSelectedSamples();
       auto begin = selectedSamples.begin();
 
@@ -285,6 +336,9 @@ namespace Belle2 {
 
       //error on a0,a1,a2 are equal (independent on the sample)
       //computing delta_a = sum in quadrature of the noise in electrons of the strips in the cluster = m_averageNoise
+
+      if (isnan(m_averageNoiseInADC))
+        B2FATAL("OOPS, we can't continue, you have to set the average noise!");
 
       double timeError = std::abs(m_averageNoiseInADC * dTdw) * std::sqrt(dwda0 * dwda0 + dwda1 * dwda1 + dwda2 * dwda2);
       //      B2INFO("m_averageNoise = " << m_averageNoiseInADC << ", dTdw = " << dTdw << ", dwda0 = " << dwda0 << ", dwda1 = " << dwda1 << ", dwda2 = " << dwda2);

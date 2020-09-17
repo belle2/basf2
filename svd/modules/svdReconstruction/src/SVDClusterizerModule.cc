@@ -311,15 +311,16 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
   // cluster time computation
   if (m_numberOfAcquiredSamples == 6) {
-    m_time6SampleClass->setRawCluster(rawCluster);
-    time = m_time6SampleClass->getClusterTime();
-    timeError = m_time6SampleClass->getClusterTimeError();
-    firstFrame = m_time6SampleClass->getFirstFrame();
+
+    std::pair<int, double> FFandTime = m_time6SampleClass->getFirstFrameAndClusterTime(rawCluster);
+    firstFrame = FFandTime.first;
+    time = FFandTime.second;
+    timeError = m_time6SampleClass->getClusterTimeError(rawCluster);
   } else if (m_numberOfAcquiredSamples == 3) {
-    m_time3SampleClass->setRawCluster(rawCluster);
-    time = m_time3SampleClass->getClusterTime();
-    timeError = m_time3SampleClass->getClusterTimeError();
-    firstFrame = m_time3SampleClass->getFirstFrame();
+    std::pair<int, double> FFandTime = m_time3SampleClass->getFirstFrameAndClusterTime(rawCluster);
+    firstFrame = FFandTime.first;
+    time = FFandTime.second;
+    timeError = m_time3SampleClass->getClusterTimeError(rawCluster);
   } else
     B2ERROR("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
 
@@ -336,13 +337,11 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
   // cluster charge computation
   if (m_numberOfAcquiredSamples == 6) {
-    m_charge6SampleClass->setRawCluster(rawCluster);
-    charge = m_charge6SampleClass->getClusterCharge();
-    seedCharge = m_charge6SampleClass->getClusterSeedCharge();
+    charge = m_charge6SampleClass->getClusterCharge(rawCluster);
+    seedCharge = m_charge6SampleClass->getClusterSeedCharge(rawCluster);
   } else if (m_numberOfAcquiredSamples == 3) {
-    m_charge3SampleClass->setRawCluster(rawCluster);
-    charge = m_charge3SampleClass->getClusterCharge();
-    seedCharge = m_charge3SampleClass->getClusterSeedCharge();
+    charge = m_charge3SampleClass->getClusterCharge(rawCluster);
+    seedCharge = m_charge3SampleClass->getClusterSeedCharge(rawCluster);
   } else
     B2ERROR("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
 

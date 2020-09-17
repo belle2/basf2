@@ -10,7 +10,7 @@
 
 #include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDCoG3Time.h>
-#include <TMath.h>
+#include <svd/reconstruction/SVDTimeReconstruction.h>
 
 using namespace std;
 
@@ -18,62 +18,34 @@ namespace Belle2 {
 
   namespace SVD {
 
-    int SVDCoG3Time::getFirstFrame()
-    {
-      return m_rawCluster.getMaxSum3Samples().first;
-    }
-
-    double SVDCoG3Time::getClusterTime()
+    std::pair<int, double> SVDCoG3Time::getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster)
     {
 
-      //take the MaxSum 3 samples
-      std::vector<float> clustered3s = m_rawCluster.getMaxSum3Samples().second;
-      auto begin = clustered3s.begin();
-      const auto end = clustered3s.end();
+      bool inElectrons = false;
 
-      auto retval = 0., norm = 0.;
-      for (auto step = 0.; begin != end; ++begin, step += m_apvClockPeriod) {
-        norm += static_cast<double>(*begin);
-        retval += static_cast<double>(*begin) * step;
-      }
-      float rawtime = retval / norm;
+      SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(rawCluster.getClsSamples(inElectrons),
+                                                                  rawCluster.getSensorID(), rawCluster.isUSide());
 
-      double time = m_CoG3TimeCal.getCorrectedTime(m_vxdID, m_isUside, -1, rawtime, m_triggerBin);
+      timeReco->setTriggerBin(m_triggerBin);
 
-      return time;
+      return timeReco->getCoG3FirstFrameAndTime();
 
     }
 
-
-    double SVDCoG3Time::getClusterTimeError()
+    double SVDCoG3Time::getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster)
     {
 
-      //NOTE: computed with the same algorithm as COG6 strip raw time error, does not take into account calibration!
 
-      //take the MaxSum 3 samples
-      std::vector<float> clustered3s = m_rawCluster.getMaxSum3Samples().second;
-      auto begin = clustered3s.begin();
-      const auto end = clustered3s.end();
+      bool inElectrons = false;
 
+      SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(rawCluster.getClsSamples(inElectrons),
+                                                                  rawCluster.getSensorID(), rawCluster.isUSide());
 
-      //sum of samples amplitudes
-      float Atot = 0;
-      //sum of time residuals squared
-      float tmpResSq = 0;
+      timeReco->setTriggerBin(m_triggerBin);
 
-      for (auto step = 0.; begin != end; ++begin, step += m_apvClockPeriod) {
-        Atot += static_cast<double>(*begin);
-        tmpResSq += TMath::Power(step - getClusterTime(), 2);
-      }
+      double timeError = timeReco->getCoG3TimeError();
 
-      //compute average noise
-      int aveNoise = 0;
-      for (auto s : m_rawCluster.getStripsInRawCluster())
-        aveNoise += s.noise * s.noise;
-
-      aveNoise = TMath::Sqrt(aveNoise);
-
-      return aveNoise / Atot * TMath::Sqrt(tmpResSq);
+      return  timeError;
 
     }
 

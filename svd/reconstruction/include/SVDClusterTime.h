@@ -31,74 +31,31 @@ namespace Belle2 {
       SVDClusterTime() {};
 
       /**
-       * set the RawCluster, including vxdID and isUside
-       */
-      void setRawCluster(const Belle2::SVD::RawCluster& rawCluster)
-      {
-        m_rawCluster = rawCluster;
-        m_vxdID = m_rawCluster.getSensorID();
-        m_isUside = m_rawCluster.isUSide();
-      };
-
-      /**
        * set the trigger bin
        */
       void setTriggerBin(const int triggerBin)
       { m_triggerBin = triggerBin; };
 
-
       /**
-       * get the first frame
+       * @return the first frame and the cluster time
        */
-      virtual int getFirstFrame() = 0;
-
-      /**
-       * @return the cluster time
-       */
-      virtual double getClusterTime() = 0;
+      virtual std::pair<int, double> getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster) = 0;
 
       /**
        * @return the cluster time error
        */
-      virtual double getClusterTimeError() = 0;
+      virtual double getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster) = 0;
 
       /**
        * virtual destructor
        */
       virtual ~SVDClusterTime() {};
 
-      /**
-       * @return the VxdID of the cluster sensor
-       */
-      VxdID getSensorID() {return m_vxdID;}
-
-      /**
-       * @return true if the cluster is on the U/P side
-       */
-      bool isUSide() {return m_isUside;}
-
-      /**
-       * @return APV clock in ns
-       */
-      double getAPVClockPeriod() {return m_apvClockPeriod;}
-
 
     protected:
 
-      /** APV clock period*/
-      double m_apvClockPeriod = 16000. / 509;
-
       /** trigger bin */
-      int m_triggerBin = -1;
-
-      /** raw cluster used to compute the time*/
-      Belle2::SVD::RawCluster m_rawCluster;
-
-      /** VxdID of the cluster */
-      VxdID m_vxdID = 0;
-
-      /** side of the cluster */
-      bool m_isUside = 0;
+      int m_triggerBin = std::numeric_limits<int>::quiet_NaN();
 
     };
 

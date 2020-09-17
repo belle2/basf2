@@ -30,19 +30,19 @@ namespace Belle2 {
     public:
 
       /**
-       * @return the first frame
+       * @return the first frame and the cluster time
        */
-      int getFirstFrame() override;
-
-      /**
-       * @return the cluster time
-       */
-      double getClusterTime() override;
+      std::pair<int, double> getFirstFrameAndClusterTime(const Belle2::SVD::RawCluster& rawCluster) override;
 
       /**
        * @return the cluster time error
        */
-      double getClusterTimeError() override;
+      double getClusterTimeError(const Belle2::SVD::RawCluster& rawCluster) override;
+
+      /**
+       * virtual destructor
+       */
+      virtual ~SVDCoG3Time() {};
 
 
     private:

@@ -34,27 +34,17 @@ namespace Belle2 {
       SVDClusterCharge() {};
 
       /**
-       * set the RawCluster, including vxdID and isUside
-       */
-      void setRawCluster(const Belle2::SVD::RawCluster& rawCluster)
-      {
-        m_rawCluster = rawCluster;
-        m_vxdID = m_rawCluster.getSensorID();
-        m_isUside = m_rawCluster.isUSide();
-      };
-
-      /**
        * @return the cluster seed charge  (as strip max sample)
        */
-      double getClusterSeedCharge()
+      double getClusterSeedCharge(const Belle2::SVD::RawCluster& rawCluster)
       {
 
-        std::vector<Belle2::SVD::stripInRawCluster> strips = m_rawCluster.getStripsInRawCluster();
+        std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
-        double rawSeedCharge = m_rawCluster.getSeedMaxSample();
-        double seedCellID = strips.at(m_rawCluster.getSeedInternalIndex()).cellID;
+        double rawSeedCharge = rawCluster.getSeedMaxSample();
+        double seedCellID = strips.at(rawCluster.getSeedInternalIndex()).cellID;
 
-        double seedCharge = m_PulseShapeCal.getChargeFromADC(m_vxdID, m_isUside, seedCellID, rawSeedCharge);
+        double seedCharge = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), seedCellID, rawSeedCharge);
 
         return seedCharge;
 
@@ -63,40 +53,23 @@ namespace Belle2 {
       /**
        * @return the cluster charge
        */
-      virtual double getClusterCharge() = 0;
+      virtual double getClusterCharge(const Belle2::SVD::RawCluster& rawCluster) = 0;
 
       /**
        * @return the cluster charge error
        * the SVDCluster does not have the chargeError data member
        * but this method maybe useful for position error estimate
        */
-      virtual double getClusterChargeError() = 0;
+      virtual double getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster) = 0;
 
       /**
        * virtual destructor
        */
       virtual ~SVDClusterCharge() {};
 
-      /**
-       * @return the VxdID of the cluster sensor
-       */
-      VxdID getSensorID() {return m_vxdID;}
-
-      /**
-       * @return true if the cluster is on the U/P side
-       */
-      bool isUSide() {return m_isUside;}
 
     protected:
 
-      /** raw cluster used to compute the charge*/
-      Belle2::SVD::RawCluster m_rawCluster;
-
-      /** VxdID of the cluster */
-      VxdID m_vxdID = 0;
-
-      /** side of the cluster */
-      bool m_isUside = 0;
 
       /**SVDPulseShaper calibration wrapper*/
       SVDPulseShapeCalibrations m_PulseShapeCal;

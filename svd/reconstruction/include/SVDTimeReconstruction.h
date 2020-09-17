@@ -25,26 +25,31 @@ namespace Belle2 {
     public:
 
       /**
+       * all constructors implemented in SVDReconstructionBase are available
+       */
+      template<class ... T> explicit SVDTimeReconstruction(T ... args): SVDReconstructionBase(args ...) {};
+
+      /**
        * virtual destructor
        */
       virtual ~SVDTimeReconstruction() {};
 
-      /** get strip time as set in SVDRecoConfiguration payload if timeAlgo = inRecoDBObjcte*/
-      double getStripTime(TString timeAlgo);
-      /** get strip time error as set in SVDRecoConfiguration payload if timeAlgo = inRecoDBObjcte*/
+      /** get first frame and strip time as set in SVDRecoConfiguration payload if timeAlgo = inRecoDBObject*/
+      std::pair<int, double> getFirstFrameAndStripTime(TString timeAlgo);
+      /** get strip time error as set in SVDRecoConfiguration payload if timeAlgo = inRecoDBObject*/
       double getStripTimeError(TString timeAlgo);
-
-      /**get first frame*/
-      int getFirstFrame() { return m_firstFrame; };
 
       /** CoG6 Time */
       double getCoG6Time();
+      /** CoG6 Time error*/
       double getCoG6TimeError();
-      /** CoG3 Time */
-      double getCoG3Time();
+      /** CoG3 First Frame and Time */
+      std::pair<int, double> getCoG3FirstFrameAndTime();
+      /** CoG3 Time error*/
       double getCoG3TimeError();
-      /** ELS3 Time */
-      double getELS3Time();
+      /** ELS3 First Frame Time */
+      std::pair<int, double> getELS3FirstFrameAndTime();
+      /** ELS3 Time error */
       double getELS3TimeError();
 
     };

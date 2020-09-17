@@ -30,19 +30,20 @@ namespace Belle2 {
     public:
 
       /**
-       * @return the cluster raw charge
+       * virtual destructor
        */
-      double getClusterRawCharge();
+      virtual ~SVDELS3Charge() {};
+
 
       /**
        * @return the cluster charge
        */
-      double getClusterCharge() override;
+      double getClusterCharge(const Belle2::SVD::RawCluster& rawCluster) override;
 
       /**
        * @return the cluster charge error
        */
-      double getClusterChargeError() override;
+      double getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster) override;
 
     };
 

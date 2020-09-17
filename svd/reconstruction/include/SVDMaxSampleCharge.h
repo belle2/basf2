@@ -28,30 +28,20 @@ namespace Belle2 {
     public:
 
       /**
-       * @return the strip charge
-       */
-      double getStripCharge(int indexInRawCluster);
-
-      /**
-       * @return the strip charge error
-       */
-      double getStripChargeError(int indexInRawCluster);
-
-      /**
        * @return the cluster charge
        */
-      double getClusterCharge() override;
+      double getClusterCharge(const Belle2::SVD::RawCluster& rawCluster) override;
 
       /**
        * @return the cluster charge error
        */
-      double getClusterChargeError() override;
+      double getClusterChargeError(const Belle2::SVD::RawCluster& rawCluster) override;
 
 
       /**
        * virtual destructor
        */
-      //      virtual ~SVDMaxSampleCharge();
+      virtual ~SVDMaxSampleCharge() {};
 
 
     };

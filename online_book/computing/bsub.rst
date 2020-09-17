@@ -119,7 +119,7 @@ To check the job status
 .. admonition:: Exercise
    :class: exercise stacked
 
-      Submit a basf2 job to queue l, and then check the status of your jobs.
+      Submit a basf2 job to queue ``l``, and then check the status of your jobs.
 
 .. admonition:: Solution
    :class: toggle solution
@@ -157,9 +157,9 @@ More information is given `here
 
 Optional
 --------
-In some case you might want to stop the submitted jobs and resume them later, 
-for instance, scheduled maintenance of storage elements where the input data 
-is located, or updating analysis global tags that used in your jobs.
+In some scenarios you might want to stop the submitted jobs and resume them 
+later, for instance, scheduled maintenance of storage elements where the input 
+data is located, or updating analysis global tags that used in your jobs.
 
 .. rubric:: Suspend jobs
 
@@ -173,9 +173,10 @@ To suspend unfinished jobs
 
    Use -a to suspend all jobs.
 
+
 .. rubric:: Resume jobs
 
-   To resumes suspended jobs
+To resumes suspended jobs
 
 .. code-block:: bash
 

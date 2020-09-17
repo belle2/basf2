@@ -94,7 +94,7 @@ and check the output
 
 .. code-block:: bash
 
-   $cat batch_output.txt
+   $ cat batch_output.txt
    Hello world, this is script example.sh.
    Finished!
 
@@ -128,12 +128,13 @@ To check the job status
 
       .. code-block:: bash
 
-         $bsub -q l "basf2 one_of_example.py"
+         $ bsub -q l "basf2 one_of_example.py"
          Job <xxxxxxxx> is submitted to queue <l>.
 
       Check status:
 
       .. code-block:: bash
+
          $bjobs
 
 
@@ -149,10 +150,10 @@ To cancel jobs
 
    Use ``0`` to kill all jobs. Use this with caution.
 
-Sometimes ``bjob``s will still show the job after we tried to terminate it. 
+Sometimes ``bjob`` will still show the job after we tried to terminate it. 
 In this case we can use the ``-r`` option to force kill it. 
 More information is given `here 
-<https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_users_guide/job_kill_force.html>_`.
+<https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_users_guide/job_kill_force.html>`_.
 
 Optional
 --------

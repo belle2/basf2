@@ -193,20 +193,20 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "If set true hits marked as auxiliary (e.g. hits in higher loops) will not be included in the track candidate.",
            m_discardAuxiliaryHits);
 
-  addParam("useSuperLayers",
-           m_param_useSuperLayers,
+  addParam("useCDCSuperLayers",
+           m_param_useCDCSuperLayers,
            "List of CDC super layers to be used.",
-           m_param_useSuperLayers);
+           m_param_useCDCSuperLayers);
 
-  addParam("useLayers",
-           m_param_useLayers,
+  addParam("useCDCLayers",
+           m_param_useCDCLayers,
            "List of CDC layers to be used.",
-           m_param_useLayers);
+           m_param_useCDCLayers);
 
-  addParam("ignoreLayers",
-           m_param_ignoreLayers,
-           "List of layers to be ignored, e.g. in cases of broken electronics or high noise.",
-           m_param_ignoreLayers);
+  addParam("ignoreCDCLayers",
+           m_param_ignoreCDCLayers,
+           "List of CDC layers to be ignored, e.g. in cases of broken electronics or high noise.",
+           m_param_ignoreCDCLayers);
 
 
 
@@ -282,17 +282,17 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
     }
   }
 
-  if (not m_param_useSuperLayers.empty()) {
-    for (unsigned short useSuperLayer : m_param_useSuperLayers) {
-      m_useSuperLayers.at(useSuperLayer) = true;
+  if (not m_param_useCDCSuperLayers.empty()) {
+    for (unsigned short useSuperLayer : m_param_useCDCSuperLayers) {
+      m_useCDCSuperLayers.at(useSuperLayer) = true;
     }
   } else {
-    m_useSuperLayers.fill(true);
+    m_useCDCSuperLayers.fill(true);
   }
 
   // Check for common value in the two vectors for using / ignoring layers
-  for (unsigned short useLayer : m_param_useLayers) {
-    for (unsigned short ingoreLayer : m_param_ignoreLayers) {
+  for (unsigned short useLayer : m_param_useCDCLayers) {
+    for (unsigned short ingoreLayer : m_param_ignoreCDCLayers) {
       if (useLayer == ingoreLayer) {
         B2FATAL("You chose to use and ignore CDC layer " << useLayer << " at the same time. "
                 "Please decide to either use or to ignore the layer.");
@@ -301,17 +301,17 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
   }
 
   // fill all layers that should be used
-  if (not m_param_useLayers.empty()) {
-    for (unsigned short layer : m_param_useLayers) {
-      m_useLayers.at(layer) = true;
+  if (not m_param_useCDCLayers.empty()) {
+    for (unsigned short layer : m_param_useCDCLayers) {
+      m_useCDCLayers.at(layer) = true;
     }
   } else {
-    m_useLayers.fill(true);
+    m_useCDCLayers.fill(true);
   }
   // set layers that should be ignored to false
-  if (not m_param_ignoreLayers.empty()) {
-    for (unsigned short layer : m_param_ignoreLayers) {
-      m_useLayers.at(layer) = false;
+  if (not m_param_ignoreCDCLayers.empty()) {
+    for (unsigned short layer : m_param_ignoreCDCLayers) {
+      m_useCDCLayers.at(layer) = false;
     }
   }
 
@@ -706,9 +706,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
           const CDCHit* cdcHit = relatedHits.object(i);
 
           unsigned short superLayerId = cdcHit->getISuperLayer();
-          if (not m_useSuperLayers[superLayerId]) continue;
+          if (not m_useCDCSuperLayers[superLayerId]) continue;
           unsigned short layerID = cdcHit->getICLayer();
-          if (not m_useLayers[layerID]) continue;
+          if (not m_useCDCLayers[layerID]) continue;
 
           // continue if this is a 2nd CDC hit information and we do not want to use it
           if (!m_useSecondCDCHits && cdcHit->is2ndHit()) {

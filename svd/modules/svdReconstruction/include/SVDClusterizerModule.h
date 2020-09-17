@@ -17,6 +17,7 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterTime.h>
 #include <svd/reconstruction/SVDClusterCharge.h>
+#include <svd/reconstruction/SVDClusterPosition.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -103,11 +104,17 @@ namespace Belle2 {
       std::string m_chargeRecoWith6SamplesAlgorithm = "not set";
       /**string storing the cluster charge reconstruction algorithm in 3-sample DAQ mode*/
       std::string m_chargeRecoWith3SamplesAlgorithm = "not set";
+      /** string storing the cluster position reconstruction algorithm in 6-sample DAQ mode*/
+      std::string m_positionRecoWith6SamplesAlgorithm = "not set";
+      /**string storing the cluster position reconstruction algorithm in 3-sample DAQ mode*/
+      std::string m_positionRecoWith3SamplesAlgorithm = "not set";
 
       SVDClusterTime* m_time6SampleClass = nullptr; /**< cluster time class for the 6-sample acquisition mode*/
       SVDClusterTime* m_time3SampleClass = nullptr; /**< cluster time class for the 3-sample acquisition mode*/
       SVDClusterCharge* m_charge6SampleClass = nullptr; /**< cluster charge class for the 6-sample acquisition mode*/
       SVDClusterCharge* m_charge3SampleClass = nullptr; /**< cluster charge class for the 3-sample acquisition mode*/
+      SVDClusterPosition* m_position6SampleClass = nullptr; /**< cluster position class for the 6-sample acquisition mode*/
+      SVDClusterPosition* m_position3SampleClass = nullptr; /**< cluster position class for the 3-sample acquisition mode*/
 
 
       // 4. Calibration Objects

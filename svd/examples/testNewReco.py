@@ -41,6 +41,8 @@ class SVDClustersQuickCheck(basf2.Module):
         self.ffNew = TH1F("clNew_ff", "New Cluster FirstFrame", 4, -0.4, 3.5)
         self.charge = TH1F("cl_charge", "Cluster Charge", 300, 0, 100000)
         self.chargeNew = TH1F("clNew_charge", "New Cluster Charge", 300, 0, 100000)
+        self.position = TH1F("cl_position", "Cluster Position", 3000, -6, 6)
+        self.positionNew = TH1F("clNew_position", "New Cluster Position", 3000, -6, 6)
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -73,6 +75,7 @@ class SVDClustersQuickCheck(basf2.Module):
             self.time.Fill(d.getClsTime())
             self.ff.Fill(d.getFirstFrame())
             self.charge.Fill(d.getCharge())
+            self.position.Fill(d.getPosition())
             isU = 0
             if(d.isUCluster()):
                 isU = 0.5
@@ -84,6 +87,7 @@ class SVDClustersQuickCheck(basf2.Module):
             self.timeNew.Fill(d.getClsTime())
             self.ffNew.Fill(d.getFirstFrame())
             self.chargeNew.Fill(d.getCharge())
+            self.positionNew.Fill(d.getPosition())
             isU = 0
             if(d.isUCluster()):
                 isU = 0.5
@@ -120,6 +124,11 @@ class SVDClustersQuickCheck(basf2.Module):
         self.charge.Write()
         self.chargeNew.GetXaxis().SetTitle("clusterNew charge")
         self.chargeNew.Write()
+
+        self.position.GetXaxis().SetTitle("cluster position")
+        self.position.Write()
+        self.positionNew.GetXaxis().SetTitle("clusterNew position")
+        self.positionNew.Write()
 
         f.Close()
 
@@ -228,27 +237,39 @@ add_svd_reconstruction(main)
 for mod in main.modules():
     if(mod.name() == "SVDSimpleClusterizer"):
         mod.param("timeAlgorithm", 0)
+        mod.param("HeadTailSize", 100)
 
 clusterizer = register_module('SVDClusterizer')
 clusterizer.param('timeAlgorithm6Samples', "CoG6")
 clusterizer.param('timeAlgorithm3Samples', "CoG6")
 clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
 clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
+clusterizer.param('positionAlgorithm6Samples', "CoGOnly")
+clusterizer.param('positionAlgorithm3Samples', "CoGOnly")
 clusterizer.param('Clusters', "SVDNewClusters")
 clusterizer.param('useDB', True)
 main.add_module(clusterizer)
 
 recoDigitCreator = register_module('SVDRecoDigitCreator')
-recoDigitCreator.param('timeAlgorithm6Samples', "CoG3")
-recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
+recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
+recoDigitCreator.param('timeAlgorithm3Samples', "CoG3")
 recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
 recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
 recoDigitCreator.param('RecoDigits', "SVDNewRecoDigits")
-recoDigitCreator.param('useDB', False)
+recoDigitCreator.param('useDB', True)
 main.add_module(recoDigitCreator)
 
+'''
+simpleclusterizer = register_module('SVDSimpleClusterizer')
+simpleclusterizer.set_name("secondSVDSimpleClusterizer")
+simpleclusterizer.param('RecoDigits', "SVDNewRecoDigits")
+simpleclusterizer.param('Clusters', "SVDSimpleClusters")
+simpleclusterizer.param('useDB', True)
+main.add_module(simpleclusterizer)
+'''
 main.add_module(SVDClustersQuickCheck())
 main.add_module(SVDRecoDigitsQuickCheck())
+
 
 '''
 add_tracking_reconstruction(

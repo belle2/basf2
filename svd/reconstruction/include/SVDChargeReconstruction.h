@@ -40,9 +40,9 @@ namespace Belle2 {
       void setSamplesAreInElectrons() {m_samplesAreInElectrons = true;};
 
       /** get strip charge as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObject*/
-      double getStripCharge(TString chargeAlgo);
+      double getStripCharge(TString chargeAlgo = "fromRecoDBObject");
       /** get strip charge error as set in SVDRecoConfiguration payload if chargeAlgo = inRecoDBObject*/
-      double getStripChargeError(TString chargeAlgo);
+      double getStripChargeError(TString chargeAlgo = "fromRecoDBObject");
 
       /** CoG6 Charge */
       double getMaxSampleCharge();

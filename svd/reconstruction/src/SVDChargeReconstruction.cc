@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDChargeReconstruction::getStripCharge(TString chargeAlgo = "fromRecoDBObject")
+    double SVDChargeReconstruction::getStripCharge(TString chargeAlgo)
     {
 
       StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
@@ -54,11 +54,11 @@ namespace Belle2 {
       }
 
       //we should NEVER get here, if we do, we should check better at the step before (SVDRecoDigitCreator or cluster reconstruction classes)
-      B2WARNING("strip charge algorithm specified in SVDRecoConfiguration not found, using MaxSample");
+      B2WARNING("strip charge algorithm specified in SVDRecoConfiguration " << stripChargeReco << " not found, using MaxSample");
       return getMaxSampleCharge();
     }
 
-    double SVDChargeReconstruction::getStripChargeError(TString chargeAlgo = "fromRecoDBObject")
+    double SVDChargeReconstruction::getStripChargeError(TString chargeAlgo)
     {
 
       StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
@@ -92,7 +92,7 @@ namespace Belle2 {
       }
 
       //we should NEVER get here, if we do, we should check better at the step before (SVDRecoDigitCreator or cluster reconstruction classes)
-      B2WARNING("strip charge algorithm specified in SVDRecoConfiguration not found, using MaxSample");
+      B2WARNING("strip charge algorithm specified in SVDRecoConfiguration " << stripChargeReco << " not found, using MaxSample");
 
       return getMaxSampleChargeError();
 

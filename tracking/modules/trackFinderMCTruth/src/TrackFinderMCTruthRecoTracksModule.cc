@@ -193,6 +193,21 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "If set true hits marked as auxiliary (e.g. hits in higher loops) will not be included in the track candidate.",
            m_discardAuxiliaryHits);
 
+  addParam("useSuperLayers",
+           m_param_useSuperLayers,
+           "List of CDC super layers to be used.",
+           m_param_useSuperLayers);
+
+  addParam("useLayers",
+           m_param_useLayers,
+           "List of CDC layers to be used.",
+           m_param_useLayers);
+
+  addParam("ignoreLayers",
+           m_param_ignoreLayers,
+           "List of layers to be ignored, e.g. in cases of broken electronics or high noise.",
+           m_param_ignoreLayers);
+
 
 
 }
@@ -266,6 +281,40 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
       B2FATAL("Both relative smearing (Smearing) and using a smearing cov (SmearingCov) is activated but only one of both can be used");
     }
   }
+
+  if (not m_param_useSuperLayers.empty()) {
+    for (unsigned short useSuperLayer : m_param_useSuperLayers) {
+      m_useSuperLayers.at(useSuperLayer) = true;
+    }
+  } else {
+    m_useSuperLayers.fill(true);
+  }
+
+  // Check for common value in the two vectors for using / ignoring layers
+  for (unsigned short useLayer : m_param_useLayers) {
+    for (unsigned short ingoreLayer : m_param_ignoreLayers) {
+      if (useLayer == ingoreLayer) {
+        B2FATAL("You chose to use and ignore CDC layer " << useLayer << " at the same time. "
+                "Please decide to either use or to ignore the layer.");
+      }
+    }
+  }
+
+  // fill all layers that should be used
+  if (not m_param_useLayers.empty()) {
+    for (unsigned short layer : m_param_useLayers) {
+      m_useLayers.at(layer) = true;
+    }
+  } else {
+    m_useLayers.fill(true);
+  }
+  // set layers that should be ignored to false
+  if (not m_param_ignoreLayers.empty()) {
+    for (unsigned short layer : m_param_ignoreLayers) {
+      m_useLayers.at(layer) = false;
+    }
+  }
+
 }
 
 void TrackFinderMCTruthRecoTracksModule::beginRun()
@@ -656,6 +705,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
           const CDCHit* cdcHit = relatedHits.object(i);
 
+          unsigned short superLayerId = cdcHit->getISuperLayer();
+          if (not m_useSuperLayers[superLayerId]) continue;
+          unsigned short layerID = cdcHit->getICLayer();
+          if (not m_useLayers[layerID]) continue;
+
           // continue if this is a 2nd CDC hit information and we do not want to use it
           if (!m_useSecondCDCHits && cdcHit->is2ndHit()) {
             continue;
@@ -681,7 +735,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
           // if flag is set discard all auxiliary hits:
           if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
-          int superLayerId = cdcHit->getISuperLayer();
 
           const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
           if (not aCDCSimHitPtr) {

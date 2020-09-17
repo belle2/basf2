@@ -75,6 +75,16 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 "List of super layers to be used - mostly for debugging",
                                 m_param_useSuperLayers);
 
+  moduleParamList->addParameter(prefixed(prefix, "useLayers"),
+                                m_param_useLayers,
+                                "List of layers to be used.",
+                                m_param_useLayers);
+
+  moduleParamList->addParameter(prefixed(prefix, "ignoreLayers"),
+                                m_param_ignoreLayers,
+                                "List of layers to be ignored, e.g. in cases of broken electronics or high noise.",
+                                m_param_ignoreLayers);
+
   moduleParamList->addParameter(prefixed(prefix, "useSecondHits"),
                                 m_param_useSecondHits,
                                 "Use the second hit information in the track finding.",
@@ -143,6 +153,31 @@ void WireHitCreator::initialize()
     }
   } else {
     m_useSuperLayers.fill(true);
+  }
+
+  // Check for common value in the two vectors for using / ignoring layers
+  for (unsigned short useLayer : m_param_useLayers) {
+    for (unsigned short ingoreLayer : m_param_ignoreLayers) {
+      if (useLayer == ingoreLayer) {
+        B2FATAL("You chose to use and ignore CDC layer " << useLayer << " at the same time. "
+                "Please decide to either use or to ignore the layer.");
+      }
+    }
+  }
+
+  // fill all layers that should be used
+  if (not m_param_useLayers.empty()) {
+    for (unsigned short layer : m_param_useLayers) {
+      m_useLayers.at(layer) = true;
+    }
+  } else {
+    m_useLayers.fill(true);
+  }
+  // set layers that should be ignored to false
+  if (not m_param_ignoreLayers.empty()) {
+    for (unsigned short layer : m_param_ignoreLayers) {
+      m_useLayers.at(layer) = false;
+    }
   }
 
   if (std::isfinite(std::get<0>(m_param_useDegreeSector))) {
@@ -214,6 +249,8 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
     ISuperLayer iSL = wireID.getISuperLayer();
     if (not m_useSuperLayers[iSL]) continue;
+    unsigned short layer = wireID.getICLayer();
+    if (not m_useLayers[layer]) continue;
 
     const CDCWire& wire = wireTopology.getWire(wireID);
 

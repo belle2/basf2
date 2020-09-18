@@ -194,17 +194,17 @@ class InclusiveLambda(BaseSkim):
     ``nCDCHits > 20``
     ``nSVDHits < 13``
     ``trackFitHypothesisPDG == 2212``
-    ``protonID > f1(p)``
+    ``protonID > 0.1``
     * pion:
     ``nCDCHits > 0``
     * Lambda:
-    ``p > 0.4``
     ``cosAngleBetweenMomentumAndVertexVector > 0.99``
-    ``flightDistance/flightDistanceErr > f2(p)
+    ``flightDistance/flightDistanceErr > 3.``
     * ``0.6 < p,proton/p,Lambda < 1.0 GeV/c``
 
     f1(p) and f2(p) are analytical functions, p being the Lambda momentum
-    (see https://indico.belle2.org/event/2419/contributions/12005/attachments/6228/9670/BottomoniumHyperons_B2GM.pdf)
+    (see https://indico.belle2.org/event/2419/contributions/12005/attachments/6228/9670/BottomoniumHyperons_B2GM.pdf
+    and https://indico.belle2.org/event/2467/contributions/13962/attachments/7240/11226/Skim_inclusiveLambda.pdf)
     """
     __authors__ = ["Bianca Scavino"]
     __description__ = "Inclusive Lambda skim"
@@ -228,13 +228,10 @@ class InclusiveLambda(BaseSkim):
         # Apply selection to Lambdas
         ma.applyCuts("Lambda0:merged", "nCDCHits_proton > 20 and nSVDHits_proton < 13 and fitHypo_proton == 2212", path=path)
         ma.applyCuts("Lambda0:merged", "nCDCHits_pion > 0", path=path)
-        ma.applyCuts("Lambda0:merged", "p > 0.4 and cosAngleBetweenMomentumAndVertexVector > 0.99", path=path)
+        ma.applyCuts("Lambda0:merged", "cosAngleBetweenMomentumAndVertexVector > 0.99", path=path)
         ma.applyCuts("Lambda0:merged", "0.6 < momRatio_protonLambda < 1.", path=path)
-        ma.applyCuts(
-            "Lambda0:merged",
-            "flightSignificance > formula(0.5946689 + 9.23346371*p - 3.62779178*p**2 + 0.39111658*p**3)",
-            path=path)
-        ma.applyCuts("Lambda0:merged", "protonID_proton > formula(5.48275333**(-1.*p) + 0.11802824)", path=path)
+        ma.applyCuts("Lambda0:merged", "flightSignificance > 3.", path=path)
+        ma.applyCuts("Lambda0:merged", "protonID_proton > 0.1", path=path)
 
         # Return the lists.
         self.SkimLists = ["Lambda0:merged"]

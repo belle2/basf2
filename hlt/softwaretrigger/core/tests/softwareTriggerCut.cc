@@ -118,7 +118,7 @@ namespace Belle2 {
       cut = SoftwareTriggerCut::compile("1 == 1", 10);
       uint32_t numberOfYes = 0;
       uint32_t numberOfNo = 0;
-      // Since the counter starts with 1, we expect (729/10)+1 yes.
+      // Since the counter starts with 0, we expect (729/10)+1 yes.
       for (uint32_t i = 0; i < 729; i++) {
         const auto cutResult = cut->check(object, false, i).first;
         EXPECT_NE(SoftwareTriggerCutResult::c_reject, cutResult);

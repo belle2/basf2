@@ -203,3 +203,7 @@ in the repository (verify this by pulling!).
    Check if there are any other open PRs. If there are, leave some comments!
    You can also add yourself as the reviewer and approve them.
 
+.. topic:: Authors of this lesson
+
+     Kilian Lieret, 
+     Martin Ritter

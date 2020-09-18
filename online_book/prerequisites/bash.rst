@@ -1,18 +1,20 @@
 .. _onlinebook_bash:
 
-Command Line Toturial (Bash)
+Command Line Tutorial (Bash)
 ============================
 
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: external tutorial + 30 min
+    **External training**: 4h30
 
-    **Exercises**: external tutorial + 10 min
+    **Teaching**: 30 min
+
+    **Exercises**: 10 min
 
     **Prerequisites**:
 
-    	* None
+        * None
 
     **Questions**:
 
@@ -284,7 +286,7 @@ most important ones are:
 
 .. envvar:: EDITOR
 
-    Lets you set your preferred editor to start when a progam needs a text editor.
+    Lets you set your preferred editor to start when a program needs a text editor.
     Can be set to the executable of any editor you would like to use by default.
 
 .. rubric:: Modifying Environment Variables in the Shell
@@ -342,3 +344,8 @@ could also be written as:
     * exported variables are called environment variables
     * there are a few important environment variables like :envvar:`PATH`
     * variables in the current shell can be modified by sourcing a script.
+
+
+.. topic:: Author of this lesson
+
+     Martin Ritter

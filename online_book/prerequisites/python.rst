@@ -81,3 +81,8 @@ here when you are done.
     :alt: Programming with Python
 
 .. needed from our side: Opening ROOT files; using pandas
+
+
+.. topic:: Author of this lesson
+
+     Martin Ritter

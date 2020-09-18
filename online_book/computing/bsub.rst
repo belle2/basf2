@@ -69,7 +69,7 @@ Different queues have different settings. For analysis, you can use ``s``,
 you might consider to use queue ``l``, which gives jobs up to 48 hours
 running time.
 More information about LSF queues can be found 
-`here <https://kekcc.kek.jp/service/kekcc/html/Eng/BatchQueueList.html>`_.
+`here <https://kekcc.kek.jp/service/kekcc/html/Eng/BatchQueueList.html>`__.
 
 This command also displays the current "Fairshare" values. Fairshare 
 defines the priorities of jobs that are dispatched.
@@ -190,7 +190,7 @@ To cancel jobs
 Sometimes ``bjob`` will still show the job after we tried to terminate it. 
 In this case we can use the ``-r`` option to force kill it. 
 More information is given `here 
-<https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_users_guide/job_kill_force.html>`_.
+<https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_users_guide/job_kill_force.html>`__.
 
 Optional
 --------

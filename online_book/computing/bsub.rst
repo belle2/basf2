@@ -1,4 +1,4 @@
-.. _onlinebook_batch:
+.. _onlinebook_bsub:
 
 Batch submission
 ================
@@ -6,6 +6,7 @@ Batch submission
    :class: overview
 
     **Prerequisites**:
+
         * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
 
     **Questions**:
@@ -41,6 +42,34 @@ To display the information about all batch queues:
 If no option is given, this returns the following information about all 
 queues: queue name, queue priority, queue status, task statistics, and 
 job state statistics.
+
+.. code-block:: bash
+
+   $ bqueues -u $USER
+   QUEUE_NAME      PRIO STATUS          MAX JL/U JL/P JL/H NJOBS  PEND   RUN  SUSP
+   s               120  Open:Active    3000  600    -    - 30885 28774  2111     0
+   l               100  Open:Active       - 1000    -    - 39959 29395 10564     0
+   h               100  Open:Active    1500  300    -    -  1719  1416   303     0
+   p               100  Open:Active    1500  300    -    -   577     0   577     0
+   sx              100  Open:Active       -  200    -    -  2185  1986   199     0
+   lx              100  Open:Active       -  200    -    -     2     0     2     0
+   hx              100  Open:Active     300   60    -    -     0     0     0     0
+   px              100  Open:Active     300  100    -    -     0     0     0     0
+   P1              100  Open:Active       -    -    -    -     0     0     0     0
+   Pmpi            100  Open:Active       -    -    -    -     0     0     0     0
+   b_b             100  Open:Active       - 1000    -    -     0     0     0     0
+   cmb_p           100  Open:Active       -  300    -    -     0     0     0     0
+   cmb_px          100  Open:Active       -  100    -   10     0     0     0     0
+   a               100  Open:Active       -    4    -    -    11     3     8     0
+   dc_generic      100  Open:Active       -    -    -    -     0     0     0     0
+
+Different queues have different settings. For analysis, you can use ``s``, 
+``l``, or ``h``. For short jobs with running time under 6 hours, th queue 
+``s`` is perferable. For jobs with execution time more than 6 hours, 
+you might consider to use queue ``l``, which gives jobs up to 48 hours
+running time.
+More information about LSF queues can be found 
+`here <https://kekcc.kek.jp/service/kekcc/html/Eng/BatchQueueList.html>`_.
 
 This command also displays the current "Fairshare" values. Fairshare 
 defines the priorities of jobs that are dispatched.
@@ -119,7 +148,18 @@ To check the job status
 .. admonition:: Exercise
    :class: exercise stacked
 
-      Submit a basf2 job to queue ``l``, and then check the status of your jobs.
+      Submit a ``basf2`` job to queue ``l``, and then check the status of your jobs.
+
+.. admonition:: Hint
+   :class: xhint stacked toggle
+
+   A simple ``basf2`` job could be the following:
+   
+   .. code-block:: python
+
+      # Print all variables known to the variable manager
+      from variables import printVars
+      printVars()
 
 .. admonition:: Solution
    :class: toggle solution
@@ -131,12 +171,9 @@ To check the job status
          $ bsub -q l "basf2 one_of_example.py"
          Job <xxxxxxxx> is submitted to queue <l>.
 
-      Check status:
+      Check status use one of the followings:
 
-      .. code-block:: bash
-
-         $bjobs
-
+      ``bjobs -q l <xxxxxxxx>``, ``bjobs <xxxxxxxx>``, or just ``bjobs`` alone.
 
 .. rubric:: Cancel a job
 

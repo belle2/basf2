@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #include <hlt/softwaretrigger/core/utilities.h>
 #include <TRandom.h>
 

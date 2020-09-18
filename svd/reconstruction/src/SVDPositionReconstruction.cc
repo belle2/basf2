@@ -58,9 +58,9 @@ namespace Belle2 {
     double SVDPositionReconstruction::getCoGPositionError()
     {
 
-      const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-      const VXD::SensorInfoBase& info = geo.getSensorInfo(m_vxdID);
-      double pitch = m_isUside ? info.getUPitch() : info.getVPitch();
+      //      const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+      //      const VXD::SensorInfoBase& info = geo.getSensorInfo(m_vxdID);
+      //      double pitch = m_isUside ? info.getUPitch() : info.getVPitch();
 
       double positionError = 0;
 

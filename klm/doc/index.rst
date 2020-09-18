@@ -60,17 +60,18 @@ There are separate PDFs for each charged-particle hypothesis and charge and for 
 * The *longitudinal-profile* PDF value :math:`P_{L}(\vec{x}; O, l, H)` for extrapolation ending outcome :math:`O` and outermost layer :math:`l` and for particle hypotesis :math:`H\ \in\ {\mu^{\pm}, \pi^{\pm}, K^{\pm}, e^{\pm}, p, \bar{p}, d, \bar{d}}` is sampled according to the measurement vector :math:`\vec{c}` given by: (a) the pattern of of all KLM layers touched during the extrapolation (not just the outermost one) and (b) the pattern of matched hits in the touched layers. 
 Sample PDF for exiting tracks are shown in :numref:`Longitudinal-PDFs` for muons and pions.
 
+* The *transverse-scattering* probability density function :math:`P_{L}(\chi^2}, n; D, H)`  for KLM region :math:`D` (barrel-only, endcap-only, or overlap) and particle hypotesis :math:`H` is sampled according to the measurement of :math:`\chi^{2}` from the Kalman filter and the number of degrees of freedom, which is twice the number of matched hits.
+The muon-hypothesis PDF is very close to the ideal :math:`\chi^2` distribution for the given number of degrees of freedom, while the the non-muon hypothesis PDFs are considerably broader for low degrees of 
+freedom. Sample PDFs are shown in :numref:`rchisquared` for muons and pions.
+
 .. _Longitudinal-PDFs:
 
 .. figure::figures/Longitudinal-PDFs-MuonPion.png
   :width: 30em
   :align: center
 
-  Sample longitudinal-profile PDFs for energetic positevely-charged muons (left\) and pions (right), for the barrel (top), forward endcap (middle) and a selected barrel-endcap-overlap (bottom). Barrel (endcap)   layers are numbered 0-14 (15-28).
-
-* The *transverse-scattering* probability density function :math:`P_{L}(\chi^2}, n; D, H)`  for KLM region :math:`D` (barrel-only, endcap-only, or overlap) and particle hypotesis :math:`H` is sampled according to the measurement of :math:`\chi^{2}` from the Kalman filter and the number of degrees of freedom, which is twice the number of matched hits.
-The muon-hypothesis PDF is very close to the ideal :math:`\chi^2` distribution for the given number of degrees of freedom, while the the non-muon hypothesis PDFs are considerably broader for low degrees of 
-freedom. Sample PDFs are shown in :numeref:`rchisquared` for muons and pions.
+  Sample longitudinal-profile PDFs for energetic positevely-charged muons (left\) and pions (right), for the barrel (top), forward endcap (middle) and a selected barrel-endcap-overlap (bottom). Barrel (endcap)
+  layers are numbered 0-14 (15-28).
 
 .. _rchisquared:
 .. figure::figures/rchisquared-MuonPlus-PionPlus-ndof.png
@@ -92,15 +93,13 @@ and stored in the ``KLMMuidLikelihood`` data-object.
 Muon Efficiency and Pion Fake Rate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The log-likelihood difference :math:`\Delta`:
+The log-likelihood difference :math:`\Delta` is the most powerful discriminator between the competing hypotesis:
 
 .. math::
 
-   \Delta\ =\ log(L(\mu^{+}; O, l, D, \vec{x}, \chi^{2}, n))\ -\ log(L(\pi^{+}; O, l, D, \vec{x}, \chi^{2}, n)),
+   \Delta\ =\ log(L(\mu^{+}; O, l, D, \vec{x}, \chi^{2}, n))\ -\ log(L(\pi^{+}; O, l, D, \vec{x}, \chi^{2}, n)).
 
-is the most powerful discriminator between the competing hypotesis. 
-The requirement :math:`\Delta > \Delta_{min}` for a user-selected :math:`\Delta_{min}` provides the best signal efficiency for the selected background rejection. Log-likelihood differences for true muons and pions are shown in :numref:`Log-Likelihood` as a funcion of the track momentum. Choosing a momentum-independent cut on :math:`\Delta\
-_{min}` that is positive and non-zero will reject soft muons prefentially, and a similar behaviour is seen when choosing a cut that is independent of the polar or azimuthal angles, because the log-likelihood differences are softer in the azimuthal cracks between sectors and in the barrel-endcap overlap region where KLM is thinner.
+The requirement :math:`\Delta > \Delta_{min}` for a user-selected :math:`\Delta_{min}` provides the best signal efficiency for the selected background rejection. Log-likelihood differences for true muons and pions are shown in :numref:`Log-Likelihood` as a funcion of the track momentum. Choosing a momentum-independent cut on :math:`\Delta_{min}` that is positive and non-zero will reject soft muons prefentially, and a similar behaviour is seen when choosing a cut that is independent of the polar or azimuthal angles, because the log-likelihood differences are softer in the azimuthal cracks between sectors and in the barrel-endcap overlap region where KLM is thinner.
 
 .. _Log-Likelihood:
 

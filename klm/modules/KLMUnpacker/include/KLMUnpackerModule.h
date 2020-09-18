@@ -91,7 +91,7 @@ namespace Belle2 {
      */
     void createDigit(
       const KLM::RawData* raw, const KLMDigitRaw* klmDigitRaw,
-      KLMDigitEventInfo* klmDigitEventInfo, int subdetector, int section,
+      KLMDigitEventInfo* klmDigitEventInfo, int Subdetector, int section,
       int sector, int layer, int plane, int strip, int lastStrip);
 
     /**
@@ -119,9 +119,9 @@ namespace Belle2 {
      * cpr8004 a,b,c,d -> PCIe40 ch. 28-31
      * @param[in] channel PCIe40 channel.
      * @param[out] copper COPPER identifier.
-     * #param[out] hslb   HSLB identifier.
+     * @param[out] hslb   HSLB identifier.
      */
-    void convertPCIe40ToCOPPER(unsigned int channel, unsigned int* copper, unsigned int* hslb) const;
+    void convertPCIe40ToCOPPER(int channel, unsigned int* copper, int* hslb) const;
 
     /* Module parameters. */
 

@@ -317,14 +317,14 @@ void KLMUnpackerModule::unpackKLMDigit(
   }
 }
 
-void KLMUnpackerModule::convertPCIe40ToCOPPER(unsigned int channel, unsigned int* copper, unsigned int* hslb) const
+void KLMUnpackerModule::convertPCIe40ToCOPPER(int channel, unsigned int* copper, int* hslb) const
 {
   if (channel >= 0 && channel < 16) {
-    unsigned int id = channel / 4;
+    int id = channel / 4;
     *copper = BKLM_ID + id + 1;
     *hslb = channel - id * 4;
   } else if (channel >= 16 && channel < 32) {
-    unsigned int id = (channel - 16) / 4;
+    int id = (channel - 16) / 4;
     *copper = EKLM_ID + id + 1;
     *hslb = (channel - 16) - id * 4;
   } else
@@ -352,10 +352,9 @@ void KLMUnpackerModule::event()
      */
     for (int j = 0; j < m_RawKLMs[i]->GetNumEntries(); j++) {
       unsigned int copper = m_RawKLMs[i]->GetNodeID(j);
-      unsigned int hslb;
-      int subdetector;
+      int hslb, subdetector;
       m_RawKLMs[i]->GetBuffer(j);
-      for (unsigned int channelReadoutBoard = 0; channelReadoutBoard < m_RawKLMs[i]->GetMaxNumOfCh(j); channelReadoutBoard++) {
+      for (int channelReadoutBoard = 0; channelReadoutBoard < m_RawKLMs[i]->GetMaxNumOfCh(j); channelReadoutBoard++) {
         if (m_RawKLMs[i]->GetMaxNumOfCh(j) == 4) { // COPPER data
           hslb = channelReadoutBoard;
           if ((copper >= EKLM_ID) && (copper <= EKLM_ID + 4))
@@ -372,7 +371,7 @@ void KLMUnpackerModule::event()
           else
             B2FATAL("The PCIe40 channel is invalid."
                     << LogVar("Channel", channelReadoutBoard));
-          convertPCIe40ToCOPPER(*channelReadoutBoard, &copper, &hslb);
+          convertPCIe40ToCOPPER(channelReadoutBoard, &copper, &hslb);
         } else {
           B2FATAL("The maximum number of channels per readout board is invalid."
                   << LogVar("Number of channels", m_RawKLMs[i]->GetMaxNumOfCh(j)));

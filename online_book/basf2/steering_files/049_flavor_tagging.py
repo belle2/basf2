@@ -70,10 +70,10 @@ ma.matchMCTruth("B0", path=main)
 
 # build the rest of the event
 ma.buildRestOfEvent("B0", fillWithMostLikely=True, path=main)
-track_based_cuts = 'thetaInCDCAcceptance and pt > 0.075'
-ecl_based_cuts = 'thetaInCDCAcceptance and E > 0.05'
-roe_mask = ('my_mask', track_based_cuts, ecl_based_cuts)
-ma.appendROEMasks('B0', [roe_mask], path=main)
+track_based_cuts = "thetaInCDCAcceptance and pt > 0.075"
+ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
+roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
+ma.appendROEMasks("B0", [roe_mask], path=main)
 
 # call flavor tagging
 ft.flavorTagger("B0", path=main)
@@ -92,6 +92,11 @@ standard_vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
 b_vars += vc.deltae_mbc
 b_vars += standard_vars
 b_vars += vc.roe_kinematics + vc.roe_multiplicities
+# Let's also add a version of the ROE variables that includes the mask:
+for roe_variable in vc.roe_kinematics + vc.roe_multiplicities:
+    # e.g. instead of 'roeE()' (no mask) we want 'roeE(my_mask)'
+    roe_variable_with_mask = roe_variable.replace("()", "(my_mask)")
+    b_vars.append(roe_variable_with_mask)
 b_vars += ft.flavor_tagging
 
 # Variables for final states (electrons, positrons, pions)

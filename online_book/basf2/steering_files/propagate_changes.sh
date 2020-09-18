@@ -7,10 +7,10 @@
 # Then run
 # ./propagate_changes 019_first_steering_file 029_roe.py 039_various_additions.py <etc>
 # To apply these changes there as well.
+# IMPORTANT NOTE: THIS IS A BIT FRAGILE, SO MAKE SURE TO CHECK
+# THAT THIS SCRIPT WORKS AS INTENDED!
 
 # Contributors: Kilian Lieret
-
-set -e
 
 changed_file=$1
 target_files="${@:2}"
@@ -20,7 +20,7 @@ git diff HEAD^ -- ${changed_file} > ${tmp_patch_name}
 
 for file in ${target_files}; do
     echo "Applying patch to ${file}"
-    patch ${file} ${tmp_patch_name}
+    patch -f --fuzz=3 ${file} ${tmp_patch_name}
 done
 
 rm ${tmp_patch_name}

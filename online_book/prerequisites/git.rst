@@ -107,6 +107,11 @@ address you got with your account.
 We also have a `confluence page <https://confluence.desy.de/x/2o4iAg>`_ with
 more information and help in case of problems.
 
+Exercises
+---------
+
+Let's test what you learned so far!
+
 .. admonition:: Exercise
    :class: exercise stacked
    
@@ -153,25 +158,46 @@ Now you should have both repositories on your local machine.
 
 Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you 
 cannot just push changes there directly. Instead, you have to open a pull request (PR).
+For this concept you need to complete the next section.
+
+Branches (intermediate)
+-----------------------
+
+By now you should have a good feeling about why git is needed and start to feel
+a bit more comfortable with basic ``git`` commandas.
+
+However there is one very important concept that we kept secret from you till
+now: branches!
+This concept is indispensable for collaborating on bigger projects, but you
+might not need it right away if you work on a project all by yourself.
+
+.. |uncheck| raw:: html
+
+    <input type="checkbox">
+
+.. hint::
+
+   If you are short on time, you may skip this section, but you need to 
+   promise that you will come back!
+   
+   |uncheck| I promise!
+
+.. note::
+
+   Now complete the first three lessons on `learngitbranching <https://learngitbranching.js.org/>`_!
+
+Now you should be familiar with the commands ``git branch`` and ``git merge``.
 
 .. admonition:: Exercise (advanced)
    :class: exercise stacked
    
-   Open a PR for a similar change in ``b2-git-training-space-2``.
+   Go to the repository ``b2-git-training-space-2`` and commit changes to a new branch.
    
 .. admonition:: Hint
    :class: xhint stacked toggle
    
-   You need to create a new branch and start working from there.
- 
-.. admonition:: Hint
-   :class: xhint stacked toggle
-   
-   After you created your branch, check it out, make some changes and commit. 
-   Then push the branch to the remote.
-   In the text that is printed on the command line, you are invited to click
-   a link to open a PR.
-   Add the starterkit organizer as a reviewer.
+   You should have already cloned this repository in the last section.
+   Run ``git pull`` to make sure you're up to date.
 
 .. admonition:: Solution
    :class: solution toggle
@@ -180,18 +206,31 @@ cannot just push changes there directly. Instead, you have to open a pull reques
    
       # Make sure your repository is up to date
       git pull
-      # Create a new branch (Important: pick a different name for your branch!)
-      git branch my-new-branch
+      # Create a new branch (IMPORTANT: pick a unique name for your branch!)
+      git branch <your new branch>
       # Switch to it
-      git checkout my-new-branch
+      git checkout <your new branch>
       # Example of a change (try something else)
       echo "I'm a cat." >> my_story.txt
       git commit -m "Adding a story"
-      git push --set-upstream origin my-new-branch 
-      
-   The output of the last command tells you to go to
-   ``https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/my-new-change``.
-   Visit the page to open your PR.
+
+Remember that you weren't allowed to push to the master branch in this 
+repository. To still get your changes in, you need to first push your
+new branch to the remote (just like there is a local and a remote ``master``
+branch you will then have a local and a remote ``<your new branch>`` branch).
+
+.. code-block:: bash
+
+   git push --set-upstream origin <your new branch>
+
+The output of the last command tells you to go to
+``https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/<your new branch>``
+to open a PR. That's exactly what we want to do!
+
+.. admonition:: Exercise
+   :class: exercise
+   
+   Create a PR and add the starterkit organizer as a reviewer.
 
 Now you have to wait for someone to approve your PR. Once they do, 
 you can click on the ``Merge`` button. Then your changes are finally

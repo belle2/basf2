@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: ParticleStats, Anze Zupanc                               *
+* Contributors: Anze Zupanc                                              *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -11,7 +11,6 @@
 #include <analysis/modules/ParticleStats/ParticleStatsModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/Environment.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 using namespace std;
@@ -27,7 +26,7 @@ ParticleStatsModule::ParticleStatsModule() : Module()
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
 
-  // initializing the rest of private memebers
+  // initializing the rest of private members
   m_nPass   = 0;
   m_nParticles = 0;
   m_PassMatrix = nullptr;
@@ -36,6 +35,8 @@ ParticleStatsModule::ParticleStatsModule() : Module()
 
 void ParticleStatsModule::initialize()
 {
+  m_particles.isRequired();
+
   unsigned nParticleLists = m_strParticleLists.size();
   for (unsigned i = 0; i < nParticleLists; ++i) {
     bool valid = m_decaydescriptor.init(m_strParticleLists[i]);
@@ -71,7 +72,7 @@ void ParticleStatsModule::event()
       B2INFO("ParticleListi " << m_strParticleLists[iList] << " not found");
       continue;
     } else {
-      if (!particlelist->getListSize())continue;
+      if (!particlelist->getListSize()) continue;
 
       pass = true;
       // All Particles&Anti-Particles
@@ -104,7 +105,7 @@ void ParticleStatsModule::event()
           B2INFO("ParticleListj " << m_strParticleLists[jList] << " not found");
           continue;
         } else {
-          if (!particlelistj->getListSize())continue;
+          if (!particlelistj->getListSize()) continue;
           (*m_PassMatrix)(iList, jList) = (*m_PassMatrix)(iList, jList) + 1.;
           if (iList != jList)unique = false;
 
@@ -116,10 +117,9 @@ void ParticleStatsModule::event()
     if (unique)(*m_PassMatrix)(iList, nParticleLists) = (*m_PassMatrix)(iList, nParticleLists) + 1.;
 
   }
-  StoreArray<Particle> Particles;
-  m_nParticles += Particles.getEntries();
+  m_nParticles += m_particles.getEntries();
 
-  if (pass)m_nPass++;
+  if (pass) m_nPass++;
 }
 
 void ParticleStatsModule::terminate()

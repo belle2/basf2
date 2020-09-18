@@ -16,6 +16,10 @@
 
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
+// dataobjects
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+
 #include <string>
 #include <memory>
 
@@ -47,6 +51,10 @@ namespace Belle2 {
 
 
   private:
+
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    StoreObjPtr<ParticleList> m_outputList; /**< output particle list */
+    StoreObjPtr<ParticleList> m_outputAntiList; /**< output anti-particle list */
 
     int m_pdgCode;                /**< PDG code of the combined mother particle */
 

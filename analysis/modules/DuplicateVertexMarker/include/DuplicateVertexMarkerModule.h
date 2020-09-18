@@ -9,16 +9,18 @@
  **************************************************************************/
 
 #pragma once
-
-#include <analysis/VariableManager/Manager.h>
 #include <framework/core/Module.h>
+
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/VariableManager/Manager.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <string>
 
 namespace Belle2 {
 
   /**
    * Identify duplicate vertices (distinct particles, but built from the same
-   * daughters) and mark the one with best chi2.Only works if the particle has
+   * daughters) and mark the one with best chi2. Only works if the particle has
    * exactly two daughters. Mainly used to deal when merging V0 vertices with
    * hand-built ones.
    */
@@ -44,6 +46,7 @@ namespace Belle2 {
 
   private:
 
+    StoreObjPtr<ParticleList> m_inPList; /**< input particle list */
     std::string m_particleList;              /**< input ParticleList name */
     std::string m_extraInfoName;             /**< output extra-info name */
     bool m_prioritiseV0;                    /**< if one of the decay is a V0, prioritise that before checking vertex quality */

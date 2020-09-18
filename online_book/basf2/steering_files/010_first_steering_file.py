@@ -1,5 +1,5 @@
 import basf2
 
-main = basf2.create_path()
+main = basf2.Path()
 
 basf2.process(main)

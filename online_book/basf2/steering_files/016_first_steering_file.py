@@ -10,7 +10,7 @@ import variables.collections as vc
 filenumber = sys.argv[1]
 
 # create path
-main = b2.create_path()
+main = b2.Path()
 
 # load input data from mdst/udst file
 filedirectory = "/group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/"

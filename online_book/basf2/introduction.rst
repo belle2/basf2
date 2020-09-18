@@ -315,8 +315,8 @@ setup script...
 
         source /cvmfs/belle.cern.ch/tools/b2setup
 
-Some people like to put an alias to the setup script in their .profile (or
-.bashrc, .zshrc, ...) file.
+Some people like to put an alias to the setup script in their ``.profile`` (or
+``.bashrc``, ``.zshrc``, ...) file.
 You are welcome to do this if you like.
 
 So now you have a Belle II environment.
@@ -324,14 +324,18 @@ You might have noticed that you still don't have the ``basf2`` executable:
 
 .. code-block:: bash
 
-        $> source /cvmfs/belle.cern.ch/tools/b2setup
+        $ source /cvmfs/belle.cern.ch/tools/b2setup
         Belle II software tools set up at: /cvmfs/belle.cern.ch/tools
-        $> basf2
+        $ basf2
         command not found: basf2
 
-You need to choose a release (a specific version of the software).
+Note: we only used the ``$`` character to distinguish the commands from the
+expected output, it should not be typed.
+
+In order to get the ``basf2`` executable you need to choose a release 
+(a specific version of the software).
 If you don't know what release you want, you should take the latest stable
-full release or the latest light release.
+full release or the latest light release (see below).
 
 There is a command-line tool to help with this.
 Try:
@@ -340,23 +344,21 @@ Try:
 
         b2help-releases --help
 
-or just:
-
-.. code-block:: bash
-
-        b2help-releases
-
-To setup the release of your choice simply call ``b2setup`` again.
-Once you've set up the environment, the ``b2setup`` executable itself will be
-in your ``PATH``:
+To setup the release of your choice simply call ``b2setup`` again with the
+name of your release.
+Since you've already set up the environment, the ``b2setup`` executable itself 
+is already in your ``PATH`` (that means we don't need the full path ``/cvmfs/.../b2setup`` anymore):
 
 .. code-block:: bash
 
         b2setup <your choice of release>
 
-If you already know what release you want, you can do it all at once:
+.. seealso:: 
 
-.. code-block:: bash
+   If you already know what release you want, you can do the first and second
+   step in one go:
+
+   .. code-block:: bash
 
         source /cvmfs/belle.cern.ch/tools/b2setup <your choice of release>
 
@@ -686,7 +688,7 @@ To leave interactive basf2 / IPython, simply:
 
      .. code-block:: bash
 
-          $> b2info-luminosity  --exp 8 --what offline
+          $ b2info-luminosity  --exp 8 --what offline
           Read 697 runs for experiment 8
           TOTAL offline   : L = 5464553.60 /nb =  5464.55 /pb =    5.465 /fb =   0.0055 /ab
 

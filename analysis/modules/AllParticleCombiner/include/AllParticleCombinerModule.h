@@ -45,8 +45,8 @@ namespace Belle2 {
   private:
 
     StoreArray<Particle> m_particles; /**< StoreArray of Particle objects */
-    StoreObjPtr<ParticleList> m_outputList; /** output particle list */
-    StoreObjPtr<ParticleList> m_outputAntiList; /** output anti-particle list */
+    StoreObjPtr<ParticleList> m_outputList; /**< output particle list */
+    StoreObjPtr<ParticleList> m_outputAntiList; /**< output anti-particle list */
 
     std::vector<std::string> m_inputListNames;  /**< List of ParticleLists which are supposed to be combined */
 

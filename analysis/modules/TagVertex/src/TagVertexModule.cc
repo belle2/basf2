@@ -125,7 +125,6 @@ namespace Belle2 {
     // roll back status will be set to 2 only if the MC info cannot be recovered
     if (m_useRollBack) m_rollbackStatus = 1;
 
-    //TODO: this won't work with nonstandard name for Particle array (e.g. will fail when adding relations)
     //input
     StoreArray<Particle>().isRequired();
     m_plist.isRequired(m_listName);

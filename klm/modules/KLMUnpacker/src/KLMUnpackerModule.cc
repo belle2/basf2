@@ -347,8 +347,8 @@ void KLMUnpackerModule::event()
       continue;
     }
     /*
-     * getNumEntries is defined in RawDataBlock.h and gives the
-     * numberOfNodes*numberOfEvents. Number of nodes is # COPPER boards.
+     * GetNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents.
+     * Number of nodes is the number of COPPER boards.
      */
     for (int j = 0; j < m_RawKLMs[i]->GetNumEntries(); j++) {
       unsigned int copper = m_RawKLMs[i]->GetNodeID(j);

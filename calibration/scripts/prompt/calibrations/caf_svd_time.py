@@ -11,6 +11,8 @@ import glob
 import ROOT
 from ROOT import Belle2, TFile
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
+from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
 
 from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDatabase
 from prompt import CalibrationSettings
@@ -25,11 +27,6 @@ import rawdata as raw
 import reconstruction as reconstruction
 
 from tracking import add_tracking_reconstruction
-
-from softwaretrigger.path_utils import (
- add_filter_software_trigger,
- add_skim_software_trigger
- )
 
 now = datetime.datetime.now()
 
@@ -53,8 +50,8 @@ def remove_module(path, name):
     return new_path
 #####################################################################################################
 
-NEW_RECO_DIGITS_NAME = "SVDRecoDigits_repeat"
-NEW_SHAPER_DIGITS_NAME = "SVDShaperDigits"
+NEW_RECO_DIGITS_NAME = "SVDRecoDigitsFromTracks"
+NEW_SHAPER_DIGITS_NAME = "SVDShaperDigitsFromTracks"
 
 
 def create_collector(name="SVDCoGTimeCalibrationCollector",
@@ -86,7 +83,12 @@ def create_algorithm(unique_id, prefix="", min_entries=10000):
     Returns:
         ROOT.Belle2.SVDCoGTimeCalibrationAlgorithm
     """
-    algorithm = SVDCoGTimeCalibrationAlgorithm(unique_id)
+    if "CoG6" in prefix:
+        algorithm = SVDCoGTimeCalibrationAlgorithm(unique_id)
+    if "CoG3" in prefix:
+        algorithm = SVD3SampleCoGTimeCalibrationAlgorithm(unique_id)
+    if "ELS3" in prefix:
+        algorithm = SVD3SampleELSTimeCalibrationAlgorithm(unique_id)
     if prefix:
         algorithm.setPrefix(prefix)
     algorithm.setMinEntries(10000)
@@ -131,7 +133,7 @@ def create_pre_collector_path(clusterizers):
     path = create_path()
 
     # unpack raw svd data and produce: SVDEventInfo and SVDShaperDigits
-    raw.add_unpackers(path)
+    raw.add_unpackers(path, components=['PXD', 'SVD', 'CDC'])
 
     # run SVD reconstruction, changing names of StoreArray
     add_tracking_reconstruction(path)
@@ -152,21 +154,11 @@ def create_pre_collector_path(clusterizers):
     for cluster in clusterizers:
         path.add_module(cluster)
 
-    # Do you also need different versions of SVDSpacePointCreator using the different "SVDClustersFromTracks"?
-    # I'm not sure the output SpacePoints are ever used, but maybe they affect other things...
-
-#    sp = register_module("SVDSpacePointCreator")
-#    sp.set_name("SPCreator")
-#    path.add_module(sp)
-
     for moda in path.modules():
         if moda.name() == "CoGReconstruction":
             moda.param("ShaperDigits", NEW_SHAPER_DIGITS_NAME)
             moda.param("RecoDigits", NEW_RECO_DIGITS_NAME)
             moda.param("CalibrationWithEventT0", False)
-#        if moda.name() == "SPCreator":
-#            moda.param("SVDClusters", "SVDClustersFromTracks")
-#            moda.param("SpacePoints", "SPacePointsFromTracks")
 
     path = remove_module(path, "SVDMissingAPVsClusterCreator")
 
@@ -177,7 +169,7 @@ def get_calibrations(input_data, **kwargs):
 
     file_to_iov_physics = input_data["hlt_hadron"]
 
-    max_files_per_run = 1
+    max_files_per_run = 10
 
     from prompt.utils import filter_by_max_files_per_run
 
@@ -196,9 +188,21 @@ def get_calibrations(input_data, **kwargs):
         print("No good input files found! Check that the input files have entries != 0!")
         sys.exit(1)
 
-    unique_id = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
-                f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
-    print(f"\nUniqueID:\n{unique_id}")
+    cog6_suffix = "_CoG6"
+    cog3_suffix = "_CoG3"
+    els3_suffix = "_ELS3"
+
+    unique_id_cog6 = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
+                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}{cog6_suffix}"
+    print(f"\nUniqueID_CoG6:\n{unique_id_cog6}")
+
+    unique_id_cog3 = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
+                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}{cog3_suffix}"
+    print(f"\nUniqueID_CoG3:\n{unique_id_cog3}")
+
+    unique_id_els3 = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_TBindep_" \
+                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}{els3_suffix}"
+    print(f"\nUniqueID_ELS3:\n{unique_id_els3}")
 
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
@@ -207,14 +211,10 @@ def get_calibrations(input_data, **kwargs):
     # Build the clusterizers with the different options.
     ####
 
-    cog6_suffix = "_CoG6"
-    cog3_suffix = "_CoG3"
-    els3_suffix = "_ELS3"
-
     cog6 = create_svd_clusterizer(name=f"ClusterReconstruction{cog6_suffix}",
                                   clusters=f"SVDClustersFromTracks{cog6_suffix}",
-                                  reco_digits=NEW_RECO_DIGITS_NAME,   # Do you use the same RecoDigits object?
-                                  shaper_digits=NEW_SHAPER_DIGITS_NAME,  # Do you use the same ShaperDigits object?
+                                  reco_digits=NEW_RECO_DIGITS_NAME,
+                                  shaper_digits=NEW_SHAPER_DIGITS_NAME,
                                   time_algorithm=0)
 
     cog3 = create_svd_clusterizer(name=f"ClusterReconstruction{cog3_suffix}",
@@ -238,22 +238,21 @@ def get_calibrations(input_data, **kwargs):
                                  event_info="SVDEventInfo",
                                  event_t0="EventT0")
 
-    # Using the same unique_id for all 3 algorithms, is this bad?
-    algo_cog6 = create_algorithm(unique_id, prefix=coll_cog6.name(), min_entries=10000)
+    algo_cog6 = create_algorithm(unique_id_cog6, prefix=coll_cog6.name(), min_entries=10000)
 
     coll_cog3 = create_collector(name=f"SVDCoGTimeCalibrationCollector{cog3_suffix}",
                                  clusters=f"SVDClustersFromTracks{cog3_suffix}",
                                  event_info="SVDEventInfo",
                                  event_t0="EventT0")
 
-    algo_cog3 = create_algorithm(unique_id, prefix=coll_cog3.name(), min_entries=10000)  # Same unique_id
+    algo_cog3 = create_algorithm(unique_id_cog3, prefix=coll_cog3.name(), min_entries=10000)
 
     coll_els3 = create_collector(name=f"SVDCoGTimeCalibrationCollector{els3_suffix}",
                                  clusters=f"SVDClustersFromTracks{els3_suffix}",
                                  event_info="SVDEventInfo",
                                  event_t0="EventT0")
 
-    algo_els3 = create_algorithm(unique_id, prefix=coll_els3.name(), min_entries=10000)  # Same unique_id
+    algo_els3 = create_algorithm(unique_id_els3, prefix=coll_els3.name(), min_entries=10000)
 
     ####
     # Build the pre_collector_path for reconstruction BUT we also sneakily
@@ -272,7 +271,6 @@ def get_calibrations(input_data, **kwargs):
                               input_files=good_input_files,
                               pre_collector_path=pre_collector_path)
 
-    # calibration.pre_algorithms = pre_alg
     # calibration.strategies = strategies.SequentialRunByRun
     # calibration.strategies = strategies.SingleIOV
     calibration.strategies = strategies.SequentialBoundaries

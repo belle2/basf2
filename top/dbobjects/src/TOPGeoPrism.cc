@@ -18,6 +18,11 @@ using namespace std;
 
 namespace Belle2 {
 
+  TOPGeoPrism::UnfoldedWindow::UnfoldedWindow(const TVector2& orig, const TVector2& dir):
+    y0(orig.X()), z0(orig.Y()), sy(dir.X()), sz(dir.Y())
+  {}
+
+
   bool TOPGeoPrism::isConsistent() const
   {
     if (m_exitThickness <= 0) return false;
@@ -109,5 +114,56 @@ namespace Belle2 {
 
     return contour;
   }
+
+
+  void TOPGeoPrism::unfold() const
+  {
+    double z = -(m_length - m_flatLength);
+    double yUp = m_thickness / 2;
+    double yDown = yUp - m_exitThickness;
+    TVector2 points[2] = {TVector2(yUp, z), TVector2(yDown, z)}; // points on upper and slanted surfaces
+
+    double alpha = getAngle();
+    TVector2 normals[2] = {TVector2(1, 0), TVector2(-cos(alpha), sin(alpha))}; // normals of upper and slanted surfaces
+
+    TVector2 orig(0, z); // window origin
+    TVector2 surf(1, 0); // window surface direction
+
+    std::vector<UnfoldedWindow> tmp;
+    reflect(points, normals, orig, surf, 1, tmp); // unfolding down
+    while (not tmp.empty()) {
+      m_unfoldedWindows.push_back(tmp.back());
+      tmp.pop_back();
+    }
+    m_unfoldedWindows.push_back(UnfoldedWindow(orig, surf)); // true window
+    m_k0 = m_unfoldedWindows.size() - 1;
+    reflect(points, normals, orig, surf, 0, m_unfoldedWindows); // unfolding up
+  }
+
+
+  void TOPGeoPrism::reflect(const TVector2* points, const TVector2* normals,
+                            const TVector2& orig, const TVector2& surf, int k,
+                            std::vector<UnfoldedWindow>& result) const
+  {
+    TVector2 rp[2] = {points[0], points[1]};
+    TVector2 n[2] = {normals[0], normals[1]};
+    auto r = orig;
+    auto s = surf;
+
+    while (rp[k].Y() < 0) {
+      r -= 2 * ((r - rp[k]) * n[k]) * n[k]; // reflect window origin
+      s -= 2 * (s * n[k]) * n[k];           // reflect window surface direction
+      result.push_back(UnfoldedWindow(r, s));
+      if (result.size() > 100) {
+        B2ERROR("TOPGeoPrism::reflect: too many reflections -> must be a bug");
+        return;
+      }
+      int i = (k + 1) % 2; // index of opposite surface
+      rp[i] -= 2 * ((rp[i] - rp[k]) * n[k]) * n[k]; // reflect point on the opposite surface
+      n[i] -= 2 * (n[i] * n[k]) * n[k];             // reflect normal of opposite surface
+      k = i; // toggle the reflection surface
+    }
+  }
+
 
 } // end Belle2 namespace

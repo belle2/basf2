@@ -372,7 +372,7 @@ void KLMUnpackerModule::event()
           else
             B2FATAL("The PCIe40 channel is invalid."
                     << LogVar("Channel", channelReadoutBoard));
-          convertPCIe40ToCOPPER(channelReadoutBoard, &copper, &hslb);
+          convertPCIe40ToCOPPER(*channelReadoutBoard, &copper, &hslb);
         } else {
           B2FATAL("The maximum number of channels per readout board is invalid."
                   << LogVar("Number of channels", m_RawKLMs[i]->GetMaxNumOfCh(j)));

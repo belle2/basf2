@@ -48,6 +48,7 @@ void TRGGDLSummaryModule::initialize()
   }
 
   _e_timtype = 0;
+  _e_rvcout = 0;
   for (int i = 0; i < 10; i++) {
     ee_psn[i] = 0;
     ee_ftd[i] = 0;
@@ -55,6 +56,7 @@ void TRGGDLSummaryModule::initialize()
   }
   for (int i = 0; i < 320; i++) {
     if (strcmp(LeafNames[i], "timtype") == 0)_e_timtype = LeafBitMap[i];
+    if (strcmp(LeafNames[i], "rvcout") == 0) _e_rvcout = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn0") == 0)   ee_psn[0] = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn1") == 0)   ee_psn[1] = LeafBitMap[i];
     if (strcmp(LeafNames[i], "psn2") == 0)   ee_psn[2] = LeafBitMap[i];
@@ -209,7 +211,7 @@ void TRGGDLSummaryModule::event()
     }
   }
 
-
+  // reg_tmdl_timtype in header. 3bit, no quality info.
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
 
   //get prescales
@@ -233,5 +235,32 @@ void TRGGDLSummaryModule::event()
   }
 
   GDLResult->setTimType(tt);
+
+  StoreObjPtr<EventMetaData> bevt;
+  unsigned _exp = bevt->getExperiment();
+  unsigned _run = bevt->getRun();
+  unsigned exprun = _exp * 1000000 + _run;
+  if (exprun < 13000500) {
+    GDLResult->setTimQuality(TRGSummary::TTYQ_CORS); // coarse
+  } else {
+    int rvcout = _data[_e_rvcout][n_clocks - 1];
+    int q = (rvcout >> 1) & 3;
+    TRGSummary::ETimingQuality timQuality = TRGSummary::TTYQ_NONE;
+    switch (q) {
+      case 1:
+        timQuality = TRGSummary::TTYQ_CORS;
+        break;
+      case 2:
+        timQuality = TRGSummary::TTYQ_FINE;
+        break;
+      case 3:
+        timQuality = TRGSummary::TTYQ_SFIN;
+        break;
+      default:
+        timQuality = TRGSummary::TTYQ_NONE;
+        break;
+    }
+    GDLResult->setTimQuality(timQuality);
+  }
 
 }

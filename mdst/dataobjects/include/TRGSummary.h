@@ -73,6 +73,18 @@ namespace Belle2 {
       TTYP_NONE = 15
     };
 
+    /** trigger timing type quality */
+    enum ETimingQuality {
+      /* Non. Should not happen. */
+      TTYQ_NONE = 0,
+      /* Coarse */
+      TTYQ_CORS = 1,
+      /* Fine */
+      TTYQ_FINE = 2,
+      /* Super Fine */
+      TTYQ_SFIN = 3,
+    };
+
     /*! default constructor: xxx */
     TRGSummary() = default;
 
@@ -147,6 +159,9 @@ namespace Belle2 {
     /**set the timType */
     void setTimType(ETimingType timType) {m_timType = timType;}
 
+    /**set the timQuality */
+    void setTimQuality(ETimingQuality timQuality) {m_timQuality = timQuality;}
+
     /*! get input bits
      * @param i index: 0, 1, 2 for bit 0-31, 32-63, 64-95, respectively.
      * @return     input bits
@@ -180,6 +195,14 @@ namespace Belle2 {
     ETimingType getTimType() const
     {
       return m_timType;
+    }
+
+    /*! get timing source quality
+     * @return     timing type quality
+     */
+    ETimingQuality getTimQuality() const
+    {
+      return m_timQuality;
     }
 
     /** Return a short summary of this object's contents in HTML format. */
@@ -220,6 +243,9 @@ namespace Belle2 {
 
     /** types of trigger timing source defined in b2tt firmware */
     ETimingType m_timType = TTYP_NONE;
+
+    /** trigger timing type quality */
+    ETimingQuality m_timQuality = TTYQ_NONE;
 
     /** the prescale factor of each bit*/
     unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};

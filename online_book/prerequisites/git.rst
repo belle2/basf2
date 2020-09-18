@@ -14,7 +14,7 @@ Version Control with Git
 
     **Prerequisites**:
 
-    	* Basic bash knowledge
+        * Basic bash knowledge
 
     **Questions**:
 
@@ -114,27 +114,27 @@ Let's test what you learned so far!
 
 .. admonition:: Exercise
    :class: exercise stacked
-   
+
    The *Belle II Training* project contains two training repositories for playing
    with git. Find and clone them.
-   
+
 .. admonition:: Hint
    :class: xhint stacked toggle
-   
+
    The project lives `here <https://stash.desy.de/projects/B2T>`__.
- 
+
 .. admonition:: Hint
    :class: xhint stacked toggle
-   
+
    The repositories live `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space/browse>`__
    and `here <https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/browse>`__.
    You can find the URL to clone by clicking a button in the sidebar on your left.
 
 .. admonition:: Solution
    :class: solution toggle
-   
+
    .. code-block:: bash
-   
+
       git clone ssh://git@stash.desy.de:7999/b2t/b2-git-training-space.git
       git clone ssh://git@stash.desy.de:7999/b2t/b2-git-training-space-2.git
 
@@ -142,21 +142,21 @@ Now you should have both repositories on your local machine.
 
 .. admonition:: Exercise
    :class: exercise stacked
-   
+
    Make a local change in ``b2-git-training-space``, commit and push.
-   
+
 .. admonition:: Solution
    :class: solution toggle
-   
+
    .. code-block:: bash
-   
+
       # Example of a change (try something else)
       echo "I'm a cat." >> my_story.txt
       git add my_story.txt
       git commit -m "Adding a story"
       git push
 
-Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you 
+Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you
 cannot just push changes there directly. Instead, you have to open a pull request (PR).
 For this concept you need to complete the next section.
 
@@ -177,9 +177,9 @@ might not need it right away if you work on a project all by yourself.
 
 .. hint::
 
-   If you are short on time, you may skip this section, but you need to 
+   If you are short on time, you may skip this section, but you need to
    promise that you will come back!
-   
+
    |uncheck| I promise!
 
 .. note::
@@ -190,12 +190,12 @@ Now you should be familiar with the commands ``git branch`` and ``git merge``.
 
 .. admonition:: Exercise (advanced)
    :class: exercise stacked
-   
+
    Go to the repository ``b2-git-training-space-2`` and commit changes to a new branch.
-   
+
 .. admonition:: Hint
    :class: xhint stacked toggle
-   
+
    You should have already cloned this repository in the last section.
    Run ``git pull`` to make sure you're up to date.
 
@@ -203,7 +203,7 @@ Now you should be familiar with the commands ``git branch`` and ``git merge``.
    :class: solution toggle
 
    .. code-block:: bash
-   
+
       # Make sure your repository is up to date
       git pull
       # Create a new branch (IMPORTANT: pick a unique name for your branch!)
@@ -214,7 +214,7 @@ Now you should be familiar with the commands ``git branch`` and ``git merge``.
       echo "I'm a cat." >> my_story.txt
       git commit -m "Adding a story"
 
-Remember that you weren't allowed to push to the master branch in this 
+Remember that you weren't allowed to push to the master branch in this
 repository. To still get your changes in, you need to first push your
 new branch to the remote (just like there is a local and a remote ``master``
 branch you will then have a local and a remote ``<your new branch>`` branch).
@@ -229,20 +229,20 @@ to open a PR. That's exactly what we want to do!
 
 .. admonition:: Exercise
    :class: exercise
-   
+
    Create a PR and add the starterkit organizer as a reviewer.
 
-Now you have to wait for someone to approve your PR. Once they do, 
+Now you have to wait for someone to approve your PR. Once they do,
 you can click on the ``Merge`` button. Then your changes are finally
 in the repository (verify this by pulling!).
 
 .. admonition:: Exercise
    :class: Exercise
-   
+
    Check if there are any other open PRs. If there are, leave some comments!
    You can also add yourself as the reviewer and approve them.
 
 .. topic:: Authors of this lesson
 
-     Kilian Lieret, 
+     Kilian Lieret,
      Martin Ritter

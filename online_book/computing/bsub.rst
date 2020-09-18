@@ -2,8 +2,13 @@
 
 Batch submission
 ================
+
 .. sidebar:: Overview
    :class: overview
+
+    **Teaching**: 10 min
+
+    **Exercises**: 10 min
 
     **Prerequisites**:
 
@@ -16,6 +21,9 @@ Batch submission
         * How to check the status of running jobs?
         * How to cancel a batch job?
 
+    **Objectives**:
+
+        * Submit computation intensive scripts to worker servers
 
 
 A batch job is submitted from a work server at KEKCC, the job is scheduled by
@@ -219,4 +227,11 @@ To resumes suspended jobs
 
       bresume <job_ID>
 
+.. admonition:: Key points
+   :class: key-points
+
+   * Submit a script to the short queue with ``bsub -q s "bash myscript.sh``
+   * Check job queues with ``bequeues``
+   * Kill jobs with ``bkill <job id>``
+   * **Always test your scripts before large scale submissions!**
 

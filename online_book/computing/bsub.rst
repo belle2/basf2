@@ -18,10 +18,10 @@ Batch submission
 
 
 
-A batch job is submitted from a work server at KEKCC, the job is scheduled by 
-`LSF <https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_welcome/lsf_kc_using.html>`_ 
-(Platform Load Sharing Facility developed by IBM) which will dispatches 
-and executes the job on a calculation server. It is important to select an 
+A batch job is submitted from a work server at KEKCC, the job is scheduled by
+`LSF <https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_welcome/lsf_kc_using.html>`_
+(Platform Load Sharing Facility developed by IBM) which will dispatches
+and executes the job on a calculation server. It is important to select an
 appropriate queue for your jobs.
 In this lession, we will go through some commands that often used in analysis.
 
@@ -30,7 +30,7 @@ Basic commands
 
 .. rubric:: Displays information about batch queues
 
-It is important to know which queues can be used and what is the workload of 
+It is important to know which queues can be used and what is the workload of
 the queue.
 
 To display the information about all batch queues:
@@ -39,8 +39,8 @@ To display the information about all batch queues:
 
    bqueues [-u $USER]
 
-If no option is given, this returns the following information about all 
-queues: queue name, queue priority, queue status, task statistics, and 
+If no option is given, this returns the following information about all
+queues: queue name, queue priority, queue status, task statistics, and
 job state statistics.
 
 .. code-block:: bash
@@ -63,28 +63,28 @@ job state statistics.
    a               100  Open:Active       -    4    -    -    11     3     8     0
    dc_generic      100  Open:Active       -    -    -    -     0     0     0     0
 
-Different queues have different settings. For analysis, you can use ``s``, 
-``l``, or ``h``. For short jobs with running time under 6 hours, th queue 
-``s`` is perferable. For jobs with execution time more than 6 hours, 
+Different queues have different settings. For analysis, you can use ``s``,
+``l``, or ``h``. For short jobs with running time under 6 hours, th queue
+``s`` is perferable. For jobs with execution time more than 6 hours,
 you might consider to use queue ``l``, which gives jobs up to 48 hours
 running time.
-More information about LSF queues can be found 
+More information about LSF queues can be found
 `here <https://kekcc.kek.jp/service/kekcc/html/Eng/BatchQueueList.html>`__.
 
-This command also displays the current "Fairshare" values. Fairshare 
+This command also displays the current "Fairshare" values. Fairshare
 defines the priorities of jobs that are dispatched.
 
 .. code-block:: bash
 
    bqueues -l [<queue_name>]
 
-Here the square brackets [...] indicate that the argument is optional 
+Here the square brackets [...] indicate that the argument is optional
 and <...> indicates that the value should be filled in by you.
 
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Check your priorities on queue s. 
+   Check your priorities on queue s.
 
 .. admonition:: Solution
    :class: toggle solution
@@ -154,7 +154,7 @@ To check the job status
    :class: xhint stacked toggle
 
    A simple ``basf2`` job could be the following:
-   
+
    .. code-block:: python
 
       # Print all variables known to the variable manager
@@ -187,15 +187,15 @@ To cancel jobs
 
    Use ``0`` to kill all jobs. Use this with caution.
 
-Sometimes ``bjob`` will still show the job after we tried to terminate it. 
-In this case we can use the ``-r`` option to force kill it. 
-More information is given `here 
+Sometimes ``bjob`` will still show the job after we tried to terminate it.
+In this case we can use the ``-r`` option to force kill it.
+More information is given `here
 <https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_users_guide/job_kill_force.html>`__.
 
 Optional
 --------
-In some scenarios you might want to stop the submitted jobs and resume them 
-later, for instance, scheduled maintenance of storage elements where the input 
+In some scenarios you might want to stop the submitted jobs and resume them
+later, for instance, scheduled maintenance of storage elements where the input
 data is located, or updating analysis global tags that used in your jobs.
 
 .. rubric:: Suspend jobs

@@ -184,20 +184,29 @@ might not need it right away if you work on a project all by yourself.
 
 .. note::
 
-   Now complete the first three lessons on `learngitbranching <https://learngitbranching.js.org/>`_!
+Now complete the first three lessons on `learngitbranching <https://learngitbranching.js.org/>`_!
+
+.. image:: learngitbranching.png
+    :target: https://learngitbranching.js.org
+    :alt: Learn git branching
 
 Now you should be familiar with the commands ``git branch`` and ``git merge``.
 
 .. admonition:: Exercise (advanced)
    :class: exercise stacked
 
-   Go to the repository ``b2-git-training-space-2`` and commit changes to a new branch.
+   Go to the repository ``b2-git-training-space-2`` and commit some changes to a new branch.
 
 .. admonition:: Hint
    :class: xhint stacked toggle
 
    You should have already cloned this repository in the last section.
    Run ``git pull`` to make sure you're up to date.
+
+.. admonition:: Hint
+   :class: xhint stacked toggle
+
+   You will need the commands ``git branch``, ``git checkout``, ``git add`` and ``git commit``.
 
 .. admonition:: Solution
    :class: solution toggle
@@ -212,6 +221,7 @@ Now you should be familiar with the commands ``git branch`` and ``git merge``.
       git checkout <your new branch>
       # Example of a change (try something else)
       echo "I'm a cat." >> my_story.txt
+      git add my_story.txt
       git commit -m "Adding a story"
 
 Remember that you weren't allowed to push to the master branch in this

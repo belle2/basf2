@@ -156,6 +156,21 @@ Now you should have both repositories on your local machine.
       git commit -m "Adding a story"
       git push
 
+.. hint::
+
+   If you get completely stuck in this exercise or in one of the exercises
+   of the next session: you can reset your local repository to be exactly
+   that of the remote repository by running with code below.
+   **Your changes might be lost irrecoverably, so only use this for our
+   test repository, unless you know what you're doing!**
+   
+   .. code-block:: bash
+   
+      git fetch origin  # Make sure we're up to date
+      git reset --hard  # RESETS ALL OF YOUR CHANGES to ensure next command works
+      git checkout master  # In case we're on a different branch (see next section)
+      git reset --hard origin/master  # RESET ALL OF YOUR CHANGES!
+
 Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you
 cannot just push changes there directly. Instead, you have to open a pull request (PR).
 For this concept you need to complete the next section.

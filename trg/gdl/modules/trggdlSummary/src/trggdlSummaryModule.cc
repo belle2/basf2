@@ -212,7 +212,7 @@ void TRGGDLSummaryModule::event()
   }
 
   // reg_tmdl_timtype in header. 3bit, no quality info.
-  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][n_clocks - 1];
+  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][0];
 
   //get prescales
   for (int i = 0; i < 320; i++) {
@@ -243,7 +243,7 @@ void TRGGDLSummaryModule::event()
   if (exprun < 13000500) {
     GDLResult->setTimQuality(TRGSummary::TTYQ_CORS); // coarse
   } else {
-    int rvcout = _data[_e_rvcout][n_clocks - 1];
+    int rvcout = _data[_e_rvcout][0];
     int q = (rvcout >> 1) & 3;
     TRGSummary::ETimingQuality timQuality = TRGSummary::TTYQ_NONE;
     switch (q) {

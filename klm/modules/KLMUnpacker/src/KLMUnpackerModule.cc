@@ -317,6 +317,21 @@ void KLMUnpackerModule::unpackKLMDigit(
   }
 }
 
+void KLMUnpackerModule::convertPCIe40ToCOPPER(unsigned int channel, unsigned int* copper, unsigned int* hslb) const
+{
+  if (channel >= 0 && channel < 16) {
+    unsigned int id = channel / 4;
+    *copper = BKLM_ID + id + 1;
+    *hslb = channel - id * 4;
+  } else if (channel >= 16 && channel < 32) {
+    unsigned int id = (channel - 16) / 4;
+    *copper = EKLM_ID + id + 1;
+    *hslb = (channel - 16) - id * 4;
+  } else
+    B2FATAL("The PCIe40 channel is invalid."
+            << LogVar("Channel", channel));
+}
+
 void KLMUnpackerModule::event()
 {
   /*
@@ -333,34 +348,35 @@ void KLMUnpackerModule::event()
     }
     /*
      * getNumEntries is defined in RawDataBlock.h and gives the
-     * numberOfNodes*numberOfEvents. Number of nodes is num copper boards.
+     * numberOfNodes*numberOfEvents. Number of nodes is # COPPER boards.
      */
     for (int j = 0; j < m_RawKLMs[i]->GetNumEntries(); j++) {
-      unsigned int copperId = m_RawKLMs[i]->GetNodeID(j);
+      unsigned int copper = m_RawKLMs[i]->GetNodeID(j);
+      unsigned int hslb;
       int subdetector;
       m_RawKLMs[i]->GetBuffer(j);
-      for (int hslb = 0; hslb < m_RawKLMs[i]->GetMaxNumOfCh(j); hslb++) {
-
-        if (m_RawKLMs[i]->GetMaxNumOfCh(j) == 4) {   // COPPER data
-          if ((copperId >= EKLM_ID) && (copperId <= EKLM_ID + 4))
+      for (unsigned int channelReadoutBoard = 0; channelReadoutBoard < m_RawKLMs[i]->GetMaxNumOfCh(j); channelReadoutBoard++) {
+        if (m_RawKLMs[i]->GetMaxNumOfCh(j) == 4) { // COPPER data
+          hslb = channelReadoutBoard;
+          if ((copper >= EKLM_ID) && (copper <= EKLM_ID + 4))
             subdetector = KLMElementNumbers::c_EKLM;
-          else if ((copperId >= BKLM_ID) && (copperId <= BKLM_ID + 4))
+          else if ((copper >= BKLM_ID) && (copper <= BKLM_ID + 4))
             subdetector = KLMElementNumbers::c_BKLM;
           else
             continue;
         } else if (m_RawKLMs[i]->GetMaxNumOfCh(j) == 48) { // PCIe40 data
-          if (0 <= hslb && hslb < 16) {
-            subdetector = KLMElementNumbers::c_BKLM; // ch0-15 -> BKLM(cpr7001-7004 for COPPER)
-          } else if (16 <= hslb && hslb < 32) {
-            subdetector = KLMElementNumbers::c_EKLM; // ch16-31 -> EKLM(cpr8001-8004 for COPPER)
-          } else {
-            B2FATAL("Channel number(=" << hslb << ") is invalid.");
-          }
+          if (channelReadoutBoard >= 0 && channelReadoutBoard < 16)
+            subdetector = KLMElementNumbers::c_BKLM;
+          else if (channelReadoutBoard >= 16 && channelReadoutBoard < 32)
+            subdetector = KLMElementNumbers::c_EKLM;
+          else
+            B2FATAL("The PCIe40 channel is invalid."
+                    << LogVar("Channel", channelReadoutBoard));
+          convertPCIe40ToCOPPER(channelReadoutBoard, &copper, &hslb);
         } else {
-          B2FATAL("The max # of channels per readout board(=" << m_RawKLMs[i]->GetMaxNumOfCh(j) << ")  is invalid.");
+          B2FATAL("The maximum number of channels per readout board is invalid."
+                  << LogVar("Number of channels", m_RawKLMs[i]->GetMaxNumOfCh(j)));
         }
-
-
         KLMDigitEventInfo* klmDigitEventInfo =
           m_DigitEventInfos.appendNew(m_RawKLMs[i], j);
         klmDigitEventInfo->setPreviousEventTriggerCTime(
@@ -390,7 +406,7 @@ void KLMUnpackerModule::event()
           klmDigitEventInfo->setUserWord(0);
         }
         for (int iHit = 0; iHit < numHits; iHit++) {
-          unpackKLMDigit(&hslbBuffer[iHit * hitLength], copperId, hslb,
+          unpackKLMDigit(&hslbBuffer[iHit * hitLength], copper, hslb,
                          subdetector, klmDigitEventInfo);
         }
       }

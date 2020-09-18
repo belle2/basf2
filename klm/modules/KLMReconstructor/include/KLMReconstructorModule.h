@@ -88,9 +88,10 @@ namespace Belle2 {
     void reconstructEKLMHits();
 
     /**
-     * Return false if channel is Hot
+     * Check if channel is normal or dead.
+     * Dead channels should not contain any signal; they are allowed for debugging.
      */
-    bool isNormal(KLMDigit* digit);
+    bool isNormal(KLMDigit* digit) const;
 
     /* EKLM methods. */
 
@@ -175,8 +176,8 @@ namespace Belle2 {
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
-    /** Ignore hot channels during 2d hit reconstruction */
-    bool m_eklmIgnoreHotChannels;
+    /** Use only Normal and Dead (for debugging) channels during 2d hit reconstruction */
+    bool m_klmIgnoreHotChannels;
 
   };
 } // end namespace Belle2

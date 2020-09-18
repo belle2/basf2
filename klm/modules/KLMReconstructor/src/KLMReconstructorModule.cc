@@ -85,8 +85,8 @@ KLMReconstructorModule::KLMReconstructorModule() :
            false);
   addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
-  addParam("IgnoreHotChannels", m_eklmIgnoreHotChannels,
-           "Ignore hot channels during 2d hit reconstruction",
+  addParam("IgnoreHotChannels", m_klmIgnoreHotChannels,
+           "Use only Normal and Dead (for debugging) channels during 2d hit reconstruction",
            true);
 }
 
@@ -150,6 +150,23 @@ void KLMReconstructorModule::event()
   reconstructEKLMHits();
 }
 
+bool KLMReconstructorModule::isNormal(KLMDigit* digit) const
+{
+  int subdetector = digit->getSubdetector();
+  int section = digit->getSection();
+  int sector = digit->getSector();
+  int layer = digit->getLayer();
+  int plane = digit->getPlane();
+  int strip = digit->getStrip();
+  uint16_t channel = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
+  enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
+  if (status == KLMChannelStatus::c_Unknown)
+    B2FATAL("Incomplete KLM channel status data.");
+  if (status == KLMChannelStatus::c_Normal || status == KLMChannelStatus::c_Dead)
+    return true;
+  return false;
+}
+
 void KLMReconstructorModule::reconstructBKLMHits()
 {
   /* Construct BKLMHit1Ds from KLMDigits. */
@@ -162,6 +179,8 @@ void KLMReconstructorModule::reconstructBKLMHits()
     if (digit->isMultiStrip())
       continue;
     if (m_bklmIgnoreScintillators && !digit->inRPC())
+      continue;
+    if (m_klmIgnoreHotChannels && !isNormal(m_Digits[index]))
       continue;
     if (digit->inRPC() || digit->isGood()) {
       uint16_t channel = BKLMElementNumbers::channelNumber(
@@ -238,25 +257,6 @@ double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
    */
 }
 
-bool KLMReconstructorModule::isNormal(KLMDigit* digit)
-{
-  int subdetector = digit->getSubdetector();
-  int section = digit->getSection();
-  int sector = digit->getSector();
-  int layer = digit->getLayer();
-  int plane = digit->getPlane();
-  int strip = digit->getStrip();
-  uint16_t channel = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
-  enum KLMChannelStatus::ChannelStatus status = m_ChannelStatus->getChannelStatus(channel);
-  if (status == KLMChannelStatus::c_Unknown)
-    B2FATAL("Incomplete KLM channel status data.");
-  if (status == KLMChannelStatus::c_Normal)
-    return true;
-  else if (status == KLMChannelStatus::c_Dead)
-    return true;
-  return false;
-}
-
 void KLMReconstructorModule::reconstructEKLMHits()
 {
   int i, n;
@@ -269,7 +269,7 @@ void KLMReconstructorModule::reconstructEKLMHits()
       continue;
     if (m_Digits[i]->isMultiStrip())
       continue;
-    if (m_eklmIgnoreHotChannels && !isNormal(m_Digits[i]))
+    if (m_klmIgnoreHotChannels && !isNormal(m_Digits[i]))
       continue;
     if (m_Digits[i]->isGood())
       digitVector.push_back(m_Digits[i]);

@@ -807,6 +807,19 @@ backward-compatibility that is guaranteed in the software.
      If BB is AA+1 (i.e. the next major release).
      You should be able to open the old file, and your analysis code should work.
 
+.. admonition:: Question
+     :class: exercise stacked
+
+     If you have an **mdst file** that is from the latest MC campaign.
+     Will you be able to open it with the latest light release?
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     **Yes**.
+     New light releases will always be able to open files from the current,
+     and last supported full release.
+     An MC campaign is always based on a full release.
 
 You will use mdst data files in the next lesson.
 

@@ -32,7 +32,7 @@ using namespace SoftwareTrigger;
 
 SkimSampleCalculator::SkimSampleCalculator() :
   m_pionParticles("pi+:skim"), m_gammaParticles("gamma:skim"), m_pionHadParticles("pi+:hadb"), m_pionTauParticles("pi+:tau"),
-  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged")
+  m_KsParticles("K_S0:merged"), m_LambdaParticles("Lambda0:merged"), m_DstParticles("D*+:d0pi")
 {
 
 }
@@ -45,6 +45,7 @@ void SkimSampleCalculator::requireStoreArrays()
   m_pionTauParticles.isRequired();
   m_KsParticles.isOptional();
   m_LambdaParticles.isOptional();
+  m_DstParticles.isOptional();
 
 };
 
@@ -732,4 +733,41 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   } else {
     calculationResult["Lambda"] = 0;
   }
+
+  // nDstp
+  unsigned int nDstp1 = 0;
+  unsigned int nDstp2 = 0;
+  unsigned int nDstp3 = 0;
+
+
+  if (m_DstParticles.isValid() && (ntrk_bha >= 3 && Bhabha2Trk == 0)) {
+    for (unsigned int i = 0; i < m_DstParticles->getListSize(); i++) {
+      const Particle* allDstCand = m_DstParticles->getParticle(i);
+      const double dstDecID = allDstCand->getExtraInfo("decayModeID");
+      if (dstDecID == 1.) nDstp1++;
+      if (dstDecID == 2.) nDstp2++;
+      if (dstDecID == 3.) nDstp3++;
+    }
+  }
+
+
+  if (nDstp1 > 0) {
+    calculationResult["Dstp1"] = 1;
+  } else {
+    calculationResult["Dstp1"] = 0;
+  }
+
+  if (nDstp2 > 0) {
+    calculationResult["Dstp2"] = 1;
+  } else {
+    calculationResult["Dstp2"] = 0;
+  }
+
+  if (nDstp3 > 0) {
+    calculationResult["Dstp3"] = 1;
+  } else {
+    calculationResult["Dstp3"] = 0;
+  }
+
+
 }

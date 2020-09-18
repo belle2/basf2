@@ -193,15 +193,15 @@ def get_calibrations(input_data, **kwargs):
     els3_suffix = "_ELS3"
 
     unique_id_cog6 = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}{cog6_suffix}"
+                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_CoG6:\n{unique_id_cog6}")
 
-    unique_id_cog3 = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}{cog3_suffix}"
+    unique_id_cog3 = f"SVD3SampleCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
+                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_CoG3:\n{unique_id_cog3}")
 
-    unique_id_els3 = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}{els3_suffix}"
+    unique_id_els3 = f"SVD3SampleELSTimeCalibrations_Prompt_{now.isoformat()}_INFO:_TBindep_" \
+                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_ELS3:\n{unique_id_els3}")
 
     requested_iov = kwargs.get("requested_iov", None)

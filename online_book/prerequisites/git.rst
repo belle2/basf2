@@ -160,7 +160,8 @@ Now you should have both repositories on your local machine.
 
    If you get completely stuck in this exercise or in one of the exercises
    of the next session: you can reset your local repository to be exactly
-   that of the remote repository by running with code below.
+   that of the remote repository by running the code below.
+   
    **Your changes might be lost irrecoverably, so only use this for our
    test repository, unless you know what you're doing!**
    
@@ -196,8 +197,6 @@ might not need it right away if you work on a project all by yourself.
    promise that you will come back!
 
    |uncheck| I promise!
-
-.. note::
 
 Now complete the first three lessons on `learngitbranching <https://learngitbranching.js.org/>`_!
 
@@ -249,17 +248,27 @@ branch you will then have a local and a remote ``<your new branch>`` branch).
    git push --set-upstream origin <your new branch>
 
 The output of the last command tells you to go to
-``https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/<your new branch>``
+
+.. code-block::
+   https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/<your new branch>
+
 to open a PR. That's exactly what we want to do!
 
 .. admonition:: Exercise
-   :class: exercise
+   :class: exercise stacked
 
    Create a PR and add the starterkit organizer as a reviewer.
+   
+.. admonition:: Solution
+   :class: solution toggle
+   
+   Click on the link described above or paste it in the address bar of
+   your browser. Follow the instructions.
 
 Now you have to wait for someone to approve your PR. Once they do,
 you can click on the ``Merge`` button. Then your changes are finally
-in the repository (verify this by pulling!).
+in the repository (verify this by checkout out the ``master`` branch and
+updating it with ``git pull``).
 
 .. admonition:: Exercise
    :class: Exercise

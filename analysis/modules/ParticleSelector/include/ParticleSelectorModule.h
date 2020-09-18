@@ -12,8 +12,12 @@
 
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <framework/core/Module.h>
+
+// framework - DataStore
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 #include <memory>
@@ -45,6 +49,8 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+
+    StoreObjPtr<ParticleList> m_particleList; /**< particle list */
 
     std::string m_decayString;   /**< Input DecayString specifying the particle being selected */
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the particle being selected */

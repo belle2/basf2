@@ -14,9 +14,6 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
-
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
@@ -177,8 +174,6 @@ namespace Belle2 {
     std::string antiListName = ParticleListName::antiParticleListName(listName);
     bool isSelfConjugatedParticle = (listName == antiListName);
 
-    StoreArray<Particle> particles;
-
     StoreObjPtr<ParticleList> outputList(listName);
     outputList.create();
     outputList->initialize(pdgCode, listName);
@@ -227,11 +222,11 @@ namespace Belle2 {
     while (m_generator->loadNext(m_chargeConjugation)) {
       Particle&& particle = m_generator->getCurrentParticle();
 
-      Particle* newParticle = particles.appendNew(particle);
+      Particle* newParticle = m_particles.appendNew(particle);
       // append to the created particle the user specified decay mode ID
       newParticle->addExtraInfo("decayModeID", m_decayModeID);
 
-      int iparticle = particles.getEntries() - 1;
+      int iparticle = m_particles.getEntries() - 1;
       outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
 

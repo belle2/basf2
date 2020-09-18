@@ -484,7 +484,12 @@ class InelasticDarkMatter(BaseSkim):
         ma.cutAndCopyList("e+:TrackFromIP", "e+:all", IPtrack, path=path)
         ma.cutAndCopyList("e+:HighEnergyTrack", "e+:all", HighEtrack, path=path)
 
-        signalPhoton = 'clusterReg==2 and clusterZernikeMVA > 0.3 and useCMSFrame(p) > 1.0'
+        signalPhoton = "[clusterReg==2 and useCMSFrame(E) > 1.0] or "
+        signalPhoton += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
+        signalPhoton += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
+        signalPhoton += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
+        signalPhoton += "[clusterReg == 13 and useCMSFrame(E) > 2.0] "     # between bwd and barrel
+
         photonVetoHE1 = 'useCMSFrame(p) > 0.6'
         photonVetoHE3 = 'p>0.5'
 
@@ -496,8 +501,8 @@ class InelasticDarkMatter(BaseSkim):
                         'nParticlesInList(e+:TrackFromIP)==0 and '
                         'nParticlesInList(e+:HighEnergyTrack) == 0 and '
                         'nParticlesInList(gamma:HighEnergyPhotons) == 1 and '
-                        'nParticlesInList(gamma:MediumEnergyPhotons) < 4'
-                        )
+                        'nParticlesInList(gamma:MediumEnergyPhotons) < 4 and '
+                        'HighLevelTrigger == 1')
 
         path = self.skim_event_cuts(idmEventCuts, path=path)
 

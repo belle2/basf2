@@ -86,7 +86,7 @@ class skimSVDBurstEventsModule(basf2.Module):
             self.return_value(0)
 
 
-class skim6SampleEventsModule(basf2.Module):
+class skim6SampleEventsPyModule(basf2.Module):
     """
     returns True if the event is acquired with 6 samples
     """
@@ -112,8 +112,8 @@ class skim6SampleEventsModule(basf2.Module):
             return
 
         # check if we acquired 6-sample strips in this event
-        if eventInfo.getNSamples() == 6
-        self.return_value(1)
+        if eventInfo.getNSamples() == 6:
+            self.return_value(1)
         else:
             self.return_value(0)
 

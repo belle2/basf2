@@ -14,7 +14,8 @@ struct ExpRun {
 inline bool operator!=(ExpRun a, ExpRun b) { return (a.exp != b.exp || a.run != b.run); }
 inline bool operator<(ExpRun a, ExpRun b) {return (1e6 * a.exp + a.run) < (1e6 * b.exp + b.run);}
 
-void filter(std::map<ExpRun, std::pair<double, double>>& runs, double cut);
+std::map<ExpRun, std::pair<double, double>> filter(const std::map<ExpRun, std::pair<double, double>>& runs, double cut,
+                                                   std::map<ExpRun, std::pair<double, double>>& runsRemoved);
 
 class Splitter {
 public:
@@ -23,6 +24,8 @@ public:
 
   std::vector<std::pair<double, std::vector<int>>> cache;
 
+  static std::map<ExpRun, std::pair<double, double>> mergeIntervals(std::map<ExpRun, std::pair<double, double>> I1,
+                                                  std::map<ExpRun, std::pair<double, double>> I2);
 
   static std::vector<std::pair<double, double>> splitToSmall(std::map<ExpRun, std::pair<double, double>> runs,
                                                              double intSize = 1. / 60);

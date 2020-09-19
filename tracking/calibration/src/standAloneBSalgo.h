@@ -1,6 +1,6 @@
 
-#ifndef analyzeTime_H
-#define analyzeTime_H
+#ifndef standAloneBSalgo_H
+#define standAloneBSalgo_H
 
 #include <vector>
 #include <tuple>

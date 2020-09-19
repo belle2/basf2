@@ -46,7 +46,7 @@ def get_calibrations(input_data, **kwargs):
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
     # Lets set some limits because this calibration doesn't need that much to run.
-    max_files_per_run = 10000
+    max_files_per_run = 1000000
 
     # We filter out any more than 100 files per run. The input data files are sorted alphabetically by b2caf-prompt-run
     # already. This procedure respects that ordering
@@ -77,9 +77,6 @@ def get_calibrations(input_data, **kwargs):
     # Calibration setup
 
     from caf.framework import Calibration
-    from caf.strategies import SequentialRunByRun
-    from caf.strategies import SequentialBoundaries
-    from caf.strategies import SimpleRunByRun
     from caf.strategies import SingleIOV
 
     # module to be run prior the collector
@@ -102,9 +99,6 @@ def get_calibrations(input_data, **kwargs):
                                  output_patterns=None,
                                  max_files_per_collector_job=1)
 
-    # calibration_bs.strategies = SequentialRunByRun
-    # calibration_bs.strategies = SequentialBoundaries
-    # calibration_bs.strategies = SimpleRunByRun
     calibration_bs.strategies = SingleIOV
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV

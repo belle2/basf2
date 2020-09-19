@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Gaetano de Marino, Tadeas Bilka                          *
+ * Contributors: Radek Zlebcik
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,7 +17,7 @@
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 
-#include "analyzeTime.h"
+#include "standAloneBSalgo.h"
 
 #include "Splitter.h"
 
@@ -62,6 +62,19 @@ TObject* getBeamSpotObj(TVector3 ipVtx, TMatrixDSym  ipVtxUnc, TMatrixDSym  size
 }
 
 
+int getID(double t, const vector<double>& breaks)
+{
+  for (int i = 0; i < int(breaks.size()) + 1; ++i) {
+    double s = (i == 0)             ? 0 : breaks[i - 1];
+    double e = (i == int(breaks.size())) ? 1e20 : breaks[i];
+    if (s  <= t   &&  t < e)
+      return i;
+  }
+  return -1;
+}
+
+
+
 CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 {
   auto tracks = getObjectPtr<TTree>("tracks");
@@ -76,9 +89,9 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   vector<event> evts = getEvents(tracks.get());
 
   //Time range for each ExpRun
-  map<ExpRun, pair<double, double>> runsInfo = getRunInfo(evts);
-
-  filter(runsInfo, 2. / 60); //include only 2m or longer runs
+  map<ExpRun, pair<double, double>> runsInfoOrg = getRunInfo(evts);
+  map<ExpRun, pair<double, double>> runsRemoved;
+  auto runsInfo = filter(runsInfoOrg, 2. / 60, runsRemoved); //include only 2m or longer runs TODO include these to payloads
 
   if (runsInfo.size() == 0) {
     cout << "Too short run" << endl;
@@ -101,32 +114,140 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   vector<vector<TMatrixDSym>> ipsUncVec(splits.size());
   vector<TMatrixDSym>  sizeMatVec(splits.size());
 
-  #pragma omp parallel for
+  //#pragma omp parallel for
   for (unsigned i = 0; i < splits.size(); ++i) {
-    const auto& r = splits[i];
+    auto& r = splits[i];
+    cout << "Radek line : " << __LINE__ << endl;
     tie(sVec[i], eVec[i]) = Splitter::getStartEnd(r);
-    cout << sVec[i] << " " << eVec[i] << endl;
+    cout << "Start of loop " << sVec[i] << " " << eVec[i] << endl;
+    cout << "Radek line : " << __LINE__ << endl;
+
+    //if(i != 77) continue;
 
     auto breaks =  Splitter::getBreaks(r);
 
+    cout << "Radek line : " << __LINE__ << endl;
+
+    vector<int> Counts(breaks.size() + 1, 0);
     // Select events belonging to the interval
     for (const auto& ev : evts) {
-      if (sVec[i] <= ev.t && ev.t < eVec[i])
+      if (sVec[i] <= ev.t && ev.t < eVec[i]) {
         evtsVec.at(i).push_back(ev);
+        ++Counts.at(getID(ev.t, breaks));
+      }
     }
 
+
+    cout << "Size comparison " << r.size() << " " << breaks.size() << endl;
+    cout << "Radek line : " << __LINE__ << endl;
+
+    //Merge smallest interval if with low stat (try it 10times)
+    for (int k = 0; k < 10; ++k)  {
+      int iMin = min_element(Counts.begin(), Counts.end()) - Counts.begin();
+      if (Counts.size() >= 2 &&  Counts[iMin] < 50) { //merge with neighbor if possible
+        auto iM = -1;
+        if (iMin == 0)
+          iM = iMin + 1;
+        else if (iMin == int(Counts.size()) - 1)
+          iM = iMin - 1;
+        else {
+          if (Counts[iMin + 1] < Counts[iMin - 1])
+            iM = iMin + 1;
+          else
+            iM = iMin - 1;
+        }
+        cout << "Radek line : " << __LINE__ << endl;
+        assert(r.size() == Counts.size());
+
+        cout << "Radek line : " << __LINE__ << " " << iM << " " <<  iMin <<  endl;
+        r.at(iM) = Splitter::mergeIntervals(r[iM], r[iMin]);
+        cout << "Radek line : " << __LINE__ << endl;
+        r.erase(r.begin() + iMin);
+        cout << "Radek line : " << __LINE__ << endl;
+        breaks =  Splitter::getBreaks(r);
+        cout << "Radek line : " << __LINE__ << endl;
+        Counts[iM] += Counts[iMin];
+        Counts.erase(Counts.begin() + iMin);
+      }
+    }
+    cout << "Radek line : " << __LINE__ << endl;
+
+    cout << "Radek line : " << __LINE__ << endl;
+    cout << "Evt size " << evtsVec.at(i).size() << endl;
+    cout << "Breaks size " << breaks.size() << endl;
+
     breakPointsVec[i] = convertSplitPoints(evtsVec.at(i), breaks);
+    cout << "I am after" << endl;
+
+    if (breaks.size() > 0)
+      cout << "HELENKA " <<   breakPointsVec[i].at(0).run << " " <<   breakPointsVec[i].at(0).evt << " " << breakPointsVec[i].size() <<
+           endl;
+    //assert(breakPointsVec[i].at(k - 1).run == exprun.run);
+
+
+    //If too few events, let the BeamSpot pars empty
+    if (evtsVec.at(i).size() < 50) {
+      continue;
+    }
 
     // Run the BeamSpot analysis
     //vector<TVector3> ipVec;
     //vector<TMatrixDSym> ipUncVec;
     //TMatrixDSym  sizeMat(3);
     sizeMatVec[i].ResizeTo(3, 3);
+    cout << "Start of running BS analysis ID : " << i <<  endl;
     tie(ipsVec[i], ipsUncVec[i], sizeMatVec[i]) = runBeamSpotAnalysis(evtsVec.at(i), breaks);
-
+    cout << "End of running BS analysis - SizeMat : " << sqrt(abs(sizeMatVec[i](0, 0))) <<   endl;
     assert(ipsVec[i].size() == r.size());
   }
 
+  //put closest neighbor, where stat was low or algo failed
+  for (unsigned i = 0; i < splits.size(); ++i) {
+    if (ipsVec[i].size() != 0) continue;
+    const auto& r = splits[i];
+    double Start, End;
+    tie(Start, End) = Splitter::getStartEnd(r);
+
+    TVector3 ipNow;
+    TMatrixDSym ipeNow(3);
+    TMatrixDSym  sizeMatNow(3);
+
+    double distMin = 1e20;
+    //Find the closest non-dummy interval
+    for (unsigned j = 0; j < splits.size(); ++j) {
+      if (ipsVec[j].size() == 0) continue; //skip empty
+      for (unsigned jj = 0; jj < splits[j].size(); ++jj) {
+        const auto& rNow = splits[j][jj];
+        double s = rNow.begin()->second.first;
+        double e = rNow.rbegin()->second.second;
+
+        double dist1 = (s - End >= 0) ? (s - End) : 1e20;
+        double dist2 = (Start - e >= 0) ? (Start - e) : 1e20;
+        double dist = min(dist1, dist2);
+
+        if (dist < distMin) {
+          ipNow = ipsVec[j].at(jj);
+          ipeNow = ipsUncVec[j].at(jj);
+          sizeMatNow = sizeMatVec[j];
+          distMin = dist;
+        }
+      }
+    }
+
+    //Store it
+    ipsVec[i].resize(r.size());
+    ipsUncVec[i].resize(r.size());
+    for (unsigned ii = 0; ii < r.size(); ++ii) {
+      ipsVec[i][ii] = ipNow;
+      ipsUncVec[i][ii].ResizeTo(3, 3);
+      ipsUncVec[i][ii] = ipeNow;
+    }
+    sizeMatVec[i].ResizeTo(3, 3);
+    sizeMatVec[i] = sizeMatNow;
+  }
+
+
+  //return c_NotEnoughData; //radek
 
   for (unsigned i = 0; i < splits.size(); ++i) {
     const auto& r = splits[i];
@@ -162,7 +283,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
         }
         exprunLast = exprun;
       }
-    }
+    } //end loop over vtx-intervals
 
 
   } //end loop over size-intervals

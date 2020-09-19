@@ -1,5 +1,16 @@
-// Program to fit vertex parameters
-// based on https://docs.belle2.org/record/1511/files/BELLE2-NOTE-TE-2019-018.pdf
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2017 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Radek Zlebcik
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+// Program obtain the Beam Spot properties from mumu track variables
+// inspired by https://docs.belle2.org/record/1511/files/BELLE2-NOTE-TE-2019-018.pdf
+//          and https://arxiv.org/pdf/1405.6569.pdf
 
 #include <iomanip>
 #include <iostream>
@@ -35,7 +46,7 @@
 #include <vector>
 
 #include "tools.h"
-#include "analyzeTime.h"
+#include "standAloneBSalgo.h"
 #include "Splitter.h"
 
 using namespace std;
@@ -280,8 +291,29 @@ pair<double, double> getSizeMinMax(double SizeX, double SizeY, double SizeXY)
   }
   double Size2Max = (A + sqrt(D)) / 2;
   return {Sqrt(Size2Min), Sqrt(Size2Max)};
-
 }
+
+
+//Get the eigen-vals of symetric 2x2 matrix, sizes in [um2] !
+double getSize2MinMat(double SizeXX, double SizeYY, double SizeXY)
+{
+  double A = SizeXX + SizeYY;
+  double B = SizeXX * SizeYY - pow(SizeXY, 2);
+  double D = pow(A, 2) - 4 * B;
+
+  if (D < 0) {
+    cout << "Problem with D" << D << endl;
+    exit(1);
+  }
+
+  double Size2Min = 2 * B / (A + sqrt(D));
+
+  return Size2Min;
+}
+
+
+
+
 
 
 // structure including all variables of interest with uncertainity from boot-strap
@@ -732,9 +764,13 @@ pair<vector<double>, vector<double>> linearFitErr(TMatrixD m, TVectorD r, double
 {
   TMatrixD mT = m; mT.T();
   TMatrixD mat = mT * m;
+
+  cout << "Mat to invert (org size : " << m.GetNrows() << " " << m.GetNcols() <<  endl;
   //mat.Print();
 
+  cout << "Inversion start" << endl;
   mat.Invert();
+  cout << "Inversion end" << endl;
   TMatrixD A = mat * mT;
   TVectorD res = A * r;
   TVectorD dataH = m * res;
@@ -787,6 +823,7 @@ pair<vector<double>, vector<double>> linearFitErr(TMatrixD m, TVectorD r, double
 //Linear fit with positivity constraint on the output parameters (for BeamSpot-size fit)
 TVectorD linearFitPos(TMatrixD mat, TVectorD r)
 {
+  const double s2MinLimit = pow(0.05, 2);
   if (mat.GetNcols() != 3) {
     cout << "Wrong size of matrix for size fit" << endl;
     exit(0);
@@ -799,7 +836,9 @@ TVectorD linearFitPos(TMatrixD mat, TVectorD r)
   TVectorD pars = Ainv * v;
 
   //If everyting OK
-  if (pars[0] >= 0 && pars[1] >= 0 && pars[0]*pars[1] >= pars[2]*pars[2])
+  double s2Min = getSize2MinMat(pars[0], pars[1], pars[2]);
+  //if (pars[0] >= 0 && pars[1] >= 0 && pars[0]*pars[1] >= pars[2]*pars[2])
+  if (pars[0] >= 0 && pars[1] >= 0 && s2Min >= s2MinLimit)
     return pars;
 
   //////////////////////////
@@ -825,7 +864,31 @@ TVectorD linearFitPos(TMatrixD mat, TVectorD r)
   //Get maximum likelihood
   //////////////////////////
 
+  //Maximum likelihood over eigenvector and angle
+  TF2* fEig = new TF2(rn(), [Norm, covMatI, pars, s2MinLimit](double * x, double*) {
+    double eig1 = x[0];
+    double eig2 = s2MinLimit;
+    double phi  = x[1];
+    double c = cos(phi);
+    double s = sin(phi);
 
+    TVectorD xVec(3);
+    xVec(0) = eig1 * c * c + eig2 * s * s;
+    xVec(1) = eig1 * s * s + eig2 * c * c;
+    xVec(2) = s * c * (eig1 - eig2);
+
+    double res = covMatI.Similarity(xVec - pars);
+    return res;
+  }, s2MinLimit, 400, 0, 2 * M_PI, 0);
+
+  double eigHigh, phi;
+  fEig->GetMinimumXY(eigHigh, phi);
+
+  pars[0] = eigHigh * pow(cos(phi), 2) + s2MinLimit * pow(sin(phi), 2);
+  pars[1] = eigHigh * pow(sin(phi), 2) + s2MinLimit * pow(cos(phi), 2);
+  pars[2] = sin(phi) * cos(phi) * (eigHigh - s2MinLimit);
+
+  /*
 
   TF2* f = new TF2(rn(), [Norm, covMatI, pars](double * x, double*) {
     TVectorD xVec(3); xVec(0) = x[0]; xVec(1) = x[1];
@@ -836,7 +899,7 @@ TVectorD linearFitPos(TMatrixD mat, TVectorD r)
     double r2 = covMatI.Similarity(xVec - pars);
 
     return min(r1, r2);
-  }, 0, 250, 0, 100, 0);
+  }, 0, 400, 0, 100, 0);
 
   double xx, yy, xy;
   f->GetMinimumXY(xx, yy);
@@ -861,6 +924,9 @@ TVectorD linearFitPos(TMatrixD mat, TVectorD r)
   pars(0) = xx;
   pars(1) = yy;
   pars(2) = xy;
+
+  */
+
   return pars;
 
 
@@ -1702,6 +1768,7 @@ spotParam fitSpotPositionSplines(const vector<event>& evts, vector<double> splX,
 
   vector<double> pars(A.GetNcols()), err2(A.GetNcols());
   double err2Mean, err2press, err2pressErr;
+  cout << "Starting linear fit ev : "  << dataVec.size()  << endl;
   tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
   cout << "Mean err xyfit " << fixed << setprecision(3) << err2Mean << " : " << err2press << " " << err2pressErr << " :  " <<
        err2press - err2Mean << endl;
@@ -2350,9 +2417,9 @@ tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(v
 
     auto resZmy = fitZpositionSplinesSimple(evts, indZ, resFin);
     if (k == kPlot) plotSpotZPositionFit(evts, resZmy, "positionFitSimpleZ");
-    if (k == kPlot) plotSpotZpositionPull(evts, resZmy, "zPositionPull", 1000);
+    if (k == kPlot) plotSpotZpositionPull(evts, resZmy, "zPositionPull", 1200);
 
-    removeSpotZpositionOutliers(evts,  resZmy, 1000);
+    //removeSpotZpositionOutliers(evts,  resZmy, 1000); RADEK comment
     resZmy = fitZpositionSplinesSimple(evts, indZ, resZmy);
 
     //resTemp.print();

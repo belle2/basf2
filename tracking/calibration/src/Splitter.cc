@@ -62,7 +62,8 @@ void shift(map<ExpRun, pair<double, double>>& runs)
   }
 }
 
-void filter(map<ExpRun, pair<double, double>>& runs, double cut)
+map<ExpRun, pair<double, double>> filter(const map<ExpRun, pair<double, double>>& runs, double cut,
+                                         map<ExpRun, pair<double, double>>& runsRemoved)
 {
   map<ExpRun, pair<double, double>> runsCopy;
 
@@ -71,9 +72,11 @@ void filter(map<ExpRun, pair<double, double>>& runs, double cut)
     double d =  I.second - I.first;
     if (d > cut)
       runsCopy[r.first] = r.second;
+    else
+      runsRemoved[r.first] = r.second;
   }
 
-  runs = runsCopy;
+  return runsCopy;
 }
 
 
@@ -218,7 +221,7 @@ double Splitter::lossFunction(const vector<pair<double, double>>&  vec, int s, i
 
   static int tBestCheck = tBest;
   if (tBestCheck != tBest) {
-    cout << "radek " << tBest << endl;
+    //cout << "radek " << tBest << endl;
     //exit(0);
   }
 
@@ -720,8 +723,8 @@ double Splitter::getMinLoss(const vector<pair<double, double>>&  vec,   int b, v
       r1 = getMinLoss(vec, i, breaksNow);
     double r2 = lossFunction(vec, i + 1, b);
     double tot = r1 + r2;
-    if (tBest < 1.0)
-      cout << "Checking b,i: " << b << " " << i << " : " << tot << endl;
+    //if (tBest < 1.0)
+    //cout << "Checking b,i: " << b << " " << i << " : " << tot << endl;
 
     if (tot < minVal) {
       minVal = tot;
@@ -821,8 +824,21 @@ vector<map<ExpRun, pair<double, double>>> breaks2intervalsSep(map<ExpRun, pair<d
   return splitsNow;
 }
 
-
-
+//Merge two intervals
+map<ExpRun, pair<double, double>> Splitter::mergeIntervals(map<ExpRun, pair<double, double>> I1,
+                                                           map<ExpRun, pair<double, double>> I2)
+{
+  map<ExpRun, pair<double, double>>  I = I1;
+  for (auto r : I2) {
+    ExpRun run = r.first;
+    if (I.count(run) == 0)
+      I[run] = r.second;
+    else {
+      I.at(run) = make_pair(min(I1.at(run).first, I2.at(run).first),   max(I1.at(run).second, I2.at(run).second));
+    }
+  }
+  return I;
+}
 
 vector<vector<map<ExpRun, pair<double, double>>>>  Splitter::getIntervals(map<ExpRun, pair<double, double>> runs, double tBestSize,
     double tBestVtx, double GapPenalty)
@@ -880,7 +896,7 @@ void splitter()
 {
   auto runs = load();
   shift(runs);
-  filter(runs, 2. / 60);
+  //filter(runs, 2. / 60);
 
   //vector<pair<double,double>>  runs = { {0,0.1}, {0.11,0.4}, {0.4,0.8},  {1.7,2.3}, {2.35,2.45}, {6.3, 7.3}};
 

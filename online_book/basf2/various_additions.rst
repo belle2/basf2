@@ -254,7 +254,7 @@ marker to the decay string:
    )
 
 .. admonition:: Extra exercises
-   :class: exercise stacked
+   :class: exercise
 
    * Store the ``isBremsCorrected`` information of the positrons and electrons
      used in the :math:`J/\psi` reconstruction

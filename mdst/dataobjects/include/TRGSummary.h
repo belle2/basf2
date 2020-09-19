@@ -251,7 +251,7 @@ namespace Belle2 {
     unsigned int m_prescaleBits[c_ntrgWords][c_trgWordSize] = {0};
 
     /**  Trigger Summary Information including bit (input, ftdl, psnm), timing and trigger source. */
-    ClassDefOverride(TRGSummary, 5);
+    ClassDefOverride(TRGSummary, 6);
   };
 
 

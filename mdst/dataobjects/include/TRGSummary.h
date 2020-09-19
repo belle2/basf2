@@ -39,25 +39,25 @@ namespace Belle2 {
 
     /** types of trigger timing source defined in b2tt firmware */
     enum ETimingType {
-      /** events triggered by top timing */
-      TTYP_PID0 = 0,
-      /** events triggered by top timing */
-      TTYP_PID1 = 4,
-      /** events triggered by top timing */
-      TTYP_PID2 = 8,
-      /** events triggered by top timing */
-      TTYP_PID3 = 12,
+      /** events triggered by ECL timing */
+      TTYP_ECL  = 0,
       /** reserved (not defined yet) */
-      TTYP_RSV0 = 2,
+      TTYP_PID1 = 4,
+      /** reserved (not defined yet) */
+      TTYP_PID2 = 8,
+      /** reserved (not defined yet) */
+      TTYP_PID3 = 12,
+      /** events triggered by self trigger */
+      TTYP_SELF = 2,
       /** reserved (not defined yet) */
       TTYP_RSV1 = 6,
       /** reserved (not defined yet) */
       TTYP_RSV2 = 10,
       /** reserved (not defined yet) */
       TTYP_RSV3 = 14,
-      /** events triggered by ecl timing */
-      TTYP_ECL = 1,
-      /** events triggered by cdc timing */
+      /** events triggered by TOP timing */
+      TTYP_TOP = 1,
+      /** events triggered by CDC timing */
       TTYP_CDC = 3,
       /** delayed physics events for background */
       TTYP_DPHY = 5,
@@ -75,7 +75,7 @@ namespace Belle2 {
 
     /** trigger timing type quality */
     enum ETimingQuality {
-      /* Non. Should not happen. */
+      /* Non. Must not happen for TOP/ECL/CDC timing events */
       TTYQ_NONE = 0,
       /* Coarse */
       TTYQ_CORS = 1,

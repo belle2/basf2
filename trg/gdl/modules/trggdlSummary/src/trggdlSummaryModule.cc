@@ -225,11 +225,15 @@ void TRGGDLSummaryModule::event()
   if (gtt == GDL::e_tt_cdc) {
     tt = TRGSummary::TTYP_CDC;
   } else if (gtt == GDL::e_tt_ecl) {
-    tt = TRGSummary::TTYP_PID0;
+    tt = TRGSummary::TTYP_ECL;
+  } else if (gtt == GDL::e_tt_top) {
+    tt = TRGSummary::TTYP_TOP;
   } else if (gtt == GDL::e_tt_dphy) {
     tt = TRGSummary::TTYP_DPHY;
   } else if (gtt == GDL::e_tt_rand) {
     tt = TRGSummary::TTYP_RAND;
+  } else if (gtt == GDL::e_tt_psnm) {
+    tt = TRGSummary::TTYP_SELF;
   } else {
     tt = TRGSummary::TTYP_NONE;
   }

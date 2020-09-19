@@ -88,31 +88,56 @@ In order to perform Bremsstrahlung recovery (either with the Belle or the Belle 
 
 Next we will build up the list of possible Bremsstrahlung photons. In order to reduce the number of background clusters included, we first define a minimum cluster energy according to the region in the ECL the cluster is found:
 
-.. code-block:: python3
-   :lineno-start: 33
+.. admonition:: Excercise
+   :class: excercise stacked
 
-    #  apply Bremsstrahlung correction to electrons
-   variables.addAlias(
-    "goodFWDGamma", "passesCut(clusterReg == 1 and clusterE > 0.075)"
-   )
-   variables.addAlias(
-    "goodBRLGamma", "passesCut(clusterReg == 2 and clusterE > 0.05)"
-   )
-   variables.addAlias(
-    "goodBWDGamma", "passesCut(clusterReg == 3 and clusterE > 0.1)"
-   )
-   variables.addAlias(
-    "goodGamma", "passesCut(goodFWDGamma or goodBRLGamma or goodBWDGamma)"
-   )
-   ma.fillParticleList("gamma:brems", "goodGamma", path=main)
+   Create a particle list, called ``gamma:brems``, with photons following the next cuts:
+
+         1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
+         2. If they are in the barrel region, their energy should be larger than 50 MeV
+         3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   Take a look at the `clusterReg` variable documentation. Use this, together with the `passesCut` variable!
+
+.. admonition:: Solution
+   :class: toggle solution
+
+        .. code-block:: python3
+           :lineno-start: 33
+
+           #  apply Bremsstrahlung correction to electrons
+           variables.addAlias(
+            "goodFWDGamma", "passesCut(clusterReg == 1 and clusterE > 0.075)"
+           )
+           variables.addAlias(
+            "goodBRLGamma", "passesCut(clusterReg == 2 and clusterE > 0.05)"
+           )
+           variables.addAlias(
+            "goodBWDGamma", "passesCut(clusterReg == 3 and clusterE > 0.1)"
+           )
+           variables.addAlias(
+            "goodGamma", "passesCut(goodFWDGamma or goodBRLGamma or goodBWDGamma)"
+           )
+           ma.fillParticleList("gamma:brems", "goodGamma", path=main)
 
 Next, we perform the actual recovery, using the `correctBrems` function in the Modular Analysis package. This step will create a new particle list; each particle in this list will have momentum given by the sum of the original, uncorrected particle momentum, and the momenta of all the Bremsstrahlung photons in the ``gamma:brems`` list that fall inside the cone(s) we mentioned previously. Each new particle will also have as daughters the original particle and its Bremsstrahlung photons (if any), and an `extraInfo` field named ``bremsCorrected`` that will indicate if at least one Bremsstrahlung photon was added to this particle. 
 
-.. code-block:: python3
-   :lineno-start: 47
+.. admonition:: Excercise
+   :class: excercise stacked
 
-   ma.correctBrems("e+:corrected", "e+:uncorrected", "gamma:brems", path=main)
-   variables.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")
+   Perform Bremsstrahlung recovery on the ``e+:uncorrected`` list,  using the `correctBrems` function and the ``gamma:brems`` photons. Create a new variable, called ``isBremsCorrected``, that tells us if a particle has been Bremsstrahlung corrected
+
+.. admonition:: Solution
+   :class: toggle solution
+
+        .. code-block:: python3
+           :lineno-start: 47
+
+           ma.correctBrems("e+:corrected", "e+:uncorrected", "gamma:brems", path=main)
+           variables.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")
 
 .. admonition:: Question
    :class: excercise stacked
@@ -126,7 +151,7 @@ Next, we perform the actual recovery, using the `correctBrems` function in the M
 .. admonition:: Excercise
    :class: excercise stacked
 
-   How would you replace line 47 to use the Belle method for Bremsstrahlung recovery, insted of the Belle II one?
+   How would you use the Belle method for Bremsstrahlung recovery, insted of the Belle II one?
 
 .. admonition:: Hint
    :class: toggle xhint stacked
@@ -157,7 +182,7 @@ When working on MC data, a special note of caution is at place. In the simulatio
 .. admonition:: Extra excercises
    :class: excercise stacked
 
-   * Create an alias for the ``isBremsCorrected`` information of the positrons and electrons used in the :math:`J/\psi` reconstruction
+   * Store the ``isBremsCorrected`` information of the positrons and electrons used in the :math:`J/\psi` reconstruction
    * Create a variable  named ``withBremsCorrection`` that indicates if any of the leptons used in the reconstruction of the B meson was Bremsstrahlung recovered
    * Create a variable to calculate the invariant mass of the :math:`J/\psi` meson using the *uncorrected* momenta of the leptons. Compare its distribution with the invariant mass obtained using the corrected particles
 
@@ -174,21 +199,32 @@ Best candidate selection can then be performed by simply selecting the particle 
 
 Continuing with our example, we will make a best candidate selection using the :b2:var:`random` variable, which returns a random number between 0 and 1 for each candidate. We will select candidates with the largest value of `random`. In order to have uniform results across different sessions, we manually set the random seed.
 
-.. code-block:: python3
-   :lineno-start: 74
+.. admonition:: Excercise
+   :class: excercise stacked
 
-   # perform best candidate selection
-   b2.set_random_seed("Belle II StarterKit")
-   ma.rankByHighest("B0", variable="random", numBest=1, path=main)
+   Set the basf2 random seed to ``"Belle II StarterKit"``. Then, rank your B mesons using the `random` variable, with the one with the highest value first. Keep only the best candidate.
 
-As the ``numBest`` parameter is nonzero, at most only one :math:`B^0` and only one :math:`\overline{B}^0` will be kept 
-for each event.
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   You may want to check the documentation for the `rankByHighest` and `set_random_seed` functions.
+
+.. admonition:: Solution
+   :class: toggle solution
+
+        .. code-block:: python3
+           :lineno-start: 74
+
+           # perform best candidate selection
+           b2.set_random_seed("Belle II StarterKit")
+           ma.rankByHighest("B0", variable="random", numBest=1, path=main)
 
 .. warning::
    Best candidate selection is used to pick the most adequately reconstructed decay, after all other selection cuts have 
    been applied. As so, make sure to include it **after** you have performed all the other cuts in your analysis.
 
 .. admonition:: Extra excercises
+   :class: excercise stacked
 
    * Remove the ``numBest`` parameter from the `rankByHighest` function, and store both the ``random`` and  the ``extraInfo(random_rank)`` variables. You can, and probably should, use aliases for this. Make sure that the ranking is working properly by plotting one variable against the other for events with more than one candidate (the number of candidates for a certain event is stored authomatically when performing a reconstruction. Take a look at the output root file in order to find how is this variable named).
    * Can you think of a good variable to rank our B mesons? Try to select candidates based on this new variable, and compare how much do your results improve by, i.e., comparing the number of true positives, false negatives, or the distributions of fitting variables such as the beam constrained mass.

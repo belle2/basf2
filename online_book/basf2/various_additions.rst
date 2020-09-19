@@ -6,17 +6,9 @@ Various additions
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**:
+    **Teaching**: 30min
 
-        * What is Bremsstrahlung radiation? Why do we care about it?
-        * How do we look for Bremsstrahlung photons?
-        * Why do we need to perform a best candidate selection?
-
-    **Exercises**:
-
-        * Implement Bremsstrahlung correction using the Belle approach (optional)
-        * Implement Bremsstrahlung correction using the Belle II approach
-        * Implement a best candidate selection
+    **Exercises**: 15min
 
     **Prerequisites**:
 
@@ -24,6 +16,9 @@ Various additions
 
     **Questions**:
 
+        * What is Bremsstrahlung radiation? Why do we care about it?
+        * How do we look for Bremsstrahlung photons?
+        * Why do we need to perform a best candidate selection?
         * How can I correct for Bremsstrahlung?
         * How can I perform a best candidate selection (BCS)?
 
@@ -33,19 +28,6 @@ Various additions
           momentum of the electrons in the
           :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
         * Perform a Best Candidate Selection
-
-.. admonition:: Key points
-    :class: key-points
-
-    * There are two main modules to perform Bremsstrahlung correction
-    * Both of them create new particle lists
-    * The members of the new particle list will have as daughter the original
-      uncorrected particle and, if a correction was performed, the
-      Bremsstrahlung photons used
-    * MC matching with Bremsstrahlung corrected particles requires a special
-      treatment: use the `isSignalAcceptBremsPhotons` variable, or add the
-      ``?addbrems`` marker in the decay string
-    * Best candidate selection sorts particles and antiparticles separately
 
 What is Bremsstrahlung radiation?
 ---------------------------------
@@ -373,3 +355,17 @@ random seed.
    introduces the convenience function `applyRandomCandidateSelection`, which is
    equivalent to using `rankByHighest` or `rankByLowest` with the `random`
    variable, and with ``numBest`` equal to 1.
+
+
+.. admonition:: Key points
+    :class: key-points
+
+    * There are two main modules to perform Bremsstrahlung correction
+    * Both of them create new particle lists
+    * The members of the new particle list will have as daughter the original
+      uncorrected particle and, if a correction was performed, the
+      Bremsstrahlung photons used
+    * MC matching with Bremsstrahlung corrected particles requires a special
+      treatment: use the `isSignalAcceptBremsPhotons` variable, or add the
+      ``?addbrems`` marker in the decay string
+    * Best candidate selection sorts particles and antiparticles separately

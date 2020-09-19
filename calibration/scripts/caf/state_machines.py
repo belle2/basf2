@@ -740,7 +740,7 @@ class CalibrationMachine(Machine):
             # Remove previous failed attempt to avoid problems
             if job.output_dir.exists():
                 B2INFO(f"Previous output directory for {self.calibration.name} collector {collection_name} exists."
-                       f"Deleting {job.output.dir} before re-submitting.")
+                       f"Deleting {job.output_dir} before re-submitting.")
                 shutil.rmtree(job.output_dir)
             job.cmd = collection.job_cmd
             job.append_current_basf2_setup_cmds()

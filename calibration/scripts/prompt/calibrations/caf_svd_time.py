@@ -25,8 +25,6 @@ import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 import rawdata as raw
 
-from svd.skim_utils import skim6SampleEventsModule
-
 from tracking import add_tracking_reconstruction
 
 now = datetime.datetime.now()
@@ -137,7 +135,7 @@ def create_pre_collector_path(clusterizers):
     raw.add_unpackers(path, components=['PXD', 'SVD', 'CDC'])
 
     # proceed only if we acquired 6-sample strips
-    skim6SampleEvents = skim6SampleEventsModule()
+    skim6SampleEvents = register_module("SVD6SampleEventSkim")
     path.add_module(skim6SampleEvents)
     emptypath = create_path()
     skim6SampleEvents.if_false(emptypath)

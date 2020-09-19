@@ -445,7 +445,8 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
 
 
 def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
-                     globalTags=None, localDBs=None, new_cdst_format=True):
+                     globalTags=None, localDBs=None, new_cdst_format=True,
+                     backend_args=None):
     '''
     Returns calibration object for alignment of TOP modules.
     :param inputFiles: A list of input files in cdst data format
@@ -454,6 +455,7 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
     :param new_cdst_format: True or False for new or old cdst format, respectively
+    :param backend_args: Dictionary of backend args for the Collection object to use
     '''
 
     #   define calibration
@@ -510,7 +512,8 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=['dn/n'],
         if localDBs:
             for localDB in reversed(localDBs):
                 collection.use_local_database(localDB)
-        collection.backend_args = {"queue": "l"}
+        if backend_args:
+            collection.backend_args = backend_args
 
         #   add collection to calibration
         cal.add_collection(name='slot_' + '{:0=2d}'.format(slot), collection=collection)

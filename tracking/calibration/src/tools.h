@@ -1,6 +1,7 @@
 #ifndef tools_H
 #define tools_H
 
+//Hack for ROOT macros
 #undef assert
 #define assert(arg)  { if((arg) == false) {std::cout << __FILE__ <<", line "<<__LINE__ << std::endl << "" << #arg << " failed" << std::endl;   exit(0);} }
 
@@ -12,7 +13,7 @@
 
 
 // Get random string
-TString rn() {return Form("%d", std::rand()); }
+inline TString rn() {return Form("%d", std::rand()); }
 
 //merge { vector<double> a, vector<double> b} into {a, b}
 inline std::vector<std::vector<double>> merge(std::vector<std::vector<std::vector<double>>> toMerge)
@@ -139,11 +140,22 @@ inline double Eval(const std::vector<double>& spl, const std::vector<double>& va
 }
 
 
+// Spline structure for zero-order & linear splines
 struct Spline {
   //spl.size() <= 1 -> order=0 , spl.size() == vals.size() -> order=1
   std::vector<double> nodes, vals, errs;
   double val(double x) const {return Eval(nodes, vals, x);}
   double err(double x) const {return Eval(nodes, errs, x);}
+
+  double center() const
+  {
+    if (nodes.size() == 0)
+      return 0;
+    else if (nodes.size() % 2 == 1)
+      return nodes[nodes.size() / 2];
+    else
+      return (nodes[nodes.size() / 2 - 1]  +  nodes[nodes.size() / 2]) / 2;
+  }
 
   void print(TString tag = "")
   {

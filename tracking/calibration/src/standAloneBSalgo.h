@@ -40,11 +40,10 @@ struct event {
 
 
 //functions
-
 std::vector<event> getEvents(TTree* tr);
 std::tuple<std::vector<TVector3>, std::vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(std::vector<event> evts,
     std::vector<double> splitPoints);
 std::vector<ExpRunEvt> convertSplitPoints(const std::vector<event>& events, std::vector<double> splitPoints);
-ExpRunEvt getPosition(const std::vector<event>& events, double tRel);
+ExpRunEvt getPosition(const std::vector<event>& events, double tEdge);
 
 #endif

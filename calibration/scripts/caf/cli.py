@@ -32,6 +32,8 @@ def command_lsf(args, backend_args=None):
     """
     B2INFO(f"Requested use of LSF backend")
     command_line_backend_args = {"queue": args.queue}
+    # If any backend_args are None then they shouldn't overwrite
+    command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
     if backend_args is None:
         backend_args = {}
     backend_args = {**backend_args, **command_line_backend_args}
@@ -52,6 +54,7 @@ def command_pbs(args, backend_args=None):
     """
     B2INFO(f"Requested use of PBS backend")
     command_line_backend_args = {"queue": args.queue}
+    command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
     if backend_args is None:
         backend_args = {}
     backend_args = {**backend_args, **command_line_backend_args}
@@ -75,6 +78,7 @@ def command_condor(args, backend_args=None):
                                  "universe": args.universe,
                                  "getenv": args.getenv
                                 }
+    command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
     if backend_args is None:
         backend_args = {}
     backend_args = {**backend_args, **command_line_backend_args}
@@ -121,8 +125,6 @@ def add_job_options(parser):
 
 
 def add_backends_subparsers(parser, default_max_processes=4,
-                            default_lsf_queue=LSF.default_backend_args["queue"],
-                            default_pbs_queue=PBS.default_backend_args["queue"],
                             default_global_job_limit=Batch.default_global_job_limit,
                             default_submission_check_heartbeat=Batch.default_sleep_between_submission_checks,
                             local_func=command_local, lsf_func=command_lsf,
@@ -150,9 +152,9 @@ def add_backends_subparsers(parser, default_max_processes=4,
                                        formatter_class=argparse.RawDescriptionHelpFormatter)
     lsf_parser.set_defaults(func=lsf_func)
 
-    lsf_parser.add_argument("--queue", dest="queue", metavar="", default=default_lsf_queue,
+    lsf_parser.add_argument("--queue", dest="queue", metavar="",
                             help=("The batch queue to use."
-                                  f" (default: {default_lsf_queue})"))
+                                  " (e.g. s)"))
 
     lsf_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
                             help=("The number of batch jobs that can be active for the user before the backend class will stop "
@@ -173,9 +175,9 @@ def add_backends_subparsers(parser, default_max_processes=4,
                                        formatter_class=argparse.RawDescriptionHelpFormatter)
     pbs_parser.set_defaults(func=pbs_func)
 
-    pbs_parser.add_argument("--queue", dest="queue", metavar="", default=default_pbs_queue,
+    pbs_parser.add_argument("--queue", dest="queue", metavar="",
                             help=("The batch queue to use."
-                                  f" (default: {default_pbs_queue})"))
+                                  " e.g. short"))
 
     pbs_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
                             help=("The number of batch jobs that can be active for the user before the backend class will stop "
@@ -196,13 +198,13 @@ def add_backends_subparsers(parser, default_max_processes=4,
                                           formatter_class=argparse.RawDescriptionHelpFormatter)
     condor_parser.set_defaults(func=condor_func)
 
-    condor_parser.add_argument("--getenv", dest="getenv", metavar="", default=HTCondor.default_backend_args["getenv"],
+    condor_parser.add_argument("--getenv", dest="getenv", metavar="",
                                help=("Should jobs inherit the submitting environment (doesn't always work as expected)."
-                                     f" (default: {HTCondor.default_backend_args['getenv']})"))
+                                     f" e.g. false"))
 
-    condor_parser.add_argument("--universe", dest="universe", metavar="", default=HTCondor.default_backend_args["universe"],
+    condor_parser.add_argument("--universe", dest="universe", metavar="",
                                help=("Jobs should be submitted using this univese."
-                                     f" (default: {HTCondor.default_backend_args['universe']})"))
+                                     " e.g. vanilla"))
 
     condor_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
                                help=("The number of batch jobs that can be active for the user before the backend class will stop "

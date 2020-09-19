@@ -53,8 +53,13 @@ namespace Belle2 {
     /**
      * Initialize event information. Called by EventProcessor, should not be
      * called by other users
+     *
+     * @param force if true force initialization even in parallel processing mode
+     *              for all processes and ignore the generator state that might
+     *              have been passed in the event stream.
+     *              This is only used on HLT event processor
      */
-    static void initializeEvent();
+    static void initializeEvent(bool force = false);
 
     /**
      * Set Event dependent Random Generator as current one. Called by EventProcessor, should not be

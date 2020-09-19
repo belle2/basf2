@@ -158,19 +158,15 @@ Now you should have both repositories on your local machine.
 
 .. hint::
 
-   If you get completely stuck in this exercise or in one of the exercises
-   of the next session: you can reset your local repository to be exactly
-   that of the remote repository by running the code below.
-   
-   **Your changes might be lost irrecoverably, so only use this for our
-   test repository, unless you know what you're doing!**
-   
-   .. code-block:: bash
-   
-      git fetch origin  # Make sure we're up to date
-      git reset --hard  # RESETS ALL OF YOUR CHANGES to ensure next command works
-      git checkout master  # In case we're on a different branch (see next section)
-      git reset --hard origin/master  # RESET ALL OF YOUR CHANGES!
+   If you get completely stuck in this exercise or in one of the following exercises
+   you have a couple of options:
+
+   * Start over by deleting the local repository and cloning a new one
+     (`the xkcd school of using git <https://xkcd.com/1597/>`_)
+   * Ask a more experienced ``git`` user for help (don't forget to include the
+     output of ``git status`` and a clear description of your problem)
+   * Familiarize yourself with ``git stash`` (shelves work that wasn't
+     commited yet) and ``git reset`` ("undo" ``git commit``)
 
 Unfortunately for you, ``b2-git-training-space-2`` has stricter rules and you
 cannot just push changes there directly. Instead, you have to open a pull request (PR).
@@ -180,7 +176,7 @@ Branches (intermediate)
 -----------------------
 
 By now you should have a good feeling about why git is needed and start to feel
-a bit more comfortable with basic ``git`` commandas.
+a bit more comfortable with basic ``git`` commands.
 
 However there is one very important concept that we kept secret from you till
 now: branches!
@@ -250,6 +246,7 @@ branch you will then have a local and a remote ``<your new branch>`` branch).
 The output of the last command tells you to go to
 
 .. code-block::
+
    https://stash.desy.de/projects/B2T/repos/b2-git-training-space-2/compare/commits?sourceBranch=refs/heads/<your new branch>
 
 to open a PR. That's exactly what we want to do!
@@ -257,11 +254,11 @@ to open a PR. That's exactly what we want to do!
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Create a PR and add the starterkit organizer as a reviewer.
-   
+   Create a PR and add the StarterKit organizer as a reviewer.
+
 .. admonition:: Solution
    :class: solution toggle
-   
+
    Click on the link described above or paste it in the address bar of
    your browser. Follow the instructions.
 

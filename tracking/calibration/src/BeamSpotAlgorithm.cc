@@ -114,7 +114,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
       }
     }
 
-    assert(r.size()  == breaks.size() + 1);
+    B2ASSERT("Number of intervals vs number of breakPoints", r.size()  == breaks.size() + 1);
 
     //Merge smallest interval if with low stat (try it 10times)
     for (int k = 0; k < 10; ++k)  {
@@ -131,7 +131,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
           else
             iM = iMin - 1;
         }
-        assert(r.size() == Counts.size());
+        B2ASSERT("Number of intervals equal to size of counters", r.size() == Counts.size());
 
         r.at(iM) = Splitter::mergeIntervals(r[iM], r[iMin]);
         r.erase(r.begin() + iMin);
@@ -161,7 +161,8 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
     B2INFO("Start of running BS analysis ID : " << i);
     tie(ipsVec[i], ipsUncVec[i], sizeMatVec[i]) = runBeamSpotAnalysis(evtsVec.at(i), breaks);
     B2INFO("End of running BS analysis - SizeMatZ : " << sqrt(abs(sizeMatVec[i](0, 0))));
-    assert(ipsVec[i].size() == r.size());
+    B2ASSERT("All intervals have IP calibration", ipsVec[i].size() == r.size());
+    B2ASSERT("All intervals have IPunc calibration", ipsUncVec[i].size() == r.size());
   }
 
 
@@ -239,12 +240,12 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
           int breakPoint;
           if (k - 1 >= 0) {
             breakPoint = breakPointsVec[i].at(k - 1).evt;
-            assert(breakPointsVec[i].at(k - 1).run == exprun.run);
+            B2ASSERT("Payload saving consistency", breakPointsVec[i].at(k - 1).run == exprun.run);
           } else {
-            assert(i != 0);
+            B2ASSERT("Payload saving consistency", i != 0);
             auto pos = getPosition(evts, sVec[i]);
             breakPoint = pos.evt;
-            assert(pos.run == exprun.run);
+            B2ASSERT("Payload saving consistency", pos.run == exprun.run);
           }
           intraRun->add(breakPoint, obj);
         }

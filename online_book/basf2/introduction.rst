@@ -367,7 +367,7 @@ warning:
 
 .. code-block:: bash
 
-        $> b2setup release-01-02-09
+        $ b2setup release-01-02-09
         Environment setup for release: release-01-02-09
         Central release directory    : /cvmfs/belle.cern.ch/el7/releases/release-01-02-09
         Warning: The release release-01-02-09 is not supported any more. Please update to ...

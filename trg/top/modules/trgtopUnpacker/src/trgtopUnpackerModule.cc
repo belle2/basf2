@@ -4,7 +4,7 @@
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
 * Contributors: Tong Pang, Vladimir Savinov                              *
-* Email:  vladimirsavinov@gmail.com
+* Email:  vladimirsavinov@gmail.com, top16@pitt.edu
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -199,18 +199,139 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
     performBufferAnalysis = false;
   } else {
     if (counterDummyWindows != 0) {
-      B2ERROR("Corrupted data? numberOfWindows = " << numberOfWindows << ", counterDummyWondows = " << counterDummyWindows);
+      B2ERROR("Corrupted data? numberOfWindows = " << numberOfWindows << ", counterDummyWindows = " << counterDummyWindows);
       performBufferAnalysis = false;
     }
   }
+
+  // the ID of the first actual window with data (depends on b2l_buffer_delay, which could be figured out from data
+  // iWindowFirst = 0 is correct for b2l_buffer_delay = 0
+  int iWindowFirst = 0;
+
+  // identify the actual first window (either the first window (when b2l_buffer_delay=0) or the first window where we see the jump of rvc by -92 or by 1188 (1188+92 = 1280))
+
+  int numberRvcJumps = 0;
+  int numberCntr127Jumps = 0;
+  int windowRvcJumpFirst = -1;
+  int windowCntr127JumpFirst = -1;
+  int clocksRvcJumpFirst = -1;
+  int clocksCntr127JumpFirst = -1;
+
+  if (performBufferAnalysis) {
+    for (int iWindow = 0; iWindow < numberOfWindows; iWindow++) {
+      int index = iWindow * windowSize + 3;
+
+      // revoclk (comes from b2tt) has the range between 0 and 1279 @127MHz => 1279*7.8ns ~10us = 1 revolution (11bits are used)
+      int revoClockNow = rdat[index] & 0x7ff;
+      //    B2INFO("rvc now = " << revoClockNow);
+      // first need to know max revoClock (1279)
+      if (revoClockLast != -1)  {
+        //      if (revoClockLast != -1 && revoClockNow > revoClockLast)  {
+        int revoClockDeltaNow = revoClockNow - revoClockLast;
+        if (revoClockDeltaNow != revoClockDeltaExpected) {
+          // -1276 is simply going to the next cycle of rvc counting, but 1188 or -92 means that we identified the first window (these numbers are such for 24 windows @ 32MHz)
+          if (revoClockDeltaNow == 1188 || revoClockDeltaNow == -92) {
+            // note that the first buffer window could not cause this condition because we would never get to execute this line on the first buffer window, yet it does not matter
+            if (iWindowFirst == 0) {
+              iWindowFirst = iWindow;
+            }
+          } else if (revoClockDeltaNow != -1276) {
+            B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " << revoClockLast <<
+                    ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
+            numberRvcJumps++;
+            if (windowRvcJumpFirst < 0) {
+              windowRvcJumpFirst = iWindow;
+              clocksRvcJumpFirst = revoClockDeltaNow;
+            }
+          }
+        }
+      }
+      revoClockLast = revoClockNow;
+
+      int cntr127Now = (rdat[index + 1] >> 16) & 0xffff;
+      //    B2INFO("cntr127 now = " << cntr127Now);
+      // first need to know max cntr127
+      if (cntr127Last != -1)  {
+        //      if (cntr127Last != -1 && cntr127Now > cntr127Last)  {
+        int cntr127DeltaNow = cntr127Now - cntr127Last;
+        if (cntr127DeltaNow != cntr127DeltaExpected) {
+          // 65444 is the value of the difference in cntr127 (VME counter) because we use 16 bits of 64 bit-long counter (these numbers are such for 24 windows @ 32MHz)
+          if (cntr127DeltaNow != 65444 && cntr127DeltaNow != -92 && cntr127DeltaNow != -65532) {
+            B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " << cntr127Last <<
+                    ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
+            numberCntr127Jumps++;
+            if (windowCntr127JumpFirst < 0) {
+              windowCntr127JumpFirst = iWindow;
+              clocksCntr127JumpFirst = cntr127DeltaNow;
+            }
+          }
+        }
+      }
+      cntr127Last = cntr127Now;
+    }
+  }
+
+  /*
+  if (numberRvcJumps > 0) {
+    B2INFO("The number of rvc jumps = " << numberRvcJumps);
+    B2INFO("The window of the first rvc jump = " << windowRvcJumpFirst);
+    B2INFO("The number of clock cycles associated with the first rvc jump = " << clocksRvcJumpFirst);
+  }
+
+  if (numberCntr127Jumps > 0) {
+    B2INFO("The number of cntr127 jumps = " << numberCntr127Jumps);
+    B2INFO("The window of the first cntr127 jump = " << windowCntr127JumpFirst);
+    B2INFO("The number of clock cycles associated with the first cntr127 jump = " << clocksCntr127JumpFirst);
+  }
+  */
+
+  // debugging: report everything from every single window when we are seeing unexpected jumps in either of the two counters
+  /*
+  if (numberRvcJumps > 0 || numberCntr127Jumps > 0) {
+    B2INFO("===========================================================================================================");
+    B2INFO("l1_rvc from header = " << l1_revo);
+    B2INFO("trgtag (evt) from buffer header = " << trgtag);
+    B2INFO("Reporting the entire data buffer");
+    B2INFO("Header 0 = : " << std::hex << rdat[0] << std::dec);
+    B2INFO("Header 1 = : " << std::hex << rdat[1] << std::dec);
+    B2INFO("Header 2 = : " << std::hex << rdat[2] << std::dec);
+    for (int iWindow = 0; iWindow < numberOfWindows; iWindow++) {
+      int index = iWindow * windowSize + 3;
+
+      B2INFO("---------------------------------------------------------------------------------");
+      int revoClockNow = rdat[index] & 0x7ff;
+      B2INFO("w rvc ----------------------------     = " << iWindow << " " << revoClockNow);
+
+      int cntr127Now = (rdat[index + 1] >> 16) & 0xffff;
+      B2INFO("w cntr127 ---------------------------- = " << iWindow << " " << cntr127Now);
+
+      for (int i = 0; i < 24; i++) {
+  B2INFO("w i = : " << iWindow << " " << i << " " << std::hex << rdat[index+i] << std::dec);
+      }
+    }
+  }
+  */
+
+  // reset "most recent" rvc and cntr127
+  revoClockLast = -1;
+  cntr127Last = -1;
+
+  //  B2INFO("Start buffer analysis, iWindowFirst = " << iWindowFirst);
 
   // events with no buffer (i.e. no payload), empty (i.e. dummy) windows and presumably corrupted events are NOT analyzed
   if (performBufferAnalysis) {
 
     // Loop over windows in B2L buffer and locate all unique TOP L1 decisions
-    for (int iWindow = 0; iWindow < numberOfWindows; iWindow++) {
+    for (int iWindowProvisional = 0; iWindowProvisional < numberOfWindows; iWindowProvisional++) {
 
-      //    B2INFO("window number = " << iWindow);
+      // we need to be smarter now about how to calculate window number in the buffer
+      int iWindow = iWindowProvisional + iWindowFirst;
+
+      if (iWindow >= numberOfWindows) {
+        iWindow = iWindow - numberOfWindows;
+      }
+
+      //      B2INFO("REAL DEBUG:  window number = " << iWindow);
 
       // error counters for possible data corruption in the current window
       unsigned int errorCountWindowMinor = 0;
@@ -246,12 +367,15 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       int revoClockNow = rdat[index] & 0x7ff;
       //    B2INFO("rvc now = " << revoClockNow);
       // first need to know max revoClock (1279)
-      if (revoClockLast != -1 && revoClockNow > revoClockLast)  {
+      if (revoClockLast != -1)  {
+        //      if (revoClockLast != -1 && revoClockNow > revoClockLast)  {
         int revoClockDeltaNow = revoClockNow - revoClockLast;
         if (revoClockDeltaNow != revoClockDeltaExpected) {
-          B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " << revoClockLast <<
-                  ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
-          errorCountWindowMinor++;
+          if (revoClockDeltaNow != 1188 && revoClockDeltaNow != -92 && revoClockDeltaNow != -1276) {
+            B2ERROR("rvc changed by an unexpected number of units: " << revoClockDeltaNow << ", last rvc = " << revoClockLast <<
+                    ", current rvc = " << revoClockNow << ", window " << iWindow << ", index = " << index);
+            errorCountWindowMinor++;
+          }
         }
       }
       if (revoClockNow > 1279) {
@@ -263,12 +387,16 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
       int cntr127Now = (rdat[index + 1] >> 16) & 0xffff;
       //    B2INFO("cntr127 now = " << cntr127Now);
       // first need to know max cntr127
-      if (cntr127Last != -1 && cntr127Now > cntr127Last)  {
+      if (cntr127Last != -1) {
+        //      if (cntr127Last != -1 && cntr127Now > cntr127Last)  {
         int cntr127DeltaNow = cntr127Now - cntr127Last;
         if (cntr127DeltaNow != cntr127DeltaExpected) {
-          B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " << cntr127Last <<
-                  ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
-          errorCountWindowMinor++;
+          // 65444 is the value of the difference in cntr127 (VME counter) because we use 16 bits of 64 bit-long counter
+          if (cntr127DeltaNow != 65444 && cntr127DeltaNow != -92 && cntr127DeltaNow != -65532) {
+            B2ERROR("cntr127 changed by an unexpected number of units: " << cntr127DeltaNow << ", cntr127 last = " << cntr127Last <<
+                    ", cntr127 now = " << cntr127Now << ", window " << iWindow << ", index = " << index + 1);
+            errorCountWindowMinor++;
+          }
         }
       }
       cntr127Last = cntr127Now;
@@ -663,6 +791,20 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   // AND incorrectly prepared (but not corrupted) data
   if (errorCountEvent != 0) {
     B2INFO("Number of instances of unexpected data diagnozed during unpacking = " << errorCountEvent);
+  }
+
+  if (numberRvcJumps > 0) {
+    B2INFO("The number of rvc jumps = " << numberRvcJumps);
+    B2INFO("The window of the first rvc jump = " << windowRvcJumpFirst);
+    B2INFO("The number of clock cycles associated with the first rvc jump = " << clocksRvcJumpFirst);
+    B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
+  }
+
+  if (numberCntr127Jumps > 0) {
+    B2INFO("The number of cntr127 jumps = " << numberCntr127Jumps);
+    B2INFO("The window of the first cntr127 jump = " << windowCntr127JumpFirst);
+    B2INFO("The number of clock cycles associated with the first cntr127 jump = " << clocksCntr127JumpFirst);
+    B2INFO("The number of combined decisions = " << m_TRGTOPCombinedTimingArray.getEntries());
   }
 
   // need to store the info about error rate / type of errors in unpacking

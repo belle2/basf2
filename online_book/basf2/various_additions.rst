@@ -53,11 +53,11 @@ What is Bremsstrahlung radiation?
 As you may guess from its unfriendly typing, "Bremsstrahlung" is a German word,
 literally meaning "braking radiation"; it is used to describe the
 electromagnetic radiation that particles emit when decelerating.
-You can read more about it in the many, many pages avaiable on the internet,
+You can read more about it in the many, many pages available on the Internet,
 starting with `Wikipedia <https://en.wikipedia.org/wiki/Bremsstrahlung>`_
 and the `PDG review <https://pdg.lbl.gov/2020/reviews/rpp2020-rev-passage-particles-matter.pdf>`_.
 
-At Belle II, Bremsstrahlung radiation is emited by particles when traversing the
+At Belle II, Bremsstrahlung radiation is emitted by particles when traversing the
 different detector components. As the largest material load is near the
 interaction region, most Bremsstrahlung radiation is expected to originate
 there. The total radiated power due to Bremsstrahlung by a particle of charge
@@ -81,13 +81,13 @@ Bremsstrahlung than heavier particles with the same energy.
 At Belle II, we usually only consider Bremsstrahlung loses for electrons and
 positrons.
 
-.. admonition:: Excercise
-   :class: excercise stacked
+.. admonition:: Exercise
+   :class: exercise stacked
 
    From the general equation for radiated power, derive the explicit form for
    the limit cases of perpendicular and parallel acceleration (if you are
    attending the Starter Kit, you may want to try this later, so it doesn't
-   interfeer with the flow of the lesson).
+   interfere with the flow of the lesson).
 
 .. admonition:: Hint
    :class: toggle xhint stacked
@@ -109,7 +109,7 @@ positrons.
         \frac{q^2a^2\gamma^6}{6\pi\varepsilon_0c^3} \hspace{1cm} P_{a\bot v} =
         \frac{q^2a^2\gamma^4}{6\pi\varepsilon_0c^3}
 
-A propper method that accounts for Bremsstrahlung loses is of outmost importance
+A proper method that accounts for Bremsstrahlung loses is of utmost importance
 at B factories; at the end of this section, you will be able to obtain the
 invariant mass distribution for the :math:`J/\psi \to e^+e^-` meson decay after
 correcting for the Bremsstrahlung radiation, and compare it with the
@@ -121,7 +121,7 @@ How do we look for Bremsstrahlung photons
 Though we will not discuss it here (but, if you are interested, you can consult
 `this document <http://kirkmcd.princeton.edu/examples/moving_far.pdf>`_), the
 radiated power for relativistic particles is maximum around the particle's
-direction of motion; we thus expect Bremsstrahlung photons to be mostly emited
+direction of motion; we thus expect Bremsstrahlung photons to be mostly emitted
 in a cone around the momentum vector of the electrons (and positrons).
 The procedures we use to perform Bremsstrahlung recovery are based on this
 assumption.
@@ -130,10 +130,10 @@ The Belle like recovery looks for photons on a single cone around the initial
 momentum of the particle; on the other side, the Belle II method uses multiple
 cones, centered around the momentum of the particle at the points along its path
 where it was more likely to emit Bremsstrahlung radiation.
-The Belle II method also performs a pre-procesing of the data, and applies some
+The Belle II method also performs a pre-processing of the data, and applies some
 initial cuts on the Bremsstrahlung photons and on the electrons which the user
 cannot undo.
-Altough we recommend using the Belle II method, you should check which procedure
+Although we recommend using the Belle II method, you should check which procedure
 works best for your analysis.
 
 In order to perform Bremsstrahlung recovery (either with the Belle or the Belle
@@ -149,8 +149,8 @@ Next we will build up the list of possible Bremsstrahlung photons.
 In order to reduce the number of background clusters included, we first define a
 minimum cluster energy according to the region in the ECL the cluster is found:
 
-.. admonition:: Excercise
-   :class: excercise stacked
+.. admonition:: Exercise
+   :class: exercise stacked
 
    Create a particle list, called ``gamma:brems``, with photons following the next cuts:
 
@@ -196,8 +196,8 @@ have as daughters the original particle and its Bremsstrahlung photons (if any),
 and an `extraInfo` field named ``bremsCorrected`` that will indicate if at least
 one Bremsstrahlung photon was added to this particle.
 
-.. admonition:: Excercise
-   :class: excercise stacked
+.. admonition:: Exercise
+   :class: exercise stacked
 
    Perform Bremsstrahlung recovery on the ``e+:uncorrected`` list,  using the
    `correctBrems` function and the ``gamma:brems`` photons. Create a new
@@ -214,7 +214,7 @@ one Bremsstrahlung photon was added to this particle.
            variables.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")
 
 .. admonition:: Question
-   :class: excercise stacked
+   :class: exercise stacked
 
    Assume that one particle in the ``e+:corrected`` particle list has
    ``isBremsCorrected`` equal to ``False``.
@@ -229,10 +229,10 @@ one Bremsstrahlung photon was added to this particle.
    Since there was no correction performed, the momentum of this particle will
    simply be the same as the momentum of its daughter.
 
-.. admonition:: Excercise
-   :class: excercise stacked
+.. admonition:: Exercise
+   :class: exercise stacked
 
-   How would you use the Belle method for Bremsstrahlung recovery, insted of the
+   How would you use the Belle method for Bremsstrahlung recovery, instead of the
    Belle II one?
 
 .. admonition:: Hint
@@ -271,8 +271,8 @@ marker to the decay string:
     path=main,
    )
 
-.. admonition:: Extra excercises
-   :class: excercise stacked
+.. admonition:: Extra exercises
+   :class: exercise stacked
 
    * Store the ``isBremsCorrected`` information of the positrons and electrons
      used in the :math:`J/\psi` reconstruction
@@ -305,12 +305,12 @@ They append to each particle an `extraInfo` field with the name
 Notice that *each particle/anti-particle list is sorted separately*, i.e.,if
 certain event has multiple :math:`B^+` and :math:`B^-` candidates, and you apply
 the ranking function to any of the particle lists, each list will be ranked
-separetely.
+separately.
 
 Best candidate selection can then be performed by simply selecting the particle
 with the lowest rank.
 You can do that by either applying a cut on the particle list, or directly
-through the `rankByHighest` and `rankByLowest` functions, by specifing a
+through the `rankByHighest` and `rankByLowest` functions, by specifying a
 non-zero value for the ``numBest`` parameter.
 Make sure to check the documentation of these functions.
 
@@ -321,8 +321,8 @@ We will select candidates with the largest value of `random`.
 In order to have uniform results across different sessions, we manually set the
 random seed.
 
-.. admonition:: Excercise
-   :class: excercise stacked
+.. admonition:: Exercise
+   :class: exercise stacked
 
    Set the basf2 random seed to ``"Belle II StarterKit"``.
    Then, rank your B mesons using the `random` variable, with the one with the
@@ -351,15 +351,15 @@ random seed.
    As so, make sure to include it **after** you have performed all the other
    cuts in your analysis.
 
-.. admonition:: Extra excercises
-   :class: excercise stacked
+.. admonition:: Extra exercises
+   :class: exercise stacked
 
    * Remove the ``numBest`` parameter from the `rankByHighest` function, and
      store both the ``random`` and  the ``extraInfo(random_rank)`` variables.
      You can, and probably should, use aliases for this.
      Make sure that the ranking is working properly by plotting one variable
      against the other for events with more than one candidate (the number of
-     candidates for a certain event is stored authomatically when performing a
+     candidates for a certain event is stored automatically when performing a
      reconstruction.
      Take a look at the output root file in order to find how is this variable named).
    * Can you think of a good variable to rank our B mesons? Try to select
@@ -370,6 +370,6 @@ random seed.
 .. note::
 
    From light release ``light-2008-kronos``, the Modular Analysis package
-   introduces the conveniece function `applyRandomCandidateSelection`, which is
+   introduces the convenience function `applyRandomCandidateSelection`, which is
    equivalent to using `rankByHighest` or `rankByLowest` with the `random`
    variable, and with ``numBest`` equal to 1.

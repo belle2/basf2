@@ -3,7 +3,7 @@
  * Copyright(C) 2017 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Gaetano de Marino, Tadeas Bilka                          *
+ * Contributors: Radek Zlebcik
  *                                                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
@@ -40,7 +40,7 @@ BeamSpotCollectorModule::BeamSpotCollectorModule() : CalibrationCollectorModule(
 
 void BeamSpotCollectorModule::prepare()
 {
-  cout << "Radek init of the trees" << endl;
+  B2INFO("Init of the trees");
   //describeProcess("CaTest::prepare");
   std::string objectName = "tracks";
   //Data object creation --------------------------------------------------
@@ -91,14 +91,12 @@ void BeamSpotCollectorModule::collect()
 
 
   StoreObjPtr<ParticleList> Y4SParticles(m_Y4SPListName);
-  const auto& frame = ReferenceFrame::GetCurrent();
+  //const auto& frame = ReferenceFrame::GetCurrent();
 
-  //for(int i = 0; i < Y4SParticles.getNDaughters(); ++i)
 
   if (!Y4SParticles.isValid() || abs(Y4SParticles->getPDGCode()) != 300553)
     return;
-  //cout << "Radek is here " << __LINE__ << endl;
-  //cout << "Size of the Y4SParticles " << Y4SParticles->getListSize() << endl;
+
   if (Y4SParticles->getListSize() !=  1)
     return;
 
@@ -126,62 +124,5 @@ void BeamSpotCollectorModule::collect()
 
 
   getObjectPtr<TTree>("tracks")->Fill();
-
-
-  /*
-  if (Y4SParticles.isValid() && abs(Y4SParticles->getPDGCode()) == 300553) {
-
-    if (Y4SParticles->getListSize() > 1)
-      return;
-
-    for (unsigned int i = 0; i < Y4SParticles->getListSize(); i++) {
-
-      Particle* Y4S = Y4SParticles->getParticle(i);
-      TVector3 IPVertex = frame.getVertex(Y4S);
-      const auto& errMatrix = Y4S->getVertexErrorMatrix();
-
-      getObjectPtr<TH1F>("Y4S_Vertex.X")->Fill(IPVertex.X());
-      getObjectPtr<TH1F>("Y4S_Vertex.Y")->Fill(IPVertex.Y());
-      getObjectPtr<TH1F>("Y4S_Vertex.Z")->Fill(IPVertex.Z());
-
-  //       m_h_xy->Fill(IPVertex.X()*IPVertex.Y());
-  //       m_h_xz->Fill(IPVertex.X()*IPVertex.Z());
-  //       m_h_yz->Fill(IPVertex.Y()*IPVertex.Z());
-  //       m_h_xx->Fill(IPVertex.X()*IPVertex.X());
-  //       m_h_yy->Fill(IPVertex.Y()*IPVertex.Y());
-  //       m_h_zz->Fill(IPVertex.Z()*IPVertex.Z());
-
-      m_h_temp->Fill(IPVertex.Y());
-      getObjectPtr<TH1F>("Var.X")->Fill(errMatrix(0, 0));
-      getObjectPtr<TH1F>("Var.Y")->Fill(errMatrix(1, 1));
-      getObjectPtr<TH1F>("Var.Z")->Fill(errMatrix(2, 2));
-
-  //       m_h_cov_x_y->Fill(errMatrix(0, 1));
-  //       m_h_cov_x_z->Fill(errMatrix(0, 2));
-  //       m_h_cov_y_z->Fill(errMatrix(1, 2));
-  //       m_h_px->Fill(frame.getMomentum(Y4S).Px());
-  //       m_h_py->Fill(frame.getMomentum(Y4S).Py());
-  //       m_h_pz->Fill(frame.getMomentum(Y4S).Pz());
-  //       m_h_E->Fill(frame.getMomentum(Y4S).E());
-      m_err_y.push_back(std::sqrt(errMatrix(1, 1)));
-      m_v_y.push_back(IPVertex.Y());
-
-      if (m_r == m_size_per_unit) {
-        m_h_temp->GetQuantiles(1, &m_median, &m_quantile);
-        for (unsigned int u = 0; u < m_v_y.size(); u++) {
-
-          m_h_y_risol->Fill(m_v_y.at(u) - m_median);
-          m_h_pull->Fill((m_v_y.at(u) - m_median) / m_err_y.at(u));
-
-        }
-        m_r = 0;
-        m_v_y.clear();
-        m_err_y.clear();
-      }
-      m_r += 1;
-    }
-
-  }
-  */
 
 }

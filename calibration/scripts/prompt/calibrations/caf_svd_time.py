@@ -24,7 +24,8 @@ import svd as svd
 import modularAnalysis as ana
 from caf.strategies import SequentialBoundaries
 import rawdata as raw
-import reconstruction as reconstruction
+
+from svd.skim_utils import skim6SampleEventsModule
 
 from tracking import add_tracking_reconstruction
 
@@ -132,10 +133,16 @@ def create_pre_collector_path(clusterizers):
     # Set-up re-processing path
     path = create_path()
 
-    # unpack raw svd data and produce: SVDEventInfo and SVDShaperDigits
+    # unpack raw data to do the tracking
     raw.add_unpackers(path, components=['PXD', 'SVD', 'CDC'])
 
-    # run SVD reconstruction, changing names of StoreArray
+    # proceed only if we acquired 6-sample strips
+    skim6SampleEvents = skim6SampleEventsModule()
+    path.add_module(skim6SampleEvents)
+    emptypath = create_path()
+    skim6SampleEvents.if_false(emptypath)
+
+    # run tracking reconstruction
     add_tracking_reconstruction(path)
 
     for moda in path.modules():
@@ -144,12 +151,13 @@ def create_pre_collector_path(clusterizers):
 
     path.add_module("SVDShaperDigitsFromTracks")
 
+    # repeat svd reconstruction using only SVDShaperDigitsFromTracks
     cog = register_module("SVDCoGTimeEstimator")
     cog.set_name("CoGReconstruction")
     path.add_module(cog)
 
     # Debugging misconfigured Datastore names
-#    path.add_module("PrintCollections")
+    #    path.add_module("PrintCollections")
 
     for cluster in clusterizers:
         path.add_module(cluster)

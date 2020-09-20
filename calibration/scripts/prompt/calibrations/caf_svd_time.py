@@ -7,6 +7,7 @@ import sys
 import multiprocessing
 import datetime
 import glob
+from random import choice, seed
 
 import ROOT
 from ROOT import Belle2, TFile
@@ -19,6 +20,7 @@ from prompt import CalibrationSettings
 from caf import backends
 from caf import strategies
 from caf.utils import ExpRun, IoV
+from prompt.utils import events_in_basf2_file
 
 import svd as svd
 import modularAnalysis as ana
@@ -116,6 +118,44 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     return cluster
 
 
+def select_files(all_input_files, min_events, max_events_per_file):
+    """
+    Selects the input file to use starting from the number of events per run that we need for the calibration.
+
+    Returns a list of file:
+        selected_files
+    """
+    selected_files = []
+    total_events = 0
+    while total_events < min_events:
+        if not all_input_files:
+            basf2.B2ERROR(f"No Input files found.")
+            break
+        # Randomly selects one file from all_input_files list
+        this_file = choice(all_input_files)
+        # Removes the file from the list to not be choosen again
+        all_input_files.remove(this_file)
+        # Returns the number of events in the file
+        events_in_file = events_in_basf2_file(this_file)
+        if not events_in_file:
+            continue
+        events_counter = 0
+        # Append the file to the list of selected files
+        selected_files.append(this_file)
+        if events_in_file < max_events_per_file:
+            events_counter = events_in_file
+        else:
+            events_counter = max_events_per_file
+        total_events += events_counter
+
+    basf2.B2INFO(f"Total chosen files = {len(selected_files)}")
+    basf2.B2INFO(f"Total events in chosen files = {total_events}")
+    if total_events < min_events:
+        basf2.B2ERROR(f"Not enough files for the calibration when max_events_per_file={max_events_per_file}.")
+
+    return selected_files
+
+
 def create_pre_collector_path(clusterizers):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
@@ -175,12 +215,19 @@ def get_calibrations(input_data, **kwargs):
 
     file_to_iov_physics = input_data["hlt_hadron"]
 
-    max_files_per_run = 10
-
+    # We should decide this numbers!
+    # Remember that our current calibration is not performed Run by Run
+    max_files_per_run = 20  # This number should be setted from the biginning
+    min_events_per_cal = 10000  # Minimum number of events needed for one run
+    min_events_per_file = 2000  # Files with less events will be discarder
+    max_events_selected_per_file = 5000  # Nominal max number of events selected per file. The events in the file can be more.
     from prompt.utils import filter_by_max_files_per_run
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file=1)
-    good_input_files = list(reduced_file_to_iov_physics.keys())
+    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file)
+    list_of_files = list(reduced_file_to_iov_physics.keys())
+    good_input_files = select_files(list_of_files[:], min_events_per_cal, max_events_selected_per_file)
+
+    basf2.B2INFO(f"Total number of files before selection = {max_files_per_run}")
     basf2.B2INFO(f"Total number of files actually used as input = {len(good_input_files)}")
 
     exps = [i.exp_low for i in reduced_file_to_iov_physics.values()]

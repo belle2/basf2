@@ -35,8 +35,6 @@ def get_calibrations(input_data, **kwargs):
       list(caf.framework.Calibration): All of the calibration objects we want to assign to the CAF process
     """
     import basf2
-    # basf2.set_debug_level(100)
-    basf2.set_log_level(basf2.LogLevel.DEBUG)
     # Set up config options
 
     # In this script we want to use one sources of input data.

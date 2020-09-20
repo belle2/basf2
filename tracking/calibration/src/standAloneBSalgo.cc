@@ -1258,10 +1258,8 @@ vector<vector<double>> fillSplineBasesLinear(const vector<event>& evts, vector<d
                                              std::function<double(track, double)> fun)
 {
   int n = spl.size(); //number of params
-  if (n == 0)
-
-    if (n == 2 && spl[0] > spl[1])
-      n = 1;
+  if (n == 0 || (n == 2 && spl[0] > spl[1]))
+    n = 1;
 
   vector<vector<double>> vecs(n);
 
@@ -1589,8 +1587,7 @@ spotParam fitZpositionSplinesSimple(const vector<event>& evts, vector<double> sp
 vector<double> fitSpotWidthCMS(vector<event> evts, spotParam spotPar)
 {
 
-  vector<double> dataVec, cDiffVec, cSumVec, sSumVec;
-  vector<double> ccVec, ssVec, scVec;
+  vector<double> dataVec, ccVec, ssVec, scVec;
 
 
   for (auto e : evts) {

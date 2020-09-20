@@ -176,7 +176,7 @@ struct Spline {
     std::cout << std::endl;
   }
 
-  Spline() { nodes = {}; vals = {0}; errs = {0}; }
+  Spline() : nodes{}, vals{0}, errs{0}   {}
 
 };
 

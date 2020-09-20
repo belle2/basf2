@@ -131,10 +131,10 @@ double Splitter::lossFunction(const vector<pair<double, double>>&  vec, int s, i
   }
 
   //net gap
-  double netTime = 0;
-  for (int i = s; i <= e; ++i) {
-    netTime += vec[i].second - vec[i].first;
-  }
+  //double netTime = 0;
+  //for (int i = s; i <= e; ++i) {
+  //  netTime += vec[i].second - vec[i].first;
+  //}
 
 
   double loss = pow(rawTime - tBest, 2) + gapPenalty * pow(gapMax, 2);

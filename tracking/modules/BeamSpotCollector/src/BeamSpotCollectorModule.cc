@@ -28,7 +28,11 @@ REG_MODULE(BeamSpotCollector)
 //                 Implementation
 //-----------------------------------------------------------------
 
-BeamSpotCollectorModule::BeamSpotCollectorModule() : CalibrationCollectorModule()
+BeamSpotCollectorModule::BeamSpotCollectorModule() : CalibrationCollectorModule(),
+  m_evt(-99), m_exp(-99), m_run(-99),
+  m_time(-99),
+  m_mu0_d0(-99), m_mu0_z0(-99), m_mu0_phi0(-99), m_mu0_tanlambda(-99), m_mu0_omega(-99),
+  m_mu1_d0(-99), m_mu1_z0(-99), m_mu1_phi0(-99), m_mu1_tanlambda(-99), m_mu1_omega(-99)
 {
   //Set module properties
 

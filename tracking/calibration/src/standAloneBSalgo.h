@@ -1,6 +1,4 @@
-
-#ifndef standAloneBSalgo_H
-#define standAloneBSalgo_H
+#pragma once
 
 #include <vector>
 #include <tuple>
@@ -46,4 +44,3 @@ std::tuple<std::vector<TVector3>, std::vector<TMatrixDSym>, TMatrixDSym>  runBea
 std::vector<ExpRunEvt> convertSplitPoints(const std::vector<event>& events, std::vector<double> splitPoints);
 ExpRunEvt getPosition(const std::vector<event>& events, double tEdge);
 
-#endif

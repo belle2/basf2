@@ -1,5 +1,4 @@
-#ifndef tools_H
-#define tools_H
+#pragma once
 
 //Hack for ROOT macros
 #undef assert
@@ -184,5 +183,3 @@ struct Spline {
 
 
 
-
-#endif

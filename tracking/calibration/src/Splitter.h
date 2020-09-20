@@ -1,6 +1,4 @@
-#ifndef Splitter_H
-#define Splitter_H
-
+#pragma once
 #include <map>
 #include <vector>
 #include <utility>
@@ -58,5 +56,3 @@ public:
 
 };
 
-
-#endif

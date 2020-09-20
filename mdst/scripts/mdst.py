@@ -137,7 +137,7 @@ def add_mdst_dump(path, print_untested=False):
                              "getRelationsWith": ["KlIds", "MCParticles"],
                              }),
         DataStorePrinter("KlId", ["isKLM", "isECL", "getKlId"]),
-        DataStorePrinter("TRGSummary", ["getTimType", "getTimQuality", "setTimQuality"], {
+        DataStorePrinter("TRGSummary", ["getTimType", "getTimQuality"], {
             "getTRGSummary": range(10),
             "getPreScale": [[int(i / 32), i % 32] for i in list(range(320))],
             "getInputBits": range(10),

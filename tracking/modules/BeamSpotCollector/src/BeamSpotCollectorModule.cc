@@ -77,7 +77,6 @@ void BeamSpotCollectorModule::startRun()
 
 void BeamSpotCollectorModule::closeRun()
 {
-  cout << "Closing run Radek " << __LINE__ << endl;
 
 }
 

@@ -60,7 +60,7 @@ ma.reconstructDecay(
 )
 
 # perform vertex fit of J/psi candidates
-vertex.KFit("J/psi:ee", conf_level=0.0, path=main)
+vertex.kFit("J/psi:ee", conf_level=0.0, path=main)
 
 # combine J/psi and KS candidates to form B0 candidates
 ma.reconstructDecay(

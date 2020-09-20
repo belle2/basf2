@@ -91,12 +91,21 @@ b_vars = []
 standard_vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
 b_vars += vc.deltae_mbc
 b_vars += standard_vars
-b_vars += vc.roe_kinematics + vc.roe_multiplicities
+
+# ROE variables
+roe_kinematics = ["roeE()", "roeM()", "roeP()", "roeMbc()", "roeDeltae()"]
+roe_multiplicities = [
+    "nROE_Charged()",
+    "nROE_Photons()",
+    "nROE_NeutralHadrons()",
+]
+b_vars += roe_kinematics + roe_multiplicities
 # Let's also add a version of the ROE variables that includes the mask:
-for roe_variable in vc.roe_kinematics + vc.roe_multiplicities:
+for roe_variable in roe_kinematics + roe_multiplicities:
     # e.g. instead of 'roeE()' (no mask) we want 'roeE(my_mask)'
     roe_variable_with_mask = roe_variable.replace("()", "(my_mask)")
     b_vars.append(roe_variable_with_mask)
+
 b_vars += ft.flavor_tagging
 
 # Variables for final states (electrons, positrons, pions)

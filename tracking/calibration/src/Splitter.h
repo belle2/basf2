@@ -33,8 +33,9 @@ public:
   double getMinLoss(const std::vector<std::pair<double, double>>&  vec,   int b, std::vector<int>& breaks);
   double lossFunction(const std::vector<std::pair<double, double>>&  vec, int s, int e);
 
-  std::vector<std::vector<std::map<ExpRun, std::pair<double, double>>>>  getIntervals(std::map<ExpRun, std::pair<double, double>>
-      runs, double tBestSize, double tBestVtx, double GapPenalty);
+  std::vector<std::vector<std::map<ExpRun, std::pair<double, double>>>>  getIntervals(const
+      std::map<ExpRun, std::pair<double, double>>
+      & runs, double tBestSize, double tBestVtx, double GapPenalty);
 
   static std::pair<double, double> getStartEnd(std::vector<std::map<ExpRun, std::pair<double, double>>> res)
   {

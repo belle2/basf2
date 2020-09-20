@@ -80,9 +80,9 @@ struct spotParam {
 
   // Constructor based on vals, errors and vector with splines - Assuming linear splines
   // xVals, yVals, kXvals, kYvals, zVals
-  spotParam(vector<double> vals, vector<double> errs, vector<vector<double>> spls, int order = 0)
+  spotParam(const vector<double>& vals, const vector<double>& errs, const vector<vector<double>>& spls, int order = 0)
   {
-    auto getSize = [order](vector<double>& sp) {
+    auto getSize = [order](const vector<double>& sp) {
       if (sp.size() == 0)
         return 1;
       else {
@@ -1021,7 +1021,7 @@ void plotSpotZPositionFit(const vector<event>& evts, spotParam par, TString fNam
 
 
 //Plot pull distribution
-void plotSpotPositionPull(const vector<event>& evts, spotParam par, TString fName, double cut = 70)
+void plotSpotPositionPull(const vector<event>& evts, const spotParam& par, TString fName, double cut = 70)
 {
   TH1D* hPull = new TH1D(rn(), "", 200, -200, 200);
 
@@ -1184,7 +1184,7 @@ void plotXYtimeDep(const vector<event>& evts, spotParam par, TString fName)
 
 
 //Plot pull distribution
-void plotSpotZpositionPull(const vector<event>& evts, spotParam par, TString fName, double cut = 1000)
+void plotSpotZpositionPull(const vector<event>& evts, const spotParam& par, TString fName, double cut = 1000)
 {
   TH1D* hPull = new TH1D(rn(), "", 200, -2000, 2000);
 
@@ -1215,7 +1215,7 @@ void plotSpotZpositionPull(const vector<event>& evts, spotParam par, TString fNa
 
 
 // Remove outliear from the position fit (for d0)
-void removeSpotPositionOutliers(vector<event>& evts,  spotParam par, double cut = 70)
+void removeSpotPositionOutliers(vector<event>& evts,  const spotParam& par, double cut = 70)
 {
   int nRem = 0;
   int nAll = 0;
@@ -1234,7 +1234,7 @@ void removeSpotPositionOutliers(vector<event>& evts,  spotParam par, double cut 
 
 
 // Remove outliear from the position fit (for z0)
-void removeSpotZpositionOutliers(vector<event>& evts,  spotParam par, double cut = 1000)
+void removeSpotZpositionOutliers(vector<event>& evts,  const spotParam& par, double cut = 1000)
 {
   int nRem = 0;
   int nAll = 0;
@@ -1348,7 +1348,7 @@ vector<vector<double>> fillSplineBasesZero(const vector<event>& evts, vector<dou
 
 
 // compare consistency of two splines, taking errers into account
-double compareSplines(Spline spl1, Spline spl2)
+double compareSplines(const Spline& spl1, const Spline& spl2)
 {
   double sum = 0;
 
@@ -1366,7 +1366,7 @@ double compareSplines(Spline spl1, Spline spl2)
 }
 
 // Fit width in z-direction in [um^2]
-double fitSpotZwidth(const vector<event>& evts, spotParam spotPar, vector<double> sizesXY)
+double fitSpotZwidth(const vector<event>& evts, const spotParam& spotPar, const vector<double>& sizesXY)
 {
 
   vector<double> dataVec;
@@ -1401,8 +1401,8 @@ double fitSpotZwidth(const vector<event>& evts, spotParam spotPar, vector<double
 
 
 // Fit xy widths (including XZ, YZ slopes), no prior
-spotParam fitSpotPositionSplines(const vector<event>& evts, vector<double> splX, vector<double> splY, vector<double> splKX,
-                                 vector<double> splKY)
+spotParam fitSpotPositionSplines(const vector<event>& evts, const vector<double>& splX, const vector<double>& splY,
+                                 const vector<double>& splKX, const vector<double>& splKY)
 {
   vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](track tr, double) {return  sin(tr.phi0);});
   vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](track tr, double) {return -cos(tr.phi0);});
@@ -1435,8 +1435,8 @@ spotParam fitSpotPositionSplines(const vector<event>& evts, vector<double> splX,
 }
 
 // Fit xy widths (including XZ, YZ slopes), with prior info from spotPars
-spotParam fitSpotPositionSplines(const vector<event>& evts, vector<double> splX, vector<double> splY, vector<double> splKX,
-                                 vector<double> splKY, spotParam spotPars)
+spotParam fitSpotPositionSplines(const vector<event>& evts, const vector<double>& splX, const vector<double>& splY,
+                                 const vector<double>& splKX, const vector<double>& splKY, const spotParam& spotPars)
 {
   vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](track tr, double) {return  sin(tr.phi0);});
   vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](track tr, double) {return -cos(tr.phi0);});
@@ -1475,7 +1475,7 @@ spotParam fitSpotPositionSplines(const vector<event>& evts, vector<double> splX,
 
 
 // simple fit of position splines, without kX, kY
-spotParam fitSpotPositionSplines(const vector<event>& evts, vector<double> splX, vector<double> splY)
+spotParam fitSpotPositionSplines(const vector<event>& evts, const vector<double>& splX, const vector<double>& splY)
 {
   vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](track tr, double) {return  sin(tr.phi0);});
   vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](track tr, double) {return -cos(tr.phi0);});
@@ -1511,8 +1511,9 @@ spotParam fitSpotPositionSplines(const vector<event>& evts, vector<double> splX,
 
 
 //Fit Zposition
-spotParam fitZpositionSplines(const vector<event>& evts, vector<double> splX, vector<double> splY,  vector<double> splKX,
-                              vector<double> splKY, vector<double> splZ)
+spotParam fitZpositionSplines(const vector<event>& evts, const vector<double>& splX, const vector<double>& splY,
+                              const vector<double>& splKX, const vector<double>& splKY,
+                              const vector<double>& splZ)
 {
   vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](track tr, double) {return -tr.tanlambda * cos(tr.phi0);});
   vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](track tr, double) {return -tr.tanlambda * sin(tr.phi0);});
@@ -1548,7 +1549,7 @@ spotParam fitZpositionSplines(const vector<event>& evts, vector<double> splX, ve
 
 
 //Fit Zposition, xIP, yIP fixed from d0 fit
-spotParam fitZpositionSplinesSimple(const vector<event>& evts, vector<double> splZ, spotParam spotPars)
+spotParam fitZpositionSplinesSimple(const vector<event>& evts, const vector<double>& splZ, const spotParam& spotPars)
 {
   vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](track, double) {return 1;});
 
@@ -1584,7 +1585,7 @@ spotParam fitZpositionSplinesSimple(const vector<event>& evts, vector<double> sp
 
 
 // Returns x-y sizes in um^2
-vector<double> fitSpotWidthCMS(vector<event> evts, spotParam spotPar)
+vector<double> fitSpotWidthCMS(const vector<event>& evts, const spotParam& spotPar)
 {
 
   vector<double> dataVec, ccVec, ssVec, scVec;
@@ -1614,7 +1615,7 @@ vector<double> fitSpotWidthCMS(vector<event> evts, spotParam spotPar)
 
 
 // Plot pulls in xy size fit
-void plotSpotSizePull(const vector<event>& evts, spotParam spotPar, vector<double> sizesXY)
+void plotSpotSizePull(const vector<event>& evts, const spotParam& spotPar, const vector<double>& sizesXY)
 {
   TH1D* hPull = new TH1D(rn(), "", 100, -2000, 2000);
   for (auto& e : evts) {
@@ -1634,7 +1635,7 @@ void plotSpotSizePull(const vector<event>& evts, spotParam spotPar, vector<doubl
 
 
 // Plot pulls in Zsize fit
-void plotSpotSizeZPull(const vector<event>& evts, spotParam spotPar, vector<double> sizesXY,  double sizeZZ)
+void plotSpotSizeZPull(const vector<event>& evts, const spotParam& spotPar, const vector<double>& sizesXY,  double sizeZZ)
 {
   TH1D* hPull = new TH1D(rn(), "", 100, -300e3, 600e3);
   for (auto& e : evts) {
@@ -1662,7 +1663,7 @@ void plotSpotSizeZPull(const vector<event>& evts, spotParam spotPar, vector<doub
 
 
 // Plot size fit control plots
-void plotSpotSizeFit(const vector<event>& evts, spotParam par, vector<double> sizeXY)
+void plotSpotSizeFit(const vector<event>& evts, const spotParam& par, const vector<double>& sizeXY)
 {
   double sxx = sizeXY[0];
   double syy = sizeXY[1];
@@ -1721,7 +1722,7 @@ void plotSpotSizeFit(const vector<event>& evts, spotParam par, vector<double> si
 
 
 // Plot zSizeFit control plots
-void plotSpotZSizeFit(const vector<event>& evts, spotParam par, vector<double> sizesXY, double sizeZZ)
+void plotSpotZSizeFit(const vector<event>& evts, const spotParam& par, const vector<double>& sizesXY, double sizeZZ)
 {
 
   gStyle->SetOptStat(0);
@@ -1808,7 +1809,7 @@ void plotSpotZSizeFit(const vector<event>& evts, spotParam par, vector<double> s
 
 
 
-void removeSpotSizeOutliers(vector<event>& evts, spotParam spotPar, vector<double> sizesXY, double cut = 1500)
+void removeSpotSizeOutliers(vector<event>& evts, const spotParam& spotPar, const vector<double>& sizesXY, double cut = 1500)
 {
 
   int nRem = 0;
@@ -1829,7 +1830,8 @@ void removeSpotSizeOutliers(vector<event>& evts, spotParam spotPar, vector<doubl
 
 
 // Remove outliers in spotSize
-void removeSpotSizeZOutliers(vector<event>& evts, spotParam spotPar, vector<double> sizesXY, double sizeZZ, double cut = 150000)
+void removeSpotSizeZOutliers(vector<event>& evts, const spotParam& spotPar, const vector<double>& sizesXY, double sizeZZ,
+                             double cut = 150000)
 {
 
   int nRem = 0;
@@ -1951,7 +1953,8 @@ map<ExpRun, pair<double, double>> getRunInfo(const vector<event>& evts)
 
 
 // Returns tuple with the beamspot parameters
-tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(vector<event> evts, vector<double> splitPoints)
+tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(vector<event> evts,
+    const vector<double>& splitPoints)
 {
   const double xyPosLimit  = 70; //um
   const double xySize2Limit = pow(40, 2); //um^2
@@ -1976,21 +1979,26 @@ tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(v
     //simple XY pos fit
     auto resTemp = fitSpotPositionSplines(evts, indX, indY);
 
-
-    if (k == kPlot) plotSpotPositionFit(evts, resTemp, "positionFitSimpe");
-    if (k == kPlot) plotSpotPositionPull(evts, resTemp, "pullsPositionSimple",  xyPosLimit);
+    if (k == kPlot) {
+      plotSpotPositionFit(evts, resTemp, "positionFitSimpe");
+      plotSpotPositionPull(evts, resTemp, "pullsPositionSimple",  xyPosLimit);
+    }
     removeSpotPositionOutliers(evts, resTemp, xyPosLimit);
 
     //simple XY pos fit (with outliers removed)
     auto resFin = fitSpotPositionSplines(evts, indX, indY);
-    if (k == kPlot) plotSpotPositionFit(evts, resFin, "positionFitSimpleC");
-    if (k == kPlot) plotSpotPositionPull(evts, resFin, "pullsPositionSimpleC",  xyPosLimit);
-    if (k == kPlot) plotXYtimeDep(evts, resFin, "simplePosTimeDep");
+    if (k == kPlot) {
+      plotSpotPositionFit(evts, resFin, "positionFitSimpleC");
+      plotSpotPositionPull(evts, resFin, "pullsPositionSimpleC",  xyPosLimit);
+      plotXYtimeDep(evts, resFin, "simplePosTimeDep");
+    }
 
     //Z position fit
     auto resZmy = fitZpositionSplinesSimple(evts, indZ, resFin);
-    if (k == kPlot) plotSpotZPositionFit(evts, resZmy, "positionFitSimpleZ");
-    if (k == kPlot) plotSpotZpositionPull(evts, resZmy, "zPositionPull", zPosLimit);
+    if (k == kPlot) {
+      plotSpotZPositionFit(evts, resZmy, "positionFitSimpleZ");
+      plotSpotZpositionPull(evts, resZmy, "zPositionPull", zPosLimit);
+    }
 
     removeSpotZpositionOutliers(evts,  resZmy, zPosLimit);
 
@@ -2000,10 +2008,10 @@ tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(v
 
     //complete XY pos fit
     auto resNew = fitSpotPositionSplines(evts, indX, indY, indKX, indKY, resZmy);
-    if (k == kPlot) plotSpotPositionFit(evts, resNew, "positionFitFull");
-
-
-    if (k == kPlot) plotKxKyFit(evts, resNew, "slopes");
+    if (k == kPlot) {
+      plotSpotPositionFit(evts, resNew, "positionFitFull");
+      plotKxKyFit(evts, resNew, "slopes");
+    }
 
     //Z position fit (iteration 2)
     resZmy = fitZpositionSplinesSimple(evts, indZ, resNew);
@@ -2029,8 +2037,10 @@ tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(v
     // fit of Z size
     double sizeZZ = fitSpotZwidth(evts, resNew, vecXY);
 
-    if (k == kPlot) plotSpotZSizeFit(evts, resNew, vecXY, sizeZZ);
-    if (k == kPlot) plotSpotSizeZPull(evts, resNew, vecXY,  sizeZZ);
+    if (k == kPlot) {
+      plotSpotZSizeFit(evts, resNew, vecXY, sizeZZ);
+      plotSpotSizeZPull(evts, resNew, vecXY,  sizeZZ);
+    }
 
     //removeSpotSizeZOutliers(evts, resNew, vecXY, sizeZZ, 150000);
     //sizeZZ = fitSpotZwidth(evts, resNew, vecXY);

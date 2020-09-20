@@ -215,7 +215,7 @@ vector<int> Splitter::dynamicBreaks(vector<pair<double, double>>  runs)
 
 
   vector<int> breaks;
-  double res = getMinLoss(runs, runs.size() - 1, breaks);
+  getMinLoss(runs, runs.size() - 1, breaks); //the minLoss (output) currently not used, only breaks
 
   return breaks;
 }
@@ -261,8 +261,8 @@ ExpRun getRun(map<ExpRun, pair<double, double>> runs, double t)
 
 
 //Get intervals separated according the runs
-vector<map<ExpRun, pair<double, double>>> breaks2intervalsSep(map<ExpRun, pair<double, double>> runsMap,
-    vector<pair<double, double>> currVec, vector<int> breaks)
+vector<map<ExpRun, pair<double, double>>> breaks2intervalsSep(const map<ExpRun, pair<double, double>>& runsMap,
+    const vector<pair<double, double>>& currVec, const vector<int>& breaks)
 {
   vector<map<ExpRun, pair<double, double>>> splitsNow(breaks.size() + 1);
   for (int i = 0; i < int(breaks.size()) + 1; ++i) {
@@ -302,7 +302,8 @@ map<ExpRun, pair<double, double>> Splitter::mergeIntervals(map<ExpRun, pair<doub
 }
 
 //Get the optimal time intervals with two levels of segmentation
-vector<vector<map<ExpRun, pair<double, double>>>>  Splitter::getIntervals(map<ExpRun, pair<double, double>> runs, double tBestSize,
+vector<vector<map<ExpRun, pair<double, double>>>>  Splitter::getIntervals(const map<ExpRun, pair<double, double>>& runs,
+    double tBestSize,
     double tBestVtx, double GapPenalty)
 {
   // Divide into small intervals

@@ -10,66 +10,11 @@
 
 #include <top/reconstruction_cpp/PhotonState.h>
 #include <framework/logging/Logger.h>
-#include <algorithm>
 
 namespace Belle2 {
   namespace TOP {
 
     double PhotonState::s_maxLen = 10000;
-
-
-    PhotonState::BarSegment::BarSegment(const TOPGeoBarSegment& bar, double zLeft):
-      A(bar.getWidth()), B(bar.getThickness()), zL(zLeft)
-    {
-      zR = zL + bar.getFullLength();
-    }
-
-
-    PhotonState::BarSegment::BarSegment(const TOPGeoModule& module):
-      A(module.getBarWidth()), B(module.getBarThickness())
-
-    {
-      zL = -module.getBarLength() / 2;
-      zR =  module.getBarLength() / 2;
-    }
-
-
-    PhotonState::Mirror::Mirror(const TOPGeoModule& module):
-      xc(module.getMirrorSegment().getXc()), yc(module.getMirrorSegment().getYc()),
-      zc(module.getMirrorSegment().getZc()), R(module.getMirrorSegment().getRadius())
-    {
-      zc += (module.getBarLength() - module.getMirrorSegment().getFullLength()) / 2;
-      zb = zc + R;
-      double Ah = std::max(module.getMirrorSegment().getWidth(), module.getBarWidth()) / 2;
-      double Bh = std::max(module.getMirrorSegment().getThickness(), module.getBarThickness()) / 2;
-      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc - Ah, 2) - pow(yc - Bh, 2)));
-      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc + Ah, 2) - pow(yc - Bh, 2)));
-      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc - Ah, 2) - pow(yc + Bh, 2)));
-      zb = std::min(zb, zc + sqrt(pow(R, 2) - pow(xc + Ah, 2) - pow(yc + Bh, 2)));
-    }
-
-
-    PhotonState::Prism::Prism(const TOPGeoModule& module):
-      A(module.getPrism().getWidth()), B(module.getPrism().getThickness())
-    {
-      yUp = B / 2;
-      const auto& prism = module.getPrism();
-      yDown = yUp - prism.getExitThickness();
-      zR = -module.getBarLength() / 2;
-      zL = zR - prism.getLength();
-      zFlat = zL + prism.getFlatLength();
-      const auto& pmtArray = module.getPMTArray();
-      // a call to prism.getFilterThickness is added for backward compatibility
-      double filterThickness = pmtArray.getFilterThickness() + prism.getFilterThickness();
-      double cookieThickness = pmtArray.getCookieThickness();
-      double pmtWindow = pmtArray.getPMT().getWinThickness();
-      zD = zL - filterThickness - cookieThickness - pmtWindow;
-
-      k0 = prism.getK0();
-      unfoldedWindows = prism.getUnfoldedWindows();
-      for (auto& w : unfoldedWindows) w.z0 += zR;
-    }
-
 
     PhotonState::PhotonState(const TVector3& position, const TVector3& direction):
       m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
@@ -78,7 +23,7 @@ namespace Belle2 {
     {}
 
 
-    bool PhotonState::isInside(const BarSegment& bar) const
+    bool PhotonState::isInside(const RaytracerBase::BarSegment& bar) const
     {
       if (abs(m_x) > bar.A / 2) return false;
       if (abs(m_y) > bar.B / 2) return false;
@@ -87,7 +32,7 @@ namespace Belle2 {
     }
 
 
-    bool PhotonState::isInside(const BarSegment& bar, const Mirror& mirror) const
+    bool PhotonState::isInside(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror) const
     {
       if (abs(m_x) > bar.A / 2) return false;
       if (abs(m_y) > bar.B / 2) return false;
@@ -98,7 +43,7 @@ namespace Belle2 {
     }
 
 
-    bool PhotonState::isInside(const Prism& prism) const
+    bool PhotonState::isInside(const RaytracerBase::Prism& prism) const
     {
       if (abs(m_x) > prism.A / 2) return false;
       if (m_z < prism.zL or m_z > prism.zR) return false;
@@ -109,7 +54,7 @@ namespace Belle2 {
     }
 
 
-    void PhotonState::propagate(const BarSegment& bar)
+    void PhotonState::propagate(const RaytracerBase::BarSegment& bar)
     {
       if (not m_status) return;
 
@@ -135,7 +80,7 @@ namespace Belle2 {
     }
 
 
-    void PhotonState::propagateSemiLinear(const BarSegment& bar, const Mirror& mirror)
+    void PhotonState::propagateSemiLinear(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror)
     {
       if (not m_status) return;
 
@@ -195,7 +140,7 @@ namespace Belle2 {
     }
 
 
-    void PhotonState::propagateExact(const BarSegment& bar, const Mirror& mirror)
+    void PhotonState::propagateExact(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror)
     {
       if (not m_status) return;
 
@@ -259,7 +204,7 @@ namespace Belle2 {
     }
 
 
-    void PhotonState::propagate(const Prism& prism)
+    void PhotonState::propagate(const RaytracerBase::Prism& prism)
     {
       if (not m_status) return;
 

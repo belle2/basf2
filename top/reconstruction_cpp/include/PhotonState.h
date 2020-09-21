@@ -10,10 +10,8 @@
 
 #pragma once
 
-#include <vector>
+#include <top/reconstruction_cpp/RaytracerBase.h>
 #include <TVector3.h>
-#include <top/dbobjects/TOPGeoBarSegment.h>
-#include <top/dbobjects/TOPGeoModule.h>
 
 namespace Belle2 {
   namespace TOP {
@@ -34,87 +32,6 @@ namespace Belle2 {
         c_MirrorSegment = 2, /**< mirror segment */
         c_Prism = 3          /**< prism */
       };
-
-      /**
-       * bar segment data in module local frame.
-       */
-      struct BarSegment {
-        double A = 0;  /**< width (dimension in x) */
-        double B = 0;  /**< thickness (dimension in y) */
-        double zL = 0; /**< minimal z */
-        double zR = 0; /**< maximal z */
-
-        /**
-         * default constructor
-         */
-        BarSegment()
-        {}
-
-        /**
-         * constructor from quartz segment.
-         * @param bar quartz segment object from TOPGeometry
-         * @param zLeft position of quartz segment left side (minimal z)
-         */
-        BarSegment(const TOPGeoBarSegment& bar, double zLeft);
-
-        /**
-         * constructor from joint quartz segments with average width and thickness.
-         * @param module module object from TOPGeometry
-         */
-        explicit BarSegment(const TOPGeoModule& module);
-      };
-
-      /**
-       * spherical mirror data in module local frame.
-       */
-      struct Mirror {
-        double xc = 0; /**< center of curvature in x */
-        double yc = 0; /**< center of curvature in y */
-        double zc = 0; /**< center of curvature in z */
-        double R = 0;  /**< radius */
-        double zb = 0; /**< minimum of mirror surface in z */
-
-        /**
-         * default constructor
-         */
-        Mirror()
-        {}
-
-        /**
-         * constructor from TOP module.
-         * @param module module object from TOPGeometry
-         */
-        explicit Mirror(const TOPGeoModule& module);
-      };
-
-      /**
-       * prism data in module local frame.
-       */
-      struct Prism {
-        double A = 0;     /**< width (dimension in x) */
-        double B = 0;     /**< thickness at bar (dimension in y) */
-        double yUp = 0;   /**< maximal y of exit window */
-        double yDown = 0; /**< minimal y of exit window */
-        double zL = 0;    /**< minimal z */
-        double zR = 0;    /**< maximal z, i.e position of prism-bar joint */
-        double zFlat = 0; /**< z where flat continues to slanted surface */
-        double zD = 0;    /**< detector (photo-cathode) position */
-        int k0 = 0; /**< index of true prism in the vector 'unfoldedWindows' */
-        std::vector<TOPGeoPrism::UnfoldedWindow> unfoldedWindows; /**< unfolded prism exit windows */
-
-        /**
-         * default constructor
-         */
-        Prism()
-        {}
-
-        /**
-         * constructor from TOP module.
-         * @param module module object from TOPGeometry
-         */
-        explicit Prism(const TOPGeoModule& module);
-      };
-
 
       /**
        * Constructor
@@ -249,7 +166,7 @@ namespace Belle2 {
        * @param bar bar segment data
        * @return true if inside
        */
-      bool isInside(const BarSegment& bar) const;
+      bool isInside(const RaytracerBase::BarSegment& bar) const;
 
       /**
        * Checks if photon is inside the mirror segment (including surface).
@@ -257,21 +174,21 @@ namespace Belle2 {
        * @param mirror spherical mirror data
        * @return true if inside
        */
-      bool isInside(const BarSegment& bar, const Mirror& mirror) const;
+      bool isInside(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror) const;
 
       /**
        * Checks if photon is inside the prism (including surface).
        * @param prism prism data
        * @return true if inside
        */
-      bool isInside(const Prism& prism) const;
+      bool isInside(const RaytracerBase::Prism& prism) const;
 
       /**
        * Propagate photon to the exit of bar segment.
        * @param bar bar segment data
        * @return true on success
        */
-      void propagate(const BarSegment& bar);
+      void propagate(const RaytracerBase::BarSegment& bar);
 
       /**
        * Propagate photon to the mirror and reflect it using semi-linear mirror optics.
@@ -283,7 +200,7 @@ namespace Belle2 {
        * @param mirror spherical mirror data
        * @return true on success
        */
-      void propagateSemiLinear(const BarSegment& bar, const Mirror& mirror);
+      void propagateSemiLinear(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror);
 
       /**
        * Propagate photon to the mirror and reflect it using exact mirror optics.
@@ -291,14 +208,14 @@ namespace Belle2 {
        * @param mirror spherical mirror data
        * @return true on success
        */
-      void propagateExact(const BarSegment& bar, const Mirror& mirror);
+      void propagateExact(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror);
 
       /**
        * Propagate photon in the prism to the detector plane.
        * @param prism prism data
        * @return true on success
        */
-      void propagate(const Prism& prism);
+      void propagate(const RaytracerBase::Prism& prism);
 
     private:
 

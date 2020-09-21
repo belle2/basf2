@@ -9,34 +9,10 @@
  **************************************************************************/
 
 #include <top/reconstruction_cpp/FastRaytracer.h>
-#include <top/geometry/TOPGeometryPar.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
   namespace TOP {
-
-    FastRaytracer::FastRaytracer(int moduleID, EGeometry geometry, EOptics optics):
-      m_moduleID(moduleID), m_geometry(geometry), m_optics(optics)
-    {
-      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
-      if (not geo->isModuleIDValid(moduleID)) {
-        B2ERROR("FastRaytracer: invalid slot number, moduleID = " << moduleID);
-        return;
-      }
-      const auto& module = geo->getModule(moduleID);
-
-      m_prism = PhotonState::Prism(module);
-      m_mirror = PhotonState::Mirror(module);
-
-      if (geometry == c_Unified) {
-        m_bars.push_back(PhotonState::BarSegment(module));
-      } else {
-        m_bars.push_back(PhotonState::BarSegment(module.getBarSegment2(), m_prism.zR));
-        m_bars.push_back(PhotonState::BarSegment(module.getBarSegment1(), m_bars.back().zR));
-        m_bars.push_back(PhotonState::BarSegment(module.getMirrorSegment(), m_bars.back().zR));
-      }
-    }
-
 
     void FastRaytracer::propagate(const PhotonState& photon) const
     {

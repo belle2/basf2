@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <top/reconstruction_cpp/RaytracerBase.h>
 #include <top/reconstruction_cpp/PhotonState.h>
 #include <vector>
 
@@ -20,68 +21,19 @@ namespace Belle2 {
     /**
      * Fast photon propagation in a quartz optics.
      */
-    class FastRaytracer {
+    class FastRaytracer : public RaytracerBase {
 
     public:
-      /**
-       * Treatement of quartz geometry.
-       */
-      enum EGeometry {
-        c_Unified = 0,   /**< single bar with average width and thickness */
-        c_Segmented = 1  /**< segmented bars */
-      };
 
       /**
-       * Treatement of spherical mirror optics.
-       */
-      enum EOptics {
-        c_SemiLinear = 0, /**< semi-linear approximation */
-        c_Exact = 1       /**< exact optics */
-      };
-
-      /**
-       * constructor
+       * Constructor
        * @param moduleID slot ID
        * @param geometry treatement of quartz geometry
        * @param optics treatement of spherical mirror optics
        */
-      FastRaytracer(int moduleID, EGeometry geometry = c_Unified, EOptics optics = c_SemiLinear);
-
-      /**
-       * Returns slot ID.
-       * @return slot ID
-       */
-      int getModuleID() const {return m_moduleID;}
-
-      /**
-       * Returns quartz geometry treatement.
-       * @return quartz geometry treatement
-       */
-      EGeometry getGeometry() const {return m_geometry;}
-
-      /**
-       * Returns treatement of spherical mirror optics.
-       * @return spherical mirror optics
-       */
-      EOptics getOptics() const {return m_optics;}
-
-      /**
-       * Returns geometry data of bar segments.
-       * @return geometry data of bar segments
-        */
-      const std::vector<PhotonState::BarSegment>& getBars() const {return m_bars;}
-
-      /**
-       * Returns geometry data of spherical mirror.
-       * @return geometry data of spherical mirror
-       */
-      const PhotonState::Mirror& getMirror() const {return m_mirror;}
-
-      /**
-       * Returns geometry data of prism.
-       * @return geometry data of prism
-       */
-      const PhotonState::Prism& getPrism() const {return m_prism;}
+      FastRaytracer(int moduleID, EGeometry geometry = c_Unified, EOptics optics = c_SemiLinear):
+        RaytracerBase(moduleID, geometry, optics)
+      {};
 
       /**
        * Propagate photon to photo-detector plane.
@@ -191,14 +143,6 @@ namespace Belle2 {
 
 
     private:
-
-      int m_moduleID = 0; /**< slot ID */
-      EGeometry m_geometry = c_Unified; /**< quartz geometry */
-      EOptics m_optics = c_SemiLinear;  /**< spherical mirror optics */
-
-      std::vector<PhotonState::BarSegment> m_bars; /**< geometry data of bar segments */
-      PhotonState::Mirror m_mirror; /**< spherical mirror geometry data */
-      PhotonState::Prism m_prism; /**< prism geometry data */
 
       mutable std::vector<PhotonState> m_photonStates; /**< photon states at propagation steps */
       mutable bool m_status = false; /**< propagation status */

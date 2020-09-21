@@ -85,7 +85,6 @@ namespace Belle2 {
     int m_useEvtGen;  /**< use EvtGen for some decays. */
     std::string m_DecFile;  /**< EvtGen decay file */
     std::string m_UserDecFile;  /**< User EvtGen decay file */
-    int m_useEvtGenParticleData; /**< Override PYTHIA parameters */
     bool m_coherentMixing;  /**< decay the B0-B0bar coherently. */
 
     MCParticleGraph mcParticleGraph; /**< An instance of the MCParticle graph. */

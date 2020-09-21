@@ -52,7 +52,6 @@ FragmentationModule::FragmentationModule() : Module()
            FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
   addParam("CoherentMixing", m_coherentMixing, "Decay the B0-B0bar coherently (should always be true)", true);
-  addParam("useEvtGenParticleData", m_useEvtGenParticleData, "Use evt.pdl particle data in PYTHIA as well", 0);
 
   //initialize member variables
   evtgen  = 0;
@@ -145,11 +144,6 @@ void FragmentationModule::initialize()
     }
     evtgen = new EvtGenDecays(m_Pythia, evtGen);
     evtgen->readDecayFile(m_UserDecFile);
-
-    // Update pythia particle tables from evtgen
-    if (m_useEvtGenParticleData > 0) {
-      evtgen->updatePythia();
-    }
   }
 
   // List variable(s) that differ from their defaults

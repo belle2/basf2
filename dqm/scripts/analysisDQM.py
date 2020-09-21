@@ -32,10 +32,12 @@ def add_mirabelle_dqm(path):
     fillParticleList('pi+:MiraBelleDst_pion', 'abs(d0)<0.5 and abs(z0)<3', path=path)
     fillParticleList('K+:MiraBelleDst_kaon',  'abs(d0)<0.5 and abs(z0)<3', path=path)
     stdPi0s(listtype='eff60_Jan2020', path=path)
-    reconstructDecay('D0:ch1 -> K-:MiraBelleDst_kaon pi+:MiraBelleDst_pion', '1.7 < M < 2.1', path=path)
-    reconstructDecay('D0:ch2 -> K-:MiraBelleDst_kaon pi+:MiraBelleDst_pion pi0:eff60_Jan2020', '1.7 < M < 2.1', path=path)
-    reconstructDecay('D*+:kpi -> D0:ch1 pi+:MiraBelleDst_pion', 'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
-    reconstructDecay('D*+:kpipi0 -> D0:ch2 pi+:MiraBelleDst_pion', 'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
+    reconstructDecay('D0:ch1_mirabelle -> K-:MiraBelleDst_kaon pi+:MiraBelleDst_pion', '1.7 < M < 2.1', path=path)
+    reconstructDecay('D0:ch2_mirabelle -> K-:MiraBelleDst_kaon pi+:MiraBelleDst_pion pi0:eff60_Jan2020', '1.7 < M < 2.1', path=path)
+    reconstructDecay('D*+:kpi -> D0:ch1_mirabelle pi+:MiraBelleDst_pion',
+                     'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
+    reconstructDecay('D*+:kpipi0 -> D0:ch2_mirabelle pi+:MiraBelleDst_pion',
+                     'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
     listmode = ['D*+:kpi', 'D*+:kpipi0']
     copyLists('D*+:MiraBelleDst', listmode, path=path)
     mirabelleDst = register_module('PhysicsObjectsMiraBelleDst')

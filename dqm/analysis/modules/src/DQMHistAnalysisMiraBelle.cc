@@ -60,20 +60,20 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   mon_dst = getMonitoringObject("dst");
 
   // make cavases to be added to MonitoringObject
-  main = new TCanvas("main", "main", 0, 0, 800, 600);
-  resolution = new TCanvas("resolution", "resolution", 0, 0, 800, 600);
-  muon_val = new TCanvas("muon_val", "muon_val", 0, 0, 400, 400);
+  mumu_main = new TCanvas("mumu_main", "mumu_main", 0, 0, 800, 600);
+  mumu_resolution = new TCanvas("mumu_resolution", "mumu_resolution", 0, 0, 800, 600);
+  mumu_muon_val = new TCanvas("mumu_muon_val", "mumu_muon_val", 0, 0, 400, 400);
   dst_mass = new TCanvas("dst_mass", "dst_mass", 0, 0, 1200, 400);
-  pi_val = new TCanvas("pi_val", "pi_val", 0, 0, 800, 400);
-  k_val = new TCanvas("k_val", "k_val", 0, 0, 800, 400);
+  dst_pi_val = new TCanvas("dst_pi_val", "dst_pi_val", 0, 0, 800, 400);
+  dst_k_val = new TCanvas("dst_k_val", "dst_k_val", 0, 0, 800, 400);
 
   // add canvases to MonitoringObject
-  mon_mumu->addCanvas(main);
-  mon_mumu->addCanvas(resolution);
-  mon_mumu->addCanvas(muon_val);
+  mon_mumu->addCanvas(mumu_main);
+  mon_mumu->addCanvas(mumu_resolution);
+  mon_mumu->addCanvas(mumu_muon_val);
   mon_dst->addCanvas(dst_mass);
-  mon_dst->addCanvas(pi_val);
-  mon_dst->addCanvas(k_val);
+  mon_dst->addCanvas(dst_pi_val);
+  mon_dst->addCanvas(dst_k_val);
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle: initialized.");
 }
@@ -119,36 +119,36 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   TH1* hist_dPhicms = findHist("PhysicsObjectsMiraBelle/hist_dPhicms");
 
   // Make TCanvases
-  // --- Main
-  main->Divide(4, 3);
-  main->cd(1);  hist_theta->Draw();
-  main->cd(2);  hist_Phi0->Draw();
-  main->cd(3);  hist_Mom->Draw();
-  main->cd(4);  hist_Pt->Draw();
-  main->cd(5);  hist_npxd->Draw();
-  main->cd(6);  hist_nsvd->Draw();
-  main->cd(7);  hist_ncdc->Draw();
-  main->cd(8);  hist_topdig->Draw();
-  main->cd(9);  hist_DetPhotonARICH->Draw();
-  main->cd(10);  hist_klmClusterLayers->Draw();
-  main->cd(11);  hist_nExtraCDCHits->Draw();
-  main->cd(12);  hist_nECLClusters->Draw();
-  // --- Resolution
-  resolution->Divide(3, 3);
-  resolution->cd(1);  hist_inv_p->Draw();
-  resolution->cd(2);  hist_dD0->Draw();
-  resolution->cd(3);  hist_dZ0->Draw();
-  resolution->cd(4);  hist_dPtcms->Draw();
-  resolution->cd(5);  hist_dPhicms->Draw();
-  resolution->cd(6);  hist_nECLClusters->Draw();
-  resolution->cd(7);  hist_nExtraCDCHits->Draw();
-  resolution->cd(8);  hist_ndf->Draw();
-  muon_val->Divide(2, 2);
+  // --- Mumu_Main
+  mumu_main->Divide(4, 3);
+  mumu_main->cd(1);  hist_theta->Draw();
+  mumu_main->cd(2);  hist_Phi0->Draw();
+  mumu_main->cd(3);  hist_Mom->Draw();
+  mumu_main->cd(4);  hist_Pt->Draw();
+  mumu_main->cd(5);  hist_npxd->Draw();
+  mumu_main->cd(6);  hist_nsvd->Draw();
+  mumu_main->cd(7);  hist_ncdc->Draw();
+  mumu_main->cd(8);  hist_topdig->Draw();
+  mumu_main->cd(9);  hist_DetPhotonARICH->Draw();
+  mumu_main->cd(10);  hist_klmClusterLayers->Draw();
+  mumu_main->cd(11);  hist_nExtraCDCHits->Draw();
+  mumu_main->cd(12);  hist_nECLClusters->Draw();
+  // --- Mumu_Resolution
+  mumu_resolution->Divide(3, 3);
+  mumu_resolution->cd(1);  hist_inv_p->Draw();
+  mumu_resolution->cd(2);  hist_dD0->Draw();
+  mumu_resolution->cd(3);  hist_dZ0->Draw();
+  mumu_resolution->cd(4);  hist_dPtcms->Draw();
+  mumu_resolution->cd(5);  hist_dPhicms->Draw();
+  mumu_resolution->cd(6);  hist_nECLClusters->Draw();
+  mumu_resolution->cd(7);  hist_nExtraCDCHits->Draw();
+  mumu_resolution->cd(8);  hist_ndf->Draw();
+  mumu_muon_val->Divide(2, 2);
   // --- Muon variables
-  muon_val->cd(1);  hist_muid->Draw();
-  muon_val->cd(2);  hist_Pval->Draw();
-  muon_val->cd(3);  hist_theta->Draw();
-  muon_val->cd(4);  hist_Phi0->Draw();
+  mumu_muon_val->cd(1);  hist_muid->Draw();
+  mumu_muon_val->cd(2);  hist_Pval->Draw();
+  mumu_muon_val->cd(3);  hist_theta->Draw();
+  mumu_muon_val->cd(4);  hist_Phi0->Draw();
 
   // calculate the values of monitoring variables
   float mean_npxd = hist_npxd->GetMean();
@@ -392,23 +392,23 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   hist_D0_pi0_InvM->Draw();
   f_pi0_InvM->Draw("SAME");
   // --- pi variables for D0 -> K pi
-  pi_val->Divide(4, 2);
-  pi_val->cd(1);  hist_D0_pi_PID_ALL_pion->Draw();
-  pi_val->cd(2);  hist_D0_pi_PID_SVD_pion->Draw();
-  pi_val->cd(3);  hist_D0_pi_PID_CDC_pion->Draw();
-  pi_val->cd(4);  hist_D0_pi_PID_TOP_pion->Draw();
-  pi_val->cd(5);  hist_D0_pi_PID_ARICH_pion->Draw();
-  pi_val->cd(6);  hist_D0_pi_PID_ECL_pion->Draw();
-  pi_val->cd(7);  hist_D0_pi_PID_KLM_pion->Draw();
+  dst_pi_val->Divide(4, 2);
+  dst_pi_val->cd(1);  hist_D0_pi_PID_ALL_pion->Draw();
+  dst_pi_val->cd(2);  hist_D0_pi_PID_SVD_pion->Draw();
+  dst_pi_val->cd(3);  hist_D0_pi_PID_CDC_pion->Draw();
+  dst_pi_val->cd(4);  hist_D0_pi_PID_TOP_pion->Draw();
+  dst_pi_val->cd(5);  hist_D0_pi_PID_ARICH_pion->Draw();
+  dst_pi_val->cd(6);  hist_D0_pi_PID_ECL_pion->Draw();
+  dst_pi_val->cd(7);  hist_D0_pi_PID_KLM_pion->Draw();
   // --- K variables for D0 -> K pi
-  k_val->Divide(4, 2);
-  k_val->cd(1);  hist_D0_K_PID_ALL_kaon->Draw();
-  k_val->cd(2);  hist_D0_K_PID_SVD_kaon->Draw();
-  k_val->cd(3);  hist_D0_K_PID_CDC_kaon->Draw();
-  k_val->cd(4);  hist_D0_K_PID_TOP_kaon->Draw();
-  k_val->cd(5);  hist_D0_K_PID_ARICH_kaon->Draw();
-  k_val->cd(6);  hist_D0_K_PID_ECL_kaon->Draw();
-  k_val->cd(7);  hist_D0_K_PID_KLM_kaon->Draw();
+  dst_k_val->Divide(4, 2);
+  dst_k_val->cd(1);  hist_D0_K_PID_ALL_kaon->Draw();
+  dst_k_val->cd(2);  hist_D0_K_PID_SVD_kaon->Draw();
+  dst_k_val->cd(3);  hist_D0_K_PID_CDC_kaon->Draw();
+  dst_k_val->cd(4);  hist_D0_K_PID_TOP_kaon->Draw();
+  dst_k_val->cd(5);  hist_D0_K_PID_ARICH_kaon->Draw();
+  dst_k_val->cd(6);  hist_D0_K_PID_ECL_kaon->Draw();
+  dst_k_val->cd(7);  hist_D0_K_PID_KLM_kaon->Draw();
 
   // calculate the values of monitoring variables
   float mean_D0_InvM = f_InvM->GetParameter(1);

@@ -85,7 +85,7 @@ KLMReconstructorModule::KLMReconstructorModule() :
            false);
   addParam("CheckSegmentIntersection", m_eklmCheckSegmentIntersection,
            "Check if segments intersect.", true);
-  addParam("IgnoreHotChannels", m_klmIgnoreHotChannels,
+  addParam("IgnoreHotChannels", m_IgnoreHotChannels,
            "Use only Normal and Dead (for debugging) channels during 2d hit reconstruction",
            true);
 }
@@ -180,7 +180,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
       continue;
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
-    if (m_klmIgnoreHotChannels && !isNormal(digit))
+    if (m_IgnoreHotChannels && !isNormal(digit))
       continue;
     if (digit->inRPC() || digit->isGood()) {
       uint16_t channel = BKLMElementNumbers::channelNumber(
@@ -270,7 +270,7 @@ void KLMReconstructorModule::reconstructEKLMHits()
       continue;
     if (digit->isMultiStrip())
       continue;
-    if (m_klmIgnoreHotChannels && !isNormal(digit))
+    if (m_IgnoreHotChannels && !isNormal(digit))
       continue;
     if (digit->isGood())
       digitVector.push_back(digit);

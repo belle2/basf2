@@ -177,7 +177,7 @@ namespace Belle2 {
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
 
     /** Use only Normal and Dead (for debugging) channels during 2d hit reconstruction */
-    bool m_klmIgnoreHotChannels;
+    bool m_IgnoreHotChannels;
 
   };
 } // end namespace Belle2

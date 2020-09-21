@@ -229,6 +229,8 @@ def my_basf2_mva_teacher(
            In addition to variables containing the "truth" substring, which are excluded by default.
     :param fast_bdt_option: specified fast BDT options, defaut: [200, 8, 3, 0.1] [nTrees, nCuts, nLevels, shrinkage]
     """
+    if exclude_variables is None:
+        exclude_variables = []
 
     weightfile_extension = Path(weightfile_identifier).suffix
     if weightfile_extension not in {".xml", ".root"}:
@@ -2538,7 +2540,7 @@ class MasterTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
-    # if global tags are specified in the settings, use them
+    # if global tags are specified in the settings, use them:
     globaltags = b2luigi.get_setting("globaltags", default=[])
     if len(globaltags) > 0:
         basf2.conditions.reset()

@@ -1,0 +1,32 @@
+# EventType: 1111420210
+# Descriptor: [B0 -> KL0 (J/psi(1S) -> mu+ mu-)]
+# NickName: Bd_JpsiKL_mumu_CPV+Bd_nunubar
+# Documentation: B0 -> KL0 (J/psi(1S) -> mu+ mu-), Btag -> nunubar
+# Tested: Yes
+# Physics WG: TDCPV
+# Responsible: G. Finocchiaro
+# Cuts: None
+# Date: 20200902
+#
+#
+Alias J/psimumu J/psi
+
+Decay Upsilon(4S)
+1.0  B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.000  K_L0  J/psimumu SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; 
+Enddecay
+CDecay anti-B0sig
+
+Decay B0
+1.000 nu_tau anti-nu_tau           PHSP;
+Enddecay
+CDecay anti-B0
+
+Decay J/psimumu
+1.000         mu+       mu-            PHOTOS VLL;
+Enddecay
+#
+End

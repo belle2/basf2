@@ -11,15 +11,11 @@
 // Own include
 #include <analysis/modules/ParticleSelector/ParticleSelectorModule.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreObjPtr.h>
-
 // framework aux
 #include <framework/logging/Logger.h>
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 using namespace std;
 
@@ -66,8 +62,7 @@ namespace Belle2 {
 
     m_listName = mother->getFullName();
 
-    StoreObjPtr<ParticleList> particleList(m_listName);
-    particleList.isRequired(m_listName);
+    m_particleList.isRequired(m_listName);
 
     m_cut = Variable::Cut::compile(m_cutParameter);
 
@@ -77,23 +72,15 @@ namespace Belle2 {
 
   void ParticleSelectorModule::event()
   {
-    StoreObjPtr<ParticleList> plist(m_listName);
-    bool existingList = plist.isValid();
-
-    if (!existingList) {
-      B2WARNING("Input list " << m_listName << " was not created?");
-      return;
-    }
-
     // loop over list only if cuts should be applied
     if (!m_cutParameter.empty()) {
       std::vector<unsigned int> toRemove;
-      unsigned int n = plist->getListSize();
+      unsigned int n = m_particleList->getListSize();
       for (unsigned i = 0; i < n; i++) {
-        const Particle* part = plist->getParticle(i);
+        const Particle* part = m_particleList->getParticle(i);
         if (!m_cut->check(part)) toRemove.push_back(part->getArrayIndex());
       }
-      plist->removeParticles(toRemove);
+      m_particleList->removeParticles(toRemove);
     }
   }
 } // end Belle2 namespace

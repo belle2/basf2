@@ -14,9 +14,6 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventShapeContainer.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
 
@@ -67,8 +64,7 @@ EventShapeCalculatorModule::EventShapeCalculatorModule() : Module()
 
 void EventShapeCalculatorModule::initialize()
 {
-  StoreObjPtr<EventShapeContainer> evtShapeContainer;
-  evtShapeContainer.registerInDataStore();
+  m_eventShapeContainer.registerInDataStore();
 }
 
 
@@ -78,8 +74,7 @@ void EventShapeCalculatorModule::event()
   PCmsLabTransform T;
   double sqrtS = T.getCMSEnergy();
 
-  StoreObjPtr<EventShapeContainer> eventShapeContainer;
-  if (!eventShapeContainer) eventShapeContainer.create();
+  if (!m_eventShapeContainer) m_eventShapeContainer.create();
 
   parseParticleLists(m_particleListNames);
 
@@ -92,12 +87,12 @@ void EventShapeCalculatorModule::event()
     if (m_enableAllMoments) {
       fw.calculateAllMoments();
       for (short i = 0; i < 9; i++) {
-        eventShapeContainer->setFWMoment(i, fw.getH(i));
+        m_eventShapeContainer->setFWMoment(i, fw.getH(i));
       }
     } else {
       fw.calculateBasicMoments();
       for (short i = 0; i < 5; i++) {
-        eventShapeContainer->setFWMoment(i, fw.getH(i));
+        m_eventShapeContainer->setFWMoment(i, fw.getH(i));
       }
     }
   }
@@ -113,8 +108,8 @@ void EventShapeCalculatorModule::event()
       B2WARNING("Eigenvalues not ordered!!!!!!!!!!");
 
     for (short i = 0; i < 3; i++) {
-      eventShapeContainer->setSphericityEigenvalue(i, Sph.getEigenvalue(i));
-      eventShapeContainer->setSphericityEigenvector(i, Sph.getEigenvector(i));
+      m_eventShapeContainer->setSphericityEigenvalue(i, Sph.getEigenvalue(i));
+      m_eventShapeContainer->setSphericityEigenvector(i, Sph.getEigenvector(i));
     }
   }
 
@@ -126,8 +121,8 @@ void EventShapeCalculatorModule::event()
     TVector3 thrust = Thrust::calculateThrust(m_p3List);
     float thrustVal = thrust.Mag();
     thrust = (1. / thrustVal) * thrust;
-    eventShapeContainer->setThrustAxis(thrust);
-    eventShapeContainer->setThrust(thrustVal);
+    m_eventShapeContainer->setThrustAxis(thrust);
+    m_eventShapeContainer->setThrust(thrustVal);
 
     // --- If required, calculates the HarmonicMoments ---
     if (m_enableHarmonicMoments) {
@@ -136,13 +131,13 @@ void EventShapeCalculatorModule::event()
         MM.calculateAllMoments();
         for (short i = 0; i < 9; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setHarmonicMomentThrust(i, moment);
+          m_eventShapeContainer->setHarmonicMomentThrust(i, moment);
         }
       } else {
         MM.calculateBasicMoments();
         for (short i = 0; i < 5; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setHarmonicMomentThrust(i, moment);
+          m_eventShapeContainer->setHarmonicMomentThrust(i, moment);
         }
       }
     }
@@ -159,7 +154,7 @@ void EventShapeCalculatorModule::event()
       std::vector<float> cones;
       cones = cleoCones.cleo_cone_with_all();
       for (short i = 0; i < 10; i++) {
-        eventShapeContainer->setCleoConeThrust(i, cones[i]);
+        m_eventShapeContainer->setCleoConeThrust(i, cones[i]);
       }
     } // end of if m_enableCleoCones
 
@@ -174,8 +169,8 @@ void EventShapeCalculatorModule::event()
         else
           p4BKW += p4;
       }
-      eventShapeContainer->setForwardHemisphere4Momentum(p4FWD);
-      eventShapeContainer->setBackwardHemisphere4Momentum(p4BKW);
+      m_eventShapeContainer->setForwardHemisphere4Momentum(p4FWD);
+      m_eventShapeContainer->setBackwardHemisphere4Momentum(p4BKW);
     } // end of if m_enableJets
   }// end of if m_enableThrust
 
@@ -194,7 +189,7 @@ void EventShapeCalculatorModule::event()
       std::vector<float> cones;
       cones = cleoCones.cleo_cone_with_all();
       for (short i = 0; i < 10; i++) {
-        eventShapeContainer->setCleoConeCollision(i, cones[i]);
+        m_eventShapeContainer->setCleoConeCollision(i, cones[i]);
       }
     }
 
@@ -205,13 +200,13 @@ void EventShapeCalculatorModule::event()
         MM.calculateAllMoments();
         for (short i = 0; i < 9; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setHarmonicMomentCollision(i, moment);
+          m_eventShapeContainer->setHarmonicMomentCollision(i, moment);
         }
       } else {
         MM.calculateBasicMoments();
         for (short i = 0; i < 5; i++) {
           auto moment = MM.getMoment(i, sqrtS);
-          eventShapeContainer->setHarmonicMomentCollision(i, moment);
+          m_eventShapeContainer->setHarmonicMomentCollision(i, moment);
         }
       }
     } // end of m_enableHarmonicMoments

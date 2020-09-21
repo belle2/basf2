@@ -11,6 +11,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
+// dataobjects
+#include <analysis/dataobjects/Particle.h>
 
 #include <analysis/ParticleCombiner/ParticleCombiner.h>
 
@@ -60,6 +64,8 @@ namespace Belle2 {
 
 
   private:
+
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
 
     int m_pdgCode;                /**< PDG code of the combined mother particle */
 

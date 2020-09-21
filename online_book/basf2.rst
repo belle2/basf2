@@ -18,4 +18,5 @@ Belle II software to perform analysis tasks.
    basf2/fei
    basf2/cs
    basf2/b2bii
+   basf2/skim
 

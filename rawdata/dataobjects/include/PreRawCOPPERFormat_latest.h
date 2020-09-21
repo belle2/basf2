@@ -159,6 +159,8 @@ namespace Belle2 {
                          int const(&nwords_ch)[MAX_PCIE40_CH],
                          RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
 
+    //! Get a pointer to detector buffer
+    int* GetDetectorBuffer(int n, int finesse_num) OVERRIDE_CPP17;
 
     //
     // Data Format : "B2Link HSLB Header"
@@ -282,17 +284,29 @@ namespace Belle2 {
     return 0;
   }
 
-
-
-
   inline unsigned int PreRawCOPPERFormat_latest::GetTrailerChksum(int  n)
   {
     int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM;
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 
+  inline int* PreRawCOPPERFormat_latest::GetDetectorBuffer(int n, int finesse_num)
+  {
+    if (GetFINESSENwords(n, finesse_num) > 0) {
+      return (GetFINESSEBuffer(n, finesse_num) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER);
+    }
+    return NULL;
+  }
 
-
+  inline int PreRawCOPPERFormat_latest::GetDetectorNwords(int n, int finesse_num)
+  {
+    int nwords = 0;
+    if (GetFINESSENwords(n, finesse_num) > 0) {
+      nwords = GetFINESSENwords(n, finesse_num)
+               - (SIZE_B2LHSLB_HEADER + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
+    }
+    return nwords;
+  }
 
 
 }

@@ -24,18 +24,6 @@ PostRawCOPPERFormat_latest::~PostRawCOPPERFormat_latest()
 {
 }
 
-
-int PostRawCOPPERFormat_latest::GetDetectorNwords(int n, int finesse_num)
-{
-  int nwords = 0;
-  if (GetFINESSENwords(n, finesse_num) > 0) {
-    nwords = GetFINESSENwords(n, finesse_num)
-             - (SIZE_B2LHSLB_HEADER + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
-  }
-  return nwords;
-}
-
-
 unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
 {
   char err_buf[500];

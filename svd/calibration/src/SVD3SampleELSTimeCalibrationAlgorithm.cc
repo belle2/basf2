@@ -109,9 +109,9 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           pfx->SetName(name.c_str());
           // Remove non-liniarity from the fit by fixing the pole position
           pol1pole->FixParameter(3, 7);
-          TFitResultPtr tfr = pfx->Fit("pol1pole", "QMRS");
+          pfx->Fit("pol1pole", "QMRS");
           pol1pole->SetParLimits(3, 0, 15);
-          tfr = pfx->Fit("pol1pole", "QMRS");
+          TFitResultPtr tfr = pfx->Fit("pol1pole", "QMRS");
           // There is small possibility that the chi2 minimization ends at the parameter boundary.
           // In such case, we may get a completely wrong fit function, thus we refit w/o boundaries.
           // if (tfr->Chi2() > 500) {

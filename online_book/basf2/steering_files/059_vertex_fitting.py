@@ -5,7 +5,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import stdV0s
 import flavorTagger as ft
-from variables import variables
+from variables import variables as vm  # shorthand for VariableManager
 import variables.collections as vc
 import variables.utils as vu
 import vertex
@@ -36,21 +36,21 @@ ma.fillParticleList(
 stdV0s.stdKshorts(path=main)
 
 # apply Bremsstrahlung correction to electrons
-variables.addAlias(
+vm.addAlias(
     "goodFWDGamma", "passesCut(clusterReg == 1 and clusterE > 0.075)"
 )
-variables.addAlias(
+vm.addAlias(
     "goodBRLGamma", "passesCut(clusterReg == 2 and clusterE > 0.05)"
 )
-variables.addAlias(
+vm.addAlias(
     "goodBWDGamma", "passesCut(clusterReg == 3 and clusterE > 0.1)"
 )
-variables.addAlias(
+vm.addAlias(
     "goodGamma", "passesCut(goodFWDGamma or goodBRLGamma or goodBWDGamma)"
 )
 ma.fillParticleList("gamma:brems", "goodGamma", path=main)
 ma.correctBrems("e+:corrected", "e+:uncorrected", "gamma:brems", path=main)
-variables.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")
+vm.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")
 
 # combine final state particles to form composite particles
 ma.reconstructDecay(
@@ -131,7 +131,7 @@ jpsi_ks_vars = vc.inv_mass + standard_vars
 jpsi_ks_vars += vc.vertex + vc.mc_vertex
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
 # Add the J/Psi mass calculated with uncorrected electrons:
-variables.addAlias(
+vm.addAlias(
     "D0_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
 )
 b_vars += ["D0_M_uncorrected"]
@@ -144,7 +144,7 @@ b_vars += vu.create_aliases_for_selected(
     cmskinematics, "^B0 -> [^J/psi -> ^e+ ^e-] [^K_S0 -> ^pi+ ^pi-]"
 )
 
-variables.addAlias(
+vm.addAlias(
     "withBremsCorrection",
     "passesCut(passesCut(ep_isBremsCorrected == 1) or passesCut(em_isBremsCorrected == 1))",
 )

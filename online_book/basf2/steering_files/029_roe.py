@@ -4,7 +4,6 @@ import sys
 import basf2 as b2
 import modularAnalysis as ma
 import stdV0s
-from variables import variables
 import variables.collections as vc
 import variables.utils as vu
 

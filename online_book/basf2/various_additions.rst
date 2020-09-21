@@ -421,3 +421,7 @@ random seed.
     * These functions sort particles and antiparticles separately
     * From light release ``light-2008-kronos``, a new helper function can be 
       used to perform random candidate selection: `applyRandomCandidateSelection`
+
+.. topic:: Authors of this lesson
+
+     Alejandro Mora

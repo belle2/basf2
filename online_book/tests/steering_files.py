@@ -49,6 +49,15 @@ class SteeringFileTest(unittest.TestCase):
                         sys.stdout.buffer.write(result.stdout)
                     self.assertEqual(result.returncode, 0)
 
+    # fixme: This should be made to run on buildbot, i.e. by adding the/some
+    #   files to the examples/validation directory
+    @unittest.skipIf(
+        not os.path.exists(
+            "/group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/"
+            "1111540100_eph3_BGx0_1.root"
+        ),
+        "Test data files not found."
+    )
     def test_lessons_1_to_5(self):
         self._test_examples_dir(
             "online_book/basf2/steering_files", additional_arguments=["1"]

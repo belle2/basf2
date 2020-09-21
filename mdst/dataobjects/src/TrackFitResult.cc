@@ -133,7 +133,7 @@ std::string TrackFitResult::getInfoHTML() const
   out << "<b>nPXDHits</b>: " << getHitPatternVXD().getNPXDHits() << "<br>";
   out << "<b>nSVDHits</b>: " << getHitPatternVXD().getNSVDHits() << "<br>";
   out << "<b>nCDCHits</b>: " << getHitPatternCDC().getNHits() << "<br>";
-  out << "<b>NDF</b>: " << m_NDF << "<br>";
+  out << "<b>NDF</b>: " << getNDF() << "<br>";
   out << " <br>";
   out << "<b>d0</b>: " << m_tau[iD0] << " cm <br>";
   out << "<b>phi0</b>: " << m_tau[iPhi0] << " rad <br>";

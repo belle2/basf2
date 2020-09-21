@@ -1734,7 +1734,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     }
 
     auto trackFit = m_trackFitResults.appendNew(helixParam, helixError, pType, pValue, patternCdc.getInteger(),
-                                                patternVxd.getInteger(), 0);
+                                                patternVxd.getInteger(), trk_fit.ndf());
     track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
     /*
       B2INFO("--- B1 Track: ");

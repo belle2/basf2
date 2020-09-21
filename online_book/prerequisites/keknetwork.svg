@@ -6,30 +6,27 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    width="592px"
    height="292px"
    viewBox="-0.5 -0.5 592 292"
-   content="&lt;mxfile host=&quot;Electron&quot; modified=&quot;2020-09-06T09:24:16.699Z&quot; agent=&quot;5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/13.6.2 Chrome/83.0.4103.122 Electron/9.2.0 Safari/537.36&quot; etag=&quot;u--IZ7DGcQ9cHI7Qaszn&quot; version=&quot;13.6.2&quot; type=&quot;device&quot;&gt;&lt;diagram id=&quot;X3tEzzg3Ban0UYDIclx3&quot; name=&quot;Page-1&quot;&gt;7Vpbb6M4FP41eWwEmEvzOPQyW01HU6krrfapcsEBTwiObOc2v37tYBOMSdrMQtvtJpWacHw/33duTkbgar75SuEi/05SVIw8J92MwPXI81zX8cSblGwrSRAoQUZxqjrtBY/4F1JCR0mXOEXM6MgJKThemMKElCVKuCGDlJK12W1KCnPVBcyQJXhMYGFL/8IpzyvpZeDs5X8gnOW8PrBqmUPdWQlYDlOybojAzQhcUUJ49Wm+uUKFVJ7WSzXu9kBrvTGKSv6aAX9n2+8/KPjxEN0FC4Tu6WS+ugBqGsa3+sSULMsUyUHOCMSE8pxkpITFPSELIXSF8CfifKuwgktOhCjn80K1FvAZFTFMZtluqitSECqaSlKK/jEq0y8SFyFJKGGsEt3iolArMk7JrFa2UFM8JSW/hXNcSA7lYmIlUztwdR+90sgDzu5Vz9Zombiqxdaf1gVZ0gQdUZrmIaQZ4seUW/VDqUExhc5XROaI063oQFEBOV6ZjIOKuFndrx76QLDYsucoIwOacsrEQOSYU1QHUqP2DBEfGtvYi3a8OYVD3ntyqICM4eTPHJcGk9zemTQ8X7ygb8IYUJ+Kq5p3BYulWsnCmSx5gUthXtr5OrYCxd+tXDXOKEwx2rcpME0LVcIUsrzmzwpRjoVLvpekeCAMc0wE2tfPhHMyb3T4UuBMNnDJshiqp0SsiajJry7QH9W55JKQLaoDTfFG7iNeSOtB9GYlJmOaXzlcyAHzTSaD3xiumT9OCrwjSDwVRDyJR/IUaHMUeN0amhYvAlL1vN6HqEiJ8kZ0isKBqOJbVLmT2hIWL6Tfbr6J/yXia0JnFoW6sWvjcdwfNFWtRQ2A/U5fcDgytAj8csR4PXK+byLn6uyggRzQuU8TOm/iDIQd+E0z/++aaIZKRHHyNMUUraHUVhvy6e51yDm1LLtXfjiXZix3/FdZdjiYZV9abJDhSQOxD+03e2l8Dv9dYf3F+O9HgySMQldw2+iwsxN2OJ8M2z5q0iosXugPgrBFu2oHvSad/sRyW4zlQlCQDJfjJBnP0Gz8c3Fm75ux97XZq6LJhatc27BsDqLT2PxCf5PN1ugL1xytMyO9WzKdMjRIFRbY6XplEMnacc/G8MGN4Z1sITrRFqJ/YwtvZwp2Bnsm+lBEDz9FzqIT6EFzFq3U3m9UrkUhk6iKq5TU7Spv65rmwxVunUUaRRVJ7xK5n1g8Vp/MXmK/6ImTp937alGedFWwMxUAeqvdWv7ODezaPuio3bSs/8reLu2rlED8T5KDSYE4LjcRtdBuk2KO07TyoojhX/C5xlrZrZg3iEfBtZxLOE6m2HGALF3ursu9UcKhouuFOxkH/cDo+Z7pGvRXWA0YXb/rimawGxrbb7yu1vlwSDYQc4MxGPauzfN9A0jguDaQwZsCGVlAPq/RMzgCYR837C2fd+0EV270+W7eUcKeGKIrLDObuP669eXrYzZDPMkbum3TtgcyBqCVcEzsK/vQt7kYDRUcfNupHKsUO3n4//hGB5eMwzJBXs+saplluHv1w7YwNGOYGwQW2/yOVMQfjG1hF9u8M9s+I9vqDOrd2GbH2fF4fGbZp2IZAIOxTDzuf5dVVf/7X7eBm38A&lt;/diagram&gt;&lt;/mxfile&gt;"
    style="background-color: rgb(255, 255, 255);"
    id="svg1075"
    sodipodi:docname="keknetwork.svg"
-   inkscape:version="1.0 (04d0dcd2e7, 2020-09-05)"
-   inkscape:export-filename="/home/ritter/belle2/software/online_book/prerequisites/keknetwork.png"
+   inkscape:version="1.0.1 (2a5465c730, 2020-09-20)"
+   inkscape:export-filename="keknetwork.png"
    inkscape:export-xdpi="96.160004"
    inkscape:export-ydpi="96.160004">
   <metadata
-     id="metadata1079">
+     id="metadata943">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -43,18 +40,16 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1043"
-     id="namedview1077"
+     inkscape:window-height="1016"
+     id="namedview60"
      showgrid="false"
-     inkscape:object-nodes="false"
-     inkscape:snap-intersection-paths="true"
-     inkscape:zoom="2.2601351"
+     inkscape:zoom="2.2381757"
      inkscape:cx="296"
      inkscape:cy="146"
-     inkscape:window-x="1920"
-     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g1065"
+     inkscape:current-layer="svg1075"
      inkscape:document-rotation="0" />
   <defs
      id="defs953" />
@@ -111,8 +106,7 @@
        id="path1089"
        style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#910000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
        d="m 285.5,0.5 c -3.3067,0 -6,2.6932972 -6,6 v 185.45898 c -1.36976,-0.92976 -2.82843,-1.75379 -4.38086,-2.42968 -0.26,-0.14 -0.54008,-0.20899 -0.83008,-0.20899 -0.77,0.01 -1.43843,0.51977 -1.64844,1.25977 -0.20999,0.74 0.10001,1.52945 0.75,1.93945 4.7,3.46 6.91844,9.54109 5.89844,16.37109 l -0.39844,2.19922 c -0.59999,2.6 -1.58015,5.09993 -2.91015,7.41993 l -1.16992,2.32031 c -5.74,12.77 -0.87969,25.56937 -0.67969,26.10937 0.26,0.66 0.89937,1.09961 1.60937,1.09961 h 0.14063 c 1.21786,-0.12018 2.4244,-0.31309 3.61914,-0.54883 V 286.5 c 0,3.3067 2.6933,6 6,6 h 300 c 3.3067,0 6,-2.6933 6,-6 V 6.5 c 0,-3.3067028 -2.6933,-6 -6,-6 z m 0,2 h 300 c 2.2333,0 4,1.7667028 4,4 v 280 c 0,2.2333 -1.7667,4 -4,4 h -300 c -2.2333,0 -4,-1.7667 -4,-4 v -43.13477 c -1.48326,0.4647 -3.0897,0.82075 -4.55078,1.06446 -1,-3.36 -3.15977,-12.93891 0.99023,-22.12891 l 1.09961,-2.16992 c 1.51,-2.62 2.62055,-5.45039 3.31055,-8.40039 l 0.42969,-2.33008 c 0.57,-3.72 0.24125,-7.51984 -0.96875,-11.08984 3.86,4.2 7.32867,10.97945 5.63867,21.43945 -0.1,0.7 0.24156,1.38047 0.85156,1.73047 0.61,0.36 1.37969,0.29937 1.92969,-0.14063 0.17,-0.13 3.45953,-2.87054 5.01953,-9.56054 0.86,1.15 1.5307,2.44054 1.9707,3.81054 L 300.49023,214.5 c -0.88,-3.16 -2.86937,-5.88969 -5.60937,-7.67969 -0.5,-0.27 -1.11109,-0.27976 -1.62109,-0.01 -0.51,0.27 -0.85993,0.76984 -0.91993,1.33984 -0.16,1.66 -0.50953,3.29867 -1.01953,4.88867 -0.36133,-7.73861 -4.01165,-14.81611 -9.82031,-19.59765 V 6.5 c 0,-2.2332972 1.7667,-4 4,-4 z m -21.09961,183.08984 c -1.97,0.1 -3.63117,0.60039 -4.20117,1.15039 -0.36,0.35 -0.55906,0.83008 -0.53906,1.33008 0.02,0.49 0.26062,0.95953 0.64062,1.26953 4.48,4.18 6.31953,10.48969 4.76953,16.42969 -2.28,-3.03 -6.19992,-7.0293 -10.66992,-7.0293 -0.57,0 -1.10969,0.28954 -1.42969,0.76954 -0.32,0.47 -0.38992,1.0696 -0.16992,1.59961 0,0.11999 4.19844,10.71156 0.14844,16.85156 v 0.1289 c -0.2,0.29 -0.38883,0.59039 -0.54883,0.90039 -3.7,6.94 -2.49023,15.46961 3.00977,21.09961 l 1.11914,1.01954 c 0.47,0.37999 0.95117,0.72031 1.45117,1.07031 0.59,0.4 1.23047,0.82976 1.98047,1.25976 l 3.44922,1.89063 c 1.14,0.55 2.36007,1.08937 3.58007,1.60937 l 1.32032,-3.19922 C 267.15055,243.25023 266.01,242.75 265,242.25 l -3.33008,-1.73047 c -0.63,-0.36 -1.21047,-0.73937 -1.73047,-1.10937 -0.39,-0.25 -0.7689,-0.53008 -1.1289,-0.83008 l -1.07032,-0.91016 c -4.44,-4.58 -5.38007,-11.50961 -2.33007,-17.09961 0.1,-0.19 0.21984,-0.38031 0.33984,-0.57031 l 0.10938,-0.14062 c 3.45999,-5.36001 2.30015,-12.79969 1.16015,-16.92969 2.99,1.95 5.45992,4.61 7.16992,7.75 0.33,0.59 0.97063,0.93086 1.64063,0.88086 0.68,-0.05 1.26023,-0.49086 1.49023,-1.13086 3.86,-10.56 0.11063,-17.88063 -2.60937,-21.39063 1.34,-0.1 2.67937,0.19008 3.85937,0.83008 l 1.84961,-2.89844 c -1.78,-1.14 -4.04953,-1.47086 -6.01953,-1.38086 z m 34.24023,33.06055 c -0.45999,0 -0.90046,0.18 -1.23046,0.5 -0.32,0.33 -0.5,0.77047 -0.5,1.23047 v 8.63867 h -12.10938 c -0.95,0 -1.73047,0.78047 -1.73047,1.73047 v 10.38086 c 0,0.95 0.78047,1.71875 1.73047,1.71875 h 5.18945 v 6.91992 c 0,0.96 0.77047,1.73047 1.73047,1.73047 h 19.01953 c 0.46,0 0.90071,-0.17977 1.22071,-0.50977 0.33,-0.32 0.50976,-0.7607 0.50976,-1.2207 v -6.91992 h 12.09961 c 0.96,0 1.73047,-0.76875 1.73047,-1.71875 V 230.75 c 0,-0.95 -0.77047,-1.73047 -1.73047,-1.73047 h -5.18945 v -8.63867 c 0,-0.46 -0.18,-0.90047 -0.5,-1.23047 -0.33,-0.32 -0.7707,-0.5 -1.2207,-0.5 z m 1.71876,3.45899 h 15.57031 v 6.91015 h -15.57031 z m -13.83008,10.37109 h 17.29101 v 6.91992 H 286.5293 Z m 20.75,0 h 15.56054 v 6.91992 H 307.2793 Z m -13.83008,10.36914 h 15.56055 v 5.18945 h -15.56055 z"
-       transform="translate(-0.5,-0.5)"
-       sodipodi:nodetypes="sscccsccccccsccssssssssssssssccccccccccccccscccsscccccsccccccccccccccccccccccccccccscscsssscssscscsssscscsscccccccccccccccccccc" />
+       transform="translate(-0.5,-0.5)" />
     <g
        fill="#910000"
        font-family="Helvetica"
@@ -141,8 +135,7 @@
        stroke-width="2"
        stroke-miterlimit="10"
        pointer-events="stroke"
-       id="path977"
-       sodipodi:nodetypes="ccc" />
+       id="path977" />
     <path
        d="M 499.76 237 L 491.76 239.67 L 493.76 237 L 491.76 234.33 Z"
        fill="#000000"
@@ -168,7 +161,7 @@
        pointer-events="all"
        id="path983" />
     <g
-       transform="translate(-12.5,-0.5)"
+       transform="translate(-14.109375,-0.5)"
        id="g989">
       <switch
          id="switch987">
@@ -214,7 +207,7 @@
        pointer-events="all"
        id="path993" />
     <g
-       transform="translate(-16.109375,-0.5)"
+       transform="translate(-14.109375,-0.5)"
        id="g999">
       <switch
          id="switch997">
@@ -240,7 +233,7 @@
            font-family="hack"
            font-size="12px"
            text-anchor="middle"
-           id="text995">ssh cw01.cc.kek.jp</text>
+           id="text995">ssh ccw01.cc.kek.jp</text>
       </switch>
     </g>
     <path
@@ -250,8 +243,7 @@
        stroke-width="2"
        stroke-miterlimit="10"
        pointer-events="stroke"
-       id="path1001"
-       sodipodi:nodetypes="cc" />
+       id="path1001" />
     <path
        d="M 499.76 147 L 491.76 149.67 L 493.76 147 L 491.76 144.33 Z"
        fill="#000000"
@@ -439,7 +431,7 @@
            font-family="hack"
            font-size="12px"
            text-anchor="middle"
-           id="text1039">cw01.cc.kek.jp</text>
+           id="text1039">ccw01.cc.kek.jp</text>
       </switch>
     </g>
     <rect
@@ -484,7 +476,7 @@
            font-family="hack"
            font-size="12px"
            text-anchor="middle"
-           id="text1049">cw02.cc.kek.jp</text>
+           id="text1049">ccw02.cc.kek.jp</text>
       </switch>
     </g>
     <rect
@@ -533,22 +525,4 @@
       </switch>
     </g>
   </g>
-  <switch
-     id="switch1073">
-    <g
-       requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility"
-       id="g1067" />
-    <a
-       transform="translate(0,-5)"
-       xlink:href="https://desk.draw.io/support/solutions/articles/16000042487"
-       target="_blank"
-       id="a1071">
-      <text
-         text-anchor="middle"
-         font-size="10px"
-         x="50%"
-         y="100%"
-         id="text1069">Viewer does not support full SVG 1.1</text>
-    </a>
-  </switch>
 </svg>

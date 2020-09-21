@@ -463,7 +463,7 @@ you have created your very own SSH identity.
 
    However, DSA has been found unsafe and there are some concerns about ECDSA so
    the only real options are RSA and Ed25519. Ed25519 was added later and should
-   be more secure but is not supported on old versions of SSH.
+   be more secure but is not supported on very old versions of SSH.
 
 .. rubric:: Using your new key
 
@@ -755,7 +755,7 @@ local files. For example
   <https://help.gnome.org/users/gnome-help/stable/nautilus-connect.html.en>`_ for
   more information but this works similar in other desktop environments.
 * In addition many editors or development environments have their own support to
-  work on a remote machine via ssh. There is a 
+  work on a remote machine via ssh. There is a
   `guide on confluence <https://confluence.desy.de/x/XGJ8Cg>`_
   explaining the setup for some of them.
 

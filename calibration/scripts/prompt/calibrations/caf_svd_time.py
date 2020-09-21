@@ -117,41 +117,85 @@ def create_svd_clusterizer(name="ClusterReconstruction",
     cluster.param("timeAlgorithm", time_algorithm)
     return cluster
 
+from itertools import islice
 
-def select_files(all_input_files, min_events, max_events_per_file):
+
+def select_files(reduced_file_to_iov, min_events, max_events_per_file):
     """
     Selects the input file to use starting from the number of events per run that we need for the calibration.
 
     Returns a list of file:
         selected_files
     """
-    selected_files = []
-    total_events = 0
-    while total_events < min_events:
-        if not all_input_files:
-            basf2.B2ERROR(f"No Input files found.")
-            break
-        # Randomly selects one file from all_input_files list
-        this_file = choice(all_input_files)
-        # Removes the file from the list to not be choosen again
-        all_input_files.remove(this_file)
-        # Returns the number of events in the file
-        events_in_file = events_in_basf2_file(this_file)
-        if not events_in_file:
-            continue
-        events_counter = 0
-        # Append the file to the list of selected files
-        selected_files.append(this_file)
-        if events_in_file < max_events_per_file:
-            events_counter = events_in_file
-        else:
-            events_counter = max_events_per_file
-        total_events += events_counter
+    all_input_files = list(reduced_file_to_iov.keys())
+    exp_list = [i.exp_low for i in reduced_file_to_iov.values()]
+    run_list = [i.run_low for i in reduced_file_to_iov.values()]
+    check_run = 0
+    check_exp = 0
+    size_for_run = []
+    size_list = 0
+    for item, nRun in enumerate(run_list):
+        if item == 0:
+            check_run = nRun
+            check_exp = exp_list[item]
+            size_list += 1
+        elif item > 0:
+            nExp = exp_list[item]
+            if nRun == check_run and nExp == check_exp:
+                size_list += 1
+            else:
+                check_run = nRun
+                check_exp = nExp
+                size_for_run.append(size_list)
+                size_list = 1
+        if item == len(run_list) - 1:
+            size_for_run.append(size_list)
+    iter_all_input_files = iter(all_input_files)
+    iter_exp_list = iter(exp_list)
+    iter_run_list = iter(run_list)
+    splitted_all_input_files = [list(islice(iter_all_input_files, elem)) for elem in size_for_run]
+    splitted_exp_list = [list(islice(iter_exp_list, elem)) for elem in size_for_run]
+    splitted_run_list = [list(islice(iter_run_list, elem)) for elem in size_for_run]
+    # print("Initial list is:", all_input_files)
+    # print("Split length list: ", size_for_run)
+    # print("List after splitting", splitted_all_input_files)
 
+    selected_files = []
+    selected_files_per_run = []
+    total_events = 0
+    total_events_per_run = 0
+    for item2, list_of_file in enumerate(splitted_all_input_files):
+        while total_events_per_run < min_events:
+            if not all_input_files:
+                B2INFO(f"No Input files found.")
+                break
+            # Randomly selects one file from all_input_files list
+            this_file = choice(list_of_file)
+            # Removes the file from the list to not be choosen again
+            list_of_file.remove(this_file)
+            # Returns the number of events in the file
+            events_in_file = events_in_basf2_file(this_file)
+            if not events_in_file:
+                continue
+            events_counter = 0
+            # Append the file to the list of selected files
+            selected_files.append(this_file)
+            selected_files_per_run.append(this_file)
+            if events_in_file < max_events_per_file:
+                events_counter = events_in_file
+            else:
+                events_counter = max_events_per_file
+            total_events += events_counter
+            total_events_per_run += events_counter
+        basf2.B2INFO(f"(Exp,Run) = ({splitted_exp_list[item2][0]},{splitted_run_list[item2][0]})")
+        basf2.B2INFO(f"Total chosen files per run = {len(selected_files_per_run)}")
+        basf2.B2INFO(f"Total events in chosen files per run = {total_events_per_run}")
+        if total_events < min_events:
+            basf2.B2ERROR(f"Not enough files for the calibration when max_events_per_file={max_events_per_file}.")
+        selected_files_per_run.clear()
+        total_events_per_run = 0
     basf2.B2INFO(f"Total chosen files = {len(selected_files)}")
     basf2.B2INFO(f"Total events in chosen files = {total_events}")
-    if total_events < min_events:
-        basf2.B2ERROR(f"Not enough files for the calibration when max_events_per_file={max_events_per_file}.")
 
     return selected_files
 
@@ -224,8 +268,7 @@ def get_calibrations(input_data, **kwargs):
     from prompt.utils import filter_by_max_files_per_run
 
     reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file)
-    list_of_files = list(reduced_file_to_iov_physics.keys())
-    good_input_files = select_files(list_of_files[:], min_events_per_cal, max_events_selected_per_file)
+    good_input_files = select_files(reduced_file_to_iov_physics, min_events_per_cal, max_events_selected_per_file)
 
     basf2.B2INFO(f"Total number of files before selection = {max_files_per_run}")
     basf2.B2INFO(f"Total number of files actually used as input = {len(good_input_files)}")

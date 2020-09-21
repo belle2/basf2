@@ -9,13 +9,13 @@
     "test_selected_task": false,
     "run_mva_evaluate": true,
     "run_validation_tasks": true,
+    "globaltags": ["mc_production_MC13a_rev1"],
     "experiment_numbers": [1003],
     "datafiles": ["/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT1.f00001.root",
 		  "/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT2.f00002.root",
 		  "/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT3.f00003.root",
 		  "/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT4.f00004.root",
-		  "/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT5.f00005.root"
-		  ],
+		  "/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT5.f00005.root"],
     "bkgfiles_by_exp": {
         "0": "/sw/belle2/bkg.rel4/",
         "1002": "/gpfs/group/belle2/BGFile/OfficialBKG/phase2/pseudorandom/prod6/",

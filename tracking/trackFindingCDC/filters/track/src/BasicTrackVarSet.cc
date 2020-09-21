@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <framework/datastore/StoreArray.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>

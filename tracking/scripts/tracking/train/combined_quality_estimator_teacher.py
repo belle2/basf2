@@ -212,7 +212,7 @@ def my_basf2_mva_teacher(
     weightfile_identifier,
     target_variable="truth",
     exclude_variables=None,
-    fast_bdt_option=[200, 8, 3, 0.1]
+    fast_bdt_option=[200, 8, 3, 0.1]  # nTrees, nCuts, nLevels, shrinkage
 ):
     """
     My custom wrapper for basf2 mva teacher.  Adapted from code in ``trackfindingcdc_teacher``.
@@ -229,8 +229,6 @@ def my_basf2_mva_teacher(
            In addition to variables containing the "truth" substring, which are excluded by default.
     :param fast_bdt_option: specified fast BDT options, defaut: [200, 8, 3, 0.1] [nTrees, nCuts, nLevels, shrinkage]
     """
-    if exclude_variables is None:
-        exclude_variables = []
 
     weightfile_extension = Path(weightfile_identifier).suffix
     if weightfile_extension not in {".xml", ".root"}:
@@ -382,7 +380,7 @@ class GenerateSimTask(Basf2PathTask):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         yield self.add_to_output(self.output_file_name())
 
@@ -499,7 +497,7 @@ class SplitNMergeSimTask(Basf2Task):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         yield self.add_to_output(self.output_file_name())
 
@@ -626,7 +624,7 @@ class VXDQEDataCollectionTask(Basf2PathTask):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         yield self.add_to_output(self.get_records_file_name())
 
@@ -657,7 +655,7 @@ class VXDQEDataCollectionTask(Basf2PathTask):
                 EstimationMethod="tripletFit",
                 UseTimingInfo=False,
                 ClusterInformation="Average",
-                MCStrictQualityEstimator=True,
+                MCStrictQualityEstimator=False,
                 mva_target=False,
                 MCInfo=False,
                 )
@@ -754,7 +752,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         yield self.add_to_output(self.get_records_file_name())
 
@@ -776,9 +774,8 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             add_unpackers(path, components=['CDC'])
         else:
             filter_choice = "recording"
-            # tracking.add_hit_preparation_modules(path)  # only needed for simulated hits - is this true??
-            # I think that SVD and PXD hits are prepared here, which does not matter for the CDC?
-            # a short test showed that these modules do not alter the output at all, so I commented it out
+            # tracking.add_hit_preparation_modules(path)  # only needed for SVD and
+            # PXD hit preparation. Does not change the CDC output.
         tracking.add_cdc_track_finding(path, with_ca=False, add_mva_quality_indicator=True)
 
         basf2.set_module_parameters(
@@ -814,7 +811,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
     random_seed = b2luigi.Parameter()
     #: Feature/variable to use as truth label for the CDC track quality estimator.
     cdc_training_target = b2luigi.Parameter()
-    #: Recotrac option, use string that is additive: deleteCDCQI0XY (= deletes CDCTracks with
+    #: RecoTrack option, use string that is additive: deleteCDCQI0XY (= deletes CDCTracks with
     # CDC-QI below 0.XY), useCDC (= uses trained CDC stored in datafiles/), useVXD (uses trained
     # VXD stored in datafiles/), noVXD (= doesn't use the VXD MVA at all)
     recotrack_option = b2luigi.Parameter(default='deleteCDCQI080')
@@ -897,7 +894,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         yield self.add_to_output(self.get_records_file_name())
 
@@ -1117,7 +1114,7 @@ class TrackQETeacherBaseTask(Basf2Task):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         yield self.add_to_output(self.get_weightfile_xml_identifier())
 
@@ -1198,7 +1195,7 @@ class RecoTrackQETeacherTask(TrackQETeacherBaseTask):
     Task to run basf2 mva teacher on collected data for the final, combined
     track quality estimator
     """
-    #: Recotrac option, use string that is additive: deleteCDCQI0XY (= deletes CDCTracks with
+    #: RecoTrack option, use string that is additive: deleteCDCQI0XY (= deletes CDCTracks with
     # CDC-QI below 0.XY), useCDC (= uses trained CDC stored in datafiles/), useVXD (uses trained
     # VXD stored in datafiles/), noVXD (= doesn't use the VXD MVA at all)
     recotrack_option = b2luigi.Parameter(default='deleteCDCQI080')
@@ -1313,7 +1310,7 @@ class HarvestingValidationBaseTask(Basf2PathTask):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         yield self.add_to_output(self.validation_output_file_name)
         yield self.add_to_output(self.reco_output_file_name)
@@ -1658,7 +1655,7 @@ class TrackQEEvaluationBaseTask(Task):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         weightfile_details = create_fbdt_option_string(self.fast_bdt_option)
         evaluation_pdf_output = self.teacher_task.weightfile_identifier_basename + weightfile_details + ".pdf"
@@ -1861,7 +1858,7 @@ class PlotsFromHarvestingValidationBaseTask(Basf2Task):
     def output(self):
         """
         Generate list of output files that the task should produce.
-        The task is considered finished iff the outputs all exist.
+        The task is considered finished if and only if the outputs all exist.
         """
         yield self.add_to_output(self.output_pdf_file_basename)
 
@@ -2179,7 +2176,7 @@ class QEWeightsLocalDBCreatorTask(Basf2Task):
             n_events_training=self.n_events_training,
             process_type=self.process_type,
             experiment_number=self.experiment_number,
-            exclude_variables=MasterTaks.exclude_variables_vxd,
+            exclude_variables=MasterTask.exclude_variables_vxd,
             fast_bdt_option=self.fast_bdt_option,
         )
         yield CDCQETeacherTask(
@@ -2541,22 +2538,11 @@ class MasterTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
-    basf2.conditions.reset()
-    # define the wanted global tags here
-    # basf2.conditions.prepend_globaltag("online_proc10")
-    # basf2.conditions.prepend_globaltag("data_reprocessing_proc10")
-    # basf2.conditions.prepend_globaltag("mc_production_MC13b")
-    # basf2.conditions.prepend_globaltag("klm_alignment_testing")
-    # basf2.conditions.prepend_globaltag("online_proc11")
-    # basf2.conditions.prepend_globaltag("data_reprocessing_proc11")
-    # basf2.conditions.prepend_globaltag("mc_production_MC13b_proc11")
-    basf2.conditions.prepend_globaltag("mc_production_MC13a_rev1")
-
-    # basf2.conditions.prepend_globaltag("online")
-    # basf2.conditions.prepend_globaltag("Reco_master_patch_rel5")
-    # basf2.conditions.prepend_globaltag("online")
-    # basf2.conditions.prepend_globaltag("data_reprocessing_prompt")
-    # basf2.conditions.prepend_globaltag("bgoverlay_production_rel5patch")
-    # basf2.conditions.prepend_globaltag("prerel5_rundep_mc_test")
+    # if global tags are specified in the settings, use them
+    globaltags = b2luigi.get_setting("globaltags", default=[])
+    if len(globaltags) > 0:
+        basf2.conditions.reset()
+        for gt in globaltags:
+            basf2.conditions.prepend_globaltag(gt)
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MasterTask(), workers=workers)

@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import basf2
 from basf2 import *
 from ROOT import Belle2
 import math as m
 import ROOT as r
-import os.path
-import sys
+from basf2 import conditions as b2conditions
 
 ##################################################################################
 #
 # test SVD geometry
 #
-# 1. add the database you want to test
+# 1. > prepend the GT you want to test
 # 2. > set the Experiment and Run number you want to test
-# 3. > basf2 testSVDGeometry.py
+# 3. > basf2 dumpGeometryParameters.py
 #
 ##################################################################################
 
@@ -216,16 +214,9 @@ class printSVDLadders(basf2.Module):
                     degStr = "{0:.2f}".format(round(angleDeg, 2))
                     print(sensorID + '     ' + xStr + '     ' + yStr + '     ' + radStr + '     ' + degStr)
 
-
-# TO DO: update conditions functions:
-# reset_database()
-# use_database_chain()
-# use_central_database("release-02-00-00")
-# use_central_database("release-02-01-00")
-# use_central_database("master_2018-12-24")
-# use_central_database("release-03-00-02")
-# use_central_database("data_reprocessing_prompt")
-# use_central_database("svd_basic_20190213")
+# add your GT here:
+# gt = ""
+# b2conditions.prepend_globaltag(gt)
 
 # Create paths
 main = create_path()

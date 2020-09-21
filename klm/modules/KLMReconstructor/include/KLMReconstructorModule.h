@@ -91,7 +91,7 @@ namespace Belle2 {
      * Check if channel is normal or dead.
      * Dead channels should not contain any signal; they are allowed for debugging.
      */
-    bool isNormal(KLMDigit* digit) const;
+    bool isNormal(const KLMDigit* digit) const;
 
     /* EKLM methods. */
 

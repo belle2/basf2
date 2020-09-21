@@ -150,7 +150,7 @@ void KLMReconstructorModule::event()
   reconstructEKLMHits();
 }
 
-bool KLMReconstructorModule::isNormal(KLMDigit* digit) const
+bool KLMReconstructorModule::isNormal(const KLMDigit* digit) const
 {
   int subdetector = digit->getSubdetector();
   int section = digit->getSection();
@@ -180,7 +180,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
       continue;
     if (m_bklmIgnoreScintillators && !digit->inRPC())
       continue;
-    if (m_klmIgnoreHotChannels && !isNormal(m_Digits[index]))
+    if (m_klmIgnoreHotChannels && !isNormal(digit))
       continue;
     if (digit->inRPC() || digit->isGood()) {
       uint16_t channel = BKLMElementNumbers::channelNumber(
@@ -259,20 +259,20 @@ double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
 
 void KLMReconstructorModule::reconstructEKLMHits()
 {
-  int i, n;
+  int i;
   double d1, d2, t, t1, t2, sd;
   std::vector<KLMDigit*> digitVector;
   std::vector<KLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
-  n = m_Digits.getEntries();
-  for (i = 0; i < n; i++) {
-    if (m_Digits[i]->getSubdetector() != KLMElementNumbers::c_EKLM)
+  for (i = 0; i < m_Digits.getEntries(); i++) {
+    KLMDigit* digit = m_Digits[i];
+    if (digit->getSubdetector() != KLMElementNumbers::c_EKLM)
       continue;
-    if (m_Digits[i]->isMultiStrip())
+    if (digit->isMultiStrip())
       continue;
-    if (m_klmIgnoreHotChannels && !isNormal(m_Digits[i]))
+    if (m_klmIgnoreHotChannels && !isNormal(digit))
       continue;
-    if (m_Digits[i]->isGood())
-      digitVector.push_back(m_Digits[i]);
+    if (digit->isGood())
+      digitVector.push_back(digit);
   }
   /* Sort by sector. */
   sort(digitVector.begin(), digitVector.end(), compareSector);

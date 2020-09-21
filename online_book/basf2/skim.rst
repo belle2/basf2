@@ -8,13 +8,15 @@ Skimming
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 
+    **Teaching**: ?? min
 
-    **Exercises**: 
+    **Exercises**: ?? min
 
     **Prerequisites**: 
     	
     	* 
+
+    	* :ref:`gbasf2 <onlinebook_gbasf2>`
 
     **Questions**:
 
@@ -24,9 +26,10 @@ Skimming
 
         * Find documentation about available skims.
 
-        * Add an existing skim to a steering file.
+        * Run a skim on a file using the command-line tool :ref:`b2skim-run
+          <b2skim-run>`.
 
-        * Run a skim on a file using the command-line tool :ref:`b2skim-run <b2skim-run>`.
+        * Add an existing skim to a steering file.
 
         * Find information about skims available on the grid.
 
@@ -34,7 +37,12 @@ Skimming
 .. admonition:: Key points
     :class: key-points
 
+    * The two sources of documentation on skims are the :ref:`Sphinx
+      documentation <skim>` and the `skimming Confluence page
+      <https://confluence.desy.de/display/BI/Skimming+Homepage>`_.
+
     * 
+
 
 What is skimming?
 -----------------
@@ -63,7 +71,7 @@ the following ways:
 
 
 Mechanics of a skim
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 Under the hood, skims operate by reconstructing some set of particles, and
 writing the reconstructed particle information to a uDST. The skim filter
@@ -89,9 +97,12 @@ removes any events which do not have any particles in the skim particle lists.
 List of available skims
 -----------------------
 
-:ref:`list of skims on Sphinx <skim_physics>`
-
-Read the source code (in particular, the ``build_lists`` method of each skim). ``skim/scripts/skim/``
+All available skims are listed on :ref:`Sphinx <skim_physics>` (although not all
+of these are produced in skim campaigns). Although we try to keep the docstrings
+for each skim up-to-date, the best way to find out what selections are in a skim
+are to read the source code. The most important part of a skim's source code is
+the ``build_lists`` method, where the particle reconstruction and selections are
+done.
 
 .. admonition:: Question
      :class: exercise stacked
@@ -109,25 +120,80 @@ Read the source code (in particular, the ``build_lists`` method of each skim). `
 Running a skim locally
 ----------------------
 
+.. note::
 
+   Things to be explained here:
+
+       * Exercise of adding a skim to a steering file.
+
+       * Run a skim via ``b2skim-run single <SkimName> -i <in> -o <out>``
 
 
 Accessing skims on the grid
 ---------------------------
 
-If a skim is requested by a working group, then it is produced on the grid 
+If a skim is requested by a working group, then it is applied to datasets on the
+grid during a skimming campaign and the output LFNs are documented on the
+*dataset searcher*. You can access these centrally-produced skims with
+:ref:`gbasf2 <onlinebook_gbasf2>`.
 
-:ref:`gbasf2 <onlinebook_gbasf2>`
+LFNs on the grid have a maximum length restriction, so we can't include the
+plain skim name in the LFN. Instead, we have standardised eight-digit *skim
+codes* to identify skims. When searching for skimmed datasets on the grid, use
+the skim codes. The documentation of each skim on :ref:`Sphinx <skim_physics>`
+contains its corresponding skim code.
 
 
-Skims and you
--------------
+.. note::
+
+    The details of the numbering scheme are explained on `the skimming
+    Confluence page
+    <https://confluence.desy.de/display/BI/Skimming+Homepage#SkimmingHomepage-Skimcodeconventionandskimregistry>`_.
+
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Use the dataset searcher to get the list of LPNs for the ``B0toDpi_Kspi``
+     skim from the MC skim campaign ``SkimM13ax1``.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     Find the skim code for ``B0toDpi_Kspi`` on the :ref:`skim documentation on
+     Sphinx <skim_physics>`.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     Visit the DIRAC webapp and navigate to the dataset searcher. The LFNs can
+     be found by selecting ``MC`` and ``BGx1``, and passing ``SkimM13ax1`` in the
+     ``Campaigns`` field, and ``14120601`` in the ``Skim Types`` field.
+
+
+.. tip::
+
+    All skims on the grid are produced using some release of the software. If
+    you're unsure which version was used to produce your skim, check the LFN, as
+    it is recorded in there! You can then directly read source code for that
+    release to find the skim definitions.
+
+
+Getting involved
+----------------
 
 Each working group has an assigned skim liaison, whose job it is to survey the
-needs of the group and develop skims.
+needs of the group and develop skims (all `listed on Confluence
+<https://confluence.desy.de/display/BI/Skimming+Homepage#SkimmingHomepage-Skimmingpersonnel>`_).
+If there is an existing skim that might be useful for your analysis and is not
+currently being produced, talk to you local skim liaison.
 
+If you would like to get more involved in the writing and testing of skims, then
+you may find the :ref:`skim experts section <writing-skims>` of the
+Sphinx documentation helpful.
 
 
 .. topic:: Author of this lesson
 
      Phil Grace
+

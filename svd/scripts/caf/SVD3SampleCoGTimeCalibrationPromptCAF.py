@@ -129,9 +129,9 @@ def get_calibrations(input_data, **kwargs):
                               )
 
     # calibration.pre_algorithms = pre_alg
-    calibration.strategies = strategies.SequentialRunByRun
+    # calibration.strategies = strategies.SequentialRunByRun
     # calibration.strategies = strategies.SingleIOV
-    # calibration.strategies = strategies.SequentialBoundaries
+    calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}

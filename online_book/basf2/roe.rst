@@ -57,12 +57,22 @@ In this chapter we will assume that you have successfully constructed your first
 Lets assume that the signal particle list is called ``X:signal`` and already successfully loaded or 
 reconstructed, then one has to have the following code to reconstruct the Rest of Event:
 
-.. code-block:: python
+.. admonition:: Exercise
+     :class: exercise stacked 
+     
+      Create a Rest Of Event for signal particle list
 
-        import basf2 as b2
-        import modularAnalysis as ma
-        main_path = b2.create_path()
-        ma.buildRestOfEvent('X:signal', path=main_path)
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     One can always look for help in the basf2 documentation, particularly `RestOfEvent` chapter. 
+  
+.. admonition:: Solution
+     :class: toggle solution
+
+     .. code-block:: python
+
+          ma.buildRestOfEvent('X:signal', path=main_path)
 
 That's it, the ROE has been reconstructed!
 Behind these python curtains, a ``RestOfEvent`` object is created for each particle in ``X:signal`` 
@@ -70,9 +80,28 @@ particle list and it includes all other charged or neutral particles, that have 
 associated to the corresponding signal candidate. By default, the charged particles assumed to be pions,
 and the neutral particles have photon or :math:`K_L^0` hypothesis.
 
-In principle, one can already try to use some of the Rest of Event variables, like ROE invariant 
-mass :b2:var:`roeM` or ROE energy :b2:var:`roeE`, but we need to clean up the ROE particles first to
-make the best use of them. 
+In principle, one can already try to use some of the Rest of Event variables. 
+
+.. admonition:: Exercise
+     :class: exercise stacked 
+      
+     Find documentation for Rest Of Event variables
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     One can use search feature in the basf2 documentation, or use offline help by typing ``basf2 variables.py`` 
+     in bash terminal. 
+  
+.. admonition:: Solution
+     :class: toggle solution
+
+     The Rest Of Event variables are in Rest Of Event secection of `VariableManager` page, 
+     which starts from :b2:var:`bssMassDifference` variable.
+
+
+Among the most usiversal and useful are ROE invariant mass :b2:var:`roeM` or ROE energy :b2:var:`roeE`, 
+but we need to clean up the ROE particles first to make the best use of them. 
 
 Rest of Event masks
 ~~~~~~~~~~~~~~~~~~~
@@ -86,27 +115,44 @@ or products of kaon or pion decays. Thus, it is important to clean up the ROE pa
 to get the best possible use of it.
 
 That is why we have a concept of the ROE masks, which are just sets of selection cuts 
-to be applied on the ROE particles. The ROE masks can be created in the following way:
+to be applied on the ROE particles. One can start from defining the following selection cut strings:
 
 .. code-block:: python
 
-        import basf2 as b2
-        import modularAnalysis as ma
-        main_path = b2.create_path()
-        ma.buildRestOfEvent('X:signal', path=main_path)
-        charged_cuts = 'nCDCHits > 0'
-        photon_cuts = 'clusterNHits > 1'
-        ma.appendROEMask('X:signal', 'my_mask', 
-                charged_cuts, photon_cuts, path=main_path)
+        track_based_cuts = 'thetaInCDCAcceptance and p > 0.075'
+        ecl_based_cuts = 'thetaInCDCAcceptance and E > 0.05'
 
-Here we have created a mask with a name ``my_mask``, that will contain only track-based 
-particles that have :b2:var:`nCDCHits` and ECL-based particles, that will have 
-at least one ECL cluster hit. 
+Here we create different cuts for charged particles, like electrons or charged pions, and for photons,
+because of different methods of measurement used to detect these particles.
 
 .. tip::
 
     These are example cuts, please use official guidelines from 
     Charged or Neutral Performance groups to set up your own selection.
+
+
+.. admonition:: Exercise
+     :class: exercise stacked 
+      
+     Create Rest Of event mask using `charged_cuts` and `photon_cuts` strings.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     One can look into `appendROEMask` or `appendROEMasks` documentation.
+  
+.. admonition:: Solution
+     :class: toggle solution
+
+
+     .. code-block:: python
+
+          roe_mask = ('my_mask', track_based_cuts, ecl_based_cuts)
+          ma.appendROEMasks('X:signal', [roe_mask], path=main_path)
+
+     Here we have created a mask with a name ``my_mask``, that will contain only track-based 
+     particles that have :b2:var:`nCDCHits` and ECL-based particles, that will have 
+     at least one ECL cluster hit. 
 
 The analyst can create as many ROE masks as needed and use them in different ROE-dependent 
 algorithms or ROE variables, like ``roeM(my_mask)`` or ``roeE(my_mask)``. Also, one can call 

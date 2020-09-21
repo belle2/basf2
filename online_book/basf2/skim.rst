@@ -34,21 +34,11 @@ Skimming
         * Find information about skims available on the grid.
 
 
-.. admonition:: Key points
-    :class: key-points
-
-    * The two sources of documentation on skims are the :ref:`Sphinx
-      documentation <skim>` and the `skimming Confluence page
-      <https://confluence.desy.de/display/BI/Skimming+Homepage>`_.
-
-    * 
-
-
 What is skimming?
 -----------------
 
 Skims are sets of selections made on data and MC with particular analyses in
-mind. The selections deliberately chosen to be relatively loose, so that the
+mind. The selections are deliberately chosen to be relatively loose, so that the
 same selections can be used and refined by multiple analysts.
 
 For example, a simple skim targeting :math:`B\to D` analyses might reconstruct a
@@ -67,7 +57,7 @@ the following ways:
       the skimmed uDST, so you can use these in further reconstruction. For
       example, there are skims which use the :ref:`FEI <onlinebook_fei>`, so
       this computationally expensive reconstruction is performed during the
-      skimming step and does not need to be repeated in further reconstruction.
+      skimming step and does not need to be repeated in later reconstruction.
 
 
 Mechanics of a skim
@@ -134,8 +124,8 @@ Accessing skims on the grid
 
 If a skim is requested by a working group, then it is applied to datasets on the
 grid during a skimming campaign and the output LFNs are documented on the
-*dataset searcher*. You can access these centrally-produced skims with
-:ref:`gbasf2 <onlinebook_gbasf2>`.
+*dataset searcher*. You can then run your analysis these centrally-produced
+skims with :ref:`gbasf2 <onlinebook_gbasf2>`.
 
 LFNs on the grid have a maximum length restriction, so we can't include the
 plain skim name in the LFN. Instead, we have standardised eight-digit *skim
@@ -148,7 +138,7 @@ contains its corresponding skim code.
 
     The details of the numbering scheme are explained on `the skimming
     Confluence page
-    <https://confluence.desy.de/display/BI/Skimming+Homepage#SkimmingHomepage-Skimcodeconventionandskimregistry>`_.
+    <https://confluence.desy.de/x/qw36Ag#SkimmingHomepage-Skimcodeconventionandskimregistry>`_.
 
 
 .. admonition:: Exercise
@@ -182,15 +172,25 @@ contains its corresponding skim code.
 Getting involved
 ----------------
 
-Each working group has an assigned skim liaison, whose job it is to survey the
-needs of the group and develop skims (all `listed on Confluence
-<https://confluence.desy.de/display/BI/Skimming+Homepage#SkimmingHomepage-Skimmingpersonnel>`_).
-If there is an existing skim that might be useful for your analysis and is not
-currently being produced, talk to you local skim liaison.
+Each working group has an assigned skim liaison (all `listed on Confluence
+<https://confluence.desy.de/x/qw36Ag#SkimmingHomepage-Skimmingpersonnel>`_),
+whose job it is to survey the needs of the group and develop skims. If there is
+an existing skim that might be useful for your analysis and is not currently
+being produced, talk to you local skim liaison.
 
 If you would like to get more involved in the writing and testing of skims, then
 you may find the :ref:`skim experts section <writing-skims>` of the
 Sphinx documentation helpful.
+
+
+.. admonition:: Key points
+    :class: key-points
+
+    * The two sources of documentation on skims are the :ref:`Sphinx
+      documentation <skim>` and the `skimming Confluence page
+      <https://confluence.desy.de/x/qw36Ag>`_.
+
+    * 
 
 
 .. topic:: Author of this lesson

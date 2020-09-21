@@ -43,9 +43,6 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 
   std::unique_ptr<TF1> pol3(new TF1("pol3", "[0] + [1]*x + [2]*x*x + [3]*x*x*x", -10,
                                     80)); // In the local study, Y. Uematsu tuned the range to (31.5,48), because the correlation is not exactly like pol3. (The deviation appears at around 48, very naive.) However, original value (-10,80) also seems working.
-  // Here we don't need to set initial values and boundaries for the fit parameter,
-  // since for the pre-defined function like 'pol3' the fit internally set the optimal ones
-  // if you don't specify the option 'B'.
 
   FileStat_t info;
   int cal_rev = 1;
@@ -96,17 +93,13 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
             gSystem->Unlink(Form("algorithm_3SampleCoG_output_rev_%d.root", cal_rev));
             return c_NotEnoughData;
           }
-          // for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
-          //   for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
-          //     if (hEventT0vsCoG->GetBinContent(i, j) < int(hEventT0vsCoG->GetEntries() * 0.001)) {
-          //       hEventT0vsCoG->SetBinContent(i, j, 0);
-          //     }
-          //   }
-          // }
-          for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++)
-            if (hEventT0vsCoG->Integral(i, i, 0, hEventT0vsCoG->GetNbinsY() + 1) <= max(2, int(hEventT0vsCoG->GetEntries() * 0.001)))
-              for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++)
+          for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
+            for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
+              if (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(hEventT0vsCoG->GetEntries() * 0.001))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
+              }
+            }
+          }
           TProfile* pfx = hEventT0vsCoG->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsCoG->GetName());
           pfx->SetName(name.c_str());

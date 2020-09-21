@@ -45,10 +45,8 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
                                         0)); // In the local study, Y. Uematsu tuned the range to (-21.5,0). Original value is (-10,80).
   pol1pole->SetParameter(1, 0.6);
   pol1pole->SetParameter(2, -150);
-  pol1pole->SetParameter(3, 7);
   pol1pole->SetParLimits(1, 0, 1);
   pol1pole->SetParLimits(2, -300, 0);
-  pol1pole->SetParLimits(3, 0, 15);
 
   FileStat_t info;
   int cal_rev = 1;
@@ -99,33 +97,32 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
             gSystem->Unlink(Form("algorithm_3SampleELS_output_rev_%d.root", cal_rev));
             return c_NotEnoughData;
           }
-          // for (int i = 1; i <= hEventT0vsELS->GetNbinsX(); i++) {
-          //   for (int j = 1; j <= hEventT0vsELS->GetNbinsY(); j++) {
-          //     if (hEventT0vsELS->GetBinContent(i, j) < int(hEventT0vsELS->GetEntries() * 0.001)) {
-          //       hEventT0vsELS->SetBinContent(i, j, 0);
-          //     }
-          //   }
-          // }
-          for (int i = 1; i <= hEventT0vsELS->GetNbinsX(); i++)
-            if (hEventT0vsELS->Integral(i, i, 0, hEventT0vsELS->GetNbinsY() + 1) <= max(2, int(hEventT0vsELS->GetEntries() * 0.001)))
-              for (int j = 1; j <= hEventT0vsELS->GetNbinsY(); j++)
+          for (int i = 1; i <= hEventT0vsELS->GetNbinsX(); i++) {
+            for (int j = 1; j <= hEventT0vsELS->GetNbinsY(); j++) {
+              if (hEventT0vsELS->GetBinContent(i, j) < max(2, int(hEventT0vsELS->GetEntries() * 0.001))) {
                 hEventT0vsELS->SetBinContent(i, j, 0);
+              }
+            }
+          }
           TProfile* pfx = hEventT0vsELS->ProfileX();
           std::string name = "pfx_" + std::string(hEventT0vsELS->GetName());
           pfx->SetName(name.c_str());
+          // Remove non-liniarity from the fit by fixing the pole position
+          pol1pole->FixParameter(3, 7);
           TFitResultPtr tfr = pfx->Fit("pol1pole", "QMRS");
+          pol1pole->SetParLimits(3, 0, 15);
+          tfr = pfx->Fit("pol1pole", "QMRS");
           // There is small possibility that the chi2 minimization ends at the parameter boundary.
           // In such case, we may get a completely wrong fit function, thus we refit w/o boundaries.
-          if (tfr->Chi2() > 500) {
-            B2WARNING("Correlation fit Chi2 is too large, refit with very wide parameter boundaries.");
-            pol1pole->SetParLimits(1, - 1e5, 1e5);
-            pol1pole->SetParLimits(2, - 1e7, 1e7);
-            pol1pole->SetParLimits(3, - 1e6, 1e6);
-            tfr = pfx->Fit("pol1pole", "QMRS");
-            pol1pole->SetParLimits(1, 0, 1);
-            pol1pole->SetParLimits(2, -300, 0);
-            pol1pole->SetParLimits(3, 0, 15);
-          }
+          // if (tfr->Chi2() > 500) {
+          //   B2WARNING("Correlation fit Chi2 is too large, refit with very wide parameter boundaries.");
+          //   pol1pole->SetParLimits(1, 0, 0);
+          //   pol1pole->SetParLimits(2, 0, 0);
+          //   pol1pole->SetParLimits(3, 0, 0);
+          //   tfr = pfx->Fit("pol1pole", "QMRS");
+          //   pol1pole->SetParLimits(1, 0, 1);
+          //   pol1pole->SetParLimits(2, -300, 0);
+          // }
           double par[4];
           pol1pole->GetParameters(par);
           // double meanT0 = hEventT0->GetMean();

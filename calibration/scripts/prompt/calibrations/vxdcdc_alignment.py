@@ -1,13 +1,22 @@
 # -*- coding: utf-8 -*-
 
-"""VXD+CDC(layers-only) alignment with Millepede II.
+"""
 
-The input collections can be:
+Simultaneous Global and Local VXD and CDC (layers-only) alignment with Millepede II
+
+The input collections can be (only single tracks currently):
 - cosmics (hlt skim) - mandatorry
 - physics - all raw data -> once off-ip is available, this can be omitted
 - hadron - for "low" momentum tracks from IP
 - mumu - mumu_2trk or mumu_tight - for high momentum tracks from IP
 - offip - not yet available - tracks from outside IP (beam background, beam-gas)
+
+Time-dependence can be (manually) configured for VXD half-shells and CDC layers.
+For example to allow VXD alignment to change in run 10, 20 an 30 in experiment 12, you set:
+
+>>> timedep_vxd : [[0, 10, 12], [0, 20, 12], [0, 30, 12]]
+
+Note that the first run in your requested iov will be added automatically.
 
 """
 import basf2
@@ -30,20 +39,23 @@ default_config = {
   "physics.max_processed_events_per_file": 2000,
 
   "cosmic.min_events": 1000000,
-  "cosmic.max_processed_events_per_file": 8000,
+  "cosmic.max_processed_events_per_file": 5000,
 
-  "hadron.min_events": 400000,
-  "hadron.max_processed_events_per_file": 2000,
+  "hadron.min_events": 100000,
+  "hadron.max_processed_events_per_file": 1000,
 
   "mumu.min_events": 400000,
-  "mumu.max_processed_events_per_file": 2000,
+  "mumu.max_processed_events_per_file": 3000,
 
   "offip.min_events": 400000,
   "offip.max_processed_events_per_file": 2000,
+
+  "timedep_vxd": [],
+  "timedep_cdc": []
   }
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="VXDCDCAlignment_stage0",
+settings = CalibrationSettings(name="Global VXD and CDC Alignment",
                                expert_username="bilkat",
                                description=__doc__,
                                input_data_formats=["raw"],
@@ -55,7 +67,6 @@ settings = CalibrationSettings(name="VXDCDCAlignment_stage0",
 def select_files(all_input_files, min_events, max_processed_events_per_file):
     from random import choice
     from prompt.utils import events_in_basf2_file
-    basf2.B2INFO("Attempting to choose a good subset of files")
     # Let's iterate, taking a sample of files from the total (no repeats or replacement) until we get enough events
     total_events = 0
     chosen_files = []
@@ -170,9 +181,9 @@ def create_cosmics_path():
 def get_calibrations(input_data, **kwargs):
 
     import basf2
+    import json
 
     cfg = kwargs['expert_config']
-
     files = dict()
 
     for colname in collection_names:
@@ -185,7 +196,6 @@ def get_calibrations(input_data, **kwargs):
 
         basf2.B2INFO(f"Selecting files for: {colname}")
         input_files = select_files(input_files[:], cfg[f'{colname}.min_events'], cfg[f'{colname}.max_processed_events_per_file'])
-        basf2.B2INFO(f"Total number of {colname} files actually used as input = {len(input_files)}")
         files[colname] = input_files
 
     # Get the overall IoV we want to cover for this request, including the end values
@@ -197,15 +207,30 @@ def get_calibrations(input_data, **kwargs):
 
     from ROOT import Belle2
     import millepede_calibration as mpc
-    import basf2
 
     import alignment.constraints
     import alignment.parameters
 
-    print(files)
+    # Pede command options
+    method = cfg['method']
+    scaleerrors = cfg['scaleerrors']
+    entries = cfg['entries']
+
+    timedep = []
+
+    timedep_vxd = cfg['timedep_vxd']
+    timedep_cdc = cfg['timedep_cdc']
+
+    if len(timedep_vxd):
+        slices = [(erx[0], erx[1], erx[2]) for erx in timedep_vxd] + [(0, requested_iov.run_low, requested_iov.exp_low)]
+        timedep.append(
+          (alignment.parameters.vxd_halfshells(), slices))
+    if len(timedep_cdc):
+        slices = [(erx[0], erx[1], erx[2]) for erx in timedep_cdc] + [(0, requested_iov.run_low, requested_iov.exp_low)]
+        timedep.append((alignment.parameters.cdc_layers(), slices))
 
     cal = mpc.create(
-        name='VXDCDCAlignment_stage0',
+        name='alignment',
         dbobjects=['VXDAlignment', 'CDCAlignment'],
         collections=[
           mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
@@ -216,16 +241,16 @@ def get_calibrations(input_data, **kwargs):
           ],
         tags=None,
         files=files,
-        timedep=[],
+        timedep=timedep,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
             alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False)
         ],
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=True),
         commands=[
-            f"method {cfg['method']}",
-            f"scaleerrors {cfg['scaleerrors']} {cfg['scaleerrors']}",
-            f"entries {cfg['entries']}"],
+            f"method {method}",
+            f"scaleerrors {scaleerrors} {scaleerrors}",
+            f"entries {entries}"],
         params=dict(minPValue=cfg['minPValue'], externalIterations=0),
         min_entries=cfg['min_entries'])
 

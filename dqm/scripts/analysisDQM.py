@@ -25,21 +25,21 @@ def add_analysis_dqm(path):
 def add_mirabelle_dqm(path):
     # MiraBelle di-muon
     fillParticleList('mu+:physMiraBelle', '', path=path)
-    mirabelle = register_module('PhysicsObjectsMiraBelle')
-    mirabelle.param('MuPListName', 'mu+:physMiraBelle')
-    path.add_module(mirabelle)
+    MiraBelleMumu = register_module('PhysicsObjectsMiraBelle')
+    MiraBelleMumu.param('MuPListName', 'mu+:physMiraBelle')
+    path.add_module(MiraBelleMumu)
     # MiraBelle D*
-    fillParticleList('pi+:MiraBelleDst_pion', 'abs(d0)<0.5 and abs(z0)<3', path=path)
-    fillParticleList('K+:MiraBelleDst_kaon',  'abs(d0)<0.5 and abs(z0)<3', path=path)
+    fillParticleList('pi+:MiraBelle', 'abs(d0)<0.5 and abs(z0)<3', path=path)
+    fillParticleList('K+:MiraBelle',  'abs(d0)<0.5 and abs(z0)<3', path=path)
     stdPi0s(listtype='eff60_Jan2020', path=path)
-    reconstructDecay('D0:ch1_mirabelle -> K-:MiraBelleDst_kaon pi+:MiraBelleDst_pion', '1.7 < M < 2.1', path=path)
-    reconstructDecay('D0:ch2_mirabelle -> K-:MiraBelleDst_kaon pi+:MiraBelleDst_pion pi0:eff60_Jan2020', '1.7 < M < 2.1', path=path)
-    reconstructDecay('D*+:kpi -> D0:ch1_mirabelle pi+:MiraBelleDst_pion',
+    reconstructDecay('D0:MiraBelle_kpi -> K-:MiraBelle pi+:MiraBelle', '1.7 < M < 2.1', path=path)
+    reconstructDecay('D0:MiraBelle_kpipi0 -> K-:MiraBelle pi+:MiraBelle pi0:eff60_Jan2020', '1.7 < M < 2.1', path=path)
+    reconstructDecay('D*+:MiraBelle_kpi -> D0:MiraBelle_kpi pi+:MiraBelle',
                      'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
-    reconstructDecay('D*+:kpipi0 -> D0:ch2_mirabelle pi+:MiraBelleDst_pion',
+    reconstructDecay('D*+:MiraBelle_kpipi0 -> D0:MiraBelle_kpipi0 pi+:MiraBelle',
                      'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
-    listmode = ['D*+:kpi', 'D*+:kpipi0']
+    listmode = ['D*+:MiraBelle_kpi', 'D*+:MiraBelle_kpipi0']
     copyLists('D*+:MiraBelleDst', listmode, path=path)
-    mirabelleDst = register_module('PhysicsObjectsMiraBelleDst')
-    mirabelleDst.param('DstListName', 'D*+:MiraBelleDst')
-    path.add_module(mirabelleDst)
+    MiraBelleDst = register_module('PhysicsObjectsMiraBelleDst')
+    MiraBelleDst.param('DstListName', 'D*+:MiraBelleDst')
+    path.add_module(MiraBelleDst)

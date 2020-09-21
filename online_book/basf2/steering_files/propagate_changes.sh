@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# THIS IS NOT A BASF2 EXAMPLE
+
 # Example use case:
 # You change something in 019_first_stering_file.py
 # For consistency, this change needs to be applied to
@@ -20,7 +22,7 @@ git diff HEAD^ -- ${changed_file} > ${tmp_patch_name}
 
 for file in ${target_files}; do
     echo "Applying patch to ${file}"
-    patch -f --fuzz=3 ${file} ${tmp_patch_name}
+    patch -f --fuzz=2 ${file} ${tmp_patch_name}
 done
 
 rm ${tmp_patch_name}

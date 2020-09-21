@@ -56,7 +56,7 @@ there. The total radiated power due to Bremsstrahlung by a particle of charge
 where :math:`\gamma = \frac{1}{\sqrt{1-\beta^2}}`.
 
 For cases where the acceleration is parallel to the velocity, the radiated power
- is proportional to :math:`\gamma^6`, whereas for perpendicular acceleration it
+is proportional to :math:`\gamma^6`, whereas for perpendicular acceleration it
 scales with :math:`\gamma^4`.
 As :math:`\gamma = E/mc^2`, lighter particles will lose more energy through
 Bremsstrahlung than heavier particles with the same energy.
@@ -253,6 +253,57 @@ marker to the decay string:
     path=main,
    )
 
+Finally, let's add the invariant mass of the :math:`J/\psi` meson without any 
+Bremsstrahlung recovery applied. Then, after running your steering file, compare
+this invariant mass with the one obtained after the recovery, by selecting only
+the correctly reconstructed :math:`J/\psi`. Can you see the effect of the 
+Bremsstrahlung recovery?
+
+.. admonition:: Exercise
+   :class: exercise stacked
+
+   Create a variable to calculate the invariant mass of the
+   :math:`J/\psi` meson using the *uncorrected* momenta of the leptons. Call it 
+   `'M_uncorrected'`.
+   Plot a histogram of `'M'` and `'M_uncorrected'` for the correctly reconstructed 
+   :math:`J/\psi` mesons
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   You may find the meta-variable `daughterCombination` useful. Can you use it in
+   combination with the `daughter` meta-variable, just for the laughs?
+
+.. admonition:: Solution
+   :class: toggle solution
+
+   ``daughterCombination(M,0:0,1:0)`` will give us the invariant mass of the first 
+   daughter of the first daughter, and the first daughter of the second daughter.
+   Since all particles in the ``e+:corrected`` particle list have as first daughter
+   the uncorrected particle, we just need to calculate this daughter combination for
+   the :math:`J/\psi` meson. We can do this by directly appending the expression to
+   the list of :math:`J/psi` variables we want to store, or we can rather make it a 
+   variable of the B mesons, by using the `daughter` meta-variable: 
+
+        .. code-block:: python3
+           :lineno-start: 113
+
+            b_vars += variables.addAlias(
+             "D0_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
+            ) 
+
+    The results should look similar to :numref:`jpsi_brems_validation_plot` (this was obtained with a 
+    different steering file, so do not mind if your plot is not exactly the same). 
+
+    .. _jpsi_brems_validation_plot:
+
+    .. figure:: jpsi_brems_validation_plot.png
+       :width: 40em
+       :align: center
+
+       Invariant mass distributions for the reconstructed decay, :math:`J/\psi \to e^+e^-`,
+       with and without Bremsstrahlung correction 
+
 .. admonition:: Extra exercises
    :class: exercise
 
@@ -260,10 +311,6 @@ marker to the decay string:
      used in the :math:`J/\psi` reconstruction
    * Create a variable  named ``withBremsCorrection`` that indicates if any of
      the leptons used in the reconstruction of the B meson was Bremsstrahlung recovered
-   * Create a variable to calculate the invariant mass of the
-     :math:`J/\psi` meson using the *uncorrected* momenta of the leptons.
-     Compare its distribution with the invariant mass obtained using the corrected particles
-
 
 Best Candidate Selection
 ________________________
@@ -338,7 +385,7 @@ random seed.
 
    * Remove the ``numBest`` parameter from the `rankByHighest` function, and
      store both the ``random`` and  the ``extraInfo(random_rank)`` variables.
-     You can, and probably should, use aliases for this.
+     You can, and probably should, use aliases for these variables.
      Make sure that the ranking is working properly by plotting one variable
      against the other for events with more than one candidate (the number of
      candidates for a certain event is stored automatically when performing a
@@ -360,7 +407,8 @@ random seed.
 .. admonition:: Key points
     :class: key-points
 
-    * There are two main modules to perform Bremsstrahlung correction
+    * There are two ways of performing Bremsstrahlung correction: `correctBrems` and
+      `correctBremsBelle`
     * Both of them create new particle lists
     * The members of the new particle list will have as daughter the original
       uncorrected particle and, if a correction was performed, the
@@ -368,4 +416,8 @@ random seed.
     * MC matching with Bremsstrahlung corrected particles requires a special
       treatment: use the `isSignalAcceptBremsPhotons` variable, or add the
       ``?addbrems`` marker in the decay string
-    * Best candidate selection sorts particles and antiparticles separately
+    * Best candidate selection can be performed with the `rankByHighest` and 
+      `rankByLowest` functions
+    * These functions sort particles and antiparticles separately
+    * From light release ``light-2008-kronos``, a new helper function can be 
+      used to perform random candidate selection: `applyRandomCandidateSelection`

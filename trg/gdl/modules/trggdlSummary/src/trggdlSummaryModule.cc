@@ -264,7 +264,6 @@ void TRGGDLSummaryModule::event()
         timQuality = TRGSummary::TTYQ_NONE;
         break;
     }
-    printf("q(%d)\n", q);
     GDLResult->setTimQuality(timQuality);
   }
 

@@ -97,6 +97,7 @@ Untested method TRGSummary::setInputBits
 Untested method TRGSummary::setPreScale
 Untested method TRGSummary::setPsnmBits
 Untested method TRGSummary::setTRGSummary
+Untested method TRGSummary::setTimQuality
 Untested method TRGSummary::setTimType
 Untested method TRGSummary::test
 Untested method TRGSummary::testFtdl
@@ -3535,6 +3536,7 @@ TRGSummary:
   getTRGSummary(7): 0
   getTRGSummary(8): 0
   getTRGSummary(9): 0
+  getTimQuality(): 0
   getTimType(): 15
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(69)
@@ -9672,6 +9674,7 @@ TRGSummary:
   getTRGSummary(7): 0
   getTRGSummary(8): 0
   getTRGSummary(9): 0
+  getTimQuality(): 0
   getTimType(): 15
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(69)
@@ -16192,6 +16195,7 @@ TRGSummary:
   getTRGSummary(7): 0
   getTRGSummary(8): 0
   getTRGSummary(9): 0
+  getTimQuality(): 0
   getTimType(): 15
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(69)

@@ -16,6 +16,8 @@ CHANGES since release-03-01-02:
 - ECLCluster:
   + hasFailedFitTime
   + hasFailedTimeResolution
+- TRGSummary:
+  * getTimQuality added
 
 - Particle masses:
   * The particle masses have been updated to PDG 2020. As a result, the

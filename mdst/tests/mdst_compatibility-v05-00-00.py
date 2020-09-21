@@ -8,6 +8,8 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-05-00-00:
 
+- TRGSummary:
+  * getTimQuality added
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

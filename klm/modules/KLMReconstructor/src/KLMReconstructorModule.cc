@@ -260,10 +260,10 @@ double KLMReconstructorModule::getTime(KLMDigit* d, double dist)
 void KLMReconstructorModule::reconstructEKLMHits()
 {
   int i, n;
-  n = m_Digits.getEntries();
   double d1, d2, t, t1, t2, sd;
   std::vector<KLMDigit*> digitVector;
   std::vector<KLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
+  n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
     KLMDigit* digit = m_Digits[i];
     if (digit->getSubdetector() != KLMElementNumbers::c_EKLM)

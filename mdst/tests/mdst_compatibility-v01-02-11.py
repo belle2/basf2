@@ -15,6 +15,8 @@ CHANGES since release-01-02-11:
 - The default magnetic field is changed affecting all momentum measurements.
 - Track:
   + getQualityIndicator
+- TrackFitResult:
+  + ndf
 - ECLCluster:
   + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity

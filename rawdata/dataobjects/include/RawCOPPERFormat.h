@@ -20,6 +20,7 @@
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
+using namespace std;
 
 #define DETECTOR_MASK 0xFF000000 // tentative
 #define COPPERID_MASK 0x00FFFFFF // tentative
@@ -331,6 +332,10 @@ namespace Belle2 {
 
     //! Get the max number of channels in a readout board
     virtual int GetMaxNumOfCh(int n) = 0;
+
+    //! Compare value from different channels and make a statistics table
+    virtual void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] , vector<vector< unsigned int>>& result);
+
 
   protected :
 

@@ -311,6 +311,9 @@ namespace Belle2 {
     //! Get the max number of channels in a readout board
     int GetMaxNumOfCh(int n);
 
+    //! Compare value from different channels and make a statistics table
+    void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] , vector<vector< unsigned int>>& result);
+
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;
 

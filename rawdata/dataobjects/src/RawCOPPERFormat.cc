@@ -8,7 +8,7 @@
 
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
-using namespace std;
+
 using namespace Belle2;
 //ClassImp(RawCOPPERFormat);
 
@@ -165,4 +165,16 @@ int* RawCOPPERFormat::PackDetectorBuf(int* packed_buf_nwords,
   printf("%s\n", err_buf); fflush(stdout);
   B2FATAL(err_buf);
   return NULL;
+}
+
+void RawCOPPERFormat::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH],
+                                         vector<vector<unsigned int> >& result)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "[FATAL] This function is not supported in the version of  RawCOPPER format that you're using. : %s %s %d: Exiting...\n", __FILE__,
+          __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  B2FATAL(err_buf);
+  return;
 }

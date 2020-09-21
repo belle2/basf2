@@ -37,57 +37,6 @@ int RawCOPPERFormat_latest::GetNumFINESSEBlock(int n)
   return cnt;
 }
 
-int* RawCOPPERFormat_latest::GetFINESSEBuffer(int n, int finesse_num)
-{
-  if (finesse_num >= MAX_PCIE40_CH || finesse_num < 0) {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] Invalid finesse # : %s %s %d\n",
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-    B2FATAL(err_buf);
-    return NULL;
-  }
-  int cur_pos = GetBufferPos(n) + (tmp_header.POS_CH_POS_TABLE + finesse_num);
-  return (m_buffer + cur_pos);
-}
-
-
-int RawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
-{
-
-  // check if finesse_num is in a range
-  if (finesse_num < 0 || finesse_num >= MAX_PCIE40_CH) {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] Invalid finesse # (=%d): %s %s %d\n", finesse_num,
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-    B2FATAL(err_buf);
-    return 0;
-  }
-
-  int pos_nwords_0;
-  int nwords;
-
-  pos_nwords_0 = GetBufferPos(n) + (tmp_header.POS_CH_POS_TABLE + finesse_num);
-  if (finesse_num == (MAX_PCIE40_CH - 1)) {
-    nwords = GetBlockNwords(n) - tmp_trailer.GetTrlNwords() - m_buffer[ pos_nwords_0 ];
-  } else {
-    nwords = m_buffer[ pos_nwords_0 + 1 ] - m_buffer[ pos_nwords_0 ];
-  }
-
-  if (nwords < 0 || nwords > 1e6) {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : # of words is strange. %d (ch=%d) : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
-            nwords, finesse_num,
-            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-    B2FATAL(err_buf);
-  }
-
-  return nwords;
-
-}
 
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 void RawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
@@ -303,3 +252,28 @@ int RawCOPPERFormat_latest::GetOffset4thFINESSE(int n)
   return NULL;
 }
 
+void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
+                                                vector<vector<unsigned int>>& result)
+{
+
+  vector<vector<unsigned int>> temp;
+
+  for (int i = 0; i < MAX_PCIE40_CH; i++) {
+    if (GetFINESSENwords(n, i) > 0) {
+
+      int same_flag = 0;
+      for (int j = 0; j < result.size(); j++) {
+        if (input_val[i] == result.at(j).at(0)) {
+          result.at(j).at(2)++;
+          same_flag = 1;
+          break;
+        }
+      }
+      if (same_flag == 0) {
+        result.push_back({ input_val[i], i, 1 });
+      }
+    }
+  }
+  sort(result.begin(), result.end(), [](const vector<unsigned int>& alpha, const vector<unsigned int>& beta) {return alpha.at(2) < beta.at(2);});
+  return;
+}

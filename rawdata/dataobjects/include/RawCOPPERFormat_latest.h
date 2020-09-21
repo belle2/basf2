@@ -14,11 +14,11 @@
 #include <rawdata/dataobjects/RawHeader_latest.h>
 #include <rawdata/dataobjects/RawTrailer_latest.h>
 #include <rawdata/CRCCalculator.h>
-
 /* #include <framework/datastore/DataStore.h> */
 /* #include <TObject.h> */
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+using namespace std;
 
 namespace Belle2 {
 
@@ -214,6 +214,10 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     int GetFINESSENwords(int n, int finesse_num) OVERRIDE_CPP17;
 
+    //! Check header value of all channels
+    void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
+                            vector<vector< unsigned int>>& result) OVERRIDE_CPP17;
+
     /// Format version number
     enum {
       DATA_FORMAT_VERSION = 4
@@ -377,7 +381,57 @@ namespace Belle2 {
     return MAX_PCIE40_CH;
   }
 
+  inline int RawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
+  {
 
+    // check if finesse_num is in a range
+    if (finesse_num < 0 || finesse_num >= MAX_PCIE40_CH) {
+      char err_buf[500];
+      sprintf(err_buf, "[FATAL] Invalid finesse # (=%d): %s %s %d\n", finesse_num,
+              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("[DEBUG] %s\n", err_buf);
+      B2FATAL(err_buf);
+      return 0;
+    }
+
+    int pos_nwords = GetBufferPos(n) + (tmp_header.POS_CH_POS_TABLE + finesse_num);
+    int nwords = 0;
+
+    if (finesse_num == (MAX_PCIE40_CH - 1)) {
+      nwords = GetBlockNwords(n) - tmp_trailer.GetTrlNwords() - m_buffer[ pos_nwords ];
+    } else {
+      nwords = m_buffer[ pos_nwords + 1 ] - m_buffer[ pos_nwords ];
+    }
+
+    if (nwords < 0 || nwords > 1e6) {
+      char err_buf[500];
+      sprintf(err_buf, "[FATAL] ERROR_EVENT : # of words is strange. %d (ch=%d) : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+              nwords, finesse_num,
+              GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("[DEBUG] %s\n", err_buf);
+      B2FATAL(err_buf);
+    }
+    return nwords;
+  }
+
+  inline int* RawCOPPERFormat_latest::GetFINESSEBuffer(int n, int finesse_num)
+  {
+    if (finesse_num >= MAX_PCIE40_CH || finesse_num < 0) {
+      char err_buf[500];
+      sprintf(err_buf, "[FATAL] Invalid finesse # : %s %s %d\n",
+              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("[DEBUG] %s\n", err_buf);
+      B2FATAL(err_buf);
+      return NULL;
+    }
+
+    if (GetFINESSENwords(n, finesse_num) > 0) {
+      int cur_pos = GetBufferPos(n) + (tmp_header.POS_CH_POS_TABLE + finesse_num);
+      return (m_buffer + cur_pos);
+    }
+    return NULL;
+  }
 
 }
 #endif

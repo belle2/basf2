@@ -10,7 +10,7 @@
     "run_mva_evaluate": true,
     "run_validation_tasks": true,
     "globaltags": ["mc_production_MC13a_rev1"],
-    "experiment_numbers": [1003],
+    "experiment_numbers": [0, 1003],
     "datafiles": ["/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT1.f00001.root",
 		  "/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT2.f00002.root",
 		  "/group/belle2/dataprod/Data/Raw/e0012/r04015/sub00/physics.0012.04015.HLT3.f00003.root",

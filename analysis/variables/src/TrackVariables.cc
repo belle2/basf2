@@ -98,6 +98,15 @@ namespace Belle2 {
       return trackFit->getNDF();
     }
 
+    double trackChi2(const Particle* part)
+    {
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+      return trackFit->getChi2();
+    }
+
     double trackFirstSVDLayer(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
@@ -513,6 +522,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
     REGISTER_VARIABLE("nDF",      trackNDF,          "Number of degrees of freedom of the track fit");
+    REGISTER_VARIABLE("chi2",      trackChi2,          "Number of degrees of freedom of the track fit");
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
     REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");
     REGISTER_VARIABLE("firstCDCLayer", trackFirstCDCLayer,     "First activated CDC layer associated to the track");

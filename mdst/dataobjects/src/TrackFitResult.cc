@@ -14,6 +14,8 @@ x * BASF2 (Belle Analysis Framework 2)                                     *
 
 #include <framework/utilities/HTML.h>
 
+#include <boost/math/special_functions/gamma.hpp>
+
 #include <sstream>
 #include <assert.h>
 
@@ -23,7 +25,7 @@ TrackFitResult::TrackFitResult() :
   m_pdg(0), m_pValue(0),
   m_hitPatternCDCInitializer(0),
   m_hitPatternVXDInitializer(0),
-  m_NDF(0)
+  m_NDF(c_NDFFlag)
 {
   memset(m_tau, 0, sizeof(m_tau));
   memset(m_cov5, 0, sizeof(m_cov5));
@@ -35,7 +37,7 @@ TrackFitResult::TrackFitResult(const TVector3& position, const TVector3& momentu
                                const float bField,
                                const uint64_t hitPatternCDCInitializer,
                                const uint32_t hitPatternVXDInitializer,
-                               const short int NDF) :
+                               const uint16_t NDF) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
   m_hitPatternVXDInitializer(hitPatternVXDInitializer),
@@ -64,7 +66,7 @@ TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<
                                const Const::ParticleType& particleType, const float pValue,
                                const uint64_t hitPatternCDCInitializer,
                                const uint32_t hitPatternVXDInitializer,
-                               const short int NDF) :
+                               const uint16_t NDF) :
   m_pdg(std::abs(particleType.getPDGCode())), m_pValue(pValue),
   m_hitPatternCDCInitializer(hitPatternCDCInitializer),
   m_hitPatternVXDInitializer(hitPatternVXDInitializer),
@@ -78,6 +80,27 @@ TrackFitResult::TrackFitResult(const std::vector<float>& tau, const std::vector<
     m_tau[i] = tau[i];
   for (unsigned int i = 0; i < c_NCovEntries; ++i)
     m_cov5[i] = cov5[i];
+}
+
+int TrackFitResult::getNDF() const
+{
+  if (m_NDF == c_NDFFlag) {
+    return -1;
+  }
+  return m_NDF;
+}
+
+double TrackFitResult::getChi2() const
+{
+  double pValue = getPValue();
+  int nDF    = getNDF();
+  if (pValue == 0) {
+    return std::numeric_limits<double>::infinity();
+  }
+  if (nDF < 0) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+  return 2 * boost::math::gamma_q_inv(nDF / 2., pValue);
 }
 
 TMatrixDSym TrackFitResult::getCovariance5() const

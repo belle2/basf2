@@ -73,7 +73,7 @@ namespace Belle2 {
                    const float bField,
                    const uint64_t hitPatternCDCInitializer,
                    const uint32_t hitPatternVXDInitializer,
-                   const short int NDF);
+                   const uint16_t NDF);
 
     /** Constructor initializing class with perigee parameters.
      *
@@ -84,12 +84,13 @@ namespace Belle2 {
      *  @param pValue        p-value of the corresponding track fit.
      *  @param hitPatternCDCInitializer  bits for initializing CDC hit pattern.
      *  @param hitPatternVXDInitializer  bits for initializing VXD hit pattern.
+     *  @param NDF  number of degrees of freedom for the fit
      */
     TrackFitResult(const std::vector<float>& tau, const std::vector<float>& cov5,
                    const Const::ParticleType& particleType, const float pValue,
                    const uint64_t hitPatternCDCInitializer,
                    const uint32_t hitPatternVXDInitializer,
-                   const short int NDF
+                   const uint16_t NDF
                   );
 
     /** Getter for vector of position at closest approach of track in r/phi projection. */
@@ -150,7 +151,10 @@ namespace Belle2 {
     double getPValue() const { return m_pValue; }
 
     /** Getter for number of degrees of freedom of the track fit. */
-    double getNDF() const { return m_NDF; }
+    int getNDF() const;
+
+    /** Get chi2 given NDF and p-value */
+    double getChi2() const;
 
     //------------------------------------------------------------------------
     // --- Getters for perigee helix parameters
@@ -278,6 +282,9 @@ namespace Belle2 {
      *  @sa HitPatternVXD
      */
     const uint32_t m_hitPatternVXDInitializer;
+
+    /** backward compatibility initialisation for NDF */
+    static const uint16_t c_NDFFlag = 0xFFFF;
 
     /** Memeber for number of degrees of freedom*/
     uint16_t m_NDF;

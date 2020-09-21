@@ -50,6 +50,11 @@ namespace Belle2 {
     double trackNDF(const Particle* part);
 
     /**
+     * return chi2 of the track fit, which is computed based on the stored p-value and NDF
+     */
+    double trackChi2(const Particle* part);
+
+    /**
      * returns the first activated SVD layer associated to the track
      */
     double trackFirstSVDLayer(const Particle* part);

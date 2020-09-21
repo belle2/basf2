@@ -122,9 +122,10 @@ b_vars += vu.create_aliases_for_selected(
 jpsi_ks_vars = vc.inv_mass + standard_vars
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
 # Add the J/Psi mass calculated with uncorrected electrons:
-b_vars += addAlias(
+variables.addAlias(
     "D0_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
 )
+b_vars += ["D0_M_uncorrected"]
 # Also add kinematic variables boosted to the center of mass frame (CMS)
 # for all particles
 cmskinematics = vu.create_aliases(

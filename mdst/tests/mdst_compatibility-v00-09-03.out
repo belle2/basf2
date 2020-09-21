@@ -21,8 +21,10 @@ Untested method Track::getTrackFitResults
 Untested method Track::setTrackFitResultIndex
 Untested method V0::getTrackFitResultIndices
 Untested method V0::getTrackIndices
+Untested method TrackFitResult::getChi2
 Untested method TrackFitResult::getHelix
 Untested method TrackFitResult::getInfoHTML
+Untested method TrackFitResult::getNDF
 Untested method TrackFitResult::getUncertainHelix
 Untested method EventLevelTrackingInfo::getNVXDClustersInLayer
 Untested method EventLevelTrackingInfo::hasCDCSLayer

@@ -335,7 +335,7 @@ void FragmentationModule::event()
 //-----------------------------------------------------------------
 //                 addParticleToPYTHIA
 //-----------------------------------------------------------------
-int FragmentationModule::addParticleToPYTHIA(MCParticle& mcParticle)
+int FragmentationModule::addParticleToPYTHIA(const MCParticle& mcParticle)
 {
   //get PDG code
   const int id = mcParticle.getPDG();

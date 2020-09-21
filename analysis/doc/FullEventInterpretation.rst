@@ -3,15 +3,7 @@
 Full event interpretation
 =========================
 
-Sphinx documentation
-####################
-
 .. seealso:: The FEI is formally described in the publication `Comp.Sci.HEP.2019.3.6 <https://link.springer.com/article/10.1007/s41781-019-0021-8>`_
-
-.. automodule:: fei
-   :members:
-   :undoc-members:
-   :imported-members:
 
 Algorithm overview
 ##################
@@ -88,6 +80,70 @@ The FEI uses several cuts, which are applied for each particle in the following 
 #.    **PostCut::value** is a cut on the absolute value of the ``SignalProbability`` and should be chosen very loose, only candidates which are highly unlikely should be thrown away here
 #.    **PostCut::bestCandidateCut** keeps for each particle only a certain number of best-candidates. The candidates of all channels are ranked using their ``SignalProbability``. Usually Between 10-20 candidates are kept per particle. This cut is extremely important because it limits the combinatoric in the next stage of reconstructions, and the algorithm can calculate the combinatoric at the next stage in advance.
 
+Applying the FEI
+################
+
+
+Just include the ``feistate.path`` create by the ``fei.get_path()`` function in your steering file.
+
+The weightfiles are automatically loaded from the condition database. This might take some time. You can also copy the localdb of the training (or another local database containing the weightfiles) in your working directory by hand to speed up the execution.
+
+After the FEI path the following lists are available
+
+*    B+:generic (hadronic tag)
+*    B+:semileptonic (semileptonic tag)
+*    B0:generic (hadronic tag)
+*    B+:semileptonic (semileptonic tag)
+
+Each candidate has three extra infos which are interesting:
+
+*    SignalProbability is the signal probability calculated using FastBDT
+*    decayModeID is the tag :math:`B` decay channel
+
+
+You can use a different decay channel configuration during the application. In particular you can omit decay-channels (e.g. the semileptonic if your are only interested in the hadronic tag).
+However, it is not possible to add new channels without training them first (obviously).
+
+You can find up to date examples in ``analysis/examples/FEI``.
+If you encounter problems which require debugging in the FEI algorithm, the best starting point is to enable the monitoring, by choosing ``monitor=True`` in the FEIConfiguration. This will create a lot of root files containing histograms of interesting variables throughout the process (e.g. MC truth before and after all the cuts). You can also create a pdf using the root files produced by the monitoring and the "Summary.pickle" file produced by the original training by executing:
+
+``basf2 fei/latexReporting.py > summary.tex``
+
+
+FEI and the conditions database
+###############################
+
+The FEI is frequently retrained and updated to give the best performance with the latest reconstruction, etc. You will need to use the relevant database in which the FEI training weights are located.
+FEI training weights are distributed by the `basf2.conditions` database under an `analysis global tag <https://confluence.desy.de/x/MhqdAw>`_.
+In order to find the latest, recommended FEI training, you can use the `b2conditionsdb-recommend` tool.
+
+``b2conditionsdb-recommend input_file.mdst.root``
+
+This tool will tell you all tags you should use. For the FEI we are only concerned with the analysis tag.
+Analysis tags are named ``analysis_tools_XXXX``.
+You will need to prepend this tag to your global tags list.
+This is done inside the FEI steering script.
+
+.. code-block:: python3
+
+        import basf2
+        import fei
+
+        basf2.conditions.prepend_globaltag("analysis_tools_XXXX")
+        conf = fei.config.FeiConfiguration(prefix="foo", ...)
+
+Note that when running on Belle converted data or MC you will need to use the ``B2BII`` and ``B2BII_MC`` database tags, respectively.
+
+If you have trouble finding the correct analysis tag, please ask a question at `B2Questions <https://questions.belle2.org>`_ and/or send a mail to frank.meier@belle2.org,
+
+Sphinx documentation
+####################
+
+
+.. automodule:: fei
+   :members:
+   :undoc-members:
+   :imported-members:
 
 Code structure
 ##############
@@ -126,8 +182,6 @@ Contains some example configurations of the FEI.  Mostly you want to use ``get_d
 You can turn on and off individual parts of the reconstruction. I advise to train with the all parts, and then turn off the parts you don't need in the application.
 
 Another interesting configuration is given by ``get_fr_channels``, which will return a configuration which is equivalent to the original Full Reconstruction algorithm used by Belle
-
-Keep in mind, you can write your own configuration. E.g. for :math:`B_{s}` particles
 
 In the training and application steering file you probably will use:
 
@@ -176,6 +230,7 @@ Most stages consists of:
  The FEI will reconstruct these 7 stages during the training phase,  since the stages depend on one another, you have to run basf2 multiple (7) times on the same data to train all the necessary multivariate classifiers.
 
 Since running a 7-phase training by hand would be very difficult there is a tool which implements the training (including distributing the jobs on a cluster, merging the training files, running the training, ...)
+
 
 Training the FEI
 ################
@@ -270,61 +325,6 @@ The FEI algorithm itself just assumes that the DataStore already contains a vali
 
 You can find up to date examples for training the specific or generic FEI, for the cases of Belle II of Belle converted data / MC in ``analysis/examples/FEI``.
 
-Applying the FEI
-################
-
-
-Just include the ``feistate.path`` create by the ``fei.get_path()`` function in your steering file.
-
-The weightfiles are automatically loaded from the condition database. This might take some time. You can also copy the localdb of the training (or another local database containing the weightfiles) in your working directory by hand to speed up the execution.
-
-After the FEI path the following lists are available
-
-*    B+:generic (hadronic tag)
-*    B+:semileptonic (semileptonic tag)
-*    B0:generic (hadronic tag)
-*    B+:semileptonic (semileptonic tag)
-
-Each candidate has three extra infos which are interesting:
-
-*    SignalProbability is the signal probability calculated using FastBDT
-*    decayModeID is the tag :math:`B` decay channel
-*    uniqueSignal marks all unique candidates (because some Bs can be reconstructed in more than one decay channel
-
-
-You can use a different decay channel configuration during the application. In particular you can omit decay-channels (e.g. the semileptonic if your are only interested in the hadronic tag).
-However, it is not possible to add new channels without training them first (obviously).
-
-You can find up to date examples in ``analysis/examples/FEI``. 
-If you encounter problems which require debugging in the FEI algorithm, the best starting point is to enable the monitoring, by choosing ``monitor=True`` in the FEIConfiguration. This will create a lot of root files containing histograms of interesting variables throughout the process (e.g. MC truth before and after all the cuts). You can also create a pdf using the root files produced by the monitoring and the "Summary.pickle" file produced by the original training by executing:
-
-``basf2 fei/latexReporting.py > summary.tex``
-
-FEI and the condition database
-##############################
-
-The FEI is frequently retrained and updated to give the best performance with the latest reconstruction, etc. You will need to use the relevant database in which the FEI training weights are located. 
-FEI training weights are distributed by the `basf2.conditions` database under an `analysis global tag <https://confluence.desy.de/x/MhqdAw>`_.
-In order to find the latest, recommended FEI training, you can use the `b2conditionsdb-recommend` tool.
-
-``b2conditionsdb-recommend input_file.mdst.root``
-
-This tool will tell you all tags you should use. For the FEI we are only concerned with the analysis tag.
-Analysis tags are named ``analysis_tools_XXXX``.
-You will need to prepend this tag to your global tags list.
-This is done inside the FEI steering script.
-
-.. code-block:: python3
-
-        import basf2
-        import fei
-
-        basf2.conditions.prepend_globaltag("analysis_tools_XXXX")
-        conf = fei.config.FeiConfiguration(prefix="foo", ...)
-        
-Note that when running on Belle converted data or MC you will need to use the ``B2BII`` and ``B2BII_MC`` database tags, respectively.
-
-If you have trouble finding the correct analysis tag, please ask a question at `B2Questions <https://questions.belle2.org>`_ and/or send a mail to frank.meier@belle2.org,
 
 Troubleshooting
 ###############
@@ -405,47 +405,6 @@ The FEI is optimized for maximum speed, but the default configuration is not sui
 
 With FEIv4 you don't need to re-train anything if you apply the above mentioned changes. Deactivating channels and tightening cuts is fine. For instance, I made a large study on the influence of the track-cut described above, and it doesn't matter at all if you use choose a different cut than the one used during the training.
 
-Area for Future design and Problem Description [for developers]
-###############################################################
-
-Please state you're name so we know who to ask if we decide to adopt an idea.
-
-**Correct reweighting depends on the channel**
-
-The hierarchical approach used (see ref 1) means, that e.g. for a given B-channel all D-candidates are treated in the same way regardless of the presumed subsequent decay of the D-Meson. For this to be possible, one needs to know the probability of a D-candidate to be true D-meson independent of its channel. In the Belle Full Reconstruction, this was achieved by training all D-channels with 50% signal 50% background and then reweighting this according to the signal fraction in generic B-anti-B-decays. After everything was done, as well the B-candidates were reweighted in such a way, that the output of the multivariate method used had the meaning of a probability in case of such generic decays. However, in most analysis we don't have just a tag-side, but a pretty stringent signal-side and/or total event requirement (let's say a muon and no additional tracks apart from that muon and the tag-side B-candidate). This means, that there are massive changes in the accepted data sample, that enrich true tag-B-candidates and prevent the output to be interpreted as such a probability. Worse, the additional enrichment of B-mesons depends on the full decay chain of the B-meson. The result in the Belle case was, that a typical cut on the B "probability" was 10**(-5), essentially all candidates that were seriously considered in the Full Reconstruction have been taken. Still, the dominant backgrounds e.g. in the B --> h nu nu analysis (ref 3, see chapter 5.7) are from correctly reconstructed tag side B-mesons. From this we conclude,
-
-*    we should try to get considerably more inclusive,
-*    if we do so, we should try to fix the misestimation of probabilities as much as possible.
-
-The enrichment is considerably higher for channels with a high number of final state particles, as in the generic B-decays there are many final particles in the detector and therefore channels with a high number of final state particles have a huge number of combinatorial candidates.
-
- 
-Possible solutions:
-
-One thing we though about, is essentially taking the signal side out first and retrain the Full Reconstruction newly for every analysis. Lets consider the case B0 --> K* nu nu. We would create training sample from looking into each MDST file construct K* mesons with some additional requirements e.g. on their momentum and afterwards take the rest of the event. So the signal MC contains then exactly one additional B Meson. But still for the background we have the generic B Bbar events... So what to do?
-
-*    Get rid of the hierarchical approach and train every of the several 1000 possible final states separately. This will be not possible due to CPU resources, but lets continue this idea for a moment to understand where we would like to go in an ideal world. If we would this, we could apply as well event cuts directly at the construction of tag-side candidates for the training. E.g. for the tag-side channel B --> D (K pi) pi, we would require, that apart from our K* on the signal side and the tag-side B-candidate no additional good quality tracks would be in the event and lets say no more than one good neutral pion. This would throw out most of the background before we even start to take any properties of the tag-side B itself into account and would make the number of combinations as well reasonable for much more complicated tag sides, lets say B --> D (K pi pi pi0) pi pi pi0 with 7 final state hadrons. While this approach can not be the final one, we could still do it for a couple of channels and test the efficiency of hierarchical approaches against this perfect approach.
-*    The intermediate step biased most by varying amounts of additional particles in the detector will be the construction of intermediate resonances like D mesons. So one possibility would be to group D trainings according to some criteria. One possibility would be to make separate D channel trainings dependent on the number of additional tracks (or good pi0) in the detector. This would increase the number of D trainings by a factor N, if we accept B channels of the type B --> D N pi and might be still workable. However, the number of additional D candidate combinations, depends not only on the additional particles, but on the D channel itself... and of course the way the background changes with additional tracks may depend on the number of tracks, that are already used for the D meson itself.
-*    There could as well be solutions with iterative methods, but if the central problem is background statistics from MC with non-hierarchical approaches, this becomes as well difficult.
-
-Cloudy ideas:
-
-*    We could use vertexing to a priori exclude tracks or defining the signal side as having to be incompatible with a vertex of the rest of event etc. for defining the training sample...
- 
-More Inclusivity
-Accepting neutral Pions with only one Gamma found
-
-
-**Martin**: The efficiency of gammas isn't that high. Therefore the channels with pi0s suffer heavily. One way to handle this is, to take a good gamma, that doesn't form a good pi0 with any other good gamma as a pi0 and use this e.g. to form D-candidates. In this case the invariant mass of the D-candidate will get a lot less well defined. On the other hand, in each later stage (D*, B) you can calculate what kind photons would have to be missed in order for the found photon to be part of the D-candidate. One can then assign a probability of this to happen (e.g. a high energy photon in the center of the barrel is unlikely to be missed). In the end, the loss of a low energy photon shouldn't have to a big effect on the momentum estimation of the B or its m_BC.
-The BaBar approach (no complete pi0 handling, bad deltaE)
-
-**Martin**: In the BaBar case, only Ds were really fully reconstructed. To make a B-candidate charged pions were added to a D-candidate so long, that adding one more charged pion would bring the invariant mass above the one of a B meson or something like that. In that sense the neutral pions are not fully considered?! However, we could think as well of handling event, where we found a good D-candidate, but no B-candidate somehow.
-
-**Thomas**: The user has access to all intermediate ParticleLists of the FEI e.g. D0:generic, D+:generic. So implementing such a approach is relatively easy. However, the FEI already reconstructs B mesons in the channels B -> D(*) n*pi , where n is 1,2,3 and we allow missing intermediate resonances. We could change the signal-definition and create something like B0:incompletepi0. In fact one just has to change the configuration, not the algorithm itself.
-Deep neural network approach
-
-**Thomas**: First studies of deep neural networks for FlavourTagging show impressive results. We could employ a deep neural network as an orthogonal ansatz for tagging. Such a deep neural networks look at all the 4-momenta and pid information in the ROE and return a signal-probability for this B candidate. Maybe it turns out that the specific FEI (which explicitly reconstructs all intermediate stages) and the deep neural network (which looks at the whole event at once) are complementary in a sense.
-Resources, Publications etc.
 
 Resources, Publications etc.
 ############################

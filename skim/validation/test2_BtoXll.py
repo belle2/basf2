@@ -15,10 +15,6 @@ import modularAnalysis as ma
 from stdCharged import stdK
 from stdCharged import stdMu
 
-from ROOT import gROOT
-import sysconfig
-
-gROOT.ProcessLine(".include " + sysconfig.get_path("include"))
 # the variables that are printed out are: Mbc and deltaE
 
 my_path = b2.Path()

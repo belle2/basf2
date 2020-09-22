@@ -84,12 +84,9 @@ def select_files(all_input_files, min_events, max_processed_events_per_file):
         if not total_events_in_file:
             # Uh Oh! Zero event file, skip it
             continue
-        events_contributed = 0
-        if total_events_in_file < max_processed_events_per_file:
-            # The file contains less than the max amount we have set (entrySequences)
-            events_contributed = total_events_in_file
-        else:
-            events_contributed = max_processed_events_per_file
+
+        events_contributed = min(total_events_in_file, max_processed_events_per_file)
+
         chosen_files.append(new_file_choice)
         total_events += events_contributed
 
@@ -108,7 +105,7 @@ def create_std_path():
 
     path = basf2.create_path()
     path.add_module('Progress')
-    path.add_module('RootInput')  # , branchNames=input_branches, entrySequences=['0:5000'])
+    path.add_module('RootInput')
     path.add_module('Gearbox')
     path.add_module('Geometry')
     raw.add_unpackers(path)
@@ -118,13 +115,6 @@ def create_std_path():
         pruneTracks=False,
         skipGeometryAdding=True,
     )
-    tmp = basf2.create_path()
-    for m in path.modules():
-        if m.name() == "PXDPostErrorChecker":
-            m.param('CriticalErrorMask', 0)
-        if m.name() == "SVDSpacePointCreator":
-            m.param("MinClusterTime", -999)
-        tmp.add_module(m)
     path.add_module('DAFRecoFitter')
     return path
 
@@ -138,7 +128,7 @@ def create_cosmics_path():
     path = basf2.create_path()
     path.add_module('Progress')
     # Remove all non-raw data to run the full reco again
-    path.add_module('RootInput')  # , branchNames=input_branches, entrySequences=['0:5000'])
+    path.add_module('RootInput')
     path.add_module('Gearbox')
     path.add_module('Geometry')
     path.add_module(
@@ -158,13 +148,7 @@ def create_cosmics_path():
         data_taking_period='early_phase3',
         merge_tracks=True
     )
-    tmp = basf2.create_path()
-    for m in path.modules():
-        if m.name() == "PXDPostErrorChecker":
-            m.param('CriticalErrorMask', 0)
-        if m.name() == "SVDSpacePointCreator":
-            m.param("MinClusterTime", -999)
-        tmp.add_module(m)
+
     path.add_module('SetRecoTrackMomentum', automatic=True)
     path.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
 

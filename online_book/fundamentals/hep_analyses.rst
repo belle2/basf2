@@ -18,22 +18,6 @@ HEP Analyses
 
 In this section you will learn the basic concepts underlying an analysis at BelleII, starting from how the data aquisition works and ending to the description of the most common analysis concepts.
 
-
-
-Cut and counts
---------------
-
-Almost regardless of the quantity you are going to measure in your analysis, you will have to face some basic problems: select events you want to study (the signal) over similar events that mimic them (the background), estimate efficiency of such  selection and, possibly, estimate the intrinsic resolution on the quantities will measure, and finally cound how many signal events you observe.
-
-The most basic way to select a signal is to apply what in jargon are called "cuts". A cut is nothing but selection, usually binary, over one quantity that has some separation power between signal and background. Of course multiples cuts can be applied in sequence, leading to quite effective background reactions. 
-Before deciding on the seleciton cirteria however, one must define the variable that will be used to count of many signal events are left. A good variable has a very peaking distribution for signal, and a smooth, uniform distribution for the background.
-
-Example Here. D*? Pi0? Need to run some simulation
-
-
-The HEP workflow
-----------------
-
 The workflow that goes from the data taking to the publication of a measurement at an HEP experiment is quite complex, and involves multiple steps that can take months ore even years. 
 While the detail of this procedure can be extremely complex and tedious the overall picture is simple enough to be fitted in a human-readable scheme:
 
@@ -43,7 +27,20 @@ While the detail of this procedure can be extremely complex and tedious the over
 
 Starting from the very end, you can see that the input to the analysis are reconstructed, skimmed events, coming either from the actual data taking or from the generation of simulated events. The skmming is necessary to reduce the size of the dataset and significantly simplify and speed-up the analysis.  The reconstruction step is the same for both real and simulated data to minimize the differences between the two, except that the data need to be first calibrated.
 
-The rest of this section will quickly go through each of the for block in thiw the workflow is split, covering the very basic concepts and deferring most of the technical expalations about how the software works to the other chapters.
+The rest of this section will quickly go through each of the four blocks in which the workflow is split, covering the very basic concepts and deferring most of the technical expalations about how the software works to the other chapters.
+
+
+
+
+Intro: Cut and count
+--------------------
+
+Almost regardless of the quantity you are going to measure in your analysis, you will have to face some basic problems: select events you want to study (the signal) over similar events that mimic them (the background), estimate efficiency of such  selection and, possibly, estimate the intrinsic resolution on the quantities will measure, and finally cound how many signal events you observe.
+
+The most basic way to select a signal is to apply what in jargon are called "cuts". A cut is nothing but selection, usually binary, over one quantity that has some separation power between signal and background. Of course multiples cuts can be applied in sequence, leading to quite effective background reactions. 
+Before deciding on the selection criteria however, one must define the variable that will be used to count of many signal events are left. A good variable has a very peaking distribution for signal, and a smooth, uniform distribution for the background.
+
+Example Here. D*? Pi0? Need to run some simulation.
 
 
 

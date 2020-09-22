@@ -156,6 +156,9 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_line_error->SetLineWidth(3);
   m_line_error->SetLineStyle(7);
 
+  m_monObj->addCanvas(m_cEffAll);
+  m_monObj->addCanvas(m_cEffAllUpdate);
+
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");

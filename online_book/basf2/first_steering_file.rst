@@ -154,6 +154,10 @@ necessary to call `fillParticleList` for ``e+`` and ``e-``. In fact, you will
 see a warning message for the second call telling you that the corresponding
 particle list already exists.
 
+As long as no selection criteria (cuts) are provided, the only difference
+between loading different charged final state particle types is the mass
+hypothesis used in the track fit.
+
 Each particle used in the ``decayString`` argument of the `fillParticleList`
 function can be extended with a label. This is useful to distinguish between
 multiple lists of the same particle type with different selection criteria,
@@ -208,6 +212,10 @@ of the decay mode you are studying, it is recommended to use them for V0s
 
     `012_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/012_first_steering_file.py>`_
 
+    In the solution we gave the electrons the label ``uncorrected``. This is
+    already in anticipation of a future extension in which Bremsstrahlung
+    recovery will be applied (:ref:`onlinebook_various_additions`).
+
 Now we have a steering file in which final state particles are loaded from the
 input mdst file to particle lists. One of the most powerful modules of the
 analysis software is the `ParticleCombiner`. It takes those particle lists and
@@ -221,7 +229,27 @@ at least one final state particle.
 The wrapper function for the ParticleCombiner is called `reconstructDecay`.
 Its first argument is a `DecayString`, which is a combination of a mother
 particle (list), an arrow, and daughter particles. The `DecayString` has its
-own grammar with several markers, keywords, and arrow types.
+own grammar with several markers, keywords, and arrow types. It is especially
+useful for inclusive reconstructions. Follow the provided link if you want to
+learn more about the `DecayString`. For the purpose of this tutorial we do not
+need any of those fancy extensions, the default arrow type ``->`` suffices.
+However, it is important to know how the particles themselves need to be
+written in the decay string.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    How do we have to type a :math:`J/psi`? Find out by scrolling through
+    ``$BELLE2_EXTERNALS_DIR/share/evtgen/evt.pdl`` or
+    ``$BELLE2_RELEASE_DIR/decfiles/dec/DECAY_BELLE2.DEC``
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    The :math:`J/psi` has to be typed ``J/psi``. Whenever you misspell a
+    particle name in a decay string, there will be an error message telling
+    you that it is unknown. In that case, go back to one of the files of this
+    exercise to figure out the correct spelling.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -239,6 +267,65 @@ own grammar with several markers, keywords, and arrow types.
     :class: toggle solution
 
     `013_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/013_first_steering_file.py>`_
+
+    In the solution we introduced a loose selection for the electrons using
+    particle identification (`electronID`), requiring the tracks to originate
+    from close to the interaction point (`dr` and `dz`), and having a polar
+    angle in the acceptance of the CDC (`thetaInCDCAcceptance`).
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Find out what's the difference between ``dr`` and ``dz``, e.g. why do we
+    not have to explicitly ask for the absolute value of dr, and the angular
+    range of the CDC acceptance (as implemented in the software).
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The documentation of `dr` and `dz` should tell you all about the first
+    question. The angular range is a bit trickier. You have to directly
+    inspect the source code of the variable defined in the variables folder of
+    the analysis package. There has been an exercise on how to find the source
+    code in :ref:`onlinebook_basf2basics_gettingstarted`.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    The variable `dr` gives the transverse distance, while `dz` is the
+    z-component of the point of closesest approach (POCA) with respect to the
+    interaction point (IP). Components are signed, while distances are
+    magnitudes. 
+
+    The polar range of the CDC acceptance is :math:`17^\circ < \theta <
+    150^\circ` as written `here
+    <https://stash.desy.de/projects/B2/repos/software/browse/analysis/variables/src/AcceptanceVariables.cc#25>`_
+
+To separate signal from background and extract physics parameter, an offline
+analysis has to be performed. The final step of the steering file is to write
+out information in a so called ntuple using `variablesToNtuple`. It can contain
+one entry per candidate or one entry per event.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    How do you switch between the two ntuple modes?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Look at the documentation of `variablesToNtuple`.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    When providing an empty decay string, an event-wise ntuple will be created.
+
+.. warning::
+    
+    Only variables declared as ``Eventbased`` are allowed in the event mode.
+    Conversely, both candidate and event-based variables are allowed in the
+    candidate mode.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -278,7 +365,8 @@ own grammar with several markers, keywords, and arrow types.
 .. admonition:: Task
     :class: exercise stacked
 
-    Save all kinematics information, both the truth and the reconstructed values, of the B meson to the ntuple.
+    Save all kinematics information, both the truth and the reconstructed
+    values, of the B meson to the ntuple.
 
 .. admonition:: Hint
     :class: toggle xhint stacked

@@ -16,18 +16,30 @@ HEP Analyses
         * Learn everything you need in order to undertsand
           what the software is supposed to do.
 
-In this section you will learn the basic concepts underlying an analysis at BelleII, starting from how the data aquisition works and ending to the description of the most common analysis concepts.
+In this section you will learn the basic concepts underlying an analysis at BelleII, 
+starting from how the data aquisition works and ending to the description of 
+the most common analysis concepts.
 
-The workflow that goes from the data taking to the publication of a measurement at an HEP experiment is quite complex, and involves multiple steps that can take months ore even years. 
-While the detail of this procedure can be extremely complex and tedious the overall picture is simple enough to be fitted in a human-readable scheme:
+The workflow that goes from the data taking to the publication of a measurement at 
+an HEP experiment is quite complex, and involves multiple steps that can take months 
+or even years. 
+While the detail of this procedure can be extremely complex and tedious the overall 
+picture is simple enough to be fitted in a human-readable scheme:
 
 .. figure:: grand_scheme_of_hep.png
   :width: 40em
   :align: center
 
-Starting from the very end, you can see that the input to the analysis are reconstructed, skimmed events, coming either from the actual data taking or from the generation of simulated events. The skmming is necessary to reduce the size of the dataset and significantly simplify and speed-up the analysis.  The reconstruction step is the same for both real and simulated data to minimize the differences between the two, except that the data need to be first calibrated.
+Starting from the very end, you can see that the input to the analysis are 
+reconstructed, skimmed events, coming either from the actual data taking or from the 
+generation of simulated events. The skmming is necessary to reduce the size of the 
+dataset and significantly simplify and speed-up the analysis.  The reconstruction 
+step is the same for both real and simulated data to minimize the differences 
+between the two, except that the data need to be first calibrated.
 
-The rest of this section will quickly go through each of the four blocks in which the workflow is split, covering the very basic concepts and deferring most of the technical expalations about how the software works to the other chapters.
+The rest of this section will quickly go through each of the four blocks in which 
+the workflow is split, covering the very basic concepts and deferring most of the 
+technical expalations about how the software works to the other chapters.
 
 
 
@@ -35,10 +47,20 @@ The rest of this section will quickly go through each of the four blocks in whic
 Intro: Cut and count
 --------------------
 
-Almost regardless of the quantity you are going to measure in your analysis, you will have to face some basic problems: select events you want to study (the signal) over similar events that mimic them (the background), estimate efficiency of such  selection and, possibly, estimate the intrinsic resolution on the quantities will measure, and finally cound how many signal events you observe.
+Almost regardless of the quantity you are going to measure in your analysis, you 
+will have to face some basic problems: select events you want to study (the 
+signal) over similar events that mimic them (the background), estimate efficiency 
+of such  selection and, possibly, estimate the intrinsic resolution on the 
+quantities will measure, and finally cound how many signal events you observe.
 
-The most basic way to select a signal is to apply what in jargon are called "cuts". A cut is nothing but selection, usually binary, over one quantity that has some separation power between signal and background. Of course multiples cuts can be applied in sequence, leading to quite effective background reactions. 
-Before deciding on the selection criteria however, one must define the variable that will be used to count of many signal events are left. A good variable has a very peaking distribution for signal, and a smooth, uniform distribution for the background.
+The most basic way to select a signal is to apply what in jargon are called "cuts". 
+A cut is nothing but selection, usually binary, over one quantity that has some 
+separation power between signal and background. Of course multiples cuts can be 
+applied in sequence, leading to quite effective background reactions. 
+Before deciding on the selection criteria however, one must define the variable 
+that will be used to count of many signal events are left. A good variable has a 
+very peaking distribution for signal, and a smooth, uniform distribution for the 
+background.
 
 Example Here. D*? Pi0? Need to run some simulation.
 
@@ -48,11 +70,23 @@ Example Here. D*? Pi0? Need to run some simulation.
 Data taking: The detector
 -------------------------
 
-If you are reading this manual, you are probably already at least partially familiar with the general layout of the BelleII experiment. However, before moving on, let's very quicly review its structure.
-Belle II has several sub-system, each one dedicate to a specific task: reconstructiong the trajectory of charged track, reconstruct the energy of photons, identify the particle type, identify muons and reconstruct long-living hadrons. Of course some systems can be used for multiple purposes: the ECL is mainly intended as a device to recontruct photons, but is also used to identify electrons and hadrons.
+If you are reading this manual, you are probably already at least partially 
+familiar with the general layout of the BelleII experiment. However, before 
+moving on, let's very quicly review its structure.
+Belle II has several sub-system, each one dedicate to a specific task: 
+reconstructiong the trajectory of charged track, reconstruct the energy of photons, 
+identify the particle type, identify muons and reconstruct long-living hadrons. 
+Of course some systems can be used for multiple purposes: the ECL is mainly 
+intended as a device to recontruct photons, but is also used to identify 
+electrons and hadrons.
 
 * Beam Pipe
-  The beam pipe itself is not an anctive part of the detector, but plays the crucial role of separating the detectro from the interaction region, which is located in the low-pressure vacuum of the superKEKB rings. It is a cilindrical pipe designed to be as think as possible in order to minimize the particle's energy loss in it,but it also assolves the scope of absorbing part of the soft X-rays emitted by the beams, that rapresent a major source of noise for the innermost detector, the PXD. 
+  The beam pipe itself is not an anctive part of the detector, but plays the crucial 
+  role of separating the detector from the interaction region, which is located in 
+  the low-pressure vacuum of the superKEKB rings. It is a cilindrical pipe designed 
+  to be as think as possible in order to minimize the particle's energy loss in it,
+  but it also assolves the scope of absorbing part of the soft X-rays emitted by 
+  the beams, that rapresent a major source of noise for the innermost detector, the PXD. 
 
 * PXD
   The first active system met by the particles that are emerging form the IP is the PiXel Detector (PXD)
@@ -74,11 +108,13 @@ Data taking: on resonance, continuum, comics
 Data taking: Triggers and filters
 ---------------------------------
  
-During the data taking, each sub-detector constantly acquires data according the the modes and specifications of its front-end electronics. This mass of data, however, cannot be written directly to disk as a constrant stream to be later sorted out, because it would require a comical amount of resources and bandwidth from the detector to the offline disks.  
-For this reason the data are aquired only when a potentially interesting even is seen in the detector, and several level of filtering are applied during the data processing before the end-users, the analysist, can run their analysis jobs on them. Whet follows is a very simplified explanation of the process the leads from the physic event to the data you can analyze.
+During the data taking, each sub-detector constantly acquires data according the modes and specifications of its front-end electronics. This mass of data, however, cannot be written directly to disk as a constrant stream to be later sorted out, because it would require a comical amount of resources and bandwidth from the detector to the offline disks.  
+For this reason the data are aquired only when a potentially interesting even is seen in the detector, and several level of filtering are applied during the data processing before the end-users, the analysist, can run their analysis jobs on them. 
+What follows is a very simplified explanation of the process the leads from the physic event to the data you can analyze.
  
 The systems that are involved in the data taking are the Data AQuisition (DAQ), the TRiGger (TRG, also known as L1) and the High Level Trigger (HLT). Collectively, they are often referred as the Online system.
-During the data taking
+
+During the data taking [...]
 
 
 Simulation: the Montecarlo
@@ -99,9 +135,8 @@ Descibe here:
 * What is the reconstruction
 * Example 1: tracking (short)
 * Example2: clustering (?)
-* Why do we need to run the reconstruction separately from teh analysis? Mention that resources are very not infinite
-
-
+* Why do we need to run the reconstruction separately from teh analysis? 
+  Mention that resources are very not infinite
 
 
 

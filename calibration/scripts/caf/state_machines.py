@@ -888,7 +888,7 @@ class CalibrationMachine(Machine):
         list_dependent_databases = []
         for dependency in self.calibration.dependencies:
             database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
-            B2INFO(f"Adding local database from {dependancy.name} for use by {self.calibration.name}.")
+            B2INFO(f"Adding local database from {dependency.name} for use by {self.calibration.name}.")
             list_dependent_databases.append((os.path.join(database_dir, 'database.txt'), database_dir))
 
         # Add previous iteration databases from this calibration

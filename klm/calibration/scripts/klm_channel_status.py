@@ -412,15 +412,15 @@ class KLMChannelStatus(AlgorithmStrategy):
                         newNormalChannels(run_data[i + 1][3].getModuleStatus())
                     basf2.B2INFO('There are %d new active modules in run %d '
                                  'relatively to run %d.' %
-                                 (new_planes_next, run_data[i][0],
+                                 (new_modules_next, run_data[i][0],
                                   run_data[i + 1][0]))
                 if (i > 0):
                     new_modules_previous = run_data[i][3].getModuleStatus(). \
                         newNormalChannels(run_data[i - 1][3].getModuleStatus())
                     basf2.B2INFO('There are %d new active modules in run %d '
                                  'relatively to run %d.' %
-                                 (new_planes_previous,
-                                  run_data[i][0], run_data[i - 1][0]))
+                                 (new_modules_previous, run_data[i][0],
+                                  run_data[i - 1][0]))
                 run_for_merging = -1
                 # If a forced merge of the normal run with another run from
                 # a different range of runs with not enough data has already

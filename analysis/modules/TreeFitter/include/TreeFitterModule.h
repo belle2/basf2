@@ -10,6 +10,11 @@
 #pragma once
 #include <framework/core/Module.h>
 
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+
 namespace Belle2 {
   class Particle;
 
@@ -38,6 +43,9 @@ namespace Belle2 {
 
     /** plot ascii art and statistics */
     void plotFancyASCII();
+
+    /** input particle list */
+    StoreObjPtr<ParticleList> m_plist;
 
     /**   name of the particle list fed to the fitter  */
     std::string m_particleList;

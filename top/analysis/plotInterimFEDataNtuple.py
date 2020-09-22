@@ -12,7 +12,7 @@ import sys
 import time
 from basf2 import *
 from ROOT import gROOT
-gROOT.SetBatch(True)
+gROOT.SetBatch(True)  # noqa
 from ROOT import gStyle, gPad, TFile, TTree, TStyle, TCanvas, TH1F, TH2F, TF1, TLegend, TAxis, TPaveStats, TLatex, TLine, TArrow
 
 

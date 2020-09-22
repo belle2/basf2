@@ -1,3 +1,12 @@
+from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
+import bisect
+from datetime import datetime
+import subprocess
+import numpy as np
+import matplotlib.cm as cmx
+import matplotlib.colors as colors
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
 import basf2
 import ROOT
 from ROOT import Belle2
@@ -5,17 +14,6 @@ from ROOT import Belle2
 from ROOT import gSystem
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
-
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.colors as colors
-import matplotlib.cm as cmx
-import numpy as np
-import subprocess
-from datetime import datetime
-import bisect
-
-from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 
 
 class QuadTreePlotter(basf2.Module):
@@ -66,8 +64,8 @@ class QuadTreePlotter(basf2.Module):
         x_edges = np.array([xAxis.GetBinLowEdge(iX) for iX in range(1, xAxis.GetNbins() + 2)])
         y_edges = np.array([yAxis.GetBinLowEdge(iY) for iY in range(1, yAxis.GetNbins() + 2)])
 
-        l = np.array([[hist.GetBinContent(iX, iY) for iY in range(1, yAxis.GetNbins() + 1)]
-                      for iX in range(1, xAxis.GetNbins() + 1)])
+        arr_l = np.array([[hist.GetBinContent(iX, iY) for iY in range(1, yAxis.GetNbins() + 1)]
+                          for iX in range(1, xAxis.GetNbins() + 1)])
 
         hist = input_file.Get("histUnused")
 
@@ -82,7 +80,7 @@ class QuadTreePlotter(basf2.Module):
 
         cmap = sb.cubehelix_palette(8, start=2, rot=0, dark=0, light=1, reverse=False, as_cmap=True)
 
-        plt.gca().pcolorfast(x_edges, y_edges, (l + l2).T, cmap=cmap)
+        plt.gca().pcolorfast(x_edges, y_edges, (arr_l + l2).T, cmap=cmap)
 
         x_labels = ["{1:0.{0}f}".format(int(not float(x).is_integer()), x) if i % 4 == 0 else "" for i, x in enumerate(x_edges)]
         plt.xticks(x_edges, x_labels)
@@ -410,8 +408,8 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         a hit belongs to
         """
         z0 = [self.range_y_min, self.range_y_max]
-        l = np.array((np.array(recoHit3D.getRecoPos3D().z()) - z0) / recoHit3D.getArcLength2D())
-        return l, z0
+        arr_l = np.array((np.array(recoHit3D.getRecoPos3D().z()) - z0) / recoHit3D.getArcLength2D())
+        return arr_l, z0
 
     def plot_hit_line(self, recoHit3D, color):
         """
@@ -421,8 +419,8 @@ class StereoQuadTreePlotter(QuadTreePlotter):
             if recoHit3D.getStereoType() == 0:
                 return
 
-            l, z0 = self.get_plottable_line(recoHit3D)
-            plt.plot(l, z0, marker="", ls="-", alpha=0.4, color=color)
+            arr_l, z0 = self.get_plottable_line(recoHit3D)
+            plt.plot(arr_l, z0, marker="", ls="-", alpha=0.4, color=color)
 
     def event(self):
         """
@@ -494,8 +492,8 @@ class StereoQuadTreePlotter(QuadTreePlotter):
                     recoHit3D = self.create_reco_hit3D(cdcHit, trajectory, mcHitLookUp.getRLInfo(cdcHit))
 
                     if recoHit3D:
-                        l = (recoHit3D.getRecoPos3D().z() - z0) / recoHit3D.getArcLength2D()
-                        plt.plot(l, z0, marker="o", color=map[mcTrackID % len(map)], ls="", alpha=0.2)
+                        arr_l = (recoHit3D.getRecoPos3D().z() - z0) / recoHit3D.getArcLength2D()
+                        plt.plot(arr_l, z0, marker="o", color=map[mcTrackID % len(map)], ls="", alpha=0.2)
 
         if self.draw_track_hits:
             for id, track in enumerate(track_vector):

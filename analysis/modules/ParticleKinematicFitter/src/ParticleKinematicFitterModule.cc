@@ -29,7 +29,6 @@
 
 // analysis dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 
 // analysis utilities
 #include <analysis/utility/PCmsLabTransform.h>
@@ -83,7 +82,6 @@ namespace Belle2 {
 
     }
 
-
     void ParticleKinematicFitterModule::initialize()
     {
       m_eventextrainfo.registerInDataStore();
@@ -92,17 +90,8 @@ namespace Belle2 {
         m_decaydescriptor.init(m_decayString);
         B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
       }
-    }
 
-
-    void ParticleKinematicFitterModule::beginRun()
-    {
-      B2INFO("ParticleKinematicFitterModule::beginRun");
-    }
-
-    void ParticleKinematicFitterModule::endRun()
-    {
-      B2INFO("ParticleKinematicFitterModule::endRun");
+      m_plist.isRequired(m_listName);
     }
 
     void ParticleKinematicFitterModule::terminate()
@@ -110,22 +99,15 @@ namespace Belle2 {
       B2INFO("ParticleKinematicFitterModule::terminate");
     }
 
-
     void ParticleKinematicFitterModule::event()
     {
       B2DEBUG(17, "ParticleKinematicFitterModule::event");
 
-      StoreObjPtr<ParticleList> plist(m_listName);
-      if (!plist) {
-        B2ERROR("ParticleList " << m_listName << " not found");
-        return;
-      }
-
-      unsigned int n = plist->getListSize();
+      unsigned int n = m_plist->getListSize();
 
       for (unsigned i = 0; i < n; i++) {
 //       Particle* particle = const_cast<Particle*> (plist->getParticle(i));
-        Particle* particle = plist->getParticle(i);
+        Particle* particle = m_plist->getParticle(i);
 
         if (m_updateDaughters == true) {
           if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
@@ -138,7 +120,6 @@ namespace Belle2 {
       }
 
     }
-
 
     bool ParticleKinematicFitterModule::doKinematicFit(Particle* mother)
     {

@@ -440,7 +440,7 @@ namespace Belle2 {
 
       if (!particle) { return std::numeric_limits<double>::quiet_NaN(); }
 
-      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle = particle->getMCParticle();
       if (!mcparticle) { return std::numeric_limits<double>::quiet_NaN(); }
 
       const Belle2::Track* track = particle->getTrack();

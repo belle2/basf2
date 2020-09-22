@@ -11,12 +11,12 @@
 
 import sys
 
+import basf2
+from reconstruction import add_mdst_output
+
 rootFileName = '../DSTtoMDST'
 logFileName = rootFileName + '.log'
 sys.stdout = open(logFileName, 'w')
-
-import basf2
-from reconstruction import add_mdst_output
 
 main = basf2.create_path()
 input = basf2.register_module('RootInput')

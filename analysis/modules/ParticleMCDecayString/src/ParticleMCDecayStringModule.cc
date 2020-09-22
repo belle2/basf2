@@ -10,16 +10,10 @@
 
 #include <analysis/modules/ParticleMCDecayString/ParticleMCDecayStringModule.h>
 
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <analysis/dataobjects/StringWrapper.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 #include <vector>
@@ -55,15 +49,13 @@ namespace Belle2 {
 
   void ParticleMCDecayStringModule::initialize()
   {
-    StoreObjPtr<ParticleList>().isRequired(m_listName);
+    m_pList.isRequired(m_listName);
 
     //This might not work for non-default names of Particle array:
-    StoreArray<Particle> particles;
-    particles.isRequired();
+    StoreArray<Particle>().isRequired();
 
-    StoreArray<StringWrapper> stringWrapperArray;
-    stringWrapperArray.registerInDataStore();
-    particles.registerRelationTo(stringWrapperArray);
+    m_stringWrapperArray.registerInDataStore();
+    StoreArray<Particle>().registerRelationTo(m_stringWrapperArray);
 
 
     // Initializing the output root file
@@ -99,11 +91,8 @@ namespace Belle2 {
   void ParticleMCDecayStringModule::event()
   {
 
-    StoreObjPtr<ParticleList> pList(m_listName);
-    StoreArray<StringWrapper> stringWrapperArray;
-
-    for (unsigned iParticle = 0; iParticle < pList->getListSize(); ++iParticle) {
-      Particle* particle = pList->getParticle(iParticle);
+    for (unsigned iParticle = 0; iParticle < m_pList->getListSize(); ++iParticle) {
+      Particle* particle = m_pList->getParticle(iParticle);
 
       const std::string decayString = getMCDecayStringFromMCParticle(particle->getRelatedTo<MCParticle>());
       std::string decayStringExtended = getDecayString(*particle); //removed const to allow string to be modified to a different format.
@@ -138,7 +127,7 @@ namespace Belle2 {
 
       m_decayString = decayStringExtended;
 
-      StringWrapper* stringWrapper = stringWrapperArray.appendNew();
+      StringWrapper* stringWrapper = m_stringWrapperArray.appendNew();
       particle->addRelationTo(stringWrapper);
       stringWrapper->setString(m_decayString);
 

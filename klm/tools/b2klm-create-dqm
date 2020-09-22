@@ -188,4 +188,5 @@ if __name__ == "__main__":
         command += f'--output {output_dqm_file} '
         command += f'--globaltags {globaltags_string} '
         basf2.B2INFO(f'The following command will be executed: {command}')
-        os.system(command)
+        if (os.system(command) != 0):
+            basf2.B2FATAL(f'The command "{command}" aborted during its execution.')

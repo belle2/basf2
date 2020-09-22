@@ -10,10 +10,10 @@
 </header>
 """
 
+from ROOT import Belle2, TNamed
+import ROOT
 contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
 
-import ROOT
-from ROOT import Belle2, TNamed
 
 input_file = ROOT.TFile('../CosmicsExtrapolation.root')
 output_file = ROOT.TFile('CosmicsExtrapolationPlots.root', 'recreate')
@@ -25,29 +25,29 @@ eklm_numbers = Belle2.EKLMElementNumbers.Instance()
 hist_xres = ROOT.TH1F('xres', 'Extrapolated hit X resolution', 100, -20, 20)
 hist_xres.SetXTitle('cm')
 hist_xres.SetYTitle('Events')
-l = hist_xres.GetListOfFunctions()
-l.Add(TNamed('Description', 'X resolution'))
-l.Add(TNamed('Check', 'No bias, resolution ~ 2 cm.'))
-l.Add(TNamed('Contact', contact))
-l.Add(TNamed('MetaOptions', 'shifter'))
+function_list = hist_xres.GetListOfFunctions()
+function_list.Add(TNamed('Description', 'X resolution'))
+function_list.Add(TNamed('Check', 'No bias, resolution ~ 2 cm.'))
+function_list.Add(TNamed('Contact', contact))
+function_list.Add(TNamed('MetaOptions', 'shifter'))
 # Y resolution histogram.
 hist_yres = ROOT.TH1F('yres', 'Extrapolated hit Y resolution', 100, -20, 20)
 hist_yres.SetXTitle('cm')
 hist_yres.SetYTitle('Events')
-l = hist_yres.GetListOfFunctions()
-l.Add(TNamed('Description', 'Y resolution'))
-l.Add(TNamed('Check', 'No bias, resolution ~ 2 cm.'))
-l.Add(TNamed('Contact', contact))
-l.Add(TNamed('MetaOptions', 'shifter'))
+function_list = hist_yres.GetListOfFunctions()
+function_list.Add(TNamed('Description', 'Y resolution'))
+function_list.Add(TNamed('Check', 'No bias, resolution ~ 2 cm.'))
+function_list.Add(TNamed('Contact', contact))
+function_list.Add(TNamed('MetaOptions', 'shifter'))
 # Z resolution histogram.
 hist_zres = ROOT.TH1F('zres', 'Extrapolated hit Z resolution', 100, -20, 20)
 hist_zres.SetXTitle('cm')
 hist_zres.SetYTitle('Events')
-l = hist_zres.GetListOfFunctions()
-l.Add(TNamed('Description', 'Z resolution'))
-l.Add(TNamed('Check', 'No bias, resolution ~ 2 cm.'))
-l.Add(TNamed('Contact', contact))
-l.Add(TNamed('MetaOptions', 'shifter'))
+function_list = hist_zres.GetListOfFunctions()
+function_list.Add(TNamed('Description', 'Z resolution'))
+function_list.Add(TNamed('Check', 'No bias, resolution ~ 2 cm.'))
+function_list.Add(TNamed('Contact', contact))
+function_list.Add(TNamed('MetaOptions', 'shifter'))
 
 for event in input_file.tree:
     bklmhit2ds = event.BKLMHit2ds

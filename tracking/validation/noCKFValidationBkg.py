@@ -10,17 +10,15 @@
 </header>
 """
 
+from tracking.validation.run import TrackingValidationRun
+import tracking
+import logging
+import basf2
 VALIDATION_OUTPUT_FILE = 'NoCKFValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-import basf2
 basf2.set_random_seed(1337)
-
-import logging
-import tracking
-
-from tracking.validation.run import TrackingValidationRun
 
 
 def setupFinderModule(path):

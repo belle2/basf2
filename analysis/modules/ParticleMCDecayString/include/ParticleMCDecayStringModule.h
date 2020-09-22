@@ -9,7 +9,12 @@
 
 #pragma once
 
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/dataobjects/StringWrapper.h>
+
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/SetMergeable.h>
 #include <framework/pcore/RootMergeable.h>
@@ -79,6 +84,9 @@ namespace Belle2 {
 
 
   private:
+
+    StoreObjPtr<ParticleList> m_pList; /**< input particle list */
+    StoreArray<StringWrapper> m_stringWrapperArray; /**< StoreArray of StringWrappers */
 
     std::string m_listName; /**< Name of the particle list **/
 

@@ -224,7 +224,7 @@ namespace Belle2 {
         return result;
 
       // check if mc match exists
-      const MCParticle* mcp = part->getRelated<MCParticle>();
+      const MCParticle* mcp = part->getMCParticle();
       if (mcp == nullptr)
         return result;
 
@@ -660,7 +660,7 @@ namespace Belle2 {
         s << "    ";
       }
       s << p->getPDGCode();
-      const MCParticle* mcp = p->getRelated<MCParticle>();
+      const MCParticle* mcp = p->getMCParticle();
       if (mcp) {
         unsigned int flags = MCMatching::getMCErrors(p, mcp);
         s << " -> MC: " << mcp->getPDG() << ", mcErrors: " << flags << " ("
@@ -686,7 +686,7 @@ namespace Belle2 {
     double particleMCMomentumTransfer2(const Particle* part)
     {
       // for B meson MC particles only
-      const MCParticle* mcB = part->getRelated<MCParticle>();
+      const MCParticle* mcB = part->getMCParticle();
 
       if (!mcB)
         return std::numeric_limits<double>::quiet_NaN();
@@ -838,7 +838,7 @@ namespace Belle2 {
 
     double recoilMCDecayType(const Particle* particle)
     {
-      auto* mcp = particle->getRelatedTo<MCParticle>();
+      auto* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<double>::quiet_NaN();

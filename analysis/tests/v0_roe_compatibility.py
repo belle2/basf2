@@ -34,7 +34,7 @@ testpath.add_module('ParticleCombiner',
 
 testpath.add_module('RestOfEventBuilder', particleList=signal_side_name,
                     particleListsInput=[fsp_tag_side])
-mask = ('cleanMask', '', '')
+mask = ('cleanMask', '', '', '')
 testpath.add_module('RestOfEventInterpreter', particleList=signal_side_name,
                     ROEMasks=mask)
 
@@ -61,5 +61,7 @@ roe_path.add_module('RestOfEventPrinter',
                     fullPrint=False)
 testpath.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
 ###############################################################################
+testpath.add_module('ParticlePrinter', listName=signal_side_name, fullPrint=False,
+                    variables=['nROE_Composites(cleanMask)'])
 
 process(testpath, 2)

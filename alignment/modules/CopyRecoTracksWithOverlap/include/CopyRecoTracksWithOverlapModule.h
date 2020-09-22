@@ -10,7 +10,11 @@
 
 #pragma once
 
+#include <analysis/dataobjects/ParticleList.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -32,12 +36,22 @@ namespace Belle2 {
 
   private:
     /// Check if RecoTrack has overlap hits -> if yes, copy to a new array
-    void processRecoTrack(const RecoTrack& track) const;
+    void processRecoTrack(const RecoTrack& track);
 
     /// Name of StoreArray with output RecoTracks with overlaps
     std::string m_overlapRecoTracksArrayName{"RecoTracksWithOverlap"};
+
     /// Name of particle list for which associated RecoTracks should be copied
-    std::string m_particleList{""};
+    std::string m_particleListName{""};
+
+    /// Tracks.
+    StoreArray<RecoTrack> m_RecoTracks;
+
+    /// Overlapping tracks.
+    StoreArray<RecoTrack> m_OverlappingRecoTracks;
+
+    /// Particle list.
+    StoreObjPtr<ParticleList> m_ParticleList;
 
   };
 }

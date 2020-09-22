@@ -14,10 +14,12 @@
 #include <string>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
-// DataStore
+// framework - DataStore
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // DataObjects
+#include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
 // KFit
@@ -68,6 +70,7 @@ namespace Belle2 {
 
   private:
 
+    StoreObjPtr<ParticleList> m_plist; /**< particle list */
     std::string m_listName;       /**< particle list name */
     double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */

@@ -167,7 +167,7 @@ namespace Belle2 {
 
     double isLambda(const Particle* particle)
     {
-      const MCParticle* mcparticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcparticle = particle->getMCParticle();
       // if (mcparticle ==nullptr)
       //  return 0.0;
       if (mcparticle != nullptr) {
@@ -369,7 +369,7 @@ namespace Belle2 {
       float BcpFlavor = 0;
 
       if (roe != nullptr) {
-        const MCParticle* BcpMC = particle->getRelatedTo<MCParticle>();
+        const MCParticle* BcpMC = particle->getMCParticle();
 
         if (Variable::isSignal(particle) > 0 && BcpMC != nullptr) {
           const MCParticle* Y4S = BcpMC->getMother();
@@ -416,9 +416,9 @@ namespace Belle2 {
       (void)particle;
       float outputB0tagQ = 0;
       if (roe.isValid()) {
-        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+        const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
         const MCParticle* Y4S = BcpMC->getMother();
-        const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+        const MCParticle* mcParticle = particle->getMCParticle();
         while (mcParticle != nullptr) {
           if (mcParticle->getMother() == Y4S) {
             if (mcParticle != BcpMC && TMath::Abs(mcParticle -> getPDG()) == 511) {
@@ -444,7 +444,7 @@ namespace Belle2 {
       int MCMatchingError = -1;
       if (roe.isValid()) {
         const Particle* Bcp = roe->getRelated<Particle>();
-        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+        const MCParticle* BcpMC = roe->getRelated<Particle>()->getMCParticle();
 
         MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
       }
@@ -537,7 +537,7 @@ namespace Belle2 {
         return std::numeric_limits<double>::quiet_NaN();
       }
 
-      const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+      const MCParticle* mcParticle = particle->getMCParticle();
 
       if (mcParticle == nullptr) return std::numeric_limits<double>::quiet_NaN();
 
@@ -990,7 +990,7 @@ namespace Belle2 {
 
         auto func = [index](const Particle * particle) -> double {
 
-          const MCParticle* mcParticle = particle->getRelated<MCParticle>();
+          const MCParticle* mcParticle = particle->getMCParticle();
           if (mcParticle == nullptr) return -2.0;
 
           int mcPDG = TMath::Abs(mcParticle->getPDG());
@@ -1185,7 +1185,7 @@ namespace Belle2 {
           float qTarget = particle -> getCharge();
           float qMC = Variable::isRestOfEventB0Flavor(nullParticle);
 
-          const MCParticle* mcParticle = particle->getRelated<MCParticle>();
+          const MCParticle* mcParticle = particle->getMCParticle();
           if (mcParticle == nullptr) return -2.0;
 
           int mcPDG = TMath::Abs(mcParticle->getPDG());
@@ -1304,7 +1304,7 @@ namespace Belle2 {
                 }
               }
               if (targetSlowPion != nullptr) {
-                const MCParticle* mcSlowPion = targetSlowPion ->getRelated<MCParticle>();
+                const MCParticle* mcSlowPion = targetSlowPion ->getMCParticle();
 //               SlowPion_q = targetSlowPion -> getCharge();
                 if (mcSlowPion != nullptr && mcSlowPion->getMother() != nullptr
                     && TMath::Abs(mcSlowPion->getPDG()) == 211 && TMath::Abs(mcSlowPion->getMother()->getPDG()) == 413) {
@@ -1343,7 +1343,7 @@ namespace Belle2 {
                 }
               }
               if (targetFastParticle != nullptr) {
-                const MCParticle* mcFastParticle = targetFastParticle ->getRelated<MCParticle>();
+                const MCParticle* mcFastParticle = targetFastParticle ->getMCParticle();
 //               FastParticle_q = targetFastParticle -> getCharge();
                 if (mcFastParticle != nullptr && mcFastParticle->getMother() != nullptr) {
                   FastParticlePDGMother = TMath::Abs(mcFastParticle->getMother()->getPDG());
@@ -1834,7 +1834,7 @@ namespace Belle2 {
             /*            if (nTargets > 1) {
                           B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
                           for (auto& iTargetParticlesCategory : targetParticlesCategory) {
-                            const MCParticle* MCp = iTargetParticlesCategory -> getRelated<MCParticle>();
+                            const MCParticle* MCp = iTargetParticlesCategory -> getMCParticle();
 
                             RelationVector<Particle> mcRelations = MCp->getRelationsFrom<Particle>();
                             if (mcRelations.size() > 1) B2WARNING("MCparticle is related to two particles");

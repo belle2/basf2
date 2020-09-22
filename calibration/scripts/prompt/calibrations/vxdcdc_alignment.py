@@ -19,7 +19,7 @@ For example to allow VXD alignment to change in run 10, 20 an 30 in experiment 1
 Note that the first run in your requested iov will be added automatically.
 
 """
-import basf2
+
 from prompt import CalibrationSettings
 from prompt.calibrations.caf_cdc import settings as cdc_calibration
 
@@ -55,7 +55,7 @@ default_config = {
   }
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name="Global VXD and CDC Alignment",
+settings = CalibrationSettings(name="VXD and CDC Alignment",
                                expert_username="bilkat",
                                description=__doc__,
                                input_data_formats=["raw"],
@@ -65,6 +65,7 @@ settings = CalibrationSettings(name="Global VXD and CDC Alignment",
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
+    import basf2
     from random import choice
     from prompt.utils import events_in_basf2_file
     # Let's iterate, taking a sample of files from the total (no repeats or replacement) until we get enough events
@@ -165,7 +166,17 @@ def create_cosmics_path():
 def get_calibrations(input_data, **kwargs):
 
     import basf2
-    import json
+
+    from caf.utils import IoV
+
+    from ROOT import Belle2
+    import millepede_calibration as mpc
+
+    import alignment.constraints
+    import alignment.parameters
+
+    from random import seed
+    seed(1234)
 
     cfg = kwargs['expert_config']
     files = dict()
@@ -184,16 +195,8 @@ def get_calibrations(input_data, **kwargs):
 
     # Get the overall IoV we want to cover for this request, including the end values
     requested_iov = kwargs.get("requested_iov", None)
-
-    from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
-
-    from ROOT import Belle2
-    import millepede_calibration as mpc
-
-    import alignment.constraints
-    import alignment.parameters
 
     # Pede command options
     method = cfg['method']
@@ -214,7 +217,7 @@ def get_calibrations(input_data, **kwargs):
         timedep.append((alignment.parameters.cdc_layers(), slices))
 
     cal = mpc.create(
-        name='alignment',
+        name='VXDCDCalignment',
         dbobjects=['VXDAlignment', 'CDCAlignment'],
         collections=[
           mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),

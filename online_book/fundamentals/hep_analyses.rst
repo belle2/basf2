@@ -421,3 +421,8 @@ Describe here:
     :class: key-points
 
     * You know where to find the Belle II TDR, "The Physics of the B factories", and "The Belle II physics book".
+
+.. topic:: Author of this lesson
+
+    Umberto Tamponi
+

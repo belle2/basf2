@@ -45,7 +45,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   int err_flag = 0;
   unsigned int eve_num = 0;
   int flag = 0;
-  unsigned int eve[4];
+  unsigned int eve[MAX_PCIE40_CH];
   for (int i = 0; i < MAX_PCIE40_CH; i++) {
     eve[ i ] = 0xbaadf00d;
     if (GetFINESSENwords(n, i) > 0) {
@@ -69,13 +69,27 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   }
 
   if (err_flag == 1) {
+    vector<vector<unsigned int>> summary_table;
+    CompareHeaderValue(n, eve, summary_table);
 
     char err_buf[500];
-    sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
-            eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
+    sprintf(err_buf, "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs :");
+    for (int i = 0; i < summary_table.size(); i++) {
+      sprintf(err_buf, "%s [ch= %u ,val= %u (# of chs= %u )] ",
+              err_buf,
+              summary_table.at(i).at(0), summary_table.at(i).at(2), summary_table.at(i).at(1));
+    }
+    sprintf(err_buf, "%s : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            err_buf,
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
+    // sprintf(err_buf,
+    //         "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+    //         eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
+    //         GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+    //         __FILE__, __PRETTY_FUNCTION__, __LINE__);
+
     printf("[DEBUG] %s\n", err_buf);
     PrintData(m_buffer, m_nwords);
     for (int i = 0; i < MAX_PCIE40_CH; i++) {
@@ -157,7 +171,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     if ((unsigned int)GetRunNo(n) != (prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT) {
       if (*cur_evenum_rawcprhdr != 0) {
 
-        unsigned int eve[4];
+        unsigned int eve[MAX_PCIE40_CH];
         for (int i = 0; i < MAX_PCIE40_CH ; i++) {
           eve[ i ] = 0xbaadf00d;
           if (GetFINESSENwords(n, i) > 0) {

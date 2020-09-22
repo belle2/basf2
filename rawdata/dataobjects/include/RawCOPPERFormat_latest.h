@@ -216,7 +216,7 @@ namespace Belle2 {
 
     //! Check header value of all channels
     void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
-                            vector<vector< unsigned int>>& result) OVERRIDE_CPP17;
+                            vector<vector< unsigned int>>& summary_table) OVERRIDE_CPP17;
 
     /// Format version number
     enum {

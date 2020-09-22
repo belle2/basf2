@@ -72,7 +72,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
     vector<vector<unsigned int>> summary_table;
     CompareHeaderValue(n, eve, summary_table);
 
-    char err_buf[500];
+    char err_buf[2500];
     sprintf(err_buf, "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs :");
     for (int i = 0; i < summary_table.size(); i++) {
       sprintf(err_buf, "%s [ch= %u ,val= %u (# of chs= %u )] ",
@@ -124,7 +124,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
 
-  char err_buf[500];
+  char err_buf[2500];
   int err_flag = 0;
 
   //
@@ -179,18 +179,28 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
             eve[ i ] = m_buffer[ pos_nwords ];
           }
         }
+
+        vector<vector<unsigned int>> summary_table;
+        CompareHeaderValue(n, eve, summary_table);
+
         sprintf(err_buf,
-                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) (",
                 prev_evenum, *cur_evenum_rawcprhdr,
                 prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
-                *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF,
-                eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
+                *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF);
+
+        for (int i = 0; i < summary_table.size(); i++) {
+          sprintf(err_buf, "%s [ch= %u ,val= %u (# of chs= %u )] ",
+                  err_buf,
+                  summary_table.at(i).at(0), summary_table.at(i).at(2), summary_table.at(i).at(1));
+        }
+        sprintf(err_buf, "%s Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+                err_buf,
                 GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         err_flag = 1;
       }
     }
-
   }
 
 
@@ -265,14 +275,13 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   int flag = 0;
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
   unsigned int temp_ctime_trgtype_footer, temp_eve_footer;
-  unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
-  char err_buf[500];
+  unsigned int utime[MAX_PCIE40_CH], ctime_trgtype[MAX_PCIE40_CH], eve[MAX_PCIE40_CH], exprun[MAX_PCIE40_CH];
+  char err_buf[2500];
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
   memset(eve, 0, sizeof(eve));
   memset(exprun, 0, sizeof(exprun));
-
 
   for (int i = 0; i < MAX_PCIE40_CH; i++) {
     int finesse_nwords = GetFINESSENwords(n, i);
@@ -298,8 +307,10 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
             temp_eve != eve[ i ] || temp_exprun != exprun[ i ]) {
           if (err_flag == 0) {
             for (int j = 0; j < MAX_PCIE40_CH; j++) {
-              printf("[DEBUG] FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n",
-                     j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
+              if (GetFINESSENwords(n, j) > 0) {
+                printf("[DEBUG] FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n",
+                       j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
+              }
             }
           }
           sprintf(err_buf, "[FATAL] ERROR_EVENT : mismatch header value over FINESSEs. Exiting...\n %s %s %d\n",

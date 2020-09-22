@@ -45,7 +45,6 @@ BeamSpotCollectorModule::BeamSpotCollectorModule() : CalibrationCollectorModule(
 void BeamSpotCollectorModule::prepare()
 {
   B2INFO("Init of the trees");
-  //describeProcess("CaTest::prepare");
   std::string objectName = "tracks";
   //Data object creation --------------------------------------------------
   TTree* tree = new TTree(objectName.c_str(), "");
@@ -75,7 +74,6 @@ void BeamSpotCollectorModule::prepare()
 
 void BeamSpotCollectorModule::collect()
 {
-  //describeProcess("CaTest::collect()");
   m_evt  = m_emd->getEvent();
   m_run  = m_emd->getRun();
   m_exp  = m_emd->getExperiment();
@@ -83,7 +81,6 @@ void BeamSpotCollectorModule::collect()
 
 
   StoreObjPtr<ParticleList> Y4SParticles(m_Y4SPListName);
-  //const auto& frame = ReferenceFrame::GetCurrent();
 
 
   if (!Y4SParticles.isValid() || abs(Y4SParticles->getPDGCode()) != 300553)

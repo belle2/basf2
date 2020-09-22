@@ -22,24 +22,18 @@ def storeSteering(name, tag):
 
     res = sorted(res, key=getRun)
 
-#   print(res)
-#   import sys
-#   sys.exit(0)
-
     fOut = open(name, 'w')
 
-    fOut.write('{"hlt_mumu": [')  # , end ="")
+    fOut.write('{"hlt_mumu": [')
 
     for i, r in enumerate(res):
         n = getRun(r)
-        fOut.write('["' + r + '", [12, '+str(n)+']]')  # , end =" ")
+        fOut.write('["' + r + '", [12, '+str(n)+']]')
         if i != len(res) - 1:
             fOut.write(', ')
 
-    fOut.write(']}')  # , end ="")
+    fOut.write(']}')
     fOut.close()
-    # print('')
-# print(res)
 
 
 def storeSteering2(name, tag):
@@ -55,7 +49,6 @@ def storeSteering2(name, tag):
         tag = '08'
 
     res = glob(baseDir)
-    # print(glob(baseDir))
 
     def getRun(r): return int(re.findall('/r[0-9]*/', r)[0][2:-1])
 
@@ -63,7 +56,7 @@ def storeSteering2(name, tag):
 
     fOut = open(name, 'w')
 
-    fOut.write('{"hlt_mumu": [')  # , end ="")
+    fOut.write('{"hlt_mumu": [')
 
     for i, r in enumerate(res):
         n = getRun(r)
@@ -72,20 +65,20 @@ def storeSteering2(name, tag):
         if i != len(res) - 1:
             fOut.write(', ')
 
-    fOut.write(']}')  # , end ="")
+    fOut.write(']}')
     fOut.close()
 
 storeSteering2('steerings/input_data_exp8off.json',  '08off')
 storeSteering2('steerings/input_data_exp8scan.json',  '08scan')
 
-# storeSteering2('steerings/input_data_exp7.json',  '07')
-# storeSteering2('steerings/input_data_exp8.json',  '08')
-# storeSteering2('steerings/input_data_exp10.json', '10')
-#
-# storeSteering('steerings/input_data_bucket9.json', 71)
-# storeSteering('steerings/input_data_bucket10.json', 91)
-# storeSteering('steerings/input_data_bucket11.json', [110, 112])
-# storeSteering2('steerings/input_data_bucket12.json', 'bucket12')
-# storeSteering('steerings/input_data_bucket13.json', 139)
-# storeSteering('steerings/input_data_bucket14.json', 166)
-# storeSteering('steerings/input_data_bucket15.json', 192)
+storeSteering2('steerings/input_data_exp7.json',  '07')
+storeSteering2('steerings/input_data_exp8.json',  '08')
+storeSteering2('steerings/input_data_exp10.json', '10')
+
+storeSteering('steerings/input_data_bucket9.json', 71)
+storeSteering('steerings/input_data_bucket10.json', 91)
+storeSteering('steerings/input_data_bucket11.json', [110, 112])
+storeSteering2('steerings/input_data_bucket12.json', 'bucket12')
+storeSteering('steerings/input_data_bucket13.json', 139)
+storeSteering('steerings/input_data_bucket14.json', 166)
+storeSteering('steerings/input_data_bucket15.json', 192)

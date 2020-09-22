@@ -89,7 +89,7 @@ inline std::vector<double> Slice(std::vector<double> v, unsigned ind, unsigned n
 }
 
 //To evaluate spline
-inline double Eval(const std::vector<double>& spl, const std::vector<double>& vals, double x)
+inline double eval(const std::vector<double>& spl, const std::vector<double>& vals, double x)
 {
   int order = -1;
   if (spl.size() == 0)
@@ -143,8 +143,8 @@ inline double Eval(const std::vector<double>& spl, const std::vector<double>& va
 struct Spline {
   //spl.size() <= 1 -> order=0 , spl.size() == vals.size() -> order=1
   std::vector<double> nodes, vals, errs;
-  double val(double x) const {return Eval(nodes, vals, x);}
-  double err(double x) const {return Eval(nodes, errs, x);}
+  double val(double x) const {return eval(nodes, vals, x);}
+  double err(double x) const {return eval(nodes, errs, x);}
 
   double center() const
   {

@@ -49,9 +49,9 @@
 using namespace std;
 
 
-// Sign-sensitive Sqr,Sqrt
-inline double Sqr(double x) {return x >= 0 ? x * x : -x * x; }; //sign-sensitive sqr
-inline double Sqrt(double x) {return x >= 0 ? sqrt(x) : -sqrt(-x); }; //sign-sensitive sqrt
+// Sign-sensitive sqr,sqrt
+inline double sqrS(double x) {return x >= 0 ? x * x : -x * x; }; //sign-sensitive sqr
+inline double sqrtS(double x) {return x >= 0 ? sqrt(x) : -sqrt(-x); }; //sign-sensitive sqrt
 
 TMatrixD getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY);
 
@@ -247,7 +247,7 @@ struct unknowVar {
 // Get angle in XY-plane from cov-matrix elements, sizes in [um] !
 double getAngle(double SizeX, double SizeY, double SizeXY)
 {
-  double C = Sqr(SizeXY);
+  double C = sqrS(SizeXY);
   //is this correct?
   double angle = 1. / 2 * atan(2 * C / (pow(SizeX, 2) - pow(SizeY, 2)));
   return angle;
@@ -272,7 +272,7 @@ pair<double, double> getSizeMinMax(double SizeX, double SizeY, double SizeXY)
     exit(1);
   }
   double Size2Max = (A + sqrt(D)) / 2;
-  return {Sqrt(Size2Min), Sqrt(Size2Max)};
+  return {sqrtS(Size2Min), sqrtS(Size2Max)};
 }
 
 
@@ -334,21 +334,21 @@ struct unknownPars {
     xyAngle.add(angle);
 
     //Get whole cov matrix
-    TMatrixD matSize = getRotatedSizeMatrix({Sqr(SizeX), Sqr(SizeY), Sqr(SizeXY)}, Sqr(SizeZ), sPar.kX.val(sPar.kX.center()),
+    TMatrixD matSize = getRotatedSizeMatrix({sqrS(SizeX), sqrS(SizeY), sqrS(SizeXY)}, sqrS(SizeZ), sPar.kX.val(sPar.kX.center()),
                                             sPar.kY.val(sPar.kY.center()));
 
     // Store elements in [um]
-    matXX.add(Sqrt(matSize(0, 0)));
-    matYY.add(Sqrt(matSize(1, 1)));
-    matZZ.add(Sqrt(matSize(2, 2)));
-    matXY.add(Sqrt(matSize(0, 1)));
+    matXX.add(sqrtS(matSize(0, 0)));
+    matYY.add(sqrtS(matSize(1, 1)));
+    matZZ.add(sqrtS(matSize(2, 2)));
+    matXY.add(sqrtS(matSize(0, 1)));
 
-    matXZ.add(Sqrt(matSize(0, 2)));
-    matYZ.add(Sqrt(matSize(1, 2)));
+    matXZ.add(sqrtS(matSize(0, 2)));
+    matYZ.add(sqrtS(matSize(1, 2)));
 
 
     // crossing-angle in mrad
-    double crossAngleVal = 1e3 * 2 * Sqrt(matSize(0, 0)) / Sqrt(matSize(2, 2));
+    double crossAngleVal = 1e3 * 2 * sqrtS(matSize(0, 0)) / sqrtS(matSize(2, 2));
     crossAngle.add(crossAngleVal);
   }
 
@@ -395,9 +395,9 @@ struct unknownPars {
 
       //vertex error matrix (symetric)
       TMatrixDSym mS(3);
-      mS(0, 0) = Sqr(x.spls[0].errs[i] * toCm);
-      mS(1, 1) = Sqr(y.spls[0].errs[i] * toCm);
-      mS(2, 2) = Sqr(z.spls[0].errs[i] * toCm);
+      mS(0, 0) = sqrS(x.spls[0].errs[i] * toCm);
+      mS(1, 1) = sqrS(y.spls[0].errs[i] * toCm);
+      mS(2, 2) = sqrS(z.spls[0].errs[i] * toCm);
 
       vtxPos.push_back(vtx);
       vtxErr.push_back(mS);
@@ -406,13 +406,13 @@ struct unknownPars {
     //BeamSpot size matrix (from iteration 0)
 
     sizeMat.ResizeTo(3, 3);
-    sizeMat(0, 0) = Sqr(matXX.vars[0] * toCm);
-    sizeMat(1, 1) = Sqr(matYY.vars[0] * toCm);
-    sizeMat(2, 2) = Sqr(matZZ.vars[0] * toCm);
+    sizeMat(0, 0) = sqrS(matXX.vars[0] * toCm);
+    sizeMat(1, 1) = sqrS(matYY.vars[0] * toCm);
+    sizeMat(2, 2) = sqrS(matZZ.vars[0] * toCm);
 
-    sizeMat(0, 1) = Sqr(matXY.vars[0] * toCm);
-    sizeMat(0, 2) = Sqr(matXZ.vars[0] * toCm);
-    sizeMat(1, 2) = Sqr(matYZ.vars[0] * toCm);
+    sizeMat(0, 1) = sqrS(matXY.vars[0] * toCm);
+    sizeMat(0, 2) = sqrS(matXZ.vars[0] * toCm);
+    sizeMat(1, 2) = sqrS(matYZ.vars[0] * toCm);
 
     sizeMat(1, 0) = sizeMat(0, 1);
     sizeMat(2, 0) = sizeMat(0, 2);
@@ -610,6 +610,7 @@ vector<event> getEvents(TTree* tr)
 {
 
   vector<event> events;
+  events.reserve(tr->GetEntries());
 
   event evt;
 
@@ -656,20 +657,6 @@ void bootStrap(vector<event>& evts)
   for (auto& e : evts)
     e.nBootStrap = gRandom->Poisson(1);
 }
-
-
-/*
-// get center time of the evnt sample
-double getAvgTime(const vector<event>&  evts)
-{
-  double minT = 1e20, maxT = -1e20;
-  for (auto ev : evts) {
-    minT = min(minT, ev.t);
-    maxT = max(maxT, ev.t);
-  }
-  return (minT + maxT) / 2;
-}
-*/
 
 
 
@@ -830,14 +817,14 @@ TH1D* getResolution(TH2D* hRes)
 }
 
 // Get meanHisto from 2D histo
-TH1D* getMean(TH2D* hRes)
+TH1D* getMean(const TH2D* hRes)
 {
   TH1D* hMean = new TH1D(rn(), "", 50, -M_PI, M_PI);
   for (int i = 1; i <= hRes->GetNbinsX(); ++i) {
     TH1D* hProj = hRes->ProjectionY(rn(), i, i);
     double mean    = hProj->GetMean();
     double meanErr = hProj->GetMeanError();
-    hMean->SetBinContent(i,   mean); //from cm2 to um2
+    hMean->SetBinContent(i,   mean);
     hMean->SetBinError(i,  meanErr);
   }
   return hMean;
@@ -2045,7 +2032,7 @@ tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(v
     //removeSpotSizeZOutliers(evts, resNew, vecXY, sizeZZ, 150000);
     //sizeZZ = fitSpotZwidth(evts, resNew, vecXY);
 
-    allPars.add(resNew, Sqrt(vecXY[0]), Sqrt(vecXY[1]), Sqrt(vecXY[2]), Sqrt(sizeZZ));
+    allPars.add(resNew, sqrtS(vecXY[0]), sqrtS(vecXY[1]), sqrtS(vecXY[2]), sqrtS(sizeZZ));
 
   }
 

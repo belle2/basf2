@@ -17,6 +17,7 @@ CHANGES since release-01-02-11:
   + getQualityIndicator
 - TrackFitResult:
   + ndf
+  + chi2
 - ECLCluster:
   + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity

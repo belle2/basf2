@@ -19,6 +19,7 @@ CHANGES since release-04-00-03:
     energies corresponding to the measured momenta became slightly different.
 - TrackFitResult:
   + ndf
+  + chi2
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

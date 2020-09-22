@@ -521,13 +521,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");
     REGISTER_VARIABLE("nPXDHits", trackNPXDHits,     "Number of PXD hits associated to the track");
     REGISTER_VARIABLE("nVXDHits", trackNVXDHits,     "Number of PXD and SVD hits associated to the track");
-    REGISTER_VARIABLE("nDF",      trackNDF,
+    REGISTER_VARIABLE("ndf",      trackNDF,
                       R"DOC(Number of degrees of freedom of the track fit. Note that it is not NHIT-5 due to outlier hit rejection.
 For mdst versions < 5.1, returns quiet_NaN().)DOC"
                      );
     REGISTER_VARIABLE("chi2",      trackChi2,
-                      R"DOC(Number of degrees of freedom of the track fit.
-Computed based on pValue and nDF. Note that for pValue exactly equal to 0 it returns infinity(). 
+                      R"DOC(Chi2 of the track fit.
+Computed based on pValue and ndf. Note that for pValue exactly equal to 0 it returns infinity(). 
 For mdst versions < 5.1, returns quiet_NaN().)DOC");
     REGISTER_VARIABLE("firstSVDLayer", trackFirstSVDLayer,     "First activated SVD layer associated to the track");
     REGISTER_VARIABLE("firstPXDLayer", trackFirstPXDLayer,     "First activated PXD layer associated to the track");

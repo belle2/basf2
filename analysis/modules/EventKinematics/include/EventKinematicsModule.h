@@ -14,6 +14,10 @@
 
 #include <framework/core/Module.h>
 
+#include <analysis/dataobjects/EventKinematics.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+
 namespace Belle2 {
   /**
    * Module to compute global quantities related to the event kinematics, like total missing energy and mass2, visible energy, etc.
@@ -33,20 +37,16 @@ namespace Belle2 {
     /** Define the physical parameters. look for them in database. */
     virtual void initialize() override;
 
-    /** Define run parameters. */
-    virtual void beginRun() override;
-
     /** Define event parameters */
     virtual void event() override;
-
-    /** Finish the run. */
-    virtual void endRun() override;
 
     /** finish the execution  */
     virtual void terminate() override;
 
 
   private:
+
+    StoreObjPtr<EventKinematics> m_eventKinematics; /**< event kinematics object pointer */
 
     bool m_usingMC;  /**< Is from MC */
 

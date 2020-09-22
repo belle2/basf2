@@ -30,11 +30,9 @@ Collaborative Tools.
 
 Belle II is an international collaboration of more than 1000 members from all 
 over the world.
+Since we are so spread out communication tools are really important.
 
-Since we are so spread out, an important part of the collaboration itself
-are our channels and avenues of communication.
-
-Since you are reading this page, you have already 
+You are reading this page, so you have already 
 `registered as a member <https://confluence.desy.de/x/ET0HAg>`_
 and obtained DESY credentials.
 These allow you to access private areas of the
@@ -54,7 +52,7 @@ right away (for newcomers) and that are needed in these lessons.
 
 `confluence.desy.de <https://confluence.desy.de>`_
     Our "wiki". 
-    Editable, linked pages that can be easily edited. 
+    Editable, linked pages that can be easily modified and updated. 
     Used for many things from run planning to tracking progress through a
     physics analysis.
 

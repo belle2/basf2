@@ -65,6 +65,12 @@ namespace Belle2 {
      */
     void loadEvtGenParticleData(Pythia8::Pythia* pythia);
 
+    /**
+     * Add particle to Pythia event.
+     * @param[in] mcParticle MC particle.
+     */
+    int addParticleToPYTHIA(const MCParticle& mcParticle);
+
     /** Pythia generator. */
     Pythia8::Pythia* m_Pythia = nullptr;
 
@@ -79,7 +85,6 @@ namespace Belle2 {
     int m_useEvtGen;  /**< use EvtGen for some decays. */
     std::string m_DecFile;  /**< EvtGen decay file */
     std::string m_UserDecFile;  /**< User EvtGen decay file */
-    int m_useEvtGenParticleData; /**< Override PYTHIA parameters */
     bool m_coherentMixing;  /**< decay the B0-B0bar coherently. */
 
     MCParticleGraph mcParticleGraph; /**< An instance of the MCParticle graph. */
@@ -88,7 +93,6 @@ namespace Belle2 {
     int nGood;   /**< number of events with successful fragmentation. */
 
     int nAdded;  /**< number of added particles. */
-    int addParticleToPYTHIA(MCParticle& mcParticle);   /**< picks particles and adds them to a pythia event. */
     int nQuarks; /**< number of quarks. */
     int nVpho; /**< number of virtual exchange particles. */
 

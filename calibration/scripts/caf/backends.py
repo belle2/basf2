@@ -1853,7 +1853,6 @@ class HTCondor(Batch):
     default_global_job_limit = 10000
     #: Default backend args for HTCondor
     default_backend_args = {
-                            "requirements": "OpSysAndVer == \"CentOS7\"",
                             "universe": "vanilla",
                             "getenv": "false",
                             "request_memory": "4 GB",  # We set the default requested memory to 4 GB to maintain parity with KEKCC
@@ -1879,7 +1878,6 @@ class HTCondor(Batch):
             print(f'error = {Path(job.working_dir, _STDERR_FILE).as_posix()}', file=submit_file)
             print(f'transfer_input_files = ', ','.join(files_to_transfer), file=submit_file)
             print(f'universe = {job_backend_args["universe"]}', file=submit_file)
-            print(f'requirements = {job_backend_args["requirements"]}', file=submit_file)
             print(f'getenv = {job_backend_args["getenv"]}', file=submit_file)
             print(f'request_memory = {job_backend_args["request_memory"]}', file=submit_file)
             print('should_transfer_files = Yes', file=submit_file)

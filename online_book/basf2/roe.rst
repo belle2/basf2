@@ -147,12 +147,12 @@ because of different methods of measurement used to detect these particles.
 
      .. code-block:: python
 
-          roe_mask = ('my_mask', track_based_cuts, ecl_based_cuts)
-          ma.appendROEMasks('X:signal', [roe_mask], path=main_path)
+              roe_mask = ('my_mask', track_based_cuts, ecl_based_cuts)
+              ma.appendROEMasks('X:signal', [roe_mask], path=main_path)
 
      Here we have created a mask with a name ``my_mask``, that will contain only track-based 
-     particles that have :b2:var:`nCDCHits` and ECL-based particles, that will have 
-     at least one ECL cluster hit. 
+     particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
+     ``ecl_based_cuts``. 
 
 The analyst can create as many ROE masks as needed and use them in different ROE-dependent 
 algorithms or ROE variables, like ``roeM(my_mask)`` or ``roeE(my_mask)``. Also, one can call 
@@ -168,47 +168,6 @@ photons entered the ROE or the ROE mask.
 
 This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`onlinebook_cs`, 
 :ref:`onlinebook_flavor_tagging` or tag :ref:`onlinebook_vertex_fitting`.
-
-.. admonition:: Question
-     :class: exercise stacked
-
-      How can I improve ROE 4-momentum resolution in my analysis?
-
-.. admonition:: Hint
-     :class: toggle xhint stacked
-
-     There can be a lot of extra particles in ROE, that are deteriorating its 4-momentum
-     resolution. Typically, they have low momentum or energy, so one can set up a 
-     ROE mask, that will reject them. Also, particles, which are outside acceptance of
-     main tracker have badly measured momentum or energy. 
-
-     .. code-block:: python
-
-         charged_cuts = 'pt > 0.05 and thetaInCDCAcceptance'
-         photon_cuts = 'E > 0.05 and thetaInCDCAcceptance'
-
-     Another hint is to use mostlikely hypothesis for charged particles in ROE, 
-     as stated in the `RestOfEvent` documentation.
-     Also, on newest releases, one can apply `updateROEUsingV0Lists` to include the 
-     long-lived particles (V0) into the ROE mask.
-
-.. admonition:: Solution
-     :class: toggle solution
-
-     .. code-block:: python
-
-         # Build ROE:
-         ma.buildRestOfEvent('X:signal', fillWithMostLikely=True, path=main_path)
-         # Define cuts against the beam-background and badly reconstructed particles:
-         charged_cuts = 'pt > 0.05 and thetaInCDCAcceptance'
-         photon_cuts = 'E > 0.05 and thetaInCDCAcceptance'
-         # Append ROE mask:
-         ma.appendROEMask('X:signal', 'my_mask',
-             charged_cuts, photon_cuts, path=main_path)
-         # Use V0 in ROE mask:
-         ma.updateROEUsingV0Lists('X:signal', 'my_mask', path=main_path)
-
-
 
 .. admonition:: Key points
     :class: key-points

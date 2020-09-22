@@ -1260,7 +1260,7 @@ Decay B0
 0.0001      J/psi  K'_10           SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005      J/psi  K_2*0           PHSP;
 0.000049000 J/psi  K0 phi          PHSP;  #Added by Yubo Li 03/09/2018
-0.0000000   J/psi  K+ pi-          PHSP;
+0.00115005   J/psi  K+ pi-          PHSP; #Updated by PG 9/2022
 
 # New Jpsi mode --------------------------------------------------------
 0.000108000 J/psi eta K0            PHSP; #Added by Yubo Li 03/09/2018
@@ -1484,15 +1484,15 @@ Decay B0
 
 #  B -> D(*) X  Exclusive modes
 #
-0.002760000 D*-     pi+                 SVS;
+0.00274268 D*-     pi+                 SVS; #Updated by PG 9/2022
 0.002680000 D-      pi+                 PHSP;
 0.007110000 rho+    D-                  SVS;
 
 # D* rho HELAMP parameters taken from ICHEP 98-852.
-0.0068   rho+    D*-                    SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47;
+0.00679879   rho+    D*-                    SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47; #Updated by PG 9/2022
 0.0005   D-  pi+  pi0                   PHSP;
 0.0082   D*-     pi+     pi0            PHSP;
-0.00084  anti-D0 pi-     pi+            PHSP;
+0.00088026  anti-D0 pi-     pi+            PHSP; #Updated by PG 9/2022
 0.00062  anti-D*0 pi-     pi+           PHSP;
 0.0005   anti-D*0 pi0  pi0              PHSP;
 
@@ -2607,7 +2607,7 @@ Decay anti-B0
 0.0001      J/psi  anti-K'_10            SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005      J/psi  anti-K_2*0            PHSP;
 0.000049000 J/psi  anti-K0 phi           PHSP;  #Added by Yubo Li 03/09/2018
-0.0000000   J/psi  K- pi+                PHSP;
+0.00115005   J/psi  K- pi+                PHSP; #Updated by PG 9/2022
 
 # New Jpsi mode --------------------------------------------------------
 0.000108000 J/psi eta anti-K0         PHSP; #CP-conjugate added by PG 05/02/2018
@@ -2831,15 +2831,15 @@ Decay anti-B0
 
 #  B -> D(*) X  Exclusive modes
 #
-0.002760000 D*+     pi-                 SVS;
+0.00274268 D*+     pi-                 SVS; #Updated by PG 9/2022
 0.002680000 D+      pi-                 PHSP;
 0.007110000 rho-    D+                  SVS;
 
 # D* rho HELAMP parameters taken from ICHEP 98-852.
-0.0068   rho-    D*+                    SVV_HELAMP 0.152 1.47 0.936 0 0.317 0.19;
+0.00679879   rho-    D*+                    SVV_HELAMP 0.152 1.47 0.936 0 0.317 0.19; #Updated by PG 9/2022
 0.0005   D+  pi-  pi0                   PHSP;
 0.0082   D*+     pi-     pi0            PHSP;
-0.00084  D0      pi+     pi-            PHSP;
+0.00088026  D0      pi+     pi-            PHSP; #Updated by PG 9/2022
 0.00062  D*0     pi+     pi-            PHSP;
 0.0005   D*0 pi0  pi0                   PHSP;
 

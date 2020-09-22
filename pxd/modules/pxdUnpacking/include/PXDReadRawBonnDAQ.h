@@ -16,6 +16,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawPXD.h>
 
+#include <pxd/unpacking/PXDLocalDAQFile.h>
+
 #include <string>
 #include <stdlib.h>
 
@@ -56,14 +58,14 @@ namespace Belle2 {
       int* m_buffer;
 
       //! File handle
-      FILE* fh; // TODO PXDLocalDAQFile
+      PXDLocalDAQFile* fh;
 
       unsigned int m_expNr; //!< set by Param
       unsigned int m_runNr; //!< set by Param
       unsigned int m_subRunNr; //!< set by Param
 
       int readOneEvent(void); //! Read data of one Event from File
-      int read_data(char* data, size_t len); //! Read amount of data (len bytes) from file to ptr data
+
     };
 
   } // end namespace PXD

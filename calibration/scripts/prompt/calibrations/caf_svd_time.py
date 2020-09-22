@@ -275,7 +275,7 @@ def get_calibrations(input_data, **kwargs):
     # We should decide this numbers!
     # Remember that our current calibration is not performed Run by Run
     max_files_per_run = 20  # This number should be setted from the biginning
-    min_events_per_cal = 20000  # Minimum number of events needed for one run
+    min_events_per_cal = 10000  # Minimum number of events needed for one run
     min_events_per_file = 2000  # Files with less events will be discarder
     max_events_selected_per_file = 5000  # Nominal max number of events selected per file. The events in the file can be more.
     from prompt.utils import filter_by_max_files_per_run

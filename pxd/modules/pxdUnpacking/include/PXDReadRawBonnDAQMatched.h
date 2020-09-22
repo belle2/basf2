@@ -16,6 +16,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <rawdata/dataobjects/RawPXD.h>
 
+#include <pxd/unpacking/PXDLocalDAQFile.h>
+
 #include <string>
 #include <map>
 #include <stdlib.h>
@@ -65,10 +67,9 @@ namespace Belle2 {
       int* m_buffer;
 
       //! File handle
-      FILE* fh;
+      PXDLocalDAQFile* fh;
 
       int readOneEvent(unsigned int& tnr); ///< Read event and store it in datastore if trigger nr matches
-      int read_data(char* data, size_t len); ///< Read amount of data (len bytes) from file to ptr data
 
       std::map <unsigned int, off_t> m_event_offset; ///< map event nr to offsets
       off_t m_last_offset{0}; ///< last checked file offset

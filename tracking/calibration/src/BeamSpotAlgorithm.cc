@@ -33,8 +33,6 @@ BeamSpotAlgorithm::BeamSpotAlgorithm() : CalibrationAlgorithm("BeamSpotCollector
 }
 
 
-std::map<ExpRun, std::pair<double, double>> getRunInfo(const std::vector<event>& evts);
-
 
 static TObject* getBeamSpotObj(TVector3 ipVtx, TMatrixDSym  ipVtxUnc, TMatrixDSym  sizeMat)
 {

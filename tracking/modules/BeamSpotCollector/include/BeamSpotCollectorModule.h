@@ -11,7 +11,7 @@
 #include <calibration/CalibrationCollectorModule.h>
 
 #include <string>
-#include "TH1F.h"
+#include <TH1F.h>
 
 namespace Belle2 {
   /**

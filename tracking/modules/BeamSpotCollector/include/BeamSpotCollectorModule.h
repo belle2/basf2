@@ -32,22 +32,10 @@ namespace Belle2 {
     void prepare() override final;
 
     /**
-     * Called when entering a new run
-     * Reset the tree
-     */
-    void startRun() override final;
-
-    /**
      * Event processor
      * The filling of the tree
      */
     void collect() override final;
-
-    /**
-     * End-of-run action.
-     * The tree is stored
-     */
-    void closeRun() override final;
 
   private:
 

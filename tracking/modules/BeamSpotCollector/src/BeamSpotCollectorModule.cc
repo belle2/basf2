@@ -72,17 +72,6 @@ void BeamSpotCollectorModule::prepare()
   registerObject<TTree>(objectName, tree);
 }
 
-void BeamSpotCollectorModule::startRun()
-{
-  // Clear counters and private histograms
-  // Ccollected (registered) histograms reset automatically by CAF
-}
-
-
-void BeamSpotCollectorModule::closeRun()
-{
-
-}
 
 void BeamSpotCollectorModule::collect()
 {

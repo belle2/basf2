@@ -12,15 +12,15 @@ Skimming
 
     **Exercises**: ?? min
 
-    **Prerequisites**: 
-    	
-    	* 
+    **Prerequisites**:
 
-    	* :ref:`gbasf2 <onlinebook_gbasf2>`
+    	* :ref:`gbasf2 lesson <onlinebook_gbasf2>`
 
     **Questions**:
 
-        * Why should analysts use skims?
+        * What are skims, and why should analysts use skims?
+
+        * How can I find information about what skims are available?
 
     **Objectives**:
 
@@ -90,11 +90,11 @@ List of available skims
 All available skims are listed on :ref:`Sphinx <skim_physics>` (although not all
 of these are produced in skim campaigns). Although we try to keep the docstrings
 for each skim up-to-date, the best way to find out what selections are in a skim
-are to read the source code. The most important part of a skim's source code is
-the ``build_lists`` method, where the particle reconstruction and selections are
-done.
+is to read the source code. The most important part of a skim's source code is
+the ``build_lists`` method, where particles are reconstructed and selections are
+applied.
 
-.. admonition:: Question
+.. admonition:: Exercise
      :class: exercise stacked
 
      Find the source code for the electroweak penguin (EWP) skims by navigating
@@ -110,13 +110,93 @@ done.
 Running a skim locally
 ----------------------
 
-.. note::
+There are two ways to run a skim yourself: including the skim in a steering
+file, or using the command-line tool ``b2skim-run``.
 
-   Things to be explained here:
+Including a skim in a steering file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-       * Exercise of adding a skim to a steering file.
+Skims in the skim package are defined via the ``BaseSkim`` class. To add all the
+required modules for a skim to your steering file, simply run:
 
-       * Run a skim via ``b2skim-run single <SkimName> -i <in> -o <out>``
+.. code-block:: python
+
+    from skim.leptonic import LeptonicUntagged
+    skim = LeptonicUntagged()
+    skim(path)  # add required skim modules to path
+
+Running the above code will add modules to the path to load so-called *standard
+particle lists*, reconstruct the skim particle lists, and write the particle
+list to an output uDST file. If you would like to disable the uDST output, you
+can do so via:
+
+.. code-block:: python
+
+    skim(path, udstOutput=False)
+
+Once the skim modules have been added to the path, you can retrieve a Python
+list of particle lists:
+
+.. code-block:: python
+
+    >>> skim.SkimLists
+    ["B0:LeptonicUntagged_0", "B0:LeptonicUntagged_1"]
+
+You can then use this list of particle list names in further reconstruction or
+ntuple output.
+
+
+Using ``b2skim-run``
+~~~~~~~~~~~~~~~~~~~~
+
+The command ``b2skim-run`` is a simple tool for applying a skim to a sample.
+
+.. code-block:: bash
+
+    b2skim-run single SkimName -i MyDataFilename.mdst.root
+
+By default the output filename will simply be the corresponding skim code (more
+on this in the next part of the lesson), but this can be controlled with the
+``-o`` flag.
+
+The full documentation of this tool can be found :ref:`on Sphinx <b2skim-run>`,
+or by using the ``-h`` flag.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Use ``b2skim-run`` to apply the skim ``XToD0_D0ToHpJm`` to the file
+     ``$BELLE2_VALIDATION_DATA_DIR/mdst13.root``.
+
+     What is the retention rate (fraction of events passing the skim) of the
+     ``XToD0_D0ToHpJm`` skim on this sample?
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     You can use the tool ``b2file-metadata-show`` to print the number of events
+     in an MDST or uDST file.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     The command to run the ``XToD0_D0ToHpJm`` skim on this sample is:
+
+     .. code-block:: bash
+
+         b2skim-run single XToD0_D0ToHpJm -i $BELLE2_VALIDATION_DATA_DIR/mdst13.root
+
+     By default, this will output a uDST file in the current directory titled
+     ``17230100.udst.root``. We can then use another command-line tool to find
+     the number of events in the MDST and uDST files:
+
+     .. code-block:: bash
+
+         b2file-metadata-show $BELLE2_VALIDATION_DATA_DIR/mdst13.root
+         b2file-metadata-show 17230100.udst.root
+
+     We find the unskimmed file has 10124 events, and the skimmed file has 228
+     events, so the retention rate on this sample is 2.2%.
 
 
 Accessing skims on the grid
@@ -131,7 +211,8 @@ LFNs on the grid have a maximum length restriction, so we can't include the
 plain skim name in the LFN. Instead, we have standardised eight-digit *skim
 codes* to identify skims. When searching for skimmed datasets on the grid, use
 the skim codes. The documentation of each skim on :ref:`Sphinx <skim_physics>`
-contains its corresponding skim code.
+contains its corresponding skim code, and the full table of codes can be found
+in the documentation of `skim.registry.SkimRegistryClass`.
 
 
 .. note::
@@ -176,7 +257,7 @@ Each working group has an assigned skim liaison (all `listed on Confluence
 <https://confluence.desy.de/x/qw36Ag#SkimmingHomepage-Skimmingpersonnel>`_),
 whose job it is to survey the needs of the group and develop skims. If there is
 an existing skim that might be useful for your analysis and is not currently
-being produced, talk to you local skim liaison.
+being produced, talk to your local skim liaison.
 
 If you would like to get more involved in the writing and testing of skims, then
 you may find the :ref:`skim experts section <writing-skims>` of the
@@ -188,9 +269,20 @@ Sphinx documentation helpful.
 
     * The two sources of documentation on skims are the :ref:`Sphinx
       documentation <skim>` and the `skimming Confluence page
-      <https://confluence.desy.de/x/qw36Ag>`_.
+      <https://confluence.desy.de/x/qw36Ag>`_. The best way to find out how a
+      particular skim is currently defined is to read the source code (either on
+      Sphinx, or in the directory ``skim/scripts/skim/`` in the software repo).
 
-    * 
+    * You can run a skim by adding a short segment of code to your steering
+      file, or by using the command-line tool ``b2skim-run``.
+
+    * Centrally-produced skims can be accessed on the grid with gbasf2. Use the
+      dataset searcher to locate skimmed data by using the relevant skim code.
+
+    * Running on skimmed data and MC can make your life as an analyst easier.
+      However, skims are only useful if they are developed through communication
+      between analysts and skim liaisons, so don't hesitate to contact your
+      working group's liaison.
 
 
 .. topic:: Author of this lesson

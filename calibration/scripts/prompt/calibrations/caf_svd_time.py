@@ -122,7 +122,20 @@ from itertools import islice
 
 def select_files(reduced_file_to_iov, min_events, max_events_per_file):
     """
-    Selects the input file to use starting from the number of events per run that we need for the calibration.
+    Selects the input files per run to use for the calibration, starting from the minimum number of events per run that we need.
+    It takes as input:
+    1) an object that cointains the list of all input files and their IoV
+    2) the minimum number of events per run we need
+    3) the maximum number of events per file that at least we want, but there can be more or less events in a selected file.
+       This number is useful to select enough files from each run as input.
+
+    It loops on all input files, read the experiment and the run number,
+    and splits the list in more lists depending on the run and experiment numbers.
+    Then it loops on the lists obtained for each run and select the number of needed files per run,
+    depending on the minimun number of events (min_events) and max_events_per_file we set.
+
+    It is absolutely necessary to have enough events per run,
+    since we need to check the distributions of each run to find the right IoVs for the payloads.
 
     Returns a list of file:
         selected_files
@@ -262,7 +275,7 @@ def get_calibrations(input_data, **kwargs):
     # We should decide this numbers!
     # Remember that our current calibration is not performed Run by Run
     max_files_per_run = 20  # This number should be setted from the biginning
-    min_events_per_cal = 10000  # Minimum number of events needed for one run
+    min_events_per_cal = 20000  # Minimum number of events needed for one run
     min_events_per_file = 2000  # Files with less events will be discarder
     max_events_selected_per_file = 5000  # Nominal max number of events selected per file. The events in the file can be more.
     from prompt.utils import filter_by_max_files_per_run

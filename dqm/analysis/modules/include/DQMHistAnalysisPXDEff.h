@@ -2,9 +2,7 @@
 // File : DQMHistAnalysisPXDEff.h
 // Description : DQM module, which gives histograms showing the efficiency of PXD sensors
 //
-// Modified to efficiency by Uwe Gebauer
-// Based on work from: Tomoyuki Konno, Tokyo Metroplitan University
-// Date : 25  - Dec - 2015 ; first commit
+// Author: Uwe Gebauer, Bjoern Spruck
 //-
 
 #pragma once

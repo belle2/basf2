@@ -259,7 +259,7 @@ namespace Belle2 {
                                         const float pValue,
                                         const uint64_t hitPatternCDCInitializer,
                                         const uint32_t hitPatternVXDInitializer,
-                                        const uint32_t ndf);
+                                        const uint16_t ndf);
 
     /**
      * Fills Helix parameters (converted to Belle II version), 5x5 error matrix, 4-momentum, position and 7x7 error matrix from Belle Helix stored in Mdst_trk_fit.

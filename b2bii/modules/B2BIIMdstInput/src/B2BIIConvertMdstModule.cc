@@ -2232,7 +2232,7 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const float pValue,
                                                             const uint64_t hitPatternCDCInitializer,
                                                             const uint32_t hitPatternVXDInitializer,
-                                                            const uint32_t ndf)
+                                                            const uint16_t ndf)
 {
   TVector3 pos(position.x(),  position.y(),  position.z());
   TVector3 mom(momentum.px(), momentum.py(), momentum.pz());

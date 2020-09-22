@@ -14,8 +14,7 @@
 #include <cerrno>
 
 #include <boost/iostreams/device/file_descriptor.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include <boost/iostreams/filter/b2zip.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/format.hpp>
 

@@ -108,11 +108,19 @@ Data taking: on resonance, continuum, comics
 Data taking: Triggers and filters
 ---------------------------------
  
-During the data taking, each sub-detector constantly acquires data according the modes and specifications of its front-end electronics. This mass of data, however, cannot be written directly to disk as a constrant stream to be later sorted out, because it would require a comical amount of resources and bandwidth from the detector to the offline disks.  
-For this reason the data are aquired only when a potentially interesting even is seen in the detector, and several level of filtering are applied during the data processing before the end-users, the analysist, can run their analysis jobs on them. 
-What follows is a very simplified explanation of the process the leads from the physic event to the data you can analyze.
+During the data taking, each sub-detector constantly acquires data according the modes 
+and specifications of its front-end electronics. This mass of data, however, cannot be 
+written directly to disk as a constrant stream to be later sorted out, because it would 
+require a comical amount of resources and bandwidth from the detector to the offline disks.  
+For this reason the data are aquired only when a potentially interesting even is seen 
+in the detector, and several level of filtering are applied during the data processing 
+before the end-users, the analysist, can run their analysis jobs on them. 
+What follows is a very simplified explanation of the process the leads from the physic 
+event to the data you can analyze.
  
-The systems that are involved in the data taking are the Data AQuisition (DAQ), the TRiGger (TRG, also known as L1) and the High Level Trigger (HLT). Collectively, they are often referred as the Online system.
+The systems that are involved in the data taking are the Data AQuisition (DAQ), the 
+TRiGger (TRG, also known as L1) and the High Level Trigger (HLT). Collectively, they are 
+often referred as the Online system.
 
 During the data taking [...]
 
@@ -143,24 +151,64 @@ Descibe here:
 Processing: Data formats
 ------------------------
 
-When an e+e- collision happens, the resulting products will leave signal in the BelleII subdetectors that are acquired, matched in time as each subsystem have a different delay and response time (event building), and saved to disk in a packed, binary format. Several steps have to be performed in order to produce a physics result of these hardly-intelligible raw data. These steps are unpacking, calibration, reconstruction and finally analysis. Each of these steps reads and writes different objects, and produces files in different formats. 
+When an e+e- collision happens, the resulting products will leave signal in the BelleII 
+subdetectors that are acquired, matched in time as each subsystem have a different delay 
+and response time (event building), and saved to disk in a packed, binary format. 
+Several steps have to be performed in order to produce a physics result of these 
+hardly-intelligible raw data. These steps are unpacking, calibration, reconstruction 
+and finally analysis. Each of these steps reads and writes different objects, and 
+produces files in different formats. 
 
 .. note::
-   All the Belle II data files are root files, where the relevant objects are stored in the branches of a tree. When we say "different formats", we refer simply to the different branches contained in those trees.
+   All the Belle II data files are root files, where the relevant objects are stored 
+   in the branches of a tree. When we say "different formats", we refer simply to the 
+   different branches contained in those trees.
 
-Let's start form the data objects we save. There are four groups of them: raw, low-level,reconstruction-level and analysis-level. The raw objects are the output of the single subsystems: digitized  PMT signals from the TOP, digitized ADC signals form the CDC, and so on. Without any further process, these objects cannot be used. The low-level objects com from the very first step of the data processing, the unpacking. The RAW signals are turned into more abstract and understandable objects: the CDC ACD signals are converted in CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-level objects are foundamentalto understand the detector performance, but they cannot yet be directly used to perform an analysis. The last step is called reconstruction, and consistin in running algorithm on the collection of digits to produce analysis-friendly quantities. The ouput of the reconstruction is are high-level variables like ECL clusters, resulign from running cluster algorithms on the ECLDigits,  tracks resulting from runnign the trackign algoriths over the collections of CDC, SVD and PXD hits,  PID likelihood resulting from the analysis of the TOP signals. In teh process of recontruction the calibrations are applied, correcting for the fluctuations in the detector response. These hgh-level objects are finally read by the analysis software, and turned into analysis-level objects: charged particles, photons, missing energies and all teh quantities used to present a physics result.
+Let's start form the data objects we save. There are four groups of them: raw, low-level,
+reconstruction-level and analysis-level. The raw objects are the output of the single 
+subsystems: digitized  PMT signals from the TOP, digitized ADC signals form the CDC, and 
+so on. Without any further process, these objects cannot be used. The low-level objects 
+come from the very first step of the data processing, the unpacking. The RAW signals are 
+turned into more abstract and understandable objects: the CDC ACD signals are converted 
+in CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-level 
+objects are foundamentalto understand the detector performance, but they cannot yet be 
+directly used to perform an analysis. The last step is called reconstruction, and consists 
+in running algorithm on the collection of digits to produce analysis-friendly quantities. 
+The ouput of the reconstruction is are high-level variables like ECL clusters, resulting 
+from running cluster algorithms on the ECLDigits,  tracks resulting from running the 
+tracking algoriths over the collections of CDC, SVD and PXD hits, PID likelihood resulting 
+from the analysis of the TOP signals. In teh process of recontruction the calibrations 
+are applied, correcting for the fluctuations in the detector response. These hgh-level 
+objects are finally read by the analysis software, and turned into analysis-level 
+objects: charged particles, photons, missing energies and all teh quantities used to 
+present a physics result.
 
 
-In BelleII there are four different data formats, reflecting which data objects are stored in a file:
+In BelleII there are four different data formats, reflecting which data objects are 
+stored in a file:
 
-* RAW. This is the most basic format. It contains the un-processed, un-calibrated output of the detector. Analysis cannot be run on these data, but they serve as base for the production of the subsequent data format
-* cDST (calibration Data Summary Table). This format contains the same objects as the RAW (so a full reconstruction could be performed starting from it), plus the results of the tracking, which is the most demanding part of the reconstruction. The scope of this format is to perform low-level detectro studies and calculate calibration constants.
-* mDST (mini Data Summary Table). This is the basic data-analysis format. It contains only the high level information that can be directly used to perfrom a physics analysis. However, it is not the suggested format to perform analysis.
-* uDST (micro Data Summary Table). This is the main format for data analysis. It's the result of the analysis skim procedure, that selects from the mDST only the few events that can be useful for a certain type of analysis (events with a well recontructed J/psi per example). The content of this ormat is the same as the mDST, with the addition of the recontructed particles used in the skimming selection (if you look at the J/psi skim, you will also find a list of J/psi already reconstructed for you in the file).
+* RAW. This is the most basic format. It contains the un-processed, un-calibrated output 
+  of the detector. Analysis cannot be run on these data, but they serve as base for the 
+  production of the subsequent data format
+* cDST (calibration Data Summary Table). This format contains the same objects as the RAW 
+  (so a full reconstruction could be performed starting from it), plus the results of the 
+  tracking, which is the most demanding part of the reconstruction. The scope of this 
+  format is to perform low-level detectro studies and calculate calibration constants.
+* mDST (mini Data Summary Table). This is the basic data-analysis format. It contains only 
+  the high level information that can be directly used to perfrom a physics analysis. 
+  However, it is not the suggested format to perform analysis.
+* uDST (micro Data Summary Table). This is the main format for data analysis. It's the 
+  result of the analysis skim procedure, that selects from the mDST only the few events 
+  that can be useful for a certain type of analysis (events with a well recontructed J/psi 
+  per example). The content of this ormat is the same as the mDST, with the addition of the 
+  recontructed particles used in the skimming selection (if you look at the J/psi skim, 
+  you will also find a list of J/psi already reconstructed for you in the file).
 
 
 .. note::
-   If you are simply running an analysis, you will mostly use uDST, if you are also involed in performance studies you will probably use cDST as well and if your core activity will be hardware opertions, you will be mostly dealing with the RAW and cDST formats.
+   If you are simply running an analysis, you will mostly use uDST, if you are also involed 
+   in performance studies you will probably use cDST as well and if your core activity will 
+   be hardware opertions, you will be mostly dealing with the RAW and cDST formats.
 
 
 
@@ -168,21 +216,34 @@ In BelleII there are four different data formats, reflecting which data objects 
 Analysis: what do we measure?
 -----------------------------
 
-The Belle II detectors can provide three kind of information: momentum, energy and PID probability. Of course not all of them are available for every particle, infact in most cases only two of them are, and however only for a very limited number of particles.  
+The Belle II detectors can provide three kind of information: momentum, energy and PID 
+probability. Of course not all of them are available for every particle, infact in most cases 
+only two of them are, and however only for a very limited number of particles.  
 
 
-Charged particles are seen in the detector if they live long enough to cross its active colume, for example the SVD layers, and leave a ionization signal in it.
+Charged particles are seen in the detector if they live long enough to cross its active colume, 
+for example the SVD layers, and leave a ionization signal in it.
 
 
 
-However, tracking only emasures the 3-momentum of these particles. In order to get form this the 4-momentum one has to either assign a mass hypothesis, which is done using the information form the particle
-identification systems.
+However, tracking only emasures the 3-momentum of these particles. In order to get form this 
+the 4-momentum one has to either assign a mass hypothesis, which is done using the 
+information from the particle identification systems.
 
 
-Neutral particles such photons, neutrons or KL do not leave any ionization in the tracking system, and can only  be detected when they interact with the dense material of the ECL or the KLM. In these cases we will have a measurement of their enery and, from the analysis of the shape of the energy deposition, an intecation about their nature.
+Neutral particles such photons, neutrons or KL do not leave any ionization in the tracking 
+system, and can only  be detected when they interact with the dense material of the ECL or 
+the KLM. In these cases we will have a measurement of their enery and, from the analysis of 
+the shape of the energy deposition, an indication about their nature.
 
 
-All the other particles that are either short lived and decay nearby the interaction point (such as the J/psi), or are long-lived but neautra and decay inside the active volumen of the detector (such the Ks or Lambda), have to be reconstructed combingin the 4-momenta of their decay products, or of the decay prducts at the end of their decay chain. We define as final state particles all the particles that are directly reconstructed from the signal they leave in the detector. The particles obtained combining other particles are usually referred as combined particles.
+All the other particles that are either short lived and decay nearby the interaction point 
+(such as the J/psi), or are long-lived but neautra and decay inside the active volumen of the 
+detector (such the Ks or Lambda), have to be reconstructed combingin the 4-momenta of their 
+decay products, or of the decay prducts at the end of their decay chain. We define as final 
+state particles all the particles that are directly reconstructed from the signal they leave 
+in the detector. The particles obtained combining other particles are usually referred as 
+combined particles.
 
 
 Analysis: the skimming

@@ -54,7 +54,6 @@ class defaultFADCMaskedStripsImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDFADCMaskedStrips.name, payload, iov)
 
 
-use_database_chain()
 b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = create_path()

@@ -10,21 +10,25 @@ HEP Analyses
 
     **Prerequisites**: 
     	
-    	* What's a B factory
+    	* What is a B factory?
+
     **Objectives**:
 
-        * Learn everything you need in order to undertsand
-          what the software is supposed to do.
+        * A first introduction to all of the basic concepts in a HEP analysis.
+        * A "big picture" overview of what the Belle II software is supposed 
+          to do.
+        * Be aware of important Belle II reference documents and (at least)
+          have spend a bit of time navigating them.
 
-In this section you will learn the basic concepts underlying an analysis at BelleII, 
-starting from how the data aquisition works and ending to the description of 
-the most common analysis concepts.
+In this section you will learn the basic concepts underlying an analysis at 
+Belle II, starting from how the data acquisition works and ending to the 
+description of the most common analysis concepts.
 
-The workflow that goes from the data taking to the publication of a measurement at 
-an HEP experiment is quite complex, and involves multiple steps that can take months 
-or even years. 
-While the detail of this procedure can be extremely complex and tedious the overall 
-picture is simple enough to be fitted in a human-readable scheme:
+The workflow that goes from the data taking to the publication of any 
+measurement in High-Energy Physics (HEP) experiment is quite complex.
+Measurements involve multiple steps that can take months or even years. 
+While the details of this procedure can be extremely complex and tedious the
+overall picture is simple enough to be fitted in a human-readable scheme:
 
 .. figure:: grand_scheme_of_hep.png
   :width: 40em
@@ -41,19 +45,17 @@ The rest of this section will quickly go through each of the four blocks in whic
 the workflow is split, covering the very basic concepts and deferring most of the 
 technical expalations about how the software works to the other chapters.
 
-
-
-
 Intro: Cut and count
 --------------------
 
 Almost regardless of the quantity you are going to measure in your analysis, you 
 will have to face some basic problems: select events you want to study (the 
 signal) over similar events that mimic them (the background), estimate efficiency 
-of such  selection and, possibly, estimate the intrinsic resolution on the 
-quantities will measure, and finally cound how many signal events you observe.
+of such a selection and, possibly, estimate the intrinsic resolution on the 
+quantities you will measure. Finally you will typically want to count how many
+signal events you observe.
 
-The most basic way to select a signal is to apply what in jargon are called "cuts". 
+The most basic way to select a signal is to apply what, in jargon, are called "cuts". 
 A cut is nothing but selection, usually binary, over one quantity that has some 
 separation power between signal and background. Of course multiples cuts can be 
 applied in sequence, leading to quite effective background reactions. 
@@ -62,40 +64,200 @@ that will be used to count of many signal events are left. A good variable has a
 very peaking distribution for signal, and a smooth, uniform distribution for the 
 background.
 
-Example Here. D*? Pi0? Need to run some simulation.
+.. admonition:: Example
 
+    In many b-physics analyses you will make candidate B mesons from 
+    combinations of tracks and calorimeter clusters.
+    You will work through an example of this in a :ref:`later lesson
+    <onlinebook_first_steering_file>`, but for now, consider the energy of your
+    candidate B in the centre-of-momentum system.
 
+    .. admonition:: Question
+        :class: exercise stacked
+    
+        What is the the energy of a B meson produced in the decay of an 
+        :math:`\Upsilon(4S)` in the rest frame of the :math:`\Upsilon`?
+    
+    .. admonition:: Solution
+        :class: toggle solution
+    
+        Half of it's rest mass: :math:`\sim 5.3 {\textrm GeV}`
 
+    The difference between half of the energy in the centre-of-momentum
+    and the total energy of the B candidate is called :math:`\Delta E`.
+    An early  **cut**  you might make is to require that this quantity 
+    is close to zero.
+    
+    That is, you would accept B meson canddiates which satisfy:
+    :math:`-150 <\Delta E< 150 {\textrm MeV}`
+    and reject those which don't.
+
+An interesting event for most B physics analyses, is one where the 
+:math:`e^+e^-` produced an `\Upsilon(4S)`.
+However this is not the most probable result in an :math:`e^+e^-` collision.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    What is the most likely final state for an :math:`e^+e^-` collision at 10 GeV?
+    What is the cross section?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    You should be able to find this information on confluence.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    At around 125 nb, the most probably process is :math:`e^+e^-\to e^+e^-`.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    What is the cross section for hadronic events?
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    About 5.8 nb.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    What is the cross section for :math:`B\bar B` hadronic events?
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    About 1.1 nb.
+
+We call anything that is not "what you want to analyse": **background**.
+This means different things for different analyses.
+Certain kinds of background events (such as :math:`e^+e^- \to e^+e^-`) are 
+relatively easy to reject and can be done in the **trigger**.
+Other kinds of backgrounds are dealt with at later stages of your analysis.
+
+We will cover different aspects of this later in this lesson, and in
+further lessons.
 
 Data taking: The detector
 -------------------------
 
 If you are reading this manual, you are probably already at least partially 
-familiar with the general layout of the BelleII experiment. However, before 
-moving on, let's very quicly review its structure.
-Belle II has several sub-system, each one dedicate to a specific task: 
-reconstructiong the trajectory of charged track, reconstruct the energy of photons, 
+familiar with the general layout of the Belle II experiment. However, before 
+moving on, let's very quickly review its structure.
+Belle II has several sub-systems, each one dedicate to a specific task: 
+reconstructing the trajectory of charged track, reconstruct the energy of photons, 
 identify the particle type, identify muons and reconstruct long-living hadrons. 
 Of course some systems can be used for multiple purposes: the ECL is mainly 
 intended as a device to recontruct photons, but is also used to identify 
 electrons and hadrons.
 
-* Beam Pipe
-  The beam pipe itself is not an anctive part of the detector, but plays the crucial 
-  role of separating the detector from the interaction region, which is located in 
-  the low-pressure vacuum of the superKEKB rings. It is a cilindrical pipe designed 
-  to be as think as possible in order to minimize the particle's energy loss in it,
-  but it also assolves the scope of absorbing part of the soft X-rays emitted by 
-  the beams, that rapresent a major source of noise for the innermost detector, the PXD. 
+.. seealso:: 
 
-* PXD
-  The first active system met by the particles that are emerging form the IP is the PiXel Detector (PXD)
+    There is an important document for any large HEP detector called the 
+    **Technical Design Report** (TDR).
 
-* SVD
+    The Belle II TDR is `arXiv:1011.0352 <https://arxiv.org/abs/1011.0352>`_.
 
+    You might like to refer to this and you will probably need to reference 
+    it in your thesis.
 
+.. figure:: belle2.png
+    :align: center
+    :width: 900px
+    :alt: The Belle II detector.
 
+    The Belle II detector.
 
+Beam Pipe
+    The beam pipe itself is not an anctive part of the detector, but plays the crucial 
+    role of separating the detector from the interaction region, which is located in 
+    the low-pressure vacuum of the superKEKB rings. It is a cylindrical pipe designed 
+    to be as thin as possible in order to minimize the particle's energy loss in it,
+    but it also assolves the scope of absorbing part of the soft X-rays emitted by 
+    the beams, that represent a major source of noise for the innermost detector, the PXD. 
+
+PXD
+    The first active system met by the particles that emerge form the IP is the PiXel
+    Detector (PXD). This is a high-granularity tracking system which is enables 
+    precise reconstruction of the intersection of tracks (a vertex).
+    You can think of this as the inner vertex detector.
+
+SVD
+    The Silicon Vertex Detector (SVD) is the second part of the vertex detector.
+    It comprises of silicon microstrip sensors and adds additional vertexing 
+    capability.
+
+VXD
+    You will occasionally hear people refer to the pair of detectors: PXD+SVD 
+    as the VerteX Detector (VXD).
+
+CDC
+    The main tracking system for Belle II is the Central Drift Chamber (CDC).
+    This is comprised of *so-called* sense wires suspended in He-C2H6 gas.
+    Charged particles passing close to the wires cause ionisation resulting 
+    in signal propagation in the wires.
+    You will hear people refer to these ionisation signals as "hits" in the 
+    CDC.
+    A charged particle passing through the CDC results in a succession of hits
+    following the trajectory of the particle.
+
+TOP
+    The Time Of Propagation (TOP) detector provides particle identification
+    information.
+    The subdetector is comprised of quartz bars and works by utilising the 
+    `Cherenkov effect
+    <https://en.wikipedia.org/wiki/Cherenkov_radiation>`_.
+    Particles passing through with a given momentum will cause Cherenkov 
+    photons to be emitted at an angle proportional to their mass.
+    The angle of emission correlated to the time taken for the photons to
+    propagate through the detector therefore, with an external measurement
+    of the momentum, the TOP provides a measurement of the particle's mass
+    and therefore it's type.
+    You might also hear people refer to the TOP as the iTOP (imaging TOP).
+
+ARICH
+    The Aerogel Ring-Imaging Cherenkov detector is another particle 
+    identification subdetector covering the forward region of the detector.
+    It is comprised of blocks of aerogel.
+    When a charge particle passes through the aerogel, just as with the quartz,
+    Cherenkov photons are emitted at an angle proporional to their mass.
+    This forms a ring of Cherenkov light around a particle track which is 
+    imaged providing an orthogonal source of mass information.
+
+ECL
+    The Electromagnetic CaLorimeter (ECL) is chiefly tasked with measuring the 
+    electromagnetic energy of photons and electrons produced in the collision.
+    In combination with tracking information, the calorimeter can distinguish, for
+    example, electrons from muons.
+    A track from an electron will stop in the calorimeter, a muon will continue 
+    through as a minimum-ionising particle.
+    It therefore provides further orthogonal information to the 
+    particle-identification system.
+
+KLM
+    Finally, there is the KLong and Muon (KLM) system.
+    The KLM provides muon identification information to tracks that pass 
+    through all other subdetectors and also reconstructs :math:`K_L^0` s from
+    the collision.
+
+.. seealso::
+
+    There are two more useful reference documents that you should be aware of.
+    Now seems like a good time to mention them.
+
+    1. Bevan, A. *et al*. The Physics of the B Factories. *Eur.Phys.J. C* **74** 3026(2014). 
+       https://doi.org/10.1140/epjc/s10052-014-3026-9
+
+    2. Kou, E. *et al*. The Belle II physics book, *PTEP 2019* **12** 123C01, 
+       https://doi.org/10.1093/ptep/ptz106.
+
+    The former is a book describing the previous generation B-factories (the detectors and their achievements).
+    The latter describes the Belle II detector and the physics goals.
+    It is sometimes referred to (rather opaquely) as the B2TiP report.
+    If you are a newcomer you should probably refer to it as it's (significantly more sane) official name.
 
 
 Data taking: on resonance, continuum, comics
@@ -110,15 +272,15 @@ Data taking: Triggers and filters
  
 During the data taking, each sub-detector constantly acquires data according the modes 
 and specifications of its front-end electronics. This mass of data, however, cannot be 
-written directly to disk as a constrant stream to be later sorted out, because it would 
+written directly to disk as a constraint stream to be later sorted out, because it would 
 require a comical amount of resources and bandwidth from the detector to the offline disks.  
-For this reason the data are aquired only when a potentially interesting even is seen 
+For this reason the data are acquired only when a potentially interesting even is seen 
 in the detector, and several level of filtering are applied during the data processing 
 before the end-users, the analysist, can run their analysis jobs on them. 
 What follows is a very simplified explanation of the process the leads from the physic 
 event to the data you can analyze.
  
-The systems that are involved in the data taking are the Data AQuisition (DAQ), the 
+The systems that are involved in the data taking are the Data acquisition (DAQ), the 
 TRiGger (TRG, also known as L1) and the High Level Trigger (HLT). Collectively, they are 
 often referred as the Online system.
 
@@ -128,7 +290,7 @@ During the data taking [...]
 Simulation: the Montecarlo
 --------------------------
 
-Descibe here:
+Describe here:
 * What a generator is
 * What the simulation is, what's Geant
 * can we trust the MC 100%? Performance studies
@@ -139,11 +301,11 @@ Descibe here:
 Processing: the reconstruction
 ------------------------------
 
-Descibe here:
+Describe here:
 * What is the reconstruction
 * Example 1: tracking (short)
 * Example2: clustering (?)
-* Why do we need to run the reconstruction separately from teh analysis? 
+* Why do we need to run the reconstruction separately from the analysis? 
   Mention that resources are very not infinite
 
 
@@ -174,13 +336,13 @@ in CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-l
 objects are foundamentalto understand the detector performance, but they cannot yet be 
 directly used to perform an analysis. The last step is called reconstruction, and consists 
 in running algorithm on the collection of digits to produce analysis-friendly quantities. 
-The ouput of the reconstruction is are high-level variables like ECL clusters, resulting 
+The output of the reconstruction is are high-level variables like ECL clusters, resulting 
 from running cluster algorithms on the ECLDigits,  tracks resulting from running the 
-tracking algoriths over the collections of CDC, SVD and PXD hits, PID likelihood resulting 
-from the analysis of the TOP signals. In teh process of recontruction the calibrations 
+tracking algorithms over the collections of CDC, SVD and PXD hits, PID likelihood resulting 
+from the analysis of the TOP signals. In the process of reconstruction the calibrations 
 are applied, correcting for the fluctuations in the detector response. These hgh-level 
 objects are finally read by the analysis software, and turned into analysis-level 
-objects: charged particles, photons, missing energies and all teh quantities used to 
+objects: charged particles, photons, missing energies and all the quantities used to 
 present a physics result.
 
 
@@ -195,20 +357,20 @@ stored in a file:
   tracking, which is the most demanding part of the reconstruction. The scope of this 
   format is to perform low-level detectro studies and calculate calibration constants.
 * mDST (mini Data Summary Table). This is the basic data-analysis format. It contains only 
-  the high level information that can be directly used to perfrom a physics analysis. 
+  the high level information that can be directly used to perform a physics analysis. 
   However, it is not the suggested format to perform analysis.
 * uDST (micro Data Summary Table). This is the main format for data analysis. It's the 
   result of the analysis skim procedure, that selects from the mDST only the few events 
-  that can be useful for a certain type of analysis (events with a well recontructed J/psi 
+  that can be useful for a certain type of analysis (events with a well reconstructed J/psi 
   per example). The content of this ormat is the same as the mDST, with the addition of the 
-  recontructed particles used in the skimming selection (if you look at the J/psi skim, 
+  reconstructed particles used in the skimming selection (if you look at the J/psi skim, 
   you will also find a list of J/psi already reconstructed for you in the file).
 
 
 .. note::
    If you are simply running an analysis, you will mostly use uDST, if you are also involed 
    in performance studies you will probably use cDST as well and if your core activity will 
-   be hardware opertions, you will be mostly dealing with the RAW and cDST formats.
+   be hardware operations, you will be mostly dealing with the RAW and cDST formats.
 
 
 
@@ -217,7 +379,7 @@ Analysis: what do we measure?
 -----------------------------
 
 The Belle II detectors can provide three kind of information: momentum, energy and PID 
-probability. Of course not all of them are available for every particle, infact in most cases 
+probability. Of course not all of them are available for every particle, in fact in most cases 
 only two of them are, and however only for a very limited number of particles.  
 
 
@@ -233,7 +395,7 @@ information from the particle identification systems.
 
 Neutral particles such photons, neutrons or KL do not leave any ionization in the tracking 
 system, and can only  be detected when they interact with the dense material of the ECL or 
-the KLM. In these cases we will have a measurement of their enery and, from the analysis of 
+the KLM. In these cases we will have a measurement of their energy and, from the analysis of 
 the shape of the energy deposition, an indication about their nature.
 
 
@@ -255,3 +417,7 @@ Describe here:
 * why it's needed
 
 
+.. admonition:: Key points
+    :class: key-points
+
+    * You know where to find the Belle II TDR, "The Physics of the B factories", and "The Belle II physics book".

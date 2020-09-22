@@ -95,7 +95,7 @@ def select_files(all_input_files, min_events, max_processed_events_per_file):
     basf2.B2INFO(f"Total events in chosen files = {total_events}")
     if total_events < min_events:
         basf2.B2FATAL(
-            "There weren't enough files events selected when max_processed_events_per_file={max_processed_events_per_file}")
+            f"There weren't enough files events selected when max_processed_events_per_file={max_processed_events_per_file}")
     return chosen_files
 
 
@@ -153,8 +153,11 @@ def create_cosmics_path():
     path.add_module('SetRecoTrackMomentum', automatic=True)
     path.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
 
-    ana.fillParticleList('mu+:good', '[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1', path=path)
-    path.add_module('SkimFilter', particleLists=['mu+:good']).if_false(basf2.create_path())
+    ana.fillParticleList(
+        'mu+:goodForVXDCDCAlignment',
+        '[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1',
+        path=path)
+    path.add_module('SkimFilter', particleLists=['mu+:goodForVXDCDCAlignment']).if_false(basf2.create_path())
 
     return path
 

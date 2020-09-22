@@ -168,7 +168,7 @@ int* RawCOPPERFormat::PackDetectorBuf(int* packed_buf_nwords,
 }
 
 void RawCOPPERFormat::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH],
-                                         vector<vector<unsigned int> >& result)
+                                         std::vector<std::vector<unsigned int> >& result)
 {
   char err_buf[500];
   sprintf(err_buf,

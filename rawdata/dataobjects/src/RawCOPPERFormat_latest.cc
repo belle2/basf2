@@ -253,14 +253,14 @@ int RawCOPPERFormat_latest::GetOffset4thFINESSE(int n)
 }
 
 void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
-                                                vector<vector<unsigned int>>& summary_table)
+                                                std::vector<std::vector<unsigned int>>& summary_table)
 {
 
   //
   // Format of summary_table
   //  <The 1st channel of a value> <# of channels of the value> <the value>
   //
-  vector<vector<unsigned int>> temp;
+  std::vector<std::vector<unsigned int>> temp;
   for (int i = 0; i < MAX_PCIE40_CH; i++) {
     if (GetFINESSENwords(n, i) > 0) {
 
@@ -277,6 +277,7 @@ void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&inpu
       }
     }
   }
-  sort(summary_table.begin(), summary_table.end(), [](const vector<unsigned int>& alpha, const vector<unsigned int>& beta) {return alpha.at(1) < beta.at(1);});
+  sort(summary_table.begin(), summary_table.end(), [](const std::vector<unsigned int>& alpha,
+  const std::vector<unsigned int>& beta) {return alpha.at(1) < beta.at(1);});
   return;
 }

@@ -11,6 +11,7 @@ import ROOT
 from ROOT import Belle2
 from ROOT.Belle2 import SVDLocalConfigParameters
 from ROOT.Belle2 import SVDGlobalConfigParameters
+from basf2 import conditions as b2conditions
 import datetime
 import os
 
@@ -59,9 +60,7 @@ class defaultSVDConfigParametersImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDDetectorConfiguration.svdGlobalConfig_name, global_payload, iov)
 
 
-use_database_chain()
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localdb_defaultconfig/database.txt", "localdb_defaultconfig", invertLogging=True)
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = create_path()
 
@@ -71,7 +70,7 @@ eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module("Gearbox")
-main.add_module("Geometry", components=['SVD'])
+main.add_module("Geometry")
 
 main.add_module(defaultSVDConfigParametersImporter())
 

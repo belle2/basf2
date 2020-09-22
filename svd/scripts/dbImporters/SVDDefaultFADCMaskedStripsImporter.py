@@ -13,6 +13,7 @@ from ROOT import Belle2
 from ROOT.Belle2 import SVDFADCMaskedStrips
 import datetime
 import os
+from basf2 import conditions as b2conditions
 
 now = datetime.datetime.now()
 
@@ -54,8 +55,7 @@ class defaultFADCMaskedStripsImporter(basf2.Module):
 
 
 use_database_chain()
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localDB_defaultFADCMaskedStrips/database.txt", "localDB_defaultFADCMaskedStrips")
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = create_path()
 

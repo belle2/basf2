@@ -259,8 +259,9 @@ namespace Belle2 {
   double getAngle(double SizeX, double SizeY, double SizeXY)
   {
     double C = sqrS(SizeXY);
-    //is this correct?
-    double angle = 1. / 2 * atan(2 * C / (pow(SizeX, 2) - pow(SizeY, 2)));
+    // By convention the range of angle is [-pi/2, pi/2],
+    // the reason is the same as with straight line, e.g. it can point to pi/4 but also to -3/4*pi
+    double angle = 1. / 2 * atan2(2 * C, (pow(SizeX, 2) - pow(SizeY, 2)));
     return angle;
   }
 

@@ -117,7 +117,6 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, randomSel):
         # Don't bother making empty input list for a Run
         if chosen_files:
             new_iov_to_files[iov] = chosen_files
-            print(new_iov_to_files)
         else:
             B2INFO(f"No files chosen for {run}")
 
@@ -134,7 +133,8 @@ def filter_by_max_events_per_dataset(files_to_iov, max_events_per_dataset):
     This function creates a new files_to_iov dictionary by appending files
     in order until the maximum number of events are reached per data set.
 
-    random files for each run are considered in the collection.
+    a single random files for each run are considered in the first round
+    and these rounds are repeated until the max events criteria is fullfilled.
 
     Parameters:
         files_to_iov (dict): {"/path/to/file.root": IoV(1,1,1,1)} type dictionary. Same style as used by the CAF
@@ -156,32 +156,25 @@ def filter_by_max_events_per_dataset(files_to_iov, max_events_per_dataset):
     all_file = []
     while restart_loop:
         restart_loop = False
-
         for iov, files in sorted(iov_to_files.items()):
             run = ExpRun(iov.exp_low, iov.run_low)
             remaining_files = files[:]
             this_file = []
 
             if total < max_events_per_dataset and remaining_files:
-
                 file_path = choice(remaining_files)
-
                 # duplicate files are skipped
                 if file_path in all_file:
                     continue
-
                 events = events_in_basf2_file(file_path)
                 total += events
-
                 # Empty files are skipped
                 if not events:
                     B2INFO(f"No events in {file_path}, skipping...")
                     continue
-
                 this_file.append(file_path)
                 all_file.append(file_path)
                 B2INFO(f"Choosing input file for {run}: {file_path} and total events so far {total}")
-
                 # Don't bother making empty input list for a Run
                 if this_file:
                     if rounds == 0:

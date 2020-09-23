@@ -87,10 +87,10 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
     ttree->GetEvent(i);
 
-    //if track is junk
+    //if track is a junk
     if (dedx <= 0 || charge == 0) continue;
 
-    //if track is in CDC accpetance
+    //if track is in CDC accpetance (though it is inbuilt in collector module)
     if (costh < TMath::Cos(150 * TMath::DegToRad()) || costh > TMath::Cos(17 * TMath::DegToRad())) continue;
 
     int bin = int((costh - fCosMin) / binW);

@@ -117,14 +117,16 @@ void CDCDedxCorrectionModule::event()
       double correction = dedxTrack.m_scale * dedxTrack.m_runGain * dedxTrack.m_cosCor * dedxTrack.m_cosEdgeCor * dedxTrack.getWireGain(
                             i) * dedxTrack.getTwoDCorrection(i) * dedxTrack.getOneDCorrection(i) * dedxTrack.getNonLADCCorrection(i);
 
-      //Modify hit level dedx calibration
+      //Modify hit level dedx
       double newhitdedx = (m_relative) ? 1 / correction : 1.0;
       StandardCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, jPath, costh, newhitdedx);
       dedxTrack.setDedx(i, newhitdedx);
 
-      //do track level dedx calibration and modifiy after loop over hits
-      if (m_relative) correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh); //get 5 corr
-      else correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh); //get all 7 corr
+      //do track level dedx and modifiy after loop over hits
+      // rel const -> upto 6 from calibrated GT and 2 are direct from dedx track (no rel cal for them now)
+      // abs const -> upto 6 from calibrated GT and 2 are direct from default GT
+      if (m_relative) correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh);
+      else correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh);
 
       // combine hits accross layers
       if (correction != 0) {

@@ -22,6 +22,7 @@ from caf.framework import Calibration, CAF, Collection
 from caf.strategies import SequentialRunByRun, SingleIOV
 from prompt import CalibrationSettings
 import reconstruction as recon
+from softwaretrigger.path_utils import (add_filter_software_trigger, add_skim_software_trigger)
 
 gSystem.Load('libreconstruction.so')
 ROOT.gROOT.SetBatch(True)
@@ -44,22 +45,43 @@ def get_calibrations(input_data, **kwargs):
     fulldataMode = False
 
     if fulldataMode:
-        input_files_physics = file_to_iov_physics
+        input_files_rungain = file_to_iov_physics
+        input_files_coscorr = file_to_iov_physics
+        input_files_wiregain = file_to_iov_physics
     else:
-        max_files_for_maxevents = 100000  # 100k events max (around 5-6 max files)
-        from prompt.utils import filter_by_max_events_per_run
-        reduced_file_to_iov_physics = filter_by_max_events_per_run(file_to_iov_physics, max_files_for_maxevents)
-        input_files_physics = list(reduced_file_to_iov_physics.keys())
-        basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
+
+        from prompt.utils import filter_by_max_events_per_run, filter_by_max_events_per_dataset
+        # collection for rungains
+        max_files_for_maxevents = 35000  # (around 5-6 random files per run)
+        reduced_file_to_iov_rungain = filter_by_max_events_per_run(file_to_iov_physics, max_files_for_maxevents, True)
+        input_files_rungain = list(reduced_file_to_iov_rungain.keys())
+        basf2.B2INFO(f"Total number of files used for rungains = {len(input_files_rungain)}")
+
+        # collection for cosinecorr
+        max_events_per_dataset = 5000000  # 5M events max (random files for all runs)
+        reduced_file_to_iov_coscorr = filter_by_max_events_per_dataset(file_to_iov_physics, max_events_per_dataset)
+        input_files_coscorr = list(reduced_file_to_iov_coscorr.keys())
+        basf2.B2INFO(f"Total number of files used for cosine = {len(input_files_coscorr)}")
+
+        # collection for cosinecorr
+        max_events_per_dataset = 5000000  # 5M events max (random files for all runs)
+        reduced_file_to_iov_wiregain = filter_by_max_events_per_dataset(file_to_iov_physics, max_events_per_dataset)
+        input_files_wiregain = list(reduced_file_to_iov_wiregain.keys())
+        basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")
 
     requested_iov = kwargs.get("requested_iov", None)
     from caf.utils import IoV
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     # ----------1a. Run Gain Pre (No Payload saving and take of effect of previous rungains)
-    # Rungain Precollector path
+    # qRungain Precollector path
     Calibrate_RGTrial = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_RGTrial)
+    add_filter_software_trigger(path=Calibrate_RGTrial)
+    add_skim_software_trigger(path=Calibrate_RGTrial)
+    trg_bhabhaskim = Calibrate_RGTrial.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
+    trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
+
     Calibrate_RGTrial.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -72,7 +94,7 @@ def get_calibrations(input_data, **kwargs):
 
     # Rungain Collector setup
     Collector_RGTrial = basf2.register_module('CDCDedxElectronCollector')
-    CollParamTrial = {'cleanupCuts': True, 'Isrun': True, 'granularity': 'run', }
+    CollParamTrial = {'cleanupCuts': True, 'IsRun': True, 'granularity': 'run', }
     Collector_RGTrial.param(CollParamTrial)
 
     # Rungain Algorithm setup
@@ -84,7 +106,7 @@ def get_calibrations(input_data, **kwargs):
         name="RunGainCalibrationTrial",
         algorithms=[Algorithm_RGTrial],
         collector=Collector_RGTrial,
-        input_files=input_files_physics)
+        input_files=input_files_rungain)
     Calibration_RGTrial.strategies = SequentialRunByRun
     Calibration_RGTrial.pre_collector_path = Calibrate_RGTrial
     Calibration_RGTrial.algorithms[0].params = {"iov_coverage": output_iov}
@@ -94,6 +116,10 @@ def get_calibrations(input_data, **kwargs):
     # Rungain Precollector path
     Calibrate_RGPre = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_RGPre)
+    add_filter_software_trigger(path=Calibrate_RGPre)
+    add_skim_software_trigger(path=Calibrate_RGPre)
+    trg_bhabhaskim = Calibrate_RGPre.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
+    trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_RGPre.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -106,7 +132,7 @@ def get_calibrations(input_data, **kwargs):
 
     # Rungain Collector setup
     Collector_RGPre = basf2.register_module('CDCDedxElectronCollector')
-    CollParamPre = {'cleanupCuts': True, 'Isrun': True, 'granularity': 'run', }
+    CollParamPre = {'cleanupCuts': True, 'IsRun': True, 'granularity': 'run', }
     Collector_RGPre.param(CollParamPre)
 
     # Rungain Algorithm setup
@@ -118,7 +144,7 @@ def get_calibrations(input_data, **kwargs):
         name="RunGainCalibrationPre",
         algorithms=[Algorithm_RGPre],
         collector=Collector_RGPre,
-        input_files=input_files_physics)
+        input_files=input_files_rungain)
     Calibration_RGPre.strategies = SequentialRunByRun
     Calibration_RGPre.pre_collector_path = Calibrate_RGPre
     Calibration_RGPre.depends_on(Calibration_RGTrial)
@@ -129,6 +155,12 @@ def get_calibrations(input_data, **kwargs):
     # Cosine Precollector path
     Calibrate_CC = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_CC)
+    add_filter_software_trigger(path=Calibrate_CC)
+    add_skim_software_trigger(path=Calibrate_CC)
+    hltfilter = Calibrate_CC.add_module('VariableToReturnValue', variable='HighLevelTrigger')
+    # hltfilter.if_value('==0', basf2.Path())
+    trg_bhabhaskim = Calibrate_CC.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
+    trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_CC.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -140,7 +172,7 @@ def get_calibrations(input_data, **kwargs):
         oneDCell=True)
     # Cosine Collector setup
     Collector_CC = basf2.register_module('CDCDedxElectronCollector')
-    CollParam_CC = {'cleanupCuts': True, 'Ischarge': True, 'Iscosth': True,  'granularity': 'all', }
+    CollParam_CC = {'cleanupCuts': True, 'IsCharge': True, 'IsCosth': True,  'granularity': 'all', }
     Collector_CC.param(CollParam_CC)
 
     # Cosine Algorithm setup
@@ -152,7 +184,7 @@ def get_calibrations(input_data, **kwargs):
         name="CosineCorrCalibration",
         algorithms=[Algorithm_CC],
         collector=Collector_CC,
-        input_files=input_files_physics)
+        input_files=input_files_coscorr)
     Calibration_CC.pre_collector_path = Calibrate_CC
     Calibration_CC.depends_on(Calibration_RGPre)
     Calibration_CC.algorithms[0].params = {"apply_iov": output_iov}
@@ -161,6 +193,10 @@ def get_calibrations(input_data, **kwargs):
     # WireGain Precollector path
     Calibrate_WG = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_WG)
+    add_filter_software_trigger(path=Calibrate_WG)
+    add_skim_software_trigger(path=Calibrate_WG)
+    trg_bhabhaskim = Calibrate_WG.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
+    trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_WG.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -173,19 +209,20 @@ def get_calibrations(input_data, **kwargs):
 
     # WireGain Collector setup
     Collector_WG = basf2.register_module('CDCDedxElectronCollector')
-    CollParam_WG = {'cleanupCuts': True, 'Iswire': True, 'Isdedxhit': True, 'granularity': 'all', }
+    CollParam_WG = {'cleanupCuts': True, 'IsWire': True, 'Isdedxhit': True, 'granularity': 'all', }
     Collector_WG.param(CollParam_WG)
 
     # WireGain Algorithm setup
     Algorithm_WG = CDCDedxWireGainAlgorithm()
     Algorithm_WG.setMonitoringPlots(True)
+    Algorithm_WG.setLocalTrucation(True)
 
     # WireGain Calibration setup
     Calibration_WG = Calibration(
         name="WireGainCalibration",
         algorithms=[Algorithm_WG],
         collector=Collector_WG,
-        input_files=input_files_physics)
+        input_files=input_files_wiregain)
     Calibration_WG.pre_collector_path = Calibrate_WG
     Calibration_WG.depends_on(Calibration_RGPre)
     Calibration_WG.depends_on(Calibration_CC)
@@ -195,6 +232,10 @@ def get_calibrations(input_data, **kwargs):
     # Rungain Precollector path
     Calibrate_RG = basf2.create_path()
     recon.prepare_cdst_analysis(path=Calibrate_RG)
+    add_filter_software_trigger(path=Calibrate_RG)
+    add_skim_software_trigger(path=Calibrate_RG)
+    trg_bhabhaskim = Calibrate_RG.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
+    trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_RG.add_module(
         'CDCDedxCorrection',
         relativeCorrections=False,
@@ -207,7 +248,7 @@ def get_calibrations(input_data, **kwargs):
 
     # Rungain Collector setup
     Collector_RG = basf2.register_module('CDCDedxElectronCollector')
-    CollParamFinal = {'cleanupCuts': True, 'Isrun': True, 'granularity': 'run', }
+    CollParamFinal = {'cleanupCuts': True, 'IsRun': True, 'granularity': 'run', }
     Collector_RG.param(CollParamFinal)
 
     # Rungain Algorithm setup
@@ -219,7 +260,7 @@ def get_calibrations(input_data, **kwargs):
         name="RunGainCalibration",
         algorithms=[Algorithm_RG],
         collector=Collector_RG,
-        input_files=input_files_physics)
+        input_files=input_files_rungain)
     Calibration_RG.strategies = SequentialRunByRun
     Calibration_RG.depends_on(Calibration_RGPre)
     Calibration_RG.depends_on(Calibration_CC)

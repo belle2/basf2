@@ -171,7 +171,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       else truncMean = 1.0;
     }
 
-    if (truncMean < 0)truncMean = 1.0; // not 0 as that is reseved for dead wire
+    if (truncMean < 0)truncMean = 1.0; // not <=0 as 0 is reseved for dead wire
     iWireTruncMean[jwire] =  truncMean;
 
     if (isMakePlots) {
@@ -241,7 +241,7 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
     }
   }
 
-  //saving final constants to histograms for validation
+  //saving final constants in a histograms for validation
   if (isMakePlots) {
 
     TCanvas* cLConst = new TCanvas("cLConst", "cLConst", 1600, 1000);
@@ -349,7 +349,7 @@ void CDCDedxWireGainAlgorithm::generateNewPayloads(std::vector<double> dedxTrunc
 
 void CDCDedxWireGainAlgorithm::getTrucationBins(TH1D* htemp, int& binlow, int& binhigh)
 {
-
+  //calculating truncation average
   double TotalInt = htemp->Integral();
   if (TotalInt <= 0 || htemp->GetNbinsX() <= 0) {
     binlow = 1.0; binhigh = 1.0;

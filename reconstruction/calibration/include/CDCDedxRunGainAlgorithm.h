@@ -1,5 +1,4 @@
-/**
- ************************************************************************
+/**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
@@ -81,12 +80,12 @@ namespace Belle2 {
 
     bool isMakePlots; /**< produce plots for status */
     bool isMergePayload; /**< merge payload at the of calibration */
+    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
 
     TString fsrun; /**< flag to indentify low stats runs */
     double fSigLim; /**< fit range limit based on sigma */
     int fdEdxBins; /**< number of bins for dedx histogram */
     double fdEdxMin; /**< min dedx range for gain cal */
     double fdEdxMax; /**< max dedx range for gain cal */
-    DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
   };
 } // namespace Belle2

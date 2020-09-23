@@ -164,7 +164,7 @@ void CDCDedxElectronCollectorModule::collect()
 
   int nTracks = m_dedxTracks.getEntries();
   if (nTracks >= 4) {
-    B2WARNING("too many tracks: unclean bhabha event: " << nTracks);
+    B2WARNING("too many tracks: unclean bhabha or radee event: " << nTracks);
     hestats->Fill(4);
     return;
   }
@@ -214,12 +214,11 @@ void CDCDedxElectronCollectorModule::collect()
       htstats->Fill(2);
 
       if (m_costh > -0.55 && m_costh < 0.820) {
-        if (dedxTrack->getNLayerHits() < 25)continue; //alllayer available here
+        if (dedxTrack->getNLayerHits() < 25)continue; //all CDC layer available here
       } else {
-        if (dedxTrack->getNLayerHits() < 10)continue; ////less layer available here
+        if (dedxTrack->getNLayerHits() < 10)continue; //less layer available here
         if (m_charge < 0)if (dedxTrack->getNLayerHits() < 15)continue;
       }
-
       htstats->Fill(3);
 
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
@@ -263,7 +262,7 @@ void CDCDedxElectronCollectorModule::collect()
     if (m_nhits > m_maxNumHits) continue;
 
     for (int i = 0; i < m_nhits; ++i) {
-      if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue;
+      // if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue;
       if (IsWire)m_wire.push_back(dedxTrack->getWire(i));
       if (IsLayer)m_layer.push_back(dedxTrack->getHitLayer(i));
       if (IsDoca)m_doca.push_back(dedxTrack->getDoca(i));

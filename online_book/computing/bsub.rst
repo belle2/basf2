@@ -25,13 +25,13 @@ Batch submission
 
         * Submit computation intensive scripts to worker servers
 
-
-A batch job is submitted from a work server at KEKCC, the job is scheduled by
+When a batch job is submitted from a work server at KEKCC, the job is scheduled by
 `LSF <https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_welcome/lsf_kc_using.html>`_
-(Platform Load Sharing Facility developed by IBM) which will dispatches
+(Platform Load Sharing Facility developed by IBM) which dispatches
 and executes the job on a calculation server. It is important to select an
 appropriate queue for your jobs.
-In this lession, we will go through some commands that often used in analysis.
+
+In this lession, we will go through some commands that are often used in analysis.
 
 Basic commands
 --------------
@@ -71,10 +71,10 @@ job state statistics.
    a               100  Open:Active       -    4    -    -    11     3     8     0
    dc_generic      100  Open:Active       -    -    -    -     0     0     0     0
 
-Different queues have different settings. For analysis, you can use ``s``,
-``l``, or ``h``. For short jobs with running time under 6 hours, th queue
-``s`` is perferable. For jobs with execution time more than 6 hours,
-you might consider to use queue ``l``, which gives jobs up to 48 hours
+Different queues have different settings. For analysis you can use ``s``,
+``l``, or ``h``. For short jobs with running time under 6 hours, the queue
+``s`` is preferable. For jobs with execution time more than 6 hours,
+you might want to use the queue ``l`` which gives jobs up to 48 hours of
 running time.
 More information about LSF queues can be found
 `here <https://kekcc.kek.jp/service/kekcc/html/Eng/BatchQueueList.html>`__.
@@ -103,7 +103,7 @@ and <...> indicates that the value should be filled in by you.
 
    Provide queue name after ``-l``, and combine with ``grep``
    command to get your information more quickly.
-   If you never use batch queue before, it should be 0.333.
+   If you have never used the batch queue before, it should be 0.333.
 
 
 Every uses has the default value of 0.333 to start with.
@@ -135,14 +135,14 @@ and check the output
    Hello world, this is script example.sh.
    Finished!
 
-Use the same method you can submit python or basf2 scripts to bqueues!
+Use the same method, you can submit Python or basf2 scripts to bqueues!
 
 .. code-block:: bash
 
    bsub -q <queue name> "basf2 <your_working_script>"
 
 .. note::
-   Always test your script before submitting large scale of jobs to batch system.
+   Always test your script before submitting large scale jobs to batch system.
 
 
 .. rubric:: Display job status
@@ -179,7 +179,7 @@ To check the job status
          $ bsub -q l "basf2 one_of_example.py"
          Job <xxxxxxxx> is submitted to queue <l>.
 
-      Check status use one of the followings:
+      To check the status use, one of the following:
 
       ``bjobs -q l <xxxxxxxx>``, ``bjobs <xxxxxxxx>``, or just ``bjobs`` alone.
 
@@ -195,16 +195,17 @@ To cancel jobs
 
    Use ``0`` to kill all jobs. Use this with caution.
 
-Sometimes ``bjob`` will still show the job after we tried to terminate it.
-In this case we can use the ``-r`` option to force kill it.
+Sometimes ``bjobs`` will still show the job after we tried to terminate it.
+In this case we can use the ``-r`` option to kill it by force.
 More information is given `here
 <https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_users_guide/job_kill_force.html>`__.
 
 Optional
 --------
 In some scenarios you might want to stop the submitted jobs and resume them
-later, for instance, scheduled maintenance of storage elements where the input
-data is located, or updating analysis global tags that used in your jobs.
+later. For instance this might be due to scheduled maintenance of storage
+elements where the input data is located or the updating of analysis global tags
+that used in your jobs.
 
 .. rubric:: Suspend jobs
 
@@ -225,13 +226,17 @@ To resumes suspended jobs
 
 .. code-block:: bash
 
-      bresume <job_ID>
+   bresume <job_ID>
 
 .. admonition:: Key points
    :class: key-points
 
-   * Submit a script to the short queue with ``bsub -q s "bash myscript.sh``
+   * Submit a script to the short queue with ``bsub -q s "bash myscript.sh"``
    * Check job queues with ``bequeues``
    * Kill jobs with ``bkill <job id>``
    * **Always test your scripts before large scale submissions!**
 
+
+.. topic:: Author of this lesson
+
+   Chia-Ling Hsu

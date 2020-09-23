@@ -58,7 +58,7 @@ signal events you observe.
 The most basic way to select a signal is to apply what, in jargon, are called "cuts". 
 A cut is nothing but selection, usually binary, over one quantity that has some 
 separation power between signal and background. Of course multiples cuts can be 
-applied in sequence, leading to quite effective background reactions. 
+applied in sequence, leading to quite effective background reductions. 
 Before deciding on the selection criteria however, one must define the variable 
 that will be used to count of many signal events are left. A good variable has a 
 very peaking distribution for signal, and a smooth, uniform distribution for the 
@@ -141,18 +141,23 @@ Other kinds of backgrounds are dealt with at later stages of your analysis.
 We will cover different aspects of this later in this lesson, and in
 further lessons.
 
-Data taking: The detector
--------------------------
+Data taking: The experiment
+---------------------------
 
 If you are reading this manual, you are probably already at least partially 
-familiar with the general layout of the Belle II experiment. However, before 
-moving on, let's very quickly review its structure.
-Belle II has several sub-systems, each one dedicated to a specific task: 
+familiar with the general layout of the SuperKEKB accelerator and the Belle II experiment. However, before 
+moving on, let's very quickly review their structure.
+
+The SuperKEKB accelerator circulates electrons and positrons in its roughly 3km circumference tunnel. These beams are asymmetric in momentum, with the electrons kept at around 7Gev/c and the positrons at around 4GeV/c circulating in opposite directions. At a single point on the accelerator ring, the two beams are steered into (almost) head-on collision, resulting in a center-of-mass energy of typically around 10.6GeV. The point of collision is named the "interaction region".
+
+The Belle II detector is built around the interaction region, with the goal to detect and measure as many of the particles produced in the SuperKEKB collisions as possible. Belle II consists of several sub-systems, each one dedicated to a specific task: 
 reconstruct the trajectory of charged track, reconstruct the energy of photons, 
 identify the particle type or to identify muons and reconstruct long-living hadrons. 
 Of course some systems can be used for multiple purposes: for example, the ECL is mainly 
 intended as a device to recontruct photons, but is also used to identify 
 electrons and hadrons.
+
+Due to the asymmetry of the SuperKEKB collisions, the Belle II detector also has an asymmetric geometry. In the context of Belle II the "forward" direction is the direction in which the electron beam points, while "backward" is the direction in which the positron beam points.
 
 .. seealso:: 
 
@@ -251,8 +256,8 @@ KLM
     If you are a newcomer you should probably refer to it as it's (significantly more sane) official name.
 
 
-Data taking: on resonance, continuum, comics
---------------------------------------------
+Data taking: on resonance, continuum, cosmics
+---------------------------------------------
 
 
 
@@ -268,8 +273,7 @@ require a comical amount of resources and bandwidth from the detector to the off
 For this reason the data are acquired only when a potentially interesting even is seen 
 in the detector, and several level of filtering are applied during the data processing 
 before the end-users, the analysist, can run their analysis jobs on them. 
-What follows is a very simplified explanation of the process the leads from the physic 
-event to the data you can analyze.
+What follows is a very simplified explanation of the process the leads from the physics event to the data you can analyze.
  
 The systems that are involved in the data taking are the Data AcQuisition (DAQ), the 
 TRiGger (TRG, also known as L1) and the High Level Trigger (HLT). Collectively, they are 

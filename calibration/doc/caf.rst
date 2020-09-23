@@ -122,6 +122,8 @@ This could be useful if a Collector step succeeded previously, but now needs to 
     :filename: calibration/tools/b2caf-status
     :func: get_argparser
     :prog: b2caf-status
+    :nodefaultconst:
+    :nogroupsections:
 
 
 The b2caf-filemap Tool
@@ -139,6 +141,8 @@ containing the dictionary.
     :filename: calibration/tools/b2caf-filemap
     :func: get_argparser
     :prog: b2caf-filemap
+    :nodefaultconst:
+    :nogroupsections:
 
 
 Job Submission Backends
@@ -188,17 +192,57 @@ At this point you should consider using a backend inheriting from the :py:class:
     :members:
     :inherited-members:
 
-Currently there are two :py:class:`Batch <caf.backends.Batch>` classes.
-The :py:class:`LSF <caf.backends.LSF>`, and the :py:class:`PBS <caf.backends.PBS>` backends.
+Currently there are three :py:class:`Batch <caf.backends.Batch>` classes.
+The :py:class:`LSF <caf.backends.LSF>`, the :py:class:`PBS <caf.backends.PBS>`, and the
+:py:class:`HTCondor <caf.backends.HTCondor>` backends.
 If you are running at KEKCC (or any site providing the ``bsub`` command) you should use the :py:class:`LSF <caf.backends.LSF>`
 backend.
 If you are running at a site that uses the ``qsub`` command, you should use the :py:class:`PBS <caf.backends.PBS>` backend.
+For NAF (DESY) and BNL you should use the HTCondor backends (they use ``condor_submit``).
 
 .. autoclass:: caf.backends.LSF
     :members:
     :inherited-members:
 
 .. autoclass:: caf.backends.PBS
+    :members:
+    :inherited-members:
+
+.. autoclass:: caf.backends.HTCondor
+    :members:
+    :inherited-members:
+
+Configuring SubJob Creation
+---------------------------
+
+You probably want to use basically the same setup for many (possibly 1000's) of jobs but with different input data or
+arguments. For this situation you can create `SubJob` objects of `Job` objects. SubJobs inherit most of the same attributes
+as the parent job. However they can have different input files and arguments.
+
+.. autoclass:: caf.backends.SubJob
+    :members:
+    :inherited-members:
+
+SubJobSplitters and Arguments Generation
+****************************************
+
+.. autoclass:: caf.backends.SubjobSplitter
+    :members:
+    :inherited-members:
+
+.. autoclass:: caf.backends.MaxFilesSplitter
+    :members:
+    :inherited-members:
+
+.. autoclass:: caf.backends.MaxSubjobsSplitter
+    :members:
+    :inherited-members:
+
+.. autoclass:: caf.backends.ArgumentsSplitter
+    :members:
+    :inherited-members:
+
+.. autoclass:: caf.backends.ArgumentsGenerator
     :members:
     :inherited-members:
 

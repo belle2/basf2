@@ -9,7 +9,7 @@ Calibration Framework (CAF)
     :maxdepth: 2
     :glob:
 
-    01-caf.rst
+    caf
 
 Prompt Calibration
 ==================
@@ -18,4 +18,4 @@ Prompt Calibration
     :maxdepth: 2
     :glob:
 
-    02-prompt.rst
+    prompt

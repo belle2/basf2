@@ -50,9 +50,8 @@ At this point you are working with the CAF and should be ready to add a prompt c
 Now identify the requirements of your calibration:
 
 * Which data formats will it take as input (raw, cDST)?
-* What kind of data will it take as input (HLT hadron skim, physics runs, cosmic runs)?
-* How many runs of data will it need to get at least one valid payload?
-* How many input files + events from a run will it need?
+* What kinds of valid calibration data will it take as input e.g. HLT hadron skim
+* How many events from a run/in total will it need?
 * Does this calibration depend on the accurate payloads from another prompt calibration?
 
 If you need to create a new script for your calibration you should create it in the ``calibration/scripts/prompt/calibrations``
@@ -123,8 +122,8 @@ So ``input_data`` is a dictionary that contains input files separated into *cate
           You can always filter/reduce the number of input files to a more manageable amount depending on how much
           data you expect to need per run (or in total).
 
-The ``**kwargs`` argument is used only to send in the ``requested_iov`` value at the moment.
-This value is the overall processing request IoV, and is the run range that your output payloads should cover.
+The ``**kwargs`` argument is used to send in the ``requested_iov`` and ``expert_config``  valuse at the moment.
+``requested_iov`` value is the overall bucket IoV, and is the run range that your output payloads should cover.
 
 .. note:: Although ``kwargs["requested_iov"]`` has both a defined lower and upper bound e.g. IoV(2, 1, 2, 100).
           For prompt processing you should endeavour to have your output payloads be open-ended e.g. IoV(2, 1, -1, -1).
@@ -144,6 +143,8 @@ b2caf-prompt-show
     :filename: calibration/tools/b2caf-prompt-show
     :func: get_argparser
     :prog: b2caf-prompt-show
+    :nodefaultconst:
+    :nogroupsections:
 
 .. _b2caf_prompt_run:
 
@@ -154,6 +155,8 @@ b2caf-prompt-run
     :filename: calibration/tools/b2caf-prompt-run
     :func: get_argparser
     :prog: b2caf-prompt-run
+    :nodefaultconst:
+    :nogroupsections:
 
 .. _b2caf_prompt_check:
 
@@ -164,6 +167,8 @@ b2caf-prompt-check
     :filename: calibration/tools/b2caf-prompt-check
     :func: get_argparser
     :prog: b2caf-prompt-check
+    :nodefaultconst:
+    :nogroupsections:
 
 
 Utility Functions

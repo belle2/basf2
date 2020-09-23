@@ -75,7 +75,7 @@ It is important to introduce intermediate cuts to reduce combinatorics in order 
 The FEI uses several cuts, which are applied for each particle in the following order:
 
 #.    **PreCut::userCut** is applied before all other cuts to introduce a-priori knowledge, e.g. final-state particle tracks (K shorts are handled via V0 objects) should originate from the IP ``'[dr < 2] and [abs(dz) < 4]'``, the invariant mass of D mesons should be inside a certain mass window ``'1.7 < M < 1.95'``, hadronic B meson candidates require a reasonable beam-constrained mass and delta E ``'Mbc > 5.2 and abs(deltaE) < 0.5'``. This cut is also used to enforce constraints on the number of additional tracks in the event for a specific signal-side ``'nRemainingTracksInEvent == 1'``.
-#. **PreCut::bestCandidateCut** keeps for each decay-channel only a certain number of best-candidates. The variable which is used to rank all the candidates in an event is usually the PID for final-state particles e.g. ``electronID``, ``pionID``, ``muonID```; the distance to the nominal invariant mass ``abs(dM)`` for intermediate particles; the product of the daughter SignalProbabilities for intermediate particles in semileptonic or KLong channels ``daughterProductOf(extraInfo(SignalProbability))``. Between 10-20 candidates per channel (charge conjugated candidates are counted separately) are typically kept at this stage. This reduces the combinatoric in each event to the same level.
+#. **PreCut::bestCandidateCut** keeps for each decay channel only a certain number of best-candidates. The variable which is used to rank all the candidates in an event is usually the PID for final-state particles e.g. ``electronID``, ``pionID``, ``muonID```; the distance to the nominal invariant mass ``abs(dM)`` for intermediate particles; the product of the daughter SignalProbabilities for intermediate particles in semileptonic or KLong channels ``daughterProductOf(extraInfo(SignalProbability))``. Between 10-20 candidates per channel (charge conjugated candidates are counted separately) are typically kept at this stage. This reduces the combinatoric in each event to the same level.
 #.    **PreCut::vertexCut** throws away candidates below a certain confidence level after the vertex fit. Default is throwing away only candidates with failed fits. Since the vertex fit is the most expensive part of the reconstruction it does not make sense to do a harder cut here, because the cuts on the network output afterwards will be more efficient without to much extra computing time
 #.    **PostCut::value** is a cut on the absolute value of the ``SignalProbability`` and should be chosen very loose, only candidates which are highly unlikely should be thrown away here
 #.    **PostCut::bestCandidateCut** keeps for each particle only a certain number of best-candidates. The candidates of all channels are ranked using their ``SignalProbability``. Usually Between 10-20 candidates are kept per particle. This cut is extremely important because it limits the combinatoric in the next stage of reconstructions, and the algorithm can calculate the combinatoric at the next stage in advance.
@@ -84,9 +84,10 @@ Applying the FEI
 ################
 
 
-Just include the ``feistate.path`` create by the ``fei.get_path()`` function in your steering file.
+Just include the ``feistate.path`` created by the ``fei.get_path()`` function in your steering file.
 
-The weightfiles are automatically loaded from the condition database. This might take some time. You can also copy the localdb of the training (or another local database containing the weightfiles) in your working directory by hand to speed up the execution.
+The weightfiles are automatically loaded from the conditions database (see `FEI and the conditions database`).
+This might take some time.
 
 After the FEI path the following lists are available
 
@@ -95,13 +96,13 @@ After the FEI path the following lists are available
 *    B0:generic (hadronic tag)
 *    B+:semileptonic (semileptonic tag)
 
-Each candidate has three extra infos which are interesting:
+Each candidate has two extra infos which are interesting:
 
 *    SignalProbability is the signal probability calculated using FastBDT
 *    decayModeID is the tag :math:`B` decay channel
 
 
-You can use a different decay channel configuration during the application. In particular you can omit decay-channels (e.g. the semileptonic if your are only interested in the hadronic tag).
+You can use a different decay channel configuration during the application. In particular you can omit decay channels (e.g. the semileptonic ones if you are only interested in the hadronic tag).
 However, it is not possible to add new channels without training them first (obviously).
 
 You can find up to date examples in ``analysis/examples/FEI``.
@@ -252,7 +253,7 @@ CPU time in the training was used for events with more than 12 tracks, yet these
 *   **generic-mode**; the training is done on double-generic Monte Carlo without signal-side selection, which corresponds to the FR of Belle. Hence, the training is independent of the signal-side and is only trained once for all analyses. The method is optimized to reconstruct tag-side of generic MC. If you don't know your signal-side selection before the tag-side is reconstructed e.g. in an inclusive analysis like :math:`B → X_c K` or :math:`B → X_{u/c} l \nu`, this is the mode you want.
 *    **specific-mode**; the training is optimized for the signal-side selection and trained on double-generic and signal Monte Carlo, in order to get enough signal statistics despite the no-remaining-tracks constraint. In this mode the FEI is trained on the RestOfEvent after the signal-side selection, therefore the training depends on the signal-side and one has to train it for every analysis separately. The method is optimized to reconstruct the tag-side of signal MC. The usual tag-side efficiency is no longer a good measure for the quality, instead you have to look at the total Y4S efficiency including your signal-side efficiency. This mode can be used in searches for :math:`B^{+} \rightarrow \tau^{+} \nu_{\tau}` (Thomas Keck), :math:`B^{+} \rightarrow l^{+} \nu_{l} \gamma` (Moritz Gelb), :math:`B^{0} \rightarrow \nu \bar{\nu}`  (Gianluca Inguglia), :math:`B \rightarrow K^{*} \nu \bar{\nu}`, :math:`B \rightarrow D^{*} \tau \nu_{\tau}`, ... Another advantage is that global constraints on the beam-constrained mass and :math:`\Delta E` can be enforced at the beginning of the training.
 
-In addition it is possible to train the multivariate classifiers for an decay-channel on real data using sPlot, however I never tested it since we do not have real data (02/2016). We also trained the FEI successfully using Belle I MC. This is commonly known as "converted FEI".
+In addition it is possible to train the multivariate classifiers for a decay channel on real data using sPlot, however I never tested it since we do not have real data (02/2016). We also trained the FEI successfully using Belle I MC. This is commonly known as "converted FEI".
 
 Basic Workflow (training)
 *************************

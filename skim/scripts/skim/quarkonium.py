@@ -191,20 +191,12 @@ class InclusiveLambda(BaseSkim):
 
     Selection criteria:
     * proton
-    ``nCDCHits > 20``
-    ``nSVDHits < 13``
-    ``trackFitHypothesisPDG == 2212``
     ``protonID > 0.1``
-    * pion:
-    ``nCDCHits > 0``
     * Lambda:
     ``cosAngleBetweenMomentumAndVertexVector > 0.99``
     ``flightDistance/flightDistanceErr > 3.``
     * ``0.6 < p,proton/p,Lambda < 1.0 GeV/c``
 
-    f1(p) and f2(p) are analytical functions, p being the Lambda momentum
-    (see https://indico.belle2.org/event/2419/contributions/12005/attachments/6228/9670/BottomoniumHyperons_B2GM.pdf
-    and https://indico.belle2.org/event/2467/contributions/13962/attachments/7240/11226/Skim_inclusiveLambda.pdf)
     """
     __authors__ = ["Bianca Scavino"]
     __description__ = "Inclusive Lambda skim"
@@ -217,17 +209,11 @@ class InclusiveLambda(BaseSkim):
     def build_lists(self, path):
 
         # Add useful alias
-        v.addAlias("nCDCHits_proton", "daughter(0, nCDCHits)")
-        v.addAlias("nSVDHits_proton", "daughter(0, nSVDHits)")
-        v.addAlias("fitHypo_proton", "daughter(0, trackFitHypothesisPDG)")
         v.addAlias("protonID_proton", "daughter(0, protonID)")
-        v.addAlias("nCDCHits_pion", "daughter(1, nCDCHits)")
         v.addAlias("momRatio_protonLambda", "formula(daughter(0, p)/p)")
         v.addAlias('flightSignificance', 'formula(flightDistance/flightDistanceErr)')
 
         # Apply selection to Lambdas
-        ma.applyCuts("Lambda0:merged", "nCDCHits_proton > 20 and nSVDHits_proton < 13 and fitHypo_proton == 2212", path=path)
-        ma.applyCuts("Lambda0:merged", "nCDCHits_pion > 0", path=path)
         ma.applyCuts("Lambda0:merged", "cosAngleBetweenMomentumAndVertexVector > 0.99", path=path)
         ma.applyCuts("Lambda0:merged", "0.6 < momRatio_protonLambda < 1.", path=path)
         ma.applyCuts("Lambda0:merged", "flightSignificance > 3.", path=path)

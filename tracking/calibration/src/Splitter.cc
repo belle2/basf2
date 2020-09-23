@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Radek Zlebcik
+ * Contributors: Radek Zlebcik                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -193,7 +193,7 @@ namespace Belle2 {
   // Get the optimal clustering of the atoms with indeces 0 .. e (recursive function with cache)
   double Splitter::getMinLoss(const vector<pair<double, double>>&  vec, int e, vector<int>& breaks)
   {
-    // If intry in cache (speed up)
+    // If entry in cache (speed up)
     if (cache[e].first >= 0) {
       breaks = cache[e].second;
       return cache[e].first;

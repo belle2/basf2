@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Radek Zlebcik                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <vector>
@@ -9,27 +19,40 @@
 
 namespace Belle2 {
 
-  // struct with expNum, runNum, evtNum
+  /** struct with expNum, runNum, evtNum */
   struct ExpRunEvt {
-    int exp, run, evt;
+    int exp; ///< experiment number
+    int run; ///< run number
+    int evt; ///< event number
+    /** simple constructor */
     ExpRunEvt(int Exp, int Run, int Evt) : exp(Exp), run(Run), evt(Evt) {}
   };
 
 
-  // track parameters (neglecting curvature)
+  /** track parameters (neglecting curvature) */
   struct Track {
-    double d0, z0, phi0, tanlambda;
+    double d0;   ///< signed distance to the POCA in x-y plane
+    double z0;   ///< z position of the POCA
+    double phi0; ///< angle of the track in x-y plane
+    double tanlambda; ///< tan of angle in the z-dirrection, if zero no movement in z
   };
 
-  //Event containing two tracks
+  /** Event containing two tracks */
   struct Event {
-    int exp, run, evtNo;
-    Track mu0, mu1;
+    int exp;   ///< experiment number
+    int run;   ///< run number
+    int evtNo; ///< event number
 
-    int nBootStrap; //random bootstrap weight (n=1 -> original sample)
-    bool isSig;     // is not removed?
-    double t;       // time of event (relative)
-    void toMicroM()   //from [cm] to [um]
+
+    Track mu0; ///< track in the event
+    Track mu1; ///< other track in the event
+
+    int nBootStrap; ///< random bootstrap weight (n=1 -> original sample)
+    bool isSig;     ///< is not removed by quality cuts?
+    double t;       ///< time of event [hours]
+
+    /** from [cm] to [um] */
+    void toMicroM()
     {
       mu0.d0 *= 1e4;
       mu1.d0 *= 1e4;

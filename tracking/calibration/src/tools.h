@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Radek Zlebcik
+ * Contributors: Radek Zlebcik                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -151,18 +151,20 @@ namespace Belle2 {
   }
 
 
-  // Spline structure for zero-order & linear splines
+  /** Spline structure for zero-order & linear splines */
+  /** nodes.size() <= 1 -> order=0 , nodes.size() == vals.size() -> order=1 */
   struct Spline {
-    //spl.size() <= 1 -> order=0 , spl.size() == vals.size() -> order=1
-    std::vector<double> nodes, vals, errs;
+    std::vector<double> nodes; ///< vector of spline nodes
+    std::vector<double> vals;  ///< vector of spline values
+    std::vector<double> errs;  ///< vector of spline errors
 
-    //get value of spline at point x
+    /** get value of spline at point x */
     double val(double x) const {return eval(nodes, vals, x);}
 
-    //get error of spline at point x
+    /** get error of spline at point x */
     double err(double x) const {return eval(nodes, errs, x);}
 
-    //Get center of the spline domain
+    /** Get center of the spline domain */
     double center() const
     {
       if (nodes.size() == 0)  //dummy situation
@@ -173,7 +175,7 @@ namespace Belle2 {
         return (nodes[nodes.size() / 2 - 1]  +  nodes[nodes.size() / 2]) / 2;
     }
 
-    //print the spline
+    /** print the spline */
     void print(TString tag = "")
     {
       std::cout << tag << " : nodes: ";

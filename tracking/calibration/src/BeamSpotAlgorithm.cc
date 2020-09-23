@@ -1,28 +1,26 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Radek Zlebcik
+ * Contributors: Radek Zlebcik                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #include <tracking/calibration/BeamSpotAlgorithm.h>
-
 #include <mdst/dbobjects/BeamSpot.h>
-
 #include <framework/database/EventDependency.h>
-
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/IntervalOfValidity.h>
 
-#include "standAloneBSalgo.h"
-
-#include "Splitter.h"
-
 #include <iostream>
 #include <iomanip>
+
+#include "standAloneBSalgo.h"
+#include "Splitter.h"
+
 
 using namespace std;
 using namespace Belle2;
@@ -150,6 +148,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
 
 
     //If too few events, let the BeamSpot pars empty
+    //Will be filled with the closest neighbor at the next stage
     if (evtsVec.at(i).size() < 50) {
       continue;
     }

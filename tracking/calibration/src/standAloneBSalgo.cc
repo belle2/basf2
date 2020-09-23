@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Radek Zlebcik
+ * Contributors: Radek Zlebcik                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -59,14 +59,17 @@ namespace Belle2 {
   TMatrixD getRotatedSizeMatrix(vector<double> xySize, double zzSize, double kX, double kY);
 
 
-//structore containing most of the beam spot parameters
+  /** structure containing most of the beam spot parameters */
   struct SpotParam {
-    Spline x, y, z;  //Splines for IP position in time
-    Spline kX, kY;   //deviation with z-coordinate
+    Spline x;  ///< spline for BS center position as a function of time (x coordinate)
+    Spline y;  ///< spline for BS center position as a function of time (y coordinate)
+    Spline z;  ///< spline for BS center position as a function of time (z coordinate)
+    Spline kX; ///< spline for BS angle in the xz plane as a function of time
+    Spline kY; ///< spline for BS angle in the yz plane as a function of time
 
     SpotParam() {}
 
-    // Print BeamSpot parameters
+    /** Print BeamSpot parameters */
     void print()
     {
       cout << "x" << endl;
@@ -81,8 +84,10 @@ namespace Belle2 {
       kY.print();
     }
 
-    // Constructor based on vals, errors and vector with splines - Assuming linear splines
-    // xVals, yVals, kXvals, kYvals, zVals
+    /** Constructor based output of the linear regresion, assuming zero-order splines
+     * vals, errors and vector with splines - are aggregated results of linear-regresion
+       Order of variables in the vals & errs vector is the following:
+       xVals, yVals, kXvals, kYvals, zVals */
     SpotParam(const vector<double>& vals, const vector<double>& errs, const vector<vector<double>>& spls, int order = 0)
     {
       auto getSize = [order](const vector<double>& sp) {
@@ -135,12 +140,12 @@ namespace Belle2 {
   };
 
 
-// Spline with uncertainity obtained from the replicas
+  /** Spline with uncertainity obtained from the boot-strap replicas */
   struct UnknowSpline {
-    vector<Spline> spls; // vector with replicas
-    void add(Spline spl) { spls.push_back(spl); } // add boot-strap replica
+    vector<Spline> spls; ///< vector with replicas
+    void add(Spline spl) { spls.push_back(spl); } ///< add boot-strap replica
 
-    // Get mean and 1-sigma errors of the spline values
+    /** Get mean and 1-sigma errors of the spline values */
     Spline getMeanSigma()
     {
       Spline sAvg;
@@ -169,7 +174,8 @@ namespace Belle2 {
       return sAvg;
     }
 
-    //percentil spline, 0.5 : median,  0.16: low interval, 0.84 : up interval
+    /** quantile of all points in spline, v=0.5 : median,
+      * v=0.16: lower 68% bound, v=0.84 : upper 68% bound */
     Spline getLimit(double v)
     {
       Spline sLim = spls[0];
@@ -196,17 +202,19 @@ namespace Belle2 {
 
 
 
-  // variable with uncertainity from boot-strap replicas
+  /** variable with uncertainity from boot-strap replicas */
   struct UnknowVar {
-    vector<double> vars;
-    void add(double x) { vars.push_back(x); } // add value to the replicas
+    vector<double> vars; ///< vector of variable values for all replicas
+    void add(double x) { vars.push_back(x); } ///< add value to the replicas
 
+    /** Get mean value */
     double getMean()
     {
       assert(vars.size() >= 1);
       return accumulate(vars.begin(), vars.end(), 0.) / vars.size();
     }
 
+    /** Get standard deviation */
     double getSigma()
     {
       assert(vars.size() >= 1);
@@ -220,7 +228,7 @@ namespace Belle2 {
         return 0;
     }
 
-    //68 % limit
+    /** Get quantile (v=0.5 -> median, v=0.16,v=0.84 68% confidence interval) */
     double getLimit(double v)
     {
       assert(vars.size() >= 1);
@@ -231,7 +239,7 @@ namespace Belle2 {
       return vars[I] * (1 - r) + vars[I + 1] * r;
     }
 
-    // Print variable of name "n" with stat-info
+    /** Print variable of name n with stat-info */
     void printStat(TString n)
     {
       assert(vars.size() >= 1);
@@ -239,7 +247,7 @@ namespace Belle2 {
              1 - 0.16) << " )" << endl;
     }
 
-    // Get basic stats
+    /** Get basic stats */
     vector<double> getStats()
     {
       return {getLimit(0.50), getLimit(0.16), getLimit(1 - 0.16)};
@@ -300,14 +308,33 @@ namespace Belle2 {
 
 
 
-// structure including all variables of interest with uncertainity from boot-strap
+  /** structure including all variables of interest with uncertainities from boot-strap */
   struct UnknownPars {
-    UnknowSpline x, y, kX, kY, z;
-    UnknowVar sizeX, sizeY, sizeXY, sizeMin, sizeMax, xyAngle;
-    UnknowVar sizeZ, crossAngle;
+    UnknowSpline x;  ///< BS position (x coordinate)
+    UnknowSpline y;  ///< BS position (y coordinate)
+    UnknowSpline kX; ///< BS angle in xz plane
+    UnknowSpline kY; ///< BS angle in yz plane
+    UnknowSpline z;  ///< BS position (z coordinate)
 
-    UnknowVar matXX, matYY, matZZ, matXY, matXZ, matYZ;
+    UnknowVar sizeX;  ///< BS size in x direction
+    UnknowVar sizeY;  ///< BS size in y direction
+    UnknowVar sizeXY; ///< off-diagonal component of BS size cov matrix in frame where z' is aligned with z
+    UnknowVar sizeMin; ///< smallest eigenvalue of the BS size cov matrix (similar to sizeY)
+    UnknowVar sizeMax; ///< middle eigenvalue of the BS size cov matrix (similar to sizeX)
+    UnknowVar xyAngle; ///< angle of the BS in xy plane when z' is aligned with z
 
+
+    UnknowVar sizeZ;  ///< BS size in z direction
+    UnknowVar crossAngle; ///< derived value of the crossing angle of the HER & LER beams
+
+    UnknowVar matXX; ///< XX element of BS size cov matrix
+    UnknowVar matYY; ///< YY element of BS size cov matrix
+    UnknowVar matZZ; ///< ZZ element of BS size cov matrix
+    UnknowVar matXY; ///< XY element of BS size cov matrix
+    UnknowVar matXZ; ///< XZ element of BS size cov matrix
+    UnknowVar matYZ; ///< YZ element of BS size cov matrix
+
+    /** add next boot-strap replica of the BS parameters */
     void add(SpotParam sPar, double SizeX, double SizeY, double SizeXY, double SizeZ)
     {
       x.add(sPar.x);
@@ -355,7 +382,7 @@ namespace Belle2 {
       crossAngle.add(crossAngleVal);
     }
 
-    // Print interesting statistics from boot-strap
+    /** Print interesting statistics from boot-strap */
     void printStat()
     {
       x.getMeanSigma().print("x");
@@ -384,7 +411,7 @@ namespace Belle2 {
       matYZ.printStat("matYZ");
     }
 
-    // get output in Belle2-like format
+    /** get output in Belle2-like format */
     void getOutput(vector<TVector3>& vtxPos, vector<TMatrixDSym>& vtxErr, TMatrixDSym& sizeMat)
     {
       //Store the vertex position
@@ -406,7 +433,7 @@ namespace Belle2 {
         vtxErr.push_back(mS);
       }
 
-      //BeamSpot size matrix (from iteration 0)
+      //BeamSpot size matrix (from boot-strap iteration 0)
 
       sizeMat.ResizeTo(3, 3);
       sizeMat(0, 0) = sqrS(matXX.vars[0] * toCm);
@@ -423,7 +450,7 @@ namespace Belle2 {
     }
 
 
-    // save bootstrap variable to TTree
+    /** save bootstrap variable to TTree */
     void setBranchVal(TTree* T, vector<double>* vec, TString n)
     {
       T->Branch(n, &vec->at(0), n + "/D");
@@ -431,7 +458,7 @@ namespace Belle2 {
       T->Branch(n + "_high", &vec->at(2), n + "_high/D");
     }
 
-    // save bootstrap spline to TTree
+    /** save bootstrap spline to TTree */
     void setBranchSpline(TTree* T, Spline* spl, TString n)
     {
       T->Branch(n + "_nodes", &spl->nodes);
@@ -441,7 +468,7 @@ namespace Belle2 {
 
 
 
-    //save everything to TTree
+    /** save everything to TTree */
     void save2tree(TString fName)
     {
 

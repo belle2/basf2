@@ -1,9 +1,9 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2017 - Belle II Collaboration                             *
+ * Copyright(C) 2020 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Radek Zlebcik
+ * Contributors: Radek Zlebcik                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,7 +17,9 @@ namespace Belle2 {
 
   /** Struct containing exp number and run number */
   struct ExpRun {
-    int exp, run;
+    int exp; ///< experiment number
+    int run; ///< run number
+    /** Simple constructor */
     ExpRun(int Exp, int Run) : exp(Exp), run(Run) {}
   };
 
@@ -50,6 +52,7 @@ namespace Belle2 {
       * @param runs: A map with key containing expNum+runNum and value start+end time in hours of the run
       * @param tBestSize: An intended length of the calibration intervals for BS-size parameters [hours]
       * @param tBestVtx: An intended length of the calibration intervals PS-position parameters [hours]
+      * @param GapPenalty: Higher number -> algorithm will tends more to avoid gaps in calib. intervals
       * @output: Vector of BS-size calib. intervals always containing vector of BS-position calib. intervals.
       *          The BS-position calib. interval is a map spanning in general over several runs
       **/

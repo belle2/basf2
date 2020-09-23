@@ -317,6 +317,8 @@ void SVDUnpackerModule::event()
 
             is3sampleData = false;
             is6sampleData = false;
+            if (m_MainHeader.DAQMode == 0) B2ERROR("SVDDataFormatCheck: the event " << eventNo <<
+                                                     " is apparently taken with 1-sample mode, this is not expected.");
             if (m_MainHeader.DAQMode == 1) is3sampleData = true;
             if (m_MainHeader.DAQMode == 2) is6sampleData = true;
 

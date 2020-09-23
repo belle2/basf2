@@ -104,7 +104,7 @@ void SVDUnpackerDQMModule::defineHisto()
   TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "EVTmatch", "missHead", "missTrail", "badMapping"};
 
   TString Xsamples[2] = {"3", "6"};
-  TString Ysamples[3] = {"3 samples", "6 samples", "3/6 mixed"};
+  TString Ysamples[3] = {"1 sample", "3 samples", "6 samples"};
 
   //preparing X axis of the DQMUnpacker histograms
   for (unsigned short i = 0; i < nBits; i++) DQMUnpackerHisto->GetXaxis()->SetBinLabel(i + 1, Xlabels[i].Data());
@@ -201,7 +201,7 @@ void SVDUnpackerDQMModule::event()
   int daqMode = m_svdEventInfo->getModeByte().getDAQMode();
   int nSamples = m_svdEventInfo->getNSamples();
 
-  DQMnSamplesHisto->Fill(nSamples / 3, daqMode);
+  DQMnSamplesHisto->Fill(nSamples / 3, daqMode + 1);
 
 
   //filling DQMUnpackerHisto

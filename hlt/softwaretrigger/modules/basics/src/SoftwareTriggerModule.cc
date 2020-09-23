@@ -108,9 +108,9 @@ void SoftwareTriggerModule::event()
     m_debugOutputStoreObject.construct();
   }
 
-  B2DEBUG(100, "Doing the calculation...");
+  B2DEBUG(20, "Doing the calculation...");
   const SoftwareTriggerObject& prefilledObject = m_calculation->fillInCalculations();
-  B2DEBUG(100, "Successfully finished the calculation.");
+  B2DEBUG(20, "Successfully finished the calculation.");
 
   makeCut(prefilledObject);
   makeDebugOutput();
@@ -165,7 +165,7 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
   for (const auto& cutWithName : m_dbHandler->getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
-    B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
+    B2DEBUG(20, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
     if (not m_param_useRandomNumbersForPreScale) {
       counter = &m_counters.at(counterIndex++);
     }
@@ -194,13 +194,13 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
 void SoftwareTriggerModule::makeDebugOutput()
 {
   if (m_param_storeDebugOutputToROOTFile) {
-    B2DEBUG(100, "Storing debug output to file as requested.");
+    B2DEBUG(20, "Storing debug output to file as requested.");
     m_calculation->writeDebugOutput(m_debugTTree);
-    B2DEBUG(100, "Finished storing the debug output to file.");
+    B2DEBUG(20, "Finished storing the debug output to file.");
   }
 
   if (makePreScale(m_param_preScaleStoreDebugOutputToDataStore)) {
-    B2DEBUG(100, "Storing debug output to DataStore as requested.");
+    B2DEBUG(20, "Storing debug output to DataStore as requested.");
     m_calculation->addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
   }
 }

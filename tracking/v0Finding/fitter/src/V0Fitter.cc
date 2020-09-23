@@ -34,7 +34,7 @@ using namespace Belle2;
 V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0sName,
                    const std::string& v0ValidationVerticesName, const std::string& recoTracksName,
                    const std::string& copiedRecoTracksName, bool enableValidation)
-  : m_validation(enableValidation), m_recoTracksName(recoTracksName), m_v0FitterMode(2), m_forcestore(false),
+  : m_validation(enableValidation), m_recoTracksName(recoTracksName), m_v0FitterMode(1), m_forcestore(false),
     m_useOnlyOneSVDHitPair(true)
 {
   m_trackFitResults.isRequired(trackFitResultsName);

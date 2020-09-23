@@ -17,7 +17,7 @@ B2BII
    **Questions**:
 
        * Can I use basf2 to analysis Belle data?
-       * Why can I use the same basf2 particle lists and variables in my b2bii analysis?
+       * Why can't I use the same basf2 particle lists and variables in my b2bii analysis?
        * How to apply PID efficiency weights in my ntuple?
 
    **Objectives**:
@@ -55,7 +55,7 @@ MC samples
 As there is no Belle detector description inside basf2, one needs to either
 use the official Belle MC samples or generate own signal MC using basf.
 The information of generating Belle MC can be found
-`here <https://belle.kek.jp/secured/wiki/doku.php?id=software%3Amcprod_scripts>__`
+`here <https://belle.kek.jp/secured/wiki/doku.php?id=software%3Amcprod_scripts>`__
 
 Generic MC
 ~~~~~~~~~~
@@ -76,7 +76,7 @@ transition, and generated based on the decay tables at
 .. rubric:: How to find Generic MC samples?
 
 You can find the sample(s) you want through
-`Belle File Search Engine <http://bweb3.cc.kek.jp/>__`
+`Belle File Search Engine <http://bweb3.cc.kek.jp/>`__
 
 .. image:: b2bii/bweb3.png
    :width: 300px
@@ -92,14 +92,14 @@ b2bii jobs.
 
 .. note::
 
-   `Belle File Search Engine <http://bweb3.cc.kek.jp/>__` is also
+   `Belle File Search Engine <http://bweb3.cc.kek.jp/>`__ is also
    for data files.
 
-**`Belle File Search Engine <http://bweb3.cc.kek.jp/>__` is only
+**`Belle File Search Engine <http://bweb3.cc.kek.jp/>`__ is only
    accessible within KEK domain or via VPN.**
 
 **More information about official MC and data can be found
-`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search>__`**
+`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search>`__**
 
 Rare MC
 ~~~~~~~
@@ -111,7 +111,7 @@ energy, but not run-dependent (i.e. The same beam energy and IP profile in
 the same experiment).
 
 Location of those special MC files can be found at
-`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:rare_mc_search>__`
+`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:rare_mc_search>`__
  
 Signal MC
 ~~~~~~~~~
@@ -167,7 +167,7 @@ Go to gsim directory
 
 **The path of evtgen files has to be absolute path.**
 
-Now you have mdst files produced in ``mcproduzh/gsim/mdst/`` directory.
+Now you have MDST files produced in ``mcproduzh/gsim/mdst/`` directory.
 
 
 .. admonition:: Exercise
@@ -195,12 +195,12 @@ Now you have mdst files produced in ``mcproduzh/gsim/mdst/`` directory.
       ./runGsimReco.csh <your_working_directory>/mcproduzh/evtgen/gen/ 
 
 More information about MC can be found
-`here <https://belle.kek.jp/secured/wiki/doku.php?id=software%3Amcprod_scripts>__`
+`here <https://belle.kek.jp/secured/wiki/doku.php?id=software%3Amcprod_scripts>`_
 
 
 First b2bii Analysis
 --------------------
-Now with Belle MDST in hand, you can use it for your first b2bii analysis.
+With Belle MDST in hand, you can use it for your first b2bii analysis.
 It is very simple, just add two lines in your script:
 
 .. code-block:: python
@@ -208,11 +208,143 @@ It is very simple, just add two lines in your script:
    from b2biiConversion import convertBelleMdstToBelleIIMdst
    convertBelleMdstToBelleIIMdst(inputfile, path=mypath)
 
-However, there are many difference between Belle detector and Belle II detector,
+Now we can use basf2 and analysis tools in basf2 to perform analyses
+over Belle MDST files.
+
+The relations between basf and basf2 objects are shown as this figure:
+
+.. image:: b2bii/conversion.png
+   :width: 300px
+
+However, there are still many difference between Belle detector and Belle II detector,
 as well as basf and basf2.
+Therefore we can't simply use the same basf2 steering files, small modification
+is needed.
+
+.. rubric:: Charged Final State Particles
+
+basf and basf2 use different Helix parameterisations, however there exist a well
+defined transformation from one parameterisation to another.
+Belle MDST stores in addition to the five helix parameters also the reference
+point (or pivot point), which is assumed to be always point ``(0,0,0)`` in the
+case of Belle II MDST.
+
+Despite the different parameterisations, charged final state particles can still
+be reconstucted using `fillParticleList`
+function in basf2.
+But due to the different definition, as well as detector, it is not
+recommanded to use Belle II style PID in b2bii.
+
+basf provided three different packages for PID:
+
+* atc_pid (KID) to separate kaons and pions, but also used for proton id
+* eID (electron ID) to separate electrons from hadrons
+* muid (muon ID) to separate muons from hadrons
+
+Each of them in its own way combined information collected from various
+subdetector systems (CDC, ACC, TOF, ECL, KLM). The combination of individual
+likelihoods from each sub detector system is in some cases (eID) combined
+with the usage of external information, such as a priori probabilities of
+each particle type that is read from the Belle DB. Due to this fact the
+Belle-like PID probabilities can not be reproduced in BASF2 from the raw
+likelihoods.
+
+Alternatively, we can use the following predefined Belle-style PID variables to
+reproduce them:
+
+   +------------------------------+------------------------------+------------------+
+   | Separation                   | basf                         | basf2            |
+   +==============================+==============================+==================+
+   | Kaon vs pion                 | atc_pid(3,1,5,3,2).prob(...) | atcPIDBelle(3,2) |
+   +------------------------------+------------------------------+------------------+
+   | proton vs pion               | atc_pid(3,1,5,4,2).prob(...) | atcPIDBelle(4,2) |
+   +------------------------------+------------------------------+------------------+
+   | proton vs Kaon               | atc_pid(3,1,5,4,3).prob(...) | atcPIDBelle(4,3) |
+   +------------------------------+------------------------------+------------------+
+   | pion vs Kaon                 | atc_pid(3,1,5,2,3).prob(...) | atcPIDBelle(2,3) |
+   +------------------------------+------------------------------+------------------+
+   | electron vs hadron           | eid.prob(3,-1,5)             | eIDBelle         |
+   +------------------------------+------------------------------+------------------+
+   | muon likelihood              | Muid_mdst.Muon_likelihood()  | muIDBelle        |
+   +------------------------------+------------------------------+------------------+
+   | muon likelihood quality flag | Muid_mdst.Prerejection()     | muIDBelleQuality |
+   +------------------------------+------------------------------+------------------+
 
 
+.. admonition:: Exercise
+   :class: exercise stacked
 
+    Try to create a list of charged kaon with :math:`KID>0.6`.
+
+.. admonition:: Solution
+   :class: toggle solution
+
+   .. code-block:: python
+
+      fillParticleList('K+:sig','atcPIDBelle(3,2)>0.6', path=mypath)
+
+
+.. rubric:: Neutral Final State Partlces
+
+Belle MDST has two additional data types: ``mdst_gamma`` and ``mdst_pi0``,
+for which there exist no equivalent data type in the Belle II MDST format.
+In other words, ``gamma`` and ``pi0`` particles are already been created in basf.
+During the conversion, b2bii converter by default creates ``gamma:mdst`` and ``pi0:mdst``.
+
+.. warning::
+   Don't use `fillParticleList` to create photon candidates or
+   don't reconstruct pi0 candidate from pairs of two photons by yourself.
+
+
+.. rubric:: V0 Particles
+
+As mentioned in `Charged Final State Particles`, all charged tracks are
+parametrised with helix with the reference point set to ``(0,0,0)`` in basf2.
+This is not optimal in the case of ``V0s`` whose decay vertices can be far away
+from the origin.
+Therefore all V0 candidates from the Mdst_Vee2 table in basf are converted to
+``Particles`` and saved as ``K_S0:mdst``, ``Lambda0:mdst``, and ``gamma:v0mdst``.
+
+The created particles have momentum and decay vertex position set to values
+given in Belle's Mdst_Vee2 table and their daughters particles with momentum
+and position at the pivot equal to V0 decay vertex. In addition, in the case
+of :math:`K_{S}^{0}` and :math:`\Lambda^{0}` the quality indicators are
+converted as well and attached as `extraInfo` flags.
+
+The quality indicators are estimated by the 
+`findKs <http://belle.kek.jp/secured/belle_note/gn323/note323.ps.gz>`__
+and `nisKsFinder <http://belle.kek.jp/secured/belle_note/gn1253/bn_1253v1.pdf>`__
+(for :math:`K_{S}^{0}`), and
+`FindLambda <https://belle.kek.jp/secured/belle_note/gn684/bn684.ps.gz>`__
+(for :math:`\Lambda^{0}`) are available as
+
+   +=========================+=========================+
+   | basf                    | basf2                   |
+   +-------------------------+-------------------------+
+   | findKs.goodKs()         | extraInfo(goodKs)       |
+   +-------------------------+-------------------------+
+   | nisKsFinder.nb_vlike()  | extraInfo(ksnbVLike)    |
+   +-------------------------+-------------------------+
+   | nisKsFinder.nb_nolam()  | extraInfo(ksnbNoLam)    |
+   +-------------------------+-------------------------+
+   | nisKsFinder.standard()  | extraInfo(ksnbStandard) |
+   +-------------------------+-------------------------+
+   | findLambda.goodLambda() | extraInfo(goodLambda)   |
+   +-------------------------+-------------------------+
+
+.. rubric:: :math:`K_{L}^{0}`
+
+``KLMClusters`` (Mdst_KLM_Cluster) and ``Klongs`` (Mdst_Klong) are converted.
+The Klongs are stored in the default ``K_L0:mdst``.
+
+.. warning::
+   Don't use `fillParticleList` to create Klong candidates.
+
+
+Here is a cheatsheet for you.
+
+.. image:: b2bii/cheatsheet.png
+      :width: 300px
 
 
 

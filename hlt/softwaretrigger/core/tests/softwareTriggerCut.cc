@@ -125,7 +125,6 @@ namespace Belle2 {
         EXPECT_NE(SoftwareTriggerCutResult::c_reject, cutResult);
         if (cutResult == SoftwareTriggerCutResult::c_accept) {
           numberOfYes++;
-          //counter = 1;
         } else if (cutResult == SoftwareTriggerCutResult::c_noResult) {
           numberOfNo++;
         }
@@ -146,7 +145,6 @@ namespace Belle2 {
       EXPECT_NE(SoftwareTriggerCutResult::c_reject, cutResult);
       if (cutResult == SoftwareTriggerCutResult::c_accept) {
         numberOfYes++;
-        //counter = 1;
       } else if (cutResult == SoftwareTriggerCutResult::c_noResult) {
         numberOfNo++;
       }

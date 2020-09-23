@@ -11,6 +11,7 @@
 #include <generators/modules/fragmentation/FragmentationModule.h>
 
 #include <generators/evtgen/EvtGenInterface.h>
+#include <generators/utilities/GeneratorConst.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -285,7 +286,7 @@ void FragmentationModule::event()
       }
 
       // Set PHOTOS flag from PYTHIA-EvtGen
-      if (m_Pythia->event[iPythiaPart].status() == 94 && m_Pythia->event[iPythiaPart].id() == 22) {
+      if (m_Pythia->event[iPythiaPart].status() == GeneratorConst::FSR_STATUS_CODE && m_Pythia->event[iPythiaPart].id() == 22) {
         p->addStatus(MCParticleGraph::GraphParticle::c_IsPHOTOSPhoton);
       }
 

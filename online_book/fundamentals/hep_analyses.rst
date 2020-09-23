@@ -93,7 +93,7 @@ background.
     and reject those which don't.
 
 An interesting event for most B physics analyses, is one where the 
-:math:`e^+e^-` produced an `\Upsilon(4S)`.
+:math:`e^+e^-` produced an :math:`\Upsilon(4S)`.
 However this is not the most probable result in an :math:`e^+e^-` collision.
 
 .. admonition:: Question
@@ -280,7 +280,7 @@ before the end-users, the analysist, can run their analysis jobs on them.
 What follows is a very simplified explanation of the process the leads from the physic 
 event to the data you can analyze.
  
-The systems that are involved in the data taking are the Data acquisition (DAQ), the 
+The systems that are involved in the data taking are the Data AcQuisition (DAQ), the 
 TRiGger (TRG, also known as L1) and the High Level Trigger (HLT). Collectively, they are 
 often referred as the Online system.
 

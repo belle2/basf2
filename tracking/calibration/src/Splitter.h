@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-// Struct containing exp number and run number
+  /** Struct containing exp number and run number */
   struct ExpRun {
     int exp, run;
     ExpRun(int Exp, int Run) : exp(Exp), run(Run) {}
@@ -127,15 +127,15 @@ namespace Belle2 {
       * @param e: Last index of the calib. interval
       * @output: A value of the loss function
       **/
-    double lossFunction(const std::vector<std::pair<double, double>>&  vec, int s, int e);
-
+    double lossFunction(const std::vector<std::pair<double, double>>&  vec, int s, int e) const;
 
 
 
     double tBest;      /** target calib. interval time in hours */
     double gapPenalty; /** in relative units (higher -> less gaps) */
 
-    std::vector<std::pair<double, std::vector<int>>> cache; /** cache used by the clustering algorithm */
+    /** cache used by the clustering algorithm (has to be reset every time) */
+    std::vector<std::pair<double, std::vector<int>>> cache;
 
 
   };

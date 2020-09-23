@@ -23,10 +23,10 @@
 
 namespace Belle2 {
 
-// Get random string
+  // Get random string
   inline TString rn() {return Form("%d", gRandom->Integer(1000000000)); }
 
-//merge { vector<double> a, vector<double> b} into {a, b}
+  //merge { vector<double> a, vector<double> b} into {a, b}
   inline std::vector<std::vector<double>> merge(std::vector<std::vector<std::vector<double>>> toMerge)
   {
     std::vector<std::vector<double>> allVecs;
@@ -36,7 +36,7 @@ namespace Belle2 {
   }
 
 
-// std vector -> ROOT vector
+  // std vector -> ROOT vector
   inline TVectorD vec2vec(std::vector<double> vec)
   {
     TVectorD v(vec.size());
@@ -46,7 +46,7 @@ namespace Belle2 {
     return v;
   }
 
-// ROOT vector -> std vector
+  // ROOT vector -> std vector
   inline std::vector<double> vec2vec(TVectorD v)
   {
     std::vector<double> vNew(v.GetNrows());
@@ -57,7 +57,7 @@ namespace Belle2 {
 
 
 
-// merge columns (from std::vectors) into ROOT matrix
+  // merge columns (from std::vectors) into ROOT matrix
   inline TMatrixD vecs2mat(std::vector<std::vector<double>> vecs)
   {
     TMatrixD m(vecs[0].size(), vecs.size());
@@ -68,7 +68,7 @@ namespace Belle2 {
     return m;
   }
 
-// for splines of the first order
+  // Equidistant range between xMin and xMax for spline of the first order
   inline std::vector<double> getRangeLin(int nVals, double xMin, double xMax)
   {
     assert(nVals >= 1);
@@ -79,7 +79,7 @@ namespace Belle2 {
     return v;
   }
 
-//for splines of zero order
+  // Equidistant range between xMin and xMax for spline of the zero order
   inline std::vector<double> getRangeZero(int nVals, double xMin, double xMax)
   {
     assert(nVals >= 1);
@@ -91,8 +91,8 @@ namespace Belle2 {
   }
 
 
-// put slice of original vecotr v[ind:ind+n] into new one
-  inline std::vector<double> Slice(std::vector<double> v, unsigned ind, unsigned n)
+  // put slice of original vecotr v[ind:ind+n] into new one
+  inline std::vector<double> slice(std::vector<double> v, unsigned ind, unsigned n)
   {
     std::vector<double> vNew;
     for (unsigned i = ind; i < ind + n && i < v.size(); ++i)
@@ -100,7 +100,7 @@ namespace Belle2 {
     return vNew;
   }
 
-//To evaluate spline
+  //To evaluate spline (zero order or first order)
   inline double eval(const std::vector<double>& spl, const std::vector<double>& vals, double x)
   {
     int order = -1;
@@ -131,10 +131,10 @@ namespace Belle2 {
         exit(1);
       }
 
+      // Linear interpolation between neighbouring nodes
       double v = ((spl[i1 + 1] - x) * vals[i1] + (x - spl[i1]) * vals[i1 + 1]) / (spl[i1 + 1] - spl[i1]);
       return v;
     } else if (order == 0) { //zero order polynomial
-      //std::cout << "Radek " << spl.size() <<" : " << vals.size() << std::endl;
       assert(spl.size() + 1 == vals.size());
       if (vals.size() == 1) {
         return vals[0];
@@ -151,16 +151,21 @@ namespace Belle2 {
   }
 
 
-// Spline structure for zero-order & linear splines
+  // Spline structure for zero-order & linear splines
   struct Spline {
     //spl.size() <= 1 -> order=0 , spl.size() == vals.size() -> order=1
     std::vector<double> nodes, vals, errs;
+
+    //get value of spline at point x
     double val(double x) const {return eval(nodes, vals, x);}
+
+    //get error of spline at point x
     double err(double x) const {return eval(nodes, errs, x);}
 
+    //Get center of the spline domain
     double center() const
     {
-      if (nodes.size() == 0)
+      if (nodes.size() == 0)  //dummy situation
         return 0;
       else if (nodes.size() % 2 == 1)
         return nodes[nodes.size() / 2];
@@ -168,6 +173,7 @@ namespace Belle2 {
         return (nodes[nodes.size() / 2 - 1]  +  nodes[nodes.size() / 2]) / 2;
     }
 
+    //print the spline
     void print(TString tag = "")
     {
       std::cout << tag << " : nodes: ";

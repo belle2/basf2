@@ -106,27 +106,27 @@ namespace Belle2 {
       int ny  = getSize(spls[1]);
       x.nodes  = spls[0];
       y.nodes  = spls[1];
-      x.vals   = Slice(vals, 0, nx);
-      y.vals   = Slice(vals, nx, ny);
-      x.errs   = Slice(errs, 0, nx);
-      y.errs   = Slice(errs, nx, ny);
+      x.vals   = slice(vals, 0, nx);
+      y.vals   = slice(vals, nx, ny);
+      x.errs   = slice(errs, 0, nx);
+      y.errs   = slice(errs, nx, ny);
 
       if (spls.size() >= 4) {
         int nkx = getSize(spls[2]);
         int nky = getSize(spls[3]);
         kX.nodes = spls[2];
         kY.nodes = spls[3];
-        kX.vals  = Slice(vals, nx + ny, nkx);
-        kY.vals  = Slice(vals, nx + ny + nkx, nky);
+        kX.vals  = slice(vals, nx + ny, nkx);
+        kY.vals  = slice(vals, nx + ny + nkx, nky);
 
-        kX.errs  = Slice(errs, nx + ny, nkx);
-        kY.errs  = Slice(errs, nx + ny + nkx, nky);
+        kX.errs  = slice(errs, nx + ny, nkx);
+        kY.errs  = slice(errs, nx + ny + nkx, nky);
 
         if (spls.size() >= 5) {
           int nz = getSize(spls[4]);
           z.nodes  = spls[4];
-          z.vals  = Slice(vals, nx + ny + nkx + nky, nz);
-          z.errs  = Slice(errs, nx + ny + nkx + nky, nz);
+          z.vals  = slice(vals, nx + ny + nkx + nky, nz);
+          z.errs  = slice(errs, nx + ny + nkx + nky, nz);
         }
       }
     }
@@ -580,8 +580,8 @@ namespace Belle2 {
   {
     double minT = 1e20, maxT = -1e20;
     for (auto ev : evts) {
-      minT = min(minT, ev.tAbs);
-      maxT = max(maxT, ev.tAbs);
+      minT = min(minT, ev.t);
+      maxT = max(maxT, ev.t);
     }
     return {minT, maxT};
   }
@@ -632,7 +632,7 @@ namespace Belle2 {
     tr->SetBranchAddress("mu0_phi0", &evt.mu0.phi0);
     tr->SetBranchAddress("mu1_phi0", &evt.mu1.phi0);
 
-    tr->SetBranchAddress("time", &evt.tAbs);
+    tr->SetBranchAddress("time", &evt.t); //time in hours
 
 
     for (int i = 0; i < tr->GetEntries(); ++i) {
@@ -645,11 +645,8 @@ namespace Belle2 {
     }
 
     //sort by time
-    sort(events.begin(), events.end(), [](event e1, event e2) {return e1.tAbs < e2.tAbs;});
+    sort(events.begin(), events.end(), [](event e1, event e2) {return e1.t < e2.t;});
 
-    for (auto& e : events) {
-      e.t = e.tAbs;
-    }
 
     return events;
   }

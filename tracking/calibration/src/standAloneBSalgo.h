@@ -9,18 +9,19 @@
 
 namespace Belle2 {
 
+  // struct with expNum, runNum, evtNum
   struct ExpRunEvt {
     int exp, run, evt;
     ExpRunEvt(int Exp, int Run, int Evt) : exp(Exp), run(Run), evt(Evt) {}
   };
 
 
-// track parameters (neglecting curvature)
+  // track parameters (neglecting curvature)
   struct track {
     double d0, z0, phi0, tanlambda;
   };
 
-//Event from two tracks
+  //Event containing two tracks
   struct event {
     int exp, run, evtNo;
     track mu0, mu1;
@@ -28,7 +29,6 @@ namespace Belle2 {
     int nBootStrap; //random bootstrap weight (n=1 -> original sample)
     bool isSig;     // is not removed?
     double t;       // time of event (relative)
-    double tAbs;       // time of event (absolute)
     void toMicroM()   //from [cm] to [um]
     {
       mu0.d0 *= 1e4;
@@ -39,12 +39,20 @@ namespace Belle2 {
   };
 
 
-//functions
+  // get vector of events from TTree
   std::vector<event> getEvents(TTree* tr);
+
+  // run the BeamSpot analysis using the splitPoints for BS-position parameters
   std::tuple<std::vector<TVector3>, std::vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(std::vector<event> evts,
       const std::vector<double>& splitPoints);
+
+  // Convert splitPoints [hours] to breakPoints in ExpRunEvt
   std::vector<ExpRunEvt> convertSplitPoints(const std::vector<event>& events, std::vector<double> splitPoints);
+
+  // get exp-run-evt number from time tEdge [hours]
   ExpRunEvt getPosition(const std::vector<event>& events, double tEdge);
+
+  // get the map of runs, where each run contains pair with start/end time [hours]
   std::map<ExpRun, std::pair<double, double>> getRunInfo(const std::vector<event>& evts);
 
 }

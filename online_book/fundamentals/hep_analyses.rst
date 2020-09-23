@@ -81,7 +81,7 @@ background.
     .. admonition:: Solution
         :class: toggle solution
     
-        Half of it's rest mass: :math:`\sim 5.3 {\textrm GeV}`
+        Half of its rest mass: :math:`\sim 5.3 {\textrm GeV}`
 
     The difference between half of the energy in the centre-of-momentum
     and the total energy of the B candidate is called :math:`\Delta E`.
@@ -206,26 +206,17 @@ CDC
 
 TOP
     The Time Of Propagation (TOP) detector provides particle identification
-    information.
-    The subdetector is comprised of quartz bars and works by utilising the 
-    `Cherenkov effect
-    <https://en.wikipedia.org/wiki/Cherenkov_radiation>`_.
-    Particles passing through with a given momentum will cause Cherenkov 
-    photons to be emitted at an angle proportional to their mass.
-    The angle of emission correlated to the time taken for the photons to
-    propagate through the detector therefore, with an external measurement
-    of the momentum, the TOP provides a measurement of the particle's mass
-    and therefore it's type.
+    information in the barrel region of Belle II .
+    The subdetector comprises of quartz bars and works by utilising the 
+    `Cherenkov effect <https://en.wikipedia.org/wiki/Cherenkov_radiation>`_.
+    Particles passing through will cause Cherenkov photons to be emitted at an angle     that directly depends on the particle velocity. Combining this velocity information with particle momentum measured in the preceding tracking detectors yields a mass measurement, which identifies the particle species.
+    Emitted Cherenkov photons are captured inside the quartz bars by total internal reflection. TOP reconstructs the Cherenkov emission angle by measuring the effective propagation time of individual Cherenkov photons from their emissions point to the TOP sensor plane. At a given momentum, heavier particles will have lower velocities, thus a lower Cherenkov opening angle and thus, on average, a longer photon propagation path, causing a longer time of propagation of individual photons.
     You might also hear people refer to the TOP as the iTOP (imaging TOP).
 
 ARICH
-    The Aerogel Ring-Imaging Cherenkov detector is another particle 
-    identification subdetector covering the forward region of the detector.
-    It is comprised of blocks of aerogel.
-    When a charge particle passes through the aerogel, just as with the quartz,
-    Cherenkov photons are emitted at an angle proporional to their mass.
-    This forms a ring of Cherenkov light around a particle track which is 
-    imaged providing an orthogonal source of mass information.
+    The Aerogel Ring-Imaging Cherenkov detector is another dedicated particle 
+    identification subdetector using aerogel as its radiator medium. It covers the forward region of the detector.
+    Just as with the quartz in TOP, Cherenkov photons are emitted when a charged particle of sufficient velocity passes through the aerogel. Contrary to the TOP quartz, the aerogel does not capture the emitted Cherenkov photons, so they are forming a cone of Cherenkov light around a particle track which is imaged as a ring of characteristic radius, providing an orthogonal source of particle mass information.
 
 ECL
     The Electromagnetic CaLorimeter (ECL) is chiefly tasked with measuring the 

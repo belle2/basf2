@@ -181,15 +181,15 @@ Beam Pipe
 
 PXD
     The first active system met by the particles that emerge form the IP is the PiXel
-    Detector (PXD). This is a high-granularity tracking system which is enables 
-    precise reconstruction of the intersection of tracks (a vertex).
+    Detector (PXD). It is a high-granularity tracking system which enables 
+    precise reconstruction of the intersection of tracks (a vertex). 
     You can think of this as the inner vertex detector.
+    The PXD is constructed from DEPFET silicon sensors segmented into individual pixels of down to 50*55:math:`\upmu m^2` size. It consists of two layers at 14mm and 22mm radius from the interaction point.
 
 SVD
-    The Silicon Vertex Detector (SVD) is the second part of the vertex detector.
-    It comprises of silicon microstrip sensors and adds additional vertexing 
-    capability.
-
+    The Silicon Vertex Detector (SVD) is the outer part of the vertex detector.
+    It comprises of double sided silicon microstrip sensors with strips widths down to 50:math:`\upmu m`. The four layers of the SVD system extend the outer radius of the vertex detector up to 140mm.
+    
 VXD
     You will occasionally hear people refer to the pair of detectors: PXD+SVD 
     as the VerteX Detector (VXD).

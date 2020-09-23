@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <tuple>
-#include "TVector3.h"
-#include "TMatrixDSym.h"
-#include "TTree.h"
+#include <TVector3.h>
+#include <TMatrixDSym.h>
+#include <TTree.h>
 #include "Splitter.h"
 
 namespace Belle2 {

@@ -589,22 +589,12 @@ namespace Belle2 {
 //get list of file names from comma-separated string
   vector<TString> extractFileNames(TString str)
   {
-    vector<int> commas;
-    for (int i = 0; i < str.Length(); ++i) {
-      if (str[i] == ',')
-        commas.push_back(i);
-    }
-    if (commas.size() == 0)
-      return {str.Strip()};
-
     vector<TString> files;
-    files.push_back(static_cast<TString>(str(0, commas[0])).Strip());
-
-    for (int i = 0; i < static_cast<int>(commas.size()) - 1; ++i) {
-      files.push_back(static_cast<TString>(str(commas[i] + 1, commas[i + 1] - commas[i] - 1)).Strip());
+    auto tempVec = str.Tokenize(",");
+    for (int i = 0; i < tempVec->GetEntries(); ++i) {
+      TString s = ((TObjString*)tempVec->At(i))->GetString();
+      files.push_back(s.Strip());
     }
-    files.push_back(static_cast<TString>(str(commas.back() + 1, 100000)).Strip());
-
     return files;
   }
 

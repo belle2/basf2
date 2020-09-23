@@ -36,7 +36,13 @@ settings = CalibrationSettings(name="caf_svd_time",
                                description=__doc__,
                                input_data_formats=["raw"],
                                input_data_names=["hlt_hadron"],
-                               depends_on=[])
+                               depends_on=[],
+                               expert_config={
+                                              "max_files_per_run": 20,
+                                              "min_events_per_run": 10000,
+                                              "min_events_per_file": 2000,
+                                              "max_events_per_file": 5000
+                                              })
 
 ##################################################################
 # Remove Module from the Path
@@ -120,7 +126,7 @@ def create_svd_clusterizer(name="ClusterReconstruction",
 from itertools import islice
 
 
-def select_files(reduced_file_to_iov, min_events, max_events_per_file):
+def select_files(reduced_file_to_iov, min_events, max_events_per_each_file):
     """
     Selects the input files per run to use for the calibration, starting from the minimum number of events per run that we need.
     It takes as input:
@@ -132,7 +138,7 @@ def select_files(reduced_file_to_iov, min_events, max_events_per_file):
     It loops on all input files, read the experiment and the run number,
     and splits the list in more lists depending on the run and experiment numbers.
     Then it loops on the lists obtained for each run and select the number of needed files per run,
-    depending on the minimun number of events (min_events) and max_events_per_file we set.
+    depending on the minimun number of events (min_events) and max_events_per_each_file we set.
 
     It is absolutely necessary to have enough events per run,
     since we need to check the distributions of each run to find the right IoVs for the payloads.
@@ -169,9 +175,6 @@ def select_files(reduced_file_to_iov, min_events, max_events_per_file):
     splitted_all_input_files = [list(islice(iter_all_input_files, elem)) for elem in size_for_run]
     splitted_exp_list = [list(islice(iter_exp_list, elem)) for elem in size_for_run]
     splitted_run_list = [list(islice(iter_run_list, elem)) for elem in size_for_run]
-    # print("Initial list is:", all_input_files)
-    # print("Split length list: ", size_for_run)
-    # print("List after splitting", splitted_all_input_files)
 
     selected_files = []
     selected_files_per_run = []
@@ -194,17 +197,17 @@ def select_files(reduced_file_to_iov, min_events, max_events_per_file):
             # Append the file to the list of selected files
             selected_files.append(this_file)
             selected_files_per_run.append(this_file)
-            if events_in_file < max_events_per_file:
+            if events_in_file < max_events_per_each_file:
                 events_counter = events_in_file
             else:
-                events_counter = max_events_per_file
+                events_counter = max_events_per_each_file
             total_events += events_counter
             total_events_per_run += events_counter
         basf2.B2INFO(f"(Exp,Run) = ({splitted_exp_list[item2][0]},{splitted_run_list[item2][0]})")
         basf2.B2INFO(f"Total chosen files per run = {len(selected_files_per_run)}")
         basf2.B2INFO(f"Total events in chosen files per run = {total_events_per_run}")
         if total_events < min_events:
-            basf2.B2ERROR(f"Not enough files for the calibration when max_events_per_file={max_events_per_file}.")
+            basf2.B2ERROR(f"Not enough files for the calibration when max_events_per_each_file={max_events_per_each_file}.")
         selected_files_per_run.clear()
         total_events_per_run = 0
     basf2.B2INFO(f"Total chosen files = {len(selected_files)}")
@@ -271,17 +274,17 @@ def create_pre_collector_path(clusterizers):
 def get_calibrations(input_data, **kwargs):
 
     file_to_iov_physics = input_data["hlt_hadron"]
+    expert_config = kwargs.get("expert_config")
+    max_files_per_run = expert_config["max_files_per_run"]  # This number should be setted from the biginning
+    min_events_per_run = expert_config["min_events_per_run"]  # Minimum number of events selected per each run
+    min_events_per_file = expert_config["min_events_per_file"]  # Files with less events will be discarded
+    # Nominal max number of events selected per file. The events in the file can be more.
+    max_events_selected_per_file = expert_config["max_events_per_file"]
 
-    # We should decide this numbers!
-    # Remember that our current calibration is not performed Run by Run
-    max_files_per_run = 20  # This number should be setted from the biginning
-    min_events_per_cal = 10000  # Minimum number of events needed for one run
-    min_events_per_file = 2000  # Files with less events will be discarder
-    max_events_selected_per_file = 5000  # Nominal max number of events selected per file. The events in the file can be more.
     from prompt.utils import filter_by_max_files_per_run
 
     reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run, min_events_per_file)
-    good_input_files = select_files(reduced_file_to_iov_physics, min_events_per_cal, max_events_selected_per_file)
+    good_input_files = select_files(reduced_file_to_iov_physics, min_events_per_run, max_events_selected_per_file)
 
     basf2.B2INFO(f"Total number of files before selection = {max_files_per_run}")
     basf2.B2INFO(f"Total number of files actually used as input = {len(good_input_files)}")

@@ -177,6 +177,14 @@ namespace Belle2 {
       return m_svdGlobalConfig_aDBObjPtr->getRelativeTimeShift();
     }
 
+    /** GLOBAL CONFIGURATION PARAMETER:
+     * Return the int corresponding to the sumber of samples (3 -> 3-sample DAQ, 6-> 6-sample DAQ, 9 ->3-mixed-6 DAQ)
+     */
+    int getNrFrames()
+    {
+      return m_svdGlobalConfig_aDBObjPtr->getNrFrames();
+    }
+
     /** returns the unique ID of the payload */
     //    TString getUniqueID() { return m_svdLocalConfig_aDBObjPtr->get_uniqueID(); }
 

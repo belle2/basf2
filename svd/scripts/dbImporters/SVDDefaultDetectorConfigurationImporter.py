@@ -29,6 +29,7 @@ zeroSuppress = 3
 apvClockTimeUnits = '16'  # in RFC units, it is a string as the xml field where it is written
 hv = 50
 relativeShift = 0
+nrFrames = 6
 
 
 class defaultSVDConfigParametersImporter(basf2.Module):
@@ -58,6 +59,7 @@ class defaultSVDConfigParametersImporter(basf2.Module):
         global_payload.setAPVClockInRFCUnits(apvClockTimeUnits)
         global_payload.setHV(hv)
         global_payload.setRelativeTimeShift(relativeShift)
+        global_payload.setNrFrames(nrFrames)
 
         Belle2.Database.Instance().storeData(Belle2.SVDDetectorConfiguration.svdLocalConfig_name, local_payload, iov)
         Belle2.Database.Instance().storeData(Belle2.SVDDetectorConfiguration.svdGlobalConfig_name, global_payload, iov)

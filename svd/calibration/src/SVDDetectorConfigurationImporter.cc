@@ -71,6 +71,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   std::string systemClock = "";
   float hv = 0;
   int relativeTimeShift = 0;
+  int nrFrames = 0;
 
   for (ptree::value_type const& cfgDocumentChild :
        pt.get_child("cfg_document")) {
@@ -95,6 +96,8 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
     if (cfgDocumentChild.first == "fadc_ctrl") {
       systemClock = cfgDocumentChild.second.get<std::string>("<xmlattr>.system_clock") ;
       B2INFO(" APV clock units = " << systemClock);
+      nrFrames = cfgDocumentChild.second.get<int>("<xmlattr>.nr_frames") ;
+      B2INFO(" Number of Frames = " << nrFrames);
 
     }
 
@@ -128,6 +131,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   svdGlobalConfig->setAPVClockInRFCUnits(systemClock);
   svdGlobalConfig->setHV(hv);
   svdGlobalConfig->setRelativeTimeShift(relativeTimeShift);
+  svdGlobalConfig->setNrFrames(nrFrames);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);

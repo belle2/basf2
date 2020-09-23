@@ -51,7 +51,7 @@
 #pragma link C++ class Belle2::SVDLocalConfigParameters +; // checksum=0x56a63232, version=1
 
 
-#pragma link C++ class Belle2::SVDGlobalConfigParameters +; // checksum=0x369ac2a6, version=3
+#pragma link C++ class Belle2::SVDGlobalConfigParameters +; // , checksum=0x1694a3c, version=3
 
 #endif
 
@@ -82,3 +82,16 @@
   targetClass="Belle2::SVDGlobalConfigParameters"\
   target="m_relativeTimeShift"          \
   code="{ m_relativeTimeShift = 0;}" \
+
+// SVDGlobalConfigParameters
+// As of version 3, a new data member is added
+// classDef = 2 -> classDef = 3
+// x ->  int m_nrFrames
+// when classDef = 1,2 m_nrFrames = 6
+#pragma read \
+  sourceClass="Belle2::SVDGlobalConfigParameters"\
+  source=""\
+  version="[-2]" \
+  targetClass="Belle2::SVDGlobalConfigParameters"\
+  target="m_nrFrames"          \
+  code="{ m_nrFrames = 6;}" \

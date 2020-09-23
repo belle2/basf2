@@ -356,6 +356,13 @@ and four-vectors of particles according to a physics model. In Belle II this is
 usually a very fast process and takes of the order of milliseconds per event to
 generate.
 
+There is a large variety of different generators for different use cases:
+EvtGen, KKMC, Tauola, Madgraph, CRY, AAFH, babayaganlo, PHOKARA, ... . All
+simulate specific physic processes and will be used for different use cases from
+perfomance studies to different analysis types. There is an internal `Belle II
+Note <https://docs.belle2.org/record/282?ln=en>`_ with more details if you're
+interested.
+
 .. rubric:: Simulation
 
 After we generated the four-vectors of our event we need to now make it look
@@ -365,8 +372,8 @@ scintillation, bremsstrahlung, pair production, Cherenkov radiation and so forth
 
 All these processes are well known and can in be simulated. There has been a lot
 of effort put into this by many experiments to create simulation software
-capable of all of these processes. The most well known one is `Geant4 <https://geant4.web.cern.ch/>`_
-and we also use it in Belle II.
+capable of all of these processes. The most well known one is
+`Geant4 <https://geant4.web.cern.ch/>`_ and we also use it in Belle II.
 
 Geant4 takes the four-vectors and simulates their interaction with a virtual
 Belle II detector. In the end we get deposited energy and particles produced by
@@ -378,7 +385,7 @@ will convert the energy deposited into information which pixels were fired.
 
 Simulating the full detector is an expensive process and takes of the order of a
 second for Belle II. For other experiments like ATLAS and CMS it can also get
-close to minutes per event.
+close to minutes per event due to the much higher energy.
 
 .. admonition:: Question
     :class: exercise stacked
@@ -401,7 +408,7 @@ close to minutes per event.
     Multiplying 770 million by one gives us 770 million seconds which is around
     8912 days or roughly 24 years.
 
-    For Belle II we intend to collect :math:`50 ab^{-1}` and the cross section
+    For Belle II we intend to collect :math:`50 \textrm{ab}^{-1}` and the cross section
     is 1.1 nb. So we expect 55 billion :math:`B\over{B}` events. Equivalent to
     636574 days or 1744 years.
 
@@ -414,7 +421,7 @@ close to minutes per event.
     providers (prices may vary, don't quote us on that).
 
     How many CPUs do we need to buy in the cloud and how much would it cost to
-    simulate the equivalent of :math:`50 ab^{-1}` :math:`B\over{B}` events in
+    simulate the equivalent of :math:`50 \textrm{ab}^{-1}` :math:`B\over{B}` events in
     six months?
 
 .. admonition:: Solution
@@ -423,8 +430,8 @@ close to minutes per event.
     We need 55 billion seconds of CPU time, equivalent to 15.3 million hours. It
     would cost us roughly $764,000.
 
-    Three months have roughly :math:`30 * 3 * 24 = 2160` hours
-    so we need 7073 CPUs.
+    Three months have roughly :math:`30 * 6 * 24 = 2160` hours
+    so we need 3540 CPUs.
 
     Now bear in mind: this is only the simulation part, there is still more work
     to do during reconstruction as will be explained in the next section.
@@ -464,19 +471,201 @@ So we have the Data Production group to organize and manage the production of
 large MC samples. They make sure that the requests of the physicists are met and
 that the computing resources we have are not wasted.
 
-.. TODO: link to DP group website?
+.. seealso::
+
+    You have already found the data production group confluence page.
+    If not, take another look at :ref:`the previous lesson <onlinebook_collaborative_tools>`_.
+    Now might be a good time to bookmark or "watch" some pages.
+
+.. admonition:: Key points
+    :class: key-points
+
+    * Simulated data (MC) is necessary to compare results to expectations
+    * "Generation" is the first step to create particles according to some
+      physics model
+    * "Simulation" is then the simulation of these particles interacting with
+      the matter in our the detector.
+    * simulating large amounts of MC is expensive
+    * there are always differences between MC and data, the Performance tries to
+      understand, quantify and minimize them.
+    * the data production group organizes and manages the MC production.
 
 
 Processing: the reconstruction
 ------------------------------
 
-Describe here:
-* What is the reconstruction
-* Example 1: tracking (short)
-* Example2: clustering (?)
-* Why do we need to run the reconstruction separately from the analysis? 
-  Mention that resources are very not infinite
+Now after the data acquisition or the simulation we have events which contain
+the raw detector responses. We need to process this information into something
+more usable for analysis. At best we want to be able to reconstruct the
+underlying particles as correctly as possible and get the original four-vectors
+of particles produced in the interaction.
 
+However, it's never possible to uniquely identify all the particles in the
+interaction because for hadronic interactions there are almost always short
+lived particles that decay before reaching the detector.
+
+In addition there will be signals in the detector which are not what we want:
+Every detector has an intrinsic noise so some detector channels will fire
+randomly. In addition there is real background not coming from the event we're
+interested in but from other electrons/positrons in the beam randomly
+interacting with each other or parts of the accelerator structure.
+
+So all we can do is look at the detector response and find a set of most likely
+particles and then leave it to the analyses to do a proper statistical analysis
+of the events.
+
+Now the exact same reconstruction is performed on MC data as on real data: We
+want the exact same algorithms in both cases. However in MC we actually know the
+correct particles and we can trace which detector response was caused by which
+particle.
+
+So we run the exact same reconstruction but in addition for MC we also trace the
+correctness of the reconstruction which we call "MC Truth".
+
+.. rubric:: Clustering
+
+One of the first steps in this reconstruction is called clustering where we need
+to combine the detector responses in each sub detector if they are related.
+
+As a simple example we can look at the PXD: If a particle passes the
+pixel detector we expect a signal in one of the pixels. But what if the particle
+passes between pixel boundaries? Or if it flies through the detector at a
+shallow angle along multiple pixels? We will get multiple pixels caused by the
+same particle.
+
+So we cluster neighboring pixels, taking the detector intrinsic properties such
+as noise into account and form groups of pixels. We can then calculate
+properties of these clusters like size, shape or center. Since our pixel detector
+has an analog readout and can measure the amount of ionisation per pixel we can
+use weighted mean calculate the center position. Or we could even use more
+advanced algorithms depending on the readout characteristics of our detector.
+
+.. _fig:reconstruction-clustering:
+
+.. figure:: clustering.svg
+   :align: center
+
+   Simple example of 2D clustering with analog signals
+
+Now this was an example for the pixel detector but this same principle is also
+used in the strip detector (in 1D) or in the calorimeter to group neighboring
+crystals into clusters.
+
+In addition the calorimeter now has different characteristic cluster shapes
+depending on what particle caused the cluster: hadronic interaction of photons.
+So the definition of a cluster in the ECL becomes more complicated as the same
+connected region of crystals might be caused by one or more photons or one
+hadron. But the principle is the same: Identify all hits caused by a particle
+and group them into clusters.
+
+.. rubric:: Tracking
+
+A very important part of our reconstruction is the so-called tracking or track
+reconstruction. It tries to identify trajectories of particles through the
+tracking detectors, called tracks. There are mainly two parts of tracking
+
+Track finding
+  Find patterns in the hit clusters in the tracking detectors that look like
+  they could be from one particle flying through the detector.
+
+Track fitting
+  Determine the best estimate of the particle trajectories found to obtain
+  position and momentum close to the interaction region as precisely as
+  possible.
+
+Track finding is a very complex process which depends a lot on the detector
+layout and characteristics and the most complex part of the reconstruction
+process. It would be impossible to describe it properly here. You can find more
+details in the Belle II physics book and there is also a paper describing `track
+finding at Belle II <https://arxiv.org/abs/2003.12466>`_
+
+What we can say that track finding and fitting requires a lot of computing time
+to find all the tracks in our events. As a matter of fact currently our tracking
+reconstruction takes about twice as long as the simulation of an event.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    Now assuming reconstruction takes exactly twice as long as simulation and
+    simulation still takes 1 second and we can buy one CPU/hour for $0.05 in a
+    commercial cloud as above.
+
+    For the full experiment we will collect :math:`50 \textrm{ab}^{-1}`. The
+    plan is to have a total trigger cross section of 20 nb (so in addition to the
+    1.1 nb of :math:`B\over{B}` we will also have some fraction of continuum,
+    tau and other events).
+
+    How many CPUs do we need to reconstruct all the real data and simulate and
+    reconstruct an equivalent amount of MC in one year? And what will it cost?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    It's basically the same question as above but we now have a cross section of
+    20 nb we want to simulate.
+
+    And we need to reconstruct both data and MC so we need to simulate once and
+    reconstruct twice.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    Now all together we will have 1 trillion events from the detector. We have
+    to simulate the same amount of events. And reconstruct both.
+
+    That leads to 5 trillion seconds of CPU time or 1.4 trillion CPU hours and
+    would require 160 thousand CPUs and cost 70 million dollars.
+
+
+.. rubric:: Particle Identification
+
+Once we have the tracks we can also try to determine the likelihoods for the
+track belonging to different particle types. For each given track we can then
+check the sub detectors contributing to particle identification if they saw
+anything that could be related to this track.
+
+For the CDC we can calculate the total energy loss over the track length and
+compare this to the expected values for different particle types. For ARICH we
+know where the track entered the detector and can check this area to see if
+there are any cerenkov rings around this position. The same principle applies to
+TOP, ECL or KLM: we know where the track entered the detectors and can check for
+any related information from these sub detectors.
+
+These detectors then calculate likelihoods for the signal caused by different
+particle types which we attach to the track information for later use by
+analysts.
+
+.. rubric:: Organization of Reconstruction.
+
+As mentioned above the reconstruction can take a long time and be very
+expensive, especially if we have a lot of data. It also depends on a lot of
+expert knowledge:
+
+* the conditions during data taking need to be taken into account: beam energies
+  and positions, detector status, ... .
+* the conversion from raw detector signal to energy needs to be properly
+  calibrated.
+* the position of the tracking detector sensors needs to be well known and
+  corrected in software (a process called alignment).
+
+So as for the simulation this is something which we centrally organize in Belle
+II. So, not very surprising, the Data Production group takes charge and
+coordinates with the detector experts the reconstruction of our data.
+
+
+.. admonition:: Key points
+    :class: key-points
+
+    * The "reconstruction" is the process where we process the raw detector
+      signal into high level objects like particle trajectories, ECL clusters
+      and PID likelihoods.
+    * Clustering is the process of finding connected regions of detector signal
+      that most likely originated from the same particle
+    * Tracking is the process of reconstructing the trajectories of particles
+      flying through the tracking detectors and infer position and momentum as
+      precisely as possible.
+    * Reconstruction takes quite some time and is handled centrally by the Data
+      Production Group
 
 
 Processing: Data formats

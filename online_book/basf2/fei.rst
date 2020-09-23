@@ -3,8 +3,6 @@
 Full Event Interpretation
 =========================
 
-.. include:: ../todo.rst
-
 .. sidebar:: Overview
     :class: overview
 
@@ -28,18 +26,10 @@ Full Event Interpretation
         * Understand the output from the FEI
 
 
-.. admonition:: Key points
-    :class: key-points
-
-    * You get the weight files from the conditions database
-    * You add the FEI to your path with ``fei.get_default_channels`` and ``fei.FEIConfiguration``.
-    * Your purity and efficiency is controlled by a cut on ``extraInfo(SignalProbability)``
-
-
 Introduction
 ------------
 
-In each  :math:`\Upsilon(4S)` decay at Belle II, two B mesons are produced. If one of the B mesons decays to to a final
+In each :math:`\Upsilon(4S)` decay at Belle II, two B mesons are produced. If one of the B mesons decays to a final
 state involving neutrinos, this B meson cannot be reconstructed completely as the neutrinos are invisible to the detector.
 The information can, however, be recovered from the second B meson. This is called **tagging**,
 the second B meson is referred to as B\ :sub:`tag`. The Full Event Interpretation (FEI; pronounced like phi)
@@ -51,46 +41,35 @@ this requires large computing resources. Instead, the classifiers are pre-traine
 
 Fortunately, for you as a user this is all contained within a few lines of code, allowing you to easily include the FEI
 in your steering file.
-In the first part of this exercise, we will use the FEI to reconstruct a  B\ :sup:`+`\ :sub:`tag` and have a look at its properties.
-In the second part we will combine the B\ :sub:`tag` with a B meson reconstructed
-in a decay channel involving neutrinos, referred to as B\ :sub:`sig`.
+In the first part of this exercise, we will use the FEI to reconstruct a  B\ :sup:`+`\ :sub:`tag` and have a look at its
+properties. In the second part we will combine the B\ :sub:`tag` with a B meson reconstructed in a decay channel
+involving neutrinos, referred to as B\ :sub:`sig`.
 
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-      Find the documentation of the FEI
+      Find the documentation of the FEI and look up "hadronic tagging" and
+      "semileptonic tagging" in the FEI's documentation.
+      What is the difference between both analysis strategies? What are advantages and disadvantages?
 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     It can be found in the :ref:`analysis/doc/index-01-analysis:Advanced Topics` section of the analysis module.
+     The documentation can be found in the :ref:`analysis/doc/index-01-analysis:Advanced Topics` section of the analysis module.
+     The definitions can be found in the section titled ``Hadronic, Semileptonic and Inclusive Tagging``.
 
 .. admonition:: Solution
      :class: toggle solution
 
      The documentation is here: `FullEventInterpretation`
 
+     Hadronic tagging uses only B meson decays without neutrinos and is therefore more precise
+     (as the exact momentum of the B meson can be known).
 
-.. admonition:: Exercise
-    :class: exercise stacked
+     Semileptonic tagging uses decays that include one neutrino,
+     these have higher branching fractions but are less precise as the kinematic information is incomplete.
 
-     Look up "hadronic tagging" and "semileptonic tagging" in the FEI's documentation.
-     What is the difference?
-
-.. admonition:: Hint
-    :class: toggle xhint stacked
-
-    This can be found in the :ref:`analysis/doc/FullEventInterpretation:Hadronic, Semileptonic and Inclusive Tagging` section.
-
-.. admonition:: Solution
-    :class: toggle solution
-
-    Hadronic tagging uses only B meson decays without neutrinos and is therefore more precise
-    (as the exact momentum of the B meson can be known).
-
-    Semileptonic tagging uses decays that include one neutrino,
-    these have higher branching fractions but are less precise as the kinematic information is incomplete.
 
 In this exercise we will use hadronic tagging, the procedure for semileptonic tagging is analogous but as it is less
 commonly used it is not discussed in this exercise.
@@ -122,7 +101,8 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
         :lines: -21
 
 Now we need the Global Tag in which the weight files for the FEI can be found. This can change once a new central
-training of the FEI is released so it is best to use the `b2conditionsdb-recommend<b2conditionsdb-recommend>` tool with the mdst file as argument.
+training of the FEI is released so it is best to use the `b2conditionsdb-recommend<b2conditionsdb-recommend>` tool
+with the mdst file as argument.
 
 The correct Global Tag must then be used in your steering file by assigning it
 to the `conditions.globaltags <ConditionsConfiguration.globaltags>` list in the ``basf2`` namespace.
@@ -130,8 +110,9 @@ to the `conditions.globaltags <ConditionsConfiguration.globaltags>` list in the 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Look up the correct Global Tag for our mdst file using `b2conditionsdb-recommend<b2conditionsdb-recommend>`. The command will return multiple
-    Global Tags, choose the one starting with ``analysis_tools`` as this one contains the FEI's weight files.
+    Look up the correct Global Tag for our mdst file using `b2conditionsdb-recommend<b2conditionsdb-recommend>`.
+    The command will return multiple Global Tags, choose the one starting with ``analysis_tools``
+    as this one contains the FEI's weight files.
 
     Include the Global Tag in your steering file.
 
@@ -144,8 +125,10 @@ to the `conditions.globaltags <ConditionsConfiguration.globaltags>` list in the 
 
         b2conditionsdb-recommend /group/belle2/users/tenchini/prerelease-05-00-00a/charged/charged_eph3_BGx0_0.root
 
-    Assign a list containing one of the resulting strings (the one starting with ``analysis_tools`` **!**,
-    they are all in one line separated by spaces) to ``b2.conditions.globaltags`` in your steering file.
+    The results are presented in one line separated by spaces. Pick the tag starting with ``analysis_tools`` and assign
+    it to ``b2.conditions.globaltags``.
+
+    Note: This variable always takes a **list** of tags.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -162,11 +145,11 @@ to the `conditions.globaltags <ConditionsConfiguration.globaltags>` list in the 
 Configuring the FEI
 *******************
 
-Now, that all the prerequisites are there, we have to configure the FEI for our purposes. To do this,
+Now that all the prerequisites are there, we have to configure the FEI for our purposes. To do this,
 we need to configure two objects:
 The `fei.get_default_channels` function and the `fei.FeiConfiguration` object.
 
-The ``get_default_channels`` function controls which channels the FEI reconstructs. Disabling channels speeds up the FEI
+The `fei.get_default_channels` function controls which channels the FEI reconstructs. Disabling channels speeds up the FEI
 so it makes sense to only select what you need by specifying the appropriate arguments.
 As only charged B mesons are reconstructed in this exercise, the ``chargedB`` argument has to be set to True (default)
 and the ``neutralB`` argument to False.
@@ -183,10 +166,10 @@ as you will only reconstruct B mesons in hadronic decay channels.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 29
+        :lines: 29-31
 
 
-The ``FEIConfiguration`` class controls the FEI's other configuration.
+The `fei.FeiConfiguration` class controls the FEI's other configuration.
 Here, the FEI monitoring should be disabled with the appropriate argument (``monitor=False``) as we are not interested in
 the internal performance characteristics of the FEI's stages.
 We also have to specify the FEI prefix argument here. This prefix allows distinguishing between different trainings
@@ -203,7 +186,7 @@ in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for th
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 32
+        :lines: 34-36
 
 The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
@@ -214,7 +197,8 @@ to the main path with the `basf2.Path.add_path` method.
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Create the FEI path with ``fei.get_path()`` and use ``add_path`` to add it to your main path.
+    Create the FEI path with `fei.get_path()` and use its `basf2.Path.add_path`
+    method to add it to your main path.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -226,7 +210,7 @@ to the main path with the `basf2.Path.add_path` method.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 34-38
+        :lines: 38-42
 
 
 You have now successfully added the FEI to the main path. The FEI will add a particle list
@@ -264,7 +248,7 @@ You should already be familiar with both topics from the previous exercises.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 41-42,46-53,54-60
+        :lines: 45-46,56-64,66-73
 
 The FEI returns not only one B meson candidate for each event but up to 20. Using the `modularAnalysis.rankByHighest`
 function, it is possible to rank the candidates by the B meson classifier output in the
@@ -282,7 +266,9 @@ candidate.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    You can find documentation on ``rankByHighest`` here: `modularAnalysis.rankByHighest`.
+    You should already be familiar with Best Candidate Selection from the :ref:`onlinebook_various_additions` lesson.
+    The documentation on ``rankByHighest`` can be found here: `modularAnalysis.rankByHighest`.
+
     The variable in `variablesToNtuple` should be called ``extraInfo(FEIProbabilityRank)``.
 
 .. admonition:: Solution
@@ -290,7 +276,7 @@ candidate.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 44-60
+        :lines: 48-73
 
 You can now execute you steering file which should look somewhat like this:
 
@@ -311,7 +297,7 @@ The beam-constrained mass `Mbc` which we have written to our ntuple is defined a
 
 .. math::
 
-    M_{bc} = \sqrt{E_{beam}^2 - \mathbf{p}_{B}^2}
+    M_{bc} = \sqrt{E_{\text{beam}}^2 - \mathbf{p}_{B}^2}
 
 For correctly reconstructed B mesons, this variable should peak at the B meson mass.
 
@@ -322,23 +308,27 @@ For correctly reconstructed B mesons, this variable should peak at the B meson m
     Load your ntuple file into python, either using ``root_pandas`` or ``uproot``.
     Then, plot the distribution of `Mbc` from 5.15 - 5.3 GeV.
 
+    You should see broad peak with a sharp drop-off below 5.2 GeV.
+    This drop-off is caused by a fixed pre-cut in the FEI. Candidates below this threshold are rejected before
+    classification as they are always incorrect.
+
 .. admonition:: Solution
     :class: toggle solution
 
     .. code-block:: python
 
+        # Include this only if running in a Jupyter notebook
         %matplotlib inline
 
-        import matplotlib.pyplot as plt
         from root_pandas import read_root
 
         df = read_root('B_charged_hadronic.root')
 
-        fig, ax = plt.subplots()
-        n, bins, patches = ax.hist(df['Mbc'], 30, range=(5.15, 5.3))
+        ax = df.hist(df['Mbc'], 30, range=(5.15, 5.3))
         ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ / GeV')
         ax.set_ylabel('Number of candidates')
-        plt.show()
+
+        ax.figure.savefig('m_bc.pdf')
 
 
 .. admonition:: Question
@@ -364,6 +354,9 @@ For correctly reconstructed B mesons, this variable should peak at the B meson m
     ``extraInfo__boFEIProbabilityRank__bc`` variable created with `modularAnalysis.rankByHighest`
     (if you have done this).
 
+    These selections should increase the purity of the B meson candidates under consideration and lead to a sharper
+    peak at the B mass.
+
     You can also have a look at the correctly reconstructed B mesons by requiring ``isSignal == 1``. By comparing this
     to the cuts on the FEI classifier you can see how well the FEI identifies correctly reconstructed B mesons.
 
@@ -378,10 +371,39 @@ For correctly reconstructed B mesons, this variable should peak at the B meson m
         best_candidate_df = df[df['extraInfo__boFEIProbabilityRank__bc'] == 1]
         sig_prob_cut_df = df[best_candidate_df['extraInfo__boSignalProbability__bc'] > 0.001]
 
-        n, bins, patches = ax.hist(df[]['Mbc'], 30, range=(5.15, 5.3))
+        n, bins, patches = ax.hist(sig_prob_cut_df['Mbc'], 30, range=(5.15, 5.3))
         ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ / GeV')
         ax.set_ylabel('Total number of candidates')
         ax.set_title('SigProb > 0.01')
 
         plt.show()
 
+Congratulations, you have now discovered the B meson in Monte Carlo data!
+This concludes the first part of this lesson. The second part of this lesson will show you now how to use
+the reconstructed B\ :sub:`tag` in you own analysis.
+
+
+Reconstructing the full :math:`\Upsilon(4S)` event
+--------------------------------------------------
+
+
+The FEI skim
+************
+
+You might have noticed that applying the FEI takes some time, even for the small file we have just processed.
+For this reason and to save computing resources, datasets with pre-applied FEI tagging exist. These
+preprocessed datasets are called *skims*. We will be using the FEI skim in this exercise.
+
+
+
+
+.. admonition:: Key points
+    :class: key-points
+
+    * Get the weight files from the conditions database
+    * Add the FEI to your path with `fei.get_default_channels` and `fei.FeiConfiguration`.
+    * FEI Purity and efficiency are controlled by a cut on ``extraInfo(SignalProbability)``
+
+.. topic:: Author of this lesson
+
+    Moritz Bauer

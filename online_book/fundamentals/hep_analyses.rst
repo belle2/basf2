@@ -145,19 +145,63 @@ Data taking: The experiment
 ---------------------------
 
 If you are reading this manual, you are probably already at least partially 
-familiar with the general layout of the SuperKEKB accelerator and the Belle II experiment. However, before 
-moving on, let's very quickly review their structure.
+familiar with the general layout of the SuperKEKB accelerator and the Belle II
+experiment. However, before moving on, let's very quickly review their structure.
 
-The SuperKEKB accelerator circulates electrons and positrons in its roughly 3km circumference tunnel. These beams are asymmetric in momentum, with the electrons kept at around 7Gev/c and the positrons at around 4GeV/c circulating in opposite directions. At a single point on the accelerator ring, the two beams are steered into (almost) head-on collision, resulting in a center-of-mass energy of typically around 10.6GeV. The point of collision is named the "interaction region".
+The SuperKEKB accelerator circulates electrons and positrons through its roughly
+3km circumference tunnel in opposite directions. These beams are asymmetric in
+momentum, with the electrons kept at around 7Gev/c and the positrons at around
+4GeV/c. At a single point on the accelerator ring, the two beams are steered
+into (almost) head-on collision, resulting in a center-of-mass energy of
+typically around 10.6GeV. The point of collision is named the "interaction
+region".
 
-The Belle II detector is built around the interaction region, with the goal to detect and measure as many of the particles produced in the SuperKEKB collisions as possible. Belle II consists of several sub-systems, each one dedicated to a specific task: 
-reconstruct the trajectory of charged track, reconstruct the energy of photons, 
-identify the particle type or to identify muons and reconstruct long-living hadrons. 
-Of course some systems can be used for multiple purposes: for example, the ECL is mainly 
-intended as a device to recontruct photons, but is also used to identify 
-electrons and hadrons.
+.. admonition:: Question
+    :class: exercise stacked
 
-Due to the asymmetry of the SuperKEKB collisions, the Belle II detector also has an asymmetric geometry. In the context of Belle II the "forward" direction is the direction in which the electron beam points, while "backward" is the direction in which the positron beam points.
+    At LHC, every bunch collision generates dozens of individual particle
+    interactions that overlay each other in the detectors (pile-up),
+    considerably complicating the data analysis. 
+    This doesn't seem to be a problem at SuperKEKB and Belle II. Why?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Start with the planned final instantaneous luminosity of SuperKEKB. How
+    many bunch crossings will happen per second? 
+    Then think about the typical cross sections in :math:`e^+e^` collisions
+    as discussed previously.
+
+.. admonition:: Another hint
+    :class: toggle xhint stacked
+
+    The goal instantaneous luminosity of SuperKEKB is :math:`8*10^35 cm^-2
+    s^-1`. It takes a beam particle bunch roughly 10us to complete a full
+    revolution around the accelerator ring. Up to 2376 bunches will circulate
+    in each ring.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    At a final design luminosity of :math:`8*10^35 cm^-2 s^-1` at 2376 bunches
+    per ring, each taking about 10us to complete a revolution, the
+    delivered luminosity per bunch crossing is about :math:`8*10^35 cm^-2 s^-1
+    * 1*10^-6 s / 2376 = 3.4*10^-7 nb`, so even the most likely Bhabha process
+    at 125nb only happens once every 25000 bunch crossings.
+
+The Belle II detector is built around the interaction region, with the goal to
+detect and measure as many of the particles produced in the SuperKEKB collisions
+as possible. Belle II consists of several sub-systems, each one dedicated to a
+specific task: reconstruct the trajectory of charged track, reconstruct the
+energy of photons, identify the particle type or to identify muons and
+reconstruct long-living hadrons. Of course some systems can be used for
+multiple purposes: for example, the ECL is mainly intended as a device to
+recontruct photons, but is also used to identify electrons and hadrons.
+
+Due to the asymmetry of the SuperKEKB collisions, the Belle II detector is
+asymmetric along the beam axis. In the context of Belle II the "forward"
+direction is the direction in which the electron beam points, while "backward"
+is the direction in which the positron beam points.
 
 .. seealso:: 
 
@@ -189,11 +233,15 @@ PXD
     Detector (PXD). It is a high-granularity tracking system which enables 
     precise reconstruction of the intersection of tracks (a vertex). 
     You can think of this as the inner vertex detector.
-    The PXD is constructed from DEPFET silicon sensors segmented into individual pixels of down to 50*55:math:`\upmu m^2` size. It consists of two layers at 14mm and 22mm radius from the interaction point.
+    The PXD is constructed from DEPFET silicon sensors segmented into individual
+    pixels of down to 50*55 :math:`\upmu m^2` size. It consists of two layers at
+    14mm and 22mm radius from the interaction point.
 
 SVD
     The Silicon Vertex Detector (SVD) is the outer part of the vertex detector.
-    It comprises of double sided silicon microstrip sensors with strips widths down to 50:math:`\upmu m`. The four layers of the SVD system extend the outer radius of the vertex detector up to 140mm.
+    It comprises of double sided silicon microstrip sensors with strips widths
+    down to 50 :math:`\upmu m`. The four layers of the SVD system extend the
+    outer radius of the vertex detector up to 140mm.
 
 VXD
     You will occasionally hear people refer to the pair of detectors: PXD+SVD 
@@ -214,14 +262,28 @@ TOP
     information in the barrel region of Belle II .
     The subdetector comprises of quartz bars and works by utilising the 
     `Cherenkov effect <https://en.wikipedia.org/wiki/Cherenkov_radiation>`_.
-    Particles passing through will cause Cherenkov photons to be emitted at an angle     that directly depends on the particle velocity. Combining this velocity information with particle momentum measured in the preceding tracking detectors yields a mass measurement, which identifies the particle species.
-    Emitted Cherenkov photons are captured inside the quartz bars by total internal reflection. TOP reconstructs the Cherenkov emission angle by measuring the effective propagation time of individual Cherenkov photons from their emissions point to the TOP sensor plane. At a given momentum, heavier particles will have lower velocities, thus a lower Cherenkov opening angle and thus, on average, a longer photon propagation path, causing a longer time of propagation of individual photons.
-    You might also hear people refer to the TOP as the iTOP (imaging TOP).
+    Particles passing through will cause Cherenkov photons to be emitted at an
+    angle that directly depends on the particle velocity. Combining this
+    velocity information with particle momentum measured in the preceding
+    tracking detectors yields a mass measurement, which identifies the particle
+    species. Emitted Cherenkov photons are captured inside the quartz bars by
+    total internal reflection. TOP reconstructs the Cherenkov emission angle by
+    measuring the effective propagation time of individual Cherenkov photons
+    from their emissions point to the TOP sensor plane. At a given momentum,
+    heavier particles will have lower velocities, thus a lower Cherenkov opening
+    angle and thus, on average, a longer photon propagation path, causing a
+    longer time of propagation of individual photons. You might also hear people
+    refer to the TOP as the iTOP (imaging TOP).
 
 ARICH
-    The Aerogel Ring-Imaging Cherenkov detector is another dedicated particle 
-    identification subdetector using aerogel as its radiator medium. It covers the forward region of the detector.
-    Just as with the quartz in TOP, Cherenkov photons are emitted when a charged particle of sufficient velocity passes through the aerogel. Contrary to the TOP quartz, the aerogel does not capture the emitted Cherenkov photons, so they are forming a cone of Cherenkov light around a particle track which is imaged as a ring of characteristic radius, providing an orthogonal source of particle mass information.
+    The Aerogel Ring-Imaging Cherenkov detector is another dedicated particle
+    identification subdetector using aerogel as its radiator medium. It covers
+    the forward region of the detector.
+    Just as with the quartz in TOP, Cherenkov photons are emitted when a charged particle
+    of sufficient velocity passes through the aerogel. Contrary to the TOP quartz, the
+    aerogel does not capture the emitted Cherenkov photons, so they are forming a cone of
+    Cherenkov light around a particle track which is imaged as a ring of characteristic
+    radius, providing an orthogonal source of particle mass information.
 
 ECL
     The Electromagnetic CaLorimeter (ECL) is chiefly tasked with measuring the 
@@ -279,7 +341,7 @@ Off-resonance
 
 Cosmic
     At the beginning and end of each run period BelleII acquires cosmic muons. These events are used mainly for
-    performance studies and for calibration, as they provide an unique sample for alignign the detectros with 
+    performance studies and for calibration, as they provide an unique sample for aligning the detectors with 
     each other. Usually part of this dataset is collected with the solenoid switched off, so that muons cross the
     detectors on straight trajectories. If the SuperKEKB accelerator has a major  downtime of few days, a cosmic dataset
     is usually collected to keep the BelleII system running.
@@ -304,22 +366,78 @@ Non-4S
 
 Data taking: Triggers and filters
 ---------------------------------
- 
-During the data taking, each sub-detector constantly acquires data according the modes 
-and specifications of its front-end electronics. This mass of data, however, cannot be 
-written directly to disk as a constraint stream to be later sorted out, because it would 
-require a comical amount of resources and bandwidth from the detector to the offline disks.  
-For this reason the data are acquired only when a potentially interesting even is seen 
-in the detector, and several level of filtering are applied during the data processing 
-before the end-users, the analysist, can run their analysis jobs on them. 
-What follows is a very simplified explanation of the process the leads from the physics event to the data you can analyze.
- 
-The systems that are involved in the data taking are the Data AcQuisition (DAQ), the 
-TRiGger (TRG, also known as L1) and the High Level Trigger (HLT). Collectively, they are 
-often referred as the Online system.
 
-During the data taking [...]
+When SuperKEKB delivers collisions to the interaction region, it is up to the
+Belle II experiment to record the data generated by the collisions. SuperKEKB
+bunches can cross the interaction region up to every 4ns. However, in the vast
+majority of cases either no collision (more precise: no hard interaction) takes
+place at all, or the collision results are not interesting (for example
+:math:`e^+e^-\to e^+e^-` type events are the most common, but of secondary
+importance to the Belle II physics program). Recording and keeping all detector
+information for each possible collision time would thus be wasteful (indeed the
+required resources and bandwidth from the detector to the offline disks would be
+rather comical). Instead, the Belle II online system, consisting of the Data
+AcQuisition (DAQ), Level 1 TriGger (TRG, also called L1) and the High Level
+Trigger (HLT), is designed to reduce the amount of data as much as possible
+before it even reaches the first storage hard disk.
 
+Generally, when Belle II is running and operational, each subdetector will
+transmit its readout data upon receipt of an external trigger signal.
+The data gathered from all subdetectors in response to a given external trigger
+is what we call "one event". Generating this trigger signal for each
+"interesting" collision is the task of the TRG system. The TRG system receives
+what effectively amounts to a low resolution "live stream" of the readout data
+of CDC, ECL and KLM (for completeness: TOP also sends stream data to TRG  but it
+is not used for triggering directly). The streamed data is interpreted in near
+realtime in highly specialised fast electronics boards (Field Programmable Gate
+Arrays, FPGAs). If TRG determines an interesting collision event has just taken
+place, it generates a trigger signal which is distributed to all subdetectors.
+The TRG system is designed to issue up to 30kHz of such triggers at full
+SuperKEKB design luminosity.
+
+.. note::
+   The TRG system will issue a trigger decision with a fixed delay of about 4us.
+   In practice, all subdetector frontend electronics thus have to keep a buffer
+   of their readout data of the past several microseconds, so they can transmit
+   the measurement they took in the time slice around 4us ago.
+
+The DAQ system makes sure that all trigger signals are synchronously delivered
+to all subdetectors. It also provides the high-speed data links that are used
+to read out the subdetector data for each event and forwards it to the HLT
+system.
+
+The HLT system is a computing cluster of about 4000 CPU cores located right next
+to the Belle II detector. It receives the full raw subdetector data for each
+triggered event performs an immediate full reconstruction, using the
+exact same basf2 software as is used in offline data analysis. Based on the
+result of this reconstruction, events are classified and either stored to a
+local offline storage hard disk drive or discarded. This high level event
+selection is expected to reduce the amount of data written to the offline
+storage by at least 60%.
+
+Both the TRG system and the HLT classify events based on the data available to
+them. While the decision whether to issue a trigger for a given collision (or on
+HLT whether to keep the event or discard it) is of course binary, certain event
+classes might be intentionally triggered at less than 100% of their occurence.
+For example, while Bhabha scattering events (:math:`e^+e^- \to e^+e^-` often just
+called "Bhabhas") are generally not very interesting for the physics program of
+Belle II, keeping some of them for calibration purposes might be very useful.
+Since Bhabhas are easily identified even with the limited information available
+to the TRG system, the TRG system will not issue a trigger for every single
+identified Bhabha event, but only for a configurable fraction. This technique of
+intentionally issuing triggers only for fractions of a given event class is
+named prescaling. When working on your own analysis, it is very important to
+keep in mind potential prescaling of the triggers that yield the events you use
+in your analysis. Since the prescaling settings can (and will) change over
+the lifetime of the Belle II experiment, updated numbers for each run can be
+found here TODO: where? on confluence?
+
+Since the TRG and HLT systems are ultimately deciding which data is being kept
+for offline analysis, the importance of understanding and validating their
+performance vs. their intended functionality is of highest importance for the
+success of the Belle II experiment.
+
+TODO: HLT tags? jiltering? (HLT skims)
 
 Simulation: the Montecarlo
 --------------------------

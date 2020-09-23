@@ -259,8 +259,47 @@ KLM
 Data taking: on resonance, continuum, cosmics
 ---------------------------------------------
 
+To collect :math:`B` mesons one must collide electrons and positrons at the centre-of-mass energy of 
+:math:`\sqrt{s} = 10.580` GeV, corresponding to the :math:`\Upsilon(4S)` resonance mass. 
+However this is not the only energy at which the SuperKEKB accelerator can work, and it's not the only
+ kind of dataset that Belle II collects.
 
+On-resonance
+    The standard collisions at :math:`\sqrt{s} = 10.580` GeV.
 
+Off-resonance
+    :math: `e^+e^- \to \Upsilon(4S) \to B\bar{B}` is not the only process that takes place at 
+    :math:`\sqrt{s} = 10.580` GeV. The production of light and charm quark pairs in the reaction 
+    :math: `e^+e^- \to u\bar{u}, d\bar{d}, s\bar{s}, c\bar{c}` has a total cross section of about :math:`3.7` 
+    nb is more that three times larger than the production of :math:`B` mesons. As the quarks hadronize leaving 
+    final states that are similar to the :math:`B\bar{B}`. This background can be studied using the Montecarlo
+    simulation, but it's more effective to study it directly on data. Occasionally, 2-3 times per year, a 
+    special dataset is collected approximatively 60 MeV below the :math:`\Upsilon(4S)`. Here no :math:`B` mesons 
+    can be produced, leaving one with a pure sample of continuum events, called *off-resonance* (or *continuum*) sample. 
+
+Cosmic
+    At the beginning and end of each run period BelleII acquires cosmic muons. These events are used mainly for
+    performance studies and for calibration, as they provide an unique sample for alignign the detectros with 
+    each other. Usually part of this dataset is collected with the solenoid switched off, so that muons cross the
+    detectors on straight trajectories. If the SuperKEKB accelerator has a major  downtime of few days, a cosmic dataset
+    is usually collected to keep the BelleII system running.
+
+Beam
+    Beam runs are special, usually short data takings used to study the beam-induced background on the inner sub-detectors.
+    They are taken with the beams circulating without colliding, to remove all the processes arising from the :math:`e^+e^-` 
+    hard scattering.
+
+Scan
+   A scan consists of rather short data taking periods (hours or few days long) performed at slightly different energies 
+   (usually 10-50 MeV apart). The goals of a scan is to measure the lineshape of the :math:`e^+e^-` cross section to either
+   check that data are collected on the resoanance peak (short scans), or to perform real physics measurements
+   such the search for exotic vecotr resoances (long scans above the :math:`\Upsilon(4S)`energy)
+
+Non-4S
+   SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at :math:`9.460` GeV to 
+   slightly above the :math:`Upsilon(6S)`, around :math:`9.460` GeV. These datasets can be used for all the non-B 
+   parts of the BelleII physics program, but are particularly interestign for the spectroscopy, hadronic physics and 
+   dark sector studies.
 
 
 Data taking: Triggers and filters

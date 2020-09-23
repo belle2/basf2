@@ -729,7 +729,8 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       const double& d0Pos = posTrack->track->getTrackFitResultWithClosestMass(Const::pion)->getD0();
 
       // Select cosmic using these tracks
-      const bool goodMagneticRegion = (z0Neg<57. or abs(d0Neg)>26.5) and (z0Pos<57. or abs(d0Pos)>26.5);
+      const bool goodMagneticRegion = (z0Neg<m_goodMagneticRegionZ0 or abs(d0Neg)>m_goodMagneticRegionD0)
+                                      and (z0Pos<m_goodMagneticRegionZ0 or abs(d0Pos)>m_goodMagneticRegionD0);
       if (maxNegpT > m_cosmicMinPt and maxPospT > m_cosmicMinPt and maxClusterENeg < m_cosmicMaxClusterEnergy
           and maxClusterEPos < m_cosmicMaxClusterEnergy and goodMagneticRegion) {
         double dphiLab = std::abs(momentumLabNeg.Phi() - momentumLabPos.Phi()) * TMath::RadToDeg();

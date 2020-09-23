@@ -507,7 +507,7 @@ namespace Belle2 {
 
 // get estimate of the zIP position (recurent function)
 // nestMax = number of iter, nest = current iter
-  double getZIPest(const track& tr, double t, const SpotParam& spotPar, int nestMax = 5, int nest = 0)
+  double getZIPest(const Track& tr, double t, const SpotParam& spotPar, int nestMax = 5, int nest = 0)
   {
     double x0, y0;
     if (nest < nestMax) {
@@ -527,7 +527,7 @@ namespace Belle2 {
 
 
 // get the D0 position corrected for IP position
-  double getCorrD(const track& tr, double t, const SpotParam& spotPar)
+  double getCorrD(const Track& tr, double t, const SpotParam& spotPar)
   {
     double zIP =  getZIPest(tr, t, spotPar);
 
@@ -540,7 +540,7 @@ namespace Belle2 {
   }
 
 //Transform D0 to time in the middle of interval
-  double getDtimeConst(const track& tr, double t, const SpotParam& spotPar)
+  double getDtimeConst(const Track& tr, double t, const SpotParam& spotPar)
   {
     double zIP  =  getZIPest(tr, t,                  spotPar);
     double zIPM =  getZIPest(tr, spotPar.z.center(), spotPar);
@@ -559,7 +559,7 @@ namespace Belle2 {
 
 
 // get Z0 corrected for the IP position
-  double getCorrZ(const track& tr, double t, const SpotParam& spotPar)
+  double getCorrZ(const Track& tr, double t, const SpotParam& spotPar)
   {
     double zIP =  getZIPest(tr, t, spotPar);
 
@@ -576,7 +576,7 @@ namespace Belle2 {
 
 
 // get min & max time of the events
-  pair<double, double> getStartStop(const vector<event>&  evts)
+  pair<double, double> getStartStop(const vector<Event>&  evts)
   {
     double minT = 1e20, maxT = -1e20;
     for (auto ev : evts) {
@@ -609,13 +609,13 @@ namespace Belle2 {
   }
 
 // read events from TTree to std::vector
-  vector<event> getEvents(TTree* tr)
+  vector<Event> getEvents(TTree* tr)
   {
 
-    vector<event> events;
+    vector<Event> events;
     events.reserve(tr->GetEntries());
 
-    event evt;
+    Event evt;
 
     tr->SetBranchAddress("run", &evt.run);
     tr->SetBranchAddress("exp", &evt.exp);
@@ -645,14 +645,14 @@ namespace Belle2 {
     }
 
     //sort by time
-    sort(events.begin(), events.end(), [](event e1, event e2) {return e1.t < e2.t;});
+    sort(events.begin(), events.end(), [](Event e1, Event e2) {return e1.t < e2.t;});
 
 
     return events;
   }
 
 // Add random booth strp weights to events
-  void bootStrap(vector<event>& evts)
+  void bootStrap(vector<Event>& evts)
   {
     for (auto& e : evts)
       e.nBootStrap = gRandom->Poisson(1);
@@ -831,7 +831,7 @@ namespace Belle2 {
   }
 
 // Geth theoretical <d0_1 *d0_2>
-  double getD12th(event e, vector<double> sizesXY)
+  double getD12th(Event e, vector<double> sizesXY)
   {
     double sxx = sizesXY[0];
     double syy = sizesXY[1];
@@ -845,7 +845,7 @@ namespace Belle2 {
   }
 
 // Geth theoretical <z0_1 *z0_2>
-  double getZ12th(event e, vector<double> sizesXY)
+  double getZ12th(Event e, vector<double> sizesXY)
   {
     double sxx = sizesXY[0];
     double syy = sizesXY[1];
@@ -862,7 +862,7 @@ namespace Belle2 {
 
 
 //Plot TGraph with the fitted function
-  void plotSpotPositionFit(const vector<event>& evts, SpotParam par, TString fName)
+  void plotSpotPositionFit(const vector<Event>& evts, SpotParam par, TString fName)
   {
     TGraph* gr = new TGraph();
     TProfile* dProf     = new TProfile(rn(), "dProf", 100, -M_PI, M_PI, "S");
@@ -947,7 +947,7 @@ namespace Belle2 {
 
 
 //Plot TGraph with the fitted function
-  void plotSpotZPositionFit(const vector<event>& evts, SpotParam par, TString fName)
+  void plotSpotZPositionFit(const vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* zProf  = new TProfile(rn(), "dProf", 100, -M_PI, M_PI, "S");
     TGraph* gr = new TGraph();
@@ -1008,7 +1008,7 @@ namespace Belle2 {
 
 
 //Plot pull distribution
-  void plotSpotPositionPull(const vector<event>& evts, const SpotParam& par, TString fName, double cut = 70)
+  void plotSpotPositionPull(const vector<Event>& evts, const SpotParam& par, TString fName, double cut = 70)
   {
     TH1D* hPull = new TH1D(rn(), "", 200, -200, 200);
 
@@ -1039,7 +1039,7 @@ namespace Belle2 {
 
 
 //Plot pull distribution
-  void plotKxKyFit(const vector<event>& evts, SpotParam par, TString fName)
+  void plotKxKyFit(const vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* profRes    = new TProfile(rn(), "dProf", 100, -800, 800, "S");
     TProfile* profResKx  = new TProfile(rn(), "dProfKx", 100, -800, 800, "S");
@@ -1109,7 +1109,7 @@ namespace Belle2 {
   }
 
 //Plot pull distribution
-  void plotXYtimeDep(const vector<event>& evts, SpotParam par, TString fName)
+  void plotXYtimeDep(const vector<Event>& evts, SpotParam par, TString fName)
   {
     TProfile* profRes    = new TProfile(rn(), "dProf", 50,   -0.5, 0.5);
     TProfile* profResTx  = new TProfile(rn(), "dProfTx", 50, -0.5, 0.5);
@@ -1171,7 +1171,7 @@ namespace Belle2 {
 
 
 //Plot pull distribution
-  void plotSpotZpositionPull(const vector<event>& evts, const SpotParam& par, TString fName, double cut = 1000)
+  void plotSpotZpositionPull(const vector<Event>& evts, const SpotParam& par, TString fName, double cut = 1000)
   {
     TH1D* hPull = new TH1D(rn(), "", 200, -2000, 2000);
 
@@ -1202,7 +1202,7 @@ namespace Belle2 {
 
 
 // Remove outliear from the position fit (for d0)
-  void removeSpotPositionOutliers(vector<event>& evts,  const SpotParam& par, double cut = 70)
+  void removeSpotPositionOutliers(vector<Event>& evts,  const SpotParam& par, double cut = 70)
   {
     int nRem = 0;
     int nAll = 0;
@@ -1221,7 +1221,7 @@ namespace Belle2 {
 
 
 // Remove outliear from the position fit (for z0)
-  void removeSpotZpositionOutliers(vector<event>& evts,  const SpotParam& par, double cut = 1000)
+  void removeSpotZpositionOutliers(vector<Event>& evts,  const SpotParam& par, double cut = 1000)
   {
     int nRem = 0;
     int nAll = 0;
@@ -1241,8 +1241,8 @@ namespace Belle2 {
 
 
 //Fill matrix with bases based on linear splines
-  vector<vector<double>> fillSplineBasesLinear(const vector<event>& evts, vector<double> spl,
-                                               std::function<double(track, double)> fun)
+  vector<vector<double>> fillSplineBasesLinear(const vector<Event>& evts, vector<double> spl,
+                                               std::function<double(Track, double)> fun)
   {
     int n = spl.size(); //number of params
     if (n == 0 || (n == 2 && spl[0] > spl[1]))
@@ -1285,7 +1285,7 @@ namespace Belle2 {
 
 
 //Fill matrix with bases based on zero-order splines
-  vector<vector<double>> fillSplineBasesZero(const vector<event>& evts, vector<double> spl, std::function<double(track, double)> fun)
+  vector<vector<double>> fillSplineBasesZero(const vector<Event>& evts, vector<double> spl, std::function<double(Track, double)> fun)
   {
     int n = spl.size() + 1; //number of params
 
@@ -1353,7 +1353,7 @@ namespace Belle2 {
   }
 
 // Fit width in z-direction in [um^2]
-  double fitSpotZwidth(const vector<event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY)
+  double fitSpotZwidth(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY)
   {
 
     vector<double> dataVec;
@@ -1388,14 +1388,14 @@ namespace Belle2 {
 
 
 // Fit xy widths (including XZ, YZ slopes), no prior
-  SpotParam fitSpotPositionSplines(const vector<event>& evts, const vector<double>& splX, const vector<double>& splY,
+  SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
                                    const vector<double>& splKX, const vector<double>& splKY)
   {
-    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](track tr, double) {return  sin(tr.phi0);});
-    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](track tr, double) {return -cos(tr.phi0);});
+    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
+    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
 
-    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](track tr, double) {return  sin(tr.phi0) * tr.z0;});
-    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](track tr, double) {return -cos(tr.phi0) * tr.z0;});
+    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](Track tr, double) {return  sin(tr.phi0) * tr.z0;});
+    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](Track tr, double) {return -cos(tr.phi0) * tr.z0;});
 
 
     vector<double> dataVec;
@@ -1422,14 +1422,14 @@ namespace Belle2 {
   }
 
 // Fit xy widths (including XZ, YZ slopes), with prior info from spotPars
-  SpotParam fitSpotPositionSplines(const vector<event>& evts, const vector<double>& splX, const vector<double>& splY,
+  SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
                                    const vector<double>& splKX, const vector<double>& splKY, const SpotParam& spotPars)
   {
-    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](track tr, double) {return  sin(tr.phi0);});
-    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](track tr, double) {return -cos(tr.phi0);});
+    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
+    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
 
-    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [ = ](track tr, double t) {return  sin(tr.phi0) * (getZIPest(tr, t, spotPars) - spotPars.z.val(t));});
-    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [ = ](track tr, double t) {return -cos(tr.phi0) * (getZIPest(tr, t, spotPars) - spotPars.z.val(t));});
+    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [ = ](Track tr, double t) {return  sin(tr.phi0) * (getZIPest(tr, t, spotPars) - spotPars.z.val(t));});
+    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [ = ](Track tr, double t) {return -cos(tr.phi0) * (getZIPest(tr, t, spotPars) - spotPars.z.val(t));});
 
 
     vector<double> dataVec;
@@ -1462,10 +1462,10 @@ namespace Belle2 {
 
 
 // simple fit of position splines, without kX, kY
-  SpotParam fitSpotPositionSplines(const vector<event>& evts, const vector<double>& splX, const vector<double>& splY)
+  SpotParam fitSpotPositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY)
   {
-    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](track tr, double) {return  sin(tr.phi0);});
-    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](track tr, double) {return -cos(tr.phi0);});
+    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return  sin(tr.phi0);});
+    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -cos(tr.phi0);});
 
     vector<double> dataVec;
     for (auto e : evts) {
@@ -1498,17 +1498,17 @@ namespace Belle2 {
 
 
 //Fit Zposition
-  SpotParam fitZpositionSplines(const vector<event>& evts, const vector<double>& splX, const vector<double>& splY,
+  SpotParam fitZpositionSplines(const vector<Event>& evts, const vector<double>& splX, const vector<double>& splY,
                                 const vector<double>& splKX, const vector<double>& splKY,
                                 const vector<double>& splZ)
   {
-    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](track tr, double) {return -tr.tanlambda * cos(tr.phi0);});
-    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](track tr, double) {return -tr.tanlambda * sin(tr.phi0);});
+    vector<vector<double>> basesX  = fillSplineBasesZero(evts, splX, [](Track tr, double) {return -tr.tanlambda * cos(tr.phi0);});
+    vector<vector<double>> basesY  = fillSplineBasesZero(evts, splY, [](Track tr, double) {return -tr.tanlambda * sin(tr.phi0);});
 
-    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](track tr, double) {return -tr.z0 * tr.tanlambda * cos(tr.phi0);});
-    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](track tr, double) {return -tr.z0 * tr.tanlambda * sin(tr.phi0);});
+    vector<vector<double>> basesKX = fillSplineBasesZero(evts, splKX, [](Track tr, double) {return -tr.z0 * tr.tanlambda * cos(tr.phi0);});
+    vector<vector<double>> basesKY = fillSplineBasesZero(evts, splKY, [](Track tr, double) {return -tr.z0 * tr.tanlambda * sin(tr.phi0);});
 
-    vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](track , double) {return 1;});
+    vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track , double) {return 1;});
 
 
     vector<double> dataVec;
@@ -1536,9 +1536,9 @@ namespace Belle2 {
 
 
 //Fit Zposition, xIP, yIP fixed from d0 fit
-  SpotParam fitZpositionSplinesSimple(const vector<event>& evts, const vector<double>& splZ, const SpotParam& spotPars)
+  SpotParam fitZpositionSplinesSimple(const vector<Event>& evts, const vector<double>& splZ, const SpotParam& spotPars)
   {
-    vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](track, double) {return 1;});
+    vector<vector<double>> basesZ  = fillSplineBasesZero(evts, splZ,  [](Track, double) {return 1;});
 
     vector<double> dataVec;
     for (auto e : evts) {
@@ -1572,7 +1572,7 @@ namespace Belle2 {
 
 
 // Returns x-y sizes in um^2
-  vector<double> fitSpotWidthCMS(const vector<event>& evts, const SpotParam& spotPar)
+  vector<double> fitSpotWidthCMS(const vector<Event>& evts, const SpotParam& spotPar)
   {
 
     vector<double> dataVec, ccVec, ssVec, scVec;
@@ -1602,7 +1602,7 @@ namespace Belle2 {
 
 
 // Plot pulls in xy size fit
-  void plotSpotSizePull(const vector<event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY)
+  void plotSpotSizePull(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY)
   {
     TH1D* hPull = new TH1D(rn(), "", 100, -2000, 2000);
     for (auto& e : evts) {
@@ -1622,7 +1622,7 @@ namespace Belle2 {
 
 
 // Plot pulls in Zsize fit
-  void plotSpotSizeZPull(const vector<event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY,  double sizeZZ)
+  void plotSpotSizeZPull(const vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY,  double sizeZZ)
   {
     TH1D* hPull = new TH1D(rn(), "", 100, -300e3, 600e3);
     for (auto& e : evts) {
@@ -1650,7 +1650,7 @@ namespace Belle2 {
 
 
 // Plot size fit control plots
-  void plotSpotSizeFit(const vector<event>& evts, const SpotParam& par, const vector<double>& sizeXY)
+  void plotSpotSizeFit(const vector<Event>& evts, const SpotParam& par, const vector<double>& sizeXY)
   {
     double sxx = sizeXY[0];
     double syy = sizeXY[1];
@@ -1709,7 +1709,7 @@ namespace Belle2 {
 
 
 // Plot zSizeFit control plots
-  void plotSpotZSizeFit(const vector<event>& evts, const SpotParam& par, const vector<double>& sizesXY, double sizeZZ)
+  void plotSpotZSizeFit(const vector<Event>& evts, const SpotParam& par, const vector<double>& sizesXY, double sizeZZ)
   {
 
     gStyle->SetOptStat(0);
@@ -1796,7 +1796,7 @@ namespace Belle2 {
 
 
 
-  void removeSpotSizeOutliers(vector<event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY, double cut = 1500)
+  void removeSpotSizeOutliers(vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY, double cut = 1500)
   {
 
     int nRem = 0;
@@ -1817,7 +1817,7 @@ namespace Belle2 {
 
 
 // Remove outliers in spotSize
-  void removeSpotSizeZOutliers(vector<event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY, double sizeZZ,
+  void removeSpotSizeZOutliers(vector<Event>& evts, const SpotParam& spotPar, const vector<double>& sizesXY, double sizeZZ,
                                double cut = 150000)
   {
 
@@ -1880,7 +1880,7 @@ namespace Belle2 {
 
 
 // Get exp,run,evtNum from the time tEdge
-  ExpRunEvt getPosition(const vector<event>& events, double tEdge)
+  ExpRunEvt getPosition(const vector<Event>& events, double tEdge)
   {
     ExpRunEvt evt(-1, -1, -1);
     double tBreak = -1e10;
@@ -1898,7 +1898,7 @@ namespace Belle2 {
 
 
 // convert splitPoints [in utc time] to expRunEvt
-  vector<ExpRunEvt> convertSplitPoints(const vector<event>& events, vector<double> splitPoints)
+  vector<ExpRunEvt> convertSplitPoints(const vector<Event>& events, vector<double> splitPoints)
   {
 
     vector<ExpRunEvt>  breakPos;
@@ -1912,7 +1912,7 @@ namespace Belle2 {
 
 
 //Get map with runs and startTime,endTime
-  map<ExpRun, pair<double, double>> getRunInfo(const vector<event>& evts)
+  map<ExpRun, pair<double, double>> getRunInfo(const vector<Event>& evts)
   {
     map<ExpRun, pair<double, double>> runsInfo;
 
@@ -1940,7 +1940,7 @@ namespace Belle2 {
 
 
 // Returns tuple with the beamspot parameters
-  tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(vector<event> evts,
+  tuple<vector<TVector3>, vector<TMatrixDSym>, TMatrixDSym>  runBeamSpotAnalysis(vector<Event> evts,
       const vector<double>& splitPoints)
   {
     const double xyPosLimit  = 70; //um

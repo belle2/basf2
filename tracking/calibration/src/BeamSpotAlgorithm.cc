@@ -68,7 +68,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   B2INFO("Number of tracks: " << tracks->GetEntries());
 
   // Tree to vector
-  vector<event> evts = getEvents(tracks.get());
+  vector<Event> evts = getEvents(tracks.get());
 
   //Time range for each ExpRun
   map<ExpRun, pair<double, double>> runsInfoOrg = getRunInfo(evts);
@@ -85,7 +85,7 @@ CalibrationAlgorithm::EResult BeamSpotAlgorithm::calibrate()
   auto splits = splt.getIntervals(runsInfo, 2, 0.5, 10);
 
   //Loop over all BeamSize intervals
-  vector<vector<event>> evtsVec(splits.size());
+  vector<vector<Event>> evtsVec(splits.size());
 
   vector<double> sVec(splits.size()), eVec(splits.size()); //vector with starts and ends of the size-blocks (time)
   vector<vector<ExpRunEvt>> breakPointsVec(splits.size()); //vector with break points positions

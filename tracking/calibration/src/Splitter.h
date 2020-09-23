@@ -57,6 +57,7 @@ namespace Belle2 {
       const std::map<ExpRun, std::pair<double, double>>& runs,
       double tBestSize, double tBestVtx, double GapPenalty);
 
+
     /** Get the start/end time of the BS-size calibration interval (vector of BS-position calib intervals).
       * @param res: The BS-size calibration interval (for example from getIntervals function)
       * @output: Vector of size-calibration intervals always containing vector of position calib. intervals.
@@ -66,6 +67,7 @@ namespace Belle2 {
       return {res.front().begin()->second.first,
               res.back().rbegin()->second.second};
     }
+
 
     /** Get vector with breaks of the BS-size calib. interval
       * @param res: The BS-size calibration interval
@@ -82,6 +84,7 @@ namespace Belle2 {
       return breaks;
     }
 
+
     /** Merge two BS-position intervals into one
       * @param I1: First interval to merge
       * @param I2: Second interval to merge
@@ -93,15 +96,6 @@ namespace Belle2 {
 
   private:
 
-    /** Split the runs into small calibration intervals (atoms) of a specified size.
-      * But definition each of these intervals spans only over single run.
-      * These will be clustered into larger intervals in the next steps
-      * @param runs: Runs to split into the atoms
-      * @param intSize: Intended size of the small intervals
-      * @output: A vector with resulting time boundaries of the atoms
-      **/
-    static std::vector<std::pair<double, double>> splitToSmall(std::map<ExpRun, std::pair<double, double>> runs,
-                                                               double intSize = 1. / 60);
 
 
     /** Get optimal break points using algorithm based on dynamic programing
@@ -132,6 +126,16 @@ namespace Belle2 {
       **/
     double lossFunction(const std::vector<std::pair<double, double>>&  vec, int s, int e) const;
 
+
+    /** Split the runs into small calibration intervals (atoms) of a specified size.
+      * But definition each of these intervals spans only over single run.
+      * These will be clustered into larger intervals in the next steps
+      * @param runs: Runs to split into the atoms
+      * @param intSize: Intended size of the small intervals
+      * @output: A vector with resulting time boundaries of the atoms
+      **/
+    static std::vector<std::pair<double, double>> splitToSmall(std::map<ExpRun, std::pair<double, double>> runs,
+                                                               double intSize = 1. / 60);
 
 
     double tBest;      /** target calib. interval time in hours */

@@ -10,6 +10,7 @@ from basf2 import B2ERROR
 
 RegisteredSkims = [
     # --- WG0: Systematics ---
+    ("10000000", "systematics", "Random"),
     ("10600100", "systematics", "Systematics"),
     ("10600300", "systematics", "SystematicsTracking"),
     ("10600400", "systematics", "Resonance"),

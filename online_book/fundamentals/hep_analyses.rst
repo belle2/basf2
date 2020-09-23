@@ -417,20 +417,20 @@ close to minutes per event due to the much higher energy.
 
     Computing time doesn't come for free. Real numbers are hard to determine,
     especially for university operated computing centers. But in 2020 one hour
-    of CPU time can probably be bought for $0.05 when going to commercial cloud
-    providers (prices may vary, don't quote us on that).
+    of CPU time can be bought for around $0.025  on demand so lets take for a
+    very quick estimate.
 
     How many CPUs do we need to buy in the cloud and how much would it cost to
-    simulate the equivalent of :math:`50 \textrm{ab}^{-1}` :math:`B\over{B}` events in
-    six months?
+    simulate the equivalent of :math:`50 \textrm{ab}^{-1}` :math:`B\over{B}`
+    events in six months?
 
 .. admonition:: Solution
     :class: toggle solution
 
     We need 55 billion seconds of CPU time, equivalent to 15.3 million hours. It
-    would cost us roughly $764,000.
+    would cost us roughly $382,000.
 
-    Three months have roughly :math:`30 * 6 * 24 = 2160` hours
+    Six months have roughly :math:`30 * 6 * 24 = 4320` hours
     so we need 3540 CPUs.
 
     Now bear in mind: this is only the simulation part, there is still more work
@@ -587,7 +587,7 @@ reconstruction takes about twice as long as the simulation of an event.
     :class: exercise stacked
 
     Now assuming reconstruction takes exactly twice as long as simulation and
-    simulation still takes 1 second and we can buy one CPU/hour for $0.05 in a
+    simulation still takes 1 second and we can buy one CPU/hour for $0.025 in a
     commercial cloud as above.
 
     For the full experiment we will collect :math:`50 \textrm{ab}^{-1}`. The
@@ -614,7 +614,17 @@ reconstruction takes about twice as long as the simulation of an event.
     to simulate the same amount of events. And reconstruct both.
 
     That leads to 5 trillion seconds of CPU time or 1.4 trillion CPU hours and
-    would require 160 thousand CPUs and cost 70 million dollars.
+    would require 160 thousand CPUs and cost 35 million dollars.
+
+    This is of course a very rough estimate: The 1/2 seconds assumption for
+    simulation/reconstruction is very very rought.  CPUs or the software might
+    get faster and we will not have this amount of data very quickly. Also the
+    CPU price is sure to change or be negotiable. Nevertheless, Computing cost
+    will always be a major driving factor.
+
+    One of the consequences will be that we cannot produce that much MC so for
+    some event types we will only be able have a fraction of the amount of
+    events simulated as we have real data.
 
 
 .. rubric:: Particle Identification

@@ -442,24 +442,358 @@ TODO: HLT tags? jiltering? (HLT skims)
 Simulation: the Montecarlo
 --------------------------
 
-Describe here:
-* What a generator is
-* What the simulation is, what's Geant
-* can we trust the MC 100%? Performance studies
-* How can you have your MC being generated?
+We need to be able to compare data from our detector to the expectation we have.
+In vert rare cases this might not be necessary, for example the discovery of the
+J/Psi was so clear a signal that we didn't need any comparison to understand
+that it was something new. But most of the time we need to make sure what we see
+is not some artefact of our very very complex experiment.
 
+To do this we create simulated events which should behave as closely as possible
+to the real detector events. This is done using sampling of random numbers
+repeatedly and thus called the `Monte Carlo method <https://en.wikipedia.org/wiki/Monte_Carlo_method>`_.
+In HEP we usually just call the whole process Montecarlo or MC for short.
+
+Now there are two parts of this procedure we need to distinguish: Generation of
+an event and simulation of the event.
+
+.. rubric:: Generation
+
+This is the physics part: the interaction we want to simulate. Given the initial
+conditions of the electron and positron colliding we generate a number of
+particles according to the physics model we want to study. This could be any
+advanced physics model (SUSY, dark matter) or basic standard model physics.
+
+It depends on the analysis: Usually we have specific samples for the decay we
+analyse, the "signal MC". And we compare these to simulation of basic standard
+model processes, the "generic MC". There might be additional simulations needed
+for specific processes which we want to exclude in our analysis, the "background
+MC".
+
+For all these different samples the principle is the same: We generate positions
+and four-vectors of particles according to a physics model. In Belle II this is
+usually a very fast process and takes of the order of milliseconds per event to
+generate.
+
+There is a large variety of different generators for different use cases:
+EvtGen, KKMC, Tauola, Madgraph, CRY, AAFH, babayaganlo, PHOKARA, ... . All
+simulate specific physic processes and will be used for different use cases from
+perfomance studies to different analysis types. There is an internal `Belle II
+Note <https://docs.belle2.org/record/282?ln=en>`_ with more details if you're
+interested.
+
+.. rubric:: Simulation
+
+After we generated the four-vectors of our event we need to now make it look
+like output from the real detector. And the real detector measures the
+interaction of these particles with the material of our detector: ionisation,
+scintillation, bremsstrahlung, pair production, Cherenkov radiation and so forth.
+
+All these processes are well known and can in be simulated. There has been a lot
+of effort put into this by many experiments to create simulation software
+capable of all of these processes. The most well known one is
+`Geant4 <https://geant4.web.cern.ch/>`_ and we also use it in Belle II.
+
+Geant4 takes the four-vectors and simulates their interaction with a virtual
+Belle II detector. In the end we get deposited energy and particles produced by
+the interactions in each sub detector.
+
+On top of that we have custom software to convert the result from Geant4 into
+signals as we see from the detector. For example the pixel detector software
+will convert the energy deposited into information which pixels were fired.
+
+Simulating the full detector is an expensive process and takes of the order of a
+second for Belle II. For other experiments like ATLAS and CMS it can also get
+close to minutes per event due to the much higher energy.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    Assuming it takes one second per event, how long would it take to simulate
+    all the 770 million :math:`B\over{B}` events collected at Belle on one CPU?
+
+    How long would it take to simulate all the :math:`B\over{B}` events we
+    intend to collect for Belle II?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    You already know the cross section for :math:`B\over{B}` events now you only
+    need the planned total luminosity for Belle II.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    Multiplying 770 million by one gives us 770 million seconds which is around
+    8912 days or roughly 24 years.
+
+    For Belle II we intend to collect :math:`50 \textrm{ab}^{-1}` and the cross section
+    is 1.1 nb. So we expect 55 billion :math:`B\over{B}` events. Equivalent to
+    636574 days or 1744 years.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    Computing time doesn't come for free. Real numbers are hard to determine,
+    especially for university operated computing centers. But in 2020 one hour
+    of CPU time can be bought for around $0.025  on demand so lets take for a
+    very quick estimate.
+
+    How many CPUs do we need to buy in the cloud and how much would it cost to
+    simulate the equivalent of :math:`50 \textrm{ab}^{-1}` :math:`B\over{B}`
+    events in six months?
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    We need 55 billion seconds of CPU time, equivalent to 15.3 million hours. It
+    would cost us roughly $382,000.
+
+    Six months have roughly :math:`30 * 6 * 24 = 4320` hours
+    so we need 3540 CPUs.
+
+    Now bear in mind: this is only the simulation part, there is still more work
+    to do during reconstruction as will be explained in the next section.
+
+.. rubric:: Differences between MC and real data.
+
+Now after this simulation we have data which looks like what we might get from
+the real detector and we can use it to compare our expectations to measurements.
+But Geant4 uses an ideal detector description we put in. Now the detector itself
+consists of thousands of tons of hardware, some of it trying to measure
+positions in micrometer precision. We don't know it perfectly and we cannot put
+every little thing correctly in the simulation: We simply don't know the exact
+material composition and place of every single screw precisely enough. And even
+if we did this would slow down Geant4 massively because the system would become
+much too complex to simulate.
+
+There will thus always be simplifications we will have to live with but we need
+to strive to make the differences as small as technically possible.
+
+But especially in the early phases of the experiment we're still in the process
+of understanding the real detector so we cannot have everything correct in the
+MC yet. This is a long and tedious process where small detail in the detector
+response need to be understood and modelled accordingly in the MC.
+
+This is an ongoing work in the Performance group which tries to understand the
+differences between MC and data by looking at specific samples and studies.
+
+.. TODO: link to performance group website?
+
+.. rubric:: Generating MC samples
+
+As you saw above, generating sufficient MC is a tedious process which requires
+large amount of CPU time. It also is prone to errors where something might not be
+setup exactly correct. These mistakes would be costly for larger productions.
+
+So we have the Data Production group to organize and manage the production of
+large MC samples. They make sure that the requests of the physicists are met and
+that the computing resources we have are not wasted.
+
+.. seealso::
+
+    You have already found the data production group confluence page.
+    If not, take another look at :ref:`the previous lesson <onlinebook_collaborative_tools>`_.
+    Now might be a good time to bookmark or "watch" some pages.
+
+.. admonition:: Key points
+    :class: key-points
+
+    * Simulated data (MC) is necessary to compare results to expectations
+    * "Generation" is the first step to create particles according to some
+      physics model
+    * "Simulation" is then the simulation of these particles interacting with
+      the matter in our the detector.
+    * simulating large amounts of MC is expensive
+    * there are always differences between MC and data, the Performance tries to
+      understand, quantify and minimize them.
+    * the data production group organizes and manages the MC production.
 
 
 Processing: the reconstruction
 ------------------------------
 
-Describe here:
-* What is the reconstruction
-* Example 1: tracking (short)
-* Example2: clustering (?)
-* Why do we need to run the reconstruction separately from the analysis? 
-  Mention that resources are very not infinite
+Now after the data acquisition or the simulation we have events which contain
+the raw detector responses. We need to process this information into something
+more usable for analysis. At best we want to be able to reconstruct the
+underlying particles as correctly as possible and get the original four-vectors
+of particles produced in the interaction.
 
+However, it's never possible to uniquely identify all the particles in the
+interaction because for hadronic interactions there are almost always short
+lived particles that decay before reaching the detector.
+
+In addition there will be signals in the detector which are not what we want:
+Every detector has an intrinsic noise so some detector channels will fire
+randomly. In addition there is real background not coming from the event we're
+interested in but from other electrons/positrons in the beam randomly
+interacting with each other or parts of the accelerator structure.
+
+So all we can do is look at the detector response and find a set of most likely
+particles and then leave it to the analyses to do a proper statistical analysis
+of the events.
+
+Now the exact same reconstruction is performed on MC data as on real data: We
+want the exact same algorithms in both cases. However in MC we actually know the
+correct particles and we can trace which detector response was caused by which
+particle.
+
+So we run the exact same reconstruction but in addition for MC we also trace the
+correctness of the reconstruction which we call "MC Truth".
+
+.. rubric:: Clustering
+
+One of the first steps in this reconstruction is called clustering where we need
+to combine the detector responses in each sub detector if they are related.
+
+As a simple example we can look at the PXD: If a particle passes the
+pixel detector we expect a signal in one of the pixels. But what if the particle
+passes between pixel boundaries? Or if it flies through the detector at a
+shallow angle along multiple pixels? We will get multiple pixels caused by the
+same particle.
+
+So we cluster neighboring pixels, taking the detector intrinsic properties such
+as noise into account and form groups of pixels. We can then calculate
+properties of these clusters like size, shape or center. Since our pixel detector
+has an analog readout and can measure the amount of ionisation per pixel we can
+use weighted mean calculate the center position. Or we could even use more
+advanced algorithms depending on the readout characteristics of our detector.
+
+.. _fig:reconstruction-clustering:
+
+.. figure:: clustering.svg
+   :align: center
+
+   Simple example of 2D clustering with analog signals
+
+Now this was an example for the pixel detector but this same principle is also
+used in the strip detector (in 1D) or in the calorimeter to group neighboring
+crystals into clusters.
+
+In addition the calorimeter now has different characteristic cluster shapes
+depending on what particle caused the cluster: hadronic interaction of photons.
+So the definition of a cluster in the ECL becomes more complicated as the same
+connected region of crystals might be caused by one or more photons or one
+hadron. But the principle is the same: Identify all hits caused by a particle
+and group them into clusters.
+
+.. rubric:: Tracking
+
+A very important part of our reconstruction is the so-called tracking or track
+reconstruction. It tries to identify trajectories of particles through the
+tracking detectors, called tracks. There are mainly two parts of tracking
+
+Track finding
+  Find patterns in the hit clusters in the tracking detectors that look like
+  they could be from one particle flying through the detector.
+
+Track fitting
+  Determine the best estimate of the particle trajectories found to obtain
+  position and momentum close to the interaction region as precisely as
+  possible.
+
+Track finding is a very complex process which depends a lot on the detector
+layout and characteristics and the most complex part of the reconstruction
+process. It would be impossible to describe it properly here. You can find more
+details in the Belle II physics book and there is also a paper describing `track
+finding at Belle II <https://arxiv.org/abs/2003.12466>`_
+
+What we can say that track finding and fitting requires a lot of computing time
+to find all the tracks in our events. As a matter of fact currently our tracking
+reconstruction takes about twice as long as the simulation of an event.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    Now assuming reconstruction takes exactly twice as long as simulation and
+    simulation still takes 1 second and we can buy one CPU/hour for $0.025 in a
+    commercial cloud as above.
+
+    For the full experiment we will collect :math:`50 \textrm{ab}^{-1}`. The
+    plan is to have a total trigger cross section of 20 nb (so in addition to the
+    1.1 nb of :math:`B\over{B}` we will also have some fraction of continuum,
+    tau and other events).
+
+    How many CPUs do we need to reconstruct all the real data and simulate and
+    reconstruct an equivalent amount of MC in one year? And what will it cost?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    It's basically the same question as above but we now have a cross section of
+    20 nb we want to simulate.
+
+    And we need to reconstruct both data and MC so we need to simulate once and
+    reconstruct twice.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    Now all together we will have 1 trillion events from the detector. We have
+    to simulate the same amount of events. And reconstruct both.
+
+    That leads to 5 trillion seconds of CPU time or 1.4 trillion CPU hours and
+    would require 160 thousand CPUs and cost 35 million dollars.
+
+    This is of course a very rough estimate: The 1/2 seconds assumption for
+    simulation/reconstruction is very very rought.  CPUs or the software might
+    get faster and we will not have this amount of data very quickly. Also the
+    CPU price is sure to change or be negotiable. Nevertheless, Computing cost
+    will always be a major driving factor.
+
+    One of the consequences will be that we cannot produce that much MC so for
+    some event types we will only be able have a fraction of the amount of
+    events simulated as we have real data.
+
+
+.. rubric:: Particle Identification
+
+Once we have the tracks we can also try to determine the likelihoods for the
+track belonging to different particle types. For each given track we can then
+check the sub detectors contributing to particle identification if they saw
+anything that could be related to this track.
+
+For the CDC we can calculate the total energy loss over the track length and
+compare this to the expected values for different particle types. For ARICH we
+know where the track entered the detector and can check this area to see if
+there are any cerenkov rings around this position. The same principle applies to
+TOP, ECL or KLM: we know where the track entered the detectors and can check for
+any related information from these sub detectors.
+
+These detectors then calculate likelihoods for the signal caused by different
+particle types which we attach to the track information for later use by
+analysts.
+
+.. rubric:: Organization of Reconstruction.
+
+As mentioned above the reconstruction can take a long time and be very
+expensive, especially if we have a lot of data. It also depends on a lot of
+expert knowledge:
+
+* the conditions during data taking need to be taken into account: beam energies
+  and positions, detector status, ... .
+* the conversion from raw detector signal to energy needs to be properly
+  calibrated.
+* the position of the tracking detector sensors needs to be well known and
+  corrected in software (a process called alignment).
+
+So as for the simulation this is something which we centrally organize in Belle
+II. So, not very surprising, the Data Production group takes charge and
+coordinates with the detector experts the reconstruction of our data.
+
+
+.. admonition:: Key points
+    :class: key-points
+
+    * The "reconstruction" is the process where we process the raw detector
+      signal into high level objects like particle trajectories, ECL clusters
+      and PID likelihoods.
+    * Clustering is the process of finding connected regions of detector signal
+      that most likely originated from the same particle
+    * Tracking is the process of reconstructing the trajectories of particles
+      flying through the tracking detectors and infer position and momentum as
+      precisely as possible.
+    * Reconstruction takes quite some time and is handled centrally by the Data
+      Production Group
 
 
 Processing: Data formats
@@ -526,38 +860,131 @@ stored in a file:
 
 
 
+Analysis: reconstructed and combined particles
+----------------------------------------------
 
-Analysis: what do we measure?
------------------------------
+The Belle II detectors can provide three kind of information: 
+* Momentum
+* Energy 
+* PID probability. 
 
-The Belle II detectors can provide three kind of information: momentum, energy and PID 
-probability. Of course not all of them are available for every particle, in fact in most cases 
-only two of them are, and however only for a very limited number of particles.  
+Of course not all of them are available for every particle, in fact in most cases 
+only two of them are, and however only for a very limited number of particles.  Most of the particles 
+in the :math:`e^+e^-` collision do not live long enough to leave any signal inside the detector, and must 
+be reconstructed measuring their decay products. This introduces the very important distinction 
+bewteen measured particles, who leave a signal inside the detector and are reconstructed directly
+starting from those signals and combined particles that are reconstructed as sum of measure particles.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    What is the average flight lenght of a 1 GeV muon and a 1 GeV :math:`D^+` meson? 
+    Do they both reach the tracking system?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Go to https://pdglive.lbl.gov/Viewer.action and look up at the muon and :math:`D^+` lifetime.
+    Remember that the beampipe radius is 1 cm.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    The average flight lenght of a particle of speed :math:`\beta` and lifetime  :math:`\tau` is 
+    :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = E/M` while :math:`\beta = p/E`,
+    therefore :math:`L = c\tau p/M`. From this:
+    :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` :math:`\mu m`. Only the muon reaches
+    the tracking system.
+	  
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    Keeping in mind the result of the previous exercise, which particles do you think survive long 
+    enough to reach the active volume of the detector and leave signal there?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Think about the truly stable and very long lived particles you know, but remember that not all
+    neutral particles are well reconstructed by the ECL or KLM!
+
+.. admonition:: Solution
+    :class: toggle solution
+
+      
+    Let's start from the charged particles. 
+    All the strongly- or electromagnetically.decaying resonances, both charged and neutral 
+    (:math:`rho`, :math:`K^\star`, :math:`\pi^0`, ...) do not 
+    live long enough to significnatly move away from the :math:`e^+e^-` interaction point, so they can
+    only be reconstructed detecting their decay products.     
+    Proton, electrons and their anti-particles are stable and definitively leave ionization signals 
+    in the tracking system, so they should be in the list. 
+    Other particles that could leave ionization are the long-lived, weakly decaying particles.
+    Charged pions, charged kaons and muons are not stable, but we saw already that the latter has a 
+    very long flight lenght, usually exceeding the scale of the detector. Pions and kaons decay much 
+    faster than a muon, buts still have a :math:`c\tau` of approximatively 8 and 4 meters respectively, 
+    which make then likely to leave a detectable track before decaying. The are both on the list. 
+    :math:`D` and :math:`B` mesons fly much less than a mm before decaying, so they cannot leave any 
+    detectable track.
+    Some hyperons, strange baryons, are charged and have a sizable lifetime. The longest-liviging one 
+    is the :math:`Csi^-` with a lifetime of 0.7 ns corresponding to `c\tau \approx 5` cm. Such particle, 
+    especially if it has few GeV of momentum, can cross the PXD and even the inner layers of the SVD 
+    leaving a signal. However, such short track would be very difficoult to reconstruct, and it's 
+    much more convenient to reconstruct these hyperons looking at their (almost) stable decay products.
+    Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as 
+    deuteron, tritium od helium. These can be produced ether in the :math:`e^+e^-` collision or, much more 
+    easily, by spallation processes on the inner detector materials.
 
 
-Charged particles are seen in the detector if they live long enough to cross its active colume, 
-for example the SVD layers, and leave a ionization signal in it.
+    Let's look now at the neutral particles. The photon is stable, and the ECL is designed exactly
+    to measure photon enegies. The (anti-)neutron is basically stable for our purposes, but it
+    leaves no signal in the tracking system and the ECL is not designed as an hadronic calorimeter.
+    There are studies focused on reconstructing this particle in the ECL, but let's leave it out
+    of the list for the moment.
+    The :math:`K_L` has :math:`c\tau \approx 15 m`, so it's definitiley to be considered stable 
+    in the scale of the experiment. As the neutron is leaves no ionization, but the KLM is designed
+    to detect its interaction in the iron layersof the solenoid's return yoke. Let's count it as a
+    reconstucted particle.
+    :math:`Lambda` and :math:`K_s` behave similarly to the :math:`K_L`,but their lifetime is much shorter
+    and, at the Belle II energies, theymostly decay inside the tracking volume. The most convenient way 
+    to reconstruct and combine their decay products, pions and proton.
 
 
+Let's see now how reconstructed and combined particles are handled, and what are the special cases.
+Recontructed particles are alsoe referres as *final state particles (FSP)*, as they are the very final 
+products of any decay chain we may be interested in reconstructing.
+In making an analysis, one has three building blocks:
 
-However, tracking only emasures the 3-momentum of these particles. In order to get form this 
-the 4-momentum one has to either assign a mass hypothesis, which is done using the 
-information from the particle identification systems.
+Reconstructed particle 
+    Reconstructed particles are the basic building block for any analysis. The originate from two 
+    different reconstruction objects: charged particles are reconstructed from tracks, photons and
+    :math:`K_L` from ECL or KLM clusters. Of course a charged track entering the ECL will leave a signal,
+    so one can have a cluster attached to a charged tracks.
+    The tracking can only measur ethe 3-momentum of a particle, so to calculate its 4-momentum one
+    has to make an assumpion on the mass. This is usually based on the response of the PID system.
+    On the other hand cltsers provide a measurement of the energy, but not of the momentum. To get it, we
+    make both an assumpion on the particle mass, and on its production point (all photons and :math:`K_L` are 
+    assumed to originate in the primary interaction point).
+    Tracks and clusters are produced during the reconstruction step. The only operation that is left to the 
+    final user at the analysis level is the mass assignment.
+
+Combined particles
+   Summing the 4-momenta of reconstructed particles one can reconstruct any resonance, at least as 
+   long as all itsdecay products are measured. One can then proceed further and combine combined particles
+   to move upwards ina decay tree, until the desired step is reached.
+   The creation of combined particles is done at the analysis level by the final user, using the tools
+   provided by the basf2 analysis package.
+
+V0
+   Finally, there's a class of combined particle that require a special treatment, and are therefore provided
+   to the user by the reconstruction procedure. So called V0 are neutral particles decaying into two charged 
+   particles far from the interaction point, leaving a typical V-shaped signature. These particles can of course be 
+   reconstructed combining the 4-momenat of their daughters, but if the decay has happened outside of the beam pipe 
+   it is better to re-run the tracking before doing it, since if a track originates not in the IP, it will cross less
+   material than expected and the multiple scattering corrections must be updated.
 
 
-Neutral particles such photons, neutrons or KL do not leave any ionization in the tracking 
-system, and can only  be detected when they interact with the dense material of the ECL or 
-the KLM. In these cases we will have a measurement of their energy and, from the analysis of 
-the shape of the energy deposition, an indication about their nature.
-
-
-All the other particles that are either short lived and decay nearby the interaction point 
-(such as the J/psi), or are long-lived but neautra and decay inside the active volumen of the 
-detector (such the Ks or Lambda), have to be reconstructed combingin the 4-momenta of their 
-decay products, or of the decay prducts at the end of their decay chain. We define as final 
-state particles all the particles that are directly reconstructed from the signal they leave 
-in the detector. The particles obtained combining other particles are usually referred as 
-combined particles.
 
 
 Analysis: the skimming

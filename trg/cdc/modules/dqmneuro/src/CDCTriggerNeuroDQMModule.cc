@@ -3100,6 +3100,23 @@ void CDCTriggerNeuroDQMModule::event()
         trs += padto(strpt.str(), 6) + ", " + padto(stromega.str(), 6) + ", " + padto(strphi.str(), 6) + ", " + padto(strtheta.str(),
                6) + ", " + padto(strz.str(), 6) + ")";
         B2DEBUG(15, padright(trs, 100));
+        vector<float> simInputSWTSSW2D =
+          ltrack.getRelatedTo<CDCTriggerMLPInput>(m_simNeuroInputVectorSWTSSW2DName)->getInput();
+        B2DEBUG(20, padright("      Input Vector simulated (id, t, alpha):", 100));
+        for (unsigned ii = 0; ii < simInputSWTSSW2D.size(); ii += 3) {
+          std::string lla = "      " + std::to_string(ii / 3) + ")";
+          std::string llb = "      " + std::to_string(ii / 3) + ")";
+          lla += "(" + padright(std::to_string(simInputSWTSSW2D[ii]),
+                                8) + " " + padright(std::to_string(simInputSWTSSW2D[ii + 1]), 8) + " " + padright(std::to_string(simInputSWTSSW2D[ii + 2]),
+                                    8) + ")";
+          llb += "  (" + padright(std::to_string(int(simInputSWTSSW2D[ii] * 4096)),
+                                  8) + " " + padright(std::to_string(int(simInputSWTSSW2D[ii + 1] * 4096)),
+                                                      8) + " " + padright(std::to_string(int(simInputSWTSSW2D[ii + 2] * 4096)),
+                                                          8) + ")";
+          B2DEBUG(30, padright(lla, 100));
+          B2DEBUG(20, padright(llb, 100));
+        }
+
       }
     }
   }

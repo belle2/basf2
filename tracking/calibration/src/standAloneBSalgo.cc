@@ -136,7 +136,7 @@ namespace Belle2 {
 
 
 // Spline with uncertainity obtained from the replicas
-  struct unknowSpline {
+  struct UnknowSpline {
     vector<Spline> spls; // vector with replicas
     void add(Spline spl) { spls.push_back(spl); } // add boot-strap replica
 
@@ -196,8 +196,8 @@ namespace Belle2 {
 
 
 
-// variable with uncertainity from boot-strap replicas
-  struct unknowVar {
+  // variable with uncertainity from boot-strap replicas
+  struct UnknowVar {
     vector<double> vars;
     void add(double x) { vars.push_back(x); } // add value to the replicas
 
@@ -301,12 +301,12 @@ namespace Belle2 {
 
 
 // structure including all variables of interest with uncertainity from boot-strap
-  struct unknownPars {
-    unknowSpline x, y, kX, kY, z;
-    unknowVar sizeX, sizeY, sizeXY, sizeMin, sizeMax, xyAngle;
-    unknowVar sizeZ, crossAngle;
+  struct UnknownPars {
+    UnknowSpline x, y, kX, kY, z;
+    UnknowVar sizeX, sizeY, sizeXY, sizeMin, sizeMax, xyAngle;
+    UnknowVar sizeZ, crossAngle;
 
-    unknowVar matXX, matYY, matZZ, matXY, matXZ, matYZ;
+    UnknowVar matXX, matYY, matZZ, matXY, matXZ, matYZ;
 
     void add(SpotParam sPar, double SizeX, double SizeY, double SizeXY, double SizeZ)
     {
@@ -1946,7 +1946,7 @@ namespace Belle2 {
     vector<double> indKX =  {};
     vector<double> indKY =  {};
 
-    unknownPars allPars, allParsZ;
+    UnknownPars allPars, allParsZ;
     const int kPlot = -1; //do plots for index kPlot
     for (int k = 0; k < 1; ++k) { //loop over BootStrap replicas
       for (auto& e : evts) e.isSig = true; //reset cuts

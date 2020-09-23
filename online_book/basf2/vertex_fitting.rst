@@ -3,14 +3,12 @@
 Vertex fitting
 ==============
 
-.. include:: ../todo.rst
-
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: 
+    **Teaching**: ?? min
 
-    **Exercises**: 
+    **Exercises**: ?? min
 
     **Prerequisites**: 
     	
@@ -18,12 +16,16 @@ Vertex fitting
 
     **Questions**:
 
-        * What is a decay vertex and why do I care?
-        * How can I fit vertices?
+        * What is a vertex fit?
+        * When do I want to perform a vertex fit?
+	* How should I choose my fit and constraints?
 
     **Objectives**:
 
-        * Perform vertex fitting
+        * Perform vertex fit of a decay
+
+Vertex/Kinematic fitting is a technique where one uses prior knowledge on the nature of a decay to improve the measurement of its observables.
+
 
 
 .. admonition:: Key points

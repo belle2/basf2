@@ -129,29 +129,27 @@ namespace Belle2 {
           numberOfNo++;
         }
       }
-      uint32_t expectedYes = (729 / 10) + 1
-    };
-    EXPECT_EQ(numberOfYes, expectedYes);
-    EXPECT_EQ(numberOfNo, 729 - expectedYes);
+      uint32_t expectedYes = (729 / 10) + 1;
+      EXPECT_EQ(numberOfYes, expectedYes);
+      EXPECT_EQ(numberOfNo, 729 - expectedYes);
 
-    cut = SoftwareTriggerCut::compile("1 == 1", 7);
-    counter = 1;
-    numberOfYes = 0;
-    numberOfNo = 0;
-    // Now the counter starts with 1, so we expect (544/7) yes.
-    for (uint32_t i = 1; i <= 544; i++)
-    {
-      const auto cutResult = cut->check(object, &counter).first;
-      EXPECT_NE(SoftwareTriggerCutResult::c_reject, cutResult);
-      if (cutResult == SoftwareTriggerCutResult::c_accept) {
-        numberOfYes++;
-      } else if (cutResult == SoftwareTriggerCutResult::c_noResult) {
-        numberOfNo++;
+      cut = SoftwareTriggerCut::compile("1 == 1", 7);
+      counter = 1;
+      numberOfYes = 0;
+      numberOfNo = 0;
+      // Now the counter starts with 1, so we expect (544/7) yes.
+      for (uint32_t i = 1; i <= 544; i++) {
+        const auto cutResult = cut->check(object, &counter).first;
+        EXPECT_NE(SoftwareTriggerCutResult::c_reject, cutResult);
+        if (cutResult == SoftwareTriggerCutResult::c_accept) {
+          numberOfYes++;
+        } else if (cutResult == SoftwareTriggerCutResult::c_noResult) {
+          numberOfNo++;
+        }
       }
+      expectedYes = (544 / 7);
+      EXPECT_EQ(numberOfYes, expectedYes);
+      EXPECT_EQ(numberOfNo, 544 - expectedYes);
     }
-    expectedYes = (544 / 7);
-    EXPECT_EQ(numberOfYes, expectedYes);
-    EXPECT_EQ(numberOfNo, 544 - expectedYes);
   }
-}
 }

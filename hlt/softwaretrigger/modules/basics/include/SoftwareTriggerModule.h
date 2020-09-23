@@ -16,9 +16,9 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
-#include <map>
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -105,8 +105,8 @@ namespace Belle2 {
       /// TTree living in the datastore for debug reasons
       StoreObjPtr<SoftwareTriggerVariables> m_debugOutputStoreObject;
 
-      /// Map between the cut identifier and the internal counter for the given identifier used to apply a prescale.
-      std::map<std::string, uint32_t> m_mapCounter;
+      /// Vector of the internal counters used to apply a prescale.
+      std::vector<uint32_t> m_counters;
 
       /// Helper function to initialize the calculation by creating a new calculation object and
       /// requiring all store arrays.

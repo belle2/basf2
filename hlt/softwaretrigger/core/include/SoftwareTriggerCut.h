@@ -99,7 +99,7 @@ namespace Belle2 {
        * Returns a pair [prescaled, non-prescaled]
        */
       std::pair<SoftwareTriggerCutResult, SoftwareTriggerCutResult> check(const SoftwareTriggerVariableManager::Object& prefilledObject,
-          bool useRandomNumbers, const uint32_t& counter = 1)
+          uint32_t* counter = nullptr)
       const;
 
     private:

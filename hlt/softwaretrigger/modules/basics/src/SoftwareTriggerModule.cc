@@ -149,43 +149,28 @@ void SoftwareTriggerModule::initializeDebugOutput()
 
 void SoftwareTriggerModule::initializeCounters()
 {
-  m_mapCounter.clear();
-  // Check all the cuts and store them in the map used for the internal counters...
-  for (const auto& cutWithName : m_dbHandler->getCutsWithNames()) {
-    // ... store only the "accept" cuts...
-    if (not(cutWithName.second)->isRejectCut()) {
-      // ... and initialize each counter with 1.
-      const std::string& cutIdentifier = cutWithName.first;
-      m_mapCounter.insert(std::pair<std::string, uint32_t>(cutIdentifier, 1));
-    }
-  }
+  // Clear the vector of counters...
+  m_counters.clear();
+  // ... and then initialize it with "numberOfCuts" 0s.
+  size_t numberOfCuts = (m_dbHandler->getCutsWithNames()).size();
+  m_counters.assign(numberOfCuts, 0);
 }
 
 void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject)
 {
+  // Define the pointer to the counter and the index of each counter in m_counters.
+  uint32_t* counter{nullptr};
+  size_t counterIndex{0};
   // Check all cuts with the prefilled object and write them back into the data store.
   for (const auto& cutWithName : m_dbHandler->getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
-    uint32_t counter = 1;
-    if ((not m_param_useRandomNumbersForPreScale) and (not(cutWithName.second)->isRejectCut())) {
-      auto it = m_mapCounter.find(cutIdentifier);
-      if (it != m_mapCounter.end())
-        counter = it->second;
-      else
-        B2FATAL("Something went wrong during the initializazion of the internal counters!" <<
-                LogVar("Cut for which no counter is found", cutIdentifier));
+    if (not m_param_useRandomNumbersForPreScale) {
+      counter = &m_counters.at(counterIndex++);
     }
-    const auto& [prescaledCutResult, nonPrescaledCutResult] = cut->check(prefilledObject, m_param_useRandomNumbersForPreScale, counter);
+    const auto& [prescaledCutResult, nonPrescaledCutResult] = cut->check(prefilledObject, counter);
     m_resultStoreObjectPointer->addResult(cutIdentifier, prescaledCutResult, nonPrescaledCutResult);
-    // Increase by 1 the counter for each accepted cut.
-    if ((not m_param_useRandomNumbersForPreScale) and (not(cutWithName.second)->isRejectCut())) {
-      if (nonPrescaledCutResult == SoftwareTriggerCutResult::c_accept) {
-        // We know that the element exists.
-        m_mapCounter.at(cutIdentifier)++;
-      }
-    }
   }
 
   // Also add the module result ( = the result of all cuts with this basename) for later reference.
@@ -214,8 +199,7 @@ void SoftwareTriggerModule::makeDebugOutput()
     B2DEBUG(100, "Finished storing the debug output to file.");
   }
 
-  if (makePreScale(m_param_preScaleStoreDebugOutputToDataStore,
-                   true)) {
+  if (makePreScale(m_param_preScaleStoreDebugOutputToDataStore)) {
     B2DEBUG(100, "Storing debug output to DataStore as requested.");
     m_calculation->addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
   }

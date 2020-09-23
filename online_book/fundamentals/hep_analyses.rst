@@ -408,38 +408,131 @@ stored in a file:
 
 
 
+Analysis: reconstructed and combined particles
+----------------------------------------------
 
-Analysis: what do we measure?
------------------------------
+The Belle II detectors can provide three kind of information: 
+* Momentum
+* Energy 
+* PID probability. 
 
-The Belle II detectors can provide three kind of information: momentum, energy and PID 
-probability. Of course not all of them are available for every particle, in fact in most cases 
-only two of them are, and however only for a very limited number of particles.  
+Of course not all of them are available for every particle, in fact in most cases 
+only two of them are, and however only for a very limited number of particles.  Most of the particles 
+in the :math:`e^+e^-` collision do not live long enough to leave any signal inside the detector, and must 
+be reconstructed measuring their decay products. This introduces the very important distinction 
+bewteen measured particles, who leave a signal inside the detector and are reconstructed directly
+starting from those signals and combined particles that are reconstructed as sum of measure particles.
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    What is the average flight lenght of a 1 GeV muon and a 1 GeV :math:`D^+` meson? 
+    Do they both reach the tracking system?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Go to https://pdglive.lbl.gov/Viewer.action and look up at the muon and :math:`D^+` lifetime.
+    Remember that the beampipe radius is 1 cm.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    The average flight lenght of a particle of speed :math:`\beta` and lifetime  :math:`\tau` is 
+    :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = E/M` while :math:`\beta = p/E`,
+    therefore :math:`L = c\tau p/M`. From this:
+    :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` :math:`\mu m`. Only the muon reaches
+    the tracking system.
+	  
+
+.. admonition:: Question
+    :class: exercise stacked
+
+    Keeping in mind the result of the previous exercise, which particles do you think survive long 
+    enough to reach the active volume of the detector and leave signal there?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Think about the truly stable and very long lived particles you know, but remember that not all
+    neutral particles are well reconstructed by the ECL or KLM!
+
+.. admonition:: Solution
+    :class: toggle solution
+
+      
+    Let's start from the charged particles. 
+    All the strongly- or electromagnetically.decaying resonances, both charged and neutral 
+    (:math:`rho`, :math:`K^\star`, :math:`\pi^0`, ...) do not 
+    live long enough to significnatly move away from the :math:`e^+e^-` interaction point, so they can
+    only be reconstructed detecting their decay products.     
+    Proton, electrons and their anti-particles are stable and definitively leave ionization signals 
+    in the tracking system, so they should be in the list. 
+    Other particles that could leave ionization are the long-lived, weakly decaying particles.
+    Charged pions, charged kaons and muons are not stable, but we saw already that the latter has a 
+    very long flight lenght, usually exceeding the scale of the detector. Pions and kaons decay much 
+    faster than a muon, buts still have a :math:`c\tau` of approximatively 8 and 4 meters respectively, 
+    which make then likely to leave a detectable track before decaying. The are both on the list. 
+    :math:`D` and :math:`B` mesons fly much less than a mm before decaying, so they cannot leave any 
+    detectable track.
+    Some hyperons, strange baryons, are charged and have a sizable lifetime. The longest-liviging one 
+    is the :math:`Csi^-` with a lifetime of 0.7 ns corresponding to `c\tau \approx 5` cm. Such particle, 
+    especially if it has few GeV of momentum, can cross the PXD and even the inner layers of the SVD 
+    leaving a signal. However, such short track would be very difficoult to reconstruct, and it's 
+    much more convenient to reconstruct these hyperons looking at their (almost) stable decay products.
+    Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as 
+    deuteron, tritium od helium. These can be produced ether in the :math:`e^+e^-` collision or, much more 
+    easily, by spallation processes on the inner detector materials.
 
 
-Charged particles are seen in the detector if they live long enough to cross its active colume, 
-for example the SVD layers, and leave a ionization signal in it.
+    Let's look now at the neutral particles. The photon is stable, and the ECL is designed exactly
+    to measure photon enegies. The (anti-)neutron is basically stable for our purposes, but it
+    leaves no signal in the tracking system and the ECL is not designed as an hadronic calorimeter.
+    There are studies focused on reconstructing this particle in the ECL, but let's leave it out
+    of the list for the moment.
+    The :math:`K_L` has :math:`c\tau \approx 15 m`, so it's definitiley to be considered stable 
+    in the scale of the experiment. As the neutron is leaves no ionization, but the KLM is designed
+    to detect its interaction in the iron layersof the solenoid's return yoke. Let's count it as a
+    reconstucted particle.
+    :math:`Lambda` and :math:`K_s` behave similarly to the :math:`K_L`,but their lifetime is much shorter
+    and, at the Belle II energies, theymostly decay inside the tracking volume. The most convenient way 
+    to reconstruct and combine their decay products, pions and proton.
 
 
+Let's see now how reconstructed and combined particles are handled, and what are the special cases.
+Recontructed particles are alsoe referres as *final state particles (FSP)*, as they are the very final 
+products of any decay chain we may be interested in reconstructing.
+In making an analysis, one has three building blocks:
 
-However, tracking only emasures the 3-momentum of these particles. In order to get form this 
-the 4-momentum one has to either assign a mass hypothesis, which is done using the 
-information from the particle identification systems.
+Reconstructed particle 
+    Reconstructed particles are the basic building block for any analysis. The originate from two 
+    different reconstruction objects: charged particles are reconstructed from tracks, photons and
+    :math:`K_L` from ECL or KLM clusters. Of course a charged track entering the ECL will leave a signal,
+    so one can have a cluster attached to a charged tracks.
+    The tracking can only measur ethe 3-momentum of a particle, so to calculate its 4-momentum one
+    has to make an assumpion on the mass. This is usually based on the response of the PID system.
+    On the other hand cltsers provide a measurement of the energy, but not of the momentum. To get it, we
+    make both an assumpion on the particle mass, and on its production point (all photons and :math:`K_L` are 
+    assumed to originate in the primary interaction point).
+    Tracks and clusters are produced during the reconstruction step. The only operation that is left to the 
+    final user at the analysis level is the mass assignment.
+
+Combined particles
+   Summing the 4-momenta of reconstructed particles one can reconstruct any resonance, at least as 
+   long as all itsdecay products are measured. One can then proceed further and combine combined particles
+   to move upwards ina decay tree, until the desired step is reached.
+   The creation of combined particles is done at the analysis level by the final user, using the tools
+   provided by the basf2 analysis package.
+
+V0
+   Finally, there's a class of combined particle that require a special treatment, and are therefore provided
+   to the user by the reconstruction procedure. So called V0 are neutral particles decaying into two charged 
+   particles far from the interaction point, leaving a typical V-shaped signature. These particles can of course be 
+   reconstructed combining the 4-momenat of their daughters, but if the decay has happened outside of the beam pipe 
+   it is better to re-run the tracking before doing it, since if a track originates not in the IP, it will cross less
+   material than expected and the multiple scattering corrections must be updated.
 
 
-Neutral particles such photons, neutrons or KL do not leave any ionization in the tracking 
-system, and can only  be detected when they interact with the dense material of the ECL or 
-the KLM. In these cases we will have a measurement of their energy and, from the analysis of 
-the shape of the energy deposition, an indication about their nature.
-
-
-All the other particles that are either short lived and decay nearby the interaction point 
-(such as the J/psi), or are long-lived but neautra and decay inside the active volumen of the 
-detector (such the Ks or Lambda), have to be reconstructed combingin the 4-momenta of their 
-decay products, or of the decay prducts at the end of their decay chain. We define as final 
-state particles all the particles that are directly reconstructed from the signal they leave 
-in the detector. The particles obtained combining other particles are usually referred as 
-combined particles.
 
 
 Analysis: the skimming

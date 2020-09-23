@@ -147,10 +147,10 @@ Data taking: The detector
 If you are reading this manual, you are probably already at least partially 
 familiar with the general layout of the Belle II experiment. However, before 
 moving on, let's very quickly review its structure.
-Belle II has several sub-systems, each one dedicate to a specific task: 
-reconstructing the trajectory of charged track, reconstruct the energy of photons, 
-identify the particle type, identify muons and reconstruct long-living hadrons. 
-Of course some systems can be used for multiple purposes: the ECL is mainly 
+Belle II has several sub-systems, each one dedicated to a specific task: 
+reconstruct the trajectory of charged track, reconstruct the energy of photons, 
+identify the particle type or to identify muons and reconstruct long-living hadrons. 
+Of course some systems can be used for multiple purposes: for example, the ECL is mainly 
 intended as a device to recontruct photons, but is also used to identify 
 electrons and hadrons.
 
@@ -174,7 +174,7 @@ electrons and hadrons.
 Beam Pipe
     The beam pipe itself is not an anctive part of the detector, but plays the crucial 
     role of separating the detector from the interaction region, which is located in 
-    the low-pressure vacuum of the superKEKB rings. It is a cylindrical pipe designed 
+    the low-pressure vacuum of the SuperKEKB rings. It is a cylindrical pipe designed 
     to be as thin as possible in order to minimize the particle's energy loss in it,
     but it also assolves the scope of absorbing part of the soft X-rays emitted by 
     the beams, that represent a major source of noise for the innermost detector, the PXD. 
@@ -189,7 +189,7 @@ PXD
 SVD
     The Silicon Vertex Detector (SVD) is the outer part of the vertex detector.
     It comprises of double sided silicon microstrip sensors with strips widths down to 50:math:`\upmu m`. The four layers of the SVD system extend the outer radius of the vertex detector up to 140mm.
-    
+
 VXD
     You will occasionally hear people refer to the pair of detectors: PXD+SVD 
     as the VerteX Detector (VXD).

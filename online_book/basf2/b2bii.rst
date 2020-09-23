@@ -318,9 +318,9 @@ and `nisKsFinder <http://belle.kek.jp/secured/belle_note/gn1253/bn_1253v1.pdf>`_
 `FindLambda <https://belle.kek.jp/secured/belle_note/gn684/bn684.ps.gz>`__
 (for :math:`\Lambda^{0}`) are available as
 
-   +=========================+=========================+
-   | basf                    | basf2                   |
    +-------------------------+-------------------------+
+   | basf                    | basf2                   |
+   +=========================+=========================+
    | findKs.goodKs()         | extraInfo(goodKs)       |
    +-------------------------+-------------------------+
    | nisKsFinder.nb_vlike()  | extraInfo(ksnbVLike)    |

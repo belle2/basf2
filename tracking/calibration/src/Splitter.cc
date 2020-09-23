@@ -86,14 +86,25 @@ namespace Belle2 {
 
   }
 
+  // get the range of interval with nIntervals and breaks stored in a vector
+  static pair<int, int> getStartEndIndexes(int nIntervals,  vector<int> breaks, int indx)
+  {
+    assert(nIntervals >= 1); //at least one interval
+    assert(indx >= 0);
+    assert(indx < int(breaks.size()) + 1); //There is one more interval than #breaks
+    int s = (indx == 0) ? 0 : breaks[indx - 1] + 1;
+    int e = (indx == int(breaks.size())) ? nIntervals - 1 : breaks[indx];
+    return {s, e};
+  }
+
   // plot clusters or runs on time axis
   void plotSRuns(vector<pair<double, double>>  runs, vector<int> breaks, int offset = 2)
   {
     TGraphErrors* gr = new TGraphErrors();
 
     for (int i = 0; i < int(breaks.size()) + 1; ++i) {
-      int s = (i == 0) ? 0 : breaks[i - 1] + 1;
-      int e = (i == int(breaks.size())) ? runs.size() - 1 : breaks[i];
+      int s, e;
+      tie(s, e) = getStartEndIndexes(runs.size(), breaks, i);
       double a = runs[s].first;
       double b = runs[e].second;
 
@@ -238,9 +249,8 @@ namespace Belle2 {
 
     vector<pair<double, double>> splitsNow;
     for (int i = 0; i < int(breaks.size()) + 1; ++i) {
-      int s = (i == 0) ? 0 : breaks[i - 1] + 1;
-      int e = (i == int(breaks.size())) ? currVec.size() - 1 : breaks[i];
-
+      int s, e;
+      tie(s, e) = getStartEndIndexes(currVec.size(), breaks, i);
       double sVal = currVec[s].first;
       double eVal = currVec[e].second;
 
@@ -278,8 +288,8 @@ namespace Belle2 {
   {
     vector<map<ExpRun, pair<double, double>>> splitsNow(breaks.size() + 1);
     for (int i = 0; i < int(breaks.size()) + 1; ++i) {
-      int s = (i == 0) ? 0 : breaks[i - 1] + 1;
-      int e = (i == int(breaks.size())) ? currVec.size() - 1 : breaks[i];
+      int s, e;
+      tie(s, e) = getStartEndIndexes(currVec.size(), breaks, i);
 
       // loop over atoms in single calib interval
       for (int k = s; k <= e; ++k) {
@@ -325,7 +335,7 @@ namespace Belle2 {
 
     // Calculate breaks for SizeIntervals
     tBest = tBestSize;
-    auto breaksSize = dynamicBreaks(smallRuns);
+    vector<int> breaksSize = dynamicBreaks(smallRuns);
 
 
     vector<vector<pair<double, double>>> splits; //split intervals
@@ -336,14 +346,14 @@ namespace Belle2 {
     tBest = tBestVtx;
     vector<int> breaksVtx;
     for (int i = 0; i < int(breaksSize.size()) + 1; ++i) { //loop over all size intervals
-      int s = (i == 0) ? 0 : breaksSize[i - 1] + 1;
-      int e = (i == int(breaksSize.size())) ? smallRuns.size() - 1 : breaksSize[i];
+      int s, e;
+      tie(s, e) = getStartEndIndexes(smallRuns.size(), breaksSize, i);
 
       // Store only atoms in the current BS-size calib. intervals
       auto currVec = slice(smallRuns, s, e);
 
       // Get optimal breaks in particular BS-size calib. interval
-      auto breaksSmall = dynamicBreaks(currVec);
+      vector<int> breaksSmall = dynamicBreaks(currVec);
 
       // Transform breaks to the time intervals
       vector<pair<double, double>> splitsNow = breaks2intervals(currVec, breaksSmall);

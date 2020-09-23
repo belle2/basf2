@@ -41,6 +41,9 @@ namespace Belle2 {
   class Splitter {
   public:
 
+    Splitter() : tBest(std::numeric_limits<double>::quiet_NaN()),
+      gapPenalty(std::numeric_limits<double>::quiet_NaN()) {}
+
 
     /** Function to merge/divide runs into the calibration intervals of given
       * characteristic length.

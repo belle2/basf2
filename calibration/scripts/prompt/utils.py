@@ -8,6 +8,7 @@ from collections import defaultdict, OrderedDict
 from itertools import groupby
 import ROOT
 from caf.utils import ExpRun, IoV
+from random import choice
 
 
 def filter_by_max_files_per_run(files_to_iov, max_files_per_run=1, min_events_per_file=0):
@@ -74,7 +75,7 @@ def group_files_by_iov(files_to_iov):
     return iov_to_files
 
 
-def filter_by_max_events_per_run(files_to_iov, max_events_per_run):
+def filter_by_max_events_per_run(files_to_iov, max_events_per_run, randomSel):
     """
     This function creates a new files_to_iov dictionary by appending files
     in order until the maximum number of events are reached per run.
@@ -93,13 +94,17 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run):
     # Ready a new dict to contain the reduced lists
     new_iov_to_files = OrderedDict()
 
-    for iov, files in iov_to_files.items():
+    for iov, files in sorted(iov_to_files.items()):
         run = ExpRun(iov.exp_low, iov.run_low)
         total = 0
         remaining_files = files[:]
         chosen_files = []
         while total < max_events_per_run and remaining_files:
-            file_path = remaining_files.pop(0)
+            if randomSel:
+                file_path = choice(remaining_files)
+                remaining_files.remove(file_path)
+            else:
+                file_path = remaining_files.pop(0)
             events = events_in_basf2_file(file_path)
             # Empty files are skipped
             if not events:
@@ -112,8 +117,86 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run):
         # Don't bother making empty input list for a Run
         if chosen_files:
             new_iov_to_files[iov] = chosen_files
+            print(new_iov_to_files)
         else:
             B2INFO(f"No files chosen for {run}")
+
+    # Now go back to files_to_iov dictionary
+    new_files_to_iov = OrderedDict()
+    for iov, files in new_iov_to_files.items():
+        for path in files:
+            new_files_to_iov[path] = iov
+    return new_files_to_iov
+
+
+def filter_by_max_events_per_dataset(files_to_iov, max_events_per_dataset):
+    """
+    This function creates a new files_to_iov dictionary by appending files
+    in order until the maximum number of events are reached per data set.
+
+    random files for each run are considered in the collection.
+
+    Parameters:
+        files_to_iov (dict): {"/path/to/file.root": IoV(1,1,1,1)} type dictionary. Same style as used by the CAF
+            for lookup values.
+        max_events_per_dataset (int): The threshold we want to reach but stop adding files if we reach it.
+
+    Returns:
+        dict: The same style of dict as the input files_to_iov, but filtered down.
+    """
+
+    # Invert dictionary so that files are grouped against the same IoV
+    iov_to_files = group_files_by_iov(files_to_iov)
+    # Ready a new dict to contain the reduced lists
+    new_iov_to_files = OrderedDict()
+
+    restart_loop = True
+    rounds = 0
+    total = 0
+    all_file = []
+    while restart_loop:
+        restart_loop = False
+
+        for iov, files in sorted(iov_to_files.items()):
+            run = ExpRun(iov.exp_low, iov.run_low)
+            remaining_files = files[:]
+            this_file = []
+
+            if total < max_events_per_dataset and remaining_files:
+
+                file_path = choice(remaining_files)
+
+                # duplicate files are skipped
+                if file_path in all_file:
+                    continue
+
+                events = events_in_basf2_file(file_path)
+                total += events
+
+                # Empty files are skipped
+                if not events:
+                    B2INFO(f"No events in {file_path}, skipping...")
+                    continue
+
+                this_file.append(file_path)
+                all_file.append(file_path)
+                B2INFO(f"Choosing input file for {run}: {file_path} and total events so far {total}")
+
+                # Don't bother making empty input list for a Run
+                if this_file:
+                    if rounds == 0:
+                        new_iov_to_files[iov] = this_file
+                    else:
+                        new_iov_to_files[iov].append(file_path)
+                else:
+                    B2INFO(f"No files chosen for {run}")
+            else:
+                restart_loop = False
+                break
+
+        if total < max_events_per_dataset:
+            rounds += 1  # restart round
+            restart_loop = True
 
     # Now go back to files_to_iov dictionary
     new_files_to_iov = OrderedDict()

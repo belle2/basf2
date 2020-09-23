@@ -15,6 +15,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <string>
 #include <vector>
+#include "TH1D.h"
 
 namespace Belle2 {
   /**
@@ -41,15 +42,34 @@ namespace Belle2 {
     void setMergePayload(bool value = true) {isMergePayload = value;}
 
     /**
+    * funtion to set flag active for plotting
+    */
+    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+
+    /**
+    * funtion to set trucation method (local vs global)
+    */
+    void setLocalTrucation(bool value = false) {isLTruc = value;}
+
+    /**
+    * funtion to set layer scaling
+    */
+    void setLayerScaling(bool value = false) {isLayerScale = value;}
+
+    /**
     * function to finally store new payload after full calibration
     */
     void generateNewPayloads(std::vector<double> dedxTruncmean);
 
     /**
-    * funtion to set flag active for plotting
+    * funtion to get bins of trunction from histogram
     */
-    void setMonitoringPlots(bool value = false) {isMakePlots = value;}
+    void getTrucationBins(TH1D* htemp, int& binlow, int& binhigh);
 
+    /**
+    * funtion to get layer avg from outer layers
+    */
+    double getLayerAverage(std::vector<double> tempWire);
 
   protected:
 
@@ -71,6 +91,16 @@ namespace Belle2 {
     std::string m_badWireFName; /**< name of bad wire file */
     bool isMakePlots; /**< produce plots for status */
     bool isMergePayload; /**< merge payload at the of calibration */
+    bool isLTruc; /**< method of trunc range for mean */
+    bool isLayerScale; /**< method of scaling layer avg */
+    int fdEdxBins; /**< number of bins for dedx histogram */
+    double fdEdxMin; /**< min dedx range for wiregain cal */
+    double fdEdxMax; /**< max dedx range for wiregain cal */
+    double fTrucMin; /**< min trunc range for mean */
+    double fTrucMax; /**< max trunc range for mean */
+    double fTrucLbin; /**< min trunc range for mean */
+    double fTrucHbin; /**< max trunc range for mean */
+    std::vector<double> flayerAvg; /** <layer wire avg of trun mean */
 
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
   };

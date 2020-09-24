@@ -176,8 +176,7 @@ region".
     :class: toggle xhint stacked
 
     The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^35\ \textrm
-    {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly :math:`10\
-    \textrm{\mu s}` to complete a full revolution around the accelerator
+    {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly 10 μs to complete a full revolution around the accelerator
     ring. Up to 2376 bunches will circulate in each ring.
 
 .. admonition:: Solution
@@ -236,14 +235,14 @@ PXD
     precise reconstruction of the intersection of tracks (a vertex).
     You can think of this as the inner vertex detector.
     The PXD is constructed from DEPFET silicon sensors segmented into individual
-    pixels of down to  :math:`50 \times 55\  \textrm{\mu m}^2` size. It consists of
+    pixels of down to  50 × 55 μm² size. It consists of
     two layers
     at 14 mm and 22 mm radius from the interaction point.
 
 SVD
     The Silicon Vertex Detector (SVD) is the outer part of the vertex detector.
     It comprises of double sided silicon microstrip sensors with strips widths
-    down to :math:`50\ \textrm{\mu m}`. The four layers of the SVD system extend
+    down to 50 μm. The four layers of the SVD system extend
     the
     outer radius of the vertex detector up to 140 mm.
 

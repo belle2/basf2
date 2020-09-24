@@ -253,7 +253,7 @@ VXD
 
 CDC
     The main tracking system for Belle II is the Central Drift Chamber (CDC).
-    This is comprised of *so-called* sense wires suspended in He-C2H6 gas.
+    This is comprised of *so-called* sense wires suspended in He-C₂H₆ gas.
     Charged particles passing close to the wires cause ionisation resulting
     in signal propagation in the wires.
     You will hear people refer to these ionisation signals as "hits" in the
@@ -345,11 +345,11 @@ Off-resonance
     can be produced, leaving one with a pure sample of continuum events, called *off-resonance* (or *continuum*) sample.
 
 Cosmic
-    At the beginning and end of each run period BelleII acquires cosmic muons. These events are used mainly for
+    At the beginning and end of each run period Belle II acquires cosmic muons. These events are used mainly for
     performance studies and for calibration, as they provide an unique sample for aligning the detectors with
     each other. Usually part of this dataset is collected with the solenoid switched off, so that muons cross the
     detectors on straight trajectories. If the SuperKEKB accelerator has a major  downtime of few days, a cosmic dataset
-    is usually collected to keep the BelleII system running.
+    is usually collected to keep the Belle II system running.
 
 Beam
     Beam runs are special, usually short data takings used to study the beam-induced background on the inner sub-detectors.
@@ -365,7 +365,7 @@ Scan
 Non-4S
    SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at :math:`9.460` GeV to
    slightly above the :math:`Upsilon(6S)`, around :math:`9.460` GeV. These datasets can be used for all the non-B
-   parts of the BelleII physics program, but are particularly interesting for the spectroscopy, hadronic physics and
+   parts of the Belle II physics program, but are particularly interesting for the spectroscopy, hadronic physics and
    dark sector studies.
 
 
@@ -824,7 +824,7 @@ coordinates with the detector experts the reconstruction of our data.
 Processing: Data formats
 ------------------------
 
-When an e+e- collision happens, the resulting products will leave signal in the BelleII
+When an e+e- collision happens, the resulting products will leave signal in the Belle II
 subdetectors that are acquired, matched in time as each subsystem have a different delay
 and response time (event building), and saved to disk in a packed, binary format.
 Several steps have to be performed in order to produce a physics result of these
@@ -857,7 +857,7 @@ objects: charged particles, photons, missing energies and all the quantities use
 present a physics result.
 
 
-In BelleII there are four different data formats, reflecting which data objects are
+In Belle II there are four different data formats, reflecting which data objects are
 stored in a file:
 
 RAW
@@ -924,7 +924,7 @@ starting from those signals and combined particles that are reconstructed as sum
     :math:`\tau` is
     :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = E/M` while :math:`\beta = p/E`,
     therefore :math:`L = c\tau p/M`. From this:
-    :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` :math:`\mu m`. Only the muon reaches
+    :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` μm. Only the muon reaches
     the tracking system.
 
 

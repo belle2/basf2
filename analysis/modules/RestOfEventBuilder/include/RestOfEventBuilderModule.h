@@ -13,7 +13,15 @@
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/RestOfEvent.h>
+
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 
@@ -46,7 +54,15 @@ namespace Belle2 {
     void createNestedROE();
   private:
 
-    std::string m_particleList;  /**< Name of the ParticleList */
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
+    StoreArray<RestOfEvent> m_roeArray; /**< StoreArray of ROEs */
+    StoreArray<RestOfEvent> m_nestedROEArray; /**< StoreArray of nested ROEs */
+    StoreObjPtr<ParticleList> m_particleList; /**< input particle list */
+    StoreArray<ECLCluster> m_eclClusters; /**< StoreArray of ECLCluster */
+    StoreArray<KLMCluster> m_klmClusters; /**< StoreArray of KLMCluster */
+    StoreArray<Track>      m_tracks; /**< StoreArray of Tracks */
+
+    std::string m_particleListName;  /**< Name of the ParticleList */
     std::string m_nestedMask;  /**< Name of the ParticleList */
     std::vector<std::string> m_particleListsInput;  /**< Name of the input particle lists of pi+ gamma and Klongs*/
     std::string m_nestedROEArrayName; /**< Name of the nested ROE */

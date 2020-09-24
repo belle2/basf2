@@ -11,6 +11,7 @@
 #include <generators/modules/fragmentation/FragmentationModule.h>
 
 #include <generators/evtgen/EvtGenInterface.h>
+#include <generators/utilities/GeneratorConst.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -52,7 +53,6 @@ FragmentationModule::FragmentationModule() : Module()
            FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true));
   addParam("UserDecFile", m_UserDecFile, "User EvtGen decay file", std::string(""));
   addParam("CoherentMixing", m_coherentMixing, "Decay the B0-B0bar coherently (should always be true)", true);
-  addParam("useEvtGenParticleData", m_useEvtGenParticleData, "Use evt.pdl particle data in PYTHIA as well", 0);
 
   //initialize member variables
   evtgen  = 0;
@@ -145,11 +145,6 @@ void FragmentationModule::initialize()
     }
     evtgen = new EvtGenDecays(m_Pythia, evtGen);
     evtgen->readDecayFile(m_UserDecFile);
-
-    // Update pythia particle tables from evtgen
-    if (m_useEvtGenParticleData > 0) {
-      evtgen->updatePythia();
-    }
   }
 
   // List variable(s) that differ from their defaults
@@ -291,7 +286,7 @@ void FragmentationModule::event()
       }
 
       // Set PHOTOS flag from PYTHIA-EvtGen
-      if (m_Pythia->event[iPythiaPart].status() == 94 && m_Pythia->event[iPythiaPart].id() == 22) {
+      if (m_Pythia->event[iPythiaPart].status() == GeneratorConst::FSR_STATUS_CODE && m_Pythia->event[iPythiaPart].id() == 22) {
         p->addStatus(MCParticleGraph::GraphParticle::c_IsPHOTOSPhoton);
       }
 
@@ -335,7 +330,7 @@ void FragmentationModule::event()
 //-----------------------------------------------------------------
 //                 addParticleToPYTHIA
 //-----------------------------------------------------------------
-int FragmentationModule::addParticleToPYTHIA(MCParticle& mcParticle)
+int FragmentationModule::addParticleToPYTHIA(const MCParticle& mcParticle)
 {
   //get PDG code
   const int id = mcParticle.getPDG();

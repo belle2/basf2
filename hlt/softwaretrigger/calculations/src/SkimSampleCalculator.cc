@@ -662,13 +662,15 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   // nKshort
   int nKshort = 0;
   double Kshort = 0.;
+  const double KsMassLow = 0.468;
+  const double KsMassHigh = 0.528;
 
   if (m_KsParticles.isValid()) {
     for (unsigned int i = 0; i < m_KsParticles->getListSize(); i++) {
       const Particle* mergeKsCand = m_KsParticles->getParticle(i);
       const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
       const double KsCandMass = mergeKsCand->getMass();
-      if (KsCandMass > 0.468 && KsCandMass < 0.528 && isKsCandGood == 1.) nKshort++;
+      if (KsCandMass > KsMassLow && KsCandMass < KsMassHigh && isKsCandGood == 1.) nKshort++;
     }
   }
 

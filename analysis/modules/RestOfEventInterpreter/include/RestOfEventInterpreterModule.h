@@ -11,7 +11,9 @@
 #pragma once
 #include <framework/core/Module.h>
 
+#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/VariableManager/Utility.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 #include <string>
 #include <vector>
@@ -41,7 +43,8 @@ namespace Belle2 {
 
   private:
 
-    std::string m_particleList;  /**< Name of the ParticleList */
+    StoreObjPtr<ParticleList> m_plist; /**< input particle list */
+    std::string m_particleListName;  /**< Name of the ParticleList */
     std::vector<std::tuple<std::string, std::string, std::string, std::string>>
         m_ROEMasks; /**< Container for tuples */
     typedef std::map<std::string, std::shared_ptr<Variable::Cut>>

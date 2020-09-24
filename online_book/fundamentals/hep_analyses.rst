@@ -1012,6 +1012,10 @@ Describe here:
 
     * You know where to find the Belle II TDR, "The Physics of the B factories", and "The Belle II physics book".
 
-.. topic:: Author of this lesson
+.. topic:: Author(s) of this lesson
 
-    Umberto Tamponi
+    Umberto Tamponi, 
+    Martin Ritter, 
+    Oskar Hartbrich,
+    Michael Eliachevitch,         
+    Sam Cunliffe

@@ -206,8 +206,11 @@ or by using the ``-h`` flag.
 Accessing skims on the grid
 ---------------------------
 
-If a skim is requested by a working group, then it is applied to datasets on the
-grid during a skimming campaign and the output LFNs are documented on the
+Analysts do not have to run the skims themselves on data or generic MC. 
+Each new MC campaign or data collection, a list of skims is requested by the analysts in the Belle II  
+physics working groups. This is done via the skim liaison or via JIRA tickets.
+ Once requested, the skim is run on the large MC and/or data samples by the skim production managers. These skims are then anounced when ready and made available to the analyst. 
+The output LFNs are documented on the
 *dataset searcher*. You can then run your analysis these centrally-produced
 skims with :ref:`gbasf2 <onlinebook_gbasf2>`.
 

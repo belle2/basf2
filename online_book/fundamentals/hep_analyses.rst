@@ -459,7 +459,7 @@ Simulation: the Monte Carlo
 
 We need to be able to compare data from our detector to the expectation we have.
 In vert rare cases this might not be necessary, for example the discovery of the
-:math:`J/\Psi` was so clear a signal that we didn't need any comparison to understand
+J/ψ was so clear a signal that we didn't need any comparison to understand
 that it was something new. But most of the time we need to make sure what we see
 is not some artefact of our very very complex experiment.
 

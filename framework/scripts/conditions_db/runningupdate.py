@@ -32,6 +32,7 @@ class RunningTagUpdaterError(Exception):
     Errors raised when trying to update the running globaltag. Can have extra
     variables in `extra_vars` to be shown to the user for additional information
     """
+    #: Initialize the class.
     def __init__(self, description, **extra_vars):
         super().__init__(description)
         #: extra keyword arguments given to the exception constructor
@@ -57,6 +58,7 @@ class RunningTagUpdater:
     6. Close all payloads to be updated in the running tag that are open just
        before the validity in the staging tag.
     """
+    #: Initialize the class.
     def __init__(self, db, running, staging, valid_from, mode):
         #: Reference to the database object to use for queries
         self._db = db

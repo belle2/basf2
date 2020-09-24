@@ -91,13 +91,14 @@ namespace Belle2 {
      *  for clusters, additional information of the first frame is
      *  used to improve the precision
      */
-
-    /** returns the number of samples, 6, 3 or 1 */
-    int getNSamples() const
-    { return m_nAPVsamples; }
-
     float getSVD2FTSWTimeShift(int firstFrame) const
     { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
+
+    /** returns the number of samples:
+     *  6, 3 or 1
+     */
+    int getNSamples() const
+    { return m_nAPVsamples; }
 
     /** getRelativeShiftInNs
      * returns the relative shift of the latency, in ns, in data taken in 3/6 samples.
@@ -105,7 +106,6 @@ namespace Belle2 {
      * It returns the correct value in ns only if data have been collected in 3-sample DAQmode,
      * otherwise it returns 0
      */
-
     float getRelativeShiftInNs() const
     {
       if (m_nAPVsamples == 3)
@@ -123,7 +123,8 @@ namespace Belle2 {
 
     /** getTimeInFTSWReference
      * it takes the cluster time in SVD reference (in either 3 or 6-sample DAQ mode)
-     * and the firstFrame and provides the time in the FTWS reference. Do not use with EventT0!
+     * and the firstFrame and provides the time in the FTWS reference.
+     * DO NOT USE WITH EventT0!
      * In the SVD reference t=0 is the time of the first sample, regardless if the event is acquired in 3- o 6-sample DAQ mode
 
      */

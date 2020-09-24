@@ -86,7 +86,7 @@ namespace Belle2 {
     float getHV(void) const  { return m_hv; };
 
     /**
-     * Returns the relative time shift between the 3-sample and 6-sampe acquired events in units of APV clock/4
+     * Returns the relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4
      * @param none
      * @return int [0,15] corresponding to relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4
      */
@@ -96,7 +96,7 @@ namespace Belle2 {
      * Returns the number of frames
      * 3 -> 3-sample only DAQ mode
      * 6 -> 6-sample only DAQ mode
-     * 9 -> 3-mixed-6 sample only DAQ mode
+     * 9 -> 3-mixed-6 sample DAQ mode
      */
     int getNrFrames(void) const  { return m_nrFrames; };
 
@@ -171,7 +171,7 @@ namespace Belle2 {
      * Set the number of frames
      * 3 -> 3-sample only DAQ mode
      * 6 -> 6-sample only DAQ mode
-     * 9 -> 3-mixed-6 sample only DAQ mode
+     * 9 -> 3-mixed-6 sample DAQ mode
      */
     void setNrFrames(int nrFrames)
     {
@@ -211,7 +211,7 @@ namespace Belle2 {
     /** number of frames
      * 3 -> 3-sample only DAQ mode
      * 6 -> 6-sample only DAQ mode
-     * 9 -> 3-mixed-6 sample only DAQ mode
+     * 9 -> 3-mixed-6 sample DAQ mode
      */
     float m_nrFrames = 0;
 

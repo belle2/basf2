@@ -75,7 +75,7 @@ We now want to reconstruct the Rest of Event of the ``B0``.
      .. literalinclude:: steering_files/029_roe.py
          :lines: 47-48
          :emphasize-lines: 48
-         :linenos:
+         :lineno-start: 47
 
 That's it, the ROE has been reconstructed!
 Behind these python curtains, a ``RestOfEvent`` object is created for each particle in ``B0``
@@ -113,7 +113,7 @@ Let's include the following lines to have a useful selection of them:
 
 .. literalinclude:: steering_files/029_roe.py
      :lines: 61-68
-     :linenos:
+     :lineno-start: 61
 
 .. admonition:: Exercise
      :class: exercise
@@ -142,7 +142,7 @@ to be applied on the ROE particles. One can start from defining the following se
 .. literalinclude:: steering_files/029_roe.py
      :lines: 47-50
      :emphasize-lines: 50-51
-     :linenos:
+     :lineno-start: 47
 
 
 Here we create different cuts for charged particles, like electrons or charged pions, and for photons,
@@ -173,7 +173,7 @@ because of different methods of measurement used to detect these particles.
      .. literalinclude:: steering_files/029_roe.py
          :lines: 47-52
          :emphasize-lines: 51-52
-         :linenos:
+         :lineno-start: 47
 
  Now we have created a mask with a name ``my_mask``, that will contain only track-based
  particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
@@ -209,7 +209,7 @@ loop to insert this argument.
      .. literalinclude:: steering_files/029_roe.py
          :lines: 62-73
          :emphasize-lines: 70-73
-         :linenos:
+         :lineno-start: 62
 
 .. tip::
 
@@ -229,7 +229,6 @@ loop to insert this argument.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/029_roe.py
-         :lines: 62-73
          :emphasize-lines: 47-52,62-73
          :linenos:
 

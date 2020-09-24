@@ -870,7 +870,7 @@ anything that could be related to this track.
 For the CDC we can calculate the total energy loss over the track length and
 compare this to the expected values for different particle types. For ARICH we
 know where the track entered the detector and can check this area to see if
-there are any cerenkov rings around this position. The same principle applies to
+there are any Cherenkov rings around this position. The same principle applies to
 TOP, ECL or KLM: we know where the track entered the detectors and can check for
 any related information from these sub detectors.
 
@@ -933,7 +933,7 @@ subsystems: digitized  PMT signals from the TOP, digitized ADC signals form the 
 so on. Without any further process, these objects cannot be used. The low-level objects
 come from the very first step of the data processing, the unpacking. The RAW signals are
 turned into more abstract and understandable objects: the CDC ACD signals are converted
-in CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-level
+to CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-level
 objects are fundamental to understand the detector performance, but they cannot yet be
 directly used to perform an analysis. The last step is called reconstruction, and consists
 in running algorithm on the collection of digits to produce analysis-friendly quantities.
@@ -1117,7 +1117,7 @@ Reconstructed particle
 Combined particles
    Summing the 4-momenta of reconstructed particles one can reconstruct any resonance, at least as
    long as all its decay products are measured. One can then proceed further and combine combined particles
-   to move upwards ina decay tree, until the desired step is reached.
+   to move upwards in a decay tree, until the desired step is reached.
    The creation of combined particles is done at the analysis level by the final user, using the tools
    provided by the basf2 analysis package.
 

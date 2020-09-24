@@ -368,8 +368,10 @@ For correctly reconstructed B mesons, this variable should peak at the B meson m
 
         fig, ax = plt.subplots()
 
-        best_candidate_df = df[df['extraInfo__boFEIProbabilityRank__bc'] == 1]
-        sig_prob_cut_df = df[best_candidate_df['extraInfo__boSignalProbability__bc'] > 0.001]
+        # If you didn't do the optional exercise, the extraInfo__boFEIProbabilityRank__bc column won't be there.
+        # Just remove this part of the query in this case.
+        sig_prob_cut_df = df.query('(extraInfo__boSignalProbability__bc > 0.01)
+                                    & (extraInfo__boFEIProbabilityRank__bc == 1)')
 
         n, bins, patches = ax.hist(sig_prob_cut_df['Mbc'], 30, range=(5.15, 5.3))
         ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ / GeV')

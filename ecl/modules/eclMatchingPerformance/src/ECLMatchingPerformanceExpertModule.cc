@@ -11,9 +11,6 @@
 #include <ecl/modules/eclMatchingPerformance/ECLMatchingPerformanceExpertModule.h>
 
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/RelationVector.h>
 
 #include <root/TFile.h>
@@ -65,10 +62,9 @@ void ECLMatchingPerformanceExpertModule::initialize()
 
 void ECLMatchingPerformanceExpertModule::event()
 {
-  StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
-  m_iEvent = eventMetaData->getEvent();
-  m_iRun = eventMetaData->getRun();
-  m_iExperiment = eventMetaData->getExperiment();
+  m_iEvent = m_EventMetaData->getEvent();
+  m_iRun = m_EventMetaData->getRun();
+  m_iExperiment = m_EventMetaData->getExperiment();
   m_trackMultiplicity = m_tracks.getEntries();
 
   double distance;

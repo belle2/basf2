@@ -58,7 +58,7 @@ def main(argv):
         # subjobs for each set of input files will be created
         cal_test.max_files_per_collector_job = 1
         # Some backends can have arguments passed to them e.g. queue type
-        cal_test.backend_args = {"queue": "s"}
+        cal_test.backend_args = {"queue": "short"}
         # The maximium iteration number you will be allowed to reach before the Calibration just completes
         cal_test.max_iterations = 2
         # Since we're using the PBS batch system we'll up the heartbeat from the default to query for when the jobs are all

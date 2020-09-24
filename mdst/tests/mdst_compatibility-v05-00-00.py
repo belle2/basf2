@@ -8,6 +8,9 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-05-00-00:
 
+- TrackFitResult:
+  + ndf
+  + chi2
 - TRGSummary:
   * getTimQuality added
 """

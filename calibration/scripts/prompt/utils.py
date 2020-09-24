@@ -65,7 +65,7 @@ def group_files_by_iov(files_to_iov):
         files_to_iov (dict): {"/path/to/file1.root": IoV(1,1,1,1), "/path/to/file2.root": IoV(1,1,1,1)}
 
     Returns:
-        dict:   {IoV(1,1,1,1): ["/path/to/file1.root", "/path/to/file2.root"]}
+        dict: {IoV(1,1,1,1): ["/path/to/file1.root", "/path/to/file2.root"]}
     """
     iov_to_files = OrderedDict()
     for iov, g in groupby(files_to_iov.items(), lambda g: g[1]):

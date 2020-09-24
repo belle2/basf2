@@ -10,12 +10,8 @@
 
 #include <analysis/modules/RestOfEventInterpreter/RestOfEventInterpreterModule.h>
 
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -44,7 +40,7 @@ namespace Belle2 {
     // Add parameters
     std::vector<std::tuple<std::string, std::string, std::string, std::string>> emptyROEMask;
 
-    addParam("particleList", m_particleList, "Name of the ParticleList");
+    addParam("particleList", m_particleListName, "Name of the ParticleList");
 
     addParam("ROEMasks", m_ROEMasks,
              "List of (maskName, trackSelectionCut, eclClusterSelectionCut) tuples that specify all ROE masks of a specific particle to be created.",
@@ -58,9 +54,7 @@ namespace Belle2 {
   void RestOfEventInterpreterModule::initialize()
   {
     // input
-    StoreObjPtr<ParticleList>().isRequired(m_particleList);
-    StoreArray<Particle> particles;
-    particles.isRequired();
+    m_plist.isRequired(m_particleListName);
 
     for (auto ROEMask : m_ROEMasks) {
       // parsing of the input tuple (maskName, trackSelectionCut, eclClusterSelectionCut, fractions)
@@ -86,12 +80,10 @@ namespace Belle2 {
 
   void RestOfEventInterpreterModule::event()
   {
-    StoreObjPtr<ParticleList> plist(m_particleList);
-
-    unsigned int nParts = plist->getListSize();
+    unsigned int nParts = m_plist->getListSize();
 
     for (unsigned i = 0; i < nParts; i++) {
-      const Particle* particle = plist->getParticle(i);
+      const Particle* particle = m_plist->getParticle(i);
       auto* roe = particle->getRelatedTo<RestOfEvent>("ALL");
       for (auto& maskName : m_maskNames) {
         if (!m_update) {

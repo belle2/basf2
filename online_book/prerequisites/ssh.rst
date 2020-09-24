@@ -13,7 +13,7 @@ SSH - Secure Shell
     **Prerequisites**:
 
         * The ssh client installed on your computer
-    	* To be able to enter simple commands on the terminal
+        * To be able to enter simple commands on the terminal
         * How to edit a text file on your computer
         * A DESY account
         * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
@@ -159,6 +159,17 @@ now connected.
 Once you are connected the next important step is to disconnect, just type
 ``exit`` and press return and your connection will be closed. If you're very
 impatient you can also press ``Ctrl-D`` as a shortcut.
+
+..  _batch system recommendation warning:
+.. warning::
+
+    Don't run long-running and CPU or memory heavy jobs on login nodes like
+    KEKCC and DESY where they have a dedicated batch systems (e.g.
+    :ref:`onlinebook_gbasf2`, :ref:`LSF <onlinebook_bsub>` or
+    :ref:`onlinebook_htcondor`). The login nodes are shared
+    resources for all users and it's not very polite and mostly also not
+    permitted to occupy them with calculations that could be done on dedicated
+    machines.
 
 .. admonition:: Exercise
    :class: exercise
@@ -355,7 +366,7 @@ login to KEKCC by just typing ``ssh kekcc`` and also copy files directly with
 ``scp``. But you will have to enter your password two times, once when
 connecting to the gateway server and then when connecting to the KEKCC machine.
 
-.. admonition:: Excercise
+.. admonition:: Exercise
    :class: exercise stacked
 
    Add a working kekcc configuration to your config file and verify that
@@ -463,7 +474,7 @@ you have created your very own SSH identity.
 
    However, DSA has been found unsafe and there are some concerns about ECDSA so
    the only real options are RSA and Ed25519. Ed25519 was added later and should
-   be more secure but is not supported on old versions of SSH.
+   be more secure but is not supported on very old versions of SSH.
 
 .. rubric:: Using your new key
 
@@ -742,7 +753,7 @@ we could use
 
 .. rubric:: Editing files over SSH
 
-There are multiple ways to shows on a system connected to by ssh as if they were
+There are multiple ways to show files on a system connected to by ssh as if they were
 local files. For example
 
 * there is ``sshfs`` which lets you connect the files on a remote machine via the
@@ -755,7 +766,7 @@ local files. For example
   <https://help.gnome.org/users/gnome-help/stable/nautilus-connect.html.en>`_ for
   more information but this works similar in other desktop environments.
 * In addition many editors or development environments have their own support to
-  work on a remote machine via ssh. There is a 
+  work on a remote machine via ssh. There is a
   `guide on confluence <https://confluence.desy.de/x/XGJ8Cg>`_
   explaining the setup for some of them.
 
@@ -799,3 +810,138 @@ Sometimes you want to have your SSH config depend on where you are with your
 laptop. For example, while at KEK you don't need to jump through the gateway.
 This is indeed possible and explained in detail on `B2 Questions
 <https://questions.belle2.org/question/1247/sshconfig-dependent-on-network/>`_.
+
+.. rubric:: Using a terminal multiplexer (e.g. tmux, screen)
+
+When you loose your ssh connection or your terminal window is closed, all
+processes that had been running in that terminal are also killed. This can
+be frustrating if it is a long-running process such compilation or a dataset
+download.
+
+To avoid this you can use a `terminal multiplexer
+<https://en.wikipedia.org/wiki/Terminal_multiplexer>`_ program such as `GNU
+screen <https://www.gnu.org/software/screen/>`_ or the newer and more
+feature-rich `tmux <https://github.com/tmux/tmux/wiki>`_. Both are
+pre-installed on KEKCC and NAF.
+
+.. hint::
+   For computational jobs like processing a steering file, use a
+   batch submission system instead (see :ref:`this warning <batch system recommendation warning>`).
+
+These programs create one or multiple new terminal sessions within your
+terminal, and these sessions run independently of the original terminal, even
+if it exits. You just have to re-connect and re-attach the old screen or tmux
+session. A terminal multiplexer allows for example to
+
+* Start a process (e.g. a download or compilation) on your work computer, log
+  out (which detaches the session) go home and from your home desktop /
+  notebook re-attach the session and check how your process is doing.
+
+* Having multiple interactive shells in parallel on a remote host, without
+  needing to open multiple terminals and connecting from each one separately.
+  Think of it like having multiple remote "tabs". Tmux can also act as a
+  terminal window manager and arrange them side-by-side. This can be useful e.g.
+  for running a process in one pane and monitoring the processor load via
+  `htop <https://htop.dev/>`_.
+
+
+.. figure:: tmux_on_kekcc.png
+   :width: 40em
+   :align: center
+
+   Tmux running in the local terminal and on KEKCC with multiple windows and
+   panes.
+
+If you don't know either programs yet: learn how to use (the newer) tmux.
+Check out the official `getting started guide
+<https://github.com/tmux/tmux/wiki/Getting-Started>`_ from its `wiki
+<https://github.com/tmux/tmux/wiki>`_ or one of the various googable online
+guides such as `this one <https://linuxhandbook.com/tmux/>`_. And I also
+recommend keeping a `cheat sheet <https://tmuxcheatsheet.com>`_ in your
+bookmarks. The commands that you need for the most basic use-case are
+
+tmux new-session
+    Creates and attaches a new tmux session. This is also the default behaviour
+    when just entering the ``tmux``. However, the ``new-session`` subcommand
+    allows for additional options such as naming sessions (see ``tmux
+    new-session --help``).
+
+tmux kill-session
+    Kills the current tmux session. Use this when you finish your work and
+    don't require your session anymore, it is a polite thing to do on shared
+    resources like login nodes.
+
+tmux detach
+    Detaches the current tmux session, so that you return your original
+    terminal session, but the tmux session keeps running in the background.
+    This happens automatically when you loose your connection or your terminal
+    is closed.
+
+tmux attach
+    Short form: ``tmux a``.
+    Attaches a running but detached tmux session. When you log into a cluster
+    like KEKCC or NAF to attach your previous tmux session, make sure are on
+    **exactly the same host** as the one in which you started
+    the initial tmux session.
+
+
+All these commands take optional arguments to be able to handle multiple
+sessions and there are many more useful tmux commands than those listed here,
+for example if you want to have multiple windows (tmux "tabs") and panes in a
+tmux. To see those, check out the documentation links above, where you will
+also find keyboard shortcuts for most of them.
+
+.. admonition:: Question
+   :class: exercise stacked
+
+   Why should I keep track of the exact host on which the terminal multiplexer
+   is run and how do I do that?
+
+.. admonition:: Hint
+   :class: toggle xhint stacked
+
+   Check out the output of the ``hostname`` command in a computing cluster like
+   KEKCC. Why is it different from the hostname that you used to login (the
+   ``Hostname`` line in your :ref:`ssh config <online_book/prerequisites/ssh:SSH
+   Configuration File>`)? Could you have found out the host name without typing
+   any commands? How can you change the specific host?
+
+.. admonition:: Solution
+   :class: toggle solution
+
+   When you connect to a computing cluster like KEKCC via a login node, e.g.
+   ``login.cc.kek.jp``, you are connected to a random host (also called "node",
+   i.e. an individual server) in that cluster for load-balancing purposes.
+   You can check the full host name with the ``hostname`` command. But you
+   can also see the first part of the hostname (the current node)
+   in your shell prompt (the string at the beginning of the command line).
+
+   If you disconnect and reconnect to the login node, you can be connected to a
+   different node, but your terminal multiplexer will still be running on the
+   old host, so you will have to connect to that specific host which it is
+   running on. From within the computing cluster, you can usually just use the
+   node name for the ssh connection. For example, if your tmux session is
+   running on ``ccw01.cc.kek.jp``, but you have been connected to ``ccw02``,
+   from there you can simply use
+
+   .. code-block:: bash
+
+       ssh ccw01
+
+   to connect to the other node. Alternatively, you
+   can directly connect to a specific host instead of the login node, but for
+   that you might need to extend your :ref:`ssh config
+   <online_book/prerequisites/ssh:SSH Configuration File>` to also use a
+   gateway server for the specific nodes in the cluster, e.g. for the KEKCC:
+
+   .. literalinclude:: ssh_config.txt
+      :lines: 31-35
+      :linenos:
+
+   Then ``ssh ccw01`` will also work from outside KEKCC.
+
+.. topic:: Author(s) of this lesson
+
+     Martin Ritter,
+     Michael Eliachevitch
+

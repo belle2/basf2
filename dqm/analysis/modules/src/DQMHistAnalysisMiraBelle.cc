@@ -57,9 +57,9 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   mon_mumu = getMonitoringObject("mumu");
 
   // make cavases to be added to MonitoringObject
-  main = new TCanvas("main", "main", 0, 0, 800, 600);
-  resolution = new TCanvas("resolution", "resolution", 0, 0, 800, 600);
-  muon_val = new TCanvas("muon_val", "muon_val", 0, 0, 400, 400);
+  main = new TCanvas("mumu_main", "main", 0, 0, 800, 600);
+  resolution = new TCanvas("mumu_resolution", "resolution", 0, 0, 800, 600);
+  muon_val = new TCanvas("mumu_muon_val", "muon_val", 0, 0, 400, 400);
 
   // add canvases to MonitoringObject
   mon_mumu->addCanvas(main);

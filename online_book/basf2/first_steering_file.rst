@@ -8,7 +8,7 @@ First steering file
 
     **Teaching**: 30 min
 
-    **Exercises**: 60 min
+    **Exercises**: 90 min
 
     **Prerequisites**: 
     	
@@ -20,14 +20,23 @@ First steering file
         * How can I load data?
         * How can I reconstruct a decay?
         * How can I match MC?
-        * Can I see some pretty pictures?
+        * How can I create an ntuple to store information?
 
     **Objectives**:
 
-        * Reconstruct :math:`B \to J/\Psi(\to e^+e^-)K_S(\to \pi^+\pi^+)`
+        * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^+)`
 
-In this hands-on tutorial you'll be writing your first steering file.
-But before we can start, you have to set up the necessary environment.
+In this hands-on tutorial you'll be writing your first steering file. Our
+ultimate goal is to reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to
+\pi^+\pi^+)`. You'll be learning step-by-step what is necessary to achieve
+this, and in the end you will produce a plot of the B meson candidates. As you
+have already learned in the previous sections, basf2 provides a large variety
+of functionality. While the final steering file of this lesson will be working
+and producing some reasonable output, there are many possible extensions that
+you will learn all about in the succeeding lessons.
+
+Let's get started: The very first step is always to set up the necessary
+environment.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -136,7 +145,7 @@ files. They are located on kekcc at
     .. literalinclude:: steering_files/011_first_steering_file.py
 
 The mdst data objects (Tracks, ECLCluster, KLMCluster, V0s) of the input file
-have to be transferred into `Particle` data objects. This is done via the
+have to be transferred into Particle data objects. This is done via the
 `ParticleLoader` module and its wrapper function `fillParticleList`.
 
 .. admonition:: Exercise
@@ -200,12 +209,10 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Task
     :class: exercise stacked
 
-    Our ultimate goal is to reconstruct :math:`B \to J/\Psi(\to
-    e^+e^-)K_S^0(\to \pi^+\pi^+)`. For now, extend your steering file by
-    loading electrons, positrons, and Kshorts. At the very end of your script
-    you should also print a summary table of all modules added to your path
-    using the function `statistics`. Then run the script and answer the
-    following questions:
+    Extend your steering file by loading electrons, positrons, and Kshorts. At
+    the very end of your script you should also print a summary table of all
+    modules added to your path using the function `statistics`. Then run the
+    script and answer the following questions:
 
     * Which are the mass window boundaries set for the :math:`K_S^0`?
     * Which module had the longest execution time?
@@ -349,6 +356,16 @@ contain one entry per candidate or one entry per event.
     Only variables declared as ``Eventbased`` are allowed in the event mode.
     Conversely, both candidate and event-based variables are allowed in the
     candidate mode.
+
+A good variable to start with is the beam-constrained mass, which is defined
+as
+
+.. math::
+
+    \text{M}_{\rm bc} = \sqrt{E_{\rm beam}^2 - \mathbf{p}_{B}^2}
+
+For correctly reconstructed B mesons this variable should peak at the B meson
+mass.
 
 .. admonition:: Task
     :class: exercise stacked

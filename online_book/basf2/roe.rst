@@ -175,9 +175,9 @@ because of different methods of measurement used to detect these particles.
          :emphasize-lines: 51-52
          :lineno-start: 47
 
- Now we have created a mask with a name ``my_mask``, that will contain only track-based
- particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
- ``ecl_based_cuts``.
+Now we have created a mask with a name ``my_mask``, that will contain only track-based
+particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
+``ecl_based_cuts``.
 
 The analyst can create as many ROE masks as needed and use them in different ROE-dependent
 algorithms or ROE variables, like ``roeM(my_mask)`` or ``roeE(my_mask)``. Also, one can call
@@ -185,7 +185,7 @@ algorithms or ROE variables, like ``roeM(my_mask)`` or ``roeE(my_mask)``. Also, 
 photons entered the ROE or the ROE mask.
 
 In the last section, we defined two lists of ROE variables. Now we want to have
-the same variables but with the ``my_mask`` mask. Since we're lazy, we use python
+the same variables but with the ``my_mask`` argument. Since we're lazy, we use a python
 loop to insert this argument.
 
 .. admonition:: Exercise
@@ -195,8 +195,8 @@ loop to insert this argument.
      replaces the ``()`` of each variable with ``(my_mask)``. Add these new
      variables to the ``b_vars`` list.
 
-.. admonition:: Exercise
-     :class: hint stacked toggle
+.. admonition:: Hint
+     :class: xhint stacked toggle
 
      .. code-block:: python
 
@@ -208,8 +208,9 @@ loop to insert this argument.
 
      .. literalinclude:: steering_files/029_roe.py
          :lines: 62-73
-         :emphasize-lines: 70-73
          :lineno-start: 62
+         :emphasize-lines: 70-73
+
 
 .. tip::
 
@@ -219,7 +220,7 @@ loop to insert this argument.
     :b2:var:`nROE_NeutralHadrons` variable.
 
 .. admonition:: Exercise
-     :class: exercise
+     :class: exercise stacked
 
      Your steering file is now complete. Run it!
 
@@ -229,7 +230,7 @@ loop to insert this argument.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/029_roe.py
-         :emphasize-lines: 47-52,62-73
+         :emphasize-lines: 47-52,61-73
          :linenos:
 
 

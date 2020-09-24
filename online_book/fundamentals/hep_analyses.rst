@@ -710,8 +710,9 @@ Track finding
    detectors belonging to each particle.
 
 Track fitting
-  Determine the best estimate of the particle trajectories found to obtain
-  position and momentum close to the interaction region as precisely as
+  Determine the best estimate of the kinematic variables describing the particle
+  trajectories corresponding to each found hit/cluster pattern to obtain the
+  particle position and momentum close to the interaction region as precisely as
   possible.
 
 Track finding is a very complex process which depends a lot on the detector

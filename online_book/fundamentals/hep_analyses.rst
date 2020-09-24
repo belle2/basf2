@@ -169,25 +169,26 @@ region".
 
     Start with the planned final instantaneous luminosity of SuperKEKB. How
     many bunch crossings will happen per second? 
-    Then think about the typical cross sections in :math:`e^+e^` collisions
+    Then think about the typical cross sections in :math:`e^+e^-` collisions
     as discussed previously.
 
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
-    The goal instantaneous luminosity of SuperKEKB is :math:`8*10^35 cm^-2
-    s^-1`. It takes a beam particle bunch roughly 10us to complete a full
-    revolution around the accelerator ring. Up to 2376 bunches will circulate
-    in each ring.
+    The goal instantaneous luminosity of SuperKEKB is :math:`8*10^35 \textrm
+    {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly :math:`10
+    \textrm{\mu s}` to complete a full revolution around the accelerator
+    ring. Up to 2376 bunches will circulate in each ring.
 
 .. admonition:: Solution
     :class: toggle solution
 
-    At a final design luminosity of :math:`8*10^35 cm^-2 s^-1` at 2376 bunches
-    per ring, each taking about 10us to complete a revolution, the
-    delivered luminosity per bunch crossing is about :math:`8*10^35 cm^-2 s^-1
-    * 1*10^-6 s / 2376 = 3.4*10^-7 nb`, so even the most likely Bhabha process
-    at 125nb only happens once every 25000 bunch crossings.
+    At a final design luminosity of :math:`8*10^35 \textrm{cm}^{-2} \textrm{s}^
+    {-1}` at 2376 bunches per ring, each taking about 10us to complete a revolution, the
+    delivered luminosity per bunch crossing is about :math:`8*10^{35} \textrm
+    {cm}^{-2} \textrm{s}^{-1} * 1*10^{-6} \textrm{s} / 2376 = 3.4*10^{-7}
+    \textrm{nb}`, so even the most likely Bhabha process at :math:`125
+    \textrm{nb}` only happens once every 25000 bunch crossings.
 
 The Belle II detector is built around the interaction region, with the goal to
 detect and measure as many of the particles produced in the SuperKEKB collisions
@@ -234,13 +235,15 @@ PXD
     precise reconstruction of the intersection of tracks (a vertex). 
     You can think of this as the inner vertex detector.
     The PXD is constructed from DEPFET silicon sensors segmented into individual
-    pixels of down to 50*55 :math:`\upmu m^2` size. It consists of two layers at
-    14mm and 22mm radius from the interaction point.
+    pixels of down to  :math:`50*55 \textrm{\mu m}^2` size. It consists of
+    two layers
+    at 14mm and 22mm radius from the interaction point.
 
 SVD
     The Silicon Vertex Detector (SVD) is the outer part of the vertex detector.
     It comprises of double sided silicon microstrip sensors with strips widths
-    down to 50 :math:`\upmu m`. The four layers of the SVD system extend the
+    down to :math:`50 \textrm{\mu m}`. The four layers of the SVD system extend
+    the
     outer radius of the vertex detector up to 140mm.
 
 VXD
@@ -390,10 +393,11 @@ what effectively amounts to a low resolution "live stream" of the readout data
 of CDC, ECL and KLM (for completeness: TOP also sends stream data to TRG  but it
 is not used for triggering directly). The streamed data is interpreted in near
 realtime in highly specialised fast electronics boards (Field Programmable Gate
-Arrays, FPGAs). If TRG determines an interesting collision event has just taken
-place, it generates a trigger signal which is distributed to all subdetectors.
-The TRG system is designed to issue up to 30kHz of such triggers at full
-SuperKEKB design luminosity.
+Arrays, FPGAs) by continuously matching it to predefined trigger conditions. If
+TRG determines an interesting collision event has just taken place, it generates
+a trigger signal which is distributed to all subdetectors. The TRG system is
+designed to issue up to 30kHz of such triggers at the full SuperKEKB design
+luminosity.
 
 .. note::
    The TRG system will issue a trigger decision with a fixed delay of about 4us.
@@ -419,7 +423,7 @@ Both the TRG system and the HLT classify events based on the data available to
 them. While the decision whether to issue a trigger for a given collision (or on
 HLT whether to keep the event or discard it) is of course binary, certain event
 classes might be intentionally triggered at less than 100% of their occurence.
-For example, while Bhabha scattering events (:math:`e^+e^- \to e^+e^-` often just
+For example, while Bhabha scattering events (:math:`e^+e^- \to e^+e^-`, often just
 called "Bhabhas") are generally not very interesting for the physics program of
 Belle II, keeping some of them for calibration purposes might be very useful.
 Since Bhabhas are easily identified even with the limited information available
@@ -436,6 +440,16 @@ Since the TRG and HLT systems are ultimately deciding which data is being kept
 for offline analysis, the importance of understanding and validating their
 performance vs. their intended functionality is of highest importance for the
 success of the Belle II experiment.
+
+.. admonition:: Key points
+    :class: key-points
+
+    * The TRG system aims to recognise interesting events from the near
+    continuous stream of collisions.
+    * The HLT system uses the full readout data for each event to further decide
+    which events to keep for offline analysis and which ones to discard.
+    * Prescaling might be used to only record every n-th event (on average) that
+    satisfies given trigger conditions.
 
 TODO: HLT tags? jiltering? (HLT skims)
 
@@ -511,13 +525,13 @@ close to minutes per event due to the much higher energy.
     Assuming it takes one second per event, how long would it take to simulate
     all the 770 million :math:`B\over{B}` events collected at Belle on one CPU?
 
-    How long would it take to simulate all the :math:`B\over{B}` events we
+    How long would it take to simulate all the :math:`B\bar{B}` events we
     intend to collect for Belle II?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    You already know the cross section for :math:`B\over{B}` events now you only
+    You already know the cross section for :math:`B\bar{B}` events now you only
     need the planned total luminosity for Belle II.
 
 .. admonition:: Solution
@@ -539,7 +553,7 @@ close to minutes per event due to the much higher energy.
     very quick estimate.
 
     How many CPUs do we need to buy in the cloud and how much would it cost to
-    simulate the equivalent of :math:`50 \textrm{ab}^{-1}` :math:`B\over{B}`
+    simulate the equivalent of :math:`50 \textrm{ab}^{-1}` :math:`B\bar{B}`
     events in six months?
 
 .. admonition:: Solution
@@ -890,7 +904,8 @@ starting from those signals and combined particles that are reconstructed as sum
 .. admonition:: Solution
     :class: toggle solution
 
-    The average flight lenght of a particle of speed :math:`\beta` and lifetime  :math:`\tau` is 
+    The average flight length of a particle of speed :math:`\beta` and lifetime 
+    :math:`\tau` is 
     :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = E/M` while :math:`\beta = p/E`,
     therefore :math:`L = c\tau p/M`. From this:
     :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` :math:`\mu m`. Only the muon reaches

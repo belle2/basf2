@@ -388,21 +388,16 @@ class BtoHad4TracksRho(BaseSkim):
     __category__ = "physics, hadronic B to charmless"
 
     def load_standard_lists(self, path):
-        loadStdVeryLooseRho0(path=path)
         loadStdVeryLooseTracks('pi', path=path)
+        loadStdVeryLooseRho0(path=path)
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
         BsigList = []
 
-        channels = {
-                    'B0:Charmless_b2rhorho': 'rho0:veryLoose rho0:veryLoose'  # 14
-                    }
-
-        for chID, channel in enumerate(channels.keys()):
-            ma.reconstructDecay(decayString=channel + ' -> ' + channels[channel],
-                                cut=Bcuts, dmID=chID, path=path)
-            BsigList.append(channel)
+        ma.reconstructDecay('B0:Charmless_b2rhorho -> rho0:veryLoose rho0:veryLoose',
+                            cut=Bcuts, path=path)
+        BsigList.append('B0:Charmless_b2rhorho')
 
         path = self.skim_event_cuts("nTracks >= 4", path=path)
         self.SkimLists = BsigList
@@ -621,52 +616,6 @@ class BtoHadRho0RhoP(BaseSkim):
 
         channels = {
                     'B+:Charmless_b2rhorho0': 'rho+:veryLoose rho0:veryLoose',  # 3
-                    }
-
-        for chID, channel in enumerate(channels.keys()):
-            ma.reconstructDecay(decayString=channel + ' -> ' + channels[channel],
-                                cut=Bcuts, dmID=chID, path=path)
-            BsigList.append(channel)
-
-        self.SkimLists = BsigList
-
-
-@fancy_skim_header
-class BtoHad3Tracks1Pi0Kstar(BaseSkim):
-    """
-    Reconstructed decay modes:
-
-    * :math:`\\B^+ -> K^{*+} K^+ K^-`
-    * :math:`\\B^+ -> K^{*+} K^+ \\pi^-`
-    * :math:`\\B^+ -> K^{*+} \\pi^+ \\pi^-`
-
-    Cuts applied:
-
-    * ``5.20 < Mbc < 5.29``
-    * ``abs(deltaE) < 0.3``
-
-    Note:
-    19130900
-    """
-    __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
-    __description__ = "Skim list for all charged B to charmless modes with 3 tracks and 1 Pi0 originating from a K*."
-    __contact__ = __liaison__
-    __category__ = "physics, hadronic B to charmless"
-
-    def load_standard_lists(self, path):
-        loadStdVeryLooseTracks('K', path=path)
-        loadStdVeryLooseTracks('pi', path=path)
-        loadStdPi0ForBToCharmless(path=path)
-        loadStdVeryLooseKstarPlusPi0(path=path)
-
-    def build_lists(self, path):
-        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
-        BsigList = []
-
-        channels = {
-                    'B+:Charmless_b2K*KK': 'K*+:veryLoosePi0 K-:veryLoose K+:veryLoose',  # 4
-                    'B+:Charmless_b2K*pipi': 'K*+:veryLoosePi0 pi-:veryLoose pi+:veryLoose',  # 5
-                    'B+:Charmless_b2K*Kpi': 'K*+:veryLoosePi0 K+:veryLoose pi-:veryLoose',  # 6
                     }
 
         for chID, channel in enumerate(channels.keys()):

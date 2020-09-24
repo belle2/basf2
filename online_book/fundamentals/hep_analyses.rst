@@ -8,25 +8,25 @@ HEP Analyses
 
     **Teaching**: 2 hrs
 
-    **Prerequisites**: 
-    	
+    **Prerequisites**:
+
     	* What is a B factory?
 
     **Objectives**:
 
         * A first introduction to all of the basic concepts in a HEP analysis.
-        * A "big picture" overview of what the Belle II software is supposed 
+        * A "big picture" overview of what the Belle II software is supposed
           to do.
         * Be aware of important Belle II reference documents and (at least)
           have spend a bit of time navigating them.
 
-In this section you will learn the basic concepts underlying an analysis at 
-Belle II, starting from how the data acquisition works and ending to the 
+In this section you will learn the basic concepts underlying an analysis at
+Belle II, starting from how the data acquisition works and ending to the
 description of the most common analysis concepts.
 
-The workflow that goes from the data taking to the publication of any 
+The workflow that goes from the data taking to the publication of any
 measurement in High-Energy Physics (HEP) experiment is quite complex.
-Measurements involve multiple steps that can take months or even years. 
+Measurements involve multiple steps that can take months or even years.
 While the details of this procedure can be extremely complex and tedious the
 overall picture is simple enough to be fitted in a human-readable scheme:
 
@@ -34,39 +34,39 @@ overall picture is simple enough to be fitted in a human-readable scheme:
   :width: 40em
   :align: center
 
-Starting from the very end, you can see that the input to the analysis are 
-reconstructed, skimmed events, coming either from the actual data taking or from the 
-generation of simulated events. The skmming is necessary to reduce the size of the 
-dataset and significantly simplify and speed-up the analysis.  The reconstruction 
-step is the same for both real and simulated data to minimize the differences 
+Starting from the very end, you can see that the input to the analysis are
+reconstructed, skimmed events, coming either from the actual data taking or from the
+generation of simulated events. The skmming is necessary to reduce the size of the
+dataset and significantly simplify and speed-up the analysis.  The reconstruction
+step is the same for both real and simulated data to minimize the differences
 between the two, except that the data need to be first calibrated.
 
-The rest of this section will quickly go through each of the four blocks in which 
-the workflow is split, covering the very basic concepts and deferring most of the 
+The rest of this section will quickly go through each of the four blocks in which
+the workflow is split, covering the very basic concepts and deferring most of the
 technical expalations about how the software works to the other chapters.
 
 Intro: Cut and count
 --------------------
 
-Almost regardless of the quantity you are going to measure in your analysis, you 
-will have to face some basic problems: select events you want to study (the 
-signal) over similar events that mimic them (the background), estimate efficiency 
-of such a selection and, possibly, estimate the intrinsic resolution on the 
+Almost regardless of the quantity you are going to measure in your analysis, you
+will have to face some basic problems: select events you want to study (the
+signal) over similar events that mimic them (the background), estimate efficiency
+of such a selection and, possibly, estimate the intrinsic resolution on the
 quantities you will measure. Finally you will typically want to count how many
 signal events you observe.
 
-The most basic way to select a signal is to apply what, in jargon, are called "cuts". 
-A cut is nothing but selection, usually binary, over one quantity that has some 
-separation power between signal and background. Of course multiples cuts can be 
-applied in sequence, leading to quite effective background reductions. 
-Before deciding on the selection criteria however, one must define the variable 
-that will be used to count of many signal events are left. A good variable has a 
-very peaking distribution for signal, and a smooth, uniform distribution for the 
+The most basic way to select a signal is to apply what, in jargon, are called "cuts".
+A cut is nothing but selection, usually binary, over one quantity that has some
+separation power between signal and background. Of course multiples cuts can be
+applied in sequence, leading to quite effective background reductions.
+Before deciding on the selection criteria however, one must define the variable
+that will be used to count of many signal events are left. A good variable has a
+very peaking distribution for signal, and a smooth, uniform distribution for the
 background.
 
 .. admonition:: Example
 
-    In many b-physics analyses you will make candidate B mesons from 
+    In many b-physics analyses you will make candidate B mesons from
     combinations of tracks and calorimeter clusters.
     You will work through an example of this in a :ref:`later lesson
     <onlinebook_first_steering_file>`, but for now, consider the energy of your
@@ -74,25 +74,25 @@ background.
 
     .. admonition:: Question
         :class: exercise stacked
-    
-        What is the the energy of a B meson produced in the decay of an 
+
+        What is the the energy of a B meson produced in the decay of an
         :math:`\Upsilon(4S)` in the rest frame of the :math:`\Upsilon`?
-    
+
     .. admonition:: Solution
         :class: toggle solution
-    
+
         Half of its rest mass: :math:`\sim 5.3 {\textrm GeV}`
 
     The difference between half of the energy in the centre-of-momentum
     and the total energy of the B candidate is called :math:`\Delta E`.
-    An early  **cut**  you might make is to require that this quantity 
+    An early  **cut**  you might make is to require that this quantity
     is close to zero.
-    
+
     That is, you would accept B meson canddiates which satisfy:
     :math:`-150 <\Delta E< 150 {\textrm MeV}`
     and reject those which don't.
 
-An interesting event for most B physics analyses, is one where the 
+An interesting event for most B physics analyses, is one where the
 :math:`e^+e^-` produced an :math:`\Upsilon(4S)`.
 However this is not the most probable result in an :math:`e^+e^-` collision.
 
@@ -134,7 +134,7 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
 
 We call anything that is not "what you want to analyse": **background**.
 This means different things for different analyses.
-Certain kinds of background events (such as :math:`e^+e^- \to e^+e^-`) are 
+Certain kinds of background events (such as :math:`e^+e^- \to e^+e^-`) are
 relatively easy to reject and can be done in the **trigger**.
 Other kinds of backgrounds are dealt with at later stages of your analysis.
 
@@ -144,7 +144,7 @@ further lessons.
 Data taking: The experiment
 ---------------------------
 
-If you are reading this manual, you are probably already at least partially 
+If you are reading this manual, you are probably already at least partially
 familiar with the general layout of the SuperKEKB accelerator and the Belle II
 experiment. However, before moving on, let's very quickly review their structure.
 
@@ -161,14 +161,14 @@ region".
 
     At LHC, every bunch collision generates dozens of individual particle
     interactions that overlay each other in the detectors (pile-up),
-    considerably complicating the data analysis. 
+    considerably complicating the data analysis.
     This doesn't seem to be a problem at SuperKEKB and Belle II. Why?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
     Start with the planned final instantaneous luminosity of SuperKEKB. How
-    many bunch crossings will happen per second? 
+    many bunch crossings will happen per second?
     Then think about the typical cross sections in :math:`e^+e^-` collisions
     as discussed previously.
 
@@ -204,14 +204,14 @@ asymmetric along the beam axis. In the context of Belle II the "forward"
 direction is the direction in which the electron beam points, while "backward"
 is the direction in which the positron beam points.
 
-.. seealso:: 
+.. seealso::
 
-    There is an important document for any large HEP detector called the 
+    There is an important document for any large HEP detector called the
     **Technical Design Report** (TDR).
 
     The Belle II TDR is `arXiv:1011.0352 <https://arxiv.org/abs/1011.0352>`_.
 
-    You might like to refer to this and you will probably need to reference 
+    You might like to refer to this and you will probably need to reference
     it in your thesis.
 
 .. figure:: belle2.png
@@ -222,17 +222,17 @@ is the direction in which the positron beam points.
     The Belle II detector.
 
 Beam Pipe
-    The beam pipe itself is not an anctive part of the detector, but plays the crucial 
-    role of separating the detector from the interaction region, which is located in 
-    the low-pressure vacuum of the SuperKEKB rings. It is a cylindrical pipe designed 
+    The beam pipe itself is not an anctive part of the detector, but plays the crucial
+    role of separating the detector from the interaction region, which is located in
+    the low-pressure vacuum of the SuperKEKB rings. It is a cylindrical pipe designed
     to be as thin as possible in order to minimize the particle's energy loss in it,
-    but it also assolves the scope of absorbing part of the soft X-rays emitted by 
-    the beams, that represent a major source of noise for the innermost detector, the PXD. 
+    but it also assolves the scope of absorbing part of the soft X-rays emitted by
+    the beams, that represent a major source of noise for the innermost detector, the PXD.
 
 PXD
     The first active system met by the particles that emerge form the IP is the PiXel
-    Detector (PXD). It is a high-granularity tracking system which enables 
-    precise reconstruction of the intersection of tracks (a vertex). 
+    Detector (PXD). It is a high-granularity tracking system which enables
+    precise reconstruction of the intersection of tracks (a vertex).
     You can think of this as the inner vertex detector.
     The PXD is constructed from DEPFET silicon sensors segmented into individual
     pixels of down to  :math:`50*55 \textrm{\mu m}^2` size. It consists of
@@ -247,15 +247,15 @@ SVD
     outer radius of the vertex detector up to 140mm.
 
 VXD
-    You will occasionally hear people refer to the pair of detectors: PXD+SVD 
+    You will occasionally hear people refer to the pair of detectors: PXD+SVD
     as the VerteX Detector (VXD).
 
 CDC
     The main tracking system for Belle II is the Central Drift Chamber (CDC).
     This is comprised of *so-called* sense wires suspended in He-C2H6 gas.
-    Charged particles passing close to the wires cause ionisation resulting 
+    Charged particles passing close to the wires cause ionisation resulting
     in signal propagation in the wires.
-    You will hear people refer to these ionisation signals as "hits" in the 
+    You will hear people refer to these ionisation signals as "hits" in the
     CDC.
     A charged particle passing through the CDC results in a succession of hits
     following the trajectory of the particle.
@@ -263,7 +263,7 @@ CDC
 TOP
     The Time Of Propagation (TOP) detector provides particle identification
     information in the barrel region of Belle II .
-    The subdetector comprises of quartz bars and works by utilising the 
+    The subdetector comprises of quartz bars and works by utilising the
     `Cherenkov effect <https://en.wikipedia.org/wiki/Cherenkov_radiation>`_.
     Particles passing through will cause Cherenkov photons to be emitted at an
     angle that directly depends on the particle velocity. Combining this
@@ -289,18 +289,18 @@ ARICH
     radius, providing an orthogonal source of particle mass information.
 
 ECL
-    The Electromagnetic CaLorimeter (ECL) is chiefly tasked with measuring the 
+    The Electromagnetic CaLorimeter (ECL) is chiefly tasked with measuring the
     electromagnetic energy of photons and electrons produced in the collision.
     In combination with tracking information, the calorimeter can distinguish, for
     example, electrons from muons.
-    A track from an electron will stop in the calorimeter, a muon will continue 
+    A track from an electron will stop in the calorimeter, a muon will continue
     through as a minimum-ionising particle.
-    It therefore provides further orthogonal information to the 
+    It therefore provides further orthogonal information to the
     particle-identification system.
 
 KLM
     Finally, there is the KLong and Muon (KLM) system.
-    The KLM provides muon identification information to tracks that pass 
+    The KLM provides muon identification information to tracks that pass
     through all other subdetectors and also reconstructs :math:`K_L^0` s from
     the collision.
 
@@ -309,10 +309,10 @@ KLM
     There are two more useful reference documents that you should be aware of.
     Now seems like a good time to mention them.
 
-    1. Bevan, A. *et al*. The Physics of the B Factories. *Eur.Phys.J. C* **74** 3026(2014). 
+    1. Bevan, A. *et al*. The Physics of the B Factories. *Eur.Phys.J. C* **74** 3026(2014).
        https://doi.org/10.1140/epjc/s10052-014-3026-9
 
-    2. Kou, E. *et al*. The Belle II physics book, *PTEP 2019* **12** 123C01, 
+    2. Kou, E. *et al*. The Belle II physics book, *PTEP 2019* **12** 123C01,
        https://doi.org/10.1093/ptep/ptz106.
 
     The former is a book describing the previous generation B-factories (the detectors and their achievements).
@@ -324,8 +324,8 @@ KLM
 Data taking: on resonance, continuum, cosmics
 ---------------------------------------------
 
-To collect :math:`B` mesons one must collide electrons and positrons at the centre-of-mass energy of 
-:math:`\sqrt{s} = 10.580` GeV, corresponding to the :math:`\Upsilon(4S)` resonance mass. 
+To collect :math:`B` mesons one must collide electrons and positrons at the centre-of-mass energy of
+:math:`\sqrt{s} = 10.580` GeV, corresponding to the :math:`\Upsilon(4S)` resonance mass.
 However this is not the only energy at which the SuperKEKB accelerator can work, and it's not the only
  kind of dataset that Belle II collects.
 
@@ -333,37 +333,37 @@ On-resonance
     The standard collisions at :math:`\sqrt{s} = 10.580` GeV.
 
 Off-resonance
-    :math: `e^+e^- \to \Upsilon(4S) \to B\bar{B}` is not the only process that takes place at 
-    :math:`\sqrt{s} = 10.580` GeV. The production of light and charm quark pairs in the reaction 
-    :math: `e^+e^- \to u\bar{u}, d\bar{d}, s\bar{s}, c\bar{c}` has a total cross section of about :math:`3.7` 
-    nb is more that three times larger than the production of :math:`B` mesons. As the quarks hadronize leaving 
+    :math: `e^+e^- \to \Upsilon(4S) \to B\bar{B}` is not the only process that takes place at
+    :math:`\sqrt{s} = 10.580` GeV. The production of light and charm quark pairs in the reaction
+    :math: `e^+e^- \to u\bar{u}, d\bar{d}, s\bar{s}, c\bar{c}` has a total cross section of about :math:`3.7`
+    nb is more that three times larger than the production of :math:`B` mesons. As the quarks hadronize leaving
     final states that are similar to the :math:`B\bar{B}`. This background can be studied using the Montecarlo
-    simulation, but it's more effective to study it directly on data. Occasionally, 2-3 times per year, a 
-    special dataset is collected approximatively 60 MeV below the :math:`\Upsilon(4S)`. Here no :math:`B` mesons 
-    can be produced, leaving one with a pure sample of continuum events, called *off-resonance* (or *continuum*) sample. 
+    simulation, but it's more effective to study it directly on data. Occasionally, 2-3 times per year, a
+    special dataset is collected approximatively 60 MeV below the :math:`\Upsilon(4S)`. Here no :math:`B` mesons
+    can be produced, leaving one with a pure sample of continuum events, called *off-resonance* (or *continuum*) sample.
 
 Cosmic
     At the beginning and end of each run period BelleII acquires cosmic muons. These events are used mainly for
-    performance studies and for calibration, as they provide an unique sample for aligning the detectors with 
+    performance studies and for calibration, as they provide an unique sample for aligning the detectors with
     each other. Usually part of this dataset is collected with the solenoid switched off, so that muons cross the
     detectors on straight trajectories. If the SuperKEKB accelerator has a major  downtime of few days, a cosmic dataset
     is usually collected to keep the BelleII system running.
 
 Beam
     Beam runs are special, usually short data takings used to study the beam-induced background on the inner sub-detectors.
-    They are taken with the beams circulating without colliding, to remove all the processes arising from the :math:`e^+e^-` 
+    They are taken with the beams circulating without colliding, to remove all the processes arising from the :math:`e^+e^-`
     hard scattering.
 
 Scan
-   A scan consists of rather short data taking periods (hours or few days long) performed at slightly different energies 
+   A scan consists of rather short data taking periods (hours or few days long) performed at slightly different energies
    (usually 10-50 MeV apart). The goals of a scan is to measure the lineshape of the :math:`e^+e^-` cross section to either
    check that data are collected on the resoanance peak (short scans), or to perform real physics measurements
    such the search for exotic vecotr resoances (long scans above the :math:`\Upsilon(4S)`energy)
 
 Non-4S
-   SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at :math:`9.460` GeV to 
-   slightly above the :math:`Upsilon(6S)`, around :math:`9.460` GeV. These datasets can be used for all the non-B 
-   parts of the BelleII physics program, but are particularly interestign for the spectroscopy, hadronic physics and 
+   SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at :math:`9.460` GeV to
+   slightly above the :math:`Upsilon(6S)`, around :math:`9.460` GeV. These datasets can be used for all the non-B
+   parts of the BelleII physics program, but are particularly interestign for the spectroscopy, hadronic physics and
    dark sector studies.
 
 
@@ -523,7 +523,7 @@ close to minutes per event due to the much higher energy.
     :class: exercise stacked
 
     Assuming it takes one second per event, how long would it take to simulate
-    all the 770 million :math:`B\over{B}` events collected at Belle on one CPU?
+    all the 770 million :math:`B\overline{B}` events collected at Belle on one CPU?
 
     How long would it take to simulate all the :math:`B\bar{B}` events we
     intend to collect for Belle II?
@@ -540,8 +540,8 @@ close to minutes per event due to the much higher energy.
     Multiplying 770 million by one gives us 770 million seconds which is around
     8912 days or roughly 24 years.
 
-    For Belle II we intend to collect :math:`50 \textrm{ab}^{-1}` and the cross section
-    is 1.1 nb. So we expect 55 billion :math:`B\over{B}` events. Equivalent to
+    For Belle II we intend to collect :math:`50\ \textrm{ab}^{-1}` and the cross section
+    is 1.1 nb. So we expect 55 billion :math:`B\overline{B}` events. Equivalent to
     636574 days or 1744 years.
 
 .. admonition:: Question
@@ -606,7 +606,7 @@ that the computing resources we have are not wasted.
 .. seealso::
 
     You have already found the data production group confluence page.
-    If not, take another look at :ref:`the previous lesson <onlinebook_collaborative_tools>`_.
+    If not, take another look at :ref:`the previous lesson <onlinebook_collaborative_tools>`.
     Now might be a good time to bookmark or "watch" some pages.
 
 .. admonition:: Key points
@@ -700,6 +700,14 @@ Track finding
   Find patterns in the hit clusters in the tracking detectors that look like
   they could be from one particle flying through the detector.
 
+.. _fig:reconstruction-trackfinding:
+
+.. figure:: trackfinding.svg
+   :align: center
+
+   The principle of track finding is to identify the patterns in the tracking
+   detectors belonging to each particle.
+
 Track fitting
   Determine the best estimate of the particle trajectories found to obtain
   position and momentum close to the interaction region as precisely as
@@ -722,9 +730,9 @@ reconstruction takes about twice as long as the simulation of an event.
     simulation still takes 1 second and we can buy one CPU/hour for $0.025 in a
     commercial cloud as above.
 
-    For the full experiment we will collect :math:`50 \textrm{ab}^{-1}`. The
+    For the full experiment we will collect :math:`50\ \textrm{ab}^{-1}`. The
     plan is to have a total trigger cross section of 20 nb (so in addition to the
-    1.1 nb of :math:`B\over{B}` we will also have some fraction of continuum,
+    1.1 nb of :math:`B\overline{B}` we will also have some fraction of continuum,
     tau and other events).
 
     How many CPUs do we need to reconstruct all the real data and simulate and
@@ -745,14 +753,15 @@ reconstruction takes about twice as long as the simulation of an event.
     Now all together we will have 1 trillion events from the detector. We have
     to simulate the same amount of events. And reconstruct both.
 
-    That leads to 5 trillion seconds of CPU time or 1.4 trillion CPU hours and
+    That leads to 5 trillion seconds of CPU time or 1.4 billion CPU hours and
     would require 160 thousand CPUs and cost 35 million dollars.
 
-    This is of course a very rough estimate: The 1/2 seconds assumption for
-    simulation/reconstruction is very very rought.  CPUs or the software might
-    get faster and we will not have this amount of data very quickly. Also the
-    CPU price is sure to change or be negotiable. Nevertheless, Computing cost
-    will always be a major driving factor.
+    This is of course a very rough estimate: The 1 and 2 seconds assumption for
+    simulation and reconstruction is very very rough. The time also differs
+    slightly for different event types. CPUs or the software might get faster
+    and we will not have this amount of data very quickly. Also the CPU price is
+    sure to change or be negotiable. Nevertheless, Computing cost will always be
+    a major driving factor.
 
     One of the consequences will be that we cannot produce that much MC so for
     some event types we will only be able have a fraction of the amount of
@@ -790,7 +799,7 @@ expert knowledge:
 * the position of the tracking detector sensors needs to be well known and
   corrected in software (a process called alignment).
 
-So as for the simulation this is something which we centrally organize in Belle
+As for the simulation this is something which we centrally organize in Belle
 II. So, not very surprising, the Data Production group takes charge and
 coordinates with the detector experts the reconstruction of our data.
 
@@ -813,63 +822,63 @@ coordinates with the detector experts the reconstruction of our data.
 Processing: Data formats
 ------------------------
 
-When an e+e- collision happens, the resulting products will leave signal in the BelleII 
-subdetectors that are acquired, matched in time as each subsystem have a different delay 
-and response time (event building), and saved to disk in a packed, binary format. 
-Several steps have to be performed in order to produce a physics result of these 
-hardly-intelligible raw data. These steps are unpacking, calibration, reconstruction 
-and finally analysis. Each of these steps reads and writes different objects, and 
-produces files in different formats. 
+When an e+e- collision happens, the resulting products will leave signal in the BelleII
+subdetectors that are acquired, matched in time as each subsystem have a different delay
+and response time (event building), and saved to disk in a packed, binary format.
+Several steps have to be performed in order to produce a physics result of these
+hardly-intelligible raw data. These steps are unpacking, calibration, reconstruction
+and finally analysis. Each of these steps reads and writes different objects, and
+produces files in different formats.
 
 .. note::
-   All the Belle II data files are root files, where the relevant objects are stored 
-   in the branches of a tree. When we say "different formats", we refer simply to the 
+   All the Belle II data files are root files, where the relevant objects are stored
+   in the branches of a tree. When we say "different formats", we refer simply to the
    different branches contained in those trees.
 
 Let's start form the data objects we save. There are four groups of them: raw, low-level,
-reconstruction-level and analysis-level. The raw objects are the output of the single 
-subsystems: digitized  PMT signals from the TOP, digitized ADC signals form the CDC, and 
-so on. Without any further process, these objects cannot be used. The low-level objects 
-come from the very first step of the data processing, the unpacking. The RAW signals are 
-turned into more abstract and understandable objects: the CDC ACD signals are converted 
-in CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-level 
-objects are foundamentalto understand the detector performance, but they cannot yet be 
-directly used to perform an analysis. The last step is called reconstruction, and consists 
-in running algorithm on the collection of digits to produce analysis-friendly quantities. 
-The output of the reconstruction is are high-level variables like ECL clusters, resulting 
-from running cluster algorithms on the ECLDigits,  tracks resulting from running the 
-tracking algorithms over the collections of CDC, SVD and PXD hits, PID likelihood resulting 
-from the analysis of the TOP signals. In the process of reconstruction the calibrations 
-are applied, correcting for the fluctuations in the detector response. These hgh-level 
-objects are finally read by the analysis software, and turned into analysis-level 
-objects: charged particles, photons, missing energies and all the quantities used to 
+reconstruction-level and analysis-level. The raw objects are the output of the single
+subsystems: digitized  PMT signals from the TOP, digitized ADC signals form the CDC, and
+so on. Without any further process, these objects cannot be used. The low-level objects
+come from the very first step of the data processing, the unpacking. The RAW signals are
+turned into more abstract and understandable objects: the CDC ACD signals are converted
+in CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-level
+objects are foundamentalto understand the detector performance, but they cannot yet be
+directly used to perform an analysis. The last step is called reconstruction, and consists
+in running algorithm on the collection of digits to produce analysis-friendly quantities.
+The output of the reconstruction is are high-level variables like ECL clusters, resulting
+from running cluster algorithms on the ECLDigits,  tracks resulting from running the
+tracking algorithms over the collections of CDC, SVD and PXD hits, PID likelihood resulting
+from the analysis of the TOP signals. In the process of reconstruction the calibrations
+are applied, correcting for the fluctuations in the detector response. These hgh-level
+objects are finally read by the analysis software, and turned into analysis-level
+objects: charged particles, photons, missing energies and all the quantities used to
 present a physics result.
 
 
-In BelleII there are four different data formats, reflecting which data objects are 
+In BelleII there are four different data formats, reflecting which data objects are
 stored in a file:
 
-* RAW. This is the most basic format. It contains the un-processed, un-calibrated output 
-  of the detector. Analysis cannot be run on these data, but they serve as base for the 
+* RAW. This is the most basic format. It contains the un-processed, un-calibrated output
+  of the detector. Analysis cannot be run on these data, but they serve as base for the
   production of the subsequent data format
-* cDST (calibration Data Summary Table). This format contains the same objects as the RAW 
-  (so a full reconstruction could be performed starting from it), plus the results of the 
-  tracking, which is the most demanding part of the reconstruction. The scope of this 
+* cDST (calibration Data Summary Table). This format contains the same objects as the RAW
+  (so a full reconstruction could be performed starting from it), plus the results of the
+  tracking, which is the most demanding part of the reconstruction. The scope of this
   format is to perform low-level detectro studies and calculate calibration constants.
-* mDST (mini Data Summary Table). This is the basic data-analysis format. It contains only 
-  the high level information that can be directly used to perform a physics analysis. 
+* mDST (mini Data Summary Table). This is the basic data-analysis format. It contains only
+  the high level information that can be directly used to perform a physics analysis.
   However, it is not the suggested format to perform analysis.
-* uDST (micro Data Summary Table). This is the main format for data analysis. It's the 
-  result of the analysis skim procedure, that selects from the mDST only the few events 
-  that can be useful for a certain type of analysis (events with a well reconstructed J/psi 
-  per example). The content of this ormat is the same as the mDST, with the addition of the 
-  reconstructed particles used in the skimming selection (if you look at the J/psi skim, 
+* uDST (micro Data Summary Table). This is the main format for data analysis. It's the
+  result of the analysis skim procedure, that selects from the mDST only the few events
+  that can be useful for a certain type of analysis (events with a well reconstructed J/psi
+  per example). The content of this ormat is the same as the mDST, with the addition of the
+  reconstructed particles used in the skimming selection (if you look at the J/psi skim,
   you will also find a list of J/psi already reconstructed for you in the file).
 
 
 .. note::
-   If you are simply running an analysis, you will mostly use uDST, if you are also involed 
-   in performance studies you will probably use cDST as well and if your core activity will 
+   If you are simply running an analysis, you will mostly use uDST, if you are also involed
+   in performance studies you will probably use cDST as well and if your core activity will
    be hardware operations, you will be mostly dealing with the RAW and cDST formats.
 
 
@@ -877,22 +886,22 @@ stored in a file:
 Analysis: reconstructed and combined particles
 ----------------------------------------------
 
-The Belle II detectors can provide three kind of information: 
+The Belle II detectors can provide three kind of information:
 * Momentum
-* Energy 
-* PID probability. 
+* Energy
+* PID probability.
 
-Of course not all of them are available for every particle, in fact in most cases 
-only two of them are, and however only for a very limited number of particles.  Most of the particles 
-in the :math:`e^+e^-` collision do not live long enough to leave any signal inside the detector, and must 
-be reconstructed measuring their decay products. This introduces the very important distinction 
+Of course not all of them are available for every particle, in fact in most cases
+only two of them are, and however only for a very limited number of particles.  Most of the particles
+in the :math:`e^+e^-` collision do not live long enough to leave any signal inside the detector, and must
+be reconstructed measuring their decay products. This introduces the very important distinction
 bewteen measured particles, who leave a signal inside the detector and are reconstructed directly
 starting from those signals and combined particles that are reconstructed as sum of measure particles.
 
 .. admonition:: Question
     :class: exercise stacked
 
-    What is the average flight lenght of a 1 GeV muon and a 1 GeV :math:`D^+` meson? 
+    What is the average flight lenght of a 1 GeV muon and a 1 GeV :math:`D^+` meson?
     Do they both reach the tracking system?
 
 .. admonition:: Hint
@@ -904,18 +913,18 @@ starting from those signals and combined particles that are reconstructed as sum
 .. admonition:: Solution
     :class: toggle solution
 
-    The average flight length of a particle of speed :math:`\beta` and lifetime 
-    :math:`\tau` is 
+    The average flight length of a particle of speed :math:`\beta` and lifetime
+    :math:`\tau` is
     :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = E/M` while :math:`\beta = p/E`,
     therefore :math:`L = c\tau p/M`. From this:
     :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` :math:`\mu m`. Only the muon reaches
     the tracking system.
-	  
+
 
 .. admonition:: Question
     :class: exercise stacked
 
-    Keeping in mind the result of the previous exercise, which particles do you think survive long 
+    Keeping in mind the result of the previous exercise, which particles do you think survive long
     enough to reach the active volume of the detector and leave signal there?
 
 .. admonition:: Hint
@@ -927,28 +936,28 @@ starting from those signals and combined particles that are reconstructed as sum
 .. admonition:: Solution
     :class: toggle solution
 
-      
-    Let's start from the charged particles. 
-    All the strongly- or electromagnetically.decaying resonances, both charged and neutral 
-    (:math:`rho`, :math:`K^\star`, :math:`\pi^0`, ...) do not 
+
+    Let's start from the charged particles.
+    All the strongly- or electromagnetically.decaying resonances, both charged and neutral
+    (:math:`rho`, :math:`K^\star`, :math:`\pi^0`, ...) do not
     live long enough to significnatly move away from the :math:`e^+e^-` interaction point, so they can
-    only be reconstructed detecting their decay products.     
-    Proton, electrons and their anti-particles are stable and definitively leave ionization signals 
-    in the tracking system, so they should be in the list. 
+    only be reconstructed detecting their decay products.
+    Proton, electrons and their anti-particles are stable and definitively leave ionization signals
+    in the tracking system, so they should be in the list.
     Other particles that could leave ionization are the long-lived, weakly decaying particles.
-    Charged pions, charged kaons and muons are not stable, but we saw already that the latter has a 
-    very long flight lenght, usually exceeding the scale of the detector. Pions and kaons decay much 
-    faster than a muon, buts still have a :math:`c\tau` of approximatively 8 and 4 meters respectively, 
-    which make then likely to leave a detectable track before decaying. The are both on the list. 
-    :math:`D` and :math:`B` mesons fly much less than a mm before decaying, so they cannot leave any 
+    Charged pions, charged kaons and muons are not stable, but we saw already that the latter has a
+    very long flight lenght, usually exceeding the scale of the detector. Pions and kaons decay much
+    faster than a muon, buts still have a :math:`c\tau` of approximatively 8 and 4 meters respectively,
+    which make then likely to leave a detectable track before decaying. The are both on the list.
+    :math:`D` and :math:`B` mesons fly much less than a mm before decaying, so they cannot leave any
     detectable track.
-    Some hyperons, strange baryons, are charged and have a sizable lifetime. The longest-liviging one 
-    is the :math:`Csi^-` with a lifetime of 0.7 ns corresponding to `c\tau \approx 5` cm. Such particle, 
-    especially if it has few GeV of momentum, can cross the PXD and even the inner layers of the SVD 
-    leaving a signal. However, such short track would be very difficoult to reconstruct, and it's 
+    Some hyperons, strange baryons, are charged and have a sizable lifetime. The longest-liviging one
+    is the :math:`Csi^-` with a lifetime of 0.7 ns corresponding to `c\tau \approx 5` cm. Such particle,
+    especially if it has few GeV of momentum, can cross the PXD and even the inner layers of the SVD
+    leaving a signal. However, such short track would be very difficoult to reconstruct, and it's
     much more convenient to reconstruct these hyperons looking at their (almost) stable decay products.
-    Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as 
-    deuteron, tritium od helium. These can be produced ether in the :math:`e^+e^-` collision or, much more 
+    Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as
+    deuteron, tritium od helium. These can be produced ether in the :math:`e^+e^-` collision or, much more
     easily, by spallation processes on the inner detector materials.
 
 
@@ -957,35 +966,35 @@ starting from those signals and combined particles that are reconstructed as sum
     leaves no signal in the tracking system and the ECL is not designed as an hadronic calorimeter.
     There are studies focused on reconstructing this particle in the ECL, but let's leave it out
     of the list for the moment.
-    The :math:`K_L` has :math:`c\tau \approx 15 m`, so it's definitiley to be considered stable 
+    The :math:`K_L` has :math:`c\tau \approx 15 m`, so it's definitiley to be considered stable
     in the scale of the experiment. As the neutron is leaves no ionization, but the KLM is designed
     to detect its interaction in the iron layersof the solenoid's return yoke. Let's count it as a
     reconstucted particle.
     :math:`Lambda` and :math:`K_s` behave similarly to the :math:`K_L`,but their lifetime is much shorter
-    and, at the Belle II energies, theymostly decay inside the tracking volume. The most convenient way 
+    and, at the Belle II energies, theymostly decay inside the tracking volume. The most convenient way
     to reconstruct and combine their decay products, pions and proton.
 
 
 Let's see now how reconstructed and combined particles are handled, and what are the special cases.
-Recontructed particles are alsoe referres as *final state particles (FSP)*, as they are the very final 
+Recontructed particles are alsoe referres as *final state particles (FSP)*, as they are the very final
 products of any decay chain we may be interested in reconstructing.
 In making an analysis, one has three building blocks:
 
-Reconstructed particle 
-    Reconstructed particles are the basic building block for any analysis. The originate from two 
+Reconstructed particle
+    Reconstructed particles are the basic building block for any analysis. The originate from two
     different reconstruction objects: charged particles are reconstructed from tracks, photons and
     :math:`K_L` from ECL or KLM clusters. Of course a charged track entering the ECL will leave a signal,
     so one can have a cluster attached to a charged tracks.
     The tracking can only measur ethe 3-momentum of a particle, so to calculate its 4-momentum one
     has to make an assumpion on the mass. This is usually based on the response of the PID system.
     On the other hand cltsers provide a measurement of the energy, but not of the momentum. To get it, we
-    make both an assumpion on the particle mass, and on its production point (all photons and :math:`K_L` are 
+    make both an assumpion on the particle mass, and on its production point (all photons and :math:`K_L` are
     assumed to originate in the primary interaction point).
-    Tracks and clusters are produced during the reconstruction step. The only operation that is left to the 
+    Tracks and clusters are produced during the reconstruction step. The only operation that is left to the
     final user at the analysis level is the mass assignment.
 
 Combined particles
-   Summing the 4-momenta of reconstructed particles one can reconstruct any resonance, at least as 
+   Summing the 4-momenta of reconstructed particles one can reconstruct any resonance, at least as
    long as all itsdecay products are measured. One can then proceed further and combine combined particles
    to move upwards ina decay tree, until the desired step is reached.
    The creation of combined particles is done at the analysis level by the final user, using the tools
@@ -993,9 +1002,9 @@ Combined particles
 
 V0
    Finally, there's a class of combined particle that require a special treatment, and are therefore provided
-   to the user by the reconstruction procedure. So called V0 are neutral particles decaying into two charged 
-   particles far from the interaction point, leaving a typical V-shaped signature. These particles can of course be 
-   reconstructed combining the 4-momenat of their daughters, but if the decay has happened outside of the beam pipe 
+   to the user by the reconstruction procedure. So called V0 are neutral particles decaying into two charged
+   particles far from the interaction point, leaving a typical V-shaped signature. These particles can of course be
+   reconstructed combining the 4-momenat of their daughters, but if the decay has happened outside of the beam pipe
    it is better to re-run the tracking before doing it, since if a track originates not in the IP, it will cross less
    material than expected and the multiple scattering corrections must be updated.
 
@@ -1019,4 +1028,3 @@ Describe here:
 .. topic:: Author of this lesson
 
     Umberto Tamponi
-

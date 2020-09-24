@@ -298,8 +298,8 @@ Bremsstrahlung recovery?
 
        # Assuming your DataFrame is called df, and you imported 
        # matplotlib.pyplot as plt
-       df.hist("Jpsi_M_uncorrected",label="w/o brems corr")
-       df.hist("J_psi_M",label="with brems corr", alpha=0.7)
+       df[df.J_psi_isSignal == 1].hist("Jpsi_M_uncorrected",label="w/o brems corr")
+       df[df.J_psi_isSignal == 1].hist("J_psi_M",label="with brems corr", alpha=0.7)
        plt.yscale("log") #set a logarithmic scale in the y-axis
        plt.legend() #show legend      
  

@@ -72,7 +72,7 @@ We now want to reconstruct the Rest of Event of the ``B0``.
 .. admonition:: Solution
      :class: toggle solution
 
-     .. literalinclude:: python
+     .. literalinclude:: steering_files/029_roe.py
          :lines: 47-48
          :emphasize-lines: 48
          :linenos:
@@ -82,6 +82,9 @@ Behind these python curtains, a ``RestOfEvent`` object is created for each parti
 particle list and it includes all other charged or neutral particles, that have not been
 associated to the corresponding signal candidate. By default, the charged particles assumed to be pions,
 and the neutral particles have photon or :math:`K_L^0` hypothesis.
+
+ROE variables
+~~~~~~~~~~~~~
 
 In principle, one can already try to use some of the Rest of Event variables.
 
@@ -94,7 +97,7 @@ In principle, one can already try to use some of the Rest of Event variables.
      :class: toggle xhint stacked
 
      One can use search feature in the basf2 documentation, or use offline help by typing ``basf2 variables.py``
-     in bash terminal.
+     in bash terminal (for example ``basf2 variables.py | grep -i roe``).
 
 .. admonition:: Solution
      :class: toggle solution
@@ -103,13 +106,29 @@ In principle, one can already try to use some of the Rest of Event variables.
      which starts from :b2:var:`bssMassDifference` variable.
 
 
-Among the most usiversal and useful are ROE invariant mass :b2:var:`roeM` or ROE energy :b2:var:`roeE`,
-but we need to clean up the ROE particles first to make the best use of them.
+Among the most usiversal and useful are ROE invariant mass :b2:var:`roeM` or ROE energy :b2:var:`roeE`.
 
-Rest of Event masks
-~~~~~~~~~~~~~~~~~~~
+Remember that we were collecting all variables in the ``b_vars`` list.
+Let's include the following lines to have a useful selection of them:
 
-The main philosophy of the Rest of Event is to include *every* particle in the event,
+.. literalinclude:: steering_files/029_roe.py
+     :lines: 61-68
+     :linenos:
+
+.. admonition:: Exercise
+     :class: exercise
+
+     Run your steering file and check that it completes without error.
+
+In principle we could already start to do an analysis.
+However, the ROE variables that we have just defined are not quite useful yet:
+we first need to "clean up" the ROE.
+For this, we define ROE masks.
+
+ROE masks
+~~~~~~~~~
+
+The main philosophy of the ROE is to include *every* particle in the event,
 that has not been associated to the signal candidate and it is up to the analyst to
 decide what particles are actually matter for the analysis.
 That is why, a typical ROE contains not only the partner particle, but also all other particles, like
@@ -120,7 +139,7 @@ to get the best possible use of it.
 That is why we have a concept of the ROE masks, which are just sets of selection cuts
 to be applied on the ROE particles. One can start from defining the following selection cut strings:
 
-.. literalinclude:: python
+.. literalinclude:: steering_files/029_roe.py
      :lines: 47-50
      :emphasize-lines: 50-51
      :linenos:
@@ -151,7 +170,7 @@ because of different methods of measurement used to detect these particles.
      :class: toggle solution
 
 
-     .. literalinclude:: python
+     .. literalinclude:: steering_files/029_roe.py
          :lines: 47-52
          :emphasize-lines: 51-52
          :linenos:
@@ -165,12 +184,60 @@ algorithms or ROE variables, like ``roeM(my_mask)`` or ``roeE(my_mask)``. Also, 
 :b2:var:`nROE_Charged` or :b2:var:`nROE_Photons` to know how many charged particles or
 photons entered the ROE or the ROE mask.
 
+In the last section, we defined two lists of ROE variables. Now we want to have
+the same variables but with the ``my_mask`` mask. Since we're lazy, we use python
+loop to insert this argument.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Write a ``for`` loop that runs over ``roe_kinematics + roe_multiplicities`` and
+     replaces the ``()`` of each variable with ``(my_mask)``. Add these new
+     variables to the ``b_vars`` list.
+
+.. admonition:: Exercise
+     :class: hint stacked toggle
+
+     .. code-block:: python
+
+        >>> "roeE()".replace("()", "(my_mask)")
+        'roeE(my_mask)
+
+.. admonition:: Solution
+     :class: solution toggle
+
+     .. literalinclude:: steering_files/029_roe.py
+         :lines: 62-73
+         :emphasize-lines: 70-73
+         :linenos:
+
 .. tip::
 
     There are also KLM-based hadrons in ROE, like :math:`K_L^0` or neutrons, but they are
     not participating in ROE 4-momentum computation, because of various temporary
     difficulties in KLM reconstruction. Nevertheless, one can count them using
     :b2:var:`nROE_NeutralHadrons` variable.
+
+.. admonition:: Exercise
+     :class: exercise
+
+     Your steering file is now complete. Run it!
+
+.. admonition:: Solution
+     :class: solution toggle
+
+     Your steering file should look like this:
+
+     .. literalinclude:: steering_files/029_roe.py
+         :lines: 62-73
+         :emphasize-lines: 47-52,62-73
+         :linenos:
+
+
+Quick plots
+~~~~~~~~~~~
+
+
 
 This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`onlinebook_cs`,
 :ref:`onlinebook_flavor_tagging` or tag :ref:`onlinebook_vertex_fitting`.

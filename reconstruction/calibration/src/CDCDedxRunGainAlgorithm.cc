@@ -68,8 +68,8 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
     runtemp = run;
   }
 
-  //min 250 good events otherwise merge to next run
-  if (hDedx->Integral() < 500) {
+  //min 500 good events otherwise merge to next run
+  if (hDedx->Integral() < 1000) {
     B2INFO("Not enough data for run (" << runtemp << ") so far only " << hDedx->Integral() << " therefore adding next run");
     fsrun += Form("%d_", runtemp);
     delete hDedx;

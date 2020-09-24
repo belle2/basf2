@@ -147,7 +147,6 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   std::vector<double> cosine;
   for (unsigned int i = 0; i < fCosbins; ++i) {
 
-    TString status = "";
 
     TLine* tl = new TLine();
     tl->SetLineColor(kBlack);
@@ -156,6 +155,8 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
     double fdEdxMeanErr = 0.0;
 
     if (!isMethodSep) {
+
+      TString status = "";
 
       double fdEdxSigma = 0.0, fdEdxSigmaErr = 0.0;
       FitGaussianWRange(hdEdx_epCosbin[i], status);
@@ -193,19 +194,20 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
       double fdEdxSigma_el = 0.0, fdEdxSigma_elErr = 0.0;
       double fdEdxMean_po = 1.0, fdEdxMean_poErr = 0.0;
       double fdEdxSigma_po = 0.0, fdEdxSigma_poErr = 0.0;
+      TString status_el = "", status_po = "";
 
       //Fit _eltrons in cos bins
-      FitGaussianWRange(hdEdx_elCosbin[i], status);
-      if (status != "FitOK") {
+      FitGaussianWRange(hdEdx_elCosbin[i], status_el);
+      if (status_el != "FitOK") {
         fdEdxMean_el = 1.0;
-        hdEdx_elCosbin[i]->SetTitle(Form("%s, Fit(%s)", hdEdx_elCosbin[i]->GetTitle(), status.Data()));
+        hdEdx_elCosbin[i]->SetTitle(Form("%s, Fit(%s)", hdEdx_elCosbin[i]->GetTitle(), status_el.Data()));
       } else {
         fdEdxMean_el = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParameter(1);
         fdEdxMean_elErr = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParError(1);
         fdEdxSigma_el = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParameter(2);
         fdEdxSigma_elErr = hdEdx_elCosbin[i]->GetFunction("gaus")->GetParError(2);
         hdEdx_elCosbin[i]->SetTitle(Form("%s, Fit (%s), #mu_{fit}: %0.04f#pm%0.04f,, #sigma_{fit}: %0.04f", hdEdx_elCosbin[i]->GetTitle(),
-                                         status.Data(), fdEdxMean_el, fdEdxMean_elErr, fdEdxSigma_el));
+                                         status_el.Data(), fdEdxMean_el, fdEdxMean_elErr, fdEdxSigma_el));
       }
 
       hdEdxMeanvsCos_el->SetBinContent(i + 1, fdEdxMean_el);
@@ -214,17 +216,25 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
       hdEdxSigmavsCos_el->SetBinError(i + 1, fdEdxSigma_elErr);
 
       //Fit _potron in cos bins
-      FitGaussianWRange(hdEdx_poCosbin[i], status);
-      if (status != "FitOK") {
+      FitGaussianWRange(hdEdx_poCosbin[i], status_po);
+      if (status_po != "FitOK") {
         fdEdxMean_po = 1.0;
-        hdEdx_poCosbin[i]->SetTitle(Form("%s, Fit(%s)", hdEdx_poCosbin[i]->GetTitle(), status.Data()));
+        hdEdx_poCosbin[i]->SetTitle(Form("%s, Fit(%s)", hdEdx_poCosbin[i]->GetTitle(), status_po.Data()));
       } else {
         fdEdxMean_po = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParameter(1);
         fdEdxMean_poErr = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParError(1);
         fdEdxSigma_po = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParameter(2);
         fdEdxSigma_poErr = hdEdx_poCosbin[i]->GetFunction("gaus")->GetParError(2);
         hdEdx_poCosbin[i]->SetTitle(Form("%s, Fit (%s), #mu_{fit}: %0.04f#pm%0.04f,, #sigma_{fit}: %0.04f", hdEdx_poCosbin[i]->GetTitle(),
-                                         status.Data(), fdEdxMean_po, fdEdxMean_poErr, fdEdxSigma_po));
+                                         status_po.Data(), fdEdxMean_po, fdEdxMean_poErr, fdEdxSigma_po));
+      }
+
+      if (status_po != "FitOK" && status_el == "FitOK") {
+        fdEdxMean_po = fdEdxMean_el;
+      } else if (status_el == "FitOK" && status_po != "FitOK") {
+        fdEdxMean_el = fdEdxMean_po;
+      } else if (status_el != "FitOK" && status_po != "FitOK") {
+        fdEdxMean_po = 1.0; fdEdxMean_el = 1.0;
       }
 
       hdEdxMeanvsCos_po->SetBinContent(i + 1, fdEdxMean_po);
@@ -442,7 +452,7 @@ void CDCDedxCosineAlgorithm::generateNewPayloads(std::vector<double> cosine)
 
 void CDCDedxCosineAlgorithm::FitGaussianWRange(TH1D*& temphist, TString& status)
 {
-  if (temphist->Integral() < 500) {
+  if (temphist->Integral() < 2000) { //atleast 1k bhabha events
     B2INFO(Form("\tThis hist (%s) have insufficient entries to perform fit (%0.03f)", temphist->GetName(), temphist->Integral()));
     status = "LowStats";
     return;

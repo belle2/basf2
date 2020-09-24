@@ -49,7 +49,6 @@ def get_calibrations(input_data, **kwargs):
         input_files_coscorr = file_to_iov_physics
         input_files_wiregain = file_to_iov_physics
     else:
-
         from prompt.utils import filter_by_max_events_per_run, filter_by_max_events_per_dataset
         # collection for rungains
         max_files_for_maxevents = 50000  # (around 5-6 random files per run) ~ 15% loss -> 80k tracks per run
@@ -58,16 +57,20 @@ def get_calibrations(input_data, **kwargs):
         basf2.B2INFO(f"Total number of files used for rungains = {len(input_files_rungain)}")
 
         # collection for cosinecorr
-        max_events_per_dataset = 15e6  # (~0.4 fb-) events max (random files for all runs) ~ 15% loss
-        reduced_file_to_iov_coscorr = filter_by_max_events_per_dataset(file_to_iov_physics, max_events_per_dataset)
-        input_files_coscorr = list(reduced_file_to_iov_coscorr.keys())
+        max_events_per_dataset = 15e6  # (~0.35 fb-) events from random files from dataset
+        input_files_coscorr = filter_by_max_events_per_dataset(list(file_to_iov_physics.keys()), max_events_per_dataset)
         basf2.B2INFO(f"Total number of files used for cosine = {len(input_files_coscorr)}")
+        if not input_files_coscorr:
+            raise ValueError(
+                f"Cosine: all requested (%d) events not found" % max_events_per_dataset)
 
         # collection for cosinecorr
-        max_events_per_dataset = 20e6  # 20(~0.5 fb-) events max (random files for all runs)
-        reduced_file_to_iov_wiregain = filter_by_max_events_per_dataset(file_to_iov_physics, max_events_per_dataset)
-        input_files_wiregain = list(reduced_file_to_iov_wiregain.keys())
+        max_events_per_dataset = 20e6  # (~0.5 fb-) events from random files from dataset
+        input_files_wiregain = filter_by_max_events_per_dataset(list(file_to_iov_physics.keys()), max_events_per_dataset)
         basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")
+        if not input_files_wiregain:
+            raise ValueError(
+                f"WireGain: all requested (%d) events not found" % max_events_per_dataset)
 
     requested_iov = kwargs.get("requested_iov", None)
     from caf.utils import IoV

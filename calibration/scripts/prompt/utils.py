@@ -128,77 +128,45 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, randomSel):
     return new_files_to_iov
 
 
-def filter_by_max_events_per_dataset(files_to_iov, max_events_per_dataset):
+def filter_by_max_events_per_dataset(input_file_list, max_events_per_dataset):
     """
-    This function creates a new files_to_iov dictionary by appending files
-    in order until the maximum number of events are reached per data set.
-
-    a single random files for each run are considered in the first round
-    and these rounds are repeated until the max events criteria is fullfilled.
+    This function creates a new list by appending random files until
+    the maximum number of events are reached per data set.
 
     Parameters:
-        files_to_iov (dict): {"/path/to/file.root": IoV(1,1,1,1)} type dictionary. Same style as used by the CAF
-            for lookup values.
+        input_file_list (list): {"/path/to/file2.root", "/path/to/file2.root" }
         max_events_per_dataset (int): The threshold we want to reach but stop adding files if we reach it.
 
     Returns:
-        dict: The same style of dict as the input files_to_iov, but filtered down.
+        list: The sorted list of random files or empty list of not enought found
     """
 
-    # Invert dictionary so that files are grouped against the same IoV
-    iov_to_files = group_files_by_iov(files_to_iov)
-    # Ready a new dict to contain the reduced lists
-    new_iov_to_files = OrderedDict()
-
-    restart_loop = True
-    rounds = 0
     total = 0
-    all_file = []
-    n_file = sum(len(files) for iov, files in iov_to_files.items())
-    while restart_loop:
-        restart_loop = False
-        for iov, files in sorted(iov_to_files.items()):
-            run = ExpRun(iov.exp_low, iov.run_low)
-            remaining_files = files[:]
-            this_file = []
+    selected_file = []
+    while total < max_events_per_dataset:
 
-            if total < max_events_per_dataset and remaining_files and len(all_file) < n_file:
-                file_path = choice(remaining_files)
-                # duplicate files are skipped
-                if file_path in all_file:
-                    continue
-                events = events_in_basf2_file(file_path)
-                total += events
-                # Empty files are skipped
-                if not events:
-                    B2INFO(f"No events in {file_path}, skipping...")
-                    continue
-                this_file.append(file_path)
-                all_file.append(file_path)
-                B2INFO(f"Choosing input file for {run}: {file_path} and total events so far {total}")
-                # Don't bother making empty input list for a Run
-                if this_file:
-                    if rounds == 0:
-                        new_iov_to_files[iov] = this_file
-                    else:
-                        new_iov_to_files[iov].append(file_path)
-                else:
-                    B2INFO(f"No files chosen for {run}")
-            else:
-                restart_loop = False
-                break
+        if not input_file_list:
+            break
 
-        if total < max_events_per_dataset and len(all_file) < n_file:
-            rounds += 1  # restart round
-            restart_loop = True
-            B2INFO(f"\t ..need more files and starting round # {rounds}")
+        file_path = choice(input_file_list)
+        input_file_list.remove(file_path)
 
-    # Now go back to files_to_iov dictionary
-    new_files_to_iov = OrderedDict()
-    for iov, files in new_iov_to_files.items():
-        for path in files:
-            new_files_to_iov[path] = iov
-    return new_files_to_iov
+        events = events_in_basf2_file(file_path)
+        # Empty files are skipped
+        if not events:
+            B2INFO(f"No events in {file_path}, skipping...")
+            continue
+
+        total += events
+        selected_file.append(file_path)
+        B2INFO(f"Choosing random input file: {file_path} and total events so far {total}")
+
+    # return empty list if request events found
+    if total < max_events_per_dataset:
+        B2INFO(f"total events {total} are less than requested {max_events_per_dataset}")
+        selected_file = []
+
+    return sorted(selected_file)
 
 
 def events_in_basf2_file(file_path):

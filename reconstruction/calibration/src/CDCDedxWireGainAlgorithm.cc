@@ -148,7 +148,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
     if (htempPerWire->Integral() == 0) {
       truncMean  = 0.0; //dead wire
-    } else if (htempPerWire->Integral() < 500) {
+    } else if (htempPerWire->Integral() < 1000) {
       truncMean  = 1.0; //partial dead or bad wire
     } else {
       if (!isLTruc) {

@@ -231,8 +231,10 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
       if (status_po != "FitOK" && status_el == "FitOK") {
         fdEdxMean_po = fdEdxMean_el;
-      } else if (status_el == "FitOK" && status_po != "FitOK") {
+        hdEdx_poCosbin[i]->SetTitle(Form("%s, mean (manual) = elec left", hdEdx_poCosbin[i]->GetTitle()));
+      } else if (status_el != "FitOK" && status_po == "FitOK") {
         fdEdxMean_el = fdEdxMean_po;
+        hdEdx_elCosbin[i]->SetTitle(Form("%s, mean (manual) = posi right", hdEdx_elCosbin[i]->GetTitle()));
       } else if (status_el != "FitOK" && status_po != "FitOK") {
         fdEdxMean_po = 1.0; fdEdxMean_el = 1.0;
       }

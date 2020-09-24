@@ -52,30 +52,33 @@ lepton.
 Basics
 ------
 
-In this chapter we will assume that you have successfully constructed your first
-`basf2` script and have your signal particle list in place.
-Lets assume that the signal particle list is called ``X:signal`` and already successfully loaded or
-reconstructed, then one has to have the following code to reconstruct the Rest of Event:
+In this chapter we will continue our work on the steering file from the last lesson.
+Remember that you have reconstructed a ``B0`` particle list.
+We now want to reconstruct the Rest of Event of the ``B0``.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-      Create a Rest Of Event for signal particle list
+      Look up how to create a Rest Of Event for your particle list
+      (it's a single line of code).
+      Add the ``fillWithMostLikely=True`` option.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     One can always look for help in the basf2 documentation, particularly `RestOfEvent` chapter.
+     You have already found the `RestOfEvent` chapter in the last exercise.
+     Take a look at the basic usage example.
 
 .. admonition:: Solution
      :class: toggle solution
 
-     .. code-block:: python
-
-          ma.buildRestOfEvent('X:signal', path=main_path)
+     .. literalinclude:: python
+         :lines: 47-48
+         :emphasize-lines: 48
+         :linenos:
 
 That's it, the ROE has been reconstructed!
-Behind these python curtains, a ``RestOfEvent`` object is created for each particle in ``X:signal``
+Behind these python curtains, a ``RestOfEvent`` object is created for each particle in ``B0``
 particle list and it includes all other charged or neutral particles, that have not been
 associated to the corresponding signal candidate. By default, the charged particles assumed to be pions,
 and the neutral particles have photon or :math:`K_L^0` hypothesis.
@@ -117,10 +120,11 @@ to get the best possible use of it.
 That is why we have a concept of the ROE masks, which are just sets of selection cuts
 to be applied on the ROE particles. One can start from defining the following selection cut strings:
 
-.. code-block:: python
+.. literalinclude:: python
+     :lines: 47-50
+     :emphasize-lines: 50-51
+     :linenos:
 
-        track_based_cuts = 'thetaInCDCAcceptance and p > 0.075'
-        ecl_based_cuts = 'thetaInCDCAcceptance and E > 0.05'
 
 Here we create different cuts for charged particles, like electrons or charged pions, and for photons,
 because of different methods of measurement used to detect these particles.
@@ -134,25 +138,27 @@ because of different methods of measurement used to detect these particles.
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Create Rest Of event mask using `charged_cuts` and `photon_cuts` strings.
+     Create a ROE mask using the `charged_cuts` and `photon_cuts` strings with the
+     `appendROEMask` or `appendROEMasks` function.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     One can look into `appendROEMask` or `appendROEMasks` documentation.
+     A mask is defined as a tuple with three values. Use `appendROEMasks` to
+     "activate" it.
 
 .. admonition:: Solution
      :class: toggle solution
 
 
-     .. code-block:: python
+     .. literalinclude:: python
+         :lines: 47-52
+         :emphasize-lines: 51-52
+         :linenos:
 
-              roe_mask = ('my_mask', track_based_cuts, ecl_based_cuts)
-              ma.appendROEMasks('X:signal', [roe_mask], path=main_path)
-
-     Here we have created a mask with a name ``my_mask``, that will contain only track-based
-     particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
-     ``ecl_based_cuts``.
+ Now we have created a mask with a name ``my_mask``, that will contain only track-based
+ particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
+ ``ecl_based_cuts``.
 
 The analyst can create as many ROE masks as needed and use them in different ROE-dependent
 algorithms or ROE variables, like ``roeM(my_mask)`` or ``roeE(my_mask)``. Also, one can call

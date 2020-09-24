@@ -13,26 +13,17 @@ The computing system
     **Prerequisites**:
 
         * An internet browser
-        * DESY accounts
-        * :ref:`onlinebook_collaborative_tools` lesson.
-        * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
-        * Basic bash
+        * Basics of data production in Belle II
+        * Notions of skimming
 
     **Questions**:
 
-        * What is the grid
-        * What is a basf2 module, path, steering file?
-        *
+        * What is the grid?
+
 
     **Objectives**:
 
-        * Understand
-        * Find the right chapters in this documentation.
-        * Run basf2 and display a list of variables
-        * Run basf2 in interactive ipython shell mode.
-        * Access the help in 3 different ways.
-        * Confidently read the source code for a `modularAnalysis` convenience
-          function.
+        * Understand...
 
 
 The distributed computing system (a.k.a. "The Grid")
@@ -71,3 +62,6 @@ Access to the data available on the grid is performed
     :alt: Computing model
 
     The Belle II distributed computing model.
+
+
+Work in progress...

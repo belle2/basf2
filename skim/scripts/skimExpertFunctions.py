@@ -37,7 +37,7 @@ def get_test_file(sampleName):
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
-        sampleFileName (str): The path to the test file on KEKCC.
+        The path to the test file on KEKCC.
     """
     sampleInfo = _get_test_sample_info(sampleName)
 
@@ -56,7 +56,7 @@ def get_total_infiles(sampleName):
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
-        nInFiles (int): Total number of input files for sample.
+        Total number of input files for sample.
     """
     sampleInfo = _get_test_sample_info(sampleName)
 
@@ -74,7 +74,7 @@ def get_events_per_file(sampleName):
     Args:
         sampleName (str): Name of the sample. MC samples are named *e.g.* "MC12_chargedBGx1", "MC9_ccbarBGx0"
     Returns:
-        nEventsPerFile (int): The average number of events in file of the given sample type.
+        The average number of events in file of the given sample type.
     """
     sampleInfo = _get_test_sample_info(sampleName)
 
@@ -101,7 +101,7 @@ def add_skim(label, lists, path):
     summaryOfLists(lists, path=path)
 
 
-def setSkimLogging(path, additional_modules=[]):
+def setSkimLogging(path, additional_modules=None):
     """
     Turns the log level to ERROR for  several modules to decrease
     the total size of the skim log files
@@ -111,6 +111,8 @@ def setSkimLogging(path, additional_modules=[]):
         additional_modules (list(str)): an optional list of extra noisy module
             names that should be silenced
     """
+    if additional_modules is None:
+        additional_modules = []
     noisy_modules = ['ParticleLoader', 'ParticleVertexFitter'] + additional_modules
     for module in path.modules():
         if module.type() in noisy_modules:
@@ -150,7 +152,7 @@ def get_eventN(fileName):
         b2.B2ERROR("FILE INVALID OR NOT FOUND.")
 
 
-def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticleLists=[], includeArrays=[], *,
+def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=None, outputParticleLists=None, includeArrays=None, *,
                    outputFile=None, dataDescription=None):
     """
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
@@ -176,6 +178,13 @@ def skimOutputMdst(skimDecayMode, path=None, skimParticleLists=[], outputParticl
     # the skim package, and importing this up the top hijacks the argparser of any
     # script which imports it.
     from mdst import add_mdst_output
+
+    if skimParticleLists is None:
+        skimParticleLists = []
+    if outputParticleLists is None:
+        outputParticleLists = []
+    if includeArrays is None:
+        includeArrays = []
 
     # if no outputfile is specified, set it to the skim name
     if outputFile is None:
@@ -332,6 +341,7 @@ def fancy_skim_header(SkimClass):
         SkimClass.__doc__ = header
 
     # If documentation of template functions not redefined, make sure BaseSkim docstring is not repeated
+    SkimClass.load_standard_lists.__doc__ = SkimClass.load_standard_lists.__doc__ or ""
     SkimClass.build_lists.__doc__ = SkimClass.build_lists.__doc__ or ""
     SkimClass.validation_histograms.__doc__ = SkimClass.validation_histograms.__doc__ or ""
     SkimClass.additional_setup.__doc__ = SkimClass.additional_setup.__doc__ or ""
@@ -355,39 +365,6 @@ class BaseSkim(ABC):
     sample. If you want to use a different test file for your skim, set it using
     `get_test_file`.
     """
-
-    # Abstract method to ensure that it is overriden whenever `BaseSkim` is inherited
-    @property
-    @abstractmethod
-    def RequiredStandardLists(self):
-        """Data structure specifying the standard particle lists to be loaded in before
-        constructing the skim list. Must have the form ``dict(str -> dict(str ->
-        list(str)))``.
-
-        If we require the following lists to be loaded,
-
-               >>> from stdCharged import stdK, stdPi
-               >>> from skim.standardlists.lightmesons import loadStdLightMesons
-               >>> stdK("all", path=path)
-               >>> stdK("loose", path=path)
-               >>> stdPi("all", path=path)
-               >>> loadStdLightMesons(path=path)
-
-        then `BaseSkim` will run run this code for us if we set `RequiredStandardLists` to
-        the following value:
-
-        .. code-block:: python
-
-            {
-                "stdCharged": {
-                    "stdK": ["all", "loose"],
-                    "stdPi": ["all"],
-                },
-                "skim.standardlists.lightmesons": {
-                      "loadStdLightMesons": [],
-                },
-            }
-        """
 
     MergeDataStructures = {}
     """Dict of ``str -> function`` pairs to determine if any special data structures
@@ -427,6 +404,19 @@ class BaseSkim(ABC):
         self.OutputFileName = OutputFileName or self.code
         self.SkimLists = []
 
+    def load_standard_lists(self, path):
+        """
+        Load any standard lists. This code will be run before any
+        `BaseSkim.additional_setup` and `BaseSkim.build_lists`.
+
+        Note:
+            This is separated into its own function so that when skims are combined, any
+            standard lists used by two skims can be loaded just once.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+
     def additional_setup(self, path):
         """
         Perform any setup steps necessary before running the skim. This may include:
@@ -437,20 +427,19 @@ class BaseSkim(ABC):
 
         Warning:
             Standard particle lists should *not* be loaded in here. This should be done
-            by setting the `RequiredStandardLists` attribute of an individual skim. This
-            is crucial for avoiding loading lists twice when combining skims for
-            production.
+            by overriding the method `BaseSkim.load_standard_lists`. This is crucial for
+            avoiding loading lists twice when combining skims for production.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
         """
 
-    # Abstract method to ensure that it is overriden whenever `BaseSkim` is inherited
+    # Abstract method to ensure that it is overridden whenever `BaseSkim` is inherited
     @abstractmethod
     def build_lists(self, path):
         """Create the skim lists to be saved in the output uDST. This function is where
         the main skim cuts should be applied. At the end of this method, the attribute
-        ``SkimLists`` must be set so it can be used by `output_udst`.
+        ``SkimLists`` must be set so it can be used by `BaseSkim.output_udst`.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
@@ -464,28 +453,30 @@ class BaseSkim(ABC):
         """
 
     # Everything beyond this point can remain as-is when defining a skim
-    def __call__(self, path, *, validation=False):
+    def __call__(self, path, *, udstOutput=True, validation=False):
         """Produce the skim particle lists and write uDST file.
 
         Parameters:
             path (basf2.Path): Skim path to be processed.
+            udstOutput (bool): If True, add uDST output to the path.
             validation (bool): If True, build lists and write validation histograms
                 instead of writing uDSTs.
         """
         self.set_skim_logging(path)
-        self.load_particle_lists(path)
+        self.load_standard_lists(path)
         self.additional_setup(path)
         # At this point, BaseSkim.skim_event_cuts may have been run, so pass
         # self._ConditionalPath for the path if it is not None (otherwise just pass the
         # regular path)
         self.build_lists(self._ConditionalPath or path)
 
+        if udstOutput:
+            self.output_udst(self._ConditionalPath or path)
+
         if validation:
             if self._method_unchanged("validation_histograms"):
                 b2.B2FATAL(f"No validation histograms defined for {self} skim.")
             self.validation_histograms(self._ConditionalPath or path)
-        else:
-            self.output_udst(self._ConditionalPath or path)
 
     _ConditionalPath = None
     """Conditional path to be set by `BaseSkim.skim_event_cuts` if event-level cuts are applied."""
@@ -498,9 +489,9 @@ class BaseSkim(ABC):
             path (basf2.Path): Skim path to be processed.
 
         Returns:
-            ConditionalPath (basf2.Path): Path on which the rest of this skim should be
-                processed. On this path, only events which passed the event-level cut
-                will be processed further.
+            Path on which the rest of this skim should be processed.
+            On this path, only events which passed the event-level cut will
+            be processed further.
 
         .. Tip::
             If running this function in `BaseSkim.additional_setup` or
@@ -508,6 +499,7 @@ class BaseSkim(ABC):
             `BaseSkim.skim_event_cuts`, *e.g.*
 
             .. code-block:: python
+
                 def build_lists(self, path):
                     path = self.skim_event_cuts("nTracks>4", path=path)
                     # rest of skim list building...
@@ -556,7 +548,7 @@ class BaseSkim(ABC):
 
     def _method_unchanged(self, method):
         """Check if the method of the class is the same as in its parent class, or if it has
-        been overriden.
+        been overridden.
 
         Useful for determining if *e.g.* `validation_histograms` has been defined for a
         particular skim.
@@ -578,38 +570,6 @@ class BaseSkim(ABC):
     def __name__(self):
         return self.name
 
-    def _validate_required_particle_lists(self):
-        """Verify that the `RequiredStandardLists` value is in the expected format.
-
-        The expected format is ``dict(str -> dict(str -> list(str)))``.
-        """
-        if self.RequiredStandardLists is None:
-            return
-
-        try:
-            for ModuleName, FunctionsAndLabels in self.RequiredStandardLists.items():
-                if not (
-                    isinstance(ModuleName, str) and isinstance(FunctionsAndLabels, dict)
-                ):
-                    raise ValueError(
-                        f"Expected str -> dict for {ModuleName} -> {FunctionsAndLabels}"
-                    )
-
-                for FunctionName, labels in FunctionsAndLabels.items():
-                    if not (isinstance(FunctionName, str) and isinstance(labels, list)):
-                        raise ValueError(
-                            f"Expected str -> list for {FunctionName} -> {labels}"
-                        )
-
-                    if not all(isinstance(label, str) for label in labels):
-                        raise ValueError(f"Expected {labels} to be a list of str.")
-        except ValueError as e:
-            b2.B2ERROR(
-                f"Invalid format of RequiredStandardLists in {str(self)} skim. "
-                "Expected dict(str -> dict(str -> list(str)))."
-            )
-            raise e
-
     def set_skim_logging(self, path):
         """Turns the log level to ERROR for selected modules to decrease the total size
         of the skim log files. Additional modules can be silenced by setting the attribute
@@ -626,50 +586,6 @@ class BaseSkim(ABC):
         for module in path.modules():
             if module.type() in set(NoisyModules):
                 module.set_log_level(b2.LogLevel.ERROR)
-
-    def load_particle_lists(self, path):
-        """Load the required particle lists for a skim, using the specified modules and
-        functions in the attribute `RequiredStandardLists`.
-
-        Parameters:
-            path (basf2.Path): Skim path to be processed.
-        """
-        if self.RequiredStandardLists is None:
-            return
-
-        # Reorder RequiredStandardLists so skim.standardlists modules are loaded *last*
-        StandardLists = {
-            k: v for (k, v) in self.RequiredStandardLists.items()
-            if not k.startswith("skim.standardlists.")
-        }
-        StandardSkimLists = {
-            k: v for (k, v) in self.RequiredStandardLists.items()
-            if k.startswith("skim.standardlists.")
-        }
-        try:
-            # The lightmesons module creates particle lists required by other skim
-            # lists, so make sure they are run before any other skim list functions.
-            lightmesons = StandardSkimLists.pop("skim.standardlists.lightmesons")
-            StandardSkimLists = {"skim.standardlists.lightmesons": lightmesons, **StandardSkimLists}
-        except KeyError:
-            pass
-
-        self.RequiredStandardLists = {**StandardLists, **StandardSkimLists}
-
-        for ModuleName, FunctionsAndLabels in self.RequiredStandardLists.items():
-            module = import_module(ModuleName)
-
-            for FunctionName, labels in FunctionsAndLabels.items():
-                ListLoader = getattr(module, FunctionName)
-
-                if labels:
-                    for label in labels:
-                        # Load lists in with calls like stdE("all", path=path)
-                        ListLoader(label, path=path)
-                else:
-                    # If list is empty, then load lists with call like
-                    # loadStdSkimPi0(path=path)
-                    ListLoader(path=path)
 
     def output_udst(self, path):
         """Write the skim particle lists to an output uDST and print a summary of the
@@ -708,15 +624,16 @@ class CombinedSkim(BaseSkim):
         path.process()
 
     When skims are combined using this class, the `BaseSkim.NoisyModules` lists of each
-    skim are combined and all silenced, and the `RequiredStandardLists` objects are
-    merged, removing duplicates. This way, `load_particle_lists` will load all the
-    required lists of each skim, without accidentally loading a list twice.
+    skim are combined and all silenced.
 
-    The heavy-lifting functions `additional_setup`, `build_lists` and `output_udst` are
-    modified to loop over the corresponding functions of each invididual skim. Calling
-    an instance of the `CombinedSkim` class will load all the required particle lists,
-    then run all the setup steps, then the list building functions, and then all the
-    output steps.
+    The heavy-lifting functions `BaseSkim.additional_setup`, `BaseSkim.build_lists` and
+    `BaseSkim.output_udst` are modified to loop over the corresponding functions of each
+    invididual skim. The `load_standard_lists` method is also modified to load all
+    required lists, without accidentally loading a list twice.
+
+    Calling an instance of the `CombinedSkim` class will load all the required particle
+    lists, then run all the setup steps, then the list building functions, and then all
+    the output steps.
     """
 
     __authors__ = ["Phil Grace"]
@@ -724,13 +641,9 @@ class CombinedSkim(BaseSkim):
     __category__ = "combined"
     __contact__ = None
 
-    RequiredStandardLists = None
-    """`BaseSkim.RequiredStandardLists` attribute initialised to `None` to get around
-    abstract property restriction. Overriden as merged
-    `BaseSkim.RequiredStandardLists` object during initialisation of `CombinedSkim`
-    instance."""
-
-    def __init__(self, *skims, NoisyModules=[], CombinedSkimName="CombinedSkim"):
+    def __init__(self, *skims, NoisyModules=None, CombinedSkimName="CombinedSkim"):
+        if NoisyModules is None:
+            NoisyModules = []
         # Check that we were passed only BaseSkim objects
         if not all([isinstance(skim, BaseSkim) for skim in skims]):
             raise NotImplementedError(
@@ -742,13 +655,6 @@ class CombinedSkim(BaseSkim):
         self.NoisyModules = list({mod for skim in skims for mod in skim.NoisyModules}) + NoisyModules
         self.TestFiles = list({f for skim in skims for f in skim.TestFiles})
 
-        for skim in skims:
-            skim._validate_required_particle_lists()
-
-        self.RequiredStandardLists = self._merge_nested_dicts(
-            skim.RequiredStandardLists for skim in skims
-        )
-
         self.merge_data_structures()
 
     def __str__(self):
@@ -759,11 +665,49 @@ class CombinedSkim(BaseSkim):
 
     def __call__(self, path):
         self.set_skim_logging(path)
-        self.load_particle_lists(path)
+        self.load_standard_lists(path)
         self.additional_setup(path)
         self.build_lists(path)
         self._check_duplicate_list_names()
         self.output_udst(path)
+
+    def load_standard_lists(self, path):
+        """Add all required standard list loading to the path.
+
+        Note:
+            To avoid loading standard lists twice, this function creates dummy paths
+            that are passed through ``load_standard_lists`` for each skim. These dummy
+            paths are then inspected, and a list of unique module-parameter combinations
+            is added to the main skim path.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+        ModulesAndParams = []
+        for skim in self.Skims:
+            DummyPath = b2.Path()
+            skim.load_standard_lists(DummyPath)
+
+            # Create a hashable data object to store the information about which
+            # standard lists have been added to the path.
+            ModulesAndParams.extend(tuple([
+                (
+                    module.type(),
+                    tuple(sorted(
+                        (param.name, param.values[0] if isinstance(param.values, list) else param.values)
+                        for param in module.available_params()
+                        if param.values != param.default
+                    )),
+                )
+                for module in DummyPath.modules()
+            ]))
+
+        # Take this data structure and convert it to a dict. This removes any duplicate entries.
+        ModulesAndParams = dict.fromkeys(ModulesAndParams)
+
+        # Add the (now unique) module+param combinations to the main path
+        for module, params in ModulesAndParams:
+            path.add_module(module, **dict(params))
 
     def additional_setup(self, path):
         """Run the `BaseSkim.additional_setup` function of each skim.
@@ -834,61 +778,3 @@ class CombinedSkim(BaseSkim):
                 f"Non-unique output particle list names in combined skim! "
                 f"{', '.join(DuplicatedParticleLists)}"
             )
-
-    def _merge_nested_dicts(self, *dicts):
-        """Merge any number of dicts recursively.
-
-        Utility function for merging `RequiredStandardLists` values from differnt
-        skims.
-
-        Parameters:
-            dicts (dict): Any number of dictionaries to be merged.
-
-        Returns:
-            MergedDict (dict): Merged dictionary without duplicates.
-        """
-        # Convert dicts from a generator expression into a list with None values removed
-        dicts = list(filter(None, list(*dicts)))
-        if not dicts:
-            return None
-
-        MergedDict = dicts[0]
-        for d in dicts[1:]:
-            MergedDict = self._merge_two_nested_dicts(MergedDict, d)
-        return MergedDict
-
-    def _merge_two_nested_dicts(self, d1, d2):
-        """Merge two dicts recursively.
-
-        Input dicts must have the same data structure, and the innermost values must be
-        lists. Lists are merged with duplicates removed.
-        """
-        # Make a list of unique keys in a way that preserves order
-        AllKeys = list(d1.keys()) + list(d2.keys())
-        UniqueKeys = list(dict.fromkeys(AllKeys))
-
-        for k in UniqueKeys:
-            if k in d1 and k in d2:
-                if isinstance(d1[k], dict) and isinstance(d2[k], dict):
-                    # If we are looking at two dicts, call this function again.
-                    d1[k] = self._merge_two_nested_dicts(d1[k], d2[k])
-                elif isinstance(d1[k], list) and isinstance(d2[k], list):
-                    # If we are looking at two lists, return a list with duplicates removed.
-                    # Raise a warning if one list is empty and the other is not.
-                    if (len(d1[k]) == 0) ^ (len(d2[k]) == 0):
-                        # TODO: remove this warning and replace with proper handling
-                        b2.B2WARNING(
-                            "Merging empty list into non-empty list. "
-                            "Some particle lists may not be loaded."
-                        )
-
-                    d1[k] = sorted({*d1[k], *d2[k]})
-                else:
-                    raise b2.B2ERROR(
-                        "Something went wrong while merging dicts. Please "
-                        "check the input dicts have the same structure."
-                    )
-            elif k in d2:
-                d1[k] = d2[k]
-
-        return d1

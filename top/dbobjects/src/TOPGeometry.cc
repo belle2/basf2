@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <top/dbobjects/TOPGeometry.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <math.h>
 #include <iostream>

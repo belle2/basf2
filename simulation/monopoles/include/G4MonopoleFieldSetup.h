@@ -13,11 +13,9 @@
 #pragma once
 
 #include <G4MagneticField.hh>
-#include <G4UniformMagField.hh>
 
 class G4FieldManager;
 class G4ChordFinder;
-class G4Mag_UsualEqRhs;
 class G4MagIntegratorStepper;
 
 namespace Belle2 {

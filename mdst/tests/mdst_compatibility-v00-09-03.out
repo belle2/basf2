@@ -428,6 +428,7 @@ TrackFitResult#0:
 [INFO] Conditions data: configured globaltag is ${default_globaltag}
   get4Momentum(): (0.142389,0.0549256,0.0689178,0.217993)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.451579
   getCov(): size(15)
     8.38213e-05
@@ -463,6 +464,7 @@ TrackFitResult#0:
   getHitPatternCDC(): 0110110000000000000000000000000011111111111111111111111111111111
   getHitPatternVXD(): 00000000010100000101010100010001
   getMomentum(): (0.142389,0.0549256,0.0689178)
+  getNDF(): -1
   getOmega(): 0.0285383
   getPValue(): 5.55867e-18
   getParticleType(): <type: pi+>
@@ -481,6 +483,7 @@ TrackFitResult#0:
 TrackFitResult#1:
   get4Momentum(): (-0.0022891,-0.102645,0.00614907,0.173375)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0598915
   getCov(): size(15)
     0.000268623
@@ -516,6 +519,7 @@ TrackFitResult#1:
   getHitPatternCDC(): 0101001100000000000000000000000000000000000000111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.0022891,-0.102645,0.00614907)
+  getNDF(): -1
   getOmega(): 0.0424209
   getPValue(): 0.0837623
   getParticleType(): <type: pi+>
@@ -534,6 +538,7 @@ TrackFitResult#1:
 TrackFitResult#2:
   get4Momentum(): (0.204365,0.0487948,-0.0955569,0.269735)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.454796
   getCov(): size(15)
     3.7851e-05
@@ -569,6 +574,7 @@ TrackFitResult#2:
   getHitPatternCDC(): 0100111000000000011111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.204365,0.0487948,-0.0955569)
+  getNDF(): -1
   getOmega(): -0.020729
   getPValue(): 0.263034
   getParticleType(): <type: pi+>
@@ -587,6 +593,7 @@ TrackFitResult#2:
 TrackFitResult#3:
   get4Momentum(): (0.582443,0.281678,0.741355,0.993816)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.14587
   getCov(): size(15)
     8.12857e-06
@@ -622,6 +629,7 @@ TrackFitResult#3:
   getHitPatternCDC(): 0011110111111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.582443,0.281678,0.741355)
+  getNDF(): -1
   getOmega(): -0.00673184
   getPValue(): 0.892646
   getParticleType(): <type: pi+>
@@ -640,6 +648,7 @@ TrackFitResult#3:
 TrackFitResult#4:
   get4Momentum(): (0.212715,-0.0139697,0.186886,0.315989)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.876685
   getCov(): size(15)
     6.91876e-05
@@ -675,6 +684,7 @@ TrackFitResult#4:
   getHitPatternCDC(): 0011101100000000000011111111111100001111111111111111111111111101
   getHitPatternVXD(): 00000000010101010101010100000001
   getMomentum(): (0.212715,-0.0139697,0.186886)
+  getNDF(): -1
   getOmega(): 0.0204311
   getPValue(): 0.712719
   getParticleType(): <type: pi+>
@@ -693,6 +703,7 @@ TrackFitResult#4:
 TrackFitResult#5:
   get4Momentum(): (-0.179647,1.22385,1.38985,1.86581)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.1236
   getCov(): size(15)
     4.09121e-06
@@ -728,6 +739,7 @@ TrackFitResult#5:
   getHitPatternCDC(): 0011101011111111111111111111111111111111111111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010000
   getMomentum(): (-0.179647,1.22385,1.38985)
+  getNDF(): -1
   getOmega(): -0.00352102
   getPValue(): 0.754775
   getParticleType(): <type: pi+>
@@ -746,6 +758,7 @@ TrackFitResult#5:
 TrackFitResult#6:
   get4Momentum(): (-0.0107993,-0.23824,0.308367,0.414059)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.29303
   getCov(): size(15)
     4.19552e-05
@@ -781,6 +794,7 @@ TrackFitResult#6:
   getHitPatternCDC(): 0011101000000000011111111111111110111111111111111111111111111111
   getHitPatternVXD(): 00000000000001011010010100010001
   getMomentum(): (-0.0107993,-0.23824,0.308367)
+  getNDF(): -1
   getOmega(): -0.0182627
   getPValue(): 0.869656
   getParticleType(): <type: pi+>
@@ -799,6 +813,7 @@ TrackFitResult#6:
 TrackFitResult#7:
   get4Momentum(): (0.774502,-0.144419,-0.752973,1.09871)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.95573
   getCov(): size(15)
     1.91391e-05
@@ -834,6 +849,7 @@ TrackFitResult#7:
   getHitPatternCDC(): 0001101100000000000000000000000000111111111011011011111111111111
   getHitPatternVXD(): 00000000000001010101010100010001
   getMomentum(): (0.774502,-0.144419,-0.752973)
+  getNDF(): -1
   getOmega(): 0.00552817
   getPValue(): 0.147005
   getParticleType(): <type: pi+>
@@ -852,6 +868,7 @@ TrackFitResult#7:
 TrackFitResult#8:
   get4Momentum(): (0.316932,-0.0199844,0.810879,0.881958)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.55346
   getCov(): size(15)
     3.5873e-05
@@ -887,6 +904,7 @@ TrackFitResult#8:
   getHitPatternCDC(): 0001001000000000000000000000000000000001111101111100000101111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.316932,-0.0199844,0.810879)
+  getNDF(): -1
   getOmega(): 0.0137151
   getPValue(): 0.133401
   getParticleType(): <type: pi+>
@@ -905,6 +923,7 @@ TrackFitResult#8:
 TrackFitResult#9:
   get4Momentum(): (-0.252888,-0.406333,-0.592573,0.774391)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.23814
   getCov(): size(15)
     0.000156462
@@ -940,6 +959,7 @@ TrackFitResult#9:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (-0.252888,-0.406333,-0.592573)
+  getNDF(): -1
   getOmega(): -0.0091002
   getPValue(): 0.96988
   getParticleType(): <type: pi+>
@@ -958,6 +978,7 @@ TrackFitResult#9:
 TrackFitResult#10:
   get4Momentum(): (-0.239415,-0.56413,-1.19383,1.34917)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.94805
   getCov(): size(15)
     0.0634368
@@ -993,6 +1014,7 @@ TrackFitResult#10:
   getHitPatternCDC(): 0001011000000111111100000000000000000000000111111100000011111101
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.239415,-0.56413,-1.19383)
+  getNDF(): -1
   getOmega(): -0.00301591
   getPValue(): 0.000273039
   getParticleType(): <type: pi+>
@@ -1011,6 +1033,7 @@ TrackFitResult#10:
 TrackFitResult#11:
   get4Momentum(): (-0.0022891,-0.102645,0.00614907,0.173375)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0598915
   getCov(): size(15)
     0.000268618
@@ -1046,6 +1069,7 @@ TrackFitResult#11:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.0022891,-0.102645,0.00614907)
+  getNDF(): -1
   getOmega(): 0.0424209
   getPValue(): 0.0837623
   getParticleType(): <type: pi+>
@@ -1064,6 +1088,7 @@ TrackFitResult#11:
 TrackFitResult#12:
   get4Momentum(): (-0.252888,-0.406333,-0.592573,0.774391)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.23814
   getCov(): size(15)
     0.000156462
@@ -1099,6 +1124,7 @@ TrackFitResult#12:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.252888,-0.406333,-0.592573)
+  getNDF(): -1
   getOmega(): -0.0091002
   getPValue(): 0.96988
   getParticleType(): <type: pi+>
@@ -1117,6 +1143,7 @@ TrackFitResult#12:
 TrackFitResult#13:
   get4Momentum(): (0.316932,-0.0199845,0.81088,0.881959)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.55346
   getCov(): size(15)
     3.58688e-05
@@ -1152,6 +1179,7 @@ TrackFitResult#13:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.316932,-0.0199845,0.81088)
+  getNDF(): -1
   getOmega(): 0.013715
   getPValue(): 0.133401
   getParticleType(): <type: pi+>
@@ -1170,6 +1198,7 @@ TrackFitResult#13:
 TrackFitResult#14:
   get4Momentum(): (0.582443,0.281678,0.741355,0.993816)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.14587
   getCov(): size(15)
     8.12923e-06
@@ -1205,6 +1234,7 @@ TrackFitResult#14:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.582443,0.281678,0.741355)
+  getNDF(): -1
   getOmega(): -0.00673184
   getPValue(): 0.892646
   getParticleType(): <type: pi+>
@@ -1223,6 +1253,7 @@ TrackFitResult#14:
 TrackFitResult#15:
   get4Momentum(): (0.316932,-0.0199845,0.81088,0.881959)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.55346
   getCov(): size(15)
     3.57527e-05
@@ -1258,6 +1289,7 @@ TrackFitResult#15:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.316932,-0.0199845,0.81088)
+  getNDF(): -1
   getOmega(): 0.0137151
   getPValue(): 0.133401
   getParticleType(): <type: pi+>
@@ -1276,6 +1308,7 @@ TrackFitResult#15:
 TrackFitResult#16:
   get4Momentum(): (-0.0107993,-0.23824,0.308367,0.414059)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.29303
   getCov(): size(15)
     4.19581e-05
@@ -1311,6 +1344,7 @@ TrackFitResult#16:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.0107993,-0.23824,0.308367)
+  getNDF(): -1
   getOmega(): -0.0182627
   getPValue(): 0.869656
   getParticleType(): <type: pi+>
@@ -3177,7 +3211,7 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-103.915,184.401,111.3)
-  getEnergy(): 0.814644
+  getEnergy(): 0.814642
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -3193,7 +3227,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 3
-  getMomentum(): (-0.280272,0.497352,0.300189,0.814644)
+  getMomentum(): (-0.280272,0.497352,0.300189,0.814642)
   getMomentumMag(): 0.645
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(0)
@@ -3204,7 +3238,7 @@ KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-112.272,188.926,257.3)
-  getEnergy(): 0.542074
+  getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -3220,7 +3254,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 2
   getLayers(): 1
-  getMomentum(): (-0.0713354,0.12004,0.163483,0.542074)
+  getMomentum(): (-0.0713354,0.12004,0.163483,0.542072)
   getMomentumMag(): 0.215
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(0)
@@ -5377,6 +5411,7 @@ V0#8:
 TrackFitResult#0:
   get4Momentum(): (0.186523,0.190646,0.0252355,0.302082)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.0946163
   getCov(): size(15)
     2.08904e-05
@@ -5412,6 +5447,7 @@ TrackFitResult#0:
   getHitPatternCDC(): 0010011100000000000011111111111111111100000011110100000011111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.186523,0.190646,0.0252355)
+  getNDF(): -1
   getOmega(): -0.0163296
   getPValue(): 0.617969
   getParticleType(): <type: pi+>
@@ -5430,6 +5466,7 @@ TrackFitResult#0:
 TrackFitResult#1:
   get4Momentum(): (0.235658,-0.228178,-0.0327837,0.357987)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.0999429
   getCov(): size(15)
     1.4391e-05
@@ -5465,6 +5502,7 @@ TrackFitResult#1:
   getHitPatternCDC(): 0100000111111111111111101111111111111111100011111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.235658,-0.228178,-0.0327837)
+  getNDF(): -1
   getOmega(): -0.0132775
   getPValue(): 0.407723
   getParticleType(): <type: pi+>
@@ -5483,6 +5521,7 @@ TrackFitResult#1:
 TrackFitResult#2:
   get4Momentum(): (-0.219281,-0.303252,0.156977,0.429147)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.419469
   getCov(): size(15)
     0.000116157
@@ -5518,6 +5557,7 @@ TrackFitResult#2:
   getHitPatternCDC(): 0011011111111111111111111111111111111111111110001100000011111111
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (-0.219281,-0.303252,0.156977)
+  getNDF(): -1
   getOmega(): 0.0116382
   getPValue(): 0.007027
   getParticleType(): <type: pi+>
@@ -5536,6 +5576,7 @@ TrackFitResult#2:
 TrackFitResult#3:
   get4Momentum(): (0.171853,0.0597749,-0.136314,0.266773)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.749179
   getCov(): size(15)
     5.83978e-05
@@ -5571,6 +5612,7 @@ TrackFitResult#3:
   getHitPatternCDC(): 0010110000000000000000000000000011111111111111111111111111111111
   getHitPatternVXD(): 00000000000001010101010100010001
   getMomentum(): (0.171853,0.0597749,-0.136314)
+  getNDF(): -1
   getOmega(): 0.0239369
   getPValue(): 0.82289
   getParticleType(): <type: pi+>
@@ -5589,6 +5631,7 @@ TrackFitResult#3:
 TrackFitResult#4:
   get4Momentum(): (0.0928894,0.331876,0.00674242,0.371881)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0195642
   getCov(): size(15)
     1.50387e-05
@@ -5624,6 +5667,7 @@ TrackFitResult#4:
   getHitPatternCDC(): 0011110011111111111111111111111111111101111111011100111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0928894,0.331876,0.00674242)
+  getNDF(): -1
   getOmega(): 0.0126374
   getPValue(): 1.06187e-10
   getParticleType(): <type: pi+>
@@ -5642,6 +5686,7 @@ TrackFitResult#4:
 TrackFitResult#5:
   get4Momentum(): (-0.239938,0.276793,0.391687,0.554151)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.06927
   getCov(): size(15)
     1.46054e-05
@@ -5677,6 +5722,7 @@ TrackFitResult#5:
   getHitPatternCDC(): 0011011011111111111111111111111111111111111111111100000011111101
   getHitPatternVXD(): 00000000010101010000010100010001
   getMomentum(): (-0.239938,0.276793,0.391687)
+  getNDF(): -1
   getOmega(): 0.0118897
   getPValue(): 0.0638273
   getParticleType(): <type: pi+>
@@ -5695,6 +5741,7 @@ TrackFitResult#5:
 TrackFitResult#6:
   get4Momentum(): (0.233546,-0.145385,-0.274775,0.413112)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.998817
   getCov(): size(15)
     2.91913e-05
@@ -5730,6 +5777,7 @@ TrackFitResult#6:
   getHitPatternCDC(): 0001011100000000000000000000000000000011111111111100000011111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.233546,-0.145385,-0.274775)
+  getNDF(): -1
   getOmega(): 0.0158319
   getPValue(): 0.554217
   getParticleType(): <type: pi+>
@@ -5748,6 +5796,7 @@ TrackFitResult#6:
 TrackFitResult#7:
   get4Momentum(): (-0.0872929,-0.00986404,0.213832,0.270039)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.4341
   getCov(): size(15)
     0.000507476
@@ -5783,6 +5832,7 @@ TrackFitResult#7:
   getHitPatternCDC(): 0001010100000000000000000000000000000000000000000011110111111000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.0872929,-0.00986404,0.213832)
+  getNDF(): -1
   getOmega(): 0.0495777
   getPValue(): 0.221662
   getParticleType(): <type: pi+>
@@ -5801,6 +5851,7 @@ TrackFitResult#7:
 TrackFitResult#8:
   get4Momentum(): (0.084425,-0.163885,0.155467,0.278632)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.843314
   getCov(): size(15)
     7.26773e-05
@@ -5836,6 +5887,7 @@ TrackFitResult#8:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101000000010001
   getMomentum(): (0.084425,-0.163885,0.155467)
+  getNDF(): -1
   getOmega(): -0.0236251
   getPValue(): 0.0611444
   getParticleType(): <type: pi+>
@@ -5854,6 +5906,7 @@ TrackFitResult#8:
 TrackFitResult#9:
   get4Momentum(): (-0.684664,-0.458608,2.56715,2.69978)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 3.11522
   getCov(): size(15)
     1.69682e-05
@@ -5889,6 +5942,7 @@ TrackFitResult#9:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.684664,-0.458608,2.56715)
+  getNDF(): -1
   getOmega(): -0.00528519
   getPValue(): 0.418853
   getParticleType(): <type: pi+>
@@ -5907,6 +5961,7 @@ TrackFitResult#9:
 TrackFitResult#10:
   get4Momentum(): (0.0551682,-0.0782768,-0.112249,0.203102)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.17214
   getCov(): size(15)
     0.000500999
@@ -5942,6 +5997,7 @@ TrackFitResult#10:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100000001
   getMomentum(): (0.0551682,-0.0782768,-0.112249)
+  getNDF(): -1
   getOmega(): -0.0454773
   getPValue(): 0.508819
   getParticleType(): <type: pi+>
@@ -5960,6 +6016,7 @@ TrackFitResult#10:
 TrackFitResult#11:
   get4Momentum(): (-0.023903,0.0725055,-0.0846393,0.1802)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.10866
   getCov(): size(15)
     0.000714501
@@ -5995,6 +6052,7 @@ TrackFitResult#11:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.023903,0.0725055,-0.0846393)
+  getNDF(): -1
   getOmega(): -0.0570493
   getPValue(): 0.421752
   getParticleType(): <type: pi+>
@@ -6013,6 +6071,7 @@ TrackFitResult#11:
 TrackFitResult#12:
   get4Momentum(): (-0.170045,-0.163112,-0.0227011,0.274802)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.0963424
   getCov(): size(15)
     0.00774449
@@ -6048,6 +6107,7 @@ TrackFitResult#12:
   getHitPatternCDC(): 0010110011111111111111111111111111111100000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.170045,-0.163112,-0.0227011)
+  getNDF(): -1
   getOmega(): 0.0181663
   getPValue(): 0.0028126
   getParticleType(): <type: pi+>
@@ -6066,6 +6126,7 @@ TrackFitResult#12:
 TrackFitResult#13:
   get4Momentum(): (0.16062,0.204843,-0.0535244,0.300174)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.205621
   getCov(): size(15)
     0.539229
@@ -6101,6 +6162,7 @@ TrackFitResult#13:
   getHitPatternCDC(): 0001101000000000000000000011111111111100000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.16062,0.204843,-0.0535244)
+  getNDF(): -1
   getOmega(): 0.018242
   getPValue(): 0.0266336
   getParticleType(): <type: pi+>
@@ -6119,6 +6181,7 @@ TrackFitResult#13:
 TrackFitResult#14:
   get4Momentum(): (-0.219286,-0.303259,0.15698,0.429157)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.419469
   getCov(): size(15)
     0.000116159
@@ -6154,6 +6217,7 @@ TrackFitResult#14:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.219286,-0.303259,0.15698)
+  getNDF(): -1
   getOmega(): 0.0116379
   getPValue(): 0.007027
   getParticleType(): <type: pi+>
@@ -6172,6 +6236,7 @@ TrackFitResult#14:
 TrackFitResult#15:
   get4Momentum(): (0.0551667,-0.0782746,-0.112246,0.203099)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.17214
   getCov(): size(15)
     0.000500976
@@ -6207,6 +6272,7 @@ TrackFitResult#15:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0551667,-0.0782746,-0.112246)
+  getNDF(): -1
   getOmega(): -0.0454786
   getPValue(): 0.508819
   getParticleType(): <type: pi+>
@@ -6225,6 +6291,7 @@ TrackFitResult#15:
 TrackFitResult#16:
   get4Momentum(): (-0.219282,-0.303253,0.156977,0.429149)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.419469
   getCov(): size(15)
     0.000116159
@@ -6260,6 +6327,7 @@ TrackFitResult#16:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.219282,-0.303253,0.156977)
+  getNDF(): -1
   getOmega(): 0.0116381
   getPValue(): 0.007027
   getParticleType(): <type: pi+>
@@ -6278,6 +6346,7 @@ TrackFitResult#16:
 TrackFitResult#17:
   get4Momentum(): (-0.0239033,0.0725066,-0.0846406,0.180201)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.10866
   getCov(): size(15)
     0.000714471
@@ -6313,6 +6382,7 @@ TrackFitResult#17:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.0239033,0.0725066,-0.0846406)
+  getNDF(): -1
   getOmega(): -0.0570485
   getPValue(): 0.421752
   getParticleType(): <type: pi+>
@@ -6331,6 +6401,7 @@ TrackFitResult#17:
 TrackFitResult#18:
   get4Momentum(): (0.171853,0.0597749,-0.136314,0.266773)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.749179
   getCov(): size(15)
     5.84332e-05
@@ -6366,6 +6437,7 @@ TrackFitResult#18:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.171853,0.0597749,-0.136314)
+  getNDF(): -1
   getOmega(): 0.0239369
   getPValue(): 0.82289
   getParticleType(): <type: pi+>
@@ -6384,6 +6456,7 @@ TrackFitResult#18:
 TrackFitResult#19:
   get4Momentum(): (0.0844248,-0.163885,0.155467,0.278632)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.843314
   getCov(): size(15)
     7.2687e-05
@@ -6419,6 +6492,7 @@ TrackFitResult#19:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0844248,-0.163885,0.155467)
+  getNDF(): -1
   getOmega(): -0.0236252
   getPValue(): 0.0611444
   getParticleType(): <type: pi+>
@@ -6437,6 +6511,7 @@ TrackFitResult#19:
 TrackFitResult#20:
   get4Momentum(): (0.0928891,0.331875,0.00674241,0.37188)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.0195643
   getCov(): size(15)
     1.50397e-05
@@ -6472,6 +6547,7 @@ TrackFitResult#20:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0928891,0.331875,0.00674241)
+  getNDF(): -1
   getOmega(): 0.0126374
   getPValue(): 1.06187e-10
   getParticleType(): <type: pi+>
@@ -6488,8 +6564,9 @@ TrackFitResult#20:
   getTransverseMomentum(): 0.344629
   getZ0(): -0.241119
 TrackFitResult#21:
-  get4Momentum(): (0.0551664,-0.0782742,-0.112245,0.203098)
+  get4Momentum(): (0.0551664,-0.0782742,-0.112245,0.203099)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.17214
   getCov(): size(15)
     0.000500976
@@ -6521,10 +6598,11 @@ TrackFitResult#21:
     -4.909413e-07 -1.772466e-06  3.905382e-05 -1.673830e-05  2.333396e-05  2.990441e-05 
      3.701149e-05  5.239582e-06 -6.333716e-05 -2.535630e-05  2.990441e-05  4.972805e-05 
   getD0(): -0.466384
-  getEnergy(): 0.203098
+  getEnergy(): 0.203099
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0551664,-0.0782742,-0.112245)
+  getNDF(): -1
   getOmega(): -0.0454789
   getPValue(): 0.508819
   getParticleType(): <type: pi+>
@@ -6543,6 +6621,7 @@ TrackFitResult#21:
 TrackFitResult#22:
   get4Momentum(): (-0.239938,0.276792,0.391686,0.55415)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.06927
   getCov(): size(15)
     1.46031e-05
@@ -6578,6 +6657,7 @@ TrackFitResult#22:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.239938,0.276792,0.391686)
+  getNDF(): -1
   getOmega(): 0.0118897
   getPValue(): 0.0638273
   getParticleType(): <type: pi+>
@@ -6596,6 +6676,7 @@ TrackFitResult#22:
 TrackFitResult#23:
   get4Momentum(): (-0.0239031,0.0725058,-0.0846396,0.1802)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -1.10866
   getCov(): size(15)
     0.000714547
@@ -6631,6 +6712,7 @@ TrackFitResult#23:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.0239031,0.0725058,-0.0846396)
+  getNDF(): -1
   getOmega(): -0.0570491
   getPValue(): 0.421752
   getParticleType(): <type: pi+>
@@ -6649,6 +6731,7 @@ TrackFitResult#23:
 TrackFitResult#24:
   get4Momentum(): (0.233546,-0.145385,-0.274775,0.413112)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.998817
   getCov(): size(15)
     2.91916e-05
@@ -6684,6 +6767,7 @@ TrackFitResult#24:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.233546,-0.145385,-0.274775)
+  getNDF(): -1
   getOmega(): 0.0158318
   getPValue(): 0.554217
   getParticleType(): <type: pi+>
@@ -6702,6 +6786,7 @@ TrackFitResult#24:
 TrackFitResult#25:
   get4Momentum(): (0.186523,0.190646,0.0252355,0.302082)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.0946163
   getCov(): size(15)
     2.08892e-05
@@ -6737,6 +6822,7 @@ TrackFitResult#25:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.186523,0.190646,0.0252355)
+  getNDF(): -1
   getOmega(): -0.0163296
   getPValue(): 0.617969
   getParticleType(): <type: pi+>
@@ -6755,6 +6841,7 @@ TrackFitResult#25:
 TrackFitResult#26:
   get4Momentum(): (0.233546,-0.145385,-0.274775,0.413112)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.998817
   getCov(): size(15)
     2.9214e-05
@@ -6790,6 +6877,7 @@ TrackFitResult#26:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.233546,-0.145385,-0.274775)
+  getNDF(): -1
   getOmega(): 0.0158319
   getPValue(): 0.554217
   getParticleType(): <type: pi+>
@@ -6808,6 +6896,7 @@ TrackFitResult#26:
 TrackFitResult#27:
   get4Momentum(): (0.084425,-0.163885,0.155467,0.278632)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.843314
   getCov(): size(15)
     7.26885e-05
@@ -6843,6 +6932,7 @@ TrackFitResult#27:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.084425,-0.163885,0.155467)
+  getNDF(): -1
   getOmega(): -0.0236251
   getPValue(): 0.0611444
   getParticleType(): <type: pi+>
@@ -6861,6 +6951,7 @@ TrackFitResult#27:
 TrackFitResult#28:
   get4Momentum(): (-0.0872925,-0.009864,0.213831,0.270038)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.4341
   getCov(): size(15)
     0.000507476
@@ -6896,6 +6987,7 @@ TrackFitResult#28:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.0872925,-0.009864,0.213831)
+  getNDF(): -1
   getOmega(): 0.049578
   getPValue(): 0.221662
   getParticleType(): <type: pi+>
@@ -6914,6 +7006,7 @@ TrackFitResult#28:
 TrackFitResult#29:
   get4Momentum(): (0.186523,0.190646,0.0252355,0.302082)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.0946163
   getCov(): size(15)
     2.08892e-05
@@ -6949,6 +7042,7 @@ TrackFitResult#29:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.186523,0.190646,0.0252355)
+  getNDF(): -1
   getOmega(): -0.0163296
   getPValue(): 0.617969
   getParticleType(): <type: pi+>
@@ -6967,6 +7061,7 @@ TrackFitResult#29:
 TrackFitResult#30:
   get4Momentum(): (-0.0872925,-0.00986399,0.213831,0.270038)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 2.4341
   getCov(): size(15)
     0.000507487
@@ -7002,6 +7097,7 @@ TrackFitResult#30:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.0872925,-0.00986399,0.213831)
+  getNDF(): -1
   getOmega(): 0.049578
   getPValue(): 0.221662
   getParticleType(): <type: pi+>
@@ -7020,6 +7116,7 @@ TrackFitResult#30:
 TrackFitResult#31:
   get4Momentum(): (-0.684665,-0.458609,2.56715,2.69979)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 3.11522
   getCov(): size(15)
     1.69682e-05
@@ -7055,6 +7152,7 @@ TrackFitResult#31:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.684665,-0.458609,2.56715)
+  getNDF(): -1
   getOmega(): -0.00528519
   getPValue(): 0.418853
   getParticleType(): <type: pi+>
@@ -13212,6 +13310,7 @@ V0#0:
 TrackFitResult#0:
   get4Momentum(): (-0.0999914,0.219547,0.150702,0.316844)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.624683
   getCov(): size(15)
     3.30517e-05
@@ -13247,6 +13346,7 @@ TrackFitResult#0:
   getHitPatternCDC(): 0111110000011111111111111111111111101111111111111111111100000000
   getHitPatternVXD(): 00000000010101010101000000010001
   getMomentum(): (-0.0999914,0.219547,0.150702)
+  getNDF(): -1
   getOmega(): -0.0180537
   getPValue(): 0.985903
   getParticleType(): <type: pi+>
@@ -13265,6 +13365,7 @@ TrackFitResult#0:
 TrackFitResult#1:
   get4Momentum(): (0.419506,-0.0397957,-0.121114,0.460128)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): -0.287416
   getCov(): size(15)
     9.03927e-06
@@ -13300,6 +13401,7 @@ TrackFitResult#1:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111000000001111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.419506,-0.0397957,-0.121114)
+  getNDF(): -1
   getOmega(): -0.0103357
   getPValue(): 0.00107658
   getParticleType(): <type: pi+>
@@ -13318,6 +13420,7 @@ TrackFitResult#1:
 TrackFitResult#2:
   get4Momentum(): (0.767493,0.195324,0.645236,1.03102)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.814736
   getCov(): size(15)
     4.72068e-06
@@ -13353,6 +13456,7 @@ TrackFitResult#2:
   getHitPatternCDC(): 0011001011111111111111110111111111111011000011111111111111111111
   getHitPatternVXD(): 00000000010101010101010100000001
   getMomentum(): (0.767493,0.195324,0.645236)
+  getNDF(): -1
   getOmega(): 0.00549951
   getPValue(): 0.505876
   getParticleType(): <type: pi+>
@@ -13371,6 +13475,7 @@ TrackFitResult#2:
 TrackFitResult#3:
   get4Momentum(): (0.055941,-0.335024,-0.0198298,0.367755)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.058381
   getCov(): size(15)
     1.28148e-05
@@ -13406,6 +13511,7 @@ TrackFitResult#3:
   getHitPatternCDC(): 0011111011111111111111111111111100111111101111111111111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.055941,-0.335024,-0.0198298)
+  getNDF(): -1
   getOmega(): 0.0128227
   getPValue(): 9.27888e-17
   getParticleType(): <type: pi+>
@@ -13424,6 +13530,7 @@ TrackFitResult#3:
 TrackFitResult#4:
   get4Momentum(): (-0.377793,0.0597576,-0.20998,0.458116)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): -0.548982
   getCov(): size(15)
     5.57926e-05
@@ -13459,6 +13566,7 @@ TrackFitResult#4:
   getHitPatternCDC(): 0011111111111111111111111111111111111101111111111101111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.377793,0.0597576,-0.20998)
+  getNDF(): -1
   getOmega(): 0.0113869
   getPValue(): 0.567141
   getParticleType(): <type: pi+>
@@ -13477,6 +13585,7 @@ TrackFitResult#4:
 TrackFitResult#5:
   get4Momentum(): (-0.243822,-0.34311,0.144241,0.466325)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.342681
   getCov(): size(15)
     1.16395e-05
@@ -13512,6 +13621,7 @@ TrackFitResult#5:
   getHitPatternCDC(): 0011110011111111111111111111111111111111111111111101111111111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.243822,-0.34311,0.144241)
+  getNDF(): -1
   getOmega(): 0.0103473
   getPValue(): 0.000187434
   getParticleType(): <type: pi+>
@@ -13530,6 +13640,7 @@ TrackFitResult#5:
 TrackFitResult#6:
   get4Momentum(): (-0.163448,-0.178647,0.346007,0.444782)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.42898
   getCov(): size(15)
     3.46107e-05
@@ -13565,6 +13676,7 @@ TrackFitResult#6:
   getHitPatternCDC(): 0011000000000000000011111111111111111011111111111100000011111111
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (-0.163448,-0.178647,0.346007)
+  getNDF(): -1
   getOmega(): -0.0179874
   getPValue(): 0.00912666
   getParticleType(): <type: pi+>
@@ -13583,6 +13695,7 @@ TrackFitResult#6:
 TrackFitResult#7:
   get4Momentum(): (-0.36479,0.152924,0.768008,0.875085)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.94164
   getCov(): size(15)
     0.000513878
@@ -13618,6 +13731,7 @@ TrackFitResult#7:
   getHitPatternCDC(): 0010100000000000000000000000011111111111111111111101111111000111
   getHitPatternVXD(): 00000000010101010101010100000000
   getMomentum(): (-0.36479,0.152924,0.768008)
+  getNDF(): -1
   getOmega(): -0.0110109
   getPValue(): 0.702635
   getParticleType(): <type: pi+>
@@ -13636,6 +13750,7 @@ TrackFitResult#7:
 TrackFitResult#8:
   get4Momentum(): (0.232609,0.144373,0.0902168,0.320264)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 0.329534
   getCov(): size(15)
     5.04331e-05
@@ -13671,6 +13786,7 @@ TrackFitResult#8:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010010
   getMomentum(): (0.232609,0.144373,0.0902168)
+  getNDF(): -1
   getOmega(): 0.0159089
   getPValue(): 0.240549
   getParticleType(): <type: pi+>
@@ -13689,6 +13805,7 @@ TrackFitResult#8:
 TrackFitResult#9:
   get4Momentum(): (1.07944,-0.110972,0.786669,1.34752)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 0.724957
   getCov(): size(15)
     4.70266e-06
@@ -13724,6 +13841,7 @@ TrackFitResult#9:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101000000010001
   getMomentum(): (1.07944,-0.110972,0.786669)
+  getNDF(): -1
   getOmega(): -0.00401371
   getPValue(): 0.652786
   getParticleType(): <type: pi+>
@@ -13742,6 +13860,7 @@ TrackFitResult#9:
 TrackFitResult#10:
   get4Momentum(): (0.0561615,-0.0591701,0.124336,0.203947)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.52411
   getCov(): size(15)
     0.000556079
@@ -13777,6 +13896,7 @@ TrackFitResult#10:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000010101010101010100010001
   getMomentum(): (0.0561615,-0.0591701,0.124336)
+  getNDF(): -1
   getOmega(): 0.0533885
   getPValue(): 0.356369
   getParticleType(): <type: pi+>
@@ -13795,6 +13915,7 @@ TrackFitResult#10:
 TrackFitResult#11:
   get4Momentum(): (-0.0309793,0.0210606,0.0719051,0.161411)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.91951
   getCov(): size(15)
     0.00767778
@@ -13830,6 +13951,7 @@ TrackFitResult#11:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000101010100010001
   getMomentum(): (-0.0309793,0.0210606,0.0719051)
+  getNDF(): -1
   getOmega(): -0.116268
   getPValue(): 0.0347971
   getParticleType(): <type: pi+>
@@ -13848,6 +13970,7 @@ TrackFitResult#11:
 TrackFitResult#12:
   get4Momentum(): (0.431568,-0.121939,0.547994,0.721732)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.22193
   getCov(): size(15)
     0.108522
@@ -13883,6 +14006,7 @@ TrackFitResult#12:
   getHitPatternCDC(): 0001110011111111111111111111111100000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.431568,-0.121939,0.547994)
+  getNDF(): -1
   getOmega(): -0.00939964
   getPValue(): 0.641957
   getParticleType(): <type: pi+>
@@ -13901,6 +14025,7 @@ TrackFitResult#12:
 TrackFitResult#13:
   get4Momentum(): (0.0561619,-0.0591706,0.124337,0.203948)
   getChargeSign(): 1
+  getChi2(): nan
   getCotTheta(): 1.52411
   getCov(): size(15)
     0.000556071
@@ -13936,6 +14061,7 @@ TrackFitResult#13:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (0.0561619,-0.0591706,0.124337)
+  getNDF(): -1
   getOmega(): 0.0533881
   getPValue(): 0.356369
   getParticleType(): <type: pi+>
@@ -13954,6 +14080,7 @@ TrackFitResult#13:
 TrackFitResult#14:
   get4Momentum(): (-0.364786,0.152923,0.768001,0.875077)
   getChargeSign(): -1
+  getChi2(): nan
   getCotTheta(): 1.94164
   getCov(): size(15)
     0.000513878
@@ -13989,6 +14116,7 @@ TrackFitResult#14:
   getHitPatternCDC(): 0000000000000000000000000000000000000000000000000000000000000000
   getHitPatternVXD(): 00000000000000000000000000000000
   getMomentum(): (-0.364786,0.152923,0.768001)
+  getNDF(): -1
   getOmega(): -0.011011
   getPValue(): 0.702635
   getParticleType(): <type: pi+>
@@ -16907,7 +17035,7 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (154.939,133.602,163.3)
-  getEnergy(): 0.542074
+  getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -16923,7 +17051,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
   getLayers(): 1
-  getMomentum(): (0.127258,0.109732,0.134124,0.542074)
+  getMomentum(): (0.127258,0.109732,0.134124,0.542072)
   getMomentumMag(): 0.215
   getPosition(): (0,0,0)
   getRelationsWith(KlIds): size(0)

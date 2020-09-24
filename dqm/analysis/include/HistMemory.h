@@ -1,5 +1,4 @@
-#ifndef _Belle2_HistMemory_h
-#define _Belle2_HistMemory_h
+#pragma once
 
 #include <framework/pcore/MsgHandler.h>
 
@@ -104,5 +103,3 @@ namespace Belle2 {
   };
 
 }
-
-#endif

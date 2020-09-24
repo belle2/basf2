@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef MCTRACKCANDCLASSIFIER_H_
-#define MCTRACKCANDCLASSIFIER_H_
+#pragma once
 
 #include <framework/core/Module.h>
 #include <string>
@@ -180,7 +179,7 @@ namespace Belle2 {
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             Int_t nbinsZ, Double_t minZ, Double_t maxZ, const char* titleZ,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
     /** Create a 3D ROOT Histogram.
      * @param name: name of histogram
@@ -201,7 +200,7 @@ namespace Belle2 {
                             Int_t nbinsX, Double_t* binsX, const char* titleX,
                             Int_t nbinsY, Double_t* binsY, const char* titleY,
                             Int_t nbinsZ, Double_t* binsZ, const char* titleZ,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
     /** Function to clone a histogram.
      * @param newname: new histogram name
@@ -211,7 +210,7 @@ namespace Belle2 {
      * @return the duplicated histogram
      */
     TH1* duplicateHistogram(const char* newname, const char* newtitle,
-                            TH1* h, TList* histoList = NULL);
+                            TH1* h, TList* histoList = nullptr);
 
     /** Function to create a ratio histogram from two histograms.
      * @param name: name of histogram
@@ -229,12 +228,12 @@ namespace Belle2 {
     /** Function to create efficiency plots and add them to list.
      * @param graphList: pointer to list to add the plots to
      */
-    void addEfficiencyPlots(TList* graphList = NULL);
+    void addEfficiencyPlots(TList* graphList = nullptr);
 
     /** Function to create inefficiency plots and add them to list.
      * @param graphList: pointer to list to add the plots to
      */
-    void addInefficiencyPlots(TList* graphList = NULL);
+    void addInefficiencyPlots(TList* graphList = nullptr);
 
     /** Calculate dR.
      * @param thetaMS: thetaMS of a hit
@@ -252,5 +251,3 @@ namespace Belle2 {
     float compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit);
   };
 }
-
-#endif /* MCTrackCandClassifierModule_H_ */

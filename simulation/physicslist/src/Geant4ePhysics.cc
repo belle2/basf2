@@ -10,12 +10,8 @@
 
 #include <simulation/physicslist/Geant4ePhysics.h>
 
-#include <CLHEP/Units/PhysicalConstants.h>
-#include <CLHEP/Units/SystemOfUnits.h>
-
 #include <G4ParticleTable.hh>
 #include <G4ParticleDefinition.hh>
-#include <G4Ions.hh>
 #include <G4ProcessManager.hh>
 #include <G4ComptonScattering.hh>
 #include <G4GammaConversion.hh>
@@ -24,8 +20,6 @@
 #include <simulation/kernel/ExtMagFieldLimitProcess.h>
 #include <simulation/kernel/ExtEnergyLoss.h>
 #include <simulation/kernel/ExtMessenger.h>
-
-#include <framework/logging/Logger.h>
 
 #define g4ePDGcode 0
 

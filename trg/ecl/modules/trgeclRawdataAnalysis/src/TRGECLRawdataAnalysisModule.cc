@@ -13,19 +13,10 @@
 //                     using  Unpacker version 1.1
 //---------------------------------------------------------------
 
-//framework headers
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
-
-#include <framework/logging/Logger.h>
-
-#include <G4RunManager.hh>
-#include "trg/ecl/TrgEclMaster.h"
 //trg package headers
 #include "trg/trg/Debug.h"
 #include "trg/ecl/modules/trgeclRawdataAnalysis/TRGECLRawdataAnalysisModule.h"
 
-#include <stdlib.h>
 #include <iostream>
 
 using namespace std;

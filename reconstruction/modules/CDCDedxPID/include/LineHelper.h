@@ -10,15 +10,8 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <framework/gearbox/Const.h>
-
 #include <cmath>
-#include <iostream>
 #include <vector>
-
-#define PI 3.14159265
-#define PI_2 1.57079632679
 
 namespace Belle2 {
 
@@ -212,7 +205,7 @@ namespace Belle2 {
 
       // The DedxPoint Of Closest Approach (poca) is useful for a reference point
       // to construct a line that represents the track.
-      DedxLine track = DedxLine(poca, std::tan(PI_2 - entAng));
+      DedxLine track = DedxLine(poca, std::tan(M_PI_2 - entAng));
 
       // Find the points of intersection with each cell boundary
       DedxPoint intLeft = m_Left.intersection(track);
@@ -251,7 +244,7 @@ namespace Belle2 {
       // The DedxPoint Of Closest Approach (poca) is useful for a reference point
       // to construct a line that represents the track.
       const DedxPoint poca = DedxPoint(doca * std::abs(std::cos(entAng)), -1.0 * doca * std::sin(entAng));
-      DedxLine track = DedxLine(poca, std::tan(PI_2 - entAng));
+      DedxLine track = DedxLine(poca, std::tan(M_PI_2 - entAng));
 
       // Find the points of intersection with each cell boundary
       DedxPoint intLeft = m_Left.intersection(track);

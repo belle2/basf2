@@ -30,9 +30,7 @@ namespace Belle2 {
   class TRGCDCTrack;
   class TRGCDCTrackMC;
   class TRGCDCWire;
-  class TRGCDCWireHit;
   class TRGCDCSegment;
-  class TRGCDCSegmentHit;
 
 /// A class to relate TRGCDCCellHit and TRGCDCTrack objects.
   class TRGCDCLink {

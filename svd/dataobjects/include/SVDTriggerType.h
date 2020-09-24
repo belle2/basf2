@@ -12,9 +12,6 @@
 #define SVDTRIGGERTYPE_H
 
 #include <cstdint>
-#include <string>
-#include <ostream>
-#include <utility>
 
 namespace Belle2 {
 

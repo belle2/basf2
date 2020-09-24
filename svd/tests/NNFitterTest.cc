@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dataobjects/VxdID.h>
 #include <svd/simulation/SVDSimulationTools.h>
 #include <svd/reconstruction/NNWaveFitter.h>
 #include <svd/reconstruction/NNWaveFitTool.h>
@@ -18,8 +17,6 @@
 #include <sstream>
 #include <string>
 #include <tuple>
-#include <cmath>
-#include <functional>
 
 using namespace std;
 

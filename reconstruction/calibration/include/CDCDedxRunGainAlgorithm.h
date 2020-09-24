@@ -13,10 +13,6 @@
 #include <reconstruction/dbobjects/CDCDedxRunGain.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include <TH1D.h>
 
 namespace Belle2 {
@@ -75,7 +71,9 @@ namespace Belle2 {
     bool isMakePlots; /**< produce plots for status */
     bool isMergePayload; /**< merge payload at the of calibration */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
-    double fSigLim = 2.5;
 
+    double fSigLim = 2.5; /**< fit range limit based on sigma */
+    double RunGainAbs = 1.0; /**< calculated Run gain */
   };
+
 } // namespace Belle2

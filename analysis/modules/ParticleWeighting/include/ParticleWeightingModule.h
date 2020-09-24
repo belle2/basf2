@@ -12,8 +12,10 @@
 
 #include <framework/core/Module.h>
 #include <analysis/dbobjects/ParticleWeightingLookUpTable.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <string>
 
@@ -24,10 +26,12 @@ namespace Belle2 {
    */
   class ParticleWeightingModule : public Module {
 
+  private:
     std::string m_tableName; /**< Name of the table */
     std::string m_inputListName; /**< name of input particle list. */
     StoreObjPtr<ParticleList> m_inputList; /**< input particle list */
     std::unique_ptr<DBObjPtr<ParticleWeightingLookUpTable>> m_ParticleWeightingLookUpTable; /**< Pointer to the table in DB */
+    StoreArray<Particle> m_particles; /**< StoreArray of Particles */
 
   public:
 

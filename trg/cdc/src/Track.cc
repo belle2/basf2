@@ -22,6 +22,7 @@
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Helix.h"
+#include "trg/cdc/TRGCDC.h"
 
 using namespace std;
 

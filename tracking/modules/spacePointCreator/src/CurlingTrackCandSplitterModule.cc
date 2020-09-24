@@ -84,8 +84,8 @@ CurlingTrackCandSplitterModule::CurlingTrackCandSplitterModule()
 
   // initialize other variables to some default values to avoid unintended behaviour
   m_saveCompleteCurler = false;
-  m_treePtr = NULL;
-  m_rootFilePtr = NULL;
+  m_treePtr = nullptr;
+  m_rootFilePtr = nullptr;
 }
 
 // ================================================= INITIALIZE =========================================================
@@ -157,7 +157,6 @@ void CurlingTrackCandSplitterModule::initialize()
     // check if there are two entries and if the second value is either UPDATE or RECREATE
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       string output;
-      // cppcheck-suppress useStlAlgorithm
       for (string entry : m_PARAMrootFileName) { output += "'" + entry + "' "; }
       B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
     }
@@ -235,8 +234,8 @@ void CurlingTrackCandSplitterModule::initialize()
       m_treePtr->Branch(name.c_str(), &m_rootMisMatchMomZ.at(layer));
     }
   } else {
-    m_rootFilePtr = NULL;
-    m_treePtr = NULL;
+    m_rootFilePtr = nullptr;
+    m_treePtr = nullptr;
   }
 }
 
@@ -343,7 +342,7 @@ void CurlingTrackCandSplitterModule::terminate()
          m_noDecisionPossibleCtr << " cases no decision could be made. There were " << m_NoSingleTrueHitCtr <<
          " SpacePoints that were related to more than one TrueHit");
   // do ROOT file stuff
-  if (m_treePtr != NULL) {
+  if (m_treePtr != nullptr) {
     m_rootFilePtr->cd(); //important! without this the famework root I/O (SimpleOutput etc) could mix with the root I/O of this module
     m_treePtr->Write();
     m_rootFilePtr->Close();
@@ -384,7 +383,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
       PXDTrueHit* pxdTrueHit =
         pxdCluster->getRelatedTo<PXDTrueHit>("ALL"); // COULDDO: search only certain PXDTrueHit arrays -> new parameter for module
 
-      if (pxdTrueHit == NULL) {
+      if (pxdTrueHit == nullptr) {
         B2DEBUG(1, "Found no PXDTrueHit for PXDCluster " << pxdCluster->getArrayIndex() << " from Array " << pxdCluster->getArrayName() <<
                 ". This PXDCluster is related with SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName());
         throw FoundNoTrueHit();

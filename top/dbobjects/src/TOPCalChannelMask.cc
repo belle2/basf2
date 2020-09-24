@@ -10,6 +10,8 @@
 
 #include <top/dbobjects/TOPCalChannelMask.h>
 
+#include <framework/logging/Logger.h>
+
 using namespace std;
 
 namespace Belle2 {

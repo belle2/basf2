@@ -29,7 +29,7 @@ void ROIpayload::init(int length)
   m_index = 0;
   m_length = length;
   if (length == 0)
-    m_rootdata = NULL;
+    m_rootdata = nullptr;
   else
     m_rootdata = new int[length];
   m_data32 = (uint32_t*)m_rootdata;

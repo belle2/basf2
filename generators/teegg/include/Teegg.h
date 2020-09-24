@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TEEGG_H
-#define TEEGG_H
+#pragma once
 
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <TLorentzRotation.h>
@@ -29,7 +28,7 @@ namespace Belle2 {
      */
     Teegg();
 
-    /** Destrucotr. */
+    /** Destructor. */
     ~Teegg();
 
     /** Sets the default settings for the TEEGG Fortran generator. */
@@ -141,7 +140,7 @@ namespace Belle2 {
     void setMTRXGG(const std::string& mtrxgg = "NONE") {m_sMTRXGG = mtrxgg;}
 
     /** set logical variable. If true then generate unweighted events
-      * @param wghtmx logical variable. If true then generate unweighted events
+      * @param unwght logical variable. If true then generate unweighted events
       */
     void setUNWGHT(int unwght = 1) { m_UNWGHT = unwght; }
 
@@ -243,4 +242,3 @@ namespace Belle2 {
 }
 
 
-#endif /* TEEG_H */

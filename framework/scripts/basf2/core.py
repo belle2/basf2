@@ -18,7 +18,7 @@ if _sys.version_info[0] < 3:
 from basf2 import _override_print  # noqa
 
 # import the C++ library with the exported functions
-import pybasf2
+import pybasf2  # noqa
 # and also import all of them in current scope for ease of use
 from pybasf2 import *  # noqa
 
@@ -27,7 +27,7 @@ from basf2 import _constwrapper  # noqa
 
 
 basf2label = 'BASF2 (Belle Analysis Software Framework 2)'
-basf2copyright = 'Copyright(C) 2010-2018  Belle II Collaboration'
+basf2copyright = 'Copyright(C) 2010-2020  Belle II Collaboration'
 
 # -----------------------------------------------
 #               Prepare basf2
@@ -275,7 +275,7 @@ def _add_module(self, module, logLevel=None, debugLevel=None, **kwargs):
     return module
 
 
-def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
+def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=None):
     """
     Add given path at the end of this path and ensure all modules there
     do not influence the main DataStore. You can thus use modules in
@@ -289,6 +289,8 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
       merge_back_event: is a list of object/array names (of event durability)
         that will be merged back into the main path.
     """
+    if merge_back_event is None:
+        merge_back_event = []
     self._add_independent_path(skim_path, ds_ID, merge_back_event)
 
 

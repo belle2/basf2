@@ -17,10 +17,7 @@
 #ifndef TRGECLUNPACKER_H
 #define TRGECLUNPACKER_H
 
-#include <stdlib.h>
 #include <string>
-#include <iostream>
-#include <vector>
 
 #include "rawdata/dataobjects/RawTRG.h"
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
@@ -28,13 +25,8 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 
-#include "trg/ecl/TrgEclDataBase.h"
-#include "trg/ecl/TrgEclMapping.h"
-
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 

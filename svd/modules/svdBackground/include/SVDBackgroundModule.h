@@ -8,7 +8,6 @@
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <string>
-#include <vector>
 #include <memory>
 #include <map>
 #include <vxd/background/niel_fun.h>
@@ -148,6 +147,7 @@ namespace Belle2 {
       /** Get number of sensors in a layer */
       inline int getNumSensors(int layerNum);
       /** Get total number of sensors */
+      // cppcheck-suppress unusedPrivateFunction
       inline int getTotalSensors();
 
       // Output directory

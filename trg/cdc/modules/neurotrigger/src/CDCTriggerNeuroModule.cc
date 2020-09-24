@@ -1,9 +1,5 @@
 #include "trg/cdc/modules/neurotrigger/CDCTriggerNeuroModule.h"
 
-#include <framework/datastore/StoreObjPtr.h>
-
-#include <framework/gearbox/Const.h>
-
 #include <cmath>
 
 using namespace Belle2;
@@ -144,6 +140,12 @@ CDCTriggerNeuroModule::event()
     // get the hit pattern (depends on phase space sector)
     unsigned long hitPattern =
       m_NeuroTrigger.getInputPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
+    // get the complete hit pattern for debug purposes
+    unsigned long chitPattern =
+      m_NeuroTrigger.getCompleteHitPattern(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
+    // get the pure driftthreshold vector
+    unsigned long puredriftth =
+      m_NeuroTrigger.getPureDriftThreshold(geoSectors[0], *m_tracks2D[itrack], m_neuroTrackInputMode);
     // get the MLP that matches the hit pattern
     int isector = m_NeuroTrigger.selectMLPbyPattern(geoSectors, hitPattern, m_neuroTrackInputMode);
     if (isector < 0) continue;
@@ -172,18 +174,40 @@ CDCTriggerNeuroModule::event()
     double z = (zIndex >= 0) ? target[zIndex] : 0.;
     int thetaIndex = m_NeuroTrigger[isector].thetaIndex();
     double cot = (thetaIndex >= 0) ? cos(target[thetaIndex]) / sin(target[thetaIndex]) : 0.;
+    bool valtrack = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getValidStereoBit() : true;
+    std::vector<bool> tsvector;
+    for (int k = 0; k < 9; k++) {
+      tsvector.push_back(bool ((chitPattern & (1 << k)) >> k));
+    }
+    tsvector = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getTSVector() : tsvector;
+    std::vector<bool> driftthreshold;
+    for (int k = 8; k >= 0; k--) {
+      driftthreshold.push_back(!tsvector[k] | bool ((puredriftth & (1 << k)) >> k));
+    }
+    int expert = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getExpert() : isector;
+    short quadrant;
+    double tphi = m_tracks2D[itrack]->getPhi0();
+    if (tphi > -1 * M_PI_4 && tphi <  1 * M_PI_4) { quadrant = 0; }
+    else if (tphi >  1 * M_PI_4 && tphi <  3 * M_PI_4) { quadrant = 1; }
+    else if (tphi >  3 * M_PI_4 || tphi < -3 * M_PI_4) { quadrant = 2; }
+    else if (tphi > -3 * M_PI_4 && tphi < -1 * M_PI_4) { quadrant = 3; }
+
+
+
+
+
     const CDCTriggerTrack* NNtrack =
       m_tracksNN.appendNew(m_tracks2D[itrack]->getPhi0(),
                            m_tracks2D[itrack]->getOmega(),
                            m_tracks2D[itrack]->getChi2D(),
                            z, cot, 0.,
                            m_tracks2D[itrack]->getFoundOldTrack(),
-                           m_tracks2D[itrack]->getDriftThreshold(),
-                           m_tracks2D[itrack]->getValidStereoBit(),
-                           m_tracks2D[itrack]->getExpert(),
-                           m_tracks2D[itrack]->getTSVector(),
+                           driftthreshold,
+                           valtrack,
+                           expert,
+                           tsvector,
                            m_tracks2D[itrack]->getTime(),
-                           -1 //quadrant not known in simulation
+                           quadrant //quadrant simulated from phi
                           );
     m_tracks2D[itrack]->addRelationTo(NNtrack);
     if (m_neuroTrackInputMode) {

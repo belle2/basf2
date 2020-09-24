@@ -12,6 +12,8 @@
 
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
+#include <framework/logging/Logger.h>
+
 #include <map>
 #include <vector>
 #include <tuple>

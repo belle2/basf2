@@ -1,5 +1,3 @@
-#ifndef BEVENT_H
-#define BEVENT_H
 //+
 // File : BEvent.h
 // Description : class to contain an event
@@ -7,6 +5,8 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 28 - Jan - 2004
 //-
+
+#pragma once
 
 #include "TObject.h"
 #include "TClonesArray.h"
@@ -36,7 +36,5 @@ public:
 
   ClassDef(BEvent, 1)
 };
-
-#endif
 
 

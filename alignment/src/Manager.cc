@@ -74,6 +74,8 @@ namespace Belle2 {
       //TODO by restricting components you stop to observe some hierarchy changes!
       m_globalVector->postHierarchyChanged(getAlignmentHierarchy());
       m_globalVector->postHierarchyChanged(getLorentzShiftHierarchy());
+      getAlignmentHierarchy().buildConstraints(m_constraints);
+      getLorentzShiftHierarchy().buildConstraints(m_constraints);
 
       // Try to init as much as possible before event processing
       // geometry, reconstruction config -> recohits & derivatives
@@ -109,6 +111,11 @@ namespace Belle2 {
       // range for time dependent calibration consts
       auto subrun = updateTimeDepGlobalLabels(emd);
 
+      // WARNING: TODO: This is actually a bug, but as we loop exactly over all timeline events
+      // to generate constraints in practice (separately from collection), it does not reveal itself
+      // usually (needs to have more runs in one job + also timdep cal. has be in effect)
+      // -> can't think of easy fix now -> rebuild constraints
+      // after each subrun change?
       bool alignmentHierarchyChanged = false;
       bool lorentzHierarchyChanged = false;
       for (auto& uid : getAlignmentHierarchy().getUsedDBObjUniqueIDs()) {
@@ -119,7 +126,7 @@ namespace Belle2 {
       }
       for (auto& uid : getLorentzShiftHierarchy().getUsedDBObjUniqueIDs()) {
         if (alignment::timeline::getContinuousIndexByTimeID(m_iniTimeTable, uid, subrun) == 1) {
-          alignmentHierarchyChanged = true;
+          lorentzHierarchyChanged = true;
           break;
         }
       }

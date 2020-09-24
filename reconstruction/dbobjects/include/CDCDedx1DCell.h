@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedx1DCell(short version, std::vector<std::vector<double>>& onedgains): m_version(version), m_onedgains(onedgains) {};
+    CDCDedx1DCell(short version, const std::vector<std::vector<double>>& onedgains): m_version(version), m_onedgains(onedgains) {};
 
     /**
      * Destructor
@@ -95,7 +95,8 @@ namespace Belle2 {
     };
 
     /** Return dE/dx mean value for the given bin
-     * @param bin number
+     * @param layer is layer number between 0-55
+     * @param bin is enta bin number
      */
     double getMean(unsigned int layer, unsigned int bin) const
     {
@@ -106,11 +107,13 @@ namespace Belle2 {
       if (bin < m_onedgains[mylayer].size())
         return m_onedgains[mylayer][bin];
       else return 1.0;
-    }
+    };
 
     /** Reset dE/dx mean value for the given bin
-     * @param bin number
-     */
+     * @param layer is layer number between 0-55
+     * @param bin is enta bin number
+     * @param value is constant for requested entabin and layer
+    */
     void setMean(unsigned int layer, unsigned int bin, double value)
     {
       int mylayer = 0;
@@ -119,7 +122,7 @@ namespace Belle2 {
 
       if (bin < m_onedgains[mylayer].size()) m_onedgains[mylayer][bin] = value;
       else m_onedgains[mylayer][bin] = 1.0;
-    }
+    };
 
     /** Return dE/dx mean value for given entrance angle
      * @param continuous layer number
@@ -157,6 +160,6 @@ namespace Belle2 {
     short m_version; /**< version number for 1D cleanup correction */
     std::vector<std::vector<double>> m_onedgains; /**< dE/dx means in entrance angle bins */
 
-    ClassDef(CDCDedx1DCell, 4); /**< ClassDef */
+    ClassDef(CDCDedx1DCell, 5); /**< ClassDef */
   };
 } // end namespace Belle2

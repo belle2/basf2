@@ -16,14 +16,12 @@
 #
 # 3. Call b2file-metadata-show on each file, but try to do it in a multiprocessed way.
 
+import fnmatch
 from pprint import PrettyPrinter
 pp = PrettyPrinter(indent=2)
 
 # Lets take some file patterns. We could have put wildcards in more places but this is enough for testing
 file_path_patterns = ["/hsm/belle2/bdata/Data/Raw/e0003/r0495[5,6]*/**/*.root"]
-
-
-import fnmatch
 
 
 def bad_run_finder(filepath):

@@ -47,6 +47,7 @@ extensions = [
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
+    'IPython.sphinxext.ipython_console_highlighting',
 ]
 
 nbsphinx_allow_errors = True
@@ -119,9 +120,22 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-# Note: This is overwritten when using ``scons --sphinx`` to build the documentation
-# change the ``sphinx_exclude_patterns`` in ``site_scons/SConscript``.
-exclude_patterns = ['_sphinxbuild', 'Thumbs.db', '.DS_Store', '**/*.ipynb']
+exclude_patterns = ['.*', '_sphinxbuild', 'Thumbs.db', 'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
+# If we want to create the light release documentation then we need t exclude anything not in the light release.
+if tags.has('light'):
+    light_packages = set([entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')])
+    for entry in os.listdir("../../"):
+        if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_patterns or entry in light_packages:
+            continue
+        exclude_patterns.append(entry)
+    del light_packages
+
+# now we need to exclude everything in the build dir except for the tools_doc
+# sub dir but there's no negative exclusion pattern so do it manually
+exclude_patterns.remove("build")
+exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*']
+# Ignore jupyter notebooks by default, we only want the ones meant for documentation
+exclude_patterns += ['**/*.ipynb', '*.ipynb']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents. :any: allows easy linking to functions/classes/modules
@@ -450,3 +464,4 @@ def setup(app):
     app.connect('autodoc-process-signature', process_sig)
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-skip-member', skipmember)
+    app.add_css_file('css/custom.css')

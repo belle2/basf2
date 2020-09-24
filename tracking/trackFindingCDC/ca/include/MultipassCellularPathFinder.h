@@ -30,7 +30,7 @@ namespace Belle2 {
      *  knots until there is no more path fullfilling the minimal length / energy requirement given
      *  as minStateToFollow to the constructor.
      */
-    template <class ACellHolder, template<class> class WeightedRelationClass>
+    template <class ACellHolder>
     class MultipassCellularPathFinder {
     public:
       /// Default constructor also checking the validity of the template arguments
@@ -67,7 +67,7 @@ namespace Belle2 {
 
       /// Applies the cellular automaton to the collection and its relations
       void apply(const std::vector<ACellHolder*>& cellHolders,
-                 const std::vector<WeightedRelationClass<ACellHolder>>& cellHolderRelations,
+                 const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
                  std::vector<Path<ACellHolder> >& paths)
       {
         B2ASSERT("Expected the relations to be sorted",
@@ -83,7 +83,7 @@ namespace Belle2 {
 
         // Forward all relations as paths
         if (m_param_caMode == "relations") {
-          for (const WeightedRelationClass<ACellHolder>& cellHolderRelation : cellHolderRelations) {
+          for (const WeightedRelation<ACellHolder>& cellHolderRelation : cellHolderRelations) {
             paths.push_back({cellHolderRelation.getFrom(), cellHolderRelation.getTo()});
           }
           return;
@@ -171,10 +171,10 @@ namespace Belle2 {
       int m_param_minPathLength = 0;
 
       /// The cellular automaton to be used.
-      CellularAutomaton<ACellHolder, WeightedRelationClass> m_cellularAutomaton;
+      CellularAutomaton<ACellHolder> m_cellularAutomaton;
 
       /// The path follower used to extract the path from the graph processed by the cellular automaton.
-      CellularPathFollower<ACellHolder, WeightedRelationClass> m_cellularPathFollower;
+      CellularPathFollower<ACellHolder> m_cellularPathFollower;
     };
   }
 }

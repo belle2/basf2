@@ -15,13 +15,11 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/IntervalOfValidity.h>
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4Box;
-class G4ExtrudedSolid;
 class G4UnionSolid;
 
 namespace Belle2 {

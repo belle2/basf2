@@ -11,13 +11,11 @@
 #include <svd/modules/svdCalibration/SVDLocalCalibrationsCheckModule.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
-#include <TStyle.h>
+#include <TCanvas.h>
 #include <TLine.h>
 #include <TPaveText.h>
+#include <TStyle.h>
 #include <TText.h>
 
 using namespace Belle2;
@@ -541,8 +539,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   TH2F* checkU = nullptr;
   TH2F* checkV = nullptr;
 
-  Int_t minY;
-  Int_t maxY;
+  Int_t minY = 0;
+  Int_t maxY = 0;
 
   Float_t leftLine = 0;
   Float_t rightLine = 0;

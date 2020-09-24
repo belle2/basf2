@@ -369,6 +369,8 @@ if __name__ == "__main__":
 
     # ok, if mode is record or both we now run the program and collect memory
     # information.
+    #: Remember the exit code of the child process
+    exit_code = 0
     if do_record:
         # create a list of memory consumptions for each pid
         process_memory = {}
@@ -436,6 +438,10 @@ if __name__ == "__main__":
         # timestamps to strings
         annot_max_length = max(len(e[1]) for e in annotations) if len(annotations) else ""
         annotations = np.array(annotations, dtype=[("time", "f4"), ("text", "U%s" % annot_max_length)])
+        exit_code = child.returncode
+        if exit_code != 0:
+            print(f"Program exited with non-zero exit code: {exit_code}", file=sys.stderr)
+
 
     # recording is done so let's write that data to file if requested. We use
     # numpy.savez to store all data as binary numpy arrays in that file.
@@ -490,7 +496,7 @@ if __name__ == "__main__":
 
     if not process_memory:
         print("program exited to fast to measure memory, exiting", file=sys.stderr)
-        sys.exit(0)
+        sys.exit(exit_code)
 
     # start plotting
     if do_plotting:
@@ -550,10 +556,8 @@ if __name__ == "__main__":
         # save plots
         with PdfPages(options.out) as pdf:
             for f in figures:
-                # select the figure
-                pl.figure(f.number)
                 # adjust the layout to fit exactly on the canvas
-                pl.tight_layout()
+                f.tight_layout()
                 # add to pdf
                 pdf.savefig(f)
 
@@ -573,3 +577,5 @@ if __name__ == "__main__":
               "avg={values[1]:>{digits[1]}} +- {values[2]:>{digits[2]}} MB"
               .format(values=values.T[i], name=name, digits=digits),
               file=sys.stderr)
+
+    sys.exit(exit_code)

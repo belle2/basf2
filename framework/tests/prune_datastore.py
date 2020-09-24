@@ -40,6 +40,7 @@ class TestModule(basf2.Module):
         evtmetadata = Belle2.PyStoreObj('EventMetaData')
         assert evtmetadata
 
+
 basf2.set_log_level(basf2.LogLevel.ERROR)
 basf2.conditions.disable_globaltag_replay()
 basf2.set_random_seed("something important")

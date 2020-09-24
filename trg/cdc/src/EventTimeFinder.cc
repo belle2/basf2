@@ -14,9 +14,7 @@
 #define TRG_SHORT_NAMES
 #define TRGCDC_SHORT_NAMES
 
-#include <bitset>
 #include "trg/trg/Debug.h"
-#include "trg/trg/State.h"
 #include "trg/trg/Channel.h"
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/TRGCDC.h"
@@ -26,10 +24,6 @@
 #include "trg/cdc/Segment.h"
 #include "trg/cdc/SegmentHit.h"
 #include "trg/cdc/EventTimeFinder.h"
-#include "framework/datastore/StoreArray.h"
-#include "framework/datastore/RelationArray.h"
-#include "cdc/dataobjects/CDCSimHit.h"
-#include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/FrontEnd.h"
 #include "trg/cdc/Merger.h"
 

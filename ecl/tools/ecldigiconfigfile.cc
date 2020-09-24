@@ -6,6 +6,9 @@
  * Program that record  cavariance matrices and other                     *
  * parameters in root file that needs for simulation                      *
  *                                                                        *
+ * NOTE: This tool is now deprecated, please use eclDigitizerConfigGen    *
+ *       instead                                                          *
+ *                                                                        *
  * Contributors: Alexander Bobrov (a.v.bobrov@inp.nsk.su) ,               *
  * Guglielmo De Nardo                                                     *
  *                                                                        *
@@ -14,7 +17,7 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include <ecl/dataobjects/ECLWaveformData.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
 #include <ecl/digitization/algorithms.h>
 #include <iostream>
 #include <stdio.h>
@@ -24,6 +27,7 @@
 #include <vector>
 #include <cassert>
 #include <framework/utilities/FileSystem.h>
+#include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
@@ -395,6 +399,7 @@ int main(int argc, char** argv)
 
 {
   assert(argc == 4 || argc == 1);
+  B2WARNING("This tool is now deprecated, please use eclDigitizerConfigGen instead");
   if (argc == 1) {
     cout << "Usage " << endl;
     cout << argv[0] << " <type>  <covar_mat_path> <parameters_path>" << endl;

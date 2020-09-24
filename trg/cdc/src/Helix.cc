@@ -13,7 +13,6 @@
 
 #include <math.h>
 #include <float.h>
-#include <exception>
 #include "trg/cdc/Helix.h"
 #include "CLHEP/Matrix/Matrix.h"
 

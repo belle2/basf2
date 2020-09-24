@@ -31,7 +31,7 @@ namespace Belle2 {
      * prerequisite for NodeEntryType:
      * - std::string getName()
      */
-    template<class NodeEntryType>
+    template<class NodeEntryType> // cppcheck-suppress constParameter
     void printCANetwork(DirectedNodeNetwork<NodeEntryType, CACell>& network, const std::string& fName)
     {
       std::string fullOut = "digraph G {\n";
@@ -67,7 +67,7 @@ namespace Belle2 {
 
 
     /** overloaded print-version for typical activeSector-networks without CACell-stuff */
-    template<class NodeEntryType, class AnyMetaInfo>
+    template<class NodeEntryType, class AnyMetaInfo> // cppcheck-suppress constParameter
     void printNetwork(DirectedNodeNetwork<NodeEntryType, AnyMetaInfo>& network, const std::string& fName)
     {
       std::string fullOut = "digraph G {\n";

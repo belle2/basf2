@@ -12,19 +12,11 @@
 #include <trg/ecl/dbobjects/TrgEclDatabaseImporter.h>
 
 // framework - Database
-#include <framework/database/Database.h>
-#include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportArray.h>
-#include <framework/database/DBImportObjPtr.h>
-
-// framework - xml
-#include <framework/gearbox/GearDir.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 // DB objects
@@ -37,10 +29,6 @@
 
 #include <iostream>
 #include <fstream>
-
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
 
 using namespace std;
 namespace Belle2 {

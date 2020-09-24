@@ -18,12 +18,9 @@
 #include <top/utilities/Chi2MinimumFinder1D.h>
 
 // framework - DataStore
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
@@ -172,7 +169,8 @@ namespace Belle2 {
 
     int Nhyp = 1;
     double mass = Const::muon.getMass();
-    TOPreco reco(Nhyp, &mass);
+    int pdg = Const::muon.getPDGCode();
+    TOPreco reco(Nhyp, &mass, &pdg);
     reco.setPDFoption(TOPreco::c_Rough);
 
     // add photon hits to reconstruction object

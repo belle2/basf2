@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BFIELDCOMPONENTRADIAL_H
-#define BFIELDCOMPONENTRADIAL_H
+#pragma once
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
@@ -137,5 +136,3 @@ namespace Belle2 {
   };
 
 } //end of namespace Belle2
-
-#endif /* BFIELDCOMPONENTRADIAL_H */

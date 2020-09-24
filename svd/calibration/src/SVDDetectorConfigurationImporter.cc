@@ -18,23 +18,16 @@
 
 // framework - Database
 #include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/database/PayloadFile.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <framework/utilities/FileSystem.h>
 
 // wrapper objects
 #include <svd/calibration/SVDDetectorConfiguration.h>
-//#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-
-#include <vxd/dataobjects/VxdID.h>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
@@ -42,8 +35,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <TFile.h>
-#include <TVectorF.h>
 
 using namespace std;
 using namespace Belle2;
@@ -78,36 +69,41 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   float  zeroSuppression = 0;
   float  latency = 0;
   std::string systemClock = "";
+  float hv = 0;
 
   for (ptree::value_type const& cfgDocumentChild :
        pt.get_child("cfg_document")) {
 
     if (cfgDocumentChild.first == "noise_run") {
-      //      std::cout << "Masking bitmap is an attribute of the node <noise_run>!" << endl;
       maskFilter = cfgDocumentChild.second.get<int>("<xmlattr>.mask") ;
-      std::cout << " masking bitmap    = " << maskFilter << endl;
+      B2INFO(" masking bitmap    = " << maskFilter);
 
     }
     if (cfgDocumentChild.first == "hardware_run") {
-      //      std::cout << "Zero suppression is an attribute of the node <hardware_run>!" << endl;
       zeroSuppression = cfgDocumentChild.second.get<float>("<xmlattr>.zs_cut") ;
-      std::cout << " zero suppression cut    = " << zeroSuppression << endl;
+      B2INFO(" zero suppression cut    = " << zeroSuppression);
 
     }
 
     if (cfgDocumentChild.first == "i2c") {
-      //std::cout << "Latency is an attribute of the node <i2c>!" << endl;
       latency = cfgDocumentChild.second.get<float>("<xmlattr>.lat") ;
-      std::cout << " latency  = " << latency << endl;
+      B2INFO(" latency  = " << latency);
 
     }
 
     if (cfgDocumentChild.first == "fadc_ctrl") {
-      //          std::cout << "Zero suppression is an attribute of the node <fadc_ctrl>!"<<endl;
       systemClock = cfgDocumentChild.second.get<std::string>("<xmlattr>.system_clock") ;
-      std::cout << " APV clock units = " << systemClock << endl;
+      B2INFO(" APV clock units = " << systemClock);
 
     }
+  }
+  for (ptree::value_type const& cfgDocumentChild :
+       pt.get_child("cfg_document.ps_setup.hv_config")) {
+    if (cfgDocumentChild.first == "config") {
+      hv = cfgDocumentChild.second.get<float>("<xmlattr>.v_conf") ;
+      B2INFO(" HV    = " << hv);
+    }
+
   }
 
   DBImportObjPtr<SVDDetectorConfiguration::t_svdGlobalConfig_payload> svdGlobalConfig(SVDDetectorConfiguration::svdGlobalConfig_name);
@@ -118,6 +114,7 @@ void SVDDetectorConfigurationImporter::importSVDGlobalConfigParametersFromXML(co
   svdGlobalConfig->setLatency(latency);
   svdGlobalConfig->setMaskFilter(maskFilter);
   svdGlobalConfig->setAPVClockInRFCUnits(systemClock);
+  svdGlobalConfig->setHV(hv);
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -139,7 +136,7 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
 
   //auxilairy variables to store the XML file values
   // TODO: calInjectedCharge is not used! Check if it can be removed.
-  std::string calInjectedCharge = "";
+  std::string calInjectedCharge;
   std::string calibTimeUnits = "";
   std::string calibDate = "";
 
@@ -148,13 +145,13 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
 
 
     if (apvChild.first == "cal_peaks") {
-      calInjectedCharge = apvChild.second.get<std::string>("<xmlattr>.units") ;
-      std::cout << " injected charge from XML  = " << calInjectedCharge << ", but actually set to 22500, hardcoded" << endl;
+      calInjectedCharge = apvChild.second.get<std::string>("<xmlattr>.units");
+      B2INFO(" injected charge from XML  = " << calInjectedCharge << ", but actually set to 22500, hardcoded");
     }
 
     if (apvChild.first == "cal_peak_time") {
-      calibTimeUnits = apvChild.second.get<std::string>("<xmlattr>.units") ;
-      std::cout << " calibration time units   = " << calibTimeUnits << endl;
+      calibTimeUnits = apvChild.second.get<std::string>("<xmlattr>.units");
+      B2INFO(" calibration time units   = " << calibTimeUnits);
 
     }
   }
@@ -162,9 +159,8 @@ void SVDDetectorConfigurationImporter::importSVDLocalConfigParametersFromXML(con
        pt.get_child("cfg_document.latest_runs")) {
 
     if (latestRunChild.first == "Noise") {
-      //      std::cout << "Masking bitmap is an attribute of the node <noise_run>!" << endl;
-      calibDate = latestRunChild.second.get<std::string>("<xmlattr>.end_of_run") ;
-      std::cout << " calibration date    = " << calibDate << endl;
+      calibDate = latestRunChild.second.get<std::string>("<xmlattr>.end_of_run");
+      B2INFO(" calibration date    = " << calibDate);
 
     }
   }

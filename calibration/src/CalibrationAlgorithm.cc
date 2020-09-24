@@ -253,7 +253,7 @@ string CalibrationAlgorithm::getExpRunString(ExpRun& expRun) const
   return expRunString;
 }
 
-string CalibrationAlgorithm::getFullObjectPath(string name, ExpRun expRun) const
+string CalibrationAlgorithm::getFullObjectPath(const string& name, ExpRun expRun) const
 {
   string dirName = getPrefix() + "/" + name;
   string objName = name + "_" + getExpRunString(expRun);
@@ -356,14 +356,13 @@ RunRange CalibrationAlgorithm::getRunRangeFromAllData() const
   // Save TDirectory to change back at the end
   TDirectory* dir = gDirectory;
   RunRange runRange;
-  RunRange* runRangeOther;
   // Construct the TDirectory name where we expect our objects to be
   string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
   for (const auto& fileName : m_inputFileNames) {
     //Open TFile to get the objects
     unique_ptr<TFile> f;
     f.reset(TFile::Open(fileName.c_str(), "READ"));
-    runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+    RunRange* runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
     if (runRangeOther) {
       runRange.merge(runRangeOther);
     } else {
@@ -508,10 +507,10 @@ bool CalibrationAlgorithm::loadInputJson(const std::string& jsonString)
 
 const std::vector<ExpRun> CalibrationAlgorithm::findPayloadBoundaries(std::vector<ExpRun> runs, int iteration)
 {
-  std::vector<ExpRun> boundaries;
+  m_boundaries.clear();
   if (m_inputFileNames.empty()) {
     B2ERROR("There aren't any input files set. Please use CalibrationAlgorithm::setInputFiles()");
-    return boundaries;
+    return m_boundaries;
   }
   // Reset the internal execution data just in case something is hanging around
   m_data.reset();
@@ -522,12 +521,12 @@ const std::vector<ExpRun> CalibrationAlgorithm::findPayloadBoundaries(std::vecto
   // Let's check that we have some now
   if (runs.empty()) {
     B2ERROR("No collected data in input files.");
-    return boundaries;
+    return m_boundaries;
   }
   // In order to find run boundaries we must have collected with data granularity == 'run'
   if (strcmp(getGranularity().c_str(), "all") == 0) {
     B2ERROR("The data is collected with granularity='all' (exp=-1,run=-1), and we can't use that to find run boundaries.");
-    return boundaries;
+    return m_boundaries;
   }
   m_data.setIteration(iteration);
   // User defined setup function
@@ -539,7 +538,7 @@ const std::vector<ExpRun> CalibrationAlgorithm::findPayloadBoundaries(std::vecto
     m_data.setRequestedRuns(runList);
     // After here, the getObject<...>(...) helpers start to work
     if (isBoundaryRequired(currentRun)) {
-      boundaries.push_back(currentRun);
+      m_boundaries.push_back(currentRun);
     }
     // Only want run-by-run
     runList.clear();
@@ -548,5 +547,5 @@ const std::vector<ExpRun> CalibrationAlgorithm::findPayloadBoundaries(std::vecto
   }
   m_data.reset();
   boundaryFindingTearDown();
-  return boundaries;
+  return m_boundaries;
 }

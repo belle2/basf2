@@ -16,6 +16,7 @@ from basf2 import set_random_seed, create_path, process, statistics, \
 from simulation import add_simulation
 from L1trigger import add_tsim
 from beamparameters import add_beamparameters
+from validation import statistics_plots, event_timing_plot
 
 set_random_seed(12345)
 
@@ -55,7 +56,6 @@ process(main)
 # Print call statistics
 print(statistics)
 
-from validation import *
 statistics_plots(
     'EvtGenSimNoBkg_statistics.root',
     contact='Software team b2soft@mail.desy.de',

@@ -12,7 +12,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
-#include <CLHEP/Units/PhysicalConstants.h>
 #include <CLHEP/Units/SystemOfUnits.h>
 
 #include <G4UnitsTable.hh>

@@ -12,6 +12,7 @@ from basf2 import *
 from ROOT import Belle2
 import ROOT
 from ROOT import gStyle, gROOT, AddressOf, TH2F
+from sys import argv
 
 
 gStyle.SetOptStat(0)
@@ -30,9 +31,8 @@ gROOT.ProcessLine('struct TreeStruct {\
    int pmtpixel;\
 };')
 
-from ROOT import TreeStruct
+from ROOT import TreeStruct  # noqa
 
-from sys import argv
 args = sys.argv
 
 

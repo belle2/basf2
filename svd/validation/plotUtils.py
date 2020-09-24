@@ -18,6 +18,7 @@ def addDetails(h, descr, check, contact_str, isShifter):
     if isShifter:
         h.GetListOfFunctions().Add(R.TNamed("MetaOptions", "shifter"))
 
+
 # constants
 SVDContact = "SVD Software Group, svd-software@belle2.org"
 
@@ -45,25 +46,25 @@ cut_noUV = R.TCut('strip_dir==-1')  # no U, no V
 
 
 # default granurality
-gD = ((cut_L3+cut_b+cut_U, 'L3_barrel_U_side'),
-      (cut_L3+cut_b+cut_V, 'L3_barrel_V_side'),
-      (cut_L456+cut_b+cut_U, 'L456_barrel_U_side'),
-      (cut_L456+cut_b+cut_V, 'L456_barrel_V_side'),
-      (cut_L456+cut_s+cut_U, 'L456_slanted_U_side'),
-      (cut_L456+cut_s+cut_V, 'L456_slanted_V_side'))
+gD = ((cut_L3 + cut_b + cut_U, 'L3_barrel_U_side'),
+      (cut_L3 + cut_b + cut_V, 'L3_barrel_V_side'),
+      (cut_L456 + cut_b + cut_U, 'L456_barrel_U_side'),
+      (cut_L456 + cut_b + cut_V, 'L456_barrel_V_side'),
+      (cut_L456 + cut_s + cut_U, 'L456_slanted_U_side'),
+      (cut_L456 + cut_s + cut_V, 'L456_slanted_V_side'))
 
-gD2 = ((cut_L3+cut_b, 'L3_barrel'),
-       (cut_L456+cut_b, 'L456_barrel'),
-       (cut_L456+cut_s, 'L456_slanted'))
+gD2 = ((cut_L3 + cut_b, 'L3_barrel'),
+       (cut_L456 + cut_b, 'L456_barrel'),
+       (cut_L456 + cut_s, 'L456_slanted'))
 
 # granurality taking into account layers and type of sensor;
-granulesLayersTypes = ((cut_L3+cut_b, 'L3_barrel'),
-                       (cut_L4+cut_b, 'L4_barrel'),
-                       (cut_L4+cut_s, 'L4_slanted'),
-                       (cut_L5+cut_b, 'L5_barrel'),
-                       (cut_L5+cut_s, 'L5_slanted'),
-                       (cut_L6+cut_b, 'L6_barrel'),
-                       (cut_L6+cut_s, 'L6_slanted'))
+granulesLayersTypes = ((cut_L3 + cut_b, 'L3_barrel'),
+                       (cut_L4 + cut_b, 'L4_barrel'),
+                       (cut_L4 + cut_s, 'L4_slanted'),
+                       (cut_L5 + cut_b, 'L5_barrel'),
+                       (cut_L5 + cut_s, 'L5_slanted'),
+                       (cut_L6 + cut_b, 'L6_barrel'),
+                       (cut_L6 + cut_s, 'L6_slanted'))
 
 # granularity for time differences between neighbour layers
 granulesTD = ((cut_L3, 'L3-L4'),
@@ -95,7 +96,7 @@ def plotRegions(name, title, x_label, y_label,
                 tree, expr, cutALL, cut,
                 descr, check, contact_str=SVDContact, isShifter=False):
     hName = f'{name}'
-    h = create1DHist(hName, title, len(granules), 1, len(granules)+1, x_label, y_label)
+    h = create1DHist(hName, title, len(granules), 1, len(granules) + 1, x_label, y_label)
     h.GetYaxis().SetRangeUser(0, 1.4)
     for i, g in enumerate(granules, 1):
         h.GetXaxis().SetBinLabel(i, g[1])
@@ -108,9 +109,9 @@ def plotRegions(name, title, x_label, y_label,
             selection = g[0]
         else:
             selection = g[0] + cut
-        n_selected = tree.Draw(f'{expr}', selectionALL+selection, 'goff')
-        h.SetBinContent(i, n_selected/n_all)
-        h.SetBinError(i, (n_selected/n_all)*(1/n_selected+1/n_all)**0.5)
+        n_selected = tree.Draw(f'{expr}', selectionALL + selection, 'goff')
+        h.SetBinContent(i, n_selected / n_all)
+        h.SetBinError(i, (n_selected / n_all) * (1 / n_selected + 1 / n_all)**0.5)
     addDetails(h, descr, check, contact_str, isShifter)
     h.SetTitle(f'{title}')
     h.Write(hName)

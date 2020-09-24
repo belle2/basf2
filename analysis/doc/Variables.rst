@@ -1,3 +1,4 @@
+.. _analysis_variablemanager_class:
 
 VariableManager
 ===============

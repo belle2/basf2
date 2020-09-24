@@ -58,6 +58,7 @@ class MergingChecker(basf2.Module):
         assert goodmergesize == below2size + above3size
         assert bestsize == below2size + above3size
 
+
 # we create 10 events with 11 electrons each
 path = basf2.Path()
 path.add_module("EventInfoSetter", evtNumList=10)

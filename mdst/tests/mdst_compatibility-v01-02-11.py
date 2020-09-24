@@ -15,6 +15,9 @@ CHANGES since release-01-02-11:
 - The default magnetic field is changed affecting all momentum measurements.
 - Track:
   + getQualityIndicator
+- TrackFitResult:
+  + ndf
+  + chi2
 - ECLCluster:
   + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity
@@ -28,9 +31,12 @@ CHANGES since release-01-02-11:
 - KlIds are added
 - SoftwareTriggerResult:
   * non-prescaled results added
+- Particle masses:
+  * The particle masses have been updated to PDG 2020. As a result, the
+    energies corresponding to the measured momenta became slightly different.
 """
 
-from basf2 import create_path, process, set_random_seed, find_file, LogLevel, logging
+from basf2 import create_path, process, set_random_seed, find_file
 from b2test_utils import configure_logging_for_tests
 from mdst import add_mdst_dump
 

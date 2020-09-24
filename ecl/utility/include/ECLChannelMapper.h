@@ -7,8 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef ECLCHANNELMAPPER_H
-#define ECLCHANNELMAPPER_H
+#pragma once
 #include <ecl/dbobjects/ECLChannelMap.h>
 namespace Belle2 {
   namespace ECL {
@@ -78,4 +77,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

@@ -25,7 +25,6 @@
 #include <top/dbobjects/TOPCalCommonT0.h>
 
 #include <string>
-#include <vector>
 
 #include <TFile.h>
 #include <TTree.h>

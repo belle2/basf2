@@ -9,9 +9,12 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
+from skim.standardlists.lightmesons import (loadStdAllF_0, loadStdAllKstar0,
+                                            loadStdAllPhi, loadStdAllRho0)
 from skimExpertFunctions import BaseSkim, fancy_skim_header
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdPhotons import stdPhotons
 from variables import variables as vm
-
 
 __liaison__ = "Kenji Inami <kenji.inami@desy.de>"
 
@@ -34,24 +37,17 @@ class TauLFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdK": ["all"],
-            "stdMu": ["all"],
-            "stdPi": ["all"],
-            "stdPr": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-        "skim.standardlists.lightmesons": {
-            "loadStdAllRho0": [],
-            "loadStdAllKstar0": [],
-            "loadStdAllPhi": [],
-            "loadStdAllF_0": [],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdK("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+        stdPr("all", path=path)
+        stdPhotons("all", path=path)
+        loadStdAllRho0(path=path)
+        loadStdAllKstar0(path=path)
+        loadStdAllPhi(path=path)
+        loadStdAllF_0(path=path)
 
     def build_lists(self, path):
         # particle selection
@@ -240,14 +236,9 @@ class TauGeneric(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def additional_setup(self, path):
         """
@@ -372,14 +363,9 @@ class TauThrust(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdPi": ["all"],
-        },
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdPhotons("all", path=path)
 
     def additional_setup(self, path):
         """
@@ -419,8 +405,6 @@ class TauThrust(BaseSkim):
         vm.addAlias('nTracksS2Thrust', 'nParticlesInList(pi+:thrustS2)')
 
     def build_lists(self, path):
-        path = self.skim_event_cuts("nGoodTracksThrust==2", path=path)
-
         ma.reconstructDecay("tau+:thrust -> pi+:thrustS1", "", path=path)
         eventParticle = ["tau+:thrust"]
 
@@ -438,7 +422,8 @@ class TauThrust(BaseSkim):
         ma.applyCuts("tau+:thrust", topologyCuts, path=path)  # cut3
         ma.applyCuts("tau+:thrust", "0.8 < thrust", path=path)  # cut4
         ma.applyCuts("tau+:thrust", "visibleEnergyOfEventCMS < 10.4", path=path)  # cut5
-        ma.applyCuts("tau+:thrust", "thrust < 0.99", path=path)  # cut6 thrust upper cut for 1x1
+        # cut6 thrust upper cut for 1x1 topology
+        ma.applyCuts("tau+:thrust", "thrust < 0.99 or nGoodTracksThrust!=2", path=path)
 
         self.SkimLists = eventParticle
 

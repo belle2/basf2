@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/ckf/svd/entities/CKFToSVDResult.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelationPointerComparison.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <tracking/ckf/general/findlets/TrackLoader.h>
 #include <tracking/ckf/general/findlets/StateCreatorWithReversal.dcl.h>
@@ -83,8 +83,7 @@ namespace Belle2 {
     /// Findlet transforming the hit results to track relations.
     RecoTrackRelator m_recoTrackRelator;
     /// Greedy filter for the relations between SVD and CDC Reco Tracks
-    TrackFindingCDC::BestMatchSelector<const RecoTrack, const RecoTrack, TrackFindingCDC::WeightedRelationPointerComparison>
-    m_bestMatchSelector;
+    TrackFindingCDC::BestMatchSelector<const RecoTrack, const RecoTrack> m_bestMatchSelector;
     /// Copy the result relations to the store array
     RelationApplier m_relationApplier;
 
@@ -98,10 +97,10 @@ namespace Belle2 {
     /// States for the hits
     std::vector<CKFToSVDState> m_states;
     /// Relations between states
-    std::vector<TrackFindingCDC::WeightedRelationPointerComparison<CKFToSVDState>> m_relations;
+    std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToSVDResult> m_results;
     /// Relations between CDC tracks and SVD tracks
-    std::vector<TrackFindingCDC::WeightedRelationPointerComparison<const RecoTrack, const RecoTrack>> m_relationsCDCToSVD;
+    std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> m_relationsCDCToSVD;
   };
 }

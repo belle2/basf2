@@ -10,8 +10,6 @@
 
 #include <svd/modules/svdCalibration/SVDClusterCalibrationsMonitorModule.h>
 #include <vxd/geometry/GeoCache.h>
-#include <svd/geometry/SensorInfo.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
@@ -199,7 +197,7 @@ void SVDClusterCalibrationsMonitorModule::endRun()
   else
     B2WARNING("No valid SVDClusterCalibrations for the requested IoV");
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
 
     m_rootFilePtr->cd();
 

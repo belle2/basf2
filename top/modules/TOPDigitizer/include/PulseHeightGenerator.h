@@ -10,9 +10,7 @@
 
 #pragma once
 
-#include<vector>
 #include <math.h>
-#include <TRandom.h>
 
 namespace Belle2 {
   namespace TOP {

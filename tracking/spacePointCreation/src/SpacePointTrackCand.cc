@@ -117,7 +117,6 @@ const std::vector<const SpacePoint*> SpacePointTrackCand::getSortedHits() const
   std::vector<const SpacePoint*> sortedSpacePoints;
   //sortedSpacePoints.reserve(m_trackSpacePoints.size());
   for (auto pair : sortVector) {
-    // cppcheck-suppress useStlAlgorithm
     sortedSpacePoints.push_back(pair.first);
   }
 

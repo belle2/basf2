@@ -17,6 +17,7 @@ RegisteredSkims = [
     ("10600600", "systematics", "SystematicsEELL"),
     ("10600700", "systematics", "SystematicsRadEE"),
     ("10620200", "systematics", "SystematicsLambda"),
+    ("11640100", "systematics", "SystematicsPhiGamma"),
 
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
@@ -63,9 +64,11 @@ RegisteredSkims = [
     ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
 
     # --- WG5: Quarkonium ---
+    ("15410300", "quarkonium", "InclusiveLambda"),
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
     ("15440100", "quarkonium", "BottomoniumUpsilon"),
-    ("16460100", "quarkonium", "ISRpipicc"),
+    # ("16460100", "quarkonium", "ISRpipicc"), Subset of 16460200, deleted.
+    ("16460200", "quarkonium", "CharmoniumPsi"),
 
     # --- WG7: Charm physics ---
     ("17230100", "charm", "XToD0_D0ToHpJm"),  # D0 -> K pi/pi pi/K K
@@ -74,6 +77,8 @@ RegisteredSkims = [
     ("17230200", "charm", "XToD0_D0ToNeutrals"),
     ("17230300", "charm", "DstToD0Pi_D0ToRare"),  # D0 -> g g/e e/mu mu
     ("17230400", "charm", "XToDp_DpToKsHp"),  # D+ -> Ks h+
+    ("17230500", "charm", "XToDp_DpToHpHmJp"),  # D+ -> h+ h- j+
+    ("17230600", "charm", "LambdacTopHpJm"),  # Lambda_c+ -> proton h- j+
     ("17240100", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
     # D* -> D0 -> K- pi+ pi0 (""+WS)
     ("17240200", "charm", "DstToD0Pi_D0ToHpJmPi0"),
@@ -84,15 +89,19 @@ RegisteredSkims = [
     ("17240500", "charm", "DstToD0Pi_D0ToHpJmEta"),
     # D* -> D0 -> pi0 pi0/Ks pi0/Ks Ks
     ("17240600", "charm", "DstToD0Pi_D0ToNeutrals"),
-    ("17240700", "charm", "DstToD0Pi_D0ToHpHmKs"),  # D* -> D0 -> h h Ks
+    ("17240700", "charm", "DstToD0Pi_D0ToHpJmKs"),  # D* -> D0 -> h h Ks
     # D* -> D0 -> K- pi+ pi0 (""+WS)
     ("17240800", "charm", "EarlyData_DstToD0Pi_D0ToHpJmPi0"),
     ("17240900", "charm", "EarlyData_DstToD0Pi_D0ToHpHmPi0"),  # D* -> D0 -> h h pi0
+    ("17241000", "charm", "DstToDpPi0_DpToHpPi0"),  # D*+ -> D+ pi0, D+ -> h+ pi0
+    ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18020100", "dark", "SinglePhotonDark"),
     ("18020200", "dark", "GammaGammaControlKLMDark"),
     ("18020300", "dark", "ALP3Gamma"),
+    ("18020400", "dark", "EGammaControlDark"),
+    ("18000000", "dark", "InelasticDarkMatter"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
@@ -146,7 +155,7 @@ class SkimRegistry:
             SkimName (str): Name of the skim as it appears in `skim.registry.RegisteredSkims`.
 
         Returns:
-            SkimModule (str): The name of the skim module which contains the skim.
+            The name of the skim module which contains the skim.
         """
         lookup = {name: module for _, module, name in self.registry}
         try:
@@ -167,7 +176,7 @@ class SkimRegistry:
                 ``skim.btocharmless`` or ``btocharmless.py``).
 
         Returns:
-            ExpectedSkims (list(str)): The skims listed in the registry as belonging to ``SkimModule``.
+            The skims listed in the registry as belonging to ``SkimModule``.
         """
         if SkimModule not in self.modules:
             B2ERROR(f"Unrecognised skim module {SkimModule}.")
@@ -190,7 +199,7 @@ class SkimRegistry:
             SkimName (str): Name of the skim to be found.
 
         Returns:
-            SkimFunction: The class constructor for the given skim.
+            The class constructor for the given skim.
         """
         ModuleName = self.get_skim_module(SkimName)
         SkimModule = import_module(f"skim.{ModuleName}")
@@ -203,7 +212,7 @@ class SkimRegistry:
             SkimName (str): Name of the skim as it appears in `skim.registry.RegisteredSkims`.
 
         Returns:
-            SkimCode (str): 8 digit skim code assigned to the given skim.
+            8 digit skim code assigned to the given skim.
         """
         lookup = {name: code for code, _, name in self.registry}
         try:
@@ -225,7 +234,7 @@ class SkimRegistry:
             SkimCode (str): 8 digit skim code assigned to some skim.
 
         Returns:
-            SkimName (str): Name of the corresponding skim as it appears in
+            Name of the corresponding skim as it appears in
             `skim.registry.RegisteredSkims`.
         """
         lookup = {code: name for code, _, name in self.registry}

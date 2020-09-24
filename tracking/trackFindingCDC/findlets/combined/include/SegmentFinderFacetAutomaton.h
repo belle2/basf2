@@ -59,7 +59,7 @@ namespace Belle2 {
       FacetCreator m_facetCreator;
 
       /// Creates the facet (hit triplet) relations of the cellular automaton
-      WeightedRelationCreator<const CDCFacet, ChooseableFacetRelationFilter, WeightedRelation> m_facetRelationCreator;
+      WeightedRelationCreator<const CDCFacet, ChooseableFacetRelationFilter> m_facetRelationCreator;
 
       /// Find the segments by composition of facets path from a cellular automaton
       SegmentCreatorFacetAutomaton m_segmentCreatorFacetAutomaton;

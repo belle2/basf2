@@ -40,13 +40,14 @@ std::string CDCPathPairFilterFactory::getIdentifier() const
 
 std::string CDCPathPairFilterFactory::getFilterPurpose() const
 {
-  return "Order cdc ckf path pairs";
+  return "Order CDC CKF path pairs. ";
 }
 
 std::map<std::string, std::string> CDCPathPairFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"none", "no track combination is valid"},
+    {"all", "set all track combinations as good"},
     {"distance", "ordering based on distance"},
     {"chi2", "ordering based on chi2"},
     {"duplicateHits", "compares last hits of both tracks to check for duplicates"},

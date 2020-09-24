@@ -1,0 +1,25 @@
+[INFO] Steering file: analysis/tests/test_software_trigger_variables_database.py
+[INFO] The random number seed is set to "\m/"
+[INFO] Starting event processing, random seed is set to '\m/'
+[INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst13.root
+[INFO]      o) SoftwareTriggerResult(software_trigger_cut&filter&1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV) = 0
+[INFO] Conditions Database: found working server
+	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions data: configured globaltags (highest priority first) are mc_production_MC13a_rev1, release-04-00-03
+[INFO]      o) SoftwareTriggerPrescaling(software_trigger_cut&filter&1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV) = 200
+[INFO]      o) SoftwareTriggerResult(INVALID_INPUT) = nan
+[ERROR] Cannot find payload in any of the configured global tags
+	name = software_trigger_cut&INVALID_INPUT
+	globaltags = mc_production_MC13a_rev1, release-04-00-03
+	experiment = 1003
+	run = 0
+[INFO]      o) SoftwareTriggerPrescaling(INVALID_INPUT) = nan
+[INFO]      o) SoftwareTriggerResult(filter 1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV) = 0
+[INFO]      o) SoftwareTriggerPrescaling(filter 1_Estargt1_GeV_cluster_no_other_cluster_Estargt0.3_GeV) = 200
+[INFO]      o) SoftwareTriggerResult(this is not a valid trigger identifier) = nan
+[ERROR] Cannot find payload in any of the configured global tags
+	name = software_trigger_cut&this&is&not&a&valid&trigger&identifier
+	globaltags = mc_production_MC13a_rev1, release-04-00-03
+	experiment = 1003
+	run = 0
+[INFO]      o) SoftwareTriggerPrescaling(this is not a valid trigger identifier) = nan

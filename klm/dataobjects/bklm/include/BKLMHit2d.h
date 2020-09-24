@@ -46,7 +46,7 @@ namespace Belle2 {
     BKLMHit2d& operator=(const BKLMHit2d&);
 
     //! Destructor
-    virtual ~BKLMHit2d()
+    ~BKLMHit2d()
     {
     }
 

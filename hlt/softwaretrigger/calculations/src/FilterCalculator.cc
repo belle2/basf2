@@ -15,6 +15,8 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
+#include <numeric>
+
 using namespace Belle2;
 using namespace SoftwareTrigger;
 
@@ -78,6 +80,11 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nE300Lab"] = 0; /**< number of clusters with Elab > m_EminLab4Cluster outside of high background endcap region */
   calculationResult["nE500Lab"] = 0; /**< number of clusters with Elab > m_EminLab3Cluster outside of high background endcap region */
   calculationResult["nE2000CMS"] = 0; /**< number of clusters with Ecms > m_Ehigh outside of high background endcap region */
+  calculationResult["nE4000CMS"] = 0; /**< number of clusters with E*>4 GeV */
+  calculationResult["nE250Lab"] = 0; /**< neutral clusters with Elab>250 MeV (anywhere) */
+  calculationResult["nMaxEPhotonAcc"] = 0; /**< Neutral, zmva>0.5, in [17,150], max 2 energy clusters*/
+  calculationResult["dphiCmsClust"] = NAN; /**< dphi* between 2 max E clusters */
+
   calculationResult["netChargeLoose"] = 0; /**< net charge of loose tracks */
   calculationResult["maximumPCMS"] = NAN; /**< maximum p* of loose tracks (GeV/c) */
   calculationResult["eexx"] = 0;
@@ -91,6 +98,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
   calculationResult["nEsingleElectronExtendedBarrel"] = 0; /**< charged clusters with E*> 1 GeV in [32,130] */
   calculationResult["nReducedEsinglePhotonReducedBarrel"] = 0; /**< charged clusters with E*> 0.5 GeV in [44,98] */
   calculationResult["nVetoClust"] = 0; /**< clusters with E>m_Emedium and |t|/dt99 < 10 */
+  calculationResult["chrgClust2GeV"] = 0; /**< charged clusters with E*>2 GeV */
+  calculationResult["neutClust045GeVAcc"] = 0; /**< neutral clusters with E*>0.45 GeV in [17,150] */
+  calculationResult["neutClust045GeVBarrel"] = 0; /**< neutral clusters with E*>0.45 GeV in [30,130] */
   calculationResult["singleTagLowMass"] = 0;
   calculationResult["singleTagHighMass"] = 0;
   calculationResult["n2GeVNeutBarrel"] = 0;
@@ -270,11 +280,23 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["nVetoClust"] += 1;
     }
 
+
     //..Single cluster trigger objects use charge, Zernike moment, and thetaLab
     const double thetaLab = selectedCluster.p4Lab.Theta() * TMath::RadToDeg();
     const double zmva = cluster.getZernikeMVA();
     const bool photon = zmva > 0.5 and not selectedCluster.isTrack;
     const bool electron = zmva > 0.5 and selectedCluster.isTrack;
+
+    //..For 1 track radiative Bhabha control sample
+    if (selectedCluster.energyCMS > 2. and selectedCluster.isTrack) {
+      calculationResult["chrgClust2GeV"] += 1;
+    }
+    if (selectedCluster.energyCMS > 0.45 and not selectedCluster.isTrack) {
+      const bool isInAcceptance = 17. < thetaLab and thetaLab < 150.;
+      if (isInAcceptance) {calculationResult["neutClust045GeVAcc"] += 1;}
+      const bool isInBarrel = 30. < thetaLab and thetaLab < 130.;
+      if (isInBarrel) {calculationResult["neutClust045GeVBarrel"] += 1;}
+    }
 
 
     // improved 3 cluster (4 cluster) trigger
@@ -295,6 +317,15 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       calculationResult["nE2000CMS"] += 1;
     }
 
+    //..For two-photon fusion ALP trigger
+    if (selectedCluster.energyLab > 0.25) {
+      calculationResult["nE250Lab"] += 1;
+    }
+    if (selectedCluster.energyCMS > 4.) {
+      calculationResult["nE4000CMS"] += 1;
+    }
+
+    //..Single cluster triggers
     if (selectedCluster.energyCMS > m_EsinglePhoton) {
       calculationResult["nEsingleClust"] += 1;
 
@@ -492,6 +523,17 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
     double thetaSum = (firstCluster.p4CMS.Theta() + secondCluster.p4CMS.Theta()) * TMath::RadToDeg();
     double dthetaSum = std::abs(thetaSum - 180);
+
+    //..Quantities for two-photon fusion triggers
+    calculationResult["dphiCmsClust"] = dphi;
+    for (int ic = 0; ic < 2; ic++) {
+      const double thetaLab = selectedClusters[ic].p4Lab.Theta() * TMath::RadToDeg();
+      const bool isInAcceptance = 17. < thetaLab and thetaLab < 150.;
+      const ECLCluster* cluster = selectedClusters[ic].cluster;
+      const double zmva = cluster->getZernikeMVA();
+      const bool photon = zmva > 0.5 and not selectedClusters[ic].isTrack;
+      if (isInAcceptance and photon) {calculationResult["nMaxEPhotonAcc"] += 1;}
+    }
 
     const double firstEnergy = firstCluster.p4CMS.E();
     const double secondEnergy = secondCluster.p4CMS.E();

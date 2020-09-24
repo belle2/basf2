@@ -12,10 +12,7 @@
 
 #include "vxd/modules/vxdMask/vxdDigitMaskingModule.h"
 
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationArray.h>
 
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <pxd/dataobjects/PXDDigit.h>
@@ -23,9 +20,11 @@
 #include <pxd/online/PXDIgnoredPixelsMap.h>
 #include <svd/online/SVDIgnoredStripsMap.h>
 
-#include <vxd/geometry/SensorInfoBase.h>
+#include <pxd/geometry/SensorInfo.h>
+#include <svd/geometry/SensorInfo.h>
 
-#include <TMath.h>
+#include <vxd/geometry/GeoCache.h>
+#include <vxd/geometry/SensorInfoBase.h>
 
 #include <boost/format.hpp>
 

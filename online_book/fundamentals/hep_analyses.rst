@@ -89,7 +89,7 @@ background.
     is close to zero.
 
     That is, you would accept B meson candidates which satisfy:
-    :math:`-150 <\Delta E< 150 {\textrm MeV}`
+    :math:`-150\ \textrm{MeV} < \Delta E < 150\ \textrm{MeV}`
     and reject those which don't.
 
 An interesting event for most B physics analyses, is one where the

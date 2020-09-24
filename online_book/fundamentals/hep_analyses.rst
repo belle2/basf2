@@ -698,8 +698,8 @@ reconstruction. It tries to identify trajectories of particles through the
 tracking detectors, called tracks. There are mainly two parts of tracking
 
 Track finding
-  Find patterns in the hit clusters in the tracking detectors that look like
-  they could be from one particle flying through the detector.
+  Find patterns in the hits or hit clusters in the tracking detectors that look like
+  they could be from a particle flying through the detector.
 
 .. _fig:reconstruction-trackfinding:
 

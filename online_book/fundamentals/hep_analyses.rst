@@ -99,13 +99,20 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
 .. admonition:: Question
     :class: exercise stacked
 
-    What is the most likely final state for an :math:`e^+e^-` collision at 10 GeV?
+    What is the most likely final state for an :math:`e^+e^-` collision at 
+    10 GeV?
     What is the cross section?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
     You should be able to find this information on confluence.
+
+.. admonition:: Another hint
+    :class: toggle xhint stacked
+
+    Probably you are looking for `this page on confluence 
+    <https://confluence.desy.de/x/AQkWAg>`_.
 
 .. admonition:: Solution
     :class: toggle solution

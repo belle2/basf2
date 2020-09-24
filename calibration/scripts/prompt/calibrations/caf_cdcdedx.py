@@ -52,19 +52,19 @@ def get_calibrations(input_data, **kwargs):
 
         from prompt.utils import filter_by_max_events_per_run, filter_by_max_events_per_dataset
         # collection for rungains
-        max_files_for_maxevents = 35000  # (around 5-6 random files per run)
+        max_files_for_maxevents = 50000  # (around 5-6 random files per run) ~ 15% loss -> 80k tracks per run
         reduced_file_to_iov_rungain = filter_by_max_events_per_run(file_to_iov_physics, max_files_for_maxevents, True)
         input_files_rungain = list(reduced_file_to_iov_rungain.keys())
         basf2.B2INFO(f"Total number of files used for rungains = {len(input_files_rungain)}")
 
         # collection for cosinecorr
-        max_events_per_dataset = 5e6  # 5M events max (random files for all runs)
+        max_events_per_dataset = 15e6  # (~0.4 fb-) events max (random files for all runs) ~ 15% loss
         reduced_file_to_iov_coscorr = filter_by_max_events_per_dataset(file_to_iov_physics, max_events_per_dataset)
         input_files_coscorr = list(reduced_file_to_iov_coscorr.keys())
         basf2.B2INFO(f"Total number of files used for cosine = {len(input_files_coscorr)}")
 
         # collection for cosinecorr
-        max_events_per_dataset = 5e6  # 5M events max (random files for all runs)
+        max_events_per_dataset = 20e6  # 20(~0.5 fb-) events max (random files for all runs)
         reduced_file_to_iov_wiregain = filter_by_max_events_per_dataset(file_to_iov_physics, max_events_per_dataset)
         input_files_wiregain = list(reduced_file_to_iov_wiregain.keys())
         basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")

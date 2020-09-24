@@ -13,9 +13,9 @@
 #include <TF1.h>
 #include <TLine.h>
 #include <TCanvas.h>
+#include <TH1I.h>
 
 using namespace Belle2;
-
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -60,7 +60,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
   for (unsigned int i = 0; i < fCosbins; ++i) {
 
-    double coslow = i * binW,  coshigh = (i + 1) * binW;
+    double coslow = i * binW + fCosMin,  coshigh = coslow + binW;
 
     hdEdx_elCosbin[i] = new TH1D(Form("hdEdx_elCosbin%d", i), "", fHistbins, fdEdxMin, fdEdxMax);
     hdEdx_elCosbin[i]->SetTitle(Form("dE/dx dist (e-) in costh (%0.02f, %0.02f)", coslow, coshigh));
@@ -270,6 +270,24 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
     psname_ep << "cdcdedx_coscal_fits.pdf]";
     ctmp_ep->Print(psname_ep.str().c_str());
     delete ctmp_ep;
+
+    TCanvas* cstats = new TCanvas("cstats", "cstats", 1000, 500);
+    cstats->SetBatch(kTRUE);
+    cstats->Divide(2, 1);
+    cstats->cd(1);
+    auto hestats = getObjectPtr<TH1I>("hestats");
+    if (hestats) {
+      hestats->SetStats(0);
+      hestats->DrawCopy("");
+    }
+    cstats->cd(2);
+    auto htstats = getObjectPtr<TH1I>("htstats");
+    if (htstats) {
+      htstats->DrawCopy("");
+      hestats->SetStats(0);
+    }
+    cstats->Print(Form("cdcdedx_coscal_stats.pdf"));
+    delete cstats;
 
     TCanvas* ctmp_epConst = new TCanvas("ctmp_epConst", "ctmp_epConst", 800, 400);
     ctmp_epConst->Divide(2, 1);

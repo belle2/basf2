@@ -15,6 +15,7 @@
 #include <TStyle.h>
 #include <algorithm>
 #include <iostream>
+#include <TH1I.h>
 
 using namespace Belle2;
 
@@ -194,6 +195,25 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     psname.str(""); psname << "cdcdedx_wiregain_wiredists.pdf]";
     ctmp->Print(psname.str().c_str());
     delete ctmp;
+
+    TCanvas* cstats = new TCanvas("cstats", "cstats", 1000, 500);
+    cstats->SetBatch(kTRUE);
+    cstats->Divide(2, 1);
+    cstats->cd(1);
+    auto hestats = getObjectPtr<TH1I>("hestats");
+    if (hestats) {
+      hestats->SetStats(0);
+      hestats->DrawCopy("");
+    }
+    cstats->cd(2);
+    auto htstats = getObjectPtr<TH1I>("htstats");
+    if (htstats) {
+      htstats->DrawCopy("");
+      hestats->SetStats(0);
+    }
+    cstats->Print(Form("cdcdedx_wiregain_stats.pdf"));
+    delete cstats;
+
   }
 
   //changing to vector array

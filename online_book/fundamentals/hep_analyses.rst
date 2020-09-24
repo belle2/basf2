@@ -339,8 +339,8 @@ Off-resonance
     :math:`\sqrt{s} = 10.580` GeV. The production of light and charm quark pairs in the reaction
     :math:`e^+e^- \to u\bar{u}, d\bar{d}, s\bar{s}, c\bar{c}` has a total cross section of about :math:`3.7`
     nb is more that three times larger than the production of :math:`B` mesons. As the quarks hadronize leaving
-    final states that are similar to the :math:`B\bar{B}`. This background can be studied using the Montecarlo
-    simulation, but it's more effective to study it directly on data. Occasionally, 2-3 times per year, a
+    final states that are similar to the :math:`B\bar{B}`. This background can be studied using the Monte Carlo
+    simulation, but it's more effective to study it directly on data. Occasionally, 2--3 times per year, a
     special dataset is collected approximately 60 MeV below the :math:`\Upsilon(4S)`. Here no :math:`B` mesons
     can be produced, leaving one with a pure sample of continuum events, called *off-resonance* (or *continuum*) sample.
 
@@ -455,19 +455,19 @@ success of the Belle II experiment.
 
 TODO: HLT tags? jiltering? (HLT skims)
 
-Simulation: the Montecarlo
---------------------------
+Simulation: the Monte Carlo
+---------------------------
 
 We need to be able to compare data from our detector to the expectation we have.
 In vert rare cases this might not be necessary, for example the discovery of the
-J/Psi was so clear a signal that we didn't need any comparison to understand
+:math:`J/\Psi` was so clear a signal that we didn't need any comparison to understand
 that it was something new. But most of the time we need to make sure what we see
 is not some artefact of our very very complex experiment.
 
 To do this we create simulated events which should behave as closely as possible
 to the real detector events. This is done using sampling of random numbers
 repeatedly and thus called the `Monte Carlo method <https://en.wikipedia.org/wiki/Monte_Carlo_method>`_.
-In HEP we usually just call the whole process Montecarlo or MC for short.
+In HEP we usually just call the whole process Monte Carlo or MC for short.
 
 Now there are two parts of this procedure we need to distinguish: Generation of
 an event and simulation of the event.

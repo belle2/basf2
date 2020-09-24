@@ -58,13 +58,13 @@ def get_calibrations(input_data, **kwargs):
         basf2.B2INFO(f"Total number of files used for rungains = {len(input_files_rungain)}")
 
         # collection for cosinecorr
-        max_events_per_dataset = 5000000  # 5M events max (random files for all runs)
+        max_events_per_dataset = 5e6  # 5M events max (random files for all runs)
         reduced_file_to_iov_coscorr = filter_by_max_events_per_dataset(file_to_iov_physics, max_events_per_dataset)
         input_files_coscorr = list(reduced_file_to_iov_coscorr.keys())
         basf2.B2INFO(f"Total number of files used for cosine = {len(input_files_coscorr)}")
 
         # collection for cosinecorr
-        max_events_per_dataset = 5000000  # 5M events max (random files for all runs)
+        max_events_per_dataset = 5e6  # 5M events max (random files for all runs)
         reduced_file_to_iov_wiregain = filter_by_max_events_per_dataset(file_to_iov_physics, max_events_per_dataset)
         input_files_wiregain = list(reduced_file_to_iov_wiregain.keys())
         basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")
@@ -157,8 +157,6 @@ def get_calibrations(input_data, **kwargs):
     recon.prepare_cdst_analysis(path=Calibrate_CC)
     add_filter_software_trigger(path=Calibrate_CC)
     add_skim_software_trigger(path=Calibrate_CC)
-    hltfilter = Calibrate_CC.add_module('VariableToReturnValue', variable='HighLevelTrigger')
-    # hltfilter.if_value('==0', basf2.Path())
     trg_bhabhaskim = Calibrate_CC.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
     Calibrate_CC.add_module(

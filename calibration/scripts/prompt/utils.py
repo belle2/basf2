@@ -154,6 +154,7 @@ def filter_by_max_events_per_dataset(files_to_iov, max_events_per_dataset):
     rounds = 0
     total = 0
     all_file = []
+    n_file = sum(len(files) for iov, files in iov_to_files.items())
     while restart_loop:
         restart_loop = False
         for iov, files in sorted(iov_to_files.items()):
@@ -161,7 +162,7 @@ def filter_by_max_events_per_dataset(files_to_iov, max_events_per_dataset):
             remaining_files = files[:]
             this_file = []
 
-            if total < max_events_per_dataset and remaining_files:
+            if total < max_events_per_dataset and remaining_files and len(all_file) < n_file:
                 file_path = choice(remaining_files)
                 # duplicate files are skipped
                 if file_path in all_file:
@@ -187,9 +188,10 @@ def filter_by_max_events_per_dataset(files_to_iov, max_events_per_dataset):
                 restart_loop = False
                 break
 
-        if total < max_events_per_dataset:
+        if total < max_events_per_dataset and len(all_file) < n_file:
             rounds += 1  # restart round
             restart_loop = True
+            B2INFO(f"\t ..need more files and starting round # {rounds}")
 
     # Now go back to files_to_iov dictionary
     new_files_to_iov = OrderedDict()

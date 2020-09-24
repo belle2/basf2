@@ -153,9 +153,9 @@ void CDCDedxElectronCollectorModule::collect()
       return;
     }
   } else {
-    hestats->GetXaxis()->SetBinLabel(2, "inactive");
-    hestats->GetXaxis()->SetBinLabel(3, "inactive");
-    hestats->GetXaxis()->SetBinLabel(4, "inactive");
+    hestats->GetXaxis()->SetBinLabel(2, "inact1");
+    hestats->GetXaxis()->SetBinLabel(3, "inact2");
+    hestats->GetXaxis()->SetBinLabel(4, "inact3");
   }
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr;

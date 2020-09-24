@@ -15,6 +15,7 @@
 #include <TLine.h>
 #include <iostream>
 #include <fstream>
+#include <TH1I.h>
 
 using namespace Belle2;
 
@@ -148,11 +149,11 @@ CalibrationAlgorithm::EResult CDCDedxRunGainAlgorithm::calibrate()
     cstats->SetBatch(kTRUE);
     cstats->Divide(2, 1);
     cstats->cd(1);
-    auto hestats = getObjectPtr<TH1D>("hestats");
-    hestats->DrawCopy("");
+    auto hestats = getObjectPtr<TH1I>("hestats");
+    if (hestats)hestats->DrawCopy("");
     cstats->cd(2);
-    auto htstats = getObjectPtr<TH1D>("htstats");
-    htstats->DrawCopy("");
+    auto htstats = getObjectPtr<TH1I>("htstats");
+    if (htstats)htstats->DrawCopy("");
     cstats->Print(Form("cdcdedx_rungain_stats_%s.pdf", fsrun.Data()));
 
     delete ctmp;

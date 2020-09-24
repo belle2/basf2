@@ -39,6 +39,15 @@ ma.reconstructDecay(
     path=main,
 )
 
+# Save variables to an output file (ntuple)
+ma.variablesToNtuple(
+    "B0",
+    variables=['Mbc', 'deltaE'],
+    filename="Bd2JpsiKS.root",
+    treename="tree",
+    path=main,
+)
+
 # Start the event loop (actually start processing things)
 b2.process(main)
 

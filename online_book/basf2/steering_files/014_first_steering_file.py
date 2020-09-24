@@ -39,10 +39,13 @@ ma.reconstructDecay(
     path=main,
 )
 
+# match reconstructed with MC particles
+ma.matchMCTruth("B0", path=main)
+
 # Save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",
-    variables=['Mbc', 'deltaE'],
+    variables=['Mbc', 'deltaE', 'isSignal'],
     filename="Bd2JpsiKS.root",
     treename="tree",
     path=main,

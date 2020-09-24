@@ -4,6 +4,7 @@ import sys
 import basf2 as b2
 import modularAnalysis as ma
 import stdV0s
+import variables.collections as vc
 
 # get input file number from the command line
 filenumber = sys.argv[1]
@@ -35,17 +36,24 @@ ma.reconstructDecay(
 # combine J/psi and KS candidates to form B0 candidates
 ma.reconstructDecay(
     "B0 -> J/psi:ee K_S0:merged",
-    cut="",
+    cut="Mbc > 5.2 and abs(deltaE) < 0.15",
     path=main,
 )
 
 # match reconstructed with MC particles
 ma.matchMCTruth("B0", path=main)
 
+# Create list of variables to save into the output file
+b_vars = []
+
+standard_vars = vc.kinematics + vc.mc_kinematics + vc.mc_truth
+b_vars += vc.deltae_mbc
+b_vars += standard_vars
+
 # Save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",
-    variables=['Mbc', 'deltaE', 'isSignal'],
+    variables=b_vars,
     filename="Bd2JpsiKS.root",
     treename="tree",
     path=main,

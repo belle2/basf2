@@ -24,7 +24,7 @@ First steering file
 
     **Objectives**:
 
-        * Reconstruct :math:`B \to J/\Psi(\to e^+e^-)K_s(\to \pi^+\pi^+)`
+        * Reconstruct :math:`B \to J/\Psi(\to e^+e^-)K_S(\to \pi^+\pi^+)`
 
 In this hands-on tutorial you'll be writing your first steering file.
 But before we can start, you have to set up the necessary environment.
@@ -32,12 +32,14 @@ But before we can start, you have to set up the necessary environment.
 .. admonition:: Task
     :class: exercise stacked
 
-    Set up the basf2 environment using the currently recommended software version.
+    Set up the basf2 environment using the currently recommended software
+    version.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    Go back to :ref:`onlinebook_basf2_introduction` to see the step-by-step instructions.
+    Go back to :ref:`onlinebook_basf2_introduction` to see the step-by-step
+    instructions.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -69,7 +71,7 @@ There are three lines of code that are part of each steering script:
 .. admonition:: Solution
     :class: toggle solution
 
-    `010_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/010_first_steering_file.py>`_
+    .. literalinclude:: steering_files/010_first_steering_file.py
 
 Of course, no events could be processed because no data has been loaded yet.
 Let's do it. As already described in the previous lesson almost all
@@ -131,7 +133,7 @@ files. They are located on kekcc at
 .. admonition:: Solution
     :class: toggle solution
 
-    `011_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/011_first_steering_file.py>`_
+    .. literalinclude:: steering_files/011_first_steering_file.py
 
 The mdst data objects (Tracks, ECLCluster, KLMCluster, V0s) of the input file
 have to be transferred into `Particle` data objects. This is done via the
@@ -140,7 +142,8 @@ have to be transferred into `Particle` data objects. This is done via the
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Read the documentation of `fillParticleList` to familiarize yourself with the required arguments.
+    Read the documentation of `fillParticleList` to familiarize yourself with
+    the required arguments.
 
     Which six final state particles can be created from Tracks?
 
@@ -168,7 +171,8 @@ e.g. soft and hard photons.
     ma.fillParticleList("e-:soft", "E < 1", path=main)
     ma.fillParticleList("e-:hard", "E > 3", path=main)
 
-.. warning:: If the provided cut string is not empty you can not use the label ``all``.
+.. warning:: If the provided cut string is not empty you can not use the label
+             ``all``.
 
 There are standard particle lists with predefined selection criteria. While
 those for charged final state particles should only be used in early stages of
@@ -196,10 +200,15 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Task
     :class: exercise stacked
 
-    Our ultimate goal is to reconstruct :math:`B \to J/\Psi(\to e^+e^-)K_s(\to
-    \pi^+\pi^+)`. Extend your steering file by loading electrons, positrons,
-    and Kshorts. At the very end of your script you should also print a
-    summary table of all modules added to your path using the function `statistics`.
+    Our ultimate goal is to reconstruct :math:`B \to J/\Psi(\to
+    e^+e^-)K_S^0(\to \pi^+\pi^+)`. For now, extend your steering file by
+    loading electrons, positrons, and Kshorts. At the very end of your script
+    you should also print a summary table of all modules added to your path
+    using the function `statistics`. Then run the script and answer the
+    following questions:
+
+    * Which are the mass window boundaries set for the :math:`K_S^0`?
+    * Which module had the longest execution time?
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -210,11 +219,18 @@ of the decay mode you are studying, it is recommended to use them for V0s
 .. admonition:: Solution
     :class: toggle solution
 
-    `012_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/012_first_steering_file.py>`_
+    .. literalinclude:: steering_files/012_first_steering_file.py
 
     In the solution we gave the electrons the label ``uncorrected``. This is
     already in anticipation of a future extension in which Bremsstrahlung
     recovery will be applied (:ref:`onlinebook_various_additions`).
+
+    In the output there are INFO messages that the Kshort invariant mass has
+    to be between 0.45 and 0.55 GeV/c :superscript:`2`.
+
+    The module ``TreeFitter_K_S0:RD`` takes the longest. It's a vertex fit of
+    the Kshort candidates. You will learn more about vertex fits in
+    :ref:`onlinebook_vertex_fitting`.
 
 Now we have a steering file in which final state particles are loaded from the
 input mdst file to particle lists. One of the most powerful modules of the
@@ -239,22 +255,28 @@ written in the decay string.
 .. admonition:: Exercise
     :class: exercise stacked
 
-    How do we have to type a :math:`J/psi`? Find out by scrolling through
-    ``$BELLE2_EXTERNALS_DIR/share/evtgen/evt.pdl`` or
-    ``$BELLE2_RELEASE_DIR/decfiles/dec/DECAY_BELLE2.DEC``
+    How do we have to type a :math:`J/\Psi`, and what is its nominal mass?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Make use of the tool ``b2help-particles``
+    (:ref:`onlinebook_basf2basics_b2help_particles`). As a spin-1
+    :math:`c\bar{c}` resonance the PDG code of the :math:`J/\Psi` is ``443``.
 
 .. admonition:: Solution
     :class: toggle solution
 
-    The :math:`J/psi` has to be typed ``J/psi``. Whenever you misspell a
+    The :math:`J/\Psi` has to be typed ``J/psi``. Whenever you misspell a
     particle name in a decay string, there will be an error message telling
-    you that it is unknown. In that case, go back to one of the files of this
-    exercise to figure out the correct spelling.
+    you that it is unknown.
+
+    The invariant mass of the J/psi is set to be 3.0969 GeV/c :superscript:`2`.
 
 .. admonition:: Task
     :class: exercise stacked
 
-    Extend the steering file by first forming J/psi candidates from
+    Extend the steering file by first forming :math:`J/\Psi` candidates from
     electron-positron combinations and then combining them with Kshorts to
     form B0 candidates.
 
@@ -266,12 +288,13 @@ written in the decay string.
 .. admonition:: Solution
     :class: toggle solution
 
-    `013_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/013_first_steering_file.py>`_
+    .. literalinclude:: steering_files/013_first_steering_file.py
+        :lines: 1-41, 51-56
 
-    In the solution we introduced a loose selection for the electrons using
-    particle identification (`electronID`), requiring the tracks to originate
-    from close to the interaction point (`dr` and `dz`), and having a polar
-    angle in the acceptance of the CDC (`thetaInCDCAcceptance`).
+In the solution we introduced a loose selection for the electrons using
+particle identification (`electronID`), requiring the tracks to originate from
+close to the interaction point (`dr` and `dz`), and having a polar angle in
+the acceptance of the CDC (`thetaInCDCAcceptance`).
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -293,7 +316,7 @@ written in the decay string.
     :class: toggle solution
 
     The variable `dr` gives the transverse distance, while `dz` is the
-    z-component of the point of closesest approach (POCA) with respect to the
+    z-component of the point of closest approach (POCA) with respect to the
     interaction point (IP). Components are signed, while distances are
     magnitudes. 
 
@@ -303,8 +326,8 @@ written in the decay string.
 
 To separate signal from background and extract physics parameter, an offline
 analysis has to be performed. The final step of the steering file is to write
-out information in a so called ntuple using `variablesToNtuple`. It can contain
-one entry per candidate or one entry per event.
+out information in a so called ntuple using `variablesToNtuple`. It can
+contain one entry per candidate or one entry per event.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -331,8 +354,8 @@ one entry per candidate or one entry per event.
     :class: exercise stacked
 
     Save the beam-constrained B mass and the difference between half the
-    centre-of-mass energy and the reconstructed B energy into an output
-    ntuple.
+    center-of-mass energy and the reconstructed B energy into an output
+    ntuple. Run your steering file with these additions.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -342,14 +365,88 @@ one entry per candidate or one entry per event.
 .. admonition:: Solution
     :class: toggle solution
 
-    `014_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/014_first_steering_file.py>`_
+    .. literalinclude:: steering_files/013_first_steering_file.py
+
+Although you are analyzing a signal MC sample, the reconstruction will find
+many candidates that are actually not signal, but random combinations that
+happen to fulfill all your selection criteria.
 
 .. admonition:: Task
     :class: exercise stacked
 
-    Run the MC matching for all particles of the decay chain and add the
+    Write a short python script, in which you load the root ntuple from the
+    previous exercise to a dataframe and then plot the distribution of the
+    beam-constrained mass into a histogram with 100 bins in the range 4.3 to
+    5.3 GeV/c :superscript:`2`. Can you identify the signal and background
+    components?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Read in the ntuple using ``read_root`` of ``root_pandas``. 
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. code-block:: python
+
+        import matplotlib.pyplot as plt
+        from root_pandas import read_root
+
+        df = read_root('Bd2JpsiKS.root')
+
+        df.hist('Mbc', bins=100, range=(4.3, 5.3))
+        plt.xlabel(r'M$_{\rm bc}$ [GeV/c$^{2}$]')
+        plt.ylabel('Number of candidates')
+        plt.xlim(4.3, 5.3)
+        plt.savefig('Mbc_all.png')
+
+    .. figure:: figs/Mbc_all.png
+        :width: 40em
+        :align: center
+
+        There is a (signal) peak at the nominal B mass of 5.28 GeV/c
+        :superscript:`2` and lots of background candidates as a shoulder left
+        of the peak.
+
+For the beam-constrained mass we know pretty well how the signal distribution
+should look like. But what's the resolution and how much background actually
+extends under the signal peak? On MC we have the advantage that we know what
+has been generated. Therefore, we can add a flag to every candidate to
+classify it as signal or background. Furthermore, we can study our background
+sources if we know what the reconstruction has falsely identified.
+
+There is a long chapter on :ref:`mcmatching` in the documentation. You should
+definitely read it to understand at least the basics.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Which module do you have to run to get the relations between the
+    reconstructed and the generated particles? How often do you have to call
+    the corresponding function?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Did you have a look at the documentation of :ref:`mcmatching`?
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    You need to run the `MCMatcherParticles` module, most conveniently
+    available via the wrapper function `modularAnalysis.matchMCTruth`. If run
+    for the head of the decay chain, it only needs to be called once because
+    the relations of all (grand)^N-daughter particles are set recursively.
+
+.. admonition:: Task
+    :class: exercise stacked
+
+    Add MC matching for all particles of the decay chain and add the
     information whether the reconstructed B meson is a signal candidate to the
-    ntuple.
+    ntuple. Run the steering file and again plot the beam-constrained mass but
+    this time use the signal flag to visualize which component is signal and
+    which is background.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -360,13 +457,62 @@ one entry per candidate or one entry per event.
 .. admonition:: Solution
     :class: toggle solution
 
-    `015_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/015_first_steering_file.py>`_
+    .. literalinclude:: steering_files/014_first_steering_file.py
+
+    .. code-block:: python
+
+        import matplotlib.pyplot as plt
+        from root_pandas import read_root
+
+        df = read_root('Bd2JpsiKS.root')
+
+        df.hist('Mbc', bins=100, range=(4.3, 5.3), by='isSignal')
+        plt.xlabel(r'M$_{\rm bc}$ [GeV/c$^{2}$]')
+        plt.ylabel('Number of candidates')
+        plt.xlim(4.3, 5.3)
+        plt.savefig('Mbc_MCsplit.png')
+
+    .. figure:: figs/Mbc_MCsplit.png
+        :width: 40em
+        :align: center
+
+        The background peaks around 5 GeV/c :superscript:`2`, but indeed
+        extends into the signal peak region.
+
+While the MC matching allows us to separate signal from background and study
+their shapes, we need to use other variables to achieve the same on collision
+data. Initially, it makes sense to look at many different variables and try to
+find those with discriminating power between signal and background. The most
+basic information are the kinematic properties like the energy and the
+momentum (and its components). In basf2 collections of variables for several
+topics are prepared.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Find out to which variable collections the three variables belong that we
+    added to the ntuple so far.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    You can find the information in the
+    :ref:`analysis/doc/Variables:Collections and Lists` section of the
+    documentation.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    The collection ``deltae_mbc`` contains `Mbc` and `deltaE`. The `isSignal`
+    variable along with many other truth match variables is in the collection
+    ``mc_truth``.
 
 .. admonition:: Task
     :class: exercise stacked
 
     Save all kinematics information, both the truth and the reconstructed
-    values, of the B meson to the ntuple.
+    values, of the B meson to the ntuple. Also use the variable collections
+    from the last exercise to replace the individual list.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -377,7 +523,43 @@ one entry per candidate or one entry per event.
 .. admonition:: Solution
     :class: toggle solution
 
-    `016_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/016_first_steering_file.py>`_
+    .. literalinclude:: steering_files/015_first_steering_file.py
+
+Apart from variables for the mother B-meson, we are also interested in
+information of the other daughter and granddaughter variables. You can access
+them via the `daughter` meta variable, which takes an integer and a variable
+name as input arguments. The integer (0-based) counts through the daughter
+particles, ``daughter(0, p)`` would for example be the momentum of the first
+daughter, in our case of the :math:`J/\Psi`. The function can be used
+recursively, so ``daughter(daughter(0, E))`` is the energy of the positive
+muon. In principle, one can add these nested variables directly to the ntuple
+but the brackets have to be escaped and the resulting variable name in the
+ntuple is not very user-friendly or intuitive. Instead, one can define aliases
+to translate the variables using `addAlias`.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    How can you replace ``daughter(daughter(0, E))`` with ``mup_E``?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Check the documentation of `addAlias` for the correct syntax.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. code-block:: python
+
+        from variables import variables as vm
+        vm.addAlias("mup_E", "daughter(daughter(0, E))")
+
+However, this can quickly fill up many, many lines. Therefore, there are tools
+to easily create aliases. The most useful is probably
+`create_aliases_for_selected`. It lets you select particles from a decay
+string via the ``^`` operator, for which you want to define aliases, and also
+set a prefix.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -395,7 +577,7 @@ one entry per candidate or one entry per event.
 .. admonition:: Solution
     :class: toggle solution
 
-    `019_first_steering_file.py <https://stash.desy.de/projects/B2/repos/software/browse/online_book/basf2/steering_files/019_first_steering_file.py>`_
+    .. literalinclude:: steering_files/019_first_steering_file.py
 
 .. admonition:: Key points
     :class: key-points
@@ -408,3 +590,6 @@ one entry per candidate or one entry per event.
     * ``variablesToNtuple`` saves an output file
     * Don't forget ``process(path)`` or nothing happens
 
+.. topic:: Author of this lesson
+
+    Frank Meier

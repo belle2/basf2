@@ -333,9 +333,9 @@ On-resonance
     The standard collisions at :math:`\sqrt{s} = 10.580` GeV.
 
 Off-resonance
-    :math: `e^+e^- \to \Upsilon(4S) \to B\bar{B}` is not the only process that takes place at
+    :math:`e^+e^- \to \Upsilon(4S) \to B\bar{B}` is not the only process that takes place at
     :math:`\sqrt{s} = 10.580` GeV. The production of light and charm quark pairs in the reaction
-    :math: `e^+e^- \to u\bar{u}, d\bar{d}, s\bar{s}, c\bar{c}` has a total cross section of about :math:`3.7`
+    :math:`e^+e^- \to u\bar{u}, d\bar{d}, s\bar{s}, c\bar{c}` has a total cross section of about :math:`3.7`
     nb is more that three times larger than the production of :math:`B` mesons. As the quarks hadronize leaving
     final states that are similar to the :math:`B\bar{B}`. This background can be studied using the Montecarlo
     simulation, but it's more effective to study it directly on data. Occasionally, 2-3 times per year, a
@@ -445,11 +445,11 @@ success of the Belle II experiment.
     :class: key-points
 
     * The TRG system aims to recognise interesting events from the near
-    continuous stream of collisions.
+      continuous stream of collisions.
     * The HLT system uses the full readout data for each event to further decide
-    which events to keep for offline analysis and which ones to discard.
+      which events to keep for offline analysis and which ones to discard.
     * Prescaling might be used to only record every n-th event (on average) that
-    satisfies given trigger conditions.
+      satisfies given trigger conditions.
 
 TODO: HLT tags? jiltering? (HLT skims)
 
@@ -523,7 +523,7 @@ close to minutes per event due to the much higher energy.
     :class: exercise stacked
 
     Assuming it takes one second per event, how long would it take to simulate
-    all the 770 million :math:`B\overline{B}` events collected at Belle on one CPU?
+    all the 770 million :math:`B\bar{B}` events collected at Belle on one CPU?
 
     How long would it take to simulate all the :math:`B\bar{B}` events we
     intend to collect for Belle II?
@@ -541,7 +541,7 @@ close to minutes per event due to the much higher energy.
     8912 days or roughly 24 years.
 
     For Belle II we intend to collect :math:`50\ \textrm{ab}^{-1}` and the cross section
-    is 1.1 nb. So we expect 55 billion :math:`B\overline{B}` events. Equivalent to
+    is 1.1 nb. So we expect 55 billion :math:`B\bar{B}` events. Equivalent to
     636574 days or 1744 years.
 
 .. admonition:: Question
@@ -732,7 +732,7 @@ reconstruction takes about twice as long as the simulation of an event.
 
     For the full experiment we will collect :math:`50\ \textrm{ab}^{-1}`. The
     plan is to have a total trigger cross section of 20 nb (so in addition to the
-    1.1 nb of :math:`B\overline{B}` we will also have some fraction of continuum,
+    1.1 nb of :math:`B\bar{B}` we will also have some fraction of continuum,
     tau and other events).
 
     How many CPUs do we need to reconstruct all the real data and simulate and

@@ -286,6 +286,7 @@ class TestMergeStaging(unittest.TestCase):
         self.assertEqual(ctx.exception.extra_vars['payloads start after first valid run'], 2)
 
     def test_operations_simple(self):
+        """Test something useful."""
         running = self.make_payloads(**self.RUNNING_BASE)
         staging = self.make_payloads(
             A=[(0, 0, -1, -1)],

@@ -45,17 +45,18 @@ The rest of this section will quickly go through each of the four blocks in whic
 the workflow is split, covering the very basic concepts and deferring most of the
 technical explanations about how the software works to the other chapters.
 
-Intro: Cut and count
---------------------
+Introduction: Cuts and signal selection
+---------------------------------------
 
 Almost regardless of the quantity you are going to measure in your analysis, you
 will have to face some basic problems: select events you want to study (the
-signal) over similar events that mimic them (the background), estimate efficiency
-of such a selection and, possibly, estimate the intrinsic resolution on the
-quantities you will measure. Finally you will typically want to count how many
-signal events you observe.
+signal) over similar events that mimic them (the background), estimate 
+efficiency of such a selection and, possibly, estimate the intrinsic resolution
+of the quantities you will measure. Finally you will typically want to count how
+many signal events you observe.
 
-The most basic way to select a signal is to apply what, in jargon, are called "cuts".
+The most basic way to select a signal is to apply what, in jargon, are called
+"cuts".
 A cut is nothing but selection, usually binary, over one quantity that has some
 separation power between signal and background. Of course multiples cuts can be
 applied in sequence, leading to quite effective background reductions.
@@ -92,6 +93,9 @@ background.
     :math:`-150\ \textrm{MeV} < \Delta E < 150\ \textrm{MeV}`
     and reject those which don't.
 
+Introduction: Backgrounds, backgrounds, backgrounds
+---------------------------------------------------
+
 An interesting event for most B physics analyses, is one where the
 :math:`e^+e^-` produced an :math:`\Upsilon(4S)`.
 However this is not the most probable result in an :math:`e^+e^-` collision.
@@ -111,11 +115,10 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
-    Probably you are looking for `this page on confluence 
+    Probably you are looking for `this page 
     <https://confluence.desy.de/x/AQkWAg>`_.
 
-.. admonition:: Solution
-    :class: toggle solution
+.. admonition:: Solution :class: toggle solution
 
     At around 125 nb, the most probably process is :math:`e^+e^-\to e^+e^-`.
 
@@ -140,13 +143,92 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
     About 1.1 nb.
 
 We call anything that is not "what you want to analyse": **background**.
-This means different things for different analyses.
-Certain kinds of background events (such as :math:`e^+e^- \to e^+e^-`) are
-relatively easy to reject and can be done in the **trigger**.
-Other kinds of backgrounds are dealt with at later stages of your analysis.
+But this is a bit of a sloppy definition.
+In fact, you will encounter roughly four things in a Belle II analysis that 
+people call "background".
+It depends a bit on how one counts.
 
-We will cover different aspects of this later in this lesson, and in
-further lessons.
+.. warning:: 
+
+    We will always specify in these lessons. 
+    But in your working life (in meetings etc), you might hear the word 
+    "background" and you will need to infer from the context precisely what is
+    being discussed.
+
+The example we've just discussed (such as :math:`e^+e^- \to e^+e^-`) are 
+background *events* or background *processes*.
+These are relatively easy to reject and can be done in the **trigger** or by 
+rather simple cuts.
+More on this :ref:`later on in this lesson
+<onlinebook_fundamentals_trigger_filter>`_.
+You don't need to worry too much about these if you are doing B physics.
+But these background processes can be important for low-multiplicity analyses.
+
+The second kind of background arises from physics processes that mimic your 
+signal.
+
+.. admonition:: Example
+
+    If you want to analyse :math:`B\to K^{(*)}\ell^+\ell^-` decays then you
+    would be concerned with the (much higher branching fraction) 
+    :math:`B\to J/\psi K^{(*)}` process where the :math:`J/\psi` subsequently
+    decays to a pair of leptons.
+
+        Most people would call this a "physics background".
+
+You would also get backgrounds of this second kind where there was some particle
+mis-identification or mis-reconstruction.
+
+The third kind of background arises from the continuum of hadronic events.
+As you saw in the exercises before, :math:`B\bar B` is only part of the hadronic
+cross section.
+You will also get hadronisation of light quarks (:math:`uds`), and the charm 
+quark (which is a background to B physics, for example, but obviously the signal
+for charm physics measurements).
+
+These hadronic events produce many tracks (around 10 or 11) per event.
+You are therefore, just by probability, likely to find some combination of 
+genuine tracks and clusters that mimic your signal but aren't from a :math:`B` 
+decay.
+We call this **continuum background**.
+This background can be suppressed to a certain extent, although many analyses 
+leave some part of this background in the data sample as it is relatively 
+straightforward to model and cutting too strictly on contunuum suppression
+variables will hurt signal efficiency at some stage.
+You will have a lesson about :ref:`continuum suppression <onlinebook_cs>`_ and
+:ref:`examples of modelling <onlinebook_fitting>`_ later in these tutorials.
+
+The fourth thing people will refer to as "background" is something rather 
+different.
+**Beam-induced background** are tracks and clusters that are not produced from
+the primary :math:`e^+e^-` collision, but from other interactions in the beam
+itself.
+These are more prevalent in Belle II compared to Belle (and previous
+experiments) since the beams are significantly more focused at SuperKEKB.
+Beam background tracks and clusters are rather easy to reject at the final 
+stages of an analysis the presence of such tracks and clusters is usually
+tolerable (you can just ignore them).
+They are, however, relevant during reconstruction and in the high-level trigger.
+
+It might be obvious but let us state an obvious thing: even events that are 
+really from your signal can contain these background clusters and tracks.
+You do not need to reject the whole event just because of some beam background.
+
+.. tip:: 
+
+    You should discuss the backgrounds that you are expecting to encounter in 
+    your analysis with your supervisor.
+    This is a very important and useful conversation.
+
+.. admonition:: Key points
+    :class: key-points
+
+    There are four(ish) important kinds of "background".
+
+    1. Trigger background and background processes.
+    2. Physics background (more of a problem when you get into your analysis).
+    3. Continuum background from (:math:`uds` and maybe :math:`c`).
+    4. Beam-induced background.
 
 Data taking: The experiment
 ---------------------------
@@ -374,6 +456,7 @@ Non-4S
    parts of the Belle II physics program, but are particularly interesting for the spectroscopy, hadronic physics and
    dark sector studies.
 
+.. _onlinebook_fundamentals_triggers_filters:
 
 Data taking: Triggers and filters
 ---------------------------------
@@ -499,7 +582,7 @@ generate.
 There is a large variety of different generators for different use cases:
 EvtGen, KKMC, Tauola, Madgraph, CRY, AAFH, babayaganlo, PHOKARA, ... . All
 simulate specific physic processes and will be used for different use cases from
-perfomance studies to different analysis types. There is an internal `Belle II
+performance studies to different analysis types. There is an internal `Belle II
 Note <https://docs.belle2.org/record/282?ln=en>`_ with more details if you're
 interested.
 
@@ -971,7 +1054,7 @@ starting from those signals and combined particles that are reconstructed as sum
     leaving a signal. However, such short track would be very difficult to reconstruct, and it's
     much more convenient to reconstruct these hyperons looking at their (almost) stable decay products.
     Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as
-    deuteron, tritium od helium. These can be produced ether in the :math:`e^+e^-` collision or, much more
+    deuteron, tritium of helium. These can be produced ether in the :math:`e^+e^-` collision or, much more
     easily, by spallation processes on the inner detector materials.
 
 

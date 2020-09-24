@@ -239,6 +239,14 @@ of the decay mode you are studying, it is recommended to use them for V0s
     the Kshort candidates. You will learn more about vertex fits in
     :ref:`onlinebook_vertex_fitting`.
 
+In the previous task you should have learned how useful it is to carefully
+study the output. This is especially relevant if there are warning or error
+messages. Remember to never ignore them as they usually point to some serious
+issue, either in the way you have written your steering file or in the basf2
+software itself. In the latter case you are encouraged to report the problem
+so that it can be fixed by some experts (maybe you even become this expert one
+day yourself).
+
 Now we have a steering file in which final state particles are loaded from the
 input mdst file to particle lists. One of the most powerful modules of the
 analysis software is the `ParticleCombiner`. It takes those particle lists and

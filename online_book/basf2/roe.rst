@@ -18,12 +18,11 @@ The Rest of Event (ROE)
 
         * I combined several particles into ``X``. How do I select everything
           that is not "in" ``X``?
-        * What is an ROE mask?
+        * How to exclude some particles from this Rest of Event / what is an ROE mask?
 
     **Objectives**:
 
-        * Learn the basics of ROE
-        * Get the best ROE 4-momentum resolution
+        * Reconstruct the ROE of a B meson
 
 
 After the reconstruction of the signal particle list it is very useful
@@ -106,7 +105,9 @@ In principle, one can already try to use some of the Rest of Event variables.
      which starts from :b2:var:`bssMassDifference` variable.
 
 
-Among the most usiversal and useful are ROE invariant mass :b2:var:`roeM` or ROE energy :b2:var:`roeE`.
+Among the most universal and useful are ROE invariant mass :b2:var:`roeM` or ROE energy :b2:var:`roeE`. Also, one can call
+:b2:var:`nROE_Charged` or :b2:var:`nROE_Photons` to know how many charged particles or
+photons entered the ROE.
 
 Remember that we were collecting all variables in the ``b_vars`` list.
 Let's include the following lines to have a useful selection of them:
@@ -129,15 +130,17 @@ ROE masks
 ~~~~~~~~~
 
 The main philosophy of the ROE is to include *every* particle in the event,
-that has not been associated to the signal candidate and it is up to the analyst to
-decide what particles are actually matter for the analysis.
-That is why, a typical ROE contains not only the partner particle, but also all other particles, like
-hadron split-off particles, :math:`\delta`-rays, unused radiative photons, beam-induced background particles
-or products of kaon or pion decays. Thus, it is important to clean up the ROE particles
-to get the best possible use of it.
+that has not been associated to the signal candidate.
+That is why a typical ROE contains not only the partner particle (e.g. the tag or signal B),
+but also all other particles, like
+hadron split-off particles, :math:`\delta`-rays, unused radiative photons, beam-induced background particles or products of kaon or pion decays.
+It is up to the analyst to decide what particles actually matter for the analysis.
+To "clean up" the ROE particles, *ROE masks* are used.
 
-That is why we have a concept of the ROE masks, which are just sets of selection cuts
-to be applied on the ROE particles. One can start from defining the following selection cut strings:
+ROE masks are just sets of selection cuts
+to be applied on the ROE particles.
+
+For our example, let's start by defining the following selection cut strings:
 
 .. literalinclude:: steering_files/029_roe.py
      :lines: 47-50
@@ -151,7 +154,7 @@ because of different methods of measurement used to detect these particles.
 .. tip::
 
     These are example cuts, please use official guidelines from
-    Charged or Neutral Performance groups to set up your own selection.
+    Charged or Neutral Performance groups to set up your own selection in a "real" analysis.
 
 
 .. admonition:: Exercise
@@ -175,16 +178,17 @@ because of different methods of measurement used to detect these particles.
          :emphasize-lines: 51-52
          :lineno-start: 47
 
-Now we have created a mask with a name ``my_mask``, that will contain only track-based
+Now we have created a mask with a name ``my_mask``, that will only allow track-based
 particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
 ``ecl_based_cuts``.
 
 The analyst can create as many ROE masks as needed and use them in different ROE-dependent
-algorithms or ROE variables, like ``roeM(my_mask)`` or ``roeE(my_mask)``. Also, one can call
-:b2:var:`nROE_Charged` or :b2:var:`nROE_Photons` to know how many charged particles or
-photons entered the ROE or the ROE mask.
+algorithms or ROE variables.
+For ROE variables, the mask is specified as an argument, like ``roeM(my_mask)``
+or ``roeE(my_mask)``.
 
-In the last section, we defined two lists of ROE variables. Now we want to have
+In the last section, we defined two lists of ROE variables (``roe_kinematics`` and ``roe_multiplicities``).
+Now we want to have
 the same variables but with the ``my_mask`` argument. Since we're lazy, we use a python
 loop to insert this argument.
 
@@ -200,8 +204,21 @@ loop to insert this argument.
 
      .. code-block:: python
 
+        The variables are nothing more than a string, which has a ``replace``
+        method:
+
         >>> "roeE()".replace("()", "(my_mask)")
-        'roeE(my_mask)
+        'roeE(my_mask)'
+
+.. admonition:: Hint
+     :class: xhint stacked toggle
+
+     .. code-block:: python
+
+        for roe_variable in roe_kinematics + roe_multiplicities:
+            roe_variable_with_mask = <your code here>
+            b_vars.append(roe_variable_with_mask)
+
 
 .. admonition:: Solution
      :class: solution toggle
@@ -253,6 +270,7 @@ This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`
     * Usage of ROE without a mask is **not** recommended.
 
 
-.. topic:: Author(s) of this lesson
+.. topic:: Authors of this lesson
 
-    Sviatoslav Bilokin
+    Sviatoslav Bilokin,
+    Kilian Lieret

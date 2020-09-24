@@ -914,7 +914,7 @@ coordinates with the detector experts the reconstruction of our data.
 Processing: Data formats
 ------------------------
 
-When an e+e- collision happens, the resulting products will leave signal in the Belle II
+When an :math:`e^+e^-` collision happens, the resulting products will leave signal in the Belle II
 subdetectors that are acquired, matched in time as each subsystem have a different delay
 and response time (event building), and saved to disk in a packed, binary format.
 Several steps have to be performed in order to produce a physics result of these
@@ -927,7 +927,7 @@ produces files in different formats.
    in the branches of a tree. When we say "different formats", we refer simply to the
    different branches contained in those trees.
 
-Let's start form the data objects we save. There are four groups of them: raw, low-level,
+Let's start from the data objects we save. There are four groups of them: raw, low-level,
 reconstruction-level and analysis-level. The raw objects are the output of the single
 subsystems: digitized  PMT signals from the TOP, digitized ADC signals form the CDC, and
 so on. Without any further process, these objects cannot be used. The low-level objects
@@ -976,6 +976,30 @@ uDST (micro Data Summary Table)
    If you are simply running an analysis, you will mostly use uDST, if you are also involved
    in performance studies you will probably use cDST as well and if your core activity will
    be hardware operations, you will be mostly dealing with the RAW and cDST formats.
+
+
+Analysis: the skimming
+----------------------
+
+After data procesing, the mDST files are finally available for analysis. While it's possible
+to run directly on them, it's however quite inconvenient. The mDST contain all the events that
+have been acquired, while usually an analysis needs only a very small fraction of them, not to
+mention that several analyses may share the need to reconstruct the same objects (countless 
+analyses include a :math:`D^{\star}` or a :math:`J/\psi`, for example).
+
+The goal of the analysis skims (often just called skims) is to produce smaller datasets, 
+each amounting to few percents of the total dataset,  that can be shared among several analyses. 
+
+To produce a skim one has do define a rather simple selection, which is as inclusive as possible 
+(or, in other words, uses cuts as loose as possible), while keeping the retention rate within
+reasonable boundaries. 
+
+.. note::
+   *When you run your analysis, you shoud first check if there is a skim that suits it*. Running
+   on skimmed files is much faster and safer than running on the full dataset. If you cannot
+   find a skims that suits your needs, talk to your working group convener first to figure
+   out the best strategy for you.
+
 
 
 
@@ -1105,16 +1129,6 @@ V0
    it is better to re-run the tracking before doing it, since if a track originates not in the IP, it will cross less
    material than expected and the multiple scattering corrections must be updated.
 
-
-
-
-Analysis: the skimming
-----------------------
-
-
-Describe here:
-* what skiming is
-* why it's needed
 
 
 .. admonition:: Key points

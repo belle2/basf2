@@ -289,9 +289,20 @@ Bremsstrahlung recovery?
            :lineno-start: 113
 
             b_vars += variables.addAlias(
-             "D0_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
+             "Jpsi_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
             ) 
+ 
+    The next code plots the distributions using pandas:
 
+    .. code-block:: python3
+
+       # Assuming your DataFrame is called df, and you imported 
+       # matplotlib.pyplot as plt
+       df.hist("Jpsi_M_uncorrected",label="w/o brems corr")
+       df.hist("J_psi_M",label="with brems corr", alpha=0.7)
+       plt.yscale("log") #set a logarithmic scale in the y-axis
+       plt.legend() #show legend      
+ 
     The results should look similar to :numref:`jpsi_brems_validation_plot` (this was obtained with a 
     different steering file, so do not mind if your plot is not exactly the same). 
 

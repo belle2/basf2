@@ -14,9 +14,6 @@
 
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/EventKinematics.h>
-
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -51,43 +48,32 @@ EventKinematicsModule::~EventKinematicsModule() = default;
 void EventKinematicsModule::initialize()
 {
   auto arrayName = (!m_usingMC) ? "EventKinematics" : "EventKinematicsFromMC";
-  StoreObjPtr<EventKinematics> evtKinematics(arrayName);
-  evtKinematics.registerInDataStore();
+  m_eventKinematics.registerInDataStore(arrayName);
 
-}
-
-void EventKinematicsModule::beginRun()
-{
 }
 
 void EventKinematicsModule::event()
 {
-  auto arrayName = (!m_usingMC) ? "EventKinematics" : "EventKinematicsFromMC";
-  StoreObjPtr<EventKinematics> eventKinematics(arrayName);
-  if (!eventKinematics) eventKinematics.construct(m_usingMC);
+  if (!m_eventKinematics) m_eventKinematics.construct(m_usingMC);
   EventKinematicsModule::getParticleMomentumLists(m_particleLists);
 
   TVector3 missingMomentum = EventKinematicsModule::getMissingMomentum();
-  eventKinematics->addMissingMomentum(missingMomentum);
+  m_eventKinematics->addMissingMomentum(missingMomentum);
 
   TVector3 missingMomentumCMS = EventKinematicsModule::getMissingMomentumCMS();
-  eventKinematics->addMissingMomentumCMS(missingMomentumCMS);
+  m_eventKinematics->addMissingMomentumCMS(missingMomentumCMS);
 
   float missingEnergyCMS = EventKinematicsModule::getMissingEnergyCMS();
-  eventKinematics->addMissingEnergyCMS(missingEnergyCMS);
+  m_eventKinematics->addMissingEnergyCMS(missingEnergyCMS);
 
   float missingMass2 = missingEnergyCMS * missingEnergyCMS - missingMomentumCMS.Mag() * missingMomentumCMS.Mag();
-  eventKinematics->addMissingMass2(missingMass2);
+  m_eventKinematics->addMissingMass2(missingMass2);
 
   float visibleEnergyCMS = EventKinematicsModule::getVisibleEnergyCMS();
-  eventKinematics->addVisibleEnergyCMS(visibleEnergyCMS);
+  m_eventKinematics->addVisibleEnergyCMS(visibleEnergyCMS);
 
   float totalPhotonsEnergy = EventKinematicsModule::getTotalPhotonsEnergy();
-  eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
-}
-
-void EventKinematicsModule::endRun()
-{
+  m_eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
 }
 
 void EventKinematicsModule::terminate()

@@ -47,10 +47,10 @@ void RandomNumbers::initialize(const std::string& seed)
 {
   s_initialSeed = seed;
   if (!s_evtRng) {
-    s_evtRng = new RandomGenerator();
+    s_evtRng = new RandomGenerator("event generator");
   }
   if (!s_runRng) {
-    s_runRng = new RandomGenerator();
+    s_runRng = new RandomGenerator("independent generator");
   }
   auto* gen = dynamic_cast<RandomGenerator*>(gRandom);
   if (!gen) {
@@ -107,12 +107,15 @@ void RandomNumbers::initializeEndRun()
   s_runRng->setBarrier(INT_MIN + s_barrierOffset);
 }
 
-void RandomNumbers::initializeEvent()
+void RandomNumbers::initializeEvent(bool force)
 {
   useEventDependent();
   //we pass the random generator to other processes in multiprocessing so we only
-  //want to initialize it in the input process (or if there is no multi processing)
-  if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isInputProcess()) {
+  //want to initialize it in the input process (or if there is no multi processing)a
+  //However on HLT we do things differently and so we need to initialize on all
+  //worker processes. So the HLT event processor can request initialization in
+  //all cases.
+  if (force || !ProcHandler::parallelProcessingUsed() or ProcHandler::isInputProcess()) {
     // when in event loop we want an error if there is no EventMetaData
     s_evtRng->setMode(RandomGenerator::c_eventDependent);
     s_evtRng->initialize();

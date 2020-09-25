@@ -11,6 +11,7 @@
 ******************************************************************************/
 
 #include <svd/modules/svdUnpacker/SVDUnpackerModule.h>
+#include <svd/calibration/SVDDetectorConfiguration.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -96,6 +97,9 @@ void SVDUnpackerModule::initialize()
 
 void SVDUnpackerModule::beginRun()
 {
+  if (!m_mapping.isValid())
+    B2FATAL("no valid SVD Channel Mapping. We stop here.");
+
   m_wrongFTBcrc = 0;
   if (m_mapping.hasChanged()) { m_map = std::make_unique<SVDOnlineToOfflineMap>(m_mapping->getFileName()); }
 
@@ -125,6 +129,15 @@ void SVDUnpackerModule::beginRun()
   nEventInfoMatchErrors = -1;
 
   seenHeadersAndTrailers = 0;
+
+  //get the relative time shift
+  SVDDetectorConfiguration detectorConfig;
+  if (detectorConfig.isValid())
+    m_relativeTimeShift = detectorConfig.getRelativeTimeShift();
+  else {
+    B2ERROR("SVDDetectorConfiguration not valid!! Setting relativeTimeShift to 0 for this reconstruction.");
+    m_relativeTimeShift = 0;
+  }
 }
 
 #ifndef __clang__
@@ -168,6 +181,9 @@ void SVDUnpackerModule::event()
 
   // flag to set SVDEventInfo once per event
   bool isSetEventInfo = false;
+
+  //flag to set nAPVsamples in SVDEventInfo once per event
+  bool isSetNAPVsamples = false;
 
   unsigned short nAPVheaders = 999;
   set<short> seenAPVHeaders = {};
@@ -216,6 +232,7 @@ void SVDUnpackerModule::event()
       unsigned short apvErrorsOR = 0;
 
       bool is3sampleData = false;
+      bool is6sampleData = false;
 
       for (unsigned int buf = 0; buf < 4; buf++) { // loop over 4 buffers
 
@@ -299,7 +316,11 @@ void SVDUnpackerModule::event()
             badTrailer = false;
 
             is3sampleData = false;
+            is6sampleData = false;
+            if (m_MainHeader.DAQMode == 0) B2ERROR("SVDDataFormatCheck: the event " << eventNo <<
+                                                     " is apparently taken with 1-sample mode, this is not expected.");
             if (m_MainHeader.DAQMode == 1) is3sampleData = true;
+            if (m_MainHeader.DAQMode == 2) is6sampleData = true;
 
             if (
               m_MainHeader.trgNumber !=
@@ -323,6 +344,8 @@ void SVDUnpackerModule::event()
               m_svdEventInfoPtr->setModeByte(m_SVDModeByte);
               m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
 
+              //set relative time shift
+              m_svdEventInfoPtr->setRelativeShift(m_relativeTimeShift);
               // set X-talk info online from Raw Data
               m_svdEventInfoPtr->setCrossTalk(m_MainHeader.xTalk);
 
@@ -366,20 +389,42 @@ void SVDUnpackerModule::event()
             sample[1] = m_data_A.sample2;
             sample[2] = m_data_A.sample3;
 
-
             sample[3] = 0;
             sample[4] = 0;
             sample[5] = 0;
 
-            if (not is3sampleData) {
+            // Let's check the next rawdata word to determine if we acquired 3 or 6 sample
+            data32_it++;
+            m_data32 = *data32_it;
 
-              data32_it++;
-              m_data32 = *data32_it; // 2nd frame with data
+            if (m_data_B.check == 0 && strip == m_data_B.stripNum) { // 2nd data frame with the same strip number -> six samples
+
+              if (!isSetNAPVsamples) {
+                m_svdEventInfoPtr->setNSamples(6);
+                isSetNAPVsamples = true;
+              } else {
+                if (is3sampleData)
+                  B2ERROR("DAQMode value (indicating 3-sample acquisition mode) doesn't correspond to the actual number of samples (6) in the data! The data might be corrupted!");
+              }
+
               crc16vec.push_back(m_data32);
 
               sample[3] = m_data_B.sample4;
               sample[4] = m_data_B.sample5;
               sample[5] = m_data_B.sample6;
+            }
+
+            else { // three samples
+              data32_it--;
+              m_data32 = *data32_it;
+
+              if (!isSetNAPVsamples) {
+                m_svdEventInfoPtr->setNSamples(3);
+                isSetNAPVsamples = true;
+              } else {
+                if (is6sampleData)
+                  B2ERROR("DAQMode value (indicating 6-sample acquisition mode) doesn't correspond to the actual number of samples (3) in the data! The data might be corrupted!");
+              }
             }
 
             // Generating SVDShaperDigit object

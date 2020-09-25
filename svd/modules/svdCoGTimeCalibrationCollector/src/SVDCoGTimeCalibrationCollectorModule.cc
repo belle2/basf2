@@ -128,10 +128,10 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
 
   for (int cl = 0 ; cl < m_svdCls.getEntries(); cl++) {
     // get cluster time
-    float clTime = m_svdCls[cl]->getClsTime();
+    float clTime_ftsw = m_svdCls[cl]->getClsTime();
 
-    //remove firstFrame and triggerBin correction applied in the clusterizer
-    clTime = clTime - eventinfo->getSVD2FTSWTimeShift(m_svdCls[cl]->getFirstFrame());
+    //remove firstFrame and triggerBin correction applied in the clusterizer AND relative shift 3/6 mixed sample DAQ
+    float clTime = eventinfo->getTimeInSVDReference(clTime_ftsw, m_svdCls[cl]->getFirstFrame());
 
     //get cluster side
     int side = m_svdCls[cl]->isUCluster();

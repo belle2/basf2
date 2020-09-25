@@ -85,7 +85,7 @@ namespace Belle2 {
                             double& dedx) const;
 
     /** Get the standard set of corrections */
-    double GetCorrection(int adc, int layer, int wireID, double doca, double enta, double costheta) const;
+    double GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const;
 
     /** Saturation correction:
      * convert the measured ionization (D) to actual ionization (I) */

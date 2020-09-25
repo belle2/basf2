@@ -105,6 +105,7 @@ void CDCDedxCorrectionModule::event()
 
     for (int i = 0; i < nhits; ++i) {
 
+      //pay attention to deadwire or gain uses
       //getADCount is already corrected w/ non linear ADC payload
       //getADCbasecount is now uncorrect ADC
       int jadcbase = dedxTrack.getADCBaseCount(i);
@@ -114,19 +115,27 @@ void CDCDedxCorrectionModule::event()
       double jEntaRS = dedxTrack.getEntaRS(i);
       double jPath = dedxTrack.getPath(i);
 
-      double correction = dedxTrack.m_scale * dedxTrack.m_runGain * dedxTrack.m_cosCor * dedxTrack.m_cosEdgeCor * dedxTrack.getWireGain(
-                            i) * dedxTrack.getTwoDCorrection(i) * dedxTrack.getOneDCorrection(i) * dedxTrack.getNonLADCCorrection(i);
+      double correction = dedxTrack.m_scale * dedxTrack.m_runGain * dedxTrack.m_cosCor * dedxTrack.m_cosEdgeCor *
+                          dedxTrack.getTwoDCorrection(i) * dedxTrack.getOneDCorrection(i) * dedxTrack.getNonLADCCorrection(i);
+      if (dedxTrack.getWireGain(i) > 0)correction *= dedxTrack.getWireGain(i); //also keep dead wire
 
       //Modify hit level dedx
       double newhitdedx = (m_relative) ? 1 / correction : 1.0;
       StandardCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, jPath, costh, newhitdedx);
       dedxTrack.setDedx(i, newhitdedx);
 
-      //do track level dedx and modifiy after loop over hits
+      // do track level dedx and modifiy after loop over hits
       // rel const -> upto 6 from calibrated GT and 2 are direct from dedx track (no rel cal for them now)
       // abs const -> upto 6 from calibrated GT and 2 are direct from default GT
-      if (m_relative) correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh);
-      else correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh);
+      if (m_relative) {
+        //prewire gains need old tracks (old bad wire) and post need track new wg (new dead wire)
+        //get same base adc + rel correction factor
+        correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh);
+        if (!m_DBWireGains && dedxTrack.getWireGain(i) == 0)correction = 0;
+      } else {
+        //get modifed adc + abs correction factor
+        correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh);
+      }
 
       // combine hits accross layers
       if (correction != 0) {
@@ -171,10 +180,13 @@ void CDCDedxCorrectionModule::RunGainCorrection(double& dedx) const
 
 void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
 {
-
   double gain = m_DBWireGains->getWireGain(wireID);
   if (gain != 0) dedx = dedx / gain;
-  else dedx = 0;
+  else {
+    //rel-abs method needs all wire for cal but w/ this method post calis (e.g.final RG)
+    //will also see all hitdedx but that is not an issue for track level calibration
+    if (m_relative)dedx = 0;
+  }
 }
 
 void CDCDedxCorrectionModule::TwoDCorrection(int layer, double doca, double enta, double& dedx) const
@@ -251,7 +263,7 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
 }
 
 
-double CDCDedxCorrectionModule::GetCorrection(int adc, int layer, int wireID, double doca, double enta, double costheta) const
+double CDCDedxCorrectionModule::GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const
 {
   double correction = 1.0;
   if (m_scaleCor) correction *= m_DBScaleFactor->getScaleFactor();

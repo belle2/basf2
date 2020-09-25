@@ -23,6 +23,7 @@ from caf.strategies import SequentialRunByRun, SingleIOV
 from prompt import CalibrationSettings
 import reconstruction as recon
 from softwaretrigger.path_utils import (add_filter_software_trigger, add_skim_software_trigger)
+from random import seed
 
 gSystem.Load('libreconstruction.so')
 ROOT.gROOT.SetBatch(True)
@@ -49,6 +50,7 @@ def get_calibrations(input_data, **kwargs):
         input_files_coscorr = file_to_iov_physics
         input_files_wiregain = file_to_iov_physics
     else:
+        seed(271492)
         from prompt.utils import filter_by_max_events_per_run, filter_by_max_events_per_dataset
         # collection for rungains
         max_files_for_maxevents = 50000  # (around 5-6 random files per run) ~ 15% loss -> 80k tracks per run
@@ -64,9 +66,6 @@ def get_calibrations(input_data, **kwargs):
             raise ValueError(
                 f"Cosine: all requested (%d) events not found" % max_events_per_dataset)
 
-        # collection for wiregain = cosine now = 15M events
-        # max_events_per_dataset = 20e6  # (~0.4 fb-) events from random files from dataset
-        # input_files_wiregain = filter_by_max_events_per_dataset(list(file_to_iov_physics.keys()), max_events_per_dataset)
         input_files_wiregain = input_files_coscorr
         basf2.B2INFO(f"Total number of files used for wiregains = {len(input_files_wiregain)}")
         if not input_files_wiregain:
@@ -217,7 +216,6 @@ def get_calibrations(input_data, **kwargs):
     # WireGain Algorithm setup
     Algorithm_WG = CDCDedxWireGainAlgorithm()
     Algorithm_WG.setMonitoringPlots(True)
-    Algorithm_WG.setLocalTrucation(True)
 
     # WireGain Calibration setup
     Calibration_WG = Calibration(

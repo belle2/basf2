@@ -45,7 +45,7 @@ ma.matchMCTruth("B0", path=main)
 # Save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",
-    variables=['Mbc', 'deltaE', 'isSignal'],
+    variables=['Mbc', 'isSignal'],
     filename="Bd2JpsiKS.root",
     treename="tree",
     path=main,

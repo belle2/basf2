@@ -39,7 +39,7 @@ Let's get started: The very first step is always to set up the necessary
 environment.
 
 .. admonition:: Task
-    :class: exercise stacked
+    :class: exercise stacked clear
 
     Set up the basf2 environment using the currently recommended software
     version.
@@ -68,9 +68,8 @@ There are three lines of code that are part of each steering script:
 .. admonition:: Task
     :class: exercise stacked
 
-    Open an empty file with an editor of your choice. Add those three lines.
-    Run the script. Don't worry, if you've done everything correct, you should
-    see some error messages. Read them carefully!
+    Open an empty file with an editor of your choice and add those three lines.
+    Save the file with a ``.py`` extension.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -80,7 +79,40 @@ There are three lines of code that are part of each steering script:
 .. admonition:: Solution
     :class: toggle solution
 
-    .. literalinclude:: steering_files/010_first_steering_file.py
+    .. code-block:: python
+
+        import basf2
+        main = basf2.Path()
+        basf2.process(main)
+
+Running steering files is as easy as calling ``basf2 scriptname.py`` on the
+command-line.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Run the short script that you just created. Don't worry, if you've done
+    everything correct, you should see some error messages. Read them
+    carefully!
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    The output should look like this:
+
+    .. code-block:: bash
+
+        [INFO] Steering file: scriptname.py
+        [INFO] Starting event processing, random seed is set to '94887e3828c78b3bd0b761678bd255317f110e183c2ed59ebdcd027e7610b9d6'
+        [ERROR] There is no module that provides event and run numbers (EventMetaData). You must add either the EventInfoSetter or an input module (e.g. RootInput) to the beginning of your path.
+        [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.  { function: void Belle2::EventProcessor::process(const PathPtr&, long int) }
+        [INFO] ===Error Summary================================================================
+        [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
+        [ERROR] There is no module that provides event and run numbers (EventMetaData). You must add either the EventInfoSetter or an input module (e.g. RootInput) to the beginning of your path.
+        [INFO] ================================================================================
+        [ERROR] in total, 1 errors occurred during processing
+
+    The random seed will of course differ in your case.
 
 Of course, no events could be processed because no data has been loaded yet.
 Let's do it. As already described in the previous lesson almost all
@@ -129,15 +161,53 @@ files. They are located on kekcc at
     :class: exercise stacked
 
     Extend your steering file by loading the data of one of the local input
-    files.
+    files. It makes sense to run the steering file again. If there is a syntax
+    error in your script or you forgot to include a necessary argument, there
+    will be an error message that should help you to debug and figure out what
+    needs to be fixed. If the script is fine, only three lines with info
+    messages should be printed to the output and you should see a quickly
+    finishing progress bar.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    First, you have to import modularAnalysis. It's better to load the whole
+    First, you have to import `modularAnalysis`. It's better to load the whole
     file, since you will need more functions of it later on. It might be
-    convenient to set an abbreviation, e.g. ``ma``. In principle, for one
-    input file `inputMdst` is sufficient.
+    convenient to set an abbreviation, e.g. ``ma``. Then, you have to set the
+    correct values for the three required arguments of `inputMdstList`.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/010_first_steering_file.py
+
+In the solution to the last task we have added empty lines, shortcuts for the
+imports, and some comments. This helps to give the script a better structure
+and allows yourself and others to easier understand what's going on in the
+steering file. In the very first line we have also added a *shebang* to define
+that the steering file should be executed with a python interpreter.
+
+So far, the input file has been completely hard-coded. But as we've seen
+before the file names only differ by the final suffix. We can be a little bit
+more flexible by providing this integer as a command-line argument. Then, we
+can select a different input file when running the steering file and without
+having to change anything in the script itself.
+
+.. admonition:: Task
+    :class: exercise stacked
+
+    Adjust your steering file so that you can select via an integer as
+    command-line argument which file is going to be processed.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    You should have learned about command-line arguments in `this
+    <https://swcarpentry.github.io/python-novice-inflammation/12-cmdline/index.html>`_
+    part of the python introduction of the software carpentry. Otherwise, go
+    back and refresh your memory. All you have to do is to import the system
+    library, store the command-line argument (``sys.argv``) in a local
+    variable, and extend the string using the f-string syntax. 
 
 .. admonition:: Solution
     :class: toggle solution
@@ -177,11 +247,18 @@ e.g. soft and hard photons.
 
 .. code-block:: python
 
-    ma.fillParticleList("e-:soft", "E < 1", path=main)
-    ma.fillParticleList("e-:hard", "E > 3", path=main)
+    ma.fillParticleList("e-:soft", "E < 1", path=main) # the label of this electron list is "soft"
+    ma.fillParticleList("e-:hard", "E > 3", path=main) # here the label is "hard"
 
 .. warning:: If the provided cut string is not empty you can not use the label
-             ``all``.
+             ``all``, i.e. having
+
+             .. code-block:: python
+
+                ma.fillParticleList("e-:all", "E > 0", path=main)
+
+             in your steering file will cause a fatal error and stop the
+             execution of your script.
 
 There are standard particle lists with predefined selection criteria. While
 those for charged final state particles should only be used in early stages of
@@ -378,14 +455,15 @@ mass.
 .. admonition:: Task
     :class: exercise stacked
 
-    Save the beam-constrained B mass and the difference between half the
-    center-of-mass energy and the reconstructed B energy into an output
-    ntuple. Run your steering file with these additions.
+    Save the beam-constrained B mass of each B candidate in an output ntuple.
+    Then, run your steering file.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    The variables are called `Mbc` and `deltaE`.
+    The variable for the beam-constrained B mass is called `Mbc`. It has to be
+    provided as element of a list to the argument ``variables`` of the
+    `variablesToNtuple` function.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -408,7 +486,8 @@ happen to fulfill all your selection criteria.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    Read in the ntuple using ``read_root`` of ``root_pandas``. 
+    Read in the ntuple using ``read_root`` of ``root_pandas``. Use the
+    histogram plotting routine of the dataframe.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -515,7 +594,7 @@ topics are prepared.
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Find out to which variable collections the three variables belong that we
+    Find out to which variable collections the two variables belong that we
     added to the ntuple so far.
 
 .. admonition:: Hint

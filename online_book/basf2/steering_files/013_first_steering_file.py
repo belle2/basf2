@@ -42,7 +42,7 @@ ma.reconstructDecay(
 # Save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",
-    variables=['Mbc', 'deltaE'],
+    variables=['Mbc'],
     filename="Bd2JpsiKS.root",
     treename="tree",
     path=main,

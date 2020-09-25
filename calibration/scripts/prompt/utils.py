@@ -81,7 +81,7 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, randomSel=Fal
     in order until the maximum number of events are reached per run.
 
     Parameters:
-        files_to_iov (dict): ["/path/to/file.root": IoV(1,1,1,1)] type dictionary. Same style as used by the CAF
+        files_to_iov (dict): {"/path/to/file.root": IoV(1,1,1,1)} type dictionary. Same style as used by the CAF
             for lookup values.
         max_events_per_run (int): The threshold we want to reach but stop adding files if we reach it.
         randomSel (bool): true will select random nfile and false will take first nfile.
@@ -135,7 +135,7 @@ def filter_by_max_events_per_dataset(input_file_list, max_events_per_dataset):
     the maximum number of events are reached per data set.
 
     Parameters:
-        input_file_list (list): {"/path/to/file2.root", "/path/to/file2.root" }
+        input_file_list (list): ["/path/to/file2.root", "/path/to/file2.root"]
         max_events_per_dataset (int): The threshold we want to reach but stop adding files if we reach it.
 
     Returns:

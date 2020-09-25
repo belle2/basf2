@@ -381,8 +381,8 @@ Decay B0
 
 #                    b -> c tau nu
 #
-0.01254160 D*-    tau+ nu_tau                  HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2022
-0.00636870 D-     tau+ nu_tau                  HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2022
+0.01254160 D*-    tau+ nu_tau                  HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021
+0.00636870 D-     tau+ nu_tau                  HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021
 0.0013   D_1-    tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
 0.0020   D'_1-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
@@ -446,8 +446,8 @@ Decay B0
 # b->u hadronic
 # Ref. [B1]:
 # Lange Nov14,2004 (flip D_s K --opposite of D_s pi)
-0.00002160 D_s+    pi-                      PHSP; #Updated by PG 9/2022
-0.00002748 D_s-    K+                       PHSP; #Updated by PG 9/2022
+0.00002160 D_s+    pi-                      PHSP; #Updated by PG 9/2021
+0.00002748 D_s-    K+                       PHSP; #Updated by PG 9/2021
 0.0000210 D_s*+   pi-                      SVS;
 0.0000219 D_s*-   K+                       SVS;
 
@@ -459,12 +459,12 @@ Decay B0
 
 # b -> s gamma
 #
-0.00004177 K*0     gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #Updated by PG 9/2022
+0.00004177 K*0     gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #Updated by PG 9/2021
 0.00000044 omega   gamma                   SVP_HELAMP 1.0 0.0 1.0 0.0;  #Changed model to SVP_HELAMP from HELAMP
 0.00000086 rho0    gamma                   SVP_HELAMP 1.0 0.0 1.0 0.;   #Changed model from PHSP to SVP_HELAMP
 0.000043   K_10  gamma                     SVP_HELAMP 1.0 0.0 1.0 0.0;  #[Reconstructed PDG2016] #Changed model from HELAMP to SVP_HELAMP
 0.0000065  K'_10  gamma                    SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 1.5e-6
-0.00001237 K_2*0   gamma                   HELAMP 1.0 0.0 1.0 0.0;      #Updated by PG 9/2022
+0.00001237 K_2*0   gamma                   HELAMP 1.0 0.0 1.0 0.0;      #Updated by PG 9/2021
 0.0000017  K''*0  gamma                    SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 2e-3
 0.0002735   Xsd    gamma                   BTOXSGAMMA 2 ; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b - s gamma  states
 
@@ -473,7 +473,7 @@ Decay B0
 0.00000551  Xsd  e+    e-                  BTOXSLL 4.8 0.2 0.0 0.41;    #[Reconstructed PDG2016] BF = 6.7e-6 -Sum of exclusive b -> s e e  modes
 0.000000021 pi+ pi- e+    e-               PHSP; #[Reconstructed PDG2016] #By lepton universality from mu mu BF
 0.000000339 K0      mu+     mu-            BTOSLLBALL; #[Reconstructed PDG2016]
-0.00000094 K*0     mu+     mu-            BTOSLLBALL; #Updated by PG 9/2022
+0.00000094 K*0     mu+     mu-            BTOSLLBALL; #Updated by PG 9/2021
 0.000000021 pi+ pi- mu+     mu-            PHSP; #[Reconstructed PDG2016]
 0.00000292  Xsd  mu+   mu-                 BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
 0.0000001   K0   tau+  tau-                BTOSLLBALL;
@@ -487,10 +487,10 @@ Decay B0
 #    B0 -> CP eigenstates  (some exclusive b -> u)   sum=0.00036
 #
 # PR LHCb 04/07/04 update BR    #CPV included, Oberhof 09/11/2017
-0.00000512 pi+ pi-     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
-0.00000159 pi0 pi0     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
-0.00000116  pi0 eta     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
-0.00000120 pi0 eta'    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
+0.00000512 pi+ pi-     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
+0.00000159 pi0 pi0     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
+0.00000116  pi0 eta     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
+0.00000120 pi0 eta'    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
 0.000001   pi0 a_00    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   pi0 f_0     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 # pi0 rho0 is with the 3-body modes #CPV included, Oberhof 09/11/2017
@@ -509,7 +509,7 @@ Decay B0
 0.000001   eta' a_00   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   eta' f_0    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   eta' rho0   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
-0.00000101   eta' omega  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
+0.00000101   eta' omega  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
 0.000001   eta' a_10   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 0.000001   eta' b_10   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   a_00 a_00   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
@@ -549,29 +549,29 @@ Decay B0
 0.000001 phi eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 0.000001 phi eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-0.00001587 K*0     eta                                     SVS; #Updated by PG 9/2022
-0.00000280 K*0     eta'                                    SVS; #Updated by PG 9/2022
-0.00000204 K*0     omega                                   SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00001587 K*0     eta                                     SVS; #Updated by PG 9/2021
+0.00000280 K*0     eta'                                    SVS; #Updated by PG 9/2021
+0.00000204 K*0     omega                                   SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000001  phi  omega                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
-0.00000120  omega omega                                       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00000120  omega omega                                       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000001  omega rho0                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 
 # PR LHCb 04/07/04 update BR
 #2-body modes from Jim Olsen
-0.00001958 K+      pi-                                     PHSP; #Updated by PG 9/2022
-0.00000008  K+  K-       PHSP; #Updated by PG 9/2022
+0.00001958 K+      pi-                                     PHSP; #Updated by PG 9/2021
+0.00000008  K+  K-       PHSP; #Updated by PG 9/2021
 # K_S0 K_L0 is 0
 # see http://babar-hn.slac.stanford.edu:5090/HyperNews/get/pubboard14/156.html
 0.000000240 K_S0    K_S0                                    PHSP;
 0.0000000  K_S0 K_L0    PHSP;
 0.000000240 K_L0    K_L0                                    PHSP;
-# Declare K0 pi0 not to have it through Pythia (LHCb - PR)
-0.0000000  K0 pi0       PHSP;
-# Split into K_s0 K_l0 (LHCb - P. Robbe)
-0.000004750 K_S0    pi0                                     PHSP;
-0.000004750 K_L0    pi0                                     PHSP;
-#Put in with 0 BR to keep PYTHIA from generating it
-0.0000000  K0 anti-K0   PHSP;
+#REMOVE LINE # Declare K0 pi0 not to have it through Pythia (LHCb - PR)
+0.00000993  K0 pi0       PHSP; #Updated by PG 9/2021
+#REMOVE LINE # Split into K_s0 K_l0 (LHCb - P. Robbe)
+#REMOVE LINE 0.000004750 K_S0    pi0                                     PHSP;
+#REMOVE LINE 0.000004750 K_L0    pi0                                     PHSP;
+#REMOVE LINE#Put in with 0 BR to keep PYTHIA from generating it
+0.00000121  K0 anti-K0   PHSP; #Updated by PG 9/2021
 
 # 3-body decays
 # this model generates interferences and higher mass rho
@@ -596,7 +596,7 @@ Decay B0
 0.000002350 rho0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;  #CPV included, Oberhof 09/11/2017
 
 # rho- 3-body modes
-0.00000701 rho-    K+                                      SVS;  #Updated by PG 9/2022
+0.00000701 rho-    K+                                      SVS;  #Updated by PG 9/2021
 
 # rho(1450) 3-body modes #CPV included, Oberhof 09/11/2017
 0.0000005 rho(2S)0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #CPV included, Oberhof 09/11/2017
@@ -610,7 +610,7 @@ Decay B0
 0.000003     a_0- pi+               PHSP;
 
 # K*0(892) 3-body modes
-0.00000330 K*0     pi0             SVS; #Updated by PG 9/2022
+0.00000330 K*0     pi0             SVS; #Updated by PG 9/2021
 0.000003     K*0 anti-K0            SVS;
 
 # K*0(1430) 3-body modes
@@ -622,15 +622,15 @@ Decay B0
 0.000001     K''*0 K0               SVS;
 
 # K*+(892) 3-body modes
-0.00000750 K*+     pi-             SVS; #Updated by PG 9/2022
+0.00000750 K*+     pi-             SVS; #Updated by PG 9/2021
 0.000002     K*+ K-                 SVS;
 
 # K*+(1430) 3-body modes
-0.00003348 K_0*+   pi-             PHSP;  #Updated by PG 9/2022
+0.00003348 K_0*+   pi-             PHSP;  #Updated by PG 9/2021
 0.000002     K_0*+ K-               PHSP;
 
 # K*0(1680) 3-body modes
-0.00001410     K''*+ pi-              SVS; #Updated by PG 9/2022
+0.00001410     K''*+ pi-              SVS; #Updated by PG 9/2021
 0.000001     K''*+ K-               SVS;
 
 # Non-resonant 3-body left-overs
@@ -641,27 +641,27 @@ Decay B0
 0.000017     pi+ pi- eta            PHSP;
 0.000001     pi+ pi- eta'           PHSP;
 
-# pi+ pi- K0: total-rhoK0-f0K0-piK*(892)-piK*(1430)=45-5-6-13./3-11./3
-0.000000000 pi+     pi-     K0      PHSP;
+#REMOVE LINE  # pi+ pi- K0: total-rhoK0-f0K0-piK*(892)-piK*(1430)=45-5-6-13./3-11./3
+0.00004970 pi+     pi-     K0      PHSP; #Updated by PG 9/2021
 
 # K+ pi- pi0
-0.00003779 K+      pi-     pi0     PHSP; #Updated by PG 9/2022
+0.00003779 K+      pi-     pi0     PHSP; #Updated by PG 9/2021
 0.000020     K+ pi- eta             PHSP;
 0.000001     K+ pi- eta'            PHSP;
 
-# pi+ K- K0.
-# Both B0 and B0bar can decay to these => 0.5e-6 each
-0.0000005    pi+ K- K0              PHSP;
-0.0000005    pi- K+ anti-K0         PHSP;
+# pi+ K- K0
+# Both B0 and B0bar can decay to these
+0.00000666    pi+ K- K0              PHSP; #Updated by PG 9/2021
+0.00000666    pi- K+ anti-K0         PHSP; #Updated by PG 9/2021
 
-# K+ K- K0
-# PR LHCb 09 Apr 2004 split into KS/KL
-0.000000     K+ K- K0               PHSP;
-0.000012350 K+      K-      K_S0    PHSP;
-0.000012350 K+      K-      K_L0    PHSP;
+#REMOVE LINE  # K+ K- K0
+#REMOVE LINE  # PR LHCb 09 Apr 2004 split into KS/KL
+#REMOVE LINE  0.000012350 K+      K-      K_S0    PHSP;
+#REMOVE LINE  0.000012350 K+      K-      K_L0    PHSP;
+0.00002679     K+ K- K0               PHSP; #Updated by PG 9/2021
 
 # K+ K- pi0
-0.00000217     K+ K- pi0              PHSP; #Updated by PG 9/2022
+0.00000217     K+ K- pi0              PHSP; #Updated by PG 9/2021
 0.000001     K+ K- eta              PHSP;
 0.000001     K+ K- eta'             PHSP;
 
@@ -693,8 +693,8 @@ Decay B0
 
 #--- 4-body rho-rho, rho-pi-pi, pi-pi-pi-pi --------------------------
 #
-0.00000096 rho0 rho0 SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
-0.00002774 rho+ rho- SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00000096 rho0 rho0 SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
+0.00002774 rho+ rho- SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000003  rho0 pi+ pi-           PHSP;
 0.000003  omega pi+ pi-          PHSP;
 0.000001  rho0 pi0 pi0           PHSP;
@@ -730,9 +730,9 @@ Decay B0
 0.000001  a_0+ pi- pi0           PHSP;
 
 #--- 4-body rho-K*, rho-pi-K, K*-pi-pi, pi-pi-pi-K -------------------
-0.00000388 rho0    K*0            SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
-0.00001030  rho-  K*+              SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
-0.00005450 pi-     pi+     K*0    PHSP; #Updated by PG 9/2022
+0.00000388 rho0    K*0            SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
+0.00001030  rho-  K*+              SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
+0.00005450 pi-     pi+     K*0    PHSP; #Updated by PG 9/2021
 0.000010  pi- pi0 K*+            PHSP;
 0.000005  pi- eta K*+            PHSP;
 0.000002  pi- eta' K*+           PHSP;
@@ -744,7 +744,7 @@ Decay B0
 0.000005  rho0  K0 pi0           PHSP;
 0.000002  rho0  K0 eta           PHSP;
 0.000001  rho0  K0 eta'          PHSP;
-0.00000280  rho0  K+ pi-           PHSP; #Updated by PG 9/2022
+0.00000280  rho0  K+ pi-           PHSP; #Updated by PG 9/2021
 0.000005  omega K0 pi0           PHSP;
 0.000002  omega K0 eta           PHSP;
 0.000001  omega K0 eta'          PHSP;
@@ -762,24 +762,24 @@ Decay B0
 0.000002  eta eta pi- K+         PHSP;
 0.000002  pi0 eta' pi- K+        PHSP;
 0.000001  eta eta' pi- K+        PHSP;
-0.00002700  rho0 K_0*0             PHSP; #Updated by PG 9/2022
-0.00002800  rho- K_0*+             PHSP; #Updated by PG 9/2022
+0.00002700  rho0 K_0*0             PHSP; #Updated by PG 9/2021
+0.00002800  rho- K_0*+             PHSP; #Updated by PG 9/2021
 0.000010  pi- pi+ K_0*0          PHSP;
 0.000010  pi0 pi0 K_0*0          PHSP;
 0.000010  pi- pi0 K_0*+          PHSP;
 0.000005  K*0 f_0                 SVS;
 0.000010  a_10 K0                 SVS;
-0.00001630 a_1-    K+            SVS; #Updated by PG 9/2022
+0.00001630 a_1-    K+            SVS; #Updated by PG 9/2021
 0.000010  b_10 K0                 SVS;
 0.0000074  b_1- K+                SVS;
 0.000005  K*0 a_00                SVS;
 0.000005  K*+ a_0-                SVS;
 
 #--- 4-body K*-K*, rho-K-K, K*-K-pi, phi-pi-pi, pi-pi-K-K ------------
-0.00000083 K*0     anti-K*0     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00000083 K*0     anti-K*0     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000001  K*+   K*-              SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 0.0000001 phi rho0               SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #CPV included, Oberhof 09/11/2017
-0.00000018 phi   pi- pi+          PHSP; #Updated by PG 9/2022
+0.00000018 phi   pi- pi+          PHSP; #Updated by PG 9/2021
 0.000001  K+ K- rho0             PHSP;
 0.000001  K0 anti-K0 rho0        PHSP;
 0.000001  K+ K- omega            PHSP;
@@ -804,15 +804,15 @@ Decay B0
 0.000001  K0 anti-K*0 pi0        PHSP;
 0.0000022  K+ anti-K*0 pi-       PHSP; #[Reconstructed PDG2020]
 0.000001  K*+ anti-K0 pi-        PHSP;
-0.00000452 K- K*0 pi+             PHSP; #Updated by PG 9/2022
+0.00000452 K- K*0 pi+             PHSP; #Updated by PG 9/2021
 0.000001  K*- K0 pi+             PHSP;
 
 #--- 4-body phi-K*, phi-K-pi, K-K-K*, pi-K-K-K -----------------------
-0.00001004 phi     K*0            SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00001004 phi     K*0            SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000010  phi K+ pi-             PHSP;
 0.000010  phi K0 pi0             PHSP;
 0.000007  phi K0 eta             PHSP;
-0.00002750 K- K+ K*0              PHSP; #Updated by PG 9/2022
+0.00002750 K- K+ K*0              PHSP; #Updated by PG 9/2021
 0.000010  K- K*+ K0              PHSP;
 0.000010  K*- K+ K0              PHSP;
 0.000010  K+ K- K+ pi-           PHSP;
@@ -1194,7 +1194,7 @@ Decay B0
 0.000001  K0 K0 anti-K'_10 eta'  PHSP;
 
 #--- 5-body phi-phi-K, phi-phi-pi, phi-3K, phi-K-K-pi, 5K, 4K-pi ------------
-0.000004100 phi phi K0           PHSP;
+0.00000450 phi phi K0           PHSP; #Updated by PG 9/2021
 0.0000001 phi phi pi0            PHSP;
 0.000001  phi K+ K- K0           PHSP;
 0.000001  phi K0 anti-K0 K0      PHSP;
@@ -1246,35 +1246,35 @@ Decay B0
 0.000210 J/psi K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;       #CPV included, Oberhof 09/11/2017
 0.000860 J/psi K*0T SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11/2017
 
-0.00001657 J/psi pi0   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #Updated by PG 9/2022
-0.00002545 J/psi rho0  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #Updated by PG 9/2022
-0.00001770 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #Updated by PG 9/2022
+0.00001657 J/psi pi0   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #Updated by PG 9/2021
+0.00002545 J/psi rho0  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #Updated by PG 9/2021
+0.00001770 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #Updated by PG 9/2021
 
 #0.000871000 J/psi  K0              PHSP; #Double counting (already contained in K_L,K_S) [FB 03/06/2019]
 0.0001      J/psi  K0  pi0         PHSP;
-0.00044     J/psi  K0  pi-  pi+    PHSP;  #Added by Yubo Li 03/09/2018
+0.00043453     J/psi  K0  pi-  pi+    PHSP; #Updated by PG 9/2021
 #0.00035    J/psi  K0  pi0  pi0    PHSP;  #Cannot find in PDG. Exclude? [PG 05/02/2018]
 #0.00035    J/psi  K+  pi-  pi0    PHSP;  #Cannot find in PDG. Exclude? [PG 05/02/2018]
 
 0.001300000 J/psi  K_10            SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0001      J/psi  K'_10           SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005      J/psi  K_2*0           PHSP;
-0.000049000 J/psi  K0 phi          PHSP;  #Added by Yubo Li 03/09/2018
-0.00115005   J/psi  K+ pi-          PHSP; #Updated by PG 9/2022
+0.00004868 J/psi  K0 phi          PHSP; #Updated by PG 9/2021
+0.00115005   J/psi  K+ pi-          PHSP; #Updated by PG 9/2021
 
 # New Jpsi mode --------------------------------------------------------
 0.000108000 J/psi eta K0            PHSP; #Added by Yubo Li 03/09/2018
 0.000230000 J/psi omega K0          PHSP; #Added by Yubo Li 03/09/2018
-0.00001078 J/psi eta               PHSP; #Updated by PG 9/2022
-0.00003944 J/psi pi+ pi-           PHSP; #Updated by PG 9/2022
-0.00000326 J/psi f_2               PHSP; #Updated by PG 9/2022
-0.00000250 J/psi K+ K-             PHSP; #Updated by PG 9/2022
-0.00000761 J/psi eta'              PHSP;  #Updated by PG 9/2022
-0.000025000 J/psi K0 K+ K-          PHSP; #Added by Yubo Li 03/09/2018
+0.00001078 J/psi eta               PHSP; #Updated by PG 9/2021
+0.00003944 J/psi pi+ pi-           PHSP; #Updated by PG 9/2021
+0.00000326 J/psi f_2               PHSP; #Updated by PG 9/2021
+0.00000250 J/psi K+ K-             PHSP; #Updated by PG 9/2021
+0.00000761 J/psi eta'              PHSP;  #Updated by PG 9/2021
+0.00002489 J/psi K0 K+ K-          PHSP;  #Updated by PG 9/2021
 0.000540000 J/psi K0 rho0           PHSP; #Added by Yubo Li 03/09/2018
-0.00077000 J/psi K*+ pi-           PHSP; #Updated by PG 9/2022
-0.00001424 J/psi pi+ pi- pi+ pi-   PHSP; #Updated by PG 9/2022
-0.00000844 J/psi f_1               PHSP; #Updated by PG 9/2022
+0.00077000 J/psi K*+ pi-           PHSP; #Updated by PG 9/2021
+0.00001424 J/psi pi+ pi- pi+ pi-   PHSP; #Updated by PG 9/2021
+0.00000844 J/psi f_1               PHSP; #Updated by PG 9/2021
 0.000660000 J/psi K*0 pi+ pi-       PHSP; #Added by Yubo Li 03/09/2018
 
 0.000290000 psi(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
@@ -1285,13 +1285,13 @@ Decay B0
 0.000098 psi(2S) K*L      SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
 0.000392 psi(2S) K*0T     SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11/2017
 
-0.00058000     psi(2S)  K+  pi-          PHSP; #Updated by PG 9/2022
+0.00058000     psi(2S)  K+  pi-          PHSP; #Updated by PG 9/2021
 0.0002     psi(2S)  K0  pi0          PHSP;
 0.0002     psi(2S)  K0  pi-  pi+     PHSP;
 0.0001     psi(2S)  K0  pi0  pi0     PHSP;
 0.0001     psi(2S)  K+  pi-  pi0     PHSP;
 0.0004     psi(2S)  K_10             PHSP;
-0.00002209   psi(2S)  pi+  pi-         PHSP;  #Updated by PG 9/2022
+0.00002209   psi(2S)  pi+  pi-         PHSP;  #Updated by PG 9/2021
 0.0000117  psi(2S)  pi0              PHSP; #Added by Yubo Li 03/09/2018
 
 0.00040  eta_c K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;   #CPV included, Oberhof 09/11/2017
@@ -1356,7 +1356,7 @@ Decay B0
 #    0.000238 * 0.99754 * (2/3) = 0.00015828
 # 2) Br(B0 -> chi_c1 K+ pi-) = 0.000497 - 0.00015828 = 0.00033872
 0.00015828   chi_c1  K*0T      SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11
-0.00049700   chi_c1  K+  pi-   PHSP; #Updated by PG 9/2022
+0.00049700   chi_c1  K+  pi-   PHSP; #Updated by PG 9/2021
 
 # B0 -> chi_c1 pi0 K0 (PDG 2019 data).
 #
@@ -1375,16 +1375,16 @@ Decay B0
 0.00003957   K*L chi_c1        SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
 0.00016936   chi_c1  K0  pi0   PHSP;
 
-0.00032    chi_c1  K0  pi-  pi+    PHSP;
+0.00031600    chi_c1  K0  pi-  pi+    PHSP; #Updated by PG 9/2021
 0.0002     chi_c1  K0  pi0  pi0    PHSP;
-0.00035200    chi_c1  K+  pi-  pi0    PHSP; #Updated by PG 9/2022
+0.00035200    chi_c1  K+  pi-  pi0    PHSP; #Updated by PG 9/2021
 0.00001120 chi_c1  pi0             PHSP;
 
 # Taken from UL of <1.5e-5 [PG 05/02/2018]
 0.0000075 chi_c2 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;  #CPV included, Oberhof 09/11/2017
 0.0000075 chi_c2 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;   #CPV included, Oberhof 09/11/2017
 
-0.00004882    chi_c2  K*0              PHSP; #Updated by PG 9/2022
+0.00004882    chi_c2  K*0              PHSP; #Updated by PG 9/2021
 0.000072   chi_c2  K+  pi-          PHSP;
 0.0001     chi_c2  K0  pi0          PHSP;
 0.00017    chi_c2  K0  pi-  pi+     PHSP;
@@ -1411,17 +1411,17 @@ Decay B0
 
 # b-> c (dc=)
 #
-0.00021133 D- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    #Updated by PG 9/2022
+0.00021133 D- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    #Updated by PG 9/2021
 # See Ref [B1] for the next 3:
 0.000305000 D*- D+  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #CPV included, Oberhof 09/11/2017
 0.000305000 D*+ D-  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #CPV included, Oberhof 09/11/2017
-0.00079553 D*- D*+ SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0;     #Updated by PG 9/2022
+0.00079553 D*- D*+ SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0;     #Updated by PG 9/2021
 
 
 # b -> c (sc=)  -->  D Ds X   Sum = 10%
 #
-0.00723697 D-      D_s+            PHSP; #Updated by PG 9/2022
-0.00804457 D*-     D_s+            SVS; #Updated by PG 9/2022
+0.00723697 D-      D_s+            PHSP; #Updated by PG 9/2021
+0.00804457 D*-     D_s+            SVS; #Updated by PG 9/2021
 0.007400000 D_s*+   D-              SVS;
 0.017700000 D_s*+   D*-             SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0;
 0.0006   D'_1- D_s+                 SVS;
@@ -1448,16 +1448,16 @@ Decay B0
 # October 26, 2004 Lange -per breco awg
 
 # External W-emission amplitude
-0.00107000 D-      D0      K+              PHSP; #Updated by PG 9/2022
-0.00346000 D-      D*0     K+              PHSP; #Updated by PG 9/2022
-0.00247000 D*-     D0      K+              PHSP; #Updated by PG 9/2022
-0.01060000 D*-     D*0     K+              PHSP; #Updated by PG 9/2022
+0.00107000 D-      D0      K+              PHSP; #Updated by PG 9/2021
+0.00346000 D-      D*0     K+              PHSP; #Updated by PG 9/2021
+0.00247000 D*-     D0      K+              PHSP; #Updated by PG 9/2021
+0.01060000 D*-     D*0     K+              PHSP; #Updated by PG 9/2021
 
 # External+internal W-emission amplitude
-0.0015   D-  D+  K0                         PHSP;
+0.00075000   D-  D+  K0                         PHSP; #Updated by PG 9/2021
 0.0018   D*- D+  K0                         PHSP;
 0.0047   D-  D*+  K0                        PHSP;
-0.007800000 D*-     D*+     K0              PHSP;
+0.00810924 D*-     D*+     K0              PHSP; #Updated by PG 9/2021
 
 # Internal W-emission amplitude (color suppressed modes)
 0.00027   D0  anti-D0  K0                    PHSP; #PDG2020
@@ -1484,23 +1484,23 @@ Decay B0
 
 #  B -> D(*) X  Exclusive modes
 #
-0.00274268 D*-     pi+                 SVS; #Updated by PG 9/2022
-0.00252113 D-      pi+                 PHSP; #Updated by PG 9/2022
-0.00757464 rho+    D-                  SVS; #Updated by PG 9/2022
+0.00274268 D*-     pi+                 SVS; #Updated by PG 9/2021
+0.00252113 D-      pi+                 PHSP; #Updated by PG 9/2021
+0.00757464 rho+    D-                  SVS; #Updated by PG 9/2021
 
 # D* rho HELAMP parameters taken from ICHEP 98-852.
-0.00679879   rho+    D*-                    SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47; #Updated by PG 9/2022
+0.00679879   rho+    D*-                    SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47; #Updated by PG 9/2021
 0.0005   D-  pi+  pi0                   PHSP;
-0.01515771   D*-     pi+     pi0            PHSP; #Updated by PG 9/2022
-0.00088026  anti-D0 pi-     pi+            PHSP; #Updated by PG 9/2022
+0.01515771   D*-     pi+     pi0            PHSP; #Updated by PG 9/2021
+0.00088026  anti-D0 pi-     pi+            PHSP; #Updated by PG 9/2021
 0.00062  anti-D*0 pi-     pi+           PHSP;
 0.0005   anti-D*0 pi0  pi0              PHSP;
 
 # D a1 updated Ref. [B1]
 0.0060   a_1+    D-                     SVS;
-0.00110000   D-      rho0    pi+            PHSP; #Updated by PG 9/2022
+0.00110000   D-      rho0    pi+            PHSP; #Updated by PG 9/2021
 0.0011   D-  rho+  pi0                  PHSP;
-0.00601693   D-      pi-     pi+     pi+    PHSP; #Updated by PG 9/2022
+0.00601693   D-      pi-     pi+     pi+    PHSP; #Updated by PG 9/2021
 0.0010   D-  pi0  pi+  pi0              PHSP;
 0.0010   anti-D0  pi-  pi+  pi0         PHSP;
 0.0001   anti-D0  pi0  pi0  pi0         PHSP;
@@ -1510,10 +1510,10 @@ Decay B0
 # updated Ref. [B1]
 # October 26, 2004 Lange update
 
-0.01299416   D*-     a_1+                   SVV_HELAMP 0.458 0.0 0.866 0.0 0.458 0.0; #Updated by PG 9/2022
-0.00572624   D*-     rho0    pi+            PHSP; #Updated by PG 9/2022
+0.01299416   D*-     a_1+                   SVV_HELAMP 0.458 0.0 0.866 0.0 0.458 0.0; #Updated by PG 9/2021
+0.00572624   D*-     rho0    pi+            PHSP; #Updated by PG 9/2021
 0.0010   D*-  rho+  pi0                 PHSP;
-0.00720907   D*-  pi-  pi+  pi+             PHSP; #Updated by PG 9/2022
+0.00720907   D*-  pi-  pi+  pi+             PHSP; #Updated by PG 9/2021
 0.0010   D*-  pi0  pi+  pi0             PHSP;
 0.0010   anti-D*0  pi-  pi+  pi0        PHSP;
 0.0001   anti-D*0  pi0  pi0  pi0        PHSP;
@@ -1535,15 +1535,15 @@ Decay B0
 # http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/151.html:
 # update: Ref. [B1]:
 
-0.00021213 D*-     K+         SVS; #Updated by PG 9/2022
-0.00018595 D-      K+         PHSP; #Updated by PG 9/2022
-0.00032971 D*-     K*+        SVV_HELAMP  0.283 0.0 0.932 0.0 0.228 0.0; #Updated by PG 9/2022
-0.00044578 K*+     D-         SVS; #Updated by PG 9/2022
+0.00021213 D*-     K+         SVS; #Updated by PG 9/2021
+0.00018595 D-      K+         PHSP; #Updated by PG 9/2021
+0.00032971 D*-     K*+        SVV_HELAMP  0.283 0.0 0.932 0.0 0.228 0.0; #Updated by PG 9/2021
+0.00044578 K*+     D-         SVS; #Updated by PG 9/2021
 
 0.000036  anti-D*0 anti-K0  SVS;
 0.000052  anti-D0 anti-K0   PHSP;
-0.00004517  K*0     anti-D0   SVS; #Updated by PG 9/2022
-0.00000219  K*0 D0             SVS; #Updated by PG 9/2022
+0.00004517  K*0     anti-D0   SVS; #Updated by PG 9/2021
+0.00000219  K*0 D0             SVS; #Updated by PG 9/2021
 0.00004  anti-D*0 K*0       SVV_HELAMP 1. 0. 1. 0. 1. 0.;
 0.00001  D*0 K*0            SVV_HELAMP 1. 0. 1. 0. 1. 0.;
 
@@ -1554,27 +1554,27 @@ Decay B0
 # with phases set to 0. Recommendation http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/169.html:
 # update: See Ref [B1]:
 
-0.00026298  anti-D0 pi0                                      PHSP; #Updated by PG 9/2022
-0.00022270  anti-D*0 pi0                                     SVS; #Updated by PG 9/2022
+0.00026298  anti-D0 pi0                                      PHSP; #Updated by PG 9/2021
+0.00022270  anti-D*0 pi0                                     SVS; #Updated by PG 9/2021
 
-0.00032064  rho0    anti-D0                                  SVS; #Updated by PG 9/2022
+0.00032064  rho0    anti-D0                                  SVS; #Updated by PG 9/2021
 0.00029   anti-D*0 rho0                                    SVV_HELAMP 0.283 0.0 0.932 0.0 0.228 0.0;
 
-0.00023592  anti-D0 eta                                      PHSP; #Updated by PG 9/2022
-0.00022620  anti-D*0 eta                                     SVS; #Updated by PG 9/2022
+0.00023592  anti-D0 eta                                      PHSP; #Updated by PG 9/2021
+0.00022620  anti-D*0 eta                                     SVS; #Updated by PG 9/2021
 
-0.00013768  anti-D0 eta'                                     PHSP; #Updated by PG 9/2022
-0.00014031  anti-D*0 eta'                                    SVS; #Updated by PG 9/2022
+0.00013768  anti-D0 eta'                                     PHSP; #Updated by PG 9/2021
+0.00014031  anti-D*0 eta'                                    SVS; #Updated by PG 9/2021
 
-0.00025395  omega   anti-D0                                  SVS; #Updated by PG 9/2022
-0.00036418  anti-D*0 omega                                   SVV_HELAMP 0.283 0.0 0.932 0.0 0.228 0.0; #Updated by PG 9/2022
+0.00025395  omega   anti-D0                                  SVS; #Updated by PG 9/2021
+0.00036418  anti-D*0 omega                                   SVV_HELAMP 0.283 0.0 0.932 0.0 0.228 0.0; #Updated by PG 9/2021
 
-0.00000001 p+  anti-p-                                      PHSP; #Updated by PG 9/2022
+0.00000001 p+  anti-p-                                      PHSP; #Updated by PG 9/2021
 
-0.00737857    D_s0*+  D-                                       PHSP; #Updated by PG 9/2022
-0.01768717    D*-     D_s0*+                                   SVS; #Updated by PG 9/2022
-0.00354786    D_s1+   D-                                       SVS; #Updated by PG 9/2022
-0.00928257    D*-     D_s1+                                    SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.; #Updated by PG 9/2022
+0.00737857    D_s0*+  D-                                       PHSP; #Updated by PG 9/2021
+0.01768717    D*-     D_s0*+                                   SVS; #Updated by PG 9/2021
+0.00354786    D_s1+   D-                                       SVS; #Updated by PG 9/2021
+0.00928257    D*-     D_s1+                                    SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.; #Updated by PG 9/2021
 
 # These need to be checked to make sure CP-conjugates are included [PG 05/02/2018]
 # There may be more of these channels spread out (likely below).
@@ -1585,7 +1585,7 @@ Decay B0
 0.00049   D-  K0  pi+                                      PHSP;
 
 0.00280   D-      omega   pi+                              PHSP;
-0.00246056   D*-     omega   pi+                              PHSP; #Updated by PG 9/2022
+0.00246056   D*-     omega   pi+                              PHSP; #Updated by PG 9/2021
 
 0.00043 D'_s1+ D-                                          PHSP;
 0.00083 D'_s1+ D*-                                         PHSP;
@@ -1620,44 +1620,44 @@ Decay B0
 0.00169344    d       anti-d  anti-s  d                       PYTHIA 48;
 0.00141123    s       anti-s  anti-s  d                       PYTHIA 48;
 0.00470412    anti-s  d                                       PYTHIA 32;
-0.000052000 anti-D0 K0                                      PHSP;
-0.00008800 anti-D0 K+      pi-                             PHSP; #Updated by PG 9/2022
-0.00000530 D0      K+      pi-                             PHSP; #Updated by PG 9/2022
+0.00005231 anti-D0 K0                                      PHSP; #Updated by PG 9/2021
+0.00008800 anti-D0 K+      pi-                             PHSP; #Updated by PG 9/2021
+0.00000530 D0      K+      pi-                             PHSP; #Updated by PG 9/2021
 0.000036000 anti-D*0 K0                                     PHSP;
-0.00271850 D*0     pi+     pi+     pi-     pi-             PHSP; #Updated by PG 9/2022
-0.000890000 eta_c   K0                                      PHSP;
+0.00271850 D*0     pi+     pi+     pi-     pi-             PHSP; #Updated by PG 9/2021
+0.00079513 eta_c   K0                                      PHSP; #Updated by PG 9/2021
 0.000170000 K0      D0      anti-D0 pi0                     PHSP;
-0.000620000 psi(2S) K0                                      PHSP;
-0.000140000 chi_c0  K0                                      PHSP;
-0.000004700 K0 rho0                                         PHSP;
+0.00058453 psi(2S) K0                                      PHSP; Updated by PG 9/2021
+0.00000111 chi_c0  K0                                      PHSP; #Updated by PG 9/2021
+0.00005231 K0 rho0                                         PHSP;
 0.000011000 eta     K_0*0                                   PHSP;
 0.000009600 eta     K_2*0                                   PHSP;
 0.000016000 omega   K_0*0                                   PHSP;
 0.000010100 omega   K_2*0                                   PHSP;
 0.000002700 f_2     K0                                      PHSP;
 0.000001400 f_0     K+      pi-                             PHSP;
-0.00000676 K_2*0   phi                                     PHSP; #Updated by PG 9/2022
-0.000007600 eta     K0      gamma                           PHSP;
+0.00000676 K_2*0   phi                                     PHSP; #Updated by PG 9/2021
+0.00000756 eta     K0      gamma                           PHSP; #Updated by PG 9/2021
 0.000002660 p+      anti-p- K0                              PHSP;
 0.000001240 p+      anti-p- K*0                             PHSP;
 0.000003140 p+      anti-Lambda0 pi-                        PHSP;
-0.000004800 anti-Lambda0 Lambda0 K0                         PHSP;
-0.00000246 anti-Lambda0 Lambda0 K*0                        PHSP; #Updated by PG 9/2022
-0.00001001 anti-Lambda0 Lambda0 D0                         PHSP; #Updated by PG 9/2022
-0.00010356 anti-D0 p+      anti-p-                         PHSP; #Updated by PG 9/2022
-0.00002841 D_s-    anti-Lambda0 p+                         PHSP; #Updated by PG 9/2022
-0.00009905 anti-D*0 p+      anti-p-                        PHSP; #Updated by PG 9/2022
-0.00145000 D*-     p+      anti-n0                         PHSP; #Updated by PG 9/2022
-0.00033200 D-      p+      anti-p- pi+                     PHSP; #Updated by PG 9/2022
-0.00046824 D*-     p+      anti-p- pi+                     PHSP; #Updated by PG 9/2022
-0.00001538 anti-Lambda_c- p+                               PHSP; #Updated by PG 9/2022
-0.00101920 anti-Lambda_c- p+      pi+     pi-              PHSP; #Updated by PG 9/2022
+0.00000476 anti-Lambda0 Lambda0 K0                         PHSP; #Updated by PG 9/2021
+0.00000246 anti-Lambda0 Lambda0 K*0                        PHSP; #Updated by PG 9/2021
+0.00001001 anti-Lambda0 Lambda0 D0                         PHSP; #Updated by PG 9/2021
+0.00010356 anti-D0 p+      anti-p-                         PHSP; #Updated by PG 9/2021
+0.00002841 D_s-    anti-Lambda0 p+                         PHSP; #Updated by PG 9/2021
+0.00009905 anti-D*0 p+      anti-p-                        PHSP; #Updated by PG 9/2021
+0.00145000 D*-     p+      anti-n0                         PHSP; #Updated by PG 9/2021
+0.00033200 D-      p+      anti-p- pi+                     PHSP; #Updated by PG 9/2021
+0.00046824 D*-     p+      anti-p- pi+                     PHSP; #Updated by PG 9/2021
+0.00001538 anti-Lambda_c- p+                               PHSP; #Updated by PG 9/2021
+0.00101920 anti-Lambda_c- p+      pi+     pi-              PHSP; #Updated by PG 9/2021
 0.000120000 anti-Sigma_c*-- p+      pi+                     PHSP;
 0.00015000 anti-Sigma_c0 p+      pi-                       PHSP; #Possible error in mapping
 0.00022000 anti-Sigma_c-- p+      pi+                      PHSP; #Possible error in mapping
-0.01759848 D*-     pi+     pi+     pi-     pi0             PHSP; #Updated by PG 9/2022
+0.01759848 D*-     pi+     pi+     pi-     pi0             PHSP; #Updated by PG 9/2021
 0.004700000 D*-     pi+     pi+     pi+     pi-     pi-     PHSP;
-0.000110000 D_s-    pi+     K0                              PHSP;
+0.00009696 D_s-    pi+     K0                              PHSP; #Updated by PG 9/2021
 
 # deleted K pi gamma
 #0.000004600 K+      pi-     gamma                          PHSP;    # Commented out as this double counts the K*2_0 decaying into Kpi
@@ -1728,8 +1728,8 @@ Decay anti-B0
 
 #                    b -> c tau nu
 #
-0.01254160 D*+    tau- anti-nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2022
-0.00636870 D+     tau- anti-nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2022
+0.01254160 D*+    tau- anti-nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021
+0.00636870 D+     tau- anti-nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021
 0.0013   D_1+    tau- anti-nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*+   tau- anti-nu_tau          LLSW 0.68 -0.2 0.3;
 0.0020   D'_1+   tau- anti-nu_tau          LLSW 0.68 -0.2 0.3;
@@ -1793,8 +1793,8 @@ Decay anti-B0
 # b->u hadronic
 # Ref. [B1]:
 # Lange Nov 14, 2004  (flip D_s K -- is opposite of D_s pi)
-0.00002160 D_s-    pi+                            PHSP; #Updated by PG 9/2022
-0.00002748 D_s+    K-                             PHSP; #Updated by PG 9/2022
+0.00002160 D_s-    pi+                            PHSP; #Updated by PG 9/2021
+0.00002748 D_s+    K-                             PHSP; #Updated by PG 9/2021
 0.0000210 D_s*-   pi+                            SVS;
 0.0000219 D_s*+   K-                             SVS;
 
@@ -1806,12 +1806,12 @@ Decay anti-B0
 
 # b -> s gamma
 #
-0.00004177 anti-K*0 gamma                       SVP_HELAMP 1.0 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00004177 anti-K*0 gamma                       SVP_HELAMP 1.0 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000000440 omega   gamma                        SVP_HELAMP 1.0 0.0 1.0 0.0; #Changed model to SVP_HELAMP from HELAMP
 0.000000860 rho0    gamma                        SVP_HELAMP 1.0 0.0 1.0 0.;  #Changed model from PHSP to SVP_HELAMP
 0.000043    anti-K_10  gamma                     SVP_HELAMP 1.0 0.0 1.0 0.0; #Uncommented and changed model from HELAMP to SVP_HELAMP
 0.0000065   anti-K'_10 gamma                     SVP_HELAMP 1.0 0.0 1.0 0.0; #Upper limit is 1.5e-6
-0.00001237 anti-K_2*0 gamma                     HELAMP 1.0 0.0 1.0 0.0;     #Updated by PG 9/2022
+0.00001237 anti-K_2*0 gamma                     HELAMP 1.0 0.0 1.0 0.0;     #Updated by PG 9/2021
 0.0000017   anti-K''*0 gamma                     SVP_HELAMP 1.0 0.0 1.0 0.0;
 0.0002735   anti-Xsd   gamma                     BTOXSGAMMA 2 ; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes
 
@@ -1820,7 +1820,7 @@ Decay anti-B0
 0.00000551  anti-Xsd  e+    e-                   BTOXSLL 4.8 0.2 0.0 0.41;   #[Reconstructed PDG2016] BF = 6.7e-6 - Sum of exclusive b -> s e e  modes
 0.000000021 pi+ pi- e+    e-                     PHSP; #[Reconstructed PDG2016] #By lepton universality from mu mu BF
 0.000000339 anti-K0 mu+     mu-                  BTOSLLBALL; #[Reconstructed PDG2016]
-0.00000094 anti-K*0 mu+     mu-                 BTOSLLBALL; #Updated by PG 9/2022
+0.00000094 anti-K*0 mu+     mu-                 BTOSLLBALL; #Updated by PG 9/2021
 0.000000021 pi+ pi- mu+     mu-                  PHSP; #[Reconstructed PDG2016]
 0.00000292  anti-Xsd  mu+   mu-                  BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
 0.0000001   anti-K0   tau+  tau-                 BTOSLLBALL;
@@ -1834,10 +1834,10 @@ Decay anti-B0
 #    B0 -> CP eigenstates  (some exclusive b -> u)   sum=0.00036
 #
 # PR LHCb 04/07/04 update BR    #CPV included, Oberhof 09/11/2017
-0.00000512 pi+ pi-    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
-0.00000159 pi0 pi0    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
-0.00000116  pi0 eta    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
-0.00000120 pi0 eta'   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
+0.00000512 pi+ pi-    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
+0.00000159 pi0 pi0    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
+0.00000116  pi0 eta    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
+0.00000120 pi0 eta'   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
 0.000001   pi0 a_00   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   pi0 f_0    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 # pi0 rho0 is with the 3-body modes #CPV included, Oberhof 09/11/2017
@@ -1856,7 +1856,7 @@ Decay anti-B0
 0.000001   eta' a_00  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   eta' f_0   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   eta' rho0  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
-0.00000101   eta' omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2022
+0.00000101   eta' omega SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #Updated by PG 9/2021
 0.000001   eta' a_10  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 0.000001   eta' b_10  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   a_00 a_00  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
@@ -1896,29 +1896,29 @@ Decay anti-B0
 0.000001 phi eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 0.000001 phi eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 
-0.00001587 anti-K*0 eta                                    SVS; #Updated by PG 9/2022
-0.00000280 anti-K*0 eta'                                   SVS; #Updated by PG 9/2022
-0.00000204 anti-K*0 omega                                  SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00001587 anti-K*0 eta                                    SVS; #Updated by PG 9/2021
+0.00000280 anti-K*0 eta'                                   SVS; #Updated by PG 9/2021
+0.00000204 anti-K*0 omega                                  SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000001  phi  omega                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
-0.00000120  omega omega                                       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00000120  omega omega                                       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000001  omega rho0                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 
 # PR LHCb 04/07/04 update BR
 #2-body modes from Jim Olsen
-0.00001958  K-  pi+                                          PHSP; #Updated by PG 9/2022
-0.00000008  K+  K-                                           PHSP; #Updated by PG 9/2022
+0.00001958  K-  pi+                                          PHSP; #Updated by PG 9/2021
+0.00000008  K+  K-                                           PHSP; #Updated by PG 9/2021
 # K_S0 K_L0 is 0
 # see http://babar-hn.slac.stanford.edu:5090/HyperNews/get/pubboard14/156.html
 0.000000240 K_S0    K_S0                                    PHSP;
 0.0000000 K_S0 K_L0                                         PHSP;
 0.000000240 K_L0    K_L0                                    PHSP;
-# Declare K0 pi0 not to have it through Pythia (LHCb - PR)
-0.000000  anti-K0 pi0                                       PHSP;
-# Split into K_S0 K_L0 (LHCb - P. Robbe)
-0.000004750 K_S0    pi0                                     PHSP;
-0.000004750 K_L0    pi0                                     PHSP;
-#Put in with 0 BR to keep PYTHIA from generating it
-0.000000 K0 anti-K0                                         PHSP;
+#REMOVE LINE # Declare K0 pi0 not to have it through Pythia (LHCb - PR)
+0.00000993  anti-K0 pi0                PHSP; #Updated by PG 9/2021
+#REMOVE LINE # Split into K_S0 K_L0 (LHCb - P. Robbe)
+#REMOVE LINE 0.000004750 K_S0    pi0                                     PHSP;
+#REMOVE LINE 0.000004750 K_L0    pi0                                     PHSP;
+#REMOVE LINE#Put in with 0 BR to keep PYTHIA from generating it
+0.00000121 K0 anti-K0                                         PHSP; #Updated by PG 9/2021
 
 # 3-body decays
 # this model generates interferences and higher mass rho
@@ -1943,7 +1943,7 @@ Decay anti-B0
 0.000002350 rho0 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;  #CPV included, Oberhof 09/11/2017
 
 # rho+ 3-body modes
-0.00000701 rho+    K-                                      SVS;  #Updated by PG 9/2022
+0.00000701 rho+    K-                                      SVS;  #Updated by PG 9/2021
 
 # rho(1450) 3-body modes #CPV included, Oberhof 09/11/2017
 0.0000005 rho(2S)0 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma; #CPV included, Oberhof 09/11/2017
@@ -1957,7 +1957,7 @@ Decay anti-B0
 0.000003     a_0+ pi-               PHSP;
 
 # K*0(892) 3-body modes
-0.00000330 anti-K*0 pi0            SVS; #Updated by PG 9/2022
+0.00000330 anti-K*0 pi0            SVS; #Updated by PG 9/2021
 0.000003     anti-K*0 K0            SVS;
 
 # K*0(1430) 3-body modes
@@ -1969,15 +1969,15 @@ Decay anti-B0
 0.000001     anti-K''*0 K0          SVS;
 
 # K*-(892) 3-body modes
-0.00000750 K*-     pi+             SVS; #Updated by PG 9/2022
+0.00000750 K*-     pi+             SVS; #Updated by PG 9/2021
 0.000002     K*- K+                 SVS;
 
 # K*-(1430) 3-body modes
-0.00003348 K_0*-   pi+             PHSP; #Updated by PG 9/2022
+0.00003348 K_0*-   pi+             PHSP; #Updated by PG 9/2021
 0.000002     K_0*- K+               PHSP;
 
 # K*0(1680) 3-body modes
-0.00001410     K''*- pi+              SVS; #Updated by PG 9/2022
+0.00001410     K''*- pi+              SVS; #Updated by PG 9/2021
 0.000001     K''*- K+               SVS;
 
 # Non-resonant 3-body left-overs
@@ -1988,27 +1988,27 @@ Decay anti-B0
 0.000017     pi- pi+ eta            PHSP;
 0.000001     pi- pi+ eta'           PHSP;
 
-# pi- pi+ anti-K0: total-rhoK0-f0K0-piK*(892)-piK*(1430)=45-5-6-13./3-11./3
-0.000000000 pi-     pi+     anti-K0 PHSP;
+#REMOVE LINE  # pi- pi+ anti-K0: total-rhoK0-f0K0-piK*(892)-piK*(1430)=45-5-6-13./3-11./3
+0.00004970 pi-     pi+     anti-K0 PHSP; #Updated by PG 9/2021
 
 # K- pi+ pi0
-0.00003779 K-      pi+     pi0     PHSP; #Updated by PG 9/2022
+0.00003779 K-      pi+     pi0     PHSP; #Updated by PG 9/2021
 0.000020     K- pi+ eta             PHSP;
 0.000001     K- pi+ eta'            PHSP;
 
-# pi- K+ K0.
-# Both B0 and B0bar can decay to these => 0.5e-6 each
-0.0000005    pi- K+ anti-K0         PHSP;
-0.0000005    pi+ K- K0              PHSP;
+# pi- K+ K0
+# Both B0 and B0bar can decay to these
+0.00000666    pi- K+ anti-K0         PHSP; #Updated by PG 9/2021
+0.00000666    pi+ K- K0              PHSP; #Updated by PG 9/2021
 
-# K- K+ anti-K0
-# PR LHCb 09 Apr 2004 split into KL/KS
-0.000000     K- K+ anti-K0          PHSP;
-0.000012350 K-      K+      K_S0    PHSP;
-0.000012350 K-      K+      K_L0    PHSP;
+#REMOVE LINE  # K- K+ anti-K0
+#REMOVE LINE  # PR LHCb 09 Apr 2004 split into KL/KS
+#REMOVE LINE  0.000012350 K-      K+      K_S0    PHSP;
+#REMOVE LINE  0.000012350 K-      K+      K_L0    PHSP;
+0.00002679     K- K+ anti-K0          PHSP; #Updated by PG 9/2021
 
 # K- K+ pi0
-0.00000217     K- K+ pi0              PHSP; #Updated by PG 9/2022
+0.00000217     K- K+ pi0              PHSP; #Updated by PG 9/2021
 0.000001     K- K+ eta              PHSP;
 0.000001     K- K+ eta'             PHSP;
 
@@ -2040,8 +2040,8 @@ Decay anti-B0
 
 #--- 4-body rho-rho, rho-pi-pi, pi-pi-pi-pi --------------------------
 #
-0.00000096 rho0 rho0 SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
-0.00002774 rho+ rho- SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00000096 rho0 rho0 SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
+0.00002774 rho+ rho- SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000003  rho0 pi+ pi-           PHSP;
 0.000003  omega pi+ pi-          PHSP;
 0.000001  rho0 pi0 pi0           PHSP;
@@ -2077,9 +2077,9 @@ Decay anti-B0
 0.000001  a_0+ pi- pi0           PHSP;
 
 #--- 4-body rho-K*, rho-pi-K, K*-pi-pi, pi-pi-pi-K -------------------
-0.00000388 rho0 anti-K*0          SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
-0.00001030  rho+  K*-              SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
-0.00005450 pi-     pi+  anti-K*0  PHSP; #Updated by PG 9/2022
+0.00000388 rho0 anti-K*0          SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
+0.00001030  rho+  K*-              SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
+0.00005450 pi-     pi+  anti-K*0  PHSP; #Updated by PG 9/2021
 0.000010  pi+ pi0 K*-            PHSP;
 0.000005  pi+ eta K*-            PHSP;
 0.000002  pi+ eta' K*-           PHSP;
@@ -2091,7 +2091,7 @@ Decay anti-B0
 0.000005  rho0  anti-K0 pi0      PHSP;
 0.000002  rho0  anti-K0 eta      PHSP;
 0.000001  rho0  anti-K0 eta'     PHSP;
-0.00000280  rho0  K- pi+           PHSP; #Updated by PG 9/2022
+0.00000280  rho0  K- pi+           PHSP; #Updated by PG 9/2021
 0.000005  omega anti-K0 pi0      PHSP;
 0.000002  omega anti-K0 eta      PHSP;
 0.000001  omega anti-K0 eta'     PHSP;
@@ -2109,24 +2109,24 @@ Decay anti-B0
 0.000002  eta eta pi+ K-         PHSP;
 0.000002  pi0 eta' pi+ K-        PHSP;
 0.000001  eta eta' pi+ K-        PHSP;
-0.00002700  rho0 anti-K_0*0        PHSP; #Updated by PG 9/2022
-0.00002800  rho+ K_0*-             PHSP; #Updated by PG 9/2022
+0.00002700  rho0 anti-K_0*0        PHSP; #Updated by PG 9/2021
+0.00002800  rho+ K_0*-             PHSP; #Updated by PG 9/2021
 0.000010  pi- pi+ anti-K_0*0     PHSP;
 0.000010  pi0 pi0 anti-K_0*0     PHSP;
 0.000010  pi+ pi0 K_0*-          PHSP;
 0.000005  anti-K*0 f_0            SVS;
 0.000010  a_10 anti-K0            SVS;
-0.00001630 a_1+    K-            SVS; #Updated by PG 9/2022
+0.00001630 a_1+    K-            SVS; #Updated by PG 9/2021
 0.000010  b_10 anti-K0            SVS;
 0.0000074  b_1+ K-                SVS;
 0.000005  anti-K*0 a_00           SVS;
 0.000005  K*- a_0+                SVS;
 
 #--- 4-body K*-K*, rho-K-K, K*-K-pi, phi-pi-pi, pi-pi-K-K ------------
-0.00000083 K*0     anti-K*0     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00000083 K*0     anti-K*0     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000001  K*+   K*-              SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 0.0000001 phi rho0               SVV_CP alpha dm 1 1.0 0.0 1.7 0.0 1.0 0.0; #CPV included, Oberhof 09/11/2017
-0.00000018 phi   pi- pi+          PHSP; #Updated by PG 9/2022
+0.00000018 phi   pi- pi+          PHSP; #Updated by PG 9/2021
 0.000001  K+ K- rho0             PHSP;
 0.000001  K0 anti-K0 rho0        PHSP;
 0.000001  K+ K- omega            PHSP;
@@ -2151,15 +2151,15 @@ Decay anti-B0
 0.000001  K0 anti-K*0 pi0        PHSP;
 0.0000022 K- K*0 pi+             PHSP; #[Reconstructed PDG2020]
 0.000001  K*- K0 pi+             PHSP;
-0.00000452  K+ anti-K*0 pi-       PHSP; #Updated by PG 9/2022
+0.00000452  K+ anti-K*0 pi-       PHSP; #Updated by PG 9/2021
 0.000001  K*+ anti-K0 pi-        PHSP;
 
 #--- 4-body phi-K*, phi-K-pi, K-K-K*, pi-K-K-K -----------------------
-0.00001004 phi     anti-K*0       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2022
+0.00001004 phi     anti-K*0       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000010  phi K- pi+             PHSP;
 0.000010  phi anti-K0 pi0        PHSP;
 0.000007  phi anti-K0 eta        PHSP;
-0.00002750 K- K+ anti-K*0         PHSP; #Updated by PG 9/2022
+0.00002750 K- K+ anti-K*0         PHSP; #Updated by PG 9/2021
 0.000010  K- K*+ anti-K0         PHSP;
 0.000010  K*- K+ anti-K0         PHSP;
 0.000010  K+ K- K- pi+           PHSP;
@@ -2541,7 +2541,7 @@ Decay anti-B0
 0.000001  anti-K0 anti-K0 K'_10 eta' PHSP;
 
 #--- 5-body phi-phi-K, phi-phi-pi, phi-3K, phi-K-K-pi, 5K, 4K-pi ------------
-0.000004100 phi phi anti-K0          PHSP;
+0.00000450 phi phi anti-K0          PHSP; #Updated by PG 9/2021
 0.0000001 phi phi pi0                PHSP;
 0.000001  phi K+ K- anti-K0          PHSP;
 0.000001  phi K0 anti-K0 anti-K0     PHSP;
@@ -2593,35 +2593,35 @@ Decay anti-B0
 0.000210 J/psi K*L SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;            #CPV included, Oberhof 09/11/2017
 0.000860 J/psi anti-K*0T SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #CPV included, Oberhof 09/11/2017
 
-0.00001657 J/psi pi0   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #Updated by PG 9/2022
-0.00002545 J/psi rho0  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #Updated by PG 9/2022
-0.00001770 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #Updated by PG 9/2022
+0.00001657 J/psi pi0   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;                #Updated by PG 9/2021
+0.00002545 J/psi rho0  SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #Updated by PG 9/2021
+0.00001770 J/psi omega SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #Updated by PG 9/2021
 
 #0.000871000 J/psi  anti-K0               PHSP; #Double counting (already contained in K_L,K_S) [FB 03/06/2019]
 0.0001      J/psi  anti-K0  pi0          PHSP;
-0.00044     J/psi  anti-K0   pi+  pi-    PHSP;  #CP-conjugate added by PG 05/02/2018
+0.00043453     J/psi  anti-K0   pi+  pi-    PHSP; #Updated by PG 9/2021
 #0.00035    J/psi  anti-K0   pi0  pi0    PHSP;  #Cannot find in PDG. Exclude? [PG 05/02/2018]
 #0.00035    J/psi  K-  pi+  pi0          PHSP;  #Cannot find in PDG. Exclude? [PG 05/02/2018]
 
 0.001300000 J/psi  anti-K_10             SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0001      J/psi  anti-K'_10            SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005      J/psi  anti-K_2*0            PHSP;
-0.000049000 J/psi  anti-K0 phi           PHSP;  #Added by Yubo Li 03/09/2018
-0.00115005   J/psi  K- pi+                PHSP; #Updated by PG 9/2022
+0.00004868 J/psi  anti-K0 phi           PHSP; #Updated by PG 9/2021
+0.00115005   J/psi  K- pi+                PHSP; #Updated by PG 9/2021
 
 # New Jpsi mode --------------------------------------------------------
 0.000108000 J/psi eta anti-K0         PHSP; #CP-conjugate added by PG 05/02/2018
 0.000230000 J/psi omega anti-K0       PHSP; #CP-conjugate added by PG 05/02/2018
-0.00001078 J/psi eta                 PHSP;  #Updated by PG 9/2022
-0.00003944 J/psi pi+ pi-             PHSP;  #Updated by PG 9/2022
-0.00000326 J/psi f_2                 PHSP; #Updated by PG 9/2022
-0.00000250 J/psi K+ K-               PHSP; #Updated by PG 9/2022
-0.00000761 J/psi eta'                PHSP;  #Updated by PG 9/2022
-0.000025000 J/psi anti-K0 K+ K-       PHSP; #CP-conjugate added by PG 05/02/2018
+0.00001078 J/psi eta                 PHSP;  #Updated by PG 9/2021
+0.00003944 J/psi pi+ pi-             PHSP;  #Updated by PG 9/2021
+0.00000326 J/psi f_2                 PHSP; #Updated by PG 9/2021
+0.00000250 J/psi K+ K-               PHSP; #Updated by PG 9/2021
+0.00000761 J/psi eta'                PHSP;  #Updated by PG 9/2021
+0.00002489 J/psi anti-K0 K+ K-       PHSP;  #Updated by PG 9/2021
 0.000540000 J/psi anti-K0 rho0        PHSP; #CP-conjugate added by PG 05/02/2018
-0.00077000 J/psi K*- pi+             PHSP;  #Updated by PG 9/2022
-0.00001424 J/psi pi+ pi- pi+ pi-     PHSP; #Updated by PG 9/2022
-0.00000844 J/psi f_1                 PHSP; #Updated by PG 9/2022
+0.00077000 J/psi K*- pi+             PHSP;  #Updated by PG 9/2021
+0.00001424 J/psi pi+ pi- pi+ pi-     PHSP; #Updated by PG 9/2021
+0.00000844 J/psi f_1                 PHSP; #Updated by PG 9/2021
 0.000660000 J/psi anti-K*0 pi+ pi-    PHSP; #CP-conjugate added by PG 05/02/2018
 
 0.000290000 psi(2S) K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;
@@ -2632,13 +2632,13 @@ Decay anti-B0
 0.000098 psi(2S) K*L            SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
 0.000392 psi(2S) anti-K*0T      SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #CPV included, Oberhof 09/11/2017
 
-0.00058000     psi(2S)  K-  pi+               PHSP; #Updated by PG 9/2022
+0.00058000     psi(2S)  K-  pi+               PHSP; #Updated by PG 9/2021
 0.0002     psi(2S)  anti-K0   pi0         PHSP;
 0.0002     psi(2S)  anti-K0   pi+  pi-    PHSP;
 0.0001     psi(2S)  anti-K0   pi0  pi0    PHSP;
 0.0001     psi(2S)  K-  pi+  pi0          PHSP;
 0.0004     psi(2S)  anti-K_10             PHSP;
-0.00002209   psi(2S)  pi+  pi-              PHSP;  #Updated by PG 9/2022
+0.00002209   psi(2S)  pi+  pi-              PHSP;  #Updated by PG 9/2021
 0.0000117  psi(2S)  pi0                   PHSP; #CP-conjugate added by PG 05/02/2018
 
 0.00040  eta_c K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0; #CPV included, Oberhof 09/11/2017
@@ -2703,7 +2703,7 @@ Decay anti-B0
 #    0.000238 * 0.99754 * (2/3) = 0.00015828
 # 2) Br(B0 -> chi_c1 K+ pi-) = 0.000497 - 0.00015828 = 0.00033872
 0.00015828   chi_c1  anti-K*0T  SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #CPV included, Oberhof 09/11/2017
-0.00049700   chi_c1  K-  pi+    PHSP; #Updated by PG 9/2022
+0.00049700   chi_c1  K-  pi+    PHSP; #Updated by PG 9/2021
 
 # anti-B0 -> chi_c1 pi0 K0 (PDG 2019 data)
 #
@@ -2722,16 +2722,16 @@ Decay anti-B0
 0.00003957   K*L chi_c1             SVV_CP beta dm -1 Aplus phAplus Azero phAzero Aminus phAminus;      #CPV included, Oberhof 09/11/2017
 0.00016936   chi_c1  anti-K0  pi0   PHSP;
 
-0.00032    chi_c1  anti-K0   pi+  pi-    PHSP;
+0.00031600    chi_c1  anti-K0   pi+  pi-    PHSP; #Updated by PG 9/2021
 0.0002     chi_c1  anti-K0   pi0  pi0    PHSP;
-0.00035200    chi_c1  K-  pi+  pi0          PHSP; #Updated by PG 9/2022
+0.00035200    chi_c1  K-  pi+  pi0          PHSP; #Updated by PG 9/2021
 0.00001120 chi_c1  pi0                   PHSP;
 
 # Taken from UL of <1.5e-5 [PG 05/02/2018]
 0.0000075 chi_c2 K_S0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;    #CPV included, Oberhof 09/11/2017
 0.0000075 chi_c2 K_L0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 -1.0 0.0;   #CPV included, Oberhof 09/11/2017
 
-0.00004882    chi_c2  anti-K*0            PHSP; #Updated by PG 9/2022
+0.00004882    chi_c2  anti-K*0            PHSP; #Updated by PG 9/2021
 0.000072   chi_c2  K-  pi+             PHSP;
 0.0001     chi_c2  anti-K0  pi0        PHSP;
 0.00017    chi_c2  anti-K0  pi+  pi-   PHSP;
@@ -2758,17 +2758,17 @@ Decay anti-B0
 
 # b-> c (dc=)
 #
-0.00021133 D- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;     #Updated by PG 9/2022
+0.00021133 D- D+ SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;     #Updated by PG 9/2021
 # See Ref [B1] for the next 3:
 0.0003050000 D*+ D-  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #CPV included, Oberhof 09/11/2017
 0.0003050000 D*- D+  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #CPV included, Oberhof 09/11/2017
-0.00079553 D*+ D*- SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0;      #Updated by PG 9/2022
+0.00079553 D*+ D*- SVV_CP beta dm 1 0.56 0.0 0.96 0.0 0.47 0.0;      #Updated by PG 9/2021
 
 
 # b -> c (sc=)  -->  D Ds X   Sum = 10%
 #
-0.00723697 D+      D_s-         PHSP; #Updated by PG 9/2022
-0.00804457 D*+     D_s-         SVS; #Updated by PG 9/2022
+0.00723697 D+      D_s-         PHSP; #Updated by PG 9/2021
+0.00804457 D*+     D_s-         SVS; #Updated by PG 9/2021
 0.007400000 D_s*-   D+           SVS;
 0.017700000 D*+     D_s*-        SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0;
 0.0006   D'_1+  D_s-             SVS;
@@ -2795,16 +2795,16 @@ Decay anti-B0
 # October 26, 2004 Lange -per breco awg
 
 # External W-emission amplitude
-0.00107000 D+      anti-D0 K-                   PHSP; #Updated by PG 9/2022
-0.00346000 D+      anti-D*0 K-                  PHSP; #Updated by PG 9/2022
-0.00247000 D*+     anti-D0 K-                   PHSP; #Updated by PG 9/2022
-0.01060000 D*+     anti-D*0 K-                  PHSP; #Updated by PG 9/2022
+0.00107000 D+      anti-D0 K-                   PHSP; #Updated by PG 9/2021
+0.00346000 D+      anti-D*0 K-                  PHSP; #Updated by PG 9/2021
+0.00247000 D*+     anti-D0 K-                   PHSP; #Updated by PG 9/2021
+0.01060000 D*+     anti-D*0 K-                  PHSP; #Updated by PG 9/2021
 
 # External+internal W-emission amplitude
-0.0015   D+  D-  anti-K0                         PHSP;
+0.00075000   D+  D-  anti-K0                         PHSP; #Updated by PG 9/2021
 0.0018   D*+ D-  anti-K0                         PHSP;
 0.0047   D+  D*-  anti-K0                        PHSP;
-0.007800000 D*+     D*-     anti-K0              PHSP;s
+0.00810924 D*+     D*-     anti-K0              PHSP; #Updated by PG 9/2021
 
 # Internal W-emission amplitude (color suppressed modes)
 0.00027   D0  anti-D0  anti-K0                    PHSP; #PDG 2020
@@ -2831,23 +2831,23 @@ Decay anti-B0
 
 #  B -> D(*) X  Exclusive modes
 #
-0.00274268 D*+     pi-                 SVS; #Updated by PG 9/2022
-0.00252113 D+      pi-                 PHSP; #Updated by PG 9/2022
-0.00757464 rho-    D+                  SVS; #Updated by PG 9/2022
+0.00274268 D*+     pi-                 SVS; #Updated by PG 9/2021
+0.00252113 D+      pi-                 PHSP; #Updated by PG 9/2021
+0.00757464 rho-    D+                  SVS; #Updated by PG 9/2021
 
 # D* rho HELAMP parameters taken from ICHEP 98-852.
-0.00679879   rho-    D*+                    SVV_HELAMP 0.152 1.47 0.936 0 0.317 0.19; #Updated by PG 9/2022
+0.00679879   rho-    D*+                    SVV_HELAMP 0.152 1.47 0.936 0 0.317 0.19; #Updated by PG 9/2021
 0.0005   D+  pi-  pi0                   PHSP;
-0.01515771   D*+     pi-     pi0            PHSP; #Updated by PG 9/2022
-0.00088026  D0      pi+     pi-            PHSP; #Updated by PG 9/2022
+0.01515771   D*+     pi-     pi0            PHSP; #Updated by PG 9/2021
+0.00088026  D0      pi+     pi-            PHSP; #Updated by PG 9/2021
 0.00062  D*0     pi+     pi-            PHSP;
 0.0005   D*0 pi0  pi0                   PHSP;
 
 # D a1 updated Ref. [B1]
 0.0060   a_1-    D+                     SVS;
-0.00110000   D+      rho0    pi-            PHSP; #Updated by PG 9/2022
+0.00110000   D+      rho0    pi-            PHSP; #Updated by PG 9/2021
 0.0011   D+  rho-  pi0                  PHSP;
-0.00601693   D+      pi+     pi-     pi-    PHSP; #Updated by PG 9/2022
+0.00601693   D+      pi+     pi-     pi-    PHSP; #Updated by PG 9/2021
 0.0010   D+  pi0  pi-  pi0              PHSP;
 0.0010   D0  pi+  pi-  pi0              PHSP;
 0.0001   D0  pi0  pi0  pi0              PHSP;
@@ -2857,10 +2857,10 @@ Decay anti-B0
 # updated Ref. [B1]
 # October 26, 2004 Lange update
 
-0.01299416   D*+     a_1-                   SVV_HELAMP 0.200 0.0 0.866 0.0 0.458 0.0; #Updated by PG 9/2022
-0.00572624   D*+     rho0    pi-            PHSP; #Updated by PG 9/2022
+0.01299416   D*+     a_1-                   SVV_HELAMP 0.200 0.0 0.866 0.0 0.458 0.0; #Updated by PG 9/2021
+0.00572624   D*+     rho0    pi-            PHSP; #Updated by PG 9/2021
 0.0010   D*+  rho-  pi0                 PHSP;
-0.00720907   D*+  pi+  pi-  pi-             PHSP; #Updated by PG 9/2022
+0.00720907   D*+  pi+  pi-  pi-             PHSP; #Updated by PG 9/2021
 0.0010   D*+  pi0  pi-  pi0             PHSP;
 0.0010   D*0  pi+  pi-  pi0             PHSP;
 0.0001   D*0  pi0  pi0  pi0             PHSP;
@@ -2882,15 +2882,15 @@ Decay anti-B0
 # http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/151.html:
 # update: Ref. [B1]:
 
-0.00021213 D*+     K-         SVS; #Updated by PG 9/2022
-0.00018595 D+      K-         PHSP; #Updated by PG 9/2022
-0.00032971 D*+     K*-        SVV_HELAMP 0.228 0.0 0.932 0.0 0.283 0.0; #Updated by PG 9/2022
-0.00044578 K*-     D+         SVS; #Updated by PG 9/2022
+0.00021213 D*+     K-         SVS; #Updated by PG 9/2021
+0.00018595 D+      K-         PHSP; #Updated by PG 9/2021
+0.00032971 D*+     K*-        SVV_HELAMP 0.228 0.0 0.932 0.0 0.283 0.0; #Updated by PG 9/2021
+0.00044578 K*-     D+         SVS; #Updated by PG 9/2021
 
 0.000036 D*0 K0             SVS;
 0.000052 D0 K0              PHSP;
-0.00004517 anti-K*0 D0        SVS; #Updated by PG 9/2022
-0.00000219 anti-K*0 anti-D0    SVS; #Updated by PG 9/2022
+0.00004517 anti-K*0 D0        SVS; #Updated by PG 9/2021
+0.00000219 anti-K*0 anti-D0    SVS; #Updated by PG 9/2021
 0.00004 D*0 anti-K*0        SVV_HELAMP 1. 0. 1. 0. 1. 0.;
 0.00001 anti-D*0 anti-K*0   SVV_HELAMP 1. 0. 1. 0. 1. 0.;
 
@@ -2901,27 +2901,27 @@ Decay anti-B0
 # with phases set to 0. Recommendation http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/169.html:
 # update: See Ref [B1]:
 
-0.00026298  D0      pi0                                     PHSP; #Updated by PG 9/2022
-0.00022270  D*0     pi0                                     SVS; #Updated by PG 9/2022
+0.00026298  D0      pi0                                     PHSP; #Updated by PG 9/2021
+0.00022270  D*0     pi0                                     SVS; #Updated by PG 9/2021
 
-0.00032064  rho0    D0                                      SVS; #Updated by PG 9/2022
+0.00032064  rho0    D0                                      SVS; #Updated by PG 9/2021
 0.00029   D*0 rho0                                        SVV_HELAMP 0.228 0.0 0.932 0.0 0.283 0.0;
 
-0.00023592  D0      eta                                     PHSP; #Updated by PG 9/2022
-0.00022620  D*0     eta                                     SVS; #Updated by PG 9/2022
+0.00023592  D0      eta                                     PHSP; #Updated by PG 9/2021
+0.00022620  D*0     eta                                     SVS; #Updated by PG 9/2021
 
-0.00013768  D0 eta'                                         PHSP; #Updated by PG 9/2022
-0.00014031  D*0     eta'                                    SVS; #Updated by PG 9/2022
+0.00013768  D0 eta'                                         PHSP; #Updated by PG 9/2021
+0.00014031  D*0     eta'                                    SVS; #Updated by PG 9/2021
 
-0.00025395  omega   D0                                      SVS; #Updated by PG 9/2022
-0.00036418  D*0     omega                                   SVV_HELAMP 0.228 0.0  0.932 0.0 0.283 0.0; #Updated by PG 9/2022
+0.00025395  omega   D0                                      SVS; #Updated by PG 9/2021
+0.00036418  D*0     omega                                   SVV_HELAMP 0.228 0.0  0.932 0.0 0.283 0.0; #Updated by PG 9/2021
 
-0.00000001 p+  anti-p-                                     PHSP; #Updated by PG 9/2022
+0.00000001 p+  anti-p-                                     PHSP; #Updated by PG 9/2021
 
-0.00737857    D_s0*-  D+                                      PHSP; #Updated by PG 9/2022
-0.01768717    D*+     D_s0*-                                  SVS; #Updated by PG 9/2022
-0.00354786    D_s1-   D+                                      SVS; #Updated by PG 9/2022
-0.00928257    D*+     D_s1-                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.; #Updated by PG 9/2022
+0.00737857    D_s0*-  D+                                      PHSP; #Updated by PG 9/2021
+0.01768717    D*+     D_s0*-                                  SVS; #Updated by PG 9/2021
+0.00354786    D_s1-   D+                                      SVS; #Updated by PG 9/2021
+0.00928257    D*+     D_s1-                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.; #Updated by PG 9/2021
 
 # These need to be checked to make sure CP-conjugates are included [PG 05/02/2018]
 # There may be more of these channels spread out (likely below).
@@ -2932,7 +2932,7 @@ Decay anti-B0
 0.00049  D+  anti-K0 pi-                                  PHSP;
 
 0.00280  D+      omega   pi-                              PHSP;
-0.00246056  D*+     omega   pi-                              PHSP; #Updated by PG 9/2022
+0.00246056  D*+     omega   pi-                              PHSP; #Updated by PG 9/2021
 
 0.00043 D'_s1- D+                                         PHSP;
 0.00083 D'_s1- D*+                                        PHSP;
@@ -2967,44 +2967,44 @@ Decay anti-B0
 0.00169344    anti-d  d       s       anti-d                  PYTHIA 48;
 0.00141123    anti-s  s       s       anti-d                  PYTHIA 48;
 0.00470412    s       anti-d                                  PYTHIA 32;
-0.000052000 D0      anti-K0                                 PHSP;
-0.00008800 D0      K-      pi+                             PHSP; #Updated by PG 9/2022
-0.00000530 anti-D0 K-      pi+                             PHSP; #Updated by PG 9/2022
+0.00005231 D0      anti-K0                                 PHSP; #Updated by PG 9/2021
+0.00008800 D0      K-      pi+                             PHSP; #Updated by PG 9/2021
+0.00000530 anti-D0 K-      pi+                             PHSP; #Updated by PG 9/2021
 0.000036000 D*0     anti-K0                                 PHSP;
-0.00271850 anti-D*0 pi-     pi-     pi+     pi+            PHSP; #Updated by PG 9/2022
-0.000890000 eta_c   anti-K0                                 PHSP;
+0.00271850 anti-D*0 pi-     pi-     pi+     pi+            PHSP; #Updated by PG 9/2021
+0.00079513 eta_c   anti-K0                                 PHSP; #Updated by PG 9/2021
 0.000170000 anti-K0 anti-D0 D0      pi0                     PHSP;
-0.000620000 psi(2S) anti-K0                                 PHSP;
-0.000140000 chi_c0  anti-K0                                 PHSP;
-0.000004700 anti-K0 rho0                                    PHSP;
+0.00058453 psi(2S) anti-K0                                 PHSP; #Updated by PG 9/2021
+0.00000111 chi_c0  anti-K0                                 PHSP; #Updated by PG 9/2021
+0.00005231 anti-K0 rho0                                    PHSP;
 0.000011000 eta     anti-K_0*0                              PHSP;
 0.000009600 eta     anti-K_2*0                              PHSP;
 0.000016000 omega   anti-K_0*0                              PHSP;
 0.000010100 omega   anti-K_2*0                              PHSP;
 0.000002700 f_2     anti-K0                                 PHSP;
 0.000001400 f_0     K-      pi+                             PHSP;
-0.00000676 anti-K_2*0 phi                                  PHSP; #Updated by PG 9/2022
-0.000007600 eta     anti-K0 gamma                           PHSP;
+0.00000676 anti-K_2*0 phi                                  PHSP; #Updated by PG 9/2021
+0.00000756 eta     anti-K0 gamma                           PHSP; #Updated by PG 9/2021
 0.000002660 anti-p- p+      anti-K0                         PHSP;
 0.000001240 anti-p- p+      anti-K*0                        PHSP;
 0.000003140 anti-p- Lambda0 pi+                             PHSP;
-0.000004800 Lambda0 anti-Lambda0 anti-K0                    PHSP;
-0.00000246 Lambda0 anti-Lambda0 anti-K*0                   PHSP; #Updated by PG 9/2022
-0.00001001 Lambda0 anti-Lambda0 anti-D0                    PHSP; #Updated by PG 9/2022
-0.00010356 D0      anti-p- p+                              PHSP; #Updated by PG 9/2022
-0.00002841 D_s+    Lambda0 anti-p-                         PHSP; #Updated by PG 9/2022
-0.00009905 D*0     anti-p- p+                              PHSP; #Updated by PG 9/2022
-0.00145000 D*+     anti-p- n0                              PHSP; #Updated by PG 9/2022
-0.00033200 D+      anti-p- p+      pi-                     PHSP; #Updated by PG 9/2022
-0.00046824 D*+     anti-p- p+      pi-                     PHSP; #Updated by PG 9/2022
-0.00001538 Lambda_c+ anti-p-                               PHSP; #Updated by PG 9/2022
-0.00101920 Lambda_c+ anti-p- pi-     pi+                   PHSP; #Updated by PG 9/2022
+0.000004800 Lambda0 anti-Lambda0 anti-K0                    PHSP; #Updated by PG 9/2021
+0.00000246 Lambda0 anti-Lambda0 anti-K*0                   PHSP; #Updated by PG 9/2021
+0.00001001 Lambda0 anti-Lambda0 anti-D0                    PHSP; #Updated by PG 9/2021
+0.00010356 D0      anti-p- p+                              PHSP; #Updated by PG 9/2021
+0.00002841 D_s+    Lambda0 anti-p-                         PHSP; #Updated by PG 9/2021
+0.00009905 D*0     anti-p- p+                              PHSP; #Updated by PG 9/2021
+0.00145000 D*+     anti-p- n0                              PHSP; #Updated by PG 9/2021
+0.00033200 D+      anti-p- p+      pi-                     PHSP; #Updated by PG 9/2021
+0.00046824 D*+     anti-p- p+      pi-                     PHSP; #Updated by PG 9/2021
+0.00001538 Lambda_c+ anti-p-                               PHSP; #Updated by PG 9/2021
+0.00101920 Lambda_c+ anti-p- pi-     pi+                   PHSP; #Updated by PG 9/2021
 0.000120000 Sigma_c*++ anti-p- pi-                          PHSP;
 0.00015000 Sigma_c0 anti-p- pi+                            PHSP; #Possible error in mapping
 0.00022000 Sigma_c++ anti-p- pi-                           PHSP; #Possible error in mapping
-0.01759848 D*+     pi-     pi-     pi+     pi0             PHSP; #Updated by PG 9/2022
+0.01759848 D*+     pi-     pi-     pi+     pi0             PHSP; #Updated by PG 9/2021
 0.004700000 D*+     pi-     pi-     pi-     pi+     pi+     PHSP;
-0.000110000 D_s+    pi-     anti-K0                         PHSP;
+0.00009696 D_s+    pi-     anti-K0                         PHSP; #Updated by PG 9/2021
 
 # deleted K pi gamma
 #0.000004600 K-      pi+     gamma                          PHSP;    # Commented out as this double counts the K*2_0 decaying into Kpi

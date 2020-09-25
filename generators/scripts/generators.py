@@ -569,6 +569,17 @@ def add_cosmics_generator(path, components=None,
         top_in_counter (bool): time of propagation from the hit point to the PMT in the trigger counter is subtracted
             (assuming PMT is put at -z of the counter).
     """
+
+    B2FATAL('''The function "add_cosmics_generator()" is outdated and it is currently not working: please replace
+
+  add_cosmics_generator(path=path)
+
+with
+
+  path.add_module('CRYInput')
+
+in your steering file (the module parameter "acceptance" has to be set, see the module docummentation).''')
+
     import cdc.cr as cosmics_setup
 
     if global_box_size is None:

@@ -75,7 +75,7 @@ def group_files_by_iov(files_to_iov):
     return iov_to_files
 
 
-def filter_by_max_events_per_run(files_to_iov, max_events_per_run, randomSel=False):
+def filter_by_max_events_per_run(files_to_iov, max_events_per_run, random_select=False):
     """
     This function creates a new files_to_iov dictionary by appending files
     in order until the maximum number of events are reached per run.
@@ -84,7 +84,7 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, randomSel=Fal
         files_to_iov (dict): {"/path/to/file.root": IoV(1,1,1,1)} type dictionary. Same style as used by the CAF
             for lookup values.
         max_events_per_run (int): The threshold we want to reach but stop adding files if we reach it.
-        randomSel (bool): true will select random nfile and false will take first nfile.
+        random_select (bool): true will select random nfile and false will take first nfile.
 
     Returns:
         dict: The same style of dict as the input files_to_iov, but filtered down.
@@ -101,7 +101,7 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, randomSel=Fal
         remaining_files = files[:]
         chosen_files = []
         while total < max_events_per_run and remaining_files:
-            if randomSel:
+            if random_select:
                 file_path = choice(remaining_files)
                 remaining_files.remove(file_path)
             else:
@@ -129,14 +129,14 @@ def filter_by_max_events_per_run(files_to_iov, max_events_per_run, randomSel=Fal
     return new_files_to_iov
 
 
-def filter_by_max_events_per_dataset(input_file_list, max_events_per_dataset):
+def filter_by_select_max_events_from_files(input_file_list, select_max_events_from_files):
     """
     This function creates a new list by appending random files until
     the maximum number of events are reached per data set.
 
     Parameters:
         input_file_list (list): ["/path/to/file2.root", "/path/to/file2.root"]
-        max_events_per_dataset (int): The threshold we want to reach but stop adding files if we reach it.
+        select_max_events_from_files (int): The threshold we want to reach but stop adding files if we reach it.
 
     Returns:
         list: The sorted list of random files or empty list of not enought found
@@ -144,7 +144,7 @@ def filter_by_max_events_per_dataset(input_file_list, max_events_per_dataset):
 
     total = 0
     selected_file = []
-    while total < max_events_per_dataset:
+    while total < select_max_events_from_files:
 
         if not input_file_list:
             break
@@ -163,8 +163,8 @@ def filter_by_max_events_per_dataset(input_file_list, max_events_per_dataset):
         B2INFO(f"Choosing random input file: {file_path} and total events so far {total}")
 
     # return empty list if request events found
-    if total < max_events_per_dataset:
-        B2INFO(f"total events {total} are less than requested {max_events_per_dataset}")
+    if total < select_max_events_from_files:
+        B2INFO(f"total events {total} are less than requested {select_max_events_from_files}")
         selected_file = []
 
     return sorted(selected_file)

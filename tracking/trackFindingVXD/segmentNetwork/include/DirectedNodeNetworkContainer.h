@@ -142,11 +142,17 @@ namespace Belle2 {
 
 
   private:
-    /// Making the Class a ROOT class
-    /// last member changed: added metaInfo for DirectedNodeNetwork
-    ClassDef(DirectedNodeNetworkContainer, 10)
+    /** This class does not need a streamer as it is not supposed to be stored.
+      But for the base classes the streamer is needed for the case of parallel processing.
+      For this reason the version is set to 0 which does actually this. It will not create
+      the streamer for the data members of the  DirectedNodeNetworkContainer itself
+      but it still creates the streamers for the base classes.
+      Just for reference: the previous class version was 10.
+    */
+    ClassDef(DirectedNodeNetworkContainer, 0)
 
   protected:
+
     /** Number of trackNodes collected. */
     int m_trackNodesCollected = 0;
     /** Number of activeSectors connections made. */

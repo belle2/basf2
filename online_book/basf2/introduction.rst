@@ -39,7 +39,7 @@ It is an abbreviation for "Belle II Analysis Software Framework".
 There is no set way to write it, you will see BASF2, Basf2 and basf2.
 You might wonder why we didn't choose "b2asf", and when you get a bit further
 you will probably wonder why it has "analysis" in the name (it does much more
-than analysis)? 
+than analysis)?
 Well historic reasons: Belle had BASF, we have basf2.
 
 Basf2 is used in all aspects of the data-processing chain at Belle II:
@@ -91,7 +91,7 @@ You will soon be running commands that look like:
 Core concepts
 -------------
 
-There are some concepts we use in basf2, which you will definitely need to 
+There are some concepts we use in basf2, which you will definitely need to
 understand.
 These are:
 
@@ -112,7 +112,7 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     You might need to revisit the tutorial pages about 
+     You might need to revisit the tutorial pages about
      :ref:`onlinebook_collaborative_tools`.
 
 .. admonition:: Solution
@@ -128,7 +128,7 @@ data processing.
 The full documentation can be found here in this website under
 the section :ref:`general_modpath`.
 
-.. warning:: 
+.. warning::
 
     It is an unfortunate clash of naming that `python uses the word
     "module" <https://docs.python.org/3/tutorial/modules.html>`_
@@ -177,7 +177,7 @@ A typical package has several modules and some python scripts which configure
 paths to do common things.
 
 You will encounter some basf2 packages in these lessons.
-We try to give them meaningful names (tracking, reconstruction, ...) 
+We try to give them meaningful names (tracking, reconstruction, ...)
 or name the package after the subdetector that they are related to (ecl, klm,
 cdc, top, ...).
 
@@ -232,7 +232,7 @@ We use the word "steering" since no real data **processing** is done in python.
      This is because of the performance.
      Python is used as a user-friendly and readable language for configuration.
 
-     .. note:: 
+     .. note::
 
          There are some exceptions, some modules are written in python for
          instance, but they are not very common.
@@ -240,7 +240,7 @@ We use the word "steering" since no real data **processing** is done in python.
 Databases
 ~~~~~~~~~
 
-There are a couple more concepts that you might come across: 
+There are a couple more concepts that you might come across:
 
 * the **conditions database**
 * and the **run database**.
@@ -268,7 +268,7 @@ good to be aware of the jargon.
     * You work in basf2 by adding modules to a path.
     * *Most* basf2 modules are written in C++.
     * Data-processing happens when you process the path.
-    * You do all of this configuration of the path, etc in python in 
+    * You do all of this configuration of the path, etc in python in
       a *steering file*.
     * You can navigate this online documentation.
 
@@ -315,8 +315,8 @@ setup script...
 
         source /cvmfs/belle.cern.ch/tools/b2setup
 
-Some people like to put an alias to the setup script in their .profile (or
-.bashrc, .zshrc, ...) file.
+Some people like to put an alias to the setup script in their ``.profile`` (or
+``.bashrc``, ``.zshrc``, ...) file.
 You are welcome to do this if you like.
 
 So now you have a Belle II environment.
@@ -324,14 +324,18 @@ You might have noticed that you still don't have the ``basf2`` executable:
 
 .. code-block:: bash
 
-        $> source /cvmfs/belle.cern.ch/tools/b2setup
+        $ source /cvmfs/belle.cern.ch/tools/b2setup
         Belle II software tools set up at: /cvmfs/belle.cern.ch/tools
-        $> basf2
+        $ basf2
         command not found: basf2
 
-You need to choose a release (a specific version of the software).
+Note: we only used the ``$`` character to distinguish the commands from the
+expected output, it should not be typed.
+
+In order to get the ``basf2`` executable you need to choose a release
+(a specific version of the software).
 If you don't know what release you want, you should take the latest stable
-full release or the latest light release.
+full release or the latest light release (see below).
 
 There is a command-line tool to help with this.
 Try:
@@ -340,23 +344,21 @@ Try:
 
         b2help-releases --help
 
-or just:
-
-.. code-block:: bash
-
-        b2help-releases
-
-To setup the release of your choice simply call ``b2setup`` again.
-Once you've set up the environment, the ``b2setup`` executable itself will be
-in your ``PATH``:
+To setup the release of your choice simply call ``b2setup`` again with the
+name of your release.
+Since you've already set up the environment, the ``b2setup`` executable itself
+is already in your ``PATH`` (that means we don't need the full path ``/cvmfs/.../b2setup`` anymore):
 
 .. code-block:: bash
 
         b2setup <your choice of release>
 
-If you already know what release you want, you can do it all at once:
+.. seealso::
 
-.. code-block:: bash
+   If you already know what release you want, you can do the first and second
+   step in one go:
+
+   .. code-block:: bash
 
         source /cvmfs/belle.cern.ch/tools/b2setup <your choice of release>
 
@@ -365,7 +367,7 @@ warning:
 
 .. code-block:: bash
 
-        $> b2setup release-01-02-09
+        $ b2setup release-01-02-09
         Environment setup for release: release-01-02-09
         Central release directory    : /cvmfs/belle.cern.ch/el7/releases/release-01-02-09
         Warning: The release release-01-02-09 is not supported any more. Please update to ...
@@ -373,7 +375,7 @@ warning:
 Sometimes people have good reason to use old releases but you should know that
 you will get limited help and support if you are using a very old version.
 
-And you expose yourself to strange bugs that will not be fixed in your version 
+And you expose yourself to strange bugs that will not be fixed in your version
 (because they are fixed in some later release).
 
 It is also true that using the latest supported release makes you cool.
@@ -505,7 +507,7 @@ If you're ever stuck and you are writing a post on `questions.belle2.org
 <https://questions.belle2.org>`_ or an email to an expert they will always want
 to know what version you are using.
 
-Try 
+Try
 
 .. code-block:: bash
 
@@ -549,10 +551,10 @@ To find information about a basf2 module, try:
 Listing the basf2 variables
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In the next lessons, you will need to refer to physics quantities in plain 
+In the next lessons, you will need to refer to physics quantities in plain
 text format.
 Basf2 defines many **variables** for you.
-These variables are collected in something called the 
+These variables are collected in something called the
 :ref:`analysis_variablemanager_class`.
 
 To check the list of basf2 variables known to the :ref:`analysis_variablemanager_class`, run
@@ -610,7 +612,7 @@ there is a tool ``b2help-particles``.
 Other useful features
 ^^^^^^^^^^^^^^^^^^^^^
 
-If you just execute basf2 without any arguments, you will start an 
+If you just execute basf2 without any arguments, you will start an
 `IPython <https://ipython.org>`_ session with many basf2 functions imported.
 Try just:
 
@@ -632,7 +634,7 @@ You should also make use of IPython's built-in documentation features.
 
 .. code-block:: ipython
 
-    In [4]: import modularAnalysis 
+    In [4]: import modularAnalysis
     In [5]: modularAnalysis.reconstructDecay?
     In [6]: # the question mark brings up the function documentation in IPython
     In [7]: print(dir(modularAnalysis)) # the python dir() function will also show you all functions' names
@@ -655,7 +657,7 @@ To leave interactive basf2 / IPython, simply:
 
    In [13]: # exit()
    In [14]: # ... or just
-   In [15]: exit 
+   In [15]: exit
 
 
 .. admonition:: Question
@@ -688,7 +690,7 @@ To leave interactive basf2 / IPython, simply:
 
      .. code-block:: bash
 
-          $> b2info-luminosity  --exp 8 --what offline
+          $ b2info-luminosity  --exp 8 --what offline
           Read 697 runs for experiment 8
           TOTAL offline   : L = 5464553.60 /nb =  5464.55 /pb =    5.465 /fb =   0.0055 /ab
 
@@ -710,9 +712,9 @@ We call software "external" if is not specific to Belle II but used *by* basf2.
     the externals in `this README file
     <https://stash.desy.de/projects/B2/repos/externals/browse/README.md>`_.
 
-Some python packages that are useful for final offline analysis are also 
+Some python packages that are useful for final offline analysis are also
 included in the externals for your convenience.
-These are tools such as `numpy <https://numpy.org>`_ and 
+These are tools such as `numpy <https://numpy.org>`_ and
 `pandas <https://pandas.pydata.org>`_.
 You will meet them in the :ref:`onlinebook_offline_analysis` lessons.
 
@@ -778,7 +780,7 @@ post-reconstruction dataobjects.
       * PIDLikelihood
       * MCParticle
 
-.. seealso:: 
+.. seealso::
 
     `What is the difference between an mdst and a dst?
     <https://questions.belle2.org/question/219/what-is-the-difference-between-an-mdst-and-a-dst/>`_
@@ -786,20 +788,20 @@ post-reconstruction dataobjects.
 .. seealso:: "mdst" in the glossary
 
 Earlier we asked some questions about **code** backward-compatibility.
-We can now take a brief diversion into the second kind of 
+We can now take a brief diversion into the second kind of
 backward-compatibility that is guaranteed in the software.
 
 .. centered:: Mdst backward-compatibility is guaranteed for the last two major releases.
 
-.. seealso:: 
+.. seealso::
 
-    The confluence page `Software Backward Compatibility 
+    The confluence page `Software Backward Compatibility
     <https://confluence.desy.de/display/BI/Backward+Compatibility>`_
 
 .. admonition:: Question
      :class: exercise stacked
 
-     If you have an **mdst file** that was created in ``release-AA-00-00`` 
+     If you have an **mdst file** that was created in ``release-AA-00-00``
      will you be able to open it with ``release-BB-00-00``?
 
 .. admonition:: Solution
@@ -809,6 +811,19 @@ backward-compatibility that is guaranteed in the software.
      If BB is AA+1 (i.e. the next major release).
      You should be able to open the old file, and your analysis code should work.
 
+.. admonition:: Question
+     :class: exercise stacked
+
+     If you have an **mdst file** that is from the latest MC campaign.
+     Will you be able to open it with the latest light release?
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     **Yes**.
+     New light releases will always be able to open files from the current,
+     and last supported full release.
+     An MC campaign is always based on a full release.
 
 You will use mdst data files in the next lesson.
 
@@ -819,27 +834,27 @@ collections of these dataobjects as particle *candidates*.
 In brief:
 
 * A track (with or without a cluster and with or without PID information)
-  is interpreted as a charged particle 
-  (:math:`e^\pm`, :math:`\mu^\pm`, :math:`\pi^\pm`, :math:`K^\pm`, or 
+  is interpreted as a charged particle
+  (:math:`e^\pm`, :math:`\mu^\pm`, :math:`\pi^\pm`, :math:`K^\pm`, or
   :math:`p^\pm`).
-* A cluster with no track in close vicinity is interpreted as a photon 
+* A cluster with no track in close vicinity is interpreted as a photon
   or a :math:`K_L^0`.
 
-* Two or more of the above particles can be combined to make *composite* 
+* Two or more of the above particles can be combined to make *composite*
   particle candidates.
   For example:
 
-  * Two photons can be combined to create :math:`\pi^0\to\gamma\gamma` 
+  * Two photons can be combined to create :math:`\pi^0\to\gamma\gamma`
     candidates.
-  * Two tracks can be combined to create :math:`K_S^0\to\pi^+\pi^-` 
+  * Two tracks can be combined to create :math:`K_S^0\to\pi^+\pi^-`
     candidates.
 
   ... And so on.
 
 In fact, the analysis package mostly operates on **ParticleList** s.
-A **ParticleList** is just the list of all such particle candidates in each 
+A **ParticleList** is just the list of all such particle candidates in each
 event.
-In the next lesson you will make your own particle lists and use analysis 
+In the next lesson you will make your own particle lists and use analysis
 package tools to manipulate them.
 
 Making your life easier
@@ -850,10 +865,10 @@ done for you in so-called "convenience functions".
 Certainly all the modules needed for these lessons.
 
 The **python module** containing these functions is called `modularAnalysis`.
-You have already met the `modularAnalysis` convenience functions 
+You have already met the `modularAnalysis` convenience functions
 earlier in this lesson: :ref:`onlinebook_basf2basics_modularanalysis_help`.
 
-You are encouraged to look at the source code for the `modularAnalysis` 
+You are encouraged to look at the source code for the `modularAnalysis`
 convenience functions that you find yourself using often.
 In pseudo-python you will see they are very often of the form:
 
@@ -863,7 +878,7 @@ In pseudo-python you will see they are very often of the form:
 
         def doAnAnalysisTask(<arguments>, path):
             """
-            A meaningful and clear docstring. Sometimes quite long-winded. 
+            A meaningful and clear docstring. Sometimes quite long-winded.
             Occasionally longer than the active code in the function.
 
             Details all of the function inputs...
@@ -911,7 +926,7 @@ In pseudo-python you will see they are very often of the form:
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Find the `modularAnalysis` convenience function that wraps the 
+     Find the `modularAnalysis` convenience function that wraps the
      :b2:mod:`ParticleCombiner` module?
      Read the function.
 

@@ -3,7 +3,7 @@
 
 """
 <header>
-<output>ECLClusterOutputFWD.root</output>
+<output>ECLClusterOutputFWD_1000MeV.root</output>
 <contact>Elisa Manoni, elisa.manoni@pg.infn.it</contact>
 </header>
 """

@@ -10,7 +10,6 @@
 
 #include <analysis/modules/VariablesToExtraInfo/VariablesToExtraInfoModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
@@ -41,7 +40,7 @@ VariablesToExtraInfoModule::~VariablesToExtraInfoModule() = default;
 
 void VariablesToExtraInfoModule::initialize()
 {
-  StoreArray<Particle>().isRequired();
+  m_particles.isRequired();
   m_inputList.isRequired(m_inputListName);
 
   //collection function pointers
@@ -66,13 +65,10 @@ void VariablesToExtraInfoModule::initialize()
 
 void VariablesToExtraInfoModule::event()
 {
-  StoreArray<Particle> particles;
-
   if (!m_inputList) {
     B2WARNING("Input list " << m_inputList.getName() << " was not created?");
     return;
   }
-
 
   const unsigned int numParticles = m_inputList->getListSize();
   for (unsigned int i = 0; i < numParticles; i++) {
@@ -83,7 +79,7 @@ void VariablesToExtraInfoModule::event()
     } else {
       std::vector<const Particle*> selparticles = m_pDDescriptor.getSelectionParticles(p);
       for (auto& selparticle : selparticles) {
-        Particle* daug = particles[selparticle->getArrayIndex()];
+        Particle* daug = m_particles[selparticle->getArrayIndex()];
         addExtraInfo(p, daug);
       }
     }

@@ -15,6 +15,9 @@ CHANGES since release-01-00-04:
 - The default magnetic field is changed affecting all momentum measurements.
 - Track:
   + getQualityIndicator
+- TrackFitResult:
+  + ndf
+  + chi2
 - ECLCluster:
   + getPulseShapeDiscriminationMVA
   + getClusterHadronIntensity
@@ -28,6 +31,7 @@ CHANGES since release-01-00-04:
 - KlIds are added
 - TRGSummary:
   * getTimTypeBits is replaced by getTimType
+  * getTimQuality added
 - SoftwareTriggerResult:
   * non-prescaled results added
 - Particle masses:

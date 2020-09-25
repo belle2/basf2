@@ -1694,6 +1694,7 @@ def reconstructMCDecay(
     dmID=0,
     writeOut=False,
     path=None,
+    chargeConjugation=True,
 ):
     r"""
     Finds and creates a ``ParticleList`` from given decay string.
@@ -1713,15 +1714,19 @@ def reconstructMCDecay(
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass given cuts (in VariableManager style) and rejected otherwise
                        isSignal==1 is always required by default.
+    @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
+    @param chargeConjugation boolean to decide whether charge conjugated mode should be reconstructed as well (on by default)
     """
 
     pmake = register_module('ParticleCombinerFromMC')
     pmake.set_name('ParticleCombinerFromMC_' + decayString)
     pmake.param('decayString', decayString)
     pmake.param('cut', cut)
+    pmake.param('decayMode', dmID)
     pmake.param('writeOut', writeOut)
+    pmake.param('chargeConjugation', chargeConjugation)
     path.add_module(pmake)
 
 

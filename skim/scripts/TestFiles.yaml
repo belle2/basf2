@@ -252,7 +252,18 @@ MC12_mumuBGx1:
 #  |____/ \__,_|\__\__,_| |___/\__,_|_| |_| |_| .__/|_|\___||___/
 #                                             |_|
 
-# NOTE: proc11 samples are hlt_hadron skims
+bucket12_exp12_4S_offres:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket12_exp12_4S_offres.mdst.root
+
+bucket11_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket11_exp12.mdst.root
+
+bucket10_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket10_exp12.mdst.root
+
+bucket9_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket9_exp12.mdst.root
+
 proc11_exp10:
   location: /group/belle2/dataprod/MC/SkimTraining/proc11_exp10.mdst.root
 

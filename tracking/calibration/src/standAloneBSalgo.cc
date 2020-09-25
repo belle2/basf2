@@ -17,7 +17,6 @@
 #include <iomanip>
 #include <iostream>
 #include <tuple>
-#include <cassert>
 
 #include <TString.h>
 #include <TH1D.h>
@@ -44,9 +43,17 @@
 #include <vector>
 #include <numeric>
 
-#include "tools.h"
+//To allow Stand-Alone running
+#if __has_include(<framework/logging/Logger.h>)
+#include <tracking/calibration/standAloneBSalgo.h>
+#include <tracking/calibration/Splitter.h>
+#include <tracking/calibration/tools.h>
+#else
 #include "standAloneBSalgo.h"
 #include "Splitter.h"
+#include "tools.h"
+#endif
+
 
 using namespace std;
 
@@ -72,15 +79,15 @@ namespace Belle2 {
     /** Print BeamSpot parameters */
     void print()
     {
-      cout << "x" << endl;
+      B2INFO("x");
       x.print();
-      cout << "y" << endl;
+      B2INFO("y");
       y.print();
-      cout << "z" << endl;
+      B2INFO("z");
       z.print();
-      cout << "kX" << endl;
+      B2INFO("kX");
       kX.print();
-      cout << "kY" << endl;
+      B2INFO("kY");
       kY.print();
     }
 
@@ -95,14 +102,13 @@ namespace Belle2 {
           return 1;
         else {
           if (order == 0) {
-            assert(sp.size() >= 1);
+            B2ASSERT("There must be least one node at this place", sp.size() >= 1);
             return int(sp.size() + 1);
           } else if (order == 1) {
-            assert(sp.size() >= 2);
+            B2ASSERT("Must be at least two nodes in lin. spline", sp.size() >= 2);
             return int(sp.size());
           } else {
-            cout << "Unknown order" << endl;
-            exit(0);
+            B2FATAL("Unknown order");
           }
         }
       };
@@ -210,14 +216,14 @@ namespace Belle2 {
     /** Get mean value */
     double getMean()
     {
-      assert(vars.size() >= 1);
+      B2ASSERT("Must be at least one replica", vars.size() >= 1);
       return accumulate(vars.begin(), vars.end(), 0.) / vars.size();
     }
 
     /** Get standard deviation */
     double getSigma()
     {
-      assert(vars.size() >= 1);
+      B2ASSERT("Must be at least one replica", vars.size() >= 1);
       double m = getMean();
       double s = 0;
       for (auto x : vars)
@@ -225,13 +231,13 @@ namespace Belle2 {
       if (vars.size() > 1)
         return sqrt(s / (vars.size() - 1));
       else
-        return 0;
+        return 0; //dummy unc. for single replica
     }
 
     /** Get quantile (v=0.5 -> median, v=0.16,v=0.84 68% confidence interval) */
     double getLimit(double v)
     {
-      assert(vars.size() >= 1);
+      B2ASSERT("Must be at least one replica", vars.size() >= 1);
       double indx = (vars.size() - 1) * v;
       sort(vars.begin(), vars.end());
       int I  = indx;
@@ -242,9 +248,9 @@ namespace Belle2 {
     /** Print variable of name n with stat-info */
     void printStat(TString n)
     {
-      assert(vars.size() >= 1);
-      cout << n << " : " <<  getMean() << "+-" << getSigma() << " : " << getLimit(0.50) << " (" << getLimit(0.16) << " , " << getLimit(
-             1 - 0.16) << " )" << endl;
+      B2ASSERT("Must be at least one replica", vars.size() >= 1);
+      B2INFO(n << " : " <<  getMean() << "+-" << getSigma() << " : " << getLimit(0.50) << " (" << getLimit(0.16) << " , " << getLimit(
+               1 - 0.16) << " )");
     }
 
     /** Get basic stats */
@@ -273,15 +279,13 @@ namespace Belle2 {
     double D = pow(A, 2) - 4 * B;
 
     if (D < 0) {
-      cout << "Problem with D" << D << endl;
-      exit(1);
+      B2FATAL("Problem with D value : " << D);
     }
 
     double Size2Min = 2 * B / (A + sqrt(D));
     if (abs(Size2Min) < 1e-7) Size2Min = 0;
     if (Size2Min < 0) {
-      cout << "Negative size" << endl;
-      exit(1);
+      B2FATAL("Negative BS eigen size : " << Size2Min);
     }
     double Size2Max = (A + sqrt(D)) / 2;
     return {sqrtS(Size2Min), sqrtS(Size2Max)};
@@ -296,8 +300,7 @@ namespace Belle2 {
     double D = pow(A, 2) - 4 * B;
 
     if (D < 0) {
-      cout << "Problem with D" << D << endl;
-      exit(1);
+      B2FATAL("Problem with D value : " << D);
     }
 
     double Size2Min = 2 * B / (A + sqrt(D));
@@ -749,10 +752,7 @@ namespace Belle2 {
   TVectorD linearFitPos(TMatrixD mat, TVectorD r)
   {
     const double s2MinLimit = pow(0.05, 2); //Minimal value of the BeamSpot eigenSize
-    if (mat.GetNcols() != 3) {
-      cout << "Wrong size of matrix for size fit" << endl;
-      exit(0);
-    }
+    B2ASSERT("Matrix size for size fit shoud be 3", mat.GetNcols() == 3);
     TMatrixD matT = mat; matT.T();
     TMatrixD A = matT * mat;
     TVectorD v = matT * r;
@@ -773,7 +773,6 @@ namespace Belle2 {
     //Calculate average error
     double err2 = (mat * pars - r).Norm2Sqr() / nDf;
 
-    //cout << "err2 " << sqrt(err2) << endl;
     TMatrixD wMat = Ainv * matT;
     TMatrixD wMatT = wMat; wMatT.T();
 
@@ -933,7 +932,7 @@ namespace Belle2 {
 
     f->Draw("same");
 
-    cout << "Saving " << fName << " prof " << endl;
+    B2INFO("Saving " << fName << " prof ");
     d->SaveAs(fName + "_prof.pdf");
 
 
@@ -958,7 +957,7 @@ namespace Belle2 {
     f->SetParameters(0, 0);
     f->Draw("same");
 
-    cout << "Saving " << fName << " profRes " << endl;
+    B2INFO("Saving " << fName << " profRes ");
     e->SaveAs(fName + "_profRes.pdf");
 
   }
@@ -1177,7 +1176,7 @@ namespace Belle2 {
     TF1* f = new TF1(rn(), "[0]*x", -1, 1);
     f->SetParameter(0, (par.x.val(1) - par.x.val(0)));
     f->Draw("same");
-    cout << "Table value " << par.x.val(1) - par.x.val(0) << endl;
+    B2INFO("Table value " << par.x.val(1) - par.x.val(0));
 
     cX->SaveAs(fName + "_tX.pdf");
 
@@ -1234,7 +1233,7 @@ namespace Belle2 {
       nRem += !e.isSig;
       ++nAll;
     }
-    //cout << "Removed fraction Position " << nRem / (nAll + 0.) << endl;
+    B2INFO("Removed fraction Position " << nRem / (nAll + 0.));
   }
 
 
@@ -1253,7 +1252,7 @@ namespace Belle2 {
       nRem += !e.isSig;
       ++nAll;
     }
-    //cout << "Removed fraction Position " << nRem / (nAll + 0.) << endl;
+    B2INFO("Removed fraction Position " << nRem / (nAll + 0.));
   }
 
 
@@ -1501,10 +1500,7 @@ namespace Belle2 {
 
     vector<double> pars(A.GetNcols()), err2(A.GetNcols());
     double err2Mean, err2press, err2pressErr;
-    //cout << "Starting linear fit ev : "  << dataVec.size()  << endl;
     tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
-    //cout << "Mean err xyfit " << fixed << setprecision(3) << err2Mean << " : " << err2press << " " << err2pressErr << " :  " <<
-    //err2press - err2Mean << endl;
 
     for (auto& e : err2) e = sqrt(e);
     return SpotParam(pars, err2, {splX, splY});
@@ -1575,7 +1571,6 @@ namespace Belle2 {
     vector<double> pars(A.GetNcols()), err2(A.GetNcols());
     double err2Mean, err2press, err2pressErr;
     tie(pars, err2) = linearFitErr(A, vData, err2Mean, err2press, err2pressErr);
-    //cout << "Mean err zfit " << sqrt(err2Mean) << endl;
 
     for (auto& e : err2) e = sqrt(e);
 
@@ -1658,8 +1653,8 @@ namespace Belle2 {
     gStyle->SetOptStat(2210);
     TCanvas* c = new TCanvas(rn(), "");
     hPull->Draw();
-    cout << "zSizeFit mean " << hPull->GetMean() << endl;
-    cout << "zSizeFit rms " << hPull->GetRMS() << endl;
+    B2INFO("zSizeFit mean " << hPull->GetMean());
+    B2INFO("zSizeFit rms " << hPull->GetRMS());
 
     c->SaveAs("pullsZSize.pdf");
   }
@@ -1830,7 +1825,7 @@ namespace Belle2 {
       nRem += !e.isSig;
       ++nAll;
     }
-    //cout << "Removed fraction Size " << nRem / (nAll + 0.) << endl;
+    B2INFO("Removed fraction Size " << nRem / (nAll + 0.));
   }
 
 
@@ -1855,7 +1850,7 @@ namespace Belle2 {
       nRem += !e.isSig;
       ++nAll;
     }
-    cout << "Removed fraction Size " << nRem / (nAll + 0.) << endl;
+    B2INFO("Removed fraction Size " << nRem / (nAll + 0.));
   }
 
 

@@ -10,16 +10,25 @@
 
 #pragma once
 
-//Hack for ROOT macros
-#undef assert
-#define assert(arg)  { if((arg) == false) {std::cout << __FILE__ <<", line "<<__LINE__ << std::endl << "" << #arg << " failed" << std::endl;   exit(0);} }
-
 #include <vector>
 #include <iostream>
 #include <cstdlib>
 #include <TMatrixD.h>
 #include <TString.h>
 #include <TRandom.h>
+
+//To allows Stand-Alone running
+#if __has_include(<framework/logging/Logger.h>)
+#include <framework/logging/Logger.h>
+#else
+#ifndef B2FATAL
+#define B2FATAL(arg) { std::cout << arg << std::endl; std::exit(1);}
+#define B2ASSERT(str, cond) { if((cond) == false) {std::cout << __FILE__ <<", line "<<__LINE__ << std::endl << "" << #cond << " failed" << std::endl;   std::exit(1);} }
+#endif
+#endif
+
+
+
 
 namespace Belle2 {
 
@@ -71,7 +80,7 @@ namespace Belle2 {
   // Equidistant range between xMin and xMax for spline of the first order
   inline std::vector<double> getRangeLin(int nVals, double xMin, double xMax)
   {
-    assert(nVals >= 1);
+    B2ASSERT("At least one value in the spline required", nVals >= 1);
     if (nVals == 1) return {};
     std::vector<double> v(nVals);
     for (int i = 0; i < nVals; ++i)
@@ -82,7 +91,7 @@ namespace Belle2 {
   // Equidistant range between xMin and xMax for spline of the zero order
   inline std::vector<double> getRangeZero(int nVals, double xMin, double xMax)
   {
-    assert(nVals >= 1);
+    B2ASSERT("At least one value in the spline required", nVals >= 1);
     if (nVals == 1) return {};
     std::vector<double> v(nVals - 1);
     for (int i = 1; i < nVals; ++i)
@@ -91,7 +100,7 @@ namespace Belle2 {
   }
 
 
-  // put slice of original vecotr v[ind:ind+n] into new one
+  // put slice of original vector v[ind:ind+n] into new one
   inline std::vector<double> slice(std::vector<double> v, unsigned ind, unsigned n)
   {
     std::vector<double> vNew;
@@ -111,31 +120,29 @@ namespace Belle2 {
     else if (spl.size() == vals.size())
       order = 1;
     else {
-      std::cout << "Unknown order of spline" << std::endl;
-      std::exit(0);
+      B2FATAL("Unknown order of spline");
     }
-    assert(0 <= order && order <= 1);
+    B2ASSERT("Spline order should be zero or one", order == 0 || order == 1);
 
     if (order == 1) {
-      assert(spl.size() >= 2);
-      assert(spl.size() == vals.size());
+      B2ASSERT("Linear spline only meaningful for two or more nodes", spl.size() >= 2);
+      B2ASSERT("As nodes as values in lin. spline", spl.size() == vals.size());
 
       if (x <= spl[0]) return vals[0];
       if (x >= spl.back()) return vals.back();
 
+      // binary search for position
       int i1 = lower_bound(spl.begin(), spl.end(), x) - spl.begin() - 1;
 
       if (!(spl[i1] <= x && x <= spl[i1 + 1])) {
-        std::cout << spl[i1] << " " << x << " " << spl[i1 + 1] << std::endl;
-        std::cout << "Problem"  << std::endl;
-        exit(1);
+        B2FATAL("Wrong place founded : " <<  spl[i1] << " " << x << " " << spl[i1 + 1]);
       }
 
       // Linear interpolation between neighbouring nodes
       double v = ((spl[i1 + 1] - x) * vals[i1] + (x - spl[i1]) * vals[i1 + 1]) / (spl[i1 + 1] - spl[i1]);
       return v;
     } else if (order == 0) { //zero order polynomial
-      assert(spl.size() + 1 == vals.size());
+      B2ASSERT("#values vs #nodes in zero-order spline", spl.size() + 1 == vals.size());
       if (vals.size() == 1) {
         return vals[0];
       } else {

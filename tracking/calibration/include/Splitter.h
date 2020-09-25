@@ -12,6 +12,23 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <limits>
+
+
+//To allow Stand-Alone running
+#if __has_include(<framework/logging/Logger.h>)
+#include <framework/logging/Logger.h>
+#else
+#ifndef B2FATAL
+#define B2FATAL(arg) { std::cout << arg << std::endl; std::exit(1);}
+#define B2ASSERT(str, cond) { if((cond) == false) {std::cout << __FILE__ <<", line "<<__LINE__ << std::endl << "" << #cond << " failed" << std::endl;   std::exit(1);} }
+#endif
+#define B2INFO(arg) { std::cout << arg << std::endl;}
+#define B2WARNING(arg) { std::cout << "WARNING : "<< arg << std::endl;}
+#endif
+
+
+
 
 namespace Belle2 {
 

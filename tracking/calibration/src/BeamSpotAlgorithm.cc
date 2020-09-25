@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/calibration/BeamSpotAlgorithm.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <framework/database/EventDependency.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -18,8 +17,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include "standAloneBSalgo.h"
-#include "Splitter.h"
+#include <tracking/calibration/BeamSpotAlgorithm.h>
+#include <tracking/calibration/standAloneBSalgo.h>
+#include <tracking/calibration/Splitter.h>
 
 
 using namespace std;

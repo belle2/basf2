@@ -21,14 +21,15 @@
 #include <TStyle.h>
 #include <TAxis.h>
 
+//To allow Stand-Alone running
+#if __has_include(<framework/logging/Logger.h>)
+#include <tracking/calibration/Splitter.h>
+#else
 #include "Splitter.h"
+#endif
+
 
 using namespace std;
-
-//hack for ROOT macros
-#undef assert
-#define assert(arg)  { if((arg) == false) {cout << __FILE__ <<", line "<<__LINE__ << endl << "" << #arg << " failed" << endl;   exit(0);} }
-
 
 namespace Belle2 {
 
@@ -89,9 +90,9 @@ namespace Belle2 {
   // get the range of interval with nIntervals and breaks stored in a vector
   static pair<int, int> getStartEndIndexes(int nIntervals,  vector<int> breaks, int indx)
   {
-    assert(nIntervals >= 1); //at least one interval
-    assert(indx >= 0);
-    assert(indx < int(breaks.size()) + 1); //There is one more interval than #breaks
+    B2ASSERT("There must be at least one interval", nIntervals >= 1);
+    B2ASSERT("Interval index must be positive", indx >= 0);
+    B2ASSERT("Interval index must be smaller than #breaks", indx < int(breaks.size()) + 1); //There is one more interval than #breaks
     int s = (indx == 0) ? 0 : breaks[indx - 1] + 1;
     int e = (indx == int(breaks.size())) ? nIntervals - 1 : breaks[indx];
     return {s, e};
@@ -134,7 +135,7 @@ namespace Belle2 {
     sort(dist.begin(), dist.end());
 
     for (auto d : dist)
-      cout << d << endl;
+      B2INFO(d);
 
   }
 
@@ -274,8 +275,8 @@ namespace Belle2 {
       }
     }
 
-    assert(nFound == 1);
-    assert(rFound != ExpRun(-1, -1))
+    B2ASSERT("Exactly one interval should be found", nFound == 1);
+    B2ASSERT("Assert that something was found", rFound != ExpRun(-1, -1));
     return rFound;
   }
 

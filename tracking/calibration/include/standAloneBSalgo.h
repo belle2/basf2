@@ -15,7 +15,13 @@
 #include <TVector3.h>
 #include <TMatrixDSym.h>
 #include <TTree.h>
+
+//To allows Stand-Alone running
+#if __has_include(<framework/logging/Logger.h>)
+#include <tracking/calibration/Splitter.h>
+#else
 #include "Splitter.h"
+#endif
 
 namespace Belle2 {
 

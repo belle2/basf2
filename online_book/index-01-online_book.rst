@@ -27,9 +27,8 @@ the software by following through a series of hands-on lessons.
 
 .. warning::
 
-   If you change the version to an earlier version, some pages (also this page!)
-   might not exist. You will learn more about our software and its versions
-   (releases) `later on <onlinebook_basf2_introduction>`_.
+   If you change the version to an earlier version than the current one, some pages (also this page!)
+   might not exist.
 
 .. warning::
 

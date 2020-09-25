@@ -160,6 +160,7 @@ namespace Belle2 {
                          RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
 
     //! Get a pointer to detector buffer
+    /* cppcheck-suppress missingOverride */
     int* GetDetectorBuffer(int n, int finesse_num) OVERRIDE_CPP17;
 
     //

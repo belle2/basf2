@@ -146,7 +146,7 @@ namespace Belle2 {
                          int* detector_buf_2nd, int nwords_2nd,
                          int* detector_buf_3rd, int nwords_3rd,
                          int* detector_buf_4th, int nwords_4th,
-                         RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
+                         RawCOPPERPackerInfo rawcprpacker_info);
 
     //! Pack data for PCIe40 data-format
     /* cppcheck-suppress missingOverride */
@@ -156,6 +156,7 @@ namespace Belle2 {
                          RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
 
     //! Get a pointer to detector buffer
+    /* cppcheck-suppress missingOverride */
     int* GetDetectorBuffer(int n, int finesse_num) OVERRIDE_CPP17;
 
     // Data Format : "B2Link PCIe40 ch Header"

@@ -73,14 +73,17 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
     CompareHeaderValue(n, eve, summary_table);
 
     char err_buf[2500];
+    char err_buf_temp[2500];
     sprintf(err_buf, "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs :");
     for (int i = 0; i < summary_table.size(); i++) {
+      memcpy(err_buf_temp, err_buf, sizeof(err_buf_temp));
       sprintf(err_buf, "%s [ch= %u ,val= %u (# of chs= %u )] ",
-              err_buf,
+              err_buf_temp,
               summary_table.at(i).at(0), summary_table.at(i).at(2), summary_table.at(i).at(1));
     }
+    memcpy(err_buf_temp, err_buf, sizeof(err_buf_temp));
     sprintf(err_buf, "%s : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
-            err_buf,
+            err_buf_temp,
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
@@ -189,13 +192,16 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
                 prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
                 *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF);
 
+        char err_buf_temp[2500];
         for (int i = 0; i < summary_table.size(); i++) {
+          memcpy(err_buf_temp, err_buf, sizeof(err_buf_temp));
           sprintf(err_buf, "%s [ch= %u ,val= %u (# of chs= %u )] ",
-                  err_buf,
+                  err_buf_temp,
                   summary_table.at(i).at(0), summary_table.at(i).at(2), summary_table.at(i).at(1));
         }
+        memcpy(err_buf_temp, err_buf, sizeof(err_buf_temp));
         sprintf(err_buf, "%s Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
-                err_buf,
+                err_buf_temp,
                 GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         err_flag = 1;
@@ -575,7 +581,8 @@ int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
                                                 RawCOPPERPackerInfo rawcpr_info)
 {
   char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
+  sprintf(err_buf, "[FATAL] This function is not supported. (%u) Exiting...: \n%s %s %d\n",
+          rawcpr_info.eve_num,
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);

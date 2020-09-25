@@ -154,15 +154,19 @@ namespace Belle2 {
     int Get4thFINESSENwords(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get # of offset words for FINESSE slot A buffer position
+    /* cppcheck-suppress missingOverride */
     int GetOffset1stFINESSE(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get # of offset words for FINESSE slot B buffer position
+    /* cppcheck-suppress missingOverride */
     int GetOffset2ndFINESSE(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get # of offset words for FINESSE slot C buffer position
+    /* cppcheck-suppress missingOverride */
     int GetOffset3rdFINESSE(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //! get # of offset words for FINESSE slot D buffer position
+    /* cppcheck-suppress missingOverride */
     int GetOffset4thFINESSE(int n) OVERRIDE_CPP17 FINAL_CPP17;
 
     //
@@ -214,6 +218,7 @@ namespace Belle2 {
     int GetFINESSENwords(int n, int finesse_num) OVERRIDE_CPP17;
 
     //! Check header value of all channels
+    /* cppcheck-suppress missingOverride */
     void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
                             std::vector<std::vector< unsigned int>>& summary_table) OVERRIDE_CPP17;
 

@@ -176,6 +176,7 @@ namespace Belle2 {
     void GetTTTimeVal(int n, struct timeval* tv) OVERRIDE_CPP17;
 
     //! Get the max number of channels in a readout board
+    /* cppcheck-suppress missingOverride */
     int GetMaxNumOfCh(int n) OVERRIDE_CPP17;
 
     /// Format version number

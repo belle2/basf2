@@ -83,6 +83,71 @@ here when you are done.
 .. needed from our side: Opening ROOT files; using pandas
 
 
+
+Practising Python
+-----------------
+
+Welcome back! Now we're going to test you on your new-found knowledge in Python! We will work in a jupyter notebook, to allow you to practice using these, the only real difference between using a jupyter notebook (.ipynb) and a python file (.py) is that jupyter notebooks are interactive and allow you to see what your code does each step of the way. If you were to type all of the following code into a python file and run it, you would acheive the same output (provided you save something as output).
+
+Incase throughout your external Python training you did not actually create a python file using bash:
+
+.. admonition:: Exercise
+   :class: exercise stacked
+
+   Create a python file, import the python library numpy, and print out a phrase of your choice.
+
+.. admonition:: Hint
+   :class: xhint stacked toggle
+	
+   To create a file you'll need to use your bash skills. The internet is your friend.
+	   
+.. admonition:: Hint
+   :class: xhint stacked toggle
+
+   The specific bash command you'll need to create a new file is `touch`.
+
+.. admonition:: Hint
+   :class: xhint stacked toggle
+
+   Add the `import` command inside your python file using your favourite editor. My personal preference is an editor called emacs. The internet is a magical place on which to learn the main keyboard commands for your chosen editor.
+   
+.. admonition:: Solution
+   :class: solution toggle
+
+   .. code-block:: bash
+
+      #create your .py file and name it as you wish.
+      touch my_file.py
+      #open your file to edit it.
+      emacs -nw my_file.py #the argument `-nw` opens the editor in your terminal.
+
+   .. code-block:: python
+      #now add the lines to your file.
+      import numpy
+      print("Hello world!")
+      
+Congratulations! You've now created your first python file. Now, run it!
+
+.. admonition:: Exercise
+   :class: exercise stacked
+
+   Run your new python file in your terminal.
+
+.. admonition:: Hint
+   :class: xhint stacked toggle
+
+   You'll need to get python to run your file.
+
+.. admonition:: Solution
+   :class: solution toggle
+
+   .. code-block:: bash
+   python3 my_file.py
+
+
+
+
 .. topic:: Author of this lesson
 
-     Martin Ritter
+     Martin Ritter (Intro) & Hannah Wakeling (Exercises)
+B

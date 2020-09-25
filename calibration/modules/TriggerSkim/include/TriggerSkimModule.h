@@ -35,9 +35,9 @@ namespace Belle2 {
     /** List of triggerlines we're interested in */
     std::vector<std::string> m_triggerLines;
     /** Result we want for each or any trigger line */
-    int m_expectedResult;
+    int m_expectedResult{1};
     /** do we want each or any trigger line? */
-    std::string m_logicMode;
+    std::string m_logicMode{"or"};
     /** do we want to prescale each trigger line ? */
     std::vector<unsigned int> m_prescales;
     /** and do we want random prescale or counters ? */

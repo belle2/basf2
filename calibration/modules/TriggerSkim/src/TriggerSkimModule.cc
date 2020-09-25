@@ -42,8 +42,7 @@ TriggerSkimModule::TriggerSkimModule() : Module()
            "Each trigger line in 'triggerLines' will be tested against the 'expectedResult' parameter. "
            "The logic mode controls whether we test using 'and' or 'or' logic to get a return value. "
            "'and' means that all trigger lines must have results == expectedResult, 'or' means that only "
-           "one of the trigger lines must match the expectedResult value.",
-           string("or"));
+           "one of the trigger lines must match the expectedResult value.", m_logicMode);
   addParam("prescaleFactors", m_prescales,
            "List of prescale factors for the trigger lines. If given it needs to be a list of prescales for each trigger line",
            m_prescales);

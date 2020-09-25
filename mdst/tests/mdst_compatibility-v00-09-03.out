@@ -98,6 +98,7 @@ Untested method TRGSummary::setInputBits
 Untested method TRGSummary::setPreScale
 Untested method TRGSummary::setPsnmBits
 Untested method TRGSummary::setTRGSummary
+Untested method TRGSummary::setTimQuality
 Untested method TRGSummary::setTimType
 Untested method TRGSummary::test
 Untested method TRGSummary::testFtdl

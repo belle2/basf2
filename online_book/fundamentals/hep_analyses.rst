@@ -93,6 +93,8 @@ background.
     :math:`-150\ \textrm{MeV} < \Delta E < 150\ \textrm{MeV}`
     and reject those which don't.
 
+.. _backgrounds:
+
 Introduction: Backgrounds, backgrounds, backgrounds
 ---------------------------------------------------
 
@@ -335,19 +337,28 @@ SVD
     the
     outer radius of the vertex detector up to 140 mm.
 
+.. _vxd-description:
 VXD
     You will occasionally hear people refer to the pair of detectors: PXD+SVD
     as the VerteX Detector (VXD).
 
+.. _cdc-description:
 CDC
     The main tracking system for Belle II is the Central Drift Chamber (CDC).
-    This is comprised of *so-called* sense wires suspended in He-C₂H₆ gas.
-    Charged particles passing close to the wires cause ionisation resulting
-    in signal propagation in the wires.
-    You will hear people refer to these ionisation signals as "hits" in the
-    CDC.
-    A charged particle passing through the CDC results in a succession of hits
-    following the trajectory of the particle.
+    It is comprised of so-called sense wires suspended in He-C₂H₆ gas. Charged
+    particles passing through the gas cause ionisation charges, which then
+    drift (hence the name) to nearby sense wires, where `gas amplification
+    <https://en.wikipedia.org/wiki/Townsend_discharge>`_ causes signal
+    propagation. You will hear people refer to these ionisation signals as
+    "hits" in the CDC. A charged particle passing through the CDC results in a
+    succession of hits following the trajectory of the particle. From the
+    timing of each wire signal it is possible to infer the drift time and thus
+    the distance at which the primary ionization was caused. You can
+    approximate the resulting isochrone with a "drift circle" for each wire, to
+    which the particle trajectory must have been tangent (see
+    :numref:`fig:reconstruction-trackfinding`) . This allows for a much better point resolution
+    than the wire spacing alone might let you assume.
+
 
 TOP
     The Time Of Propagation (TOP) detector provides particle identification
@@ -788,16 +799,21 @@ reconstruction. It tries to identify trajectories of particles through the
 tracking detectors, called tracks. There are mainly two parts of tracking
 
 Track finding
-  Find patterns in the hits or hit clusters in the tracking detectors that look like
-  they could be from a particle flying through the detector.
+  Find patterns (i.e. collections of hits) in the hits or hit clusters in the
+  tracking detectors that look like they could be from a particle flying
+  through the detector.
 
 .. _fig:reconstruction-trackfinding:
-
 .. figure:: trackfinding.svg
-   :align: center
 
-   The principle of track finding is to identify the patterns in the tracking
-   detectors belonging to each particle.
+   View of a simulated event in an x-y cross-section of the :ref:`CDC
+   <cdc-description>`. The shown CDC hits originate either from charged
+   particles belonging to the event or from beam-induced :ref:`backgrounds
+   <backgrounds>`. The principle of track finding is to identify patterns of
+   hits belonging to the same particle, which are then shown in the same color
+   on the right. Hits that remain grey are rejected as background. Hits in
+   the :ref:`vertex detectors <vxd-description>` are not shown here, but help
+   with finding tracks in the CDC.
 
 Track fitting
   Determine the best estimate of the kinematic variables describing the particle

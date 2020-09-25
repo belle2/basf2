@@ -8,9 +8,9 @@ Python
 
     **External Training**: about 7 hours.
 
-    **Teaching**: 5 min
+    **Teaching**: 10 min
 
-    **Exercises**: 0 min
+    **Exercises**: 10 min
 
     **Prerequisites**:
 
@@ -19,13 +19,15 @@ Python
     **Questions**:
 
         * What are the key concepts of python?
+        * How can I define functions in python?
         * How can I process tabular data?
         * How can I plot data?
-        * How can I define functions in python?
+
 
     **Objectives**:
 
         * Get familiar with python
+        * Understand how to manipulate and plot data with `root_pandas`
 
 High Energy Physics (HEP) analyses are too complex to be done with pen, paper
 and calculator. They usually are not even suited for spreadsheet programs like
@@ -119,7 +121,7 @@ In the case that, throughout your external Python training, you did not create a
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Create a python file, import the python library 'NumPy' as `np`, and print out a phrase of your choice.
+   Create a python file, import the python library 'NumPy' as the shortcut `np`, and print out the value of pi.
 
 .. admonition:: Hint
    :class: xhint stacked toggle
@@ -145,11 +147,12 @@ In the case that, throughout your external Python training, you did not create a
       touch my_file.py
       #open your file to edit it.
       emacs -nw my_file.py #the argument `-nw` opens the editor in your terminal.
+	  #now add the python lines to your file.
+
 
    .. code-block:: python
-      #now add the lines to your file.
-      import numpy
-      print("Hello world!")
+      import numpy as np
+      print(np.pi)
       
 Congratulations! You've now created your first python file. Now, run it!
 
@@ -195,55 +198,91 @@ This section aims to answer the question "How can I process tabular data?"
 
 We will use the ``root_pandas`` package to read TTrees from ROOT files. 
 
-Now, the previous sentence may have not been familiar at all to you. If so, read on. If not, feel free to skip the next paragraph.
+Now, the previous sentence may have not been familiar to you at all. If so, read on. If not, feel free to skip the next paragraph.
 
 ROOT: a nano introduction
 ---------------------------
-ROOT files, as you'll come to be familiar with, are the main way we store our data at Belle II. Within these files are 'TTrees' known as 'trees', which are analogous to a sub-folder. For example, you may store a tree full of :math: `B` meson candidates. Within a tree you can have 'TBranches' known as 'branches'. Each branch could be one of the oodles of variables available for the particle you've stored in your tree - for example, the :math:`B` meson's invariant mass, it's daughter's momentum, it's great-great-granddaughter's cluster energy etc. etc. etc.
+ROOT files, as you'll come to be familiar with, are the main way we store our data at Belle II. Within these files are 'TTrees' known as 'trees', which are analogous to a sub-folder. For example, you may store a tree full of :math:`B` meson candidates. Within a tree you can have 'TBranches' known as 'branches'. Each branch could be one of the oodles of variables available for the particle you've stored in your tree - for example, the :math:`B` meson's invariant mass, it's daughter's momentum, it's great-great-granddaughter's cluster energy etc. etc. etc.
 
 More information:`CERN's ROOT <https://root.cern.ch/>`
 For when you need help with your root file manipulation: `CERN's ROOT Forum <https://root-forum.cern.ch/>`
 
+Jupyter Notebooks
+-----------------
+Jupyter Notebooks are interactive notebooks that allow one to visualise code, data and outputs in a linear and clear way. When you run a notebook you have an operating system called a kernel that runs the code .
+Each block in a jupyter notebook is a 'cell'. These cells can be run using the kernel by clicking the run button or by pressing `Shift + Enter`. 
+When you run a cell, the kernel will process and store any variables or dataframes you define.
+If your kernel crashes, you will have to restart it.
+
+.. admonition:: Exercise
+   :class: exercise stacked
+
+   Examine the `Cell` and `Kernel` drop down menus to see what options you have available.
+
+
+Pandas
+======
+
+Pandas provides high-performance, easy-to-use data structures and data analysis tools for Python, see `here <https://pandas.pydata.org/docs/user_guide/10min.html>`.
 
 Importing ROOT files and manipulating with Python
 -------------------------------------------------
 In this section we will learn how to import a ROOT file as a Pandas DataFrame using the ``root_pandas`` library.
 
 
-``root_pandas`` needs ROOT to be installed but there is an alternative called ``uproot`` which can root files into pandas dataframes without requiring ROOT
+``root_pandas`` needs ROOT to be installed but there is an alternative called ``uproot`` which can load root files into pandas dataframes without requiring ROOT.
 
-.. code:: ipython3
 
-	import root_pandas
+.. admonition:: Exercise
+   :class: exercise stacked
 
-Example data
-------------
+   Start a jupyter notebook and import `root_pandas`, as well as other libraries you think you'll need.
 
-In previous example notebooks the simple decay mode :math:`B^0\to \phi K_S^0`, where :math:`\phi \to K^+ K^-` and :math:`K_S^0 \to \pi^+ \pi^-` was reconstructed. Now we will use these candidates to plot example distributions. This time we use the ``root_pandas`` package to read the data.
+.. admonition:: Hint
+   :class: xhint stacked toggle
 
+   You can find some help here :ref:`onlinebook_ssh`.
+
+.. admonition:: Solution
+   :class: solution toggle
+
+	.. code:: ipython3
+		import root_pandas
+
+
+You can load in an example dataframe from: 
 .. code:: ipython3
 
 	# Loading an example data frame
 	df = root_pandas.read_root("https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root")
 
-If your files are quite large you may start to find your jupyter notebook kernel crashing - there are a few ways in which we can mitigate
-  this.
+This code imports the `pandas_tutorial_ntuple.root` root file as a dataframe `df`.
+
+If your files are quite large you may start to find your jupyter notebook kernel crashing - there are a few ways in which we can mitigate this.
 
  	-  ‘Chunk’ your data
   	-  Only import the columns (variables) that you will use/need.
 	-  Add any cuts you can
 
-To import the file it is similiar to before: ``df_chunk = root_pandas.read_root([filePath/fileName],'treeName', columns=Y4S_columns, chunksize=100000)`` where I have defined which columns I wish to be included in the following string:
+To import the file using chunking there are some slight differences in the code:  ``df_chunk = root_pandas.read_root([filePath/fileName],'treeName', columns=Y4S_columns, chunksize=100)``. Here I have defined which columns I wish to be included in the following string:
 
 .. code:: ipython3
 
 	Y4S_columns = ['B0_mbc', 'B0_M', 'B0_deltae', 'B0_isSignal']
 
+.. admonition:: Exercise
+   :class: exercise stacked
+
+   Load your dataframe as chunks.
+
+.. admonition:: Solution
+   :class: solution toggle   
+
 	.. code:: ipython3
 
-		df_chunk=root_pandas.read_root(["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"], 'Y4S', columns=Y4Sbefore_columns, chunksize=1000000)
+		df_chunk=root_pandas.read_root(["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"], 'Y4S', columns=Y4S_columns, chunksize=100000)
 
-Now the data is loaded as chunks, we run through all the chunks and piece them together. This is the point at which we can add our cuts to reduce the loaded file more.
+Now the data is loaded as chunks, we 'loop' over or run through all the chunks and piece them together. This is the point at which we can add our cuts to reduce the loaded, chunked file more.
 
 .. code:: ipython3
 
@@ -255,19 +294,23 @@ Now the data is loaded as chunks, we run through all the chunks and piece them t
 		df_list.append(chunk)
         df = pd.concat(df_list) #Concatenate our chunks into a dataframe!
 
-In jupyter notebooks you can display a DataFrame by calling it in a cell.
+As you can see in the previous snippet, we implemented a cut using the `query` function. Remember this, it will come up later!
 
-You can see the output, where each row corresponds to one candidate in our case:
+
+Investigating your DataFrame
+----------------------------
+
+In jupyter notebooks you can display a DataFrame by calling it in a cell. You can see the output, where in our case each row corresponds to one candidate:
 
 .. code:: ipython3
 
 	df
 
-	You can take a preview of the dataframe by only showing the ``head`` of the dataframe. Try using ``tail`` for the opposite effect. (Optional: You can specify the number of rows shown in the brackets).
+You can see a preview of the dataframe by only showing the ``head`` of the dataframe. Try using ``tail`` for the opposite effect. (Optional: You can specify the number of rows shown in the brackets).
 
 .. code:: ipython3
 
-	df.head()
+	df.head(5)
 
 Each DataFrame has an index (which is in our case the number of the candidates) and a set of columns:
 
@@ -293,24 +336,22 @@ A useful feature to quickly summarize your data is to use the descibe function:
 
 	df.describe()
 
+
+
 Selecting parts of your DataFrame
 ---------------------------------
 
 Selecting columns, rows or subsets of DataFrames works in similar manner as python built in objects or numpy arrays.
 
 Getting
--------
+^^^^^^^
 
-Selecting a colums can be performed by ``df['column_name']`` or ``df.column_name``. The result will be a pandas Series, a 1D vector.
-
-.. code:: ipython3
-
-	df['B0_M']
-
-using ``df.column`` allows for completion
+Selecting a column can be performed by ``df['column_name']`` or ``df.column_name``. The result will be a pandas Series, a 1D vector. The difference between the two options is that using ``df.column`` allows for auto-completion.
 
 .. code:: ipython3
 
+	df['B0_M'].describe()
+	#or
 	df.B0_M.describe()
 
 Selecting multiple columns
@@ -338,6 +379,7 @@ Similarly to arrays in python, one can select rows via ``df[i:j]``. And single r
 
 	df[2:10]
 
+
 Vectorized Operations
 ---------------------
 
@@ -349,7 +391,7 @@ This is one of the most powerful features of pandas and numpy. Operations on a S
 
 .. code:: ipython3
 
-	# Stupid example of vectorized operations
+	# Awful non-physical example of vectorized operations
 
 	import numpy as np
 
@@ -377,76 +419,23 @@ You can easily add or remove columns in the following way:
 
 	df['fancy_new_column']
 
+
+
 Modifying Columns
 -----------------
 
-Sometimes we want to change the type of a column. For example if we look at all the different values in the ``B0_isSignal`` column
+Sometimes we want to change the type of a column. For example if we look at all the different values in the ``B0_isSignal`` column by using
 
 .. code:: ipython3
 
 	df['B0_isSignal'].unique()
 
-We see that there are only two values. So it might make more sense to interpet this as a boolean value
+we see that there are only two values. So it might make more sense to interpet this as a boolean value:
 
 .. code:: ipython3
 
 	df['B0_isSignal'] = df['B0_isSignal'].astype(bool)
 	df.B0_isSignal.value_counts()
-
-Boolean Indexing
-----------------
-
-Boolean indexing will probably be the most used method to select parts of a dataframe. A boolean mask can be passed to the DataFrame like ``df[[True, False, False, ...]]``, where the result will only return rows with ``True``.
-
-.. code:: ipython3
-
-	# lets create a boolean mask:
-
-
-We can now select the DataFrame by this mask
-
-.. code:: ipython3
-
-	df[ df.B0_deltae.abs() < 0.1 ]
-
-	# or
-
-	sel = df.B0_deltae.abs() < 0.1
-
-	subset[sel].head(10)
-
-You can use python boolean arithmetic to make more complex selections. However, we have an equivalent but much faster selection than looping over the frame
-
-In the following cell we: \* create the three masks, \* then applied element wise logical operation
-
-.. code:: ipython3
-
-	sel = ((df.B0_deltae < 0) & (df.B0_mbc > 5)) | (df.B0_isSignal == 1 )
-	sel
-
-Beware: These are logical operators on arrays of truth values.
-
-Creating subsets of DataFrames
-------------------------------
-
-Many times it will be practical to create subsets of DataFrames to easily store selections.
-
-.. code:: ipython3
-
-	df2 = subset[sel]
-
-.. code:: ipython3
-
-	df2.describe()
-
-.. code:: ipython3
-
-	(len(df) - len(df2) )/ len(df)
-
-Side note
-~~~~~~~~~
-
-When creating subsets of a DataFrame, there will \ *not*\  be a hard-copy of the data in memory, the new DataFrame will only be a mask to the original one. This causes problems if you add new columns into a subset of a DataFrame, i.e.  ``df2["new"] = 42``. Only for special cases it is advised to create a hard copy of data in memory by calling ``df.copy()``.
 
 
 .. admonition:: Exercise
@@ -455,35 +444,9 @@ When creating subsets of a DataFrame, there will \ *not*\  be a hard-copy of the
 	Create two DataFrames, one for Signal and one for Background only containing ``B0_mbc``, ``B0_M`` and ``B0_deltae`` columns. Split between signal and background using the ``B0_isSignal`` column.
 
 
-Statistical Operations
-----------------------
-
-There are built-in operations on pandas objects that allow us to access statistical operations easily
-
-.. code:: ipython3
-
-	df.min()
-
-.. code:: ipython3
-
-	df.max() - df.median()
-
-Binned Statistics
------------------
-
-.. code:: ipython3
-
-	df.B0_isSignal.value_counts()
 
 
 
-.. admonition:: Exercise
-   :class: exercise stacked
-
-	Calculate the average number of candidates per event. (Use the mean and standard deviation.)
-
-
-	   
 
 
 Grouped Operations
@@ -493,16 +456,19 @@ One of the most powerful features of pandas is the ``groupby`` operation.
 
 .. code:: ipython3
 
-	subset.groupby('B0_isSignal').describe().T
+	df.groupby('B0_isSignal').describe().T
 
-	# What does the  .T do?
+.. admonition:: Exercise
+   :class: exercise stacked
+	
+	What does the  .T do?
 
 .. code:: ipython3
 
 	group = df.groupby('B0_isSignal')
 	group.size()
 
-Group by muptible columns
+Group by multiple columns
 -------------------------
 
 .. code:: ipython3
@@ -519,13 +485,11 @@ This is an excellent tool to monitor statistical quantities across categories, i
 .. admonition:: Exercise
    :class: exercise stacked
 
-	Do a best candidate selection on min(abs(B0_deltae))
+   Create your own groupby() DataFrame and use the internet to find a way to rank your candidates.
 
 .. code:: ipython3
 
 	# create groupby
-
-.. code:: ipython3
 
 	# use group.column.rank(...)
 
@@ -545,8 +509,7 @@ This is an excellent tool to monitor statistical quantities across categories, i
 A short introduction to plotting in python
 ==========================================
 
-In this short tutorial we want to demonstrate the ``matplotlib`` package
-used to plot in python.
+In this section we will answer 'How can I plot data?' and demonstrate the ``matplotlib`` package used to plot in python.
 
 .. code:: ipython3
 
@@ -556,11 +519,7 @@ used to plot in python.
 Example data
 ------------
 
-In previous example notebooks the simple decay mode
-:math:`B^0\to \phi K_S^0`, where :math:`\phi \to K^+ K^-` and
-:math:`K_S^0 \to \pi^+ \pi^-` was reconstructed. Now we will use these
-candidates to plot example distributions. This time we use the
-``root_pandas`` package to read the data
+In previous example notebooks the simple decay mode :math:`B^0\to \phi K_S^0`, where :math:`\phi \to K^+ K^-` and :math:`K_S^0 \to \pi^+ \pi^-` was reconstructed. Now we will use these candidates to plot example distributions. This time we use the ``root_pandas`` package to read the data
 
 .. code:: ipython3
 
@@ -595,9 +554,7 @@ The following cells show how to implement it.
 Using Matplotlib
 ----------------
 
-Matplotlib however is a much more developed plotting tool that functions
-well with juptyer notebooks, so this is what this tutorial will focus
-on. You can compare the differences between the syntax below.
+Matplotlib however is a much more developed plotting tool that functions well with juptyer notebooks, so this is what this tutorial will focus on. You can compare the differences between the syntax below.
 
 .. code:: ipython3
 
@@ -611,10 +568,7 @@ on. You can compare the differences between the syntax below.
 Making your plots pretty
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Let’s face it, physicists aren’t well known for their amazing graphical
-representations, but here’s our chance to shine! We can implement
-matplotlib functions to make our plots GREAT. You can even choose a
-colourblind friendly colour scheme!
+Let’s face it, physicists aren’t well known for their amazing graphical representations, but here’s our chance to shine! We can implement matplotlib functions to make our plots GREAT. You can even choose a colourblind friendly colour scheme!
 
 You can have subplots:
 
@@ -636,8 +590,7 @@ You can have subplots:
     axes.set_xlim(5.2, 5.3)
     fig.tight_layout()
 
-The implementation of 2D histrograms are often very useful and are
-easily done:
+The implementation of 2D histrograms are often very useful and are easily done:
 
 .. code:: ipython3
 
@@ -648,8 +601,7 @@ easily done:
     plt.ylabel(r"$M(\phi)$")
     plt.savefig("2dplot.pdf")
 
-Matplotlib now understands data frames so in almost all cases you can
-just name the columns and supply the dataframe as ``data=`` argument
+Matplotlib now understands data frames so in almost all cases you can just name the columns and supply the dataframe as ``data=`` argument
 
 .. code:: ipython3
 
@@ -659,20 +611,16 @@ just name the columns and supply the dataframe as ``data=`` argument
 
 
 
-Task:
------
+.. admonition:: Exercise
+   :class: exercise stacked
 
-Write a function to automatically plot a column in the DataFrame for
-signal and background. Loop over all columns and produce all plots.
-
+	Write a function to automatically plot a column in the DataFrame for signal and background. Loop over all columns and produce all plots.
 
 
 
 
 
 
-How can I define functions in python?
--------------------------------------
 
 
 

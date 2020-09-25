@@ -1,7 +1,8 @@
 .. _onlinebook_git:
 
-Version Control with Git
-========================
+==========================
+ Version Control with Git
+==========================
 
 .. sidebar:: Overview
     :class: overview
@@ -83,7 +84,7 @@ Afterwards we can quickly go to the Belle II specific things you might need to
 be aware of.
 
 Belle II Specifics
-------------------
+==================
 
 In Belle II we use Bitbucket Server by Atlassian for our git repositories. While
 this is rather similar to github in some regards. It is strongly advised to use
@@ -108,7 +109,7 @@ We also have a `confluence page <https://confluence.desy.de/x/2o4iAg>`_ with
 more information and help in case of problems.
 
 Exercises
----------
+=========
 
 Let's test what you learned so far!
 
@@ -173,7 +174,7 @@ cannot just push changes there directly. Instead, you have to open a pull reques
 For this concept you need to complete the next section.
 
 Branches (intermediate)
------------------------
+=======================
 
 By now you should have a good feeling about why git is needed and start to feel
 a bit more comfortable with basic ``git`` commands.

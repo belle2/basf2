@@ -1,5 +1,5 @@
-from basf2 import *
-set_log_level(LogLevel.INFO)
+import basf2
+basf2.set_log_level(basf2.LogLevel.INFO)
 
 import os
 import sys
@@ -13,15 +13,12 @@ from caf.framework import Calibration, CAF, Collection, LocalDatabase, CentralDa
 from caf import backends
 from caf import strategies
 
-import rawdata as raw
-import reconstruction as reco
 import modularAnalysis as ana
-import vertex as vx
 
 
 def BeamSpotCalibration(files, tags):
 
-    path = create_path()
+    path = basf2.create_path()
 
     path.add_module('Progress')
 
@@ -33,7 +30,7 @@ def BeamSpotCalibration(files, tags):
     ana.fillParticleList('mu+:BS', muSelection, path=path)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=path)
 
-    collector = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
+    collector = basf2.register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm = BeamSpotAlgorithm()
 
     calibration = Calibration('BeamSpot',

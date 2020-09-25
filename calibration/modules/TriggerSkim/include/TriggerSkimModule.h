@@ -9,12 +9,13 @@
  **************************************************************************/
 #pragma once
 
-#include <string>
-
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
-
 #include <framework/core/Module.h>
+
+#include <string>
+#include <map>
+#include <boost/variant.hpp>
 
 namespace Belle2 {
   /// Returns the calibration result from SoftwareTriigerResult for skimming out calibration flagged events
@@ -30,16 +31,15 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+    bool checkTrigger(const std::string& name, unsigned int prescale = 1, uint32_t* counter = nullptr) const;
     /** Required input for trigger results */
     StoreObjPtr<SoftwareTriggerResult> m_trigResults;
-    /** List of triggerlines we're interested in */
-    std::vector<std::string> m_triggerLines;
+    /** List of triggerlines we're interested in. Or Optional a map of trigger lines and their prescale values */
+    std::vector<boost::variant<std::string, std::tuple<std::string, unsigned int>>> m_triggerLines;
     /** Result we want for each or any trigger line */
     int m_expectedResult{1};
     /** do we want each or any trigger line? */
     std::string m_logicMode{"or"};
-    /** do we want to prescale each trigger line ? */
-    std::vector<unsigned int> m_prescales;
     /** and do we want random prescale or counters ? */
     bool m_useRandomNumbersForPreScale{true};
     /** if we don't use random prescale we need counters */

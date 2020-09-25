@@ -156,6 +156,8 @@ def getSeedTrackFitResult(reco_track):
     b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
+    # the value 65535 corresponds to 0xFFFF, which will cause TrackFitResult::getNDF to return -1
+    ndf = 65535
 
     track_fit_result = Belle2.TrackFitResult(
         position,
@@ -167,6 +169,7 @@ def getSeedTrackFitResult(reco_track):
         b_field,
         cdc_hit_pattern,
         svd_hit_pattern,
+        ndf
     )
 
     return track_fit_result

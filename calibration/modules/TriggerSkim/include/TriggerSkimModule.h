@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: David Dossett                                                   *
+ * Contributors: David Dossett                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -30,13 +30,19 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
-
-    StoreObjPtr<SoftwareTriggerResult> m_trigResults; /**< Required input for trigger results */
-
+    /** Required input for trigger results */
+    StoreObjPtr<SoftwareTriggerResult> m_trigResults;
+    /** List of triggerlines we're interested in */
     std::vector<std::string> m_triggerLines;
-
+    /** Result we want for each or any trigger line */
     int m_expectedResult;
-
+    /** do we want each or any trigger line? */
     std::string m_logicMode;
+    /** do we want to prescale each trigger line ? */
+    std::vector<unsigned int> m_prescales;
+    /** and do we want random prescale or counters ? */
+    bool m_useRandomNumbersForPReScale{true};
+    /** if we don't use random prescale we need counters */
+    std::vector<uint32_t> m_prescaleCounters;
   };
 }

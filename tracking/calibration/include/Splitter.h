@@ -44,7 +44,7 @@ namespace Belle2 {
   inline bool operator!=(ExpRun a, ExpRun b) { return (a.exp != b.exp || a.run != b.run); }
 
   /** less than for ExpRun */
-  inline bool operator<(ExpRun a, ExpRun b) {return (1e6 * a.exp + a.run) < (1e6 * b.exp + b.run);}
+  inline bool operator<(ExpRun a, ExpRun b) {return ((a.exp < b.exp) || (a.exp == b.exp && a.run < b.run));}
 
   /** filter events to remove runs shorter than cut, it stores removed runs in runsRemoved */
   std::map<ExpRun, std::pair<double, double>> filter(const std::map<ExpRun, std::pair<double, double>>& runs, double cut,

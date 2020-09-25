@@ -1,6 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging
+from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
+from tracking.run.event_generation import StandardEventGenerationRun
+import tracking.metamodules as metamodules
+import tracking.harvest.refiners as refiners
+import tracking.harvest.harvesting as harvesting
+from tracking.validation.plot import ValidationPlot
+from tracking.validation.utilities import prob, is_primary
+from tracking.utilities import NonstrictChoices
+from ROOT import std
+from ROOT import Belle2  # make Belle2 namespace available
 import os
 import sys
 import numpy as np
@@ -10,22 +21,6 @@ import basf2
 from ROOT import gSystem
 gSystem.Load('libtracking')
 gSystem.Load('libtrackFindingCDC')
-
-from ROOT import Belle2  # make Belle2 namespace available
-from ROOT import std
-
-from tracking.utilities import NonstrictChoices
-from tracking.validation.utilities import prob, is_primary
-from tracking.validation.plot import ValidationPlot
-
-import tracking.harvest.harvesting as harvesting
-import tracking.harvest.refiners as refiners
-import tracking.metamodules as metamodules
-
-from tracking.run.event_generation import StandardEventGenerationRun
-from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
-
-import logging
 
 
 def get_logger():

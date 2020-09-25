@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>DstToD0Pi_D0ToHpJm.dst.root</output>
+  <output>../DstToD0Pi_D0ToHpJm.dst.root</output>
   <contact>gonggd@mail.ustc.edu.cn</contact>
 </header>
 """

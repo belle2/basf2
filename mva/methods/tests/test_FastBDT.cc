@@ -211,6 +211,7 @@ namespace {
     },
     {}, {0.0, 1.0, 0.0, 1.0, 0.0, 1.0});
 
+    // cppcheck-suppress unreadVariable
     auto expert = interface.getExpert();
 
 #if FastBDT_VERSION_MAJOR >= 3

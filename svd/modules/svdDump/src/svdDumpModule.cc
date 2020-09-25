@@ -65,7 +65,7 @@ void svdDumpModule::terminate()
   B2INFO("svdDumpModule: terminate() is called.");
 
   m_outputFile->close();
-  delete m_outputFile; m_outputFile = NULL;
+  delete m_outputFile; m_outputFile = nullptr;
 
   return;
 }

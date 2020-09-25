@@ -90,6 +90,10 @@ unsigned int RawFTSWFormat::GetFrameCount(int n)
   return -1;
 }
 
+// The parameter n is unused: let's disable the compiler warning for this function.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 void RawFTSWFormat::GetPCTimeVal(int n, struct timeval* tv)
 {
   // According to Nakao-san's comment at DAQ meeting on Feb.28, 2020. If one calls this function for older data, just returning 0 values is fine.
@@ -98,5 +102,6 @@ void RawFTSWFormat::GetPCTimeVal(int n, struct timeval* tv)
   tv->tv_usec = 0;
 
   return;
-
 }
+
+#pragma GCC diagnostic pop

@@ -28,7 +28,7 @@ localDB = argvs[2]
 # Determine experiment number from the path name
 try:
     expNo = int((pathToFiles.split('/e')[-1]).split('/')[0])
-except:
+except BaseException:
     B2ERROR("Cannot determine experiment number from path name: " + pathToFiles)
     sys.exit()
 
@@ -50,7 +50,7 @@ for fileName in allFileNames:
         runFirst.append(runNum + 1)
         runLast.append(runNum)
         fileNames.append(fileName)
-    except:
+    except BaseException:
         B2WARNING(fileName +
                   ': cannot determine last run number from file name, file skipped.')
         continue

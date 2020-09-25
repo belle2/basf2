@@ -1,5 +1,4 @@
 import basf2
-basf2.set_log_level(basf2.LogLevel.INFO)
 
 import os
 import sys
@@ -14,6 +13,8 @@ from caf import backends
 from caf import strategies
 
 import modularAnalysis as ana
+
+basf2.set_log_level(basf2.LogLevel.INFO)
 
 
 def BeamSpotCalibration(files, tags):

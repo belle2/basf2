@@ -34,7 +34,7 @@ REG_MODULE(MCTrackCandClassifier)
 
 /// Implementation
 MCTrackCandClassifierModule::MCTrackCandClassifierModule() : Module()
-  , m_rootFilePtr(NULL)
+  , m_rootFilePtr(nullptr)
 {
   //Set module properties
   setDescription("This module is meant to classify the MCTrackCands as either ideal, fine and nasty");
@@ -516,7 +516,7 @@ void MCTrackCandClassifierModule::terminate()
   addEfficiencyPlots(m_histoList);
   addInefficiencyPlots(m_histoList);
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TIter nextH(m_histoList);
@@ -754,7 +754,7 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
     the_other1 = hden->GetXaxis();
     the_other2 = hden->GetYaxis();
   } else
-    return NULL;
+    return nullptr;
 
 
   TH1F* h;

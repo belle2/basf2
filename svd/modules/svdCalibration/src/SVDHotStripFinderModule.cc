@@ -178,11 +178,11 @@ void SVDHotStripFinderModule::endRun()
 
   if (!m_useHSFinderV1) {
 
-    TDirectory* oldDir = NULL;
-    TDirectory* dir_occuL[4] = {NULL, NULL, NULL, NULL};
+    TDirectory* oldDir = nullptr;
+    TDirectory* dir_occuL[4] = {nullptr, nullptr, nullptr, nullptr};
 
     //prepare ROOT FILE
-    if (m_rootFilePtr != NULL) {
+    if (m_rootFilePtr != nullptr) {
       m_rootFilePtr->cd();
       oldDir = gDirectory;
       dir_occuL[0] = oldDir->mkdir("layer3");
@@ -290,7 +290,7 @@ void SVDHotStripFinderModule::endRun()
             for (int s = 0; s < hm_hot_strips->getHistogram(*itSvdSensors, k)->GetEntries(); s++)
               m_hHotStripsSummary->fill(*itSvdSensors, k, 1);
 
-            if (m_rootFilePtr != NULL) {
+            if (m_rootFilePtr != nullptr) {
               dir_occuL[layer - 3]->cd();
               hm_occupancy->getHistogram(*itSvdSensors, k)->Write();
               hm_hot_strips->getHistogram(*itSvdSensors, k)->SetLineColor(kBlack);
@@ -323,7 +323,7 @@ void SVDHotStripFinderModule::endRun()
       ++itSvdLayers;
     }
 
-    if (m_rootFilePtr != NULL) {
+    if (m_rootFilePtr != nullptr) {
       oldDir->cd();
       m_hHotStripsSummary->getHistogram(0)->Write();
       m_hHotStripsSummary->getHistogram(1)->Write();
@@ -350,12 +350,12 @@ void SVDHotStripFinderModule::endRun()
 void SVDHotStripFinderModule::terminate()
 {
   if (m_useHSFinderV1) {
-    TDirectory* oldDir = NULL;
+    TDirectory* oldDir = nullptr;
 
-    TDirectory* dir_occuL[4] = {NULL, NULL, NULL, NULL};
+    TDirectory* dir_occuL[4] = {nullptr, nullptr, nullptr, nullptr};
 
     //prepare ROOT FILE
-    if (m_rootFilePtr != NULL) {
+    if (m_rootFilePtr != nullptr) {
       m_rootFilePtr->cd();
       oldDir = gDirectory;
       dir_occuL[0] = oldDir->mkdir("layer3");
@@ -516,7 +516,7 @@ void SVDHotStripFinderModule::terminate()
               }
             }
 
-            if (m_rootFilePtr != NULL) {
+            if (m_rootFilePtr != nullptr) {
               hm_occupancy->getHistogram(*itSvdSensors, k)->Scale(1.0 / (double)nevents);
 
               dir_occuL[i]->cd();
@@ -566,7 +566,7 @@ void SVDHotStripFinderModule::terminate()
 
     }
 
-    if (m_rootFilePtr != NULL) {
+    if (m_rootFilePtr != nullptr) {
       oldDir->cd();
 
       m_hHotStripsSummary->getHistogram(0)->Write();

@@ -94,6 +94,7 @@ namespace Belle2 {
 
     B2INFO("[RestOfEventPrinterModule] END ------------------------------------------");
   }
+
   void RestOfEventPrinterModule::printMaskParticles(const std::vector<const Particle*>& maskParticles) const
   {
     for (auto* particle : maskParticles) {

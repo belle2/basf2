@@ -9,8 +9,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLTRIG_H
-#define ECLTRIG_H
+#pragma once
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -123,4 +122,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

@@ -8,15 +8,17 @@ __authors__ = [
     "Michael De Nuccio",
     "Ilya Komarov",
     "Giacomo De Pietro",
-    "Miho Wakai"
+    "Miho Wakai",
+    "Savino Longo"
 ]
 
 
 import basf2 as b2
-import pdg
 import modularAnalysis as ma
+import pdg
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
-
+from stdCharged import stdE, stdMu
+from stdPhotons import stdPhotons
 
 __liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
 
@@ -34,11 +36,8 @@ class SinglePhotonDark(BaseSkim):
     __description__ = "Single photon skim list for the dark photon analysis."
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         # no good tracks in the event
@@ -74,8 +73,6 @@ class ALP3Gamma(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
-
-    RequiredStandardLists = None
 
     def addALPToPDG(self):
         """Adds the ALP codes to the basf2 pdg instance """
@@ -153,11 +150,8 @@ class DimuonPlusMissingEnergy(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdMu": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         dimuon_list = []
@@ -192,12 +186,9 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-            "stdMu": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         """
@@ -235,11 +226,9 @@ class LFVZpVisible(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all", "loose"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdE("loose", path=path)
 
     def build_lists(self, path):
         """
@@ -292,14 +281,9 @@ class EGammaControlDark(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector, control-channel"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-        "stdCharged": {
-            "stdE": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        stdE("all", path=path)
 
     def build_lists(self, path):
 
@@ -362,11 +346,8 @@ class GammaGammaControlKLMDark(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector, control-channel"
 
-    RequiredStandardLists = {
-        "stdPhotons": {
-            "stdPhotons": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
 
     TestFiles = [get_test_file("MC13_ggBGx1")]
 
@@ -452,11 +433,8 @@ class DielectronPlusMissingEnergy(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
 
-    RequiredStandardLists = {
-        "stdCharged": {
-            "stdE": ["all"],
-        },
-    }
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
 
     TestFiles = [get_test_file("MC13_mumuBGx1")]
 
@@ -483,3 +461,49 @@ class DielectronPlusMissingEnergy(BaseSkim):
         # And return the dielectron list
         dielectron_list.append(dielectron_name)
         self.SkimLists = dielectron_list
+
+
+@fancy_skim_header
+class InelasticDarkMatter(BaseSkim):
+    """
+    Skim list contains events with no tracks from IP, no high E tracks and only one high E photon.
+    """
+    __authors__ = ["Savino Longo"]
+    __contact__ = __liaison__
+    __description__ = "iDM list for the iDM analysis."
+    __category__ = "physics, dark sector"
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+
+        IPtrack = 'abs(dr) < 0.05'  # cm
+        HighEtrack = 'useCMSFrame(p)>3.0'  # GeV
+        ma.cutAndCopyList("e+:TrackFromIP", "e+:all", IPtrack, path=path)
+        ma.cutAndCopyList("e+:HighEnergyTrack", "e+:all", HighEtrack, path=path)
+
+        signalPhoton = "[clusterReg==2 and useCMSFrame(E) > 1.0] or "
+        signalPhoton += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
+        signalPhoton += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
+        signalPhoton += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
+        signalPhoton += "[clusterReg == 13 and useCMSFrame(E) > 2.0] "     # between bwd and barrel
+
+        photonVetoHE1 = 'useCMSFrame(p) > 0.6'
+        photonVetoHE3 = 'p>0.5'
+
+        ma.cutAndCopyList("gamma:ISR", "gamma:all", signalPhoton, path=path)
+        ma.cutAndCopyList("gamma:HighEnergyPhotons", "gamma:all", photonVetoHE1, path=path)
+        ma.cutAndCopyList("gamma:MediumEnergyPhotons", "gamma:all", photonVetoHE3, path=path)
+
+        idmEventCuts = ('nParticlesInList(gamma:ISR)==1 and '
+                        'nParticlesInList(e+:TrackFromIP)==0 and '
+                        'nParticlesInList(e+:HighEnergyTrack) == 0 and '
+                        'nParticlesInList(gamma:HighEnergyPhotons) == 1 and '
+                        'nParticlesInList(gamma:MediumEnergyPhotons) < 4 and '
+                        'HighLevelTrigger == 1')
+
+        path = self.skim_event_cuts(idmEventCuts, path=path)
+
+        self.SkimLists = ["gamma:all", 'e-:all']

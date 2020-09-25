@@ -137,7 +137,7 @@ bool ParticleGun::generateEvent(MCParticleGraph& graph)
   }
 
   //Make list of particles
-  double firstMomentum = 0.0;
+  double firstMomentum;
   for (int i = 0; i < nTracks; ++i) {
     MCParticleGraph::GraphParticle& p = graph.addParticle();
     p.setStatus(MCParticle::c_PrimaryParticle);

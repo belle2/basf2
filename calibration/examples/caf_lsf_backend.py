@@ -6,9 +6,6 @@
 # Not all of the configuration is strictly necessary, it's just to show some options
 
 from basf2 import *
-set_log_level(LogLevel.INFO)
-# set_log_level(LogLevel.DEBUG)
-# set_debug_level(29)
 
 import os
 import sys
@@ -17,6 +14,8 @@ import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
+
+set_log_level(LogLevel.INFO)
 
 
 def main(argv):
@@ -65,10 +64,10 @@ def main(argv):
         # Since we're using the LSF batch system we'll up the heartbeat from the default to query for when the jobs are all finished
         # No point spamming it
         cal_test.heartbeat = 15
-        # The interval in seconds between full updates of the remaining collector jobs, default = 300
+        # The interval in seconds between full updates of the remaining collector jobs, default = 30
         # Checking every subjob can be a long process when you have a lot of them so it's best not to do it too often
         # After this interval the finished/remaining collector jobs will be printed
-        cal_test.collector_full_update_interval = 60
+        cal_test.collector_full_update_interval = 30
         # Choosing an AlgorithmStrategy for each algorithm (here we just use the same for all of them)
         cal_test.strategies = SequentialRunByRun
         # The collector output file patterns you want to make sure are tracked by the CAF. By default only CollectorOutput.root
@@ -83,7 +82,7 @@ def main(argv):
     # Add in our list of calibrations
     for cal in calibrations:
         cal_fw.add_calibration(cal)
-    # Use the default LSF backend setup, can view the default options in calibration/data/backends.cfg
+
     cal_fw.backend = backends.LSF()
     # Start running
     cal_fw.run()

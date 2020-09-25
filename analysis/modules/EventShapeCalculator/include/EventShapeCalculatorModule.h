@@ -14,6 +14,10 @@
 
 #include <framework/core/Module.h>
 
+#include <analysis/dataobjects/EventShapeContainer.h>
+
+#include <framework/datastore/StoreObjPtr.h>
+
 namespace Belle2 {
   /**
    * Module to compute event shape variables starting from three lists of particle objects (tracks, gammas, Klongs).
@@ -58,6 +62,8 @@ namespace Belle2 {
 
 
   private:
+
+    StoreObjPtr<EventShapeContainer> m_eventShapeContainer; /**< event shape container object pointer */
 
     std::vector<std::string> m_particleListNames;  /**< Names of the ParticleLists (inputs). */
     std::vector<TLorentzVector> m_p4List; /**< vector containing all the 4-momenta of the particles contained in the input lists. */

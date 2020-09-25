@@ -73,9 +73,9 @@ void PXDEventPlotModule::event()
   unsigned int evtNr = m_eventMetaData->getEvent();
   unsigned int evtRun = m_eventMetaData->getRun();
 
-  for (auto h : m_histos) {
-    if (h.second) h.second->Reset();
-  }
+  for (auto h : m_histos) if (h.second) h.second->Reset();
+  for (auto h : m_histos_gm) if (h.second) h.second->Reset();
+  for (auto h : m_histos_gm2) if (h.second) h.second->Reset();
 
   std::map <VxdID, bool> cm_map;
   bool cm_flag = false;
@@ -235,8 +235,7 @@ void PXDEventPlotModule::event()
     m_c->Print((canvasname + "_gm.png").data());
     m_c->Print((canvasname + "_gm.pdf").data());
     m_c->Print((canvasname + "_gm.root").data());
-  }
-  if (m_gateModeFlag) {
+
     m_c->Clear();
     m_c->Divide(4, 5);
     m_c->cd(0);
@@ -248,7 +247,7 @@ void PXDEventPlotModule::event()
       m_c->SetFrameBorderSize(4);
       m_c->SetFrameBorderMode(4);
     }
-    int i = 1;
+    i = 1;
 
     for (auto h : m_histos_gm2) {
       m_c->cd(i++);

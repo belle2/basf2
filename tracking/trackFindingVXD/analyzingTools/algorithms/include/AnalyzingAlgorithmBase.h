@@ -31,7 +31,7 @@ namespace Belle2 {
 
     /** minimal struct for keeping track which tc is which */
     struct TcPair {
-      /** standard constructor sets NULL-ptrs. */
+      /** standard constructor sets nullptr-ptrs. */
       TcPair() : refTC(nullptr), testTC(nullptr) {}
 
       /** constructor sets valid values */
@@ -88,7 +88,7 @@ namespace Belle2 {
       if (m_storeRefTCDataForTestTC == false) { return aTC; }
 
       // handle cases when attached reference TC has to be used instead of own data:
-      if (aTC.assignedTC != NULL) { return *aTC.assignedTC; }
+      if (aTC.assignedTC != nullptr) { return *aTC.assignedTC; }
 
       throw AnalyzingAlgorithmBase::No_refTC_Attached();
     }
@@ -98,7 +98,7 @@ namespace Belle2 {
     virtual const TcPair chooseCorrectPairOfTCs(const TCInfoType& aTC) const
     {
       // capture bad case, where second TC is missing:
-      if (aTC.assignedTC == NULL) { throw AnalyzingAlgorithmBase::No_refTC_Attached(); }
+      if (aTC.assignedTC == nullptr) { throw AnalyzingAlgorithmBase::No_refTC_Attached(); }
 
       if (aTC.tcType == TCType::Reference or aTC.tcType == TCType::Lost) {
         return TcPair(aTC, *aTC.assignedTC);

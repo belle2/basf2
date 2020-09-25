@@ -20,10 +20,10 @@
 """
 
 import ROOT
-ROOT.gROOT.SetBatch(ROOT.kTRUE)
+ROOT.gROOT.SetBatch(ROOT.kTRUE)  # noqa
 
 from ROOT import TFile, TChain, TH1F, TH2F, TNamed, gStyle, PyConfig
-PyConfig.IgnoreCommandLineOptions = True
+PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 import sys
 from optparse import OptionParser

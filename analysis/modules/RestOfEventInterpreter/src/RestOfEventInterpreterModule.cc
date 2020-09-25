@@ -10,12 +10,8 @@
 
 #include <analysis/modules/RestOfEventInterpreter/RestOfEventInterpreterModule.h>
 
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
@@ -42,9 +38,9 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    std::vector<std::tuple<std::string, std::string, std::string>> emptyROEMask;
+    std::vector<std::tuple<std::string, std::string, std::string, std::string>> emptyROEMask;
 
-    addParam("particleList", m_particleList, "Name of the ParticleList");
+    addParam("particleList", m_particleListName, "Name of the ParticleList");
 
     addParam("ROEMasks", m_ROEMasks,
              "List of (maskName, trackSelectionCut, eclClusterSelectionCut) tuples that specify all ROE masks of a specific particle to be created.",
@@ -58,9 +54,7 @@ namespace Belle2 {
   void RestOfEventInterpreterModule::initialize()
   {
     // input
-    StoreObjPtr<ParticleList>().isRequired(m_particleList);
-    StoreArray<Particle> particles;
-    particles.isRequired();
+    m_plist.isRequired(m_particleListName);
 
     for (auto ROEMask : m_ROEMasks) {
       // parsing of the input tuple (maskName, trackSelectionCut, eclClusterSelectionCut, fractions)
@@ -68,13 +62,16 @@ namespace Belle2 {
       std::string maskName = get<0>(ROEMask);
       std::string trackSelection = get<1>(ROEMask);
       std::string eclClusterSelection = get<2>(ROEMask);
+      std::string klmClusterSelection = get<3>(ROEMask);
 
       std::shared_ptr<Variable::Cut> trackCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(trackSelection));
       std::shared_ptr<Variable::Cut> eclClusterCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(eclClusterSelection));
+      std::shared_ptr<Variable::Cut> klmClusterCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(klmClusterSelection));
 
       m_maskNames.push_back(maskName);
       m_trackCuts.insert(stringAndCutMap::value_type(maskName, trackCut));
       m_eclClusterCuts.insert(stringAndCutMap::value_type(maskName, eclClusterCut));
+      m_klmClusterCuts.insert(stringAndCutMap::value_type(maskName, klmClusterCut));
 
       B2INFO("RestOfEventInterpreter added ROEMask with specific fractions under name \'" << maskName << "\' with track cuts: " <<
              trackSelection << " and eclCluster cuts: " << eclClusterSelection);
@@ -83,18 +80,16 @@ namespace Belle2 {
 
   void RestOfEventInterpreterModule::event()
   {
-    StoreObjPtr<ParticleList> plist(m_particleList);
-
-    unsigned int nParts = plist->getListSize();
+    unsigned int nParts = m_plist->getListSize();
 
     for (unsigned i = 0; i < nParts; i++) {
-      const Particle* particle = plist->getParticle(i);
+      const Particle* particle = m_plist->getParticle(i);
       auto* roe = particle->getRelatedTo<RestOfEvent>("ALL");
       for (auto& maskName : m_maskNames) {
         if (!m_update) {
           roe->initializeMask(maskName, "ROEInterpreterModule");
         }
-        roe->updateMaskWithCuts(maskName, m_trackCuts.at(maskName), m_eclClusterCuts.at(maskName), nullptr, m_update);
+        roe->updateMaskWithCuts(maskName, m_trackCuts.at(maskName), m_eclClusterCuts.at(maskName), m_klmClusterCuts.at(maskName), m_update);
       }
     }
   }

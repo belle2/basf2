@@ -137,12 +137,14 @@ void SVDCoGTimeEstimatorModule::event()
   //start loop on SVDSHaperDigits
   Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
 
+  m_NumberOfAPVSamples = m_storeSVDEvtInfo->getNSamples();
+
+  B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
+
   for (const SVDShaperDigit& shaper : m_storeShaper) {
 
     m_StopCreationReco = false;
 
-    m_NumberOfAPVSamples = fromModeToNumberOfSample((int) modeByte.getDAQMode());
-    B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
 
     if (m_StopCreationReco)
       continue;
@@ -237,21 +239,6 @@ void SVDCoGTimeEstimatorModule::terminate()
 {
 }
 
-//definition of the extra functions
-
-int SVDCoGTimeEstimatorModule::fromModeToNumberOfSample(int modality)
-{
-  if (modality == 2)
-    return 6;
-  else if (modality == 1)
-    return 3;
-  else if (modality == 0)
-    return 1;
-
-  B2WARNING("Wrong SVDModeByte = " << modality << "; skipping this SVDShaperDigit!");
-  return -1;
-
-}
 
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)
 {
@@ -268,7 +255,7 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaper
   } else {
     averagetime = -1;
     m_StopCreationReco = true;
-    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is NULL! Skipping this SVDShaperDigit!");
+    B2WARNING("Trying to divide by 0 (ZERO)! Sum of amplitudes is nullptr! Skipping this SVDShaperDigit!");
   }
 
   return averagetime;

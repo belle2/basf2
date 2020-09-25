@@ -194,12 +194,12 @@ namespace Belle2 {
     /** Function returning a TH1F */
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = NULL);
+                            const char* xtitle, TList* histoList = nullptr);
     /** Function returning TH2F */
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
   };
 }

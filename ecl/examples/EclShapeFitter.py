@@ -96,6 +96,7 @@ class ShapeFitterModule(Module):
 
                     self.eventNumber += 1
 
+
 b2.set_log_level(b2.LogLevel.ERROR)
 
 # Create path. Register necessary modules to this path.

@@ -31,6 +31,7 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   //Parameter definition
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
+  addParam("MonName", m_monName, "Monitoring Name", std::string("DQM_TEST"));
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
   B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
@@ -49,6 +50,8 @@ DQMHistAnalysisIPModule::~DQMHistAnalysisIPModule()
 void DQMHistAnalysisIPModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisIP: initialized.");
+
+  m_monObj = getMonitoringObject("ip");
 
   TString a;
   a = m_histoname;
@@ -206,6 +209,7 @@ void DQMHistAnalysisIPModule::event()
         // dont add another line...
         m_line->Draw();
       }
+      m_monObj->setVariable(m_monName, x);
       m_c1->Modified();
       m_c1->Update();
 #ifdef _BELLE2_EPICS
@@ -227,6 +231,7 @@ void DQMHistAnalysisIPModule::terminate()
 {
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
+    // cppcheck-suppress knownConditionTrueFalse
     if (m_parameters > 0) {
       for (auto i = 0; i < m_parameters; i++) {
         if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");

@@ -15,6 +15,7 @@
 #include <vxd/geometry/GeoTools.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+using namespace std;
 using namespace Belle2;
 
 void DQMEventProcessorBase::Run()

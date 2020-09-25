@@ -45,6 +45,7 @@ the software by following through a series of hands-on lessons.
 
    The first lesson of this book (:ref:`onlinebook_collaborative_tools`) will show
    several other places where you can get help later on.
+   It also includes a quick tips section about the chat: :ref:`onlinebook_collaborative_tools_b2chat_howto`.
 
 .. toctree::
    :maxdepth: 2

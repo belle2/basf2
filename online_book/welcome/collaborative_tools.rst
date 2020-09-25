@@ -155,6 +155,7 @@ With all of these tools, it might be hard to work out where to go to get help.
     to think about where to ask:
     The `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
     in our chat will provide instant help.
+    Please also check out the quick tips section below: :ref:`onlinebook_collaborative_tools_b2chat_howto`.
 
 ... meta
 ~~~~~~~~
@@ -206,6 +207,55 @@ Let's assume you are working with the grid when...
 
 Some tips
 ---------
+
+.. _onlinebook_collaborative_tools_b2chat_howto:
+
+Asking a question in #starterkit-workshop
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    The `#starterkit-workshop channel <https://chat.belle2.org/channel/starterkit-workshop>`_
+    is usually only active during the StarterKit workshop.
+    After the workshop, we recommend you to try one of the other alternatives
+    (but you can always try, of course).
+
+.. hint::
+
+    If you want to try the following hints, you can join the `#test channel <https://chat.belle2.org/channel/test>`_
+    to type out anything you want (anyone else in this channel will be able to read
+    it though).
+
+Our chat works like any other chats with a couple of nice features. For example you can
+put small parts of code in backticks ```print("hello world")```) and you can add a larger
+bit of source code in triple backticks like so (note that you can create a new line by pressing
+Shift-Enter):
+
+.. code-block::
+
+   ```
+   print("foo")
+   print("bar")
+   ```
+
+The only thing that we would like you to pay attention to, is that you make use of
+the "threading" feature of our chat. This makes it easier to get an overview
+over all recent questions.
+
+If you want to reply to an existing message,
+please click on the small icon on the right:
+
+.. figure:: collaborative_tools/reply_1.png
+   :align: center
+   :alt: Clicking the reply button
+
+If there are already several replies, you can also click the reply button
+below (it will open a side panel with all the replies):
+
+.. figure:: collaborative_tools/reply_2.png
+   :align: center
+   :alt: Clicking the reply button
+
 
 Confluence
 ~~~~~~~~~~
@@ -297,8 +347,8 @@ of the software you are using.
     * Add the date.
     * Add your favourite picture of a cat / piece of art.
 
-How to ask a good question
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+How to ask a good question on questions.belle2
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Like most Q&A forums, `questions.belle2.org <https://questions.belle2.org>`_ is
 only as good as the posts.

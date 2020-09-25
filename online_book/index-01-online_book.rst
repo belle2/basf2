@@ -4,14 +4,14 @@
 Online textbook
 ===============
 
-This online textbook aims to help new Belle II members to get started with 
+This online textbook aims to help new Belle II members to get started with
 the software by following through a series of hands-on lessons.
 
-.. note::
-   **We want YOU to contribute to this book!**
+.. admonition:: **We want YOU to contribute to this book!**
+   :class: toggle
 
-.. include:: contribute.rst
-   :start-line: 6
+   .. include:: contribute.rst
+      :start-line: 5
 
 .. toctree::
    :maxdepth: 2

@@ -101,7 +101,7 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMnSamplesHisto->GetYaxis()->SetTitle("DAQ Mode");
   m_DQMnSamplesHisto->GetXaxis()->SetTitle("number of APV samples");
 
-  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "m_upsetAPV", "EVTmatch", "missHead", "missTrail", "m_badMapping"};
+  TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "EVTmatch", "missHead", "missTrail", "badMapping"};
 
   TString Xsamples[2] = {"3", "6"};
   TString Ysamples[3] = {"3 samples", "6 samples", "3/6 mixed"};

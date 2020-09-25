@@ -102,6 +102,19 @@ class BtoHad2Tracks(BaseSkim):
         path = self.skim_event_cuts("nTracks >= 2", path=path)
         self.SkimLists = BsigList
 
+    def validation_histograms(self, path):
+        ma.cutAndCopyLists('B0:validation', self.SkimLists, '', path=path)
+        # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
+        ma.variablesToHistogram(
+            filename='BtoHad2Tracks_Validation.root',
+            decayString='B0:validation',
+            variables=[
+                ('Mbc', 100, 5.2, 5.3),
+                ('deltaE', 100, -0.3, 0.3)],
+            variables_2d=[
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.3, 0.3)],
+            path=path)
+
 
 @fancy_skim_header
 class BtoHad3Tracks(BaseSkim):

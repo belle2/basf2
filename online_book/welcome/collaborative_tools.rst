@@ -220,12 +220,6 @@ Asking a question in #starterkit-workshop
     After the workshop, we recommend you to try one of the other alternatives
     (but you can always try, of course).
 
-.. hint::
-
-    If you want to try the following hints, you can join the `#test channel <https://chat.belle2.org/channel/test>`_
-    to type out anything you want (anyone else in this channel will be able to read
-    it though).
-
 Our chat works like any other chats with a couple of nice features. For example you can
 put small parts of code in backticks ```print("hello world")```) and you can add a larger
 bit of source code in triple backticks like so (note that you can create a new line by pressing
@@ -256,6 +250,17 @@ below (it will open a side panel with all the replies):
    :align: center
    :alt: Clicking the reply button
 
+.. admonition:: Exercise
+    :class: exercise
+
+    Join the `#test channel <https://chat.belle2.org/channel/test>`_ and type
+    some quick test messages. Try to include some bits of "code" as shown above.
+
+.. admonition:: Exercise
+    :class: exercise
+
+    Try out the "reply" feature, either by replying to one of the previous messages
+    from other users or by replying to your own message.
 
 Confluence
 ~~~~~~~~~~

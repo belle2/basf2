@@ -41,7 +41,7 @@ namespace Belle2 {
     /** do we want to prescale each trigger line ? */
     std::vector<unsigned int> m_prescales;
     /** and do we want random prescale or counters ? */
-    bool m_useRandomNumbersForPReScale{true};
+    bool m_useRandomNumbersForPreScale{true};
     /** if we don't use random prescale we need counters */
     std::vector<uint32_t> m_prescaleCounters;
   };

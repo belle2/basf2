@@ -381,8 +381,8 @@ Decay B0
 
 #                    b -> c tau nu
 #
-0.01254160 D*-    tau+ nu_tau                  HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021
-0.00636870 D-     tau+ nu_tau                  HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021
+0.0131838 D*-    tau+ nu_tau                  HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021 (based on the HFLAV theory average of R(D/D*) of 0.299 and 0.258 and our D/D* l nu BFs in the MC.
+0.0063986 D-     tau+ nu_tau                  HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021 (based on the HFLAV theory average of R(D/D*) of 0.299 and 0.258 and our D/D* l nu BFs in the MC.
 0.0013   D_1-    tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
 0.0020   D'_1-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
@@ -468,12 +468,12 @@ Decay B0
 0.0000017  K''*0  gamma                    SVP_HELAMP 1.0 0.0 1.0 0.0;  #Upper limit is 2e-3
 0.0002735   Xsd    gamma                   BTOXSGAMMA 2 ; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b - s gamma  states
 
-0.000000160 K0      e+      e-             BTOSLLBALL;
-0.000001030 K*0     e+      e-             BTOSLLBALL;
+0.00000054 K0      e+      e-             BTOSLLBALL; #Updated by PG 9/2021. Use FLAVIO predicted values.
+0.00000121 K*0     e+      e-             BTOSLLBALL; #Updated by PG 9/2021. Use FLAVIO predicted values.
 0.00000551  Xsd  e+    e-                  BTOXSLL 4.8 0.2 0.0 0.41;    #[Reconstructed PDG2016] BF = 6.7e-6 -Sum of exclusive b -> s e e  modes
 0.000000021 pi+ pi- e+    e-               PHSP; #[Reconstructed PDG2016] #By lepton universality from mu mu BF
-0.000000339 K0      mu+     mu-            BTOSLLBALL; #[Reconstructed PDG2016]
-0.00000094 K*0     mu+     mu-            BTOSLLBALL; #Updated by PG 9/2021
+0.00000054 K0      mu+     mu-            BTOSLLBALL; #Updated by PG 9/2021. Use FLAVIO predicted values.
+0.00000120 K*0     mu+     mu-            BTOSLLBALL; #Updated by PG 9/2021. Use FLAVIO predicted values.
 0.000000021 pi+ pi- mu+     mu-            PHSP; #[Reconstructed PDG2016]
 0.00000292  Xsd  mu+   mu-                 BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
 0.0000001   K0   tau+  tau-                BTOSLLBALL;
@@ -1728,8 +1728,8 @@ Decay anti-B0
 
 #                    b -> c tau nu
 #
-0.01254160 D*+    tau- anti-nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021
-0.00636870 D+     tau- anti-nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021
+0.0131838 D*+    tau- anti-nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021 (based on the HFLAV theory average of R(D/D*) of 0.299 and 0.258 and our D/D* l nu BFs in the MC
+0.0063986 D+     tau- anti-nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021 (based on the HFLAV theory average of R(D/D*) of 0.299 and 0.258 and our D/D* l nu BFs in the MC.
 0.0013   D_1+    tau- anti-nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
 0.0013   D_0*+   tau- anti-nu_tau          LLSW 0.68 -0.2 0.3;
 0.0020   D'_1+   tau- anti-nu_tau          LLSW 0.68 -0.2 0.3;
@@ -1815,12 +1815,12 @@ Decay anti-B0
 0.0000017   anti-K''*0 gamma                     SVP_HELAMP 1.0 0.0 1.0 0.0;
 0.0002735   anti-Xsd   gamma                     BTOXSGAMMA 2 ; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes
 
-0.000000160 anti-K0 e+      e-                   BTOSLLBALL; 
-0.000001030 anti-K*0 e+      e-                  BTOSLLBALL; 
+0.00000054 anti-K0 e+      e-                   BTOSLLBALL; #Updated by PG 9/2021. Use FLAVIO predicted values.
+0.00000121 anti-K*0 e+      e-                  BTOSLLBALL; #Updated by PG 9/2021. Use FLAVIO predicted values.
 0.00000551  anti-Xsd  e+    e-                   BTOXSLL 4.8 0.2 0.0 0.41;   #[Reconstructed PDG2016] BF = 6.7e-6 - Sum of exclusive b -> s e e  modes
 0.000000021 pi+ pi- e+    e-                     PHSP; #[Reconstructed PDG2016] #By lepton universality from mu mu BF
-0.000000339 anti-K0 mu+     mu-                  BTOSLLBALL; #[Reconstructed PDG2016]
-0.00000094 anti-K*0 mu+     mu-                 BTOSLLBALL; #Updated by PG 9/2021
+0.00000054 anti-K0 mu+     mu-                  BTOSLLBALL; #Updated by PG 9/2021. Use FLAVIO predicted values.
+0.00000120 anti-K*0 mu+     mu-                 BTOSLLBALL; #Updated by PG 9/2021. Use FLAVIO predicted values.
 0.000000021 pi+ pi- mu+     mu-                  PHSP; #[Reconstructed PDG2016]
 0.00000292  anti-Xsd  mu+   mu-                  BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
 0.0000001   anti-K0   tau+  tau-                 BTOSLLBALL;
@@ -3094,8 +3094,8 @@ Decay B+
 
 #                   b -> c tau nu
 #
-0.0134976 anti-D*0     tau+ nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.0068527 anti-D0      tau+ nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
+0.0141642 anti-D*0     tau+ nu_tau          HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021 (based on the HFLAV theory average of R(D/D*) of 0.299 and 0.258 and our D/D* l nu BFs in the MC
+0.0069069 anti-D0      tau+ nu_tau          HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233) BF Updated by PG 9/2021 (based on the HFLAV theory average of R(D/D*) of 0.299 and 0.258 and our D/D* l nu BFs in the MC
 0.0013    anti-D_10    tau+ nu_tau          LLSW 0.71 -1.6 -0.5 2.9;
 0.0013    anti-D_0*0   tau+ nu_tau          LLSW 0.68 -0.2 0.3;
 0.0020    anti-D'_10   tau+ nu_tau          LLSW 0.68 -0.2 0.3;
@@ -4161,8 +4161,8 @@ Decay B-
 
 #                   b -> c tau nu
 #
-0.0134976 D*0     tau- anti-nu_tau        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233)
-0.0068527 D0      tau- anti-nu_tau        HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233)
+0.0141642 D*0     tau- anti-nu_tau        HQET3 0.912 1.205 1.15 1.404 0.854; #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021 (based on the HFLAV theory average of R(D/D*) of 0.299 and 0.258 and our D/D* l nu BFs in the MC
+0.0069069 D0      tau- anti-nu_tau        HQET3 1.0541 1.128 1.0;             #FF values taken from HFLAV 2016 (1612.07233). BF Updated by PG 9/2021 (based on the HFLAV theory average of R(D/D*) of 0.299 and 0.258 and our D/D* l nu BFs in the MC
 0.0013    D_10    tau- anti-nu_tau        LLSW 0.71 -1.6 -0.5 2.9;
 0.0013    D_0*0   tau- anti-nu_tau        LLSW 0.68 -0.2 0.3;
 0.0020    D'_10   tau- anti-nu_tau        LLSW 0.68 -0.2 0.3;

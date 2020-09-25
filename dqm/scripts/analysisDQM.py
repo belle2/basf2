@@ -29,13 +29,13 @@ def add_mirabelle_dqm(path):
     MiraBelleDst2_path = create_path()
 
     trigger_skim_mumutight = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_mumutight"])
-    trigger_skim_mumutight.if_value("==1", MiraBelleMumu_path, AfterConditionPath.END)
+    trigger_skim_mumutight.if_value("==1", MiraBelleMumu_path, AfterConditionPath.CONTINUE)
 
     trigger_skim_dstar_1 = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_dstar_1"])
-    trigger_skim_dstar_1.if_value("==1", MiraBelleDst_path, AfterConditionPath.END)
+    trigger_skim_dstar_1.if_value("==1", MiraBelleDst_path, AfterConditionPath.CONTINUE)
 
     trigger_skim_dstar_2 = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_dstar_2"])
-    trigger_skim_dstar_2.if_value("==1", MiraBelleDst2_path, AfterConditionPath.END)
+    trigger_skim_dstar_2.if_value("==1", MiraBelleDst2_path, AfterConditionPath.CONTINUE)
 
     # MiraBelle di-muon path
     fillParticleList('mu+:physMiraBelle', '', path=MiraBelleMumu_path)

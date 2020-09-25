@@ -51,7 +51,6 @@ void PhysicsObjectsMiraBelleDstModule::defineHisto()
   // Mass distributions
   m_h_D0_InvM = new TH1F("hist_D0_InvM", "Signal enhanced;m_h_D0_InvM;", 50, 1.81, 1.95);
   m_h_delta_m = new TH1F("hist_delta_m", "Signal enhanced;delta_m;", 50, 0.14, 0.16);
-  m_h_D0_pi0_InvM = new TH1F("hist_D0_pi0_InvM", "#pi^{0} mass of D^{*}#rightarrowK#pi#pi^{0};D0_pi0_InvM;", 50, 0.09, 0.17);
   // Soft pion
   m_h_D0_softpi_PID_ALL_pion = new TH1F("hist_D0_softpi_PID_ALL_pion", "D0_softpi_PID_ALL_pion;D0_softpi_PID_ALL_pion;", 50, 0, 1);
   m_h_D0_softpi_PID_SVD_pion = new TH1F("hist_D0_softpi_PID_SVD_pion", "D0_softpi_PID_SVD_pion;D0_softpi_PID_SVD_pion;", 50, 0, 1);
@@ -167,7 +166,6 @@ void PhysicsObjectsMiraBelleDstModule::beginRun()
   m_h_sideband_D0_K_PID_ARICH_kaon->Reset();
   m_h_sideband_D0_K_PID_ECL_kaon->Reset();
   m_h_sideband_D0_K_PID_KLM_kaon->Reset();
-  m_h_D0_pi0_InvM->Reset();
 }
 
 void PhysicsObjectsMiraBelleDstModule::event()
@@ -195,122 +193,113 @@ void PhysicsObjectsMiraBelleDstModule::event()
   for (unsigned int i = 0; i < dstParticles->getListSize(); i++) {
     const Particle* dst = dstParticles->getParticle(i);
     const Particle* d0 = dst->getDaughter(0);
-    int n_daughters = d0->getNDaughters();
     float dst_mass = dst->getMass();
     float d0_mass = d0->getMass();
     float delta_m = dst_mass - d0_mass;
     if (delta_m < 0.14 || 0.16 < delta_m || d0_mass < 1.81 || 1.95 < d0_mass) continue;
-    if (n_daughters == 2) {
-      // True if the event is in signal region
-      bool isSignal_D0_InvM(false), isSignal_delta_m(false);
-      // D0 and D*+ mass
-      if (0.143 < delta_m && delta_m < 0.147) {
-        m_h_D0_InvM->Fill(d0_mass);
-        isSignal_D0_InvM = true;
-      }
-      if (1.83 < d0_mass && d0_mass < 1.89) {
-        m_h_delta_m->Fill(delta_m);
-        isSignal_delta_m = true;
-      }
-      const PIDLikelihood* pid_K = d0->getDaughter(0)->getPIDLikelihood();
-      const PIDLikelihood* pid_Pi = d0->getDaughter(1)->getPIDLikelihood();
-      const PIDLikelihood* pid_softPi = dst->getDaughter(1)->getPIDLikelihood();
+    // True if the event is in signal region
+    bool isSignal_D0_InvM(false), isSignal_delta_m(false);
+    // D0 and D*+ mass
+    if (0.143 < delta_m && delta_m < 0.147) {
+      m_h_D0_InvM->Fill(d0_mass);
+      isSignal_D0_InvM = true;
+    }
+    if (1.83 < d0_mass && d0_mass < 1.89) {
+      m_h_delta_m->Fill(delta_m);
+      isSignal_delta_m = true;
+    }
+    const PIDLikelihood* pid_K = d0->getDaughter(0)->getPIDLikelihood();
+    const PIDLikelihood* pid_Pi = d0->getDaughter(1)->getPIDLikelihood();
+    const PIDLikelihood* pid_softPi = dst->getDaughter(1)->getPIDLikelihood();
 
-      if (isSignal_D0_InvM && isSignal_delta_m) {
-        // Signal region
-        // PID of K
-        m_h_D0_K_PID_ALL_kaon->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion, 1.));
-        if (pid_K->isAvailable(Const::SVD))   m_h_D0_K_PID_SVD_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
-              1., Const::SVD));
-        if (pid_K->isAvailable(Const::CDC))   m_h_D0_K_PID_CDC_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
-              1., Const::CDC));
-        if (pid_K->isAvailable(Const::TOP))   m_h_D0_K_PID_TOP_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
-              1., Const::TOP));
-        if (pid_K->isAvailable(Const::ARICH)) m_h_D0_K_PID_ARICH_kaon ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
-              1., Const::ARICH));
-        if (pid_K->isAvailable(Const::ECL))   m_h_D0_K_PID_ECL_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
-              1., Const::ECL));
-        if (pid_K->isAvailable(Const::KLM))   m_h_D0_K_PID_KLM_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
-              1., Const::KLM));
-        // PID of pi
-        m_h_D0_pi_PID_ALL_pion->Fill(pid_Pi->getProbability(Belle2::Const::pion, Belle2::Const::kaon, 1.));
-        if (pid_Pi->isAvailable(Const::SVD))   m_h_D0_pi_PID_SVD_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::SVD));
-        if (pid_Pi->isAvailable(Const::CDC))   m_h_D0_pi_PID_CDC_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::CDC));
-        if (pid_Pi->isAvailable(Const::TOP))   m_h_D0_pi_PID_TOP_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::TOP));
-        if (pid_Pi->isAvailable(Const::ARICH)) m_h_D0_pi_PID_ARICH_pion ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::ARICH));
-        if (pid_Pi->isAvailable(Const::ECL))   m_h_D0_pi_PID_ECL_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::ECL));
-        if (pid_Pi->isAvailable(Const::KLM))   m_h_D0_pi_PID_KLM_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::KLM));
-        // PID of soft pi
-        m_h_D0_softpi_PID_ALL_pion->Fill(pid_softPi->getProbability(Belle2::Const::pion, Belle2::Const::kaon, 1.));
-        if (pid_softPi->isAvailable(Const::SVD))   m_h_D0_softpi_PID_SVD_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::SVD));
-        if (pid_softPi->isAvailable(Const::CDC))   m_h_D0_softpi_PID_CDC_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::CDC));
-        if (pid_softPi->isAvailable(Const::TOP))   m_h_D0_softpi_PID_TOP_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::TOP));
-        if (pid_softPi->isAvailable(Const::ARICH)) m_h_D0_softpi_PID_ARICH_pion ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::ARICH));
-        if (pid_softPi->isAvailable(Const::ECL))   m_h_D0_softpi_PID_ECL_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::ECL));
-        if (pid_softPi->isAvailable(Const::KLM))   m_h_D0_softpi_PID_KLM_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::KLM));
-      } else {
-        // Sideband region for BG subtraction
-        // PID of K
-        m_h_sideband_D0_K_PID_ALL_kaon->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion, 1.));
-        if (pid_K->isAvailable(Const::SVD))   m_h_sideband_D0_K_PID_SVD_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
-              Belle2::Const::pion, 1., Const::SVD));
-        if (pid_K->isAvailable(Const::CDC))   m_h_sideband_D0_K_PID_CDC_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
-              Belle2::Const::pion, 1., Const::CDC));
-        if (pid_K->isAvailable(Const::TOP))   m_h_sideband_D0_K_PID_TOP_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
-              Belle2::Const::pion, 1., Const::TOP));
-        if (pid_K->isAvailable(Const::ARICH)) m_h_sideband_D0_K_PID_ARICH_kaon ->Fill(pid_K->getProbability(Belle2::Const::kaon,
-              Belle2::Const::pion, 1., Const::ARICH));
-        if (pid_K->isAvailable(Const::ECL))   m_h_sideband_D0_K_PID_ECL_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
-              Belle2::Const::pion, 1., Const::ECL));
-        if (pid_K->isAvailable(Const::KLM))   m_h_sideband_D0_K_PID_KLM_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
-              Belle2::Const::pion, 1., Const::KLM));
-        // PID of pi
-        m_h_sideband_D0_pi_PID_ALL_pion->Fill(pid_Pi->getProbability(Belle2::Const::pion, Belle2::Const::kaon, 1.));
-        if (pid_Pi->isAvailable(Const::SVD))   m_h_sideband_D0_pi_PID_SVD_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::SVD));
-        if (pid_Pi->isAvailable(Const::CDC))   m_h_sideband_D0_pi_PID_CDC_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::CDC));
-        if (pid_Pi->isAvailable(Const::TOP))   m_h_sideband_D0_pi_PID_TOP_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::TOP));
-        if (pid_Pi->isAvailable(Const::ARICH)) m_h_sideband_D0_pi_PID_ARICH_pion ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::ARICH));
-        if (pid_Pi->isAvailable(Const::ECL))   m_h_sideband_D0_pi_PID_ECL_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::ECL));
-        if (pid_Pi->isAvailable(Const::KLM))   m_h_sideband_D0_pi_PID_KLM_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
-              Belle2::Const::kaon, 1., Const::KLM));
-        // PID of soft pi
-        m_h_sideband_D0_softpi_PID_ALL_pion->Fill(pid_softPi->getProbability(Belle2::Const::pion, Belle2::Const::kaon, 1.));
-        if (pid_softPi->isAvailable(Const::SVD))   m_h_sideband_D0_softpi_PID_SVD_pion   ->Fill(pid_softPi->getProbability(
-                Belle2::Const::pion, Belle2::Const::kaon, 1., Const::SVD));
-        if (pid_softPi->isAvailable(Const::CDC))   m_h_sideband_D0_softpi_PID_CDC_pion   ->Fill(pid_softPi->getProbability(
-                Belle2::Const::pion, Belle2::Const::kaon, 1., Const::CDC));
-        if (pid_softPi->isAvailable(Const::TOP))   m_h_sideband_D0_softpi_PID_TOP_pion   ->Fill(pid_softPi->getProbability(
-                Belle2::Const::pion, Belle2::Const::kaon, 1., Const::TOP));
-        if (pid_softPi->isAvailable(Const::ARICH)) m_h_sideband_D0_softpi_PID_ARICH_pion ->Fill(pid_softPi->getProbability(
-                Belle2::Const::pion, Belle2::Const::kaon, 1., Const::ARICH));
-        if (pid_softPi->isAvailable(Const::ECL))   m_h_sideband_D0_softpi_PID_ECL_pion   ->Fill(pid_softPi->getProbability(
-                Belle2::Const::pion, Belle2::Const::kaon, 1., Const::ECL));
-        if (pid_softPi->isAvailable(Const::KLM))   m_h_sideband_D0_softpi_PID_KLM_pion   ->Fill(pid_softPi->getProbability(
-                Belle2::Const::pion, Belle2::Const::kaon, 1., Const::KLM));
-      }
-    } else if (d0->getNDaughters() == 3) {
-      // Mass of Pi0
-      if (1.83 < d0_mass && d0_mass < 1.89 && 0.142 < delta_m && delta_m < 0.148) {
-        //m_h_D0_pi0_InvM->Fill(Belle2::Variable::particleInvariantMass(d0->getDaughter(2)));
-        m_h_D0_pi0_InvM->Fill(Belle2::Variable::particleInvariantMassFromDaughters(d0->getDaughter(2)));
-      }
+    if (isSignal_D0_InvM && isSignal_delta_m) {
+      // Signal region
+      // PID of K
+      m_h_D0_K_PID_ALL_kaon->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion, 1.));
+      if (pid_K->isAvailable(Const::SVD))   m_h_D0_K_PID_SVD_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
+            1., Const::SVD));
+      if (pid_K->isAvailable(Const::CDC))   m_h_D0_K_PID_CDC_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
+            1., Const::CDC));
+      if (pid_K->isAvailable(Const::TOP))   m_h_D0_K_PID_TOP_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
+            1., Const::TOP));
+      if (pid_K->isAvailable(Const::ARICH)) m_h_D0_K_PID_ARICH_kaon ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
+            1., Const::ARICH));
+      if (pid_K->isAvailable(Const::ECL))   m_h_D0_K_PID_ECL_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
+            1., Const::ECL));
+      if (pid_K->isAvailable(Const::KLM))   m_h_D0_K_PID_KLM_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion,
+            1., Const::KLM));
+      // PID of pi
+      m_h_D0_pi_PID_ALL_pion->Fill(pid_Pi->getProbability(Belle2::Const::pion, Belle2::Const::kaon, 1.));
+      if (pid_Pi->isAvailable(Const::SVD))   m_h_D0_pi_PID_SVD_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::SVD));
+      if (pid_Pi->isAvailable(Const::CDC))   m_h_D0_pi_PID_CDC_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::CDC));
+      if (pid_Pi->isAvailable(Const::TOP))   m_h_D0_pi_PID_TOP_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::TOP));
+      if (pid_Pi->isAvailable(Const::ARICH)) m_h_D0_pi_PID_ARICH_pion ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::ARICH));
+      if (pid_Pi->isAvailable(Const::ECL))   m_h_D0_pi_PID_ECL_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::ECL));
+      if (pid_Pi->isAvailable(Const::KLM))   m_h_D0_pi_PID_KLM_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::KLM));
+      // PID of soft pi
+      m_h_D0_softpi_PID_ALL_pion->Fill(pid_softPi->getProbability(Belle2::Const::pion, Belle2::Const::kaon, 1.));
+      if (pid_softPi->isAvailable(Const::SVD))   m_h_D0_softpi_PID_SVD_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::SVD));
+      if (pid_softPi->isAvailable(Const::CDC))   m_h_D0_softpi_PID_CDC_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::CDC));
+      if (pid_softPi->isAvailable(Const::TOP))   m_h_D0_softpi_PID_TOP_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::TOP));
+      if (pid_softPi->isAvailable(Const::ARICH)) m_h_D0_softpi_PID_ARICH_pion ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::ARICH));
+      if (pid_softPi->isAvailable(Const::ECL))   m_h_D0_softpi_PID_ECL_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::ECL));
+      if (pid_softPi->isAvailable(Const::KLM))   m_h_D0_softpi_PID_KLM_pion   ->Fill(pid_softPi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::KLM));
+    } else {
+      // Sideband region for BG subtraction
+      // PID of K
+      m_h_sideband_D0_K_PID_ALL_kaon->Fill(pid_K->getProbability(Belle2::Const::kaon, Belle2::Const::pion, 1.));
+      if (pid_K->isAvailable(Const::SVD))   m_h_sideband_D0_K_PID_SVD_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
+            Belle2::Const::pion, 1., Const::SVD));
+      if (pid_K->isAvailable(Const::CDC))   m_h_sideband_D0_K_PID_CDC_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
+            Belle2::Const::pion, 1., Const::CDC));
+      if (pid_K->isAvailable(Const::TOP))   m_h_sideband_D0_K_PID_TOP_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
+            Belle2::Const::pion, 1., Const::TOP));
+      if (pid_K->isAvailable(Const::ARICH)) m_h_sideband_D0_K_PID_ARICH_kaon ->Fill(pid_K->getProbability(Belle2::Const::kaon,
+            Belle2::Const::pion, 1., Const::ARICH));
+      if (pid_K->isAvailable(Const::ECL))   m_h_sideband_D0_K_PID_ECL_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
+            Belle2::Const::pion, 1., Const::ECL));
+      if (pid_K->isAvailable(Const::KLM))   m_h_sideband_D0_K_PID_KLM_kaon   ->Fill(pid_K->getProbability(Belle2::Const::kaon,
+            Belle2::Const::pion, 1., Const::KLM));
+      // PID of pi
+      m_h_sideband_D0_pi_PID_ALL_pion->Fill(pid_Pi->getProbability(Belle2::Const::pion, Belle2::Const::kaon, 1.));
+      if (pid_Pi->isAvailable(Const::SVD))   m_h_sideband_D0_pi_PID_SVD_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::SVD));
+      if (pid_Pi->isAvailable(Const::CDC))   m_h_sideband_D0_pi_PID_CDC_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::CDC));
+      if (pid_Pi->isAvailable(Const::TOP))   m_h_sideband_D0_pi_PID_TOP_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::TOP));
+      if (pid_Pi->isAvailable(Const::ARICH)) m_h_sideband_D0_pi_PID_ARICH_pion ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::ARICH));
+      if (pid_Pi->isAvailable(Const::ECL))   m_h_sideband_D0_pi_PID_ECL_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::ECL));
+      if (pid_Pi->isAvailable(Const::KLM))   m_h_sideband_D0_pi_PID_KLM_pion   ->Fill(pid_Pi->getProbability(Belle2::Const::pion,
+            Belle2::Const::kaon, 1., Const::KLM));
+      // PID of soft pi
+      m_h_sideband_D0_softpi_PID_ALL_pion->Fill(pid_softPi->getProbability(Belle2::Const::pion, Belle2::Const::kaon, 1.));
+      if (pid_softPi->isAvailable(Const::SVD))   m_h_sideband_D0_softpi_PID_SVD_pion   ->Fill(pid_softPi->getProbability(
+              Belle2::Const::pion, Belle2::Const::kaon, 1., Const::SVD));
+      if (pid_softPi->isAvailable(Const::CDC))   m_h_sideband_D0_softpi_PID_CDC_pion   ->Fill(pid_softPi->getProbability(
+              Belle2::Const::pion, Belle2::Const::kaon, 1., Const::CDC));
+      if (pid_softPi->isAvailable(Const::TOP))   m_h_sideband_D0_softpi_PID_TOP_pion   ->Fill(pid_softPi->getProbability(
+              Belle2::Const::pion, Belle2::Const::kaon, 1., Const::TOP));
+      if (pid_softPi->isAvailable(Const::ARICH)) m_h_sideband_D0_softpi_PID_ARICH_pion ->Fill(pid_softPi->getProbability(
+              Belle2::Const::pion, Belle2::Const::kaon, 1., Const::ARICH));
+      if (pid_softPi->isAvailable(Const::ECL))   m_h_sideband_D0_softpi_PID_ECL_pion   ->Fill(pid_softPi->getProbability(
+              Belle2::Const::pion, Belle2::Const::kaon, 1., Const::ECL));
+      if (pid_softPi->isAvailable(Const::KLM))   m_h_sideband_D0_softpi_PID_KLM_pion   ->Fill(pid_softPi->getProbability(
+              Belle2::Const::pion, Belle2::Const::kaon, 1., Const::KLM));
     }
   }
 }

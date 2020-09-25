@@ -23,23 +23,46 @@ def add_analysis_dqm(path):
 
 
 def add_mirabelle_dqm(path):
-    # MiraBelle di-muon
-    fillParticleList('mu+:physMiraBelle', '', path=path)
+    # Software Trigger to divert the path
+    MiraBelleMumu_path = create_path()
+    MiraBelleDst_path = create_path()
+    MiraBelleDst2_path = create_path()
+
+    trigger_skim_mumutight = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_mumutight"])
+    trigger_skim_mumutight.if_value("==1", MiraBelleMumu_path, AfterConditionPath.END)
+
+    trigger_skim_dstar_1 = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_dstar_1"])
+    trigger_skim_dstar_1.if_value("==1", MiraBelleDst_path, AfterConditionPath.END)
+
+    trigger_skim_dstar_2 = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_dstar_2"])
+    trigger_skim_dstar_2.if_value("==1", MiraBelleDst2_path, AfterConditionPath.END)
+
+    # MiraBelle di-muon path
+    fillParticleList('mu+:physMiraBelle', '', path=MiraBelleMumu_path)
     MiraBelleMumu = register_module('PhysicsObjectsMiraBelle')
     MiraBelleMumu.param('MuPListName', 'mu+:physMiraBelle')
-    path.add_module(MiraBelleMumu)
-    # MiraBelle D*
-    fillParticleList('pi+:MiraBelle', 'abs(d0)<0.5 and abs(z0)<3', path=path)
-    fillParticleList('K+:MiraBelle',  'abs(d0)<0.5 and abs(z0)<3', path=path)
-    stdPi0s(listtype='eff60_Jan2020', path=path)
-    reconstructDecay('D0:MiraBelle_kpi -> K-:MiraBelle pi+:MiraBelle', '1.7 < M < 2.1', path=path)
-    reconstructDecay('D0:MiraBelle_kpipi0 -> K-:MiraBelle pi+:MiraBelle pi0:eff60_Jan2020', '1.7 < M < 2.1', path=path)
-    reconstructDecay('D*+:MiraBelle_kpi -> D0:MiraBelle_kpi pi+:MiraBelle',
-                     'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
-    reconstructDecay('D*+:MiraBelle_kpipi0 -> D0:MiraBelle_kpipi0 pi+:MiraBelle',
-                     'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=path)
-    listmode = ['D*+:MiraBelle_kpi', 'D*+:MiraBelle_kpipi0']
-    copyLists('D*+:MiraBelleDst', listmode, path=path)
+    MiraBelleMumu_path.add_module(MiraBelleMumu)
+
+    # MiraBelle D* (followed by D0 -> K pi) path
+    fillParticleList('pi+:MiraBelleDst1', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst_path)
+    fillParticleList('K+:MiraBelleDst1',  'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst_path)
+    reconstructDecay('D0:MiraBelleDst1_kpi -> K-:MiraBelleDst1 pi+:MiraBelleDst1', '1.7 < M < 2.1', path=MiraBelleDst_path)
+    reconstructDecay('D*+:MiraBelleDst1_kpi -> D0:MiraBelleDst1_kpi pi+:MiraBelleDst1',
+                     'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=MiraBelleDst_path)
     MiraBelleDst = register_module('PhysicsObjectsMiraBelleDst')
-    MiraBelleDst.param('DstListName', 'D*+:MiraBelleDst')
-    path.add_module(MiraBelleDst)
+    MiraBelleDst.param('DstListName', 'D*+:MiraBelleDst1_kpi')
+    MiraBelleDst_path.add_module(MiraBelleDst)
+
+    # MiraBelle D* (followed by D0 -> K pi pi0) path
+    fillParticleList('pi+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
+    fillParticleList('K+:MiraBelleDst2',  'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
+    stdPi0s(listtype='eff60_Jan2020', path=MiraBelleDst2_path)
+    reconstructDecay(
+        'D0:MiraBelleDst2_kpipi0 -> K-:MiraBelleDst2 pi+:MiraBelleDst2 pi0:eff60_Jan2020',
+        '1.7 < M < 2.1',
+        path=MiraBelleDst2_path)
+    reconstructDecay('D*+:MiraBelleDst2_kpipi0 -> D0:MiraBelleDst2_kpipi0 pi+:MiraBelleDst2',
+                     'useCMSFrame(p) > 2.5 and massDifference(0) < 0.16', path=MiraBelleDst2_path)
+    MiraBelleDst2 = register_module('PhysicsObjectsMiraBelleDst2')
+    MiraBelleDst2.param('DstListName', 'D*+:MiraBelleDst2_kpipi0')
+    MiraBelleDst2_path.add_module(MiraBelleDst2)

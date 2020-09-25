@@ -268,7 +268,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   TH1* hist_sideband_D0_K_PID_ARICH_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ARICH_kaon");
   TH1* hist_sideband_D0_K_PID_ECL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ECL_kaon");
   TH1* hist_sideband_D0_K_PID_KLM_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_KLM_kaon");
-  TH1* hist_D0_pi0_InvM = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi0_InvM");
+  TH1* hist_D0_pi0_InvM = findHist("PhysicsObjectsMiraBelleDst2/hist_D0_pi0_InvM");
 
   // Fit mass distributions for scale factor
   TF1* f_InvM = new TF1("f_InvM", "[0]*TMath::Gaus(x,[1],[2])+[3]*pow(x-[4],2)+[5]", 1.81, 1.95);

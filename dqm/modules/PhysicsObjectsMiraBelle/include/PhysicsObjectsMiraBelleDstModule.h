@@ -167,9 +167,6 @@ namespace Belle2 {
     /** PID of KLM for kaon in sideband */
     TH1F* m_h_sideband_D0_K_PID_KLM_kaon = nullptr;
 
-    /** Pi0 invariant mass for D0->Kpipi0 */
-    TH1F* m_h_D0_pi0_InvM = nullptr;
-
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
 

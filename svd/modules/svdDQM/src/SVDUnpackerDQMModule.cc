@@ -90,6 +90,7 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMUnpackerHisto = new TH2F("m_DQMUnpackerHisto", "SVD Data Format Monitor", nBits, 1, nBits + 1, 52, 1, 53);
   m_DQMEventFractionHisto = new TH1F("m_DQMEventFractionHisto", "SVD Error Fraction Event Counter", 2, 0, 2);
   m_DQMnSamplesHisto = new TH2F("m_DQMnSamplesHisto", "nAPVsamples VS DAQMode", 2, 1, 3, 3, 1, 4);
+  m_DQMnSamplesHisto2 = new TH2F("m_DQMnSamplesHisto2", "nAPVsamples VS DAQMode", 2, 1, 3, 2, 1, 3);
 
   m_DQMUnpackerHisto->GetYaxis()->SetTitle("FADC board");
   m_DQMUnpackerHisto->GetYaxis()->SetTitleOffset(1.2);
@@ -101,6 +102,9 @@ void SVDUnpackerDQMModule::defineHisto()
   m_DQMnSamplesHisto->GetYaxis()->SetTitle("DAQ Mode");
   m_DQMnSamplesHisto->GetXaxis()->SetTitle("number of APV samples");
 
+  m_DQMnSamplesHisto2->GetYaxis()->SetTitle("DAQ Mode");
+  m_DQMnSamplesHisto2->GetXaxis()->SetTitle("number of APV samples");
+
   TString Xlabels[nBits] = {"EvTooLong", "TimeOut", "doubleHead", "badEvt", "errCRC", "badFADC", "badTTD", "badFTB", "badALL", "errAPV", "errDET", "errFrame", "errFIFO", "APVmatch", "FADCmatch", "upsetAPV", "EVTmatch", "missHead", "missTrail", "badMapping"};
 
   TString Xsamples[2] = {"3", "6"};
@@ -111,7 +115,10 @@ void SVDUnpackerDQMModule::defineHisto()
 
   //preparing X and Y axis of the DQMnSamples histograms
   for (unsigned short i = 0; i < 2; i++) m_DQMnSamplesHisto->GetXaxis()->SetBinLabel(i + 1, Xsamples[i].Data());
+  for (unsigned short i = 0; i < 2; i++) m_DQMnSamplesHisto2->GetXaxis()->SetBinLabel(i + 1, Xsamples[i].Data());
+
   for (unsigned short i = 0; i < 3; i++) m_DQMnSamplesHisto->GetYaxis()->SetBinLabel(i + 1, Ysamples[i].Data());
+  for (unsigned short i = 0; i < 2; i++) m_DQMnSamplesHisto2->GetYaxis()->SetBinLabel(i + 1, Ysamples[i].Data());
 
   m_DQMEventFractionHisto->GetXaxis()->SetBinLabel(1, "OK");
   m_DQMEventFractionHisto->GetXaxis()->SetBinLabel(2, "Error(s)");
@@ -152,6 +159,10 @@ void SVDUnpackerDQMModule::beginRun()
 
   if (m_DQMnSamplesHisto != nullptr) {
     m_DQMnSamplesHisto->Reset();
+  }
+
+  if (m_DQMnSamplesHisto2 != nullptr) {
+    m_DQMnSamplesHisto2->Reset();
   }
 
   m_shutUpNoData = false;
@@ -202,6 +213,7 @@ void SVDUnpackerDQMModule::event()
   int nSamples = m_svdEventInfo->getNSamples();
 
   m_DQMnSamplesHisto->Fill(nSamples / 3, daqMode);
+  if (daqMode < 3) m_DQMnSamplesHisto2->Fill(nSamples / 3, daqMode);
 
 
   //filling m_DQMUnpackerHisto

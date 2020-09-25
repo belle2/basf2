@@ -7,6 +7,10 @@
 
 from basf2 import *
 from modularAnalysis import *
+import b2biiConversion
+import ROOT
+from ROOT import Belle2
+ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
 
 variables = ['p', 'pt', 'pz', 'phi',
              'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)', 'daughter(0, phi)',
@@ -26,11 +30,6 @@ variables = ['p', 'pt', 'pz', 'phi',
              'daughter(2, daughter(0, minC2HDist))', 'daughter(2, daughter(1, minC2HDist))',
              'daughterInvariantMass(0, 1)', 'daughterInvariantMass(0, 2)', 'daughterInvariantMass(1, 2)']
 spectators = ['isSignal', 'M', 'expNum', 'evtNum', 'runNum', 'mcErrors']
-
-import b2biiConversion
-import ROOT
-from ROOT import Belle2
-ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)
 
 
 def reconstruction_path(inputfiles):

@@ -1,10 +1,10 @@
 
 # Script to analyze the output of TOPFE_qualityPlots.py
 
+import sys
 import ROOT
 ROOT.gStyle.SetOptStat(0)
 ROOT.gROOT.SetBatch()
-import sys
 
 if len(sys.argv) < 2:
     print("Usage: %s <name of root ntuple>" % sys.argv[0])

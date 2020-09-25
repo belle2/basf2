@@ -2,6 +2,7 @@ import basf2
 from softwaretrigger import constants
 import modularAnalysis
 import stdV0s
+import vertex
 from geometry import check_components
 import reconstruction
 
@@ -120,6 +121,32 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
     stdV0s.stdKshorts(path=path, fitter='KFit')
+    stdV0s.stdLambdas(path=path)
+    modularAnalysis.fillParticleList("K+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
+    modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
+    modularAnalysis.fillParticleList("gamma:loose", 'theta > 0.296706 and theta < 2.61799 and \
+    [[clusterReg == 1 and E > 0.03] or [clusterReg == 2 and E > 0.02] or [clusterReg == 3 and E > 0.03]] and \
+    [abs(clusterTiming) < formula(1.0 * clusterErrorTiming) or E > 0.1] and [clusterE1E9 > 0.3 or E > 0.1] ', path=path)
+    modularAnalysis.reconstructDecay('pi0:loose -> gamma:loose gamma:loose', '0.075 < M < 0.175', 1, True, path=path)
+    modularAnalysis.cutAndCopyList('pi0:veryLooseFit', 'pi0:loose', '', True, path=path)
+    vertex.kFit('pi0:veryLooseFit', 0.0, 'mass', path=path)
+    D0_Cut = '1.7 < M < 2.1'
+    D0_Ch = ['K-:dstSkim pi+:dstSkim',
+             'K-:dstSkim pi+:dstSkim pi0:veryLooseFit',
+             'K-:dstSkim pi+:dstSkim pi-:dstSkim pi+:dstSkim']
+
+    for chID, channel in enumerate(D0_Ch):
+        chID += 1
+        modularAnalysis.reconstructDecay('D0:ch' + str(chID) + ' -> ' + str(channel), D0_Cut, dmID=chID, path=path)
+
+    Dst_Cut = 'useCMSFrame(p) > 2.2 and massDifference(0) < 0.16'
+    Dst_List = []
+
+    for chID, channel in enumerate(D0_Ch):
+        chID += 1
+        modularAnalysis.reconstructDecay('D*+:ch' + str(chID) + ' -> D0:ch' + str(chID) + ' pi+:all', Dst_Cut, dmID=chID, path=path)
+        Dst_List.append('D*+:ch' + str(chID))
+    modularAnalysis.copyLists(outputListName='D*+:d0pi', inputListNames=Dst_List, path=path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)

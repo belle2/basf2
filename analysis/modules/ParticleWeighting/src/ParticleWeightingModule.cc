@@ -10,9 +10,8 @@
 
 // Own include
 #include <analysis/modules/ParticleWeighting/ParticleWeightingModule.h>
-#include <framework/datastore/StoreArray.h>
+
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/database/DBObjPtr.h>
 #include <analysis/VariableManager/Manager.h>
 
 // framework aux
@@ -64,7 +63,7 @@ namespace Belle2 {
 
   void ParticleWeightingModule::initialize()
   {
-    StoreArray<Particle>().isRequired();
+    m_particles.isRequired();
     m_inputList.isRequired(m_inputListName);
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
   }
@@ -76,12 +75,11 @@ namespace Belle2 {
       B2WARNING("Input list " << m_inputList.getName() << " was not created?");
       return;
     }
-    StoreArray<Particle> particles;
     const unsigned int numParticles = m_inputList->getListSize();
     for (unsigned int i = 0; i < numParticles; i++) {
       const Particle* ppointer = m_inputList->getParticle(i);
       double index = ppointer->getArrayIndex();
-      Particle* p = particles[index];
+      Particle* p = m_particles[index];
       WeightInfo info = getInfo(p);
       for (const auto& entry : info) {
         p->addExtraInfo(m_tableName + "_" + entry.first, entry.second);

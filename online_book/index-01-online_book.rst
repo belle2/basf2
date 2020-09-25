@@ -14,6 +14,7 @@ the software by following through a series of hands-on lessons.
    :start-line: 6
 
 .. toctree::
+   :maxdepth: 2
    :glob:
 
    welcome

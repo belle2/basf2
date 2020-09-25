@@ -4,6 +4,9 @@
 
 from prompt import CalibrationSettings
 from prompt.utils import events_in_basf2_file
+import basf2
+from random import choice, seed
+from caf.framework import Calibration
 
 
 #: Tells the automated system some details of this script
@@ -13,10 +16,6 @@ settings = CalibrationSettings(name="CDC Tracking",
                                input_data_formats=["raw"],
                                input_data_names=["hlt_mumu", "hlt_hadron", "Bcosmics"],
                                depends_on=[])
-
-
-import basf2
-from random import choice, seed
 
 
 def select_files(all_input_files, min_events, max_processed_events_per_file):
@@ -335,9 +334,6 @@ def sr_algo():
     algo.setStoreHisto(True)
     algo.setThreshold(0.4)
     return algo
-
-
-from caf.framework import Calibration
 
 
 class CDCCalibration(Calibration):

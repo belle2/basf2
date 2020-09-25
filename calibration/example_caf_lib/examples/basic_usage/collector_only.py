@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 from sys import argv
 # logging.package("calibration").log_level = LogLevel.DEBUG
 # logging.package("calibration").debug_level = 100
+set_log_level(LogLevel.INFO)
 
 if len(argv) == 2:
     data_dir = argv[1]

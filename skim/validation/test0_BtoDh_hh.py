@@ -4,7 +4,7 @@
 
 """
 <header>
-  <output>BtoDh_hh.dst.root</output>
+  <output>../BtoDh_hh.dst.root</output>
   <contact>niharikarout@physics.iitm.ac.in</contact>
 </header>
 """

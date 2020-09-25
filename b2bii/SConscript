@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['belle_legacy']
+env['LIBS'] = ['belle_legacy', 'framework', 'b2bii_dataobjects']
 env['CONTINUE'] = True
 
 Return('env')

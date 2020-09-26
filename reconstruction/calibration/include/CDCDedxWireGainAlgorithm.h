@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include "TH1D.h"
+#include "TH2F.h"
 
 namespace Belle2 {
   /**
@@ -62,12 +63,27 @@ namespace Belle2 {
     void generateNewPayloads(std::vector<double> dedxTruncmean);
 
     /**
-    * funtion to get bins of trunction from histogram
+    * function to get bins of trunction from histogram
     */
     void getTrucationBins(TH1D* htemp, int& binlow, int& binhigh);
 
     /**
-    * funtion to get layer avg from outer layers
+    * function to plot bad wire status (then and now)
+    */
+    void plotBadWires(int nDeadwires, int oBadwires);
+
+    /**
+    * function to plot wires in hist with input file
+    */
+    TH2F* getHistoPattern(TString badFileName, TString suffix);
+
+    /**
+    * function to return various CDC indexing for given wire
+    */
+    double getIndexVal(int iWire, TString what);
+
+    /**
+    * function to get layer avg from outer layers
     */
     double getLayerAverage(std::vector<double> tempWire);
 

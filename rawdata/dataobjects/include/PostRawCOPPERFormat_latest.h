@@ -146,7 +146,7 @@ namespace Belle2 {
                          int* detector_buf_2nd, int nwords_2nd,
                          int* detector_buf_3rd, int nwords_3rd,
                          int* detector_buf_4th, int nwords_4th,
-                         RawCOPPERPackerInfo rawcprpacker_info);
+                         RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
 
     //! Pack data for PCIe40 data-format
     /* cppcheck-suppress missingOverride */

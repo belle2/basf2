@@ -333,7 +333,7 @@ namespace Belle2 {
 
     //! Compare value from different channels and make a statistics table
     virtual void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
-                                    std::vector<std::vector< unsigned int>>& result);
+                                    std::vector<std::vector< unsigned int> >& result);
 
     //! Get hostname of a node from the RawCOPPER header
     virtual void GetNodeName(int n, char* node_name, int bufsize);

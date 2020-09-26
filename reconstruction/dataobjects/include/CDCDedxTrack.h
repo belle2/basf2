@@ -204,7 +204,7 @@ namespace Belle2 {
     int getADCBaseCount(int i) const { return m_hADCBaseCount[i]; }
 
     /** Return the factor introduce for adcCount (non-linearity) correction */
-    int getNonLADCCorrection(int i) const { return (m_hADCBaseCount[i] * 1.0) / m_hADCCount[i]; }
+    double getNonLADCCorrection(int i) const { return (m_hADCBaseCount[i] * 1.0) / m_hADCCount[i]; }
 
     /** Return the distance of closest approach to the sense wire for this hit */
     double getDoca(int i) const { return m_hDoca[i]; }

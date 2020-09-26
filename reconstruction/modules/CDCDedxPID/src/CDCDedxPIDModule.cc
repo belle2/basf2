@@ -482,6 +482,9 @@ void CDCDedxPIDModule::event()
           // --------------------
           // save individual hits (even for dead wires)
           // --------------------
+          if (correction != 0) dadcCount = dadcCount / correction;
+          else dadcCount = 0;
+
           double cellDedx = (dadcCount / celldx);
 
           // correct for path length through the cell
@@ -498,7 +501,6 @@ void CDCDedxPIDModule::event()
           // save layer hits only with active wires
           // --------------------
           if (correction != 0) {
-            dadcCount = dadcCount / correction;
 
             layerdE += dadcCount;
             layerdx += celldx;

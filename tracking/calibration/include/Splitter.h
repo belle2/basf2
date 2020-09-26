@@ -15,8 +15,8 @@
 #include <limits>
 
 
-//To allow Stand-Alone running
-#if __has_include(<framework/logging/Logger.h>)
+//If compiled within BASF2
+#ifdef _PACKAGE_
 #include <framework/logging/Logger.h>
 #else
 #ifndef B2FATAL

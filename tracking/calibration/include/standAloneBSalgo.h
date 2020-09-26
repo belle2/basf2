@@ -16,8 +16,8 @@
 #include <TMatrixDSym.h>
 #include <TTree.h>
 
-//To allows Stand-Alone running
-#if __has_include(<framework/logging/Logger.h>)
+//If compiled within BASF2
+#ifdef _PACKAGE_
 #include <tracking/calibration/Splitter.h>
 #else
 #include "Splitter.h"

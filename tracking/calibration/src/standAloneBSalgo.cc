@@ -43,8 +43,8 @@
 #include <vector>
 #include <numeric>
 
-//To allow Stand-Alone running
-#if __has_include(<framework/logging/Logger.h>)
+//if compiled within BASF2
+#ifdef _PACKAGE_
 #include <tracking/calibration/standAloneBSalgo.h>
 #include <tracking/calibration/Splitter.h>
 #include <tracking/calibration/tools.h>

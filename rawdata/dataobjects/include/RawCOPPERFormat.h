@@ -11,7 +11,7 @@
 // Includes
 #include <stdio.h>
 #include <string>
-
+#include <vector>
 #include <rawdata/RawCOPPERPackerInfo.h>
 #include <rawdata/dataobjects/RawDataBlockFormat.h>
 

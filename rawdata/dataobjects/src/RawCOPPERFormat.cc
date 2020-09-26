@@ -178,3 +178,38 @@ void RawCOPPERFormat::CompareHeaderValue(int n, const unsigned int (&input_val)[
   B2FATAL(err_buf);
   return;
 }
+
+void RawCOPPERFormat::GetNodeName(int n, char* node_name, int bufsize)
+{
+  unsigned int node_id = GetNodeID(n);
+  if (node_name == NULL || node_id == 0 || bufsize < 20) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "[FATAL] Null pointer or strange node_id(%.8x)in an argument of this function. Exiting... : \n%s %s %d\n",
+            node_id,
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf); // to reduce multiple error messages
+  } else {
+    sprintf(node_name, "cpr%d",
+            (10 * (node_id >> 28) + (node_id >> 24)) * 1000 +
+            (node_id & COPPERID_MASK));
+  }
+}
+
+void RawCOPPERFormat::GetNodeName(char* node_name, unsigned int node_id, int bufsize)
+{
+  if (node_name == NULL || node_id == 0 || bufsize < 20) {
+    char err_buf[500];
+    sprintf(err_buf,
+            "[FATAL] Null pointer or strange node_id(%.8x)in an argument of this function. Exiting... : \n%s %s %d\n",
+            node_id,
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf); // to reduce multiple error messages
+  } else {
+    sprintf(node_name, "cpr%d",
+            (10 * (node_id >> 28) + (node_id >> 24)) * 1000 +
+            (node_id & COPPERID_MASK));
+  }
+}

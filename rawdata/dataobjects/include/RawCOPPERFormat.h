@@ -335,6 +335,12 @@ namespace Belle2 {
     virtual void CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,
                                     std::vector<std::vector< unsigned int>>& result);
 
+    //! Get hostname of a node from the RawCOPPER header
+    virtual void GetNodeName(int n, char* node_name, int bufsize);
+
+    //! Get hostname of a node from an argument
+    virtual void GetNodeName(char* node_name, unsigned int node_id, int bufsize);
+
 
   protected :
 

@@ -41,8 +41,11 @@ unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
 unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 {
   char err_buf[500];
+  char hostname[128];
+  GetNodeName(n, hostname, sizeof(hostname));
   sprintf(err_buf,
-          "[FATAL] ERROR_EVENT : No event # in B2LFEE header. (block %d) Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+          "[FATAL] %s ch=%d : ERROR_EVENT : No event # in B2LFEE header. (block %d) Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+          hostname, -1,
           n,
           GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -83,8 +86,11 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            hostname, -1,
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -107,8 +113,11 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
 bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
 {
   char err_buf[500];
+  char hostname[128];
+  GetNodeName(n, hostname, sizeof(hostname));
   sprintf(err_buf,
-          "[FATAL] ERROR_EVENT : No magic word # in COPPER header (block %d). Exiting...: eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+          "[FATAL] %s ch=%d : ERROR_EVENT : No magic word # in COPPER header (block %d). Exiting...: eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+          hostname, -1,
           n,
           GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -159,8 +168,11 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   int finesse_nwords = GetFINESSENwords(n, finesse_num);
   if (finesse_nwords <= 0) {
     char err_buf[500];
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : The specified finesse(%c) seems to be empty(nwords = %d). Cannot calculate CRC16. Exiting...: eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : The specified finesse(%c) seems to be empty(nwords = %d). Cannot calculate CRC16. Exiting...: eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            hostname, finesse_num,
             65 + finesse_num, finesse_nwords,
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -202,10 +214,12 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       // Do not stop data
       //
       char err_buf[500];
+      char hostname[128];
+      GetNodeName(n, hostname, sizeof(hostname));
       if ((GetNodeID(n) & DETECTOR_MASK) == ARICH_ID) {
         sprintf(err_buf,
-                "[WARNING] ARICH(cpr=%.8x) POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
-                GetNodeID(n),
+                "[WARNING] %s ch=%d : ARICH : POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+                hostname, finesse_num,
                 *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
                 65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -213,7 +227,8 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
         PrintData(GetFINESSEBuffer(n, finesse_num), GetFINESSENwords(n, finesse_num));
       } else {
         sprintf(err_buf,
-                "[FATAL] POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+                "[FATAL] %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+                hostname, finesse_num,
                 *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
                 65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -231,8 +246,11 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       // Stop taking data
       //
       char err_buf[500];
+      char hostname[128];
+      GetNodeName(n, hostname, sizeof(hostname));
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : POST B2link event CRC16 error without B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+              "[FATAL] %s ch=%d : ERROR_EVENT : POST B2link event CRC16 error without B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+              hostname, finesse_num,
               *buf , temp_crc16, GetFINESSENwords(n, finesse_num), copper_buf[ tmp_header.POS_TRUNC_MASK_DATATYPE ],
               65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);

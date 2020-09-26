@@ -56,8 +56,11 @@ int PreRawCOPPERFormat_v2::GetFINESSENwords(int n, int finesse_num)
 {
   if (!CheckCOPPERMagic(n)) {
     char err_buf[500];
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format. : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format. : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            hostname, finesse_num,
             65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] %s", err_buf); fflush(stdout);
@@ -89,8 +92,11 @@ int PreRawCOPPERFormat_v2::GetFINESSENwords(int n, int finesse_num)
       break;
     default :
       char err_buf[500];
+      char hostname[128];
+      GetNodeName(n, hostname, sizeof(hostname));
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : Specifined FINESSE number( = %d ) is invalid. Exiting... : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+              "[FATAL] %s ch=%d : ERROR_EVENT : Specified FINESSE number( = %d ) is invalid. Exiting... : slot%c eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+              hostname, finesse_num,
               finesse_num,
               65 + finesse_num, GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -126,7 +132,11 @@ unsigned int PreRawCOPPERFormat_v2::GetB2LFEE32bitEventNumber(int n)
   if (flag == 0) {
     PrintData(m_buffer, m_nwords);
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : No HSLB data in COPPER data. Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
+    sprintf(err_buf,
+            "[FATAL] %s ch=%d : ERROR_EVENT : No HSLB data in COPPER data. Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            hostname, -1,
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
@@ -135,10 +145,12 @@ unsigned int PreRawCOPPERFormat_v2::GetB2LFEE32bitEventNumber(int n)
   }
 
   if (err_flag == 1) {
-
     char err_buf[500];
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            hostname, -1,
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -176,14 +188,17 @@ void PreRawCOPPERFormat_v2::CheckData(int n,
                                       unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
 
-  char err_buf[500];
+  char err_buf[1000];
   int err_flag = 0;
   //
   // check Magic words
   //
   if (!CheckCOPPERMagic(n)) {
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            hostname, -1,
             GetMagicDriverHeader(n), GetMagicFPGAHeader(n), GetMagicFPGATrailer(n), GetMagicDriverTrailer(n),
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -196,8 +211,12 @@ void PreRawCOPPERFormat_v2::CheckData(int n,
   *cur_evenum_rawcprhdr = GetEveNo(n);
   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
+
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : Event # in PreRawCOPPERFormat_v2 header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : Event # in PreRawCOPPERFormat_v2 header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            hostname, -1,
             *cur_evenum_rawcprhdr, evenum_feehdr,
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -211,15 +230,22 @@ void PreRawCOPPERFormat_v2::CheckData(int n,
   *cur_copper_ctr = GetCOPPERCounter(n);
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
+      char hostname[128];
+      GetNodeName(n, hostname, sizeof(hostname));
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+              "[FATAL] %s ch=%d : ERROR_EVENT : Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting... : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+              hostname, -1,
               n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
               GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
-      sprintf(err_buf, "[FATAL] ERROR_EVENT : COPPER counter jump : i %d prev 0x%x cur 0x%x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+      char hostname[128];
+      GetNodeName(n, hostname, sizeof(hostname));
+      sprintf(err_buf,
+              "[FATAL] %s ch=%d : ERROR_EVENT : COPPER counter jump : i %d prev 0x%x cur 0x%x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+              hostname, -1,
               n, prev_copper_ctr, *cur_copper_ctr,
               GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -242,8 +268,12 @@ void PreRawCOPPERFormat_v2::CheckData(int n,
             eve[ i ] = m_buffer[ pos_nwords ];
           }
         }
+
+        char hostname[128];
+        GetNodeName(n, hostname, sizeof(hostname));
         sprintf(err_buf,
-                "[FATAL] ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+                "[FATAL] %s ch=%d : ERROR_EVENT : Invalid Event # at the beginning of the run (It should be zero.): preveve 0x%x cureve 0x%x : prev(exp %u run %d sub %u ) cur(exp %u run %d sub %u ) ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) Exiting... : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+                hostname, -1,
                 prev_evenum, *cur_evenum_rawcprhdr,
                 prev_exprunsubrun_no >> 22 , (prev_exprunsubrun_no >> 8) & 0x3FFF, prev_exprunsubrun_no & 0xFF,
                 *cur_exprunsubrun_no >> 22 , (*cur_exprunsubrun_no >> 8) & 0x3FFF, *cur_exprunsubrun_no & 0xFF,
@@ -267,8 +297,11 @@ void PreRawCOPPERFormat_v2::CheckData(int n,
   // Check checksum calculated by COPPER driver
   //
   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
+            hostname, -1,
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, GetDriverChkSum(n), CalcDriverChkSum(n),
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -281,8 +314,11 @@ void PreRawCOPPERFormat_v2::CheckData(int n,
   tmp_trailer.SetBuffer(GetRawTrlBufPtr(n));
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : PreRawCOPPERFormat_v2 checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : PreRawCOPPERFormat_v2 checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            hostname, -1,
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
             GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -333,7 +369,7 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
   unsigned int temp_ctime_trgtype_footer, temp_eve_footer;
   unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
-  char err_buf[500];
+  char err_buf[2500];
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
@@ -369,7 +405,16 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
                      j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
             }
           }
-          sprintf(err_buf, "[FATAL] ERROR_EVENT : mismatch header value over FINESSEs. Exiting...\n %s %s %d\n",
+
+          char hostname[128];
+          GetNodeName(n, hostname, sizeof(hostname));
+          sprintf(err_buf,
+                  "[FATAL] %s ch=%d : ERROR_EVENT : mismatch header value over FINESSEs. Exiting... FINESSE #=0 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=1 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=2 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x FINESSE #=3 buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n %s %s %d\n",
+                  hostname, -1,
+                  GetFINESSENwords(n, 0), ctime_trgtype[ 0 ], utime[ 0 ], eve[ 0 ], exprun[ 0 ],
+                  GetFINESSENwords(n, 1), ctime_trgtype[ 1 ], utime[ 1 ], eve[ 1 ], exprun[ 1 ],
+                  GetFINESSENwords(n, 2), ctime_trgtype[ 2 ], utime[ 2 ], eve[ 2 ], exprun[ 2 ],
+                  GetFINESSENwords(n, 3), ctime_trgtype[ 3 ], utime[ 3 ], eve[ 3 ], exprun[ 3 ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
 
@@ -377,8 +422,11 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
           break;
         } else if (temp_ctime_trgtype != temp_ctime_trgtype_footer ||
                    (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
+          char hostname[128];
+          GetNodeName(n, hostname, sizeof(hostname));
           sprintf(err_buf,
-                  "[FATAL] ERROR_EVENT : mismatch(finesse %d) between header(ctime %.8x eve %.8x) and footer(ctime %.8x eve_crc16 %.8x). Exiting...\n %s %s %d\n",
+                  "[FATAL] %s ch=%d : ERROR_EVENT : mismatch(finesse %d) between header(ctime %.8x eve %.8x) and footer(ctime %.8x eve_crc16 %.8x). Exiting...\n %s %s %d\n",
+                  hostname, i,
                   i,  temp_ctime_trgtype,  temp_eve, temp_ctime_trgtype_footer, temp_eve_footer,
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
@@ -447,8 +495,11 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
       copper_buf[ POS_CH_C_DATA_LENGTH ] == 0 &&
       copper_buf[ POS_CH_D_DATA_LENGTH ] == 0) {
     char err_buf[500];
+    char hostname[128];
+    GetNodeName(hostname, m_node_id , sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
+            hostname, -1,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     //    string err_str = err_buf; throw (err_str);
@@ -472,8 +523,12 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
   //
   if (m_buffer[ tmp_header.POS_NWORDS ] != m_nwords) {
     char err_buf[500];
+
+    char hostname[128];
+    GetNodeName(hostname, m_node_id , sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n %s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n %s %s %d\n",
+            hostname, -1,
             m_nwords, m_buffer[ tmp_header.POS_NWORDS ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
@@ -537,8 +592,11 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
 
     if (ff55_higher_bits != 0xff550000) {
       char err_buf[500];
+      char hostname[128];
+      GetNodeName(hostname, m_node_id , sizeof(hostname));
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : HSLB slotA's trailer magic word(0xff55) is invalid. :  : eve %8u run %d foooter %.8x : %s %s %d\n",
+              "[FATAL] %s ch=%d : ERROR_EVENT : HSLB slotA's trailer magic word(0xff55) is invalid. : eve %8u run %d foooter %.8x : %s %s %d\n",
+              hostname, 0,
               cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
               m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -551,8 +609,13 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
       const int linkdown_bit = 15;
       //      const int packet_crcerr_bit = 8;
       char err_buf[500];
+      char hostname[128];
+      GetNodeName(hostname, m_node_id , sizeof(hostname));
+
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
-        sprintf(err_buf, "[FATAL] B2link down on slot A eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
+        sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link down on slot A eve %8u foooter %.8x : %s %s %d\n",
+                hostname, 0,
+                cur_ftsw_eve32,
                 m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -564,8 +627,8 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x1 << 28);
           sprintf(err_buf,
-                  "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot A eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
-                  m_node_id,
+                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot A eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  hostname, 0,
                   cur_ftsw_eve32,
                   m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -575,8 +638,8 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x1 << 28);
-          sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n",
-                  m_node_id,
+          sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link packet CRC error slot A eve %8u foooter %.8x : %s %s %d\n",
+                  hostname, 0,
                   cur_ftsw_eve32,
                   m_buffer[ offset_1st_finesse + copper_buf[ POS_CH_A_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -594,11 +657,13 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
                        0xFFFF0000;
 
     ff55_lower_bits = (m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
-
+    char hostname[128];
+    GetNodeName(hostname, m_node_id , sizeof(hostname));
     if (ff55_higher_bits != 0xff550000) {
       char err_buf[500];
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : HSLB slotB's trailer magic word(0xff55) is invalid. :  : eve %8u run %d foooter %.8x : %s %s %d\n",
+              "[FATAL] %s ch=%d : ERROR_EVENT : HSLB slotB's trailer magic word(0xff55) is invalid. : eve %8u run %d foooter %.8x : %s %s %d\n",
+              hostname, 1,
               cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
               m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -612,7 +677,9 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
       const int linkdown_bit = 15;
       //      const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
-        sprintf(err_buf, "[FATAL] B2link down on slot B eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
+        sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link down on slot B eve %8u foooter %.8x : %s %s %d\n",
+                hostname, 1,
+                cur_ftsw_eve32,
                 m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -624,8 +691,8 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x2 << 28);
           sprintf(err_buf,
-                  "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot B eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
-                  m_node_id,
+                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot B eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  hostname, 1,
                   cur_ftsw_eve32,
                   m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -635,8 +702,8 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x2 << 28);
-          sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",
-                  m_node_id,
+          sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link packet CRC error slot B eve %8u foooter %.8x : %s %s %d\n",
+                  hostname, 1,
                   cur_ftsw_eve32,
                   m_buffer[ offset_2nd_finesse + copper_buf[ POS_CH_B_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -654,11 +721,13 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
                        0xFFFF0000;
 
     ff55_lower_bits = (m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
-
+    char hostname[128];
+    GetNodeName(hostname, m_node_id , sizeof(hostname));
     if (ff55_higher_bits != 0xff550000) {
       char err_buf[500];
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : HSLB slotC's trailer magic word(0xff55) is invalid. :  : eve %8u run %d foooter %.8x : %s %s %d\n",
+              "[FATAL] %s ch=%d : ERROR_EVENT : HSLB slotC's trailer magic word(0xff55) is invalid. : eve %8u run %d foooter %.8x : %s %s %d\n",
+              hostname, 2,
               cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
               m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -672,7 +741,9 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
       const int linkdown_bit = 15;
 
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
-        sprintf(err_buf, "[FATAL] B2link down on slot C eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
+        sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link down on slot C eve %8u foooter %.8x : %s %s %d\n",
+                hostname, 2,
+                cur_ftsw_eve32,
                 m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -684,8 +755,8 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x4 << 28);
           sprintf(err_buf,
-                  "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot C eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
-                  m_node_id,
+                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot C eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  hostname, 2,
                   cur_ftsw_eve32,
                   m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -695,8 +766,8 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x4 << 28);
-          sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",
-                  m_node_id,
+          sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link packet CRC error slot C eve %8u foooter %.8x : %s %s %d\n",
+                  hostname, 2,
                   cur_ftsw_eve32,
                   m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -715,11 +786,13 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
                        0xFFFF0000;
 
     ff55_lower_bits = (m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] & 0xFFFF);
-
+    char hostname[128];
+    GetNodeName(hostname, m_node_id , sizeof(hostname));
     if (ff55_higher_bits != 0xff550000) {
       char err_buf[500];
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : HSLB slotD's trailer magic word(0xff55) is invalid. :  : eve %8u run %d foooter %.8x : %s %s %d\n",
+              "[FATAL] %s ch=%d : ERROR_EVENT : HSLB slotD's trailer magic word(0xff55) is invalid. : eve %8u run %d foooter %.8x : %s %s %d\n",
+              hostname, 3,
               cur_ftsw_eve32, (m_buffer[ tmp_header.POS_EXP_RUN_NO ] >> 8) & 0x3FFF,
               m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -733,7 +806,9 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
       const int linkdown_bit = 15;
 
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
-        sprintf(err_buf, "[FATAL] B2link down on slot D eve %8u foooter %.8x : %s %s %d\n", cur_ftsw_eve32,
+        sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link down on slot D eve %8u foooter %.8x : %s %s %d\n",
+                hostname, 3,
+                cur_ftsw_eve32,
                 m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -745,8 +820,8 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8 << 28);
           sprintf(err_buf,
-                  "[WARNING] ARICH(cpr=%.8x) B2link packet CRC error slot D eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
-                  m_node_id,
+                  "[WARNING] %s ch=%d : ARICH : B2link packet CRC error slot D eve %8u foooter %.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: %s %s %d\n",
+                  hostname, 3,
                   cur_ftsw_eve32,
                   m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -756,8 +831,8 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
         } else {
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= tmp_header.B2LINK_PACKET_CRC_ERROR;
           m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] |= (unsigned int)(0x8 << 28);
-          sprintf(err_buf, "[FATAL] (cpr=%.8x) B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",
-                  m_node_id,
+          sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : B2link packet CRC error slot D eve %8u foooter %.8x : %s %s %d\n",
+                  hostname, 3,
                   cur_ftsw_eve32,
                   m_buffer[ offset_4th_finesse + copper_buf[ POS_CH_D_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ],
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -801,7 +876,10 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
   //
   if (chksum_body != (unsigned int)(m_buffer[ body_end ])) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
+    char hostname[128];
+    GetNodeName(hostname, m_node_id , sizeof(hostname));
+    sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
+            hostname, -1,
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
@@ -841,7 +919,11 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
   }
   if (err_flag == 1) {
     char err_buf[500];
-    sprintf(err_buf, "[FATAL] ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
+    char hostname[128];
+    GetNodeName(hostname, m_node_id , sizeof(hostname));
+    sprintf(err_buf,
+            "[FATAL] %s ch=%d : ERROR_EVENT : Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
+            hostname, -1,
             GetMagicDriverHeader(datablock_id),
             GetMagicFPGAHeader(datablock_id),
             GetMagicFPGATrailer(datablock_id),
@@ -860,10 +942,10 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
 
   *cur_exprunsubrun_no = GetExpRunSubrun(datablock_id);
 
-//   if ((unsigned int)cur_ftsw_eve32 < 50) {
-//     printf("EVENT OUTPUT ########## %u\n", cur_ftsw_eve32);
-//     PrintData(GetBuffer(datablock_id), TotalBufNwords());
-//   }
+  //   if ((unsigned int)cur_ftsw_eve32 < 50) {
+  //     printf("EVENT OUTPUT ########## %u\n", cur_ftsw_eve32);
+  //     PrintData(GetBuffer(datablock_id), TotalBufNwords());
+  //   }
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if (prev_eve32 + 1 != cur_ftsw_eve32) {
       unsigned int eve[4] = {0xbaadf00d, 0xbaadf00d, 0xbaadf00d, 0xbaadf00d };
@@ -888,8 +970,11 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
       }
 
       char err_buf[500];
+      char hostname[128];
+      GetNodeName(hostname, m_node_id , sizeof(hostname));
       sprintf(err_buf,
-              "[FATAL] ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) prun %u crun %u\n %s %s %d\n",
+              "[FATAL] %s ch=%d : ERROR_EVENT : Invalid event_number. Exiting...: cur 32bit eve %u preveve %u ( A:0x%.8x B:0x%.8x C:0x%.8x D:0x%.8x ) prun %u crun %u\n %s %s %d\n",
+              hostname, -1,
               cur_ftsw_eve32, prev_eve32,
               eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
               prev_exprunsubrun_no, *cur_exprunsubrun_no,
@@ -942,7 +1027,10 @@ void PreRawCOPPERFormat_v2::CheckB2LFEEHeaderVersion(int n)
         printf("[DEBUG] \033[0m");
         fflush(stderr);
         char err_buf[500];
-        sprintf(err_buf, "[FATAL] ERROR_EVENT : FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
+        char hostname[128];
+        GetNodeName(n, hostname, sizeof(hostname));
+        sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
+                hostname, i,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         B2FATAL(err_buf);
 #endif
@@ -956,7 +1044,10 @@ void PreRawCOPPERFormat_v2::CheckB2LFEEHeaderVersion(int n)
     if (i == 3) {
 #ifdef TEMP
       char err_buf[500];
-      sprintf(err_buf, "[FATAL] ERROR_EVENT : PreRawCOPPERFormat_v2 contains no FINESSE data. Exiting...\n %s %s %d\n",
+      char hostname[128];
+      GetNodeName(n, hostname, sizeof(hostname));
+      sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : PreRawCOPPERFormat_v2 contains no FINESSE data. Exiting...\n %s %s %d\n",
+              hostname, i,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
       //      string err_str = err_buf; throw (err_str);
@@ -1143,8 +1234,11 @@ int PreRawCOPPERFormat_v2::CopyReducedBuffer(int n, int* buf_to)
       if (finesse_nwords - SIZE_B2LHSLB_HEADER - SIZE_B2LFEE_HEADER
           - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER < 0) {
         char err_buf[500];
+        char hostname[128];
+        GetNodeName(n, hostname, sizeof(hostname));
         sprintf(err_buf,
-                "[FATAL] ERROR_EVENT : Finesse buffer size is too small( %d words < %d words). May be the data are corrupted. Exiting...\n %s %s %d\n",
+                "[FATAL] %s ch=%d : ERROR_EVENT : Finesse buffer size is too small( %d words < %d words). May be the data are corrupted. Exiting...\n %s %s %d\n",
+                hostname, j,
                 finesse_nwords, SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -1237,8 +1331,11 @@ int PreRawCOPPERFormat_v2::CopyReducedBuffer(int n, int* buf_to)
 
   if ((old_rawcopper_chksum ^ removed_xor_chksum) != new_rawcopper_chksum) {
     char err_buf[500];
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : RawCOPPER XOR checksum is inconsistent between before/after data reduction.(%.8x != %.8x ^ %.8x = %.8x ) Exiting...\n %s %s %d\n",
+            "[FATAL] %s ch=%d : ERROR_EVENT : RawCOPPER XOR checksum is inconsistent between before/after data reduction.(%.8x != %.8x ^ %.8x = %.8x ) Exiting...\n %s %s %d\n",
+            hostname, -1,
             new_rawcopper_chksum,  old_rawcopper_chksum, removed_xor_chksum, old_rawcopper_chksum ^ removed_xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
@@ -1345,7 +1442,11 @@ int PreRawCOPPERFormat_v2::CheckCRC16(int n, int finesse_num)
 
   if ((unsigned short)(*buf & 0xFFFF) != temp_crc16) {
     PrintData(GetBuffer(n), *(GetBuffer(n) + tmp_header.POS_NWORDS));
-    printf("[FATAL] ERROR_EVENT : PRE CRC16 error : slot %c B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
+    char err_buf[500];
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
+    printf("[FATAL] %s ch=%d : ERROR_EVENT : PRE CRC16 error : slot %c : B2LCRC16 %x Calculated CRC16 %x : Nwords of FINESSE buf %d\n",
+           hostname, finesse_num,
            65 + finesse_num, *buf , temp_crc16, GetFINESSENwords(n, finesse_num));
     int* temp_buf = GetFINESSEBuffer(n, finesse_num);
     for (int k = 0; k <  GetFINESSENwords(n, finesse_num); k++) {
@@ -1356,10 +1457,10 @@ int PreRawCOPPERFormat_v2::CheckCRC16(int n, int finesse_num)
     }
     printf("\n");
     fflush(stdout);
-    char err_buf[500];
     sprintf(err_buf,
-            "[FATAL] ERROR_EVENT : B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
-            (unsigned short)(*buf & 0xFFFF), temp_crc16,
+            "[FATAL] %s ch=%d : ERROR_EVENT : slot %c : B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
+            hostname, finesse_num,
+            65 + finesse_num, (unsigned short)(*buf & 0xFFFF), temp_crc16,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     B2FATAL(err_buf); // to reduce multiple error messages
@@ -1519,4 +1620,3 @@ int* PreRawCOPPERFormat_v2::PackDetectorBuf(int* packed_buf_nwords,
   *packed_buf_nwords = poswords_to;
   return packed_buf;
 }
-

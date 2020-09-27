@@ -38,10 +38,27 @@ What is skimming?
 -----------------
 
 Skims are sets of selections made on data and MC with particular analyses in
-mind. The purpose of skims is to produce data and MC files that have been reduced from their original size. This is done by applying a list of criteria to the data and MC, such that only events that interested a given analyst will be stored and provided. The analyst can then use the skimmed samples to further fine tune and improve their research. Skimmed samples are usually around 90% smaller than the original data and MC samples they are produced from. These samples are thus more manageable to use for analysis development and reduce the overall CPU and storage usage requierements of each analyst. Belle II  is expecting to collect 50 ab-1 of data, which will be almost impossible to run on without skimming.
+mind. The purpose of skims is to produce data and MC files that have been
+reduced from their original size. This is done by applying a list of criteria to
+the data and MC, such that only events that interested a given analyst will be
+stored and provided. The analyst can then use the skimmed samples to further
+fine tune and improve their research. Skimmed samples are usually around 90%
+smaller than the original data and MC samples they are produced from. These
+samples are thus more manageable to use for analysis development and reduce the
+overall CPU and storage usage requierements of each analyst. Belle II is
+expecting to collect 50 ab-1 of data, which will be almost impossible to run on
+without skimming.
 
-The criteria for skims varies from analysis to analysis. The general gist is to use a loose selection which can then be optimized by the analyst.
-For example, an analyst looking for the decay of a :math:`B\to D \ell \nu` and :math:`D^0 \to K^- \pi^+`  will want to examine events where there are at least 3 tracks: two for the :math:`D` daughter tracks and one for the lepton. The corresponding skim can include such a criteria where only events with more 3 tracks or more are included. The skim will also include a loose selection for the reconstruction of a :math: `B` meson.  Tighter selection criteria related to the lepton or D reconstruction are usually not applied at skim level. The analyst applied their optimized selection on the skimmed samples.  
+The criteria for skims varies from analysis to analysis. The general gist is to
+use a loose selection which can then be optimized by the analyst. For example,
+an analyst looking for the decay of a :math:`B\to D \ell \nu` and :math:`D^0 \to
+K^- \pi^+` will want to examine events where there are at least 3 tracks: two
+for the :math:`D` daughter tracks and one for the lepton. The corresponding skim
+can include such a criteria where only events with more 3 tracks or more are
+included. The skim will also include a loose selection for the reconstruction of
+a :math: `B` meson. Tighter selection criteria related to the lepton or D
+reconstruction are usually not applied at skim level. The analyst applied their
+optimized selection on the skimmed samples.
 
 Skims are intended into reduce the overall CPU requirements of the
 collaboration, and to make your life easier. Skims can make your life easier in
@@ -61,9 +78,17 @@ the following ways:
 Mechanics of a skim
 ~~~~~~~~~~~~~~~~~~~
 
-Under the hood, skims operate by running over the miniDST, which is the format of the produced Monte Carlo samples and the processed data at Belle II, reconstructing a specific particle list, and
-writing the reconstructed particle information to a microDST, referred to as uDST. The skim filter
-removes any events which do not satisfy the criteria of the given skim, and thus do not have any candidates in the skim particle lists. For example, for the decay of  :math:`B\to D \ell \nu` and :math:`D^0 \to K^- \pi^+`, all events with less than 3 tracks are not included. Furthermore, in the skim itself, :math:`B` meson is reconstructed using very loose criteria on the lepton and :math:`D` daughters. Events that do not have a :math:`B` candidate satisfying the loose criteria defined by the skim will not be included. 
+Under the hood, skims operate by running over the miniDST, which is the format
+of the produced Monte Carlo samples and the processed data at Belle II,
+reconstructing a specific particle list, and writing the reconstructed particle
+information to a microDST, referred to as uDST. The skim filter removes any
+events which do not satisfy the criteria of the given skim, and thus do not have
+any candidates in the skim particle lists. For example, for the decay of
+:math:`B\to D \ell \nu` and :math:`D^0 \to K^- \pi^+`, all events with less than
+3 tracks are not included. Furthermore, in the skim itself, :math:`B` meson is
+reconstructed using very loose criteria on the lepton and :math:`D` daughters.
+Events that do not have a :math:`B` candidate satisfying the loose criteria
+defined by the skim will not be included.
 
 .. admonition:: Question
      :class: exercise stacked
@@ -73,7 +98,8 @@ removes any events which do not satisfy the criteria of the given skim, and thus
 .. admonition:: Solution
      :class: toggle solution
 
-     uDST files contain the skimmed particle list  information in addition to all the information contained in the mDST.
+     uDST files contain the skimmed particle list information in addition to all
+     the information contained in the mDST.
 
      .. note::
 
@@ -85,7 +111,8 @@ removes any events which do not satisfy the criteria of the given skim, and thus
 List of available skims
 -----------------------
 
-At Belle II, we already have a list of skims developed by different analysts and skim liaisons.
+At Belle II, we already have a list of skims developed by different analysts and
+skim liaisons.
 All available skims are listed on :ref:`Sphinx <skim_physics>` (although not all
 of these are produced in skim campaigns). Although we try to keep the docstrings
 for each skim up-to-date, the best way to find out what selections are in a skim
@@ -111,8 +138,8 @@ Running a skim locally
 
 As mentioned above, there is a list of developed skims available in the skim package.
 An analyst starting a new project is strongly encouraged to browse through the list 
-of available skims and find out if there is a skim that meets their needs. Available skims 
-are ready to run on any data and MC sample. 
+of available skims and find out if there is a skim that meets their needs.
+Available skims are ready to run on any data and MC sample.
  
 There are two ways to run a skim yourself: including the skim in a steering
 file, or using the command-line tool ``b2skim-run``.
@@ -144,7 +171,7 @@ list of particle lists:
 .. code-block:: python
 
     >>> skim.SkimLists
-    ["B0:LeptonicUntagged_0", "B0:LeptonicUntagged_1"]
+    ["B-:LeptonicUntagged_0", "B-:LeptonicUntagged_1"]
 
 You can then use this list of particle list names in further reconstruction or
 ntuple output.
@@ -207,12 +234,13 @@ Accessing skims on the grid
 ---------------------------
 
 Analysts do not have to run the skims themselves on data or generic MC. 
-Each new MC campaign or data collection, a list of skims is requested by the analysts in the Belle II  
-physics working groups. This is done via the skim liaison or via JIRA tickets.
- Once requested, the skim is run on the large MC and/or data samples by the skim production managers. These skims are then anounced when ready and made available to the analyst. 
-The output LFNs are documented on the
-*dataset searcher*. You can then run your analysis these centrally-produced
-skims with :ref:`gbasf2 <onlinebook_gbasf2>`.
+Each new MC campaign or data collection, a list of skims is requested by the
+analysts in the Belle II physics working groups. This is done via the skim
+liaison or via JIRA tickets. Once requested, the skim is run on the large MC
+and/or data samples by the skim production managers. These skims are then
+anounced when ready and made available to the analyst. The output LFNs are
+documented on the *dataset searcher*. You can then run your analysis these
+centrally-produced skims with :ref:`gbasf2 <onlinebook_gbasf2>`.
 
 LFNs on the grid have a maximum length restriction, so we can't include the
 plain skim name in the LFN. Instead, we have standardised eight-digit *skim
@@ -267,8 +295,8 @@ an existing skim that might be useful for your analysis and is not currently
 being produced, talk to your local skim liaison.
 
 If you would like to get more involved in the writing and testing of skims, then
-you may find the :ref:`skim experts section <writing-skims>` of the
-Sphinx documentation helpful.
+you may find the :ref:`skim experts section <writing-skims>` of the Sphinx
+documentation helpful.
 
 
 .. admonition:: Key points

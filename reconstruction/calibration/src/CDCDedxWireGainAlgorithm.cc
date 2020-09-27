@@ -175,7 +175,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       else truncMean = 1.0;
     }
 
-    if (truncMean < 0)truncMean = 1.0; // not <=0 as 0 is reseved for dead wire
+    if (truncMean < 0)truncMean = 0.0; // not <=0 as 0 is reserved for dead wires
     iWireTruncMean[jwire] =  truncMean;
 
     if (isMakePlots) {
@@ -516,7 +516,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   if (hxyNewDead) {
     hxyNewDead->SetTitle("");
     hxyNewDead->SetMarkerStyle(20);
-    hxyNewDead->SetMarkerSize(0.3);
+    hxyNewDead->SetMarkerSize(0.25);
     hxyNewDead->SetMarkerColor(kRed);
     hxyNewDead->SetStats(0);
     hxyNewDead->Draw("same");
@@ -583,7 +583,7 @@ TH2F* CDCDedxWireGainAlgorithm::getHistoPattern(TString badFileName, TString suf
 
 double CDCDedxWireGainAlgorithm::getIndexVal(int iWire, TString what)
 {
-
+  //radius of each CDC layer
   double r[56] = {
     16.80,  17.80,  18.80,  19.80,  20.80,  21.80,  22.80,  23.80,
     25.70,  27.52,  29.34,  31.16,  32.98,  34.80,

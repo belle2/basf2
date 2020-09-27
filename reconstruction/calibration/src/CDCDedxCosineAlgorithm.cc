@@ -33,7 +33,7 @@ CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() :
   fdEdxMax(3.0)
 {
   // Set module properties
-  setDescription("A calibration algorithm for CDC dE/dx _eltron cos(theta) dependence");
+  setDescription("A calibration algorithm for CDC dE/dx electron cos(theta) dependence");
 
 }
 
@@ -42,7 +42,7 @@ CDCDedxCosineAlgorithm::CDCDedxCosineAlgorithm() :
 //-----------------------------------------------------------------
 CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 {
-  B2INFO("Preparing dE/dx calibration for CDC dE/dx _eltron saturation");
+  B2INFO("Preparing dE/dx calibration for CDC dE/dx electron saturation");
 
   // Get data objects
   auto ttree = getObjectPtr<TTree>("tree");

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Skim list building functions for the low multiplicity physics working group """
+""" Skim lists building functions for the low multiplicity physics working group """
 
 __authors__ = [
     "Xing-Yu Zhou",

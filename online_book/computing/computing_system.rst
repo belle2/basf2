@@ -44,7 +44,7 @@ It manages the processing of the raw data, skimming and analysis, as well as the
 
 .. figure:: B2computingModel.png
     :align: center
-    :width: 400px
+    :width: 600px
     :alt: The Belle II grid
 
     Snapshot of the Belle II grid, composed by 60 computing sites around the world.
@@ -58,10 +58,10 @@ Access to the data available on the grid is performed
 
 .. figure:: B2computingModel.png
     :align: center
-    :width: 400px
+    :width: 600px
     :alt: Computing model
 
     The Belle II distributed computing model.
 
 
-Work in progress...
+WORK IN PROGRESS ...

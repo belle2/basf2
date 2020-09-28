@@ -12,10 +12,10 @@ Gbasf2
 
     **Prerequisites**:
 
-        * Go through `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_ for getting access to the grid services.
-        * An ``ssh`` client and the :ref:`onlinebook_ssh` lesson.
+        * `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
         * A system with SL6 or CentOS 7.
         * Grid certificate installed in ``~/.globus`` and on the web browser.
+        * :ref:`onlinebook_first_steering_file` lesson.
 
     **Questions**:
 
@@ -57,11 +57,37 @@ The same steering files used with basf2 work with gbasf2, and the usual workflow
     * Once you submit jobs, they will be assigned to computing systems around the world.
     * If your job is problematic, it will be distributed to the world and all sites will be affected.
 
+
+Go to `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_
+and verify that you have the prerequisites. You need:
+
+* A system with SL6 or CentOS 7.
+* A valid grid certificate issued within a year and installed in ``~/.globus`` in ``.pem`` format.
+* Belle Virtual Organization (VO) membership registered or renewed within a year at the
+  `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
+* Registration in `DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_.
+
+.. note::
+
+    It is required to join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
+    where you can ask for help and receive announcements on releases and system issues.
+
+
 Installing gbasf2
 -----------------
 
 Unfortunately, at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).
+
+.. note::
+
+    Be sure that the userkey.pem has the ``rw`` permissions only for the owner and no permission to the others.
+    You should see ``-rw-------`` with ``ls -l ~/.globus/userkey.pem``. Otherwise, use
+
+    .. code-block:: bash
+
+        chmod 600 ~/.globus/userkey.pem
+
 
 Open a terminal and create a directory to store your gbasf2 installation. Inside, let's download the
 installation script:
@@ -157,10 +183,13 @@ is introduced. Each dataset is subdivided by directories with name ``subXX``, wh
     * By design, each datablock contains a maximum of 1000 files.
     * If a dataset contains more than 1000 files, at least it will be subdivided in two datablocks.
 
+The command-line tool for listing the content of a directory on the grid is ``gb2_ds_list``
+(it is equivalent to ``ls`` on your local system). You can use it to see how many datablock contains each dataset.
+
 .. tip::
 
-    The command-line tool for listing the content of a directory on the grid is ``gb2_ds_list``
-    (it is equivalent to ``ls`` on your local system).
+    All the gbasf2 command-line tools (sometimes called gb2 tools) have the flags ``--help``
+    and ``--usage`` to see all the available options.
 
 .. admonition:: Exercise
      :class: exercise stacked
@@ -203,6 +232,12 @@ options and get familiar with them.
     :alt: The dataset searcher
 
     The Dataset Searcher at the DIRAC web portal.
+
+.. note::
+
+    Accessing the DIRAC web portal requires that your user certificate is installed in your web browser. See
+    `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_ for details.
+
 
 The ``MC Event types`` box show by default the generic samples available (charged, mixed, uubar, etc.).
 If you want to search
@@ -310,61 +345,94 @@ let's submit the gbasf2 jobs:
            -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/mdst/sub00 \
            ~michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py
 
-    TODO: Show the output of the command (after the downtime of the grid finishes)
+A project summary and a confirmation prompt will be displayed after excecuting gbasf2
+
+.. code-block:: bash
+
+    ************************************************
+    *************** Project summary ****************
+    ** Project name: gb2Tutorial_Bd2JpsiKs
+    ** Dataset path: /belle/user/michmx/gb2Tutorial_Bd2JpsiKs
+    ** Steering file: /home/michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py
+    ** Job owner: michmx @ belle (105:58:39)
+    ** Preferred site / SE: None / None
+    ** Input files for first job: LFN:/belle/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/mdst/sub00/mdst_000001_prod00009436_task10020000001.root
+    ** Number of data sets: 1
+    ** Number of input files: 803
+    ** Number of jobs: 803
+    ** Processed data (MB): 968305
+    ** Processed events: 158623897 events
+    ** Estimated CPU time per job: 3293 min
+    ************************************************
+    Are you sure to submit the project?
+    Please enter Y or N:
+
+After verifying that everything is correct, you can confirm the submission.
 
 .. admonition:: Question
      :class: exercise stacked
 
-     What is the name of the project and the basf2 release in the example above?
+     What is the the basf2 release in the example above?
 
 .. admonition:: Solution
      :class: toggle solution
 
-     The name of the project is ``gb2Tutorial_BdJpsiKs`` and the light release is ``light-2002-ichep``.
+     The basf2 light release is ``light-2002-ichep``.
 
 
 .. tip::
 
     You can check which basf2 releases are available for running jobs on the grid using ``gb2_check_release``.
 
-
-.. admonition:: Exercise
-     :class: exercise stacked
-
-     Submit a gbasf2 job with an steering file built by you in previous chapters of the book.
-
-     * Search an interesting datablock to use as input.
-     * Prepare your steering file.
-     * Submit using gbasf2.
-
-.. admonition:: Hint
-     :class: toggle xhint stacked
-
-     "Interesting datablock" means, if you are reconstructing B+ mesons for example, you may want to run
-     over a ``charged`` datablock to get as many signal events as possible,
-     or to see how the background of your signal looks.
-
-.. admonition:: Additional hint
-     :class: toggle xhint stacked
-
-     Use the flag ``--usage`` to see the available options.
-
-.. admonition:: Solution
-     :class: toggle solution
-
-     gbasf2 -i <dataset> -s release-05-00-00 -p <your project name> <your steering file>
-
-
 .. admonition:: Key points
     :class: key-points
 
     * A gbasf2 project can be submitted **per datablock**, NOT per dataset.
+
         * We will fix this in coming gbasf2 releases.
 
     * Inside the project, gbasf2 will produce file-by-file jobs.
 
     * The number of output files in the project will be the number of files in the input datablock.
 
+
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Submit a gbasf2 job with an steering file built by you in previous chapters of the book, for analyzing
+     a datablock of MC13a, MC Event Types ``charged`` with energy ``4S`` and without beam background.
+     Use ``release-05-00-00`` of basf2.
+
+     Remember:
+
+     * Prepare your steering file.
+     * Search the input datablock.
+     * Submit using gbasf2.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     Use the Dataset Searcher to locate MC13a datasets of MC Event Types ``charged`` and ``BGx0``.
+
+.. admonition:: Additional hint
+     :class: toggle xhint stacked
+
+     The input datablock may be obtained using
+
+     .. code-block:: bash
+
+        gb2_ds_search dataset --data_type mc --campaign MC13a --beam_energy 4S --mc_event charged --bkg_level BGx0
+
+     and adding ``sub00`` at the end.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     .. code-block:: bash
+
+        gbasf2 -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009551/s00/e1003/4S/r00000/charged/mdst/sub00
+        -s release-05-00-00 -p myFirstProject <your steering file>
 
 
 Submit jobs with multiple LFNs
@@ -386,13 +454,267 @@ If you want to submit a project with several datablocks, prepare a list of LFNs 
 Monitoring jobs
 ---------------
 
+There are two ways to monitor your jobs on the grid: command-line tools and the DIRAC web portal.
+
+Monitoring in the terminal
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In with command-line tools, you can use ``gb2_project_summary``
+to have an overview of your project (The flag ``-p`` will specify the project name):
+
+.. code-block:: bash
+
+    gb2_project_summary -p gb2Tutorial_Bd2JpsiKs
+
+           Project          Owner    Status    Done   Fail   Run   Wait   Submission Time(UTC)   Duration
+    =====================================================================================================
+    gb2Tutorial_Bd2JpsiKs   michmx   Running   0      0      5     0      2020-07-07 08:41:40    00:01:15
+
+
+.. tip::
+
+    If no project name is specified, the tool will display information of your projects in the last month.
+
+
+The gb2 tool ``gb2_job_status`` list all the jobs running in a project, including the status and minor status:
+
+.. code-block:: bash
+
+    gb2_job_status -p gb2Tutorial_Bd2JpsiKs
+
+    5 jobs are selected.
+
+     Job id     Status         MinorStatus        ApplicationStatus      Site
+    =============================================================================
+    161844659   Running   Application             Running             LCG.KEK2.jp
+    161844660   Running   Application             Running             LCG.KEK2.jp
+    161844661   Running   Input Data Resolution   Unknown             LCG.Pisa.it
+    161844662   Running   Application             Running             LCG.KEK2.jp
+    161844663   Running   Application             Running             LCG.KEK2.jp
+
+    --- Summary of Selected Jobs ---
+    Completed:0  Deleted:0  Done:0  Failed:0  Killed:0  Running:5  Stalled:0  Waiting:0
+
+
+Monitoring using the web portal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The second way is looking at the job monitor in the `DIRAC web portal <https://dirac.cc.kek.jp:8443/DIRAC/>`_.
+
+* Open the portal, click on the logo at the bottom-left and go to Applications/Job Monitor.
+* You have to click on 'Submit' to display the information.
+
+You should see something like this:
+
+.. figure:: JobMonitor.png
+    :align: center
+    :width: 600px
+    :alt: The job monitor
+
+    The Job Monitor at the DIRAC web portal.
+
+.. tip::
+
+    The Job Monitor includes many tools and features to track and manage your jobs, including a statistics panel
+    (pie icon at the left-top). Get familiar with them.
+
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Monitor the jobs that you have submitted in the previous exercise. Wait until they finish successfully.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+      Do you see failed jobs? Go to the last section "Dealing with issues".
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     Use the DIRAC web portal and open the Job Monitor. Jobs in green are in 'Done' status, while the failed ones are in red.
+
+
 
 Downloading the output
 ----------------------
 
+If all your jobs finished successfully (have status 'Done'), then you can download the output.
+The output files will be located below your user space (``/belle/user/<username>/<project_name>``).
+You can check the output using ``gb2_ds_list <project_name>``:
+
+.. code-block:: bash
+
+    gb2_ds_list gb2Tutorial_Bd2JpsiKs
+
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_0.root
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_1.root
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_2.root
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_3.root
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_4.root
+
+.. tip::
+
+    To see the size of your output and its location, you can use the flags ``-l`` and ``-lg``.
+
+To actually download the files, use ``gb2_ds_get``:
+
+.. code-block:: bash
+
+    gb2_ds_get gb2Tutorial_Bd2JpsiKs
+
+    Download 5 files from SE
+    Trying to download srm://kek2-se03.cc.kek.jp:8444/srm/managerv2?SFN=/disk/belle/TMP/belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_4.root to /home/michmx/gbasf2Tutorial/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_4.root
+    Trying to download srm://kek2-se03.cc.kek.jp:8444/srm/managerv2?SFN=/disk/belle/TMP/belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_1.root to /home/michmx/gbasf2Tutorial/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_1.root
+    ...
+
+    Successfully downloaded files:
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_4.root
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_1.root
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_3.root
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_0.root
+    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_2.root in /home/michmx/gbasf2Tutorial/gb2Tutorial_Bd2JpsiKs
+
+    Failed files:
+
+.. tip::
+
+    Keep in mind: as far as you have a gbasf2 installation, you can submit jobs or download files from any machine.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Download the output of your jobs submitted in a previous exercise. Verify that they are readable using ROOT.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     First check that all your jobs finished successfully. Issues? Go to the next section.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     Just use ``gb2_ds_get <your project name>`` (Easy, right?).
 
 
+Dealing with issues
+-------------------
 
+Sometimes, things do not go well. A few jobs can fail because a large list of reasons, like
+
+* A timeout in the transfer of a file between sites.
+* A central service not available for a short period of time.
+* An issue in the site hosting the job.
+* etc.
+
+Some of my jobs failed
+^^^^^^^^^^^^^^^^^^^^^^
+
+If you find that **some** of your jobs failed, most probably there was a temporal issue with your job or the site.
+You need to reschedule these jobs by yourself.
+
+You can use ``gb2_job_reschedule -p <project name>``:
+
+.. code-block:: bash
+
+    gb2_job_reschedule --usage
+
+    Resubmit failed jobs or projects.
+    Only jobs which have fatal status (Failed, Killed, Stalled) are affected.
+    Exact same sandbox and parameters are reused. Thus you may need to submit different job if they are wrong.
+
+    By default, select only your jobs in current group.
+    Please switch group and user name by options.
+    All user's jobs are specified by '-u all'.
+
+    Examples:
+
+    % gb2_job_reschedule -j 723428,723429
+    % gb2_job_reschedule -p project1 -u user
+
+Or you can use the job monitor in the DIRAC web portal, selecting the failed jobs and clicking the **'Reschedule'**
+button.
+
+All my jobs failed
+^^^^^^^^^^^^^^^^^^
+
+If **all** your jobs failed, most probably something is wrong with the steering file or the gbasf2 arguments
+(Did you test your steering file locally before submitting the jobs?).
+
+A useful way to track which was the problem is (if possible) downloading the output sandbox. It contains the logs
+related to your job.
+
+.. figure:: getSandbox.png
+    :align: center
+    :width: 600px
+    :alt: The job monitor
+
+    How to download the output sandbox from the Job Monitor.
+
+
+It is also possible to retrieve the log files directly from the command line using ``gb2_job_output``:
+
+.. code-block:: bash
+
+    gb2_job_output -j 161846653
+
+    download output sandbox below ./log/JOBID
+    1 jobs are selected.
+    Please wait...
+                               Result for jobs: ['161846653']
+    =====================================================================================
+    Downloaded: "Job output sandbox retrieved in /home/michmx/gb2_tutorial/log/161846653"
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Download the output sandbox of one of your jobs. Check what is inside.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     One of the logs inside may look very familiar.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     The file ``basf2helper.py.log`` contains the actual output of your basf2 steering file executed on the grid site.
+
+
+Where to go for help?
+---------------------
+
+The `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ is the main channel of communication
+related to issues with the grid. Feel free to ask every time that you need help.
+
+Additionally, some pages at Confluence are prepared with additional information:
+
+* `Gbasf2 mainpage <https://confluence.desy.de/display/BI/Computing+GBasf2>`_
+* `Gbasf2 FAQ <https://confluence.desy.de/display/BI/GBasf2+FAQ>`_ and `troubleshooting <https://confluence.desy.de/display/BI/gbasf2+trouble+shooting>`_
+* `Computing glossary <https://confluence.desy.de/display/BI/Computing+Glossary>`_
+
+Take a look to the `gbasf2 tutorials <https://confluence.desy.de/display/BI/GBasf2+Tutorials>`_ (they contain some advanced topics not covered here).
+
+You can also ask in `questions.belle2.org <https://questions.belle2.org/questions>`_.
+Even you can answer questions from other users and earn some karma!
+
+
+And, we need your help!
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Computers are not so smart. Sometimes, they fail.
+
+* "Sometimes" x Huge Resources = **"Often"**
+* The computing system need 24 hour x 7 day care.
+
+Please help us as a Data Production Shifter. You can book at `shift.belle2.org <https://shift.belle2.org/>`_
+(a `very nice manual <https://confluence.desy.de/display/BI/Computing+ShiftManual>`_ is already prepared).
+
+If you have some experience as data production shifter, please become an Expert Shifter.
+The `Expert Shifter training course <https://confluence.desy.de/display/BI/DC+Operations+Experts+Manual#DCOperationsExpertsManual-RoadtoanExpertShifter>`_ is open.
+
+
+You will learn a lot about the computing system, and it is a very important service to the collaboration.
 
 
 

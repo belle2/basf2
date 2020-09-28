@@ -14,14 +14,12 @@ from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as va
-from modularAnalysis import reconstructDecay
-from modularAnalysis import rankByHighest
 
 
 @fancy_skim_header
 class TwoTrackLeptonsForLuminosity(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}` and `e^{+}e^{-} \\to \mu^{+}\mu^{-}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to e^{+}e^{-}` and :math:`e^{+}e^{-} \\to \mu^{+}\mu^{-}`
     """
     __authors__ = "Xing-Yu Zhou"
     __description__ = "Skim list for two track lepton (e+e- to e+e- and e+e- to mu+mu-) events for luminosity measurements."
@@ -146,12 +144,12 @@ class LowMassTwoTrack(BaseSkim):
 class SingleTagPseudoScalar(BaseSkim):
     """
     **Physics channel**:
-   ;math: `e^{+}e^{-} \\to  e^{\\pm} (e^{\\mp}) \\pi^{0}/\\eta/\\eta^{\prime}`
+    :math:`e^{+}e^{-} \\to  e^{\\pm} (e^{\\mp}) \\pi^{0}/\\eta/\\eta^{\prime}`
 
     """
     __authors__ = ["Hisaki Hayashii"]
     __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
-    __description__ = "A skim script to select event with one high-energy electron and one or more pi0/eta/eta mesons."
+    __description__ = "A skim script to select events with one high-energy electron and one or more pi0/eta/eta mesons."
     __category__ = "physics, low multiplicity"
     """
     **Decay Modes**
@@ -161,7 +159,7 @@ class SingleTagPseudoScalar(BaseSkim):
     *3      :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
     *4      :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
     *5      :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \gamma\gamma)`,
-   * 6      :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`,
+    *6      :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`,
 
     **Additional Cuts**
     """
@@ -176,14 +174,14 @@ class SingleTagPseudoScalar(BaseSkim):
         # Used cuts
         # --
         # Condition for a tagged electron
-        #  - The tagged elecron must be identified as electron and mast have high
+        #  - The tagged electron must be identified as electron and mast have high
         #    energy  greater than 1.5 GeV.
-        #  -  dz, dr cuts should be tight enough  to remove duplicated tracks.
+        #  - dz, dr cuts should be tight enough to remove duplicated tracks.
         # --
         Electron_IPcut = 'abs(dz) < 2.0 and dr < 0.5'
         Pt_cut = 'pt > 0.15'
         ElectronIDcut = 'electronID > 0.7'    # require electron ID
-        ElectronEcut = 'E > 1.5'                    # tagged electron conditon.
+        ElectronEcut = 'E > 1.5'              # tagged electron condition.
         # --
         # Condition for charged pions. These pions are used to reconstruct  eta, eta'.
         # -
@@ -194,7 +192,7 @@ class SingleTagPseudoScalar(BaseSkim):
         # -
         good_cluster = 'clusterE > 0.1'
         # --
-        # pi0  mass region, A wide mass region is shoose to see backgroud shape.
+        # pi0  mass region, A wide mass region is chosen to see background shape.
         # -
         pi0_mass_wide = '0.06 < InvM < 0.18'
         # --
@@ -203,7 +201,7 @@ class SingleTagPseudoScalar(BaseSkim):
         pi0_energy = ' E > 0.5'
         # --
         # eta, eta'  mass region.
-        # A wide mass region is chosed to see the background shape.
+        # A wide mass region is chosen to see the background shape.
         # -
         eta_mass_wide = '0.50 < InvM < 0.60'
         etap_mass_wide = '0.91 < InvM < 1.10'
@@ -211,11 +209,11 @@ class SingleTagPseudoScalar(BaseSkim):
         # ---
         #  Selection of tagged electron/positron.
         #
-        #   partilce-list:
-        #    e+:all         : all
+        #   particle-list:
+        #    e+:all      : all
         #    e+:good     : electron ID > 0.7,Originating from IP.
         #    e+:highE    : E_lab> 1.5GeV                                       -> nhighEel
-        #    e+:tagged  : E >1.5 GeV and highest E                      -> nTagged
+        #    e+:tagged   : E >1.5 GeV and highest E                      -> nTagged
         #       nhighEel == 1: No. of high energy electron should be one.
         # ---
         # e+:good
@@ -239,10 +237,10 @@ class SingleTagPseudoScalar(BaseSkim):
         # --
         # Selection of charged pion
         # -
-        #    pi+:all         : all
-        #    pi+:good     :  Originating from IP. abs(dz)<2.0cm  dr <0.5 cm,
+        #    pi+:all      : all
+        #    pi+:good     : Originating from IP. abs(dz)<2.0cm  dr <0.5 cm,
         #                           pt>0.15
-        #                           not identified as an  electron, ( electron ID < 0.7),  -> npion
+        #                           not identified as an electron, (electron ID < 0.7),  -> npion
         # --
         #  pi+:good, npion
         ma.cutAndCopyList('pi+:good', 'pi+:all',
@@ -252,7 +250,7 @@ class SingleTagPseudoScalar(BaseSkim):
         va.addAlias('npion', 'nParticlesInList(pi+:good)')
         # ---
         #  Selection gammas
-        #      gamma:all       :all
+        #      gamma:all    : all
         #      gamma:good   : E>0.1 GeV     -> nphoton
         # ---
         #
@@ -264,8 +262,8 @@ class SingleTagPseudoScalar(BaseSkim):
         # --
         #        pi0  reconstruction
         #
-        #     pi0:loose         : 0.08 < <Mgg  < 0.17
-        #     pi0:highE        :  E_pi0  > 0.5 GeV
+        #     pi0:loose        : 0.08 < <Mgg  < 0.17
+        #     pi0:highE        : E_pi0  > 0.5 GeV
         # --
         ma.cutAndCopyList('gamma:first', 'gamma:good', good_cluster, path=path)
         ma.cutAndCopyList('gamma:second', 'gamma:good', good_cluster,
@@ -281,10 +279,10 @@ class SingleTagPseudoScalar(BaseSkim):
         va.addAlias('npi0highE', 'nParticlesInList(pi0:highE)')
 
         # --
-        #      eta- resonstruction                                                       mode
-        #       eta:gg                       :eta->gg                                             2
-        #       eta:pipipi0                :eta ->pipipi0                                     3
-        #       eta:pipig                   :eta->pipi gamma                              4
+        #      eta- reconstruction                                                       mode
+        #       eta:gg                       :eta->gg                                     2
+        #       eta:pipipi0                  :eta ->pipipi0                               3
+        #       eta:pipig                    :eta->pipi gamma                             4
         # --
         # mode = 2
         # --
@@ -305,8 +303,8 @@ class SingleTagPseudoScalar(BaseSkim):
         va.addAlias('nmode4', 'nParticlesInList(eta:pipig)')
         # --
         # eta'  reconstruction
-        #       eta':pipieta_gg        :eta' -> pipieta (eta->  gg)                 5
-        #       eta':pipig                 :eta' -> pipi gamma                           6
+        #       eta':pipieta_gg        :eta' -> pipieta (eta->  gg)                      5
+        #       eta':pipig             :eta' -> pipi gamma                               6
         # --
         #   mode = 5
         # --
@@ -323,7 +321,7 @@ class SingleTagPseudoScalar(BaseSkim):
         # --
         # Final skim condition
         # --
-        #  Reqire one tagged electron  and <=2 the other charged tracks.
+        #  Require one tagged electron  and <=2 the other charged tracks.
         #  --
         presel = ' nhighEel == 1 and npion <= 2 '
         va.addAlias('mode_sum',
@@ -331,12 +329,12 @@ class SingleTagPseudoScalar(BaseSkim):
 
         eventcuts = presel + ' and mode_sum >= 1'
         #
-        #   Although a condition "mode_sum >-1 " looks like very loose,
-        #  the redution rate of this SingleTagPsedoScalar skim is very large, i.e. 1/50,
+        #  Although a condition "mode_sum >-1 " looks like very loose,
+        #  the reduction rate of this SingleTagPseudoScalar skim is very large, i.e. 1/50,
         #  since the requirements, one high-energy electron and <=2 other charged
         #  tracks, are quite stringent.
         #
         path = self.skim_event_cuts(eventcuts, path=path)
         #
-        # Only tagged electron information is added to the standard u-mdst output.
+        # Only tagged electron information is added to the standard udst output.
         self.SkimLists = ['e+:highE']

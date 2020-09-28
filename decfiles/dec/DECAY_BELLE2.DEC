@@ -1627,7 +1627,7 @@ Decay B0
 0.00271850 D*0     pi+     pi+     pi-     pi-             PHSP; #Updated by PG 9/2021
 0.00079513 eta_c   K0                                      PHSP; #Updated by PG 9/2021
 0.000170000 K0      D0      anti-D0 pi0                     PHSP;
-0.00058453 psi(2S) K0                                      PHSP; Updated by PG 9/2021
+0.00058453 psi(2S) K0                                      PHSP; #Updated by PG 9/2021
 0.00000111 chi_c0  K0                                      PHSP; #Updated by PG 9/2021
 0.00005231 K0 rho0                                         PHSP;
 0.000011000 eta     K_0*0                                   PHSP;

@@ -30,6 +30,7 @@ import rawdata as raw
 from tracking import add_tracking_reconstruction
 
 now = datetime.datetime.now()
+isMC = True
 
 settings = CalibrationSettings(name="caf_svd_time",
                                expert_username="gdujany",
@@ -232,7 +233,11 @@ def create_pre_collector_path(clusterizers):
     path = create_path()
 
     # unpack raw data to do the tracking
-    raw.add_unpackers(path, components=['PXD', 'SVD', 'CDC'])
+    if not isMC:
+        raw.add_unpackers(path, components=['PXD', 'SVD', 'CDC'])
+    else:
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
 
     # proceed only if we acquired 6-sample strips
     skim6SampleEvents = register_module("SVD6SampleEventSkim")
@@ -304,15 +309,18 @@ def get_calibrations(input_data, **kwargs):
     cog3_suffix = "_CoG3"
     els3_suffix = "_ELS3"
 
-    unique_id_cog6 = f"SVDCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
+    calType = "Prompt"
+    if isMC:
+        calType = "MC"
+    unique_id_cog6 = f"SVDCoGTimeCalibrations_{calType}_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
                      f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_CoG6:\n{unique_id_cog6}")
 
-    unique_id_cog3 = f"SVD3SampleCoGTimeCalibrations_Prompt_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
+    unique_id_cog3 = f"SVD3SampleCoGTimeCalibrations_{calType}_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
                      f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_CoG3:\n{unique_id_cog3}")
 
-    unique_id_els3 = f"SVD3SampleELSTimeCalibrations_Prompt_{now.isoformat()}_INFO:_TBindep_" \
+    unique_id_els3 = f"SVD3SampleELSTimeCalibrations_{calType}_{now.isoformat()}_INFO:_TBindep_" \
                      f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_ELS3:\n{unique_id_els3}")
 
@@ -344,24 +352,27 @@ def get_calibrations(input_data, **kwargs):
     ####
     # Build the Collectors and Algorithms with the different (but matching) options
     ####
+    eventInfo = "SVDEventInfo"
+    if isMC:
+        eventInfo = "SVDEventInfoSim"
 
     coll_cog6 = create_collector(name=f"SVDCoGTimeCalibrationCollector{cog6_suffix}",
                                  clusters=f"SVDClustersFromTracks{cog6_suffix}",
-                                 event_info="SVDEventInfo",
+                                 event_info=eventInfo,
                                  event_t0="EventT0")
 
     algo_cog6 = create_algorithm(unique_id_cog6, prefix=coll_cog6.name(), min_entries=10000)
 
     coll_cog3 = create_collector(name=f"SVDCoGTimeCalibrationCollector{cog3_suffix}",
                                  clusters=f"SVDClustersFromTracks{cog3_suffix}",
-                                 event_info="SVDEventInfo",
+                                 event_info=eventInfo,
                                  event_t0="EventT0")
 
     algo_cog3 = create_algorithm(unique_id_cog3, prefix=coll_cog3.name(), min_entries=10000)
 
     coll_els3 = create_collector(name=f"SVDCoGTimeCalibrationCollector{els3_suffix}",
                                  clusters=f"SVDClustersFromTracks{els3_suffix}",
-                                 event_info="SVDEventInfo",
+                                 event_info=eventInfo,
                                  event_t0="EventT0")
 
     algo_els3 = create_algorithm(unique_id_els3, prefix=coll_els3.name(), min_entries=10000)

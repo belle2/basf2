@@ -54,7 +54,7 @@ PXDReadRawBonnDAQMatchedModule::~PXDReadRawBonnDAQMatchedModule()
 void PXDReadRawBonnDAQMatchedModule::initialize()
 {
   // Open File
-  fh = new PXDLocalDAQFile(m_filename);
+  fh = fopen(m_filename.c_str(), "rb");
   if (fh) {
     B2INFO("Read BonnDAQ Data from " << m_filename);
   } else {
@@ -69,16 +69,19 @@ void PXDReadRawBonnDAQMatchedModule::initialize()
   B2DEBUG(29, "PXDReadRawBonnDAQMatchedModule: initialized.");
 }
 
+int PXDReadRawBonnDAQMatchedModule::read_data(char* data, size_t len)
+{
+  size_t l = 0;
+  if (fh) l = fread(data, 1, len, fh);
+  if (l != len) return 0;
+  return l;
+}
+
 int PXDReadRawBonnDAQMatchedModule::readOneEvent(unsigned int& rettriggernr)
 {
-
-  if (!fh) {
-    B2ERROR("BonnDAQ Data file is not open ");
-  }
-
   unsigned int triggernr = 0xFFFFFFFF;
 
-  auto current_offset = fh->tell();
+  auto current_offset = ftell(fh);
   if (current_offset > m_last_offset) m_last_offset = current_offset;
 
   struct EvtHeader {
@@ -98,7 +101,7 @@ int PXDReadRawBonnDAQMatchedModule::readOneEvent(unsigned int& rettriggernr)
     ulittle32_t* data32 = (ulittle32_t*)data;
     ulittle16_t* data16 = (ulittle16_t*)data;
     // Read 8 bytes header (group)
-    int br = fh->read_data(data, 4);
+    int br = read_data(data, 4);
     if (br <= 0) return br;
     unsigned int chunk_size = 0;
     if (evt->get_header8() == 0) {
@@ -109,7 +112,7 @@ int PXDReadRawBonnDAQMatchedModule::readOneEvent(unsigned int& rettriggernr)
       chunk_size = evt->get_size();
     }
     if (chunk_size <= 1) return 0;
-    br = fh->read_data(data + 4, chunk_size * 4 - 4);
+    br = read_data(data + 4, chunk_size * 4 - 4);
     if (br <= 0) return br;
     if (evt->get_header12() == 0xe230) {
       B2DEBUG(29, "File info " << std::hex << evt->get_header12() << " Events " << std::dec << data32[1]);
@@ -207,7 +210,7 @@ int PXDReadRawBonnDAQMatchedModule::readOneEvent(unsigned int& rettriggernr)
       rettriggernr = triggernr;
 
       m_event_offset[triggernr] = current_offset;
-      current_offset = fh->tell();
+      current_offset = ftell(fh);
       if (current_offset > m_last_offset) m_last_offset = current_offset;
 
       return 1;
@@ -236,7 +239,7 @@ void PXDReadRawBonnDAQMatchedModule::event()
   // Check if event has an offset, if not skip until end of checked area
   auto offset = m_event_offset[triggernr];
   if (offset == 0) offset = m_last_offset;
-  fh->seek(offset);
+  fseek(fh, offset, SEEK_SET);
   // Get a record from file
   auto tnr = triggernr;
   do {
@@ -257,6 +260,6 @@ void PXDReadRawBonnDAQMatchedModule::event()
 
 void PXDReadRawBonnDAQMatchedModule::terminate()
 {
+  if (fh) fclose(fh);
   fh = 0;
 }
-

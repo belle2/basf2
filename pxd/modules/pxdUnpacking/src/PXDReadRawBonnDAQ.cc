@@ -245,6 +245,9 @@ void PXDReadRawBonnDAQModule::event()
 
 void PXDReadRawBonnDAQModule::terminate()
 {
-  fh = 0;
+  if (fh) {
+    delete(fh);
+    fh = 0;
+  }
 }
 

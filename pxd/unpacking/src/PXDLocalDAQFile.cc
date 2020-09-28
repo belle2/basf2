@@ -54,7 +54,7 @@ void PXDLocalDAQFile::openFile(std::string filename)
 
   //open file in read mode and set stream correctly
   m_fd = open(filename.c_str(), O_RDONLY);
-  auto filter = new io::filtering_istream();
+  auto* filter = new io::filtering_istream();
   if (m_compressed) filter->push(io::bzip2_decompressor());
   filter->push(io::file_descriptor_source(m_fd, io::close_handle));
   filter->exceptions(ios_base::badbit | ios_base::failbit);
@@ -76,9 +76,9 @@ int PXDLocalDAQFile::status() const
 int PXDLocalDAQFile::read(char* buf, int size)
 {
   // cast stream object
-  auto* in = dynamic_cast<std::istream*>(m_stream.get());
+  auto in = dynamic_cast<std::istream*>(m_stream.get());
   if (!in) {
-    B2FATAL("PXDLocalDAQFile::read() called on a file opened in write mode");
+    B2FATAL("PXDLocalDAQFile::read() cannot get input file");
   }
   //trigger eof if there's nothing left int the file. Could throw an error on decompress failure
   try {
@@ -111,23 +111,3 @@ int PXDLocalDAQFile::read_data(char* data, size_t len)
   return l;
 }
 
-void PXDLocalDAQFile::seek(std::streamoff& offset)
-{
-  // cast stream object
-  auto* in = dynamic_cast<std::istream*>(m_stream.get());
-  if (!in) {
-    B2FATAL("PXDLocalDAQFile::seek() called on a file opened in write mode");
-  }
-  in->seekg(offset, ios_base::beg);
-  return;
-}
-
-std::streampos PXDLocalDAQFile::tell()
-{
-  // cast stream object
-  auto* in = dynamic_cast<std::istream*>(m_stream.get());
-  if (!in) {
-    B2FATAL("PXDLocalDAQFile::tell() called on a file opened in write mode");
-  }
-  return in->tellg();
-}

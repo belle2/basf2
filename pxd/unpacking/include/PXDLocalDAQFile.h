@@ -33,17 +33,11 @@ namespace Belle2 {
     /** Read a record from a file. Returns the data size if successfully read, otherwise 0.*/
     int read_data(char* data, size_t len);
 
-    void seek(std::streamoff& offset);
-
-    std::streampos tell();
-
   private:
     /** actually open the file */
     void openFile(std::string filename);
 
   private:
-    /** maximal size of one file (in Bytes). */
-    const static int c_MaxFileSize {512000000 * 4};
 
     std::string m_filename; /**< Name of the opened file. */
     int m_fd{ -1}; /**< file descriptor. */

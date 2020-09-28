@@ -1139,7 +1139,7 @@ Combined particles
 
 V0
    Finally, there's a class of combined particle that require a special treatment, and are therefore provided
-   to the user by the reconstruction procedure. So called V0 are neutral particles decaying into two charged
+   to the user by the reconstruction procedure. So-called V0 are neutral particles decaying into two charged
    particles far from the interaction point, leaving a typical V-shaped signature. These particles can of course be
    reconstructed combining the four-momenta of their daughters, but if the decay has happened outside of the beam pipe
    it is better to re-run the tracking before doing it, since if a track originates not in the IP, it will cross less

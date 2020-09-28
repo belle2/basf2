@@ -59,7 +59,7 @@ ploter(
     descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
-    isShifter=True)
+    isShifter=False)
 
 
 ploter(
@@ -203,7 +203,7 @@ ploter(
     descr='Definition: (reconstructed time of the cluster) - (time of the TrueHit)\
     for all signal clusters.',
     check='Distribution peak around 0.',
-    isShifter=True)
+    isShifter=False)
 
 
 ploter(

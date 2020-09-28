@@ -45,7 +45,7 @@ def setup_basf2_and_db(zmq=False):
                             help="Don't write any output files",
                             action="store_true", default=False)
 
-    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count(),
+    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count()-5,
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local payload locations to use for the ConditionDB",

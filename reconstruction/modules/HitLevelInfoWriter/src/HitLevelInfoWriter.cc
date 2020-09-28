@@ -9,9 +9,7 @@
  **************************************************************************/
 
 #include <reconstruction/modules/HitLevelInfoWriter/HitLevelInfoWriter.h>
-
 #include <reconstruction/dataobjects/DedxConstants.h>
-
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 using namespace Belle2;
@@ -28,6 +26,8 @@ HitLevelInfoWriterModule::HitLevelInfoWriterModule() : Module()
   addParam("particleLists", m_strParticleList, "Vector of ParticleLists to save", std::vector<std::string>());
   addParam("enableHitLevel", enableHitLevel, "True or False for Hit level variables", false);
   addParam("enableExtraVar", enableExtraVar, "True or False for extra track/hit level variables", false);
+  addParam("nodeadwire", nodeadwire, "True or False for deadwire hit variables", true);
+
 }
 
 HitLevelInfoWriterModule::~HitLevelInfoWriterModule() { }
@@ -286,6 +286,13 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   m_runGain = m_DBRunGain->getRunGain();
   m_cosCor = m_DBCosineCor->getMean(m_cosTheta);
 
+  if (m_cosTheta <= -0.850 || m_cosTheta >= 0.950) {
+    m_cosEdgeCor = m_DBCosEdgeCor->getMean(m_cosTheta);
+  } else {
+    m_cosEdgeCor = 1.0;
+  }
+
+
   m_chie = dedxTrack->getChi(0);
   m_chimu = dedxTrack->getChi(1);
   m_chipi = dedxTrack->getChi(2);
@@ -329,12 +336,15 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
   // Get the vector of dE/dx values for all hits
   if (enableHitLevel) {
     for (int ihit = 0; ihit < h_nhits; ++ihit) {
+
+      if (nodeadwire && m_DBWireGains->getWireGain(h_wire[ihit]) == 0)continue;
       h_lwire[ihit] = dedxTrack->getWireInLayer(ihit);
       h_wire[ihit] = dedxTrack->getWire(ihit);
       h_layer[ihit] = dedxTrack->getHitLayer(ihit);
       h_path[ihit] = dedxTrack->getPath(ihit);
       h_dedx[ihit] = dedxTrack->getDedx(ihit);
-      h_adcraw[ihit] = dedxTrack->getADCCount(ihit);
+      h_adcraw[ihit] = dedxTrack->getADCBaseCount(ihit);
+      h_adccorr[ihit] = dedxTrack->getADCCount(ihit);
       h_doca[ihit] = dedxTrack->getDoca(ihit);
       h_ndoca[ihit] = h_doca[ihit] / dedxTrack->getCellHalfWidth(ihit);
       h_ndocaRS[ihit] = dedxTrack->getDocaRS(ihit) / dedxTrack->getCellHalfWidth(ihit);
@@ -351,6 +361,7 @@ HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
         h_foundByTrackFinder[ihit] = dedxTrack->getFoundByTrackFinder(ihit);
       }
       // Get the calibration constants
+      h_facnladc[ihit] = dedxTrack->getNonLADCCorrection(ihit);
       h_wireGain[ihit] = m_DBWireGains->getWireGain(h_wire[ihit]);
       h_twodCor[ihit] = m_DB2DCell->getMean(h_layer[ihit], h_ndocaRS[ihit], h_entaRS[ihit]);
       h_onedCor[ihit] = m_DB1DCell->getMean(h_layer[ihit], h_entaRS[ihit]);
@@ -377,6 +388,7 @@ HitLevelInfoWriterModule::clearEntries()
       h_path[ihit] = 0;
       h_dedx[ihit] = 0;
       h_adcraw[ihit] = 0;
+      h_adccorr[ihit] = 0;
       h_doca[ihit] = 0;
       h_ndoca[ihit] = 0;
       h_ndocaRS[ihit] = 0;
@@ -384,6 +396,7 @@ HitLevelInfoWriterModule::clearEntries()
       h_entaRS[ihit] = 0;
       h_driftT[ihit] = 0;
       // h_driftD[ihit] = 0;
+      h_facnladc[ihit] = 0;
       h_wireGain[ihit] = 0;
       h_twodCor[ihit] = 0;
       h_onedCor[ihit] = 0;
@@ -453,6 +466,7 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
   // calibration constants
   m_tree[i]->Branch("scale", &m_scale, "scale/D");
   m_tree[i]->Branch("coscor", &m_cosCor, "coscor/D");
+  m_tree[i]->Branch("cosedgecor", &m_cosEdgeCor, "cosedgecor/D");
   m_tree[i]->Branch("rungain", &m_runGain, "rungain/D");
 
   // PID values
@@ -495,6 +509,7 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
     m_tree[i]->Branch("hPath", h_path, "hPath[hNHits]/D");
     m_tree[i]->Branch("hDedx", h_dedx, "hDedx[hNHits]/D");
     m_tree[i]->Branch("hADCRaw", h_adcraw, "hADCRaw[hNHits]/D");
+    m_tree[i]->Branch("hADCCorr", h_adccorr, "hADCCorr[hNHits]/D");
     m_tree[i]->Branch("hDoca", h_doca, "hDoca[hNHits]/D");
     m_tree[i]->Branch("hNDoca", h_ndoca, "hNDoca[hNHits]/D");
     m_tree[i]->Branch("hNDocaRS", h_ndocaRS, "hNDocaRS[hNHits]/D");
@@ -502,6 +517,7 @@ HitLevelInfoWriterModule::bookOutput(std::string filename)
     m_tree[i]->Branch("hEntaRS", h_entaRS, "hEntaRS[hNHits]/D");
     m_tree[i]->Branch("hDriftT", h_driftT, "hDriftT[hNHits]/D");
     m_tree[i]->Branch("hDriftD", h_driftD, "hDriftD[hNHits]/D");
+    m_tree[i]->Branch("hFacnlADC", h_facnladc, "hFacnlADC[hNHits]/D");
     m_tree[i]->Branch("hWireGain", h_wireGain, "hWireGain[hNHits]/D");
     m_tree[i]->Branch("hTwodcor", h_twodCor, "hTwodcor[hNHits]/D");
     m_tree[i]->Branch("hOnedcor", h_onedCor, "hOnedcor[hNHits]/D");

@@ -294,7 +294,7 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
     )
 
 
-def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticledata=0, *, skip_on_failure=True):
+def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure=True):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
 
@@ -305,8 +305,6 @@ def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticled
         path (basf2.Path): path where the generator should be added
         finalstate (str): uubar, ddbar, ssbar, ccbar
         userdecfile (str): EvtGen decfile used for particle decays
-        useevtgenparticledata (bool): Experimental feature to use a consistent
-            set of particle properties between EvtGen and PYTHIA
         skip_on_failure (bool): If True stop event processing right after
             fragmentation fails. Otherwise continue normally
     """
@@ -367,7 +365,6 @@ def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticled
         UseEvtGen=1,
         DecFile=decay_file,
         UserDecFile=decay_user,
-        useEvtGenParticleData=useevtgenparticledata
     )
 
     if skip_on_failure:
@@ -378,7 +375,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticled
 
 
 def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='',
-                                      useevtgenparticledata=0, *, include_conjugates=True, max_iterations=100000):
+                                      *, include_conjugates=True, max_iterations=100000):
     """
     Add continuum generation but require at least one of the given particles be
     present in the event.
@@ -399,8 +396,6 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
         particles (list): A list of particle names or pdg codes. An event is
            only accepted if at lease one of those particles appears in the event.
         userdecfile (str): EvtGen decfile used for particle decays
-        useevtgenparticledata (bool): Experimental feature to use a consistent
-            set of particle properties between EvtGen and PYTHIA
         include_conjugates (bool): If True (default) accept the event also if a
             charge conjugate of the given particles is found
         max_iterations (int): maximum tries per event to generate the requested
@@ -414,7 +409,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
     loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles"])
     # add the generator but make sure it doesn't stop processing on
     # fragmentation failure as is this currently not supported by do_while
-    add_continuum_generator(loop_path, finalstate, userdecfile, useevtgenparticledata, skip_on_failure=False)
+    add_continuum_generator(loop_path, finalstate, userdecfile, skip_on_failure=False)
     # check for the particles we want
     loop_path.add_module("InclusiveParticleChecker", particles=particles, includeConjugates=include_conjugates)
     # Done, add this to the path and iterate it until we found our particle
@@ -574,6 +569,17 @@ def add_cosmics_generator(path, components=None,
         top_in_counter (bool): time of propagation from the hit point to the PMT in the trigger counter is subtracted
             (assuming PMT is put at -z of the counter).
     """
+
+    B2FATAL('''The function "add_cosmics_generator()" is outdated and it is currently not working: please replace
+
+  add_cosmics_generator(path=path)
+
+with
+
+  path.add_module('CRYInput')
+
+in your steering file (the module parameter "acceptance" has to be set, see the module docummentation).''')
+
     import cdc.cr as cosmics_setup
 
     if global_box_size is None:

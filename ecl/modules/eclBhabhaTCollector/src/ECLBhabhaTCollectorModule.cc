@@ -215,10 +215,8 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
 void ECLBhabhaTCollectorModule::prepare()
 {
   //=== MetaData
-  StoreObjPtr<EventMetaData> evtMetaData;
-
-  B2INFO("ECLBhabhaTCollector: Experiment = " << evtMetaData->getExperiment() <<
-         "  run = " << evtMetaData->getRun());
+  B2INFO("ECLBhabhaTCollector: Experiment = " << m_EventMetaData->getExperiment() <<
+         "  run = " << m_EventMetaData->getRun());
 
 
   //=== Create histograms and register them in the data store
@@ -824,8 +822,6 @@ void ECLBhabhaTCollectorModule::collect()
 
 //  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Tree saving
     //== Save debug TTree with detailed information if necessary.
-    StoreObjPtr<EventMetaData> evtMetaData;
-
     m_tree_cid      = ecl_dig->getCellId();
     m_tree_amp      = ecl_dig->getAmp();
     m_tree_en       = en;
@@ -839,9 +835,9 @@ void ECLBhabhaTCollectorModule::collect()
     m_tree_t0       = evt_t0;
     m_tree_t0_unc   = evt_t0_unc;
     m_E_DIV_p       = E_DIV_p[iCharge];
-    m_tree_evtNum  = evtMetaData->getEvent();
+    m_tree_evtNum  = m_EventMetaData->getEvent();
     m_crystalCrate  = crystalMapper->getCrateID(ecl_cal->getCellId());
-    m_runNum        = evtMetaData->getRun();
+    m_runNum        = m_EventMetaData->getRun();
 
     if (m_saveTree) {
       m_dbgTree_electrons->Fill();
@@ -998,13 +994,12 @@ void ECLBhabhaTCollectorModule::collect()
   for (int iCharge = 0; iCharge < 2; iCharge++) {
     if (crystalCutsPassed[iCharge]) {
       //  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Tree saving
-      StoreObjPtr<EventMetaData> evtMetaData;
-      m_tree_evtNum  = evtMetaData->getEvent();
+      m_tree_evtNum  = m_EventMetaData->getEvent();
       m_tree_cid      = crystalIDs[iCharge];
       //m_tree_time     = times[iCharge];
       m_tree_time     = times_noPreviousCalibrations[iCharge];
       m_crystalCrate  = crateIDs[iCharge];
-      m_runNum        = evtMetaData->getRun();
+      m_runNum        = m_EventMetaData->getRun();
       m_tree_en       = crystalEnergies[iCharge];  // for studies of ts as a function of energy
       m_tree_E1Etot   = crystalEnergies[iCharge] / trkEClustLab[iCharge];
       m_tree_E1E2     = crystalEnergies[iCharge] / crystalEnergies2[iCharge];
@@ -1055,9 +1050,8 @@ void ECLBhabhaTCollectorModule::collect()
 
 
   for (long unsigned int digit_i = 0; digit_i < time_ECLCaldigits_bothClusters.size(); digit_i++) {
-    StoreObjPtr<EventMetaData> evtMetaData;
-    m_runNum        = evtMetaData->getRun();
-    m_tree_evtNum  = evtMetaData->getEvent();
+    m_runNum        = m_EventMetaData->getRun();
+    m_tree_evtNum  = m_EventMetaData->getEvent();
     m_tree_ECLCalDigitTime  = time_ECLCaldigits_bothClusters[digit_i];
     m_tree_ECLCalDigitE = E_ECLCaldigits_bothClusters[digit_i];
     m_tree_ECLDigitAmplitude = amp_ECLDigits_bothClusters[digit_i];

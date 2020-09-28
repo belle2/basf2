@@ -93,9 +93,7 @@ def get_calibrations(input_data, **kwargs):
                                  collector=collector_bs,
                                  algorithms=algorithm_bs,
                                  input_files=input_files_physics,
-                                 pre_collector_path=rec_path_1,
-                                 output_patterns=None,
-                                 max_files_per_collector_job=1)
+                                 pre_collector_path=rec_path_1)
 
     calibration_bs.strategies = SequentialRunByRun
 

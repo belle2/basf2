@@ -1,5 +1,12 @@
 #include "daq/slc/nsm/NSMMessage.h"
 
+// 20191004 nakao
+// duplicating the NSM2 library function in a user function
+// NSMMessage::read(NSMcontext* nsmc)
+// is really a bad idea, need to be revised.
+// Until then, nsmsys2.h is needed.
+#include <nsm2/nsmsys2.h>
+
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>

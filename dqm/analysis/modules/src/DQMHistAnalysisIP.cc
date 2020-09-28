@@ -211,6 +211,7 @@ void DQMHistAnalysisIPModule::event()
         // dont add another line...
         m_line->Draw();
       }
+      m_monObj->setVariable(m_monName, x);
       m_c1->Modified();
       m_c1->Update();
 

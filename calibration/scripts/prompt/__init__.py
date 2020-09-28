@@ -42,7 +42,9 @@ class CalibrationSettings(namedtuple('CalSet_Factory', ["name", "expert_username
             the caf_config.json sent into ``b2caf-prompt-run``.
     """
 
-    #: Allowed data file formats. You should use these values for ``CalibrationSettings.input_data_formats``.
+    #: Allowed data file formats. You should use these values for `CalibrationSettings.input_data_formats`.
+    #  Right now you should only use "raw" or "cdst" because we don't actually run calibrations on "mdst" or "udst".
+    #  They are here for completeness.
     allowed_data_formats = frozenset({"raw", "cdst", "mdst", "udst"})
 
     def __new__(cls, name, expert_username, description,

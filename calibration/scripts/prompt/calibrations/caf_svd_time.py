@@ -30,7 +30,7 @@ import rawdata as raw
 from tracking import add_tracking_reconstruction
 
 now = datetime.datetime.now()
-isMC = True
+isMC = False
 
 settings = CalibrationSettings(name="caf_svd_time",
                                expert_username="gdujany",

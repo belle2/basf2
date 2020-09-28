@@ -14,20 +14,19 @@ Python
 
     **Prerequisites**:
 
-    	* None
+      * None
 
     **Questions**:
 
-        * What are the key concepts of python?
-        * How can I define functions in python?
-        * How can I process tabular data?
-        * How can I plot data?
+      * What are the key concepts of python?
+      * How can I process tabular data?
+      * How can I plot data?
 
 
     **Objectives**:
 
-        * Get familiar with python
-        * Understand how to manipulate and plot data with `root_pandas`
+      * Get familiar with python
+      * Understand how to manipulate and plot data with `root_pandas`
 
 High Energy Physics (HEP) analyses are too complex to be done with pen, paper
 and calculator. They usually are not even suited for spreadsheet programs like
@@ -74,7 +73,7 @@ to be familiar with it. By now you probably know what's coming next.
 
 Luckily there is a very large amount of good python tutorials out there. We'll
 stick with Software Carpentry and their `Programming with Python
-<https://swcarpentry.github.io/python-novice-inflammation/>`_  introduction. We
+<https://swcarpentry.github.io/python-novice-inflammation/>`_   introduction. We
 would like you to go there and go through the introduction and then come back
 here when you are done.
 
@@ -103,23 +102,37 @@ What are the key concepts of python?
 
 As you should be aware by now, the key concepts of python include:
 
-   * importing libraries that you wish to use
-   * importing and/or storing data in different ways i.e. arrays, lists
-   * writing and using (sometimes pre-defined) functions
-   * writing conditions: if statements, for loops etc.
-   * understanding and using errors to debug
+  * importing libraries that you wish to use
+  * importing and/or storing data in different ways i.e. arrays, lists
+  * writing and using (sometimes pre-defined) functions
+  * writing conditions: if statements, for loops etc.
+  * understanding and using errors to debug
 
 You should be aware that there are multiple ways of running
 python. Either interactively from your terminal:
+
 .. code-block:: bash
-	   	python
-	   	>>> import numpy
-	   	>>> print(numpy.pi)
+       python3
+       >>> import numpy
+       >>> print(numpy.pi)
+
 As a script from your terminal:
+
 .. code-block:: bash
-	   	python my_script.py # where this file has python commands inside
+       python3 my_script.py # where this file has python commands inside
+
 Or within a python compiler and interpreter such as Visual Studio or XCode.
 
+The official recommended version of python is python3. Python2 is no longer supported. To check which python version you have installed you can check in your terminal using 
+
+.. code-block:: bash
+   python3 --version 
+
+OR you could perform this in a live python session, either in your terminal or in a jupyter notebook using:
+
+.. code-block:: bash
+   from platform import python_version
+   print(python_version())
 
 
 A section to really cover our bases
@@ -129,64 +142,58 @@ In the case that, throughout your external Python training, you did
 not create a python file using bash commands:
 
 .. admonition:: Exercise
-   :class: exercise stacked
+  :class: exercise stacked
 
-   Create a python file, import the python library 'NumPy' as the
-   shortcut `np`, and print out the value of pi.
-
-.. admonition:: Hint
-   :class: xhint stacked toggle
-	
-   To create a file you'll need to use your bash skills. The internet is your friend.
-	   
-.. admonition:: Hint
-   :class: xhint stacked toggle
-
-   The specific bash command you'll need to create a new file is `touch`.
+  Create a python file, import the python library 'NumPy' as the
+  shortcut `np`, and print out the value of pi.
 
 .. admonition:: Hint
-   :class: xhint stacked toggle
+  :class: xhint stacked toggle
+  
+  To create a file you'll need to use your bash skills. The internet is your friend.
+     
+.. admonition:: Hint
+  :class: xhint stacked toggle
 
-   Add the ``import`` command inside your python file using your favourite
-   editor. My personal preference is an editor called emacs. The internet is a
-   magical place on which to learn the main keyboard commands for your chosen
-   editor.
-   
+  The specific bash command you'll need to create a new file is `touch`.
+
+.. admonition:: Hint
+  :class: xhint stacked toggle
+
+  Add the ``import`` command inside your python file using your favourite
+  editor. Previous tutorials introduced the editor 'nano' to you.
+  
 .. admonition:: Solution
-   :class: solution toggle
+  :class: solution toggle
 
-   .. code-block:: bash
+  .. code-block:: bash
 
-      # create your .py file and name it as you wish.
-      touch my_file.py
-      # open your file to edit it.
-      emacs -nw my_file.py # the argument `-nw` opens the editor in your terminal.
+    # create your .py file and name it as you wish.
+    touch my_file.py
+    # open your file to edit it.
+    emacs -nw my_file.py # the argument `-nw` opens the editor in your terminal.
 
-	Now add the python lines to your file.
+  Now add the python lines to your file.
 
-   	.. code-block:: python
-      import numpy as np
-      print(np.pi)
-      
+  .. code-block:: python
+  
+    import numpy as np
+    print(np.pi)
+     
 Congratulations! You've now created your first python file. Now, run it!
 
 .. admonition:: Exercise
-   :class: exercise stacked
+  :class: exercise stacked
 
-   Run your new python file in your terminal.
+Run your new python file in your terminal.
 
 .. admonition:: Solution
-   :class: solution toggle
+  :class: solution toggle
 
-	.. code-block:: ipython3
-   		python my_file.py # perhaps you'll want to use `python3` instead depending on which python you have installed. 
+  .. code-block:: ipython3
 
-To check which python version you have installed you can check in your terminal using 
+    python3 my_file.py
 
-.. code-block:: bash
-   	python # or python3
-	from platform import python_version
-	print(python_version())
 
 Great! Well done! 😁 You can now create python scripts in your terminal!
 
@@ -201,9 +208,9 @@ Remember that everything you do in your jupyter notebook is an interactive versi
 
 
 
-   
+  
 Pandas Tutorial and Python Data Analysis
-==========================================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This section aims to answer the question "How can I process tabular data?"
 
@@ -233,24 +240,19 @@ Jupyter Notebooks
 
 Jupyter Notebooks are interactive notebooks that allow one to visualise code,
 data and outputs in a linear and clear way. When you run a notebook you have an
-operating system called a kernel that runs the code .  Each block in a jupyter
+operating system called a kernel that runs the code .   Each block in a jupyter
 notebook is a 'cell'. These cells can be run using the kernel by clicking the
-run button or by pressing `Shift + Enter`.  When you run a cell, the kernel will
-process and store any variables or dataframes you define.  If your kernel
+run button or by pressing `Shift + Enter`.   When you run a cell, the kernel will
+process and store any variables or dataframes you define.   If your kernel
 crashes, you will have to restart it.
 
 .. admonition:: Exercise
-   :class: exercise stacked
+  :class: exercise stacked
 
-   Examine the `Cell` and `Kernel` drop down menus to see what options you have available.
+  Examine the `Cell` and `Kernel` drop down menus to see what options you have available.
 
 
-Pandas
-======
 
-Pandas provides high-performance, easy-to-use data structures and data analysis
-tools for Python, see `here
-<https://pandas.pydata.org/docs/user_guide/10min.html>`.
 
 Importing ROOT files and manipulating with Python
 -------------------------------------------------
@@ -259,80 +261,41 @@ In this section we will learn how to import a ROOT file as a Pandas DataFrame
 using the ``root_pandas`` library.
 
 
+Pandas provides high-performance, easy-to-use data structures and data analysis
+tools for Python, see `here
+<https://pandas.pydata.org/docs/user_guide/10min.html>`.
+
+
 ``root_pandas`` needs ROOT to be installed but there is an alternative called
 ``uproot`` which can load root files into pandas dataframes without requiring
 ROOT.
 
 
 .. admonition:: Exercise
-   :class: exercise stacked
+  :class: exercise stacked
 
-   Start a jupyter notebook and import `root_pandas`, as well as other libraries you think you'll need.
+  Start a jupyter notebook and import `root_pandas`, as well as other libraries you think you'll need.
 
 .. admonition:: Hint
-   :class: xhint stacked toggle
+  :class: xhint stacked toggle
 
-   You can find some help here :ref:`onlinebook_ssh`.
-
-.. admonition:: Solution
-   :class: solution toggle
-
-	.. code:: ipython3
-		import root_pandas
-
-
-You can load in an example dataframe from: 
-.. code:: ipython3
-
-	# Loading an example data frame
-	df = root_pandas.read_root("https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root")
-
-This code imports the `pandas_tutorial_ntuple.root` root file as a dataframe `df`.
-
-If your files are quite large you may start to find your jupyter notebook kernel
-crashing - there are a few ways in which we can mitigate this.
-
- 	-  ‘Chunk’ your data
-  	-  Only import the columns (variables) that you will use/need.
-	-  Add any cuts you can
-
-To import the file using chunking there are some slight differences in the code:
-``df_chunk = root_pandas.read_root([filePath/fileName],'treeName',
-columns = Y4S_columns, chunksize = 100)``. Here I have defined which columns I wish
-to be included in the following string:
-
-.. code:: ipython3
-
-	Y4S_columns = ['B0_mbc', 'B0_M', 'B0_deltae', 'B0_isSignal']
-
-.. admonition:: Exercise
-   :class: exercise stacked
-
-   Load your dataframe as chunks.
+  You can find some help here :ref:`onlinebook_ssh`.
 
 .. admonition:: Solution
-   :class: solution toggle   
+  :class: solution toggle
 
-	.. code:: ipython3
+  .. code:: ipython3
+     import root_pandas
 
-		df_chunk=root_pandas.read_root(["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"], 'Y4S', columns=Y4S_columns, chunksize=100000)
 
-Now the data is loaded as chunks, we 'loop' over or run through all the chunks
-and piece them together. This is the point at which we can add our cuts to
-reduce the loaded, chunked file more.
-
+You can load in an example dataframe using the `read_root` function from the `root_pandas` package. 
 .. code:: ipython3
 
-	cut="(B0_mbc>5.2)" # Define our cut
+  # Loading an example data frame
+  df = root_pandas.read_root("https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root")
 
-	df_list = []
-	for chunk in df_chunk:
-		chunk = chunk.query(cut) # Implement our cut!
-		df_list.append(chunk)
-    df = pd.concat(df_list) # Concatenate our chunks into a dataframe!
+This code imports the `pandas_tutorial_ntuple.root` root file as a dataframe `df`. 
 
-As you can see in the previous snippet, we implemented a cut using the `query`
-function. Remember this, it will come up later!
 
 
 Investigating your DataFrame
@@ -343,7 +306,7 @@ can see the output, where in our case each row corresponds to one candidate:
 
 .. code:: ipython3
 
-	df
+  df
 
 Note that for the dataframe to be displayed a cell with multiple lines of 
 code, one must call it at the end of the cell.
@@ -355,33 +318,33 @@ specify the number of rows shown in the brackets).
 
 .. code:: ipython3
 
-	df.head(5)
+  df.head(5)
 
 Each DataFrame has an index (which is in our case the number of the candidates)
 and a set of columns:
 
 .. code:: ipython3
 
-	len(df.columns)
+  len(df.columns)
 
 You can access the full data stored in the DataFrame with the ``values`` object,
 which is a large 2D numpy matrix
 
 .. code:: ipython3
 
-	df.values
+  df.values
 
 You can display the values of the DataFrame also sorted by a specific column:
 
 .. code:: ipython3
 
-	df.sort_values(by='B0_M').head()
+  df.sort_values(by='B0_M').head()
 
 A useful feature to quickly summarize your data is to use the descibe function:
 
 .. code:: ipython3
 
-	df.describe()
+  df.describe()
 
 
 
@@ -401,9 +364,9 @@ auto-completion.
 
 .. code:: ipython3
 
-	df['B0_M'].describe()
-	# or
-	df.B0_M.describe()
+  df['B0_M'].describe()
+  # or
+  df.B0_M.describe()
 
 Selecting multiple columns
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -412,14 +375,14 @@ Multiple columns can be selected by passing an array of columns:
 
 .. code:: ipython3
 
-	df[['B0_mbc', 'B0_M', 'B0_deltae', 'B0_isSignal']].describe()
+  df[['B0_mbc', 'B0_M', 'B0_deltae', 'B0_isSignal']].describe()
 
 We can assign the subset to a variable
 
 .. code:: ipython3
 
-	subset = df[['B0_mbc', 'B0_M', 'B0_deltae', 'B0_isSignal']]
-	subset.columns
+  subset = df[['B0_mbc', 'B0_M', 'B0_deltae', 'B0_isSignal']]
+  subset.columns
 
 Selecting Rows
 ^^^^^^^^^^^^^^
@@ -429,7 +392,7 @@ rows can be returned via ``df.iloc[i]``.
 
 .. code:: ipython3
 
-	df[2:10]
+  df[2:10]
 
 
 Vectorized Operations
@@ -440,17 +403,17 @@ Series or DataFrame are performed element-wise.
 
 .. code:: ipython3
 
-	df.B0_mbc - df.B0_M
+  df.B0_mbc - df.B0_M
 
 .. code:: ipython3
 
-	# Awful non-physical example of vectorized operations
+  # Awful non-physical example of vectorized operations
 
-	import numpy as np
+  import numpy as np
 
-	x = (df.B0_deltae * df.B0_et)**2 /(np.sin(df.B0_cc2)+np.sqrt(df.B0_cc5))
+  x = (df.B0_deltae * df.B0_et)**2 /(np.sin(df.B0_cc2)+np.sqrt(df.B0_cc5))
 
-	2*x - 2
+  2*x - 2
 
 Adding Columns
 --------------
@@ -459,18 +422,18 @@ You can easily add or remove columns in the following way:
 
 .. code:: ipython3
 
-	# Adding a columns:
+  # Adding a columns:
 
-	df['fancy_new_column'] = (df.B0_deltae * df.B0_et)**2 /(np.sin(df.B0_cc2)+np.sqrt(df.B0_cc5) + 0.1)
-	df['delta_M_mbc'] = df.B0_M - df.B0_mbc
-
-.. code:: ipython3
-
-	df.delta_M_mbc.describe()
+  df['fancy_new_column'] = (df.B0_deltae * df.B0_et)**2 /(np.sin(df.B0_cc2)+np.sqrt(df.B0_cc5) + 0.1)
+  df['delta_M_mbc'] = df.B0_M - df.B0_mbc
 
 .. code:: ipython3
 
-	df['fancy_new_column']
+  df.delta_M_mbc.describe()
+
+.. code:: ipython3
+
+  df['fancy_new_column']
 
 
 
@@ -482,23 +445,23 @@ the different values in the ``B0_isSignal`` column by using
 
 .. code:: ipython3
 
-	df['B0_isSignal'].unique()
+  df['B0_isSignal'].unique()
 
 we see that there are only two values. So it might make more sense to interpet
 this as a boolean value:
 
 .. code:: ipython3
 
-	df['B0_isSignal'] = df['B0_isSignal'].astype(bool)
-	df.B0_isSignal.value_counts()
+  df['B0_isSignal'] = df['B0_isSignal'].astype(bool)
+  df.B0_isSignal.value_counts()
 
 
 .. admonition:: Exercise
-   :class: exercise stacked
+  :class: exercise stacked
 
-	Create two DataFrames, one for Signal and one for Background only
-	containing ``B0_mbc``, ``B0_M`` and ``B0_deltae`` columns. Split between
-	signal and background using the ``B0_isSignal`` column.
+  Create two DataFrames, one for Signal and one for Background only
+  containing ``B0_mbc``, ``B0_M`` and ``B0_deltae`` columns. Split between
+  signal and background using the ``B0_isSignal`` column.
 
 
 
@@ -509,49 +472,11 @@ this as a boolean value:
 Grouped Operations
 ------------------
 
-One of the most powerful features of pandas is the ``groupby`` operation.
+One of the most powerful features of pandas is the ``groupby`` operation.  This is beyond the scope of the tutorial, but the user should be aware of it's existence ready for later analysis. ``groupby`` allows the user to group all rows in a dateframe by selected variables.
 
 .. code:: ipython3
 
-	df.groupby('B0_isSignal').describe().T
-
-.. admonition:: Exercise
-   :class: exercise stacked
-	
-	What does the  .T do?
-
-.. code:: ipython3
-
-	group = df.groupby('B0_isSignal')
-	group.size()
-
-Group by multiple columns
--------------------------
-
-.. code:: ipython3
-
-	group = df.groupby(['exp_no', 'run_no', 'evt_no'])
-
-.. code:: ipython3
-
-	group.size()
-
-
-.. admonition:: Exercise
-   :class: exercise stacked
-
-   Create your own groupby() DataFrame and use the internet to find a way to rank your candidates.
-
-.. code:: ipython3
-
-	# create groupby
-
-	# use group.column.rank(...)
-
-
-
-
-
+  df.groupby('B0_isSignal').describe()
 
 
 
@@ -569,27 +494,25 @@ In this section we will answer 'How can I plot data?' and demonstrate the
 
 .. code:: ipython3
 
-    import matplotlib.pyplot as plt
-    %matplotlib inline
+  import matplotlib.pyplot as plt
+  %matplotlib inline
 
-Example data
-------------
 
-In previous example notebooks the simple decay mode :math:`B^0\to \phi K_S^0`,
+In previous example workshops the simple decay mode :math:`B^0\to \phi K_S^0`,
 where :math:`\phi \to K^+ K^-` and :math:`K_S^0 \to \pi^+ \pi^-` was
 reconstructed. Now we will use these candidates to plot example
 distributions. This time we use the ``root_pandas`` package to read the data
 
 .. code:: ipython3
 
-    # Loading an example data frame
-    import root_pandas
+  # Loading an example data frame
+  import root_pandas
 
 .. code:: ipython3
 
-    df = root_pandas.read_root("https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root").astype(float)
-    df.B0_isSignal = df.B0_isSignal.astype(bool)
-    df.describe()
+  df = root_pandas.read_root("https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root").astype(float)
+  df.B0_isSignal = df.B0_isSignal.astype(bool)
+  df.describe()
 
 Pandas built in histogram function
 ----------------------------------
@@ -599,16 +522,16 @@ following cells show how to implement it.
 
 .. code:: ipython3
 
-    df.B0_mbc.hist(range = (5.2, 5.3), bins = 100)
+  df.B0_mbc.hist(range=(5.2, 5.3), bins=100)
 
 .. code:: ipython3
 
-    df.B0_mbc.hist(range = (5.2, 5.3), bins = 100, by = df.B0_isSignal)
+  df.B0_mbc.hist(range=(5.2, 5.3), bins=100, by=df.B0_isSignal)
 
 .. code:: ipython3
 
-    df[df.B0_isSignal == True].B0_mbc.hist(range = (5.2, 5.3), bins = 100)
-    df[df.B0_isSignal == False].B0_mbc.hist(range = (5.2, 5.3), bins = 100, alpha = .5)
+  df[df.B0_isSignal == True].B0_mbc.hist(range=(5.2, 5.3), bins=100)
+  df[df.B0_isSignal == False].B0_mbc.hist(range=(5.2, 5.3), bins=100, alpha=.5)
 
 Using Matplotlib
 ----------------
@@ -619,12 +542,12 @@ compare the differences between the syntax below.
 
 .. code:: ipython3
 
-    h = plt.hist(df.B0_mbc, bins = 100, range = (5.2, 5.3))
+  h = plt.hist(df.B0_mbc, bins=100, range=(5.2, 5.3))
 
 .. code:: ipython3
 
-    h = plt.hist(df.B0_mbc[df.B0_isSignal], bins = 100, range = (5.2, 5.3))
-    h = plt.hist(df.B0_mbc[~df.B0_isSignal], bins = 100, range = (5.2, 5.3))
+  h = plt.hist(df.B0_mbc[df.B0_isSignal], bins=100, range=(5.2, 5.3))
+  h = plt.hist(df.B0_mbc[~df.B0_isSignal], bins=100, range=(5.2, 5.3))
 
 Making your plots pretty
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -638,52 +561,91 @@ You can have subplots:
 
 .. code:: ipython3
 
-    fig, axes = plt.subplots(figsize = (10,6))
-    
-    h = axes.hist(df.B0_mbc[df.B0_isSignal == 1], 
-                 bins = 100, range = (5.2, 5.3), 
-                 histtype = 'stepfilled', lw = 1,
-                 label = "Signal", edgecolor = 'black')
-    h = axes.hist(df.B0_mbc[df.B0_isSignal == 0], 
-                 bins = 100, range = (5.2, 5.3), 
-                 histtype = 'step', lw = 2,
-                 label = "Background")
-    axes.legend(loc = "best")
-    axes.set_xlabel(r"$M_{\mathrm{bc}}$", fontsize = 18)
-    axes.grid()
-    axes.set_xlim(5.2, 5.3)
-    fig.tight_layout()
+  fig, axes = plt.subplots(figsize=(10,6))
 
-The implementation of 2D histrograms are often very useful and are easily done:
+  h = axes.hist(df.B0_mbc[df.B0_isSignal == 1], bins=100, range=(5.2, 5.3), 
+    histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
+  h = axes.hist(df.B0_mbc[df.B0_isSignal == 0], bins=100, range=(5.2, 5.3), 
+    histtype='step', lw=2, label="Background")
+  axes.legend(loc="best")
+  axes.set_xlabel(r"$M_{\mathrm{bc}}$", fontsize=18)
+  axes.grid()
+  axes.set_xlim(5.2, 5.3)
+  fig.tight_layout()
+
+The implementation of 2D histograms are often very useful and are easily done:
 
 .. code:: ipython3
 
-    plt.figure(figsize = (15,10))
-    cut = 'B0_mbc > 5.2 and B0_phi_M < 1.1'
-    h = plt.hist2d(df.query(cut).B0_mbc, df.query(cut).B0_phi_M, bins = 100)
-    plt.xlabel(r"$M_{BC}$")
-    plt.ylabel(r"$M(\phi)$")
-    plt.savefig("2dplot.pdf")
+  plt.figure(figsize=(15,10))
+  cut = 'B0_mbc>5.2 and B0_phi_M<1.1'
+  h = plt.hist2d(df.query(cut).B0_mbc, df.query(cut).B0_phi_M, bins=100)
+  plt.xlabel(r"$M_{BC}$")
+  plt.ylabel(r"$M(\phi)$")
+  plt.savefig("2dplot.pdf")
 
 Matplotlib now understands data frames so in almost all cases you can just name
-the columns and supply the dataframe as ``data = `` argument
+the columns and supply the dataframe as ``data=`` argument
 
 .. code:: ipython3
 
-    fig, axes = plt.subplots(1,2, figsize = (20,10))
-    axes[0].hist2d("B0_mbc", "B0_deltae", range = [(5.26,5.29), (-0.1,0.1)], df[df.B0_isSignal], bins = 50);
-    axes[1].hist2d("B0_mbc", "B0_deltae", range = [(5.26,5.29), (-0.1,0.1)], data = df[~df.B0_isSignal], bins = 50, cmap="magma");
+  fig, axes = plt.subplots(1,2, figsize=(20,10))
+  axes[0].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)], df[df.B0_isSignal], bins=50);
+  axes[1].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)], data=df[~df.B0_isSignal], bins=50, cmap="magma");
 
 
 
 .. admonition:: Exercise
-   :class: exercise stacked
+  :class: exercise stacked
 
-	Write a function to automatically plot a column in the DataFrame for
-	signal and background. Loop over all columns and produce all plots.
+  Write a function to automatically plot a column in the DataFrame for
+  signal and background. Loop over all columns and produce all plots.
 
 
+Dealing with large files in a jupyter notebook
+----------------------------------------------
 
+If your files are quite large you may start to find your jupyter notebook kernel
+crashing - there are a few ways in which we can mitigate this.
+
+  -   ‘Chunk’ your data
+  -   Only import the columns (variables) that you will use/need.
+  -   Add any cuts you can
+
+To import the file using chunking there are some slight differences in the code:
+``df_chunk = root_pandas.read_root([filePath/fileName],'treeName',
+columns = Y4S_columns, chunksize=100)``. Here I have defined which columns I wish
+to be included in the following string:
+
+.. code:: ipython3
+
+  Y4S_columns = ['B0_mbc', 'B0_M', 'B0_deltae', 'B0_isSignal']
+
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  Load your dataframe as chunks.
+
+.. admonition:: Solution
+  :class: solution toggle  
+
+  .. code:: ipython3
+
+    df_chunk=root_pandas.read_root(["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"], 'Y4S', columns=Y4S_columns, chunksize=100000)
+
+Now the data is loaded as chunks, we 'loop' over or run through all the chunks
+and piece them together. This is the point at which we can add our cuts to
+reduce the loaded, chunked file more.
+
+.. code:: ipython3
+
+  cut="(B0_mbc>5.2)" # Define our cut
+
+  df_list = []
+  for chunk in df_chunk:
+    chunk = chunk.query(cut) # Implement our cut!
+    df_list.append(chunk)
+    df = pd.concat(df_list) # Concatenate our chunks into a dataframe!
 
 
 
@@ -692,5 +654,5 @@ the columns and supply the dataframe as ``data = `` argument
 
 .. topic:: Authors of this lesson
 
-     Martin Ritter (Intro)
-     Hannah Wakeling (Exercises)
+  Martin Ritter (Intro)
+  Hannah Wakeling (Exercises)

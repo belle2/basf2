@@ -112,27 +112,31 @@ You should be aware that there are multiple ways of running
 python. Either interactively from your terminal:
 
 .. code-block:: bash
-       python3
-       >>> import numpy
-       >>> print(numpy.pi)
+
+  python3
+  >>> import numpy
+  >>> print(numpy.pi)
 
 As a script from your terminal:
 
 .. code-block:: bash
-       python3 my_script.py # where this file has python commands inside
+
+  python3 my_script.py # where this file has python commands inside
 
 Or within a python compiler and interpreter such as Visual Studio or XCode.
 
 The official recommended version of python is python3. Python2 is no longer supported. To check which python version you have installed you can check in your terminal using 
 
 .. code-block:: bash
-   python3 --version 
+
+  python3 --version 
 
 OR you could perform this in a live python session, either in your terminal or in a jupyter notebook using:
 
 .. code-block:: bash
-   from platform import python_version
-   print(python_version())
+
+  from platform import python_version
+  print(python_version())
 
 
 A section to really cover our bases
@@ -185,7 +189,7 @@ Congratulations! You've now created your first python file. Now, run it!
 .. admonition:: Exercise
   :class: exercise stacked
 
-Run your new python file in your terminal.
+  Run your new python file in your terminal.
 
 .. admonition:: Solution
   :class: solution toggle
@@ -285,10 +289,12 @@ ROOT.
   :class: solution toggle
 
   .. code:: ipython3
-     import root_pandas
+
+    import root_pandas
 
 
 You can load in an example dataframe using the `read_root` function from the `root_pandas` package. 
+
 .. code:: ipython3
 
   # Loading an example data frame
@@ -550,7 +556,7 @@ compare the differences between the syntax below.
   h = plt.hist(df.B0_mbc[~df.B0_isSignal], bins=100, range=(5.2, 5.3))
 
 Making your plots pretty
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 Let’s face it, physicists aren’t well known for their amazing graphical
 representations, but here’s our chance to shine! We can implement matplotlib
@@ -655,4 +661,5 @@ reduce the loaded, chunked file more.
 .. topic:: Authors of this lesson
 
   Martin Ritter (Intro)
+
   Hannah Wakeling (Exercises)

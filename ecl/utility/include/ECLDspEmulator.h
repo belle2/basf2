@@ -78,7 +78,7 @@ namespace Belle2 {
                        INT* fg33, int* y, int& ttrig2, int& la_thr,
                        int& hit_thr, int& skip_thr, int& k_a, int& k_b,
                        int& k_c, int& k_16, int& k1_chi, int& k2_chi,
-                       int& chi_thres, bool adjusted_timing = true);
+                       int& chi_thres, bool adjusted_timing = false);
 
   }
 }

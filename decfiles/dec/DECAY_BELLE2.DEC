@@ -3153,28 +3153,28 @@ Decay B+
 
 # b-> s gamma
 #
-0.000042100  K*+   gamma              SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model from HELAMP ro SVP_HELAMP
-0.000044000  K_1+  gamma              SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model from HELAMP to  SVP_HELAMP
-0.000014000  K_2*+ gamma              HELAMP 1.0 0.0 1.0 0.0;     #[Reconstructed PDG2016] #Changed model to HELAMP from PHSP
+0.00003918  K*+   gamma              SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
+0.00004380  K_1+  gamma              SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
+0.00001377  K_2*+ gamma              HELAMP 1.0 0.0 1.0 0.0;      #BF Updated by PG 9/2021
 0.000000980  rho+  gamma              SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
-0.000001     K'_1+ gamma              SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
-0.000027     K'*+  gamma              SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
-0.000067     K''*+ gamma              SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.00000970     K'_1+ gamma              SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
+0.00002710     K'*+  gamma              SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
+0.00006670     K''*+ gamma              SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
 0.00013792   Xsu   gamma              BTOXSGAMMA 2; #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes
 
 # b -> s l l
 #
-0.000000550 K+      e+      e-                            BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000060 K+      e+      e-                            BTOSLLBALL; #BF Updated by PG 9/2021. Use FLAVIO predicted values.
 0.0000000179 pi+    e+     e-                             BTOSLLBALL; #[Reconstructed PDG2016] #[new mode from mumu mode]
-0.000001550 K*+     e+      e-                            BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000130 K*+     e+      e-                            BTOSLLBALL; #BF Updated by PG 9/2021. Use FLAVIO predicted values.
 0.00000044   K+  pi+  pi-  e+  e-                         PHSP; #[Reconstructed PDG2016] #[new mode from mumu mode]
 0.000000293   K+  pi0  pi0  e+  e-                        PHSP; #[Reconstructed PDG2016] #[new mode via isospin from mumu mode]
 0.000000079 K+ phi    e+     e-                           PHSP; #[Reconstructed PDG2016] #[new mode from mumu]
 0.0000038377 Xsu  e+    e-                                BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 6.7e-6 - Sum of exclusive b -> s e e  modes
-0.000000443 K+      mu+     mu-                           BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000060 K+      mu+     mu-                           BTOSLLBALL; #BF Updated by PG 9/2021. Use FLAVIO predicted values.
 0.0000000179 pi+      mu+     mu-                         BTOSLLBALL; #[Reconstructed PDG2016]
-0.000000960 K*+     mu+     mu-                           BTOSLLBALL; #[Reconstructed PDG2016]
-0.00000044   K+  pi+  pi-  mu+  mu-                       PHSP; #[Reconstructed PDG2016] #[new mode]
+0.00000129 K*+     mu+     mu-                           BTOSLLBALL; #BF Updated by PG 9/2021. Use FLAVIO predicted values.
+0.00000043   K+  pi+  pi-  mu+  mu-                       PHSP;  #BF Updated by PG 9/2021
 0.000000293   K+  pi0  pi0  mu+  mu-                      PHSP; #[Reconstructed PDG2016] #[new mode via isospin]
 0.000000079 K+ phi    mu+     mu-                         PHSP; #[Reconstructed PDG2016] #[new mode]
 0.0000021347 Xsu  mu+   mu-                               BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
@@ -3197,43 +3197,43 @@ Decay B+
 0.000026   pi+   pi0   pi0                                  CB3PI-P00 alpha;
 0.000000   pi+   pi+   pi-                                  CB3PI-MPP alpha;
 
-0.000004070 eta     pi+                                     PHSP;
-0.000002330 eta     K+                                      PHSP;
-0.000019300 K*+     eta                                     SVS;
-0.000007000 rho+    eta                                     SVS;
+0.00000402 eta     pi+                                     PHSP; #BF Updated by PG 9/2021
+0.00000236 eta     K+                                      PHSP; #BF Updated by PG 9/2021
+0.00001932 K*+     eta                                     SVS; #BF Updated by PG 9/2021
+0.00000703 rho+    eta                                     SVS; #BF Updated by PG 9/2021
 0.000002700 eta'    pi+                                     PHSP;
-0.000070600 eta'    K+                                      PHSP;
-0.000004900 K*+     eta'                                    SVS;
-0.000008700 rho+    eta'                                    SVS;
-0.000006900 omega   pi+                                     SVS;
-0.000006700 omega   K+                                      SVS;
+0.00007036 eta'    K+                                      PHSP; #BF Updated by PG 9/2021
+0.00000480 K*+     eta'                                    SVS; #BF Updated by PG 9/2021
+0.00000970 rho+    eta'                                    SVS; #BF Updated by PG 9/2021
+0.00000688 omega   pi+                                     SVS; #BF Updated by PG 9/2021
+0.00000647 omega   K+                                      SVS; #BF Updated by PG 9/2021
 0.0000010  omega K*+                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 0.000015900 omega   rho+                                    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
-0.0000000  phi pi+                                          SVS;
-0.000008300 phi     K+                                      SVS;
+0.00000003  phi pi+                                          SVS; #BF Updated by PG 9/2021
+0.00000883 phi     K+                                      SVS; #BF Updated by PG 9/2021
 
 #2-body modes from Jim Olsen
-# (K_S0 K- and K_L0 K- -> 1x10^-6, Jim Olsen - Mar 27, 2001)
-# (pi- pi0 -> 5x10^-6 and K- pi0 -> 11x10^-6, Jim Olsen - Mar 27, 2001)
-# PR LHCb 04/08/04 split into KS/KL
-0.000000    K0 pi+                                          PHSP;
-0.000011550 K_S0    pi+                                     PHSP;
-0.000011550 K_L0    pi+                                     PHSP;
-0.000001360 anti-K0 K+                                      PHSP;
-0.000005700 pi+     pi0                                     PHSP;
-0.000012900 K+      pi0                                     PHSP;
+#REMOVE LINE # (K_S0 K- and K_L0 K- -> 1x10^-6, Jim Olsen - Mar 27, 2001)
+#REMOVE LINE # (pi- pi0 -> 5x10^-6 and K- pi0 -> 11x10^-6, Jim Olsen - Mar 27, 2001)
+#REMOVE LINE # PR LHCb 04/08/04 split into KS/KL
+0.00002368    K0 pi+                                          PHSP; #BF Updated by PG 9/2021
+#REMOVE LINE 0.000011550 K_S0    pi+                                     PHSP;
+#REMOVE LINE 0.000011550 K_L0    pi+                                     PHSP;
+0.00000131 anti-K0 K+                                      PHSP; #BF Updated by PG 9/2021
+0.00000548 pi+     pi0                                     PHSP; #BF Updated by PG 9/2021
+0.00001294 K+      pi0                                     PHSP; #BF Updated by PG 9/2021
 
 # 3-body John Back (jback@slac.stanford.edu) - Oct 15, 2002
 # JGS intersperses modes with pi0->eta,eta'
 # B+ modes
-#
+
 # rho0 3-body modes
-0.000008300 rho0    pi+                                     SVS;
-0.000003700 rho0    K+                                      SVS;
+0.00000829 rho0    pi+                                     SVS; #BF Updated by PG 9/2021
+0.00000374 rho0    K+                                      SVS; #BF Updated by PG 9/2021
 
 # rho+ 3-body modes
-0.000010900 rho+    pi0                                     SVS;
-0.000008000 rho+    K0                                      SVS;
+0.00001093 rho+    pi0                                     SVS; #BF Updated by PG 9/2021
+0.00000727 rho+    K0                                      SVS; #BF Updated by PG 9/2021
 
 # rho(1450) 3-body modes
 0.0000022    rho(2S)0 pi+           SVS;
@@ -3247,16 +3247,16 @@ Decay B+
 0.000001     a_00 pi+               PHSP;
 0.000001     a_0+ pi0               PHSP;
 
-0.0000016 f_2     pi+               PHSP;
+0.00000224 f_2     pi+               PHSP; #BF Updated by PG 9/2021
 
 # K*0(892) 3-body modes
-0.000045     K_0*0   pi+            PHSP;
+0.00003905     K_0*0   pi+            PHSP;
 0.000001     anti-K_0*0 K+          PHSP;
-0.000002     K_0*+ pi0              PHSP;
+0.00001190     K_0*+ pi0              PHSP; #BF Updated by PG 9/2021
 0.000002     K_0*+ anti-K0          PHSP;
 
 # K*+(892) 3-body modes
-0.000006900 K*+     pi0             SVS;
+0.00000680 K*+     pi0             SVS; #BF Updated by PG 9/2021
 0.000003     K*+ anti-K0            SVS;
 
 # Non-resonant 3-body left-overs
@@ -3266,13 +3266,13 @@ Decay B+
 #0402270.000002     pi+ pi- pi+            PHSP;
 
 # K+ pi- pi+: high mass + f0(400-1200) = (5+5)e-6
-0.000000000 K+      pi-     pi+     PHSP;
+0.00005097 K+      pi-     pi+     PHSP; #BF Updated by PG 9/2021
 
 # K+ K- pi+: just non-resonant
-0.000005000 K+      K-      pi+     PHSP;
+0.00000524 K+      K-      pi+     PHSP; #BF Updated by PG 9/2021
 
 # K+K-K+: high mass structure near 1500 + non-res: total - phiK = 30-4
-0.000025400 K+      K-      K+      PHSP;
+0.00003401 K+      K-      K+      PHSP; #BF Updated by PG 9/2021
 
 # K+K+pi-: suppressed mode (1e-7)
 0.0000001    K+ K+ pi-              PHSP;
@@ -3770,7 +3770,7 @@ Decay B+
 
 #   B -> cc= s          sum = 1.92%
 #
-0.001026  J/psi K+                   SVS; #[Reconstructed PDG2018]
+0.00100556  J/psi K+                   SVS; #BF Updated by PG 9/2021
 0.001430  J/psi K*+                  SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
 0.000041  J/psi pi+                  SVS; #[Reconstructed PDG2018]
 0.000050  J/psi rho+                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus;
@@ -3956,7 +3956,7 @@ Decay B+
 
 #  B -> D(*) X  Exclusive Modes
 0.005190000 anti-D*0 pi+                SVS;
-0.004840000 anti-D0 pi+                 PHSP;
+0.00467517 anti-D0 pi+                 PHSP; #BF Updated by PG 9/2021
 0.013400000 rho+    anti-D0             SVS;
 # D* rho HELAMP parameters taken from ICHEP 98-852.
 0.009800000 anti-D*0 rho+               SVV_HELAMP 0.283 1.13 0.932 0.0 0.228 0.95;
@@ -3964,7 +3964,7 @@ Decay B+
 0.0005   anti-D0  pi0  pi+              PHSP;
 0.0005   anti-D*0  pi0  pi+             PHSP;
 0.001070000 D-      pi+     pi+         PHSP;
-0.001350000 D*-     pi+     pi+         PHSP;
+0.00134876 D*-     pi+     pi+         PHSP; #BF Updated by PG 9/2021
 
 # D a1 updated Ref. [B1]:
 0.004000000 a_1+    anti-D0             SVS;
@@ -4059,7 +4059,7 @@ Decay B+
 0.000009100 eta     K_2*+                                   PHSP;
 0.000024000 omega   K_0*+                                   PHSP;
 0.000021000 omega   K_2*+                                   PHSP;
-0.000010100 K*0     pi+                                     PHSP;
+0.00001006 K*0     pi+                                     PHSP; #BF Updated by PG 9/2021
 0.000001070 f_2     K+                                      PHSP;
 0.000005600 K_2*0   pi+                                     PHSP;
 0.000001200 K*+     K*0                                     PHSP;
@@ -4220,28 +4220,28 @@ Decay B-
 
 # b-> s gamma
 #
-0.000042100 K*-      gamma             SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016]
-0.000044000 K_1-     gamma             SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
-0.000014000 K_2*-    gamma             HELAMP 1.0 0.0 1.0 0.0;     #[Reconstructed PDG2016] #Changed model to HELAMP from PHSP
+0.00003918 K*-      gamma             SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
+0.00004380 K_1-     gamma             SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
+0.00001377 K_2*-    gamma             HELAMP 1.0 0.0 1.0 0.0;      #BF Updated by PG 9/2021
 0.000000980 rho-     gamma             SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from PHSP
-0.000001    K'_1-    gamma             SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
-0.000027    K'*-     gamma             SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
-0.000067    K''*-    gamma             SVP_HELAMP 1.0 0.0 1.0 0.0; #[Reconstructed PDG2016] #Changed model to SVP_HELAMP from HELAMP
+0.00000970    K'_1-    gamma             SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
+0.00002710    K'*-     gamma             SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
+0.00006670    K''*-    gamma             SVP_HELAMP 1.0 0.0 1.0 0.0;  #BF Updated by PG 9/2021
 0.00013792  anti-Xsu gamma             BTOXSGAMMA 2 ;  #[Reconstructed PDG2016] BF = 3.49e-4 - Sum of exclusive b -> s gamma modes
 
 # b -> s l l
 #
-0.000000550 K-      e+      e-                              BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000060 K-      e+      e-                              BTOSLLBALL; #BF Updated by PG 9/2021. Use FLAVIO predicted values.
 0.0000000179 pi-    e+      e-                              BTOSLLBALL; #[Reconstructed PDG2016] #[new mode from mu mu mode]
-0.000001550 K*-     e+      e-                              BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000130 K*-     e+      e-                              BTOSLLBALL; #BF Updated by PG 9/2021. Use FLAVIO predicted values.
 0.00000044 K- pi+ pi-    e+     e-                          PHSP; #[Reconstructed PDG2016] #[new mode from mu mu mode]
 0.000000293 K- pi0 pi0    e+     e-                         PHSP; #[Reconstructed PDG2016] #[new mode via isospin from mu mu mode]
 0.000000079 K- phi    e+     e-                             PHSP; #[Reconstructed PDG2016] #[new mode]
 0.0000038377 anti-Xsu  e+    e-                             BTOXSLL 4.8 0.2 0.0 0.41;  #[Reconstructed PDG2016] BF = 6.7e-6 -Sum of exclusive b -> s e e  modes
-0.000000443 K-      mu+     mu-                             BTOSLLBALL; #[Reconstructed PDG2016]
+0.00000060 K-      mu+     mu-                             BTOSLLBALL; #BF Updated by PG 9/2021. Use FLAVIO predicted values.
 0.0000000179 pi-      mu+     mu-                           BTOSLLBALL; #[Reconstructed PDG2016] #[new mode]
-0.00000096 K*-     mu+     mu-                              BTOSLLBALL; #[Reconstructed PDG2016]
-0.00000044 K- pi+ pi-    mu+     mu-                        PHSP; #[Reconstructed PDG2016] #[new mode]
+0.00000129 K*-     mu+     mu-                              BTOSLLBALL; #BF Updated by PG 9/2021. Use FLAVIO predicted values.
+0.00000043 K- pi+ pi-    mu+     mu-                        PHSP;  #BF Updated by PG 9/2021
 0.000000293 K- pi0 pi0    mu+     mu-                       PHSP; #[Reconstructed PDG2016] #[new mode via isospin]
 0.000000079 K- phi    mu+     mu-                           PHSP; #[Reconstructed PDG2016] #[new mode]
 0.0000021347 anti-Xsu  mu+   mu-                            BTOXSLL 4.8 0.2 0.0 0.41; #[Reconstructed PDG2016] BF = 4.3e-6 - Sum of exclusive b -> s mu mu  modes
@@ -4264,44 +4264,43 @@ Decay B-
 0.000026   pi-   pi0   pi0                                  CB3PI-P00 alpha;
 0.000000   pi-   pi-   pi+                                  CB3PI-MPP alpha;
 
-0.000004070 eta     pi-                                     PHSP; 
-0.000002330 eta     K-                                      PHSP; 
-0.000019300 K*-     eta                                     SVS; 
-0.000007000 rho-    eta                                     SVS; 
+0.00000402 eta     pi-                                     PHSP;  #BF Updated by PG 9/2021
+0.00000236 eta     K-                                      PHSP;  #BF Updated by PG 9/2021
+0.00001932 K*-     eta                                     SVS;  #BF Updated by PG 9/2021
+0.00000703 rho-    eta                                     SVS;  #BF Updated by PG 9/2021
 0.000002700 eta'    pi-                                     PHSP; 
-0.000070600 eta'    K-                                      PHSP; 
-0.000004900 K*-     eta'                                    SVS; 
-0.000008700 rho-    eta'                                    SVS; 
-0.000006900 omega   pi-                                     SVS; 
-0.000006700 omega   K-                                      SVS; 
+0.00007036 eta'    K-                                      PHSP;  #BF Updated by PG 9/2021
+0.00000480 K*-     eta'                                    SVS;  #BF Updated by PG 9/2021
+0.00000970 rho-    eta'                                    SVS;  #BF Updated by PG 9/2021
+0.00000688 omega   pi-                                     SVS;  #BF Updated by PG 9/2021
+0.00000647 omega   K-                                      SVS;  #BF Updated by PG 9/2021
 0.0000010  omega K*-                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 0.000015900 omega   rho-                                    SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; 
-0.0000000  phi pi-                                          SVS;
-0.000008300 phi     K-                                      SVS; 
+0.00000003  phi pi-                                          SVS; #BF Updated by PG 9/2021
+0.00000883 phi     K-                                      SVS;  #BF Updated by PG 9/2021
 
 #2-body modes from Jim Olsen
-# (K_S0 K- and K_L0 K- -> 1x10^-6, Jim Olsen - Mar 27, 2001)
-# (pi- pi0 -> 5x10^-6 and K- pi0 -> 11x10^-6, Jim Olsen - Mar 27, 2001)
-# PR LHCb 04/08/2004 Split into Ks/KL
-0.000000    anti-K0 pi-                                     PHSP;
-0.000011550 K_S0    pi-                                     PHSP; 
-0.000011550 K_L0    pi-                                     PHSP; 
-0.000001360 K0      K-                                      PHSP; 
-0.000005700 pi-     pi0                                     PHSP; 
-0.000012900 K-      pi0                                     PHSP; 
+#REMOVE LINE # (K_S0 K- and K_L0 K- -> 1x10^-6, Jim Olsen - Mar 27, 2001)
+#REMOVE LINE # (pi- pi0 -> 5x10^-6 and K- pi0 -> 11x10^-6, Jim Olsen - Mar 27, 2001)
+#REMOVE LINE # PR LHCb 04/08/04 split into KS/KL
+0.00002368    anti-K0 pi-                                     PHSP; #BF Updated by PG 9/2021
+#REMOVE LINE 0.000011550 K_S0    pi-                                     PHSP;
+#REMOVE LINE 0.000011550 K_L0    pi-                                     PHSP;
+0.00000131 K0      K-                                      PHSP; #BF Updated by PG 9/2021
+0.00000548 pi-     pi0                                     PHSP;  #BF Updated by PG 9/2021
+0.00001294 K-      pi0                                     PHSP;  #BF Updated by PG 9/2021
 
 # 3-body John Back (jback@slac.stanford.edu) - Oct 15, 2002
 # JGS intersperses modes with pi0->eta,eta'
 # B- modes
 
 # rho0 3-body modes
-0.000008300 rho0    pi-                                     SVS; 
-0.000003700 rho0    K-                                      SVS; 
+0.00000829 rho0    pi-                                     SVS;  #BF Updated by PG 9/2021
+0.00000374 rho0    K-                                      SVS;  #BF Updated by PG 9/2021
 
 # rho- 3-body modes
-0.000010900 rho-    pi0                                     SVS; 
-0.000008000 rho-    anti-K0                                 SVS; 
-
+0.00001093 rho-    pi0                                     SVS;  #BF Updated by PG 9/2021
+0.00000727 rho-    anti-K0                                 SVS;  #BF Updated by PG 9/2021
 
 # rho(1450) 3-body modes
 0.0000022    rho(2S)0 pi-           SVS;
@@ -4315,16 +4314,16 @@ Decay B-
 0.000001     a_00 pi-               PHSP;
 0.000001     a_0- pi0               PHSP;
 
-0.0000016 f_2     pi-               PHSP; 
+0.00000224 f_2     pi-               PHSP;  #BF Updated by PG 9/2021
 
 # K*(1430) 3-body modes
-0.000045     anti-K_0*0 pi-         PHSP; 
+0.00003905     anti-K_0*0 pi-         PHSP;
 0.000001     K_0*0 K-               PHSP;
-0.000002     K_0*- pi0              PHSP;
+0.00001190     K_0*- pi0              PHSP; #BF Updated by PG 9/2021
 0.000002     K_0*- K0               PHSP;
 
 # K*-(892) 3-body modes
-0.000006900 K*-     pi0             SVS; 
+0.00000680 K*-     pi0             SVS;  #BF Updated by PG 9/2021
 0.0000030     K*- K0                SVS;
 
 # Non-resonant 3-body left-overs
@@ -4334,13 +4333,13 @@ Decay B-
 #0402270.000002     pi- pi+ pi-     PHSP;
 
 # K- pi+ pi-: high mass + f0(400-1200) = (5+5)e-6
-0.000000000 K-      pi+     pi-     PHSP; 
+0.00005097 K-      pi+     pi-     PHSP;  #BF Updated by PG 9/2021
 
 # K- K+ pi-: just non-resonant
-0.000005000 K-      K+      pi-     PHSP; 
+0.00000524 K-      K+      pi-     PHSP;  #BF Updated by PG 9/2021
 
 # K- K+ K-: high mass structure near 1500 + non-res: total - phiK = 30 - 4
-0.000025400 K-      K+      K-      PHSP; 
+0.00003401 K-      K+      K-      PHSP;  #BF Updated by PG 9/2021
 
 # K-K-pi+: suppressed mode (1e-7)
 0.0000001    K- K- pi+              PHSP;
@@ -4838,7 +4837,7 @@ Decay B-
 
 #   B -> cc= s          sum = 1.92%
 #
-0.001026  J/psi   K-                  SVS; #[Reconstructed PDG2018]
+0.00100556  J/psi   K-                  SVS; #BF Updated by PG 9/2021
 0.001430  J/psi   K*-                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; 
 0.000041  J/psi   pi-                 SVS; #[Reconstructed PDG2018]
 0.000050  J/psi   rho-                SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; 
@@ -5024,7 +5023,7 @@ Decay B-
 
 #  B -> D(*) X  Exclusive Modes
 0.005190000 D*0     pi-                  SVS; 
-0.004840000 D0      pi-                  PHSP; 
+0.00467517 D0      pi-                  PHSP;  #BF Updated by PG 9/2021
 0.013400000 rho-    D0                   SVS; 
 # D* rho HELAMP parameters taken from ICHEP 98-852.
 0.009800000 D*0     rho-                 SVV_HELAMP 0.228 0.95 0.932 0.0 0.283 1.13; 
@@ -5032,7 +5031,7 @@ Decay B-
 0.0005   D0  pi0  pi-                    PHSP;
 0.0005   D*0 pi0  pi-                    PHSP;
 0.001070000 D+      pi-     pi-          PHSP; 
-0.001350000 D*+     pi-     pi-          PHSP; 
+0.00134876 D*+     pi-     pi-          PHSP;  #BF Updated by PG 9/2021
 
 # D a1 updated Ref. [B1]:
 0.004000000 a_1-    D0                   SVS; 
@@ -5126,7 +5125,7 @@ Decay B-
 0.000009100 eta     K_2*-                                   PHSP;  
 0.000024000 omega   K_0*-                                   PHSP;  
 0.000021000 omega   K_2*-                                   PHSP;  
-0.000010100 anti-K*0 pi-                                    PHSP;  
+0.00001006 anti-K*0 pi-                                    PHSP;   #BF Updated by PG 9/2021
 0.000001070 f_2     K-                                      PHSP;  
 0.000005600 anti-K_2*0 pi-                                  PHSP;  
 0.000001200 K*-     anti-K*0                                PHSP;  

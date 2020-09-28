@@ -49,7 +49,6 @@ void LogSystem::resetLogConnections()
     delete connection;
   }
   m_logConnections.clear();
-  s_debugEnabled = false;
 }
 
 
@@ -205,6 +204,7 @@ void LogSystem::resetLogging()
   addLogConnection(new LogConnectionFilter(new LogConnectionConsole(STDOUT_FILENO)));
 
   m_printErrorSummary = false;
+  s_debugEnabled = false;
 }
 
 void LogSystem::printErrorSummary()

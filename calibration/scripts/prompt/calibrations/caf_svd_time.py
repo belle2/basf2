@@ -388,7 +388,7 @@ def get_calibrations(input_data, **kwargs):
     # We leave the coll_els3 to be the one "managed" by the CAF
 
     # calibration setup
-    calibration = Calibration("SVDCoGTime",
+    calibration = Calibration("SVDTime",
                               collector=coll_els3,   # The other collectors are in the pre_collector_path itself
                               algorithms=[algo_cog6, algo_cog3, algo_els3],
                               input_files=good_input_files,

@@ -31,6 +31,7 @@ namespace Belle2 {
     virtual void event() override;
 
   private:
+    /** Check a single trigger line for the expected result */
     bool checkTrigger(const std::string& name, unsigned int prescale = 1, uint32_t* counter = nullptr) const;
     /** Required input for trigger results */
     StoreObjPtr<SoftwareTriggerResult> m_trigResults;

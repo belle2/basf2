@@ -49,6 +49,7 @@ void LogSystem::resetLogConnections()
     delete connection;
   }
   m_logConnections.clear();
+  s_debugEnabled = false;
 }
 
 

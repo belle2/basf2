@@ -39,7 +39,14 @@ Leptonic skims
 .. automodule:: skim.leptonic
     :members:
     :undoc-members:
-    
+
+Low multiplicity skims
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: skim.lowMulti
+    :members:
+    :undoc-members:
+
 Quarkonium skims
 ~~~~~~~~~~~~~~~~
 

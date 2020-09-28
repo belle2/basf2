@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import sys
-import basf2 as b2
-import modularAnalysis as ma
-import fei
 
+import basf2 as b2
+import fei
+import modularAnalysis as ma
 
 # get input file number from the command line
 filenumber = sys.argv[1]
@@ -27,7 +27,11 @@ b2.conditions.globaltags = ["analysis_tools_release-04-02"]
 # Get FEI default channels.
 # Utilise the arguments to toggle on and off certain channels
 particles = fei.get_default_channels(
-    chargedB=True, neutralB=False, hadronic=True, semileptonic=False
+    chargedB=True,
+    neutralB=False,
+    hadronic=True,
+    semileptonic=False,
+    baryonic=True,
 )
 
 # Set up FEI configuration specifying the FEI prefix
@@ -41,8 +45,8 @@ feistate = fei.get_path(particles, configuration)
 # Add FEI path to the path to be processed
 main.add_path(feistate.path)
 
-
-# Add MC matching when applying to MC. This is required for variables like isSignal and mcErrors below
+# Add MC matching when applying to MC.
+# This is required for variables like isSignal and mcErrors below
 ma.matchMCTruth(list_name="B+:generic", path=main)
 
 # Rank B+ candidates by signal classifier output

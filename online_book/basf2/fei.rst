@@ -128,7 +128,7 @@ to the `conditions.globaltags <ConditionsConfiguration.globaltags>` list in the 
     The results are presented in one line separated by spaces. Pick the tag starting with ``analysis_tools`` and assign
     it to ``b2.conditions.globaltags``.
 
-    Note: This variable always takes a **list** of tags.
+    **NOTE**: This variable always takes a **list** of tags.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -407,14 +407,12 @@ Prerequisites (part 2)
     :class: exercise stacked
 
     Start a new steering file.
-
     In this file, you won't need the ``fei`` package so you can skip this import.
     We will, however, use the variable aliases so be sure to import the variable manager.
-
     Create a path and load the udst file
     ``/home/belle2/mbauer/fei_tutorial/fei_skimmed_xulnu.udst.root``.
 
-    NOTE: You can still use `modularAnalysis.inputMdst` to do this, even though it's a ``udst`` file.
+    **NOTE**: You can still use `modularAnalysis.inputMdst` to do this, even though it's a ``udst`` file.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -445,7 +443,7 @@ meson provided by the FEI to get the ϒ(4S).
 
     Then, reconstruct a B\ :sup:`0` meson particle list called ``B0:signal`` from a muon and a pion.
 
-    NOTE: There is no neutrino reconstructed as it won't be seen in the detector,
+    **NOTE**: There is no neutrino reconstructed as it won't be seen in the detector,
     we will have to remember this later on.
 
 .. admonition:: Hint
@@ -466,7 +464,7 @@ meson provided by the FEI to get the ϒ(4S).
     Then, the combine the ``B0:generic`` from the udst file with the
     ``anti-B0:signal`` to a list called ``Upsilon(4S):opp_cp`` .
 
-    NOTE: The ``B0:generic`` should come first in the decay string, otherwise
+    **NOTE**: The ``B0:generic`` should come first in the decay string, otherwise
     the missing mass squared variable we're using later won't know which of the B mesons
     is the tag and which is the signal.
 
@@ -502,12 +500,14 @@ metavariable, e.g. ``daughter(0, extraInfo(SignalProbability))``.
 
 With regards to MC matching we have to look out for two things:
 
-* The neutrino: We have reconstructed a decay with a neutrino but can't see this neutrino
+* The neutrino:
+    We have reconstructed a decay with a neutrino but can't see this neutrino
     in the reconstructed detector. As there will always be a discrepancy between the decay in MC and the
     reconstructed decay, the `isSignal` variable will always be zero. Instead, you can use the
     `isSignalAcceptMissingNeutrino` variable.
 
-* Which particle to look at: The number of perfectly (i.e. ``isSignal == 1.0``) reconstructed B\ :sub:`tag` mesons
+* Which particle to look at:
+    The number of perfectly (i.e. ``isSignal == 1.0``) reconstructed B\ :sub:`tag` mesons
     is not very large as you might have noticed in the first part of the exercise. As we are only really
     interested in the B\ :sub:`sig`, the `isSignalAcceptMissingNeutrino` of this B meson can be a better signal
     definition than `isSignalAcceptMissingNeutrino` of the ``Upsilon(4S)`` [#f1]_.
@@ -561,7 +561,7 @@ Like in the first part of this lesson, you can now analyse your nTuple. As befor
 probability (now under the alias ``Btag_SigProb`` if you have adapted the example) to select more pure
 ϒ(4S) candidates and plot `m2RecoilSignalSide` for different values of the classifier.
 
-NOTE: A histogram of `Mbc` will look quite different in this exercise, this is because in the last exercise we have used
+**NOTE**: A histogram of `Mbc` will look quite different in this exercise, this is because in the last exercise we have used
 a generic MC sample and in this exercise we are using a sample with only four decay channels.
 
 

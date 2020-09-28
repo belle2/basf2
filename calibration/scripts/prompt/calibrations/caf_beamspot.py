@@ -12,6 +12,7 @@ settings = CalibrationSettings(name="BeamSpot Calibrations",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["hlt_mumu"],
+                               expert_config={"size_interval_len": 2.0, "position_interval_len": 0.5, "gap_penalty": 10},
                                depends_on=[])
 
 ##############################
@@ -86,6 +87,8 @@ def get_calibrations(input_data, **kwargs):
 
     collector_bs = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm_bs = BeamSpotAlgorithm()
+    algorithm_bs.setIntervalsLength(kwargs['expert_config']["size_interval_len"],  kwargs['expert_config']["position_interval_len"])
+    algorithm_bs.setGapPenalty(kwargs['expert_config']["gap_penalty"])
 
     calibration_bs = Calibration('BeamSpot',
                                  collector=collector_bs,

@@ -151,9 +151,7 @@ class SingleTagPseudoScalar(BaseSkim):
     """
     __authors__ = ["Hisaki Hayashii"]
     __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
-    __description__ = "A skim script for a pseudoscalar meson production in this
-    single-tag two-photon processes.  The script selects events with one
-    high-energy E > 1.5 GeV electron(or positron), and one or more pi0/eta/eta mesons."
+    __description__ = "A skim script to select event with one high-energy electron and one or more pi0/eta/eta mesons."
     __category__ = "physics, low multiplicity"
     """
     **Decay Modes**
@@ -178,8 +176,8 @@ class SingleTagPseudoScalar(BaseSkim):
         # Used cuts
         # --
         # Condition for a tagged electron
-        #  - The tagged elecron must be identified as electron and be high energy
-        #     (E >1.5 GeV)
+        #  - The tagged elecron must be identified as electron and mast have high
+        #    energy  greater than 1.5 GeV.
         #  -  dz, dr cuts should be tight enough  to remove duplicated tracks.
         # --
         Electron_IPcut = 'abs(dz) < 2.0 and dr < 0.5'
@@ -196,15 +194,16 @@ class SingleTagPseudoScalar(BaseSkim):
         # -
         good_cluster = 'clusterE > 0.1'
         # --
-        # pi0  mass region, to be wide in the skiming step.
+        # pi0  mass region, A wide mass region is shoose to see backgroud shape.
         # -
         pi0_mass_wide = '0.06 < InvM < 0.18'
         # --
-        # pi0_energy.  (This cut is applied only for mode 1 e(e)pi0.)
+        # pi0_energy.  This energy cut is applied for e(e)pi0 mode only.
         # -
         pi0_energy = ' E > 0.5'
         # --
-        # eta, eta'  mass region. to be wide in the skimming step.
+        # eta, eta'  mass region.
+        # A wide mass region is chosed to see the background shape.
         # -
         eta_mass_wide = '0.50 < InvM < 0.60'
         etap_mass_wide = '0.91 < InvM < 1.10'
@@ -217,7 +216,7 @@ class SingleTagPseudoScalar(BaseSkim):
         #    e+:good     : electron ID > 0.7,Originating from IP.
         #    e+:highE    : E_lab> 1.5GeV                                       -> nhighEel
         #    e+:tagged  : E >1.5 GeV and highest E                      -> nTagged
-        #       nhighEel == 1    : No of high energy electron should be one.
+        #       nhighEel == 1: No. of high energy electron should be one.
         # ---
         # e+:good
         ma.cutAndCopyList('e+:good', 'e+:all',
@@ -256,7 +255,7 @@ class SingleTagPseudoScalar(BaseSkim):
         #      gamma:all       :all
         #      gamma:good   : E>0.1 GeV     -> nphoton
         # ---
-        # Order the list according to the energy
+        #
         ma.rankByHighest('gamma:all', "clusterE", path=path)
         va.addAlias('clusterERank', 'extraInfo(clusterE_rank)')
         ma.cutAndCopyList('gamma:good', 'gamma:all', good_cluster, path=path)
@@ -299,7 +298,7 @@ class SingleTagPseudoScalar(BaseSkim):
                             eta_mass_wide, dmID=3, path=path)
         va.addAlias('nmode3', 'nParticlesInList(eta:pipipi0)')
         # --
-        #  mode=4
+        #  mode = 4
         # --
         ma.reconstructDecay('eta:pipig -> pi+:good pi-:good gamma:good',
                             eta_mass_wide, dmID=4, path=path)
@@ -309,8 +308,7 @@ class SingleTagPseudoScalar(BaseSkim):
         #       eta':pipieta_gg        :eta' -> pipieta (eta->  gg)                 5
         #       eta':pipig                 :eta' -> pipi gamma                           6
         # --
-        # --
-        #   mode=5
+        #   mode = 5
         # --
         ma.reconstructDecay("eta':pipieta_gg -> pi+:good pi-:good eta:gg",
                             etap_mass_wide, dmID=5, path=path)
@@ -322,25 +320,23 @@ class SingleTagPseudoScalar(BaseSkim):
         ma.reconstructDecay("eta':pipig -> pi+:good pi-:good gamma:good",
                             etap_mass_wide, dmID=6, path=path)
         va.addAlias('nmode6', "nParticlesInList(eta':pipig)")
-        #
         # --
         # Final skim condition
         # --
-        #  Reqire on tagged electron with energy > 1.5 and the number of charged
-        #  should be less than equal two.
+        #  Reqire one tagged electron  and <=2 the other charged tracks.
+        #  --
         presel = ' nhighEel == 1 and npion <= 2 '
         va.addAlias('mode_sum',
                     'formula(npi0highE + nmode2 + nmode3 + nmode4 + nmode5 + nmode6 )')
 
         eventcuts = presel + ' and mode_sum >= 1'
         #
-        #   Although a condition "mode_sum >-1 " looks like very loose, but the
-        #  the preselection condition, one high-energy electron and <= other charged
-        # tracks, is quite tight. In practice, the events with one more pi0/eta/eta' are
-        # very small. So the redution rate for this skim for experimental  data
-        # very large, i.e. 1/50.
+        #   Although a condition "mode_sum >-1 " looks like very loose,
+        #  the redution rate of this SingleTagPsedoScalar skim is very large, i.e. 1/50,
+        #  since the requirements, one high-energy electron and <=2 other charged
+        #  tracks, are quite stringent.
         #
         path = self.skim_event_cuts(eventcuts, path=path)
         #
-        # Only tagged electron information is added to the standard umdst output.
+        # Only tagged electron information is added to the standard u-mdst output.
         self.SkimLists = ['e+:highE']

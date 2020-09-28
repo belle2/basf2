@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 
+################################################################
+# A simple script to produce json files with list of input data
+# files for the BeamSpot calibration.
+# Each bucket for exp12 is taken separately.
+################################################################
+
+
 from glob import glob
 import re
+
+# Produce json file for airflow-based mumu-skims (exp12)
 
 
 def storeSteering(name, tag):
@@ -36,6 +45,7 @@ def storeSteering(name, tag):
     fOut.close()
 
 
+# Produce json file for bucket12 or exp7,exp8 or exp10
 def storeSteering2(name, tag):
     baseDir = '/group/belle2/dataprod/Data/OfficialReco/proc11/e00'+tag+'/4S/r*/skim/hlt_mumu_2trk/mdst'
     if tag == 'bucket12':
@@ -67,6 +77,8 @@ def storeSteering2(name, tag):
 
     fOut.write(']}')
     fOut.close()
+
+# Produce all the json steerings to the steering directory
 
 storeSteering2('steerings/input_data_exp8off.json',  '08off')
 storeSteering2('steerings/input_data_exp8scan.json',  '08scan')

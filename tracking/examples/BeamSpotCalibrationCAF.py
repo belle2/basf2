@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+
+#############################################################
+# The CAF script for the BeamSpot calibration
+#############################################################
+
 import basf2
 
 import os
@@ -18,19 +24,23 @@ basf2.set_log_level(basf2.LogLevel.INFO)
 
 
 def BeamSpotCalibration(files, tags):
+    """
+    Function to get the BeamSpot calibration object.
+    Takes list of files and list of GTs as arguments.
+    """
 
     path = basf2.create_path()
-
     path.add_module('Progress')
-
     path.add_module('RootInput')
 
+    # Select mumu decays with enough hits
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=path)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=path)
 
+    # Init the BeamSpot collector and algo
     collector = basf2.register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm = BeamSpotAlgorithm()
 
@@ -45,7 +55,8 @@ def BeamSpotCalibration(files, tags):
                               backend_args=None
                               )
 
-    calibration.strategies = strategies.SimpleRunByRun
+    # The segmentation is done in the algorithm
+    calibration.strategies = strategies.SingleIOV
 
     return calibration
 

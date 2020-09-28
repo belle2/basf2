@@ -69,7 +69,6 @@ def get_calibrations(input_data, **kwargs):
     from ROOT.Belle2 import BeamSpotAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana
-    import vertex as vx
 
     ###################################################
     # Calibration setup
@@ -84,7 +83,6 @@ def get_calibrations(input_data, **kwargs):
     muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=rec_path_1)
-    # vx.kFit('Upsilon(4S):BS', conf_level=0, path=rec_path_1)
 
     collector_bs = register_module('BeamSpotCollector', Y4SPListName='Upsilon(4S):BS')
     algorithm_bs = BeamSpotAlgorithm()

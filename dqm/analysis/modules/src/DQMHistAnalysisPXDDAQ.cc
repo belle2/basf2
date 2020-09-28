@@ -53,6 +53,7 @@ void DQMHistAnalysisPXDDAQModule::initialize()
 
   m_cMissingDHP = new TCanvas((m_histogramDirectoryName + "/c_MissingDHP").data());
 
+  m_monObj->addCanvas(m_cMissingDHP);
 
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {

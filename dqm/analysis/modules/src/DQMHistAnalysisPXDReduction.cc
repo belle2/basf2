@@ -49,7 +49,6 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");
 
   m_monObj = getMonitoringObject("pxd");
-
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here
@@ -75,6 +74,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_hReduction->Draw("");
+  m_monObj->addCanvas(m_cReduction);
 
   /// FIXME were to put the lines depends ...
 //   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);

@@ -58,13 +58,12 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
 
-  m_monObj = getMonitoringObject("pxd");
-
   m_refFile = NULL;
   if (m_refFileName != "") {
     m_refFile = new TFile(m_refFileName.data());
   }
 
+  m_monObj = getMonitoringObject("pxd");
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // collect the list of all PXD Modules in the geometry here

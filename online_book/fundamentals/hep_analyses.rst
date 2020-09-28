@@ -834,6 +834,40 @@ reconstruction takes about twice as long as the simulation of an event.
 .. admonition:: Question
     :class: exercise stacked
 
+    What are possible reasons for the tracking algorithms to occasionally find
+    apparent tracks that are not associated with real particles, known as
+    *fakes*?
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Take a good look at the left event display on the left side in
+    :numref:`fig:reconstruction-trackfinding`. This is a relatively clean event
+    and we might get much more hits from beam-induced :ref:`backgrounds
+    <backgrounds>`.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    With high numbers of hits from beam-induced backgrounds and resulting high
+    occupancies, the track finding faces a combinatorial challenge: Of the
+    exponential number of possible combinations of hits, it has to find those
+    that correspond to trajectories of real particles. But there's many wrong
+    combinations of hits that might look like tracks originating from the
+    interaction point and sometimes, they are miss-identified as tracks. These
+    wrong combinations can include both hits from backgrounds or from particles
+    originating from the primary event.
+
+    Reconstructed tracks that are caused by an individual beam-background
+    particle are also called fakes. However, they are relatively easy to reject
+    because they don't originate from the interaction point and have typically
+    high boosts along the beam-axis. But their sheer high number relative to
+    hits from signal tracks is among the things that make tracking at Belle II
+    challenging.
+
+.. admonition:: Question
+    :class: exercise stacked
+
     Now assuming reconstruction takes exactly twice as long as simulation and
     simulation still takes 1 second and we can buy one CPU/hour for $0.025 in a
     commercial cloud as above.

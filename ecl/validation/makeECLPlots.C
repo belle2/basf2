@@ -40,8 +40,8 @@ Double_t Novosibirsk(Double_t *xp,Double_t *par);
 void makeECLPlots() 
 {
 
-  //  TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";  
-  // gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
+  TString dataobj = "$BELLE2_LOCAL_DIR/lib/$BELLE2_SUBDIR/libdataobjects.so";
+  gROOT->LoadMacro(gSystem->ExpandPathName(dataobj.Data()));
   if (TFile::Open("../ECLBkgOutput.root") != nullptr) {
     TFile* bkg_input = TFile::Open("../ECLBkgOutput.root");
     TTree* bkg_tree = (TTree*) bkg_input->Get("m_tree");

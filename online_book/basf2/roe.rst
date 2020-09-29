@@ -101,7 +101,7 @@ In principle, one can already try to use some of the Rest of Event variables.
 .. admonition:: Solution
      :class: toggle solution
 
-     The Rest Of Event variables are in Rest Of Event secection of `VariableManager` page,
+     The Rest Of Event variables are in Rest Of Event section of `VariableManager` page,
      which starts from :b2:var:`bssMassDifference` variable.
 
 
@@ -254,7 +254,27 @@ loop to insert this argument.
 Quick plots
 ~~~~~~~~~~~
 
+.. _roe_mask_plots:
+.. figure:: roe/roe_mask_comparison.svg
+    :align: center
+    :width: 600px
+    :alt: ROE mask comparison
 
+    ROE invariant mass (left) and number of charged ROE particles (right).
+
+:numref:`roe_mask_plots` shows a comparison between ROE with mask ``my_mask`` and ROE with no mask applied
+for two variables: :b2:var:`roeM` and :b2:var:`nROE_Charged`. 
+
+The invariant mass distribution for masked ROE is much narrower and its mean is a little bit below 
+nominal :math:`B^0` mass, contrary to the unmasked ROE distribution. 
+This is expected, because a generic :math:`B^0` decay may produce particles, 
+that are not accounted in ROE mass computation, like :math:`K_L^0` or neutrinos. 
+
+The distribution of the number of charged particles for masked ROE has much more prominent peaks 
+at *4* and *6* particles than its unmasked version, which corresponds to the fact that a correctly 
+reconstructed :math:`B^0` will have an even number of charged duaghter particles.
+This means, that even a simple ROE mask ``my_mask`` does a really good job of cleaning up the particles,
+which are not associated to the partner :math:`B^0`.
 
 This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`onlinebook_cs`,
 :ref:`onlinebook_flavor_tagging` or tag :ref:`onlinebook_vertex_fitting`.

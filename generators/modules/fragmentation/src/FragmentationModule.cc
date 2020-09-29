@@ -145,6 +145,13 @@ void FragmentationModule::initialize()
     }
     evtgen = new EvtGenDecays(m_Pythia, evtGen);
     evtgen->readDecayFile(m_UserDecFile);
+    // Workaround for Pythia bug. It is the only way to call
+    // EvtGenDecays::updateData(true) to disable particle decays
+    // for all particles from EvtGen decay table. Thus, EvtGen generation
+    // has to be called before generation of the first Pythia event.
+    // Since Pythia event is currently empty, it actually only updates
+    // the particle properties (exactly what is necessary).
+    evtgen->decay();
   }
 
   // List variable(s) that differ from their defaults

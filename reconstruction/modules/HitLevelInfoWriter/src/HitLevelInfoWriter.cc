@@ -174,7 +174,9 @@ void HitLevelInfoWriterModule::event()
       }
 
       if (dedxTrack->size() == 0 || dedxTrack->size() > 200) continue;
-      if (dedxTrack->getCosTheta() < -1.0 || dedxTrack->getCosTheta() > 1.0) continue;
+      //if out CDC (dont add as we dont correct via correctionmodules)
+      if (dedxTrack->getCosTheta() < TMath::Cos(150.0 * TMath::DegToRad()))continue; //-0.866
+      if (dedxTrack->getCosTheta() > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
 
       // fill the event meta data
       StoreObjPtr<EventMetaData> evtMetaData;

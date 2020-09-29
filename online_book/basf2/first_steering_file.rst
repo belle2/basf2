@@ -114,8 +114,11 @@ command-line.
 
     The random seed will of course differ in your case.
 
-Of course, no events could be processed because no data has been loaded yet.
-Let's do it. As already described in the previous lesson almost all
+Loading input data
+------------------
+
+Of course, no events could be processed so far because no data has been loaded
+yet. Let's do it. As already described in the previous lesson almost all
 convenience functions that are needed can be found in `modularAnalysis`.
 
 It is recommended to use `inputMdstList` or `inputMdst`. If you look at the
@@ -213,6 +216,9 @@ having to change anything in the script itself.
     :class: toggle solution
 
     .. literalinclude:: steering_files/011_first_steering_file.py
+
+Filling particle lists
+----------------------
 
 The mdst data objects (Tracks, ECLCluster, KLMCluster, V0s) of the input file
 have to be transferred into Particle data objects. This is done via the
@@ -324,6 +330,9 @@ software itself. In the latter case you are encouraged to report the problem
 so that it can be fixed by some experts (maybe you even become this expert one
 day yourself).
 
+Combining particles
+-------------------
+
 Now we have a steering file in which final state particles are loaded from the
 input mdst file to particle lists. One of the most powerful modules of the
 analysis software is the `ParticleCombiner`. It takes those particle lists and
@@ -381,7 +390,7 @@ written in the decay string.
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
-        :lines: 1-41, 51-56
+        :lines: 1-41, 51-55
 
 In the solution we introduced a loose selection for the electrons using
 particle identification (`electronID`), requiring the tracks to originate from
@@ -415,6 +424,9 @@ the acceptance of the CDC (`thetaInCDCAcceptance`).
     The polar range of the CDC acceptance is :math:`17^\circ < \theta <
     150^\circ` as written `here
     <https://stash.desy.de/projects/B2/repos/software/browse/analysis/variables/src/AcceptanceVariables.cc#25>`_
+
+Writing out information to an ntuple
+------------------------------------
 
 To separate signal from background and extract physics parameter, an offline
 analysis has to be performed. The final step of the steering file is to write
@@ -513,6 +525,9 @@ happen to fulfill all your selection criteria.
         :superscript:`2` and lots of background candidates as a shoulder left
         of the peak.
 
+Adding MC information
+---------------------
+
 For the beam-constrained mass we know pretty well how the signal distribution
 should look like. But what's the resolution and how much background actually
 extends under the signal peak? On MC we have the advantage that we know what
@@ -583,6 +598,9 @@ definitely read it to understand at least the basics.
         The background peaks around 5 GeV/c :superscript:`2`, but indeed
         extends into the signal peak region.
 
+Variable collections
+--------------------
+
 While the MC matching allows us to separate signal from background and study
 their shapes, we need to use other variables to achieve the same on collision
 data. Initially, it makes sense to look at many different variables and try to
@@ -629,6 +647,9 @@ topics are prepared.
 
     .. literalinclude:: steering_files/015_first_steering_file.py
 
+Variable aliases
+----------------
+
 Apart from variables for the mother B-meson, we are also interested in
 information of the other daughter and granddaughter variables. You can access
 them via the `daughter` meta variable, which takes an integer and a variable
@@ -659,11 +680,13 @@ to translate the variables using `addAlias`.
         from variables import variables as vm
         vm.addAlias("mup_E", "daughter(daughter(0, E))")
 
-However, this can quickly fill up many, many lines. Therefore, there are tools
+However, this can quickly fill up many, many lines. Therefore, there are utils
 to easily create aliases. The most useful is probably
 `create_aliases_for_selected`. It lets you select particles from a decay
 string via the ``^`` operator, for which you want to define aliases, and also
-set a prefix.
+set a prefix. Another utility is `create_aliases`, which is particularly
+useful to wrap a list of variables in another meta-variable like `useCMSFrame`
+or `matchedMC`.
 
 .. admonition:: Task
     :class: exercise stacked

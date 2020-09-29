@@ -86,7 +86,7 @@ Applying the FEI
 
 Just include the ``feistate.path`` created by the ``fei.get_path()`` function in your steering file.
 
-The weightfiles are automatically loaded from the conditions database (see `FEI and the conditions database`).
+The weightfiles are automatically loaded from the conditions database (see :ref:`analysis/doc/FullEventInterpretation:FEI and the conditions database`).
 This might take some time.
 
 After the FEI path the following lists are available

@@ -3,14 +3,13 @@
 
 from abc import ABC, abstractmethod
 import subprocess
-from importlib import import_module
 import json
 import re
 
 import yaml
 
 import basf2 as b2
-from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
+from modularAnalysis import applyCuts, removeParticlesNotInLists, skimOutputUdst, summaryOfLists
 from skim.registry import Registry
 
 
@@ -372,6 +371,11 @@ class BaseSkim(ABC):
     config parameters when running multiple FEI skims at once, so that it can be run
     just once with all the necessary arguments."""
 
+    ApplyHLTHadronCut = False
+    """If this property is set to True, then the HLT selection for ``hlt_hadron`` will
+    be applied to the skim lists when the skim is added to the path.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -469,6 +473,7 @@ class BaseSkim(ABC):
         # self._ConditionalPath for the path if it is not None (otherwise just pass the
         # regular path)
         self.build_lists(self._ConditionalPath or path)
+        self.apply_hlt_hadron_cut(self._ConditionalPath or path)
 
         if udstOutput:
             self.output_udst(self._ConditionalPath or path)
@@ -604,6 +609,17 @@ class BaseSkim(ABC):
         skimOutputUdst(self.OutputFileName, self.SkimLists, path=path)
         summaryOfLists(self.SkimLists, path=path)
 
+    def apply_hlt_hadron_cut(self, path):
+        """Apply the ``hlt_hadron`` selection if the property ``ApplyHLTHadronCut`` is True.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+        hlt_hadron = "SoftwareTriggerResult(software_trigger_cut&skim&accept_hadron)"
+        if self.ApplyHLTHadronCut:
+            for SkimList in self.SkimLists:
+                applyCuts(SkimList, f"{hlt_hadron}==1", path=path)
+
 
 class CombinedSkim(BaseSkim):
     """Class for creating combined skims which can be run using similar-looking methods
@@ -668,6 +684,7 @@ class CombinedSkim(BaseSkim):
         self.load_standard_lists(path)
         self.additional_setup(path)
         self.build_lists(path)
+        self.apply_hlt_hadron_cut(path)
         self._check_duplicate_list_names()
         self.output_udst(path)
 
@@ -735,6 +752,15 @@ class CombinedSkim(BaseSkim):
         """
         for skim in self.Skims:
             skim.output_udst(skim._ConditionalPath or path)
+
+    def apply_hlt_hadron_cut(self, path):
+        """Run the `BaseSkim.apply_hlt_hadron_cut` function for each skim.
+
+        Parameters:
+            path (basf2.Path): Skim path to be processed.
+        """
+        for skim in self.Skims:
+            skim.apply_hlt_hadron_cut(skim._ConditionalPath or path)
 
     def merge_data_structures(self):
         """Read the values of `BaseSkim.MergeDataStructures` and merge data structures

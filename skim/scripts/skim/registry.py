@@ -110,15 +110,10 @@ RegisteredSkims = [
     ("19130100", "btocharmless", "BtoHad2Tracks"),
     ("19130200", "btocharmless", "BtoHad3Tracks"),
     ("19130300", "btocharmless", "BtoHad4Tracks"),
-    ("19130301", "btocharmless", "BtoHad4TracksFSPonly"),
-    ("19130302", "btocharmless", "BtoHad4TracksKS"),
-    ("19130303", "btocharmless", "BtoHad4TracksKstar"),
-    ("19120200", "btocharmless", "BtoHad4TracksRho"),
     ("19130400", "btocharmless", "BtoHad5Tracks"),
     ("19130500", "btocharmless", "BtoHad1Track1Pi0"),
     ("19130600", "btocharmless", "BtoHad2Tracks1Pi0"),
-    ("19130700", "btocharmless", "BtoHad1Track1Ks1Pi0"),
-    ("19130800", "btocharmless", "BtoHadRho0RhoP"),
+    ("19130700", "btocharmless", "BtoHad3Tracks1Pi0"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

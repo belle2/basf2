@@ -31,7 +31,7 @@ When a batch job is submitted from a work server at KEKCC, the job is scheduled 
 and executes the job on a calculation server. It is important to select an
 appropriate queue for your jobs.
 
-In this lession, we will go through some commands that are often used in analysis.
+In this lesson, we will go through some commands that are often used in analysis.
 
 Basic commands
 --------------
@@ -72,9 +72,9 @@ job state statistics.
    dc_generic      100  Open:Active       -    -    -    -     0     0     0     0
 
 Different queues have different settings. For analysis you can use ``s``,
-``l``, or ``h``. For short jobs with running time under 6 hours, the queue
-``s`` is preferable. For jobs with execution time more than 6 hours,
-you might want to use the queue ``l`` which gives jobs up to 48 hours of
+``l``, or ``h``. For short jobs with running time under 3 hours, the queue
+``s`` is preferable. For jobs with execution time more than 3 hours,
+you might want to use the queue ``l`` which gives jobs up to 24 hours of
 running time.
 More information about LSF queues can be found
 `here <https://kekcc.kek.jp/service/kekcc/html/Eng/BatchQueueList.html>`__.
@@ -179,7 +179,7 @@ To check the job status
          $ bsub -q l "basf2 one_of_example.py"
          Job <xxxxxxxx> is submitted to queue <l>.
 
-      To check the status use, one of the following:
+      To check the status, use one of the following:
 
       ``bjobs -q l <xxxxxxxx>``, ``bjobs <xxxxxxxx>``, or just ``bjobs`` alone.
 

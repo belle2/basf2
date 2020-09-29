@@ -125,7 +125,7 @@ def stdPi0s(listtype="eff60_Jan2020", path=None):
         ma.cutAndCopyList('pi0:eff60_Jan2020Fit', 'pi0:eff60_Jan2020', '', True, path)
         kFit('pi0:eff60_Jan2020Fit', 0.0, 'mass', path=path)
     else:
-        raise ValueError(f"\"{listtype}\"git  is none of the allowed standardized types of pi0 lists!")
+        raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of pi0 lists!")
 
 # pi0 list for skims (and ONLY for skims)
 

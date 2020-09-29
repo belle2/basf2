@@ -174,7 +174,7 @@ class SingleTagPseudoScalar(BaseSkim):
         # Used cuts
         # --
         # Condition for a tagged electron
-        #  - The tagged electron must be identified as electron and mast have high
+        #  - The tagged electron must be identified as electron and must have high
         #    energy  greater than 1.5 GeV.
         #  - dz, dr cuts should be tight enough to remove duplicated tracks.
         # --
@@ -235,7 +235,7 @@ class SingleTagPseudoScalar(BaseSkim):
         va.addAlias('nTagged', 'nParticlesInList(e+:tagged)')
 
         # --
-        # Selection of charged pion
+        # Selection of charged pions
         # -
         #    pi+:all      : all
         #    pi+:good     : Originating from IP. abs(dz)<2.0cm  dr <0.5 cm,
@@ -249,7 +249,7 @@ class SingleTagPseudoScalar(BaseSkim):
                           + PionIDcut, path=path)
         va.addAlias('npion', 'nParticlesInList(pi+:good)')
         # ---
-        #  Selection gammas
+        #  Selection of gammas
         #      gamma:all    : all
         #      gamma:good   : E>0.1 GeV     -> nphoton
         # ---
@@ -279,7 +279,7 @@ class SingleTagPseudoScalar(BaseSkim):
         va.addAlias('npi0highE', 'nParticlesInList(pi0:highE)')
 
         # --
-        #      eta- reconstruction                                                       mode
+        #      eta  reconstruction                                                       mode
         #       eta:gg                       :eta->gg                                     2
         #       eta:pipipi0                  :eta ->pipipi0                               3
         #       eta:pipig                    :eta->pipi gamma                             4
@@ -321,7 +321,7 @@ class SingleTagPseudoScalar(BaseSkim):
         # --
         # Final skim condition
         # --
-        #  Require one tagged electron  and <=2 the other charged tracks.
+        #  Require one tagged electron  and <=2 of other charged tracks.
         #  --
         presel = ' nhighEel == 1 and npion <= 2 '
         va.addAlias('mode_sum',
@@ -329,7 +329,7 @@ class SingleTagPseudoScalar(BaseSkim):
 
         eventcuts = presel + ' and mode_sum >= 1'
         #
-        #  Although a condition "mode_sum >-1 " looks like very loose,
+        #  Although a condition of "mode_sum >= 1" looks like very loose,
         #  the reduction rate of this SingleTagPseudoScalar skim is very large, i.e. 1/50,
         #  since the requirements, one high-energy electron and <=2 other charged
         #  tracks, are quite stringent.

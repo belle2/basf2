@@ -333,6 +333,10 @@ def fancy_skim_header(SkimClass):
         * **Contact**: {contact}
     """
 
+    if SkimClass.ApplyHLTHadronCut:
+        HLTLine = "*This skim includes a selection on the HLT flag* ``hlt_hadron``."
+        header = f"{header.rstrip()}\n\n        {HLTLine}\n"
+
     if SkimClass.__doc__:
         SkimClass.__doc__ = header + "\n\n" + SkimClass.__doc__.lstrip("\n")
     else:

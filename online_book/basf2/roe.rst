@@ -260,10 +260,10 @@ Quick plots
     :width: 600px
     :alt: ROE mask comparison
 
-    ROE invariant mass (left) and number of charged ROE particles (right).
+    Distributions of ROE invariant mass (left) and number of charged ROE particles (right).
 
-:numref:`roe_mask_plots` shows a comparison between ROE with mask ``my_mask`` and ROE with no mask applied
-for two variables: :b2:var:`roeM` and :b2:var:`nROE_Charged`. 
+:numref:`roe_mask_plots` shows a comparison of :b2:var:`roeM` and :b2:var:`nROE_Charged` distributions
+for ROE with mask ``my_mask`` case and ROE with no mask applied.
 
 The invariant mass distribution for masked ROE is much narrower and its mean is a little bit below 
 nominal :math:`B^0` mass, contrary to the unmasked ROE distribution. 

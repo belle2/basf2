@@ -46,9 +46,9 @@ def get_calibrations(input_data, **kwargs):
     fulldataMode = False
 
     if fulldataMode:
-        input_files_rungain = file_to_iov_physics
-        input_files_coscorr = file_to_iov_physics
-        input_files_wiregain = file_to_iov_physics
+        input_files_rungain = list(file_to_iov_physics.keys())
+        input_files_coscorr = list(file_to_iov_physics.keys())
+        input_files_wiregain = list(file_to_iov_physics.keys())
     else:
         seed(271492)
         from prompt.utils import filter_by_max_events_per_run, filter_by_select_max_events_from_files

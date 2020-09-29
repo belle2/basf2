@@ -780,15 +780,12 @@ namespace Belle2 {
     TMatrixD covMatI = covMat;
     covMatI.Invert();
 
-    double Norm = 1. / (pow(2 * M_PI, 3 / 2.) *  sqrt(covMat.Determinant()));
-
-
     //////////////////////////
     //Get maximum likelihood
     //////////////////////////
 
     //Maximum likelihood over eigenvector and angle
-    TF2* fEig = new TF2(rn(), [Norm, covMatI, pars, s2MinLimit](double * x, double*) {
+    TF2 fEig(rn(), [covMatI, pars, s2MinLimit](double * x, double*) {
       double eig1 = x[0];
       double eig2 = s2MinLimit;
       double phi  = x[1];
@@ -805,7 +802,7 @@ namespace Belle2 {
     }, s2MinLimit, 400, 0, 2 * M_PI, 0);
 
     double eigHigh, phi;
-    fEig->GetMinimumXY(eigHigh, phi);
+    fEig.GetMinimumXY(eigHigh, phi);
 
     pars[0] = eigHigh * pow(cos(phi), 2) + s2MinLimit * pow(sin(phi), 2);
     pars[1] = eigHigh * pow(sin(phi), 2) + s2MinLimit * pow(cos(phi), 2);

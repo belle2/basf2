@@ -161,7 +161,7 @@ not create a python file using bash commands:
 .. admonition:: Hint
   :class: xhint stacked toggle
 
-  The specific bash command you'll need to create a new file is `touch`.
+  The specific bash command you'll need to create a new file is ``touch``.
 
 .. admonition:: Hint
   :class: xhint stacked toggle

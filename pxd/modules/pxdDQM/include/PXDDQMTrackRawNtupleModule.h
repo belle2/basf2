@@ -84,15 +84,15 @@ namespace Belle2 {
     /** Input array for DAQ Status. */
     StoreObjPtr<PXDDAQStatus> m_storeDAQEvtStats;
 
-    double m_pcut; ///< pValue-Cut for tracks
-    double m_momCut; ///< Cut on fitted track momentum
-    double m_pTCut; ///< Cut on fitted track pT
-    unsigned int m_minSVDHits; ///< Required hits in SVD strips for tracks
-    int m_uDist; ///< distance in ucell to intercept to accept hit
-    int m_vDist; ///< distance in vcell to intercept to accept hit
+    double m_pcut{0}; ///< pValue-Cut for tracks
+    double m_momCut{0}; ///< Cut on fitted track momentum
+    double m_pTCut{0}; ///< Cut on fitted track pT
+    unsigned int m_minSVDHits{0}; ///< Required hits in SVD strips for tracks
+    int m_uDist{0}; ///< distance in ucell to intercept to accept hit
+    int m_vDist{0}; ///< distance in vcell to intercept to accept hit
 
-    TFile* m_file{}; ///< pointer to opened file
-    TNtuple* m_tuple{}; ///< pointer to opened tuple
+    TFile* m_file{nullptr}; ///< pointer to opened file
+    TNtuple* m_tuple{nullptr}; ///< pointer to opened tuple
 
   };
 }

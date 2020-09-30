@@ -14,10 +14,12 @@
 #include <string>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
-// DataStore
+// framework - DataStore
 #include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // DataObjects
+#include <analysis/dataobjects/ParticleList.h>
 #include <mdst/dbobjects/BeamSpot.h>
 
 // KFit
@@ -68,6 +70,7 @@ namespace Belle2 {
 
   private:
 
+    StoreObjPtr<ParticleList> m_plist; /**< particle list */
     std::string m_listName;       /**< particle list name */
     double m_confidenceLevel;     /**< required fit confidence level */
     double m_Bfield;              /**< magnetic field from data base */
@@ -195,14 +198,16 @@ namespace Belle2 {
 
     /**
      * Fills valid particle's children (with valid error matrix) in the vector of Particles that will enter the fit.
-     * Pi0 particles are treated separately so they are filled to another vector.
+     * Particles formed from two photons (e.g. pi0) are treated separately so they are filled to another vector.
      */
-    bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren, std::vector<const Particle*>& pi0Children);
+    bool fillFitParticles(const Particle* mother, std::vector<const Particle*>& fitChildren,
+                          std::vector<const Particle*>& twoPhotonChildren);
 
     /**
-     * Performs mass refit of pi0 assuming that pi0 originates from the point given by VertexFit.
+     * Combines preFit particle and vertex information from vertex fit kv to create new postFit particle.
+     * A mass refit of this new particle is performed assuming that it originates from the point given by VertexFit.
      */
-    bool redoPi0MassFit(Particle* pi0Temp, const Particle* pi0Orig, const analysis::VertexFitKFit& kv) ;
+    bool redoTwoPhotonDaughterMassFit(Particle* postFit, const Particle* preFit, const analysis::VertexFitKFit& kv) ;
 
     /**
      * Fit using Rave

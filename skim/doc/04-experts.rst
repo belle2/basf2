@@ -42,7 +42,7 @@ To write a new skim, please follow these steps:
        >>> help(MySkim)
 
    .. tip::
-       If your skim does not define ``__description__``, ``__category__``, ``__authors__``, ``__contact__``, ``RequiredStandardLists`` or ``build_lists``, then you will see an error message like:
+       If your skim does not define ``__description__``, ``__category__``, ``__authors__``, ``__contact__``, or ``build_lists``, then you will see an error message like:
 
        ::
 
@@ -50,9 +50,11 @@ To write a new skim, please follow these steps:
 
        This can be fixed by defining these required attributes and methods.
 
-3. *[Mandatory]* Specify all required particle lists in the attribute ``RequiredStandardLists``. If you don't require any standard lists, then you can set this to ``None``. See the documentation of this attribute for instructions on how to do this for your skim.
+3. If you require any standard lists to be loaded for your skim, override the method ``load_standard_lists``. This will be run before ``build_lists`` and ``additional_setup``.
 
-4. If any further setup is required, then override the ``additional_setup`` method.   
+   This step is separated into its own function so that the `CombinedSkim` class can do special handling of these functions to avoid accidentally loading a standard list twice when combinining skims.
+
+4. If any further setup is required, then override the ``additional_setup`` method.
 
 5. *[Mandatory]* Define all cuts by overriding ``build_lists``. Before the end of the ``build_lists`` method, the attribute ``SkimLists`` must be set to a list of skim list names.
 
@@ -242,5 +244,18 @@ The module ``skimExpertFunctions`` contains helper functions to perform common t
    :filename: skim/tools/b2skim-prod
    :func: get_argument_parser
    :prog: b2skim-prod
+   :nodefaultconst:
+   :nogroupsections:
+
+
+.. _lpns2yaml:
+
+``lpns2yaml.py``: Convert lists of LPNs to format expected by ``b2skim-prod``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: skim/tools/lpns2yaml.py
+   :func: get_argument_parser
+   :prog: lpns2yaml.py
    :nodefaultconst:
    :nogroupsections:

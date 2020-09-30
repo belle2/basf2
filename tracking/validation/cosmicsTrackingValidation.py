@@ -10,19 +10,16 @@
 </header>
 """
 
+from tracking.validation.run import TrackingValidationRun
+from tracking import add_cr_tracking_reconstruction
+import logging
+import basf2
 VALIDATION_OUTPUT_FILE = 'CosmicsTrackingValidation.root'
 CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 10000
 ACTIVE = True
 
-import basf2
 basf2.set_random_seed(1337)
-
-import logging
-
-
-from tracking import add_cr_tracking_reconstruction
-from tracking.validation.run import TrackingValidationRun
 
 
 class Cosmics(TrackingValidationRun):

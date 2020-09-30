@@ -1,6 +1,8 @@
 #include "daq/slc/database/DBInterface.h"
 
 #include <daq/slc/base/StringUtil.h>
+#include <daq/slc/system/LockGuard.h>
+#include <daq/slc/system/LogFile.h>
 
 #include <cstdarg>
 #include <cstdio>
@@ -30,18 +32,25 @@ void DBInterface::init(const std::string& host,
   m_user = user;
   m_password = password;
   m_port = port;
-  m_buf = new char[1024000];
+  m_buf = new char[m_buf_size];
 }
 
 void DBInterface::execute(const char* text, ...)
 {
-  va_list ap;
-  va_start(ap, text);
-  vsprintf(m_buf, text, ap);
-  va_end(ap);
-  //std::cout << m_buf << std::endl;
-  //execute_imp(m_buf);
-  StringList s = StringUtil::split(m_buf, ';');
+  StringList s;
+
+  {
+    LockGuard lockGuard(m_mutex);
+
+    va_list ap;
+    va_start(ap, text);
+    vsnprintf(m_buf, m_buf_size, text, ap);
+    va_end(ap);
+    //std::cout << m_buf << std::endl;
+    //execute_imp(m_buf);
+    s = StringUtil::split(m_buf, ';');
+  }
+
   for (size_t i = 0; i < s.size(); i++)
     execute_imp(s[i].c_str());
 }

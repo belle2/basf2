@@ -331,6 +331,17 @@ namespace Belle2 {
       return missing;
     }
 
+    double genMissingMomentumOfEventCMS(const Particle*)
+    {
+      StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMomentumCMS().Mag();
+      return missing;
+    }
+
     double missingMomentumOfEventCMS_Px(const Particle*)
     {
       StoreObjPtr<EventKinematics> evtShape;
@@ -386,11 +397,34 @@ namespace Belle2 {
       return missing;
     }
 
+    double genMissingEnergyOfEventCMS(const Particle*)
+    {
+      StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingEnergyCMS();
+      return missing;
+    }
+
+
     double missingMass2OfEvent(const Particle*)
     {
       StoreObjPtr<EventKinematics> evtShape;
       if (!evtShape) {
         B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double missing = evtShape->getMissingMass2();
+      return missing;
+    }
+
+    double genMissingMass2OfEvent(const Particle*)
+    {
+      StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
         return std::numeric_limits<float>::quiet_NaN();
       }
       double missing = evtShape->getMissingMass2();
@@ -408,6 +442,18 @@ namespace Belle2 {
       return visible;
     }
 
+    double genVisibleEnergyOfEventCMS(const Particle*)
+    {
+      StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double visible = evtShape->getVisibleEnergyCMS();
+      return visible;
+    }
+
+
     double totalPhotonsEnergyOfEvent(const Particle*)
     {
       StoreObjPtr<EventKinematics> evtShape;
@@ -418,6 +464,18 @@ namespace Belle2 {
       double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
       return energyOfPhotons;
     }
+
+    double genTotalPhotonsEnergyOfEvent(const Particle*)
+    {
+      StoreObjPtr<EventKinematics> evtShape("EventKinematicsFromMC");
+      if (!evtShape) {
+        B2WARNING("Cannot find missing momentum information, did you forget to run EventKinematicsModule with usingMC parameter set to true?");
+        return std::numeric_limits<float>::quiet_NaN();
+      }
+      double energyOfPhotons = evtShape->getTotalPhotonsEnergy();
+      return energyOfPhotons;
+    }
+
 
     double eventYearMonthDay(const Particle*)
     {
@@ -538,7 +596,7 @@ false in case of same flavor B-mesons and NaN if an event has no generated neutr
 )DOC");
     REGISTER_VARIABLE("IPY", getIPY, "[Eventbased] y coordinate of the measured interaction point");
     REGISTER_VARIABLE("IPZ", getIPZ, "[Eventbased] z coordinate of the measured interaction point");
-    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point")
+    REGISTER_VARIABLE("IPCov(i,j)", ipCovMatrixElement, "[Eventbased] (i,j)-th element of the covariance matrix of the measured interaction point");
 
     REGISTER_VARIABLE("genIPX", getGenIPX, R"DOC(
 [Eventbased] x coordinate of the interaction point used for the underlying **MC generation**.
@@ -550,16 +608,16 @@ Returns NAN for data.
     REGISTER_VARIABLE("genIPZ", getGenIPZ, "[Eventbased] z coordinate of the interaction point used for the underlying **MC generation**.");
 
     REGISTER_VARIABLE("date", eventYearMonthDay,
-                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n"
-                      " See also eventYear, provided for convenience."
-                      " For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
+                      "[Eventbased] Returns the date when the event was recorded, a number of the form YYYYMMDD (in UTC).\n\n"
+                      "See also eventYear, provided for convenience.\n"
+                      "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
     REGISTER_VARIABLE("year", eventYear,
-                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n"
+                      "[Eventbased] Returns the year when the event was recorded (in UTC).\n\n"
                       "For more precise eventTime, see eventTimeSeconds and eventTimeSecondsFractionRemainder.");
     REGISTER_VARIABLE("eventTimeSeconds", eventTimeSeconds,
                       "[Eventbased] Time of the event in seconds (truncated down) since 1970/1/1 (Unix epoch).");
     REGISTER_VARIABLE("eventTimeSecondsFractionRemainder", eventTimeSecondsFractionRemainder,
-                      "[Eventbased] Remainder of the event time in fractions of a second.\n"
+                      "[Eventbased] Remainder of the event time in fractions of a second.\n\n"
                       "Use eventTimeSeconds + eventTimeSecondsFractionRemainder to get the total event time in seconds.");
 
     VARIABLE_GROUP("EventKinematics");
@@ -576,6 +634,8 @@ Returns NAN for data.
                       "[Eventbased] The theta angle of the missing momentum of the event in lab obtained with EventKinematics module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS", missingMomentumOfEventCMS,
                       "[Eventbased] The magnitude of the missing momentum in CMS obtained with EventKinematics module")
+    REGISTER_VARIABLE("genMissingMomentumOfEventCMS", genMissingMomentumOfEventCMS,
+                      "[Eventbased] The magnitude of the missing momentum in CMS obtained with EventKinematics module from generator")
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Px", missingMomentumOfEventCMS_Px,
                       "[Eventbased] The x component of the missing momentum in CMS obtained with EventKinematics module")
     REGISTER_VARIABLE("missingMomentumOfEventCMS_Py", missingMomentumOfEventCMS_Py,
@@ -586,12 +646,20 @@ Returns NAN for data.
                       "[Eventbased] The theta angle of the missing momentum in CMS obtained with EventKinematics module")
     REGISTER_VARIABLE("missingEnergyOfEventCMS", missingEnergyOfEventCMS,
                       "[Eventbased] The missing energy in CMS obtained with EventKinematics module")
+    REGISTER_VARIABLE("genMissingEnergyOfEventCMS", genMissingEnergyOfEventCMS,
+                      "[Eventbased] The missing energy in CMS obtained with EventKinematics module from generator")
     REGISTER_VARIABLE("missingMass2OfEvent", missingMass2OfEvent,
                       "[Eventbased] The missing mass squared obtained with EventKinematics module")
+    REGISTER_VARIABLE("genMissingMass2OfEvent", genMissingMass2OfEvent,
+                      "[Eventbased] The missing mass squared obtained with EventKinematics module from generator")
     REGISTER_VARIABLE("visibleEnergyOfEventCMS", visibleEnergyOfEventCMS,
                       "[Eventbased] The visible energy in CMS obtained with EventKinematics module")
+    REGISTER_VARIABLE("genVisibleEnergyOfEventCMS", genVisibleEnergyOfEventCMS,
+                      "[Eventbased] The visible energy in CMS obtained with EventKinematics module from generator")
     REGISTER_VARIABLE("totalPhotonsEnergyOfEvent", totalPhotonsEnergyOfEvent,
                       "[Eventbased] The energy in lab of all the photons obtained with EventKinematics module");
+    REGISTER_VARIABLE("genTotalPhotonsEnergyOfEvent", genTotalPhotonsEnergyOfEvent,
+                      "[Eventbased] The energy in lab of all the photons obtained with EventKinematics module from generator");
 
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0,

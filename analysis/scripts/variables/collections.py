@@ -94,7 +94,7 @@ dalitz_3body = [
 ]
 
 #: Tracking variables, replacement for Track tool
-track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue']
+track = ['dr', 'dx', 'dy', 'dz', 'd0', 'z0', 'pValue', 'ndf']
 
 #: Replacement for TrackHits tool
 track_hits = ['nCDCHits', 'nPXDHits', 'nSVDHits', 'nVXDHits']
@@ -132,7 +132,8 @@ mc_variables = [
 ]
 
 #: PID variables
-pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'deuteronID']
+pid = ['kaonID', 'pionID', 'protonID', 'muonID', 'electronID', 'deuteronID',
+       'binaryPID(211, 13)', 'binaryPID(211, 321)', 'binaryPID(211, 2212)', 'binaryPID(321, 2212)']
 
 #: Replacement for ROEMultiplicities tool
 roe_multiplicities = [
@@ -325,6 +326,25 @@ event_kinematics = [
     "missingMass2OfEvent",
     "visibleEnergyOfEventCMS",
     "totalPhotonsEnergyOfEvent"
+]
+
+#: Variables created by MC version of event kinematics module
+mc_event_kinematics = [
+    'genMissingMass2OfEvent',
+    'genMissingEnergyOfEventCMS',
+    'genMissingMomentumOfEventCMS',
+    'genTotalPhotonsEnergyOfEvent',
+    'genVisibleEnergyOfEventCMS'
+]
+
+#: Belle Track CDC hit variables
+belle_track_hit = [
+    "BelleFirstCDCHitX",
+    "BelleFirstCDCHitY",
+    "BelleFirstCDCHitZ",
+    "BelleLastCDCHitX",
+    "BelleLastCDCHitY",
+    "BelleLastCDCHitZ"
 ]
 
 # now register all the variables declared in this file as collections

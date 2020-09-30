@@ -477,6 +477,7 @@ TH1* DQMHistAnalysisPXDTrackChargeModule::GetHisto(TString histoname)
   TH1* hh1 = nullptr;
   gROOT->cd();
 //   hh1 = findHist(histoname.Data());
+  // cppcheck-suppress knownConditionTrueFalse
   if (hh1 == NULL) {
     B2DEBUG(20, "findHisto failed " << histoname << " not in memfile");
     // the following code sux ... is there no root function for that?

@@ -199,6 +199,7 @@ def all():
     # TODO: klm
     return beamspot() + pxd() + svd() + cdc_layers() + cdc_wires() + cdc_t0s()
 
+
 if __name__ == '__main__':
     print("Number of available parameters:")
     print("BeamSpot:", len(beamspot()))

@@ -72,11 +72,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # SVD CLUSTERS ON TRACK
             path.add_module('SVDDQMClustersOnTrack')
 
-        # VXD (PXD/SVD common)
-        if components is None or 'PXD' in components or 'SVD' in components:
-            vxddqm = register_module('VXDDQMExpressReco')
-            path.add_module(vxddqm)
-
         # Event time measuring detectors
         if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:
             eventT0DQMmodule = register_module('EventT0DQM')

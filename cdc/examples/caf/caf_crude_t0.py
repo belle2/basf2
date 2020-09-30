@@ -1,5 +1,4 @@
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -10,6 +9,7 @@ from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
 
+set_log_level(LogLevel.INFO)
 data_dir = '/gpfs/fs02/belle2/users/dvthanh/201702_unpacked/'
 runs = []
 with open('runlist') as runlist:

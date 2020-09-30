@@ -1,3 +1,5 @@
+.. _onlinebook_analysis_model:
+
 Analysis model
 ==============
 

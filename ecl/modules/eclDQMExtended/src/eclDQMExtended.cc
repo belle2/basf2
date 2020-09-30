@@ -21,9 +21,6 @@
 #include <framework/logging/Logger.h>
 
 //ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/utility/ECLDspUtilities.h>
 #include <ecl/utility/ECLDspEmulator.h>
 
@@ -277,14 +274,9 @@ void ECLDQMEXTENDEDModule::initialize()
 {
   REG_HISTOGRAM;   // required to register histograms to HistoManager
 
-  StoreArray<ECLDigit> ECLDigits;
-  ECLDigits.isRequired();
-
-  StoreArray<ECLTrig> ECLTrigs;
-  ECLTrigs.isOptional();
-
-  StoreArray<ECLDsp> ECLDsps;
-  ECLDsps.isOptional();
+  m_ECLDigits.isRequired();
+  m_ECLTrigs.isOptional();
+  m_ECLDsps.isOptional();
 
   if (!mapper.initFromDB()) B2FATAL("ECL DQM logic test FATAL:: Can't initialize eclChannelMapper");
 
@@ -494,18 +486,14 @@ void ECLDQMEXTENDEDModule::beginRun()
 
 void ECLDQMEXTENDEDModule::event()
 {
-  StoreArray<ECLDsp> ECLDsps;
-  StoreArray<ECLTrig> ECLTrigs;
-  StoreArray<ECLDigit> ECLDigits;
-
   int iAmpflag_qualityfail = 0;
   int iTimeflag_qualityfail = 0;
 
-  for (auto& aECLDsp : ECLDsps) {
+  for (auto& aECLDsp : m_ECLDsps) {
     m_CellId = aECLDsp.getCellId();
     std::vector<int> DspArray = aECLDsp.getDspA();
-    if (!ECLTrigs.isValid()) B2FATAL("ECL DQM logic test FATAL: Trigger time information is not available");
-    for (auto& aECLTrig : ECLTrigs) {
+    if (!m_ECLTrigs.isValid()) B2FATAL("ECL DQM logic test FATAL: Trigger time information is not available");
+    for (auto& aECLTrig : m_ECLTrigs) {
       if (aECLTrig.getTrigId() == mapper.getCrateID(m_CellId)) {
         m_TrigTime = aECLTrig.getTimeTrig();
         break;

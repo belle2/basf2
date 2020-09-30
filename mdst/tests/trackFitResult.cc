@@ -46,7 +46,7 @@ namespace Belle2 {
       TMatrixDSym cov6(6);
 
       // Set up class for testing
-      TrackFitResult myResult(position, momentum, cov6, charge, pType, pValue, bField, 0, 0);
+      TrackFitResult myResult(position, momentum, cov6, charge, pType, pValue, bField, 0, 0, 0);
 
       // Test all vector elements
       EXPECT_NEAR(position.X(), myResult.getPosition().X(), absError);
@@ -88,7 +88,7 @@ namespace Belle2 {
       for (auto& element : cov) {
         element = generator.Gaus(1e-4);
       }
-      Belle2::TrackFitResult myResult(tau, cov, pType, pValue, 0, 0);
+      Belle2::TrackFitResult myResult(tau, cov, pType, pValue, 0, 0, 0);
       TMatrixDSym covariance(myResult.getCovariance6());
 
       for (int i = 0; i < 5; ++i)
@@ -102,7 +102,7 @@ namespace Belle2 {
         }
       }
       Belle2::TrackFitResult myResult2(myResult.getPosition(), myResult.getMomentum(), cov6,
-                                       myResult.getChargeSign(), pType, pValue, bField, 0, 0);
+                                       myResult.getChargeSign(), pType, pValue, bField, 0, 0, 0);
 
       TMatrixDSym myResultCov5 = myResult.getCovariance5();
       TMatrixDSym myResult2Cov5 = myResult2.getCovariance5();
@@ -147,15 +147,15 @@ namespace Belle2 {
     auto pType = Belle2::Const::electron;
 
     auto charge = -1.0;
-    Belle2::TrackFitResult myResultMinus(position, momentum, cov6, charge, pType, pValue, bField, 0, 0);
+    Belle2::TrackFitResult myResultMinus(position, momentum, cov6, charge, pType, pValue, bField, 0, 0, 0);
     EXPECT_EQ(myResultMinus.getChargeSign(), charge);
 
     charge = 0;
-    Belle2::TrackFitResult myResultNull(position, momentum, cov6, charge, pType, pValue, bField, 0, 0);
+    Belle2::TrackFitResult myResultNull(position, momentum, cov6, charge, pType, pValue, bField, 0, 0, 0);
     EXPECT_EQ(myResultNull.getChargeSign(), charge);
 
     charge = +1.0;
-    Belle2::TrackFitResult myResultPlus(position, momentum, cov6, charge, pType, pValue, bField, 0, 0);
+    Belle2::TrackFitResult myResultPlus(position, momentum, cov6, charge, pType, pValue, bField, 0, 0, 0);
     EXPECT_EQ(myResultPlus.getChargeSign(), charge);
   }
 

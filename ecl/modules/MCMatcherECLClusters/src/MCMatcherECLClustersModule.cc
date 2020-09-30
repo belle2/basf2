@@ -101,7 +101,7 @@ void MCMatcherECLClustersModule::event()
     }
 
     // relation from CalibratedDigit to MC particle
-    for (const std::pair<int, double>& t : e) {
+    for (std::pair<int, double> t : e) {
       int ind = Index[t.first];
       double w = t.second;
       if (ind >= 0

@@ -67,6 +67,8 @@ namespace Belle2 {
 
     SVDModeByte m_SVDModeByte;  /**<  SVDModeByte object */
     SVDTriggerType m_SVDTriggerType;  /**<  SVDTriggerType object */
+
+    int m_relativeShift; /**< latency difference between the 3- and 6-sample acquired events*/
   };
 }
 

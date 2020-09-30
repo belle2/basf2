@@ -12,9 +12,6 @@
 
 #include <iostream>
 #include <ecl/modules/eclChargedPIDDataAnalysisExpert/ECLChargedPIDDataAnalysisModule.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -133,7 +130,7 @@ void ECLChargedPIDDataAnalysisModule::initialize()
   if (m_writeToRoot) {
     m_rootFilePtr = new TFile(m_rootFileName.c_str(), "RECREATE");
   } else {
-    m_rootFilePtr = NULL;
+    m_rootFilePtr = nullptr;
   }
   // initialize N1 tree
   n1_tree = new TTree("n1_tree", "ECL Charged PID tree: N1 Hypothesis");
@@ -277,14 +274,13 @@ void ECLChargedPIDDataAnalysisModule::event()
 
   n2_eclEoP->clear();
 
-  StoreObjPtr<EventMetaData> eventmetadata;
-  if (eventmetadata) {
-    n1_iExperiment = eventmetadata->getExperiment();
-    n1_iRun = eventmetadata->getRun();
-    n1_iEvent = eventmetadata->getEvent();
-    n2_iExperiment = eventmetadata->getExperiment();
-    n2_iRun = eventmetadata->getRun();
-    n2_iEvent = eventmetadata->getEvent();
+  if (m_EventMetaData) {
+    n1_iExperiment = m_EventMetaData->getExperiment();
+    n1_iRun = m_EventMetaData->getRun();
+    n1_iEvent = m_EventMetaData->getEvent();
+    n2_iExperiment = m_EventMetaData->getExperiment();
+    n2_iRun = m_EventMetaData->getRun();
+    n2_iEvent = m_EventMetaData->getEvent();
   } else {
     n1_iExperiment = -1;
     n1_iRun = -1;
@@ -295,9 +291,7 @@ void ECLChargedPIDDataAnalysisModule::event()
   }
 
   // get the matched MC particle
-  StoreArray<MCParticle> m_mcpart;
-
-  for (const MCParticle& imcpart : m_mcpart) {
+  for (const MCParticle& imcpart : m_mcParticles) {
     if (!imcpart.hasStatus(MCParticle::c_PrimaryParticle)) continue; // only check primaries
     if (imcpart.hasStatus(MCParticle::c_Initial)) continue; // ignore initial particles
     if (imcpart.hasStatus(MCParticle::c_IsVirtual)) continue; // ignore virtual particles
@@ -307,7 +301,7 @@ void ECLChargedPIDDataAnalysisModule::event()
 
     // get mc particle kinematics
     n1_mcPdg->push_back(imcpart.getPDG());
-    if (imcpart.getMother() != NULL) n1_mcMothPdg->push_back(imcpart.getMother()->getPDG());
+    if (imcpart.getMother() != nullptr) n1_mcMothPdg->push_back(imcpart.getMother()->getPDG());
     else n1_mcMothPdg->push_back(-999);
     n1_mcEnergy->push_back(imcpart.getEnergy());
     n1_mcP->push_back(imcpart.getMomentum().Mag());
@@ -315,7 +309,7 @@ void ECLChargedPIDDataAnalysisModule::event()
     n1_mcPhi->push_back(imcpart.getMomentum().Phi());
 
     n2_mcPdg->push_back(imcpart.getPDG());
-    if (imcpart.getMother() != NULL) n2_mcMothPdg->push_back(imcpart.getMother()->getPDG());
+    if (imcpart.getMother() != nullptr) n2_mcMothPdg->push_back(imcpart.getMother()->getPDG());
     else n2_mcMothPdg->push_back(-999);
     n2_mcEnergy->push_back(imcpart.getEnergy());
     n2_mcP->push_back(imcpart.getMomentum().Mag());
@@ -433,7 +427,7 @@ void ECLChargedPIDDataAnalysisModule::endRun()
 
 void ECLChargedPIDDataAnalysisModule::terminate()
 {
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     n1_tree->Write();
     n2_tree->Write();

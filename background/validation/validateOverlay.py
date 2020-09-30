@@ -35,11 +35,11 @@ class Histogrammer(Module):
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
                               100, 30000, 40000))
         self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 4000))
-        self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 4000))
+        self.hist.append(TH1F('CDCHits', 'CDCHits', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
         self.hist.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
-                              100, 0, 100))
+                              100, 0, 200))
         self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
 
         for h in self.hist:

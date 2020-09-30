@@ -307,7 +307,7 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  ParticleLists: e+ (5+0) + e- (5+0)
 [INFO] collection=Particles
  PDGCode=-11 Charge=1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=0 arrayIndex=0 identifier=0 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.02, 0.22, -0.10) p=0.2459
@@ -326,7 +326,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-11 Charge=1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=1 arrayIndex=1 identifier=1 daughterIndices:  (none)
  mass=0.000511
  momentum=(0.52, -0.60, -0.23) p=0.8266
@@ -345,7 +345,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-11 Charge=1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=3 arrayIndex=3 identifier=3 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.30, -0.27, 0.35) p=0.5362
@@ -364,7 +364,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-11 Charge=1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=5 arrayIndex=5 identifier=5 daughterIndices:  (none)
  mass=0.000511
  momentum=(0.63, -0.16, 0.51) p=0.8243
@@ -383,7 +383,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-11 Charge=1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=7 arrayIndex=7 identifier=7 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.17, 0.09, 0.49) p=0.5298
@@ -402,7 +402,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=11 Charge=-1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=2 arrayIndex=2 identifier=2 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.27, 0.24, -0.18) p=0.404
@@ -421,7 +421,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=11 Charge=-1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=4 arrayIndex=4 identifier=4 daughterIndices:  (none)
  mass=0.000511
  momentum=(0.16, -0.86, -0.35) p=0.9433
@@ -440,7 +440,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=11 Charge=-1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=6 arrayIndex=6 identifier=6 daughterIndices:  (none)
  mass=0.000511
  momentum=(0.07, 1.49, 1.55) p=2.153
@@ -459,7 +459,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=11 Charge=-1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=8 arrayIndex=8 identifier=8 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.10, -0.13, 0.33) p=0.3647
@@ -478,7 +478,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=11 Charge=-1 PDGMass=0.000511
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=9 arrayIndex=9 identifier=9 daughterIndices:  (none)
  mass=0.000511
  momentum=(-0.07, -0.43, -0.55) p=0.7039
@@ -500,7 +500,7 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  ParticleLists: pi+ (5+0) + pi- (5+0)
 [INFO] collection=Particles
  PDGCode=211 Charge=1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=0 arrayIndex=10 identifier=0 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.02, 0.22, -0.10) p=0.2459
@@ -519,7 +519,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=211 Charge=1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=1 arrayIndex=11 identifier=1 daughterIndices:  (none)
  mass=0.1396
  momentum=(0.52, -0.60, -0.23) p=0.8266
@@ -538,7 +538,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=211 Charge=1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=3 arrayIndex=13 identifier=3 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.30, -0.27, 0.35) p=0.5362
@@ -557,7 +557,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=211 Charge=1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=5 arrayIndex=15 identifier=5 daughterIndices:  (none)
  mass=0.1396
  momentum=(0.63, -0.16, 0.51) p=0.8243
@@ -576,7 +576,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=211 Charge=1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=7 arrayIndex=17 identifier=7 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.17, 0.09, 0.49) p=0.5298
@@ -595,7 +595,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-211 Charge=-1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=2 arrayIndex=12 identifier=2 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.27, 0.24, -0.18) p=0.404
@@ -614,7 +614,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-211 Charge=-1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=4 arrayIndex=14 identifier=4 daughterIndices:  (none)
  mass=0.1396
  momentum=(0.16, -0.86, -0.35) p=0.9433
@@ -633,7 +633,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-211 Charge=-1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=6 arrayIndex=16 identifier=6 daughterIndices:  (none)
  mass=0.1396
  momentum=(0.07, 1.49, 1.55) p=2.153
@@ -652,7 +652,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-211 Charge=-1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=8 arrayIndex=18 identifier=8 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.10, -0.13, 0.33) p=0.3647
@@ -671,7 +671,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-211 Charge=-1 PDGMass=0.1396
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=9 arrayIndex=19 identifier=9 daughterIndices:  (none)
  mass=0.1396
  momentum=(-0.07, -0.43, -0.55) p=0.7039
@@ -693,7 +693,7 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  ParticleLists: K+ (5+0) + K- (5+0)
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=0 arrayIndex=20 identifier=0 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.02, 0.24, -0.10) p=0.2584
@@ -712,7 +712,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=1 arrayIndex=21 identifier=1 daughterIndices:  (none)
  mass=0.4937
  momentum=(0.52, -0.60, -0.23) p=0.8274
@@ -731,7 +731,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=3 arrayIndex=23 identifier=3 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.30, -0.27, 0.35) p=0.5387
@@ -750,7 +750,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=5 arrayIndex=25 identifier=5 daughterIndices:  (none)
  mass=0.4937
  momentum=(0.63, -0.16, 0.51) p=0.8253
@@ -769,7 +769,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=321 Charge=1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=7 arrayIndex=27 identifier=7 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.17, 0.09, 0.50) p=0.5335
@@ -788,7 +788,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-321 Charge=-1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=2 arrayIndex=22 identifier=2 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.28, 0.24, -0.18) p=0.4088
@@ -807,7 +807,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-321 Charge=-1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=4 arrayIndex=24 identifier=4 daughterIndices:  (none)
  mass=0.4937
  momentum=(0.16, -0.86, -0.35) p=0.9436
@@ -826,7 +826,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-321 Charge=-1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=6 arrayIndex=26 identifier=6 daughterIndices:  (none)
  mass=0.4937
  momentum=(0.07, 1.49, 1.55) p=2.153
@@ -845,7 +845,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-321 Charge=-1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=8 arrayIndex=28 identifier=8 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.10, -0.13, 0.33) p=0.3702
@@ -864,7 +864,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-321 Charge=-1 PDGMass=0.4937
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=9 arrayIndex=29 identifier=9 daughterIndices:  (none)
  mass=0.4937
  momentum=(-0.07, -0.43, -0.55) p=0.705
@@ -886,7 +886,7 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  ParticleLists: p+ (5+0) + anti-p- (5+0)
 [INFO] collection=Particles
  PDGCode=2212 Charge=1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=321
+ flavorType=1 particleSource=1 particleTypeUsedForFit=321
  mdstIndex=0 arrayIndex=30 identifier=0 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.02, 0.24, -0.10) p=0.2584
@@ -905,7 +905,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2212 Charge=1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=1 arrayIndex=31 identifier=1 daughterIndices:  (none)
  mass=0.9383
  momentum=(0.52, -0.60, -0.23) p=0.8309
@@ -924,7 +924,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2212 Charge=1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=3 arrayIndex=33 identifier=3 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.31, -0.28, 0.36) p=0.5486
@@ -943,7 +943,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2212 Charge=1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=5 arrayIndex=35 identifier=5 daughterIndices:  (none)
  mass=0.9383
  momentum=(0.63, -0.16, 0.51) p=0.8303
@@ -962,7 +962,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2212 Charge=1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=7 arrayIndex=37 identifier=7 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.18, 0.09, 0.51) p=0.5503
@@ -981,7 +981,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-2212 Charge=-1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=2 arrayIndex=32 identifier=2 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.29, 0.25, -0.19) p=0.4273
@@ -1000,7 +1000,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-2212 Charge=-1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=4 arrayIndex=34 identifier=4 daughterIndices:  (none)
  mass=0.9383
  momentum=(0.16, -0.86, -0.35) p=0.9459
@@ -1019,7 +1019,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-2212 Charge=-1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=6 arrayIndex=36 identifier=6 daughterIndices:  (none)
  mass=0.9383
  momentum=(0.07, 1.49, 1.55) p=2.153
@@ -1038,7 +1038,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-2212 Charge=-1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=8 arrayIndex=38 identifier=8 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.11, -0.14, 0.35) p=0.3917
@@ -1057,7 +1057,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-2212 Charge=-1 PDGMass=0.9383
- flavorType=1 particleType=1 particleTypeUsedForFit=2212
+ flavorType=1 particleSource=1 particleTypeUsedForFit=2212
  mdstIndex=9 arrayIndex=39 identifier=9 daughterIndices:  (none)
  mass=0.9383
  momentum=(-0.07, -0.43, -0.55) p=0.7028
@@ -1079,7 +1079,7 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  ParticleLists: mu+ (5+0) + mu- (5+0)
 [INFO] collection=Particles
  PDGCode=-13 Charge=1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=0 arrayIndex=40 identifier=0 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.02, 0.22, -0.10) p=0.2459
@@ -1098,7 +1098,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-13 Charge=1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=1 arrayIndex=41 identifier=1 daughterIndices:  (none)
  mass=0.1057
  momentum=(0.52, -0.60, -0.23) p=0.8266
@@ -1117,7 +1117,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-13 Charge=1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=3 arrayIndex=43 identifier=3 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.30, -0.27, 0.35) p=0.5362
@@ -1136,7 +1136,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-13 Charge=1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=5 arrayIndex=45 identifier=5 daughterIndices:  (none)
  mass=0.1057
  momentum=(0.63, -0.16, 0.51) p=0.8243
@@ -1155,7 +1155,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=-13 Charge=1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=7 arrayIndex=47 identifier=7 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.17, 0.09, 0.49) p=0.5298
@@ -1174,7 +1174,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=13 Charge=-1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=2 arrayIndex=42 identifier=2 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.27, 0.24, -0.18) p=0.404
@@ -1193,7 +1193,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=13 Charge=-1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=4 arrayIndex=44 identifier=4 daughterIndices:  (none)
  mass=0.1057
  momentum=(0.16, -0.86, -0.35) p=0.9433
@@ -1212,7 +1212,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=13 Charge=-1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=6 arrayIndex=46 identifier=6 daughterIndices:  (none)
  mass=0.1057
  momentum=(0.07, 1.49, 1.55) p=2.153
@@ -1231,7 +1231,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=13 Charge=-1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=8 arrayIndex=48 identifier=8 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.10, -0.13, 0.33) p=0.3647
@@ -1250,7 +1250,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=13 Charge=-1 PDGMass=0.1057
- flavorType=1 particleType=1 particleTypeUsedForFit=211
+ flavorType=1 particleSource=1 particleTypeUsedForFit=211
  mdstIndex=9 arrayIndex=49 identifier=9 daughterIndices:  (none)
  mass=0.1057
  momentum=(-0.07, -0.43, -0.55) p=0.7039
@@ -1272,7 +1272,7 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  ParticleList : K_L0 (0+8)
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=2 particleTypeUsedForFit=0
+ flavorType=0 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=12 arrayIndex=50 identifier=1001 daughterIndices:  (none)
  mass=0.4976
  momentum=(-0.01, -0.02, 0.09) p=0.09314
@@ -1291,7 +1291,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=2 particleTypeUsedForFit=0
+ flavorType=0 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=17 arrayIndex=51 identifier=6001 daughterIndices:  (none)
  mass=0.4976
  momentum=(-0.00, -0.02, 0.02) p=0.02535
@@ -1310,7 +1310,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=2 particleTypeUsedForFit=0
+ flavorType=0 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=19 arrayIndex=52 identifier=8001 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.04, 0.09, 0.07) p=0.1225
@@ -1329,7 +1329,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=2 particleTypeUsedForFit=0
+ flavorType=0 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=23 arrayIndex=53 identifier=13001 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.06, -0.12, -0.15) p=0.1977
@@ -1348,7 +1348,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=3 particleTypeUsedForFit=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=54 identifier=0 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.08, -1.01, -0.35) p=1.075
@@ -1367,7 +1367,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=3 particleTypeUsedForFit=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
  mdstIndex=1 arrayIndex=55 identifier=1 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.25, -0.24, -0.25) p=0.43
@@ -1386,7 +1386,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=3 particleTypeUsedForFit=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
  mdstIndex=2 arrayIndex=56 identifier=2 daughterIndices:  (none)
  mass=0.4976
  momentum=(-0.01, 0.18, 0.11) p=0.215
@@ -1405,7 +1405,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=130 Charge=0 PDGMass=0.4976
- flavorType=0 particleType=3 particleTypeUsedForFit=0
+ flavorType=0 particleSource=3 particleTypeUsedForFit=0
  mdstIndex=3 arrayIndex=57 identifier=3 daughterIndices:  (none)
  mass=0.4976
  momentum=(0.00, -0.00, -0.00) p=0
@@ -1427,7 +1427,7 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  ParticleList : gamma (0+4)
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
- flavorType=0 particleType=2 particleTypeUsedForFit=0
+ flavorType=0 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=58 identifier=1001 daughterIndices:  (none)
  mass=0
  momentum=(-0.01, -0.02, 0.09) p=0.09314
@@ -1446,7 +1446,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
- flavorType=0 particleType=2 particleTypeUsedForFit=0
+ flavorType=0 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=5 arrayIndex=59 identifier=6001 daughterIndices:  (none)
  mass=0
  momentum=(-0.00, -0.02, 0.02) p=0.02579
@@ -1465,7 +1465,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
- flavorType=0 particleType=2 particleTypeUsedForFit=0
+ flavorType=0 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=7 arrayIndex=60 identifier=8001 daughterIndices:  (none)
  mass=0
  momentum=(0.04, 0.10, 0.07) p=0.1263
@@ -1484,7 +1484,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=22 Charge=0 PDGMass=0
- flavorType=0 particleType=2 particleTypeUsedForFit=0
+ flavorType=0 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=11 arrayIndex=61 identifier=13001 daughterIndices:  (none)
  mass=0
  momentum=(0.06, -0.12, -0.15) p=0.2045
@@ -1506,7 +1506,7 @@ Total Number of Particles created in the DataStore: 7734
 [INFO]  ParticleLists: n0 (8+0) + anti-n0 (0+0)
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
- flavorType=1 particleType=2 particleTypeUsedForFit=0
+ flavorType=1 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=12 arrayIndex=62 identifier=1001 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.01, -0.02, 0.09) p=0.09314
@@ -1525,7 +1525,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
- flavorType=1 particleType=2 particleTypeUsedForFit=0
+ flavorType=1 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=17 arrayIndex=63 identifier=6001 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.00, -0.02, 0.02) p=0.02535
@@ -1544,7 +1544,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
- flavorType=1 particleType=2 particleTypeUsedForFit=0
+ flavorType=1 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=19 arrayIndex=64 identifier=8001 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.04, 0.09, 0.07) p=0.1225
@@ -1563,7 +1563,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
- flavorType=1 particleType=2 particleTypeUsedForFit=0
+ flavorType=1 particleSource=2 particleTypeUsedForFit=0
  mdstIndex=23 arrayIndex=65 identifier=13001 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.06, -0.12, -0.15) p=0.1977
@@ -1582,7 +1582,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
- flavorType=1 particleType=3 particleTypeUsedForFit=0
+ flavorType=1 particleSource=3 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=66 identifier=0 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.08, -1.01, -0.35) p=1.075
@@ -1601,7 +1601,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
- flavorType=1 particleType=3 particleTypeUsedForFit=0
+ flavorType=1 particleSource=3 particleTypeUsedForFit=0
  mdstIndex=1 arrayIndex=67 identifier=1 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.25, -0.24, -0.25) p=0.43
@@ -1620,7 +1620,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
- flavorType=1 particleType=3 particleTypeUsedForFit=0
+ flavorType=1 particleSource=3 particleTypeUsedForFit=0
  mdstIndex=2 arrayIndex=68 identifier=2 daughterIndices:  (none)
  mass=0.9396
  momentum=(-0.01, 0.18, 0.11) p=0.215
@@ -1639,7 +1639,7 @@ Total Number of Particles created in the DataStore: 7734
 
 [INFO] collection=Particles
  PDGCode=2112 Charge=0 PDGMass=0.9396
- flavorType=1 particleType=3 particleTypeUsedForFit=0
+ flavorType=1 particleSource=3 particleTypeUsedForFit=0
  mdstIndex=3 arrayIndex=69 identifier=3 daughterIndices:  (none)
  mass=0.9396
  momentum=(0.00, -0.00, -0.00) p=0

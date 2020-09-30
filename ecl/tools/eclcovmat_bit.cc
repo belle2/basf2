@@ -384,7 +384,7 @@ void bit(int num, char* inputPath)
       filename += "_L.dat";
       //      sprintf(BMin, "/hsm/belle/bdata2/users/avbobrov/belle2/corr%d/Binmcor%d_L.dat", num, ChN);
 
-      if ((BMcoIN = fopen(filename.c_str(), "rb")) == NULL) {
+      if ((BMcoIN = fopen(filename.c_str(), "rb")) == nullptr) {
         printf(" file %s is absent \n", filename.c_str());
         exit(1);
       }
@@ -932,7 +932,7 @@ void bit(int num, char* inputPath)
   char BMin[256];
   sprintf(BMin, "bitst%d.dat", num);
 
-  if ((BMcoIN = fopen(BMin, "w")) == NULL) {
+  if ((BMcoIN = fopen(BMin, "w")) == nullptr) {
     printf(" file %s is absent \n", BMin);
     exit(1);
   }

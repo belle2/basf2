@@ -16,6 +16,11 @@
 #
 ######################################################
 
+import os
+import glob
+import math
+from matplotlib.ticker import FormatStrFormatter
+import matplotlib.pyplot as plt
 import ROOT
 from ROOT import Belle2
 import sys
@@ -31,11 +36,6 @@ mpl.use('Agg')
 mpl.rcParams.update({'font.size': 22})
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
-import math
-import glob
-import os
 
 
 if len(sys.argv) != 5:

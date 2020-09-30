@@ -26,10 +26,10 @@ import basf2
 import logging
 
 import ROOT
-ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
-
 import os
+
+ROOT.gSystem.Load("libtracking")
 
 
 class FilterProperties(object):

@@ -20,11 +20,16 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <simulation/kernel/UserInfo.h>
+#include <geometry/GeometryManager.h>
 
 #include <G4ParticleTable.hh>
 #include <G4VUserPrimaryParticleInformation.hh>
 #include <G4ParticleDefinition.hh>
 #include <G4ParticleTypes.hh>
+#include <G4VPhysicalVolume.hh>
+#include <G4LogicalVolume.hh>
+#include <G4VSolid.hh>
+#include <CLHEP/Vector/LorentzVector.h>
 
 #include <TLorentzVector.h>
 
@@ -36,7 +41,10 @@ using namespace Belle2::Simulation;
 MCParticleGenerator::MCParticleGenerator(const string& mcCollectionName, MCParticleGraph& mcParticleGraph) :
   G4VPrimaryGenerator(), m_mcCollectionName(mcCollectionName), m_mcParticleGraph(mcParticleGraph)
 {
-
+  G4VPhysicalVolume* topVolume = geometry::GeometryManager::getInstance().getTopVolume();
+  if (topVolume) {
+    m_topSolid = topVolume->GetLogicalVolume()->GetSolid();
+  }
 }
 
 
@@ -72,6 +80,43 @@ void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
   }
 }
 
+G4PrimaryVertex*  MCParticleGenerator::determineVertex(const MCParticleGraph::GraphParticle& p, double& productionTimeShift)
+{
+  // We want to determine the simulation vertex for the given particle.
+  // So lets see where it is
+  TVector3 mcProdVtx = p.getProductionVertex();
+  G4ThreeVector pos(mcProdVtx.X() / Unit::mm * CLHEP::mm,
+                    mcProdVtx.Y() / Unit::mm * CLHEP::mm,
+                    mcProdVtx.Z() / Unit::mm * CLHEP::mm);
+  productionTimeShift = 0;
+  // and make sure its inside the simulation volume
+  if (m_topSolid && m_topSolid->Inside(pos) == kOutside) {
+    // Ok, we're outside the simulation volume. Check if we can actually
+    // get to the simulation volume in time, no fields outside the volume
+    TLorentzVector mcPartMom4 = p.get4Vector();
+    CLHEP::HepLorentzVector mom(mcPartMom4.X() / Unit::MeV * CLHEP::MeV,
+                                mcPartMom4.Y() / Unit::MeV * CLHEP::MeV,
+                                mcPartMom4.Z() / Unit::MeV * CLHEP::MeV,
+                                mcPartMom4.E() / Unit::MeV * CLHEP::MeV);
+    const auto dir = mom.vect().unit();
+    double distance = m_topSolid->DistanceToIn(pos, dir);
+
+    if (distance == kInfinity) {
+      B2DEBUG(10, "Particle starts outside simulation volume and isn't intersecting, skipping");
+      return nullptr;
+    }
+
+    const double speed = (p.getMass() == 0 ? mom.beta() : 1) * CLHEP::c_light;
+    const double flightLength = speed * p.getLifetime();
+    if (distance > flightLength) {
+      B2DEBUG(10, "Particle starts outside simulation volume and doesn't reach it before decaying, skipping");
+      return nullptr;
+    }
+    pos += dir * distance;
+    productionTimeShift = (distance / speed);
+  }
+  return new G4PrimaryVertex(pos.x(), pos.y(), pos.z(), p.getProductionTime() + productionTimeShift);
+}
 
 void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
                                       G4Event* event,
@@ -126,31 +171,56 @@ void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
 
   //Create a new Geant4 Primary particle and
   //store the link to the GraphMCParticle object as user info.
-  G4PrimaryParticle* newPart = NULL;
+  G4PrimaryParticle* newPart = nullptr;
+  // And maybe we need to generate a new primary Geant4 vertex for this particle.
+  G4PrimaryVertex* vertex = nullptr;
+  // And in the rare case that the particle started outside the simulation volume
+  // we need an adjusted production time
+  double productionTimeShift{0};
 
+  // Ok, we want to add the particle and it doesn't have a mother so lets see
+  // if we can find a proper vertex
+  if (addToG4 and lastG4Mother == nullptr) {
+    vertex = determineVertex(graphParticle, productionTimeShift);
+    // we don't have a mother and no vertex so skip this particle
+    if (not vertex) addToG4 = false;
+  }
+  // So now we have a particle to add and either a mother or a vertex.
+  // Let's create the particle in Geant4
   if (addToG4) {
-    TLorentzVector mcPartMom4 = mcParticle.get4Vector();
+    const TLorentzVector mcPartMom4 = graphParticle.get4Vector();
     newPart = new G4PrimaryParticle(pdef,
                                     mcPartMom4.X() / Unit::MeV * CLHEP::MeV,
                                     mcPartMom4.Y() / Unit::MeV * CLHEP::MeV,
                                     mcPartMom4.Z() / Unit::MeV * CLHEP::MeV,
                                     mcPartMom4.E() / Unit::MeV * CLHEP::MeV);
-    newPart->SetMass(mcParticle.getMass() / Unit::MeV * CLHEP::MeV);
+    newPart->SetMass(graphParticle.getMass() / Unit::MeV * CLHEP::MeV);
     if (opticalPhoton) {
-      TVector3 polarization = mcParticle.getDecayVertex(); // temporary stored here
+      TVector3 polarization = graphParticle.getDecayVertex(); // temporary stored here
       newPart->SetPolarization(polarization.X(), polarization.Y(), polarization.Z());
     }
     newPart->SetUserInformation(new ParticleInfo(graphParticle));
 
     //Set propagation time only if useTime is true, the MCparticle has a valid vertex and has children.
-    useTime &= mcParticle.hasValidVertex() && mcParticle.getFirstDaughter() > 0;
+    useTime &= graphParticle.hasValidVertex() && mcParticle.getFirstDaughter() > 0;
     if (useTime) {
       //ProperTime is in particle eigentime, so convert lab lifetime to eigentime
-      double propertime = mcParticle.getLifetime() / mcParticle.get4Vector().Gamma();
+      //correct for any possible shift between simulation vertex and generation vertex
+      double propertime = (graphParticle.getLifetime() - productionTimeShift) / mcPartMom4.Gamma();
       newPart->SetProperTime(propertime);
     }
 
-    if (lastG4Mother != NULL) lastG4Mother->SetDaughter(newPart);
+    if (lastG4Mother) {
+      lastG4Mother->SetDaughter(newPart);
+      // This particle will be produced at the decay vertex of its mother so we **want** Geant4 to
+      // overwrite production time/vertex, so as convention having NaN here means we'll
+      // take over the values from Geant4 instead of the ones from the generator
+      graphParticle.setProductionTime(std::numeric_limits<float>::quiet_NaN());
+    } else {
+      vertex->SetPrimary(newPart);
+      event->AddPrimaryVertex(vertex);
+    }
+
     g4Mother = newPart;
 
     //Do not store the generator info in the MCParticles block unless Geant4 creates a track in the detector.
@@ -158,25 +228,6 @@ void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
 
   } else {
     B2DEBUG(100, "The particle " << mcParticle.getIndex() << " (PDG " << mcParticle.getPDG() << ") was not added to Geant4");
-  }
-
-  //If there is no Geant4 mother particle and the particle is added to Geant4, create a new primary vertex and assign the particle
-  if ((lastG4Mother == NULL) && (addToG4)) {
-    //Create the vertex
-    TVector3 mcProdVtx = mcParticle.getProductionVertex();
-    G4PrimaryVertex* vertex = new G4PrimaryVertex(mcProdVtx.X() / Unit::mm * CLHEP::mm,
-                                                  mcProdVtx.Y() / Unit::mm * CLHEP::mm,
-                                                  mcProdVtx.Z() / Unit::mm * CLHEP::mm,
-                                                  mcParticle.getProductionTime());
-    vertex->SetPrimary(newPart);
-
-    //Add the vertex to the event
-    event->AddPrimaryVertex(vertex);
-    B2DEBUG(10, "Created the vertex ("
-            << mcProdVtx.X() / Unit::cm << " cm,"
-            << mcProdVtx.Y() / Unit::cm << " cm,"
-            << mcProdVtx.Z() / Unit::cm << " cm) with the primary particle "
-            << mcParticle.getPDG());
   }
 
   //Add all children

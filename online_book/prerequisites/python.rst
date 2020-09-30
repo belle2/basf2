@@ -420,7 +420,7 @@ Series or DataFrame are performed element-wise.
 
   import numpy as np
 
-  x = (df.B0_deltae * df.B0_et)**2 /(np.sin(df.B0_cc2)+np.sqrt(df.B0_cc5))
+  x = (df.B0_deltae * df.B0_et)**2 / (np.sin(df.B0_cc2) + np.sqrt(df.B0_cc5))
 
   2*x - 2
 
@@ -433,7 +433,7 @@ You can easily add or remove columns in the following way:
 
   # Adding a columns:
 
-  df['fancy_new_column'] = (df.B0_deltae * df.B0_et)**2 /(np.sin(df.B0_cc2)+np.sqrt(df.B0_cc5) + 0.1)
+  df['fancy_new_column'] = (df.B0_deltae * df.B0_et)**2 / (np.sin(df.B0_cc2) + np.sqrt(df.B0_cc5) + 0.1)
   df['delta_M_mbc'] = df.B0_M - df.B0_mbc
 
 .. code:: ipython3

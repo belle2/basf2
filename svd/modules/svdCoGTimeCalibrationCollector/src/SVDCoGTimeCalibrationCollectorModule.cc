@@ -56,10 +56,10 @@ void SVDCoGTimeCalibrationCollectorModule::prepare()
   hEventT0NoSync.GetXaxis()->SetTitle("event_t0 (ns)");
   m_hEventT0nosync = new SVDHistograms<TH1F>(hEventT0NoSync);
 
-  m_hEventT0FromCDST = new TH1F("hEventT0FromCDST", "EventT0FromCDST", 200, -100, 100);
-  registerObject<TH1F>("hEventT0FromCDST", m_hEventT0FromCDST);
-  m_hEventT0FromCDSTSync = new TH1F("hEventT0FromCDSTSync", "EventT0FromCDSTSync", 200, -100, 100);
-  registerObject<TH1F>("hEventT0FromCDSTSync", m_hEventT0FromCDSTSync);
+  m_hEventT0FromCDC = new TH1F("hEventT0FromCDC", "EventT0FromCDC", 200, -100, 100);
+  registerObject<TH1F>("hEventT0FromCDC", m_hEventT0FromCDC);
+  m_hEventT0FromCDCSync = new TH1F("hEventT0FromCDCSync", "EventT0FromCDCSync", 200, -100, 100);
+  registerObject<TH1F>("hEventT0FromCDCSync", m_hEventT0FromCDCSync);
   m_hRawCoGTimeL3V = new TH1F("hRawCoGTimeL3V", "RawCoGTimeL3V", 200, -100, 100);
   registerObject<TH1F>("hRawCoGTimeL3V", m_hRawCoGTimeL3V);
 
@@ -102,16 +102,22 @@ void SVDCoGTimeCalibrationCollectorModule::startRun()
       }
     }
   }
-  m_hEventT0FromCDST->Reset();
-  m_hEventT0FromCDSTSync->Reset();
+  m_hEventT0FromCDC->Reset();
+  m_hEventT0FromCDCSync->Reset();
 }
 
 void SVDCoGTimeCalibrationCollectorModule::collect()
 {
+  if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {return;}
+
   float eventT0 = 0;
-  if (m_eventT0->hasEventT0()) {
-    eventT0 = m_eventT0->getEventT0();
-    getObjectPtr<TH1F>("hEventT0FromCDST")->Fill(eventT0);
+  // Set the CDC event t0 value if it exists
+  if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
+    auto evtT0List_CDC = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
+    // Set the CDC event t0 value for filling into the histogram
+    // The most accurate CDC event t0 value is the last one in the list.
+    eventT0 = evtT0List_CDC.back().eventT0;
+    getObjectPtr<TH1F>("hEventT0FromCDC")->Fill(eventT0);
   }
   if (!m_svdCls.isValid()) {
     B2WARNING("!!!! File is not Valid: isValid() = " << m_svdCls.isValid());
@@ -148,7 +154,7 @@ void SVDCoGTimeCalibrationCollectorModule::collect()
       getObjectPtr<TH2F>(m_hEventT0vsCoG->getHistogram(theVxdID, side)->GetName())->Fill(clTime, eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0->getHistogram(theVxdID, side)->GetName())->Fill(eventT0Sync);
       getObjectPtr<TH1F>(m_hEventT0nosync->getHistogram(theVxdID, side)->GetName())->Fill(eventT0);
-      getObjectPtr<TH1F>("hEventT0FromCDSTSync")->Fill(eventT0Sync);
+      getObjectPtr<TH1F>("hEventT0FromCDCSync")->Fill(eventT0Sync);
       if (layer == 3 && side == 0) {getObjectPtr<TH1F>("hRawCoGTimeL3V")->Fill(clTime);}
     }
   };

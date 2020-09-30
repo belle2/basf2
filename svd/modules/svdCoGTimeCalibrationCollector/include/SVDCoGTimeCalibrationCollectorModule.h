@@ -78,8 +78,8 @@ namespace Belle2 {
     SVDHistograms<TH1F>* m_hEventT0 = nullptr; /**< EventT0 synchronized distribution*/
     SVDHistograms<TH1F>* m_hEventT0nosync = nullptr; /**< EventT0 NOT synchroinized distribution*/
 
-    TH1F* m_hEventT0FromCDST = nullptr; /**< EventT0 distribution read by the cDST*/
-    TH1F* m_hEventT0FromCDSTSync = nullptr; /**< EventT0 distribution read by the cDST and then synchronized*/
+    TH1F* m_hEventT0FromCDC = nullptr; /**< EventT0 distribution read by the cDST*/
+    TH1F* m_hEventT0FromCDCSync = nullptr; /**< EventT0 distribution read by the cDST and then synchronized*/
     TH1F* m_hRawCoGTimeL3V = nullptr; /**< Raw_CoG distribution of layer3 V-side */
 
     double m_rawCoGBinWidth = 2; /**< Raw_CoG Bin Width [ns] for 2D-histogram */

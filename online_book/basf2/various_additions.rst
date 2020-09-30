@@ -141,7 +141,7 @@ with the `passesCut` function.
     How would you define the alias ``myCut`` for the cut ``E > 1 and p > 1``?
 
 .. admonition:: Solution
-    :class: solution
+    :class: solution toggle
 
     You can use the ``passesCut`` function to turn a cut into a variable and
     assign an alias for it.
@@ -160,11 +160,11 @@ with the `passesCut` function.
          2. If they are in the barrel region, their energy should be larger than 50 MeV
          3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
 
-    To do this, you need the `clusterReg` and `clusterE` variable.
-    To keep everything neat and
-    tidy, we recommend that you define the aliases ``goodFWDGamma`,
-    ``goodBRLGamma`` and ``goodBWDGamma`` for the three cuts. Finally you can
-    combine them to a ``goodGamma`` cut and use this to fill the particle list.
+   To do this, you need the `clusterReg` and `clusterE` variable.
+   To keep everything neat and
+   tidy, we recommend that you define the aliases ``goodFWDGamma``,
+   ``goodBRLGamma`` and ``goodBWDGamma`` for the three cuts. Finally you can
+   combine them to a ``goodGamma`` cut and use this to fill the particle list.
 
 .. admonition:: Hint
    :class: toggle xhint stacked
@@ -173,11 +173,11 @@ with the `passesCut` function.
 
    .. code-block:: python3
 
-        vm.addAlias(
-            "goodXXXGamma", "passesCut(clusterReg == XXX and clusterE > XXX)"
-           )
+       vm.addAlias(
+           "goodXXXGamma", "passesCut(clusterReg == XXX and clusterE > XXX)"
+       )
 
-    where the ``XXX`` should be filled by you.
+   where the ``XXX`` should be filled by you.
 
 .. admonition:: Another hint
    :class: toggle xhint stacked
@@ -188,7 +188,7 @@ with the `passesCut` function.
 
         vm.addAlias(
             "goodFWDGamma", "passesCut(clusterReg == 1 and clusterE > 0.075)"
-           )
+        )
 
 .. admonition:: Solution
    :class: toggle solution

@@ -184,32 +184,16 @@ with the `passesCut` function.
 
    This is the first one:
 
-   .. code-block:: python3
-
-        vm.addAlias(
-            "goodFWDGamma", "passesCut(clusterReg == 1 and clusterE > 0.075)"
-        )
+   .. literalinclude:: steering_files/039_various_additions.py
+           :lines: 33-36
+           :lineno-start: 33
 
 .. admonition:: Solution
    :class: toggle solution
 
-        .. code-block:: python3
+        .. literalinclude:: steering_files/039_various_additions.py
+           :lines: 33-45
            :lineno-start: 33
-
-           #  apply Bremsstrahlung correction to electrons
-           variables.addAlias(
-            "goodFWDGamma", "passesCut(clusterReg == 1 and clusterE > 0.075)"
-           )
-           variables.addAlias(
-            "goodBRLGamma", "passesCut(clusterReg == 2 and clusterE > 0.05)"
-           )
-           variables.addAlias(
-            "goodBWDGamma", "passesCut(clusterReg == 3 and clusterE > 0.1)"
-           )
-           variables.addAlias(
-            "goodGamma", "passesCut(goodFWDGamma or goodBRLGamma or goodBWDGamma)"
-           )
-           ma.fillParticleList("gamma:brems", "goodGamma", path=main)
 
 Next, we perform the actual recovery, using the `correctBrems` function in the
 Modular Analysis package.
@@ -233,11 +217,9 @@ one Bremsstrahlung photon was added to this particle.
 .. admonition:: Solution
    :class: toggle solution
 
-        .. code-block:: python3
+        .. literalinclude:: steering_files/039_various_additions.py
+           :lines: 47-48
            :lineno-start: 47
-
-           ma.correctBrems("e+:corrected", "e+:uncorrected", "gamma:brems", path=main)
-           variables.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")
 
 .. admonition:: Question
    :class: exercise stacked
@@ -287,15 +269,9 @@ Bremsstrahlung corrected particles,  you can either replace the ``isSignal``
 variable by the `isSignalAcceptBremsPhotons` one, or add the ``?addbrems``
 marker to the decay string:
 
-.. code-block:: python3
+.. literalinclude:: steering_files/039_various_additions.py
+   :lines: 50-55
    :lineno-start: 50
-
-   # combine final state particles to form composite particles
-   ma.reconstructDecay(
-    "J/psi:ee -> e+:corrected e-:corrected ?addbrems",
-    cut="dM < 0.11",
-    path=main,
-   )
 
 Finally, let's add the invariant mass of the :math:`J/\psi` meson without any
 Bremsstrahlung recovery applied. Then, after running your steering file, compare
@@ -304,55 +280,54 @@ the correctly reconstructed :math:`J/\psi`. Can you see the effect of the
 Bremsstrahlung recovery?
 
 .. admonition:: Exercise
-   :class: exercise stacked
+    :class: exercise stacked
 
-   Create a variable to calculate the invariant mass of the
-   :math:`J/\psi` meson using the *uncorrected* momenta of the leptons. Call it
-   `'M_uncorrected'`.
-   Plot a histogram of `'M'` and `'M_uncorrected'` for the correctly reconstructed
-   :math:`J/\psi` mesons
+    Create a variable to calculate the invariant mass of the
+    :math:`J/\psi` meson using the *uncorrected* momenta of the leptons. Call it
+    ``M_uncorrected``.
+    You may find the meta-variable `daughterCombination` useful.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+    :class: toggle xhint stacked
 
-   You may find the meta-variable `daughterCombination` useful. Can you use it in
-   combination with the `daughter` meta-variable, just for the laughs?
+    ``daughterCombination(M,0:0,1:0)`` will give us the invariant mass of the first
+    daughter of the first daughter, and the first daughter of the second daughter.
+    Since all particles in the ``e+:corrected`` particle list have as first daughter
+    the uncorrected particle, we just need to calculate this daughter combination for
+    the :math:`J/\psi` meson.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    We can do this by directly appending the expression to
+    the list of :math:`J/\psi` variables we want to store, or we can rather make it a
+    variable of the B mesons, by using the `daughter` meta-variable.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/039_various_additions.py
+      :lines: 113-115
+      :lineno-start: 113
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Plot a histogram of `M` and ``M_uncorrected`` for the correctly reconstructed
+    :math:`J/\psi` mesons
 
 .. admonition:: Solution
    :class: toggle solution
 
-   ``daughterCombination(M,0:0,1:0)`` will give us the invariant mass of the first
-   daughter of the first daughter, and the first daughter of the second daughter.
-   Since all particles in the ``e+:corrected`` particle list have as first daughter
-   the uncorrected particle, we just need to calculate this daughter combination for
-   the :math:`J/\psi` meson. We can do this by directly appending the expression to
-   the list of :math:`J/psi` variables we want to store, or we can rather make it a
-   variable of the B mesons, by using the `daughter` meta-variable:
-
-        .. code-block:: python3
-           :lineno-start: 113
-
-            b_vars += variables.addAlias(
-             "Jpsi_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
-            )
-
-    The next code plots the distributions using pandas:
-
-    .. code-block:: python3
-
-       # Assuming your DataFrame is called df, and you imported
-       # matplotlib.pyplot as plt
-       df[df.J_psi_isSignal == 1].hist("Jpsi_M_uncorrected",label="w/o brems corr")
-       df[df.J_psi_isSignal == 1].hist("J_psi_M",label="with brems corr", alpha=0.7)
-       plt.yscale("log") #set a logarithmic scale in the y-axis
-       plt.legend() #show legend
+    .. literalinclude:: roe/invariant_mass_plot.py
+      :linenos:
 
     The results should look similar to :numref:`jpsi_brems_validation_plot` (this was obtained with a
     different steering file, so do not mind if your plot is not exactly the same).
 
     .. _jpsi_brems_validation_plot:
 
-    .. figure:: jpsi_brems_validation_plot.png
+    .. figure:: roe/jpsi_brems_validation_plot.png
        :width: 40em
        :align: center
 
@@ -421,12 +396,9 @@ random seed.
 .. admonition:: Solution
    :class: toggle solution
 
-        .. code-block:: python3
-           :lineno-start: 74
-
-           # perform best candidate selection
-           b2.set_random_seed("Belle II StarterKit")
-           ma.rankByHighest("B0", variable="random", numBest=1, path=main)
+    .. literalinclude:: steering_files/039_various_additions.py
+       :lines: 74-76
+       :lineno-start: 74
 
 .. warning::
 
@@ -436,7 +408,7 @@ random seed.
    cuts in your analysis.
 
 .. admonition:: Extra exercises
-   :class: exercise stacked
+   :class: exercise
 
    * Remove the ``numBest`` parameter from the `rankByHighest` function, and
      store both the ``random`` and  the ``extraInfo(random_rank)`` variables.

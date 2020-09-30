@@ -230,7 +230,7 @@ ROOT: a nano introduction
 ---------------------------
 
 ROOT files, as you'll come to be familiar with, are the main way we store our
-data at Belle II. Within these files are 'TTrees' known as 'trees', which are
+data at Belle II. Within these files are ``TTree`` objects known as 'trees', which are
 analogous to a sub-folder. For example, you may store a tree full of :math:`B`
 meson candidates. Within a tree you can have 'TBranches' known as
 'branches'. Each branch could be one of the oodles of variables available for

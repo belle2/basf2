@@ -83,9 +83,9 @@ class BtoHad2Tracks(BaseSkim):
     def build_lists(self, path):
         Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
 
-        channels = {'B0:Charmless_b2pipi': 'pi+:veryLoose pi-:veryLoose',  # 1
-                    'B0:Charmless_b2Kpi': 'K+:veryLoose pi-:veryLoose',  # 2
-                    'B0:Charmless_b2KK': 'K+:veryLoose K-:veryLoose',  # 3
+        channels = {'B0:Charmless_b2pipi': 'pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 1
+                    'B0:Charmless_b2Kpi': 'K+:SkimVeryLoose pi-:SkimVeryLoose',  # 2
+                    'B0:Charmless_b2KK': 'K+:SkimVeryLoose K-:SkimVeryLoose',  # 3
                     }
 
         BsigList = []
@@ -142,13 +142,13 @@ class BtoHad3Tracks(BaseSkim):
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
-        channels = {'B+:Charmless_b2pipipi': 'pi+:veryLoose pi+:veryLoose pi-:veryLoose',  # 1
-                    'B+:Charmless_b2Kspi': 'K_S0:merged pi+:veryLoose',  # 2
-                    'B+:Charmless_b2KsK': 'K_S0:merged K+:veryLoose',  # 3
-                    'B+:Charmless_b2Kpipi': 'K+:veryLoose pi+:veryLoose pi-:veryLoose ',  # 4
-                    'B+:Charmless_b2KKpi_0': 'K+:veryLoose K+:veryLoose  pi-:veryLoose',  # 5
-                    'B+:Charmless_b2KKpi_1': 'K+:veryLoose K-:veryLoose  pi+:veryLoose',  # 6
-                    'B+:Charmless_b2KKK': 'K+:veryLoose K+:veryLoose K-:veryLoose',  # 7
+        channels = {'B+:Charmless_b2pipipi': 'pi+:SkimVeryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 1
+                    'B+:Charmless_b2Kspi': 'K_S0:merged pi+:SkimVeryLoose',  # 2
+                    'B+:Charmless_b2KsK': 'K_S0:merged K+:SkimVeryLoose',  # 3
+                    'B+:Charmless_b2Kpipi': 'K+:SkimVeryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose ',  # 4
+                    'B+:Charmless_b2KKpi_0': 'K+:SkimVeryLoose K+:SkimVeryLoose  pi-:SkimVeryLoose',  # 5
+                    'B+:Charmless_b2KKpi_1': 'K+:SkimVeryLoose K-:SkimVeryLoose  pi+:SkimVeryLoose',  # 6
+                    'B+:Charmless_b2KKK': 'K+:SkimVeryLoose K+:SkimVeryLoose K-:SkimVeryLoose',  # 7
                     }
 
         BsigList = []
@@ -200,19 +200,19 @@ class BtoHad4Tracks(BaseSkim):
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
-        channels = {'B0:Charmless_b2pipipipi': 'pi+:veryLoose pi-:veryLoose pi+:veryLoose pi-:veryLoose',  # 1
-                    'B0:Charmless_b2Kpipipi': 'K+:veryLoose pi-:veryLoose pi+:veryLoose pi-:veryLoose',  # 2
-                    'B0:Charmless_b2KKpipi': 'K+:veryLoose K-:veryLoose pi+:veryLoose pi-:veryLoose',  # 3
-                    'B0:Charmless_b2KpiKpi': 'K+:veryLoose pi-:veryLoose K+:veryLoose pi-:veryLoose',  # 4
-                    'B0:Charmless_b2KKKpi': 'K+:veryLoose K-:veryLoose K+:veryLoose pi-:veryLoose',  # 5
-                    'B0:Charmless_b2KKKK': 'K+:veryLoose K-:veryLoose K+:veryLoose K-:veryLoose',  # 6
-                    'B0:Charmless_b2Kspipi': 'K_S0:merged pi+:veryLoose pi-:veryLoose',  # 7
-                    'B0:Charmless_b2KsKpi': 'K_S0:merged K+:veryLoose pi-:veryLoose',  # 8
-                    'B0:Charmless_b2KsKK': 'K_S0:merged K+:veryLoose K-:veryLoose',  # 9
+        channels = {'B0:Charmless_b2pipipipi': 'pi+:SkimVeryLoose pi-:SkimVeryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 1
+                    'B0:Charmless_b2Kpipipi': 'K+:SkimVeryLoose pi-:SkimVeryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 2
+                    'B0:Charmless_b2KKpipi': 'K+:SkimVeryLoose K-:SkimVeryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 3
+                    'B0:Charmless_b2KpiKpi': 'K+:SkimVeryLoose pi-:SkimVeryLoose K+:SkimVeryLoose pi-:SkimVeryLoose',  # 4
+                    'B0:Charmless_b2KKKpi': 'K+:SkimVeryLoose K-:SkimVeryLoose K+:SkimVeryLoose pi-:SkimVeryLoose',  # 5
+                    'B0:Charmless_b2KKKK': 'K+:SkimVeryLoose K-:SkimVeryLoose K+:SkimVeryLoose K-:SkimVeryLoose',  # 6
+                    'B0:Charmless_b2Kspipi': 'K_S0:merged pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 7
+                    'B0:Charmless_b2KsKpi': 'K_S0:merged K+:SkimVeryLoose pi-:SkimVeryLoose',  # 8
+                    'B0:Charmless_b2KsKK': 'K_S0:merged K+:SkimVeryLoose K-:SkimVeryLoose',  # 9
                     'B0:Charmless_b2KsKs': 'K_S0:merged K_S0:merged',  # 10
-                    'B0:Charmless_b2K*KK': 'K*0:veryLoose K+:veryLoose K-:veryLoose',  # 11
-                    'B0:Charmless_b2K*pipi': 'K*0:veryLoose pi+:veryLoose pi-:veryLoose',  # 12
-                    'B0:Charmless_b2K*Kpi': 'K*0:veryLoose K+:veryLoose pi-:veryLoose',  # 13
+                    'B0:Charmless_b2K*KK': 'K*0:veryLoose K+:SkimVeryLoose K-:SkimVeryLoose',  # 11
+                    'B0:Charmless_b2K*pipi': 'K*0:veryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 12
+                    'B0:Charmless_b2K*Kpi': 'K*0:veryLoose K+:SkimVeryLoose pi-:SkimVeryLoose',  # 13
                     'B0:Charmless_b2rhorho': 'rho0:veryLoose rho0:veryLoose'  # 14
                     }
         BsigList = []
@@ -253,9 +253,9 @@ class BtoHad5Tracks(BaseSkim):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
         BsigList = []
         channels = {
-                    'B+:Charmless_b2K*KK': 'K*+:veryLoose K+:veryLoose K-:veryLoose',  # 1
-                    'B+:Charmless_b2K*pipi': 'K*+:veryLoose pi+:veryLoose pi-:veryLoose',  # 2
-                    'B+:Charmless_b2K*Kpi': 'K*+:veryLoose K+:veryLoose pi-:veryLoose',  # 3
+                    'B+:Charmless_b2K*KK': 'K*+:veryLoose K+:SkimVeryLoose K-:SkimVeryLoose',  # 1
+                    'B+:Charmless_b2K*pipi': 'K*+:veryLoose pi+:SkimVeryLoose pi-:SkimVeryLoose',  # 2
+                    'B+:Charmless_b2K*Kpi': 'K*+:veryLoose K+:SkimVeryLoose pi-:SkimVeryLoose',  # 3
                     }
 
         for chID, channel in enumerate(channels.keys()):
@@ -293,8 +293,8 @@ class BtoHad1Track1Pi0(BaseSkim):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
         BsigList = []
         channels = {
-                    'B+:Charmless_b2pipi0': 'pi+:veryLoose pi0:charmlessFit',  # 1
-                    'B+:Charmless_b2Kpi0': 'K+:veryLoose pi0:charmlessFit',  # 2
+                    'B+:Charmless_b2pipi0': 'pi+:SkimVeryLoose pi0:charmlessFit',  # 1
+                    'B+:Charmless_b2Kpi0': 'K+:SkimVeryLoose pi0:charmlessFit',  # 2
                     }
 
         for chID, channel in enumerate(channels.keys()):
@@ -336,10 +336,10 @@ class BtoHad2Tracks1Pi0(BaseSkim):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.3'
         BsigList = []
         channels = {
-                    'B0:Charmless_b2pipipi0': 'pi+:veryLoose pi-:veryLoose pi0:charmlessFit',  # 1
-                    'B0:Charmless_b2Kpipi0_0': 'K+:veryLoose pi-:veryLoose pi0:charmlessFit',  # 2
-                    'B0:Charmless_b2Kpipi0_1': 'K-:veryLoose pi+:veryLoose pi0:charmlessFit',  # 3
-                    'B0:Charmless_b2KKpi0': 'K+:veryLoose K-:veryLoose pi0:charmlessFit',  # 4
+                    'B0:Charmless_b2pipipi0': 'pi+:SkimVeryLoose pi-:SkimVeryLoose pi0:charmlessFit',  # 1
+                    'B0:Charmless_b2Kpipi0_0': 'K+:SkimVeryLoose pi-:SkimVeryLoose pi0:charmlessFit',  # 2
+                    'B0:Charmless_b2Kpipi0_1': 'K-:SkimVeryLoose pi+:SkimVeryLoose pi0:charmlessFit',  # 3
+                    'B0:Charmless_b2KKpi0': 'K+:SkimVeryLoose K-:SkimVeryLoose pi0:charmlessFit',  # 4
                     'B0:Charmless_b2Kspi0': 'K_S0:merged pi0:charmlessFit',  # 5
                     }
 
@@ -387,12 +387,12 @@ class BtoHad3Tracks1Pi0(BaseSkim):
         BsigList = []
 
         channels = {
-                    'B+:Charmless_b2Kspipi0': 'K_S0:merged pi+:veryLoose pi0:charmlessFit',  # 1
-                    'B+:Charmless_b2KsKpi0': 'K_S0:merged K+:veryLoose pi0:charmlessFit',  # 2
-                    'B+:Charmless_b2rhorho0': 'rho+:veryLoose rho0:veryLoose'  # 3
-                    'B+:Charmless_b2K*KK': 'K*+:veryLoosePi0 K-:veryLoose K+:veryLoose',  # 4
-                    'B+:Charmless_b2K*pipi': 'K*+:veryLoosePi0 pi-:veryLoose pi+:veryLoose',  # 5
-                    'B+:Charmless_b2K*Kpi': 'K*+:veryLoosePi0 K+:veryLoose pi-:veryLoose',  # 6
+                    'B+:Charmless_b2Kspipi0': 'K_S0:merged pi+:SkimVeryLoose pi0:charmlessFit',  # 1
+                    'B+:Charmless_b2KsKpi0': 'K_S0:merged K+:SkimVeryLoose pi0:charmlessFit',  # 2
+                    'B+:Charmless_b2rhorho0': 'rho+:veryLoose rho0:veryLoose',  # 3
+                    'B+:Charmless_b2K*KK': 'K*+:veryLoosePi0 K-:SkimVeryLoose K+:SkimVeryLoose',  # 4
+                    'B+:Charmless_b2K*pipi': 'K*+:veryLoosePi0 pi-:SkimVeryLoose pi+:SkimVeryLoose',  # 5
+                    'B+:Charmless_b2K*Kpi': 'K*+:veryLoosePi0 K+:SkimVeryLoose pi-:SkimVeryLoose',  # 6
                     }
 
         for chID, channel in enumerate(channels.keys()):

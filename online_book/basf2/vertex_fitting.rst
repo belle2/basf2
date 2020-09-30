@@ -27,12 +27,12 @@ Vertex fitting
 Introduction
 ------------
 
-In the broadest sense, decay fitting is the technique by which one uses prior knowledge on the nature of a decay to improve the measurement of its observables.
-The fits we are going to perform are of two there are two main types of fitting:
+In the broadest sense, we call vertex fitting a technique in which one uses prior knowledge on the nature of a decay to improve the measurement of its observables.
+The fits we are going to perform are of two main types:
 
-* **Geometric Fitting:** We use the fit to determine the decay vertex of the particle. Usually this is done by fitting the tracks of its charged decay products, 
-  which we know originate from a common point.  Additional information could be available and can be added - for example, if the particle is short lived, we can 
-  apply an IP constraint, i.e. fit the beam spot together with the tracks. If there's only one track, this is the only way to obtain a vertex.
+* **Geometric Fitting:** We use the fit to determine the decay vertex of the particle. Usually this is done by fitting together the tracks of its charged decay products, 
+  which we know originate from a common point.  Additional information could be available - for example, if the particle is short lived, we can improve this by adding 
+  an IP constraint, i.e. fit the beam spot together with the tracks. If there's only one track, using the beam spot is the only way to obtain a vertex.
 
 .. warning::
 
@@ -48,10 +48,9 @@ The fits we are going to perform are of two there are two main types of fitting:
    If you apply a mass constraint, the invariant mass will be fixed to the nominal mass. This is problematic if you want then to use this variable, for example
    if you want to fit a peak. In that case, make sure you save the pre-fit mass separately.
   
-.. admonition:: Fitters in basf2
-    :class: key-points
+.. note:: 
 
-    * Several fitters exist. For this exercise we will focus on ``KFit`` which is the most basic one.
+   Several fitters exist. For this exercise we will focus on ``KFit`` which is the most basic one.
 
 .. admonition:: Exercise
      :class: exercise stacked 
@@ -66,7 +65,7 @@ The fits we are going to perform are of two there are two main types of fitting:
 .. admonition:: Solution
      :class: toggle solution
 
-     You can find it here: `Vertex-fitting convenience functions`.
+     You can find it here: `Vertex`.
 
 
 Basic Fitting
@@ -112,11 +111,8 @@ Now suppose you are interested in reconstructing the :math:`B` decay vertex posi
 	  vertex.kFit("J/psi:ee", conf_level=0.0, path=main)
 	  ...
 	  jpsi_ks_vars += vc.vertex + vc.mc_vertex
-
-	  
-     .. note::
-
-         You can also set the confidence level to -1, which means failed fits will be included. The fit p-value is saved as part of mc.vertex.
+     
+     You can also set the confidence level to -1, which means failed fits will be included. The fit p-value is saved as part of mc.vertex.
 
 .. admonition:: Exercise
      :class: exercise stacked

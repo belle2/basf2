@@ -324,11 +324,13 @@ SVD
     outer radius of the vertex detector up to 140 mm.
 
 .. _vxd-description:
+
 VXD
     You will occasionally hear people refer to the pair of detectors: PXD+SVD
     as the VerteX Detector (VXD).
 
 .. _cdc-description:
+
 CDC
     The main tracking system for Belle II is the Central Drift Chamber (CDC).
     It is comprised of so-called sense wires suspended in He-C₂H₆ gas. Charged
@@ -1012,9 +1014,10 @@ uDST (micro Data Summary Table)
   This is the main format for data analysis. It's the
   result of the analysis skim procedure, that selects from the mDST only the few events
   that can be useful for a certain type of analysis (events with a well reconstructed J/psi
-  per example). The content of this format is the same as the mDST, with the addition of the
-  reconstructed particles used in the skimming selection (if you look at the J/psi skim,
-  you will also find a list of J/psi already reconstructed for you in the file).
+  per example). Skimming is described in more detail in the next section.
+  The content of this format is the same as the mDST, with the addition of the
+  reconstructed particles used in the skimming selection (if you look at the :math:`J/\psi` skim,
+  you will also find a list of :math:`J/\psi` already reconstructed for you in the file).
 
 
 .. note::

@@ -17,7 +17,7 @@
 #pragma link C++ class Belle2::SVDEnergyDepositionEvent+; // checksum=0x78e3259d, version=2
 #pragma link C++ class Belle2::SVDNeutronFluxEvent+; // checksum=0x4fa137ca, version=1
 #pragma link C++ class Belle2::SVDOccupancyEvent+; // checksum=0x4e908461, version=2
-#pragma link C++ class Belle2::SVDEventInfo+; // checksum=0x9c36714f, version=1
+#pragma link C++ class Belle2::SVDEventInfo+; // checksum=0x204fcf80, version=2
 
 #pragma link C++ class Belle2::SVDHistograms< TH1F > +; // checksum=0x934fd5c5, version=1
 #pragma link C++ class Belle2::SVDHistograms< TH1D > +; // checksum=0xf778b047, version=1

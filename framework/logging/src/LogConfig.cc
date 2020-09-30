@@ -36,6 +36,7 @@ void LogConfig::setLogLevel(ELogLevel logLevel)
                                               PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__, 0));
     logLevel = c_Error;
   }
+  if (logLevel == c_Debug) Belle2::LogSystem::enableDebug();
   m_logLevel = logLevel;
 }
 

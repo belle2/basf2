@@ -3,7 +3,7 @@
 
 """
 <header>
-<output>ECLClusterOutputBarrel.root</output>
+<output>ECLClusterOutputBarrel_1000MeV.root</output>
 <contact>Elisa Manoni, elisa.manoni@pg.infn.it</contact>
 </header>
 """

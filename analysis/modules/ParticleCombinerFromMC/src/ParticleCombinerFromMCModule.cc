@@ -14,9 +14,6 @@
 // framework aux
 #include <framework/logging/Logger.h>
 
-// dataobjects
-#include <analysis/dataobjects/Particle.h>
-
 // decay descriptor
 #include <analysis/DecayDescriptor/DecayDescriptorParticle.h>
 
@@ -53,9 +50,13 @@ namespace Belle2 {
     addParam("decayString", m_decayString,
              "Input DecayDescriptor string (see :ref:`DecayString`).");
     addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
+    addParam("decayMode", m_decayModeID, "User-specified decay mode identifier (saved in 'decayModeID' extra-info for each Particle)",
+             0);
 
     addParam("writeOut", m_writeOut,
              "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
+    addParam("chargeConjugation", m_chargeConjugation,
+             "If true, the charge-conjugated mode will be reconstructed as well", true);
 
     // initializing the rest of private members
     m_pdgCode   = 0;
@@ -155,7 +156,7 @@ namespace Belle2 {
 
     DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
     particleList.registerInDataStore(flags);
-    if (!isSelfConjugatedParticle) {
+    if (!isSelfConjugatedParticle && m_chargeConjugation) {
       StoreObjPtr<ParticleList> antiParticleList(antiListName);
       antiParticleList.registerInDataStore(flags);
     }
@@ -173,13 +174,11 @@ namespace Belle2 {
     std::string antiListName = ParticleListName::antiParticleListName(listName);
     bool isSelfConjugatedParticle = (listName == antiListName);
 
-    StoreArray<Particle> particles;
-
     StoreObjPtr<ParticleList> outputList(listName);
     outputList.create();
     outputList->initialize(pdgCode, listName);
 
-    if (!isSelfConjugatedParticle) {
+    if (!isSelfConjugatedParticle && m_chargeConjugation) {
       StoreObjPtr<ParticleList> outputAntiList(antiListName);
       outputAntiList.create();
       outputAntiList->initialize(-1 * pdgCode, antiListName);
@@ -220,12 +219,14 @@ namespace Belle2 {
     m_generator = std::make_unique<ParticleGenerator>(decaydescriptor, "");
     m_generator->init();
 
-    while (m_generator->loadNext()) {
+    while (m_generator->loadNext(m_chargeConjugation)) {
       Particle&& particle = m_generator->getCurrentParticle();
 
-      particles.appendNew(particle);
-      int iparticle = particles.getEntries() - 1;
+      Particle* newParticle = m_particles.appendNew(particle);
+      // append to the created particle the user specified decay mode ID
+      newParticle->addExtraInfo("decayModeID", m_decayModeID);
 
+      int iparticle = m_particles.getEntries() - 1;
       outputList->addParticle(iparticle, particle.getPDGCode(), particle.getFlavorType());
     }
 

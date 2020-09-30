@@ -22,6 +22,8 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 // FRAMEWORK
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -73,6 +75,9 @@ namespace Belle2 {
     { return "ECLShowers" ; }
 
     StoreArray<MCParticle> m_mcParticles; /**< MCParticles StoreArray*/
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     // N1 Hypo
     TTree* n1_tree; /**< Root tree and file for saving the output */

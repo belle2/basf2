@@ -61,14 +61,14 @@ namespace Belle2 {
         B2WARNING("Please use isCloneOfSignalSide variable in for_each ROE loop!");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      auto* particleMC = particle->getRelatedTo<MCParticle>();
+      auto* particleMC = particle->getMCParticle();
       if (!particleMC) {
         return 0.0;
       }
       auto* signal = roe->getRelatedFrom<Particle>();
       auto signalFSPs = signal->getFinalStateDaughters();
       for (auto* daughter : signalFSPs) {
-        auto* daughterMC = daughter->getRelatedTo<MCParticle>();
+        auto* daughterMC = daughter->getMCParticle();
         if (daughterMC == particleMC) {
           return 1.0;
         }
@@ -82,12 +82,12 @@ namespace Belle2 {
         B2WARNING("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
         return std::numeric_limits<float>::quiet_NaN();
       }
-      auto* particleMC = particle->getRelatedTo<MCParticle>();
+      auto* particleMC = particle->getMCParticle();
       if (!particleMC) {
         return 0.0;
       }
       auto* signalReco = roe->getRelatedFrom<Particle>();
-      auto* signalMC = signalReco->getRelatedTo<MCParticle>();
+      auto* signalMC = signalReco->getMCParticle();
       MCParticle* ancestorMC = particleMC->getMother();
       while (ancestorMC) {
         if (ancestorMC == signalMC) {
@@ -244,7 +244,7 @@ namespace Belle2 {
 
     double ROE_MC_E(const Particle* particle)
     {
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -259,7 +259,7 @@ namespace Belle2 {
 
     double ROE_MC_P(const Particle* particle)
     {
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -274,7 +274,7 @@ namespace Belle2 {
 
     double ROE_MC_Px(const Particle* particle)
     {
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -290,7 +290,7 @@ namespace Belle2 {
 
     double ROE_MC_Py(const Particle* particle)
     {
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -306,7 +306,7 @@ namespace Belle2 {
 
     double ROE_MC_Pz(const Particle* particle)
     {
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -322,7 +322,7 @@ namespace Belle2 {
 
     double ROE_MC_Pt(const Particle* particle)
     {
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -338,7 +338,7 @@ namespace Belle2 {
 
     double ROE_MC_PTheta(const Particle* particle)
     {
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -354,7 +354,7 @@ namespace Belle2 {
 
     double ROE_MC_M(const Particle* particle)
     {
-      const MCParticle* mcp = particle->getRelated<MCParticle>();
+      const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
         return std::numeric_limits<float>::quiet_NaN();
@@ -381,7 +381,7 @@ namespace Belle2 {
         StoreArray<Particle> particles;
 
         //Get MC Particle of the B meson
-        const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+        const MCParticle* mcParticle = particle->getMCParticle();
 
         if (!mcParticle)
           return std::numeric_limits<float>::quiet_NaN();
@@ -413,7 +413,7 @@ namespace Belle2 {
         auto roeParticles = roe->getParticles(maskName);
         for (auto* roeParticle : roeParticles)
         {
-          auto* mcroeParticle = roeParticle->getRelated<MCParticle>();
+          auto* mcroeParticle = roeParticle->getMCParticle();
           if (mcroeParticle != nullptr) {
             mcROEObjects.insert(mcroeParticle);
           }

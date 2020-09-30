@@ -1,9 +1,10 @@
 .. _onlinebook_basf2:
 
-Work with basf2
-===============
+Working with Belle II software.
+===============================
 
-This chapter contains materials devoted to work with Belle II Analysis Software Framework (basf2).
+This chapter contains lessons designed to get you up-and-running using the 
+Belle II software to perform analysis tasks.
 
 .. toctree::
 

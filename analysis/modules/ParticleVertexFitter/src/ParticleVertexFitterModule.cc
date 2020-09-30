@@ -11,10 +11,6 @@
 // Own include
 #include <analysis/modules/ParticleVertexFitter/ParticleVertexFitterModule.h>
 
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -22,7 +18,6 @@
 
 // dataobjects
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/Btube.h>
 // utilities
 #include <analysis/utility/CLHEPToROOT.h>
@@ -77,6 +72,9 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::initialize()
   {
+    // Particle list with name m_listName has to exist
+    m_plist.isRequired(m_listName);
+
     // magnetic field
     m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
 
@@ -107,13 +105,6 @@ namespace Belle2 {
 
   void ParticleVertexFitterModule::event()
   {
-
-    StoreObjPtr<ParticleList> plist(m_listName);
-    if (!plist) {
-      B2ERROR("ParticleList " << m_listName << " not found");
-      return;
-    }
-
     if (m_vertexFitter == "Rave")
       analysis::RaveSetup::initialize(1, m_Bfield);
 
@@ -136,9 +127,9 @@ namespace Belle2 {
                                        || m_withConstraint == "mother" || m_withConstraint == "iptubecut" || m_withConstraint == "btube"))
       analysis::RaveSetup::getInstance()->setBeamSpot(m_BeamSpotCenter, m_beamSpotCov);
     std::vector<unsigned int> toRemove;
-    unsigned int n = plist->getListSize();
+    unsigned int n = m_plist->getListSize();
     for (unsigned i = 0; i < n; i++) {
-      Particle* particle = plist->getParticle(i);
+      Particle* particle = m_plist->getParticle(i);
       m_hasCovMatrix = false;
       if (m_updateDaughters == true) {
         if (m_decayString.empty()) ParticleCopy::copyDaughters(particle);
@@ -179,7 +170,7 @@ namespace Belle2 {
       if (particle->getPValue() < m_confidenceLevel)
         toRemove.push_back(particle->getArrayIndex());
     }
-    plist->removeParticles(toRemove);
+    m_plist->removeParticles(toRemove);
 
     //free memory allocated by rave. initialize() would be enough, except that we must clean things up before program end...
     if (m_vertexFitter == "Rave")

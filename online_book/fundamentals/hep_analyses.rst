@@ -107,7 +107,9 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
 
     What is the most likely final state for an :math:`e^+e^-` collision at
     10 GeV?
-    What is the cross section?
+    What is its cross section?
+    Also look up the cross section for hadronic events and for
+    :math:`B\bar B` hadronic events.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -120,29 +122,13 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
     Probably you are looking for `this page
     <https://confluence.desy.de/x/AQkWAg>`_.
 
-.. admonition:: Solution :class: toggle solution
+.. admonition:: Solution
+    :class: toggle solution
 
     At around 125 nb, the most probably process is :math:`e^+e^-\to e^+e^-`.
+    The cross section for hadronic events is around 5.8 nb, the cross section
+    for :math:`B\bar B` hadronic events is around 1.1 nb.
 
-.. admonition:: Question
-    :class: exercise stacked
-
-    What is the cross section for hadronic events?
-
-.. admonition:: Solution
-    :class: toggle solution
-
-    About 5.8 nb.
-
-.. admonition:: Question
-    :class: exercise stacked
-
-    What is the cross section for :math:`B\bar B` hadronic events?
-
-.. admonition:: Solution
-    :class: toggle solution
-
-    About 1.1 nb.
 
 We call anything that is not "what you want to analyse": **background**.
 But this is a bit of a sloppy definition.

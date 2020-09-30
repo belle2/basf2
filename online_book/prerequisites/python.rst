@@ -353,6 +353,22 @@ A useful feature to quickly summarize your data is to use the descibe function:
 
   df.describe()
 
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  What are the output rows of ``df.describe``?
+
+.. admonition:: Hint
+  :class: xhint stacked toggle
+
+  No hint here!
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  ``df.describe`` has the great ability to summarize each of your columns/variables. When using it, a table is printed with rows of 'count', 'mean', 'std', 'min', '25%', '50%', '75%' and 'max'.
+   
+
 You can also display the values of the DataFrame sorted by a specific column:
 
 .. code:: ipython3

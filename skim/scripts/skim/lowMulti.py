@@ -13,9 +13,6 @@ import modularAnalysis as ma
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
-from variables import variables as va
-from modularAnalysis import reconstructDecay
-from modularAnalysis import rankByHighest
 
 
 @fancy_skim_header
@@ -145,26 +142,22 @@ class LowMassTwoTrack(BaseSkim):
 @fancy_skim_header
 class SingleTagPseudoScalar(BaseSkim):
     """
-    **Physics channel**:
-    :math:`e^{+}e^{-} \\to  e^{\\pm} (e^{\\mp}) \\pi^{0}/\\eta/\\eta^{\prime}`
+    **Physics channel**: :math:`e^{+}e^{-} \\to  e^{\\pm} (e^{\\mp}) \\pi^{0}/\\eta/\\eta^{\prime}`
 
+    **Decay Modes**
+
+        1. :math:`\\pi^{0}\\to \\gamma \gamma`,
+        2. :math:`\\eta \\to \gamma\\gamma`,
+        3. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
+        4. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
+        5. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \gamma\gamma)`,
+        6. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`
     """
+
     __authors__ = ["Hisaki Hayashii"]
     __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
     __description__ = "A skim script to select events with one high-energy electron and one or more pi0/eta/eta mesons."
     __category__ = "physics, low multiplicity"
-    """
-    **Decay Modes**
-
-    *1      :math:`\\pi^{0}\\to \\gamma \gamma `,
-    *2      :math:`\\eta \\to \gamma\\gamma `,
-    *3      :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
-    *4      :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
-    *5      :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \gamma\gamma)`,
-    *6      :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`,
-
-    **Additional Cuts**
-    """
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

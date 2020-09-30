@@ -577,9 +577,9 @@ You can have subplots:
   fig, axes = plt.subplots(figsize=(10,6))
 
   h = axes.hist(df.B0_mbc[df.B0_isSignal == 1], bins=100, range=(5.2, 5.3), 
-    histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
+                histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
   h = axes.hist(df.B0_mbc[df.B0_isSignal == 0], bins=100, range=(5.2, 5.3), 
-    histtype='step', lw=2, label="Background")
+                histtype='step', lw=2, label="Background")
   axes.legend(loc="best")
   axes.set_xlabel(r"$M_{\mathrm{bc}}$", fontsize=18)
   axes.grid()

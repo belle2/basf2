@@ -492,6 +492,18 @@ this as a boolean value:
   df.B0_isSignal.value_counts()
 
 
+Querying Rows (i.e. making cuts)
+--------------------------------
+
+Finally, arguably the most useful function for your analyses is the ``query`` function. Querying allows one to cut on data using variables and values using a 'cut string'. Within your cut string you can use usual python logic to have many arguments. For example:
+
+.. code:: ipython3
+
+df.query("(B0_mbc>5.2) & (B0_deltae>-1")
+
+.. note::
+  There is a limit to the number of arguments in one query! Can you find it?)
+
 .. admonition:: Exercise
   :class: exercise stacked
 

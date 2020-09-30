@@ -313,6 +313,19 @@ Bremsstrahlung recovery?
 .. admonition:: Exercise
     :class: exercise stacked
 
+    Your steering file should now be complete. Please run it or compare it with the solution.
+
+.. admonition:: Solution
+    :class: solution toggle
+
+    Your steering file should look like this:
+
+    .. literalinclude:: steering_files/035_various_additions.py
+        :linenos:
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
     Plot a histogram of `M` and ``M_uncorrected`` for the correctly reconstructed
     :math:`J/\psi` mesons
 
@@ -406,6 +419,18 @@ random seed.
    decay, after all other selection cuts have been applied.
    As so, make sure to include it **after** you have performed all the other
    cuts in your analysis.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Your steering file should now be complete. Run it or compare it with the
+    solution.
+
+.. admonition:: Solution
+     :class: solution toggle
+
+     .. literalinclude:: steering_files/039_various_additions.py
+       :linenos:
 
 .. admonition:: Extra exercises
    :class: exercise

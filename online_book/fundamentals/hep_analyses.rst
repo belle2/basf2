@@ -162,7 +162,7 @@ background *events* or background *processes*.
 These are relatively easy to reject and can be done in the **trigger** or by 
 rather simple cuts.
 More on this :ref:`later on in this lesson
-<onlinebook_fundamentals_trigger_filter>`_.
+<onlinebook_fundamentals_trigger_filter>`.
 You don't need to worry too much about these if you are doing B physics.
 But these background processes can be important for low-multiplicity analyses.
 
@@ -197,8 +197,8 @@ This background can be suppressed to a certain extent, although many analyses
 leave some part of this background in the data sample as it is relatively 
 straightforward to model and cutting too strictly on contunuum suppression
 variables will hurt signal efficiency at some stage.
-You will have a lesson about :ref:`continuum suppression <onlinebook_cs>`_ and
-:ref:`examples of modelling <onlinebook_fitting>`_ later in these tutorials.
+You will have a lesson about :ref:`continuum suppression <onlinebook_cs>` and
+:ref:`examples of modelling <onlinebook_fitting>` later in these tutorials.
 
 The fourth thing people will refer to as "background" is something rather 
 different.

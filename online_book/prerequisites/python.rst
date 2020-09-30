@@ -150,7 +150,7 @@ not create a python file using bash commands:
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Create a python file, import the python library 'NumPy' as the
+  Create a python file, import the python library `NumPy <https://numpy.org>`_ as the
   shortcut ``np``, and print out the value of π.
 
 .. admonition:: Hint
@@ -218,10 +218,11 @@ Remember that everything you do in your jupyter notebook is an interactive versi
 Pandas Tutorial and Python Data Analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This section aims to answer the question "How can I process tabular data?"
+This section aims to answer the question *"How can I process tabular data?"*
 
 
-We will use the ``root_pandas`` package to read TTrees from ROOT files.
+We will use the `root_pandas <https://github.com/scikit-hep/root_pandas>`_
+package to read TTrees from ROOT files.
 
 Now, the previous sentence may have not been familiar to you at all. If so, read
 on. If not, feel free to skip the next paragraph.
@@ -245,7 +246,7 @@ For when you need help with your root file manipulation:
 Jupyter Notebooks
 -----------------
 
-Jupyter Notebooks are interactive notebooks that allow one to visualise code,
+`Jupyter <https://jupyter.org/>`_ Notebooks are interactive notebooks that allow one to visualise code,
 data and outputs in a linear and clear way. When you run a notebook you have an
 operating system called a kernel that runs the code .   Each block in a jupyter
 notebook is a 'cell'. These cells can be run using the kernel by clicking the
@@ -274,8 +275,8 @@ tools for Python, see `here
 
 
 ``root_pandas`` needs ROOT to be installed but there is an alternative called
-``uproot`` which can load root files into pandas dataframes without requiring
-ROOT.
+`uproot <https://github.com/scikit-hep/uproot>`_ which can load root files into
+pandas dataframes without requiring ROOT.
 
 
 .. admonition:: Exercise
@@ -502,7 +503,7 @@ A short introduction to plotting in python
 ==========================================
 
 In this section we will answer 'How can I plot data?' and demonstrate the
-``matplotlib`` package used to plot in python.
+`matplotlib <https://matplotlib.org>`_ package used to plot in python.
 
 .. code:: ipython3
 

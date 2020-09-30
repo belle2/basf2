@@ -122,7 +122,7 @@ As a script from your terminal:
 
 .. code-block:: bash
 
-  python3 my_script.py # where this file has python commands inside
+  python3 my_script.py  # where this file has python commands inside
 
 Or within a python compiler and interpreter such as Visual Studio or XCode.
 
@@ -175,8 +175,8 @@ not create a python file using bash commands:
 
     # create your .py file and name it as you wish.
     touch my_file.py
-    # open your file to edit it.
-    emacs -nw my_file.py # the argument `-nw` opens the editor in your terminal.
+    # open your file to edit it in your editor of choice, e.g.
+    nano my_file.py
 
   Now add the python lines to your file.
 
@@ -651,9 +651,9 @@ reduce the loaded, chunked file more.
 
   df_list = []
   for chunk in df_chunk:
-    chunk = chunk.query(cut) # Implement our cut!
+    chunk = chunk.query(cut)  # Implement our cut!
     df_list.append(chunk)
-    df = pd.concat(df_list) # Concatenate our chunks into a dataframe!
+    df = pd.concat(df_list)  # Concatenate our chunks into a dataframe!
 
 
 

@@ -215,8 +215,6 @@ class SingleTagPseudoScalar(BaseSkim):
         #    e+:all         : all
         #    e+:good     : electron ID > 0.7, Originating from IP.
         #    e+:highE    : E_lab> 1.5GeV                                       -> nhighEel
-        #    e+:tagged   : E > 1.5 GeV and highest E                      -> nTagged
-        #       nhighEel == 1: No. of high energy electron should be one.
         # ---
         # e+:good
         ma.cutAndCopyList('e+:good', 'e+:all',
@@ -230,11 +228,6 @@ class SingleTagPseudoScalar(BaseSkim):
         # --e+:highE
         ma.cutAndCopyList('e+:highE', 'e+:good', ElectronEcut, path=path)
         va.addAlias('nhighEel', 'nParticlesInList(e+:highE)')
-
-        # -e+:tagged
-        ma.cutAndCopyList('e+:tagged', 'e+:good', ElectronEcut +
-                          ' and egood_pRank==1', path=path)
-        va.addAlias('nTagged', 'nParticlesInList(e+:tagged)')
 
         # --
         # Selection of charged pions
@@ -256,8 +249,6 @@ class SingleTagPseudoScalar(BaseSkim):
         #      gamma:good   : E>0.1 GeV     -> nphoton
         # ---
         #
-        ma.rankByHighest('gamma:all', "clusterE", path=path)
-        va.addAlias('clusterERank', 'extraInfo(clusterE_rank)')
         ma.cutAndCopyList('gamma:good', 'gamma:all', good_cluster, path=path)
         va.addAlias('nphoton', 'nParticlesInList(gamma:good)')
 
@@ -267,11 +258,8 @@ class SingleTagPseudoScalar(BaseSkim):
         #     pi0:loose        : 0.08 < <Mgg  < 0.17
         #     pi0:highE        : E_pi0  > 0.5 GeV
         # --
-        ma.cutAndCopyList('gamma:first', 'gamma:good', good_cluster, path=path)
-        ma.cutAndCopyList('gamma:second', 'gamma:good', good_cluster,
-                          path=path)
         #
-        ma.reconstructDecay('pi0:loose -> gamma:first gamma:second',
+        ma.reconstructDecay('pi0:loose -> gamma:good gamma:good',
                             pi0_mass_wide, dmID=1, path=path)
         ma.rankByHighest('pi0:loose', "p", path=path)
         va.addAlias('pi0_p_Rank', 'extraInfo(p_rank)')
@@ -288,7 +276,7 @@ class SingleTagPseudoScalar(BaseSkim):
         # --
         # mode = 2
         # --
-        ma.reconstructDecay('eta:gg -> gamma:first gamma:second',
+        ma.reconstructDecay('eta:gg -> gamma:good gamma:good',
                             eta_mass_wide, dmID=2, path=path)
         va.addAlias('nmode2', 'nParticlesInList(eta:gg)')
         # ---

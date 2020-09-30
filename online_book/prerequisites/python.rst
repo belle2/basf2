@@ -237,8 +237,9 @@ the particle you've stored in your tree --- for example, the :math:`B` meson's
 invariant mass, it's daughter's momentum, it's great-great-granddaughter's
 cluster energy etc. etc. etc.
 
-More information:`CERN's ROOT <https://root.cern.ch/>`
-For when you need help with your root file manipulation: `CERN's ROOT Forum <https://root-forum.cern.ch/>`
+More information:`CERN's ROOT <https://root.cern.ch/>`_
+For when you need help with your root file manipulation:
+`CERN's ROOT Forum <https://root-forum.cern.ch/>`_
 
 Jupyter Notebooks
 -----------------
@@ -268,7 +269,7 @@ using the ``root_pandas`` library.
 
 Pandas provides high-performance, easy-to-use data structures and data analysis
 tools for Python, see `here
-<https://pandas.pydata.org/docs/user_guide/10min.html>`.
+<https://pandas.pydata.org/docs/user_guide/10min.html>`_.
 
 
 ``root_pandas`` needs ROOT to be installed but there is an alternative called

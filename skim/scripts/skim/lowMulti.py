@@ -14,6 +14,8 @@ from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as va
+from modularAnalysis import reconstructDecay
+from modularAnalysis import rankByHighest
 
 
 @fancy_skim_header
@@ -210,10 +212,10 @@ class SingleTagPseudoScalar(BaseSkim):
         #  Selection of tagged electron/positron.
         #
         #   particle-list:
-        #    e+:all      : all
-        #    e+:good     : electron ID > 0.7,Originating from IP.
+        #    e+:all         : all
+        #    e+:good     : electron ID > 0.7, Originating from IP.
         #    e+:highE    : E_lab> 1.5GeV                                       -> nhighEel
-        #    e+:tagged   : E >1.5 GeV and highest E                      -> nTagged
+        #    e+:tagged   : E > 1.5 GeV and highest E                      -> nTagged
         #       nhighEel == 1: No. of high energy electron should be one.
         # ---
         # e+:good

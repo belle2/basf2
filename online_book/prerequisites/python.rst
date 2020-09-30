@@ -114,8 +114,9 @@ python. Either interactively from your terminal:
 .. code-block:: bash
 
   python3
-  >>> import numpy
-  >>> print(numpy.pi)
+
+>>> import numpy
+>>> print(numpy.pi)
 
 As a script from your terminal:
 
@@ -133,7 +134,7 @@ The official recommended version of python is python3. Python2 is no longer supp
 
 OR you could perform this in a live python session, either in your terminal or in a jupyter notebook using:
 
-.. code-block:: bash
+.. code:: ipython3
 
   from platform import python_version
   print(python_version())

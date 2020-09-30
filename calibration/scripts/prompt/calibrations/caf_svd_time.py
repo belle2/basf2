@@ -232,7 +232,7 @@ def create_pre_collector_path(clusterizers):
     path = create_path()
 
     # unpack raw data to do the tracking
-    # raw.add_unpackers(path, components=['PXD', 'SVD', 'CDC'])
+    raw.add_unpackers(path, components=['PXD', 'SVD', 'CDC'])
 
     # proceed only if we acquired 6-sample strips
     skim6SampleEvents = register_module("SVD6SampleEventSkim")

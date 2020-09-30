@@ -302,7 +302,8 @@ You can load in an example dataframe using the ``read_root`` function from the `
 .. code:: ipython3
 
   # Loading an example data frame
-  df = root_pandas.read_root("https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root")
+  file_path = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
+  df = root_pandas.read_root(file_path)
 
 This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe ``df``.
 

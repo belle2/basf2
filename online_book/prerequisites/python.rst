@@ -305,7 +305,7 @@ You can load in an example dataframe using the ``read_root`` function from the `
   file_path = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
   df = root_pandas.read_root(file_path)
 
-This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe ``df``.
+This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe ``df``. You are welcome to import your own root files, but be aware that the variables and outputs will appear differently to this tutorial.
 
 
 
@@ -373,12 +373,12 @@ Finally, everyone who works with numpy and pandas will at some point try to use 
 .. admonition:: Hint
   :class: xhint stacked toggle
 
-  Try it out in your jupyter notebook. To understand the output, the internet is once again your friend.
+  Try it out in your jupyter notebook. To understand the output the internet is, once again, your friend.
 
 .. admonition:: Solution
   :class: solution toggle
 
-  The output comes in the form of a tuple (a finite ordered list (sequence) of elements). For example, one output could be ``(15540523, 20)``, which is saying you have a dataframe of 15540523 rows, and 20 columns. 
+  The output comes in the form of a tuple (a finite ordered list (or sequence) of elements). For example, one output could be ``(15540523, 20)``, which is saying you have a dataframe of 15540523 rows, and 20 columns. 
 
 
 
@@ -413,7 +413,7 @@ Multiple columns can be selected by passing an array of columns:
 
   df[['B0_mbc', 'B0_M', 'B0_deltae', 'B0_isSignal']].describe()
 
-We can assign the subset to a variable
+We can assign this subset of our original dataframe to a new variable
 
 .. code:: ipython3
 
@@ -496,16 +496,24 @@ this as a boolean value:
   :class: exercise stacked
 
   Create two DataFrames, one for Signal and one for Background only
-  containing ``B0_mbc``, ``B0_M`` and ``B0_deltae`` columns. Split between
-  signal and background using the ``B0_isSignal`` column.
+  containing ``B0_mbc``, ``B0_M``, ``B0_isSignal`` and ``B0_deltae`` columns. 
+
+.. admonition:: Hint
+  :class: xhint stacked toggle
+
+  Split between signal and background using the ``B0_isSignal`` column.
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  .. code:: ipython3
+    bkgd_df = df.query("(B0_isSignal==0)")["B0_mbc", "B0_M", "B0_isSignal","B0_deltae"]
+    signal_df = df.query("(B0_isSignal==1)")["B0_mbc", "B0_M", "B0_isSignal","B0_deltae"]
 
 
 
 
-
-
-
-Grouped Operations
+Grouped Operations: a quick note
 ------------------
 
 One of the most powerful features of pandas is the ``groupby`` operation. This

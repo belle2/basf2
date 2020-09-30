@@ -522,7 +522,8 @@ distributions. This time we use the ``root_pandas`` package to read the data
 
 .. code:: ipython3
 
-  df = root_pandas.read_root("https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root").astype(float)
+  fileₚath = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
+  df = root_pandas.read_root(fileₚath).astype(float)
   df.B0_isSignal = df.B0_isSignal.astype(bool)
   df.describe()
 
@@ -602,8 +603,10 @@ the columns and supply the dataframe as ``data=`` argument
 .. code:: ipython3
 
   fig, axes = plt.subplots(1,2, figsize=(20,10))
-  axes[0].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)], data=df[df.B0_isSignal], bins=50);
-  axes[1].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)], data=df[~df.B0_isSignal], bins=50, cmap="magma");
+  axes[0].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)],
+                 data=df[df.B0_isSignal], bins=50);
+  axes[1].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)],
+                 data=df[~df.B0_isSignal], bins=50, cmap="magma");
 
 
 
@@ -643,7 +646,8 @@ to be included in the following string:
 
   .. code:: ipython3
 
-    df_chunk=root_pandas.read_root(["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"], 'Y4S', columns=Y4S_columns, chunksize=100000)
+    files = ["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"]
+    df_chunk=root_pandas.read_root(files, 'Y4S', columns=Y4S_columns, chunksize=100000)
 
 Now the data is loaded as chunks, we 'loop' over or run through all the chunks
 and piece them together. This is the point at which we can add our cuts to

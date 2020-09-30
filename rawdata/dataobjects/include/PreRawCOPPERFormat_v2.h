@@ -1,16 +1,16 @@
 //+
-// File : PreRawCOPPERFormat_latest.h
+// File : PreRawCOPPERFormat_v2.h
 // Description : Module to handle raw data from COPPER
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
-#ifndef PRERAWCOPPERFORMAT_LATEST_H
-#define PRERAWCOPPERFORMAT_LATEST_H
+#ifndef PRERAWCOPPERFORMAT_V2_H
+#define PRERAWCOPPERFORMAT_V2_H
 
 // Includes
-#include <rawdata/dataobjects/PostRawCOPPERFormat_latest.h>
+#include <rawdata/dataobjects/PostRawCOPPERFormat_v2.h>
 #include <rawdata/CRCCalculator.h>
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
@@ -23,15 +23,15 @@ namespace Belle2 {
    * This class stores data received by COPPER via belle2linkt
    * Data from all detectors except PXD are stored in this class
    */
-  class PreRawCOPPERFormat_latest : public RawCOPPERFormat_latest {
+  class PreRawCOPPERFormat_v2 : public RawCOPPERFormat_v2 {
   public:
     //! Default constructor
-    PreRawCOPPERFormat_latest();
+    PreRawCOPPERFormat_v2();
 
     //! Constructor using existing pointer to raw data buffer
-    //PreRawCOPPERFormat_latest(int* bufin, int nwords);
+    //PreRawCOPPERFormat_v2(int* bufin, int nwords);
     //! Destructor
-    virtual ~PreRawCOPPERFormat_latest();
+    virtual ~PreRawCOPPERFormat_v2();
 
     //
     // Get position of or pointer to data
@@ -46,6 +46,21 @@ namespace Belle2 {
     /* cppcheck-suppress missingOverride */
     int GetDetectorNwords(int n, int finesse_num) OVERRIDE_CPP17;
 
+    //! get Detector buffer of slot A
+    /* cppcheck-suppress missingOverride */
+    int* Get1stDetectorBuffer(int n) OVERRIDE_CPP17;
+
+    //! get Detector Buffer of slot B
+    /* cppcheck-suppress missingOverride */
+    int* Get2ndDetectorBuffer(int n) OVERRIDE_CPP17;
+
+    //! get Detector Buffer of slot C
+    /* cppcheck-suppress missingOverride */
+    int* Get3rdDetectorBuffer(int n) OVERRIDE_CPP17;
+
+    //! get Detector Buffer of slot D
+    /* cppcheck-suppress missingOverride */
+    int* Get4thDetectorBuffer(int n) OVERRIDE_CPP17;
     ///////////////////////////////////////////////////////////////////////////////////////
 
     //! get posistion of COPPER block in unit of word
@@ -57,6 +72,14 @@ namespace Belle2 {
     //! get COPPER counter(not event number)
     /* cppcheck-suppress missingOverride */
     unsigned int GetCOPPERCounter(int n) OVERRIDE_CPP17;
+
+    //! get # of offset words for FINESSE slot A buffer position
+    /* cppcheck-suppress missingOverride */
+    int GetOffset1stFINESSE(int n) OVERRIDE_CPP17;
+
+    //! get data size of  FINESSE buffer
+    /* cppcheck-suppress missingOverride */
+    int GetFINESSENwords(int n, int finesse) OVERRIDE_CPP17;
 
     //
     // Get information from "B2link(attached by FEE and HLSB) header"
@@ -152,16 +175,49 @@ namespace Belle2 {
                          int* detector_buf_4th, int nwords_4th,
                          RawCOPPERPackerInfo rawcprpacker_info) OVERRIDE_CPP17;
 
-    //! Pack data (format ver. = -1 -> Select the latest format version)
-    /* cppcheck-suppress missingOverride */
-    int* PackDetectorBuf(int* packed_buf_nwords,
-                         int* const(&detector_buf_ch)[MAX_PCIE40_CH],
-                         int const(&nwords_ch)[MAX_PCIE40_CH],
-                         RawCOPPERPackerInfo rawcpr_info) OVERRIDE_CPP17;
+    //! Copy one datablock to buffer
 
-    //! Get a pointer to detector buffer
-    /* cppcheck-suppress missingOverride */
-    int* GetDetectorBuffer(int n, int finesse_num) OVERRIDE_CPP17;
+
+    //
+    // size of "COPPER front header" and "COPPER trailer"
+    //
+    //! Copper data words = ( total_data_length in COPPER header ) + COPPER_HEADER_TRAILER_NWORDS
+    enum {
+      SIZE_COPPER_DRIVER_HEADER = 7,
+      SIZE_COPPER_DRIVER_TRAILER = 2
+    };
+
+    //
+    // Data Format : "COPPER header"
+    //
+    enum {
+      POS_MAGIC_COPPER_1 = 0,
+      POS_EVE_NUM_COPPER = 1,
+      POS_SUBSYSTEM_ID = 2,
+      POS_CRATE_ID = 3,
+      POS_SLOT_ID = 4,
+      POS_MAGIC_COPPER_2 = 7,
+      POS_DATA_LENGTH = 8,
+      POS_CH_A_DATA_LENGTH = 9,
+      POS_CH_B_DATA_LENGTH = 10,
+      POS_CH_C_DATA_LENGTH = 11,
+      POS_CH_D_DATA_LENGTH = 12,
+
+      SIZE_COPPER_HEADER = 13
+    };
+
+
+
+    //
+    // Data Format : "COPPER Trailer"
+    //
+    enum {
+      POS_MAGIC_COPPER_3 = 0,
+      POS_CHKSUM_COPPER = 1,
+      POS_MAGIC_COPPER_4 = 2,
+
+      SIZE_COPPER_TRAILER = 3
+    };
 
     //
     // Data Format : "B2Link HSLB Header"
@@ -202,6 +258,19 @@ namespace Belle2 {
       SIZE_B2LHSLB_TRAILER = 1
     };
 
+
+
+    //
+    // COPPER magic words
+    //
+    enum {
+      COPPER_MAGIC_DRIVER_HEADER = 0x7FFF0008,
+      COPPER_MAGIC_FPGA_HEADER = 0xFFFFFAFA,
+      COPPER_MAGIC_FPGA_TRAILER = 0xFFFFF5F5,
+      COPPER_MAGIC_DRIVER_TRAILER = 0x7FFF0009
+    };
+
+
     //
     // magic words attached by HSLB
     //
@@ -211,16 +280,72 @@ namespace Belle2 {
     };
 
     //! data fromat after size reduction
-    PostRawCOPPERFormat_latest m_reduced_rawcpr; //! not record
+    PostRawCOPPERFormat_v2 m_reduced_rawcpr; //! not record
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
-    //    ClassDefOverride(PreRawCOPPERFormat_latest, 2);
+    //    ClassDefOverride(PreRawCOPPERFormat_v2, 2);
 
   };
 
 
-  inline int* PreRawCOPPERFormat_latest::GetExpRunSubrunBuf(int n)
+  inline int PreRawCOPPERFormat_v2::GetOffset1stFINESSE(int n)
+  {
+    int pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+    return pos_nwords;
+  }
+
+
+
+  inline int* PreRawCOPPERFormat_v2::Get1stDetectorBuffer(int n)
+  {
+#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+    CheckB2LFEEHeaderVersion(n);
+#endif
+    if (Get1stFINESSENwords(n) > 0) {
+      int pos_nwords = GetOffset1stFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+      return &(m_buffer[ pos_nwords ]);
+    }
+    return NULL;
+  }
+
+  inline int* PreRawCOPPERFormat_v2::Get2ndDetectorBuffer(int n)
+  {
+#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+    CheckB2LFEEHeaderVersion(n);
+#endif
+    if (Get2ndFINESSENwords(n) > 0) {
+      int pos_nwords = GetOffset2ndFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+      return &(m_buffer[ pos_nwords ]);
+    }
+    return NULL;
+  }
+
+  inline int* PreRawCOPPERFormat_v2::Get3rdDetectorBuffer(int n)
+  {
+#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+    CheckB2LFEEHeaderVersion(n);
+#endif
+    if (Get3rdFINESSENwords(n) > 0) {
+      int pos_nwords = GetOffset3rdFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+      return &(m_buffer[ pos_nwords ]);
+    }
+    return NULL;
+  }
+
+  inline int* PreRawCOPPERFormat_v2::Get4thDetectorBuffer(int n)
+  {
+#ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
+    CheckB2LFEEHeaderVersion(n);
+#endif
+    if (Get4thFINESSENwords(n) > 0) {
+      int pos_nwords = GetOffset4thFINESSE(n) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER;
+      return &(m_buffer[ pos_nwords ]);
+    }
+    return NULL;
+  }
+
+  inline int* PreRawCOPPERFormat_v2::GetExpRunSubrunBuf(int n)
   {
 #ifdef USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
     CheckB2LFEEHeaderVersion(n);
@@ -231,27 +356,19 @@ namespace Belle2 {
 
 
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetMagicDriverHeader(int n)
+  inline unsigned int PreRawCOPPERFormat_v2::GetMagicDriverHeader(int n)
   {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-    B2FATAL(err_buf);
-    return 0;
+    int pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + POS_MAGIC_COPPER_1;
+    return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetMagicFPGAHeader(int n)
+  inline unsigned int PreRawCOPPERFormat_v2::GetMagicFPGAHeader(int n)
   {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-    B2FATAL(err_buf);
-    return 0;
+    int pos_nwords = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS + POS_MAGIC_COPPER_2;
+    return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetMagicFPGATrailer(int n)
+  inline unsigned int PreRawCOPPERFormat_v2::GetMagicFPGATrailer(int n)
   {
     int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() - 3;
 
@@ -260,14 +377,14 @@ namespace Belle2 {
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetMagicDriverTrailer(int n)
+  inline unsigned int PreRawCOPPERFormat_v2::GetMagicDriverTrailer(int n)
   {
     int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() - 1;
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetDriverChkSum(int n)
+  inline unsigned int PreRawCOPPERFormat_v2::GetDriverChkSum(int n)
   {
     int pos_nwords = GetBufferPos(n) + GetBlockNwords(n)
                      - tmp_trailer.RAWTRAILER_NWORDS - SIZE_COPPER_DRIVER_TRAILER;
@@ -275,40 +392,19 @@ namespace Belle2 {
   }
 
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetCOPPERCounter(int n)
+  inline unsigned int PreRawCOPPERFormat_v2::GetCOPPERCounter(int n)
   {
-    char err_buf[500];
-    sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] %s\n", err_buf);
-    B2FATAL(err_buf);
-    return 0;
+    int pos_nwords = GetBufferPos(n) + POS_EVE_NUM_COPPER + tmp_header.RAWHEADER_NWORDS;
+    return (unsigned int)(m_buffer[ pos_nwords ]);
   }
 
-  inline unsigned int PreRawCOPPERFormat_latest::GetTrailerChksum(int  n)
+
+
+
+  inline unsigned int PreRawCOPPERFormat_v2::GetTrailerChksum(int  n)
   {
     int pos_nwords = GetBufferPos(n) + GetBlockNwords(n) - tmp_trailer.GetTrlNwords() + tmp_trailer.POS_CHKSUM;
     return (unsigned int)(m_buffer[ pos_nwords ]);
   }
-
-  inline int* PreRawCOPPERFormat_latest::GetDetectorBuffer(int n, int finesse_num)
-  {
-    if (GetFINESSENwords(n, finesse_num) > 0) {
-      return (GetFINESSEBuffer(n, finesse_num) + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER);
-    }
-    return NULL;
-  }
-
-  inline int PreRawCOPPERFormat_latest::GetDetectorNwords(int n, int finesse_num)
-  {
-    int nwords = 0;
-    if (GetFINESSENwords(n, finesse_num) > 0) {
-      nwords = GetFINESSENwords(n, finesse_num)
-               - (SIZE_B2LHSLB_HEADER + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
-    }
-    return nwords;
-  }
-
-
 }
 #endif

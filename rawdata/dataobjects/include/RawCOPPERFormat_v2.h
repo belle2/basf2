@@ -1,18 +1,18 @@
 //+
-// File : RawCOPPERFormat_v1.h
+// File : RawCOPPERFormat_v2.h
 // Description : Module to handle raw data from COPPER
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
-#ifndef RAWCOPPERFORMAT_V1_H
-#define RAWCOPPERFORMAT_V1_H
+#ifndef RAWCOPPERFORMAT_V2_H
+#define RAWCOPPERFORMAT_V2_H
 
 // Includes
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
-#include <rawdata/dataobjects/RawHeader_v1.h>
-#include <rawdata/dataobjects/RawTrailer_v1.h>
+#include <rawdata/dataobjects/RawHeader_v2.h>
+#include <rawdata/dataobjects/RawTrailer_v2.h>
 #include <rawdata/CRCCalculator.h>
 
 /* #include <framework/datastore/DataStore.h> */
@@ -28,15 +28,16 @@ namespace Belle2 {
    * This class stores data received by COPPER via belle2linkt
    * Data from all detectors except PXD are stored in this class
    */
-  class RawCOPPERFormat_v1 : public RawCOPPERFormat {
+
+  class RawCOPPERFormat_v2 : public RawCOPPERFormat {
   public:
     //! Default constructor
-    RawCOPPERFormat_v1();
+    RawCOPPERFormat_v2();
 
     //! Constructor using existing pointer to raw data buffer
-    //RawCOPPERFormat_v1(int* bufin, int nwords);
+    //RawCOPPERFormat_v2(int* bufin, int nwords);
     //! Destructor
-    virtual ~RawCOPPERFormat_v1();
+    virtual ~RawCOPPERFormat_v2();
 
     //
     // Get position of or pointer to data
@@ -70,7 +71,7 @@ namespace Belle2 {
     int* GetRawTrlBufPtr(int n) OVERRIDE_CPP17;
 
     //
-    // Get information from "RawCOPPERFormat_v1 header" attached by DAQ software
+    // Get information from "RawCOPPERFormat_v2 header" attached by DAQ software
     //
 
     /* cppcheck-suppress missingOverride */
@@ -101,6 +102,14 @@ namespace Belle2 {
     //! Add Detected Error bitflag
     /* cppcheck-suppress missingOverride */
     void AddErrorBitFlag(int n, unsigned int error_bit_flag) OVERRIDE_CPP17;
+
+    //! check CRC packet Error
+    /* cppcheck-suppress missingOverride */
+    int GetPacketCRCError(int n) OVERRIDE_CPP17;
+
+    //! check CRC event Error
+    /* cppcheck-suppress missingOverride */
+    int GetEventCRCError(int n) OVERRIDE_CPP17;
 
     //! get node-ID from data
     /* cppcheck-suppress missingOverride */
@@ -172,25 +181,25 @@ namespace Belle2 {
 
     /// Format version number
     enum {
-      DATA_FORMAT_VERSION = 1
+      DATA_FORMAT_VERSION = 2
     };
 
     //! header ( not recorded )
-    RawHeader_v1 tmp_header;
+    RawHeader_v2 tmp_header;
 
     //! trailer ( not recorded )
-    RawTrailer_v1 tmp_trailer;
+    RawTrailer_v2 tmp_trailer;
 
 
   protected :
     ///ver.2 Change FEE format as presented at B2GM in Nov.2013 ( Nov.20, 2013)
-    //    ClassDefOverride(RawCOPPERFormat_v1, 2);
+    //    ClassDefOverride(RawCOPPERFormat_v2, 2);
   };
 
 
 
 
-  inline int* RawCOPPERFormat_v1::GetRawTrlBufPtr(int n)
+  inline int* RawCOPPERFormat_v2::GetRawTrlBufPtr(int n)
   {
     int pos_nwords;
     if (n == (m_num_events * m_num_nodes) - 1) {
@@ -201,148 +210,164 @@ namespace Belle2 {
     return &(m_buffer[ pos_nwords ]);
   }
 
-  inline int RawCOPPERFormat_v1::GetExpNo(int n)
+  inline int RawCOPPERFormat_v2::GetExpNo(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetExpNo();
   }
 
-  inline unsigned int RawCOPPERFormat_v1::GetExpRunSubrun(int n)
+
+  inline unsigned int RawCOPPERFormat_v2::GetExpRunSubrun(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetExpRunSubrun();
   }
 
-  inline int RawCOPPERFormat_v1::GetRunNo(int n)
+
+  inline int RawCOPPERFormat_v2::GetRunNo(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetRunNo();
   }
 
 
-  inline int RawCOPPERFormat_v1::GetSubRunNo(int n)
+  inline int RawCOPPERFormat_v2::GetSubRunNo(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetSubRunNo();
   }
 
-  inline unsigned int RawCOPPERFormat_v1::GetEveNo(int n)
+  inline unsigned int RawCOPPERFormat_v2::GetEveNo(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetEveNo();
   }
 
 
-  inline unsigned int RawCOPPERFormat_v1::GetNodeID(int n)
+  inline unsigned int RawCOPPERFormat_v2::GetNodeID(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetNodeID();
   }
 
 
-  inline int RawCOPPERFormat_v1::GetDataType(int n)
+  inline int RawCOPPERFormat_v2::GetDataType(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetDataType();
   }
 
-  inline int RawCOPPERFormat_v1::GetTruncMask(int n)
+  inline int RawCOPPERFormat_v2::GetTruncMask(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetTruncMask();
   }
 
-  inline unsigned int RawCOPPERFormat_v1::GetErrorBitFlag(int n)
+  inline unsigned int RawCOPPERFormat_v2::GetErrorBitFlag(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetErrorBitFlag();
   }
 
-  inline void RawCOPPERFormat_v1::AddErrorBitFlag(int n, unsigned int error_bit_flag)
+  inline void RawCOPPERFormat_v2::AddErrorBitFlag(int n, unsigned int error_bit_flag)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     tmp_header.AddErrorBitFlag(error_bit_flag);
     return;
   }
 
-  inline int RawCOPPERFormat_v1::Get1stDetectorNwords(int n)
+  inline int RawCOPPERFormat_v2::GetPacketCRCError(int n)
+  {
+    tmp_header.SetBuffer(GetBuffer(n));
+    return tmp_header.GetPacketCRCError();
+  }
+
+  inline int RawCOPPERFormat_v2::GetEventCRCError(int n)
+  {
+    tmp_header.SetBuffer(GetBuffer(n));
+    return tmp_header.GetEventCRCError();
+  }
+
+
+  inline int RawCOPPERFormat_v2::Get1stDetectorNwords(int n)
   {
     return GetDetectorNwords(n, 0);
   }
 
-  inline int RawCOPPERFormat_v1::Get2ndDetectorNwords(int n)
+  inline int RawCOPPERFormat_v2::Get2ndDetectorNwords(int n)
   {
     return GetDetectorNwords(n, 1);
   }
 
-  inline int RawCOPPERFormat_v1::Get3rdDetectorNwords(int n)
+  inline int RawCOPPERFormat_v2::Get3rdDetectorNwords(int n)
   {
     return GetDetectorNwords(n, 2);
   }
 
-  inline int RawCOPPERFormat_v1::Get4thDetectorNwords(int n)
+  inline int RawCOPPERFormat_v2::Get4thDetectorNwords(int n)
   {
     return GetDetectorNwords(n, 3);
   }
 
 
 
-  inline int RawCOPPERFormat_v1::Get1stFINESSENwords(int n)
+  inline int RawCOPPERFormat_v2::Get1stFINESSENwords(int n)
   {
     return GetFINESSENwords(n, 0);
   }
 
-  inline int RawCOPPERFormat_v1::Get2ndFINESSENwords(int n)
+  inline int RawCOPPERFormat_v2::Get2ndFINESSENwords(int n)
   {
     return GetFINESSENwords(n, 1);
   }
 
-  inline int RawCOPPERFormat_v1::Get3rdFINESSENwords(int n)
+  inline int RawCOPPERFormat_v2::Get3rdFINESSENwords(int n)
   {
     return GetFINESSENwords(n, 2);
   }
 
-  inline int RawCOPPERFormat_v1::Get4thFINESSENwords(int n)
+  inline int RawCOPPERFormat_v2::Get4thFINESSENwords(int n)
   {
     return GetFINESSENwords(n, 3);
   }
 
 
 
-  inline unsigned int RawCOPPERFormat_v1::GetTTCtimeTRGType(int n)
+  inline unsigned int RawCOPPERFormat_v2::GetTTCtimeTRGType(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetTTCtimeTRGType();
   }
 
-  inline unsigned int RawCOPPERFormat_v1::GetTTUtime(int n)
+  inline unsigned int RawCOPPERFormat_v2::GetTTUtime(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetTTUtime();
   }
 
-  inline int RawCOPPERFormat_v1::GetTTCtime(int n)
+  inline int RawCOPPERFormat_v2::GetTTCtime(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetTTCtime();
   }
 
-  inline int RawCOPPERFormat_v1::GetTRGType(int n)
+  inline int RawCOPPERFormat_v2::GetTRGType(int n)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     return tmp_header.GetTRGType();
   }
 
-  inline void RawCOPPERFormat_v1::GetTTTimeVal(int n, struct timeval* tv)
+  inline void RawCOPPERFormat_v2::GetTTTimeVal(int n, struct timeval* tv)
   {
     tmp_header.SetBuffer(GetBuffer(n));
     tmp_header.GetTTTimeVal(tv);
     return ;
   }
 
-  inline int RawCOPPERFormat_v1::GetMaxNumOfCh(int  n)
+  inline int RawCOPPERFormat_v2::GetMaxNumOfCh(int  n)
   {
     return MAX_COPPER_CH;
   }
+
 }
 #endif

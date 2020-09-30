@@ -1,13 +1,13 @@
 //+
-// File : RawTrailer_latest.cc
+// File : RawTrailer_v2.cc
 // Description : Module to handle RawTraeiler attached to raw data from COPPER
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
-#ifndef RAWTRAILER_LATEST_H
-#define RAWTRAILER_LATEST_H
+#ifndef RAWTRAILER_V2_H
+#define RAWTRAILER_V2_H
 
 #include <stdio.h>
 
@@ -26,14 +26,14 @@ namespace Belle2 {
    * This class defines the format of the trailer of RawCOPPER class data
    * and used for extracting trailer info from RawCOPPER object
    */
-  //  class RawTrailer_latest : public TObject {
-  class RawTrailer_latest {
+  //  class RawTrailer_v2 : public TObject {
+  class RawTrailer_v2 {
   public:
     //! Default constructor
-    RawTrailer_latest();
+    RawTrailer_v2();
 
     //! Destructor
-    ~RawTrailer_latest();
+    ~RawTrailer_v2();
 
     //! set buffer
     void CheckBuffer(); //! set buffer
@@ -55,7 +55,7 @@ namespace Belle2 {
     int GetMagicWord(); //! Get magic word
 
     enum {
-      RAWTRAILER_NWORDS = 4
+      RAWTRAILER_NWORDS = 2
     };
 
     enum {
@@ -63,69 +63,67 @@ namespace Belle2 {
     };
 
     enum {
-      POS_ERROR_BIT_CH1 = 0,
-      POS_ERROR_CH2 = 1,
-      POS_CHKSUM = 2,
-      POS_TERM_WORD = 3
+      POS_CHKSUM = 0,
+      POS_TERM_WORD = 1
     };
 
   private:
-    //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer_latest )
+    //! do not record buffer ( RawCOPPER includes buffer of RawHeader and RawTrailer_v2 )
     int* m_buffer; //! do not record
 
     /// To derive from TObject
     // ver.2 Do not record m_buffer pointer. (Dec.19, 2014)
-    //    ClassDef(RawTrailer_latest, 1);
+    //    ClassDef(RawTrailer_v2, 1);
   };
 
 
-  inline void RawTrailer_latest::CheckBuffer()
+  inline void RawTrailer_v2::CheckBuffer()
   {
     if (m_buffer == NULL) {
       B2FATAL("m_buffer is NULL. Exiting...");
     }
   }
 
-  inline int* RawTrailer_latest::GetBuffer()
+  inline int* RawTrailer_v2::GetBuffer()
   {
     return m_buffer;
   }
 
-  inline void RawTrailer_latest::SetBuffer(int* bufin)
+  inline void RawTrailer_v2::SetBuffer(int* bufin)
   {
     m_buffer = bufin;
   }
 
-  inline void RawTrailer_latest::Initialize()
+  inline void RawTrailer_v2::Initialize()
   {
     SetMagicWord();
   }
 
-  inline void RawTrailer_latest::SetChksum(int chksum)
+  inline void RawTrailer_v2::SetChksum(int chksum)
   {
     CheckBuffer();
     m_buffer[ POS_CHKSUM ] = chksum;
   }
 
-  inline void RawTrailer_latest::SetMagicWord()
+  inline void RawTrailer_v2::SetMagicWord()
   {
     CheckBuffer();
     m_buffer[ POS_TERM_WORD ] = MAGIC_WORD_TERM_TRAILER;
   }
 
-  inline int RawTrailer_latest::GetMagicWord()
+  inline int RawTrailer_v2::GetMagicWord()
   {
     CheckBuffer();
     return m_buffer[ POS_TERM_WORD ];
   }
 
-  inline unsigned int RawTrailer_latest::GetChksum()
+  inline unsigned int RawTrailer_v2::GetChksum()
   {
     CheckBuffer();
     return (unsigned int)(m_buffer[ POS_CHKSUM ]);
   }
 
-  inline int RawTrailer_latest::GetTrlNwords()
+  inline int RawTrailer_v2::GetTrlNwords()
   {
     return RAWTRAILER_NWORDS;
   }

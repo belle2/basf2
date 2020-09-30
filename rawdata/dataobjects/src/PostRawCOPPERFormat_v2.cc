@@ -1,12 +1,12 @@
 //+
-// File : RawCOPPERFormat_latest.cc
+// File : RawCOPPERFormat_v2.cc
 // Description : Module to handle raw data from COPPER.
 //
 // Author : Satoru Yamada, IPNS, KEK
 // Date : 2 - Aug - 2013
 //-
 
-#include <rawdata/dataobjects/PostRawCOPPERFormat_latest.h>
+#include <rawdata/dataobjects/PostRawCOPPERFormat_v2.h>
 
 
 using namespace std;
@@ -14,17 +14,29 @@ using namespace Belle2;
 
 //#define DESY
 //#define NO_ERROR_STOP
-//ClassImp(PostRawCOPPERFormat_latest);
+//ClassImp(PostRawCOPPERFormat_v2);
 
-PostRawCOPPERFormat_latest::PostRawCOPPERFormat_latest()
+PostRawCOPPERFormat_v2::PostRawCOPPERFormat_v2()
 {
 }
 
-PostRawCOPPERFormat_latest::~PostRawCOPPERFormat_latest()
+PostRawCOPPERFormat_v2::~PostRawCOPPERFormat_v2()
 {
 }
 
-unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
+
+int PostRawCOPPERFormat_v2::GetDetectorNwords(int n, int finesse_num)
+{
+  int nwords = 0;
+  if (GetFINESSENwords(n, finesse_num) > 0) {
+    nwords = GetFINESSENwords(n, finesse_num)
+             - (SIZE_B2LHSLB_HEADER + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
+  }
+  return nwords;
+}
+
+
+unsigned int PostRawCOPPERFormat_v2::CalcDriverChkSum(int n)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
@@ -35,10 +47,64 @@ unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
 }
 
 
+int PostRawCOPPERFormat_v2::GetFINESSENwords(int n, int finesse_num)
+{
+  int pos_nwords_0, pos_nwords_1;
+  int nwords = 0;
+  switch (finesse_num) {
+    case 0 :
+      pos_nwords_0 = GetBufferPos(n) + tmp_header.POS_OFFSET_1ST_FINESSE;
+      pos_nwords_1 = GetBufferPos(n) + tmp_header.POS_OFFSET_2ND_FINESSE;
+      nwords = m_buffer[ pos_nwords_1 ] - m_buffer[ pos_nwords_0 ];
+      break;
+    case 1 :
+      pos_nwords_0 = GetBufferPos(n) + tmp_header.POS_OFFSET_2ND_FINESSE;
+      pos_nwords_1 = GetBufferPos(n) + tmp_header.POS_OFFSET_3RD_FINESSE;
+      nwords = m_buffer[ pos_nwords_1 ] - m_buffer[ pos_nwords_0 ];
+      break;
+    case 2 :
+      pos_nwords_0 = GetBufferPos(n) + tmp_header.POS_OFFSET_3RD_FINESSE;
+      pos_nwords_1 = GetBufferPos(n) + tmp_header.POS_OFFSET_4TH_FINESSE;
+      nwords = m_buffer[ pos_nwords_1 ] - m_buffer[ pos_nwords_0 ];
+      break;
+    case 3 :
+      pos_nwords_0 = GetBufferPos(n) + tmp_header.POS_OFFSET_4TH_FINESSE;
+      {
+        int nwords_1 = GetBlockNwords(n)
+                       - SIZE_COPPER_DRIVER_TRAILER
+                       - tmp_trailer.GetTrlNwords();
+        nwords = nwords_1 - m_buffer[ pos_nwords_0 ];
+      }
+      break;
+    default :
+      char err_buf[500];
+      sprintf(err_buf, "[FATAL] Invalid finesse # : %s %s %d\n",
+              __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      printf("[DEBUG] %s\n", err_buf);
+      B2FATAL(err_buf);
+  }
+
+  if (nwords < 0 || nwords > 1e6) {
+    char err_buf[500];
+    char hostname[128];
+    GetNodeName(n, hostname, sizeof(hostname));
+    sprintf(err_buf, "[FATAL] %s ch=%d : ERROR_EVENT : # of words is strange. %d : eve 0x%x exp %d run %d sub %d\n %s %s %d\n",
+            hostname, finesse_num,
+            nwords,
+            GetEveNo(n), GetExpNo(n), GetRunNo(n), GetSubRunNo(n),
+            __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("[DEBUG] %s\n", err_buf);
+    B2FATAL(err_buf);
+  }
+
+  return nwords;
+
+}
 
 
 
-unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
+
+unsigned int PostRawCOPPERFormat_v2::GetB2LFEE32bitEventNumber(int n)
 {
   char err_buf[500];
   char hostname[128];
@@ -56,10 +122,10 @@ unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 
 
 
-void PostRawCOPPERFormat_latest::CheckData(int n,
-                                           unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
-                                           unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
-                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
+void PostRawCOPPERFormat_v2::CheckData(int n,
+                                       unsigned int prev_evenum, unsigned int* cur_evenum_rawcprhdr,
+                                       unsigned int prev_copper_ctr, unsigned int* cur_copper_ctr,
+                                       unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
   char err_buf[500];
   int err_flag = 0;
@@ -110,7 +176,7 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
 
 }
 
-bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
+bool PostRawCOPPERFormat_v2::CheckCOPPERMagic(int n)
 {
   char err_buf[500];
   char hostname[128];
@@ -126,7 +192,7 @@ bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
   return false;
 }
 
-void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
+void PostRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported (block %d). Exiting...\n%s %s %d\n",
@@ -135,8 +201,8 @@ void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   B2FATAL(err_buf);
 }
 
-unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
-    unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
+unsigned int PostRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
+                                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 
 {
   char err_buf[500];
@@ -149,7 +215,7 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
 }
 
 
-int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords)
+int PostRawCOPPERFormat_v2::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
@@ -159,7 +225,7 @@ int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int fin
   B2FATAL(err_buf);
 }
 
-int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
+int PostRawCOPPERFormat_v2::CheckCRC16(int n, int finesse_num)
 {
 
   //
@@ -216,6 +282,7 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
       char err_buf[500];
       char hostname[128];
       GetNodeName(n, hostname, sizeof(hostname));
+
       if ((GetNodeID(n) & DETECTOR_MASK) == ARICH_ID) {
         sprintf(err_buf,
                 "[WARNING] %s ch=%d : ARICH : POST B2link event CRC16 error with B2link Packet CRC error. data(%x) calc(%x) fns nwords %d type 0x%.8x : This error is ignored and the error event will be recorded in .sroot file acording to request from ARICH group: slot%c eve 0x%x exp %d run %d sub %d\n%s %s %d\n",
@@ -274,37 +341,25 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 }
 
 
-int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
-                                                 int* detector_buf_1st,  int nwords_1st,
-                                                 int* detector_buf_2nd,  int nwords_2nd,
-                                                 int* detector_buf_3rd,  int nwords_3rd,
-                                                 int* detector_buf_4th,  int nwords_4th,
-                                                 RawCOPPERPackerInfo rawcpr_info)
-{
-  char err_buf[500];
-  sprintf(err_buf, "[FATAL] This function is not supported. (%u) Exiting...: \n%s %s %d\n",
-          rawcpr_info.eve_num,
-          __FILE__, __PRETTY_FUNCTION__, __LINE__);
-  printf("[DEBUG] %s\n", err_buf);
-  B2FATAL(err_buf);
-  return NULL;
-}
-
-
-int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
-                                                 int* const(&detector_buf_ch)[MAX_PCIE40_CH],
-                                                 int const(&nwords_ch)[MAX_PCIE40_CH],
-                                                 RawCOPPERPackerInfo rawcpr_info)
+int* PostRawCOPPERFormat_v2::PackDetectorBuf(int* packed_buf_nwords,
+                                             int* detector_buf_1st,  int nwords_1st,
+                                             int* detector_buf_2nd,  int nwords_2nd,
+                                             int* detector_buf_3rd,  int nwords_3rd,
+                                             int* detector_buf_4th,  int nwords_4th,
+                                             RawCOPPERPackerInfo rawcpr_info)
 {
   int* packed_buf = NULL;
+
   int poswords_to = 0;
+  int* detector_buf[ 4 ] = { detector_buf_1st, detector_buf_2nd, detector_buf_3rd, detector_buf_4th };
+  int nwords[ 4 ] = { nwords_1st, nwords_2nd, nwords_3rd, nwords_4th };
 
   // calculate the event length
-  int length_nwords = tmp_header.GetHdrNwords() + tmp_trailer.GetTrlNwords();
+  int length_nwords = tmp_header.GetHdrNwords() + SIZE_COPPER_HEADER + SIZE_COPPER_TRAILER + tmp_trailer.GetTrlNwords();
 
-  for (int i = 0; i < MAX_PCIE40_CH; i++) {
-    if (detector_buf_ch[ i ] == NULL || nwords_ch[ i ] <= 0) continue;    // for an empty FINESSE slot
-    length_nwords += nwords_ch[ i ];
+  for (int i = 0; i < 4; i++) {
+    if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;    // for an empty FINESSE slot
+    length_nwords += nwords[ i ];
     length_nwords += SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER
                      + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
   }
@@ -331,22 +386,34 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
   packed_buf[ tmp_header.POS_NODE_ID ] = rawcpr_info.node_id; // node ID
 
   // fill the positions of finesse buffers
-  int ch = 0;
-  packed_buf[ tmp_header.POS_CH_POS_TABLE + ch ] = tmp_header.RAWHEADER_NWORDS;
-  for (int i = 1; i < MAX_PCIE40_CH; i++) {
-    ch = i;
-    if (nwords_ch[ ch - 1 ] == 0) {
-      packed_buf[ tmp_header.POS_CH_POS_TABLE + ch ] = packed_buf[ tmp_header.POS_CH_POS_TABLE + (ch - 1) ];
-    } else {
-      packed_buf[ tmp_header.POS_CH_POS_TABLE + ch ] = packed_buf[ tmp_header.POS_CH_POS_TABLE + (ch - 1) ] +
-                                                       nwords_ch[ ch - 1 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
-    }
+  packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ] = tmp_header.RAWHEADER_NWORDS + SIZE_COPPER_HEADER;
+
+  packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_1ST_FINESSE ];
+  if (nwords[ 0 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ] +=
+      nwords[ 0 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+
+  packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_2ND_FINESSE ];
+  if (nwords[ 1 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ] +=
+      nwords[ 1 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER;
+  }
+
+  packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] = packed_buf[ tmp_header.POS_OFFSET_3RD_FINESSE ];
+  if (nwords[ 2 ] > 0) {
+    packed_buf[ tmp_header.POS_OFFSET_4TH_FINESSE ] += nwords[ 2 ] + SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER  + SIZE_B2LFEE_TRAILER +
+                                                       SIZE_B2LHSLB_TRAILER;
   }
   poswords_to += tmp_header.GetHdrNwords();
 
+  // Fill COPPER header
+  poswords_to += SIZE_COPPER_HEADER;
+
   // Fill FINESSE buffer
-  for (int i = 0; i < MAX_PCIE40_CH; i++) {
-    if (detector_buf_ch[ i ] == NULL || nwords_ch[ i ] <= 0) continue;     // for an empty FINESSE slot
+  for (int i = 0; i < 4; i++) {
+
+    if (detector_buf[ i ] == NULL || nwords[ i ] <= 0) continue;     // for an empty FINESSE slot
 
     // Fill b2link HSLB header
     packed_buf[ poswords_to + POS_B2LHSLB_MAGIC ] = 0xffaa0000 | (0xffff & rawcpr_info.eve_num);
@@ -357,21 +424,22 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     poswords_to += SIZE_B2LFEE_HEADER;
 
     // copy the 1st Detector Buffer
-    memcpy(packed_buf + poswords_to, detector_buf_ch[ i ], nwords_ch[ i ]*sizeof(int));
-    poswords_to += nwords_ch[ i ];
+    memcpy(packed_buf + poswords_to, detector_buf[ i ], nwords[ i ]*sizeof(int));
+    poswords_to += nwords[ i ];
 
     // Fill b2link FEE trailer
     unsigned int crc16 = 0;
-    packed_buf[ poswords_to + POS_B2LFEE_ERRCNT_CRC16 ] =
-      ((0xffff & rawcpr_info.eve_num) << 16) | (crc16 &
-                                                0xffff);       // Error count is stored in this buffer for ver.2 format but it is set to zero here.
+    packed_buf[ poswords_to + POS_B2LFEE_ERRCNT_CRC16 ] =  crc16 &
+                                                           0xffff; // Error count is stored in this buffer for ver.2 format but it is set to zero here.
     poswords_to += SIZE_B2LFEE_TRAILER;
 
     // Fill b2link HSLB trailer
-    packed_buf[ poswords_to + POS_B2LHSLB_TRL_MAGIC ] =  0xff550000;
     poswords_to += SIZE_B2LHSLB_TRAILER;
 
   }
+
+  // Fill COPPER trailer
+  poswords_to += SIZE_COPPER_TRAILER;
 
   // Fill RawTrailer
   packed_buf[ poswords_to + tmp_trailer.POS_TERM_WORD ] = tmp_trailer.MAGIC_WORD_TERM_TRAILER;
@@ -381,28 +449,4 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
 
   return packed_buf;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

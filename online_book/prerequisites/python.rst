@@ -131,7 +131,7 @@ To check which python version you have installed you can check in your terminal 
 
 .. code-block:: bash
 
-  python3 --version 
+  python3 --version
 
 OR you could perform this in a live python session, either in your terminal or in a jupyter notebook using:
 
@@ -155,9 +155,9 @@ not create a python file using bash commands:
 
 .. admonition:: Hint
   :class: xhint stacked toggle
-  
+
   To create a file you'll need to use your bash skills. The internet is your friend.
-     
+
 .. admonition:: Hint
   :class: xhint stacked toggle
 
@@ -168,7 +168,7 @@ not create a python file using bash commands:
 
   Add the ``import`` command inside your python file using your favourite
   editor. Previous tutorials introduced the editor 'nano' to you.
-  
+
 .. admonition:: Solution
   :class: solution toggle
 
@@ -182,10 +182,10 @@ not create a python file using bash commands:
   Now add the python lines to your file.
 
   .. code-block:: python
-  
+
     import numpy as np
     print(np.pi)
-     
+
 Congratulations! You've now created your first python file. Now, run it!
 
 .. admonition:: Exercise
@@ -207,21 +207,21 @@ From now on follow this textbook and practise your python skills in a jupyter
 notebook. If you are unsure how to use juptyer notebooks, go back to
 :ref:`onlinebook_ssh` to learn how to get them running.
 
-Remember that everything you do in your jupyter notebook is an interactive version of your python script. 
+Remember that everything you do in your jupyter notebook is an interactive version of your python script.
 
 
 
 
 
 
-  
+
 Pandas Tutorial and Python Data Analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This section aims to answer the question "How can I process tabular data?"
 
 
-We will use the ``root_pandas`` package to read TTrees from ROOT files. 
+We will use the ``root_pandas`` package to read TTrees from ROOT files.
 
 Now, the previous sentence may have not been familiar to you at all. If so, read
 on. If not, feel free to skip the next paragraph.
@@ -317,7 +317,7 @@ can see the output, where in our case each row corresponds to one candidate:
 
   df
 
-Note that for the dataframe to be displayed a cell with multiple lines of 
+Note that for the dataframe to be displayed a cell with multiple lines of
 code, one must call it at the end of the cell.
 
 
@@ -576,9 +576,9 @@ You can have subplots:
 
   fig, axes = plt.subplots(figsize=(10,6))
 
-  h = axes.hist(df.B0_mbc[df.B0_isSignal == 1], bins=100, range=(5.2, 5.3), 
+  h = axes.hist(df.B0_mbc[df.B0_isSignal == 1], bins=100, range=(5.2, 5.3),
                 histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
-  h = axes.hist(df.B0_mbc[df.B0_isSignal == 0], bins=100, range=(5.2, 5.3), 
+  h = axes.hist(df.B0_mbc[df.B0_isSignal == 0], bins=100, range=(5.2, 5.3),
                 histtype='step', lw=2, label="Background")
   axes.legend(loc="best")
   axes.set_xlabel(r"$M_{\mathrm{bc}}$", fontsize=18)
@@ -642,7 +642,7 @@ to be included in the following string:
   Load your dataframe as chunks.
 
 .. admonition:: Solution
-  :class: solution toggle  
+  :class: solution toggle
 
   .. code:: ipython3
 

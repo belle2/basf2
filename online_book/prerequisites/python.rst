@@ -338,24 +338,49 @@ and a set of columns:
 
   len(df.columns)
 
-You can access the full data stored in the DataFrame with the ``values`` object,
+You can access the full data stored in the DataFrame with the ``to_numpy`` object,
 which is a large 2D numpy matrix
 
 .. code:: ipython3
 
-  df.values
+  df.to_numpy
 
-You can display the values of the DataFrame also sorted by a specific column:
-
-.. code:: ipython3
-
-  df.sort_values(by='B0_M').head()
+However ``to_numpy`` may not be the mot visually pleasing, or easy, way to see the contents of your dataframe. 
 
 A useful feature to quickly summarize your data is to use the descibe function:
 
 .. code:: ipython3
 
   df.describe()
+
+You can also display the values of the DataFrame sorted by a specific column:
+
+.. code:: ipython3
+
+  df.sort_values(by='B0_M').head()
+
+Finally, everyone who works with numpy and pandas will at some point try to use a fancy funtion and get an error message that the *shapes* of some objects differ. As a debugging tool, you can use
+
+.. code:: ipython3
+
+  df.shape
+
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  What is the output of ``df.shape`` and what does it mean?
+
+.. admonition:: Hint
+  :class: xhint stacked toggle
+
+  Try it out in your jupyter notebook. To understand the output, the internet is once again your friend.
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  The output comes in the form of a tuple (a finite ordered list (sequence) of elements). For example, one output could be ``(15540523, 20)``, which is saying you have a dataframe of 15540523 rows, and 20 columns. 
+
+
 
 
 
@@ -617,6 +642,14 @@ the columns and supply the dataframe as ``data=`` argument
 
   Write a function to automatically plot a column in the DataFrame for
   signal and background. Loop over all columns and produce all plots.
+
+
+Finally, Belle II does have an `official plot style<https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally. You do not need to worry about this at this stage, but keep it in mind. As you will find out, from ``release-05-00-00`` the plot style is available in the Belle II software `BASF2`. Once you have that running, importing the style is as easy as "one, two, ...
+
+.. code:: ipython3
+
+  from matplotlib import pyplot as plt
+  plt.style.use("belle2")
 
 
 Dealing with large files in a jupyter notebook

@@ -167,7 +167,7 @@ not create a python file using bash commands:
   :class: xhint stacked toggle
 
   Add the ``import`` command inside your python file using your favourite
-  editor. Previous tutorials introduced the editor 'nano' to you.
+  editor. Previous tutorials introduced the *nano* editor to you.
 
 .. admonition:: Solution
   :class: solution toggle
@@ -231,10 +231,10 @@ ROOT: a nano introduction
 ---------------------------
 
 ROOT files, as you'll come to be familiar with, are the main way we store our
-data at Belle II. Within these files are ``TTree`` objects known as 'trees', which are
+data at Belle II. Within these files are ``TTree`` objects known as *trees*, which are
 analogous to a sub-folder. For example, you may store a tree full of :math:`B`
-meson candidates. Within a tree you can have 'TBranches' known as
-'branches'. Each branch could be one of the oodles of variables available for
+meson candidates. Within a tree you can have ``TBranch``'es known as
+*branches*. Each branch could be one of the oodles of variables available for
 the particle you've stored in your tree --- for example, the :math:`B` meson's
 invariant mass, it's daughter's momentum, it's great-great-granddaughter's
 cluster energy etc. etc. etc.
@@ -249,7 +249,7 @@ Jupyter Notebooks
 `Jupyter <https://jupyter.org/>`_ Notebooks are interactive notebooks that allow one to visualise code,
 data and outputs in a linear and clear way. When you run a notebook you have an
 operating system called a kernel that runs the code .   Each block in a jupyter
-notebook is a 'cell'. These cells can be run using the kernel by clicking the
+notebook is a "cell". These cells can be run using the kernel by clicking the
 run button or by pressing ``Shift + Enter``.   When you run a cell, the kernel will
 process and store any variables or dataframes you define.   If your kernel
 crashes, you will have to restart it.
@@ -503,7 +503,7 @@ rows in a dateframe by selected variables.
 A short introduction to plotting in python
 ==========================================
 
-In this section we will answer 'How can I plot data?' and demonstrate the
+In this section we will answer *"How can I plot data?"* and demonstrate the
 `matplotlib <https://matplotlib.org>`_ package used to plot in python.
 
 .. code:: ipython3
@@ -625,7 +625,7 @@ Dealing with large files in a jupyter notebook
 If your files are quite large you may start to find your jupyter notebook kernel
 crashing - there are a few ways in which we can mitigate this.
 
-  - ‘Chunk’ your data
+  - "Chunk" your data
   - Only import the columns (variables) that you will use/need.
   - Add any cuts you can
 
@@ -656,7 +656,7 @@ Here I have defined which columns I wish to be included in the following string:
     files = ["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"]
     df_chunk=root_pandas.read_root(files, 'Y4S', columns=Y4S_columns, chunksize=100000)
 
-Now the data is loaded as chunks, we 'loop' over or run through all the chunks
+Now the data is loaded as chunks, we "loop" over or run through all the chunks
 and piece them together. This is the point at which we can add our cuts to
 reduce the loaded, chunked file more.
 

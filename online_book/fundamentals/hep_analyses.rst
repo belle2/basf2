@@ -181,7 +181,7 @@ decay.
 We call this **continuum background**.
 This background can be suppressed to a certain extent, although many analyses
 leave some part of this background in the data sample as it is relatively
-straightforward to model and cutting too strictly on contunuum suppression
+straightforward to model and cutting too strictly on continuum suppression
 variables will hurt signal efficiency at some stage.
 You will have a lesson about :ref:`continuum suppression <onlinebook_cs>` and
 :ref:`examples of modelling <onlinebook_fitting>` later in these tutorials.
@@ -443,7 +443,7 @@ Beam
 
 Scan
    A scan consists of rather short data taking periods (hours or few days long) performed at slightly different energies
-   (usually 10-50 MeV apart). The goals of a scan is to measure the lineshape of the :math:`e^+e^-` cross section to either
+   (usually 10-50 MeV apart). The goals of a scan is to measure the line shape of the :math:`e^+e^-` cross section to either
    check that data are collected on the resonance peak (short scans), or to perform real physics measurements
    such the search for exotic vector resonances (long scans above the :math:`\Upsilon(4S)`energy)
 
@@ -545,7 +545,7 @@ Simulation: the Monte Carlo
 ---------------------------
 
 We need to be able to compare data from our detector to the expectation we have.
-In vert rare cases this might not be necessary, for example the discovery of the
+In verty rare cases this might not be necessary, for example the discovery of the
 J/ψ was so clear a signal that we didn't need any comparison to understand
 that it was something new. But most of the time we need to make sure what we see
 is not some artefact of our very very complex experiment.
@@ -1026,7 +1026,7 @@ uDST (micro Data Summary Table)
 Analysis: the skimming
 ----------------------
 
-After data procesing, the mDST files are finally available for analysis. While it's possible
+After data processing, the mDST files are finally available for analysis. While it's possible
 to run directly on them, it's however quite inconvenient. The mDST contain all the events that
 have been acquired, while usually an analysis needs only a very small fraction of them, not to
 mention that several analyses may share the need to reconstruct the same objects (countless
@@ -1040,7 +1040,7 @@ To produce a skim one has do define a rather simple selection, which is as inclu
 reasonable boundaries.
 
 .. note::
-   *When you run your analysis, you shoud first check if there is a skim that suits it*. Running
+   *When you run your analysis, you should first check if there is a skim that suits it*. Running
    on skimmed files is much faster and safer than running on the full dataset. If you cannot
    find a skims that suits your needs, talk to your working group convener first to figure
    out the best strategy for you.

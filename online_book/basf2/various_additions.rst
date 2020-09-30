@@ -480,4 +480,5 @@ random seed.
 
 .. topic:: Authors of this lesson
 
-     Alejandro Mora
+     Alejandro Mora,
+     Kilian Lieret

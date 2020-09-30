@@ -25,7 +25,7 @@ Python
 
     **Objectives**:
 
-      * Get familiar with python
+      * Get more familiar with python
       * Understand how to manipulate and plot data with ``root_pandas``
 
 High Energy Physics (HEP) analyses are too complex to be done with pen, paper

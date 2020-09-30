@@ -39,9 +39,6 @@ class BtoPi0Pi0(BaseSkim):
 
     * ``5.24 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
-
-    Note:
-    19120100
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Francis Pham", "Benedikt Wach"]
     __description__ = "Skim list definitions for neutral B to two neutral pions."
@@ -73,9 +70,6 @@ class BtoHad2Tracks(BaseSkim):
     * ``nTracks >= 2 (event level)``
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.3``
-
-    Note:
-    19130100
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list definitions for all neutral B to charmless modes  with 2 tracks."
@@ -135,9 +129,6 @@ class BtoHad3Tracks(BaseSkim):
     * ``nTracks >= 3 (event level)``
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.3``
-
-    Note:
-    19130200
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list definitions for all neutral B to charmless modes with 3 tracks."
@@ -194,9 +185,6 @@ class BtoHad4Tracks(BaseSkim):
 
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.3``
-
-    Note:
-    19130300
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list definitions for all neutral B to charmless modes with 4 tracks."
@@ -249,9 +237,6 @@ class BtoHad5Tracks(BaseSkim):
 
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.3``
-
-    Note:
-    19130400
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list for B+ to charmless modes with 5 tracks and including one intermediate state K*+."
@@ -293,9 +278,6 @@ class BtoHad1Track1Pi0(BaseSkim):
 
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.3``
-
-    Note:
-    19130500
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list for all B+ to charmless modes with 1 track and 1 pi0."
@@ -338,9 +320,6 @@ class BtoHad2Tracks1Pi0(BaseSkim):
 
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.3``
-
-    Note:
-    19130600
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list for all neutral B to charmless modes with 2 tracks and 1 pi0."
@@ -380,14 +359,14 @@ class BtoHad3Tracks1Pi0(BaseSkim):
     * :math:`\\B^+ -> K_{\\rm S}^{0} pi^+ \\pi^0`
     * :math:`\\B^+ -> K_{\\rm S}^{0} K^+ \\pi^0`
     * :math:`\\B^+ -> rho+ rho0`
+    * :math:`\\B^+ -> K^{*+} K^+ K^-`
+    * :math:`\\B^+ -> K^{*+} K^+ \\pi^-`
+    * :math:`\\B^+ -> K^{*+} \\pi^+ \\pi^-`
 
     Cuts applied:
 
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.3``
-
-    Note:
-    19130700
     """
     __authors__ = ["Fernando Abudinen", "Riccardo Manfredi", "Sebastiano Raiz", "Benedikt Wach"]
     __description__ = "Skim list for all charged B to charmless modes with 3 tracks and 1 Pi0."
@@ -401,6 +380,7 @@ class BtoHad3Tracks1Pi0(BaseSkim):
         stdKshorts(path=path)
         loadStdVeryLooseRho0(path=path)
         loadStdVeryLooseRhoPlus(path=path)
+        loadStdVeryLooseKstarPlusPi0(path=path)
 
     def build_lists(self, path):
         Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
@@ -410,6 +390,9 @@ class BtoHad3Tracks1Pi0(BaseSkim):
                     'B+:Charmless_b2Kspipi0': 'K_S0:merged pi+:veryLoose pi0:charmlessFit',  # 1
                     'B+:Charmless_b2KsKpi0': 'K_S0:merged K+:veryLoose pi0:charmlessFit',  # 2
                     'B+:Charmless_b2rhorho0': 'rho+:veryLoose rho0:veryLoose'  # 3
+                    'B+:Charmless_b2K*KK': 'K*+:veryLoosePi0 K-:veryLoose K+:veryLoose',  # 4
+                    'B+:Charmless_b2K*pipi': 'K*+:veryLoosePi0 pi-:veryLoose pi+:veryLoose',  # 5
+                    'B+:Charmless_b2K*Kpi': 'K*+:veryLoosePi0 K+:veryLoose pi-:veryLoose',  # 6
                     }
 
         for chID, channel in enumerate(channels.keys()):

@@ -24,40 +24,37 @@ def loadStdVeryLooseTracks(particletype, path):
     if particletype not in ['pi', 'K', 'p', 'e', 'mu']:
         B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
 
-    ma.fillParticleList(particletype + '+:veryLoose', goodTrack, True, path=path)
+    ma.fillParticleList(particletype + '+:SkimVeryLoose', goodTrack, True, path=path)
 
 
 def loadStdVeryLooseKstar0(path):
     """
-    Create a list of 'K*0:veryLoose' list from 'pi-:veryLoose K+:veryLoose' with :math:`0.74 < M < 1.04~GeV`
+    Create a list of 'K*0:veryLoose' list from 'pi-:SkimVeryLoose K+:SkimVeryLoose' with :math:`0.7 < M < 1.6~GeV`
 
-    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('K*0:veryLoose -> K+:veryLoose pi-:veryLoose', '0.7 < M < 1.6', 1, path=path)
+    ma.reconstructDecay('K*0:veryLoose -> K+:SkimVeryLoose pi-:SkimVeryLoose', '0.7 < M < 1.6', 1, path=path)
     return 'K*0:veryLoose'
 
 
 def loadStdVeryLooseRho0(path):
     """
-    Create a list of 'rho0:veryLoose' list from 'pi-:veryLoose pi+:veryLoose' with :math:`0.47 < M < 1.15~GeV`
+    Create a list of 'rho0:veryLoose' list from 'pi-:SkimVeryLoose pi+:SkimVeryLoose' with :math:`0.47 < M < 1.15~GeV`
 
-    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('rho0:veryLoose -> pi+:veryLoose pi-:veryLoose', '0.47 < M < 1.15', 1, path=path)
+    ma.reconstructDecay('rho0:veryLoose -> pi+:SkimVeryLoose pi-:SkimVeryLoose', '0.47 < M < 1.15', 1, path=path)
     return 'rho0:veryLoose'
 
 
 def loadStdVeryLooseRhoPlus(path):
     """
-    Create a list of 'rho+:veryLoose' list from 'pi0:charmlessFit pi+:veryLoose' with :math:`0.47 < M < 1.15~GeV`
+    Create a list of 'rho+:veryLoose' list from 'pi0:charmlessFit pi+:SkimVeryLoose' with :math:`0.47 < M < 1.15~GeV`
 
-    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('rho+:veryLoose -> pi+:veryLoose pi0:charmlessFit', '0.47 < M < 1.15', 1, path=path)
-    return 'rho+:veryLoose'
+    ma.reconstructDecay('rho+:veryLoose -> pi+:SkimVeryLoose pi0:charmlessFit', '0.47 < M < 1.15', 1, path=path)
+    return 'rho+:VeryLoose'
 
 
 def loadStdPi0ForBToCharmless(path):
@@ -78,26 +75,24 @@ def loadStdPi0ForBToCharmless(path):
                       '[daughter(1,clusterReg)==3 and daughter(1,E)> 0.020]] and ' +
                       'M > 0.105 and M < 0.150 ',
                       path=path)
-    kFit('pi0:charmlessFit', 0.0, fit_type='vertex', path=path)
+    kFit('pi0:charmlessFit', 0.0, fit_type='mass', path=path)
 
 
 def loadStdVeryLooseKstarPlus(path):
     """
-    Create a list of 'K*+:veryLoose' list from 'pi+:veryLoose K_S0:merged' with :math:`0.74 < M < 1.04~GeV`
+    Create a list of 'K*+:veryLoose' list from 'pi+:SkimVeryLoose K_S0:merged' with :math:`0.7 < M < 1.6~GeV`
 
-    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('K*+:veryLoose -> K_S0:merged pi+:veryLoose', '0.7 < M < 1.6', 1, path=path)
+    ma.reconstructDecay('K*+:veryLoose -> K_S0:merged pi+:SkimVeryLoose', '0.7 < M < 1.6', 1, path=path)
     return 'K*+:veryLoose'
 
 
 def loadStdVeryLooseKstarPlusPi0(path):
     """
-    Create a list of 'K*+:veryLoosePi0' list from 'K+:veryLoose pi0:charmlessFit' with :math:`0.74 < M < 1.04~GeV`
+    Create a list of 'K*+:veryLoosePi0' list from 'K+:SkimVeryLoose pi0:charmlessFit' with :math:`0.7 < M < 1.6~GeV`
 
-    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('K*+:veryLoosePi0 -> K+:veryLoose pi0:charmlessFit', '0.7 < M < 1.6', 1, path=path)
+    ma.reconstructDecay('K*+:veryLoosePi0 -> K+:SkimVeryLoose pi0:charmlessFit', '0.7 < M < 1.6', 1, path=path)
     return 'K*+:veryLoosePi0'

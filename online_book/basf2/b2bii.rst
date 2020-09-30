@@ -10,7 +10,8 @@ B2BII
 
    **Exercises**: 60 min
 
-   **Prerequisites**: 
+   **Prerequisites**:
+
        * First steering file
        * Batch submission
 
@@ -79,7 +80,7 @@ transitions, and have been generated based on the decay tables at
 .. rubric:: How to find Generic MC samples?
 
 You can find the sample(s) you want through
-`Belle File Search Engine <http://bweb3.cc.kek.jp/>`__
+`Belle File Search Engine <http://bweb3.cc.kek.jp/>`_
 
 .. image:: b2bii/bweb3.png
    :width: 600px
@@ -94,15 +95,15 @@ You can either use the file list (physical path) or URL as input file list for
 b2bii jobs.
 
 .. note::
-   `Belle File Search Engine <http://bweb3.cc.kek.jp/>`__ is also
+   `Belle File Search Engine <http://bweb3.cc.kek.jp/>`_ is also
    for data files.
 
 .. warning::
-   `Belle File Search Engine <http://bweb3.cc.kek.jp/>`__ is only 
+   `Belle File Search Engine <http://bweb3.cc.kek.jp/>`_ is only
    accessible within KEK domain or via VPN.
 
-**More information about official MC and data can be found
-`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search>`__**
+**More information about official MC and data can be found**
+`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search>`__
 
 .. rubric:: Rare MC
 
@@ -113,7 +114,7 @@ Rare :math:`B` MC was generated with an experiment-dependent beam
 energy, but not run-dependent (i.e. The same beam energy and IP profile in
 the same experiment).
 
-Location of those special MC files can be found at
+Location of those special MC files can be found
 `here <https://belle.kek.jp/secured/wiki/doku.php?id=software:rare_mc_search>`__
  
 .. rubric:: Signal MC
@@ -123,7 +124,7 @@ signal MC samples.
 
 Now we will learn how to use the ``mcproduzh`` package to generate signal MC in Belle.
 This package was developed by "U"shiroda-san, A. "Z"upanc, and "H"orii-san, and 
-it consists of generation, simulation, and reconstuction based on ``evtgen`` and
+it consists of generation, simulation, and reconstruction based on ``evtgen`` and
 ``gsim`` scripts.
 It will create MC samples for a list of experiments, normalized by their
 :math:`N(B\overline{B})` or integrated luminosity.
@@ -180,7 +181,6 @@ Now you have MDST files produced in ``mcproduzh/gsim/mdst/`` directory.
       Try to generate a MC sample with 1000
       :math:`B^{+} \to \overline{D}^{0}(\to K^{+} \pi^{-}) \pi^{+}` events.
 
-
 .. admonition:: Solution
    :class: toggle solution
 
@@ -223,10 +223,10 @@ The relations between basf and basf2 objects are shown in this figure:
 
 However, there are still many differences between the Belle detector and the
 Belle II detector, as well as basf and basf2.
-Therefore we can't simply use the same basf2 steering files, small
+Therefore, we can't simply use the same basf2 steering files, small
 modifications are needed.
 
-.. _Charged Final State Particles:
+.. _Charged_Final_State_Particles:
 .. rubric:: Charged Final State Particles
 
 basf and basf2 use different Helix parameterisations, however there exist a well
@@ -236,7 +236,7 @@ point (or pivot point), which is assumed to be always point ``(0,0,0)`` in the
 case of Belle II MDST.
 
 Despite the different parameterisations, charged final state particles can still
-be reconstucted using `fillParticleList` function in basf2.
+be reconstructed using `fillParticleList` function in basf2.
 But due to the different definition, as well as detector, it is not
 recommended to use Belle II style PID in b2bii.
 
@@ -289,7 +289,7 @@ reproduce them:
       ma.fillParticleList('pi+:sig', 'atcPIDBelle(3,2)<0.4', path=mypath)
 
 
-.. rubric:: Neutral Final State Partlces
+.. rubric:: Neutral Final State Particles
 
 Belle MDST has two additional data types: ``mdst_gamma`` and ``mdst_pi0``,
 for which there exist no equivalent data type in the Belle II MDST format.
@@ -303,11 +303,11 @@ During the conversion, b2bii converter by default creates ``gamma:mdst`` and ``p
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Can you reconstrcut a decay :math:`D^0 \to K^{-} \pi^{+} \pi^{0}` with mass
+   Can you reconstruct a decay :math:`D^0 \to K^{-} \pi^{+} \pi^{0}` with mass
    between 1.7 to 2.0 GeV in a b2bii analysis.  
 
 .. admonition:: Hint
-   :class: toggle xhint
+   :class: toggle xhint stacked
 
    Always use premade particle list for neutrals!
 
@@ -322,7 +322,7 @@ During the conversion, b2bii converter by default creates ``gamma:mdst`` and ``p
 
 .. rubric:: V0 Particles
 
-As mentioned in :ref:`ChargedFinalStateParticles`, all charged tracks are
+As mentioned in :ref:`Charged_Final_State_Particles`, all charged tracks are
 parametrised with a helix with the reference point set to ``(0,0,0)`` in basf2.
 This is not optimal in the case of ``V0s`` whose decay vertices can be far away
 from the origin.
@@ -334,7 +334,7 @@ The created particles have momentum and decay vertex position set to values
 given in Belle's Mdst_Vee2 table and their daughters particles with momentum
 and position at the pivot equal to V0 decay vertex. 
 In addition, the quality indicators for :math:`K_{S}^{0}` and
-:math:`\Lambda^{0}` can be used by simply calling `goodBelleKshort` and
+:math:`\Lambda^{0}` can be used by simply calling :b2:var:`goodBelleKshort` and
 `goodBelleLambda`, respectively.
 
 
@@ -344,7 +344,7 @@ In addition, the quality indicators for :math:`K_{S}^{0}` and
    Select ``good Kshort`` from ``K_S0:mdst`` list.
 
 .. admonition:: Hint
-   :class: toggle xhint
+   :class: toggle xhint stacked
 
    Use `cutAndCopyList` to select candidates from an existing list.
 
@@ -369,8 +369,8 @@ The Klongs are stored in the default ``K_L0:mdst``.
 .. admonition:: Task
    :class: exercise stacked
 
-   Use the final task in `First steering file` lesson as a template, try to
-   convert it to your first b2bii analysis script.
+   Use the final task in :ref:`onlinebook_first_steering_file` lesson as a
+   template, try to convert it to your first b2bii analysis script.
 
    This time, let's reconstruct
    :math:`B^{-} \to D^{0} \pi^{-}` with :math:`D^{0} \to K^{-}\pi^{+}\pi^{0}`.
@@ -384,15 +384,13 @@ The Klongs are stored in the default ``K_L0:mdst``.
    You can use this line to get the example file:
    basf2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)
 
-
 .. admonition:: Hint
-   :class: toggle xhint
+   :class: toggle xhint stacked
 
-   `First steering file` lesson is your best friend!
+   :ref:`onlinebook_first_steering_file` lesson is your best friend!
 
    Remember always using premade particle lists for neutrals,
    Don't forget to use Belle-style PID for charged particles.
-
 
 .. admonition:: Solution
    :class: toggle solution
@@ -407,7 +405,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
    * Making basf2 process Belle data is as easy as adding 
      ``convertBelleMdstToBelle2Mdst()`` to the top of your steering file.
    * Be careful with: particle lists and variables in your analysis.
-   * **Never use ``fillParticleList`` to create neutral final state particles!!**
+   * **Never use** `fillParticleList` **to create neutral final state particles!!**
 
 
 .. topic:: Author of this lesson

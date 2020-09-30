@@ -392,10 +392,10 @@ class GenerateSimTask(Basf2PathTask):
         """
         basf2.set_random_seed(self.random_seed)
         path = basf2.create_path()
-        if self.experiment_number in [1002, 1003]:
+        if self.experiment_number in [0, 1002, 1003]:
             runNo = 0
         elif self.experiment_number == 12:
-            runNo = 5736
+            runNo = 0
         path.add_module(
             "EventInfoSetter", evtNumList=[self.n_events], runList=[runNo], expList=[self.experiment_number]
         )
@@ -436,6 +436,10 @@ class GenerateSimTask(Basf2PathTask):
                 generatorpreselection.param('applyInCMS', True)
                 path.add_module(generatorpreselection)
                 # generatorpreselection.if_value('!=11', empty)
+            elif "EEEE" in self.random_seed:
+                ge.add_aafh_generator(path=path, finalstate='e+e-e+e-', preselection=False)
+            elif "EEMUMU" in self.random_seed:
+                ge.add_aafh_generator(path=path, finalstate='e+e-mu+mu-', preselection=False)
             elif "TAUPAIR" in self.random_seed:
                 ge.add_kkmc_generator(path, finalstate='tau+tau-')
             elif "DDBAR" in self.random_seed:
@@ -932,7 +936,8 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         # (CDB payloads) to new weightfiles created by this b2luigi script
         if ('DATA' in self.random_seed or 'useCDC' in self.recotrack_option) and 'noCDC' not in self.recotrack_option:
             cdc_identifier = 'datafiles/' + \
-                CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask, fast_bdt_option=self.fast_bdt_option)
+                             'trackfindingcdc_TrackQualityIndicator.weights.xml'
+            # CDCQETeacherTask.get_weightfile_xml_identifier(CDCQETeacherTask, fast_bdt_option=self.fast_bdt_option)
             if os.path.exists(cdc_identifier):
                 replace_cdc_qi = True
             elif 'useCDC' in self.recotrack_option:
@@ -962,7 +967,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
                 VXDQETeacherTask.get_weightfile_xml_identifier(
                     VXDQETeacherTask, fast_bdt_option=self.fast_bdt_option))[0]
             replace_vxd_qi = True
-
+        # replace_cdc_qi = False
         cdc_qe_mva_filter_parameters = None
         # if tracks below a certain CDC QI index shall be deleted online, this needs to be specified in the filter parameters.
         # this is also possible in case of the default (CBD) payloads.
@@ -971,7 +976,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
             cut = int(self.recotrack_option[cut_index:cut_index+3])/100.
             if replace_cdc_qi:
                 cdc_qe_mva_filter_parameters = {
-                    "identifier": cdc_identifier, "cut": cut}
+                    "identifier": cdc_identifier, "cut": cut, }
             else:
                 cdc_qe_mva_filter_parameters = {
                     "cut": cut}
@@ -979,10 +984,13 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
             cdc_qe_mva_filter_parameters = {
                 "identifier": cdc_identifier}
         if cdc_qe_mva_filter_parameters is not None:
+            # if no cut is specified, the default value is at zero and nothing is deleted.
             basf2.set_module_parameters(
                 path,
                 name="TFCDC_TrackQualityEstimator",
                 filterParameters=cdc_qe_mva_filter_parameters,
+                deleteTracks=True,
+                resetTakenFlag=True
                 )
         if replace_vxd_qi:
             basf2.set_module_parameters(
@@ -996,8 +1004,19 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         new_path = basf2.create_path()
         for module in path.modules():
             if module.name() != track_qe_module_name:
-                new_path.add_module(module)
+                if not module.name == 'TrackCreator':
+                    new_path.add_module(module)
             else:
+                # the TrackCreator needs to be conducted before the Collector such that
+                # MDSTTracks are related to RecoTracks and d0 and z0 can be read out
+                new_path.add_module(
+                    'TrackCreator',
+                    pdgCodes=[
+                        211,
+                        321,
+                        2212],
+                    recoTrackColName='RecoTracks',
+                    trackColName='MDSTTracks')  # , useClosestHitToIP=True, useBFieldAtHit=True)
                 new_path.add_module(
                     "TrackQETrainingDataCollector",
                     TrainingDataOutputName=self.get_output_file_name(self.get_records_file_name()),
@@ -2294,46 +2313,51 @@ class MasterTask(b2luigi.WrapperTask):
     #: list of variables to exclude for the cdc mva.
     exclude_variables_cdc = [
         "has_matching_segment",
-        "n_cdc_hits",
+        "size",
+        "n_tracks",
+        "globalImpact",
+        "impact_helix",
+        "d0_helix",
+        "z0_helix",
         "avg_hit_dist",
-        "drift_length_sum",
+        "cont_layer_mean",
+        "cont_layer_variance",
+        "cont_layer_max",
+        "cont_layer_min",
+        "cont_layer_first",
+        "cont_layer_last",
+        "cont_layer_max_vs_last",
+        "cont_layer_first_vs_min",
+        "cont_layer_count",
+        "cont_layer_occupancy",
+        "super_layer_mean",
+        "super_layer_variance",
+        "super_layer_max_vs_last",
+        "super_layer_first_vs_min",
+        "super_layer_occupancy",
         "drift_length_mean",
         "drift_length_variance",
         "drift_length_max",
         "drift_length_min",
-        "norm_drift_length_sum",
-        "norm_drift_length_max",
-        "norm_drift_length_min",
+        "drift_length_sum",
         "norm_drift_length_mean",
         "norm_drift_length_variance",
-        "tot_sum",
+        "norm_drift_length_max",
+        "norm_drift_length_min",
+        "norm_drift_length_sum",
+        "adc_mean",
+        "adc_variance",
+        "adc_max",
+        "adc_min",
+        "adc_sum",
         "tot_mean",
         "tot_variance",
         "tot_max",
         "tot_min",
-        "adc_variance",
-        "adc_max",
-        "adc_mean",
-        "adc_min",
-        "adc_sum",
+        "tot_sum",
         "empty_s_mean",
         "empty_s_variance",
-        "empty_s_max",
-        "cont_layer_first_vs_min",
-        "cont_layer_max_vs_last",
-        "cont_layer_occupancy",
-        "cont_layer_mean",
-        "cont_layer_min",
-        "cont_layer_max",
-        "cont_layer_first",
-        "cont_layer_last",
-        "cont_layer_variance",
-        "cont_layer_count",
-        "super_layer_first_vs_min",
-        "super_layer_max_vs_last",
-        "super_layer_occupancy",
-        "super_layer_mean",
-        "super_layer_variance"]
+        "empty_s_max"]
     #: list of variables to exclude for the vxd mva:
     exclude_variables_vxd = [
         'energyLoss_max', 'energyLoss_min', 'energyLoss_mean', 'energyLoss_std', 'energyLoss_sum',
@@ -2433,12 +2457,28 @@ class MasterTask(b2luigi.WrapperTask):
         ):
             # if test_selected_task is activated, only run the following tasks:
             if b2luigi.get_setting("test_selected_task", default=False):
-                yield CDCQEDataCollectionTask(
+                # for process_type in ['BHABHA', 'MUMU', 'TAUPAIR', 'YY', 'EEEE', 'EEMUMU', 'UUBAR', \
+                #    'DDBAR', 'CCBAR', 'SSBAR', 'BBBAR']:
+                    # if process_type in ['BHABHA', 'MUMU', 'TAUPAIR', 'YY', 'EEEE', 'EEMUMU']:
+                    #    events = self.n_events_testing*2
+                    # else:
+                # events = self.n_events_testing
+                for cut in ['000', '070']:  # , '050', '070', '080', '090']:
+                    yield RecoTrackQEDataCollectionTask(
                         num_processes=self.num_processes,
                         n_events=self.n_events_testing,
                         experiment_number=experiment_number,
                         random_seed=self.process_type + '_test',
-                        )
+                        recotrack_option='useCDC_noVXD_deleteCDCQI'+cut,
+                        cdc_training_target=cdc_training_target,
+                        fast_bdt_option=fast_bdt_option,
+                    )
+                yield CDCQEDataCollectionTask(
+                    num_processes=self.num_processes,
+                    n_events=self.n_events_testing,
+                    experiment_number=experiment_number,
+                    random_seed=self.process_type + '_test',
+                )
                 yield CDCQETeacherTask(
                     n_events_training=self.n_events_training,
                     process_type=self.process_type,
@@ -2446,7 +2486,7 @@ class MasterTask(b2luigi.WrapperTask):
                     exclude_variables=self.exclude_variables_cdc,
                     training_target=cdc_training_target,
                     fast_bdt_option=fast_bdt_option,
-                    )
+                )
             else:
                 # if data shall be processed, it can neither be trained nor evaluated
                 if 'DATA' in self.process_type:

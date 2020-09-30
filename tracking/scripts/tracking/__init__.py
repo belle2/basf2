@@ -53,11 +53,11 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_vxdTrack_QI = False
         add_recoTrack_QI = False
 
-    if add_recoTrack_QI and (not add_cdcTrack_QI or not add_vxdTrack_QI):
-        B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
-        add_cdcTrack_QI = False
-        add_vxdTrack_QI = False
-        add_recoTrack_QI = False
+    # if add_recoTrack_QI and (not add_cdcTrack_QI or not add_vxdTrack_QI):
+    #    B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
+    #    add_cdcTrack_QI = False
+    #    add_vxdTrack_QI = False
+    #    add_recoTrack_QI = False
 
     if not skipGeometryAdding:
         add_geometry_modules(path, components=components)

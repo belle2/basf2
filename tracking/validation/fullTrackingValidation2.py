@@ -20,11 +20,13 @@ from tracking.validation.run import TrackingValidationRun
 
 test_cuts = [0.0, 0.7, 0.8, 0.9]  # 0.25, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95]
 processes = ['BHABHA', 'MUMU', 'TAUPAIR', 'YY', 'EEEE', 'EEMUMU', 'UUBAR', 'DDBAR', 'CCBAR', 'SSBAR', 'BBBAR']
-with open("fullVal_cut_iterator.txt", "r") as cut_file:
+with open("fullVal_cut_iterator2.txt", "r") as cut_file:
     iterator = int(cut_file.read())
 process_it, cut_it = divmod(iterator, 4)
 cut = test_cuts[cut_it]
 process = processes[process_it]
+if iterator >= 41:
+    process = 'CAUSEERROR'
 print("The cut value of the CDC QI is:", cut)
 print("Test the process:", process)
 print(str(int(cut*100)).zfill(3))

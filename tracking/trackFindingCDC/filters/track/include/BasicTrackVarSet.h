@@ -33,8 +33,13 @@ namespace Belle2 {
       "pt",
       "size",
       "hits_per_layer",
+      "n_tracks",
 
       "sz_slope",
+      "globalImpact",
+      "impact_helix",
+      "d0_helix",
+      "z0_helix",
       "z0",
       "s_range",
       "avg_hit_dist",

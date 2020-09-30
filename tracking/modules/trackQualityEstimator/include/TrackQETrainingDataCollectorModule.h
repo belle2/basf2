@@ -87,6 +87,10 @@ namespace Belle2 {
 
     /** truth information collected with m_estimatorMC
      * type is float to be consistend with m_variableSet (and TTree + MVA implementation) */
-    float m_truth = NAN;
+    float m_matched = NAN;
+    float m_background = NAN;
+    float m_ghost = NAN;
+    float m_fake = NAN;
+    float m_clone = NAN;
   };
 }

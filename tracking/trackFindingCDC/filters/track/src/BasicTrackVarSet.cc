@@ -46,6 +46,7 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   statistics_accumulator  cont_layer_acc;
   statistics_accumulator super_layer_acc;
 
+  unsigned int n_tracks = track->getNTracks();
   unsigned int size = track->size();
 
   std::vector<unsigned int> cont_layer;
@@ -133,8 +134,13 @@ bool BasicTrackVarSet::extract(const CDCTrack* track)
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
   var<named("size")>() = size;
   var<named("hits_per_layer")>() = hits_per_layer;
+  var<named("n_tracks")>() = n_tracks;
 
   var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
+  var<named("globalImpact")>() = toFinite(trajectory2D.getGlobalImpact(), 0);
+  var<named("impact_helix")>() = toFinite(trajectory3D.getLocalHelix().helix().impactXY(), 0);
+  var<named("d0_helix")>() = toFinite(trajectory3D.getLocalHelix().helix().d0(), 0);
+  var<named("z0_helix")>() = toFinite(trajectory3D.getLocalHelix().helix().z0(), 0);
   var<named("z0")>() = toFinite(trajectorySZ.getZ0(), 0);
   var<named("s_range")>() = toFinite(s_range, 0);
   var<named("avg_hit_dist")>() = toFinite(avg_hit_dist, 0);

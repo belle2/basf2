@@ -63,7 +63,7 @@ Bremsstrahlung than heavier particles with the same energy.
 At Belle II, we usually only consider Bremsstrahlung loses for electrons and
 positrons.
 
-.. admonition:: Exercise
+.. admonition:: Exercise (optional)
    :class: exercise stacked
 
    From the general equation for radiated power, derive the explicit form for
@@ -129,7 +129,27 @@ Bremsstrahlung corrected yet!).
 
 Next we will build up the list of possible Bremsstrahlung photons.
 In order to reduce the number of background clusters included, we first define a
-minimum cluster energy according to the region in the ECL the cluster is found:
+minimum cluster energy according to the region in the ECL the cluster is found.
+
+Because this cut will be a bit complicated, we will define aliases for cuts.
+This actually works with the `addAlias` function as well, if we combine it
+with the `passesCut` function.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    How would you define the alias ``myCut`` for the cut ``E > 1 and p > 1``?
+
+.. admonition:: Solution
+    :class: solution
+
+    You can use the ``passesCut`` function to turn a cut into a variable and
+    assign an alias for it.
+
+    .. code-block:: python3
+
+        from variables import variables as vm
+        vm.addAlias("myCut", "passesCut(E > 1 and p > 1")
 
 .. admonition:: Exercise
    :class: exercise stacked
@@ -140,11 +160,35 @@ minimum cluster energy according to the region in the ECL the cluster is found:
          2. If they are in the barrel region, their energy should be larger than 50 MeV
          3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
 
+    To do this, you need the `clusterReg` and `clusterE` variable.
+    To keep everything neat and
+    tidy, we recommend that you define the aliases ``goodFWDGamma`,
+    ``goodBRLGamma`` and ``goodBWDGamma`` for the three cuts. Finally you can
+    combine them to a ``goodGamma`` cut and use this to fill the particle list.
+
 .. admonition:: Hint
    :class: toggle xhint stacked
 
-   Take a look at the `clusterReg` variable documentation.
-   Use this, together with the `passesCut` variable!
+   The cuts will look like this:
+
+   .. code-block:: python3
+
+        vm.addAlias(
+            "goodXXXGamma", "passesCut(clusterReg == XXX and clusterE > XXX)"
+           )
+
+    where the ``XXX`` should be filled by you.
+
+.. admonition:: Another hint
+   :class: toggle xhint stacked
+
+   This is the first one:
+
+   .. code-block:: python3
+
+        vm.addAlias(
+            "goodFWDGamma", "passesCut(clusterReg == 1 and clusterE > 0.075)"
+           )
 
 .. admonition:: Solution
    :class: toggle solution
@@ -253,19 +297,19 @@ marker to the decay string:
     path=main,
    )
 
-Finally, let's add the invariant mass of the :math:`J/\psi` meson without any 
+Finally, let's add the invariant mass of the :math:`J/\psi` meson without any
 Bremsstrahlung recovery applied. Then, after running your steering file, compare
 this invariant mass with the one obtained after the recovery, by selecting only
-the correctly reconstructed :math:`J/\psi`. Can you see the effect of the 
+the correctly reconstructed :math:`J/\psi`. Can you see the effect of the
 Bremsstrahlung recovery?
 
 .. admonition:: Exercise
    :class: exercise stacked
 
    Create a variable to calculate the invariant mass of the
-   :math:`J/\psi` meson using the *uncorrected* momenta of the leptons. Call it 
+   :math:`J/\psi` meson using the *uncorrected* momenta of the leptons. Call it
    `'M_uncorrected'`.
-   Plot a histogram of `'M'` and `'M_uncorrected'` for the correctly reconstructed 
+   Plot a histogram of `'M'` and `'M_uncorrected'` for the correctly reconstructed
    :math:`J/\psi` mesons
 
 .. admonition:: Hint
@@ -277,34 +321,34 @@ Bremsstrahlung recovery?
 .. admonition:: Solution
    :class: toggle solution
 
-   ``daughterCombination(M,0:0,1:0)`` will give us the invariant mass of the first 
+   ``daughterCombination(M,0:0,1:0)`` will give us the invariant mass of the first
    daughter of the first daughter, and the first daughter of the second daughter.
    Since all particles in the ``e+:corrected`` particle list have as first daughter
    the uncorrected particle, we just need to calculate this daughter combination for
    the :math:`J/\psi` meson. We can do this by directly appending the expression to
-   the list of :math:`J/psi` variables we want to store, or we can rather make it a 
-   variable of the B mesons, by using the `daughter` meta-variable: 
+   the list of :math:`J/psi` variables we want to store, or we can rather make it a
+   variable of the B mesons, by using the `daughter` meta-variable:
 
         .. code-block:: python3
            :lineno-start: 113
 
             b_vars += variables.addAlias(
              "Jpsi_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
-            ) 
- 
+            )
+
     The next code plots the distributions using pandas:
 
     .. code-block:: python3
 
-       # Assuming your DataFrame is called df, and you imported 
+       # Assuming your DataFrame is called df, and you imported
        # matplotlib.pyplot as plt
        df[df.J_psi_isSignal == 1].hist("Jpsi_M_uncorrected",label="w/o brems corr")
        df[df.J_psi_isSignal == 1].hist("J_psi_M",label="with brems corr", alpha=0.7)
        plt.yscale("log") #set a logarithmic scale in the y-axis
-       plt.legend() #show legend      
- 
-    The results should look similar to :numref:`jpsi_brems_validation_plot` (this was obtained with a 
-    different steering file, so do not mind if your plot is not exactly the same). 
+       plt.legend() #show legend
+
+    The results should look similar to :numref:`jpsi_brems_validation_plot` (this was obtained with a
+    different steering file, so do not mind if your plot is not exactly the same).
 
     .. _jpsi_brems_validation_plot:
 
@@ -313,7 +357,7 @@ Bremsstrahlung recovery?
        :align: center
 
        Invariant mass distributions for the reconstructed decay, :math:`J/\psi \to e^+e^-`,
-       with and without Bremsstrahlung correction 
+       with and without Bremsstrahlung correction
 
 .. admonition:: Extra exercises
    :class: exercise
@@ -427,10 +471,10 @@ random seed.
     * MC matching with Bremsstrahlung corrected particles requires a special
       treatment: use the `isSignalAcceptBremsPhotons` variable, or add the
       ``?addbrems`` marker in the decay string
-    * Best candidate selection can be performed with the `rankByHighest` and 
+    * Best candidate selection can be performed with the `rankByHighest` and
       `rankByLowest` functions
     * These functions sort particles and antiparticles separately
-    * From light release ``light-2008-kronos``, a new helper function can be 
+    * From light release ``light-2008-kronos``, a new helper function can be
       used to perform random candidate selection: `applyRandomCandidateSelection`
 
 .. topic:: Authors of this lesson

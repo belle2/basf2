@@ -26,7 +26,7 @@ Python
     **Objectives**:
 
       * Get familiar with python
-      * Understand how to manipulate and plot data with `root_pandas`
+      * Understand how to manipulate and plot data with ``root_pandas``
 
 High Energy Physics (HEP) analyses are too complex to be done with pen, paper
 and calculator. They usually are not even suited for spreadsheet programs like
@@ -150,7 +150,7 @@ not create a python file using bash commands:
   :class: exercise stacked
 
   Create a python file, import the python library 'NumPy' as the
-  shortcut `np`, and print out the value of π.
+  shortcut ``np``, and print out the value of π.
 
 .. admonition:: Hint
   :class: xhint stacked toggle
@@ -248,14 +248,14 @@ Jupyter Notebooks are interactive notebooks that allow one to visualise code,
 data and outputs in a linear and clear way. When you run a notebook you have an
 operating system called a kernel that runs the code .   Each block in a jupyter
 notebook is a 'cell'. These cells can be run using the kernel by clicking the
-run button or by pressing `Shift + Enter`.   When you run a cell, the kernel will
+run button or by pressing ``Shift + Enter``.   When you run a cell, the kernel will
 process and store any variables or dataframes you define.   If your kernel
 crashes, you will have to restart it.
 
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Examine the `Cell` and `Kernel` drop down menus to see what options you have available.
+  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options you have available.
 
 
 
@@ -280,7 +280,7 @@ ROOT.
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Start a jupyter notebook and import `root_pandas`, as well as other libraries you think you'll need.
+  Start a jupyter notebook and import ``root_pandas``, as well as other libraries you think you'll need.
 
 .. admonition:: Hint
   :class: xhint stacked toggle
@@ -295,14 +295,14 @@ ROOT.
     import root_pandas
 
 
-You can load in an example dataframe using the `read_root` function from the `root_pandas` package. 
+You can load in an example dataframe using the ``read_root`` function from the ``root_pandas`` package.
 
 .. code:: ipython3
 
   # Loading an example data frame
   df = root_pandas.read_root("https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root")
 
-This code imports the `pandas_tutorial_ntuple.root` root file as a dataframe `df`. 
+This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe ``df``.
 
 
 

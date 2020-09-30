@@ -39,13 +39,13 @@ The fits we are going to perform are of two main types:
     If no vertex fit is performed, the corresponding variables for the vertex position will not be filled.
 
 
-* **Kinematic Fitting:** We use the fit to improve our knowledge of the particle kinematics. By default composite particle kinematics are built off the decay products
+* **Kinematic Fitting:** We use the fit to improve our knowledge of the particle kinematics. By default, composite particle kinematics are built off the decay products
   using 4-momentum conservation. If the particle we are reconstructing has a well defined mass (either stable, or a narrow resonance) it might make sense to apply a mass
   constraint to help reject combinatorial background. 
 
 .. warning::
 
-   If you apply a mass constraint, the invariant mass will be fixed to the nominal mass. This is problematic if you want then to use this variable, for example
+   If you apply a mass constraint, the invariant mass will be fixed to the nominal mass. This is problematic if you then want to use this variable, for example
    if you want to fit a peak. In that case, make sure you save the pre-fit mass separately.
   
 .. note:: 
@@ -82,13 +82,13 @@ Now suppose you are interested in reconstructing the :math:`B` decay vertex posi
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     It can't be the :math:`B` itself: neither the :math:`J/Psi` nor the :math:`K_s` are charged tracks.
+     It can't be the :math:`B` itself: out of its daughters, neither the :math:`J/\Psi` nor the :math:`K_s` are charged tracks.
 
 .. admonition:: Answer
      :class: toggle solution
      
-     You must fit the :math:`J/Psi \to e^+e^-` vertex. The :math:`J/Psi` is short-lived and therefore its vertex is a good approximation of the :math:`B`. 
-     The :math:`K_s` can decay several cm away from where it is produced.
+     You must fit the :math:`J/\Psi \to e^+e^-` vertex. The :math:`J/\Psi` is short-lived and therefore its vertex is a good approximation of the :math:`B`. 
+     Meanwhile, the :math:`K_s` can decay several cm away from where it is produced.
 
 
 .. admonition:: Exercise
@@ -114,16 +114,10 @@ Now suppose you are interested in reconstructing the :math:`B` decay vertex posi
      
      You can also set the confidence level to -1, which means failed fits will be included. The fit p-value is saved as part of mc.vertex.
 
-.. admonition:: Exercise
-     :class: exercise stacked
-
-     Plot the vertex position and pull.
-
-
 .. admonition:: Optional Exercise
      :class: exercise stacked
 
-     Fit the :math:`K_s` as well and compare its flight length to the :math:`J/Psi`
+     Fit the :math:`K_s` as well. How does its flight lenght compare to the :math:`J/Psi`?
 
 .. admonition:: Optional Exercise
      :class: exercise stacked
@@ -134,23 +128,31 @@ Now suppose you are interested in reconstructing the :math:`B` decay vertex posi
 Tag Vertex Fitting
 ------------------
 
-Since :math:`B` mesons are produced in pairs, for every signal candidate we reconstruct, there will be also another (the "tag") which is not explicitly reconstructed. We 
-might be interested in knowning the decay position of this B without placing any requirements on its decay. This is done using the ``TagV`` module. 
-TagV performs a geometric fit over the tracks in the ROE to determine the tag decay vertex. However, not all tracks will necessarily come from the tag itself; consider for example our signal, 
-where the pion tracks originate from a displaced vertex. TagV is designed to iteratively downweight those tracks, ultimately excluding them from the fit.
+Since :math:`B` mesons are produced in pairs, for every signal candidate we reconstruct, there will also be another (the "tag") which is not explicitly reconstructed. We 
+might be interested in knowing the decay position of this meson without placing any requirements on its decay. This is done using the ``TagV`` module. 
+``TagV`` performs a geometric fit over the tracks in the ROE to determine the tag decay vertex. However, not all tracks will necessarily come from the tag itself; consider for example our signal, 
+where the pion tracks originate from a long lived kaon vertex. TagV is designed to iteratively downweight those tracks, ultimately excluding them from the fit.
 
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Locate the TagV documentation.
+     Locate the ``TagV`` documentation.
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     It's in the same page as ``KFit``.
 
 .. admonition:: Question
      :class: exercise stacked
 
-   By default, TagV only uses tracks with PXD hits. Why?
+     By default, TagV only uses tracks with PXD hits. Why?
 
+.. admonition:: Solution
+     :class: toggle solution
 
-.. In order to reinforce the fit, an IP constraint is applied to the TagV fit. If the signal is fully reconstructed, the signal B flight direction might be used to relax this fit.
+     Those tracks provide the best resolution close to the interaction point. As a bonus, this selection rejects tracks from displaced vertices.
+
 
 .. admonition:: Exercise
      :class: exercise stacked
@@ -171,7 +173,39 @@ where the pion tracks originate from a displaced vertex. TagV is designed to ite
           ...
           b_vars += vc.tag_vertex + vc.mc_tag_vertex
 
+
+Plotting
+--------
+
+Congratulations! Your steering file is ready!
+\... or maybe you just skipped ahead. Either way, time to run it and check the results.
+
+
 .. admonition:: Exercise
      :class: exercise stacked
 
-   Plot some relevant variable.
+   Run the steering file.
+
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     .. code-block:: bash
+          basf2 steering_file_name.py
+     Replace with the name of your steering file as appropriate.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+   Plot some relevant variables for :math:`J/\Psi`, the tag vertex and, if you did the optional exercise, :math:`K_s`.
+   
+   * Vertex position (try various coordinates, in particular try the radial distance)
+   * Resolution (:math:`\sigma(x)/x`) where x is each of the above variables.
+   * Pull (:math:`(x-x(MC)/\sigma(x)`).
+   
+   Is this what you expect?
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     INSERT NOTEBOOK?

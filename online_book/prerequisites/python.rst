@@ -628,9 +628,14 @@ crashing - there are a few ways in which we can mitigate this.
   -   Add any cuts you can
 
 To import the file using chunking there are some slight differences in the code:
-``df_chunk = root_pandas.read_root([filePath/fileName],'treeName',
-columns = Y4S_columns, chunksize=100)``. Here I have defined which columns I wish
-to be included in the following string:
+
+.. code:: ipython3
+
+   df_chunk = root_pandas.read_root(
+       [filePath/fileName], 'treeName', columns=Y4S_columns, chunksize=100
+   )
+
+Here I have defined which columns I wish to be included in the following string:
 
 .. code:: ipython3
 

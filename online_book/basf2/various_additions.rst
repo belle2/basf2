@@ -355,6 +355,19 @@ Bremsstrahlung recovery?
    * Create a variable  named ``withBremsCorrection`` that indicates if any of
      the leptons used in the reconstruction of the B meson was Bremsstrahlung recovered
 
+.. admonition:: Key points
+    :class: key-points
+
+    * There are two ways of performing Bremsstrahlung correction: `correctBrems` and
+      `correctBremsBelle`
+    * Both of them create new particle lists
+    * The members of the new particle list will have as daughter the original
+      uncorrected particle and, if a correction was performed, the
+      Bremsstrahlung photons used
+    * MC matching with Bremsstrahlung corrected particles requires a special
+      treatment: use the `isSignalAcceptBremsPhotons` variable, or add the
+      ``?addbrems`` marker in the decay string
+
 Best Candidate Selection
 ________________________
 
@@ -459,15 +472,6 @@ random seed.
 .. admonition:: Key points
     :class: key-points
 
-    * There are two ways of performing Bremsstrahlung correction: `correctBrems` and
-      `correctBremsBelle`
-    * Both of them create new particle lists
-    * The members of the new particle list will have as daughter the original
-      uncorrected particle and, if a correction was performed, the
-      Bremsstrahlung photons used
-    * MC matching with Bremsstrahlung corrected particles requires a special
-      treatment: use the `isSignalAcceptBremsPhotons` variable, or add the
-      ``?addbrems`` marker in the decay string
     * Best candidate selection can be performed with the `rankByHighest` and
       `rankByLowest` functions
     * These functions sort particles and antiparticles separately

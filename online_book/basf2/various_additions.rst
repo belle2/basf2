@@ -369,7 +369,7 @@ Bremsstrahlung recovery?
       ``?addbrems`` marker in the decay string
 
 Best Candidate Selection
-________________________
+------------------------
 
 Sometimes, even after multiple selection criteria have been applied, a single
 event may contain more than one candidate for the reconstructed decay.

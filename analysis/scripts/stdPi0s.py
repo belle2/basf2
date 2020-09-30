@@ -16,17 +16,17 @@ from vertex import kFit
 from basf2 import B2WARNING
 
 
-def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
+def stdPi0s(listtype="eff60_Jan2020", path=None):
     """
     Function to prepare one of several standardized types of pi0 lists:
 
-    - 'pi0:all' using gamma:all
-    - 'pi0:eff10_Jan2020' gamma:pi0eff10_Jan2020, mass range selection, 10% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff20_Jan2020' gamma:pi0eff20_Jan2020, mass range selection, 20% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff30_Jan2020' gamma:pi0eff30_Jan2020, mass range selection, 30% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff40_Jan2020' gamma:pi0eff40_Jan2020, mass range selection, 40% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff50_Jan2020' gamma:pi0eff50_Jan2020, mass range selection, 50% pi0 efficiency list, optimized in January 2020
-    - 'pi0:eff60_Jan2020' gamma:pi0eff60_Jan2020, mass range selection, 60% pi0 efficiency list, optimized in January 2020
+    - 'all' using gamma:all
+    - 'eff10_Jan2020' gamma:pi0eff10_Jan2020, mass range selection, 10% pi0 efficiency list, optimized in January 2020
+    - 'eff20_Jan2020' gamma:pi0eff20_Jan2020, mass range selection, 20% pi0 efficiency list, optimized in January 2020
+    - 'eff30_Jan2020' gamma:pi0eff30_Jan2020, mass range selection, 30% pi0 efficiency list, optimized in January 2020
+    - 'eff40_Jan2020' gamma:pi0eff40_Jan2020, mass range selection, 40% pi0 efficiency list, optimized in January 2020
+    - 'eff50_Jan2020' gamma:pi0eff50_Jan2020, mass range selection, 50% pi0 efficiency list, optimized in January 2020
+    - 'eff60_Jan2020' gamma:pi0eff60_Jan2020, mass range selection, 60% pi0 efficiency list, optimized in January 2020
 
     You can also append "Fit" to the listtype which will run a mass fit and
     require that the fit did not fail. For example: "pi0:eff50_Jan2020Fit" is the 50%
@@ -124,6 +124,8 @@ def stdPi0s(listtype='pi0:eff60_Jan2020', path=None):
         stdPi0s('eff60_Jan2020', path)
         ma.cutAndCopyList('pi0:eff60_Jan2020Fit', 'pi0:eff60_Jan2020', '', True, path)
         kFit('pi0:eff60_Jan2020Fit', 0.0, 'mass', path=path)
+    else:
+        raise ValueError(f"\"{listtype}\" is none of the allowed standardized types of pi0 lists!")
 
 # pi0 list for skims (and ONLY for skims)
 

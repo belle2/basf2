@@ -253,8 +253,9 @@ region".
     :class: toggle xhint stacked
 
     The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^35\ \textrm
-    {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly 10 μs to complete a full revolution around the accelerator
-    ring. Up to 2376 bunches will circulate in each ring.
+    {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly 10 μs to complete
+    a full revolution around the accelerator ring. Up to 2376 bunches will circulate 
+    in each ring.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -355,7 +356,7 @@ TOP
     `Cherenkov effect <https://en.wikipedia.org/wiki/Cherenkov_radiation>`_.
     Particles passing through will cause Cherenkov photons to be emitted at an
     angle that directly depends on the particle velocity. Combining this
-    velocity information with particle momentum measured in the preceding
+    velocity information with the particle momentum measured in the preceding
     tracking detectors yields a mass measurement, which identifies the particle
     species. Emitted Cherenkov photons are captured inside the quartz bars by
     total internal reflection. TOP reconstructs the Cherenkov emission angle by
@@ -486,7 +487,7 @@ is what we call "one event". Generating this trigger signal for each
 what effectively amounts to a low resolution "live stream" of the readout data
 of CDC, ECL and KLM (for completeness: TOP also sends stream data to TRG  but it
 is not used for triggering directly). The streamed data is interpreted in near
-realtime in highly specialized fast electronics boards (Field Programmable Gate
+realtime using specialized fast electronics (Field Programmable Gate
 Arrays, FPGAs) by continuously matching it to predefined trigger conditions. If
 TRG determines an interesting collision event has just taken place, it generates
 a trigger signal which is distributed to all subdetectors. The TRG system is
@@ -506,7 +507,7 @@ system.
 
 The HLT system is a computing cluster of about 4000 CPU cores located right next
 to the Belle II detector. It receives the full raw subdetector data for each
-triggered event performs an immediate full reconstruction, using the
+triggered event and performs an immediate full reconstruction using the
 exact same basf2 software as is used in offline data analysis. Based on the
 result of this reconstruction, events are classified and either stored to a
 local offline storage hard disk drive or discarded. This high level event
@@ -530,9 +531,9 @@ in your analysis. Since the prescaling settings can (and will) change over
 the lifetime of the Belle II experiment, you have to update numbers for each run.
 
 Since the TRG and HLT systems are ultimately deciding which data is being kept
-for offline analysis, the importance of understanding and validating their
-performance vs. their intended functionality is of highest importance for the
-success of the Belle II experiment.
+for offline analysis, understanding and validating their performance vs. their
+intended functionality is of highest importance for the success of the Belle II
+experiment.
 
 .. admonition:: Key points
     :class: key-points

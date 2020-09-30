@@ -82,6 +82,10 @@ def getAllSamples(mcCampaign):
         "proc11_exp7",
         "proc11_exp8",
         "proc11_exp10",
+        "bucket9_exp12",
+        "bucket10_exp12",
+        "bucket11_exp12",
+        "bucket12_exp12_4S_offres",
     ]
 
     return mcSamples, dataSamples

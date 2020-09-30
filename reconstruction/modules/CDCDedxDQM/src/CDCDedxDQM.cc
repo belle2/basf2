@@ -38,7 +38,7 @@ void CDCDedxDQMModule::defineHisto()
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   fCurrentEventNum = eventMetaDataPtr->getRun();
 
-  temp1D = new TH1D("hdEdx_PerRun", Form("hdEdx_PerRun%d", fCurrentEventNum), 200, 0., 2.);
+  temp1D = new TH1D("hdEdx_PerRun", Form("hdEdx_PerRun%d", fCurrentEventNum), 300, 0., 3.);
   temp1D->GetXaxis()->SetTitle("dEdx trucMean of bhabha tracks");
   temp1D->GetYaxis()->SetTitle("Entries");
 
@@ -93,7 +93,7 @@ void CDCDedxDQMModule::event()
   const std::map<std::string, int>& fresults = m_TrgResult->getResults();
   if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end()
       and fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end()) {
-    B2WARNING("CDCDedxDQMModule: Can't find required trigger identifiers: going back ");
+    //B2WARNING("CDCDedxDQMModule: Can't find required trigger identifiers: going back ");
     return;
   }
 
@@ -102,7 +102,7 @@ void CDCDedxDQMModule::event()
   const bool IsHadronEvtAccepted = (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron") ==
                                     SoftwareTriggerCutResult::c_accept);
   if (!IsBhabhaEvtAccepted and !IsHadronEvtAccepted) {
-    B2WARNING("CDCDedxDQMModule: not an bhabha or hadron event: going back");
+    //B2WARNING("CDCDedxDQMModule: not an bhabha or hadron event: going back");
     return;
   }
   // fill histograms for bhabha-events only

@@ -1,9 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-Convert list of LPNs into YAML format expected by b2skim-prod. The expected input to
-this script is a text file of LPNs, which can be obtained from the dataset searcher.
+"""\
+``%(prog)s`` is a tool for converting a list of LPNs into YAML format expected by
+:ref:`b2skim-prod<b2skim-prod>`. The expected input to ``%(prog)s`` is a text file of
+LPNs, like those which can be downloaded from the dataset searcher.
+
+The test sample labels (under the key ``sampleLabel``) are automatically generated, so
+please check they all correspond to a label ``skim/scripts/TestFiles.yaml`` after
+running the script.
+
+--epilog--
+.. rubric:: Example usage
+
+* Convert list of BGx1 MC LPNs into YAML format and print to screen::
+
+    $ %(prog)s my_MC_LPNs.txt --mc --bg BGx1
+
+* Convert list of data LPNs into YAML format and save to file::
+
+    $ %(prog)s my_data_LPNs.txt --data -o my_data_LPNs.yaml
+
 """
 
 import argparse
@@ -20,7 +37,12 @@ __author__ = "Phil Grace"
 
 
 def get_argument_parser():
-    parser = argparse.ArgumentParser()
+    description, epilog = __doc__.split("--epilog--")
+    parser = argparse.ArgumentParser(
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=epilog,
+    )
     parser.add_argument(
         metavar="input_lpn_list_file",
         dest="input",
@@ -30,13 +52,22 @@ def get_argument_parser():
         "-o",
         metavar="output_filename",
         dest="output",
-        help="Output YAML file name. If none given, prints to screen.",
+        help="Output YAML file name. If none given, prints output to screen.",
     )
     DataMCGroup = parser.add_mutually_exclusive_group(required=True)
-    DataMCGroup.add_argument("--data", action="store_true")
-    DataMCGroup.add_argument("--mc", action="store_true")
+    DataMCGroup.add_argument(
+        "--data", action="store_true", help="Flag to indicate the LPNs are for data."
+    )
+    DataMCGroup.add_argument(
+        "--mc", action="store_true", help="Flag to indicate the LPNs are for MC."
+    )
 
-    parser.add_argument("--bg", choices=("BGx0", "BGx1"), required=("--mc" in sys.argv))
+    parser.add_argument(
+        "--bg",
+        choices=("BGx0", "BGx1"),
+        required=("--mc" in sys.argv),
+        help="Beam background level of MC samples. Only required for MC.",
+    )
     return parser
 
 

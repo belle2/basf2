@@ -67,7 +67,7 @@
 #ifdef LOG_NO_B2DEBUG
 #define B2DEBUG(level, streamText) _B2_DO_NOTHING
 #else
-#define B2DEBUG(level, streamText) B2LOG(Belle2::LogConfig::c_Debug, level, streamText)
+#define B2DEBUG(level, streamText) do { if (Belle2::LogSystem::debugEnabled()) B2LOG(Belle2::LogConfig::c_Debug, level, streamText); } while(false)
 #endif
 
 /**

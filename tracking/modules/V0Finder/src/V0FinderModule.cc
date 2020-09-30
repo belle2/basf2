@@ -30,6 +30,8 @@ V0FinderModule::V0FinderModule() : Module()
   //input tracks
   addParam("RecoTracks", m_arrayNameRecoTrack,
            "RecoTrack StoreArray name (input)", std::string(""));
+  addParam("CopiedRecoTracks", m_arrayNameCopiedRecoTrack,
+           "RecoTrack StoreArray name (used for track refitting)", std::string("CopiedRecoTracks"));
   addParam("TrackFitResults", m_arrayNameTFResult,
            "Belle2::TrackFitResult StoreArray name (in- and output).\n"
            "Note that the V0s use pointers indices into these arrays, so all hell may break loose, "
@@ -53,6 +55,12 @@ V0FinderModule::V0FinderModule() : Module()
   addParam("vertexChi2CutOutside", m_vertexChi2CutOutside,
            "Maximum chi² for the vertex fit (NDF = 1)", 50.);
 
+  addParam("v0FitterMode", m_v0FitterMode,
+           "designate which fitAndStore function is called in V0Fitter.\n"
+           "    0: store V0 at the first vertex fit, regardless of inner hits \n"
+           "    1: remove hits inside the V0 vertex position\n"
+           "    2: mode 2 +  don't use SVD hits if there is only one available SVD hit-pair (default)",
+           1);
 
   addParam("massRangeKshort", m_MassRangeKshort, "mass range in GeV for reconstructed Kshort used for pre-selection of candidates"
            " (to be chosen loosely as used momenta ignore material effects)", m_MassRangeKshort);
@@ -68,9 +76,11 @@ void V0FinderModule::initialize()
   m_tracks.requireRelationTo(recoTracks);
   //All the other required StoreArrays are checked in the Construtor of the V0Fitter.
   m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
-                                          m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack, m_validation);
+                                          m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
+                                          m_arrayNameCopiedRecoTrack, m_validation);
 
   m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside);
+  m_v0Fitter->setFitterMode(m_v0FitterMode);
 
   // safeguard for users that try to break the code
   if (std::get<0>(m_MassRangeKshort) > std::get<1>(m_MassRangeKshort)) {

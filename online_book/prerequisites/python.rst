@@ -150,7 +150,7 @@ not create a python file using bash commands:
   :class: exercise stacked
 
   Create a python file, import the python library 'NumPy' as the
-  shortcut `np`, and print out the value of pi.
+  shortcut `np`, and print out the value of π.
 
 .. admonition:: Hint
   :class: xhint stacked toggle
@@ -233,7 +233,7 @@ data at Belle II. Within these files are 'TTrees' known as 'trees', which are
 analogous to a sub-folder. For example, you may store a tree full of :math:`B`
 meson candidates. Within a tree you can have 'TBranches' known as
 'branches'. Each branch could be one of the oodles of variables available for
-the particle you've stored in your tree - for example, the :math:`B` meson's
+the particle you've stored in your tree --- for example, the :math:`B` meson's
 invariant mass, it's daughter's momentum, it's great-great-granddaughter's
 cluster energy etc. etc. etc.
 

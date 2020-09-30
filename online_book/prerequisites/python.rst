@@ -522,8 +522,8 @@ distributions. This time we use the ``root_pandas`` package to read the data
 
 .. code:: ipython3
 
-  fileₚath = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
-  df = root_pandas.read_root(fileₚath).astype(float)
+  file_path = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
+  df = root_pandas.read_root(file_path).astype(float)
   df.B0_isSignal = df.B0_isSignal.astype(bool)
   df.describe()
 

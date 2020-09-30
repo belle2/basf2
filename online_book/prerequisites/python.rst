@@ -126,7 +126,8 @@ As a script from your terminal:
 
 Or within a python compiler and interpreter such as Visual Studio or XCode.
 
-The official recommended version of python is python3. Python2 is no longer supported. To check which python version you have installed you can check in your terminal using 
+The official recommended version of python is python3. Python2 is no longer supported.
+To check which python version you have installed you can check in your terminal using
 
 .. code-block:: bash
 
@@ -480,7 +481,10 @@ this as a boolean value:
 Grouped Operations
 ------------------
 
-One of the most powerful features of pandas is the ``groupby`` operation.  This is beyond the scope of the tutorial, but the user should be aware of it's existence ready for later analysis. ``groupby`` allows the user to group all rows in a dateframe by selected variables.
+One of the most powerful features of pandas is the ``groupby`` operation. This
+is beyond the scope of the tutorial, but the user should be aware of it's
+existence ready for later analysis. ``groupby`` allows the user to group all
+rows in a dateframe by selected variables.
 
 .. code:: ipython3
 

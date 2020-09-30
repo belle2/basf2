@@ -623,9 +623,9 @@ Dealing with large files in a jupyter notebook
 If your files are quite large you may start to find your jupyter notebook kernel
 crashing - there are a few ways in which we can mitigate this.
 
-  -   ‘Chunk’ your data
-  -   Only import the columns (variables) that you will use/need.
-  -   Add any cuts you can
+  - ‘Chunk’ your data
+  - Only import the columns (variables) that you will use/need.
+  - Add any cuts you can
 
 To import the file using chunking there are some slight differences in the code:
 
@@ -660,7 +660,7 @@ reduce the loaded, chunked file more.
 
 .. code:: ipython3
 
-  cut="(B0_mbc>5.2)" # Define our cut
+  cut = "(B0_mbc > 5.2)" # Define our cut
 
   df_list = []
   for chunk in df_chunk:

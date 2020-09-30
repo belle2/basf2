@@ -158,7 +158,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
 bool SVDCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
 {
   float meanRawCoGTimeL3V = 0;
-  // auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDST");
+  // auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDC");
   auto rawCoGTimeL3V = getObjectPtr<TH1F>("hRawCoGTimeL3V");
   // float meanEventT0 = eventT0Hist->GetMean();
   if (!rawCoGTimeL3V) {

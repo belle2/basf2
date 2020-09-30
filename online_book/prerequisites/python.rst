@@ -598,7 +598,7 @@ the columns and supply the dataframe as ``data=`` argument
 .. code:: ipython3
 
   fig, axes = plt.subplots(1,2, figsize=(20,10))
-  axes[0].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)], df[df.B0_isSignal], bins=50);
+  axes[0].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)], data=df[df.B0_isSignal], bins=50);
   axes[1].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)], data=df[~df.B0_isSignal], bins=50, cmap="magma");
 
 

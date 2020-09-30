@@ -519,6 +519,7 @@ df.query("(B0_mbc>5.2) & (B0_deltae>-1")
   :class: solution toggle
 
   .. code:: ipython3
+
     bkgd_df = df.query("(B0_isSignal==0)")["B0_mbc", "B0_M", "B0_isSignal","B0_deltae"]
     signal_df = df.query("(B0_isSignal==1)")["B0_mbc", "B0_M", "B0_isSignal","B0_deltae"]
 
@@ -617,32 +618,87 @@ representations, but here’s our chance to shine! We can implement matplotlib
 functions to make our plots GREAT. You can even choose a `colourblind friendly
 colour scheme<https://confluence.desy.de/display/BI/Colo%28u%29r+Blind+Friendly+Plots+and+Displays>`_!
 
-You can have subplots:
+It is possible to display multiple plots at once using ``plt.subplots``. As you can see 
+below, rather than simply having our histograms show up using ``plt``, we define a 
+figure ``fig`` and an axis ``ax``. 
+These are the equivalent of our canvas where we paint our code art. 
 
 .. code:: ipython3
 
-  fig, axes = plt.subplots(figsize=(10,6))
+  fig, ax = plt.subplots(1,2,figsize=(10,6))
 
-  h = axes.hist(df.query("(B0_isSignal == 1)").B0_mbc, bins=100, range=(5.2, 5.3),
+  h = ax[0].hist(df.query("(B0_isSignal == 1)").B0_mbc, bins=100, range=(5.2, 5.3),
                 histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
-  h = axes.hist(df.query("(B0_isSignal == 0)").B0_mbc, bins=100, range=(5.2, 5.3),
+  h = ax[1].hist(df.query("(B0_isSignal == 0)").B0_mbc, bins=100, range=(5.2, 5.3),
                 histtype='step', lw=2, label="Background")
-  axes.legend(loc="best")
-  axes.set_xlabel(r"$M_{\mathrm{bc}}$", fontsize=18)
-  axes.grid()
-  axes.set_xlim(5.2, 5.3)
-  fig.tight_layout()
+
+  ax[0].legend(loc="best")
+  ax[0].set_xlabel(r"$M_{\mathrm{bc}}$", fontsize=18)
+  ax[0].grid() # applies a nice grid to the plot
+  ax[0].set_xlim(5.2, 5.3) # sets the range of the x-axis
+
+  plt.show() #shows the figure after all changes to the style have been made
+
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  Run the above code to see the effects on the output and then apply your own changes to
+  the second axis.
+
+.. admonition:: Hint
+  :class: xhint stacked toggle
+
+  ``ax[0]`` refers to the first axis, so all changes in the code snippet above will
+  only change that axis.
+
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  This solution is a basic example, there are many fun style edits you can find online for
+  yourself.
+
+  .. code:: ipython3
+    
+    fig, ax = plt.subplots(1,2,figsize=(10,6))
+
+    h = ax[0].hist(df.query("(B0_isSignal == 1)").B0_mbc, bins=100, range=(5.2, 5.3),
+                  histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
+    h = ax[1].hist(df.query("(B0_isSignal == 0)").B0_mbc, bins=100, range=(5.2, 5.3),
+                  histtype='step', lw=2, label="Background")
+
+    ax[0].legend(loc="best")
+    ax[1].legend(loc=3)
+
+    ax[0].set_xlabel(r"$M_{\mathrm{bc}}$", fontsize=18)
+    ax[1].set_xlabel(r"$M_{\mathrm{bc}}$", fontsize=20)
+
+    ax[0].grid()
+
+    ax[0].set_xlim(5.2, 5.3)
+    ax[1].set_xlim(5.2, 5.3)
+
+    plt.show()
+
+
 
 The implementation of 2D histograms are often very useful and are easily done:
 
 .. code:: ipython3
 
   plt.figure(figsize=(15,10))
-  cut = 'B0_mbc>5.2 and B0_phi_M<1.1'
+  cut = '(B0_mbc>5.2) & (B0_phi_M<1.1)'
   h = plt.hist2d(df.query(cut).B0_mbc, df.query(cut).B0_phi_M, bins=100)
   plt.xlabel(r"$M_{BC}$")
   plt.ylabel(r"$M(\phi)$")
   plt.savefig("2dplot.pdf")
+  plt.show()
+  plt.close()
+
+.. note:: 
+  Note here how the query cut has been defined as a variable. This could save you a headache
+  later! It reduces the chance of human copy/paste errors and also allows a quick 
+  bulk change to your applied cuts.
 
 Matplotlib now understands data frames so in almost all cases you can just name
 the columns and supply the dataframe as ``data=`` argument

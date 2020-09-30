@@ -700,24 +700,6 @@ The implementation of 2D histograms are often very useful and are easily done:
   later! It reduces the chance of human copy/paste errors and also allows a quick 
   bulk change to your applied cuts.
 
-Matplotlib now understands data frames so in almost all cases you can just name
-the columns and supply the dataframe as ``data=`` argument
-
-.. code:: ipython3
-
-  fig, axes = plt.subplots(1,2, figsize=(20,10))
-  axes[0].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)],
-                 data=df.query("B0_isSignal == 1)"], bins=50);
-  axes[1].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)],
-                 data=df.query("B0_isSignal == 0)", bins=50, cmap="magma");
-
-
-
-.. admonition:: Exercise
-  :class: exercise stacked
-
-  Write a function to automatically plot a column in the DataFrame for
-  signal and background. Loop over all columns and produce all plots.
 
 
 Finally, Belle II does have an `official plot style<https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally. You do not need to worry about this at this stage, but keep it in mind. As you will find out, from ``release-05-00-00`` the plot style is available in the Belle II software `BASF2`. Once you have that running, importing the style is as easy as "one, two, ...

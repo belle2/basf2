@@ -527,8 +527,7 @@ intentionally issuing triggers only for fractions of a given event class is
 named prescaling. When working on your own analysis, it is very important to
 keep in mind potential prescaling of the triggers that yield the events you use
 in your analysis. Since the prescaling settings can (and will) change over
-the lifetime of the Belle II experiment, updated numbers for each run can be
-found here TODO: where? on confluence?
+the lifetime of the Belle II experiment, you have to update numbers for each run.
 
 Since the TRG and HLT systems are ultimately deciding which data is being kept
 for offline analysis, the importance of understanding and validating their
@@ -544,8 +543,6 @@ success of the Belle II experiment.
       which events to keep for offline analysis and which ones to discard.
     * Prescaling might be used to only record every n-th event (on average) that
       satisfies given trigger conditions.
-
-TODO: HLT tags? jiltering? (HLT skims)
 
 Simulation: the Monte Carlo
 ---------------------------

@@ -10,7 +10,7 @@ HEP Analyses
 
     **Prerequisites**:
 
-    	* What is a B factory?
+        * What is a B factory?
 
     **Objectives**:
 
@@ -50,7 +50,7 @@ Introduction: Cuts and signal selection
 
 Almost regardless of the quantity you are going to measure in your analysis, you
 will have to face some basic problems: select events you want to study (the
-signal) over similar events that mimic them (the background), estimate 
+signal) over similar events that mimic them (the background), estimate
 efficiency of such a selection and, possibly, estimate the intrinsic resolution
 of the quantities you will measure. Finally you will typically want to count how
 many signal events you observe.
@@ -105,7 +105,7 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
 .. admonition:: Question
     :class: exercise stacked
 
-    What is the most likely final state for an :math:`e^+e^-` collision at 
+    What is the most likely final state for an :math:`e^+e^-` collision at
     10 GeV?
     What is the cross section?
 
@@ -117,7 +117,7 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
-    Probably you are looking for `this page 
+    Probably you are looking for `this page
     <https://confluence.desy.de/x/AQkWAg>`_.
 
 .. admonition:: Solution :class: toggle solution
@@ -146,37 +146,37 @@ However this is not the most probable result in an :math:`e^+e^-` collision.
 
 We call anything that is not "what you want to analyse": **background**.
 But this is a bit of a sloppy definition.
-In fact, you will encounter roughly four things in a Belle II analysis that 
+In fact, you will encounter roughly four things in a Belle II analysis that
 people call "background".
 It depends a bit on how one counts.
 
-.. warning:: 
+.. warning::
 
-    We will always specify in these lessons. 
-    But in your working life (in meetings etc), you might hear the word 
+    We will always specify in these lessons.
+    But in your working life (in meetings etc), you might hear the word
     "background" and you will need to infer from the context precisely what is
     being discussed.
 
-The example we've just discussed (such as :math:`e^+e^- \to e^+e^-`) are 
+The example we've just discussed (such as :math:`e^+e^- \to e^+e^-`) are
 background *events* or background *processes*.
-These are relatively easy to reject and can be done in the **trigger** or by 
+These are relatively easy to reject and can be done in the **trigger** or by
 rather simple cuts.
 More on this :ref:`later on in this lesson
 <onlinebook_fundamentals_trigger_filter>`.
 You don't need to worry too much about these if you are doing B physics.
 But these background processes can be important for low-multiplicity analyses.
 
-The second kind of background arises from physics processes that mimic your 
+The second kind of background arises from physics processes that mimic your
 signal.
 
 .. admonition:: Example
 
     If you want to analyse :math:`B\to K^{(*)}\ell^+\ell^-` decays then you
-    would be concerned with the (much higher branching fraction) 
+    would be concerned with the (much higher branching fraction)
     :math:`B\to J/\psi K^{(*)}` process where the :math:`J/\psi` subsequently
     decays to a pair of leptons.
 
-        Most people would call this a "physics background".
+    Most people would call this a "physics background".
 
 You would also get backgrounds of this second kind where there was some particle
 mis-identification or mis-reconstruction.
@@ -184,41 +184,41 @@ mis-identification or mis-reconstruction.
 The third kind of background arises from the continuum of hadronic events.
 As you saw in the exercises before, :math:`B\bar B` is only part of the hadronic
 cross section.
-You will also get hadronisation of light quarks (:math:`uds`), and the charm 
+You will also get hadronisation of light quarks (:math:`uds`), and the charm
 quark (which is a background to B physics, for example, but obviously the signal
 for charm physics measurements).
 
 These hadronic events produce many tracks (around 10 or 11) per event.
-You are therefore, just by probability, likely to find some combination of 
-genuine tracks and clusters that mimic your signal but aren't from a :math:`B` 
+You are therefore, just by probability, likely to find some combination of
+genuine tracks and clusters that mimic your signal but aren't from a :math:`B`
 decay.
 We call this **continuum background**.
-This background can be suppressed to a certain extent, although many analyses 
-leave some part of this background in the data sample as it is relatively 
+This background can be suppressed to a certain extent, although many analyses
+leave some part of this background in the data sample as it is relatively
 straightforward to model and cutting too strictly on contunuum suppression
 variables will hurt signal efficiency at some stage.
 You will have a lesson about :ref:`continuum suppression <onlinebook_cs>` and
 :ref:`examples of modelling <onlinebook_fitting>` later in these tutorials.
 
-The fourth thing people will refer to as "background" is something rather 
+The fourth thing people will refer to as "background" is something rather
 different.
 **Beam-induced background** are tracks and clusters that are not produced from
 the primary :math:`e^+e^-` collision, but from other interactions in the beam
 itself.
 These are more prevalent in Belle II compared to Belle (and previous
 experiments) since the beams are significantly more focused at SuperKEKB.
-Beam background tracks and clusters are rather easy to reject at the final 
+Beam background tracks and clusters are rather easy to reject at the final
 stages of an analysis the presence of such tracks and clusters is usually
 tolerable (you can just ignore them).
 They are, however, relevant during reconstruction and in the high-level trigger.
 
-It might be obvious but let us state an obvious thing: even events that are 
+It might be obvious but let us state an obvious thing: even events that are
 really from your signal can contain these background clusters and tracks.
 You do not need to reject the whole event just because of some beam background.
 
-.. tip:: 
+.. tip::
 
-    You should discuss the backgrounds that you are expecting to encounter in 
+    You should discuss the backgrounds that you are expecting to encounter in
     your analysis with your supervisor.
     This is a very important and useful conversation.
 
@@ -1034,15 +1034,15 @@ Analysis: the skimming
 After data procesing, the mDST files are finally available for analysis. While it's possible
 to run directly on them, it's however quite inconvenient. The mDST contain all the events that
 have been acquired, while usually an analysis needs only a very small fraction of them, not to
-mention that several analyses may share the need to reconstruct the same objects (countless 
+mention that several analyses may share the need to reconstruct the same objects (countless
 analyses include a :math:`D^{\star}` or a :math:`J/\psi`, for example).
 
-The goal of the analysis skims (often just called skims) is to produce smaller datasets, 
-each amounting to few percents of the total dataset,  that can be shared among several analyses. 
+The goal of the analysis skims (often just called skims) is to produce smaller datasets,
+each amounting to few percents of the total dataset,  that can be shared among several analyses.
 
-To produce a skim one has do define a rather simple selection, which is as inclusive as possible 
+To produce a skim one has do define a rather simple selection, which is as inclusive as possible
 (or, in other words, uses cuts as loose as possible), while keeping the retention rate within
-reasonable boundaries. 
+reasonable boundaries.
 
 .. note::
    *When you run your analysis, you shoud first check if there is a skim that suits it*. Running
@@ -1188,8 +1188,8 @@ V0
 
 .. topic:: Author(s) of this lesson
 
-    Umberto Tamponi, 
-    Martin Ritter, 
+    Umberto Tamponi,
+    Martin Ritter,
     Oskar Hartbrich,
-    Michael Eliachevitch,         
+    Michael Eliachevitch,
     Sam Cunliffe

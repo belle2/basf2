@@ -597,8 +597,8 @@ Using Matplotlib
 ----------------
 
 Matplotlib however is a much more developed plotting tool that functions well
-with juptyer notebooks, so this is what this tutorial will focus on. You can
-compare the differences between the syntax below.
+with juptyer notebooks, so this is what this tutorial will focus on. Compare 
+the differences between the syntaxes using the code below.
 
 .. code:: ipython3
 
@@ -606,16 +606,16 @@ compare the differences between the syntax below.
 
 .. code:: ipython3
 
-  h = plt.hist(df.B0_mbc[df.B0_isSignal], bins=100, range=(5.2, 5.3))
-  h = plt.hist(df.B0_mbc[~df.B0_isSignal], bins=100, range=(5.2, 5.3))
+  h = plt.hist(df.query("(B0_isSignal==1)").B0_mbc, bins=100, range=(5.2, 5.3))
+  h = plt.hist(df.query("(B0_isSignal==0)").B0_mbc, bins=100, range=(5.2, 5.3))
 
 Making your plots pretty
 ------------------------
 
 Let’s face it, physicists aren’t well known for their amazing graphical
 representations, but here’s our chance to shine! We can implement matplotlib
-functions to make our plots GREAT. You can even choose a colourblind friendly
-colour scheme!
+functions to make our plots GREAT. You can even choose a `colourblind friendly
+colour scheme<https://confluence.desy.de/display/BI/Colo%28u%29r+Blind+Friendly+Plots+and+Displays>`_!
 
 You can have subplots:
 
@@ -623,9 +623,9 @@ You can have subplots:
 
   fig, axes = plt.subplots(figsize=(10,6))
 
-  h = axes.hist(df.B0_mbc[df.B0_isSignal == 1], bins=100, range=(5.2, 5.3),
+  h = axes.hist(df.query("(B0_isSignal == 1)").B0_mbc, bins=100, range=(5.2, 5.3),
                 histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
-  h = axes.hist(df.B0_mbc[df.B0_isSignal == 0], bins=100, range=(5.2, 5.3),
+  h = axes.hist(df.query("(B0_isSignal == 0)").B0_mbc, bins=100, range=(5.2, 5.3),
                 histtype='step', lw=2, label="Background")
   axes.legend(loc="best")
   axes.set_xlabel(r"$M_{\mathrm{bc}}$", fontsize=18)
@@ -651,9 +651,9 @@ the columns and supply the dataframe as ``data=`` argument
 
   fig, axes = plt.subplots(1,2, figsize=(20,10))
   axes[0].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)],
-                 data=df[df.B0_isSignal], bins=50);
+                 data=df.query("B0_isSignal == 1)"], bins=50);
   axes[1].hist2d("B0_mbc", "B0_deltae", range=[(5.26,5.29), (-0.1,0.1)],
-                 data=df[~df.B0_isSignal], bins=50, cmap="magma");
+                 data=df.query("B0_isSignal == 0)", bins=50, cmap="magma");
 
 
 

@@ -455,7 +455,7 @@ Scan
 
 Non-4S
    SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at :math:`9.460` GeV to
-   slightly above the :math:`Upsilon(6S)`, around :math:`9.460` GeV. These datasets can be used for all the non-B
+   slightly above the :math:`\Upsilon(6S)`, around :math:`9.460` GeV. These datasets can be used for all the non-B
    parts of the Belle II physics program, but are particularly interesting for the spectroscopy, hadronic physics and
    dark sector studies.
 

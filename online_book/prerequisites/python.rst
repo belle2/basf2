@@ -8,13 +8,13 @@ Python
 
     **External Training**: about 7 hours.
 
-    **Teaching**: 10 min
+    **Teaching**: 1 hour
 
-    **Exercises**: 10 min
+    **Exercises**: 30 min
 
     **Prerequisites**:
 
-      * None
+      * :ref:`onlinebook_ssh`
 
     **Questions**:
 

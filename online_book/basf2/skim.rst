@@ -78,7 +78,7 @@ the following ways:
 Mechanics of a skim
 ~~~~~~~~~~~~~~~~~~~
 
-Under the hood, skims operate by running over the miniDST, which is the format
+Under the hood, skims operate by running over the mDST, which is the format
 of the produced Monte Carlo samples and the processed data at Belle II,
 reconstructing a specific particle list, and writing the reconstructed particle
 information to a microDST, referred to as uDST. The skim filter removes any
@@ -93,19 +93,16 @@ defined by the skim will not be included.
 .. admonition:: Question
      :class: exercise stacked
 
-     What is the difference between the mDST and uDST formats?
+     uDST files contain the skimmed particle list information in addition to all
+     the information contained in the mDST. Why is the file size of a uDST skim
+     still smaller than the original size of the mDST?
 
 .. admonition:: Solution
      :class: toggle solution
 
-     uDST files contain the skimmed particle list information in addition to all
-     the information contained in the mDST.
-
-     .. note::
-
-         Even though we are adding more information to the files during
-         skimming, the lower number of output events means the file sizes are
-         still reduced.
+     Even though we are adding more information to each event by saving the
+     reconstructed particle lists, only a fraction of events are kept by the
+     skim, so the overall file sizes are reduced.
 
 
 List of available skims
@@ -206,7 +203,7 @@ or by using the ``-h`` flag.
      :class: toggle xhint stacked
 
      You can use the tool ``b2file-metadata-show`` to print the number of events
-     in an MDST or uDST file.
+     in an mDST or uDST file.
 
 .. admonition:: Solution
      :class: toggle solution
@@ -219,7 +216,7 @@ or by using the ``-h`` flag.
 
      By default, this will output a uDST file in the current directory titled
      ``17230100.udst.root``. We can then use another command-line tool to find
-     the number of events in the MDST and uDST files:
+     the number of events in the mDST and uDST files:
 
      .. code-block:: bash
 

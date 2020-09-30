@@ -408,6 +408,10 @@ KLM
     It is sometimes referred to (rather opaquely) as the B2TiP report.
     If you are a newcomer you should probably refer to it as it's (significantly more sane) official name.
 
+.. admonition:: Key points
+    :class: key-points
+
+    * You know where to find the Belle II TDR, "The Physics of the B factories", and "The Belle II physics book".
 
 Data taking: on resonance, continuum, cosmics
 ---------------------------------------------
@@ -1177,12 +1181,6 @@ V0
    it is better to re-run the tracking before doing it, since if a track originates not in the IP, it will cross less
    material than expected and the multiple scattering corrections must be updated.
 
-
-
-.. admonition:: Key points
-    :class: key-points
-
-    * You know where to find the Belle II TDR, "The Physics of the B factories", and "The Belle II physics book".
 
 .. topic:: Author(s) of this lesson
 

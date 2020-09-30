@@ -141,9 +141,6 @@ OR you could perform this in a live python session, either in your terminal or i
   print(python_version())
 
 
-A section to really cover our bases
------------------------------------
-
 In the case that, throughout your external Python training, you did
 not create a python file using bash commands:
 
@@ -216,7 +213,7 @@ Remember that everything you do in your jupyter notebook is an interactive versi
 
 
 Pandas Tutorial and Python Data Analysis
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------------
 
 This section aims to answer the question *"How can I process tabular data?"*
 
@@ -228,7 +225,7 @@ Now, the previous sentence may have not been familiar to you at all. If so, read
 on. If not, feel free to skip the next paragraph.
 
 ROOT: a nano introduction
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ROOT files, as you'll come to be familiar with, are the main way we store our
 data at Belle II. Within these files are ``TTree`` objects known as *trees*, which are
@@ -239,12 +236,15 @@ the particle you've stored in your tree --- for example, the :math:`B` meson's
 invariant mass, it's daughter's momentum, it's great-great-granddaughter's
 cluster energy etc. etc. etc.
 
-More information:`CERN's ROOT <https://root.cern.ch/>`_
-For when you need help with your root file manipulation:
+* More information:`CERN's ROOT <https://root.cern.ch/>`_
+
+* For when you need help with your root file manipulation:
 `CERN's ROOT Forum <https://root-forum.cern.ch/>`_
 
+|
+
 Jupyter Notebooks
------------------
+^^^^^^^^^^^^^^^^^
 
 `Jupyter <https://jupyter.org/>`_ Notebooks are interactive notebooks that allow one to visualise code,
 data and outputs in a linear and clear way. When you run a notebook you have an
@@ -259,11 +259,12 @@ crashes, you will have to restart it.
 
   Examine the ``Cell`` and ``Kernel`` drop down menus to see what options you have available.
 
+|
+|
 
 
-
-Importing ROOT files and manipulating with Python
--------------------------------------------------
+Importing ROOT files
+^^^^^^^^^^^^^^^^^^^^
 
 In this section we will learn how to import a ROOT file as a Pandas DataFrame
 using the ``root_pandas`` library.
@@ -310,7 +311,7 @@ This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe `
 
 
 Investigating your DataFrame
-----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In jupyter notebooks you can display a DataFrame by calling it in a cell. You
 can see the output, where in our case each row corresponds to one candidate:
@@ -400,8 +401,8 @@ Finally, everyone who works with numpy and pandas will at some point try to use 
 
 
 
-Selecting parts of your DataFrame
----------------------------------
+Manipulating your DataFrame
+---------------------------
 
 Selecting columns, rows or subsets of DataFrames works in similar manner as
 python built in objects or numpy arrays.
@@ -448,7 +449,7 @@ rows can be returned via ``df.iloc[i]``.
 
 
 Vectorized Operations
----------------------
+^^^^^^^^^^^^^^^^^^^^^
 
 This is one of the most powerful features of pandas and numpy. Operations on a
 Series or DataFrame are performed element-wise.
@@ -468,7 +469,7 @@ Series or DataFrame are performed element-wise.
   2*x - 2
 
 Adding Columns
---------------
+^^^^^^^^^^^^^^^
 
 You can easily add or remove columns in the following way:
 
@@ -490,7 +491,7 @@ You can easily add or remove columns in the following way:
 
 
 Modifying Columns
------------------
+^^^^^^^^^^^^^^^^^
 
 Sometimes we want to change the type of a column. For example if we look at all
 the different values in the ``B0_isSignal`` column by using
@@ -509,7 +510,7 @@ this as a boolean value:
 
 
 Querying Rows (i.e. making cuts)
---------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Finally, arguably the most useful function for your analyses is the ``query`` function. Querying allows one to cut on data using variables and values using a 'cut string'. Within your cut string you can use usual python logic to have many arguments. For example:
 
@@ -543,7 +544,7 @@ df.query("(B0_mbc>5.2) & (B0_deltae>-1")
 
 
 Grouped Operations: a quick note
-------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 One of the most powerful features of pandas is the ``groupby`` operation. This
 is beyond the scope of the tutorial, but the user should be aware of it's
@@ -592,7 +593,7 @@ distributions. This time we use the ``root_pandas`` package to read the data
   df.describe()
 
 Pandas built in histogram function
-----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 There exists, if you prefer, a built in histogram function for Pandas. The
 following cells show how to implement it.
@@ -627,7 +628,7 @@ the differences between the syntaxes using the code below.
   h = plt.hist(df.query("(B0_isSignal==0)").B0_mbc, bins=100, range=(5.2, 5.3))
 
 Making your plots pretty
-------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Let’s face it, physicists aren’t well known for their amazing graphical
 representations, but here’s our chance to shine! We can implement matplotlib

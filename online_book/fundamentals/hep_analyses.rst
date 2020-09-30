@@ -978,23 +978,32 @@ produces files in different formats.
    different branches contained in those trees.
 
 Let's start from the data objects we save. There are four groups of them: raw, low-level,
-reconstruction-level and analysis-level. The raw objects are the output of the single
-subsystems: digitized  PMT signals from the TOP, digitized ADC signals form the CDC, and
-so on. Without any further process, these objects cannot be used. The low-level objects
-come from the very first step of the data processing, the unpacking. The RAW signals are
-turned into more abstract and understandable objects: the CDC ACD signals are converted
-to CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-level
-objects are fundamental to understand the detector performance, but they cannot yet be
-directly used to perform an analysis. The last step is called reconstruction, and consists
-in running algorithm on the collection of digits to produce analysis-friendly quantities.
-The output of the reconstruction is are high-level variables like ECL clusters, resulting
-from running cluster algorithms on the ECLDigits,  tracks resulting from running the
-tracking algorithms over the collections of CDC, SVD and PXD hits, PID likelihood resulting
-from the analysis of the TOP signals. In the process of reconstruction the calibrations
-are applied, correcting for the fluctuations in the detector response. These hgh-level
-objects are finally read by the analysis software, and turned into analysis-level
-objects: charged particles, photons, missing energies and all the quantities used to
-present a physics result.
+reconstruction-level and analysis-level.
+
+raw objects
+    Raw objects are the output of the single
+    subsystems: digitized  `PMT <https://en.wikipedia.org/wiki/Photomultiplier_tube>`__ signals from the TOP,
+    digitized `ADC <https://en.wikipedia.org/wiki/Analog-to-digital_converter>`__ signals form the CDC, and
+    so on. Without any further processing, these objects cannot be used.
+low-level objects
+    Low-level objects come from the very first step of the data processing, the unpacking. The RAW signals are
+    turned into more abstract and understandable objects: the CDC ACD signals are converted
+    to CDChits, the TOP PMT signals are turned into TOPDigits, and so on.  The low-level
+    objects are fundamental to understand the detector performance, but they cannot yet be
+    directly used to perform an analysis.
+reconstruction-level objects
+    The last step is called reconstruction, and consists
+    in running algorithm on the collection of digits to produce analysis-friendly quantities.
+    The output of the reconstruction is are high-level variables like ECL clusters, resulting
+    from running cluster algorithms on the ECLDigits,  tracks resulting from running the
+    tracking algorithms over the collections of CDC, SVD and PXD hits, PID likelihood resulting
+    from the analysis of the TOP signals. In the process of reconstruction the calibrations
+    are applied, correcting for the fluctuations in the detector response.
+analysis-level objects
+    These high-level
+    objects are finally read by the analysis software, and turned into analysis-level
+    objects: charged particles, photons, missing energies and all the quantities used to
+    present a physics result.
 
 
 In Belle II there are four different data formats, reflecting which data objects are
@@ -1003,7 +1012,7 @@ stored in a file:
 RAW
   This is the most basic format. It contains the un-processed, un-calibrated output
   of the detector. Analysis cannot be run on these data, but they serve as base for the
-  production of the subsequent data format
+  production of the subsequent data format.
 cDST (calibration Data Summary Table)
   This format contains the same objects as the RAW
   (so a full reconstruction could be performed starting from it), plus the results of the

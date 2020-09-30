@@ -340,7 +340,7 @@ Bremsstrahlung recovery?
 
     .. _jpsi_brems_validation_plot:
 
-    .. figure:: roe/jpsi_brems_validation_plot.png
+    .. figure:: roe/brems_corr_invariant_mass.png
        :width: 40em
        :align: center
 

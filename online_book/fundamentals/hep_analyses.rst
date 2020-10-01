@@ -525,6 +525,23 @@ local offline storage hard disk drive or discarded. This high level event
 selection is expected to reduce the amount of data written to the offline
 storage by at least 60%.
 
+.. note::
+   The HLT can operate in two modes: **filtering** and **monitoring**. In the former the
+   events that do not satisfy any of the HLT  selections (called "lines")
+   are discarded and lost forever. In the latter, all the events are kept regardless of the 
+   HLT decision (which is however stored, so analyses of the HLT filtering efficiency
+   can be conducted). 
+   On top of this, the HLT also performs a first, rought skimming producing the so-called
+   **HLT skims**. All the events that are satisfying the HLT conditions (regardless of the 
+   HLT operation mode), are then assigned according to a quick analysis into few
+   possible categories: bhabha, hadronic, tau, mumu and so on attaching a flag to them,
+   which can then be read out from the raw data without reconstructing the full event.
+   This categorization is mainly done to quickly select the events that are needed for 
+   calibration and send them to the calibration center, however the hadronic HLT skim 
+   (called **hlt_hadron**) has become increasingly popular to perform analysis in the 
+   early stage of the experiment, and is being considered as a starting point
+   for many analysis skims (more on them later), so you will likely hear of it.
+
 Both the TRG system and the HLT classify events based on the data available to
 them. While the decision whether to issue a trigger for a given collision (or on
 HLT whether to keep the event or discard it) is of course binary, certain event
@@ -548,6 +565,7 @@ Since the TRG and HLT systems are ultimately deciding which data is being kept
 for offline analysis, understanding and validating their performance vs. their
 intended functionality is of highest importance for the success of the Belle II
 experiment.
+
 
 .. admonition:: Key points
     :class: key-points
@@ -944,8 +962,8 @@ expert knowledge:
 * the position of the tracking detector sensors needs to be well known and
   corrected in software (a process called alignment).
 
-As for the simulation this is something which we centrally organize in Belle
-II. So, not very surprising, the Data Production group takes charge and
+As for the simulation this is something which we centrally organize in Belle II. 
+So, not very surprising, the Data Production group takes charge and
 coordinates with the detector experts the reconstruction of our data.
 
 

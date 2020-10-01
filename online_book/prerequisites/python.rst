@@ -246,24 +246,24 @@ process and store any variables or dataframes you define.   If your kernel
 crashes, you will have to restart it.
 
 .. admonition:: Exercise
-  :class: exercise stacked
+  :class: exercise
 
-  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options 
+  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options
   you have available.
 
-It is also useful to be able to access help or extra information about the 
-tools you will be using. In particular you will often want to check 
-information about a python object you are using. The definition of a python 
-object includes commands, packages, modules, classes, types... 
+It is also useful to be able to access help or extra information about the
+tools you will be using. In particular you will often want to check
+information about a python object you are using. The definition of a python
+object includes commands, packages, modules, classes, types...
 basically anything that has a description called a *docstring*).
-There are multiple ways to access this information, including 
-what is already discussed  in :ref:`_onlinebook_basf2_introduction`. 
-For jupyter notebooks, a great interactive way to access the information 
+There are multiple ways to access this information, including
+what is already discussed  in :ref:`_onlinebook_basf2_introduction`.
+For jupyter notebooks, a great interactive way to access the information
 (docstring) is by putting your cursor on the object in question and pressing
-``Shift + Tab``. 
+``Shift + Tab``.
 
-In addition to the ``Shift + Tab`` option, you can also run a cell with your 
-object in question, with a question mark! For example, if our object in 
+In addition to the ``Shift + Tab`` option, you can also run a cell with your
+object in question, with a question mark! For example, if our object in
 question is ``matplotlib`` we can type:
 
 .. code:: ipython3
@@ -388,7 +388,7 @@ A useful feature to quickly summarize your data is to use the descibe function:
 * ``std``, the standard deviation of the column
 * ``min``, and ``max``: the smallest and largest value of the column
 * ``25%``, ``50%``, ``75%``: the value where only 25%, 50% or 75% of the entries in the column have
-  a smaller value. For example if we have 100 entries in the dataframe the 25% quantile is the 25th smallest value. 
+  a smaller value. For example if we have 100 entries in the dataframe the 25% quantile is the 25th smallest value.
   The 50% quantile is also known as the median.
 
 
@@ -557,8 +557,8 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
 
   .. code:: ipython3
 
-    bkgd_df = df.query("(B0_isSignal==0)")["B0_mbc", "B0_M", "B0_isSignal","B0_deltae"]
-    signal_df = df.query("(B0_isSignal==1)")["B0_mbc", "B0_M", "B0_isSignal","B0_deltae"]
+    bkgd_df = df.query("(B0_isSignal==0)")[["B0_mbc", "B0_M", "B0_isSignal", "B0_deltae"]]
+    signal_df = df.query("(B0_isSignal==1)")[["B0_mbc", "B0_M", "B0_isSignal", "B0_deltae"]]
 
 
 

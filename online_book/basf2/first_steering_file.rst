@@ -10,8 +10,8 @@ First steering file
 
     **Exercises**: 90 min
 
-    **Prerequisites**: 
-    	
+    **Prerequisites**:
+
     	* Creating and running scripts in the terminal
     	* Basic python
 
@@ -59,17 +59,19 @@ environment.
         b2help-releases
         b2setup <release-shown-at-prompt-by-previous-script>
 
-There are three lines of code that are part of each steering script:
-
-   * Importing the ``basf2`` python library
-   * Creating a `basf2.Path`
-   * Processing the path
+Now let's get started with your steering file!
 
 .. admonition:: Task
     :class: exercise stacked
 
-    Open an empty file with an editor of your choice and add those three lines.
-    Save the file with a ``.py`` extension.
+    Open an empty file with an editor of your choice. Add three lines that do
+    the following:
+
+    * Importing the ``basf2`` python library
+    * Creating a `basf2.Path` (call it ``main``)
+    * Processing the path with `basf2.process`
+
+    Save the file as ``myanalysis.py``.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -85,7 +87,7 @@ There are three lines of code that are part of each steering script:
         main = basf2.Path()
         basf2.process(main)
 
-Running steering files is as easy as calling ``basf2 scriptname.py`` on the
+Running steering files is as easy as calling ``basf2 myanalysis.py`` on the
 command-line.
 
 .. admonition:: Exercise
@@ -131,6 +133,13 @@ former.
     How many arguments are required for the `inputMdstList` function?
     Which value has to be set for the environment type?
 
+.. admonition:: Hint
+    :class: xhint stacked toggle
+
+    Take a look at the signature of the function. It is highlighted in
+    blue at the top. Some arguments take a default value, e.g. ``skipNEvents=0``
+    and are therefore not required.
+
 .. admonition:: Solution
     :class: toggle solution
 
@@ -140,12 +149,16 @@ former.
     * a list of root input files
     * the path
 
-    In 99 % ``default`` should be set as ``environmentType``.
+    In 99 % of all cases ``default`` should be set as ``environmentType``.
+    The Belle II MC that you are reading was produced with a recent release,
+    so this also applies here.
 
 In a later lesson you'll learn how and where to find input files for your
 analysis. For the purpose of this tutorial we have prepared some local input
 files. They are located on kekcc at
 ``/group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/``.
+
+.. todo: Add a note in case they are at DESY NAF or on their local machine
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -155,6 +168,10 @@ files. They are located on kekcc at
 
 .. admonition:: Solution
     :class: toggle solution
+
+    .. code-block:: bash
+
+        ls /group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/
 
     There are each 100 files with and without beam background (BGx1 and BGx0).
     Their names only differ by the final suffix, which is an integer between 0
@@ -174,9 +191,10 @@ files. They are located on kekcc at
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    First, you have to import `modularAnalysis`. It's better to load the whole
-    file, since you will need more functions of it later on. It might be
-    convenient to set an abbreviation, e.g. ``ma``. Then, you have to set the
+    Don't forget to import `modularAnalysis` (this is the module that contains
+    `inputMdstList`). It might be
+    convenient to set an abbreviation, e.g. ``ma``.
+    Then you have to set the
     correct values for the three required arguments of `inputMdstList`.
 
 .. admonition:: Solution
@@ -187,7 +205,8 @@ files. They are located on kekcc at
 In the solution to the last task we have added empty lines, shortcuts for the
 imports, and some comments. This helps to give the script a better structure
 and allows yourself and others to easier understand what's going on in the
-steering file. In the very first line we have also added a *shebang* to define
+steering file. In the very first line we have also added a
+`shebang <https://en.wikipedia.org/wiki/Shebang_(Unix)>`_ to define
 that the steering file should be executed with a python interpreter.
 
 So far, the input file has been completely hard-coded. But as we've seen
@@ -209,8 +228,15 @@ having to change anything in the script itself.
     <https://swcarpentry.github.io/python-novice-inflammation/12-cmdline/index.html>`_
     part of the python introduction of the software carpentry. Otherwise, go
     back and refresh your memory. All you have to do is to import the system
-    library, store the command-line argument (``sys.argv``) in a local
-    variable, and extend the string using the f-string syntax. 
+    library, store the correct command-line argument (from ``sys.argv``) in a local
+    variable ``filenumber``, and extend the path string to include it.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Rather than concatenating strings with ``+`` (``"file_" + str(filenumber) + ".root"``),
+    you can also use so-called f-strings: ``f"file_{filenumber}.root"``. They
+    are great for both readability and performance.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -419,7 +445,7 @@ the acceptance of the CDC (`thetaInCDCAcceptance`).
     The variable `dr` gives the transverse distance, while `dz` is the
     z-component of the point of closest approach (POCA) with respect to the
     interaction point (IP). Components are signed, while distances are
-    magnitudes. 
+    magnitudes.
 
     The polar range of the CDC acceptance is :math:`17^\circ < \theta <
     150^\circ` as written `here
@@ -449,7 +475,7 @@ contain one entry per candidate or one entry per event.
     When providing an empty decay string, an event-wise ntuple will be created.
 
 .. warning::
-    
+
     Only variables declared as ``Eventbased`` are allowed in the event mode.
     Conversely, both candidate and event-based variables are allowed in the
     candidate mode.

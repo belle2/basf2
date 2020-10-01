@@ -429,8 +429,8 @@ Manipulating your DataFrame
 Selecting columns, rows or subsets of DataFrames works in similar manner as
 python built in objects or numpy arrays.
 
-Selecting column(s)
-^^^^^^^^^^^^^^^^^^^
+Selecting columns
+^^^^^^^^^^^^^^^^^
 
 Selecting a column can be performed by ``df['column_name']`` or
 ``df.column_name``. The result will be a pandas Series, a 1D vector. The

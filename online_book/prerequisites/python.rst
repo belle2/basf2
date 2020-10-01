@@ -207,11 +207,6 @@ notebook. If you are unsure how to use juptyer notebooks, go back to
 Remember that everything you do in your jupyter notebook is an interactive version of your python script.
 
 
-
-
-
-
-
 Pandas Tutorial and Python Data Analysis
 ----------------------------------------
 
@@ -237,11 +232,7 @@ invariant mass, it's daughter's momentum, it's great-great-granddaughter's
 cluster energy etc. etc. etc.
 
 * More information:`CERN's ROOT <https://root.cern.ch/>`_
-
-* For when you need help with your root file manipulation:
-`CERN's ROOT Forum <https://root-forum.cern.ch/>`_
-
-|
+* If you get stuck with ROOT, you can also ask in  `CERN's ROOT Forum <https://root-forum.cern.ch/>`_
 
 Jupyter Notebooks
 ^^^^^^^^^^^^^^^^^
@@ -258,10 +249,6 @@ crashes, you will have to restart it.
   :class: exercise stacked
 
   Examine the ``Cell`` and ``Kernel`` drop down menus to see what options you have available.
-
-|
-|
-
 
 Importing ROOT files
 ^^^^^^^^^^^^^^^^^^^^
@@ -346,7 +333,7 @@ which is a large 2D numpy matrix
 
   df.to_numpy
 
-However ``to_numpy`` may not be the mot visually pleasing, or easy, way to see the contents of your dataframe. 
+However ``to_numpy`` may not be the mot visually pleasing, or easy, way to see the contents of your dataframe.
 
 A useful feature to quickly summarize your data is to use the descibe function:
 
@@ -368,7 +355,7 @@ A useful feature to quickly summarize your data is to use the descibe function:
   :class: solution toggle
 
   ``df.describe`` has the great ability to summarize each of your columns/variables. When using it, a table is printed with rows of 'count', 'mean', 'std', 'min', '25%', '50%', '75%' and 'max'.
-   
+
 
 You can also display the values of the DataFrame sorted by a specific column:
 
@@ -395,7 +382,7 @@ Finally, everyone who works with numpy and pandas will at some point try to use 
 .. admonition:: Solution
   :class: solution toggle
 
-  The output comes in the form of a tuple (a finite ordered list (or sequence) of elements). For example, one output could be ``(15540523, 20)``, which is saying you have a dataframe of 15540523 rows, and 20 columns. 
+  The output comes in the form of a tuple (a finite ordered list (or sequence) of elements). For example, one output could be ``(15540523, 20)``, which is saying you have a dataframe of 15540523 rows, and 20 columns.
 
 
 
@@ -516,7 +503,7 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
 
 .. code:: ipython3
 
-df.query("(B0_mbc>5.2) & (B0_deltae>-1")
+    df.query("(B0_mbc>5.2) & (B0_deltae>-1")
 
 .. note::
   There is a limit to the number of arguments in one query! Can you find it?)
@@ -525,7 +512,7 @@ df.query("(B0_mbc>5.2) & (B0_deltae>-1")
   :class: exercise stacked
 
   Create two DataFrames, one for Signal and one for Background only
-  containing ``B0_mbc``, ``B0_M``, ``B0_isSignal`` and ``B0_deltae`` columns. 
+  containing ``B0_mbc``, ``B0_M``, ``B0_isSignal`` and ``B0_deltae`` columns.
 
 .. admonition:: Hint
   :class: xhint stacked toggle
@@ -554,13 +541,6 @@ rows in a dateframe by selected variables.
 .. code:: ipython3
 
   df.groupby('B0_isSignal').describe()
-
-
-
-
-
-
-
 
 
 A short introduction to plotting in python
@@ -593,7 +573,7 @@ distributions. This time we use the ``root_pandas`` package to read the data
   df.describe()
 
 Pandas built in histogram function
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------
 
 There exists, if you prefer, a built in histogram function for Pandas. The
 following cells show how to implement it.
@@ -615,7 +595,7 @@ Using Matplotlib
 ----------------
 
 Matplotlib however is a much more developed plotting tool that functions well
-with juptyer notebooks, so this is what this tutorial will focus on. Compare 
+with juptyer notebooks, so this is what this tutorial will focus on. Compare
 the differences between the syntaxes using the code below.
 
 .. code:: ipython3
@@ -632,13 +612,12 @@ Making your plots pretty
 
 Let’s face it, physicists aren’t well known for their amazing graphical
 representations, but here’s our chance to shine! We can implement matplotlib
-functions to make our plots GREAT. You can even choose a `colourblind friendly
-colour scheme<https://confluence.desy.de/display/BI/Colo%28u%29r+Blind+Friendly+Plots+and+Displays>`_!
+functions to make our plots GREAT. You can even choose a `colourblind friendly colour scheme <https://confluence.desy.de/display/BI/Colo%28u%29r+Blind+Friendly+Plots+and+Displays>`_!
 
-It is possible to display multiple plots at once using ``plt.subplots``. As you can see 
-below, rather than simply having our histograms show up using ``plt``, we define a 
-figure ``fig`` and an axis ``ax``. 
-These are the equivalent of our canvas where we paint our code art. 
+It is possible to display multiple plots at once using ``plt.subplots``. As you can see
+below, rather than simply having our histograms show up using ``plt``, we define a
+figure ``fig`` and an axis ``ax``.
+These are the equivalent of our canvas where we paint our code art.
 
 .. code:: ipython3
 
@@ -676,7 +655,7 @@ These are the equivalent of our canvas where we paint our code art.
   yourself.
 
   .. code:: ipython3
-    
+
     fig, ax = plt.subplots(1,2,figsize=(10,6))
 
     h = ax[0].hist(df.query("(B0_isSignal == 1)").B0_mbc, bins=100, range=(5.2, 5.3),
@@ -712,14 +691,14 @@ The implementation of 2D histograms are often very useful and are easily done:
   plt.show()
   plt.close()
 
-.. note:: 
+.. note::
   Note here how the query cut has been defined as a variable. This could save you a headache
-  later! It reduces the chance of human copy/paste errors and also allows a quick 
+  later! It reduces the chance of human copy/paste errors and also allows a quick
   bulk change to your applied cuts.
 
 
 
-Finally, Belle II does have an `official plot style<https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally. You do not need to worry about this at this stage, but keep it in mind. As you will find out, from ``release-05-00-00`` the plot style is available in the Belle II software `BASF2`. Once you have that running, importing the style is as easy as "one, two, ...
+Finally, Belle II does have an `official plot style <https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally. You do not need to worry about this at this stage, but keep it in mind. As you will find out, from ``release-05-00-00`` the plot style is available in the Belle II software `BASF2`. Once you have that running, importing the style is as easy as "one, two, ...
 
 .. code:: ipython3
 
@@ -727,8 +706,8 @@ Finally, Belle II does have an `official plot style<https://stash.desy.de/projec
   plt.style.use("belle2")
 
 
-Dealing with large files in a jupyter notebook
-----------------------------------------------
+Dealing with large files in a jupyter notebook (optional)
+---------------------------------------------------------
 
 If your files are quite large you may start to find your jupyter notebook kernel
 crashing - there are a few ways in which we can mitigate this.
@@ -774,9 +753,9 @@ reduce the loaded, chunked file more.
 
   df_list = []
   for chunk in df_chunk:
-    chunk = chunk.query(cut)  # Implement our cut!
-    df_list.append(chunk)
-    df = pd.concat(df_list)  # Concatenate our chunks into a dataframe!
+      chunk = chunk.query(cut)  # Implement our cut!
+      df_list.append(chunk)
+  df = pd.concat(df_list)  # Concatenate our chunks into a dataframe!
 
 
 

@@ -155,10 +155,42 @@ former.
 
 In a later lesson you'll learn how and where to find input files for your
 analysis. For the purpose of this tutorial we have prepared some local input
-files. They are located on kekcc at
-``/group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/``.
+files.
 
-.. todo: Add a note in case they are at DESY NAF or on their local machine
+.. admonition:: If you're working at kekcc (recommended)
+    :class: stacked
+
+    The data files are located on kekcc at
+
+    .. code-block::
+
+        /group/belle2/users/tenchini/prerelease-05-00-00a/1111540100/
+
+    This is also the location that is assumed in the solutions that are presented
+    below.
+
+.. admonition:: If you're working at DESY NAF
+    :class: stacked toggle
+
+    Please use the files at
+
+    .. code-block::
+
+        /nfs/dust/belle2/user/b2soft/1111540100
+
+    instead. This means that you have to change the data file in all of the
+    solutions below.
+
+.. admonition:: If you're working from another machine
+    :class: toggle
+
+    Perhaps you are working on the server of your home institute or even on
+    your own local machine. In this case you first need to copy the
+    data files to your home directory on your local machine from kekcc or DESY
+    via a SSH connection (cf. :ref:`onlinebook_ssh`) and then change the path
+    accordingly. Note that we might not
+    be able to provide you with the same level of support on other machines
+    though.
 
 .. admonition:: Exercise
     :class: exercise stacked

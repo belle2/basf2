@@ -452,7 +452,7 @@ Scan
    A scan consists of rather short data taking periods (hours or few days long) performed at slightly different energies
    (usually 10-50 MeV apart). The goals of a scan is to measure the line shape of the :math:`e^+e^-` cross section to either
    check that data are collected on the resonance peak (short scans), or to perform real physics measurements
-   such the search for exotic vector resonances (long scans above the :math:`\Upsilon(4S)`energy)
+   such the search for exotic vector resonances (long scans above the :math:`\Upsilon(4S)` energy)
 
 Non-4S
    SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at :math:`9.460` GeV to

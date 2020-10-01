@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import sys
-
 import basf2 as b2
 import fei
 import modularAnalysis as ma
+from variables import variables as vm
 
 # get input file number from the command line
 filenumber = sys.argv[1]
@@ -13,7 +13,7 @@ filenumber = sys.argv[1]
 main = b2.Path()
 
 # load input data from mdst/udst file
-filedirectory = "/group/belle2/users/tenchini/prerelease-05-00-00a/charged/"
+filedirectory = "/group/belle2/users/tenchini/prerelease-05-00-00a/charged"
 ma.inputMdst(
     environmentType="default",
     filename=f"{filedirectory}/charged_eph3_BGx0_{filenumber}.root",
@@ -56,6 +56,10 @@ ma.rankByHighest(
     outputVariable="FEIProbabilityRank",
     path=main,
 )
+vm.addAlias("FEIProbRank", "extraInfo(FEIProbabilityRank)")
+
+vm.addAlias("SigProb", "extraInfo(SignalProbability)")
+vm.addAlias("decayModeID", "extraInfo(decayModeID)")
 
 # Store tag-side variables of interest.
 ma.variablesToNtuple(
@@ -64,9 +68,9 @@ ma.variablesToNtuple(
         "Mbc",
         "deltaE",
         "mcErrors",
-        "extraInfo(decayModeID)",
-        "extraInfo(SignalProbability)",
-        "extraInfo(FEIProbabilityRank)",
+        "SigProb",
+        "decayModeID",
+        "FEIProbRank",
         "isSignal",
     ],
     filename="B_charged_hadronic.root",

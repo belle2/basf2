@@ -70,7 +70,6 @@ involving neutrinos, referred to as B\ :sub:`sig`.
      Semileptonic tagging uses decays that include one neutrino,
      these have higher branching fractions but are less precise as the kinematic information is incomplete.
 
-
 In this exercise we will use hadronic tagging, the procedure for semileptonic tagging is analogous but as it is less
 commonly used it is not discussed in this exercise.
 
@@ -88,7 +87,9 @@ In addition to the usual python packages (``basf2`` and `modularAnalysis`) we al
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Import ``basf2``, ``modularAnalysis`` and ``fei``. Then create a path and
+    Import ``basf2``, ``modularAnalysis`` and ``fei``.
+    In addition, we will be using variable aliases so be sure to import the variable manager.
+    Then create a path and
     load input data from an ``mdst`` file.
 
     You can again use mdst files from ``/group/belle2/users/tenchini/prerelease-05-00-00a/charged/`` on KEKCC.
@@ -168,7 +169,7 @@ efficiency.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 29-31
+        :lines: 29-35
 
 
 The `fei.FeiConfiguration` class controls the other configuration options of the FEI.
@@ -188,7 +189,7 @@ in a single Global Tag and is ``prefix=FEIv4_2020_MC13_release_04_01_01`` for th
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 34-36
+        :lines: 37-40
 
 The configuration created above must now be turned into a ``basf2`` path which can be appended to the main path.
 This is done with the `fei.get_path` function which takes the channel configuration
@@ -212,7 +213,7 @@ to the main path with the `basf2.Path.add_path` method.
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 38-42
+        :lines: 42-46
 
 
 You have now successfully added the FEI to the main path. The FEI will add a particle list
@@ -225,17 +226,19 @@ can be used to select B meson candidates to which the FEI assigns a higher proba
 Final Steps
 ***********
 
-What remains now is adding Monte Carlo matching and writing the ``B+:generic`` list to a ``.root`` file.
-You should already be familiar with both topics from the previous exercises.
+What remains now is adding Monte Carlo matching and creating variable aliases for the ``extraInfo``\ s
+created by the FEI. Then, you can write the ``B+:generic`` list to a ``.root`` file.
+You should already be familiar with these topics from the previous exercises.
 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Add MC matching to the ``B+:generic`` particle list.
+    Add MC matching to the ``B+:generic`` particle list and create variable aliases
+    for ``extraInfo(decayModeID)`` and ``extraInfo(SignalProbability)``.
 
     Then, write out the ``B+:generic`` particle list to a ``root`` file.
     Interesting variables are `Mbc`, `deltaE`,
-    ``extraInfo(decayModeID)``, ``extraInfo(SignalProbability)`` and `isSignal`.
+    ``extraInfo(decayModeID)``, ``extraInfo(SignalProbability)`` and `isSignal` (or their aliases).
 
     Finally, start the event loop with a call to `basf2.process`.
 
@@ -245,12 +248,14 @@ You should already be familiar with both topics from the previous exercises.
     Go back to :ref:`onlinebook_first_steering_file` to see the step-by-step instructions on how to add MC matching,
     write the ntuple and start the event loop.
 
+    Aliases are introduced in :ref:`onlinebook_various_additions`, check there if you are unsure how to use them.
+
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 45-46,56-64,66-73
+        :lines: 50-51, 61-72, 74-78
 
 The FEI returns not only one B meson candidate for each event but up to 20. Using the `modularAnalysis.rankByHighest`
 function, it is possible to rank the candidates by the B meson classifier output in the
@@ -263,7 +268,8 @@ candidate.
     Use ``rankByHighest`` to rank the B meson candidates in the ``B+:generic`` list by the
     ``extraInfo(SignalProbability)`` variable. Write the rank to a new variable called ``FEIProbabilityRank``.
 
-    Don't forget to write this variable to your ntuple (within an ``extraInfo`` metavariable).
+    Don't forget to create an alias for this variable (within an ``extraInfo`` metavariable) and write this to the
+    nTuple.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -271,16 +277,17 @@ candidate.
     You should already be familiar with Best Candidate Selection from the :ref:`onlinebook_various_additions` lesson.
     The documentation on ``rankByHighest`` can be found here: `modularAnalysis.rankByHighest`.
 
-    The variable in `variablesToNtuple` should be called ``extraInfo(FEIProbabilityRank)``.
+    If the ``outputVariable`` argument of `modularAnalysis.rankByHighest` is called ``FEIProbabilityRank``,
+    the alias should be created for ``extraInfo(FEIProbabilityRank)``.
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/070_fei.py
         :language: python
-        :lines: 48-73
+        :lines: 52-78
 
-You can now execute you steering file which should look somewhat like this:
+You can now execute your steering file which should look somewhat like this:
 
 .. admonition:: Final steering file
     :class: toggle solution
@@ -308,7 +315,7 @@ indicator for the quality of the B mesons we have reconstructed.
 
     You should see broad peak with a sharp drop-off below 5.2 GeV.
     This drop-off is caused by a fixed pre-cut in the FEI. Candidates below this threshold are rejected before
-    classification as they are always incorrect.
+    classification as they are almost always incorrect.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -318,21 +325,22 @@ indicator for the quality of the B mesons we have reconstructed.
         # Include this only if running in a Jupyter notebook
         %matplotlib inline
 
+        import matplotlib.pyplot as plt
         from root_pandas import read_root
 
         df = read_root('B_charged_hadronic.root')
 
-        ax = df.hist(df['Mbc'], 30, range=(5.15, 5.3))
-        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ / GeV')
+        fig, ax = plt.subplots()
+        n, bins, patches = ax.hist(df['Mbc'], bins=30, range=(5.15, 5.3))
+        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
         ax.set_ylabel('Number of candidates')
-
-        ax.figure.savefig('m_bc.pdf')
+        ax.savefig('m_bc.pdf')
 
 
 .. admonition:: Question
     :class: exercise stacked
 
-    The distribution of `Mbc` you have just plotted doesn't peak at the B meson mass of 5.28 GeV. Why is that?
+    The distribution of `Mbc` you have just plotted doesn't peak at the B meson mass of 5.28 GeV. Can you explain this?
 
 .. admonition:: Solution
     :class: toggle solution
@@ -364,19 +372,26 @@ indicator for the quality of the B mesons we have reconstructed.
 
     .. code-block:: python
 
+        # Include this only if running in a Jupyter notebook
+        %matplotlib inline
+
+        import matplotlib.pyplot as plt
+        from root_pandas import read_root
+
+        df = read_root('B_charged_hadronic.root')
+
         fig, ax = plt.subplots()
 
-        # If you didn't do the optional exercise, the extraInfo__boFEIProbabilityRank__bc column won't be there.
+        # If you didn't do the optional exercise, the 'FEIProbRank' column won't be there.
         # Just remove this part of the query in this case.
-        sig_prob_cut_df = df.query('(extraInfo__boSignalProbability__bc > 0.01)
-                                    & (extraInfo__boFEIProbabilityRank__bc == 1)')
+        sig_prob_cut_df = df.query('(SigProb > 0.01)
+                                    & (FEIProbRank == 1)')
 
-        n, bins, patches = ax.hist(sig_prob_cut_df['Mbc'], 30, range=(5.15, 5.3))
-        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ / GeV')
+        n, bins, patches = ax.hist(sig_prob_cut_df['Mbc'], bins=30, range=(5.15, 5.3))
+        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
         ax.set_ylabel('Total number of candidates')
         ax.set_title('SigProb > 0.01')
-
-        plt.show()
+        ax.savefig('m_bc_cut_0_01.pdf')
 
 Congratulations, you have now discovered the B meson in Monte Carlo data!
 This concludes the first part of this lesson. The second part of this lesson will show you now how to use
@@ -384,7 +399,10 @@ the reconstructed B\ :sub:`tag` in you own analysis.
 
 
 Reconstructing the full ϒ(4S) event
---------------------------------------------------
+-----------------------------------
+
+In this part of the lesson, we will reconstruct the full ϒ(4S) event using the FEI. The B\ :sup:`0` decay
+process we will be looking at is the semileptonic decay to a charged pion, a muon and a muon neutrino.
 
 The FEI skim
 ************
@@ -403,16 +421,22 @@ as much data as we would have to for a  file containing decays in all B decay ch
 Prerequisites (part 2)
 **********************
 
+Lets get started with the usual steps. Nothing here should be new to you.
+
 .. admonition:: Exercise
     :class: exercise stacked
 
     Start a new steering file.
     In this file, you won't need the ``fei`` package so you can skip this import.
-    We will, however, use the variable aliases so be sure to import the variable manager.
     Create a path and load the udst file
     ``/home/belle2/mbauer/fei_tutorial/fei_skimmed_xulnu.udst.root``.
 
     **NOTE**: You can still use `modularAnalysis.inputMdst` to do this, even though it's a ``udst`` file.
+
+    Then, fill two particle lists with muons and charged pions. For the muons, you can require a `muonID`
+    above 0.9, for the pions a `pionID` above 0.5.
+    For both you should apply some requirements on the track, you can use
+    ``dr < 0.5 and abs(dz) < 2 nCDCHits > 20 and thetaInCDCAcceptance``
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -424,7 +448,7 @@ Prerequisites (part 2)
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 1-13
+        :lines: 1-20
 
 
 ϒ(4S) Reconstruction
@@ -433,42 +457,45 @@ Prerequisites (part 2)
 Now, let's get started with the reconstruction. We will first create the signal B meson, then combine it with the B
 meson provided by the FEI to get the ϒ(4S).
 
+As the semileptonic decay we are analysing contains a neutrino,  a few things have to be considered.
+The neutrino is not used the reconstruction of the B\ :sub:`sig` as it can't be seen in the Belle II detector.
+This leads to a discrepancy between the simulated decay and the reconstructed decay,
+causing the `isSignal` variable to always be zero.
+
+To solve this you can tell the MC matching algorithm to accept missing neutrinos by using the ``?nu`` flag,
+similiar to the ``?addbrems`` flag introduced in :ref:`onlinebook_various_additions`.
+Just add this flag to the end of the decay string in `modularAnalysis.reconstructDecay`. [#f1]_
+
+
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Then, fill two particle lists with muons and charged pions. For the muons, you can require a `muonID`
-    above 0.9, for the pions a `pionID` above 0.5.
-    For both you should apply some requirements on the track, you can use
-    ``dr < 0.5 and abs(dz) < 2 nCDCHits > 20 and thetaInCDCAcceptance``
-
-    Then, reconstruct a B\ :sup:`0` meson particle list called ``B0:signal`` from a muon and a pion.
-
-    **NOTE**: There is no neutrino reconstructed as it won't be seen in the detector,
-    we will have to remember this later on.
-
-.. admonition:: Hint
-    :class: toggle xhint stacked
-
-        Use `modularAnalysis.fillParticleList`, then `modularAnalysis.reconstructDecay`.
+    Reconstruct a B\ :sup:`0` meson particle list called ``B0:signal`` from a positive pion and a muon.
+    Add the ``?nu`` flag as described above.
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 15-22
+        :lines: 22
+
+
+So far, we have not used the FEI. Now, we will use the B\ :sub:`tag` in the udst file and combine it with the
+B\ :sub:`sig` we have just created.
+
 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    Then, the combine the ``B0:generic`` from the udst file with the
-    ``anti-B0:signal`` to a list called ``Upsilon(4S):opp_cp`` .
+    Combine the ``B0:generic`` from the udst file with the
+    ``anti-B0:signal`` to a list called ``Upsilon(4S):opposite_cp`` .
 
     **NOTE**: The ``B0:generic`` should come first in the decay string, otherwise
     the missing mass squared variable we're using later won't know which of the B mesons
     is the tag and which is the signal.
 
-    Can you think of a reason for the ``opp_cp`` identifier of the ``Upsilon(4S)``
+    Can you think of a reason for the ``opposite_cp`` identifier of the ``Upsilon(4S)``
     list?
 
     Have we forgotten something?
@@ -479,38 +506,64 @@ meson provided by the FEI to get the ϒ(4S).
     Think of special properties of B\ :sup:`0` mesons compared to B\ :sup:`+` mesons.
 
     For the implementation: You will most likely need one more `modularAnalysis.reconstructDecay`
-    to create the second particle list and and the `modularAnalysis.copyLists` function to combine both.
+    to create the second particle list and and the `modularAnalysis.copyLists` function to combine both lists.
 
 .. admonition:: Solution
     :class: toggle solution
 
-    To account for B\ :sup:`0` meson mixing, you should also combine same-sign B\ :sup:`0` mesons.
+    To account for B\ :sup:`0` meson mixing, you should also combine same-sign B\ :sup:`0` mesons as the
+    anti-B\ :sup:`0` can oscillate to a anti-B\ :sup:`0`.
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
         :lines: 24-37
 
 
-Final steps (part 2)
-********************
+Now that we have reconstructed the full ϒ(4S), we will create a Rest of Event.
+You have already done this in :ref:`onlinebook_roe` for a B meson, here however we
+will create a Rest of Event for the ϒ(4S). This allows us to count the tracks left over after reconstructing the ϒ(4S),
+for two correctly reconstructed B mesons there should be no tracks left over.
+
+For this to work we have to use a slightly different ROE mask than in the ROE chapter. In addition to the track cuts
+given there, two cuts on the two distance variables `dr` and `dz` are needed to match the cuts used by the FEI to
+reconstruct B\ :sub:`tag` candidates.
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Create a Rest of Event for the ``Upsilon(4S)`` list. Then, append an ROE mask using the cuts introduced in the
+    chapter :ref:`onlinebook_roe` and the additional track cuts mentioned above.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The track cuts should be ``thetaInCDCAcceptance and pt > 0.075 and dr < 2 and abs(dz) < 4`` and the ecl cuts
+    ``thetaInCDCAcceptance and E > 0.05``.
+    To create the ROE, use `modularAnalysis.buildRestOfEvent`.
+    To append the ROE mask, use `modularAnalysis.appendROEMasks`.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/071_fei.py
+        :language: python
+        :lines: 39-43
+
+
+Writing out the nTuple
+**********************
 
 We are now ready to add MC matching and write out the nTuple.
-You can access all the B\ :sub:`tag`'s properties from the first part of the exercise using the `daughter`
-metavariable, e.g. ``daughter(0, extraInfo(SignalProbability))``.
 
-With regards to MC matching we have to look out for two things:
+While the MC matching is applied to the ``Upsilon(4S)`` list, you can also access the daughter's truth variables using
+the `daughter` metavariable.
 
-* The neutrino:
-    We have reconstructed a decay with a neutrino but can't see this neutrino
-    in the reconstructed detector. As there will always be a discrepancy between the decay in MC and the
-    reconstructed decay, the `isSignal` variable will always be zero. Instead, you can use the
-    `isSignalAcceptMissingNeutrino` variable.
+This is especially useful in FEI analyses:
 
-* Which particle to look at:
-    The number of perfectly (i.e. ``isSignal == 1.0``) reconstructed B\ :sub:`tag` mesons
-    is not very large as you might have noticed in the first part of the exercise. As we are only really
-    interested in the B\ :sub:`sig`, the `isSignalAcceptMissingNeutrino` of this B meson can be a better signal
-    definition than `isSignalAcceptMissingNeutrino` of the ``Upsilon(4S)`` [#f1]_.
+As you might have noticed in the first part of the exercise, the number of perfectly (i.e. ``isSignal == 1.0``)
+reconstructed B\ :sub:`tag` mesons is not very large  As we are only really
+interested in the B\ :sub:`sig`, the `isSignal` variable of this B meson can be a better signal
+definition than the `isSignal` variable of the ``Upsilon(4S)``
 
 In addition to the properties of the B mesons, we can now also use information from the full event.
 
@@ -520,13 +573,17 @@ separating power in (semi-)leptonic analyses.
 There are different implementations of the missing mass squared in *basf2*, this version uses the explicit
 B\ :sub:`tag` momentum (here reconstructed by the FEI) and has therefore a high resolution.
 
+A second variable with high separating power is the number of additional charged tracks introduced above.
+This variable is called `nROE_Charged` in basf2. It needs the ROE mask name defined above as an argument in brackets.
+
 .. admonition:: Exercise
     :class: exercise stacked
 
     Add MC matching for the ``Upsilon(4S)`` to your path.
 
-    Write the Upsilon(4S) particle list to an nTuple. Include the FEI variables, the signal variables mentioned above
-    and the missing mass squared.
+    Write the Upsilon(4S) particle list to an nTuple. Include the variables used in the first part of the lesson,
+    the signal variables mentioned above (both for the B\ :sub:`sig` and the ϒ(4S)), the missing mass squared and
+    the number of additional tracks.
 
     It is recommended to define aliases for the variables as otherwise the variables will be long and unwieldy
     in your offline analysis.
@@ -534,18 +591,21 @@ B\ :sub:`tag` momentum (here reconstructed by the FEI) and has therefore a high 
     Finally, don't forget to process the path!
 
 .. admonition:: Hint
-    :class: exercise stacked
+    :class: toggle xhint stacked
 
     If you have forgotten how to use aliases: This is introduced in :ref:`onlinebook_various_additions`.
+
+    If you have adapted the solution given here, the variable containing the number of additional tracks
+    will be ``nROE_Charged(my_mask)``.
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/071_fei.py
         :language: python
-        :lines: 39-62
+        :lines: 45-70
 
-You can now execute you steering file which should look somewhat like this:
+You can now execute your steering file which should look somewhat like this:
 
 .. admonition:: Final steering file
     :class: toggle solution
@@ -561,9 +621,63 @@ Like in the first part of this lesson, you can now analyse your nTuple. As befor
 probability (now under the alias ``Btag_SigProb`` if you have adapted the example) to select more pure
 ϒ(4S) candidates and plot `m2RecoilSignalSide` for different values of the classifier.
 
-**NOTE**: A histogram of `Mbc` will look quite different in this exercise, this is because in the last exercise we have used
-a generic MC sample and in this exercise we are using a sample with only four decay channels.
+You can also see how cuts on the number of additional tracks change the histogram.
 
+**NOTE**: A histogram of `Mbc` will look quite different in this part of the exercise exercise,
+this is because in the last exercise we have used a generic MC sample and in this exercise we are using
+an MC sample with only four decay channels.
+
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Plot `m2RecoilSignalSide` for ``Bsig_isSignal == 1.0`` to see what well-reconstructed B -> pi l nu decays should
+    look like.
+    Then, plot `m2RecoilSignalSide` for different cuts on the FEI classifier output. See also how the shape of
+    `m2RecoilSignalSide` changes when requiring zero additional tracks.
+
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. code-block:: python
+
+        # Include this only if running in a Jupyter notebook
+        %matplotlib inline
+
+        import matplotlib.pyplot as plt
+        from root_pandas import read_root
+
+        df = read_root('Upsilon4S.root')
+
+        fig, ax = plt.subplots()
+
+        # Requiring only the B_sig to be correctly reconstructed.
+        # Try what happens if you require the whole Y(4S) to be correct!
+        signal_df = df.query('(Bsig_isSignal  == 1.0)')
+
+        n, bins, patches = ax.hist(signal_df['m2RecoilSignalSide'], bins=30, range=(-2, 5))
+        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
+        ax.set_ylabel('Total number of candidates')
+        ax.set_title('Bsig_isSignal == 1')
+        fig.savefig('m2RSS_Signal.pdf')
+
+        fig, ax = plt.subplots()
+
+        # This is just an example cut, you can try without the cut on nCharged
+        # and for different values on BtagSigProb
+        cut_df = df.query('(Btag_SigProb > 0.01) & (nCharged == 0.0)')
+
+        n, bins, patches = ax.hist(cut_df['m2RecoilSignalSide'], bins=30, range=(-2, 5))
+        ax.set_xlabel(r'$\mathrm{M}_{\mathrm{bc}}$ in GeV/c^2')
+        ax.set_ylabel('Total number of candidates')
+        ax.set_title('SigProb > 0.01')
+        fig.savefig('m2RSS_FEIcut_0_01_nCharged_0.pdf')
+
+
+Congratulations, you now know how to run the FEI and how to use it in your analysis. If you would like to know more
+you can always read the extensive documentation of the FEI. Here you can also find instructions on how to train the FEI
+and explanations on the code structure.
 
 .. admonition:: Key points
     :class: key-points
@@ -579,6 +693,5 @@ a generic MC sample and in this exercise we are using a sample with only four de
 
 .. rubric:: Footnotes
 
-.. [#f1] You can also use the :ref:`Grammar_for_custom_MCMatching` to do this,
-        both ways should give the same result in this exercise.
-        For simplicity, will stick with `isSignalAcceptMissingNeutrino`.
+.. [#f1] Alternatively, you can also use the `isSignalAcceptMissingNeutrino` variable instead of `isSignal`
+            but we will be going with the ``?nu`` flag and `isSignal` in our example.

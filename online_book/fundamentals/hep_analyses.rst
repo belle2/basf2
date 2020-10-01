@@ -1124,8 +1124,8 @@ starting from those signals and combined particles that are reconstructed as sum
       :math:`D` and :math:`B` mesons fly much less than a mm before decaying, so they cannot leave any
       detectable track.
     * Some hyperons, strange baryons, are charged and have a sizable lifetime. The longest-living one
-      is the :math:`\Xi^+` with a lifetime of 1.7 ns corresponding to :math:`c\tau \approx 5` cm. Such particle,
-      especially if it has few GeV of momentum, can cross the PXD and even the inner layers of the SVD
+      is the :math:`\Xi^+` with a lifetime of 1.7 ns corresponding to :math:`c\tau \approx 5` cm. Such a particle,
+      especially if it has some few GeV of momentum, can cross the PXD and even the inner layers of the SVD,
       leaving a signal. However, such short track would be very difficult to reconstruct, and it's
       much more convenient to reconstruct these hyperons looking at their (almost) stable decay products.
     * Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as

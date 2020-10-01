@@ -305,7 +305,6 @@ in the documentation of `skim.registry.SkimRegistryClass`.
     release to find the skim definitions.
 
 
-
 .. admonition:: Exercise
      :class: exercise
 
@@ -318,10 +317,16 @@ in the documentation of `skim.registry.SkimRegistryClass`.
 Skimmed data samples are made available in directories on the grid, where each
 directory corresponds to a given run. This results in an inconvenient number of
 directories the user has to run on, however, this preserves the run information of
-a given skim, as inherited from data production. Currently the dataset searcher
-does not list all available directories for a given skim production job. It only
-lists one directory. In reality, there are usually ~100 directories per production.
-THIS IS A KNOWN BUG AND WILL BE IMPROVED IN FUTURE DEVELOPMENTS OF THE DATASET SEARCHER. For now,
+a given skim, as inherited from data production.
+
+.. warning::
+
+    Currently the dataset searcher
+    does not list all available directories for a given skim production job. It only
+    lists one directory. In reality, there are usually ~100 directories per production.
+    This is a known bug and will be improved in future developments of the dataset searcher.
+
+For now,
 the following is a workaround in order to run your analysis script on the full set
 of skimmed data samples available for a given campaign.
 
@@ -356,7 +361,7 @@ Here, ``xxx`` is the length of the LPN up to ``/4S/`` in
     done > fulllfnlist.txt
 
 
-Use gbasf2 to check the submission with ``--dryrun`` before submitting your jobs. 
+Use ``gbasf2`` to check the submission with ``--dryrun`` before submitting your jobs. 
 Of course, you should make sure your script runs at KEKCC before submitting to the grid!   
 
 .. code-block:: bash
@@ -364,7 +369,7 @@ Of course, you should make sure your script runs at KEKCC before submitting to t
     gbasf2 <myscript.py> -p <myproject> -s <release> \
          --input_dslist proc11skims.lfn.list --dryrun
 
- Right now, gbasf2 only allows you to submit up to 1000 jobs in a single project.
+Right now, ``gbasf2`` only allows you to submit up to 1000 jobs in a single project.
 That means you will have to split up the proc11 data. This can be accomplished by splitting up
 ``fulllfnlist.txt``
 
@@ -377,7 +382,7 @@ This will split the list into batches of 100 datasets, creating output files lis
 but note that each dataset (``.../sub00``) can contain multiple input files
 (``.../sub00/file_000.root``). If needed, you can split the file again.
 
-5. Submit gbasf2 projects for each input file.
+5. Submit ``gbasf2`` projects for each input file.
 
 .. code-block:: bash
 
@@ -395,15 +400,15 @@ but note that each dataset (``.../sub00``) can contain multiple input files
 
 
 .. admonition:: Hint
-     :class: toggle xhint stacked
+    :class: toggle xhint stacked
 
-     Follow steps 1 to 5 to access the list of LFNs for the Proc11 samples and split the list into
-     batches of 100 files.
+    Follow steps 1 to 5 to access the list of LFNs for the Proc11 samples and split the list into
+    batches of 100 files.
 
 .. admonition:: Hint
-     :class: toggle xhint
+    :class: toggle xhint
 
-      MC Matching does not work on data.
+    MC Matching does not work on data.
 
 
 Accessing skims as flags:

@@ -246,24 +246,24 @@ process and store any variables or dataframes you define.   If your kernel
 crashes, you will have to restart it.
 
 .. admonition:: Exercise
-  :class: exercise stacked
+  :class: exercise
 
-  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options 
+  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options
   you have available.
 
-It is also useful to be able to access help or extra information about the 
-tools you will be using. In particular you will often want to check 
-information about a python object you are using. The definition of a python 
-object includes commands, packages, modules, classes, types... 
+It is also useful to be able to access help or extra information about the
+tools you will be using. In particular you will often want to check
+information about a python object you are using. The definition of a python
+object includes commands, packages, modules, classes, types...
 basically anything that has a description called a *docstring*).
-There are multiple ways to access this information, including 
-what is already discussed  in :ref:`_onlinebook_basf2_introduction`. 
-For jupyter notebooks, a great interactive way to access the information 
+There are multiple ways to access this information, including
+what is already discussed  in :ref:`_onlinebook_basf2_introduction`.
+For jupyter notebooks, a great interactive way to access the information
 (docstring) is by putting your cursor on the object in question and pressing
-``Shift + Tab``. 
+``Shift + Tab``.
 
-In addition to the ``Shift + Tab`` option, you can also run a cell with your 
-object in question, with a question mark! For example, if our object in 
+In addition to the ``Shift + Tab`` option, you can also run a cell with your
+object in question, with a question mark! For example, if our object in
 question is ``matplotlib`` we can type:
 
 .. code:: ipython3
@@ -388,7 +388,7 @@ A useful feature to quickly summarize your data is to use the descibe function:
 * ``std``, the standard deviation of the column
 * ``min``, and ``max``: the smallest and largest value of the column
 * ``25%``, ``50%``, ``75%``: the value where only 25%, 50% or 75% of the entries in the column have
-  a smaller value. For example if we have 100 entries in the dataframe the 25% quantile is the 25th smallest value. 
+  a smaller value. For example if we have 100 entries in the dataframe the 25% quantile is the 25th smallest value.
   The 50% quantile is also known as the median.
 
 
@@ -557,8 +557,8 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
 
   .. code:: ipython3
 
-    bkgd_df = df.query("(B0_isSignal==0)")["B0_mbc", "B0_M", "B0_isSignal","B0_deltae"]
-    signal_df = df.query("(B0_isSignal==1)")["B0_mbc", "B0_M", "B0_isSignal","B0_deltae"]
+    bkgd_df = df.query("(B0_isSignal==0)")[["B0_mbc", "B0_M", "B0_isSignal", "B0_deltae"]]
+    signal_df = df.query("(B0_isSignal==1)")[["B0_mbc", "B0_M", "B0_isSignal", "B0_deltae"]]
 
 
 
@@ -621,15 +621,17 @@ following cells show how to implement it.
 
 .. code:: ipython3
 
-  df[df.B0_isSignal == True].B0_mbc.hist(range=(5.2, 5.3), bins=100)
-  df[df.B0_isSignal == False].B0_mbc.hist(range=(5.2, 5.3), bins=100, alpha=.5)
+  df.query("(B0_isSignal==1)").B0_mbc.hist(range=(5.2, 5.3), bins=100)
+  df.query("(B0_isSignal==0)").B0_mbc.hist(range=(5.2, 5.3), bins=100, alpha=.5)
 
 Using Matplotlib
 ----------------
 
-Matplotlib however is a much more developed plotting tool that functions well
-with juptyer notebooks, so this is what this tutorial will focus on. Compare
-the differences between the syntaxes using the code below.
+Internally the pandas library however makes use of matplotlib itself.
+Using matplotlib directly opens up many more possibilities. It also works well
+with juptyer notebooks, so this is what this tutorial will focus on.
+Compare the following two code snippets with their equivalent of the last
+section to get a feeling for the syntax.
 
 .. code:: ipython3
 
@@ -649,12 +651,12 @@ functions to make our plots GREAT. You can even choose a `colourblind friendly c
 
 It is possible to display multiple plots at once using ``plt.subplots``. As you can see
 below, rather than simply having our histograms show up using ``plt``, we define a
-figure ``fig`` and an axis ``ax``.
+figure ``fig`` and axes ``ax``.
 These are the equivalent of our canvas where we paint our code art.
 
 .. code:: ipython3
 
-  fig, ax = plt.subplots(1,2,figsize=(10,6))
+  fig, ax = plt.subplots(1, 2, figsize=(10, 6))
 
   h = ax[0].hist(df.query("(B0_isSignal == 1)").B0_mbc, bins=100, range=(5.2, 5.3),
                 histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
@@ -666,7 +668,7 @@ These are the equivalent of our canvas where we paint our code art.
   ax[0].grid() # applies a nice grid to the plot
   ax[0].set_xlim(5.2, 5.3) # sets the range of the x-axis
 
-  plt.show() #shows the figure after all changes to the style have been made
+  plt.show()  # shows the figure after all changes to the style have been made
 
 .. admonition:: Exercise
   :class: exercise stacked

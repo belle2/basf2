@@ -1086,8 +1086,8 @@ starting from those signals and combined particles that are reconstructed as sum
 
     The average flight length of a particle of speed :math:`\beta` and lifetime
     :math:`\tau` is
-    :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = E/M` while :math:`\beta = p/E`,
-    therefore :math:`L = c\tau p/M`. From this:
+    :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = \frac{E}{Mc^2}` while :math:`\beta = pc/E`,
+    therefore :math:`L = \tau p/M`. From this:
     :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` μm. Only the muon reaches
     the tracking system.
 

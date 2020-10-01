@@ -506,7 +506,7 @@ B\ :sub:`sig` we have just created.
     Think of special properties of B\ :sup:`0` mesons compared to B\ :sup:`+` mesons.
 
     For the implementation: You will most likely need one more `modularAnalysis.reconstructDecay`
-    to create the second particle list and and the `modularAnalysis.copyLists` function to combine both lists.
+    to create the second particle list and the `modularAnalysis.copyLists` function to combine both lists.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -623,7 +623,7 @@ probability (now under the alias ``Btag_SigProb`` if you have adapted the exampl
 
 You can also see how cuts on the number of additional tracks change the histogram.
 
-**NOTE**: A histogram of `Mbc` will look quite different in this part of the exercise exercise,
+**NOTE**: A histogram of `Mbc` will look quite different in this part of the exercise,
 this is because in the last exercise we have used a generic MC sample and in this exercise we are using
 an MC sample with only four decay channels.
 

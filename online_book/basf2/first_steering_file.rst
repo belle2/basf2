@@ -391,7 +391,7 @@ internally. For multi-body decays like the one described above there can
 easily be many multiple candidates, which share some particles but differ by
 at least one final state particle.
 
-The wrapper function for the ParticleCombiner is called `reconstructDecay`.
+The wrapper function (convenience function) for the `ParticleCombiner` is called `reconstructDecay`.
 Its first argument is a `DecayString`, which is a combination of a mother
 particle (list), an arrow, and daughter particles. The `DecayString` has its
 own grammar with several markers, keywords, and arrow types. It is especially
@@ -433,6 +433,18 @@ written in the decay string.
     :class: toggle xhint stacked
 
     All you need is to call `reconstructDecay` twice.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The :math:`J/\Psi` reconstruction looks like this:
+
+    .. literalinclude:: steering_files/013_first_steering_file.py
+        :lines: 30-33
+        :lineno-start: 30
+
+    We have already included a `dM` cut to narrow down the promising candidates for a
+    :math:`J/\Psi`.
 
 .. admonition:: Solution
     :class: toggle solution

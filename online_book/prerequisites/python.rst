@@ -383,6 +383,14 @@ A useful feature to quickly summarize your data is to use the descibe function:
 
   ``df.describe`` has the great ability to summarize each of your columns/variables. When using it, a table is printed with rows of 'count', 'mean', 'std', 'min', '25%', '50%', '75%' and 'max'.
 
+* ``count``, the number of entries
+* ``mean``, the average of all entries
+* ``std``, the standard deviation of the column
+* ``min``, and ``max``: the smallest and largest value of the column
+* ``25%``, ``50%``, ``75%``: the value where only 25%, 50% or 75% of the entries in the column have
+  a smaller value. For example if we have 100 entries in the dataframe the 25% quantile is the 25th smallest value. 
+  The 50% quantile is also known as the median.
+
 
 You can also display the values of the DataFrame sorted by a specific column:
 
@@ -421,8 +429,8 @@ Manipulating your DataFrame
 Selecting columns, rows or subsets of DataFrames works in similar manner as
 python built in objects or numpy arrays.
 
-Getting
-^^^^^^^
+Selecting column(s)
+^^^^^^^^^^^^^^^^^^^
 
 Selecting a column can be performed by ``df['column_name']`` or
 ``df.column_name``. The result will be a pandas Series, a 1D vector. The
@@ -435,8 +443,6 @@ auto-completion.
   # or
   df.B0_M.describe()
 
-Selecting multiple columns
-^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Multiple columns can be selected by passing an array of columns:
 
@@ -530,7 +536,7 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
 
 .. code:: ipython3
 
-    df.query("(B0_mbc>5.2) & (B0_deltae>-1")
+    df.query("(B0_mbc>5.2) & (B0_deltae>-1"))
 
 .. note::
   There is a limit to the number of arguments in one query! Can you find it?)

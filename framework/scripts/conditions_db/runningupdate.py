@@ -100,6 +100,8 @@ class RunningTagUpdater:
         self._running_payloads = db.get_all_iovs(self._running_info['name'])
         #: Payloads currently in the staging tag
         self._staging_payloads = db.get_all_iovs(self._staging_info['name'])
+        #: First iov per payload name in staging to not close and open the same revision
+        self._staging_first_iovs = {}
 
     def _check_state(self, tagname, taginfo, required):
         """Check the state of a globaltag given the tag information object returned by the database
@@ -178,6 +180,9 @@ class RunningTagUpdater:
                 errors["wrong validity"] += 1
                 B2ERROR(f"Wrong validity for payload in staging tag '{tagname}'", name=p.name, validity=p.iov)
 
+            # trivial, only one payload per name to remember so it's always the first
+            self._staging_first_iovs[p.name] = p
+
         # how many errors did we have?
         if any(errors.values()):
             raise RunningTagUpdaterError(f"Staging tag '{tagname}' not fit for update in simple mode", **errors)
@@ -233,6 +238,13 @@ class RunningTagUpdater:
                     latest_iov[p.name] = p
                 else:
                     latest_iov[p.name] = max(p, prev)
+
+            # remember the first iov of each payload to extend what's in running if they match
+            first = self._staging_first_iovs.get(p.name, None)
+            if first is None:
+                self._staging_first_iovs[p.name] = p
+            else:
+                self._staging_first_iovs[p.name] = min(p, first)
 
         # Ok, now check for all payloads if the resulting iov is a single one or multiple,
         # aka having gaps. In that case print the gaps
@@ -292,6 +304,16 @@ class RunningTagUpdater:
             if (staging is not None) and p.iov[2:] == (-1, -1):
                 # extend the staging to infinity to make sure we close existing payloads correctly
                 staging_range = IntervalOfValidity(*(staging.first + (-1, -1))) & valid_range
+
+                # if the first payload didn't change revision we don't need to make
+                # a new iov but can just extend the existing one
+                first_iov = self._staging_first_iovs.get(p.name, None)
+                if first_iov is not None and first_iov.revision == p.revision:
+                    staging_range -= IntervalOfValidity(first_iov.iov)
+                    self._staging_payloads.remove(first_iov)
+                    # there's a chance this is empty now
+                    if not staging_range:
+                        continue
                 # close the existing iov before the range covered in staging
                 p.iov = (IntervalOfValidity(p.iov) - staging_range).tuple
                 # and mark the iov for closing

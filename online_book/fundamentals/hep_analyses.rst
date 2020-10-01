@@ -293,7 +293,9 @@ is the direction in which the positron beam points.
 .. seealso::
 
     There is an important document for any large HEP detector called the
-    **Technical Design Report** (TDR).
+    **Technical Design Report** (TDR). This document contains the proposed design
+    of the experiment. Most of its content is reliable, even if some details such
+    the performance studies may be (very) outdated.
 
     The Belle II TDR is `arXiv:1011.0352 <https://arxiv.org/abs/1011.0352>`_.
 
@@ -538,7 +540,9 @@ named prescaling. When working on your own analysis, it is very important to
 keep in mind potential prescaling of the triggers that yield the events you use
 in your analysis. Since the prescaling settings can (and will) change over
 the lifetime of the Belle II experiment, updated numbers for each run can be
-found `here <https://confluence.desy.de/display/BI/TriggerBitTable>`_.
+found `here <https://confluence.desy.de/display/BI/TriggerBitTable>`_.. See also 
+`this question <https://questions.belle2.org/question/9437/where-to-find-pre-scaling-factors/>`_.
+for more details.
 
 Since the TRG and HLT systems are ultimately deciding which data is being kept
 for offline analysis, understanding and validating their performance vs. their

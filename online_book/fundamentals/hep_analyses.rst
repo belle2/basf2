@@ -26,8 +26,10 @@ description of the most common analysis concepts.
 
 The workflow that goes from the data taking to the publication of any
 measurement in High-Energy Physics (HEP) experiment is quite complex.
-Measurements involve multiple steps that can take months or even years.
-While the details of this procedure can be extremely complex and tedious the
+The data analysis itself involve multiple steps that can take months or even years,
+and this comes on top of teh time required to take the data,
+process them, and produce the corresponding simulated events.
+While the details of allthese procedures can be extremely complex and tedious, the
 overall picture is simple enough to be fitted in a human-readable scheme:
 
 .. figure:: grand_scheme_of_hep.png
@@ -35,9 +37,10 @@ overall picture is simple enough to be fitted in a human-readable scheme:
   :align: center
 
 Starting from the very end, you can see that the input to the analysis are
-reconstructed, skimmed events, coming either from the actual data taking or from the
-generation of simulated events. The skimming is necessary to reduce the size of the
-dataset and significantly simplify and speed-up the analysis.  The reconstruction
+reconstructed and skimmed events, coming either from the actual data taking or from
+the generation of simulated events (in jargon Monte Carlo, often mispelled
+"Montecarlo", or MC). The skimming is necessary to reduce the size of the
+dataset and significantly simplify and speed-up the analysis. The reconstruction
 step is the same for both real and simulated data to minimize the differences
 between the two, except that the data need to be first calibrated.
 
@@ -50,10 +53,12 @@ Introduction: Cuts and signal selection
 
 Almost regardless of the quantity you are going to measure in your analysis, you
 will have to face some basic problems: select events you want to study (the
-signal) over similar events that mimic them (the background), estimate
-efficiency of such a selection and, possibly, estimate the intrinsic resolution
-of the quantities you will measure. Finally you will typically want to count how
-many signal events you observe.
+signal) over similar events that mimic them (the background, more about this
+later), estimate efficiency of such a selection and, possibly, estimate the
+intrinsic resolutionof the quantities you will measure. Finally you will want to
+count how many signal events you observe, or meaure other quantities like an
+invariant mass (i.e. the position of a peak) or a polarization from an angular
+distribution.
 
 The most basic way to select a signal is to apply what, in jargon, are called
 "cuts".
@@ -98,15 +103,16 @@ background.
 Introduction: Backgrounds, backgrounds, backgrounds
 ---------------------------------------------------
 
-An interesting event for most B physics analyses, is one where the
-:math:`e^+e^-` produced an :math:`\Upsilon(4S)`.
+An interesting event for most B physics analyses is one where the
+:math:`e^+e^-` produced an :math:`\Upsilon(4S)`, which subsequently decay
+into :math:`B\bar{B}` meson pair.
 However this is not the most probable result in an :math:`e^+e^-` collision.
 
 .. admonition:: Question
     :class: exercise stacked
 
     What is the most likely final state for an :math:`e^+e^-` collision at
-    10 GeV?
+    :math:`\sqrt{s}=10` GeV?
     What is its cross section?
     Also look up the cross section for hadronic events and for
     :math:`B\bar B` hadronic events.
@@ -167,13 +173,13 @@ signal.
 You would also get backgrounds of this second kind where there was some particle
 mis-identification or mis-reconstruction.
 
-The third kind of background arises from the continuum of hadronic events.
+The third kind of background arises from the non-resonant :math:`e^+e^- \to q\bar{q}`
+hadronic events.
 As you saw in the exercises before, :math:`B\bar B` is only part of the hadronic
 cross section.
 You will also get hadronisation of light quarks (:math:`uds`), and the charm
 quark (which is a background to B physics, for example, but obviously the signal
 for charm physics measurements).
-
 These hadronic events produce many tracks (around 10 or 11) per event.
 You are therefore, just by probability, likely to find some combination of
 genuine tracks and clusters that mimic your signal but aren't from a :math:`B`
@@ -230,8 +236,11 @@ The SuperKEKB accelerator circulates electrons and positrons through its roughly
 momentum, with the electrons kept at around 7 GeV/c and the positrons at around
 4 GeV/c. At a single point on the accelerator ring, the two beams are steered
 into (almost) head-on collision, resulting in a center-of-mass energy of
-typically around 10.6 GeV. The point of collision is named the "interaction
-region".
+typically around 10.58 GeV, corresponding to the :math:`Upsilon(4S)` resonance.
+The point of collision is named the "interaction region".
+The  center of mass energy can be changed to take data at other resoances of the
+:math:`\Upsilon` family, from around 9.4 to 11 GeV, for the non-B physics part
+of the Belle II physics program.
 
 .. admonition:: Question
     :class: exercise stacked
@@ -253,8 +262,9 @@ region".
     :class: toggle xhint stacked
 
     The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^35\ \textrm
-    {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly 10 μs to complete a full revolution around the accelerator
-    ring. Up to 2376 bunches will circulate in each ring.
+    {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly 10 μs to complete
+    a full revolution around the accelerator ring. Up to 2376 bunches will circulate
+    in each ring.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -313,15 +323,13 @@ PXD
     You can think of this as the inner vertex detector.
     The PXD is constructed from DEPFET silicon sensors segmented into individual
     pixels of down to  50 × 55 μm² size. It consists of
-    two layers
-    at 14 mm and 22 mm radius from the interaction point.
+    two layers at 14 mm and 22 mm radius from the interaction point.
 
 SVD
     The Silicon Vertex Detector (SVD) is the outer part of the vertex detector.
     It comprises of double sided silicon microstrip sensors with strips widths
     down to 50 μm. The four layers of the SVD system extend
-    the
-    outer radius of the vertex detector up to 140 mm.
+    the outer radius of the vertex detector up to 140 mm.
 
 .. _vxd-description:
 
@@ -416,11 +424,11 @@ KLM
 Data taking: on resonance, continuum, cosmics
 ---------------------------------------------
 
-To collect :math:`B` mesons one must collide electrons and positrons at the
+We saw that to collect :math:`B` mesons one must collide electrons and positrons at the
 centre-of-mass energy of :math:`\sqrt{s} = 10.580` GeV, corresponding to the
 :math:`\Upsilon(4S)` resonance mass. However this is not the only energy at
 which the SuperKEKB accelerator can work, and it's not the only kind of dataset
-that Belle II collects.
+that Belle II can collect.
 
 On-resonance
     The standard collisions at :math:`\sqrt{s} = 10.580` GeV.
@@ -438,24 +446,26 @@ Off-resonance
 Cosmic
     At the beginning and end of each run period Belle II acquires cosmic muons. These events are used mainly for
     performance studies and for calibration, as they provide an unique sample for aligning the detectors with
-    each other. Usually part of this dataset is collected with the solenoid switched off, so that muons cross the
-    detectors on straight trajectories. If the SuperKEKB accelerator has a major  downtime of few days, a cosmic dataset
-    is usually collected to keep the Belle II system running.
+    each other. Usually part of this dataset is collected with the solenoid switched off, so that
+    muons cross the detectors on straight trajectories. If the SuperKEKB accelerator has a major
+    downtime of few days, a cosmic dataset is usually collected to keep the Belle II system running.
 
 Beam
-    Beam runs are special, usually short data takings used to study the beam-induced background on the inner sub-detectors.
-    They are taken with the beams circulating without colliding, to remove all the processes arising from the :math:`e^+e^-`
-    hard scattering.
+    Beam runs are special, usually short data takings used to study the beam-induced background on
+    the inner sub-detectors.
+    They are taken with the beams circulating without colliding, to remove all the processes
+    related to :math:`e^+e^-` hard scattering.
 
 Scan
-   A scan consists of rather short data taking periods (hours or few days long) performed at slightly different energies
-   (usually 10-50 MeV apart). The goals of a scan is to measure the line shape of the :math:`e^+e^-` cross section to either
+   A scan consists of rather short data taking periods (hours or few days long) performed at
+   slightly different energies (usually 10-50 MeV apart). The goals of a scan is to measure
+   the line shape of the :math:`e^+e^-` cross section to either
    check that data are collected on the resonance peak (short scans), or to perform real physics measurements
    such the search for exotic vector resonances (long scans above the :math:`\Upsilon(4S)`energy)
 
 Non-4S
-   SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at :math:`9.460` GeV to
-   slightly above the :math:`\Upsilon(6S)`, around :math:`9.460` GeV. These datasets can be used for all the non-B
+   SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at
+   :math:`9.460` GeV to slightly above the :math:`\Upsilon(6S)`, around :math:`9.460` GeV. These datasets can be used for all the non-B
    parts of the Belle II physics program, but are particularly interesting for the spectroscopy, hadronic physics and
    dark sector studies.
 
@@ -474,7 +484,7 @@ importance to the Belle II physics program). Recording and keeping all detector
 information for each possible collision time would thus be wasteful (indeed the
 required resources and bandwidth from the detector to the offline disks would be
 rather comical). Instead, the Belle II online system, consisting of the Data
-AcQuisition (DAQ), Level 1 TriGger (TRG, also called L1) and the High Level
+Acquisition (DAQ), Level 1 Trigger (TRG, also called L1) and the High Level
 Trigger (HLT), is designed to reduce the amount of data as much as possible
 before it even reaches the first storage hard disk.
 
@@ -527,7 +537,8 @@ intentionally issuing triggers only for fractions of a given event class is
 named prescaling. When working on your own analysis, it is very important to
 keep in mind potential prescaling of the triggers that yield the events you use
 in your analysis. Since the prescaling settings can (and will) change over
-the lifetime of the Belle II experiment, you have to update numbers for each run.
+the lifetime of the Belle II experiment, updated numbers for each run can be
+found `here <https://confluence.desy.de/display/BI/TriggerBitTable>`_.
 
 Since the TRG and HLT systems are ultimately deciding which data is being kept
 for offline analysis, the importance of understanding and validating their
@@ -682,7 +693,6 @@ response need to be understood and modelled accordingly in the MC.
 This is an ongoing work in the Performance group which tries to understand the
 differences between MC and data by looking at specific samples and studies.
 
-.. TODO: link to performance group website?
 
 .. rubric:: Generating MC samples
 

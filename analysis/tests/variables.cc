@@ -341,7 +341,7 @@ namespace {
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
-    myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    myResults.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* savedTrack = myTracks.appendNew(mytrack);
@@ -367,7 +367,7 @@ namespace {
     //-----------------------------------------------------------------------
     // now add another track and mock up a V0 and a V0-based particle
     myResults.appendNew(position, momentum, cov6, charge * -1,
-                        Const::electron, pValue, bField, CDCValue, 16777215);
+                        Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track secondTrack;
     secondTrack.setTrackFitResultIndex(Const::electron, 1);
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
@@ -455,7 +455,7 @@ namespace {
       TMatrixDSym cov(6);
       trackfits.appendNew(
         TVector3(), TVector3(), cov, -1, Const::electron, 0.5, 1.5,
-        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+        static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* electron_tr = tracks.appendNew(Track());
       electron_tr->setTrackFitResultIndex(Const::electron, 0);
       electron_tr->addRelationTo(cl1);  // a track <--> cluster match
@@ -463,7 +463,7 @@ namespace {
       TMatrixDSym cov1(6);
       trackfits.appendNew(
         TVector3(), TVector3(), cov1, -1, Const::pion, 0.51, 1.5,
-        static_cast<unsigned long long int>(0x300000000000000), 16777215);
+        static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* pion_tr = tracks.appendNew(Track());
       pion_tr->setTrackFitResultIndex(Const::pion, 0);
       pion_tr->addRelationTo(cl1);  // a track <--> cluster match
@@ -1234,13 +1234,13 @@ namespace {
     Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
 
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.15, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.4, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
     track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.6, 0.0, 0.0),
-                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
 
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 1);
@@ -4135,7 +4135,7 @@ namespace {
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* allTrack = tracks.appendNew(mytrack);
@@ -4329,7 +4329,7 @@ namespace {
     TVector3 momentum(pt.Px(), pt.Py(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
-    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215);
+    tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
     Track mytrack;
     mytrack.setTrackFitResultIndex(Const::electron, 0);
     Track* savedTrack1 = tracks.appendNew(mytrack);

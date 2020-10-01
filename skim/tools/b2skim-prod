@@ -9,8 +9,8 @@
 also generating combined steering files.
 
 YAML files are used by this tool to define the LPNs of datasets. Below are examples of
-valid YAML entries for data and MC. The tool ``skim/tools/lpns2yaml.py`` is provided to
-create these YAML files from a list of LPNs.
+valid YAML entries for data and MC. The tool :ref:`lpns2yaml.py<lpns2yaml>` is provided
+to create these YAML files from a list of LPNs.
 
 .. code-block:: yaml
 

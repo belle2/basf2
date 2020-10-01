@@ -221,7 +221,7 @@ You do not need to reject the whole event just because of some beam background.
 
     1. Trigger background and background processes.
     2. Physics background (more of a problem when you get into your analysis).
-    3. Continuum background from (:math:`uds` and maybe :math:`c`).
+    3. Continuum background (from :math:`uds` and maybe :math:`c`).
     4. Beam-induced background.
 
 Data taking: The experiment
@@ -363,7 +363,7 @@ TOP
     `Cherenkov effect <https://en.wikipedia.org/wiki/Cherenkov_radiation>`_.
     Particles passing through will cause Cherenkov photons to be emitted at an
     angle that directly depends on the particle velocity. Combining this
-    velocity information with particle momentum measured in the preceding
+    velocity information with the particle momentum measured in the preceding
     tracking detectors yields a mass measurement, which identifies the particle
     species. Emitted Cherenkov photons are captured inside the quartz bars by
     total internal reflection. TOP reconstructs the Cherenkov emission angle by
@@ -461,7 +461,7 @@ Scan
    slightly different energies (usually 10-50 MeV apart). The goals of a scan is to measure
    the line shape of the :math:`e^+e^-` cross section to either
    check that data are collected on the resonance peak (short scans), or to perform real physics measurements
-   such the search for exotic vector resonances (long scans above the :math:`\Upsilon(4S)`energy)
+   such the search for exotic vector resonances (long scans above the :math:`\Upsilon(4S)` energy).
 
 Non-4S
    SuperKEKB can operate across the whole spectrum of bottomonia, from the :math:`\Upsilon(1S)` at
@@ -496,7 +496,7 @@ is what we call "one event". Generating this trigger signal for each
 what effectively amounts to a low resolution "live stream" of the readout data
 of CDC, ECL and KLM (for completeness: TOP also sends stream data to TRG  but it
 is not used for triggering directly). The streamed data is interpreted in near
-realtime in highly specialized fast electronics boards (Field Programmable Gate
+realtime using specialized fast electronics (Field Programmable Gate
 Arrays, FPGAs) by continuously matching it to predefined trigger conditions. If
 TRG determines an interesting collision event has just taken place, it generates
 a trigger signal which is distributed to all subdetectors. The TRG system is
@@ -516,7 +516,7 @@ system.
 
 The HLT system is a computing cluster of about 4000 CPU cores located right next
 to the Belle II detector. It receives the full raw subdetector data for each
-triggered event performs an immediate full reconstruction, using the
+triggered event and performs an immediate full reconstruction using the
 exact same basf2 software as is used in offline data analysis. Based on the
 result of this reconstruction, events are classified and either stored to a
 local offline storage hard disk drive or discarded. This high level event
@@ -541,9 +541,9 @@ the lifetime of the Belle II experiment, updated numbers for each run can be
 found `here <https://confluence.desy.de/display/BI/TriggerBitTable>`_.
 
 Since the TRG and HLT systems are ultimately deciding which data is being kept
-for offline analysis, the importance of understanding and validating their
-performance vs. their intended functionality is of highest importance for the
-success of the Belle II experiment.
+for offline analysis, understanding and validating their performance vs. their
+intended functionality is of highest importance for the success of the Belle II
+experiment.
 
 .. admonition:: Key points
     :class: key-points
@@ -1095,8 +1095,8 @@ starting from those signals and combined particles that are reconstructed as sum
 
     The average flight length of a particle of speed :math:`\beta` and lifetime
     :math:`\tau` is
-    :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = E/M` while :math:`\beta = p/E`,
-    therefore :math:`L = c\tau p/M`. From this:
+    :math:`L = \gamma\beta\tau c`. The Lorentz factor is :math:`\gamma = \frac{E}{Mc^2}` while :math:`\beta = pc/E`,
+    therefore :math:`L = \tau p/M`. From this:
     :math:`L_{\mu} \approx 63` m and :math:`L_{D^0} \approx 170` μm. Only the muon reaches
     the tracking system.
 

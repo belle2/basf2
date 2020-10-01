@@ -10,6 +10,8 @@
 
 #pragma once
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <string>
 #include <TMatrix.h>
@@ -33,6 +35,8 @@ namespace Belle2 {
     TMatrix*  m_MultiplicityMatrix;
     /** Decay descriptor of the particle being selected */
     DecayDescriptor m_decaydescriptor;
+    /** StoreArray of Particles */
+    StoreArray<Particle> m_particles;
 
   public:
     /** Constructor. */

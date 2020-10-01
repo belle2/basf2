@@ -26,10 +26,10 @@ description of the most common analysis concepts.
 
 The workflow that goes from the data taking to the publication of any
 measurement in High-Energy Physics (HEP) experiment is quite complex.
-The data analysis itself involve multiple steps that can take months or even years,
-and this comes on top of teh time required to take the data,
+The data analysis itself involves multiple steps that can take months or even years,
+and this comes on top of the time required to take the data,
 process them, and produce the corresponding simulated events.
-While the details of allthese procedures can be extremely complex and tedious, the
+While the details of all these procedures can be extremely complex and tedious, the
 overall picture is simple enough to be fitted in a human-readable scheme:
 
 .. figure:: grand_scheme_of_hep.png
@@ -55,7 +55,7 @@ Almost regardless of the quantity you are going to measure in your analysis, you
 will have to face some basic problems: select events you want to study (the
 signal) over similar events that mimic them (the background, more about this
 later), estimate efficiency of such a selection and, possibly, estimate the
-intrinsic resolutionof the quantities you will measure. Finally you will want to
+intrinsic resolution of the quantities you will measure. Finally you will want to
 count how many signal events you observe, or meaure other quantities like an
 invariant mass (i.e. the position of a peak) or a polarization from an angular
 distribution.
@@ -105,7 +105,7 @@ Introduction: Backgrounds, backgrounds, backgrounds
 
 An interesting event for most B physics analyses is one where the
 :math:`e^+e^-` produced an :math:`\Upsilon(4S)`, which subsequently decay
-into :math:`B\bar{B}` meson pair.
+into a :math:`B\bar{B}` meson pair.
 However this is not the most probable result in an :math:`e^+e^-` collision.
 
 .. admonition:: Question
@@ -238,7 +238,7 @@ momentum, with the electrons kept at around 7 GeV/c and the positrons at around
 into (almost) head-on collision, resulting in a center-of-mass energy of
 typically around 10.58 GeV, corresponding to the :math:`Upsilon(4S)` resonance.
 The point of collision is named the "interaction region".
-The  center of mass energy can be changed to take data at other resoances of the
+The  center of mass energy can be changed to take data at other resonances of the
 :math:`\Upsilon` family, from around 9.4 to 11 GeV, for the non-B physics part
 of the Belle II physics program.
 

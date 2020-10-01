@@ -305,6 +305,27 @@ class TestMergeStaging(unittest.TestCase):
                              ['CREATE', 'C', 10, (2,  0, -1, -1)],
                          ])
 
+    def test_operations_full(self):
+        """
+        In full mode we close B even if there's nothing in the staging tag
+        to allow "removing" payloads from the set of valid ones
+        """
+        running = self.make_payloads(**self.RUNNING_BASE)
+        staging = self.make_payloads(
+            A=[(0, 0, -1, -1)],
+            C=[(0, 0, -1, -1)],
+            start_revision=10)
+        db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
+        updater = RunningTagUpdater(db, "running", "staging", (2, 0), Mode.FULL_REPLACEMENT)
+        result = updater.calculate_update()
+        self.assertEqual(self.parse_operations(result),
+                         [
+                             ['CLOSE',  'A',  4, (1, 12,  1, -1)],
+                             ['CLOSE',  'B',  1, (0,  0,  1, -1)],
+                             ['CREATE', 'A', 10, (2,  0, -1, -1)],
+                             ['CREATE', 'C', 10, (2,  0, -1, -1)],
+                         ])
+
     def test_operations_ragged(self):
         """This time B doesn't start on the spot but a bit later. And A is a list of iovs to be preserved"""
         running = self.make_payloads(**self.RUNNING_BASE)
@@ -421,6 +442,48 @@ class TestMergeStaging(unittest.TestCase):
                 result.append(payload)
         result.sort()
         self.assertEqual(expected, result)
+
+    def test_doc_example_full(self):
+        """Extract the example from the `b2conditionsdb tag runningupdate` docstring and run it"""
+        running, staging, expected = self.create_payloads_from_text(command_tag_runningupdate.__doc__)
+        # make a copy of the running payloads just to be able to compare later
+        result = running[:]
+        db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
+        updater = RunningTagUpdater(db, "running", "staging", (1, 2), Mode.FULL_REPLACEMENT)
+        operations = updater.calculate_update()
+        # check that the update does what we actually wrote in the doc. This will
+        # fail if the docs are updated.
+        self.assertEqual(self.parse_operations(operations),
+                         [
+                             ['CLOSE',  'payload1', 2, (1, 1, 1, 1)],
+                             ['CLOSE',  'payload2', 1, (0, 1, 1, 4)],
+                             ['CLOSE',  'payload4', 1, (0, 1, 1, 20)],
+                             ['CLOSE',  'payload5', 1, (0, 1, 1, 1)],
+                             ['CREATE', 'payload1', 3, (1, 2, 1, 8)],
+                             ['CREATE', 'payload1', 4, (1, 9, 1, 20)],
+                             ['CREATE', 'payload2', 2, (1, 5, 1, 20)],
+                             ['CREATE', 'payload3', 2, (1, 2, -1, -1)],
+                         ])
+
+    def test_doc_example_fixclosed(self):
+        """Extract the example from the `b2conditionsdb tag runningupdate` docstring and run it"""
+        running, staging, expected = self.create_payloads_from_text(command_tag_runningupdate.__doc__)
+        # make a copy of the running payloads just to be able to compare later
+        result = running[:]
+        db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
+        updater = RunningTagUpdater(db, "running", "staging", (1, 2), Mode.FIX_CLOSED)
+        operations = updater.calculate_update()
+        # check that the update does what we actually wrote in the doc. This will
+        # fail if the docs are updated.
+        self.assertEqual(self.parse_operations(operations),
+                         [
+                             ['CLOSE',  'payload1', 2, (1, 1, 1, 1)],
+                             ['CLOSE',  'payload2', 1, (0, 1, 1, 4)],
+                             ['CREATE', 'payload1', 3, (1, 2, 1, 8)],
+                             ['CREATE', 'payload1', 4, (1, 9, -1, -1)],
+                             ['CREATE', 'payload2', 2, (1, 5, -1, -1)],
+                             ['CREATE', 'payload3', 2, (1, 2, -1, -1)],
+                         ])
 
 
 if __name__ == "__main__":

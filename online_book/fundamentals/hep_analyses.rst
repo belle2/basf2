@@ -254,7 +254,7 @@ region".
 
     The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^35\ \textrm
     {cm}^-2 \textrm{s}^-1`. It takes a beam particle bunch roughly 10 μs to complete
-    a full revolution around the accelerator ring. Up to 2376 bunches will circulate 
+    a full revolution around the accelerator ring. Up to 2376 bunches will circulate
     in each ring.
 
 .. admonition:: Solution
@@ -1108,42 +1108,46 @@ starting from those signals and combined particles that are reconstructed as sum
     :class: toggle solution
 
 
-    Let's start from the charged particles.
-    All the strongly- or electromagnetically.decaying resonances, both charged and neutral
-    (:math:`rho`, :math:`K^\star`, :math:`\pi^0`, ...) do not
-    live long enough to significantly move away from the :math:`e^+e^-` interaction point, so they can
-    only be reconstructed detecting their decay products.
-    Proton, electrons and their anti-particles are stable and definitively leave ionization signals
-    in the tracking system, so they should be in the list.
-    Other particles that could leave ionization are the long-lived, weakly decaying particles.
-    Charged pions, charged kaons and muons are not stable, but we saw already that the latter has a
-    very long flight length, usually exceeding the scale of the detector. Pions and kaons decay much
-    faster than a muon, buts still have a :math:`c\tau` of approximately 8 and 4 meters respectively,
-    which make then likely to leave a detectable track before decaying. The are both on the list.
-    :math:`D` and :math:`B` mesons fly much less than a mm before decaying, so they cannot leave any
-    detectable track.
-    Some hyperons, strange baryons, are charged and have a sizable lifetime. The longest-living one
-    is the :math:`Csi^-` with a lifetime of 0.7 ns corresponding to `c\tau \approx 5` cm. Such particle,
-    especially if it has few GeV of momentum, can cross the PXD and even the inner layers of the SVD
-    leaving a signal. However, such short track would be very difficult to reconstruct, and it's
-    much more convenient to reconstruct these hyperons looking at their (almost) stable decay products.
-    Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as
-    deuteron, tritium of helium. These can be produced ether in the :math:`e^+e^-` collision or, much more
-    easily, by spallation processes on the inner detector materials.
+    Let's start from the **charged particles**.
+
+    * All the strongly- or electromagnetically decaying resonances, both charged and neutral
+      (:math:`\rho`, :math:`K^\star`, :math:`\pi^0`, ...) do not
+      live long enough to significantly move away from the :math:`e^+e^-` interaction point, so they can
+      only be reconstructed detecting their decay products.
+    * Proton, electrons and their anti-particles are stable and definitively leave ionization signals
+      in the tracking system, so they should be in the list.
+    * Other particles that could leave ionization are the long-lived, weakly decaying particles.
+      Charged pions, charged kaons and muons are not stable, but we saw already that the latter has a
+      very long flight length, usually exceeding the scale of the detector. Pions and kaons decay much
+      faster than a muon, buts still have a :math:`c\tau` of approximately 8 and 4 meters respectively,
+      which make then likely to leave a detectable track before decaying. The are both on the list.
+      :math:`D` and :math:`B` mesons fly much less than a mm before decaying, so they cannot leave any
+      detectable track.
+    * Some hyperons, strange baryons, are charged and have a sizable lifetime. The longest-living one
+      is the :math:`\Xi^+` with a lifetime of 1.7 ns corresponding to :math:`c\tau \approx 5` cm. Such a particle,
+      especially if it has some few GeV of momentum, can cross the PXD and even the inner layers of the SVD,
+      leaving a signal. However, such short track would be very difficult to reconstruct, and it's
+      much more convenient to reconstruct these hyperons looking at their (almost) stable decay products.
+    * Finally, there's one last category of stable charged particles we can detect: light (anti-)nuclei as
+      deuteron, tritium of helium. These can be produced ether in the :math:`e^+e^-` collision or, much more
+      easily, by spallation processes on the inner detector materials.
 
 
-    Let's look now at the neutral particles. The photon is stable, and the ECL is designed exactly
-    to measure photon energies. The (anti-)neutron is basically stable for our purposes, but it
-    leaves no signal in the tracking system and the ECL is not designed as an hadronic calorimeter.
-    There are studies focused on reconstructing this particle in the ECL, but let's leave it out
-    of the list for the moment.
-    The :math:`K_L` has :math:`c\tau \approx 15 m`, so it's definitely to be considered stable
-    in the scale of the experiment. As the neutron is leaves no ionization, but the KLM is designed
-    to detect its interaction in the iron layers of the solenoid's return yoke. Let's count it as a
-    reconstructed particle.
-    :math:`Lambda` and :math:`K_s` behave similarly to the :math:`K_L`,but their lifetime is much shorter
-    and, at the Belle II energies, they mostly decay inside the tracking volume. The most convenient way
-    to reconstruct and combine their decay products, pions and proton.
+    Let's look now at the **neutral particles**.
+
+    * The photon is stable, and the ECL is designed exactly
+      to measure photon energies.
+    * The (anti-)neutron is basically stable for our purposes, but it
+      leaves no signal in the tracking system and the ECL is not designed as an hadronic calorimeter.
+      There are studies focused on reconstructing this particle in the ECL, but let's leave it out
+      of the list for the moment.
+    * The :math:`K_L` has :math:`c\tau \approx 15 m`, so it's definitely to be considered stable
+      in the scale of the experiment. As the neutron is leaves no ionization, but the KLM is designed
+      to detect its interaction in the iron layers of the solenoid's return yoke. Let's count it as a
+      reconstructed particle.
+    * :math:`\Lambda` and :math:`K_s` behave similarly to the :math:`K_L`, but their lifetime is much shorter
+      and, at the Belle II energies, they mostly decay inside the tracking volume. The most convenient way
+      to reconstruct and combine their decay products, pions and proton.
 
 
 Let's see now how reconstructed and combined particles are handled, and what are the special cases.

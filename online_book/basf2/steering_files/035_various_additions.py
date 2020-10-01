@@ -71,10 +71,6 @@ ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
 roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
 ma.appendROEMasks("B0", [roe_mask], path=main)
 
-# perform best candidate selection
-b2.set_random_seed("Belle II StarterKit")
-ma.rankByHighest("B0", variable="random", numBest=1, path=main)
-
 # Create list of variables to save into the output file
 b_vars = []
 

@@ -502,7 +502,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
   hxyAll->SetStats(0);
   hxyAll->Draw();
 
-  TH2F* hxyOldBad = getHistoPattern("cdcdedx_wiregain_badwireold.txt", "oldbad");
+  TH2F* hxyOldBad = getHistoPattern("cdcdedx_wiregain_badwireold.txt", "old dead");
   if (hxyOldBad) {
     hxyOldBad->SetTitle("");
     hxyOldBad->SetMarkerStyle(20);
@@ -512,7 +512,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
     hxyOldBad->Draw("same");
   }
 
-  TH2F* hxyNewDead = getHistoPattern("cdcdedx_wiregain_deadwirenew.txt", "newdead");
+  TH2F* hxyNewDead = getHistoPattern("cdcdedx_wiregain_deadwirenew.txt", "new dead");
   if (hxyNewDead) {
     hxyNewDead->SetTitle("");
     hxyNewDead->SetMarkerStyle(20);
@@ -522,7 +522,7 @@ void CDCDedxWireGainAlgorithm::plotBadWires(int nDeadwires, int oBadwires)
     hxyNewDead->Draw("same");
   }
 
-  auto legend = new TLegend(0.72, 0.82, 0.90, 0.92);
+  auto legend = new TLegend(0.72, 0.80, 0.90, 0.92);
   legend->SetBorderSize(0);
   legend->SetLineWidth(3);
   legend->SetHeader(Form("Total Dead: %d (~%0.02f%%)", nDeadwires, 100.*(nDeadwires) / 14336.0));
@@ -553,7 +553,7 @@ TH2F* CDCDedxWireGainAlgorithm::getHistoPattern(TString badFileName, TString suf
   std::ifstream infile;
   infile.open(Form("%s", badFileName.Data()));
 
-  TH2F* temp = new TH2F(Form("temp_%s", suffix.Data()), "badwire", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
+  TH2F* temp = new TH2F(Form("temp_%s", suffix.Data()), "wire status", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
   if (!infile.fail()) {
     int bwires = 0;
     while (infile >> bwires) {

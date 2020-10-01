@@ -231,7 +231,7 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
 {
 
   if (!m_relative && m_nonlADC)
-    m_DBNonlADC->getCorrectedADC(adc, layer);
+    adc = m_DBNonlADC->getCorrectedADC(adc, layer);
 
   dedx *= adc * std::sqrt(1 - costheta * costheta) / length;
 
@@ -275,7 +275,7 @@ double CDCDedxCorrectionModule::GetCorrection(int& adc, int layer, int wireID, d
 
   //these last two are only for abs constant
   if (!m_relative) {
-    if (m_nonlADC)m_DBNonlADC->getCorrectedADC(adc, layer);
+    if (m_nonlADC)adc = m_DBNonlADC->getCorrectedADC(adc, layer);
     if (m_cosineEdge && (costheta <= -0.850 || costheta >= 0.950)) {
       correction *= m_DBCosEdgeCor->getMean(costheta);
     }

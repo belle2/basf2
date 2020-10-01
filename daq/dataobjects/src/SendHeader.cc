@@ -88,10 +88,10 @@ void SendHeader::SetNodeID(int node_id)
 void SendHeader::SetRunNum(int run_num)
 {
 
-  unsigned int inv_mask = ~((unsigned int)(tmp_header.RUNNO_MASK));
+  unsigned int inv_mask = ~((unsigned int)(RUNNO_MASK));
   m_buffer[ POS_EXP_RUN_NUM ] =
     ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) |
-    (((unsigned int)run_num << tmp_header.RUNNO_SHIFT) & tmp_header.RUNNO_MASK);
+    (((unsigned int)run_num << RUNNO_SHIFT) & RUNNO_MASK);
 
   return;
 }
@@ -99,19 +99,19 @@ void SendHeader::SetRunNum(int run_num)
 void SendHeader::SetSubRunNum(int subrun_num)
 {
 
-  unsigned int inv_mask = ~((unsigned int)(tmp_header.SUBRUNNO_MASK));
+  unsigned int inv_mask = ~((unsigned int)(SUBRUNNO_MASK));
   m_buffer[ POS_EXP_RUN_NUM ] =
-    ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) | ((unsigned int)subrun_num & tmp_header.SUBRUNNO_MASK);
+    ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) | ((unsigned int)subrun_num & SUBRUNNO_MASK);
   return;
 }
 
 void SendHeader::SetExpNum(int exp_num)
 {
 
-  unsigned int inv_mask = ~((unsigned int)(tmp_header.EXP_MASK));
+  unsigned int inv_mask = ~((unsigned int)(EXP_MASK));
   m_buffer[ POS_EXP_RUN_NUM ] =
     ((unsigned int)m_buffer[ POS_EXP_RUN_NUM ] & inv_mask) |
-    (((unsigned int)exp_num << tmp_header.EXP_SHIFT) & tmp_header.EXP_MASK);
+    (((unsigned int)exp_num << EXP_SHIFT) & EXP_MASK);
 
   return;
 }
@@ -136,26 +136,26 @@ int SendHeader::GetNodeID() { return m_buffer[ POS_NODE_ID ]; }
 
 int SendHeader::GetRunNum()
 {
-  return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & tmp_header.RUNNO_MASK) >> tmp_header.RUNNO_SHIFT);
+  return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & RUNNO_MASK) >> RUNNO_SHIFT);
 }
 
 int SendHeader::GetSubRunNum()
 {
-  return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & tmp_header.SUBRUNNO_MASK);
+  return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & SUBRUNNO_MASK);
 }
 
 int SendHeader::GetRunNumSubRunNum()
 {
 
   return ((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) &
-          (tmp_header.RUNNO_MASK | tmp_header.SUBRUNNO_MASK));
+          (RUNNO_MASK | SUBRUNNO_MASK));
 }
 
 
 int SendHeader::GetExpNum()
 {
 
-  return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & tmp_header.EXP_MASK) >> tmp_header.EXP_SHIFT);
+  return (((unsigned int)(m_buffer[ POS_EXP_RUN_NUM ]) & EXP_MASK) >> EXP_SHIFT);
 }
 
 

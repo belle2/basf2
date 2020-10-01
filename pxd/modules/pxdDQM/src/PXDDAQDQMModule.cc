@@ -129,6 +129,13 @@ void PXDDAQDQMModule::beginRun()
 
 void PXDDAQDQMModule::event()
 {
+  hDAQDHPDataMissing->Fill(-1); // to normalize to the number of events
+  hDAQErrorDHC->Fill(-1, -1); // to normalize to the number of events
+  hDAQErrorDHE->Fill(-1, -1); // to normalize to the number of events
+  /// An Error Flag can only be set, if the object actually exists,
+  /// thus we have to check for a difference to the number of events, too
+  /// Remark: for HLT event selection and/or events rejected by the event-
+  /// of-doom-buster, we might count anyhow broken events as broken from PXD
   B2DEBUG(20, "Iterate PXD DAQ Status");
   auto evt = *m_storeDAQEvtStats;
   PXDErrorFlags evt_emask = evt.getErrorMask();
@@ -136,11 +143,11 @@ void PXDDAQDQMModule::event()
     PXDErrorFlags mask = (1ull << i);
     if ((evt_emask & mask) == mask) hDAQErrorEvent->Fill(getPXDBitErrorName(i).c_str(), 1);
   }
-  hDAQDHPDataMissing->Fill(-1); // to normalize to the number of events
   B2DEBUG(20, "Iterate PXD Packets, Err " << evt_emask);
   for (auto& pkt : evt) {
     B2DEBUG(20, "Iterate PXD DHC in Pkt " << pkt.getPktIndex());
     for (auto& dhc : pkt) {
+      hDAQErrorDHC->Fill(dhc.getDHCID(), -1);// normalize
       PXDErrorFlags dhc_emask = dhc.getErrorMask();
       for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {
         PXDErrorFlags mask = (1ull << i);
@@ -159,6 +166,7 @@ void PXDDAQDQMModule::event()
       }
       B2DEBUG(20, "Iterate PXD DHE in DHC " << dhc.getDHCID() << " , Err " << dhc_emask);
       for (auto& dhe : dhc) {
+        hDAQErrorDHE->Fill(dhe.getDHEID(), -1);// normalize
         PXDErrorFlags dhe_emask = dhe.getErrorMask();
         B2DEBUG(20, "DHE " << dhe.getDHEID() << " , Err " << dhe_emask);
         for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) {

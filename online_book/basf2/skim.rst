@@ -14,7 +14,7 @@ Skimming
 
     **Prerequisites**:
 
-    	* :ref:`gbasf2 lesson <onlinebook_gbasf2>`
+        * :ref:`gbasf2 lesson <onlinebook_gbasf2>`
 
     **Questions**:
 
@@ -196,6 +196,21 @@ or by using the ``-h`` flag.
      Use ``b2skim-run`` to apply the skim ``XToD0_D0ToHpJm`` to the file
      ``$BELLE2_VALIDATION_DATA_DIR/mdst13.root``.
 
+.. admonition:: Solution
+     :class: toggle solution
+
+     The command to run the ``XToD0_D0ToHpJm`` skim on this sample is:
+
+     .. code-block:: bash
+
+         b2skim-run single XToD0_D0ToHpJm -i $BELLE2_VALIDATION_DATA_DIR/mdst13.root
+
+     By default, this will output a uDST file in the current directory titled
+     ``17230100.udst.root``.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
      What is the retention rate (fraction of events passing the skim) of the
      ``XToD0_D0ToHpJm`` skim on this sample?
 
@@ -207,16 +222,6 @@ or by using the ``-h`` flag.
 
 .. admonition:: Solution
      :class: toggle solution
-
-     The command to run the ``XToD0_D0ToHpJm`` skim on this sample is:
-
-     .. code-block:: bash
-
-         b2skim-run single XToD0_D0ToHpJm -i $BELLE2_VALIDATION_DATA_DIR/mdst13.root
-
-     By default, this will output a uDST file in the current directory titled
-     ``17230100.udst.root``. We can then use another command-line tool to find
-     the number of events in the mDST and uDST files:
 
      .. code-block:: bash
 
@@ -327,7 +332,7 @@ want (e.g. Campaigns: SkimP11x1). At the bottom of the page, there is a button
 “Download .txt file” you can use to get a list of all datablocks, for example: ``lfn.list.txt``
 As mentioned, the dataset searcher only list one directory for a given production.
 
- To access the full list of directories, you can use the following script:
+To access the full list of directories, you can use the following script:
 
 .. code-block:: bash
 
@@ -361,7 +366,7 @@ Of course, you should make sure your script runs at KEKCC before submitting to t
 
  Right now, gbasf2 only allows you to submit up to 1000 jobs in a single project.
 That means you will have to split up the proc11 data. This can be accomplished by splitting up
- fulllfnlist.txt 
+``fulllfnlist.txt``
 
 .. code-block:: bash
 

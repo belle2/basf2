@@ -220,9 +220,9 @@ Asking a question in #starterkit-workshop
     After the workshop, we recommend you to try one of the other alternatives
     (but you can always try, of course).
 
-Our chat works like any other chats with a couple of nice features. For example you can
-put small parts of code in backticks ```print("hello world")```) and you can add a larger
-bit of source code in triple backticks like so (note that you can create a new line by pressing
+Our chat works like any other chat with a couple of nice features. For example you can
+put small parts of code in backticks ```print("hello world")``` and you can add larger
+bits of source code in triple backticks like so (note that you can create a new line by pressing
 Shift-Enter):
 
 .. code-block::

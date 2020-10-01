@@ -322,11 +322,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
 
     Extend your steering file by loading electrons, positrons, and :math:`K_S^0`s. At
     the very end of your script you should also print a summary table of all
-    modules added to your path using the function `statistics`. Then run the
-    script and answer the following questions:
-
-    * Which are the mass window boundaries set for the :math:`K_S^0`?
-    * Which module had the longest execution time?
+    modules added to your path using the function `statistics`.
 
 .. admonition:: Hint
     :class: toggle xhint stacked

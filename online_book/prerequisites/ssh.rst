@@ -165,9 +165,8 @@ impatient you can also press ``Ctrl-D`` as a shortcut.
 
     Don't run long-running and CPU or memory heavy jobs on login nodes like
     KEKCC and DESY where they have a dedicated batch systems (e.g.
-    :ref:`online_book/computing/gbasf2:gbasf2`, :ref:`LSF
-    <online_book/computing/batch:Batch submission>` or
-    :ref:`online_book/computing/htcondor:htcondor`). The login nodes are shared
+    :ref:`onlinebook_gbasf2`, :ref:`LSF <onlinebook_bsub>` or
+    :ref:`onlinebook_htcondor`). The login nodes are shared
     resources for all users and it's not very polite and mostly also not
     permitted to occupy them with calculations that could be done on dedicated
     machines.
@@ -475,7 +474,7 @@ you have created your very own SSH identity.
 
    However, DSA has been found unsafe and there are some concerns about ECDSA so
    the only real options are RSA and Ed25519. Ed25519 was added later and should
-   be more secure but is not supported on old versions of SSH.
+   be more secure but is not supported on very old versions of SSH.
 
 .. rubric:: Using your new key
 

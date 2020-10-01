@@ -588,11 +588,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         belleVeeDaughterHelix(belleV0, 1, helixParam, helixError);
 
-        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, 0.5, -1, -1);
+        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, 0.5, -1, -1, 0);
         trackFitPIndex = trackFitP->getArrayIndex();
 
         belleVeeDaughterToCartesian(belleV0, 1, pTypeP, momentumP, positionP, error7x7P);
-        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1));
+        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1, 0));
         // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
 
@@ -619,7 +619,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           continue;
         }
 
-        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1);
+        auto trackFitP = m_trackFitResults.appendNew(helixParam, helixError, pTypeP, pValue, -1, -1, 0);
 
         trackFitPIndex = trackFitP->getArrayIndex();
 
@@ -644,11 +644,11 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
         std::vector<float> helixError(15);
         belleVeeDaughterHelix(belleV0, -1, helixParam, helixError);
 
-        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, 0.5, -1, -1);
+        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, 0.5, -1, -1, 0);
         trackFitMIndex = trackFitM->getArrayIndex();
 
         belleVeeDaughterToCartesian(belleV0, -1, pTypeM, momentumM, positionM, error7x7M);
-        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1));
+        TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1, 0));
         // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
         for (unsigned i = 0; i < 7; i++)
@@ -674,7 +674,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
           continue;
         }
 
-        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1);
+        auto trackFitM = m_trackFitResults.appendNew(helixParam, helixError, pTypeM, pValue, -1, -1, 0);
 
         trackFitMIndex = trackFitM->getArrayIndex();
 
@@ -1708,7 +1708,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
       svdVMask <<= 2;
     }
 
-    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, patternVxd.getInteger());
+    TrackFitResult helixFromHelix(helixParam, helixError, pType, pValue, -1, patternVxd.getInteger(), 0);
 
     if (m_use6x6CovarianceMatrix4Tracks) {
       TMatrixDSym cartesianCovariance(6);
@@ -1734,7 +1734,7 @@ void B2BIIConvertMdstModule::convertMdstChargedObject(const Belle::Mdst_charged&
     }
 
     auto trackFit = m_trackFitResults.appendNew(helixParam, helixError, pType, pValue, patternCdc.getInteger(),
-                                                patternVxd.getInteger());
+                                                patternVxd.getInteger(), trk_fit.ndf());
     track->setTrackFitResultIndex(pType, trackFit->getArrayIndex());
     /*
       B2INFO("--- B1 Track: ");
@@ -2231,7 +2231,8 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
                                                             const Const::ParticleType& pType,
                                                             const float pValue,
                                                             const uint64_t hitPatternCDCInitializer,
-                                                            const uint32_t hitPatternVXDInitializer)
+                                                            const uint32_t hitPatternVXDInitializer,
+                                                            const uint16_t ndf)
 {
   TVector3 pos(position.x(),  position.y(),  position.z());
   TVector3 mom(momentum.px(), momentum.py(), momentum.pz());
@@ -2251,7 +2252,7 @@ TrackFitResult B2BIIConvertMdstModule::createTrackFitResult(const CLHEP::HepLore
     }
   }
 
-  return TrackFitResult(pos, mom, errMatrix, charge, pType, pValue, BFIELD, hitPatternCDCInitializer, hitPatternVXDInitializer);
+  return TrackFitResult(pos, mom, errMatrix, charge, pType, pValue, BFIELD, hitPatternCDCInitializer, hitPatternVXDInitializer, ndf);
 }
 
 double B2BIIConvertMdstModule::atcPID(const PIDLikelihood* pid, int sigHyp, int bkgHyp)

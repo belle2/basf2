@@ -14,9 +14,6 @@ from tracking.validation.run import TrackingValidationRun
 import tracking
 import logging
 import reconstruction
-from tracking import *
-from tracking.path_utils import *
-from basf2 import *
 import basf2
 VALIDATION_OUTPUT_FILE = 'fullTrackingValidation_plusECL.root'
 N_EVENTS = 10000

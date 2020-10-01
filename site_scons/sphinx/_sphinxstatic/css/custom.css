@@ -26,14 +26,14 @@
 .rst-content .toggle .admonition-title {
     display: block;
     clear: both;
-    /* Avoid that there is a bit of the box that will be expanded 
+    /* Avoid that there is a bit of the box that will be expanded
     later showing */
     margin-bottom: -12px;
 }
 
 .rst-content .toggle .admonition-title + * {
-	/* Since we set the admonition-title to have -12px margin, we need to 
-	balance this for its first sibling here. */
+    /* Since we set the admonition-title to have -12px margin, we need to
+    balance this for its first sibling here. */
     margin-top: 24px;
 }
 
@@ -44,6 +44,18 @@
 .rst-content .toggle .admonition-title.open:after {
     content: " ▶";
 }
+
+
+/* Workaround for sidebar issues, especially together with toggle buttons:
+   If we place toggle admonition next to a sidebar, the layout will be messed
+   up. By adding this class to the admonition box (if it's an exercise-solution
+   pair, the exercise admonition), we enforce vertical space that pushes the
+   admonition after the sidebar.
+*/
+.clear {
+    clear: both;
+}
+
 
 /* Styling specific admonitions */
 /* ---------------------------- */

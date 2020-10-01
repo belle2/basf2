@@ -86,7 +86,9 @@ def add_store_only_rawdata_path(path, additonal_store_arrays_to_keep=None):
     path.add_module("PruneDataStore", matchEntries=entries_to_keep).set_name("KeepRawData")
 
 
-def add_filter_software_trigger(path, store_array_debug_prescale=0):
+def add_filter_software_trigger(path,
+                                store_array_debug_prescale=0,
+                                use_random_numbers_for_prescale=True):
     """
     Add the SoftwareTrigger for the filter cuts to the given path.
 
@@ -96,10 +98,14 @@ def add_filter_software_trigger(path, store_array_debug_prescale=0):
     :param path: The path to which the module should be added.
     :param store_array_debug_prescale: When not 0, store each N events the content of the variables needed for the
      cut calculations in the data store.
+    :param use_random_numbers_for_prescale: If True, the prescales are applied using randomly generated numbers,
+     otherwise are applied using an internal counter.
     :return: the software trigger module
     """
-    hlt_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="filter",
-                                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)
+    hlt_cut_module = path.add_module("SoftwareTrigger",
+                                     baseIdentifier="filter",
+                                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale,
+                                     useRandomNumbersForPreScale=use_random_numbers_for_prescale)
 
     return hlt_cut_module
 
@@ -147,6 +153,7 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
         modularAnalysis.reconstructDecay('D*+:ch' + str(chID) + ' -> D0:ch' + str(chID) + ' pi+:all', Dst_Cut, dmID=chID, path=path)
         Dst_List.append('D*+:ch' + str(chID))
     modularAnalysis.copyLists(outputListName='D*+:d0pi', inputListNames=Dst_List, path=path)
+    modularAnalysis.fillParticleList("pi+:offip", '[abs(d0) > 1 and abs(z0) > 2] and [nSVDHits >=3 or nCDCHits >= 20]', path=path)
 
     path.add_module("SoftwareTrigger", baseIdentifier="skim",
                     preScaleStoreDebugOutputToDataStore=store_array_debug_prescale)

@@ -163,8 +163,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.allowedLayers = {0, 3, 4, 5, 6};
 //   config1.uSectorDivider = { .15, .5, .85, 1.};
 //   config1.vSectorDivider = { .1, .3, .5, .7, .9, 1.};
-  config1.uSectorDivider = { .3, .7, 1.}; // standard relevant version
-  config1.vSectorDivider = { .3, .7, 1.}; // standard relevant version
+  config1.uSectorDivider = {.25, .5, .75, 1.}; // standard relevant version
+  config1.vSectorDivider = {.25, .5, .75, 1.}; // standard relevant version
 //   config1.uSectorDivider = { .5, 1.}; // small relevant version
 //   config1.vSectorDivider = { .5, 1.}; // small relevant version
 //   config1.uSectorDivider = { 1.}; // minimal relevant version

@@ -104,7 +104,7 @@ command-line.
 
     .. code-block:: bash
 
-        [INFO] Steering file: scriptname.py
+        [INFO] Steering file: myanalysis.py
         [INFO] Starting event processing, random seed is set to '94887e3828c78b3bd0b761678bd255317f110e183c2ed59ebdcd027e7610b9d6'
         [ERROR] There is no module that provides event and run numbers (EventMetaData). You must add either the EventInfoSetter or an input module (e.g. RootInput) to the beginning of your path.
         [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.  { function: void Belle2::EventProcessor::process(const PathPtr&, long int) }
@@ -224,10 +224,9 @@ files.
     :class: toggle xhint stacked
 
     Don't forget to import `modularAnalysis` (this is the module that contains
-    `inputMdstList`). It might be
-    convenient to set an abbreviation, e.g. ``ma``.
-    Then you have to set the
-    correct values for the three required arguments of `inputMdstList`.
+    `inputMdstList`). It might be convenient to set an abbreviation, e.g.
+    ``ma``. Then you have to set the correct values for the three required
+    arguments of `inputMdstList`.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -406,6 +405,55 @@ software itself. In the latter case you are encouraged to report the problem
 so that it can be fixed by some experts (maybe you even become this expert one
 day yourself).
 
+In order to purify a sample it makes sense to apply at least loose selection
+criteria. This can be based on the particle identification (e.g. `electronID`
+for electrons and positrons), requiring the tracks to originate from close to the
+interaction point (`dr` and `dz`), and having a polar angle in the acceptance
+of the CDC (`thetaInCDCAcceptance`).
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Find out what's the difference between ``dr`` and ``dz``, e.g. why do we
+    not have to explicitly ask for the absolute value of dr, and the angular
+    range of the CDC acceptance (as implemented in the software).
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    The documentation of `dr` and `dz` should tell you all about the first
+    question. The angular range is a bit trickier. You have to directly
+    inspect the source code of the variable defined in the variables folder of
+    the analysis package. There has been an exercise on how to find the source
+    code in :ref:`onlinebook_basf2basics_gettingstarted`.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    The variable `dr` gives the transverse distance, while `dz` is the
+    z-component of the point of closest approach (POCA) with respect to the
+    interaction point (IP). Components are signed, while distances are
+    magnitudes.
+
+    The polar range of the CDC acceptance is :math:`17^\circ < \theta <
+    150^\circ` as written `here
+    <https://stash.desy.de/projects/B2/repos/software/browse/analysis/variables/src/AcceptanceVariables.cc#25>`_
+
+.. admonition:: Task
+    :class: exercise stacked
+
+    Apply a cut on the electron particle list, requiring an electron ID
+    greater than 0.1, a maximal transverse distance to the IP of 0.5 cm, a
+    maximal distance in z-direction to the IP of 2 cm, and the track to be
+    inside the CDC acceptance.
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/013_first_steering_file.py
+        :lines: 23-27
+
+
 Combining particles
 -------------------
 
@@ -419,15 +467,15 @@ internally. For multi-body decays like the one described above there can
 easily be many multiple candidates, which share some particles but differ by
 at least one final state particle.
 
-The wrapper function (convenience function) for the `ParticleCombiner` is called `reconstructDecay`.
-Its first argument is a `DecayString`, which is a combination of a mother
-particle (list), an arrow, and daughter particles. The `DecayString` has its
-own grammar with several markers, keywords, and arrow types. It is especially
-useful for inclusive reconstructions. Follow the provided link if you want to
-learn more about the `DecayString`. For the purpose of this tutorial we do not
-need any of those fancy extensions, the default arrow type ``->`` suffices.
-However, it is important to know how the particles themselves need to be
-written in the decay string.
+The wrapper function (convenience function) for the `ParticleCombiner` is
+called `reconstructDecay`. Its first argument is a `DecayString`, which is a
+combination of a mother particle (list), an arrow, and daughter particles. The
+`DecayString` has its own grammar with several markers, keywords, and arrow
+types. It is especially useful for inclusive reconstructions. Follow the
+provided link if you want to learn more about the `DecayString`. For the
+purpose of this tutorial we do not need any of those fancy extensions, the
+default arrow type ``->`` suffices. However, it is important to know how the
+particles themselves need to be written in the decay string.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -479,39 +527,6 @@ written in the decay string.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :lines: 1-41, 51-55
-
-In the solution we introduced a loose selection for the electrons using
-particle identification (`electronID`), requiring the tracks to originate from
-close to the interaction point (`dr` and `dz`), and having a polar angle in
-the acceptance of the CDC (`thetaInCDCAcceptance`).
-
-.. admonition:: Exercise
-    :class: exercise stacked
-
-    Find out what's the difference between ``dr`` and ``dz``, e.g. why do we
-    not have to explicitly ask for the absolute value of dr, and the angular
-    range of the CDC acceptance (as implemented in the software).
-
-.. admonition:: Hint
-    :class: toggle xhint stacked
-
-    The documentation of `dr` and `dz` should tell you all about the first
-    question. The angular range is a bit trickier. You have to directly
-    inspect the source code of the variable defined in the variables folder of
-    the analysis package. There has been an exercise on how to find the source
-    code in :ref:`onlinebook_basf2basics_gettingstarted`.
-
-.. admonition:: Solution
-    :class: toggle solution
-
-    The variable `dr` gives the transverse distance, while `dz` is the
-    z-component of the point of closest approach (POCA) with respect to the
-    interaction point (IP). Components are signed, while distances are
-    magnitudes.
-
-    The polar range of the CDC acceptance is :math:`17^\circ < \theta <
-    150^\circ` as written `here
-    <https://stash.desy.de/projects/B2/repos/software/browse/analysis/variables/src/AcceptanceVariables.cc#25>`_
 
 Writing out information to an ntuple
 ------------------------------------

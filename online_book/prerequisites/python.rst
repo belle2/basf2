@@ -621,15 +621,17 @@ following cells show how to implement it.
 
 .. code:: ipython3
 
-  df[df.B0_isSignal == True].B0_mbc.hist(range=(5.2, 5.3), bins=100)
-  df[df.B0_isSignal == False].B0_mbc.hist(range=(5.2, 5.3), bins=100, alpha=.5)
+  df.query("(B0_isSignal==1)").B0_mbc.hist(range=(5.2, 5.3), bins=100)
+  df.query("(B0_isSignal==0)").B0_mbc.hist(range=(5.2, 5.3), bins=100, alpha=.5)
 
 Using Matplotlib
 ----------------
 
-Matplotlib however is a much more developed plotting tool that functions well
-with juptyer notebooks, so this is what this tutorial will focus on. Compare
-the differences between the syntaxes using the code below.
+Internally the pandas library however makes use of matplotlib itself.
+Using matplotlib directly opens up many more possibilities. It also works well
+with juptyer notebooks, so this is what this tutorial will focus on.
+Compare the following two code snippets with their equivalent of the last
+section to get a feeling for the syntax.
 
 .. code:: ipython3
 
@@ -649,12 +651,12 @@ functions to make our plots GREAT. You can even choose a `colourblind friendly c
 
 It is possible to display multiple plots at once using ``plt.subplots``. As you can see
 below, rather than simply having our histograms show up using ``plt``, we define a
-figure ``fig`` and an axis ``ax``.
+figure ``fig`` and axes ``ax``.
 These are the equivalent of our canvas where we paint our code art.
 
 .. code:: ipython3
 
-  fig, ax = plt.subplots(1,2,figsize=(10,6))
+  fig, ax = plt.subplots(1, 2, figsize=(10, 6))
 
   h = ax[0].hist(df.query("(B0_isSignal == 1)").B0_mbc, bins=100, range=(5.2, 5.3),
                 histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
@@ -666,7 +668,7 @@ These are the equivalent of our canvas where we paint our code art.
   ax[0].grid() # applies a nice grid to the plot
   ax[0].set_xlim(5.2, 5.3) # sets the range of the x-axis
 
-  plt.show() #shows the figure after all changes to the style have been made
+  plt.show()  # shows the figure after all changes to the style have been made
 
 .. admonition:: Exercise
   :class: exercise stacked

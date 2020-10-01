@@ -257,7 +257,34 @@ crashes, you will have to restart it.
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options you have available.
+  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options 
+  you have available.
+
+It is also useful to be able to access help or extra information about the 
+tools you will be using. In particular you will often want to check 
+information about a python object you are using. The definition of a python 
+object includes commands, packages, modules, classes, types... 
+basically anything that has a description called a *docstring*).
+There are multiple ways to access this information, including 
+what is already discussed  in :ref:`_onlinebook_basf2_introduction`. 
+For jupyter notebooks, a great interactive way to access the information 
+(docstring) is by putting your cursor on the object in question and pressing
+``Shift + Tab``. 
+
+In addition to the ``Shift + Tab`` option, you can also run a cell with your 
+object in question, with a question mark! For example, if our object in 
+question is ``matplotlib`` we can type:
+
+.. code:: ipython3
+
+  matplotlib?
+
+For any python interpreter, one can also use:
+
+.. code:: ipython3
+
+  help(object)
+
 
 |
 |

@@ -215,7 +215,7 @@ You do not need to reject the whole event just because of some beam background.
 
     1. Trigger background and background processes.
     2. Physics background (more of a problem when you get into your analysis).
-    3. Continuum background from (:math:`uds` and maybe :math:`c`).
+    3. Continuum background (from :math:`uds` and maybe :math:`c`).
     4. Beam-induced background.
 
 Data taking: The experiment

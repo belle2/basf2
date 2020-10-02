@@ -327,42 +327,41 @@ This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe `
 Investigating your DataFrame
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In jupyter notebooks you can display a DataFrame by calling it in a cell. You
-can see the output, where in our case each row corresponds to one candidate:
+In jupyter notebooks, the last value of a cell is shown as output. So if we create
+a cell with
 
 .. code:: ipython3
 
   df
 
-Note that for the dataframe to be displayed a cell with multiple lines of
-code, one must call it at the end of the cell.
+as the last line, we will see a visual representation of the dataframe. In your case
+each row of the dataframe corresponds to one candidate of a collision event.
 
-
-You can see a preview of the dataframe by only showing the ``head`` of the
-dataframe. Try using ``tail`` for the opposite effect. (Optional: You can
-specify the number of rows shown in the brackets).
+You can also show a preview of the dataframe by only showing the first few rows using ``head``.
+Similarly ``tail`` shows the last few rows. Optionally: You can
+specify the number of rows shown in parentheses.
 
 .. code:: ipython3
 
   df.head(5)
 
-Each DataFrame has an index (which is in our case the number of the candidates)
+Each DataFrame has an index (you can think of this as row numbers, in our case the number of the candidates)
 and a set of columns:
 
 .. code:: ipython3
 
   len(df.columns)
 
-You can access the full data stored in the DataFrame with the ``to_numpy`` object,
+You can access the full data stored in the DataFrame with the ``to_numpy`` method,
 which is a large 2D numpy matrix
 
 .. code:: ipython3
 
   df.to_numpy
 
-However ``to_numpy`` may not be the mot visually pleasing, or easy, way to see the contents of your dataframe.
+However ``to_numpy`` may not be the most visually pleasing (or easy) way to inspect the contents of your dataframe.
 
-A useful feature to quickly summarize your data is to use the descibe function:
+A useful feature to quickly summarize your data is to use the ``descibe`` method:
 
 .. code:: ipython3
 
@@ -391,18 +390,13 @@ A useful feature to quickly summarize your data is to use the descibe function:
   a smaller value. For example if we have 100 entries in the dataframe the 25% quantile is the 25th smallest value.
   The 50% quantile is also known as the median.
 
-
 You can also display the values of the DataFrame sorted by a specific column:
 
 .. code:: ipython3
 
   df.sort_values(by='B0_M').head()
 
-Finally, everyone who works with numpy and pandas will at some point try to use a fancy funtion and get an error message that the *shapes* of some objects differ. As a debugging tool, you can use
-
-.. code:: ipython3
-
-  df.shape
+Finally, everyone who works with numpy and pandas will at some point try to use a fancy funtion and get an error message that the *shapes* of some objects differ.
 
 .. admonition:: Exercise
   :class: exercise stacked
@@ -412,15 +406,13 @@ Finally, everyone who works with numpy and pandas will at some point try to use 
 .. admonition:: Hint
   :class: xhint stacked toggle
 
-  Try it out in your jupyter notebook. To understand the output the internet is, once again, your friend.
+  Try it out in your jupyter notebook. To understand the output, ``df.shape?`` (or ``pd.DataFrame.shape?``) is,
+  once again, your friend.
 
 .. admonition:: Solution
   :class: solution toggle
 
   The output comes in the form of a tuple (a finite ordered list (or sequence) of elements). For example, one output could be ``(15540523, 20)``, which is saying you have a dataframe of 15540523 rows, and 20 columns.
-
-
-
 
 
 Manipulating your DataFrame
@@ -508,8 +500,6 @@ You can easily add or remove columns in the following way:
 
   df['fancy_new_column']
 
-
-
 Modifying Columns
 ^^^^^^^^^^^^^^^^^
 
@@ -557,11 +547,8 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
 
   .. code:: ipython3
 
-    bkgd_df = df.query("(B0_isSignal==0)")[["B0_mbc", "B0_M", "B0_isSignal", "B0_deltae"]]
-    signal_df = df.query("(B0_isSignal==1)")[["B0_mbc", "B0_M", "B0_isSignal", "B0_deltae"]]
-
-
-
+    bkgd_df = df.query("B0_isSignal==0")[["B0_mbc", "B0_M", "B0_isSignal", "B0_deltae"]]
+    signal_df = df.query("B0_isSignal==1")[["B0_mbc", "B0_M", "B0_isSignal", "B0_deltae"]]
 
 Grouped Operations: a quick note
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -621,8 +608,8 @@ following cells show how to implement it.
 
 .. code:: ipython3
 
-  df.query("(B0_isSignal==1)").B0_mbc.hist(range=(5.2, 5.3), bins=100)
-  df.query("(B0_isSignal==0)").B0_mbc.hist(range=(5.2, 5.3), bins=100, alpha=.5)
+  df.query("B0_isSignal==1").B0_mbc.hist(range=(5.2, 5.3), bins=100)
+  df.query("B0_isSignal==0").B0_mbc.hist(range=(5.2, 5.3), bins=100, alpha=.5)
 
 Using Matplotlib
 ----------------
@@ -639,8 +626,8 @@ section to get a feeling for the syntax.
 
 .. code:: ipython3
 
-  h = plt.hist(df.query("(B0_isSignal==1)").B0_mbc, bins=100, range=(5.2, 5.3))
-  h = plt.hist(df.query("(B0_isSignal==0)").B0_mbc, bins=100, range=(5.2, 5.3))
+  h = plt.hist(df.query("B0_isSignal==1").B0_mbc, bins=100, range=(5.2, 5.3))
+  h = plt.hist(df.query("B0_isSignal==0").B0_mbc, bins=100, range=(5.2, 5.3))
 
 Making your plots pretty
 ^^^^^^^^^^^^^^^^^^^^^^^^

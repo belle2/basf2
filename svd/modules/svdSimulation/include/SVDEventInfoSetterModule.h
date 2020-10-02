@@ -17,6 +17,7 @@
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDTriggerType.h>
+#include <simulation/dataobjects/SimClockState.h>
 
 namespace Belle2 {
   /**
@@ -51,6 +52,7 @@ namespace Belle2 {
 
   private:
     StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr; /**< Output object. */
+    StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
 
     // SVDModeByte content */
     int m_runType; /**< run type */

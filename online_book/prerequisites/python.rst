@@ -217,6 +217,16 @@ operating system called a kernel that runs the code.
 
   Connecting and starting a jupyter notebook is described in more detail here (:ref:`onlinebook_ssh`).
 
+.. admonition:: Running on other servers (optional)
+  :class: toggle
+
+  In principle most of the content of this page will work from anywhere if
+  you have installed the right packages.
+
+  * If you have the Belle II software explained and set up, there are no issues
+    at all (e.g. at DESY NAF)
+  * Else you might need to install some packages locally
+
 Note that your script ``my_script.py`` from before is also shown.
 
 .. admonition:: Exercise
@@ -299,18 +309,17 @@ For jupyter notebooks, a great interactive way to access the information
 
 In addition to the ``Shift + Tab`` option, you can also run a cell with your
 object in question, with a question mark! For example, if our object in
-question is ``matplotlib`` we can type:
+question is the ``print`` function we can type:
 
 .. code:: ipython3
 
-  matplotlib?
+  print?
 
 For any python interpreter, one can also use:
 
 .. code:: ipython3
 
   help(object)
-
 
 Pandas Tutorial and Python Data Analysis
 ----------------------------------------
@@ -336,7 +345,7 @@ the particle you've stored in your tree --- for example, the :math:`B` meson's
 invariant mass, it's daughter's momentum, it's great-great-granddaughter's
 cluster energy etc. etc. etc.
 
-* More information:`CERN's ROOT <https://root.cern.ch/>`_
+* More information: `CERN's ROOT <https://root.cern.ch/>`_
 * If you get stuck with ROOT, you can also ask in  `CERN's ROOT Forum <https://root-forum.cern.ch/>`_
 
 

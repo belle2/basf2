@@ -762,18 +762,19 @@ definitely read it to understand at least the basics.
         extends into the signal peak region.
 
 As you could see, it makes sense to cut on `mbc` from below. A complementary
-variable that can be used to cut away background is :math:`Delta E` (`deltaE`).
+variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
 
 .. admonition:: Exercise
     :class: exercise stacked
 
-    When combining your :math:`J/\Psi' with your :math:`K_S^0` introduce a cut
+    When combining your :math:`J/\Psi` with your :math:`K_S^0` introduce a cut
     :math:`m_{bc} > 5.2` and :math:`|\Delta E|<0.15`.
 
 .. admonition:: Hint
     :class: xhint stacked toggle
 
-    Take a look at the ``cut`` argument to `reconstructDecay`.
+    Take a look at the ``cut`` argument to `reconstructDecay`. You will also
+    need the `abs` metafunction.
 
 .. admonition:: Solution
     :class: solution toggle
@@ -876,15 +877,59 @@ or `matchedMC`.
     standard variables from before for all particles in the decay chain, the
     kinematics both in the lab and the CMS frame.
 
-.. admonition:: Hint
+.. admonition:: Hint: Where to look
     :class: toggle xhint stacked
 
-    Variable collections and alias functions are your friend!
+    You need the variable collections and alias functions mentioned above!
+    Take it one step at a time, it's more lines of code than in the previous
+    examples.
+
+.. admonition:: Hint: Partial solution for final state particles
+    :class: toggle xhint stacked
+
+    This is how we add variables to the final state particles:
+
+    .. literalinclude:: steering_files/019_first_steering_file.py
+        :lines: 54-60
+        :lineno-start: 54
+
+    Next, do the same for the :math:`J/\Psi` and the :math:`K_S^0` in a similar
+    fashion.
+
+.. admonition:: Hint: CMS variables
+    :class: toggle xhint stacked
+
+    The bit about the CMS variables is tricky. First create a variable
+    ``cmskinematics`` with the `create_aliases` function. Use "CMS" as the
+    prefix. What do you need to specify for the wrapper?
+    Then use your ``cmskinematics`` variable together with
+    `create_aliases_for_selected` to add these variables to the relevant
+    particles.
+
+.. admonition:: Hint: Partial solution for the CMS variables
+    :class: toggle xhint stacked
+
+    This is the code for the first part of the last hint:
+
+    .. literalinclude:: steering_files/019_first_steering_file.py
+        :lines: 64-68
+        :lineno-start: 64
 
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/019_first_steering_file.py
+        :linenos:
+
+.. seealso::
+
+    Some more example steering files that center around the `VariableManager`
+    can be found `on stash <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/VariableManager>`_.
+
+.. admonition:: Exercise
+    :class: exercise
+
+    Run your steering file one last time to check that it works!
 
 .. admonition:: Key points
     :class: key-points
@@ -897,6 +942,6 @@ or `matchedMC`.
     * ``variablesToNtuple`` saves an output file
     * Don't forget ``process(path)`` or nothing happens
 
-.. topic:: Author of this lesson
+.. topic:: Authors of this lesson
 
-    Frank Meier
+    Frank Meier, Kilian Lieret (minor improvements)

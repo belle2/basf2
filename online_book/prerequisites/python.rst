@@ -771,6 +771,25 @@ Importing the style is as easy as "one, two, ...
   from matplotlib import pyplot as plt
   plt.style.use("belle2")
 
+.. seealso::
+
+  A very fun way to explore the capabilities of ``matplotlib`` is the
+  `matplotlib gallery <https://matplotlib.org/3.1.1/gallery/index.html>`_ that
+  shows many example plots together with the code that was used to generate them.
+
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  Select your favorit plot from the ``matplotlib`` gallery. Can you generate
+  it in your notebook? Try to modify some properties of the plotting
+  (different colors, labels or data).
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  You should be able to generate the picture simply by copy-pasting the code
+  example given.
+
 
 Dealing with large files in a jupyter notebook (optional)
 ---------------------------------------------------------

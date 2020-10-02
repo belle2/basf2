@@ -114,12 +114,12 @@ Now suppose you are interested in reconstructing the :math:`B` decay vertex posi
      
      You can also set the confidence level to -1, which means failed fits will be included. The fit p-value is saved as part of mc.vertex.
 
-.. admonition:: Optional Exercise
+.. admonition:: Exercise (optional)
      :class: exercise stacked
 
      Fit the :math:`K_s` as well. How does its flight lenght compare to the :math:`J/Psi`?
 
-.. admonition:: Optional Exercise
+.. admonition:: Exercise (optional)
      :class: exercise stacked
 
      Look up the documentation for ``TreeFitter`` and fit the whole :math:`B \to J/\Psi(\to e^+e^-)K_s(\to \pi^+\pi^+)` decay chain at once.
@@ -178,9 +178,7 @@ where the pion tracks originate from a long lived kaon vertex. TagV is designed 
 Conclusion and Plotting
 ----------------------
 
-Congratulations! Your steering file is ready!
-\... or maybe you just skipped ahead. Either way, time to run it and check the results.
-
+Congratulations! Your steering file is ready! Time to run it and check the results.
 
 .. admonition:: Exercise
      :class: exercise stacked
@@ -200,22 +198,88 @@ Congratulations! Your steering file is ready!
      .. code-block:: bash
           basf2 steering_files/059_vertex_fitting.py
     
-We will now plot some 
+You can now plot some relevant vertex variables. In general, the choice would depend on what you need for your analysis.
+A few examples would include:
 
-
+   * Vertex position in various coordinates, such as dz and dr.
+   * P-value of the fit.
+   * Resolution of the vertex fit (:math:`\sigma(x)/x`) where x is each of the above variables.
+   * Pull (:math:`(x-x(MC)/\sigma(x)`).
+     
+As an exercise we will focus on the first two.
 
 .. admonition:: Exercise
      :class: exercise stacked
+     
+     Plot the :math:`J/\Psi` vertex position and compare it with the true value. Plot the p-value distribution of the fit.
 
-   Plot some relevant variables for :math:`J/\Psi`, the tag vertex and, if you did the optional exercise, :math:`K_s`.
-   
-   * Vertex position (try various coordinates, in particular try the radial distance)
-   * Resolution (:math:`\sigma(x)/x`) where x is each of the above variables.
-   * Pull (:math:`(x-x(MC)/\sigma(x)`).
-   
-   Is this what you expect?
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     Plotting was already discussed in `_onlinebook_roe`. For the sake of this exercise, remember we already set the minimum p-value
+     of our fits to 0, so failed fits will not be included and you can plot it in the [0,1] interval. 
+     If you changed that, failed fits will be included with a p-value of -1; make sure to change your plotting range accordingly to [-1,1].
+
 
 .. admonition:: Solution
      :class: toggle solution
 
-     INSERT NOTEBOOK?
+     .. code-block:: python
+        
+        import matplotlib as mpl
+	import matplotlib.pyplot as plt
+	from root_pandas import read_root
+	plt.style.use('belle2')
+        df = root_pandas.read_root('Bd2JpsiKS.root')
+	m_bins = 50
+	#Z position
+	plt.figure(figsize=(8,6))
+	m_range=[-0.1,0.1]
+	plt.xlim(left=-0.1,right=0.15)
+	plt.hist(df["Jpsi_dz"], bins=m_bins, range=m_range, label=r'$J/\psi$ vertex')
+	plt.hist(df["Jpsi_mcDecayVertexZ"], histtype='step', lw=2,color='black', linestyle='--', bins=m_bins, range=m_range, label=r'$J/\psi$ vertex(MC)')
+	plt.xlabel("dz[cm]")
+	plt.ylabel("Events")
+	plt.legend()
+	plt.savefig("vertex/jpsi_dz.svg")
+	#P-value
+	plt.figure(figsize=(8,6))
+	m_range=[0,1]
+	plt.xlim(left=-0.05,right=1.05)
+	plt.hist(df_signal_only["Jpsi_chiProb"], bins=m_bins,range=m_range,label=r'$J/\psi$ vertex')
+	plt.yscale("log")  # set a logarithmic scale in the y-axis
+	plt.xlabel("p-value")
+	plt.ylabel("Events")
+	plt.legend()
+	plt.savefig("vertex/pValue.svg")
+
+.. _vertex_plots:
+.. figure:: vertex/jpsi_dz.svg
+    :align: left
+    :width: 300px
+    :alt: Z position of the :math:`J/\Psi` vertex.
+
+.. figure:: vertex/pValue.svg
+    :align: right
+    :width: 300px
+    :alt: P-value of the vertex fit.
+
+    Distributions of the fitted vertex position in Z, along with the fit p-values.
+
+.. admonition:: Exercises (optional)
+     :class: exercise stacked
+
+     * Compare the :math:`J/\Psi` and Tag vertex positions and show that they are both compatible with being :math:`B` vertices.
+     * If you've fit the :math:`K_s` vertex, compare its radial position with the :math:`J/\Psi`. Is this what you expect?
+
+.. admonition:: Key points
+    :class: key-points
+
+    * Use ``KFit`` to fit simple vertices. 
+    * Think carefully which vertex you need to fit, and whether it will need additional constraints.
+    * Study the documentation  if you need a different functionality, such as ``TreeFitter`` to fit complex trees.
+    * Use ``TagV`` to reconstruct a vertex from the ROE.
+
+.. topic:: Authors of this lesson
+
+    Francesco Tenchini

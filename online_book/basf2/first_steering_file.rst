@@ -761,14 +761,14 @@ definitely read it to understand at least the basics.
         The background peaks around 5 GeV/c :superscript:`2`, but indeed
         extends into the signal peak region.
 
-As you could see, it makes sense to cut on `mbc` from below. A complementary
+As you could see, it makes sense to cut on `Mbc` from below. A complementary
 variable that can be used to cut away background is :math:`\Delta E` (`deltaE`).
 
 .. admonition:: Exercise
     :class: exercise stacked
 
     When combining your :math:`J/\Psi` with your :math:`K_S^0` introduce a cut
-    :math:`m_{bc} > 5.2` and :math:`|\Delta E|<0.15`.
+    :math:`\text{M}_{\rm bc} > 5.2` and :math:`|\Delta E|<0.15`.
 
 .. admonition:: Hint
     :class: xhint stacked toggle

@@ -871,6 +871,7 @@ convenience functions that you find yourself using often.
 In pseudo-python you will see they are very often of the form:
 
 .. code-block:: python
+        :linenos:
 
         import basf2
 
@@ -939,7 +940,13 @@ Congratulations!
 You are now ready to write your first steering file.
 Good luck.
 
+.. seealso::
+
+    While the next sections will help you to understand the basics of steering
+    files step by step, there are also some comple examples for steering files
+    `in the main software repository <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples>`_.
+    You might want to take a look there after the starterkit.
+
 .. topic:: Author of this lesson
 
     Sam Cunliffe
-

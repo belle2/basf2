@@ -460,14 +460,13 @@ Series or DataFrame are performed element-wise.
 
   df.B0_mbc - df.B0_M
 
-.. code:: ipython3
+Let's look a slightly more complicated (but totally non-physical) example:
 
-  # Awful non-physical example of vectorized operations
+.. code:: ipython3
 
   import numpy as np
 
   x = (df.B0_deltae * df.B0_et)**2 / (np.sin(df.B0_cc2) + np.sqrt(df.B0_cc5))
-
   2*x - 2
 
 Adding Columns
@@ -566,11 +565,10 @@ reconstructed. Now we will use these candidates to plot example
 distributions. This time we use the ``root_pandas`` package to read the data
 
 .. code:: ipython3
+  :linenos:
 
-  # Loading an example data frame
   import root_pandas
 
-.. code:: ipython3
 
   file_path = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
   df = root_pandas.read_root(file_path).astype(float)
@@ -632,6 +630,7 @@ figure ``fig`` and axes ``ax``.
 These are the equivalent of our canvas where we paint our code art.
 
 .. code:: ipython3
+  :linenos:
 
   # Here we set up the "canvas" to show two plots side by side
   fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 6))
@@ -677,6 +676,7 @@ These are the equivalent of our canvas where we paint our code art.
   yourself.
 
   .. code:: ipython3
+    :linenos:
 
     fig, ax = plt.subplots(1,2,figsize=(10,6))
 
@@ -778,9 +778,9 @@ Dealing with large files in a jupyter notebook (optional)
 If your files are quite large you may start to find your jupyter notebook kernel
 crashing - there are a few ways in which we can mitigate this.
 
-  - "Chunk" your data
-  - Only import the columns (variables) that you will use/need.
-  - Add any cuts you can
+- "Chunk" your data
+- Only import the columns (variables) that you will use/need.
+- Add any cuts you can
 
 To import the file using chunking there are some slight differences in the code:
 
@@ -814,8 +814,9 @@ and piece them together. This is the point at which we can add our cuts to
 reduce the loaded, chunked file more.
 
 .. code:: ipython3
+  :linenos:
 
-  cut = "(B0_mbc > 5.2)" # Define our cut
+  cut = "(B0_mbc > 5.2)"  # Define our cut
 
   df_list = []
   for chunk in df_chunk:
@@ -824,7 +825,57 @@ reduce the loaded, chunked file more.
   df = pd.concat(df_list)  # Concatenate our chunks into a dataframe!
 
 
+Your journey continues
+----------------------
+
+If you haven't programmed in python before this lesson, then you're probably quite
+exhausted at this point and deserve a break!
+
+However, your python journey has just begun and there's a lot to learn.
+
+.. |uncheck| raw:: html
+
+    <input type="checkbox">
+
+.. hint::
+
+  Even if you can somehow get your analysis "to work" with your current understanding
+  of python, we can't encourage you enough to keep on educating yourself about
+  python and its best coding practices.
+
+  Chances are you will write a LOT of code and work on your analysis for a long time.
+  Bad design decisions and sloppy coding practices will slowly build up and might
+  cost you a lot of time and nerves in the end (and will cause pain to anyone
+  who will have to work with your code afterwards).
+
+  |uncheck| I promise I will read more about this.
+
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  A small `east egg <https://en.wikipedia.org/wiki/Easter_egg_(media)>`_ that has been
+  included in python: Simply run
+
+  .. code-block:: python
+
+    import this
+
+  Can you make sense of the output?
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  This "Zen of Python" collects 19 guiding principles for writing good python code.
+  There's a `wikipedia page about it <https://en.wikipedia.org/wiki/Zen_of_Python>`_ and many
+  more resources that you can google that go into more detail.
+
+.. seealso::
+
+  We have started to compile a reading list for python `on confluence <https://confluence.desy.de/x/ARC3Cg>`_.
+  Please help us extend it!
+
 .. topic:: Authors of this lesson
 
   Martin Ritter (Intro),
-  Hannah Wakeling (Exercises)
+  Hannah Wakeling (Exercises),
+  Kilian Lieret

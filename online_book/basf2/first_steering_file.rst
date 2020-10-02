@@ -520,7 +520,7 @@ particles themselves need to be written in the decay string.
     particle name in a decay string, there will be an error message telling
     you that it is unknown.
 
-    The invariant mass of the J/psi is set to be 3.0969 GeV/c :superscript:`2`.
+    The invariant mass of the :math:`J/\Psi` is set to be 3.0969 GeV/c :superscript:`2`.
 
 .. admonition:: Task
     :class: exercise stacked
@@ -528,6 +528,8 @@ particles themselves need to be written in the decay string.
     Extend the steering file by first forming :math:`J/\Psi` candidates from
     electron-positron combinations and then combining them with Kshorts to
     form B0 candidates.
+
+    Include a ``dM < 0.11`` cut for the :math:`J/\Psi`.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -542,9 +544,6 @@ particles themselves need to be written in the decay string.
     .. literalinclude:: steering_files/013_first_steering_file.py
         :lines: 30-33
         :lineno-start: 30
-
-    We have already included a `dM` cut to narrow down the promising candidates for a
-    :math:`J/\Psi`.
 
 .. admonition:: Solution
     :class: toggle solution
@@ -762,6 +761,27 @@ definitely read it to understand at least the basics.
         The background peaks around 5 GeV/c :superscript:`2`, but indeed
         extends into the signal peak region.
 
+As you could see, it makes sense to cut on `mbc` from below. A complementary
+variable that can be used to cut away background is :math:`Delta E` (`deltaE`).
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    When combining your :math:`J/\Psi' with your :math:`K_S^0` introduce a cut
+    :math:`m_{bc} > 5.2` and :math:`|\Delta E|<0.15`.
+
+.. admonition:: Hint
+    :class: xhint stacked toggle
+
+    Take a look at the ``cut`` argument to `reconstructDecay`.
+
+.. admonition:: Solution
+    :class: solution toggle
+
+    .. literalinclude:: steering_files/015_first_steering_file.py
+        :lines: 36-41
+        :lineno-start: 35
+
 Variable collections
 --------------------
 
@@ -805,6 +825,7 @@ documentation.
     :class: toggle solution
 
     .. literalinclude:: steering_files/015_first_steering_file.py
+        :linenos:
 
 Variable aliases
 ----------------

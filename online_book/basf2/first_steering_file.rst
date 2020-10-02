@@ -213,12 +213,15 @@ files.
     :class: exercise stacked
 
     Extend your steering file by loading the data of one of the local input
-    files. It makes sense to run the steering file again. If there is a syntax
-    error in your script or you forgot to include a necessary argument, there
-    will be an error message that should help you to debug and figure out what
-    needs to be fixed. If the script is fine, only three lines with info
-    messages should be printed to the output and you should see a quickly
-    finishing progress bar.
+    files. It makes sense to run the steering file again.
+
+    * If there is a syntax
+      error in your script or you forgot to include a necessary argument, there
+      will be an error message that should help you to debug and figure out what
+      needs to be fixed.
+    * If the script is fine, only three lines with info
+      messages should be printed to the output and you should see a quickly
+      finishing progress bar.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -232,6 +235,7 @@ files.
     :class: toggle solution
 
     .. literalinclude:: steering_files/010_first_steering_file.py
+        :linenos:
 
 In the solution to the last task we have added empty lines, shortcuts for the
 imports, and some comments. This helps to give the script a better structure
@@ -273,6 +277,8 @@ having to change anything in the script itself.
     :class: toggle solution
 
     .. literalinclude:: steering_files/011_first_steering_file.py
+        :linenos:
+        :emphasize-lines: 8, 14
 
 Filling particle lists
 ----------------------
@@ -374,6 +380,7 @@ of the decay mode you are studying, it is recommended to use them for V0s
     :class: toggle solution
 
     .. literalinclude:: steering_files/012_first_steering_file.py
+        :linenos:
 
     In the solution we gave the electrons the label ``uncorrected``. This is
     already in anticipation of a future extension in which Bremsstrahlung
@@ -387,8 +394,18 @@ of the decay mode you are studying, it is recommended to use them for V0s
     * Which are the mass window boundaries set for the :math:`K_S^0`?
     * Which module had the longest execution time?
 
+.. admonition:: Hint
+    :class: xhint stacked toggle
+
+    Don't forget to include a number, e.g. ``1`` as command line argument to
+    specify the input file number!
+
 .. admonition:: Solution
     :class: toggle solution
+
+    .. code-block::
+
+        basf2 myanalysis.py 1
 
     In the output there are ``INFO`` messages that the :math:`K_S^0` invariant mass has
     to be between 0.45 and 0.55 GeV/c :superscript:`2`.
@@ -447,11 +464,18 @@ of the CDC (`thetaInCDCAcceptance`).
     maximal distance in z-direction to the IP of 2 cm, and the track to be
     inside the CDC acceptance.
 
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Previously we were using an empty string ``""`` as argument to
+    ``fileParticleList``. Now you need to change this.
+
 .. admonition:: Solution
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :lines: 23-27
+        :lineno-start: 23
 
 
 Combining particles
@@ -527,6 +551,7 @@ particles themselves need to be written in the decay string.
 
     .. literalinclude:: steering_files/013_first_steering_file.py
         :lines: 1-41, 51-55
+        :linenos:
 
 Writing out information to an ntuple
 ------------------------------------
@@ -557,7 +582,7 @@ contain one entry per candidate or one entry per event.
     Conversely, both candidate and event-based variables are allowed in the
     candidate mode.
 
-A good variable to start with is the beam-constrained mass, which is defined
+A good variable to start with is the beam-constrained mass `Mbc`, which is defined
 as
 
 .. math::
@@ -584,6 +609,8 @@ mass.
     :class: toggle solution
 
     .. literalinclude:: steering_files/013_first_steering_file.py
+        :linenos:
+        :emphasize-lines: 45
 
 Although you are analyzing a signal MC sample, the reconstruction will find
 many candidates that are actually not signal, but random combinations that
@@ -604,10 +631,18 @@ happen to fulfill all your selection criteria.
     Read in the ntuple using ``read_root`` of ``root_pandas``. Use the
     histogram plotting routine of the dataframe.
 
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    You might take a look back at your python training. This is a good use case
+    for a jupyter notebook. Make sure to include the ``%matplotlib inline``
+    magic to see the plots.
+
 .. admonition:: Solution
     :class: toggle solution
 
     .. code-block:: python
+        :linenos:
 
         import matplotlib.pyplot as plt
         from root_pandas import read_root
@@ -661,27 +696,53 @@ definitely read it to understand at least the basics.
     for the head of the decay chain, it only needs to be called once because
     the relations of all (grand)^N-daughter particles are set recursively.
 
+.. ---------------------
+
 .. admonition:: Task
     :class: exercise stacked
 
     Add MC matching for all particles of the decay chain and add the
     information whether the reconstructed B meson is a signal candidate to the
-    ntuple. Run the steering file and again plot the beam-constrained mass but
+    ntuple. Run the steering file and again.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Only one line of code is needed to call `matchMCTruth`.
+
+.. admonition:: Hint
+    :class: toggle xhint stacked
+
+    Which variable is added by `matchMCTruth`? Remember to add it to the
+    output!
+
+.. admonition:: Solution
+    :class: toggle solution
+
+    .. literalinclude:: steering_files/014_first_steering_file.py
+        :linenos:
+        :emphasize-lines: 42-43, 48
+
+.. --------------
+
+.. admonition:: Task
+    :class: exercise stacked
+
+    Plot the beam-constrained mass but
     this time use the signal flag to visualize which component is signal and
     which is background.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    Only one call of `matchMCTruth` is needed. The necessary variable is
-    called `isSignal`.
+    Remember the ``by`` keyword for ``df.hist``? Alternatively you could also
+    use ``df.query``. The necessary variable is called `isSignal`.
 
 .. admonition:: Solution
     :class: toggle solution
 
-    .. literalinclude:: steering_files/014_first_steering_file.py
-
     .. code-block:: python
+        :linenos:
 
         import matplotlib.pyplot as plt
         from root_pandas import read_root
@@ -710,20 +771,15 @@ data. Initially, it makes sense to look at many different variables and try to
 find those with discriminating power between signal and background. The most
 basic information are the kinematic properties like the energy and the
 momentum (and its components). In basf2 collections of variables for several
-topics are prepared.
+topics are prepared. You can find the information in the
+:ref:`analysis/doc/Variables:Collections and Lists` section of the
+documentation.
 
 .. admonition:: Exercise
     :class: exercise stacked
 
     Find out to which variable collections the two variables belong that we
     added to the ntuple so far.
-
-.. admonition:: Hint
-    :class: toggle xhint stacked
-
-    You can find the information in the
-    :ref:`analysis/doc/Variables:Collections and Lists` section of the
-    documentation.
 
 .. admonition:: Solution
     :class: toggle solution

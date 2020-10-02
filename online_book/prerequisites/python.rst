@@ -483,13 +483,11 @@ Series or DataFrame are performed element-wise.
 Adding Columns
 ^^^^^^^^^^^^^^^
 
-You can easily add or remove columns in the following way:
+You can easily add columns in the following way:
 
 .. code:: ipython3
 
-  # Adding a columns:
-
-  df['fancy_new_column'] = (df.B0_deltae * df.B0_et)**2 / (np.sin(df.B0_cc2) + np.sqrt(df.B0_cc5) + 0.1)
+  df['fancy_new_column'] = (df.B0_deltae * df.B0_et)**2 / np.sin(df.B0_cc2)
   df['delta_M_mbc'] = df.B0_M - df.B0_mbc
 
 .. code:: ipython3
@@ -529,7 +527,7 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
     df.query("(B0_mbc>5.2) & (B0_deltae>-1"))
 
 .. note::
-  There is a limit to the number of arguments in one query! Can you find it?)
+  There is a limit to the number of arguments in one query! Can you find it?
 
 .. admonition:: Exercise
   :class: exercise stacked
@@ -611,6 +609,11 @@ following cells show how to implement it.
   df.query("B0_isSignal==1").B0_mbc.hist(range=(5.2, 5.3), bins=100)
   df.query("B0_isSignal==0").B0_mbc.hist(range=(5.2, 5.3), bins=100, alpha=.5)
 
+.. admonition:: Exercise
+  :class: exercise
+
+  Now plot ``B0_deltae`` separately for signal and background.
+
 Using Matplotlib
 ----------------
 
@@ -643,7 +646,9 @@ These are the equivalent of our canvas where we paint our code art.
 
 .. code:: ipython3
 
-  fig, ax = plt.subplots(1, 2, figsize=(10, 6))
+  # Here we set up the "canvas" to show two plots side by side
+  fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 6))
+  # ax is now an array with two elements, each representing one plot
 
   h = ax[0].hist(df.query("(B0_isSignal == 1)").B0_mbc, bins=100, range=(5.2, 5.3),
                 histtype='stepfilled', lw=1, label="Signal", edgecolor='black')
@@ -707,7 +712,6 @@ These are the equivalent of our canvas where we paint our code art.
     plt.show()
 
 
-
 The implementation of 2D histograms are often very useful and are easily done:
 
 .. code:: ipython3
@@ -727,8 +731,17 @@ The implementation of 2D histograms are often very useful and are easily done:
   bulk change to your applied cuts.
 
 
+Finally, Belle II does have an `official plot style <https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally.
+You do not need to worry about this at this stage, but keep it in mind.
 
-Finally, Belle II does have an `official plot style <https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally. You do not need to worry about this at this stage, but keep it in mind. As you will find out, from ``release-05-00-00`` the plot style is available in the Belle II software `BASF2`. Once you have that running, importing the style is as easy as "one, two, ...
+.. warning::
+
+  The following will only work if you have the Belle II software `BASF2` set up.
+  You will learn how to do so in the following chapters.
+  You're invited to still try executing the following lines, but don't worry if
+  you see an error message telling you that the style has not been found.
+
+Importing the style is as easy as "one, two, ...
 
 .. code:: ipython3
 
@@ -786,10 +799,6 @@ reduce the loaded, chunked file more.
       chunk = chunk.query(cut)  # Implement our cut!
       df_list.append(chunk)
   df = pd.concat(df_list)  # Concatenate our chunks into a dataframe!
-
-
-
-
 
 
 .. topic:: Authors of this lesson

@@ -174,8 +174,9 @@ where the pion tracks originate from a long lived kaon vertex. TagV is designed 
           b_vars += vc.tag_vertex + vc.mc_tag_vertex
 
 
-Plotting
---------
+
+Conclusion and Plotting
+----------------------
 
 Congratulations! Your steering file is ready!
 \... or maybe you just skipped ahead. Either way, time to run it and check the results.
@@ -186,13 +187,22 @@ Congratulations! Your steering file is ready!
 
    Run the steering file.
 
-
 .. admonition:: Solution
-     :class: toggle solution
+     :class: solution toggle
 
+     Your steering file should look like this:
+
+     .. literalinclude:: steering_files/059_vertex_fitting.py
+         :emphasize-lines: 11, 62-63, 88-89, 117, 131
+         :linenos:
+   
+     Run it like this (replace with your own file as appropriate):
      .. code-block:: bash
-          basf2 steering_file_name.py
-     Replace with the name of your steering file as appropriate.
+          basf2 steering_files/059_vertex_fitting.py
+    
+We will now plot some 
+
+
 
 .. admonition:: Exercise
      :class: exercise stacked

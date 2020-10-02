@@ -346,6 +346,38 @@ could also be written as:
     * variables in the current shell can be modified by sourcing a script.
 
 
+Further reading
+---------------
+
+Bash has a lot of features and it might take a long time before you feel fully
+"at home" in the command line. As with many other tools, it might feel very
+clumsy at first and it takes some effort to get a feeling for its true power.
+We could only show you some very basic features, but there is much more to be
+discovered.
+The more you know, the more the command line will become an integral part of life
+for you (after some time you might be surprised with how many commands you remember).
+
+.. admonition:: Exercise
+    :class: exercise
+
+    Search for "most useful bash commands" in your browser. Write down a
+    couple of commands that you might need in the future.
+
+.. danger::
+
+    NEVER use a bash command you do not understand.
+    As you might have seen, bash commands are a very *raw* way of interacting
+    with your machine. You cannot count on being prompted for confirmation if you
+    do something dangerous (the ``rm`` command just deletes, it doesn't ask for
+    confirmation and there is no trash).
+    So always make sure that you know what you're doing.
+
+.. seealso::
+
+  We have started to compile a reading list for git `on confluence <https://confluence.desy.de/x/pRG3Cg>`_.
+  Please take a look (and help us extend it if you can recommend other tutorials)!
+
+
 .. topic:: Author of this lesson
 
      Martin Ritter

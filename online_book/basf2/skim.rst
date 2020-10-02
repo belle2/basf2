@@ -6,9 +6,9 @@ Skimming
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: ?? min
+    **Teaching**: 25 min
 
-    **Exercises**: ?? min
+    **Exercises**: 25 min
 
     **Prerequisites**:
 
@@ -324,89 +324,10 @@ a given skim, as inherited from data production.
     lists one directory. In reality, there are usually ~100 directories per production.
     This is a known bug and will be improved in future developments of the dataset searcher.
 
-For now,
-the following is a workaround in order to run your analysis script on the full set
+For now, a workaround in order is described on the `Skim Confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=167963852>_`
+ to run your analysis script on the full set
 of skimmed data samples available for a given campaign.
 
-
-To get the list of samples of interest, first go to the `dataset searcher <https://dirac.cc.kek.jp:8443/DIRAC/>`_ .
-Click on Menu→BelleDIRACApps→Dataset Searcher and search for the samples you
-want (e.g. Campaigns: SkimP11x1). At the bottom of the page, there is a button
-``Download .txt file`` you can use to get a list of all datablocks, for example: ``lfn.list.txt``
-As mentioned, the dataset searcher only list one directory for a given production.
-
-To access the full list of directories, you can use the following script:
-
-.. code-block:: bash
-
-    i=0;
-    while read in;
-    do myfile="lfnlist_${i}.txt";
-    gb2_ds_list ${in:0:xxx} > ${myfile};
-    ((i=i+1));
-    done < lfnlist.txt
-
-Here, ``xxx`` is the length of the LPN up to ``/4S/`` in
-``/belle/Data/release-04-01-04/DB00001102/SkimP11x1/prod000XXXXX/e000Y/4S/``.
-This first step produces the file: ``lfnlist_X.txt`` . Then to get the LFN list:
-
-.. code-block:: bash
-
-    for lfnlist in lfnlist_*.txt;
-    do while read in;
-    do echo ${in}/"skimDecayMode"/udst/sub00;
-    done < ${lfnlist};
-    done > fulllfnlist.txt
-
-
-Use ``gbasf2`` to check the submission with ``--dryrun`` before submitting your jobs.
-Of course, you should make sure your script runs at KEKCC before submitting to the grid! 
-
-.. code-block:: bash
-
-    gbasf2 <myscript.py> -p <myproject> -s <release> \
-         --input_dslist proc11skims.lfn.list --dryrun
-
-Right now, ``gbasf2`` only allows you to submit up to 1000 jobs in a single project.
-That means you will have to split up the proc11 data. This can be accomplished by splitting up
-``fulllfnlist.txt``
-
-.. code-block:: bash
-
-    split proc11skims.lfn.list -l 100 proc11.lfn_
-
-This will split the list into batches of 100 datasets, creating output files list
-``proc11skims.lfn.aa`` (``ab``, ``ac``, etc.). You can probably split in smaller batches,
-but note that each dataset (``.../sub00``) can contain multiple input files
-(``.../sub00/file_000.root``). If needed, you can split the file again.
-
-Submit ``gbasf2`` projects for each input file.
-
-.. code-block:: bash
-
-    gbasf2 <myscript.py> -p <myproject>_aa -s <release> --input_dslist proc11skims.lfn_aa
-    gbasf2 <myscript.py> -p <myproject>_ab -s <release> --input_dslist proc11skims.lfn_ab
-
-
-.. admonition:: Exercise
-     :class: exercise stacked
-
-     Run the analysis script in `B2A303-MultipleDecays-Reconstruction.py
-     <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples/tutorials/B2A303-MultipleDecays-Reconstruction.py>`_
-     on one batch of 100 LPNs for the proc 11 data samples ``B0toDpi_Kspi``
-     skim from the data skim campaign ``SkimP11x1`` on the grid.
-
-
-.. admonition:: Hint
-    :class: toggle xhint stacked
-
-    Follow steps 1 to 5 to access the list of LFNs for the Proc11 samples and split the list into
-    batches of 100 files.
-
-.. admonition:: Hint
-    :class: toggle xhint
-
-    MC Matching does not work on data.
 
 
 Getting involved

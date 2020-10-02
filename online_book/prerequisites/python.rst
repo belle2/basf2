@@ -630,8 +630,18 @@ In this section we will answer *"How can I plot data?"* and demonstrate the
 .. code:: ipython3
 
   import matplotlib.pyplot as plt
+  # show plots in notebook
   %matplotlib inline
 
+
+.. hint::
+
+  ``%matplotlib inline`` is not normal python code (you might get a ``SyntaxError``), but a so called
+  `magic function <https://ipython.readthedocs.io/en/stable/interactive/tutorial.html#magics-explained>`_
+  of your interactive python environment. Here it is responsible for showing the
+  plots in your notebook.
+
+  If you don't see any plots, you have probably forgot to include and execute this line!
 
 In previous example workshops the simple decay mode :math:`B^0\to \phi K_S^0`,
 where :math:`\phi \to K^+ K^-` and :math:`K_S^0 \to \pi^+ \pi^-` was
@@ -642,7 +652,6 @@ distributions. This time we use the ``root_pandas`` package to read the data
   :linenos:
 
   import root_pandas
-
 
   file_path = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
   df = root_pandas.read_root(file_path).astype(float)
@@ -946,7 +955,7 @@ However, your python journey has just begun and there's a lot to learn.
 .. admonition:: Exercise
   :class: exercise stacked
 
-  A small `east egg <https://en.wikipedia.org/wiki/Easter_egg_(media)>`_ that has been
+  A small `easter egg <https://en.wikipedia.org/wiki/Easter_egg_(media)>`_ that has been
   included in python: Simply run
 
   .. code-block:: python

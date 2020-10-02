@@ -273,6 +273,27 @@ updating it with ``git pull``).
    Check if there are any other open PRs. If there are, leave some comments!
    You can also add yourself as the reviewer and approve them.
 
+Further reading
+---------------
+
+Git is complex and it might take you months (or years, depending on your effort)
+to really feel its full power and to be able to use it effortless.
+
+At this point `the xkcd comic <https://xkcd.com/1597/>`_ from above might still
+show you (we certainly haven't taught you enough to change it). Therefore it's important
+to continue your training even after the StarterKit. It will not be time wasted!
+
+.. seealso::
+
+  We have started to compile a reading list for git `on confluence <https://confluence.desy.de/x/qhG3Cg>`_.
+  Please take a look (and help us extend it if you can recommend other tutorials)!
+
+.. hint::
+
+  There is a variety of graphical user interfaces for git. If visualizing things
+  helps you and you still feel uncomfortable in the command line, you might
+  want to try them out!
+
 .. topic:: Authors of this lesson
 
      Kilian Lieret,

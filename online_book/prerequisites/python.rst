@@ -657,6 +657,15 @@ These are the equivalent of our canvas where we paint our code art.
 
   plt.show()  # shows the figure after all changes to the style have been made
 
+.. note::
+
+  Note that we were using so-called r-strings: ``r"this is my string"``.
+  Usually characters escaped with a backslash have special meanings. For example
+  ``\n`` represents a line break. If you want to type a literal ``\n`` (for example
+  when you type a :math:`\nu` in LaTeX for your plot labels as ``\nu``), you can either
+  "escape" the backslash ``\\nu`` or deactivate special characters altogether by
+  adding an ``r`` to the beginning of the string ``r"\nu"``.
+
 .. admonition:: Exercise
   :class: exercise stacked
 
@@ -668,7 +677,6 @@ These are the equivalent of our canvas where we paint our code art.
 
   ``ax[0]`` refers to the first axis, so all changes in the code snippet above will
   only change that axis.
-
 
 .. admonition:: Solution
   :class: solution toggle

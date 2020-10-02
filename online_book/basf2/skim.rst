@@ -3,8 +3,6 @@
 Skimming
 ========
 
-.. include:: ../todo.rst
-
 .. sidebar:: Overview
     :class: overview
 
@@ -331,10 +329,10 @@ the following is a workaround in order to run your analysis script on the full s
 of skimmed data samples available for a given campaign.
 
 
-1. To get the list of samples of interest, first go to the `dataset searcher <https://dirac.cc.kek.jp:8443/DIRAC/>`_ .
-Click on  Menu->BelleDIRACApps→Dataset Searcher and search for the samples you
+To get the list of samples of interest, first go to the `dataset searcher <https://dirac.cc.kek.jp:8443/DIRAC/>`_ .
+Click on Menu→BelleDIRACApps→Dataset Searcher and search for the samples you
 want (e.g. Campaigns: SkimP11x1). At the bottom of the page, there is a button
-“Download .txt file” you can use to get a list of all datablocks, for example: ``lfn.list.txt``
+``Download .txt file`` you can use to get a list of all datablocks, for example: ``lfn.list.txt``
 As mentioned, the dataset searcher only list one directory for a given production.
 
 To access the full list of directories, you can use the following script:
@@ -350,7 +348,7 @@ To access the full list of directories, you can use the following script:
 
 Here, ``xxx`` is the length of the LPN up to ``/4S/`` in
 ``/belle/Data/release-04-01-04/DB00001102/SkimP11x1/prod000XXXXX/e000Y/4S/``.
- This first step produces the file: ``lfnlist_X.txt`` . Then to get the LFN list:
+This first step produces the file: ``lfnlist_X.txt`` . Then to get the LFN list:
 
 .. code-block:: bash
 
@@ -361,8 +359,8 @@ Here, ``xxx`` is the length of the LPN up to ``/4S/`` in
     done > fulllfnlist.txt
 
 
-Use ``gbasf2`` to check the submission with ``--dryrun`` before submitting your jobs. 
-Of course, you should make sure your script runs at KEKCC before submitting to the grid!   
+Use ``gbasf2`` to check the submission with ``--dryrun`` before submitting your jobs.
+Of course, you should make sure your script runs at KEKCC before submitting to the grid! 
 
 .. code-block:: bash
 
@@ -382,7 +380,7 @@ This will split the list into batches of 100 datasets, creating output files lis
 but note that each dataset (``.../sub00``) can contain multiple input files
 (``.../sub00/file_000.root``). If needed, you can split the file again.
 
-5. Submit ``gbasf2`` projects for each input file.
+Submit ``gbasf2`` projects for each input file.
 
 .. code-block:: bash
 

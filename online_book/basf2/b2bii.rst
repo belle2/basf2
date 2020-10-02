@@ -84,7 +84,7 @@ You can find the sample(s) you want through
 
 .. warning::
    `Belle File Search Engine <http://bweb3.cc.kek.jp/>`_ is only
-   accessible within KEK domain or via VPN. Or look in the :ref:`_onlinebook_ssh`
+   accessible within KEK domain or via VPN. Or look in the :ref:`onlinebook_ssh`
    tutorial for a way to access it via SSH forwarding.
 
 .. image:: b2bii/bweb3.png

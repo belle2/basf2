@@ -81,24 +81,11 @@ here when you are done.
     :target: https://swcarpentry.github.io/python-novice-inflammation/
     :alt: Programming with Python
 
-
-
-
-Practising Python
-=================
-
-Welcome back! Now we're going to test you on your new-found knowledge
-in Python. We will work in a jupyter notebook, to allow you to
-practice using them. The main difference between using a jupyter
-notebook (.ipynb) and a python file (.py) is that jupyter notebooks
-are interactive and allow you to see what your code does each step of
-the way. If you were to type all of the following code into a python
-file and run it, you would acheive the same output (provided you save
-something as output).
-
-
 What are the key concepts of python?
 ------------------------------------
+
+Welcome back! Now we're going to test you on your new-found knowledge
+in Python.
 
 As you should be aware by now, the key concepts of python include:
 
@@ -200,8 +187,18 @@ Congratulations! You've now created your first python file. Now, run it!
 
 Great! Well done! 😁 You can now create python scripts in your terminal!
 
-From now on follow this textbook and practise your python skills in a jupyter
-notebook. If you are unsure how to use juptyer notebooks, go back to
+Practising Python
+-----------------
+
+We will work in a jupyter notebook, to allow you to
+practice using your python skills further. The main difference between using a jupyter
+notebook (``.ipynb``) and a python file (``.py``) is that jupyter notebooks
+are interactive and allow you to see what your code does each step of
+the way. If you were to type all of the following code into a python
+file and run it, you would acheive the same output (provided you save
+something as output).
+
+If you are unsure how to use juptyer notebooks, go back to
 :ref:`onlinebook_ssh` to learn how to get them running.
 
 Remember that everything you do in your jupyter notebook is an interactive version of your python script.
@@ -414,13 +411,6 @@ Finally, everyone who works with numpy and pandas will at some point try to use 
 
   The output comes in the form of a tuple (a finite ordered list (or sequence) of elements). For example, one output could be ``(15540523, 20)``, which is saying you have a dataframe of 15540523 rows, and 20 columns.
 
-
-Manipulating your DataFrame
----------------------------
-
-Selecting columns, rows or subsets of DataFrames works in similar manner as
-python built in objects or numpy arrays.
-
 Selecting columns
 ^^^^^^^^^^^^^^^^^
 
@@ -526,9 +516,6 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
 
     df.query("(B0_mbc>5.2) & (B0_deltae>-1"))
 
-.. note::
-  There is a limit to the number of arguments in one query! Can you find it?
-
 .. admonition:: Exercise
   :class: exercise stacked
 
@@ -562,7 +549,7 @@ rows in a dateframe by selected variables.
 
 
 A short introduction to plotting in python
-==========================================
+------------------------------------------
 
 In this section we will answer *"How can I plot data?"* and demonstrate the
 `matplotlib <https://matplotlib.org>`_ package used to plot in python.
@@ -591,7 +578,7 @@ distributions. This time we use the ``root_pandas`` package to read the data
   df.describe()
 
 Pandas built in histogram function
-----------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 There exists, if you prefer, a built in histogram function for Pandas. The
 following cells show how to implement it.
@@ -615,7 +602,7 @@ following cells show how to implement it.
   Now plot ``B0_deltae`` separately for signal and background.
 
 Using Matplotlib
-----------------
+^^^^^^^^^^^^^^^^
 
 Internally the pandas library however makes use of matplotlib itself.
 Using matplotlib directly opens up many more possibilities. It also works well

@@ -127,14 +127,13 @@ OR you could perform this in a live python session, either in your terminal or i
   from platform import python_version
   print(python_version())
 
-
-In the case that, throughout your external Python training, you did
-not create a python file using bash commands:
+Let's create a python file from terminal and run it
 
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Create a python file, import the python library `NumPy <https://numpy.org>`_ as the
+  Log in to KEKCC. Create a folder ``starterkit`` in your home folder and
+  create a python file ``my_file.py``. Import the python library `NumPy <https://numpy.org>`_ as the
   shortcut ``np``, and print out the value of π.
 
 .. admonition:: Hint
@@ -145,22 +144,27 @@ not create a python file using bash commands:
 .. admonition:: Hint
   :class: xhint stacked toggle
 
-  The specific bash command you'll need to create a new file is ``touch``.
+  The specific bash commands you'll need are ``mkdir``, ``cd`` and ``touch``.
 
 .. admonition:: Hint
   :class: xhint stacked toggle
 
   Add the ``import`` command inside your python file using your favourite
-  editor. Previous tutorials introduced the *nano* editor to you.
+  editor. Previous tutorials introduced the ``nano`` editor to you.
 
 .. admonition:: Solution
   :class: solution toggle
 
   .. code-block:: bash
 
-    # create your .py file and name it as you wish.
+    # Make sure we're in our home directory
+    cd ~
+    # Create a folder and change there
+    mkdir starterkit
+    cd starterkit
+    # Create your .py file
     touch my_file.py
-    # open your file to edit it in your editor of choice, e.g.
+    # Open your file to edit it in your editor of choice, e.g.
     nano my_file.py
 
   Now add the python lines to your file.
@@ -187,21 +191,125 @@ Congratulations! You've now created your first python file. Now, run it!
 
 Great! Well done! 😁 You can now create python scripts in your terminal!
 
-Practising Python
------------------
+Practising Python: Jupyter notebooks
+-------------------------------------
 
-We will work in a jupyter notebook, to allow you to
-practice using your python skills further. The main difference between using a jupyter
+We will work in a jupyter notebook to allow you to
+practice using your python skills further.
+
+`Jupyter <https://jupyter.org/>`_ Notebooks are interactive notebooks that allow one to visualise code,
+data and outputs in a very simple way. When you run a notebook you have an
+operating system called a kernel that runs the code.
+
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  Navigate to your ``starterkit`` folder on KEKCC that you created in the previous
+  exercise. Start your Jupyter notebook server. Open the jupyter page in your browser.
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  .. code-block:: bash
+
+    cd ~/starterkit  # just to make sure we're there
+    jupyter-notebook --port <your forwarded port> --no-browser
+
+  Connecting and starting a jupyter notebook is described in more detail here (:ref:`onlinebook_ssh`).
+
+Note that your script ``my_script.py`` from before is also shown.
+
+.. admonition:: Exercise
+  :class: exercise
+
+  Click on ``my_script.py`` and add another line of python code and save.
+  Go back to the home screen and click on "New" and then "Text File".
+  Call your file ``my_second_script.py`` and add a couple of lines of
+  python.
+
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  Now open a second terminal window and connect to kekcc. Verify that you did
+  indeed create the second file and change the contents of the first.
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  .. code-block:: bash
+
+    cd ~/starterkit
+    ls
+    cat my_script.py
+    cat my_second_script.py
+
+.. hint::
+
+  Throughout all of the following lessons you always need to have one terminal window for your
+  jupyter notebook to run in and one more to enter commands in bash, just as we
+  practiced right now.
+
+Okay, so we can also create and edit files through our browser. Nice!
+
+But the true power of jupyter are its *notebooks*. Click on "New" and "Python 3 (Belle 2)" as
+shown in the screenshot
+
+.. image:: python/jupyter_create_notebook.png
+    :width: 40em
+
+A new window with your notebook will open.
+
+The main difference between using a jupyter
 notebook (``.ipynb``) and a python file (``.py``) is that jupyter notebooks
 are interactive and allow you to see what your code does each step of
-the way. If you were to type all of the following code into a python
-file and run it, you would acheive the same output (provided you save
+the way. If you were to type all of code into a python
+file and run it, you would achieve the same output (provided you save
 something as output).
 
-If you are unsure how to use juptyer notebooks, go back to
-:ref:`onlinebook_ssh` to learn how to get them running.
+Each block in a jupyter
+notebook is a "cell". These cells can be run using the kernel by clicking the
+run button or by pressing ``Shift + Enter``.   When you run a cell, the kernel will
+process and store any variables or dataframes you define.   If your kernel
+crashes, you will have to restart it.
 
-Remember that everything you do in your jupyter notebook is an interactive version of your python script.
+.. admonition:: Exercise
+  :class: exercise
+
+  Click on "Help" and then on "User Interface Tour" to get a first overview
+  over jupyter.
+  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options
+  you have available.
+
+.. admonition:: Exercise
+  :class: exercise
+
+  Write a couple of lines of python in a cell of the notebook and execute
+  them.
+
+It is also useful to be able to access help or extra information about the
+tools you will be using. In particular you will often want to check
+information about a python object you are using. The definition of a python
+object includes commands, packages, modules, classes, types...
+basically anything that has a description called a *docstring*).
+There are multiple ways to access this information, including
+what is already discussed  in :ref:`_onlinebook_basf2_introduction`.
+For jupyter notebooks, a great interactive way to access the information
+(docstring) is by putting your cursor on the object in question and pressing
+``Shift + Tab``.
+
+In addition to the ``Shift + Tab`` option, you can also run a cell with your
+object in question, with a question mark! For example, if our object in
+question is ``matplotlib`` we can type:
+
+.. code:: ipython3
+
+  matplotlib?
+
+For any python interpreter, one can also use:
+
+.. code:: ipython3
+
+  help(object)
 
 
 Pandas Tutorial and Python Data Analysis
@@ -231,48 +339,6 @@ cluster energy etc. etc. etc.
 * More information:`CERN's ROOT <https://root.cern.ch/>`_
 * If you get stuck with ROOT, you can also ask in  `CERN's ROOT Forum <https://root-forum.cern.ch/>`_
 
-Jupyter Notebooks
-^^^^^^^^^^^^^^^^^
-
-`Jupyter <https://jupyter.org/>`_ Notebooks are interactive notebooks that allow one to visualise code,
-data and outputs in a linear and clear way. When you run a notebook you have an
-operating system called a kernel that runs the code .   Each block in a jupyter
-notebook is a "cell". These cells can be run using the kernel by clicking the
-run button or by pressing ``Shift + Enter``.   When you run a cell, the kernel will
-process and store any variables or dataframes you define.   If your kernel
-crashes, you will have to restart it.
-
-.. admonition:: Exercise
-  :class: exercise
-
-  Examine the ``Cell`` and ``Kernel`` drop down menus to see what options
-  you have available.
-
-It is also useful to be able to access help or extra information about the
-tools you will be using. In particular you will often want to check
-information about a python object you are using. The definition of a python
-object includes commands, packages, modules, classes, types...
-basically anything that has a description called a *docstring*).
-There are multiple ways to access this information, including
-what is already discussed  in :ref:`_onlinebook_basf2_introduction`.
-For jupyter notebooks, a great interactive way to access the information
-(docstring) is by putting your cursor on the object in question and pressing
-``Shift + Tab``.
-
-In addition to the ``Shift + Tab`` option, you can also run a cell with your
-object in question, with a question mark! For example, if our object in
-question is ``matplotlib`` we can type:
-
-.. code:: ipython3
-
-  matplotlib?
-
-For any python interpreter, one can also use:
-
-.. code:: ipython3
-
-  help(object)
-
 
 Importing ROOT files
 ^^^^^^^^^^^^^^^^^^^^
@@ -280,26 +346,14 @@ Importing ROOT files
 In this section we will learn how to import a ROOT file as a Pandas DataFrame
 using the ``root_pandas`` library.
 
-
 Pandas provides high-performance, easy-to-use data structures and data analysis
 tools for Python, see `here
 <https://pandas.pydata.org/docs/user_guide/10min.html>`_.
 
-
-``root_pandas`` needs ROOT to be installed but there is an alternative called
-`uproot <https://github.com/scikit-hep/uproot>`_ which can load root files into
-pandas dataframes without requiring ROOT.
-
-
 .. admonition:: Exercise
   :class: exercise stacked
 
-  Start a jupyter notebook and import ``root_pandas``, as well as other libraries you think you'll need.
-
-.. admonition:: Hint
-  :class: xhint stacked toggle
-
-  You can find some help here :ref:`onlinebook_ssh`.
+  Start a new notebook and import ``root_pandas``.
 
 .. admonition:: Solution
   :class: solution toggle
@@ -308,18 +362,29 @@ pandas dataframes without requiring ROOT.
 
     import root_pandas
 
-
 You can load in an example dataframe using the ``read_root`` function from the ``root_pandas`` package.
 
 .. code:: ipython3
+  :linenos:
 
-  # Loading an example data frame
   file_path = "https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"
   df = root_pandas.read_root(file_path)
 
 This code imports the ``pandas_tutorial_ntuple.root`` root file as a dataframe ``df``. You are welcome to import your own root files, but be aware that the variables and outputs will appear differently to this tutorial.
 
+.. admonition:: Alternatives to ``root_pandas`` (optional)
+  :class: toggle
 
+  ``root_pandas`` needs ROOT to be installed but there is an alternative called
+  `uproot <https://github.com/scikit-hep/uproot>`_ which can load root files into
+  pandas dataframes without requiring ROOT. This means it's a bit simpler to
+  install on your personal machine.
+
+  With ``uproot``, line 2 of the above snippet becomes
+
+  .. code-block::
+
+    df = uproot.open(file_path)["b0phiKs"].pandas.df
 
 Investigating your DataFrame
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

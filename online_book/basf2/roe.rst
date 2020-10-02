@@ -8,7 +8,7 @@ The Rest of Event (ROE)
 
     **Teaching**: 10-20 min
 
-    **Exercises**: 5-10 min
+    **Exercises**: 10-20 min
 
     **Prerequisites**:
 
@@ -253,6 +253,99 @@ loop to insert this argument.
 
 Quick plots
 ~~~~~~~~~~~
+
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Plot ROE invariant mass and number of charged particles in ROE distributions
+     and compare masked and unmasked ROE.
+     Column names in the ntuple:
+
+     +---------------------+-----------------------+-----------------------------------+
+     |                     | :b2:var:`roeM`        | :b2:var:`nROE_Charged`            |
+     +---------------------+-----------------------+-----------------------------------+
+     |Unmasked ROE         | ``roeM__bo__bc``      | ``nROE_Charged__bo__bc``          |
+     +---------------------+-----------------------+-----------------------------------+
+     |ROE with ``my_mask`` |``roeM__bomy_mask__bc``| ``nROE_Charged__bomy_mask__bc``   |
+     +---------------------+-----------------------+-----------------------------------+
+
+.. admonition:: Hint
+     :class: xhint stacked toggle
+
+      * One can use ``matplotlib`` functions to plot several histograms on one figure side-by-side,
+        documentation is on  `this page <https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.subplots.html>`_.
+      * Some of the distributions contain a outliers, which need to be rejected in order to 
+        get meaningful plots.
+        Proposed ranges: :b2:var:`roeM` from 0 to 10 and :b2:var:`nROE_Charged` from 0 to 15.
+      * Another hint is that comparison plots look better if they are a bit transparent, which 
+        can be achieved by supplying ``alpha=0.6`` argument to the plotting functions.
+      * As we are plotting many distributions on one figure 
+        `legends <https://matplotlib.org/tutorials/intermediate/legend_guide.html>`_ and axis titles are important 
+
+.. admonition:: Hint
+     :class: xhint stacked toggle
+
+     .. code-block:: python
+        
+        import root_pandas
+        import matplotlib.pyplot as plt
+        plt.style.use('belle2')
+        df = root_pandas.read_root('Bd2JpsiKS.root')
+        m_bins = 50
+        m_range = (0,10)
+        fig, ax = plt.subplots(1,2, figsize=(15,7))
+        # Left subplot of ROE mass:
+        ax[0].hist(...)
+        ax[0].hist(...)
+        ax[0].set_xlim(m_range)
+        ax[0].set_xlabel('ROE mass [GeV/$c^2$]')
+        # Right subplot of number of charged ROE particles:
+        m_bins = 15
+        m_range = (0,15)
+        ax[1].hist(...)
+        ax[1].hist(...)
+        ax[1].set_xlim(m_range)
+        ax[1].set_xlabel('# of charged ROE particles')
+        ax[1].legend()
+        fig.tight_layout()
+        fig.savefig('roe_mask_comparison.svg')
+
+.. admonition:: Solution
+     :class: solution toggle
+
+     .. code-block:: python
+        
+        import root_pandas
+        import matplotlib.pyplot as plt
+        plt.style.use('belle2')
+        df = root_pandas.read_root('Bd2JpsiKS.root')
+        m_bins = 50
+        m_range = (0,10)
+        fig, ax = plt.subplots(1,2, figsize=(15,7))
+        # Left subplot of ROE mass:
+        ax[0].hist(df['roeM__bo__bc'], label='No mask', 
+                   bins = m_bins, range=m_range, alpha=0.6)
+        ax[0].hist(df['roeM__bomy_mask__bc'], label='"my_mask" applied', 
+                   bins = m_bins, range=m_range, alpha=0.6)
+        ax[0].set_xlim(m_range)
+        ax[0].set_xlabel('ROE mass [GeV/$c^2$]')
+        # Right subplot of number of charged ROE particles:
+        m_bins = 15
+        m_range = (0,15)
+        ax[1].hist(df['nROE_Charged__bo__bc'], label='No mask', 
+                   bins = m_bins, range=m_range, alpha=0.6)
+        ax[1].hist(df['nROE_Charged__bomy_mask__bc'], label='"my_mask" applied',  
+                   bins = m_bins, range=m_range, alpha=0.6)
+        ax[1].set_xlim(m_range)
+        ax[1].set_xlabel('# of charged ROE particles')
+        ax[1].legend()
+        fig.tight_layout()
+        fig.savefig('roe_mask_comparison.svg')
+
+
+
+
 
 .. _roe_mask_plots:
 .. figure:: roe/roe_mask_comparison.svg

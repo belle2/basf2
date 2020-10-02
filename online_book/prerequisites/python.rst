@@ -715,6 +715,7 @@ These are the equivalent of our canvas where we paint our code art.
 The implementation of 2D histograms are often very useful and are easily done:
 
 .. code:: ipython3
+  :linenos:
 
   plt.figure(figsize=(15,10))
   cut = '(B0_mbc>5.2) & (B0_phi_M<1.1)'
@@ -723,13 +724,48 @@ The implementation of 2D histograms are often very useful and are easily done:
   plt.ylabel(r"$M(\phi)$")
   plt.savefig("2dplot.pdf")
   plt.show()
-  plt.close()
 
 .. note::
-  Note here how the query cut has been defined as a variable. This could save you a headache
-  later! It reduces the chance of human copy/paste errors and also allows a quick
-  bulk change to your applied cuts.
 
+  Note here how the query cut has been defined as the string ``cut`` which is then
+  passed to ``df.query``. You should always avoid copy/pasting the same code
+  (inflexible and prone to errors).
+
+.. admonition:: Exercise
+  :class: exercise stacked
+
+  However the code above is not as efficient as it could be. Do you see why?
+  How could you solve this?
+
+.. admonition:: Hint
+  :class: xhint stacked toggle
+
+  With a very large dataframe, ``query`` can take a lot of time (you need to look
+  at every row of the dataframe, even if only few rows pass the selection)
+
+.. admonition:: Hint
+  :class: xhint stacked toggle
+
+  So the issue is that you call ``df.query(cut)`` twice. How could you avoid this?
+
+.. admonition:: Solution
+  :class: solution toggle
+
+  You could simply define ``df_cut = df.query(cut)`` and then use ``df_cut``
+  in line 3.
+
+.. admonition:: Another way to use matplotlib with dataframes
+  :class: toggle
+
+  Most matplotlib functions also support a ``data`` keyword which can take a
+  dataframe. Afterwards you can specify columns by their string names.
+  In our example, line 3 could have been
+
+  .. code-block:: python
+
+    h = plt.hist2d("B0_mbc", "B0_phi_M", bins=100, data=df.query(cut))
+
+  Note that this also solves the last exercise (we only call ``query`` once).
 
 Finally, Belle II does have an `official plot style <https://stash.desy.de/projects/B2/repos/plot_style/browse>`_, for plots that are *published* internally and externally.
 You do not need to worry about this at this stage, but keep it in mind.
@@ -803,6 +839,5 @@ reduce the loaded, chunked file more.
 
 .. topic:: Authors of this lesson
 
-  Martin Ritter (Intro)
-
+  Martin Ritter (Intro),
   Hannah Wakeling (Exercises)

@@ -409,11 +409,6 @@ Submit ``gbasf2`` projects for each input file.
     MC Matching does not work on data.
 
 
-Accessing skims as flags:
--------------------------
-
-
-
 Getting involved
 ----------------
 
@@ -449,7 +444,7 @@ documentation helpful.
       working group's liaison.
 
 
-.. topic:: Author of this lesson
+.. topic:: Authors of this lesson
 
-     Phil Grace
+     Phil Grace, Racha Cheaib
 

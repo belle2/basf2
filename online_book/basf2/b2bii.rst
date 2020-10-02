@@ -62,7 +62,7 @@ The information of generating Belle MC can be found
 .. rubric:: Generic MC
 
 Generic MC is the official MC samples at Belle, which was generated with
-run-dependent beam energy. There are multiple ``streams`` of these samples,
+run-dependent beam background. There are multiple ``streams`` of these samples,
 and each ``stream`` contains the same amount of events as present in the real
 Belle data.
 
@@ -82,6 +82,11 @@ transitions, and have been generated based on the decay tables at
 You can find the sample(s) you want through
 `Belle File Search Engine <http://bweb3.cc.kek.jp/>`_
 
+.. warning::
+   `Belle File Search Engine <http://bweb3.cc.kek.jp/>`_ is only
+   accessible within KEK domain or via VPN. Or look in the :ref:`_onlinebook_ssh`
+   tutorial for a way to access it via SSH forwarding.
+
 .. image:: b2bii/bweb3.png
    :width: 600px
 
@@ -97,10 +102,6 @@ b2bii jobs.
 .. note::
    `Belle File Search Engine <http://bweb3.cc.kek.jp/>`_ is also
    for data files.
-
-.. warning::
-   `Belle File Search Engine <http://bweb3.cc.kek.jp/>`_ is only
-   accessible within KEK domain or via VPN.
 
 **More information about official MC and data can be found**
 `here <https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search>`__

@@ -2526,15 +2526,15 @@ def writePi0EtaVeto(
                           'cluster': 'EtaVetoIdentifierWithLargerClusterSize',
                           'both': 'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize'}
 
-    dictPi0ExtraInfoName = {'standard': 'Pi0VetoOrigin',
-                            'tight': 'Pi0VetoTightEnergyThreshold',
-                            'cluster': 'Pi0VetoLargeClusterSize',
-                            'both': 'Pi0VetoTightEnergyThresholdAndLargeClusterSize'}
+    dictPi0ExtraInfoName = {'standard': 'tmp_Pi0ProbOrigin',
+                            'tight': 'tmp_Pi0ProbTightEnergyThreshold',
+                            'cluster': 'tmp_Pi0ProbLargeClusterSize',
+                            'both': 'tmp_Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
 
-    dictEtaExtraInfoName = {'standard': 'EtaVetoOrigin',
-                            'tight': 'EtaVetoTightEnergyThreshold',
-                            'cluster': 'EtaVetoLargeClusterSize',
-                            'both': 'EtaVetoTightEnergyThresholdAndLargeClusterSize'}
+    dictEtaExtraInfoName = {'standard': 'tmp_EtaProbOrigin',
+                            'tight': 'tmp_EtaProbTightEnergyThreshold',
+                            'cluster': 'tmp_EtaProbLargeClusterSize',
+                            'both': 'tmp_EtaProbTightEnergyThresholdAndLargeClusterSize'}
 
     dictPi0ExtraInfoRename = {'standard': 'Pi0ProbOrigin',
                               'tight': 'Pi0ProbTightEnergyThreshold',

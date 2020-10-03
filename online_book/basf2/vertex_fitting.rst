@@ -6,9 +6,9 @@ Vertex fitting
 .. sidebar:: Overview
     :class: overview
 
-    **Teaching**: ?? min
+    **Teaching**: 15 min
 
-    **Exercises**: ?? min
+    **Exercises**: 25 min
 
     **Prerequisites**:
 
@@ -32,12 +32,12 @@ prior knowledge on the nature of a decay to improve the measurement of its
 observables. The fits we are going to perform are of two main types:
 
 * **Geometric Fitting:** We use the fit to determine the decay vertex of the
-particle. Usually this is done by fitting together the tracks of its charged
-decay products,  which we know originate from a common point.  Additional
-information could be available ---  for example, if the particle is short lived,
-we can improve this by adding  an IP constraint, i.e. fit the beam spot together
-with the tracks. If there's only one track,  using the beam spot is the only way
-to obtain a vertex.
+  particle. Usually this is done by fitting together the tracks of its charged
+  decay products,  which we know originate from a common point.  Additional
+  information could be available ---  for example, if the particle is short lived,
+  we can improve this by adding  an IP constraint, i.e. fit the beam spot together
+  with the tracks. If there's only one track,  using the beam spot is the only way
+  to obtain a vertex.
 
 .. warning::
 
@@ -133,12 +133,13 @@ study).
 	  jpsi_ks_vars += vc.vertex + vc.mc_vertex
 
      You can also set the confidence level to -1, which means failed fits will
-     be included. The fit p-value is saved as part of mc.vertex.
+     be included. The fit p-value is saved as part of the ``vc.vertex``
+     collection.
 
 .. admonition:: Exercise (optional)
      :class: exercise
 
-     Fit the :math:`K_s` as well. How does its flight lenght compare to the
+     Fit the :math:`K_s` as well. How does its flight length compare to the
      :math:`J/\Psi`?
 
 .. admonition:: Exercise (optional)
@@ -229,12 +230,6 @@ results.
          :emphasize-lines: 11, 62-63, 88-89, 117, 131
          :linenos:
 
-     Run it like this (replace with your own file as appropriate):
-
-     .. code-block:: bash
-
-        basf2 steering_files/059_vertex_fitting.py 1
-
 You can now plot some relevant vertex variables. In general, the choice would
 depend on what you need for your analysis. A few examples would include:
 
@@ -252,14 +247,22 @@ As an exercise we will focus on the first two.
      Plot the :math:`J/\Psi` vertex position and compare it with the true value.
      Plot the p-value distribution of the fit.
 
-.. admonition:: Hint
+.. admonition:: Hint: Variable names
+     :class: toggle xhint stacked
+
+     You can either take another look at the variable collections that you
+     included above, or you load your dataframe and then take a look at its
+     columns ``print(df.columns)``.
+
+.. admonition:: Hint: Plot ranges
      :class: toggle xhint stacked
 
      Plotting was already discussed in :ref:`onlinebook_roe`. For the sake of this
      exercise, remember we already set the minimum p-value of our fits to 0, so
      failed fits will not be included and you can plot it in the [0,1] interval.
-     If you changed that, failed fits will be included with a p-value of -1;
-     make sure to change your plotting range accordingly to [-1,1].
+
+     Should you have changed that, failed fits will be included with a p-value of -1;
+     in this case, make sure to change your plotting range accordingly to [-1,1].
 
 
 .. admonition:: Solution

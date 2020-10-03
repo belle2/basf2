@@ -252,7 +252,7 @@ As an exercise we will focus on the first two.
 
      You can either take another look at the variable collections that you
      included above, or you load your dataframe and then take a look at its
-     columns ``print(df.columns)``.
+     columns ``print(list(df.columns))``.
 
 .. admonition:: Hint: Plot ranges
      :class: toggle xhint stacked

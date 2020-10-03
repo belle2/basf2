@@ -136,13 +136,13 @@ study).
      be included. The fit p-value is saved as part of mc.vertex.
 
 .. admonition:: Exercise (optional)
-     :class: exercise stacked
+     :class: exercise
 
      Fit the :math:`K_s` as well. How does its flight lenght compare to the
-     :math:`J/Psi`?
+     :math:`J/\Psi`?
 
 .. admonition:: Exercise (optional)
-     :class: exercise stacked
+     :class: exercise
 
      Look up the documentation for ``TreeFitter`` and fit the whole
      :math:`B \to J/\Psi(\to e^+e^-)K_s(\to \pi^+\pi^+)` decay chain at once.
@@ -161,7 +161,7 @@ placing any requirements on its decay. This is done using the ``TagV`` module.
 ``TagV`` performs a geometric fit over the tracks in the ROE to determine the
 tag decay vertex. However, not all tracks will necessarily come from the tag
 itself; consider for example our signal,  where the pion tracks originate from a
-long lived kaon vertex. TagV is designed to iteratively downweight those tracks,
+long lived kaon vertex. ``TagV`` is designed to iteratively downweight those tracks,
 ultimately excluding them from the fit.
 
 .. admonition:: Exercise
@@ -189,7 +189,7 @@ ultimately excluding them from the fit.
 .. admonition:: Exercise
      :class: exercise stacked
 
-   Call the TagV module and save the output.
+     Call the ``TagV`` module and save the output.
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -210,13 +210,13 @@ ultimately excluding them from the fit.
 
 
 Conclusion and Plotting
-----------------------
+-----------------------
 
 Congratulations! Your steering file is ready! Time to run it and check the
 results.
 
 .. admonition:: Exercise
-     :class: exercise stacked
+   :class: exercise stacked
 
    Run the steering file.
 
@@ -230,8 +230,10 @@ results.
          :linenos:
 
      Run it like this (replace with your own file as appropriate):
+
      .. code-block:: bash
-          basf2 steering_files/059_vertex_fitting.py
+
+        basf2 steering_files/059_vertex_fitting.py 1
 
 You can now plot some relevant vertex variables. In general, the choice would
 depend on what you need for your analysis. A few examples would include:
@@ -253,65 +255,66 @@ As an exercise we will focus on the first two.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Plotting was already discussed in `_onlinebook_roe`. For the sake of this
+     Plotting was already discussed in :ref:`onlinebook_roe`. For the sake of this
      exercise, remember we already set the minimum p-value of our fits to 0, so
      failed fits will not be included and you can plot it in the [0,1] interval.
-      If you changed that, failed fits will be included with a p-value of -1;
+     If you changed that, failed fits will be included with a p-value of -1;
      make sure to change your plotting range accordingly to [-1,1].
 
 
 .. admonition:: Solution
-     :class: toggle solution
+    :class: toggle solution
 
-     .. code-block:: python
+    .. code-block:: python
 
         import matplotlib as mpl
-	import matplotlib.pyplot as plt
-	from root_pandas import read_root
-	plt.style.use('belle2')
+        import matplotlib.pyplot as plt
+        from root_pandas import read_root
+        plt.style.use('belle2')
         df = root_pandas.read_root('Bd2JpsiKS.root')
-	m_bins = 50
-	#Z position
-	plt.figure(figsize=(8,6))
-	m_range=[-0.1,0.1]
-	plt.xlim(left=-0.1,right=0.15)
-	plt.hist(df["Jpsi_dz"], bins=m_bins, range=m_range,
-             label=r'$J/\psi$ vertex')
-	plt.hist(df["Jpsi_mcDecayVertexZ"], histtype='step', lw=2, color='black',
-             linestyle='--', bins=m_bins, range=m_range,
-             label=r'$J/\psi$ vertex(MC)')
-	plt.xlabel("dz[cm]")
-	plt.ylabel("Events")
-	plt.legend()
-	plt.savefig("vertex/jpsi_dz.svg")
-	#P-value
-	plt.figure(figsize=(8,6))
-	m_range=[0,1]
-	plt.xlim(left=-0.05,right=1.05)
-	plt.hist(df_signal_only["Jpsi_chiProb"], bins=m_bins, range=m_range,
-             label=r'$J/\psi$ vertex')
-	plt.yscale("log")  # set a logarithmic scale in the y-axis
-	plt.xlabel("p-value")
-	plt.ylabel("Events")
-	plt.legend()
-	plt.savefig("vertex/pValue.svg")
+        m_bins = 50
+        #Z position
+        plt.figure(figsize=(8,6))
+        m_range=[-0.1,0.1]
+        plt.xlim(left=-0.1,right=0.15)
+        plt.hist(df["Jpsi_dz"], bins=m_bins, range=m_range,
+                 label=r'$J/\psi$ vertex')
+        plt.hist(df["Jpsi_mcDecayVertexZ"], histtype='step', lw=2, color='black',
+                 linestyle='--', bins=m_bins, range=m_range,
+                 label=r'$J/\psi$ vertex(MC)')
+        plt.xlabel("dz[cm]")
+        plt.ylabel("Events")
+        plt.legend()
+        plt.savefig("vertex/jpsi_dz.svg")
+        #P-value
+        plt.figure(figsize=(8,6))
+        m_range=[0,1]
+        plt.xlim(left=-0.05,right=1.05)
+        plt.hist(df_signal_only["Jpsi_chiProb"], bins=m_bins, range=m_range,
+                 label=r'$J/\psi$ vertex')
+        plt.yscale("log")  # set a logarithmic scale in the y-axis
+        plt.xlabel("p-value")
+        plt.ylabel("Events")
+        plt.legend()
+        plt.savefig("vertex/pValue.svg")
 
 .. _vertex_plots:
 .. figure:: vertex/jpsi_dz.svg
-    :align: left
-    :width: 300px
+    :width: 400px
+    :align: center
     :alt: Z position of the :math:`J/\Psi` vertex.
 
+    Distribution of the fitted vertex position in Z
+
 .. figure:: vertex/pValue.svg
-    :align: right
-    :width: 300px
+    :width: 400px
+    :align: center
     :alt: P-value of the vertex fit.
 
-    Distributions of the fitted vertex position in Z, along with the fit
-    p-values.
+    Distribution of the fit p-values.
 
 .. admonition:: Exercises (optional)
-     :class: exercise stacked
+     :class: exercise
 
      * Compare the :math:`J/\Psi` and Tag vertex positions and show that they
        are both compatible with being :math:`B` vertices.

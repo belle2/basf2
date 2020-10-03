@@ -114,7 +114,7 @@ for roe_variable in roe_kinematics + roe_multiplicities:
     b_vars.append(roe_variable_with_mask)
 
 b_vars += ft.flavor_tagging
-b_vars += vc.vertex + vc.mc_vertex
+b_vars += vc.tag_vertex + vc.mc_tag_vertex
 
 # Variables for final states (electrons, positrons, pions)
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars

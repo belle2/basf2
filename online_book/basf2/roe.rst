@@ -362,6 +362,8 @@ Quick plots
         fig.tight_layout()
         fig.savefig('roe_mask_comparison.svg')
 
+     The resulting plot should look like the figure below.
+
 
 .. _roe_mask_plots:
 .. figure:: roe/roe_mask_comparison.svg
@@ -374,16 +376,35 @@ Quick plots
 :numref:`roe_mask_plots` shows a comparison of :b2:var:`roeM` and :b2:var:`nROE_Charged` distributions
 for ROE with mask ``my_mask`` case and ROE with no mask applied.
 
-The invariant mass distribution for masked ROE is much narrower and its mean is a little bit below
-nominal :math:`B^0` mass, contrary to the unmasked ROE distribution.
-This is expected, because a generic :math:`B^0` decay may produce particles,
-that are not accounted in ROE mass computation, like :math:`K_L^0` or neutrinos.
+.. admonition:: Strange variable names
+    :class: toggle
 
-The distribution of the number of charged particles for masked ROE has much more prominent peaks
-at *4* and *6* particles than its unmasked version, which corresponds to the fact that a correctly
-reconstructed :math:`B^0` will have an even number of charged daughter particles.
-This means that even a simple ROE mask like ``my_mask`` does a really good job of cleaning up the particles,
-which are not associated to the partner :math:`B^0`.
+    You might wonder where these strange variable names came from. This is because
+    it is tried to avoid branch names (columns of your output ROOT file) that contain
+    special characters (parentheses, spaces and so on).
+    For example, every ``(`` is replaced by ``_bo`` for "bracket open". What does
+    ``_bc`` stand for?
+
+.. admonition:: Exercise
+    :class: exercise stacked
+
+    Take another look at :numref:`roe_mask_plots` and describe what you see.
+    Can you explain the differences between the masked and unmasked variables?
+
+.. admonition:: Solution
+    :class: solution toggle
+
+    The invariant mass distribution for masked ROE is much narrower and its mean is a little bit below
+    nominal :math:`B^0` mass, contrary to the unmasked ROE distribution.
+    This is expected, because a generic :math:`B^0` decay may produce particles,
+    that are not accounted in ROE mass computation, like :math:`K_L^0` or neutrinos.
+
+    The distribution of the number of charged particles for masked ROE has much more prominent peaks
+    at *4* and *6* particles than its unmasked version, which corresponds to the fact that a correctly
+    reconstructed :math:`B^0` will have an even number of charged daughter particles.
+
+    This means that even a simple ROE mask like ``my_mask`` does a really good job of cleaning up the particles,
+    which are not associated to the partner :math:`B^0`.
 
 This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`onlinebook_cs`,
 :ref:`onlinebook_flavor_tagging` or tag :ref:`onlinebook_vertex_fitting`.

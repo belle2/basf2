@@ -9,14 +9,15 @@ import math as m
 import ROOT as r
 import os.path
 import sys
+from basf2 import conditions as b2conditions
 
 ##################################################################################
 #
 # test SVD SensorInfo getters
 #
-# 1. add the database you want to test
+# 1. > prepend the GT you want to test
 # 2. > set the Experiment and Run number you want to test
-# 3. > basf2 testSensorInfo.py
+# 3. > basf2 dumpSensorInfoParameters.py
 #
 ##################################################################################
 
@@ -76,15 +77,9 @@ class printMobility(basf2.Module):
 
         print('TEMPERATURE = ' + str(sensorInfo.getTemperature))
 
-# add your database here
-# use_database_chain()
-# use_central_database("release-02-00-00")
-# use_central_database("release-02-01-00")
-# use_central_database("master_2018-12-24")
-# use_central_database("release-03-00-02")
-# use_local_database('data_reprocessing_prompt')
-# Create paths
-
+# add your GT here:
+# gt = ""
+# b2conditions.prepend_globaltag(gt)
 
 main = create_path()
 
@@ -95,7 +90,7 @@ eventinfosetter.param('evtNumList', [1])
 main.add_module(eventinfosetter)
 
 main.add_module("Gearbox")
-main.add_module('Geometry', useDB=True)
+main.add_module('Geometry')
 
 main.add_module(printVelocity())
 main.add_module(printMobility())

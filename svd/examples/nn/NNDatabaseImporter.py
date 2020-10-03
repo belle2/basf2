@@ -10,8 +10,6 @@ from basf2 import *
 import ROOT
 from ROOT import Belle2
 
-use_local_database("localDB_NN_toImport/database_NN_toImport.txt", "localDB_NN_toImport")
-
 main = create_path()
 
 # Event info setter - execute single event

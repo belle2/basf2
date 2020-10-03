@@ -90,7 +90,7 @@ You can find the sample(s) you want through
    accessible within KEK domain or via VPN. Or look in the :ref:`onlinebook_ssh`
    tutorial for a way to access it via SSH forwarding.
 
-.. figure:: :: b2bii/bweb3.png
+.. figure:: b2bii/bweb3.png
    :width: 600px
    :align: center
    :alt: The Belle File Search Engine
@@ -110,8 +110,10 @@ b2bii jobs.
    `Belle File Search Engine <http://bweb3.cc.kek.jp/>`_ is also
    for data files.
 
-**More information about official MC and data can be found**
-`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search>`__
+.. seealso::
+
+   More information about official MC and data can be found
+   `here <https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search>`__
 
 .. rubric:: Rare MC
 
@@ -153,7 +155,7 @@ There will be two directories ``evtgen`` and ``gsim``, and one file ``READER``.
 
 Second step: generate events according to a decay table
 
-Go to evtgen directory
+Go to your evtgen directory
 
 .. code-block:: bash
 
@@ -162,14 +164,14 @@ Go to evtgen directory
    ./runEvtgen nBB.txt [user-decay-table].dec [module-param-config].conf \
       [TotalNomberOfEvents] [EventsPerJob]
 
-[module-param-config].conf is for evtgen module configuration setting.
+``[module-param-config].conf`` is for evtgen module configuration setting.
 There are config setting examples in the package. For B analysis,
 just choose ``Y4S.conf`` for your jobs.
 
-In this step, you will get \*.gen files stored under
+In this step, you will get ``*.gen`` files stored in the
 ``mcproduzh/evtgen/gen`` directory.
 
-Finally, run simulation and produce mdst file.
+Finally, run the simulation and produce the mdst file.
 Go to gsim directory
 
 .. code-block:: bash
@@ -182,7 +184,7 @@ Go to gsim directory
 
    The path to the evtgen files has to be an absolute path!
 
-Now you have MDST files produced in ``mcproduzh/gsim/mdst/`` directory.
+Now you have MDST files produced in the ``mcproduzh/gsim/mdst/`` directory.
 
 .. admonition:: Exercise
    :class: exercise stacked
@@ -229,6 +231,7 @@ The relations between basf and basf2 objects are shown in this figure:
 
 .. image:: b2bii/conversion.png
    :width: 600px
+   :align: center
 
 However, there are still many differences between the Belle detector and the
 Belle II detector, as well as basf and basf2.
@@ -302,12 +305,12 @@ reproduce them:
 
 Belle MDST has two additional data types: ``mdst_gamma`` and ``mdst_pi0``,
 for which there exist no equivalent data type in the Belle II MDST format.
-In other words, ``gamma`` and ``pi0`` particles are already been created in basf.
+In other words, photons and :math:`\pi^0` particles are already created in basf.
 During the conversion, b2bii converter by default creates ``gamma:mdst`` and ``pi0:mdst``.
 
 .. warning::
    Don't use `fillParticleList` to create photon candidates and
-   don't reconstruct pi0 candidates from pairs of two photons by yourself.
+   don't reconstruct :math:`\pi^0` candidates from pairs of two photons by yourself.
 
 .. admonition:: Exercise
    :class: exercise stacked
@@ -414,7 +417,7 @@ The Klongs are stored in the default ``K_L0:mdst``.
 
    * Making basf2 process Belle data is as easy as adding
      ``convertBelleMdstToBelle2Mdst()`` to the top of your steering file.
-   * Be careful with: particle lists and variables in your analysis.
+   * Be careful with particle lists and variables in your analysis.
    * **Never use** `fillParticleList` **to create neutral final state particles!!**
 
 

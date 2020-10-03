@@ -2526,25 +2526,15 @@ def writePi0EtaVeto(
                           'cluster': 'EtaVetoIdentifierWithLargerClusterSize',
                           'both': 'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize'}
 
-    dictPi0ExtraInfoName = {'standard': 'tmp_Pi0ProbOrigin',
-                            'tight': 'tmp_Pi0ProbTightEnergyThreshold',
-                            'cluster': 'tmp_Pi0ProbLargeClusterSize',
-                            'both': 'tmp_Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
+    dictPi0ExtraInfoName = {'standard': 'Pi0ProbOrigin',
+                            'tight': 'Pi0ProbTightEnergyThreshold',
+                            'cluster': 'Pi0ProbLargeClusterSize',
+                            'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
 
-    dictEtaExtraInfoName = {'standard': 'tmp_EtaProbOrigin',
-                            'tight': 'tmp_EtaProbTightEnergyThreshold',
-                            'cluster': 'tmp_EtaProbLargeClusterSize',
-                            'both': 'tmp_EtaProbTightEnergyThresholdAndLargeClusterSize'}
-
-    dictPi0ExtraInfoRename = {'standard': 'Pi0ProbOrigin',
-                              'tight': 'Pi0ProbTightEnergyThreshold',
-                              'cluster': 'Pi0ProbLargeClusterSize',
-                              'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
-
-    dictEtaExtraInfoRename = {'standard': 'EtaProbOrigin',
-                              'tight': 'EtaProbTightEnergyThreshold',
-                              'cluster': 'EtaProbLargeClusterSize',
-                              'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize'}
+    dictEtaExtraInfoName = {'standard': 'EtaProbOrigin',
+                            'tight': 'EtaProbTightEnergyThreshold',
+                            'cluster': 'EtaProbLargeClusterSize',
+                            'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize'}
 
     ListName = dictListName[mode]
     Pi0EnergyCut = dictPi0EnergyCut[mode]
@@ -2554,8 +2544,6 @@ def writePi0EtaVeto(
     EtaPayloadName = dictEtaPayloadName[mode]
     Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
     EtaExtraInfoName = dictEtaExtraInfoName[mode]
-    Pi0ExtraInfoRename = dictPi0ExtraInfoRename[mode]
-    EtaExtraInfoRename = dictEtaExtraInfoRename[mode]
 
     """
     pi0 veto
@@ -2576,7 +2564,7 @@ def writePi0EtaVeto(
     rankByHighest('pi0:Pi0Veto' + ListName, 'extraInfo(' + Pi0ExtraInfoName + ')', numBest=1, path=roe_path)
     # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
     variableToSignalSideExtraInfo('pi0:Pi0Veto' + ListName,
-                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoRename + suffix}, path=roe_path)
+                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoName + suffix}, path=roe_path)
 
     """
     eta veto
@@ -2590,7 +2578,7 @@ def writePi0EtaVeto(
                         extraInfoName=EtaExtraInfoName, identifier=EtaPayloadName)
     rankByHighest('eta:EtaVeto' + ListName, 'extraInfo(' + EtaExtraInfoName + ')', numBest=1, path=roe_path)
     variableToSignalSideExtraInfo('eta:EtaVeto' + ListName,
-                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoRename + suffix}, path=roe_path)
+                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoName + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

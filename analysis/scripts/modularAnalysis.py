@@ -2420,7 +2420,6 @@ def oldwritePi0EtaVeto(
 def writePi0EtaVeto(
     particleList,
     decayString,
-    workingDirectory='.',
     mode='standard',
     downloadFlag=True,
     selection='',
@@ -2446,9 +2445,6 @@ def writePi0EtaVeto(
     * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
     * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
 
-    If you don't have weight files in your workingDirectory,
-    these files are downloaded from the database to your workingDirectory automatically.
-
     The following strings are available for mode:
 
     * standard: loose energy cut and no clusterNHits cut are applied to soft photon
@@ -2472,9 +2468,7 @@ def writePi0EtaVeto(
 
     @param particleList     the input ParticleList
     @param decayString 		specify Particle to be added to the ParticleList
-    @param workingDirectory the weight file directory
     @param mode				choose one mode out of 'standard', 'tight', 'cluster' and 'both'
-    @param downloadFlag 	whether download default weight files or not
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
     @param suffix           optional suffix to be appended to the usual extraInfo name
@@ -2503,9 +2497,6 @@ def writePi0EtaVeto(
     deadEndPath = create_path()
     signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
     fillSignalSideParticleList(f'{hardParticle}:HardPhoton{suffix}', decayString, path=roe_path)
-    if not os.path.isdir(workingDirectory):
-        os.mkdir(workingDirectory)
-        B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
 
     dictListName = {'standard': 'Origin',
                     'tight': 'TightEnergyThreshold',
@@ -2526,16 +2517,6 @@ def writePi0EtaVeto(
                              'tight': 'abs(clusterTiming)<clusterErrorTiming',
                              'cluster': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2',
                              'both': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2'}
-
-    dictPi0WeightFileName = {'standard': 'pi0veto_origin.root',
-                             'tight': 'pi0veto_tight.root',
-                             'cluster': 'pi0veto_cluster.root',
-                             'both': 'pi0veto_both.root'}
-
-    dictEtaWeightFileName = {'standard': 'etaveto_origin.root',
-                             'tight': 'etaveto_tight.root',
-                             'cluster': 'etaveto_cluster.root',
-                             'both': 'etaveto_both.root'}
 
     dictPi0PayloadName = {'standard': 'Pi0VetoIdentifierStandard',
                           'tight': 'Pi0VetoIdentifierWithHigherEnergyThreshold',
@@ -2571,8 +2552,6 @@ def writePi0EtaVeto(
     Pi0EnergyCut = dictPi0EnergyCut[mode]
     EtaEnergyCut = dictEtaEnergyCut[mode]
     TimingAndNHitsCut = dictTimingAndNHitsCut[mode]
-    Pi0WeightFileName = dictPi0WeightFileName[mode]
-    EtaWeightFileName = dictEtaWeightFileName[mode]
     Pi0PayloadName = dictPi0PayloadName[mode]
     EtaPayloadName = dictEtaPayloadName[mode]
     Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
@@ -2592,15 +2571,9 @@ def writePi0EtaVeto(
     # reconstruct pi0
     reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, '',
                      allowChargeViolation=True, path=roe_path)
-    # if you don't have weight files in your workingDirectory,
-    # these files are downloaded from database to your workingDirectory automatically.
-    if not os.path.isfile(workingDirectory + '/' + Pi0WeightFileName):
-        if downloadFlag:
-            basf2_mva.download(Pi0PayloadName, workingDirectory + '/' + Pi0WeightFileName)
-            B2INFO('writePi0EtaVeto: ' + Pi0WeightFileName + ' has been downloaded from database to workingDirectory.')
     # MVA training is conducted.
     roe_path.add_module('MVAExpert', listNames=['pi0:Pi0Veto' + ListName],
-                        extraInfoName=Pi0ExtraInfoName, identifier=workingDirectory + '/' + Pi0WeightFileName)
+                        extraInfoName=Pi0ExtraInfoName, identifier=Pi0PayloadName)
     # Pick up only one pi0/eta candidate with the highest pi0/eta probability.
     rankByHighest('pi0:Pi0Veto' + ListName, 'extraInfo(' + Pi0ExtraInfoName + ')', numBest=1, path=roe_path)
     # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
@@ -2615,12 +2588,8 @@ def writePi0EtaVeto(
     applyCuts(etasoft, TimingAndNHitsCut, path=roe_path)
     reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, '',
                      allowChargeViolation=True, path=roe_path)
-    if not os.path.isfile(workingDirectory + '/' + EtaWeightFileName):
-        if downloadFlag:
-            basf2_mva.download(EtaPayloadName, workingDirectory + '/' + EtaWeightFileName)
-            B2INFO('writePi0EtaVeto: ' + EtaWeightFileName + ' has been downloaded from database to workingDirectory.')
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],
-                        extraInfoName=EtaExtraInfoName, identifier=workingDirectory + '/' + EtaWeightFileName)
+                        extraInfoName=EtaExtraInfoName, identifier=EtaPayloadName)
     rankByHighest('eta:EtaVeto' + ListName, 'extraInfo(' + EtaExtraInfoName + ')', numBest=1, path=roe_path)
     variableToSignalSideExtraInfo('eta:EtaVeto' + ListName,
                                   {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoRename + suffix}, path=roe_path)

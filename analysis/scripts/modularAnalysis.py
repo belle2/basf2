@@ -2425,7 +2425,8 @@ def writePi0EtaVeto(
     downloadFlag=True,
     selection='',
     path=None,
-    suffix=''
+    suffix='',
+    hardParticle='gamma'
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -2491,7 +2492,7 @@ def writePi0EtaVeto(
                     break
                 for submodule in subpath.modules():
                     print(submodule.name())
-                    if f'gamma:HardPhoton{suffix}' in submodule.name():
+                    if f'{hardParticle}:HardPhoton{suffix}' in submodule.name():
                         suffix += '_0'
                         B2WARNING("Same extension already used in writePi0EtaVeto, append '_0'")
                         renameSuffix = True
@@ -2500,7 +2501,7 @@ def writePi0EtaVeto(
     roe_path = create_path()
     deadEndPath = create_path()
     signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
-    fillSignalSideParticleList(f'gamma:HardPhoton{suffix}', decayString, path=roe_path)
+    fillSignalSideParticleList(f'{hardParticle}:HardPhoton{suffix}', decayString, path=roe_path)
     if not os.path.isdir(workingDirectory):
         os.mkdir(workingDirectory)
         B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
@@ -2588,7 +2589,8 @@ def writePi0EtaVeto(
     # apply an additional cut for soft photon
     applyCuts(pi0soft, TimingAndNHitsCut, path=roe_path)
     # reconstruct pi0
-    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> gamma:HardPhoton{suffix} ' + pi0soft, '', path=roe_path)
+    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, '',
+                     allowChargeViolation=True, path=roe_path)
     # if you don't have weight files in your workingDirectory,
     # these files are downloaded from database to your workingDirectory automatically.
     if not os.path.isfile(workingDirectory + '/' + Pi0WeightFileName):
@@ -2610,7 +2612,8 @@ def writePi0EtaVeto(
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaEnergyCut, path=roe_path)
     applyCuts(etasoft, TimingAndNHitsCut, path=roe_path)
-    reconstructDecay('eta:EtaVeto' + ListName + f' -> gamma:HardPhoton{suffix} ' + etasoft, '', path=roe_path)
+    reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, '',
+                     allowChargeViolation=True, path=roe_path)
     if not os.path.isfile(workingDirectory + '/' + EtaWeightFileName):
         if downloadFlag:
             basf2_mva.download(EtaPayloadName, workingDirectory + '/' + EtaWeightFileName)

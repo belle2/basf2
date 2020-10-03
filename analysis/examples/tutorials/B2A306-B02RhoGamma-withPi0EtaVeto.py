@@ -78,7 +78,6 @@ ma.buildRestOfEvent(target_list_name='B0',
 # perform pi0/eta veto
 ma.writePi0EtaVeto(particleList='B0',
                    decayString='B0 -> rho0 ^gamma',
-                   workingDirectory='./pi0etaveto',
                    path=my_path)
 
 # at this stage the B0 candidates should have
@@ -90,15 +89,9 @@ ma.writePi0EtaVeto(particleList='B0',
 # the extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) does not exist. In these cases
 # -999 will be written to the extraInfo(Pi0_Prob) branch and extraInfo(Eta_Prob) branch.
 # You can change extraInfo names of pi0/eta probability by setting pi0vetoname and etavetoname parameters. For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', workingDirectory='./pi0etaveto', pi0vetoname='Pi0_Prob2', etavetoname='Eta_Prob2')
+# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', pi0vetoname='Pi0_Prob2', etavetoname='Eta_Prob2')
 
-# You need at least the default weight files: pi0veto.root and etaveto.root for writePi0EtaVeto.
-# The default files are optimised by MC campaign 9.
-# If you don't have weight files in your workingDirectory,
-# these files are downloaded from database to your workingDirectory automatically.
-# The default workingDirectory is '.'
-# You can also download them from following directory in KEKCC:
-# /gpfs/group/belle2/users/akimasa/pi0etaveto
+# The weight files are optimised by MC campaign 12.
 # If you train by yourself, you should refer to
 # B2A701-ContinuumSuppression_Input.py
 # B2A702-ContinuumSuppression_MVATrain.py

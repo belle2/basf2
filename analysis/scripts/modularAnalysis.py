@@ -2421,7 +2421,6 @@ def writePi0EtaVeto(
     particleList,
     decayString,
     mode='standard',
-    downloadFlag=True,
     selection='',
     path=None,
     suffix='',
@@ -2475,7 +2474,6 @@ def writePi0EtaVeto(
     @param hardPhoton           particle name which is used to calculate the pi0/eta probability (default is gamma)
     """
 
-    import os
     import basf2_mva
 
     renameSuffix = False

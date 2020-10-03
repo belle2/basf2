@@ -32,7 +32,7 @@ stdPhotons("loose", path=mypath)
 # Example 1 : Calculate pi0/eta probability using gamma
 # Reconstruct B0 -> K*0 gamma
 reconstructDecay("K*0:Kpi     -> K+:loose pi-:loose", "", path=mypath)
-reconstructDecay("B0:Kpigamma -> K*0:Kpi gamma:loose", "useCMSFrame( daughter(1, E) ) > 1.4", path=mypath)
+reconstructDecay("B0:Kpigamma -> K*0:Kpi gamma:loose", "useCMSFrame(daughter(1,E))>1.4", path=mypath)
 matchMCTruth("B0:Kpigamma", path=mypath)
 
 # writePi0EtaVeto requires to build ROE
@@ -47,8 +47,8 @@ writePi0EtaVeto(particleList='B0:Kpigamma',
 
 # Example 2 : Calculate pi0/eta probability using non-gamma particle.
 # Reconstruct B+ -> anti-D0 pi+. This is one of the mode to validate the pi0/eta veto tool.
-reconstructDecay("D0:Kpi      -> K-:loose pi+:loose", "", path=mypath)
-reconstructDecay("B+:Dpi      -> anti-D0:Kpi pi+:loose", "useCMSFrame( daughter(1, E) ) > 1.4", path=mypath)
+reconstructDecay("D0:Kpi -> K-:loose pi+:loose", "", path=mypath)
+reconstructDecay("B+:Dpi -> anti-D0:Kpi pi+:loose", "useCMSFrame(daughter(1,E))>1.4", path=mypath)
 matchMCTruth("B+:Dpi", path=mypath)
 
 # writePi0EtaVeto requires to build ROE

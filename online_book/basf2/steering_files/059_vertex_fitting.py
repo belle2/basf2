@@ -14,7 +14,7 @@ import vertex
 filenumber = sys.argv[1]
 
 # set analysis global tag (needed for flavor tagging)
-b2.use_central_database("analysis_tools_release-04-02")
+b2.conditions.prepend_globaltag("analysis_tools_release-04-02")
 
 # create path
 main = b2.Path()
@@ -83,7 +83,7 @@ ma.appendROEMasks("B0", [roe_mask], path=main)
 ft.flavorTagger(["B0"], path=main)
 
 # remove B0 candidates without a valid flavor information
-ma.applyCuts("B0", "qrOutput(FBDT) > -2", path=main)
+ma.applyCuts("B0", "FBDT_qrCombined > -2", path=main)
 
 # fit B vertex on the tag-side
 vertex.TagV("B0", constraintType="tube", fitAlgorithm="Rave", path=main)

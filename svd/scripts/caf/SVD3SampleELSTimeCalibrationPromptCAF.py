@@ -110,7 +110,7 @@ def get_calibrations(input_data, **kwargs):
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
     # collector setup
-    collector = register_module('SVDCoGTimeCalibrationCollector')
+    collector = register_module('SVDTimeCalibrationCollector')
     collector.param("SVDClustersFromTracksName", "SVDClustersFromTracks")
     collector.param("SVDEventInfoName", "SVDEventInfo")
     collector.param("EventT0Name", "EventT0")

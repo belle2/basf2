@@ -24,7 +24,7 @@ using namespace std;
 using namespace Belle2;
 
 SVD3SampleCoGTimeCalibrationAlgorithm::SVD3SampleCoGTimeCalibrationAlgorithm(const std::string& str) :
-  CalibrationAlgorithm("SVDCoGTimeCalibrationCollector")
+  CalibrationAlgorithm("SVDTimeCalibrationCollector")
 {
   setDescription("SVD3SampleCoGTimeCalibration calibration algorithm");
   m_id = str;
@@ -142,26 +142,26 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
 
 bool SVD3SampleCoGTimeCalibrationAlgorithm::isBoundaryRequired(const Calibration::ExpRun& currentRun)
 {
-  float meanRawCoGTimeL3V = 0;
+  float meanRawTimeL3V = 0;
   // auto eventT0Hist = getObjectPtr<TH1F>("hEventT0FromCDC");
-  auto rawCoGTimeL3V = getObjectPtr<TH1F>("hRawCoGTimeL3V");
+  auto rawTimeL3V = getObjectPtr<TH1F>("hRawTimeL3V");
   // float meanEventT0 = eventT0Hist->GetMean();
-  if (!rawCoGTimeL3V) {
-    meanRawCoGTimeL3V = m_previousRawCoGTimeMeanL3V.value();
+  if (!rawTimeL3V) {
+    meanRawTimeL3V = m_previousRawTimeMeanL3V.value();
   } else {
-    meanRawCoGTimeL3V = rawCoGTimeL3V->GetMean();
+    meanRawTimeL3V = rawTimeL3V->GetMean();
   }
-  if (!m_previousRawCoGTimeMeanL3V) {
+  if (!m_previousRawTimeMeanL3V) {
     B2INFO("Setting start payload boundary to be the first run ("
            << currentRun.first << "," << currentRun.second << ")");
-    m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
+    m_previousRawTimeMeanL3V.emplace(meanRawTimeL3V);
 
     return true;
-  } else if (abs(meanRawCoGTimeL3V - m_previousRawCoGTimeMeanL3V.value()) > m_allowedTimeShift) {
-    B2INFO("Histogram mean has shifted from " << m_previousRawCoGTimeMeanL3V.value()
-           << " to " << meanRawCoGTimeL3V << ". We are requesting a new payload boundary for ("
+  } else if (abs(meanRawTimeL3V - m_previousRawTimeMeanL3V.value()) > m_allowedTimeShift) {
+    B2INFO("Histogram mean has shifted from " << m_previousRawTimeMeanL3V.value()
+           << " to " << meanRawTimeL3V << ". We are requesting a new payload boundary for ("
            << currentRun.first << "," << currentRun.second << ")");
-    m_previousRawCoGTimeMeanL3V.emplace(meanRawCoGTimeL3V);
+    m_previousRawTimeMeanL3V.emplace(meanRawTimeL3V);
     return true;
   } else {
     return false;

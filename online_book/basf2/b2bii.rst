@@ -75,7 +75,10 @@ Similar to Belle II MC, there are also different categories of Belle MC:
 
 Generic :math:`B` samples only contain decay modes with :math:`b \to c` quark
 transitions, and have been generated based on the decay tables at
-/sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/DECAY.DEC.
+
+.. code-block::
+
+   /sw/belle/belle/b20090127_0910/share/data-files/evtgenutil/DECAY.DEC.
 
 .. rubric:: How to find Generic MC samples?
 
@@ -87,8 +90,12 @@ You can find the sample(s) you want through
    accessible within KEK domain or via VPN. Or look in the :ref:`onlinebook_ssh`
    tutorial for a way to access it via SSH forwarding.
 
-.. image:: b2bii/bweb3.png
+.. figure:: :: b2bii/bweb3.png
    :width: 600px
+   :align: center
+   :alt: The Belle File Search Engine
+
+   The Belle File Search Engine
 
 By specifying ``Exp No``, ``Event Type``, ``Data Type``, and ``Stream No``,
 ``Event Type`` means different MC types (charged, mixed, uds, .. ).
@@ -115,16 +122,16 @@ Rare :math:`B` MC was generated with an experiment-dependent beam
 energy, but not run-dependent (i.e. The same beam energy and IP profile in
 the same experiment).
 
-Location of those special MC files can be found
-`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:rare_mc_search>`__
- 
+The location of those special MC files can be found
+`here <https://belle.kek.jp/secured/wiki/doku.php?id=software:rare_mc_search>`__.
+
 .. rubric:: Signal MC
 
 As there is no Belle detector description, you can only use basf to produce
 signal MC samples.
 
 Now we will learn how to use the ``mcproduzh`` package to generate signal MC in Belle.
-This package was developed by "U"shiroda-san, A. "Z"upanc, and "H"orii-san, and 
+This package was developed by "U"shiroda-san, A. "Z"upanc, and "H"orii-san, and
 it consists of generation, simulation, and reconstruction based on ``evtgen`` and
 ``gsim`` scripts.
 It will create MC samples for a list of experiments, normalized by their
@@ -152,14 +159,14 @@ Go to evtgen directory
 
    cd mcproduzh/evtgen
 
-   ./runEvtgen nBB.txt [user-decay-table].dec [module-param-config].conf
-   [TotalNomberOfEvents] [EventsPerJob]
+   ./runEvtgen nBB.txt [user-decay-table].dec [module-param-config].conf \
+      [TotalNomberOfEvents] [EventsPerJob]
 
 [module-param-config].conf is for evtgen module configuration setting.
 There are config setting examples in the package. For B analysis,
 just choose ``Y4S.conf`` for your jobs.
 
-In this step, you will get \*.gen files stored under 
+In this step, you will get \*.gen files stored under
 ``mcproduzh/evtgen/gen`` directory.
 
 Finally, run simulation and produce mdst file.
@@ -169,18 +176,19 @@ Go to gsim directory
 
    cd mcproduzh/gsim/
 
-   ./runGsimReco.csh [absolutePathToEvtgenGeneratorFiles/]"
+   ./runGsimReco.csh "[absolutePathToEvtgenGeneratorFiles/]"
 
-**The path to the evtgen files has to be an absolute path.**
+.. warning::
+
+   The path to the evtgen files has to be an absolute path!
 
 Now you have MDST files produced in ``mcproduzh/gsim/mdst/`` directory.
-
 
 .. admonition:: Exercise
    :class: exercise stacked
 
-      Try to generate a MC sample with 1000
-      :math:`B^{+} \to \overline{D}^{0}(\to K^{+} \pi^{-}) \pi^{+}` events.
+   Try to generate a MC sample with 1000
+   :math:`B^{+} \to \overline{D}^{0}(\to K^{+} \pi^{-}) \pi^{+}` events.
 
 .. admonition:: Solution
    :class: toggle solution
@@ -197,10 +205,10 @@ Now you have MDST files produced in ``mcproduzh/gsim/mdst/`` directory.
    .. code-block:: bash
 
       cd ../gsim
-      ./runGsimReco.csh <your_working_directory>/mcproduzh/evtgen/gen/ 
+      ./runGsimReco.csh <your_working_directory>/mcproduzh/evtgen/gen/
 
 More information about MC can be found
-`here <https://belle.kek.jp/secured/wiki/doku.php?id=software%3Amcprod_scripts>`_
+`here <https://belle.kek.jp/secured/wiki/doku.php?id=software%3Amcprod_scripts>`__.
 
 
 Analysis with b2bii
@@ -274,8 +282,8 @@ reproduce them:
 .. admonition:: Exercise
    :class: exercise stacked
 
-    Try to create a list of :math:`K^{+}` with :math:`\text{KID}>0.6`,
-    and another list of :math:`\pi^{+}` with :math:`\text{KID}<0.4`.
+   Try to create a list of :math:`K^{+}` with :math:`\text{KID}>0.6`,
+   and another list of :math:`\pi^{+}` with :math:`\text{KID}<0.4`.
 
 .. admonition:: Solution
    :class: toggle solution
@@ -304,13 +312,13 @@ During the conversion, b2bii converter by default creates ``gamma:mdst`` and ``p
 .. admonition:: Exercise
    :class: exercise stacked
 
-   Can you reconstruct a decay :math:`D^0 \to K^{-} \pi^{+} \pi^{0}` with mass
-   between 1.7 to 2.0 GeV in a b2bii analysis.  
+   Reconstruct the decay :math:`D^0 \to K^{-} \pi^{+} \pi^{0}` with mass
+   between 1.7 to 2.0 GeV in a b2bii analysis.
 
 .. admonition:: Hint
    :class: toggle xhint stacked
 
-   Always use premade particle list for neutrals!
+   Always use premade particle lists for neutrals!
 
 .. admonition:: Solution
    :class: toggle solution
@@ -327,13 +335,13 @@ As mentioned in :ref:`Charged_Final_State_Particles`, all charged tracks are
 parametrised with a helix with the reference point set to ``(0,0,0)`` in basf2.
 This is not optimal in the case of ``V0s`` whose decay vertices can be far away
 from the origin.
-Therefore, all V0 candidates from the Mdst_Vee2 table in basf are converted to
+Therefore, all V0 candidates from the ``Mdst_Vee2`` table in basf are converted to
 ``Particles`` and saved in the particle lists ``K_S0:mdst``, ``Lambda0:mdst``,
 and ``gamma:v0mdst``.
 
 The created particles have momentum and decay vertex position set to values
-given in Belle's Mdst_Vee2 table and their daughters particles with momentum
-and position at the pivot equal to V0 decay vertex. 
+given in Belle's ``Mdst_Vee2`` table and their daughters particles with momentum
+and position at the pivot equal to V0 decay vertex.
 In addition, the quality indicators for :math:`K_{S}^{0}` and
 :math:`\Lambda^{0}` can be used by simply calling :b2:var:`goodBelleKshort` and
 `goodBelleLambda`, respectively.
@@ -359,13 +367,11 @@ In addition, the quality indicators for :math:`K_{S}^{0}` and
 
 .. rubric:: :math:`K_{L}^{0}`
 
-``KLMClusters`` (Mdst_KLM_Cluster) and ``Klongs`` (Mdst_Klong) are converted.
+``KLMClusters`` (``Mdst_KLM_Cluster``) and ``Klongs`` (Mdst_Klong) are converted.
 The Klongs are stored in the default ``K_L0:mdst``.
 
 .. warning::
    Don't use `fillParticleList` to create Klong candidates.
-
-
 
 .. admonition:: Task
    :class: exercise stacked
@@ -383,7 +389,10 @@ The Klongs are stored in the default ``K_L0:mdst``.
    with other variables for all particles in the decay chain to the ntuple.
 
    You can use this line to get the example file:
-   basf2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)
+
+   .. code-block::
+
+      basf2.find_file('b2bii_input_evtgen_exp_07_BptoD0pip-D0toKpipi0-0.mdst', 'examples', False)
 
 .. admonition:: Hint
    :class: toggle xhint stacked
@@ -397,13 +406,13 @@ The Klongs are stored in the default ``K_L0:mdst``.
    :class: toggle solution
 
    .. literalinclude:: b2bii/b2bii_example.py
-
+      :linenos:
 
 
 .. admonition:: Key points
    :class: key-points
 
-   * Making basf2 process Belle data is as easy as adding 
+   * Making basf2 process Belle data is as easy as adding
      ``convertBelleMdstToBelle2Mdst()`` to the top of your steering file.
    * Be careful with: particle lists and variables in your analysis.
    * **Never use** `fillParticleList` **to create neutral final state particles!!**

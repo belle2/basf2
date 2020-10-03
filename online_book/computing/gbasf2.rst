@@ -403,7 +403,7 @@ After verifying that everything is correct, you can confirm the submission.
 
      Submit a gbasf2 job with an steering file built by you in previous chapters of the book, for analyzing
      a datablock of MC13a, MC Event Types ``charged`` with energy ``4S`` and without beam background.
-     Use ``release-05-00-00`` of basf2.
+     Use ``light-2008-kronos`` of basf2.
 
      Remember:
 
@@ -433,7 +433,7 @@ After verifying that everything is correct, you can confirm the submission.
      .. code-block:: bash
 
         gbasf2 -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009551/s00/e1003/4S/r00000/charged/mdst/sub00
-        -s release-05-00-00 -p myFirstProject <your steering file>
+        -s light-2008-kronos -p myFirstProject <your steering file>
 
 
 Submit jobs with multiple LFNs

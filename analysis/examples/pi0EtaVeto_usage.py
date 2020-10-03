@@ -18,6 +18,7 @@ from variables import variables as vm  # shorthand for the variable manager inst
 from stdCharged import stdK, stdPi
 from stdPhotons import stdPhotons
 
+# writePi0EtaVeto uses a payload in analysis global tag.
 basf2.conditions.prepend_globaltag('analysis_tools_release-04-02')
 
 mypath = basf2.create_path()
@@ -38,7 +39,7 @@ matchMCTruth("B0:Kpigamma", path=mypath)
 buildRestOfEvent("B0:Kpigamma", path=mypath)
 
 # Call writePi0EtaVeto
-# particleList : Signal side particleList
+# particleList : Signal side particle's particleList
 # decayString : DecayString specifing a particle which is used to calculate the pi0/eta probability
 writePi0EtaVeto(particleList='B0:Kpigamma',
                 decayString='B0 -> [K*0 -> K+ pi-] ^gamma',

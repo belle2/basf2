@@ -43,7 +43,7 @@ stored and provided. The analyst can then use the skimmed samples to further
 fine tune and improve their research. Skimmed samples are usually around 90%
 smaller than the original data and MC samples they are produced from. These
 samples are thus more manageable to use for analysis development and reduce the
-overall CPU and storage usage requierements of each analyst. Belle II is
+overall CPU and storage usage requirements of each analyst. Belle II is
 expecting to collect 50 ab-1 of data, which will be almost impossible to run on
 without skimming.
 
@@ -54,7 +54,7 @@ K^- \pi^+` will want to examine events where there are at least 3 tracks: two
 for the :math:`D` daughter tracks and one for the lepton. The corresponding skim
 can include such a criteria where only events with more 3 tracks or more are
 included. The skim will also include a loose selection for the reconstruction of
-a :math: `B` meson. Tighter selection criteria related to the lepton or D
+a :math:`B` meson. Tighter selection criteria related to the lepton or D
 reconstruction are usually not applied at skim level. The analyst applied their
 optimized selection on the skimmed samples.
 
@@ -238,13 +238,13 @@ Each new MC campaign or data collection, a list of skims is requested by the
 analysts in the Belle II physics working groups. This is done via the skim
 liaison or via JIRA tickets. Once requested, the skim is run on the large MC
 and/or data samples by the skim production managers. These skims are then
-anounced when ready and made available to the analyst.
+announced when ready and made available to the analyst.
 
 
 Each skim campaign on data or MC samples  has a given name. For example, skims of MC13a
-run-independent MC are listed under the campign name SkimM13ax1. Skims of data are usually
-made available for official processing, like Proc11, or for individual buckets like bucket9,
-bucket10, etc..The corresponding skim campaign names are SkimP11x1 and SkimB9x1-SkimB13x1.
+run-independent MC are listed under the campaign name ``SkimM13ax1``. Skims of data are usually
+made available for official processing, like ``Proc11``, or for individual buckets like ``bucket9``,
+``bucket10``, etc..The corresponding skim campaign names are ``SkimP11x1`` and ``SkimB9x1-SkimB13x1``.
 The production status of available MC and data samples is continuously updated on the
 `Data Production Status <https://confluence.desy.de/display/BI/Data+Production+Status>`_ page.
 Status updates on the readiness of a skim campaign are also posted on the `Skim Confluence page
@@ -252,7 +252,7 @@ Status updates on the readiness of a skim campaign are also posted on the `Skim 
 For example, you can browse `here <https://confluence.desy.de/pages/viewpage.action?pageId=167963852>`_
 for the latest updates on 2020a,b data skims.
 
-To find the list of skim campaign campaigns available on the , simply browse through the app,
+To find the list of skim campaign campaigns available on the, simply browse through the app,
 select Data type: MC or Data and look in the drop-down menu under Campaigns.  All skim campaigns
 start with the not so mysterious name "Skim".
 
@@ -324,8 +324,9 @@ a given skim, as inherited from data production.
     lists one directory. In reality, there are usually ~100 directories per production.
     This is a known bug and will be improved in future developments of the dataset searcher.
 
-For now, a workaround in order is described on the `Skim Confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=167963852>_`
- to run your analysis script on the full set
+For now, a workaround in order is described on the
+`Skim Confluence page <https://confluence.desy.de/pages/viewpage.action?pageId=167963852>_`
+to run your analysis script on the full set
 of skimmed data samples available for a given campaign.
 
 

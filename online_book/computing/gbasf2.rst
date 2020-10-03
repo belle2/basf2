@@ -34,11 +34,9 @@ Gbasf2
         * Download the output for offline analysis.
 
 
-Gbasf2 is an extension of basf2, from your desktop to the grid.
+Gbasf2 is the command-line client for submitting grid-based basf2 jobs.
 Data and MC samples are distributed in many storage sites around the world, and the gbasf2 tools allow you to access and
 analyze them.
-
-.. seealso:: :ref:`onlinebook_computing_system`
 
 The same steering files used with basf2 work with gbasf2, and the usual workflow is:
 
@@ -47,7 +45,6 @@ The same steering files used with basf2 work with gbasf2, and the usual workflow
 * Locate your input files.
 * Submit jobs to the grid with the same steering file.
 * Download the output to perform the offline analysis (plots, fits, etc.)
-
 
 .. warning::
 
@@ -76,7 +73,10 @@ and verify that you have the prerequisites. You need:
 Installing gbasf2
 -----------------
 
-Unfortunately, at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
+Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
+gbasf2 can function. At this moment, only SL6 and CentOS 7 are supported.
+
+Also, unfortunately at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).
 
 .. note::
@@ -210,7 +210,7 @@ The command-line tool for listing the content of a directory on the grid is ``gb
      will show you that the dataset contains 3 datablocks.
 
 
-.. tip::
+.. note::
 
     Sometimes, in the documentation (such as Confluence pages) we refer to the **logical path name** (LPN)
     of datasets and datablocks, while for files we keep LFN. In practice, LFN and LPN are the same thing.
@@ -310,7 +310,8 @@ version to use.
 .. warning::
 
     Do not use special characters in the project names ($, #, %, /, etc.),
-    it could create problems with file names in some sites and in the databases.
+    it could create problems with file names in some sites and in the databases
+    (we allow only ``[^a-zA-Z0-9+-_]``).
 
 
 Once located the dataset to use for your analysis, you can specify the LFN of the **datablock** to use as input with
@@ -696,27 +697,6 @@ Additionally, some pages at Confluence are prepared with additional information:
 Take a look to the `gbasf2 tutorials <https://confluence.desy.de/display/BI/GBasf2+Tutorials>`_ (they contain some advanced topics not covered here).
 
 You can also ask in `questions.belle2.org <https://questions.belle2.org/questions>`_.
-Even you can answer questions from other users and earn some karma!
-
-
-And, we need your help!
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Computers are not so smart. Sometimes, they fail.
-
-* "Sometimes" x Huge Resources = **"Often"**
-* The computing system need 24 hour x 7 day care.
-
-Please help us as a Data Production Shifter. You can book at `shift.belle2.org <https://shift.belle2.org/>`_
-(a `very nice manual <https://confluence.desy.de/display/BI/Computing+ShiftManual>`_ is already prepared).
-
-If you have some experience as data production shifter, please become an Expert Shifter.
-The `Expert Shifter training course <https://confluence.desy.de/display/BI/DC+Operations+Experts+Manual#DCOperationsExpertsManual-RoadtoanExpertShifter>`_ is open.
-
-
-You will learn a lot about the computing system, and it is a very important service to the collaboration.
-
-
 
 
 .. topic:: Author of this lesson

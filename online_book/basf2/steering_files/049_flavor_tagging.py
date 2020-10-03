@@ -76,7 +76,7 @@ roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
 ma.appendROEMasks("B0", [roe_mask], path=main)
 
 # call flavor tagging
-ft.flavorTagger("B0", path=main)
+ft.flavorTagger(["B0"], path=main)
 
 # remove B0 candidates without a valid flavor information
 ma.applyCuts("B0", "qrOutput(FBDT) > -2", path=main)

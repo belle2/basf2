@@ -302,7 +302,7 @@ information about a python object you are using. The definition of a python
 object includes commands, packages, modules, classes, types...
 basically anything that has a description called a *docstring*).
 There are multiple ways to access this information, including
-what is already discussed  in :ref:`_onlinebook_basf2_introduction`.
+what is already discussed  in :ref:`onlinebook_basf2_introduction`.
 For jupyter notebooks, a great interactive way to access the information
 (docstring) is by putting your cursor on the object in question and pressing
 ``Shift + Tab``.

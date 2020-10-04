@@ -86,7 +86,7 @@ ft.flavorTagger(["B0"], path=main)
 ma.applyCuts("B0", "FBDT_qrCombined > -2", path=main)
 
 # fit B vertex on the tag-side
-vertex.TagV("B0", constraintType="tube", fitAlgorithm="Rave", path=main)
+vertex.TagV("B0", fitAlgorithm="Rave", path=main)
 
 # perform best candidate selection
 b2.set_random_seed("Belle II StarterKit")

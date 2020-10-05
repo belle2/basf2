@@ -132,6 +132,11 @@ It can take the numbers
 That means that we can check how well our flavor tagger performed by comparing
 it to `FBDT_qrCombined`!
 
+.. admonition:: Exercise (optional)
+    :class: exercise
+
+    Plot a histogram of ``FBDT_qrCombined`` and ``qrMC``.
+
 .. admonition:: Exercise
     :class: exercise stacked
 

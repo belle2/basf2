@@ -12,12 +12,14 @@ ax.hist(
     histtype="step",
     linewidth=1.5,
     label=r"True $\bar B^0$",
+    bins=30,
 )
 ax.hist(
     df.query("qrMC == 1.")["FBDT_qrCombined"],
     histtype="step",
     linewidth=1.5,
     label=r"True $B^0$",
+    bins=30,
 )
 ax.set_xlabel("FBDT_qrCombined")
 ax.legend()

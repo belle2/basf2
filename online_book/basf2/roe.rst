@@ -149,7 +149,7 @@ For our example, let's start by defining the following selection cut strings:
 .. literalinclude:: steering_files/029_roe.py
      :lines: 47-50
      :emphasize-lines: 49-50
-     :lineno-start: 3-4
+     :lineno-start: 47
 
 
 Here we created different cuts for charged particles, like electrons or charged pions, and for photons,

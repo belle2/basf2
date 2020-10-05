@@ -294,8 +294,7 @@ gateway servers first, either ``sshcc1.kek.jp`` or ``sshcc2.kek.jp``
 
 .. warning::
 
-    Your username on KEKCC is not necessarily the same as your DESY username
-    (that you have used to log in to ``bastion.desy.de``).
+    Your username on KEKCC is not necessarily the same as your DESY username.
 
 and once this connection is established you can login to KEKCC from this gateway
 server.
@@ -371,15 +370,16 @@ login to KEKCC by just typing ``ssh kekcc`` and also copy files directly with
 ``scp``. But you will have to enter your password two times, once when
 connecting to the gateway server and then when connecting to the KEKCC machine.
 
-.. admonition:: ``ProxyJump`` trouble
-    :class: toggle
+.. admonition:: In case of ``ProxyJump`` trouble
+    :class: toggle warning
 
     The ``ProxyJump`` directive was introduced in OpenSSH 7.3. If you get an
     error message ``Bad configuration option: proxyjump``, please check if
     you can update your SSH client.
 
     While we definitely recommend you to get an up-to-date system that can use
-    the newer version, a quick workaround is to add the following line:
+    the newer version, a quick workaround is to replace the ``ProxyJump`` line
+    with the following (using ``ProxyCommand``):
 
     .. code-block::
 

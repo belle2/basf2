@@ -132,8 +132,7 @@ void PXDPackerModule::initialize()
 void PXDPackerModule::beginRun()
 {
   if (m_overrideFirmwareVersion == 0) {
-    if (m_firmwareFromDB && (*m_firmwareFromDB)
-        && (*m_firmwareFromDB).isValid()) m_firmware = (**m_firmwareFromDB).getDHHFirmwareVersion();
+    if (m_firmwareFromDB.isValid()) m_firmware = (*m_firmwareFromDB).getDHHFirmwareVersion();
     else B2FATAL("Could not read PXD Firmware version from db");
   } else {
     m_firmware = m_overrideFirmwareVersion;

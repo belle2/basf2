@@ -62,19 +62,19 @@ NEW_RECO_DIGITS_NAME = "SVDRecoDigitsFromTracks"
 NEW_SHAPER_DIGITS_NAME = "SVDShaperDigitsFromTracks"
 
 
-def create_collector(name="SVDCoGTimeCalibrationCollector",
+def create_collector(name="SVDTimeCalibrationCollector",
                      clusters="SVDClustersFromTracks",
                      event_info="SVDEventInfo",
                      event_t0="EventT0",
                      granularity="run"):
     """
-    Simply creates a SVDCoGTimeCalibrationCollector module with some options.
+    Simply creates a SVDTimeCalibrationCollector module with some options.
 
     Returns:
         pybasf2.Module
     """
 
-    collector = register_module("SVDCoGTimeCalibrationCollector")
+    collector = register_module("SVDTimeCalibrationCollector")
     collector.set_name(name)
     collector.param("SVDClustersFromTracksName", clusters)
     collector.param("SVDEventInfoName", event_info)
@@ -249,6 +249,8 @@ def create_pre_collector_path(clusterizers):
     add_tracking_reconstruction(path)
     path = remove_module(path, "V0Finder")
 
+    path = remove_module(path, "V0Finder")
+
     for moda in path.modules():
         if moda.name() == "SVDCoGTimeEstimator":
             moda.param("CalibrationWithEventT0", False)
@@ -357,21 +359,21 @@ def get_calibrations(input_data, **kwargs):
     if isMC:
         eventInfo = "SVDEventInfoSim"
 
-    coll_cog6 = create_collector(name=f"SVDCoGTimeCalibrationCollector{cog6_suffix}",
+    coll_cog6 = create_collector(name=f"SVDTimeCalibrationCollector{cog6_suffix}",
                                  clusters=f"SVDClustersFromTracks{cog6_suffix}",
                                  event_info=eventInfo,
                                  event_t0="EventT0")
 
     algo_cog6 = create_algorithm(unique_id_cog6, prefix=coll_cog6.name(), min_entries=10000)
 
-    coll_cog3 = create_collector(name=f"SVDCoGTimeCalibrationCollector{cog3_suffix}",
+    coll_cog3 = create_collector(name=f"SVDTimeCalibrationCollector{cog3_suffix}",
                                  clusters=f"SVDClustersFromTracks{cog3_suffix}",
                                  event_info=eventInfo,
                                  event_t0="EventT0")
 
     algo_cog3 = create_algorithm(unique_id_cog3, prefix=coll_cog3.name(), min_entries=10000)
 
-    coll_els3 = create_collector(name=f"SVDCoGTimeCalibrationCollector{els3_suffix}",
+    coll_els3 = create_collector(name=f"SVDTimeCalibrationCollector{els3_suffix}",
                                  clusters=f"SVDClustersFromTracks{els3_suffix}",
                                  event_info=eventInfo,
                                  event_t0="EventT0")

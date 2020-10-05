@@ -80,23 +80,6 @@ start right away!
         :lines: 78-79
         :lineno-start: 78
 
-Good!
-Now let's talk about the output of the flavor tagger. This is the value
-:math:`q\cdot r`, where :math:`q=-1` corresponds to a :math:`\bar B^0` and
-:math:`q=+1` to :math:`B^0`. :math:`r` is called the dilution factor. It's 0
-if the algorighm can't decide between both options for :math:`q` and 1 if the
-algorithm is certain about it's decision.
-
-The variable `FBDT_qrCombined` is the :math:`q\cdot r` result of one of the
-models of the `FlavorTagger` (a *fast boosted decision tree*).
-It can also be ``NaN`` to signal that not a single charged
-track in the ROE was found, so that the algorithm can't work.
-
-.. note::
-
-    In releases before release-05, a value of :math:`\pm 2` was used instead of
-    ``NaN``.
-
 .. admonition:: Exercise
     :class: stacked exercise
 
@@ -124,7 +107,25 @@ track in the ROE was found, so that the algorithm can't work.
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :linenos:
 
-Part of the variables you just added was also ``qrMC``. It can take the numbers
+Good!
+Now let's talk about the output of the flavor tagger. This is the value
+:math:`q\cdot r`, where :math:`q=-1` corresponds to a :math:`\bar B^0` and
+:math:`q=+1` to :math:`B^0`. :math:`r` is called the dilution factor. It's 0
+if the algorighm can't decide between both options for :math:`q` and 1 if the
+algorithm is certain about it's decision.
+
+The variable `FBDT_qrCombined` is the :math:`q\cdot r` result of one of the
+models of the `FlavorTagger` (a *fast boosted decision tree*).
+It can also be ``NaN`` to signal that not a single charged
+track in the ROE was found, so that the algorithm can't work.
+
+.. note::
+
+    In releases before release-05, a value of :math:`\pm 2` was used instead of
+    ``NaN``.
+
+Part of the variables you just added was also ``qrMC`` for the "true" (MC level) flavor of the :math:`B_\text{tag}`.
+It can take the numbers
 :math:`\pm 1`, as well as 0 (no flavor defined in the MC) and :math:`\pm 2`
 (some problems with MC matching in the ROE).
 

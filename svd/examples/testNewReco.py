@@ -43,6 +43,20 @@ class SVDClustersQuickCheck(basf2.Module):
         self.chargeNew = TH1F("clNew_charge", "New Cluster Charge", 300, 0, 100000)
         self.position = TH1F("cl_position", "Cluster Position", 3000, -6, 6)
         self.positionNew = TH1F("clNew_position", "New Cluster Position", 3000, -6, 6)
+        self.positionSigma = TH1F("cl_positionSigma", "Cluster Position Error", 300, 0, 100)
+        self.positionSigmaNew = TH1F("clNew_positionSigma", "New Cluster Position Error", 300, 0, 100)
+        self.positionS1 = TH1F("cl_positionS1", "Cluster Position Size 1", 3000, -6, 6)
+        self.positionS1New = TH1F("clNew_positionS1", "New Cluster Position Size 1", 3000, -6, 6)
+        self.positionS1Sigma = TH1F("cl_positionS1Sigma", "Cluster Position Error Size 1", 300, 0, 100)
+        self.positionS1SigmaNew = TH1F("clNew_positionS1Sigma", "New Cluster Position Error Size 1", 300, 0, 100)
+        self.positionS2 = TH1F("cl_positionS2", "Cluster Position Size 2", 3000, -6, 6)
+        self.positionS2New = TH1F("clNew_positionS2", "New Cluster Position Size 2", 3000, -6, 6)
+        self.positionS2Sigma = TH1F("cl_positionS2Sigma", "Cluster Position Size Error 2", 300, 0, 100)
+        self.positionS2SigmaNew = TH1F("clNew_positionS2Sigma", "New Cluster Position Error Size 2", 300, 0, 100)
+        self.positionS3 = TH1F("cl_positionS3", "Cluster Position Size >2", 3000, -6, 6)
+        self.positionS3New = TH1F("clNew_positionS3", "New Cluster Position Size >2", 3000, -6, 6)
+        self.positionS3Sigma = TH1F("cl_positionS3Sigma", "Cluster Position Error Size >2", 300, 0, 100)
+        self.positionS3SigmaNew = TH1F("clNew_positionS3Sigma", "New Cluster Position Error Size >2", 300, 0, 100)
 
         geoCache = Belle2.VXD.GeoCache.getInstance()
 
@@ -76,6 +90,16 @@ class SVDClustersQuickCheck(basf2.Module):
             self.ff.Fill(d.getFirstFrame())
             self.charge.Fill(d.getCharge())
             self.position.Fill(d.getPosition())
+            self.positionSigma.Fill(d.getPositionSigma() * 1e4)
+            if d.getSize() == 1:
+                self.positionS1.Fill(d.getPosition())
+                self.positionS1Sigma.Fill(d.getPositionSigma() * 1e4)
+            if d.getSize() == 2:
+                self.positionS2.Fill(d.getPosition())
+                self.positionS2Sigma.Fill(d.getPositionSigma() * 1e4)
+            if d.getSize() > 2:
+                self.positionS3.Fill(d.getPosition())
+                self.positionS3Sigma.Fill(d.getPositionSigma() * 1e4)
             isU = 0
             if(d.isUCluster()):
                 isU = 0.5
@@ -88,6 +112,17 @@ class SVDClustersQuickCheck(basf2.Module):
             self.ffNew.Fill(d.getFirstFrame())
             self.chargeNew.Fill(d.getCharge())
             self.positionNew.Fill(d.getPosition())
+            self.positionSigmaNew.Fill(d.getPositionSigma() * 1e4)
+            if d.getSize() == 1:
+                self.positionS1New.Fill(d.getPosition())
+                self.positionS1SigmaNew.Fill(d.getPositionSigma() * 1e4)
+            if d.getSize() == 2:
+                self.positionS2New.Fill(d.getPosition())
+                self.positionS2SigmaNew.Fill(d.getPositionSigma() * 1e4)
+            if d.getSize() > 2:
+                self.positionS3New.Fill(d.getPosition())
+                self.positionS3SigmaNew.Fill(d.getPositionSigma() * 1e4)
+
             isU = 0
             if(d.isUCluster()):
                 isU = 0.5
@@ -95,7 +130,7 @@ class SVDClustersQuickCheck(basf2.Module):
                                                                   d.getSensorID().getSensorNumber()+isU)
 
     def terminate(self):
-        f = TFile("quicktestSVDCluster.root", "RECREATE")
+        f = TFile("quicktestSVDClusterOldDefault.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
             hist.GetYaxis().SetTitle("sensor # + 0.5 is isU")
@@ -129,6 +164,41 @@ class SVDClustersQuickCheck(basf2.Module):
         self.position.Write()
         self.positionNew.GetXaxis().SetTitle("clusterNew position")
         self.positionNew.Write()
+
+        self.positionSigma.GetXaxis().SetTitle("cluster position error (#mum)")
+        self.positionSigma.Write()
+        self.positionSigmaNew.GetXaxis().SetTitle("clusterNew position error (#mum)")
+        self.positionSigmaNew.Write()
+
+        self.positionS1.GetXaxis().SetTitle("cluster position")
+        self.positionS1.Write()
+        self.positionS1New.GetXaxis().SetTitle("clusterNew position")
+        self.positionS1New.Write()
+
+        self.positionS1Sigma.GetXaxis().SetTitle("cluster position error (#mum)")
+        self.positionS1Sigma.Write()
+        self.positionS1SigmaNew.GetXaxis().SetTitle("clusterNew position error (#mum)")
+        self.positionS1SigmaNew.Write()
+
+        self.positionS2.GetXaxis().SetTitle("cluster position")
+        self.positionS2.Write()
+        self.positionS2New.GetXaxis().SetTitle("clusterNew position")
+        self.positionS2New.Write()
+
+        self.positionS2Sigma.GetXaxis().SetTitle("cluster position error (#mum)")
+        self.positionS2Sigma.Write()
+        self.positionS2SigmaNew.GetXaxis().SetTitle("clusterNew position error (#mum)")
+        self.positionS2SigmaNew.Write()
+
+        self.positionS3.GetXaxis().SetTitle("cluster position")
+        self.positionS3.Write()
+        self.positionS3New.GetXaxis().SetTitle("clusterNew position")
+        self.positionS3New.Write()
+
+        self.positionS3Sigma.GetXaxis().SetTitle("cluster position error (#mum)")
+        self.positionS3Sigma.Write()
+        self.positionS3SigmaNew.GetXaxis().SetTitle("clusterNew position error (#mum)")
+        self.positionS3SigmaNew.Write()
 
         f.Close()
 
@@ -237,15 +307,15 @@ add_svd_reconstruction(main)
 for mod in main.modules():
     if(mod.name() == "SVDSimpleClusterizer"):
         mod.param("timeAlgorithm", 0)
-        mod.param("HeadTailSize", 100)
+        mod.param("HeadTailSize", 3)
 
 clusterizer = register_module('SVDClusterizer')
 clusterizer.param('timeAlgorithm6Samples', "CoG6")
 clusterizer.param('timeAlgorithm3Samples', "CoG6")
 clusterizer.param('chargeAlgorithm6Samples', "MaxSample")
 clusterizer.param('chargeAlgorithm3Samples', "MaxSample")
-clusterizer.param('positionAlgorithm6Samples', "CoGOnly")
-clusterizer.param('positionAlgorithm3Samples', "CoGOnly")
+clusterizer.param('positionAlgorithm6Samples', "oldDefault")
+clusterizer.param('positionAlgorithm3Samples', "oldDefault")
 clusterizer.param('Clusters', "SVDNewClusters")
 clusterizer.param('useDB', True)
 main.add_module(clusterizer)

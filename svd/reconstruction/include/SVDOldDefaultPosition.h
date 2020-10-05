@@ -10,34 +10,41 @@
 
 #pragma once
 
-//abstract class:
+#include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterPosition.h>
-//derived classes:
-#include <svd/reconstruction/SVDCoGOnlyPosition.h>
-#include <svd/reconstruction/SVDOldDefaultPosition.h>
+
+#include <vector>
 
 namespace Belle2 {
 
   namespace SVD {
 
     /**
-     * Cluster Position Factory Class
+     * Derived Class representing the SVD cluster position
+     * computed with the old algorithm (up to release-05).
      */
-    class SVDRecoPositionFactory {
+    class SVDOldDefaultPosition : public SVDClusterPosition {
 
     public:
 
-      static SVDClusterPosition* NewPosition(const std::string& description)
-      {
-        if (description == "CoGOnly")
-          return new SVDCoGOnlyPosition;
-        if (description == "oldDefault")
-          return new SVDOldDefaultPosition;
+      /**
+       * @return the first frame and the cluster position
+       */
+      double getClusterPosition(const Belle2::SVD::RawCluster& rawCluster) override;
 
-        B2WARNING("the SVD cluster position algorithm is not recognized, using oldDefault!");
+      /**
+       * @return the cluster position error
+       */
+      double getClusterPositionError(const Belle2::SVD::RawCluster& rawCluster) override;
 
-        return new SVDOldDefaultPosition;
-      }
+      /**
+       * virtual destructor
+       */
+      virtual ~SVDOldDefaultPosition() {};
+
+    private:
+
+
     };
 
   }

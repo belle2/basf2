@@ -165,159 +165,45 @@ class SingleTagPseudoScalar(BaseSkim):
         stdPhotons("all", path=path)
 
     def build_lists(self, path):
-        # ------------------------------------------------------------
-        # Used cuts
-        # --
-        # Condition for a tagged electron
-        #  - The tagged electron must be identified as electron and must have high
-        #    energy  greater than 1.5 GeV.
-        #  - dz, dr cuts should be tight enough to remove duplicated tracks.
-        # --
-        Electron_IPcut = 'abs(dz) < 2.0 and dr < 0.5'
-        Pt_cut = 'pt > 0.15'
-        ElectronIDcut = 'electronID > 0.7'    # require electron ID
-        ElectronEcut = 'E > 1.5'              # tagged electron condition.
-        # --
-        # Condition for charged pions. These pions are used to reconstruct  eta, eta'.
-        # -
-        Pion_IPcut = 'abs(dz) < 2.0 and dr < 0.5'
-        PionIDcut = 'electronID < 0.7'
-        # --
-        # Condition for photons, used for pi0/eta/eta' reconstruction.
-        # -
-        good_cluster = 'clusterE > 0.1'
-        # --
-        # pi0  mass region, A wide mass region is chosen to see background shape.
-        # -
-        pi0_mass_wide = '0.06 < InvM < 0.18'
-        # --
-        # pi0_energy.  This energy cut is applied for e(e)pi0 mode only.
-        # -
-        pi0_energy = ' E > 0.5'
-        # --
-        # eta, eta'  mass region.
-        # A wide mass region is chosen to see the background shape.
-        # -
-        eta_mass_wide = '0.50 < InvM < 0.60'
-        etap_mass_wide = '0.91 < InvM < 1.10'
-        # --------------------------------------------------------------------------------------------
-        # ---
-        #  Selection of tagged electron/positron.
-        #
-        #   particle-list:
-        #    e+:all         : all
-        #    e+:good     : electron ID > 0.7, Originating from IP.
-        #    e+:highE    : E_lab> 1.5GeV                                       -> nhighEel
-        # ---
-        # e+:good
-        ma.cutAndCopyList('e+:good', 'e+:all',
-                          Electron_IPcut + ' and '
-                          + Pt_cut + ' and '
-                          + ElectronIDcut, path=path)
-        va.addAlias('ngoodelectron', 'nParticlesInList(e+:good)')
-        ma.rankByHighest('e+:good', "p", path=path)
-        va.addAlias('egood_pRank', 'extraInfo(p_rank)')
+        label = "PseudoScalarSkim"
+        TrackCuts = "abs(dz) < 2.0 and dr < 0.5 and pt > 0.15"
 
-        # --e+:highE
-        ma.cutAndCopyList('e+:highE', 'e+:good', ElectronEcut, path=path)
-        va.addAlias('nhighEel', 'nParticlesInList(e+:highE)')
+        ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and electronID > 0.7", path=path)
+        ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and electronID < 0.7", path=path)
+        ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path)
 
-        # --
-        # Selection of charged pions
-        # -
-        #    pi+:all      : all
-        #    pi+:good     : Originating from IP. abs(dz)<2.0cm  dr <0.5 cm,
-        #                           pt>0.15
-        #                           not identified as an electron, (electron ID < 0.7),  -> npion
-        # --
-        #  pi+:good, npion
-        ma.cutAndCopyList('pi+:good', 'pi+:all',
-                          Pion_IPcut + ' and '
-                          + Pt_cut + ' and '
-                          + PionIDcut, path=path)
-        va.addAlias('npion', 'nParticlesInList(pi+:good)')
-        # ---
-        #  Selection of gammas
-        #      gamma:all    : all
-        #      gamma:good   : E>0.1 GeV     -> nphoton
-        # ---
-        #
-        ma.cutAndCopyList('gamma:good', 'gamma:all', good_cluster, path=path)
-        va.addAlias('nphoton', 'nParticlesInList(gamma:good)')
+        pi0MassWindow = "0.06 < InvM < 0.18"
+        etaMassWindow = "0.50 < InvM < 0.60"
+        etapMassWindow = "0.91 < InvM < 1.10"
+        ModesAndCuts = [
+            (f"pi0:{label}_loose -> gamma:{label} gamma:{label}", pi0MassWindow),
+            (f"eta:gg -> gamma:{label} gamma:{label}", etaMassWindow),
+            (f"eta:pipipi0 -> pi+:{label} pi-:{label} pi0:{label}_loose", etaMassWindow),
+            (f"eta:pipig -> pi+:{label} pi-:{label} gamma:{label}", etaMassWindow),
+            (f"eta':pipieta_gg -> pi+:{label} pi-:{label} eta:gg", etapMassWindow),
+            (f"eta':pipig -> pi+:{label} pi-:{label} gamma:{label}", etapMassWindow),
+        ]
+        for dmID, (mode, cut) in enumerate(ModesAndCuts):
+            ma.reconstructDecay(mode, cut, dmID=dmID, path=path)
 
-        # --
-        #        pi0  reconstruction
-        #
-        #     pi0:loose        : 0.08 < <Mgg  < 0.17
-        #     pi0:highE        : E_pi0  > 0.5 GeV
-        # --
-        #
-        ma.reconstructDecay('pi0:loose -> gamma:good gamma:good',
-                            pi0_mass_wide, dmID=1, path=path)
-        ma.rankByHighest('pi0:loose', "p", path=path)
-        va.addAlias('pi0_p_Rank', 'extraInfo(p_rank)')
-        va.addAlias('npi0loose', 'nParticlesInList(pi0:loose)')
-        # - pi0:highE
-        ma.cutAndCopyList('pi0:highE', 'pi0:loose', pi0_energy, path=path)
-        va.addAlias('npi0highE', 'nParticlesInList(pi0:highE)')
+        ma.cutAndCopyList(f"pi0:{label}_highE", f"pi0:{label}_loose", "E > 0.5", path=path)
 
-        # --
-        #      eta  reconstruction                                                       mode
-        #       eta:gg                       :eta->gg                                     2
-        #       eta:pipipi0                  :eta ->pipipi0                               3
-        #       eta:pipig                    :eta->pipi gamma                             4
-        # --
-        # mode = 2
-        # --
-        ma.reconstructDecay('eta:gg -> gamma:good gamma:good',
-                            eta_mass_wide, dmID=2, path=path)
-        va.addAlias('nmode2', 'nParticlesInList(eta:gg)')
-        # ---
-        # mode = 3
-        #  --
-        ma.reconstructDecay('eta:pipipi0 -> pi+:good pi-:good pi0:loose',
-                            eta_mass_wide, dmID=3, path=path)
-        va.addAlias('nmode3', 'nParticlesInList(eta:pipipi0)')
-        # --
-        #  mode = 4
-        # --
-        ma.reconstructDecay('eta:pipig -> pi+:good pi-:good gamma:good',
-                            eta_mass_wide, dmID=4, path=path)
-        va.addAlias('nmode4', 'nParticlesInList(eta:pipig)')
-        # --
-        # eta'  reconstruction
-        #       eta':pipieta_gg        :eta' -> pipieta (eta->  gg)                      5
-        #       eta':pipig             :eta' -> pipi gamma                               6
-        # --
-        #   mode = 5
-        # --
-        ma.reconstructDecay("eta':pipieta_gg -> pi+:good pi-:good eta:gg",
-                            etap_mass_wide, dmID=5, path=path)
-        va.addAlias('nmode5', "nParticlesInList(eta':pipieta_gg)")
+        particles = [
+            f"pi0:{label}_highE",
+            f"eta:gg",
+            f"eta:pipipi0",
+            f"eta:pipig",
+            f"eta':pipieta_gg",
+            f"eta':pipig"
+        ]
+        ModeSum = " + ".join(f"nParticlesInList({particle})" for particle in particles)
+        presel = f"nParticlesInList(e+:{label}) == 1 and nParticlesInList(pi+:{label}) <= 2"
+        EventCuts = f"{presel} and formula({ModeSum}) >= 1"
 
-        # --
-        #  mode=6
-        # --
-        ma.reconstructDecay("eta':pipig -> pi+:good pi-:good gamma:good",
-                            etap_mass_wide, dmID=6, path=path)
-        va.addAlias('nmode6', "nParticlesInList(eta':pipig)")
-        # --
-        # Final skim condition
-        # --
-        #  Require one tagged electron  and <=2 of other charged tracks.
-        #  --
-        presel = ' nhighEel == 1 and npion <= 2 '
-        va.addAlias('mode_sum',
-                    'formula(npi0highE + nmode2 + nmode3 + nmode4 + nmode5 + nmode6 )')
+        # Although a condition of "mode_sum >= 1" looks like very loose,
+        # the reduction rate of this SingleTagPseudoScalar skim is very large, i.e. 1/50,
+        # since the requirements, one high-energy electron and <=2 other charged
+        # tracks, are quite stringent.
+        path = self.skim_event_cuts(EventCuts, path=path)
 
-        eventcuts = presel + ' and mode_sum >= 1'
-        #
-        #  Although a condition of "mode_sum >= 1" looks like very loose,
-        #  the reduction rate of this SingleTagPseudoScalar skim is very large, i.e. 1/50,
-        #  since the requirements, one high-energy electron and <=2 other charged
-        #  tracks, are quite stringent.
-        #
-        path = self.skim_event_cuts(eventcuts, path=path)
-        #
-        # Only tagged electron information is added to the standard udst output.
-        self.SkimLists = ['e+:highE']
+        self.SkimLists = [f"e+:{label}"]

@@ -81,15 +81,13 @@ ma.writePi0EtaVeto(particleList='B0',
                    path=my_path)
 
 # at this stage the B0 candidates should have
-# extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) value attached.
-# extraInfo(Pi0_Prob) means pi0 probability for the B0 candidates whose gamma daughter.
-# extraInfo(Eta_Prob) means eta probability for the B0 candidates whose gamma daughter.
+# extraInfo(Pi0ProbOrigin) and extraInfo(EtaProbOrigin) value attached.
+# extraInfo(Pi0ProbOrigin) means pi0 probability for the B0 candidates whose gamma daughter.
+# extraInfo(EtaProbOrigin) means eta probability for the B0 candidates whose gamma daughter.
 # For the B0 candidates whose gamma daughter could not be combined with
 # any of the remaining photons to form pi0/eta because of soft photon selection
-# the extraInfo(Pi0_Prob) and extraInfo(Eta_Prob) does not exist. In these cases
-# -999 will be written to the extraInfo(Pi0_Prob) branch and extraInfo(Eta_Prob) branch.
-# You can change extraInfo names of pi0/eta probability by setting pi0vetoname and etavetoname parameters. For example,
-# writePi0EtaVeto('B0', 'B0 -> rho0 ^gamma', pi0vetoname='Pi0_Prob2', etavetoname='Eta_Prob2')
+# the extraInfo(Pi0ProbOrigin) and extraInfo(EtaProbOrigin) does not exist. In these cases
+# NaN will be written to the extraInfo(Pi0ProbOrigin) branch and extraInfo(EtaProbOrigin) branch.
 
 # The weight files are optimised by MC campaign 12.
 # If you train by yourself, you should refer to
@@ -200,7 +198,7 @@ b_vars = vc.kinematics + \
                                    decay_string='B0 -> ^rho0 gamma') + \
     vu.create_aliases_for_selected(list_of_variables=rho_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
-    vu.create_aliases(list_of_variables=['Pi0_Prob', 'Eta_Prob', 'pi0veto'],
+    vu.create_aliases(list_of_variables=['Pi0ProbOrigin', 'EtaProbOrigin', 'pi0veto'],
                       wrapper='extraInfo({variable})',
                       prefix="B")
 

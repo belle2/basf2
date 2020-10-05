@@ -55,14 +55,21 @@ void SVDEventInfoSetterModule::initialize()
   //Register the EventInfo in the data store
   m_svdEventInfoPtr.registerInDataStore(m_svdEventInfoName, DataStore::c_ErrorIfAlreadyRegistered);
 
+  m_simClockState.isOptional();
+
 // TO BE ADDED(?): some functions than can check the validity of the given parameters
 }
 
 void SVDEventInfoSetterModule::event()
 {
   if (m_randomTriggerBin) {
-    const int triggerBinsInAPVclock = 4; //hard coded for the moment
-    m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
+    if (m_simClockState.isValid())
+      m_triggerBin = m_simClockState->getSVDTriggerBin();
+    else {
+      const int triggerBinsInAPVclock = 4; //hard coded for the moment
+      m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
+      B2DEBUG(25, "simClockState, random generation of trigger bin");
+    }
   } else if (m_triggerBin < 0 || m_triggerBin > 3)
     B2ERROR("the triggerBin value is wrong, it must be an integer between 0 and 3, check and fix");
 

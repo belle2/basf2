@@ -88,16 +88,16 @@ Now let's talk about the output of the flavor tagger. This is the value
 :math:`q=+1` to :math:`B^0`. :math:`r` is called the dilution factor. It's 0
 if the algorighm can't decide between both options for :math:`q` and 1 if the
 algorithm is certain about it's decision.
+
 The variable `FBDT_qrCombined` is the :math:`q\cdot r` result of one of the
 models of the `FlavorTagger` (a *fast boosted decision tree*).
-It can also take the value of :math:`-2` to signal that not a single charged
+It can also be NaN to signal that not a single charged
 track in the ROE was found, so that the algorithm can't work.
 
 .. admonition:: Exercise
     :class: stacked exercise
 
-    Place a cut on ``qrOutput(FBDT)`` to avoid this case
-    (take a look at the `applyCuts` function). Also add the the
+    Add the the
     `flavorTagger.flavor_tagging` variable collection to your output
     variables
 
@@ -105,14 +105,8 @@ track in the ROE was found, so that the algorithm can't work.
     :class: toggle solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 81-82
-        :lineno-start: 81
-
-    and
-
-    .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 109
-        :lineno-start: 109
+        :lines: 106
+        :lineno-start: 106
 
 .. admonition:: Exercise
     :class: stacked exercise

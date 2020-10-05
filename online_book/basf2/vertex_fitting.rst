@@ -227,7 +227,7 @@ results.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/059_vertex_fitting.py
-         :emphasize-lines: 11, 62-63, 88-89, 117, 131
+         :emphasize-lines: 11, 62-63, 85-86, 114, 128
          :linenos:
 
 You can now plot some relevant vertex variables. In general, the choice would

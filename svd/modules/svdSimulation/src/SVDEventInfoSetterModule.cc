@@ -43,6 +43,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   addParam("triggerBin", m_triggerBin, "Trigger bin 0/1/2/3 - useful for timing studies. The default is random.", int(999));
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
   addParam("crossTalk", m_xTalk, "Defines the cross-talk flag for the event", bool(false));
+  addParam("relativeShift", m_relativeShift, "Relative shift between 3- and 6-sample events, in units of APV clock / 4", int(0));
 
   // default ModeByte settings: 10 0 10 000 (144)
 }
@@ -54,14 +55,21 @@ void SVDEventInfoSetterModule::initialize()
   //Register the EventInfo in the data store
   m_svdEventInfoPtr.registerInDataStore(m_svdEventInfoName, DataStore::c_ErrorIfAlreadyRegistered);
 
+  m_simClockState.isOptional();
+
 // TO BE ADDED(?): some functions than can check the validity of the given parameters
 }
 
 void SVDEventInfoSetterModule::event()
 {
   if (m_randomTriggerBin) {
-    const int triggerBinsInAPVclock = 4; //hard coded for the moment
-    m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
+    if (m_simClockState.isValid())
+      m_triggerBin = m_simClockState->getSVDTriggerBin();
+    else {
+      const int triggerBinsInAPVclock = 4; //hard coded for the moment
+      m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
+      B2DEBUG(25, "simClockState, random generation of trigger bin");
+    }
   } else if (m_triggerBin < 0 || m_triggerBin > 3)
     B2ERROR("the triggerBin value is wrong, it must be an integer between 0 and 3, check and fix");
 
@@ -77,6 +85,14 @@ void SVDEventInfoSetterModule::event()
   m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
   m_svdEventInfoPtr->setMatchTriggerType(m_TriggerTypeMatch);
   m_svdEventInfoPtr->setCrossTalk(m_xTalk);
+  m_svdEventInfoPtr->setRelativeShift(m_relativeShift);
+
+  int nAPVsamples = 6;
+  if (m_daqMode == 1)
+    nAPVsamples = 3;
+
+  m_svdEventInfoPtr->setNSamples(nAPVsamples);
+
 }
 
 

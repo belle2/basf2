@@ -158,9 +158,11 @@ option = os.environ['BELLE2_OPTION']
 if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')
+    global_env.Append(F90FLAGS='-g')
 elif option == 'opt':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3', '-flto'])
     global_env.Append(FORTRANFLAGS=['-O3'])
+    global_env.Append(F90FLAGS=['-O3'])
     # Parallel LTO avoids sequential bottlenecks when large libraries are
     # linked, but causes oversubscription when linking libraries concurrently.
     # Performance and RAM usage measurements suggest that between these two
@@ -207,7 +209,7 @@ elif option == 'clang':
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
-    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
+    global_env.Append(CCFLAGS=["-O3", "-Wno-missing-braces", '-Wmissing-field-initializers', '-Wshadow', '-Wno-unused-command-line-argument'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
     # system ones. First we disable the default c++ include path

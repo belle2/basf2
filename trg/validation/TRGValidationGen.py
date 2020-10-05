@@ -39,7 +39,7 @@ main.add_module(particlegun)
 add_simulation(main)
 
 # add trigger
-add_tsim(main, component=["CDC", "ECL", "KLM", "GRL", "GDL"])
+add_tsim(main, components=["CDC", "ECL", "KLM", "GRL", "GDL"])
 
 # output
 rootoutput = register_module('RootOutput')

@@ -36,7 +36,7 @@ class SVDChargeSharing(Module):
         nTruehits = truehits.getEntries()
         clusters = Belle2.PyStoreArray('SVDClusters')
         nClusters = clusters.getEntries()
-
+        print("nClusters = "+str(nClusters))
         geoCache = Belle2.VXD.GeoCache.getInstance()
         # Start with clusters and use the relation to get the corresponding
         # digits and truehits.

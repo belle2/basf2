@@ -31,6 +31,7 @@ DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
   //Parameter definition
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
   addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
+  addParam("MonitorPrefix", m_monPrefix, "Monitor Prefix");// force to be set!
   addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
   B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
@@ -50,14 +51,18 @@ void DQMHistAnalysisIPModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisIP: initialized.");
 
+  m_monObj = getMonitoringObject("ip");
+
   TString a;
   a = m_histoname;
-  m_c1 = new TCanvas(a + "_fit");
+  m_c1 = new TCanvas(a + "_fit"); // prefer to change canvas name to monitorPrefix, but then chnages on the web gui are needed :-(
 
   m_line = new TLine(0, 10, 0, 0);
   m_line->SetVertical(true);
   m_line->SetLineColor(8);
   m_line->SetLineWidth(3);
+
+  m_monObj->addCanvas(m_c1);
 
   // need the function to get parameter names
 #ifdef _BELLE2_EPICS
@@ -208,6 +213,10 @@ void DQMHistAnalysisIPModule::event()
       }
       m_c1->Modified();
       m_c1->Update();
+
+      m_monObj->setVariable(m_monPrefix + "_mean", x);
+      m_monObj->setVariable(m_monPrefix + "_width", w);
+
 #ifdef _BELLE2_EPICS
       if (m_useEpics) {
         B2INFO("Update EPICS");

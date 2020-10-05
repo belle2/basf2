@@ -137,12 +137,14 @@ void SVDCoGTimeEstimatorModule::event()
   //start loop on SVDSHaperDigits
   Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
 
+  m_NumberOfAPVSamples = m_storeSVDEvtInfo->getNSamples();
+
+  B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
+
   for (const SVDShaperDigit& shaper : m_storeShaper) {
 
     m_StopCreationReco = false;
 
-    m_NumberOfAPVSamples = fromModeToNumberOfSample((int) modeByte.getDAQMode());
-    B2DEBUG(1, "number of APV samples = " << m_NumberOfAPVSamples);
 
     if (m_StopCreationReco)
       continue;
@@ -237,21 +239,6 @@ void SVDCoGTimeEstimatorModule::terminate()
 {
 }
 
-//definition of the extra functions
-
-int SVDCoGTimeEstimatorModule::fromModeToNumberOfSample(int modality)
-{
-  if (modality == 2)
-    return 6;
-  else if (modality == 1)
-    return 3;
-  else if (modality == 0)
-    return 1;
-
-  B2WARNING("Wrong SVDModeByte = " << modality << "; skipping this SVDShaperDigit!");
-  return -1;
-
-}
 
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)
 {

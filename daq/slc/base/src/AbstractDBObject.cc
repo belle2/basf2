@@ -3,6 +3,7 @@
 #include <daq/slc/base/StringUtil.h>
 
 #include <cstdlib>
+#include <limits>
 
 using namespace Belle2;
 
@@ -75,6 +76,8 @@ void AbstractDBObject::add(const std::string& name, DBField::Property pro)
 const std::string AbstractDBObject::getValueText(const std::string& name)
 const
 {
+  const static int double_precision = std::numeric_limits<double>::digits10 + 2;
+
   if (hasField(name)) {
     switch (getProperty(name).getType()) {
       case DBField::BOOL:   return getBool(name) ? "true" : "false";
@@ -83,7 +86,7 @@ const
       case DBField::INT:    return StringUtil::form("%d", (int)getInt(name));
       case DBField::LONG:   return StringUtil::form("%ld", getLong(name));
       case DBField::FLOAT:  return StringUtil::form("%f", getFloat(name));
-      case DBField::DOUBLE: return StringUtil::form("%f", getDouble(name));
+      case DBField::DOUBLE: return StringUtil::form("%.*e", double_precision, getDouble(name));
       case DBField::TEXT:   return getText(name);
       default: break;
     }

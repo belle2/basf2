@@ -11,7 +11,7 @@ DAQPATH=${TEMP_LOCAL_DIR}/daq/dataobjects/src:${TEMP_LOCAL_DIR}/daq/rawdata/src
 SLCPATH=${TEMP_LOCAL_DIR}/daq/slc/readout/src:${TEMP_LOCAL_DIR}/daq/slc/system/src:${TEMP_LOCAL_DIR}/daq/slc/base/src
 VPATH = ${RAWDATAPATH}:${DAQPATH}:${SLCPATH}
 
-RAWDATAOBJS = RawDataBlockFormat.o RawCOPPERFormat.o RawCOPPERFormat_latest.o PreRawCOPPERFormat_latest.o PostRawCOPPERFormat_latest.o RawHeader_latest.o RawTrailer_latest.o RawTLUFormat.o RawFTSWFormat.o RawFTSWFormat_latest.o CRCCalculator.o 
+RAWDATAOBJS = RawDataBlockFormat.o RawCOPPERFormat.o RawCOPPERFormat_v2.o PreRawCOPPERFormat_v2.o PostRawCOPPERFormat_v2.o RawHeader_v2.o RawTrailer_v2.o RawTLUFormat.o RawFTSWFormat.o RawFTSWFormat_latest.o CRCCalculator.o 
 DAQOBJS = DesSer.o DesSerPrePC.o DesSerCOPPER.o CprErrorMessage.o SendHeader.o SendTrailer.o
 SLCOBJS = RunInfoBuffer.o SharedMemory.o MMutex.o MCond.o LogFile.o Mutex.o Date.o ConfigFile.o StringUtil.o
 OBJS = ${RAWDATAOBJS} ${DAQOBJS} ${SLCOBJS}

@@ -14,11 +14,7 @@
 #include <analysis/modules/TreeFitter/TreeFitterModule.h>
 #include <analysis/VertexFitting/TreeFitter/FitManager.h>
 
-#include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/Particle.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <analysis/utility/ParticleCopy.h>
@@ -95,9 +91,8 @@ TreeFitterModule::TreeFitterModule() : Module(), m_nCandidatesBeforeFit(-1), m_n
 
 void TreeFitterModule::initialize()
 {
-  StoreObjPtr<ParticleList>().isRequired(m_particleList);
-  StoreArray<Belle2::Particle> particles;
-  particles.isRequired();
+  m_plist.isRequired(m_particleList);
+  StoreArray<Particle>().isRequired();
   m_nCandidatesBeforeFit = 0;
   m_nCandidatesAfter = 0;
 
@@ -115,19 +110,17 @@ void TreeFitterModule::beginRun()
 
 void TreeFitterModule::event()
 {
-  StoreObjPtr<ParticleList> plist(m_particleList);
-
-  if (!plist) {
+  if (!m_plist) {
     B2ERROR("ParticleList " << m_particleList << " not found");
     return;
   }
 
   std::vector<unsigned int> toRemove;
-  const unsigned int n = plist->getListSize();
+  const unsigned int n = m_plist->getListSize();
   m_nCandidatesBeforeFit += n;
 
   for (unsigned i = 0; i < n; i++) {
-    Belle2::Particle* particle = plist->getParticle(i);
+    Belle2::Particle* particle = m_plist->getParticle(i);
 
     if (m_updateDaughters == true) {
       ParticleCopy::copyDaughters(particle);
@@ -145,8 +138,8 @@ void TreeFitterModule::event()
     }
 
   }
-  plist->removeParticles(toRemove);
-  m_nCandidatesAfter += plist->getListSize();
+  m_plist->removeParticles(toRemove);
+  m_nCandidatesAfter += m_plist->getListSize();
 }
 
 

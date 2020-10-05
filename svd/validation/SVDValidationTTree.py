@@ -52,7 +52,7 @@ gROOT.ProcessLine('struct EventData {\
     float truehit_time;\
     };')
 
-from ROOT import EventData
+from ROOT import EventData  # noqa
 
 
 class SVDValidationTTree(Module):

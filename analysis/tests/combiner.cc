@@ -19,6 +19,7 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Const.h>
 
 #include <utility>
 #include <algorithm>
@@ -772,9 +773,9 @@ namespace {
 
     // create and initialize the lists
     gamma.create();
-    gamma->initialize(22, "gamma:test");
+    gamma->initialize(Const::photon.getPDGCode(), "gamma:test");
     klong.create();
-    klong->initialize(130, "K_L0:test");
+    klong->initialize(Const::Klong.getPDGCode(), "K_L0:test");
     vpho.create();
     vpho->initialize(10022, "vpho:test");
 
@@ -888,7 +889,8 @@ namespace {
     Particle* g_2 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 1));
     Particle* g_3 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 2));
     Particle* g_4 = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster, 3));
-    Particle* KL  = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 130, Particle::c_Unflavored, Particle::c_ECLCluster, 4));
+    Particle* KL  = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), Const::Klong.getPDGCode(), Particle::c_Unflavored,
+                                                 Particle::c_ECLCluster, 4));
 
 
     Particle* g_1_copy = particles.appendNew(Particle(TLorentzVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
@@ -992,7 +994,7 @@ namespace {
     DataStore::Instance().setInitializeActive(false);
 
     klong_1.create();
-    klong_1->initialize(130, "K_L0:1");
+    klong_1->initialize(Const::Klong.getPDGCode(), "K_L0:1");
 
     // add particles to lists
     pipAll->addParticle(pip_1);

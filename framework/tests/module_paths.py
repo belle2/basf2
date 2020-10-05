@@ -54,6 +54,7 @@ class PrintName(basf2.Module):
         # error level to check that this doesn't prevent execution
         basf2.B2ERROR("In module " + self.name())
 
+
 main = basf2.create_path()
 
 # register necessary modules

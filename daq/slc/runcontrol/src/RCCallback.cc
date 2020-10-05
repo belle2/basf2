@@ -113,7 +113,7 @@ bool RCCallback::perform(NSMCommunicator& com)
   RCState tstate(cmd.nextTState());
   try {
     if (tstate != Enum::UNKNOWN) {
-      log(LogFile::DEBUG, "RC request %s from %s", msg.getNodeName(), msg.getRequestName());
+      log(LogFile::DEBUG, "RC request %s from %s", msg.getRequestName(), msg.getNodeName());
       setState(tstate);
       std::string nodename = getNode().getName();
       bool ismaster = nodename == "RUNCONTROL" ||

@@ -137,6 +137,7 @@ void PXDPackerModule::beginRun()
     m_firmware = m_overrideFirmwareVersion;
   }
 }
+
 void PXDPackerModule::terminate()
 {
 }

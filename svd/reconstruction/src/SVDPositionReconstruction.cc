@@ -117,8 +117,7 @@ namespace Belle2 {
         double first = stripCharge / sumStripCharge * pitch / sqrt(12);
         //        B2INFO("first = " << stripCharge << "/" << sumStripCharge << "*" << pitch << "/" << sqrt(12) << " = " << first);
         double second = (stripPos - getCoGPosition()) / sumStripCharge * averageNoiseInElectrons;
-        //        B2INFO("second = " << "(" << stripPos << " - " << getCoGPosition() << ")/" << sumStripCharge << "*" << averageNoiseInElectrons <<
-        " = " << second);
+        //        B2INFO("second = " << "(" << stripPos << " - " << getCoGPosition() << ")/" << sumStripCharge << "*" << averageNoiseInElectrons <<  " = " << second);
         positionError = TMath::Power(first, 2) + TMath::Power(second, 2);
 
       }

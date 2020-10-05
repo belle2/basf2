@@ -3,8 +3,6 @@
 Flavor tagging
 ==============
 
-.. include:: ../todo.rst
-
 .. sidebar:: Overview
     :class: overview
 
@@ -18,7 +16,7 @@ Flavor tagging
 
     **Questions**:
 
-        * How can I distinguish between a :math:`B^0` and a :math:`\bar B^0`
+        * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
 
     **Objectives**:
 
@@ -33,7 +31,7 @@ This is where the `FlavorTagger` comes in. Used in an analysis, where we have
 reconstructed a signal :math:`B_\text{sig}`, the `FlavorTagger` looks at the ROE
 of the :math:`B_\text{sig}` (i.e. at the :math:`B_\text{tag}`) and applies
 machine learning techniques (also called multivariate analysis) to determine the
-its flavor.
+flavor of the :math:`B_\text{tag}`.
 In this lesson we will not train this model ourselves, but rather use
 pre-computed weights. So where do we get them?
 
@@ -91,8 +89,13 @@ algorithm is certain about it's decision.
 
 The variable `FBDT_qrCombined` is the :math:`q\cdot r` result of one of the
 models of the `FlavorTagger` (a *fast boosted decision tree*).
-It can also be NaN to signal that not a single charged
+It can also be ``NaN`` to signal that not a single charged
 track in the ROE was found, so that the algorithm can't work.
+
+.. note::
+
+    In releases before release-05, a value of :math:`\pm 2` was used instead of
+    ``NaN``.
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -161,8 +164,8 @@ it to `FBDT_qrCombined`!
 .. admonition:: Key points
     :class: key-points
 
-    * The flavor tagger is used to discriminate between :math:`B^0` and
-      :math:`\bar B^0`
+    * The flavor tagger is used to discriminate between :math:`B_\text{tag}^0` and
+      :math:`\bar B_\text{tag}^0`
     * The output is of the form :math:`\pm 1` times the confidence between 0 and
       1.
 

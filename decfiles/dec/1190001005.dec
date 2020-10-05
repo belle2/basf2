@@ -12,10 +12,10 @@
 #
 
 Particle Xsd 2.02 1.38
-LSFLAT Xsu
+LSFLAT Xsd
 #
 Particle anti-Xsd 2.02 1.38
-LSFLAT anti-Xsu
+LSFLAT anti-Xsd
 #
 Decay Upsilon(4S)
 1.0 B0sig anti-B0sig B0 anti-B0	VSS_BMIX dm;

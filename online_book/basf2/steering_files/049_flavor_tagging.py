@@ -78,9 +78,6 @@ ma.appendROEMasks("B0", [roe_mask], path=main)
 # call flavor tagging
 ft.flavorTagger(["B0"], path=main)
 
-# remove B0 candidates without a valid flavor information
-ma.applyCuts("B0", "FBDT_qrCombined > -2", path=main)
-
 # perform best candidate selection
 b2.set_random_seed("Belle II StarterKit")
 ma.rankByHighest("B0", variable="random", numBest=1, path=main)

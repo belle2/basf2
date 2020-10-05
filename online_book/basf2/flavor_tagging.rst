@@ -3,8 +3,6 @@
 Flavor tagging
 ==============
 
-.. include:: ../todo.rst
-
 .. sidebar:: Overview
     :class: overview
 
@@ -18,7 +16,7 @@ Flavor tagging
 
     **Questions**:
 
-        * How can I distinguish between a :math:`B^0` and a :math:`\bar B^0`
+        * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
 
     **Objectives**:
 
@@ -33,7 +31,7 @@ This is where the `FlavorTagger` comes in. Used in an analysis, where we have
 reconstructed a signal :math:`B_\text{sig}`, the `FlavorTagger` looks at the ROE
 of the :math:`B_\text{sig}` (i.e. at the :math:`B_\text{tag}`) and applies
 machine learning techniques (also called multivariate analysis) to determine the
-its flavor.
+flavor of the :math:`B_\text{tag}`.
 In this lesson we will not train this model ourselves, but rather use
 pre-computed weights. So where do we get them?
 
@@ -82,22 +80,10 @@ start right away!
         :lines: 78-79
         :lineno-start: 78
 
-Good!
-Now let's talk about the output of the flavor tagger. This is the value
-:math:`q\cdot r`, where :math:`q=-1` corresponds to a :math:`\bar B^0` and
-:math:`q=+1` to :math:`B^0`. :math:`r` is called the dilution factor. It's 0
-if the algorighm can't decide between both options for :math:`q` and 1 if the
-algorithm is certain about it's decision.
-The variable `FBDT_qrCombined` is the :math:`q\cdot r` result of one of the
-models of the `FlavorTagger` (a *fast boosted decision tree*).
-It can also take the value of :math:`-2` to signal that not a single charged
-track in the ROE was found, so that the algorithm can't work.
-
 .. admonition:: Exercise
     :class: stacked exercise
 
-    Place a cut on ``qrOutput(FBDT)`` to avoid this case
-    (take a look at the `applyCuts` function). Also add the the
+    Add the the
     `flavorTagger.flavor_tagging` variable collection to your output
     variables
 
@@ -105,14 +91,8 @@ track in the ROE was found, so that the algorithm can't work.
     :class: toggle solution
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 81-82
-        :lineno-start: 81
-
-    and
-
-    .. literalinclude:: steering_files/049_flavor_tagging.py
-        :lines: 109
-        :lineno-start: 109
+        :lines: 106
+        :lineno-start: 106
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -127,12 +107,35 @@ track in the ROE was found, so that the algorithm can't work.
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :linenos:
 
-Part of the variables you just added was also ``qrMC``. It can take the numbers
+Good!
+Now let's talk about the output of the flavor tagger. This is the value
+:math:`q\cdot r`, where :math:`q=-1` corresponds to a :math:`\bar B^0` and
+:math:`q=+1` to :math:`B^0`. :math:`r` is called the dilution factor. It's 0
+if the algorighm can't decide between both options for :math:`q` and 1 if the
+algorithm is certain about it's decision.
+
+The variable `FBDT_qrCombined` is the :math:`q\cdot r` result of one of the
+models of the `FlavorTagger` (a *fast boosted decision tree*).
+It can also be ``NaN`` to signal that not a single charged
+track in the ROE was found, so that the algorithm can't work.
+
+.. note::
+
+    In releases before release-05, a value of :math:`\pm 2` was used instead of
+    ``NaN``.
+
+Part of the variables you just added was also ``qrMC`` for the "true" (MC level) flavor of the :math:`B_\text{tag}`.
+It can take the numbers
 :math:`\pm 1`, as well as 0 (no flavor defined in the MC) and :math:`\pm 2`
 (some problems with MC matching in the ROE).
 
 That means that we can check how well our flavor tagger performed by comparing
 it to `FBDT_qrCombined`!
+
+.. admonition:: Exercise (optional)
+    :class: exercise
+
+    Plot a histogram of ``FBDT_qrCombined`` and ``qrMC``.
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -167,8 +170,8 @@ it to `FBDT_qrCombined`!
 .. admonition:: Key points
     :class: key-points
 
-    * The flavor tagger is used to discriminate between :math:`B^0` and
-      :math:`\bar B^0`
+    * The flavor tagger is used to discriminate between :math:`B_\text{tag}^0` and
+      :math:`\bar B_\text{tag}^0`
     * The output is of the form :math:`\pm 1` times the confidence between 0 and
       1.
 

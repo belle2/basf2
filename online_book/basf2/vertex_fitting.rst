@@ -12,13 +12,13 @@ Vertex fitting
 
     **Prerequisites**:
 
-    	* The previous lesson
+        * The previous lesson
 
     **Questions**:
 
         * What is a vertex fit?
         * When do I want to perform a vertex fit?
-	* How should I choose my fit and constraints?
+        * How should I choose my fit and constraints?
 
     **Objectives**:
 
@@ -127,10 +127,10 @@ study).
      .. code-block:: python
 
           import vertex
-	  ...
-	  vertex.kFit("J/psi:ee", conf_level=0.0, path=main)
-	  ...
-	  jpsi_ks_vars += vc.vertex + vc.mc_vertex
+          ...
+          vertex.kFit("J/psi:ee", conf_level=0.0, path=main)
+          ...
+          jpsi_ks_vars += vc.vertex + vc.mc_vertex
 
      You can also set the confidence level to -1, which means failed fits will
      be included. The fit p-value is saved as part of the ``vc.vertex``
@@ -227,7 +227,7 @@ results.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/059_vertex_fitting.py
-         :emphasize-lines: 11, 62-63, 88-89, 117, 131
+         :emphasize-lines: 11, 62-63, 85-86, 114, 128
          :linenos:
 
 You can now plot some relevant vertex variables. In general, the choice would

@@ -15,7 +15,6 @@
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <svd/calibration/SVDClusterCalibrations.h>
-//#include <svd/dbobjects/SVDRecoConfiguration.h>
 
 #include <vector>
 
@@ -53,9 +52,16 @@ namespace Belle2 {
       /** CoG Position error with simple propagation formula*/
       double getCoGPositionErrorPropagation();
       /** AHT Position */
-      double getAHTPosition() {return 0;}
+      double getAHTPosition();
       /** AHT Position error*/
-      double getAHTPositionError() {return 0;};
+      double getAHTPositionError();
+
+    private:
+      /** get the sum of strip charges*/
+      double getSumOfStripCharges();
+
+      /** get the cluster noise as sum in quadrature of strip noise (in electrons)*/
+      double getClusterNoise();
 
     protected:
 
@@ -67,9 +73,6 @@ namespace Belle2 {
 
       /** side of the strip */
       bool m_isUside = 0;
-
-      /**Reconstruction Configuration dbobject*/
-      //      DBObjPtr<SVDRecoConfiguration> m_recoConfig;
 
       /**SVDClusterCalibration calibration wrapper*/
       SVDClusterCalibrations m_ClusterCal;

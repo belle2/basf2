@@ -2424,7 +2424,11 @@ def writePi0EtaVeto(
     selection='',
     path=None,
     suffix='',
-    hardParticle='gamma'
+    hardParticle='gamma',
+    pi0PayloadNameOverride=None,
+    pi0SoftPhotonCutOverride=None,
+    etaPayloadNameOverride=None,
+    etaSoftPhotonCutOverride=None
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -2472,6 +2476,12 @@ def writePi0EtaVeto(
     @param path       		modules are added to this path
     @param suffix           optional suffix to be appended to the usual extraInfo name
     @param hardPhoton           particle name which is used to calculate the pi0/eta probability (default is gamma)
+    @param payloadNameOverride  specify the payload name of pi0 veto only if one wants to use non-default one. (default is None)
+    @param softPhotonCutOverride  specify the soft photon selection criteria of pi0 veto only if one wants to use non-default one.
+                                  (default is None)
+    @param payloadNameOverride  specify the payload name of eta veto only if one wants to use non-default one. (default is None)
+    @param softPhotonCutOverride  specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
+                                  (default is None)
     """
 
     import basf2_mva
@@ -2501,10 +2511,10 @@ def writePi0EtaVeto(
                     'cluster': 'LargeClusterSize',
                     'both': 'TightEnrgyThresholdAndLargeClusterSize'}
 
-    dictPi0EnergyCut = {'standard': '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
-                        'tight': '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]',
-                        'cluster': '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
-                        'both': '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]'}
+    dictPi0EnergyCut = {'standard': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+                        'tight': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+                        'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+                        'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictEtaEnergyCut = {'standard': '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
                         'tight': '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
@@ -2548,12 +2558,17 @@ def writePi0EtaVeto(
     """
     pi0 veto
     """
+    if pi0PayloadNameOverride is not None:
+        Pi0PayloadName = pi0PayloadNameOverride
+    if pi0SoftPhotonCutOverride is None:
+        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + TimingAndNHitsCut
+    else:
+        Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
+
     # define the particleList name for soft photon
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
-    # fill the particleList for soft photon with energy cut
-    fillParticleList(pi0soft, Pi0EnergyCut, path=roe_path)
-    # apply an additional cut for soft photon
-    applyCuts(pi0soft, TimingAndNHitsCut, path=roe_path)
+    # fill the particleList for soft photon with energy, timing and clusterNHits cuts
+    fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
     # reconstruct pi0
     reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, '',
                      allowChargeViolation=True, path=roe_path)
@@ -2569,9 +2584,15 @@ def writePi0EtaVeto(
     """
     eta veto
     """
+    if etaPayloadNameOverride is not None:
+        EtaPayloadName = etaPayloadNameOverride
+    if etaSoftPhotonCutOverride is None:
+        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + TimingAndNHitsCut
+    else:
+        EtaSoftPhotonCut = etaSoftPhotonCutOverride
+
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
-    fillParticleList(etasoft, EtaEnergyCut, path=roe_path)
-    applyCuts(etasoft, TimingAndNHitsCut, path=roe_path)
+    fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)
     reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, '',
                      allowChargeViolation=True, path=roe_path)
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],

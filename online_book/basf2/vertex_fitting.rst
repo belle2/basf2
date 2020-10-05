@@ -12,13 +12,13 @@ Vertex fitting
 
     **Prerequisites**:
 
-    	* The previous lesson
+        * The previous lesson
 
     **Questions**:
 
         * What is a vertex fit?
         * When do I want to perform a vertex fit?
-	* How should I choose my fit and constraints?
+        * How should I choose my fit and constraints?
 
     **Objectives**:
 
@@ -127,10 +127,10 @@ study).
      .. code-block:: python
 
           import vertex
-	  ...
-	  vertex.kFit("J/psi:ee", conf_level=0.0, path=main)
-	  ...
-	  jpsi_ks_vars += vc.vertex + vc.mc_vertex
+          ...
+          vertex.kFit("J/psi:ee", conf_level=0.0, path=main)
+          ...
+          jpsi_ks_vars += vc.vertex + vc.mc_vertex
 
      You can also set the confidence level to -1, which means failed fits will
      be included. The fit p-value is saved as part of the ``vc.vertex``

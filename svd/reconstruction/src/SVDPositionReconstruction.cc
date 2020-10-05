@@ -11,7 +11,6 @@
 #include <framework/logging/Logger.h>
 #include <svd/reconstruction/SVDPositionReconstruction.h>
 #include <svd/reconstruction/SVDChargeReconstruction.h>
-#include <svd/dataobjects/SVDEventInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/geometry/SensorInfo.h>
 
@@ -43,7 +42,6 @@ namespace Belle2 {
         double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
 
         //getting the charge with the algorithm set in the DBobject
-        //  double stripCharge  = chargeReco->getStripCharge("fromRecoDBObject");
         double stripCharge  = chargeReco->getStripCharge();
 
         position += stripPos * stripCharge;
@@ -53,35 +51,101 @@ namespace Belle2 {
       return position / charge;
     }
 
-
-
     double SVDPositionReconstruction::getCoGPositionError()
     {
-
-      //      const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-      //      const VXD::SensorInfoBase& info = geo.getSensorInfo(m_vxdID);
-      //      double pitch = m_isUside ? info.getUPitch() : info.getVPitch();
-
+      const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+      const VXD::SensorInfoBase& info = geo.getSensorInfo(m_vxdID);
+      double pitch = m_isUside ? info.getUPitch() : info.getVPitch();
       double positionError = 0;
 
-      /*
-      SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
-      float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
-      chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
 
-      //if cluster size > 1
-      double a = 3;
-      double sn = m_charge / m_strips.at(0).noise;
-      m_positionError = a * pitch / sn;
+      double sumStripCharge = 0;
 
+      //first compute the sum of strip charges
+      for (auto aStrip : m_strips) {
 
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
+        float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
+        chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
+
+        double stripCharge  = chargeReco->getStripCharge();
+        sumStripCharge += stripCharge;
+      }
+
+      float noiseFirstStrip =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, m_strips.at(0).cellID);
+      float noiseLastStrip =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, m_strips.at(m_strips.size() - 1).cellID);
+      //      float noiseAverage = (noiseFirstStrip + noiseLastStrip) /2;
+      float noiseAverage = noiseFirstStrip;
+
+      double cutAdjacent = m_ClusterCal.getMinAdjSNR(m_vxdID, m_isUside);
+
+      // if cluster size == 1
+      // add a strip charge equal to the zero-suppression threshold to compute the error
       if (m_strips.size() == 1) {
-      // Add a strip charge equal to the zero-suppression threshold to compute the error
-      double phantomCharge = m_cutAdjacent * m_strips.at(0).noise;
-      positionError = pitch * phantomCharge / (m_charge + phantomCharge);
-        }
-      */
+        double phantomCharge = cutAdjacent * noiseFirstStrip;
+        positionError = pitch * phantomCharge / (sumStripCharge + phantomCharge);
+        //  B2INFO("NEW size = 1, pitch = "<<pitch<<" cutAdjacent = "<<cutAdjacent<<", noiseFirstStrip = "<<noiseFirstStrip<<" ERROR  = "<<positionError);
+        return positionError;
+      }
+
+      // if cluster size > 1
+      double a = cutAdjacent;
+      double sn = sumStripCharge / noiseAverage;
+      positionError = a * pitch / sn;
       return positionError;
+
+    }
+
+    double SVDPositionReconstruction::getCoGPositionErrorPropagation()
+    {
+      // just do error propagation of the weighted average with:
+      // assume error on strip position  = pitch / sqrt(12)
+      // assume error on strip charge = noise
+      // strip position in cm
+      // strip charge in electrons
+
+      const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+      const VXD::SensorInfoBase& info = geo.getSensorInfo(m_vxdID);
+      double pitch = m_isUside ? info.getUPitch() : info.getVPitch();
+
+      if (m_strips.size() == 1)
+        return pitch / sqrt(12);
+
+      double positionError = 0;
+      double sumStripCharge = 0;
+
+      //first compute the sum of strip charges
+      for (auto aStrip : m_strips) {
+
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
+        float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
+        chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
+
+        double stripCharge  = chargeReco->getStripCharge();
+        sumStripCharge += stripCharge;
+      }
+
+      // error propagation formula:
+      for (auto aStrip : m_strips) {
+
+        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
+        float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
+        chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
+
+        double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
+
+        double stripCharge  = chargeReco->getStripCharge();
+
+        double first = stripCharge / sumStripCharge * pitch / sqrt(12);
+        B2INFO("first = " << stripCharge << "/" << sumStripCharge << "*" << pitch << "/" << sqrt(12) << " = " << first);
+        double second = (stripPos - getCoGPosition()) / sumStripCharge * averageNoiseInElectrons;
+        B2INFO("second = " << "(" << stripPos << " - " << getCoGPosition() << ")/" << sumStripCharge << "*" << averageNoiseInElectrons <<
+               " = " << second);
+        positionError = TMath::Power(first, 2) + TMath::Power(second, 2);
+
+      }
+
+      return sqrt(positionError);
 
     }
 

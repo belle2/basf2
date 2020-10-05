@@ -14,7 +14,8 @@
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
-#include <svd/dbobjects/SVDRecoConfiguration.h>
+#include <svd/calibration/SVDClusterCalibrations.h>
+//#include <svd/dbobjects/SVDRecoConfiguration.h>
 
 #include <vector>
 
@@ -49,6 +50,8 @@ namespace Belle2 {
       double getCoGPosition();
       /** CoG Position error*/
       double getCoGPositionError();
+      /** CoG Position error with simple propagation formula*/
+      double getCoGPositionErrorPropagation();
       /** AHT Position */
       double getAHTPosition() {return 0;}
       /** AHT Position error*/
@@ -66,7 +69,10 @@ namespace Belle2 {
       bool m_isUside = 0;
 
       /**Reconstruction Configuration dbobject*/
-      DBObjPtr<SVDRecoConfiguration> m_recoConfig;
+      //      DBObjPtr<SVDRecoConfiguration> m_recoConfig;
+
+      /**SVDClusterCalibration calibration wrapper*/
+      SVDClusterCalibrations m_ClusterCal;
 
       /**SVDPulseShape calibration wrapper*/
       SVDPulseShapeCalibrations m_PulseShapeCal;

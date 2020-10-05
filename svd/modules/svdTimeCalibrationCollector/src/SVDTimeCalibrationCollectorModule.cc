@@ -102,9 +102,6 @@ void SVDTimeCalibrationCollectorModule::startRun()
       }
     }
   }
-  getObjectPtr<TH1F>("hEventT0FromCDC")->Reset();
-  getObjectPtr<TH1F>("hEventT0FromCDCSync")->Reset();
-  getObjectPtr<TH1F>("hRawTimeL3V")->Reset();
 }
 
 void SVDTimeCalibrationCollectorModule::collect()

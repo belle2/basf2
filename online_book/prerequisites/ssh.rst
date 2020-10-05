@@ -286,11 +286,11 @@ KEK network is rather complex so a very simplified layout is shown in
 
 
 So unless you are using VPN or are at KEK you most likely need to connect to the
-gateway servers first, either ``ssh1cc.kek.jp`` or ``ssh2cc.kek.jp``
+gateway servers first, either ``sshcc1.kek.jp`` or ``sshcc2.kek.jp``
 
 .. code-block:: none
 
-    ssh username@ssh1cc.kek.jp
+    ssh username@sshcc1.kek.jp
 
 and once this connection is established you can login to KEKCC from this gateway
 server.
@@ -500,7 +500,7 @@ with this key.
 
 .. code-block:: bash
 
-    ssh-copy-id -i ~/.ssh/id_rsa ssh1cc.kek.jp
+    ssh-copy-id -i ~/.ssh/id_rsa sshcc1.kek.jp
     ssh-copy-id -i ~/.ssh/id_rsa kekcc
 
 .. note::

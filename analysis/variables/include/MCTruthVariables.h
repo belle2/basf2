@@ -298,9 +298,14 @@ namespace Belle2 {
     double getLEREnergy(const Particle*);
 
     /**
-     * return crossing angle from generator level beam kinematics
+     * return horizontal crossing angle from generator level beam kinematics
      */
-    double getCrossingAngle(const Particle*);
+    double getCrossingAngleX(const Particle*);
+
+    /**
+     * return vertical crossing angle from generator level beam kinematics
+     */
+    double getCrossingAngleY(const Particle*);
 
     /**
      * returns the weight of the ECLCluster -> MCParticle relation for the

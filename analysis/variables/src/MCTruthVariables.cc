@@ -778,11 +778,36 @@ namespace Belle2 {
       return (beamParamsDB->getLER()).E();
     }
 
-    double getCrossingAngle(const Particle*)
+    double getCrossingAngleX(const Particle*)
     {
+      // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      return (beamParamsDB->getHER()).Vect().Angle(-1.0 * (beamParamsDB->getLER()).Vect());
+      TVector3 herVec = (beamParamsDB->getHER()).Vect();
+      TVector3 lerVec = (beamParamsDB->getLER()).Vect();
+
+      // only looking at the XZ plane -> set y-coordinates to zero
+      herVec.SetY(0);
+      lerVec.SetY(0);
+
+      //calculate the crossing angle
+      return herVec.Angle(-1.0 * lerVec);
     }
+
+    double getCrossingAngleY(const Particle*)
+    {
+      // get the beam momenta from the DB
+      static DBObjPtr<BeamParameters> beamParamsDB;
+      TVector3 herVec = (beamParamsDB->getHER()).Vect();
+      TVector3 lerVec = (beamParamsDB->getLER()).Vect();
+
+      // only looking at the YZ plane -> set x-coordinates to zero
+      herVec.SetX(0);
+      lerVec.SetX(0);
+
+      //calculate the crossing angle
+      return herVec.Angle(-1.0 * lerVec);
+    }
+
 
     double particleClusterMatchWeight(const Particle* particle)
     {
@@ -1000,8 +1025,13 @@ namespace Belle2 {
 
 .. warning:: This variable does not make sense for data.
 )DOC");
-    REGISTER_VARIABLE("XAngle", getCrossingAngle, R"DOC(
-[Eventbased] The nominal beam crossing angle from generator level beam kinematics.
+    REGISTER_VARIABLE("XAngle", getCrossingAngleX, R"DOC(
+[Eventbased] The nominal horizontal beam crossing angle from generator level beam kinematics.
+
+.. warning:: This variable does not make sense for data.
+)DOC");
+    REGISTER_VARIABLE("YAngle", getCrossingAngleY, R"DOC(
+[Eventbased] The nominal vertical beam crossing angle from generator level beam kinematics.
 
 .. warning:: This variable does not make sense for data.
 )DOC");

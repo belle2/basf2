@@ -51,8 +51,10 @@ void BeamParameters::setVertex(const TVector3& vertex, const std::vector<double>
 TLorentzVector BeamParameters::getFourVector(double energy, double angleX, double angleY)
 {
   double p = sqrt(pow(energy, 2) - pow(Const::electronMass, 2));
-  if (angleX < 0) angleY = M_PI + angleY;
-  if (angleX < 0) angleX = M_PI + angleX;
+  if (angleX < 0) {
+    angleX = M_PI + angleX;
+    angleY = M_PI + angleY;
+  }
 
   double Sign = cos(angleX) < 0 ?  -1 : 1;
 

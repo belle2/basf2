@@ -432,8 +432,8 @@ Decay B0
 0.000000   D*(2S)- mu+  nu_mu           ISGW2;
 0.002140   Xu-  mu+  nu_mu              VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000250   pi-    tau+ nu_tau           ISGW2;
-0.000083   rho-   tau+ nu_tau           ISGW2;
+0.000094227  pi- tau+ nu_tau             ISGW2; #Assuming R_pi  = 0.641 [arXiv:1509.06938]. Updated by PG 9/2021
+0.000156755  rho- tau+ nu_tau            ISGW2; #Assuming R_rho = 0.535 [priv. comm. M. Prim]. Updated by PG 9/2021
 0.000090   a_1-   tau+ nu_tau           ISGW2;
 0.000008   b_1-   tau+ nu_tau           ISGW2;
 0.000008   a_0-   tau+ nu_tau           ISGW2;
@@ -494,10 +494,10 @@ Decay B0
 0.000001   pi0 a_00    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   pi0 f_0     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 # pi0 rho0 is with the 3-body modes #CPV included, Oberhof 09/11/2017
-0.000001   pi0 omega   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.00000007   pi0 omega   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #BF with 1.3sigma. https://arxiv.org/pdf/0804.2422.pdf. Updated by PG 9/2021
 0.000001   pi0 a_10    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 0.000001   pi0 b_10    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
-0.000001   eta eta     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.00000050   eta eta     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #BF with 1.9sigma. https://arxiv.org/pdf/0804.2422.pdf. Updated by PG 9/2021
 0.000001   eta eta'    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 0.000001   eta a_00    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   eta f_0     SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
@@ -545,14 +545,14 @@ Decay B0
 0.0  omega anti-K0   PHSP;
 
 # phipi0 has no simple Pengiun or tree so who knows - ditto phieta/eta'? #CPV included, Oberhof 09/11/2017
-0.000001 phi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
-0.000001 phi eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
-0.000001 phi eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.0000001 phi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #BF<0. Set BF<UL. https://arxiv.org/pdf/1206.4760.pdf. Updated by PG 9/2021
+0.0000002 phi eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #BF with 1.4sigma. https://arxiv.org/pdf/0907.1743.pdf. Updated by PG 9/2021
+0.0000002 phi eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #BF with 0.5sigma. https://arxiv.org/pdf/0907.1743.pdf. Updated by PG 9/2021
 
 0.00001587 K*0     eta                                     SVS; #Updated by PG 9/2021
 0.00000280 K*0     eta'                                    SVS; #Updated by PG 9/2021
 0.00000204 K*0     omega                                   SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
-0.000001  phi  omega                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
+0.00000010  phi  omega                                     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #PDG UL 0.00000070. Set BF<UL https://arxiv.org/pdf/1312.0056.pdf. Updated by PG 9/2021
 0.00000120  omega omega                                       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000001  omega rho0                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 
@@ -828,12 +828,12 @@ Decay B0
 0.000002  K- K+ K'_10            PHSP;
 
 #--- 4-body phi-phi, phi-K-K, K-K-K-K --------------------------------
-0.0000001 phi phi                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
-0.0000001 phi K+ K-              PHSP;
-0.0000001 phi K0 anti-K0         PHSP;
-0.0000001 K+ K- K+ K-            PHSP;
-0.0000001 K0 anti-K0 K+ K-       PHSP;
-0.0000001 K0 anti-K0 K0 anti-K0  PHSP;
+0.00000001 phi phi                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #PDG UL 0.00000003 https://arxiv.org/pdf/1907.10003.pdf. Lower all 4-body phi phi BFs by 0(1). Updated by PG 9/2021
+0.00000001 phi K+ K-              PHSP;
+0.00000001 phi K0 anti-K0         PHSP;
+0.00000001 K+ K- K+ K-            PHSP;
+0.00000001 K0 anti-K0 K+ K-       PHSP;
+0.00000001 K0 anti-K0 K0 anti-K0  PHSP;
 
 #--- 5-body rho-rho-pi, rho-pi-pi-pi, pi-pi-pi-pi-pi -------------------
 0.000010  rho0 rho0 pi0          PHSP;
@@ -1387,8 +1387,8 @@ Decay B0
 0.00004882    chi_c2  K*0              PHSP; #Updated by PG 9/2021
 0.000072   chi_c2  K+  pi-          PHSP;
 0.0001     chi_c2  K0  pi0          PHSP;
-0.00017    chi_c2  K0  pi-  pi+     PHSP;
-0.000074   chi_c2  K+  pi-  pi0     PHSP;
+0.000010   chi_c2  K0  pi-  pi+     PHSP; #No BF. Set BF<UL https://arxiv.org/abs/1512.02672. Updated by PG 9/2021
+0.000010   chi_c2  K+  pi-  pi0     PHSP; #No BF. Set BF<UL https://arxiv.org/abs/1512.02672. Updated by PG 9/2021
 0.0001     chi_c2  K0  pi0  pi0     PHSP;
 
 # Previously commented out. Now included [PG 05/02/2018]
@@ -1779,8 +1779,8 @@ Decay anti-B0
 0.000000   D*(2S)+ mu-  anti-nu_mu         ISGW2;
 0.002140   Xu+  mu-  anti-nu_mu            VUB 4.8 1.29 0.22 20 0.30 0.55 1.20 0.61 1.26 0.85 1.34 1.08 1.41 1.21 1.48 1.30 1.55 1.30 1.61 1.33 1.67 1.36 1.73 1.39 1.79 1.33 1.84 1.42 1.90 1.39 1.95 1.39 2.00 1.37 2.50 1.30 3.00 0.74 3.50 0.99 4.00 1.09 4.50 1.00; #[PDG2017]
 
-0.000250   pi+    tau- anti-nu_tau         ISGW2;
-0.000083   rho+   tau- anti-nu_tau         ISGW2;
+0.000094227   pi+    tau- anti-nu_tau         ISGW2; #Assuming R_pi  = 0.641 [arXiv:1509.06938]. Updated by PG 9/2021
+0.000156755   rho+   tau- anti-nu_tau         ISGW2; #Assuming R_rho = 0.535 [priv. comm. M. Prim]. Updated by PG 9/2021
 0.000090   a_1+   tau- anti-nu_tau         ISGW2;
 0.000008   b_1+   tau- anti-nu_tau         ISGW2;
 0.000008   a_0+   tau- anti-nu_tau         ISGW2;
@@ -1841,10 +1841,10 @@ Decay anti-B0
 0.000001   pi0 a_00   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   pi0 f_0    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 # pi0 rho0 is with the 3-body modes #CPV included, Oberhof 09/11/2017
-0.000001   pi0 omega  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.00000007   pi0 omega  SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #BF with 1.3sigma. https://arxiv.org/pdf/0804.2422.pdf. Updated by PG 9/2021
 0.000001   pi0 a_10   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 0.000001   pi0 b_10   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
-0.000001   eta eta    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
+0.00000050   eta eta    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma; #BF with 1.9sigma. https://arxiv.org/pdf/0804.2422.pdf. Updated by PG 9/2021
 0.000001   eta eta'   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma 1.0 minusGamma;
 0.000001   eta a_00   SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
 0.000001   eta f_0    SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 gamma -1.0 minusGamma;
@@ -1892,14 +1892,14 @@ Decay anti-B0
 0.0  omega anti-K0   PHSP;
 
 # phipi0 has no simple Penguin or tree so who knows - ditto phieta/eta'? #CPV included, Oberhof 09/11/2017
-0.000001 phi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
-0.000001 phi eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
-0.000001 phi eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
+0.0000001 phi pi0 SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #BF<0. Set BF<UL. https://arxiv.org/pdf/1206.4760.pdf
+0.0000002 phi eta SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;  #BF with 1.4sigma. https://arxiv.org/pdf/0907.1743.pdf. Updated by PG 9/2021
+0.0000002 phi eta' SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0; #BF with 0.5sigma. https://arxiv.org/pdf/0907.1743.pdf. Updated by PG 9/2021
 
 0.00001587 anti-K*0 eta                                    SVS; #Updated by PG 9/2021
 0.00000280 anti-K*0 eta'                                   SVS; #Updated by PG 9/2021
 0.00000204 anti-K*0 omega                                  SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
-0.000001  phi  omega                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
+0.00000010  phi  omega                                     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #PDG UL 0.00000070. Set BF<UL https://arxiv.org/pdf/1312.0056.pdf. Updated by PG 9/2021
 0.00000120  omega omega                                       SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #Updated by PG 9/2021
 0.000001  omega rho0                                        SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
 
@@ -2175,7 +2175,7 @@ Decay anti-B0
 0.000002  K- K+ anti-K'_10       PHSP;
 
 #--- 4-body phi-phi, phi-K-K, K-K-K-K --------------------------------
-0.0000001 phi phi                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0;
+0.0000001 phi phi                SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; 1.0 0.0 1.7 0.0 1.0 0.0; #PDG UL 0.00000003 https://arxiv.org/pdf/1907.10003.pdf. Lower all 4-body phi phi BFs by O(1). Updated by PG 9/2021
 0.0000001 phi K+ K-              PHSP;
 0.0000001 phi K0 anti-K0         PHSP;
 0.0000001 K+ K- K+ K-            PHSP;
@@ -2734,8 +2734,8 @@ Decay anti-B0
 0.00004882    chi_c2  anti-K*0            PHSP; #Updated by PG 9/2021
 0.000072   chi_c2  K-  pi+             PHSP;
 0.0001     chi_c2  anti-K0  pi0        PHSP;
-0.00017    chi_c2  anti-K0  pi+  pi-   PHSP;
-0.000074   chi_c2  K-  pi+  pi0        PHSP;
+0.000010   chi_c2  anti-K0  pi+  pi-   PHSP; #No BF. Set BF<UL https://arxiv.org/abs/1512.02672. Updated by PG 9/2021
+0.000010   chi_c2  K-  pi+  pi0        PHSP; #No BF. Set BF<UL https://arxiv.org/abs/1512.02672. Updated by PG 9/2021
 0.0001    chi_c2  anti-K0  pi0  pi0    PHSP;
 
 # Previously commented out. Now included [PG 05/02/2018]
@@ -3124,10 +3124,10 @@ Decay B+
 0.000000   anti-D*(2S)0 mu+  nu_mu          ISGW2;
 0.002140   Xu0   mu+  nu_mu                 VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000030   pi0    tau+ nu_tau               ISGW2;
+0.0000508044 pi0 tau+ nu_tau                  ISGW2; #Assuming R_pi = 0.641 [arXiv:1509.06938]. Updated by PG 9/2021
 0.000012   eta    tau+ nu_tau               ISGW2;
-0.000042   rho0   tau+ nu_tau               ISGW2;
-0.000042   omega   tau+ nu_tau              ISGW2;
+0.00008453  rho0 tau+ nu_tau                ISGW2; #Assuming R_rho = 0.535 [priv. comm. M. Prim]. Updated by PG 9/2021
+0.000064974  omega tau+ nu_tau               ISGW2; #Assuming R_om  = 0.546 [priv. comm. M. Prim]. Updated by PG 9/2021
 0.000018   eta'   tau+ nu_tau               ISGW2;
 0.000046   a_10    tau+ nu_tau              ISGW2;
 0.000027   b_10    tau+ nu_tau              ISGW2;
@@ -3275,9 +3275,9 @@ Decay B+
 0.00003401 K+      K-      K+      PHSP; #BF Updated by PG 9/2021
 
 # K+K+pi-: suppressed mode (1e-7)
-0.0000001    K+ K+ pi-              PHSP;
+0.00000001    K+ K+ pi-              PHSP; #PDG UL. BF=-0.000000038 https://arxiv.org/pdf/1608.01478.pdf. Lower BF to O(-8). Updated by PG 9/2021
 # K-pi+pi+: suppressed mode (1e-7)
-0.0000001    K- pi+ pi+             PHSP;
+0.000000001    K- pi+ pi+             PHSP; #PDG UL. BF=0.0000000056 https://arxiv.org/pdf/1608.01478.pdf : 5.6* 10^{-9}. Lower BF to O(-9). Updated by PG 9/2021
 
 # K+ anti-K0 pi0
 0.000001     K+ anti-K0 pi0         PHSP;
@@ -3602,7 +3602,7 @@ Decay B+
 0.000020  a_10 K*+               PHSP;
 0.000010  a_10 K+ pi0            PHSP;
 0.000010  a_10 K0 pi+            PHSP;
-0.000020  a_1+ K*0               PHSP;
+0.0000013  a_1+ K*0               PHSP; #PDG UL. BF=0.0000013 https://arxiv.org/pdf/1007.2732.pdf. Updated by PG 9/2021
 0.000010  a_1+ K+ pi-            PHSP;
 0.000010  a_1+ K0 pi0            PHSP;
 0.000005  K*+ a_00 pi0           PHSP;
@@ -3675,7 +3675,7 @@ Decay B+
 #--- 5-body phi-K*-pi, phi-K-2pi, K-K-K*-pi, 2pi-K-K-K --------------------
 0.000010  phi K*+ pi0            PHSP;
 0.000010  phi K+ rho0            PHSP;
-0.000010  phi K+ omega           PHSP;
+0.00000115  phi K+ omega           PHSP; # PDG UL. BF=0.00000115 https://arxiv.org/pdf/0902.4757.pdf. Updated by PG 9/2021
 0.000010  phi K+ f_0             PHSP;
 0.000010  phi K0 rho+            PHSP;
 0.000010  phi K0 pi+ pi0         PHSP;
@@ -3743,7 +3743,6 @@ Decay B+
 0.000010  K+ K'_10 anti-K0 pi0   PHSP;
 0.000005  K+ K'_10 anti-K0 eta   PHSP;
 0.000002  K+ K'_10 anti-K0 eta'  PHSP;
-
 #--- 5-body phi-phi-K, phi-phi-pi, phi-3K, phi-K-K-pi, 5K, 4K-pi ------------
 0.00000498 phi     phi     K+   PHSP; #BF Updated by PG 9/2021
 0.000001  phi phi pi+            PHSP;
@@ -3805,7 +3804,7 @@ Decay B+
 0.00106262 eta_c  K+                      PHSP;  #BF Updated by PG 9/2021
 0.00108086 K*+ eta_c                      SVS; #BF Updated by PG 9/2021
 0.0002   eta_c  K0  pi+                 PHSP;
-0.000062 eta_c  K+  pi0                 PHSP;  #set as UL as PDG
+0.000062 eta_c  K+  pi0                 PHSP;  #Set as PDG UL.
 0.0002   eta_c  K+  pi+  pi-            PHSP;
 0.0001   eta_c  K+  pi0  pi0            PHSP;
 0.0001   eta_c  K0  pi+  pi0            PHSP;
@@ -3819,7 +3818,7 @@ Decay B+
 0.00005    eta_c(2S)   K0   pi+  pi0    PHSP;
 
 0.00015004  chi_c0  K+                     PHSP;  #BF Updated by PG 9/2021
-0.00021  K*+   chi_c0                   SVS; #set as UL as PDG
+0.00014  K*+   chi_c0                   SVS; #PDG UL. BF=0.00014 https://arxiv.org/pdf/0808.1487.pdf. Updated by PG 9/2021
 0.0002   chi_c0  K0   pi+               PHSP;
 0.0001   chi_c0  K+  pi0                PHSP;
 0.0002   chi_c0  K+  pi+  pi-           PHSP;
@@ -4191,10 +4190,10 @@ Decay B-
 0.000000   D*(2S)0 mu-  anti-nu_mu                  ISGW2;
 0.002140   Xu0   mu-  anti-nu_mu                    VUB 4.8 1.29 0.22 20 0.30 0.54 1.20 0.95 1.26 0.78 1.34 0.98 1.41 0.91 1.48 1.23 1.55 1.36 1.61 1.39 1.67 1.38 1.73 1.43 1.79 1.41 1.84 1.42 1.90 1.45 1.95 1.40 2.00 1.42 2.50 1.31 3.00 1.36 3.50 1.15 4.00 1.01 4.50 1.51; #[PDG2017]
 
-0.000030   pi0    tau- anti-nu_tau                  ISGW2;
+0.0000508044   pi0    tau- anti-nu_tau                ISGW2; #Assuming R_pi = 0.641 [arXiv:1509.06938]. Updated by PG 9/2021
 0.000012   eta    tau- anti-nu_tau                  ISGW2;
-0.000042   rho0   tau- anti-nu_tau                  ISGW2;
-0.000042   omega   tau- anti-nu_tau                 ISGW2;
+0.00008453   rho0   tau- anti-nu_tau                ISGW2; #Assuming R_rho = 0.535 [priv. comm. M. Prim]. Updated by PG 9/2021
+0.000064974   omega   tau- anti-nu_tau                 ISGW2; #Assuming R_om  = 0.546 [priv. comm. M. Prim]. Updated by PG 9/2021
 0.000018   eta'   tau- anti-nu_tau                  ISGW2;
 0.000046   a_10    tau- anti-nu_tau                 ISGW2;
 0.000027   b_10    tau- anti-nu_tau                 ISGW2;
@@ -4342,9 +4341,9 @@ Decay B-
 0.00003401 K-      K+      K-      PHSP;  #BF Updated by PG 9/2021
 
 # K-K-pi+: suppressed mode (1e-7)
-0.0000001    K- K- pi+              PHSP;
+0.00000001    K- K- pi+              PHSP; #PDG UL. BF=-0.000000038 https://arxiv.org/pdf/1608.01478.pdf. Lower BF to O(-8). Updated by PG 9/2021
 # K+pi-pi-: suppressed mode (1e-7)
-0.0000001    K+ pi- pi-             PHSP;
+0.000000001    K+ pi- pi-             PHSP; #PDG UL. BF=0.0000000056 https://arxiv.org/pdf/1608.01478.pdf : 5.6* 10^{-9}. Lower BF to O(-9). Updated by PG 9/2021
 #
 # K- K0 pi0
 0.000001     K- K0 pi0              PHSP;
@@ -4669,7 +4668,7 @@ Decay B-
 0.000020  a_10 K*-               PHSP;
 0.000010  a_10 K- pi0            PHSP;
 0.000010  a_10 anti-K0 pi-       PHSP;
-0.000020  a_1- anti-K*0          PHSP;
+0.0000013  a_1- anti-K*0          PHSP; #PDG UL. BF=0.0000013 https://arxiv.org/pdf/1007.2732.pdf. Updated by PG 9/2021
 0.000010  a_1- K- pi+            PHSP;
 0.000010  a_1- anti-K0 pi0       PHSP;
 0.000005  K*- a_00 pi0           PHSP;
@@ -4742,7 +4741,7 @@ Decay B-
 #--- 5-body phi-K*-pi, phi-K-2pi, K-K-K*-pi, 2pi-K-K-K --------------------
 0.000010  phi K*- pi0            PHSP;
 0.000010  phi K- rho0            PHSP;
-0.000010  phi K- omega           PHSP;
+0.00000115  phi K- omega           PHSP; # PDG UL. BF=0.00000115 https://arxiv.org/pdf/0902.4757.pdf. Updated by PG 9/2021
 0.000010  phi K- f_0             PHSP;
 0.000010  phi anti-K0 rho-       PHSP;
 0.000010  phi anti-K0 pi- pi0    PHSP;
@@ -4844,7 +4843,7 @@ Decay B-
 0.0001    J/psi K-  pi0               PHSP;
 0.0001    J/psi K'_1-                 SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.0005    J/psi K_2*-                 PHSP;
-0.001800  J/psi   K_1-                SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0; #[Reconstructed PDG2011]
+0.001800  J/psi   K_1-                SVV_HELAMP 0.5 0.0 1.0 0.0 0.5 0.0;
 0.00081142   J/psi  K- pi+ pi-           PHSP;  #BF Updated by PG 9/2021
 0.0000337 J/psi  K- K+ K-             PHSP; #Added by Yubo Li 03/09/2018
 0.00012359  J/psi  eta  K-              PHSP;  #BF Updated by PG 9/2021
@@ -4871,7 +4870,7 @@ Decay B-
 0.00106262 eta_c   K-                         PHSP;  #BF Updated by PG 9/2021
 0.00108086 K*-    eta_c                       SVS;   #BF Updated by PG 9/2021
 0.0002   eta_c  anti-K0  pi-                PHSP;
-0.000062 eta_c  K-  pi0                     PHSP; #set as UL as PDG
+0.000062 eta_c  K-  pi0                     PHSP; #set as PDG UL.
 0.0002   eta_c  K-  pi+  pi-                PHSP;
 0.0001   eta_c  K-  pi0  pi0                PHSP;
 0.0001   eta_c  anti-K0  pi-  pi0           PHSP;
@@ -4885,7 +4884,7 @@ Decay B-
 0.00005  eta_c(2S)   anti-K0   pi-  pi0     PHSP;
 
 0.00015004  chi_c0  K-                         PHSP;  #BF Updated by PG 9/2021
-0.00021  K*-   chi_c0                       SVS;  #Set as UL as PDG
+0.00014  K*-   chi_c0                       SVS;  #PDG UL. BF=0.00014 https://arxiv.org/pdf/0808.1487.pdf. Updated by PG 9/2021
 0.0002   chi_c0  anti-K0   pi-              PHSP;
 0.0001   chi_c0  K-  pi0                    PHSP;
 0.0002   chi_c0  K-  pi+  pi-               PHSP;

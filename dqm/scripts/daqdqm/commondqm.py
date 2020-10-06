@@ -90,13 +90,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         hlt_skim_lines_in_plot = [
             "accept_hadron",
-            "accept_mumu_1trk",
             "accept_mumu_2trk",
-            "accept_bhabha",
-            "accept_bhabhaecl",
+            "accept_bhabha_all",
             "accept_gamma_gamma",
-            "accept_tau_tau",
-            "accept_single_photon_1GeV",
+            "accept_radmumu",
+            "accept_offip",
+            "accept_mumutight",
+            "accept_tau_2trk",
+            "accept_tau_Ntrk",
         ]
 
         # Default plot
@@ -116,8 +117,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
            },
            cutResultIdentifiersIgnored={
                "skim": [
-                   "accept_bhabha",
-                   "accept_bhabhaecl",
+                   "accept_bhabha_all",
                    ]
            },
            createTotalResultHistograms=False,

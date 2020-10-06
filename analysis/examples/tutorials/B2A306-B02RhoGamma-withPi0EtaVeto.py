@@ -98,10 +98,10 @@ ma.writePi0EtaVeto(particleList='B0',
 
 # For the validation purpose, one may want to calculate the pi0/eta probability using a particle other than a photon.
 # Example : B+ -> anti-D0 pi+. This is one of the mode to validate the pi0/eta veto tool.
-ma.reconstructDecay("D0:Kpi -> K-:loose pi+:loose", "", path=mypath)
-ma.reconstructDecay("B+:Dpi -> anti-D0:Kpi pi+:loose", "useCMSFrame(daughter(1,E))>1.4", path=mypath)
-ma.matchMCTruth("B+:Dpi", path=mypath)
-ma.buildRestOfEvent("B+:Dpi", path=mypath)
+ma.reconstructDecay("D0:Kpi -> K-:loose pi+:loose", "", path=my_path)
+ma.reconstructDecay("B+:Dpi -> anti-D0:Kpi pi+:loose", "useCMSFrame(daughter(1,E))>1.4", path=my_path)
+ma.matchMCTruth("B+:Dpi", path=my_path)
+ma.buildRestOfEvent("B+:Dpi", path=my_path)
 
 # hardParticle : If one wants to use non-gamma particle to calcuate the pi0/eta probability,
 #                you have to tell the particle name with an argument hardParticle. (default: gammma)
@@ -109,7 +109,7 @@ ma.writePi0EtaVeto(particleList='B+:Dpi',
                    decayString='B+ -> [anti-D0 -> K+ pi-] ^pi+',
                    mode='standard',
                    hardParticle='pi+',
-                   path=mypath)
+                   path=my_path)
 
 
 # The weight files are optimised by MC campaign 12.

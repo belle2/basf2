@@ -224,8 +224,13 @@ operating system called a kernel that runs the code.
   you have installed the right packages.
 
   * If you have the Belle II software explained and set up, there are no issues
-    at all (e.g. at DESY NAF)
-  * Else you might need to install some packages locally
+    at all. Please start your jupyter notebook after running ``b2setup`` as
+    shown in the SSH tutorial
+  * If you are using the DESY NAF Jupyter Hub, make sure that you select the
+    latest Belle II software release as kernel (i.e. ``release-xx-xx-xx``),
+    rather than ``python`` (the letter won't have ROOT properly set up).
+  * If you cannot set up the Belle II software, you might need to install some
+    packages locally
 
 Note that your script ``my_script.py`` from before is also shown.
 

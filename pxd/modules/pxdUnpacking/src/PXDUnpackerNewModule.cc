@@ -99,16 +99,12 @@ void PXDUnpackerNewModule::initialize()
   m_unpackedEventsCount = 0;
   for (int i = 0; i < ONSEN_MAX_TYPE_ERR; i++) m_errorCounter[i] = 0;
 
-  if (m_overrideFirmwareVersion == 0) {
-    m_firmwareFromDB = unique_ptr<Belle2::DBObjPtr<Belle2::PXDDHHFirmwareVersionPar>>(new
-                       Belle2::DBObjPtr<Belle2::PXDDHHFirmwareVersionPar>());
-  }
 }
 
 void PXDUnpackerNewModule::beginRun()
 {
   if (m_overrideFirmwareVersion == 0) {
-    if ((*m_firmwareFromDB) && (*m_firmwareFromDB).isValid()) m_firmware = (**m_firmwareFromDB).getDHHFirmwareVersion();
+    if (m_firmwareFromDB.isValid()) m_firmware = (*m_firmwareFromDB).getDHHFirmwareVersion();
     else B2FATAL("Cannot get PXD Firmware version from db");
   } else {
     m_firmware = m_overrideFirmwareVersion;
@@ -290,10 +286,11 @@ void PXDUnpackerNewModule::unpack_rawpxd(RawPXD& px, int inx)
       m_errorMask |= c_FRAME_SIZE;
     } else {
       B2DEBUG(29, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
-      if (m_firmware < 10) {///
+      if (m_firmware < 10) {
+        /// 1--9 is reserved for old firmware
         unpack_dhc_frame_v01(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
       } else if (m_firmware >= 10) {
-        //
+        /// 10-- is used for new firmware
         unpack_dhc_frame_v10(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
       } else {
         B2FATAL("Firmware Version not supported " << m_firmware);

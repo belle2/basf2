@@ -533,32 +533,25 @@ class SystematicsRadEE(BaseSkim):
 
 @fancy_skim_header
 class SystematicsLambda(BaseSkim):
-    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato"]
+    __authors__ = ["Sam Cunliffe", "Torben Ferber", "Ilya Komarov", "Yuji Kato", "Jake Bennett"]
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "systematics"
 
     def build_lists(self, path):
-        LambdaCuts = "M < 1.2"
-
-        ma.fillParticleList("p+:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
-        ma.fillParticleList("pi-:SystematicsLambda", "", enforceFitHypothesis=True, path=path)
         LambdaChannel = ["p+:SystematicsLambda pi-:SystematicsLambda"]
+
+        va.variables.addAlias("fsig", "formula(flightDistance/flightDistanceErr")
+        va.variables.addAlias("pMom", "daughter(0,p)")
+        va.variables.addAlias("piMom", "daughter(1,p)")
+        va.variables.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom)")
 
         LambdaList = []
         for chID, channel in enumerate(LambdaChannel):
-            ma.reconstructDecay("Lambda0:syst" + str(chID) + " -> " + channel, LambdaCuts, chID, path=path)
-            vertex.kFit("Lambda0:syst" + str(chID), 0.002, path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "1.10<M<1.13", path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*x+y*y)>0.0225", path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "formula(x*px+y*py)>0", path=path)
-            ma.applyCuts(
-                "Lambda0:syst" +
-                str(chID),
-                "formula([x*px*x*px+2*x*px*y*py+y*py*y*py]/[[px*px+py*py]*[x*x+y*y]])>0.994009",
-                path=path)
-            ma.applyCuts("Lambda0:syst" + str(chID), "p>0.2", path=path)
-            ma.matchMCTruth("Lambda0:syst0", path=path)
+            stdV0s.stdLambdas(path=path)
+
+            ma.cutAndCopyList("Lambda0:syst" + str(chID), "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
+            ma.matchMCTruth("Lambda0:syst" + str(chID), path=path)
             LambdaList.append("Lambda0:syst" + str(chID))
 
         self.SkimLists = LambdaList

@@ -249,8 +249,6 @@ def create_pre_collector_path(clusterizers):
     add_tracking_reconstruction(path)
     path = remove_module(path, "V0Finder")
 
-    path = remove_module(path, "V0Finder")
-
     for moda in path.modules():
         if moda.name() == "SVDCoGTimeEstimator":
             moda.param("CalibrationWithEventT0", False)

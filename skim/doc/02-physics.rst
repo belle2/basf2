@@ -56,6 +56,8 @@ Leptonic skims
 .. automodule:: skim.leptonic
     :members:
     :undoc-members:
+    
+.. _skim_physics_lowmultiplicity: 
 
 Low multiplicity skims
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -64,6 +66,8 @@ Low multiplicity skims
     :members:
     :undoc-members:
 
+
+.. _skim_physics_quarkonium:
 
 Quarkonium skims
 ~~~~~~~~~~~~~~~~

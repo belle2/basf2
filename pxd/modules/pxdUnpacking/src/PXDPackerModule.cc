@@ -544,6 +544,9 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
     /// Ghost frames are ALWAYS an indication for a data flow/daq problem
     /// need to be consistent for simulation!
     if (m_firmware < 10) {
+      // behaviour of old firmware is not upward comaptible, but for simulation (=Packing) the new behaviour
+      // would work even for the old unpacking, even so not according to firmware documentation
+      // -> maybe we remove this code?
       // we DROP the frame, thus we have to correct DHE and DHC counters
       dhc_byte_count -= 8; // fixed size of Header
       dhe_byte_count -= 8; // fixed size of Header

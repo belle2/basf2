@@ -236,6 +236,7 @@ To resumes suspended jobs
    * Kill jobs with ``bkill <job id>``
    * **Always test your scripts before large scale submissions!**
 
+.. include:: ../survey.rst
 
 .. topic:: Author of this lesson
 

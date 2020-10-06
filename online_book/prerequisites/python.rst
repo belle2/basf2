@@ -976,6 +976,8 @@ However, your python journey has just begun and there's a lot to learn.
   We have started to compile a reading list for python `on confluence <https://confluence.desy.de/x/ARC3Cg>`_.
   Please help us extend it!
 
+.. include:: ../survey.rst
+
 .. topic:: Authors of this lesson
 
   Martin Ritter (Intro),

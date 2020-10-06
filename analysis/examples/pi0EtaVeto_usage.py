@@ -55,7 +55,7 @@ ma.buildRestOfEvent("B+:Dpi", path=mypath)
 
 # Call writePi0EtaVeto
 # hardParticle : If you want to use non-gamma particle to calcuate the pi0/eta probability,
-#                you have to tell the particle name with an argument hardPhoton. (default: gammma)
+#                you have to tell the particle name with an argument hardParticle. (default: gammma)
 ma.writePi0EtaVeto('B+:Dpi',
                    'B+ -> [anti-D0 -> K+ pi-] ^pi+',
                    hardParticle='pi+',

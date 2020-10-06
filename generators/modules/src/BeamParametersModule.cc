@@ -32,9 +32,9 @@ BeamParametersModule::BeamParametersModule() : Module()
 
   // Parameter definitions
   addParam("energyHER", m_energyHER, "Energy of the High Energy Ring", 7.0);
-  addParam("angleXHER", m_angleXHER, "horizontal angle of the High Energy Ring. "
+  addParam("angleXHER", m_angleXHER, "angle of the High Energy Ring in the x-z plane. "
            "Negative values are interpreted as pi - value", 0.0415);
-  addParam("angleYHER", m_angleYHER, "vertical angle of the High Energy Ring. "
+  addParam("angleYHER", m_angleYHER, "angle of the High Energy Ring in the y-z plane. "
            "Negative values are interpreted as pi - value", 0.0);
   addParam("covHER", m_covHER, "covariance matrix of the High Energy Ring. This "
            "can either be one value which is the squared energy spread, three "
@@ -42,9 +42,9 @@ BeamParametersModule::BeamParametersModule() : Module()
            "and vertial spread (E, theta_x, theta_y) or a full covariance "
            "matrix with 9 elements", std::vector<double>(1, 0));
   addParam("energyLER", m_energyLER, "Energy of the Low Energy Ring", 4.0);
-  addParam("angleXLER", m_angleXLER, "horizontal angle of the Low Energy Ring. "
+  addParam("angleXLER", m_angleXLER, "angle of the Low Energy Ring in the x-z plane. "
            "Negative values are interpreted as pi - value", -0.0415);
-  addParam("angleYLER", m_angleYLER, "vertical angle of the Low Energy Ring. "
+  addParam("angleYLER", m_angleYLER, "angle of the Low Energy Ring in the y-z plane. "
            "Negative values are interpreted as pi - value", 0.0);
   addParam("covLER", m_covLER, "covariance matrix of the Low Energy Ring. This "
            "can either be one value which is the squared energy spread, three "

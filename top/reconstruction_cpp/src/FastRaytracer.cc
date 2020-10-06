@@ -42,8 +42,9 @@ namespace Belle2 {
             newState.propagateExact(bar, m_mirror);
           }
           if (not newState.getPropagationStatus()) return;
-          m_Nxm += abs(newState.getNx());
-          m_Nym += abs(newState.getNy());
+
+          m_Nxm += (m_Nxm % 2 == 0) ? newState.getNx() : -newState.getNx();
+          m_Nym += (m_Nym % 2 == 0) ? newState.getNy() : -newState.getNy();
         }
       }
 
@@ -55,8 +56,9 @@ namespace Belle2 {
         auto& newState = m_photonStates.back();
         newState.propagate(bar);
         if (not newState.getPropagationStatus()) return;
-        m_Nxb += abs(newState.getNx());
-        m_Nyb += abs(newState.getNy());
+
+        m_Nxb += (m_Nxb % 2 == 0) ? newState.getNx() : -newState.getNx();
+        m_Nyb += (m_Nyb % 2 == 0) ? newState.getNy() : -newState.getNy();
       }
 
       const auto& lastState = m_photonStates.back();
@@ -64,23 +66,12 @@ namespace Belle2 {
       auto& newState = m_photonStates.back();
       newState.propagate(m_prism);
       if (not newState.getPropagationStatus()) return;
-      m_Nxe = abs(newState.getNx());
-      m_Nye = abs(newState.getNy());
 
-      if (photon.getKx() < 0) {
-        m_Nxm = -m_Nxm;
-        m_Nxb = -m_Nxb;
-        m_Nxe = -m_Nxe;
-      }
-      if (photon.getKy() < 0) {
-        m_Nym = -m_Nym;
-        m_Nyb = -m_Nyb;
-        m_Nye = -m_Nye;
-      }
+      m_Nxe = newState.getNx();
+      m_Nye = newState.getNy();
 
       m_status = true;
     }
-
 
     bool FastRaytracer::getTotalReflStatus(double cosTotal) const
     {
@@ -90,6 +81,11 @@ namespace Belle2 {
       return true;
     }
 
+    double FastRaytracer::getPropagationLen() const
+    {
+      if (m_photonStates.empty()) return 0;
+      return m_photonStates.back().getPropagationLen();
+    }
 
     double FastRaytracer::getXD() const
     {
@@ -101,12 +97,25 @@ namespace Belle2 {
         if (photonState.getSegmentType() == PhotonState::c_MirrorSegment) break;
         x = photonState.getUnfoldedX(x);
       }
-      if (m_Nxm % 2 != 0) x = -x; // convention used in F77 code
       return x;
     }
 
 
     double FastRaytracer::getYD() const
+    {
+      if (m_photonStates.empty()) return 0;
+
+      double y = m_photonStates.back().getYD();
+      for (int i = m_photonStates.size() - 2; i > 0; i--) {
+        const auto& photonState = m_photonStates[i];
+        if (photonState.getSegmentType() == PhotonState::c_MirrorSegment) break;
+        y = photonState.getUnfoldedY(y);
+      }
+      return y;
+    }
+
+
+    double FastRaytracer::getInPlaneYD() const
     {
       if (m_photonStates.empty()) return 0;
 
@@ -117,6 +126,13 @@ namespace Belle2 {
         y = photonState.getUnfoldedY(y);
       }
       return y;
+    }
+
+
+    double FastRaytracer::getZD() const
+    {
+      if (m_photonStates.empty()) return 0;
+      return m_photonStates.back().getZD();
     }
 
 
@@ -134,6 +150,29 @@ namespace Belle2 {
       return y;
     }
 
+
+    int FastRaytracer::getNx() const
+    {
+      int Nx = m_Nxm;
+      Nx += (Nx % 2 == 0) ? m_Nxb : -m_Nxb;
+      Nx += (Nx % 2 == 0) ? m_Nxe : -m_Nxe;
+      return Nx;
+    }
+
+
+    int FastRaytracer::getNy() const
+    {
+      int Ny = m_Nym;
+      Ny += (Ny % 2 == 0) ? m_Nyb : -m_Nyb;
+      Ny += (Ny % 2 == 0) ? m_Nye : -m_Nye;
+      return Ny;
+    }
+
+    int FastRaytracer::getNys() const
+    {
+      int N = (m_Nye > 0) ? m_Nye / 2 : (abs(m_Nye) + 1) / 2;
+      return N;
+    }
 
   } // TOP
 } // Belle2

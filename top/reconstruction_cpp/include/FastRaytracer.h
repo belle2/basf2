@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace TOP {
 
     /**
-     * Fast photon propagation in a quartz optics.
+     * Fast photon propagation in quartz optics.
      */
     class FastRaytracer : public RaytracerBase {
 
@@ -62,20 +62,42 @@ namespace Belle2 {
       bool getTotalReflStatus(double cosTotal) const;
 
       /**
-       * Returns unfolded position in x at Detector plane.
+       * Returns total propagation length since initial position.
+       * @return propagation length
+       */
+      double getPropagationLen() const;
+
+      /**
+       * Returns unfolded position in x at virtual Detector plane.
        * Reliable only if propagation status is true.
        * For reflected photons unfolding is done up to spherical mirror.
-       * @return unfolded position in x at Detector plane
+       * @return unfolded position in x at virtual Detector plane
        */
       double getXD() const;
 
       /**
-       * Returns unfolded position in y at Detector plane.
+       * Returns unfolded position in y at virtual Detector plane.
        * Reliable only if propagation status is true.
        * For reflected photons unfolding is done up to spherical mirror.
-       * @return unfolded position in y at Detector plane
+       * @return unfolded position in y at virtual Detector plane
        */
       double getYD() const;
+
+      /**
+       * Returns unfolded position in y such that the prism unfolded windows
+       * are turned over into the real Detector plane.
+       * Reliable only if propagation status is true.
+       * For reflected photons unfolding is done up to spherical mirror.
+       * @return unfolded position in y at real Detector plane
+       */
+      double getInPlaneYD() const;
+
+      /**
+       * Returns unfolded position in z of virtual Detector plane.
+       * Reliable only if propagation status is true.
+       * @return unfolded position in z of virtual Detector plane
+       */
+      double getZD() const;
 
       /**
        * Returns unfolded position in y at Bar-prism-connection plane.
@@ -90,7 +112,7 @@ namespace Belle2 {
        * Reliable only if propagation status is true.
        * @return number of reflections in x
        */
-      int getNx() const {return (m_Nxm + m_Nxb + m_Nxe);}
+      int getNx() const;
 
       /**
        * Returns signed number of reflections in x before mirror.
@@ -118,7 +140,7 @@ namespace Belle2 {
        * Reliable only if propagation status is true.
        * @return number of reflections in y
        */
-      int getNy() const {return (m_Nym + m_Nyb + m_Nye);}
+      int getNy() const;
 
       /**
        * Returns signed number of reflections in y before mirror.
@@ -140,6 +162,13 @@ namespace Belle2 {
        * @return number of reflections in y
        */
       int getNye() const {return m_Nye;}
+
+      /**
+       * Returns number of reflections on slanted prism surface.
+       * Reliable only if propagation status is true.
+       * @return number of reflections on slanted prism surface
+       */
+      int getNys() const;
 
 
     private:

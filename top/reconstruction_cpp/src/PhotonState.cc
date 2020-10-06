@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <top/reconstruction_cpp/PhotonState.h>
+#include <top/reconstruction_cpp/func.h>
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
@@ -19,6 +20,13 @@ namespace Belle2 {
     PhotonState::PhotonState(const TVector3& position, const TVector3& direction):
       m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
       m_kx(direction.X()), m_ky(direction.Y()), m_kz(direction.Z()),
+      m_status(true)
+    {}
+
+
+    PhotonState::PhotonState(const TVector3& position, double kx, double ky, double kz):
+      m_x(position.X()), m_y(position.Y()), m_z(position.Z()),
+      m_kx(kx), m_ky(ky), m_kz(kz),
       m_status(true)
     {}
 
@@ -72,8 +80,8 @@ namespace Belle2 {
       if (len < 0 or len > s_maxLen) return;
       m_propLen += len;
 
-      fold(m_x + len * m_kx, bar.A, m_x, m_kx, m_nx);
-      fold(m_y + len * m_ky, bar.B, m_y, m_ky, m_ny);
+      func::fold(m_x + len * m_kx, bar.A, m_x, m_kx, m_nx);
+      func::fold(m_y + len * m_ky, bar.B, m_y, m_ky, m_ny);
       m_z = z;
 
       m_status = true;
@@ -103,7 +111,7 @@ namespace Belle2 {
       if (ss == 0) return;
       int i = 0;
       while (true) {
-        double xc = unfold(mirror.xc, nx, bar.A);
+        double xc = func::unfold(mirror.xc, nx, bar.A);
         double x = m_x - xc;
         double z = m_z - mirror.zc;
         double rdir = x * m_kx + z * m_kz;
@@ -125,8 +133,8 @@ namespace Belle2 {
 
       m_propLen += len;
 
-      fold(m_x + len * m_kx, bar.A, m_x, m_kx, m_nx);
-      fold(m_y + len * m_ky, bar.B, m_y, m_ky, m_ny);
+      func::fold(m_x + len * m_kx, bar.A, m_x, m_kx, m_nx);
+      func::fold(m_y + len * m_ky, bar.B, m_y, m_ky, m_ny);
       m_y = mirror.yc;
       m_z += len * m_kz;
 
@@ -162,8 +170,8 @@ namespace Belle2 {
       int ny = lround((m_y + len * m_ky) / bar.B);
       int i = 0;
       while (true) {
-        double xc = unfold(mirror.xc, nx, bar.A);
-        double yc = unfold(mirror.yc, ny, bar.B);
+        double xc = func::unfold(mirror.xc, nx, bar.A);
+        double yc = func::unfold(mirror.yc, ny, bar.B);
         double x = m_x - xc;
         double y = m_y - yc;
         double z = m_z - mirror.zc;
@@ -188,8 +196,8 @@ namespace Belle2 {
 
       m_propLen += len;
 
-      fold(m_x + len * m_kx, bar.A, m_x, m_kx, m_nx);
-      fold(m_y + len * m_ky, bar.B, m_y, m_ky, m_ny);
+      func::fold(m_x + len * m_kx, bar.A, m_x, m_kx, m_nx);
+      func::fold(m_y + len * m_ky, bar.B, m_y, m_ky, m_ny);
       m_z += len * m_kz;
 
       double normX = (m_x - mirror.xc) / mirror.R;
@@ -217,6 +225,9 @@ namespace Belle2 {
 
       if (m_kz > 0) return;
 
+      double ky_in = m_ky;
+      double kz_in = m_kz;
+
       if (m_z > prism.zFlat) {
 
         int step = 1;
@@ -231,14 +242,16 @@ namespace Belle2 {
             continue;
           }
           double len = ((win.y0 - m_y) * win.sz - (win.z0 - m_z) * win.sy) / s;
-          double yu = m_y + len * m_ky - win.y0;
-          double zu = m_z + len * m_kz - win.z0;
+          m_yD = m_y + len * m_ky;
+          m_zD = m_z + len * m_kz;
+          double yu = m_yD - win.y0;
+          double zu = m_zD - win.z0;
           double y = yu * win.sy + zu * win.sz;
           if (y >= prism.yDown and y <= prism.yUp) {
             if (len < 0 or len > s_maxLen) return;
             double ky = m_ky * win.sy + m_kz * win.sz;
             double kz = m_kz * win.sy - m_ky * win.sz;
-            fold(m_x + len * m_kx, prism.A, m_x, m_kx, m_nx);
+            func::fold(m_x + len * m_kx, prism.A, m_x, m_kx, m_nx);
             m_y = y;
             m_ky = ky;
             m_ny = k - prism.k0;
@@ -260,6 +273,8 @@ success:
       m_y += len * m_ky;
       m_z = prism.zD;
       m_propLen += len;
+      m_yD += len * ky_in;
+      m_zD += len * kz_in;
 
       m_status = true;
     }

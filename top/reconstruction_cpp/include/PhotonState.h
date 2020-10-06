@@ -11,6 +11,7 @@
 #pragma once
 
 #include <top/reconstruction_cpp/RaytracerBase.h>
+#include <top/reconstruction_cpp/func.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -34,11 +35,26 @@ namespace Belle2 {
       };
 
       /**
-       * Constructor
+       * Default constructor
+       */
+      PhotonState()
+      {}
+
+      /**
+       * Constructor with position and direction vectors
        * @param position initial photon position (must be inside quartz)
        * @param direction initial direction vector (must be unit vector)
        */
       PhotonState(const TVector3& position, const TVector3& direction);
+
+      /**
+       * Constructor with position vector and direction components
+       * @param position initial photon position (must be inside quartz)
+       * @param kx initial direction x-component (must be unit vector)
+       * @param ky initial direction y-component (must be unit vector)
+       * @param kz initial direction z-component (must be unit vector)
+       */
+      PhotonState(const TVector3& position, double kx, double ky, double kz);
 
       /**
        * Sets maximal allowed propagation length.
@@ -75,14 +91,26 @@ namespace Belle2 {
        * @param x position to unfold
        * @return unfolded position
        */
-      double getUnfoldedX(double x) const {return unfold(x, m_nx, m_A);}
+      double getUnfoldedX(double x) const {return func::unfold(x, m_nx, m_A);}
 
       /**
        * Unfolds the position in y.
        * @param y position to unfold
        * @return unfolded position
        */
-      double getUnfoldedY(double y) const {return (unfold(y - m_y0, m_ny, m_B) + m_y0);}
+      double getUnfoldedY(double y) const {return (func::unfold(y - m_y0, m_ny, m_B) + m_y0);}
+
+      /**
+       * Returns detection position y in unfolded prism
+       * @return detection position y in unfolded prism
+       */
+      double getYD() const {return m_yD;}
+
+      /**
+       * Returns detection position z in unfolded prism
+       * @return detection position z in unfolded prism
+       */
+      double getZD() const {return m_zD;}
 
       /**
        * Returns direction as 3D unit vector.
@@ -152,9 +180,11 @@ namespace Belle2 {
       bool getPropagationStatus() const {return m_status;}
 
       /**
-       * Returns total internal reflection status. TODO: check also slanted prism side!
+       * Returns total internal reflection status.
        * @param cosTotal cosine of total reflection angle
        * @return true if totally reflected
+       *
+       * TODO: check also slanted prism surface
        */
       bool getTotalReflStatus(double cosTotal) const
       {
@@ -219,33 +249,6 @@ namespace Belle2 {
 
     private:
 
-      /**
-       * unfold a coordinate.
-       * @param x true position
-       * @param nx signed number of reflections
-       * @param A size for unfolding
-       * @return unfolded coordinate (position of image)
-       */
-      double unfold(double x, int nx, double A) const;
-
-      /**
-       * unfold a direction.
-       * @param kx true direction component
-       * @param nx signed number of reflections
-       * @return unfolded direction component
-       */
-      double unfold(double kx, int nx) const;
-
-      /**
-       * fold a coordinate (inverse of unfold).
-       * @param xu unfolded coordinate (position of image)
-       * @param A size for folding
-       * @param x true position [out]
-       * @param kx true direction component [out]
-       * @param nx signed number of reflections [out]
-       */
-      void fold(double xu, double A, double& x, double& kx, int& nx) const;
-
       double m_x = 0; /**< position in x */
       double m_y = 0; /**< position in y */
       double m_z = 0; /**< position in z */
@@ -258,38 +261,14 @@ namespace Belle2 {
       double m_A = 0; /**< width of the quartz segment (dimension in x) for unfolding */
       double m_B = 0; /**< thickness of the quartz segment (dimension in y) for unfolding */
       double m_y0 = 0; /**< origin in y for unfolding */
+      double m_yD = 0; /**< unfolded prism detection position in y */
+      double m_zD = 0; /**< unfolded prism detection position in z */
       EType m_type = c_Undefined; /**< quartz segment type at last propagation step */
       bool m_status = false; /**< propagation status */
 
       static double s_maxLen; /**< maximal allowed propagation length */
 
     };
-
-
-    inline double PhotonState::unfold(double x, int nx, double A) const
-    {
-      if (nx % 2 == 0) return (nx * A + x);
-      else return (nx * A - x);
-    }
-
-
-    inline double PhotonState::unfold(double kx, int nx) const
-    {
-      if (nx % 2 == 0) return kx;
-      else return -kx;
-    }
-
-
-    inline void PhotonState::fold(double xu, double A, double& x, double& kx, int& nx) const
-    {
-      nx = lround(xu / A);
-      x = xu - nx * A;
-      if (nx % 2 != 0) {
-        x = -x;
-        kx = -kx;
-      }
-    }
-
 
   } // namespace TOP
 } // namespace Belle2

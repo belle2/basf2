@@ -28,6 +28,7 @@
 #               K. Ota (Oct 2017)
 #               I. Komarov (December 2017)
 #               I. Komarov (September 2018)
+#               Y. Sato (October 2020)
 #
 ################################################################################
 
@@ -39,6 +40,7 @@ import variables.utils as vu
 # create path
 my_path = b2.create_path()
 
+# writePi0EtaVeto uses a payload in analysis global tag.
 b2.conditions.prepend_globaltag('analysis_tools_release-04-02')
 
 # load input ROOT file
@@ -76,18 +78,39 @@ ma.buildRestOfEvent(target_list_name='B0',
                     path=my_path)
 
 # perform pi0/eta veto
+# particleList : Signal side particle's particleList
+# decayString : DecayString specifing a particle which is used to calculate the pi0/eta probability
+# mode : One can select the payload from 'standard'(default), 'tight', 'cluster', and 'both'.
+#        Each payload is optimized for different soft-photon selection criteria.
+#        If one wants to use one's own payload and soft-photon criteria, please use arguments,
+#        pi0PayloadNameOverride, pi0SoftPhotonCutOverride, etaPayloadNameOverride, etaSoftPhotonCutOverride,
 ma.writePi0EtaVeto(particleList='B0',
                    decayString='B0 -> rho0 ^gamma',
+                   mode='standard',
                    path=my_path)
 
-# at this stage the B0 candidates should have
-# extraInfo(Pi0ProbOrigin) and extraInfo(EtaProbOrigin) value attached.
-# extraInfo(Pi0ProbOrigin) means pi0 probability for the B0 candidates whose gamma daughter.
-# extraInfo(EtaProbOrigin) means eta probability for the B0 candidates whose gamma daughter.
+# Then one can obtain the pi0/eta probability by the variables, `pi0Prob(arg)` and `etaProb`.
+# The argument corresponds to the mode which you set in writPieEtaVeto function.
+# In above case, one can call `pi0Probe(standard)` and `etaProb(standard)`.
 # For the B0 candidates whose gamma daughter could not be combined with
-# any of the remaining photons to form pi0/eta because of soft photon selection
-# the extraInfo(Pi0ProbOrigin) and extraInfo(EtaProbOrigin) does not exist. In these cases
-# NaN will be written to the extraInfo(Pi0ProbOrigin) branch and extraInfo(EtaProbOrigin) branch.
+# any of the remaining photons to form pi0/eta because of soft photon selection.
+# In these cases NaN will be written to the `pi0Probe(standard)` branch and `etaProb(standard)` branch.
+
+# For the validation purpose, one may want to calculate the pi0/eta probability using a particle other than a photon.
+# Example : B+ -> anti-D0 pi+. This is one of the mode to validate the pi0/eta veto tool.
+ma.reconstructDecay("D0:Kpi -> K-:loose pi+:loose", "", path=mypath)
+ma.reconstructDecay("B+:Dpi -> anti-D0:Kpi pi+:loose", "useCMSFrame(daughter(1,E))>1.4", path=mypath)
+ma.matchMCTruth("B+:Dpi", path=mypath)
+ma.buildRestOfEvent("B+:Dpi", path=mypath)
+
+# hardParticle : If one wants to use non-gamma particle to calcuate the pi0/eta probability,
+#                you have to tell the particle name with an argument hardParticle. (default: gammma)
+ma.writePi0EtaVeto(particleList='B+:Dpi',
+                   decayString='B+ -> [anti-D0 -> K+ pi-] ^pi+',
+                   mode='standard',
+                   hardParticle='pi+',
+                   path=mypath)
+
 
 # The weight files are optimised by MC campaign 12.
 # If you train by yourself, you should refer to
@@ -198,9 +221,8 @@ b_vars = vc.kinematics + \
                                    decay_string='B0 -> ^rho0 gamma') + \
     vu.create_aliases_for_selected(list_of_variables=rho_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
-    vu.create_aliases(list_of_variables=['Pi0ProbOrigin', 'EtaProbOrigin', 'pi0veto'],
-                      wrapper='extraInfo({variable})',
-                      prefix="B")
+    ['pi0Prob(standard)', 'etaProb(standard)', 'extraInfor(pi0veto)']
+
 
 # Saving variables to ntuple
 rootOutputFile = "B2A306-B02RhoGamma-withPi0EtaVeto.root"

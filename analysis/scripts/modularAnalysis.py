@@ -2476,12 +2476,12 @@ def writePi0EtaVeto(
     @param path       		modules are added to this path
     @param suffix           optional suffix to be appended to the usual extraInfo name
     @param hardParticle           particle name which is used to calculate the pi0/eta probability (default is gamma)
-    @param payloadNameOverride  specify the payload name of pi0 veto only if one wants to use non-default one. (default is None)
-    @param softPhotonCutOverride  specify the soft photon selection criteria of pi0 veto only if one wants to use non-default one.
-                                  (default is None)
-    @param payloadNameOverride  specify the payload name of eta veto only if one wants to use non-default one. (default is None)
-    @param softPhotonCutOverride  specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
-                                  (default is None)
+    @param pi0PayloadNameOverride  specify the payload name of pi0 veto only if one wants to use non-default one. (default is None)
+    @param pi0SoftPhotonCutOverride specify the soft photon selection criteria of pi0 veto only if one wants to use non-default one.
+                                    (default is None)
+    @param etaPayloadNameOverride  specify the payload name of eta veto only if one wants to use non-default one. (default is None)
+    @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
+                                    (default is None)
     """
 
     import basf2_mva

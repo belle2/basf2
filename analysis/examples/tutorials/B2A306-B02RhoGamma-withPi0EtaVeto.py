@@ -36,6 +36,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import variables.collections as vc
 import variables.utils as vu
+from stdCharged import stdK, stdPi
 
 # create path
 my_path = b2.create_path()
@@ -98,6 +99,8 @@ ma.writePi0EtaVeto(particleList='B0',
 
 # For the validation purpose, one may want to calculate the pi0/eta probability using a particle other than a photon.
 # Example : B+ -> anti-D0 pi+. This is one of the mode to validate the pi0/eta veto tool.
+stdK('loose', path=my_path)
+stdPi('loose', path=my_path)
 ma.reconstructDecay("D0:Kpi -> K-:loose pi+:loose", "", path=my_path)
 ma.reconstructDecay("B+:Dpi -> anti-D0:Kpi pi+:loose", "useCMSFrame(daughter(1,E))>1.4", path=my_path)
 ma.matchMCTruth("B+:Dpi", path=my_path)

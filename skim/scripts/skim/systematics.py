@@ -550,7 +550,6 @@ class SystematicsLambda(BaseSkim):
 
         LambdaList = []
         ma.cutAndCopyList("Lambda0:syst0", "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
-        ma.matchMCTruth("Lambda0:syst0", path=path)
         LambdaList.append("Lambda0:syst0")
 
         self.SkimLists = LambdaList

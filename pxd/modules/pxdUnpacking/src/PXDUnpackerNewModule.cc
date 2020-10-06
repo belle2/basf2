@@ -330,7 +330,8 @@ void PXDUnpackerNewModule::unpack_dhp_raw(void* data, unsigned int frame_len, un
   // Size: 64*768 + 8 bytes for a full frame readout
   if (frame_len != 0xC008) {
     if (!(m_suppressErrorMask & c_FIX_SIZE)) B2WARNING("Frame size unsupported for RAW ADC frame! $" <<
-                                                         LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str()));
+                                                         LogVar("size [bytes] $", static_cast < std::ostringstream && >(std::ostringstream() << hex << frame_len).str())
+                                                         << LogVar("DHE", dhe_ID) << LogVar("DHP", dhe_DHPport));
     m_errorMask |= c_FIX_SIZE;
     return;
   }

@@ -21,5 +21,9 @@
     * too hard exercises (which one?)
     * etc.
 
+    If you know how to do it, we recommend you to report bugs and other requests
+    with `JIRA <https://agira.desy.de/>`_. Make sure to use the
+    ``documentation-training`` component of the ``Belle II Software`` project.
+
     Note however that this is not the place to get immediate help if you're
     being stuck (see :numref:`onlinebook_collaborative_tools` instead).

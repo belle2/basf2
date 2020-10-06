@@ -34,8 +34,8 @@ namespace {
       DataStore::Instance().setInitializeActive(false);
 
       // have some useful defaults for the beam parameters
-      beamparams.setHER(7.004, 0.0415, {2.63169e-05, 1e-5, 1e-5});
-      beamparams.setLER(4.002, -0.0415, {5.64063e-06, 1e-5, 1e-5});
+      beamparams.setHER(7.004, 0.0415,  0, {2.63169e-05, 1e-5, 1e-5});
+      beamparams.setLER(4.002, -0.0415, 0, {5.64063e-06, 1e-5, 1e-5});
       beamparams.setVertex({0, 1, 2}, {4.10916e-07, 0, -2.64802e-06, 0, 1.7405e-11, 0, -2.64802e-06, 0, 0.000237962});
     }
 
@@ -87,8 +87,8 @@ namespace {
     // two beams completely head on, one with energy uncertainty so invariant
     // mass uncertainty should be exactly the same as single uncertainty. Here
     // we give variance so we expect 0.1
-    beamparams.setHER(10, 0, {0.01});
-    beamparams.setLER(10, M_PI, {0});
+    beamparams.setHER(10, 0, 0, {0.01});
+    beamparams.setLER(10, M_PI, 0, {0});
     beamparams.setGenerationFlags(BeamParameters::c_smearBeamEnergy);
     DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
 
@@ -106,7 +106,7 @@ namespace {
     }
 
     // uncertainty on both so result should be sqrt(a^2 + b^2) = sqrt(2) * 0.1
-    beamparams.setLER(10, M_PI, {0.01});
+    beamparams.setLER(10, M_PI, 0, {0.01});
     beamparams.setGenerationFlags(BeamParameters::c_smearBeamEnergy);
     DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
     {

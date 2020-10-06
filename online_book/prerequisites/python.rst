@@ -587,7 +587,7 @@ Finally, arguably the most useful function for your analyses is the ``query`` fu
 
 .. code:: ipython3
 
-    df.query("(B0_mbc>5.2) & (B0_deltae>-1"))
+    df.query("(B0_mbc>5.2) & (B0_deltae>-1)")
 
 .. admonition:: Exercise
   :class: exercise stacked
@@ -889,7 +889,7 @@ To import the file using chunking there are some slight differences in the code:
 .. code:: ipython3
 
    df_chunk = root_pandas.read_root(
-       [filePath/fileName], 'treeName', columns=Y4S_columns, chunksize=100
+       ['filePath/fileName'], columns=Y4S_columns, chunksize=100
    )
 
 Here I have defined which columns I wish to be included in the following string:
@@ -909,7 +909,7 @@ Here I have defined which columns I wish to be included in the following string:
   .. code:: ipython3
 
     files = ["https://desycloud.desy.de/index.php/s/R8iModtQsa4WwYx/download?path=%2F&files=pandas_tutorial_ntuple.root"]
-    df_chunk=root_pandas.read_root(files, 'Y4S', columns=Y4S_columns, chunksize=100000)
+    df_chunk=root_pandas.read_root(files, columns=Y4S_columns, chunksize=100000)
 
 Now the data is loaded as chunks, we "loop" over or run through all the chunks
 and piece them together. This is the point at which we can add our cuts to
@@ -917,6 +917,9 @@ reduce the loaded, chunked file more.
 
 .. code:: ipython3
   :linenos:
+
+  import pandas as pd
+
 
   cut = "(B0_mbc > 5.2)"  # Define our cut
 

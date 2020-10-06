@@ -1026,12 +1026,12 @@ namespace Belle2 {
 .. warning:: This variable does not make sense for data.
 )DOC");
     REGISTER_VARIABLE("XAngle", getCrossingAngleX, R"DOC(
-[Eventbased] The nominal horizontal beam crossing angle from generator level beam kinematics.
+[Eventbased] The nominal beam crossing angle in the x-z plane from generator level beam kinematics.
 
 .. warning:: This variable does not make sense for data.
 )DOC");
     REGISTER_VARIABLE("YAngle", getCrossingAngleY, R"DOC(
-[Eventbased] The nominal vertical beam crossing angle from generator level beam kinematics.
+[Eventbased] The nominal beam crossing angle in the y-z plane from generator level beam kinematics.
 
 .. warning:: This variable does not make sense for data.
 )DOC");

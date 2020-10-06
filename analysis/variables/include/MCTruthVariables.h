@@ -298,12 +298,12 @@ namespace Belle2 {
     double getLEREnergy(const Particle*);
 
     /**
-     * return horizontal crossing angle from generator level beam kinematics
+     * return crossing angle in the x-z plane from generator level beam kinematics
      */
     double getCrossingAngleX(const Particle*);
 
     /**
-     * return vertical crossing angle from generator level beam kinematics
+     * return crossing angle in the y-z plane from generator level beam kinematics
      */
     double getCrossingAngleY(const Particle*);
 

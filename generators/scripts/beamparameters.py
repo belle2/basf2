@@ -13,8 +13,8 @@ import numpy as np
 beamparameter_defaults = {
     "energyHER": 5.28,
     "energyLER": 5.28,
-    "angleHER": 0,
-    "angleLER": math.pi,
+    "angleXHER": 0,
+    "angleXLER": math.pi,
     "covHER": [0],
     "covLER": [0],
     "vertex": [0, 0, 0],
@@ -36,8 +36,8 @@ beamparameter_presets = {
         "energyLER": 4.,
         # beam angles with respect to the z axis in radian, negative gets
         # converted into pi - |angle|
-        "angleHER": 0.0415,
-        "angleLER": -0.0415,
+        "angleXHER": 0.0415,
+        "angleXLER": -0.0415,
         # covariance matrices for the beam parametrized in
         # (E, theta_x, theta_y) = energy and horizontal and vertical angular
         # spread
@@ -106,7 +106,7 @@ beamparameter_presets = {
     "KEKB-Belle": (None, {
         "energyHER": 7.998213,
         "energyLER": 3.499218,
-        "angleHER": 0.022,
+        "angleXHER": 0.022,
     }),
     "LEP1": (None, {
         "energyHER": 45.6,
@@ -249,16 +249,16 @@ def calculate_beamparameters(name, E_cms=None):
     if "bunchHER" in preset and "bunchLER" in preset:
         her_size = preset["bunchHER"]
         ler_size = preset["bunchLER"]
-        her_angle = values["angleHER"]
-        ler_angle = values["angleLER"]
+        her_angle = values["angleXHER"]
+        ler_angle = values["angleXLER"]
         _, cov = calculate_beamspot(
             [0, 0, 0], [0, 0, 0], her_size, ler_size, her_angle, ler_angle
         )
         values["covVertex"] = list(cov.flat)
 
     if E_cms is not None:
-        ler = __get_4vector(values["energyLER"], values["angleLER"])
-        her = __get_4vector(values["energyHER"], values["angleHER"])
+        ler = __get_4vector(values["energyLER"], values["angleXLER"])
+        her = __get_4vector(values["energyHER"], values["angleXHER"])
         mass = (her + ler).M()
         scale = E_cms / mass
         B2INFO("Scaling beam energies by %g to obtain E_cms = %g GeV" % (scale, E_cms))
@@ -280,7 +280,7 @@ if __name__ == "__main__":
     beampos_spot, cov_spot = calculate_beamspot(
         [0, 0, 0], [0, 0, 0],
         values["bunchHER"], values["bunchLER"],
-        values["angleHER"], values["angleLER"],
+        values["angleXHER"], values["angleXLER"],
     )
     print("Beamspot position:")
     print(beampos_spot)
@@ -293,9 +293,9 @@ if __name__ == "__main__":
     try:
         from matplotlib import pyplot as pl
         #: covariance matrix for her bunch
-        cov_her = cov_matrix(values["bunchHER"], values["angleHER"])
+        cov_her = cov_matrix(values["bunchHER"], values["angleXHER"])
         #: covariance matrix for ler bunch
-        cov_ler = cov_matrix(values["bunchLER"], values["angleLER"])
+        cov_ler = cov_matrix(values["bunchLER"], values["angleXLER"])
         #: random points according to her bunch covariance
         points_her = np.random.multivariate_normal([0, 0, 0], cov_her, 1000)
         #: random points according to ler bunch covariance
@@ -318,9 +318,9 @@ if __name__ == "__main__":
     #: nominal SuperKEKB LER energy
     eler = values["energyLER"]
     #: nominal SuperKEKB HER angle
-    aher = values["angleHER"]
+    aher = values["angleXHER"]
     #: nominal SuperKEKB LER angle
-    aler = values["angleLER"]
+    aler = values["angleXLER"]
 
     # calculate beam energies for Y1S - Y4S by scaling them from the nominal
     # beam energies for the SuperKEKB preset

@@ -12,12 +12,13 @@ __authors__ = [
 
 import basf2 as b2
 import modularAnalysis as ma
+import variables as va
 import vertex
 from skimExpertFunctions import BaseSkim, fancy_skim_header, get_test_file
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
-from stdV0s import stdKshorts
+from stdV0s import stdKshorts, stdLambdas
 
 # TODO: Add liaison name and email address
 __liaison__ = ""
@@ -538,21 +539,19 @@ class SystematicsLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    def build_lists(self, path):
-        LambdaChannel = ["p+:SystematicsLambda pi-:SystematicsLambda"]
+    def load_standard_lists(self, path):
+        stdLambdas("merged", path=path)
 
-        va.variables.addAlias("fsig", "formula(flightDistance/flightDistanceErr")
+    def build_lists(self, path):
+        va.variables.addAlias("fsig", "formula(flightDistance/flightDistanceErr)")
         va.variables.addAlias("pMom", "daughter(0,p)")
         va.variables.addAlias("piMom", "daughter(1,p)")
-        va.variables.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom)")
+        va.variables.addAlias("daughtersPAsym", "formula((pMom-piMom)/(pMom+piMom))")
 
         LambdaList = []
-        for chID, channel in enumerate(LambdaChannel):
-            stdV0s.stdLambdas(path=path)
-
-            ma.cutAndCopyList("Lambda0:syst" + str(chID), "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
-            ma.matchMCTruth("Lambda0:syst" + str(chID), path=path)
-            LambdaList.append("Lambda0:syst" + str(chID))
+        ma.cutAndCopyList("Lambda0:syst0", "Lambda0:merged", "fsig>10 and daughtersPAsym>0.41", path=path)
+        ma.matchMCTruth("Lambda0:syst0", path=path)
+        LambdaList.append("Lambda0:syst0")
 
         self.SkimLists = LambdaList
 

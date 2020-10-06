@@ -304,6 +304,8 @@ As an exercise we will focus on the first two.
       ``TreeFitter`` to fit complex trees.
     * Use ``TagV`` to reconstruct a vertex from the ROE.
 
+.. include:: ../survey.rst
+
 .. topic:: Authors of this lesson
 
     Francesco Tenchini

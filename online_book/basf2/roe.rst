@@ -419,6 +419,7 @@ This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`
       continuum suppression or flavor tag.
     * Usage of ROE without a mask is **not** recommended.
 
+.. include:: ../survey.rst
 
 .. topic:: Authors of this lesson
 

@@ -942,6 +942,8 @@ or `matchedMC`.
     * ``variablesToNtuple`` saves an output file
     * Don't forget ``process(path)`` or nothing happens
 
+.. include:: ../survey.rst
+
 .. topic:: Authors of this lesson
 
     Frank Meier, Kilian Lieret (minor improvements)

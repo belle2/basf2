@@ -395,7 +395,7 @@ It is also true that using the latest supported release makes you cool.
 .. admonition:: Solution
      :class: toggle solution
 
-     Choosing a release under the section :ref:`cvmfs-setup`.
+     It is described in the section :ref:`choosing_a_release`.
 
 .. admonition:: Question
      :class: exercise stacked
@@ -588,6 +588,8 @@ For now, you can list them all with:
 
     basf2 modularAnalysis.py
 
+.. _onlinebook_basf2basics_b2help_particles:
+
 Basf2 particles
 ^^^^^^^^^^^^^^^
 
@@ -595,7 +597,7 @@ Sometimes you will need to write particles' names in plain text format.
 Basf2 adopts the convention used by ROOT, the PDG, EvtGen, ...
 
 To show information about all the particles and properties known to basf2,
-there is a tool `b2help-particles`.
+there is a tool ``b2help-particles``.
 
 .. code-block:: bash
 
@@ -871,6 +873,7 @@ convenience functions that you find yourself using often.
 In pseudo-python you will see they are very often of the form:
 
 .. code-block:: python
+        :linenos:
 
         import basf2
 
@@ -939,7 +942,13 @@ Congratulations!
 You are now ready to write your first steering file.
 Good luck.
 
+.. seealso::
+
+    While the next sections will help you to understand the basics of steering
+    files step by step, there are also some comple examples for steering files
+    `in the main software repository <https://stash.desy.de/projects/B2/repos/software/browse/analysis/examples>`_.
+    You might want to take a look there after the starterkit.
+
 .. topic:: Author of this lesson
 
     Sam Cunliffe
-

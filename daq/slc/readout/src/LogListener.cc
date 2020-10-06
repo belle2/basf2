@@ -36,20 +36,34 @@ void LogListener::run()
   int count = 0;
   try {
     while (true) {
-      c = preader.readChar();
-      if (c != '\n' && iscntrl(c)) continue;
-      if (c == '\n' && count > 0) {
-        s = m_con->getParName() + " : " + ss.str();
+      c = preader.readChar(); //read next character from pipe
+
+      if (c != '\n' && iscntrl(c)) continue; //character is unprintable, skip
+
+      if (c == '\n' && count > 0) { //newline received line was not empty -> message is assembled, submit
+        std::string assembledLogMessage(ss.str());
+
+        // basf2 has a flag to escape newlines with "\\n" to write multi-line log messages into a single line
+        // see: https://agira.desy.de/browse/BII-6470
+        // if m_enableUnescapeNewlines is set, these "\\n" will be replaced with "\n" newlines again before the log message is sent out
+
+        if (m_enableUnescapeNewlines) {
+          assembledLogMessage = StringUtil::replace(assembledLogMessage, "\\n", "\n");
+        }
+
+        s = m_con->getParName() + " : " + assembledLogMessage;
         ss.str("");
         //m_con->lock();
         if (priority == LogFile::UNKNOWN) {
           priority = LogFile::DEBUG;
         }
+
         if (priority > LogFile::DEBUG) {
           m_con->getCallback()->log(priority, s);
         } else {
           LogFile::debug(s);
         }
+
         if (m_con->getCallback()->getNode().getState() == RCState::RUNNING_S) {
           if (priority == LogFile::ERROR) {
             // m_con->getCallback()->log(LogFile::ERROR, s);
@@ -61,12 +75,12 @@ void LogListener::run()
         //m_con->unlock();
         count = 0;
         priority = LogFile::UNKNOWN;
-      } else if (isprint(c)) {
-        if (count == 0 && c == '[') {
+      } else if (isprint(c)) { //continue to assemble message
+        if (count == 0 && c == '[') { //start of a "[DEBUG]"-like priority identifier preceding each log line
           ss << c;
           while (true) {
             c = preader.readChar();
-            if (c == ']') {
+            if (c == ']') { //end of a "[DEBUG]"-like priority identifier
               ss << c;
               s = ss.str();
               if (s == "[DEBUG]") priority = LogFile::DEBUG;

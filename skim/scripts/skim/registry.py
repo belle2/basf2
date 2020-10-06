@@ -4,11 +4,14 @@
 """"""
 
 from importlib import import_module
+import pandas as pd
 
 from basf2 import B2ERROR
 
+from tabulate import tabulate
 
-RegisteredSkims = [
+
+_RegisteredSkims = [
     # --- WG0: Systematics ---
     ("10600100", "systematics", "Systematics"),
     ("10600300", "systematics", "SystematicsTracking"),
@@ -117,15 +120,57 @@ must be of the form ``(code, module, name)``.
 """
 
 
-class SkimRegistry:
-    """A class for managing the registry of skims. Initialised using `RegisteredSkims`,
-    and then contains helper functions for getting information from the registry."""
+def _add_skim_registry_table(SkimRegistry):
+    """
+    Decorator to add a Sphinx table to the docstring of the skim registry.
 
-    def __init__(self, RegisteredSkims):
-        self.registry = RegisteredSkims
-        self._codes = [code for code, _, _ in self.registry]
-        self._modules = list({module for _, module, _ in self.registry})
-        self._names = [names for _, _, names in self.registry]
+    Inserts table wherever '<TABLE>' is in the docstring.
+    """
+
+    df = pd.DataFrame(_RegisteredSkims, columns=["Skim code", "Module", "Skim name"])
+    df = df[["Module", "Skim name", "Skim code"]].sort_values(by=["Module", "Skim code"])
+    table = tabulate(df, showindex="never", tablefmt="grid", headers=df.columns)
+
+    # Manual text manipulation (read: filthy hack) to make the table hierarchical
+    OriginalLines = table.split("\n")
+    header, OriginalLines, footer = OriginalLines[:2], OriginalLines[2:-1], OriginalLines[-1]
+    CurrentModule = ""
+    lines = []
+    lines.append("\n    ".join(header))
+    for BorderLine, TextLine in zip(OriginalLines[::2], OriginalLines[1::2]):
+        segments = TextLine.split("|")
+        module = segments[1].lstrip().rstrip()
+        if CurrentModule == module:
+            segments[1] = " " * len(segments[1])
+            BorderLine = "|" + " " * len(segments[1]) + BorderLine.lstrip("+").lstrip("-")
+        else:
+            CurrentModule = module
+        lines.append(BorderLine)
+        lines.append("|".join(segments))
+    lines.append(footer)
+
+    SkimRegistry.__doc__ = SkimRegistry.__doc__.replace("<TABLE>", "\n    ".join(lines))
+
+    return SkimRegistry
+
+
+@_add_skim_registry_table
+class SkimRegistryClass:
+    """
+    Class containing information on all official registered skims. This class also
+    contains helper functions for getting information from the registry. For
+    convenience, an instance of this class is provided: `skim.registry.Registry`.
+
+    The table below lists all registered skims and their skim codes:
+
+    <TABLE>
+    """
+    _registry = _RegisteredSkims
+
+    def __init__(self):
+        self._codes = [code for code, _, _ in self._registry]
+        self._modules = list({module for _, module, _ in self._registry})
+        self._names = [names for _, _, names in self._registry]
 
     @property
     def names(self):
@@ -147,18 +192,18 @@ class SkimRegistry:
         skim.
 
         Parameters:
-            SkimName (str): Name of the skim as it appears in `skim.registry.RegisteredSkims`.
+            SkimName (str): Name of the skim as it appears in the skim registry.
 
         Returns:
             The name of the skim module which contains the skim.
         """
-        lookup = {name: module for _, module, name in self.registry}
+        lookup = {name: module for _, module, name in self._registry}
         try:
             return lookup[SkimName]
         except KeyError:
             B2ERROR(
                 f"Unrecognised skim name {SkimName}. "
-                "Please add your skim to `skim.registry.RegisteredSkims`."
+                "Please add your skim to the list in `skim/scripts/skim/registry.py`."
             )
             raise LookupError(SkimName)
 
@@ -177,7 +222,7 @@ class SkimRegistry:
             B2ERROR(f"Unrecognised skim module {SkimModule}.")
             raise LookupError(SkimModule)
 
-        ModuleLookup = {name: module for _, module, name in self.registry}
+        ModuleLookup = {name: module for _, module, name in self._registry}
         NameLookup = {
             module: [name for name in self.names if ModuleLookup[name] == module]
             for module in self.modules
@@ -188,7 +233,7 @@ class SkimRegistry:
         """Get the skim class constructor for the given skim.
 
         This is achieved by importing the module listed alongside the skim name in the
-        `skim.registry.RegisteredSkims`.
+        skim registry.
 
         Parameters:
             SkimName (str): Name of the skim to be found.
@@ -204,18 +249,18 @@ class SkimRegistry:
         """Find the 8 digit skim code assigned to the skim with the provided name.
 
         Parameters:
-            SkimName (str): Name of the skim as it appears in `skim.registry.RegisteredSkims`.
+            SkimName (str): Name of the corresponding skim as it appears in the skim registry.
 
         Returns:
             8 digit skim code assigned to the given skim.
         """
-        lookup = {name: code for code, _, name in self.registry}
+        lookup = {name: code for code, _, name in self._registry}
         try:
             return lookup[SkimName]
         except KeyError:
             B2ERROR(
                 f"Unrecognised skim name {SkimName}. "
-                "Please add your skim to `skim.registry.RegisteredSkims`."
+                "Please add your skim to the list in `skim/scripts/skim/registry.py`."
             )
             raise LookupError(SkimName)
 
@@ -229,24 +274,23 @@ class SkimRegistry:
             SkimCode (str): 8 digit skim code assigned to some skim.
 
         Returns:
-            Name of the corresponding skim as it appears in
-            `skim.registry.RegisteredSkims`.
+            Name of the corresponding skim as it appears in the skim registry.
         """
-        lookup = {code: name for code, _, name in self.registry}
+        lookup = {code: name for code, _, name in self._registry}
         try:
             return lookup[SkimCode]
         except KeyError:
             B2ERROR(
                 f"Unrecognised skim code {SkimCode}. "
-                "Please add your skim to `skim.registry.RegisteredSkims`."
+                "Please add your skim to the list in `skim/scripts/skim/registry.py`."
             )
             raise LookupError(SkimCode)
 
 
-Registry = SkimRegistry(RegisteredSkims)
+Registry = SkimRegistryClass()
 """
-An instance of the `SkimRegistry`, containing the information skims defined in
-`RegisteredSkims`. Use this in your script to get information from the registry.
+An instance of `skim.registry.SkimRegistryClass`. Use this in your script to get
+information from the registry.
 
     >>> from skim.registry import Registry
     >>> Registry.encode_skim_name("SinglePhotonDark")

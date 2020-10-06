@@ -265,6 +265,7 @@ def command_tag_runningupdate(args, db=None):
             payload2, rev 1, valid from 0,1 to -1,-1
             payload3, rev 1, valid from 0,1 to 1,0
             payload4, rev 1, valid from 0,1 to -1,-1
+            payload5, rev 1, valid from 0,1 to -1,-1
 
         staging tag contains ::
 
@@ -272,6 +273,7 @@ def command_tag_runningupdate(args, db=None):
             payload1, rev 4, valid from 1,9 to 1,20
             payload2, rev 2, valid from 1,5 to 1,20
             payload3, rev 2, valid from 0,0 to -1,-1
+            payload4, rev 1, valid from 0,0 to 1,20
 
         Then running ``b2conditionsdb tag runningupdate running staging --run 1 2 --allow-closed``,
         the running globaltag after the update will contain ::
@@ -284,7 +286,8 @@ def command_tag_runningupdate(args, db=None):
             payload2, rev 2, valid from 1,5 to 1,20
             payload3, rev 1, valid from 0,1 to 1,0
             payload3, rev 2, valid from 1,2 to -1,-1
-            payload4, rev 1, valid from 0,1 to -1,-1
+            payload4, rev 1, valid from 0,1 to 1,20
+            payload5, rev 1, valid from 0,1 to -1,-1
 
         Note that
 
@@ -293,14 +296,18 @@ def command_tag_runningupdate(args, db=None):
           validity from the staging tag
         - payload3 was already closed in the running tag so no change is
           performed. This might result in gaps but is intentional
-        - payload4 was not closed as there was no update to it in the staging tag
+        - payload4 was not closed at rim 1,2 because the staging tag had the same
+          revision of the payload so the these were merged to one long validity.
+        - payload5 was not closed as there was no update to it in the staging tag.
+          If we would have run with ``--full-replacement`` it would have been closed.
         - if we would have chosen ``--run 1 1`` the update would have failed because
           payload1, rev2 in running starts at 1,1 so we would have a conflict
         - if we would have chosen ``--run 1 6`` the update would have failed because
           payload2 in the staging tag starts before this run
         - if we would have chosen to open the final iovs in staging by using
-          ``--fix-closed``, payload1, rev 4 and payload2, rev 2 would be valid
-          until -1,-1 after the running tag
+          ``--fix-closed``, payload1, rev 4; payload2, rev 2 and payload4 rev 1
+          would be valid until -1,-1 after the running tag. In fact, payload 4
+          would not be changed at all.
     """
     if db is None:
         args.add_argument("running", help="name of the running globaltag")
@@ -310,31 +317,34 @@ def command_tag_runningupdate(args, db=None):
                            help="First experiment + run number for which the update should be "
                            "valid. Two numbers separated by space")
         choice = args.add_mutually_exclusive_group()
-        choice.add_argument("--allow-closed", default=False, action="store_true",
+        choice.add_argument("--allow-closed", dest="mode", action="store_const",
+                            const=RunningTagUpdateMode.ALLOW_CLOSED,
+                            default=RunningTagUpdateMode.STRICT,
                             help="if given allow payloads in the staging tag to not "
                             "be open, i.e. they don't have to be open ended in the "
                             "update. Useful to retire a payload by adding one last update")
-        choice.add_argument("--fix-closed", default=False, action="store_true",
+        choice.add_argument("--fix-closed", dest="mode", action="store_const",
+                            const=RunningTagUpdateMode.FIX_CLOSED,
                             help="if given automatically open the last iov for each "
                             "payload in staging if it is closed.")
-        choice.add_argument("--simple-mode", default=False, action="store_true",
+        choice.add_argument("--simple-mode", dest="mode", action="store_const",
+                            const=RunningTagUpdateMode.SIMPLE,
                             help="if given require the staging tag to solely consist "
                             "of fully infinite validities: Only one iov per payload "
                             "with a validity of (0,0,-1,-1)")
+        choice.add_argument("--full-replacement", dest="mode", action="store_const",
+                            const=RunningTagUpdateMode.FULL_REPLACEMENT,
+                            help="if given perform a full replacement and close all "
+                            "open iovs in the running tag not present in the staging tag. "
+                            "After such an update exactly the payloads in the staging tag "
+                            "will be valid after the given run. This allows for closed iovs "
+                            "in the staging tag as with ``--allow-closed``")
         args.add_argument("--dry-run", default=False, action="store_true",
                           help="Only show the changes, don't try to apply them")
         return
 
-    mode = RunningTagUpdateMode.STRICT
-    if args.allow_closed:
-        mode = RunningTagUpdateMode.ALLOW_CLOSED
-    if args.fix_closed:
-        mode = RunningTagUpdateMode.FIX_CLOSED
-    if args.simple_mode:
-        mode = RunningTagUpdateMode.SIMPLE
-
     try:
-        updater = RunningTagUpdater(db, args.running, args.staging, args.run, mode)
+        updater = RunningTagUpdater(db, args.running, args.staging, args.run, args.mode)
         operations = updater.calculate_update()
     except RunningTagUpdaterError as e:
         B2ERROR(e, **e.extra_vars)

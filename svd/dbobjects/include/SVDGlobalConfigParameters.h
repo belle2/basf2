@@ -85,6 +85,21 @@ namespace Belle2 {
      */
     float getHV(void) const  { return m_hv; };
 
+    /**
+     * Returns the relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4
+     * @param none
+     * @return int [0,15] corresponding to relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4
+     */
+    int getRelativeTimeShift(void) const  { return m_relativeTimeShift; };
+
+    /**
+     * Returns the number of frames
+     * 3 -> 3-sample only DAQ mode
+     * 6 -> 6-sample only DAQ mode
+     * 9 -> 3-mixed-6 sample DAQ mode
+     */
+    int getNrFrames(void) const  { return m_nrFrames; };
+
 
     /**
      * Set the zero suppression
@@ -141,6 +156,27 @@ namespace Belle2 {
     {
       m_hv = hv;
     }
+    /**
+     * Set the Relative time shift between 3- and 6- sample acquired events in units of APV clock / 4
+     * Input:
+     * @param int relative time shift
+     *
+     */
+    void setRelativeTimeShift(float relativeTimeShift)
+    {
+      m_relativeTimeShift = relativeTimeShift;
+    }
+
+    /**
+     * Set the number of frames
+     * 3 -> 3-sample only DAQ mode
+     * 6 -> 6-sample only DAQ mode
+     * 9 -> 3-mixed-6 sample DAQ mode
+     */
+    void setNrFrames(int nrFrames)
+    {
+      m_nrFrames = nrFrames;
+    };
 
 
     /**
@@ -168,11 +204,22 @@ namespace Belle2 {
      */
     float m_hv = 0;
 
+    /** relative time shift between the 3-sample and 6-sample acquired events in units of APV clock/4 [0,15]
+     */
+    float m_relativeTimeShift = 0;
+
+    /** number of frames
+     * 3 -> 3-sample only DAQ mode
+     * 6 -> 6-sample only DAQ mode
+     * 9 -> 3-mixed-6 sample DAQ mode
+     */
+    float m_nrFrames = 0;
+
     /** APVclock
      */
     std::string m_APVClockInRFCUnits;
 
-    ClassDef(SVDGlobalConfigParameters, 2); /**< needed by root*/
+    ClassDef(SVDGlobalConfigParameters, 3); /**< needed by root*/
 
   };
 

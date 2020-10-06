@@ -11,7 +11,6 @@
 
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
 
 using namespace std;
 using namespace Belle2;
@@ -133,7 +132,7 @@ void DesSerCOPPER::DataAcquisition()
         }
         const int num_nodes = 1;
         const int num_events = 1;
-        PreRawCOPPERFormat_latest temp_rawcopper;
+        PreRawCOPPERFormat_v2 temp_rawcopper;
         temp_rawcopper.SetBuffer(temp_buf, m_size_word, 0, num_events, num_nodes);
         // Fill header and trailer
         try {

@@ -9,6 +9,12 @@
  **************************************************************************/
 
 #include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/logging/LogSystem.h>
 #include <mdst/dbobjects/TRGGDLDBPrescales.h>
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
@@ -18,6 +24,8 @@
 #include <trg/gdl/dbobjects/TRGGDLDBAlgs.h>
 #include <iostream>
 #include <fstream>
+//#include <TFile.h>
+//#include <TH1F.h>
 
 using namespace Belle2;
 
@@ -510,10 +518,10 @@ void setunpacker()
 {
 
   const int N_LEAF = 320;
-  const int N_UNPACKER_ARRAY = 15;
+  const int N_UNPACKER_ARRAY = 16;
 
   const int run[N_UNPACKER_ARRAY][4] = { //itnitial exp, initial run, end exp, end run
-    0,    0, -1,  -1,
+    0,    0, -1,  -1, //-1,[0]
     0,    0, 3,  528,
     3,  529, 3,  676,
     3,  677, 3, 1314,
@@ -527,39 +535,45 @@ void setunpacker()
     7,    0, 7, 1560,
     7, 1561, 7, 2102,
     7, 2103, 10,  -1,
-    12,   0, 12, -1
+    12,   0, 13, 500,
+    13, 501, 15,  -1 //14,[15]
   };
 
   /** num of leafs in data_b2l **/
   const int nLeafs[N_UNPACKER_ARRAY] = {
     37, 37, 27, 26, 26,
     26, 31, 32, 31, 32,
-    31, 31, 30, 27, 27
+    31, 31, 30, 27, 27,
+    32
   };
   /** num of leafs for others **/
   const int nLeafsExtra[N_UNPACKER_ARRAY] = {
     8,   8,  9, 11, 11,
     11, 11, 11, 11, 11,
-    11, 11, 13, 14, 16
+    11, 11, 13, 14, 16,
+    16
   };
   /** num of clk time window **/
   const int nClks[N_UNPACKER_ARRAY] = {
     48, 48, 48, 48, 48,
     32, 32, 32, 32, 32,
-    32, 32, 32, 32, 32
+    32, 32, 32, 32, 32,
+    32
   };
   /** num of bits **/
   const int nBits[N_UNPACKER_ARRAY] = {
     640, 640, 640, 640, 640,
     640, 640, 640, 640, 640,
-    640, 640, 640, 640, 640
+    640, 640, 640, 640, 640,
+    640
   };
 
   /** num of inputleafmap raw **/
   const int nrows[N_UNPACKER_ARRAY] = {
     45, 45, 51, 52, 52,
     52, 57, 61, 61, 61,
-    61, 61, 63, 66, 69
+    61, 61, 63, 66, 69,
+    78
   };
 
 
@@ -578,7 +592,11 @@ void setunpacker()
     "ntopslot", "finalrvc", "tttmdl",   "tdsrcp",  "tdtopp",
     "tdeclp",   "tdcdcp",   "psn3",     "ftd3",    "itd4",
     "itd3",     "cnttrg",   "cnttrg8",  "ftd4",    "psn4",
-    "etmdata", "sepagdll1", "sepacoml1", "gdll1rev"
+    "etmdata", "sepagdll1", "sepacoml1", "gdll1rev",  // 69
+    // +9 for [15]
+    "ftd5", "psn5", "ttfinal", "sigfinal",
+    "topqua", "eclqua", "cdcqua",
+    "klmcc", "klecc" // 78
   };
 
 
@@ -823,6 +841,26 @@ void setunpacker()
       5,  6, 23, 17, 10,
       11, 37,  1, 16, 22,
       38, 39, 40, 41
+    },
+
+    {
+      //14,[15] 32+16
+      -1, -1, 41, -1, -1,
+      33, -1, -1, -1, -1,
+      7,  8,  9, 47, -1,
+      -1, -1, -1, -1,  0,
+      36, 18, 24, 25, -1,
+      -1, -1, 26, 19, -1,
+      20, 12, 13, 14, -1,
+      -1, -1, 42, 43, 44,
+      40, 34, -1, -1, 35,
+      -1, -1, -1, -1, -1,
+      -1, -1,  2,  3,  4,
+      5,  6, 23, 17, 10,
+      11, 37,  1, 16, 22,
+      -1, 39, 45, 46, 15,
+      21, 27, 28, 29, 30,
+      31, 32, 38
     }
 
   };
@@ -1352,6 +1390,42 @@ void setunpacker()
       95, 31, // psn2
       63, 31, // psn1
       31, 31, // psn0
+    },
+
+    {
+      //14. [15].
+      622, 10, // 0  [19] rvc
+      611, 15, // 1  cnttrg8
+      379,  3, // 2  [52] tttmdl
+      592,  0, // 3  tdsrcp
+      591,  0, // 4  tdtopp
+      590,  0, // 5  tdeclp
+      589,  0, // 6  tdcdcp
+      588, 13, // 7  toptiming
+      573, 13, // 8  ecltiming
+      558, 13, // 9  cdctiming
+      543, 31, // 10 itd4
+      511, 31, // 11 itd3
+      479, 31, // 12 itd2
+      447, 31, // 13 itd1
+      415, 31, // 14 itd0
+      367, 31, // 15 [69] ftd5
+      351, 31, // 16 ftd4
+      319, 31, // 17 ftd3
+      287, 31, // 18 ftd2
+      255, 31, // 19 ftd1
+      223, 31, // 20 ftd0
+      175, 15, // 21 [70] psn5
+      159, 31, // 22 psn4
+      127, 31, // 23 psn3
+      95,  31, // 24 psn2
+      63,  31, // 25 psn1
+      31,  31, // 26 psn0
+      383,  3, // 27 [71] ttfinal
+      623,  0, // 28 [72] sigfinal
+      375,  1, // 29 [73] topqua
+      373,  1, // 30 [74] eclqua
+      371,  1  // 31 [75] cdcqua
     }
 
 
@@ -1360,22 +1434,26 @@ void setunpacker()
   int m_nword_header[N_UNPACKER_ARRAY] {
     3, 3, 4, 6, 6,
     6, 6, 6, 6, 6,
-    6, 6, 6, 6, 6
+    6, 6, 6, 6, 6,
+    6
   };
   int m_conf[N_UNPACKER_ARRAY] {
     0, 0, 1, 2, 3,
     4, 5, 6, 7, 6,
-    7, 7, 8, 9, 10
+    7, 7, 8, 9, 10,
+    11
   };
   int m_nword_input[N_UNPACKER_ARRAY] {
     3, 3, 3, 3, 3,
     3, 3, 5, 5, 5,
-    5, 5, 5, 5, 5
+    5, 5, 5, 5, 5,
+    5
   };
   int m_nword_output[N_UNPACKER_ARRAY] {
     3, 3, 3, 3, 3,
     3, 3, 3, 3, 3,
-    3, 4, 4, 5, 5
+    3, 4, 4, 5, 5,
+    6
   };
 
   const int BitMap_extra[N_UNPACKER_ARRAY][N_LEAF][3] = {
@@ -1605,6 +1683,27 @@ void setunpacker()
       4, 11, 16, //sepacoml1,40
       4, 27, 5, //gdll1_rev,41
       2, 14, 15//rvcout,42
+    },
+
+    {
+      //14=[15]
+      //i_wd, downto, width
+      -1, -1, -1, //32, evt
+      -1, -1, -1, //33, clk
+      0, -1, -1, //34, firmid
+      1, -1, -1, //35, firmver
+      3, 11, 11, //36, drvc
+      2,  0, 11, //37, klecc
+      3,  0, 11, //38, gdll1rvc
+      5,  0, 12, //39, coml1rvc
+      -1, -1, -1, //40, conf
+      2, 29,  3, //41, timtype
+      5, 12, 20, //42, cnttrg
+      4,  0, 11, //43, klmcc
+      3, 22, 10, //44, sepagdll1
+      4, 11, 16, //45, sepacoml1
+      4, 27,  5, //46, gdll1_rev
+      2, 12, 17  //47, rvcout
     }
 
   };

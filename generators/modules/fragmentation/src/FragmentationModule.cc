@@ -46,7 +46,7 @@ FragmentationModule::FragmentationModule() : Module()
 
   //Parameter definition
   addParam("ParameterFile", m_parameterfile, "Input parameter file for PYTHIA",
-           std::string("../modules/fragmentation/data/pythia_default.dat"));
+           FileSystem::findFile("generators/modules/fragmentation/data/pythia_belle2.dat"));
   addParam("ListPYTHIAEvent", m_listEvent, "List event record of PYTHIA after hadronization", 0);
   addParam("UseEvtGen", m_useEvtGen, "Use EvtGen for specific decays", 1);
   addParam("DecFile", m_DecFile, "EvtGen decay file (DECAY.DEC)",
@@ -119,7 +119,8 @@ void FragmentationModule::initialize()
   m_Pythia->readString("ProcessLevel:all = off");
 
   // Read the PYTHIA input file, overrides parameters
-  m_Pythia->readFile(m_parameterfile);
+  if (!m_Pythia->readFile(m_parameterfile))
+    B2FATAL("Cannot read Pythia parameter file.");
 
   // Set framework generator
   FragmentationRndm* fragRndm = new FragmentationRndm();
@@ -145,6 +146,13 @@ void FragmentationModule::initialize()
     }
     evtgen = new EvtGenDecays(m_Pythia, evtGen);
     evtgen->readDecayFile(m_UserDecFile);
+    // Workaround for Pythia bug. It is the only way to call
+    // EvtGenDecays::updateData(true) to disable particle decays
+    // for all particles from EvtGen decay table. Thus, EvtGen generation
+    // has to be called before generation of the first Pythia event.
+    // Since Pythia event is currently empty, it actually only updates
+    // the particle properties (exactly what is necessary).
+    evtgen->decay();
   }
 
   // List variable(s) that differ from their defaults

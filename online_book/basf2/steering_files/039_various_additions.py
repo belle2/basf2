@@ -66,7 +66,7 @@ ma.matchMCTruth("B0", path=main)
 
 # build the rest of the event
 ma.buildRestOfEvent("B0", fillWithMostLikely=True, path=main)
-track_based_cuts = "thetaInCDCAcceptance and pt > 0.075"
+track_based_cuts = "thetaInCDCAcceptance and pt > 0.075 and dr < 5 and abs(dz) < 10"
 ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
 roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
 ma.appendROEMasks("B0", [roe_mask], path=main)
@@ -111,9 +111,9 @@ jpsi_ks_vars = vc.inv_mass + standard_vars
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
 # Add the J/Psi mass calculated with uncorrected electrons:
 vm.addAlias(
-    "D0_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
+    "Jpsi_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
 )
-b_vars += ["D0_M_uncorrected"]
+b_vars += ["Jpsi_M_uncorrected"]
 # Also add kinematic variables boosted to the center of mass frame (CMS)
 # for all particles
 cmskinematics = vu.create_aliases(

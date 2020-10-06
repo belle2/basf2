@@ -14,7 +14,7 @@ import vertex
 filenumber = sys.argv[1]
 
 # set analysis global tag (needed for flavor tagging)
-b2.use_central_database("analysis_tools_release-04-02")
+b2.conditions.prepend_globaltag("analysis_tools_release-04-02")
 
 # create path
 main = b2.Path()
@@ -74,19 +74,19 @@ ma.matchMCTruth("B0", path=main)
 
 # build the rest of the event
 ma.buildRestOfEvent("B0", fillWithMostLikely=True, path=main)
-track_based_cuts = "thetaInCDCAcceptance and pt > 0.075"
+track_based_cuts = "thetaInCDCAcceptance and pt > 0.075 and dr < 5 and abs(dz) < 10"
 ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
 roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
 ma.appendROEMasks("B0", [roe_mask], path=main)
 
 # call flavor tagging
-ft.flavorTagger("B0", path=main)
+ft.flavorTagger(["B0"], path=main)
 
 # remove B0 candidates without a valid flavor information
-ma.applyCuts("B0", "qrOutput(FBDT) > -2", path=main)
+ma.applyCuts("B0", "FBDT_qrCombined > -2", path=main)
 
 # fit B vertex on the tag-side
-vertex.TagV("B0", constraintType="tube", fitAlgorithm="Rave", path=main)
+vertex.TagV("B0", fitAlgorithm="Rave", path=main)
 
 # perform best candidate selection
 b2.set_random_seed("Belle II StarterKit")
@@ -114,7 +114,7 @@ for roe_variable in roe_kinematics + roe_multiplicities:
     b_vars.append(roe_variable_with_mask)
 
 b_vars += ft.flavor_tagging
-b_vars += vc.vertex + vc.mc_vertex
+b_vars += vc.tag_vertex + vc.mc_tag_vertex
 
 # Variables for final states (electrons, positrons, pions)
 fs_vars = vc.pid + vc.track + vc.track_hits + standard_vars
@@ -132,9 +132,9 @@ jpsi_ks_vars += vc.vertex + vc.mc_vertex
 b_vars += vu.create_aliases_for_selected(jpsi_ks_vars, "B0 -> ^J/psi ^K_S0")
 # Add the J/Psi mass calculated with uncorrected electrons:
 vm.addAlias(
-    "D0_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
+    "Jpsi_M_uncorrected", "daughter(0, daughterCombination(M,0:0,1:0))"
 )
-b_vars += ["D0_M_uncorrected"]
+b_vars += ["Jpsi_M_uncorrected"]
 # Also add kinematic variables boosted to the center of mass frame (CMS)
 # for all particles
 cmskinematics = vu.create_aliases(

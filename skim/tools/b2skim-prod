@@ -9,8 +9,8 @@
 also generating combined steering files.
 
 YAML files are used by this tool to define the LPNs of datasets. Below are examples of
-valid YAML entries for data and MC. The tool ``skim/tools/lpns2yaml.py`` is provided to
-create these YAML files from a list of LPNs.
+valid YAML entries for data and MC. The tool :ref:`lpns2yaml.py<lpns2yaml>` is provided
+to create these YAML files from a list of LPNs.
 
 .. code-block:: yaml
 
@@ -80,8 +80,7 @@ create these YAML files from a list of LPNs.
         runNumber: 0
 
 To produce JSON files for a list of combined skims, pass this tool the YAML file and the
-names of the skims. The combined skims must be defined in
-`skim.registry.RegisteredSkims`. The other required arguments include the skim campaign,
+names of the skims. The other required arguments include the skim campaign,
 intended release to be used, and base directory of the repository to output the JSON
 files in.
 
@@ -947,8 +946,7 @@ def get_argument_parser():
         required=True,
         nargs="+",
         metavar="CombinedSkim",
-        help="List of skims to produce request files for. "
-        "Only accepts combined skims listed in `skim.registry.RegisteredSkims`.",
+        help="List of skims to produce request files for."
     )
     parser.add_argument(
         "-o",

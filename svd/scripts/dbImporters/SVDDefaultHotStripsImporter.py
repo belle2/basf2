@@ -13,6 +13,7 @@ from ROOT import Belle2
 from ROOT.Belle2 import SVDHotStripsCalibrations
 import datetime
 import os
+from basf2 import conditions as b2conditions
 
 now = datetime.datetime.now()
 
@@ -50,9 +51,7 @@ class defaultHotStripsImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDHotStripsCalibrations.name, payload, iov)
 
 
-use_database_chain()
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localDB_defaultHotStripsCalibrations/database.txt", "localDB_defaultHotStripsCalibrations")
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = create_path()
 
@@ -61,8 +60,8 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox")  # , fileName="/geometry/Beast2_phase2.xml")
-main.add_module("Geometry", components=['SVD'])  # , useDB = True)
+main.add_module("Gearbox")
+main.add_module("Geometry")
 
 main.add_module(defaultHotStripsImporter())
 

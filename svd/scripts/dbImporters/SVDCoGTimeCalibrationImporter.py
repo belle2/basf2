@@ -28,7 +28,7 @@ from ROOT.Belle2 import SVDCoGCalibrationFunction
 from ROOT.Belle2 import SVDCoGTimeCalibrations
 from svd import *
 from svd.CoGCalibration_utils import SVDCoGTimeCalibrationImporterModule
-
+from basf2 import conditions as b2conditions
 import matplotlib.pyplot as plt
 import simulation
 
@@ -48,29 +48,27 @@ else:
     with open(filename, 'r') as f:
         inputFileList = [line.strip() for line in f]
 
-reset_database()
-use_database_chain()
-use_central_database('data_reprocessing_proc7')
+b2conditions.prepend_globaltag("svd_loadedOnFADC")
 if '_CHECK' not in localdb:
-    use_central_database('svd_NOCoGCorrections')
+    b2conditions.prepend_globaltag('svd_NOCoGCorrections')
     if os.path.isdir(localdb):
         print('WARNING, you are using CoG corrections in ' + localdb + ' exiting')
         sys.exit(1)
     else:
-        use_local_database(localdb + "/database.txt", localdb, invertLogging=True)
+        b2conditions.testing_payloads = [str(localdb)]
 else:
     localdb = localdb.split('_')
     if not os.path.isdir(localdb[0]):
         print('WARNING, the localDB ' + localdb[0] + ' containing the corrections is missing, exiting.')
         sys.exit(1)
     else:
-        use_local_database(localdb[0] + "/database.txt", localdb[0], invertLogging=True)
+        b2conditions.testing_payloads = [str(localdb)]
     localdb = sys.argv[1]
     if os.path.isdir(localdb):
         print('WARNING, you are using CoG corrections in ' + localdb + ' exiting')
         sys.exit(1)
     else:
-        use_local_database(localdb + "/database.txt", localdb, invertLogging=True)
+        b2conditions.testing_payloads = [str(localdb)]
 
 main = create_path()
 

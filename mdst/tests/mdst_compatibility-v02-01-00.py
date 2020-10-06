@@ -17,6 +17,8 @@ CHANGES since release-02-01-00:
   + hasFailedFitTime
   + hasFailedTimeResolution
   - getCovarianceMatrixAsArray removed
+- TRGSummary:
+  * getTimQuality added
 - SoftwareTriggerResult:
   * non-prescaled results added
 - TrackFitResult:

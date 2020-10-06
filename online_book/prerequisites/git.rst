@@ -1,7 +1,8 @@
 .. _onlinebook_git:
 
-Version Control with Git
-========================
+==========================
+ Version Control with Git
+==========================
 
 .. sidebar:: Overview
     :class: overview
@@ -83,7 +84,7 @@ Afterwards we can quickly go to the Belle II specific things you might need to
 be aware of.
 
 Belle II Specifics
-------------------
+==================
 
 In Belle II we use Bitbucket Server by Atlassian for our git repositories. While
 this is rather similar to github in some regards. It is strongly advised to use
@@ -108,7 +109,7 @@ We also have a `confluence page <https://confluence.desy.de/x/2o4iAg>`_ with
 more information and help in case of problems.
 
 Exercises
----------
+=========
 
 Let's test what you learned so far!
 
@@ -173,7 +174,7 @@ cannot just push changes there directly. Instead, you have to open a pull reques
 For this concept you need to complete the next section.
 
 Branches (intermediate)
------------------------
+=======================
 
 By now you should have a good feeling about why git is needed and start to feel
 a bit more comfortable with basic ``git`` commands.
@@ -272,6 +273,27 @@ updating it with ``git pull``).
 
    Check if there are any other open PRs. If there are, leave some comments!
    You can also add yourself as the reviewer and approve them.
+
+Further reading
+---------------
+
+Git is complex and it might take you months (or years, depending on your effort)
+to really feel its full power and to be able to use it effortless.
+
+At this point `the xkcd comic <https://xkcd.com/1597/>`_ from above might still
+show you (we certainly haven't taught you enough to change it). Therefore it's important
+to continue your training even after the StarterKit. It will not be time wasted!
+
+.. seealso::
+
+  We have started to compile a reading list for git `on confluence <https://confluence.desy.de/x/qhG3Cg>`_.
+  Please take a look (and help us extend it if you can recommend other tutorials)!
+
+.. hint::
+
+  There is a variety of graphical user interfaces for git. If visualizing things
+  helps you and you still feel uncomfortable in the command line, you might
+  want to try them out!
 
 .. topic:: Authors of this lesson
 

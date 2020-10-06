@@ -29,6 +29,8 @@ CHANGES since release-01-02-11:
   + hasFailedTimeResolution
   * getCovarianceMatrixAsArray removed
 - KlIds are added
+- TRGSummary:
+  * getTimQuality added
 - SoftwareTriggerResult:
   * non-prescaled results added
 - Particle masses:

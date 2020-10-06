@@ -25,6 +25,11 @@ class RunningTagUpdateMode(Enum):
     #: Only allow trivial (0,0,-1,-1) validities in the staging tag and only one
     #  validity per payload name
     SIMPLE = 4
+    #: Replace full state of the globaltag. Similar to ALLOW_CLOSED but any
+    #  payload present and open in the running tag that is **not** part of the
+    #  staging tag will be closed. After the update the new valid payloads will
+    #  be exactly the ones in the staging tag
+    FULL_REPLACEMENT = 6
 
 
 class RunningTagUpdaterError(Exception):
@@ -32,6 +37,7 @@ class RunningTagUpdaterError(Exception):
     Errors raised when trying to update the running globaltag. Can have extra
     variables in `extra_vars` to be shown to the user for additional information
     """
+    #: Initialize the class.
     def __init__(self, description, **extra_vars):
         super().__init__(description)
         #: extra keyword arguments given to the exception constructor
@@ -57,6 +63,7 @@ class RunningTagUpdater:
     6. Close all payloads to be updated in the running tag that are open just
        before the validity in the staging tag.
     """
+    #: Initialize the class.
     def __init__(self, db, running, staging, valid_from, mode):
         #: Reference to the database object to use for queries
         self._db = db
@@ -76,7 +83,8 @@ class RunningTagUpdater:
         #  for example when retireing a payload
         self._mode = mode
         #: Do we allow closed iovs in staging?
-        self._allow_closed = mode in (RunningTagUpdateMode.ALLOW_CLOSED, RunningTagUpdateMode.FIX_CLOSED)
+        self._allow_closed = mode in (RunningTagUpdateMode.ALLOW_CLOSED, RunningTagUpdateMode.FIX_CLOSED,
+                                      RunningTagUpdateMode.FULL_REPLACEMENT)
         #: Do we want to automatically open closed iovs?
         self._fix_closed = (mode == RunningTagUpdateMode.FIX_CLOSED)
         #: Dictionary mapping payload names in the staging tag to the coverage
@@ -98,6 +106,8 @@ class RunningTagUpdater:
         self._running_payloads = db.get_all_iovs(self._running_info['name'])
         #: Payloads currently in the staging tag
         self._staging_payloads = db.get_all_iovs(self._staging_info['name'])
+        #: First iov per payload name in staging to not close and open the same revision
+        self._staging_first_iovs = {}
 
     def _check_state(self, tagname, taginfo, required):
         """Check the state of a globaltag given the tag information object returned by the database
@@ -176,6 +186,9 @@ class RunningTagUpdater:
                 errors["wrong validity"] += 1
                 B2ERROR(f"Wrong validity for payload in staging tag '{tagname}'", name=p.name, validity=p.iov)
 
+            # trivial, only one payload per name to remember so it's always the first
+            self._staging_first_iovs[p.name] = p
+
         # how many errors did we have?
         if any(errors.values()):
             raise RunningTagUpdaterError(f"Staging tag '{tagname}' not fit for update in simple mode", **errors)
@@ -232,6 +245,13 @@ class RunningTagUpdater:
                 else:
                     latest_iov[p.name] = max(p, prev)
 
+            # remember the first iov of each payload to extend what's in running if they match
+            first = self._staging_first_iovs.get(p.name, None)
+            if first is None:
+                self._staging_first_iovs[p.name] = p
+            else:
+                self._staging_first_iovs[p.name] = min(p, first)
+
         # Ok, now check for all payloads if the resulting iov is a single one or multiple,
         # aka having gaps. In that case print the gaps
         for name, iovs in full_coverage.items():
@@ -283,13 +303,30 @@ class RunningTagUpdater:
         # Ok, all checks done ...
         valid_range = IntervalOfValidity(*(self._valid_from + (-1, -1)))
         operations = []
-        # we only need to close payloads that are present in staging
+        # we only need to close payloads that are present in staging ... unless
+        # we run in FULL mode in which we close everything
         for p in self._running_payloads:
             # so check if we have a coverage in the staging tag
             staging = self._staging_coverage.get(p.name, None)
-            if (staging is not None) and p.iov[2:] == (-1, -1):
-                # extend the staging to infinity to make sure we close existing payloads correctly
-                staging_range = IntervalOfValidity(*(staging.first + (-1, -1))) & valid_range
+            if p.iov[2:] == (-1, -1):
+                if staging is None:
+                    # payload not present in staging tag. Ignore unless we do full replacement
+                    if not self._mode == RunningTagUpdateMode.FULL_REPLACEMENT:
+                        continue
+                    staging_range = valid_range
+                else:
+                    # extend the staging to infinity to make sure we close existing payloads correctly
+                    staging_range = IntervalOfValidity(*(staging.first + (-1, -1))) & valid_range
+
+                # if the first payload didn't change revision we don't need to make
+                # a new iov but can just extend the existing one
+                first_iov = self._staging_first_iovs.get(p.name, None)
+                if first_iov is not None and first_iov.revision == p.revision:
+                    staging_range -= IntervalOfValidity(first_iov.iov)
+                    self._staging_payloads.remove(first_iov)
+                    # there's a chance this is empty now
+                    if not staging_range:
+                        continue
                 # close the existing iov before the range covered in staging
                 p.iov = (IntervalOfValidity(p.iov) - staging_range).tuple
                 # and mark the iov for closing

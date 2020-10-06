@@ -16,7 +16,7 @@
 
 using namespace Belle2;
 
-ERecoMasterCallback::ERecoMasterCallback() : m_callback(NULL)
+ERecoMasterCallback::ERecoMasterCallback(ConfigFile& config) : m_callback(NULL)
 {
   reg(RFCommand::CONFIGURE);
   reg(RFCommand::UNCONFIGURE);
@@ -26,6 +26,9 @@ ERecoMasterCallback::ERecoMasterCallback() : m_callback(NULL)
   reg(RFCommand::PAUSE);
   reg(RFCommand::RESTART);
   reg(RFCommand::STATUS);
+
+  m_rcnode = NSMNode(config.get("ereco.rcnode"));
+  LogFile::debug("ERecoMaster started: Bridge Node = %s", m_rcnode.getName().c_str());
 }
 
 void ERecoMasterCallback::initialize(const DBObject& obj)
@@ -269,6 +272,18 @@ void ERecoMasterCallback::abort()
 void ERecoMasterCallback::start(int expno, int runno)
 {
   int pars[] = {expno, runno};
+  std::string script;
+  if (getNode().getName().find("_") != std::string::npos) {
+    get("hlt.script", script);
+    //    script = "run_processor.py";
+  } else {
+    LogFile::debug("asking database : node = %s", m_rcnode.getName().c_str());
+    get(m_rcnode, "RUNCONTROL@hlt.script", script);
+    //    get(NSMNode("BERECO1"), "RUNCONTROL@hlt.script", script);
+    //    get(m_rcnode, "hlt.script", script, 30);
+    script = "run_" + script + ".py";
+    printf("ERECO script = %s\n", script.c_str());
+  }
   for (NSMNodeList::iterator it = m_nodes.begin(); it != m_nodes.end(); it++) {
     NSMNode& node(*it);
     if (node.getName().find("EVP") == std::string::npos) {
@@ -286,9 +301,9 @@ void ERecoMasterCallback::start(int expno, int runno)
       }
     }
     if (node.getState() != RCState::RUNNING_S) {
-      if (NSMCommunicator::send(NSMMessage(node, RCCommand::START, 2, pars))) {
+      if (NSMCommunicator::send(NSMMessage(node, RCCommand::START, 2, pars, script))) {
         setState(node, RCState::STARTING_TS);
-        LogFile::debug("%s >> STARTING", node.getName().c_str());
+        LogFile::debug("%s >> STARTING (script=%s)", node.getName().c_str(), script.c_str());
       } else {
         throw (RCHandlerException("Failed to configure %s", node.getName().c_str()));
       }

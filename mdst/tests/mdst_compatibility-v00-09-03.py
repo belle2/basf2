@@ -30,8 +30,6 @@ CHANGES since release-00-09-03:
   + hasFailedTimeResolution
   * getCovarianceMatrixAsArray removed
 - KlIds are added
-- TRGSummary:
-  * getTimTypeBits is replaced by getTimType
 - SoftwareTriggerResult:
   * getTotalResult removed
   * non-prescaled results added

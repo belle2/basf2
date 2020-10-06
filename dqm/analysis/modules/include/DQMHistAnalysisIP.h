@@ -46,8 +46,8 @@ namespace Belle2 {
     std::string m_histoname;
     /** The prefix of PV. */
     std::string  m_pvPrefix;
-    /** Then ame of monitoring variable. */
-    std::string  m_monName;
+    /** The prefix for MonitoringObj. */
+    std::string  m_monPrefix;
     /** Update entry intervall */
     int m_minEntries = 1000;
 

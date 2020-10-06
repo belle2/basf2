@@ -15,13 +15,6 @@ from svd.dump_clusters import dump_clusters
 # show warnings during processing
 set_log_level(LogLevel.WARNING)
 
-# Set database
-"""
-For phase 3 related studies, use this tag
-"""
-# use_local_database('localDB_NN_toImport/database_NN_toImport.txt','localDB_NN_toImport')
-use_central_database("development")
-
 # Register modules
 
 # Particle gun module

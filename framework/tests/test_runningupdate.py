@@ -286,6 +286,7 @@ class TestMergeStaging(unittest.TestCase):
         self.assertEqual(ctx.exception.extra_vars['payloads start after first valid run'], 2)
 
     def test_operations_simple(self):
+        """Test something useful."""
         running = self.make_payloads(**self.RUNNING_BASE)
         staging = self.make_payloads(
             A=[(0, 0, -1, -1)],
@@ -301,6 +302,27 @@ class TestMergeStaging(unittest.TestCase):
                              ['CLOSE',  'B',  1, (0,  0,  1, -1)],
                              ['CREATE', 'A', 10, (2,  0, -1, -1)],
                              ['CREATE', 'B', 10, (2,  0, -1, -1)],
+                             ['CREATE', 'C', 10, (2,  0, -1, -1)],
+                         ])
+
+    def test_operations_full(self):
+        """
+        In full mode we close B even if there's nothing in the staging tag
+        to allow "removing" payloads from the set of valid ones
+        """
+        running = self.make_payloads(**self.RUNNING_BASE)
+        staging = self.make_payloads(
+            A=[(0, 0, -1, -1)],
+            C=[(0, 0, -1, -1)],
+            start_revision=10)
+        db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
+        updater = RunningTagUpdater(db, "running", "staging", (2, 0), Mode.FULL_REPLACEMENT)
+        result = updater.calculate_update()
+        self.assertEqual(self.parse_operations(result),
+                         [
+                             ['CLOSE',  'A',  4, (1, 12,  1, -1)],
+                             ['CLOSE',  'B',  1, (0,  0,  1, -1)],
+                             ['CREATE', 'A', 10, (2,  0, -1, -1)],
                              ['CREATE', 'C', 10, (2,  0, -1, -1)],
                          ])
 
@@ -323,6 +345,30 @@ class TestMergeStaging(unittest.TestCase):
                              ['CREATE', 'A', 11, (2,  6,  2, 10)],
                              ['CREATE', 'A', 12, (2, 11, -1, -1)],
                              ['CREATE', 'B', 10, (2,  8, -1, -1)],
+                             ['CREATE', 'C', 10, (2,  0, -1, -1)],
+                         ])
+
+    def test_operations_extend(self):
+        """If the staging payloads have same revision as the last one in running merge them"""
+        running = self.make_payloads(**self.RUNNING_BASE)
+        staging = self.make_payloads(
+            A=[(0, 0, 2, 5), (2, 6, 2, 10), (2, 11, -1, -1)],
+            B=[(2, 8, -1, -1)],
+            C=[(2, 0, -1, -1)],
+            start_revision=10)
+        # we nee to have the same revision for merging though so fudge a bit
+        staging[0].revision = 4
+        staging[-2].revision = 1
+        print([(e.name, e.revision, e.iov) for e in running])
+        print([(e.name, e.revision, e.iov) for e in staging])
+        db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
+        updater = RunningTagUpdater(db, "running", "staging", (2, 0), Mode.STRICT)
+        result = updater.calculate_update()
+        self.assertEqual(self.parse_operations(result),
+                         [
+                             ['CLOSE',  'A',  4, (1, 12,  2, 5)],
+                             ['CREATE', 'A', 11, (2,  6,  2, 10)],
+                             ['CREATE', 'A', 12, (2, 11, -1, -1)],
                              ['CREATE', 'C', 10, (2,  0, -1, -1)],
                          ])
 
@@ -367,7 +413,7 @@ class TestMergeStaging(unittest.TestCase):
     def test_doc_example(self):
         """Extract the example from the `b2conditionsdb tag runningupdate` docstring and run it"""
         running, staging, expected = self.create_payloads_from_text(command_tag_runningupdate.__doc__)
-        # make a copy of the running payloads just to be able to
+        # make a copy of the running payloads just to be able to compare later
         result = running[:]
         db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
         updater = RunningTagUpdater(db, "running", "staging", (1, 2), Mode.ALLOW_CLOSED)
@@ -378,6 +424,7 @@ class TestMergeStaging(unittest.TestCase):
                          [
                              ['CLOSE',  'payload1', 2, (1, 1, 1, 1)],
                              ['CLOSE',  'payload2', 1, (0, 1, 1, 4)],
+                             ['CLOSE',  'payload4', 1, (0, 1, 1, 20)],
                              ['CREATE', 'payload1', 3, (1, 2, 1, 8)],
                              ['CREATE', 'payload1', 4, (1, 9, 1, 20)],
                              ['CREATE', 'payload2', 2, (1, 5, 1, 20)],
@@ -395,6 +442,48 @@ class TestMergeStaging(unittest.TestCase):
                 result.append(payload)
         result.sort()
         self.assertEqual(expected, result)
+
+    def test_doc_example_full(self):
+        """Extract the example from the `b2conditionsdb tag runningupdate` docstring and run it"""
+        running, staging, expected = self.create_payloads_from_text(command_tag_runningupdate.__doc__)
+        # make a copy of the running payloads just to be able to compare later
+        result = running[:]
+        db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
+        updater = RunningTagUpdater(db, "running", "staging", (1, 2), Mode.FULL_REPLACEMENT)
+        operations = updater.calculate_update()
+        # check that the update does what we actually wrote in the doc. This will
+        # fail if the docs are updated.
+        self.assertEqual(self.parse_operations(operations),
+                         [
+                             ['CLOSE',  'payload1', 2, (1, 1, 1, 1)],
+                             ['CLOSE',  'payload2', 1, (0, 1, 1, 4)],
+                             ['CLOSE',  'payload4', 1, (0, 1, 1, 20)],
+                             ['CLOSE',  'payload5', 1, (0, 1, 1, 1)],
+                             ['CREATE', 'payload1', 3, (1, 2, 1, 8)],
+                             ['CREATE', 'payload1', 4, (1, 9, 1, 20)],
+                             ['CREATE', 'payload2', 2, (1, 5, 1, 20)],
+                             ['CREATE', 'payload3', 2, (1, 2, -1, -1)],
+                         ])
+
+    def test_doc_example_fixclosed(self):
+        """Extract the example from the `b2conditionsdb tag runningupdate` docstring and run it"""
+        running, staging, expected = self.create_payloads_from_text(command_tag_runningupdate.__doc__)
+        # make a copy of the running payloads just to be able to compare later
+        result = running[:]
+        db = self.make_mock_db(running_payloads=running, staging_payloads=staging)
+        updater = RunningTagUpdater(db, "running", "staging", (1, 2), Mode.FIX_CLOSED)
+        operations = updater.calculate_update()
+        # check that the update does what we actually wrote in the doc. This will
+        # fail if the docs are updated.
+        self.assertEqual(self.parse_operations(operations),
+                         [
+                             ['CLOSE',  'payload1', 2, (1, 1, 1, 1)],
+                             ['CLOSE',  'payload2', 1, (0, 1, 1, 4)],
+                             ['CREATE', 'payload1', 3, (1, 2, 1, 8)],
+                             ['CREATE', 'payload1', 4, (1, 9, -1, -1)],
+                             ['CREATE', 'payload2', 2, (1, 5, -1, -1)],
+                             ['CREATE', 'payload3', 2, (1, 2, -1, -1)],
+                         ])
 
 
 if __name__ == "__main__":

@@ -241,6 +241,18 @@ class IntervalOfValidity:
         # no union possible: not directly connected and not overlapping
         return None
 
+    def contains(self, exp, run):
+        """Check if a run is part of the validtiy"""
+        return (
+            ((exp > self.first_exp) or (exp == self.first_exp and run < self.first_run)) and
+            ((exp < self.final_exp) or (exp == self.final_exp and run < self.final_run))
+        )
+
+    @property
+    def is_open(self):
+        """Check whether the iov is valid until infinity"""
+        return self.final == (math.inf, math.inf)
+
     @property
     def tuple(self):
         """Return the iov as a tuple with experiment/run numbers replaced with -1

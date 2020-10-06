@@ -16,6 +16,9 @@ EOT
     exit 1;
 fi
 
+# unset DISPLAY to prevent crashes when ROOT tries to open canvases
+unset DISPLAY
+
 # make sure we have a release directory
 if [ -z "$BELLE2_RELEASE_DIR" ]; then
     if [ ! -z "$BELLE2_LOCAL_DIR" ]; then
@@ -33,6 +36,22 @@ if [ -z "$BELLE2_VALIDATION_DATA_DIR" ]; then
 fi
 if [ ! -d "$BELLE2_VALIDATION_DATA_DIR" ]; then
     echo "\$BELLE2_VALIDATION_DATA_DIR doesn't exist, did you install the validation data with b2install-data?" >&2
+    exit 1
+fi
+
+# take settings from validation data dir
+if [ ! -f "${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/info.sh" ]; then
+    echo "no info.sh in \${BELLE2_VALIDATION_DATA_DIR}/hltvalidation, cannot continue"
+    exit 1
+fi
+source ${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/info.sh
+
+# make the file path absolute ...
+export VALIDATION_RAWDATA="${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/${VALIDATION_RAWDATA}"
+
+# make sure we have the rawdata
+if [ ! -f "$VALIDATION_RAWDATA" ]; then
+    echo "Validation data ${RAWDATA} doesn't exist. Have you installed the validation data with b2install-data?" >&2
     exit 1
 fi
 
@@ -55,12 +74,22 @@ shopt -s nullglob
 
 mkdir -p ${OUTPUT_DIR}
 
-for file in $BELLE2_RELEASE_DIR/hlt/tests/release_validation/${STAGE}-*; do
-    if [[ -f "$file" && -x $(realpath "$file") ]]; then
-        echo "Executing $(basename $file)"
-        $file 2>&1 | tee $OUTPUT_DIR/$(basename ${file%.*}).log
-    elif [[ -f "$file" && "$file" == *.py ]]; then
-        echo "Running 'basf2 $(basename $file)'"
-        basf2 -- $file 2>&1 | tee $OUTPUT_DIR/$(basename ${file%.*}).log
-    fi
-done
+# save the environment variables we have
+env > ${OUTPUT_DIR}/env.log
+
+function run_stage() {
+    for file in $BELLE2_RELEASE_DIR/hlt/tests/release_validation/$1-*; do
+        if [[ -f "$file" && -x $(realpath "$file") ]]; then
+            echo "Executing $(basename $file)"
+            $file 2>&1 | tee $OUTPUT_DIR/$(basename ${file%.*}).log
+        elif [[ -f "$file" && "$file" == *.py ]]; then
+            echo "Running 'basf2 $(basename $file)'"
+            basf2 -- $file 2>&1 | tee $OUTPUT_DIR/$(basename ${file%.*}).log
+        fi
+    done
+}
+
+# always run the setup first
+run_stage setup
+# and then the real stage
+run_stage $STAGE

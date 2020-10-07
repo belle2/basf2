@@ -224,6 +224,8 @@ void SVDUnpackerModule::event()
       unsigned short ftbError = 0;
       unsigned short trgType = 0;
       unsigned short trgNumber = 0;
+      unsigned short daqMode = -1;
+      unsigned short daqType = 0;
       unsigned short cmc1;
       unsigned short cmc2;
       unsigned short apvErrors;
@@ -308,6 +310,11 @@ void SVDUnpackerModule::event()
             fadc = m_MainHeader.FADCnum;
             trgType = m_MainHeader.trgType;
             trgNumber = m_MainHeader.trgNumber;
+            daqMode = m_MainHeader.DAQMode;
+            daqType = m_MainHeader.DAQType;
+
+            //Let's add run-dependent info: daqMode="11" in case of 3-mixed-6 sample acquisition mode.
+            if (daqType) daqMode = 3;
 
             nAPVheaders = 0; // start counting APV headers for this FADC
             nAPVmatch = true; //assume correct # of APV headers
@@ -317,10 +324,11 @@ void SVDUnpackerModule::event()
 
             is3sampleData = false;
             is6sampleData = false;
-            if (m_MainHeader.DAQMode == 0) B2ERROR("SVDDataFormatCheck: the event " << eventNo <<
-                                                     " is apparently taken with 1-sample mode, this is not expected.");
-            if (m_MainHeader.DAQMode == 1) is3sampleData = true;
-            if (m_MainHeader.DAQMode == 2) is6sampleData = true;
+
+            if (daqMode == 0) B2ERROR("SVDDataFormatCheck: the event " << eventNo <<
+                                        " is apparently taken with 1-sample mode, this is not expected.");
+            if (daqMode == 1) is3sampleData = true;
+            if (daqMode == 2) is6sampleData = true;
 
             if (
               m_MainHeader.trgNumber !=
@@ -335,7 +343,7 @@ void SVDUnpackerModule::event()
             }
 
             // create SVDModeByte object from MainHeader vars
-            m_SVDModeByte = SVDModeByte(m_MainHeader.runType, m_MainHeader.evtType, m_MainHeader.DAQMode, m_MainHeader.trgTiming);
+            m_SVDModeByte = SVDModeByte(m_MainHeader.runType, 0, daqMode, m_MainHeader.trgTiming);
 
             // create SVDEventInfo and fill it with SVDModeByte & SVDTriggerType objects
             if (!isSetEventInfo) {

@@ -38,7 +38,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", string("SVDEventInfoSim"));
   addParam("runType", m_runType, "Defines the run type: raw/transparent/zero-suppressed/z-s+hit time finding", int(2));
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
-  addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples", int(2));
+  addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples or 3-mixed-6 samples", int(2));
   addParam("randomTriggerBin", m_randomTriggerBin, "Trigger bin is randomly chosen between 0/1/2/3.", bool(true));
   addParam("triggerBin", m_triggerBin, "Trigger bin 0/1/2/3 - useful for timing studies. The default is random.", int(999));
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
@@ -81,7 +81,7 @@ void SVDEventInfoSetterModule::event()
   m_svdEventInfoPtr->setRelativeShift(m_relativeShift);
 
   int nAPVsamples = 6;
-  if (m_daqMode == 1)
+  if (m_triggerType == 1 or m_triggerType == 0 or m_triggerType == 4 or m_triggerType == 8 or m_triggerType == 12)
     nAPVsamples = 3;
 
   m_svdEventInfoPtr->setNSamples(nAPVsamples);

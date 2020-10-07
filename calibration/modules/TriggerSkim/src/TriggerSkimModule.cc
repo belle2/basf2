@@ -15,6 +15,7 @@
 #include <framework/utilities/Utils.h>
 
 #include <algorithm>
+#include <stdexcept>
 
 using namespace Belle2;
 
@@ -100,11 +101,16 @@ void TriggerSkimModule::initialize()
 }
 
 bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int prescale, uint32_t* counter) const {
-  bool accepted = m_trigResults->getResult(name) == static_cast<SoftwareTriggerCutResult>(m_expectedResult);
-  if(accepted and prescale!=1) {
-    accepted &= SoftwareTrigger::makePreScale(prescale, counter);
+  try {
+    bool accepted = m_trigResults->getResult(name) == static_cast<SoftwareTriggerCutResult>(m_expectedResult);
+    if(accepted and prescale!=1) {
+      accepted &= SoftwareTrigger::makePreScale(prescale, counter);
+    }
+    return accepted;
+  } catch(std::out_of_range &e) {
+    B2ERROR("software trigger line not found" << LogVar("line", name));
+    return false;
   }
-  return accepted;
 }
 
 void TriggerSkimModule::event()

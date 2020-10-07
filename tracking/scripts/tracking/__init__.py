@@ -10,7 +10,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                                add_cdcTrack_QI=False, add_vxdTrack_QI=False, add_recoTrack_QI=False):
+                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.

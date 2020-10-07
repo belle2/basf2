@@ -535,9 +535,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
-            filterParameters={"cut": 0.0},
-            deleteTracks=False,
-            resetTakenFlag=False
+            filterParameters={"cut": 0.7},
+            deleteTracks=True,
+            resetTakenFlag=True
         )
 
     # Export CDCTracks to RecoTracks representation

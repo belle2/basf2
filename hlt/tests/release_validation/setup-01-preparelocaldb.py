@@ -65,7 +65,7 @@ def prepare_globaltag(db, exp, run):
             update_payload(payloads, p, 2, f"e{exp}r{run}")
 
     # and take everything from staging
-    staging = db.get_all_iovs("staging_online_release-05-01-00")
+    staging = db.get_all_iovs("staging_online")
     for p in staging:
         update_payload(payloads, p, 3, "staging")
 

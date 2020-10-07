@@ -39,12 +39,14 @@ if [ ! -d "$BELLE2_VALIDATION_DATA_DIR" ]; then
     exit 1
 fi
 
-# take settings from validation data dir
-if [ ! -f "${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/info.sh" ]; then
-    echo "no info.sh in \${BELLE2_VALIDATION_DATA_DIR}/hltvalidation, cannot continue"
-    exit 1
+# take settings from validation data dir unless all are already set to allow overriding which file to use in bamboo
+if [ -z "$VALIDATION_RAWDATA" ] || [ -z "$VALIDATION_EXP" ] || [ -z "$VALIDATION_RUN" ]; then
+    if [ ! -f "${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/info.sh" ]; then
+        echo "no info.sh in \${BELLE2_VALIDATION_DATA_DIR}/hltvalidation, cannot continue"
+        exit 1
+    fi
+    source ${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/info.sh
 fi
-source ${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/info.sh
 
 # make the file path absolute ...
 export VALIDATION_RAWDATA="${BELLE2_VALIDATION_DATA_DIR}/hltvalidation/${VALIDATION_RAWDATA}"

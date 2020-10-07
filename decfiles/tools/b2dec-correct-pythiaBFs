@@ -36,19 +36,6 @@ if __name__ == '__main__':
     filepath = args.input
     outpath = args.output
 
-    print(filepath)
-    print(outpath)
-
-#    if(len(sys.argv) < 3):
-#        if(len(sys.argv) < 2):
-#            filepath = '../../dec/DECAY_BELLE2.DEC'
-#        else:
-#            filepath = sys.argv[1]
-#        outfile = filepath+'_COR'
-#    else:
-#        filepath = sys.argv[1]
-#        outfile = sys.argv[2]
-
     Balldecs = {'B+': [], 'B-': [], 'B0': [], 'anti-B0': []}
     Bdecs = {'B+': [], 'B-': [], 'B0': [], 'anti-B0': []}
 

@@ -27,11 +27,6 @@ def arg_parser():
 if __name__ == "__main__":
     args = arg_parser().parse_args()
     filepath = args.input
-    print(filepath)
-#    if(len(sys.argv) < 2):
-#        filepath = '../../dec/DECAY_BELLE2.DEC'
-#    else:
-#        filepath = sys.argv[1]
 
     Balldecs = {'B+': [], 'B-': [], 'B0': [], 'anti-B0': []}
     Bdecs = {'B+': [], 'B-': [], 'B0': [], 'anti-B0': []}

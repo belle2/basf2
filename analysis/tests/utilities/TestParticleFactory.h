@@ -156,7 +156,7 @@ namespace TestUtilities {
       Belle2::StoreArray<Belle2::Track> myTracks;
       myTrackFits.appendNew(vertex, tmomentum, cov6, charge, Belle2::Const::ChargedStable(abs(particleDescription->getPDGCode())), pValue,
                             bField,
-                            CDCValue, 16777215);
+                            CDCValue, 16777215, 0);
       Belle2::Track mytrack;
       Belle2::StoreArray<Belle2::Particle> myParticles;
       mytrack.setTrackFitResultIndex(Belle2::Const::ChargedStable(abs(particleDescription->getPDGCode())), myTrackFits.getEntries() - 1);

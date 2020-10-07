@@ -20,6 +20,7 @@
 #include <klm/dataobjects/KLMDigit.h>
 #include <klm/dbobjects/eklm/EKLMReconstructionParameters.h>
 #include <klm/dbobjects/eklm/EKLMTimeCalibration.h>
+#include <klm/dbobjects/KLMChannelStatus.h>
 #include <klm/dbobjects/KLMTimeWindow.h>
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
@@ -86,6 +87,12 @@ namespace Belle2 {
      */
     void reconstructEKLMHits();
 
+    /**
+     * Check if channel is normal or dead.
+     * Dead channels should not contain any signal; they are allowed for debugging.
+     */
+    bool isNormal(const KLMDigit* digit) const;
+
     /* EKLM methods. */
 
     /**
@@ -137,6 +144,7 @@ namespace Belle2 {
 
     /** Element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
+    const KLMElementNumbers* m_ElementNumbers;
 
     /** Geometry data. */
     const EKLM::GeometryData* m_eklmGeoDat;
@@ -164,6 +172,12 @@ namespace Belle2 {
 
     /** Alignment Hits. */
     StoreArray<EKLMAlignmentHit> m_eklmAlignmentHits;
+
+    /** Channel status. */
+    DBObjPtr<KLMChannelStatus> m_ChannelStatus;
+
+    /** Use only Normal and Dead (for debugging) channels during 2d hit reconstruction */
+    bool m_IgnoreHotChannels;
 
   };
 } // end namespace Belle2

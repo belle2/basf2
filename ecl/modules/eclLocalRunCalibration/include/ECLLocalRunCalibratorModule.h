@@ -21,6 +21,9 @@
 
 // FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // ECL
 #include <ecl/dataobjects/ECLDigit.h>
@@ -193,6 +196,14 @@ namespace Belle2 {
      * deviation accumulators for all cell ids.
      */
     ECLLocalRunCalibUnit* m_ampl;
+    /**
+     * Event metadata.
+     */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
+    /**
+     * ECL digits.
+     */
+    StoreArray<ECLDigit> m_ECLDigits;
     /**
      * Write full tree of times and amplitudes
      per each cellid

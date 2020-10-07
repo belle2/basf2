@@ -10,6 +10,7 @@ from basf2 import B2ERROR
 
 RegisteredSkims = [
     # --- WG0: Systematics ---
+    ("10000000", "systematics", "Random"),
     ("10600100", "systematics", "Systematics"),
     ("10600300", "systematics", "SystematicsTracking"),
     ("10600400", "systematics", "Resonance"),
@@ -64,6 +65,7 @@ RegisteredSkims = [
     ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
 
     # --- WG5: Quarkonium ---
+    ("15410300", "quarkonium", "InclusiveLambda"),
     ("15420100", "quarkonium", "BottomoniumEtabExclusive"),
     ("15440100", "quarkonium", "BottomoniumUpsilon"),
     # ("16460100", "quarkonium", "ISRpipicc"), Subset of 16460200, deleted.
@@ -100,6 +102,7 @@ RegisteredSkims = [
     ("18020200", "dark", "GammaGammaControlKLMDark"),
     ("18020300", "dark", "ALP3Gamma"),
     ("18020400", "dark", "EGammaControlDark"),
+    ("18000000", "dark", "InelasticDarkMatter"),
     ("18360100", "taupair", "TauLFV"),
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),

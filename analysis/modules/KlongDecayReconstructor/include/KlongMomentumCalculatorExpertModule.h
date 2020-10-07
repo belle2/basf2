@@ -48,6 +48,8 @@ namespace Belle2 {
 
   private:
 
+    StoreObjPtr<ParticleList> m_koutputList; /**< Klong output particle list */
+
     int m_pdgCode;                /**< PDG code of the combined mother particle */
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
     std::string m_finalDecayString;   /**< Final DecayString specifying the decay being reconstructed with recalculated KL momenta*/

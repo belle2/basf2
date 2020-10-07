@@ -32,7 +32,7 @@ import mdst
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       abort_path=None):
+                       abort_path=None, use_random_numbers_for_hlt_prescale=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -56,6 +56,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
     :param abort_path: the path to use when the reconstruction is aborted. If None an empty path will be used.
+    :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
+        generated numbers, otherwise are applied using an internal counter.)
     """
 
     # Check components.
@@ -104,7 +106,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                             pruneTracks=pruneTracks,
                                             add_muid_hits=add_muid_hits,
                                             addClusterExpertModules=addClusterExpertModules)
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
         # if you don't need the softwareTrigger result, then you can add only these two modules of the post-tracking reconstruction
         else:
@@ -130,7 +133,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                         addClusterExpertModules=addClusterExpertModules)
         # Add the modules calculating the software trigger cuts (but not performing them)
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
 
     #
@@ -145,7 +149,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                         addClusterExpertModules=addClusterExpertModules)
         # Add the modules calculating the software trigger cuts (but not performing them)
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
 
 

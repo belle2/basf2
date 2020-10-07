@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <svd/dataobjects/SVDDAQDiagnostic.h>
 #include <svd/dataobjects/SVDEventInfo.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/online/SVDOnlineToOfflineMap.h>
@@ -62,6 +63,9 @@ namespace Belle2 {
 
     /** SVDEventInfo StoreObjectPointer */
     StoreObjPtr<SVDEventInfo> m_svdEventInfo;
+
+    /** Trigger Summary data object */
+    StoreObjPtr<TRGSummary> m_objTrgSummary;
 
     /** SVDShaperDigits StoreArray name */
     std::string m_ShaperDigitName;
@@ -115,6 +119,7 @@ namespace Belle2 {
     TH1F* m_DQMEventFractionHisto = nullptr; /**< TH1F histogram showing the fraction of events affected by errors*/
     TH2F* m_DQMnSamplesHisto = nullptr; /**< TH2F histogram showing number of samples in data VS daqMode */
     TH2F* m_DQMnSamplesHisto2 = nullptr; /**< TH2F histogram showing number of samples in data VS daqMode (2bins only) */
+    TH2F* m_DQMtrgQuality = nullptr; /**< TH2F histogram showing number of samples in data VS Trigger Quality */
 
   };
 

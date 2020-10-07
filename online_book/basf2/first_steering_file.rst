@@ -921,6 +921,16 @@ or `matchedMC`.
     .. literalinclude:: steering_files/019_first_steering_file.py
         :linenos:
 
+.. hint::
+
+    * If you are confused by what we are doing with the ``b_vars`` list, simply
+      add a couple of ``print(b_vars)`` between the definition and the
+      operations on it. You might also want to take another look at
+      `your training on lists <https://swcarpentry.github.io/python-novice-inflammation/05-lists/index.html>`_.
+    * If you are confused by the aliases that we are creating, simply use
+      `VariableManager.printAliases` (``vm.printAliases()``) just before
+      processing your path.
+
 .. seealso::
 
     Some more example steering files that center around the `VariableManager`

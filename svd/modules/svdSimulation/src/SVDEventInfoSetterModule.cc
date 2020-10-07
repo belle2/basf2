@@ -10,6 +10,7 @@
 
 #include <svd/modules/svdSimulation/SVDEventInfoSetterModule.h>
 #include <root/TRandom.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 using namespace std;
 using namespace Belle2;
@@ -81,8 +82,9 @@ void SVDEventInfoSetterModule::event()
   m_svdEventInfoPtr->setRelativeShift(m_relativeShift);
 
   int nAPVsamples = 6;
-  if (m_triggerType == 1 or m_triggerType == 0 or m_triggerType == 4 or m_triggerType == 8 or m_triggerType == 12)
-    nAPVsamples = 3;
+  if (m_triggerType == TRGSummary::ETimingType::TTYP_TOP or m_triggerType == TRGSummary::ETimingType::TTYP_ECL
+      or m_triggerType == TRGSummary::ETimingType::TTYP_PID1 or m_triggerType == TRGSummary::ETimingType::TTYP_PID2
+      or m_triggerType == TRGSummary::ETimingType::TTYP_PID3) nAPVsamples = 3;
 
   m_svdEventInfoPtr->setNSamples(nAPVsamples);
 

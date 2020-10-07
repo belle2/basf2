@@ -82,14 +82,15 @@ void SVDEventInfoSetterModule::event()
   m_svdEventInfoPtr->setRelativeShift(m_relativeShift);
 
   int nAPVsamples = 6;
-  if (m_triggerType == TRGSummary::ETimingType::TTYP_TOP or m_triggerType == TRGSummary::ETimingType::TTYP_ECL
-      or m_triggerType == TRGSummary::ETimingType::TTYP_PID1 or m_triggerType == TRGSummary::ETimingType::TTYP_PID2
-      or m_triggerType == TRGSummary::ETimingType::TTYP_PID3) nAPVsamples = 3;
+
+  if (m_daqMode == 1) nAPVsamples = 3;
+  else if (m_daqMode == 3) {
+    if (m_triggerType == TRGSummary::ETimingType::TTYP_TOP or m_triggerType == TRGSummary::ETimingType::TTYP_ECL
+        or m_triggerType == TRGSummary::ETimingType::TTYP_PID1 or m_triggerType == TRGSummary::ETimingType::TTYP_PID2
+        or m_triggerType == TRGSummary::ETimingType::TTYP_PID3) nAPVsamples = 3;
+  }
 
   m_svdEventInfoPtr->setNSamples(nAPVsamples);
 
 }
-
-
-
 

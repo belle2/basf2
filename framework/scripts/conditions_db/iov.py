@@ -243,10 +243,7 @@ class IntervalOfValidity:
 
     def contains(self, exp, run):
         """Check if a run is part of the validtiy"""
-        return (
-            ((exp > self.first_exp) or (exp == self.first_exp and run < self.first_run)) and
-            ((exp < self.final_exp) or (exp == self.final_exp and run < self.final_run))
-        )
+        return self.first <= (exp, run) <= self.final
 
     @property
     def is_open(self):

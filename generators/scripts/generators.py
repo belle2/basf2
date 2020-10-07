@@ -186,7 +186,7 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate=''):
+def add_kkmc_generator(path, finalstate='', usePythiaFlags=False):
     """
     Add the default muon pair and tau pair generator KKMC
 
@@ -196,7 +196,7 @@ def add_kkmc_generator(path, finalstate=''):
     """
 
     #: kkmc input file
-    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
+    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tauola_bbb.input.dat')
 
     #: kkmc file that will hold cross section and other information
     kkmc_logfile = 'kkmc_tautau.txt'
@@ -204,15 +204,18 @@ def add_kkmc_generator(path, finalstate=''):
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: tau config file (empty for mu+mu-)
-    kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+    #: tau config file (empty for tau+tau- and mu+mu-)
+    kkmc_tauconfigfile = ''
 
+    #: If the tau decay must be controlled by Pythia flags
     if finalstate == 'tau+tau-':
-        pass
+        if usePythiaFlags:
+            kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+
     elif finalstate == 'mu+mu-':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')
         kkmc_logfile = 'kkmc_mumu.txt'
-        kkmc_tauconfigfile = ''
+
     else:
         B2FATAL("add_kkmc_generator final state not supported: {}".format(finalstate))
 

@@ -2155,12 +2155,12 @@ Decay anti-B0
 0.000002000   K-  K+  anti-K'_10                           PHSP;
 
 #--- 4-body phi-phi, phi-K-K, K-K-K-K --------------------------------
-0.000000100   phi  phi                                     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #PDG UL 0.00000003 https://arxiv.org/pdf/1907.10003.pdf. Lower all 4-body phi phi BFs by O(1). Updated by PG 9/2021
-0.000000100   phi  K+  K-                                  PHSP;
-0.000000100   phi  K0  anti-K0                             PHSP;
-0.000000100   K+  K-  K+  K-                               PHSP;
-0.000000100   K0  anti-K0  K+  K-                          PHSP;
-0.000000100   K0  anti-K0  K0  anti-K0                     PHSP;
+0.000000010   phi  phi                                     SVV_HELAMP  1.0 0.0 1.7 0.0 1.0 0.0; #PDG UL 0.00000003 https://arxiv.org/pdf/1907.10003.pdf. Lower all 4-body phi phi BFs by O(1). Updated by PG 9/2021
+0.000000010   phi  K+  K-                                  PHSP;
+0.000000010   phi  K0  anti-K0                             PHSP;
+0.000000010   K+  K-  K+  K-                               PHSP;
+0.000000010   K0  anti-K0  K+  K-                          PHSP;
+0.000000010   K0  anti-K0  K0  anti-K0                     PHSP;
 
 #--- 5-body rho-rho-pi, rho-pi-pi-pi, pi-pi-pi-pi-pi -------------------
 0.000010000   rho0  rho0  pi0                              PHSP;

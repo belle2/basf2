@@ -109,7 +109,12 @@ bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int presc
     }
     return accepted;
   } catch(std::out_of_range &e) {
-    B2ERROR("software trigger line not found" << LogVar("line", name));
+    // typo? change in lines? In any case we nope out of here but let's try to give a helpful message
+    std::string available_lines = "";
+    for(auto&& [line, result]: m_trigResults->getResults()){
+            available_lines += line + "(" + std::to_string((int)result) + ") ";
+    }
+    B2FATAL("software trigger line not found" << LogVar("requested", name) << LogVar("available", available_lines));
     return false;
   }
 }

@@ -87,41 +87,56 @@ namespace Belle2 {
 
     double SVDPositionReconstruction::getCoGPositionErrorPropagation()
     {
-      // just do error propagation of the weighted average with:
-      // assume error on strip position  = pitch / sqrt(12)
-      // assume error on strip charge = noise
-      // strip position in cm
-      // strip charge in electrons
+      // two contributions to the error:
+      // 1. error propagation of the weighted average with:
+      //  error on strip position = 0
+      //  error on strip charge = strip noise
+      // 2. missed strip on one side of cluster with charge = cutAdjacent*Noise
+      //  where Nosie = average strip noise of the strips in the cluster
 
       const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
       const VXD::SensorInfoBase& info = geo.getSensorInfo(m_vxdID);
       double pitch = m_isUside ? info.getUPitch() : info.getVPitch();
 
-      if (m_strips.size() == 1)
-        return pitch / sqrt(12);
-
       double positionError = 0;
       double sumStripCharge = getSumOfStripCharges();
+      double stripPos = 0;
+      float stripNoiseInElectrons = 0;
+      float averageNoiseInElectrons = 0;
 
-      // error propagation formula:
+      // error propagation contribution:
       for (auto aStrip : m_strips) {
 
         SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
-        float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
+        stripNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
         chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
+        averageNoiseInElectrons += stripNoiseInElectrons;
 
-        double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
+        stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
 
-        double stripCharge  = chargeReco->getStripCharge();
+        double chargeError = (stripPos - getCoGPosition()) / sumStripCharge * averageNoiseInElectrons;
 
-        double first = stripCharge / sumStripCharge * pitch / sqrt(12);
-        //        B2INFO("first = " << stripCharge << "/" << sumStripCharge << "*" << pitch << "/" << sqrt(12) << " = " << first);
-        double second = (stripPos - getCoGPosition()) / sumStripCharge * averageNoiseInElectrons;
-        //        B2INFO("second = " << "(" << stripPos << " - " << getCoGPosition() << ")/" << sumStripCharge << "*" << averageNoiseInElectrons <<  " = " << second);
-        positionError = TMath::Power(first, 2) + TMath::Power(second, 2);
-
+        positionError += TMath::Power(chargeError, 2);
+        /*
+        if(m_strips.size() == 2){
+        B2INFO("first = " << stripCharge << "/" << sumStripCharge << "*" << pitch << "/" << sqrt(12) << " = " << first);
+        B2INFO("second = " << "(" << stripPos << " - " << getCoGPosition() << ")/" << sumStripCharge << "*" << averageNoiseInElectrons <<  " = " << second);
+        }*/
       }
 
+      // phantom charge contribution:
+      double minSNRAdjacent = m_ClusterCal.getMinAdjSNR(m_vxdID, m_isUside);
+      double x_plus1 = stripPos + pitch;
+      averageNoiseInElectrons /= m_strips.size();
+      double S_plus1 = averageNoiseInElectrons * minSNRAdjacent;
+      double phChargeError = getCoGPosition() * sumStripCharge + x_plus1 * S_plus1;
+      phChargeError /= sumStripCharge + S_plus1;
+      phChargeError -= getCoGPosition();
+
+      //      B2INFO("phChargeError "<< phChargeError);
+      positionError = positionError * positionError + phChargeError * phChargeError;
+      //      if(m_strips.size() == 2)
+      //  B2INFO("NEW CoGError = "<<sqrt(positionError));
       return sqrt(positionError);
 
     }

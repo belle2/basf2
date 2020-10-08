@@ -125,6 +125,12 @@ namespace Belle2 {
 
 
       /**
+       * returns the position of the cluster after
+       * lorentz shift correction
+       */
+      double applyLorentzShiftCorrection(double position, VxdID vxdID, bool isU);
+
+      /**
        * computes charge, position and time of the raw cluster
        * and appends the new SVDCluster to the StoreArray
        */

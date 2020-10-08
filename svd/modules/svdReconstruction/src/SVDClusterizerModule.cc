@@ -14,6 +14,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/Environment.h>
 
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
@@ -360,8 +361,10 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   } else //we should never get here!
     B2FATAL("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
 
+  //apply the Lorentz Shift Correction
+  position = applyLorentzShiftCorrection(position, sensorID, isU);
 
-  //  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());  double time = 0;
+  //  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
 
   //append the new cluster to the StoreArray
   m_storeClusters.appendNew(SVDCluster(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
@@ -432,4 +435,23 @@ void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawClu
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 
 }
+
+double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID vxdID, bool isU)
+{
+
+  //Lorentz shift correction - PATCHED
+  //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE.
+
+  const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(vxdID));
+
+  bool isMC = Environment::Instance().isMC();
+
+  if ((vxdID.getLayerNumber() == 3) && ! isMC)
+    position += sensorInfo.getLorentzShift(isU, position);
+  else
+    position -= sensorInfo.getLorentzShift(isU, position);
+
+  return position;
+}
+
 

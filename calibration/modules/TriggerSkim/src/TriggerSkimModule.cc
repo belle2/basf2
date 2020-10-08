@@ -50,16 +50,17 @@ lines were accepted after their own prescale.
            "So either ``['hadron', 'cosmic']`` or ``[('hadron', 1), ('cosmic', 20)]`` "
            "or a mix of both");
   addParam("expectedResult", m_expectedResult,
-           "The SoftwareTriggerResult value that each trigger line in the 'triggerLines' param will be tested for.", int(1));
+           "The SoftwareTriggerResult value that each trigger line in the ``triggerLines`` "
+           "parameter will be tested for.", int(1));
   addParam("logicMode", m_logicMode,
-           "Each trigger line in 'triggerLines' will be tested against the 'expectedResult' parameter. "
+           "Each trigger line in ``triggerLines`` will be tested against the ``expectedResult`` parameter. "
            "The logic mode controls whether we test using 'and' or 'or' logic to get a return value. "
-           "'and' means that all trigger lines must have results == expectedResult, 'or' means that only "
+           "'and' means that all trigger lines must have ``results == expectedResult``, 'or' means that only "
            "one of the trigger lines must match the expectedResult value.", m_logicMode);
   addParam("useRandomNumbersForPreScale", m_useRandomNumbersForPreScale, "Flag to use random numbers (True) "
            "or a counter (False) for applying the prescale. In the latter case, the module will retain exactly "
            "one event every N processed, where N (the counter value) is set for each line via the "
-	   "`triggerLines` option. By default, random numbers are used.", m_useRandomNumbersForPreScale);
+           "``triggerLines`` option. By default, random numbers are used.", m_useRandomNumbersForPreScale);
 }
 
 void TriggerSkimModule::initialize()

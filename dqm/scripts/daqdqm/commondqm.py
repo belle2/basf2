@@ -199,13 +199,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
         # CDCTriggerNeuro
-        path.add_module('CDCTriggerNeuroDQM',
-                        limitedoutput=True,
-                        showRecoTracks=False,
-                        skipWithoutHWTS=True,
-                        maxRecoZDist=1.0,
-                        maxRecoD0Dist=0.5,
-                        )
+        path.add_module('CDCTriggerNeuroDQM')
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL

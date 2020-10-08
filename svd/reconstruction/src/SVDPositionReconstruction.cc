@@ -101,14 +101,13 @@ namespace Belle2 {
       double positionError = 0;
       double sumStripCharge = getSumOfStripCharges();
       double stripPos = 0;
-      float stripNoiseInElectrons = 0;
       float averageNoiseInElectrons = 0;
 
       // error propagation contribution:
       for (auto aStrip : m_strips) {
 
         SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
-        stripNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
+        float stripNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
         chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
         averageNoiseInElectrons += stripNoiseInElectrons;
 

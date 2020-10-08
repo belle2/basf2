@@ -207,9 +207,10 @@ def add_kkmc_generator(path, finalstate='', usePythiaFlags=False):
     #: tau config file (empty for tau+tau- and mu+mu-)
     kkmc_tauconfigfile = ''
 
-    #: If the tau decay must be controlled by Pythia flags
     if finalstate == 'tau+tau-':
+        #: If the tau decay must be controlled by Pythia flags
         if usePythiaFlags:
+            kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
             kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
 
     elif finalstate == 'mu+mu-':

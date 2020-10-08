@@ -12,13 +12,12 @@ import basf2
 import argparse
 import os
 import sys
-from ROOT import Belle2
 
 def arg_parser():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-i', '--input',
-                        default=Belle2.FileSystem.findFile('decfiles/dec/DECAY_BELLE2.DEC'),
+                        default=basf2.find_file('decfiles/dec/DECAY_BELLE2.DEC'),
                         #nargs='1',
                         help='input file names; it is possible to use the wildcard "*" to pass multiple files in input',
                         metavar='FILE')

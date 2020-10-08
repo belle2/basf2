@@ -63,6 +63,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cCommonMode = new TCanvas((m_histogramDirectoryName + "/c_CommonMode").data());
+  m_cCommonModeDelta = new TCanvas((m_histogramDirectoryName + "/c_CommonModeDelta").data());
 
   m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
@@ -122,9 +123,14 @@ void DQMHistAnalysisPXDCMModule::beginRun()
   B2DEBUG(99, "DQMHistAnalysisPXDCM: beginRun called.");
 
   m_cCommonMode->Clear();
-  m_hCommonModeDelta->Clear();
-  m_hCommonModeOld->Clear();
+  m_cCommonModeDelta->Clear();
   m_cCommonMode->SetLogz();
+  m_cCommonModeDelta->SetLogz();
+
+  // this is needed at least for the "Old" and "Delta" one or update doesnt work
+  m_hCommonMode->Reset();
+  m_hCommonModeDelta->Reset();
+  m_hCommonModeOld->Reset();
 }
 
 void DQMHistAnalysisPXDCMModule::event()

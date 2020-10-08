@@ -1275,3 +1275,10 @@ int Particle::generatePDGCodeFromCharge(const int chargeSign, const Const::Charg
   if (chargedStable == Const::muon || chargedStable == Const::electron) PDGCode = -PDGCode;
   return PDGCode;
 }
+
+bool Particle::isMostLikely() const
+{
+  const PIDLikelihood* likelihood = Particle::getPIDLikelihood();
+  if (likelihood) return likelihood->getMostLikely().getPDGCode() == std::abs(m_pdgCode);
+  else return false;
+}

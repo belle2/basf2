@@ -856,6 +856,11 @@ namespace Belle2 {
     }
 
     /**
+     * Returns true if the (track-based) particle is created with its most likely mass hypothesis
+     */
+    bool isMostLikely() const;
+
+    /**
     * Returns the ECLCluster EHypothesisBit for this Particle.
     */
     ECLCluster::EHypothesisBit getECLClusterEHypothesisBit() const

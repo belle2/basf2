@@ -156,10 +156,6 @@ void CDCTriggerNeuroDQMModule::defineHisto()
     m_neuroHWSelTSCount = new TH1F("NeuroHWSelTSCount", "number of selected TS per SL; sl", 9, 0, 9);
   }
   if (!m_limitedoutput && m_unpacked2DTracksName != "") {
-    m_2DHWInTSID = new TH1F("2DHWInTSID", "ID of 2D incoming axial track segments",
-                            2336, 0, 2335);
-    m_2DHWInTSCount = new TH1F("2DHWInTSCount", " number of 2D incoming TS per event",
-                               200, 0, 800);
     m_2DHWInTSPrioT_Layer0 = new TH1F("2DHWInTSPrioT_Layer0", "Priority time of track segments in layer 0",
                                       512, 0, 511);
     m_2DHWInTSPrioT_Layer2 = new TH1F("2DHWInTSPrioT_Layer2", "Priority time of track segments in layer 2",
@@ -1324,6 +1320,7 @@ void CDCTriggerNeuroDQMModule::beginRun()
 {
   // Just to make sure, reset all the histograms.
   if (m_unpackedNeuroTracksName != "") {
+
     m_neuroHWOutZ->Reset();
     m_neuroHWOutCosTheta->Reset();
     m_neuroHWOutInvPt->Reset();
@@ -1352,8 +1349,6 @@ void CDCTriggerNeuroDQMModule::beginRun()
     m_2DHWOutm_time->Reset();
     m_2DHWOutTrackCount->Reset();
 
-    m_2DHWInTSID->Reset();
-    m_2DHWInTSCount->Reset();
   }
   if (m_unpacked2DTracksName != "" && m_unpackedNeuroTracksName != "") {
     m_neuroHWInVs2DOutTrackCount->Reset();
@@ -1795,6 +1790,7 @@ void CDCTriggerNeuroDQMModule::beginRun()
     m_DeltaRecoSWTSSW2DInvPt->Reset();
     m_DeltaRecoSWTSSW2DPhi->Reset();
   }
+
 }
 
 void CDCTriggerNeuroDQMModule::event()
@@ -2633,7 +2629,6 @@ void CDCTriggerNeuroDQMModule::event()
 
     for (CDCTriggerSegmentHit& hit : m_unpackedSegmentHits) {
       nof2dinsegments++;
-      m_2DHWInTSID->Fill(hit.getSegmentID());
       if (!m_limitedoutput) {
         unsigned int sl = hit.getISuperLayer();
         switch (sl) {
@@ -2666,7 +2661,6 @@ void CDCTriggerNeuroDQMModule::event()
       }
     }
     if (nof2dinsegments > 0) {
-      m_2DHWInTSCount->Fill(nof2dinsegments);
     }
   }
 

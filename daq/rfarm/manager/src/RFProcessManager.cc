@@ -19,6 +19,7 @@
 
 extern "C" {
 #include <nsm2/nsmlib2.h>
+#include <nsm2/nsmsys2.h>
 }
 
 using namespace std;
@@ -184,10 +185,10 @@ int RFProcessManager::CheckOutput()
       if (nsmc && FD_ISSET(nsmc->sock, &fdset)) {
         //        NSMCommunicator(nsmc).callContext();
         char buf[NSM_TCPMSGSIZ];
-        if (nsmlib_recv(nsmc, (NSMtcphead*)buf, 1000) < 0)
+        if (nsmlib_recv(nsmc, (struct NSMtcphead_struct*)buf, 1000) < 0)
           printf("RFProcessManager: Failed to read NSM context\n");
         else
-          nsmlib_call(nsmc, (NSMtcphead*)buf);
+          nsmlib_call(nsmc, (struct NSMtcphead_struct*)buf);
       }
       if (m_iopipe[0] > 0 &&
           FD_ISSET(m_iopipe[0], &fdset)) {

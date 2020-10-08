@@ -111,13 +111,23 @@ int EvtGenInterface::setup(const std::string& DECFileName, const std::string& pa
 int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParentParticle, TVector3 pPrimaryVertex,
                                    int inclusiveType, const std::string& inclusiveParticle)
 {
+  EvtId inclusiveParticleID, inclusiveAntiParticleID;
+
   if (!m_ParentInitialized)
     B2FATAL("Parent particle is not initialized.");
   //Init evtgen
   m_pinit.set(pParentParticle.E(), pParentParticle.X(), pParentParticle.Y(), pParentParticle.Z());
 
-  EvtId Inclusive_Particle_ID = EvtPDL::getId(inclusiveParticle);
-  EvtId Inclusive_Anti_Particle_ID = EvtPDL::chargeConj(Inclusive_Particle_ID);
+  if (inclusiveType != 0) {
+    inclusiveParticleID = EvtPDL::getId(inclusiveParticle);
+    if (inclusiveParticleID.getId() < 0)
+      B2FATAL("Incorrect inclusive particle " << inclusiveParticle);
+    inclusiveAntiParticleID = EvtPDL::chargeConj(inclusiveParticleID);
+    if (inclusiveAntiParticleID.getId() < 0) {
+      B2FATAL("Cannot find the charge-conjugate particle for "
+              << inclusiveParticle);
+    }
+  }
 
   bool we_got_inclusive_particle = false;
   do {
@@ -134,8 +144,8 @@ int EvtGenInterface::simulateEvent(MCParticleGraph& graph, TLorentzVector pParen
       do {
         //for (int ii = 0; ii < iPart ; ii++) {
         //std::cout << p->getPDGId() << std::endl;
-        if (p->getId() == Inclusive_Particle_ID ||
-            (inclusiveType == 2 && p->getId() == Inclusive_Anti_Particle_ID)) {
+        if (p->getId() == inclusiveParticleID ||
+            (inclusiveType == 2 && p->getId() == inclusiveAntiParticleID)) {
           we_got_inclusive_particle = true;
           break;
         }

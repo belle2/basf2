@@ -30,6 +30,8 @@ settings = CalibrationSettings(name="Example Complex",
                                input_data_names=["physics", "cosmics", "Bcosmics"],
                                depends_on=[example_simple],
                                expert_config={
+                                              "physics_prescale": 0.2,
+                                              "max_events_per_file": 100,
                                               "max_files_per_run": 2,
                                               "payload_boundaries": []
                                              })
@@ -49,8 +51,7 @@ settings = CalibrationSettings(name="Example Complex",
 # that have had their input files assigned and any configuration applied. The final output payload IoV(s)
 # should also be set correctly to be open-ended e.g. IoV(exp_low, run_low, -1, -1)
 #
-# The database_chain, backend_args, backend, max_files_per_collector_job, and heartbeat of these
-# calibrations will all be set/overwritten by the b2caf-prompt-run tool.
+# The database_chain of these calibrations will all be set/overwritten by the b2caf-prompt-run tool.
 
 
 def get_calibrations(input_data, **kwargs):
@@ -125,33 +126,45 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Collector setup
     # We'll make two instances of the same CollectorModule, but configured differently
-    col_test_physics = register_module('CaTest')
+    col_test_physics = register_module("CaTest")
     # This has to be 'run' otherwise our SequentialBoundaries strategy can't work.
     # We could make it optional, based on the contents of the expert_config.
-    col_test_physics.param('granularity', 'run')
-    col_test_physics.param('spread', 4)
+    col_test_physics.param("granularity", "run")
+    col_test_physics.param("spread", 4)
 
-    col_test_Bcosmics = register_module('CaTest')
-    col_test_Bcosmics.param('granularity', 'all')
-    col_test_Bcosmics.param('spread', 1)
+    col_test_Bcosmics = register_module("CaTest")
+    col_test_Bcosmics.param("granularity", "all")
+    col_test_Bcosmics.param("spread", 1)
 
-    col_test_cosmics = register_module('CaTest')
-    col_test_cosmics.param('granularity', 'all')
-    col_test_cosmics.param('spread', 10)
+    col_test_cosmics = register_module("CaTest")
+    col_test_cosmics.param("granularity", "all")
+    col_test_cosmics.param("spread", 10)
 
     ###################################################
     # Reconstruction path setup
     # create the basf2 paths to run before each Collector module
 
-    # Let's specify that not all events will be used per file
-    # This assumes that we will be using the default max_files_per_collector_job=1 in b2caf-prompt-run!
-    max_events = 100
-    root_input = register_module('RootInput',
-                                 entrySequences=[f'0:{max_events}']
+    # Let's specify that not all events will be used per file for every Collection
+    # Just set this with one element in the list if you use it. The value will be duplicated in collector subjobs if the number
+    # of input files is larger than 1.
+    max_events = expert_config["max_events_per_file"]
+    root_input = register_module("RootInput",
+                                 entrySequences=[f"0:{max_events}"]
                                  )
+
+    # And/or we could set a prescale so that only a fraction of events pass onwards.
+    # This is most useful for randomly selecting events throughout input files.
+    # Note that if you set the entrySequences AS WELL as a prescale then you will be combining the entrySequences and prescale
+    # so that only a few events are passed into the Prescale module, and then only a fraction of those will continue to the
+    # Collector module.
+    prescale = expert_config["physics_prescale"]
+    prescale_mod = register_module("Prescale", prescale=prescale)
+    empty_path = create_path()
+    prescale_mod.if_false(empty_path, basf2.AfterConditionPath.END)
 
     rec_path_physics = create_path()
     rec_path_physics.add_module(root_input)
+    rec_path_physics.add_module(prescale_mod)
     # could now add reconstruction modules dependent on the type of input data
 
     rec_path_cosmics = create_path()
@@ -187,19 +200,25 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Collection Setup
+    #
+    # We set the maximum number of collector (sub)jobs. This isn't necessary (the default is 1000). But I do it here
+    # just to show that b2caf-prompt-run no longer overwrites these types of settings (unless explicitly set).
     collection_physics = Collection(collector=col_test_physics,
                                     input_files=input_files_physics,
                                     pre_collector_path=rec_path_physics,
+                                    max_collector_jobs=4
                                     )
 
     collection_cosmics = Collection(collector=col_test_cosmics,
                                     input_files=input_files_cosmics,
                                     pre_collector_path=rec_path_cosmics,
+                                    max_collector_jobs=2
                                     )
 
     collection_Bcosmics = Collection(collector=col_test_Bcosmics,
                                      input_files=input_files_Bcosmics,
                                      pre_collector_path=rec_path_Bcosmics,
+                                     max_collector_jobs=2
                                      )
 
     ###################################################
@@ -213,7 +232,7 @@ def get_calibrations(input_data, **kwargs):
     cal_test1 = Calibration("TestCalibration_cosmics")
     # Add collections in with unique names
     cal_test1.add_collection(name="cosmics", collection=collection_cosmics)
-    cal_test1.add_collection(name='Bcosmics', collection=collection_Bcosmics)
+    cal_test1.add_collection(name="Bcosmics", collection=collection_Bcosmics)
     cal_test1.algorithms = [alg_test1]
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     cal_test1.algorithms[0].params = {"apply_iov": output_iov}

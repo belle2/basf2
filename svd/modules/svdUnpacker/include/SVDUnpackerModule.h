@@ -230,6 +230,7 @@ namespace Belle2 {
       /** Map to store a list of upset APVs */
       std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_upsetAPVs;
 
+      int m_relativeTimeShift; /**< latency difference between the 3- and 6-sample acquired events in usint of APV clock / 4, read from SVDGlobalConfigParameters and filled into SVDEventInfo */
 
     };//end class declaration
 

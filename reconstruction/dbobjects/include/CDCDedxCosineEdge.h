@@ -89,10 +89,10 @@ namespace Belle2 {
       std::vector<double> temp;
       if (costh < 0) {
         temp = m_largeCos[0];
-        coslow = -0.870; coshigh = -0.850; //this is hardcoded and fix
+        coslow = -0.870; coshigh = -0.850; //this is hardcoded and fixed
       } else if (costh > 0) {
         temp = m_largeCos[1];
-        coslow = 0.950; coshigh = 0.960; //this is hardcoded and fix
+        coslow = 0.950; coshigh = 0.960; //this is hardcoded and fixed
       } else {
         B2ERROR("CDCDedxCosineEdge:choose > 0 for forward and <0 for backward side");
         return 1.0;
@@ -100,7 +100,7 @@ namespace Belle2 {
 
       //don't do anything for other cosine range
       if (costh < coslow || costh > coshigh) {
-        B2WARNING("CDCDedxCosineEdge:outside range choose in between " << coslow << " and " << coshigh);
+        B2WARNING("CDCDedxCosineEdge:outside range (" << costh << ")choose in between " << coslow << " and " << coshigh);
         return 1.0;
       }
 

@@ -39,8 +39,8 @@ class TestStdPi0s(unittest.TestCase):
         print(list(result))
 
     def test_nonsense_list(self):
-        """check that the builder function works with the all list"""
-        self._check_list("flibble", expected_lists=[])
+        """check that the builder function raises a ValueError for a non-existing list name"""
+        self.assertRaises(ValueError, self._check_list, "flibble")
 
     def test_all_list(self):
         """check that the builder function works with the all list"""

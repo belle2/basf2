@@ -246,3 +246,16 @@ The module ``skimExpertFunctions`` contains helper functions to perform common t
    :prog: b2skim-prod
    :nodefaultconst:
    :nogroupsections:
+
+
+.. _lpns2yaml:
+
+``lpns2yaml.py``: Convert lists of LPNs to format expected by ``b2skim-prod``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. argparse::
+   :filename: skim/tools/lpns2yaml.py
+   :func: get_argument_parser
+   :prog: lpns2yaml.py
+   :nodefaultconst:
+   :nogroupsections:

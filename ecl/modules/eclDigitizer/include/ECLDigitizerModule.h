@@ -17,6 +17,7 @@
 
 //Framework
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
@@ -163,6 +164,9 @@ namespace Belle2 {
     void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
     /** fill the waveform array FitA by electronic noise and bias it for channel J [0-8735]*/
     void makeElectronicNoiseAndPedestal(int j, int* FitA);
+
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     /** input arrays */
     StoreArray<ECLHit>    m_eclHits;  /**< hits array  */

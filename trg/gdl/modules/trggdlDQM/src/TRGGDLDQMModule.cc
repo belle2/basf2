@@ -611,7 +611,9 @@ void TRGGDLDQMModule::event()
   // fill Output_extra for efficiency study
   fillOutputExtra();
   // fill Output for high purity efficiency study
-  fillOutputPureExtra();
+  if (m_skim != 1) {
+    fillOutputPureExtra();
+  }
 
   // fill summary histograms
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
@@ -1324,18 +1326,20 @@ TRGGDLDQMModule::fillOutputExtra(void)
                                         14 + 1)); //fyb with lml|eclmumu
   }
 
-  h_eff_shifter->SetBinContent(1,  h_psn_extra[1]->GetBinContent(1 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //fff with c4|hie
-  h_eff_shifter->SetBinContent(2,  h_psn_extra[1]->GetBinContent(2 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //ffo with c4|hie
-  h_eff_shifter->SetBinContent(3,  h_psn_extra[1]->GetBinContent(19 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //ffy with c4|hie
-  h_eff_shifter->SetBinContent(4,  h_psn_extra[1]->GetBinContent(20 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //fyo with c4|hie
-  h_eff_shifter->SetBinContent(5,  h_psn_extra[1]->GetBinContent(27 + 1) / h_psn_extra[1]->GetBinContent(
-                                 6 + 1)); //hie with fff|ffo|ffb
-  h_eff_shifter->SetBinContent(6,  h_psn_extra[1]->GetBinContent(26 + 1) / h_psn_extra[1]->GetBinContent(
-                                 6 + 1)); //c4 with fff|ffo|ffb
-  h_eff_shifter->SetBinContent(7,  h_psn_extra[4]->GetBinContent(48 + 1) / h_psn_extra[4]->GetBinContent(
-                                 14 + 1) * 10); //mu_b2b with lml|eclmumu
-  h_eff_shifter->SetBinContent(8,  h_psn_extra[4]->GetBinContent(49 + 1) / h_psn_extra[4]->GetBinContent(
-                                 14 + 1) * 50); //mu_eb2b with lml|eclmumu
+  if (m_skim != 0) {
+    h_eff_shifter->SetBinContent(1,  h_psn_extra[1]->GetBinContent(1 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //fff with c4|hie
+    h_eff_shifter->SetBinContent(2,  h_psn_extra[1]->GetBinContent(2 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //ffo with c4|hie
+    h_eff_shifter->SetBinContent(3,  h_psn_extra[1]->GetBinContent(19 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //ffy with c4|hie
+    h_eff_shifter->SetBinContent(4,  h_psn_extra[1]->GetBinContent(20 + 1) / h_psn_extra[1]->GetBinContent(5 + 1)); //fyo with c4|hie
+    h_eff_shifter->SetBinContent(5,  h_psn_extra[1]->GetBinContent(27 + 1) / h_psn_extra[1]->GetBinContent(
+                                   6 + 1)); //hie with fff|ffo|ffb
+    h_eff_shifter->SetBinContent(6,  h_psn_extra[1]->GetBinContent(26 + 1) / h_psn_extra[1]->GetBinContent(
+                                   6 + 1)); //c4 with fff|ffo|ffb
+    h_eff_shifter->SetBinContent(7,  h_psn_extra[4]->GetBinContent(48 + 1) / h_psn_extra[4]->GetBinContent(
+                                   14 + 1) * 10); //mu_b2b with lml|eclmumu
+    h_eff_shifter->SetBinContent(8,  h_psn_extra[4]->GetBinContent(49 + 1) / h_psn_extra[4]->GetBinContent(
+                                   14 + 1) * 50); //mu_eb2b with lml|eclmumu
+  }
 
 }
 

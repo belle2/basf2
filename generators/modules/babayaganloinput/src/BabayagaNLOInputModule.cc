@@ -124,7 +124,7 @@ void BabayagaNLOInputModule::event()
   }
 
   // initial particle from beam parameters
-  MCInitialParticles& initial = s_initial.generate();
+  const MCInitialParticles& initial = s_initial.generate();
 
   // CM energy
   double ecm = initial.getMass();

@@ -293,30 +293,6 @@ namespace Belle2 {
                                                      bool unpackComposite = true) const;
 
     /**
-     * Get vector of all (no mask) or a subset (use mask) of all Tracks in ROE.
-     *
-     * @param maskName Name of mask
-     * @return vector of pointers to unused Tracks
-     */
-    std::vector<const Track*> getTracks(const std::string& maskName = "") const;
-
-    /**
-     * Get vector of all (no mask) or a subset (use mask) of all ECLClusters in ROE.
-     *
-     * @param maskName Name of mask
-     * @return vector of pointers to unused ECLClusters
-     */
-    std::vector<const ECLCluster*> getECLClusters(const std::string& maskName = "") const;
-
-    /**
-     * Get vector of all unused KLMClusters.
-     *
-     * @param maskName Name of mask
-     * @return vector of pointers to unused KLMClusters
-     */
-    std::vector<const KLMCluster*> getKLMClusters(const std::string& maskName = "") const;
-
-    /**
      * Get 4-momentum vector all (no mask) or a subset (use mask) of all Tracks and ECLClusters in ROE.
      *
      * @param maskName Name of mask

@@ -308,41 +308,6 @@ RestOfEvent::Mask* RestOfEvent::findMask(const std::string& name)
   return nullptr;
 
 }
-std::vector<const Track*> RestOfEvent::getTracks(const std::string& maskName) const
-{
-  std::vector<const Track*> result;
-  std::vector<const Particle*> allParticles = getParticles(maskName);
-  for (auto* particle : allParticles) {
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_Track) {
-      result.push_back(particle->getTrack());
-    }
-  }
-  return result;
-}
-std::vector<const ECLCluster*> RestOfEvent::getECLClusters(const std::string& maskName) const
-{
-  std::vector<const ECLCluster*> result;
-  std::vector<const Particle*> allParticles = getParticles(maskName);
-  for (auto* particle : allParticles) {
-    //Get all ECL clusters independently of the particle type, (both charged and neutral)
-    auto* cluster = particle->getECLCluster();
-    if (cluster and cluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
-      result.push_back(cluster);
-    }
-  }
-  return result;
-}
-std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(const std::string& maskName) const
-{
-  std::vector<const KLMCluster*> result;
-  std::vector<const Particle*> allParticles = getParticles(maskName);
-  for (auto* particle : allParticles) {
-    if (particle->getParticleSource() == Particle::EParticleSourceObject::c_KLMCluster) {
-      result.push_back(particle->getKLMCluster());
-    }
-  }
-  return result;
-}
 
 int RestOfEvent::getNTracks(const std::string& maskName) const
 {

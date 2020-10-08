@@ -1349,7 +1349,7 @@ Decay B0
 #    0.000238 * 0.99754 * (2/3) = 0.00015828
 # 2) Br(B0 -> chi_c1 K+ pi-) = 0.000497 - 0.00015828 = 0.00033872
 0.000158280   chi_c1  K*0T                                 SVV_HELAMP PKHminus PKphHminus PKHzero PKphHzero PKHplus PKphHplus; #CPV included, Oberhof 09/11
-0.000497000   chi_c1  K+  pi-                              PHSP; #Updated by PG 9/2021
+0.000338720   chi_c1  K+  pi-                              PHSP; #Updated by PG 9/2021
 
 # B0 -> chi_c1 pi0 K0 (PDG 2019 data).
 #
@@ -2683,7 +2683,7 @@ Decay anti-B0
 #    0.000238 * 0.99754 * (2/3) = 0.00015828
 # 2) Br(B0 -> chi_c1 K+ pi-) = 0.000497 - 0.00015828 = 0.00033872
 0.000158280   chi_c1  anti-K*0T                            SVV_HELAMP PKHplus PKphHplus PKHzero PKphHzero PKHminus PKphHminus; #CPV included, Oberhof 09/11/2017
-0.000497000   chi_c1  K-  pi+                              PHSP; #Updated by PG 9/2021
+0.000338720   chi_c1  K-  pi+                              PHSP; #Updated by PG 9/2021
 
 # anti-B0 -> chi_c1 pi0 K0 (PDG 2019 data)
 #

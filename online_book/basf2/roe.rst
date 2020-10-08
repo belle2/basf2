@@ -164,7 +164,7 @@ because of different methods of measurement used to detect these particles.
 .. admonition:: Exercise
      :class: exercise stacked
 
-     Create a ROE mask using the `charged_cuts` and `photon_cuts` strings with the
+     Create a ROE mask using the ``charged_cuts`` and ``photon_cuts`` strings with the
      `appendROEMask` or `appendROEMasks` function.
 
 .. admonition:: Hint

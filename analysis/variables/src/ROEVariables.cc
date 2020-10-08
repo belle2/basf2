@@ -502,16 +502,7 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        // Get unused ECLClusters in ROE
-        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
-        int nNeutrals = 0;
-
-        // Select ECLClusters with no associated tracks
-        for (auto& roeCluster : roeClusters)
-          if (roeCluster->isNeutral())
-            nNeutrals++;
-
-        return nNeutrals;
+        return roe->getPhotons(maskName).size();
       };
       return func;
     }
@@ -537,7 +528,15 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        return roe->getPhotons(maskName).size();
+        // Get unused ECLClusters in ROE
+        auto roeClusters = roe->getPhotons(maskName);
+        int nPhotons = 0;
+
+        // Select ECLClusters with photon hypothesis
+        for (auto& roeCluster : roeClusters)
+          if (roeCluster->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons)
+            nPhotons++;
+        return nPhotons;
       };
       return func;
     }
@@ -741,11 +740,21 @@ namespace Belle2 {
           return std::numeric_limits<float>::quiet_NaN();
         }
 
-        std::vector<const ECLCluster*> roeClusters = roe->getECLClusters(maskName);
         double extraE = 0.0;
 
+        auto roeClusters = roe->getPhotons(maskName);
+
         for (auto& roeCluster : roeClusters)
-          extraE += roeCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+          if (roeCluster->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons)
+            extraE += roeCluster->getECLClusterEnergy();
+
+        auto roeChargedParticles = roe->getChargedParticles(maskName);
+
+        for (auto& roeChargedParticle : roeChargedParticles)
+        {
+          if (roeChargedParticle->getECLCluster())
+            extraE += roeChargedParticle->getECLClusterEnergy();
+        }
 
         return extraE;
       };

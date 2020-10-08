@@ -352,8 +352,13 @@ int RestOfEvent::getNTracks(const std::string& maskName) const
 
 int RestOfEvent::getNECLClusters(const std::string& maskName) const
 {
-  int nROEECLClusters = getECLClusters(maskName).size();
-  return nROEECLClusters;
+  int nROEneutralECLClusters = getPhotons(maskName).size();
+  int nROEchargedECLClusters = 0;
+  for (auto& roeParticle : getChargedParticles(maskName)) {
+    if (roeParticle->getECLCluster()) ++nROEchargedECLClusters;
+  }
+
+  return nROEneutralECLClusters + nROEchargedECLClusters;
 }
 
 int RestOfEvent::getNKLMClusters(const std::string& maskName) const
@@ -364,15 +369,13 @@ int RestOfEvent::getNKLMClusters(const std::string& maskName) const
 
 TLorentzVector RestOfEvent::get4VectorNeutralECLClusters(const std::string& maskName) const
 {
-  std::vector<const ECLCluster*> roeClusters = RestOfEvent::getECLClusters(maskName);
+  auto roeClusters = getPhotons(maskName);
   TLorentzVector roe4VectorECLClusters;
 
   // Add all momenta from neutral ECLClusters which have the nPhotons hypothesis
-  ClusterUtils C;
   for (auto& roeCluster : roeClusters) {
-    if (roeCluster->isNeutral())
-      if (roeCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-        roe4VectorECLClusters += C.Get4MomentumFromCluster(roeCluster, ECLCluster::EHypothesisBit::c_nPhotons);
+    if (roeCluster->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons)
+      roe4VectorECLClusters += roeCluster->get4Vector();
   }
 
   return roe4VectorECLClusters;

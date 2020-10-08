@@ -3995,28 +3995,28 @@ Decay B+
 0.000940000   anti-D*0  D'_s1+                             PHSP;
 
 #  Lam_c X  / Sigma_c X
-0.02876885    anti-cd_1  uu_1                              PYTHIA 23;
+0.02879144    anti-cd_1  uu_1                              PYTHIA 23;
 
 #  Xi_c X     2.4%
-0.00784609    anti-cs_1  uu_1                              PYTHIA 23;
+0.00785225    anti-cs_1  uu_1                              PYTHIA 23;
 
-0.19638336    u  anti-d  anti-c  u                         PYTHIA         48;
-0.03748671    u  anti-d  anti-c  u                         PYTHIA         13;
-0.01961513    u  anti-s  anti-c  u                         PYTHIA         13;
+0.19653757    u  anti-d  anti-c  u                         PYTHIA         48;
+0.03751615    u  anti-d  anti-c  u                         PYTHIA         13;
+0.01963053    u  anti-s  anti-c  u                         PYTHIA         13;
 #lange - try to crank up the psi production....
-0.06451202    c  anti-s  anti-c  u                         PYTHIA         13;
-0.00348711    c  anti-d  anti-c  u                         PYTHIA         13;
-0.00261533    u  anti-d  anti-u  u                         PYTHIA         48;
-0.00348711    c  anti-s  anti-u  u                         PYTHIA         48;
+0.06456268    c  anti-s  anti-c  u                         PYTHIA         13;
+0.00348985    c  anti-d  anti-c  u                         PYTHIA         13;
+0.00261738    u  anti-d  anti-u  u                         PYTHIA         48;
+0.00348985    c  anti-s  anti-u  u                         PYTHIA         48;
 # JGS 11/5/02 This and similar a few lines above have been divided by two
 # to solve a double-counting problem for this channel
-0.00178716    u  anti-u  anti-d  u                         PYTHIA         48;
-0.00006105    d  anti-d  anti-d  u                         PYTHIA         48;
-0.00007848    s  anti-s  anti-d  u                         PYTHIA         48;
-0.00191796    u  anti-u  anti-s  u                         PYTHIA         48;
-0.00156923    d  anti-d  anti-s  u                         PYTHIA         48;
-0.00130771    s  anti-s  anti-s  u                         PYTHIA         48;
-0.00435890    anti-s  u                                    PYTHIA         32;
+0.00178856    u  anti-u  anti-d  u                         PYTHIA         48;
+0.00006110    d  anti-d  anti-d  u                         PYTHIA         48;
+0.00007854    s  anti-s  anti-d  u                         PYTHIA         48;
+0.00191947    u  anti-u  anti-s  u                         PYTHIA         48;
+0.00157046    d  anti-d  anti-s  u                         PYTHIA         48;
+0.00130874    s  anti-s  anti-s  u                         PYTHIA         48;
+0.00436232    anti-s  u                                    PYTHIA         32;
 
 0.001500000   anti-D*0  K+  K*0                            PHSP;
 0.018000000   anti-D*0  pi-  pi+  pi+  pi0                 PHSP;
@@ -5055,28 +5055,28 @@ Decay B-
 0.000940000   D*0  D'_s1-                                  PHSP;
 
 #  Lam_c X  / Sigma_c X      4.0 %
-0.02876885    cd_1  anti-uu_1                              PYTHIA 23; 
+0.02879144    cd_1  anti-uu_1                              PYTHIA 23; 
 
 #  Xi_c X     2.5%
-0.00784609    cs_1  anti-uu_1                              PYTHIA 23; 
+0.00785225    cs_1  anti-uu_1                              PYTHIA 23; 
 
-0.19638336    anti-u  d  c  anti-u                         PYTHIA         48; 
-0.03748671    anti-u  d  c  anti-u                         PYTHIA         13; 
-0.01961513    anti-u  s  c  anti-u                         PYTHIA         13; 
+0.19653757    anti-u  d  c  anti-u                         PYTHIA         48; 
+0.03751615    anti-u  d  c  anti-u                         PYTHIA         13; 
+0.01963053    anti-u  s  c  anti-u                         PYTHIA         13; 
 #lange - try to crank up the psi production....
-0.06451202    anti-c  s  c  anti-u                         PYTHIA         13; 
-0.00348711    anti-c  d  c  anti-u                         PYTHIA         13; 
-0.00261533    anti-u  d  u  anti-u                         PYTHIA         48; 
-0.00348711    anti-c  s  u  anti-u                         PYTHIA         48; 
+0.06456268    anti-c  s  c  anti-u                         PYTHIA         13; 
+0.00348985    anti-c  d  c  anti-u                         PYTHIA         13; 
+0.00261738    anti-u  d  u  anti-u                         PYTHIA         48; 
+0.00348985    anti-c  s  u  anti-u                         PYTHIA         48; 
 # JGS 11/5/02 This and similar a few lines above have been divided by two
 # to solve a double-counting problem for this channel
-0.00178716    anti-u  u  d  anti-u                         PYTHIA         48; 
-0.00006105    anti-d  d  d  anti-u                         PYTHIA         48; 
-0.00007848    anti-s  s  d  anti-u                         PYTHIA         48; 
-0.00191796    anti-u  u  s  anti-u                         PYTHIA         48; 
-0.00156923    anti-d  d  s  anti-u                         PYTHIA         48; 
-0.00130771    anti-s  s  s  anti-u                         PYTHIA         48; 
-0.00435890    s  anti-u                                    PYTHIA         32; 
+0.00178856    anti-u  u  d  anti-u                         PYTHIA         48; 
+0.00006110    anti-d  d  d  anti-u                         PYTHIA         48; 
+0.00007854    anti-s  s  d  anti-u                         PYTHIA         48; 
+0.00191947    anti-u  u  s  anti-u                         PYTHIA         48; 
+0.00157046    anti-d  d  s  anti-u                         PYTHIA         48; 
+0.00130874    anti-s  s  s  anti-u                         PYTHIA         48; 
+0.00436232    s  anti-u                                    PYTHIA         32; 
 
 0.001500000   D*0  K-  K*0                                 PHSP;  
 0.018000000   D*0  pi+  pi-  pi-  pi0                      PHSP;  

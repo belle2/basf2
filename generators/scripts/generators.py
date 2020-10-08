@@ -193,6 +193,7 @@ def add_kkmc_generator(path, finalstate='', usePythiaFlags=False):
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate(str): either "mu+mu-" or "tau+tau-"
+        usePythiaFlags(bool): If true, tau decay is controlled via Pythia flags. It doesn't affect mu+mu- decays.
     """
 
     #: kkmc input file

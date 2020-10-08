@@ -83,6 +83,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
   }
   return result;
 }
+
 std::vector<const Particle*> RestOfEvent::getPhotons(const std::string& maskName, bool unpackComposite) const
 {
   auto particles = getParticles(maskName, unpackComposite);
@@ -94,6 +95,7 @@ std::vector<const Particle*> RestOfEvent::getPhotons(const std::string& maskName
   }
   return photons;
 }
+
 std::vector<const Particle*> RestOfEvent::getHadrons(const std::string& maskName, bool unpackComposite) const
 {
   auto particles = getParticles(maskName, unpackComposite);
@@ -344,7 +346,7 @@ std::vector<const KLMCluster*> RestOfEvent::getKLMClusters(const std::string& ma
 
 int RestOfEvent::getNTracks(const std::string& maskName) const
 {
-  int nTracks = getTracks(maskName).size();
+  int nTracks = getChargedParticles(maskName).size();
   return nTracks;
 }
 
@@ -356,7 +358,7 @@ int RestOfEvent::getNECLClusters(const std::string& maskName) const
 
 int RestOfEvent::getNKLMClusters(const std::string& maskName) const
 {
-  int nROEKLMClusters = getKLMClusters(maskName).size();
+  int nROEKLMClusters = getHadrons(maskName).size();
   return nROEKLMClusters;
 }
 

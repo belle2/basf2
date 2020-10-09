@@ -230,7 +230,7 @@ namespace TreeFitter {
     if (pb) {
       updateCand(*pb, cand, isTreeHead);
     } else {
-      B2ERROR("Can't find candidate " << cand.getName() << "in tree " << m_particle->getName());
+      B2ERROR("Can't find candidate " << cand.getName() << " in tree " << m_particle->getName());
     }
     return pb != nullptr;
   }
@@ -241,9 +241,6 @@ namespace TreeFitter {
     int posindex = pb.posIndex();
     if (posindex < 0 && pb.mother()) {
       posindex = pb.mother()->posIndex();
-    }
-    if (pb.type() == ParticleBase::kFeedthroughParticle) {
-      return;
     }
 
     if (m_updateDaugthers || isTreeHead) {
@@ -293,7 +290,7 @@ namespace TreeFitter {
   {
     const bool updateableMother = updateCand(cand, isTreeHead);
 
-    if (updateableMother) {
+    if (updateableMother and not cand.hasExtraInfo("bremsCorrected")) {
       const int ndaughters = cand.getNDaughters();
       for (int i = 0; i < ndaughters; i++) {
         auto* daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));

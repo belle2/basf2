@@ -40,8 +40,8 @@ class TestStdPhotons(unittest.TestCase):
             self.assertEqual(a, b, "Loaded list \'%s\' instead of \'%s\' with function %s" % (a, b, std_function.__name__))
 
     def test_nonsense_list(self):
-        """check that the builder function works with the all list"""
-        self._check_list("flibble", expected_lists=[])
+        """Check that the builder function raises a ValueError for a non-existing list name."""
+        self.assertRaises(ValueError, self._check_list, "flibble")
 
     def test_all_list(self):
         """check that the builder function works with the all list"""

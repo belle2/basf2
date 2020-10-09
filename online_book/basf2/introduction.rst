@@ -609,6 +609,57 @@ there is a tool ``b2help-particles``.
 
 .. note:: In the next lesson you will need to use these names.
 
+
+.. admonition:: Question
+     :class: exercise stacked
+
+     What was the luminosity collected in experiment 8?
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     There is a command line tool for that.
+     Try tabcompletion ``b2<tab>``.
+
+.. admonition:: Another hint
+     :class: toggle xhint stacked
+
+     .. code-block:: bash
+
+         $ b2info-<tab>
+
+.. admonition:: Are you sure you really need another hint?
+     :class: toggle xhint stacked
+
+     .. code-block:: bash
+
+          $ b2info-luminosity --help
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     .. code-block:: bash
+
+          $ b2info-luminosity  --exp 8 --what offline
+          Read 697 runs for experiment 8
+          TOTAL offline   : L = 5464553.60 /nb =  5464.55 /pb =    5.465 /fb =   0.0055 /ab
+
+     So the answer is :math:`\sim 5.5\textrm{ fb}^{-1}`.
+
+     .. admonition:: It didn't work
+
+         Did you get an error like this?
+
+         ::
+
+             [INFO] ===Error Summary================================================================
+             [FATAL] DB /group/belle2/dataprod/Luminosity/OffLineLuminosity.db not found. The live luminosity is only available on KEKCC (sorry)
+             [INFO] ================================================================================
+
+         Sorry about that. Can you try this command at KEK ?
+         This should be fixed properly soon.
+
+
 Other useful features
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -660,41 +711,6 @@ To leave interactive basf2 / IPython, simply:
    In [15]: exit
 
 
-.. admonition:: Question
-     :class: exercise stacked
-
-     What was the luminosity collected in experiment 8?
-
-.. admonition:: Hint
-     :class: toggle xhint stacked
-
-     There is a command line tool for that.
-     Try tabcompletion ``b2<tab>``.
-
-.. admonition:: Another hint
-     :class: toggle xhint stacked
-
-     .. code-block:: bash
-
-         b2info-<tab>
-
-.. admonition:: Are you sure you really need another hint?
-     :class: toggle xhint stacked
-
-     .. code-block:: bash
-
-          b2info-luminosity --help
-
-.. admonition:: Solution
-     :class: toggle solution
-
-     .. code-block:: bash
-
-          $ b2info-luminosity  --exp 8 --what offline
-          Read 697 runs for experiment 8
-          TOTAL offline   : L = 5464553.60 /nb =  5464.55 /pb =    5.465 /fb =   0.0055 /ab
-
-     So the answer is :math:`\sim 5.5\textrm{ fb}^{-1}`.
 
 
 Other useful things in your environment

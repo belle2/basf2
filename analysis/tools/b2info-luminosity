@@ -166,6 +166,7 @@ class Luminosity:
         self.session = requests.Session()
         if self.Token is None:
             # If no specific username use the local system username or provide one to authenticate
+            b2.B2INFO(f"Please provide your DESY credentials to access the rundb.")
             if self.Username is None:
                 localUsername = getpass.getuser()
                 self.Username=input(f"DESY username (return for {localUsername}) : ") or localUsername
@@ -299,7 +300,7 @@ class Luminosity:
         df=pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"])
         rows=[]
 
-        print(f"Reading exp {exp} from RunRegistry")
+        print(f"Reading exp {exp} from rundb (this can take a while depending on the size of the query)")
         
         for run in self.get_run_info(min_experiment={exp[0]}, max_experiment={exp[-1]}, run_type="physics", expand=True):
             if not run['time_stop']:

@@ -20,10 +20,6 @@ namespace TreeFitter {
     /** constructor */
     RecoComposite(Belle2::Particle* bc, const ParticleBase* mother) ;
 
-    /** constructor */
-    RecoComposite(Belle2::Particle* bc, const ParticleBase* mother, const ConstraintConfiguration& config, bool forceFitAll,
-                  bool massconstraint = false);
-
     /** destructor */
     virtual ~RecoComposite() {};
 
@@ -74,9 +70,6 @@ namespace TreeFitter {
     {
       alist.push_back(Constraint(this, Constraint::composite, depth, dimM())) ;
       alist.push_back(Constraint(this, Constraint::geometric, depth, 3)) ;
-      if (m_massconstraint) {
-        alist.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
-      }
     }
 
   protected:
@@ -89,8 +82,5 @@ namespace TreeFitter {
 
     /** flag */
     bool m_hasEnergy;
-
-    /** flag */
-    bool m_massconstraint;
   };
 }

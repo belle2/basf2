@@ -66,7 +66,9 @@ namespace Belle2 {
         , m_vxdID(sensorID)
         , m_isUside(isU)
         , m_cellID(aStrip.cellID)
-      { };
+      {
+        buildAlgorithmSets();
+      };
 
       /**
        * Constructor with the SVDShaperDigit::APVFloatSamples,
@@ -78,7 +80,9 @@ namespace Belle2 {
         , m_vxdID(sensorID)
         , m_isUside(isU)
         , m_cellID(std::numeric_limits<int>::quiet_NaN())
-      { };
+      {
+        buildAlgorithmSets();
+      };
 
 
       /**

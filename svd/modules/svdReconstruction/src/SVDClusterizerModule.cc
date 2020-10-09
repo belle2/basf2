@@ -14,6 +14,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/Environment.h>
 
 #include <svd/geometry/SensorInfo.h>
 #include <svd/dataobjects/SVDEventInfo.h>
@@ -22,6 +23,8 @@
 
 #include <svd/reconstruction/SVDRecoTimeFactory.h>
 #include <svd/reconstruction/SVDRecoChargeFactory.h>
+#include <svd/reconstruction/SVDRecoPositionFactory.h>
+
 
 using namespace std;
 using namespace Belle2;
@@ -73,6 +76,12 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   addParam("chargeAlgorithm3Samples", m_chargeRecoWith3SamplesAlgorithm,
            " choose charge algorithm for 3-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS",
            m_chargeRecoWith3SamplesAlgorithm);
+  addParam("positionAlgorithm6Samples", m_positionRecoWith6SamplesAlgorithm,
+           " choose position algorithm for 6-sample DAQ mode:  old (default), CoGOnly",
+           m_positionRecoWith6SamplesAlgorithm);
+  addParam("positionAlgorithm3Samples", m_positionRecoWith3SamplesAlgorithm,
+           " choose position algorithm for 3-sample DAQ mode:  old (default), CoGOnly",
+           m_positionRecoWith3SamplesAlgorithm);
 
   addParam("useDB", m_useDB,
            "if false use clustering and reconstruction configuration module parameters", m_useDB);
@@ -115,24 +124,20 @@ void SVDClusterizerModule::beginRun()
     m_chargeRecoWith3SamplesAlgorithm = "MaxSample";
   };
 
-  B2INFO("SVD  6-sample DAQ, strip time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", strip charge algorithm: " <<
-         m_chargeRecoWith6SamplesAlgorithm);
-
-  B2INFO("SVD  3-sample DAQ, strip time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", strip charge algorithm: " <<
-         m_chargeRecoWith3SamplesAlgorithm);
-
 
   m_time6SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith6SamplesAlgorithm);
   m_time3SampleClass = SVDRecoTimeFactory::NewTime(m_timeRecoWith3SamplesAlgorithm);
   m_charge6SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith6SamplesAlgorithm);
   m_charge3SampleClass = SVDRecoChargeFactory::NewCharge(m_chargeRecoWith3SamplesAlgorithm);
+  m_position6SampleClass = SVDRecoPositionFactory::NewPosition(m_positionRecoWith6SamplesAlgorithm);
+  m_position3SampleClass = SVDRecoPositionFactory::NewPosition(m_positionRecoWith3SamplesAlgorithm);
 
+  B2INFO("SVD  6-sample DAQ, cluster time algorithm: " << m_timeRecoWith6SamplesAlgorithm <<  ", cluster charge algorithm: " <<
+         m_chargeRecoWith6SamplesAlgorithm << ", cluster position algorithm: " << m_positionRecoWith6SamplesAlgorithm);
 
-  B2INFO("SVD  6-sample DAQ, cluster time algorithm:" << m_timeRecoWith6SamplesAlgorithm <<  ", cluster charge algorithm: " <<
-         m_chargeRecoWith6SamplesAlgorithm);
+  B2INFO("SVD  3-sample DAQ, cluster time algorithm: " << m_timeRecoWith3SamplesAlgorithm <<  ", cluster charge algorithm: " <<
+         m_chargeRecoWith3SamplesAlgorithm << ", cluster position algorithm: " << m_positionRecoWith3SamplesAlgorithm);
 
-  B2INFO("SVD  3-sample DAQ, cluster time algorithm:" << m_timeRecoWith3SamplesAlgorithm <<  ", cluster charge algorithm: " <<
-         m_chargeRecoWith3SamplesAlgorithm);
 }
 
 void SVDClusterizerModule::initialize()
@@ -288,8 +293,6 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   int size = rawCluster.getSize();
 
   //first take Event Informations:
-  // 1. acquisition mode (6 or 3 sample)
-
   StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
   std::string m_svdEventInfoName = "SVDEventInfo";
   if (!temp_eventinfo.isValid())
@@ -297,10 +300,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
-  int daqMode = eventinfo->getModeByte().getDAQMode();
-  if (daqMode == 2) m_numberOfAcquiredSamples = 6;
-  if (daqMode == 1) m_numberOfAcquiredSamples = 3;
-  if (daqMode == 0) m_numberOfAcquiredSamples = 1;
+  m_numberOfAcquiredSamples = eventinfo->getNSamples();
 
   //--------------
   // CLUSTER TIME
@@ -311,7 +311,6 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
   // cluster time computation
   if (m_numberOfAcquiredSamples == 6) {
-
     std::pair<int, double> FFandTime = m_time6SampleClass->getFirstFrameAndClusterTime(rawCluster);
     firstFrame = FFandTime.first;
     time = FFandTime.second;
@@ -321,8 +320,8 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     firstFrame = FFandTime.first;
     time = FFandTime.second;
     timeError = m_time3SampleClass->getClusterTimeError(rawCluster);
-  } else
-    B2ERROR("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
+  } else //we should never get here!
+    B2FATAL("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
 
   // now go into FTSW reference frame
   time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
@@ -342,8 +341,8 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   } else if (m_numberOfAcquiredSamples == 3) {
     charge = m_charge3SampleClass->getClusterCharge(rawCluster);
     seedCharge = m_charge3SampleClass->getClusterSeedCharge(rawCluster);
-  } else
-    B2ERROR("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
+  } else //we should never get here!
+    B2FATAL("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
 
   //-----------------
   // CLUSTER POSITION
@@ -351,7 +350,21 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
 
   float position = std::numeric_limits<float>::quiet_NaN();
   float positionError = std::numeric_limits<float>::quiet_NaN();
-  //  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());  double time = 0;
+
+  // cluster position computation
+  if (m_numberOfAcquiredSamples == 6) {
+    position = m_position6SampleClass->getClusterPosition(rawCluster);
+    positionError = m_position6SampleClass->getClusterPositionError(rawCluster);
+  } else if (m_numberOfAcquiredSamples == 3) {
+    position = m_position3SampleClass->getClusterPosition(rawCluster);
+    positionError = m_position3SampleClass->getClusterPositionError(rawCluster);
+  } else //we should never get here!
+    B2FATAL("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");
+
+  //apply the Lorentz Shift Correction
+  position = applyLorentzShiftCorrection(position, sensorID, isU);
+
+  //  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
 
   //append the new cluster to the StoreArray
   m_storeClusters.appendNew(SVDCluster(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
@@ -371,7 +384,6 @@ void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawClu
 
   RelationIndex<SVDShaperDigit, MCParticle> relDigitMCParticle(m_storeDigits, m_storeMCParticles, m_relShaperDigitMCParticleName);
   RelationIndex<SVDShaperDigit, SVDTrueHit> relDigitTrueHit(m_storeDigits, m_storeTrueHits, m_relShaperDigitTrueHitName);
-
 
 
   //register relation between ShaperDigit and Cluster
@@ -423,4 +435,23 @@ void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawClu
   relClusterDigit.add(clsIndex, digit_weights.begin(), digit_weights.end());
 
 }
+
+double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID vxdID, bool isU)
+{
+
+  //Lorentz shift correction - PATCHED
+  //NOTE: layer 3 is upside down with respect to L4,5,6 in the real data (real SVD), but _not_ in the simulation. We need to change the sign of the Lorentz correction on L3 only if reconstructing data, i.e. if Environment::Instance().isMC() is FALSE.
+
+  const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(vxdID));
+
+  bool isMC = Environment::Instance().isMC();
+
+  if ((vxdID.getLayerNumber() == 3) && ! isMC)
+    position += sensorInfo.getLorentzShift(isU, position);
+  else
+    position -= sensorInfo.getLorentzShift(isU, position);
+
+  return position;
+}
+
 

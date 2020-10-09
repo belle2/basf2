@@ -46,9 +46,9 @@ class TestStdPi0s(unittest.TestCase):
 
     def test_default_list_exists(self):
         """
-        Check that the default exist is one of the lists in the cases that are checked for in :func:`stdPi0s.stdPi0s`.
+        Check that the default list type is one of the lists in the cases that are checked for in :func:`stdPi0s.stdPi0s`.
 
-        This test relies a ``ValueError`` being raised for nonsense list types, which is tested by
+        This test relies on ``ValueError`` being raised for nonsense list types, which is tested by
         :func:`test_nonsense_list`.  However, :func:`test_nonsense_list` doesn't ensure that the default list works, so
         for that this test is needed.
         """

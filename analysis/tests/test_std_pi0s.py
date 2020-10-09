@@ -46,7 +46,7 @@ class TestStdPi0s(unittest.TestCase):
 
     def test_default_list_exists(self):
         """
-        Check that the default works.
+        Check that the default exist is one of the lists in the cases that are checked for in :func:`stdPi0s.stdPi0s`.
 
         This test relies a ``ValueError`` being raised for nonsense list types, which is tested by
         :func:`test_nonsense_list`.  However, :func:`test_nonsense_list` doesn't ensure that the default list works, so
@@ -59,6 +59,12 @@ class TestStdPi0s(unittest.TestCase):
             stdPi0s_signature = inspect.signature(stdPi0s.stdPi0s)
             default_listtype = stdPi0s_signature.parameters["listtype"].default
             self.fail(f"stdPi0s default listtype {default_listtype} is not in set of allowed list names.")
+
+    def test_default_list_works(self):
+        """Check that the default list type works."""
+        stdPi0s_signature = inspect.signature(stdPi0s.stdPi0s)
+        default_listtype = stdPi0s_signature.parameters["listtype"].default
+        self._check_list(expected_lists=["pi0" + default_listtype, default_listtype])
 
     def test_all_list(self):
         """check that the builder function works with the all list"""

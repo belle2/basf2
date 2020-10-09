@@ -33,6 +33,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDCM"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:CommonMode:"));
   addParam("useEpics", m_useEpics, "useEpics", true);
+  addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 10000);
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
@@ -62,15 +63,30 @@ void DQMHistAnalysisPXDCMModule::initialize()
   gROOT->cd(); // this seems to be important, or strange things happen
 
   m_cCommonMode = new TCanvas((m_histogramDirectoryName + "/c_CommonMode").data());
+  m_cCommonModeDelta = new TCanvas((m_histogramDirectoryName + "/c_CommonModeDelta").data());
+
   m_hCommonMode = new TH2F("CommonMode", "CommonMode; Module; CommonMode", m_PXDModules.size(), 0, m_PXDModules.size(), 63, 0, 63);
   m_hCommonMode->SetDirectory(0);// dont mess with it, this is MY histogram
   m_hCommonMode->SetStats(false);
+  m_hCommonModeDelta = new TH2F("CommonModeDelta", "CommonModeDelta; Module; CommonModeDelta", m_PXDModules.size(), 0,
+                                m_PXDModules.size(), 63, 0, 63);
+  m_hCommonModeDelta->SetDirectory(0);// dont mess with it, this is MY histogram
+  m_hCommonModeDelta->SetStats(false);
+  m_hCommonModeOld = new TH2F("CommonModeOld", "CommonModeOld; Module; CommonModeOld", m_PXDModules.size(), 0, m_PXDModules.size(),
+                              63, 0, 63);
+  m_hCommonModeOld->SetDirectory(0);// dont mess with it, this is MY histogram
+  m_hCommonModeOld->SetStats(false);
+
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     TString ModuleName = (std::string)m_PXDModules[i];
     m_hCommonMode->GetXaxis()->SetBinLabel(i + 1, ModuleName);
+    m_hCommonModeDelta->GetXaxis()->SetBinLabel(i + 1, ModuleName);
+    m_hCommonModeOld->GetXaxis()->SetBinLabel(i + 1, ModuleName);
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_hCommonMode->Draw("colz");
+  m_hCommonModeDelta->Draw("colz");
+  m_hCommonModeOld->Draw("colz");
 
   m_monObj->addCanvas(m_cCommonMode);
 
@@ -107,7 +123,14 @@ void DQMHistAnalysisPXDCMModule::beginRun()
   B2DEBUG(99, "DQMHistAnalysisPXDCM: beginRun called.");
 
   m_cCommonMode->Clear();
+  m_cCommonModeDelta->Clear();
   m_cCommonMode->SetLogz();
+  m_cCommonModeDelta->SetLogz();
+
+  // this is needed at least for the "Old" and "Delta" one or update doesnt work
+  m_hCommonMode->Reset();
+  m_hCommonModeDelta->Reset();
+  m_hCommonModeOld->Reset();
 }
 
 void DQMHistAnalysisPXDCMModule::event()
@@ -130,11 +153,22 @@ void DQMHistAnalysisPXDCMModule::event()
     if (hh1) {
       double current = 0.0;
       double outside = 0.0;
+
+      auto nevent = hh1->GetBinContent(0); // misuse underflow as event counter
+      bool update = nevent - m_hCommonModeOld->GetBinContent(i + 1, 0) > m_minEntries ;
+      if (update) m_hCommonModeOld->SetBinContent(i + 1, 0, nevent);
       for (int bin = 1; bin <= 63; bin++) { // we ignore CM63!!!
         double v;
         v = hh1->GetBinContent(bin);
         m_hCommonMode->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
         current += v;
+        if (nevent < m_minEntries) {
+          m_hCommonModeDelta->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
+        } else if (update) {
+          auto old = m_hCommonModeOld->GetBinContent(i + 1, bin); // attention, mixing bin nr and index
+          m_hCommonModeDelta->SetBinContent(i + 1, bin, v - old); // attention, mixing bin nr and index
+          m_hCommonModeOld->SetBinContent(i + 1, bin, v); // attention, mixing bin nr and index
+        }
       }
 
       m_monObj->setVariable(("cm_" + (std::string)m_PXDModules[i]).c_str(), hh1->GetMean());
@@ -142,7 +176,7 @@ void DQMHistAnalysisPXDCMModule::event()
 
       /// TODO: integration intervalls depend on CM default value, this seems to be agreed =10
       outside += hh1->Integral(16, 63);
-      // FIXME currently we have to much noise below the line ... thsu excluding this to avoid false alarms
+      // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
       // outside += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
       all_outside += outside;
       all += current;
@@ -156,45 +190,88 @@ void DQMHistAnalysisPXDCMModule::event()
       }
     }
   }
-  m_cCommonMode->cd();
 
-
-  // not enough Entries
   int status = 0;
-  if (all < 100.) {
-    m_cCommonMode->Pad()->SetFillColor(kGray);// Magenta or Gray
-    status = 0; // default
-  } else {
-    /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
-    if (all_outside / all > 1e-5 || /*all_cm / all > 1e-5 ||*/ error_flag) {
-      m_cCommonMode->Pad()->SetFillColor(kRed);// Red
-      status = 4;
-    } else if (all_outside / all > 1e-6 || /*all_cm / all > 1e-6 ||*/ warn_flag) {
-      m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
-      status = 3;
-    } else if (all_outside == 0. /*&& all_cm == 0.*/) {
-      m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
-      status = 2;
-    } else { // between 0 and 50 ...
-      m_cCommonMode->Pad()->SetFillColor(kWhite);// White
-      status = 1;
+  {
+    m_cCommonMode->cd();
+    // not enough Entries
+    if (all < 100.) {
+      m_cCommonMode->Pad()->SetFillColor(kGray);// Magenta or Gray
+      status = 0; // default
+    } else {
+      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
+      if (all_outside / all > 1e-5 || /*all_cm / all > 1e-5 ||*/ error_flag) {
+        m_cCommonMode->Pad()->SetFillColor(kRed);// Red
+        status = 4;
+      } else if (all_outside / all > 1e-6 || /*all_cm / all > 1e-6 ||*/ warn_flag) {
+        m_cCommonMode->Pad()->SetFillColor(kYellow);// Yellow
+        status = 3;
+      } else if (all_outside == 0. /*&& all_cm == 0.*/) {
+        m_cCommonMode->Pad()->SetFillColor(kGreen);// Green
+        status = 2;
+      } else { // between 0 and 50 ...
+        m_cCommonMode->Pad()->SetFillColor(kWhite);// White
+        status = 1;
+      }
     }
-  }
 
-  if (m_hCommonMode) {
-    m_hCommonMode->Draw("colz");
-    m_line1->Draw();
-    m_line2->Draw();
+    if (m_hCommonMode) {
+      m_hCommonMode->Draw("colz");
+      m_line1->Draw();
+      m_line2->Draw();
 //     m_line3->Draw();
+    }
+
+    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+
+    m_cCommonMode->Modified();
+    m_cCommonMode->Update();
   }
 
-  auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
-  tt->SetTextAngle(90);// Rotated
-  tt->SetTextAlign(12);// Centered
-  tt->Draw();
+  {
+    m_cCommonModeDelta->cd();
+    // not enough Entries
+#if 0
+    int status = 0;
+    if (all < 100.) {
+      m_cCommonModeDelta->Pad()->SetFillColor(kGray);// Magenta or Gray
+      status = 0; // default
+    } else {
+      /// FIXME: absolute numbers or relative numbers and what is the acceptable limit?
+      if (all_outside / all > 1e-5 || /*all_cm / all > 1e-5 ||*/ error_flag) {
+        m_cCommonModeDelta->Pad()->SetFillColor(kRed);// Red
+        status = 4;
+      } else if (all_outside / all > 1e-6 || /*all_cm / all > 1e-6 ||*/ warn_flag) {
+        m_cCommonModeDelta->Pad()->SetFillColor(kYellow);// Yellow
+        status = 3;
+      } else if (all_outside == 0. /*&& all_cm == 0.*/) {
+        m_cCommonModeDelta->Pad()->SetFillColor(kGreen);// Green
+        status = 2;
+      } else { // between 0 and 50 ...
+        m_cCommonModeDelta->Pad()->SetFillColor(kWhite);// White
+        status = 1;
+      }
+    }
+#endif
+    if (m_hCommonModeDelta) {
+      m_hCommonModeDelta->Draw("colz");
+      m_line1->Draw();
+      m_line2->Draw();
+//     m_line3->Draw();
+    }
 
-  m_cCommonMode->Modified();
-  m_cCommonMode->Update();
+    auto tt = new TLatex(5.5, 3, "1.3.2 Module is broken, please ignore");
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+
+    m_cCommonModeDelta->Modified();
+    m_cCommonModeDelta->Update();
+  }
+
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
     double data = all > 0 ? (all_outside / all) : 0;

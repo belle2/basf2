@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+############################################################################
+#
+# this script is used to create ECLCrystalsShapeAndPosition payload
+# from files ecl/data/crystal_{shape,position}_{forward,barrel,backward}.dat
+#
+############################################################################
+
 import basf2
 main = basf2.create_path()
 main.add_module("EventInfoSetter")

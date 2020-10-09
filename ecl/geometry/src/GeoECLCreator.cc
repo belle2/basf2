@@ -70,13 +70,13 @@ void GeoECLCreator::createFromDB(const std::string&, G4LogicalVolume& topVolume,
   backward(topVolume);
 }
 
-void GeoECLCreator::createPayloads(const GearDir& content, const IntervalOfValidity& iov)
+void GeoECLCreator::createPayloads(const GearDir&, const IntervalOfValidity& iov)
 {
   ECLCrystalsShapeAndPosition crystals = loadCrystalsShapeAndPosition();
   Database::Instance().storeData<ECLCrystalsShapeAndPosition>(&crystals, iov);
 }
 
-void GeoECLCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
+void GeoECLCreator::create(const GearDir&, G4LogicalVolume& topVolume, geometry::GeometryTypes)
 {
   m_sensediode = new SensitiveDiode("ECLSensitiveDiode");
   G4SDManager::GetSDMpointer()->AddNewDetector(m_sensediode);

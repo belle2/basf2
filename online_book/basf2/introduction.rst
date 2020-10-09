@@ -656,8 +656,8 @@ there is a tool ``b2help-particles``.
              [FATAL] DB /group/belle2/dataprod/Luminosity/OffLineLuminosity.db not found. The live luminosity is only available on KEKCC (sorry)
              [INFO] ================================================================================
 
-        Sorry about that. Can you try this command at KEK ?
-        This should be fixed properly soon.
+         Sorry about that. Can you try this command at KEK ?
+         This should be fixed properly soon.
 
 
 Other useful features

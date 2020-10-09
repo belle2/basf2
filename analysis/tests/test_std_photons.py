@@ -61,6 +61,11 @@ class TestStdPhotons(unittest.TestCase):
             default_listtype = stdPhotons_signature.parameters["listtype"].default
             self.fail(f"stdPhotons default listtype {default_listtype} is not in set of allowed list names.")
 
+    def test_default_list_works(self):
+        """Check that the default list type (loose) works."""
+        # basically a duplicate of test_loose_list
+        self._check_list(expected_lists=["cdc", "loose"])
+
     def test_all_list(self):
         """check that the builder function works with the all list"""
         self._check_list("all", expected_lists=["all"])

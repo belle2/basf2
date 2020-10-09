@@ -14,6 +14,7 @@ __email__ = "stefano.lacaprara@pd.infn.it, alberto.martini@roma3.infn.it"
 
 
 import argparse
+import getpass
 import re
 import sqlite3
 import time
@@ -117,6 +118,16 @@ def argparser():
                         action="store",
                         default="/group/belle2/dataprod/Luminosity/OffLineLuminosity.db",
                         help="DataBase path for OffLine Lumi (for developers)")
+    parser.add_argument("--token",
+                        dest="token",
+                        type=str,
+                        required=False,
+                        help="Use the read-only token to automatize the script")
+    parser.add_argument("--username",
+                        dest="username",
+                        type=str,
+                        required=False,
+                        help="Provide DESY username for crediantial access")
 
     plot_actions = {
         "DAY"  : "Histogram of daily integrated luminosity",
@@ -147,14 +158,21 @@ class Luminosity:
         """
         self.DBonline = args.dbonline
         self.DBoffline = args.dbofflie
+        self.Token = args.token
+        self.Username = args.username
         self.what=args.what
 
-        self.ACCESS_TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbmRwb2ludHMiOltdLCJuYW1lIjoiTHVtaW5vc2l0eSBQbG90cyAobGFjYXByYXIpIn0.CmZ4xdSNFnskDi77xFHUUySJIRhA6DVpslCEEvOUDKY"
         self.URL="https://rundb.belle2.org"
         self.session = requests.Session()
-        if not self.session:
-            b2.B2FATAL(f"could not establish connection to rundb: {self.URL}")
-        self.session.headers.update({'Authorization':f'Bearer {self.ACCESS_TOKEN}', 'Content-Type': 'application/json'})
+        if self.Token is None:
+            # If no specific username use the local system username or provide one to authenticate
+            if self.Username is None:
+                localUsername = getpass.getuser()
+                self.Username=input(f"DESY username (return for {localUsername}) : ") or localUsername
+            self.session.auth = (self.Username, getpass.getpass("DESY password: "))
+        else:
+            # Otherwise use the api key
+            self.session.headers.update({'Authorization': f'Bearer {self.Token}'})
         
         self.exp=args.exp
         self.expstr="-".join(str(_) for _ in args.exp)
@@ -163,7 +181,6 @@ class Luminosity:
             b2.B2FATAL(f"No run range (--runs ) allowed if multiple experiments are selected (--exp {self.exp})")
         if args.plot == 'RUN' and len(self.exp)>1:
             b2.B2FATAL(f"If plotting lumi per run (--plot RUN) you can select only one experiment (--exp {self.exp})")
-
         self.runRangeStr="All runs"
         if self.runs:
             self.runRangeStr=f"Runs {min(self.runs)}-{max(self.runs)}"
@@ -208,18 +225,19 @@ class Luminosity:
             cmdexp += f" AND run >= {min(self.runs)} AND run <= {max(self.runs)}"
 
         # Get the DB as a pandas.Dataframe.
+        print(cmdexp, self.conn, self.exp)
         df = pd.read_sql(cmdexp, self.conn, params=self.exp)
+        print(f"Read {len(df)} runs for experiment {self.expstr}")
         df = df.sort_values(by=['date'])
         print(f"Read {len(df)} runs for experiment {self.expstr}")
-
-        # # convert epoch to date
-        df['date'] = pd.to_datetime(df['date'],unit='s')
 
         # lumi in /fb
         df['lumi'] *= 1E-6
 
         # cumulative integrated luminosity
         df['intLumi'] = df['lumi'].cumsum()
+
+        df['intLumiDel']= None
 
         return df
 
@@ -235,9 +253,6 @@ class Luminosity:
         # Get the DB as a pandas.Dataframe.
         df = pd.read_sql(cmdexp, self.conn, params=exp)
         df = df.sort_values(by=['date'])
-
-        # convert epoch to date
-        df['date'] = pd.to_datetime(df['date'],unit='s')
 
         # lumi in /fb
         df['lumi'] *= 1E-6
@@ -281,23 +296,26 @@ class Luminosity:
         import dateutil.parser
            
         # temporary hack to get exp 7 and 8 from online DB
-        df=pd.DataFrame(columns=["exp", "run", "date", "lumi","intLumi","intLumiDel"])
+        df=pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"])
         rows=[]
-    
+
         print(f"Reading exp {exp} from RunRegistry")
         
         for run in self.get_run_info(min_experiment={exp[0]}, max_experiment={exp[-1]}, run_type="physics", expand=True):
             if not run['time_stop']:
-                continue
+                run['time_stop']=run['time_start']
             row={"exp":run['experiment'],
                  "run":run['run'],
                  "date":int(dateutil.parser.parse(run['time_start']).timestamp()),
+                 "date_stop":int(dateutil.parser.parse(run['time_stop']).timestamp()),
                  "lumi":run['statistics']['lumi_recorded'],
-                }
-            if(run['extra_data']):
-                row['intLumiDel']=run['extra_data']['statistics']['lumi_exp_delivered']
+                 }
+            if(run['statistics']['lumi_exp_delivered']):
+                row['intLumiDel']=run['statistics']['lumi_exp_delivered']
+            else:
+                row['intLumiDel']=None
+
             rows.append(row)
-        
         df = pd.DataFrame(rows)
         print(f"Read {len(df)} runs from exp {exp}")
 
@@ -306,10 +324,7 @@ class Luminosity:
         df['intLumiDel'] *= 1E-6
         #df.fillna(0)
 
-        # convert epoch to date
-        df['date'] = pd.to_datetime(df['date'],unit='s')
-
-        # TEMPORARY and AWFUL FIX for exp12 runs 1329-1333: integrated delivered luminosity is wrong.
+        # TEMPORARY and AWFULFIX for exp12 runs 1329-1333: integrated delivered luminosity is wrong.
         print(exp)
         if 12 in exp:
             print('FIXING DELIVERED LUMI FOR RUNS 1329-1333')
@@ -325,6 +340,17 @@ class Luminosity:
                 df.at[index,'intLumiDel']=newlumi
                 print(f'Fixed runs {run} delivered lumi to {newlumi:0.3f} /pb')
         
+            print('FIXING DELIVERED LUMI FOR RUNS 1188,1189,2596')
+            df = df.reset_index(drop=True)
+            index_1188=df.index[(df['exp']==12) & (df['run']==1188)]
+            index_1189=df.index[(df['exp']==12) & (df['run']==1189)]
+            index_2596=df.index[(df['exp']==12) & (df['run']==2596)]
+            df.loc[index_1188,'intLumiDel']=df.loc[index_1188-1,'intLumiDel'].values[0]+df.loc[index_1188, 'lumi'].values[0]
+            df.loc[index_1189,'intLumiDel']=df.loc[index_1189-1,'intLumiDel'].values[0]+df.loc[index_1189,'lumi'].values[0]
+            df.loc[index_2596,'intLumiDel']=df.loc[index_2596-1,'intLumiDel'].values[0]+df.loc[index_2596,'lumi'].values[0]
+            print("Fixed runs 1188 delivered intLumi to", df.loc[index_1188,'intLumiDel'].values[0].round(decimals=5), "/pb,")
+            print("Fixed runs 1189 delivered intLumi to", df.loc[index_1189,'intLumiDel'].values[0].round(decimals=5), "/pb")
+            print("Fixed runs 2596 delivered intLumi to", df.loc[index_2596,'intLumiDel'].values[0].round(decimals=5), "/pb")
         return df
 
     def getDataFrame(self,exp):
@@ -332,7 +358,7 @@ class Luminosity:
 
         if self.what=='online':
             # temporary hack to get exp 7 and 8 from online DB
-            df=pd.DataFrame(columns=["exp", "run", "date", "lumi","intLumi","intLumiDel"])
+            df=pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"])
             if self.exp[0]<9:
                 # need to 
                 self.conn = self.create_connection(self.what)
@@ -348,8 +374,13 @@ class Luminosity:
                 df=df.append(self.getDataFrameFromRunRegistry(exp_rr),sort=False)
             # cumulative integrated luminosity
             df['intLumi'] = df['lumi'].cumsum()
+            df['lumiDel'] = df['intLumiDel'].diff()
         else:
-            b2.B2FATAL(f"{self.what} not supported yet")
+            self.conn = self.create_connection(self.what)
+            df=pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"])
+            df=df.append(self.getDataFrameFromDBOffLine(),sort=False)
+            df['intLumi'] = df['lumi'].cumsum()
+            df['lumiDel'] = np.nan
 
         return df
 
@@ -362,15 +393,44 @@ class Luminosity:
 
         # protection for strange entry in the database
         df=self.df.copy()
-
         #drop runs with no date
         df["TMP"] = df.date.values                 # date is a DateTimeIndex
         df = df[df.TMP.notnull()]                  # remove all NaT values
         df.drop(["TMP"], axis=1, inplace=True)     # delete TMP again
 
+        df.date_stop.fillna(df.date+10, inplace=True)
+        df['date'] = pd.to_datetime(df['date'],unit='s')
+        df['date_stop'] = pd.to_datetime(df['date_stop'],unit='s')
+
         #drop runs with start date before actual start  of BelleII
         df=df[~(df['date']<'2018-01-01')]
-    
+        df = df[df['intLumi'].notnull()]
+
+        #treatment of runs across midnight
+        df_midnight = df[(df['date_stop'].dt.day-df['date'].dt.day)>0]
+        df = df.reset_index(drop=True)
+        df_midnight.index = list(df.index[df['date_stop'].dt.day-df['date'].dt.day>0].tolist())
+        df_midnight['duration'] = (df_midnight['date_stop']-df_midnight['date']).dt.total_seconds()
+        #change the day time to midnight
+        df_midnight['midnight_date'] = pd.DatetimeIndex(df_midnight.date_stop).normalize()
+        df_midnight['midnight_date'] = pd.to_datetime(df_midnight['midnight_date'],unit='s')
+        df_midnight['duration_midnight'] = (df_midnight['midnight_date'] - df_midnight['date']).dt.total_seconds()
+        #evaluation of the weights to impose on the first part of the run, before midnight
+        df_midnight['weight'] = df_midnight['duration_midnight'].div(df_midnight['duration'])
+
+        for ind in df_midnight.index:
+            #Assign the correct weights to the lumi of the runs if we have a delivered luminosity value
+            if df.loc[ind, 'intLumiDel'] is not np.nan:
+                #recorded lumi
+                df.loc[ind+1, 'lumi'] = df.loc[ind+1, 'lumi'] + df.loc[ind, 'lumi'] * (1-df_midnight.loc[ind, 'weight'])
+                df.loc[df.index==ind, 'lumi'] = df['lumi'] * df_midnight['weight']
+                #delivered lumi
+                df.loc[ind+1, 'lumiDel'] = df.loc[ind+1, 'lumiDel'] + df.loc[ind, 'lumiDel'] * (1-df_midnight.loc[ind, 'weight'])
+                df.loc[df.index==ind, 'lumiDel'] = df['lumiDel'] * df_midnight['weight']
+
+        df['intLumi'] = df['lumi'].cumsum()
+        df['intLumiDel'] = df['lumiDel'].cumsum()
+
         # Group runs by date, and store the int lumi per date as the max cumulative lumi.
         # This returns a pandas.Series object.
         srs_lumi_date = []
@@ -381,20 +441,30 @@ class Luminosity:
             freq='D'
             width=1.0
         if period==2: # weekly
-            srs_lumi_date = df.groupby(df["date"].dt.ceil('7d'))["lumi"].sum()
-            srs_lumi_del_date = df.groupby(df["date"].dt.ceil('7d'))["intLumiDel"].max()
+            df['date_week'] = df['date'].dt.to_period('W').apply(lambda r: r.start_time)
+            srs_lumi_date = df.groupby(df["date_week"].dt.ceil('7d'))["lumi"].sum()
+            srs_lumi_del_date = df.groupby(df["date_week"].dt.ceil('7d'))["intLumiDel"].max()
             label="Weekly"
             freq='7d'
-            width=3.5
+            width=6.5
     
         srs_lumi_date = srs_lumi_date.asfreq(freq, fill_value=0.0)
         srs_lumi_del_date = srs_lumi_del_date.asfreq(freq, fill_value=0.0)
 
-        x = srs_lumi_date.index.values
-        y = srs_lumi_date.values
+        if period==1:
+            x = srs_lumi_date.index.values
+            y = srs_lumi_date.values
+
+        if period==2:
+        # Note that some offsets do not have a vectorized implementation. 
+        #They can still be used but will raise a PerformanceWarning
+            new_index_x = srs_lumi_date.index + pd.DateOffset(days=+4)
+            x = new_index_x.values
+            y = srs_lumi_date.values
 
         # integrated luminosity
         yInt = np.cumsum(srs_lumi_date.values)
+
         # delivered integrated luminosity
         yIntDel = fill_zeros_with_last(srs_lumi_del_date.values)
         yIntDel = np.ma.masked_where(np.isnan(yIntDel), yIntDel)
@@ -402,14 +472,19 @@ class Luminosity:
         figure, ax1 = plt.subplots()
         
         ax1.bar(x, y, label=f"Recorded {label}", color="blue", width=-width, alpha=0.5, align='edge')
-
         ax1.set_xlabel(r"Date")
         ax1.set_ylabel(rf"Total integrated {label} luminosity [$\mathrm{{fb}}^{{-1}}$]", color="blue")
         ax1.set_ylim(bottom=0,top=y.max()*1.2)
         ax1.tick_params(axis='y', labelcolor="blue")
+        ax1.yaxis.grid(which='major', color="blue", linestyle='dotted')
+        ax1.xaxis.set_major_locator(mdates.WeekdayLocator(MO))
+        #get a better separation on x-axis labels for long periods
+        start, end = ax1.get_xlim()
+        if(end-start>60.0): #in days 
+            ax1.set_xticks(ax1.get_xticks()[::2])
+            if(end-start>120.0):
+                ax1.set_xticks(ax1.get_xticks()[::2])
 
-        ax1.xaxis.set_minor_locator(ticker.AutoLocator())
-        ax1.xaxis.set_major_locator(ticker.AutoLocator())
         ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
 
         # plot integrate lumi
@@ -422,21 +497,28 @@ class Luminosity:
         ax2.tick_params(axis='y', labelcolor="red")
         if (self.delivered):
             ax2.plot(x, yIntDel, color="red", lw=2,linestyle="-.", label=rf"$\int\mathcal{{L}}_{{Delivered}}\,dt\,= {self.df['intLumiDel'].max():.2f}\,[\mathrm{{fb}}^{{-1}}]$")
+
         ax2.plot(x, yInt, color="red", lw=2, label=rf"$\int\mathcal{{L}}_{{Recorded}}\,dt\,= {self.df['intLumi'].max():.2f}\,[\mathrm{{fb}}^{{-1}}]$")
 
-        ax2.xaxis.set_major_locator(ticker.AutoLocator())
-        ax2.xaxis.set_minor_locator(ticker.AutoLocator())
+        ax2.xaxis.set_major_locator(mdates.WeekdayLocator(MO))
+        #get a better separation on x-axis labels for long periods
+        start, end = ax2.get_xlim()
+        if(end-start>60.0): #in days
+            ax2.set_xticks(ax2.get_xticks()[::2])
+            if(end-start>120.0):
+                ax2.set_xticks(ax2.get_xticks()[::2])
+
 
         h1, l1 = ax1.get_legend_handles_labels()
         h2, l2 = ax2.get_legend_handles_labels()
 
-        ax2.legend(h1+h2, l1+l2, loc="upper left",title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
+        ax2.legend(h1+h2, l1+l2, loc="upper left",title=r"Integrated luminosity")
 
         # Text box. Use axis coords.
         plt.text(0., 1.02, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(1., 1.02, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, ha='right', fontsize=12)
 
-        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')}", transform=ax1.transAxes, fontsize=6, ha="right")
+        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')} JST", transform=ax1.transAxes, fontsize=6, ha="right")
 
         filename=f"Lumi{self.what.title()}_{label}_Exp{self.expstr}"
         if self.runs:
@@ -448,6 +530,8 @@ class Luminosity:
 
         # produce plot of luminosity efficiency
         if self.delivered:
+
+            df = df[df.date > '2020-03-07']
             df['lumiEff']=df['intLumi']/df['intLumiDel']
 
             yIntPeriod = srs_lumi_date.values
@@ -467,14 +551,21 @@ class Luminosity:
             ax1.set_ylim(bottom=0,top=100)
             ax1.set_ylabel(rf"Data taking $\varepsilon$", color="blue")
 
-            ax1.xaxis.set_major_locator(ticker.AutoLocator())
             ax1.xaxis.set_major_locator(mdates.WeekdayLocator(MO))
-            fmt=mdates.DateFormatter('%y/%m/%d')
+            #get a better separation on x-axis labels for long periods
+            start, end = ax1.get_xlim()
+            if(end-start>60.0): #in days
+                ax1.set_xticks(ax1.get_xticks()[::2])
+                if(end-start>120.0):
+                    ax1.set_xticks(ax1.get_xticks()[::2])
+
+            fmt=mdates.DateFormatter('%Y/%m/%d')
             ax1.xaxis.set_major_formatter(fmt)
-            ax1.yaxis.set_major_locator(ticker.FixedLocator([0, 10, 30, 50, 70, 80, 90, 100]))
+            ax1.yaxis.set_major_locator(ticker.FixedLocator([0, 10, 30, 50, 70, 80, 90, 95, 100]))
             ax1.yaxis.grid(which='major', linestyle='dotted')
             ax1.yaxis.set_major_formatter(ticker.PercentFormatter())
             ax1.tick_params(axis="x", labelrotation=45, labelsize="small", length=8)
+            plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')} JST", transform=ax1.transAxes, fontsize=6, ha="right")
 
             df=df[df['lumiEff'].between(0,1)]
             # print(df[['date','intLumi','intLumiDel','lumiEff']]
@@ -526,6 +617,8 @@ class Luminosity:
             dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
         else:
             dfRuns=self.df
+        if len(dfRuns)==0:
+            b2.B2FATAL(f"The selected run numbers do not exist. Please choose wisely the run numbers.")
 
         figure, ax1 = plt.subplots()
 
@@ -537,6 +630,15 @@ class Luminosity:
         ax1.set_xlim(left=int(dfRuns['run'].min()*0.99))
         ax1.set_ylim(bottom=0,top=dfRuns['lumi'].max()*1.2)
         ax1.xaxis.set_major_locator(ticker.LinearLocator(numticks=10))
+        ax1.xaxis.set_major_locator(ticker.AutoLocator())
+
+        #get a better separation on x-axis labels for long periods
+        start, end = ax1.get_xlim()
+        if(end-start>1000.0): #in run numbers
+            ax1.set_xticks(ax1.get_xticks()[::2])
+            if(end-start>2000.0):
+                ax1.set_xticks(ax1.get_xticks()[::2])
+
 
         # plot integrate lumi
         ax2 = ax1.twinx()
@@ -545,19 +647,26 @@ class Luminosity:
         ax2.tick_params(axis='y', labelcolor="red")
         ax2.xaxis.set_major_locator(ticker.LinearLocator(numticks=10))
         ax2.xaxis.set_major_locator(ticker.AutoLocator())
+
+        #get a better separation on x-axis labels for long periods
+        start, end = ax2.get_xlim()
+        if(end-start>1000.0): #in run numbers
+            ax2.set_xticks(ax2.get_xticks()[::2])
+            if(end-start>2000.0):
+                ax2.set_xticks(ax2.get_xticks()[::2])
         if (self.delivered):
             ax2.plot(dfRuns['run'], dfRuns['intLumiDel'], color="red",linestyle="-.",  label=rf"$\int\mathcal{{L}}_{{Delivered}}\,dt\,= {self.df['intLumiDel'].max():.2f}\,[\mathrm{{fb}}^{{-1}}]$")
         ax2.plot(dfRuns['run'], dfRuns['intLumi'], color="red", label=rf"$\int\mathcal{{L}}_{{Recorded}}\,dt\,= {self.df['intLumi'].max():.2f}\,[\mathrm{{fb}}^{{-1}}]$")
 
         h1, l1 = ax1.get_legend_handles_labels()
         h2, l2 = ax2.get_legend_handles_labels()
-        ax2.legend(h1+h2, l1+l2, loc=2, title=r"Integrated luminosity [$\mathrm{fb}^{-1}$]")
+        ax2.legend(h1+h2, l1+l2, loc=2, title=r"Integrated luminosity")
 
         # Text box. Use axis coords.
         plt.text(0., 1.02, rf"Belle II {self.what.title()} luminosity", transform=ax1.transAxes, fontsize=12)
         plt.text(1., 1.02, rf"Exp: {self.expstr} - {self.runRangeStr}", transform=ax1.transAxes, ha='right', fontsize=12)
 
-        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')}", transform=ax1.transAxes, fontsize=6, ha="right")
+        plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')} JST", transform=ax1.transAxes, fontsize=6, ha="right")
 
         filename=f"Lumi{self.what.title()}PerRun_Exp{self.expstr}"
         if self.runs:
@@ -573,7 +682,6 @@ class Luminosity:
         # these are the runs to be selected
         if (self.runs):
             dfRuns=self.df[self.df['run'].isin(self.runs)].copy()
-            dfRuns['intLumi'] = dfRuns['lumi'].cumsum()
         else:
             dfRuns=self.df
         # create a reduced dataframe with only runs selected
@@ -599,7 +707,7 @@ class Luminosity:
             print('-' * 61)
         L=dfRuns['lumi'].sum()
         print(f"RECORDED  {self.what}   : L = {L*1E6:8.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
-        Ld=dfRuns['intLumiDel'].max()
+        Ld=dfRuns['lumiDel'].sum()
         print(f"DELIVERED {self.what}   : L = {Ld*1E6:8.2f} /nb = {Ld*1E3:8.2f} /pb = {Ld:8.3f} /fb = {Ld/1E3:8.4f} /ab")
         
         pass

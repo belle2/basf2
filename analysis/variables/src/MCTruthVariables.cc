@@ -226,7 +226,7 @@ namespace Belle2 {
     double isSignalAcceptBremsPhotons(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return 0.0;
+      if (!mcparticle) return realNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits
@@ -448,10 +448,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_PrimaryParticle;
-      if (mcp->hasStatus(bitmask))
-        return 1;
-      else
-        return 0;
+      return mcp->hasStatus(bitmask) ? 1 : 0;
     }
 
     double particleMCVirtualParticle(const Particle* p)
@@ -460,10 +457,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_IsVirtual;
-      if (mcp->hasStatus(bitmask))
-        return 1;
-      else
-        return 0;
+      return mcp->hasStatus(bitmask) ? 1 : 0;
     }
 
     double particleMCInitialParticle(const Particle* p)
@@ -472,10 +466,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_Initial;
-      if (mcp->hasStatus(bitmask))
-        return 1;
-      else
-        return 0;
+      return mcp->hasStatus(bitmask) ? 1 : 0;
     }
 
     double particleMCISRParticle(const Particle* p)
@@ -484,10 +475,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_IsISRPhoton;
-      if (mcp->hasStatus(bitmask))
-        return 1;
-      else
-        return 0;
+      return mcp->hasStatus(bitmask) ? 1 : 0;
     }
 
     double particleMCFSRParticle(const Particle* p)
@@ -496,10 +484,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_IsFSRPhoton;
-      if (mcp->hasStatus(bitmask))
-        return 1;
-      else
-        return 0;
+      return mcp->hasStatus(bitmask) ? 1 : 0;
     }
 
     double particleMCPhotosParticle(const Particle* p)
@@ -508,10 +493,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_IsPHOTOSPhoton;
-      if (mcp->hasStatus(bitmask))
-        return 1;
-      else
-        return 0;
+      return mcp->hasStatus(bitmask) ? 1 : 0;
     }
 
     double generatorEventWeight(const Particle*)

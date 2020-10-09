@@ -3,6 +3,8 @@
 #
 # this script is used to create ECLCrystalsShapeAndPosition payload
 # from files ecl/data/crystal_{shape,position}_{forward,barrel,backward}.dat
+# Note that the GeoConfiguration payload created by this script should
+# be used only for testing, since it includes only the ECL
 #
 ############################################################################
 

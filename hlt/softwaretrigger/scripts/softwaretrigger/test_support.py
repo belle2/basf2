@@ -83,7 +83,10 @@ def generate_input_file(run_type, location, output_file_name, exp_number):
 
             def event(self):
                 self.results.create()
+                # and add all the results that are used on express reco just to test all paths
                 self.results.addResult("software_trigger_cut&all&total_result", 1)
+                self.results.addResult("software_trigger_cut&skim&accept_mumutight", 1)
+                self.results.addResult("software_trigger_cut&skim&accept_dstar_1", 1)
 
         path.add_module(FakeHLTResult())
 

@@ -53,8 +53,8 @@ namespace Belle2 {
 
   private:
 
-    TTree* m_histogramTree = NULL; /**< Initialisation of TTree object */
-    TH1F* m_hist = NULL; /**< Initialisation of crosstalk histogram */
+    TTree* m_histogramTree = nullptr; /**< Initialisation of TTree object */
+    TH1F* m_hist = nullptr; /**< Initialisation of crosstalk histogram */
     int m_layer = 4; /**< Number of layers to define size of TTree */
     int m_ladder = 16; /**< Number of ladders */
     int m_sensor = 5; /**< Number of sensors */

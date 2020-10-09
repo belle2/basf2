@@ -8,10 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXCORRECTIONPARAMETERS_H
-#define CDCDEDXCORRECTIONPARAMETERS_H
+#pragma once
 
 #define c_NCDCLayers                56
 #define c_NCDCWires                 14336
-
-#endif

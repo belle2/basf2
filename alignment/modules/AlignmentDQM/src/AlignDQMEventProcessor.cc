@@ -13,6 +13,7 @@
 #include <alignment/modules/AlignmentDQM/AlignDQMEventProcessor.h>
 #include <alignment/modules/AlignmentDQM/AlignDQMModule.h>
 
+using namespace std;
 using namespace Belle2;
 
 void AlignDQMEventProcessor::FillCommonHistograms()

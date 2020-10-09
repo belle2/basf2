@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+import svd as svd
 from SVDChargeSharing import SVDChargeSharing
 logging.log_level = LogLevel.WARNING
 
@@ -15,12 +16,6 @@ progress = register_module('Progress')
 gearbox = register_module('Gearbox')
 # Create geometry
 geometry = register_module('Geometry')
-# Run simulation
-simulation = register_module('FullSim')
-# SVD digitization module
-svddigi = register_module('SVDDigitizer')
-# SVD clustering module
-svdclust = register_module('SVDClusterizer')
 # RootOutput
 output = register_module('RootOutput')
 
@@ -66,12 +61,6 @@ if (factor != 1.0):
         ],
     })
 
-# Select subdetectors to be built
-geometry.param('components', ['SVD'])
-
-# svddigi.param('statisticsFilename', 'digi.root')
-svddigi.param('ElectronicEffects', True)
-
 # create processing path
 main = create_path()
 main.add_module(eventinfosetter)
@@ -79,9 +68,9 @@ main.add_module(progress)
 main.add_module(particlegun)
 main.add_module(gearbox)
 main.add_module(geometry)
-main.add_module(simulation)
-main.add_module(svddigi)
-main.add_module(svdclust)
+main.add_module("FullSim")
+svd.add_svd_simulation(main)
+svd.add_svd_reconstruction(main)
 main.add_module(analyze)
 
 # generate events

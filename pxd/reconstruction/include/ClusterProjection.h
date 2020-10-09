@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PXD_ClusterProjection_H
-#define PXD_ClusterProjection_H
+#pragma once
 
 namespace Belle2 {
 
@@ -124,5 +123,3 @@ namespace Belle2 {
   } // PXD namespace
 
 } // Belle2 namespace
-
-#endif //PXD_ClusterProjection_H

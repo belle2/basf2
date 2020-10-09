@@ -46,4 +46,22 @@ void FarBeamLineGeo::initialize(const GearDir& content)
     bendingSections += name;
   }
   addParameter("Bending", bendingSections);
+
+  std::string collimators;
+  for (const GearDir& coll : content.getNodes("Collimator")) {
+    std::string name = coll.getString("@name");
+    addParameters(coll, name);
+    if (!collimators.empty()) collimators += " ";
+    collimators += name;
+  }
+  addParameter("Collimator", collimators);
+
+  std::string collimatorShields;
+  for (const GearDir& collShield : content.getNodes("CollimatorShield")) {
+    std::string name = collShield.getString("@name");
+    addParameters(collShield, name);
+    if (!collimatorShields.empty()) collimatorShields += " ";
+    collimatorShields += name;
+  }
+  addParameter("CollimatorShield", collimatorShields);
 }

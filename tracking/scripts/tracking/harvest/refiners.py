@@ -673,13 +673,14 @@ class SavePullAnalysisRefiner(Refiner):
                  estimate_name=None,
                  variance_name=None,
                  quantity_name=None,
-                 aux_names=[],
+                 aux_names=None,
                  unit=None,
                  outlier_z_score=None,
                  absolute=False,
                  which_plots=None):
         """Constructor for this refiner"""
-
+        if aux_names is None:
+            aux_names = []
         #: cached name for this pull analysis
         self.name = name
         #: cached contact person for this pull analysis
@@ -908,9 +909,12 @@ class FilterRefiner(Refiner):
 class SelectRefiner(Refiner):
     """Refiner for selection"""
 
-    def __init__(self, wrapped_refiner, select=[], exclude=[]):
+    def __init__(self, wrapped_refiner, select=None, exclude=None):
         """Constructor for this refiner"""
-
+        if select is None:
+            select = []
+        if exclude is None:
+            exclude = []
         #: cached value of the wrapped refiner
         self.wrapped_refiner = wrapped_refiner
         #: cached value of the selector
@@ -932,10 +936,11 @@ class GroupByRefiner(Refiner):
 
     def __init__(self,
                  wrapped_refiner,
-                 by=[],
+                 by=None,
                  exclude_by=None):
         """Constructor for this refiner"""
-
+        if by is None:
+            by = []
         #: cached value of the wrapped refiner
         self.wrapped_refiner = wrapped_refiner
         #: cached value of the group-by classifier
@@ -1259,7 +1264,12 @@ def save_tree(**kwds):
     return SaveTreeRefiner(**kwds)
 
 
-def select_crop_parts(crops, select=[], exclude=[]):
+def select_crop_parts(crops, select=None, exclude=None):
+    if select is None:
+        select = []
+    if exclude is None:
+        exclude = []
+
     if isinstance(select, str):
         select = [select, ]
 

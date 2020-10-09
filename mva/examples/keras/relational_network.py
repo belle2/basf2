@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 
@@ -77,7 +76,7 @@ def partial_fit(state, X, S, y, w, epoch):
         Class has to inherit from abstract Callback class
         """
 
-        def on_epoch_end(self, epoch, logs={}):
+        def on_epoch_end(self, epoch, logs=None):
             """
             Print summary at the end of epoch.
             For other possibilities look at the abstract Callback class.

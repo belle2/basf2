@@ -17,8 +17,6 @@
 
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   /** DQM of tracks

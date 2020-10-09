@@ -62,7 +62,7 @@ namespace Belle2 {
       Belle2::MVA::Weightfile::saveToDatabase(weightfile, identifier, iov);
     }
 
-    void upload_array(std::vector<std::string>& filenames, const std::string& identifier, int exp1, int run1, int exp2, int run2)
+    void upload_array(const std::vector<std::string>& filenames, const std::string& identifier, int exp1, int run1, int exp2, int run2)
     {
       Belle2::IntervalOfValidity iov(exp1, run1, exp2, run2);
 
@@ -93,8 +93,8 @@ namespace Belle2 {
       weightfile.setTemporaryDirectory(directory);
       GeneralOptions general_options;
       weightfile.getOptions(general_options);
-      auto expert = supported_interfaces[general_options.m_method]->getExpert();
-      expert->load(weightfile);
+      auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+      expertLocal->load(weightfile);
 
     }
 
@@ -172,8 +172,8 @@ namespace Belle2 {
         // otherwise this would apply to the expert as well.
         general_options.m_max_events = 0;
 
-        auto expert = supported_interfaces[general_options.m_method]->getExpert();
-        expert->load(weightfile);
+        auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+        expertLocal->load(weightfile);
         // define if target variables should be copied
         if (not copy_target) {
           general_options.m_target_variable = std::string();
@@ -183,7 +183,7 @@ namespace Belle2 {
         auto& branch = branches[i];
         ROOTDataset data(general_options);
         std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
-        auto results = expert->apply(data);
+        auto results = expertLocal->apply(data);
         std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::milli> training_time = stop - start;
         B2INFO("Elapsed application time in ms " << training_time.count() << " for " << general_options.m_identifier);
@@ -275,16 +275,16 @@ namespace Belle2 {
       AbstractInterface::initSupportedInterfaces();
       auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
       if (supported_interfaces.find(general_options.m_method) != supported_interfaces.end()) {
-        auto teacher = supported_interfaces[general_options.m_method]->getTeacher(general_options, specific_options);
+        auto teacherLocal = supported_interfaces[general_options.m_method]->getTeacher(general_options, specific_options);
         std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
-        auto weightfile = teacher->train(data);
+        auto weightfile = teacherLocal->train(data);
         std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::milli> training_time = stop - start;
         B2INFO("Elapsed training time in ms " << training_time.count() << " for " << general_options.m_identifier);
         Weightfile::save(weightfile, general_options.m_identifier);
-        auto expert = supported_interfaces[general_options.m_method]->getExpert();
-        expert->load(weightfile);
-        return expert;
+        auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+        expertLocal->load(weightfile);
+        return expertLocal;
       } else {
         B2ERROR("Interface doesn't support chosen method" << general_options.m_method);
         throw std::runtime_error("Interface doesn't support chosen method" + general_options.m_method);
@@ -388,6 +388,7 @@ namespace Belle2 {
       mc_general_options.m_identifier = general_options.m_identifier + "_pdf.xml";
       mc_general_options.m_method = "PDF";
       PDFOptions pdf_options;
+      // cppcheck-suppress unreadVariable
       auto pdf_expert = teacher_dataset(mc_general_options, pdf_options, mc_dataset);
 
       GeneralOptions combination_general_options = general_options;
@@ -423,6 +424,7 @@ namespace Belle2 {
 
       GeneralOptions boost_general_options = general_options;
       boost_general_options.m_identifier = general_options.m_identifier + "_boost.xml";
+      // cppcheck-suppress unreadVariable
       auto boost_expert = teacher_dataset(boost_general_options, specific_options, boost_dataset);
 
       GeneralOptions reweighter_general_options = general_options;
@@ -447,9 +449,9 @@ namespace Belle2 {
       auto reweight_expert = teacher_dataset(reweighter_general_options, reweighter_specific_options, dataset);
       auto weights = reweight_expert->apply(dataset);
       ReweightingDataset reweighted_dataset(general_options, dataset, weights);
-      auto expert = teacher_dataset(general_options, specific_options, reweighted_dataset);
+      auto expertLocal = teacher_dataset(general_options, specific_options, reweighted_dataset);
 
-      return expert;
+      return expertLocal;
     }
 
     std::unique_ptr<Belle2::MVA::Expert> teacher_sideband_substraction(const GeneralOptions& general_options,
@@ -480,9 +482,9 @@ namespace Belle2 {
 
       GeneralOptions sideband_general_options = general_options;
       SidebandDataset sideband_dataset(sideband_general_options, data_dataset, mc_dataset, meta_options.m_sideband_variable);
-      auto expert = teacher_dataset(general_options, specific_options, sideband_dataset);
+      auto expertLocal = teacher_dataset(general_options, specific_options, sideband_dataset);
 
-      return expert;
+      return expertLocal;
     }
 
 

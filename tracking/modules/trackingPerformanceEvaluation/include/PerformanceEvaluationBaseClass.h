@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#ifndef PERFORMANCEEVALUATIONBASECLASS_H_
-#define PERFORMANCEEVALUATIONBASECLASS_H_
+
+#pragma once
 
 #include <TFile.h>
 #include <TList.h>
@@ -49,42 +49,42 @@ namespace Belle2 {
     /// Create a 1D histogram and add it to the TList of 1D-histograms
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t min, Double_t max,
-                            const char* xtitle, TList* histoList = NULL);
+                            const char* xtitle, TList* histoList = nullptr);
 
     /// Create a 1D histogram and add it to the TList of 1D-histograms
     TH1F* createHistogram1D(const char* name, const char* title,
                             Int_t nbins, Double_t* bins,
-                            const char* xtitle, TList* histoList = NULL);
+                            const char* xtitle, TList* histoList = nullptr);
 
     /// Create a 2D histogram and add it to the TList of 2D-histograms
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
-                            TList* histoList = NULL); /**< Create 2D histogram */
+                            TList* histoList = nullptr); /**< Create 2D histogram */
 
     /// Create a 2D histogram and add it to the TList of 2D-histograms
     TH2F* createHistogram2D(const char* name, const char* title,
                             Int_t nbinsX, Double_t* binsX, const char* titleX,
                             Int_t nbinsY, Double_t* binsY, const char* titleY,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
     /// Create a 3D histogram and add it to the TList of 3D-histograms
     TH3F* createHistogram3D(const char* name, const char* title,
                             Int_t nbinsX, Double_t minX, Double_t maxX, const char* titleX,
                             Int_t nbinsY, Double_t minY, Double_t maxY, const char* titleY,
                             Int_t nbinsZ, Double_t minZ, Double_t maxZ, const char* titleZ,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
     /// Create a 3D histogram and add it to the TList of 3D-histograms
     TH3F* createHistogram3D(const char* name, const char* title,
                             Int_t nbinsX, Double_t* binsX, const char* titleX,
                             Int_t nbinsY, Double_t* binsY, const char* titleY,
                             Int_t nbinsZ, Double_t* binsZ, const char* titleZ,
-                            TList* histoList = NULL);
+                            TList* histoList = nullptr);
 
     /// Make a copy of a 1D histogram and add it to the TList of 1D-histograms
     TH1* duplicateHistogram(const char* newname, const char* newtitle,
-                            TH1* h, TList* histoList = NULL);
+                            TH1* h, TList* histoList = nullptr);
 
 
     /// Make a new 1D histogram from the ratio of two others and add it to the TList of 1D-histograms
@@ -95,24 +95,24 @@ namespace Belle2 {
 
 
     /// Create pt-, theta- and phi-efficiency 1D histograms and add them to the TList of 1D-histograms
-    void addEfficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);
+    void addEfficiencyPlots(TList* graphList = nullptr, TH3F* h3_xPerMCParticle = nullptr, TH3F* h3_MCParticle = nullptr);
     /// Create pt-, theta- and phi-inefficiency 1D histograms and add them to the TList of 1D-histograms
-    void addInefficiencyPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL,
-                              TH3F* h3_MCParticle = NULL);
+    void addInefficiencyPlots(TList* graphList = nullptr, TH3F* h3_xPerMCParticle = nullptr,
+                              TH3F* h3_MCParticle = nullptr);
     /// Create pt-, theta- and phi-purity 1D histograms and add them to the TList of 1D-histograms
-    void addPurityPlots(TList* graphList = NULL, TH3F* h3_xPerMCParticle = NULL, TH3F* h3_MCParticle = NULL);
+    void addPurityPlots(TList* graphList = nullptr, TH3F* h3_xPerMCParticle = nullptr, TH3F* h3_MCParticle = nullptr);
 
     /// Create a 1D efficiency histogram and add it to the TList of 1D-histograms
     TH1F* effPlot1D(TH1F* h1_den, TH1F* h1_num,
-                    const char* name, const char* title, bool geo_accettance, TList* histoList = NULL);
+                    const char* name, const char* title, bool geo_accettance, TList* histoList = nullptr);
 
     /// Create a 1D efficiency histogram and add it to the TList of 1D-histograms
     TH1F* effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack, TH1F* h1_Track,
-                    const char* name, const char* title, TList* histoList = NULL);
+                    const char* name, const char* title, TList* histoList = nullptr);
 
     /// Create a 2D efficiency histogram and add it to the TList of 2D-histograms
     TH2F* effPlot2D(TH2F* h2_den, TH2F* h2_num,
-                    const char* name, const char* title, bool geo_accettance, TList* histoList = NULL);
+                    const char* name, const char* title, bool geo_accettance, TList* histoList = nullptr);
 
     /// Create a 2D efficiency histogram and add it to the TList of 2D-histograms
     TH2F* effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack, TH2F* h2_Track,
@@ -120,15 +120,15 @@ namespace Belle2 {
 
     /// Create a 1D efficiency histogram for geometric acceptance and add it to the TList of 1D-histograms
     TH1F* geoAcc1D(TH1F* h1_den, TH1F* h1_num,
-                   const char* name, const char* title, TList* histoList = NULL);
+                   const char* name, const char* title, TList* histoList = nullptr);
 
     /// Create a 2D efficiency histogram for geometric acceptance and add it to the TList of 2D-histograms
     TH2F* geoAcc2D(TH2F* h2_den, TH2F* h2_num,
-                   const char* name, const char* title, TList* histoList = NULL);
+                   const char* name, const char* title, TList* histoList = nullptr);
 
     /// Create a 1D efficiency histogram for V0 finding and add it to the TList of 1D-histograms
     TH1F* V0FinderEff(TH1F* h1_dau0, TH1F* h1_dau1, TH1F* h1_Mother,
-                      const char* name, const char* title, TList* histoList = NULL);
+                      const char* name, const char* title, TList* histoList = nullptr);
 
 
     /* user-defined parameters */
@@ -139,6 +139,3 @@ namespace Belle2 {
 
   };
 } // end of namespace
-
-
-#endif /* PERFORMANCEEVALUATIONBASECLASS_H_ */

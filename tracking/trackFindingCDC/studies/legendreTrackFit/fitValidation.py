@@ -1,3 +1,10 @@
+from tracking import modules
+from tracking.run.event_generation import StandardEventGenerationRun
+from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
+import sys
+import logging
+from tracking.harvest import refiners
+from tracking.harvest.harvesting import HarvestingModule
 import basf2
 import ROOT
 from ROOT import Belle2
@@ -5,13 +12,6 @@ from ROOT import Belle2
 from ROOT import gSystem
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
-
-from tracking.harvest.harvesting import HarvestingModule
-from tracking.harvest import refiners
-import logging
-import sys
-
-from trackfindingcdc.cdcdisplay import CDCSVGDisplayModule
 
 
 class FitValidationModule(HarvestingModule):
@@ -90,12 +90,9 @@ class FitValidationModule(HarvestingModule):
     save_tree = refiners.save_tree(folder_name="tree")
 
 
-from tracking.run.event_generation import StandardEventGenerationRun
-from tracking import modules
-
-
 class FitValidation(StandardEventGenerationRun):
     """Read generated events or generate new events, simulate, fit the tracks and validate"""
+
     def create_path(self):
         """Create and populate the basf2 path"""
 
@@ -115,6 +112,7 @@ class FitValidation(StandardEventGenerationRun):
 def main():
     run = FitValidation()
     run.configure_and_execute_from_commandline()
+
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(levelname)s:%(message)s')

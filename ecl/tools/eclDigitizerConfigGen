@@ -62,9 +62,9 @@ def main():
     #=== Load covariance matrix data
 
     # Folder with inverse covariance matrices and waveform parameters
-    PATH_PREFIX = '/home/belle/avbobrov/eclshaper_sp/file/run02320_2_feb20_noise'
+    PATH_PREFIX = sys.argv[1]#'/home/belle/avbobrov/eclshaper_sp/file/run02320_2_feb20_noise'
     # Folder with time shift data
-    PATH_PREFIX_TID = '/home/belle/avbobrov/eclshaper_sp/file/tid'
+    PATH_PREFIX_TID = sys.argv[2]#'/home/belle/avbobrov/eclshaper_sp/file/tid'
 
     # Cell ID-indexed list (0..8735) of ECLWaveformData objects
     # (waveform parameters and inv cov matrices)
@@ -217,10 +217,14 @@ def adjustParameters(path, wf_data_list):
     """
     Adjust parameters based on time shift data
     """
+    # Waveform shaper parameters, taken from PhotonMCPar11 array, from ecl/tools/eclDigitizerConfigGen
+    default_parameters = [0.5, 0.648324, 0.401711, 0.374167, 0.849417, 0.00144548, 4.70722, 0.815639, 0.555605, 0.2752]
     timeshifts = [float(x) for x in open(path).readlines()]
     for wf_data, shift in zip(wf_data_list, timeshifts):
-        t0 = wf_data.getWaveformPar(0)
-        wf_data.setWaveformPar(0, t0 + shift - 72./2304.)
+        # t0 = wf_data.getWaveformPar(0)
+        # wf_data.setWaveformPar(0, t0 + shift - 72./2304.)
+        for i, par in enumerate(default_parameters):
+            wf_data.setWaveformPar(i, par)
     return wf_data_list
 
 

@@ -247,14 +247,12 @@ TrgEclMapping::getTCPhiIdFromTCId(int TCId)
 //
 //
 //
-
 TVector3 TrgEclMapping::getTCPosition(int TCId)
 {
   if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> input TCId is wrong!!!");
 
   }
-
 
   double TCPosition[576][3] =  {
     { 52.5341, 16.6502, 197.05},
@@ -1512,9 +1510,6 @@ TrgEclMapping::getTCIdFromFAMChannel(int NFAM, int NChannel)
 
 }
 //
-//
-
-
 //
 //
 std::vector<int>

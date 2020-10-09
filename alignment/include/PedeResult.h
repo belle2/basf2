@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef PEDERESULT_H
-#define PEDERESULT_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -109,4 +108,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

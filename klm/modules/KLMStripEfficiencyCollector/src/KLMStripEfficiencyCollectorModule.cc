@@ -193,6 +193,12 @@ void KLMStripEfficiencyCollectorModule::findMatchingDigit(
   struct HitData* hitData)
 {
   for (const KLMDigit& digit : m_Digits) {
+    /*
+     * TODO: multi-strip digits are ugnored for now.
+     * It is necessary to take them into account.
+     */
+    if (digit.isMultiStrip())
+      continue;
     if (!(digit.getSubdetector() == hitData->subdetector &&
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&

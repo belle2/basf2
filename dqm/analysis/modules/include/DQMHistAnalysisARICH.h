@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHDQMANALYSISMODULE_H
-#define ARICHDQMANALYSISMODULE_H
-
 #pragma once
 
 //DQM
@@ -103,5 +100,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

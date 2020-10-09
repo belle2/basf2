@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 
@@ -67,7 +66,7 @@ def partial_fit(state, X, S, y, w, epoch):
     """
     class TestCallback(Callback):
 
-        def on_epoch_end(self, epoch, logs={}):
+        def on_epoch_end(self, epoch, logs=None):
             loss, acc = state.model.evaluate(state.Xtest, state.ytest, verbose=0, batch_size=1000)
             loss2, acc2 = state.model.evaluate(X[:10000], y[:10000], verbose=0, batch_size=1000)
             print('\nTesting loss: {}, acc: {}'.format(loss, acc))

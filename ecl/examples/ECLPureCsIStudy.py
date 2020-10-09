@@ -1,59 +1,84 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-########################################################
-# Dump digit information for pure CsI vs CsI(Tl)
-# using particle gun to generate single particles
-# enabling pure CsI digitization
-# dump useful in a flat ntuple + enriched mdst
-#
-# Guglielmo De Nardo - 2015 Belle II Collaboration
-########################################################
+"""Dump digit information for pure CsI vs CsI(Tl)
+   using 'ParticleGun' to generate single particles
+   enabling pure CsI digitization
+   dump useful in a flat ntuple + enriched mdst
 
-import os
-from basf2 import *
+Usage:
+    $ basf2 ECLPureCsIStudy.py -- --momentum <number>
+            --fileNamePrefix <name> --elecNoise <number>
+            --photoStatResolution <number>
+            [--beamBkgPath <path_to_files> --pdgCode <integer>]
+"""
+
+import glob
+import argparse
+import basf2 as b2
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from reconstruction import add_mdst_output
 from beamparameters import add_beamparameters
 
-import sys
-import glob
+__authors__ = ['Guglielmo De Nardo', 'Abtin Narimani Charan']
+__copyright__ = 'Copyright 2020 - Belle II Collaboration'
+__maintainer__ = 'Abtin Narimani Charan'
+__email__ = 'abtin.narimani.charan@desy.de'
 
-par = sys.argv
-argc = len(par)
 
-pdg = int(par[1])
-momentum = float(par[2])
-filenameprefix = par[3]
-elenoise = float(par[4])
-photo = float(par[5])
+def argparser():
 
-withbg = 0
-if (argc == 7):
-    isbg = par[6]
-    withbg = 1
-mdstfile = par[3]
-mdstfile += '-mdst.root'
-digistudyfile = par[3]
-digistudyfile += '-digi'
+    parser = argparse.ArgumentParser()
 
-generator = 0
-if (pdg == 0):
-    generator = 1
+    parser.add_argument('--momentum',
+                        type=float,
+                        required=True,
+                        help='Fixed momentum of particle equivalent in GeV')
 
-main = create_path()
+    parser.add_argument('--fileNamePrefix',
+                        required=True,
+                        help='Output file name')
 
-eventinfosetter = register_module('EventInfoSetter')
-main.add_module(eventinfosetter)
+    parser.add_argument('--elecNoise',
+                        type=float,
+                        required=True,
+                        help='Electronics noise energy equivalent in MeV')
 
-if (generator == 0):
+    parser.add_argument('--photoStatResolution',
+                        type=float,
+                        required=True,
+                        help='Sigma for 1 MeV energy deposit')
+
+    parser.add_argument('--beamBkgPath',
+                        help='If you want to add beam background, pass this'
+                        'option with path to beam background files.')
+
+    parser.add_argument('--pdgCode',
+                        type=int,
+                        help='PDG code of particle'
+                        ' For more information:'
+                        'http://pdg.lbl.gov/2019/reviews/rpp2018-rev-monte-carlo-numbering.pdf')
+    return parser
+
+
+args = argparser().parse_args()
+
+# Create path. Register necessary modules to this path.
+mainPath = b2.create_path()
+
+# Register and add 'EventInfoSetter' module
+eventInfoSetter = b2.register_module('EventInfoSetter')
+mainPath.add_module(eventInfoSetter)
+
+if args.pdgCode:
     # single particle generator settings
-    pGun = register_module('ParticleGun')
-    param_pGun = {
-        'pdgCodes': [pdg],
+    particleGun = b2.register_module('ParticleGun')
+    param_particleGun = {
+        'pdgCodes': [args.pdgCode],
         'nTracks': 1,
         'momentumGeneration': 'fixed',
-        'momentumParams': [momentum],
+        'momentumParams': [args.momentum],
         'thetaGeneration': 'uniform',
         'thetaParams': [13.0, 30.0],
         'phiGeneration': 'uniform',
@@ -63,54 +88,62 @@ if (generator == 0):
         'yVertexParams': [0.0, 0.0],
         'zVertexParams': [0.0, 0.0],
     }
-
-    pGun.param(param_pGun)
-    main.add_module(pGun)
+    particleGun.param(param_particleGun)
+    mainPath.add_module(particleGun)
 else:
-    # beam parameters
-    beamparameters = add_beamparameters(main, "Y4S")
-    evtgeninput = register_module('EvtGenInput')
-    main.add_module(evtgeninput)
+    # Beam parameters
+    beamparameters = add_beamparameters(mainPath, 'Y4S')
+    evtGenInput = b2.register_module('EvtGenInput')
+    mainPath.add_module(evtGenInput)
 
-
-if (withbg == 1):
-    bg = glob.glob(isbg + '/*.root')
-    add_simulation(main, bkgfiles=bg)
+if args.beamBkgPath:
+    # Add beam background
+    bgFiles = glob.glob(args.beamBkgPath + '/*.root')
+    # Simulation
+    add_simulation(mainPath, bkgfiles=bgFiles)
 else:
-    add_simulation(main)
+    add_simulation(mainPath)
 
-add_reconstruction(main, components='ECL')
+# Reconstruction
+add_reconstruction(mainPath, components='ECL')
 
-ecl_digitizerPureCsI = register_module('ECLDigitizerPureCsI')
-ecl_digitizerPureCsI.param('adcTickFactor', 8)
-ecl_digitizerPureCsI.param('sigmaTrigger', 0.)
-ecl_digitizerPureCsI.param('elecNoise', elenoise)
-ecl_digitizerPureCsI.param('photostatresolution', photo)
-ecl_digitizerPureCsI.param('sigmaTrigger', 0)
-ecl_digitizerPureCsI.param('LastRing', 12)
-ecl_digitizerPureCsI.param('NoCovMatrix', 1)
+# Register and add 'ECLDigitizerPureCsI' module
+eclDigitizerPureCsI = b2.register_module('ECLDigitizerPureCsI')
+eclDigitizerPureCsI.param('adcTickFactor', 8)
+eclDigitizerPureCsI.param('sigmaTrigger', 0.)
+eclDigitizerPureCsI.param('elecNoise',
+                          args.elecNoise)
+eclDigitizerPureCsI.param('photostatresolution',
+                          args.photoStatResolution)
+eclDigitizerPureCsI.param('sigmaTrigger', 0)
+eclDigitizerPureCsI.param('LastRing', 12)
+eclDigitizerPureCsI.param('NoCovMatrix', 1)
+if args.withBkg:
+    eclDigitizerPureCsI.param('Background', 1)
+mainPath.add_module(eclDigitizerPureCsI)
 
-if (withbg == 1):
-    ecl_digitizerPureCsI.param('Background', 1)
+# Register and add 'ECLDigitCalibratorPureCsI' module
+eclDigitCalibratorPureCsI = b2.register_module('ECLDigitCalibratorPureCsI')
+mainPath.add_module(eclDigitCalibratorPureCsI)
 
-main.add_module(ecl_digitizerPureCsI)
+# Register and add 'ECLReconstructorPureCsI' module
+eclReconstructorPureCsI = b2.register_module('ECLReconstructorPureCsI')
+mainPath.add_module(eclReconstructorPureCsI)
 
-ecl_calibrator_PureCsI = register_module('ECLDigitCalibratorPureCsI')
-main.add_module(ecl_calibrator_PureCsI)
-ecl_shower_rec_PureCsI = register_module('ECLReconstructorPureCsI')
-main.add_module(ecl_shower_rec_PureCsI)
+# Register and add 'ECLDigiStudy' module
+eclDigiStudy = b2.register_module('ECLDigiStudy')
+eclDigiStudy.param('outputFileName',
+                   args.fileNamePrefix + '_digi')
+mainPath.add_module(eclDigiStudy)
 
-ecl_digistudy = register_module('ECLDigiStudy')
-ecl_digistudy.param('outputFileName', digistudyfile)
-main.add_module(ecl_digistudy)
+# display = b2.register_module('Display')
+# mainPath.add_module(display)
 
-# display = register_module('Display')
-# main.add_module(display)
-
+# Add output mdst file with ECL information
 add_mdst_output(
-    main,
+    mainPath,
     mc=True,
-    filename=mdstfile,
+    filename=args.fileNamePrefix + '.mdst.root',
     additionalBranches=[
         'ECLHits',
         'ECLClustersPureCsI',
@@ -124,8 +157,10 @@ add_mdst_output(
         'ECLDigitsPureCsIToECLHits'])
 
 # Show progress of processing
-progress = register_module('ProgressBar')
-main.add_module(progress)
+progressBar = b2.register_module('ProgressBar')
+mainPath.add_module(progressBar)
 
-process(main)
-print(statistics)
+# Process the events and print call statistics
+mainPath.add_module('Progress')
+b2.process(mainPath)
+print(b2.statistics)

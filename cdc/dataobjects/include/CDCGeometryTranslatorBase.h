@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCGEOMETRYTRANSLATORBASE_H
-#define CDCGEOMETRYTRANSLATORBASE_H
+#pragma once
 
 #include <cdc/dataobjects/WireID.h>
 
@@ -51,4 +50,3 @@ namespace Belle2 {
     };
   }
 }
-#endif /* CDCGEOMETRYTRANSLATORBASE_H */

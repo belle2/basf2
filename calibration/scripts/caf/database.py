@@ -54,12 +54,12 @@ class SQLiteDB():
     def close(self):
         if self.conn:
             if not self.read_only:
-                B2DEBUG(29, "Committing changes and closing Connection for database {}".format(self.database_path))
+                B2DEBUG(29, f"Committing changes and closing Connection for database {self.database_path}.")
                 self.conn.commit()
             self.conn.close()
 
     def open(self, database_path, timeout):
-        B2DEBUG(29, "Opening Connection for database {}".format(self.database_path))
+        B2DEBUG(29, f"Opening Connection for database {self.database_path}.")
         connection_uri = 'file:'+str(database_path)
         if self.read_only:
             connection_uri += '?mode=ro'
@@ -70,13 +70,13 @@ class SQLiteDB():
 
     def query(self, sql, parameters=tuple()):
         cursor = self.conn.cursor()
-        B2DEBUG(29, "execute({}, {})".format(sql, parameters))
+        B2DEBUG(29, f"execute({sql}, {parameters}).")
         return cursor.execute(sql, parameters)
 
     def create_schema(self):
         for table_name, fields in self.schema.items():
             columns = ",".join(fields)
-            sql = "CREATE TABLE {} ({})".format(table_name, columns)
+            sql = f"CREATE TABLE {table_name} ({columns})"
             self.query(sql)
         self.conn.commit()
 

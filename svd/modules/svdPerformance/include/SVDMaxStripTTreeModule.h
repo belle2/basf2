@@ -52,7 +52,7 @@ namespace Belle2 {
     std::string m_shapersStoreArrayName{"SVDShaperDigits"};  /**< storeArray name of the input ShaperDigits */
     StoreArray<SVDShaperDigit> m_shapers; /**< array of SVDShaperDigits*/
 
-    SVDAPVHistograms<TH1F>* m_hHits = NULL; /**< hits per APV*/
+    SVDAPVHistograms<TH1F>* m_hHits = nullptr; /**< hits per APV*/
 
     TTree* m_t = nullptr;  /**< tree containing info related to the U and V side strips*/
     /* Branches */

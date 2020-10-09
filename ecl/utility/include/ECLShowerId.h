@@ -8,9 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSHOWERID_H
-#define ECLSHOWERID_H
-
+#pragma once
 
 namespace Belle2 {
   namespace ECL {
@@ -71,8 +69,3 @@ namespace Belle2 {
     };
   }
 } // Belle2 namespace
-
-#endif
-
-
-

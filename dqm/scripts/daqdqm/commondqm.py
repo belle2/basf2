@@ -72,11 +72,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # SVD CLUSTERS ON TRACK
             path.add_module('SVDDQMClustersOnTrack')
 
-        # VXD (PXD/SVD common)
-        if components is None or 'PXD' in components or 'SVD' in components:
-            vxddqm = register_module('VXDDQMExpressReco')
-            path.add_module(vxddqm)
-
         # Event time measuring detectors
         if components is None or 'CDC' in components or 'ECL' in components or 'TOP' in components:
             eventT0DQMmodule = register_module('EventT0DQM')
@@ -203,6 +198,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
+        # CDCTriggerNeuro
+        path.add_module('CDCTriggerNeuroDQM')
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL
@@ -210,18 +207,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
 
-    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]) and (dqm_environment == 'hlt'):
-        # CDCTriggerNeuro
-        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
-                        hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
-        path.add_module('SetupGenfitExtrapolation')
-        path.add_module('CDCTriggerNeuroDQM',
-                        limitedoutput=True,
-                        showRecoTracks=True,
-                        skipWithoutHWTS=True,
-                        maxRecoZDist=1.0,
-                        maxRecoD0Dist=0.5,
-                        )
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')

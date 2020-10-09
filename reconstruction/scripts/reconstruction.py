@@ -32,7 +32,7 @@ import mdst
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       nCDCHitsMax=6000, nSVDShaperDigitsMax=70000):
+                       abort_path=None, use_random_numbers_for_hlt_prescale=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -55,17 +55,21 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param nCDCHitsMax: the max number of CDC hits for an event to be reconstructed.
-    :param nSVDShaperDigitsMax: the max number of SVD shaper digits for an event to be reconstructed.
+    :param abort_path: the path to use when the reconstruction is aborted. If None an empty path will be used.
+    :param use_random_numbers_for_hlt_prescale: If True, the HLT filter prescales are applied using randomly
+        generated numbers, otherwise are applied using an internal counter.)
     """
 
     # Check components.
     check_components(components)
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    empty_path = create_path()
-    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=nCDCHitsMax, nSVDShaperDigitsMax=nSVDShaperDigitsMax)
-    doom.if_true(empty_path, AfterConditionPath.END)
+    if abort_path is None:
+        abort_path = create_path()
+    doom = path.add_module('EventsOfDoomBuster')
+    doom.if_true(abort_path, AfterConditionPath.END)
+    abort_path.add_module('EventErrorFlag',
+                          errorFlag=Belle2.EventMetaData.c_ReconstructionAbort)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_pretracking_reconstruction(path,
@@ -102,7 +106,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                             pruneTracks=pruneTracks,
                                             add_muid_hits=add_muid_hits,
                                             addClusterExpertModules=addClusterExpertModules)
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
         # if you don't need the softwareTrigger result, then you can add only these two modules of the post-tracking reconstruction
         else:
@@ -128,7 +133,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                         addClusterExpertModules=addClusterExpertModules)
         # Add the modules calculating the software trigger cuts (but not performing them)
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
 
     #
@@ -143,7 +149,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                         addClusterExpertModules=addClusterExpertModules)
         # Add the modules calculating the software trigger cuts (but not performing them)
         if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
-            add_filter_software_trigger(path)
+            add_filter_software_trigger(path,
+                                        use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
             add_skim_software_trigger(path)
 
 
@@ -212,10 +219,15 @@ def add_cosmics_reconstruction(
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
-    # Add only the dE/dx calculation and prune the tracks
     if reconstruct_cdst:
-        add_dedx_modules(main_path)
-        add_prune_tracks(main_path, components=components)
+        # if PXD or SVD are included, you will need there two modules which are not part of the standard reconstruction
+        if not components or ('PXD' in components):
+            path.add_module("PXDClustersFromTracks")
+        if not components or ('SVD' in components):
+            path.add_module("SVDShaperDigitsFromTracks")
+        # And add only the dE/dx calculation and prune the tracks
+        add_dedx_modules(path)
+        add_prune_tracks(path, components=components)
 
     else:
         # Add further reconstruction modules
@@ -288,7 +300,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True, add
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param cosmics: if True, steer TOP for cosmic reconstruction.
     :param for_cdst_analysis: if True, dEdx, EventT0 and PruneTracks modules are not added to the path.
-    This is only needed by prepare_cdst_analysis().
+           This is only needed by prepare_cdst_analysis().
     """
 
     # Not add dEdx modules in prepare_cdst_analysis()
@@ -416,7 +428,6 @@ def add_cdst_output(
         'TRGECLClusters',
         'TRGECLUnpackerStores',
         'TRGECLUnpackerEvtStores',
-        'BKLMHit2ds',
         'TRGGRLUnpackerStore',
         'CDCTriggerSegmentHits',
         'CDCTrigger2DFinderTracks',
@@ -430,16 +441,8 @@ def add_cdst_output(
         'CDCTriggerNNOutputBits',
         'TRGGDLUnpackerStores',
         'TRGTOPUnpackerStores',
-        'TracksToBKLMHit2ds',
         'RecoHitInformations',
         'RecoHitInformationsToBKLMHit2ds',
-        'EKLMAlignmentHits',
-        'TracksToEKLMHit2ds',
-        'EKLMHit2ds',
-        'EKLMDigits',
-        'EKLMHit2dsToEKLMDigits',
-        'KLMMuidLikelihoods',
-        'TracksToKLMMuidLikelihoods',
         'TracksToARICHLikelihoods',
         'TracksToExtHits',
         'ARICHDigits',
@@ -448,10 +451,18 @@ def add_cdst_output(
         'ARICHLikelihoods',
         'ARICHTracksToExtHits',
         'SoftwareTriggerVariables',
-        'BKLMDigits',
+        'KLMDigits',
+        'KLMMuidLikelihoods',
+        'TracksToKLMMuidLikelihoods',
         'BKLMHit1ds',
+        'BKLMHit1dsToKLMDigits',
+        'BKLMHit2ds',
         'BKLMHit2dsToBKLMHit1ds',
-        'BKLMHit1dsToBKLMDigits',
+        'EKLMAlignmentHits',
+        'EKLMHit2ds',
+        'EKLMHit2dsToKLMDigits',
+        'TracksToBKLMHit2ds',
+        'TracksToEKLMHit2ds',
         'SVDShaperDigitsFromTracks',
         'TRGGDLUnpackerStores',
         'VXDDedxTracks',

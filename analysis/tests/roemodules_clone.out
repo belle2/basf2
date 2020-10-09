@@ -43,13 +43,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | 211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | 211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -58,13 +58,13 @@
 [INFO]  - ROE related to MC particle with PDG: -321
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | 211 | -211 | 211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  12 |  13 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | 211 | -211 | 211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  12 |  13 |  15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -73,13 +73,13 @@
 [INFO]  - ROE related to MC particle with PDG: 11
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  12 |  13 |  14 |  15 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  12 |  13 |  14 |  15 |  17 |  18 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -88,13 +88,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -103,13 +103,13 @@
 [INFO]  - ROE related to MC particle with PDG: -2212
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -118,13 +118,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -133,13 +133,13 @@
 [INFO]  - ROE related to MC particle with PDG: -13
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -148,13 +148,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | 211 | -211 | -211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  12 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | 211 | -211 | -211 | 211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  12 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -163,13 +163,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | 211 | -211 | 211 | -211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  12 |  13 |  14 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | -211 | 211 | -211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  12 |  13 |  14 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -178,13 +178,13 @@
 [INFO]  - ROE related to MC particle with PDG: -13
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 4
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | -211 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  12 |  13 |  14 |  15 |  16 |  18 |  19 |  20 |  21 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 9
 [INFO]  - - No. of Photons           in ROE: 3
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | -211 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  12 |  13 |  14 |  15 |  16 |  18 |  19 |  20 |  22 |  23 |  28 |  29 |  30 |  31 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -193,13 +193,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -208,13 +208,13 @@
 [INFO]  - ROE related to MC particle with PDG: -321
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -223,13 +223,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -238,13 +238,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -253,13 +253,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -268,13 +268,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -283,13 +283,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -298,13 +298,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -313,13 +313,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -328,13 +328,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -343,13 +343,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -358,13 +358,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -373,13 +373,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | -211 | -211 | -211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  24 |  25 |  26 |  27 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -388,13 +388,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  28 |  29 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  28 |  29 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -403,13 +403,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 14
 [INFO]  - No. of Photons           in ROE: 20
-[INFO]  - No. of Neutral hadrons   in ROE: 1
+[INFO]  - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  30 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  48 |  49 |  64 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 14
 [INFO]  - - No. of Photons           in ROE: 17
-[INFO]  - - No. of Neutral hadrons   in ROE: 1
+[INFO]  - - No. of K_L0 and neutrons in ROE: 1
 [INFO]  - - |211 | 211 | -211 | 211 | -211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  31 |  32 |  33 |  34 |  35 |  36 |  37 |  38 |  39 |  40 |  41 |  42 |  43 |  44 |  45 |  46 |  47 |  64 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -418,13 +418,13 @@
 [INFO]  - ROE related to MC particle with PDG: -321
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 11
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | 211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  9 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  36 |  37 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 6
 [INFO]  - - No. of Photons           in ROE: 10
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - - |7 |  9 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -434,20 +434,20 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  10 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  9 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -455,7 +455,7 @@
 [INFO]  ParticleLists: B+:other (0+2) + B-:other (0+2)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=47 identifier=-1 daughterIndices: 7, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: 211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.466
@@ -475,7 +475,7 @@
 
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=48 identifier=-1 daughterIndices: 7, 9, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: 211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=6.847
@@ -499,13 +499,13 @@
 [INFO]  - ROE related to MC particle with PDG: 13
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 11
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | 211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  36 |  37 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 6
 [INFO]  - - No. of Photons           in ROE: 10
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - - |7 |  8 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -515,10 +515,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -526,7 +526,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=57 identifier=-1 daughterIndices: 7, 8, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: 211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.452
@@ -550,13 +550,13 @@
 [INFO]  - ROE related to MC particle with PDG: 13
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 11
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | 211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  9 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  36 |  37 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 6
 [INFO]  - - No. of Photons           in ROE: 10
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - - |7 |  8 |  9 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -566,10 +566,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -577,7 +577,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=66 identifier=-1 daughterIndices: 7, 8, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: 211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.452
@@ -601,13 +601,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 11
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | -211 | -211 | 211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |8 |  9 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  36 |  37 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 6
 [INFO]  - - No. of Photons           in ROE: 10
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |-211 | -211 | -211 | 211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - - |8 |  9 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -617,20 +617,20 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |8 |  10 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |8 |  9 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -638,7 +638,7 @@
 [INFO]  ParticleLists: B+:other (0+2) + B-:other (0+2)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=76 identifier=-1 daughterIndices: 8, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: -211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.849
@@ -658,7 +658,7 @@
 
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=77 identifier=-1 daughterIndices: 8, 9, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: -211, -211, 211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=7.143
@@ -682,13 +682,13 @@
 [INFO]  - ROE related to MC particle with PDG: -11
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 11
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  9 |  10 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  36 |  37 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 6
 [INFO]  - - No. of Photons           in ROE: 10
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | -211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - - |7 |  8 |  9 |  10 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -698,20 +698,20 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  10 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  9 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -719,7 +719,7 @@
 [INFO]  ParticleLists: B+:other (0+2) + B-:other (0+2)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=87 identifier=-1 daughterIndices: 7, 8, 10, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=3.889
@@ -739,7 +739,7 @@
 
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=88 identifier=-1 daughterIndices: 7, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.175
@@ -763,13 +763,13 @@
 [INFO]  - ROE related to MC particle with PDG: -13
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 11
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  9 |  10 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  36 |  37 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 6
 [INFO]  - - No. of Photons           in ROE: 10
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | -211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - - |7 |  8 |  9 |  10 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -778,13 +778,13 @@
 [INFO]  - ROE related to MC particle with PDG: -11
 [INFO]  - No. of Charged particles in ROE: 6
 [INFO]  - No. of Photons           in ROE: 11
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  9 |  10 |  11 |  12 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  36 |  37 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 6
 [INFO]  - - No. of Photons           in ROE: 10
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | -211 | -211 | 211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - - |7 |  8 |  9 |  10 |  11 |  12 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -794,20 +794,20 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  10 |  11 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 4
 [INFO]  - No. of Photons           in ROE: 10
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |7 |  8 |  9 |  11 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  36 |  37 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -815,7 +815,7 @@
 [INFO]  ParticleLists: B+:other (0+2) + B-:other (0+2)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=105 identifier=-1 daughterIndices: 7, 8, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=5.89
@@ -835,7 +835,7 @@
 
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=106 identifier=-1 daughterIndices: 7, 8, 9, 11, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 36, 37, 
  daughter PDGCodes: 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=7.228
@@ -859,13 +859,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | 211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |9 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | 211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |9 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -874,13 +874,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | 211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |9 |  10 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | 211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |9 |  10 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -889,13 +889,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | -211 | 211 | 211 | 211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |9 |  10 |  11 |  12 |  13 |  14 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | 211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |9 |  10 |  11 |  12 |  13 |  14 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -904,13 +904,13 @@
 [INFO]  - ROE related to MC particle with PDG: 11
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | -211 | 211 | 211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |9 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | 211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |9 |  10 |  11 |  12 |  13 |  14 |  15 |  16 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -919,13 +919,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |-211 | -211 | 211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |-211 | -211 | 211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |10 |  11 |  12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -934,13 +934,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | -211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |9 |  10 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |9 |  10 |  11 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -949,13 +949,13 @@
 [INFO]  - ROE related to MC particle with PDG: 321
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | -211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |9 |  10 |  11 |  12 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |9 |  10 |  11 |  12 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -964,13 +964,13 @@
 [INFO]  - ROE related to MC particle with PDG: 321
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | -211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |9 |  10 |  11 |  12 |  13 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |9 |  10 |  11 |  12 |  13 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -979,13 +979,13 @@
 [INFO]  - ROE related to MC particle with PDG: 13
 [INFO]  - No. of Charged particles in ROE: 8
 [INFO]  - No. of Photons           in ROE: 15
-[INFO]  - No. of Neutral hadrons   in ROE: 4
+[INFO]  - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - |211 | -211 | -211 | 211 | 211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - |9 |  10 |  11 |  12 |  13 |  14 |  15 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 8
 [INFO]  - - No. of Photons           in ROE: 14
-[INFO]  - - No. of Neutral hadrons   in ROE: 4
+[INFO]  - - No. of K_L0 and neutrons in ROE: 4
 [INFO]  - - |211 | -211 | -211 | 211 | 211 | 211 | -211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 130 | 130 | 130 | 
 [INFO]  - - |9 |  10 |  11 |  12 |  13 |  14 |  15 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  27 |  28 |  29 |  30 |  31 |  45 |  46 |  47 |  48 |  49 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -994,13 +994,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  45 |  46 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1010,10 +1010,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |13 |  15 |  16 |  18 |  19 |  21 |  22 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  45 |  46 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1021,7 +1021,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=61 identifier=-1 daughterIndices: 13, 15, 16, 18, 19, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 45, 46, 
  daughter PDGCodes: 211, -211, 211, 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.945
@@ -1045,13 +1045,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  62 |  63 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1061,10 +1061,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |13 |  16 |  18 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  62 |  63 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1072,7 +1072,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=81 identifier=-1 daughterIndices: 13, 16, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 62, 63, 
  daughter PDGCodes: 211, 211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=7.907
@@ -1096,13 +1096,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  15 |  16 |  17 |  18 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  16 |  17 |  18 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  82 |  83 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1112,10 +1112,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |13 |  15 |  16 |  18 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  82 |  83 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1123,7 +1123,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=101 identifier=-1 daughterIndices: 13, 15, 16, 18, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 82, 83, 
  daughter PDGCodes: 211, -211, 211, 211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.863
@@ -1147,13 +1147,13 @@
 [INFO]  - ROE related to MC particle with PDG: 13
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  16 |  17 |  18 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  102 |  103 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1162,13 +1162,13 @@
 [INFO]  - ROE related to MC particle with PDG: -321
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  16 |  17 |  18 |  19 |  20 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  120 |  121 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1178,10 +1178,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |13 |  15 |  16 |  18 |  19 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  120 |  121 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1189,7 +1189,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=139 identifier=-1 daughterIndices: 13, 15, 16, 18, 19, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 120, 121, 
  daughter PDGCodes: 211, -211, 211, 211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=7.99
@@ -1213,13 +1213,13 @@
 [INFO]  - ROE related to MC particle with PDG: -211
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  140 |  141 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1229,10 +1229,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | -211 | -211 | 211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |13 |  15 |  16 |  18 |  19 |  21 |  22 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  140 |  141 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1240,7 +1240,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=159 identifier=-1 daughterIndices: 13, 15, 16, 18, 19, 21, 22, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 140, 141, 
  daughter PDGCodes: 211, -211, 211, 211, -211, -211, 211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=9.013
@@ -1264,13 +1264,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |-211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  160 |  161 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1280,10 +1280,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |15 |  16 |  18 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  160 |  161 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1291,7 +1291,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=179 identifier=-1 daughterIndices: 15, 16, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 160, 161, 
  daughter PDGCodes: -211, 211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.86
@@ -1315,13 +1315,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |-211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - - |12 |  13 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1331,10 +1331,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | -211 | 211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  15 |  16 |  18 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1342,7 +1342,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=199 identifier=-1 daughterIndices: 12, 13, 15, 16, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 
  daughter PDGCodes: -211, 211, -211, 211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 
  mass=8.844
@@ -1366,13 +1366,13 @@
 [INFO]  - ROE related to MC particle with PDG: 211
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  15 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  17 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  200 |  201 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1382,10 +1382,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |13 |  15 |  18 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  200 |  201 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1393,7 +1393,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=219 identifier=-1 daughterIndices: 13, 15, 18, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 200, 201, 
  daughter PDGCodes: 211, -211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.273
@@ -1417,13 +1417,13 @@
 [INFO]  - ROE related to MC particle with PDG: -13
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  15 |  16 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  16 |  18 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  220 |  221 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1432,13 +1432,13 @@
 [INFO]  - ROE related to MC particle with PDG: -11
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  15 |  16 |  17 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | -211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  16 |  17 |  19 |  20 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  238 |  239 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1448,10 +1448,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | -211 | -211 | 211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |13 |  15 |  16 |  19 |  21 |  22 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  238 |  239 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1459,7 +1459,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=257 identifier=-1 daughterIndices: 13, 15, 16, 19, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 238, 239, 
  daughter PDGCodes: 211, -211, 211, -211, -211, 211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=7.924
@@ -1483,13 +1483,13 @@
 [INFO]  - ROE related to MC particle with PDG: 2212
 [INFO]  - No. of Charged particles in ROE: 11
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |-211 | 211 | 211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 
 [INFO]  - |12 |  13 |  14 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  
 [INFO]  - Info for ROEMask with name: 'cleanMask'
 [INFO]  - - No. of Charged particles in ROE: 11
 [INFO]  - - No. of Photons           in ROE: 8
-[INFO]  - - No. of Neutral hadrons   in ROE: 2
+[INFO]  - - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - - |211 | -211 | 211 | 211 | 211 | -211 | -211 | -211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - - |13 |  15 |  16 |  17 |  18 |  19 |  20 |  21 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  258 |  259 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1499,10 +1499,10 @@
 [INFO] [RestOfEventPrinterModule] START ----------------------------------------
 [INFO]  - ROE related to particle with PDG: 443
 [INFO]  - ROE related to MC particle with PDG: -1
-[INFO]  - Is Nested ROE
+[INFO]  - ROE is nested
 [INFO]  - No. of Charged particles in ROE: 9
 [INFO]  - No. of Photons           in ROE: 8
-[INFO]  - No. of Neutral hadrons   in ROE: 2
+[INFO]  - No. of K_L0 and neutrons in ROE: 2
 [INFO]  - |211 | -211 | 211 | 211 | -211 | -211 | -211 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 22 | 130 | 130 | 211 | -211 | 
 [INFO]  - |13 |  15 |  16 |  18 |  19 |  21 |  23 |  24 |  25 |  26 |  27 |  28 |  29 |  30 |  31 |  40 |  41 |  258 |  259 |  
 [INFO] [RestOfEventPrinterModule] END ------------------------------------------
@@ -1510,7 +1510,7 @@
 [INFO]  ParticleLists: B+:other (0+1) + B-:other (0+1)
 [INFO] collection=Particles
  PDGCode=521 Charge=1 PDGMass=5.279
- flavorType=0 particleType=6 particleTypeUsedForFit=0
+ flavorType=0 particleSource=6 particleTypeUsedForFit=0
  mdstIndex=0 arrayIndex=277 identifier=-1 daughterIndices: 13, 15, 16, 18, 19, 21, 23, 24, 25, 26, 27, 28, 29, 30, 31, 40, 41, 258, 259, 
  daughter PDGCodes: 211, -211, 211, 211, -211, -211, -211, 22, 22, 22, 22, 22, 22, 22, 22, 130, 130, 211, -211, 
  mass=8.754

@@ -2,6 +2,7 @@
 
 """Common functions for KLM calibration strategies."""
 
+import basf2
 from caf.utils import ExpRun, IoV
 
 

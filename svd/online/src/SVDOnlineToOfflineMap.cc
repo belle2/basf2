@@ -166,12 +166,12 @@ bool SVDOnlineToOfflineMap::isAPVinMap(VxdID sensorID, bool side, unsigned short
 
 
 SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
-                                                      unsigned char APV25, unsigned char channel, short samples[6], float time, SVDModeByte mode)
+                                                      unsigned char APV25, unsigned char channel, short samples[6], float time)
 {
   // Issue a warning, we'll be sending out a null pointer.
   if (channel > 127) {
     B2WARNING(" channel out of range (0-127):" << LogVar("channel", int(channel)));
-    return NULL;
+    return nullptr;
   }
   const SensorInfo& info = getSensorInfo(FADC, APV25);
   short strip = getStripNumber(channel, info);
@@ -181,9 +181,9 @@ SVDShaperDigit* SVDOnlineToOfflineMap::NewShaperDigit(unsigned char FADC,
 
   // create SVDShaperDigit only for existing sensor
   if (info.m_sensorID) {
-    return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time, mode);
+    return new SVDShaperDigit(info.m_sensorID, info.m_uSide, strip, rawSamples, time);
   } else {
-    return NULL;
+    return nullptr;
   }
 }
 

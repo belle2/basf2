@@ -26,24 +26,26 @@
 
 #define RBUFSIZE 100000000
 
-class RawRevRb2Sock {
-public:
-  /*! Constuctor and Destructor */
-  RawRevRb2Sock(std::string rbuf, int port, std::string shmname, int id);
-  ~RawRevRb2Sock(void);
+namespace Belle2 {
 
-  /*! Event function */
-  int SendEvent(void);
+  class RawRevRb2Sock {
+  public:
+    /*! Constuctor and Destructor */
+    RawRevRb2Sock(std::string rbuf, int port, std::string shmname, int id);
+    ~RawRevRb2Sock(void);
 
-  /*! Reconnect */
-  int Reconnect(void);
+    /*! Event function */
+    int SendEvent(void);
 
-private:
-  RingBuffer* m_rbuf;
-  RSocketSend* m_sock;
-  RFFlowStat* m_flow;
-  int* m_evtbuf;
+    /*! Reconnect */
+    int Reconnect(void);
 
-};
+  private:
+    RingBuffer* m_rbuf;
+    RSocketSend* m_sock;
+    RFFlowStat* m_flow;
+    int* m_evtbuf;
 
+  };
 
+}

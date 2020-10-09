@@ -38,7 +38,7 @@ namespace Belle2 {
 
   public:
 
-    bool GetBeamBkg(std::vector<std::vector<double>>);
+    int GetBeamBkg(std::vector<std::vector<double>>);
 
   private:
     //

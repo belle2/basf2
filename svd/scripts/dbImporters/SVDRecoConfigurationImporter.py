@@ -17,14 +17,14 @@ now = datetime.datetime.now()
 
 # cluster reconstruction algorithms:
 algorithmFor_timeRecoWith6Samples = "CoG6"
-algorithmFor_timeRecoWith3Samples = "CoG3"
-algorithmFor_positionRecoWith6Samples = "CoG"
-algorithmFor_positionRecoWith3Samples = "CoG"
+algorithmFor_timeRecoWith3Samples = "CoG6"
+algorithmFor_positionRecoWith6Samples = "oldDefault"
+algorithmFor_positionRecoWith3Samples = "oldDefault"
 algorithmFor_chargeRecoWith6Samples = "MaxSample"
 algorithmFor_chargeRecoWith3Samples = "MaxSample"
 # strip reconstruction algorithms:
 algorithmFor_stripTimeRecoWith6Samples = "CoG6"
-algorithmFor_stripTimeRecoWith3Samples = "CoG3"
+algorithmFor_stripTimeRecoWith3Samples = "CoG6"
 algorithmFor_stripChargeRecoWith6Samples = "MaxSample"
 algorithmFor_stripChargeRecoWith3Samples = "MaxSample"
 
@@ -37,8 +37,8 @@ class recoConfigurationImporter(basf2.Module):
 
         iov = Belle2.IntervalOfValidity.always()
 
-        payload = Belle2.SVDRecoConfiguration("SVDRecoConfiguration_TEST_" +
-                                              str(now.isoformat()) + "_INFO:_everythingSet")
+        payload = Belle2.SVDRecoConfiguration("SVDRecoConfiguration_default_" +
+                                              str(now.isoformat()) + "_INFO:_CoG6Time_MaxSampleCharge_oldDefaultPosition")
 
         # cluster time
         payload.setTimeRecoWith6Samples(algorithmFor_timeRecoWith6Samples)

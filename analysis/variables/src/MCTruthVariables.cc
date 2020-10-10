@@ -35,14 +35,14 @@ namespace Belle2 {
     static const double realNaN = std::numeric_limits<double>::quiet_NaN();
     static const int     intNaN = std::numeric_limits<int>::quiet_NaN();
 
+
     double isSignal(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
-
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+      return (status == MCMatching::c_Correct);
     }
 
     double isSignalAcceptWrongFSPs(const Particle* part)
@@ -55,15 +55,12 @@ namespace Belle2 {
       status &= (~MCMatching::c_MisID);
       status &= (~MCMatching::c_AddedWrongParticle);
 
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+      return (status == MCMatching::c_Correct);
     }
 
     double isPrimarySignal(const Particle* part)
     {
-      if (isSignal(part) > 0.5 and particleMCPrimaryParticle(part) > 0.5)
-        return 1.0;
-      else
-        return 0.0;
+      return (isSignal(part) > 0.5 and particleMCPrimaryParticle(part) > 0.5);
     }
 
     double isMisidentified(const Particle* part)
@@ -71,16 +68,14 @@ namespace Belle2 {
       const MCParticle* mcp = part->getMCParticle();
       if (!mcp) return realNaN;
       int st = MCMatching::getMCErrors(part, mcp);
-      return double((st & MCMatching::c_MisID) != 0);
+      return ((st & MCMatching::c_MisID) != 0);
     }
 
     double isWrongCharge(const Particle* part)
     {
       const MCParticle* mcp = part->getMCParticle();
       if (!mcp) return realNaN;
-      int pch = part->getCharge(),
-          mch = mcp->getCharge();
-      return double((pch != mch));
+      return (part->getCharge() != mcp->getCharge());
     }
 
     double isCloneTrack(const Particle* particle)
@@ -89,9 +84,9 @@ namespace Belle2 {
       if (!Const::chargedStableSet.contains(Const::ParticleType(abs(particle->getPDGCode()))))
         return realNaN;
       // get mcparticle weight (mcmatch weight)
-      auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
+      const auto mcpww = particle->getRelatedToWithWeight<MCParticle>();
       if (!mcpww.first) return realNaN;
-      return double(mcpww.second < 0);
+      return (mcpww.second < 0);
     }
 
     double isOrHasCloneTrack(const Particle* particle)
@@ -100,7 +95,7 @@ namespace Belle2 {
       std::queue<const Particle*> qq;
       qq.push(particle);
       while (!qq.empty()) {
-        auto d = qq.front(); // get daughter
+        const auto d = qq.front(); // get daughter
         qq.pop();            // remove the daughter from the queue
         if (isCloneTrack(d) == 1.0) return 1.0;
         size_t nDau = d->getNDaughters(); // number of daughters of daughters
@@ -167,7 +162,6 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
-
       return mcparticle->getArrayIndex();
     }
 
@@ -180,7 +174,7 @@ namespace Belle2 {
       //remove the following bits
       status &= (~MCMatching::c_MissNeutrino);
 
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+      return (status == MCMatching::c_Correct);
     }
 
     double isSignalAcceptMissingMassive(const Particle* part)
@@ -193,7 +187,7 @@ namespace Belle2 {
       status &= (~MCMatching::c_MissMassiveParticle);
       status &= (~MCMatching::c_MissKlong);
 
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+      return (status == MCMatching::c_Correct);
     }
 
     double isSignalAcceptMissingGamma(const Particle* part)
@@ -205,7 +199,7 @@ namespace Belle2 {
       //remove the following bits
       status &= (~MCMatching::c_MissGamma);
 
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+      return (status == MCMatching::c_Correct);
     }
 
     double isSignalAcceptMissing(const Particle* part)
@@ -220,7 +214,7 @@ namespace Belle2 {
       status &= (~MCMatching::c_MissKlong);
       status &= (~MCMatching::c_MissNeutrino);
 
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+      return (status == MCMatching::c_Correct);
     }
 
     double isSignalAcceptBremsPhotons(const Particle* part)
@@ -232,14 +226,13 @@ namespace Belle2 {
       //remove the following bits
       status &= (~MCMatching::c_AddedRecoBremsPhoton);
 
-      return (status == MCMatching::c_Correct) ? 1.0 : 0.0;
+      return (status == MCMatching::c_Correct);
     }
 
     double particleMCMatchPDGCode(const Particle* part)
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
-
       return mcparticle->getPDG();
     }
 
@@ -250,16 +243,14 @@ namespace Belle2 {
 
     double particleNumberOfMCMatch(const Particle* particle)
     {
-      RelationVector<MCParticle> mcRelations =
-        particle->getRelationsTo<MCParticle>();
-      return double(mcRelations.size());
+      RelationVector<MCParticle> mcRelations = particle->getRelationsTo<MCParticle>();
+      return (mcRelations.size());
     }
 
     double particleMCMatchWeight(const Particle* particle)
     {
       auto relWithWeight = particle->getRelatedToWithWeight<MCParticle>();
       if (!relWithWeight.first) return realNaN;
-
       return relWithWeight.second;
     }
 
@@ -267,7 +258,6 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
-
       return mcparticle->getDecayTime();
     }
 
@@ -275,7 +265,6 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
-
       return mcparticle->getLifetime();
     }
 
@@ -373,7 +362,6 @@ namespace Belle2 {
 
         pDaughters += mcD->get4Vector();
       }
-
       return (pInitial - pDaughters).M();
     }
 
@@ -402,9 +390,13 @@ namespace Belle2 {
       PCmsLabTransform T;
       double e_Beam = T.getCMSEnergy() / 2.0; // GeV
       double m_B = part->getPDGMass();
+
+      // Y(4S) mass according PDG (https://pdg.lbl.gov/2020/listings/rpp2020-list-upsilon-4S.pdf)
+      const double  mY4S = 10.5794; // GeV
+
       // if this is a continuum run, use an approximate Y(4S) CMS energy
       if (e_Beam * e_Beam - m_B * m_B < 0) {
-        e_Beam = 1.0579400E+1 / 2.0; // GeV
+        e_Beam = mY4S / 2.0;
       }
       double p_B = std::sqrt(e_Beam * e_Beam - m_B * m_B);
 
@@ -430,7 +422,6 @@ namespace Belle2 {
     {
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-
       return mcp->getSecondaryPhysicsProcess();
     }
 
@@ -438,7 +429,6 @@ namespace Belle2 {
     {
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-
       return mcp->getStatus();
     }
 
@@ -448,7 +438,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_PrimaryParticle;
-      return mcp->hasStatus(bitmask) ? 1 : 0;
+      return mcp->hasStatus(bitmask);
     }
 
     double particleMCVirtualParticle(const Particle* p)
@@ -457,7 +447,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_IsVirtual;
-      return mcp->hasStatus(bitmask) ? 1 : 0;
+      return mcp->hasStatus(bitmask);
     }
 
     double particleMCInitialParticle(const Particle* p)
@@ -466,7 +456,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_Initial;
-      return mcp->hasStatus(bitmask) ? 1 : 0;
+      return mcp->hasStatus(bitmask);
     }
 
     double particleMCISRParticle(const Particle* p)
@@ -475,7 +465,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_IsISRPhoton;
-      return mcp->hasStatus(bitmask) ? 1 : 0;
+      return mcp->hasStatus(bitmask);
     }
 
     double particleMCFSRParticle(const Particle* p)
@@ -484,7 +474,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_IsFSRPhoton;
-      return mcp->hasStatus(bitmask) ? 1 : 0;
+      return mcp->hasStatus(bitmask);
     }
 
     double particleMCPhotosParticle(const Particle* p)
@@ -493,7 +483,7 @@ namespace Belle2 {
       if (!mcp) return realNaN;
 
       unsigned int bitmask = MCParticle::c_IsPHOTOSPhoton;
-      return mcp->hasStatus(bitmask) ? 1 : 0;
+      return mcp->hasStatus(bitmask);
     }
 
     double generatorEventWeight(const Particle*)
@@ -554,10 +544,7 @@ namespace Belle2 {
 
       // If charged: make sure it was seen in the SVD.
       // If neutral: make sure it was seen in the ECL.
-      if (abs(mcp->getCharge()) > 0)
-        return seenInSVD(p);
-      else
-        return seenInECL(p);
+      return (abs(mcp->getCharge()) > 0) ? seenInSVD(p) : seenInECL(p);
     }
 
     double seenInPXD(const Particle* p)
@@ -566,7 +553,7 @@ namespace Belle2 {
         return realNaN;
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-      return (double)mcp->hasSeenInDetector(Const::PXD);
+      return mcp->hasSeenInDetector(Const::PXD);
     }
 
     double seenInSVD(const Particle* p)
@@ -575,7 +562,7 @@ namespace Belle2 {
         return realNaN;
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-      return (double)mcp->hasSeenInDetector(Const::SVD);
+      return mcp->hasSeenInDetector(Const::SVD);
     }
 
     double seenInCDC(const Particle* p)
@@ -584,7 +571,7 @@ namespace Belle2 {
         return realNaN;
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-      return (double)mcp->hasSeenInDetector(Const::CDC);
+      return mcp->hasSeenInDetector(Const::CDC);
     }
 
     double seenInTOP(const Particle* p)
@@ -593,7 +580,7 @@ namespace Belle2 {
         return realNaN;
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-      return (double)mcp->hasSeenInDetector(Const::TOP);
+      return mcp->hasSeenInDetector(Const::TOP);
     }
 
     double seenInECL(const Particle* p)
@@ -602,7 +589,7 @@ namespace Belle2 {
         return realNaN;
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-      return (double)mcp->hasSeenInDetector(Const::ECL);
+      return mcp->hasSeenInDetector(Const::ECL);
     }
 
     double seenInARICH(const Particle* p)
@@ -611,7 +598,7 @@ namespace Belle2 {
         return realNaN;
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-      return (double)mcp->hasSeenInDetector(Const::ARICH);
+      return mcp->hasSeenInDetector(Const::ARICH);
     }
 
     double seenInKLM(const Particle* p)
@@ -620,7 +607,7 @@ namespace Belle2 {
         return realNaN;
       const MCParticle* mcp = p->getMCParticle();
       if (!mcp) return realNaN;
-      return (double)mcp->hasSeenInDetector(Const::KLM);
+      return mcp->hasSeenInDetector(Const::KLM);
     }
 
     int genNStepsToDaughter(const Particle* p, const std::vector<double>& arguments)
@@ -648,17 +635,12 @@ namespace Belle2 {
         return intNaN;
       }
 
-      if (nChildren == 1) {
-        return 1;
-      } else {
-        int motherIndex = mcp->getIndex();
+      if (nChildren == 1) return 1;
 
-        std::vector<int> genMothers;
-        MCMatching::fillGenMothers(daugMCP, genMothers);
-        auto match = std::find(genMothers.begin(), genMothers.end(), motherIndex);
-
-        return match - genMothers.begin();
-      }
+      std::vector<int> genMothers;
+      MCMatching::fillGenMothers(daugMCP, genMothers);
+      auto match = std::find(genMothers.begin(), genMothers.end(), mcp->getIndex());
+      return match - genMothers.begin();
     }
 
     int genNMissingDaughter(const Particle* p, const std::vector<double>& arguments)
@@ -693,8 +675,8 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 herVec = (beamParamsDB->getHER()).Vect();
-      TVector3 lerVec = (beamParamsDB->getLER()).Vect();
+      TVector3 herVec = beamParamsDB->getHER().Vect();
+      TVector3 lerVec = beamParamsDB->getLER().Vect();
 
       // only looking at the horizontal (XZ plane) -> set y-coordinates to zero
       herVec.SetY(0);
@@ -708,8 +690,8 @@ namespace Belle2 {
     {
       // get the beam momenta from the DB
       static DBObjPtr<BeamParameters> beamParamsDB;
-      TVector3 herVec = (beamParamsDB->getHER()).Vect();
-      TVector3 lerVec = (beamParamsDB->getLER()).Vect();
+      TVector3 herVec = beamParamsDB->getHER().Vect();
+      TVector3 lerVec = beamParamsDB->getLER().Vect();
 
       // only looking at the vertical (YZ plane) -> set x-coordinates to zero
       herVec.SetX(0);
@@ -735,9 +717,7 @@ namespace Belle2 {
       const ECLCluster* cluster = particle->getECLCluster();
       if (!cluster) return realNaN;
 
-      auto mcps = cluster->getRelationsTo<MCParticle>();
-      if (mcps.size() == 0) return realNaN;
-
+      const auto mcps = cluster->getRelationsTo<MCParticle>();
       for (unsigned int i = 0; i < mcps.size(); ++i)
         if (mcps[i]->getArrayIndex() == matchedToIndex)
           return mcps.weight(i);

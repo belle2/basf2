@@ -598,6 +598,8 @@ Help us out with documentation: as a beginner, you know best what is missing!
 
 .. tip:: Bugs do exist, don't hesitate too much to report them.
 
+.. include:: ../survey.rst
+
 .. topic:: Author(s) of this lesson
 
      Kilian Lieret,

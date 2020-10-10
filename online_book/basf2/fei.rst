@@ -10,8 +10,8 @@ Full Event Interpretation
 
     **Exercises**: 30 min (including processing)
 
-    **Prerequisites**: 
-    	
+    **Prerequisites**:
+
     	* Lessons 1-2
 
     **Questions**:
@@ -686,6 +686,8 @@ and explanations on the code structure.
     * Add the FEI to your path with `fei.get_default_channels` and `fei.FeiConfiguration`.
     * FEI Purity and efficiency are controlled by a cut on ``extraInfo(SignalProbability)``
     * The B\ :sub:`tag` from the FEI can be used to construct a complete ϒ(4S) event.
+
+.. include:: ../survey.rst
 
 .. topic:: Author of this lesson
 

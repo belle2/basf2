@@ -2420,12 +2420,15 @@ def oldwritePi0EtaVeto(
 def writePi0EtaVeto(
     particleList,
     decayString,
-    workingDirectory='.',
     mode='standard',
-    downloadFlag=True,
     selection='',
     path=None,
-    suffix=''
+    suffix='',
+    hardParticle='gamma',
+    pi0PayloadNameOverride=None,
+    pi0SoftPhotonCutOverride=None,
+    etaPayloadNameOverride=None,
+    etaSoftPhotonCutOverride=None
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -2444,9 +2447,6 @@ def writePi0EtaVeto(
     * daughter(1,clusterNHits): soft photon total crystal weights sum(w_i) with w_i<=1
     * daughter(1,clusterE9E21): soft photon ratio of energies in inner 3x3 crystals and 5x5 crystals without corners
     * cosHelicityAngleMomentum: pi0/eta candidates cosHelicityAngleMomentum
-
-    If you don't have weight files in your workingDirectory,
-    these files are downloaded from the database to your workingDirectory automatically.
 
     The following strings are available for mode:
 
@@ -2471,15 +2471,19 @@ def writePi0EtaVeto(
 
     @param particleList     the input ParticleList
     @param decayString 		specify Particle to be added to the ParticleList
-    @param workingDirectory the weight file directory
     @param mode				choose one mode out of 'standard', 'tight', 'cluster' and 'both'
-    @param downloadFlag 	whether download default weight files or not
     @param selection 		selection criteria that Particle needs meet in order for for_each ROE path to continue
     @param path       		modules are added to this path
     @param suffix           optional suffix to be appended to the usual extraInfo name
+    @param hardParticle           particle name which is used to calculate the pi0/eta probability (default is gamma)
+    @param pi0PayloadNameOverride  specify the payload name of pi0 veto only if one wants to use non-default one. (default is None)
+    @param pi0SoftPhotonCutOverride specify the soft photon selection criteria of pi0 veto only if one wants to use non-default one.
+                                    (default is None)
+    @param etaPayloadNameOverride  specify the payload name of eta veto only if one wants to use non-default one. (default is None)
+    @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
+                                    (default is None)
     """
 
-    import os
     import basf2_mva
 
     renameSuffix = False
@@ -2491,7 +2495,7 @@ def writePi0EtaVeto(
                     break
                 for submodule in subpath.modules():
                     print(submodule.name())
-                    if f'gamma:HardPhoton{suffix}' in submodule.name():
+                    if f'{hardParticle}:HardPhoton{suffix}' in submodule.name():
                         suffix += '_0'
                         B2WARNING("Same extension already used in writePi0EtaVeto, append '_0'")
                         renameSuffix = True
@@ -2500,20 +2504,17 @@ def writePi0EtaVeto(
     roe_path = create_path()
     deadEndPath = create_path()
     signalSideParticleFilter(particleList, selection, roe_path, deadEndPath)
-    fillSignalSideParticleList(f'gamma:HardPhoton{suffix}', decayString, path=roe_path)
-    if not os.path.isdir(workingDirectory):
-        os.mkdir(workingDirectory)
-        B2INFO('writePi0EtaVeto: ' + workingDirectory + ' has been created as workingDirectory.')
+    fillSignalSideParticleList(f'{hardParticle}:HardPhoton{suffix}', decayString, path=roe_path)
 
     dictListName = {'standard': 'Origin',
                     'tight': 'TightEnergyThreshold',
                     'cluster': 'LargeClusterSize',
                     'both': 'TightEnrgyThresholdAndLargeClusterSize'}
 
-    dictPi0EnergyCut = {'standard': '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
-                        'tight': '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]',
-                        'cluster': '[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]',
-                        'both': '[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]'}
+    dictPi0EnergyCut = {'standard': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+                        'tight': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]',
+                        'cluster': '[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.02] or [clusterReg==3 and E>0.02]]',
+                        'both': '[[clusterReg==1 and E>0.03] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.04]]'}
 
     dictEtaEnergyCut = {'standard': '[clusterReg==1 and E>0.035] or [clusterReg==2 and E>0.03] or [clusterReg==3 and E>0.03]',
                         'tight': '[clusterReg==1 and E>0.06] or [clusterReg==2 and E>0.06] or [clusterReg==3 and E>0.06]',
@@ -2525,16 +2526,6 @@ def writePi0EtaVeto(
                              'cluster': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2',
                              'both': 'abs(clusterTiming)<clusterErrorTiming and clusterNHits >= 2'}
 
-    dictPi0WeightFileName = {'standard': 'pi0veto_origin.root',
-                             'tight': 'pi0veto_tight.root',
-                             'cluster': 'pi0veto_cluster.root',
-                             'both': 'pi0veto_both.root'}
-
-    dictEtaWeightFileName = {'standard': 'etaveto_origin.root',
-                             'tight': 'etaveto_tight.root',
-                             'cluster': 'etaveto_cluster.root',
-                             'both': 'etaveto_both.root'}
-
     dictPi0PayloadName = {'standard': 'Pi0VetoIdentifierStandard',
                           'tight': 'Pi0VetoIdentifierWithHigherEnergyThreshold',
                           'cluster': 'Pi0VetoIdentifierWithLargerClusterSize',
@@ -2545,81 +2536,70 @@ def writePi0EtaVeto(
                           'cluster': 'EtaVetoIdentifierWithLargerClusterSize',
                           'both': 'EtaVetoIdentifierWithHigherEnergyThresholdAndLargerClusterSize'}
 
-    dictPi0ExtraInfoName = {'standard': 'Pi0VetoOrigin',
-                            'tight': 'Pi0VetoTightEnergyThreshold',
-                            'cluster': 'Pi0VetoLargeClusterSize',
-                            'both': 'Pi0VetoTightEnergyThresholdAndLargeClusterSize'}
+    dictPi0ExtraInfoName = {'standard': 'Pi0ProbOrigin',
+                            'tight': 'Pi0ProbTightEnergyThreshold',
+                            'cluster': 'Pi0ProbLargeClusterSize',
+                            'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
 
-    dictEtaExtraInfoName = {'standard': 'EtaVetoOrigin',
-                            'tight': 'EtaVetoTightEnergyThreshold',
-                            'cluster': 'EtaVetoLargeClusterSize',
-                            'both': 'EtaVetoTightEnergyThresholdAndLargeClusterSize'}
-
-    dictPi0ExtraInfoRename = {'standard': 'Pi0ProbOrigin',
-                              'tight': 'Pi0ProbTightEnergyThreshold',
-                              'cluster': 'Pi0ProbLargeClusterSize',
-                              'both': 'Pi0ProbTightEnergyThresholdAndLargeClusterSize'}
-
-    dictEtaExtraInfoRename = {'standard': 'EtaProbOrigin',
-                              'tight': 'EtaProbTightEnergyThreshold',
-                              'cluster': 'EtaProbLargeClusterSize',
-                              'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize'}
+    dictEtaExtraInfoName = {'standard': 'EtaProbOrigin',
+                            'tight': 'EtaProbTightEnergyThreshold',
+                            'cluster': 'EtaProbLargeClusterSize',
+                            'both': 'EtaProbTightEnergyThresholdAndLargeClusterSize'}
 
     ListName = dictListName[mode]
     Pi0EnergyCut = dictPi0EnergyCut[mode]
     EtaEnergyCut = dictEtaEnergyCut[mode]
     TimingAndNHitsCut = dictTimingAndNHitsCut[mode]
-    Pi0WeightFileName = dictPi0WeightFileName[mode]
-    EtaWeightFileName = dictEtaWeightFileName[mode]
     Pi0PayloadName = dictPi0PayloadName[mode]
     EtaPayloadName = dictEtaPayloadName[mode]
     Pi0ExtraInfoName = dictPi0ExtraInfoName[mode]
     EtaExtraInfoName = dictEtaExtraInfoName[mode]
-    Pi0ExtraInfoRename = dictPi0ExtraInfoRename[mode]
-    EtaExtraInfoRename = dictEtaExtraInfoRename[mode]
 
     """
     pi0 veto
     """
+    if pi0PayloadNameOverride is not None:
+        Pi0PayloadName = pi0PayloadNameOverride
+    if pi0SoftPhotonCutOverride is None:
+        Pi0SoftPhotonCut = Pi0EnergyCut + ' and ' + TimingAndNHitsCut
+    else:
+        Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
+
     # define the particleList name for soft photon
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
-    # fill the particleList for soft photon with energy cut
-    fillParticleList(pi0soft, Pi0EnergyCut, path=roe_path)
-    # apply an additional cut for soft photon
-    applyCuts(pi0soft, TimingAndNHitsCut, path=roe_path)
+    # fill the particleList for soft photon with energy, timing and clusterNHits cuts
+    fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
     # reconstruct pi0
-    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> gamma:HardPhoton{suffix} ' + pi0soft, '', path=roe_path)
-    # if you don't have weight files in your workingDirectory,
-    # these files are downloaded from database to your workingDirectory automatically.
-    if not os.path.isfile(workingDirectory + '/' + Pi0WeightFileName):
-        if downloadFlag:
-            basf2_mva.download(Pi0PayloadName, workingDirectory + '/' + Pi0WeightFileName)
-            B2INFO('writePi0EtaVeto: ' + Pi0WeightFileName + ' has been downloaded from database to workingDirectory.')
+    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, '',
+                     allowChargeViolation=True, path=roe_path)
     # MVA training is conducted.
     roe_path.add_module('MVAExpert', listNames=['pi0:Pi0Veto' + ListName],
-                        extraInfoName=Pi0ExtraInfoName, identifier=workingDirectory + '/' + Pi0WeightFileName)
+                        extraInfoName=Pi0ExtraInfoName, identifier=Pi0PayloadName)
     # Pick up only one pi0/eta candidate with the highest pi0/eta probability.
     rankByHighest('pi0:Pi0Veto' + ListName, 'extraInfo(' + Pi0ExtraInfoName + ')', numBest=1, path=roe_path)
     # 'extraInfo(Pi0Veto)' is labeled 'Pi0_Prob'
     variableToSignalSideExtraInfo('pi0:Pi0Veto' + ListName,
-                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoRename + suffix}, path=roe_path)
+                                  {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoName + suffix}, path=roe_path)
 
     """
     eta veto
     """
+    if etaPayloadNameOverride is not None:
+        EtaPayloadName = etaPayloadNameOverride
+    if etaSoftPhotonCutOverride is None:
+        EtaSoftPhotonCut = EtaEnergyCut + ' and ' + TimingAndNHitsCut
+    else:
+        EtaSoftPhotonCut = etaSoftPhotonCutOverride
+
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
-    fillParticleList(etasoft, EtaEnergyCut, path=roe_path)
-    applyCuts(etasoft, TimingAndNHitsCut, path=roe_path)
-    reconstructDecay('eta:EtaVeto' + ListName + f' -> gamma:HardPhoton{suffix} ' + etasoft, '', path=roe_path)
-    if not os.path.isfile(workingDirectory + '/' + EtaWeightFileName):
-        if downloadFlag:
-            basf2_mva.download(EtaPayloadName, workingDirectory + '/' + EtaWeightFileName)
-            B2INFO('writePi0EtaVeto: ' + EtaWeightFileName + ' has been downloaded from database to workingDirectory.')
+    fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)
+    reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, '',
+                     allowChargeViolation=True, path=roe_path)
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],
-                        extraInfoName=EtaExtraInfoName, identifier=workingDirectory + '/' + EtaWeightFileName)
+                        extraInfoName=EtaExtraInfoName, identifier=EtaPayloadName)
     rankByHighest('eta:EtaVeto' + ListName, 'extraInfo(' + EtaExtraInfoName + ')', numBest=1, path=roe_path)
     variableToSignalSideExtraInfo('eta:EtaVeto' + ListName,
-                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoRename + suffix}, path=roe_path)
+                                  {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoName + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

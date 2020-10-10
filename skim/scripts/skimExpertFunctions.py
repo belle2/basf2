@@ -401,7 +401,7 @@ class BaseSkim(ABC):
         """
         self.name = self.__class__.__name__
         self.code = Registry.encode_skim_name(self.name)
-        self.OutputFileName = OutputFileName or self.code
+        self.OutputFileName = OutputFileName
         self.SkimLists = []
 
     def load_standard_lists(self, path):
@@ -601,7 +601,12 @@ class BaseSkim(ABC):
                 f"No skim list names defined in self.SkimLists for {self} skim!"
             )
 
-        skimOutputUdst(self.OutputFileName, self.SkimLists, path=path)
+        skimOutputUdst(
+            skimDecayMode=self.code,
+            skimParticleLists=self.SkimLists,
+            outputFile=self.OutputFileName,
+            path=path,
+        )
         summaryOfLists(self.SkimLists, path=path)
 
 

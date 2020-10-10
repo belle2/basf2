@@ -10,6 +10,7 @@
 
 #include <svd/modules/svdSimulation/SVDEventInfoSetterModule.h>
 #include <root/TRandom.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 using namespace std;
 using namespace Belle2;
@@ -38,7 +39,7 @@ SVDEventInfoSetterModule::SVDEventInfoSetterModule() : Module()
   addParam("SVDEventInfo", m_svdEventInfoName, "Defines the name of the EventInfo", string("SVDEventInfoSim"));
   addParam("runType", m_runType, "Defines the run type: raw/transparent/zero-suppressed/z-s+hit time finding", int(2));
   addParam("eventType", m_eventType, "Defines the event type: TTD event (global run)/standalone event (local run)", int(0));
-  addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples", int(2));
+  addParam("daqMode", m_daqMode, "Defines the DAQ mode: 1/3/6 samples or 3-mixed-6 samples", int(2));
   addParam("randomTriggerBin", m_randomTriggerBin, "Trigger bin is randomly chosen between 0/1/2/3.", bool(true));
   addParam("triggerBin", m_triggerBin, "Trigger bin 0/1/2/3 - useful for timing studies. The default is random.", int(999));
   addParam("triggerType", m_triggerType, "Defines the trigger type, default: CDC trigger", uint8_t(3));
@@ -55,14 +56,21 @@ void SVDEventInfoSetterModule::initialize()
   //Register the EventInfo in the data store
   m_svdEventInfoPtr.registerInDataStore(m_svdEventInfoName, DataStore::c_ErrorIfAlreadyRegistered);
 
+  m_simClockState.isOptional();
+
 // TO BE ADDED(?): some functions than can check the validity of the given parameters
 }
 
 void SVDEventInfoSetterModule::event()
 {
   if (m_randomTriggerBin) {
-    const int triggerBinsInAPVclock = 4; //hard coded for the moment
-    m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
+    if (m_simClockState.isValid())
+      m_triggerBin = m_simClockState->getSVDTriggerBin();
+    else {
+      const int triggerBinsInAPVclock = 4; //hard coded for the moment
+      m_triggerBin = gRandom->Integer(triggerBinsInAPVclock);
+      B2DEBUG(25, "simClockState, random generation of trigger bin");
+    }
   } else if (m_triggerBin < 0 || m_triggerBin > 3)
     B2ERROR("the triggerBin value is wrong, it must be an integer between 0 and 3, check and fix");
 
@@ -81,13 +89,15 @@ void SVDEventInfoSetterModule::event()
   m_svdEventInfoPtr->setRelativeShift(m_relativeShift);
 
   int nAPVsamples = 6;
-  if (m_daqMode == 1)
-    nAPVsamples = 3;
+
+  if (m_daqMode == 1) nAPVsamples = 3;
+  else if (m_daqMode == 3) {
+    if (m_triggerType == TRGSummary::ETimingType::TTYP_TOP or m_triggerType == TRGSummary::ETimingType::TTYP_ECL
+        or m_triggerType == TRGSummary::ETimingType::TTYP_PID1 or m_triggerType == TRGSummary::ETimingType::TTYP_PID2
+        or m_triggerType == TRGSummary::ETimingType::TTYP_PID3) nAPVsamples = 3;
+  }
 
   m_svdEventInfoPtr->setNSamples(nAPVsamples);
 
 }
-
-
-
 

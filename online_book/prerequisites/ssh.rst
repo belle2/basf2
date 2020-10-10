@@ -286,11 +286,15 @@ KEK network is rather complex so a very simplified layout is shown in
 
 
 So unless you are using VPN or are at KEK you most likely need to connect to the
-gateway servers first, either ``ssh1cc.kek.jp`` or ``ssh2cc.kek.jp``
+gateway servers first, either ``sshcc1.kek.jp`` or ``sshcc2.kek.jp``
 
 .. code-block:: none
 
-    ssh username@ssh1cc.kek.jp
+    ssh username@sshcc1.kek.jp
+
+.. warning::
+
+    Your username on KEKCC is not necessarily the same as your DESY username.
 
 and once this connection is established you can login to KEKCC from this gateway
 server.
@@ -365,6 +369,24 @@ configuration if we need to perform even more jumps. You should now be able to
 login to KEKCC by just typing ``ssh kekcc`` and also copy files directly with
 ``scp``. But you will have to enter your password two times, once when
 connecting to the gateway server and then when connecting to the KEKCC machine.
+
+.. admonition:: In case of ``ProxyJump`` trouble
+    :class: toggle warning
+
+    The ``ProxyJump`` directive was introduced in OpenSSH 7.3. If you get an
+    error message ``Bad configuration option: proxyjump``, please check if
+    you can update your SSH client.
+
+    While we definitely recommend you to get an up-to-date system that can use
+    the newer version, a quick workaround is to replace the ``ProxyJump`` line
+    with the following (using ``ProxyCommand``):
+
+    .. code-block::
+
+        ProxyCommand ssh hostname -W %h:%p
+
+    Where ``hostname`` should be the server you jump through, so
+    ``sshcc1.kek.jp`` in our case.
 
 .. admonition:: Exercise
    :class: exercise stacked
@@ -500,7 +522,7 @@ with this key.
 
 .. code-block:: bash
 
-    ssh-copy-id -i ~/.ssh/id_rsa ssh1cc.kek.jp
+    ssh-copy-id -i ~/.ssh/id_rsa sshcc1.kek.jp
     ssh-copy-id -i ~/.ssh/id_rsa kekcc
 
 .. note::
@@ -939,6 +961,8 @@ also find keyboard shortcuts for most of them.
       :linenos:
 
    Then ``ssh ccw01`` will also work from outside KEKCC.
+
+.. include:: ../survey.rst
 
 .. topic:: Author(s) of this lesson
 

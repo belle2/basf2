@@ -10,15 +10,13 @@ import basf2
 from basf2 import *
 import ROOT
 from ROOT.Belle2 import SVDLocalCalibrationsImporter
-from ROOT.Belle2 import FileSystem
 import os
 import sys
 import glob
-import subprocess
-import interactive
 import argparse
 from fnmatch import fnmatch
 from termcolor import colored
+from basf2 import conditions as b2conditions
 
 parser = argparse.ArgumentParser(description="SVD Local Calibrations Importer")
 parser.add_argument('--exp', metavar='experiment', dest='exp', type=int, nargs=1, help='Experiment Number, = 1 for GCR')
@@ -71,13 +69,7 @@ if not str(proceed) == 'y':
     print(colored(str(proceed) + ' != y, therefore we exit now', 'red'))
     exit(1)
 
-reset_database()
-use_database_chain()
-# central DB needed for the channel mapping DB object
-# GLOBAL_TAG = "vxd_commissioning_20181030"
-GLOBAL_TAG = "online"
-use_central_database(GLOBAL_TAG)
-use_local_database("localDB/database.txt", "localDB", invertLogging=True)
+b2conditions.prepend_globaltag("svd_basic")
 
 # local tag and database needed for commissioning
 

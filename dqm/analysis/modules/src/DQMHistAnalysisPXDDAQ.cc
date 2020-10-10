@@ -30,13 +30,16 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:DAQ:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   B2DEBUG(1, "DQMHistAnalysisPXDDAQ: Constructor done.");
 }
 
 DQMHistAnalysisPXDDAQModule::~DQMHistAnalysisPXDDAQModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -52,13 +55,19 @@ void DQMHistAnalysisPXDDAQModule::initialize()
   m_cMissingDHE = new TCanvas((m_histogramDirectoryName + "/c_MissingDHE").data());
   m_cMissingDHP = new TCanvas((m_histogramDirectoryName + "/c_MissingDHP").data());
 
+  m_monObj->addCanvas(m_cMissingDHC);
+  m_monObj->addCanvas(m_cMissingDHE);
+  m_monObj->addCanvas(m_cMissingDHP);
+
   m_hMissingDHC = new TH2F("hPXDMissingDHC", "hPXDMissingDHC", 16, 0, 16, 2, 0, 2);
   m_hMissingDHE = new TH2F("hPXDMissingDHE", "hPXDMissingDHE", 64, 0, 64, 2, 0, 2);
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -155,9 +164,10 @@ void DQMHistAnalysisPXDDAQModule::event()
   }
 
 // #ifdef _BELLE2_EPICS
-//
+//  if (m_useEpics) {
 //   SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
 //   SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+//  }
 // #endif
 }
 

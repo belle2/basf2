@@ -13,7 +13,7 @@ import variables.utils as vu
 filenumber = sys.argv[1]
 
 # set analysis global tag (needed for flavor tagging)
-b2.use_central_database("analysis_tools_release-04-02")
+b2.conditions.prepend_globaltag("analysis_tools_release-04-02")
 
 # create path
 main = b2.Path()
@@ -70,16 +70,13 @@ ma.matchMCTruth("B0", path=main)
 
 # build the rest of the event
 ma.buildRestOfEvent("B0", fillWithMostLikely=True, path=main)
-track_based_cuts = "thetaInCDCAcceptance and pt > 0.075"
+track_based_cuts = "thetaInCDCAcceptance and pt > 0.075 and dr < 5 and abs(dz) < 10"
 ecl_based_cuts = "thetaInCDCAcceptance and E > 0.05"
 roe_mask = ("my_mask", track_based_cuts, ecl_based_cuts)
 ma.appendROEMasks("B0", [roe_mask], path=main)
 
 # call flavor tagging
-ft.flavorTagger("B0", path=main)
-
-# remove B0 candidates without a valid flavor information
-ma.applyCuts("B0", "qrOutput(FBDT) > -2", path=main)
+ft.flavorTagger(["B0"], path=main)
 
 # perform best candidate selection
 b2.set_random_seed("Belle II StarterKit")

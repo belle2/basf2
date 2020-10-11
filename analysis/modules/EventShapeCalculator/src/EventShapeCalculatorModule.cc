@@ -45,6 +45,7 @@ EventShapeCalculatorModule::EventShapeCalculatorModule() : Module()
 {
   // Set module properties
   setDescription("Module to compute event shape attributes starting from particlelists. The core algorithms are not implemented in this module, but in dedicated basf2 classes.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definitions
   addParam("particleListNames", m_particleListNames, "List of the ParticleLists to be used for the calculation of the EventShapes.",
            vector<string>());

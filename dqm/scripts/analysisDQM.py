@@ -15,7 +15,15 @@ def add_analysis_dqm(path):
     fillParticleList('pi+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
     reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)
-    buildEventShape(path=path)
+    buildEventShape(
+        path=path,
+        foxWolfram=True,
+        cleoCones=False,
+        collisionAxis=False,
+        harmonicMoments=False,
+        jets=False,
+        sphericity=False,
+        thrust=False)
 
     dqm = register_module('PhysicsObjectsDQM')
     dqm.param('PI0PListName', 'pi0:physDQM')

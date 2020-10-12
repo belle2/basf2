@@ -368,15 +368,31 @@ def printPrimaryMCParticles(path):
     path.add_module(mcparticleprinter)
 
 
-def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None):
+def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
+                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
+
+    Parameters:
+        onlyPrimaries (bool): If True show only primary particles, that is particles coming from
+            the generator and not created by the simulation.
+        maxLevel (int): If 0 or less print the whole tree, otherwise stop after n generations
+        showProperties (bool): If True show mass, energy and charge of the particles
+        showMomenta (bool): if True show the momenta of the particles
+        showVertices (bool): if True show production vertex and time of all particles
+        showStatus (bool): if True show some status information on the particles.
+            For secondary particles this includes creation process.
     """
 
-    mcparticleprinter = register_module('PrintMCParticles')
-    mcparticleprinter.param('onlyPrimaries', onlyPrimaries)
-    mcparticleprinter.param('maxLevel', maxLevel)
-    path.add_module(mcparticleprinter)
+    path.add_module(
+        "PrintMCParticles",
+        onlyPrimaries=onlyPrimaries,
+        maxLevel=maxLevel,
+        showProperties=showProperties,
+        showMomenta=showMomenta,
+        showVertices=showVertices,
+        showStatus=showStatus,
+    )
 
 
 def correctBrems(outputList,

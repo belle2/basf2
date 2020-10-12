@@ -133,7 +133,7 @@ Let's create a python file from terminal and run it
   :class: exercise stacked
 
   Log in to KEKCC. Create a folder ``starterkit`` in your home folder and
-  create a python file ``my_file.py``. Import the basic math library `math <https://docs.python.org/3/library/math.html`_
+  create a python file ``my_file.py``. Import the basic math library `math <https://docs.python.org/3/library/math.html>`_
   and print out the value of π.
 
 .. admonition:: Hint

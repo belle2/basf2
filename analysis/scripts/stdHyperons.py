@@ -7,7 +7,6 @@ from vertex import treeFit, kFit
 from stdCharged import stdPi, stdK
 from stdV0s import stdLambdas
 from stdPhotons import stdPhotons
-from stdPi0s import stdPi0s
 
 
 def stdXi(fitter='TreeFit', b2bii=False, path=None):

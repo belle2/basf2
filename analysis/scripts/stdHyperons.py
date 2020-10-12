@@ -314,7 +314,7 @@ def goodXi0(xitype='loose', path=None):
             True,
             path=path)
     else:
-        raise ValueError(f"\"{xitype}\" is none of the allowed Ξ⁰ list types!")
+        raise ValueError(f"\"{xitype}\" is none of the allowed Xi0 list types!")
 
 
 def goodOmega(omegatype='loose', path=None):
@@ -362,4 +362,4 @@ def goodOmega(omegatype='loose', path=None):
             True,
             path=path)
     else:
-        raise ValueError(f"\"{omegatype}\" is none of the allowed Ω⁻ list types!")
+        raise ValueError(f"\"{omegatype}\" is none of the allowed Omega list types!")

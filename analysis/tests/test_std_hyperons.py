@@ -69,11 +69,12 @@ class TestStdHyperons(unittest.TestCase):
 
     def test_stdXi0(self):
         """Check stdXi0"""
-        for gammatype, b2bii in product(['eff20', 'eff30', 'eff40', 'eff50', 'eff60'], [True, False]):
+        for gamma_efficiency, b2bii in product(['eff20', 'eff30', 'eff40', 'eff50', 'eff60'], [True, False]):
+            gamma_type = f"{gamma_efficiency}_Jan2020"
             self.assertTrue(
                 self._check_list(
                     lambda path: stdXi0(
-                        gammatype=gammatype,
+                        gammatype=gamma_type,
                         b2bii=b2bii,
                         path=path),
                     expected_lists=['Xi0:std']))
@@ -103,7 +104,7 @@ class TestStdHyperons(unittest.TestCase):
         """Check goodXi0 lists: veryloose, loose, tight"""
         for xitype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdXi0(gammatype='eff50', b2bii=False, path=path)
+                stdXi0(gammatype='eff50_Jan2020', b2bii=False, path=path)
                 goodXi0(xitype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Xi0:std', f'Xi0:{xitype}']),
                             f"xitype = {xitype}")

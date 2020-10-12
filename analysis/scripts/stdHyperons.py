@@ -71,15 +71,16 @@ def stdXi(fitter='TreeFit', b2bii=False, path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40', b2bii=False, path=None):
+def stdXi0(gammatype='eff40_Jan2020', b2bii=False, path=None):
     r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-        gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
-                         for the pi0 reconstruction from ``gamma:pi0effxx`` (default ``eff40``)
+        gammatype (str): specify either ``eff60_Jan2020``, ``eff50_Jan2020``, ``eff40_Jan2020``,
+                         ``eff30_Jan2020``, or ``eff20_Jan2020``
+                         for the pi0 reconstruction from ``gamma:pi0effxx_Jan2020`` (default ``eff40``)
         b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """

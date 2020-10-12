@@ -29,19 +29,32 @@ def add_mirabelle_dqm(path):
     MiraBelleNotDst1_path = create_path()
     MiraBelleDst2_path = create_path()
 
-    trigger_skim_mumutight = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_mumutight"])
+    trigger_skim_mumutight = path.add_module(
+        "TriggerSkim",
+        triggerLines=["software_trigger_cut&skim&accept_mumutight"],
+        resultOnMissing=0,
+    )
     trigger_skim_mumutight.if_value("==1", MiraBelleMumu_path, AfterConditionPath.CONTINUE)
 
-    trigger_skim_dstar_1 = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_dstar_1"])
+    trigger_skim_dstar_1 = path.add_module(
+        "TriggerSkim",
+        triggerLines=["software_trigger_cut&skim&accept_dstar_1"],
+        resultOnMissing=0,
+    )
     trigger_skim_dstar_1.if_value("==1", MiraBelleDst1_path, AfterConditionPath.CONTINUE)
 
     trigger_skim_not_dstar_1 = path.add_module(
         "TriggerSkim",
         triggerLines=["software_trigger_cut&skim&accept_dstar_1"],
-        expectedResult=0)
+        expectedResult=0,
+        resultOnMissing=0,
+    )
     trigger_skim_not_dstar_1.if_value("==1", MiraBelleNotDst1_path, AfterConditionPath.CONTINUE)
     trigger_skim_dstar_2 = MiraBelleNotDst1_path.add_module(
-        "TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_dstar_2"])
+        "TriggerSkim",
+        triggerLines=["software_trigger_cut&skim&accept_dstar_2"],
+        resultOnMissing=0,
+    )
     trigger_skim_dstar_2.if_value("==1", MiraBelleDst2_path, AfterConditionPath.CONTINUE)
 
     # MiraBelle di-muon path

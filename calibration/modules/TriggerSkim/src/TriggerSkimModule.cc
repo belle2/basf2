@@ -61,11 +61,18 @@ lines were accepted after their own prescale.
            "or a counter (False) for applying the prescale. In the latter case, the module will retain exactly "
            "one event every N processed, where N (the counter value) is set for each line via the "
            "``triggerLines`` option. By default, random numbers are used.", m_useRandomNumbersForPreScale);
+  addParam("resultOnMissing", m_resultOnMissing, "Value to return if there's no hlt trigger result available. "
+           "If this is set to None a FATAL error will be raised if the results are missing. Otherwise the value "
+           "given will be set as return value of the module", m_resultOnMissing);
 }
 
 void TriggerSkimModule::initialize()
 {
-  m_trigResults.isRequired();
+  if(!m_resultOnMissing) {
+    m_trigResults.isRequired();
+  } else {
+    m_trigResults.isOptional();
+  }
   if (m_logicMode != "and" && m_logicMode != "or") {
     B2FATAL("You have entered an invalid parameter for logicMode. "
             "Valid strings are any of ['or', 'and']");
@@ -98,7 +105,6 @@ void TriggerSkimModule::initialize()
     m_prescaleCounters.clear();
     m_prescaleCounters.assign(havePrescales, 0);
   }
-
 }
 
 bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int prescale, uint32_t* counter) const {
@@ -121,6 +127,14 @@ bool TriggerSkimModule::checkTrigger(const std::string& name, unsigned int presc
 
 void TriggerSkimModule::event()
 {
+  if(!m_trigResults) {
+    if(m_resultOnMissing) {
+      setReturnValue(*m_resultOnMissing);
+      return;
+    }
+    B2FATAL("No HLT Trigger result available (if this is expected to be possible "
+            "please use the `resultOnMissing` parameter");
+  }
   // count accepted triggers
   size_t numAccepted(0);
   // Now check all lines, index is the prescale counter if needed

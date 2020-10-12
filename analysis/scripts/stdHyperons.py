@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+from ROOT import Belle2
 from basf2 import B2ERROR
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
 from vertex import treeFit, kFit
@@ -235,6 +236,10 @@ def goodXi(xitype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``, list
     """
 
+    if (not Belle2.PyStoreObj("ParticleList").isOptional("Xi-:std")):
+        stdXi(path=path)
+        # raise ValueError('The ParticleList "Xi-:std" has to be created before calling "goodXi"!')
+
     if xitype == 'veryloose':
         cutAndCopyList(
             'Xi-:veryloose',
@@ -280,6 +285,10 @@ def goodXi0(xitype='loose', path=None):
         xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
         path (basf2.Path): modules are added to this path building the ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``, list
     """
+
+    if (not Belle2.PyStoreObj("ParticleList").isOptional("Xi0:std")):
+        stdXi0(path=path)
+        # raise ValueError('The ParticleList "Xi0:std" has to be created before calling "goodXi0"!')
 
     if xitype == 'veryloose':
         # Select pi0 at 3*sigma around the nominal mass
@@ -330,6 +339,10 @@ def goodOmega(omegatype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Omega-:veryloose``, ``Omega-:loose``,
                            or ``Omega-:tight``, list
     """
+
+    if (not Belle2.PyStoreObj("ParticleList").isOptional("Omega-:std")):
+        stdOmega(path=path)
+        # raise ValueError('The ParticleList "Xi-:std" has to be created before calling "goodOmega"!')
 
     if omegatype == 'veryloose':
         cutAndCopyList(

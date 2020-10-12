@@ -94,31 +94,33 @@ class TestStdHyperons(unittest.TestCase):
         """Check goodXi lists: veryloose, loose, tight"""
         for xitype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdXi(fitter='TreeFit', b2bii=False, path=path)
+                # stdXi(fitter='TreeFit', b2bii=False, path=path)
                 goodXi(xitype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Xi-:std', f'Xi-:{xitype}']))
             # Should be no 'Xi' list. Make sure we did not make typos.
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Xi:{xitype}']))
+            # self.assertRaises(ValueError, self._check_list, goodXi)
 
     def test_goodX0(self):
         """Check goodXi0 lists: veryloose, loose, tight"""
         for xitype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdXi0(gammatype='eff50_Jan2020', b2bii=False, path=path)
+                # stdXi0(gammatype='eff50_Jan2020', b2bii=False, path=path)
                 goodXi0(xitype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Xi0:std', f'Xi0:{xitype}']),
                             f"xitype = {xitype}")
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Xi:{xitype}']))
+            # self.assertRaises(ValueError, self._check_list, goodXi0)
 
     def test_goodOmega(self):
         """Check goodOmega lists: veryloose, loose, tight"""
         for omegatype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
-                stdOmega(fitter='TreeFit', b2bii=False, path=path)
+                # stdOmega(fitter='TreeFit', b2bii=False, path=path)
                 goodOmega(omegatype, path)
             self.assertTrue(self._check_list(create_list, expected_lists=['Omega-:std', f'Omega-:{omegatype}']))
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Omega:{omegatype}']))
-
+            # self.assertRaises(ValueError, self._check_list, goodOmega)
 
 if __name__ == '__main__':
     unittest.main()

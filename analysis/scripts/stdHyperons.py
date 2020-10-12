@@ -266,6 +266,8 @@ def goodXi(xitype='loose', path=None):
 <1.001 ]',
             True,
             path=path)
+    else:
+        raise ValueError(f"\"{xitype}\" is none of the allowed Ξ⁻ list types!")
 
 
 def goodXi0(xitype='loose', path=None):
@@ -312,6 +314,8 @@ def goodXi0(xitype='loose', path=None):
             abs( daughter(1,dM) ) < 0.0116 ]',
             True,
             path=path)
+    else:
+        raise ValueError(f"\"{xitype}\" is none of the allowed Ξ⁰ list types!")
 
 
 def goodOmega(omegatype='loose', path=None):
@@ -358,3 +362,5 @@ def goodOmega(omegatype='loose', path=None):
 <1.0005 ]',
             True,
             path=path)
+    else:
+        raise ValueError(f"\"{omegatype}\" is none of the allowed Ω⁻ list types!")

@@ -335,7 +335,7 @@ instructive to switch on debugging output by using the ``-v`` option of ssh:
 
 Once you have created a configuration file (next section) it can also sometimes
 be helpful to disable it to rule out this source of error. This can be done
-by using the ``-F`` option to specify a blank userfile:
+by using the ``-F`` option to specify a blank config file:
 
 .. code-block:: bash
 

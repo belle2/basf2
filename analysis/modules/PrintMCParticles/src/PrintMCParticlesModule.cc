@@ -125,7 +125,8 @@ void PrintMCParticlesModule::initialize()
 
 void PrintMCParticlesModule::event()
 {
-  m_output.clear();
+  // clear any previous outputs
+  m_output.str(std::string());
 
   if (not m_particleList.empty()) {
     m_output << "Content from MCParticle list '" << m_mcparticles.getName() << "'" << std::endl;

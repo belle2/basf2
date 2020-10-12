@@ -266,7 +266,7 @@ def goodXi(xitype='loose', path=None):
             True,
             path=path)
     else:
-        raise ValueError(f"\"{xitype}\" is none of the allowed Ξ⁻ list types!")
+        raise ValueError(f"\"{xitype}\" is none of the allowed Xi- list types!")
 
 
 def goodXi0(xitype='loose', path=None):

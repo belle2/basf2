@@ -166,7 +166,6 @@ class Luminosity:
         self.session = requests.Session()
         if self.Token is None:
             # If no specific username use the local system username or provide one to authenticate
-            b2.B2INFO(f"Please provide your DESY credentials to access the rundb.")
             if self.Username is None:
                 localUsername = getpass.getuser()
                 self.Username=input(f"DESY username (return for {localUsername}) : ") or localUsername
@@ -297,12 +296,14 @@ class Luminosity:
         import dateutil.parser
            
         # temporary hack to get exp 7 and 8 from online DB
-        df=pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"])
+        columns=["exp", "run", "date", "date_stop", "lumi","intLumi","intLumiDel"]
+        df=pd.DataFrame(columns=columns)
         rows=[]
 
-        print(f"Reading exp {exp} from rundb (this can take a while depending on the size of the query)")
+        print(f"Reading exp {exp} from RunRegistry")
         
         for run in self.get_run_info(min_experiment={exp[0]}, max_experiment={exp[-1]}, run_type="physics", expand=True):
+            print(run)
             if not run['time_stop']:
                 run['time_stop']=run['time_start']
             row={"exp":run['experiment'],
@@ -317,7 +318,7 @@ class Luminosity:
                 row['intLumiDel']=None
 
             rows.append(row)
-        df = pd.DataFrame(rows)
+        df = pd.DataFrame(rows,columns=columns)
         print(f"Read {len(df)} runs from exp {exp}")
 
         # lumi in /fb
@@ -392,6 +393,8 @@ class Luminosity:
         :param period: 1 for day, 2 for week (start on monday)
         """
 
+        if self.df.empty:
+            b2.B2FATAL(f"No entries for experiment/run range")
         # protection for strange entry in the database
         df=self.df.copy()
         #drop runs with no date

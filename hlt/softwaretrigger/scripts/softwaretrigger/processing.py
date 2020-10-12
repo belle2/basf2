@@ -45,7 +45,7 @@ def setup_basf2_and_db(zmq=False):
                             help="Don't write any output files",
                             action="store_true", default=False)
 
-    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count(),
+    parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count()-5,
                         help='Number of parallel processes to use')
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local payload locations to use for the ConditionDB",
@@ -164,16 +164,8 @@ def add_hlt_processing(path,
     # ... and one for all dismissed events
     discard_path = basf2.Path()
 
-    # Run EventsOfDoomBuster savely, i.e. do not discard the events, put sent the event into the metadata path.
-    # This way the EventsOfDoomBuster is run twice (second time in add_reconstruction) but it will not bust any
-    # events, as we filtered here already. Caveat: nCDCHitsMax and nSVDShaperDigitsMax have to be equal in both
-    # modules.
-    doom = path.add_module("EventsOfDoomBuster", nCDCHitsMax=constants.DOOM_NCDCHITSMAX,
-                           nSVDShaperDigitsMax=constants.DOOM_NSVDSHAPERDIGITSMAX)
-    doom.if_true(discard_path, basf2.AfterConditionPath.CONTINUE)
-
     # Do the reconstruction needed for the HLT decision
-    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, **kwargs)
+    path_utils.add_filter_reconstruction(path, run_type=run_type, components=reco_components, abort_path=discard_path, **kwargs)
 
     # Add the part of the dqm modules, which should run after every reconstruction
     path_utils.add_hlt_dqm(path, run_type=run_type, components=reco_components, dqm_mode=constants.DQMModes.before_filter)
@@ -194,7 +186,8 @@ def add_hlt_processing(path,
     else:
         basf2.B2FATAL(f"The software trigger mode {softwaretrigger_mode} is not supported.")
 
-    # For all dismissed events we remove the data store content
+    # For all dismissed events we set the HLTDiscard error flag and remove the data store content
+    discard_path.add_module("EventErrorFlag", errorFlag=ROOT.Belle2.EventMetaData.c_HLTDiscard)
     path_utils.add_store_only_metadata_path(discard_path)
 
     # For accepted events we continue the reconstruction
@@ -246,7 +239,7 @@ def add_expressreco_processing(path,
     # this is needed as by default also un-selected events will get passed to ereco,
     # however they are empty.
     if select_only_accepted_events:
-        skim_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
+        skim_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"], resultOnMissing=0)
         skim_module.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     # ensure that only DataStore content is present that we expect in

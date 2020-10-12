@@ -109,7 +109,7 @@ void SVDPerformanceTTreeModule::initialize()
   m_t_V->Branch("svdStripCharge", &m_svdStripCharge);
   m_t_V->Branch("svdClTime", &m_svdClTime, "svdClTime/F");
   m_t_V->Branch("svdStripTime", &m_svdStripTime);
-  m_t_U->Branch("svdStripPosition", &m_svdStripPosition);
+  m_t_V->Branch("svdStripPosition", &m_svdStripPosition);
   m_t_V->Branch("svdRes", &m_svdRes, "svdRes/F");
   m_t_V->Branch("svdClIntStrPos", &m_svdClIntStrPos, "svdClIntStrPos/F");
   m_t_V->Branch("svdClPos", &m_svdClPos, "svdClPos/F");
@@ -278,7 +278,8 @@ void SVDPerformanceTTreeModule::event()
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          if (!(m_svdSize == 128 && theRecoDigits.size() == 0))
+          //skip clusters created beacuse of missing APV
+          if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
@@ -344,7 +345,8 @@ void SVDPerformanceTTreeModule::event()
           if ((theRecoDigits.size() != m_svdSize) && (m_svdSize != 128)) //virtual cluster
             B2ERROR(" Inconsistency with cluster size! # recoDigits = " << theRecoDigits.size() << " != " << m_svdSize << " cluster size");
 
-          if (!(m_svdSize == 128 && theRecoDigits.size() == 0))
+          //skip clusters created beacuse of missing APV
+          if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               m_svdStripTime.push_back(theRecoDigits[d]->getTime());
@@ -368,7 +370,7 @@ void SVDPerformanceTTreeModule::event()
 void SVDPerformanceTTreeModule::terminate()
 {
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
     m_t_U->Write();
     m_t_V->Write();

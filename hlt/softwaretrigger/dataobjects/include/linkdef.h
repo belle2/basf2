@@ -5,6 +5,6 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerVariables+;
+#pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerVariables+; // checksum=0x260a1ad5, version=1
 
 #endif

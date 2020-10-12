@@ -37,7 +37,7 @@ namespace Belle2 {
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter>
   void CKFRelationCreator<AState, ASeedRelationFilter, AHitRelationFilter>::apply(std::vector<AState>& seedStates,
       std::vector<AState>& states,
-      std::vector<TrackFindingCDC::WeightedRelationPointerComparison<AState>>& relations)
+      std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations)
   {
     const std::vector<AState*> seedStatePointers = TrackFindingCDC::as_pointers<AState>(seedStates);
     const std::vector<AState*> statePointers = TrackFindingCDC::as_pointers<AState>(states);

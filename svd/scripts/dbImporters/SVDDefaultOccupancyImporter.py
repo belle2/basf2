@@ -66,8 +66,6 @@ class defaultOccupancyImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDOccupancyCalibrations.name, payload, iov)
 
 
-use_local_database("localDB_occupancy/database.txt", "localDB_occupancy")
-
 main = create_path()
 
 # Event info setter - execute single event
@@ -75,8 +73,8 @@ eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
-main.add_module("Gearbox")  # , fileName="/geometry/Beast2_phase2.xml")
-main.add_module("Geometry", components=['SVD'])
+main.add_module("Gearbox")
+main.add_module("Geometry")
 
 main.add_module(defaultOccupancyImporter())
 

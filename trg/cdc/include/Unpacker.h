@@ -270,12 +270,12 @@ namespace Belle2 {
         unsigned iTracker,
         const CDCTriggerNeuroConfig::B2FormatLine b2line)
       {
-        if ((b2line.offset + foundtime >= 0) &&
-            (b2line.offset + foundtime <= bitsNN->getEntries())) {
+        if (int(b2line.offset + foundtime) >= 0 &&
+            int(b2line.offset + foundtime) <= bitsNN->getEntries()) {
 
           NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
 
-          if (slv_to_bin_string(bitsn->signal()[iTracker]).size() >= (NN_WIDTH - b2line.start)) {
+          if (int(slv_to_bin_string(bitsn->signal()[iTracker]).size()) >= (NN_WIDTH - b2line.start)) {
             data = slv_to_bin_string(bitsn->signal()[iTracker]).substr(NN_WIDTH - 1 - b2line.end, b2line.end - b2line.start + 1);
           } else {
             data = "";
@@ -463,7 +463,7 @@ namespace Belle2 {
      *
      *  @return         TRG2DFinderTrack containing omega, phi0 and related TS hit
      */
-    TRG2DFinderTrack decode2DTrack(std::string p_charge,
+    TRG2DFinderTrack decode2DTrack(std::string p_charge __attribute__((unused)),
                                    std::string p_omega,
                                    std::string p_phi,
                                    std::string p_ts0,

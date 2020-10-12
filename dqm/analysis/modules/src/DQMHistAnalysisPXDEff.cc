@@ -2,10 +2,7 @@
 // File : DQMHistAnalysisPXDEff.cc
 // Description : DQM module, which gives histograms showing the efficiency of PXD sensors
 //
-// Author : Uwe Gebauer
-// based on work from B. Spruck
-// based on work from Tomoyuki Konno, Tokyo Metropolitan Univerisity
-// Date : someday
+// Author : Uwe Gebauer, Bjoern Spruck
 //-
 
 
@@ -41,6 +38,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
            std::string("PXDEFF"));
   addParam("singleHists", m_singleHists, "Also plot one efficiency histogram per module", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
@@ -51,7 +49,9 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
 DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -60,17 +60,14 @@ void DQMHistAnalysisPXDEffModule::initialize()
   B2DEBUG(99, "DQMHistAnalysisPXDEffModule: initialized.");
 
   m_monObj = getMonitoringObject("pxd");
-
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-    // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
-
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -158,10 +155,15 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_line_error->SetLineWidth(3);
   m_line_error->SetLineStyle(7);
 
+  m_monObj->addCanvas(m_cEffAll);
+  m_monObj->addCanvas(m_cEffAllUpdate);
+
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
@@ -171,16 +173,24 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: beginRun called.");
 
-  // no way to reset TEfficiency
+  // no way to reset TEfficiency, do it bin by bin
+  // m_cEffAll->Clear();
+  // m_cEffAllUpdate->Clear();
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    int j = i + 1;
+    m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAll->SetTotalEvents(j, 0);
+    m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAllUpdate->SetTotalEvents(j, 0);
+  }
   // Thus histo will contain old content until first update
   m_hEffAllLastTotal->Reset();
   m_hEffAllLastPassed->Reset();
-  // m_cEffAll->Clear();
-  // m_cEffAllUpdate->Clear();
 
   for (auto single_cmap : m_cEffModules) {
     if (single_cmap.second) single_cmap.second->Clear();
   }
+
 }
 
 
@@ -247,8 +257,8 @@ void DQMHistAnalysisPXDEffModule::event()
     int j = i + 1;
 
     if (mapHits[aModule] == nullptr || mapMatches[aModule] == nullptr) {
+      m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, 0);
-      m_hEffAll->SetPassedEvents(j, 0);
     } else {
       double nmatch = mapMatches[aModule]->Integral(); // GetEntries()?
       double nhit = mapHits[aModule]->Integral();
@@ -263,11 +273,13 @@ void DQMHistAnalysisPXDEffModule::event()
       }
 
       all += ihit;
+      m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
       m_hEffAll->SetTotalEvents(j, nhit);
       m_hEffAll->SetPassedEvents(j, nmatch);
 
       if (nhit < m_minEntries) {
         // update the first entries directly (short runs)
+        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
         m_hEffAllUpdate->SetTotalEvents(j, nhit);
         m_hEffAllUpdate->SetPassedEvents(j, nmatch);
         m_hEffAllLastTotal->SetBinContent(j, nhit);
@@ -414,9 +426,11 @@ void DQMHistAnalysisPXDEffModule::event()
   m_monObj->setVariable("nmodules", ieff);
 
 #ifdef _BELLE2_EPICS
-  double data = 0;
-  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    double data = 0;
+    SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 

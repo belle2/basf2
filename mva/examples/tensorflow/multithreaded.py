@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Dennis Weyland 2017
 
@@ -16,7 +15,7 @@ CONTINUE_ENQUEUE = True
 
 def signal_handler(signal, frame):
     """
-    Used to safely stopp training. This can only be used in main thread,
+    Used to safely stop training. This can only be used in main thread,
     so depending on the training style, it can take a while before execution.
     """
     print('Stopping Training safely')

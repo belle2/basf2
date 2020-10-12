@@ -1,5 +1,4 @@
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import sys
 import ROOT
@@ -9,12 +8,16 @@ from caf.framework import Calibration
 
 from collections import OrderedDict
 
+set_log_level(LogLevel.INFO)
 UVWABC = [1, 2, 3, 4, 5, 6]
 
 
-def collect(calibration, basf2_args=[]):
+def collect(calibration, basf2_args=None):
     import pickle
     import subprocess
+
+    if basf2_args is None:
+        basf2_args = []
 
     main = create_path()
     main.add_module('RootInput', inputFileNames=calibration.input_files)

@@ -16,14 +16,14 @@ import basf2
 
 # reenable GUI thread for our canvas
 from ROOT import PyConfig
-PyConfig.StartGuiThread = True
-
-# Set the global log level
-basf2.logging.log_level = basf2.LogLevel.WARNING
+PyConfig.StartGuiThread = True  # noqa
 
 # Load the required libraries
 import ROOT
 from ROOT import Belle2
+
+# Set the global log level
+basf2.logging.log_level = basf2.LogLevel.WARNING
 
 # Create some histograms to be filled
 h_nTracks = ROOT.TH1D('nTracks', 'Number of Tracks per Event;#', 20, 0, 20)

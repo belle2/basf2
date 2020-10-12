@@ -3,6 +3,7 @@
 from basf2 import *
 from svd import *
 import glob
+from basf2 import conditions as b2conditions
 
 #########
 #
@@ -38,12 +39,9 @@ outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V1_" +
 if useLauraAlg:
     outputfile = "SVDHotStripFinderZS5_exp" + str(exp) + "run" + str(run) + "_V2_" + str(myflag) + ".root"
 
-use_database_chain()
-use_central_database("data_reprocessing_prompt_bucket6")
-use_central_database("svd_basic")
-use_central_database("svd_onlySVDinGeoConfiguration")
-
-use_local_database("localDB_HSF/database.txt", "localDB_HSF")
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
+b2conditions.prepend_globaltag("data_reprocessing_prompt")
+b2conditions.prepend_globaltag("svd_basic")
 
 main = create_path()
 

@@ -78,6 +78,11 @@ namespace Belle2 {
     bool storeTrackFromRecoTrack(RecoTrack& recoTrack,
                                  const bool useClosestHitToIP = false, const bool useBFieldAtHit = false);
 
+    /// Get the HitPattern in the VXD.
+    static uint32_t getHitPatternVXDInitializer(const RecoTrack& recoTrack);
+    /// Get the HitPattern in the CDC.
+    static uint64_t getHitPatternCDCInitializer(const RecoTrack& recoTrack);
+
   private:
     /// TrackColName (output).
     std::string m_trackColName;
@@ -89,11 +94,6 @@ namespace Belle2 {
     TVector3 m_beamSpot;
     ///  Extrapolation target, positive z direction.
     TVector3 m_beamAxis;
-
-    /// Get the HitPattern in the VXD.
-    uint32_t getHitPatternVXDInitializer(const RecoTrack& recoTrack) const;
-    /// Get the HitPattern in the CDC.
-    uint64_t getHitPatternCDCInitializer(const RecoTrack& recoTrack) const;
   };
 
 }

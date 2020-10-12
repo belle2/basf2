@@ -42,12 +42,12 @@ namespace Belle2 {
      *  In addition a parameter is exposed to only keep a fixed number of highest weighted relations
      *  from each segment.
      */
-    template <class AObject, class ARelationFilter, template<class ...> class WeightedRelationClass>
-    class WeightedRelationCreator : public Findlet<AObject* const, WeightedRelationClass<AObject>> {
+    template <class AObject, class ARelationFilter>
+    class WeightedRelationCreator : public Findlet<AObject* const, WeightedRelation<AObject>> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<AObject, WeightedRelationClass<AObject> >;
+      using Super = Findlet<AObject, WeightedRelation<AObject> >;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -75,7 +75,7 @@ namespace Belle2 {
 
       /// Main function
       void apply(const std::vector<AObject*>& inputObjects,
-                 std::vector<WeightedRelationClass<AObject>>& weightedRelations) final {
+                 std::vector<WeightedRelation<AObject>>& weightedRelations) final {
 
         B2ASSERT("Expected the objects on which relations are constructed to be sorted",
         std::is_sorted(inputObjects.begin(), inputObjects.end(), LessOf<Deref>()));
@@ -88,8 +88,8 @@ namespace Belle2 {
           int nCurrentRepetitions = 1;
           auto sameFrom =
           [&nMaxRepetitions,
-          &nCurrentRepetitions](const WeightedRelationClass<AObject>& relation,
-          const WeightedRelationClass<AObject>& otherRelation) -> bool {
+          &nCurrentRepetitions](const WeightedRelation<AObject>& relation,
+          const WeightedRelation<AObject>& otherRelation) -> bool {
             if (relation.getFrom() == otherRelation.getFrom())
             {
               ++nCurrentRepetitions;

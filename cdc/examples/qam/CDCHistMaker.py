@@ -46,30 +46,30 @@ histADC = []
 histTDC = []
 histADCinLayer = []
 
-for l in range(56):
-    histADCinLayer.append(TH1D('h' + str(500000 + l),
-                               'ADC Layer' + str(l),
+for l_adc in range(56):
+    histADCinLayer.append(TH1D('h' + str(500000 + l_adc),
+                               'ADC Layer' + str(l_adc),
                                400, 0.0, 400.))
-    for w in range(nWires[l]):
-        hid = getHistID(l, w)
+    for w in range(nWires[l_adc]):
+        hid = getHistID(l_adc, w)
         hADC = TH1D('h' + str(100000 + hid),
-                    'ADC Layer' + str(l) + 'Wire' + str(w),
+                    'ADC Layer' + str(l_adc) + 'Wire' + str(w),
                     400, 0.0, 400.)
         hTDC = TH1D('h' + str(200000 + hid),
-                    'TDC Layer' + str(l) + 'Wire' + str(w),
+                    'TDC Layer' + str(l_adc) + 'Wire' + str(w),
                     2000, 4000., 6000.)
         histADC.append(hADC)
         histTDC.append(hTDC)
 
 
-histADCTDC = [TH2D('h' + str(300000 + l),
-                   'ADC2TDC Layer' + str(l),
+histADCTDC = [TH2D('h' + str(300000 + l_adc),
+                   'ADC2TDC Layer' + str(l_adc),
                    200, 0.0, 400., 200, 4000, 6000)
-              for l in range(56)]
+              for l_adc in range(56)]
 
-histHit = [TH1D('h' + str(400000 + l),
-                'HitDist Layer' + str(l),
-                400, 0.0, 400.) for l in range(56)]
+histHit = [TH1D('h' + str(400000 + l_adc),
+                'HitDist Layer' + str(l_adc),
+                400, 0.0, 400.) for l_adc in range(56)]
 
 
 class CDCHistMakerModule(Module):
@@ -105,15 +105,15 @@ class CDCHistMakerModule(Module):
         for hit in hits:
             #            rawhit = hit.getRelatedTo('CDCRawHits')
             sl = hit.getISuperLayer()
-            l = hit.getILayer()
-            cl = l if sl == 0 else 8 + (sl - 1) * 6 + l
+            l_hit = hit.getILayer()
+            cl = l_hit if sl == 0 else 8 + (sl - 1) * 6 + l_hit
             w = hit.getIWire()
             adc = hit.getADCCount()
             tdc = hit.getTDCCount()
 
             #            b = rawhit.getBoardId()
             #            c = rawhit.getFEChannel()
-            #            B2DEBUG(99, 'sl ' + str(sl) + ' l ' + str(l) +
+            #            B2DEBUG(99, 'sl ' + str(sl) + ' l_hit ' + str(l_hit) +
             #                    ' cl ' + str(cl) + ' w ' + str(w) +
             #                    ' b ' + str(b) + ' c ' + str(c))
             hid = getHistID(cl, w)

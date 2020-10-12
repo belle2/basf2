@@ -91,7 +91,7 @@ def add_mdst_dump(path, print_untested=False):
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
             "getPhi", "getOmega", "getZ0", "getTanLambda", "getCotTheta",
-            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD"
+            "getTau", "getCov", "getCovariance5", "getHitPatternCDC", "getHitPatternVXD", "getNDF", "getChi2"
             ]),
         DataStorePrinter("EventLevelTrackingInfo", [
             "getNCDCHitsNotAssigned", "getNCDCHitsNotAssignedPostCleaning",
@@ -137,7 +137,7 @@ def add_mdst_dump(path, print_untested=False):
                              "getRelationsWith": ["KlIds", "MCParticles"],
                              }),
         DataStorePrinter("KlId", ["isKLM", "isECL", "getKlId"]),
-        DataStorePrinter("TRGSummary", ["getTimType"], {
+        DataStorePrinter("TRGSummary", ["getTimType", "getTimQuality"], {
             "getTRGSummary": range(10),
             "getPreScale": [[int(i / 32), i % 32] for i in list(range(320))],
             "getInputBits": range(10),

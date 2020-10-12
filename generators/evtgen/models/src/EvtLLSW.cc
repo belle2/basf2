@@ -63,10 +63,10 @@ void EvtLLSW::decay(EvtParticle* p)
 void EvtLLSW::initProbMax()
 {
 
-  EvtId parnum, mesnum, lnum;
+  EvtId lnum; //parnum, mesnum;
 
-  parnum = getParentId();
-  mesnum = getDaug(0);
+  //parnum = getParentId();
+  //mesnum = getDaug(0);
   lnum = getDaug(1);
 
   // Leptons

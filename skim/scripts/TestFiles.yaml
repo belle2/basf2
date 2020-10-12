@@ -119,6 +119,19 @@ MC13_mumuBGx1:
   average_events_per_file: 10000
 
 
+## phi-gamma neutral and charged MC
+
+phigamma_neutral:
+  location: /group/belle2/users/fnc/MC/phi_gamma_neutral_prod/phi_gamma_neutral_prod_mdst_00001.root
+  total_input_files: 600
+  average_events_per_file: 1000
+
+phigamma_charged:
+  location: /group/belle2/users/fnc/MC/phi_gamma_charged_prod/phi_gamma_charged_prod_mdst_00001.root
+  total_input_files: 500
+  average_events_per_file: 1000
+
+
 ## MC12 generic
 
 MC12_ccbarBGx1:
@@ -239,7 +252,18 @@ MC12_mumuBGx1:
 #  |____/ \__,_|\__\__,_| |___/\__,_|_| |_| |_| .__/|_|\___||___/
 #                                             |_|
 
-# NOTE: proc11 samples are hlt_hadron skims
+bucket12_exp12_4S_offres:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket12_exp12_4S_offres.mdst.root
+
+bucket11_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket11_exp12.mdst.root
+
+bucket10_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket10_exp12.mdst.root
+
+bucket9_exp12:
+  location: /group/belle2/dataprod/MC/SkimTraining/bucket9_exp12.mdst.root
+
 proc11_exp10:
   location: /group/belle2/dataprod/MC/SkimTraining/proc11_exp10.mdst.root
 

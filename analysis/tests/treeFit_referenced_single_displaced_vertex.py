@@ -73,5 +73,6 @@ class TestTreeFits(unittest.TestCase):
 
         print("Test passed, cleaning up.")
 
+
 if __name__ == '__main__':
     unittest.main()

@@ -1213,7 +1213,7 @@ void EffPlotsModule::terminate()
   //---------------------------------------------------------------------------------
 
   //write histograms on the output root file
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
     m_rootFilePtr->cd();
 
     TIter nextHMC(m_histoList_MCParticles);

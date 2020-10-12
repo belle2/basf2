@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCDEDXCORRECTIONMODULE_H
-#define CDCDEDXCORRECTIONMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -24,6 +23,8 @@
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
+#include <reconstruction/dbobjects/CDCDedxADCNonLinearity.h> //new in rel5
+#include <reconstruction/dbobjects/CDCDedxCosineEdge.h> //new in rel5
 
 #include <vector>
 
@@ -72,18 +73,19 @@ namespace Belle2 {
     /** Perform the cosine correction */
     void CosineCorrection(double costheta, double& dedx) const;
 
+    /** Perform the cosine edge correction */
+    void CosineEdgeCorrection(double costh, double& dedx) const;
+
     /** Perform a hadron saturation correction.
      * (Set the peak of the truncated mean for electrons to 1) */
     void HadronCorrection(double costheta,  double& dedx) const;
 
-    /** Perform a standard set of corrections (layer-level only) */
-    void StandardCorrection(int wireID, double costheta, double& dedx) const;
-
     /** Perform a standard set of corrections */
-    void StandardCorrection(int layer, int wireID, double doca, double enta, double costheta, double& dedx) const;
+    void StandardCorrection(int adc, int layer, int wireID, double doca, double enta, double length, double costheta,
+                            double& dedx) const;
 
     /** Get the standard set of corrections */
-    double GetCorrection(int layer, int wireID, double doca, double enta, double costheta) const;
+    double GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const;
 
     /** Saturation correction:
      * convert the measured ionization (D) to actual ionization (I) */
@@ -105,6 +107,8 @@ namespace Belle2 {
     bool m_runGain; /**< boolean to apply run gains */
     bool m_twoDCell; /**< boolean to apply 2D correction */
     bool m_oneDCell; /**< boolean to apply 1D correction */
+    bool m_cosineEdge; /**< boolean to apply cosine edge */
+    bool m_nonlADC; /**< boolean to apply non linear ADC */
 
     StoreArray<CDCDedxTrack> m_cdcDedxTracks; /**< Store array: CDCDedxTrack */
 
@@ -117,6 +121,8 @@ namespace Belle2 {
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
+    DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< hadron saturation non linearity */
+    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< cosine edge calibration */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */
 
@@ -141,4 +147,3 @@ namespace Belle2 {
 
   };
 } // Belle2 namespace
-#endif

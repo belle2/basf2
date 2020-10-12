@@ -27,7 +27,7 @@ gROOT.ProcessLine('struct EventDataTrueHit {\
     int strip_dir;\
     };')
 
-from ROOT import EventDataTrueHit
+from ROOT import EventDataTrueHit  # noqa
 
 
 class SVDValidationTTreeTrueHit(Module):

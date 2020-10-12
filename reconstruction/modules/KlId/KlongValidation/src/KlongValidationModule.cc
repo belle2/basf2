@@ -22,9 +22,9 @@
 #include <TGraph.h>
 #include <cstring>
 
-using namespace Belle2;
-using namespace KlId;
 using namespace std;
+using namespace Belle2;
+using namespace Belle2::KlongId;
 
 REG_MODULE(KlongValidation);
 
@@ -74,7 +74,7 @@ void KlongValidationModule::initialize()
   m_fakeMom_Pass   = new TH1F("Momentum Fake Passed", "Momentum Fake Passed;Momentum;Count", 25, 0, 5);
   m_fakeMom     = new TH1F("Momentum Fake Rate", "Momentum Fake Rate;Momentum;Fake Rate", 25, 0, 5);
 
-  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 100, -5, 15);
+  m_time     = new TH1F("KLM Cluster Time", "Cluster Timing;Cluster time;Count", 20, -5, 15);
   m_trackSep     = new TH1F("KLM trackSeperation Distance", "KLM trackSeperation Distance;Distance;Count", 100, 0, 4000);
   m_energy     = new TH1F("KLM Energy", "KLM Energy;Energy;count", 25, 0, 5);
   m_nLayer     = new TH1F("KLM N-Layer", "N-layer;N-layer;count", 20, 0, 20);
@@ -288,8 +288,8 @@ void KlongValidationModule::terminate()
                                                  "Purity vs Efficiency each point represents a cut on the klong ID."));
   m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
   m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
-  m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
-  m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
+  m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
+  m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
 
   // tuple: pointer to the plot, name of the plot, true for shifter plots
   std::vector<std::tuple<TH1F*, std::string, bool>> histograms;
@@ -316,7 +316,7 @@ void KlongValidationModule::terminate()
     std::get<0>(hist) -> SetTitle(std::get<1>(hist).c_str());
     std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Description", std::get<1>(hist)));
     std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Check", "Should not change"));
-    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Contact", "jkrohn@student.unimelb.edu.au"));
+    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
     if (std::get<2>(hist))
       std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.99,pvalue-error=0.1"));
     else

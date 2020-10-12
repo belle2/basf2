@@ -2,9 +2,6 @@
 # Calibration. And how the SequentialRunByRun strategy deals with gaps in the input data
 
 from basf2 import *
-# set_log_level(LogLevel.DEBUG)
-# set_debug_level(29)
-set_log_level(LogLevel.INFO)
 
 import os
 import sys
@@ -16,6 +13,8 @@ from caf.framework import Calibration, CAF
 from caf.utils import ExpRun, IoV
 from caf.strategies import SequentialRunByRun
 from caf.backends import Local, LSF
+
+set_log_level(LogLevel.INFO)
 
 
 def main(argv):

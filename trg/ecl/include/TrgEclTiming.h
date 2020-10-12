@@ -51,6 +51,32 @@ namespace Belle2 {
     void SetNofTopTC(int NtopTC) {NofTopTC = NtopTC;}
     //! Get Timing Source
     int GetTimingSource() {return Source;}
+    // set energy threshold of event timing quality flag
+    void setEventTimingQualityThresholds(std::vector<double> iEventTimingQualityThresholds)
+    {
+      m_EventTimingQualityThresholds = iEventTimingQualityThresholds;
+    }
+    // get event timing quality flag
+    int getEventTimingQualityFlag()
+    {
+      return m_EventTimingQualityFlag;
+    }
+    // get TCId which is a source of event timing
+    int getEventTimingTCId()
+    {
+      return m_EventTimingTCId;
+    }
+    // get theta ID of TC which is a source of event timing
+    int getEventTimingTCThetaId()
+    {
+      return m_EventTimingTCThetaId;
+    }
+    // get TC energy which is a source of event timing
+    double getEventTimingTCEnergy()
+    {
+      return m_EventTimingTCEnergy;
+    }
+
   private:
     //! TC Energy
     std::vector<double> TCEnergy;
@@ -58,6 +84,21 @@ namespace Belle2 {
     std::vector<double> TCTiming;
     //! TC Id
     std::vector<int> TCId;
+
+    // Event timing quality flag (for SVD DAQ)
+    // 3:= super-fine timing
+    // 2:= fine timing
+    // 1:= other
+    // 0:= no TC hit
+    int m_EventTimingQualityFlag;
+    // energy threshold(low, high) for quality flag (GeV)
+    std::vector<double> m_EventTimingQualityThresholds;
+    // TCId of event timing source
+    int m_EventTimingTCId;
+    // TC ThetaId of event timing source
+    int m_EventTimingTCThetaId;
+    // TC Energy of event timing source
+    double m_EventTimingTCEnergy;
 
     //! # of  considered TC  in Energy weighted timing method.
     int NofTopTC;

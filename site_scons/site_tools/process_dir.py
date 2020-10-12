@@ -147,6 +147,18 @@ def process_dir(
             if not env.Dictionary().get('CONTINUE', True):
                 return
 
+    # Add additional sources.
+    if 'ADDITIONAL_SOURCES' in env.Dictionary():
+        additional_src_nodes = []
+        for source in env.Dictionary()['ADDITIONAL_SOURCES']:
+            additional_src_nodes += get_files(os.path.join(dir_name, source))
+        additional_src_files = [
+            os.path.join(parent_env['BUILDDIR'], str(node)) for node in
+            additional_src_nodes]
+        if (len(additional_src_files) > 0):
+            src_files.append(additional_src_files)
+        env['SRC_FILES'] = src_files
+
     # install header files in the include directory
     includes = env.Install(os.path.join(env['INCDIR'], dir_name),
                            env['HEADER_FILES'])

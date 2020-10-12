@@ -19,14 +19,12 @@ namespace Belle2 {
    * Hit pattern of the VXD within a track.
    * The pattern is stored using a std::bitset. This allows to use the STL, which is very efficiently programmed.
    *
-   * Only hits from the outgoing arm are stored.
-   * For each layer there are two bits. The layer counting is from
+   * Only hits from the outgoing arm are stored. For each layer there are two bits. The layer counting is:
+   *  - PXD: layers 1 and 2;
+   *  - SVD: layers 3, 4, 5 and 6.
    *
-   * XXX: The numbering scheme is not final.
-   * PXD layer: 0, 1
-   * SVD layer: 0, 1, 2, 3
-   * The numbering scheme in this class is _NOT_ equivalent to the one defined in [BELLE2-NOTE-TE-2015-010].
-   * --> https://d2comp.kek.jp/record/243/files/BELLE2-NOTE-TE-2015-010.pdf
+   * The numbering scheme in this class is equivalent to the one defined in the note BELLE2-NOTE-TE-2015-010:
+   * https://docs.belle2.org/record/243
    *
    * @sa HitPatternCDC
    *

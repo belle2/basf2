@@ -52,18 +52,18 @@ namespace Belle2 {
       GeoBKLMCreator& operator=(GeoBKLMCreator&) = delete;
 
       //! Destructor of the GeoBKLMCreator class
-      virtual ~GeoBKLMCreator();
+      ~GeoBKLMCreator();
 
       //! Creates the objects for the BKLM geometry
       //! virtual void create(const GearDir&, G4LogicalVolume&, geometry::GeometryTypes type);
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
       {
         BKLMGeometryPar config = createConfiguration(content);
         createGeometry(config, topVolume, type);
       }
 
       //! Create the configuration objects and save them in the Database.
-      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
+      void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
       {
         DBImportObjPtr<BKLMGeometryPar> importObj;
         importObj.construct(createConfiguration(content));
@@ -71,7 +71,7 @@ namespace Belle2 {
       }
 
       //! Create the geometry from the Database
-      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
       {
         DBObjPtr<BKLMGeometryPar> dbObj;
         if (!dbObj) {

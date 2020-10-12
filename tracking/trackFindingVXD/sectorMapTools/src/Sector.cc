@@ -29,7 +29,7 @@ std::string Sector::printSector()
 {
   string isSectorActive = "no", useDistance = "no";
 
-  if (m_myActiveSector != NULL) isSectorActive = "yes";
+  if (m_myActiveSector != nullptr) isSectorActive = "yes";
   if (m_useDistance4sort == true) useDistance = "yes";
 
   uint nFriends = m_myFriends.size();

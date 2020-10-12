@@ -264,6 +264,7 @@ void SVDNNShapeReconstructorModule::event()
 
       // If the strip is not masked away, normalize samples (sample/stripNoise)
       apvSamples normedSamples;
+      // cppcheck-suppress knownConditionTrueFalse
       if (validDigit) {
         auto samples = shaperDigit.getSamples();
         transform(samples.begin(), samples.end(), normedSamples.begin(),
@@ -322,8 +323,7 @@ void SVDNNShapeReconstructorModule::event()
       int recoDigitIndex = storeRecoDigits.getEntries();
       storeRecoDigits.appendNew(
         SVDRecoDigit(sensorID, isU, shaperDigit.getCellID(), stripAmplitude,
-                     stripAmplitudeError, stripTime, stripTimeError, *pStrip, stripChi2,
-                     modeByte)
+                     stripAmplitudeError, stripTime, stripTimeError, *pStrip, stripChi2)
       );
 
       //Create relations to RecoDigits

@@ -13,9 +13,6 @@
 
 from basf2 import *
 
-use_database_chain()
-db = "localDB_SVDGeometryPar"
-use_local_database(db + "/database.txt", db)
 
 main = create_path()
 main.add_module('EventInfoSetter')

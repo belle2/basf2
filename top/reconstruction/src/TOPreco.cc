@@ -26,6 +26,8 @@ extern "C" {
   void set_store_opt_(int*);
   float get_logl_(float*, float*, float*, float*);
   void get_logl_ch_(float*, float*, float*, float*, float*);
+  void get_logl_ch_sfot_(float*, float*, float*, float*, float*, float*);
+  void get_sfot_(float*, float*, float*, float*);
   int data_getnum_();
   void set_channel_mask_(int*, int*, int*);
   void set_channel_off_(int*, int*);
@@ -333,6 +335,24 @@ namespace Belle2 {
       float tmax = (float) timeMax;
       float sigt = (float) sigma;
       get_logl_ch_(&t0, &tmin, &tmax, &sigt, logL);
+    }
+
+    void TOPreco::getLogL(double timeShift, double timeMin, double timeMax, double sigma,
+                          float* logL, float* sphot)
+    {
+      float t0 = (float) timeShift;
+      float tmin = (float) timeMin;
+      float tmax = (float) timeMax;
+      float sigt = (float) sigma;
+      get_logl_ch_sfot_(&t0, &tmin, &tmax, &sigt, logL, sphot);
+    }
+
+    void TOPreco::getSigPhot(double timeShift, double timeMin, double timeMax, float* sfot)
+    {
+      float t0 = (float) timeShift;
+      float tmin = (float) timeMin;
+      float tmax = (float) timeMax;
+      get_sfot_(&t0, &tmin, &tmax, sfot);
     }
 
     void TOPreco::getTrackHit(int LocGlob, double R[3], double Dir[3], double& Len,

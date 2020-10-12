@@ -23,7 +23,6 @@
 # output file RootOutput.root contains many additional diagnostic histograms.
 
 from basf2 import *
-set_log_level(LogLevel.INFO)
 
 import ROOT
 from ROOT.Belle2 import eclMuMuEAlgorithm
@@ -33,6 +32,7 @@ from caf.framework import Calibration, CAF
 import glob
 inputFileNames = glob.glob('/nfs/dust/belle2/user/ferber/data/kkmc_mumu/kkmc-mumu-1485213008/*.root')
 print(inputFileNames)
+set_log_level(LogLevel.INFO)
 
 # The collector module
 eclMuMuE = register_module('eclMuMuECollector')

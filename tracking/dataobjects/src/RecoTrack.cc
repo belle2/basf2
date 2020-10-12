@@ -536,7 +536,6 @@ std::vector<RecoHitInformation*> RecoTrack::getRecoHitInformations(bool getSorte
 
   hitList.reserve(recoHitInformations.size());
   for (auto& recoHit : recoHitInformations) {
-    // cppcheck-suppress useStlAlgorithm
     hitList.push_back(&recoHit);
   }
 

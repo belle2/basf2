@@ -120,7 +120,7 @@ void SVDCoGTimeCalibrationsMonitorModule::endRun()
   else
     B2WARNING("No valid SVDCoGTimeCalibrations for the requested IoV");
 
-  if (m_rootFilePtr != NULL) {
+  if (m_rootFilePtr != nullptr) {
 
     m_rootFilePtr->cd();
 

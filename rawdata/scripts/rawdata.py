@@ -138,11 +138,12 @@ def add_unpackers(path, components=None):
         add_neuro_2d_unpackers(path)
 
 
-def add_raw_output(path, filename='raw.root', additionalBranches=[]):
+def add_raw_output(path, filename='raw.root', additionalBranches=None):
     """
     This function adds an output module for raw data to a path.
     """
-
+    if additionalBranches is None:
+        additionalBranches = []
     output = register_module('RootOutput')
     output.param('outputFileName', filename)
     branches = ['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
@@ -151,14 +152,15 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     path.add_module(output)
 
 
-def add_raw_seqoutput(path, filename='raw.sroot', additionalObjects=[], fileNameIsPattern=False):
+def add_raw_seqoutput(path, filename='raw.sroot', additionalObjects=None, fileNameIsPattern=False):
     """
     This function adds an seqroot output module for raw data to a path.
 
     :param bool fileNameIsPattern: If true the filename needs to be a printf pattern with a placeholder for the
     filenumber starting at 0, for example "raw-f%06d.root"
     """
-
+    if additionalObjects is None:
+        additionalObjects = []
     output = register_module('SeqRootOutput')
     output.param('outputFileName', filename)
     output.param('fileNameIsPattern', fileNameIsPattern)

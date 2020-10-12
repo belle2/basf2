@@ -46,6 +46,7 @@ void RawCOPPER::SetVersion()
   }
 
   m_version = ((m_buffer[ POS_FORMAT_VERSION ]) & FORMAT_MASK) >> 8;
+
   switch (m_version) {
     case LATEST_POSTREDUCTION_FORMAT_VER :
       m_access = new PostRawCOPPERFormat_latest;
@@ -53,6 +54,14 @@ void RawCOPPER::SetVersion()
       break;
     case (0x80 + LATEST_POSTREDUCTION_FORMAT_VER) :
       m_access = new PreRawCOPPERFormat_latest;
+      //            printf("Calling PreRawCOPPERFormat_latest\n");
+      break;
+    case 0x2 :
+      m_access = new PostRawCOPPERFormat_v2;
+      //            printf("Calling PostRawCOPPERFormat_latest\n");
+      break;
+    case (0x80 + 0x2) :
+      m_access = new PreRawCOPPERFormat_v2;
       //            printf("Calling PreRawCOPPERFormat_latest\n");
       break;
     case 0x1 :
@@ -178,12 +187,12 @@ void RawCOPPER::PackDetectorBuf(
   int* detector_buf_4th, int nwords_4th,
   RawCOPPERPackerInfo rawcprpacker_info)
 {
-
+  // This function should be used for packing COPPER-format data.
   if (m_access != NULL) {
     delete m_access;
   }
-  m_access = new PostRawCOPPERFormat_latest;
-  m_version = LATEST_POSTREDUCTION_FORMAT_VER;
+  m_access = new PostRawCOPPERFormat_v2; // The latest version for COPPER-format
+  m_version = 2; // The latest version for COPPER-format
   m_num_events = 1;
   m_num_nodes = 1;
 
@@ -204,6 +213,40 @@ void RawCOPPER::PackDetectorBuf(
   return;
 }
 
+void RawCOPPER::PackDetectorBuf(int* const(&detector_buf_ch)[MAX_PCIE40_CH],
+                                int const(&nwords_ch)[MAX_PCIE40_CH],
+                                RawCOPPERPackerInfo rawcprpacker_info)
+{
+  if (LATEST_POSTREDUCTION_FORMAT_VER < 4) {
+    char err_buf[500];
+    sprintf(err_buf, "This function must be used for PCIe40 data(ver.4 or later). Exiting...");
+    printf("%s", err_buf); fflush(stdout);
+    B2FATAL(err_buf);
+  }
+
+  if (m_access != NULL) {
+    delete m_access;
+  }
+
+  m_access = new PostRawCOPPERFormat_latest;
+  m_version = LATEST_POSTREDUCTION_FORMAT_VER;
+  m_num_events = 1;
+  m_num_nodes = 1;
+
+  int* packed_buf = NULL;
+  packed_buf = m_access->PackDetectorBuf(&m_nwords,
+                                         detector_buf_ch, nwords_ch,
+                                         rawcprpacker_info);
+
+  int delete_flag = 1; // Not use preallocated buffer. Delete m_buffer when destructer is called.
+  SetBuffer(packed_buf, m_nwords, delete_flag, m_num_events, m_num_nodes);
+
+  delete_flag = 0; // For m_access, need not to delete m_buffer
+  m_access->SetBuffer(m_buffer, m_nwords, delete_flag, m_num_events, m_num_nodes);
+
+  return;
+}
+
 
 void RawCOPPER::PackDetectorBuf4DummyData(
   int* detector_buf_1st, int nwords_1st,
@@ -212,12 +255,13 @@ void RawCOPPER::PackDetectorBuf4DummyData(
   int* detector_buf_4th, int nwords_4th,
   RawCOPPERPackerInfo rawcprpacker_info)
 {
-
+  // This function should be used for packing COPPER-format data.
   if (m_access != NULL) {
     delete m_access;
   }
-  m_access = new PreRawCOPPERFormat_latest;
-  m_version = LATEST_POSTREDUCTION_FORMAT_VER;
+  m_access = new PostRawCOPPERFormat_v2; // The latest version for COPPER-format
+  m_version = 2; // The latest version for COPPER-format
+
   m_num_events = 1;
   m_num_nodes = 1;
 
@@ -264,4 +308,11 @@ std::string RawCOPPER::getInfoHTML() const
   }
 
   return s.str();
+}
+
+void RawCOPPER::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] , vector<vector< unsigned int>>& result)
+{
+  CheckVersionSetBuffer();
+  m_access->CompareHeaderValue(n, input_val, result);
+  return;
 }

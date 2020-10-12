@@ -31,13 +31,16 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
+  addParam("useEpics", m_useEpics, "useEpics", true);
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
 DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
 {
 #ifdef _BELLE2_EPICS
-  if (ca_current_context()) ca_context_destroy();
+  if (m_useEpics) {
+    if (ca_current_context()) ca_context_destroy();
+  }
 #endif
 }
 
@@ -46,7 +49,6 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");
 
   m_monObj = getMonitoringObject("pxd");
-
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //collect the list of all PXD Modules in the geometry here
@@ -72,6 +74,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_hReduction->Draw("");
+  m_monObj->addCanvas(m_cReduction);
 
   /// FIXME were to put the lines depends ...
 //   m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
@@ -89,9 +92,11 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
 
 #ifdef _BELLE2_EPICS
-  if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 
@@ -166,9 +171,10 @@ void DQMHistAnalysisPXDReductionModule::event()
   m_cReduction->Modified();
   m_cReduction->Update();
 #ifdef _BELLE2_EPICS
-
-  SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
-  SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  if (m_useEpics) {
+    SEVCHK(ca_put(DBR_DOUBLE, mychid, (void*)&data), "ca_set failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
 #endif
 }
 

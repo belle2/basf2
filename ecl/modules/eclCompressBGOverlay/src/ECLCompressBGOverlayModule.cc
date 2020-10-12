@@ -47,7 +47,7 @@ void ECLCompressBGOverlayModule::initialize()
   m_eclDsps.registerInDataStore();
   m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
   m_comp = selectAlgo(m_compAlgo & 0x7f);
-  if (m_comp == NULL)
+  if (m_comp == nullptr)
     B2FATAL("Unknown compression algorithm: " << m_compAlgo);
 }
 

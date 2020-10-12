@@ -41,7 +41,7 @@ ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber)
 {
   FILE* fl;
   fl = fopen(filename, "rb");
-  if (fl == NULL) {
+  if (fl == nullptr) {
     B2ERROR("Can't open file " << filename);
   }
 

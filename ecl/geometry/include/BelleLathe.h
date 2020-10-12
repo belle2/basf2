@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef BelleLathe_HH
-#define BelleLathe_HH
+#pragma once
 
 #include "G4Types.hh"
 
@@ -157,5 +156,3 @@ namespace Belle2 {
     };
   }
 }
-#endif
-

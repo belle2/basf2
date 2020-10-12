@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef CDCUnpackerModule_H
-#define CDCUnpackerModule_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
@@ -165,7 +164,7 @@ namespace Belle2 {
 
       /**
        * Check if the hit wire is valid or not.
-       * @param WireID hit wire.
+       * @param wireId hit wire.
        */
       bool isValidBoardChannel(WireID wireId)
       {
@@ -349,6 +348,4 @@ namespace Belle2 {
 
   } //end CDC namespace;
 } // end namespace Belle2
-
-#endif // CDCUnpackerModule_H
 

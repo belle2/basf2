@@ -17,6 +17,7 @@
 
 //Framework
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
@@ -164,6 +165,9 @@ namespace Belle2 {
     /** fill the waveform array FitA by electronic noise and bias it for channel J [0-8735]*/
     void makeElectronicNoiseAndPedestal(int j, int* FitA);
 
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
+
     /** input arrays */
     StoreArray<ECLHit>    m_eclHits;  /**< hits array  */
     StoreArray<ECLHit>    m_eclDiodeHits; /**< diode hits array  */
@@ -192,5 +196,6 @@ namespace Belle2 {
     double m_DspWithExtraMCInfoThreshold;  /**< Energy threshold above which to store DSPs with extra information */
     bool m_trigTime; /**< Use trigger time from beam background overlay */
     std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
+    bool m_dspDataTest; /**< DSP data usage flag */
   };
 }//Belle2

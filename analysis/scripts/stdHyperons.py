@@ -236,7 +236,7 @@ def goodXi(xitype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``, list
     """
 
-    if (not Belle2.PyStoreObj("ParticleList").isOptional("Xi-:std")):
+    if not Belle2.PyStoreObj("ParticleList").isOptional("Xi-:std"):
         stdXi(path=path)
         # raise ValueError('The ParticleList "Xi-:std" has to be created before calling "goodXi"!')
 
@@ -286,7 +286,7 @@ def goodXi0(xitype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``, list
     """
 
-    if (not Belle2.PyStoreObj("ParticleList").isOptional("Xi0:std")):
+    if not Belle2.PyStoreObj("ParticleList").isOptional("Xi0:std"):
         stdXi0(path=path)
         # raise ValueError('The ParticleList "Xi0:std" has to be created before calling "goodXi0"!')
 
@@ -340,7 +340,7 @@ def goodOmega(omegatype='loose', path=None):
                            or ``Omega-:tight``, list
     """
 
-    if (not Belle2.PyStoreObj("ParticleList").isOptional("Omega-:std")):
+    if not Belle2.PyStoreObj("ParticleList").isOptional("Omega-:std"):
         stdOmega(path=path)
         # raise ValueError('The ParticleList "Xi-:std" has to be created before calling "goodOmega"!')
 

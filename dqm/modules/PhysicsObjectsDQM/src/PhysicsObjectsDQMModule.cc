@@ -8,7 +8,7 @@
 
 #include <dqm/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/variables/ContinuumSuppressionVariables.h>
+#include <analysis/variables/EventShapeVariables.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <TDirectory.h>
@@ -104,7 +104,7 @@ void PhysicsObjectsDQMModule::event()
   StoreObjPtr<ParticleList> pi0Particles(m_pi0PListName);
   StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
 
-  double R2 = Belle2::Variable::R2EventLevel(nullptr);
+  double R2 = Belle2::Variable::foxWolframR2(nullptr);
   m_h_R2->Fill(R2);
 
   if (pi0Particles.isValid() && abs(pi0Particles->getPDGCode()) == 111) {

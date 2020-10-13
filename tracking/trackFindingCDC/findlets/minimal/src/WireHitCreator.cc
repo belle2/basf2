@@ -72,17 +72,23 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
 
   moduleParamList->addParameter(prefixed(prefix, "useSuperLayers"),
                                 m_param_useSuperLayers,
-                                "List of super layers to be used - mostly for debugging",
+                                "List of super layers to be used.",
                                 m_param_useSuperLayers);
 
   moduleParamList->addParameter(prefixed(prefix, "useLayers"),
                                 m_param_useLayers,
-                                "List of layers to be used.",
+                                "List of layers to be used. "
+                                "If a layer number is given in 'ignoreLayers', too, this will result on a B2FATAL. "
+                                "Either use 'useLayers' and provide a set of layers to be used, "
+                                "or use 'ignoreLayers' and provide a list of layers to be ignored, but not both at the same time.",
                                 m_param_useLayers);
 
   moduleParamList->addParameter(prefixed(prefix, "ignoreLayers"),
                                 m_param_ignoreLayers,
-                                "List of layers to be ignored, e.g. in cases of broken electronics or high noise.",
+                                "List of layers to be ignored. "
+                                "If a layer number is given in 'useLayers', too, this will result on a B2FATAL. "
+                                "Either use 'useLayers' and provide a set of layers to be used, "
+                                "or use 'ignoreLayers' and provide a list of layers to be ignored, but not both at the same time.",
                                 m_param_ignoreLayers);
 
   moduleParamList->addParameter(prefixed(prefix, "useSecondHits"),
@@ -156,8 +162,8 @@ void WireHitCreator::initialize()
   }
 
   // Check for common value in the two vectors for using / ignoring layers
-  for (unsigned short useLayer : m_param_useLayers) {
-    for (unsigned short ingoreLayer : m_param_ignoreLayers) {
+  for (const uint useLayer : m_param_useLayers) {
+    for (const uint ingoreLayer : m_param_ignoreLayers) {
       if (useLayer == ingoreLayer) {
         B2FATAL("You chose to use and ignore CDC layer " << useLayer << " at the same time. "
                 "Please decide to either use or to ignore the layer.");
@@ -167,7 +173,7 @@ void WireHitCreator::initialize()
 
   // fill all layers that should be used
   if (not m_param_useLayers.empty()) {
-    for (unsigned short layer : m_param_useLayers) {
+    for (const uint layer : m_param_useLayers) {
       m_useLayers.at(layer) = true;
     }
   } else {
@@ -175,7 +181,7 @@ void WireHitCreator::initialize()
   }
   // set layers that should be ignored to false
   if (not m_param_ignoreLayers.empty()) {
-    for (unsigned short layer : m_param_ignoreLayers) {
+    for (const uint layer : m_param_ignoreLayers) {
       m_useLayers.at(layer) = false;
     }
   }

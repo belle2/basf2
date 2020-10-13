@@ -200,12 +200,18 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
 
   addParam("useCDCLayers",
            m_param_useCDCLayers,
-           "List of CDC layers to be used.",
+           "List of layers to be used. "
+           "If a layer number is given in 'ignoreLayers', too, this will result on a B2FATAL. "
+           "Either use 'useLayers' and provide a set of layers to be used, "
+           "or use 'ignoreLayers' and provide a list of layers to be ignored, but not both at the same time.",
            m_param_useCDCLayers);
 
   addParam("ignoreCDCLayers",
            m_param_ignoreCDCLayers,
-           "List of CDC layers to be ignored, e.g. in cases of broken electronics or high noise.",
+           "List of layers to be ignored. "
+           "If a layer number is given in 'useLayers', too, this will result on a B2FATAL. "
+           "Either use 'useLayers' and provide a set of layers to be used, "
+           "or use 'ignoreLayers' and provide a list of layers to be ignored, but not both at the same time.",
            m_param_ignoreCDCLayers);
 
 
@@ -283,7 +289,7 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
   }
 
   if (not m_param_useCDCSuperLayers.empty()) {
-    for (unsigned short useSuperLayer : m_param_useCDCSuperLayers) {
+    for (const uint useSuperLayer : m_param_useCDCSuperLayers) {
       m_useCDCSuperLayers.at(useSuperLayer) = true;
     }
   } else {
@@ -291,8 +297,8 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
   }
 
   // Check for common value in the two vectors for using / ignoring layers
-  for (unsigned short useLayer : m_param_useCDCLayers) {
-    for (unsigned short ingoreLayer : m_param_ignoreCDCLayers) {
+  for (const uint useLayer : m_param_useCDCLayers) {
+    for (const uint ingoreLayer : m_param_ignoreCDCLayers) {
       if (useLayer == ingoreLayer) {
         B2FATAL("You chose to use and ignore CDC layer " << useLayer << " at the same time. "
                 "Please decide to either use or to ignore the layer.");
@@ -302,7 +308,7 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
 
   // fill all layers that should be used
   if (not m_param_useCDCLayers.empty()) {
-    for (unsigned short layer : m_param_useCDCLayers) {
+    for (const uint layer : m_param_useCDCLayers) {
       m_useCDCLayers.at(layer) = true;
     }
   } else {
@@ -310,7 +316,7 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
   }
   // set layers that should be ignored to false
   if (not m_param_ignoreCDCLayers.empty()) {
-    for (unsigned short layer : m_param_ignoreCDCLayers) {
+    for (const uint layer : m_param_ignoreCDCLayers) {
       m_useCDCLayers.at(layer) = false;
     }
   }

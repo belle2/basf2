@@ -79,10 +79,10 @@ namespace Belle2 {
       std::vector<int> m_param_useSuperLayers;
 
       /// Parameter : List of layers to be used
-      std::vector<int> m_param_useLayers;
+      std::vector<uint> m_param_useLayers;
 
       /// Parameter : List of layers to be ignored in tracking e.g. for simulating too high occupancy
-      std::vector<int> m_param_ignoreLayers;
+      std::vector<uint> m_param_ignoreLayers;
 
       /// Parameter : If true, the second hit information will be used to create Wire Hits
       bool m_param_useSecondHits = false;

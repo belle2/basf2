@@ -472,14 +472,20 @@ def add_cdst_output(
     if rawFormat:
         branches = [
             'EventMetaData',
+            'SoftwareTriggerResult',
+            'SoftwareTriggerVariables',
+            'RawFTSWs',
             'RawPXDs',
             'RawSVDs',
+            'ROIpayload',
+            'ROIs',
             'RawCDCs',
             'RawECLs',
             'RawARICHs',
             'RawKLMs',
             'RawTOPs',
-            'RawTRGs',
+            'RawTRGs'
+            'TRGSummary',
             'RecoTracks',
             'Tracks',
             'V0s',
@@ -500,7 +506,7 @@ def add_cdst_output(
             ]
 
         if "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
-            B2ERROR("PXDClusterFsromTracks is required in CDST output but its module is not found!")
+            B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found!")
 
     if dataDescription is None:
         dataDescription = {}

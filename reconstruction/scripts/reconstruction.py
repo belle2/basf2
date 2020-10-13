@@ -484,7 +484,7 @@ def add_cdst_output(
             'RawARICHs',
             'RawKLMs',
             'RawTOPs',
-            'RawTRGs'
+            'RawTRGs',
             'TRGSummary',
             'RecoTracks',
             'Tracks',

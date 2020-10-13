@@ -238,7 +238,6 @@ def goodXi(xitype='loose', path=None):
 
     if not Belle2.PyStoreObj("ParticleList").isOptional("Xi-:std"):
         stdXi(path=path)
-        # raise ValueError('The ParticleList "Xi-:std" has to be created before calling "goodXi"!')
 
     if xitype == 'veryloose':
         cutAndCopyList(
@@ -288,7 +287,6 @@ def goodXi0(xitype='loose', path=None):
 
     if not Belle2.PyStoreObj("ParticleList").isOptional("Xi0:std"):
         stdXi0(path=path)
-        # raise ValueError('The ParticleList "Xi0:std" has to be created before calling "goodXi0"!')
 
     if xitype == 'veryloose':
         # Select pi0 at 3*sigma around the nominal mass
@@ -342,7 +340,6 @@ def goodOmega(omegatype='loose', path=None):
 
     if not Belle2.PyStoreObj("ParticleList").isOptional("Omega-:std"):
         stdOmega(path=path)
-        # raise ValueError('The ParticleList "Xi-:std" has to be created before calling "goodOmega"!')
 
     if omegatype == 'veryloose':
         cutAndCopyList(

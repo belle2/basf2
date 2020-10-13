@@ -49,5 +49,5 @@ void SpacePointLoader::apply(std::vector<const SpacePoint*>& spacePoints)
     TrackFindingCDC::erase_remove_if(spacePoints, hitIsAlreadyUsed);
   }
 
-  B2DEBUG(50, "Starting with " << spacePoints.size() << " hits.");
+  B2DEBUG(29, "Starting with " << spacePoints.size() << " hits.");
 }

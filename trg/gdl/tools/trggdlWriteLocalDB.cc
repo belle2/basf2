@@ -30,12 +30,12 @@
 using namespace Belle2;
 
 //#define ONLINE 0
-//#define ONLINE 1
-#define ONLINE 2    //end of exp12 for MC14
+#define ONLINE 1
+//#define ONLINE 2    //end of exp12 for MC14
 
 
 /* common for setalg, setinputbits, setftdlbits */
-const int N_FTD_VERS = 15;
+const int N_FTD_VERS = 16;
 const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end run
   0,  0,     6,   -1, //  0
   7,  0,     7, 2102, //  1 11
@@ -52,10 +52,11 @@ const int ftd_run[N_FTD_VERS][4] = { //itnitial exp, initial run, end exp, end r
   //      +{s2[sf][35o],grl{gg,bb}} -nimin[23], #klm  reduced
   10, 4601, 12, 1659, // 12 24 o and b for short trk chged to s2[sf][o5]
   12, 1660, 12, 1858, // 13 25 +{bff,bhie}
-  12, 1859, -1,   -1  // 14 26 trk req removed from mu_pair
+  12, 1859, 13,   -1, // 14 26 trk req removed from mu_pair
+  14,    0, -1,   -1  // 15 29
 };
 const int ftd_version[] = {
-  24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26
+  24, 11, 12, 13, 14, 15, 14, 15, 16, 17, 22, 23, 24, 25, 26, 29
 };
 
 
@@ -876,21 +877,21 @@ void setunpacker()
     {
       //14,[15] 32+16
       -1, -1, 41, -1, -1,
-      33, -1, -1, -1, -1,
-      7,  8,  9, 47, -1,
+      38, -1, -1, -1, -1,
+      7,  8,  9,  47, -1,
       -1, -1, -1, -1,  0,
       36, 18, 24, 25, -1,
       -1, -1, 26, 19, -1,
       20, 12, 13, 14, -1,
-      -1, -1, 42, 43, 44,
-      40, 34, -1, -1, 35,
+      -1, -1, 32, 33, 34,
+      35, 39, -1, -1, 40,
       -1, -1, -1, -1, -1,
       -1, -1,  2,  3,  4,
-      5,  6, 23, 17, 10,
-      11, 37,  1, 16, 22,
-      -1, 39, 45, 46, 15,
+      5,  6,  23, 17, 10,
+      11, 42,  1, 16, 22,
+      -1, 44, 45, 46, 15,
       21, 27, 28, 29, 30,
-      31, 32, 38
+      31, 43, 37
     }
 
   };

@@ -6,7 +6,8 @@ from basf2 import *
 from ROOT import Belle2
 
 
-def add_svd_new_reconstruction(path, isROIsimulation=False, applyMasking=False):
+def add_svd_new_reconstruction(path, isROIsimulation=False):
+
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
         dataFormatName = '__ROISVDDataFormat'
@@ -20,21 +21,7 @@ def add_svd_new_reconstruction(path, isROIsimulation=False, applyMasking=False):
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = 'SVDMissingAPVsClusterCreator'
 
-# add strip masking if needed
-    if(applyMasking):
-        if(isROIsimulation):
-            shaperDigitsName = '__ROISVDShaperDigitsUnmasked'
-            maskingName = '__ROISVDStripMasking'
-        else:
-            shaperDigitsName = 'SVDShaperDigitsUnmasked'
-            maskingName = 'SVDStripMasking'
-
-        if maskingName not in [e.name() for e in path.modules()]:
-            masking = register_module('SVDStripMasking')
-            masking.set_name(maskingName)
-            masking.param('ShaperDigitsUnmasked', shaperDigitsName)
-            path.add_module(masking)
-
+    # data format check NOT appended
     if dataFormatName not in [e.name() for e in path.modules()]:
         dataFormat = register_module('SVDDataFormatCheck')
         dataFormat.param('ShaperDigits', shaperDigitsName)

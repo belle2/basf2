@@ -177,7 +177,8 @@ void PrintMCParticlesModule::printTree(const std::vector<MCParticle*>& particles
   for (const auto* mc : particles) {
     // are we the last in the list? if so we need a different box char
     const bool last = ++particle_index == num_particles;
-    m_output << indent << (last ? "╰─ " : "├─ ");
+    m_output << indent << (last ? "╰" : "├");
+    m_output << (mc->hasStatus(MCParticle::c_PrimaryParticle) ? "── " : "╶╶ ");
     // now print the name and pdg code. Optionally with color
     TParticlePDG* pdef = pdb->GetParticle(mc->getPDG());
     m_output << colorStart[mc->hasStatus(MCParticle::c_PrimaryParticle)] << (pdef ? pdef->GetTitle() : "[UNKNOWN]");
@@ -221,7 +222,7 @@ void PrintMCParticlesModule::printTree(const std::vector<MCParticle*>& particles
       m_output << propIndent;
       m_output << "list index=" << mc->getIndex();
     }
-    // and if we hav shown any extra info and have daughters leave a blank line
+    // and if we have shown any extra info and have daughters leave a blank line
     if (showDaughters and anyExtraInfo) m_output << propIndent;
     // now we're done with the particle ...
     m_output << std::endl;
@@ -229,5 +230,7 @@ void PrintMCParticlesModule::printTree(const std::vector<MCParticle*>& particles
     if (showDaughters) {
       printTree(daughters, level + 1, newIndent);
     }
+    // and if we show any extra info also leave blank line to sibling
+    if (anyExtraInfo and not last) m_output << newIndent << std::endl;
   }
 }

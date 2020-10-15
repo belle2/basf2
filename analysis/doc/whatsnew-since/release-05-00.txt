@@ -77,6 +77,9 @@ Modules
 
  * The :b2:mod:`ParticleCombinerFromMC` and the `reconstructMCDecay` function can set decayModeID extraInfo with an argument ``dmID``.
    One can decide whether charge conjugated mode should be reconstructed with new boolean argument ``chargeConjugation`` (true by default).
+ * The :b2:mod:`PrintMCParticles` module and thus also the `printMCParticles` function
+   has a completely new layout that should be much easier to parse, especially for complicated events. By default it shows
+   much less information but in an easier to parse tree representation. See the documentation of `printMCParticles` for details.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

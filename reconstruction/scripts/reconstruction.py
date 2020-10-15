@@ -12,6 +12,8 @@ from pxd import add_pxd_reconstruction
 
 from rawdata import add_unpackers
 
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
@@ -470,22 +472,7 @@ def add_cdst_output(
     ]
 
     if rawFormat:
-        branches = [
-            'EventMetaData',
-            'SoftwareTriggerResult',
-            'SoftwareTriggerVariables',
-            'RawFTSWs',
-            'RawPXDs',
-            'RawSVDs',
-            'ROIpayload',
-            'ROIs',
-            'RawCDCs',
-            'RawECLs',
-            'RawARICHs',
-            'RawKLMs',
-            'RawTOPs',
-            'RawTRGs',
-            'TRGSummary',
+        branches = ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + [
             'RecoTracks',
             'Tracks',
             'V0s',

@@ -5,7 +5,7 @@
 # Stuck? Ask for help at questions.belle2.org
 #
 # This tutorial demonstrates how to include the flavor
-# tagging user interphase into your analysis.
+# tagging user interface into your analysis.
 # The following decay chain:
 #
 # B0 -> J/psi Ks
@@ -138,7 +138,7 @@ ft.flavorTagger(
 # 'MaximumPstar',
 # 'KaonPion']
 #
-# If you want to train yourself, have a look at the scritps under analysis/release-validation/CPVTools/
+# If you want to train yourself, have a look at the scripts under analysis/release-validation/CPVTools/
 # in principle you need only to run CPVToolsValidatorInParalell.sh
 # If you train the  event and combiner levels, you need two different samples of at least 500k events (one for each sampler).
 # The different samples are needed to avoid biases between levels.
@@ -155,10 +155,10 @@ ft.flavorTagger(
 #
 # Attention: to train the flavor tagger you need MC samples generated without built-in CP violation!
 # The best sample for this is B0-> nu_tau anti-nu_tau .
-# You can apply cuts using the flavor Tagger: qrOutput(FBDT) > -2 rejects all events which do not
+# You can apply cuts using the flavor Tagger: isNAN(qrOutput(FBDT)) < 1 rejects all events which do not
 # provide flavor information using the tag side
 ma.applyCuts(list_name='B0:sig',
-             cut='qrOutput(FBDT) > -2',
+             cut='isNAN(qrOutput(FBDT)) < 1',
              path=cp_val_path)
 
 # If you applied the cut on qrOutput(FBDT) > -2 before then you can rank by highest r- factor
@@ -169,8 +169,8 @@ ma.rankByHighest(particleList='B0:sig',
                  path=cp_val_path)
 
 # Fit vertex of the B0 on the signal side
-vx.raveFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
-           constraint='', path=cp_val_path)
+vx.kFit(list_name='B0:sig', conf_level=0.0, decay_string='B0:sig -> [J/psi:mumu -> ^mu+ ^mu-] K_S0',
+        constraint='', path=cp_val_path)
 
 
 # Fit Vertex of the B0 on the tag side

@@ -90,7 +90,7 @@ ma.reconstructDecay(decayString='B0:sig -> J/psi:mumu K_S0:pipi', cut='Mbc > 5.2
 ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 
 # build the rest of the event associated to the B0
-ma.buildRestOfEvent(target_list_name='B0:sig',
+ma.buildRestOfEvent(target_list_name='B0:sig', fillWithMostLikely=True,
                     path=cp_val_path)
 
 b2.conditions.append_globaltag("analysis_tools_release-04-02")

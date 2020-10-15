@@ -69,6 +69,7 @@ namespace Belle2 {
     bool m_createNestedROE; /**< Should we create nested ROE? */
     bool m_fromMC; /**< Should we create MC ROE? */
     bool m_useKLMEnergy; /**< Should we use KLM energy in ROE? */
+    bool m_builtWithMostLikely; /**< Is the ROE built with most-likely particle lists? */
     /**
     * Adds all particles from input particle lists that are not used in reconstruction of given particle.
     *

@@ -173,8 +173,13 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0 (all vectors are empty).
      */
-    explicit RestOfEvent(int pdgCode = 0, bool isNested = false, bool isFromMC = false, bool useKLMEnergy = false):
-      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC), m_useKLMEnergy(useKLMEnergy) { };
+    explicit RestOfEvent(int pdgCode = 0,
+                         bool isNested = false,
+                         bool isFromMC = false,
+                         bool useKLMEnergy = false,
+                         bool builtWithMostLikely = false):
+      m_pdgCode(pdgCode), m_isNested(isNested), m_isFromMC(isFromMC), m_useKLMEnergy(useKLMEnergy),
+      m_builtWithMostLikely(builtWithMostLikely) { };
     // setters
     /**
      * Add StoreArray indices of given Particles to the list of unused particles in the event.
@@ -256,6 +261,11 @@ namespace Belle2 {
      * Returns true if the ROE is nested
      */
     bool getIsNested() const {return m_isNested;}
+
+    /**
+     * Returns true if the ROE was built with most-likely particle lists
+     */
+    bool isBuiltWithMostLikely() const {return m_builtWithMostLikely;}
     // getters
     /**
      * Get all Particles from ROE mask.
@@ -352,6 +362,8 @@ namespace Belle2 {
     bool m_isNested;                   /**< Nested ROE indicator */
     bool m_isFromMC;                   /**< MC ROE indicator */
     bool m_useKLMEnergy;               /**< Include KLM energy into ROE 4-vector */
+    bool m_builtWithMostLikely;        /**< indicates whether most-likely particle lists were used in build of ROE */
+
     // Private methods
     /**
      *  Checks if a particle has its copy in the provided list
@@ -366,7 +378,9 @@ namespace Belle2 {
      * Prints indices in the given set in a single line
      */
     void printIndices(const std::string& maskName = "", bool unpackComposite = true, const std::string& tab = " - ") const;
-    ClassDef(RestOfEvent, 6) /**< class definition */
+
+    ClassDef(RestOfEvent, 7) /**< class definition */
+    // v7: added m_builtWithMostLikely
 
   };
 

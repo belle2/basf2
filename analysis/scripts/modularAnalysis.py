@@ -1860,6 +1860,7 @@ def buildRestOfEvent(target_list_name, inputParticlelists=None,
     roeBuilder.set_name('ROEBuilder_' + target_list_name)
     roeBuilder.param('particleList', target_list_name)
     roeBuilder.param('particleListsInput', inputParticlelists)
+    roeBuilder.param('mostLikely', fillWithMostLikely)
     path.add_module(roeBuilder)
 
 

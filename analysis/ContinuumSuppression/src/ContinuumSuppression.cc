@@ -16,6 +16,7 @@
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
 
 #include <vector>
 
@@ -95,6 +96,11 @@ namespace Belle2 {
     const RestOfEvent* roe = particle->getRelated<RestOfEvent>();
 
     if (roe) {
+
+      if (!roe->isBuiltWithMostLikely()) {
+        B2ERROR("The ROE was not created with most-likely particle lists."
+                "The continuum suppression will not work properly.");
+      }
 
       // Charged tracks
       //

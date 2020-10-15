@@ -27,7 +27,6 @@ using namespace std;
 #define LOG_FPRINTF (fprintf)
 #define ERR_FPRINTF (fprintf)
 #define ERROR(func) { fprintf(stderr, "[ERROR] %s:%d: "#func"(): %s\n", __FILE__, __LINE__, strerror(errno));}
-#define B2S_ERROR(func) { fprintf(stderr, "[ERROR] %s:%d: "#func"(): %s\n", __FILE__, __LINE__, strerror(errno));}
 
 std::map<int, std::string> myconn;
 std::map<int, unsigned int> mycount;
@@ -161,7 +160,7 @@ b2_timed_blocking_io(const int sd, const int timeout /* secs */)
     tv.tv_usec = 0;
     ret = setsockopt(sd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(struct timeval));
     if (ret == -1) {
-      B2S_ERROR(setsockopt);
+      ERROR(setsockopt);
       return -1;
     }
 
@@ -169,25 +168,25 @@ b2_timed_blocking_io(const int sd, const int timeout /* secs */)
     tv.tv_usec = 0;
     ret = setsockopt(sd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
     if (ret == -1) {
-      B2S_ERROR(setsockopt);
+      ERROR(setsockopt);
       return -1;
     }
   } else if (timeout == 0) {
     ret = fcntl(sd, F_SETFL, O_NDELAY);
     if (ret == -1) {
-      B2S_ERROR(fcntl);
+      ERROR(fcntl);
       return -1;
     }
   } else if (timeout < 0) {
     ret = fcntl(sd, F_GETFL, O_NDELAY);
     if (ret == -1) {
-      B2S_ERROR(fcntl);
+      ERROR(fcntl);
       return -1;
     }
     ret &= ~O_NDELAY;
     ret = fcntl(sd, F_SETFL, ret);
     if (ret == -1) {
-      B2S_ERROR(fcntl);
+      ERROR(fcntl);
       return -1;
     }
   }
@@ -207,7 +206,7 @@ b2_build_sockaddr_in(const char* hostname, const unsigned short port, struct soc
     struct hostent* hoste;
     hoste = gethostbyname(hostname);
     if (!hoste) {
-      B2S_ERROR(gethostbyname);
+      ERROR(gethostbyname);
       return -1;
     }
     in->sin_addr = *(struct in_addr*)(hoste->h_addr);
@@ -227,21 +226,21 @@ b2_create_tcp_socket(void)
 
   sd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (sd == -1) {
-    B2S_ERROR(socket);
+    ERROR(socket);
     return -1;
   }
 
 #if 0
   ret = b2_timed_blocking_io(sd, 0);
   if (ret == -1) {
-    B2S_ERROR(b2_timed_blocking_io);
+    ERROR(b2_timed_blocking_io);
     return -1;
   }
 #endif
 
   ret = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&one, sizeof(int));
   if (ret == -1) {
-    B2S_ERROR(setsockopt);
+    ERROR(setsockopt);
     return -1;
   }
 
@@ -259,25 +258,25 @@ b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept
 
   sd = b2_create_tcp_socket();
   if (sd < 0) {
-    B2S_ERROR(b2_create_tcp_socket);
+    ERROR(b2_create_tcp_socket);
     return -1;
   }
 
   ret = b2_build_sockaddr_in("0.0.0.0", port, &in);
   if (ret == -1) {
-    B2S_ERROR(b2_build_sockaddr_in);
+    ERROR(b2_build_sockaddr_in);
     return -1;
   }
 
   ret = bind(sd, (const struct sockaddr*)&in, sizeof(struct sockaddr_in));
   if (ret == -1) {
-    B2S_ERROR(bind);
+    ERROR(bind);
     return -1;
   }
 
   ret = listen(sd, 1);
   if (ret == -1) {
-    B2S_ERROR(listen);
+    ERROR(listen);
     return -1;
   }
 
@@ -295,19 +294,19 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
 
   sd = b2_create_tcp_socket();
   if (sd < 0) {
-    B2S_ERROR(b2_create_tcp_socket);
+    ERROR(b2_create_tcp_socket);
     return -1;
   }
 
   ret = b2_build_sockaddr_in(hostname, port, &in);
   if (ret == -1) {
-    B2S_ERROR(b2_build_sockaddr_in);
+    ERROR(b2_build_sockaddr_in);
     return -1;
   }
 
   ret = connect(sd, (const struct sockaddr*)&in, sizeof(struct sockaddr_in));
   if (ret == -1 && errno != EINPROGRESS) {
-    B2S_ERROR(connect);
+    ERROR(connect);
     return -1;
   }
 
@@ -328,7 +327,7 @@ b2_send(const int sd, const void* buf, const size_t size)
 
     ret = send(sd, ptr, n_bytes_remained, 0);
     if (ret == -1 && errno != EINTR) {
-      B2S_ERROR(send);
+      ERROR(send);
       return -1;
     }
     if (ret == -1 && errno == EINTR) {
@@ -375,7 +374,7 @@ b2_recv(const int sd,       void* buf, const size_t size)
 
     ret = recv(sd, ptr, n_bytes_remained, 0);
     if (ret == -1 && (errno != EINTR && errno != EWOULDBLOCK)) {
-      B2S_ERROR(recv);
+      ERROR(recv);
       return -1;
     }
     if (ret == -1 && (errno == EINTR || errno == EWOULDBLOCK)) {

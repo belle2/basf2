@@ -201,6 +201,7 @@ void PrintMCParticlesModule::printTree(const std::vector<MCParticle*>& particles
     if (m_showProperties) {
       m_output << propIndent;
       m_output << boost::format("mass=%.3g energy=%.3g charge=%d") % mc->getMass() % mc->getEnergy() % mc->getCharge();
+      if (not mc->hasStatus(MCParticle::c_LeftDetector)) m_output << boost::format(" lifetime=%.3g") % mc->getLifetime();
     }
     if (m_showMomenta) {
       const TVector3& p = mc->getMomentum();

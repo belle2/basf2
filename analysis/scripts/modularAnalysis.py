@@ -426,19 +426,19 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
 
     On demand, extra information on all the particles can be displayed by
     enabling any of the ``showProperties``, ``showMomenta``, ``showVertices``
-    and ``showStatus`` flags. Enabling all of them will print will look like
+    and ``showStatus`` flags. Enabling all of them will look like
     this::
 
         ...
         ╰── pi- (-211)
-            │ mass=0.14 energy=0.445 charge=-1
+            │ mass=0.14 energy=0.445 charge=-1 lifetime=6.36
             │ p=(0.257, -0.335, 0.0238) |p|=0.423
             │ production vertex=(0.113, -0.0531, 0.0156), time=0.00589
             │ status flags=PrimaryParticle, StableInGenerator, StoppedInDetector
             │ list index=48
             │
             ╰╶╶ n0 (2112)
-                mass=0.94 energy=0.94 charge=0
+                mass=0.94 energy=0.94 charge=0 lifetime=5.28e+03
                 p=(-0.000238, -0.0127, 0.0116) |p|=0.0172
                 production vertex=(144, 21.9, -1.29), time=39
                 status flags=StoppedInDetector
@@ -476,7 +476,7 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         maxLevel (int): If 0 or less print the whole tree, otherwise stop after n generations
         showProperties (bool): If True show mass, energy and charge of the particles
         showMomenta (bool): if True show the momenta of the particles
-        showVertices (bool): if True show production vertex and time of all particles
+        showVertices (bool): if True show production vertex and production time of all particles
         showStatus (bool): if True show some status information on the particles.
             For secondary particles this includes creation process.
     """

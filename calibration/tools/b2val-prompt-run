@@ -1,0 +1,169 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+This tool is used to run validation scripts. This has to be run after a CAF as it requires the input and output
+directories. It will be used by the prompt calibration automation system and by developers testing their prompt scripts.
+
+It basically takes a config files as input, which defines the script, path to CAF job output directory, path to the 
+input data file. It then runs a validation job by finding the correct script in the current release's
+``calibration/scripts/prompt/validation`` directory and executing its ``run_validation`` function.
+
+To test a new prompt validation script it is recommended to place it in the correct
+directory to check if this tool can use it.
+"""
+
+from scripts.prompt.validations.klm_strip_efficiency import run_validation
+import ROOT
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+
+import basf2
+from basf2 import B2ERROR, B2INFO, B2WARNING
+import json
+import importlib
+from pathlib import Path
+from collections import OrderedDict
+import shutil
+
+from caf.utils import IoV
+from caf import backends
+from caf import cli
+
+from prompt import prompt_validation_script_package
+
+def get_files(args):
+
+    validation_config_path = Path(args.validation_config)
+    if not validation_config_path.is_file():
+        raise FileNotFoundError(f"The file {validation_config_path.as_posix()} does not exist")
+    with open(validation_config_path, 'r') as validation_config_file:
+        validation_config = json.load(validation_config_file)
+
+    job_path = validation_config.get('job_path', None)
+
+    download_paths = {} 
+    for file in validation_module.settings.download_files:
+        path_to_files = [] 
+        for path in Path(job_path).rglob(file):
+            path_to_files.append(path)
+        download_paths[file] = path_to_files 
+    
+    current_directory = Path().absolute()
+    download_files_path = Path(current_directory, 'download_files')
+    try:
+        download_files_path.mkdir(parents=True)
+    except FileExistsError as e:
+        B2WARNING(f"Download file directory '{download_files_path.as_posix()}' exists.")
+        B2INFO(f"Removing '{download_files_path.as_posix()}'...")
+        shutil.rmtree(download_files_path)
+        download_files_path.mkdir(parents=True)
+
+    B2INFO(f"Will now copy the requested files from the CAF output to '{download_files_path.as_posix()}'")
+    for file_name, file_paths in download_paths.items():
+        if len(file_paths) == 1:
+            B2INFO(f"Copying {file_name} to {download_files_path}")
+            shutil.copyfile(file_paths, download_files_path)
+        else:
+            for file_path in file_paths:
+                B2INFO(f"Multiple copies of {file_name} files exist, will retrieve files with directory tree included")
+                new_download_file_path = Path(download_files_path, file_path)
+                new_download_file_path.mkdir(parents=True)
+                shutil.copyfile(file_path, new_download_file_path)
+
+
+def run_validation(args):
+    """Path to config JSON file, used to set up the validation script, CAF output path, input data path used.
+
+Required format of JSON file:
+
+.. code-block:: python
+
+    {
+     "validation_script": (str),
+     "job_path" (str),
+     "input_data_path" (str),
+     "download_files" list(str)
+     "backend_args" dict,     <- Optional as the backend default values and/or values in the prompt script will be used otherwise
+     "requested_iov" array[4](int),
+     "expert_config" dict     <- Optional as the prompt script default will be used if this isn't set here.
+    }
+
+The backend_args dictionary will be used to set up the `caf.backends.Backend` class and overrides the defaults of that class.
+If you set backend options via the command line e.g. ``--queue l``, then this will override backend_args values in this JSON
+file. Individual `caf.framework.Collection` objects can also override these options by setting them. So the final priority order
+is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
+-> b2val-prompt-run command line options]
+"""
+
+    validation_config_path = Path(args.validation_config)
+    if not validation_config_path.is_file():
+        raise FileNotFoundError(f"The file {validation_config_path.as_posix()} does not exist")
+    with open(validation_config_path, 'r') as validation_config_file:
+        validation_config = json.load(validation_config_file)
+
+    import importlib
+    module_name = prompt_validation_script_package + Path(validation_config["validation_script"]).stem
+    try:
+        validation_module = importlib.import_module(module_name)
+    except ModuleNotFoundError:
+        B2ERROR(f"Couldn't import {module_name}")
+        return 1
+    
+    B2INFO("Getting values for 'expert_config' from the prompt script.")
+    expert_config = validation_module.settings.expert_config   # set to be the default from the script
+    # If we have values in the validation_config we merge/overwrite with the default
+    if "expert_config" in validation_config:
+        # Overwrite/merge the default Validation Settings with JSON
+        B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
+        expert_config = {**expert_config, **validation_config["expert_config"]}
+
+    validation_module.run_validation(job_path=validation_config.get('job_path', None), 
+                                     input_data_path=validation_config.get('job_path', None),
+                                     requested_iov=validation_config.get('requested_iov',None),
+                                     expert_config=expert_config)
+
+
+def get_argparser():
+    """Setup the argparser for this command line tool"""
+    import argparse
+    parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+    subparsers = cli.add_backends_subparsers(parser)
+
+    for subparser in subparsers:
+        subparser.add_argument("validation_config", help=setup_caf.__doc__)
+        subparser.add_argument("input_data", help=get_input_data.__doc__)
+
+        cli.add_basf2_options(subparser)
+        cli.add_monitor_options(subparser, default_heartbeat=default_collection_heartbeat)
+        cli.add_job_options(subparser)
+
+        subparser.add_argument("--dry-run", dest="dry_run", action="store_true",
+                            help="Flags if the CAF process should be set up but not run. "
+                                 "Good for testing if your prompt script and config files are well formed without attempting "
+                                 "to submit any jobs."
+                           )
+        subparser.set_defaults(dry_run=False)
+
+        subparser.add_argument("--overwrite-working-dir", dest="overwrite_workdir", action="store_true",
+                            help="Flags if the tool should delete the validation working directory before "
+                                 "beginning the processing. This will delete the previous results! Only use if you want a clean "
+                                 "start from the beginning again!"
+                           )
+
+        subparser.set_defaults(overwrite_workdir=False)
+        subparser.set_defaults(expert_config={})
+
+    return parser
+
+
+def main():
+    parser = get_argparser()
+    args = parser.parse_args()
+
+    # Do the input data load
+    get_files(args)
+    run_validation(args)
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(main())

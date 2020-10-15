@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 """
-This tool lists either the available prompt calibration script names, or details about a specific
-prompt calibration scripts.
+This tool lists either the available prompt calibration or validation script names, or details about a specific
+prompt calibration or validation scripts.
 The details are found by inspecting the `settings <prompt.CalibrationSettings>` variable of the
-calibration script.
+calibration script or the `settings <prompt.ValidationSettings>` variable of the validation script.
 """
 
 import ROOT
@@ -16,16 +16,25 @@ from basf2 import B2ERROR, B2INFO, B2WARNING
 import json
 from pathlib import Path
 
-from prompt import prompt_script_package, prompt_script_dir 
+from prompt import prompt_script_package, prompt_script_dir
+from prompt import prompt_validation_script_package, prompt_validation_script_dir
 
-def get_all_script_paths():
-    script_path = Path(basf2.find_file(prompt_script_dir))
+def get_all_script_paths(validation=False):
+    if validation:
+        script_dir = prompt_validation_script_dir
+    else:
+        script_dir = prompt_script_dir
+    script_path = Path(basf2.find_file(script_dir))
     return script_path.glob("*.py")
 
 
-def get_script_settings(name):
+def get_script_settings(name, validation=False):
     import importlib
-    cal_module = importlib.import_module(prompt_script_package + Path(name).stem)
+    if validation:
+        script_package = prompt_validation_script_package
+    else:
+        script_package = prompt_script_package
+    cal_module = importlib.import_module(script_package + Path(name).stem)
     return cal_module.settings
 
 
@@ -33,12 +42,16 @@ def get_argparser():
     """Setup the argparser for this command line tool"""
     import argparse
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                                     description="Prints details about the available prompt calibration scripts."
+                                     description="Prints details about the available prompt calibration (default) or validation scripts."
                                     )
     parser.add_argument("--script-name", dest="script_name", metavar="",
                         help="The prompt script to print details about. If this is not given, a list of available scripts "
                              "will instead be printed."
                        )
+    parser.add_argument("--validation", dest="validation", action="store_true",
+                        help="Shows the validation scripts instead of the calibration scripts"
+                       )
+    parser.set_defaults(validation=False)
     parser.add_argument("--json", dest="json", action="store_true",
                         help="Script details will be printed as a JSON string instead of nice stdout. "
                              "Used for automatic collection of calibration script details."
@@ -52,7 +65,7 @@ def main():
     parser = get_argparser()
     args = parser.parse_args()
     if not args.script_name:
-        all_script_paths = [p.name for p in get_all_script_paths()]
+        all_script_paths = [p.name for p in get_all_script_paths(validation=args.validation)]
         if args.json:
             print(json.dumps(all_script_paths))
         else:
@@ -60,7 +73,7 @@ def main():
             for script_path in all_script_paths:
                 print(script_path)
     else:
-        settings = get_script_settings(args.script_name)
+        settings = get_script_settings(args.script_name,validation=args.validation)
         if args.json:
             print(settings.json_dumps())
         else:

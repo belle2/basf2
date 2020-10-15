@@ -17,12 +17,9 @@
 #include "daq/roisend/config.h"
 #include "daq/roisend/h2m.h"
 
-#include "daq/rfarm/manager/RFFlowStat.h"
 #include <boost/spirit/home/support/detail/endian.hpp>
 
 using namespace std;
-
-#define HRP_MALLOC_BUFFER_SIZE (ROI_MAX_PACKET_SIZE * 64) /* byte */
 
 
 #define LOG_FPRINTF (fprintf)
@@ -358,9 +355,6 @@ main(int argc, char* argv[])
   //  unsigned short accept_port[MM_MAX_HLTOUT];
   unsigned short accept_port;
 
-  char shmname[1024];
-  int shmid;
-
   LOG_FPRINTF(stderr, "[INFO] merger_merge: Process invoked [ver(%s %s)]\n", __DATE__, __TIME__);
 
   if (argc < 4) {
@@ -371,11 +365,11 @@ main(int argc, char* argv[])
   /* argv copy */
   char* p;
 
-  p = argv[1];
-  strcpy(shmname, p);
-
-  p = argv[2];
-  shmid = atoi(p);
+//   p = argv[1];
+//   strcpy(shmname, p);
+//
+//   p = argv[2];
+//   shmid = atoi(p);
 
   p = argv[3];
   strcpy(onsen_host, p);
@@ -385,9 +379,6 @@ main(int argc, char* argv[])
 
   p = argv[5];
   accept_port = atoi(p);
-
-  /* Flow monitor */
-  Belle2::RFFlowStat* flstat = new Belle2::RFFlowStat(shmname, shmid, NULL);
 
   signal(SIGPIPE, catch_pipe_function);
   signal(SIGTERM, catch_term_function);
@@ -638,8 +629,6 @@ main(int argc, char* argv[])
             print_stat();
             exit(1);
           }
-
-          flstat->log(n_bytes_to_onsen);
 
           mycount[0]++;
           if (0 /*event_count < 5 || event_count % 10000 == 0*/) {

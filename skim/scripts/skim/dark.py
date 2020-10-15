@@ -41,45 +41,47 @@ class SinglePhotonDark(BaseSkim):
 
     def build_lists(self, path):
 
-        # no good tracks in the event
-        cleaned = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
+        # start with all photons with E* above 500 MeV in the tracking acceptance
+        in_tracking_acceptance = "0.296706 < theta < 2.61799"  # rad = [17, 150] degrees
+        ma.cutAndCopyList(
+            "gamma:singlePhoton", "gamma:all",
+            f"useCMSFrame(E) > 0.5 and {in_tracking_acceptance}", path=path)
 
-        # only one photon above 300 MeV
-        # (there may be another photon lower energy -- veto these later)
-        angle = "0.296706 < theta < 2.61799"  # rad, (17 -- 150 deg)
-        ma.cutAndCopyList("gamma:300", "gamma:all", "E > 0.3 and " + angle, path=path)
-
-        path = self.skim_event_cuts(
-            f"0 < nParticlesInList(gamma:300) < 2 and nCleanedTracks({cleaned}) < 1",
-            path=path
-        )
-
-        # check the second-most-energetic photon above 100 MeV and veto if it's
-        # in time with our signal candidate -- do this after the event cuts
-        # since it uses the ParticleCombiner and should not be done for all
-        # events (it also makes the logic cleaner and more readable)
-        intime = "maxWeightedDistanceFromAverageECLTime < 1"
-        ma.cutAndCopyList("gamma:100_to_300", "gamma:all",
-                          "E > 0.1 and E < 0.3 and " + angle, path=path)
-        ma.rankByHighest("gamma:100_to_300", "E", numBest=1, path=path)
-        ma.reconstructDecay(
-            "vpho:intime -> gamma:300 gamma:100_to_300", intime, path=path)
-        veto_additional_in_time_cluster = 'nParticlesInList(vpho:intime) < 1'
-        # FIXME: perhaps we can remove the angle requirement on the second cluster
-
-        # require a region-dependent minimum energy of the candidate
-        region_dependent = " [clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
+        # require a region-dependent minimum energy of the candidate, we have
+        # a new 0.5 GeV trigger in the inner barrel: [44.2, 94.8] degrees @ L1
+        region_dependent = " [clusterTheta < 1.65457213 and clusterTheta > 0.77143553] or "
+        region_dependent += "[clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
         region_dependent += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
         region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
         region_dependent += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
-        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0] or "  # between bwd and barrel
-        # we have a new 0.5 GeV trigger in the inner barrel: [44.2, 94.8] degrees @ L1
-        region_dependent += "[clusterTheta < 1.65457213 and clusterTheta > 0.77143553 and useCMSFrame(E) > 0.5]"
+        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0]"      # between bwd and barrel
+        ma.applyCuts("gamma:singlePhoton", region_dependent, path=path)
 
-        # final signal selection is the region-dependent part and passing the
-        # 'in-time' veto on the second-most-energetic cluster
-        signal_selection = f"[{region_dependent}] and [{veto_additional_in_time_cluster}]"
-        ma.cutAndCopyList("gamma:singlePhoton", "gamma:300", signal_selection, path=path)
+        # require only one single photon candidate and no good tracks in the event
+        good_tracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
+        path = self.skim_event_cuts(
+            f"nParticlesInList(gamma:singlePhoton) < 2 and nCleanedTracks({good_tracks}) < 1",
+            path=path
+        )
+
+        # check the second-most-energetic photon (above 550 MeV is unlikely to
+        # be beam-induced background) and veto if it's in time with our signal
+        # candidate -- do after the event cuts since it uses a ParticleCombiner
+        # and should not be done for all events (save event-processing time)
+        not_in_signal_list = "isInList(gamma:singlePhoton) < 1"
+        in_time = "maxWeightedDistanceFromAverageECLTime < 1"
+        ma.cutAndCopyList("gamma:to_veto", "gamma:all",
+                          f"E > 0.55 and {not_in_signal_list}", path=path)
+        ma.rankByHighest("gamma:to_veto", "E", numBest=1, path=path)
+        ma.reconstructDecay("vpho:veto -> gamma:singlePhoton gamma:to_veto",
+                            in_time, path=path)
+        veto_additional_in_time_cluster = 'nParticlesInList(vpho:veto) < 1'
+
+        # final signal selection must pass the 'in-time' veto on the
+        # second-most-energetic cluster -- this is also an event cut, but apply
+        # to the list (which is anyway a maximum one candidate per event) since
+        # we can only call skim_event_cuts once
+        ma.applyCuts("gamma:singlePhoton", veto_additional_in_time_cluster, path=path)
         self.SkimLists = ["gamma:singlePhoton"]
 
 

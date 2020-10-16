@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from basf2 import *
+import basf2
 
 from ROOT import Belle2
 
@@ -67,9 +67,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
 
     # Do not even attempt at reconstructing events w/ abnormally large occupancy.
     if abort_path is None:
-        abort_path = create_path()
+        abort_path = basf2.create_path()
     doom = path.add_module('EventsOfDoomBuster')
-    doom.if_true(abort_path, AfterConditionPath.END)
+    doom.if_true(abort_path, basf2.AfterConditionPath.END)
     abort_path.add_module('EventErrorFlag',
                           errorFlag=Belle2.EventMetaData.c_ReconstructionAbort)
 
@@ -518,9 +518,9 @@ def add_arich_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ARICH' in components:
-        arich_fillHits = register_module('ARICHFillHits')
+        arich_fillHits = basf2.register_module('ARICHFillHits')
         path.add_module(arich_fillHits)
-        arich_rec = register_module('ARICHReconstructor')
+        arich_rec = basf2.register_module('ARICHReconstructor')
         # enabled for ARICH DQM plots
         arich_rec.param('storePhotons', 1)
         path.add_module(arich_rec)
@@ -536,15 +536,15 @@ def add_top_modules(path, components=None, cosmics=False):
     """
     # TOP reconstruction
     if components is None or 'TOP' in components:
-        top_cm = register_module('TOPChannelMasker')
+        top_cm = basf2.register_module('TOPChannelMasker')
         path.add_module(top_cm)
         if cosmics:
-            top_finder = register_module('TOPCosmicT0Finder')
+            top_finder = basf2.register_module('TOPCosmicT0Finder')
             path.add_module(top_finder)
         else:
-            top_finder = register_module('TOPBunchFinder')
+            top_finder = basf2.register_module('TOPBunchFinder')
             path.add_module(top_finder)
-        top_rec = register_module('TOPReconstructor')
+        top_rec = basf2.register_module('TOPReconstructor')
         path.add_module(top_rec)
 
 
@@ -557,9 +557,9 @@ def add_cluster_expert_modules(path, components=None):
     """
     # KLMExpert (needed for KlId) ClusterMatcher (needed for Cluster)
     if components is None or ('KLM' in components and 'ECL' in components):
-        klm_expert = register_module('KLMExpert')
+        klm_expert = basf2.register_module('KLMExpert')
         path.add_module(klm_expert)
-        cluster_matcher = register_module('ClusterMatcher')
+        cluster_matcher = basf2.register_module('ClusterMatcher')
         path.add_module(cluster_matcher)
 
 
@@ -572,7 +572,7 @@ def add_pid_module(path, components=None):
     """
     # charged particle PID
     if components is None or 'SVD' in components or 'CDC' in components:
-        mdstPID = register_module('MdstPID')
+        mdstPID = basf2.register_module('MdstPID')
         path.add_module(mdstPID)
 
 
@@ -584,9 +584,9 @@ def add_klm_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'KLM' in components:
-        klm_rec = register_module('KLMReconstructor')
+        klm_rec = basf2.register_module('KLMReconstructor')
         path.add_module(klm_rec)
-        klm_clusters_rec = register_module('KLMClustersReconstructor')
+        klm_clusters_rec = basf2.register_module('KLMClustersReconstructor')
         path.add_module(klm_clusters_rec)
 
 
@@ -599,7 +599,7 @@ def add_klm_mc_matcher_module(path, components=None):
     """
     # MC matching
     if components is None or 'KLM' in components:
-        klm_mc = register_module('MCMatcherKLMClusters')
+        klm_mc = basf2.register_module('MCMatcherKLMClusters')
         path.add_module(klm_mc)
 
 
@@ -613,7 +613,7 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     """
     # Muid is needed for muonID computation and ECLCluster-Track matching.
     if components is None or ('CDC' in components and 'ECL' in components and 'KLM' in components):
-        muid = register_module('Muid', addHitsToRecoTrack=add_hits_to_reco_track)
+        muid = basf2.register_module('Muid', addHitsToRecoTrack=add_hits_to_reco_track)
         path.add_module(muid)
     if components is not None and 'CDC' in components:
         if ('ECL' not in components and 'KLM' in components):
@@ -637,50 +637,50 @@ def add_ecl_modules(path, components=None):
     if components is None or 'ECL' in components:
 
         # ECL offline waveform fitting
-        ecl_waveform_fit = register_module('ECLWaveformFit')
+        ecl_waveform_fit = basf2.register_module('ECLWaveformFit')
         path.add_module(ecl_waveform_fit)
 
         # ECL digit calibration
-        ecl_digit_calibration = register_module('ECLDigitCalibrator')
+        ecl_digit_calibration = basf2.register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
         # ECL T0 extraction
         path.add_module('ECLEventT0')
 
         # ECL connected region finder
-        ecl_crfinder = register_module('ECLCRFinder')
+        ecl_crfinder = basf2.register_module('ECLCRFinder')
         path.add_module(ecl_crfinder)
 
         # ECL local maximum finder
-        ecl_lmfinder = register_module('ECLLocalMaximumFinder')
+        ecl_lmfinder = basf2.register_module('ECLLocalMaximumFinder')
         path.add_module(ecl_lmfinder)
 
         # ECL splitter N1
-        ecl_splitterN1 = register_module('ECLSplitterN1')
+        ecl_splitterN1 = basf2.register_module('ECLSplitterN1')
         path.add_module(ecl_splitterN1)
 
         # ECL splitter N2
-        ecl_splitterN2 = register_module('ECLSplitterN2')
+        ecl_splitterN2 = basf2.register_module('ECLSplitterN2')
         path.add_module(ecl_splitterN2)
 
         # ECL Shower Correction
-        ecl_showercorrection = register_module('ECLShowerCorrector')
+        ecl_showercorrection = basf2.register_module('ECLShowerCorrector')
         path.add_module(ecl_showercorrection)
 
         # ECL Shower Calibration
-        ecl_showercalibration = register_module('ECLShowerCalibrator')
+        ecl_showercalibration = basf2.register_module('ECLShowerCalibrator')
         path.add_module(ecl_showercalibration)
 
         # ECL Shower Shape
-        ecl_showershape = register_module('ECLShowerShape')
+        ecl_showershape = basf2.register_module('ECLShowerShape')
         path.add_module(ecl_showershape)
 
         # ECL Pulse Shape Discrimination
-        ecl_clusterPSD = register_module('ECLClusterPSD')
+        ecl_clusterPSD = basf2.register_module('ECLClusterPSD')
         path.add_module(ecl_clusterPSD)
 
         # ECL covariance matrix
-        ecl_covariance = register_module('ECLCovarianceMatrix')
+        ecl_covariance = basf2.register_module('ECLCovarianceMatrix')
         path.add_module(ecl_covariance)
 
         # ECL finalize -> must run after eventT0Combiner
@@ -696,7 +696,7 @@ def add_ecl_finalizer_module(path, components=None):
 
     if components is None or 'ECL' in components:
         # ECL finalize
-        ecl_finalize = register_module('ECLFinalizer')
+        ecl_finalize = basf2.register_module('ECLFinalizer')
         path.add_module(ecl_finalize)
 
 
@@ -730,7 +730,7 @@ def add_ecl_track_brem_finder(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components)):
-        brem_finder = register_module('ECLTrackBremFinder')
+        brem_finder = basf2.register_module('ECLTrackBremFinder')
         path.add_module(brem_finder)
 
 
@@ -743,7 +743,7 @@ def add_ecl_chargedpid_module(path, components=None):
     """
     if components is None or 'ECL' in components:
         # charged PID
-        charged_id = register_module('ECLChargedPID')
+        charged_id = basf2.register_module('ECLChargedPID')
         path.add_module(charged_id)
 
 
@@ -756,7 +756,7 @@ def add_ecl_mc_matcher_module(path, components=None):
     """
     if components is None or 'ECL' in components:
         # MC matching
-        ecl_mc = register_module('MCMatcherECLClusters')
+        ecl_mc = basf2.register_module('MCMatcherECLClusters')
         path.add_module(ecl_mc)
 
 
@@ -768,7 +768,7 @@ def add_ext_module(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'CDC' in components:
-        ext = register_module('Ext')
+        ext = basf2.register_module('Ext')
         path.add_module(ext)
 
 
@@ -782,13 +782,13 @@ def add_dedx_modules(path, components=None):
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
-        CDCdEdxPID = register_module('CDCDedxPID')
+        CDCdEdxPID = basf2.register_module('CDCDedxPID')
         path.add_module(CDCdEdxPID)
 
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:
-        VXDdEdxPID = register_module('VXDDedxPID')
+        VXDdEdxPID = basf2.register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
 
 

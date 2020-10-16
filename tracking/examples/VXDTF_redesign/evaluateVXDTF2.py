@@ -16,6 +16,7 @@
 
 
 from basf2 import *
+import sys
 import argparse
 # Import custom module chain for VXDTF2
 from setup_modules import setup_VXDTF2
@@ -44,7 +45,7 @@ setup_name = 'SVDOnlyDefault'
 if usePXD:
     setup_name = 'SVDPXDDefault'
 
-performFit = True
+performFit = False
 
 # Logging and Debug Levels
 set_log_level(LogLevel.ERROR)
@@ -62,12 +63,18 @@ path.add_module(rootInput)
 eventinfoprinter = register_module('EventInfoPrinter')
 path.add_module(eventinfoprinter)
 
-# puts gearbox and geometry into the path
-setup_Geometry(path)
+# Gearbox
+gearbox = register_module('Gearbox')
+path.add_module(gearbox)
 
-# Event counter
-eventCounter = register_module('EventCounter')
-path.add_module(eventCounter)
+# puts gearbox and geometry into the path
+# Geometry
+geometry = register_module('Geometry')
+geometry.param('components', ['BeamPipe',
+                              'MagneticFieldConstant4LimitedRSVD',
+                              'PXD',
+                              'SVD'])
+path.add_module(geometry)
 
 # VXDTF2: Including actual VXDTF2 Modul Chain
 setup_VXDTF2(path=path,
@@ -104,5 +111,6 @@ trackingValidationModule = CombinedTrackingValidationModule(
     expert_level=2)
 path.add_module(trackingValidationModule)
 
+path.add_module('Progress')
 process(path)
 print(statistics)

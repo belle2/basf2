@@ -3,10 +3,6 @@
 
 """
 Script to get the integrated luminosity of a set of runs
-
-Usage:
-    b2info-luminosity --exp <E> --runs <Range> --what [online|offline] --plot [DAY|WEEK|RUN] [--verbose]
-
 """
 
 __author__ = "Stefano Lacaprara, Alberto Martini"
@@ -166,6 +162,7 @@ class Luminosity:
         self.session = requests.Session()
         if self.Token is None:
             # If no specific username use the local system username or provide one to authenticate
+            b2.B2INFO(f"Please provide your DESY credentials to access the rundb.")
             if self.Username is None:
                 localUsername = getpass.getuser()
                 self.Username=input(f"DESY username (return for {localUsername}) : ") or localUsername
@@ -227,9 +224,9 @@ class Luminosity:
         # Get the DB as a pandas.Dataframe.
         print(cmdexp, self.conn, self.exp)
         df = pd.read_sql(cmdexp, self.conn, params=self.exp)
-        print(f"Read {len(df)} runs for experiment {self.expstr}")
+        b2.B2INFO(f"Read {len(df)} runs for experiment {self.expstr}")
         df = df.sort_values(by=['date'])
-        print(f"Read {len(df)} runs for experiment {self.expstr}")
+        b2.B2INFO(f"Read {len(df)} runs for experiment {self.expstr}")
 
         # lumi in /fb
         df['lumi'] *= 1E-6
@@ -256,7 +253,7 @@ class Luminosity:
 
         # lumi in /fb
         df['lumi'] *= 1E-6
-        print(f"Read {len(df)} runs for experiment {exp}")
+        b2.B2INFO(f"Read {len(df)} runs for experiment {exp}")
 
         return df
 
@@ -300,10 +297,9 @@ class Luminosity:
         df=pd.DataFrame(columns=columns)
         rows=[]
 
-        print(f"Reading exp {exp} from RunRegistry")
+        b2.B2INFO(f"Reading exp {exp} from rundb (this can take a while depending on the size of the query)")
         
         for run in self.get_run_info(min_experiment={exp[0]}, max_experiment={exp[-1]}, run_type="physics", expand=True):
-            print(run)
             if not run['time_stop']:
                 run['time_stop']=run['time_start']
             row={"exp":run['experiment'],
@@ -319,7 +315,7 @@ class Luminosity:
 
             rows.append(row)
         df = pd.DataFrame(rows,columns=columns)
-        print(f"Read {len(df)} runs from exp {exp}")
+        b2.B2INFO(f"Read {len(df)} runs from exp {exp}")
 
         # lumi in /fb
         df['lumi'] *= 1E-6
@@ -340,7 +336,7 @@ class Luminosity:
                 newlumi=df.at[index,'intLumiDel']+intLumiDelRun1200
                 #print(newlumi)
                 df.at[index,'intLumiDel']=newlumi
-                print(f'Fixed runs {run} delivered lumi to {newlumi:0.3f} /pb')
+                b2.B2INFO(f'Fixed runs {run} delivered lumi to {newlumi:0.3f} /pb')
         
             print('FIXING DELIVERED LUMI FOR RUNS 1188,1189,2596')
             df = df.reset_index(drop=True)
@@ -527,7 +523,7 @@ class Luminosity:
         filename=f"Lumi{self.what.title()}_{label}_Exp{self.expstr}"
         if self.runs:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
-        print(f"Creating {filename}.pdf|png files")
+        b2.B2INFO(f"Creating {filename}.pdf|png files")
         for fileformat in ['pdf','png']:
             plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight", dpi=150)
 
@@ -572,18 +568,6 @@ class Luminosity:
             plt.text(1, -0.25, f"Plot on {datetime.now().strftime('%Y/%m/%d %H:%M %Z')} JST", transform=ax1.transAxes, fontsize=6, ha="right")
 
             df=df[df['lumiEff'].between(0,1)]
-            # print(df[['date','intLumi','intLumiDel','lumiEff']]
-            #         .to_string(index=False,
-            #             col_space=3,
-            #             header=['date','int Lumi','int Lumi Delivered','lumiEff'],
-            #             formatters={
-            #             "data" : "".format,
-            #             "intLumi" : "{:,.3f}".format,
-            #             "intLumiDel" : "{:,.3f}".format,
-            #             "lumiEff" : "{:,.2f}".format,
-            #             }
-            #             )
-            #      )
 
             ax1.plot_date(df['date'],
                           df['lumiEff']*100, 
@@ -601,7 +585,7 @@ class Luminosity:
             filename=f"LumiEff{self.what.title()}_{label}_Exp{self.expstr}"
             if self.runs:
                 filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
-            print(f"Creating {filename}.pdf|png files")
+            b2.B2INFO(f"Creating {filename}.pdf|png files")
             for fileformat in ['pdf','png']:
                 plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight", dpi=150)
 
@@ -675,7 +659,7 @@ class Luminosity:
         filename=f"Lumi{self.what.title()}PerRun_Exp{self.expstr}"
         if self.runs:
             filename+=f"_RunRange{min(self.runs)}-{max(self.runs)}"
-        print(f"Creating {filename}.pdf|png files")
+        b2.B2INFO(f"Creating {filename}.pdf|png files")
         for fileformat in ['pdf','png']:
             plt.savefig(f"{filename}.{fileformat}", bbox_inches="tight")
 
@@ -710,10 +694,13 @@ class Luminosity:
                                 ))
             print('-' * 61)
         L=dfRuns['lumi'].sum()
-        print(f"RECORDED  {self.what}   : L = {L*1E6:8.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
+        b2.B2INFO(f"RECORDED  {self.what}   : L = {L*1E6:8.2f} /nb = {L*1E3:8.2f} /pb = {L:8.3f} /fb = {L/1E3:8.4f} /ab")
         Ld=dfRuns['lumiDel'].sum()
-        print(f"DELIVERED {self.what}   : L = {Ld*1E6:8.2f} /nb = {Ld*1E3:8.2f} /pb = {Ld:8.3f} /fb = {Ld/1E3:8.4f} /ab")
+        b2.B2INFO(f"DELIVERED {self.what}   : L = {Ld*1E6:8.2f} /nb = {Ld*1E3:8.2f} /pb = {Ld:8.3f} /fb = {Ld/1E3:8.4f} /ab")
         
+        #store luminosity values for each run in a .csv file
+        dfRuns.to_csv("dfruns.csv")
+
         pass
 
 

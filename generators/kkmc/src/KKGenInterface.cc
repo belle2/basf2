@@ -8,27 +8,26 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-
-#include <framework/logging/Logger.h>
+/* Own header. */
 #include <generators/kkmc/KKGenInterface.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-#include <framework/particledb/EvtGenDatabasePDG.h>
-#include <THashList.h>
 
+/* Belle 2 headers. */
+#include <framework/gearbox/Const.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
+
+/* ROOT headers. */
+#include <THashList.h>
+#include <TLorentzVector.h>
+
+/* C++ headers. */
 #include <cmath>
 #include <string>
 #include <utility>
 
-#include <TLorentzVector.h>
-
-using namespace std;
 using namespace Belle2;
-
-KKGenInterface::KKGenInterface()
-{
-}
 
 int KKGenInterface::setup(const std::string& KKdefaultFileName, const std::string& tauinputFileName,
                           const std::string& taudecaytableFileName, const std::string& KKMCOutputFileName)
@@ -176,7 +175,7 @@ int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
     return hepevt_.nhep;
   }
 
-  vector <MCParticleGraph::GraphParticle*> MCPList;
+  std::vector <MCParticleGraph::GraphParticle*> MCPList;
 
   //Fill top particle in the tree & starting the queue:
   for (int i = 1; i <= hepevt_.nhep; ++i) {
@@ -202,7 +201,8 @@ int KKGenInterface::addParticles2Graph(MCParticleGraph& graph, TVector3 vertex)
 
 void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphParticle* gParticle, TVector3 vertex)
 {
-  if (index < 1 || index > hepevt_.nhep) return;
+  if (index < 1 || index > hepevt_.nhep)
+    return;
   //updating the GraphParticle information from /hepevt/ common block information
 
   // convert PYTHIA ID to PDG ID
@@ -259,38 +259,7 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   gParticle->setProductionVertex(pProductionVertex);
   gParticle->setProductionTime(hepevt_.vhep[index - 1][3]*Unit::mm / Const::speedOfLight);
   gParticle->setValidVertex(true);
-
-
-  return;
 }
-
-// bool KKGenInterface::getPythiaCharge(int kf, double& c)
-// {
-//   // Get charge of asked particle from PYTHIA /PYDAT2/ common block
-//   int kc = pycomp_(kf);
-//   bool ret = (kc > 0 && kc < 500);
-//   if (ret) {
-//     c = (double)pydat2_.KCHG[0][kc - 1] / 3.;
-//     if (c > 0 && kf < 0) c = -c;
-//   }
-//   return ret;
-// }
-// int KKGenInterface::getPythiaSpinType(int kf)
-// {
-//   // Calc. spin of asked particle from PYTHIA ID
-//   int akf = abs(kf);
-//   int ret = -1;
-//   if (akf > 0 && akf < 20) {
-//     ret = 1;
-//   } else if ((akf > 20 && akf < 25) || (akf > 31 && akf < 35)) {
-//     ret = 2;
-//   } else if (akf == 25 || (akf >= 35 && akf <= 37)) {
-//     ret = 0;
-//   } else if (akf > 100) {
-//     ret = akf % 10 - 1;
-//   }
-//   return ret;
-// }
 
 void KKGenInterface::term()
 {

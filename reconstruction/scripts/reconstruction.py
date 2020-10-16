@@ -12,6 +12,8 @@ from pxd import add_pxd_reconstruction
 
 from rawdata import add_unpackers
 
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
+
 from tracking import (
     add_mc_tracking_reconstruction,
     add_tracking_reconstruction,
@@ -470,16 +472,7 @@ def add_cdst_output(
     ]
 
     if rawFormat:
-        branches = [
-            'EventMetaData',
-            'RawPXDs',
-            'RawSVDs',
-            'RawCDCs',
-            'RawECLs',
-            'RawARICHs',
-            'RawKLMs',
-            'RawTOPs',
-            'RawTRGs',
+        branches = ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS + [
             'RecoTracks',
             'Tracks',
             'V0s',
@@ -500,7 +493,7 @@ def add_cdst_output(
             ]
 
         if "PXDClustersFromTracks" not in [module.name() for module in path.modules()]:
-            B2ERROR("PXDClusterFsromTracks is required in CDST output but its module is not found!")
+            B2ERROR("PXDClustersFromTracks is required in CDST output but its module is not found!")
 
     if dataDescription is None:
         dataDescription = {}

@@ -60,7 +60,7 @@ class SinglePhotonDark(BaseSkim):
         # require only one single photon candidate and no good tracks in the event
         good_tracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
         path = self.skim_event_cuts(
-            f"nParticlesInList(gamma:singlePhoton) < 2 and nCleanedTracks({good_tracks}) < 1",
+            f"nParticlesInList(gamma:singlePhoton) == 1 and nCleanedTracks({good_tracks}) == 0",
             path=path
         )
 

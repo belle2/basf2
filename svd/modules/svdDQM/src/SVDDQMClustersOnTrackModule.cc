@@ -313,6 +313,8 @@ void SVDDQMClustersOnTrackModule::event()
   BOOST_FOREACH(Track & track, m_storeTracks) {
 
     const TrackFitResult* tfr = track.getTrackFitResult(Const::pion);
+    if (!tfr) //in case of cosmic tracking, fitting is done with the muon mass hypothesis
+      tfr = track.getTrackFitResult(Const::muon);
     if (!tfr) continue;
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);

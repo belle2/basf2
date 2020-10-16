@@ -133,7 +133,7 @@ namespace Belle2 {
       float amplitude = 0;
       int maxbin = 0;
       APVFloatSamples samples =  this->getSamples();
-      for (int k = 0; k < 6; k ++) {
+      for (int k = 0; k < c_nAPVSamples; k++) {
         if (samples[k] > amplitude) {
           amplitude = samples[k];
           maxbin = k;
@@ -150,7 +150,7 @@ namespace Belle2 {
     {
       float amplitude = 0;
       APVFloatSamples samples =  this->getSamples();
-      for (int k = 0; k < 6; k ++) {
+      for (int k = 0; k < c_nAPVSamples; k++) {
         if (samples[k] > amplitude)
           amplitude = samples[k];
       }
@@ -251,7 +251,7 @@ namespace Belle2 {
     {
       int nOKSamples = 0;
       Belle2::SVDShaperDigit::APVFloatSamples samples_vec = this->getSamples();
-      for (int k = 0; k < 6; k ++)
+      for (int k = 0; k < c_nAPVSamples; k++)
         if (samples_vec[k] >= cutMinSignal)
           nOKSamples++;
 

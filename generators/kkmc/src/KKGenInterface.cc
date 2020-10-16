@@ -17,6 +17,7 @@
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <THashList.h>
 
+#include <cmath>
 #include <string>
 #include <utility>
 
@@ -225,8 +226,8 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
     gParticle->addStatus(MCParticle::c_Initial);
   }
 
-  // Z or W should be virtual
-  if (hepevt_.idhep[index - 1] == 23 || hepevt_.idhep[index - 1] == 24) {
+  // Z0 or W+/W- must be flagged as virtual
+  if (hepevt_.idhep[index - 1] == 23 || std::abs(hepevt_.idhep[index - 1]) == 24) {
     gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsVirtual);
   } else if (hepevt_.isthep[index - 1] == 1) {
     gParticle->addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);

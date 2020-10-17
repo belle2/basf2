@@ -95,7 +95,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         enableRecTrg (bool): Enables to convert RecTrg_summary3 table.
         enableEvtcls (bool): Enables to convert Evtcls and Evtcls_hadronic tables.
         Smear_trk (float): Smear the MC tracks to match real data. Does not work on real data.
-            Could be set to 0, 1 or 2.
+            Default value is 0 which does no smearing. The recommended value is 2 if you want track smearing.
+            Details can be found https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library

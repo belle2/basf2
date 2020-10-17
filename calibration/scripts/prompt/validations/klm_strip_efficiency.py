@@ -28,7 +28,6 @@ def run_validation(job_path, input_data_path, requested_iov, **kwargs):
     # input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
 
     import os
-
     import basf2
     import ROOT
     from ROOT.Belle2 import KLMCalibrationChecker

@@ -9,8 +9,9 @@ import re
 
 import yaml
 
+import udst
 import basf2 as b2
-from modularAnalysis import removeParticlesNotInLists, skimOutputUdst, summaryOfLists
+from modularAnalysis import removeParticlesNotInLists, summaryOfLists
 from skim.registry import Registry
 
 
@@ -97,7 +98,7 @@ def add_skim(label, lists, path):
 
     """
     skimCode = Registry.encode_skim_name(label)
-    skimOutputUdst(skimCode, lists, path=path)
+    udst.add_skimmed_udst_output(path, skimCode, lists)
     summaryOfLists(lists, path=path)
 
 
@@ -601,7 +602,7 @@ class BaseSkim(ABC):
                 f"No skim list names defined in self.SkimLists for {self} skim!"
             )
 
-        skimOutputUdst(
+        udst.add_skimmed_udst_output(
             skimDecayMode=self.code,
             skimParticleLists=self.SkimLists,
             outputFile=self.OutputFileName,

@@ -20,7 +20,7 @@ import basf2
 from basf2 import B2ERROR, B2INFO, B2WARNING
 import json
 import importlib
-from pathlib import Path
+from pathlib import Path, PurePath
 from collections import OrderedDict
 import shutil
 
@@ -55,7 +55,7 @@ def get_files(args):
         path_to_files = [] 
         for path in Path(job_path).rglob(file):
             path_to_files.append(path)
-        download_paths[file] = path_to_files 
+        download_paths[file] = path_to_files
     
     current_directory = Path().absolute()
     download_files_path = Path(current_directory, 'download_files')
@@ -66,7 +66,6 @@ def get_files(args):
         B2INFO(f"Removing '{download_files_path.as_posix()}'...")
         shutil.rmtree(download_files_path)
         download_files_path.mkdir(parents=True)
-
     B2INFO(f"Will now copy the requested files from the CAF output to '{download_files_path.as_posix()}'")
     for file_name, file_paths in download_paths.items():
         if len(file_paths) == 1:
@@ -74,10 +73,13 @@ def get_files(args):
             shutil.copyfile(file_paths, download_files_path)
         else:
             for file_path in file_paths:
-                B2INFO(f"Multiple copies of {file_name} files exist, will retrieve files with directory tree included")
-                new_download_file_path = Path(download_files_path, file_path)
-                new_download_file_path.mkdir(parents=True)
-                shutil.copyfile(file_path, new_download_file_path)
+               	B2INFO(f"Multiple copies of {file_name} files exist, will retrieve files with directory tree included")
+                file_path_str = str(file_path)
+                file_suffix = file_path_str[file_path_str.find('calibration_results'):]
+                dl_file_path = Path(file_suffix).relative_to('calibration_results')
+                new_download_file_path = download_files_path.joinpath(dl_file_path).parent 
+                new_download_file_path.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(file_path, Path(new_download_file_path, file_name))
 
 
 def run_validation(args):

@@ -844,6 +844,7 @@ const ECLCluster* Particle::getECLCluster() const
 double Particle::getECLClusterEnergy() const
 {
   const ECLCluster* cluster = this->getECLCluster();
+  if (!cluster) return 0;
   return cluster->getEnergy(this->getECLClusterEHypothesisBit());
 }
 

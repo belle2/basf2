@@ -214,6 +214,15 @@ def add_kkmc_generator(path, finalstate='', useTauolaBelle=False, signalconfigfi
     kkmc_tauconfigfile = ''
 
     if finalstate == 'tau+tau-':
+        B2WARNING("add_kkmc_generator: please set finalstate as 'tau-tau+'. 'tau+tau-' will be deprecated in the future"
+                  " for consistency in the configuration files.")
+        finalstate = 'tau-tau+'
+    if finalstate == 'mu+mu-':
+        B2WARNING("add_kkmc_generator: please set finalstate as 'mu-mu+'. 'mu+mu-' will be deprecated in the future for"
+                  " consistency in the configuration files.")
+        finalstate = 'mu-mu+'
+
+    if finalstate == 'tau-tau+':
         if useTauolaBelle:
             B2INFO("Generating tau pair events with TauolaBelle")
             #: If TauolaBelle, the tau decay must be controlled by Pythia flags
@@ -227,7 +236,7 @@ def add_kkmc_generator(path, finalstate='', useTauolaBelle=False, signalconfigfi
             else:
                 kkmc_inputfile = signalconfigfile
 
-    elif finalstate == 'mu+mu-':
+    elif finalstate == 'mu-mu+':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')
         kkmc_logfile = 'kkmc_mumu.txt'
 

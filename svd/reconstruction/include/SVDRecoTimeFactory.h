@@ -28,6 +28,10 @@ namespace Belle2 {
 
     public:
 
+      /**
+       * static function that returns the
+       * class to compute the cluster time
+       */
       static SVDClusterTime* NewTime(const std::string& description)
       {
         if (description == "CoG6")

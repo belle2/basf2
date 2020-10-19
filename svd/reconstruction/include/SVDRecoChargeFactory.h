@@ -28,6 +28,10 @@ namespace Belle2 {
 
     public:
 
+      /**
+       * static function that returns the
+       * class to compute the cluster charge
+       */
       static SVDClusterCharge* NewCharge(const std::string& description)
       {
         if (description == "MaxSample")

@@ -27,6 +27,10 @@ namespace Belle2 {
 
     public:
 
+      /**
+       * static function that returns the
+       * class to compute the cluster position
+       */
       static SVDClusterPosition* NewPosition(const std::string& description)
       {
         if (description == "CoGOnly")

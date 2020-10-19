@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from basf2 import *
+
 from simulation import add_simulation
 from basf2 import conditions as b2conditions
 from svd import *
@@ -157,8 +157,8 @@ class SVDClustersQuickCheck(basf2.Module):
             self.positionPullNew.Fill((d.getPosition() - truePos)/d.getPositionSigma())
 
     def terminate(self):
-        #        f = TFile("quicktestSVDClusterOldDefault.root", "RECREATE")
-        f = TFile("quicktestSVDCluster1kCoGErrProp.root", "RECREATE")
+        f = TFile("quicktestSVDClusterOldDefault_PR.root", "RECREATE")
+        #        f = TFile("quicktestSVDCluster1kCoGErrProp.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
             hist.GetYaxis().SetTitle("sensor # + 0.5 is isU")
@@ -306,7 +306,7 @@ class SVDRecoDigitsQuickCheck(basf2.Module):
                                                                   d.getSensorID().getSensorNumber()+isU)
 
     def terminate(self):
-        f = TFile("quicktestSVDRecoDigit.root", "RECREATE")
+        f = TFile("quicktestSVDRecoDigitOldDefault_PR.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
             hist.GetYaxis().SetTitle("sensor # + 0.5 is isU")
@@ -330,7 +330,7 @@ class SVDRecoDigitsQuickCheck(basf2.Module):
 
 # b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 # b2conditions.prepend_globaltag("svd_NOCoGCorrections")
-# b2conditions.prepend_globaltag("svd_test_svdRecoConfiguration")
+b2conditions.prepend_globaltag("svd_test_svdRecoConfiguration")
 
 main = create_path()
 
@@ -367,7 +367,7 @@ main.add_module(clusterizer)
 
 recoDigitCreator = register_module('SVDRecoDigitCreator')
 recoDigitCreator.param('timeAlgorithm6Samples', "CoG6")
-recoDigitCreator.param('timeAlgorithm3Samples', "CoG3")
+recoDigitCreator.param('timeAlgorithm3Samples', "CoG6")
 recoDigitCreator.param('chargeAlgorithm6Samples', "MaxSample")
 recoDigitCreator.param('chargeAlgorithm3Samples', "MaxSample")
 recoDigitCreator.param('RecoDigits', "SVDNewRecoDigits")
@@ -403,8 +403,10 @@ main.add_module(clseval)
 svdperf = register_module('SVDPerformance')
 svdperf.param('outputFileName', "SVDPerformance" + str(tag))
 main.add_module(svdperf)
+
+main.add_module('RootOutput')
 '''
-# main.add_module('RootOutput')
+
 main.add_module('Progress')
 
 print_path(main)

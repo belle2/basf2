@@ -3,7 +3,7 @@ def list_to_vector(lst):
     Helper function to convert a python list into a std::vector of the same type.
     Is not a very general and good method, but works for the different use cases in
     the STM.
-    :param l: The list to convert
+    :param lst: The list to convert
     :return: A std::vector with the same content as the input list.
     """
     from ROOT import std

@@ -183,7 +183,9 @@ def outputUdst(filename, particleLists=None, includeArrays=None, path=None, data
 
     """
     import udst
-    udst.add_udst_output(path, filename, particleLists, includeArrays, dataDescription)
+    udst.add_udst_output(
+        path=path, filename=filename, particleLists=particleLists,
+        additionalBranches=includeArrays, dataDescription=dataDescription)
 
 
 def outputIndex(filename, path, includeArrays=None, keepParents=False, mc=True):

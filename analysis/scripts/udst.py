@@ -16,12 +16,12 @@ from b2test_utils.datastoreprinter import DataStorePrinter, PrintObjectsModule
 
 
 def add_udst_output(
-    path, filename, particleLists=None, includeArrays=None, dataDescription=None,
+    path, filename, particleLists=None, additionalBranches=None, dataDescription=None,
 ):
     """
     Save uDST (user-defined Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
-    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    Additional Store Arrays and Relations to be stored can be specified via additionalBranches
     list argument.
 
     See also: `mdst.add_mdst_output`
@@ -33,7 +33,7 @@ def add_udst_output(
     :param basf2.Path path: Path to add the output modules to.
     :param str filename: Name of the output file.
     :param list(str) particleLists: Names of the particle lists to write out.
-    :param list(str) includeArrays: datastore arrays/objects to write to the output
+    :param list(str) additionalBranches: datastore arrays/objects to write to the output
         file in addition to mdst and particle information
     :param dict dataDescription: Additional data descriptions to add to the output
         file. For example {"mcEventType":"mixed"}
@@ -41,8 +41,8 @@ def add_udst_output(
 
     if particleLists is None:
         particleLists = []
-    if includeArrays is None:
-        includeArrays = []
+    if additionalBranches is None:
+        additionalBranches = []
 
     # also add anti-particle lists
     plSet = set(particleLists)
@@ -59,7 +59,7 @@ def add_udst_output(
             "ParticleExtraInfoMap",
             "EventExtraInfo",
         ]
-        + includeArrays
+        + additionalBranches
         + list(plSet)
     )
 
@@ -84,7 +84,7 @@ def add_skimmed_udst_output(
     skimDecayMode,
     skimParticleLists=None,
     outputParticleLists=None,
-    includeArrays=None,
+    additionalBranches=None,
     outputFile=None,
     dataDescription=None,
 ):
@@ -92,7 +92,7 @@ def add_skimmed_udst_output(
     Create a new path for events that contain a non-empty particle list specified via skimParticleLists.
     Write the accepted events as a udst file, saving only particles from skimParticleLists
     and from outputParticleLists.
-    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    Additional Store Arrays and Relations to be stored can be specified via additionalBranches
     list argument.
 
     :param basf2.Path path: Path to add the skim output to.
@@ -103,7 +103,7 @@ def add_skimmed_udst_output(
         An event will be accepted if at least one of the particle lists is not empty
     :param list(str) outputParticleLists: Names of the particle lists to store in
         the output in addition to the ones in skimParticleLists
-    :param list(str) includeArrays: datastore arrays/objects to write to the output
+    :param list(str) additionalBranches: datastore arrays/objects to write to the output
         file in addition to mdst and particle information
     :param str outputFile: Name of the output file if different from the skim name
     :param dict dataDescription: Additional data descriptions to add to the output
@@ -114,8 +114,8 @@ def add_skimmed_udst_output(
         skimParticleLists = []
     if outputParticleLists is None:
         outputParticleLists = []
-    if includeArrays is None:
-        includeArrays = []
+    if additionalBranches is None:
+        additionalBranches = []
     # if no outputfile is specified, set it to the skim name
     if outputFile is None:
         outputFile = skimDecayMode
@@ -146,7 +146,7 @@ def add_skimmed_udst_output(
         skim_path,
         outputFile,
         saveParticleLists,
-        includeArrays,
+        additionalBranches,
         dataDescription=dataDescription,
     )
     filter_path.add_independent_path(skim_path, "skim_" + skimDecayMode)

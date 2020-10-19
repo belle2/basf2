@@ -186,7 +186,7 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate='', usePythiaFlags=False):
+def add_kkmc_generator(path, finalstate='', signaldecfile='', usePythiaFlags=False):
     """
     Add the default muon pair and tau pair generator KKMC
 
@@ -205,7 +205,7 @@ def add_kkmc_generator(path, finalstate='', usePythiaFlags=False):
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: tau config file (empty for tau+tau- and mu+mu-)
+    #: tau config file (empty for generic tau+tau- and mu+mu-)
     kkmc_tauconfigfile = ''
 
     if finalstate == 'tau+tau-':
@@ -213,6 +213,9 @@ def add_kkmc_generator(path, finalstate='', usePythiaFlags=False):
         if usePythiaFlags:
             kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
             kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+        #: Check if there is a signal decfile provided by the user
+        if not signaldecfile == '':
+            kkmc_tauconfigfile = signaldecfile
 
     elif finalstate == 'mu+mu-':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')

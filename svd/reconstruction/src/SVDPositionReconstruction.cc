@@ -115,12 +115,8 @@ namespace Belle2 {
 
         double chargeError = (stripPos - getCoGPosition()) / sumStripCharge * averageNoiseInElectrons;
 
-        positionError += TMath::Power(chargeError, 2);
-        /*
-        if(m_strips.size() == 2){
-        B2INFO("first = " << stripCharge << "/" << sumStripCharge << "*" << pitch << "/" << sqrt(12) << " = " << first);
-        B2INFO("second = " << "(" << stripPos << " - " << getCoGPosition() << ")/" << sumStripCharge << "*" << averageNoiseInElectrons <<  " = " << second);
-        }*/
+        positionError += chargeError * chargeError;
+
       }
 
       // phantom charge contribution:
@@ -132,10 +128,8 @@ namespace Belle2 {
       phChargeError /= sumStripCharge + S_plus1;
       phChargeError -= getCoGPosition();
 
-      //      B2INFO("phChargeError "<< phChargeError);
-      positionError = positionError * positionError + phChargeError * phChargeError;
-      //      if(m_strips.size() == 2)
-      //  B2INFO("NEW CoGError = "<<sqrt(positionError));
+      positionError += phChargeError * phChargeError;
+
       return sqrt(positionError);
 
     }

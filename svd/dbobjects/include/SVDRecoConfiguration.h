@@ -221,6 +221,3 @@ namespace Belle2 {
   };
 
 }
-
-/*  LocalWords:  TString
- */

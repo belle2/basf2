@@ -252,7 +252,7 @@ void SVDClusterizerModule::event()
     }
 
     //this strip has a sufficient S/N
-    stripInRawCluster aStrip;
+    StripInRawCluster aStrip;
     aStrip.shaperDigitIndex = i;
     aStrip.maxSample = thisCharge;
     aStrip.cellID = thisCellID;
@@ -395,7 +395,7 @@ void SVDClusterizerModule::writeClusterRelations(Belle2::SVD::RawCluster& rawClu
   vector<pair<int, float> > digit_weights;
   digit_weights.reserve(m_storeClusters[clsIndex]->getSize());
 
-  std::vector<stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+  std::vector<StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
   for (auto strip : strips) {
 

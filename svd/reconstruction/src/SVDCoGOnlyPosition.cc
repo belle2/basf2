@@ -26,7 +26,7 @@ namespace Belle2 {
 
       //as weighted average of the strip position with strip max sample
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       SVDPositionReconstruction* positionReco = new SVDPositionReconstruction(strips, rawCluster.getSensorID(), rawCluster.isUSide());
 
@@ -40,7 +40,7 @@ namespace Belle2 {
 
       //as weighted average of the strip position with strip max sample
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       SVDPositionReconstruction* positionReco = new SVDPositionReconstruction(strips, rawCluster.getSensorID(), rawCluster.isUSide());
 

@@ -39,7 +39,7 @@ namespace Belle2 {
       double getClusterSeedCharge(const Belle2::SVD::RawCluster& rawCluster)
       {
 
-        std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+        std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
         double rawSeedCharge = rawCluster.getSeedMaxSample();
         double seedCellID = strips.at(rawCluster.getSeedInternalIndex()).cellID;

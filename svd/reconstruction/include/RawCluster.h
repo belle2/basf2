@@ -22,7 +22,7 @@ namespace Belle2 {
      * structure containing the relevant informations
      * of each strip of the raw cluster
      */
-    struct stripInRawCluster {
+    struct StripInRawCluster {
       int shaperDigitIndex; /**< index of the shaper digit*/
       int cellID; /**<strip cellID*/
       int maxSample; /** ADC max of the acquired samples*/
@@ -56,10 +56,10 @@ namespace Belle2 {
       /**
        * Add a Strip to the current cluster.
        * Update the cluster seed strip.
-       * @param stripInRawCluster aStrip to add to the cluster
+       * @param StripInRawCluster aStrip to add to the cluster
        * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
        */
-      bool add(VxdID vxdID, bool isUside, struct  stripInRawCluster& aStrip);
+      bool add(VxdID vxdID, bool isUside, struct  StripInRawCluster& aStrip);
 
       /**
        * @return true if the raw cluster candidate can be promoted to raw cluster (seedMaxSample > 0 and seedSNR > cutSeed)
@@ -97,7 +97,7 @@ namespace Belle2 {
       /**
        * @return the vector of the strips in the cluster
        */
-      const std::vector<stripInRawCluster> getStripsInRawCluster() const { return m_strips; };
+      const std::vector<StripInRawCluster> getStripsInRawCluster() const { return m_strips; };
 
       /**
        * @return the max sample (in ADC) of the seed strip
@@ -136,7 +136,7 @@ namespace Belle2 {
       int m_seedInternalIndex = -1;
 
       /** vector containing the strips in the cluster */
-      std::vector<stripInRawCluster> m_strips;
+      std::vector<StripInRawCluster> m_strips;
 
       /** Name of the collection to use for the SVDShaperDigits */
       std::string m_storeShaperDigitsName;

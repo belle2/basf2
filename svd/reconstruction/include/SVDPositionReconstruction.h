@@ -32,7 +32,7 @@ namespace Belle2 {
       /**
        * constructor
        */
-      explicit SVDPositionReconstruction(const std::vector<Belle2::SVD::stripInRawCluster>& strips, VxdID sensorID, bool isU)
+      explicit SVDPositionReconstruction(const std::vector<Belle2::SVD::StripInRawCluster>& strips, VxdID sensorID, bool isU)
         : m_strips(strips)
         , m_vxdID(sensorID)
         , m_isUside(isU)
@@ -66,7 +66,7 @@ namespace Belle2 {
     protected:
 
       /** strips in the cluster*/
-      std::vector<Belle2::SVD::stripInRawCluster> m_strips;
+      std::vector<Belle2::SVD::StripInRawCluster> m_strips;
 
       /** VxdID of the strip */
       VxdID m_vxdID = 0;

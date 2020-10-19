@@ -58,10 +58,10 @@ namespace Belle2 {
       };
 
       /**
-       * Constructor with the stripInRawCluster,
+       * Constructor with the StripInRawCluster,
        * for strip reconstruction in cluster reconstruction
        */
-      explicit SVDReconstructionBase(const Belle2::SVD::stripInRawCluster& aStrip, VxdID sensorID, bool isU)
+      explicit SVDReconstructionBase(const Belle2::SVD::StripInRawCluster& aStrip, VxdID sensorID, bool isU)
         : m_samples(aStrip.samples)
         , m_vxdID(sensorID)
         , m_isUside(isU)

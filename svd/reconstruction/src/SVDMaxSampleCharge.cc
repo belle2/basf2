@@ -25,13 +25,13 @@ namespace Belle2 {
 
       //as sum of the strip charges ( = max sample)
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       double charge = 0;
 
       for (int i = 0; i < (int)strips.size(); i++) {
 
-        Belle2::SVD::stripInRawCluster strip = strips.at(i);
+        Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
         SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
 
@@ -52,13 +52,13 @@ namespace Belle2 {
 
       //sum in quadrature of the strip noises
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       double noiseSquared = 0;
 
       for (int i = 0; i < (int)strips.size(); i++) {
 
-        Belle2::SVD::stripInRawCluster strip = strips.at(i);
+        Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
         SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
 

@@ -50,7 +50,7 @@ namespace Belle2 {
       , m_storeShaperDigitsName(storeShaperDigitsName)
     {m_strips.clear();};
 
-    bool RawCluster::add(VxdID vxdID, bool isUside, struct  stripInRawCluster& aStrip)
+    bool RawCluster::add(VxdID vxdID, bool isUside, struct  StripInRawCluster& aStrip)
     {
 
       bool added = false;

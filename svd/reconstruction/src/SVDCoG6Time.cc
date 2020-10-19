@@ -26,14 +26,14 @@ namespace Belle2 {
 
       //as weighted average of the strip time with strip max sample
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       double time = 0;
       double sumAmplitudes = 0;
 
       for (int i = 0; i < (int)strips.size(); i++) {
 
-        Belle2::SVD::stripInRawCluster strip = strips.at(i);
+        Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
         SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
         timeReco->setTriggerBin(m_triggerBin);
@@ -54,13 +54,13 @@ namespace Belle2 {
 
       //as error on weighted average, neglecting error on weights
 
-      std::vector<Belle2::SVD::stripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+      std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       double variance = 0;
 
       for (int i = 0; i < (int)strips.size(); i++) {
 
-        Belle2::SVD::stripInRawCluster strip = strips.at(i);
+        Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
         SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
         timeReco->setTriggerBin(m_triggerBin);

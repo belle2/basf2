@@ -186,7 +186,7 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate='', useTauolaBelle=False, signalconfigfile=''):
+def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False):
     """
     Add the default muon pair and tau pair generator KKMC.
     For tau decays, TauolaBelle and TauolaBBB are available.

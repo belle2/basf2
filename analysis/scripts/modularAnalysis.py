@@ -839,7 +839,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
         fillParticleLists([kaons, pions, v0lambdas], path=mypath)
 
     Tip:
-        Gammas can also be loaded from KLMCluster by explicitly setting the
+        Gammas can also be loaded from KLMClusters by explicitly setting the
         parameter ``loadPhotonsFromKLM`` to True. However, this should only be
         done in select use-cases and the effect should be studied carefully.
 
@@ -870,7 +870,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
                                      If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
-        loadPhotonsFromKLM (bool):   If true, photon canidates will be created from KLMCluster as well.
+        loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
     """
 
     pload = register_module('ParticleLoader')
@@ -913,7 +913,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
         fillParticleList('Lambda0 -> p+ pi-', '0.9 < M < 1.3', path=mypath)
 
     Tip:
-        Gammas can also be loaded from KLMCluster by explicitly setting the
+        Gammas can also be loaded from KLMClusters by explicitly setting the
         parameter ``loadPhotonsFromKLM`` to True. However, this should only be
         done in select use-cases and the effect should be studied carefully.
 
@@ -937,7 +937,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
                                      If enforceFitHypothesis is False (the default) the next closest fit hypothesis
                                      in terms of mass difference will be used if the fit using exact particle
                                      type is not available.
-        loadPhotonsFromKLM (bool):   If true, photon canidates will be created from KLMCluster as well.
+        loadPhotonsFromKLM (bool):   If true, photon candidates will be created from KLMClusters as well.
     """
 
     pload = register_module('ParticleLoader')

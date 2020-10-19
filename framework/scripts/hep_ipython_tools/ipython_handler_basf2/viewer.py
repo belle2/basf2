@@ -43,7 +43,7 @@ class PathViewer(viewer.IPythonWidget):
         #: The path to show
         try:
             self.path = path.modules()
-        except:
+        except BaseException:
             self.path = path
 
         #: In the standalone mode, the basic parameters of the modules are shown
@@ -125,7 +125,10 @@ class ModuleViewer(viewer.IPythonWidget):
          if it has the default value, no color,
          if not, red color.
         """
-        if str(param.values) != str(param.default) and str(param.default) != "":
+        if str(
+            param.values) != str(
+            param.default) and str(
+                param.default) != "":
             color_text = " style='color: red;'"
         else:
             color_text = ""
@@ -146,13 +149,17 @@ class ModuleViewer(viewer.IPythonWidget):
             else:
                 module_name = self.module.name()
 
-            html.value += self.table_title_html.format(module_name=module_name, package=self.module.package(),
-                                                       td_style=self.td_html)
+            html.value += self.table_title_html.format(
+                module_name=module_name,
+                package=self.module.package(),
+                td_style=self.td_html)
 
-            html.value += self.table_row_html_single.format(text=self.module.description(), td_style=self.td_html)
+            html.value += self.table_row_html_single.format(
+                text=self.module.description(), td_style=self.td_html)
 
         if len(self.module.available_params()) == 0:
-            html.value += self.table_row_html_single.format(text="No parameters available.", td_style=self.td_html)
+            html.value += self.table_row_html_single.format(
+                text="No parameters available.", td_style=self.td_html)
         else:
             for param in self.module.available_params():
                 color_text = self.get_color_code(param)
@@ -162,7 +169,8 @@ class ModuleViewer(viewer.IPythonWidget):
                 else:
                     table_row_html = self.table_row_parameters
 
-                html.value += table_row_html.format(param=param, color_text=color_text, td_style=self.td_html)
+                html.value += table_row_html.format(
+                    param=param, color_text=color_text, td_style=self.td_html)
         html.value += "</table>"
 
         return html
@@ -177,7 +185,8 @@ class DependencyViewer(viewer.IPythonWidget):
         self.store_arrays_with_dependencies_JSON = store_arrays_with_dependencies_JSON
 
         #: Part of the name representing the object for javascript
-        self.random_name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+        self.random_name = ''.join(random.choice(
+            string.ascii_letters) for _ in range(10))
         #: The name representing the object for javascript
         self.element_name = "dependencies_" + self.random_name
 
@@ -185,7 +194,8 @@ class DependencyViewer(viewer.IPythonWidget):
         self.d3_include_string = """<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>"""
 
         #: Template for the element itself
-        self.d3_element_string = """<div id="{element_name}"></div>""".format(element_name=self.element_name)
+        self.d3_element_string = """<div id="{element_name}"></div>""".format(
+            element_name=self.element_name)
 
         #: Template for the style
         self.style_template = """<style>
@@ -241,7 +251,8 @@ class DependencyViewer(viewer.IPythonWidget):
             nodes_json=self.store_arrays_with_dependencies_JSON)
 
         #: Template for the full HTML
-        self.viewer_template = self.d3_include_string + self.nodes_template + self.d3_element_string + self.style_template + """
+        self.viewer_template = self.d3_include_string + self.nodes_template + \
+            self.d3_element_string + self.style_template + """
             <script>
             var diameter = 960;
             var radius = diameter / 2;

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from root_numpy import hist2array
+from matplotlib import pyplot as pl
 from basf2 import logging, LogLevel, create_path, process
 import ROOT as root
 import numpy as np
 import matplotlib as mpl
 mpl.use("Agg")
-from matplotlib import pyplot as pl
-from root_numpy import hist2array
 
 # Don't show all the info messages
 logging.log_level = LogLevel.ERROR
@@ -20,7 +20,10 @@ main.add_module("EventInfoSetter", evtNumList=[1])
 main.add_module("Gearbox")
 # as well as the geometry. We assign regions to each creator which allows to
 # split the material budget by region instead of material.
-geometry = main.add_module("Geometry", logLevel=LogLevel.INFO, assignRegions=True)
+geometry = main.add_module(
+    "Geometry",
+    logLevel=LogLevel.INFO,
+    assignRegions=True)
 # MaterialScan uses the Geant4 setup which is created by the FullSim module so
 # we need this as well
 main.add_module('FullSim')
@@ -37,7 +40,8 @@ materialscan.param({
     'ray.phi': 0,
     # Alternatively one can set the direction of the ray directly
     # 'ray.direction': [1, 0, 0],
-    # Max depth for the scan in cm (x axis limit on the histogram). 0 = no limit
+    # Max depth for the scan in cm (x axis limit on the histogram). 0 = no
+    # limit
     'ray.maxDepth': 0,
     # Bin width (roughly) for the output histogram in cm
     'ray.sampleDepth': 0.1,
@@ -75,13 +79,24 @@ def plot_hist(region, **argk):
 all_data, mat_edges = plot_hist("All_Regions", label="All regions", c="k")
 
 # Now plot the different regions separately
-for region in ["BeamPipe", "PXD", "SVD", "CDC", "ARICH", "TOP", "ECL", "EKLM", "BKLM", "STR", "COIL"]:
+for region in [
+    "BeamPipe",
+    "PXD",
+    "SVD",
+    "CDC",
+    "ARICH",
+    "TOP",
+    "ECL",
+    "EKLM",
+    "BKLM",
+    "STR",
+        "COIL"]:
     plot_hist(region, label=region)
 
 # Log scale anyone?
 # pl.yscale("log")
 pl.ylim(ymin=0)
-pl.xlim(xmin=mat_edges[0], xmax=mat_edges[-1]+1)
+pl.xlim(xmin=mat_edges[0], xmax=mat_edges[-1] + 1)
 pl.xlabel("Flight length [cm]")
 pl.ylabel("Radiation length [$X_0 / %.3g$ cm]" % (mat_edges[1] - mat_edges[0]))
 pl.legend(loc="best")

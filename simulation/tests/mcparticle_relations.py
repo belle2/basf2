@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from ROOT import Belle2
+from basf2 import Module
 import os
 import shutil
 from basf2 import *
 
 logging.log_level = LogLevel.ERROR
-
-from basf2 import Module
-from ROOT import Belle2
 
 
 class TestModule(Module):

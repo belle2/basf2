@@ -58,12 +58,7 @@ args = parser.parse_args()
 
 
 # Ignoring runs
-pxd_ignore_run_list = [
-    ExpRun(
-        3, 484), ExpRun(
-            3, 485), ExpRun(
-                3, 486), ExpRun(
-                    3, 524)]
+pxd_ignore_run_list = [ExpRun(3, 484), ExpRun(3, 485), ExpRun(3, 486), ExpRun(3, 524)]
 
 # Set the IoV range for this calibration
 iov_to_calibrate = IoV(

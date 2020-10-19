@@ -152,19 +152,19 @@ void SVDRecoDigitCreatorModule::initialize()
   m_relShaperDigitMCParticleName = relDigitMCParticles.getName();
   */
   // Report:
-  B2DEBUG(1, "SVDRecoDigitCreator Parameters (in default system unit, *=cannot be set directly):");
+  B2DEBUG(25, "SVDRecoDigitCreator Parameters (in default system unit, *=cannot be set directly):");
 
-  B2DEBUG(1, " 1. COLLECTIONS:");
-  B2DEBUG(1, " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2DEBUG(1, " -->  SVDShaperDigits:      " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
-  B2DEBUG(1, " -->  SVDRecoDigits:      " << DataStore::arrayName<SVDRecoDigit>(m_storeRecoDigitsName));
-  B2DEBUG(1, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
-  B2DEBUG(1, " -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
-  /*  B2DEBUG(1, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
-  B2DEBUG(1, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
-  B2DEBUG(1, " -->  ClusterDigitRel:    " << m_relClusterShaperDigitName);
-  B2DEBUG(1, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
-  B2DEBUG(1, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
+  B2DEBUG(25, " 1. COLLECTIONS:");
+  B2DEBUG(25, " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2DEBUG(25, " -->  SVDShaperDigits:      " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
+  B2DEBUG(25, " -->  SVDRecoDigits:      " << DataStore::arrayName<SVDRecoDigit>(m_storeRecoDigitsName));
+  B2DEBUG(25, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
+  B2DEBUG(25, " -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  /*  B2DEBUG(25, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
+  B2DEBUG(25, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
+  B2DEBUG(25, " -->  ClusterDigitRel:    " << m_relClusterShaperDigitName);
+  B2DEBUG(25, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
+  B2DEBUG(25, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
   */
 }
 

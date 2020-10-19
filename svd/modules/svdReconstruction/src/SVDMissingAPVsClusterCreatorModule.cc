@@ -74,10 +74,10 @@ void SVDMissingAPVsClusterCreatorModule::initialize()
   m_storeClustersName = m_storeClusters.getName();
 
   // Report:
-  B2DEBUG(1, "SVDMissingAPVsClusterCreator Parameters (in default system unit, *=cannot be set directly):");
+  B2DEBUG(29, "SVDMissingAPVsClusterCreator Parameters (in default system unit, *=cannot be set directly):");
 
-  B2DEBUG(1, " 1. COLLECTIONS:");
-  B2DEBUG(1, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
+  B2DEBUG(29, " 1. COLLECTIONS:");
+  B2DEBUG(29, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
 }
 
 
@@ -132,6 +132,6 @@ void SVDMissingAPVsClusterCreatorModule::event()
                                 ));
     }
   }
-  B2DEBUG(1, "Number of clusters: " << m_storeClusters.getEntries());
+  B2DEBUG(29, "Number of clusters: " << m_storeClusters.getEntries());
 }
 

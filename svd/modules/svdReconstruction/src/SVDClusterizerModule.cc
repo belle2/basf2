@@ -174,21 +174,21 @@ void SVDClusterizerModule::initialize()
   m_relShaperDigitMCParticleName = relDigitMCParticles.getName();
 
   // Report:
-  B2DEBUG(1, "SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
+  B2DEBUG(20, "SVDClusterizer Parameters (in default system unit, *=cannot be set directly):");
 
-  B2DEBUG(1, " 1. COLLECTIONS:");
-  B2DEBUG(1, " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
-  B2DEBUG(1, " -->  SVDShaperDigits:      " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
-  B2DEBUG(1, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
-  B2DEBUG(1, " -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
-  B2DEBUG(1, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
-  B2DEBUG(1, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
-  B2DEBUG(1, " -->  ClusterDigitRel:    " << m_relClusterShaperDigitName);
-  B2DEBUG(1, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
-  B2DEBUG(1, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
-  B2DEBUG(1, " 2. CLUSTERING:");
-  B2DEBUG(1, " -->  Neighbour cut:      " << m_cutAdjacent);
-  B2DEBUG(1, " -->  Seed cut:           " << m_cutSeed);
+  B2DEBUG(20, " 1. COLLECTIONS:");
+  B2DEBUG(20, " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
+  B2DEBUG(20, " -->  SVDShaperDigits:      " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
+  B2DEBUG(20, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
+  B2DEBUG(20, " -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
+  B2DEBUG(20, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
+  B2DEBUG(20, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
+  B2DEBUG(20, " -->  ClusterDigitRel:    " << m_relClusterShaperDigitName);
+  B2DEBUG(20, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
+  B2DEBUG(20, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
+  B2DEBUG(20, " 2. CLUSTERING:");
+  B2DEBUG(20, " -->  Neighbour cut:      " << m_cutAdjacent);
+  B2DEBUG(20, " -->  Seed cut:           " << m_cutSeed);
 }
 
 
@@ -244,7 +244,7 @@ void SVDClusterizerModule::event()
     //Ignore digits with insufficient signal
     float thisNoise = m_NoiseCal.getNoise(thisSensorID, thisSide, thisCellID);
     float thisCharge = m_storeDigits[i]->getMaxADCCounts();
-    B2DEBUG(10, "Noise = " << thisNoise << " ADC, MaxSample = " << thisCharge << " ADC");
+    B2DEBUG(20, "Noise = " << thisNoise << " ADC, MaxSample = " << thisCharge << " ADC");
 
     if ((float)thisCharge / thisNoise < m_cutAdjacent) {
       i++;
@@ -281,7 +281,7 @@ void SVDClusterizerModule::event()
   if ((rawCluster.getSize() > 0) && (rawCluster.isGoodRawCluster()))
     finalizeCluster(rawCluster);
 
-  B2DEBUG(1, "Number of clusters: " << m_storeClusters.getEntries());
+  B2DEBUG(20, "Number of clusters: " << m_storeClusters.getEntries());
 }
 
 

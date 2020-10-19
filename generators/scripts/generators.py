@@ -186,14 +186,18 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate='', signaldecfile='', usePythiaFlags=False):
+def add_kkmc_generator(path, finalstate='', useTauolaBelle=False, signalconfigfile=''):
     """
-    Add the default muon pair and tau pair generator KKMC
+    Add the default muon pair and tau pair generator KKMC.
+    For tau decays, TauolaBelle and TauolaBBB are available.
+    Signal events can be produced setting a configuration file. Please notice that the configuration files for
+    TauolaBelle and TauolaBBB has a very different structure (see the examples below generators/examples).
 
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate(str): either "mu+mu-" or "tau+tau-"
-        usePythiaFlags(bool): If true, tau decay is controlled via Pythia flags. It doesn't affect mu+mu- decays.
+        signalconfigfile(str): File with information of the signal event to generate.
+        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. It doesn't affect mu+mu- decays.
     """
 
     #: kkmc input file
@@ -205,17 +209,22 @@ def add_kkmc_generator(path, finalstate='', signaldecfile='', usePythiaFlags=Fal
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: tau config file (empty for generic tau+tau- and mu+mu-)
+    #: tau config file (empty for generic mu+mu- and tau+tau- with TauolaBBB)
     kkmc_tauconfigfile = ''
 
     if finalstate == 'tau+tau-':
-        #: If the tau decay must be controlled by Pythia flags
-        if usePythiaFlags:
+        if useTauolaBelle:
+            B2INFO("Generating tau pair events with TauolaBelle")
+            #: If TauolaBelle, the tau decay must be controlled by Pythia flags
             kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
             kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
         #: Check if there is a signal decfile provided by the user
-        if not signaldecfile == '':
-            kkmc_tauconfigfile = signaldecfile
+        if not signalconfigfile == '':
+            B2INFO(f"Using config file defined by user: {signalconfigfile}")
+            if useTauolaBelle:
+                kkmc_tauconfigfile = signalconfigfile
+            else:
+                kkmc_inputfile = signalconfigfile
 
     elif finalstate == 'mu+mu-':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')

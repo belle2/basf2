@@ -53,6 +53,7 @@ Variables
    :b2:var:`cosThetaBetweenParticleAndNominalB` in which all descendant neutrino momenta are subtracted from the B momentum
    during the calculation.
  * Added new variables :b2:var:`ndf` and :b2:var:`chi2` to return track NDF and Chi2
+ * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
 
 Modules
 +++++++

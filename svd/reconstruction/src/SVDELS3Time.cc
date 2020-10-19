@@ -23,12 +23,12 @@ namespace Belle2 {
 
       bool inElectrons = false;
 
-      SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(rawCluster.getClsSamples(inElectrons),
-                                                                  rawCluster.getSensorID(), rawCluster.isUSide());
+      SVDTimeReconstruction timeReco(rawCluster.getClsSamples(inElectrons),
+                                     rawCluster.getSensorID(), rawCluster.isUSide());
 
-      timeReco->setTriggerBin(m_triggerBin);
+      timeReco.setTriggerBin(m_triggerBin);
 
-      return timeReco->getELS3FirstFrameAndTime();
+      return timeReco.getELS3FirstFrameAndTime();
 
     }
 
@@ -37,12 +37,12 @@ namespace Belle2 {
 
       bool inElectrons = false;
 
-      SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(rawCluster.getClsSamples(inElectrons),
-                                                                  rawCluster.getSensorID(), rawCluster.isUSide());
+      SVDTimeReconstruction timeReco(rawCluster.getClsSamples(inElectrons),
+                                     rawCluster.getSensorID(), rawCluster.isUSide());
 
-      timeReco->setTriggerBin(m_triggerBin);
+      timeReco.setTriggerBin(m_triggerBin);
 
-      double timeError = timeReco->getELS3TimeError();
+      double timeError = timeReco.getELS3TimeError();
 
       return  timeError;
 

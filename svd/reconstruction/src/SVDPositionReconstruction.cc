@@ -35,14 +35,14 @@ namespace Belle2 {
 
       for (auto aStrip : m_strips) {
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
+        SVDChargeReconstruction chargeReco(aStrip, m_vxdID, m_isUside);
         float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
-        chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
+        chargeReco.setAverageNoise(aStrip.noise, averageNoiseInElectrons);
 
         double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
 
         //getting the charge with the algorithm set in the DBobject
-        double stripCharge  = chargeReco->getStripCharge();
+        double stripCharge  = chargeReco.getStripCharge();
 
         position += stripPos * stripCharge;
         charge += stripCharge;
@@ -106,9 +106,9 @@ namespace Belle2 {
       // error propagation contribution:
       for (auto aStrip : m_strips) {
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
+        SVDChargeReconstruction chargeReco(aStrip, m_vxdID, m_isUside);
         float stripNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
-        chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
+        chargeReco.setAverageNoise(aStrip.noise, averageNoiseInElectrons);
         averageNoiseInElectrons += stripNoiseInElectrons;
 
         stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
@@ -147,18 +147,18 @@ namespace Belle2 {
 
       //informations about the head strip
       int headStripCellID = m_strips.at(m_strips.size() - 1).cellID;
-      SVDChargeReconstruction* chargeRecoHead = new SVDChargeReconstruction(m_strips.at(m_strips.size() - 1), m_vxdID, m_isUside);
+      SVDChargeReconstruction chargeRecoHead(m_strips.at(m_strips.size() - 1), m_vxdID, m_isUside);
       float averageNoiseInElectronsHead =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, headStripCellID);
-      chargeRecoHead->setAverageNoise(m_strips.at(m_strips.size() - 1).noise, averageNoiseInElectronsHead);
+      chargeRecoHead.setAverageNoise(m_strips.at(m_strips.size() - 1).noise, averageNoiseInElectronsHead);
 
-      double headStripCharge = chargeRecoHead->getStripCharge();
+      double headStripCharge = chargeRecoHead.getStripCharge();
       //informations about the tail strip
       int tailStripCellID = m_strips.at(0).cellID;
-      SVDChargeReconstruction* chargeRecoTail = new SVDChargeReconstruction(m_strips.at(0), m_vxdID, m_isUside);
+      SVDChargeReconstruction chargeRecoTail(m_strips.at(0), m_vxdID, m_isUside);
       float averageNoiseInElectronsTail =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, tailStripCellID);
-      chargeRecoTail->setAverageNoise(m_strips.at(0).noise, averageNoiseInElectronsTail);
+      chargeRecoTail.setAverageNoise(m_strips.at(0).noise, averageNoiseInElectronsTail);
 
-      double tailStripCharge = chargeRecoTail->getStripCharge();
+      double tailStripCharge = chargeRecoTail.getStripCharge();
 
 
       // average strip charge of the center of the cluster
@@ -187,18 +187,18 @@ namespace Belle2 {
 
       //informations about the head strip
       int headStripCellID = m_strips.at(m_strips.size() - 1).cellID;
-      SVDChargeReconstruction* chargeRecoHead = new SVDChargeReconstruction(m_strips.at(m_strips.size() - 1), m_vxdID, m_isUside);
+      SVDChargeReconstruction chargeRecoHead(m_strips.at(m_strips.size() - 1), m_vxdID, m_isUside);
       float averageNoiseInElectronsHead =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, headStripCellID);
-      chargeRecoHead->setAverageNoise(m_strips.at(m_strips.size() - 1).noise, averageNoiseInElectronsHead);
+      chargeRecoHead.setAverageNoise(m_strips.at(m_strips.size() - 1).noise, averageNoiseInElectronsHead);
 
-      double headStripCharge = chargeRecoHead->getStripCharge();
+      double headStripCharge = chargeRecoHead.getStripCharge();
       //informations about the tail strip
       int tailStripCellID = m_strips.at(0).cellID;
-      SVDChargeReconstruction* chargeRecoTail = new SVDChargeReconstruction(m_strips.at(0), m_vxdID, m_isUside);
+      SVDChargeReconstruction chargeRecoTail(m_strips.at(0), m_vxdID, m_isUside);
       float averageNoiseInElectronsTail =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, tailStripCellID);
-      chargeRecoTail->setAverageNoise(m_strips.at(0).noise, averageNoiseInElectronsTail);
+      chargeRecoTail.setAverageNoise(m_strips.at(0).noise, averageNoiseInElectronsTail);
 
-      double tailStripCharge = chargeRecoTail->getStripCharge();
+      double tailStripCharge = chargeRecoTail.getStripCharge();
 
       // average strip charge of the center of the cluster
 
@@ -229,11 +229,11 @@ namespace Belle2 {
       // compute the sum of strip charges
       for (auto aStrip : m_strips) {
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(aStrip, m_vxdID, m_isUside);
+        SVDChargeReconstruction chargeReco(aStrip, m_vxdID, m_isUside);
         float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(m_vxdID, m_isUside, aStrip.cellID);
-        chargeReco->setAverageNoise(aStrip.noise, averageNoiseInElectrons);
+        chargeReco.setAverageNoise(aStrip.noise, averageNoiseInElectrons);
 
-        double stripCharge  = chargeReco->getStripCharge();
+        double stripCharge  = chargeReco.getStripCharge();
         sumStripCharge += stripCharge;
       }
       return sumStripCharge;

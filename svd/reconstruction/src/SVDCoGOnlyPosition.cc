@@ -28,9 +28,9 @@ namespace Belle2 {
 
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
-      SVDPositionReconstruction* positionReco = new SVDPositionReconstruction(strips, rawCluster.getSensorID(), rawCluster.isUSide());
+      SVDPositionReconstruction positionReco(strips, rawCluster.getSensorID(), rawCluster.isUSide());
 
-      double position = positionReco->getCoGPosition();
+      double position = positionReco.getCoGPosition();
 
       return position;
     }
@@ -42,9 +42,9 @@ namespace Belle2 {
 
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
-      SVDPositionReconstruction* positionReco = new SVDPositionReconstruction(strips, rawCluster.getSensorID(), rawCluster.isUSide());
+      SVDPositionReconstruction positionReco(strips, rawCluster.getSensorID(), rawCluster.isUSide());
 
-      double positionError = positionReco->getCoGPositionError();
+      double positionError = positionReco.getCoGPositionError();
 
       return positionError;
     }

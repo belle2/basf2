@@ -33,14 +33,14 @@ namespace Belle2 {
 
         Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
+        SVDChargeReconstruction chargeReco(strip, rawCluster.getSensorID(), rawCluster.isUSide());
 
         float noiseInADC = strip.noise;
         float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID,
                                                                   noiseInADC);
-        chargeReco->setAverageNoise(noiseInADC, noiseInElectrons);
+        chargeReco.setAverageNoise(noiseInADC, noiseInElectrons);
 
-        charge += chargeReco->getSumSamplesCharge();
+        charge += chargeReco.getSumSamplesCharge();
       }
 
 
@@ -60,13 +60,13 @@ namespace Belle2 {
 
         Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
-        SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
+        SVDChargeReconstruction chargeReco(strip, rawCluster.getSensorID(), rawCluster.isUSide());
         float noiseInADC = strip.noise;
         float noiseInElectrons = m_PulseShapeCal.getChargeFromADC(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID,
                                                                   noiseInADC);
-        chargeReco->setAverageNoise(noiseInADC, noiseInElectrons);
+        chargeReco.setAverageNoise(noiseInADC, noiseInElectrons);
 
-        double noise = chargeReco->getSumSamplesChargeError();
+        double noise = chargeReco.getSumSamplesChargeError();
 
         noiseSquared += noise * noise;
       }

@@ -35,10 +35,10 @@ namespace Belle2 {
 
         Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
-        SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
-        timeReco->setTriggerBin(m_triggerBin);
+        SVDTimeReconstruction timeReco(strip, rawCluster.getSensorID(), rawCluster.isUSide());
+        timeReco.setTriggerBin(m_triggerBin);
 
-        double stripTime = timeReco->getCoG6Time();
+        double stripTime = timeReco.getCoG6Time();
 
         time += strip.maxSample * stripTime;
         sumAmplitudes += strip.maxSample;
@@ -62,10 +62,10 @@ namespace Belle2 {
 
         Belle2::SVD::StripInRawCluster strip = strips.at(i);
 
-        SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(strip, rawCluster.getSensorID(), rawCluster.isUSide());
-        timeReco->setTriggerBin(m_triggerBin);
+        SVDTimeReconstruction timeReco(strip, rawCluster.getSensorID(), rawCluster.isUSide());
+        timeReco.setTriggerBin(m_triggerBin);
 
-        double stripTimeError = timeReco->getCoG6TimeError();
+        double stripTimeError = timeReco.getCoG6TimeError();
 
         variance += stripTimeError * stripTimeError;
       }

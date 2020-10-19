@@ -95,7 +95,7 @@ namespace Belle2 {
       bool m_useDB = true;
 
       // 3. Cluster Reconstruction Configuration:
-      int m_numberOfAcquiredSamples = 0; /**< number of acquired samples, can be 6,3 or 1*/
+      int m_numberOfAcquiredSamples = 0; /**< number of acquired samples, can be 6 or 3 (1 is not supported!)*/
       /** string storing the cluster time reconstruction algorithm in 6-sample DAQ mode*/
       std::string m_timeRecoWith6SamplesAlgorithm = "not set";
       /** string storing the cluster time reconstruction algorithm in 3-sample DAQ mode*/

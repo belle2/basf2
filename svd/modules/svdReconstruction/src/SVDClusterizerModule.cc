@@ -65,22 +65,22 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
   addParam("ClusterSN", m_cutCluster,
            "minimum value of the SNR of the cluster", m_cutCluster);
   addParam("timeAlgorithm6Samples", m_timeRecoWith6SamplesAlgorithm,
-           " choose time algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default), CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS",
+           " choose time algorithm for the 6-sample DAQ mode:  CoG6 = 6-sample CoG (default), CoG3 = 3-sample CoG,  ELS3 = 3-sample ELS. Overwritten by the dbobject is useDB = True (default).",
            m_timeRecoWith6SamplesAlgorithm);
   addParam("timeAlgorithm3Samples", m_timeRecoWith3SamplesAlgorithm,
-           " choose time algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG, CoG3 = 3-sample CoG (default),  ELS3 = 3-sample ELS",
+           " choose time algorithm for the 3-sample DAQ mode:  CoG6 = 6-sample CoG, CoG3 = 3-sample CoG (default),  ELS3 = 3-sample ELS. Overwritten by the dbobject is useDB = True (default).",
            m_timeRecoWith3SamplesAlgorithm);
   addParam("chargeAlgorithm6Samples", m_chargeRecoWith6SamplesAlgorithm,
-           " choose charge algorithm for 6-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS",
+           " choose charge algorithm for 6-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject is useDB = True (default).",
            m_chargeRecoWith6SamplesAlgorithm);
   addParam("chargeAlgorithm3Samples", m_chargeRecoWith3SamplesAlgorithm,
-           " choose charge algorithm for 3-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS",
+           " choose charge algorithm for 3-sample DAQ mode:  MaxSample (default), SumSamples,  ELS3 = 3-sample ELS. Overwritten by the dbobject is useDB = True (default).",
            m_chargeRecoWith3SamplesAlgorithm);
   addParam("positionAlgorithm6Samples", m_positionRecoWith6SamplesAlgorithm,
-           " choose position algorithm for 6-sample DAQ mode:  old (default), CoGOnly",
+           " choose position algorithm for 6-sample DAQ mode:  old (default), CoGOnly. Overwritten by the dbobject is useDB = True (default).",
            m_positionRecoWith6SamplesAlgorithm);
   addParam("positionAlgorithm3Samples", m_positionRecoWith3SamplesAlgorithm,
-           " choose position algorithm for 3-sample DAQ mode:  old (default), CoGOnly",
+           " choose position algorithm for 3-sample DAQ mode:  old (default), CoGOnly. Overwritten by the dbobject is useDB = True (default).",
            m_positionRecoWith3SamplesAlgorithm);
 
   addParam("useDB", m_useDB,

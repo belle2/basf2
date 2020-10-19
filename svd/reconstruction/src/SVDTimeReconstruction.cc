@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace SVD {
 
-    std::pair<int, double> SVDTimeReconstruction::getFirstFrameAndStripTime(TString timeAlgo = "fromRecoDBObject")
+    std::pair<int, double> SVDTimeReconstruction::getFirstFrameAndStripTime(const TString& timeAlgo = "fromRecoDBObject")
     {
 
       StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
@@ -60,7 +60,7 @@ namespace Belle2 {
     }
 
 
-    double SVDTimeReconstruction::getStripTimeError(TString timeAlgo = "fromRecoDBObject")
+    double SVDTimeReconstruction::getStripTimeError(const TString& timeAlgo = "fromRecoDBObject")
     {
 
       StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");

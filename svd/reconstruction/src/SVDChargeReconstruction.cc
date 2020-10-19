@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace SVD {
 
-    double SVDChargeReconstruction::getStripCharge(TString chargeAlgo)
+    double SVDChargeReconstruction::getStripCharge(const TString& chargeAlgo)
     {
 
       StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");
@@ -58,7 +58,7 @@ namespace Belle2 {
       return getMaxSampleCharge();
     }
 
-    double SVDChargeReconstruction::getStripChargeError(TString chargeAlgo)
+    double SVDChargeReconstruction::getStripChargeError(const TString& chargeAlgo)
     {
 
       StoreObjPtr<SVDEventInfo> temp_eventinfo("SVDEventInfo");

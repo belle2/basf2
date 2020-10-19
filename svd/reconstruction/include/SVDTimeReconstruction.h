@@ -35,9 +35,9 @@ namespace Belle2 {
       virtual ~SVDTimeReconstruction() {};
 
       /** get first frame and strip time as set in SVDRecoConfiguration payload if timeAlgo = inRecoDBObject*/
-      std::pair<int, double> getFirstFrameAndStripTime(TString timeAlgo);
+      std::pair<int, double> getFirstFrameAndStripTime(const TString& timeAlgo);
       /** get strip time error as set in SVDRecoConfiguration payload if timeAlgo = inRecoDBObject*/
-      double getStripTimeError(TString timeAlgo);
+      double getStripTimeError(const TString& timeAlgo);
 
       /** CoG6 Time */
       double getCoG6Time();

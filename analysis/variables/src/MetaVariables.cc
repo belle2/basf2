@@ -1686,28 +1686,6 @@ namespace Belle2 {
       }
     }
 
-    Manager::FunctionPtr tan(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 1) {
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::tan(var->function(particle)); };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments for meta function tan");
-      }
-    }
-
-    Manager::FunctionPtr atan(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 1) {
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto func = [var](const Particle * particle) -> double { return std::atan(var->function(particle)); };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments for meta function atan");
-      }
-    }
-
     Manager::FunctionPtr log10(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -3045,8 +3023,6 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("asin(variable)", asin, "Returns arcsine of the given variable.");
     REGISTER_VARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.");
     REGISTER_VARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable.");
-    REGISTER_VARIABLE("tan(variable)", tan, "Returns trigonometric tangent function evaluated for the given variable.");
-    REGISTER_VARIABLE("atan(variable)", atan, "Returns arctangent value of the given variable.");
     REGISTER_VARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.");
     REGISTER_VARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"

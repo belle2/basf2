@@ -355,18 +355,6 @@ namespace Belle2 {
     Manager::FunctionPtr acos(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns the (trigonometric) tangent value of a variable of the given particle
-     * First argument in the argument vector must be the name of variable
-     */
-    Manager::FunctionPtr tan(const std::vector<std::string>& arguments);
-
-    /**
-     * Returns function which returns the arctangent value of a variable of the given particle
-     * First argument in the argument vector must be the name of variable
-     */
-    Manager::FunctionPtr atan(const std::vector<std::string>& arguments);
-
-    /**
      * Returns function which returns the log10 value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */

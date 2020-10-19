@@ -196,8 +196,9 @@ def add_kkmc_generator(path, finalstate='', useTauolaBelle=False, signalconfigfi
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate(str): either "mu+mu-" or "tau+tau-"
-        signalconfigfile(str): File with information of the signal event to generate.
-        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. It doesn't affect mu+mu- decays.
+        signalconfigfile(str): File with configuration of the signal event to generate. It doesn't affect mu+mu- decays.
+        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBBB is used.
+                              It doesn't affect mu+mu- decays.
     """
 
     #: kkmc input file

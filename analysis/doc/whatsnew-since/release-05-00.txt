@@ -81,6 +81,8 @@ Modules
  * The :b2:mod:`PrintMCParticles` module and thus also the `printMCParticles` function
    has a completely new layout that should be much easier to parse, especially for complicated events. By default it shows
    much less information but in an easier to parse tree representation. See the documentation of `printMCParticles` for details.
+ * The special treatment of MCMatching for the tau-decay is fixed. The treatment was working fine in release-04, but it was broken
+   in the release-05.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

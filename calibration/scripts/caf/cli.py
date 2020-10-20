@@ -162,7 +162,7 @@ def add_backends_subparsers(parser, default_max_processes=4,
                                   "submitting processes and the number submitted before re-checking."
                                   f" (default: {default_global_job_limit})"))
 
-    lsf_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    lsf_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                             default=default_submission_check_heartbeat,
                             help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                   "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."
@@ -185,7 +185,7 @@ def add_backends_subparsers(parser, default_max_processes=4,
                                   "submitting processes and the number submitted before re-checking."
                                   f" (default: {default_global_job_limit})"))
 
-    pbs_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    pbs_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                             default=default_submission_check_heartbeat,
                             help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                   "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."
@@ -218,7 +218,7 @@ def add_backends_subparsers(parser, default_max_processes=4,
             "submitting processes and the number submitted before re-checking."
             f" (default: {default_global_job_limit})"))
 
-    condor_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    condor_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                                default=default_submission_check_heartbeat,
                                help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                      "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."

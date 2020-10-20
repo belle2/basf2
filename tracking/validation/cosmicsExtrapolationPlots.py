@@ -29,60 +29,84 @@ output_file = ROOT.TFile('CosmicsExtrapolationPlots.root', 'recreate')
 bklm_numbers = Belle2.BKLMElementNumbers()
 eklm_numbers = Belle2.EKLMElementNumbers.Instance()
 
-# X resolution histogram (forward propagation).
-hist_xres_forward = ROOT.TH1F('xres_forward', 'Extrapolated hit X resolution', 100, -20, 20)
-hist_xres_forward.SetXTitle('cm')
-hist_xres_forward.SetYTitle('Events')
-function_list = hist_xres_forward.GetListOfFunctions()
-function_list.Add(TNamed('Description', 'X resolution (forward propagation)'))
-function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
-function_list.Add(TNamed('Contact', contact))
-function_list.Add(TNamed('MetaOptions', 'shifter'))
-# Y resolution histogram (forward propagation).
-hist_yres_forward = ROOT.TH1F('yres_forward', 'Extrapolated hit Y resolution', 100, -20, 20)
-hist_yres_forward.SetXTitle('cm')
-hist_yres_forward.SetYTitle('Events')
-function_list = hist_yres_forward.GetListOfFunctions()
-function_list.Add(TNamed('Description', 'Y resolution (forward propagation)'))
-function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
-function_list.Add(TNamed('Contact', contact))
-function_list.Add(TNamed('MetaOptions', 'shifter'))
-# Z resolution histogram (forward propagation).
-hist_zres_forward = ROOT.TH1F('zres_forward', 'Extrapolated hit Z resolution', 100, -20, 20)
-hist_zres_forward.SetXTitle('cm')
-hist_zres_forward.SetYTitle('Events')
-function_list = hist_zres_forward.GetListOfFunctions()
-function_list.Add(TNamed('Description', 'Z resolution (forward propagation)'))
-function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
-function_list.Add(TNamed('Contact', contact))
-function_list.Add(TNamed('MetaOptions', 'shifter'))
-# X resolution histogram (backward propagation).
-hist_xres_backward = ROOT.TH1F('xres_backward', 'Extrapolated hit X resolution', 100, -20, 20)
-hist_xres_backward.SetXTitle('cm')
-hist_xres_backward.SetYTitle('Events')
-function_list = hist_xres_backward.GetListOfFunctions()
-function_list.Add(TNamed('Description', 'X resolution (backward propagation)'))
-function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
-function_list.Add(TNamed('Contact', contact))
-function_list.Add(TNamed('MetaOptions', 'shifter'))
-# Y resolution histogram (backward propagation).
-hist_yres_backward = ROOT.TH1F('yres_backward', 'Extrapolated hit Y resolution', 100, -20, 20)
-hist_yres_backward.SetXTitle('cm')
-hist_yres_backward.SetYTitle('Events')
-function_list = hist_yres_backward.GetListOfFunctions()
-function_list.Add(TNamed('Description', 'Y resolution (backward propagation)'))
-function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
-function_list.Add(TNamed('Contact', contact))
-function_list.Add(TNamed('MetaOptions', 'shifter'))
-# Z resolution histogram (bakcward propagation).
-hist_zres_backward = ROOT.TH1F('zres_backward', 'Extrapolated hit Z resolution', 100, -20, 20)
-hist_zres_backward.SetXTitle('cm')
-hist_zres_backward.SetYTitle('Events')
-function_list = hist_zres_backward.GetListOfFunctions()
-function_list.Add(TNamed('Description', 'Z resolution (backward propagation)'))
-function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
-function_list.Add(TNamed('Contact', contact))
-function_list.Add(TNamed('MetaOptions', 'shifter'))
+
+def set_options(histogram, description):
+    histogram.SetXTitle('cm')
+    histogram.SetYTitle('Events')
+    function_list = histogram.GetListOfFunctions()
+    function_list.Add(TNamed('Description', description))
+    function_list.Add(TNamed('Check', ' No bias, no large background, resolution ~ 2 cm.'))
+    function_list.Add(TNamed('Contact', contact))
+    function_list.Add(TNamed('MetaOptions', 'shifter'))
+
+
+# X resolution histograms (forward propagation).
+hist_xres_forward_mum = ROOT.TH1F('xres_forward_mum',
+                                  'X resolution (#mu^{-}, forward)',
+                                  100, -20, 20)
+set_options(hist_xres_forward_mum,
+            'Extrapolated hit X resolution (mu-, forward propagation).')
+hist_xres_forward_mup = ROOT.TH1F('xres_forward_mup',
+                                  'X resolution (#mu^{+}, forward)',
+                                  100, -20, 20)
+set_options(hist_xres_forward_mup,
+            'Extrapolated hit X resolution (mu+, forward propagation).')
+# Y resolution histograms (forward propagation).
+hist_yres_forward_mum = ROOT.TH1F('yres_forward_mum',
+                                  'Y resolution (#mu^{-}, forward)',
+                                  100, -20, 20)
+set_options(hist_yres_forward_mum,
+            'Extrapolated hit Y resolution (mu-, forward propagation).')
+hist_yres_forward_mup = ROOT.TH1F('yres_forward_mup',
+                                  'Y resolution (#mu^{+}, forward)',
+                                  100, -20, 20)
+set_options(hist_yres_forward_mup,
+            'Extrapolated hit Y resolution (mu+, forward propagation).')
+# Z resolution histograms (forward propagation).
+hist_zres_forward_mum = ROOT.TH1F('zres_forward_mum',
+                                  'Z resolution (#mu^{-}, forward)',
+                                  100, -20, 20)
+set_options(hist_zres_forward_mum,
+            'Extrapolated hit Z resolution (mu-, forward propagation).')
+hist_zres_forward_mup = ROOT.TH1F('zres_forward_mup',
+                                  'Z resolution (#mu^{+}, forward)',
+                                  100, -20, 20)
+set_options(hist_zres_forward_mup,
+            'Extrapolated hit Z resolution (mu+, forward propagation).')
+
+# X resolution histograms (backward propagation).
+hist_xres_backward_mum = ROOT.TH1F('xres_backward_mum',
+                                   'X resolution (#mu^{-}, backward)',
+                                   100, -20, 20)
+set_options(hist_xres_backward_mum,
+            'Extrapolated hit X resolution (mu-, backward propagation).')
+hist_xres_backward_mup = ROOT.TH1F('xres_backward_mup',
+                                   'X resolution (#mu^{+}, backward)',
+                                   100, -20, 20)
+set_options(hist_xres_backward_mup,
+            'Extrapolated hit X resolution (mu+, backward propagation).')
+# Y resolution histograms (backward propagation).
+hist_yres_backward_mum = ROOT.TH1F('yres_backward_mum',
+                                   'Y resolution (#mu^{-}, backward)',
+                                   100, -20, 20)
+set_options(hist_yres_backward_mum,
+            'Extrapolated hit Y resolution (mu-, backward propagation).')
+hist_yres_backward_mup = ROOT.TH1F('yres_backward_mup',
+                                   'Y resolution (#mu^{+}, backward)',
+                                   100, -20, 20)
+set_options(hist_yres_backward_mup,
+            'Extrapolated hit Y resolution (mu+, backward propagation).')
+# Z resolution histograms (backward propagation).
+hist_zres_backward_mum = ROOT.TH1F('zres_backward_mum',
+                                   'Z resolution (#mu^{-}, backward)',
+                                   100, -20, 20)
+set_options(hist_zres_backward_mum,
+            'Extrapolated hit Z resolution (mu-, backward propagation).')
+hist_zres_backward_mup = ROOT.TH1F('zres_backward_mup',
+                                   'Z resolution (#mu^{+}, backward)',
+                                   100, -20, 20)
+set_options(hist_zres_backward_mup,
+            'Extrapolated hit Z resolution (mu+, backward propagation).')
 
 for event in input_file.tree:
     bklmhit2ds = event.BKLMHit2ds
@@ -104,13 +128,36 @@ for event in input_file.tree:
                 continue
             ext_position = exthit.getPosition()
             if exthit.isBackwardPropagated():
-                hist_xres_backward.Fill(ext_position.X() - bklmhit2d.getGlobalPositionX())
-                hist_yres_backward.Fill(ext_position.Y() - bklmhit2d.getGlobalPositionY())
-                hist_zres_backward.Fill(ext_position.Z() - bklmhit2d.getGlobalPositionZ())
+                if exthit.getPdgCode() == 13:
+                    hist_xres_backward_mum.Fill(
+                        ext_position.X() - bklmhit2d.getGlobalPositionX())
+                    hist_yres_backward_mum.Fill(
+                        ext_position.Y() - bklmhit2d.getGlobalPositionY())
+                    hist_zres_backward_mum.Fill(
+                        ext_position.Z() - bklmhit2d.getGlobalPositionZ())
+                elif exthit.getPdgCode() == -13:
+                    hist_xres_backward_mup.Fill(
+                        ext_position.X() - bklmhit2d.getGlobalPositionX())
+                    hist_yres_backward_mup.Fill(
+                        ext_position.Y() - bklmhit2d.getGlobalPositionY())
+                    hist_zres_backward_mup.Fill(
+                        ext_position.Z() - bklmhit2d.getGlobalPositionZ())
             else:
-                hist_xres_forward.Fill(ext_position.X() - bklmhit2d.getGlobalPositionX())
-                hist_yres_forward.Fill(ext_position.Y() - bklmhit2d.getGlobalPositionY())
-                hist_zres_forward.Fill(ext_position.Z() - bklmhit2d.getGlobalPositionZ())
+                if exthit.getPdgCode() == 13:
+                    hist_xres_forward_mum.Fill(
+                        ext_position.X() - bklmhit2d.getGlobalPositionX())
+                    hist_yres_forward_mum.Fill(
+                        ext_position.Y() - bklmhit2d.getGlobalPositionY())
+                    hist_zres_forward_mum.Fill(
+                        ext_position.Z() - bklmhit2d.getGlobalPositionZ())
+                elif exthit.getPdgCode() == -13:
+                    hist_xres_forward_mup.Fill(
+                        ext_position.X() - bklmhit2d.getGlobalPositionX())
+                    hist_yres_forward_mup.Fill(
+                        ext_position.Y() - bklmhit2d.getGlobalPositionY())
+                    hist_zres_forward_mup.Fill(
+                        ext_position.Z() - bklmhit2d.getGlobalPositionZ())
+
     for eklmhit2d in eklmhit2ds:
         section = eklmhit2d.getSection()
         sector = eklmhit2d.getSector()
@@ -127,20 +174,48 @@ for event in input_file.tree:
                 continue
             ext_position = exthit.getPosition()
             if exthit.isBackwardPropagated():
-                hist_xres_backward.Fill(ext_position.X() - eklmhit2d.getPositionX())
-                hist_yres_backward.Fill(ext_position.Y() - eklmhit2d.getPositionY())
-                hist_zres_backward.Fill(ext_position.Z() - eklmhit2d.getPositionZ())
+                if exthit.getPdgCode() == 13:
+                    hist_xres_backward_mum.Fill(
+                        ext_position.X() - eklmhit2d.getPositionX())
+                    hist_yres_backward_mum.Fill(
+                        ext_position.Y() - eklmhit2d.getPositionY())
+                    hist_zres_backward_mum.Fill(
+                        ext_position.Z() - eklmhit2d.getPositionZ())
+                elif exthit.getPdgCode() == -13:
+                    hist_xres_backward_mup.Fill(
+                        ext_position.X() - eklmhit2d.getPositionX())
+                    hist_yres_backward_mup.Fill(
+                        ext_position.Y() - eklmhit2d.getPositionY())
+                    hist_zres_backward_mup.Fill(
+                        ext_position.Z() - eklmhit2d.getPositionZ())
             else:
-                hist_xres_forward.Fill(ext_position.X() - eklmhit2d.getPositionX())
-                hist_yres_forward.Fill(ext_position.Y() - eklmhit2d.getPositionY())
-                hist_zres_forward.Fill(ext_position.Z() - eklmhit2d.getPositionZ())
+                if exthit.getPdgCode() == 13:
+                    hist_xres_forward_mum.Fill(
+                        ext_position.X() - eklmhit2d.getPositionX())
+                    hist_yres_forward_mum.Fill(
+                        ext_position.Y() - eklmhit2d.getPositionY())
+                    hist_zres_forward_mum.Fill(
+                        ext_position.Z() - eklmhit2d.getPositionZ())
+                elif exthit.getPdgCode() == -13:
+                    hist_xres_forward_mup.Fill(
+                        ext_position.X() - eklmhit2d.getPositionX())
+                    hist_yres_forward_mup.Fill(
+                        ext_position.Y() - eklmhit2d.getPositionY())
+                    hist_zres_forward_mup.Fill(
+                        ext_position.Z() - eklmhit2d.getPositionZ())
 
 output_file.cd()
-hist_xres_forward.Write()
-hist_yres_forward.Write()
-hist_zres_forward.Write()
-hist_xres_backward.Write()
-hist_yres_backward.Write()
-hist_zres_backward.Write()
+hist_xres_forward_mum.Write()
+hist_xres_forward_mup.Write()
+hist_yres_forward_mum.Write()
+hist_yres_forward_mup.Write()
+hist_zres_forward_mum.Write()
+hist_zres_forward_mup.Write()
+hist_xres_backward_mum.Write()
+hist_xres_backward_mup.Write()
+hist_yres_backward_mum.Write()
+hist_yres_backward_mup.Write()
+hist_zres_backward_mum.Write()
+hist_zres_backward_mup.Write()
 output_file.Close()
 input_file.Close()

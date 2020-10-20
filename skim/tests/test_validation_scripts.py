@@ -15,17 +15,18 @@ __authors__ = ['Giacomo De Pietro']
 
 
 def dry_run(validation_path):
+    '''
+    Check if the steering file at the given path can be run with the "--dry-run" option.
+    '''
     validation_file = basf2.find_file(validation_path)
     result = os.system(f'basf2 {validation_file} --dry-run -i input.root -o output.root')
     return result, validation_path
 
 
 if __name__ == "__main__":
-
     # First let's check in a smart way how many cores we can use.
     num_workers = max(int(mp.cpu_count() / (1. + os.getloadavg()[1])), 1)
     basf2.B2INFO(f'The test will be executed using {num_workers} workers.')
-
     # Then, let's run the test!
     validation_paths = glob.glob('skim/validation/*.py')
     failed_files = []

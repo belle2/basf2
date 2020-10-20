@@ -78,17 +78,12 @@ class printCrystals(basf2.Module):
             thetaid = int(self.obj_eclgeometrypar.GetThetaID())
             phiid = int(self.obj_eclgeometrypar.GetPhiID())
 
-            self.list_pos.append(
-                np.array([x, y, z, phi, theta, phiid, thetaid]))
+            self.list_pos.append(np.array([x, y, z, phi, theta, phiid, thetaid]))
 
             nn1 = np.array(self.obj_neighbours1.getNeighbours(idx + 1))
             nn1c = np.array(self.obj_neighbours1C.getNeighbours(idx + 1))
-            nn1legacy = np.array(
-                self.obj_neighbours1legacy.getNeighbours(
-                    idx + 1))
-            nn1clegacy = np.array(
-                self.obj_neighbours1Clegacy.getNeighbours(
-                    idx + 1))
+            nn1legacy = np.array(self.obj_neighbours1legacy.getNeighbours(idx + 1))
+            nn1clegacy = np.array(self.obj_neighbours1Clegacy.getNeighbours(idx + 1))
             self.list_neighbours1.append(nn1)
             self.list_nneighbours1.append(len(nn1))
 
@@ -103,12 +98,8 @@ class printCrystals(basf2.Module):
 
             nn2 = np.array(self.obj_neighbours2.getNeighbours(idx + 1))
             nn2c = np.array(self.obj_neighbours2C.getNeighbours(idx + 1))
-            nn2legacy = np.array(
-                self.obj_neighbours2legacy.getNeighbours(
-                    idx + 1))
-            nn2clegacy = np.array(
-                self.obj_neighbours2Clegacy.getNeighbours(
-                    idx + 1))
+            nn2legacy = np.array(self.obj_neighbours2legacy.getNeighbours(idx + 1))
+            nn2clegacy = np.array(self.obj_neighbours2Clegacy.getNeighbours(idx + 1))
 
             self.list_neighbours2.append(nn2)
             self.list_nneighbours2.append(len(nn2))
@@ -128,101 +119,51 @@ class printCrystals(basf2.Module):
 
         # neighbour maps: N1 and NC1
         dfneighbours1 = pd.DataFrame(data=self.list_neighbours1)
-        dfneighbours1.to_csv(
-            'crystals_neighbours1.csv',
-            index=True,
-            header=False)
+        dfneighbours1.to_csv('crystals_neighbours1.csv', index=True, header=False)
         dfneighbours1c = pd.DataFrame(data=self.list_neighbours1c)
-        dfneighbours1c.to_csv(
-            'crystals_neighbours1c.csv',
-            index=True,
-            header=False)
+        dfneighbours1c.to_csv('crystals_neighbours1c.csv', index=True, header=False)
 
         # number of neighbours
         dfnneighbours1 = pd.DataFrame(data=self.list_nneighbours1)
-        dfnneighbours1.to_csv(
-            'crystals_nneighbours1.csv',
-            index=True,
-            header=False)
+        dfnneighbours1.to_csv('crystals_nneighbours1.csv', index=True, header=False)
         dfnneighbours1c = pd.DataFrame(data=self.list_nneighbours1c)
-        dfnneighbours1c.to_csv(
-            'crystals_nneighbours1.csv',
-            index=True,
-            header=False)
+        dfnneighbours1c.to_csv('crystals_nneighbours1.csv', index=True, header=False)
 
         # neighbour maps: N2 and NC2
         dfneighbours2 = pd.DataFrame(data=self.list_neighbours2)
-        dfneighbours2.to_csv(
-            'crystals_neighbours2.csv',
-            index=True,
-            header=False)
+        dfneighbours2.to_csv('crystals_neighbours2.csv', index=True, header=False)
         dfneighbours2c = pd.DataFrame(data=self.list_neighbours2c)
-        dfneighbours2c.to_csv(
-            'crystals_neighbours2c.csv',
-            index=True,
-            header=False)
+        dfneighbours2c.to_csv('crystals_neighbours2c.csv', index=True, header=False)
 
         # number of neighbours
         dfnneighbours2 = pd.DataFrame(data=self.list_nneighbours2)
-        dfnneighbours2.to_csv(
-            'crystals_nneighbours2.csv',
-            index=True,
-            header=False)
+        dfnneighbours2.to_csv('crystals_nneighbours2.csv', index=True, header=False)
         dfnneighbours2c = pd.DataFrame(data=self.list_nneighbours2c)
-        dfnneighbours2c.to_csv(
-            'crystals_nneighbours2c.csv',
-            index=True,
-            header=False)
+        dfnneighbours2c.to_csv('crystals_nneighbours2c.csv', index=True, header=False)
 
         # neighbour maps: N1 and NC1 LEGACY VERSION
         dfneighbours1legacy = pd.DataFrame(data=self.list_neighbours1legacy)
-        dfneighbours1legacy.to_csv(
-            'crystals_neighbours1legacy.csv',
-            index=True,
-            header=False)
+        dfneighbours1legacy.to_csv('crystals_neighbours1legacy.csv', index=True, header=False)
         dfneighbours1clegacy = pd.DataFrame(data=self.list_neighbours1clegacy)
-        dfneighbours1clegacy.to_csv(
-            'crystals_neighbours1clegacy.csv',
-            index=True,
-            header=False)
+        dfneighbours1clegacy.to_csv('crystals_neighbours1clegacy.csv', index=True, header=False)
 
         # number of neighbours
         dfnneighbours1legacy = pd.DataFrame(data=self.list_nneighbours1legacy)
-        dfnneighbours1legacy.to_csv(
-            'crystals_nneighbours1legacy.csv',
-            index=True,
-            header=False)
-        dfnneighbours1clegacy = pd.DataFrame(
-            data=self.list_nneighbours1clegacy)
-        dfnneighbours1clegacy.to_csv(
-            'crystals_nneighbours1clegacy.csv',
-            index=True,
-            header=False)
+        dfnneighbours1legacy.to_csv('crystals_nneighbours1legacy.csv', index=True, header=False)
+        dfnneighbours1clegacy = pd.DataFrame(data=self.list_nneighbours1clegacy)
+        dfnneighbours1clegacy.to_csv('crystals_nneighbours1clegacy.csv', index=True, header=False)
 
         # neighbour maps: N2 and NC2 LEGACY VERSION
         dfneighbours2legacy = pd.DataFrame(data=self.list_neighbours2legacy)
-        dfneighbours2legacy.to_csv(
-            'crystals_neighbours2legacy.csv',
-            index=True,
-            header=False)
+        dfneighbours2legacy.to_csv('crystals_neighbours2legacy.csv', index=True, header=False)
         dfneighbours2clegacy = pd.DataFrame(data=self.list_neighbours2clegacy)
-        dfneighbours2clegacy.to_csv(
-            'crystals_neighbours2clegacy.csv',
-            index=True,
-            header=False)
+        dfneighbours2clegacy.to_csv('crystals_neighbours2clegacy.csv', index=True, header=False)
 
         # number of neighbours
         dfnneighbours2legacy = pd.DataFrame(data=self.list_nneighbours2legacy)
-        dfnneighbours2legacy.to_csv(
-            'crystals_nneighbours2legacy.csv',
-            index=True,
-            header=False)
-        dfnneighbours2clegacy = pd.DataFrame(
-            data=self.list_nneighbours2clegacy)
-        dfnneighbours2clegacy.to_csv(
-            'crystals_nneighbours2clegacy.csv',
-            index=True,
-            header=False)
+        dfnneighbours2legacy.to_csv('crystals_nneighbours2legacy.csv', index=True, header=False)
+        dfnneighbours2clegacy = pd.DataFrame(data=self.list_nneighbours2clegacy)
+        dfnneighbours2clegacy.to_csv('crystals_nneighbours2clegacy.csv', index=True, header=False)
 
     def event(self):
         """Event loop"""

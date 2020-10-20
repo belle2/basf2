@@ -34,11 +34,11 @@ def dry_run(validation_file):
     '''
     Check if the steering file at the given path can be run with the "--dry-run" option.
     '''
-    result = sp.call(["basf2", validation_file, "--dry-run", "-i", "input.root", "-o", "output.root"])
+    result = sp.call(['basf2', validation_file, '--dry-run', '-i', 'input.root', '-o', 'output.root', '-l', 'ERROR'])
     return (result, validation_file)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # First, let's check in a smart way how many cores we can use (or override it).
     args = arg_parser().parse_args()
     num_workers = None

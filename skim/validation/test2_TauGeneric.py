@@ -47,5 +47,7 @@ create_validation_histograms(
         ('Theta_miss', 30, 0, 180, '', contact, '', '')],
     variables_2d=[('invMS1', 30, 0, 3, 'invMS2', 30, 0, 3, '', contact, '', '')],
     path=taugenericskim)
+
+# process
 b2.process(taugenericskim)
 print(b2.statistics)

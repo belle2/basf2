@@ -79,18 +79,7 @@ def plot_hist(region, **argk):
 all_data, mat_edges = plot_hist("All_Regions", label="All regions", c="k")
 
 # Now plot the different regions separately
-for region in [
-    "BeamPipe",
-    "PXD",
-    "SVD",
-    "CDC",
-    "ARICH",
-    "TOP",
-    "ECL",
-    "EKLM",
-    "BKLM",
-    "STR",
-        "COIL"]:
+for region in ["BeamPipe", "PXD", "SVD", "CDC", "ARICH", "TOP", "ECL", "EKLM", "BKLM", "STR", "COIL"]:
     plot_hist(region, label=region)
 
 # Log scale anyone?

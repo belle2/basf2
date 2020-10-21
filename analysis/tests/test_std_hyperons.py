@@ -109,7 +109,7 @@ class TestStdHyperons(unittest.TestCase):
             # Should be no 'Xi' list. Make sure we did not make typos.
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Xi:{xitype}']))
 
-    def test_goodX0(self):
+    def test_goodXi0(self):
         """Check goodXi0 lists: veryloose, loose, tight"""
         for xitype in ['veryloose', 'loose', 'tight']:
             def create_list(path):
@@ -118,7 +118,7 @@ class TestStdHyperons(unittest.TestCase):
                             f"xitype = {xitype}")
             self.assertFalse(self._check_list(create_list, expected_lists=[f'Xi:{xitype}']))
 
-    def test_goodX0_with_std_added_before(self):
+    def test_goodXi0_with_std_added_before(self):
         """Check goodXi0 lists: veryloose, loose, tight. Test behavior if std list was already added before."""
         for xitype in ['veryloose', 'loose', 'tight']:
             def create_list(path):

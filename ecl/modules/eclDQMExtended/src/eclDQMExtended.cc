@@ -21,9 +21,6 @@
 #include <framework/logging/Logger.h>
 
 //ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/utility/ECLDspUtilities.h>
 #include <ecl/utility/ECLDspEmulator.h>
 
@@ -83,6 +80,8 @@ ECLDQMEXTENDEDModule::ECLDQMEXTENDEDModule()
   addParam("SaveDetailedFitData", m_SaveDetailedFitData, "Save detailed data "
            "(ampdiff_{cellid,shaper}, timediff_{cellid,shaper} histograms) for "
            "failed fits.", false);
+  addParam("AdjustedTiming", m_adjusted_timing, "Use improved procedure for "
+           "time determination in ShaperDSP emulator", true);
 }
 
 ECLDQMEXTENDEDModule::~ECLDQMEXTENDEDModule()
@@ -277,14 +276,9 @@ void ECLDQMEXTENDEDModule::initialize()
 {
   REG_HISTOGRAM;   // required to register histograms to HistoManager
 
-  StoreArray<ECLDigit> ECLDigits;
-  ECLDigits.isRequired();
-
-  StoreArray<ECLTrig> ECLTrigs;
-  ECLTrigs.isOptional();
-
-  StoreArray<ECLDsp> ECLDsps;
-  ECLDsps.isOptional();
+  m_ECLDigits.isRequired();
+  m_ECLTrigs.isOptional();
+  m_ECLDsps.isOptional();
 
   if (!mapper.initFromDB()) B2FATAL("ECL DQM logic test FATAL:: Can't initialize eclChannelMapper");
 
@@ -443,9 +437,9 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   int* y = adc_data.data();
   int ttrig2 = trigger_time - 2 * (trigger_time / 8);
 
-
   auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
-                       Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres);
+                       Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2, chi_thres,
+                       m_adjusted_timing);
   m_AmpFit = result.amp;
   m_TimeFit = result.time;
   m_QualityFit = result.quality;
@@ -494,18 +488,14 @@ void ECLDQMEXTENDEDModule::beginRun()
 
 void ECLDQMEXTENDEDModule::event()
 {
-  StoreArray<ECLDsp> ECLDsps;
-  StoreArray<ECLTrig> ECLTrigs;
-  StoreArray<ECLDigit> ECLDigits;
-
   int iAmpflag_qualityfail = 0;
   int iTimeflag_qualityfail = 0;
 
-  for (auto& aECLDsp : ECLDsps) {
+  for (auto& aECLDsp : m_ECLDsps) {
     m_CellId = aECLDsp.getCellId();
     std::vector<int> DspArray = aECLDsp.getDspA();
-    if (!ECLTrigs.isValid()) B2FATAL("ECL DQM logic test FATAL: Trigger time information is not available");
-    for (auto& aECLTrig : ECLTrigs) {
+    if (!m_ECLTrigs.isValid()) B2FATAL("ECL DQM logic test FATAL: Trigger time information is not available");
+    for (auto& aECLTrig : m_ECLTrigs) {
       if (aECLTrig.getTrigId() == mapper.getCrateID(m_CellId)) {
         m_TrigTime = aECLTrig.getTimeTrig();
         break;

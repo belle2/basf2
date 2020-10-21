@@ -124,9 +124,7 @@ class defaultPulseShapeImporter(basf2.Module):
         Belle2.Database.Instance().storeData(Belle2.SVDPulseShapeCalibrations.calAmp_name, calAmp_payload, iov)
 
 
-use_database_chain()
-use_central_database("svd_onlySVDinGeoConfiguration")
-use_local_database("localDB_defaultPulseShapeCalibrations/database.txt", "localDB_defaultPulseShapeCalibrations")
+b2conditions.prepend_globaltag("svd_onlySVDinGeoConfiguration")
 
 main = create_path()
 
@@ -136,7 +134,7 @@ eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
 main.add_module(eventinfosetter)
 
 main.add_module("Gearbox")
-main.add_module("Geometry", components=['SVD'])
+main.add_module("Geometry")
 
 main.add_module(defaultPulseShapeImporter())
 

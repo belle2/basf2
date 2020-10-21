@@ -120,7 +120,7 @@ void MuidModule::initialize()
     m_Hypotheses.push_back(Const::muon);
   } else { // user defined - intended for debugging only!
     std::vector<Const::ChargedStable> stack;
-    for (const Const::ChargedStable& pdgIter : Const::chargedStableSet) {
+    for (const Const::ChargedStable pdgIter : Const::chargedStableSet) {
       stack.push_back(pdgIter);
     }
     for (unsigned int i = 0; i < m_PDGCodes.size(); ++i) {

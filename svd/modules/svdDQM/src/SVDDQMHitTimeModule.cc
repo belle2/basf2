@@ -41,10 +41,10 @@ void SVDDQMHitTimeModule::defineHisto()
   oldDir->mkdir("SVDHitTime")->cd();
 
   int nBins = 200 ;
-  double minT0 = -60 ;
-  double maxT0 =  140 ;
+  double minT0 = -100 ;
+  double maxT0 =  100 ;
   if (m_isSVDTimeCalibrated) {
-    minT0 = -100 ;
+    minT0 = -150 ;
     maxT0 =  100 ;
   }
 

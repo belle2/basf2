@@ -13,7 +13,9 @@ import multiprocessing
 
 
 class Runner(ABC):
-    """Abstract Base Class for Runner type object"""
+    """
+    Abstract Base Class for Runner type object.
+    """
     @abstractmethod
     def run(self):
         """
@@ -99,7 +101,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
         """
         """
         from .strategies import AlgorithmStrategy
-        B2INFO("SequentialAlgorithmsRunner begun for Calibration {}".format(self.name))
+        B2INFO(f"SequentialAlgorithmsRunner begun for Calibration {self.name}.")
         # First we do the setup of algorithm strategies
         strategies = []
         for algorithm in self.algorithms:
@@ -124,13 +126,13 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
                                 args=(strategy, iov, iteration, queue))
 
             self.results[strategy.algorithm.name] = []
-            B2INFO("Starting subprocess of AlgorithmStrategy for {}".format(strategy.algorithm.name))
+            B2INFO(f"Starting subprocess of AlgorithmStrategy for {strategy.algorithm.name}.")
             B2INFO("Logging will be diverted into algorithm output.")
             child.start()
             final_state = None
             final_loop = False
 
-            B2INFO("Collecting results for {}.".format(strategy.algorithm.name))
+            B2INFO(f"Collecting results for {strategy.algorithm.name}.")
             while True:
                 # Do we have results?
                 while not queue.empty():
@@ -183,7 +185,7 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
         """Runs the AlgorithmStrategy sends back the results"""
         strategy.run(iov, iteration, queue)
         # Get the return codes of the algorithm for the IoVs found by the Process
-        B2INFO("Finished Strategy for {}".format(strategy.algorithm.name))
+        B2INFO(f"Finished Strategy for {strategy.algorithm.name}.")
 
 
 class RunnerError(Exception):

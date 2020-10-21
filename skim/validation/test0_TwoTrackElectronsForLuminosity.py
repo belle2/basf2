@@ -18,7 +18,7 @@ basf2.set_log_level(basf2.LogLevel.INFO)
 
 main = basf2.create_path()
 
-main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=10000)
+main.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=1000)
 
 # Register the BABAYAGA.NLO module
 babayaganlo = basf2.register_module('BabayagaNLOInput')

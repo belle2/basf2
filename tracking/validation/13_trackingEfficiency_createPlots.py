@@ -28,7 +28,7 @@
 
 import ROOT
 
-ROOT.PyConfig.IgnoreCommandLineOptions = True
+ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
 from ROOT import TFile, TChain, TTree, TH1F, TCanvas, TGraphErrors, TGraph, \
     gStyle, TNamed, TF1, TProfile
 import sys

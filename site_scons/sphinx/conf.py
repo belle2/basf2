@@ -47,6 +47,7 @@ extensions = [
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
+    'IPython.sphinxext.ipython_console_highlighting',
 ]
 
 nbsphinx_allow_errors = True
@@ -463,3 +464,4 @@ def setup(app):
     app.connect('autodoc-process-signature', process_sig)
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-skip-member', skipmember)
+    app.add_css_file('css/custom.css')

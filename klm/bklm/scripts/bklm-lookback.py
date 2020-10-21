@@ -89,7 +89,7 @@ if (options.window[0] < 0) or (options.window[1] < options.window[0]) or (option
     sys.exit()
 window = options.window
 
-inputName = re.sub("HLT.\.f0....", "HLT*.f*", options.infilename)
+inputName = re.sub(r"HLT.\.f0....", "HLT*.f*", options.infilename)
 fileList = glob.glob(inputName)
 if len(fileList) == 0:
     print("No file(s) match {0}".format(inputName))

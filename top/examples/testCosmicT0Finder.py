@@ -52,7 +52,7 @@ gROOT.ProcessLine('struct TreeStruct {\
    float dt0;       /* difference: dt + t0 - timeShift */ \
 };')
 
-from ROOT import TreeStruct
+from ROOT import TreeStruct  # noqa
 
 
 class Ntuple(Module):

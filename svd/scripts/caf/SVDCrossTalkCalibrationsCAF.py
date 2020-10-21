@@ -7,8 +7,6 @@
 
 from basf2 import *
 
-set_log_level(LogLevel.INFO)
-
 import os
 import sys
 import multiprocessing
@@ -25,6 +23,7 @@ import rawdata as raw
 
 from basf2 import conditions
 
+set_log_level(LogLevel.INFO)
 input_branches = [
     'RawSVDs'
 ]
@@ -56,9 +55,6 @@ def SVDCrossTalkCalibrations(files, tags):
                               max_files_per_collector_job=-1,
                               backend_args=None
                               )
-    # Local database containing occupancy payload required for runs that do not have SVDOccupancy payload
-    # attached to svd_basic global tag
-    # calibration.use_local_database('/gpfs/fs02/belle2/group/detector/SVD/earlyPhase3/localDB_Occupancy/database.txt')
 
     calibration.strategies = strategies.SequentialRunByRun
 

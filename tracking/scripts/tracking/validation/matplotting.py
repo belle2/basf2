@@ -5,19 +5,18 @@ import ROOT
 import re
 import functools
 import numpy as np
-#: ignore invalid floating-point operations
-np.seterr(invalid='ignore')
-
-import sys
-#: largest possible floating-point value
-flt_max = sys.float_info.max
-#: smallest possible floating-point value
-flt_min = sys.float_info.min
-
 import collections
 from .plot import ValidationPlot
 
 import logging
+
+import sys
+#: ignore invalid floating-point operations
+np.seterr(invalid='ignore')
+#: largest possible floating-point value
+flt_max = sys.float_info.max
+#: smallest possible floating-point value
+flt_min = sys.float_info.min
 
 
 def get_logger():
@@ -45,6 +44,7 @@ class defaults:
     legend = True
     #: show label by default
     label = True
+
 
 #: A list of classes that are implemented as plotable
 plotable_classes = (
@@ -509,8 +509,10 @@ def get_stats_from_th(th):
     return stats
 
 
-def compose_stats_label(title, additional_stats={}):
+def compose_stats_label(title, additional_stats=Nnoe):
     """Render the summary statistics to a label string."""
+    if additional_stats is None:
+        additional_stats = {}
     keys = list(additional_stats.keys())
     labeled_value_template = "{0:<9}: {1:.3g}"
     labeled_string_template = "{0:<9}: {1:>9s}"

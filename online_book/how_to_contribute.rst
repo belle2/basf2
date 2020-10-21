@@ -1,4 +1,4 @@
-.. _how_to_contribute:
+.. _onlinebook_how_to_contribute:
 
 Why contribute? Read our propaganda at :doc:`/online_book/contribute`.
 
@@ -43,7 +43,7 @@ Submitting a PR
 You need to 
 
 1. Clone the software repository or create a development setup as explained in
-   :doc:`/tools_doc/index-01-tools`
+   :ref:`build/tools_doc/index-01-tools:Development Setup`
 2. Change to a new branch ``feature/...`` or ``bugfix/...``
 3. Make your changes
 4. Optionally: Preview them locally as described in :doc:`/framework/doc/atend-doctools`

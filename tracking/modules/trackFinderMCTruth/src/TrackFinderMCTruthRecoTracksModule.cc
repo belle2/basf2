@@ -193,6 +193,27 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "If set true hits marked as auxiliary (e.g. hits in higher loops) will not be included in the track candidate.",
            m_discardAuxiliaryHits);
 
+  addParam("useCDCSuperLayers",
+           m_param_useCDCSuperLayers,
+           "List of CDC super layers to be used.",
+           m_param_useCDCSuperLayers);
+
+  addParam("useCDCLayers",
+           m_param_useCDCLayers,
+           "List of layers to be used. "
+           "If a layer number is given in 'ignoreLayers', too, this will result on a B2FATAL. "
+           "Either use 'useLayers' and provide a set of layers to be used, "
+           "or use 'ignoreLayers' and provide a list of layers to be ignored, but not both at the same time.",
+           m_param_useCDCLayers);
+
+  addParam("ignoreCDCLayers",
+           m_param_ignoreCDCLayers,
+           "List of layers to be ignored. "
+           "If a layer number is given in 'useLayers', too, this will result on a B2FATAL. "
+           "Either use 'useLayers' and provide a set of layers to be used, "
+           "or use 'ignoreLayers' and provide a list of layers to be ignored, but not both at the same time.",
+           m_param_ignoreCDCLayers);
+
 
 
 }
@@ -266,6 +287,40 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
       B2FATAL("Both relative smearing (Smearing) and using a smearing cov (SmearingCov) is activated but only one of both can be used");
     }
   }
+
+  if (not m_param_useCDCSuperLayers.empty()) {
+    for (const uint useSuperLayer : m_param_useCDCSuperLayers) {
+      m_useCDCSuperLayers.at(useSuperLayer) = true;
+    }
+  } else {
+    m_useCDCSuperLayers.fill(true);
+  }
+
+  // Check for common value in the two vectors for using / ignoring layers
+  for (const uint useLayer : m_param_useCDCLayers) {
+    for (const uint ingoreLayer : m_param_ignoreCDCLayers) {
+      if (useLayer == ingoreLayer) {
+        B2FATAL("You chose to use and ignore CDC layer " << useLayer << " at the same time. "
+                "Please decide to either use or to ignore the layer.");
+      }
+    }
+  }
+
+  // fill all layers that should be used
+  if (not m_param_useCDCLayers.empty()) {
+    for (const uint layer : m_param_useCDCLayers) {
+      m_useCDCLayers.at(layer) = true;
+    }
+  } else {
+    m_useCDCLayers.fill(true);
+  }
+  // set layers that should be ignored to false
+  if (not m_param_ignoreCDCLayers.empty()) {
+    for (const uint layer : m_param_ignoreCDCLayers) {
+      m_useCDCLayers.at(layer) = false;
+    }
+  }
+
 }
 
 void TrackFinderMCTruthRecoTracksModule::beginRun()
@@ -427,7 +482,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
       MCParticle* currentMother = aMcParticlePtr->getMother();
       int nFalsePdgCodes = 0;
       int nAncestor = 0;
-      while (currentMother not_eq NULL) {
+      while (currentMother not_eq nullptr) {
         int currentMotherPdgCode = currentMother->getPDG();
         for (int i = 0; i not_eq nFromPdgCodes; ++i) {
           if (m_fromPdgCodes[i] not_eq currentMotherPdgCode) {
@@ -656,6 +711,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
           const CDCHit* cdcHit = relatedHits.object(i);
 
+          unsigned short superLayerId = cdcHit->getISuperLayer();
+          if (not m_useCDCSuperLayers[superLayerId]) continue;
+          unsigned short layerID = cdcHit->getICLayer();
+          if (not m_useCDCLayers[layerID]) continue;
+
           // continue if this is a 2nd CDC hit information and we do not want to use it
           if (!m_useSecondCDCHits && cdcHit->is2ndHit()) {
             continue;
@@ -681,7 +741,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
           // if flag is set discard all auxiliary hits:
           if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
-          int superLayerId = cdcHit->getISuperLayer();
 
           const CDCSimHit* aCDCSimHitPtr = cdcHit->getRelatedFrom<CDCSimHit>();
           if (not aCDCSimHitPtr) {

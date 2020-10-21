@@ -47,7 +47,9 @@ using namespace Belle2;
 //
 //
 //
-TrgEclCluster::TrgEclCluster(): _BRICN(0), _FWDICN(0), _BWDICN(0), _BRNofCluster(0), _FWDNofCluster(0), _BWDNofCluster(0),
+TrgEclCluster::TrgEclCluster():
+  _BRICN(0), _FWDICN(0), _BWDICN(0),
+  _BRNofCluster(0), _FWDNofCluster(0), _BWDNofCluster(0),
   _EventId(0), _Method(1), _LimitNCluster(6), _Position(1)
 {
   // initialize All parameters
@@ -172,7 +174,9 @@ TrgEclCluster::setICN(std::vector<int> tcid)
   return;
 }
 void
-TrgEclCluster::setICN(std::vector<int> tcid, std::vector<double> tcenergy, std::vector<double> tctiming)
+TrgEclCluster::setICN(std::vector<int> tcid,
+                      std::vector<double> tcenergy,
+                      std::vector<double> tctiming)
 {
   TCId = tcid ;
   Energy = tcenergy;
@@ -245,9 +249,6 @@ void TrgEclCluster::setBarrelICN(int Method)
   TCFireTiming.resize(432, 0.);
   TCFirePosition.resize(432, std::vector<double>(3, 0.));
 
-
-
-
   const int  hit_size  = TCId.size();
   for (int ihit = 0 ; ihit < hit_size ; ihit++) {
     if (TCId[ihit] >= 81 && TCId[ihit] <= 512) {
@@ -259,11 +260,9 @@ void TrgEclCluster::setBarrelICN(int Method)
       TCFirePosition[TCId[ihit] - 81][2] = (_TCMap->getTCPosition(TCId[ihit])).Z();
     }
   }
-
-
-  // // //
-  // // //
-  // // //
+  //
+  //
+  //
   int tc_upper = 0; // check upper TC
   int tc_upper_right = 0; // check right TC
   int tc_right = 0; // check right TC
@@ -1009,7 +1008,6 @@ TrgEclCluster::setForwardICN(int Method)
       TempNofTCinCluster.push_back(noftcincluster);
       TempMaxTCId.push_back(maxTCId);
 
-
       Sort1D.push_back(TempICNTCId);
       Sort1D.push_back(clusterenergy);
       Sort1D.push_back(clustertiming);
@@ -1041,15 +1039,9 @@ TrgEclCluster::setForwardICN(int Method)
     ClusterPositionZ[1].push_back(Sort2D[jtc][5]);
     NofTCinCluster[1].push_back(Sort2D[jtc][6]);
     MaxTCId[1].push_back(Sort2D[jtc][7]);
-
-
   }
 
-
-
-
   _FWDNofCluster = MaxTCId[1].size();
-
 }
 //
 //
@@ -1085,8 +1077,6 @@ void TrgEclCluster::setBackwardICN(int Method)
   Sort1D.clear();
   Sort2D.clear();
 
-
-
   TCFire.clear();
   TCFireEnergy.clear();
   TCFireTiming.clear();
@@ -1096,8 +1086,6 @@ void TrgEclCluster::setBackwardICN(int Method)
   TCFireEnergy.resize(64, 0.);
   TCFireTiming.resize(64, 0.);
   TCFirePosition.resize(64, std::vector<double>(3, 0.));
-
-
 
   const int  hit_size  = TCId.size();
   for (int ihit = 0 ; ihit < hit_size ; ihit++) {
@@ -1390,7 +1378,6 @@ void TrgEclCluster::setBackwardICN(int Method)
 
   const int clustersize = Sort2D.size();
   for (int jtc = 0; jtc < clustersize; jtc++) {
-
     ClusterEnergy[2].push_back(Sort2D[jtc][1]);
     ClusterTiming[2].push_back(Sort2D[jtc][2]);
     ClusterPositionX[2].push_back(Sort2D[jtc][3]);
@@ -1398,14 +1385,9 @@ void TrgEclCluster::setBackwardICN(int Method)
     ClusterPositionZ[2].push_back(Sort2D[jtc][5]);
     NofTCinCluster[2].push_back(Sort2D[jtc][6]);
     MaxTCId[2].push_back(Sort2D[jtc][7]);
-
-
   }
 
   _BWDNofCluster = MaxTCId[2].size();
-
-
-
 }
 
 //
@@ -1439,8 +1421,6 @@ TrgEclCluster::setBarrelICN()
   int tc_lower_left = 0; // check lower TC
   int tc_left = 0;
   int tc_upper_left = 0;
-
-
 
   for (int iii = 0 ; iii < 432 ; iii++) {
     if (TCFire[iii] == 0) { continue; }
@@ -1512,7 +1492,6 @@ TrgEclCluster::setBarrelICN()
       }
     }
 
-
     TempCluster[0] = iii + 80 + 1; //middle of ICN
     TempCluster[1] = tc_upper; // upper
     TempCluster[2] = tc_upper_right; //right
@@ -1523,12 +1502,10 @@ TrgEclCluster::setBarrelICN()
     TempCluster[7] = tc_left; //lower
     TempCluster[8] = tc_upper_left; //lower right;
 
-
-
     if (!(tc_upper != 0 || tc_left != 0)) {
       if (!(tc_lower != 0 && tc_lower_left != 0)) {
         _BRICN++;
-        int phiid = _TCMap -> getTCPhiIdFromTCId(iii + 80 + 1);
+        int phiid = _TCMap->getTCPhiIdFromTCId(iii + 80 + 1);
 
         if (phiid == 36 || (phiid > 0 && phiid < 11)) {
           _Quadrant[1][0]++;
@@ -1682,7 +1659,7 @@ TrgEclCluster::setForwardICN()
     if (!(TempCluster[1] != 0 || TempCluster[7] != 0)) {
       if (!(TempCluster[5] != 0 && TempCluster[6] != 0)) {
         _FWDICN++;
-        int phiid = _TCMap -> getTCPhiIdFromTCId(TCFire[iii]);
+        int phiid = _TCMap->getTCPhiIdFromTCId(TCFire[iii]);
 
         if (phiid == 32 || (phiid > 0 && phiid < 10)) {
           _Quadrant[0][0]++;
@@ -1833,7 +1810,7 @@ int TrgEclCluster::setBackwardICN()
     if (!(TempCluster[1] != 0 || TempCluster[7] != 0)) {
       if (!(TempCluster[5] != 0 && TempCluster[6] != 0)) {
         _BWDICN ++;
-        int phiid = _TCMap -> getTCPhiIdFromTCId(TCFire[iii]);
+        int phiid = _TCMap->getTCPhiIdFromTCId(TCFire[iii]);
 
         if (phiid == 32 || (phiid > 0 && phiid < 10)) {
           _Quadrant[2][0]++;
@@ -1851,14 +1828,9 @@ int TrgEclCluster::setBackwardICN()
 
       }
     }
-
   }
 
-
-
-
   return _BWDICN;
-
 }
 //
 //

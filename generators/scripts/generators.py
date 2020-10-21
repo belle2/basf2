@@ -186,17 +186,23 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate=''):
+def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False):
     """
-    Add the default muon pair and tau pair generator KKMC
+    Add the default muon pair and tau pair generator KKMC.
+    For tau decays, TauolaBelle and TauolaBBB are available.
+    Signal events can be produced setting a configuration file. Please notice that the configuration files for
+    TauolaBelle and TauolaBBB has a very different structure (see the examples below generators/examples).
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate(str): either "mu+mu-" or "tau+tau-"
+        finalstate(str): either "mu-mu+" or "tau-tau+"
+        signalconfigfile(str): File with configuration of the signal event to generate. It doesn't affect mu-mu+ decays.
+        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBBB is used.
+                              It doesn't affect mu-mu+ decays.
     """
 
     #: kkmc input file
-    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
+    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tauola_bbb.input.dat')
 
     #: kkmc file that will hold cross section and other information
     kkmc_logfile = 'kkmc_tautau.txt'
@@ -204,15 +210,36 @@ def add_kkmc_generator(path, finalstate=''):
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: tau config file (empty for mu+mu-)
-    kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+    #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBBB)
+    kkmc_tauconfigfile = ''
 
     if finalstate == 'tau+tau-':
-        pass
-    elif finalstate == 'mu+mu-':
+        B2WARNING("add_kkmc_generator: please set finalstate as 'tau-tau+'. 'tau+tau-' will be deprecated in the future"
+                  " for consistency in the configuration files.")
+        finalstate = 'tau-tau+'
+    if finalstate == 'mu+mu-':
+        B2WARNING("add_kkmc_generator: please set finalstate as 'mu-mu+'. 'mu+mu-' will be deprecated in the future for"
+                  " consistency in the configuration files.")
+        finalstate = 'mu-mu+'
+
+    if finalstate == 'tau-tau+':
+        if useTauolaBelle:
+            B2INFO("Generating tau pair events with TauolaBelle")
+            #: If TauolaBelle, the tau decay must be controlled by Pythia flags
+            kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
+            kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+        #: Check if there is a signal decfile provided by the user
+        if not signalconfigfile == '':
+            B2INFO(f"Using config file defined by user: {signalconfigfile}")
+            if useTauolaBelle:
+                kkmc_tauconfigfile = signalconfigfile
+            else:
+                kkmc_inputfile = signalconfigfile
+
+    elif finalstate == 'mu-mu+':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')
         kkmc_logfile = 'kkmc_mumu.txt'
-        kkmc_tauconfigfile = ''
+
     else:
         B2FATAL("add_kkmc_generator final state not supported: {}".format(finalstate))
 
@@ -294,7 +321,7 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
     )
 
 
-def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticledata=0, *, skip_on_failure=True):
+def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure=True):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
 
@@ -305,8 +332,6 @@ def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticled
         path (basf2.Path): path where the generator should be added
         finalstate (str): uubar, ddbar, ssbar, ccbar
         userdecfile (str): EvtGen decfile used for particle decays
-        useevtgenparticledata (bool): Experimental feature to use a consistent
-            set of particle properties between EvtGen and PYTHIA
         skip_on_failure (bool): If True stop event processing right after
             fragmentation fails. Otherwise continue normally
     """
@@ -367,7 +392,6 @@ def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticled
         UseEvtGen=1,
         DecFile=decay_file,
         UserDecFile=decay_user,
-        useEvtGenParticleData=useevtgenparticledata
     )
 
     if skip_on_failure:
@@ -378,7 +402,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', useevtgenparticled
 
 
 def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='',
-                                      useevtgenparticledata=0, *, include_conjugates=True, max_iterations=100000):
+                                      *, include_conjugates=True, max_iterations=100000):
     """
     Add continuum generation but require at least one of the given particles be
     present in the event.
@@ -399,8 +423,6 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
         particles (list): A list of particle names or pdg codes. An event is
            only accepted if at lease one of those particles appears in the event.
         userdecfile (str): EvtGen decfile used for particle decays
-        useevtgenparticledata (bool): Experimental feature to use a consistent
-            set of particle properties between EvtGen and PYTHIA
         include_conjugates (bool): If True (default) accept the event also if a
             charge conjugate of the given particles is found
         max_iterations (int): maximum tries per event to generate the requested
@@ -414,7 +436,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
     loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles"])
     # add the generator but make sure it doesn't stop processing on
     # fragmentation failure as is this currently not supported by do_while
-    add_continuum_generator(loop_path, finalstate, userdecfile, useevtgenparticledata, skip_on_failure=False)
+    add_continuum_generator(loop_path, finalstate, userdecfile, skip_on_failure=False)
     # check for the particles we want
     loop_path.add_module("InclusiveParticleChecker", particles=particles, includeConjugates=include_conjugates)
     # Done, add this to the path and iterate it until we found our particle
@@ -574,6 +596,17 @@ def add_cosmics_generator(path, components=None,
         top_in_counter (bool): time of propagation from the hit point to the PMT in the trigger counter is subtracted
             (assuming PMT is put at -z of the counter).
     """
+
+    B2FATAL('''The function "add_cosmics_generator()" is outdated and it is currently not working: please replace
+
+  add_cosmics_generator(path=path)
+
+with
+
+  path.add_module('CRYInput')
+
+in your steering file (the module parameter "acceptance" has to be set, see the module docummentation).''')
+
     import cdc.cr as cosmics_setup
 
     if global_box_size is None:

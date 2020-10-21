@@ -3,14 +3,13 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
+ * Contributors: Torben Ferber (torben.ferber@desy.de)                    *
  *               Poyuan Chen                                              *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSIMHIT_H
-#define ECLSIMHIT_H
+#pragma once
 
 #include <G4ThreeVector.hh>
 #include <simulation/dataobjects/SimHitBase.h>
@@ -147,4 +146,3 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif

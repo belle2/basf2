@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2017
 
@@ -61,7 +60,7 @@ if __name__ == "__main__":
     p, t = method.apply_expert(test_data, general_options.m_treename)
     global_auc = basf2_mva_util.calculate_roc_auc(p, t)
 
-    # Approach 1: Read out the importance calculted by the method itself
+    # Approach 1: Read out the importance calculated by the method itself
     print("Variable importances returned my method")
     for variable in method.variables:
         print(variable, method.importances.get(variable, 0.0))

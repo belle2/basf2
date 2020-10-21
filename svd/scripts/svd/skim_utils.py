@@ -6,7 +6,7 @@
 ##
 
 ######
-# util to skim out the event triggered with random trigger
+# util to skim the events
 #
 # in order to use this function:
 # import it:
@@ -15,7 +15,7 @@
 #     skimRNDtrg = skimOutRNDTrgModule()
 #     main.add_module(skimRNDtrg)
 #     emptypath = create_path()
-#     skimRNDtrg .if_false(emptypath)
+#     skimRNDtrg.if_false(emptypath)
 ####
 
 import basf2
@@ -80,8 +80,39 @@ class skimSVDBurstEventsModule(basf2.Module):
 
             return
 
-        # unknown meaning of this number
         if strips.getEntries() > self.nMaxStrips:
+            self.return_value(1)
+        else:
+            self.return_value(0)
+
+
+class skim6SampleEventsPyModule(basf2.Module):
+    """
+    returns True if the event is acquired with 6 samples
+    """
+
+    def __init__(self):
+        """constructor"""
+
+        super().__init__()
+
+    def event(self):
+        '''event'''
+
+        # take SVDEventInfo or SVDvVentInfoSim
+        eventInfo = Belle2.PyStoreObj('SVDEventInfo')
+
+        if not eventInfo.isValid():
+            eventInfo = Belle2.PyStoreObjPtr('SVDEventInfoSim')
+
+        if not eventInfo.isValid():
+            B2WARNING('No SVDEventInfo/SVDEventInfoSim - event ignored')
+            self.return_value(0)
+
+            return
+
+        # check if we acquired 6-sample strips in this event
+        if eventInfo.getNSamples() == 6:
             self.return_value(1)
         else:
             self.return_value(0)

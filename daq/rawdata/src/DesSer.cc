@@ -13,6 +13,9 @@
 #include <sys/mman.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
+#include <unistd.h>
+
+#include <csignal>
 
 #include <csignal>
 

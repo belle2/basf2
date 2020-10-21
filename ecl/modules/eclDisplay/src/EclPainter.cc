@@ -79,7 +79,7 @@ void EclPainter::getInformation(int, int, MultilineWidget* panel)
 
 EclPainter* EclPainter::handleClick(int, int)
 {
-  return NULL;
+  return nullptr;
 }
 
 void EclPainter::setXRange(int, int)

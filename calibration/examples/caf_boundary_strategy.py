@@ -3,7 +3,6 @@
 # and change the input data below.
 
 from basf2 import *
-set_log_level(LogLevel.DEBUG)
 
 import sys
 from pathlib import Path
@@ -13,6 +12,9 @@ from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
+
+
+set_log_level(LogLevel.DEBUG)
 
 
 def main(argv):

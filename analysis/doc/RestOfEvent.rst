@@ -156,7 +156,7 @@ In basf2 this is realized by ``path.for_each`` functionality:
 In this example we create another path ``roe_path``, which is used to loop over the created ROE objects.
 By calling ``modularAnalysis`` methods with ``path = roe_path`` we create basf2 modules, which will be executed for each ROE candidate.
 Here we fill ``gamma:roe`` particle list with ROE photons by using 
-a cut ``isInRestOfEvent == 1``. One can proceeed to fill other types ROE particles, 
+a cut ``isInRestOfEvent == 1``. One can proceed to fill other types ROE particles, 
 like pions, kaons etc, in the same way. 
 It is possible to execute other modules in the ROE loop, like :func:`modularAnalysis.reconstructDecay` for example,
 however, it is **important** to use a proper ROE path when calling any basf2 functionality in the ROE loop.
@@ -178,7 +178,7 @@ extended to any particle on the signal side, for example:
 ROE masks
 ---------
 
-The ROE object contains **every** particle in the event, which has not been associated to the targed particle candidate. 
+The ROE object contains **every** particle in the event, which has not been associated to the target particle candidate. 
 Therefore, a clean up procedure is **necessary** to filter out beam-induced energy depositions from the ROE.
 In basf2 framework it is done using a concept of ROE mask. The ROE mask is a simple container of particles, 
 which have passed a selection criteria:

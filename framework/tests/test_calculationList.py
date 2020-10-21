@@ -112,6 +112,7 @@ class TestCalculationList(TestCase):
             else:
                 self.assertEqual(all_calculation_kwargs[index], None)
 
+
 if __name__ == "__main__":
     main()
 # @endcond

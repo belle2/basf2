@@ -2,6 +2,7 @@ import basf2
 import ROOT
 import datetime
 import os
+import re
 import subprocess
 from basf2 import *
 from ROOT import Belle2
@@ -35,7 +36,6 @@ elif argc == 2:
 
 probcut = float(probcut)
 # print(probcut)
-import re
 
 rootdir = None
 prefix = None

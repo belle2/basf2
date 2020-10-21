@@ -54,7 +54,6 @@ void SpacePointCreatorTestModule::initialize()
 
 
   for (auto aName : m_containerSpacePointsName) {
-    // cppcheck-suppress useStlAlgorithm
     m_allSpacePointStoreArrays.push_back({/* aName,*/ StoreArray<SpacePoint>(aName) });
   }
 
@@ -145,7 +144,6 @@ void SpacePointCreatorTestModule::event()
       std::vector<genfit::PlanarMeasurement> tempMeasurements = aSP.getGenfitCompatible();
 
       for (genfit::PlanarMeasurement& measurement : tempMeasurements) {
-        // cppcheck-suppress useStlAlgorithm
         hitOutput.push_back({aSP.getType(), measurement.clone()});
       }
     }

@@ -99,7 +99,7 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
   std::size_t nAxialTracks = mcTracksByMCParticleIdx.size();
   outputAxialTracks.reserve(outputAxialTracks.size() + nAxialTracks);
 
-  for (const std::pair<ITrackType, CDCHitVector>& mcTracksAndMCParticleIdx : mcTracksByMCParticleIdx) {
+  for (const std::pair<ITrackType, CDCHitVector> mcTracksAndMCParticleIdx : mcTracksByMCParticleIdx) {
 
     const CDCHitVector& mcTrack = mcTracksAndMCParticleIdx.second;
 

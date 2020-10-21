@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOUSCHEKTURTLEINPUTMODULE_H_
-#define TOUSCHEKTURTLEINPUTMODULE_H_
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -74,4 +73,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif /* TOUSCHEKTURTLEINPUTMODULE_H_ */

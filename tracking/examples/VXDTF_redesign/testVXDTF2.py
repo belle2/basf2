@@ -19,6 +19,7 @@ from basf2 import *
 import argparse
 # Import custom module chain for VXDTF2
 from setup_modules import setup_VXDTF2
+import sys
 
 
 # ---------------------------------------------------------------------------------------
@@ -70,15 +71,11 @@ geometry.param('components', ['BeamPipe',
                               'SVD'])
 path.add_module(geometry)
 
-# Event counter
-eventCounter = register_module('EventCounter')
-path.add_module(eventCounter)
-
 
 # VXDTF2: Including actual VXDTF2 Modul Chain
 setup_VXDTF2(path=path,
              use_pxd=usePXD,
-             secmap_name=secmap_name,
+             sec_map_file=secmap_name,
              overlap_filter='hopfield',
              quality_estimator='circleFit')
 
@@ -111,6 +108,6 @@ if useDisplay:
     display.param('showAllPrimaries', True)
     path.add_module(display)
 
-
+path.add_module('Progress')
 process(path)
 print(statistics)

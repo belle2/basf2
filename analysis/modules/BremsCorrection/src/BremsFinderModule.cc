@@ -16,12 +16,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationVector.h>
-#include <framework/datastore/StoreArray.h>
 
 // dataobjects
-#include <analysis/dataobjects/Particle.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
@@ -154,17 +150,12 @@ namespace Belle2 {
     m_outputList.registerInDataStore(m_outputListName, flags);
     m_outputAntiList.registerInDataStore(m_outputAntiListName, flags);
 
-    StoreArray<Particle> particles;
-    StoreArray<PIDLikelihood> pidlikelihoods;
-    particles.registerRelationTo(pidlikelihoods);
+    m_particles.registerRelationTo(m_pidlikelihoods);
   }
 
   void BremsFinderModule::event()
   {
-    StoreArray<Particle> particles;
-    StoreArray<MCParticle> mcParticles;
-
-    RelationArray particlesToMCParticles(particles, mcParticles);
+    RelationArray particlesToMCParticles(m_particles, m_mcParticles);
 
     // new output particle list
     m_outputList.create();
@@ -309,7 +300,7 @@ namespace Belle2 {
       correctedLepton.addExtraInfo("bremsCorrectedPhotonEnergy", bremsGammaEnergySum);
 
       // add the mc relation
-      Particle* newLepton = particles.appendNew(correctedLepton);
+      Particle* newLepton = m_particles.appendNew(correctedLepton);
       const MCParticle* mcLepton = lepton->getRelated<MCParticle>();
       const PIDLikelihood* pid = lepton->getPIDLikelihood();
 

@@ -79,10 +79,10 @@ energy range and the set of particles involved.  For Belle2PhysicsList, and most
 Geant4 reference physics lists, these processes are usually implemented by two main 
 hadronic models, the Bertini cascade and the FTFP QCD string model.  QCD string models
 are excellent for high energies where the incident hadron has more than a few GeV of
-kinetic energy, sufficent to form a QCD string.  Below such energies, QCD strings do not
+kinetic energy, sufficient to form a QCD string.  Below such energies, QCD strings do not
 form and a larger part of the target nucleus contributes to the reaction.  Hence
 intra-nuclear cascade models such as Bertini are used.  Because the dividing line
-between these two regimes is not sharp, and because a smooth transiton between one and
+between these two regimes is not sharp, and because a smooth transition between one and
 the other is desired, Geant4 hadronic models are often overlapped in energy.  The
 following list shows the energy ranges over which the hadronic models are applied.
 

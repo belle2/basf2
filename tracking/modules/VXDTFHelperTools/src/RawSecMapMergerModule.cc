@@ -41,6 +41,9 @@ RawSecMapMergerModule::RawSecMapMergerModule() : Module()
   addParam("printFullGraphs", m_PARAMprintFullGraphs,
            "If true, the full trained graphs will be printed to screen. WARNING: produces a lot of output for full detector-cases!",
            bool(false));
+
+  addParam("threshold", m_RelThreshold,
+           "Relative threshold (in %) used to prune the sector maps. Will remove X % of the least used subgraphs.", {0});
 }
 
 
@@ -185,8 +188,9 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
 
   // creating main graph containing all subgraphs:
   vector<string> filterNames;
-  // cppcheck-suppress useStlAlgorithm
-  for (auto& entry : filterBranches) { filterNames.push_back(entry.name); }
+  for (auto& entry : filterBranches) {
+    filterNames.push_back(entry.name);
+  }
   SectorGraph<FilterType> mainGraph(filterNames);
 
   if (nEntries == 0) { B2WARNING("buildGraph: valid file but no data stored!"); return mainGraph; }

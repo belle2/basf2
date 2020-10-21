@@ -388,7 +388,8 @@ def _std_hyperon_is_in_path(hyperon, path):
     :param path: Instance of basf2.Path
     :returns: Boolean, whether  ``PListCutAndCopy`` with ``outputListName`` ``<hyperon>:std`` was found in path.
     """
-    # this function only checks the
+    # maybe this function could be generalized for other standard particles, but
+    # so far it has only been tested for standard hyperons:
     allowed_hyperons = {"Xi-", "Xi0", "Omega-"}
     if hyperon not in allowed_hyperons:
         raise ValueError(

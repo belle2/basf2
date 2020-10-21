@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from ROOT import Belle2
 from basf2 import B2ERROR, B2WARNING
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
 from vertex import treeFit, kFit

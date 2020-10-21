@@ -21,30 +21,26 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
 // framework aux
 #include <framework/logging/Logger.h>
 
-#include <iostream>
-#include <algorithm>
 #include <cmath>
-
-using namespace std;
 
 namespace Belle2 {
   namespace Variable {
+
+    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+    static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
     // An helper function to get track fit results
     // Not registered in variable mananger
     TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle)
     {
       const Track* track = particle->getTrack();
-      if (!track) {
-        return nullptr;
-      }
+      if (!track) return nullptr;
 
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(Const::ChargedStable(abs(
                                          particle->getPDGCode())));
@@ -54,9 +50,7 @@ namespace Belle2 {
     double trackNHits(const Particle* part, const Const::EDetector& det)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
 
       if (det == Const::EDetector::CDC) {
         return trackFit->getHitPatternCDC().getNHits();
@@ -65,7 +59,7 @@ namespace Belle2 {
       } else if (det == Const::EDetector::PXD) {
         return trackFit->getHitPatternVXD().getNPXDHits();
       } else {
-        return std::numeric_limits<double>::quiet_NaN();
+        return realNaN;
       }
     }
 
@@ -92,278 +86,203 @@ namespace Belle2 {
     double trackNDF(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getNDF();
     }
 
     double trackChi2(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getChi2();
     }
 
     double trackFirstSVDLayer(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getHitPatternVXD().getFirstSVDLayer();
     }
 
     double trackFirstPXDLayer(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
     }
 
     double trackFirstCDCLayer(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getHitPatternCDC().getFirstLayer();
     }
 
     double trackLastCDCLayer(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getHitPatternCDC().getLastLayer();
     }
 
     double trackD0(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getD0();
     }
 
     double trackPhi0(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getPhi0();
     }
 
     double trackOmega(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getOmega();
     }
 
     double trackZ0(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getZ0();
     }
 
     double trackTanLambda(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
       return trackFit->getTanLambda();
     }
 
     double trackD0Error(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[0][0];
-      if (errorSquared > 0.0)
-        return sqrt(errorSquared);
-      else
-        return std::numeric_limits<double>::quiet_NaN();
+      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
     }
 
     double trackPhi0Error(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[1][1];
-      if (errorSquared > 0.0)
-        return sqrt(errorSquared);
-      else
-        return std::numeric_limits<double>::quiet_NaN();
+      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
     }
 
     double trackOmegaError(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[2][2];
-      if (errorSquared > 0.0)
-        return sqrt(errorSquared);
-      else
-        return std::numeric_limits<double>::quiet_NaN();
+      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
     }
 
     double trackZ0Error(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[3][3];
-      if (errorSquared > 0.0)
-        return sqrt(errorSquared);
-      else
-        return std::numeric_limits<double>::quiet_NaN();
+      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
     }
 
     double trackTanLambdaError(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
+      if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[4][4];
-      if (errorSquared > 0.0)
-        return sqrt(errorSquared);
-      else
-        return std::numeric_limits<double>::quiet_NaN();
+      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
     }
 
     double trackPValue(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return std::numeric_limits<float>::quiet_NaN();
-      }
-
+      if (!trackFit) return realNaN;
       return trackFit->getPValue();
     }
 
     double trackFitHypothesisPDG(const Particle* part)
     {
       auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) {
-        return 0.0;
-      }
-
+      if (!trackFit) return realNaN;
       return trackFit->getParticleType().getPDGCode();
     }
 
     double trackNECLClusters(const Particle* part)
     {
       const Track* track = part->getTrack();
-      if (!track)
-        return std::numeric_limits<double>::quiet_NaN();
+      if (!track) return realNaN;
 
       // count the number of nPhotons hypothesis ecl clusters
       int count = 0;
       for (const ECLCluster& cluster : track->getRelationsTo<ECLCluster>())
         if (cluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-          count++;
-      return double(count);
+          ++count;
+      return count;
+    }
+
+    // used in trackHelixExtTheta and trackHelixExtPhi
+    TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
+    {
+      if (pars.size() != 3) {
+        B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
+        return vecNaN;
+      }
+
+      const double r    = pars[0];
+      const double zfwd = pars[1];
+      const double zbwd = pars[2];
+
+      // get the track fit
+      auto trackFit = getTrackFitResultFromParticle(part);
+      if (!trackFit) return vecNaN;
+
+      // get helix and paremeters
+      const double z0 = trackFit->getZ0();
+      const double tanlambda = trackFit->getTanLambda();
+      const Helix h = trackFit->getHelix();
+
+      // extrapolate to radius
+      const double arcLength = h.getArcLength2DAtCylindricalR(r);
+      const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
+
+      // extrapolate to FWD z
+      const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
+
+      // extrapolate to BWD z
+      const double lBWD = (zbwd - z0) / tanlambda > 0 ? (zbwd - z0) / tanlambda : std::numeric_limits<double>::max();
+
+      // pick smalles arclength
+      const double l = std::min({lHelixRadius, lFWD, lBWD});
+
+      return h.getPositionAtArcLength2D(l);
     }
 
     // returns extrapolated theta position based on helix parameters
     double trackHelixExtTheta(const Particle* part, const std::vector<double>& pars)
     {
-      if (pars.size() != 3) {
-        B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
-        return std::numeric_limits<double>::quiet_NaN();
-      }
-
-      const double r = pars[0];
-      const double zfwd = pars[1];
-      const double zbwd = pars[2];
-
-      // get the track fit
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) return std::numeric_limits<double>::quiet_NaN();
-
-      // get helix and paremeters
-      const double z0 = trackFit->getZ0();
-      const double tanlambda = trackFit->getTanLambda();
-      const Helix h = trackFit->getHelix();
-
-      // extrapolate to radius
-      const double arcLength = h.getArcLength2DAtCylindricalR(r);
-      const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
-
-      // extrapolate to FWD z
-      const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
-
-      // extrapolate to BWD z
-      const double lBWD = (zbwd - z0) / tanlambda > 0 ? (zbwd - z0) / tanlambda : std::numeric_limits<double>::max();
-
-      // pick smalles arclength
-      const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
-
-      return atan2(h.getPositionAtArcLength2D(l).Perp(), h.getPositionAtArcLength2D(l).Z());
+      TVector3 position = getPositionOnHelix(part, pars);
+      if (position == vecNaN) return realNaN;
+      return position.Theta();
     }
 
     // returns extrapolated phi position based on helix parameters
     double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars)
     {
-      if (pars.size() != 3) {
-        B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
-        return std::numeric_limits<double>::quiet_NaN();
-      }
-
-      const double r = pars[0];
-      const double zfwd = pars[1];
-      const double zbwd = pars[2];
-
-      // get the track fit
-      auto trackFit = getTrackFitResultFromParticle(part);
-      if (!trackFit) return std::numeric_limits<double>::quiet_NaN();
-
-      // get helix and paremeters
-      const double z0 = trackFit->getZ0();
-      const double tanlambda = trackFit->getTanLambda();
-      const Helix h = trackFit->getHelix();
-
-      // extrapolate to radius
-      const double arcLength = h.getArcLength2DAtCylindricalR(r);
-      const double lHelixRadius = arcLength > 0 ? arcLength : std::numeric_limits<double>::max();
-
-      // extrapolate to FWD z
-      const double lFWD = (zfwd - z0) / tanlambda > 0 ? (zfwd - z0) / tanlambda : std::numeric_limits<double>::max();
-
-      // extrapolate to BWD z
-      const double lBWD = (zbwd - z0) / tanlambda > 0 ? (zbwd - z0) / tanlambda : std::numeric_limits<double>::max();
-
-      // pick smalles arclength
-      const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
-
-      return atan2(h.getPositionAtArcLength2D(l).Y(), h.getPositionAtArcLength2D(l).X());
+      TVector3 position = getPositionOnHelix(part, pars);
+      if (position == vecNaN) return realNaN;
+      return position.Phi();
     }
 
 
@@ -375,7 +294,7 @@ namespace Belle2 {
     double nExtraCDCHits(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       return elti->getNCDCHitsNotAssigned();
     }
 
@@ -384,7 +303,7 @@ namespace Belle2 {
     double nExtraCDCHitsPostCleaning(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       return elti->getNCDCHitsNotAssignedPostCleaning();
     }
 
@@ -392,7 +311,7 @@ namespace Belle2 {
     double hasExtraCDCHitsInLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       int ilayer = int(std::lround(layer[0]));
       return elti->hasCDCLayer(ilayer);
     }
@@ -401,7 +320,7 @@ namespace Belle2 {
     double hasExtraCDCHitsInSuperLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       int ilayer = int(std::lround(layer[0]));
       return elti->hasCDCSLayer(ilayer);
     }
@@ -410,7 +329,7 @@ namespace Belle2 {
     double nExtraCDCSegments(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       return elti->getNCDCSegments();
     }
 
@@ -418,7 +337,7 @@ namespace Belle2 {
     double nExtraVXDHitsInLayer(const Particle*, const std::vector<double>& layer)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       int ilayer = int(std::lround(layer[0]));
       return elti->getNVXDClustersInLayer(ilayer);
     }
@@ -427,9 +346,9 @@ namespace Belle2 {
     double nExtraVXDHits(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       double out = 0.0;
-      for (uint16_t ilayer = 1; ilayer < 7; ilayer++)
+      for (uint16_t ilayer = 1; ilayer < 7; ++ilayer)
         out += elti->getNVXDClustersInLayer(ilayer);
       return out;
     }
@@ -438,7 +357,7 @@ namespace Belle2 {
     double svdFirstSampleTime(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       return elti->getSVDFirstSampleTime();
     }
 
@@ -449,36 +368,34 @@ namespace Belle2 {
     double trackFindingFailureFlag(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
-      if (!elti) return std::numeric_limits<double>::quiet_NaN();
+      if (!elti) return realNaN;
       return elti->hasAnErrorFlag();
     }
 
     double getHelixParameterPullAtIndex(const Particle* particle, const int index)
     {
-
-      if (!particle) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!particle) return realNaN;
 
       const MCParticle* mcparticle = particle->getMCParticle();
-      if (!mcparticle) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!mcparticle) return realNaN;
 
       const Belle2::Track* track = particle->getTrack();
-      if (!track) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!track) return realNaN;
 
       const Belle2::TrackFitResult* trackfit =  track->getTrackFitResultWithClosestMass(Belle2::Const::ChargedStable(std::abs(
                                                   particle->getPDGCode())));
-      if (!trackfit) { return std::numeric_limits<double>::quiet_NaN(); }
+      if (!trackfit) return realNaN;
 
       const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
       const TMatrixDSym measCovariance = measHelix.getCovariance();
       const TVector3 mcProdVertex = mcparticle->getVertex();
       const TVector3 mcMomentum = mcparticle->getMomentum();
 
-      const double BzAtProdVertex = Belle2::BFieldManager::getField(TVector3(mcProdVertex.X(), mcProdVertex.Y(),
-                                    mcProdVertex.Z())).Z() / Belle2::Unit::T;
+      const double BzAtProdVertex = Belle2::BFieldManager::getField(mcProdVertex).Z() / Belle2::Unit::T;
       const double mcParticleCharge = mcparticle->getCharge();
       const Belle2::Helix mcHelix = Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
 
-      const std::vector<double> mcHelixPars = {mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
+      const std::vector<double> mcHelixPars   = {mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(), measHelix.getZ0(), measHelix.getTanLambda()};
       const std::vector<double> measErrSquare = {measCovariance[0][0], measCovariance[1][1], measCovariance[2][2], measCovariance[3][3], measCovariance[4][4]};
 
@@ -511,11 +428,11 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Tracking");
-    REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     "mc-meas/err_meas for d0");
-    REGISTER_VARIABLE("phi0Pull", getHelixPhi0Pull,     "mc-meas/err_meas for phi0");
-    REGISTER_VARIABLE("omegaPull", getHelixOmegaPull,     "mc-meas/err_meas for omega");
-    REGISTER_VARIABLE("z0Pull", getHelixZ0Pull,     "mc-meas/err_meas for z0");
-    REGISTER_VARIABLE("tanLambdaPull", getHelixTanLambdaPull,     "mc-meas/err_meas for tanLambda");
+    REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     "(mc-meas)/err_meas for d0");
+    REGISTER_VARIABLE("phi0Pull", getHelixPhi0Pull,     "(mc-meas)/err_meas for phi0");
+    REGISTER_VARIABLE("omegaPull", getHelixOmegaPull,     "(mc-meas)/err_meas for omega");
+    REGISTER_VARIABLE("z0Pull", getHelixZ0Pull,     "(mc-meas)/err_meas for z0");
+    REGISTER_VARIABLE("tanLambdaPull", getHelixTanLambdaPull,     "(mc-meas)/err_meas for tanLambda");
 
     REGISTER_VARIABLE("nCDCHits", trackNCDCHits,     "Number of CDC hits associated to the track");
     REGISTER_VARIABLE("nSVDHits", trackNSVDHits,     "Number of SVD hits associated to the track");

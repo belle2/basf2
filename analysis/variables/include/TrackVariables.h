@@ -216,6 +216,9 @@ namespace Belle2 {
 
     /** helper function to get track fit result from particle */
     TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle);
+
+    /** helper function to get the position on the Helix */
+    TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars);
   }
 } // Belle2 namespace
 

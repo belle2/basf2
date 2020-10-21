@@ -14,6 +14,7 @@
 
 #include <TObject.h>
 #include <cmath>
+#include <TMath.h>
 
 namespace Belle2 {
 
@@ -139,12 +140,13 @@ namespace Belle2 {
       if (layer >= 8 && m_onedgains.size() == 2) mylayer = 1;
       else if (m_onedgains.size() == 56) mylayer = layer;
 
+      double piby2 =  TMath::Pi() / 2.0;
       // assume rotational symmetry
-      if (enta < -3.1416 / 2.0) enta += 3.1416 / 2.0;
-      if (enta > 3.1416 / 2.0) enta -= 3.1416 / 2.0;
+      if (enta < -piby2) enta += piby2;
+      if (enta > piby2) enta -= piby2;
 
-      double binsize = (m_onedgains[mylayer].size() != 0) ? 3.14159 / m_onedgains[mylayer].size() : 0.0;
-      int bin = (binsize != 0.0) ? std::floor((enta + 3.14159 / 2.0) / binsize) : -1;
+      double binsize = (m_onedgains[mylayer].size() != 0) ? 2.0 * piby2 / m_onedgains[mylayer].size() : 0.0;
+      int bin = (binsize != 0.0) ? std::floor((enta + piby2) / binsize) : -1;
       if (bin < 0 || (unsigned)bin >= m_onedgains[mylayer].size()) {
         B2WARNING("Problem with CDC dE/dx 1D binning!");
         return 1.0;

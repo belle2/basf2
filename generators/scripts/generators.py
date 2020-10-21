@@ -186,17 +186,23 @@ def add_aafh_generator(
             B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate=''):
+def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False):
     """
-    Add the default muon pair and tau pair generator KKMC
+    Add the default muon pair and tau pair generator KKMC.
+    For tau decays, TauolaBelle and TauolaBBB are available.
+    Signal events can be produced setting a configuration file. Please notice that the configuration files for
+    TauolaBelle and TauolaBBB has a very different structure (see the examples below generators/examples).
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate(str): either "mu+mu-" or "tau+tau-"
+        finalstate(str): either "mu-mu+" or "tau-tau+"
+        signalconfigfile(str): File with configuration of the signal event to generate. It doesn't affect mu-mu+ decays.
+        useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBBB is used.
+                              It doesn't affect mu-mu+ decays.
     """
 
     #: kkmc input file
-    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
+    kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tauola_bbb.input.dat')
 
     #: kkmc file that will hold cross section and other information
     kkmc_logfile = 'kkmc_tautau.txt'
@@ -204,15 +210,36 @@ def add_kkmc_generator(path, finalstate=''):
     #: kkmc configuration file, should be fine as is
     kkmc_config = Belle2.FileSystem.findFile('data/generators/kkmc/KK2f_defaults.dat')
 
-    #: tau config file (empty for mu+mu-)
-    kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+    #: tau config file (empty for generic mu-mu+ and tau-tau+ with TauolaBBB)
+    kkmc_tauconfigfile = ''
 
     if finalstate == 'tau+tau-':
-        pass
-    elif finalstate == 'mu+mu-':
+        B2WARNING("add_kkmc_generator: please set finalstate as 'tau-tau+'. 'tau+tau-' will be deprecated in the future"
+                  " for consistency in the configuration files.")
+        finalstate = 'tau-tau+'
+    if finalstate == 'mu+mu-':
+        B2WARNING("add_kkmc_generator: please set finalstate as 'mu-mu+'. 'mu+mu-' will be deprecated in the future for"
+                  " consistency in the configuration files.")
+        finalstate = 'mu-mu+'
+
+    if finalstate == 'tau-tau+':
+        if useTauolaBelle:
+            B2INFO("Generating tau pair events with TauolaBelle")
+            #: If TauolaBelle, the tau decay must be controlled by Pythia flags
+            kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau.input.dat')
+            kkmc_tauconfigfile = Belle2.FileSystem.findFile('data/generators/kkmc/tau_decaytable.dat')
+        #: Check if there is a signal decfile provided by the user
+        if not signalconfigfile == '':
+            B2INFO(f"Using config file defined by user: {signalconfigfile}")
+            if useTauolaBelle:
+                kkmc_tauconfigfile = signalconfigfile
+            else:
+                kkmc_inputfile = signalconfigfile
+
+    elif finalstate == 'mu-mu+':
         kkmc_inputfile = Belle2.FileSystem.findFile('data/generators/kkmc/mu.input.dat')
         kkmc_logfile = 'kkmc_mumu.txt'
-        kkmc_tauconfigfile = ''
+
     else:
         B2FATAL("add_kkmc_generator final state not supported: {}".format(finalstate))
 

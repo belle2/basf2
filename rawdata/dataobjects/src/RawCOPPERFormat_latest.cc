@@ -273,7 +273,7 @@ void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&inpu
         }
       }
       if (same_flag == 0) {
-        summary_table.push_back({ i, 1, input_val[i] });
+        summary_table.push_back({ static_cast<unsigned int>(i), 1, input_val[i] });
       }
     }
   }

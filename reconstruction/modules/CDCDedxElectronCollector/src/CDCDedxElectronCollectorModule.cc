@@ -213,11 +213,16 @@ void CDCDedxElectronCollectorModule::collect()
       if (m_costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
       htstats->Fill(2);
 
+      //making some cuts based on acceptance
       if (m_costh > -0.55 && m_costh < 0.820) {
         if (dedxTrack->getNLayerHits() < 25)continue; //all CDC layer available here
       } else {
-        if (dedxTrack->getNLayerHits() < 10)continue; //less layer available here
-        if (m_charge < 0)if (dedxTrack->getNLayerHits() < 15)continue;
+        if (m_costh <= -0.62 || m_costh >= 0.880) {
+          if (dedxTrack->getNLayerHits() < 10)continue; //less layer available here
+          if (m_costh > 0 && dedxTrack->getNLayerHits() < 13)continue;
+        } else {
+          if (dedxTrack->getNLayerHits() < 18)continue;
+        }
       }
       htstats->Fill(3);
 

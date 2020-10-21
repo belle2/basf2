@@ -90,13 +90,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
 
         hlt_skim_lines_in_plot = [
             "accept_hadron",
-            "accept_mumu_1trk",
             "accept_mumu_2trk",
-            "accept_bhabha",
-            "accept_bhabhaecl",
+            "accept_bhabha_all",
             "accept_gamma_gamma",
-            "accept_tau_tau",
-            "accept_single_photon_1GeV",
+            "accept_radmumu",
+            "accept_offip",
+            "accept_mumutight",
+            "accept_tau_2trk",
+            "accept_tau_Ntrk",
         ]
 
         # Default plot
@@ -116,8 +117,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
            },
            cutResultIdentifiersIgnored={
                "skim": [
-                   "accept_bhabha",
-                   "accept_bhabhaecl",
+                   "accept_bhabha_all",
                    ]
            },
            createTotalResultHistograms=False,
@@ -198,6 +198,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             firmwareResultCollectionName='TRGCDCT3DUnpackerStore' + str(mod_t3d),
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
+        # CDCTriggerNeuro
+        path.add_module('CDCTriggerNeuroDQM')
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL
@@ -205,18 +207,6 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
 
-    if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]) and (dqm_environment == 'hlt'):
-        # CDCTriggerNeuro
-        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName='CDCTriggerNeuroTracks',
-                        hitCollectionName='CDCTriggerNNInputSegmentHits', axialOnly=True)
-        path.add_module('SetupGenfitExtrapolation')
-        path.add_module('CDCTriggerNeuroDQM',
-                        limitedoutput=True,
-                        showRecoTracks=True,
-                        skipWithoutHWTS=True,
-                        maxRecoZDist=1.0,
-                        maxRecoD0Dist=0.5,
-                        )
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
         trackDqm = register_module('TrackDQM')

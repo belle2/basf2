@@ -108,8 +108,12 @@ namespace Belle2 {
 
       double time2sensor(int cid, const G4ThreeVector& hit_pos);
     private:
-      /** Global transformations */
-      G4Transform3D* m_ECLForwardGlobalT = NULL, *m_ECLBackwardGlobalT = NULL, *m_ECLBarrelGlobalT = NULL;
+      /** Global transformations for the forward part*/
+      G4Transform3D* m_ECLForwardGlobalT = nullptr;
+      /** Global transformations for the backward part*/
+      G4Transform3D* m_ECLBackwardGlobalT = nullptr;
+      /** Global transformations for the barrel part*/
+      G4Transform3D* m_ECLBarrelGlobalT = nullptr;
       /** initialise the crystal */
       void InitCrystal(int cid);
       /** crystal geometry */

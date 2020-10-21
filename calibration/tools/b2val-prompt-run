@@ -20,38 +20,51 @@ import basf2
 from basf2 import B2ERROR, B2INFO, B2WARNING
 import json
 import importlib
-from pathlib import Path, PurePath
-from collections import OrderedDict
+from pathlib import Path
 import shutil
+import os 
 
 from caf.utils import IoV
 from caf import backends
 from caf import cli
+from caf.backends import Local, Job, monitor_jobs
 
-from prompt import prompt_validation_script_package
+from prompt import prompt_validation_script_package, prompt_validation_script_dir
 
 default_collection_heartbeat = 60
 
-def get_files(args):
-    
+def get_validation_config(args):
     validation_config_path = Path(args.validation_config)
     if not validation_config_path.is_file():
         raise FileNotFoundError(f"The file {validation_config_path.as_posix()} does not exist")
     with open(validation_config_path, 'r') as validation_config_file:
         validation_config = json.load(validation_config_file)
+    return validation_config
 
-    job_path = validation_config.get('job_path', None)
-
-    import importlib
+def get_validation_module(args):
+    validation_config = get_validation_config(args)
     module_name = prompt_validation_script_package + Path(validation_config["validation_script"]).stem
     try:
         validation_module = importlib.import_module(module_name)
     except ModuleNotFoundError:
         B2ERROR(f"Couldn't import {module_name}")
         return 1
-        
+    return validation_module
+
+def get_files(args):
+    validation_config = get_validation_config(args)
+    validation_module = get_validation_module(args)       
+
+    job_path = validation_config.get('job_path', "")
+    download_files_json = validation_config.get('download_files', "")
+
+    # Get the list of files to download from Settings and input JSON
     download_paths = {} 
-    for file in validation_module.settings.download_files:
+    files_to_download = validation_module.settings.download_files
+    for file in download_files_json:
+        files_to_download.append(file)
+
+    for file in files_to_download:
         path_to_files = [] 
         for path in Path(job_path).rglob(file):
             path_to_files.append(path)
@@ -67,13 +80,14 @@ def get_files(args):
         shutil.rmtree(download_files_path)
         download_files_path.mkdir(parents=True)
     B2INFO(f"Will now copy the requested files from the CAF output to '{download_files_path.as_posix()}'")
+    print()
     for file_name, file_paths in download_paths.items():
-        if len(file_paths) == 1:
-            B2INFO(f"Copying {file_name} to {download_files_path}")
-            shutil.copyfile(file_paths, download_files_path)
-        else:
-            for file_path in file_paths:
-               	B2INFO(f"Multiple copies of {file_name} files exist, will retrieve files with directory tree included")
+        for file_path in file_paths:
+            if len(file_paths) == 1:
+                B2INFO(f"Copying {file_name} to {download_files_path}")
+                shutil.copyfile(file_path, Path(download_files_path, file_name))
+            else:
+                B2INFO(f"Multiple copies of {file_name} files exist, will retrieve files with directory tree included")
                 file_path_str = str(file_path)
                 file_suffix = file_path_str[file_path_str.find('calibration_results'):]
                 dl_file_path = Path(file_suffix).relative_to('calibration_results')
@@ -82,7 +96,7 @@ def get_files(args):
                 shutil.copyfile(file_path, Path(new_download_file_path, file_name))
 
 
-def run_validation(args):
+def create_validation_jobs(args):
     """Path to config JSON file, used to set up the validation script, CAF output path, input data path used.
 
 Required format of JSON file:
@@ -105,21 +119,16 @@ file. Individual `caf.framework.Collection` objects can also override these opti
 is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
 -> b2val-prompt-run command line options]
 """
+    validation_config = get_validation_config(args)
+    validation_module = get_validation_module(args)       
+    current_directory = Path().absolute()
+    script_name = validation_config["validation_script"]
 
-    validation_config_path = Path(args.validation_config)
-    if not validation_config_path.is_file():
-        raise FileNotFoundError(f"The file {validation_config_path.as_posix()} does not exist")
-    with open(validation_config_path, 'r') as validation_config_file:
-        validation_config = json.load(validation_config_file)
+    # Now we set the backend that will be used globally.
+    backend_args = validation_config.get("backend_args", None)
+    backend = args.func(args, backend_args=backend_args)
+    B2INFO(f"Default CAF backend_args: {backend}")
 
-    import importlib
-    module_name = prompt_validation_script_package + Path(validation_config["validation_script"]).stem
-    try:
-        validation_module = importlib.import_module(module_name)
-    except ModuleNotFoundError:
-        B2ERROR(f"Couldn't import {module_name}")
-        return 1
-    
     B2INFO("Getting values for 'expert_config' from the prompt script.")
     expert_config = validation_module.settings.expert_config   # set to be the default from the script
     # If we have values in the validation_config we merge/overwrite with the default
@@ -128,10 +137,23 @@ is (lowest -> highest): [Backend.default_backend_args -> validation_config.json
         B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
         expert_config = {**expert_config, **validation_config["expert_config"]}
 
-    validation_module.run_validation(job_path=validation_config.get('job_path', None), 
-                                     input_data_path=validation_config.get('job_path', None),
-                                     requested_iov=validation_config.get('requested_iov',None),
-                                     expert_config=expert_config)
+    job = Job(name=validation_module.settings.name)
+    # Working directory that will be sent to the backend and used as the current working directory
+    job.working_dir = Path(current_directory, "validation_results")
+    # Output directory, where the stdout and stderr will be sent.
+    job.output_dir = Path(current_directory, "validation_results")
+    # The command we want to run
+    module_name = prompt_validation_script_package + Path(script_name).stem
+    job_path = validation_config.get('job_path', None)
+    input_data_path=validation_config.get('input_data_path', None)
+    requested_iov=validation_config.get('requested_iov', None)
+    job.cmd = ["basf2", f"{os.environ['BELLE2_LOCAL_DIR']}/{prompt_validation_script_dir}/{script_name}", f"{job_path} {input_data_path} {requested_iov}"]
+    job.append_current_basf2_setup_cmds()
+    return [job]
+    # validation_module.run_validation(job_path=validation_config.get('job_path', ""), 
+    #                                  input_data_path=validation_config.get('job_path', ""),
+    #                                  requested_iov=validation_config.get('requested_iov', ""),
+    #                                  expert_config=expert_config)
 
 
 def get_argparser():
@@ -141,7 +163,7 @@ def get_argparser():
     subparsers = cli.add_backends_subparsers(parser)
 
     for subparser in subparsers:
-        subparser.add_argument("validation_config", help=run_validation.__doc__)
+        subparser.add_argument("validation_config", help=create_validation_jobs.__doc__)
 
         cli.add_basf2_options(subparser)
         cli.add_monitor_options(subparser, default_heartbeat=default_collection_heartbeat)
@@ -169,10 +191,18 @@ def get_argparser():
 def main():
     parser = get_argparser()
     args = parser.parse_args()
-
-    # Do the input data load
+    basf2.set_log_level(basf2.LogLevel.names[args.log_level])
+    if args.debug_level:
+        basf2.set_log_level(basf2.LogLevel.DEBUG)  # Override
+        basf2.set_debug_level(args.debug_level)
+    # Do the input data load and run validation
     get_files(args)
-    run_validation(args)
+    job = create_validation_jobs(args)
+    backend = args.func(args)
+    backend.submit(job)
+    monitor_jobs(args, job)
+    if isinstance(backend, Local):
+        backend.join()
 
 if __name__ == "__main__":
     import sys

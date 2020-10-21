@@ -10,6 +10,7 @@ Checks the KLM Strip Efficiency Payloads by:
 
 import basf2
 from prompt import ValidationSettings
+import sys
 
 ##############################
 # REQUIRED VARIABLE #
@@ -20,7 +21,7 @@ from prompt import ValidationSettings
 settings = ValidationSettings(name='KLM strip efficiency',
                               description=__doc__,
                               download_files=['stdout'],
-                              expert_config={'hello': 'world'})
+                              expert_config=None)
 
 
 def run_validation(job_path, input_data_path, requested_iov, **kwargs):
@@ -87,3 +88,6 @@ def run_validation(job_path, input_data_path, requested_iov, **kwargs):
     graph.Write()
     input_file.Close()
     output_file.Close()
+
+if __name__ == "__main__":
+    run_validation(*sys.argv[1:])

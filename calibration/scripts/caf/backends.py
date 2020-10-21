@@ -604,6 +604,7 @@ class Job:
             self.setup_cmds.append(f"BACKEND_BELLE2_RELEASE_LOC={os.environ['BELLE2_LOCAL_DIR']}")
             self.setup_cmds.append(f"pushd $BACKEND_BELLE2_RELEASE_LOC > /dev/null")
             self.setup_cmds.append(f"source $BACKEND_B2SETUP")
+            self.setup_cmds.append(f"b2setup")
             self.setup_cmds.append(f"popd > /dev/null")
 
 

@@ -396,14 +396,7 @@ def _std_hyperon_is_in_path(hyperon, path):
             f"\"{hyperon}\" is not in list of hyperons that this function has been tested for ({allowed_hyperons})."
         )
     for module in path.modules():
-        if (module.name().split("_")[0] == "PListCutAndCopy" and
-                _get_param_dict(module)["outputListName"] == f"{hyperon}:std"):
+        if (module.name() == f"PListCutAndCopy_{hyperon}:std" or
+                module.name().split(" -> ")[0] == f"ParticleCombiner_{hyperon}:std"):
             return True
     return False
-
-
-def _get_param_dict(module):
-    """Helper function that returns a dictionary with all parameters names and values of a basf2 module"""
-    if not isinstance(module, Module):
-        raise ValueError("_get_param_dict only works for basf2 modules.")
-    return {param.name: param.values for param in module.available_params()}

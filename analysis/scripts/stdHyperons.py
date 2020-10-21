@@ -71,16 +71,16 @@ def stdXi(fitter='TreeFit', b2bii=False, path=None):
         path=path)
 
 
-def stdXi0(gammatype='eff40_Jan2020', b2bii=False, path=None):
+def stdXi0(gammatype='eff40', b2bii=False, path=None):
     r"""
     Reconstruct the standard :math:`\Xi^0` ``ParticleList`` named ``Xi0:std``.
 
     .. seealso:: `BELLE2-NOTE-PH-2019-011 <https://docs.belle2.org/record/BELLE2-NOTE-PH-2019-011.pdf>`_.
 
     Parameters:
-        gammatype (str): specify either ``eff60_Jan2020``, ``eff50_Jan2020``, ``eff40_Jan2020``,
-                         ``eff30_Jan2020``, or ``eff20_Jan2020``
-                         for the pi0 reconstruction from ``gamma:pi0effxx_Jan2020`` (default ``eff40``)
+        gammatype (str): specify either ``eff60``, ``eff50``, ``eff40``, ``eff30``, or ``eff20``
+                         to select the signal efficiency of the photons used in the pi0 reconstruction
+                         (default ``eff40``)
         b2bii (bool): specify Belle or Belle II reconstruction
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
@@ -98,8 +98,8 @@ def stdXi0(gammatype='eff40_Jan2020', b2bii=False, path=None):
             [ chiProb > 0.0 ]',
             True, path=path)
         # ~7*sigma Range around nominal mass
-        stdPhotons(f'pi0{gammatype}', path=path)
-        reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype} gamma:pi0{gammatype}',
+        stdPhotons(f'pi0{gammatype}_Jan2020', path=path)
+        reconstructDecay(f'pi0:reco -> gamma:pi0{gammatype}_Jan2020 gamma:pi0{gammatype}_Jan2020',
                          'abs( dM ) < 0.0406',
                          True, path=path)
 

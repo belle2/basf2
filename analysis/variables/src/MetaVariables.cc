@@ -3045,8 +3045,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_VARIABLE("asin(variable)", asin, "Returns arcsine of the given variable.");
     REGISTER_VARIABLE("cos(variable)", cos, "Returns cosine value of the given variable.");
     REGISTER_VARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable.");
-    REGISTER_VARIABLE("exp(variable)", log10, "Returns exponential evaluated for the given variable.");
-    REGISTER_VARIABLE("log10(variable)", log10, "Returns natural logarithm evaluated for the given variable.");
+    REGISTER_VARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.");
+    REGISTER_VARIABLE("log10(variable)", log, "Returns natural logarithm evaluated for the given variable.");
     REGISTER_VARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.");
     REGISTER_VARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"

@@ -80,7 +80,7 @@ namespace Belle2 {
     double trackD0(const Particle* part);
 
     /**
-     * returns the track's tranverse momentum angle
+     * returns the track's transverse momentum angle
      */
     double trackPhi0(const Particle* part);
 
@@ -105,7 +105,7 @@ namespace Belle2 {
     double trackD0Error(const Particle* part);
 
     /**
-     * returns the track's tranverse momentum angle error
+     * returns the track's transverse momentum angle error
      */
     double trackPhi0Error(const Particle* part);
 
@@ -172,7 +172,7 @@ namespace Belle2 {
     double nExtraVXDHits(const Particle*);
 
     /**
-     * returns time of first SVD sample relatvie to event T0
+     * returns time of first SVD sample relative to event T0
      */
     double svdFirstSampleTime(const Particle*);
 

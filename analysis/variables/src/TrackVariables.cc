@@ -36,7 +36,7 @@ namespace Belle2 {
     static const TVector3 vecNaN(realNaN, realNaN, realNaN);
 
     // An helper function to get track fit results
-    // Not registered in variable mananger
+    // Not registered in variable manager
     TrackFitResult const* getTrackFitResultFromParticle(Particle const* particle)
     {
       const Track* track = particle->getTrack();
@@ -236,7 +236,7 @@ namespace Belle2 {
     TVector3 getPositionOnHelix(const Particle* part, const std::vector<double>& pars)
     {
       if (pars.size() != 3) {
-        B2WARNING("Exactly three parameters (r, zfwd, zbwd) required.");
+        B2FATAL("Exactly three parameters (r, zfwd, zbwd) required.");
         return vecNaN;
       }
 
@@ -248,7 +248,7 @@ namespace Belle2 {
       auto trackFit = getTrackFitResultFromParticle(part);
       if (!trackFit) return vecNaN;
 
-      // get helix and paremeters
+      // get helix and parameters
       const double z0 = trackFit->getZ0();
       const double tanlambda = trackFit->getTanLambda();
       const Helix h = trackFit->getHelix();
@@ -263,7 +263,7 @@ namespace Belle2 {
       // extrapolate to BWD z
       const double lBWD = (zbwd - z0) / tanlambda > 0 ? (zbwd - z0) / tanlambda : std::numeric_limits<double>::max();
 
-      // pick smalles arclength
+      // pick smallest arclength
       const double l = std::min({lHelixRadius, lFWD, lBWD});
 
       return h.getPositionAtArcLength2D(l);
@@ -272,6 +272,10 @@ namespace Belle2 {
     // returns extrapolated theta position based on helix parameters
     double trackHelixExtTheta(const Particle* part, const std::vector<double>& pars)
     {
+      if (pars.size() != 3) {
+        B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtTheta.");
+        return realNaN;
+      }
       TVector3 position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Theta();
@@ -280,6 +284,10 @@ namespace Belle2 {
     // returns extrapolated phi position based on helix parameters
     double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars)
     {
+      if (pars.size() != 3) {
+        B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtPhi.");
+        return realNaN;
+      }
       TVector3 position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
       return position.Phi();
@@ -353,7 +361,7 @@ namespace Belle2 {
       return out;
     }
 
-    // time of first SVD sample relatvie to event T0
+    // time of first SVD sample relative to event T0
     double svdFirstSampleTime(const Particle*)
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
@@ -391,7 +399,7 @@ namespace Belle2 {
       const TVector3 mcProdVertex = mcparticle->getVertex();
       const TVector3 mcMomentum = mcparticle->getMomentum();
 
-      const double BzAtProdVertex = Belle2::BFieldManager::getField(mcProdVertex).Z() / Belle2::Unit::T;
+      const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
       const double mcParticleCharge = mcparticle->getCharge();
       const Belle2::Helix mcHelix = Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
 
@@ -460,7 +468,7 @@ For mdst versions < 5.1, returns quiet_NaN().)DOC");
     REGISTER_VARIABLE("omegaErr",     trackOmegaError,     "Error of curvature of the track");
     REGISTER_VARIABLE("z0Err",        trackZ0Error,        "Error of z coordinate of the POCA");
     REGISTER_VARIABLE("tanlambdaErr", trackTanLambdaError, "Error of slope of the track in the r-z plane");
-    REGISTER_VARIABLE("pValue", trackPValue, "chi2 probalility of the track fit");
+    REGISTER_VARIABLE("pValue", trackPValue, "chi2 probability of the track fit");
     REGISTER_VARIABLE("trackFitHypothesisPDG", trackFitHypothesisPDG, "PDG code of the track hypothesis actually used for the fit");
     REGISTER_VARIABLE("trackNECLClusters", trackNECLClusters,
                       "Number ecl clusters matched to the track. This is always 0 or 1 with newer versions of ECL reconstruction.");

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from ROOT import Belle2
-from basf2 import B2ERROR, Module
+from basf2 import B2ERROR, B2WARNING
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
 from vertex import treeFit, kFit
 
@@ -237,6 +237,7 @@ def goodXi(xitype='loose', path=None):
     """
 
     if not _std_hyperon_is_in_path("Xi-", path):
+        B2WARNING("Could not find standard Xi particle list! Creating it with default options.")
         stdXi(path=path)
         assert _std_hyperon_is_in_path("Xi-", path)
 
@@ -287,6 +288,7 @@ def goodXi0(xitype='loose', path=None):
     """
 
     if not _std_hyperon_is_in_path("Xi0", path):
+        B2WARNING("Could not find standard Xi0 particle list! Creating it with default options.")
         stdXi0(path=path)
         assert _std_hyperon_is_in_path("Xi0", path)
 
@@ -341,6 +343,7 @@ def goodOmega(omegatype='loose', path=None):
     """
 
     if not _std_hyperon_is_in_path("Omega-", path):
+        B2WARNING("Could not find standard Omega particle list! Creating it with default options.")
         stdOmega(path=path)
         assert _std_hyperon_is_in_path("Omega-", path)
 

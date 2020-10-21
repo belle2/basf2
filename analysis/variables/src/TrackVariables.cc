@@ -237,7 +237,6 @@ namespace Belle2 {
     {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required.");
-        return vecNaN;
       }
 
       const double r    = pars[0];
@@ -274,7 +273,6 @@ namespace Belle2 {
     {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtTheta.");
-        return realNaN;
       }
       TVector3 position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
@@ -286,7 +284,6 @@ namespace Belle2 {
     {
       if (pars.size() != 3) {
         B2FATAL("Exactly three parameters (r, zfwd, zbwd) required for helixExtPhi.");
-        return realNaN;
       }
       TVector3 position = getPositionOnHelix(part, pars);
       if (position == vecNaN) return realNaN;
@@ -320,7 +317,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
       if (!elti) return realNaN;
-      int ilayer = int(std::lround(layer[0]));
+      int ilayer = std::lround(layer[0]);
       return elti->hasCDCLayer(ilayer);
     }
 
@@ -329,7 +326,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
       if (!elti) return realNaN;
-      int ilayer = int(std::lround(layer[0]));
+      int ilayer = std::lround(layer[0]);
       return elti->hasCDCSLayer(ilayer);
     }
 
@@ -346,7 +343,7 @@ namespace Belle2 {
     {
       StoreObjPtr<EventLevelTrackingInfo> elti;
       if (!elti) return realNaN;
-      int ilayer = int(std::lround(layer[0]));
+      int ilayer = std::lround(layer[0]);
       return elti->getNVXDClustersInLayer(ilayer);
     }
 

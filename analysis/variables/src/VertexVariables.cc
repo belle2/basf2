@@ -294,8 +294,7 @@ namespace Belle2 {
     Manager::FunctionPtr particleProductionCovElement(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 2) {
-        B2WARNING("Number of arguments of prodVertexCov function is incorrect!");
-        return nullptr;
+        B2FATAL("Number of arguments of prodVertexCov function is incorrect!");
       }
 
       int ielement = -1;
@@ -309,7 +308,7 @@ namespace Belle2 {
       }
 
       if (std::min(ielement, jelement) < 0 || std::max(ielement, jelement) > 2) {
-        B2WARNING("Range of indexes of prodVertexCov function is incorrect!");
+        B2ERROR("Range of indexes of prodVertexCov function is incorrect!");
         return nullptr;
       }
 

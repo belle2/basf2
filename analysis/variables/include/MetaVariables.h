@@ -355,6 +355,18 @@ namespace Belle2 {
     Manager::FunctionPtr acos(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the exponential value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr exp(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns the natural log value of a variable of the given particle
+     * First argument in the argument vector must be the name of variable
+     */
+    Manager::FunctionPtr log(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the log10 value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */

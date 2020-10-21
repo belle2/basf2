@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from ROOT import Belle2
-from basf2 import B2ERROR
+from basf2 import B2ERROR, Module
 from modularAnalysis import cutAndCopyList, reconstructDecay, applyCuts
 from vertex import treeFit, kFit
 
@@ -236,8 +236,9 @@ def goodXi(xitype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``, list
     """
 
-    if not Belle2.PyStoreObj("ParticleList").isOptional("Xi-:std"):
+    if not _std_hyperon_is_in_path("Xi-", path):
         stdXi(path=path)
+        assert _std_hyperon_is_in_path("Xi-", path)
 
     if xitype == 'veryloose':
         cutAndCopyList(
@@ -285,8 +286,9 @@ def goodXi0(xitype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``, list
     """
 
-    if not Belle2.PyStoreObj("ParticleList").isOptional("Xi0:std"):
+    if not _std_hyperon_is_in_path("Xi0", path):
         stdXi0(path=path)
+        assert _std_hyperon_is_in_path("Xi0", path)
 
     if xitype == 'veryloose':
         # Select pi0 at 3*sigma around the nominal mass
@@ -338,8 +340,9 @@ def goodOmega(omegatype='loose', path=None):
                            or ``Omega-:tight``, list
     """
 
-    if not Belle2.PyStoreObj("ParticleList").isOptional("Omega-:std"):
+    if not _std_hyperon_is_in_path("Omega-", path):
         stdOmega(path=path)
+        assert _std_hyperon_is_in_path("Omega-", path)
 
     if omegatype == 'veryloose':
         cutAndCopyList(
@@ -373,3 +376,33 @@ def goodOmega(omegatype='loose', path=None):
             path=path)
     else:
         raise ValueError(f"\"{omegatype}\" is none of the allowed Omega list types!")
+
+
+def _std_hyperon_is_in_path(hyperon, path):
+    """
+    Helper function to check if the std hyperon is already in the reconstruction path.
+
+    Checks whether there is a ``PListCutAndCopy`` module with the
+    ``outputListName``: ``<hyperon>:std``.
+    :param hyperon: One of ["Xi-", "Xi0", "Omega-"]
+    :param path: Instance of basf2.Path
+    :returns: Boolean, whether  ``PListCutAndCopy`` with ``outputListName`` ``<hyperon>:std`` was found in path.
+    """
+    # this function only checks the
+    allowed_hyperons = {"Xi-", "Xi0", "Omega-"}
+    if hyperon not in allowed_hyperons:
+        raise ValueError(
+            f"\"{hyperon}\" is not in list of hyperons that this function has been tested for ({allowed_hyperons})."
+        )
+    for module in path.modules():
+        if (module.name().split("_")[0] == "PListCutAndCopy" and
+                _get_param_dict(module)["outputListName"] == f"{hyperon}:std"):
+            return True
+    return False
+
+
+def _get_param_dict(module):
+    """Helper function that returns a dictionary with all parameters names and values of a basf2 module"""
+    if not isinstance(module, Module):
+        raise ValueError("_get_param_dict only works for basf2 modules.")
+    return {param.name: param.values for param in module.available_params()}

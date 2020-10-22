@@ -578,15 +578,10 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
-          PCmsLabTransform T;
-          ClusterUtils C;
-          TLorentzVector momXChargedTracks; //Momentum of charged X tracks in CMS-System
-          TLorentzVector momXChargedClusters; //Momentum of charged X clusters in CMS-System
-          TLorentzVector momXNeutralClusters; //Momentum of neutral X clusters in CMS-System
-          TLorentzVector momTarget = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Mu in CMS-System
-
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
           if (!roe.isValid()) return 0;
+
+          TLorentzVector momXChargedTracks; //Momentum of charged X tracks in CMS-System
 
           const auto& roeChargedParticles = roe->getChargedParticles();
           for (auto& roeChargedParticle : roeChargedParticles)
@@ -595,7 +590,7 @@ namespace Belle2 {
             momXChargedTracks += roeChargedParticle->get4Vector();
           }
 
-          momXNeutralClusters = roe->get4VectorNeutralECLClusters();
+          TLorentzVector momXNeutralClusters = roe->get4VectorNeutralECLClusters(); //Momentum of neutral X clusters in CMS-System
 
           const auto& klongs = roe->getHadrons();
           for (auto& klong : klongs)
@@ -605,9 +600,8 @@ namespace Belle2 {
             }
           }
 
-          // TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
-          TLorentzVector momX = T.rotateLabToCms() * (momXChargedTracks +
-                                                      momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momX = PCmsLabTransform::labToCms(momXChargedTracks + momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momTarget = PCmsLabTransform::labToCms(particle->get4Vector());  //Momentum of Mu in CMS-System
           TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
 
           double output = 0.0;
@@ -623,7 +617,7 @@ namespace Belle2 {
 
             const auto& photons = roe->getPhotons();
             for (auto& photon : photons) {
-              if ((T.rotateLabToCms() * photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
+              if (PCmsLabTransform::labToCms(photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
                 E_W_90 += photon->getECLClusterEnergy();
               }
             }
@@ -635,16 +629,13 @@ namespace Belle2 {
                     continue;
                   float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
                   if (iEnergy == iEnergy) {
-                    if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(&chargedCluster,
-                                                                        ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
+                    if (PCmsLabTransform::labToCms(ClusterUtils().Get4MomentumFromCluster(&chargedCluster,
+                                                   ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0)
+                      E_W_90 += iEnergy;
                   }
                 }
               }
             }
-
-            //       for (auto & i : klm) {
-            //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
-            //         }
 
             output = E_W_90;
           } else {

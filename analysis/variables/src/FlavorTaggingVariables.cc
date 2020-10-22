@@ -57,16 +57,14 @@ namespace Belle2 {
 
     double momentumMissingTagSide(const Particle*)
     {
-      TLorentzVector trackiCMSVec;
-      TLorentzVector roeCMSVec;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (roe.isValid()) {
-        const auto& roeChargedParticles = roe->getChargedParticles();
-        for (auto roeChargedParticle : roeChargedParticles) {
-          if (not roeChargedParticle->isMostLikely()) continue;
-          trackiCMSVec = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
-          roeCMSVec += trackiCMSVec;
-        }
+      if (!roe.isValid()) return 0;
+      TLorentzVector roeCMSVec;
+
+      const auto& roeChargedParticles = roe->getChargedParticles();
+      for (auto roeChargedParticle : roeChargedParticles) {
+        if (not roeChargedParticle->isMostLikely()) continue;
+        roeCMSVec += PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
       }
       double missMom = -roeCMSVec.P();
       return missMom ;

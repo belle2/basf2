@@ -166,7 +166,8 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[0][0];
-      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
+      if (errorSquared <= 0) return realNaN;
+      return sqrt(errorSquared);
     }
 
     double trackPhi0Error(const Particle* part)
@@ -175,7 +176,8 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[1][1];
-      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
+      if (errorSquared <= 0) return realNaN;
+      return sqrt(errorSquared);
     }
 
     double trackOmegaError(const Particle* part)
@@ -184,7 +186,8 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[2][2];
-      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
+      if (errorSquared <= 0) return realNaN;
+      return sqrt(errorSquared);
     }
 
     double trackZ0Error(const Particle* part)
@@ -193,7 +196,8 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[3][3];
-      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
+      if (errorSquared <= 0) return realNaN;
+      return sqrt(errorSquared);
     }
 
     double trackTanLambdaError(const Particle* part)
@@ -202,7 +206,8 @@ namespace Belle2 {
       if (!trackFit) return realNaN;
 
       double errorSquared = trackFit->getCovariance5()[4][4];
-      return (errorSquared > 0.0) ? sqrt(errorSquared) : realNaN;
+      if (errorSquared <= 0) return realNaN;
+      return sqrt(errorSquared);
     }
 
     double trackPValue(const Particle* part)

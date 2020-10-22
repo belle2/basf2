@@ -295,22 +295,15 @@ namespace Belle2 {
 
     double isMajorityInRestOfEventFromB0bar(const Particle*)
     {
-      int vote = 0;
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      if (roe.isValid()) {
-        for (auto& track : roe->getChargedParticles()) {
-          const MCParticle* mcParticle = track->getMCParticle();
-          while (mcParticle != nullptr) {
-            if (mcParticle->getPDG() == 511) {
-              vote++;
-            }
-            if (mcParticle->getPDG() == -511) {
-              vote--;
-            }
-            mcParticle = mcParticle->getMother();
-          }
-        }
+      if (!roe.isValid()) return 0;
+
+      int vote = 0;
+      for (auto& track : roe->getChargedParticles()) {
+        const MCParticle* mcParticle = track->getMCParticle();
+        vote += getB0flavourMC(mcParticle);
       }
+
       return vote < 0;
     }
 

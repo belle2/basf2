@@ -181,6 +181,9 @@ def print_function(args):
         pd.set_option('display.max_columns', 500)
         pd.set_option('display.width', 1000)
         print(df)
+    elif args.format == "scriptable":
+        sfmt = 'b2hlt_triggers add_cut {Base Identifier} {Cut Identifier} "{Cut Condition}" {Cut Prescaling} {Reject Cut}'.format
+        df.apply(lambda x: print(sfmt(**x)), 1)
     elif args.format == "jira":
         from tabulate import tabulate
         print(tabulate(df, tablefmt="jira", showindex=False, headers="keys"))
@@ -392,7 +395,7 @@ top in the localdb will be shown.
                                          """)
     print_parser.add_argument("--database", help="Which database to print. Defaults to 'online,localdb:latest'.",
                               type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
-    choices = ["human-readable", "json", "list", "pandas"]
+    choices = ["human-readable", "json", "list", "pandas", "scriptable"]
     try:
         from tabulate import tabulate
         choices += ['jira', 'grid']

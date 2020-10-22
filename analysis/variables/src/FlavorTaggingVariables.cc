@@ -73,65 +73,61 @@ namespace Belle2 {
     double cosTPTO(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-      PCmsLabTransform T;
+      if (!roe.isValid()) return 0;
+
       std::vector<TVector3> p3_cms_roe;
-      TVector3 thrustO;
       static const double P_MAX(3.2);
 
-      double result = 0 ;
+      // The following calculation of the thrust axis has been copied and modified
+      // from analysis/ContinuumSuppression/src/ContinuumSuppression.cc
+      // At some point this has to be updated!
 
-      if (roe.isValid()) {
-
-        // The following calculation of the thrust axis has been copied and modified
-        // from analysis/ContinuumSuppression/src/ContinuumSuppression.cc
-        // At some point this has to be updated!
-
-        // Charged tracks
-        //
-        const auto& roeTracks = roe->getChargedParticles();
-        for (auto& roeChargedParticle : roeTracks) {
-          // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
-          // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
-          if (roeChargedParticle->isMostLikely()) {
-            TLorentzVector p_cms = T.rotateLabToCms() * roeChargedParticle->get4Vector();
-            if (p_cms != p_cms) continue;
-            if (p_cms.Rho() > P_MAX) continue;
-            p3_cms_roe.push_back(p_cms.Vect());
-          }
+      // Charged tracks
+      //
+      const auto& roeTracks = roe->getChargedParticles();
+      for (auto& roeChargedParticle : roeTracks) {
+        // TODO: Add helix and KVF with IpProfile once available. Port from L163-199 of:
+        // /belle/b20090127_0910/src/anal/ekpcontsuppress/src/ksfwmoments.cc
+        if (roeChargedParticle->isMostLikely()) {
+          TLorentzVector p_cms = PCmsLabTransform::labToCms(roeChargedParticle->get4Vector());
+          if (p_cms != p_cms) continue;
+          if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_roe.push_back(p_cms.Vect());
         }
-
-        // ECLCluster -> Gamma
-        const auto& roePhotons = roe->getPhotons();
-        for (auto& roePhoton : roePhotons) {
-          if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
-            TLorentzVector p_lab = roePhoton->get4Vector();
-            if (p_lab != p_lab) continue;
-            if (p_lab.Rho() < 0.05) continue;
-            TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-            if (p_cms != p_cms) continue;
-            if (p_cms.Rho() > P_MAX) continue;
-            p3_cms_roe.push_back(p_cms.Vect());
-          }
-        }
-
-        const auto& roeKlongs = roe->getHadrons();
-        for (auto& roeKlong : roeKlongs) {
-          if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
-            TLorentzVector p_lab = roeKlong->get4Vector();
-            if (p_lab != p_lab) continue;
-            if (p_lab.Rho() < 0.05) continue;
-            TLorentzVector p_cms = T.rotateLabToCms() * p_lab;
-            if (p_cms != p_cms) continue;
-            if (p_cms.Rho() > P_MAX) continue;
-            p3_cms_roe.push_back(p_cms.Vect());
-          }
-        }
-
-        thrustO  = Thrust::calculateThrust(p3_cms_roe);
-        const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
-        if (pAxis == pAxis) result = fabs(cos(pAxis.Angle(thrustO)));
-
       }
+
+      // ECLCluster -> Gamma
+      const auto& roePhotons = roe->getPhotons();
+      for (auto& roePhoton : roePhotons) {
+        if (roePhoton->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
+          TLorentzVector p_lab = roePhoton->get4Vector();
+          if (p_lab != p_lab) continue;
+          if (p_lab.Rho() < 0.05) continue;
+          TLorentzVector p_cms = PCmsLabTransform::labToCms(p_lab);
+          if (p_cms != p_cms) continue;
+          if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_roe.push_back(p_cms.Vect());
+        }
+      }
+
+      const auto& roeKlongs = roe->getHadrons();
+      for (auto& roeKlong : roeKlongs) {
+        if (nKLMClusterTrackMatches(roeKlong) == 0 && !(roeKlong->getKLMCluster()->getAssociatedEclClusterFlag())) {
+          TLorentzVector p_lab = roeKlong->get4Vector();
+          if (p_lab != p_lab) continue;
+          if (p_lab.Rho() < 0.05) continue;
+          TLorentzVector p_cms = PCmsLabTransform::labToCms(p_lab);
+          if (p_cms != p_cms) continue;
+          if (p_cms.Rho() > P_MAX) continue;
+          p3_cms_roe.push_back(p_cms.Vect());
+        }
+      }
+
+      const TVector3 thrustO = Thrust::calculateThrust(p3_cms_roe);
+      const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
+      double result = 0;
+      if (pAxis == pAxis) result = abs(cos(pAxis.Angle(thrustO)));
+
       return result;
     }
 

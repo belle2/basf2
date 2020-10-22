@@ -1134,7 +1134,7 @@ namespace Belle2 {
                                                   "mcAssociated"          // 13
                                              };
 
-      int index = find(names.begin(), names.end(), particleName) - names.begin();
+      unsigned index = find(names.begin(), names.end(), particleName) - names.begin();
       if (index == names.size()) {
         B2FATAL("isRightCategory: Not available category " << particleName <<
                 ". The possibilities are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
@@ -1404,8 +1404,10 @@ namespace Belle2 {
       auto outputExtraInfo = arguments[1];
       auto rankingExtraInfo = arguments[2];
 
-      int indexRanking = find(availableExtraInfos.begin(), availableExtraInfos.end(), rankingExtraInfo) - availableExtraInfos.begin();
-      int indexOutput  = find(availableExtraInfos.begin(), availableExtraInfos.end(), outputExtraInfo)  - availableExtraInfos.begin();
+      unsigned indexRanking = find(availableExtraInfos.begin(), availableExtraInfos.end(),
+                                   rankingExtraInfo) - availableExtraInfos.begin();
+      unsigned indexOutput  = find(availableExtraInfos.begin(), availableExtraInfos.end(),
+                                   outputExtraInfo)  - availableExtraInfos.begin();
 
       if (indexRanking == availableExtraInfos.size()) {
         B2FATAL("QpOf: Not available category " << rankingExtraInfo <<

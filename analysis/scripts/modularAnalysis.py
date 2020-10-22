@@ -841,7 +841,7 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False, path=None, enforceFi
     Tip:
         Gammas can also be loaded from KLMClusters by explicitly setting the
         parameter ``loadPhotonsFromKLM`` to True. However, this should only be
-        done in select use-cases and the effect should be studied carefully.
+        done in selected use-cases and the effect should be studied carefully.
 
     Tip:
         For "K_L0" it is now possible to load from ECLClusters, to revert to
@@ -915,7 +915,7 @@ def fillParticleList(decayString, cut, writeOut=False, path=None, enforceFitHypo
     Tip:
         Gammas can also be loaded from KLMClusters by explicitly setting the
         parameter ``loadPhotonsFromKLM`` to True. However, this should only be
-        done in select use-cases and the effect should be studied carefully.
+        done in selected use-cases and the effect should be studied carefully.
 
     Tip:
         For "K_L0" it is now possible to load from ECLClusters, to revert to

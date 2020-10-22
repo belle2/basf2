@@ -263,6 +263,20 @@ namespace Belle2 {
       } else return 0.0;
     }
 
+    // helper function to get flavour of MC B0
+    static int getB0flavourMC(const MCParticle* mcParticle)
+    {
+      while (mcParticle) {
+        if (mcParticle->getPDG() == 511) {
+          return 1;
+        } else if (mcParticle->getPDG() == -511) {
+          return -1;
+        }
+        mcParticle = mcParticle->getMother();
+      }
+      return 0; //no B found
+    }
+
 //     Target Variables --------------------------------------------------------------------------------------------------
 
     double isMajorityInRestOfEventFromB0(const Particle*)

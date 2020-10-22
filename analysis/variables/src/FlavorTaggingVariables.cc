@@ -244,7 +244,7 @@ namespace Belle2 {
 
 
       int flag = 0;
-      for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
+      for (unsigned int i = 0; i < KShortList->getListSize(); ++i) {
         if (!particle->overlapsWith(KShortList->getParticle(i)))
           ++flag;
       }
@@ -293,6 +293,22 @@ namespace Belle2 {
       return false;
     }
 
+
+
+    static int getB0flavourMC(const MCParticle* mcParticle)
+    {
+      while (mcParticle) {
+        if (mcParticle->getPDG() == 511) {
+          return 1;
+        } else if (mcParticle->getPDG() == -511) {
+          return -1;
+        }
+        mcParticle = mcParticle->getMother();
+      }
+      return 0; //no B found
+    }
+
+
 //     Target Variables --------------------------------------------------------------------------------------------------
 
     double isMajorityInRestOfEventFromB0(const Particle*)
@@ -303,17 +319,7 @@ namespace Belle2 {
       int vote = 0;
       for (auto& track : roe->getTracks()) {
         const MCParticle* mcParticle = track->getRelated<MCParticle>();
-        while (mcParticle) {
-          if (mcParticle->getPDG() == 511) {
-            vote++;
-            break;
-          }
-          if (mcParticle->getPDG() == -511) {
-            vote--;
-            break;
-          }
-          mcParticle = mcParticle->getMother();
-        }
+        vote += getB0flavourMC(mcParticle);
       }
 
       return vote > 0;
@@ -327,15 +333,7 @@ namespace Belle2 {
       int vote = 0;
       for (auto& track : roe->getTracks()) {
         const MCParticle* mcParticle = track->getRelated<MCParticle>();
-        while (mcParticle) {
-          if (mcParticle->getPDG() == 511) {
-            vote++;
-          }
-          if (mcParticle->getPDG() == -511) {
-            vote--;
-          }
-          mcParticle = mcParticle->getMother();
-        }
+        vote += getB0flavourMC(mcParticle);
       }
 
       return vote < 0;
@@ -368,38 +366,39 @@ namespace Belle2 {
     double isRelatedRestOfEventB0Flavor(const Particle* particle)
     {
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
+      if (!roe) return 0;
+
+      const MCParticle* BcpMC = particle->getMCParticle();
+      if (!BcpMC) return 0;
+      if (!Variable::isSignal(particle) > 0) return 0;
+
+      const MCParticle* Y4S = BcpMC->getMother();
+      if (!Y4S) return 0;
 
       int BtagFlavor = 0;
       int BcpFlavor = 0;
 
-      if (roe != nullptr) {
-        const MCParticle* BcpMC = particle->getMCParticle();
-
-        if (Variable::isSignal(particle) > 0 && BcpMC != nullptr) {
-          const MCParticle* Y4S = BcpMC->getMother();
-          if (Y4S != nullptr) {
-            for (auto& iTrack : roe->getTracks()) {
-              const MCParticle* mcParticle = iTrack->getRelated<MCParticle>();
-              while (mcParticle != nullptr) {
-                if (mcParticle->getMother() == Y4S) {
-                  if (mcParticle == BcpMC) {
-                    if (mcParticle -> getPDG() > 0) BcpFlavor = 2;
-                    else BcpFlavor = -2;
-                  } else if (BtagFlavor == 0) {
-                    if (abs(mcParticle -> getPDG()) == 511 || abs(mcParticle -> getPDG()) == 521) {
-                      if (mcParticle -> getPDG() > 0) BtagFlavor = 1;
-                      else BtagFlavor = -1;
-                    } else BtagFlavor = 5;
-                  }
-                  break;
-                }
-                mcParticle = mcParticle->getMother();
+      for (auto& iTrack : roe->getTracks()) {
+        const MCParticle* mcParticle = iTrack->getRelated<MCParticle>();
+        while (mcParticle) {
+          if (mcParticle->getMother() == Y4S) {
+            if (mcParticle == BcpMC) {
+              BcpFlavor = (mcParticle->getPDG() > 0) ? 2 : -2;
+            } else if (BtagFlavor == 0) {
+              if (abs(mcParticle->getPDG()) == 511 || abs(mcParticle->getPDG()) == 521) {
+                BtagFlavor = (mcParticle->getPDG() > 0) ? 1 : -1;
+              } else {
+                BtagFlavor = 5;
               }
-              if (BcpFlavor != 0 || BtagFlavor == 5) break;
             }
+            break;
           }
+          mcParticle = mcParticle->getMother();
         }
+        if (BcpFlavor != 0 || BtagFlavor == 5) break;
       }
+
+
       return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
     }
 
@@ -449,18 +448,6 @@ namespace Belle2 {
       return MCMatching::getMCErrors(Bcp, BcpMC);
     }
 
-    static int getB0flavourMC(const MCParticle* mcParticle)
-    {
-      while (mcParticle) {
-        if (mcParticle->getPDG() == 511) {
-          return 1;
-        } else if (mcParticle->getPDG() == -511) {
-          return -1;
-        }
-        mcParticle = mcParticle->getMother();
-      }
-      return 0; //no B found
-    }
 
     double isRelatedRestOfEventMajorityB0Flavor(const Particle* part)
     {
@@ -685,43 +672,46 @@ namespace Belle2 {
         //       StoreObjPtr<ParticleList> KaonList("K+:ROE");
         StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
 
-        TLorentzVector momTargetKaon = labToCms(particle -> get4Vector());
-        TLorentzVector momTargetSlowPion;
 
-        double chargeTargetKaon = particle -> getCharge();
+        if ((requestedVariable != "HaveOpositeCharges") && (requestedVariable != "cosKaonPion"))
+          B2FATAL("Wrong variable  " << requestedVariable << " requested. The possibilities are cosKaonPion or HaveOpositeCharges");
+
+
+        TLorentzVector momTargetSlowPion;
+        double chargeTargetSlowPion = 0;
+        if (SlowPionList.isValid())
+        {
+          double maximumProbSlowPion = 0;
+          for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
+            Particle* pSlowPion = SlowPionList->getParticle(i);
+            if (!pSlowPion) continue;
+            if (!pSlowPion->hasExtraInfo("isRightCategory(SlowPion)")) continue;
+
+            double probSlowPion = pSlowPion->getExtraInfo("isRightCategory(SlowPion)");
+            if (probSlowPion > maximumProbSlowPion) {
+              maximumProbSlowPion = probSlowPion;
+              chargeTargetSlowPion =  pSlowPion->getCharge();
+              momTargetSlowPion = labToCms(pSlowPion->get4Vector());
+            }
+          }
+        }
 
         double output = 0.0;
 
-        if ((requestedVariable == "HaveOpositeCharges") || (requestedVariable == "cosKaonPion"))
+        double chargeTargetKaon = particle->getCharge();
+        if (requestedVariable == "HaveOpositeCharges")
         {
-          float chargeTargetSlowPion = 0;
-          if (SlowPionList.isValid()) {
-            double maximumProbSlowPion = 0;
-            for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
-              Particle* pSlowPion = SlowPionList->getParticle(i);
-              if (pSlowPion != nullptr) {
-                if (pSlowPion -> hasExtraInfo("isRightCategory(SlowPion)")) {
-                  double probSlowPion = pSlowPion->getExtraInfo("isRightCategory(SlowPion)");
-                  if (probSlowPion > maximumProbSlowPion) {
-                    maximumProbSlowPion = probSlowPion;
-                    chargeTargetSlowPion =  pSlowPion -> getCharge();
-                    momTargetSlowPion = labToCms(pSlowPion -> get4Vector());
-                  }
-                }
-              }
-            }
-          }
-          if (requestedVariable == "HaveOpositeCharges") {
-            if (chargeTargetKaon * chargeTargetSlowPion == -1) output = 1;
-          }
-          if (requestedVariable == "cosKaonPion") {
-            if (momTargetKaon == momTargetKaon
-                && momTargetSlowPion == momTargetSlowPion) output = cos(momTargetKaon.Angle(momTargetSlowPion.Vect()));
-          }
-
-        } else {
-          B2FATAL("Wrong variable  " << requestedVariable << " requested. The possibilities are cosKaonPion or HaveOpositeCharges");
+          if (chargeTargetKaon * chargeTargetSlowPion == -1)
+            output = 1;
         }
+        //TODO: when momTargetSlowPion == momTargetSlowPion fail?
+        else if (requestedVariable == "cosKaonPion")
+        {
+          TLorentzVector momTargetKaon = labToCms(particle->get4Vector());
+          if (momTargetKaon == momTargetKaon && momTargetSlowPion == momTargetSlowPion)
+            output = cos(momTargetKaon.Angle(momTargetSlowPion.Vect()));
+        }
+
         return output;
       };
       return func;
@@ -1489,30 +1479,24 @@ namespace Belle2 {
       //used by simple_flavor_tagger
 
       auto particleListName = arguments[0];
-      auto outputExtraInfo = arguments[1];
+      auto outputExtraInfo  = arguments[1];
       auto rankingExtraInfo = arguments[2];
 
-      int indexOutput = -1;
-      int indexRanking = -1;
+
+      unsigned indexRanking = find(availableExtraInfos.begin(), availableExtraInfos.end(),
+                                   rankingExtraInfo) - availableExtraInfos.begin();
+      unsigned indexOutput  = find(availableExtraInfos.begin(), availableExtraInfos.end(),
+                                   outputExtraInfo)  - availableExtraInfos.begin();
 
 
-      for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
-        if (rankingExtraInfo == availableExtraInfos[i]) {indexRanking = i; break;}
-      }
-
-
-      for (unsigned i = 0; i < availableExtraInfos.size(); ++i) {
-        if (outputExtraInfo == availableExtraInfos[i]) {indexOutput = i; break;}
-      }
-
-      if (indexRanking == -1) {
+      if (indexRanking == availableExtraInfos.size()) {
         B2FATAL("weightedQpOf: Not available category " << rankingExtraInfo <<
                 ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                 <<
                 ". The possibilities for isRightCategory() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, KaonPion, MaximumPstar, FSC and Lambda");
       }
 
-      if (indexOutput == -1) {
+      if (indexOutput == availableExtraInfos.size()) {
         B2FATAL("weightedQpOf: Not available category " << outputExtraInfo <<
                 ". The possibilities for isRightTrack() are Electron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastHadron, MaximumPstar, and Lambda"
                 <<

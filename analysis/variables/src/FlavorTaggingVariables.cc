@@ -198,16 +198,16 @@ namespace Belle2 {
     double transverseMomentumOfChargeTracksInRoe(const Particle* part)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      if (!roe.isValid()) return 0;
 
       double sum = 0.0;
 
-      if (roe.isValid()) {
-        for (const auto& track : roe->getChargedParticles()) {
-          if (part->isCopyOf(track, true)) continue;
-          if (!track->isMostLikely()) continue;
-          sum += track->getMomentum().Perp2();
-        }
+      for (const auto& track : roe->getChargedParticles()) {
+        if (part->isCopyOf(track, true)) continue;
+        if (!track->isMostLikely()) continue;
+        sum += track->getMomentum().Perp2();
       }
+
       return sum;
 
     }

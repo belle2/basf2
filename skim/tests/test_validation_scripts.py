@@ -39,6 +39,8 @@ def dry_run(validation_file):
 
 
 if __name__ == '__main__':
+    # Skip this test for light releases.
+    b2u.skip_test_if_light()
     # First, let's check in a smart way how many cores we can use (or override it).
     args = arg_parser().parse_args()
     num_workers = None

@@ -8,8 +8,7 @@ import time
 
 if __name__ == "__main__":
     from basf2 import conditions
-    # NOTE: do not use testing payloads in production! Any results obtained
-    # like this WILL NOT BE PUBLISHED
+    # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
     ]
@@ -69,8 +68,7 @@ if __name__ == "__main__":
 
     stats = []
     test_data = ["validation.root"]
-    for label, options in [("FastBDT", fastbdt_options),
-                           ("FastBDT_PT", fastbdt_pt_options)]:
+    for label, options in [("FastBDT", fastbdt_options), ("FastBDT_PT", fastbdt_pt_options)]:
         training_start = time.time()
         general_options.m_identifier = label
         basf2_mva.teacher(general_options, options)
@@ -78,8 +76,7 @@ if __name__ == "__main__":
         training_time = training_stop - training_start
         method = basf2_mva_util.Method(general_options.m_identifier)
         inference_start = time.time()
-        p, t = method.apply_expert(basf2_mva.vector(
-            *test_data), general_options.m_treename)
+        p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
         inference_stop = time.time()
         inference_time = inference_stop - inference_start
         auc = basf2_mva_util.calculate_roc_auc(p, t)

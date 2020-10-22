@@ -1,4 +1,4 @@
-"""
+'''
 This module contains convenience functions to setup most commonly used physics
 generators correctly with their default settings. More information can be found
 in `BELLE2-NOTE-PH-2015-006`_
@@ -6,7 +6,7 @@ in `BELLE2-NOTE-PH-2015-006`_
 Contact: Torben Ferber (ferber@physics.ubc.ca)
 
 .. _BELLE2-NOTE-PH-2015-006: https://docs.belle2.org/record/282
-"""
+'''
 
 from basf2 import *
 from ROOT import Belle2
@@ -466,33 +466,59 @@ def add_bhwide_generator(path, minangle=0.5):
     bhwide.param('WtMax', 3.0)
 
 
-def add_babayaganlo_generator(path, finalstate='', minenergy=0.15, minangle=10.0):
-    """
-    Add the high precision QED generator BABAYAGA.NLO to the path. Settings correspond to cross sections in BELLE2-NOTE-PH-2015-006
+def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0, fmax=-1.0, generateInECLAcceptance=False):
+    '''
+    Add the high precision QED generator BabaYaga@NLO to the path.
 
     Parameters:
-        path (basf2.Path): path where the generator should be added
-        finalstate (str): ee or gg
-        minenergy (float): minimum particle energy in GeV
-        minangle (float): angular range from minangle to 180-minangle for primary particles (in degrees)
-    """
+        path (basf2.Path): path where the generator should be added.
+        finalstate (str): ee (e+e-) or gg (gammagamma).
+        minenergy (float): minimum particle (leptons for 'ee', photons for 'gg') energy in GeV.
+        minangle (float): angular range from minangle to 180-minangle for primary particles (in degrees).
+        fmax (float): maximum of differential cross section weight. This parameter should be set only by experts.
+        generateInECLAcceptance (bool): if True, the GeneratorPreselection module is used to select only events
+          with both the primary particles within the ECL acceptance.
+    '''
 
-    babayaganlo = path.add_module("BabayagaNLOInput")
+    babayaganlo = path.add_module('BabayagaNLOInput')
+
+    if not (fmax == -1.0):
+        B2WARNING(f'The BabayagaNLOInput parameter "FMax" will be set to {fmax} instead to the default value (-1.0). '
+                  'Please do not do this, unless you are extremely sure about this choice.')
 
     if finalstate == 'ee':
         babayaganlo.param('FinalState', 'ee')
         babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
         babayaganlo.param('MinEnergy', minenergy)
-        babayaganlo.param('FMax', 1.e5)
+        babayaganlo.param('FMax', fmax)
 
     elif finalstate == 'gg':
         babayaganlo.param('FinalState', 'gg')
         babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
         babayaganlo.param('MinEnergy', minenergy)
-        babayaganlo.param('FMax', 1.e4)
+        babayaganlo.param('FMax', fmax)
 
     else:
-        B2FATAL("add_babayaganlo_generator final state not supported: {}".format(finalstate))
+        B2FATAL(f'add_babayaganlo_generator final state not supported: {finalstate}')
+
+    if generateInECLAcceptance:
+        B2INFO(f'The final state {finalstate} is preselected requiring both primary particles within the ECL acceptance.')
+        emptypath = Path()
+        add_generator_preselection(path=path,
+                                   emptypath=emptypath,
+                                   applyInCMS=False)
+        if finalstate == 'ee':
+            set_module_parameters(path=path,
+                                  name='GeneratorPreselection',
+                                  nChargedMin=2,
+                                  MinChargedTheta=12.4,
+                                  MaxChargedTheta=155.1,)
+        elif finalstate == 'gg':
+            set_module_parameters(path=path,
+                                  name='GeneratorPreselection',
+                                  nPhotonMin=2,
+                                  MinPhotonTheta=12.4,
+                                  MaxPhotonTheta=155.1)
 
 
 def add_phokhara_generator(path, finalstate=''):

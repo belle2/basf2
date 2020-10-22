@@ -585,71 +585,73 @@ namespace Belle2 {
           TLorentzVector momXNeutralClusters; //Momentum of neutral X clusters in CMS-System
           TLorentzVector momTarget = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Mu in CMS-System
 
-          double output = 0.0;
-
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-          if (roe.isValid())
+          if (!roe.isValid()) return 0;
+
+          const auto& roeChargedParticles = roe->getChargedParticles();
+          for (auto& roeChargedParticle : roeChargedParticles)
           {
-            const auto& roeChargedParticles = roe->getChargedParticles();
+            if (roeChargedParticle->isCopyOf(particle, true)) continue;
+            momXChargedTracks += roeChargedParticle->get4Vector();
+          }
+
+          momXNeutralClusters = roe->get4VectorNeutralECLClusters();
+
+          const auto& klongs = roe->getHadrons();
+          for (auto& klong : klongs)
+          {
+            if (nKLMClusterTrackMatches(klong) == 0 && !(klong->getKLMCluster()->getAssociatedEclClusterFlag())) {
+              momXNeutralClusters += klong->get4Vector();
+            }
+          }
+
+          // TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
+          TLorentzVector momX = T.rotateLabToCms() * (momXChargedTracks +
+                                                      momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
+          TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
+
+          double output = 0.0;
+          if (requestedVariable == "recoilMass") output = momX.M();
+          else if (requestedVariable == "recoilMassSqrd") output = momX.M2();
+          else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
+          else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
+          else if (requestedVariable == "EW90")
+          {
+
+            TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
+            float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
+
+            const auto& photons = roe->getPhotons();
+            for (auto& photon : photons) {
+              if ((T.rotateLabToCms() * photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
+                E_W_90 += photon->getECLClusterEnergy();
+              }
+            }
             for (auto& roeChargedParticle : roeChargedParticles) {
-              if (roeChargedParticle->isCopyOf(particle, true)) continue;
-              momXChargedTracks += roeChargedParticle->get4Vector();
-            }
-
-            momXNeutralClusters = roe->get4VectorNeutralECLClusters();
-
-            const auto& klongs = roe->getHadrons();
-            for (auto& klong : klongs) {
-              if (nKLMClusterTrackMatches(klong) == 0 && !(klong->getKLMCluster()->getAssociatedEclClusterFlag())) {
-                momXNeutralClusters += klong->get4Vector();
-              }
-            }
-
-            // TLorentzVector momXcharged(momXchargedtracks.Vect(), momXchargedclusters.E());
-            TLorentzVector momX = T.rotateLabToCms() * (momXChargedTracks +
-                                                        momXNeutralClusters); //Total Momentum of the recoiling X in CMS-System
-            TLorentzVector momMiss = -(momX + momTarget); //Momentum of Anti-v  in CMS-System
-
-            if (requestedVariable == "recoilMass") output = momX.M();
-            else if (requestedVariable == "recoilMassSqrd") output = momX.M2();
-            else if (requestedVariable == "pMissCMS") output = momMiss.Vect().Mag();
-            else if (requestedVariable == "cosThetaMissCMS") output = TMath::Cos(momTarget.Angle(momMiss.Vect()));
-            else if (requestedVariable == "EW90") {
-
-              TLorentzVector momW = momTarget + momMiss; //Momentum of the W-Boson in CMS
-              float E_W_90 = 0 ; // Energy of all charged and neutral clusters in the hemisphere of the W-Boson
-
-              const auto& photons = roe->getPhotons();
-              for (auto& photon : photons) {
-                if ((T.rotateLabToCms() * photon->get4Vector()).Vect().Dot(momW.Vect()) > 0) {
-                  E_W_90 += photon->getECLClusterEnergy();
-                }
-              }
-              for (auto& roeChargedParticle : roeChargedParticles) {
-                if (!roeChargedParticle->isCopyOf(particle, true)) {
-                  for (const ECLCluster& chargedCluster : roeChargedParticle->getTrack()->getRelationsWith<ECLCluster>()) {
-                    // ignore everything except the nPhotons hypothesis
-                    if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
-                      continue;
-                    float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
-                    if (iEnergy == iEnergy) {
-                      if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(&chargedCluster,
-                                                                          ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
-                    }
+              if (!roeChargedParticle->isCopyOf(particle, true)) {
+                for (const ECLCluster& chargedCluster : roeChargedParticle->getTrack()->getRelationsWith<ECLCluster>()) {
+                  // ignore everything except the nPhotons hypothesis
+                  if (!chargedCluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))
+                    continue;
+                  float iEnergy = chargedCluster.getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
+                  if (iEnergy == iEnergy) {
+                    if ((T.rotateLabToCms() * C.Get4MomentumFromCluster(&chargedCluster,
+                                                                        ECLCluster::EHypothesisBit::c_nPhotons)).Vect().Dot(momW.Vect()) > 0) E_W_90 += iEnergy;
                   }
                 }
               }
-
-              //       for (auto & i : klm) {
-              //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
-              //         }
-
-              output = E_W_90;
-            } else {
-              B2FATAL("Wrong variable  " << requestedVariable <<
-                      " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
             }
+
+            //       for (auto & i : klm) {
+            //         if ((T.rotateLabToCms() * i -> getMomentum()).Vect().Dot(momW.Vect()) > 0) E_W_90 +=;
+            //         }
+
+            output = E_W_90;
+          } else {
+            B2FATAL("Wrong variable " << requestedVariable <<
+            " requested. The possibilities are recoilMass, recoilMassSqrd, pMissCMS, cosThetaMissCMS or EW90");
           }
+
           return output;
         };
         return func;

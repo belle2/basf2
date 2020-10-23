@@ -41,6 +41,8 @@ class SVDClustersQuickCheck(basf2.Module):
         self.ffNew = TH1F("clNew_ff", "New Cluster FirstFrame", 4, -0.4, 3.5)
         self.charge = TH1F("cl_charge", "Cluster Charge", 300, 0, 100)
         self.chargeNew = TH1F("clNew_charge", "New Cluster Charge", 300, 0, 100)
+        self.SNR = TH1F("cl_SNR", "Cluster SNR", 100, 0, 100)
+        self.SNRNew = TH1F("clNew_SNR", "New Cluster SNR", 100, 0, 100)
         self.position = TH1F("cl_position", "Cluster Position", 300, -6, 6)
         self.positionNew = TH1F("clNew_position", "New Cluster Position", 300, -6, 6)
         self.positionSigma = TH1F("cl_positionSigma", "Cluster Position Error", 300, 0, 100)
@@ -104,6 +106,7 @@ class SVDClustersQuickCheck(basf2.Module):
             self.time.Fill(d.getClsTime())
             self.ff.Fill(d.getFirstFrame())
             self.charge.Fill(d.getCharge()/1000)
+            self.SNR.Fill(d.getSNR())
             self.position.Fill(d.getPosition())
             self.positionSigma.Fill(d.getPositionSigma() * 1e4)
             if d.getSize() == 1:
@@ -137,6 +140,7 @@ class SVDClustersQuickCheck(basf2.Module):
             self.timeNew.Fill(d.getClsTime())
             self.ffNew.Fill(d.getFirstFrame())
             self.chargeNew.Fill(d.getCharge()/1000)
+            self.SNRNew.Fill(d.getSNR())
             self.positionNew.Fill(d.getPosition())
             self.positionSigmaNew.Fill(d.getPositionSigma() * 1e4)
             if d.getSize() == 1:
@@ -157,7 +161,7 @@ class SVDClustersQuickCheck(basf2.Module):
             self.positionPullNew.Fill((d.getPosition() - truePos)/d.getPositionSigma())
 
     def terminate(self):
-        f = TFile("quicktestSVDClusterOldDefault_PR.root", "RECREATE")
+        f = TFile("quicktestSVDClusterOldDefault_PR3.root", "RECREATE")
         #        f = TFile("quicktestSVDCluster1kCoGErrProp.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
@@ -187,6 +191,11 @@ class SVDClustersQuickCheck(basf2.Module):
         self.charge.Write()
         self.chargeNew.GetXaxis().SetTitle("cluster charge (ke-)")
         self.chargeNew.Write()
+
+        self.SNR.GetXaxis().SetTitle("cluster SNR")
+        self.SNR.Write()
+        self.SNRNew.GetXaxis().SetTitle("cluster SNR")
+        self.SNRNew.Write()
 
         self.position.GetXaxis().SetTitle("cluster position (cm)")
         self.position.Write()
@@ -306,7 +315,7 @@ class SVDRecoDigitsQuickCheck(basf2.Module):
                                                                   d.getSensorID().getSensorNumber()+isU)
 
     def terminate(self):
-        f = TFile("quicktestSVDRecoDigitOldDefault_PR.root", "RECREATE")
+        f = TFile("quicktestSVDRecoDigitOldDefault_PR3.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
             hist.GetYaxis().SetTitle("sensor # + 0.5 is isU")

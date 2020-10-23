@@ -337,9 +337,11 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   // cluster charge computation
   if (m_numberOfAcquiredSamples == 6) {
     charge = m_charge6SampleClass->getClusterCharge(rawCluster);
+    SNR = m_charge6SampleClass->getClusterSNR(rawCluster);
     seedCharge = m_charge6SampleClass->getClusterSeedCharge(rawCluster);
   } else if (m_numberOfAcquiredSamples == 3) {
     charge = m_charge3SampleClass->getClusterCharge(rawCluster);
+    SNR = m_charge3SampleClass->getClusterSNR(rawCluster);
     seedCharge = m_charge3SampleClass->getClusterSeedCharge(rawCluster);
   } else //we should never get here!
     B2FATAL("SVD Reconstruction not available for this cluster (unrecognized or not supported  number of acquired APV samples!!");

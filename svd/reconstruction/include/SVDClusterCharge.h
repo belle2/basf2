@@ -14,8 +14,10 @@
 #include <svd/reconstruction/RawCluster.h>
 
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/calibration/SVDNoiseCalibrations.h>
 
 #include <vector>
+#include <TMath.h>
 
 namespace Belle2 {
 
@@ -32,6 +34,28 @@ namespace Belle2 {
        * Constructor to create an empty Cluster Charge Object
        */
       SVDClusterCharge() {};
+
+
+      /**
+       * @return the cluster SNR
+       */
+      double getClusterSNR(const Belle2::SVD::RawCluster& rawCluster)
+      {
+
+        double clusterCharge = getClusterCharge(rawCluster);
+        double clusterNoise = 0;
+
+        std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
+
+        for (auto strip : strips)
+          clusterNoise += TMath::Power(m_NoiseCal.getNoiseInElectrons(rawCluster.getSensorID(), rawCluster.isUSide(), strip.cellID), 2);
+
+        clusterNoise = TMath::Sqrt(clusterNoise);
+
+        B2INFO("cluster charge = " << clusterCharge << ", clusterNoise = " << clusterNoise);
+        return clusterCharge / clusterNoise;
+
+      }
 
       /**
        * @return the cluster seed charge  (as strip max sample)
@@ -70,10 +94,11 @@ namespace Belle2 {
 
     protected:
 
-
       /**SVDPulseShaper calibration wrapper*/
       SVDPulseShapeCalibrations m_PulseShapeCal;
 
+      /**SVDNoise calibration wrapper*/
+      SVDNoiseCalibrations m_NoiseCal;
     };
 
   }

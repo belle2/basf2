@@ -6,6 +6,7 @@ import root_pandas
 import basf2 as b2
 import b2test_utils as b2tu
 import modularAnalysis as ma
+from stdPi0s import stdPi0s
 from variables import variables as vm
 
 
@@ -53,6 +54,23 @@ def run_copylists():
     ma.copyLists("vpho:ef", ["vpho:e", "vpho:f"], path=pa)
     dump_3_v2nts(["e", "f", "ef"], path=pa)
 
+    # fourth test: check that it is considered whose daughter a pi0 is when
+    # there are two charge-conjugated daughters
+    stdPi0s('all', path=pa)
+    ma.reconstructDecay("tau+:pi -> pi+", "", dmID=0, path=pa)
+    ma.reconstructDecay("tau+:pipi0 -> pi+ pi0:all", "", dmID=1, path=pa)
+    # the pi0 is the daughter of the tau-
+    ma.reconstructDecay("vpho:g_with_duplicates -> tau+:pi tau-:pipi0", "", path=pa, chargeConjugation=False)
+    # the pi0 is the daughter of the tau+
+    ma.reconstructDecay("vpho:h_with_duplicates -> tau-:pi tau+:pipi0", "", path=pa, chargeConjugation=False)
+    # some of the candidates are duplicates that should be eliminated
+    ma.copyList("vpho:g", "vpho:g_with_duplicates", path=pa)
+    ma.copyList("vpho:h", "vpho:h_with_duplicates", path=pa)
+    # now both lists individually only contain unique candidates and merging
+    # them should just be the sum
+    ma.copyLists("vpho:gh", ["vpho:g", "vpho:h"], path=pa)
+    dump_3_v2nts(["g", "h", "gh"], path=pa)
+
     b2tu.safe_process(pa, 1)
 
 
@@ -81,6 +99,10 @@ class TestCopyLists(unittest.TestCase):
         self.assertEqual(self._count("e"), self._count("e"))
         self.assertEqual(self._count("e"), self._count("ef"))
 
+    def test_neutrals_in_decays_to_charge_conjugated_daughters(self):
+        """Self-conjugated particles can be daughters of both charge-conjugated mother particles.
+        Those multiple candidates are no duplicates and copying the particle list should not remove them."""
+        self.assertEqual(self._count("g") + self._count("h"), self._count("gh"))
 
 if __name__ == "__main__":
     with b2tu.clean_working_directory():

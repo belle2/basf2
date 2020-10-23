@@ -201,7 +201,8 @@ namespace Belle2 {
     if (p->getNDaughters() == 0) {
       idSequence.push_back(p->getMdstArrayIndex());
     } else {
-      idSequence.push_back(p->getNDaughters());
+      // decorate number of daughters with flavor sign of particle
+      idSequence.push_back(p->getPDGCode() / abs(p->getPDGCode()) * p->getNDaughters());
       // this is not FSP (go one level down)
       for (unsigned i = 0; i < p->getNDaughters(); i++)
         fillUniqueIdentifier(p->getDaughter(i), idSequence);

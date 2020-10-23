@@ -364,8 +364,6 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
   //apply the Lorentz Shift Correction
   position = applyLorentzShiftCorrection(position, sensorID, isU);
 
-  //  float positionError = m_ClusterCal.getCorrectedClusterPositionError(sensorID, isU, size, cluster.getPositionError());
-
   //append the new cluster to the StoreArray
   m_storeClusters.appendNew(SVDCluster(sensorID, isU, position, positionError, time, timeError, charge, seedCharge, size, SNR, -1,
                                        firstFrame));

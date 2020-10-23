@@ -12,6 +12,7 @@
 
 #include <svd/reconstruction/RawCluster.h>
 #include <svd/reconstruction/SVDClusterPosition.h>
+#include <svd/calibration/SVDClusterCalibrations.h>
 
 #include <vector>
 
@@ -44,7 +45,7 @@ namespace Belle2 {
 
     private:
 
-
+      SVDClusterCalibrations m_ClusterCal; /**<SVDCluster calibrations for the position error scale factors*/
     };
 
   }

@@ -43,8 +43,6 @@ namespace Belle2 {
     double SVDOldDefaultPosition::getClusterPositionError(const Belle2::SVD::RawCluster& rawCluster)
     {
 
-      //as weighted average of the strip position with strip max sample
-
       std::vector<Belle2::SVD::StripInRawCluster> strips = rawCluster.getStripsInRawCluster();
 
       SVDPositionReconstruction positionReco(strips, rawCluster.getSensorID(), rawCluster.isUSide());
@@ -55,6 +53,11 @@ namespace Belle2 {
         positionError = positionReco.getCoGPositionError();
       else
         positionError = positionReco.getAHTPositionError();
+
+      //apply cluster position error scale factors
+      positionError = m_ClusterCal.getCorrectedClusterPositionError(rawCluster.getSensorID(), rawCluster.isUSide(), strips.size(),
+                      positionError);
+
 
       return positionError;
     }

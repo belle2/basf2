@@ -239,7 +239,7 @@ def add_expressreco_processing(path,
     # this is needed as by default also un-selected events will get passed to ereco,
     # however they are empty.
     if select_only_accepted_events:
-        skim_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
+        skim_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"], resultOnMissing=0)
         skim_module.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     # ensure that only DataStore content is present that we expect in

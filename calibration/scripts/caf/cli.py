@@ -156,13 +156,13 @@ def add_backends_subparsers(parser, default_max_processes=4,
                             help=("The batch queue to use."
                                   " (e.g. s)"))
 
-    lsf_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
+    lsf_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit, type=int,
                             help=("The number of batch jobs that can be active for the user before the backend class will stop "
                                   "submitting. This is not a completely hard limit, the actual max reached depends on other "
                                   "submitting processes and the number submitted before re-checking."
                                   f" (default: {default_global_job_limit})"))
 
-    lsf_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    lsf_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                             default=default_submission_check_heartbeat,
                             help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                   "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."
@@ -179,13 +179,13 @@ def add_backends_subparsers(parser, default_max_processes=4,
                             help=("The batch queue to use."
                                   " e.g. short"))
 
-    pbs_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
+    pbs_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit, type=int,
                             help=("The number of batch jobs that can be active for the user before the backend class will stop "
                                   "submitting. This is not a completely hard limit, the actual max reached depends on other "
                                   "submitting processes and the number submitted before re-checking."
                                   f" (default: {default_global_job_limit})"))
 
-    pbs_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    pbs_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                             default=default_submission_check_heartbeat,
                             help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                   "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."
@@ -206,13 +206,19 @@ def add_backends_subparsers(parser, default_max_processes=4,
                                help=("Jobs should be submitted using this univese."
                                      " e.g. vanilla"))
 
-    condor_parser.add_argument("--global-job-limit", dest="global_job_limit", metavar="", default=default_global_job_limit,
-                               help=("The number of batch jobs that can be active for the user before the backend class will stop "
-                                     "submitting. This is not a completely hard limit, the actual max reached depends on other "
-                                     "submitting processes and the number submitted before re-checking."
-                                     f" (default: {default_global_job_limit})"))
+    condor_parser.add_argument(
+        "--global-job-limit",
+        dest="global_job_limit",
+        metavar="",
+        default=default_global_job_limit,
+        type=int,
+        help=(
+            "The number of batch jobs that can be active for the user before the backend class will stop "
+            "submitting. This is not a completely hard limit, the actual max reached depends on other "
+            "submitting processes and the number submitted before re-checking."
+            f" (default: {default_global_job_limit})"))
 
-    condor_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="",
+    condor_parser.add_argument("--submission-check-heartbeat", dest="submission_check_heartbeat", metavar="", type=int,
                                default=default_submission_check_heartbeat,
                                help=("The time (seconds) between checking if there are fewer batch jobs than the global limit. "
                                      "Generally not needed to change, but it certainly shouldn't be set lower than 30 seconds."

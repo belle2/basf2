@@ -95,7 +95,8 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   TFile f(fname, "NEW");
 
   if (f.IsZombie()) {
-    B2WARNING("File " << fname << " already exists and it will not be rewritten. If desired please delete file and re-run.");
+    B2WARNING("File " << LogVar("MonitoringObject file",
+                                fname) << " already exists and it will not be rewritten. If desired please delete file and re-run.");
     return;
   }
 

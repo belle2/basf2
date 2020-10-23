@@ -154,7 +154,7 @@ background *events* or background *processes*.
 These are relatively easy to reject and can be done in the **trigger** or by
 rather simple cuts.
 More on this :ref:`later on in this lesson
-<onlinebook_fundamentals_trigger_filter>`.
+<onlinebook_fundamentals_triggers_filters>`.
 You don't need to worry too much about these if you are doing B physics.
 But these background processes can be important for low-multiplicity analyses.
 

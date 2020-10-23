@@ -53,6 +53,8 @@ Variables
    :b2:var:`cosThetaBetweenParticleAndNominalB` in which all descendant neutrino momenta are subtracted from the B momentum
    during the calculation.
  * Added new variables :b2:var:`ndf` and :b2:var:`chi2` to return track NDF and Chi2
+ * Added the inverse trigonometric functions: :b2:var:`acos`, :b2:var:`asin`.
+ * Added new variables :b2:var:`exp` and :b2:var:`log`.
 
 Modules
 +++++++
@@ -64,8 +66,11 @@ Modules
  * Added the new wrapper function `applyRandomCandidateSelection`, which uses the :b2:mod:`BestCandidateSelection` module to
    reduce the number of candidates in the input particle list to one candidate per event based on a random value.
  * The ``EventKinematics`` module can now compute event kinematics using generated particles as an input.
- * The new argument ``suffix`` has been added to the `writePi0EtaVeto` function to allow calculating this veto for multiple
-   photons.
+ * Arguments of `writePi0EtaVeto` have been updated. ``downloadFlag`` and ``workingDirectory`` have been removed since the
+   download processes can be skipped. New arguments have been added for several reasons. ``suffix`` allows to calculate this
+   veto for multiple photons. ``hardParticle`` allows to call this function for a given particle other than a photon. 
+   Four new arguments have been added to override the payload names and soft photon selections, ``pi0PayloadNameOverride``,
+   ``etaPayloadNameOverride``, ``pi0SoftPhotonCutOverride``, and ``etaSoftPhotonCutOverride``.
  * A new helper method `updateROEUsingV0Lists` has been added to facilitate application of V0Finder results in Rest Of Event.
  * In :b2:mod:`TagVertex`, all charged particles from the ROE are loaded to be included in the tag vertex fit (and not only those with a pion hypothesis)
  * Added a possibility to add a ROE mask for KLM-based particles and an experimental option of including KLM-based particles into ROE 4-vector computation.
@@ -74,6 +79,11 @@ Modules
 
  * The :b2:mod:`ParticleCombinerFromMC` and the `reconstructMCDecay` function can set decayModeID extraInfo with an argument ``dmID``.
    One can decide whether charge conjugated mode should be reconstructed with new boolean argument ``chargeConjugation`` (true by default).
+ * The :b2:mod:`PrintMCParticles` module and thus also the `printMCParticles` function
+   has a completely new layout that should be much easier to parse, especially for complicated events. By default it shows
+   much less information but in an easier to parse tree representation. See the documentation of `printMCParticles` for details.
+ * The special treatment of MCMatching for the tau-decay is fixed. The treatment was working fine in release-04, but it was broken
+   in the release-05.
 
 Full Event Interpretation
 +++++++++++++++++++++++++

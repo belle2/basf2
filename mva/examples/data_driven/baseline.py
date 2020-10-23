@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Thomas Keck 2017
 
 import basf2_mva
-from basf2 import *
-from modularAnalysis import *
 
 if __name__ == "__main__":
     variables = ['p', 'pt', 'pz', 'phi',

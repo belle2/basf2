@@ -167,7 +167,8 @@ namespace Belle2 {
       bool thisModeMatch(m_ModeByteMatch);
       bool thisTriggerMatch(m_TriggerTypeMatch);
       bool thisXtalk(m_Xtalk);
-      bool thisRelativeShift(m_relativeTimeShift);
+      int thisRelativeShift(m_relativeTimeShift);
+      int thisNsamples(m_nAPVsamples);
 
       std::ostringstream os;
 
@@ -180,6 +181,7 @@ namespace Belle2 {
       os << " TriggerType Match: " << thisTriggerMatch << std::endl;
       os << " Cross Talk: " << (thisXtalk ? "true" : "false") << std::endl;
       os << " Relative Shift 3/6: " << (unsigned int)thisRelativeShift << std::endl;
+      os << " Number of APV samples: " << (unsigned int)thisNsamples << std::endl;
       return os.str();
     }
 

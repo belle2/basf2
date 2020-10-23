@@ -56,7 +56,7 @@ HexDataPackerModule::HexDataPackerModule() : Module()
   setDescription("an Example to pack data to a RawCOPPER object");
 
   ///  maximum # of events to produce( -1 : inifinite)
-  addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
+  addParam("MaxEventNum", max_ > nevt, "Maximum event number to make", -1);
 
   ///  maximum # of events to produce( -1 : inifinite)
   //  addParam("NodeID", m_nodeid, "Node ID", 0);
@@ -137,39 +137,59 @@ void HexDataPackerModule::event()
     }
     string strin;
     getline(m_ifs, strin);
+#ifdef DEBUG
     printf("%s\n", strin.c_str());
+#endif
     sscanf(strin.c_str(), "%s %s %s %s",
            char1, char2, char3, char4);
+#ifdef DEBUG
     printf("Printing %s %s %s %s\n",
            char1, char2, char3, char4);
+#endif
     if (strcmp(char1, "data") == 0) {
+#ifdef DEBUG
       printf("pos 1\n"); fflush(stdout);
+#endif
       if (strcmp(char4, "Trailer") == 0) {
+#ifdef DEBUG
         printf("pos 2\n"); fflush(stdout);
+#endif
         continue;
       }
       if (strcmp(char2, "0") == 0) {
+#ifdef DEBUG
         printf("pos 3\n"); fflush(stdout);
+#endif
         continue;
       } else if (strcmp(char2, "7") == 0) {
+#ifdef DEBUG
         printf("pos 4\n"); fflush(stdout);
+#endif
         sscanf(strin.c_str(), "%s %d %s %x %x %x %x %x %x %x %x",
                char1, &(val[0]), char2, &(val[1]), &(val[2]), &(val[3]), &(val[4]), &(val[5]), &(val[6]), &(val[7]), &(val[8]));
         size = val[1];
+        val[2] = val[2] | 0x00008000; // For data which was not reduced in FPGA
         if (size < 0 || size > MAX_CPRBUF_WORDS) {
           B2FATAL("The size of an event =(" << size << ") is too large. Exiting...");
         }
+      } else {
+        sscanf(strin.c_str(), "%s %d %s %x %x %x %x %x %x %x %x",
+               char1, &(val[0]), char2, &(val[1]), &(val[2]), &(val[3]), &(val[4]), &(val[5]), &(val[6]), &(val[7]), &(val[8]));
       }
       if (size <= 0) {
         B2FATAL("The size of an event (=" << size << ") is too large. Exiting...");
       } else {
+#ifdef DEBUG
         printf("pos 5\n"); fflush(stdout);
+#endif
         for (int i = 1; i <= 8 ; i++) {
           if (word_count >= MAX_CPRBUF_WORDS) {
             B2FATAL("The size of an event (=" << size << ") is too large. Exiting...");
           }
           evtbuf[word_count] = val[i];
+#ifdef DEBUG
           printf("word %d size %d\n", word_count, size); fflush(stdout);
+#endif
           word_count++;
           if (word_count == size) {
             event_end = 1;
@@ -181,6 +201,15 @@ void HexDataPackerModule::event()
     }
   }
 
+#ifdef DEBUG
+  if (size > 0 && size < MAX_CPRBUF_WORDS) {
+    for (int i = 0; i < size; i++) {
+      printf("%.8x ", evtbuf[i]);
+      if (i % 8 == 7) printf("\n");
+    }
+    printf("\n");
+  }
+#endif
   StoreObjPtr<EventMetaData> evtmetadata;
   if (run_end == 0) {
     (ary.appendNew())->SetBuffer(evtbuf, size, 1, 1, 1);

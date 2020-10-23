@@ -181,9 +181,6 @@ def print_function(args):
         pd.set_option('display.max_columns', 500)
         pd.set_option('display.width', 1000)
         print(df)
-    elif args.format == "scriptable":
-        sfmt = 'b2hlt_triggers add_cut {Base Identifier} {Cut Identifier} "{Cut Condition}" {Cut Prescaling} {Reject Cut}'.format
-        df.apply(lambda x: print(sfmt(**x)), 1)
     elif args.format == "jira":
         from tabulate import tabulate
         print(tabulate(df, tablefmt="jira", showindex=False, headers="keys"))
@@ -216,6 +213,21 @@ def print_function(args):
                 print()
     else:
         raise AttributeError(f"Do not understand format {args.format}")
+
+
+def create_script_function(args):
+    """
+    Print the b2hlt_trigger commands to create a lobal database copy.
+    """
+    cuts = args.database.get_all_cuts()
+    df = pd.DataFrame(cuts)
+
+    sfmt = 'b2hlt_triggers add_cut {Base Identifier} {Cut Identifier} "{Cut Condition}" {Cut Prescaling} {Reject Cut}'.format
+    if args.filename is None:
+        df.apply(lambda x: print(sfmt(**x)), 1)
+    else:
+        with open(args.filename, 'w') as f:
+            df.apply(lambda x: f.write(sfmt(**x) + '\n'), 1)
 
 
 def iov_includes(iov_list, exp, run):
@@ -395,7 +407,7 @@ top in the localdb will be shown.
                                          """)
     print_parser.add_argument("--database", help="Which database to print. Defaults to 'online,localdb:latest'.",
                               type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
-    choices = ["human-readable", "json", "list", "pandas", "scriptable"]
+    choices = ["human-readable", "json", "list", "pandas"]
     try:
         from tabulate import tabulate
         choices += ['jira', 'grid']
@@ -405,6 +417,21 @@ top in the localdb will be shown.
                               "To get access to more options please install the tabulate package using pip",
                               choices=choices, default="human-readable")
     print_parser.set_defaults(func=print_function)
+
+    # create-script command
+    create_script_parser = subparsers.add_parser(
+        "create_script",
+        help="Create b2hlt_triggers command to create a online globaltag copy.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""
+Generate the required b2hlt_trigger commands to reproduce an online globaltag for a given exp/run
+number to create a local database version of it.
+                                                 """)
+    create_script_parser.add_argument("--database", help="Which database to print. Defaults to 'online:latest'.",
+                                      type=DownloadableDatabase, default=DownloadableDatabase("online:latest"))
+    create_script_parser.add_argument("--filename", default=None,
+                                      help="Write to given filename instead of stdout.")
+    create_script_parser.set_defaults(func=create_script_function)
 
     # add_cut command
     add_cut_parser = subparsers.add_parser("add_cut", help="Add a new cut.",

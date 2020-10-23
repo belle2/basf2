@@ -11,7 +11,7 @@
 #include <top/reconstruction_cpp/InverseRaytracer.h>
 #include <top/reconstruction_cpp/func.h>
 #include <framework/logging/Logger.h>
-#include <math.h>
+#include <cmath>
 
 namespace Belle2 {
   namespace TOP {

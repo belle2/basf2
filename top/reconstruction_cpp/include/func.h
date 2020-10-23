@@ -61,6 +61,16 @@ namespace Belle2 {
         }
       }
 
+      /**
+       * Returns number of even numbers in the range given by arguments
+       * @param j1 first number
+       * @param j2 last number (exclusive)
+       * @return number of even numbers
+       */
+      inline int getNumOfEven(int j1, int j2)
+      {
+        return (j2 - j1 + 1 - abs(j1) % 2) / 2;
+      }
 
     } // func
   } // TOP

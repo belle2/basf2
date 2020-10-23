@@ -11,6 +11,7 @@
 #pragma once
 
 #include <top/dbobjects/TOPGeoBase.h>
+#include <top/dbobjects/TOPWavelengthFilter.h>
 #include <vector>
 
 namespace Belle2 {
@@ -59,6 +60,12 @@ namespace Belle2 {
       m_QE = qe;
       setName(name);
     }
+
+    /**
+     * Multiplies quantum efficiency data points with filter transmission
+     * @param filter wavelength filter
+     */
+    void applyFilterTransmission(const TOPWavelengthFilter& filter);
 
     /**
      * Clears the object
@@ -119,6 +126,18 @@ namespace Belle2 {
      * @return wavelength step in [nm]
      */
     double getLambdaStep() const {return m_lambdaStep;}
+
+    /**
+     * Returns wavelength of the first nonzero QE data point
+     * @return wavelength of the first nonzero QE data point
+     */
+    double getMinLambda() const;
+
+    /**
+     * Returns wavelength of the last nonzero QE data point
+     * @return wavelength of the last nonzero QE data point
+     */
+    double getMaxLambda() const;
 
     /**
      * Returns collection efficiency

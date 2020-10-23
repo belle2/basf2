@@ -263,6 +263,32 @@ namespace Belle2 {
     unsigned getPixelID(double x, double y) const;
 
     /**
+     * Returns x coordinate of pixel center
+     * @param col valid column number (1-based)
+     * @return x coordinate of pixel center
+     */
+    double getX(unsigned col) const;
+
+    /**
+     * Returns y coordinate of pixel center
+     * @param row valid row number (1-based)
+     * @return y coordinate of pixel center
+     */
+    double getY(unsigned row) const;
+
+    /**
+     * Returns pixel size in x
+     * @return pixel size in x
+     */
+    double getDx() const {return getSensSizeX() / m_numColumns;}
+
+    /**
+     * Returns pixel size in y
+     * @return pixel size in y
+     */
+    double getDy() const {return getSensSizeY() / m_numRows;}
+
+    /**
      * Check for consistency of data members
      * @return true if values consistent (valid)
      */

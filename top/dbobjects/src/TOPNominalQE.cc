@@ -15,6 +15,16 @@ using namespace std;
 
 namespace Belle2 {
 
+
+  void TOPNominalQE::applyFilterTransmission(const TOPWavelengthFilter& filter)
+  {
+    for (size_t i = 0; i < m_QE.size(); i++) {
+      double lambda = m_lambdaFirst + m_lambdaStep * i;
+      m_QE[i] *= filter.getBulkTransmittance(lambda);
+    }
+  }
+
+
   double TOPNominalQE::getQE(double lambda) const
   {
     double dlam = lambda - m_lambdaFirst;
@@ -22,6 +32,24 @@ namespace Belle2 {
     unsigned i = int(dlam / m_lambdaStep);
     if (i > m_QE.size() - 2) return m_QE.back();
     return m_QE[i] + (m_QE[i + 1] - m_QE[i]) / m_lambdaStep * (dlam - i * m_lambdaStep);
+  }
+
+
+  double TOPNominalQE::getMinLambda() const
+  {
+    for (size_t i = 0; i < m_QE.size(); i++) {
+      if (m_QE[i] > 0) return m_lambdaFirst + m_lambdaStep * i;
+    }
+    return getLambdaLast();
+  }
+
+
+  double TOPNominalQE::getMaxLambda() const
+  {
+    for (size_t i = m_QE.size() - 1; i < m_QE.size(); i--) {
+      if (m_QE[i] > 0) return m_lambdaFirst + m_lambdaStep * i;
+    }
+    return m_lambdaFirst;
   }
 
 

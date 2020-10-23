@@ -18,6 +18,7 @@ namespace Belle2 {
 
   unsigned TOPGeoPMT::getPixelColumn(double x) const
   {
+    x *= s_unit;
     if (fabs(x) >= m_sensSizeX / 2) return 0;
     return m_numColumns - int((x + m_sensSizeX / 2) / m_sensSizeX * m_numColumns);
   }
@@ -25,6 +26,7 @@ namespace Belle2 {
 
   unsigned TOPGeoPMT::getPixelRow(double y) const
   {
+    y *= s_unit;
     if (fabs(y) >= m_sensSizeY / 2) return 0;
     return int((y + m_sensSizeY / 2) / m_sensSizeY * m_numRows) + 1;
   }
@@ -38,6 +40,18 @@ namespace Belle2 {
 
     return (row - 1) * m_numColumns + col;
   }
+
+
+  double TOPGeoPMT::getX(unsigned col) const
+  {
+    return (int)(m_numColumns + 1 - 2 * col) / 2.0 * getDx();
+  }
+
+  double TOPGeoPMT::getY(unsigned row) const
+  {
+    return (int)(2 * row - m_numRows - 1) / 2.0 * getDy();
+  }
+
 
   bool TOPGeoPMT::isConsistent() const
   {

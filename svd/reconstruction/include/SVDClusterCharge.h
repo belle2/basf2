@@ -52,7 +52,6 @@ namespace Belle2 {
 
         clusterNoise = TMath::Sqrt(clusterNoise);
 
-        B2INFO("cluster charge = " << clusterCharge << ", clusterNoise = " << clusterNoise);
         return clusterCharge / clusterNoise;
 
       }

@@ -199,7 +199,7 @@ namespace Belle2 {
     idSequence.push_back(p->getPDGCode());
 
     if (p->getNDaughters() == 0) {
-      idSequence.push_back(p->getMdstArrayIndex());
+      idSequence.push_back(p->getMdstSource());
     } else {
       // decorate number of daughters with flavor sign of particle
       idSequence.push_back(p->getPDGCode() / abs(p->getPDGCode()) * p->getNDaughters());

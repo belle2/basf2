@@ -423,8 +423,8 @@ namespace Belle2 {
     }
 
     /**
-     * Returns uncertaint on the invariant mass
-     * (requiers valid momentum error matrix)
+     * Returns uncertainty on the invariant mass
+     * (requires valid momentum error matrix)
      * @return mass error
      */
     //float getMassError() const;
@@ -642,7 +642,7 @@ namespace Belle2 {
     /** Apply a function to all daughters of this particle
      *
      * @param function function object to run on each daughter. If this
-     *    function returns true the processing will be stopped immeddiately.
+     *    function returns true the processing will be stopped immediately.
      * @param recursive if true go through all daughters of daughters as well
      * @param includeSelf if true also apply the function to this particle
      * @return true if the function returned true for any of the particles it
@@ -674,7 +674,7 @@ namespace Belle2 {
     std::vector<int> getMdstArrayIndices(EParticleSourceObject type) const;
 
     /**
-     * Returns true if final state ancessors of oParticle overlap
+     * Returns true if final state ancestors of oParticle overlap
      * @param oParticle pointer to particle
      * @return true if overlap, otherwise false
      */
@@ -792,7 +792,7 @@ namespace Belle2 {
      */
     float getExtraInfo(const std::string& name) const;
 
-    /** Return wether the extra info with the given name is set. */
+    /** Return whether the extra info with the given name is set. */
     bool hasExtraInfo(const std::string& name) const;
 
     /** Return the id of the associated ParticleExtraInfoMap or -1 if no map is set. */

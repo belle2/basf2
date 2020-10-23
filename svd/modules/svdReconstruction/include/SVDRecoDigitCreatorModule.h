@@ -60,27 +60,18 @@ namespace Belle2 {
       std::string m_storeRecoDigitsName;
       /** Name of the collection to use for the SVDClusters */
       std::string m_storeClustersName;
-      /** Name of the collection to use for the SVDTrueHits */
-      std::string m_storeTrueHitsName;
-      /** Name of the collection to use for the MCParticles */
-      std::string m_storeMCParticlesName;
-      /** Name of the relation between SVDShaperDigits and MCParticles */
-//      std::string m_relShaperDigitMCParticleName;
-      /** Name of the relation between SVDRecoDigits and MCParticles */
-      std::string m_relRecoDigitMCParticleName;
+
+      /** Name of the relation between SVDClusters and SVDRecoDigits*/
+      std::string m_relClusterToRecoName;
       /** Name of the relation between SVDRecoDigits and SVDShaperDigits */
-      std::string m_relRecoDigitShaperDigitName;
+      std::string m_relRecoToShaperName;
 
       /** Collection of SVDClusters */
       StoreArray<SVDCluster> m_storeClusters;
       /** Collection of SVDShaperDigits */
-      StoreArray<SVDShaperDigit> m_storeDigits;
+      StoreArray<SVDShaperDigit> m_storeShaper;
       /** Collection of SVDRecoDigits */
-      StoreArray<SVDRecoDigit> m_storeRecoDigits;
-      /** Collection of SVDTrueHits */
-      StoreArray<SVDTrueHit> m_storeTrueHits;
-      /** Collection of MCParticles */
-      StoreArray<MCParticle> m_storeMCParticles;
+      StoreArray<SVDRecoDigit> m_storeReco;
 
 // 2. Reconstruction
       /** if true takes the strip reconstruction configuration from the DB objects*/

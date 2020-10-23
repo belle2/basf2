@@ -161,8 +161,7 @@ class SVDClustersQuickCheck(basf2.Module):
             self.positionPullNew.Fill((d.getPosition() - truePos)/d.getPositionSigma())
 
     def terminate(self):
-        f = TFile("quicktestSVDClusterOldDefault_PR3.root", "RECREATE")
-        #        f = TFile("quicktestSVDCluster1kCoGErrProp.root", "RECREATE")
+        f = TFile("quicktestSVDClusterOldDefault.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
             hist.GetYaxis().SetTitle("sensor # + 0.5 is isU")
@@ -315,7 +314,7 @@ class SVDRecoDigitsQuickCheck(basf2.Module):
                                                                   d.getSensorID().getSensorNumber()+isU)
 
     def terminate(self):
-        f = TFile("quicktestSVDRecoDigitOldDefault_PR3.root", "RECREATE")
+        f = TFile("quicktestSVDRecoDigitOldDefault.root", "RECREATE")
         for hist in self.test:
             hist.GetXaxis().SetTitle("ladder #")
             hist.GetYaxis().SetTitle("sensor # + 0.5 is isU")

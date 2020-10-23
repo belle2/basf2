@@ -49,10 +49,6 @@ SVDRecoDigitCreatorModule::SVDRecoDigitCreatorModule() : Module(),
            "SVDRecoDigits collection name", string(""));
   addParam("Clusters", m_storeClustersName,
            "SVDCluster collection name", string(""));
-  addParam("SVDTrueHits", m_storeTrueHitsName,
-           "TrueHit collection name", string(""));
-  addParam("MCParticles", m_storeMCParticlesName,
-           "MCParticles collection name", string(""));
 
   // 2. Reconstruction
   addParam("timeAlgorithm6Samples", m_timeRecoWith6SamplesAlgorithm,
@@ -119,53 +115,31 @@ void SVDRecoDigitCreatorModule::beginRun()
 void SVDRecoDigitCreatorModule::initialize()
 {
   //Register collections
-  m_storeRecoDigits.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
+  m_storeReco.registerInDataStore(m_storeRecoDigitsName, DataStore::c_ErrorIfAlreadyRegistered);
   m_storeClusters.isRequired(m_storeClustersName);
-  m_storeDigits.isRequired(m_storeShaperDigitsName);
-  m_storeTrueHits.isOptional(m_storeTrueHitsName);
-  m_storeMCParticles.isOptional(m_storeMCParticlesName);
+  m_storeShaper.isRequired(m_storeShaperDigitsName);
 
-  /*
-  RelationArray relClusterDigits(m_storeClusters, m_storeDigits);
-  RelationArray relClusterTrueHits(m_storeClusters, m_storeTrueHits);
-  RelationArray relClusterMCParticles(m_storeClusters, m_storeMCParticles);
-  RelationArray relDigitTrueHits(m_storeDigits, m_storeTrueHits);
-  RelationArray relDigitMCParticles(m_storeDigits, m_storeMCParticles);
-
-  relClusterDigits.registerInDataStore();
-  //Relations to simulation objects only if the ancestor relations exist
-  if (relDigitTrueHits.isOptional())
-    relClusterTrueHits.registerInDataStore();
-  if (relDigitMCParticles.isOptional())
-    relClusterMCParticles.registerInDataStore();
+  RelationArray relRecoToShaper(m_storeReco, m_storeShaper);
+  relRecoToShaper.registerInDataStore();
+  RelationArray relClusterToReco(m_storeClusters, m_storeReco);
+  relClusterToReco.registerInDataStore();
 
   //Store names to speed up creation later
   m_storeClustersName = m_storeClusters.getName();
-  m_storeShaperDigitsName = m_storeDigits.getName();
-  m_storeTrueHitsName = m_storeTrueHits.getName();
-  m_storeMCParticlesName = m_storeMCParticles.getName();
+  m_storeShaperDigitsName = m_storeShaper.getName();
 
-  m_relClusterShaperDigitName = relClusterDigits.getName();
-  m_relClusterTrueHitName = relClusterTrueHits.getName();
-  m_relClusterMCParticleName = relClusterMCParticles.getName();
-  m_relShaperDigitTrueHitName = relDigitTrueHits.getName();
-  m_relShaperDigitMCParticleName = relDigitMCParticles.getName();
-  */
+  m_relRecoToShaperName = relRecoToShaper.getName();
+  m_relClusterToRecoName = relClusterToReco.getName();
+
   // Report:
   B2DEBUG(25, "SVDRecoDigitCreator Parameters (in default system unit, *=cannot be set directly):");
 
   B2DEBUG(25, " 1. COLLECTIONS:");
-  B2DEBUG(25, " -->  MCParticles:        " << DataStore::arrayName<MCParticle>(m_storeMCParticlesName));
   B2DEBUG(25, " -->  SVDShaperDigits:      " << DataStore::arrayName<SVDShaperDigit>(m_storeShaperDigitsName));
   B2DEBUG(25, " -->  SVDRecoDigits:      " << DataStore::arrayName<SVDRecoDigit>(m_storeRecoDigitsName));
   B2DEBUG(25, " -->  SVDClusters:        " << DataStore::arrayName<SVDCluster>(m_storeClustersName));
-  B2DEBUG(25, " -->  SVDTrueHits:        " << DataStore::arrayName<SVDTrueHit>(m_storeTrueHitsName));
-  /*  B2DEBUG(25, " -->  DigitMCRel:         " << m_relShaperDigitMCParticleName);
-  B2DEBUG(25, " -->  ClusterMCRel:       " << m_relClusterMCParticleName);
-  B2DEBUG(25, " -->  ClusterDigitRel:    " << m_relClusterShaperDigitName);
-  B2DEBUG(25, " -->  DigitTrueRel:       " << m_relShaperDigitTrueHitName);
-  B2DEBUG(25, " -->  ClusterTrueRel:     " << m_relClusterTrueHitName);
-  */
+  B2DEBUG(25, " -->  ClusterToRecoRel:    " << m_relClusterToRecoName);
+  B2DEBUG(25, " -->  RecoToShaperRel:    " << m_relRecoToShaperName);
 }
 
 
@@ -180,28 +154,24 @@ void SVDRecoDigitCreatorModule::event()
   StoreObjPtr<SVDEventInfo> eventinfo(m_svdEventInfoName);
   if (!eventinfo) B2ERROR("No SVDEventInfo!");
 
-  int numberOfAcquiredSamples = 0;
-  int daqMode = eventinfo->getModeByte().getDAQMode();
-  if (daqMode == 2) numberOfAcquiredSamples = 6;
-  if (daqMode == 1) numberOfAcquiredSamples = 3;
-  if (daqMode == 0) numberOfAcquiredSamples = 1;
+  int numberOfAcquiredSamples = eventinfo->getNSamples();
 
   int triggerBin = eventinfo->getModeByte().getTriggerBin();
 
-  int nDigits = m_storeDigits.getEntries();
+  int nDigits = m_storeShaper.getEntries();
   if (nDigits == 0)
     return;
 
-  m_storeRecoDigits.clear();
+  m_storeReco.clear();
 
   //loop over the SVDShaperDigits
   int i = 0;
 
   while (i < nDigits) {
 
-    VxdID sensorID = m_storeDigits[i]->getSensorID();
-    bool isU =  m_storeDigits[i]->isUStrip();
-    int cellID = m_storeDigits[i]->getCellID();
+    VxdID sensorID = m_storeShaper[i]->getSensorID();
+    bool isU =  m_storeShaper[i]->isUStrip();
+    int cellID = m_storeShaper[i]->getCellID();
     float averageNoiseInADC =  m_NoiseCal.getNoise(sensorID, isU, cellID);
     float averageNoiseInElectrons =  m_NoiseCal.getNoiseInElectrons(sensorID, isU, cellID);
 
@@ -215,10 +185,10 @@ void SVDRecoDigitCreatorModule::event()
 
 
     // build SVDTimeReconstuction and SVDChargeReconstruction classes with the SVDShaperDigit
-    SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(*m_storeDigits[i]);
+    SVDTimeReconstruction* timeReco = new SVDTimeReconstruction(*m_storeShaper[i]);
     timeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
     timeReco->setTriggerBin(triggerBin);
-    SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(*m_storeDigits[i]);
+    SVDChargeReconstruction* chargeReco = new SVDChargeReconstruction(*m_storeShaper[i]);
     chargeReco->setAverageNoise(averageNoiseInADC, averageNoiseInElectrons);
 
 
@@ -243,19 +213,55 @@ void SVDRecoDigitCreatorModule::event()
     // now go into FTSW reference frame
     time = time + eventinfo->getSVD2FTSWTimeShift(firstFrame);
 
-    //    B2INFO("time = (" << time << " ± " << timeError << ") ns");
-    //    B2INFO("charge = (" << charge << " ± " << chargeError << ") e-");
-
     //append the new SVDRecoDigit to the StoreArray
-    m_storeRecoDigits.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));
+    m_storeReco.appendNew(SVDRecoDigit(sensorID, isU, cellID, charge, chargeError, time, timeError, probabilities, chi2));
 
-    // write relations
-    // TO DO
+    // write relations SVDRecoDigit -> SVDShaperDigit
+    RelationArray relRecoToShaper(m_storeReco, m_storeShaper,
+                                  m_relRecoToShaperName);
+    if (relRecoToShaper) relRecoToShaper.clear();
+
+    int recoIndex = m_storeReco.getEntries() - 1;
+    int shaperIndex = i;
+    if (recoIndex != shaperIndex)
+      B2ERROR("incompatible SVDShaperDigit and sVDRecoDigit indexes, they are supposed to be the same, while: SVDRecoDigit Index = " <<
+              recoIndex << " != " << shaperIndex << " = SVDShaperDigit index");
+
+    vector<pair<unsigned int, float> > digit_weights;
+    digit_weights.reserve(1);
+    digit_weights.emplace_back(shaperIndex, 1.0);
+    relRecoToShaper.add(recoIndex, digit_weights.begin(), digit_weights.end());
+
 
     i++;
   } //exit loop on ShaperDigits
 
-  B2DEBUG(25, "Number of strips: " << m_storeRecoDigits.getEntries());
+  B2DEBUG(25, "Number of strips: " << m_storeReco.getEntries());
+
+  //write relations: SVDCluster -> SVDRecoDigit
+  //1. loop on clusters
+  //2. take related shaper digits
+  //3. build relation with reco digit with the same index, using reco charge as weight
+
+  RelationArray relClusterToReco(m_storeClusters, m_storeReco,
+                                 m_relClusterToRecoName);
+  if (relClusterToReco) relClusterToReco.clear();
+
+  for (const SVDCluster& cluster : m_storeClusters) {
+
+    int clusterIndex = cluster.getArrayIndex();
+
+    vector<pair<unsigned int, float> > digit_weights;
+    digit_weights.reserve(cluster.getSize());
+
+    RelationVector<SVDShaperDigit> theShaperDigits = DataStore::getRelationsWithObj<SVDShaperDigit>(&cluster);
+
+    for (int s = 0; s < (int)theShaperDigits.size(); s++)
+      digit_weights.push_back(make_pair(s, m_storeReco[s]->getCharge()));
+
+    relClusterToReco.add(clusterIndex, digit_weights.begin(), digit_weights.end());
+  }
+
 }
 
 

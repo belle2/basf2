@@ -7,6 +7,7 @@ import basf2 as b2
 import b2test_utils as b2tu
 import modularAnalysis as ma
 from stdPi0s import stdPi0s
+from stdV0s import stdKshorts
 from variables import variables as vm
 
 
@@ -71,6 +72,24 @@ def run_copylists():
     ma.copyLists("vpho:gh", ["vpho:g", "vpho:h"], path=pa)
     dump_3_v2nts(["g", "h", "gh"], path=pa)
 
+    # fifth test: check that it is considered whose daughter self-conjugated
+    # particles are if there are two charge-conjugated daughters
+    stdPi0s('all', path=pa)
+    stdKshorts(path=pa)
+    ma.reconstructDecay("tau+:KS0 -> pi+ K_S0:merged", "", dmID=0, path=pa)
+    ma.reconstructDecay("tau+:pi0 -> pi+ pi0:all", "", dmID=1, path=pa)
+    # the pi0 is the daughter of the tau-
+    ma.reconstructDecay("vpho:KSpi0_with_duplicates -> tau+:KS0 tau-:pi0", "", path=pa, chargeConjugation=False)
+    # the pi0 is the daughter of the tau+
+    ma.reconstructDecay("vpho:pi0KS_with_duplicates -> tau-:KS0 tau+:pi0", "", path=pa, chargeConjugation=False)
+    # some of the candidates are duplicates that should be eliminated
+    ma.copyList("vpho:KS", "vpho:KSpi0_with_duplicates", path=pa)
+    ma.copyList("vpho:pi0", "vpho:pi0KS_with_duplicates", path=pa)
+    # now both lists individually only contain unique candidates and merging
+    # them should just be the sum
+    ma.copyLists("vpho:KSpi0", ["vpho:KS", "vpho:pi0"], path=pa)
+    dump_3_v2nts(["KS", "pi0", "KSpi0"], path=pa)
+
     b2tu.safe_process(pa, 1)
 
 
@@ -103,6 +122,11 @@ class TestCopyLists(unittest.TestCase):
         """Self-conjugated particles can be daughters of both charge-conjugated mother particles.
         Those multiple candidates are no duplicates and copying the particle list should not remove them."""
         self.assertEqual(self._count("g") + self._count("h"), self._count("gh"))
+
+    def test_different_association_of_neutrals_same_number_of_daughters(self):
+        """Different self-conjugated particles are daughters of charge-conjugated mother particles.
+        The two mother particles have the same amount of daughters."""
+        self.assertEqual(self._count("KS") + self._count("pi0"), self._count("KSpi0"))
 
 if __name__ == "__main__":
     with b2tu.clean_working_directory():

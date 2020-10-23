@@ -196,7 +196,7 @@ namespace Belle2 {
     /**
      * Returns the X axis label of the prior
      * @param particle the charged stable type of the prior's species
-     * @return the X axis label for the prior stable of the selected particle species
+     * @return the X axis label for the prior table of the selected particle species
      */
     std::string getXAxisLabel(const Const::ChargedStable& particle) const
     {
@@ -208,7 +208,7 @@ namespace Belle2 {
     /**
      * Returns the Y axis label of the prior
      * @param particle the charged stable type of the prior's species
-     * @return the Y axis label for the prior stable of the selected particle species
+     * @return the Y axis label for the prior table of the selected particle species
      */
     std::string getYAxisLabel(const Const::ChargedStable& particle) const
     {

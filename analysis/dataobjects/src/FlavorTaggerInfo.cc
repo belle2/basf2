@@ -212,11 +212,6 @@ std::vector<MCParticle*> FlavorTaggerInfo::getMCParticleMother() const
 
 std::vector<Track*> FlavorTaggerInfo::getTracks() const
 {
-  //TODO what is this loop?
-  for (auto& track : m_tracks) {
-    if (track) {
-    }
-  }
   return m_tracks;
 }
 

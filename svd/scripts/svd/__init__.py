@@ -10,12 +10,14 @@ def add_svd_new_reconstruction(path, isROIsimulation=False):
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
+        recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
         clusterName = '__ROIsvdClusters'
         shaperDigitsName = ""
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         clusterizerName = 'SVDClusterizer'
+        recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
         clusterName = ""
         shaperDigitsName = ""
@@ -40,6 +42,13 @@ def add_svd_new_reconstruction(path, isROIsimulation=False):
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
+
+    # Add SVDRecoDigit creator module
+    # useful for DQM and validation
+    if recocreatorName not in [e.name() for e in path.modules()]:
+        recoDigitCreator = register_module('SVDRecoDigitCreator')
+        recoDigitCreator.set_name(recocreatorName)
+        main.add_module(recoDigitCreator)
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, useNN=False, useCoG=True, applyMasking=False):

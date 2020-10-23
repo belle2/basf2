@@ -80,9 +80,11 @@ def command_condor(args, backend_args=None):
                                  "path_prefix": args.path_prefix
                                 }
     command_line_backend_args = {key: value for key, value in command_line_backend_args.items() if value is not None}
+    print('This is the comandl ine', command_line_backend_args)
     if backend_args is None:
         backend_args = {}
     backend_args = {**backend_args, **command_line_backend_args}
+    print('This got sent in', backend_args)
     backend = HTCondor(backend_args=backend_args)  # Sets the backend defaults (can be overriden at the Job level)
     backend.global_job_limit = args.global_job_limit
     backend.sleep_between_submission_checks = args.submission_check_heartbeat

@@ -538,7 +538,7 @@ class Job:
         Path objects.
         """
         with open(Path(self.working_dir, _input_data_file_path), mode="w") as input_data_file:
-            json.dump([Path(path_prefix, file_path).as_posix() for file_path in self.input_files], input_data_file, indent=2)
+            json.dump([path_prefix+file_path.as_posix() for file_path in self.input_files], input_data_file, indent=2)
 
     def copy_input_sandbox_files_to_working_dir(self):
         """
@@ -1149,7 +1149,9 @@ class Batch(Backend):
         # Make sure the working directory of the job is created
         job.working_dir.mkdir(parents=True, exist_ok=True)
         job.copy_input_sandbox_files_to_working_dir()
-        job.dump_input_data()
+        job_backend_args = {**self.backend_args, **job.backend_args}
+        path_prefix = job_backend_args.get("path_prefix", "")
+        job.dump_input_data(path_prefix=path_prefix)
         # Make submission file if needed
         batch_submit_script_path = self.get_batch_submit_script_path(job)
         self._make_submit_file(job, batch_submit_script_path)

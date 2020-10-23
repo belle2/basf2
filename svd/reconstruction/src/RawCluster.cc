@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/calibration/SVDPulseShapeCalibrations.h>
+#include <svd/reconstruction/SVDMaxSumAlgorithm.h>
 
 using namespace std;
 
@@ -33,7 +34,6 @@ namespace Belle2 {
       , m_seedSNR(-1)
       , m_seedIndex(-1)
       , m_seedInternalIndex(-1)
-      , m_strips(4)
       , m_storeShaperDigitsName("SVDShaperDigits")
     {m_strips.clear();};
 
@@ -46,11 +46,10 @@ namespace Belle2 {
       , m_seedSNR(-1)
       , m_seedIndex(-1)
       , m_seedInternalIndex(-1)
-      , m_strips(4)
       , m_storeShaperDigitsName(storeShaperDigitsName)
     {m_strips.clear();};
 
-    bool RawCluster::add(VxdID vxdID, bool isUside, struct  StripInRawCluster& aStrip)
+    bool RawCluster::add(VxdID vxdID, bool isUside, struct StripInRawCluster& aStrip)
     {
 
       bool added = false;
@@ -78,7 +77,7 @@ namespace Belle2 {
 
         if (aStrip.maxSample > m_seedMaxSample) {
           m_seedMaxSample = aStrip.maxSample;
-          m_seedSNR = (float)aStrip.maxSample / aStrip.noise;
+          m_seedSNR = (float)aStrip.maxSample / (float)aStrip.noise;
           m_seedInternalIndex = m_strips.size() - 1;
           m_seedIndex = aStrip.shaperDigitIndex;
         }
@@ -139,18 +138,10 @@ namespace Belle2 {
       //take the cluster samples
       Belle2::SVDShaperDigit::APVFloatSamples clsSamples = getClsSamples(inElectrons);
 
-      //Max Sum selection
-      if (clsSamples.size() < 3) B2ERROR("APV25 samples less than 3!?");
-      std::vector<float> Sum2bin(clsSamples.size() - 1, 0);
-      for (int iBin = 0; iBin < static_cast<int>(clsSamples.size()) - 1; ++iBin)
-        Sum2bin.at(iBin) = clsSamples.at(iBin) + clsSamples.at(iBin + 1);
-      auto itSum = std::max_element(std::begin(Sum2bin), std::end(Sum2bin));
-      int ctrFrame = std::distance(std::begin(Sum2bin), itSum);
-      if (ctrFrame == 0) ctrFrame = 1;
-      std::vector<float> clustered3s = {clsSamples.at(ctrFrame - 1), clsSamples.at(ctrFrame), clsSamples.at(ctrFrame + 1)};
-
-      return std::make_pair(ctrFrame - 1, clustered3s);
+      SVDMaxSumAlgorithm maxSum = SVDMaxSumAlgorithm(clsSamples);
+      return std::make_pair(maxSum.getFirstFrame(), maxSum.getSelectedSamples());
 
     }
+
   }  //SVD namespace
 } //Belle2 namespace

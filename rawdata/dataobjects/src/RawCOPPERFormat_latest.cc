@@ -217,7 +217,7 @@ int RawCOPPERFormat_latest::GetOffset1stFINESSE(int n)
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  return NULL;
+  return 0;
 }
 
 
@@ -228,7 +228,7 @@ int RawCOPPERFormat_latest::GetOffset2ndFINESSE(int n)
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  return NULL;
+  return 0;
 }
 
 
@@ -239,7 +239,7 @@ int RawCOPPERFormat_latest::GetOffset3rdFINESSE(int n)
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  return NULL;
+  return 0;
 }
 
 int RawCOPPERFormat_latest::GetOffset4thFINESSE(int n)
@@ -249,7 +249,7 @@ int RawCOPPERFormat_latest::GetOffset4thFINESSE(int n)
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("[DEBUG] %s\n", err_buf);
   B2FATAL(err_buf);
-  return NULL;
+  return 0;
 }
 
 void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&input_val)[MAX_PCIE40_CH] ,

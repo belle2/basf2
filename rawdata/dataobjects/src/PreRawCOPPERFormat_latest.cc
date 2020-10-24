@@ -384,8 +384,8 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   return;
 }
 
-unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_node_id, unsigned int prev_eve32,
-    unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
+unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int /*m_node_id*/, unsigned int /*prev_eve32*/,
+    unsigned int /*prev_exprunsubrun_no*/, unsigned int* /*cur_exprunsubrun_no*/)
 {
   char err_buf[500];
   sprintf(err_buf, "[FATAL] This function is not supported. Exiting...: \n%s %s %d\n",
@@ -613,11 +613,11 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
 
 }
 
-int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
-                                                int* detector_buf_1st, int nwords_1st,
-                                                int* detector_buf_2nd, int nwords_2nd,
-                                                int* detector_buf_3rd, int nwords_3rd,
-                                                int* detector_buf_4th, int nwords_4th,
+int* PreRawCOPPERFormat_latest::PackDetectorBuf(int* /*packed_buf_nwords*/,
+                                                int* /*detector_buf_1st*/, int /*nwords_1st*/,
+                                                int* /*detector_buf_2nd*/, int /*nwords_2nd*/,
+                                                int* /*detector_buf_3rd*/, int /*nwords_3rd*/,
+                                                int* /*detector_buf_4th*/, int /*nwords_4th*/,
                                                 RawCOPPERPackerInfo rawcpr_info)
 {
   char err_buf[500];

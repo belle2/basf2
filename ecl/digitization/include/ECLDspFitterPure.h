@@ -15,9 +15,9 @@
 namespace Belle2 {
   namespace ECL {
     double func(int i, int ifine,
-                EclConfigurationPure::signalsamplepure_t& signal);
+                const EclConfigurationPure::signalsamplepure_t& signal);
     double func1(int i, int ifine,
-                 EclConfigurationPure::signalsamplepure_t& signal);
+                 const EclConfigurationPure::signalsamplepure_t& signal);
     void initParams(EclConfigurationPure::fitparamspure_t& params,
                     EclConfigurationPure::signalsamplepure_t& signal);
     void DSPFitterPure(const EclConfigurationPure::fitparamspure_t& params,

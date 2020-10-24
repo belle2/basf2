@@ -224,37 +224,37 @@ namespace Belle2 {
     /**
      * Array with tabulated signal waveform.
      */
-    void setF(std::vector<short int>& src) { packCoefVector(src, m_f); }
+    void setF(const std::vector<short int>& src) { packCoefVector(src, m_f); }
     /**
      * Array with tabulated derivative of signal waveform
      */
-    void setF1(std::vector<short int>& src) { packCoefVector(src, m_f1); }
+    void setF1(const std::vector<short int>& src) { packCoefVector(src, m_f1); }
     /**
      * Array FG31, used to estimate signal amplitude.
      * Calculated from F and covariance matrix.
      */
-    void setF31(std::vector<short int>& src) { packCoefVector(src, m_fg31); }
+    void setF31(const std::vector<short int>& src) { packCoefVector(src, m_fg31); }
     /**
      * Array FG32, used to estimate A * delta_t.
      * (A -- amplitude, delta_t -- time shift for linearization)
      *
      * Calculated from F and covariance matrix.
      */
-    void setF32(std::vector<short int>& src) { packCoefVector(src, m_fg32); }
+    void setF32(const std::vector<short int>& src) { packCoefVector(src, m_fg32); }
     /**
      * Array FG33, used to estimate pedestal height in signal.
      *
      * Calculated from F and covariance matrix.
      */
-    void setF33(std::vector<short int>& src) { packCoefVector(src, m_fg33); }
+    void setF33(const std::vector<short int>& src) { packCoefVector(src, m_fg33); }
     /**
      * Alternative for FG31 for signals with small amplitude.
      */
-    void setF41(std::vector<short int>& src) { packCoefVector(src, m_fg41); }
+    void setF41(const std::vector<short int>& src) { packCoefVector(src, m_fg41); }
     /**
      * Alternative for FG33 for signals with small amplitude.
      */
-    void setF43(std::vector<short int>& src) { packCoefVector(src, m_fg43); }
+    void setF43(const std::vector<short int>& src) { packCoefVector(src, m_fg43); }
 
     /** Sets major version of DSP coefficients */
     void setverMaj(unsigned char val) { m_verMaj = val; }

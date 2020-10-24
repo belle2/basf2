@@ -94,8 +94,8 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
   vector<float> t_offsets_prev;  // previous time offsets
 
   // temp copies of offsets
-  vector<float> t_offsets_temp;
-  vector<float> t_offsets_unc_temp;
+  //vector<float> t_offsets_temp;
+  //vector<float> t_offsets_unc_temp;
 
 
   int minNumEntries = 40;

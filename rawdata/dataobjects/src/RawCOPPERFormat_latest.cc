@@ -265,7 +265,7 @@ void RawCOPPERFormat_latest::CompareHeaderValue(int n, const unsigned int (&inpu
     if (GetFINESSENwords(n, i) > 0) {
 
       int same_flag = 0;
-      for (int j = 0; j < summary_table.size(); j++) {
+      for (unsigned j = 0; j < summary_table.size(); ++j) {
         if (input_val[i] == summary_table.at(j).at(2)) {
           summary_table.at(j).at(1)++;
           same_flag = 1;

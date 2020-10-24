@@ -26,7 +26,7 @@ namespace Belle2 {
    * basf2 classes. This scheme has been chosen partially because it was already used by the ContinuumSuppression, and partially
    * because different modules may need to access the very same core utilities.
    *
-   * The steering parameters of the module mostly consist in flags that enable the user to switch on or off the calculation
+   * The steering parameters of the module mostly consist of flags that enable the user to switch on or off the calculation
    * of different quantities.
    */
   class EventShapeCalculatorModule : public Module {

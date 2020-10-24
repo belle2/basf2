@@ -32,7 +32,7 @@ namespace Belle2 {
     /** destructor  */
     virtual ~CurlTaggerModule() override;
 
-    /**  initialse */
+    /**  initialise */
     virtual void initialize() override;
 
     /**  begin run - unused*/

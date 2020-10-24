@@ -43,10 +43,10 @@ namespace Belle2 {
      */
     RestOfEventBuilderModule();
 
-    /** Overriden initialize method */
+    /** Overridden initialize method */
     virtual void initialize() override;
 
-    /** Overriden event method */
+    /** Overridden event method */
     virtual void event() override;
     /** create usual (host) ROE */
     void createROE();

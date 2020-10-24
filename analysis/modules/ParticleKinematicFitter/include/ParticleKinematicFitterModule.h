@@ -132,7 +132,7 @@ namespace Belle2 {
       bool fillFitParticles(Particle* mother, std::vector<Particle*>& particleChildren);
 
       /**
-       * Added four vectors and calcuated a covariance matrix for a combined particles
+       * Added four vectors and calculated a covariance matrix for a combined particles
        * @param mother pointer to particle
       */
       bool AddFour(Particle* mother);

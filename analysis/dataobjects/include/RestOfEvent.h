@@ -150,7 +150,7 @@ namespace Belle2 {
       /**
        *  Print mask and selected particles associated to the mask
        */
-      void print()
+      void print() const
       {
         B2INFO("Mask name: " + m_name + " originating from " + m_origin);
         if (!m_isValid) {

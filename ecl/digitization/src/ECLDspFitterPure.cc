@@ -35,7 +35,7 @@ double Belle2::ECL::func1(int i, int ifine,
 }
 
 void Belle2::ECL::initParams(EclConfigurationPure::fitparamspure_t& params,
-                             EclConfigurationPure::signalsamplepure_t& signal)
+                             const EclConfigurationPure::signalsamplepure_t& signal)
 {
 
   for (int i = 0; i < 16; i++) {

@@ -36,7 +36,7 @@ namespace Belle2 {
      \param digits List of ECLCalDigits
      \param weights List of weights
      */
-    double computeEnergySum(std::vector<ECLCalDigit>& digits, std::vector<double>& weights);
+    double computeEnergySum(const std::vector<ECLCalDigit>& digits, std::vector<double>& weights);
 
   } // namespace ECL
 } // namespace Belle2

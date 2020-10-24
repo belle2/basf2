@@ -163,12 +163,13 @@ void ECLBackgroundModule::initialize()
 
   REG_HISTOGRAM
 
-  if (m_doARICH)  B2INFO("ECLBackgroundModule: ARICH plots are being produced");
-
-  // Initialize variables
+  if (m_doARICH)  {
+    B2INFO("ECLBackgroundModule: ARICH plots are being produced");
+    // Initialize variables
 #ifdef DOARICH
-  if (m_doARICH) m_arichgp = ARICHGeometryPar::Instance();
+    m_arichgp = ARICHGeometryPar::Instance();
 #endif
+  }
 
   m_nEvent = 0;
   BuildECL();

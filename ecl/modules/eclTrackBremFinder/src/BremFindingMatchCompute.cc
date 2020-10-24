@@ -28,7 +28,6 @@ bool BremFindingMatchCompute::isMatch()
 
   auto fitted_pos = fitted_state.getPos();
   auto fitted_mom = fitted_state.getMom();
-  //auto fitted_dir = fitted_state.getDir(); // not used now
 
   auto cov = fitted_state.get6DCov();
   const double err_px = cov[3][3];

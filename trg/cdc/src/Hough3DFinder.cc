@@ -243,8 +243,10 @@ namespace Belle2 {
     TRGDebug::enterStage("3D finder");
 
     // For saving to root file.
-    if (m_makeRootFile) m_mDouble["iSave"] = 0;
-    if (m_makeRootFile) HandleRoot::initializeEvent(m_mEventTVectorD, m_mTClonesArray);
+    if (m_makeRootFile) {
+      m_mDouble["iSave"] = 0;
+      HandleRoot::initializeEvent(m_mEventTVectorD, m_mTClonesArray);
+    }
 
     // Get event number.
     StoreObjPtr<EventMetaData> eventMetaDataPtr;

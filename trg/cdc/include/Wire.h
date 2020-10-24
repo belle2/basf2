@@ -106,7 +106,7 @@ namespace Belle2 {
     const TRGCDCWireHitMC* hit(TRGCDCWireHitMC*);
 
     /// set signal |= newSignal
-    void addSignal(TRGSignal& newSignal);
+    void addSignal(const TRGSignal& newSignal);
 
   public:// TRG
 
@@ -152,7 +152,7 @@ namespace Belle2 {
 
   inline
   void
-  TRGCDCWire::addSignal(TRGSignal& newSignal)
+  TRGCDCWire::addSignal(const TRGSignal& newSignal)
   {
     _signal |= newSignal;
   }

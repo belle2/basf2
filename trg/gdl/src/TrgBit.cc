@@ -260,7 +260,7 @@ TrgBit::printPreScaleValues(void) const
 void
 TrgBit::printConf(void) const
 {
-  printf("TrgBit class: exp(%d), run(%d), nconf_psnm(%d), nconf_ftdl(%d), nconf_input(%d), n_input(%d), n_output(%d)\n", _exp, _run,
+  printf("TrgBit class: exp(%d), run(%d), nconf_psnm(%u), nconf_ftdl(%u), nconf_input(%u), n_input(%u), n_output(%u)\n", _exp, _run,
          nconf_psnm, nconf_ftdl, nconf_input, n_input, n_output);
 }
 

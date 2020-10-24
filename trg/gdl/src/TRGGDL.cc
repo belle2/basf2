@@ -356,17 +356,17 @@ namespace Belle2 {
 
       if (_algFromDB) {
 
-        int L1Summary = 0;
-        int L1Summary_psnm = 0;
+        //int L1Summary = 0; Not used now
+        //int L1Summary_psnm = 0; Not used now
 
         for (int i = 0; i < N_OutputBits; i++) {
           bool ftdl_fired = isFiredFTDL(_inpBits, db_algs->getalg(i));
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
-            L1Summary |= (1 << i);
+            //L1Summary |= (1 << i);
             if (doprescale(m_PrescalesDB->getprescales(i))) {
-              L1Summary_psnm |= (1 << i);
+              //L1Summary_psnm |= (1 << i);
               psnm_fired = true;
             }
           }
@@ -391,8 +391,8 @@ namespace Belle2 {
 
       } else {
 
-        int L1Summary = 0;
-        int L1Summary_psnm = 0;
+        //int L1Summary = 0; currently not used
+        //int L1Summary_psnm = 0; not used now
         std::string str;
         std::vector<std::string> algs;
         std::ifstream isload(_algFilePath.c_str(), std::ios::in);
@@ -408,9 +408,9 @@ namespace Belle2 {
           bool psnm_fired = false;
           _ftdBits.push_back(ftdl_fired);
           if (ftdl_fired) {
-            L1Summary |= (1 << i);
+            //L1Summary |= (1 << i);
             if (doprescale(m_PrescalesDB->getprescales(i))) {
-              L1Summary_psnm |= (1 << i);
+              //L1Summary_psnm |= (1 << i);
               psnm_fired = true;
             }
           }

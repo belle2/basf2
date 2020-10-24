@@ -2292,7 +2292,7 @@ namespace Belle2 {
       // relation to SegmentHits
       vector<TRGCDCLink*> links = track2D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
-        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        const TRGCDCSegment* segment = static_cast<const TRGCDCSegment*>(links[its]->cell());
         const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
         for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
           track->addRelationTo(storeHits[ihit]);
@@ -2312,7 +2312,7 @@ namespace Belle2 {
       // relation to SegmentHits
       vector<TRGCDCLink*> links = track2D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
-        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        const TRGCDCSegment* segment = static_cast<const TRGCDCSegment*>(links[its]->cell());
         const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
         for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
           track->addRelationTo(storeHits[ihit]);
@@ -2338,7 +2338,7 @@ namespace Belle2 {
       // relation to SegmentHits
       vector<TRGCDCLink*> links = track3D->links();
       for (unsigned its = 0; its < links.size(); ++its) {
-        TRGCDCSegment* segment = (TRGCDCSegment*)links[its]->cell();
+        const TRGCDCSegment* segment = static_cast<const TRGCDCSegment*>(links[its]->cell());
         const vector<const CDCTriggerSegmentHit*> storeHits = segment->storeHits();
         for (unsigned ihit = 0; ihit < storeHits.size(); ++ihit) {
           track->addRelationTo(storeHits[ihit]);

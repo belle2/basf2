@@ -268,7 +268,7 @@ namespace Belle2 {
         StoreArray<CDCTriggerUnpacker::NNBitStream>* bitsNN,
         unsigned foundtime,
         unsigned iTracker,
-        const CDCTriggerNeuroConfig::B2FormatLine b2line)
+        const CDCTriggerNeuroConfig::B2FormatLine& b2line)
       {
         if (int(b2line.offset + foundtime) >= 0 &&
             int(b2line.offset + foundtime) <= bitsNN->getEntries()) {

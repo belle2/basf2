@@ -62,7 +62,7 @@ namespace Belle2 {
     void regions(TRGCDCHoughPlane& hp, const unsigned threshold) const;
 
     /// Kaiyu's logic. Finds peaks from nested patterns.
-    void p1p2Methode(TRGCDCHoughPlane& hp,
+    void p1p2Methode(const TRGCDCHoughPlane& hp,
                      const unsigned threshold,
                      std::vector<std::vector<unsigned>>& peaks) const;
 

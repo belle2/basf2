@@ -216,12 +216,12 @@ void TRGRAWDATAModule::initialize()
   }
   if (m_print_dbmap) {
 
-    const int nword_header = m_unpacker->get_nword_header();
-    const int n_clocks     = m_unpacker->getnClks();
-    const int nBits        = m_unpacker->getnBits();
+    //const int nword_header = m_unpacker->get_nword_header(); //not used for now
+    //const int n_clocks     = m_unpacker->getnClks(); //not used for now
+    //const int nBits        = m_unpacker->getnBits(); //not used for now
     const int n_leafs      = m_unpacker->getnLeafs();
     const int n_leafsExtra = m_unpacker->getnLeafsExtra();
-    const int conf         = m_unpacker->getconf();
+    //const int conf         = m_unpacker->getconf(); //not used for now
 
     int aBitMap[320][2] = {0};
     int aBitMap_extra[100][3] = { -1};
@@ -338,7 +338,7 @@ void TRGRAWDATAModule::event()
         if (0x15000001 == cprid && hslb == 0) {
 
           if (m_mydebug) {
-            printf("aa:GDL start: 0x%x%c exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d)\n",
+            printf("aa:GDL start: 0x%x%c exp(%d), run(%d), eve(%u), eve(0x%x), nword(%d)\n",
                    cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
           }
 
@@ -353,14 +353,14 @@ void TRGRAWDATAModule::event()
 
           if (nword < 3) {
             cntr_nwe_badnwd[e_gdl]++;
-            printf("ab:GDL(0x%x%c) exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d), ",
+            printf("ab:GDL(0x%x%c) exp(%d), run(%d), eve(%u), eve(0x%x), nword(%d), ",
                    cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
             printf("buf0(0x%x), buf1(0x%x), buf2(0x%x)\n", buf0, buf1, buf2);
             continue;
           }
 
           if (nword < 8) {
-            printf("ad:GDL(0x%x%c) exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d)\n",
+            printf("ad:GDL(0x%x%c) exp(%d), run(%d), eve(%u), eve(0x%x), nword(%d)\n",
                    cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
             cntr_nwe_badnwd[e_gdl]++;
           } else {
@@ -398,10 +398,10 @@ void TRGRAWDATAModule::event()
               diag |= (lastdd != 0xdd)       ? 4 : 0;
               diag |= (gdlhdrcnttrg20 != eve20) ? 8 : 0;
               diag |= !(eve16 == cnttrg_data_16 + 1 || (eve16 == 0 && cnttrg_data_16 == 0xffff)) ? 16 : 0;
-              printf("ae:GDL(0x%x%c) exp(%d), run(%d), evedaq(%d=0x%x), gdlhdrcnttrg20(%d,0x%x), "
-                     "cnttrg_data16(%d=0x%x), l1rvc(%d)-lastrvc(%d)=%d, nword(%d), diag(%d)\n",
+              printf("ae:GDL(0x%x%c) exp(%d), run(%d), evedaq(%u=0x%x), gdlhdrcnttrg20(%u,0x%x), "
+                     "cnttrg_data16(%u=0x%x), l1rvc(%u)-lastrvc(%u)=%u, nword(%d), diag(%u)\n",
                      cprid, 'a' + hslb, _exp, _run, _eve, _eve, gdlhdrcnttrg20, gdlhdrcnttrg20,
-                     cnttrg_data_16, cnttrg_data_16, gdlrvc12, last_rvc, gdlrvc12 - last_rvc, nword, diag);
+                     cnttrg_data_16, cnttrg_data_16, gdlrvc12, last_rvc, gdlrvc12 - last_rvc, nword, diag); //TODO can the difference be negative?
               printf("\n");
               cntr_nwn_badtrg[e_gdl]++;
             } else {
@@ -487,18 +487,18 @@ void TRGRAWDATAModule::event()
         if (nword < 3) {
           // err
           cntr_nwe_badnwd[e_mdl]++;
-          printf("ah:%s(0x%x%c) exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d), ",
+          printf("ah:%s(0x%x%c) exp(%d), run(%d), eve(%u), eve(0x%x), nword(%d), ",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
           printf("buf0(0x%x), buf1(0x%x), buf2(0x%x)\n", buf0, buf1, buf2);
           continue;
         } else if (nword == _hdr_nwd) {
           // header-only event
           if (gdlrvc12 != buf2rvc12) {
-            printf("ai:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
+            printf("ai:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%d), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
                    moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, gdlrvc12, buf2rvc12);
             cntr_nw3_badrvc[e_mdl]++;
           } else if (eve20 != buf2cnttrg20) {
-            printf("aj:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x)\n",
+            printf("aj:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%d), cnttrg20(0x%x)\n",
                    moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20);
             cntr_nw3_badtrg[e_mdl]++;
           } else if ((_eve % _scale) == 0) {
@@ -509,7 +509,7 @@ void TRGRAWDATAModule::event()
           continue;
         } else if (nword != _nwd) {
           // err
-          printf("bo:wrong nword: %s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), buf0(0x%x), buf2(0x%x)\n",
+          printf("bo:wrong nword: %s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%d), buf0(0x%x), buf2(0x%x)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf0, buf2);
           cntr_nwe_badnwd[e_mdl]++;
           continue;
@@ -531,7 +531,7 @@ void TRGRAWDATAModule::event()
         unsigned buf5_lsb16 = ((buf5 >> 16) & 0xffff);
 
         if (m_mydebug) {
-          printf("af:Debug0: %s(0x%x%c) exp(%d), run(%d), eve(%d), eve(0x%x), nword(%d)\n",
+          printf("af:Debug0: %s(0x%x%c) exp(%d), run(%d), eve(%u), eve(0x%x), nword(%d)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword);
         }
 
@@ -639,20 +639,20 @@ void TRGRAWDATAModule::event()
         h_0->SetBinContent(4 * e_mdl + 2, _nclk, datacnttrg32);
         h_0->SetBinContent(4 * e_mdl + 3, _nclk, buf2rvc12);
         if (gdlrvc12 != buf2rvc12) {
-          printf("ba:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
+          printf("ba:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%d), gdlrvc12(0x%x), buf2rvc12(0x%x)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, gdlrvc12, buf2rvc12);
           cntr_nwn_badrvc[e_mdl]++;
           something_bad = true;
         }
         if (buf3dddd == 0xbbbb) {
           cntr_nwn_badbbb[e_mdl]++;
-          printf("bv:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
+          printf("bv:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
           something_bad = true;
         }
         if (buf3dddd != 0xdddd) {
           cntr_nwn_badddd[e_mdl]++;
-          printf("bb:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
+          printf("bb:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
                  moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
           something_bad = true;
         }
@@ -662,7 +662,7 @@ void TRGRAWDATAModule::event()
                 (m_cpr_3d0 <= cprid && cprid <= m_cpr_3d3)
               )
              ) {
-            printf("bc:%s(0x%x%c) exp(%d), run(%d), eve(%d,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
+            printf("bc:%s(0x%x%c) exp(%d), run(%d), eve(%u,0x%x), nword(%d), cnttrg20(0x%x), dddd(0x%x), datacnttrg32(0x%x)\n",
                    moduleNames[e_mdl], cprid, 'a' + hslb, _exp, _run, _eve, _eve, nword, buf2cnttrg20, buf3dddd, datacnttrg32);
             cntr_nwn_badtrg[e_mdl]++;
             something_bad = true;

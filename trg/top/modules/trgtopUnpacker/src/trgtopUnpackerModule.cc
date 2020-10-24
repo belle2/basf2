@@ -170,7 +170,6 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   //  }
 
   // various test patterns will be used to check the data
-  /* cppcheck-suppress variableScope */
   unsigned int testPattern;
 
   int revoClockLast = -1;
@@ -179,8 +178,6 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
   // error counter for possible data corruption
   unsigned int errorCountEvent = 0;
 
-  // need to know when a new decision is made (there could be more than one TOP L1 timing decision stored in the same B2L buffer)
-  int t0CombinedDecisionLast = -1;
 
   // check if this event's buffer is a dummy buffer
   int counterDummyWindows = 0;
@@ -320,6 +317,9 @@ void TRGTOPUnpackerModule::fillTreeTRGTOP(int* rdat)
 
   // events with no buffer (i.e. no payload), empty (i.e. dummy) windows and presumably corrupted events are NOT analyzed
   if (performBufferAnalysis) {
+
+    // need to know when a new decision is made (there could be more than one TOP L1 timing decision stored in the same B2L buffer)
+    int t0CombinedDecisionLast = -1;
 
     // Loop over windows in B2L buffer and locate all unique TOP L1 decisions
     for (int iWindowProvisional = 0; iWindowProvisional < numberOfWindows; iWindowProvisional++) {

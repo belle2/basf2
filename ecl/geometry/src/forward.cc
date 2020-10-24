@@ -31,6 +31,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   G4LogicalVolume* top = &_top;
 
   const bool sec = 0;
+  // cppcheck-suppress knownConditionTrueFalse
   const double phi0 = 0, dphi = sec ? M_PI / 16 : 2 * M_PI;
 
   const bool b_inner_support_ring = 1;

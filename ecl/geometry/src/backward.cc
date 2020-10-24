@@ -26,6 +26,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
   G4LogicalVolume* top = &_top;
 
   const bool sec = 0;
+  // cppcheck-suppress knownConditionTrueFalse
   const double phi0 = 0, dphi = sec ? M_PI / 16 : 2 * M_PI;
 
   const bool b_inner_support_ring = 1;
@@ -226,6 +227,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
                                 0);
   if (overlap) gpv1->CheckOverlaps(npoints);
 
+  // cppcheck-suppress knownConditionTrueFalse
   if (b_septum_wall) {
     double d = 5, dr = 0.001;
     Point_t vin[] = {{3., 474.9}, {434. - zsep, 702.27 - tand(27.81)* zsep}, {434 - zsep, 1496 - 20 - d - dr}, {434 - 214.8 - d / tand(52.90), 1496 - 20 - d - dr}, {3, 1190.2 - dr}};
